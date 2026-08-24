@@ -18,14 +18,13 @@ import argparse, json, os, re, subprocess, sys, time, urllib.request
 from datetime import datetime
 from pathlib import Path
 
-DEVICE = "C3FBA9DE-4A60-555B-A65F-80D6809A275B"
+DEVICE = os.environ.get("ATV_DEVICE", "")  # devicectl device name or UDID — REQUIRED
 BUNDLE = os.environ.get("ATV_BUNDLE", "com.example.appname.tvos")
 OCR = "/tmp/awocr"
 SHOT_EVERY = 4.0   # 4K captures pressure the device's screenshot daemon;
                    # 2.5s coincided with jetsam events on ~every run
 PYATV = "/tmp/pyatv-venv/bin/atvremote"
-PYATV_ARGS = ["--address", "10.0.0.223", "--id", "7A:3F:0C:4E:20:1E",
-              "--protocol", "companion"]
+PYATV_ARGS = [a for a in ["--address", os.environ.get("ATV_PYATV_ADDRESS", ""), "--id", os.environ.get("ATV_PYATV_ID", "")] if a]
 
 
 def sh(cmd, timeout=90, **kw):
@@ -37,7 +36,7 @@ def resolve_card(title):
     Girl Friday lesson: tests ran green against an id the app no longer
     surfaced while the viewer watched a different copy fail."""
     idx = json.loads(urllib.request.urlopen(
-        "https://archivewatch.org/catalog-index.json").read())
+        os.environ.get("APP_CATALOG_BASE", "https://example.com") + "/catalog-index.json").read())
     items = idx["items"] if isinstance(idx, dict) and "items" in idx else idx
     hits = [r for r in items if isinstance(r, list) and isinstance(r[1], str)
             and r[1].lower() == title.lower()]
@@ -157,7 +156,7 @@ def playhead_at(buf, wall):
 def fetch_vtt(item):
     try:
         body = urllib.request.urlopen(
-            f"https://archivewatch.org/subs/{item}/en.vtt").read().decode()
+            os.environ.get("APP_CATALOG_BASE", "https://example.com") + f"/subs/{item}/en.vtt").read().decode()
     except Exception:
         return None
     cues, block = [], []
@@ -179,7 +178,12 @@ def norm(s):
     return re.sub(r"[^a-z0-9 ]", "", s.lower()).strip()
 
 
+def _require_env():
+    if not DEVICE:
+        raise SystemExit("Set ATV_DEVICE to the paired Apple TV's devicectl name/UDID (and ATV_BUNDLE, APP_CATALOG_BASE, ATV_PYATV_ADDRESS/ID as needed).")
+
 def main():
+    _require_env()
     ap = argparse.ArgumentParser()
     ap.add_argument("--title")
     ap.add_argument("--item")
@@ -204,7 +208,7 @@ def main():
         if probe_at: time.sleep(probe_at)
         probe = sh(["xcrun", "devicectl", "device", "info", "processes",
                     "--device", DEVICE], timeout=60)
-        if "ArchiveWatch.app/ArchiveWatch" not in probe.stdout:
+        if BUNDLE.split(".")[-2].capitalize() not in probe.stdout:
             print("[scenario] app died in launch window — one retry")
             launch(item, outdir)
             time.sleep(8)

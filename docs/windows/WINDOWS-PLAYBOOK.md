@@ -1,3 +1,10 @@
+> **Enabling Windows in a new app**: copy `docs/windows/workflows/*.yml`
+> into `.github/workflows/`, rename every `AppName.*` to your solution/
+> project names, create the `windows/` solution per this playbook, and
+> set `MSIX_PROJECT` if your MSIX project path differs. This doc and
+> `WINDOWS-STORE-SUBMISSION.md` were written in Tidbits Trivia as the
+> runbook for the NEXT app — this one.
+
 # Windows Tidbits — Build/Test/Ship Playbook ($0, from a Mac)
 
 **Companion to `WINDOWS-DESIGN.md`** (the binding spec) and

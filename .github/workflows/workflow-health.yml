@@ -1,3 +1,4 @@
+# (Workflow/incident names in comments refer to Archive Watch, the origin repo.)
 name: Workflow health
 
 # Catch the ways a workflow can be broken while reporting success — which is
@@ -14,8 +15,10 @@ name: Workflow health
 # it will end, and the checking should not end with it.
 
 on:
-  schedule:
-    - cron: '13 7 * * *'      # daily, off the hour so it does not pile onto :00
+  # DORMANT BY DEFAULT — uncomment once this repo has scheduled workflows
+  # of its own to guard (see docs/CI-FLEET.md).
+  # schedule:
+  # - cron: '13 7 * * *'      # daily, off the hour so it does not pile onto :00
   workflow_dispatch:
     inputs:
       lookback_hours:

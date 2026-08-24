@@ -33,7 +33,7 @@ we must request scopes. Apple:
 
 | Host | POST | Verdict |
 |---|---|---|
-| GitHub Pages (`tidbitstrivia.com`) | **405** | ❌ Out — measured against the live site |
+| GitHub Pages (`<your-domain>`) | **405** | ❌ Out — measured against the live site |
 | Firebase Hosting | — | ❌ Dynamic needs **Blaze (paid)**; breaks the $0 guardrail |
 | Firebase `__/auth/handler` | **200** | ⚠️ Free + already Apple-registered, but it's strictly the Firebase **JS SDK** browser handshake; a native app can't harvest a token from it |
 | **Cloudflare Worker** | **200** | ✅ **Chosen** |
@@ -109,12 +109,12 @@ cd workers/tidbits-auth && npm test && npx wrangler deploy
 Live at **`https://tidbits-auth.benwilkoff.workers.dev`** (account `benwilkoff@gmail.com`).
 
 > **Ownership note:** the Worker lives on a *personal* Cloudflare account while the rest of
-> the Tidbits stack (Apple, Google Cloud, Firebase) is under `ben@learningischange.com`.
+> the Tidbits stack (Apple, Google Cloud, Firebase) is under `<your-apple-id-email>`.
 > Functionally irrelevant; worth consolidating if the company's asset ownership ever matters.
 
 ## Apple portal registration — DONE 2026-07-20
 
-Registered on the Services ID `com.learningischange.tidbitstrivia.web` (Team `L2G756LY8N`,
+Registered on the Services ID `<your-services-id>` (Team `<your-team-id>`,
 identifier confirmed from the DOM so a silent typo couldn't slip through):
 
 | | Value |
@@ -122,7 +122,7 @@ identifier confirmed from the DOM so a silent typo couldn't slip through):
 | Domain added | `tidbits-auth.benwilkoff.workers.dev` |
 | Return URL added | `https://tidbits-auth.benwilkoff.workers.dev/apple/callback` |
 
-**Web sign-in was left untouched** — `tidbitstrivia.com` and
+**Web sign-in was left untouched** — `<your-domain>` and
 `tidbits-trivia-f2ddb.firebaseapp.com` plus the Firebase `__/auth/handler` Return URL are
 all still registered (Apple confirmed "5 Website URLs" at save). Re-opened the config after
 a fresh page load to verify persistence, and read the stored Return URL back out of the DOM

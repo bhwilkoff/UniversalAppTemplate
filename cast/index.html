@@ -5,15 +5,15 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Archive Watch — Cast Receiver</title>
+<title>App Name — Cast Receiver</title>
 <!--
-  Archive Watch — Google Cast Custom Web Receiver (CAF v3).
+  App Name — Google Cast Custom Web Receiver (CAF v3).
 
-  Hosted at https://archivewatch.org/cast/ and pointed at by the app ID
+  Hosted at https://example.com/cast/ and pointed at by the app ID
   registered in the Google Cast SDK Developer Console (see
   docs/TV-PLATFORM-BACKLOG.md §OWNER O1 — a one-time $5 registration).
 
-  Why a CUSTOM receiver rather than the Default Media Receiver: Archive Watch
+  Why a CUSTOM receiver rather than the Default Media Receiver: App Name
   needs three things the default one will not do —
     1. side-loaded WebVTT subtitle tracks (Decision 039), so captions survive
        the cast instead of being dropped,
@@ -62,7 +62,7 @@
 </head>
 <body>
   <cast-media-player></cast-media-player>
-  <div id="credit">archivewatch.org · public domain · courtesy of the Internet Archive</div>
+  <div id="credit">example.com · public domain · courtesy of the Internet Archive</div>
   <div id="error" role="alert">
     <h1>Can’t play this title</h1>
     <p id="error-detail"></p>

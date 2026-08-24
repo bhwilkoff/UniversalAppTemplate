@@ -28,7 +28,7 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 
 REPO = Path(__file__).resolve().parent.parent
-MASTER = REPO / "ArchiveWatch/ArchiveWatch/Assets.xcassets/AppIcon.appiconset/icon-1024.png"
+MASTER = REPO / __import__("os").environ.get("APP_ICON_1024", "branding/icon-1024.png")  # FILL IN: your 1024px icon master
 STORE_OUT = REPO / "assets/tv/tv-banner-1280x720.png"
 APK_OUT = REPO / "android/app/src/main/res/drawable-xhdpi/tv_banner.png"
 

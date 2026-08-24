@@ -6,7 +6,7 @@
  * fetch to a local path that isn't in the package — the app would have
  * launched to an empty catalog on every LG and Samsung TV.
  *
- * These assertions run the REAL expression out of watch.js (not a copy) so
+ * These assertions run the REAL expression out of js/app.js (not a copy) so
  * they follow the source if it is edited.
  *
  * Usage: node tools/test_packaged_origin.mjs
@@ -16,7 +16,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const watchSrc = fs.readFileSync(path.join(ROOT, 'watch.js'), 'utf8');
+const watchSrc = fs.readFileSync(path.join(ROOT, 'js/app.js'), 'utf8');
 
 let pass = 0, fail = 0;
 const ok = (name, got, want) => {
@@ -34,7 +34,7 @@ const truthy = (name, got) => {
 const m = watchSrc.match(
   /const CANONICAL_ROOT = [\s\S]*?const PAGES_ROOT = [\s\S]*?;\n/);
 if (!m) {
-  console.log('FAIL  could not locate the PAGES_ROOT block in watch.js');
+  console.log('FAIL  could not locate the PAGES_ROOT block in js/app.js');
   process.exit(1);
 }
 const block = m[0];
@@ -47,27 +47,27 @@ function resolveRootFor(href) {
 }
 
 ok('browser https root',
-   resolveRootFor('https://archivewatch.org/'), 'https://archivewatch.org/');
+   resolveRootFor('https://example.com/'), 'https://example.com/');
 ok('browser https deep path keeps its directory',
-   resolveRootFor('https://archivewatch.org/index.html?tv=1'), 'https://archivewatch.org/');
+   resolveRootFor('https://example.com/index.html?tv=1'), 'https://example.com/');
 ok('localhost dev server still same-origin',
    resolveRootFor('http://localhost:8123/index.html'), 'http://localhost:8123/');
 ok('webOS package (file://) falls back to canonical',
-   resolveRootFor('file:///media/developer/apps/usr/palm/applications/com.archivewatch.app/index.html'),
-   'https://archivewatch.org/');
+   resolveRootFor('file:///media/developer/apps/usr/palm/applications/com.example.appname/index.html'),
+   'https://example.com/');
 ok('Tizen package (file://) falls back to canonical',
-   resolveRootFor('file:///opt/usr/apps/ArchiveWatch/res/wgt/index.html'),
-   'https://archivewatch.org/');
+   resolveRootFor('file:///opt/usr/apps/ExampleApp/res/wgt/index.html'),
+   'https://example.com/');
 
 /* A file:// root that did NOT fall back would produce a local path — this is
    the exact failure the fallback exists to prevent. */
-const packagedRoot = resolveRootFor('file:///opt/usr/apps/ArchiveWatch/res/wgt/index.html');
+const packagedRoot = resolveRootFor('file:///opt/usr/apps/ExampleApp/res/wgt/index.html');
 truthy('packaged catalog URL is remote, not a local file',
        new URL('catalog-index.json', packagedRoot).protocol === 'https:');
 
 /* ---- 2. The staged packages carry the CURRENT shared app ---- */
 
-const SHARED = ['index.html', 'watch.js', 'watch.css', 'tv.js', 'tv.css'];
+const SHARED = ['index.html', 'js/app.js', 'watch.css', 'tv.js', 'tv.css'];
 for (const pkg of ['webos', 'tizen']) {
   const dir = path.join(ROOT, 'tv', pkg, 'app');
   if (!fs.existsSync(dir)) {
@@ -83,10 +83,10 @@ for (const pkg of ['webos', 'tizen']) {
   // stale cache and is deliberately stripped.
   truthy(`${pkg} has no packaged service worker`,
          !fs.existsSync(path.join(dir, 'sw.js')));
-  // The registration lives in watch.js, not index.html — it must be guarded by
+  // The registration lives in js/app.js, not index.html — it must be guarded by
   // protocol so a packaged (file://) launch never calls register('sw.js').
-  truthy(`${pkg} watch.js guards SW registration by protocol`,
-         fs.readFileSync(path.join(dir, 'watch.js'), 'utf8')
+  truthy(`${pkg} js/app.js guards SW registration by protocol`,
+         fs.readFileSync(path.join(dir, 'js/app.js'), 'utf8')
            .includes('in navigator && /^https?:$/.test(location.protocol)'));
 }
 

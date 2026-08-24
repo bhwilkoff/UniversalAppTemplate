@@ -9,7 +9,7 @@ description: Use when touching the web viewer's data access (/watch/), adding a 
 
 | Host | Ranged GET | CORS for `fetch()` | Usable from browser JS? |
 |---|---|---|---|
-| GitHub Pages (`archivewatch.org`) | **206** | **yes `*`** | ✅ the only fetchable catalog host |
+| GitHub Pages (`<your-pages-domain>`) | **206** | **yes `*`** | ✅ the only fetchable catalog host |
 | GitHub Release assets | 206 | none | ❌ (native apps only) |
 | `archive.org/download/*` (storage nodes) | 206 | none | ❌ for fetch; ✅ for `<img>`/`<video>` (elements skip CORS) |
 | `archive.org/metadata/*`, scrape API | — | yes `*` | ✅ |
@@ -22,7 +22,7 @@ do 206" — it was a **HEAD-request artifact**. Range works on GET.
 - Browse/search: `catalog-index.json` (Pages, ~5.4 MB, popularity-sorted
   tuples `[id, title, year, contentType, poster]` + a top-level `shelves`
   map, schema 3 — handle shorter older rows; built by
-  `tools/build_catalog_index.py`).
+  `a build_catalog_index-style script (example in Archive Watch; not shipped here)`).
 - Shelves: the index's editorial `shelves` map (the apps' item_shelves
   analog), cross-shelf deduped + day-seed rotated client-side. **Never the
   live scrape API for consumer surfaces** — audited 2026-06-10: scrape

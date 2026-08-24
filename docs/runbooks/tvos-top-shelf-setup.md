@@ -5,7 +5,7 @@ Continue Watching + Editor's Picks + What's New when Archive Watch is
 focused on the tvOS Home Screen.
 
 > **STATUS (2026-05-31): IMPLEMENTED in-repo.** The extension target
-> (`ArchiveWatchTopShelf`), the App Group (`group.com.bhwilkoff.archivewatch`)
+> (`AppNameTopShelf`), the App Group (`group.<your-reverse-dns>.appname`)
 > on both targets, the provider, the snapshot writer, deep links, and the
 > background refresh are all committed on branch `v1-hardening` and build
 > clean on the tvOS 26.5 simulator (the `project.pbxproj` was edited by
@@ -14,7 +14,7 @@ focused on the tvOS Home Screen.
 > **The one thing left for the owner:** the App Group capability must be
 > enabled for this App ID in your Apple Developer account for **device /
 > TestFlight** builds. With Automatic signing + a team set, Xcode usually
-> registers `group.com.bhwilkoff.archivewatch` on the first device build;
+> registers `group.<your-reverse-dns>.appname` on the first device build;
 > if device signing complains, toggle App Groups in Signing & Capabilities
 > for both targets. Simulator builds need nothing extra.
 
@@ -25,7 +25,7 @@ What follows is the original setup guide, now matching what's in the repo.
 ## Step 1 — App Group (both targets)
 
 1. Apple Developer portal (or Xcode → Signing & Capabilities → **+ App
-   Group**) → create `group.com.bhwilkoff.archivewatch`.
+   Group**) → create `group.<your-reverse-dns>.appname`.
 2. Add the **App Groups** capability to the **main app** target and
    select that group.
 3. Repeat for the Top Shelf extension target (Step 2).
@@ -37,10 +37,10 @@ This is the shared container both processes read/write.
 ## Step 2 — Create the extension target
 
 Xcode → **File ▸ New ▸ Target… ▸ tvOS ▸ TV Top Shelf Extension**.
-Name it `ArchiveWatchTopShelf`. Xcode wires the embed phase + a stub
+Name it `AppNameTopShelf`. Xcode wires the embed phase + a stub
 `ContentProvider`. Then:
 
-- Add the **App Groups** capability → `group.com.bhwilkoff.archivewatch`.
+- Add the **App Groups** capability → `group.<your-reverse-dns>.appname`.
 - Replace the generated `ContentProvider.swift` with the file in Step 4.
 - Delete the boilerplate sample code Xcode generated.
 
@@ -49,7 +49,7 @@ Name it `ArchiveWatchTopShelf`. Xcode wires the embed phase + a stub
 ## Step 3 — Main app: write the snapshot (already-safe code)
 
 Add this to the **main app** target (e.g.
-`ArchiveWatch/ArchiveWatch/Services/TopShelfSnapshot.swift`). It writes a
+`AppName/AppName/Services/TopShelfSnapshot.swift`). It writes a
 small JSON the extension reads. Call `TopShelfSnapshot.write(from:)` after
 the catalog loads and whenever Continue Watching changes. It no-ops
 gracefully if the App Group isn't configured yet, so it's safe to add
@@ -59,7 +59,7 @@ before the group exists.
 import Foundation
 
 enum TopShelfSnapshot {
-    static let appGroup = "group.com.bhwilkoff.archivewatch"
+    static let appGroup = "group.<your-reverse-dns>.appname"
     static let fileName = "topshelf.json"
 
     struct Payload: Codable {
@@ -130,7 +130,7 @@ class ContentProvider: TVTopShelfContentProvider {
                 // Deep link into the app (Step 5).
                 shelfItem.playAction = nil
                 shelfItem.displayAction = TVTopShelfAction(
-                    url: URL(string: "archivewatch://item/\(item.archiveID)")!
+                    url: URL(string: "appname://item/\(item.archiveID)")!
                 )
                 return shelfItem
             }
@@ -153,12 +153,12 @@ class ContentProvider: TVTopShelfContentProvider {
 
 ## Step 5 — Deep-link handling in the app
 
-Top Shelf items open `archivewatch://item/{id}`. Declare the scheme and
+Top Shelf items open `appname://item/{id}`. Declare the scheme and
 route it:
 
 1. **Info.plist** — add a URL type. Since the project uses
    `GENERATE_INFOPLIST_FILE = YES`, set `INFOPLIST_FILE` to a small
-   `ArchiveWatch/Info.plist` containing:
+   `AppName/Info.plist` containing:
 
    ```xml
    <key>CFBundleURLTypes</key>
@@ -192,7 +192,7 @@ route it:
 
    This same `onOpenURL` is the more robust transport for the App
    Intents too (replace the `IntentInbox` singleton with
-   `archivewatch://surprise` etc. if you prefer URL-based routing).
+   `appname://surprise` etc. if you prefer URL-based routing).
 
 ---
 

@@ -241,6 +241,31 @@ shipped to production and its lessons were folded back in:
     session-start hook. Tell it what you want to build; the
     methodology is already in the room.
 
+### Steps 11–13 — the Universal-generation layers (each optional, adopt when earned)
+
+11. **Enable the smart-TV layer** (when the app earns the living room):
+    `tv.css`/`tv.js`/`js/cast-sender.js` are already wired into
+    `index.html` and self-disable off-TV. Fill in `tv/webos/appinfo.json`
+    + `tv/tizen/config.xml` (app id, name, allowed hosts), register a
+    Cast receiver ($5) and set `CAST_APP_ID` in `js/cast-sender.js`,
+    then package with `tv/build-tv-packages.sh`. Landscape + stores:
+    `docs/TV-PLATFORMS.md`; Android TV rides the existing Android app
+    (see `androidtv-compose-focus`).
+12. **Enable Windows** (when a desktop column is earned): follow
+    `docs/windows/WINDOWS-PLAYBOOK.md` — copy
+    `docs/windows/workflows/*.yml` into `.github/workflows/` and rename
+    `AppName.*` to your solution.
+13. **Enable the guardians + harnesses** (once the repo has scheduled
+    workflows or on-device work): uncomment the `schedule:` blocks in
+    `.github/workflows/workflow-health.yml` +
+    `retry-infra-failures.yml`; start any data-writing workflow from
+    `docs/templates/split-writer-workflow-template.yml`. Device
+    harnesses configure via env: `ATV_DEVICE` / `ATV_BUNDLE` /
+    `APP_CATALOG_BASE` (Apple TV), `TV_PKG` / `TV_ACT` (Android TV),
+    `APP_BUNDLE` / `APP_DOMAIN` (the rest); build the OCR helper once
+    with `swiftc -O tools/ScreenOCR/main.swift -o /tmp/appocr`. Catalog:
+    `docs/DEVICE-HARNESSES.md`.
+
 ## How sessions work
 
 - Session-start hook injects CLAUDE.md + current state from
@@ -329,6 +354,13 @@ pathways), `app-store-screenshots` (marketing assets),
 `app-store-review` (iOS rejection prevention).
 
 ## Skills bundled with the template
+
+> **Maintenance note**: the vendored set carries ~12 near-duplicate
+> framework pairs from two upstream vintages (`cloudkit`/`cloudkit-sync`,
+> `mapkit`/`mapkit-location`, `passkit`/`passkit-wallet`, …). Their
+> bodies differ, so both are kept; when consolidating, pick per pair and
+> record the survivors in `tools/refresh-skills.sh` so a re-sync doesn't
+> reintroduce the rest.
 
 Skills and slash commands are vendored directly into `.claude/` so
 anyone who clones this repo has everything available immediately —

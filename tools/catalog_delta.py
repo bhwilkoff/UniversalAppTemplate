@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# (Workflow/incident names in comments refer to Archive Watch, the origin repo.)
 """Turn any catalog-mutating tool into a lock-free one, without changing it.
 
 THE PROBLEM, measured. Twenty-seven workflows hold the single `catalog-writers`

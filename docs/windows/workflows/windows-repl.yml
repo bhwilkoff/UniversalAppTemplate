@@ -49,15 +49,15 @@ jobs:
           dotnet-version: '10.0.x'
 
       - name: Build (Release)
-        run: dotnet build Tidbits.slnx -c Release
+        run: dotnet build AppName.slnx -c Release
 
       - name: Tests (real Windows render + input)
         env:
-          TIDBITS_ARTIFACTS: ${{ github.workspace }}/windows/artifacts
-          TIDBITS_UPDATE_BASELINES: ${{ inputs.update_baselines && '1' || '' }}
+          APPNAME_ARTIFACTS: ${{ github.workspace }}/windows/artifacts
+          APPNAME_UPDATE_BASELINES: ${{ inputs.update_baselines && '1' || '' }}
         shell: pwsh
         run: |
-          $args = @('test','Tidbits.HeadlessTests/Tidbits.HeadlessTests.csproj','-c','Release','--no-build')
+          $args = @('test','AppName.HeadlessTests/AppName.HeadlessTests.csproj','-c','Release','--no-build')
           if ('${{ inputs.test_filter }}' -ne '') { $args += @('--filter','${{ inputs.test_filter }}') }
           dotnet @args
 
@@ -65,9 +65,9 @@ jobs:
         if: ${{ inputs.run_app }}
         shell: pwsh
         run: |
-          dotnet publish Tidbits.App/Tidbits.App.csproj -c Release -r win-x64 --self-contained `
+          dotnet publish AppName.App/AppName.App.csproj -c Release -r win-x64 --self-contained `
             -p:PublishSingleFile=true -o publish/win-x64
-          $p = Start-Process -FilePath "publish/win-x64/Tidbits.App.exe" -PassThru
+          $p = Start-Process -FilePath "publish/win-x64/AppName.App.exe" -PassThru
           Start-Sleep -Seconds 10
           Add-Type -AssemblyName System.Windows.Forms, System.Drawing
           $b = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
@@ -76,14 +76,14 @@ jobs:
           $g.CopyFromScreen($b.Location, [System.Drawing.Point]::Empty, $b.Size)
           New-Item -ItemType Directory -Force -Path artifacts | Out-Null
           $bmp.Save("$PWD/artifacts/launched-desktop.png")
-          if ($p.HasExited) { throw "Tidbits.App.exe exited early (code $($p.ExitCode))" }
+          if ($p.HasExited) { throw "AppName.App.exe exited early (code $($p.ExitCode))" }
           Stop-Process -Id $p.Id -Force
 
       - name: Ad-hoc command
         if: ${{ inputs.command != '' }}
         shell: pwsh
         env:
-          TIDBITS_ARTIFACTS: ${{ github.workspace }}/windows/artifacts
+          APPNAME_ARTIFACTS: ${{ github.workspace }}/windows/artifacts
         run: ${{ inputs.command }}
 
       # Baselines are captured on Windows (the ship target) — download this artifact
@@ -93,7 +93,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: windows-baselines
-          path: windows/Tidbits.HeadlessTests/Baselines/windows/*.png
+          path: windows/AppName.HeadlessTests/Baselines/windows/*.png
           if-no-files-found: warn
 
       - name: Upload artifacts (always — a FAILED run's PNGs are the diagnostic)

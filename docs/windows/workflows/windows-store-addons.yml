@@ -1,7 +1,7 @@
 name: Windows Store add-ons (verify Club product ids)
 
 # Reads the Club add-ons back from the Microsoft Store's own API and checks their
-# developer-chosen product ids against ClubProducts in Tidbits.Core.
+# developer-chosen product ids against ClubProducts in AppName.Core.
 #
 #   gh workflow run windows-store-addons.yml
 #
@@ -88,7 +88,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
           # The contract: every id the app asks for must exist as an add-on.
-          expected=$(grep -oE '"club\.[a-z]+"' windows/Tidbits.Core/Networking/IStoreGateway.cs \
+          expected=$(grep -oE '"club\.[a-z]+"' windows/AppName.Core/Networking/IStoreGateway.cs \
             | tr -d '"' | sort -u)
           actual=$(echo "$body" | jq -r '.value[].productId' | sort -u)
           echo "Expected (from ClubProducts): $(echo $expected)"

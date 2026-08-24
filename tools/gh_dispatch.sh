@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# (Workflow/incident names in comments refer to Archive Watch, the origin repo.)
 # Retry a `gh workflow run` dispatch against transient GitHub API errors.
 #
 # Why: the dispatch API intermittently returns HTTP 500/502/503. Under a job's

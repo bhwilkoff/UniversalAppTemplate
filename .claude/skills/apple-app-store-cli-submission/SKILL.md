@@ -1,13 +1,13 @@
 ---
 name: apple-app-store-cli-submission
-description: Build + upload Archive Watch's macOS/iOS/tvOS App Store builds from the command line (no Xcode GUI) — the manual-REST-signing pathway, the ITMS-90111 Xcode-floor trap, the PyJWT venv, per-platform SDK downloads, the tuple-sort type-check gotcha, and screenshots. Invoke before archiving, signing, submitting, or resubmitting any Apple build, or when App Review rejects a build for SDK/Xcode/signing reasons.
+description: REFERENCE IMPLEMENTATION (Archive Watch) behind the generic `cloud-appstore-submission` skill — consult AFTER it for the local-CLI pathway and its traps. Build + upload Archive Watch's macOS/iOS/tvOS App Store builds from the command line (no Xcode GUI) — the manual-REST-signing pathway, the ITMS-90111 Xcode-floor trap, the PyJWT venv, per-platform SDK downloads, the tuple-sort type-check gotcha, and screenshots. Invoke before archiving, signing, submitting, or resubmitting any Apple build, or when App Review rejects a build for SDK/Xcode/signing reasons.
 ---
 
 # Apple App Store submission (CLI) — Archive Watch
 
-Runbook: `docs/mac-app-store-submission.md`. Live state + cert ids:
+Runbook: `docs/CLOUD-SUBMISSION.md`. Live state + cert ids:
 `mac_app_store_build_pathway` memory. All three Apple apps share ONE App Store
-Connect record (bundle id `app.archivewatch.tvos`, Decision 042). Android is a
+Connect record (bundle id `com.example.appname`, Decision 042). Android is a
 separate path (`tools/submit-play.sh`, Play Developer API).
 
 ## PRIMARY PATH — build in the cloud (the dev Mac is on a BETA macOS)
@@ -44,7 +44,7 @@ macOS** — use the cloud path above. The OWNER selects the build in ASC and hit
 ## Load-bearing rules (each cost real time to learn)
 
 1. **Manual signing is REQUIRED — cloud/automatic signing FAILS for this team key**
-   ("Cloud signing permission error" / "No profiles for app.archivewatch.tvos"),
+   ("Cloud signing permission error" / "No profiles for com.example.appname"),
    even though the key CAN create certs/profiles via REST. The script signs
    manually: `asc_certs.py` (Apple Distribution + Mac Installer certs) +
    `asc_profiles.py` (a profile per bundle id). Don't "simplify" it to automatic.
@@ -120,5 +120,5 @@ to exact size — `tools/mac-shotset.sh <app>` runs the whole set. Needs Screen
 Recording permission. Any build may produce screenshots (not the submitted binary).
 ```
 DEVELOPER_DIR=<released-Xcode>/Contents/Developer \
-  tools/mac-shotset.sh "<DerivedData>/Release/Archive Watch.app"
+  tools/mac-shotset.sh "<DerivedData>/Release/YourApp.app"
 ```

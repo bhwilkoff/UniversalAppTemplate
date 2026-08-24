@@ -377,7 +377,7 @@ Bump `AppVersion.xcconfig` + `android/app/build.gradle.kts` + run
 review/test channel and still need you to press *Submit for Review* / promote.
 
 Two Microsoft Store traps that reappear on any fresh product, both already solved
-once and written up in `docs/WINDOWS-STORE-SUBMISSION.md`: the **Submission
+once and written up in `docs/windows/WINDOWS-STORE-SUBMISSION.md`: the **Submission
 Options** page has a *required* `runFullTrust` justification, and the red "access
 policies document is not present in the config set" banner is an Xbox-Live config
 blocker cleared by **Xbox services → bottom → Test**, not by any submission

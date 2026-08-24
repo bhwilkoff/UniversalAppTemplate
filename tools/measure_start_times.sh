@@ -41,11 +41,11 @@ for id in "$@"; do
   "$ATV" turn_on >/dev/null 2>&1; sleep 2; "$ATV" menu >/dev/null 2>&1; sleep 2
   xcrun devicectl device process launch --terminate-existing --device "$DEV" \
     -e "{\"AW_START_ITEM\":\"$id\",\"AW_AUTOPLAY\":\"1\",\"AW_DIAG_FILE\":\"1\",\"AW_PLAYBACK_DIAG\":\"1\",\"AW_NO_RESUME\":\"1\",\"AW_NO_CAPTIONS\":\"1\",\"AW_HEDGE_PROBE\":\"$HEDGE\"}" \
-    app.archivewatch.tvos >/dev/null 2>&1
+    ${APP_BUNDLE:-com.example.appname} >/dev/null 2>&1
   sleep "$WAIT"
   log=$(mktemp)
   xcrun devicectl device copy from --device "$DEV" --domain-type appDataContainer \
-    --domain-identifier app.archivewatch.tvos --source Library/Caches/awdiag.log \
+    --domain-identifier ${APP_BUNDLE:-com.example.appname} --source Library/Caches/awdiag.log \
     --destination "$log" >/dev/null 2>&1
   # Only THIS launch's lines: the diag file accumulates across runs and an
   # older session's itemReady would score the current one as instant.

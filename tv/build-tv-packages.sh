@@ -24,12 +24,13 @@ TARGET="${1:-all}"
 
 # The shared app payload. Keep this list in sync with sw.js SHELL_URLS — both
 # describe "what the app is made of".
-APP_FILES=(index.html watch.css watch.js tv.css tv.js cast-sender.js manifest.json 404.html)
+APP_FILES=(index.html tv.css tv.js manifest.json)
 APP_DIRS=(assets)
 # From js/ the viewer needs ONLY api.js. app.js and whats-new.js belong to the
 # curator dashboard at /curate/ — dead weight in a TV package, and webOS's
 # packager aborts trying to minify them.
-APP_JS=(js/api.js)
+APP_JS=(js/api.js js/app.js js/cast-sender.js)
+APP_CSS=(css/styles.css)
 
 # One source of truth for the version, the same file the Apple targets read
 # (Decision 003). Both vendor manifests are STAMPED at package time rather than
@@ -57,6 +58,8 @@ stage() {
     mkdir -p "$dest/$(dirname "$f")"
     [ -f "$ROOT/$f" ] && cp "$ROOT/$f" "$dest/$f" || echo "  (skip missing $f)"
   done
+  mkdir -p "$dest/css"
+  for f in "${APP_CSS[@]}"; do cp "$ROOT/$f" "$dest/css/"; done
   # macOS turds ship inside the package otherwise. Removed here rather than via
   # ares-package -e, whose pattern did not match a nested assets/.DS_Store.
   find "$dest" -name '.DS_Store' -delete
@@ -66,11 +69,13 @@ stage() {
   # watch.js reaches because PAGES_ROOT falls back to the canonical origin under
   # file:// — do not "simplify" that back to a relative URL.
   rm -f "$dest/sw.js"
-  # watch.js skips registration itself when the protocol is not http(s), so
-  # there is nothing to strip here. Assert it, rather than trusting it: a
-  # regression would mean a rejected register() on every TV launch.
-  if ! grep -qF 'in navigator && /^https?:$/.test(location.protocol)' "$dest/watch.js"; then
-    echo "  !! watch.js no longer guards serviceWorker registration by protocol" >&2
+  # If the app registers a service worker, it must guard registration by
+  # protocol (a packaged TV app runs under file:// and a rejected register()
+  # fires on every launch). Assert it when the main script is present.
+  MAIN_JS="$dest/js/app.js"
+  if [ -f "$MAIN_JS" ] && grep -q 'serviceWorker' "$MAIN_JS" \
+     && ! grep -qE "serviceWorker.+https?" "$MAIN_JS"; then
+    echo "  !! app.js registers a service worker without a protocol guard" >&2
     exit 1
   fi
 }

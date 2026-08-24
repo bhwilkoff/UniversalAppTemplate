@@ -83,4 +83,4 @@ drains over days (~950/day) via the daily cron — that's by design, not a failu
 
 ## Prevention
 Decision 020: catalog-mutating builds are additive + merge-guarded
-(`tools/merge_catalogs.py`), so a build can never replace the catalog again.
+(`a merge_catalogs-style additive merge tool (example in Archive Watch)`), so a build can never replace the catalog again.

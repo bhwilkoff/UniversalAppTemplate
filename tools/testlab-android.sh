@@ -20,7 +20,7 @@
 # to leave headroom for the verify run after a fix.
 set -euo pipefail
 
-PROJECT="tidbits-trivia-f2ddb"
+PROJECT="${FIREBASE_PROJECT:?Set FIREBASE_PROJECT to your Firebase project id}"
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 APK=""
 QUICK=0
@@ -73,7 +73,7 @@ A row reading "Application crashed" has its stack waiting in the GCS bucket prin
 above, NOT in this output:
 
   gcloud storage ls   "gs://<bucket>/<run>/<device>/"
-  gcloud storage cp   "gs://<bucket>/<run>/<device>/data_app_crash_0_com_tidbitstrivia_app.txt" .
+  gcloud storage cp   "gs://<bucket>/<run>/<device>/data_app_crash_0_com_example_appname.txt" .
 
 "Infrastructure failure" and "Test failed to run" are Test Lab's own flake — confirm
 by checking the device logcat for our package before treating either as a real defect.

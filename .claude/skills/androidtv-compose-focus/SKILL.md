@@ -1,12 +1,12 @@
 ---
 name: androidtv-compose-focus
-description: Compose-for-TV patterns for Archive Watch's Android TV / Google TV / Fire TV build — the tv-material-only dependency rule (TvLazy* was REMOVED), the runtime UiModeManager branch (never a fork or flavor), the focus contract (scale+ring+lift, imperative initial focus, multi-keycode select), the Google quality gates (TV-ML/MT/LB/BN/PS/G6/G1), the TV-NP conflict that forces MediaSession off on TV, and the Fire TV zero-GMS rule. Invoke before building or changing ANY Android TV surface, focus behavior, manifest declaration, or TV playback path.
+description: REFERENCE IMPLEMENTATION (Archive Watch) behind the generic `smart-tv-platform-expansion` skill — consult AFTER it, for the worked example. Compose-for-TV patterns for Archive Watch's Android TV / Google TV / Fire TV build — the tv-material-only dependency rule (TvLazy* was REMOVED), the runtime UiModeManager branch (never a fork or flavor), the focus contract (scale+ring+lift, imperative initial focus, multi-keycode select), the Google quality gates (TV-ML/MT/LB/BN/PS/G6/G1), the TV-NP conflict that forces MediaSession off on TV, and the Fire TV zero-GMS rule. Invoke before building or changing ANY Android TV surface, focus behavior, manifest declaration, or TV playback path.
 ---
 
 # Android TV (Compose) — focus, compliance, and the traps
 
-Binding spec: `docs/TV-DESIGN.md` §6 (mechanics) + §3 (focus contract).
-Strategy: **Decision 047**. Backlog: `docs/TV-PLATFORM-BACKLOG.md` Phase 2.
+Binding spec: `docs/templates/TV-DESIGN-template.md (copy to docs/TV-DESIGN.md when adopted)` §6 (mechanics) + §3 (focus contract).
+Strategy: **Decision 047**. Backlog: `docs/templates/TV-PLATFORM-BACKLOG-template.md` Phase 2.
 
 The Android TV build is **not a port**. The data layer, repositories, routes and
 player engine are shared verbatim with the phone app; only composables differ.
@@ -178,7 +178,7 @@ adb shell "run-as <pkg> cat files/catalog.sqlite" > live.sqlite
 
 ## See also
 
-- `docs/TV-DESIGN.md` — the binding rules any surface must cite
+- `docs/templates/TV-DESIGN-template.md (copy to docs/TV-DESIGN.md when adopted)` — the binding rules any surface must cite
 - `android-production-gotchas` — the data-layer/`produceState`/`dbVersion`
   discipline, unchanged on TV
 - `tvos-platform-patterns` — the *principles* of ten-foot design transfer even

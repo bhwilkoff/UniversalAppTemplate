@@ -11,8 +11,8 @@
 set -uo pipefail
 OUT="${1:?usage: atv_see.sh <out.png> [min_bytes]}"
 MIN="${2:-400000}"
-DEV="${AW_ATV:-Ben Bedroom}"
-DEVELOPER_DIR="${DEVELOPER_DIR:-/Applications/Xcode-beta.app/Contents/Developer}" \
+DEV="${ATV_DEVICE:?Set ATV_DEVICE to the paired Apple TV devicectl name/UDID}"
+DEVELOPER_DIR="${DEVELOPER_DIR:-/Applications/Xcode.app/Contents/Developer}" \
   xcrun devicectl device capture screenshot --device "$DEV" --destination "$OUT" >/dev/null 2>&1
 sz=$(stat -f%z "$OUT" 2>/dev/null || echo 0)
 if [ "$sz" -lt "$MIN" ]; then
@@ -36,14 +36,14 @@ if [ -x /tmp/awocr ]; then
   # sweep drove the SYSTEM UI past prime video and fubo and reported the TV
   # shelves missing. The frame was perfectly legible and completely irrelevant.
   #
-  # Set AW_EXPECT to a string the app's own UI shows (default matches the tvOS
-  # sidebar/Home chrome); pass AW_EXPECT=- to skip when testing another screen.
-  EXPECT="${AW_EXPECT:-Home|FEATURE FILMS|Continue Watching|Movies|TV Shows|Surprise}"
+  # Set ATV_EXPECT to a string the app's own UI shows (default matches the tvOS
+  # sidebar/Home chrome); pass ATV_EXPECT=- to skip when testing another screen.
+  EXPECT="${ATV_EXPECT:-Home}"  # FILL IN: strings your app\x27s home chrome shows
   if [ "$EXPECT" != "-" ] && ! printf '%s' "$txt" | grep -qiE "$EXPECT"; then
     if printf '%s' "$txt" | grep -qiE "prime video|pluto|fubo|Apple TV\+|Select up for full screen"; then
       echo "WRONG SCREEN: $OUT is the tvOS home screen, not Archive Watch" >&2
     else
-      echo "WRONG SCREEN: $OUT does not match AW_EXPECT ($EXPECT)" >&2
+      echo "WRONG SCREEN: $OUT does not match ATV_EXPECT ($EXPECT)" >&2
     fi
     exit 2
   fi

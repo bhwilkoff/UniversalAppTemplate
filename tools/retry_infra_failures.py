@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# (Workflow/incident names in comments refer to Archive Watch, the origin repo.)
 """Re-run workflow runs that GitHub's hosted-runner fleet never actually started.
 
 Runner-allocation failures — "The job was not acquired by Runner of type hosted even

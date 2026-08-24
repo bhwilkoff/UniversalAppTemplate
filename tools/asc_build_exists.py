@@ -15,6 +15,7 @@ because it could not check is worse than no guard.
 
 Usage: python3 tools/asc_build_exists.py <marketing_version> <build_number>
 """
+import os
 import sys
 
 try:
@@ -23,7 +24,7 @@ except Exception as e:                      # pragma: no cover - import guard
     print(f"[asc] cannot load the ASC client ({e}); skipping the check")
     sys.exit(0)
 
-APP_BUNDLE = "app.archivewatch.tvos"
+APP_BUNDLE = os.environ.get("APP_BUNDLE", "com.example.appname")  # FILL IN
 
 
 def main() -> int:

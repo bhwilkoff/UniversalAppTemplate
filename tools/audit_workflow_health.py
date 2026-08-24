@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """Catch the ways a workflow can be broken while reporting success.
 
+(Incident names below refer to Archive Watch, this tool's origin repo —
+they are the failure CLASSES this catches, kept as worked examples.)
+
 Every failure found in this repo's CI has been of that kind, not a red X:
 
   * `word-index` logged "audio download failed" for months. The download was
@@ -49,7 +52,7 @@ NOT_PRODUCERS = set(
         # include this workflow's own name — judging its own last run makes
         # one failure permanent.
         "Workflow health,Deploy Pages,pages-build-deployment,"
-        "Retry infrastructure failures,App Store build (cloud),Android build",
+        "Retry infrastructure failures,App Store build (cloud),Android Build",
     ).split(",") if n.strip()
 )
 LOOKBACK_HOURS = int(os.environ.get("LOOKBACK_HOURS", "36"))

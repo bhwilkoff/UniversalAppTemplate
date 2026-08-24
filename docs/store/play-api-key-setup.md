@@ -11,15 +11,15 @@ creation. This guide gives the happy path first, then fixes that block head-on.
 > account with a JSON key, and (b) that service account invited into Play Console with permissions.
 
 End state we want:
-- a service-account JSON key saved at **`~/.config/play/archivewatch-play.json`**
-- that service account **invited in Play Console** with release permission for **com.archivewatch.app**
+- a service-account JSON key saved at **`~/.config/play/PLAY_SERVICE_ACCOUNT.json`**
+- that service account **invited in Play Console** with release permission for **com.your-app.app**
 
 ---
 
 ## Part A — Create the service account + JSON key (Google Cloud Console)
 
 1. Go to **console.cloud.google.com**. Top bar → **project picker** → **New Project** (name it e.g.
-   `archivewatch-play`). Use the project picker to make sure it's *selected* afterward.
+   `your-app-play`). Use the project picker to make sure it's *selected* afterward.
    - *If your Google login is a plain Gmail with no Workspace/organization, the project is created
      "No organization" — and key creation will just work (skip Part C).*
 
@@ -28,7 +28,7 @@ End state we want:
    right project is selected, click **Enable**.
 
 3. Create the service account: **IAM & Admin → Service Accounts → + Create service account**.
-   - Name: `archivewatch-ci` (anything).
+   - Name: `your-app-ci` (anything).
    - **Skip** the "Grant this service account access to project" (roles) step — Play permissions are
      granted later in Play Console, not here. Click **Done**.
 
@@ -41,8 +41,8 @@ End state we want:
 5. Move it out of Downloads into the expected location:
    ```bash
    mkdir -p ~/.config/play
-   mv ~/Downloads/archivewatch-play-*.json ~/.config/play/archivewatch-play.json
-   chmod 600 ~/.config/play/archivewatch-play.json
+   mv ~/Downloads/your-app-play-*.json ~/.config/play/PLAY_SERVICE_ACCOUNT.json
+   chmod 600 ~/.config/play/PLAY_SERVICE_ACCOUNT.json
    ```
 
 ---
@@ -50,7 +50,7 @@ End state we want:
 ## Part B — Invite the service account in Play Console
 
 1. Copy the service account's **email** (looks like
-   `archivewatch-ci@archivewatch-play.iam.gserviceaccount.com`) — it's on the Service Accounts page.
+   `your-app-ci@your-app-play.iam.gserviceaccount.com`) — it's on the Service Accounts page.
 2. **Play Console → Users and permissions → Invite new users.** Paste the email.
 3. **App permissions** tab → **Add app** → select **Archive Watch** → grant at least:
    - **Release to production, exclude devices, and use Play App Signing** (this covers production
@@ -100,15 +100,15 @@ policy.) Install once: `brew install --cask google-cloud-sdk`, then in a termina
 
 ```bash
 gcloud auth login                                   # opens a browser; sign in as the developer
-PROJECT=archivewatch-play
+PROJECT=your-app-play
 gcloud projects create $PROJECT 2>/dev/null || true
 gcloud config set project $PROJECT
 gcloud services enable androidpublisher.googleapis.com
-gcloud iam service-accounts create archivewatch-ci --display-name "Archive Watch CI"
-SA=archivewatch-ci@$PROJECT.iam.gserviceaccount.com
+gcloud iam service-accounts create your-app-ci --display-name "Archive Watch CI"
+SA=your-app-ci@$PROJECT.iam.gserviceaccount.com
 mkdir -p ~/.config/play
-gcloud iam service-accounts keys create ~/.config/play/archivewatch-play.json --iam-account $SA
-chmod 600 ~/.config/play/archivewatch-play.json
+gcloud iam service-accounts keys create ~/.config/play/PLAY_SERVICE_ACCOUNT.json --iam-account $SA
+chmod 600 ~/.config/play/PLAY_SERVICE_ACCOUNT.json
 echo "Service account email to invite in Play Console: $SA"
 ```
 
@@ -122,7 +122,7 @@ Then do **Part B** (invite `$SA` in Play Console). If the last command errors
 
 ## Part E — Verify + first release
 
-Once the JSON is at `~/.config/play/archivewatch-play.json` and the SA is invited, I (or you) can run:
+Once the JSON is at `~/.config/play/PLAY_SERVICE_ACCOUNT.json` and the SA is invited, I (or you) can run:
 
 ```bash
 tools/submit-play.sh --track production --notes "…"     # bumps versionCode, builds the AAB, uploads
@@ -135,10 +135,10 @@ python3 - <<'PY'
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 c=service_account.Credentials.from_service_account_file(
-  __import__('os').path.expanduser('~/.config/play/archivewatch-play.json'),
+  __import__('os').path.expanduser('~/.config/play/PLAY_SERVICE_ACCOUNT.json'),
   scopes=['https://www.googleapis.com/auth/androidpublisher'])
 s=build('androidpublisher','v3',credentials=c,cache_discovery=False)
-e=s.edits().insert(packageName='com.archivewatch.app',body={}).execute()
+e=s.edits().insert(packageName='com.your-app.app',body={}).execute()
 print('OK — API + permissions work. edit id', e['id'])
 PY
 ```

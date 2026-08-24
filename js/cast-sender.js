@@ -30,7 +30,7 @@
   // Google's Default Media Receiver 'CC1AD845' remains a working fallback if
   // the custom receiver ever needs to be bypassed — it needs no registration
   // but drops subtitles and provenance.
-  var CAST_APP_ID = '58AF34C3';
+  var CAST_APP_ID = 'CC1AD845';   // FILL IN: your Cast Console app id ('CC1AD845' = Default Media Receiver, works unregistered)
   var USING_DEFAULT_RECEIVER = (CAST_APP_ID === 'CC1AD845');
 
   var castContext = null;

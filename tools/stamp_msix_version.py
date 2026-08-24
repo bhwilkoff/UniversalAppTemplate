@@ -19,8 +19,11 @@ import pathlib
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 XCCONFIG = ROOT / "AppVersion.xcconfig"
-MANIFEST = ROOT / "windows" / "Tidbits.App" / "AppxManifest.xml"
-CSPROJ = ROOT / "windows" / "Tidbits.App" / "Tidbits.App.csproj"
+import os
+# Override per app: MSIX_PROJECT=windows/YourApp.App (dir holding the manifest + csproj)
+_PROJ = ROOT / os.environ.get("MSIX_PROJECT", "windows/AppName.App")
+MANIFEST = _PROJ / "AppxManifest.xml"
+CSPROJ = _PROJ / (_PROJ.name + ".csproj")
 
 
 def marketing_version() -> str:

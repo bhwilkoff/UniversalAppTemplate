@@ -113,18 +113,18 @@ target everywhere — enough to tell the story, few enough that every one earns 
 
 ## §2 — The autonomous playbook
 
-`tools/capture-screenshots.sh` runs a whole platform unattended. It leans on the
+`tools/capture-screenshots.sh (ported; adapt hooks per app)` runs a whole platform unattended. It leans on the
 `DebugHooks` env family (CLAUDE.md, *"Drive the app to a known state for
 screenshots"*), so no screen needs a human tap.
 
 ```bash
-tools/capture-screenshots.sh ios       # iPhone 6.9"
-tools/capture-screenshots.sh ipad
-tools/capture-screenshots.sh tvos
-tools/capture-screenshots.sh macos
-tools/capture-screenshots.sh android
-tools/capture-screenshots.sh android-tablet
-tools/capture-screenshots.sh all       # every Apple + Android target, in order
+tools/capture-screenshots.sh (ported; adapt hooks per app) ios       # iPhone 6.9"
+tools/capture-screenshots.sh (ported; adapt hooks per app) ipad
+tools/capture-screenshots.sh (ported; adapt hooks per app) tvos
+tools/capture-screenshots.sh (ported; adapt hooks per app) macos
+tools/capture-screenshots.sh (ported; adapt hooks per app) android
+tools/capture-screenshots.sh (ported; adapt hooks per app) android-tablet
+tools/capture-screenshots.sh (ported; adapt hooks per app) all       # every Apple + Android target, in order
 ```
 
 Output lands in `branding/store-screenshots/<platform>/NN-name.png`, numbered in

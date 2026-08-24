@@ -21,7 +21,7 @@
 
 set -uo pipefail
 
-PKG="${TV_PKG:-com.example.appname.debug}"
+PKG="${TV_PKG:-com.example.appname.debug}"   # FILL IN (or export TV_PKG)
 ACT="${TV_ACT:-com.example.appname.MainActivity}"
 ADB="${ADB:-adb}"
 SERIAL="${SERIAL:-emulator-5554}"

@@ -1,3 +1,4 @@
+# (Workflow/incident names in comments refer to Archive Watch, the origin repo.)
 # Actions' hosted-runner fleet sometimes refuses to start our jobs — "The job was not
 # acquired by Runner of type hosted even after multiple attempts". Not one step of ours
 # runs; the run just fails ~15 minutes later. The 2026-08-06 Actions major outage took
@@ -10,8 +11,10 @@
 name: Retry infrastructure failures
 
 on:
-  schedule:
-    - cron: "*/30 * * * *"
+  # DORMANT BY DEFAULT — uncomment once this repo has scheduled workflows
+  # of its own to guard (see docs/CI-FLEET.md).
+  # schedule:
+  # - cron: "*/30 * * * *"
   workflow_dispatch:
     inputs:
       lookback_hours:

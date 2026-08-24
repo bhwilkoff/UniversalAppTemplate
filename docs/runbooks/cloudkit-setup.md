@@ -15,7 +15,7 @@
 > App Store builds talk to the PRODUCTION CloudKit environment, which never
 > auto-creates record types (only Xcode-run Development builds do, just-in-
 > time). After running any dev build once while signed in: CloudKit Dashboard
-> (icloud.developer.apple.com) → container `iCloud.app.archivewatch.tvos` →
+> (icloud.developer.apple.com) → container `iCloud.<your-bundle-id>` →
 > Schema → **Deploy Schema Changes…** to Production. Until that's done, every
 > TestFlight build shows "CloudKit schema/container problem" under Settings →
 > Account. Also note: an Xcode-installed device build (Development) and a
@@ -28,12 +28,12 @@ clean (accessing `CKContainer` without the entitlement traps). To turn it on, th
 owner does these one-time steps on a Mac with the Apple Developer account, then
 verifies on real Apple TVs.
 
-## 1. Capabilities (Xcode → target ArchiveWatch → Signing & Capabilities)
+## 1. Capabilities (Xcode → target AppName → Signing & Capabilities)
 - **+ Capability → Sign in with Apple.**
 - **+ Capability → iCloud** → check **CloudKit** → add container
-  **`iCloud.app.archivewatch.tvos`** (must match `CloudSync.containerID` in
+  **`iCloud.<your-bundle-id>`** (must match `CloudSync.containerID` in
   `Services/CloudKitSyncService.swift` AND the container already declared in
-  `ArchiveWatch/ArchiveWatch.entitlements`). Do **NOT** use the old
+  `AppName/AppName.entitlements`). Do **NOT** use the old
   `iCloud.com.bhwilkoff.archivewatch` id — it does not match the code/entitlements
   and was the reason sync silently did nothing.
 - These also need enabling on the App ID in the Apple Developer portal (Xcode's
@@ -80,11 +80,11 @@ Two Apple TVs on the SAME iCloud account, both signed in (Settings → Account):
 4. **Progress** — watch 5 min on A; the resume point shows on B.
 5. CloudKit Dashboard → private DB shows a `Tombstone` record type after a delete.
 If a device CRASHES on launch: the iCloud(CloudKit) capability + container
-`iCloud.app.archivewatch.tvos` isn't on the App ID — add it and rebuild.
+`iCloud.<your-bundle-id>` isn't on the App ID — add it and rebuild.
 
 ## Why this shape
 Decision 009 said "no accounts; all state local." Decision 022 reverses the
 "all-local" half: Apple-native auth only (no third-party), sync is **optional**
 and gates nothing but itself, and the data lives in the user's own private
-CloudKit DB (we never see it). See `DECISIONS.md` 022 and `docs/tvOS-DESIGN.md`
+CloudKit DB (we never see it). See `DECISIONS.md` 022 and `docs/templates/TVOS-DESIGN-template.md`
 §10.2.

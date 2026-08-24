@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Capture a FULL Mac App Store screenshot set for Archive Watch, driving the app to each screen via
-# the AW_START_TAB / AW_START_ITEM / AW_CS_TEST launch hooks (RootView_macOS / CreationStudioTest).
+# the APP_START_TAB / APP_START_ITEM / AW_CS_TEST launch hooks (RootView_macOS / CreationStudioTest).
 # Each shot: relaunch the app on the target screen, size its window to 16:10, wait for art to load,
 # capture the window, and frame it onto a 2880x1800 brand canvas (tools/mac-screenshots.sh logic).
 #
@@ -14,7 +14,7 @@ APP="${1:?usage: mac-shotset.sh /path/to/<app>.app}"
 EXE="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$APP/Contents/Info.plist" 2>/dev/null)"
 BIN="$APP/Contents/MacOS/$EXE"
 [ -x "$BIN" ] || { echo "no binary at $BIN"; exit 1; }
-OUTDIR="$HOME/Desktop/ArchiveWatch-Mac-Screenshots"
+OUTDIR="$HOME/Desktop/${APP_NAME:-AppName}-Mac-Screenshots"
 mkdir -p "$OUTDIR"
 SIZE="${SIZE:-2880x1800}"; W="${SIZE%x*}"; H="${SIZE#*x}"
 BG="${BG:-#0A0A0A}"; MARGIN="${MARGIN:-0.04}"
@@ -25,7 +25,7 @@ PYBIN="tools/.play-venv/bin/python"; [ -x "$PYBIN" ] || PYBIN="python3"
 
 # `|| true`: pkill exits 1 when nothing matches, which under `set -e` would abort the
 # whole run at the first quit (when no app is running yet). No-match is not an error here.
-quit() { pkill -f "Archive Watch.app" 2>/dev/null || true; pkill -f "ArchiveWatchMac" 2>/dev/null || true; sleep 1.5; }
+quit() { pkill -f "${APP_NAME:-AppName}.app" 2>/dev/null || true; sleep 1.5; }
 
 size_window() {
   osascript >/dev/null 2>&1 <<OSA || true
@@ -99,7 +99,7 @@ sleep "${WARM:-90}"
 quit
 
 # Pick two visually strong Detail items from the cached catalog DB (popular, designed art + backdrop).
-DB="$(ls -t "$HOME/Library/Containers/app.archivewatch.tvos/Data/Library/Caches/"*.sqlite 2>/dev/null | head -1)"
+DB="$(ls -t "$HOME/Library/Containers/${APP_BUNDLE:-com.example.appname}/Data/Library/Caches/"*.sqlite 2>/dev/null | head -1)"
 ITEM1="${ITEM1:-}"; ITEM2="${ITEM2:-}"
 if [ -z "$ITEM1" ] && [ -n "$DB" ] && command -v sqlite3 >/dev/null; then
   PICKS="$(sqlite3 "$DB" "SELECT archiveID FROM items WHERE posterURL IS NOT NULL AND posterURL!='' AND hasRealArtwork=1 AND artworkSource!='generated' AND contentType='feature-film' AND imdbVotes>=50000 ORDER BY popularityScore DESC LIMIT 2;" 2>/dev/null || true)"
@@ -108,17 +108,17 @@ if [ -z "$ITEM1" ] && [ -n "$DB" ] && command -v sqlite3 >/dev/null; then
 fi
 echo "Detail items: ITEM1=${ITEM1:-<none>}  ITEM2=${ITEM2:-<none>}  (DB=$DB)"
 
-shot 01-home           AW_START_TAB=home
-shot 02-movies         AW_START_TAB=movies
-shot 03-tvshows        AW_START_TAB=tv
-shot 04-collections    AW_START_TAB=collections
-shot 05-channels       AW_START_TAB=channels
-[ -n "$ITEM1" ] && shot 06-detail AW_START_ITEM="$ITEM1"
-[ -n "$ITEM2" ] && shot 07-detail-2 AW_START_ITEM="$ITEM2"
-shot 08-studio-landing AW_START_TAB=create     # Creation Studio tab BEFORE opening/creating a project
+shot 01-home           APP_START_TAB=home
+shot 02-movies         APP_START_TAB=movies
+shot 03-tvshows        APP_START_TAB=tv
+shot 04-collections    APP_START_TAB=collections
+shot 05-channels       APP_START_TAB=channels
+[ -n "$ITEM1" ] && shot 06-detail APP_START_ITEM="$ITEM1"
+[ -n "$ITEM2" ] && shot 07-detail-2 APP_START_ITEM="$ITEM2"
+shot 08-studio-landing APP_START_TAB=create     # Creation Studio tab BEFORE opening/creating a project
 shot 09-studio-editor  AW_CS_TEST=editor
 shot 10-studio-clip    AW_CS_TEST=markclip
-shot 11-surprise       AW_START_TAB=surprise
+shot 11-surprise       APP_START_TAB=surprise
 quit
 
 echo "== done. Set in $OUTDIR =="

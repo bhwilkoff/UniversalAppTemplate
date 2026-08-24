@@ -1,12 +1,12 @@
 ---
 name: smarttv-web-app
-description: Smart-TV web patterns for Archive Watch's LG webOS / Samsung Tizen / VIDAA build — the additive tv.js+tv.css layer over the vanilla PWA (never a fork, no React so Norigin is out), the vanilla spatial-navigation engine and its misalignment-weight scoring, per-platform key/lifecycle/packaging shims only, Magic Remote pointer coexistence, .ipk/.wgt packaging from the shared root files, and the Node DOM-shim verification. Invoke before building or changing ANY web-TV surface, focus behavior, remote-key handling, or TV packaging.
+description: REFERENCE IMPLEMENTATION (Archive Watch) behind the generic `smart-tv-platform-expansion` skill — consult AFTER it, for the worked example. Smart-TV web patterns for Archive Watch's LG webOS / Samsung Tizen / VIDAA build — the additive tv.js+tv.css layer over the vanilla PWA (never a fork, no React so Norigin is out), the vanilla spatial-navigation engine and its misalignment-weight scoring, per-platform key/lifecycle/packaging shims only, Magic Remote pointer coexistence, .ipk/.wgt packaging from the shared root files, and the Node DOM-shim verification. Invoke before building or changing ANY web-TV surface, focus behavior, remote-key handling, or TV packaging.
 ---
 
 # Smart-TV web app — focus, remotes, packaging
 
-Binding spec: `docs/TV-DESIGN.md` §7. Strategy: **Decision 047**.
-Backlog: `docs/TV-PLATFORM-BACKLOG.md` Phase 3.
+Binding spec: `docs/templates/TV-DESIGN-template.md (copy to docs/TV-DESIGN.md when adopted)` §7. Strategy: **Decision 047**.
+Backlog: `docs/templates/TV-PLATFORM-BACKLOG-template.md` Phase 3.
 
 One web build ships to **LG webOS, Samsung Tizen, and VIDAA/Titan/Zeasn**. They
 are all HTML5 runtimes; the differences are key codes, lifecycle events and
@@ -164,7 +164,7 @@ against the file on disk.
 
 ## See also
 
-- `docs/TV-DESIGN.md` §7 — the binding rules
+- `docs/templates/TV-DESIGN-template.md (copy to docs/TV-DESIGN.md when adopted)` §7 — the binding rules
 - `web-platform-patterns` — service-worker versioning, view lifecycle, the
   sticky/scroll-snap CSS gotchas that still apply
 - `web-catalog-data-layer` — where the TV build's catalog data comes from

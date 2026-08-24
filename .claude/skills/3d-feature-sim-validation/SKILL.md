@@ -196,7 +196,7 @@ The user is the final reviewer. Always do one device-test before declaring a fix
 
 ## Real-world example (BOBA Playbook Hero Shot)
 
-The Hero Shot feature in BOBA-Playbook went through 50+ iterations. The breakthrough happened when the rotation-strip sim was introduced (see `tools/HeroShotSim/sim3d.swift` and the `renderIOSv67RotationStrip` function). Specific bugs caught BY the sim (and avoided being shipped):
+The Hero Shot feature in BOBA-Playbook went through 50+ iterations. The breakthrough happened when the rotation-strip sim was introduced (see `a HeroShotSim-style offline renderer (example in BOBA Playbook; build per app)` and the `renderIOSv67RotationStrip` function). Specific bugs caught BY the sim (and avoided being shipped):
 
 - **v6.8 edge box at 4× thickness**: the sim render showed a solid magenta rectangle where the card art should have been — because the 0.6mm-thick edge box was z-occluding the front plane at 0.15mm. Without the sim, the user would have woken up to a feature where every card showed as a solid colored block.
 - **v6.9 back wash at yaw=180°**: the PBR back with clearcoat 0.20 caught rim light at the perfect specular angle, washing the back center white. Sim caught this BEFORE the user tested.

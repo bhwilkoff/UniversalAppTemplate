@@ -5,7 +5,7 @@ than authoring. **LG rejects submissions whose self-checklist is missing or
 thin**, and that is the single most common avoidable rejection, so §2 is written
 to be pasted as-is.
 
-Backlog: `docs/TV-PLATFORM-BACKLOG.md` L1–L8. Strategy: Decision 047.
+Backlog: `docs/templates/TV-PLATFORM-BACKLOG-template.md` L1–L8. Strategy: Decision 047.
 **LG is the first web-TV store to target** because an individual can publish
 globally there, whereas Samsung's default Public Seller tier is US-only.
 

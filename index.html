@@ -85,5 +85,11 @@
 
   <script src="js/api.js"></script>
   <script src="js/app.js"></script>
+  <!-- Additive smart-TV layer + Cast sender: both self-disable off-TV
+       (tv.js adds html.tv only on a TV runtime; cast-sender no-ops when the
+       Cast framework never loads). See docs/TV-PLATFORMS.md. -->
+  <link rel="stylesheet" href="tv.css">
+  <script src="tv.js"></script>
+  <script src="js/cast-sender.js"></script>
 </body>
 </html>

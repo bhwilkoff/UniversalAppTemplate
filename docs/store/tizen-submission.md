@@ -1,11 +1,11 @@
 # Samsung Tizen — submission pack
 
-Companion to `docs/webos-submission.md`. The **app is identical** — same web
+Companion to `docs/store/webos-submission.md`. The **app is identical** — same web
 build, same TV layer, differing only in key codes, lifecycle events and
 packaging (Decision 047 §7.3). What differs is Samsung's process, and one
 business decision that is genuinely yours.
 
-Backlog: `docs/TV-PLATFORM-BACKLOG.md` S1–S6.
+Backlog: `docs/templates/TV-PLATFORM-BACKLOG-template.md` S1–S6.
 
 ---
 
@@ -50,10 +50,10 @@ and Development checklists by hand. The items that matter for this app:
 | Overscan | Pass | 5% safe insets; no text at the panel edge |
 | Ten-foot legibility | Pass | 24px body minimum at 1080p |
 | No account / payment | Pass | No sign-in, advertising, or purchases |
-| Content rights | Pass | Public-domain / CC only — see `docs/webos-submission.md` §4 |
+| Content rights | Pass | Public-domain / CC only — see `docs/store/webos-submission.md` §4 |
 
 The remote-driven walkthrough Samsung may ask for is the same as
-`docs/webos-submission.md` §1; the app behaves identically.
+`docs/store/webos-submission.md` §1; the app behaves identically.
 
 ---
 
@@ -77,7 +77,7 @@ back it up somewhere durable, outside the repo.
 
 ## 4. Store listing
 
-Same copy as `docs/webos-submission.md` §3. Samsung's screenshot dimensions
+Same copy as `docs/store/webos-submission.md` §3. Samsung's screenshot dimensions
 differ from LG's — check the current requirement in Seller Office at upload
 time rather than trusting a cached number.
 

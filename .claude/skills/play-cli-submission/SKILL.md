@@ -43,13 +43,13 @@ gcloud iam service-accounts create …
 gcloud iam service-accounts keys create key.json --iam-account …
 ```
 
-Then invite that SA's email into the Play Console. **Eventual-consistency retry**: a freshly-created SA sometimes isn't yet visible to the key-create call — retry key creation a few times with backoff before treating it as a real failure. Full walkthrough in `docs/play-api-key-setup.md`.
+Then invite that SA's email into the Play Console. **Eventual-consistency retry**: a freshly-created SA sometimes isn't yet visible to the key-create call — retry key creation a few times with backoff before treating it as a real failure. Full walkthrough in `docs/store/play-api-key-setup.md`.
 
 ## Scaffolding shipped
 
 - `tools/submit-play.sh` — the CLI entry point
 - `tools/play-publish.py` — the edits-transaction driver (insert → upload → track → commit)
-- `docs/play-api-key-setup.md` — SA key setup + the org-policy workaround
+- `docs/store/play-api-key-setup.md` — SA key setup + the org-policy workaround
 
 ## See also
 

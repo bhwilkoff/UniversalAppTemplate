@@ -1,11 +1,11 @@
 ---
 name: macos-native-app-shell
-description: Native macOS patterns for Archive Watch — the multi-scene shell (WindowGroup browse + DocumentGroup .archiveproj editor), Library≠Project, shared-Core reuse, AND the parity-face runtime gotchas (player-as-window-root, NO externalMetadata on macOS, full-width-16:9 hero, the fill-image layout trap, no-archive-thumbnail posters, the ImagePipeline + grayscale-decode fix, the fixed-window Channels EPG, structured-concurrency-not-Combine-timers, Callsheet via NSWorkspace). Invoke before building or changing ANY macOS shell, window, document, player, hero, image, or browse/play/library surface.
+description: REFERENCE IMPLEMENTATION (Archive Watch) behind the generic `macos-platform-patterns` skill — consult AFTER it, for the worked example. Native macOS patterns for Archive Watch — the multi-scene shell (WindowGroup browse + DocumentGroup .archiveproj editor), Library≠Project, shared-Core reuse, AND the parity-face runtime gotchas (player-as-window-root, NO externalMetadata on macOS, full-width-16:9 hero, the fill-image layout trap, no-archive-thumbnail posters, the ImagePipeline + grayscale-decode fix, the fixed-window Channels EPG, structured-concurrency-not-Combine-timers, Callsheet via NSWorkspace). Invoke before building or changing ANY macOS shell, window, document, player, hero, image, or browse/play/library surface.
 ---
 
 # macOS App Shell — native structure for Archive Watch
 
-Binding spec: `docs/macOS-DESIGN.md` §1–§2, §7. Evidence:
+Binding spec: `docs/templates/MACOS-DESIGN-template.md (copy to docs/macOS-DESIGN.md when adopted)` §1–§2, §7. Evidence:
 `docs/research/creation-studio-{macos-architecture-parity,nle-ux-teardown}.md`.
 The Mac is NOT the iOS app resized — build Mac-native idioms.
 
@@ -61,7 +61,7 @@ inspectors, menus) — don't port the phone's full-screen modal navigation.
 
 ## Parity-face runtime rules (browse / play / library) — the gotchas that bit
 
-Full detail: `docs/macOS-DESIGN.md` Part B (§B1–§B12). The sharp ones, each fixed in code
+Full detail: `docs/templates/MACOS-DESIGN-template.md (copy to docs/macOS-DESIGN.md when adopted)` Part B (§B1–§B12). The sharp ones, each fixed in code
 after real failure — don't relearn them:
 
 - **Player is the window ROOT while playing** (§B2), NOT an overlay on the split view —
@@ -90,7 +90,7 @@ after real failure — don't relearn them:
   `org.archivewatch.project`. Sandbox needs `device.microphone` + `device.audio-input` or TCC
   silently denies the voiceover recorder (§B12).
 - **Shipping is its own skill:** `apple-app-store-cli-submission` (manual signing, the
-  ITMS-90111 Xcode-floor trap, PyJWT venv, screenshots) + `docs/macOS-DESIGN.md` Part C.
+  ITMS-90111 Xcode-floor trap, PyJWT venv, screenshots) + `docs/templates/MACOS-DESIGN-template.md (copy to docs/macOS-DESIGN.md when adopted)` Part C.
 
 ## Feature states & density
 

@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+# REFERENCE IMPLEMENTATION (Tidbits Trivia). The SHAPE is the point:
+# env-hook-driven captures per screen, crash detection via the pid simctl
+# returned, durable capture paths, findings in a rounds table. To adopt:
+# replace the TIDBITS_* debug hooks and the screen list with YOUR app's
+# DebugHooks vocabulary (docs/DEVICE-HARNESSES.md, "the QA sweep").
 # qa-sweep.sh — drive EVERY game mode and feature screen on a simulator and capture a PNG
 # of each, so playability and feature completeness can be reviewed from the images rather
 # than by clicking through 40 surfaces by hand.
@@ -23,8 +28,8 @@ PLATFORM="${1:-ios}"
 # return to is a capture you have to take twice.
 OUT="${2:-build/qa/$(date +%F)-$PLATFORM}"
 mkdir -p "$OUT"
-export DEVELOPER_DIR="${DEVELOPER_DIR:-/Applications/Xcode-beta.app/Contents/Developer}"
-BUNDLE=com.learningischange.tidbitstrivia
+export DEVELOPER_DIR="${DEVELOPER_DIR:-/Applications/Xcode.app/Contents/Developer}"
+BUNDLE="${APP_BUNDLE:-com.example.appname}"   # FILL IN
 
 case "$PLATFORM" in
   ios)  DEVICE_MATCH="iPhone 17 Pro" ;;
