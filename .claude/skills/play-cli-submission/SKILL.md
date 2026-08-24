@@ -1,6 +1,6 @@
 ---
 name: play-cli-submission
-description: Use when shipping an Android build (AAB) to Google Play from the command line — no Play Console GUI. Carries the Play Developer API v3 "edits" transaction (insert → upload AAB → set track+notes → commit), service-account JSON auth, the versionCode-+1-every-upload rule, applicationId≠namespace, staged rollout fractions, and the org-policy-block gotcha (create the SA under a personal gmail via gcloud, with an eventual-consistency retry on key create). Triggers on Google Play, Play Console, AAB upload, submit-play, androidpublisher, service account, versionCode, staged rollout, "Play rejected the version", internal track, org policy key block.
+description: Use when shipping an Android build (AAB) to Google Play from the command line — no Play Console GUI. Carries the Play Developer API v3 "edits" transaction (insert → upload AAB → set track+notes → commit), service-account JSON auth, the versionCode-+1-every-upload rule, applicationId≠namespace, staged rollout fractions, and the org-policy-block gotcha (create the SA under a personal gmail via gcloud, with an eventual-consistency retry on key create). Triggers on Google Play, Play Console, AAB upload, submit-play, androidpublisher, service account, versionCode, staged rollout, "Play rejected the version", internal track, org policy key block, refused to auto-submit, pre-launch report, Test Lab.
 ---
 
 # Play CLI Submission
@@ -45,10 +45,32 @@ gcloud iam service-accounts keys create key.json --iam-account …
 
 Then invite that SA's email into the Play Console. **Eventual-consistency retry**: a freshly-created SA sometimes isn't yet visible to the key-create call — retry key creation a few times with backoff before treating it as a real failure. Full walkthrough in `docs/store/play-api-key-setup.md`.
 
+## Rule 7 — A committed edit can still stall in the Console
+
+The edits transaction ends at Play's REVIEW layer, not at "live". Two
+Console states have cost real releases: a changes bar reading **"refused to
+auto-submit"** (or a stuck "N changes") means those changes will NEVER
+process until acted on — it is a stall, not a queue; and **"Submit N
+changes" is all-or-nothing** — every pending Console edit rides the same
+submit, so read what the N contains first. After any CLI publish, confirm
+the Console shows the release in review/live, not sitting behind a changes
+bar. (The Windows twin of this lesson — the `commit=true` and
+publishing-hold stalls — is in `docs/windows/WINDOWS-STORE-SUBMISSION.md`.)
+
+## Rule 8 — The pre-launch report is Firebase Test Lab; run it yourself
+
+The internal track generates NO pre-launch report, so the first automated
+device pass otherwise happens AFTER promotion — too late. The report is
+just Firebase Test Lab: run `tools/testlab-android.sh` against the release
+AAB before promoting. **Physical devices only** — emulators cannot see Play
+Billing, so billing-at-startup crashes (Decision 039's mixed-list throw)
+pass every emulator and fail on every real phone.
+
 ## Scaffolding shipped
 
 - `tools/submit-play.sh` — the CLI entry point
 - `tools/play-publish.py` — the edits-transaction driver (insert → upload → track → commit)
+- `tools/testlab-android.sh` — the self-run pre-launch report (Firebase Test Lab, physical devices)
 - `docs/store/play-api-key-setup.md` — SA key setup + the org-policy workaround
 
 ## See also

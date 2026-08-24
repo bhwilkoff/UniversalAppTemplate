@@ -1,6 +1,6 @@
 ---
 name: cross-platform-parity-discipline
-description: Use when shipping ANY user-facing feature in a multi-platform repo, when asked to "check parity", "audit features", or before a launch wave on any platform. Carries the PARITY.md workflow — same verb / native idiom, same-change-set updates, deliberate-defer cells with reasons, platform-specific affordance sections — and the periodic parity AUDIT protocol that catches missing rows and silently-false cells. Triggers on PARITY.md, feature parity, parity matrix, "ship on all platforms", "does Android have", parity audit, cross-platform feature, launch readiness.
+description: Use when shipping ANY user-facing feature in a multi-platform repo, when asked to "check parity", "audit features", or before a launch wave on any platform. Carries the PARITY.md workflow — same verb / native idiom, same-change-set updates, deliberate-defer cells with reasons, platform-specific affordance sections — and the periodic parity AUDIT protocol that catches missing rows and silently-false cells. Triggers on PARITY.md, feature parity, parity matrix, "ship on all platforms", "does Android have", parity audit, cross-platform feature, launch readiness, degenerate state, platform port audit.
 ---
 
 # Cross-Platform Parity Discipline
@@ -84,12 +84,36 @@ conscientiously.
    not trusted. The canonical false cell: a "(synced)" claim where
    the sync payload never actually carried that record type — code
    existed, data never flowed.
-3. **Stale-blocker check**: for every ⏳/🚫, is the recorded reason
-   still true? Blockers expire (an API ships, a domain gets bought,
-   a measurement gets re-run and contradicts the old one).
-4. **Fix in the same pass**: small gaps (a missing toggle, a missing
+3. **Degenerate-outcome pass**: for the marquee features, drive each
+   to its tie / zero / empty / cold-quit outcome, not just the happy
+   path — a game that ends in a tie, a list with zero results, a
+   session killed mid-flow and relaunched. Happy-path audits miss
+   whole bug classes; a real pass found the tie screen, the
+   empty-history dashboard, and the resume-after-force-quit path all
+   broken on platforms whose happy paths were ✅.
+4. **Stale-blocker check — in BOTH directions**: for every ⏳/🚫, is
+   the recorded reason still true? Blockers expire (an API ships, a
+   domain gets bought, a measurement gets re-run and contradicts the
+   old one). And **audit the claim against the code before building
+   the "missing" feature** — a documented-backlog sweep found four ⏳
+   items that were wrong docs: the features already existed and the
+   matrix was stale in the pessimistic direction. Building from a
+   false ⏳ duplicates shipped work.
+5. **Fix in the same pass**: small gaps (a missing toggle, a missing
    row) get closed during the audit; large ones get ⏳ cells with
    reasons and land in the milestone queue ordered by size.
+
+## Auditing a whole-platform port
+
+When one platform is a PORT of another (a new desktop twin, a TV form
+factor), organize the audit doc **by failure class, not surface by
+surface**: missing entirely · present-but-wrong (logic diverges from the
+source platform) · present-but-unwired (renders, does nothing) ·
+degenerate-state-only bugs. Surface-by-surface walks re-find the same
+class N times and miss the classes that cut across surfaces; a
+failure-class organization turns each class into one fix applied
+everywhere. Give the port its own per-item tracker doc
+(`docs/<PLATFORM>-PARITY.md`) mirroring the main matrix's rows.
 
 ## Working the gap queue
 

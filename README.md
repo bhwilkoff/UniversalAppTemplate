@@ -137,8 +137,8 @@ shipped to production and its lessons were folded back in:
 │   ├── TVOS-PLAYBOOK.md      The full tvOS focus/ten-foot/playback playbook
 │   ├── TV-PLATFORMS.md       Smart-TV store landscape (LG/Samsung/Amazon/Roku/Vizio/Cast)
 │   ├── windows/              Optional 6th platform: Avalonia + MSIX + headless CI
-│   ├── store/                webOS/Tizen submission, Play API key, IAP troubleshooting,
-│   │                         store-screenshot rules
+│   ├── store/                webOS/Tizen submission, Play API key, IAP troubleshooting +
+│   │                         the multi-store IAP release choreography, store-screenshot rules
 │   ├── runbooks/             CloudKit setup, data recovery, tvOS Top Shelf
 │   └── templates/            Seed templates: 6 per-platform binding design docs
 │                            (tvOS/iOS/macOS/Web/Android/Windows) + data-plane contract

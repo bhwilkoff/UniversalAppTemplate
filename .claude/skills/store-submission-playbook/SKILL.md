@@ -1,6 +1,6 @@
 ---
 name: store-submission-playbook
-description: Use when preparing ANY store submission — App Store (iOS/iPadOS/tvOS) or Google Play — including TestFlight/internal-track setup, store listings, screenshots, signing, review prep, and the post-approval follow-ups. Carries the cross-store checklist and the expensive gotchas pre-paid - layered tvOS icons, Play App Signing vs upload-key fingerprints, AASA/assetlinks serving, the personal-account 12-tester rule, screenshot automation via env hooks, privacy manifests, and account-deletion requirements. Triggers on App Store submission, Play Console, TestFlight, app review, store listing, screenshots, signing, archive build, assetlinks, AASA, privacy manifest, release prep.
+description: Use when preparing ANY store submission — App Store (iOS/iPadOS/tvOS/macOS), Google Play, or the Microsoft Store — including TestFlight/internal-track setup, store listings, screenshots, signing, review prep, in-app purchase launches, and the post-approval follow-ups. Carries the cross-store checklist and the expensive gotchas pre-paid - layered tvOS icons, Play App Signing vs upload-key fingerprints, AASA/assetlinks serving, the personal-account 12-tester rule, screenshot automation via env hooks, privacy manifests, account-deletion requirements, the one-submission-per-IAP-product rule and the Ready-to-Submit trap, per-platform License Agreement settings, and the pre-launch-report-is-Test-Lab reality. Triggers on App Store submission, Play Console, TestFlight, app review, store listing, screenshots, signing, archive build, assetlinks, AASA, privacy manifest, release prep, in-app purchase, IAP, subscription launch, paywall empty, pre-launch report, Ready to Submit.
 ---
 
 # Store Submission Playbook
@@ -138,6 +138,20 @@ Shares the Apple pre-flight above; the Mac-specific gates:
   app EMITS (share links, App Links routes) must be declared in an
   intent-filter, and every route must land on the right screen —
   test with `adb shell am start -a android.intent.action.VIEW -d <url>`.
+- **The internal track produces NO pre-launch report.** The
+  pre-launch report IS Firebase Test Lab under another name — don't
+  wait for Play to run it, run it yourself
+  (`tools/testlab-android.sh`) before promoting. **Physical devices
+  only**: emulators cannot see Play Billing at all, so a
+  billing-at-startup crash (the classic mixed-product-list throw,
+  Decision 039) is invisible on every emulator and every local run.
+- **Two Console publish traps**: a changes bar reading "refused to
+  auto-submit" (or stuck at "N changes") means those changes will
+  NEVER process until you act on them — it is a stall, not a queue;
+  and **"Submit N changes" is all-or-nothing** — every pending
+  Console edit (listing copy, data-safety answers, another track's
+  release) rides the same submit, so check what the N contains
+  before clicking.
 
 ## Web (the no-gate platform)
 
@@ -147,6 +161,29 @@ GitHub Pages — Jekyll silently drops dot-directories), HTTPS
 enforced, share URLs render a real landing (a 404-forwarder into
 the app router makes every native share URL meaningful even before
 the web feature exists).
+
+## In-app purchases (any store) — the launch choreography
+
+The full sequencing doc is `docs/store/IAP-RELEASE-CHOREOGRAPHY.md`;
+Decision 039 carries the per-store API shapes; client-side diagnosis
+is `docs/store/IAP-TROUBLESHOOTING.md`. The rules that gate everything:
+
+- **The financial paperwork is the critical path and it's owner-only**
+  (Apple Paid Applications agreement, Play payments profile, Partner
+  Center payout/tax — the last is invisible to non-owner identities).
+  Until done, stores return EMPTY product lists with no error.
+- **An Apple IAP product attaches to exactly ONE review submission** —
+  concurrent platform submissions starve each other. Ship the
+  product-carrying platform first, wait for approval, then the rest.
+- **"Ready to Submit" means never submitted.** Check the review
+  submission's ITEM list, not the product's state page.
+- **Per-platform settings exist** — the License Agreement (EULA) is
+  set per Apple platform; walk each platform's page after changing it.
+- **Empty-success ≠ thrown error** in the products query — render and
+  log them differently, retry the cold-start empty case.
+- **Purchases only verify on each store's real provisioning path**
+  (TestFlight / a physical Play device / the certified Store MSIX) —
+  plan an owner pass per store after release.
 
 ## After approval
 

@@ -37,6 +37,7 @@ these patterns; invoke the skill when its trigger matches.
 | Video/audio streaming from hosts you don't control | `resilient-media-streaming` |
 | Sync, sign-in, favorites/progress across devices | `per-ecosystem-sync-islands` |
 | Preparing any store submission (App Store, Mac App Store, Play, tvOS, Microsoft Store) | `store-submission-playbook` |
+| Launching or debugging in-app purchases on any store (empty paywall, review starvation) | `store-submission-playbook` + `docs/store/IAP-RELEASE-CHOREOGRAPHY.md` |
 | Building/signing/uploading an Apple build from CI (default) | `cloud-appstore-submission` |
 | Publishing an Android build to Play from the CLI | `play-cli-submission` |
 | Publishing a Windows MSIX to the Microsoft Store from CI | `windows-production-gotchas` + `docs/windows/WINDOWS-STORE-SUBMISSION.md` |

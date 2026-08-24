@@ -152,3 +152,21 @@ generator merge guards, randomness-outside-selection, per-store billing
 shapes); README tree/step-12 + CONTRIBUTING now name the scaffold. Left: green;
 Store assets (7 PNGs) intentionally not generated (per-app branding);
 first-Windows-run baselines armed via `-f update_baselines=true` as documented.
+
+**2026-08-24 (second pass) — parity + store-approval robustness.** Found: the
+scaffold wave left three lesson families unported — multi-store IAP release
+choreography, Play pre-launch/publish traps, and the parity-audit method
+lessons. Done: new `docs/store/IAP-RELEASE-CHOREOGRAPHY.md` (financial
+paperwork as owner-only critical path, one-review-submission-per-IAP-product /
+ship serially, the Ready-to-Submit trap, per-platform License Agreement,
+empty-success vs thrown-error, per-store query shapes, real-provisioning-only
+purchase verification, the launch-order checklist); store-submission-playbook
+gained the IAP section + the internal-track-has-no-pre-launch-report /
+Test-Lab-yourself / refused-to-auto-submit / all-or-nothing-submit bullets;
+play-cli-submission gained Rules 7–8 (Console stalls, testlab-android.sh);
+cross-platform-parity-discipline gained the degenerate-outcome audit pass
+(tie/zero/empty/cold-quit), the both-directions stale-⏳ check (false docs vs
+false cells), and the failure-class organization for whole-platform-port
+audits; tvos-platform-patterns gained the SignInWithAppleButton-in-Form
+swallowed-click gotcha; CLAUDE.md table + README tree point at the new doc.
+Left: green.

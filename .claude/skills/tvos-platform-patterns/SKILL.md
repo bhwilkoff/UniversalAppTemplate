@@ -91,6 +91,13 @@ The engine is **geometric, not hierarchical**: it scores all on-screen focusable
 
 ---
 
+- **A `SignInWithAppleButton` inside a `Form` row swallows the remote
+  click** — the row takes focus, the button never receives the press, and
+  `onCompletion` silently never fires (an App Review-visible dead end).
+  Host the button outside the Form (or in a plain focusable container)
+  and never ship a sign-in affordance whose completion handler you
+  haven't seen fire on the simulator.
+
 ## Shape recipes (the load-bearing screens)
 
 ### Sidebar / nav
