@@ -816,3 +816,102 @@ that drops records users may reference leaves a forwarding address.
 "drained" in 94 seconds, dead links headlining a home screen with
 `verified: true`, and a destructive merge acting on saturation readings that
 were statistical coin-flips.
+
+## 035 — Account deletion is a launch requirement, and the anonymous account is an account
+*Date: 2026-08-24 (from Tidbits Trivia Decision 048 + the 2026-07-28 App Review rejections)*
+
+Every platform that ships sign-in ships in-app account deletion in the same
+release — and the deletion path must cover the ANONYMOUS account too. An
+anonymous/guest identity that accumulates state (records, progress, an Elo)
+IS an account in every store's review rubric, even though your UI never
+called it one.
+
+**Why**: Apple rejected a build for exactly this — the reviewer never signed
+in, tapped Delete Account as an anonymous user, and the app had no path.
+Both Apple and Play now require in-app deletion for any app with account
+creation; retrofitting it under review pressure is the most expensive time
+to build it.
+
+**How to apply**: the Settings surface on every platform gets a Delete
+Account row that works for BOTH signed-in and anonymous identities (wipe
+local state + the backend record). Watch the backend semantics: a naive
+"delete" that writes `null` into a shared tree can be a no-op or a
+tombstone-clobber — verify the record is actually gone by reading it back.
+
+## 036 — Bundled content is queried, never loaded: RAM is a shipping constraint
+*Date: 2026-08-24 (from Tidbits Trivia Decision 049 + the vc75/vc85 Play rejections)*
+
+A large bundled corpus (questions, cards, entries — anything in the tens of
+MB as JSON) is accessed through a query layer (SQLite/FTS) or per-mode lazy
+slices, never eagerly deserialized into the object heap at boot. Emulators
+and dev phones hide this class entirely.
+
+**Why**: Play rejected a release twice for an unreproducible-locally crash;
+MEASUREMENT (not iteration) found a 299MB heap peak from eagerly decoding
+the bundled corpus — and a later "fix" re-created it by building per-mode
+shape sets at boot. The corpus grows with every content pass, so the failure
+arrives silently in a release that changed no code.
+
+**How to apply**: bundle a database, not a blob; open it memory-mapped and
+query. If JSON is unavoidable, load per-mode/per-screen slices on demand and
+measure the heap on the LOWEST-RAM device the stores will install to. Add a
+CI check that fails when the eager-loaded bytes at boot exceed a budget.
+
+## 037 — A generator's output is not the shipped artifact; re-running one must be additive
+*Date: 2026-08-24 (from Tidbits Trivia Decision 051, the genguard + tombstones fix)*
+
+When generated content is later hand-edited (authored fixes, curated
+deletions), the generator's raw output becomes an INPUT to the shipped
+artifact, not the artifact itself. Re-running a `gen_*.py` must merge over
+authored changes and honor tombstones for authored deletions — a plain
+regenerate silently reverts every hand fix and resurrects every removed row.
+
+**Why**: authored quality fixes were silently reverted for weeks because a
+generator rewrote its output file wholesale; nothing failed, the diff just
+quietly undid human work.
+
+**How to apply**: every generator writes through a merge guard: authored
+rows win by key, deletions live in a tombstone list the generator respects,
+and CI diffs regenerated output against the shipped artifact to catch a
+guard bypass. Never let "regenerate" be a synonym for "overwrite".
+
+## 038 — Randomness lives outside the selection pipeline
+*Date: 2026-08-24 (from Tidbits Trivia Decision 052; companion to Decision 025)*
+
+A shuffle INSIDE a selection pipeline (shuffle → filter → truncate) chooses
+CONTENT, not presentation, the moment anything downstream truncates — and it
+does so differently per platform and per run. Selection must be
+deterministic end to end (hash-rank per Decision 025); randomness is applied
+only to the final presentation of an already-chosen set (option order,
+display shuffle), seeded where cross-platform agreement matters.
+
+**Why**: a "random for variety" shuffle ahead of a truncation step meant
+different platforms — and different runs — silently played different
+content while every layer looked correct in isolation.
+
+**How to apply**: audit any pipeline containing both a shuffle and a limit.
+Move the shuffle after the cut, or replace it with hash-rank. Golden-test
+the selected SET, not just the first item.
+
+## 039 — Store billing APIs disagree in shape; port the intent, never the code
+*Date: 2026-08-24 (from Tidbits Trivia Decision 055 + the Windows Club IAP build)*
+
+Each store's billing API has a load-bearing shape of its own, and the shapes
+are OPPOSITES: Play Billing requires one query PER product type (a mixed
+INAPP+SUBS list throws — on the main thread, at startup, only on a real
+Play-provisioned device), while the Microsoft Store requires ONE query for
+everything (a subscription is a `Durable` add-on; filtering by a
+"subscription" kind silently returns nothing). Harmonizing them into one
+cross-platform abstraction ships a crash on one platform and an empty
+paywall on the other.
+
+**Why**: the mixed-list throw shipped two consecutive crashing Android
+releases — invisible on emulators (no Play Billing) and in every local
+test; the Windows kind-filter mistake produced an empty paywall with no
+error anywhere. Both were "the other platform's pattern, applied here".
+
+**How to apply**: the entitlement MODEL is shared (products, entitlement
+state, fail-open gating); each platform's QUERY layer is written from that
+store's own docs, verified on that store's real provisioning path (Firebase
+Test Lab / the certified Store install), never translated from a sibling.
+Verify configured product ids by reading them back from the store's own API.

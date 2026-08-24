@@ -133,3 +133,22 @@ the entry retire when circumstances change).
 
 <!-- Append-only. Format: state found → work done → state left.
      Keep entries short — one paragraph per session. -->
+
+**2026-08-24 — Windows scaffold + Tidbits lessons ported.** Found: sixth-gen
+template with docs/windows/ present but no `windows/` source scaffold, a
+WINDOWS-STORE-SUBMISSION.md that was an unadapted Tidbits copy (real Store
+IDs), a playbook describing a pre-ship layout, and no vendored Windows skill.
+Done: committed the `windows/` scaffold (AppName.Core / .App / .HeadlessTests /
+.Windows — the as-shipped Tidbits architecture with every version gotcha
+pre-solved; builds clean, 11 headless tests pass, shell PNGs verified light +
+dark at 1180×760 and the 900×680 floor, versions stamped from
+AppVersion.xcconfig); generalized WINDOWS-STORE-SUBMISSION.md (placeholders +
+§0 checklist, all 12 gotchas + IAP §7 kept); rewrote WINDOWS-PLAYBOOK.md to the
+as-built flat layout (.NET 10, TFM-isolation, DPAPI, narrow-width shell
+renders, network-race flag); added the `windows-production-gotchas` skill;
+added a `## Windows app` CLAUDE.md section + Windows columns in both design
+tables; appended DECISIONS 035–039 (anonymous-account deletion, query-not-load,
+generator merge guards, randomness-outside-selection, per-store billing
+shapes); README tree/step-12 + CONTRIBUTING now name the scaffold. Left: green;
+Store assets (7 PNGs) intentionally not generated (per-app branding);
+first-Windows-run baselines armed via `-f update_baselines=true` as documented.

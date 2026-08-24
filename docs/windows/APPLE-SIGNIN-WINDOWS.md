@@ -53,7 +53,7 @@ open browser ───────────▶ appleid.apple.com
                           user consents
                                  │ form_post (POST)
                                  ▼
-                          https://tidbits-auth.benwilkoff.workers.dev/apple/callback
+                          https://<your-auth-worker>.workers.dev/apple/callback
                                  │ parse state -> port, 302 (a NAVIGATION)
                                  ▼
                                               http://127.0.0.1:P/?id_token=…&state=<nonce>
@@ -84,7 +84,7 @@ domain Apple trusts**. So:
 - `state` keeps its CSRF job: it's `<nonce>.<port>`, and **only the nonce half is returned
   to the app**, which compares it. The port never comes back.
 
-Proven by 9 unit tests (`workers/tidbits-auth/test/`) *and* against the deployed Worker:
+Proven in the source app by 9 unit tests *and* against the deployed Worker:
 
 | Attack | Live result |
 |---|---|
@@ -103,13 +103,13 @@ fires **once per Apple sign-in on Windows** — a rounding error. Note the quota
 ## Deploy
 
 ```bash
-cd workers/tidbits-auth && npm test && npx wrangler deploy
+cd workers/<your-auth-worker> && npm test && npx wrangler deploy
 ```
 
-Live at **`https://tidbits-auth.benwilkoff.workers.dev`** (account `benwilkoff@gmail.com`).
+Deploy to your own `*.workers.dev` subdomain (free tier).
 
 > **Ownership note:** the Worker lives on a *personal* Cloudflare account while the rest of
-> the Tidbits stack (Apple, Google Cloud, Firebase) is under `<your-apple-id-email>`.
+> the app's stack (Apple, Google Cloud, Firebase) is under `<your-apple-id-email>`.
 > Functionally irrelevant; worth consolidating if the company's asset ownership ever matters.
 
 ## Apple portal registration — DONE 2026-07-20
@@ -119,8 +119,8 @@ identifier confirmed from the DOM so a silent typo couldn't slip through):
 
 | | Value |
 |---|---|
-| Domain added | `tidbits-auth.benwilkoff.workers.dev` |
-| Return URL added | `https://tidbits-auth.benwilkoff.workers.dev/apple/callback` |
+| Domain added | `<your-auth-worker>.workers.dev` |
+| Return URL added | `https://<your-auth-worker>.workers.dev/apple/callback` |
 
 **Web sign-in was left untouched** — `<your-domain>` and
 `tidbits-trivia-f2ddb.firebaseapp.com` plus the Firebase `__/auth/handler` Return URL are

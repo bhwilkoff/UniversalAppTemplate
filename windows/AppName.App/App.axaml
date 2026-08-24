@@ -1,0 +1,106 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AppName.App.App"
+             xmlns:local="using:AppName.App"
+             xmlns:sty="using:FluentAvalonia.Styling"
+             RequestedThemeVariant="Default">
+    <!-- "Default" follows the system light/dark; FluentAvaloniaTheme gives the WinUI 11 look. -->
+
+    <Application.DataTemplates>
+        <local:ViewLocator/>
+    </Application.DataTemplates>
+
+    <Application.Resources>
+        <!-- Brand tokens (shared design system — keep in lockstep with css/:root,
+             Design.swift, Color.kt). -->
+        <Color x:Key="BrandPrimary">#FF5C35</Color>
+        <Color x:Key="BrandAccent">#0047FF</Color>
+    </Application.Resources>
+
+    <Application.Styles>
+        <!-- Brand accent instead of the default purple. -->
+        <sty:FluentAvaloniaTheme CustomAccentColor="#FF5C35" />
+
+        <!-- Reusable design-token styles — one definition, many views. Adopt via
+             Classes="card" etc.; never restyle at a call site. -->
+        <Style Selector="Border.card">
+            <Setter Property="Background" Value="{DynamicResource CardBackgroundFillColorDefaultBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource CardStrokeColorDefaultBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Padding" Value="20"/>
+            <!-- The card owns its elevation shadow — never hand-add shadow padding at
+                 a call site. Kept subtle so it reads native on Fluent. -->
+            <Setter Property="BoxShadow" Value="0 1 8 0 #1A000000"/>
+        </Style>
+
+        <!-- The brand CTA. FluentAvalonia derives a LIGHTER accent for the dark theme
+             (AccentFillColorDefaultBrush -> Light1/2/3), which washes a brand-colored
+             hero out while hard-coded brand fills beside it stay saturated — adjacent
+             CTAs disagreeing. The brand primary is a FIXED token on every platform,
+             so pin it here. Fluent's derived accent still drives focus rings and
+             selection, which is the correct native behaviour for those. -->
+        <Style Selector="Button.accent /template/ ContentPresenter">
+            <Setter Property="Background" Value="#FF5C35"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="#FF5C35"/>
+        </Style>
+        <Style Selector="Button.accent:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#E64A22"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="#E64A22"/>
+        </Style>
+        <Style Selector="Button.accent:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="#CC3E1B"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="#CC3E1B"/>
+        </Style>
+        <Style Selector="Button.accent:disabled /template/ ContentPresenter">
+            <Setter Property="Background" Value="#66FF5C35"/>
+            <Setter Property="Foreground" Value="#99FFFFFF"/>
+        </Style>
+        <!-- Same rule, different control: a switched-on ToggleSwitch is an accent
+             surface too. Pin the "on" fill in both themes. -->
+        <Style Selector="ToggleSwitch:checked /template/ Border#SwitchKnobBounds">
+            <Setter Property="Background" Value="#FF5C35"/>
+            <Setter Property="BorderBrush" Value="#FF5C35"/>
+        </Style>
+
+        <Style Selector="Button.chunky">
+            <Setter Property="Padding" Value="24,13"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="CornerRadius" Value="10"/>
+        </Style>
+        <Style Selector="Button.compact">
+            <Setter Property="Padding" Value="14,8"/>
+            <Setter Property="CornerRadius" Value="8"/>
+        </Style>
+
+        <!-- The six-level type ramp (L1 page title -> L6 tabular), one definition
+             adopted via Classes. Density comes from removing chrome, not adding
+             decoration (mobile-first-density-design); refuse a 7th level. -->
+        <Style Selector="TextBlock.view-heading">     <!-- L1 page title -->
+            <Setter Property="FontSize" Value="34"/>
+            <Setter Property="FontWeight" Value="Black"/>
+        </Style>
+        <Style Selector="TextBlock.section-header">   <!-- L2 section header -->
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+        <Style Selector="TextBlock.body-strong">      <!-- L3 emphasized body -->
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+        <Style Selector="TextBlock.body">             <!-- L4 body -->
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+        <Style Selector="TextBlock.caption">          <!-- L5 caption -->
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Opacity" Value="0.7"/>
+        </Style>
+        <Style Selector="TextBlock.tabular">          <!-- L6 tabular (scores/times) -->
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontFamily" Value="Cascadia Mono,Consolas,Menlo,monospace"/>
+        </Style>
+    </Application.Styles>
+</Application>

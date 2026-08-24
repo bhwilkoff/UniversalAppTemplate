@@ -36,9 +36,10 @@ these patterns; invoke the skill when its trigger matches.
 | A value that must be identical on every platform (daily pick, shuffle, hash) | `cross-platform-determinism` |
 | Video/audio streaming from hosts you don't control | `resilient-media-streaming` |
 | Sync, sign-in, favorites/progress across devices | `per-ecosystem-sync-islands` |
-| Preparing any store submission (App Store, Mac App Store, Play, tvOS) | `store-submission-playbook` |
+| Preparing any store submission (App Store, Mac App Store, Play, tvOS, Microsoft Store) | `store-submission-playbook` |
 | Building/signing/uploading an Apple build from CI (default) | `cloud-appstore-submission` |
 | Publishing an Android build to Play from the CLI | `play-cli-submission` |
+| Publishing a Windows MSIX to the Microsoft Store from CI | `windows-production-gotchas` + `docs/windows/WINDOWS-STORE-SUBMISSION.md` |
 | Logging an architecture decision | `architectural-decision-log` |
 | User pushback after 3+ iterations of "still broken" | `3d-feature-debug-loop` |
 | Adding/editing ANY scheduled workflow, or debugging CI failures / lock contention / alert noise | `ci-fleet-engineering` |
@@ -85,9 +86,11 @@ Platform-specific skill triggers:
   spatial-navigation engine, per-platform shims, `.ipk`/`.wgt`
   packaging from the one shared root. Vendor landscape + store
   process: `docs/TV-PLATFORMS.md`.
-- **Windows (optional 6th platform)**: `docs/windows/` — Avalonia +
-  headless-Skia where `windows-latest` IS the Windows machine; the
-  MSIX Store pipeline; isolate any platform TFM in its own library.
+- **Windows (optional 6th platform)**: `windows-production-gotchas`
+  FIRST — the CI-is-the-Windows-machine doctrine, headless-PNG
+  observability, the visual-baseline gate, the platform-TFM and MSIX
+  traps. The `windows/` scaffold is the as-shipped architecture
+  (builds green out of the box); pipeline depth in `docs/windows/`.
 - **Web**: `web-platform-patterns` is the umbrella — view system,
   URL state, service worker, IndexedDB, image fallback chains, CSS
   gotchas, headless verification. Design skills under `KUI:<name>`;
@@ -421,15 +424,63 @@ and the Android skill stack carry the depth):
 
 ---
 
+## Windows app (optional 6th platform)
+
+**Stack**: **Avalonia 12** + **FluentAvaloniaUI 3** + **.NET 10** (C#),
+`CommunityToolkit.Mvvm` for MVVM, DPAPI for secrets. No WinUI, no WPF —
+Avalonia-only, because `Avalonia.Headless` renders real Skia pixels
+in-process on any OS, which is what makes the $0, no-Windows-hardware
+pipeline real (Decision 029). Ships to the Microsoft Store as an MSIX
+(Microsoft re-signs — no cert to manage) + a single-file `.exe` direct
+channel.
+
+The **`windows/` scaffold is the as-shipped architecture** of a
+Store-certified app — adopt it per `windows/README.md`; don't re-derive
+it. Four projects, and the shape is load-bearing: `AppName.Core`
+(OS-agnostic C# port of the shared logic), `AppName.App` (Avalonia UI),
+`AppName.HeadlessTests` (PNG snapshots + the visual-baseline gate +
+golden vectors), `AppName.Windows` (the ONLY `net10.0-windows` TFM —
+content-free WinRT edge, loaded reflectively; the TFM on the app project
+kills every MSIX publish with MSB4062).
+
+**The loop is CI, not a local desktop**: iterate on the Mac head
+(`dotnet test` → `Read` the PNGs), gate on `windows-latest`
+(`gh workflow run windows-repl.yml`, ~2–4 min). "Renders on the Mac" is
+never "correct on Windows". Critical conventions (depth in
+`windows-production-gotchas` + `docs/windows/WINDOWS-PLAYBOOK.md`):
+
+- **FluentAvalonia components first** (`FANavigationView` shell,
+  `FAContentDialog`, `SettingsExpander`) before any custom control —
+  note the `FA` prefix in v3.
+- **Compiled bindings on** + `x:DataType` on every view — a binding
+  typo is a build error, not a silent blank. Views are parameterless.
+- **The six-level type ramp + `Border.card` live once in `App.axaml`**;
+  pin the brand accent (Fluent's dark-theme derivation washes it out).
+- **All network calls through the shared Core client** — never a raw
+  `HttpClient` from a view/VM.
+- **Secrets are DPAPI-protected**, never cleartext on disk.
+- **Pure function + thin Windows-guarded edge** for all Win32/WinRT work
+  (`Win32HostInterop`, the reflective store gateway) — this is what
+  keeps it testable off Windows.
+- **Version bump on every ship** — `<Version>` in the csproj +
+  AppxManifest, stamped by `tools/stamp_msix_version.py` from
+  `AppVersion.xcconfig` (the Store reserves the 4th segment).
+- **Ship**: `gh workflow run windows-store.yml -f submit=true
+  -f commit=true` — anything less succeeds while shipping nothing. See
+  `docs/windows/WINDOWS-STORE-SUBMISSION.md` for the bootstrap and the
+  silent stalls.
+
+---
+
 ## Shared design system
 
-**Design tokens** — keep these in lockstep across web / Apple / Android
-(the three Apple platforms share one `Design.swift` in Core):
+**Design tokens** — keep these in lockstep across web / Apple / Android /
+Windows (the three Apple platforms share one `Design.swift` in Core):
 
-| Token | Web | Apple (iOS/macOS/tvOS Core) | Android |
-|---|---|---|---|
-| Primary | `--color-primary` in `:root` | `Color.primary` in `Design.swift` | `BrandPrimary` in `ui/theme/Color.kt` |
-| Surface | `--color-surface` | `Color.surface` | `BrandSurface` |
+| Token | Web | Apple (iOS/macOS/tvOS Core) | Android | Windows |
+|---|---|---|---|---|
+| Primary | `--color-primary` in `:root` | `Color.primary` in `Design.swift` | `BrandPrimary` in `ui/theme/Color.kt` | `BrandPrimary` in `App.axaml` (+ the pinned `.accent` styles) |
+| Surface | `--color-surface` | `Color.surface` | `BrandSurface` | `BrandSurface` / `Border.card` |
 
 <!-- FILL IN your palette. Two systems, kept distinct:
      - Brand (UI chrome only): primary CTA, accent, background, surface
@@ -453,14 +504,14 @@ and the Android skill stack carry the depth):
 Refuse a seventh; refactor instead. See `mobile-first-density-design`
 for the discipline.
 
-| Level | Web class | iOS / macOS `Font.TextStyle` | tvOS | Android M3 token |
-|---|---|---|---|---|
-| L1 Page title | `.view-heading` | `.largeTitle` | `.title1` (57pt) | `displaySmall` |
-| L2 Section header | `.section-header` | `.title2` | `.title3` (38pt) | `headlineSmall` |
-| L3 Emphasized body | `.body-strong` | `.headline` | `.headline` | `titleMedium` |
-| L4 Body | `.body` | `.body` | `.body` (29pt — the 10-ft floor) | `bodyMedium` |
-| L5 Caption | `.caption` | `.caption` | `.caption1` (25pt) | `labelMedium` |
-| L6 Tabular | `.tabular` | `.body.monospacedDigit()` | same | `bodySmall` w/ tabular |
+| Level | Web class | iOS / macOS `Font.TextStyle` | tvOS | Android M3 token | Windows (`App.axaml`) |
+|---|---|---|---|---|---|
+| L1 Page title | `.view-heading` | `.largeTitle` | `.title1` (57pt) | `displaySmall` | `TextBlock.view-heading` (34/Black) |
+| L2 Section header | `.section-header` | `.title2` | `.title3` (38pt) | `headlineSmall` | `.section-header` (20/Bold) |
+| L3 Emphasized body | `.body-strong` | `.headline` | `.headline` | `titleMedium` | `.body-strong` |
+| L4 Body | `.body` | `.body` | `.body` (29pt — the 10-ft floor) | `bodyMedium` | `.body` |
+| L5 Caption | `.caption` | `.caption` | `.caption1` (25pt) | `labelMedium` | `.caption` |
+| L6 Tabular | `.tabular` | `.body.monospacedDigit()` | same | `bodySmall` w/ tabular | `.tabular` |
 
 macOS shares the iOS `Font.TextStyle` ramp (same Core `Design.swift`).
 tvOS uses the same six levels but its own larger ramp — system tokens

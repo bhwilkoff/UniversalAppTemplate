@@ -41,11 +41,13 @@ into a next-letter fork.
   `smarttv-web-app` skills, the additive `tv.js`/`tv.css` layer, a Cast
   receiver, and webOS/Tizen packaging + submission docs) — two builds
   reach five stores; Cast covers the closed sets.
-- **Windows as an optional first-class platform**
-  (`docs/windows/`) — Avalonia + headless-Skia CI where
-  `windows-latest` IS the Windows machine, the Microsoft Store MSIX
-  pipeline, Sign in with Apple on Windows, and the platform-TFM
-  isolation rule.
+- **Windows as an optional first-class platform** — a committed
+  `windows/` scaffold (the as-shipped Avalonia architecture: builds
+  green out of the box, headless-PNG snapshots, the visual-baseline
+  gate, the isolated-TFM WinRT library) plus `docs/windows/`: Avalonia +
+  headless-Skia CI where `windows-latest` IS the Windows machine, the
+  Microsoft Store MSIX pipeline, Sign in with Apple on Windows, and the
+  `windows-production-gotchas` skill.
 - **The full tvOS playbook** (`docs/TVOS-PLAYBOOK.md`) and the
   multi-store IAP troubleshooting + store-screenshot rule set
   (`docs/store/`).
@@ -176,6 +178,13 @@ shipped to production and its lessons were folded back in:
 │   ├── scripts/sync_shared_assets.sh     Mirror /assets/ into the AAB
 │   └── README.md                         Per-module bootstrap notes
 │
+├── windows/               Optional 6th platform: Avalonia + FluentAvalonia + .NET scaffold
+│   ├── AppName.Core/                     OS-agnostic C# port of the shared logic
+│   ├── AppName.App/                      Avalonia UI (shell, type ramp, DPAPI, Win32 seam)
+│   ├── AppName.HeadlessTests/            PNG snapshots + visual-baseline gate + goldens
+│   ├── AppName.Windows/                  The ONLY net10.0-windows TFM (content-free WinRT edge)
+│   └── README.md                         Adoption + the Mac↔CI loop
+│
 ├── tv.js, tv.css          Additive smart-TV layer over the web app (webOS/Tizen)
 ├── tv/                    webOS/Tizen packaging (build-tv-packages.sh + manifests)
 ├── cast/                  Google Cast custom Web Receiver (CAF v3)
@@ -251,10 +260,13 @@ shipped to production and its lessons were folded back in:
     then package with `tv/build-tv-packages.sh`. Landscape + stores:
     `docs/TV-PLATFORMS.md`; Android TV rides the existing Android app
     (see `androidtv-compose-focus`).
-12. **Enable Windows** (when a desktop column is earned): follow
-    `docs/windows/WINDOWS-PLAYBOOK.md` — copy
-    `docs/windows/workflows/*.yml` into `.github/workflows/` and rename
-    `AppName.*` to your solution.
+12. **Enable Windows** (when a desktop column is earned): adopt the
+    committed `windows/` scaffold per `windows/README.md` (rename
+    `AppName.*`, copy `docs/windows/workflows/*.yml` into
+    `.github/workflows/`), then follow
+    `docs/windows/WINDOWS-PLAYBOOK.md`. Verify with
+    `cd windows && dotnet test` (PNGs on any OS), gate on
+    `windows-repl.yml`.
 13. **Enable the guardians + harnesses** (once the repo has scheduled
     workflows or on-device work): uncomment the `schedule:` blocks in
     `.github/workflows/workflow-health.yml` +

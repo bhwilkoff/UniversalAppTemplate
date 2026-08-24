@@ -1,9 +1,10 @@
 # Contributing
 
 This is a quint-platform template — web + iOS/iPadOS + macOS + tvOS +
-Android in one repo. The contribution rules below keep the platforms
-in lockstep. (The three Apple platforms — iOS, macOS, tvOS — build
-from one universal target and one shared `Core/`.)
+Android in one repo, with Windows as an optional sixth platform
+(`windows/`). The contribution rules below keep the platforms in
+lockstep. (The three Apple platforms — iOS, macOS, tvOS — build from
+one universal target and one shared `Core/`.)
 
 ## The parity rule
 
@@ -24,6 +25,11 @@ Reject PRs that ship a user-facing change without touching PARITY.
 | Version bumped (if shipping) | n/a — GitHub Pages | `AppVersion.xcconfig` | `app/build.gradle.kts` `versionCode` + `versionName` |
 | Docs touched | `WEB-DESIGN.md` if UI/IA changed | `iOS-DESIGN.md` / `macOS-DESIGN.md` / `tvOS-DESIGN.md` if UI/IA changed | `ANDROID-DESIGN.md` if UI/IA changed |
 | PARITY.md row | ✅ | ✅ | ✅ |
+
+If the Windows column is enabled: tests via `cd windows && dotnet test`
+on any OS, gated on `windows-repl.yml` (real `windows-latest` pixels);
+version via `AppVersion.xcconfig` + `tools/stamp_msix_version.py`;
+`WINDOWS-DESIGN.md` if UI/IA changed; PARITY.md row like every platform.
 
 ## Conventions
 
