@@ -1,3 +1,5 @@
+// PORTED FROM ARCHIVE WATCH — Google Cast sender (additive, self-disabling).
+// Replace the receiver app id with YOUR Cast Console registration.
 /* Archive Watch — Google Cast sender (web).
  *
  * Adds a Cast button to the player that hands the current film to a Chromecast,

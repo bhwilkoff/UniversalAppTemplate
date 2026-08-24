@@ -1,8 +1,8 @@
-# Android module — QuadAppTemplate
+# Android module — Universal App Template
 
 Native Kotlin + Jetpack Compose codebase for the Android client.
 Lives under `/android/` in the same monorepo as web (`/`, `/css/`,
-`/js/`) and iOS (`/ios/`).
+`/js/`) and iOS (`/apple/`).
 
 ## First-time bootstrap
 

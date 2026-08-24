@@ -124,12 +124,23 @@ shipped to production and its lessons were folded back in:
 ├── DEEP_LINKS.md          The URL contract across all platforms
 ├── README.md              This file
 ├── .claude/               Slash commands + session-start hook + vendored skills
-├── .github/workflows/     appstore-build.yml (Apple cloud build+submit) + android-build.yml
+├── .github/workflows/     appstore-build.yml + android-build.yml + the two standing
+│                          guardians: workflow-health.yml, retry-infra-failures.yml
 ├── .well-known/           Universal Links + App Links verification files
 ├── docs/
 │   ├── CLOUD-SUBMISSION.md   The Apple + Play cloud/API build & submit runbook
-│   └── templates/           Seed templates: 5 per-platform binding design docs
-│                            (tvOS/iOS/macOS/Web/Android) + data-plane contract
+│   ├── CI-FLEET.md           Workflow doctrine: locks, budgets, guards, sweeper, auditor
+│   ├── AUTONOMOUS-LOOPS.md   Unattended-loop discipline: external observation, honesty
+│   ├── DEVICE-HARNESSES.md   Per-platform observation harness catalog
+│   ├── TVOS-PLAYBOOK.md      The full tvOS focus/ten-foot/playback playbook
+│   ├── TV-PLATFORMS.md       Smart-TV store landscape (LG/Samsung/Amazon/Roku/Vizio/Cast)
+│   ├── windows/              Optional 6th platform: Avalonia + MSIX + headless CI
+│   ├── store/                webOS/Tizen submission, Play API key, IAP troubleshooting,
+│   │                         store-screenshot rules
+│   ├── runbooks/             CloudKit setup, data recovery, tvOS Top Shelf
+│   └── templates/            Seed templates: 6 per-platform binding design docs
+│                            (tvOS/iOS/macOS/Web/Android/Windows) + data-plane contract
+│                            + TV design/backlog + split-writer workflow + owner playbook
 │
 ├── index.html             Web app entry (vanilla HTML/CSS/JS — no build step)
 ├── css/styles.css         Mobile-first CSS; body flex-column for Safari
@@ -147,9 +158,16 @@ shipped to production and its lessons were folded back in:
 ├── AppVersion.xcconfig    Shared Apple version numbers (all Apple targets)
 ├── ci_scripts/            Xcode Cloud build scripts (optional; cloud workflow is the default)
 │
-├── tools/                 Cloud submission scaffolding + skill refresh
-│   ├── submit-appstore.sh, asc_certs.py, asc_profiles.py, ci_make_signing_p12.py
-│   ├── submit-play.sh, play-publish.py
+├── tools/                 Submission, CI-fleet, and device-harness tooling
+│   ├── submit-appstore.sh, asc_certs.py, asc_profiles.py, asc_prune_certs.py,
+│   │   asc_build_exists.py, ci_make_signing_p12.py, submit-play.sh, play-publish.py
+│   ├── gh_retry.sh, gh_dispatch.sh, retry_infra_failures.py,
+│   │   audit_workflow_health.py, check_workflow_gates.py,
+│   │   sqlite_publish_guard.py, catalog_delta.py
+│   ├── atv_scenario.py + ScreenOCR/, atv_see.sh, throttled_range_server.py,
+│   │   verify_tv_focus.sh, tv_screenshots.sh, test_tv_focus.mjs, test_tv_ua.mjs,
+│   │   test_packaged_origin.mjs, audit_fire_tv_gms.py, audit_tv_g6.py,
+│   │   qa-sweep.sh, testlab-android.sh, mac-screenshots.sh, devserve.py
 │   └── refresh-skills.sh, install-android-skills.sh
 │
 ├── android/               Android module (Kotlin + Compose + Material 3 Expressive)
@@ -157,6 +175,10 @@ shipped to production and its lessons were folded back in:
 │   ├── app/                              Composition root
 │   ├── scripts/sync_shared_assets.sh     Mirror /assets/ into the AAB
 │   └── README.md                         Per-module bootstrap notes
+│
+├── tv.js, tv.css          Additive smart-TV layer over the web app (webOS/Tizen)
+├── tv/                    webOS/Tizen packaging (build-tv-packages.sh + manifests)
+├── cast/                  Google Cast custom Web Receiver (CAF v3)
 │
 └── .gitignore             Build artifacts + secrets across all platforms
 ```

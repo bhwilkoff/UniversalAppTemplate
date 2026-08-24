@@ -1,3 +1,7 @@
+// PORTED FROM ARCHIVE WATCH — the additive smart-TV layer. Adapt the
+// DOM selectors/observers to YOUR viewer markup; the spatial-nav engine,
+// platform shims, and html.tv scoping are app-neutral. See the
+// smarttv-web-app skill and docs/templates/TV-DESIGN-template.md.
 /* Archive Watch — smart-TV layer (Samsung Tizen · LG webOS · VIDAA · aggregators).
  *
  * Binding rules: docs/TV-DESIGN.md §7. Strategy: Decision 047.
