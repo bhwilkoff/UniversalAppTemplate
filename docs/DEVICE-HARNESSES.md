@@ -117,6 +117,25 @@ images through ONE decode path — captured frames are RGBA, PNG-decoded files
 BGRA, and comparing them directly reports identical images as differing only
 where they are colored.
 
+## Compile-the-shipped-file Swift harnesses
+
+For Apple-framework behavior no simulator can prove (AVFoundation asset
+shapes, HLS loading, rotation logic that must survive process restarts),
+write a standalone `swiftc`-compiled harness that COMPILES THE SHIPPED
+SOURCE FILE plus a small main — not a mock of it — and exercises it against
+real frameworks and real network. Archive Watch ran ~22 of these
+(`test_local_subtitle_loader.swift`, `test_airplay_routing.swift`,
+`test_topshelf_rotation.swift`, …); they caught, among others: a `file://`
+HLS master that never plays (empty error log, zero access events — only a
+real AVPlayer shows it), a Top Shelf rotation window that could render a
+shelf of filler while every assertion passed (fixed by asserting a marquee
+row per window), and negative controls that would have passed with the
+feature deleted. Keep pure logic in Foundation-only files precisely so a
+harness can compile them. Two rules: the harness runs the SHIPPED file (a
+re-implementation verifies nothing), and platform-behavior probes run ONE
+SHAPE PER PROCESS — state leaks between probes attributed one shape's
+result to another and cost three shipped "fixes."
+
 ## In-app self-audit
 
 For surfaces no external instrument can reach cheaply, ship an env-gated

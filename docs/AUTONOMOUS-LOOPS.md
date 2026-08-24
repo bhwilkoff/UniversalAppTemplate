@@ -86,6 +86,19 @@ a property true by construction). Standing habits:
   entries move VERBATIM to `docs/decisions/` archives (never summarized —
   append-only binds in the archives too). Roll at ~120 KB.
 
+## 3b. Research before architecture (standing rule)
+
+No architecture change to a load-bearing subsystem ships from pattern-
+matching or memory: commission a full best-practices research pass first
+(current-year sources, verified-vs-inferred marked), check the decision log
+for approaches already REJECTED (re-implementing one without new evidence
+is the cardinal sin), and encode the findings as a skill or binding doc so
+the next session inherits the conclusion, not the search. The one time this
+repo skipped it, three successive caption architectures were built on a
+mis-measured premise. Corollary: when the platform vendor documents a
+capability, MEASURE it on the target device before building on it — the
+doc's claim and the device's behavior diverged four separate times.
+
 ## 4. Sources of work, order of work
 
 - Mine the owner's actual words first: verbatim requests in commit history,

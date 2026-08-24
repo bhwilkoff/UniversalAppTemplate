@@ -136,6 +136,9 @@ shipped to production and its lessons were folded back in:
 │   ├── DEVICE-HARNESSES.md   Per-platform observation harness catalog
 │   ├── TVOS-PLAYBOOK.md      The full tvOS focus/ten-foot/playback playbook
 │   ├── TV-PLATFORMS.md       Smart-TV store landscape (LG/Samsung/Amazon/Roku/Vizio/Cast)
+│   ├── MEDIA-PLAYBACK.md     Streaming + captions doctrine (media apps)
+│   ├── PROVENANCE.md         Coverage map: every lesson's home + deliberate exclusions
+│   ├── research/             Ported research references (ten-foot design, social video, sync)
 │   ├── windows/              Optional 6th platform: Avalonia + MSIX + headless CI
 │   ├── store/                webOS/Tizen submission, Play API key, IAP troubleshooting +
 │   │                         the multi-store IAP release choreography, store-screenshot rules

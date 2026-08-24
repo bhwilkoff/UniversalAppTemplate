@@ -623,6 +623,13 @@ the triggers above. Read the doc before re-deriving the pattern.
   merely-fixed is a load-bearing distinction in every session log;
   DECISIONS.md stays context-sized (index + recent entries, older
   entries archived VERBATIM under `docs/decisions/`, roll at ~120 KB).
+- **`docs/MEDIA-PLAYBACK.md`** — for MEDIA apps only: the streaming +
+  captions doctrine (loader invariants, the custom-loader/native-feature
+  conflict list, HLS shapes, live captions, subtitle judging).
+- **`docs/PROVENANCE.md`** — the coverage map. When you learn something
+  template-worthy in an app repo, upstream the generic form HERE in the
+  same session and update the map — app-local docs are where lessons go
+  to be lost.
 - **`docs/DEVICE-HARNESSES.md`** — the per-platform observation
   harness catalog (Apple TV scenario runner + OCR, Android TV focus
   verification, web-TV engine tests, throttled-network ship gates,
