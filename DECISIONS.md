@@ -915,3 +915,91 @@ state, fail-open gating); each platform's QUERY layer is written from that
 store's own docs, verified on that store's real provisioning path (Firebase
 Test Lab / the certified Store install), never translated from a sibling.
 Verify configured product ids by reading them back from the store's own API.
+
+## 040 — Local persistence must never block launch: open in do/catch, fall back to in-memory
+*Date: 2026-08-24 (from Bsky Dreams, the SwiftData corrupt-store fix)*
+
+The local store (SwiftData `ModelContainer`, Room database, IndexedDB
+open) is created inside a failure handler; if the on-disk store fails to
+open, the app falls back to an in-memory store and launches anyway.
+
+**Why**: a corrupt or migration-incompatible store previously crashed the
+app on every launch with no recovery path — the user's only fix was
+delete-and-reinstall. One session without persistence is a nuisance; a
+launch-blocking trap is a lost user. (Same family as the SwiftData
+lightweight-migration trap: a property added to an existing model needs an
+inline default at the declaration, or existing stores crash on open.)
+
+**How to apply**: wrap container/DB creation in do/catch (or the platform
+equivalent), fall back to in-memory, and let the next clean launch rebuild
+the on-disk store. Surface degraded persistence to the user only if a
+user-visible feature depends on it. Never let "the store is the app's
+foundation" justify trapping on it.
+
+## 041 — When the native project can't live at the repo root, a root workspace shim satisfies the CI host
+*Date: 2026-08-24 (from Bsky Dreams, the Xcode Cloud onboarding fight)*
+
+Decision 002 puts the Xcode project at the repo root. When a repo's
+history makes that impossible (the root belongs to another platform and
+the project is nested), do NOT move the project — add a **root
+`.xcworkspace`** whose `FileRef` points at the nested `.xcodeproj`, and
+target the workspace from CI.
+
+**Why**: Xcode Cloud (and similar hosts) hard-require the
+project/workspace at the repository root and silently revert a configured
+subdirectory path. Relocating a live App Store project mixes platform
+sources and churns every path; the workspace shim is three small files.
+
+**How to apply**: (1) root `NameApp.xcworkspace` referencing the nested
+project; (2) a **workspace-level shared scheme**
+(`.xcworkspace/xcshareddata/xcschemes/`) copied from the project scheme
+with container paths rewritten relative to the root — CI validates the
+scheme at the workspace's shared-data path, not the project's; (3)
+`ci_scripts/` beside the workspace (the repo root), because the CI host
+only runs scripts beside whatever the workflow targets. Quote paths —
+nested projects often carry spaces. Note per Decision 020 the GitHub-runner
+pipeline remains the default; this shim is for whichever host imposes the
+root requirement.
+
+## 042 — Platform-free logic gets a sidecar SPM package so `swift test` runs without a simulator
+*Date: 2026-08-24 (from Bsky Dreams, the gesture-router test package)*
+
+Pure logic that a UI feature depends on (gesture routing math, ranking
+functions, parsers) is extracted into a small standalone SwiftPM package
+in the repo — `platforms: [.macOS(...)]`, no app-target dependency — with
+its tests, runnable via bare `swift test`.
+
+**Why**: logic embedded in the app target can only be tested through
+xcodebuild + a booted simulator — slow enough that tests don't get run in
+tight loops, and unavailable to CI shells without simulator setup. The
+sidecar package gave a 43-test suite on the exact code that had burned 16
+debugging iterations, at second-scale runtimes. It also forces the
+platform seam: code in the package provably imports no UIKit/SwiftUI.
+
+**How to apply**: when a bug-prone feature has a computable core, extract
+that core into a repo-local SPM package (source + testTarget), have the
+app target include the same source, and run `swift test` in the loop and
+in CI. This complements Decision 032 — external observation still gates
+UI behavior; the package gates the math.
+
+## 043 — Algorithmic surfaces honor the user's own moderation and explain every ranked item
+*Date: 2026-08-24 (from Bsky Dreams, the Discover feed rebuild)*
+
+Any surface this template's apps rank algorithmically (feeds, discovery,
+recommendations) must (a) apply the user's OWN existing moderation
+settings — platform mutes/blocks, muted words, content-label
+preferences — rather than an app-invented blocklist, (b) personalize only
+from signals the user can see and change by acting in the app, and (c)
+attach a one-line "why you're seeing this" reason to every ranked item.
+
+**Why**: the first build merged globally engagement-ranked sources — every
+account saw the same feed, global virality dominated, and the score
+structurally rewarded rage-bait. Ranking is an editorial act; unexamined,
+it optimizes for exactly what the "Why we build" note rejects. The
+transparency chip is the enforcement mechanism: a signal whose reason
+can't be stated in one chip is too opaque to use.
+
+**How to apply**: run the `learning-orientation-design` four questions
+against the ranking FUNCTION itself, not just the feature proposal; full
+pattern (multi-source merge, conversation-weighted scoring, seen-item
+bypass, flat-tabs IA) in `values-based-feed-ranking`.

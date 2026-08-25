@@ -167,7 +167,19 @@ intentional). Use `Text(verbatim:)` for numbers that must not localize
 
 4.7 **Image loading** rides `AsyncImage` over the launch-configured
 `URLCache` (e.g. 64 MB / 400 MB) with a quiet placeholder. Don't add
-per-view caches or third-party loaders.
+per-view caches or third-party loaders. **Exception — high-churn
+`Lazy*` surfaces** (feed, gallery, image grids): `AsyncImage` shows
+the wrong image in recycled cells and decodes full-res on the main
+thread; those surfaces use the ONE shared cached loader
+(URL re-check after await + off-main downsample —
+`ios-production-gotchas` §Image loading), still never a per-view
+cache or a third-party package.
+
+4.8 **Haptics use the app's semantic taxonomy only** — `selection` /
+`light`·`medium`·`heavy` / `success`·`warning`·`error` — never a
+bare `UIImpactFeedbackGenerator` at a call site. `error` always
+pairs with a surfaced error banner; `selection` always pairs with a
+page/segment change (CLAUDE.md §Shared design system).
 
 ---
 

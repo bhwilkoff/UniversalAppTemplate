@@ -147,3 +147,41 @@ against the live published data, so audit progress never blocks on the
 device being awake. Two audit patterns it exists to catch: **create paths
 without their inverse** (create-channel with no delete) and **parity that
 never returned to the platform it started on**.
+
+## Apple TV depth-audit patterns (Tidbits campaign, 2026-08-24)
+
+Beyond once-per-feature scenarios, the patterns that found real bugs at scale
+(`tools/atv_run.py` is the hardened runner — verified wake, anti-doze,
+foreground guard, capture-timeout tolerance, crash-proof reports, per-scenario
+`drop_env`, a `--luma` image gate; `tools/atv_report.py` tabulates a day):
+
+- **Verified wake, always**: launches are DENIED while the device dozes
+  ("System is asleep — foreground app launch forbidden") or come up
+  BACKGROUNDED — app alive, home screen on the glass, mimicking an app bug.
+  Poll the Companion power state to On; re-wake before every retry; OCR one
+  post-launch probe frame for home-screen signatures and relaunch if seen.
+  A whole "category is broken" finding dissolved into this.
+- **Content-region luma gate**: OCR cannot see a missing IMAGE. Emit
+  luminance stddev over the content band from the OCR tool; a flat region
+  where a photo belongs fails the scenario. Drive N date-seeded random rows
+  through the real loader on-device — once-per-feature proves the code path,
+  the random batches prove arbitrary CONTENT.
+- **Tail-match legibility audits**: render the corpus's LONGEST prompts /
+  options / explanations solo (a forced-question debug hook) and assert the
+  text's TAIL reaches the glass. Char-count static audits cannot see
+  truncation; the tail is the truncation tell.
+- **Press-storm walks**: directional storms + select/menu on every surface,
+  asserting the app stays alive ON that surface and back dismisses correctly.
+  A screenshot cannot show a focus strand; a storm makes it fail loudly.
+- **Liveness audits obey the marker rules**: 429/5xx report UNVERIFIED
+  (distinct exit code), never dead — the first corpus-image sweep called
+  3,333 rate-limited URLs "dead". Politeness (few workers, long backoff) and
+  content-type checks (an HTML error page 200s); repair through the
+  generator's merge guard + tombstones, never by editing shipped output.
+- **Word-bound content-facing regexes**: a forbid pattern of `Error` matched
+  inside the word "terrorists" in a question prompt and failed a healthy run.
+- **Chunk long background work** (~≤8 min per task) and write every result
+  durably as you go: harness reapers, network throttles, and sleep timers
+  all lose less when each slice lands its own file.
+- **Reboot the device between long harness days**: the 4K screenshot daemon
+  degrades after ~80 captures-runs (timeouts, then thin frames).

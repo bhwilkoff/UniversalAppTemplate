@@ -5,7 +5,10 @@ source apps produced, where it lives in THIS template, and what was
 deliberately excluded with reasons. Update this file when upstreaming new
 lessons — it is how the next audit knows what "complete" means.
 Last full audit: 2026-08-24, against Archive Watch (95 decisions),
-Tidbits Trivia (56), Quint (27), BOBA + Bsky (frozen 2026-06-30).
+Tidbits Trivia (56), Quint (27), BOBA (frozen 2026-06-30),
+Bsky Dreams (upstreamed through 2026-08-24 — the post-freeze lessons:
+Share Extension, feed-ranking values pass, content extraction, iOS
+resilience/image/gesture/haptics gotchas, Decisions 040–043).
 
 ## Coverage: domain → home in this template
 
@@ -25,6 +28,10 @@ Tidbits Trivia (56), Quint (27), BOBA + Bsky (frozen 2026-06-30).
 | Data recovery + git forensics | `docs/runbooks/data-recovery.md` |
 | Design research (ten-foot benchmarks, social video specs) | `docs/research/` |
 | Icon/branding pipeline | `tools/render-app-icon.py`, `branding/` |
+| Algorithmic feeds / discovery ranking (multi-source merge, values pass, seen-dedup + bypass) | `values-based-feed-ranking` skill, Decision 043 |
+| Third-party page content (CORS proxy chains, reader-mode extraction, link previews, article-language detection) | `web-content-extraction` skill, cross-ref in `web-platform-patterns` |
+| iOS Share Extension (App Group handoff, responder-chain open, rejected-approach table, web Shortcut counterpart) | `ios-share-extension` skill |
+| iOS production additions from Bsky Dreams (synchronized-group build gotcha, recycled-cell image loading, NetworkMonitor + SwiftData fallback wiring, UIGestureRecognizer-subclass touch capture, AVKit animation crash, haptics taxonomy) | `ios-production-gotchas` skill (amended), CLAUDE.md §Shared design system (haptics), IOS-DESIGN template §4.7–4.8, Decisions 040–042 |
 
 ## Deliberate exclusions (do not "rediscover" these)
 

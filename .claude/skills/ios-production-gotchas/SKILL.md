@@ -1,11 +1,11 @@
 ---
 name: ios-production-gotchas
-description: Use when building or debugging iOS/iPadOS SwiftUI features — the cross-cutting production lessons from three shipped App Store apps that no single framework skill covers. Carries the presentation races (fullScreenCover(item:) not isPresented), the matchedTransitionSource-outermost rule, the dark-mode AccentColor legibility trap, fill-mode image layout blowups, background-audio detach/reattach, size-class (never UIDevice) adaptivity, SwiftUI Equatable/render mismatches, and the simulator verification recipes. Triggers on fullScreenCover, sheet race, black screen modal, zoom transition, accent color dark mode, unreadable button, background audio, PiP, AVAudioSession, iPad layout, size class, "works on simulator", Equatable view, navigation transition.
+description: Use when building or debugging iOS/iPadOS SwiftUI features — the cross-cutting production lessons from four shipped App Store apps that no single framework skill covers. Carries the presentation races (fullScreenCover(item:) not isPresented), the matchedTransitionSource-outermost rule, the dark-mode AccentColor legibility trap, fill-mode image layout blowups, background-audio detach/reattach, size-class (never UIDevice) adaptivity, SwiftUI Equatable/render mismatches, the synchronized-group new-file build gotcha, recycled-cell wrong-image loading, NetworkMonitor + SwiftData resilience wiring, the UIGestureRecognizer-subclass touch-capture pattern, the semantic haptics taxonomy, and the simulator verification recipes. Triggers on fullScreenCover, sheet race, black screen modal, zoom transition, accent color dark mode, unreadable button, background audio, PiP, AVAudioSession, iPad layout, size class, "works on simulator", Equatable view, navigation transition, cannot find in scope new file, wrong image in cell, AsyncImage scroll hitch, offline banner, ModelContainer crash, delaysTouchesBegan, haptics.
 ---
 
 # iOS Production Gotchas
 
-The cross-cutting lessons from shipping three iOS apps to the App
+The cross-cutting lessons from shipping four iOS apps to the App
 Store. The vendored framework skills (swiftui-*, avkit, etc.) carry
 API depth; this skill carries the **bugs that cost multi-iteration
 debugging sessions** and their one-line fixes — check here FIRST when
@@ -30,6 +30,12 @@ a symptom matches.
   bugs are born.
 - Settings is a sheet behind a toolbar gear, not a tab — tab bars
   are for content verbs.
+- **A toolbar `Button` gets an unsuppressable rounded-rect highlight**
+  (`UIButtonConfiguration`, iOS 15+) that no SwiftUI modifier or
+  legacy appearance API removes. If the design forbids it, use a
+  plain view + `.onTapGesture` (→ `UIBarButtonItem(customView:)`,
+  never configured), and restore accessibility with
+  `.accessibilityLabel` + `.accessibilityAddTraits(.isButton)`.
 
 ## The dark-mode legibility trap
 
@@ -79,6 +85,82 @@ one appearance. Fixes:
 - Auth: Keychain for credentials; silent re-auth on launch and on
   `scenePhase == .active` (the visibilitychange analog) before the
   first authenticated call — not on a timer.
+- **When SwiftUI gestures need immediate touch delivery** (a canvas,
+  a physics graph, anything where taps/drags "need a warm-up" before
+  firing): SwiftUI `DragGesture`/`TapGesture` and even a `UIView`
+  `touchesBegan` override are delayed by `_UIHostingView`'s
+  `delaysTouchesBegan`. The structurally immune pattern is a custom
+  `UIGestureRecognizer` **subclass** whose own
+  `touchesBegan/Moved/Ended` overrides do the work — recognizer touch
+  methods are dispatched by the gesture system before responder-chain
+  delivery. Keep it passive (`cancelsTouchesInView = false`,
+  `canPrevent`/`canBePrevented` return false, reset to `.failed` at
+  sequence end) and pass `view.bounds.size` to callbacks so callers
+  never need a possibly-stale `GeometryProxy`. Extract the routing
+  math into a platform-free type so it's unit-testable (Decision
+  042).
+
+## Image loading in high-churn lists
+
+- **`AsyncImage` in a `LazyVStack`/`LazyVGrid` shows the WRONG image
+  in recycled cells**: an in-flight load lands after the cell was
+  reassigned to a different item. Any cached loader must **re-check
+  the bound URL after the await** and discard a mismatched result —
+  that one check kills the bug class.
+- `AsyncImage` also decodes full-resolution on the main thread —
+  scroll hitches and memory spikes in feed/gallery surfaces. Use a
+  small shared loader: `NSCache` (e.g. 600 items / 60 MB) +
+  **off-main ImageIO downsampling to display size**
+  (`kCGImageSourceCreateThumbnailFromImageAlways` +
+  `kCGImageSourceThumbnailMaxPixelSize`). Keep `AsyncImage` for
+  low-churn one-offs.
+- This complements — not replaces — the launch-configured big
+  `URLCache` (transport layer). Expose the decoded-cache's
+  `clearCache()` behind a Settings action.
+
+## Resilience wiring
+
+- **Connectivity**: one `@Observable` monitor wrapping a single
+  `NWPathMonitor` on a background queue, injected via
+  `@Environment`. Views use it to show the offline banner and keep
+  cached content visible — offline must be distinguishable from "the
+  server failed", or users see a retry button that cannot succeed
+  (`universal-feature-states`).
+- **SwiftData `ModelContainer` creation goes in `do/catch` with an
+  in-memory fallback.** A corrupt or migration-incompatible on-disk
+  store otherwise crashes every launch with no recovery path short
+  of reinstalling. Losing one session of persistence is acceptable;
+  a launch-blocking trap never is.
+- SwiftData lightweight-migration trap: a property added to an
+  existing `@Model` needs an **inline default at the declaration**
+  (`var kind: String = "default"`) or existing stores crash on open.
+
+## Haptics: a semantic taxonomy, not ad-hoc generators
+
+Define one `Haptics` enum with semantic cases and call ONLY those:
+`selection` (paging, toggles, tab changes), `light`/`medium`/`heavy`
+(discrete actions by weight), `success`/`warning`/`error` (operation
+outcomes). Scattered `UIImpactFeedbackGenerator(style:)` calls drift
+— the same event ends up with different feedback in different views,
+and feedback gets sprinkled as noise. Two binding pairings: `error`
+always accompanies a surfaced error banner; `selection` always
+accompanies a page/segment change. Pick the meaning, not the
+generator; prefer `.sensoryFeedback(_:trigger:)` as the call site
+where it fits (`native-platform-first`).
+
+## Build system: the synchronized-group new-file gotcha
+
+Projects using file-system-synchronized groups
+(`PBXFileSystemSynchronizedRootGroup`) **intermittently fail to
+compile brand-new standalone `.swift` files** — "cannot find X in
+scope" persists through clean builds and a DerivedData wipe while the
+file plainly exists on disk. Mitigation: **inline new types into an
+already-compiled file** (the app-store file, the design-system file)
+instead of creating a new `.swift` file; if a new file is
+unavoidable, verify it compiles into the target before building
+anything on top of it. New **asset-catalog** entries (colorsets,
+imagesets) are processed by `actool` regardless — new assets are
+safe.
 
 ## Media + background
 
@@ -96,6 +178,21 @@ one appearance. Fixes:
   needs `canStartPictureInPictureAutomaticallyFromInline`.
 - Create a fresh `AVPlayer` at the resume timecode per presentation
   — don't pass live players between views.
+- **SwiftUI animations crash AVKit**: an inline video view inside an
+  animated layout change (a reply box opening, a row expanding)
+  crashes because `AVPlayerLayer` rejects implicit CoreAnimation
+  frame animations. Apply `.transaction { $0.animation = nil }` to
+  the video view to block animation propagation into it.
+- **Inline → fullscreen video: present `AVPlayerViewController` via
+  UIKit `present(_:animated:completion:)`**, with a fresh player at
+  the current seek position and `player.play()` in the completion.
+  Wrapping it in a SwiftUI `fullScreenCover` produces a
+  double-fullscreen layer with no dismiss path.
+- One shared `AVPlayer` for a paged full-screen video feed
+  (TikTok-style): `replaceCurrentItem` on page change, briefly muted
+  (~400 ms) to hide the buffer-prime audio pop; page cells size with
+  `.containerRelativeFrame([.horizontal, .vertical])`, not
+  `GeometryReader` (unreliable inside a `NavigationStack`).
 - Streaming from flaky hosts: `resilient-media-streaming`.
 
 ## Verification recipes

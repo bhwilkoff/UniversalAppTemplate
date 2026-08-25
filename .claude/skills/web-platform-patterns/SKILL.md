@@ -64,7 +64,9 @@ deploy-reality layer** that vanilla web apps live or die on.
   bounded FALLBACK only — never a runtime dependency.
 - Never `fetch()` hosts that don't send CORS (verify with GET, not
   HEAD); `<img>`/`<video>` elements are CORS-exempt — use them. Full
-  matrix in `shared-data-plane-contract`.
+  matrix in `shared-data-plane-contract`. When fetching arbitrary
+  third-party pages IS the feature (reader mode, link previews), use
+  the bounded multi-proxy chain in `web-content-extraction`.
 - **Auth/token refresh on `visibilitychange`, not timers** — a
   background tab's timers are throttled; refresh when the user
   returns, before the first action.

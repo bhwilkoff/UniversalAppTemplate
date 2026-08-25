@@ -47,13 +47,18 @@ these patterns; invoke the skill when its trigger matches.
 | A fix that can't be verified from logs or a simulator (TV focus, playback, on-device behavior) | `device-observation-harness` |
 | Expanding to Android TV / Fire TV / webOS / Tizen / Cast | `smart-tv-platform-expansion`, then `androidtv-compose-focus` / `smarttv-web-app` |
 | Running an unattended multi-tick development loop | `autonomous-loop-cadence` |
+| Building any algorithmic feed / discovery / "for you" surface or multi-source merge | `values-based-feed-ranking` |
+| Reader mode, article extraction, or OG/link-preview cards from third-party pages | `web-content-extraction` |
+| Adding an iOS share-sheet target (Share Extension) | `ios-share-extension` |
 
 Platform-specific skill triggers:
 
 - **iOS / iPadOS**: `ios-production-gotchas` FIRST when a symptom
   matches (presentation races, dark-mode legibility, layout blowups,
-  background audio, "works on simulator") — it carries the
-  cross-cutting lessons from three shipped apps. Framework depth
+  background audio, wrong image in a recycled cell, a new `.swift`
+  file that won't compile, "works on simulator") — it carries the
+  cross-cutting lessons from four shipped apps. Share-sheet targets:
+  `ios-share-extension`. Framework depth
   lives in the 80+ vendored Apple skills (swiftui-patterns,
   swiftui-navigation, swiftdata, ios-networking,
   swiftui-liquid-glass, app-intents, widgetkit, etc.).
@@ -94,8 +99,9 @@ Platform-specific skill triggers:
   (builds green out of the box); pipeline depth in `docs/windows/`.
 - **Web**: `web-platform-patterns` is the umbrella — view system,
   URL state, service worker, IndexedDB, image fallback chains, CSS
-  gotchas, headless verification. Design skills under `KUI:<name>`;
-  `frontend-design` for component-level work.
+  gotchas, headless verification. Third-party page content (reader
+  mode, link previews): `web-content-extraction`. Design skills
+  under `KUI:<name>`; `frontend-design` for component-level work.
 
 ---
 
@@ -524,6 +530,16 @@ decoration. Test at 375px before 1440px. On tvOS the analogue is
 **focus does the work** — the focused card is the chrome; surrounding
 cards should be quiet, and brightness is reserved for the focused
 element.
+
+**Haptics (touch platforms)**: one semantic taxonomy, never ad-hoc
+generators. `selection` (paging, toggles, segment changes) ·
+`light`/`medium`/`heavy` (discrete actions by weight) ·
+`success`/`warning`/`error` (operation outcomes). Two binding
+pairings: `error` always accompanies a surfaced error banner;
+`selection` always accompanies a page/segment change. Call sites name
+the meaning; the platform mapping (`.sensoryFeedback` /
+`UIFeedbackGenerator` on iOS, `HapticFeedback` on Android) lives in
+one place. Don't sprinkle feedback where it adds noise.
 
 **Icons vs. emoji (R-ICON-1)**: UI icons come from the platform icon
 system — SF Symbols on Apple, Material Symbols on Android, inline SVG on

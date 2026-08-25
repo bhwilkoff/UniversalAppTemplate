@@ -321,6 +321,13 @@ from shipping the same app on five platforms):
   platform reuses)
 - `store-submission-playbook` — App Store + Mac App Store + Play +
   tvOS submission, end to end, with the gotchas pre-paid
+- `values-based-feed-ranking` — algorithmic feeds/discovery that pass
+  the learning-orientation check as a *ranking function*: multi-source
+  merge, the user's own moderation honored, conversation over
+  virality, "why you're seeing this" on every item
+- `web-content-extraction` — reader mode + link previews from
+  third-party pages: the bounded multi-proxy CORS chain on web, the
+  stripped off-screen-WKWebView extractor on iOS
 
 **Cloud / API builds** (the submission pipeline this template
 pioneered — build + sign + upload without a local shippable Mac):
@@ -339,9 +346,11 @@ pioneered — build + sign + upload without a local shippable Mac):
 **Platform depth** — each platform gets an umbrella/gotchas skill
 distilled from production, plus framework references:
 - **iOS**: `ios-production-gotchas` (presentation races, dark-mode
-  legibility, layout traps, background audio) + 80+ vendored Apple
-  framework skills (SwiftUI, SwiftData, networking, Liquid Glass, App
-  Intents, WidgetKit, …)
+  legibility, layout traps, background audio, recycled-cell image
+  loading, resilience wiring, the synchronized-group build gotcha,
+  haptics taxonomy) + `ios-share-extension` (share-sheet targets)
+  + 80+ vendored Apple framework skills (SwiftUI, SwiftData,
+  networking, Liquid Glass, App Intents, WidgetKit, …)
 - **macOS**: `macos-platform-patterns` — the native Mac shell
   (`NavigationSplitView` + AppKit where SwiftUI stutters), player-as-
   window-root, the no-`externalMetadata` rule, the full-width-hero and
