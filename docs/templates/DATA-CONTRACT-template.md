@@ -82,6 +82,25 @@ Notes to keep verified (re-measure with GET, not HEAD):
 
 ---
 
+## 5.5 Display vocabulary (render-layer mapping)
+
+<!-- Schema field names are frozen (a rename is a migration); what
+     users SEE is a mapping every client applies identically. List
+     each field whose user-facing name differs from its schema name,
+     the community/domain term to render, and any deliberate
+     exceptions (one surface where a different word is correct).
+     Community vocabulary is a design contract: if your users call
+     them "weapons," the field can stay `element` forever but no UI
+     string may say "Element." E.g.:
+
+     | Schema field | Renders as | Exceptions |
+     |---|---|---|
+     | element      | Weapon     | none |
+     | treatment    | Treatment  | the one "Rarity by ..." explainer section |
+-->
+
+---
+
 ## 6. Refresh protocol
 
 <!-- Cadence, manifest shape, client behavior on failure (keep

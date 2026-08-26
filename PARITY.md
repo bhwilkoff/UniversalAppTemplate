@@ -104,6 +104,21 @@ When shipping any user-facing feature:
 
 ---
 
+## 3b. Teaching surfaces
+
+Teaching is a parity domain with DELIBERATE asymmetry — track it so
+a future session doesn't "harmonize" a rejection into a port (see
+`universal-feature-states`).
+
+| Surface | Web | iOS | macOS | tvOS | Android | Notes |
+|---|---|---|---|---|---|---|
+| EmptyState (productive next action) | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | Required everywhere from the first list/grid |
+| ErrorBanner / OfflinePill | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | Required everywhere |
+| HintBanner (one-shot tip) | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | Persisted dismissals + a global reset in Settings |
+| Multi-step anchored walkthroughs | 🚫 | ⏳ | 🚫 | 🚫 | 🚫 | iOS-only where its idioms are novel; other platforms use EmptyState + hints + a `?` explainer — record the rejection in each platform's design doc |
+
+---
+
 ## 4. Authentication + profile
 
 | Feature | Web | iOS | macOS | tvOS | Android | Notes |

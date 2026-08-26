@@ -73,7 +73,15 @@ shipped to production and its lessons were folded back in:
 
 - **BOBA Playbook** (iOS App Store + Play internal track + web) —
   origin of the parity matrix, binding design docs, and the
-  native-platform-first discipline.
+  native-platform-first discipline. Its late cycle (re-audited
+  2026-08-26) contributed nine more skills: provenance-honest market
+  data (the vanish-inference sold-history engine), canonical entity
+  identity, the two-tier image CDN, the zero-cost hosted backend
+  (Supabase-shaped split + worker fleet), the on-device camera
+  recognition pipeline, marketplace-adjacent design (pure-introduction
+  trading + the TRADE-DESIGN template), third-party revocation
+  resilience, third-party-IP monetization, and the two-agent handoff
+  protocol — plus Decisions 044–052.
 - **Bsky Dreams** (iOS App Store + web) — cross-platform auth,
   deep-link routing lessons.
 - **Archive Watch** (tvOS + iOS on the App Store, **macOS**, Android
@@ -328,6 +336,32 @@ from shipping the same app on five platforms):
 - `web-content-extraction` — reader mode + link previews from
   third-party pages: the bounded multi-proxy CORS chain on web, the
   stripped off-screen-WKWebView extractor on iOS
+- `canonical-entity-identity` — one canonical ID + one canonical
+  asset per entity: single-source composite-ID formulas, collision
+  audits, lockstep migrations, the md5 byte-collision guard
+- `image-cdn-discipline` — the two-tier image CDN (thumbs + full),
+  helper-per-platform URLs, no images in git, the
+  dev-domain-isn't-production trap
+- `zero-cost-hosted-backend` — when users must see each other's data:
+  hosted DB for auth + user data only, static catalog, CDN media,
+  the serverless worker fleet, RLS roles, username/handle rules
+- `provenance-honest-market-data` — prices that state what kind of
+  data they are; generate your own sold history via vanish-inference;
+  match-precision gates; audit-by-pattern
+- `camera-recognition-pipeline` — identifying physical objects with
+  the camera: fingerprint-primary/OCR-confirm, the silent-wrong
+  principle, evidence aggregation, the desktop CLI mirror harness
+- `marketplace-adjacent-design` — user-to-user trading without
+  touching money: pure introduction, App Store §1.2 minimum controls,
+  the risk-acceptance table (+ `docs/templates/TRADE-DESIGN-template.md`)
+- `third-party-revocation-resilience` — every external data
+  dependency is presumed revocable: the prevention posture and the
+  compliant removal loop
+- `third-party-ip-monetization` — monetizing around IP you don't
+  own: license-then-monetize, the own-engineering line, entitlement
+  architecture, pre-committed decision gates
+- `two-agent-handoff` — coordinating two asymmetric AI agent
+  surfaces through one versioned handoff file
 
 **Cloud / API builds** (the submission pipeline this template
 pioneered — build + sign + upload without a local shippable Mac):

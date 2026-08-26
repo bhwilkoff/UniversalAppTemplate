@@ -9,6 +9,15 @@ Tidbits Trivia (56), Quint (27), BOBA (frozen 2026-06-30),
 Bsky Dreams (upstreamed through 2026-08-24 — the post-freeze lessons:
 Share Extension, feed-ranking values pass, content extraction, iOS
 resilience/image/gesture/haptics gotchas, Decisions 040–043).
+**BOBA re-audit 2026-08-26**: the 2026-08-24 audit's assumption that
+BOBA's lessons "predate Quint and are already folded in" was wrong for
+its late cycle (2026-04 → 2026-06) — the pricing rebuild, canonical
+identity, scan pipeline, trading design, hosted backend, revocation
+loop, and iOS-27 gating were all missing. Upstreamed as 9 new skills,
+the TRADE-DESIGN template, Decisions 044–052, and amendments across
+ios/android-production-gotchas, cloud/play submission,
+universal-feature-states, shared-data-plane-contract, AUTONOMOUS-LOOPS,
+PARITY, and the DATA-CONTRACT + IOS-DESIGN templates.
 
 ## Coverage: domain → home in this template
 
@@ -32,6 +41,20 @@ resilience/image/gesture/haptics gotchas, Decisions 040–043).
 | Third-party page content (CORS proxy chains, reader-mode extraction, link previews, article-language detection) | `web-content-extraction` skill, cross-ref in `web-platform-patterns` |
 | iOS Share Extension (App Group handoff, responder-chain open, rejected-approach table, web Shortcut counterpart) | `ios-share-extension` skill |
 | iOS production additions from Bsky Dreams (synchronized-group build gotcha, recycled-cell image loading, NetworkMonitor + SwiftData fallback wiring, UIGestureRecognizer-subclass touch capture, AVKit animation crash, haptics taxonomy) | `ios-production-gotchas` skill (amended), CLAUDE.md §Shared design system (haptics), IOS-DESIGN template §4.7–4.8, Decisions 040–042 |
+| Provenance-honest market data (signal hierarchy, vanish-inference sold history, match-precision gates, audit-by-pattern, dead-affordance rule) | `provenance-honest-market-data` skill, Decisions 044 + 050 |
+| Canonical entity identity (one ID/one asset, single-source composite formula, collision audits, lockstep migration, md5 byte guard) | `canonical-entity-identity` + `image-cdn-discipline` skills, Decision 046 |
+| Two-tier image CDN (thumbs/full, helper-per-platform, no images in git, dev-domain-isn't-production, cache sizing) | `image-cdn-discipline` skill |
+| Hosted backend split (auth+user-data DB only, static catalog, CDN media, worker fleet, RLS roles, username/handle + banned-words, account deletion, push dispatcher) | `zero-cost-hosted-backend` skill, Decision 047 (reconciles 015) |
+| On-device camera recognition (fingerprint-primary/OCR-confirm, silent-wrong principle, evidence aggregation, CLI mirror + pixel parity, capture traps) | `camera-recognition-pipeline` skill, `ios-production-gotchas` §Camera + capture |
+| Marketplace-adjacent features (never-touch-money, pure introduction, §1.2 minimum controls, DSA geo-block, risk-acceptance table, ToS clauses) | `marketplace-adjacent-design` skill, `docs/templates/TRADE-DESIGN-template.md`, Decision 049 |
+| Third-party dependency revocation (prevention posture + the compliant removal loop, provenance backfill, frozen legacy data) | `third-party-revocation-resilience` skill, Decision 051 |
+| Monetizing around IP you don't own (license-then-monetize, the own-engineering line, entitlement architecture, decision gates) | `third-party-ip-monetization` skill |
+| Two-agent handoff (single-file channel, directional outboxes, ownership lists, provenance-cited deliveries) | `two-agent-handoff` skill |
+| Next-OS additive adoption (dual runtime+compile gates, the SDK-conditional flag, Compat wrapper, beta-Xcode submit trap) | `cloud-appstore-submission` Rule 6 (amended), Decision 048 |
+| Android release symbols + ML Kit (embed-in-AAB, zip -D, jarsigner; unbundled-vs-bundled) | `android-production-gotchas` §Release engineering, `play-cli-submission` Rule 9 |
+| Display vocabulary as a render-layer contract; word-prefix search; image-first sort; two-phase catalog load | `shared-data-plane-contract` §Client consumption rules, DATA-CONTRACT template §5.5, Decision 052 |
+| Teaching-surface platform asymmetry (walkthroughs iOS-only; documented rejections elsewhere) | `universal-feature-states` (amended), PARITY.md §3b |
+| Autonomous-loop pre-push checklist (import sweeps, stale call sites, artifact sweeps, deprecation signatures) | `docs/AUTONOMOUS-LOOPS.md` §7 |
 
 ## Deliberate exclusions (do not "rediscover" these)
 
@@ -53,8 +76,13 @@ resilience/image/gesture/haptics gotchas, Decisions 040–043).
   with their apps.
 - **~12 duplicate framework-skill pairs** from two vendored vintages —
   kept both pending a per-pair review (see README maintenance note).
-- **BOBA's uncommitted skill dump + stray store artifacts** — superseded;
-  its committed lessons predate Quint and are already folded in.
+- **BOBA's uncommitted skill dump + stray store artifacts** — superseded
+  as artifacts. (The 2026-08-24 claim that BOBA's committed lessons were
+  "already folded in" was wrong — corrected by the 2026-08-26 re-audit
+  above. What remains deliberately excluded: BOBA's card-catalog
+  pipeline itself, the Radish-specific tooling, the practice-battle
+  engine, and its filled-in binding design docs — app-specific; their
+  generic halves now live in the skills listed above.)
 
 ## The upstreaming rule
 

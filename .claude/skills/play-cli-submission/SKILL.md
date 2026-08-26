@@ -66,6 +66,20 @@ AAB before promoting. **Physical devices only** — emulators cannot see Play
 Billing, so billing-at-startup crashes (Decision 039's mixed-list throw)
 pass every emulator and fail on every real phone.
 
+## Rule 9 — Native debug symbols travel INSIDE the AAB
+
+Play's "missing debug symbols" warning (from pre-stripped dependency
+`.so` files — ML Kit and friends) cannot be reliably cleared by
+uploading `native-debug-symbols.zip`: the API route
+(`edits.deobfuscationfiles.upload`) is blocked for some accounts and
+the Console UI upload doesn't dependably take. Embed instead: a
+Gradle task injects each `.so` as
+`BUNDLE-METADATA/com.android.tools.build.debugsymbols/<abi>/<lib>.so.dbg`
+and re-signs with the upload key. **Use `zip -D`** — a directory zip
+entry inside an AAB surfaces as a misleading "invalid signature"
+rejection. Full recipe: `android-production-gotchas` §Release
+engineering.
+
 ## Scaffolding shipped
 
 - `tools/submit-play.sh` — the CLI entry point

@@ -123,6 +123,12 @@ actions for destructive verbs (§4.3).
 3.5 **Detail** — scroll view: primary content → title/meta → action
 row (primary prominent) → body → related.
 3.6 **Sheet** — transient pickers and forms; `presentationDetents`.
+On iPad, `.presentationCompactAdaptation(.popover)` is for LEAF
+surfaces only (filter panel, single-action picker): **a modal
+presented from inside a popover silently no-ops** — a surface that
+re-presents (sign-in, sub-flows) stays a plain `.sheet` on every
+size class. This exact trap earned an App Store 2.1(a) rejection
+("tapping Sign In does nothing on iPad").
 3.7 **Full-screen cover** — reserved for [the player / an immersive
 surface] only (§4.4).
 3.8 **Tile** — [content tile] for content; gradient-on-accent compact

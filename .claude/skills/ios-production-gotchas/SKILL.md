@@ -1,6 +1,6 @@
 ---
 name: ios-production-gotchas
-description: Use when building or debugging iOS/iPadOS SwiftUI features — the cross-cutting production lessons from four shipped App Store apps that no single framework skill covers. Carries the presentation races (fullScreenCover(item:) not isPresented), the matchedTransitionSource-outermost rule, the dark-mode AccentColor legibility trap, fill-mode image layout blowups, background-audio detach/reattach, size-class (never UIDevice) adaptivity, SwiftUI Equatable/render mismatches, the synchronized-group new-file build gotcha, recycled-cell wrong-image loading, NetworkMonitor + SwiftData resilience wiring, the UIGestureRecognizer-subclass touch-capture pattern, the semantic haptics taxonomy, and the simulator verification recipes. Triggers on fullScreenCover, sheet race, black screen modal, zoom transition, accent color dark mode, unreadable button, background audio, PiP, AVAudioSession, iPad layout, size class, "works on simulator", Equatable view, navigation transition, cannot find in scope new file, wrong image in cell, AsyncImage scroll hitch, offline banner, ModelContainer crash, delaysTouchesBegan, haptics.
+description: Use when building or debugging iOS/iPadOS SwiftUI features — the cross-cutting production lessons from four shipped App Store apps that no single framework skill covers. Carries the presentation races (fullScreenCover(item:) not isPresented), the sheet-in-popover silent no-op (App Store rejection class), the matchedTransitionSource-outermost rule, the dark-mode AccentColor legibility trap, fill-mode image layout blowups, background-audio detach/reattach, size-class (never UIDevice) adaptivity, SwiftUI Equatable/render mismatches, derived-array staleness in @Observable stores, the synchronized-group new-file build gotcha, recycled-cell wrong-image loading, NetworkMonitor + SwiftData resilience wiring, the UIGestureRecognizer-subclass touch-capture pattern, the UIScrollView gesture-overlay deadlock, project-wide MainActor default isolation, first-frame synchronous loading, the semantic haptics taxonomy, camera capture traps, and the simulator verification recipes. Triggers on fullScreenCover, sheet race, black screen modal, popover iPad sheet nothing happens, zoom transition, accent color dark mode, unreadable button, background audio, PiP, AVAudioSession, iPad layout, size class, "works on simulator", Equatable view, navigation transition, cannot find in scope new file, wrong image in cell, AsyncImage scroll hitch, offline banner, ModelContainer crash, delaysTouchesBegan, haptics, UIImagePickerController, nonisolated, Sendable callback class, TimelineView slow, ImageRenderer frame, slow first frame, type-check timeout.
 ---
 
 # iOS Production Gotchas
@@ -30,6 +30,19 @@ a symptom matches.
   bugs are born.
 - Settings is a sheet behind a toolbar gear, not a tab — tab bars
   are for content verbs.
+- **A modal presented from inside an iPad popover silently no-ops.**
+  A sheet that adapts via `.presentationCompactAdaptation(.popover)`
+  on iPad must never itself present another sheet or
+  `fullScreenCover` — the nested presentation does nothing, with no
+  error. A Profile surface that was a popover on iPad made "Sign In"
+  a dead button → **App Store rejection 2.1(a)**. Rule: popover
+  adaptation is for LEAF surfaces only (filter panels, pickers,
+  single-action menus); any surface that re-presents stays a plain
+  `.sheet` on every size class.
+- **Chained presentations need `onDismiss:`, not sleep.** Opening a
+  sheet right after a `fullScreenCover` dismisses requires
+  `.fullScreenCover(... onDismiss:)` to sequence the second
+  presentation — `Task.sleep` delays race and fail intermittently.
 - **A toolbar `Button` gets an unsuppressable rounded-rect highlight**
   (`UIButtonConfiguration`, iOS 15+) that no SwiftUI modifier or
   legacy appearance API removes. If the design forbids it, use a
@@ -82,6 +95,25 @@ one appearance. Fixes:
   iterating** — print the state you believe vs the state that
   renders. The divergence point is the bug (CLAUDE.md debugging
   philosophy; it has paid off every time).
+- **First-frame data must load synchronously in the initializer.**
+  Wrapping the initial catalog/content load in `Task {}` queues it
+  behind SwiftUI's first render pass — a ~10 s blank screen before
+  any content. Load a small bundled head synchronously; hydrate the
+  rest async.
+- **Benchmark a serializer before using it as a cache.** One standard
+  encoder took 20–30 s over ~12k structs; plain `JSONDecoder` on a
+  bundled file took 1–3 s — the "obvious" caching layer was 10×
+  slower than not caching.
+- **`TimelineView(.animation)` is expensive** — wrap it conditionally
+  on the animating state (`if state.pending != nil`) so dozens of
+  static tiles don't re-evaluate every frame.
+- **`ImageRenderer` captures `.current` state, not interpolated
+  animation** — SwiftUI's `withAnimation` interpolation lives in the
+  GPU layer. When rendering an animated frame stream, drive values
+  from a time function, never from animated `@State`.
+- **A `let x: T = switch …` expression inside a SwiftUI body with
+  several locals reliably times out the type checker.** Extract the
+  switch into a function.
 - Auth: Keychain for credentials; silent re-auth on launch and on
   `scenePhase == .active` (the visibilitychange analog) before the
   first authenticated call — not on a timer.
@@ -99,6 +131,31 @@ one appearance. Fixes:
   never need a possibly-stale `GeometryProxy`. Extract the routing
   math into a platform-free type so it's unit-testable (Decision
   042).
+- **Never put a SwiftUI gesture overlay in a ZStack ABOVE a
+  `UIScrollView`-backed view** (a zoomable image, a scrolling
+  canvas) — the two gesture systems deadlock and one side goes dead.
+  When a surface needs both scroll/zoom AND custom gestures, build
+  the whole surface in UIKit and pass touches through with a
+  `hitTest` override returning `nil` for regions the overlay doesn't
+  own. (A crop view took 5 iterations of fighting SwiftUI gestures
+  before the UIKit rebuild fixed it in one.)
+- **In `@Observable` stores, every mutation of a source array must
+  also rebuild any DERIVED array the UI renders from.** Mutating
+  `items[i]` in place while a view renders from `filteredItems`
+  shows stale data with no error — a staleness bug that was four
+  layers deep before the derived-array rule was found. Centralize
+  mutations in one store method that rebuilds the derivatives.
+- **Project-wide MainActor default isolation**
+  (`SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor`) makes every class
+  implicitly `@MainActor` — classes receiving framework callbacks
+  off-main (capture pipelines, network listeners) need explicit
+  `nonisolated` at the class level, and `Task {}` stays on the main
+  actor (use `Task.detached` to actually reach a background thread).
+- **Network.framework callback classes under Swift 6 strict
+  concurrency**: a `nonisolated final class` marked
+  `@unchecked Sendable` with an `NSLock`-protected cache, bridging
+  to MainActor state separately — `NWListener`/`NWConnection`
+  callbacks cannot land on a MainActor-isolated type.
 
 ## Image loading in high-churn lists
 
@@ -194,6 +251,18 @@ safe.
   `.containerRelativeFrame([.horizontal, .vertical])`, not
   `GeometryReader` (unreliable inside a `NavigationStack`).
 - Streaming from flaky hosts: `resilient-media-streaming`.
+
+## Camera + capture
+
+- **`UIImagePickerController` is broken on multi-camera iPhones**
+  (camera contention on triple-lens devices). Use `AVCaptureSession`
+  + `AVCapturePhotoOutput` pinned to `.builtInWideAngleCamera`.
+- **Correct EXIF orientation before Vision/CIImage** — a captured
+  `UIImage`'s pixels are sideways relative to its orientation
+  metadata; run an orientation-normalize pass first or OCR/detection
+  reads rotated garbage.
+- Recognition pipelines (OCR + fingerprint matching, CLI mirror
+  harnesses, confidence gates): `camera-recognition-pipeline`.
 
 ## Verification recipes
 

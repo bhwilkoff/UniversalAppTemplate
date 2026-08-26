@@ -125,6 +125,19 @@ Rules:
 - **Voice: second person, action-oriented** — *"Tap a card to add it to your deck."* not *"In this view, users can build decks by..."*
 - **Re-launchable** — every walkthrough re-triggers from a "?" overflow Menu so returning users can re-learn
 
+**Walkthroughs are a per-platform decision, and rejecting them is
+valid.** They earn their ~600-line engine only where the platform's
+idioms are genuinely novel (iOS tab gestures, fullScreenCover
+patterns). Web primitives (sidebar nav, links, `<dialog>`) and
+Android conventions (NavigationBar, push/back, ModalBottomSheet) are
+universally legible — those platforms deliberately ship NO
+walkthrough engine and instead map each would-be walkthrough to a
+documented replacement: tab first-visit → EmptyState with the
+productive action; feature tip → HintBanner/TooltipBox; a `?` icon →
+a short explainer dialog. Record the rejection in that platform's
+design doc and give teaching surfaces a PARITY.md row, so a future
+session doesn't "harmonize" the deliberate asymmetry into a port.
+
 ### Decision tree — which teaching surface
 
 | Use case | Component |

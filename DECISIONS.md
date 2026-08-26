@@ -1003,3 +1003,207 @@ can't be stated in one chip is too opaque to use.
 against the ranking FUNCTION itself, not just the feature proposal; full
 pattern (multi-source merge, conversation-weighted scoring, seen-item
 bypass, flat-tabs IA) in `values-based-feed-ranking`.
+
+---
+
+## 044 — Every user-visible affordance must control something real
+*Date: 2026-08-26 (from BOBA Playbook, the pricing time-window picker removal)*
+
+A control that visually scopes a panel but actually filters an empty or
+irrelevant data source is not a "no-op control," it's a trust-erosion
+device — the user forms a wrong mental model from its apparent scope.
+
+**Why**: a 7/30/90-day picker appeared to scope an entire pricing panel
+but only set one query param on one signal — a signal that was
+permanently empty. Worse, the three platforms sent different values for
+that param, splitting the server cache so the same entity showed
+different data per platform at the same moment. The picker's removal
+fixed both the lie and the divergence.
+
+**How to apply**: before shipping any picker/toggle/filter, name exactly
+what it changes; if the honest answer is "one sub-signal" scope it
+visually to that signal, and if the answer is "nothing real," remove it.
+When platforms hit a shared cached endpoint, fix the parameters
+server-side or normalize the cache key (`zero-cost-hosted-backend`).
+
+---
+
+## 045 — Feature gating: keep the code, gate the single UI entry point
+*Date: 2026-08-26 (from BOBA Playbook)*
+
+When a feature is built but blocked on an external dependency, keep all
+implementation code in place and gate at ONE call site
+(`if featureEnabled { … }`). Don't delete or hollow out working code
+while waiting.
+
+**Why**: building ahead of infrastructure is sometimes unavoidable.
+Half-deleted code makes the feature harder to re-enable and the codebase
+ambiguous about what works. A one-line gate makes re-enabling a one-line
+diff and keeps the implementation compiling (so refactors can't silently
+rot it).
+
+**How to apply**: one flag, one entry point, a note in SCRATCHPAD's
+deferred list naming the external blocker. The exception is a REVOKED
+dependency — that's a removal, not a gate
+(`third-party-revocation-resilience`).
+
+---
+
+## 046 — One canonical ID and one canonical asset per entity
+*Date: 2026-08-26 (from BOBA Playbook's "One ID per Card, One Image per Card")*
+
+Every entity in a shared catalog gets exactly one canonical identifier
+(a composite-ID formula defined in ONE source per language, stored as a
+real field, never recomputed at runtime) and exactly one canonical
+asset, enforced at the byte layer by an md5-collision guard in the
+pipeline.
+
+**Why**: identity drift is the root of the worst catalog bug classes —
+wrong-entity merges, duplicate rows, one entity silently wearing
+another's image. Each is invisible until a user notices, and each is
+enforced only where it can be measured: the ID at the catalog layer, the
+asset at the binary layer.
+
+**How to apply**: `canonical-entity-identity` carries the formula
+rules, collision audits, and the lockstep migration protocol;
+`image-cdn-discipline` carries the asset-side guard.
+
+---
+
+## 047 — Two backend postures: sync islands OR the hosted split — choose in M0
+*Date: 2026-08-26 (reconciles 015; from BOBA Playbook)*
+
+Decision 015's sync-islands posture (each ecosystem syncs on the user's
+OWN cloud; no backend to run) is the default — but it only serves
+per-user data. The moment users must see EACH OTHER'S data (public
+profiles, shared collections, moderation, matching), the app takes the
+hosted split instead: a hosted Postgres for auth + user data ONLY,
+catalog as static published artifacts, media on a zero-egress CDN, and
+small serverless workers for the seams. Never both for the same data.
+
+**Why**: the two postures were sitting unreconciled in this log — 015
+assumed no backend while 011's JWT-refresh rule assumed one. The real
+rule is a fork on ONE question: is any user's data read by another user?
+No → sync islands (zero infrastructure). Yes → the hosted split, kept
+free-tier-viable by putting only genuinely shared state in the database.
+
+**How to apply**: record the choice as an M0 decision.
+`per-ecosystem-sync-islands` for the first path;
+`zero-cost-hosted-backend` for the second (roles + RLS, worker fleet,
+username/handle rules, account deletion).
+
+---
+
+## 048 — Next-OS APIs are adopted additively behind BOTH a runtime and a compile-time gate
+*Date: 2026-08-26 (from BOBA Playbook, the iOS 27 adoption + the un-submittable build)*
+
+While the deployment floor stays on OS N, every OS N+1 API is adopted
+behind `if #available(OS N+1, *)` (runtime) wrapped in a compilation
+condition that only exists when building against the N+1 SDK
+(`OTHER_SWIFT_FLAGS[sdk=iphoneosN+1*] = -D OSNPLUS1_SDK`), with the OS-N
+path in `#else` — and the gates live in ONE Compat wrapper file.
+
+**Why**: `#available` alone still requires the symbol in the build SDK,
+so the project silently compiles ONLY under beta Xcode — and App Store
+Connect rejects every beta-Xcode build. The failure surfaces at submit
+time, long after the build "worked" locally. The compile-time gate keeps
+the GA toolchain shippable and the beta toolchain testable from the same
+source. Never bump the floor as a shortcut, and never adopt an N+1 API
+that regresses an existing affordance or has no real problem behind it.
+
+**How to apply**: recipe in `cloud-appstore-submission` Rule 6. When the
+floor rises to N+1, delete the flag and the `#else` branches, keep the
+runtime `#available`.
+
+---
+
+## 049 — Marketplace-adjacent features never touch money
+*Date: 2026-08-26 (from BOBA Playbook, TRADE-DESIGN.md)*
+
+If the app introduces users who then trade/sell with each other, the
+app processes, holds, escrows, or takes a cut of NOTHING. The
+architecture is pure introduction: passive matching on explicit user
+inputs, a deep link to an external messaging platform, block +
+mailto-report + published contact for store compliance — and the app
+steps out of the transaction entirely.
+
+**Why**: the moment funds flow through the app, marketplace-facilitator
+laws trigger (multi-state tax collection, 1099-K, money-transmitter
+analysis, KYC/AML) — inoperable for a small team. Hosting user-to-user
+messaging triggers per-message moderation obligations and creates an
+archive of dispute evidence. Subscriptions via store IAP are NOT
+touching money (you sell access to your features, not a cut of their
+transactions).
+
+**How to apply**: `marketplace-adjacent-design` + seed the binding doc
+from `docs/templates/TRADE-DESIGN-template.md` BEFORE building any
+trading surface. Kill any proposal with a Pay button, escrow, or
+per-trade fee at proposal stage.
+
+---
+
+## 050 — Market data is provenance-honest, and the sold history is generated, not bought
+*Date: 2026-08-26 (from BOBA Playbook, the pricing rebuild)*
+
+Every price/valuation states what KIND of data it is; an asking price
+or derived estimate is never presented as market value. When no sold
+data exists, the honest label ("N active listings · no sales data yet")
+IS the feature. When no API will sell you transaction history, snapshot
+public active listings and infer sales from vanishings — after ~60 days
+you own the history.
+
+**Why**: asking prices run 10–25% above transacted; folding them into a
+"market value" silently inflates every number, and a fabricated
+"Market Est." teaches users to distrust the whole surface. The
+structural insight: pipelines that depend on a third party for the
+scarce data are broken by design — the durable asset is the history you
+generate and own.
+
+**How to apply**: `provenance-honest-market-data` — the signal
+hierarchy, vanish-inference scoring, match-precision gates, the
+audit-by-pattern discipline, and the UI rules.
+
+---
+
+## 051 — Every third-party data dependency is presumed revocable
+*Date: 2026-08-26 (from BOBA Playbook, a partner's revocation email)*
+
+Operate so that any single external data/image/API partner can revoke
+authorization without killing the product: prefer data you generate or
+that the community contributes, keep provenance per record, and design
+the exit before the dependency is load-bearing.
+
+**Why**: a partner who saw the app as a competitor revoked everything
+by email — data, images, mappings, lookup logic, automation — leaving
+one permitted use (an outbound link). The removal took a 24-tick
+compliant teardown plus a multi-thousand-record provenance backfill.
+The cost of independence is paid once; the cost of dependence recurs
+with every partner's mood.
+
+**How to apply**: `third-party-revocation-resilience` for both halves —
+the prevention posture and the compliant-removal loop (prohibition list
+first, replacement table before deletion, frozen legacy data vs live
+automation, grep-verified end state). For the monetization side of IP
+you don't own: `third-party-ip-monetization`.
+
+---
+
+## 052 — User-facing vocabulary is a render-layer contract over frozen schema names
+*Date: 2026-08-26 (from BOBA Playbook, "Weapon" over `element`)*
+
+Schema field names are frozen (renames are migrations); what users see
+is a display-vocabulary mapping recorded in the data contract and
+applied identically by every client. The community's own terms win over
+schema language and over generic industry terms — including deliberate,
+documented exceptions where one surface correctly uses a different
+word.
+
+**Why**: users learn and own their domain's vocabulary; leaking schema
+language ("Element") or conflating two domain concepts under one
+borrowed term ("Rarity") robs them of it and makes every platform
+translate differently. The mapping table makes the vocabulary
+enforceable in review instead of tribal.
+
+**How to apply**: fill the Display Vocabulary section of
+`docs/DATA-CONTRACT.md` (template §5.5); reject PRs that render a
+schema name the mapping translates.

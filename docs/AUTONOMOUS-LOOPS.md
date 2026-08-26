@@ -141,3 +141,35 @@ surfaces them, continues elsewhere, and re-checks. Corollaries:
   REFUSES to run with a premium flag set beats a checklist), and captures go
   to a durable path — "a capture you cannot return to is a capture you have
   to take twice."
+
+## 7. The pre-push checklist — recurring self-inflicted CI breaks
+
+From a 175+-tick marathon loop: each of these broke CI at least once;
+the check is cheap, and missing it costs a re-push + a CI cycle.
+
+- **Unused-import sweeps are a special-risk change.** A
+  `\bSymbol\(`-style heuristic misses trailing-lambda invocations
+  (no parens), function references passed without parens
+  (`action: save`), and fully-qualified references. Grep for the
+  bare symbol, not symbol-with-paren; run a sweep through CI on a
+  branch before merging it.
+- **Removing a symbol while leaving a call site** is the most common
+  self-inflicted compile break. After deleting symbols, grep globally
+  for each and verify only the definition line is gone.
+- Adding a construct often needs a non-obvious import (a
+  concurrency-scope extension living in a different module than the
+  type it extends).
+- **Framework migrations change what's projectable** — swapping an
+  observation mechanism can silently remove two-way binding
+  derivation (`$store`), breaking every input call site; re-bind
+  locally at the top of the consuming scope.
+- **`git add -A` sweeps build artifacts** in non-gitignored paths.
+  Check `git status` + `git diff --stat` for surprising sizes before
+  pushing; gitignore artifact patterns proactively.
+- **When a deprecation warning recommends a new overload, READ the
+  new signature** — reordered lambda parameters compile at the
+  declaration (names are positional aliases) and fail confusingly at
+  use sites.
+- Codify recurring anti-pattern replacements (e.g. blocking
+  `alert()` → the app's toast) as standing rules so the loop applies
+  them uniformly instead of rediscovering them per tick.

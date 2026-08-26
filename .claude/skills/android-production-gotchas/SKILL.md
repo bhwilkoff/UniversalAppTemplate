@@ -1,6 +1,6 @@
 ---
 name: android-production-gotchas
-description: Use when building or debugging the Android (Kotlin + Compose + M3) app — the cross-cutting production lessons from shipping a Compose app to Google Play that the framework docs don't carry. Covers data-layer invalidation keying (dbVersion on every produceState), BundledSQLiteDriver for guaranteed FTS5, the staged atomic DB swap ritual, the contradictory-WHERE silent-empty bug class, sealed-Route navigation with a deep-link inbox, icon parity mapping (SF Symbols → Material), Media3 queue flags, and emulator verification recipes. Triggers on Compose, Room, SQLite Android, FTS5, produceState, LaunchedEffect key, sealed route, BackHandler, deep link Android, emulator, assembleDebug, Media3 queue, "screen shows zero items", "empty grid", Play build.
+description: Use when building or debugging the Android (Kotlin + Compose + M3) app — the cross-cutting production lessons from shipping Compose apps to Google Play that the framework docs don't carry. Covers data-layer invalidation keying (dbVersion on every produceState), BundledSQLiteDriver for guaranteed FTS5, the staged atomic DB swap ritual, the contradictory-WHERE silent-empty bug class, sealed-Route navigation with a deep-link inbox, icon parity mapping (SF Symbols → Material), Media3 queue flags, the state-from-prop remember trap, ViewModel reset on auth change, locale-safe currency formatting, native debug symbols embedded IN the AAB (zip -D, jarsigner), the ML Kit bundled-vs-unbundled choice, and emulator verification recipes. Triggers on Compose, Room, SQLite Android, FTS5, produceState, LaunchedEffect key, sealed route, BackHandler, deep link Android, emulator, assembleDebug, Media3 queue, "screen shows zero items", "empty grid", Play build, missing debug symbols warning, native-debug-symbols zip, ML Kit, remember mutableStateOf prop, previous user's data, currency format.
 ---
 
 # Android Production Gotchas
@@ -116,6 +116,50 @@ until proven otherwise.
   sized to the REAL video aspect (feed the aspect from a
   `Player.VideoSize` listener), gated by a presence flag so PiP only
   fires during playback (never from a browse screen).
+
+## Compose state traps
+
+- **`var x by remember { mutableStateOf(prop.field) }` captures the
+  prop ONCE** and ignores every later prop change — the classic
+  edit-sheet-shows-stale-values bug. Bind directly to the prop, or
+  key the remember: `remember(prop.field) { … }`.
+- **ViewModels caching per-user state must wipe their cache when
+  `authState.userId` transitions.** Hilt-scoped VMs outlive sign-out;
+  without the reset, the previous user's data leaks into the next
+  session. Observe the userId and clear on change.
+- **`"%.2f".format(x)` honors the device locale** — a USD price
+  renders `1,99` on a German device. All fixed-currency displays go
+  through one helper pinned to the currency's locale
+  (`String.format(Locale.US, …)`).
+- **Centroid-aware `rememberTransformableState` lambda parameter
+  order is `(centroid, zoom, pan, rotation)`** — centroid FIRST;
+  the wrong order compiles (positional aliases) and breaks at use.
+
+## Release engineering: native debug symbols + ML Kit
+
+- **Embed native debug symbols IN the AAB; don't upload a zip.**
+  Play's "missing debug symbols" warning fires when dependencies ship
+  pre-stripped `.so` files (ML Kit, other Google libs) so AGP's
+  symbol task produces nothing. The standalone
+  `native-debug-symbols.zip` can only be ingested via the Play
+  Developer API (`edits.deobfuscationfiles.upload`), which some
+  accounts can't reach, and the manual UI upload doesn't reliably
+  take. Fix: a Gradle task (`finalizedBy bundleRelease`) injects each
+  `.so` as
+  `BUNDLE-METADATA/com.android.tools.build.debugsymbols/<abi>/<lib>.so.dbg`
+  (path + `.dbg` suffix per AGP's `ExtractNativeDebugMetadataTask`)
+  and re-signs with the upload key (`jarsigner`). BuildID-only
+  stripped symbols are accepted.
+- **When injecting, use `zip -D`** — AABs forbid directory zip
+  entries, and Play reports the violation as a misleading "invalid
+  signature" rejection. Verify with `bundletool validate`.
+- **ML Kit: prefer the unbundled (Play-Services) artifact** over
+  bundled — the bundled `.so` ships pre-stripped (triggers the
+  debug-symbols warning), adds ~11 MB to the AAB, and its "works
+  offline" advantage is illusory (install requires being online
+  either way). Unbundled needs manifest meta-data
+  (`com.google.mlkit.vision.DEPENDENCIES`) for install-time model
+  download; the API surface is identical.
 
 ## Theme + surfaces
 

@@ -31,6 +31,15 @@ these patterns; invoke the skill when its trigger matches.
 | Shipping a feature on ANY platform | `cross-platform-parity-discipline` |
 | Planning a new platform, or sequencing the buildout | `multiplatform-expansion-method` |
 | Designing/changing shared backend data the clients consume | `shared-data-plane-contract` |
+| A shared catalog needs stable entity IDs, or an ID formula/migration | `canonical-entity-identity` |
+| Serving a catalog's images/media (tiers, CDN, cache sizing) | `image-cdn-discipline` |
+| Users must see EACH OTHER'S data (profiles, shared collections, roles, moderation) | `zero-cost-hosted-backend` (vs `per-ecosystem-sync-islands` — Decision 047) |
+| Showing prices, valuations, or market data from third-party listings | `provenance-honest-market-data` |
+| Identifying physical objects with the live camera (OCR + matching) | `camera-recognition-pipeline` |
+| Adding user-to-user trading / selling / matching | `marketplace-adjacent-design` + `docs/templates/TRADE-DESIGN-template.md` |
+| Adding a third-party data dependency — or a partner revokes one | `third-party-revocation-resilience` |
+| Monetizing an app built around IP/content you don't own | `third-party-ip-monetization` |
+| Coordinating work with a second AI agent surface | `two-agent-handoff` |
 | Deriving a shipped corpus from a messy source (facts, cards, entries) | `content-corpus-derivation` |
 | Real-time multiplayer across native + web (local same-room or online) | `cross-platform-multiplayer` |
 | A value that must be identical on every platform (daily pick, shuffle, hash) | `cross-platform-determinism` |

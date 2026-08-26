@@ -112,3 +112,32 @@ the artifact, publish a small `manifest.json` (schemaVersion,
 generatedAt, counts, bytes) — a cheap version probe for tooling and
 future clients, even if today's clients go straight to the asset
 with ETag.
+
+## Client consumption rules (every consumer, every platform)
+
+Cross-platform UX bugs hide in the *consumption* layer even when the
+plane itself is clean. Four rules earned in production:
+
+- **Two-phase progressive load for a big JSON catalog**: ship a small
+  head file (the first ~500 items, a couple hundred KB) that loads
+  synchronously for an instant first frame, then hydrate the full
+  catalog behind it. One 5 MB decode before first paint reads as a
+  hung app. (For corpora past a few MB, prefer the SQLite
+  query-on-disk route above instead.)
+- **Search is word-prefix, never substring.** One shared matcher per
+  platform: "amon" finds "Amon-Ra" and never "Damon". A raw
+  `.contains()` matcher sprayed across surfaces produces different
+  results per screen and surfaces embarrassing mismatches. Specify
+  the matching semantics in the data contract so every client
+  reproduces them.
+- **Items with imagery sort ahead of image-pending placeholders** in
+  every grid — the primary sort key, applied identically on all
+  platforms. A wall of placeholders at the top of a browse surface
+  reads as broken.
+- **Display vocabulary is part of the contract.** Schema field names
+  are frozen (renames are a migration); what users SEE is a
+  render-layer mapping every client applies identically (field
+  `element` renders as "Weapon"). Put the mapping table in the data
+  contract doc — see the DATA-CONTRACT template's Display Vocabulary
+  section — so no client leaks schema language into the UI and no
+  two clients translate differently.
