@@ -132,6 +132,42 @@ When closing parity gaps in bulk (a "parity wave"):
 - Update PARITY.md per change set within the wave, not once at the
   end — a wave that dies mid-way must leave a true matrix.
 
+## The dead-API audit: a declaration nothing calls is an unshipped feature
+
+A parity matrix is built from what each platform's UI *offers*. It cannot see
+a capability that exists in shared code and is **wired on zero platforms** —
+every cell looks consistent, because they are all consistently wrong.
+
+Found in production: a `beginStallSuspension` on a shared SharePlay service,
+public, documented, and **called by nothing on any platform**. Every player
+received a playback coordinator and none of them ever suspended it, so a
+buffering participant silently drifted out of sync instead of the group
+waiting. The matrix had no row for it; the code review had nothing to catch,
+because the method was correct.
+
+Run this whenever you audit a shared layer:
+
+```bash
+# every public/internal method on the shared service, minus its own definition
+grep -rn --include="*.swift" "func " Shared/Services/Thing.swift |
+  sed -E 's/.*func ([a-zA-Z0-9_]+).*/\1/' |
+  while read f; do
+    n=$(grep -rn --include="*.swift" "\.$f(" . | grep -vc "Services/Thing.swift")
+    [ "$n" -eq 0 ] && echo "NEVER CALLED: $f"
+  done
+```
+
+Two rules follow:
+
+- **Prefer driving cross-cutting behaviour from the shared entry point** rather
+  than exposing it for each platform to remember. The stall suspension moved
+  into the shared `attach(player:)`; three platforms then cannot diverge on it
+  again, and there is no per-platform call site to forget.
+- **A capability with no row is a capability with no owner.** If shared code
+  can do something a user would notice, it earns a matrix row even when the
+  answer is identical everywhere — that row is what makes "wired nowhere"
+  visible.
+
 ## Verbs that deserve a row people forget
 
 Share (and what a share URL opens on each platform) · lock-screen /

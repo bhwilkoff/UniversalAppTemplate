@@ -459,6 +459,140 @@ final class ActivityManager {
 }
 ```
 
+## Production lessons (shipped, Archive Watch 2026-09)
+
+Everything above is the API. These are the four defects that shipping it on
+tvOS + iOS + macOS actually produced — each was live in a build that compiled
+clean and looked right.
+
+### Identity is a stable content id, never the URL
+
+`AVPlayerPlaybackCoordinatorDelegate.playbackCoordinator(_:identifierFor:)` is
+not boilerplate. In any app with a custom `AVAssetResourceLoaderDelegate`,
+per-device CDN URLs, or a mid-playback failover to a different source copy, two
+participants **essentially never hold the same URL**. Apple documents the
+delegate for exactly this: it establishes "identity of two items created from
+different URLs."
+
+Answer with your own stable content id. When it is unknown, return a fresh
+UUID — that correctly means *not the same content*, and a group that refuses to
+sync beats one syncing two different films.
+
+```swift
+func playbackCoordinator(_ c: AVPlayerPlaybackCoordinator,
+                         identifierFor item: AVPlayerItem) -> String {
+    contentID ?? UUID().uuidString      // never item.asset's URL
+}
+```
+
+The delegate can be called off the main actor — lock-guard the value rather
+than actor-isolating it.
+
+### Listen from LAUNCH, not from data-ready
+
+The highest-value bug in this list. "Move this call to Apple TV" (and
+`supportsContinuationOnTV` generally) **cold-launches** your app. If
+`sessions()` iteration is attached to a view that only appears after your data
+loads, nobody is listening during the loading screen — which is precisely the
+window the system hands the session over in. Symptom reported by the user: *the
+call dropped and SharePlay ended*, on a handoff whose Continuity Camera part
+worked fine.
+
+Joining the **session** may not wait for data. Resolving the **content** may.
+
+Corollary: any "a session named this content, go open it" router must be keyed
+on your data version (`.task(id: dbVersion)`), not `onChange` alone —
+`onChange` only fires for changes it was present for, so a session arriving
+during a cold launch sets the pending id *before* the router exists and is
+never seen.
+
+### A stalled participant must SUSPEND, not drift
+
+```swift
+suspension = player.playbackCoordinator.beginSuspension(for: .stallRecovery)
+// ... when isPlaybackLikelyToKeepUp returns true:
+suspension?.end()
+```
+
+Drive this from your shared attach point, **not from each platform's player**.
+Shipped here as a public method that *nothing called on any platform* — every
+player received a coordinator and none ever suspended it, so a buffering viewer
+silently fell behind instead of the group waiting. Centralising it is what stops
+three platforms diverging on it again.
+
+Bind the stall observer with `object: nil` plus an identity check rather than
+`object: item`, if your player can replace its item on a source failover — an
+observer bound to the item seen at attach time goes quiet on exactly the swap
+that follows a bad stall.
+
+In Swift 6, a `Notification` is not `Sendable`. Derive a `Sendable` value
+(an `ObjectIdentifier`) *outside* the isolated block; sending the notification
+in is a data-race error.
+
+### "Watch Together" must never silently play alone
+
+`prepareForActivation()` returns `.activationDisabled` when the user is not in
+a call. That is **ordinary, not an error**. Returning a `Bool` from your share
+function collapses it into "false", the caller falls through, and the film just
+plays — user report: *"If I start from the app and select Watch Together
+without a call being live, it just plays the movie."*
+
+Use a three-case outcome, because a Bool cannot say *why* nothing happened:
+
+```swift
+enum ShareOutcome { case started, needsCall, cancelled }
+```
+
+On `needsCall`, present `GroupActivitySharingController`, which picks people and
+**places the call** for you. Begin playback only once a session is live.
+
+### `GroupActivitySharingController` differs by kit — and is missing on tvOS
+
+| | availability | shape | reading `result` |
+|---|---|---|---|
+| UIKit (`_GroupActivities_UIKit`) | iOS 15.4+ | `UIViewController`, presented modally | after dismissal (`presentationControllerDidDismiss`) |
+| AppKit (`_GroupActivities_AppKit`) | macOS 13+ | `NSViewController`, `presentAsSheet` | `await controller.result` directly — no delegate |
+| tvOS | **does not exist** (checked in the 27.0 SDK) | — | — |
+
+`result` is an **async property** in both kits — a common miss that makes the
+sheet look like it returns nothing.
+
+tvOS therefore cannot start the call. Have it *explain* ("start a FaceTime call
+first"), never offer a control that cannot work.
+
+```swift
+// AppKit
+guard let host = NSApp.keyWindow?.contentViewController else { return false }
+guard let c = try? GroupActivitySharingController(activity) else { return false }
+host.presentAsSheet(c)
+return await c.result == .success
+```
+
+### Never coordinate a secondary player
+
+If your app runs any second `AVPlayer` — a muted scout for live captions, a
+preview, a thumbnail scrubber — coordinate **only** the main one. Coordinating
+a scout that runs ahead at 2× drags the entire group to 2×.
+
+### Note on `NSSupportsGroupActivities`
+
+The Setup section above lists this key. It appears **nowhere in the Xcode 27
+bundle**, and Archive Watch ships SharePlay on tvOS, iOS and macOS *without*
+it — including starting a call from inside the app via
+`GroupActivitySharingController`, verified end to end on real hardware. Treat
+the key as unverified: do not add it on the assumption it is required, and do
+not conclude from its absence that starting-without-a-call is unavailable.
+
+### Verify on hardware, with two Apple IDs
+
+A simulator cannot place a FaceTime call. Real verification needs two physical
+devices **signed into different Apple IDs** — "two devices, one account"
+behaves differently and will pass a test the real case fails. Confirm the
+installed build on *every* device with `devicectl device info apps` before
+diagnosing: a stale build on one device is invisible and explains symptoms it
+did not cause (an Apple TV sat three builds behind an iPad through an entire
+SharePlay debugging session here).
+
 ## Review Checklist
 
 - [ ] Group Activities entitlement (`com.apple.developer.group-session`) added

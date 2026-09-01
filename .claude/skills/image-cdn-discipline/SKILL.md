@@ -112,3 +112,55 @@ Configure deliberately at launch:
 - Client-side recycled-cell image bugs: see `ios-production-gotchas`.
 - Publishing the metadata catalog itself: see
   `shared-data-plane-contract`.
+
+## Never put art you did not author into a box that reshapes it
+
+A catalog whose images come from many sources does **not** have one aspect
+ratio, and assuming it does is a defect that ships looking fine on the samples
+you checked.
+
+Measured across one real catalog's poster sources (width/height):
+
+```
+tmdb .67   omdb .68   tvdb .68   fanart .70   generated .67    <- poster-shaped
+commons  .67-1.38     archive 1.28-1.76      wikidata 1.33-2.37 <- arbitrary stills
+```
+
+So the rule is not "everything is 2:3". It is **never reshape it**: fit at the
+image's own intrinsic aspect, bound one dimension, let the other follow.
+
+Two failure modes, and the second is the one that bites on the fix:
+
+1. **Crop-scaling a portrait poster into a wide hero box.** A 2:3 poster
+   center-cropped to ~2.4:1 is a horizontal sliver — unrecognizable as a
+   poster, which also reads to users as "you are not using the good artwork."
+   Live here on 85.7% of a catalog, because the hero did
+   `backdrop ?? poster` and most items have no backdrop.
+2. **"Fixing" it by forcing a 2:3 frame.** That letterboxes the landscape
+   sources inside a floating black box. The first fix was this, and the device
+   showed it immediately.
+
+```kotlin
+// WRONG — reshapes            // WRONG — assumes one shape
+ContentScale.Crop              Modifier.aspectRatio(2f/3f)
+// RIGHT — height-bounded, width from the image's own intrinsics
+ContentScale.Fit
+```
+
+Practical companions:
+
+- Fill the empty space with an **ambient wash**: the same image, crop-scaled
+  and heavily blurred, behind the fit copy. It reads as intentional rather than
+  as a gap.
+- Draw the fit image **above** any scrim. Hero scrims usually end fully opaque,
+  so art placed under one loses its bottom third.
+- `backdrop ?? poster` is a bug anywhere the destination is not the poster's
+  own aspect. Grep for that fallback specifically — it was live in five
+  surfaces on one platform.
+- **Gate curated shelves on professional artwork**, not the weaker
+  "has *some* designed art" flag, which admits machine-generated frame grabs.
+  Never gate a user's own **favorites** that way: hiding someone's saved title
+  for its artwork is a different thing from curating a shelf.
+
+Measure before assuming — one `HEAD`/decode pass over a sample per source
+settles the aspect question in minutes and would have skipped the wrong fix.

@@ -18,7 +18,7 @@ Dreams, BOBA Playbook) are folded back HERE, continuously, instead of
 into a next-letter fork.
 
 **New in the Universal generation** (everything learned since Quint,
-2026-07 → 2026-08):
+2026-07 → 2026-09):
 
 - **CI fleet engineering** (`docs/CI-FLEET.md`) — running 30+ scheduled
   workflows without losing work or crying wolf: the compute/apply lock
@@ -35,7 +35,25 @@ into a next-letter fork.
   `tools/`) — the paired-Apple-TV scenario runner with screen OCR,
   D-pad focus verification on Android TV, the throttled-network ship
   gate, the QA sweep, physical Test Lab, and the
-  `device-observation-harness` skill.
+  `device-observation-harness` skill. Now also carries **verify the
+  artifact, never the build** — a `| tail` that hid a `BUILD FAILED`, and
+  a stale build on one device that explained symptoms it did not cause.
+- **Sharing a device bench between concurrent agent sessions**
+  (`tools/devlease.py` + the `concurrent-agent-device-leases` skill) —
+  two Claude Code sessions driving the same phones and TVs each kept
+  finding the other's app in the foreground and diagnosing it as a bug in
+  its own product. A cooperative lease (`~/.device-lease`), held for the
+  WHOLE run in ONE process, because per-invocation leases leave gaps a
+  peer drives straight through.
+- **SharePlay in production** (`shareplay-activities`) — the four defects
+  that shipping GroupActivities across tvOS/iOS/macOS actually produced:
+  coordinate by a stable content id rather than the URL, listen from
+  launch (a continuation cold-launches the app), suspend the group on a
+  stall from the shared attach point, and never let "Watch Together"
+  silently play alone.
+- **Art you did not author** (`image-cdn-discipline`) — a multi-source
+  catalog does not have one aspect ratio; never put such an image in a
+  box that reshapes it, and measure the sources before assuming.
 - **TV platforms beyond Apple** (`docs/TV-PLATFORMS.md`, the
   `smart-tv-platform-expansion` / `androidtv-compose-focus` /
   `smarttv-web-app` skills, the additive `tv.js`/`tv.css` layer, a Cast

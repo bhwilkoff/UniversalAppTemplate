@@ -117,6 +117,35 @@ images through ONE decode path — captured frames are RGBA, PNG-decoded files
 BGRA, and comparing them directly reports identical images as differing only
 where they are colored.
 
+## Verify the artifact, never the build
+
+Three failures, each of which produced a confident and wrong "verified":
+
+- **`| tail` on `xcodebuild` hid a `BUILD FAILED`.** The pipeline's exit status
+  is the tail command's, and the last lines of a failed build are often
+  innocuous. Always grep for the verdict, never trust the tail:
+  ```bash
+  xcodebuild ... 2>&1 | grep -E "^e: |error: |BUILD SUCCEEDED|BUILD FAILED"
+  ```
+  The catch here came from an unrelated check — `aapt2 dump badging` still
+  reporting the OLD versionCode — not from reading the build log.
+
+- **A stale build on ONE device explains symptoms it did not cause.** An Apple
+  TV sat three builds behind an iPad through an entire SharePlay debugging
+  session. After every install, read the version back OFF the device rather
+  than inferring it from a successful build:
+  ```bash
+  xcrun devicectl device info apps --device <UDID>   # Apple
+  adb shell dumpsys package <pkg> | grep versionName # Android
+  ```
+
+- **A successful `install` is not a successful *launch*.** Installs work while
+  an Apple TV sleeps; launches return "System is asleep", and there is no wake
+  verb — the scenario runner has to wake it first.
+
+The general rule: a build step reports what the *toolchain* did. Only the
+device reports what the *user will run*. Assert against the device.
+
 ## Compile-the-shipped-file Swift harnesses
 
 For Apple-framework behavior no simulator can prove (AVFoundation asset
