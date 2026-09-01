@@ -23,23 +23,11 @@ Rules, deliberately few enough that any other tool can implement them in an hour
   * Reading a foreign lease tells you WHO has it, so a message names a peer
     instead of blaming the app.
 
-    with lease("firetv", task="tidbits live join"):
+    with lease("firetv", task="appname live join"):
         ...                       # the device is yours for the duration
 
     ok, holder = try_lease("firetv")
     if not ok:  print(f"skipping firetv — held by {holder}")
-
-ORIGIN: this file is a VERBATIM copy of Tidbits-Trivia's tools/devlease.py, which
-authored the protocol. Only DEVICE_LEASE_OWNER's default differs. Do not "improve"
-it here — the lease dir, the filename, the JSON fields and the DEVICE KEYS are a
-contract between two repos, and a unilateral change silently stops the interlock
-rather than failing loudly. Canonical keys (from Tidbits' tools/adb_run.py):
-
-    firetv     10.0.0.139:5555      androidtv  10.0.0.55:5555
-    pixel      (mDNS serial)        windows
-
-    python3 tools/devlease.py              # who holds what
-    python3 tools/devlease.py release-all  # release only OUR leases
 """
 import contextlib
 import json
@@ -50,7 +38,7 @@ from pathlib import Path
 DIR = Path(os.environ.get("DEVICE_LEASE_DIR", Path.home() / ".device-lease"))
 DEFAULT_TTL = 900          # 15 min: longer than any single run here, short enough
                            # that a crashed session frees the bench on its own.
-OWNER = os.environ.get("DEVICE_LEASE_OWNER", "archive-watch")
+OWNER = os.environ.get("DEVICE_LEASE_OWNER", "appname-trivia")
 
 
 def _path(dev):
@@ -58,8 +46,22 @@ def _path(dev):
     return DIR / f"{dev}.json"
 
 
+def _alive(pid):
+    """Is that process still running? Only meaningful for a lease taken on THIS
+    machine, which is the only kind this bench has."""
+    try:
+        os.kill(pid, 0)
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        return True                     # exists, owned by someone else
+    except (OSError, TypeError):
+        return True                     # unknown: assume held, never steal on a guess
+    return True
+
+
 def read(dev):
-    """The current lease, or None when free/expired."""
+    """The current lease, or None when free / expired / held by a dead process."""
     p = _path(dev)
     try:
         d = json.loads(p.read_text())
@@ -67,6 +69,14 @@ def read(dev):
         return None
     if d.get("expires", 0) < time.time():
         return None                     # expired: treated as free, not stolen
+    # A killed session must not hold the bench for the rest of its TTL. A sweep died
+    # to a timeout without releasing, and the next sweep was refused for four more
+    # minutes with "this sweep covers NOTHING" — correct, and needlessly so.
+    #
+    # Only ever reclaimed from a DEAD pid, never a slow one: the check is "does this
+    # process still exist", not "has it taken too long".
+    if not _alive(d.get("pid")):
+        return None
     return d
 
 

@@ -569,3 +569,31 @@ implementation. See the `learning-orientation-design` skill:
 A "no" to any is a redesign signal at proposal stage, not after
 shipping. Applies identically across all five platforms — and it is
 the part of this template most worth keeping when you make it yours.
+
+## Real-device testing and store submission
+
+Two rigs come with the template, both proven on a shipped six-platform app.
+
+**Autonomous fleet testing** — drive iOS, iPadOS, tvOS, macOS, Android, Windows and the
+web on real hardware and grade from the screen, not the logs.
+
+1. Fill in `tools/app_config.py` — bundle ids, package names, your bench, and the
+   on-screen vocabulary that proves your app is showing. It is the only file to edit.
+2. Add env-gated entry hooks so any screen can be opened directly (no-ops in
+   production). `python3 tools/hook_coverage.py` reports which surfaces are reachable.
+3. `python3 tools/qa_suite.py` runs the fleet.
+
+Method and the traps: **`docs/AUTONOMOUS-FLEET-TESTING.md`**, or invoke the
+`autonomous-fleet-testing` skill.
+
+**CLI store submission** — the whole Apple ship is commands, including creating the
+App Store version and submitting for review. Nobody opens App Store Connect.
+
+```bash
+gh workflow run appstore-build.yml -f platform=ios
+gh workflow run appstore-submit.yml -f mode=upload \
+  -f create_version=X.Y.Z -f attach_build=N -f release_notes="..." -f submit=true
+gh workflow run appstore-submit.yml -f mode=audit    # verify from Apple
+```
+
+Runbook and the four build-green/upload-fail traps: **`docs/APPLE-SUBMISSION-CLI.md`**.

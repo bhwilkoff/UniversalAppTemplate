@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Create + install App Store provisioning profiles for a set of bundle ids via the App Store Connect
 API, and print a bundleID->profileUUID map (JSON). Used by tools/submit-appstore.sh for MANUAL signing,
-because cloud-managed/automatic signing can fail for a team's ASC API key ("Cloud signing permission
-error") even though the same key can create certs/profiles directly via the REST API.
+because cloud-managed signing fails for this team's API key ("Cloud signing permission error") even
+though the key can create certs/profiles directly via the REST API.
 
 Usage:  asc_profiles.py <ios|tvos|mac> <distCertId> <bundleId> [bundleId ...]
 Env:    ASC_KEY_ID, ASC_ISSUER_ID, and the .p8 at ~/.appstoreconnect/private_keys/AuthKey_<KEYID>.p8
@@ -20,7 +20,6 @@ def token():
     kp = os.environ.get("ASC_KEY_PATH", os.path.expanduser(f"~/.appstoreconnect/private_keys/AuthKey_{kid}.p8"))
     key = open(kp).read()
     now = int(time.time())
-    # ES256 JWT — the ASC API requires an EC P-256 signature (the .p8 is an EC key).
     return jwt.encode({"iss": iss, "iat": now, "exp": now + 600, "aud": "appstoreconnect-v1"},
                       key, algorithm="ES256", headers={"kid": kid, "typ": "JWT"})
 
@@ -34,12 +33,31 @@ def api(method, path, body=None):
     except urllib.error.HTTPError as e:
         raise SystemExit(f"ASC API {method} {path} -> {e.code}: {e.read().decode()[:400]}")
 
-def bundle_resource_id(identifier):
+PLATFORM_KEY = {"ios": "IOS", "tvos": "IOS", "mac": "MAC_OS"}
+
+
+def bundle_resource_id(identifier, platform="ios"):
+    """The App ID's resource id, registering it if this is the first time we ship it.
+
+    This used to hard-fail with "register it first". That was fine while every bundle
+    id predated the tool, and it stopped being fine the moment a new EXTENSION target
+    appeared: adding the iMessage extension made the archive succeed and then the
+    signing step die on com.example.appname.Messages, with nothing on
+    the machine to fix. A new target is exactly when this runs, so it registers.
+    """
     _, d = api("GET", f"/v1/bundleIds?filter[identifier]={identifier}&limit=20")
     for x in d.get("data", []):
         if x["attributes"]["identifier"] == identifier:
             return x["id"]
-    raise SystemExit(f"bundle id not found in App Store Connect: {identifier} (register it first)")
+
+    print(f"  registering new App ID: {identifier}", file=sys.stderr)
+    _, d = api("POST", "/v1/bundleIds", {"data": {
+        "type": "bundleIds",
+        "attributes": {"identifier": identifier,
+                       # Apple rejects '.' and '_' in the NAME (not the identifier).
+                       "name": identifier.replace(".", " ").replace("_", " "),
+                       "platform": PLATFORM_KEY[platform]}}})
+    return d["data"]["id"]
 
 def main():
     if len(sys.argv) < 4:
@@ -50,13 +68,13 @@ def main():
     os.makedirs(pdir, exist_ok=True)
     out = {}
     for ident in bundle_ids:
-        name = f"AppName {platform} {ident}"
+        name = f"AW {platform} {ident}"
         # Delete any existing profile with this name (a stale one can't be reused if the cert changed).
         _, d = api("GET", f"/v1/profiles?filter[name]={urllib.parse.quote(name)}&limit=20")
         for x in d.get("data", []):
             if x["attributes"]["name"] == name:
                 api("DELETE", f"/v1/profiles/{x['id']}")
-        bid = bundle_resource_id(ident)
+        bid = bundle_resource_id(ident, platform)
         body = {"data": {"type": "profiles",
                          "attributes": {"name": name, "profileType": ptype},
                          "relationships": {"bundleId": {"data": {"type": "bundleIds", "id": bid}},

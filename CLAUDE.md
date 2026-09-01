@@ -51,6 +51,8 @@ these patterns; invoke the skill when its trigger matches.
 | Publishing an Android build to Play from the CLI | `play-cli-submission` |
 | Publishing a Windows MSIX to the Microsoft Store from CI | `windows-production-gotchas` + `docs/windows/WINDOWS-STORE-SUBMISSION.md` |
 | Logging an architecture decision | `architectural-decision-log` |
+| Building or extending real-device test automation | `autonomous-fleet-testing` + `docs/AUTONOMOUS-FLEET-TESTING.md` |
+| Creating an App Store version / submitting for review from the CLI | `docs/APPLE-SUBMISSION-CLI.md` (the FULL ship is CLI — never ask the owner to press Submit) |
 | User pushback after 3+ iterations of "still broken" | `3d-feature-debug-loop` |
 | Adding/editing ANY scheduled workflow, or debugging CI failures / lock contention / alert noise | `ci-fleet-engineering` |
 | A fix that can't be verified from logs or a simulator (TV focus, playback, on-device behavior) | `device-observation-harness` |

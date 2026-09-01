@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""External-observation scenario runner for the paired Apple TV (Tidbits).
+"""External-observation scenario runner for a paired Apple TV.
 
 Ported from Archive Watch's atv_scenario.py and adapted to trivia: launches the
 app with DebugHooks env, screenshots the GLASS on an interval, OCRs every frame
@@ -18,11 +18,13 @@ Requires: /tmp/tbocr (swiftc -O tools/ScreenOCR/main.swift -o /tmp/tbocr),
 the paired ATV, the app installed (tools/atv_install.sh).
 Playbook + findings log: docs/TVOS-TEST-PLAYBOOK.md.
 """
+from app_config import *  # app identity + calibrated thresholds
+
 import argparse, json, re, subprocess, sys, time
 from pathlib import Path
 
 DEVICE = "YOUR-DEVICE-UDID"   # Your Apple TV (devicectl UDID)
-BUNDLE = "com.example.appname"
+BUNDLE = APPLE_BUNDLE_ID
 OCR = "/tmp/tbocr"
 SHOT_EVERY = 4.0   # 4K captures pressure the device's screenshot daemon;
                    # 2.5s coincided with jetsam events on Archive Watch
@@ -141,13 +143,13 @@ SCENARIOS = {
         minutes=1.5,
         # Apple Quick Match rides GameKit: the native matchmaker sheet is the
         # correct surface (Automatch / Invite Friends / Start Game), not the
-        # Tidbits-copy search screen the web/Android Firebase queue shows.
+        # The in-app search screen the web/Android queue shows.
         expect_seq=[r"Multiplayer Game|Automatch", r"Start Game|Invite Friends"],
         forbid_extra=r"QUICK PLAY",
         note="Quick Match full flow: press to search, match or bot fallback."),
     "paywall": dict(
         env={"APP_PAYWALL": "1"}, minutes=0.5,
-        expect_any=r"Club|Tidbits Club", forbid_extra=r"\$0|nil",
+        expect_any=r"Club", forbid_extra=r"\$0|nil",
         note="Club paywall renders plans (or the honest empty state)."),
 }
 
@@ -241,7 +243,7 @@ def launch(env, drop=()):
 
 def app_alive():
     r = devicectl("device", "info", "processes", "--device", DEVICE, timeout=60)
-    return "TidbitsTrivia.app/TidbitsTrivia" in r.stdout
+    return "AppName.app/AppName" in r.stdout
 
 
 def capture_loop(outdir, minutes, presses):

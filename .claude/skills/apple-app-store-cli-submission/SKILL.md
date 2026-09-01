@@ -1,6 +1,6 @@
 ---
 name: apple-app-store-cli-submission
-description: REFERENCE IMPLEMENTATION (Archive Watch) behind the generic `cloud-appstore-submission` skill — consult AFTER it for the local-CLI pathway and its traps. Build + upload Archive Watch's macOS/iOS/tvOS App Store builds from the command line (no Xcode GUI) — the manual-REST-signing pathway, the ITMS-90111 Xcode-floor trap, the PyJWT venv, per-platform SDK downloads, the tuple-sort type-check gotcha, and screenshots. Invoke before archiving, signing, submitting, or resubmitting any Apple build, or when App Review rejects a build for SDK/Xcode/signing reasons.
+description: REFERENCE IMPLEMENTATION (Archive Watch) behind the generic `cloud-appstore-submission` skill — consult AFTER it for the local-CLI pathway and its traps. Build + upload Archive Watch's macOS/iOS/tvOS App Store builds from the command line (no Xcode GUI) — the manual-REST-signing pathway, the ITMS-90111 Xcode-floor trap, the PyJWT venv, per-platform SDK downloads, the tuple-sort type-check gotcha, and screenshots. Invoke before archiving, signing, submitting, or resubmitting any Apple build; when creating an App Store version or submitting for review from the CLI; or when App Review rejects a build for SDK/Xcode/signing reasons.
 ---
 
 # Apple App Store submission (CLI) — Archive Watch
@@ -122,3 +122,69 @@ Recording permission. Any build may produce screenshots (not the submitted binar
 DEVELOPER_DIR=<released-Xcode>/Contents/Developer \
   tools/mac-shotset.sh "<DerivedData>/Release/YourApp.app"
 ```
+
+---
+
+## The last mile: creating the version and submitting for review (2026-09-01)
+
+Everything above ships the **binary**. This section ships the **submission** — the two
+steps that used to require a human in App Store Connect and no longer do.
+
+Full runbook: `docs/APPLE-SUBMISSION-CLI.md`. Tool: `tools/asc_submit.py`, wrapped by
+`.github/workflows/appstore-submit.yml` (CI, because the ASC issuer id is a repo secret
+and belongs in one place).
+
+```bash
+gh workflow run appstore-submit.yml \
+  -f mode=upload -f create_version=X.Y.Z -f attach_build=N \
+  -f release_notes="..." -f submit=true
+gh workflow run appstore-submit.yml -f mode=audit     # verify from Apple, not the tool
+```
+
+### Why this looked impossible
+
+**`POST /v1/appStoreVersionSubmissions` answers 403:**
+
+```
+The resource 'appStoreVersionSubmissions' does not allow 'CREATE'.
+Allowed operation is: DELETE
+```
+
+That reads as a permissions wall, so the natural conclusion is "the API cannot submit;
+a human must." It is **deprecated**, and the message never says so. The replacement is
+three calls:
+
+1. `POST /v1/reviewSubmissions` — platform + app relationship
+2. `POST /v1/reviewSubmissionItems` — the appStoreVersion as an item
+3. `PATCH /v1/reviewSubmissions/{id}` — `submitted: true`
+
+Apple's model is a submission carrying one or more items (version, IAPs), which is also
+why a version can no longer be sent on its own.
+
+### The other four traps — all of which build and archive GREEN
+
+1. **A TestFlight upload does not create an App Store version.** Separate records. Use
+   `-f create_version=X.Y.Z`.
+2. **A new extension/app target needs its App ID registered** — signing dies with
+   "bundle id not found in App Store Connect ... (register it first)". `asc_profiles.py`
+   now registers it. Apple rejects `.` and `_` in a bundle id's *name*.
+3. **An iMessage icon set needs `"platform": "ios"`** on its `universal` and
+   `ios-marketing` entries, or actool silently drops them and emits no
+   `MSMessagesExtensionStoreIconName`.
+4. **`ASC_KEY_P8` is base64**, not raw PEM — raw fails with
+   `Unable to load PEM file ... MalformedFraming`.
+
+### Release type
+
+Versions are created **`AFTER_APPROVAL`** so approval puts the app on the store with no
+further action. An approved build waiting on a button is a silent stall. Release type
+is logistics, not reviewable content, so `-f release_type=` changes it even while the
+version sits in `WAITING_FOR_REVIEW`.
+
+### Always audit
+
+`-f mode=audit` checks the attached build, required localisation fields, every
+screenshot set's delivery state *and per-asset errors*, age rating, review contact, the
+export-compliance answer, and whether an open review submission actually has items. It
+exits non-zero on a blocker. Run it **before and after** submitting — the tool's own
+success message is not evidence.
