@@ -309,8 +309,15 @@ What a human must do — surface these early, they have lead time:
 
 ## 10. Roku — decide, don't drift
 
-0% code reuse (BrightScript + SceneGraph), ~2–4 months for one experienced dev.
-Before committing budget, price two things:
+**If you have decided to build it, the whole body of Roku knowledge is in
+`roku-brightscript-app`** (the language traps, the SceneGraph focus/render
+model, the from-scratch design system, the ECP harness and its silent
+failures, deep-linking, and the cert limits). This section is only the
+go/no-go.
+
+0% code reuse (BrightScript + SceneGraph), ~2–4 months for one experienced dev
+(a full catalog app is buildable in a focused multi-week loop with a device on
+the network). Before committing budget, price two things:
 
 - Its **performance thresholds** (home rendered within 15s, playback within 8s)
   against your origin's real latency — measure on hardware.
@@ -323,6 +330,8 @@ path was sunset in 2024.
 
 ## See also
 
+- `roku-brightscript-app` — everything about actually building the Roku channel
+- `ten-foot-detail-design` — the Detail/Series/Search design shared across TV runtimes
 - `cross-platform-parity-discipline` — track TV as clients in the parity matrix
 - `native-platform-first` — exhaust platform primitives before custom widgets
 - `resilient-media-streaming` — the streaming layer TV inherits
