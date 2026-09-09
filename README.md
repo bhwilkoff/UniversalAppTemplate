@@ -597,3 +597,17 @@ gh workflow run appstore-submit.yml -f mode=audit    # verify from Apple
 ```
 
 Runbook and the four build-green/upload-fail traps: **`docs/APPLE-SUBMISSION-CLI.md`**.
+
+## Product health
+
+`pulse/` + `tools/pulse_collect.py` is a daily dashboard that reads every
+channel a shipped app has — store submissions and reviews, downloads and
+installs, crash clusters, social posts and their engagement, mentions across the
+open web, and CI health — into one page.
+
+Its governing rule is that **a reader which cannot read says so, and never
+renders as a zero**: a confident zero from a broken reader is worse than no
+dashboard, because it reads as good news and nobody checks again.
+
+See `docs/PRODUCT-PULSE.md`, and the `product-pulse-dashboard` and
+`store-metrics-pipelines` skills.

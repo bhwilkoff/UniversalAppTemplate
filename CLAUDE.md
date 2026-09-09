@@ -24,6 +24,8 @@ these patterns; invoke the skill when its trigger matches.
 
 | When | Skill |
 |---|---|
+| Building a product-health / metrics dashboard | `product-pulse-dashboard` |
+| Reading store downloads, installs, reviews, crashes | `store-metrics-pipelines` |
 | Starting any feature change | `feature-shipping-discipline` |
 | Proposing UI / IA work | `binding-design-doc-discipline` |
 | Designing any view (any platform) | `mobile-first-density-design` + `native-platform-first` |

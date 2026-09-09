@@ -22,6 +22,22 @@ ANDROID_MAIN_ACTIVITY = "com.example.appname.MainActivity"
 WINDOWS_PROCESS = "AppName"                       # the .exe, minus the extension
 WEB_URL = "http://localhost:8080"
 
+# --- Product health (tools/pulse_collect.py, /pulse) --------------------------
+# The numeric App Store id, from the listing URL or `v1/apps?filter[bundleId]=`.
+APPLE_APP_STORE_ID = ""                           # e.g. "6776697407"
+GITHUB_REPO = ""                                  # e.g. "owner/Repo"
+PRODUCT_NAME = "AppName"                          # how a human writes it
+PRODUCT_SITE = "https://example.com"              # the public site, no slash
+# What counts as somebody talking about US when searching the open web. The
+# LOOSE term is matched only alongside a corroborating word, because a product
+# name is usually also two ordinary English words.
+MENTION_STRICT = ("example.com", "appname")
+MENTION_LOOSE = "app name"
+# Play Console -> Download reports -> Statistics -> "Copy Cloud Storage URI".
+# NOT derivable from the developer id in the Console URL.
+PLAY_REPORTS_BUCKET = ""                          # e.g. "pubsite_prod_rev_0978..."
+
+
 # --- The bench ----------------------------------------------------------------
 # Real hardware, by udid/serial. None = not on this bench.
 DEVICES = {
