@@ -34,6 +34,7 @@ returns.
 | `play_crashes` | `vitals.errors.issues` + one report each | Play SA + API enabled |
 | `play_users` | `distinctUsers` × 7 dimensions | Play SA (withheld below an audience floor) |
 | `play_reports` | GCS installs CSVs | `PLAY_REPORTS_BUCKET` + bucket grant |
+| `amazon_vitals` | Amazon `vitals/apps/{pkg}/{metricSet}` | `AMAZON_CLIENT_ID`/`SECRET` + a profile MAPPED to the Reporting API |
 | `manual_stores` | `ops/stores-manual.json` | you, by hand |
 | `social_programme` | your posting ledger | nothing |
 | `social_liveness` | per-platform "is it still up" | the platform tokens |
@@ -60,6 +61,12 @@ returns.
   `youtube.upload` only, deliberately. Report that as a choice, not a fault.
 - **GitHub traffic needs a token with repo admin**; the Actions token is not
   allowed it. "0 views" and "we were not permitted to ask" are different claims.
+- **Amazon's `invalid_scope` is a missing MAPPING, not a denial** — attach the
+  security profile at My Settings > API Access. And on Amazon, a 404 means the
+  route is real with no data, while a 400 means no such route.
+- **A hand-kept store row is not the same as a store with no API.** Give each
+  row an `api` key saying what is machine-readable, and let the renderer believe
+  it — assuming otherwise mislabelled a whole platform for five weeks.
 - **`--only` merges.** A partial run must never delete what it did not collect.
 - **Mentions and reviews accumulate**, deduped by identity, because a fuzzy
   search that does not repeat is not evidence that a post was deleted.

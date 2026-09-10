@@ -132,21 +132,46 @@ answer is normal and is not "no reviews exist" — say so.
 ## Amazon Appstore
 
 There **is** a Reporting/Vitals API — `POST
-developer.amazon.com/api/appstore/vitals/apps/{pkg}/crashMetricSet:query`, the
-same shape as Google's, with `crashMetricSet`, `anrMetricSet`, `lmkMetricSet`
-and `issuesMetricSet`.
+developer.amazon.com/api/appstore/vitals/apps/{pkg}/{metricSet}:query`, the same
+shape as Google's, with `crashMetricSet`, `anrMetricSet` and `lmkMetricSet`.
+Scope `adx_reporting::appstore:marketer`, token from
+`https://api.amazon.com/auth/o2/token` by client credentials.
 
-The API Explorer is at **`/reporting/console/appstore/apiaccess`**. Do not look
-for `/settings/console/apiaccess` — it 404s, and that wrong path is how a
-project can conclude the API does not exist.
+### `invalid_scope` means the profile is not MAPPED — it is not a denial
 
-Auth is Login with Amazon client credentials. If **every** scope answers
-`invalid_scope`, the problem is not the scope string: the docs require "a
-Security Profile **mapped to** the Reporting API", and the mapping is what is
-missing. The console's internal endpoints (`rpdata`, `mtdata`) are
-cookie-authenticated and are not a pipeline.
+This is the single most expensive trap in this file, because it reads exactly
+like an account permissions problem and is not.
 
----
+A security profile must be **attached to each API individually** at
+**My Settings → Enterprise Security Features → API Access**
+(`/apps-and-games/console/api-access/home.html`). Creating the profile and
+enabling Login with Amazon is *not* enough — the page will read "No Security
+Profile Attached" while every scope answers `invalid_scope`. Attaching is two
+clicks and grants the scope immediately.
+
+Do not look for `/settings/console/apiaccess` (404). The Vitals **API Explorer**
+is separately at `/reporting/console/appstore/apiaccess`, and it is the fastest
+way to see the exact request shape for your app.
+
+### The 404-vs-400 route discriminator
+
+Amazon does not document its route list, so probe it:
+
+| Answer | Meaning |
+|---|---|
+| `404 NOT_FOUND` | the route is **real**; there is no data for this app |
+| `400 "Unable to fetch the request scope for uri = ..."` | **no such route** |
+
+That is how you establish the API's real surface. Probed with a valid token,
+every non-vitals path — `/sales`, `/reports`, `/apps`, `/reporting/*` — answers
+400. **Vitals is the whole reporting API.** Unit sales exist only in the console
+(My Reports → App Analytics → Overview/Units), so hand-declare them.
+
+### An empty answer is not a broken reader
+
+A young app has no vitals: all metric sets answer 404 and the console's own App
+Health page is equally blank. Report "authenticated; the store holds no vitals
+for this app yet", never a zero and never a failure.
 
 ## The stores with no API at all
 
