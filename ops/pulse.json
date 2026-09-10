@@ -1,0 +1,245 @@
+{
+ "stores": [
+  {
+   "store": "Amazon Appstore",
+   "platform": "Fire TV",
+   "state": "LIVE",
+   "version": "1.42.x",
+   "since": "2026-09-01",
+   "note": "Submission API returns invalid_scope; console only.",
+   "url": "https://developer.amazon.com/apps-and-games/console/apps/list.html",
+   "manual": true
+  },
+  {
+   "store": "Roku Channel Store",
+   "platform": "Roku",
+   "state": "SUBMITTED",
+   "version": "1.0.51",
+   "since": "2026-09-08",
+   "note": "Channel 881015. No developer API — check the Dashboard.",
+   "url": "https://developer.roku.com/developer-channels/channels",
+   "manual": true
+  },
+  {
+   "store": "LG Content Store",
+   "platform": "webOS",
+   "state": "NOT SUBMITTED",
+   "version": null,
+   "since": null,
+   "note": "Package builds; Seller Lounge account is the owner step.",
+   "url": "https://seller.lgappstv.com/",
+   "manual": true
+  },
+  {
+   "store": "Samsung Apps TV",
+   "platform": "Tizen",
+   "state": "NOT SUBMITTED",
+   "version": null,
+   "since": null,
+   "note": "Public Seller is US-only; needs the signing certificate.",
+   "url": "https://seller.samsungapps.com/",
+   "manual": true
+  },
+  {
+   "store": "Web (PWA)",
+   "platform": "archivewatch.org",
+   "state": "LIVE",
+   "version": "rolling",
+   "since": "2026-06-10",
+   "note": "Ships on every Pages deploy.",
+   "url": "https://archivewatch.org",
+   "manual": true
+  }
+ ],
+ "ratings": [],
+ "reviews": [],
+ "mentions": [],
+ "distribution": {},
+ "social": {},
+ "health": {
+  "issues": [],
+  "workflows": []
+ },
+ "github": {
+  "stars": null,
+  "forks": null,
+  "watchers": null,
+  "openIssues": null,
+  "views14d": null,
+  "uniques14d": null,
+  "clones14d": null,
+  "url": "https://github.com/"
+ },
+ "asks": [],
+ "loves": [],
+ "sources": {
+  "apple_stores": {
+   "ok": false,
+   "note": "No module named 'asc_release'",
+   "at": "2026-09-10T16:58:53+00:00"
+  },
+  "apple_reviews": {
+   "ok": false,
+   "note": "No module named 'asc_release'",
+   "at": "2026-09-10T16:58:53+00:00"
+  },
+  "apple_rating": {
+   "ok": false,
+   "note": "iTunes lookup returned no result",
+   "at": "2026-09-10T16:58:53+00:00"
+  },
+  "apple_performance": {
+   "ok": false,
+   "note": "No module named 'asc_release'",
+   "at": "2026-09-10T16:58:53+00:00"
+  },
+  "apple_downloads": {
+   "ok": false,
+   "note": "set ASC_VENDOR_NUMBER (App Store Connect -> Payments and Financial Reports) to read downloads",
+   "at": "2026-09-10T16:58:53+00:00"
+  },
+  "play_stores": {
+   "ok": false,
+   "note": "no Play service-account key (set PLAY_SERVICE_ACCOUNT_JSON)",
+   "at": "2026-09-10T16:58:53+00:00"
+  },
+  "play_reviews": {
+   "ok": false,
+   "note": "no Play service-account key (set PLAY_SERVICE_ACCOUNT_JSON)",
+   "at": "2026-09-10T16:58:53+00:00"
+  },
+  "play_rating": {
+   "ok": false,
+   "note": "HTTP Error 404: Not Found",
+   "at": "2026-09-10T16:58:53+00:00"
+  },
+  "play_vitals": {
+   "ok": false,
+   "note": "no Play service-account key",
+   "at": "2026-09-10T16:58:53+00:00"
+  },
+  "play_crashes": {
+   "ok": false,
+   "note": "no Play service-account key",
+   "at": "2026-09-10T16:58:53+00:00"
+  },
+  "play_users": {
+   "ok": false,
+   "note": "no Play service-account key",
+   "at": "2026-09-10T16:58:53+00:00"
+  },
+  "play_reports": {
+   "ok": false,
+   "note": "set PLAY_REPORTS_BUCKET (Play Console -> Download reports -> Statistics -> Copy Cloud Storage URI)",
+   "at": "2026-09-10T16:58:53+00:00"
+  },
+  "manual_stores": {
+   "ok": true,
+   "note": "5 declared store(s)",
+   "at": "2026-09-10T16:58:53+00:00"
+  },
+  "social_programme": {
+   "ok": false,
+   "note": "[Errno 2] No such file or directory: '/home/runner/work/UniversalAppTemplate/UniversalAppTemplate/social/posted.json'",
+   "at": "2026-09-10T16:58:53+00:00"
+  },
+  "social_reach": {
+   "ok": false,
+   "note": "no social credential in this environment",
+   "at": "2026-09-10T16:58:53+00:00"
+  },
+  "social_replies": {
+   "ok": false,
+   "note": "no Bluesky credential in this environment",
+   "at": "2026-09-10T16:58:53+00:00"
+  },
+  "social_liveness": {
+   "ok": false,
+   "note": "no posts in the ledger yet",
+   "at": "2026-09-10T16:58:53+00:00"
+  },
+  "youtube_channel": {
+   "ok": false,
+   "note": "no YouTube credential in this environment",
+   "at": "2026-09-10T16:58:53+00:00"
+  },
+  "mentions_reddit": {
+   "ok": true,
+   "note": "0 kept",
+   "at": "2026-09-10T16:58:54+00:00"
+  },
+  "mentions_hn": {
+   "ok": true,
+   "note": "0 kept of 0",
+   "at": "2026-09-10T16:58:55+00:00"
+  },
+  "mentions_lemmy": {
+   "ok": true,
+   "note": "0 kept",
+   "at": "2026-09-10T16:58:57+00:00"
+  },
+  "mentions_news": {
+   "ok": true,
+   "note": "0 kept",
+   "at": "2026-09-10T16:58:57+00:00"
+  },
+  "mentions_bluesky": {
+   "ok": false,
+   "note": "no Bluesky credential in this environment",
+   "at": "2026-09-10T16:58:57+00:00"
+  },
+  "mentions_mastodon": {
+   "ok": false,
+   "note": "no Mastodon credential in this environment",
+   "at": "2026-09-10T16:58:57+00:00"
+  },
+  "github": {
+   "ok": true,
+   "note": "None star(s), 0 open issue(s), 0 from outside",
+   "at": "2026-09-10T16:58:58+00:00"
+  },
+  "workflows": {
+   "ok": true,
+   "note": "0 finding(s), 0 urgent",
+   "at": "2026-09-10T16:59:00+00:00"
+  },
+  "catalog": {
+   "ok": false,
+   "note": "catalog-index unreachable: HTTP Error 404: Not Found",
+   "at": "2026-09-10T16:59:00+00:00"
+  },
+  "distribution": {
+   "ok": true,
+   "note": "none yet",
+   "at": "2026-09-10T16:59:00+00:00"
+  },
+  "asks": {
+   "ok": true,
+   "note": "0 request(s), 0 bit(s) of praise",
+   "at": "2026-09-10T16:59:00+00:00"
+  }
+ },
+ "stale": {},
+ "history": [
+  {
+   "date": "2026-09-10",
+   "appleRating": null,
+   "appleRatings": null,
+   "playRating": null,
+   "playRatings": null,
+   "reviews": 0,
+   "mentions": 0,
+   "posts": null,
+   "likes": 0,
+   "followers": 0,
+   "stars": null,
+   "views14d": null,
+   "catalogItems": null,
+   "urgent": 0
+  }
+ ],
+ "generatedAt": "2026-09-10T16:59:00+00:00",
+ "repoVersion": "1.0",
+ "repoBuild": "1",
+ "_": "Written by tools/pulse_collect.py. `history` is the series and is append-only per day; everything else is the latest reading. A source that could not answer says so in `sources` — never assume a zero."
+}
