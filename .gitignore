@@ -4,6 +4,9 @@
 .LSOverride
 
 # Xcode
+# The project is GENERATED from project.yml (`xcodegen generate`); project.yml
+# is the source of truth, so the .xcodeproj at the root never enters git.
+/*.xcodeproj/
 build/
 DerivedData/
 *.xcuserdata/

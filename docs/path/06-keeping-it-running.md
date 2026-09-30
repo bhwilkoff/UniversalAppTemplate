@@ -1,5 +1,9 @@
 # 06. Keeping it running
 
+**Where you are.** Your app is in a store. Strangers can install it, and
+you can no longer see everything that happens to it by using it
+yourself.
+
 On September 14, 2026, five days after Archive Watch's dashboard went
 live, I sent the agent this:
 
@@ -106,8 +110,8 @@ fifty workflows for one app:
   finished before a time limit, and never replace an artifact with a
   smaller one.
 
-The guardian workflows ship switched off. Turn them on when your repo
-has scheduled workflows worth guarding.
+The guardian workflows ship switched off. Ask the agent to turn them
+on once your app has scheduled work worth guarding.
 
 ## Loops
 
@@ -127,27 +131,63 @@ them safe:
 
 ## What it costs
 
-Pulse needs credentials for every store it reads, and each store's are
-set up differently. `docs/PRODUCT-PULSE.md` walks through each one. Until
-you add them, the page is honest and mostly empty.
+Pulse needs a key from every store it reads, and each store hands them
+out differently. The agent knows the way to each one
+(`docs/PRODUCT-PULSE.md`), but only you can log in and create them.
+Until you do, the page is honest and mostly empty.
 
 The CI fleet costs attention. Every scheduled workflow is one more thing
 that can fail quietly. Add one only when the work it does is worth
 watching.
 
-## What to do
+## Working with your agent
 
-1. Copy `ops/pulse.config.example.json` to `ops/pulse.config.json` and
-   fill in your app's identity.
-2. Run `python3 tools/pulse_collect.py` with no credentials. Every
-   reader should say "not configured" or explain why it is dark. None
-   should say zero.
-3. Open `pulse/?fixture` in a browser to see the page with sample data,
-   then `pulse/` to see yours.
-4. Add the credentials for one store, run it again, and read the result
-   next to that store's own console. Do the numbers agree?
-5. When you have more than one scheduled workflow, turn on
-   `workflow-health.yml`.
+1. **Ask for one page.** Tell the agent what you want to be able to see
+   without opening a single store console:
 
-Be ready to show one number Pulse read correctly, and one reader that
-told you honestly it could not.
+   > a single place for me to go in order to understand what our users
+   > are enjoying or requesting of the app AND to understand the
+   > performance of the various platform's apps.
+
+   It sets up Pulse, fills in your app's identity, and tells you which
+   accounts it needs a key from. Do the key steps the way you did in
+   stage 05.
+
+2. **Read the page, not the stores.** Open Pulse each morning for a
+   week. When something looks wrong or missing, say what you see:
+
+   > I don't see the data represented on the different areas of Pulse
+   > (No macOS or Roku items on Reach).
+
+   Then ask it to act on what the page shows:
+
+   > Take a look at 'Needs Attention' section of the Archive Watch Pulse
+   > and see what you can directly address and solve for?
+
+3. **Treat every failure email as a bug in the machinery.** Forward it,
+   and ask for the whole class of failure to end, not just this run:
+
+   > I want to stop getting alerts for failed GitHub actions. Can you fix
+   > it so that if it isn't broken, it doesn't fail?
+
+4. **Bring in real people.** Post about your app somewhere your people
+   are. Bring what they say back to the agent:
+
+   > I posted about the app with links to all of the platforms on Reddit
+   > yesterday [...] I'd like you to use the comments/feedback from the
+   > users on this post to identify issues that need to be solved across
+   > all platforms.
+
+5. **Run your first loop.** Pick a job too big for one sitting (a full
+   audit of every screen on one platform, say) and start it with
+   `/loop`, the goal, and where it should stop. Watch the first few
+   ticks. When a tick does nothing new, say so. When the job is done,
+   stop it and ask for a summary of what changed and what is waiting on
+   you.
+
+**When you are ready to move on,** Pulse reads at least one store
+honestly, a failure email has become a fix instead of a habit, and you
+have run a loop from start to stop.
+
+Be ready to show one number Pulse read correctly, one reader that told
+you honestly it could not, and what your loop finished.

@@ -1,5 +1,9 @@
 # 00. Why we build
 
+**Where you are.** You have an idea for an app and your own copy of this
+template. Nothing is built yet, and that is exactly the right moment for
+this stage.
+
 On September 26, 2026, deep into building Archive Watch, I told the
 agent I was working with this, and it became one of the project's
 standing instructions:
@@ -58,8 +62,8 @@ There are three places, and each one is read at a different moment.
    > growth, not to replace thinking, but to deepen it. [...] The goal is
    > never a slick product. It is a tool that makes someone more human.
 
-   You will rewrite it for your app. Keep it short enough that you
-   would say it out loud.
+   You will not write yours in a text editor. You will say it to the
+   agent, and it will write it there.
 
 2. **The four questions** (the `learning-orientation-design` skill). Before
    any feature is built, the agent asks:
@@ -77,8 +81,9 @@ There are three places, and each one is read at a different moment.
    handed a "for you" box learn nothing, and come to depend on it.
 
 3. **Standing instructions.** These are the dated rules, in your own
-   words, that an app earns as you build it. Archive Watch earned three
-   in one week:
+   words, that an app earns as you build it. I did not write mine in
+   advance. I said each one the moment the agent crossed it, and asked
+   for it to be written down. Archive Watch earned three in one week:
 
    - **Only essential words on screen.** "You and I are having a
      conversation, but not everything I say or what you discover needs
@@ -111,19 +116,47 @@ leaves them more capable instead of less. But, I want you to draw the
 line on purpose, in writing, before the agent draws it for you by
 default.
 
-## What to do
+## Working with your agent
 
-1. Read the "Why we build" section at the top of `CLAUDE.md`. Rewrite it
-   for your app, in your own words, in five sentences or fewer.
-2. Write one standing instruction about something you will not let AI do
-   inside your product. Put the date on it and quote yourself, the way
-   Archive Watch does. Add it under "Standing instructions" in
-   `CLAUDE.md`.
-3. Take the first feature you want to build and run the four questions
-   against it, out loud or on paper. If any answer is "no", redesign it
-   now, while it is still cheap.
-4. Record the platform set and your rule as the first two entries in
-   `DECISIONS.md`. Lead each one with *why*.
+Open Claude Code in your copy of the template. Everything in this stage
+is a conversation. `docs/path/talking-to-your-agent.md` has the moves.
+
+1. **Tell it why.** Before any feature, say what the app is for, who it
+   is for, and what you hope it does for them. Talk the way you would to
+   a friend. Here is how I put one:
+
+   > It seems like a very good platform to build out for Tidbits,
+   > especially as we seek to create a positive habit for learning via
+   > trivia.
+
+   Then ask the agent to rewrite the "Why we build" paragraph in
+   `CLAUDE.md` from what you said, and to read it back to you. Correct
+   it until it sounds like you and not like a company. Five sentences
+   or fewer.
+
+2. **Name one line you will not cross.** Something the app will never
+   do, or never let AI do inside it. Say it plainly and say why:
+
+   > It is absolutely not acceptable. The goal of this app (and all of
+   > my apps) is for them to cost $0 to run.
+
+   Ask the agent to add it to the standing instructions in `CLAUDE.md`
+   with today's date and your words in quotes. You will add more of
+   these as you build, each one the moment you need it.
+
+3. **Test the idea against the four questions.** Ask the agent to run
+   the `learning-orientation-design` skill against your idea and tell
+   you where it fails. Where it does, change the idea now, while it is
+   only words.
+
+4. **Let it ask you the rest.** Ask the agent what it needs to know
+   before it can start building, as a set of multiple-choice questions.
+   Answer them. It records the answers as your first decisions, with
+   the why first.
+
+**When you are ready to move on,** the "Why we build" paragraph sounds
+like you, there is one rule in your own words, and the agent has what
+it needs to start.
 
 Be ready to share your "why we build" paragraph, your one rule, and what
 that rule will cost you.

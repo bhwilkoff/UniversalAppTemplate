@@ -25,9 +25,9 @@
   2. Decide the platform set (all five? skip tvOS? add Windows?)
      → DECISIONS.md
   3. Fill in CLAUDE.md project identity sections
-  4. Create the universal Xcode project at repo root (no spaces in
-     name; iPhone + iPad + Mac + Apple TV destinations) and move the
-     `apple/` starter files into it, per apple/README.md
+  4. Rename the app in `project.yml`, then the agent runs
+     `xcodegen generate` and builds iOS, tvOS, and macOS unsigned,
+     per apple/README.md
   5. Open `android/` in Android Studio, rename `com.example.appname`
   6. Enable GitHub Pages on main branch (+ `.nojekyll` if serving
      `/.well-known/`)
@@ -49,13 +49,13 @@
       (`python3 -m http.server 8080`, then http://localhost:8080);
       `index.html`, `css/styles.css`, `js/app.js` render your first
       view; GitHub Pages enabled
-- [ ] **Apple (universal)**: the repo ships starter files, not a
-      project. Create the Xcode project at repo root per
-      `apple/README.md` (no spaces in the name); iPhone + iPad + Mac +
-      Apple TV destinations on ONE target; `apple/` files moved into the Xcode group preserving
-      the Core / iOS / macOS / tvOS split; `AppVersion.xcconfig`
-      referenced by both Debug + Release configs; empty shell runs on
-      the iOS, macOS, and tvOS destinations
+- [ ] **Apple (universal)**: the project is generated from
+      `project.yml` by the agent, never clicked through Xcode. Rename
+      `AppName` and the bundle ids in `project.yml` (no spaces), run
+      `xcodegen generate`, then build unsigned for iOS Simulator,
+      tvOS Simulator, and macOS and run the Core tests, per
+      `apple/README.md`. ONE target, four destinations; sources stay
+      in `apple/`; `AppVersion.xcconfig` is already wired
 - [ ] **Android**: `cd android && ./gradlew :app:assembleDebug`
       builds out of the box; open `android/` in Android Studio; rename
       the package from `com.example.appname` to your reverse-DNS and

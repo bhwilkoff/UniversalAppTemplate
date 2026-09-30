@@ -1,5 +1,8 @@
 # 04. Seeing it work
 
+**Where you are.** Two platforms run on your own devices, and so far you
+have been the one checking every fix. That stops here.
+
 On September 17, 2026, in the middle of a test run, I typed this to the
 agent working on Archive Watch:
 
@@ -43,7 +46,7 @@ screen, a number read from the device, or a person holding it.
 
 I want to be able to read the word "fixed" in a session log and trust
 it. That means every "fixed" points at something someone could look at:
-a screenshot, a measurement, a run of a harness that could have failed
+a screenshot, a measurement, a test run that could have failed
 and did not.
 
 ## The ladder
@@ -56,35 +59,35 @@ cheapest one that can actually see the bug.
    `APP_DOOR_SECONDS`) that open any screen directly and do nothing in a
    release build. The starters already honor them in debug builds. On
    the web they are ordinary URL parameters (`?view=`, `?item=`,
-   `?mute=1`). They are how a
-   harness, or a store screenshot, gets to a known state without tapping
+   `?mute=1`). They are how the
+   agent's tests, and your store screenshots, get to a known state without tapping
    through the app. `tools/hook_coverage.py` reports which screens have
    one.
 2. **Simulators and headless browsers.** Fast and free, and fine for
    layout and logic. Headless Chrome is also the only way to get a true
    1920×1080 TV viewport on a laptop, which is why the TV-web tools use it.
 3. **Real devices on a bench.** Screenshots of the actual glass, read
-   with on-device text recognition (OCR), so the harness grades what a
+   with on-device text recognition (OCR), so the agent grades what a
    person would see.
 4. **A person.** Some things only a person can judge: whether a
    transition feels right, whether a caption is readable from the couch.
-   Those go on a short list for the owner, and the harness does not
+   Those go on a short list for the owner, and the agent does not
    pretend to have checked them.
 
 ## The bench
 
-A bench is the set of real devices your harness is allowed to drive.
-In this template it is a file, `tools/bench.json`, copied from
-`tools/bench.example.json`, and every device in it has a **role**:
+A bench is the set of real devices the agent is allowed to drive. The
+agent keeps the list in a file (`tools/bench.json`) and fills it in as
+you connect each device, and every device in it has a **role**:
 
-- **test**: the harness may use it freely.
+- **test**: the agent may use it freely.
 - **floor**: the oldest hardware you support (Archive Watch keeps a 2015
   Apple TV HD for this).
 - **os-control**: a device held on an older OS, to tell an OS bug from
   an app bug.
-- **owner-watches**: a device a person actually uses. The harness
+- **owner-watches**: a device a person actually uses. The agent
   refuses it unless you say yes for that run.
-- **owner-personal-never-touch**: your own phone. The harness refuses
+- **owner-personal-never-touch**: your own phone. The agent refuses
   it every time, even when handed its raw ID.
 
 Those last two roles exist because of the fireplace TV.
@@ -99,7 +102,7 @@ Every run in this template follows the same manners.
   whole run, and the other waits.
 - **Doors are muted and time-limited by default.** An audible run is
   opt-in, and you ask first. That is the HomePod lesson.
-- **Teardown is checked, not assumed.** The harness stops the app, then
+- **Teardown is checked, not assumed.** The agent stops the app, then
   asks the device whether anything is still running, then puts the TV
   back in the power state it found, and reads that back too
   (`tools/atv_teardown.sh`, `tools/apple_device.py`).
@@ -111,11 +114,11 @@ Every run in this template follows the same manners.
 
 ## Instruments that tell the truth
 
-A harness is an instrument, and an instrument that cannot see must say
+A test rig is an instrument, and an instrument that cannot see must say
 so. Archive Watch learned each of these the expensive way:
 
 - A sleeping Apple TV returns a perfectly valid, perfectly black
-  screenshot. So the harness asks the TV if it is on before every
+  screenshot. So the agent asks the TV if it is on before every
   capture, rather than guessing from the pixels.
 - A screenshot file left over from an earlier run looks exactly like a
   new one. So every capture deletes the old file first and refuses one
@@ -146,20 +149,56 @@ simulator run. That is why the ladder exists: most checks belong on the
 lower rungs, and only the ones that can fool the lower rungs need to
 climb.
 
-## What to do
+## Working with your agent
 
-1. Add one door to your app: an environment variable that opens your
-   most important screen directly, and does nothing in a release build.
-2. Copy `tools/bench.example.json` to `tools/bench.json`. Add your own
-   phone with the role `owner-personal-never-touch`. Add any device you
-   are willing to let a harness drive as `test`.
-3. Fill in `tools/app_config.py`: your bundle IDs, and the words that
-   prove your app is on screen.
-4. Ask your agent to fix something small, then to prove it with a
-   screenshot from a real device or a harness run. Read the screenshot
-   yourself.
-5. Write one test that should fail on the old code. Run it against the
-   old code first.
+Start with what you have. My bench grew to fourteen devices, but it grew
+one device at a time, months into building. One phone is enough for
+this stage.
 
-Be ready to show the screenshot that proved your fix, and to say what
-it would have looked like if the fix had not worked.
+1. **Hand over the testing.** Tell the agent, in your own words, what I
+   told mine:
+
+   > You should be able to see stuttering and swallowed audio. You
+   > should be able to see the captions and measure their timing and
+   > their accuracy... I should not be the one testing your work.
+
+   Ask it to set itself up to test on your device. It will tell you the
+   physical steps only you can do: turning on developer mode, trusting
+   the computer, reading it a pairing code. Do those, and read it the
+   codes.
+
+2. **Say whose devices are whose.** Tell the agent which device is yours
+   and must never be touched, which ones people in your home actually
+   use and need asking about first, and which it may use freely. It
+   writes those down as roles, and its tools refuse the devices you
+   protected.
+
+3. **Ask for proof with every "fixed."** From now on, when the agent
+   says something works, ask to see it: a screenshot from your device, a
+   measurement, a run that could have failed. Look at the screenshot
+   yourself. When the report and your eyes disagree, say so:
+
+   > This version is a huge step backward and you keep claiming things
+   > are fixed and you have fully tested them, but I see no evidence of
+   > either.
+
+4. **When it guesses, stop it.** If a fix fails twice, ask for research,
+   or for a way to see the problem, before the next attempt:
+
+   > you're guessing, build a simulator so you can iterate locally
+   > instead of making me test every tweak.
+
+5. **Keep living with the app.** The agent's instruments will miss
+   things. You will catch them by using the app, and each one you report
+   becomes a check the agent adds, so it does not miss that one again.
+
+6. **Correct its manners.** If it leaves something playing, drives a
+   device someone is using, or wakes a TV in the wrong room, say so, and
+   ask for a rule so it never happens again.
+
+**When you are ready to move on,** the agent has proven a fix to you
+with a screenshot from your own device, your devices have roles, and
+you have stopped being the first person to find its mistakes.
+
+Be ready to show the screenshot that proved a fix, and to say what it
+would have looked like if the fix had not worked.

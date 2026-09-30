@@ -42,10 +42,10 @@ auto-discovery. Spaces in paths cause shell-script and CI issues.
 Past projects that nested under two levels with spaces lost hours
 debugging "Project does not exist at root."
 
-**How to apply**: when creating the Xcode project, save to repo
-root. Product name has no spaces. Move scaffolded `apple/` source
-files into the Xcode-created group (preserving the Core / iOS /
-tvOS split — see Decision 013), then delete the `apple/` directory.
+**How to apply**: the project is generated at the repo root from
+`project.yml` (`xcodegen generate`) and gitignored. Product name has
+no spaces. Sources stay in `apple/`, preserving the Core / iOS /
+macOS / tvOS split (Decision 013). See `apple/README.md`.
 
 ---
 

@@ -56,18 +56,23 @@ make, why it is built that way, what to do, and what to bring back.
 | [07. Raising the ceiling](docs/path/07-raising-the-ceiling.md) | New features on the newest devices, without raising the floor. |
 | [08. Working with AI](docs/path/08-working-with-ai.md) | Make the repository remember, so the agent can. |
 
+Keep [Talking to your agent](docs/path/talking-to-your-agent.md) open
+the whole way through. It is the set of moves I actually use, in the
+words I actually typed, and every stage points back to it.
+
 Teaching with it? `COURSE.md` maps the stages to weeks.
 
 ## Using it for your app
 
-1. Click **Use this template** on GitHub, and clone your copy.
-2. Open it in Claude Code. The session-start hook loads the current
-   state from `SCRATCHPAD.md`, and `CLAUDE.md` gives the agent the rules
-   and the skill table.
-3. Start with stage 00, then 01. Run the web app with
-   `python3 -m http.server 8080` and open http://localhost:8080.
+1. Click **Use this template** on GitHub to make your own copy.
+2. Open it in Claude Code. `CLAUDE.md` gives the agent the rules and the
+   skill table, so it already knows how this template builds.
+3. Tell it why your app exists (stage 00), then what you want and where
+   the truth lives (stage 01). It will build the first version and put
+   it live at an address you can open on your phone.
 
-Everything else waits until you need it.
+Everything else waits until you need it. `docs/path/talking-to-your-agent.md`
+is the one page to keep open while you work.
 
 ## What is in the box
 

@@ -45,7 +45,8 @@ def ios_config(body: str) -> bool:
     if plats:
         return "iphoneos" in plats.group(1)
     sdk = re.search(r"SDKROOT = (\w+);", body)
-    return not sdk or sdk.group(1) == "iphoneos"
+    # `auto` is a universal (multi-destination) config, which includes iOS.
+    return not sdk or sdk.group(1) in ("iphoneos", "auto")
 
 
 def floors(text: str) -> list:
@@ -81,6 +82,8 @@ check("control: no targets at all is refused", not ok(floors("")))
 check("control: a tvOS-only extension's IPHONEOS setting is not a floor",
       ok(floors(cfg(f"{MAX_MAJOR}.0") + "\n"
                 + cfg("99.0", 'SUPPORTED_PLATFORMS = "appletvos appletvsimulator";\n '))))
+check("control: a universal (SDKROOT = auto) config's floor is read",
+      floors(cfg("17.0", "SDKROOT = auto;\n ")) == [17.0])
 check("control: an xcconfig floor is read", floors(f"{KEY} = 17.0\n") == [17.0])
 
 files = sources()

@@ -180,6 +180,13 @@ jobs:
           export APP_BUNDLE
           python3 asc_build_exists.py "$VER" "$BUILD"
 
+      # The .xcodeproj is generated output (gitignored), so a fresh checkout has none. project.yml
+      # is the source of truth; every step below reads the project this creates.
+      - name: Generate the Xcode project from project.yml
+        run: |
+          command -v xcodegen >/dev/null || brew install xcodegen
+          xcodegen generate
+
       # Deployment floors are chosen by hardware reach; a raised floor silently stops shipping to
       # devices. Both tests are no-ops (with a message) until the app has an Xcode project.
       - name: Deployment floors have not drifted

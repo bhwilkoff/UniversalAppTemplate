@@ -1,5 +1,9 @@
 # 02. The shape of an app
 
+**Where you are.** One platform is live, full of real data, and you have
+sent it a few rounds of feedback from your own phone. Before a second
+platform exists, it is time to decide what "the same app" means.
+
 In September 2026, Roku's store analytics showed Archive Watch crashing
 16 times in two days, always on the same line:
 `DetailScreen.brs:781`, a count over a film's cast list.
@@ -103,13 +107,17 @@ dropped a great deal. The cost of an app that feels slightly foreign on
 every device it runs on did not drop at all.
 
 The price is discipline. Three codebases drift unless something holds
-them together. This template holds them together with four things.
+them together. This template holds them together with four things, and
+you will not build any of them by hand. You will ask for them, and then
+hold the agent to them.
 
 1. **`PARITY.md`.** Every feature a person can use is a row. Every
    platform is a column. Every cell is honest: ✅ shipped, 🚧 in
    progress, ⏳ planned, 🚫 not doing it (with the reason), or n/a when
    the platform cannot have it at all. A feature ships with its row, in
-   the same commit, or it did not ship.
+   the same commit, or it did not ship. The agent writes it. Your job is
+   to read it as a list of promises, and to not believe a cell until
+   you have seen it on the device.
 2. **The data contract** (`docs/DATA-CONTRACT.md`, seeded from
    `docs/templates/`). It names every published file, its shape, and the
    query verbs every app must reproduce. It is written the day the
@@ -140,18 +148,57 @@ the detail:
   building a custom one.
 - `canonical-entity-identity`: one stable ID per thing, on every platform.
 
-## What to do
+## Working with your agent
 
-1. Write one sentence naming the data your app is about, and one naming
-   where it will be published. Put both in `DECISIONS.md` as your
-   data-plane decision, with the *why* first.
-2. List your app's first five verbs. Add each as a row in `PARITY.md`,
-   with a cell for every platform you chose in stage 00.
-3. For one of those verbs, write its idiom on each platform in the Notes
-   column. If you do not know a platform's idiom, ask your agent to
-   look it up in that platform's skill, and check the answer against the
-   platform's own documentation.
-4. Open `js/api.js`. Find where the web app would call your data. That
-   is the first line of your contract.
+1. **Ask for the matrix.** Tell the agent every platform you plan to
+   reach, even the ones that are months away, and ask it to write the
+   parity matrix for everything your app already does. This is roughly
+   what I said:
 
-Be ready to show your five rows and explain one idiom you had to look up.
+   > continue working on our parity matrix across all platforms to make
+   > sure we can launch on all platforms with the same features across
+   > the board
+
+   Read what comes back as a list of promises. Strike anything you do
+   not actually want. Ask why about any cell you do not understand.
+
+2. **Name the platform whose choices win.** When two platforms disagree
+   about order, labels or which shelves appear, one of them should be
+   the reference. Say which:
+
+   > the shelves across platforms should have the same titles + order...
+   > I prefer the order and titles of the Apple TV app (replicate
+   > everywhere).
+
+3. **Move the answers into the data.** Ask the agent to make sure that
+   every rule about what exists and what is allowed (what counts as
+   appropriate, what a person can see, what is featured) is decided once
+   in the pipeline and published, so no app decides it for itself. The
+   `shared-data-plane-contract` skill carries how. The agent will ask you
+   for the rules themselves. Those are yours.
+
+4. **Make the web the address.** Ask that every Share button, on every
+   platform, share a link to your web app, and that the web app open the
+   native app when someone taps it on a phone:
+
+   > I would like the share functions inside each one of the apps [...]
+   > to share the archivewatch.org links rather than the archive.org
+   > links. I also think that the web app should redirect to the native
+   > apps if you click on them on your phone/iPad/android.
+
+5. **Distrust the cells.** Ask for an audit that reads the code, not the
+   matrix:
+
+   > continue with your parity work and audit all features to ensure we
+   > have identified all of the items that should go in the parity
+   > matrix.
+
+   Then pick one feature and check it yourself on two devices, even if
+   one of them is just a phone and a laptop browser.
+
+**When you are ready to move on,** there is a matrix you have read and
+trimmed, one rule about your data that you decided and the pipeline now
+enforces, and every Share button points at your web address.
+
+Be ready to show your matrix, and one cell the audit or your own eyes
+proved wrong.

@@ -7,7 +7,8 @@ before. This page lists every doc by the stage that sends you there.
 ## The path
 
 `path/00-why-we-build.md` through `path/08-working-with-ai.md`. Read them
-in order the first time.
+in order the first time. `path/talking-to-your-agent.md` is the companion
+to all of them: how to ask, correct, and decide, in real prompts.
 
 ## By stage
 

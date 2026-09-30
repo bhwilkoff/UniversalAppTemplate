@@ -1,5 +1,8 @@
 # 07. Raising the ceiling
 
+**Where you are.** Your app is shipped, Pulse is watching it, and you use
+it every day. Using it is where the next feature comes from.
+
 On September 12, 2026, I asked for something that sounded like it needed
 a server:
 
@@ -119,18 +122,59 @@ build.
 - `app-intents`, `widgetkit` and the other Apple framework skills for
   each system feature.
 
-## What to do
+## Working with your agent
 
-1. Pick one feature that only your newest devices can do. Write its row
-   in `PARITY.md` with an honest cell for every platform, including `n/a`
-   and 🚫 with reasons.
-2. Before building it, write down what your app already has that could
-   carry it: the link, the data you already publish, the sync you
-   already use.
-3. Ask your agent for two designs: one that needs a new server, and one
-   that does not. Compare them against the four questions from stage 00.
-4. Build it on one platform, behind a capability check, so the older
-   devices never see a button that does nothing.
+1. **Notice the want while using the app.** The best features I built
+   started as a sentence like this one:
+
+   > I've been leaving the 'Party Play' going on my TVs to enjoy ambient
+   > videos as I work and I realized that I wanted three different
+   > features to be built into the view that don't currently exist
+
+   Write the want down the moment you have it, in those terms.
+
+2. **Ask for research before code.** Ask whether it is possible, on
+   which platforms, and what it would cost, including whether it needs
+   a server:
+
+   > Can you investigate the ability for the Apple versions of the app
+   > to take advantage of SharePlay and synchronous viewing of movies
+   > together using Apple's API's and version 27 platform features?
+
+   Read the answer against the four questions from stage 00 before you
+   say yes.
+
+3. **Say build it, everywhere it can go.** When the research says yes,
+   ask for the full feature on every platform that can have it, and an
+   honest row in the parity matrix for the ones that cannot:
+
+   > I'd like you to fully implement SharePlay for all Apple platforms.
+
+4. **Hold the bars.** When the agent reaches for a custom control where
+   the platform has one, or a paid server where none is needed, stop it:
+
+   > There is now a persistent captions icon on the screen rather than
+   > using the build in captions UI on iPhone [...] The goal is native
+   > support for all features using native UI and APIs
+
+5. **Use it for real, then critique.** Use the feature the way it is
+   meant to be used, with the people it is meant for. Then send a
+   numbered round:
+
+   > That worked. The videos were in sync while the call was live.
+   > However, I noticed that I had to initiate the facetime call first
+   > and then do the share button within Archive Watch. [...] Can we have
+   > the call initiate from the app or have it tell you what to do when
+   > you try to select 'Watch Together' without first having a call
+   > going?
+
+6. **Check the older device.** Open the app on your oldest supported
+   device and make sure it says, in a sentence, what it cannot do,
+   rather than showing a button that does nothing.
+
+**When you are ready to move on,** a feature you wanted from your own
+use is live on every platform that can have it, and the older devices
+say honestly what they cannot do.
 
 Be ready to show the feature on your newest device, and the sentence an
 older device shows instead.

@@ -1,5 +1,8 @@
 # 05. Shipping
 
+**Where you are.** Your app runs on your devices, and the agent can prove
+its own fixes. Nobody else can install it yet.
+
 On September 13, 2026, the App Store version of Archive Watch was
 1.42.53. The repository was at 1.42.94. That is 41 versions, including
 the whole shared-playlist feature, all of it verified on real devices
@@ -18,9 +21,14 @@ morning spent clicking through four store consoles. I want the agent to
 be able to do the whole release from the command line, and I want to
 be able to read, from the store itself, what is actually live.
 
-That turned out to be possible for almost everything. The places it is
-not are listed at the end, because they are the places a person has to
-show up.
+That turned out to be possible for almost everything, but it took me
+three months to get there. In June I was still creating App Store
+versions by hand and uploading Android builds myself. By September my
+whole release instruction was two words:
+
+> Ship every platform
+
+The places where a person still has to show up are listed below.
 
 ## One version number
 
@@ -34,7 +42,8 @@ followed the shared file. It was 88 versions behind, so a crash report
 from Google Play could not be matched to the code that caused it.
 `tools/test_version_contract.py` now holds the rule.
 
-Bump it on every release.
+The agent bumps it on every release, and a test fails if any platform
+drifts from it.
 
 ## Apple, from a GitHub runner
 
@@ -61,8 +70,9 @@ floor tests from stage 03, archives, and then hands off to
 - It refuses to submit without release notes.
 - It submits for review.
 
-`python3 tools/asc_release.py status` tells you what is live, in review,
-or waiting, straight from Apple. The runbooks are
+When you ask whether a release is live, the agent reads the answer
+straight from Apple (`tools/asc_release.py status`) rather than
+guessing. The runbooks it follows are
 `docs/CLOUD-SUBMISSION.md` (build, sign, upload) and
 `docs/APPLE-SUBMISSION-CLI.md` (version, release, review).
 
@@ -106,19 +116,57 @@ It also costs patience. The first submission to every store takes
 longer than any after it, because the first one is where you meet every
 form.
 
-## What to do
+## Working with your agent
 
-1. Set up the App Store signing secrets once, following
-   `docs/CLOUD-SUBMISSION.md`.
-2. Bump `AppVersion.xcconfig`, commit, and run
-   `gh workflow run appstore-build.yml -f platform=ios -f submit=false`.
-   Watch it finish.
-3. Run `python3 tools/asc_release.py status` and read what Apple says
-   about your build.
-4. Write real release notes, in your own words, for a person who has
-   never seen your app. Then ship.
-5. Open your app's page in the store on your own phone and install it.
-   That, not the green checkmark, is shipped.
+1. **Open the accounts.** Create the store accounts yourself (Apple, and
+   Google Play if you have an Android app), pay for them, and agree to
+   their terms. Tell the agent when they exist.
+
+2. **Ask for everything a submission needs.** In June, this is how I
+   started:
+
+   > Let's get all of the info (screenshots, description, etc.) that we
+   > need to submit the iPhone version to the app store.
+
+   The agent drafts the listing, captures the screenshots from your app,
+   answers what it can of the privacy questions, and tells you what only
+   you can answer.
+
+3. **Make the words yours.** Read the store description and the release
+   notes out loud. Rewrite anything that sounds like a machine wrote it.
+   Your "no AI copy" rule from stage 00 applies to the store page too:
+
+   > I really don't want to have to remove strange formatting every time
+   > I want to submit to the app store that shows that it was AI
+   > generated.
+
+4. **Do the credential step together.** The build and submission run in
+   the cloud and need keys from your accounts. Ask the agent to take you
+   to the exact screen for each one:
+
+   > I'd like you to use Chrome to take me to the right screen to
+   > generate the oauth token and I'd like you to walk me through that
+   > process
+
+   When a secret has to be saved, type it into the prompt yourself with
+   a `!` in front of the command the agent gives you, so the value goes
+   straight where it belongs.
+
+5. **Say ship.** Then ask whether it is really done:
+
+   > Did you ship it fully? I'd like to move on to another scope of work.
+
+6. **Paste the rejection whole.** If a store rejects the build, copy the
+   entire message to the agent. It diagnoses, fixes and resubmits. If it
+   says something cannot be done by the command line, and you know
+   other apps do it, say so.
+
+7. **Install it like a stranger.** Open your app's page in the store on a
+   device you did not build it on, and install it. That, not the green
+   checkmark, is shipped.
+
+**When you are ready to move on,** someone who has never met you could
+install your app from a store.
 
 Be ready to show your app in a store, installed on a device you did not
 build it on.

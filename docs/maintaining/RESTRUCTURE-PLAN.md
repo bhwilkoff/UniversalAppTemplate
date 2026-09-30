@@ -147,11 +147,33 @@ lesson a class can run as-is, and a checklist a solo builder can follow.
 - **Tick 2.** Wrote this plan and the writing guide while the agents run.
 - **Tick 27.** Final verification all green (11 Python test files, web suite 0 FAIL, gates clean, 144 skills valid, Android assembleDebug + unit tests, Windows 11/11). A first private-data scan was blind (zsh does not word-split a variable) and reported nothing; re-run with xargs found room names, real store ids and incident details, all generalized. Committed and pushed.
 
+## Second round (Ben, 2026-09-30, after the first push)
+
+> Let's take another couple of passes on the flow of the phases and the
+> instructions at the bottom of each markdown file in the "What to do"
+> section. [...] The goal is to teach others how to build software in
+> the way that I actually build software. Never did I run a localhost
+> web server. Never did I manually input data for the apps.
+
+- Mined 612 of Ben's own prompts (Archive Watch and Tidbits transcripts)
+  and 1,670 commits that quote him into `HOW-BEN-BUILDS.md`.
+- New `docs/path/talking-to-your-agent.md`: the moves he actually uses,
+  in his words.
+- Every stage now opens with **Where you are** and closes with **When
+  you are ready to move on**, so the stages hand off to one another.
+- "What to do" became **Working with your agent**: what you say, what
+  the agent does, what you look at, what you decide. No local servers,
+  hand-typed data, file editing, or commands to run.
+- COURSE.md weeks now describe the app growing; class time reads one
+  real prompt together.
+- Apple project generated from `project.yml` by the agent (XcodeGen),
+  so stage 03's "the agent sets up the project" is true. Verified: generate + unsigned build for iOS, tvOS, macOS; floor tests pass (and `test_ios_floor.py` had a bug that made it blind to universal targets, now fixed with a control).
+
 ## What is still open
 
 - Ben's call: whether `docs/path/` as the course spine plus the ten-week `COURSE.md` sketch is the shape he wants.
 - A social posting pipeline and `social-video-teaser-craft` were not ported (PROVENANCE exclusions).
-- The Apple starter has been typechecked against the SDKs but never built inside a real Xcode project in this loop.
+- The Apple starter now generates from `project.yml` and builds unsigned for iOS, tvOS and macOS, but only on the Xcode 27 beta (no GA Xcode on this Mac); no signed archive or CI run yet; tvOS still needs a layered icon before a store submission.
 - DECISIONS.md keeps its historical em dashes (append-only).
 - **Tick 26.** Path/link scan over all human-facing docs, CLAUDE.md, templates and hand-written skills: every miss is an adopter-created file except four; fixed. Ported tools/test_us_english.py (2,805 strings, pass) and tools/test_web.sh (all web suites, parse, braces: pass), both cited by skills and never ported. Next: final full verification, then commit + push.
 - **Tick 25.** Revision: 03 (two unsourced claims), 04 (unsourced timing), 07 (server contradiction; question attributed to the investigation doc, not the agent). 01, 05, 06, 08 re-read; no changes needed beyond earlier fixes. Next: link/path check across all docs, final test run, then commit + push.

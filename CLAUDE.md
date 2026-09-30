@@ -310,26 +310,28 @@ experience: ~60–70% of a media app's Swift is platform-agnostic
 universal target makes that reuse real instead of aspirational, and
 all three Apple platforms ride the same CloudKit private database for
 free cross-device sync. macOS is the cheapest platform to add because
-it reuses the entire Core. See `apple/README.md` for the exact Xcode
-setup.
+it reuses the entire Core.
 
-**Project structure** (Xcode Cloud compatible). The repo does NOT
-ship an Xcode project. It ships starter Swift files in `apple/`
-(`App/`, `Core/`, `iOS/`, `macOS/`, `tvOS/`, `Resources/`, `Tests/`).
-Create the project in Xcode at the repo root, then move the `apple/`
-files into its source folder, per `apple/README.md`. The result:
+**Project structure.** The agent generates the project; nobody clicks
+through Xcode. `project.yml` (XcodeGen) is the source of truth and
+`xcodegen generate` writes the gitignored `AppName.xcodeproj` at the
+root. Sources stay in `apple/`. Change targets, settings, and
+Info.plist keys in `project.yml`, never in Xcode's panels (the next
+generate wipes them). See `apple/README.md`.
 
 ```
 /                          ← repo root
-├── AppName.xcodeproj/     ← you create this, at root (Xcode Cloud requirement)
-├── AppName/               ← the apple/ starter files, moved here
+├── project.yml            ← XcodeGen spec (source of truth)
+├── AppName.xcodeproj/     ← generated at root, gitignored
+├── apple/
 │   ├── App/               ← entry point (#if os branches)
 │   ├── Core/              ← platform-agnostic: Models, Networking,
 │   │                        Store, query/queue/sync logic
 │   ├── iOS/               ← iPhone/iPad views (#if os(iOS))
 │   ├── macOS/             ← Mac views (#if os(macOS))
 │   ├── tvOS/              ← Apple TV views (#if os(tvOS))
-│   └── Resources/
+│   ├── Resources/
+│   └── Tests/             ← Core tests (macOS test target)
 ├── AppVersion.xcconfig    ← shared version numbers (all Apple targets)
 ├── ci_scripts/            ← Xcode Cloud build scripts
 ├── index.html, css/, js/  ← Web app

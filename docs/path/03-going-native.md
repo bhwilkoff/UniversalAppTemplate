@@ -1,5 +1,9 @@
 # 03. Going native
 
+**Where you are.** One platform is live with real data. There is a
+parity matrix listing what every other platform must do, and the rules
+about your data live in the pipeline. Now the app gets a second home.
+
 Late in September 2026, an iPhone 6 Plus prompted a question I put to
 the agent: "The current native app requires iOS 26, but we are
 investigating if we can make it work on older hardware."
@@ -73,22 +77,24 @@ into a second app (`androidtv-compose-focus`).
 
 ## Choosing a floor
 
-Choosing a floor is a measurement, not an opinion.
+Choosing a floor is a measurement, not an opinion. This is what the
+agent does when you ask, and what it should show you.
 
-1. **Ask what hardware each candidate floor reaches.** iOS 18 and 17 run
+1. **What hardware each candidate floor reaches.** iOS 18 and 17 run
    on the same phones, so 17 buys nothing that 18 does not. iOS 26 lost
    the XS and XR, so 18 buys them back. tvOS 27 dropped the Apple TV HD
    and the first 4K, so the Apple TV floor stays at 26.
-2. **Test-build at each candidate and count the errors.** Do not commit
-   it. Read the count. Two files is a yes. 428 errors is a no.
-3. **Hold the floor with a test.** `tools/test_ios_floor.py` and
+2. **The cost of each candidate, measured.** The agent test-builds at
+   each one without keeping the change, and counts what breaks. Two
+   files is a yes. 428 errors is a no.
+3. **A test that holds the floor.** `tools/test_ios_floor.py` and
    `tools/test_tvos_floor.py` run before every Apple archive and refuse a
    target above the floor you chose. On Android, keep `lint NewApi`
    clean at the floor for every build flavor.
-4. **Gate newer features by capability.** On Apple, `#available`. On
+4. **Newer features gated by capability.** On Apple, `#available`. On
    Android, `Build.VERSION.SDK_INT`. Live captions in Archive Watch are an
    iOS 26 feature, and the iOS 18 phone simply does not show the button.
-5. **Send what is left to the web.** The website is the floor below the
+5. **The web for everything older.** The website is the floor below the
    floor.
 
 Some traps showed up along the way, and the skills carry them. Android 6
@@ -107,21 +113,62 @@ Apple TV HD on the bench for that reason. It does not have an iOS 18
 phone yet, which means the iOS 18 path is tested less than it should be.
 Stage 04 is about why that matters.
 
-## What to do
+## Working with your agent
 
-1. Pick your second platform. Write down why, in one sentence, in
-   `DECISIONS.md`.
-2. For Apple: follow `apple/README.md` to create the one universal
-   target at the repository root. For Android: open `android/` in
-   Android Studio and run `./gradlew :app:assembleDebug`.
-3. Ask your agent to measure the floor: test-build at two candidate
-   deployment targets and report the error counts. Do not let it commit
-   the experiment.
-4. Record the floor you chose and the hardware it reaches as a decision,
-   leading with *why*.
-5. Build your first verb from stage 02 on the new platform, in that
-   platform's own idiom, and update its row in `PARITY.md` in the same
-   commit.
+1. **Do the human part first.** A native app needs a developer account:
+   Apple's is $99 a year, Google Play's is $25 once. Create the account
+   yourself and tell the agent when it exists. Everything after that is
+   a conversation.
+
+2. **Ask for the native version of everything.** Name the platform and
+   ask for every feature, built the way that platform's people expect.
+   Here is close to what I said when Archive Watch went past the Apple
+   TV:
+
+   > build native iOS/Android/web versions of every tvOS feature using
+   > the TriAppTemplate as the basis
+
+   The agent sets up the project, builds the app, and puts it on your
+   device. If it hands you a list of steps to click through in Xcode or
+   Android Studio, push back the way I did:
+
+   > a lot of the instructions in the readme ... seem like things that
+   > you can do programatically rather than having me do them in Xcode
+
+3. **Hold the native bar on the device.** Use the new app and say where
+   it feels borrowed from the first platform. These are the kinds of
+   things I said:
+
+   > The iPad should not just be a blown up version of the phone, but
+   > rather a distinct and first class experience.
+
+   > within the MacOS native app, nearly everything in the app should be
+   > accessible via menus and hardly anything is. That is the design for
+   > desktop-class apps and it should be so for ours as well.
+
+4. **Ask what the oldest device could be, and what it would cost.** The
+   agent measures it with throwaway test builds and tells you which
+   devices each choice reaches. The choice is yours. If you have an old
+   device in a drawer, bring it in:
+
+   > I have an iPhone 12 that I'd like to use for testing on older
+   > devices.
+
+5. **Keep the modern devices modern.** When the floor starts holding
+   back newer devices, say so, and ask for newer features behind a
+   capability check instead of dropping them for everyone:
+
+   > There is no reason to do a bunch of work pushing the platform on for
+   > modern Roku users if it is going to be hamstrung by the older
+   > devices that are mostly stuck in 2014.
+
+6. **Check the matrix against your hands.** Ask the agent to update the
+   parity matrix for the new platform. Then open one feature on both
+   platforms and see whether they really do the same thing.
+
+**When you are ready to move on,** the second platform is on your own
+device, it does the same things as the first in its own idiom, and you
+have chosen its floor from a measurement.
 
 Be ready to name the oldest device your app will run on, and the
 newest feature it will not show there.

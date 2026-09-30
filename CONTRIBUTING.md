@@ -78,9 +78,10 @@ version via `AppVersion.xcconfig` + `tools/stamp_msix_version.py`;
 # 1. Web
 python3 -m http.server 8080      # http://localhost:8080
 
-# 2. Apple: create the universal Xcode project at the repo root, then
-#    move the apple/ starter files into it (steps in apple/README.md).
+# 2. Apple: generate the universal Xcode project from project.yml
+#    (brew install xcodegen; steps in apple/README.md).
 #    One target covers iPhone, iPad, Mac and Apple TV.
+xcodegen generate
 
 # 3. Android: first build downloads SDK + AGP + deps
 cd android && ./gradlew :app:assembleDebug

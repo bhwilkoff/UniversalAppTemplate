@@ -25,7 +25,7 @@ if [ "$PLATFORM" = "all" ]; then
 fi
 
 # ============================ PER-APP CONFIG (edit these per template instance) ==================
-# PROJECT     — the repo-root .xcodeproj (Decision: .xcodeproj at root for Xcode Cloud discovery).
+# PROJECT     — the repo-root .xcodeproj, generated from project.yml (`xcodegen generate`).
 # BID_FILTER  — a substring that matches ALL of THIS app's bundle ids (main app + any extensions).
 #               NOTE: iOS, tvOS, and macOS can (and here do) SHARE ONE App Store Connect record via
 #               a single bundle id like `com.example.appname`; extensions add a suffix, which the
@@ -75,6 +75,12 @@ fi
 # Metal toolchain — only needed if the app ships a .metal shader; Xcode ships it as a separate component.
 "$DEV/usr/bin/xcrun" --find metal >/dev/null 2>&1 || { echo "Installing Metal toolchain (~700MB)…"; xcodebuild -downloadComponent MetalToolchain; }
 
+# The project is generated output (gitignored); make sure it exists and matches project.yml.
+if [ -f project.yml ]; then
+  command -v xcodegen >/dev/null || { echo "xcodegen missing: brew install xcodegen"; exit 1; }
+  xcodegen generate --quiet
+fi
+
 VERSION="$(grep -E '^MARKETING_VERSION' AppVersion.xcconfig | sed 's/.*= *//')"
 BUILD="$(grep   -E '^CURRENT_PROJECT_VERSION' AppVersion.xcconfig | sed 's/.*= *//')"
 echo "[$PLATFORM] $SCHEME $VERSION ($BUILD) | $(/usr/bin/xcodebuild -version | tr '\n' ' ') | $DEV"
@@ -86,7 +92,7 @@ rm -rf "$ARCH" "$EXPORT"
 echo "[$PLATFORM] archiving…"
 xcodebuild -project "$PROJECT" -scheme "$SCHEME" \
   -configuration Release -destination "$DEST" -archivePath "$ARCH" archive \
-  -allowProvisioningUpdates "${AUTH[@]}"
+  DEVELOPMENT_TEAM="$TEAM" -allowProvisioningUpdates "${AUTH[@]}"
 
 # --- the embedded bundle ids (main app + extensions) --------------------------------------------
 APP="$(ls -d "$ARCH"/Products/Applications/*.app 2>/dev/null | head -1)"

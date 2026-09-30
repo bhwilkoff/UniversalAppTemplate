@@ -1,5 +1,9 @@
 # 08. Working with AI
 
+**Where you are.** You have been building for weeks. By now the agent
+has forgotten something you told it at least once, and you have had to
+explain it again. This stage is about making that stop.
+
 On September 24, 2026, I wrote this to the agent working on Archive
 Watch:
 
@@ -28,6 +32,9 @@ done, what was verified, and what was only hoped.
 ## Where the memory lives
 
 Each file has one job, and is read at a different moment.
+
+You will not edit these files yourself. The agent keeps them. Your part
+is to ask it to, and to notice when it has not.
 
 | File | Its job | Read |
 |---|---|---|
@@ -117,17 +124,50 @@ write your app's words, choose what your people should see, or do the
 part of the work that was supposed to be theirs. Those lines are yours
 to draw, in writing, where the agent will read them.
 
-## What to do
+## Working with your agent
 
-1. Read your `SCRATCHPAD.md`. Is the current state true today? Fix it
-   if not.
-2. Find one thing you corrected your agent on this week. Make sure it
-   is saved as a memory with a "Why" line.
-3. Find one lesson from your app that the next app should not have to
-   learn. Write it as a skill (see `.claude/skills/README.md`, "Adding
-   your own").
-4. Write the decision you are least sure about, leading with the rule,
-   and say what would make you change it.
+1. **Before a session ends, ask it to write everything down.** Any time
+   you are about to stop, restart, or run low on context:
 
-Be ready to show the skill you wrote, and to say which mistake it will
-save the next person from.
+   > We are close to needing to compact, please document everything we
+   > might need before I do that.
+
+2. **When you correct something twice, make it a rule.**
+
+   > Can you make a memory so that after every tick when you re-arm the
+   > loop, you give a time when the next tick should occur?
+
+   > If you are low on context, compact. Can't you simply add that as a
+   > rule?
+
+3. **When it reinvents something, send it back to what it wrote.**
+
+   > You have fully documented device testing pathways for each device.
+   > Please stop trying to reinvent things you already know how to do.
+
+4. **Ask it what it is waiting on.** Instead of reading its notes, ask:
+
+   > What are the things you are wating on me for?
+
+   And when there are decisions to make, ask for them as choices.
+
+5. **Turn this app's lessons into skills.** When you have learned
+   something the next app should not have to learn again, ask for it:
+
+   > Document everything we have done today, as we are needing to
+   > compact. (create any new skills necessary)
+
+   Then ask the agent to bring those skills back into your copy of the
+   template, so your next app starts with them.
+
+6. **Draw the line again.** Reread your "Why we build" paragraph and your
+   standing rules from stage 00. Ask the agent whether anything you have
+   built since crosses them. Decide what to do about each answer
+   yourself.
+
+**When you are done with the path,** your app is shipped and running,
+your agent remembers what you taught it, and the lessons from this app
+are waiting for the next one.
+
+Be ready to show one skill your app taught, and to say which mistake it
+will save the next person from.
