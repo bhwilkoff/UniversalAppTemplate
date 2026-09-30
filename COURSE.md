@@ -23,7 +23,7 @@ set of conversations with the agent, not a set of files to edit.
 
 | Week | Stage | Where the app gets to | What they bring back |
 |---|---|---|---|
-| 1 | 00. Why we build | The agent knows why the app exists and who it is for, in the student's words, with one rule it will not cross. | The paragraph, the rule, and what the rule will cost. |
+| 1 | 00. Why we build | A running note for the app, opened with the wish at the top, and an agent that knows why the app exists and who it is for, in the student's words, with one rule it will not cross. | The paragraph, the rule, and what the rule will cost. |
 | 2 | 01. The first prototype | One platform live at a real address, full of real data from a pipeline the agent built, after two rounds of feedback from the student's own phone. | The app on their phone, and one thing the real data taught them. |
 | 3 | 02. The shape of an app | A parity matrix the student has read and trimmed, and one data rule they decided that the pipeline now enforces. | The matrix, and one cell their own eyes proved wrong. |
 | 4 | 03. Going native | A second platform on the student's own device. | One verb shown on both platforms, each in its own idiom. |

@@ -42,10 +42,29 @@ thought of.
 
 Most of my best prompts were not typed into Claude Code. They were
 written in a plain note I kept for each app, while I was using the app,
-and pasted in when they were ready. Each note had the same rough shape:
-the description of the app at the top, a numbered list of feature
-ideas, a "Next:" list for the round I was collecting, a "Fix:" list, a
-"Done:" list, and prompts for long loops drafted ahead of time.
+and pasted in when they were ready. I opened a note on the first day of
+every app and kept it for as long as the app lived. The Archive Watch
+note runs from the April feature ideas to the September Roku work.
+
+Each note grew downward in the same rough order:
+
+1. **The wish at the top.** One sentence, then a numbered list of what
+   the app should do, then what to research, then what the first
+   session should produce. (Stage 01 has the whole Tidbits one.)
+2. **Rounds.** A heading like "Next:" or "Next feedback:", and under it
+   a numbered list, one observation per item, written while I used the
+   app: where it is, what is wrong, what it should be, on which
+   platforms.
+3. **A ledger.** "Done:", "Fix:", "Outstanding:", "Future:". Ideas left
+   there are not lost. Three one-line Archive Watch ideas became
+   features months later.
+4. **Loop prompts, drafted ahead.** Whole `/loop` prompts, written days
+   before I sent them.
+5. **Answers to the agent's questions,** numbered to match its
+   questions.
+6. **Other people's words.** A friend's feature request, testers'
+   messages with my draft replies underneath, a partner's email.
+7. **The steps the agent handed back to me,** kept until I did them.
 
 A round from my Archive Watch note, collected while I used the Android
 TV version and sent on September 3:
@@ -59,6 +78,29 @@ TV version and sent on September 3:
 > 2. The first item on each shelf is inaccessible. If you try to access
 > it, it will take you directly to the sidebar items. This needs to be
 > fixed.
+
+When I pasted a round, I typed one line in front of it to set the
+scope. From Tidbits Trivia, July 1:
+
+> Please work on the following ten tasks as a set of large updates for
+> Tidbits Trivia across all platforms. However, before you start please
+> read through your documentation for how we build and where we are in
+> the progress of each platform:
+
+And from BOBA Playbook in April, where I had only tested the web app:
+
+> Here are the intitial pieces of feedback for the two new features.
+> Although they were written while only looking at the web app version
+> of the features, some of them also have implications for how the iOS
+> version is built, so please pay attention to both
+
+If you are not sure a round landed (a session compacted, or it went
+quiet), paste it again and ask. I did.
+
+One habit of mine not to copy: my notes mixed keys and passwords in
+with the feedback. Keep secrets out of your notes and out of the chat.
+They belong in a password manager or your platform's secret store, and
+the agent can be told where to find them.
 
 The note is where you think. The prompt is where you send it.
 

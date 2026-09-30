@@ -76,7 +76,13 @@ You need one thing set up first: a GitHub account, with your copy of the
 template kept public so GitHub Pages can host the web app for free. The
 agent does the rest of the setup, and will tell you if it needs you.
 
-1. **The kickoff.** Draft it in your notes first, then paste it in one
+1. **Add the wish to your note.** Under the why you wrote in stage 00,
+   write the wish in one sentence. Under it, list what the app should
+   do, numbered. This note is where
+   you will think for the life of the app; `talking-to-your-agent.md`
+   shows the shape mine took.
+
+2. **The kickoff.** Draft it in your note first, then paste it in one
    message. It needs the wish, the source, what you want researched
    before anything is built, and what "done" means for this sitting.
    Here is most of mine for Tidbits Trivia, June 16:
@@ -109,7 +115,7 @@ agent does the rest of the setup, and will tell you if it needs you.
    `universal-feature-states` skills do a lot of this without you
    asking for them.
 
-2. **Keep it going.** When it reports back, do not polish yet. Ask for
+3. **Keep it going.** When it reports back, do not polish yet. Ask for
    the next round of the wish. The night I started Tidbits, two of the
    three prompts after the kickoff were some version of this, and each
    one added a platform or a whole feature:
@@ -117,21 +123,28 @@ agent does the rest of the setup, and will tell you if it needs you.
    > keep pushing forward with the next round of work to fully build
    > out this game/app
 
-3. **Open it on your phone and use it.** The agent will give you the
+4. **Open it on your phone and use it.** The agent will give you the
    live address. Use the app for real, for ten minutes, the way the
-   person you are building it for would. Write down what you notice, in
-   plain words.
+   person you are building it for would. Keep your note open beside it,
+   and under a "Next:" heading write each thing you notice as its own
+   numbered item: where it is, what is wrong, what it should be.
 
-4. **Send the round.** Send what you noticed as a numbered list. Ask the
-   agent to fix all of it and tell you which numbers are done. Then use
-   it again. Do this at least twice.
+5. **Send the round.** Paste the whole list, with one line in front of
+   it that sets the scope, the way I did in BOBA Playbook's first week:
 
-5. **Steer the data with one real item.** Find one record that is wrong
+   > Please update both apps (iOS and Web App)
+
+   Ask the agent to fix all of it and tell you which numbers are done.
+   Move the done items to a "Done:" list in your note. Then use the app
+   again and start the next round. In BOBA's second week I sent five
+   rounds in under two days, each one after using the latest build. Do this at least twice.
+
+6. **Steer the data with one real item.** Find one record that is wrong
    (a bad title, a missing image, a question that makes no sense). Paste
    its link or describe it, ask why, and ask the agent to look for the
    same problem everywhere.
 
-6. **Try it the hard way.** Turn on airplane mode and open the app. Open
+7. **Try it the hard way.** Turn on airplane mode and open the app. Open
    a search that should find nothing. Tell the agent what you saw. Every
    list in this template has a loading, empty, error and offline state,
    and this is how you find out whether yours are real.

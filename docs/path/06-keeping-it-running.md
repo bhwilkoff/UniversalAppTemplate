@@ -181,7 +181,8 @@ watching.
    > it so that if it isn't broken, it doesn't fail?
 
 4. **Bring in real people.** Post about your app somewhere your people
-   are. Bring what they say back to the agent. The day after I posted
+   are. Copy what they say into your note first, decide what you think
+   of it, then bring it to the agent. The day after I posted
    Archive Watch on Reddit:
 
    > I posted about the app with links to all of the platforms on Reddit
@@ -212,7 +213,8 @@ watching.
 
    Watch the first few ticks. When a tick does nothing new, say so. When
    the job is done, stop it and ask for a summary of what changed and
-   what is waiting on you.
+   what is waiting on you. Then write what went wrong this time into
+   the note, so the next loop's charter can say it up front.
 
 **When you are ready to move on,** Pulse reads at least one store
 honestly, a failure email has become a fix instead of a habit, and you

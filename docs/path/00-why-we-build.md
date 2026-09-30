@@ -121,8 +121,11 @@ default.
 Open Claude Code in your copy of the template. Everything in this stage
 is a conversation. `docs/path/talking-to-your-agent.md` has the moves.
 
-1. **Tell it why.** Before any feature, say what the app is for, who it
-   is for, and what you hope it does for them. Talk the way you would to
+1. **Tell it why.** Start a plain note for your app, in whatever notes
+   app you already use, and write the why at the top of it first. You
+   will keep this note for the life of the app. Then, before any
+   feature, say to the agent what the app is for, who it is for, and
+   what you hope it does for them. Talk the way you would to
    a friend. The reason matters most later, when it settles a question
    you did not see coming. In July, Tidbits Trivia's agent was deciding
    how much of a new paid club to put behind locks, and I answered with
