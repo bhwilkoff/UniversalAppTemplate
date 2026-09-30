@@ -4,40 +4,31 @@
 parity matrix listing what every other platform must do, and the rules
 about your data live in the pipeline. Now the app gets a second home.
 
-Late in September 2026, an iPhone 6 Plus prompted a question I put to
-the agent: "The current native app requires iOS 26, but we are
-investigating if we can make it work on older hardware."
+On June 9, 2026, Archive Watch's Apple TV app went to App Store review.
+It had spent seven weeks as the only version of the app. That same day
+I asked for three more (the iPhone and iPad, Android, and the web), each
+built natively for its own platform, with a plan and a parity matrix
+first. All three started that day.
 
-The agent measured instead of guessing. It test-built the app at lower
-and lower deployment targets and counted what broke. Nothing native
-could reach the iPhone 6 Plus at all. Apple's current tools stop at iOS
-15. Below iOS 17, the app's data layer fell apart: 428 errors. At iOS 18,
-the whole app needed changes in two files.
-
-And iOS 26 was exactly the release that dropped the iPhone XS and XR.
-Moving the floor to 18 brought those phones back for the cost of two
-files. The iPhone 6 Plus got something too: a pointer to the website, which
-is where a device that old belongs.
-
-**The floor is a floor, not a ceiling.**
+They could start that fast because of stage 02. The data plane was
+already published, so each new app was only views and a reader. What
+was left to decide was not how to share the data. It was what the app
+should feel like on each new platform, and how old a device it should
+reach. Those are the two decisions in this stage.
 
 ## What I want
 
-I want the hand-me-down phone, the 2015 Apple TV, and the Fire TV stick
-someone got for free to run the app, and run it well. I also want the
-newest devices to get everything they are capable of. Those two wants
-only look like they conflict.
+I want each platform to feel like it was the first one. The iPhone app
+should feel like an iPhone app, not a shrunken television. The Mac app
+should feel like a Mac app, with menus and windows, not a stretched
+iPad. As I put it once for Tidbits Trivia:
 
-Here is how I said it to the agent during the Android version of the
-same work:
+> Yes. Each platform should feel like a first class native experience.
 
-> Remember, you are trying to keep the floor low for Android, but we
-> aren't trying to hamstring modern devices that are capable of doing
-> many more things. If you have to make it so that certain features can
-> only be utilized on more modern devices, that is okay.
-
-So, a floor is where the app starts working. It is never the limit on
-what the app can do.
+And I want the hand-me-down phone, the 2015 Apple TV and the Fire TV
+stick someone got for free to run the app, and run it well, without
+holding back what the newest devices can do. Those last two wants only
+look like they conflict, and the second half of this page is about why.
 
 ## The order of the platforms
 
@@ -47,9 +38,8 @@ the method:
 1. **Apple TV, April 17.** The platform where its people were. Seven
    weeks alone, with the data pipeline growing underneath it.
 2. **iPhone and iPad, the web, and Android, all on June 9.** Three
-   platforms in one day was possible because the seam was already clean.
-   The data plane was published, so each new app was only views and a
-   reader.
+   platforms in one day, because the seam between data and views was
+   already clean.
 3. **Mac, June 22.** Thirteen days later. The Mac is the cheapest
    platform to add, because it shares the entire Apple `Core/` with the
    iPhone and the Apple TV. It still needed its own shell: pointer,
@@ -75,10 +65,36 @@ On Android, one app serves phones, tablets, Google TV and Fire TV. The
 TV experience is chosen at runtime from the device itself, never forked
 into a second app (`androidtv-compose-focus`).
 
-## Choosing a floor
+## How old a device
 
-Choosing a floor is a measurement, not an opinion. This is what the
-agent does when you ask, and what it should show you.
+The second decision took me longer to learn. Late in September, an
+iPhone 6 Plus prompted a question I put to the agent: "The current
+native app requires iOS 26, but we are investigating if we can make it
+work on older hardware."
+
+The agent measured instead of guessing. It test-built the app at lower
+and lower deployment targets and counted what broke. Nothing native
+could reach the iPhone 6 Plus at all. Apple's current tools stop at iOS
+15. Below iOS 17, the app's data layer fell apart: 428 errors. At iOS
+18, the whole app needed changes in two files. And iOS 26 was exactly
+the release that dropped the iPhone XS and XR, so moving the floor to 18
+brought those phones back for the cost of two files. The iPhone 6 Plus
+got something too: a pointer to the website, which is where a device
+that old belongs.
+
+Here is how I said it to the agent during the Android version of the
+same work:
+
+> Remember, you are trying to keep the floor low for Android, but we
+> aren't trying to hamstring modern devices that are capable of doing
+> many more things. If you have to make it so that certain features can
+> only be utilized on more modern devices, that is okay.
+
+**The floor is a floor, not a ceiling.**
+
+A floor is where the app starts working. It is never the limit on what
+the app can do. Choosing one is a measurement, not an opinion, and this
+is what the agent does when you ask:
 
 1. **What hardware each candidate floor reaches.** iOS 18 and 17 run
    on the same phones, so 17 buys nothing that 18 does not. iOS 26 lost
@@ -89,7 +105,7 @@ agent does when you ask, and what it should show you.
    files is a yes. 428 errors is a no.
 3. **A test that holds the floor.** `tools/test_ios_floor.py` and
    `tools/test_tvos_floor.py` run before every Apple archive and refuse a
-   target above the floor you chose. On Android, keep `lint NewApi`
+   target above the floor you chose. On Android, `lint NewApi` stays
    clean at the floor for every build flavor.
 4. **Newer features gated by capability.** On Apple, `#available`. On
    Android, `Build.VERSION.SDK_INT`. Live captions in Archive Watch are an
@@ -122,9 +138,8 @@ Stage 04 is about why that matters.
 
 2. **Ask for the native version of everything.** Name the platforms and
    ask for every feature, built the way each platform's people expect,
-   with a plan and a parity matrix first. On June 9, the day Archive
-   Watch's Apple TV app went to App Store review after seven weeks on
-   its own:
+   with a plan and a parity matrix first. This is the June 9 prompt
+   from the top of this page:
 
    > Alright, now that we have submitted the first version of the Apple
    > TV app to the app store, it is now time to start building out a
@@ -200,7 +215,8 @@ Stage 04 is about why that matters.
 
 **When you are ready to move on,** the second platform is on your own
 device, it does the same things as the first in its own idiom, and you
-have chosen its floor from a measurement.
+have chosen its floor from a measurement. So far, you have been the one
+checking that it all works. Stage 04 hands that job to the agent.
 
 Be ready to name the oldest device your app will run on, and the
 newest feature it will not show there.

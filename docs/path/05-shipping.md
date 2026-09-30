@@ -1,7 +1,8 @@
 # 05. Shipping
 
 **Where you are.** Your app runs on your devices, and the agent can prove
-its own fixes. Nobody else can install it yet.
+its own fixes. Nobody else can install it yet, and it turns out that
+those are two different kinds of done.
 
 On September 13, 2026, the App Store version of Archive Watch was
 1.42.53. The repository was at 1.42.94. That is 41 versions, including
@@ -10,7 +11,7 @@ and shipped to nobody. Google Play was further behind still, on 1.42.6.
 
 Nothing had reported the gap. The loop had been writing "verified on
 the glass" in its session log for days, and every word of it was true.
-The work simply sat.
+Stage 04 had done its job perfectly. The work simply sat.
 
 **A feature nobody can install is unfinished.**
 
@@ -39,11 +40,9 @@ at build time. Windows has it stamped into its package.
 That rule exists because of the same September 13. Android's version
 name turned out to be typed by hand, under a comment claiming it
 followed the shared file. It was 88 versions behind, so a crash report
-from Google Play could not be matched to the code that caused it.
-`tools/test_version_contract.py` now holds the rule.
-
-The agent bumps it on every release, and a test fails if any platform
-drifts from it.
+from Google Play could not be matched to the code that caused it. Now
+the agent bumps the one number on every release, and a test
+(`tools/test_version_contract.py`) fails if any platform drifts from it.
 
 ## Apple, from a GitHub runner
 
@@ -178,7 +177,9 @@ form.
    checkmark, is shipped.
 
 **When you are ready to move on,** someone who has never met you could
-install your app from a store.
+install your app from a store. Once they can, you can no longer see
+everything that happens to it by using it yourself. Stage 06 is about
+seeing the rest.
 
 Be ready to show your app in a store, installed on a device you did not
 build it on.

@@ -2,7 +2,8 @@
 
 **Where you are.** One platform is live, full of real data, and you have
 sent it a few rounds of feedback from your own phone. Before a second
-platform exists, it is time to decide what "the same app" means.
+platform exists, it is time to decide what "the same app" means. Here
+is why that decision matters, from much later in Archive Watch's life.
 
 In September 2026, Roku's store analytics showed Archive Watch crashing
 16 times in two days, always on the same line:
@@ -26,8 +27,9 @@ Here is how the decision record put it afterward:
 > what hides an incorrect one.
 
 That story is the shape of every app in this template. There is one
-source of data, many readers of it, and the readers will disagree
-quietly unless something makes them disagree out loud.
+source of data and many readers of it, and the readers will disagree
+quietly unless something makes them disagree out loud. Your app has one
+reader today. This stage is about getting ready for the second.
 
 ## What I want
 
@@ -37,9 +39,13 @@ rights decision, the same search results, and the same saved list. I do
 not want them to get the same screen. The Roku should feel like a Roku.
 The phone should feel like a phone.
 
+The film, the rights decision and the saved list are the same
+everywhere. The way you reach them is not. That is the whole parity rule
+in four words:
+
 **Same verb, native idiom.**
 
-That line is the whole parity rule. The verbs (browse, search, save,
+The verbs (browse, search, save,
 play, share) are identical everywhere. The idioms, meaning the controls
 and gestures and layouts that carry each verb, are whatever each
 platform's own people already know. Search on iOS is `.searchable`. On
@@ -52,7 +58,9 @@ app "is *not* the definitive version to be shrunk onto other screens."
 
 ## Two layers
 
-Every app built from this template has two layers, and you build them
+The rule has a structure underneath it. Every app built from this
+template has two layers: one that holds what is the same everywhere, and
+one that holds what is native to each platform. You build them
 differently.
 
 **The data plane is built once.** Whatever your app is about (films,
@@ -208,16 +216,19 @@ the detail:
 
    That sentence became BOBA's rule for what makes a record unique, and
    later the template's `canonical-entity-identity` skill.
-   Ask for audits that read the code, and check the cells you care about
-   against what people can actually install. On September 30, months
-   into Archive Watch:
+
+   Keep distrusting the cells for as long as the app lives. Ask for
+   audits that read the code, and check the cells you care about against
+   what people can actually install. On September 30, months into
+   Archive Watch:
 
    > Is the "Join a Room" feature on the library section available in
    > the currently live 1.42.699 version on Google Play?
 
 **When you are ready to move on,** there is a matrix you have read and
 trimmed, one rule about your data that you decided and the pipeline now
-enforces, and every Share button points at your web address.
+enforces, and every Share button points at your web address. You know
+what "the same app" means. Stage 03 builds it on a second platform.
 
 Be ready to show your matrix, and one cell the audit or your own eyes
 proved wrong.

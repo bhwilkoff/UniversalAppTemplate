@@ -18,7 +18,8 @@ AI wrote most of the code, and yet the rule I cared about most that week
 was a limit on what AI is allowed to do *inside* the app.
 
 Both of those are true at once. This template is built to hold them
-together.
+together, and the reason starts with something I wrote six months
+earlier.
 
 ## Computer-shaped problems
 
@@ -62,8 +63,16 @@ There are three places, and each one is read at a different moment.
    > growth, not to replace thinking, but to deepen it. [...] The goal is
    > never a slick product. It is a tool that makes someone more human.
 
-   You will not write yours in a text editor. You will say it to the
-   agent, and it will write it there.
+   The paragraph sounds abstract until it has to decide something. In
+   July, Tidbits Trivia's agent was deciding how much of a new paid club
+   to put behind locks, and I answered with the reason the app exists:
+
+   > the whole point of Tidbits Trivia is that we are the world's best
+   > trivia app with the least amount behind a paywall.
+
+   That one sentence decided the design: one quiet row for the club,
+   and everything else free. Your app's paragraph will do the same work
+   for questions you cannot see yet.
 
 2. **The four questions** (the `learning-orientation-design` skill). Before
    any feature is built, the agent asks:
@@ -119,28 +128,21 @@ default.
 ## Working with your agent
 
 Open Claude Code in your copy of the template. Everything in this stage
-is a conversation. `docs/path/talking-to-your-agent.md` has the moves.
+is a conversation, and `talking-to-your-agent.md` has the moves.
 
-1. **Tell it why.** Start a plain note for your app, in whatever notes
-   app you already use, and write the why at the top of it first. You
-   will keep this note for the life of the app. Then, before any
-   feature, say to the agent what the app is for, who it is for, and
-   what you hope it does for them. Talk the way you would to
-   a friend. The reason matters most later, when it settles a question
-   you did not see coming. In July, Tidbits Trivia's agent was deciding
-   how much of a new paid club to put behind locks, and I answered with
-   the reason the app exists:
+1. **Start your note with the why.** Open a plain note for your app, in
+   whatever notes app you already use. At the top, write what the app is
+   for, who it is for, and what you hope it does for them. You will keep
+   this note for the life of the app, and it is where your prompts will
+   be drafted from now on.
 
-   > the whole point of Tidbits Trivia is that we are the world's best
-   > trivia app with the least amount behind a paywall.
+2. **Tell the agent why.** Say what you wrote, the way you would to a
+   friend. Then ask the agent to rewrite the "Why we build" paragraph in
+   `CLAUDE.md` from what you said, and to read it back to you. Correct it
+   until it sounds like you and not like a company. Five sentences or
+   fewer.
 
-   That one sentence decided the design: one quiet row for the club,
-   and everything else free. Then ask the agent to rewrite the "Why we
-   build" paragraph in `CLAUDE.md` from what you said, and to read it
-   back to you. Correct it until it sounds like you and not like a
-   company. Five sentences or fewer.
-
-2. **Name one line you will not cross.** Something the app will never
+3. **Name one line you will not cross.** Something the app will never
    do, or never let AI do inside it. Say it plainly and say why. Mine
    usually came out the moment the agent proposed crossing one. In
    September, the agent designed Archive Watch's Watch Together feature
@@ -154,12 +156,12 @@ is a conversation. `docs/path/talking-to-your-agent.md` has the moves.
    with today's date and your words in quotes. You will add more of
    these as you build.
 
-3. **Test the idea against the four questions.** Ask the agent to run
+4. **Test the idea against the four questions.** Ask the agent to run
    the `learning-orientation-design` skill against your idea and tell
    you where it fails. Where it does, change the idea now, while it is
-   only words. The same test applies to every feature later. Nine days
-   into BOBA Playbook, the agent built a price feature that leaned on
-   another site's prices, and I asked the question the four questions
+   only words. The same test will keep applying to every feature. Nine
+   days into BOBA Playbook, the agent built a price feature that leaned
+   on another site's prices, and I asked the question the four questions
    are for:
 
    > This is NOT what I want. I want my app to be indpendent from
@@ -167,16 +169,17 @@ is a conversation. `docs/path/talking-to-your-agent.md` has the moves.
    > just using Radish, there is no reason for this feature to exist.
    > People should just go to radish, right?
 
-4. **Let it ask you the rest.** Ask the agent what it still needs to
-   know before it starts, and answer as a numbered list. This is how I
-   opened each early milestone of BOBA Playbook, the first evening:
+5. **Let it ask you the rest.** Ask the agent what it still needs to
+   know before it starts. This is how I opened each early milestone of
+   BOBA Playbook, starting the first evening:
 
    > Great. Let's begin on M2. Do you have any question at the beginning
    > of this milestone that are unanswered by the current documentation?
 
-   Answer in a list of your own, numbered to match, and say only what
-   the decision needs. From Archive Watch, months later, answering five
-   of the agent's questions in one message:
+   Answer in your note first, numbered to match its questions, saying
+   only what each decision needs. It is a habit that lasts. Here is
+   Archive Watch, months later, answering five of the agent's questions
+   in one message:
 
    > 1. Yes. Move forward with a single clock. If you need a time zone
    > to organize around, you can choose UTC, but all times should show
@@ -186,9 +189,10 @@ is a conversation. `docs/path/talking-to-your-agent.md` has the moves.
 
    The agent records your answers as decisions, with the why first.
 
-**When you are ready to move on,** the "Why we build" paragraph sounds
-like you, there is one rule in your own words, and the agent has what
-it needs to start.
+**When you are ready to move on,** your note starts with the why, the
+"Why we build" paragraph in `CLAUDE.md` sounds like you, there is one
+rule in your own words, and the agent has what it needs to start. Stage
+01 turns all of that into something you can hold.
 
 Be ready to share your "why we build" paragraph, your one rule, and what
 that rule will cost you.

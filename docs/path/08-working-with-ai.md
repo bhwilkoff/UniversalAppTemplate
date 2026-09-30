@@ -31,15 +31,16 @@ done, what was verified, and what was only hoped.
 
 ## Where the memory lives
 
-Each file has one job, and is read at a different moment.
-
-You will not edit these files yourself. The agent keeps them. Your part
-is to ask it to, and to notice when it has not.
+There are two halves. Your note, which you have kept since stage 00, is
+yours: the wish, the rounds, the ledger, what other people said. The
+rest is the agent's, a set of files each with one job, read at a
+different moment. You will not edit those yourself. Your part is to ask
+the agent to keep them, and to notice when it has not.
 
 | File | Its job | Read |
 |---|---|---|
 | `CLAUDE.md` | Who the app is for, the rules, and the table of which skill to use when. | At the start of every session |
-| `SCRATCHPAD.md` | The current state, the next actions, and an append-only session log: state found, work done, state left. | At the start of every session |
+| `SCRATCHPAD.md` | The current state, the next actions, and the last two session-log entries (state found, work done, state left). Older entries move, word for word, to `docs/SESSION-LOG.md`. | At the start of every session |
 | `DECISIONS.md` | Why the app is built the way it is. Each entry leads with the rule, then why, then how to apply it. | Before changing anything it covers |
 | `PARITY.md` | What exists on which platform, honestly. | Before and after any feature |
 | The memory folder | Corrections and confirmations from you, each with a "Why" line. | At the start of every session |
@@ -91,19 +92,15 @@ two-click setting. So now, **a negative finding says how it was found
 and when it should be checked again.** An absence you searched for once
 is weak evidence, and consoles change.
 
-## Loops
+## Why loops depend on all of this
 
-This template was reorganized by a loop: an agent working in
-five-minute ticks, reading its own plan at the start of each one
-(`docs/maintaining/RESTRUCTURE-PLAN.md`), doing the next thing, sending
-slower work to helper agents in the background, and writing down what it
-did before the tick ended. Archive Watch ran loops like that for days.
-
-They work because of everything above. A loop without a plan file
-forgets what it was doing. A loop without the stage 04 rules reports
-fiction. A loop without a small always-loaded context runs out of room
-to think. `docs/AUTONOMOUS-LOOPS.md`, `docs/ENGINEERING-PROCESS.md` and the
-`autonomous-loop-cadence` skill carry the rest.
+The loops from stage 06 are where memory matters most, because a loop
+runs for hours with nobody watching each step. A loop without a plan
+file forgets what it was doing. A loop without the stage 04 rules
+reports fiction. A loop whose always-loaded files have grown too large
+runs out of room to think. `docs/AUTONOMOUS-LOOPS.md`,
+`docs/ENGINEERING-PROCESS.md` and the `autonomous-loop-cadence` skill
+carry the rest.
 
 ## What it costs
 
@@ -177,7 +174,9 @@ to draw, in writing, where the agent will read them.
 
 **When you are done with the path,** your app is shipped and running,
 your agent remembers what you taught it, and the lessons from this app
-are waiting for the next one.
+are waiting for the next one. The next app starts at stage 00 again,
+with a new note and a new why. It will go faster, because this time the
+repository remembers.
 
 Be ready to show one skill your app taught, and to say which mistake it
 will save the next person from.

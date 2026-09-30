@@ -10,10 +10,10 @@ a server:
 > published on the web app for anyone to browse and potentially add to
 > their account and view them on native apps as well.
 
-At the time, Archive Watch had no server and no accounts. People's saved films live
-on their own devices and sync through their own iCloud or Google Drive.
-There was nowhere for us to put a playlist, and building somewhere
-would have undone a decision the whole app rests on.
+At the time, Archive Watch had no server and no accounts. People's saved
+films lived on their own devices and synced through their own iCloud or
+Google Drive. There was nowhere for us to put a playlist, and building
+somewhere would have undone a decision the whole app rests on.
 
 So, the investigation began with a different question. Not how to
 build a sharing service, but whether one was needed at all.
@@ -23,6 +23,12 @@ encoded, fifty films fit in a link of about 1,368 characters, measured
 across 300 random playlists from the real catalog. The whole playlist
 travels inside the URL. The web app opens it for anyone. The native apps
 open the same link and offer to save it. No server was built.
+
+Stage 03 was about the floor: the oldest device the app reaches. This
+stage is about the ceiling: everything the newest devices can do. The
+playlist link is the lesson the whole stage runs on, because it raised
+the ceiling for every platform without adding a single thing the app
+needed in order to run:
 
 **Raise the ceiling without raising the floor.**
 
@@ -188,7 +194,9 @@ build.
 
 **When you are ready to move on,** a feature you wanted from your own
 use is live on every platform that can have it, and the older devices
-say honestly what they cannot do.
+say honestly what they cannot do. By now you have built a lot, and
+taught the agent a lot along the way. Stage 08 is about making sure it
+remembers.
 
 Be ready to show the feature on your newest device, and the sentence an
 older device shows instead.

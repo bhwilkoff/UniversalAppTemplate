@@ -1,8 +1,7 @@
 # 06. Keeping it running
 
-**Where you are.** Your app is in a store. Strangers can install it, and
-you can no longer see everything that happens to it by using it
-yourself.
+**Where you are.** Your app is in a store, and strangers are installing
+it on devices you will never see.
 
 On September 14, 2026, five days after Archive Watch's dashboard went
 live, I sent the agent this:
@@ -25,6 +24,12 @@ It reads as news, maybe bad news, but believable. Nobody checks it
 again. A blank that says "I could not read Roku today" gets checked the
 same morning.
 
+That rule runs through this whole stage. Once strangers are using your
+app, you need instruments for three things you cannot see by using it
+yourself: what is happening to the app out in the world, what the
+machinery behind it is doing, and work too big to sit and watch. Each
+one has to tell you honestly when it cannot see.
+
 ## What I want
 
 Once an app is in folks' hands, I want to know how it is doing without
@@ -34,7 +39,7 @@ two-star review nobody has answered, a build that failed overnight. And
 I want the good news too, because a list of only problems is a hard
 thing to open every morning.
 
-## Pulse
+## Pulse: the app in the world
 
 `pulse/` is that page, and `tools/pulse_collect.py` is what fills it.
 Once a day, a GitHub Actions workflow reads every channel the app has:
@@ -82,9 +87,10 @@ These came from real mornings, and each has a test.
 - **Wait for the stores.** Google Play's install numbers arrive up to
   two weeks late. The alarm waits for the measured delay, not a guess.
 
-## The CI fleet
+## The CI fleet: the machinery
 
-Pulse watches the app. Something also has to watch the machinery.
+Pulse watches the app. Something also has to watch the machinery, and
+it fails in the same way a dashboard does: by looking fine.
 
 On September 8, the agent found that Archive Watch's catalog had not
 published since September 6. One step in the publishing workflow ran a
@@ -113,12 +119,14 @@ fifty workflows for one app:
 The guardian workflows ship switched off. Ask the agent to turn them
 on once your app has scheduled work worth guarding.
 
-## Loops
+## Loops: work too big to watch
 
-This template was reorganized by a loop: an agent working in timed
-ticks, reading its own plan at the start of each one, doing the next
-thing, and writing down what it did. Archive Watch ran loops like this
-for days. `docs/AUTONOMOUS-LOOPS.md` holds the discipline that made
+Some work takes hours or days: auditing every record, testing every
+screen, porting every feature. For that, the agent works on a loop. It
+wakes in timed ticks, reads its own plan at the start of each one, does
+the next thing, and writes down what it did, while you check in. This
+template itself was reorganized by one, and Archive Watch ran loops like
+it for days. `docs/AUTONOMOUS-LOOPS.md` holds the discipline that made
 them safe:
 
 - The agent is never the tester (stage 04).
@@ -218,7 +226,9 @@ watching.
 
 **When you are ready to move on,** Pulse reads at least one store
 honestly, a failure email has become a fix instead of a habit, and you
-have run a loop from start to stop.
+have run a loop from start to stop. You can see what is happening to
+the app without living inside it. That frees you up for the part stage
+07 is about: making it better.
 
 Be ready to show one number Pulse read correctly, one reader that told
 you honestly it could not, and what your loop finished.
