@@ -23,6 +23,8 @@ PKG="${TV_PKG:-com.example.appname.debug}"   # FILL IN (or export TV_PKG)
 ACT="${TV_ACT:-com.example.appname.MainActivity}"
 ADB="${ADB:-adb}"
 SERIAL="${SERIAL:-emulator-5554}"
+# The debug intent extras are <prefix>_start_<key>; match it to what your app reads.
+PREFIX="${TV_EXTRA_PREFIX:-appname}"
 OUT="${1:-$HOME/Desktop/TV-Screenshots}"
 SETTLE="${SETTLE:-26}"     # cold start + catalog swap; shots taken too early show a seed catalog
 
@@ -35,7 +37,7 @@ shot() { # shot <name> <flag> <key> <value> [extra dpad presses]
   sleep 2
   $ADB -s "$SERIAL" shell am start \
     -c android.intent.category.LEANBACK_LAUNCHER -a android.intent.action.MAIN \
-    -n "$PKG/$ACT" "$flag" "aw_start_$key" "$value" >/dev/null 2>&1
+    -n "$PKG/$ACT" "$flag" "${PREFIX}_start_$key" "$value" >/dev/null 2>&1
   sleep "$SETTLE"
   # A shot with nothing focused looks broken in a store listing — the focused
   # card IS the visual subject on a TV. Nudge into content first.
@@ -58,6 +60,7 @@ print('x'.join(map(str, struct.unpack('>II', d[16:24]))) if len(d)>=24 else 'unr
   fi
 }
 
+# FILL IN: the shot list below is a worked example from a video-catalog app.
 echo "Android TV store screenshots -> $OUT"
 echo
 

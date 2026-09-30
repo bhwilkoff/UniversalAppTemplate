@@ -141,5 +141,81 @@ console.log("\nratio() and dots()");
   check("state is carried by class, not by a fill", /class="stop"/.test(h), true);
 }
 
+/* ── spark: a row of sparks shares ONE scale, or it lies ─────────────────
+   Without a pinned max every spark autoscales, so 3 a day and 300 a day draw
+   the same picture — and a caption claiming a shared scale is false. */
+console.log("\nspark() as small multiples");
+{
+  const top = (h) => Math.min(...(/<polyline class="line" points="([^"]+)"/.exec(h)[1])
+    .split(" ").map((p) => +p.split(",")[1]));
+  const small = C.spark([1, 3, 2, 3], { max: 300, min: 0 });
+  const big = C.spark([100, 300, 200, 300], { max: 300, min: 0 });
+  check("on a shared scale the small series stays near the floor", top(small) > 30, true);
+  near("and the big one reaches the top", top(big), 3, 0.2);
+  check("self-scaled, the small series fills the frame (the lie a shared max prevents)",
+        top(C.spark([1, 3, 2, 3])) < 5, true);
+}
+
+/* ── runChart: a series against its OWN normal range ─────────────────── */
+console.log("\nrunChart()");
+{
+  const h = C.runChart([10, 11, 9, 10, 10, 11, 9, 40]);
+  check("a point far outside ±2σ is marked as signal", (h.match(/class="out"/g) || []).length, 1);
+  check("...and says so", /outside 2σ/.test(h), true);
+  check("an ordinary series has no signal marks",
+        (C.runChart([10, 11, 9, 10, 10, 11, 9, 10]).match(/class="out"/g) || []).length, 0);
+  check("under four points it falls back to a spark, never a fake band",
+        /c-spark/.test(C.runChart([1, 2, 3])), true);
+}
+
+/* ── calendarHeat: gaps are visible ────────────────────────────────────── */
+console.log("\ncalendarHeat()");
+{
+  const h = C.calendarHeat([{ date: "2026-09-01", value: 1 }, { date: "2026-09-10", value: 4 }], { weeks: 2 });
+  check("one cell per day of the window", (h.match(/<i /g) || []).length, 14);
+  check("a day with nothing is drawn as an EMPTY cell, not skipped", (h.match(/class="l0"/g) || []).length, 12);
+  check("the busiest day is the top step", /class="l4" title="2026-09-10: 4"/.test(h), true);
+}
+
+/* ── dotPlot: position on a shared axis ─────────────────────────────────── */
+console.log("\ndotPlot()");
+{
+  const h = C.dotPlot([{ label: "US", value: 80 }, { label: "GB", value: 20 }]);
+  const lefts = [...h.matchAll(/left:([\d.]+)%/g)].map((m) => +m[1]);
+  check("the largest sits at the end of the axis", lefts[0], 100);
+  near("a quarter of it sits a quarter along", lefts[1], 25, 0.1);
+}
+
+/* ── pareto: what to fix first ──────────────────────────────────────────── */
+console.log("\npareto()");
+{
+  const h = C.pareto([{ label: "b", value: 1 }, { label: "a", value: 7 }, { label: "c", value: 2 }]);
+  const order = [...h.matchAll(/<title>([a-z]): /g)].map((m) => m[1]);
+  check("bars are sorted worst first", order, ["a", "c", "b"]);
+  const cum = /class="cum" points="([^"]+)"/.exec(h)[1].split(" ").map((p) => +p.split(",")[1]);
+  near("the cumulative line ends at 100% (the top)", cum[cum.length - 1], 3, 0.1);
+}
+
+/* ── timeChart: a dated series says WHEN, and a gap looks like a gap ────── */
+console.log("\ntimeChart()");
+{
+  const pts = [{ date: "2026-09-01", v: 3 }, { date: "2026-09-02", v: 5 }, { date: "2026-09-03", v: 4 }];
+  const h = C.timeChart([{ label: "installs", points: pts }], { label: "Installs" });
+  check("the first and last dates are printed", /Sep 1<\/span><span>Sep 3/.test(h), true);
+  check("the top of the scale is printed", /class="c-time-y">5</.test(h), true);
+  check("the figure is keyboard-focusable for the readout", /tabindex="0"/.test(h), true);
+  check("a screen reader gets the range and the latest value",
+        /aria-label="Installs: Sep 1, 2026 to Sep 3, 2026, latest 4"/.test(h), true);
+  const stalled = C.timeChart([{ label: "installs", points: pts }], { to: "2026-09-10" });
+  check("days a series does not cover are GREYED, so a stalled reader looks different from a quiet week",
+        /class="gap"/.test(stalled), true);
+  check("a one-point series draws nothing rather than a flat line",
+        C.timeChart([{ label: "x", points: [pts[0]] }]), "");
+  check("two series are told apart by dash, never by hue", /class="ln s1"/.test(
+        C.timeChart([{ label: "a", points: pts }, { label: "b", points: pts }])), true);
+  check("a missing day is a break in the line, not a zero",
+        /M[\d.]+,[\d.]+M/.test(C.timeChart([{ label: "x", points: [pts[0], pts[1], { date: "2026-09-05", v: 2 }, { date: "2026-09-06", v: 3 }] }]).replace(/L[\d.,]+/g, "")), true);
+}
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

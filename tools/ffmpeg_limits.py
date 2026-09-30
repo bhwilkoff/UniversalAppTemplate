@@ -16,7 +16,7 @@ machine usable by default and gets out of the way in CI.
   * Anywhere else it is `nice -n 10 ffmpeg -threads <half the cores>`, so a
     transcode yields to whatever the person is actually doing.
 
-`AW_FFMPEG_THREADS` and `AW_FFMPEG_NICE` override both, for the times when a
+`APP_FFMPEG_THREADS` and `APP_FFMPEG_NICE` override both, for the times when a
 local run genuinely should have the machine.
 """
 from __future__ import annotations
@@ -35,7 +35,7 @@ def threads() -> int:
     """Half the cores, at least one, unless told otherwise. Half rather than
     `cores - 1`: the point is to leave the machine RESPONSIVE, and a single
     spare core does not do that once memory bandwidth is saturated too."""
-    override = os.environ.get("AW_FFMPEG_THREADS", "").strip()
+    override = os.environ.get("APP_FFMPEG_THREADS", "").strip()
     if override.isdigit():
         return max(1, int(override))
     if on_ci():
@@ -44,7 +44,7 @@ def threads() -> int:
 
 
 def _nice() -> int:
-    override = os.environ.get("AW_FFMPEG_NICE", "").strip()
+    override = os.environ.get("APP_FFMPEG_NICE", "").strip()
     if override.lstrip("-").isdigit():
         return int(override)
     return 0 if on_ci() else 10

@@ -3,6 +3,10 @@ import SwiftData
 
 @main
 struct AppNameApp: App {
+    // Owned here (not `.environment(AppStore())` inline) so a re-evaluated
+    // Scene body never swaps in a fresh store and drops navigation state.
+    @State private var store = AppStore()
+
     init() {
         // 100 MB memory / 500 MB disk — mirrors Android's Coil 3 config
         // so image cache behavior is symmetric across platforms.
@@ -15,7 +19,7 @@ struct AppNameApp: App {
     var body: some Scene {
         WindowGroup {
             RootView()
-                .environment(AppStore())
+                .environment(store)
                 // .environment(AuthManager())  // FILL IN: your auth manager
                 // Universal Links + custom-scheme dispatch.
                 // On iOS 17+, .onOpenURL fires for BOTH Universal Links
@@ -30,8 +34,8 @@ struct AppNameApp: App {
                 .onOpenURL { url in
                     // FILL IN: route by url.scheme, then by path
                     // switch url.scheme {
-                    // case "https": IntentInbox.shared.post(.universalLink(url))
-                    // case "appname": IntentInbox.shared.post(.customScheme(url))
+                    // case "https": store.post(.item(url.lastPathComponent))
+                    // case "appname": store.post(.item(url.lastPathComponent))
                     // default: break
                     // }
                 }
@@ -66,7 +70,28 @@ struct AppNameApp: App {
 /// another. Add each platform branch EXPLICITLY; a bare #else silently gives
 /// a new platform the iOS view.
 struct RootView: View {
+    @Environment(AppStore.self) private var store
+
     var body: some View {
+        platformRoot
+            // The ONE place the inbox is consumed: deep links and test doors
+            // alike land in the store and are routed here.
+            .onChange(of: store.inbox, initial: true) { _, pending in
+                if !pending.isEmpty { store.drainInbox() }
+            }
+            // Test doors (DEBUG builds only; LaunchDoors.current is empty in
+            // Release). APP_DOOR_SECONDS bounds the door's activity.
+            .task {
+                let doors = LaunchDoors.current
+                guard !doors.isEmpty, store.openDoorsOnce(doors) else { return }
+                if let seconds = doors.doorSeconds {
+                    guard (try? await Task.sleep(for: .seconds(seconds))) != nil else { return }
+                    store.endDoor()
+                }
+            }
+    }
+
+    @ViewBuilder private var platformRoot: some View {
         #if os(tvOS)
         ContentView_tvOS()
         #elseif os(macOS)

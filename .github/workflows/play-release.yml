@@ -10,9 +10,9 @@ name: Play release
 # exists because the dev Mac cannot ship locally. Android had no equivalent, so
 # every Play release was paid for out of the owner's working day.
 #
-# THE SMOKE TEST, HONESTLY. tools/submit-play.sh runs the release artifact on a
-# real device before uploading, because Play once rejected a build for a launch
-# crash that only R8 produced (vc43, a Room constructor stripped through
+# THE SMOKE TEST, HONESTLY. A local release should run the release artifact on
+# a real device before uploading, because Play once rejected a build for a
+# launch crash that only R8 produced (a Room constructor stripped through
 # Glance). A CI runner has no device, and this project does not use emulators.
 # So the guard is not dropped, it is MOVED: CI publishes to the INTERNAL track,
 # which installs over a Play-signed copy with no uninstall, and promotion to
@@ -86,10 +86,13 @@ jobs:
         if: ${{ inputs.promote != '' }}
         env:
           PLAY_SERVICE_ACCOUNT_JSON: /home/runner/.config/play/service-account.json
+          PROMOTE: ${{ inputs.promote }}
+          ROLLOUT: ${{ inputs.rollout }}
         run: |
           set -euo pipefail
-          python3 tools/play_promote.py --version-code "${{ inputs.promote }}" \
-            --to production ${{ inputs.rollout && format('--rollout {0}', inputs.rollout) || '' }}
+          ARGS=(--version-code "$PROMOTE" --to production)
+          if [ -n "$ROLLOUT" ]; then ARGS+=(--rollout "$ROLLOUT"); fi
+          python3 tools/play_promote.py "${ARGS[@]}"
 
       # ── build path ────────────────────────────────────────────────────────
       - name: Restore the upload keystore
@@ -99,7 +102,6 @@ jobs:
           KS_PASS: ${{ secrets.UPLOAD_KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.UPLOAD_KEY_ALIAS }}
           KEY_PASS: ${{ secrets.UPLOAD_KEY_PASSWORD }}
-          OS_KEY: ${{ secrets.AW_OPENSUBTITLES_API_KEY }}
         run: |
           set -euo pipefail
           for v in KS_B64 KS_PASS KEY_ALIAS KEY_PASS; do
@@ -113,23 +115,23 @@ jobs:
             echo "UPLOAD_KEYSTORE_PASSWORD=$KS_PASS"
             echo "UPLOAD_KEY_ALIAS=$KEY_ALIAS"
             echo "UPLOAD_KEY_PASSWORD=$KEY_PASS"
-            echo "awOpenSubtitlesApiKey=${OS_KEY:-}"
           } >> "$HOME/.gradle/gradle.properties"
 
-      - name: Bump versionCode and sync versionName
+      - name: Bump versionCode (versionName is read from AppVersion.xcconfig)
         if: ${{ inputs.promote == '' }}
         id: ver
         run: |
           set -euo pipefail
           python3 - <<'PY' >> "$GITHUB_OUTPUT"
           import re, pathlib
-          # Decision 101: AppVersion.xcconfig is the ONE version number.
+          # AppVersion.xcconfig is the ONE version number: the Gradle build
+          # READS versionName from it (tools/test_version_contract.py), so only
+          # versionCode is bumped here; mv is reported for the summary.
           mv = re.search(r"MARKETING_VERSION\s*=\s*(\S+)",
                          pathlib.Path("AppVersion.xcconfig").read_text()).group(1)
           g = pathlib.Path("android/app/build.gradle.kts"); s = g.read_text()
           vc = int(re.search(r"versionCode\s*=\s*(\d+)", s).group(1)) + 1
           s = re.sub(r"versionCode\s*=\s*\d+", f"versionCode = {vc}", s, count=1)
-          s = re.sub(r'versionName\s*=\s*"[^"]+"', f'versionName = "{mv}"', s, count=1)
           g.write_text(s)
           print(f"code={vc}")
           print(f"name={mv}")
@@ -138,30 +140,38 @@ jobs:
       - name: Build the signed bundle
         if: ${{ inputs.promote == '' }}
         working-directory: android
-        run: ./gradlew --no-daemon bundleGoogleRelease
+        run: ./gradlew --no-daemon bundleRelease
 
       - name: Refuse an unsigned bundle
         if: ${{ inputs.promote == '' }}
         run: |
           set -euo pipefail
-          AAB=android/app/build/outputs/bundle/googleRelease/app-google-release.aab
+          AAB=android/app/build/outputs/bundle/release/app-release.aab
           [ -f "$AAB" ] || { echo "::error::no bundle was produced"; exit 1; }
           # An unsigned AAB uploads and then fails review; catch it here.
           unzip -l "$AAB" | grep -q "META-INF/.*\.RSA\|META-INF/.*\.EC" \
             || { echo "::error::the bundle is not signed — the keystore step did not take"; exit 1; }
           echo "signed bundle: $(du -h "$AAB" | cut -f1)"
 
+      # Inputs arrive as ENVIRONMENT, never pasted into the script: release notes
+      # containing a double quote would close the shell string, and free text
+      # pasted into a shell line is an injection route. Optional flags are
+      # `if ... fi`, never `[ -n x ] && ARGS+=(...)`, which returns 1 when x is
+      # empty and fails the step whenever it is the step's last line.
       - name: Publish
         if: ${{ inputs.promote == '' }}
         env:
           PLAY_SERVICE_ACCOUNT_JSON: /home/runner/.config/play/service-account.json
+          TRACK: ${{ inputs.track }}
+          NOTES: ${{ inputs.notes }}
+          ROLLOUT: ${{ inputs.rollout }}
         run: |
           set -euo pipefail
-          ARGS=(--track "${{ inputs.track }}")
-          [ -n "${{ inputs.notes }}" ] && ARGS+=(--notes "${{ inputs.notes }}")
-          [ -n "${{ inputs.rollout }}" ] && ARGS+=(--rollout "${{ inputs.rollout }}")
+          ARGS=(--track "$TRACK")
+          if [ -n "$NOTES" ]; then ARGS+=(--notes "$NOTES"); fi
+          if [ -n "$ROLLOUT" ]; then ARGS+=(--rollout "$ROLLOUT"); fi
           python3 tools/play-publish.py \
-            android/app/build/outputs/bundle/googleRelease/app-google-release.aab "${ARGS[@]}"
+            android/app/build/outputs/bundle/release/app-release.aab "${ARGS[@]}"
 
       - name: Keep the versionCode
         if: ${{ inputs.promote == '' }}

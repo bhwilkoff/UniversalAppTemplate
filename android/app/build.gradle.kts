@@ -9,16 +9,31 @@ plugins {
     alias(libs.plugins.hilt)
 }
 
+/** The one marketing version, shared with the Apple targets. Fails loudly rather
+ *  than guessing: a silent fallback would put the drift straight back. */
+val marketingVersion: String = rootProject.file("../AppVersion.xcconfig")
+    .readLines()
+    .firstOrNull { it.trimStart().startsWith("MARKETING_VERSION") }
+    ?.substringAfter("=")?.trim()
+    ?: error("MARKETING_VERSION not found in AppVersion.xcconfig")
+
 android {
     namespace = "com.example.appname"  // FILL IN: your reverse-DNS package
-    compileSdk = 36
+    compileSdk = 37                    // the 2026.05 Compose BOM requires compiling against API 37
 
     defaultConfig {
         applicationId = "com.example.appname"  // FILL IN
         minSdk = 29                            // Android 10 — >95% device coverage in 2026
         targetSdk = 36                         // bump to 37 when Android 17 ships + Play forces
+        // Play rejects ANY previously-uploaded versionCode — bump +1 before
+        // every Play upload, even if that upload was never released.
         versionCode = 1
-        versionName = "1.0.0"
+        // READ from AppVersion.xcconfig rather than copied, because copying is
+        // what goes wrong: a literal here drifted 88 patch versions behind the
+        // Apple apps in a shipped app, so an Android user reporting a problem
+        // named a version family that had not existed for weeks.
+        // tools/test_version_contract.py holds this.
+        versionName = marketingVersion
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables { useSupportLibrary = true }
@@ -68,7 +83,6 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions { jvmTarget = "17" }
 
     buildFeatures {
         compose = true
@@ -87,6 +101,10 @@ android {
     testOptions {
         unitTests.isIncludeAndroidResources = true
     }
+}
+
+kotlin {
+    compilerOptions { jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17 }
 }
 
 dependencies {

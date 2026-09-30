@@ -1,20 +1,15 @@
 #!/bin/bash
-# Runs silently at every Claude Code session start.
-# Injects project context without requiring manual orientation.
+# Runs at every Claude Code session start. Claude Code already loads
+# CLAUDE.md on its own, so this only adds the live state from
+# SCRATCHPAD.md: the part of the project that changes between sessions.
 
 if [ ! -f "CLAUDE.md" ]; then
-  echo "=== CLAUDE.md not found — fill it in to get started ==="
+  echo "=== CLAUDE.md not found. Fill it in to get started (see README.md) ==="
   exit 0
 fi
 
-echo "=== PROJECT CONTEXT ==="
-cat CLAUDE.md
-echo ""
-
 if [ -f "SCRATCHPAD.md" ]; then
-  echo "=== CURRENT STATE ==="
-  awk '/^## Current State/,/^---/' SCRATCHPAD.md | head -n -1
-  echo ""
+  echo "=== CURRENT STATE (from SCRATCHPAD.md) ==="
+  awk 'tolower($0) ~ /^## current state/ {on=1} on && /^---/ {exit} on {print}' SCRATCHPAD.md
+  echo "=== END CURRENT STATE ==="
 fi
-
-echo "=== END OF SESSION CONTEXT ==="

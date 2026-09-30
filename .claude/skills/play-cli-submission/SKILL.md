@@ -1,6 +1,6 @@
 ---
 name: play-cli-submission
-description: Use when shipping an Android build (AAB) to Google Play from the command line — no Play Console GUI. Carries the Play Developer API v3 "edits" transaction (insert → upload AAB → set track+notes → commit), service-account JSON auth, the versionCode-+1-every-upload rule, applicationId≠namespace, staged rollout fractions, and the org-policy-block gotcha (create the SA under a personal gmail via gcloud, with an eventual-consistency retry on key create). Triggers on Google Play, Play Console, AAB upload, submit-play, androidpublisher, service account, versionCode, staged rollout, "Play rejected the version", internal track, org policy key block, refused to auto-submit, pre-launch report, Test Lab.
+description: "Use when shipping an Android build (AAB) to Google Play without the Play Console GUI, from CI (play-release.yml builds to internal; promote the SAME versionCode with play_promote.py) or the CLI (submit-play.sh). Carries the Play Developer API v3 edits transaction, service-account JSON auth, versionCode +1 on every upload, versionName read from AppVersion.xcconfig, the 500-character release-notes cap (check before the bump), applicationId vs namespace, staged rollout, changesNotSentForReview and the refused-to-auto-submit stall, inputs as env in workflows, and the org-policy key block. Triggers on Google Play, Play Console, AAB upload, submit-play, play-release.yml, androidpublisher, service account, versionCode, staged rollout, promote, internal track, org policy key block, refused to auto-submit, changesNotSentForReview, pre-launch report, Test Lab."
 ---
 
 # Play CLI Submission
@@ -13,17 +13,27 @@ Ship an Android App Bundle to Google Play entirely from the CLI, via the **Play 
 - Setting up service-account auth for automated Play publishing
 - Play rejects a version code, or an SA key can't be created
 
-## Rule 1 — Publishing is one "edits" transaction
+## Rule 1: Publishing is one "edits" transaction, and it runs in CI by default
 
-The Play Developer API v3 is transactional: **insert an edit** (get an edit-id) → **upload the AAB** to that edit → **assign it to a track** with release notes and status → **commit** the edit. Nothing is live until commit; a validation failure aborts the whole edit cleanly (no partial release). The shipped driver `tools/submit-play.sh` → `tools/play-publish.py` runs exactly this sequence.
+The Play Developer API v3 is transactional: **insert an edit** (get an edit id), **upload the AAB** to it, **assign it to a track** with release notes and status, **commit**. Nothing is live until commit; a validation failure aborts the whole edit (no partial release). `tools/play-publish.py` runs exactly this sequence.
+
+The default venue is CI, not the laptop (a release build is R8 plus a full Kotlin compile, and it has taken a working Mac to 18% free memory):
+
+```
+gh workflow run play-release.yml -f notes="..."            # bump versionCode, build, publish to INTERNAL
+# install from Play internal on a real device and use it, then:
+gh workflow run play-release.yml -f promote=<versionCode>  # the SAME artifact to production (+ -f rollout=0.1)
+```
+
+`play-release.yml` bumps `versionCode`, builds the signed bundle, refuses an unsigned one, publishes, and commits the bump back with `[skip ci]`. Promotion (`tools/play_promote.py`) builds nothing: the artifact users get is the one that was tested. Secrets: `PLAY_SERVICE_ACCOUNT_JSON`, `UPLOAD_KEYSTORE_B64`, `UPLOAD_KEYSTORE_PASSWORD`, `UPLOAD_KEY_ALIAS`, `UPLOAD_KEY_PASSWORD`. Workflow inputs reach scripts as **env** (release notes with a quote otherwise close the shell string) and optional flags are `if ... fi`, never `[ -n x ] && ARGS+=(...)`. The local path, `tools/submit-play.sh`, still works for a machine that can spare the build.
 
 ## Rule 2 — Service-account JSON auth, scope androidpublisher
 
 Auth is a **service-account JSON key** (from a GCP project) with the `https://www.googleapis.com/auth/androidpublisher` scope, and that service account **granted access in the Play Console** (Users & permissions → invite the SA email → release permissions). No OAuth user flow, no interactive login — the SA key is the whole credential. Keep it out of git (`~/.config/…` or a CI secret).
 
-## Rule 3 — versionCode +1 on EVERY upload
+## Rule 3: versionCode +1 on EVERY upload; versionName is not yours to type
 
-Bump `versionCode` for every single AAB you upload. **Why**: Play permanently rejects any `versionCode` it has seen before — **even one uploaded to a draft/unreleased track and never shipped**. There is no reuse. Keep `versionName` in lockstep with the app's marketing version across platforms; `versionCode` is a monotonic integer that only ever increments.
+Bump `versionCode` for every AAB you upload. Play permanently rejects any `versionCode` it has seen, **even one uploaded to a draft track and never shipped**. `versionName` is READ from `AppVersion.xcconfig` by the Gradle build (held by `tools/test_version_contract.py`), so it cannot drift from the Apple marketing version; only `versionCode` is bumped. Anything that can refuse the upload must be checked BEFORE the bump: **release notes are capped at 500 characters**, and a refusal after the bump has spent the versionCode. Don't start a new upload while a previous release is still in review; batch trivial releases.
 
 ## Rule 4 — applicationId ≠ namespace
 
@@ -45,17 +55,9 @@ gcloud iam service-accounts keys create key.json --iam-account …
 
 Then invite that SA's email into the Play Console. **Eventual-consistency retry**: a freshly-created SA sometimes isn't yet visible to the key-create call — retry key creation a few times with backoff before treating it as a real failure. Full walkthrough in `docs/store/play-api-key-setup.md`.
 
-## Rule 7 — A committed edit can still stall in the Console
+## Rule 7: A committed edit can still stall in the Console
 
-The edits transaction ends at Play's REVIEW layer, not at "live". Two
-Console states have cost real releases: a changes bar reading **"refused to
-auto-submit"** (or a stuck "N changes") means those changes will NEVER
-process until acted on — it is a stall, not a queue; and **"Submit N
-changes" is all-or-nothing** — every pending Console edit rides the same
-submit, so read what the N contains first. After any CLI publish, confirm
-the Console shows the release in review/live, not sitting behind a changes
-bar. (The Windows twin of this lesson — the `commit=true` and
-publishing-hold stalls — is in `docs/windows/WINDOWS-STORE-SUBMISSION.md`.)
+The edits transaction ends at Play's REVIEW layer, not at "live". When Play will not send changes for review automatically (managed publishing, or a rejection pending), `edits.commit` fails and says to set **`changesNotSentForReview=true`**. Committing that way succeeds, and the changes then wait in the Console for a human send. That is the same state as a changes bar reading **"refused to auto-submit"** (or a stuck "N changes"): those changes will NEVER process until acted on. It is a stall, not a queue. And **"Submit N changes" is all-or-nothing**: every pending Console edit rides the same submit, so read what the N contains first. After any publish, confirm the release shows in review or live, not behind a changes bar. Retry 5xx on the API calls; a 4xx is a real answer. (The Windows twin, the `commit=true` and publishing-hold stalls, is in `docs/windows/WINDOWS-STORE-SUBMISSION.md`.)
 
 ## Rule 8 — The pre-launch report is Firebase Test Lab; run it yourself
 
@@ -82,8 +84,10 @@ engineering.
 
 ## Scaffolding shipped
 
-- `tools/submit-play.sh` — the CLI entry point
-- `tools/play-publish.py` — the edits-transaction driver (insert → upload → track → commit)
+- `.github/workflows/play-release.yml`: the CI entry point (build to internal, or `promote=<versionCode>`)
+- `tools/submit-play.sh`: the local entry point
+- `tools/play-publish.py`: the edits-transaction driver (insert, upload, track, commit)
+- `tools/play_promote.py`: move an existing versionCode to another track, no build
 - `tools/testlab-android.sh` — the self-run pre-launch report (Firebase Test Lab, physical devices)
 - `docs/store/play-api-key-setup.md` — SA key setup + the org-policy workaround
 

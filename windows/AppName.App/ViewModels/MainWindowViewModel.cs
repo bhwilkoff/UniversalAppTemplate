@@ -4,6 +4,10 @@ namespace AppName.App.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase
 {
+    /// Player-level mute (APP_MUTE door). Every player reads it, so a harness run
+    /// is silent unless it opts in.
+    public bool IsMuted { get; set; } = LaunchHooks.Mute;
+
     /// The shell surfaces, keyed by the NavigationView item tag. Mirror your app's
     /// tab set here — same verbs as the other platforms, Windows idiom.
     public IReadOnlyDictionary<string, SectionViewModel> Sections { get; } =

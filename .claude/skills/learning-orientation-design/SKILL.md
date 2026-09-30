@@ -1,6 +1,6 @@
 ---
 name: learning-orientation-design
-description: Use before implementing any new feature — the test is whether the feature serves human learning and growth, not replacement. Ask four questions: Does it deepen understanding? Invite participation? Support human agency? Pass the clarity-over-cleverness check? Features that fail these tests get refactored or rejected at proposal stage, not after shipping. Triggers on new feature proposal, building a tool, "should we add X?", AI feature, automation, learning product.
+description: "Use before implementing any new feature — the test is whether the feature serves human learning and growth, not replacement. Ask four questions: Does it deepen understanding? Invite participation? Support human agency? Pass the clarity-over-cleverness check? Features that fail these tests get refactored or rejected at proposal stage, not after shipping. Triggers on new feature proposal, building a tool, \"should we add X?\", AI feature, automation, learning product, AI-written copy, generated lists, MCP/feed surfaces in the app."
 ---
 
 # Learning-Orientation Feature Design
@@ -115,6 +115,39 @@ When the tool guesses what the user wants and silently does it, two failure mode
 ### ❌ Passing off automation as a human
 
 If a feature substitutes a bot/AI for a missing person — a CPU opponent while matchmaking is empty, an auto-reply, a synthetic "other user" — it must be **visibly labeled** as such. A labeled bot is an honest, graceful bootstrap; a bot disguised as a human is a dark pattern that manufactures a false social relationship. The test: *would the user feel deceived if they learned the truth?* If yes, label it. (This is a hard rule, not a preference — it applies to every synthetic stand-in for a human, no exceptions.)
+
+## Standing rules from a shipped app
+
+Two owner rules from Archive Watch that apply to any content app built
+on this template. Record your app's version of each in CLAUDE.md
+Standing instructions, with the owner's dated words.
+
+### No AI-written lists or copy in the product
+
+Owner, 2026-09-26: *"I don't want AI making lists and writing copy. Any
+time we can use metadata or user copy/categorization from archive.org."*
+
+Lists, notes, blurbs and shelf membership come from DATA: the source's
+own metadata (subjects, collections, descriptions), the creators' and
+reviewers' own words, the community's public lists and favorites,
+reference facts, or plain rules over those fields (genre x decade). A
+human editor may write; a model may not. A model can still help BUILD
+the pipeline that selects from human sources; it does not author what
+the person reads. This is question 4 (clarity) and the "passing off
+automation as a human" rule applied to copy: a list that looks curated
+must have been curated by someone.
+
+### Side doors are findable, never featured
+
+Owner, 2026-09-26: *"I also want to make sure that the surfaces for
+getting the playlists or using MCP with our site should not distract
+from the core functionality of the apps (finding and playing movies is
+the core functionality, not adding them to IPTV services)."*
+
+Feeds for other apps (IPTV playlists, RSS/Atom, partner indexes) and
+assistant access (an MCP endpoint) are documented on the website and
+never a button, row or menu item in the apps' main surfaces. The core
+verb gets the screen; integrations get a documentation page.
 
 ## Sequencing — when to apply this skill
 

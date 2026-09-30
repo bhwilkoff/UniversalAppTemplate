@@ -1,190 +1,100 @@
 ---
 name: apple-app-store-cli-submission
-description: REFERENCE IMPLEMENTATION (Archive Watch) behind the generic `cloud-appstore-submission` skill — consult AFTER it for the local-CLI pathway and its traps. Build + upload Archive Watch's macOS/iOS/tvOS App Store builds from the command line (no Xcode GUI) — the manual-REST-signing pathway, the ITMS-90111 Xcode-floor trap, the PyJWT venv, per-platform SDK downloads, the tuple-sort type-check gotcha, and screenshots. Invoke before archiving, signing, submitting, or resubmitting any Apple build; when creating an App Store version or submitting for review from the CLI; or when App Review rejects a build for SDK/Xcode/signing reasons.
+description: "The version / release / review half of an Apple App Store ship, from the CLI, behind the generic `cloud-appstore-submission` skill (consult that first for build, sign, upload). Covers tools/asc_release.py (status + ship across IOS / TV_OS / MAC_OS; waits for VALID; refuses to submit without What's New; the three-call reviewSubmissions flow), appstore-submit.yml modes, tools/asc_submit.py (screenshot sets, --audit, --platform), the local submit-appstore.sh pathway, the ITMS-90111 / ITMS-90301 checks, per-platform SDK downloads, release type, and Mac screenshots. Invoke when creating an App Store version, attaching a build, submitting or resubmitting for review, auditing a version, uploading screenshot sets, or when App Review rejects a build for SDK/Xcode/signing reasons."
 ---
 
-# Apple App Store submission (CLI) — Archive Watch
+# Apple App Store submission (CLI): version, release, review
 
-Runbook: `docs/CLOUD-SUBMISSION.md`. Live state + cert ids:
-`mac_app_store_build_pathway` memory. All three Apple apps share ONE App Store
-Connect record (bundle id `com.example.appname`, Decision 042). Android is a
-separate path (`tools/submit-play.sh`, Play Developer API).
+Runbooks: `docs/APPLE-SUBMISSION-CLI.md` (this half) and `docs/CLOUD-SUBMISSION.md` (build, sign, upload). All Apple platforms share ONE App Store Connect record and ONE bundle id (`APPLE_BUNDLE_ID` in `tools/app_config.py`, or the `APP_BUNDLE` repo variable). Android is a separate path (`play-cli-submission`).
 
-## PRIMARY PATH — build in the cloud (the dev Mac is on a BETA macOS)
+**The full ship is CLI. Nobody opens App Store Connect to press Submit, and you never ask the owner to.**
 
-Local builds are REJECTED (ITMS-90301, rule 2) because the dev Mac runs a beta macOS.
-**Build in the cloud instead:**
+## The release
+
 ```
-# bump AppVersion.xcconfig (patch + build) and PUSH first — the runner builds the committed version
-gh workflow run appstore-build.yml -f platform=all     # or mac | ios | tvos
+# bump AppVersion.xcconfig (both numbers), push, then ONE dispatch:
+gh workflow run appstore-build.yml -f platform=all -f notes="What's new"
 ```
-`.github/workflows/appstore-build.yml` runs on a GitHub-hosted **`macos-26`** runner
-(RELEASED macOS + Xcode 26.6 → clears both ITMS-90301 and ITMS-90111), FREE for this
-public repo. It imports the signing `.p12`s from repo secrets into a temp keychain and
-runs `tools/submit-appstore.sh` with `ASC_DIST_CERT_ID`. Validated 2026-06-30 (all three
-at 1.3.249/771). Then the OWNER selects the build in ASC → Submit for Review.
 
-**Re-seeding the signing secrets** (one-time, or if a CI cert changes):
-`tools/ci_make_signing_p12.py <distribution|mac_installer> out.p12 <pw>` mints a dedicated
-cert via the ASC API and bundles it into a **`-legacy`-PBE** `.p12` (macOS `security import`
-can't read OpenSSL-3 default AES-256 PBE), then `gh secret set APPLE_DIST_P12` (base64,
-single-line) etc. CI certs: dist `87TU7L3TBQ`, installer `K8QX4BXZZL`. Apple Distribution
-is capped at 2 certs — reuse, don't keep minting.
+`appstore-build.yml` uploads, waits for the build to go VALID, and runs `asc_release.py ship --submit`. When it uploaded without submitting (no notes, or `submit=false`):
 
-## The local command (only on a RELEASED-macOS machine)
+```
+gh workflow run appstore-submit.yml -f mode=ship -f release_notes="..." -f submit=true
+gh workflow run appstore-submit.yml -f mode=status          # verify from Apple, not the tool
+gh workflow run appstore-submit.yml -f mode=audit -f platform=ios
+```
+
+## tools/asc_release.py
+
+```
+asc_release.py status [--build N]
+asc_release.py ship [--platform all|ios|tvos|mac] [--version X.Y.Z] [--build N]
+                    [--notes T | --notes-file F] [--locale en-US]
+                    [--release-type AFTER_APPROVAL|MANUAL|SCHEDULED]
+                    [--wait-build-minutes 40] [--submit] [--dry-run]
+```
+
+- **Every platform** in `APP_STORE_PLATFORMS` (default `tvos,ios,mac` = `TV_OS`, `IOS`, `MAC_OS`). One version and one reviewSubmission PER platform.
+- **status** is read-only and exits 0 whenever it read everything (reporters never fail). "Not uploaded" / "PROCESSING" print as `::warning::`. A build missing from `v1/builds` is looked up on `buildUploads`, which carries Apple's post-upload errors. A version in review is judged by the build it carries.
+- **ship**, per platform: reuse an editable version and **rename** it to the target string, or create one `AFTER_APPROVAL`; skip (warning, not failure) a platform already waiting for review; `--wait-build-minutes` polls until THIS build is `VALID` on THIS platform; attach (filtered by `preReleaseVersion.platform`); set What's New; set release type; `--submit` runs the three-call flow. A platform that fails stops before submitting; exit 1 only if one failed.
+- **`--submit` with no notes is refused before any network call.** Apple refuses review without whatsNew, but only after versions are created and builds attached.
+- Version string and build number come from `AppVersion.xcconfig`. Pass `--build` when a later commit moved the repo's number past the uploaded build.
+- Errors print every `meta.associatedErrors` entry; that is where Apple's reason lives.
+
+## appstore-submit.yml modes
+
+Pure REST on `ubuntu-latest`; the three `ASC_KEY_*` secrets only.
+
+| mode | runs | platforms |
+|---|---|---|
+| `status` (default) | `asc_release.py status` | all |
+| `ship` | status, `asc_release.py ship --wait-build-minutes 40`, status into the step summary | all or one |
+| `audit` | `asc_submit.py --audit` (exits non-zero on a blocker) | one |
+| `list` | `asc_submit.py --list` | one |
+| `upload` | `asc_submit.py --set ...` from `sets` (+ `replace`, `dry_run`) | one |
+
+`ship` takes `version`, `build`, `release_notes`, `release_type`, `submit` (default **false** here: a bare ship only prepares), `dry_run`. Inputs reach scripts as env; optional flags are `if ... fi`.
+
+## tools/asc_submit.py
+
+Screenshot sets and the audit, for ONE `--platform ios|tvos|mac` (default ios). `--set DISPLAY_TYPE=DIR` (+ `--replace`; without it a non-empty set is skipped); `--audit` (attached build, localisation fields, every screenshot set's delivery state and per-asset errors, age rating, review contact, export compliance, whether an open review submission has items); `--list`, `--status`; `--release-type` alone is legal on a version already in review. Its `--create-version` / `--attach-build` / `--submit` remain for a one-platform fix-up; ship with `asc_release.py`.
+
+## Why submitting looked impossible
+
+`POST /v1/appStoreVersionSubmissions` answers `403 ... does not allow 'CREATE'. Allowed operation is: DELETE`. Deprecated, and the message never says so. Submitting is:
+
+1. `POST /v1/reviewSubmissions` (platform + app)
+2. `POST /v1/reviewSubmissionItems` (the appStoreVersion as an item)
+3. `PATCH /v1/reviewSubmissions/{id}` with `submitted: true`
+
+## The traps (all build and archive GREEN)
+
+1. **A TestFlight upload does not create an App Store version.** Separate records. `ship` opens one.
+2. **Hardcoding `filter[platform]=IOS` ships one app of three** and reports success.
+3. **Builds must be filtered by `preReleaseVersion.platform`.** One number exists once per platform; unfiltered, a random platform's build is attached and Connect says "different platform than the version".
+4. **A wrong version string can't be deleted** (`409 Only the first version of any platform can be deleted`), and Connect accepts a string lower than the live one. Rename it while `PREPARE_FOR_SUBMISSION`.
+5. **A new extension/app target needs its App ID registered.** `asc_profiles.py` registers it. Apple rejects `.` and `_` in a bundle id's *name*.
+6. **An iMessage icon set needs `"platform": "ios"`** on its `universal` and `ios-marketing` entries, or actool silently drops them and emits no `MSMessagesExtensionStoreIconName`.
+7. **`ASC_KEY_P8` is base64**, not raw PEM (`MalformedFraming`).
+8. **An IAP product rides exactly ONE review submission.** Concurrent platform submissions starve each other; ship the product-carrying platform first.
+
+## Release type
+
+Versions are created **`AFTER_APPROVAL`**: an approved build waiting on a button is a silent stall. Release type is logistics, not reviewable content, so it changes even in `WAITING_FOR_REVIEW`: `asc_submit.py --platform ios --release-type MANUAL`.
+
+## The local pathway (only on a RELEASED-macOS machine)
 
 ```
 DEVELOPER_DIR=<released-Xcode>/Contents/Developer tools/submit-appstore.sh <mac|ios|tvos|all>
-```
-It archives → resolves embedded bundle ids → ensures certs → creates an App Store
-profile per bundle id → writes a manual ExportOptions → exports + uploads via the
-ASC API key. Re-running is safe. **Rejected ITMS-90301 if the build machine is on a beta
-macOS** — use the cloud path above. The OWNER selects the build in ASC and hits Submit.
-
-## Load-bearing rules (each cost real time to learn)
-
-1. **Manual signing is REQUIRED — cloud/automatic signing FAILS for this team key**
-   ("Cloud signing permission error" / "No profiles for com.example.appname"),
-   even though the key CAN create certs/profiles via REST. The script signs
-   manually: `asc_certs.py` (Apple Distribution + Mac Installer certs) +
-   `asc_profiles.py` (a profile per bundle id). Don't "simplify" it to automatic.
-
-2. **Two post-upload rejections gate every local build — CHECK BOTH BEFORE building:**
-   - **ITMS-90111 (Xcode/SDK floor, recurring).** The Xcode/SDK is older than Apple's
-     current floor. Diagnose: `WebFetch https://developer.apple.com/news/releases` for
-     the latest **released/RC** Xcode (a build number ending in a lowercase letter, e.g.
-     `27A5194q`, is a BETA — rejected), compare to `xcodebuild -version`; owner installs
-     it (`xcodes install <ver>`, Apple ID + 2FA, not headless), rebuild all three at a
-     fresh build. (First hit 2026-06-30: 26.0 → 26.6.)
-   - **ITMS-90301 ("not accepting applications built with this version of the OS") = the
-     build MACHINE is on a BETA macOS.** A GA Xcode does NOT help — Apple rejects ANY
-     App Store build made on a beta OS. Check `sw_vers` (a BuildVersion ending in a
-     lowercase letter, e.g. `26A5353q`, or `ProductVersion` of an unreleased macOS, is a
-     beta) or `BuildMachineOSBuild` in the archive's app Info.plist. **You cannot fix
-     this by rebuilding on a beta box — don't try.** Build on a RELEASED macOS instead.
-     (Hit 2026-06-30: the dev Mac is on macOS 27 beta `26A5353q`.)
-   - **Both vanish with Xcode Cloud** (Apple's runners = released macOS + released Xcode;
-     `ci_scripts/ci_post_clone.sh` already exists). It's the standing recommendation when
-     the local box is on a beta OS or chasing the Xcode floor. **TestFlight still accepts
-     beta-OS / beta-built binaries** — only App Store *review* is gated, so testing isn't
-     blocked.
-
-3. **PyJWT dependency self-heals.** `asc_certs.py`/`asc_profiles.py` sign the ASC JWT
-   with `import jwt` (PyJWT) + cryptography. Homebrew python3 is PEP-668 and lacks
-   them; the script now auto-provisions `tools/.asc-venv` and runs the cert tools
-   from it. If you bypass the script, put a jwt-capable python on PATH first.
-
-4. **Per-platform device SDKs + Metal are separate Xcode component downloads.** A
-   fresh Xcode needs `-downloadComponent MetalToolchain` (~700 MB; the app has a
-   `.metal` shader — the script auto-installs it) and may need
-   `xcodebuild -downloadPlatform iOS`/`tvOS` if the "Any iOS/tvOS Device"
-   destination shows "not installed". (Xcode `.xip` GA installs usually bundle them.)
-
-5. **Released Xcode only — never beta for review.** The code carries
-   `#if compiler(>=6.4)` guards so macOS/iOS/tvOS-27 symbols compile on BOTH the
-   GA toolchain (uses the `#else` 26 API) and the beta. Any NEW 27-only symbol must
-   be `#if compiler(>=6.4)`-guarded, NOT just `#available` (a runtime check still
-   needs the symbol in the BUILD SDK → fails to COMPILE on GA). Audit:
-   `grep -rn 'available((macOS|iOS|tvOS) 27'`.
-
-6. **tvOS tuple-sort type-check timeout.** `.sorted { (a,b,c) > (a,b,c) }` tuple
-   comparisons "unable to type-check in reasonable time" on the GA toolchain (build
-   fine on beta's newer Swift). Compare field-by-field. tvOS-only files surface this
-   (iOS/macOS don't compile them). Fix wherever a new type-check timeout appears.
-
-## Credentials & secrets (configured)
-
-- ASC API key (TEAM key): ID `G5549XF8RV`, issuer `69a6de74-3929-47e3-e053-5b8c7c11a4d1`,
-  `.p8` at `~/.appstoreconnect/private_keys/` (OUTSIDE the repo). IDs in gitignored
-  `tools/asc-credentials.env` (sourced by the script). Individual keys 401.
-- Existing cert ids: Apple Distribution `7VDL7K5H79`, 3rd Party Mac Installer
-  `T445JWG853` (reused find-first; created+imported only if absent).
-- Bundle ids embedded: iOS = main + `.widgets`; tvOS = main + `.topshelf`; macOS =
-  main only. `.ipa` exports take no installer cert; the macOS `.pkg` does.
-- **Bump BOTH `MARKETING_VERSION` + `CURRENT_PROJECT_VERSION` in AppVersion.xcconfig
-  every build** — App Review burns a build number even on rejection; the next must be
-  ahead. Build numbers can differ per platform but we keep them aligned.
-
-## Disk (the box runs ~97% full)
-
-A fresh Xcode needs ~25-30 GB. Free it: delete the obsolete Xcode app, clear
-`~/Library/Developer/Xcode/DerivedData/*`, `build/*.xcarchive build/*-export`
-between platforms. Don't delete an Xcode app without owner OK (hard to reverse).
-
-## Screenshots
-
-macOS: 16:10, EXACTLY 1280×800 / 1440×900 / 2560×1600 / **2880×1800**. Drive the
-app via `AW_START_TAB` / `AW_START_ITEM` / `AW_CS_TEST` launch hooks; capture by
-REGION from the AX window bounds (SwiftUI exposes no AXWindowNumber) then PIL-frame
-to exact size — `tools/mac-shotset.sh <app>` runs the whole set. Needs Screen
-Recording permission. Any build may produce screenshots (not the submitted binary).
-```
-DEVELOPER_DIR=<released-Xcode>/Contents/Developer \
-  tools/mac-shotset.sh "<DerivedData>/Release/YourApp.app"
+tools/asc_release.py ship --platform <p> --submit --notes-file whats-new.txt --wait-build-minutes 40
 ```
 
----
+Before a local build, check both post-upload rejections:
+- **ITMS-90111 (Xcode floor, recurring).** Compare the latest released/RC Xcode on developer.apple.com/news/releases with `xcodebuild -version`. A build ending in a lowercase letter is a beta.
+- **ITMS-90301 (the build MACHINE is on a beta macOS).** A GA Xcode does not help. Check `sw_vers` or `BuildMachineOSBuild` in the archive's Info.plist. You cannot fix it by rebuilding on a beta box; use the cloud.
 
-## The last mile: creating the version and submitting for review (2026-09-01)
+A fresh Xcode may need `xcodebuild -downloadComponent MetalToolchain` (apps with `.metal` shaders) and `xcodebuild -downloadPlatform iOS` / `tvOS` when "Any iOS Device" shows "not installed". Free ~25-30 GB first (DerivedData, old archives); never delete an Xcode app without the owner's OK.
 
-Everything above ships the **binary**. This section ships the **submission** — the two
-steps that used to require a human in App Store Connect and no longer do.
+## Mac screenshots
 
-Full runbook: `docs/APPLE-SUBMISSION-CLI.md`. Tool: `tools/asc_submit.py`, wrapped by
-`.github/workflows/appstore-submit.yml` (CI, because the ASC issuer id is a repo secret
-and belongs in one place).
-
-```bash
-gh workflow run appstore-submit.yml \
-  -f mode=upload -f create_version=X.Y.Z -f attach_build=N \
-  -f release_notes="..." -f submit=true
-gh workflow run appstore-submit.yml -f mode=audit     # verify from Apple, not the tool
-```
-
-### Why this looked impossible
-
-**`POST /v1/appStoreVersionSubmissions` answers 403:**
-
-```
-The resource 'appStoreVersionSubmissions' does not allow 'CREATE'.
-Allowed operation is: DELETE
-```
-
-That reads as a permissions wall, so the natural conclusion is "the API cannot submit;
-a human must." It is **deprecated**, and the message never says so. The replacement is
-three calls:
-
-1. `POST /v1/reviewSubmissions` — platform + app relationship
-2. `POST /v1/reviewSubmissionItems` — the appStoreVersion as an item
-3. `PATCH /v1/reviewSubmissions/{id}` — `submitted: true`
-
-Apple's model is a submission carrying one or more items (version, IAPs), which is also
-why a version can no longer be sent on its own.
-
-### The other four traps — all of which build and archive GREEN
-
-1. **A TestFlight upload does not create an App Store version.** Separate records. Use
-   `-f create_version=X.Y.Z`.
-2. **A new extension/app target needs its App ID registered** — signing dies with
-   "bundle id not found in App Store Connect ... (register it first)". `asc_profiles.py`
-   now registers it. Apple rejects `.` and `_` in a bundle id's *name*.
-3. **An iMessage icon set needs `"platform": "ios"`** on its `universal` and
-   `ios-marketing` entries, or actool silently drops them and emits no
-   `MSMessagesExtensionStoreIconName`.
-4. **`ASC_KEY_P8` is base64**, not raw PEM — raw fails with
-   `Unable to load PEM file ... MalformedFraming`.
-
-### Release type
-
-Versions are created **`AFTER_APPROVAL`** so approval puts the app on the store with no
-further action. An approved build waiting on a button is a silent stall. Release type
-is logistics, not reviewable content, so `-f release_type=` changes it even while the
-version sits in `WAITING_FOR_REVIEW`.
-
-### Always audit
-
-`-f mode=audit` checks the attached build, required localisation fields, every
-screenshot set's delivery state *and per-asset errors*, age rating, review contact, the
-export-compliance answer, and whether an open review submission actually has items. It
-exits non-zero on a blocker. Run it **before and after** submitting — the tool's own
-success message is not evidence.
+16:10, EXACTLY 1280x800 / 1440x900 / 2560x1600 / 2880x1800. Drive the app with the `APP_START_TAB` / `APP_START_ITEM` env hooks, capture the app's WINDOW by id (`tools/mac_window_shot.swift`, built to `build/bin/winshot`), never a screen region or full screen (both photograph whatever else is on screen), then frame to the exact size (`tools/mac-shotset.sh <app>`). Needs Screen Recording permission. Any build may produce screenshots.

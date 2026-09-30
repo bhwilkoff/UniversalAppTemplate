@@ -593,6 +593,15 @@ diagnosing: a stale build on one device is invisible and explains symptoms it
 did not cause (an Apple TV sat three builds behind an iPad through an entire
 SharePlay debugging session here).
 
+### SharePlay is Apple-only coordination; cross-platform sync is a separate path
+
+SharePlay never exposes the call's audio/video to the app and cannot
+reach Android or the web. For a watch party that spans platforms at
+$0 (server-clock state record, rate-before-seek correction, D1
+polling, room code separate from host key), see
+`cross-platform-multiplayer` "Synced media across platforms at $0".
+Keep SharePlay as the Apple-to-Apple path beside it.
+
 ## Review Checklist
 
 - [ ] Group Activities entitlement (`com.apple.developer.group-session`) added

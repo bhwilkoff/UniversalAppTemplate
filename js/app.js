@@ -44,6 +44,10 @@
 
   /* ---- State ---- */
   let currentView = 'home';
+  let currentItem = null;
+  // Player-level mute (?mute=1 door). Every player reads it, so a harness run
+  // is silent unless it opts in.
+  let playerMuted = false;
 
   /* ================================================================
      VIEW SYSTEM
@@ -136,13 +140,25 @@
     // If authenticated: hide auth, show app, load first view
     // If not: show auth screen
 
-    // URL routing (deep links / bookmarks)
+    // URL routing (deep links / bookmarks). The URL is the web's door — the
+    // twin of the native harness hooks in tools/app_config.py:
+    //   ?view=<tab>          APP_START_TAB     (also a real, shareable URL)
+    //   ?item=<id>           APP_START_ITEM    (also a real, shareable URL)
+    //   ?mute=1              APP_MUTE
+    //   ?door_seconds=<n>    APP_DOOR_SECONDS  (return home after n seconds)
     const params = new URLSearchParams(window.location.search);
     const urlView = params.get('view');
     if (urlView) {
       showView(urlView, true);
     } else {
       showView('home', true);
+    }
+    const urlItem = params.get('item');
+    if (urlItem) currentItem = urlItem; // FILL IN: open the item's detail view
+    if (params.get('mute') === '1') playerMuted = true;
+    const doorSeconds = Number(params.get('door_seconds'));
+    if (doorSeconds > 0) {
+      setTimeout(() => { currentItem = null; showView('home'); }, doorSeconds * 1000);
     }
   }
 

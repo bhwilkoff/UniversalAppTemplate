@@ -51,6 +51,9 @@ jobs:
         run: |
           echo "GOOGLE_WEB_CLIENT_ID=$GOOGLE_WEB_CLIENT_ID" >> gradle.properties
 
+      - name: versionName is read from AppVersion.xcconfig, not a literal
+        run: python3 ../tools/test_version_contract.py
+
       - name: Build debug + unit tests
         if: github.event_name == 'pull_request' || github.event_name == 'push'
         run: ./gradlew :app:assembleDebug :app:testDebugUnitTest --no-daemon

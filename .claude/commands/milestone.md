@@ -9,8 +9,9 @@ Complete the current milestone.
    - Update "Current state": advance active milestone, update next
      actions, clear resolved questions, set last session date
    - Update feature parity table if applicable
-   - Append brief session log entry (state found → work done → state
-     left, one paragraph)
+   - Append a brief session log entry (state found, work done, state
+     left, one paragraph). If that makes more than two entries, move
+     the oldest, word for word, to `docs/SESSION-LOG.md`
 4. If the milestone introduced any non-obvious technical decisions,
    invoke `/decision` to log them in DECISIONS.md.
 5. Confirm with one-line summary of what was completed and what

@@ -25,11 +25,15 @@ PKG="${TV_PKG:-com.example.appname.debug}"   # FILL IN (or export TV_PKG)
 ACT="${TV_ACT:-com.example.appname.MainActivity}"
 ADB="${ADB:-adb}"
 SERIAL="${SERIAL:-emulator-5554}"
+# The debug intent extras are <prefix>_start_<key> and <prefix>_focus_log, and
+# the focus trace is logged under one logcat tag. Match both to what your app reads.
+PREFIX="${TV_EXTRA_PREFIX:-appname}"
+TAG="${TV_FOCUS_TAG:-APPFOCUS}"
 PASS=0
 FAIL=0
 
 key()   { $ADB -s "$SERIAL" shell input keyevent "KEYCODE_DPAD_$1" >/dev/null 2>&1; sleep "${2:-1.1}"; }
-trace() { $ADB -s "$SERIAL" logcat -d -s AWFOCUS 2>/dev/null | sed 's/.*AWFOCUS *: *//' | grep -v '^$'; }
+trace() { $ADB -s "$SERIAL" logcat -d -s "$TAG" 2>/dev/null | sed "s/.*$TAG *: *//" | grep -v '^$'; }
 
 launch() { # launch <extra-flag> <value>
   $ADB -s "$SERIAL" logcat -c >/dev/null 2>&1
@@ -37,21 +41,21 @@ launch() { # launch <extra-flag> <value>
   sleep 2
   $ADB -s "$SERIAL" shell am start \
     -c android.intent.category.LEANBACK_LAUNCHER -a android.intent.action.MAIN \
-    -n "$PKG/$ACT" "$1" aw_start_"$2" "$3" --ez aw_focus_log true >/dev/null 2>&1
+    -n "$PKG/$ACT" "$1" "${PREFIX}_start_$2" "$3" --ez "${PREFIX}_focus_log" true >/dev/null 2>&1
   sleep "${LAUNCH_WAIT:-24}"
 }
 
 # Focus state straight from the accessibility tree.
 #
-# The AWFOCUS trace only sees elements built with our own tvFocusable(), which
+# The focus trace only sees elements built with our own tvFocusable(), which
 # covers the TV-native screens. But the TV also routes to SHARED phone screens
 # (Settings, Playlist, Person, Collection grid) — those carry no trace at all,
 # so a trace-based check would report a false FAILURE on a screen that works,
 # or worse, a false PASS. uiautomator reports what the framework actually
 # focused, whoever built the widget.
 ui_focused() {
-  $ADB -s "$SERIAL" shell uiautomator dump /sdcard/aw_ui.xml >/dev/null 2>&1
-  $ADB -s "$SERIAL" shell cat /sdcard/aw_ui.xml 2>/dev/null \
+  $ADB -s "$SERIAL" shell uiautomator dump /sdcard/appname_ui.xml >/dev/null 2>&1
+  $ADB -s "$SERIAL" shell cat /sdcard/appname_ui.xml 2>/dev/null \
     | tr '>' '\n' | grep 'focused="true"'
 }
 
@@ -99,6 +103,8 @@ surface_route() { # surface_route <route> <expected>
 WANTED=("$@")
 want() { [ ${#WANTED[@]} -eq 0 ] && return 0; for w in "${WANTED[@]}"; do [ "$w" = "$1" ] && return 0; done; return 1; }
 
+# FILL IN: the surfaces below are a worked example from a video-catalog app.
+# Replace the tabs, routes and expected trace labels with your own.
 echo "Android TV focus verification ($SERIAL)"
 echo
 
@@ -112,7 +118,7 @@ want collections && surface_route collections     "collection:"
 want decade      && surface_route "decade:1920"   "tile:"
 want cartoon     && surface_route cartoon         "tile:|focusable"
 
-# Shared phone screens the TV routes to. These have no AWFOCUS trace, so they
+# Shared phone screens the TV routes to. These have no focus trace, so they
 # are asserted against the accessibility tree instead — and they are exactly
 # where an unreachable control hides, because they were never designed for a
 # remote.

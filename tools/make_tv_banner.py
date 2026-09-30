@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-make_tv_banner.py — render the Archive Watch TV banner at BOTH sizes it is
-needed in, from the one photographic master.
+make_tv_banner.py — render the app's TV banner at BOTH sizes it is
+needed in, from the one icon master.
 
 There are two different "TV banners" and conflating them costs a submission:
 
@@ -14,26 +14,40 @@ There are two different "TV banners" and conflating them costs a submission:
 The store asset is rendered NATIVELY at 1280x720 rather than upscaled from the
 320 version, which would be a visibly soft 4x blowup on a 10-foot screen.
 
-Source of truth for the artwork is `AppIcon.appiconset/icon-1024.png` — the
-photographic 1902 "Le Voyage dans la Lune" still. Do NOT reintroduce an
-illustrated moon (owner directive; the SVG masters were deleted).
+Source of truth for the artwork is the ONE canonical 1024px icon master
+(APP_ICON_1024). Derive every banner from it; a second master drifts.
+
+The wordmark is the product name (BANNER_TITLE, else app_config.PRODUCT_NAME):
+the first word in white, the rest in the brand color. BANNER_TAGLINE adds an
+optional small line underneath.
 
 Usage:  python3 tools/make_tv_banner.py [--check]
         --check verifies the committed files match a fresh render.
 """
 
+import os
 import sys
 from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+try:
+    import app_config as _cfg  # noqa: E402
+except Exception:              # pragma: no cover - a template with no config yet
+    _cfg = None
+
 REPO = Path(__file__).resolve().parent.parent
-MASTER = REPO / __import__("os").environ.get("APP_ICON_1024", "branding/icon-1024.png")  # FILL IN: your 1024px icon master
+_WORDS = (os.environ.get("BANNER_TITLE") or getattr(_cfg, "PRODUCT_NAME", "AppName")).upper().split()
+TITLE_1 = _WORDS[0] if _WORDS else "APP"
+TITLE_2 = " ".join(_WORDS[1:])
+TAGLINE = os.environ.get("BANNER_TAGLINE", "").upper()
+MASTER = REPO / os.environ.get("APP_ICON_1024", "branding/icon-1024.png")  # FILL IN: your 1024px icon master
 STORE_OUT = REPO / "assets/tv/tv-banner-1280x720.png"
 APK_OUT = REPO / "android/app/src/main/res/drawable-xhdpi/tv_banner.png"
 
 INK = (10, 10, 10)             # near-black field, matches the app's dark-first chrome
-ORANGE = (255, 92, 53)         # --color-primary, marquee orange
+ORANGE = (255, 92, 53)         # --color-primary
 WHITE = (255, 255, 255)
 MUTED = (176, 176, 176)
 
@@ -86,7 +100,7 @@ def render(w: int, h: int) -> Image.Image:
     img = Image.new("RGB", (w, h), INK)
     draw = ImageDraw.Draw(img)
 
-    # Left: the film-framed still, centre-cropped to a column narrower than a
+    # Left: the icon art, centre-cropped to a column narrower than a
     # square so the wordmark gets real room on a 16:9 canvas.
     art_w = int(w * 0.40)
     art = Image.open(MASTER).convert("RGB")
@@ -99,21 +113,28 @@ def render(w: int, h: int) -> Image.Image:
     tx = art_w + pad
     avail = w - tx - pad
 
-    f_title, trk = _fit(draw, "ARCHIVE", BOLD_FACES, avail, 0.06, int(h * 0.24))
-    f_sub, sub_trk = _fit(draw, "PUBLIC DOMAIN CINEMA", PLAIN_FACES, avail, 0.16, int(h * 0.075))
+    # One size for both title lines, fitted to the longer, so they match.
+    longest = max((TITLE_1, TITLE_2), key=len)
+    f_title, trk = _fit(draw, longest, BOLD_FACES, avail, 0.06, int(h * 0.24))
     title_h = f_title.size
-    sub_h = f_sub.size
-
+    lines = 2 if TITLE_2 else 1
     line_gap = int(title_h * 0.18)
     rule_gap = int(h * 0.055)
-    block_h = title_h * 2 + line_gap + rule_gap + sub_h
+    block_h = title_h * lines + line_gap * (lines - 1)
+    if TAGLINE:
+        f_sub, sub_trk = _fit(draw, TAGLINE, PLAIN_FACES, avail, 0.16, int(h * 0.075))
+        block_h += rule_gap + f_sub.size
     y = (h - block_h) // 2
 
-    _tracked(draw, (tx, y), "ARCHIVE", f_title, WHITE, trk)
-    y += title_h + line_gap
-    _tracked(draw, (tx, y), "WATCH", f_title, ORANGE, trk)
-    y += title_h + rule_gap
-    _tracked(draw, (tx, y), "PUBLIC DOMAIN CINEMA", f_sub, MUTED, sub_trk)
+    _tracked(draw, (tx, y), TITLE_1, f_title, WHITE, trk)
+    y += title_h
+    if TITLE_2:
+        y += line_gap
+        _tracked(draw, (tx, y), TITLE_2, f_title, ORANGE, trk)
+        y += title_h
+    if TAGLINE:
+        y += rule_gap
+        _tracked(draw, (tx, y), TAGLINE, f_sub, MUTED, sub_trk)
     return img
 
 

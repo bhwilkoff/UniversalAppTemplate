@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Catch the ways a workflow can be broken while reporting success.
 
-(Incident names below refer to Archive Watch, this tool's origin repo —
+(Incident names below come from the production repo this tool was built in —
 they are the failure CLASSES this catches, kept as worked examples.)
 
-Every failure found in this repo's CI has been of that kind, not a red X:
+Every failure found in that repo's CI was of this kind, not a red X:
 
   * `word-index` logged "audio download failed" for months. The download was
     fine; a Python import was missing, AFTER it. Green, 260 minutes, 0 films.
@@ -27,7 +27,19 @@ workflow's last run actually PRODUCED and flags the patterns:
   DRAINED    genuinely finished its backlog but still running at full cadence
   SILENT     no yield line at all — cannot be judged, which is its own problem
 
-Exit code is non-zero when anything needs attention, so it can gate a workflow.
+It is a REPORTER, and reporters never fail: the exit code is 0 whenever the
+audit itself ran. A red X means "this run could not do its job"; failing the
+auditor to signal somebody ELSE's problem is a category error, and an alert
+channel that cries wolf gets muted — after which a real break goes unread. The
+urgent findings (BROKEN, KILLED) go to ONE self-closing GitHub issue instead:
+`tools/report_workflow_health.py` reads these printed lines back.
+
+Config (env):
+  GITHUB_REPOSITORY   owner/repo to audit (set on every Actions runner)
+  NO_YIELD_LINE       extra comma-separated workflow names whose runs print no
+                      yield line (their failures still count; only the yield
+                      analysis is skipped)
+  LOOKBACK_HOURS, REAL_WORK_MINUTES
 """
 
 from __future__ import annotations
@@ -42,19 +54,26 @@ from datetime import datetime, timedelta, timezone
 
 REPO = os.environ.get("GITHUB_REPOSITORY", "")
 _REPO_DIR = pathlib.Path(__file__).resolve().parents[1]
-# These do not produce catalog yield and never will: they build, deploy, probe
-# or sweep. Flagging them as SILENT is noise that trains a reader to skim.
-NOT_PRODUCERS = set(
-    n.strip() for n in os.environ.get(
-        "NOT_PRODUCERS",
-        # Sensible defaults for this template's own workflows; extend per app
-        # via the NOT_PRODUCERS env (comma-separated workflow names). Always
-        # include this workflow's own name — judging its own last run makes
-        # one failure permanent.
-        "Workflow health,Deploy Pages,pages-build-deployment,"
-        "Retry infrastructure failures,App Store build (cloud),Android Build",
-    ).split(",") if n.strip()
-)
+WORKFLOWS_DIR = _REPO_DIR / ".github" / "workflows"
+# Workflows whose runs print no yield line: they build, deploy, submit or sweep. A GREEN run of one of these says
+# nothing about what it did, so the SILENT / BROKEN / DRAINED analysis is
+# meaningless for them — but a FAILED one is failed like any other.
+#
+# This set used to be NOT_PRODUCERS and meant "skip entirely", and that is how
+# the workflow that shipped an app's catalog failed every hour for two days
+# completely unreported: it was on the list because it prints no yield
+# summary, and the list was being read as "never look at it". A failure is a
+# failure whoever produced it. Extend per app via the NO_YIELD_LINE env.
+NO_YIELD_LINE = {
+    "Android Build", "App Store build (cloud)",
+    "App Store submit (version, review, screenshots)", "Play release",
+    "Deploy Pages", "pages-build-deployment", "Retry infrastructure failures",
+    "Pulse",
+} | {n.strip() for n in os.environ.get("NO_YIELD_LINE", "").split(",") if n.strip()}
+
+# Judged not at all. Judging its own last run makes one failure permanent: it
+# fails, then reports that failure as a finding, which fails it again.
+SELF = {"Workflow health"}
 LOOKBACK_HOURS = int(os.environ.get("LOOKBACK_HOURS", "36"))
 # A run that took longer than this and produced nothing is not "no work to do".
 REAL_WORK_MINUTES = float(os.environ.get("REAL_WORK_MINUTES", "10"))
@@ -93,19 +112,68 @@ def minutes(run: dict) -> float:
         return 0.0
 
 
+
+_SELF_CANCELLING: dict[str, bool] = {}
+
+
+def self_cancelling(name: str) -> bool:
+    """Does this workflow ASK to be cancelled when a newer run arrives?
+
+    `concurrency.cancel-in-progress: true` is a deliberate choice — Deploy Pages
+    makes it because a static site only needs the newest deploy, and because two
+    overlapping deploys collide on the Pages API. A run cancelled by that rule is
+    the rule WORKING, and reporting it as KILLED is the auditor alerting on a
+    design decision. Read it from the workflow file rather than keeping a list of
+    exempt names, so a new workflow gets the right treatment for free.
+    """
+    if name in _SELF_CANCELLING:
+        return _SELF_CANCELLING[name]
+    try:
+        import yaml                                  # noqa: PLC0415
+    except ImportError:
+        # This tool had no third-party dependency before, and Pulse shells out
+        # to it. Failing to START over a convenience would be a worse fault than
+        # the false KILLED it prevents, so degrade: assume NOT self-cancelling,
+        # which only re-enables an alert rather than silencing one.
+        _SELF_CANCELLING[name] = False
+        return False
+    hit = False
+    for f in sorted(WORKFLOWS_DIR.glob("*.y*ml")):
+        try:
+            doc = yaml.safe_load(f.read_text()) or {}
+        except Exception:                            # noqa: BLE001
+            continue
+        if doc.get("name") != name:
+            continue
+        conc = doc.get("concurrency")
+        if isinstance(conc, dict) and conc.get("cancel-in-progress") is True:
+            hit = True
+        for job in (doc.get("jobs") or {}).values():
+            jc = job.get("concurrency") if isinstance(job, dict) else None
+            if isinstance(jc, dict) and jc.get("cancel-in-progress") is True:
+                hit = True
+        break
+    _SELF_CANCELLING[name] = hit
+    return hit
+
+
 URGENT_SEVERITIES = ("BROKEN", "KILLED")
+# Appended to a finding's printed line when its fix is already in flight. The
+# reporter (tools/report_workflow_health.py) reads the printed lines back and
+# keys on this exact text, so it is the contract between the two scripts.
+FIX_IN_FLIGHT = "may already be fixed and awaiting its next scheduled run"
 
 
 def urgent_findings(findings):
-    """The findings that should FAIL the job — i.e. send the owner an email.
+    """The findings that go to the workflow-health issue (never a red X here).
 
     Only the failures NOTHING ELSE alerts for. A FAILED run already sent the
-    owner its own failure email from GitHub, so failing this job over it is a
-    second alert for the same event, repeated daily until the fix lands —
-    which is how the owner came to ask for the alerts to stop. BROKEN (green
-    but produced nothing) and KILLED (cancelled, which GitHub never emails
-    about) have no other voice; those still fail the job. FAILED and STALE
-    stay in the report, where a reader of the summary sees them.
+    owner its own failure email from GitHub, so raising it again is a second
+    alert for the same event, repeated daily until the fix lands — which is
+    how the owner came to ask for the alerts to stop. BROKEN (green but
+    produced nothing) and KILLED (cancelled, which GitHub never emails about)
+    have no other voice; those go to the issue. FAILED and STALE stay in the
+    report, where a reader of the summary sees them.
 
     A finding whose fix is already in flight (a later manual run succeeded, so
     the schedule simply has not had its say yet) is REPORTED but not failed.
@@ -157,15 +225,56 @@ def cron_period_hours(path: str) -> float | None:
     return best
 
 
-def judge(name: str, run: dict) -> tuple[str, str] | None:
-    """Return (severity, explanation) when this run deserves a human's attention."""
+def displaced(run: dict) -> bool:
+    """Was this run destroyed in the concurrency queue before anything ran?
+
+    Such a run carries NO information about the workflow's health — it never
+    left the queue. Cached because both `judge` and the run-selection ask.
+
+    Displacement happens at JOB granularity too, and testing only the
+    whole-run case is why this failed EVERY DAY on a self-healing condition.
+    In a compute/apply split writer, the `probe` job succeeds and banks its
+    deltas as an artifact while the short `apply` job sits pending on the
+    shared writers' lock; GitHub keeps one pending job per group, so a newer
+    arrival destroys it with ZERO steps. `any(steps)` then sees the probe's
+    ten steps, the run is judged KILLED, and KILLED is urgent — a red X and an
+    email, daily, for a run `retry_infra_failures` re-runs on its own. This is
+    the SAME test that sweeper already makes; the two must not disagree about
+    what a displaced job looks like.
+    """
+    if run.get("conclusion") != "cancelled":
+        return False
+    if run["id"] not in _DISPLACED:
+        jobs = api(f"actions/runs/{run['id']}/jobs").get("jobs", [])
+        whole = not any(j.get("steps") for j in jobs)
+        bad = [j for j in jobs
+               if j.get("conclusion") not in ("success", "skipped", "neutral")]
+        # Some jobs finished and every job that did NOT has zero steps: the
+        # work exists, only a queued job was displaced.
+        partial = bool(jobs) and bool(bad) and not any(j.get("steps") for j in bad)
+        _DISPLACED[run["id"]] = whole or partial
+    return _DISPLACED[run["id"]]
+
+
+_DISPLACED: dict = {}
+
+
+def judge(name: str, run: dict, yield_ok: bool = True) -> tuple[str, str] | None:
+    """Return (severity, explanation) when this run deserves a human's attention.
+
+    `yield_ok` is False for a workflow that prints no summary line: its green
+    runs are not analysed for yield, but every other verdict still applies.
+    """
     concl = run.get("conclusion")
     mins = minutes(run)
 
     if concl == "cancelled":
+        if self_cancelling(name):
+            return None                # it asked to be superseded; that is the rule working
+        if displaced(run):
+            return ("DROPPED", "a job was displaced in the concurrency queue "
+                               "before it ran a step; the sweeper re-runs it")
         jobs = api(f"actions/runs/{run['id']}/jobs").get("jobs", [])
-        if not any(j.get("steps") for j in jobs):
-            return ("DROPPED", "displaced in the concurrency queue before any step ran")
         skipped = [s["name"] for j in jobs for s in j.get("steps", [])
                    if s.get("conclusion") == "skipped"]
         publishy = [s for s in skipped if re.search(r"publish|commit|upload|rebuild", s, re.I)]
@@ -176,6 +285,9 @@ def judge(name: str, run: dict) -> tuple[str, str] | None:
 
     if concl != "success":
         return ("FAILED", f"conclusion={concl}")
+
+    if not yield_ok:
+        return None                # green, and it was never going to say more
 
     # Green. Did it do anything?
     log = gh("run", "view", str(run["id"]), "--log")
@@ -211,6 +323,9 @@ def judge(name: str, run: dict) -> tuple[str, str] | None:
 
 
 def main() -> int:
+    if not REPO:
+        print("set GITHUB_REPOSITORY=owner/repo (Actions sets it) — nothing audited")
+        return 0
     workflows = [w for w in api("actions/workflows?per_page=100").get("workflows", [])
                  if w.get("state") == "active" and w.get("path", "").startswith(".github")]
     cutoff = datetime.now(timezone.utc) - timedelta(hours=LOOKBACK_HOURS)
@@ -236,12 +351,22 @@ def main() -> int:
         # consecutive scheduled failures (2026-08-18, 08-19) hidden behind
         # exactly that on 08-20.
         sched = [r for r in runs if r.get("event") == "schedule"]
-        run = sched[0] if sched else runs[0]
+        # A DISPLACED scheduled run never left the queue, so it is evidence of
+        # nothing — and standing it up as the verdict silences whatever else
+        # has been happening. Prefer the newest scheduled run that actually
+        # ran; if every recent one was displaced, say so AND judge the newest
+        # completed run of any event, because a failing dispatch on top of a
+        # schedule that never gets to start is real evidence that something is
+        # broken. (A SUCCESSFUL dispatch still cannot mask a failed schedule:
+        # this fires only when no scheduled run ran at all.)
+        alive = [r for r in sched if not displaced(r)]
+        all_displaced = bool(sched) and not alive
+        run = alive[0] if alive else runs[0]
         try:
             started = datetime.fromisoformat(run["run_started_at"].replace("Z", "+00:00"))
         except Exception:
             continue
-        if w["name"] in NOT_PRODUCERS:
+        if w["name"] in SELF:
             continue
         # Window sized to THIS workflow's cadence, not a fixed 36h. A weekly
         # job's newest run is always older than 36h, so the old fixed cutoff
@@ -263,7 +388,12 @@ def main() -> int:
                              f"cadence is ~{period:.0f}h", False))
             continue
         checked += 1
-        verdict = judge(w["name"], run)
+        if all_displaced:
+            findings.append(("DROPPED", w["name"],
+                             "every recent SCHEDULED run was displaced in the "
+                             "concurrency queue — the cadence is not running",
+                             False))
+        verdict = judge(w["name"], run, w["name"] not in NO_YIELD_LINE)
         if verdict:
             why = verdict[1]
             # A monthly workflow cannot confirm a fix for up to a month, so a
@@ -280,7 +410,7 @@ def main() -> int:
             if newer_ok:
                 why += (f" — but a manual run on "
                         f"{newer_ok[0]['run_started_at'][:10]} SUCCEEDED, so this "
-                        f"may already be fixed and awaiting its next scheduled run")
+                        f"{FIX_IN_FLIGHT}")
             # A later successful DISPATCH means a fix has shipped and the
             # schedule has not had its say yet. Still REPORTED, but it must not
             # fail the job: GitHub emails on failure, and a check that is red
@@ -306,6 +436,9 @@ def main() -> int:
     deferred = [f for f in findings if f[3]]
     already_alerted = [f for f in findings if f[0] == "FAILED" and not f[3]]
     print(f"\n{len(findings)} finding(s); {len(urgent)} need action rather than a decision.")
+    if urgent:
+        print("The urgent ones go to the workflow-health issue "
+              "(tools/report_workflow_health.py); this run itself stays green.")
     if deferred:
         print(f"{len(deferred)} already have a fix in flight (a later manual run "
               f"succeeded) and are awaiting their next scheduled run — reported, "
@@ -313,8 +446,9 @@ def main() -> int:
     if already_alerted:
         print(f"{len(already_alerted)} FAILED finding(s) already sent their own "
               f"alert (GitHub emails on a failed run) — reported here, not "
-              f"re-failed (Decision 093).")
-    return 1 if urgent else 0
+              f"re-failed (GitHub already emailed).")
+    # Reporters never fail: the audit ran, so this run did its job.
+    return 0
 
 
 if __name__ == "__main__":

@@ -86,3 +86,7 @@ AuthKey_*.p8
 asc-credentials.env
 *_keys.env
 Secrets.xcconfig
+
+# The bench manifest names real devices (UDIDs, IPs, account labels) — per machine.
+# Start from tools/bench.example.json; ~/.device-bench.json is the machine-wide home.
+tools/bench.json

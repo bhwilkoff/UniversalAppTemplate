@@ -1,7 +1,6 @@
-> PORTED FROM ARCHIVE WATCH as research reference. App-specific numbers
-> and host names are that app's; the method and platform facts travel.
-
 # Research: watch-state sync architecture (2026-08-17)
+
+> Research done for Archive Watch on 2026-08-17, ported here 2026-08-24 as a historical reference. App-specific numbers and host names are that app's; the method and platform facts travel.
 
 Commissioned after the owner reported devices disagreeing on history/watched
 state despite the hand-rolled CloudKit sync. Full agent findings, condensed;
@@ -11,8 +10,8 @@ sources at bottom. Feeds the playback-quality program's sync track.
 
 The hand-rolled four-fixed-record design cannot converge on tvOS by
 construction:
-- It has NO push path. CKDatabaseSubscription only tracks CUSTOM zones —
-  the fixed records live in the default zone (chosen to dodge the CKQuery
+- It has NO push path. CKDatabaseSubscription only tracks CUSTOM zones.
+  The fixed records live in the default zone (chosen to dodge the CKQuery
   queryable-index trap), so no subscription can ever fire for them.
 - tvOS loses foreground the moment the user goes Home or the TV sleeps; the
   60s timer stops; nothing wakes the app. "Device B stale" is the expected
@@ -25,7 +24,7 @@ auto-created subscriptions + push-triggered fetch while frontmost, server
 change tokens (cheap on-activation fetch), retry/scheduling. Realistic
 convergence: seconds-to-~15s frontmost; on-launch otherwise (pause on ATV A,
 walk to ATV B, launch → converged before the Detail screen). Simulator gets
-no CloudKit pushes — device-only verification.
+no CloudKit pushes, so verification is device-only.
 
 SwiftData+CloudKit mirroring REJECTED for this app: bans @Attribute(.unique)
 (archiveID keys), fails silently on violations, unforceable opaque scheduler,
@@ -48,31 +47,31 @@ conflict errors; one engine per database; let the engine self-schedule.
    (fetchChanges() IS Sync Now).
 
 ## Merge semantics verdict
-- Favorites: current union+tombstone is a textbook OR-set — keep (simplifies
+- Favorites: current union+tombstone is a textbook OR-set. Keep it (simplifies
   to record-exists/record-deleted with per-item records).
 - Resume position: LWW right, granularity wrong → per-item LWW by modifiedAt
   (deviceID tiebreak). "completed" merges by OR, never LWW.
 - Play history/counts: LWW is WRONG. Append-only PlayEvent union (immutable
   {archiveID, date, secondsWatched} per event; merge = set union). Count and
   last-watched are DERIVED. Compact old events client-side.
-- Playlists: per-playlist LWW by modifiedAt is the industry norm — keep.
+- Playlists: per-playlist LWW by modifiedAt is the industry norm. Keep.
 
 ## History vs Watched UX (the Trakt model = the standard)
 - History = chronological log of dated PLAY EVENTS; a title may repeat;
   entries individually deletable.
 - Watched = DERIVED per-title state (played-to-completion at least once, OR
-  manual override); shown as a checkmark/badge on tiles + a Detail toggle —
+  manual override); shown as a checkmark/badge on tiles + a Detail toggle,
   NOT a separate content list. "Mark unwatched" clears flag + resume, never
   deletes history.
 - Continue Watching = progress-derived, third and separate.
 - Confusion arises exactly when apps present overlapping lists that conflate
-  state/event/progress claims — the fix is one derivation direction, not one
+  state/event/progress claims. The fix is one derivation direction, not one
   list.
 
 ## Google Drive appDataFolder notes (Android/web plane)
 - drive.appdata = non-sensitive scope: no verification/CASA audit needed.
 - PUBLISH the OAuth consent screen to Production (no review needed for
-  non-sensitive scopes) — in Testing status refresh tokens die every 7 days.
+  non-sensitive scopes). In Testing status, refresh tokens die every 7 days.
 - Browser PWA: ~1h access tokens, no refresh token → sync-on-open model, not
   standing credential. Authorized origins must include https://archivewatch.org.
 

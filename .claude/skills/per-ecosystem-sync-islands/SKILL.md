@@ -1,6 +1,6 @@
 ---
 name: per-ecosystem-sync-islands
-description: Use when adding sync of user state (favorites, progress, playlists, preferences) across devices, when adding sign-in, or when tempted to stand up a sync backend. Carries the sync-islands architecture (CloudKit private DB for Apple, Google Drive App Data for Android+Web — the user's own cloud, no server to run), the query-free CloudKit record pattern that replaced a never-worked CKQuery design, tombstones + last-writer-wins merge, optional sign-in gating only sync, and user-visible sync status. Triggers on CloudKit, sync, iCloud, Drive App Data, sign in with Apple, sign in with Google, favorites sync, cross-device, "needs a backend", tombstone, last writer wins.
+description: "Use when adding sync of user state (favorites, progress, playlists, preferences) across devices, when adding sign-in, or when tempted to stand up a sync backend. Carries the sync-islands architecture (CloudKit private DB for Apple, Google Drive App Data for Android+Web — the user's own cloud, no server to run), the query-free CloudKit record pattern that replaced a never-worked CKQuery design, tombstones + last-writer-wins merge, optional sign-in gating only sync, and user-visible sync status. Also the web bridging both islands (CloudKit JS + Drive, one merge, tombstones both ways, per-environment CloudKit JS tokens). Triggers on CloudKit, sync, iCloud, Drive App Data, sign in with Apple, sign in with Google, favorites sync, cross-device, \"needs a backend\", tombstone, last writer wins, CloudKit JS, web sign in with Apple, Android OAuth client SHA-1."
 ---
 
 # Per-Ecosystem Sync Islands
@@ -27,10 +27,12 @@ existing one.
 - Web + Android sharing one Drive folder means a user signed into
   the same Google account converges across them for free — a bonus,
   not a backend. Namespace per platform only if isolation is wanted.
-- **No cross-ecosystem sync.** Apple syncs with Apple, Google with
-  Google. Accept the asymmetry; record it in PARITY.md. A neutral
-  backend is the explicitly-rejected alternative (unneeded
-  complexity for personal-state payloads).
+- **No cross-ecosystem sync between NATIVE apps.** Apple syncs with
+  Apple, Google with Google. Accept the asymmetry; record it in
+  PARITY.md. A neutral backend is the explicitly-rejected alternative
+  (unneeded complexity for personal-state payloads). The one exception
+  is a client, not a server: the web can sign in to BOTH islands (see
+  "The web bridges the islands").
 
 ## The non-negotiables
 
@@ -106,3 +108,53 @@ an optimization, not the spine.
   builds stay green before the human adds capabilities in Xcode —
   capability-gated features can live in the tree without breaking
   anyone.
+
+## The web bridges the islands
+
+The browser is the one client that can hold both clouds (Archive
+Watch, Decision 102, verified on hardware):
+
+- **Apple island from the web:** Apple's CloudKit JS signs the viewer
+  in with Apple and reads/writes the SAME container, record type and
+  fixed-ID blobs the Apple apps use. No server of ours, no Apple
+  secret in the page; the API token is public by design.
+- **Google island from the web:** the same Drive App Data file
+  Android uses.
+- **One merge function** (one JS module) applied to both, so a browser
+  signed into both is where the islands converge. Tombstones travel
+  BOTH ways; a store that union-merges without them resurrects every
+  deletion. Grep every sync client's header for "tombstones not yet"
+  style TODOs; AW's Android + web had inherited the pre-tombstone
+  design.
+- Two buttons, not one: a viewer in one ecosystem sees one button do
+  everything they need.
+
+Traps:
+
+- **A CloudKit JS API token belongs to ONE environment.** The iCloud
+  dashboard opens on Development by default; the web client configures
+  `production` (matching the shipped apps' deployed schema). A
+  Development token renders the Sign in with Apple button and fails
+  every request. Also: allow Sign in with Apple on the token and set
+  its allowed origins (add localhost only for local testing).
+- **A feature gated on a credential nobody has is never tested.** AW's
+  Drive sync sat dormant for months behind a missing OAuth client; when
+  switched on, it dropped the consent `PendingIntent` Google returns on
+  EVERY first authorization, so the one path every user takes was the
+  untested one. Before calling a dormant feature done, drive its
+  first-run path with a real credential on a real device.
+- **An Android OAuth client is keyed on package + ONE signing
+  certificate.** Register the Play app-signing key, the upload key, and
+  the debug package/key separately. Missing the Play signing one fails
+  only in production. Google allows a package + SHA-1 pair in only one
+  Cloud project, so decide which project owns Android before adding a
+  second scope.
+- **Keep `drive.appdata` the only scope**: it is non-sensitive, so the
+  consent screen needs no verification and has no 100-user cap. Adding a
+  sensitive scope to that project changes both.
+- **Exclude the merge's own writes from the sync trigger**, or applying
+  a pull schedules the next push forever.
+
+Sign-in flows themselves (PKCE vs Device Code, redirect scheme,
+refresh-token persistence, the missing-credential state): see
+`authentication` "Installed-app OAuth to third-party providers".

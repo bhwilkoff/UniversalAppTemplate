@@ -1,4 +1,4 @@
-# CI Fleet Engineering — running 30+ scheduled workflows without losing work or crying wolf
+# CI Fleet Engineering: running 30+ scheduled workflows without losing work or crying wolf
 
 Distilled from Archive Watch (2026-06 → 2026-08), where a data pipeline grew to
 ~35 scheduled workflows sharing one repository, and every rule below was paid
@@ -7,7 +7,7 @@ shapes ship in `docs/templates/`. Decision numbers refer to Archive Watch's
 DECISIONS.md, kept so the full incident write-ups stay findable.
 
 The one-sentence doctrine: **a green run must have done something, a red run
-must mean something, and no run may destroy work — its own or another's.**
+must mean something, and no run may destroy work, its own or another's.**
 
 ---
 
@@ -18,7 +18,7 @@ must serialize through one concurrency group. Two facts about GitHub's
 concurrency model then dominate everything:
 
 - **GitHub keeps ONE pending run per group.** A newer arrival does not queue
-  behind an existing pending run — it DESTROYS it. Archive Watch measured 7
+  behind an existing pending run. It DESTROYS it. Archive Watch measured 7
   scheduled runs destroyed in a single 12-hour window while one job held the
   lock for 4 hours.
 - **The same rule applies at JOB granularity** for job-level concurrency: a
@@ -36,11 +36,11 @@ concurrency model then dominate everything:
   accumulator read hours earlier silently REVERTS whatever another writer
   published meanwhile. A field-level merge composes; a snapshot republish
   does not.
-- The lock is declared at WORKFLOW level by default — splitting into two jobs
+- The lock is declared at WORKFLOW level by default. Splitting into two jobs
   changes nothing until the top-level `concurrency:` is removed and
   re-declared on the apply job alone.
 - Gate every apply step on a "Stop if nothing changed" check, and validate
-  with `tools/check_workflow_gates.py` in CI — an ungated step after the gate
+  with `tools/check_workflow_gates.py` in CI. An ungated step after the gate
   runs against a catalog that is not there.
 - Long whole-run holders that also push to git (ingest pipelines) need care:
   convert them last, deliberately.
@@ -49,13 +49,13 @@ concurrency model then dominate everything:
 
 A job killed by `timeout-minutes` never reaches its publish steps; the run's
 work is computed and then discarded. Archive Watch had a workflow that hit its
-330-minute wall on all 15 of its first 15 runs — 15 "cancelled", zero
+330-minute wall on all 15 of its first 15 runs: 15 "cancelled", zero
 publishes, every day's work thrown away.
 
 - Every long tool takes `--max-minutes` and **stops starting new items** past
   it, returning 0 so the caller publishes what finished.
 - **Measure the budget from process start (D091)**, not from the start of the
-  expensive loop — a network-bound setup phase before the deadline computation
+  expensive loop. A network-bound setup phase before the deadline computation
   once made the effective budget 204 minutes against a 180-minute timeout.
 - **The budget must be able to fire inside one item.** A between-items check
   is defeated by a single expensive item: a 2,500-cue film was an hour of
@@ -66,14 +66,14 @@ publishes, every day's work thrown away.
   `continue-on-error`, and let a final **verdict step** decide the run
   (section 5).
 - On a mid-item abort, either discard that item's partial output or make the
-  resume marker transactional — partial rows without the "done" marker get
+  resume marker transactional. Partial rows without the "done" marker get
   re-inserted in full next run and duplicate.
 
 ## 3. Restores never swallow; publishes never shrink (D020/D089)
 
 The deadliest green run: `gh release upload --clobber` DELETES the asset
 before uploading, a large raw upload 422'd (2 GB asset cap), both assets
-vanished — and the next run's restore had `|| echo "first run"`, so it
+vanished, and the next run's restore had `|| echo "first run"`, so it
 rebuilt the shared index from zero and republished over it. 702,148 rows
 destroyed by a run that reported success.
 
@@ -81,20 +81,20 @@ destroyed by a run that reported success.
   asset cannot be fetched is an emergency: fail the step. Never `|| true` a
   restore.
 - **Snapshot row counts immediately after restore and refuse a shrunken
-  publish** — `tools/sqlite_publish_guard.py snapshot` / `check`. Growth and
+  publish** (`tools/sqlite_publish_guard.py snapshot` / `check`). Growth and
   equality pass; any table shrinking is a hard failure naming the numbers.
-- Never upload a raw multi-hundred-MB member nothing consumes — publish the
+- Never upload a raw multi-hundred-MB member nothing consumes. Publish the
   compressed form only (raw DEFLATE `.zz`, wbits=-15, matches Apple's
   Compression framework on device).
 - Gate the publish on the restore: `if: always() &&
   steps.restore.outcome == 'success'`. `always()` exists so a killed compute
   still publishes; it must never let a failed restore publish garbage.
 - Rebuild-style workflows must MERGE into the fetched accumulator and abort
-  if the result shrinks (D020) — never publish a from-scratch build as the
+  if the result shrinks (D020). Never publish a from-scratch build as the
   whole dataset.
 - Wrap every `gh release upload` in `tools/gh_retry.sh` (retries transients,
   refuses to retry the deterministic 422-too-large), and every fire-and-forget
-  dispatch in `tools/gh_dispatch.sh` (warns and exits 0 — a failed dispatch of
+  dispatch in `tools/gh_dispatch.sh` (warns and exits 0, because a failed dispatch of
   an idempotent, self-scheduled pipeline must not fail a clean run).
 
 ## 4. Dropped work heals itself (D048/D057/D095)
@@ -102,13 +102,13 @@ destroyed by a run that reported success.
 `tools/retry_infra_failures.py` runs on a 30-minute cron and re-runs exactly
 three shapes, each carrying a no-side-effect proof:
 
-1. **Never-started runs** — runner-allocation failures where no step of ours
+1. **Never-started runs**: runner-allocation failures where no step of ours
    reached a conclusion. Nothing ran, so nothing can repeat.
-2. **Whole-run queue displacement** — a cancelled run where NO job has any
+2. **Whole-run queue displacement**: a cancelled run where NO job has any
    steps (GitHub records displacement as zero jobs, or one job with zero
    steps). Re-run in full, only when the group is idle, one per group per
    sweep.
-3. **Displaced apply jobs (D095)** — some jobs succeeded, and every
+3. **Displaced apply jobs (D095)**: some jobs succeeded, and every
    non-successful job has ZERO steps. `rerun-failed-jobs` re-runs only the
    displaced jobs against the artifact the compute banked.
 
@@ -122,7 +122,7 @@ change with `DRY_RUN=1` against real history before shipping it.
 ## 5. A red X is reserved for broken (D093)
 
 GitHub emails on failed runs. An alert channel that cries wolf daily is one
-the owner mutes — and then a real break goes unread.
+the owner mutes, and then a real break goes unread.
 
 - **A backstop timeout on a run whose work still published is a warning, not
   a failure.** Pair every backstopped compute step with a verdict step:
@@ -136,27 +136,68 @@ the owner mutes — and then a real break goes unread.
   green for weeks with an EMPTY repo secret. Capture the exit code and emit a
   `::warning::` instead.
 
-## 6. An auditor for the failures nothing else alerts (D090/D093)
+## 6. An auditor for the failures nothing else alerts (D090/D093/D107)
 
-Red gets noticed; the dangerous failures are green. `tools/
-audit_workflow_health.py` runs daily and judges what each workflow's last
-completed SCHEDULED run actually PRODUCED:
+Red gets noticed; the dangerous failures are green. `tools/audit_workflow_health.py` runs daily
+(`.github/workflows/workflow-health.yml`) and judges what each workflow's last completed SCHEDULED
+run actually PRODUCED:
 
-- **BROKEN** — green, took real time, produced nothing (zero-yield summary)
-- **KILLED** — cancelled with publish steps skipped
-- **DROPPED** — displaced in the queue before any step ran
-- **STALE** — the schedule stopped firing (absence needs its own verdict)
-- **SILENT** — no yield line at all, which is its own problem
-- **DRAINED** — genuinely finished its backlog (informational)
+- **BROKEN**: green, took real time, produced nothing (zero-yield summary)
+- **KILLED**: cancelled with publish steps skipped
+- **FAILED**: red (reported, but GitHub already emailed about it)
+- **DROPPED**: displaced in the queue before any step ran, at run OR job granularity
+- **STALE**: the schedule stopped firing (absence needs its own verdict)
+- **SILENT**: no yield line at all, which is its own problem
+- **DRAINED**: genuinely finished its backlog (informational)
 
-The rules that took iteration to get right: judge each workflow against **its
-own cadence** (~2.5 periods), never a fixed lookback — a fixed 36 h window
-made every weekly/monthly workflow structurally unauditable. Judge the newest
-SCHEDULED run, never a manual dispatch — a green experiment must not mask a
-broken schedule — but report a newer successful dispatch as "fix in flight"
-without failing. And **fail the auditor's own run only for findings nothing
-else alerts** (BROKEN, KILLED): a FAILED run already emailed its own red X,
-and re-failing over it is a duplicate alert repeated daily.
+The rules that took iteration to get right:
+
+- **Judge each workflow against its own cadence** (~2.5 periods), never a fixed lookback. A fixed
+  36 h window made every weekly and monthly workflow structurally unauditable.
+- **Judge the newest scheduled run that actually ran**, never a manual dispatch: a green experiment
+  must not mask a broken schedule. A newer successful dispatch is reported as "fix in flight", not
+  urgent.
+- **A workflow that asks to be superseded is not KILLED.** The auditor reads
+  `concurrency.cancel-in-progress: true` from the workflow file itself (workflow or job level), so a
+  deploy cancelled by a newer deploy is the rule working.
+- **Workflows that print no yield line are still judged.** `NO_YIELD_LINE` (extend it with the env
+  of the same name) skips only the yield analysis for builds, deploys and submits. Their failures
+  still count. It used to be a `NOT_PRODUCERS` list that skipped them entirely, and that is how the
+  workflow shipping an app's catalog failed every hour for two days, completely unreported.
+- **The auditor does not judge itself** (`SELF`). Judging its own last run makes one failure
+  permanent: it fails, reports the failure, and fails again.
+
+**The auditor never fails.** Reporters never fail (D107). A workflow going red says "I could not do
+my job", and the auditor did its job the moment it looked. Failing it to signal somebody else's
+problem is a category error, and an alert channel that cries wolf is one the owner mutes. So
+`audit_workflow_health.py` exits 0 whenever the audit ran, and the urgent findings (BROKEN and
+KILLED, the classes nothing else alerts for) go to **one self-closing GitHub issue** through
+`tools/report_workflow_health.py`:
+
+- nothing urgent: any open "Workflow health: attention needed" issue is closed with a note;
+- something urgent: the issue is opened, or its body **updated in place**. The body always holds
+  what is wrong NOW, and its existence is the alert.
+
+The report step runs `if: always()` and needs `issues: write` and `GH_TOKEN`.
+
+**Reporters are held to it statically.** `tools/check_workflow_gates.py` runs three checks and
+exits 1 on any violation:
+
+1. Every split workflow's `apply` job is fully gated on `steps.gate.outputs.go` after its "Stop if
+   nothing changed" step.
+2. **Every step that runs `gh`** (or the `gh_retry.sh` / `gh_dispatch.sh` wrappers) **has
+   `GH_TOKEN` in scope**, at step, job or workflow level. A runner has no ambient credential: a
+   publish step without it fails, everything after it is skipped, and one catalog publisher shipped
+   nothing for two days that way.
+3. **A reporter workflow never exits non-zero on its findings.** For every workflow listed in
+   `REPORTERS` (add your dashboards and auditors), a step that can `exit 1`, `sys.exit(1)` or
+   `raise SystemExit(1)` must carry a `# reporter-may-fail: <why>` comment saying the failure is
+   over its OWN mechanics. Whether a step fails over what it read or over its own plumbing is not
+   something a regex can judge, so the author states it in words.
+
+Regression tests: `tools/test_workflow_health.py` (the auditor, plus negative controls for the
+gate checker's reporter and token checks) and `tools/test_workflow_health_gate.py` (what reaches
+the issue). Run the gate checker itself after touching any workflow.
 
 ## 7. Markers, evidence, and freshness (D055/D056/D084/D088)
 
@@ -164,7 +205,7 @@ The silent-failure class underneath everything above is a flag whose meaning
 drifted:
 
 - **"Already attempted" markers record the SOURCE.** A bare boolean shared by
-  two providers means the second provider never sees a target — coverage
+  two providers means the second provider never sees a target. Coverage
   plateaus and reports "backlog drained" in 94 seconds.
 - **A verification expires.** "Verified" without "when" means a check made in
   June looks identical to yesterday's; give every liveness/validation marker
@@ -183,7 +224,7 @@ drifted:
 - **Shared reversible flags are registered state (D083).** When several tools
   write one `excluded` flag and one reconcile restores it, every tool's
   marker must be registered with the reconcile or its work is undone on the
-  next build — and the reconcile should NAME any unregistered
+  next build, and the reconcile should NAME any unregistered
   exclusion-looking marker it un-hides.
 
 ## 8. Reading CI honestly
@@ -196,31 +237,54 @@ Hard-won measurement discipline, each learned by being fooled:
 - **Step conclusions are unfakeable; log grep is not.** Grepping a run log can
   match the SCRIPT TEXT in the `##[group]Run` header rather than output.
 - **`bash -e` does not see through pipes.** `python tool.py | tee log` masks
-  the tool's exit code without `set -o pipefail` — the run goes green while
-  the tool crashed.
+  the tool's exit code without `set -o pipefail`, and the run goes green while
+  the tool crashed. A storage-bucket probe hid its own crash exactly that way.
+  Every step that pipes a tool into `tee` starts `set -o pipefail`, or reads
+  `${PIPESTATUS[0]}` when it must keep going.
 - **A retry that succeeded is not a failure.** Check the attempt count before
   declaring a push failed.
 - **A suspiciously low count from a new rule means the selection upstream
-  never handed it the population** — check what was offered before believing
+  never handed it the population**. Check what was offered before believing
   what was found (resume markers and pre-filters both do this).
-- **One experiment per process** when measuring platform behavior — state
+- **One experiment per process** when measuring platform behavior. State
   leaks between probes in one process attributed one shape's result to
   another and cost three shipped "fixes".
 
 ## 9. Runner facts worth knowing
 
-- Public repos get free macOS (Apple Silicon) runners — heavy Apple-only work
+- Public repos get free macOS (Apple Silicon) runners, so heavy Apple-only work
   (Vision scoring, Swift builds) can leave the dev machine entirely (D039a).
   Scale by SHARDS across runners, never by workers on one machine.
-- Hosted runners have **no Apple speech models and cannot install them** —
-  benchmark a pipeline on a machine that represents where it RUNS (D060).
+- Hosted runners have **no Apple speech models and cannot install them**.
+  Benchmark a pipeline on a machine that represents where it RUNS (D060).
 - Datacenter IPs are second-class citizens: loc.gov 403s them, Wikimedia
   throttles spoofed UAs, WDQS 504s them. Some feeds only run from a
   residential IP; design those steps to skip cleanly in CI.
 - Conversely, sweeps that hammer an external host belong IN CI, not on the
-  dev machine — archive.org rate-limits per IP, and a local sweep degraded
+  dev machine. archive.org rate-limits per IP, and a local sweep degraded
   playback for every device in the house.
 - `gh release upload --clobber` = delete-then-upload; assets over 2 GB 422.
 - A cron'd workflow always runs the default branch's HEAD version; a RE-RUN
-  of an old run uses the OLD commit's workflow definition — mind that window
+  of an old run uses the OLD commit's workflow definition, so mind that window
   when changing publish formats.
+
+## 10. Shell and scheduler traps
+
+Four more, each paid for by a run that did the wrong thing quietly:
+
+- **`[ -n "$X" ] && ARGS+=(...)` is a trap under `bash -e`.** The test returns 1 when `X` is empty.
+  Mid-script, `-e` ignores it. As the LAST line of a step (or of a function), that 1 becomes the
+  exit status and the step goes red over an optional input nobody filled in. Write every optional
+  flag as `if [ -n "$X" ]; then ARGS+=(...); fi`.
+- **Inputs arrive as environment, never pasted into the script.** `${{ inputs.notes }}` inside a
+  `run:` block is text substitution: a double quote in release notes closes the shell string, and
+  free text pasted into a shell line is an injection route. Map each input to `env:` and read
+  `"$NOTES"`.
+- **Crons run late: plan for four to five hours.** GitHub queues scheduled runs behind its own load,
+  and Archive Watch's daily dashboard cron measured four to five hours after its scheduled time.
+  Schedule for the lag (and off the hour), and when a report must follow a release, trigger it with `workflow_run` on the release
+  workflow instead of hoping the cron lands after it.
+- **`[skip ci]` skips more than you meant.** A bot commit marked `[skip ci]` (a version bump pushed
+  back by a release workflow) triggers no `push` workflows at all, including the deploy you wanted.
+  Chain the deploy with `workflow_run` on the workflow that made the commit, and use `paths-ignore`
+  for commits that genuinely should not deploy.

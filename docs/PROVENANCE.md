@@ -1,23 +1,25 @@
-# Provenance & Coverage Map — where every lesson lives, and what was left behind
+# Provenance
 
-The audit record for the Universal generation: every knowledge domain the
-source apps produced, where it lives in THIS template, and what was
-deliberately excluded with reasons. Update this file when upstreaming new
-lessons — it is how the next audit knows what "complete" means.
-Last full audit: 2026-08-24, against Archive Watch (95 decisions),
-Tidbits Trivia (56), Quint (27), BOBA (frozen 2026-06-30),
-Bsky Dreams (upstreamed through 2026-08-24 — the post-freeze lessons:
-Share Extension, feed-ranking values pass, content extraction, iOS
-resilience/image/gesture/haptics gotchas, Decisions 040–043).
-**BOBA re-audit 2026-08-26**: the 2026-08-24 audit's assumption that
-BOBA's lessons "predate Quint and are already folded in" was wrong for
-its late cycle (2026-04 → 2026-06) — the pricing rebuild, canonical
-identity, scan pipeline, trading design, hosted backend, revocation
-loop, and iOS-27 gating were all missing. Upstreamed as 9 new skills,
-the TRADE-DESIGN template, Decisions 044–052, and amendments across
-ios/android-production-gotchas, cloud/play submission,
-universal-feature-states, shared-data-plane-contract, AUTONOMOUS-LOOPS,
-PARITY, and the DATA-CONTRACT + IOS-DESIGN templates.
+Every lesson in this template was paid for in a real app. This page
+records which app, where the lesson lives here now, and what was left
+behind on purpose, so the next audit knows what "complete" means and
+nobody rediscovers an exclusion.
+
+**Audits.**
+
+- **2026-08-24**, the Universal generation: Archive Watch (decisions
+  through 095), Tidbits Trivia (56), Quint (27), BOBA Playbook (frozen
+  2026-06-30), Bsky Dreams (through 2026-08-24).
+- **2026-08-26**, BOBA re-audit: the earlier assumption that BOBA's late
+  cycle was already folded in was wrong. Nine skills, the TRADE-DESIGN
+  template and Decisions 044 to 052 came out of it.
+- **2026-09-30**, Archive Watch decisions 096 to 158, plus everything
+  since the September 1 to 9 ports: the real-device harness, Pulse,
+  store tooling, floors by hardware, parity practice, and the data
+  contract. The full work queue is
+  `docs/maintaining/ARCHIVE-WATCH-GAP-AUDIT-2026-09-30.md`, and the
+  record of the reorganization it drove is
+  `docs/maintaining/RESTRUCTURE-PLAN.md`.
 
 ## Coverage: domain → home in this template
 
@@ -54,41 +56,67 @@ PARITY, and the DATA-CONTRACT + IOS-DESIGN templates.
 | Android release symbols + ML Kit (embed-in-AAB, zip -D, jarsigner; unbundled-vs-bundled) | `android-production-gotchas` §Release engineering, `play-cli-submission` Rule 9 |
 | Display vocabulary as a render-layer contract; word-prefix search; image-first sort; two-phase catalog load | `shared-data-plane-contract` §Client consumption rules, DATA-CONTRACT template §5.5, Decision 052 |
 | Teaching-surface platform asymmetry (walkthroughs iOS-only; documented rejections elsewhere) | `universal-feature-states` (amended), PARITY.md §3b |
-| Autonomous-loop pre-push checklist (import sweeps, stale call sites, artifact sweeps, deprecation signatures) | `docs/AUTONOMOUS-LOOPS.md` §7 |
+| Autonomous-loop pre-push checklist (import sweeps, stale call sites, artifact sweeps, deprecation signatures) | `docs/AUTONOMOUS-LOOPS.md` §10 |
+| Real-device testing: bench manifest and roles, whole-run leases, leave-as-found teardown, stale-proof and power-aware capture, window-only Mac capture, Roku and web-TV glass tools, verdict doctrine, audit ledgers | `docs/AUTONOMOUS-FLEET-TESTING.md` (method), `docs/DEVICE-HARNESSES.md` (catalog), `tools/bench.py` + runners, `docs/templates/DEVICE-AUDIT-LEDGER-template.md`, `autonomous-fleet-testing` / `device-observation-harness` / `concurrent-agent-device-leases` skills, `docs/maintaining/HARNESS-PORT-2026-09-30.md` |
+| Launch doors in every starter (start tab, start item, mute, door seconds; debug-only) | `apple/Core/Store/LaunchDoors.swift`, `android/.../navigation/LaunchDoors.kt`, `windows/AppName.App/LaunchHooks.cs`, `js/app.js`, `tools/app_config.py`, `tools/hook_coverage.py` |
+| Product Pulse (collector, charts, look rules, reader honesty, privacy counting, store traps) | `docs/PRODUCT-PULSE.md`, `pulse/`, `tools/pulse_*`, `product-pulse-dashboard` + `store-metrics-pipelines` skills, `docs/maintaining/PULSE-PORT-2026-09-30.md` |
+| Platform floors by hardware reach, held by CI tests; capability tiers | `docs/path/03-going-native.md`, `multiplatform-expansion-method` Step 3b, `tools/test_ios_floor.py` / `test_tvos_floor.py`, Decision 004 amendment, PARITY "Oldest hardware served" |
+| Apple ship from the CLI across three platforms; Play notes cap and retries | `tools/asc_release.py`, `appstore-build.yml`, `appstore-submit.yml`, `docs/CLOUD-SUBMISSION.md`, `docs/APPLE-SUBMISSION-CLI.md`, `play-cli-submission` |
+| One version number everywhere | `AppVersion.xcconfig`, `tools/test_version_contract.py`, `tools/stamp_msix_version.py` |
+| Workflow auditor that never fails, gate checker | `tools/audit_workflow_health.py`, `tools/report_workflow_health.py`, `tools/check_workflow_gates.py`, `docs/CI-FLEET.md` §6 and §10 |
+| Parity practice (mechanical guards, port ledgers, maintenance protocol, doc-layer parity) | `cross-platform-parity-discipline`, `PARITY.md`, `docs/templates/PORT-PARITY-LEDGER-template.md`, `FEATURE-DESIGN-template.md` |
+| Data contract as a test; projection ladder; field tiers; named filters | `shared-data-plane-contract`, `docs/templates/DATA-CONTRACT-template.md` |
+| State in the link; the web bridges the sync islands; $0 watch party; one free Worker of adapters | `DEEP_LINKS.md`, `per-ecosystem-sync-islands`, `cross-platform-multiplayer`, `zero-cost-hosted-backend`, `pulse/worker-example/` |
+| Engineering disciplines and loop working style | `docs/ENGINEERING-PROCESS.md`, `docs/AUTONOMOUS-LOOPS.md` |
+| iPad regular-width rules | `docs/templates/IPAD-DESIGN-template.md` |
+| Standing rules on words and AI in the product | `learning-orientation-design`, `mobile-first-density-design`, `CLAUDE.md` Standing instructions |
 
 ## Deliberate exclusions (do not "rediscover" these)
 
+- **Archive Watch's Watch Together Studio and Creation Studio engines**
+  (live broadcast, camera compositing, clip editing): app-specific. The
+  generic halves (own a small documented protocol, prove it against a
+  local server with a wrong-key control) are noted in
+  `docs/ENGINEERING-PROCESS.md`.
+- **Archive Watch's rights-audit specifics and its catalog, subtitle and
+  poster pipelines** (about forty workflows): inseparable from
+  archive.org. The patterns are in `docs/CI-FLEET.md` and the data-plane
+  skill.
+- **A social posting pipeline and the `social-video-teaser-craft` skill**:
+  not ported yet. A candidate for a later audit.
 - **Archive Watch's catalog pipeline** (~150 tools: discovery, enrichment,
-  rights audit, TV spines, covers, subtitles sourcing) — inseparable from
+  rights audit, TV spines, covers, subtitles sourcing): inseparable from
   archive.org and that app's data model. The PATTERNS it proved are here
   (CI-FLEET, marker rules, additive merges); the tools are not. Worked
   examples: Archive-Watch `tools/` + `docs/decisions/`.
-- **`macos-creation-studio-engine` skill** — a Mac video-editor engine for
+- **`macos-creation-studio-engine` skill**: a Mac video-editor engine for
   one app. Its two reusable AVFoundation truths (one-model-to-composition;
   the two-pass grade→overlay rule) are noted in the MACOS-DESIGN template
   lineage; build the rest per app from `docs/research/`
   video-clipping material in Archive Watch if ever needed.
-- **Tidbits' game/corpus/multiplayer internals** — the generic halves
+- **Tidbits' game/corpus/multiplayer internals**: the generic halves
   already live in `cross-platform-multiplayer` / `-determinism` /
   `content-corpus-derivation` (Quint era).
-- **App-specific binding design docs** (tvOS-DESIGN etc. of each app) —
+- **App-specific binding design docs** (tvOS-DESIGN etc. of each app):
   the template ships SEEDS in `docs/templates/`; the filled-in docs stay
   with their apps.
-- **~12 duplicate framework-skill pairs** from two vendored vintages —
-  kept both pending a per-pair review (see README maintenance note).
-- **BOBA's uncommitted skill dump + stray store artifacts** — superseded
+- **Duplicate framework skills.** On 2026-09-30, twelve legacy copies that
+  matched their newer twins were deleted. `ios-security` and
+  `metrickit-diagnostics` remain because their content differs (see
+  `.claude/skills/README.md`).
+- **BOBA's uncommitted skill dump + stray store artifacts**: superseded
   as artifacts. (The 2026-08-24 claim that BOBA's committed lessons were
-  "already folded in" was wrong — corrected by the 2026-08-26 re-audit
+  "already folded in" was wrong, and was corrected by the 2026-08-26 re-audit
   above. What remains deliberately excluded: BOBA's card-catalog
   pipeline itself, the Radish-specific tooling, the practice-battle
-  engine, and its filled-in binding design docs — app-specific; their
+  engine, and its filled-in binding design docs, which are app-specific; their
   generic halves now live in the skills listed above.)
 
 ## The upstreaming rule
 
 When a session in any app repo produces a template-worthy lesson: (1) fix
 it in the app, (2) upstream the GENERIC form here in the same working
-session — a doc section, a skill trigger, a tool, or a seed Decision — and
+session (a doc section, a skill trigger, a tool, or a seed Decision), and
 (3) add or update the row above. Lessons trapped in app-local docs are the
 drift this file exists to catch: Tidbits wrote 20 docs and zero skills in
 its biggest month, and that gap took an audit to find.

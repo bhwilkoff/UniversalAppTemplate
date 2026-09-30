@@ -7,12 +7,12 @@ Fire OS is an Android fork WITHOUT Google Play Services. Any GMS dependency
 runtime on a Fire TV device — usually as a crash on first use, not a build
 error, which is why this has to be a gate rather than a code review.
 
-Archive Watch is in the best possible position: as measured 2026-08-03 the
-dependency set is entirely GMS-free (OkHttp, kotlinx-serialization, Coil,
-Media3, androidx.sqlite). This script exists to KEEP it that way — the moment
-the Cast sender lands (backlog C4) it must be excluded from the Fire variant,
-and a silent transitive GMS pull would otherwise go unnoticed until a device
-test (docs/TV-DESIGN.md §6.6, Decision 047).
+The lesson came from Archive Watch, whose dependency set was entirely GMS-free
+(OkHttp, kotlinx-serialization, Coil, Media3, androidx.sqlite). This script
+exists to KEEP an app that way: the moment a Cast sender lands it must be
+excluded from the Fire variant, and a silent transitive GMS pull would
+otherwise go unnoticed until a device test (docs/TV-DESIGN.md §6.6, the Fire TV
+zero-GMS flavor rule).
 
 Usage:
     python3 tools/audit_fire_tv_gms.py [path/to/app.apk|.aab]

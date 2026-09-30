@@ -1,6 +1,6 @@
 ---
 name: binding-design-doc-discipline
-description: Use when a project has a binding design doc (DESIGN.md, WEB-DESIGN.md, STYLE_GUIDE.md, etc.) that governs UI/IA decisions. The workflow is: before proposing any new view/sheet/picker/nav level, quote the rule that justifies it. If no rule fits, the proposal needs a NEW rule (and discussion) before it ships. The doc is the source of truth; fix the doc first, then fix the feature. Triggers on design doc, binding spec, DESIGN.md, design rule, "follow the design system."
+description: "Use when a project has a binding design doc (DESIGN.md, WEB-DESIGN.md, STYLE_GUIDE.md, etc.) that governs UI/IA decisions. The workflow is: before proposing any new view/sheet/picker/nav level, quote the rule that justifies it. If no rule fits, the proposal needs a NEW rule (and discussion) before it ships. The doc is the source of truth; fix the doc first, then fix the feature. Triggers on design doc, binding spec, DESIGN.md, design rule, \"follow the design system.\""
 ---
 
 # Binding Design Doc Discipline
@@ -127,6 +127,33 @@ A binding doc isn't there to TELL you what to do — it's there to BIND you. Rea
 
 The doc is a small thing changed often by one person (the owner). Adding rules without their sign-off creates rules that aren't actually binding (because the owner didn't agree). Propose; don't unilaterally write.
 
+## Doc-layer parity (multi-platform repos)
+
+Each platform has its own binding doc, so a cross-platform rule written
+into only one of them is a rule the others will contradict later.
+
+- **Stamp the rule into every platform doc the same day.** When the
+  owner approves a rule for all platforms, add it to each DESIGN doc
+  (iOS, iPad, macOS, tvOS, TV, web, Android, Roku...) in one change,
+  each copy citing the origin rule number and the owner's dated words
+  ("owner YYYY-MM-DD: 'Yes, all platforms'"). Archive Watch's "New to
+  Archive Watch" shelf landed in seven docs on one day this way.
+- **Say when a rule deliberately inverts a sibling's**, in both docs,
+  so it is not "harmonized" into a bug.
+- **Feature-scoped binding docs** (`CAPTIONS.md`, `SHAREPLAY.md`,
+  `LINK-SHARING.md`, `PULSE.md`) sit beside the platform docs for any
+  feature whose capability differs by OS version or hardware. Seed from
+  `docs/templates/FEATURE-DESIGN-template.md`. Each carries:
+  - an OS × platform capability matrix, every cell measured, re-derived
+    by an audit script over the real data (Archive Watch's
+    `audit_caption_tiers.py` for its caption tiers);
+  - a requirements checklist for a new platform;
+  - which doc wins on conflict: the feature doc on what the feature
+    does, the platform doc on how it looks.
+- **Form-factor docs extend, not replace.** An iPad doc
+  (`docs/templates/IPAD-DESIGN-template.md`) extends iOS-DESIGN at
+  regular width; iOS-DESIGN wins on shell and taxonomy.
+
 ## In commit messages
 
 Once a feature ships, the commit message should quote the rule it implements (in addition to whatever else):
@@ -151,3 +178,4 @@ The discipline scales — it works for a 1-person project or a 50-person team. T
 
 - [[architectural-decision-log]] — companion pattern: each binding-doc rule that's non-obvious gets a corresponding DECISIONS.md entry explaining the WHY
 - [[feature-shipping-discipline]] — the full sequence from doc-read through ship
+- [[cross-platform-parity-discipline]]: PARITY.md, capability tiers, parity guards

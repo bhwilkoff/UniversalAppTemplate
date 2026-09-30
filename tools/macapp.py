@@ -15,10 +15,15 @@ test is the app measured, and a name collision cannot occur.
 """
 import re
 import subprocess
+import sys
 import time
 from pathlib import Path
 
-PROC = "AppName"
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import app_config  # noqa: E402
+from devharness import capture_fresh, ensure_winshot  # noqa: E402
+
+PROC = app_config.APPLE_EXECUTABLE
 
 
 def _osa(script, timeout=15):
@@ -44,7 +49,7 @@ def launch(binary, env=None):
 
 
 def close_projectors(pid):
-    """Close leftover the app Live projector windows.
+    """Close leftover projector windows (an app-specific secondary WindowGroup).
 
     Each hosted night opens one, and macOS restores them all on the next launch —
     a measured session had six stacked up. They are 1280x720 and they sit OVER
@@ -81,12 +86,12 @@ def raise_pid(pid):
         return False
 
 
-# The the app Live PROJECTOR is its own WindowGroup ("appname-bigscreen",
+# The app's PROJECTOR is its own WindowGroup ("appname-bigscreen",
 # defaultSize 1280x720) and macOS restores it across launches — one measured
 # session had SEVEN windows: six restored projectors titled "the app" at
 # 1280x720, plus the real main window titled "Records" at 1180x760. Asking for
-# "front window" photographed a projector and read its idle splash, "TIDBITS
-# LIVE — The host will start the night shortly", as the app ignoring every
+# "front window" photographed a projector and read its idle splash ("The host
+# will start the night shortly") as the app ignoring every
 # launch hook. The app was correct throughout.
 PROJECTOR_SIZE = (1280, 720)
 
@@ -149,21 +154,27 @@ def bounds(pid):
 
 
 def capture(pid, path, tries=12):
+    """Capture the app's MAIN WINDOW by window id, owned by exactly this pid.
+
+    Never a screen region (`-R`) and never the full screen. A region grab takes
+    SCREEN pixels, so anything in front of the app window lands in the frame — which
+    has meant personal documents in other windows.
+    The window-id capture reads the window's own content whether or not it is in
+    front, so it needs no raise either. Restored secondary windows (projectors) are
+    skipped by their fixed size."""
+    ok, why = ensure_winshot()
+    if not ok:
+        print(f"[mac] no window-capture instrument: {why}")
+        return False
     close_projectors(pid)
-    """Raise, then grab the window's screen region. -R takes SCREEN pixels, so
-    the app must be in front or a terminal gets graded as the app."""
     for _ in range(tries):
-        raise_pid(pid)
-        time.sleep(0.7)
-        b = bounds(pid)
-        if b and b[2] > 200 and b[3] > 200:
-            try:
-                subprocess.run(["screencapture", "-x", "-o", "-R",
-                                f"{b[0]},{b[1]},{b[2]},{b[3]}", str(path)],
-                               capture_output=True, timeout=40)
-            except subprocess.SubprocessError:
-                continue
-            if Path(path).exists() and Path(path).stat().st_size > 5000:
-                return True
+        ok, why = capture_fresh(path, lambda p: subprocess.run(
+            [str(app_config.WINSHOT_BIN), f"pid:{pid}", "", str(p),
+             "--min-width", "200",
+             "--skip-size", f"{PROJECTOR_SIZE[0]}x{PROJECTOR_SIZE[1]}"],
+            capture_output=True, text=True, timeout=40))
+        if ok and Path(path).stat().st_size > 5000:
+            return True
         time.sleep(1.2)
+    print(f"[mac] window capture failed: {why}")
     return False

@@ -1,6 +1,6 @@
 ---
 name: ci-fleet-engineering
-description: Use when adding, editing, or debugging ANY scheduled GitHub Actions workflow that mutates shared data, publishes an artifact, or runs on a cron — and when diagnosing CI failures, cancelled runs, lock contention, lost work, or alert noise. Carries the fleet doctrine paid for across ~35 workflows - the compute/apply lock split, budgets that publish vs timeouts that kill, restore/publish guards against the clobber-delete class, the never-started/displaced-run sweeper, the green-but-broken health auditor, and "a red X is reserved for broken." Triggers on workflow yml, cron, concurrency group, timeout-minutes, gh release upload, cancelled run, "workflow failed", CI alert, lock, superseded, publish step skipped.
+description: "Use when adding, editing, or debugging ANY GitHub Actions workflow that mutates shared data, publishes an artifact, reports, or runs on a cron, and when diagnosing CI failures, cancelled runs, lock contention, lost work, or alert noise. Carries the fleet doctrine: the compute/apply lock split, budgets that publish vs timeouts that kill, restore/publish guards, the never-started/displaced-run sweeper, the health auditor that never fails (findings go to one self-closing issue), the static gate checker (apply gating, GH_TOKEN in scope, reporter-may-fail), a red X reserved for broken, and the shell/scheduler traps (pipefail with tee, the [ -n x ] && ARGS+= trap, inputs as env, late crons, [skip ci] vs workflow_run). Triggers on workflow yml, cron, concurrency group, timeout-minutes, gh release upload, cancelled run, CI alert, lock, publish step skipped, GH_TOKEN, reporter, health issue, skip ci."
 ---
 
 # CI Fleet Engineering
@@ -27,8 +27,26 @@ and no run may destroy work — its own or another's.**
    clobber-upload a file that can be rejected (2 GB cap → both assets vanish).
 4. **Uploads** wrap in `tools/gh_retry.sh` (must-persist, fails loudly);
    **dispatches** in `tools/gh_dispatch.sh` (fire-and-forget, exits 0).
-5. **Never `cmd || true`** — capture the exit code and `::warning::` it.
-   `tool | tee log` needs `set -o pipefail` or a crash goes green.
+5. **Never `cmd || true`**: capture the exit code and `::warning::` it.
+   `tool | tee log` needs `set -o pipefail` (or `${PIPESTATUS[0]}`) or a crash
+   goes green.
+6. **Inputs as env, never pasted.** `${{ inputs.x }}` inside `run:` is text
+   substitution: a quote closes the string, free text is injection. Map to
+   `env:` and read `"$X"`. Optional flags are `if [ -n "$X" ]; then ARGS+=(...); fi`,
+   never `[ -n "$X" ] && ARGS+=(...)`: that returns 1 on empty input, and as a
+   step's (or function's) last line it fails the step under `bash -e`.
+7. **Every step that runs `gh` has `GH_TOKEN` in scope** (step, job or
+   workflow env). A runner has no ambient credential; a publish step without
+   it fails and skips everything after it.
+8. **Reporters never fail on their findings.** A dashboard, auditor or status
+   check exits 0 whenever it read what it came to read, and puts findings in
+   the step summary, a `::warning::`, or an issue. A step in a `REPORTERS`
+   workflow that can exit non-zero carries `# reporter-may-fail: <why>`
+   naming its OWN mechanics.
+9. **Schedule for the lag.** Crons run four to five hours late; when work must
+   follow a release, trigger it with `workflow_run`. A bot commit marked
+   `[skip ci]` fires no `push` workflows at all, including deploys; chain
+   those with `workflow_run` and use `paths-ignore` instead.
 
 ## Standing guardians (enable once per repo)
 
@@ -36,10 +54,19 @@ and no run may destroy work — its own or another's.**
   — re-runs never-started runs and queue-displaced runs/apply-jobs. The gate is
   "zero steps ran," which is the no-side-effect proof; verify changes with
   `DRY_RUN=1` against real history.
-- `.github/workflows/workflow-health.yml` + `tools/audit_workflow_health.py` —
-  daily judge of what each workflow's last SCHEDULED run PRODUCED (green-but-
-  zero-yield, killed-with-publish-skipped, stale schedules), each judged
-  against its OWN cadence. It fails only for findings nothing else alerts.
+- `.github/workflows/workflow-health.yml` + `tools/audit_workflow_health.py`:
+  daily judge of what each workflow's last SCHEDULED run PRODUCED (BROKEN,
+  KILLED, FAILED, DROPPED, STALE, SILENT, DRAINED), each against its OWN
+  cadence. `NO_YIELD_LINE` workflows skip only the yield check; their failures
+  still count. Self-cancelling workflows (`cancel-in-progress: true`) are not
+  KILLED. **The auditor never fails.** Urgent findings (BROKEN, KILLED: the
+  ones nothing else alerts) go to ONE self-closing issue via
+  `tools/report_workflow_health.py`, opened or updated in place, closed when
+  the fleet is clean.
+- `tools/check_workflow_gates.py`: static checks, exit 1 on violation. Apply
+  jobs fully gated; every `gh` step has `GH_TOKEN`; reporter workflows
+  (`REPORTERS`) never exit non-zero without `# reporter-may-fail:`. Tests:
+  `tools/test_workflow_health.py`, `tools/test_workflow_health_gate.py`.
 
 ## When diagnosing
 

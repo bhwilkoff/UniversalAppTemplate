@@ -1,22 +1,26 @@
 {
- "_": "Stores with no API. Edit this file when a state changes \u2014 the dashboard shows it beside the machine-read ones so the estate is never half-reported.",
- "stores": [
+ "_": "Stores whose state no reader can fetch, declared by hand so the page shows the WHOLE estate rather than the half with an API. Move a row from _examples into stores when you ship there. Each row says its `route`. A read fact replaces a declared one: Amazon's live versionCode (amazon_live), Roku's field versions (roku_engagement) and the web row's newest deploy (product.deployWorkflow) overwrite what is typed here. Store names are matched literally by the collector and page: 'Amazon Appstore', 'Roku Channel Store', 'LG Content Store', 'Samsung Apps TV', 'Web (PWA)'.",
+ "stores": [],
+ "_examples": [
   {
    "store": "Amazon Appstore",
    "platform": "Fire TV",
    "state": "LIVE",
-   "version": "1.42.x",
-   "since": "2026-09-01",
-   "note": "Submission API returns invalid_scope; console only.",
+   "version": "1.0.0",
+   "since": "2026-01-01",
+   "api": "vitals",
+   "route": "Submission API (live build), Sales report (installs), Vitals API",
+   "note": "",
    "url": "https://developer.amazon.com/apps-and-games/console/apps/list.html"
   },
   {
    "store": "Roku Channel Store",
    "platform": "Roku",
    "state": "SUBMITTED",
-   "version": "1.0.51",
-   "since": "2026-09-08",
-   "note": "Channel 881015. No developer API \u2014 check the Dashboard.",
+   "version": "1.0.0",
+   "since": "2026-01-01",
+   "route": "Looker scheduled delivery to the drop box (no API)",
+   "note": "",
    "url": "https://developer.roku.com/developer-channels/channels"
   },
   {
@@ -25,7 +29,8 @@
    "state": "NOT SUBMITTED",
    "version": null,
    "since": null,
-   "note": "Package builds; Seller Lounge account is the owner step.",
+   "route": "declared by hand (no API)",
+   "note": "",
    "url": "https://seller.lgappstv.com/"
   },
   {
@@ -34,17 +39,19 @@
    "state": "NOT SUBMITTED",
    "version": null,
    "since": null,
-   "note": "Public Seller is US-only; needs the signing certificate.",
+   "route": "declared by hand (no API)",
+   "note": "",
    "url": "https://seller.samsungapps.com/"
   },
   {
    "store": "Web (PWA)",
-   "platform": "archivewatch.org",
+   "platform": "the website",
    "state": "LIVE",
    "version": "rolling",
-   "since": "2026-06-10",
-   "note": "Ships on every Pages deploy.",
-   "url": "https://archivewatch.org"
+   "since": null,
+   "route": "the newest successful deploy workflow run",
+   "note": "",
+   "url": ""
   }
  ]
 }

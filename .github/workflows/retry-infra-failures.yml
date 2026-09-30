@@ -5,7 +5,7 @@
 # out three scheduled runs here that way, including whole shards of the stock index.
 # The long-period crons are the ones that hurt: an 8-hourly classifier that misses is
 # 8 hours of backlog, so this sweeper re-runs the jobs that never started. Conservative
-# by construction — see tools/retry_infra_failures.py and Decision 048: a run is only
+# by construction — see tools/retry_infra_failures.py and the never-started-run rule: a run is only
 # re-run when none of our steps ever executed, so there is no side effect to repeat and
 # no stale catalog snapshot to re-publish (the re-run fetches the catalog fresh).
 name: Retry infrastructure failures

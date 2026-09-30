@@ -1,297 +1,355 @@
-# Windows 10/11 — Tidbits Trivia Design Doc (BINDING)
+# [APP NAME] Windows design (BINDING)
 
-**Status:** BINDING spec for the sixth platform (research complete
-2026-07-05, see `WINDOWS-RESEARCH.md`; verdict: GO at ~$0). The app
-is **not built yet** — this doc governs the build. Cite rule numbers
-in proposals/commits ("per WINDOWS-DESIGN §6.2"), and **fix the doc
-first** when it conflicts with a feature. Companion: `WINDOWS-
-PLAYBOOK.md` (the build/test/ship pipeline + first-class-Windows how-to).
+<!-- Seed for docs/WINDOWS-DESIGN.md (you create it from this file once
+     the Windows app passes ~5 views). Invoke
+     `binding-design-doc-discipline` for the workflow and
+     `windows-production-gotchas` for the mechanics this doc does NOT
+     restate. The build/test/ship pipeline lives in
+     docs/windows/WINDOWS-PLAYBOOK.md and the Store submission in
+     docs/windows/WINDOWS-STORE-SUBMISSION.md. Reference them, do not
+     duplicate them.
 
-**Stack (settled by research):** Avalonia UI **v12** (.NET 9, C#, XAML,
-MIT) + **FluentAvalonia** for WinUI-accurate Win11 controls. Rendered
-with Skia (own controls, not WinUI peers) — which is exactly why it
-**cross-builds from macOS**. Persistence: SQLite (via `sqlite-net` or
-EF Core) — the SwiftData/Room analog. Shared backend: the existing
-**Firebase RTDB `live/{code}` data plane**, consumed by a **C# client
-twin** of `firebase.js` / the Swift `FirebaseRTDB`.
+     Learned in Tidbits Trivia, a trivia app whose Windows build was
+     certified in the Microsoft Store in 2026. Its marquee was a host-run
+     live night on a laptop and a projector, which is where the
+     "second-screen presenter" module (section 6) came from.
 
-> Windows earns its place because Tidbits' marquee is **Tidbits Live**
-> — a lean-back, big-screen, host-run experience, and Windows laptops
-> + projectors are the dominant pub/venue hardware. This is a
-> **host-first** platform. (Consumer game rides along; parity, native
-> idiom.)
+     Sections marked "(optional module)" apply only if the app has that
+     surface. Replace every [BRACKET] and delete the FILL notes. -->
+
+**Status: binding.** Quote the relevant rule before proposing any new
+window, page, dialog, or feature ("per WINDOWS-DESIGN 5.4"). When the
+doc and a feature conflict, **fix the doc first**. Amendments are
+append-only, with a dated note and a reason.
+
+Division of labor: **this doc** is the binding Windows contract.
+**`windows-production-gotchas`** carries the mechanics and failure
+modes. **`docs/windows/WINDOWS-PLAYBOOK.md`** is the pipeline.
+**`PARITY.md`** says what ships where. **`DECISIONS.md`** (029) says
+why Windows is here at all.
+
+**Stack (settled, see `windows/README.md`):** Avalonia 12 +
+FluentAvaloniaUI 3 + .NET 10 (C#, XAML). Avalonia renders with Skia
+(its own controls, not WinUI peers), which is exactly why it
+cross-builds and renders headless from a Mac. Persistence:
+[FILL IN: SQLite via `sqlite-net` or EF Core, the SwiftData/Room
+analog]. Shared backend: [FILL IN: the data plane every client already
+consumes], read by a C# client twin of the web and native clients.
+
+> [FILL IN: why Windows earns its place for this app, in two
+> sentences. Name the person and the hardware. Tidbits Trivia's answer
+> was "hosts run live nights from Windows laptops plugged into
+> projectors", so Windows was a host-first platform and the consumer
+> game rode along for parity.]
 
 ---
 
-## §0 — Architecture blockers (read FIRST; the compile/structure traps)
+## 0. Architecture blockers (the compile and structure traps)
 
-0.1 **Core is a C# port, not shared Swift.** ~60–70% of the app is
-platform-agnostic logic (models, RTDB REST client, wire types,
-game/queue/scoring/Elo, the Live host session, the corpus consumer).
-It is **re-implemented in C#** in a `Tidbits.Core` class library — the
-same relationship Android (Kotlin) and web (JS) have to the contract.
-**No Swift is shared or bridged.** The contract (`DATA-CONTRACT.md`,
-the RTDB room schema, wire types) is the source of truth both sides
-conform to. Golden-vector tests (mirror `run_golden.sh`) keep the C#
-wire types byte-compatible with the Apple/Kotlin/JS twins.
+0.1 **Core is a C# port, not shared Swift.** Roughly 60 to 70 percent
+of an app is platform-agnostic logic (models, the REST client, wire
+types, scoring and queue logic, the corpus consumer). It is
+**re-implemented in C#** in `AppName.Core`, the same relationship
+Android (Kotlin) and the web (JS) have to the contract. No Swift is
+shared or bridged. The contract (`docs/DATA-CONTRACT.md`, which you
+create from `docs/templates/DATA-CONTRACT-template.md`) is the source
+of truth every side conforms to. Golden-vector tests
+(`windows/AppName.HeadlessTests/HashRankTests.cs` is the pattern) keep
+the C# wire types byte-compatible with the Apple, Kotlin and JS twins.
 
-0.2 **The Win32 interop seam is the `#if os()` analog.** Mica-via-DWM,
+0.2 **The Win32 interop seam is the `#if os()` analog.** Mica via DWM,
 taskbar `ITaskbarList3`, global `RegisterHotKey`, and the
-`WM_NCHITTEST`→`HTMAXBUTTON` snap fix all need the HWND
+`WM_NCHITTEST` to `HTMAXBUTTON` snap fix all need the HWND
 (`TopLevel.TryGetPlatformHandle()`). Put ALL of it behind ONE
-`Win32HostInterop` helper in a Windows-guarded file
-(`OperatingSystem.IsWindows()` guards + a `net9.0-windows` TFM path).
-`Tidbits.Core` NEVER references it — Core stays OS-agnostic so it
-compiles for the headless test host and the macOS dev head.
+`Win32HostInterop` helper (`windows/AppName.App/Services/Win32HostInterop.cs`)
+with `OperatingSystem.IsWindows()` guards. `AppName.Core` NEVER
+references it, so Core stays OS-agnostic and compiles for the headless
+test host and the macOS dev head.
 
-0.3 **JIT self-contained publish, NOT Native AOT.** `dotnet publish -r
-win-x64 --self-contained` cross-builds from Apple Silicon; **Native
-AOT does not cross-OS** and would force a Windows build box. Keep AOT
-out of the default pipeline (a CI-only experiment at most).
+0.3 **Only `AppName.Windows` carries the `net10.0-windows` TFM.** It is
+a content-free WinRT edge (Store purchases and similar), loaded
+reflectively. Putting the Windows TFM on the app project kills every
+MSIX publish with MSB4062.
 
-0.4 **Package identity is required for the good parts.** Toasts, jump
-lists, startup task, and `tidbitstrivia://` protocol activation all
-need MSIX/sparse-package identity or they throw `NO_PACKAGE`. Ship a
-**sparse package** for sideload + a **full MSIX** for the Store (same
-identity → identical behavior). An unpackaged raw `.exe` is dev-only.
+0.4 **JIT self-contained publish, NOT Native AOT.** `dotnet publish -r
+win-x64 --self-contained` cross-builds from Apple Silicon. Native AOT
+does not cross OSes and would force a Windows build box. Keep AOT out
+of the default pipeline (a CI-only experiment at most).
 
-0.5 **Develop against the Avalonia macOS head; verify via headless PNG
-+ Windows CI.** Avalonia runs natively on this Mac — iterate the UI
-there. Gate "done" on a `Avalonia.Headless` PNG (`Read` it) AND a
-`windows-latest` CI run. "Compiles" and "renders on the Mac head" are
-not "correct on Windows" (Mica/chrome/snap are Win-only — §6, §8).
+0.5 **Package identity is required for the good parts.** Toasts, jump
+lists, the startup task, and `[appscheme]://` protocol activation all
+need MSIX package identity or they throw `NO_PACKAGE`. The Store MSIX
+carries that identity. An unpackaged raw `.exe` loses those features,
+so treat the direct-download channel as a reduced surface and say so in
+PARITY.md.
 
----
-
-## §1 — What Windows is
-
-1.1 A **host/emcee cockpit + consumer game**, in ONE Avalonia app,
-Fluent-themed for Windows 11 (graceful on Windows 10). Host mode is
-the reason the platform exists; the consumer game is parity.
-
-1.2 **Design principles (identical to the sibling platforms; idioms
-diverge):** density from removing chrome; six-level type ramp; brand
-`#FF5C35` for CTAs; learning-first (every question a door). The
-**inversions** vs the Mac: pointer + **keyboard-first** (Windows users
-run the show from the keyboard), Alt-mnemonic menu bar, taskbar/tray
-presence, system light/dark + accent, Mica materials.
-
-1.3 **First-class, not a port (the bar):** if a Windows user would say
-"this is clearly a cross-platform port," it fails §8.2. The tells of
-first-class: Mica window base, real Win11 caption, projector on a
-second monitor with hot-plug survival, taskbar progress = the round
-timer, global hotkeys, toast notifications, snap-layout participation,
-remembered per-monitor geometry.
+0.6 **Develop against the Avalonia macOS head. Verify with a headless
+PNG and Windows CI.** Avalonia runs natively on the Mac, so iterate the
+UI there. Gate "done" on an `Avalonia.Headless` PNG (`Read` it) AND a
+`windows-latest` CI run (`windows-repl.yml`, copied from
+`docs/windows/workflows/`). "Compiles" and "renders on the Mac head"
+are not "correct on Windows": Mica, window chrome and snap are
+Windows-only (sections 2 and 8).
 
 ---
 
-## §2 — The shell (window model)
+## 1. What the Windows app is
 
-2.1 **Consumer shell = FluentAvalonia `NavigationView`** (the WinUI
-idiom): a left nav pane (Play · Records · Create · Tidbits Live) that
-auto-collapses to a hamburger at narrow widths. NOT the macOS
-`NavigationSplitView` reused, NOT a tab bar. One content frame.
+1.1 [FILL IN: the one-line shape. Example: "a host cockpit plus the
+consumer app, in ONE Avalonia app, Fluent-themed for Windows 11 and
+graceful on Windows 10."] Name which mode is the reason the platform
+exists and which modes ride along for parity.
 
-2.2 **Settings is a NavigationView footer item** (gear), opening a
-Settings page — the Windows idiom (there is no macOS `⌘,` Settings
-scene). Sign-in lives here AND as a Records banner (mirror the macOS
-R-REC fix). Windows has no crash analog, but **do** verify sign-in is
-reachable in ≤2 clicks from launch.
+1.2 **Design principles are identical to the sibling platforms; the
+idioms diverge.** Density from removing chrome, the six-level type
+ramp, the brand primary for CTAs, and the learning-orientation test.
+The inversions against the Mac: pointer plus **keyboard-first**
+(Windows folks run things from the keyboard), an Alt-mnemonic menu bar,
+taskbar and tray presence, system light/dark and accent, Mica
+materials.
 
-2.3 **Host mode REPLACES the window content** (like macOS "game
-replaces window root"): starting/joining a Live night swaps the shell
-for the cockpit — never an overlay over the nav (its chrome bleeds).
-The projector is a SEPARATE top-level window (§6.3).
+1.3 **First-class, not a port (the bar).** If a Windows user would say
+"this is clearly a cross-platform port," it fails 8.2. The tells of a
+first-class app: a Mica window base, a real Windows 11 caption, snap
+layout participation, remembered per-monitor geometry, taskbar
+progress where a long-running state exists, toast notifications, and
+global hotkeys where the app is driven while another window has focus.
+
+---
+
+## 2. The shell (window model)
+
+2.1 **The shell is FluentAvalonia `FANavigationView`** (the WinUI
+idiom): a left nav pane ([FILL IN: the top-level destinations]) that
+collapses to a hamburger at narrow widths. NOT the macOS
+`NavigationSplitView` reused, NOT a tab bar. One content frame. **The
+landing surface renders on load**, never as a side effect of
+`SelectionChanged`: a detail pane that stays blank until someone
+clicks the nav is a broken first impression.
+
+2.2 **Settings is a `FANavigationView` footer item** (gear), opening a
+Settings page. That is the Windows idiom (there is no `Cmd+,` Settings
+scene). If the app has accounts, sign-in lives in Settings AND as a
+banner on the surface that benefits from signing in. Sign-in must be
+reachable in two clicks or fewer from launch.
+
+2.3 **A full-screen mode REPLACES the window content.** Starting a
+session, a game, or a presenter mode swaps the shell for that surface.
+Never an overlay over the nav, because its chrome bleeds through. (The
+same rule as the macOS player-as-window-root.) A second screen is a
+SEPARATE top-level window (section 6).
 
 2.4 **Window chrome:** extend into the title bar
-(`ExtendClientAreaToDecorationsHint`), Mica backdrop
-(`TransparencyLevelHint="Mica"` + transparent background + translucent
-panels), follow `ActualThemeVariant`. **Verify on the pinned build**
-(§0.5, §8.5) — some Avalonia 12 previews black-window on Mica.
+(`ExtendClientAreaToDecorationsHint`), a Mica backdrop
+(`TransparencyLevelHint="Mica"` plus a transparent background and
+translucent panels), and follow `ActualThemeVariant`. **Verify on the
+pinned Avalonia build** (0.6, 8.6): some Avalonia 12 previews rendered
+a black window on Mica.
 
 ---
 
-## §3 — Consumer game (parity, keyboard-first)
+## 3. The main experience (parity, keyboard-first)
 
-3.1 **The game replaces the shell content** while playing (Esc / a Quit
-affordance returns). ONE game engine (the C# Core port) — never a
-second engine (§7.5).
+3.1 **One engine.** The main experience runs on the C# Core port, never
+a second engine or a re-derived pipeline (7.3). Esc or a visible Quit
+affordance always returns to the shell.
 
-3.2 **Keyboard-first:** number keys pick MCQ options, Enter continues,
-Esc quits, arrows where a slider/stepper applies — mirrors the tvOS/
-macOS keyboard maps. Every interactive control is Tab-reachable with a
-visible system-accent focus ring.
+3.2 **Keyboard-first.** [FILL IN: the key map. Example: number keys
+pick options, Enter continues, Esc quits, arrows drive sliders and
+steppers.] Mirror the tvOS and macOS key maps where they exist. Every
+interactive control is Tab-reachable with a visible system-accent
+focus ring.
 
-3.3 **Picture rounds** route through ONE image helper (decoded cache +
-capped `HttpClient`), never bare per-frame network image controls —
-the Windows analog of the macOS `ImagePipeline` rule. Decode to a
-consistent color space (avoid the grayscale-as-white-box class).
+3.3 **Remote images route through ONE image helper** (a decoded cache
+plus a capped `HttpClient`), never bare per-frame network image
+controls. This is the Windows analog of the macOS `ImagePipeline`
+rule. Decode to a consistent color space so a grayscale or CMYK image
+never renders as a white box.
 
-3.4 **Results = a scrollable recap** (score, accuracy, streak, "tidbits
-to remember"), Fluent cards; the primary action (Play again) is a
-single accent button, not a stretched full-width control (Windows
-buttons size to content — the `CompactButtonStyle` lesson from macOS).
-
----
-
-## §4 — Records (dashboard, not a ledger)
-
-4.1 **R-REC-1 holds on Windows:** Records is a **dashboard** — streak +
-lifetime → **recent games bounded to 3 + "See all"** → your knowledge
-→ calibration → personal bests → facts to review. "See all" is a light
-Fluent `DataGrid`/list, **never** a wall of cards. Do not port an
-inline-dump. (Same rule as iOS §5.3–5.6 / macOS §4.1.)
-
-4.2 **Sign-in banner when signed out** (mirrors the macOS Records fix)
-— "Sign in to sync your records," routing to Settings sign-in.
+3.4 **Buttons size to content** (the Fluent default). A full-width
+button is ONLY a genuine single primary CTA below content, never a
+control sitting next to another control in a row. The macOS app
+shipped exactly that malformed-button class once. Do not reintroduce
+it here.
 
 ---
 
-## §5 — Design system (Fluent, brand-forward)
+## 4. Lists and dashboards
+
+4.1 **A history surface is a dashboard, not a ledger.** Summary first,
+then **recent items bounded to three plus "See all"**, then the deeper
+sections. "See all" is a light Fluent list or `DataGrid`, **never** a
+wall of cards. Do not port an inline dump from another platform.
+
+4.2 **Every list and grid defines its loading, empty, error and
+offline states** (`universal-feature-states`). A signed-out state that
+hides data carries a banner routing to sign-in.
+
+---
+
+## 5. Design system (Fluent, brand-forward)
 
 5.1 **Shared tokens, Windows expression.** Reuse the palette values
-(`--color-primary #FF5C35`, accent `#0047FF`, surface, ink, border)
-as Avalonia `ThemeVariant` resource dictionaries (light + dark). Brand
-drives CTAs/active states; the **system accent** drives OS chrome only
-(focus rings, selection) so the app belongs on the machine without
-diluting the brand.
+from CLAUDE.md (`--color-primary`, `--color-accent`, surface, text,
+border) as Avalonia `ThemeVariant` resource dictionaries (light and
+dark) in `windows/AppName.App/App.axaml`. The brand drives CTAs and
+active states. The **system accent** drives OS chrome only (focus
+rings, selection), so the app belongs on the machine without diluting
+the brand.
 
-5.2 **The `chunkyCard` analog** is a reusable Avalonia `ControlTheme`
-(rounded rect, 2.5px border, own shadow — never hand-add shadow
-padding at call sites, per macOS §7.9). Reuse it for game options,
-records cards, cockpit panels.
+5.2 **One card style.** `Border.card` in `App.axaml` is the reusable
+card (rounded rect, border, its own shadow). Never hand-add shadow
+padding at a call site.
 
-5.3 **Typography = the same six levels** (L1 page title → L6 tabular),
-mapped to Fluent type ramp / explicit sizes. Big-screen/projector text
-sizes by **viewport fraction + min scale**, never fixed pt (the macOS
-scale-to-fit fix — a projector at 100% vs a 150% laptop makes fixed pt
-wrong).
+5.3 **Typography is the same six levels** (L1 page title to L6
+tabular), defined once in `App.axaml`. Refuse a seventh. Any
+big-screen or presenter text scales by **viewport fraction with a
+minimum scale**, never a fixed point size: a projector at 100 percent
+and a laptop at 150 percent make fixed sizes wrong on one of them.
 
-5.4 **Buttons size to content** (Fluent default). A full-width button
-is ONLY a genuine single primary CTA below content — never a control
-sitting next to another control in a row (the exact macOS "malformed
-button" class; do not reintroduce it).
+5.4 **The brand CTA is PINNED, and an accent button never sits on an
+accent surface.** FluentAvalonia derives a lighter accent for the dark
+theme, so a `Classes="accent"` button washes out to a pale tint with
+black text while any hard-coded brand color beside it stays saturated.
+Two adjacent CTAs then disagree. `Button.accent` pins the brand token
+(with white text) in both themes. Fluent's derived accent still drives
+focus rings and selection, which is correct there. On a brand-colored
+surface the accent button is invisible, so use the inverse treatment
+(a white chip with a brand-colored label). This applies to EVERY accent
+surface, not only buttons: a switched-on `ToggleSwitch` washed out the
+same way until it was pinned too.
 
----
-
-## §6 — Tidbits Live (the marquee — host cockpit + projector + join)
-
-6.1 **Same backend, C# client.** The cockpit publishes `LiveRoom.Pub`
-to RTDB `live/{code}`; phone/web/other-platform joiners render it —
-byte-identical wire types (§0.1). Full parity with the macOS host:
-rounds/questions, reveal, scoring, answer distribution, hold/break,
-skip/jump, tie-break, CSV export, standings, the premium waves
-(A authoring, B AV/show, C submission/scoring, D venue, E standings).
-
-6.2 **The cockpit** (host laptop): a keyboard-run control surface.
-Space=reveal, ←/→=prev/next, digits=jump, Esc=big-screen hold; an
-Alt-mnemonic menu bar (File/Game/Live/View/Help); **taskbar progress =
-the round timer / teams-answered** so a host with the cockpit
-minimized still sees state; **global hotkeys** (`RegisterHotKey`) so
-Reveal/Next fire even when the projector or a slideshow has focus.
-Buttons size to content (§5.4).
-
-6.3 **The projector (big-screen) = a SEPARATE chromeless top-level
-window** on the second monitor: pick the non-primary `Screen`, set
-`Position = screen.Bounds.Position` THEN `WindowState.FullScreen`,
-`SystemDecorations="None"`, blank cursor. **MUST survive hot-plug** —
-projectors connect/disconnect mid-night; on display change, re-query
-`Screens` and fall back to the primary (or a "no projector" slide),
-never vanish off-screen. Remember the chosen monitor. All big-screen
-text scales by viewport fraction (§5.3).
-
-5.5 **The brand CTA is PINNED; an accent button never sits on an accent
-surface.** FluentAvalonia derives a lighter accent for the dark theme, so a
-`Classes="accent"` button washes out to salmon-with-black-text while any
-hard-coded `#FF5C35` beside it stays saturated — two adjacent CTAs disagreeing.
-`Button.accent` pins the brand token (+ white) in both themes; Fluent's derived
-accent still drives focus rings and selection, which IS correct there. And on a
-coral surface the accent button is invisible — use the inverse treatment (white
-chip, coral label), as the Daily hero row does. This applies to EVERY accent
-surface, not just buttons — a switched-on `ToggleSwitch` washed out the same
-way until it was pinned too.
-
-5.6 **Settings is `FASettingsExpander` rows**, not bold `TextBlock` headers over
-`StackPanel`s — Header + Description + a Footer control per row is the Windows 11
-Settings shape. Status messages use `FAInfoBar`. Any row carrying an ACCOUNT
-affordance ships `IsExpanded="True"`: sign-in hidden behind a chevron reads as
-"this app has no account", which is exactly what the iPhone got wrong.
-(FluentAvalonia 3 prefixes these `FA…`; the unprefixed WinUI names do not resolve.)
-
-6.3a **The projector must never hijack the only display.** Auto-
-fullscreen is correct ONLY when a non-primary `Screen` exists. With a
-single monitor, open a normal **decorated, resizable** window the host
-can drag onto the projector themselves — a chromeless fullscreen
-window on the primary display covers the cockpit with no title bar,
-no taskbar entry, and no way out. Always `ShowInTaskbar`, and always
-bind **Esc to leave fullscreen** so the big screen is never a trap.
-
-6.3b **Cockpit control rows WRAP.** The transport (back/reveal/next/
-skip/lock) and night-management (tie-break/merge/export/print/
-projector/end) groups are a dozen buttons; in a non-wrapping
-`StackPanel` they clip or collide the moment the window is anything
-but maximised. Use `WrapPanel` per group so they reflow onto another
-line. A control the host cannot reach mid-night is a broken night.
-
-6.4 **Join** is unchanged for players (phones hit
-`tidbitstrivia.com/live/CODE`); the cockpit shows the join QR + code.
-Windows also **registers `tidbitstrivia://` + the https join link** so
-a shared link opens the Windows app into a **deep-link inbox** (never
-mutate the router directly — the cross-platform inbox rule).
-
-6.5 **Toasts** (host): "Team 4 joined," "all teams answered — reveal?",
-timer expired — via `DesktopNotifications.Avalonia`.
+5.5 **Settings is `FASettingsExpander` rows**, not bold `TextBlock`
+headers over `StackPanel`s. Header, Description and a Footer control
+per row is the Windows 11 Settings shape. Status messages use
+`FAInfoBar`. Any row carrying an ACCOUNT affordance ships
+`IsExpanded="True"`: sign-in hidden behind a chevron reads as "this
+app has no account." (FluentAvalonia 3 prefixes these `FA`. The
+unprefixed WinUI names do not resolve.)
 
 ---
 
-## §7 — Anti-patterns (never)
+## 6. Second-screen presenter window (optional module)
 
-7.1 A resized macOS/iOS layout, or reusing `NavigationSplitView`
-instead of the Fluent `NavigationView` (§2.1). 7.2 Host cockpit as an
-overlay over the nav instead of replacing window content (§2.3). 7.3
-A second game engine or a re-derived RTDB pipeline instead of the C#
-Core port + shared contract (§0.1, §3.1). 7.4 Native AOT / any step
-that forces a Windows build machine into the default pipeline (§0.3).
-7.5 Bare per-frame network image control for picture art (§3.3). 7.6
-A Records inline dump instead of the bounded dashboard (§4.1). 7.7
-Full-width button next to another control in a row (§5.4). 7.8
-Hand-added shadow padding at a card call site (§5.2). 7.9 Fixed-pt
-big-screen text (§5.3). 7.10 Projector window that vanishes when the
-display is unplugged (§6.3), or goes fullscreen-chromeless on a
-single-monitor machine (§6.3a). 7.13 A non-wrapping cockpit control
-row (§6.3b). 7.14 A detail pane that stays blank until the user
-clicks the nav — the landing surface renders on load, never as a
-side effect of `SelectionChanged` (§2.1). 7.11 Win32 interop leaking into
-`Tidbits.Core` (§0.2). 7.12 Shipping "done" on the macOS Avalonia head
-without a headless PNG + `windows-latest` CI check (§0.5, §8).
+<!-- FILL: delete this section if the app never drives a second
+     display. Keep it for any host, presenter, kiosk, or big-screen
+     mode. -->
 
----
+6.1 **The control surface.** [FILL IN: the keyboard map for the host.
+Example: Space reveals, Left/Right move, digits jump, Esc holds the big
+screen.] An Alt-mnemonic menu bar mirrors every action. **Taskbar
+progress** shows the running state so a host with the window minimized
+still sees it. **Global hotkeys** (`RegisterHotKey`) fire the main
+actions even when the presenter window or a slideshow has focus.
 
-## §8 — The tests (before any surface ships)
+6.2 **The presenter window is a SEPARATE chromeless top-level window**
+on the second monitor: pick the non-primary `Screen`, set `Position =
+screen.Bounds.Position` THEN `WindowState.FullScreen`,
+`SystemDecorations="None"`, and hide the cursor. **It must survive
+hot-plug.** Projectors connect and disconnect mid-session, so on a
+display change re-query `Screens` and fall back to the primary (or a
+"no second display" slide). Never vanish off-screen. Remember the
+chosen monitor. All presenter text scales by viewport fraction (5.3).
 
-8.1 **Competent-designer test** — rebuildable from a paragraph? 8.2
-**Windows-idiom test** — Mica/caption, keyboard+Alt-menus, taskbar/
-tray, projector — or is it a ported Mac window? 8.3 **Cross-build
-test** — does `dotnet publish -r win-x64 --self-contained` succeed from
-the Mac (no AOT, no Windows-only dep pulled into Core)? 8.4 **Parity**
-— same verb as the other platforms, native idiom; PARITY.md row
-updated. 8.5 **Headless-PNG test** — an `[AvaloniaFact]` renders the
-surface to PNG (`Read` it) at cockpit + projector sizes and both theme
-variants. 8.6 **Real-Windows test** — `windows-latest` CI builds, runs
-the headless capture, and (for Mica/chrome/snap) a desktop screenshot;
-artifacts checked. 8.7 **Contract test** — C# wire types pass the
-golden vectors against the Apple/Kotlin/JS twins.
+6.3 **The presenter window never hijacks the only display.**
+Auto-fullscreen is correct ONLY when a non-primary `Screen` exists.
+With a single monitor, open a normal **decorated, resizable** window
+the host can drag onto the projector. A chromeless fullscreen window on
+the primary display covers the control surface with no title bar, no
+taskbar entry, and no way out. Always `ShowInTaskbar`, and always bind
+**Esc to leave fullscreen** so the big screen is never a trap.
+
+6.4 **Control rows WRAP.** A dozen host buttons in a non-wrapping
+`StackPanel` clip or collide the moment the window is anything but
+maximized. Use a `WrapPanel` per group so they reflow onto another
+line. A control the host cannot reach mid-session is a broken session.
 
 ---
 
-## Open owner decisions (from research; non-blocking to start)
+## 7. Links and notifications
 
-1. **Distribution:** default is **both** — free Microsoft Store (MSIX,
-   auto-signed, no SmartScreen, $0) + Velopack/GitHub Releases
-   (unsigned initially). Confirm appetite for the Store MSIX + review.
-2. **Signing spend:** default **$0** (unsigned + Store). ~$10/mo Azure
-   Artifact Signing is a later optional upgrade for unsigned-free direct
-   download — decide when there's an audience.
-3. **Scope of first slice:** recommend **host-first** — cockpit +
-   projector + join (the marquee, and the reason Windows exists) before
-   the consumer game, so the platform proves its unique value early.
+7.1 **Deep links land in an inbox.** Register `[appscheme]://` and the
+https twin of every shared link (see `DEEP_LINKS.md`) so a shared link
+opens the Windows app into a **deep-link inbox**. External entry
+points never mutate the router directly (the cross-platform inbox
+rule).
+
+7.2 **Toasts** for the events a person would otherwise miss while the
+window is in the background ([FILL IN: the events]), through
+`DesktopNotifications.Avalonia` or the Store identity's native path.
+Toasts need package identity (0.5).
+
+---
+
+## 8. Anti-patterns (never)
+
+- A resized macOS or iOS layout, or reusing `NavigationSplitView`
+  instead of `FANavigationView` (2.1).
+- A landing pane that stays blank until the nav is clicked (2.1).
+- A full-screen mode as an overlay over the nav instead of replacing
+  the window content (2.3).
+- A second engine or a re-derived data pipeline instead of the C# Core
+  port and the shared contract (0.1, 3.1).
+- Native AOT, or any step that forces a Windows build machine into the
+  default pipeline (0.4).
+- The `net10.0-windows` TFM on any project other than `AppName.Windows`
+  (0.3).
+- Win32 interop leaking into `AppName.Core` (0.2).
+- A bare per-frame network image control for remote art (3.3).
+- An inline history dump instead of the bounded dashboard (4.1).
+- A full-width button next to another control in a row (3.4).
+- Hand-added shadow padding at a card call site (5.2).
+- Fixed-point big-screen text (5.3).
+- An unpinned accent CTA, or an accent button on an accent surface
+  (5.4).
+- A presenter window that vanishes when the display is unplugged, or
+  goes fullscreen-chromeless on a single-monitor machine (6.2, 6.3).
+- A non-wrapping control row (6.4).
+- Declaring "done" on the macOS Avalonia head without a headless PNG
+  and a `windows-latest` CI check (0.6, 9).
+
+---
+
+## 9. The tests (before any surface ships)
+
+1. **Competent-designer test.** Could someone rebuild the surface from
+   one paragraph of this doc?
+2. **Windows-idiom test.** Mica and caption, keyboard and Alt menus,
+   taskbar and tray. Or is it a ported Mac window?
+3. **Cross-build test.** Does `dotnet publish -r win-x64
+   --self-contained` succeed from the Mac, with no AOT and no
+   Windows-only dependency pulled into Core?
+4. **Parity test.** Same verb as the other platforms, native idiom,
+   PARITY.md row updated in the same change set.
+5. **Headless-PNG test.** An `[AvaloniaFact]` renders the surface to
+   PNG (`Read` it) at every window size that matters and in both theme
+   variants. The visual-baseline gate
+   (`windows/AppName.HeadlessTests/VisualBaseline.cs`) passes.
+6. **Real-Windows test.** `windows-latest` CI builds, runs the headless
+   capture, and (for Mica, chrome and snap) takes a desktop screenshot.
+   Download the artifacts and look at them.
+7. **Contract test.** The C# wire types pass the golden vectors against
+   the Apple, Kotlin and JS twins.
+
+---
+
+## Open owner decisions
+
+<!-- FILL: resolve these with the owner before the first Store
+     submission. The defaults below are what Tidbits Trivia shipped. -->
+
+1. **Distribution.** Default is **both**: the free Microsoft Store
+   (MSIX, Microsoft re-signs it, no SmartScreen prompt, $0) plus a
+   direct single-file `.exe` or Velopack installer on GitHub Releases
+   (unsigned at first). Confirm the owner wants the Store listing and
+   its review.
+2. **Signing spend.** Default is **$0** (unsigned direct download plus
+   the Store). Azure Artifact Signing at about $10 a month is a later,
+   optional upgrade that removes SmartScreen from the direct download.
+   Decide when there is an audience.
+3. **First slice.** [FILL IN: which surface ships first. Recommend the
+   one that is the reason Windows exists, so the platform proves its
+   value early.]
+
+The Windows app is done when a Windows person forgets it was built on
+a Mac.

@@ -1,6 +1,6 @@
 """Drive a real Windows 10/11 machine over SSH — the sixth device in the fleet.
 
-Decision 045 said there is no Windows box, so `windows-latest` IS the box and
+The CI-is-the-Windows-machine rule said there is no Windows box, so `windows-latest` IS the box and
 everything is observed through CI artifacts. That constraint is now lifted for
 ITERATION: a real machine on the LAN can be deployed to, launched, and
 photographed in the same loop as the Apple TV or the Pixel. CI stays the GATE —

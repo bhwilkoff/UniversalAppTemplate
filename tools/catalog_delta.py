@@ -6,7 +6,8 @@ THE PROBLEM, measured. Twenty-seven workflows hold the single `catalog-writers`
 lock for their ENTIRE run — fetch, compute for up to four hours, publish — and
 their average demand adds up to **24.2 hours per cycle** against a lock that has
 24 hours a day to give. It is oversubscribed, which is why runs are destroyed in
-the queue routinely rather than occasionally (Decision 057), why budgets have to
+the queue routinely rather than occasionally (GitHub keeps one pending run per
+concurrency group), why budgets have to
 be measured in hours, and why a kill discards a whole run's work.
 
 The compute needs no lock. Only the mutation does, and the mutation takes about

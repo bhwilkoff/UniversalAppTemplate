@@ -1,6 +1,6 @@
 ---
 name: cross-platform-multiplayer
-description: Use when building any real-time multiplayer that must span native (iOS/macOS/tvOS/Android) AND the web — same-room local play over the LAN, or online play across the internet. Carries the transport-seam abstraction, the "protocol + arbiter live in Core with no networking import" rule, ship-IDs-not-payloads, the mDNS+TCP+AES-GCM serverless local path, the canonical-wire-schema + golden-parity test method, host-paced everyone-plays coordination with a friendly-game trust model, leader election, the online reality (GameKit is Apple-only, Google killed Play Games real-time multiplayer in 2020) + neutral-backend and believable-bot fallbacks. Triggers on multiplayer, peer-to-peer, matchmaking, same-room, Bonjour/mDNS, Wi-Fi Aware, GameKit, Firebase rooms, "play with a friend", online match, wire protocol, cross-platform sync of live state.
+description: "Use when building any real-time multiplayer that must span native (iOS/macOS/tvOS/Android) AND the web — same-room local play over the LAN, or online play across the internet. Carries the transport-seam abstraction, the \"protocol + arbiter live in Core with no networking import\" rule, ship-IDs-not-payloads, the mDNS+TCP+AES-GCM serverless local path, the canonical-wire-schema + golden-parity test method, host-paced everyone-plays coordination with a friendly-game trust model, leader election, the online reality (GameKit is Apple-only, Google killed Play Games real-time multiplayer in 2020) + neutral-backend and believable-bot fallbacks. Also the $0 cross-platform watch party. Triggers on multiplayer, peer-to-peer, matchmaking, same-room, Bonjour/mDNS, Wi-Fi Aware, GameKit, Firebase rooms, \"play with a friend\", online match, wire protocol, cross-platform sync of live state, watch party, synced playback."
 ---
 
 # Cross-Platform Multiplayer
@@ -128,6 +128,72 @@ The settled reality that forces the architecture:
   strangers. Make the server own the clock, split the public prompt from the
   private answer key, and reject late/implausible answers. Only add this when you
   actually ship stranger-matched play — it's real work.
+
+## Synced media across platforms at $0 (the watch party)
+
+The media variant: everyone watches the same film in sync, on any
+platform, with no running cost. Shipped in Archive Watch (Swift,
+Kotlin, web against one Worker + D1).
+
+- **SharePlay is coordination only, and Apple-only.** It syncs state
+  between Apple devices; it never hands the app another participant's
+  call audio/video, and it cannot reach Android or the web. Keep it as
+  the Apple-to-Apple path (see `shareplay-activities`); do not build
+  the cross-platform feature on it.
+- **The call is not our problem.** People already have Zoom, Meet,
+  FaceTime or a phone call. Carrying voice means a transport, NAT
+  traversal, TURN for the 10-20% behind symmetric NAT, and per-message
+  billing; a relay cannot be $0 at scale because free-tier request
+  limits are PER ACCOUNT, shared by every user (one 4-person talking
+  party measured at ~72% of a day's free Worker requests). Sync is the
+  only networking left, and it is orders of magnitude cheaper.
+- **Send STATE, never the playhead.** The host publishes one record
+  only when state changes (play, pause, seek, rate, end):
+  `{ item, position, atServerTime, rate, paused, generation }`.
+  Clients extrapolate `expected = position + (now - atServerTime) * rate`
+  while not paused. A two-hour film is tens of writes, not thousands.
+  The SERVER bumps `generation`, never the client.
+- **The server is the clock.** Cristian's algorithm: send `t0`, server
+  answers `ts`, reply lands at `t1`,
+  `offset = ts - (t0 + t1) / 2`, error bounded by RTT/2. Keep the
+  sample with the SMALLEST round trip, never an average. Return
+  `serverTime` in the same GET as the state, so every poll is also a
+  clock sample (no separate time endpoint). Watch units at the
+  boundary (seconds vs ms).
+- **Correct by rate before seeking.** Under 150 ms: nothing. 150 ms to
+  2 s: rate 0.97x / 1.03x until aligned, then 1.0. Over 2 s: seek.
+  Pause/play applied immediately. A 3% nudge is invisible; a seek
+  rebuffers in front of everyone.
+- **The host is authoritative; a stalled guest catches up.** The show
+  never waits for a straggler (the inverse of SharePlay, which
+  suspends, because here the host may also be broadcasting).
+- **Transport: D1 polling on an existing Worker.** Guests poll ~3 s and
+  extrapolate between polls; the host writes on change. Workers KV is
+  eventually consistent for up to 60 s (a pause would take a minute),
+  so it is unusable here. See `zero-cost-hosted-backend` for the
+  shared-Worker rules (rate limiters, cron sweep of stale rooms).
+- **Room code != host key.** A code is read aloud, so seeing it must
+  not be the power to drive. `POST /new` returns `{code, hostKey}`
+  once, to the creator; every write requires the key; a read never
+  returns it. Test: code without key refused, wrong key refused, room
+  unchanged, GET carries no key.
+- **Guests play the host's exact file.** The room stores the file
+  identity (`<item>/<file>`, never a URL, so a room cannot point
+  guests at another host), and every join path reads the room before
+  building a player. Copies of "the same title" differ in length; a
+  guest on another copy is on another timeline.
+- **Normalise the code identically everywhere** (a heard "oh" is 0 on
+  every stack) and assert it with a parity test between the Worker and
+  each client.
+- **Correction returns a value; the platform applies it.**
+  `correction(state, now) -> .none | .rate(x) | .seek(t) | .pause`
+  knows nothing about AVPlayer / ExoPlayer / `<video>`, so the whole
+  host-to-guest chain tests against a real local Worker with no device
+  in the loop. Nobody is ever asked to do anything; corrections are
+  silent.
+- **Privacy:** a room row says what a film is doing, nothing about
+  people. Ending deletes it; a cron sweep deletes idle rooms; presence
+  is anonymous per-join tokens read only as a count.
 
 ## Believable-bot fallback (and the non-negotiable honesty rule)
 

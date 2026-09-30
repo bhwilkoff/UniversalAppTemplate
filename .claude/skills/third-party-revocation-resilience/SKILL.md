@@ -1,6 +1,6 @@
 ---
 name: third-party-revocation-resilience
-description: Use when the app depends on a third party's data, images, or API (a price guide, a metadata provider, a scraping target, a partner feed) — both BEFORE the dependency becomes load-bearing (design the exit path) and the day a partner revokes authorization (execute a compliant removal without losing the product). Carries the independence posture, the prohibition-list-first removal protocol, the replacement-architecture table, frozen-legacy-data vs live-automation split, grep-verified compliance, and the backfill methodology. Triggers on revocation, cease and desist, takedown, "they pulled our access", data partner, third-party dependency, remove the integration, backfill, provenance flip, compliance removal.
+description: "Use when the app depends on a third party's data, images, or API (a price guide, a metadata provider, a scraping target, a partner feed) — both BEFORE the dependency becomes load-bearing (design the exit path) and the day a partner revokes authorization (execute a compliant removal without losing the product). Carries the independence posture, the prohibition-list-first removal protocol, the replacement-architecture table, frozen-legacy-data vs live-automation split, grep-verified compliance, and the backfill methodology. Also shared per-app API quotas (price each call, never retry quota errors, degrade, keep a no-API path). Triggers on revocation, cease and desist, takedown, \"they pulled our access\", data partner, third-party dependency, remove the integration, backfill, provenance flip, compliance removal, quota, quotaExceeded, per-app quota, API units."
 ---
 
 # Third-Party Revocation Resilience
@@ -35,6 +35,30 @@ path designed BEFORE the feature ships on top of it:
 - **Never let a third party's identifiers become your primary
   keys.** Your canonical IDs are yours; theirs are a mapped,
   droppable column.
+
+### Shared per-app quotas (a slow revocation)
+
+Many APIs meter quota per PROJECT (the one behind the app's shipped
+client id), not per signed-in user. Every user then draws on the same
+daily pool, and one popular evening can spend it for everyone. Archive
+Watch measured a two-hour YouTube live show at ~7,700 of the 10,000
+daily units (~7,200 of them chat polling at the provider's own 5 s
+interval): about one show a day for all users. Rules (Decision 136):
+
+- **Price every call before adding it** (units x calls per session) and
+  write the price next to the call. Poll at the slowest cadence the
+  feature tolerates; make expensive reads opt-in.
+- **Never retry a quota error.** Stop, say so on screen, back off
+  exponentially on anything else.
+- **Degrade, never die.** Every quota-backed feature has a defined
+  state for "quota gone" in which the core verb still works.
+- **Keep a no-API path first-class**, not a debug door (a pasted stream
+  key needs no API and spends no quota). It is the one route whose
+  capacity does not depend on the vendor.
+- **File the vendor's quota extension early**; it is a separate review
+  from OAuth verification. "Bring your own cloud project" gives each
+  user their own quota but is a wall almost nobody climbs; offer it as
+  an option, never the default.
 
 ## Part 2 — The removal protocol (the day the email arrives)
 

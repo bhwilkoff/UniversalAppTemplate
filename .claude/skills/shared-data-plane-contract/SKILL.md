@@ -1,6 +1,6 @@
 ---
 name: shared-data-plane-contract
-description: Use when multiple clients consume the same content/data (a catalog, feed, corpus, or library), when designing how published data reaches the apps, when a browser client needs the shared data (CORS/Range realities), or when changing the published schema. Carries the consumers-only rule, the contract doc, hosting trade-offs (GitHub Releases vs Pages vs git), verified CORS/Range matrix, ETag refresh, raw-DEFLATE on-device decompression, additive schema evolution, and merge-guarded mutations. Triggers on data plane, shared catalog, published database, sqlite over http, data contract, CORS, range requests, ETag, schema version, "where should the data live".
+description: Use when multiple clients consume the same content/data (a catalog, feed, corpus, or library), when designing how published data reaches the apps, when a browser client needs the shared data (CORS/Range realities), or when changing the published schema. Carries the consumers-only rule, the contract doc, hosting trade-offs (GitHub Releases vs Pages vs git), verified CORS/Range matrix, ETag refresh, raw-DEFLATE on-device decompression, additive schema evolution, merge-guarded mutations, contract tests over the real artifact, the projection ladder with one gatekeeper index, field tiers by use, named filter clauses, pipeline-side policy flags (never recommended, always findable), stricter outbound tiers, and small extension files. Triggers on data plane, shared catalog, published database, sqlite over http, data contract, CORS, range requests, ETag, schema version, "where should the data live".
 ---
 
 # Shared Data Plane Contract
@@ -141,3 +141,125 @@ plane itself is clean. Four rules earned in production:
   contract doc — see the DATA-CONTRACT template's Display Vocabulary
   section — so no client leaks schema language into the UI and no
   two clients translate differently.
+
+## A data contract is a test, not a docstring
+
+A shape the contract states is asserted by a test over the REAL
+published artifact (every shard, every row), not only unit fixtures.
+Archive Watch (Decision 116): the detail builder documented "cast is
+always a list" and emitted a bare string when a person had no photo.
+The web happened to check `Array.isArray` and coped; Roku trusted the
+docstring and crashed on 5.4% of titles. **One client's tolerance
+hides the defect from every other client.** A second reader coping is
+not evidence the contract holds.
+
+- Fix the PRODUCER first when the defect is in data: republishing
+  repairs already-shipped clients with no store review. Then fix the
+  client too, because a client may not crash on a shape.
+- Every contract test has a negative control (break the producer,
+  watch it fail).
+
+## Projections: one ladder, one gatekeeper
+
+Not every client can read the full artifact. Publish a ladder of
+projections, each cut from the one above it:
+
+| Consumer | Projection |
+|---|---|
+| Native apps (Apple, Android) | full SQLite, queried on disk |
+| Browser, Roku, other thin clients | slim index JSON (browse/search rows) + detail files sharded by a stable hash of the id (e.g. 256 FNV-1a shards, positional arrays, fields APPEND-only so indices never shift), one shard fetched per Detail view |
+| Free-tier Worker endpoints, partner feeds | smaller shards again, cut from the slim index |
+
+- **The slim index is the gatekeeper for every thin surface.** An id
+  absent from it is never requested from a shard, never put in a feed,
+  never answered by an endpoint. A builder never re-derives
+  membership.
+- **Policy predicates are imported by every builder, never copied.**
+  Archive Watch's index build had its own looser copy of the mature
+  rule; a title the Apple TV hid showed on Roku (Decision 105). Its
+  hero rule had been copied by half, and web and Roku admitted 46% and
+  67% more films than the apps. Import the function; test the parity.
+- The client-side shard function mirrors the builder's exactly (see
+  `cross-platform-determinism`).
+
+## Tier fields by how they are used
+
+Every new field goes to the cheapest layer that supports its use:
+
+- **Detail-only** ("find out more"): the per-row JSON blob, decoded
+  only on Detail. Zero query cost.
+- **Searchable text**: the FTS index.
+- **Values people filter by**: a small normalized join table
+  `(id, value)` with an index.
+- Never a new hot-path or sort column for a nice-on-Detail field.
+
+Budget both before committing: the compressed download size (set a
+ceiling and measure on a real build) and query cost (`EXPLAIN QUERY
+PLAN` plus timings before and after on browse, sort, search, Detail).
+
+## Named filter clauses, and verbs that state which they apply
+
+Name each universal WHERE fragment once in the contract (e.g.
+`adultAnd`, `typeAnd`, `homeAnd`, `notCommercial`) and give every
+query verb a column saying exactly which clauses it applies.
+
+- **Advertising surfaces are gated more strictly than lookups.** A
+  shelf or hero that headlines an item applies the stricter clause;
+  Search, Browse, and Detail by id do not (Detail must resolve
+  anything the app can link to).
+- A verb whose filter column is unwritten will be reimplemented
+  differently on every platform.
+
+## Policy lives in the pipeline
+
+- **Put a guard in the shared selector, not a downstream sweep.** A
+  sweep that hides what the picker admitted is a race the catalog
+  loses every time a new item lands (Archive Watch Decision 104).
+- **Rank once in the pipeline and store the why.** "Related" ranked
+  per client gave the same item a different shelf on every screen.
+  Compute it once over the post-policy rows, publish ids plus the
+  reason for each link, and let clients fall back to a simple query
+  when a row is missing (Decision 139).
+- **If the pipeline can compute a shared value, publish the result**
+  rather than mirroring an algorithm on every device (see
+  `cross-platform-determinism` Rule 0).
+
+## "Never recommended, always findable" is a data flag
+
+Some items belong in the catalog but must never be chosen FOR the
+person: propaganda, titles with a rights caveat. Model it as a flag
+(e.g. `noRecommend` plus a reason), recomputed every build from
+sourced evidence.
+
+- Every surface that picks for the viewer skips it: shelves, heroes,
+  related, channels, widgets, Top Shelf, surprise picks, social posts.
+- Every surface the viewer drives keeps it: search, browse filters,
+  collections, Detail.
+- Each platform names the gate once (`isRecommendable`, `noRecAnd`)
+  and a test asserts every pipeline output honors it, with an
+  unflagged control.
+
+## Outbound surfaces use a stricter tier
+
+A feed handed to a third party (a store's search index, a partner
+catalog) is a stronger claim than showing an item in your own app.
+Give it its own stricter tier, still cut from the served index. But a
+playlist or export of what the app already shows follows the app's
+gate, not the partner tier (Archive Watch Decisions 113 vs 145).
+
+- **Feed ids never change once submitted.** If the partner caps id
+  length, derive a stable hashed id and never "clean it up".
+- A deploy refuses a feed below a floor count, so a shrunken feed
+  cannot ship green.
+
+## Small purpose-built files for extensions
+
+Top Shelf, widgets, complications, and heroes should not open the
+full DB. Publish tiny JSON the pipeline computes (e.g. `topshelf.json`
+rows, `tonight.json` as `{ "YYYY-MM-DD": id }`).
+
+- Key daily picks by calendar date and let each client read its OWN
+  local date; start the schedule at yesterday so every time zone
+  finds today.
+- Days already published keep their value across rebuilds, so a
+  midday publish never changes today.

@@ -30,6 +30,8 @@ on:
 permissions:
   actions: read
   contents: read
+  # The auditor reports through an issue rather than through a red X.
+  issues: write
 
 jobs:
   audit:
@@ -49,6 +51,8 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           LOOKBACK_HOURS: ${{ github.event.inputs.lookback_hours || '36' }}
         run: |
+          # The auditor exits 0 whenever it ran; a non-zero rc is its OWN
+          # mechanics (gh unreachable) and must not skip the summary below.
           set +e
           python3 tools/audit_workflow_health.py | tee health.log
           echo "rc=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
@@ -59,14 +63,44 @@ jobs:
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
+      # A gate violation is a FINDING about some other workflow, so this step
+      # reports it (a ::warning:: annotation per violation plus the step
+      # summary) and stays green, like the audit above. The same checker is
+      # what a PR or a local run uses as a hard gate; here it only reports.
       - name: Check every split workflow is fully gated
-        run: python3 tools/check_workflow_gates.py
-
-      # Fail LOUDLY on the findings that need action, so this workflow's own red
-      # X is the signal — the whole point being that green ticks stopped meaning
-      # anything.
-      - name: Fail if something is broken
-        if: steps.audit.outputs.rc != '0'
         run: |
-          echo "::error::A workflow ran and produced nothing, or died with its publish steps skipped. See the summary."
-          exit 1
+          set +e
+          python3 tools/check_workflow_gates.py > gates.log 2>&1
+          rc=$?
+          cat gates.log
+          {
+            echo '## Workflow gates'
+            echo '```'
+            cat gates.log
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$rc" -ne 0 ]; then
+            n=0
+            while IFS= read -r line; do
+              echo "::warning title=Workflow gate::${line#  }"
+              n=$((n + 1))
+            done < <(grep '^  ' gates.log)
+            if [ "$n" -eq 0 ]; then
+              echo "::warning title=Workflow gate::check_workflow_gates.py exited $rc with no violation lines; see the log"
+            fi
+          fi
+
+      # An AUDITOR never fails (reporters never fail). Its job is to look and
+      # report, and it did that; a workflow going red says IT could not do its
+      # job. Failing here to signal somebody else's problem is a category error,
+      # and an alert channel that cries wolf gets muted.
+      #
+      # Urgent findings (BROKEN, KILLED — the classes nothing else alerts for)
+      # still need a channel that is not email-by-red-X, so they go to ONE
+      # GitHub issue: opened when something is wrong, UPDATED in place while it
+      # stays wrong, and CLOSED the moment the fleet is clean.
+      - name: Raise or clear the health issue
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 tools/report_workflow_health.py --summary "$GITHUB_STEP_SUMMARY"

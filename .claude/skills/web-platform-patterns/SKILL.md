@@ -1,6 +1,6 @@
 ---
 name: web-platform-patterns
-description: Use before any web (vanilla HTML/CSS/JS, no build step, static hosting) UI / routing / data / offline / image work. The web umbrella skill — view-system architecture, URL-driven state + canonical share URLs, the 404-forwarder, image fallback chains with jittered retry, service-worker versioning discipline, IndexedDB schema migration, the CSS gotchas that cost real iteration (sticky containing-box, scroll-snap rails, container-query heroes), bounded fetches, and the headless verification protocol (Node DOM shim, CDN cache-bust). Triggers on vanilla JS, hash router, showView, service worker, PWA, IndexedDB, GitHub Pages, scroll-snap, position sticky, image fallback, 404.html, URL params, AbortSignal, "works locally but not deployed".
+description: "Use before any web (vanilla HTML/CSS/JS, no build step, static hosting) UI / routing / data / offline / image work. The web umbrella skill — view-system architecture, URL-driven state + canonical share URLs, the 404-forwarder, image fallback chains with jittered retry, service-worker versioning discipline, IndexedDB schema migration, the CSS gotchas that cost real iteration (sticky containing-box, scroll-snap rails, container-query heroes), bounded fetches, and the headless verification protocol (Node DOM shim, CDN cache-bust). Triggers on vanilla JS, hash router, showView, service worker, PWA, IndexedDB, share link, playlist link, [hidden], facet chips, native video controls, node --check, GitHub Pages, scroll-snap, position sticky, image fallback, 404.html, URL params, AbortSignal, \"works locally but not deployed\"."
 ---
 
 # Web Platform Patterns
@@ -39,6 +39,21 @@ deploy-reality layer** that vanilla web apps live or die on.
 - Infinite scroll = an `IntersectionObserver` sentinel + page size
   (~60); always show the REAL total count, not the loaded count.
 - Debounce text search ~180 ms; mirror the query into the URL.
+- **A one-shot render replaces before it appends.** A `rendered` flag
+  guarding an append-only render stacks the page on the first
+  re-render (AW Home: 28 sections became 81, stale cards still
+  showing).
+- **Facets are computed against the OTHER facet's selection.** Chips
+  built from the whole result set offer combinations with zero rows.
+  Assert "no offered chip yields zero rows", in a node test over the
+  shipped function.
+- **One rule, one function.** Two callers of one rule drift; name it
+  (`searchFacets()`, `nativeControlSet()`) and call it from both.
+- **View Transitions**: every DOM update of the swap goes INSIDE the
+  `startViewTransition` callback (outside it is captured half-applied);
+  skip the API under `prefers-reduced-motion` in JS too (a media query
+  cannot cancel a snapshot already taken); test that `showView` swaps
+  identically with and without the API.
 
 ## URL-driven state + the canonical-twin contract
 
@@ -52,6 +67,30 @@ deploy-reality layer** that vanilla web apps live or die on.
 - Percent-encode slugs in routes — non-ASCII slugs are real.
 - "Open in app" on Detail: `appname://` scheme on Apple UAs, an
   `intent://` URL **with the current page as fallback** on Android.
+
+## State in the link (no backend)
+
+User-made lists (playlists, collections) can travel inside the share
+URL. Full rules + measurements: `DEEP_LINKS.md` "State in the link".
+
+- Deflate + base64url (`CompressionStream('deflate-raw')`, no
+  library). AW measured 50 items at a median 1,368 chars (p95
+  1,542); ~2,000 is the practical ceiling (chat apps, email, QR). Cap
+  at ~50, say so on screen, never truncate silently. Version-prefix the
+  payload; keep an uncompressed variant for platforms without deflate.
+- Shape: `/list/#<blob>`. Route in the PATH (Android intent filters
+  cannot see a fragment); payload in the FRAGMENT (never reaches a
+  server).
+- `/list/index.html` is a REAL generated page with generic preview copy.
+  GitHub Pages serves `404.html` with HTTP 404 and crawlers skip
+  previews on a 404. Keep the 404 forwarder only as a safety net; the
+  deploy refuses to ship without the static page.
+- Old link shapes decode forever.
+- Declare the AASA path only after the Apple app that handles it is
+  LIVE (not approved); Android's intent filter ships in the APK, so it
+  is safe in the same release.
+- TVs share the same link as a QR code; prove it by decoding a photo of
+  the screen back to the exact string.
 
 ## Data fetch hygiene
 
@@ -97,11 +136,18 @@ lines, nothing else.
 - **Shell cache-first, with a version string bumped on EVERY shell
   change** (`const CACHE = 'shell-v7'`) — a forgotten bump is the
   classic "deployed but users see the old app."
+- **`fetch(url, {cache:'no-store'})` does NOT bypass a service
+  worker.** A fetch that "proves the server is wrong" may be the worker
+  answering. Clear the SW (DevTools > Application) before trusting it.
 - Data files (indexes, config JSON): **network-first with last-good
   fallback**.
 - **Never cache video/streams.** Pass media requests through
   untouched.
-- Skip admin/secondary tools' paths entirely (they stay live).
+- Skip admin/secondary tools' paths entirely (they stay live). A
+  root-scope SW caches EVERYTHING not excluded: AW's `/pulse` dashboard
+  served yesterday's reading beside today's timestamp. Guard with a
+  test that regex-reads the `startsWith` bypass clauses out of the
+  shipped `sw.js` (`test_sw_bypass.mjs`).
 - Offline scope is honest: open + browse cached data; streaming
   playback offline is out of scope.
 
@@ -116,6 +162,16 @@ lines, nothing else.
   IndexedDB.
 
 ## CSS gotchas that cost real iteration
+
+- **An author `display` beats the UA's `[hidden] { display:none }`.**
+  `.thing { display:flex }` on a `hidden`-toggled element leaves it on
+  screen (AW shipped a 19px empty bordered strip on every desktop
+  page). Write `.thing:not([hidden]) { display:flex }`, never
+  `!important`.
+- **Turning an element into `<a>` inherits the bare `a` rule** (accent
+  color, underline). A link not shaped like a link needs
+  `color:inherit; text-decoration:none`, affordance on `:hover` /
+  `:focus-visible`.
 
 - **Two-axis sticky (rail `left:0` + ruler `top:0`) requires rows
   set to `width: max-content`** — otherwise the sticky containing
@@ -136,6 +192,16 @@ lines, nothing else.
   `main { flex:1; overflow-y:auto; min-height:0 }`, no
   `viewport-fit=cover`.
 
+## Native media controls: never draw one twice
+
+The browser's own `<video controls>` bar already has some controls, and
+which ones differs per engine (AW measured, 2026-09): Safari (mac/iPad)
+has PiP + a speed menu in the bar; Chrome's overflow has speed but PiP
+is right-click only; Firefox has neither in the bar. One function
+(`nativeControlSet(video, doc)`) decides which of OUR controls to hide;
+test it read out of the shipped JS with an engine fixture per row. Do
+not assume the matrix; open each browser's menu.
+
 ## Porting deterministic logic to JS
 
 When the same seeded logic must agree across platforms (schedules,
@@ -145,6 +211,24 @@ to LOCAL time when the experience is local (6 AM local ≠ 6 AM UTC);
 verify cross-platform agreement on a fixed seed before shipping.
 
 ## Verification protocol (web changes)
+
+- **One-command gate (`tools/test_web.sh`)**: every node test, then
+  `node --check` on each shipped script (a syntax error blanks the
+  whole app), then a CSS brace-balance count (a truncated `cat >>`
+  append silently drops every later rule).
+- **Every `API.x` the JS calls must be exported by `js/api.js`.**
+  Plain JS has no compiler: AW called a nonexistent `API.summary` for
+  115 versions and every web guest got no player. Grep call sites
+  against the `return {…}` export block; include a control assert
+  that proves the check can fail.
+- **Tests read the function out of the SHIPPED file** (regex-extract,
+  `new Function`), so the test cannot drift from what runs.
+- **Read `PARITY.md` columns by header name.** `row.split("|")` has a
+  leading empty element; index math silently overwrote AW's macOS
+  column four times.
+- **An insane instrument is not evidence.** A zero-width browser window
+  reports garbage layout while DOM counts stay valid; never fix CSS to
+  satisfy it.
 
 - **Execute the real JS in a Node DOM shim** to verify logic —
   headless Chrome's `--virtual-time-budget` distorts timers and

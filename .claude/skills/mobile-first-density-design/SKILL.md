@@ -1,6 +1,6 @@
 ---
 name: mobile-first-density-design
-description: Use when designing or reviewing any UI — the principle is that visual density comes from REMOVING chrome, not adding decoration. Three weights × two sizes give six hierarchy levels with zero added pixels. Mobile-first means testing at 375px before 1440px. Apply the Tufte / Things 3 / Reeder lineage of dense-but-readable design. Triggers on UI design, density, layout, visual hierarchy, screen design, "design this view", "looks busy", "feels cluttered."
+description: Use when designing or reviewing any UI — the principle is that visual density comes from REMOVING chrome, not adding decoration. Three weights × two sizes give six hierarchy levels with zero added pixels. Mobile-first means testing at 375px before 1440px. Apply the Tufte / Things 3 / Reeder lineage of dense-but-readable design. Triggers on UI design, density, layout, visual hierarchy, screen design, "design this view", "looks busy", "feels cluttered", caption copy, explanatory text, spelling locale.
 ---
 
 # Mobile-First Density Design
@@ -21,7 +21,7 @@ This is the Tufte / Things 3 / Reeder / Linear / Vercel lineage: information-den
 - Reviewing typography: how many weights, how many sizes
 - Deciding whether to use a tinted background on a card
 
-## The six binding density rules
+## The binding density rules
 
 ### 1. No tinted-box backgrounds on lists/cards
 
@@ -66,6 +66,34 @@ Why: when disclosure is unpredictable, the user can't anticipate the consequence
 If no, you've added decoration. Strip and rebuild from the description.
 
 This is the most powerful self-review tool. When in doubt, write the paragraph. If the paragraph wouldn't reproduce the screen, the screen has noise you can remove.
+
+### 7. Only essential words on screen
+
+Owner (Archive Watch), 2026-09-22: *"You and I are having a
+conversation, but not everything I say or what you discover needs to be
+listed in the interface. Only essential information should be
+displayed, anything additional just reads as noise."*
+
+A caption earns its place only if it is one of three things:
+- a **refusal** (why a control is disabled or absent right now),
+- a **warning** the person would not otherwise know,
+- a **fact** they cannot discover by looking.
+
+Cut anything that explains a control's own behavior, restates what just
+happened, or justifies a design decision. That reasoning belongs in the
+design doc and code comments, where it is read on purpose. Agents are
+the usual source of this noise: a finding from the session is not a
+label.
+
+### 8. One spelling locale, linted
+
+Pick one spelling locale for everything a person reads on a screen
+(AW chose US English on 2026-09-22 after "programme" shipped on a
+label) and hold it with a test that scans user-facing strings on every
+platform (AW `tools/test_us_english.py`). Two exceptions, listed in the
+test: strings that must MATCH someone else's data keep that data's
+spelling (a search keyword list may need both `color` and `colour`),
+and framework identifiers are names, not words.
 
 ## Mobile-first sequencing
 

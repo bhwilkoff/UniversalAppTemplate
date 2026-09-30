@@ -1,11 +1,14 @@
-# LG webOS — submission pack
+# The LG webOS submission pack
 
 Everything LG Seller Lounge asks for, drafted so submission is paperwork rather
 than authoring. **LG rejects submissions whose self-checklist is missing or
 thin**, and that is the single most common avoidable rejection, so §2 is written
 to be pasted as-is.
 
-Backlog: `docs/templates/TV-PLATFORM-BACKLOG-template.md` L1–L8. Strategy: Decision 047.
+Backlog: `docs/templates/TV-PLATFORM-BACKLOG-template.md` L1–L8. Strategy: Decision 028.
+The worked example below is Archive Watch's own pack (2026-08); swap in your
+app's name, surfaces, listing copy and rights position.
+
 **LG is the first web-TV store to target** because an individual can publish
 globally there, whereas Samsung's default Public Seller tier is US-only.
 
@@ -16,7 +19,7 @@ globally there, whereas Samsung's default Public Seller tier is US-only.
 *LG asks for a narrative walkthrough of the app driven by the remote. This is
 that document.*
 
-**App:** Archive Watch — a cinematheque for the Internet Archive.
+**App:** Archive Watch, a cinematheque for the Internet Archive.
 **Content:** public-domain and Creative-Commons film and television, streamed
 directly from archive.org. No account, no advertising, no purchases.
 
@@ -43,8 +46,8 @@ hero opens that film. Pressing **Down** moves into the shelves.
 
 **Search** offers an on-screen keyboard operated with the D-pad; results appear
 as a grid as characters are entered. Because typing with a remote is slow,
-Search also offers **browse-without-typing** shortcuts — every decade from the
-1890s to the 2020s, plus themes — each of which opens a filtered grid. A viewer
+Search also offers **browse-without-typing** shortcuts: every decade from the
+1890s to the 2020s, plus themes, each of which opens a filtered grid. A viewer
 can find something without entering a single character.
 
 ### Watching
@@ -90,7 +93,7 @@ metadata sources, and a link to donate to the Internet Archive.
 | 4 | Something is always focused | Pass | Claimed on entry to every surface, including loading states |
 | 5 | Back returns to the previous screen | Pass | Layered: an open player closes before any navigation |
 | 6 | Back at the root exits the app | Pass | `webOS.platformBack()` |
-| 7 | Magic Remote pointer works | Pass | Hover moves focus; D-pad continues from there — one focus state |
+| 7 | Magic Remote pointer works | Pass | Hover moves focus; D-pad continues from there; one focus state |
 | 8 | Media keys operate playback | Pass | Play, Pause, Play/Pause, Rewind, Fast-Forward |
 | 9 | Playback starts and completes | Pass | Progressive H.264 MP4 over HTTPS from archive.org |
 | 10 | Subtitles selectable where present | Pass | WebVTT via `<track>` |
@@ -109,7 +112,7 @@ metadata sources, and a link to donate to the Internet Archive.
 
 - **Name:** Archive Watch
 - **Category:** Video / Entertainment
-- **Short description:** Watch the public domain — classic films, silent
+- **Short description:** Watch the public domain: classic films, silent
   cinema, animation and vintage television, streamed free from the Internet
   Archive.
 - **Screenshots:** 1280×720. Home, Browse, a title page, Channels, and
@@ -124,25 +127,25 @@ metadata sources, and a link to donate to the Internet Archive.
 
 Archive Watch streams only titles the pipeline has cleared as public domain or
 Creative Commons. A rights audit runs on **every** published build and hides
-anything that fails (Decisions 027 / 044): modern works without a genuine
+anything that fails (Archive Watch's own Decisions 027 and 044): modern works without a genuine
 free-culture licence are excluded, and a bogus "public domain" tag on a
 commercial release does not rescue a title. Video is streamed from archive.org;
 the app hosts no content.
 
 ---
 
-## 5. Owner steps — nothing here is engineering
+## 5. Owner steps (nothing here is engineering)
 
 | # | Step |
 |---|---|
-| 1 | Create an **LG Seller Lounge** account (free; individuals may publish globally) |
+| 1 | Create an **LG Seller Lounge** account (free; a single person may publish globally) |
 | 2 | Create an **LG Developer** account and enable **Developer Mode** on an LG TV |
 | 3 | Install the webOS TV CLI, then `./tv/build-tv-packages.sh webos` to produce the `.ipk` |
-| 3b | **Before submitting, sanity-check the side-loaded app actually shows films.** A packaged app runs from `file://`, and a relative data URL there resolves to a path that is not in the package — that bug was found and fixed on 2026-08-05, but it is invisible in the browser build, so confirm on the TV: if Home is empty, the data plane regressed (`node tools/test_packaged_origin.mjs` guards it) |
+| 3b | **Before submitting, sanity-check the side-loaded app actually shows films.** A packaged app runs from `file://`, and a relative data URL there resolves to a path that is not in the package. That bug was found and fixed on 2026-08-05, but it is invisible in the browser build, so confirm on the TV: if Home is empty, the data plane regressed (`node tools/test_packaged_origin.mjs` guards it) |
 | 4 | Side-load and spot-check on the TV: `ares-install`, then `ares-launch` |
 | 5 | Capture five 1280×720 screenshots |
 | 6 | Submit the `.ipk`, this UX scenario (§1) and this self-checklist (§2) |
 | 7 | Expect 5–10 business days, and possibly 2–3 review cycles |
 
-Verify the CLI version at install time — published sources disagree (1.12.x vs
+Verify the CLI version at install time. Published sources disagree (1.12.x vs
 3.2.x), and the older CLI and VS Code extension were deprecated in 2024.

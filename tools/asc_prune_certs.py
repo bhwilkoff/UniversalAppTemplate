@@ -25,7 +25,7 @@ what it selects:
   * DISTRIBUTION and MAC_INSTALLER_DISTRIBUTION certificates. Those are the ones
     that actually sign shipping builds and live in the repo's .p12 secrets.
   * Any development certificate NOT named "Created via API" — notably the
-    owner's own "Ben Wilkoff" cert, which their local Xcode signs with. Revoking
+    owner's own personal-name cert, which their local Xcode signs with. Revoking
     that would break the dev machine.
   * The newest --keep (default 2) API-created certs, in case a build is in
     flight while this runs.

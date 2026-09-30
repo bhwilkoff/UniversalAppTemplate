@@ -22,22 +22,11 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import bench  # noqa: E402
 
-DEVELOPER_DIR = "/Applications/Xcode-beta.app/Contents/Developer"
-BUNDLE = APPLE_BUNDLE_ID
-ADB = str(Path.home() / "Library/Android/sdk/platform-tools/adb")
-APKG = "com.example.appname.debug"
-
-APPLE = {
-    "atv":    "C3FBA9DE-4A60-555B-A65F-80D6809A275B",
-    "ipad":   "AC5377E9-6053-51DE-8E65-D88A4E9345FA",
-    "iphone": "B4E756E2-CBFA-5F63-8CEE-21D226637AF7",
-}
-ANDROID = {
-    "pixel":     "adb-3B211JEKB14516-4M5scf._adb-tls-connect._tcp",
-    "firetv":    "10.0.0.139:5555",
-    "androidtv": "10.0.0.55:5555",
-}
+APKG = ANDROID_PACKAGE_DEBUG
+APPLE_PLATFORMS = ("ios", "ipados", "tvos")
+ANDROID_PLATFORMS = ("android", "androidtv", "firetv")
 
 
 def _run(cmd, timeout=60, env=None):
@@ -58,43 +47,47 @@ def _pkill(cmd):
 
 
 def reset(dev):
-    """Stop the app on `dev`. Returns (ok, detail).
+    """Stop the app on `dev` (a bench name). Returns (ok, detail).
 
     Deliberately a STOP, not a data wipe. `adb pm clear` would also erase records,
-    the daily streak and the sign-in — state a test may legitimately need, and
-    state that belongs to the owner on their own devices. What causes a stale
-    screen is a running process, not saved data.
-    """
-    if dev in APPLE:
-        # devicectl terminates by PID, not by bundle id — it takes --pid and nothing
-        # else, so the bundle has to be resolved to a running process first. A reset
-        # that cannot express "stop this app" would have to launch it instead, and
-        # "reset then look" would just show the app again and prove nothing.
-        ok, out = _run(["xcrun", "devicectl", "device", "info", "processes",
-                        "--device", APPLE[dev]],
-                       env={"DEVELOPER_DIR": DEVELOPER_DIR}, timeout=90)
+    streaks and the sign-in — state a test may legitimately need, and state that
+    belongs to the owner on their own devices. What causes a stale screen is a
+    running process, not saved data.
+
+    Apple: devicectl terminates by PID, and `info processes` prints EXECUTABLE
+    PATHS, not bundle ids — this reset used to look for the bundle id in that
+    output, never found it, and reported "not running" about a live app. It now
+    matches the exact executable (apple_device.terminate_verified) and asks the
+    device afterwards whether it is gone.
+
+    A never-touch device is refused: stopping an app on somebody's personal phone
+    is touching it."""
+    try:
+        e = bench.require(dev, allow_owner=True)
+    except bench.RefusedDevice as ex:
+        return False, str(ex)
+    platform = e.get("platform") or dev
+    if platform in APPLE_PLATFORMS:
+        import apple_device
+        if not e.get("udid"):
+            return False, "no udid on the bench"
+        return apple_device.terminate_verified(e["udid"])
+    if platform in ANDROID_PLATFORMS:
+        serial = e.get("serial") or e.get("address")
+        ok, out = _run([str(ADB), "-s", serial, "shell", "am", "force-stop", APKG])
         if not ok:
             return False, out[:200]
-        pids = [line.split()[0] for line in out.splitlines()
-                if BUNDLE in line and line.split() and line.split()[0].isdigit()]
-        if not pids:
-            return True, "not running"          # already the state we wanted
-        for pid in pids:
-            ok, out = _run(["xcrun", "devicectl", "device", "process", "terminate",
-                            "--device", APPLE[dev], "--pid", pid],
-                           env={"DEVELOPER_DIR": DEVELOPER_DIR})
-            if not ok:
-                return False, out[:200]
-        return True, f"terminated {len(pids)}"
-    if dev in ANDROID:
-        return _run([ADB, "-s", ANDROID[dev], "shell", "am", "force-stop", APKG])
-    if dev == "mac":
-        return _pkill(["pkill", "-x", "AppName"])
-    if dev == "windows":
+        # A stop command sent is not a process gone — ask.
+        _, pid = _run([str(ADB), "-s", serial, "shell", "pidof", APKG])
+        return (not pid.strip(), "stopped — verified" if not pid.strip()
+                else f"STILL RUNNING (pid {pid.strip()})")
+    if platform == "macos" or dev == "mac":
+        return _pkill(["pkill", "-x", APPLE_EXECUTABLE])
+    if platform == "windows" or dev == "windows":
         import winbox
         winbox.quit_app()
         return True, "stopped"
-    if dev == "web":
+    if platform == "web" or dev == "web":
         return _pkill(["pkill", "-f", "appname-cdp-profile"])
     return False, f"unknown device {dev!r}"
 

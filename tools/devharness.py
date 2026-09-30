@@ -1,17 +1,18 @@
-"""Shared spine for the real-hardware harnesses (tvOS / iOS / Android).
+"""Shared spine for the real-hardware harnesses (tvOS / iOS / Android / Mac / web).
 
-Archive Watch runs three hand-written harnesses that share nothing but an OCR
-binary, and it pays for that: its iOS harness has no wake, no alive probe and no
-retry ladder because the tvOS resilience was never back-ported. Everything here
-is the part that is genuinely platform-agnostic — OCR, grading, artifact paths,
-and the blind-instrument guard — so a lesson learned on one device reaches all
-of them.
+The harnesses this rig descends from were three hand-written scripts that shared
+nothing but an OCR binary, and they paid for it: the iOS one had no wake, no alive
+probe and no retry ladder because the tvOS resilience was never back-ported.
+Everything here is the part that is genuinely platform-agnostic — OCR, grading,
+artifact paths, the stale-capture guard and the blind-instrument guard — so a lesson
+learned on one device reaches all of them.
 
-Device plumbing deliberately does NOT live here. Waking a tvOS box over
-Companion, unlocking a Pixel over adb, and giving up on a locked iPad are not
-the same operation wearing different hats, and pretending otherwise is how you
-get a lowest-common-denominator harness that cannot express what any one
-platform actually needs.
+Device plumbing deliberately does NOT live here. Waking a tvOS box over Companion,
+unlocking a Pixel over adb, and giving up on a locked iPad are not the same
+operation wearing different hats, and pretending otherwise is how you get a
+lowest-common-denominator harness that cannot express what any one platform
+actually needs. Apple plumbing shared by the iOS and tvOS runners lives in
+tools/apple_device.py.
 """
 import json
 import re
@@ -19,21 +20,28 @@ import subprocess
 import time
 from pathlib import Path
 
-OCR = "/tmp/tbocr"
+import app_config
+
+# ONE OCR binary for every runner, at a durable path (app_config.OCR_BIN), built
+# from tools/ScreenOCR/main.swift on first use. See ensure_tool().
+OCR = str(app_config.OCR_BIN)
 
 # A frame carrying fewer than this many OCR lines is unreadable — a locked or
 # sleeping device yields zero, a real app screen yields many. Line count is
 # resolution independent, which a byte-size threshold is not.
-MIN_LINES_READABLE = 4
+MIN_LINES_READABLE = app_config.MIN_OCR_LINES
 
 # Text at the very frame edge is text the layout could not fit. Thresholds are
-# CALIBRATED per platform against a real capture, never copied: Archive Watch's
-# 0.010 called three correctly-rendered this app's headings clipped on every frame,
-# because our own gutter sits at x=0.0099-0.0116 on the iPad.
-CLIP_X_DEFAULT = 0.005
+# CALIBRATED per platform against a real capture, never copied: a 0.010 threshold
+# ported from another app called three of this app's correctly-rendered headings
+# clipped on every frame, because this app's own gutter sat at x=0.0099-0.0116 on
+# the iPad.
+CLIP_X_DEFAULT = app_config.CLIP_X
 
-FORBID_DEFAULT = (r"No questions|Couldn.t load|Something went wrong|"
-                  r"failed to|\berror\b|couldn.t be")
+FORBID_DEFAULT = app_config.FORBIDDEN
+
+# A capture older than this is not the capture you just asked for.
+FRESH_SECONDS = 60
 
 
 def sh(cmd, timeout=90, **kw):
@@ -43,11 +51,75 @@ def sh(cmd, timeout=90, **kw):
 def qa_dir(platform, name):
     """build/qa/<platform>-<date>/<name>-<epoch>/ — durable, never /tmp, because
     background tasks get reaped and a capture you cannot return to is a capture
-    you have to take twice."""
-    d = (Path("build/qa") / f"{platform}-{time.strftime('%Y-%m-%d')}"
+    you have to take twice. Anchored at the repo, not the cwd."""
+    d = (app_config.QA_ROOT / f"{platform}-{time.strftime('%Y-%m-%d')}"
          / f"{name}-{int(time.time())}")
     d.mkdir(parents=True, exist_ok=True)
     return d
+
+
+def ensure_tool(binary, source, extra=()):
+    """Build a Swift helper into its durable path if it is missing or older than its
+    source. Returns (ok, why). A missing instrument is reported, never guessed around.
+    """
+    binary, source = Path(binary), Path(source)
+    if binary.exists() and (not source.exists()
+                            or binary.stat().st_mtime >= source.stat().st_mtime):
+        return True, str(binary)
+    if not source.exists():
+        return False, f"{binary} missing and no source at {source}"
+    binary.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        r = subprocess.run(["swiftc", "-O", str(source), "-o", str(binary), *extra],
+                           capture_output=True, text=True, timeout=600)
+    except (OSError, subprocess.SubprocessError) as e:
+        return False, f"could not build {binary}: {e}"
+    if r.returncode != 0 or not binary.exists():
+        return False, f"swiftc failed for {source}: {(r.stderr or r.stdout)[-300:]}"
+    return True, str(binary)
+
+
+def ensure_ocr():
+    return ensure_tool(app_config.OCR_BIN, app_config.OCR_SRC)
+
+
+def ensure_winshot():
+    return ensure_tool(app_config.WINSHOT_BIN, app_config.WINSHOT_SRC)
+
+
+def capture_fresh(path, run, max_age=FRESH_SECONDS):
+    """Take a capture that CANNOT hand back stale evidence. Returns (ok, why).
+
+    `run(path)` performs the capture (any tool). The target is deleted FIRST, and
+    the result is refused unless a new non-empty file exists whose mtime is inside
+    `max_age`. Written after a PNG from an earlier attempt was read and reasoned
+    about as though it were current: that capture had failed, the old file was still
+    on disk, and the only tell was the clock drawn inside the image. An instrument
+    that can silently return old evidence is worse than none — it produces confident
+    wrong conclusions."""
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        path.unlink()
+    except FileNotFoundError:
+        pass
+    t0 = time.time()
+    try:
+        detail = run(path)
+    except subprocess.TimeoutExpired:
+        return False, "capture timed out"
+    except (OSError, subprocess.SubprocessError) as e:
+        return False, f"capture failed to run: {e}"
+    if not path.exists() or path.stat().st_size == 0:
+        why = ""
+        if isinstance(detail, subprocess.CompletedProcess):
+            why = " — " + " ".join(l for l in (detail.stdout + detail.stderr).splitlines()
+                                   if re.search(r"error|invalidated|cancel", l, re.I))[:200]
+        return False, f"no file written{why}"
+    age = time.time() - path.stat().st_mtime
+    if age > max_age or path.stat().st_mtime < t0 - 2:
+        return False, f"STALE: {path.name} is {age:.0f}s old; the capture did not write it"
+    return True, f"{path.stat().st_size // 1024} KB"
 
 
 # Set by ocr() when the OCR process itself failed. Callers MUST check it before
@@ -68,12 +140,15 @@ def ocr(shots):
     out = {}
     paths = [str(p) for _, p in shots]
     for chunk in (paths[k:k + 20] for k in range(0, len(paths), 20)):
+        ok, why = ensure_ocr()
+        if not ok:
+            out[OCR_FAILED] = f"OCR unavailable: {why}"
+            return out
         try:
             r = sh([OCR] + chunk, timeout=600)
         except (OSError, subprocess.SubprocessError) as e:
-            # OCR lives in /tmp, so it does not survive a reboot. A traceback
-            # here is better than a false "screen off", but a sentence saying
-            # how to get it back is better than either.
+            # A traceback here is better than a false "screen off", but a sentence
+            # saying how to get it back is better than either.
             out[OCR_FAILED] = (f"cannot run {OCR}: {e} — rebuild with "
                                f"`swiftc -O tools/ScreenOCR/main.swift -o {OCR}`")
             return out
@@ -105,6 +180,46 @@ def clipped_lines(d, clip_x=CLIP_X_DEFAULT):
             if t.get("x", 1.0) <= clip_x and t.get("h", 1.0) <= 0.030]
 
 
+def edge_clips(d, clip_x=CLIP_X_DEFAULT, right_margin=0.010, max_h=0.030):
+    """(defects, peeks) for one OCR frame, using the box WIDTH ScreenOCR reports.
+
+    A LEFT-edge cut is always a defect: no padded layout starts a line at x=0. A
+    RIGHT-edge cut is usually a horizontally scrolling row's intended PEEK, so it is
+    reported, not failed. A line ending in an ellipsis is truncation the layout
+    chose — reported as a peek too. Big type (poster lettering, a hero numeral) is
+    excluded by height, because artwork legitimately runs to the edge."""
+    defects, peeks = [], []
+    for t in d.get("allText", []):
+        text = (t.get("text") or "").strip()
+        if not text or t.get("h", 1.0) > max_h:
+            continue
+        x, w = t.get("x", 1.0), t.get("w")
+        if x <= clip_x:
+            defects.append(text)
+        elif w is not None and x + w >= 1.0 - right_margin:
+            peeks.append(text)
+        elif text.endswith(("\u2026", "...")):
+            peeks.append(text)
+    return defects, peeks
+
+
+def measure(d, width_pt, max_chars=80, prose_min=25, prose_max_h=0.020):
+    """The longest line of PROSE on a frame: (chars, points, text) or None.
+
+    Character count, not width, is what a reader's eye has to track — past ~80 a
+    line stops being readable — but the width is returned too, since that is the
+    number a `frame(maxWidth:)` is written in. `width_pt` is the frame's width in
+    points (the device's logical width)."""
+    prose = [t for t in d.get("allText", [])
+             if len((t.get("text") or "").strip()) > prose_min
+             and t.get("h", 1.0) < prose_max_h]
+    if not prose:
+        return None
+    worst = max(prose, key=lambda t: len(t["text"]))
+    return (len(worst["text"].strip()), round((worst.get("w") or 0) * width_pt),
+            worst["text"].strip())
+
+
 def frame_darkness(path):
     """Mean luma 0-255 and the fraction of near-black pixels.
 
@@ -128,9 +243,9 @@ def frame_darkness(path):
 
 class Grader:
     """Collects assertions, prints them as they are decided, and writes a
-    machine-comparable report.json. Archive Watch's Android and iOS harnesses
-    print and exit with no JSON, so nothing there can be compared across runs
-    and there is no regression baseline at all — this exists so ours can be."""
+    machine-comparable report.json. Harnesses that print and exit with no JSON
+    cannot be compared across runs and have no regression baseline at all — this
+    exists so ours can be."""
 
     def __init__(self, outdir, **meta):
         self.outdir = Path(outdir)
@@ -176,6 +291,13 @@ class Grader:
             m = re.search(spec["expect_any"], all_text, re.I)
             self.grade("expect_any", bool(m), f"/{spec['expect_any']}/ "
                        + (f"matched {m.group(0)!r}" if m else "matched nothing"))
+        if "expect_end" in spec and shots:
+            # The FINAL state, not any frame: a door that must end on its own is
+            # proved by where the run finished, not by where it passed through.
+            last = frame_text(texts.get(shots[-1][1].name, {}))
+            m = re.search(spec["expect_end"], last, re.I)
+            self.grade("expect_end", bool(m), f"/{spec['expect_end']}/ in the last frame"
+                       + (f" matched {m.group(0)!r}" if m else " — NOT found"))
 
         bad = re.search(spec.get("forbid", FORBID_DEFAULT), all_text, re.I)
         self.grade("no_error_text", not bad,

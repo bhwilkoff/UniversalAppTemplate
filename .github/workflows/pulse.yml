@@ -1,20 +1,42 @@
 name: Pulse
 
-# One reading a day of how Archive Watch is doing — every store, every review,
-# every mention — into ops/pulse.json, which /pulse renders.
+# A reading of how the product is doing — every store, every review, every
+# mention — into ops/pulse.json, which /pulse renders.
 #
-# This is a REPORTER (Decision 107): it never fails because something it read is
-# unhealthy. It fails only when it could not do its own job, which is to write a
-# file. A source that will not answer is recorded IN the output and shown on the
-# page, because a dashboard that prints a confident zero for a broken reader is
-# worse than no dashboard.
+# This is a REPORTER: it never fails because something it read is unhealthy.
+# It fails only when it could not do its own job, which is to write and push
+# one file. A source that will not answer is recorded IN the output and shown
+# on the page, because a dashboard that prints a confident zero for a broken
+# reader is worse than no dashboard.
 #
-# It takes NO catalog lock: it writes one file nothing else touches.
+# It takes no lock: it writes files nothing else touches.
 
 on:
-  schedule:
-    - cron: "17 13 * * *"     # 07:17 America/Denver — before the owner's day
+  # DORMANT BY DEFAULT. Copy ops/pulse.config.example.json to
+  # ops/pulse.config.json, set the secrets below, run it once by hand
+  # (workflow_dispatch), then uncomment the triggers.
+  #
+  # schedule:
+  #   # GitHub runs scheduled workflows HOURS late on a busy account — one
+  #   # repo measured 4-5 h, consistently, across four daily workflows. Aim
+  #   # for when the page must be ready MINUS that lag: 08:17 UTC lands
+  #   # ~06:30-07:30 America/Denver. Measure your own lag from run history.
+  #   - cron: "17 8 * * *"
+  #   # A second reading, so a day's store actions are on the page that evening.
+  #   - cron: "17 20 * * *"
+  #
+  # # A RELEASE CHANGES WHAT THE PAGE SHOULD SAY: re-read only the stores the
+  # # moment a release workflow finishes (a full reading is ~10 minutes, and
+  # # most of it does not move when a build ships). Names must match exactly.
+  # workflow_run:
+  #   workflows: ["Play release", "App Store submit (version, review, screenshots)"]
+  #   types: [completed]
   workflow_dispatch:
+    inputs:
+      only:
+        description: "comma-separated readers (blank = a full reading)"
+        required: false
+        default: ""
 
 permissions:
   contents: write
@@ -38,9 +60,9 @@ jobs:
         # pyyaml: the fleet auditor Pulse shells out to parses workflow YAML.
         run: pip install --quiet PyJWT cryptography google-api-python-client google-auth pyyaml
 
-      # asc_release.py reads the key off DISK (~/.appstoreconnect/private_keys),
-      # which is how appstore-submit.yml has always fed it. Passing ASC_KEY_P8
-      # as an env var looked right and read zero Apple reviews.
+      # The ASC key is read OFF DISK (~/.appstoreconnect/private_keys), the
+      # way every Apple tool here is fed. Passing the key material as an env
+      # var looked right and read zero Apple reviews.
       - name: Write the ASC API key
         env:
           ASC_KEY_P8_B64: ${{ secrets.ASC_KEY_P8 }}
@@ -49,7 +71,7 @@ jobs:
         run: |
           set -euo pipefail
           for v in ASC_KEY_P8_B64 KID ISS; do
-            [ -n "${!v:-}" ] || { echo "::warning::secret for $v is missing"; exit 0; }
+            [ -n "${!v:-}" ] || { echo "::warning::secret for $v is missing; Apple readers will say so"; exit 0; }
           done
           mkdir -p ~/.appstoreconnect/private_keys
           printf '%s' "$ASC_KEY_P8_B64" | base64 -d > ~/.appstoreconnect/private_keys/AuthKey_${KID}.p8
@@ -60,12 +82,21 @@ jobs:
         env:
           ASC_VENDOR_NUMBER: ${{ secrets.ASC_VENDOR_NUMBER }}
           # A SECOND key, Sales-and-Reports only. The release key is App
-          # Manager and Apple will not widen a key after it is created.
+          # Manager, and Apple will not widen a key after it is created.
           ASC_REPORTS_KEY_ID: ${{ secrets.ASC_REPORTS_KEY_ID }}
           ASC_REPORTS_KEY_P8: ${{ secrets.ASC_REPORTS_KEY_P8 }}
+          # One read-only Google robot for Play, Search Console and Cloud
+          # Monitoring. The JSON itself or a path.
           PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
           # The Console names this bucket; it is NOT the developer id in the URL.
           PLAY_REPORTS_BUCKET: ${{ secrets.PLAY_REPORTS_BUCKET }}
+          AMAZON_CLIENT_ID: ${{ secrets.AMAZON_CLIENT_ID }}
+          AMAZON_CLIENT_SECRET: ${{ secrets.AMAZON_CLIENT_SECRET }}
+          # The app's devportal id: needed to ask which build is live.
+          AMAZON_APP_ID: ${{ secrets.AMAZON_APP_ID }}
+          # Roku has no API: its Looker schedule posts to the Worker's drop box,
+          # and the collector reads (and, on --apply only, acks) with this token.
+          PULSE_INGEST_TOKEN: ${{ secrets.PULSE_INGEST_TOKEN }}
           BLUESKY_HANDLE: ${{ secrets.BLUESKY_HANDLE }}
           BLUESKY_APP_PASSWORD: ${{ secrets.BLUESKY_APP_PASSWORD }}
           MASTODON_INSTANCE: ${{ secrets.MASTODON_BASE_URL }}
@@ -77,20 +108,36 @@ jobs:
           YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
           YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: python3 tools/pulse_collect.py --apply
+          # Stores only after a release (workflow_run), or what a dispatch
+          # named; a full reading otherwise. --only keeps every section it did
+          # not re-read (the partial-run rule).
+          ONLY: ${{ github.event_name == 'workflow_run' && 'apple_stores,play_stores,amazon_live,roku_engagement,manual_stores,play_crashes' || inputs.only }}
+        # set -o pipefail matters the day anyone adds `| tee`: a pipe makes the
+        # step's status tee's, and a reader that died would report green.
+        run: |
+          set -o pipefail
+          python3 tools/pulse_collect.py --apply ${ONLY:+--only "$ONLY"}
 
       - name: Say what could not be read
         run: |
+          # The collector REFUSES to write a reading that is mostly dark; then
+          # there is no file to summarise, and that is a warning, not a red X.
+          if [ -f ops/pulse.json ]; then :; else
+            echo "::warning::no ops/pulse.json — the collector refused a degraded reading or none exists yet"
+            exit 0
+          fi
           python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
           import json
           d = json.load(open("ops/pulse.json"))
           src = d.get("sources", {})
-          ok = [k for k, v in src.items() if v.get("ok")]
-          bad = [(k, v.get("note", "")) for k, v in src.items() if not v.get("ok")]
+          on = {k: v for k, v in src.items() if not v.get("off")}
+          ok = [k for k, v in on.items() if v.get("ok")]
+          bad = [(k, v.get("note", "")) for k, v in on.items() if not v.get("ok")]
+          off = [k for k, v in src.items() if v.get("off")]
           h = (d.get("history") or [{}])[-1]
-          print(f"### Pulse — {len(ok)}/{len(src)} readers answered\n")
+          print(f"### Pulse — {len(ok)}/{len(on)} configured readers answered, {len(off)} not configured\n")
           print(f"{h.get('reviews') or 0} review(s) · {h.get('mentions') or 0} mention(s) · "
-                f"{h.get('posts') or 0} post(s) · rating {h.get('appleRating')}\n")
+                f"rating {h.get('appleRating')}\n")
           if bad:
               print("| reader | why it could not read |\n|---|---|")
               for k, why in bad:
@@ -98,9 +145,9 @@ jobs:
           PY
           # A reader that cannot read is a finding on the PAGE, never a red X here.
           python3 -c "
-          import json,sys
+          import json
           d=json.load(open('ops/pulse.json'))
-          bad=[k for k,v in d.get('sources',{}).items() if not v.get('ok')]
+          bad=[k for k,v in d.get('sources',{}).items() if not v.get('ok') and not v.get('off')]
           if bad: print('::warning::pulse readers offline: ' + ', '.join(bad))
           "
 
@@ -109,10 +156,14 @@ jobs:
           # reporter-may-fail: losing the reading IS this run failing its own job.
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add ops/pulse.json ops/stores-manual.json
+          [ -f ops/pulse.json ] || { echo "nothing to keep (the reading was refused)"; exit 0; }
+          git add ops/pulse.json
           if git diff --cached --quiet; then
-            echo "no change in today's reading"; exit 0
+            echo "no change in the reading"; exit 0
           fi
+          # [skip ci] keeps a reading from setting the fleet running — which
+          # also means this push triggers NO deploy. Put this workflow in the
+          # deploy workflow's `workflow_run`, or the site serves an old page.
           git commit -m "Pulse: today's reading [skip ci]"
           for i in 1 2 3 4 5; do
             git push && exit 0

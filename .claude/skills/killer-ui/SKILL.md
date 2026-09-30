@@ -1,5 +1,5 @@
 ---
-name: KUI
+name: killer-ui
 version: "1.0.0"
 description: >
   Killer UI — a Claude Code skill set that turns vibe-coded UIs into

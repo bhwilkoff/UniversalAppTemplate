@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
-"""Upload store screenshots to App Store Connect.
+"""Upload store screenshots to App Store Connect, and audit a version before review.
+
+SHIPPING (version, build, What's New, submit) is `tools/asc_release.py`, which does
+every Apple platform in one run. This tool's --attach-build / --submit remain for a
+one-platform fix-up, and are platform-aware: pass --platform (default ios). They
+used to hardcode filter[platform]=IOS, which silently shipped only the iPhone app
+and could attach a tvOS or Mac build to the iOS version (one build NUMBER exists
+once per platform; only filter[preReleaseVersion.platform] tells them apart).
 
 Built for the iMessage sets, which are the ones with no other route: the app's own
 screenshots come out of `tools/capture-screenshots.sh` and get dragged into the
@@ -29,7 +36,9 @@ import urllib.error
 import urllib.request
 
 BASE = "https://api.appstoreconnect.apple.com/"
-BUNDLE = APPLE_BUNDLE_ID
+BUNDLE = os.environ.get("APP_BUNDLE") or APPLE_BUNDLE_ID
+PLATFORMS = {"ios": "IOS", "tvos": "TV_OS", "mac": "MAC_OS"}
+PLATFORM = "IOS"          # set from --platform in main()
 
 
 def token():
@@ -88,7 +97,7 @@ IN_FLIGHT = {"WAITING_FOR_REVIEW", "IN_REVIEW", "PENDING_DEVELOPER_RELEASE"}
 
 def versions(app_id):
     vs = call(f"v1/apps/{app_id}/appStoreVersions?limit=50"
-              "&filter[platform]=IOS&fields[appStoreVersions]=versionString,appStoreState")
+              f"&filter[platform]={PLATFORM}&fields[appStoreVersions]=versionString,appStoreState")
     return vs["data"]
 
 
@@ -107,17 +116,17 @@ def editable_version(app_id, create=None, allow_in_flight=False):
         states = [(v["attributes"]["versionString"], v["attributes"]["appStoreState"])
                   for v in versions(app_id)[:5]]
         raise SystemExit(
-            f"no editable iOS version; recent: {states}\n"
+            f"no editable {PLATFORM} version; recent: {states}\n"
             f"pass --create-version X.Y.Z to open one.")
     # AFTER_APPROVAL by default: a version that sits approved-but-unreleased waiting
     # for someone to press a button is a silent stall, and this project has already
     # lost days to exactly that on the Microsoft Store.
     made = call("v1/appStoreVersions", method="POST", body={"data": {
         "type": "appStoreVersions",
-        "attributes": {"platform": "IOS", "versionString": create,
+        "attributes": {"platform": PLATFORM, "versionString": create,
                        "releaseType": "AFTER_APPROVAL"},
         "relationships": {"app": {"data": {"type": "apps", "id": app_id}}}}})
-    print(f"created iOS version {create} (releaseType AFTER_APPROVAL)")
+    print(f"created {PLATFORM} version {create} (releaseType AFTER_APPROVAL)")
     return made["data"]
 
 
@@ -133,7 +142,7 @@ def submit_for_review(app_id, version_id):
     """
     open_states = {"READY_FOR_REVIEW", "WAITING_FOR_REVIEW", "IN_REVIEW", "UNRESOLVED_ISSUES"}
     existing = call(f"v1/reviewSubmissions?filter[app]={app_id}"
-                    "&filter[platform]=IOS&limit=50")
+                    f"&filter[platform]={PLATFORM}&limit=50")
     sub = next((r for r in existing["data"]
                 if r["attributes"].get("state") in open_states), None)
     if sub and sub["attributes"]["state"] != "READY_FOR_REVIEW":
@@ -142,7 +151,7 @@ def submit_for_review(app_id, version_id):
     if sub is None:
         sub = call("v1/reviewSubmissions", method="POST", body={"data": {
             "type": "reviewSubmissions",
-            "attributes": {"platform": "IOS"},
+            "attributes": {"platform": PLATFORM},
             "relationships": {"app": {"data": {"type": "apps", "id": app_id}}}}})["data"]
         print(f"opened review submission {sub['id']}")
 
@@ -166,11 +175,20 @@ def submit_for_review(app_id, version_id):
 
 
 REQUIRED_SHOT_SETS = {
-    "APP_IPHONE_67": "iPhone 6.9\" app screenshots",
-    "APP_IPAD_PRO_3GEN_129": "iPad 13\" app screenshots",
-    "IMESSAGE_APP_IPHONE_67": "iMessage iPhone screenshots",
-    "IMESSAGE_APP_IPAD_PRO_3GEN_129": "iMessage iPad screenshots",
+    "IOS": {
+        "APP_IPHONE_67": "iPhone 6.9\" app screenshots",
+        "APP_IPAD_PRO_3GEN_129": "iPad 13\" app screenshots",
+    },
+    "TV_OS": {"APP_APPLE_TV": "Apple TV screenshots"},
+    "MAC_OS": {"APP_DESKTOP": "Mac screenshots"},
 }
+# Only an app with an iMessage extension needs these, and Connect then refuses the
+# version without them ("You must upload an iMessage screenshot").
+if os.environ.get("ASC_REQUIRE_IMESSAGE_SHOTS") == "1":
+    REQUIRED_SHOT_SETS["IOS"].update({
+        "IMESSAGE_APP_IPHONE_67": "iMessage iPhone screenshots",
+        "IMESSAGE_APP_IPAD_PRO_3GEN_129": "iMessage iPad screenshots",
+    })
 
 
 def audit(app_id, locale):
@@ -229,7 +247,7 @@ def audit(app_id, locale):
         bad = [x for x in shots["data"]
                if (x["attributes"].get("assetDeliveryState") or {}).get("errors")]
         have[st["attributes"]["screenshotDisplayType"]] = (done, len(shots["data"]), bad)
-    for dtype, label in REQUIRED_SHOT_SETS.items():
+    for dtype, label in REQUIRED_SHOT_SETS[PLATFORM].items():
         if dtype not in have:
             problems.append(f"no screenshot set for {dtype} ({label})")
             print(f"  {dtype:32} MISSING")
@@ -255,8 +273,8 @@ def audit(app_id, locale):
         if not d:
             problems.append("no age rating declaration on this version")
     except SystemExit:
-        notes.append("age rating unreadable — the app is live at 1.6.73, which "
-                     "cannot happen without one, so treat as set")
+        notes.append("age rating unreadable — if a version of the app is already "
+                     "live it cannot be missing, so treat as set")
 
     try:
         det = call(f"v1/appStoreVersions/{vid}/appStoreReviewDetail")
@@ -278,7 +296,7 @@ def audit(app_id, locale):
                             "(set ITSAppUsesNonExemptEncryption in the plist to avoid it)")
 
     # --- the review submission itself ---------------------------------------
-    subs = call(f"v1/reviewSubmissions?filter[app]={app_id}&filter[platform]=IOS&limit=20")
+    subs = call(f"v1/reviewSubmissions?filter[app]={app_id}&filter[platform]={PLATFORM}&limit=20")
     live = [r for r in subs["data"]
             if r["attributes"].get("state") not in {"COMPLETE", "CANCELING"}]
     for r in live:
@@ -307,8 +325,11 @@ def report(problems, notes):
 
 
 def main():
-    global TOK
-    ap = argparse.ArgumentParser()
+    global TOK, PLATFORM
+    ap = argparse.ArgumentParser(description=__doc__,
+                                 formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--platform", default="ios", choices=sorted(PLATFORMS),
+                    help="which platform's version to act on (default ios)")
     ap.add_argument("--set", action="append", default=[],
                     metavar="DISPLAY_TYPE=DIR",
                     help="e.g. IMESSAGE_APP_IPHONE_67=branding/store-screenshots/...")
@@ -319,7 +340,7 @@ def main():
     ap.add_argument("--create-version", metavar="X.Y.Z",
                     help="open a new App Store version if none is editable")
     ap.add_argument("--list", action="store_true",
-                    help="print the app's iOS versions and exit")
+                    help="print the platform's versions and exit")
     ap.add_argument("--attach-build", metavar="N",
                     help="attach this build number to the version")
     ap.add_argument("--release-notes", metavar="TEXT",
@@ -334,8 +355,10 @@ def main():
                     help="full pre-submission audit of the newest version; exits non-zero on a blocker")
     a = ap.parse_args()
 
-    if not a.set and not a.list:
-        raise SystemExit("nothing to do: pass --set DISPLAY_TYPE=DIR or --list")
+    if not (a.set or a.list or a.audit or a.status or a.submit or a.attach_build
+            or a.release_notes or a.release_type):
+        raise SystemExit("nothing to do: pass --set DISPLAY_TYPE=DIR, --list, --audit or --status")
+    PLATFORM = PLATFORMS[a.platform]
     TOK = token()
 
     apps = call(f"v1/apps?filter[bundleId]={BUNDLE}")
@@ -369,11 +392,12 @@ def main():
     if a.attach_build:
         builds = call(f"v1/builds?filter[app]={app_id}&limit=50"
                       f"&filter[version]={a.attach_build}"
+                      f"&filter[preReleaseVersion.platform]={PLATFORM}"
                       "&fields[builds]=version,processingState,expired")
         usable = [b for b in builds["data"]
                   if not b["attributes"].get("expired")]
         if not usable:
-            raise SystemExit(f"build {a.attach_build} not found for this app")
+            raise SystemExit(f"build {a.attach_build} not found for {PLATFORM}")
         b = usable[0]
         state = b["attributes"]["processingState"]
         if state != "VALID":

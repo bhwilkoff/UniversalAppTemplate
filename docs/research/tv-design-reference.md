@@ -1,7 +1,6 @@
-> PORTED FROM ARCHIVE WATCH as research reference. App-specific numbers
-> and host names are that app's; the method and platform facts travel.
+# Design Reference: UHF, Channels, Apple TV
 
-# Design Reference — UHF, Channels, Apple TV
+> Research done for Archive Watch during its early tvOS design (the source is undated; it predates M2), ported here 2026-08-24 as a historical reference. App-specific numbers and host names are that app's; the method and platform facts travel.
 
 Three touchstone apps, studied for what to borrow, what to adapt, and
 what to leave behind. The goal is a tvOS interface that feels native,
@@ -24,24 +23,24 @@ affordances on every featured card. **We adopt this.** Our Archive Watch
 equivalents: **+** = "Save for Later" (Favorites), **i** = Detail page.
 
 **Poster-centric shelves.** tvOS 26 moved hard toward "cinematic poster
-art" — 2:3 tall posters instead of 16:9 stills. This is the format
+art": 2:3 tall posters instead of 16:9 stills. This is the format
 audiences read as "a film." **We adopt this for film shelves, keep 16:9
 for TV episodes and footage.** No mixing of aspect ratios within a single
-row — it looks amateur.
+row. It looks amateur.
 
 **Up Next is persistent.** A single shelf, always second from top, lives
-across sessions. **We adopt this as "Continue Watching"** — SwiftData-backed,
+across sessions. **We adopt this as "Continue Watching"**: SwiftData-backed,
 shows playback progress as a thin bar at the bottom of the card.
 
 **Detail page split layout.** Hero still on top (auto-plays silent
 preview loop after 2s focus), metadata below in a two-column grid. Cast,
 crew, related content live below the fold as horizontal shelves. **We
-adopt the split but drop the silent-preview loop** — it requires generating
+adopt the split but drop the silent-preview loop**. It requires generating
 preview clips we don't have and would be gimmicky for archival content.
 
 **Focus effects.** Parallax on cards, subtle lift + shadow, title
-appearing on hover. Standard tvOS. **We use the defaults exactly** —
-deviation here feels wrong immediately.
+appearing on hover. Standard tvOS. **We use the defaults exactly**.
+Deviation here feels wrong immediately.
 
 ### Patterns to leave behind
 - **Channels/Apps surface.** Apple TV app's top-level "Store Channels"
@@ -62,24 +61,24 @@ deviation here feels wrong immediately.
 **EPG rethought for remote navigation.** UHF explicitly states they
 "reinvented the EPG experience from the ground up." Their layout prioritizes
 the **focused channel expanding inline** rather than dragging users into a
-separate detail view. **We adopt this for the Collection Browse screen** —
+separate detail view. **We adopt this for the Collection Browse screen**:
 hovering a collection card expands it inline to show a preview of 6
 items, no drill-down required for a quick scan.
 
 **TMDb-sourced hero art and metadata on every title.** UHF's detail pages
-show TMDB-sourced backdrops, cast, ratings — exactly the enrichment
+show TMDB-sourced backdrops, cast, ratings: exactly the enrichment
 pipeline we planned in `metadata-sources.md`. Seeing it in production
 validates the architecture. **We match this pattern**: every Archive
 item, after enrichment, looks like a "real" streaming title.
 
 **Sidebar primary navigation.** UHF uses a left-rail menu on iPad / Mac
 (Live TV / Series / Movies). On tvOS specifically, the primary nav is a
-top tab bar — platform convention. **We use top tabs on tvOS, match the
+top tab bar (platform convention). **We use top tabs on tvOS, match the
 categorical split**: Home / Browse / Search / Favorites.
 
 **Generous free tier / low friction.** No sign-in to browse. **We
 match: no account ever.** All user state is local-only SwiftData. This
-aligns with the learning-orientation values in CLAUDE.md — no funnel,
+aligns with the learning-orientation values in CLAUDE.md: no funnel,
 no upsell.
 
 ### Patterns to leave behind
@@ -99,23 +98,23 @@ a whole-home DVR. Deeply thoughtful about long content libraries.
 **List layouts for expanded content.** Recent Channels updates leaned
 into "list layouts when expanding into content" rather than grids-only. A
 grid is for scanning; a list is for deciding. **We adopt a toggle on
-the Browse screen** — grid-view for visual scanning, list-view (with
+the Browse screen**: grid-view for visual scanning, list-view (with
 longer synopsis, runtime, year visible) for readers. Focus remembers
 the choice.
 
 **Personal Sections.** Channels lets users create their own shelves
 (custom smart-filters) that persist alongside the app's default shelves.
-**We adopt a lightweight version in v2** — let users favorite a
+**We adopt a lightweight version in v2**: let users favorite a
 collection and have it appear as a shelf on Home. Keeps the app
 personal without adding account machinery.
 
 **Recordings show timecode, not minutes.** Channels DVR displays "0:12:34
 / 1:42:10" rather than "12 min watched / 102 total." This respects the
 viewer's position in the work itself. **We adopt this for Continue
-Watching** — show actual timecode on the progress tooltip.
+Watching**: show actual timecode on the progress tooltip.
 
 **Fix Incorrect Match affordance.** Channels surfaces "this match is
-wrong — here are alternatives" directly in the UI. For an archive
+wrong, here are alternatives" directly in the UI. For an archive
 where TMDb matching will sometimes fail, **we adopt this** as a
 user-facing escape hatch: long-press (or hold Select) on a detail
 page → "This isn't right" → fuzzy-search TMDb for alternatives →
@@ -123,12 +122,12 @@ re-link. The new link goes to local SwiftData; it doesn't round-trip
 to Archive.org.
 
 **Theater Mode / dimming.** Channels has a "Theater Mode" that dims
-ambient UI during playback focus. **We adopt a subtle version** — the
+ambient UI during playback focus. **We adopt a subtle version**: the
 shelf background gradient dims 15% when a video card is focused for
 > 2s, drawing the eye to the chosen work.
 
 **Video Groups.** Channels groups related recordings. **We adopt for
-multi-part films and TV series** — episodes surface as a nested shelf
+multi-part films and TV series**. Episodes surface as a nested shelf
 inside the parent item's detail page.
 
 ### Patterns to leave behind
@@ -161,8 +160,8 @@ inside the parent item's detail page.
 
 **Type**
 - SF Pro Display for titles (57pt hero, 34pt shelf title)
-- New York (serif) for synopsis paragraphs on detail pages —
-  archival content earns a serif. Deviation from tvOS default,
+- New York (serif) for synopsis paragraphs on detail pages.
+  Archival content earns a serif. Deviation from tvOS default,
   justified.
 - SF Pro Text for metadata and body (29pt minimum)
 
@@ -179,10 +178,10 @@ inside the parent item's detail page.
 - Modal transitions: cross-dissolve, 250ms
 
 **Shelf rhythm**
-- 4–5 visible cards per shelf, with 2 cards peeking on the right
+- 4 to 5 visible cards per shelf, with 2 cards peeking on the right
 - 48px gutters between cards
 - 96px gutters between shelves
-- Generous density — this is an archive, not a warehouse
+- Generous density: this is an archive, not a warehouse
 
 ---
 
@@ -197,7 +196,7 @@ inside the parent item's detail page.
   matters.
 
 Collectively: a **cinematheque**, not a **catalog**. Measured, serifed,
-unhurried — but snappy to operate.
+unhurried, but snappy to operate.
 
 ---
 
@@ -207,12 +206,12 @@ unhurried — but snappy to operate.
    is focused for 2s, the way Apple TV does? We have no preview clips.
    Could we generate 10-second compressed previews server-side via
    GitHub Actions and host on Pages? Decide after M2.
-2. **Serif body type on tvOS** — New York ships with the system, but
+2. **Serif body type on tvOS**. New York ships with the system, but
    is rarely used in tvOS apps. Does it feel distinctive-correct or
    distracting? Prototype and evaluate on a real screen before
    committing.
 3. **Per-collection visual identity.** Should the Prelinger shelf feel
-   different from the Classic TV shelf? Arguments both ways —
+   different from the Classic TV shelf? Arguments both ways:
    consistency vs. editorial character. Lean toward subtle differences:
    same layout, different accent color per collection.
 4. **"Shuffle this collection"** action as a first-class button next

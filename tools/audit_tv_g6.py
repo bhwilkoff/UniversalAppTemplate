@@ -5,7 +5,7 @@ Google's TV app quality requirement TV-G6 went LIVE 2026-08-01: a TV app must
 support both 32-bit and 64-bit architectures AND comply with 16 KB page sizes.
 It is not automatically satisfied — it depends on how every bundled native
 library was linked, so it must be measured, not assumed (docs/TV-DESIGN.md
-§6.4, Decision 047).
+§6.4, the TV quality gates).
 
 A 64-bit ELF is 16 KB-compliant when every PT_LOAD segment has p_align >= 16384.
 We parse the ELF program headers directly so this runs anywhere Python does —

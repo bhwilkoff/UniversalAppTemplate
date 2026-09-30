@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
-# REFERENCE IMPLEMENTATION (Tidbits Trivia). The SHAPE is the point:
-# env-hook-driven captures per screen, crash detection via the pid simctl
-# returned, durable capture paths, findings in a rounds table. To adopt:
-# replace the TIDBITS_* debug hooks and the screen list with YOUR app's
-# DebugHooks vocabulary (docs/DEVICE-HARNESSES.md, "the QA sweep").
+# REFERENCE IMPLEMENTATION (built for a trivia game; the modes and screens
+# below are its own). The SHAPE is the point: env-hook-driven captures per
+# screen, crash detection from a crash report newer than the launch, durable
+# capture paths, findings in a rounds table. To adopt: set the identity in
+# tools/app_config.py, HOOK_PREFIX to your hooks' prefix, and replace the
+# screen list with YOUR app's debug-hook vocabulary (docs/DEVICE-HARNESSES.md,
+# "the QA sweep").
 # qa-sweep.sh — drive EVERY game mode and feature screen on a simulator and capture a PNG
 # of each, so playability and feature completeness can be reviewed from the images rather
 # than by clicking through 40 surfaces by hand.
@@ -29,7 +31,11 @@ PLATFORM="${1:-ios}"
 OUT="${2:-build/qa/$(date +%F)-$PLATFORM}"
 mkdir -p "$OUT"
 export DEVELOPER_DIR="${DEVELOPER_DIR:-/Applications/Xcode.app/Contents/Developer}"
-BUNDLE="${APP_BUNDLE:-com.example.appname}"   # FILL IN
+cfg() { python3 -c "import sys; sys.path.insert(0, 'tools'); import app_config as c; print(c.$1)"; }
+BUNDLE="${APP_BUNDLE:-$(cfg APPLE_BUNDLE_ID)}"
+EXECUTABLE="${APP_EXECUTABLE:-$(cfg APPLE_EXECUTABLE)}"
+# Env hooks are <P>_NAME.
+P="${HOOK_PREFIX:-APP}"
 
 case "$PLATFORM" in
   ios)  DEVICE_MATCH="iPhone 17 Pro" ;;
@@ -60,10 +66,10 @@ shot() {
   for kv in "$@"; do env_args+=("SIMCTL_CHILD_${kv%%=*}=${kv#*=}"); done
   # Onboarding would sit over every single capture. On tvOS the Game Center sign-in
   # overlay ALSO covers the whole screen on launch and ate an entire capture run.
-  [ "$PLATFORM" = "tvos" ] && env_args+=("SIMCTL_CHILD_TIDBITS_NO_GAMECENTER=1")
+  [ "$PLATFORM" = "tvos" ] && env_args+=("SIMCTL_CHILD_${P}_NO_GAMECENTER=1")
   # Mark the moment, so a crash report written AFTER the launch is unambiguous.
   local stamp; stamp="$OUT/.stamp"; : > "$stamp"
-  env "${env_args[@]}" SIMCTL_CHILD_TIDBITS_SKIP_ONBOARD=1 \
+  env "${env_args[@]}" SIMCTL_CHILD_${P}_SKIP_ONBOARD=1 \
     xcrun simctl launch "$SIM" "$BUNDLE" >/dev/null 2>&1
   sleep "$settle"
   xcrun simctl io "$SIM" screenshot "$OUT/$name.png" >/dev/null 2>&1
@@ -72,7 +78,7 @@ shot() {
   # `simctl spawn kill -0` does not report the app's liveness either. A .ips written after
   # the stamp is the only signal here that means what it says.
   local crash
-  crash=$(find ~/Library/Logs/DiagnosticReports -name "TidbitsTrivia*.ips" \
+  crash=$(find ~/Library/Logs/DiagnosticReports -name "$EXECUTABLE*.ips" \
             -newer "$stamp" 2>/dev/null | head -1)
   if [ -n "$crash" ]; then
     echo "  $name  <-- CRASHED ($(basename "$crash"))"
@@ -84,42 +90,42 @@ shot() {
 echo "== game modes (mid-question) =="
 for mode in classic timeAttack survival stake sweep pictureId thisOrThat closestCall \
             ordering matching typeAnswer oddOneOut ladder enumerate daily; do
-  shot "mode-$mode" "TIDBITS_AUTOPLAY=$mode:mixed"
+  shot "mode-$mode" "${P}_AUTOPLAY=$mode:mixed"
 done
 
 echo "== game modes (after answering — reveal + scoring) =="
 for mode in classic stake pictureId thisOrThat closestCall ordering matching typeAnswer oddOneOut; do
-  shot "reveal-$mode" "TIDBITS_AUTOPLAY=$mode:mixed" "TIDBITS_AUTOPILOT=1" \
-       "TIDBITS_AUTOPILOT_STEPS=1" "TIDBITS_AUTOPILOT_CORRECT=1"
+  shot "reveal-$mode" "${P}_AUTOPLAY=$mode:mixed" "${P}_AUTOPILOT=1" \
+       "${P}_AUTOPILOT_STEPS=1" "${P}_AUTOPILOT_CORRECT=1"
 done
 
 echo "== end-of-game results =="
 for mode in classic survival sweep; do
-  SETTLE=30 shot "results-$mode" "TIDBITS_AUTOPLAY=$mode:mixed" "TIDBITS_AUTOPILOT=1" \
-       "TIDBITS_AUTOPILOT_CORRECT=1"
+  SETTLE=30 shot "results-$mode" "${P}_AUTOPLAY=$mode:mixed" "${P}_AUTOPILOT=1" \
+       "${P}_AUTOPILOT_CORRECT=1"
 done
 
 echo "== feature screens =="
-shot home              "TIDBITS_TAB=play"
-shot records           "TIDBITS_TAB=records" "TIDBITS_SEED_RECORDS=24"
-shot create            "TIDBITS_TAB=create"
-shot settings          "TIDBITS_SETTINGS=1"
-shot profile           "TIDBITS_PROFILE=1"
-shot customize         "TIDBITS_CUSTOMIZE=1"
-shot daily-archive     "TIDBITS_DAILY_ARCHIVE=1"
-shot night-setup       "TIDBITS_NIGHT_SETUP=1"
-shot party             "TIDBITS_PARTY=1"
-shot versus            "TIDBITS_VERSUS=1"
-shot multiplayer       "TIDBITS_MULTIPLAYER=1"
-shot paywall           "TIDBITS_PAYWALL=1"
-shot club-hub          "TIDBITS_CLUB_HUB=1" "TIDBITS_CLUB=1"
-shot story-archive     "TIDBITS_STORY_ARCHIVE=1" "TIDBITS_CLUB=1" "TIDBITS_SEED_RECORDS=24"
-shot atlas             "TIDBITS_ATLAS=1" "TIDBITS_CLUB=1" "TIDBITS_SEED_RECORDS=24"
-shot linkwall          "TIDBITS_LINKWALL=1" "TIDBITS_CLUB=1"
-shot expedition-map    "TIDBITS_EXPEDITION_MAP=1" "TIDBITS_CLUB=1"
-shot marathon          "TIDBITS_MARATHON=1" "TIDBITS_CLUB=1" "TIDBITS_MARATHON_LEN=5"
-shot weakspot          "TIDBITS_AUTOPLAY=weakSpot:mixed" "TIDBITS_CLUB=1" "TIDBITS_SEED_RECORDS=24"
-shot mix               "TIDBITS_MIX=1"
+shot home              "${P}_TAB=play"
+shot records           "${P}_TAB=records" "${P}_SEED_RECORDS=24"
+shot create            "${P}_TAB=create"
+shot settings          "${P}_SETTINGS=1"
+shot profile           "${P}_PROFILE=1"
+shot customize         "${P}_CUSTOMIZE=1"
+shot daily-archive     "${P}_DAILY_ARCHIVE=1"
+shot night-setup       "${P}_NIGHT_SETUP=1"
+shot party             "${P}_PARTY=1"
+shot versus            "${P}_VERSUS=1"
+shot multiplayer       "${P}_MULTIPLAYER=1"
+shot paywall           "${P}_PAYWALL=1"
+shot club-hub          "${P}_CLUB_HUB=1" "${P}_CLUB=1"
+shot story-archive     "${P}_STORY_ARCHIVE=1" "${P}_CLUB=1" "${P}_SEED_RECORDS=24"
+shot atlas             "${P}_ATLAS=1" "${P}_CLUB=1" "${P}_SEED_RECORDS=24"
+shot linkwall          "${P}_LINKWALL=1" "${P}_CLUB=1"
+shot expedition-map    "${P}_EXPEDITION_MAP=1" "${P}_CLUB=1"
+shot marathon          "${P}_MARATHON=1" "${P}_CLUB=1" "${P}_MARATHON_LEN=5"
+shot weakspot          "${P}_AUTOPLAY=weakSpot:mixed" "${P}_CLUB=1" "${P}_SEED_RECORDS=24"
+shot mix               "${P}_MIX=1"
 
 echo
 echo "captured $(ls "$OUT"/*.png 2>/dev/null | wc -l | tr -d ' ') PNGs → $OUT"

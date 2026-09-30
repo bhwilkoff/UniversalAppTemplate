@@ -1,6 +1,6 @@
 ---
 name: product-pulse-dashboard
-description: Build a daily product-health dashboard that reads every channel a shipped app has — store submissions and reviews, downloads and installs, crashes, social posts and their engagement, mentions across the open web, CI health. Use when someone asks for "one place to see how the app is doing", a metrics or KPI page, an ops dashboard, or wants to track store performance and user feedback over time.
+description: Build a daily product-health dashboard that reads every channel a shipped app has — store submissions and reviews, downloads and installs, crashes, search, server-side usage tallies, social posts, mentions across the open web, CI health. Use when someone asks for "one place to see how the app is doing", a metrics or KPI page, an ops dashboard, a Needs attention list, drill-downs, or wants to track store performance and user feedback over time; also when a Pulse reading is stale, refused, or shows a suspicious zero.
 ---
 
 # Product Pulse: one page that knows how the product is doing
@@ -32,6 +32,26 @@ There are four routes to that lie and a real dashboard hits all of them:
 | A partial run overwrote | Yesterday's mentions vanish | `--only` MERGES; it replaces only what it collected |
 | A full run dropped a failed section | Four reviews become a hole | a failed reader keeps its last value, marked `stale` |
 | A fuzzy search did not repeat | A real mention evaporates | mentions and reviews ACCUMULATE, deduped by identity |
+| A health key missing from the carry map | A section silently vanishes when its reader fails | `HEALTH_OWNS` covers every `state["health"][k] =`, asserted by a test |
+| A missing column defaulted to 0 | "0 installs" for a platform with 112 (the rows came from a different report) | `num_or_none`: a missing cell is NULL; series keep only days that carry the column |
+| An unknown vendor code skipped silently | macOS read ZERO for weeks (Mac product codes are a different family) | record every skipped code WITH its units, on the page |
+| A tool that "succeeded" at nothing | "0 findings" from an auditor that audited nothing | positive test: require "Checked N" with N > 0 |
+
+**Not configured is not broken.** A reader the app has not set up (no App
+Store id in the config) records `off: true` and the page says "not configured"
+— a third state, never merged with "could not read". Config is identical on
+every machine; credentials are not.
+
+**Refuse a reading you cannot trust.** A laptop holds a few credentials, CI
+holds all of them. A local `--apply` with many readers dark still carries each
+dark section forward (correct), and committing it replaced CI's fresh numbers —
+a platform vanished hours after being fixed. If a THIRD or more of the
+configured readers that ran were dark, `--apply` refuses (exit 0, says why;
+`--force` overrides). The guard is on the shape of the run, not the machine.
+
+**A dry run must not consume.** A reader whose source deletes what it acks (a
+drop box) acks only on `--apply`, and never acks a payload it could not parse —
+that payload is the only evidence of the shape that broke it.
 
 And one more, from the workflow rather than the code: **a secret that exists but
 is never passed to the step is indistinguishable from one that was never made.**
@@ -55,7 +75,28 @@ Follow Few and Cleveland & McGill, in that order:
 - **Zero is DRAWN; absence is WRITTEN.**
 
 `pulse/charts.js` implements exactly this: `bullet`, `bars`, `spark`, `stack`,
-`legend`, `dots`, `ratio`, `cadence`. Hand-rolled inline SVG, no library.
+`legend`, `dots`, `ratio`, `cadence`, plus the question-driven forms —
+`runChart` (series against its own ±2σ: "is this normal?"), `calendarHeat`
+("did it keep coming?"), `dotPlot` (many ranked categories), `pareto` ("what do
+I fix first?"), `timeChart` (dated, with a keyboard/pointer readout), `spans`
+(when each version was seen). Hand-rolled inline SVG, no library.
+
+The look rules that came later, each from a real complaint:
+
+- **Sparks in a row share ONE scale** (`max`/`min`), or 3/day and 300/day draw
+  the same picture. Small multiples on one calendar grey the days a series
+  does not cover, so a stalled reader looks different from a quiet week.
+- **A chart over time shows WHEN**: first/last date, top of scale, a readout.
+  Instants in the owner's time zone, never UTC.
+- **A change names its period**, always, from one function: "+18% vs prior
+  7 days". A day still in progress is never compared; no comparison against
+  a prior period the vendor never measured.
+- **Stale says "as of"**: past a source's MEASURED lag, an amber chip and a
+  Needs-attention line.
+- **Only essential words**: a caption is a refusal, a warning, or a fact the
+  reader cannot see. Reasons live in the doc and code comments.
+- **The page writes no style**; the one exception is a computed length, set
+  as a custom property.
 
 ### 3. Every panel opens, and every number links to where it came from
 
@@ -70,8 +111,13 @@ leaves, and nothing does both.
 
 ## The one list that asks for a decision
 
-"Needs you" is the only actionable section, and what it contains is a judgement
-worth getting right:
+The Overview opens on **Needs attention / Going well**, and every item comes
+from ONE `RULES` table (id, JSON path, threshold, tier: decide / watch / good).
+A new signal is a new row, never a new rendering branch — and the doc carries
+the same table. Each item: a sentence, a number, its comparison, its period,
+and a drawer. Tier colours down the left edge; six shown, then "N more".
+
+What goes in it is a judgement worth getting right:
 
 - **Filter by whether the USER's problem is live, not by whether you replied.**
   A first version filtered low-star reviews to unanswered ones, which put the
@@ -81,21 +127,68 @@ worth getting right:
   were last seen two releases ago is a list nobody reads. Compare each cluster's
   `lastAppVersion` to what is actually in production.
 - **A crash with a fix written but not shipped is a RELEASE task, not a fix
-  task.** Record it (`ops/fixed-in.json`) and ask for the release by name,
-  or the same work gets asked for twice.
+  task.** Record the Android `versionCode` carrying it (`ops/fixed-in.json`);
+  at or below Play's live build = shipped, at or below in-flight = in review,
+  otherwise "fix in repo, not released". Never compare an Apple build number.
+- **Usage fell / rose** = the last 7 COMPLETE days vs the 7 before, with a
+  floor (≥10) so tiny counts do not scream. A series older than its lag is
+  "stale", never compared.
 - **When it is empty, say so in words.** "Nothing is asking for you" plus what
   was checked beats a blank panel, which is indistinguishable from a broken one.
 
+## Views, drawers, and what the page may not do
+
+- **One view per audience/question**, from ONE `VIEWS` list the tabs and the
+  router both read (they disagreed once; a tab looked dead): Overview, Reach,
+  Engagement, Health, Voice, Search, Program, Ops, plus a section per platform.
+  The social program is its own view — posting next to installs invites a
+  causal reading neither supports. Moving a SECTION without moving its PANELS
+  is a half-measure that looks complete. Never combine engagement units across
+  platforms into one "engaged users" number.
+- **One drill-down**: a native `<dialog>` drawer routed in the hash
+  (`#health/crash/<id>`), carrying a dated chart with its change, the COMPLETE
+  sortable table (never silently capped), and the source link.
+- **A code error is not a data failure.** Draw each part in its own
+  try/catch and report a throw as "a bug in pulse.js, not a data problem" —
+  a fetch chain whose `.catch` said "Could not load the readings" sent the
+  owner to check data that was fine.
+- **Nothing about the app in the page code.** Name, site, repo, time zone and
+  profiles ride in the reading's `app` block.
+
+## Counting usage without breaking the privacy promise
+
+A usage number comes from something a server ALREADY receives to provide the
+feature (a room it opens, a feed it serves), or from a vendor's own reporting
+(Cloud Monitoring's count of the app's API calls) — never from an app sending a
+new count. A first-party counter stores `day | shape | count` only; a VISIT and
+a ROUTE VIEW are separate keys and never summed. If a question cannot be
+answered that way, the answer is a privacy-page change the owner makes, not a
+reader.
+
 ## Getting it running
 
-1. Fill in `tools/app_config.py` — App Store id, Android package, repo,
-   product name, site, and the mention terms. One file.
-2. `python3 tools/pulse_collect.py` — collect and print, write nothing. Each
-   source prints `ok` with a note or `--` with the reason.
-3. `--apply` writes `ops/pulse.json`; serve `pulse/` and open it.
-4. `.github/workflows/pulse.yml` runs it daily and commits the reading.
+1. Copy `ops/pulse.config.example.json` to `ops/pulse.config.json`; identity
+   the template already knows falls back to `tools/app_config.py`. Blank =
+   that reader is off. Credentials are env only.
+2. `python3 tools/pulse_collect.py` — dry run: `ok`, `--` (dark, with the
+   reason) or `off` (not configured) per reader. `--only a,b` MERGES.
+3. `--apply` writes `ops/pulse.json`; open `/pulse/`. `/pulse/?fixture`
+   renders a synthetic reading (`tools/pulse_make_fixture.py`) with no
+   credentials at all.
+4. `.github/workflows/pulse.yml` ships DORMANT; uncomment its triggers once
+   configured. Tests: `tools/test_pulse_collect.py`,
+   `tools/test_pulse_charts.mjs`, `tools/test_pulse_render.mjs`.
 
-Two things that bite in deployment:
+Things that bite in deployment:
+
+- **Crons run late.** GitHub ran one account's schedules 4–5 h late,
+  consistently. Measure your lag from run history and schedule for
+  "ready by" minus the lag. Add a `workflow_run` re-read of the STORE readers
+  only after each release workflow, so a release is on the page in minutes.
+- **Alarm past the MEASURED lag, never a default.** Play's acquisition data
+  runs 6–8 days behind (lag 8); its install export ~6 days plus a monthly-file
+  delay (alarm at 14). A 3-day default called every normal day stale, and a
+  page that cries stale teaches its reader to ignore the word.
 
 - **The daily commit carries `[skip ci]`** — correct, or a reading sets the
   whole fleet running — which also means its push triggers **no deploy**. Add
@@ -128,6 +221,8 @@ An alert channel that cries wolf gets muted, and then a real break goes unread.
 ## See also
 
 - `docs/PRODUCT-PULSE.md` — the reference: what each source needs and returns
+- `pulse/worker-example/` — optional $0 Cloudflare Worker: counter, tallies,
+  and the vendor drop box
 - `store-metrics-pipelines` — how each store actually exposes its numbers, and
   the trap in each one
 - `mobile-first-density-design` — the density rules the panels obey

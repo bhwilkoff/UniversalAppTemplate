@@ -1,6 +1,6 @@
 ---
 name: cross-platform-parity-discipline
-description: Use when shipping ANY user-facing feature in a multi-platform repo, when asked to "check parity", "audit features", or before a launch wave on any platform. Carries the PARITY.md workflow — same verb / native idiom, same-change-set updates, deliberate-defer cells with reasons, platform-specific affordance sections — and the periodic parity AUDIT protocol that catches missing rows and silently-false cells. Triggers on PARITY.md, feature parity, parity matrix, "ship on all platforms", "does Android have", parity audit, cross-platform feature, launch readiness, degenerate state, platform port audit.
+description: "Use when shipping ANY user-facing feature in a multi-platform repo, when asked to check parity or audit features, or before a launch wave on any platform. Carries the PARITY.md workflow (same verb / native idiom, same-change-set updates, deliberate-defer cells with reasons, capability tiers not effort tiers), the periodic parity AUDIT that catches missing rows and silently-false cells, mechanical parity guards (extract constants/ORDER BY/refusal sentences from each platform and diff, with a negative control), port ledgers at three levels, the PARITY.md maintenance protocol, and doc-layer parity. Triggers on PARITY.md, feature parity, parity matrix, ship on all platforms, does Android have, parity audit, parity test, parity guard, port ledger, platform port audit, cross-platform feature, launch readiness, degenerate state, capability tier."
 ---
 
 # Cross-Platform Parity Discipline
@@ -64,6 +64,36 @@ In the SAME change set (not a follow-up):
   "Top Shelf (tvOS) ↔ WidgetKit (iOS) ↔ Glance widgets (Android) ↔
   PWA shortcuts (web)."
 
+## Capability tiers, not effort tiers
+
+What a platform offers is decided by what its hardware and OS CAN do,
+never by how much of the port has been written. Legacy or weak devices
+never set the ceiling: gate the affordance, keep the implementation
+whole.
+
+- **Gate on a hardware predicate, not a form factor.** "Host can be in
+  the show" = camera AND microphone present (`FEATURE_CAMERA_ANY` +
+  mic), not `isTelevision()`. A TV that has a camera passes; a
+  cameraless tablet fails. Apply the predicate at EVERY entry point in
+  the same change (phone overflow row and TV button are one decision;
+  fixing one is how the defect survives in the other).
+- **Never have vs currently lack.** A capability the device can NEVER
+  have is omitted outright, with the reason in PARITY.md (a permanent
+  apology on screen is clutter). One it COULD have and currently lacks
+  (unconfigured sign-in, camera not yet permitted) stays visible with
+  one sentence saying why and what unlocks it. Never a silently
+  missing button.
+- **Publish a capability definition table** in PARITY.md when one
+  feature name covers several modes: rows = platforms, columns = the
+  named modes (and separate HOST vs JOIN columns when those differ),
+  each cell ✅/🚫 with the OS or hardware reason. It is the canonical
+  answer to "what does X mean on this device"; the rows below carry
+  the engineering detail.
+
+Source: Archive Watch Decisions 131/132 (Watch Together's three named
+modes; Android TV and Fire TV entries removed because no camera or
+mic, while tvOS keeps it by borrowing an iPhone via Continuity Camera).
+
 ## The parity audit (run before launch waves + once per milestone)
 
 Day-to-day updates miss two failure classes that only an audit
@@ -114,6 +144,40 @@ class N times and miss the classes that cut across surfaces; a
 failure-class organization turns each class into one fix applied
 everywhere. Give the port its own per-item tracker doc
 (`docs/<PLATFORM>-PARITY.md`) mirroring the main matrix's rows.
+
+### Port ledgers at three levels
+
+A screen matrix alone lies. Archive Watch's Roku feature ledger
+reported 74 ✅ rows and "feature parity"; the owner used the build the
+next day and returned 20 defects (non-functional More Like This, a
+Channels view that was not an EPG, filters that cycled instead of
+picked). The ✅ rows counted surfaces that EXISTED, not surfaces
+FINISHED to the reference platform's standard. Likewise an Android TV
+"12/12 D-pad-verified" claim measured reachability, not parity.
+Reachable is not parity.
+
+Keep three levels, seeded from `docs/templates/PORT-PARITY-LEDGER-template.md`:
+
+1. **Screen matrix** (`<PLATFORM>-PARITY.md`): does each surface exist
+   and is it reachable. Necessary, never sufficient.
+2. **Feature ledger** (`<PLATFORM>-FEATURE-PARITY.md`): the reference
+   platform's buttons and behaviours INSIDE each screen, enumerated
+   from its SOURCE files (grep the views), not from memory. A surface
+   that exists and does nothing is worse than a missing one: it
+   promises.
+3. **Owner feedback ledger** (`<PLATFORM>-FEEDBACK-LEDGER.md`): each
+   item from a human using the build, numbered, in their words, binding
+   until its row reads ✅ with on-device evidence. It supersedes any
+   earlier self-assessment; keep the superseded tally in the doc as a
+   record of the mistake.
+
+Tag every cell with its verification tier: **T1 device** (screenshot,
+log, focus tree on real hardware) · **T2 code** (wiring read end to
+end) · **T3 owner** (feel, visual judgment). Only T1 or T3 flips a cell
+to ✅. Where possible the app self-reports what it rendered (a log line
+listing the shelves it drew), so a T1 check reads evidence instead of
+eyeballing. Record deliberate platform differences as n/a WITH the
+reason, in both directions.
 
 ## Working the gap queue
 
@@ -167,6 +231,96 @@ Two rules follow:
   can do something a user would notice, it earns a matrix row even when the
   answer is identical everywhere — that row is what makes "wired nowhere"
   visible.
+
+## Mechanical parity guards
+
+When one rule is implemented in several languages (a hero-eligibility
+bar, a search ORDER BY, a room-code alphabet, a refusal sentence),
+reading diffs will not catch drift: each copy is correct where it
+lives. A test that reads the SHIPPED source of every platform and
+diffs the rule will.
+
+- **Regex-extract, don't re-implement.** Pull the constant set, the
+  year, the `ORDER BY` clause, or the user-facing sentence out of the
+  real Swift, Kotlin, JS and pipeline files, and assert they are equal
+  (sentences character for character). Where possible also EXECUTE the
+  extracted rule against a small fixture (the ORDER BY against an
+  in-memory FTS table) with cases the rule exists for.
+- **One run asks every surface the same gate question.** For a flow
+  with several entry points (every "go live" / "purchase" / "share"
+  surface), grep each surface for each gate its siblings have. Archive
+  Watch had one gate-added-on-one-platform-only defect recur four
+  times, each found by eye, late, before
+  `test_studio_surface_parity.sh` existed. It is a source check: it
+  proves no surface lacks a gate its siblings have, not that the screen
+  behaves.
+- **Check the pipeline against the clients too.** Every value the
+  producer can emit must have a client sentence, or it falls to a
+  default that leaks an internal name to a user.
+- **Web: every `API.x` the JS calls must be exported.** Plain JS has no
+  compiler; a call to a non-existent `API.summary` shipped from
+  v1.42.469 to v1.42.584 and left every browser guest with no player. Parse the
+  export block of `js/api.js`, grep callers for `API\.(\w+)`, diff.
+- **Every guard has a negative control.** Mutate one side (add a bucket
+  to one set, run the old `ORDER BY rank`) and assert the guard FAILS.
+  A guard that cannot fail is decoration; one Archive Watch text-wrap
+  test passed with the defect reinstated and was thrown away.
+- **Cite the guard in the PARITY row's Notes** (`test_hero_rule_parity.py`)
+  so the next editor knows the rule is enforced and where.
+- Run the guards in CI on every push; they cost milliseconds.
+
+Why it matters: Archive Watch's web and Roku copied only half of the
+hero rights bar (the year, not the buckets) and admitted 46% and 67%
+more titles than the apps until a guard compared all four copies.
+
+Prefer removing the copies (compute once in the pipeline, publish the
+result: `cross-platform-determinism` Rule 0) over guarding them. Guard
+what must stay mirrored.
+
+## PARITY.md maintenance protocol
+
+A matrix that grows into a journal stops being readable, then stops
+being true. Archive Watch's PARITY.md reached 830 lines with single
+rows over 13,000 characters.
+
+- **Cap a cell at one sentence plus a link.** Evidence goes in the cell
+  ("✅ verified iPhone 12, 2026-09-20"), the story goes in the ledger,
+  design doc or DECISIONS entry the cell links to.
+- **One summary row per ledgered port.** Once a platform has its own
+  ledger, PARITY holds one line pointing at it; do not keep a second
+  per-surface copy (it drifts false the moment the ledger moves on).
+- **n/a is not 🚫.** n/a = the verb does not apply to this platform
+  (lock-screen controls on tvOS). 🚫 = could apply, deliberately not
+  built, with the reason.
+- **Name the parity test in Notes** for any row a guard enforces.
+- **Carry an "Oldest hardware served" row** (the floor per platform
+  and the device it reaches) and a **capability definition table** for
+  any multi-mode feature (see Capability tiers).
+- **Per-section verification-gate tables** are fine where a section's
+  cells share a gate (device run, owner review).
+- **Scripts read columns by HEADER name, never by index.**
+  `line.split("|")` returns a LEADING EMPTY element, so `parts[4]` is
+  not the fourth platform. Archive Watch silently overwrote the macOS
+  column four times this way; the table still rendered and the wrong
+  cell read as fact. Build the index from the header row
+  (`cols = [c.strip() for c in header.strip().strip("|").split("|")]`).
+
+## Doc-layer parity
+
+A cross-platform rule lives in EVERY platform design doc, not only the
+one where it was first written. When the owner says "yes, all
+platforms", stamp the rule into each DESIGN doc the SAME day, each copy
+citing the origin rule number and the owner's dated words (Archive
+Watch's "New to Archive Watch" shelf landed in all seven platform
+design docs on 2026-09-25, each quoting "Yes, all platforms"). A doc that lacks the
+rule will be "harmonized" by a future session.
+
+Features that cut across every platform (captions, SharePlay/watch
+party, link sharing, analytics) get a feature-scoped binding doc beside
+the platform docs, seeded from `docs/templates/FEATURE-DESIGN-template.md`:
+an OS × platform capability matrix that an audit script re-derives
+from the real data, and a new-platform checklist. See
+`binding-design-doc-discipline`.
 
 ## Verbs that deserve a row people forget
 

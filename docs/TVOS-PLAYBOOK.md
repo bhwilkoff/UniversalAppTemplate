@@ -1,8 +1,8 @@
-# tvOS Playbook — Archive Watch
+# tvOS Playbook
 
-A durable reference for building a world-class tvOS 17+ experience. Synthesized from the tvOS HIG, WWDC sessions (2020–2025), Apple developer docs, shipping app analysis (Apple TV app, Channels, UHF, Plex, Infuse), and hard-earned production patterns. Every concrete rule in this playbook is citable — sources are listed per section so future decisions stay traceable.
+A durable reference for building a tvOS app that feels at home in the living room. The deployment floor is **tvOS 26, held below 27** (27 dropped the Apple TV HD and the first-generation 4K; see `CLAUDE.md` and Decision 004). tvOS 27 APIs are adopted additively behind `#available` (Decision 048). Synthesized from the tvOS HIG, WWDC sessions (2020–2025), Apple developer docs, shipping app analysis (Apple TV app, Channels, UHF, Plex, Infuse), and production patterns learned in Archive Watch. Every concrete rule here is citable: sources are listed per section so future decisions stay traceable.
 
-When designing or coding any screen of this app, open the relevant section first. When in doubt, the footer "Five unbreakable rules" at the bottom are the backstops.
+When designing or coding any tvOS screen, open the relevant section first. When in doubt, the "Five unbreakable rules" at the bottom are the backstops. The `tvos-platform-patterns` skill carries the same patterns in agent form. Once your tvOS app passes about three core screens, copy this file into your app repo as `docs/tvos-playbook.md` (you create this) and grow it there.
 
 ---
 
@@ -10,21 +10,21 @@ When designing or coding any screen of this app, open the relevant section first
 
 Apple's HIG frames tvOS around five principles. Internalize them before writing any view.
 
-1. **Connected.** Every interactive element should feel tactile to the Siri Remote's touch surface — subtle motion, parallax, lift on focus.
-2. **Clear.** Ruthless hierarchy, generous margins, never clutter. Users must instinctively know where they are.
+1. **Connected.** Every interactive element should feel tactile to the Siri Remote's touch surface: subtle motion, parallax, lift on focus.
+2. **Clear.** Ruthless hierarchy, generous margins, never clutter. Folks must instinctively know where they are.
 3. **Immersive.** Edge-to-edge artwork, cinematic framing, no heavy chrome around media.
-4. **Shared / living-room.** Multiple people may be watching. Defaults must be safe (hence Decision 012's adult filter).
+4. **Shared / living-room.** Multiple people may be watching. Defaults must be safe (if your catalog has mature content, filter it off by default).
 5. **Ten-foot UI.** Typical viewing distance is 8–12 ft. Touch-target thinking is replaced by focus-reach thinking. 29 pt is the body text floor.
 
-Implicit sixth principle, cited across every WWDC focus talk: **focus is the primary interaction model.** Subtract focusable elements before you add them. If a layout has trap focus, it is broken.
+Implicit sixth principle, cited across every WWDC focus talk: **focus is the primary interaction model.** Subtract focusable elements before you add them. If a layout traps focus, it is broken.
 
-Sources: Apple HIG — Designing for tvOS; WWDC20 #10049 "Create great designs for tvOS"; BPXL Craft HIG primer.
+Sources: Apple HIG, Designing for tvOS; WWDC20 #10049 "Create great designs for tvOS"; BPXL Craft HIG primer.
 
 ---
 
-## 2. Focus engine — the API surface and decision tree
+## 2. The focus engine: API surface and decision tree
 
-The single most-mis-used part of the platform. Every tvOS app lives or dies on its focus engine work.
+The single most misused part of the platform. Every tvOS app lives or dies on its focus engine work.
 
 ### 2.1 Every focus API and when to reach for it
 
@@ -33,26 +33,26 @@ The single most-mis-used part of the platform. Every tvOS app lives or dies on i
 | `@FocusState` (Bool) | Single focusable's focus state | Only one item being programmatically focused |
 | `@FocusState` (enum) | Multi-target in one scope | Any time you have 2+ possible focus targets |
 | `.focused($state)` / `.focused($state, equals: .x)` | Bind a view to FocusState | Read current focus + drive it programmatically |
-| `.focusable()` | Make a non-interactive view participate | Custom views that need to receive focus (not `Button`s — those are focusable for free) |
+| `.focusable()` | Make a non-interactive view participate | Custom views that need to receive focus (not `Button`s, which are focusable for free) |
 | `.focusable(_: interactions:)` | Specify focus-activation semantics | Custom views needing `.activate`, `.edit`, or `[.activate, .edit]` |
 | `.focusEffect()` / `.focusEffectDisabled()` | Custom focus treatment / suppress system halo | When rendering focus state yourself via `@Environment(\.isFocused)` |
-| `.focusSection()` | Mark a container as a traversal unit | Sidebar, content pane, each shelf — use for irregular layouts |
+| `.focusSection()` | Mark a container as a traversal unit | Sidebar, content pane, each shelf; use for irregular layouts |
 | `.focusScope()` + `@Namespace` | Reset-able focus boundary | Modal roots where `defaultFocus` should retarget on re-entry |
 | `.defaultFocus($state, .value)` | Declarative initial focus | **Preferred** over imperative `onAppear` assignment (avoids race) |
 | `.prefersDefaultFocus(_:in:)` | Specific view prefers default within scope | Older API; `defaultFocus` is cleaner |
 | `.onMoveCommand(_:)` | Intercept directional presses | Only when focus engine wouldn't consume them |
-| `.onExitCommand(_:)` | Intercept Back button | **Sparingly** — only for custom player UI or custom overlays |
+| `.onExitCommand(_:)` | Intercept Back button | **Sparingly**: only for custom player UI or custom overlays |
 | `.onPlayPauseCommand(_:)` | Intercept Play/Pause | Media screens + toggle-able contexts |
-| `.hoverEffect(.highlight \| .lift)` | System focus treatment | Stock behavior on posters/buttons — don't stack with custom scale |
+| `.hoverEffect(.highlight \| .lift)` | System focus treatment | Stock behavior on posters/buttons; don't stack with custom scale |
 | `@Environment(\.isFocused)` | Read current view's focus | In `PrimitiveButtonStyle` / custom styles |
 
-### 2.2 Decision tree — "I need X focus behavior"
+### 2.2 Decision tree for focus behavior
 
 **Q: Default-focus a button on view appear.**
 → `.defaultFocus($focus, .play)` on the container. Never `focus = .play` in `onAppear` (races first render). If the view loads data, gate with `if !items.isEmpty`.
 
 **Q: Set focus programmatically after data loads.**
-→ `.task { focus = .play }` — runs after first render. Or `.onChange(of: items) { ... }`.
+→ `.task { focus = .play }` runs after first render. Or `.onChange(of: items) { ... }`.
 
 **Q: Focus should restore when a sheet / modal re-opens.**
 → `.focusScope(ns)` + `.defaultFocus($focus, .x, in: ns)`.
@@ -61,7 +61,7 @@ The single most-mis-used part of the platform. Every tvOS app lives or dies on i
 → `.focusable(true)` + render focus state with `@Environment(\.isFocused)`.
 
 **Q: I want to fully replace the system focus halo on a button.**
-→ Custom `PrimitiveButtonStyle` reading `@Environment(\.isFocused)`, plus `.focusEffectDisabled()`. Do **not** use `.buttonStyle(.plain)` — it destroys focusability on tvOS.
+→ Custom `PrimitiveButtonStyle` reading `@Environment(\.isFocused)`, plus `.focusEffectDisabled()`. Do **not** use `.buttonStyle(.plain)`: it destroys focusability on tvOS.
 
 ### 2.3 Traversal mechanics (geometric, not hierarchical)
 
@@ -159,29 +159,29 @@ struct PosterButtonStyle: PrimitiveButtonStyle {
 
 ### 2.5 Common bugs and fixes
 
-- **`.buttonStyle(.plain)` kills focusability** — use `.buttonStyle(.card)` or `.borderless`, or a custom `PrimitiveButtonStyle` with `@Environment(\.isFocused)`.
-- **ScrollView yanks layout** when focus handoff between focusables needs reconciling — wrap shelves with `.focusSection()`, never nest vertical ScrollViews.
-- **`defaultFocus` not honored** — target not yet in hierarchy (gate with `if !items.isEmpty`), or competing `prefersDefaultFocus`, or FocusState is on a recreating view.
-- **`focusSection` not bounding** — it's a hint, not a wall. For true constraint, `.onMoveCommand` intercepts and consumes the event.
-- **Focus stuck in sidebar** — content pane has no focusable at same Y as the focused sidebar row; add `.focusSection()` + `.defaultFocus` on content.
-- **`onExitCommand` swallowed** — a focused child ate it. Move handler to the focused level.
-- **FocusState race in `onAppear`** — use `.task { ... }` or `.defaultFocus` instead.
+- **`.buttonStyle(.plain)` kills focusability.** Use `.buttonStyle(.card)` or `.borderless`, or a custom `PrimitiveButtonStyle` with `@Environment(\.isFocused)`.
+- **ScrollView yanks layout** when focus handoff between focusables needs reconciling. Wrap shelves with `.focusSection()`, never nest vertical ScrollViews.
+- **`defaultFocus` not honored.** The target is not yet in the hierarchy (gate with `if !items.isEmpty`), or a `prefersDefaultFocus` competes, or FocusState is on a recreating view.
+- **`focusSection` not bounding.** It's a hint, not a wall. For true constraint, `.onMoveCommand` intercepts and consumes the event.
+- **Focus stuck in sidebar.** The content pane has no focusable at the same Y as the focused sidebar row; add `.focusSection()` + `.defaultFocus` on content.
+- **`onExitCommand` swallowed.** A focused child ate it. Move the handler to the focused level.
+- **FocusState race in `onAppear`.** Use `.task { ... }` or `.defaultFocus` instead.
 
 ### 2.6 Antipatterns (never do these)
 
 - Calling `.focusable()` on a `Button` (double-declaring creates ghost candidates).
 - Using `.onTapGesture` on actionable elements instead of `Button` (clickpad center press is unreliable with tap gestures).
-- Putting `.focusSection()` on parent HStack **and** both children — the parent's section conflicts with children's.
-- Reassigning `@FocusState` inside `onChange(of: focus)` — loop.
-- `.animation(.default)` on a view containing focusable children — scope animations to specific properties.
+- Putting `.focusSection()` on parent HStack **and** both children. The parent's section conflicts with the children's.
+- Reassigning `@FocusState` inside `onChange(of: focus)`. That's a loop.
+- `.animation(.default)` on a view containing focusable children. Scope animations to specific properties.
 - Assuming `.hoverEffect` is iOS-only. On tvOS it's **the** focus effect.
 
-### 2.7 NavigationSplitView on tvOS — know the trade-off
+### 2.7 NavigationSplitView on tvOS and its trade-off
 
-The tvOS 17.2 Apple TV app redesign uses a sidebar pattern. The community signals are mixed:
-- Apple's HIG endorses `NavigationSplitView` + `.tabViewStyle(.sidebarAdaptable)` (tvOS 18+ only) for apps with 6+ top-level destinations.
-- The production focus-engine experts advise **manual HStack + focusSection per child** for tvOS 17+ because NavigationSplitView's built-in focus assumptions sometimes fight custom treatments.
-- For Archive Watch's 5 tabs: manual HStack is the safer path given tvOS 17+ target. Revisit if deployment target moves to tvOS 18+.
+The Apple TV app uses a sidebar pattern. The community signals are mixed:
+- Apple's HIG endorses `NavigationSplitView` + `.tabViewStyle(.sidebarAdaptable)` for apps with 6+ top-level destinations. At the tvOS 26 floor it is always available.
+- Production focus-engine experts advise a **manual HStack + focusSection per child** because NavigationSplitView's built-in focus assumptions sometimes fight custom treatments.
+- Learned in Archive Watch (5 tabs, built when its floor was tvOS 17): the manual HStack held up. At a tvOS 26 floor, try `.sidebarAdaptable` first and drop to the manual HStack only when focus measurably fights you.
 
 Sources: WWDC21 #10153 "Direct and reflect focus in SwiftUI"; WWDC23 #10162 "The SwiftUI cookbook for focus"; WWDC24 #10144 "Work with windows in SwiftUI"; WWDC25 #284 "What's new in SwiftUI"; Apple developer docs (`FocusState`, `focusSection`, `focusScope`, `defaultFocus`, `focusEffectDisabled`); Airbnb Engineering "Mastering the tvOS Focus Engine"; Apple Developer Forums (#706321 ScrollView + prefersDefaultFocus incompatibility, #756261 .plain button unfocusable).
 
@@ -191,11 +191,11 @@ Sources: WWDC21 #10153 "Direct and reflect focus in SwiftUI"; WWDC23 #10162 "The
 
 ### 3.1 Safe area and margins
 
-- **Safe area insets (1080p and 4K, tvOS-wide):** 90 pt leading/trailing, 60 pt top/bottom. Constant across resolutions — points don't scale.
+- **Safe area insets (1080p and 4K, tvOS-wide):** 90 pt leading/trailing, 60 pt top/bottom. Constant across resolutions, because points don't scale.
 - **Overscan reality:** older TVs crop 2–5% off every edge. Critical content (titles, buttons, posters) must stay inside the safe area. Decorative bleed (hero art, gradient washes) can extend to edges.
 - **Usable width at 1920 pt:** 1920 − 180 = **1740 pt**.
 - **Standard gutter between horizontal cards:** 30–80 pt (typical 40–60 pt).
-- **Standard vertical spacing between stacked shelves:** minimum 80 pt — a 1.1× focused card must not collide with a neighbor row.
+- **Standard vertical spacing between stacked shelves:** minimum 80 pt, so a 1.1× focused card never collides with a neighbor row.
 - **Shelf row height:** ~400–500 pt (card + title + subtitle + focus headroom).
 
 ### 3.2 Card sizes (observed across shipping apps)
@@ -212,16 +212,16 @@ Sources: WWDC21 #10153 "Direct and reflect focus in SwiftUI"; WWDC23 #10162 "The
 ### 3.3 Title labels on cards
 
 - **Apple convention: titles below poster** in 1 line (bolder apps 2 lines max).
-- **Infuse's move:** show title **only on focus** (fades in). Cleanest treatment in the study — eliminates baseline clutter.
-- **Title font size at 10ft:** 20–22 pt is the readable sweet spot. 18pt is borderline. 17pt is unreadable at 10ft — per HIG.
+- **Infuse's move:** show title **only on focus** (fades in). Cleanest treatment in the study, because it eliminates baseline clutter.
+- **Title font size at 10ft:** 20–22 pt is the readable sweet spot. 18pt is borderline. 17pt is unreadable at 10ft, per HIG.
 
-Sources: Apple HIG — Layout; Median content-formatting guide; BPXL Craft primer; shipping app analysis (Apple TV, Plex, Infuse, Channels, UHF).
+Sources: Apple HIG, Layout; Median content-formatting guide; BPXL Craft primer; shipping app analysis (Apple TV, Plex, Infuse, Channels, UHF).
 
 ---
 
 ## 4. Typography
 
-### 4.1 The tvOS ramp — use these tokens, don't hardcode
+### 4.1 The tvOS ramp: use these tokens, don't hardcode
 
 | Token | Size | Weight | Leading | Use |
 |---|---|---|---|---|
@@ -230,7 +230,7 @@ Sources: Apple HIG — Layout; Median content-formatting guide; BPXL Craft prime
 | Title 2 | 48 pt | Medium | 52 pt | Subsections |
 | Title 3 | 38 pt | Regular | 42 pt | Card headlines |
 | Headline | 38 pt | Semibold | 42 pt | Emphasized body start |
-| **Body** | **29 pt** | **Regular** | **36 pt** | **Default — floor for 10ft** |
+| **Body** | **29 pt** | **Regular** | **36 pt** | **Default, the floor for 10ft** |
 | Callout | 31 pt | Regular | 38 pt | Highlighted inline |
 | Subheadline | 29 pt | Regular | 36 pt | Secondary |
 | Footnote | 23 pt | Regular | 32 pt | Metadata |
@@ -241,33 +241,33 @@ Rules:
 - **29 pt is the 10-ft body text floor.** Below that is "difficult to read at living room distances" (direct HIG quote).
 - **Titles 48 pt or larger.**
 - SF Pro Display for all text ≥ 20 pt (automatic with system tokens).
-- Avoid Ultralight/Thin — they shimmer at distance.
+- Avoid Ultralight/Thin. They shimmer at distance.
 - Line-height 1.1–1.25×, never tighter than 1.05×.
-- Serif is acceptable as display type (Archive Watch's editorial flavor) but **body must stay sans at 29 pt**.
-- **Dynamic Type does NOT apply on tvOS.** Bold Text is honored automatically when using system tokens.
+- Serif is acceptable as display type (an editorial brand) but **body must stay sans at 29 pt**.
+- **Dynamic Type arrived in tvOS 27** (`.scaledFont`). Honor it behind `#available(tvOS 27, *)` and keep the fixed 29 pt floor on tvOS 26, which has no Dynamic Type. System tokens make both paths nearly free. Bold Text is honored automatically when using system tokens.
 
 ### 4.2 Reading text on hero art
 
 Never place body text directly on a poster/backdrop without a scrim. Target ~7:1 contrast ratio because couch glare eats 1.5–2 stops off whatever you design.
 
-Sources: Apple HIG — Typography; BasThomas tvOS-guidelines; createwithswift Materials.
+Sources: Apple HIG, Typography; BasThomas tvOS-guidelines; createwithswift Materials.
 
 ---
 
-## 5. Color & materials
+## 5. Color and materials
 
 - **Dark-first, always.** tvOS's default is dark; bright backgrounds bleach the room and clash with cinematic content. Only ship Light mode if it earns its keep.
 - **System materials** (hardware-accelerated blur + vibrancy):
-  - `.regularMaterial` — full-screen backgrounds, panels with text
-  - `.thinMaterial` — stacked layers where depth matters
-  - `.ultraThinMaterial` — transient HUDs only
+  - `.regularMaterial`: full-screen backgrounds, panels with text
+  - `.thinMaterial`: stacked layers where depth matters
+  - `.ultraThinMaterial`: transient HUDs only
   - **Text container?** favor `.regular` or `.thick`.
-- **Vibrancy colors** only on materials — don't paint solid hex over a vibrancy layer; use the semantic vibrant palette so legibility adapts to backdrop luminance.
+- **Vibrancy colors** only on materials. Don't paint solid hex over a vibrancy layer; use the semantic vibrant palette so legibility adapts to backdrop luminance.
 - **Contrast:** WCAG AA floor, but target 7:1 for body on ambient hero art.
 - **Focus = the single strongest brightness affordance** in a screen. Reserve the lift for focused items; don't spray bright accents everywhere.
-- **Avoid quaternary colors on `.thin`/`.ultraThin` materials** — contrast is insufficient.
+- **Avoid quaternary colors on `.thin`/`.ultraThin` materials.** Contrast is insufficient.
 
-Archive Watch's per-category accent palette (Decision 013) is the correct approach: one accent per content category (Feature Film #FF5C35, Silent Era #C9A66B, etc.), used sparingly for focused-state glow, shelf-title accent dot, and the brand's home rail.
+A per-category accent palette (one accent per content category, learned in Archive Watch) fits this rule when it is used sparingly: the focused-state glow, a shelf-title accent dot, and the brand's home rail. Keep the palette in Core `Design.swift` so it matches the other platforms (Decision 012).
 
 Sources: HIG Materials; WWDC22 "Design with accessibility in mind".
 
@@ -281,10 +281,10 @@ Sources: HIG Materials; WWDC22 "Design with accessibility in mind".
 |---|---|
 | Focus scale (tiles/cards) | **1.08–1.10** (Plex 1.08, Infuse 1.10, Channels 1.06) |
 | Focus scale (buttons/controls) | **1.06–1.08** |
-| Focus transition | `.spring(response: 0.4, dampingFraction: 0.82, blendDuration: 0)` — ~400ms critically-damped |
+| Focus transition | `.spring(response: 0.4, dampingFraction: 0.82, blendDuration: 0)`, ~400ms critically-damped |
 | Card press-down | `.spring(response: 0.25, dampingFraction: 0.75)` |
 | Modal / detail push | `.smooth(duration: 0.5)` or `.spring(response: 0.5, dampingFraction: 0.9)` |
-| Tab switch | `.easeInOut(duration: 0.35)` (no spring — tabs don't bounce) |
+| Tab switch | `.easeInOut(duration: 0.35)` (no spring; tabs don't bounce) |
 | Shelf auto-scroll | `.timingCurve(0.25, 0.1, 0.25, 1.0, duration: 0.5)` ease-in-out |
 | Full-screen player present | `.spring(duration: 0.6, dampingFraction: 0.78)` + crossfade to black |
 | Hero carousel rotation | **7–8 seconds** per item (Apple ~7s, Infuse ~8s, Plex 10s too slow) |
@@ -293,9 +293,9 @@ Sources: HIG Materials; WWDC22 "Design with accessibility in mind".
 
 ### 6.2 `hoverEffect` (the tvOS focus effect)
 
-- `.highlight` — brightens ~+15% luminance, scales ~1.10, adds specular sheen tracking Siri Remote trackpad. **Use for poster art and image-forward content.**
-- `.lift` — scale ~1.08 + drop shadow (y:12, blur:24, opacity:0.35), no specular. **Use for buttons, text cards, settings rows.**
-- **Never stack `hoverEffect` with custom `scaleEffect`** driven by `@FocusState` — they fight. Pick one:
+- `.highlight`: brightens ~+15% luminance, scales ~1.10, adds specular sheen tracking the Siri Remote trackpad. **Use for poster art and image-forward content.**
+- `.lift`: scale ~1.08 + drop shadow (y:12, blur:24, opacity:0.35), no specular. **Use for buttons, text cards, settings rows.**
+- **Never stack `hoverEffect` with a custom `scaleEffect`** driven by `@FocusState`. They fight. Pick one:
   - Stock: `.hoverEffect(.highlight)` alone
   - Custom: `.hoverEffectDisabled()` + drive scale/shadow/rotation yourself
 
@@ -304,30 +304,30 @@ Sources: HIG Materials; WWDC22 "Design with accessibility in mind".
 The real Apple TV parallax uses layered image stacks (`.imagestack` in the asset catalog) with per-layer translation/rotation driven by Siri Remote trackpad position.
 
 SwiftUI approximation paths:
-1. **Layered images + `rotation3DEffect`** driven by drag on the Remote — best visual, most code
-2. **`UIViewRepresentable` + `UIInterpolatingMotionEffect`** — most accurate, UIKit plumbing
-3. **`.visualEffect` + `GeometryProxy`** (tvOS 17+) — cheap pseudo-parallax, focus-state-driven
+1. **Layered images + `rotation3DEffect`** driven by drag on the Remote: best visual, most code
+2. **`UIViewRepresentable` + `UIInterpolatingMotionEffect`**: most accurate, UIKit plumbing
+3. **`.visualEffect` + `GeometryProxy`**: cheap pseudo-parallax, focus-state-driven
 
-For Archive Watch: option 3 for every card in a grid (can't afford 200 UIKit parallax layers); option 2 for the hero.
+For a poster grid: option 3 for every card (you can't afford 200 UIKit parallax layers); option 2 for the hero.
 
-### 6.4 Attention & micro-motion
+### 6.4 Attention and micro-motion
 
-- **Idle pulse on primary CTA:** scale 1.0 → 1.03 → 1.0 over 1.6 s ease-in-out, repeating, only after focused for >3 s with no input. Never pulse continuously — reads as nagging.
+- **Idle pulse on primary CTA:** scale 1.0 → 1.03 → 1.0 over 1.6 s ease-in-out, repeating, only after focused for >3 s with no input. Never pulse continuously. It reads as nagging.
 - **Shimmer for skeleton posters:** linear gradient sweep L→R over 1.2 s ease-in-out, looped. Angle 20°, gradient width ~30% of card.
 - **Hero carousel:** crossfade (0.8 s) + slow Ken Burns zoom (1.0 → 1.05 over the full 6–8 s dwell). Crossfade alone feels static; zoom alone induces motion sickness at 10 ft.
 
 ### 6.5 Performance costs
 
-Apple TV HD (A8, 1GB RAM) vs. 4K (A10X–A15, 3GB). tvOS locked at 60fps as of tvOS 26 (no 120fps).
+Apple TV HD (A8, 1GB RAM) vs. 4K (A10X–A15, 3GB). The HD still runs tvOS 26, so at the tvOS 26 floor it is a real target. tvOS is locked at 60fps as of tvOS 26 (no 120fps).
 
 Cost ranking (cheap → expensive):
-1. `opacity`, `scaleEffect`, `offset` — effectively free (GPU composited)
-2. `rotation3DEffect` — cheap up to ~50 instances
-3. `shadow(radius:)` — **expensive**, rasterized per frame. Budget ~20 shadowed views onscreen. Wrap in `.drawingGroup()` to flatten if needed.
-4. `blur(radius:)` — **very expensive** on A8. Each 8 pt ≈ doubles cost. Never animate blur radius. Prefer `Material` (hardware-accelerated).
-5. `matchedGeometryEffect` on images — moderate; 1–2 active hero transitions is fine.
+1. `opacity`, `scaleEffect`, `offset`: effectively free (GPU composited)
+2. `rotation3DEffect`: cheap up to ~50 instances
+3. `shadow(radius:)`: **expensive**, rasterized per frame. Budget ~20 shadowed views onscreen. Wrap in `.drawingGroup()` to flatten if needed.
+4. `blur(radius:)`: **very expensive** on A8. Each 8 pt roughly doubles cost. Never animate blur radius. Prefer `Material` (hardware-accelerated).
+5. `matchedGeometryEffect` on images: moderate; 1–2 active hero transitions is fine.
 
-**Rules for Archive Watch:** animate transforms (scale/offset/rotation/opacity) freely; treat shadow and blur as static set-dressing; never animate blur radius; use `.drawingGroup()` on complex focused cells only if profiling shows dropped frames on A8.
+**Rules:** animate transforms (scale/offset/rotation/opacity) freely; treat shadow and blur as static set-dressing; never animate blur radius; use `.drawingGroup()` on complex focused cells only if profiling shows dropped frames on A8.
 
 ### 6.6 Reduce Motion (App Store requirement)
 
@@ -336,19 +336,19 @@ Check `@Environment(\.accessibilityReduceMotion)`. When true:
 - Disable hero carousel auto-rotate
 - Replace spring animations with crossfade/instant state change
 
-Sources: WWDC16 #210 "Focus Interaction in tvOS"; WWDC20 #10042 "Design for the Living Room"; WWDC23 #10158 "Animate with Springs"; WWDC23 #10054 "Explore SwiftUI animation"; WWDC24 #10144 "Enhance your UI animations"; HIG — Motion.
+Sources: WWDC16 #210 "Focus Interaction in tvOS"; WWDC20 #10042 "Design for the Living Room"; WWDC23 #10158 "Animate with Springs"; WWDC23 #10054 "Explore SwiftUI animation"; WWDC24 #10144 "Enhance your UI animations"; HIG, Motion.
 
 ---
 
 ## 7. Image pipeline
 
-### 7.1 Why AsyncImage is wrong for poster grids
+### 7.1 AsyncImage is wrong for poster grids
 
-- Starts download only when a LazyHStack/Grid cell is **realized** — not appearance, not focus. That's the pop-in.
-- Routes through `URLSession.shared` and respects `URLCache.shared` — but the decoded `UIImage` is thrown away on every view rebuild.
+- It starts the download only when a LazyHStack/Grid cell is **realized**: not on appearance, not on focus. That's the pop-in.
+- It routes through `URLSession.shared` and respects `URLCache.shared`, but the decoded `UIImage` is thrown away on every view rebuild.
 - No prefetching API.
-- Decoding on draw time (lazy) = main-thread hitches when multiple cells paint at once.
-- Re-downloads on view identity changes (URL computed in `body` triggers teardown).
+- Decoding at draw time (lazy) = main-thread hitches when multiple cells paint at once.
+- It re-downloads on view identity changes (a URL computed in `body` triggers teardown).
 
 ### 7.2 Custom `ImageLoader` architecture
 
@@ -403,7 +403,7 @@ actor ImageLoader {
 }
 ```
 
-**The magic line: `kCGImageSourceShouldCacheImmediately: true`** — forces decode now, not at draw. Also downsamples in one pass at the final display size, saving ~10× memory vs decoding raw JPEG.
+**The key line is `kCGImageSourceShouldCacheImmediately: true`.** It forces decode now, not at draw. It also downsamples in one pass at the final display size, saving ~10× memory vs decoding the raw JPEG.
 
 ### 7.3 SwiftUI wrapper
 
@@ -432,7 +432,7 @@ struct RemoteImage: View {
 
 ### 7.4 Prefetching pattern (SwiftUI has no built-in API)
 
-Drive from the data source, not the view. When shelf items array changes:
+Drive from the data source, not the view. When the shelf items array changes:
 
 ```swift
 .onChange(of: shelfItems) { _, new in
@@ -455,22 +455,22 @@ Drive from the data source, not the view. When shelf items array changes:
 
 ### 7.6 SwiftUI gotchas
 
-- AsyncImage re-download on rebuild: **never compute URLs in `body`** — store on the model.
-- Don't `.id(item.id)` on `RemoteImage` — use on the container only.
+- AsyncImage re-downloads on rebuild: **never compute URLs in `body`**. Store them on the model.
+- Don't `.id(item.id)` on `RemoteImage`. Use it on the container only.
 - `.task(id:)` cancellation works only if the loader checks `Task.isCancelled` between awaits.
-- Pending image load must NOT gate layout. Always render a placeholder Color immediately.
-- **`Text("\(intValue)")` adds a locale grouping comma** → a decade renders as
+- A pending image load must NOT gate layout. Always render a placeholder Color immediately.
+- **`Text("\(intValue)")` adds a locale grouping comma**, so a decade renders as
   "1,960s". `Text` interpolates through `LocalizedStringKey`, which formats an
   `Int` with the locale number formatter. Use `Text(verbatim: "\(n)s")` or
-  `Text(String(n))` for years/decades/IDs. (`Text(String(year))` is already safe
-  — it's the non-localized `Text(_:)` initializer.) Caught on Browse-by-Era tiles
-  (2026-06).
+  `Text(String(n))` for years/decades/IDs. (`Text(String(year))` is already safe:
+  it's the non-localized `Text(_:)` initializer.) Learned in Archive Watch on
+  browse-by-decade tiles (2026-06).
 
 Sources: WWDC18 #219 "Image and Graphics Best Practices"; WWDC21 "Demystify SwiftUI"; Apple sample "Destination Video" (tvOS target); Nuke / Kingfisher source for reference.
 
 ---
 
-## 8. Remote control + accessibility
+## 8. Remote control and accessibility
 
 ### 8.1 Siri Remote (2nd gen) button semantics
 
@@ -478,97 +478,133 @@ Sources: WWDC18 #219 "Image and Graphics Best Practices"; WWDC21 "Demystify Swif
 |---|---|---|---|
 | Back (short) | Exit to Home | Pop one level | Exit player |
 | Back (long-press) | Home Screen (system) | Home Screen | Home Screen |
-| TV | Home / last app (user pref) | — | — |
+| TV | Home / last app (user pref) | (none) | (none) |
 | Siri | Dictation / search UI | Context search | "Who said that?" rewind |
-| Play/Pause | — | Activate focused item (some screens) | Toggle playback |
+| Play/Pause | (none) | Activate focused item (some screens) | Toggle playback |
 | Clickpad center | Select focused | Select focused | Pause/resume |
 | Clickpad edges | Move focus | Move focus | Scrub / chapter nav |
 
+### 8.1a Taking a clickpad press from AVPlayerViewController
+
+To make up/down CLICKS do something inside an `AVPlayerViewController` (channel
+surfing, next/previous item), add a `UITapGestureRecognizer` with
+`allowedPressTypes` set to that press, attach it to `vc.view`, and give it
+priority: its delegate returns `true` from
+`gestureRecognizer(_:shouldBeRequiredToFailBy:)` for recognizers whose
+`allowedPressTypes` overlap its own.
+
+Learned in Archive Watch (2026-09), with two wrong turns, both measured on an
+Apple TV with pyatv presses and a log line per press offered:
+
+- **No delegate:** the recognizer is never offered an up/down press. AVKit takes it.
+- **`shouldRecognizeSimultaneouslyWith` returning true:** the press is taken,
+  AND AVKit also acts on it and opens its info panel, which swallows the NEXT
+  press. Every other press is lost, and focus sits on `AVInfoMenuCell`.
+
+Scope the priority to the same press type. If you require failure more
+broadly, select and left/right end up waiting on a recognizer that never fails.
+
+### 8.1b Press the keys yourself
+
+An input feature is not done until you have pressed it through pyatv on a
+real Apple TV, with a log line per press. The simulator's remote and a code
+read both miss the failures in §8.1a: a press that never reaches your
+recognizer, or every other press silently lost. Log each press as it is
+offered and as it is handled, send the sequence (up, up, down, select, back)
+from pyatv, and compare the two lists. A press sent with no matching log line
+is the bug. This is Decision 032 applied to input: the agent is never the
+tester, and the device is. The pyatv setup lives in `docs/DEVICE-HARNESSES.md`
+and the `device-observation-harness` skill.
+
 ### 8.2 Back button contract (App Store rejection risk if violated)
 
-- **Never override Back outside player/modal** — Guideline 4.0 treats reassignment as rejection risk.
+- **Never override Back outside player/modal.** Guideline 4.0 treats reassignment as a rejection risk.
 - Back at tab root = exit app (system behavior, don't intercept).
-- Back inside NavigationStack = pop (system behavior — your own `onExitCommand` is usually redundant).
+- Back inside NavigationStack = pop (system behavior; your own `onExitCommand` is usually redundant).
 - Back in modal = dismiss.
 - Back in full-screen player = exit player (AVKit does it).
 - Long-press Back = Home Screen (system, don't intercept).
 
 ### 8.3 Play/Pause semantics
 
-- Non-video screens: ignore (unless you have ambient trailer).
-- **Focused film card + Play/Pause = start playback** (convention across Apple TV, Netflix, Disney+). Wire via `.onPlayPauseCommand` on the focused card.
-- Video player: AVPlayerViewController handles — don't override.
+- Non-video screens: ignore (unless you have an ambient trailer).
+- **Focused media card + Play/Pause = start playback** (convention across Apple TV, Netflix, Disney+). Wire via `.onPlayPauseCommand` on the focused card.
+- Video player: AVPlayerViewController handles it. Don't override.
 
-### 8.4 Accessibility — non-negotiables
+### 8.4 Accessibility non-negotiables
 
-- **Dynamic Type does NOT apply on tvOS.** Use system tokens; don't hardcode sizes.
-- **Bold Text** — honored automatically with system fonts.
-- **Reduce Motion** — required. `@Environment(\.accessibilityReduceMotion)` gate on every spring/parallax/auto-rotate.
-- **Increase Contrast** — `@Environment(\.colorSchemeContrast)`. Drop scrims, raise accent opacity when `.increased`.
-- **VoiceOver** — every custom focusable needs `.accessibilityLabel` + `.accessibilityHint`. `.accessibilityAddTraits(.isButton)` on focusable non-Buttons.
-- **Switch Control** — works via focus engine for free if all actionables are `Button`s or `.focusable(true)`.
-- **Closed captions** — AVPlayerViewController surfaces from HLS/MP4 tracks. For Archive items without tracks, check via `AVAsset.mediaSelectionGroup(forMediaCharacteristic: .legible)` and surface a "Captions not available" notice.
+- **Dynamic Type exists from tvOS 27 only** (`.scaledFont`). Honor it behind `#available`; on tvOS 26 use system tokens and never hardcode sizes.
+- **Bold Text:** honored automatically with system fonts.
+- **Reduce Motion:** required. `@Environment(\.accessibilityReduceMotion)` gates every spring/parallax/auto-rotate.
+- **Increase Contrast:** `@Environment(\.colorSchemeContrast)`. Drop scrims, raise accent opacity when `.increased`.
+- **VoiceOver:** every custom focusable needs `.accessibilityLabel` + `.accessibilityHint`. `.accessibilityAddTraits(.isButton)` on focusable non-Buttons.
+- **Switch Control:** works via the focus engine for free if all actionables are `Button`s or `.focusable(true)`.
+- **Closed captions:** AVPlayerViewController surfaces them from HLS/MP4 tracks. For items without tracks, check via `AVAsset.mediaSelectionGroup(forMediaCharacteristic: .legible)` and surface a "Captions not available" notice. `docs/MEDIA-PLAYBACK.md` carries the captions doctrine.
 
 ### 8.5 Internationalization
 
-- RTL: focus engine auto-swaps left/right directions. `onMoveCommand` gives you semantic `.leading`/`.trailing` — never physical `.left`/`.right` in logic.
+- RTL: the focus engine auto-swaps left/right directions. `onMoveCommand` gives you semantic `.leading`/`.trailing`; never use physical `.left`/`.right` in logic.
 - Dates/numbers: `.formatted(date: .abbreviated, ...)`, `Duration.seconds(x).formatted()` honor locale automatically.
 
 ### 8.6 Player metadata (Info panel + the wrong "year")
 
 `AVPlayerViewController` displays metadata from BOTH the player item's
-`externalMetadata` AND the asset's own embedded metadata. Two lessons (2026-06):
+`externalMetadata` AND the asset's own embedded metadata (Decision 022). Two
+lessons, learned in Archive Watch (2026-06):
 
 - **The stray year above the scrubber is the MP4's embedded `creation_time`, not
-  yours.** Archive's re-encoded derivatives carry `creation_time = 0`
-  (1970-01-01 UTC), which renders as **"1969"** in a negative-UTC zone. Deleting
-  your own `externalMetadata` does nothing — the value is on the asset.
+  yours.** Re-encoded derivatives from some hosts (the Internet Archive's, in
+  that case) carry `creation_time = 0` (1970-01-01 UTC), which renders as
+  **"1969"** in a negative-UTC zone. Deleting your own `externalMetadata` does
+  nothing, because the value is on the asset.
 - **`externalMetadata` OVERRIDES asset metadata by identifier.** To blank the
-  date, emit override items with EMPTY values for the creation-date keys —
+  date, emit override items with EMPTY values for the creation-date keys:
   `.commonIdentifierCreationDate`, `.quickTimeMetadataCreationDate`,
   `.quickTimeUserDataCreationDate` (override all three; MP4s vary in which they
-  carry). See `suppressedDateMetadata()` in `AVPlayerScreen.swift`.
-- **Apply metadata to EVERY player surface.** The episode player originally set
-  no `externalMetadata`, so it still showed the asset's year. Movie + episode
-  players must both apply the title + the date suppressor.
-- A bare 4-digit year is NOT a valid date for `.commonIdentifierCreationDate` —
-  AVKit reinterprets it (we once saw 2035/2045). Either omit creation date
-  entirely or supply a real ISO date; never a bare year.
+  carry). Keep this in one `suppressedDateMetadata()` helper beside your player
+  screen.
+- **Apply metadata to EVERY player surface.** A second player (episodes, say)
+  that sets no `externalMetadata` still shows the asset's year. Every player
+  must apply the title + the date suppressor.
+- A bare 4-digit year is NOT a valid date for `.commonIdentifierCreationDate`.
+  AVKit reinterprets it (2035 and 2045 have been observed). Either omit creation
+  date entirely or supply a real ISO date; never a bare year.
 
-Sources: HIG — Remote and Controllers; Apple Support "Siri Remote"; WWDC21 #10046 "Design for the Siri Remote"; WWDC22 #10032 "Dive into App Intents"; App Store Review Guidelines 2.5.1, 4.0; AVPlayerViewController docs.
+Sources: HIG, Remote and Controllers; Apple Support "Siri Remote"; WWDC21 #10046 "Design for the Siri Remote"; WWDC22 #10032 "Dive into App Intents"; App Store Review Guidelines 2.5.1, 4.0; AVPlayerViewController docs.
 
 ---
 
 ## 9. Shipping-app patterns (what to copy, what to avoid)
 
-### 9.1 Navigation shell — the spectrum
+### 9.1 The navigation shell spectrum
 
-- **Apple TV (17.2+):** sidebar — ~80pt collapsed / ~280pt expanded, auto-expands on focus entry. 6+ top-level destinations.
+- **Apple TV app:** sidebar, ~80pt collapsed / ~280pt expanded, auto-expands on focus entry. 6+ top-level destinations.
 - **Channels, Plex, Infuse:** top tabs, 4–6 destinations, centered.
-- **UHF:** inverts the model — left "channel spine" IS the content, not navigation chrome.
+- **UHF:** inverts the model. The left "channel spine" IS the content, not navigation chrome.
 
-**Decision for Archive Watch:** 5 top-level tabs is in tab-bar territory. But we've committed to sidebar per user request. Implementation: manual HStack + `.focusSection()`, expand on focus, orange accent for selected.
+Four to six top-level destinations is tab-bar territory; six or more favors a sidebar. If you pick a sidebar with fewer (Archive Watch did, at five, by the owner's choice), build it per §2.7: expand on focus, brand accent for the selected row. Record the choice in your `tvOS-DESIGN.md` (you create this, from `docs/templates/TVOS-DESIGN-template.md`).
 
 ### 9.2 Home screen patterns
 
 - Hero carousel: 7–8 second rotation, crossfade, subtle Ken Burns (1.0 → 1.05). Pause on focus entry.
 - Hero content: category, title, year/runtime/byline. **No synopsis** (noisy, unread at 10ft).
-- Randomize the hero pool per-launch, not a fixed 7. Draw from top-N-by-popularity (shelf count), shuffle, take 7.
+- Randomize the hero pool per launch, not a fixed 7. Draw from the top N by popularity, shuffle, take 7. If other platforms must show the same hero, use the hash-rank in `cross-platform-determinism` instead of a shuffle (Decision 025).
 - Below hero: 4–8 shelves typical. Continue Watching first if non-empty, Editor's Picks / For You second, then editorial.
-- **Carousel = ONE focusable surface whose content swaps — never overlay
+- **Carousel = ONE focusable surface whose content swaps. Never overlay
   all pages.** Render only the current banner (`.id(item)` + `.transition`);
   do NOT stack all N banners in a `ZStack` with `.opacity(0)` on the
   inactive ones. opacity / `allowsHitTesting(false)` do **not** remove
   focusability, so N stacked banners bound to one `@FocusState` register as
   N overlapping focus candidates and the engine can't route "up" into the
-  hero from below — focus gets stuck on the first shelf. (Cost real
-  iteration: commit `77bea61`. tvOS focus is geometric, not hierarchical.)
+  hero from below. Focus gets stuck on the first shelf. (Learned in Archive
+  Watch at the cost of real iteration. tvOS focus is geometric, not
+  hierarchical.)
 - **`.focusSection()` on the hero AND each shelf row; never on the outer
   `ScrollView`/`LazyVStack`.** Parent + child sections conflict. Sectioning
   each row is what lets vertical moves jump row-to-row regardless of
   horizontal scroll position.
 - **Claim initial focus exactly once** (a `hasClaimedInitialFocus` guard),
-  not in a bare `.task { isFocused = true }` — a `.task` re-fires when the
+  not in a bare `.task { isFocused = true }`. A `.task` re-fires when the
   lazy hero is recycled on scroll and yanks focus back mid-browse.
 
 ### 9.3 Shelf design
@@ -580,7 +616,7 @@ Sources: HIG — Remote and Controllers; Apple Support "Siri Remote"; WWDC21 #10
 
 ### 9.4 Detail screen
 
-- **Auto-focus Play on entry** (Plex's miss is the #1 complained-about detail behavior).
+- **Auto-focus Play on entry** (Plex's miss is the #1 complained-about detail behavior). This deliberately inverts the iOS rule of never stealing focus; say so in your design docs.
 - Full-bleed backdrop top ~45–60%. Poster insets lower-left, metadata to its right.
 - Play button pill, large, pinned at the seam between backdrop and metadata (roughly Y = 55%).
 - "More Like This" shelf at the bottom.
@@ -588,9 +624,9 @@ Sources: HIG — Remote and Controllers; Apple Support "Siri Remote"; WWDC21 #10
 
 ### 9.5 Search
 
-- Use Apple's directional keyboard (`UISearchController` / `.searchable`) — you get Siri dictation free.
-- Live results — don't require submit.
-- Never invent a grid keyboard — tests worse with Siri Remote trackpad.
+- Use Apple's directional keyboard (`UISearchController` / `.searchable`). You get Siri dictation free.
+- Live results. Don't require submit.
+- Never invent a grid keyboard. It tests worse with the Siri Remote trackpad.
 
 ### 9.6 Playback
 
@@ -599,52 +635,56 @@ Sources: HIG — Remote and Controllers; Apple Support "Siri Remote"; WWDC21 #10
 - Info panel: chapters, subtitles, audio, runtime, source attribution.
 - Infuse-level scene thumbnails on scrub = aspirational, not required.
 
-Sources: Field study of Apple TV app (17.2+), Channels, UHF, Plex, Infuse — reviews from The Verge / 9to5Mac / MacRumors, Firecore release notes, Fancy Bits (Channels) blog.
+Sources: Field study of the Apple TV app, Channels, UHF, Plex, Infuse; reviews from The Verge / 9to5Mac / MacRumors, Firecore release notes, Fancy Bits (Channels) blog.
 
 ---
 
-## 10. Archive Watch-specific applications
+## 10. Mapping the playbook to your decisions
 
-Mapping the above to our app's concrete decisions already logged in DECISIONS.md:
+The template's DECISIONS.md already commits you to several of these sections. Fill in the app-specific rows when you copy this file into your app.
 
-- **Decision 006 (tvOS-first):** the whole playbook applies.
-- **Decision 007 (TMDb):** 500px w500 posters = 500×750 native; target 240×360@2x display = 480×720 decoded. ImageIO downsample in one pass (§7.2).
-- **Decision 011 (hybrid curation):** hero rotation uses randomized top-N from the full catalog (§9.2), not just curated 7.
-- **Decision 012 (adult filter on):** safe living-room defaults align with HIG "shared device" principle (§1).
-- **Decision 013 (per-category accents):** reserve brightness for focus (§5); accents used sparingly for focus glow, shelf dot, brand rail.
-- **Decision 014 (random actions):** App Intents + `onPlayPauseCommand` wiring (§8.3).
-- **Decision 015 (Top Shelf):** 1920×1080 hero, `.sectioned` style, deep links (`archivewatch://item/{id}`).
+- **Decision 004 (tvOS 26 baseline) and 048 (next-OS APIs behind both gates):** §4.1 and §8.4 Dynamic Type handling.
+- **Decision 013 / 019 (one universal Apple target):** the image pipeline (§7) and models live in Core; only views live in `tvOS/`.
+- **Decision 017 (tvOS persistence) and 040 (persistence never blocks launch):** §11.
+- **Decision 018 (env hooks):** drive the app to a known screen for §8.1b press tests and store screenshots.
+- **Decision 022 (player metadata):** §8.6.
+- **Decision 032 (the agent is never the tester):** §8.1b.
+- **Image source and poster sizes:** [FILL IN: your artwork host, its native poster size, your display size. Downsample in one pass per §7.2.]
+- **Living-room safety default:** [FILL IN: what is filtered by default on a shared screen (§1).]
+- **Category accents:** [FILL IN: your palette, if any (§5).]
+- **Top Shelf:** [FILL IN: style and deep link shape, e.g. `appname://item/{id}`.] Setup lives in `docs/runbooks/tvos-top-shelf-setup.md`.
 
 ---
 
-## 11. Persistence — the tvOS writable-directory trap
+## 11. Persistence and the tvOS writable-directory trap
 
-tvOS apps **cannot write to `Application Support` or `Documents`** — only
+tvOS apps **cannot write to `Application Support` or `Documents`**. Only
 `Library/Caches` and `tmp` are writable in the app's own container. The
 simulator is lenient and lets Application Support writes through, so this
 class of bug **passes every simulator test and crashes only on real
 hardware** (`NSCocoaErrorDomain 513`, EPERM "Operation not permitted").
-Found the hard way on first device install (crash at
-`CatalogRefreshService.swift:24`).
+Learned in Archive Watch on its first device install, as a launch crash in
+the catalog refresh service.
 
-Rules:
+Rules (Decision 017):
 
-- **Never `FileManager.url(for: .applicationSupportDirectory, …, create: true)`**
-  — it throws on device. Use
+- **Never `FileManager.url(for: .applicationSupportDirectory, …, create: true)`.**
+  It throws on device. Use
   `FileManager.urls(for: .cachesDirectory, in: .userDomainMask).first`
-  (non-throwing) for any file cache. Re-fetchable data (downloaded catalog,
-  per-series JSON) belongs in Caches anyway.
+  (non-throwing) for any file cache. Re-fetchable data (a downloaded catalog,
+  per-item JSON) belongs in Caches anyway.
 - **Never `try!` a directory/file creation.** A filesystem permission error
   becomes a fatal crash. Use `try?` + a fallback.
-- **SwiftData / Core Data default store is Application Support → it crashes
-  on device too.** Don't rely on `.modelContainer(for:)`. Build the container
-  with an explicit `ModelConfiguration(groupContainer: .identifier(…))` (App
-  Group — writable, persistent, shared with the Top Shelf extension), and
+- **The SwiftData / Core Data default store is Application Support, so it
+  crashes on device too.** Don't rely on `.modelContainer(for:)`. Build the
+  container with an explicit `ModelConfiguration(groupContainer: .identifier(…))`
+  (App Group: writable, persistent, shared with the Top Shelf extension), and
   fall back to `ModelContainer(for: schema)` then an in-memory store so the
-  app always launches. See `ArchiveWatchApp.makeModelContainer()`.
+  app always launches (Decision 040). Keep this in one `makeModelContainer()`
+  on your `App` type.
 - **The App Group container IS writable on tvOS** (and survives, unlike
-  Caches which the system may purge). It's the right home for anything that
-  must persist — favorites, watch progress, the Top Shelf snapshot JSON.
+  Caches, which the system may purge). It's the right home for anything that
+  must persist: favorites, watch progress, the Top Shelf snapshot JSON.
 - Anything in Caches can be purged under storage pressure; treat it as a
   performance cache, not a source of truth.
 
@@ -655,11 +695,11 @@ Rules:
 When in doubt, check against these:
 
 1. **Dark-first, 29 pt body floor, 90/60 safe area.**
-2. **Back is sacred — never intercept outside player/modal.**
-3. **Reachability contract — every focusable reachable from every other via arrows, in every direction that has content.**
-4. **No `.buttonStyle(.plain)` on tvOS** — breaks focusability. Use `.borderless` + `.focusEffectDisabled` + custom `isFocused` treatment, or `.buttonStyle(.card)`.
-5. **Preserve focus across state changes** — by stable identifier, not index.
+2. **Back is sacred. Never intercept it outside player/modal.**
+3. **Reachability contract: every focusable is reachable from every other via arrows, in every direction that has content.**
+4. **No `.buttonStyle(.plain)` on tvOS.** It breaks focusability. Use `.borderless` + `.focusEffectDisabled` + custom `isFocused` treatment, or `.buttonStyle(.card)`.
+5. **Preserve focus across state changes** by stable identifier, not index.
 
 ---
 
-*Playbook last reviewed: 2026-06-01. Revisit after each WWDC.*
+*Playbook last reviewed: 2026-09-30. Revisit after each WWDC.*

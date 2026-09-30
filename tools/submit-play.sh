@@ -4,7 +4,9 @@
 # the release AAB with the existing upload key (~/.gradle/gradle.properties), then uploads + releases
 # via tools/play-publish.py (Google Play Developer API v3).
 #
-#   tools/submit-play.sh [--track production|internal|alpha|beta] [--notes "..."] [--rollout 0.1] [--draft] [--no-bump]
+#   tools/submit-play.sh [--track production|internal|alpha|beta] [--notes "..." | --notes @file] [--rollout 0.1] [--draft] [--no-bump]
+#
+# Notes over Play's 500-character limit are refused before the versionCode bump.
 #
 # NOTE: needs `chmod +x tools/submit-play.sh` once (git preserves the bit thereafter).
 #
@@ -28,6 +30,28 @@ while [ $# -gt 0 ]; do
 done
 
 GRADLE="android/app/build.gradle.kts"
+
+# Play caps release notes at 500 characters and enforces it at COMMIT, the very
+# last call, after the bundle is built and uploaded. A 513-character note once
+# cost a seven-minute run and burned a versionCode with it. Checked HERE, before
+# anything is bumped or built, because that is the only place failing costs
+# nothing. (--notes @file reads the file, as play-publish.py does.)
+if [ -n "$NOTES" ]; then
+  if [ "${NOTES#@}" != "$NOTES" ]; then
+    NOTES_FILE="${NOTES#@}"; NOTES_FILE="${NOTES_FILE/#\~/$HOME}"
+    [ -f "$NOTES_FILE" ] || { echo "Release notes file not found: $NOTES_FILE"; exit 1; }
+    NOTES_TEXT="$(cat "$NOTES_FILE")"
+  else
+    NOTES_TEXT="$NOTES"
+  fi
+  N=$(printf '%s' "$NOTES_TEXT" | python3 -c 'import sys; print(len(sys.stdin.read().strip()))')
+  if [ "$N" -gt 500 ]; then
+    echo "Release notes are $N characters; Play's limit is 500."
+    echo "Shorten by $((N - 500)) and re-run. Nothing has been built or bumped yet."
+    exit 1
+  fi
+fi
+
 KEY="${PLAY_SERVICE_ACCOUNT_JSON:-$HOME/.config/play/PLAY_SERVICE_ACCOUNT.json}"
 [ -f "$KEY" ] || { echo "Missing service-account JSON at $KEY (see setup notes at top / docs/CLOUD-SUBMISSION.md)"; exit 1; }
 
@@ -38,7 +62,8 @@ if [ "$BUMP" = 1 ]; then
   /usr/bin/sed -i '' -E "s/(versionCode[[:space:]]*=[[:space:]]*)[0-9]+/\1$NEW/" "$GRADLE"
   echo "versionCode $CUR → $NEW"
 fi
-VN="$(grep -E '^\s*versionName\s*=' "$GRADLE" | head -1 | sed -E 's/.*"(.*)".*/\1/')"
+# versionName is READ from AppVersion.xcconfig by the Gradle build, so read it there too.
+VN="$(grep -E '^MARKETING_VERSION[[:space:]]*=' AppVersion.xcconfig | head -1 | sed -E 's/.*=[[:space:]]*//')"
 VC="$(grep -E '^\s*versionCode\s*=' "$GRADLE" | head -1 | sed -E 's/[^0-9]//g')"
 echo "Building Android $VN (versionCode $VC) …"
 

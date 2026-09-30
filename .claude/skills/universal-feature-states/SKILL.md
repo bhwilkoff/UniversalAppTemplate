@@ -1,6 +1,6 @@
 ---
 name: universal-feature-states
-description: Use when designing any list, grid, search, sheet, or feature with content that loads. Every such surface must define behavior for FOUR states beyond happy path — loading, empty, error, offline. Plus understand the distinction between EmptyState (structural), ErrorBanner (attention), HintBanner (first-run tip), and Walkthrough (multi-step tutorial). Triggers on empty state, loading state, error handling, offline support, ContentUnavailableView, "what happens if no data?"
+description: Use when designing any list, grid, search, sheet, or feature with content that loads. Every such surface must define behavior for FOUR states beyond happy path — loading, empty, error, offline. Plus understand the distinction between EmptyState (structural), ErrorBanner (attention), HintBanner (first-run tip), and Walkthrough (multi-step tutorial). Also the Unavailable state for a capability, sign-in, permission or credential this device lacks (never a silently missing button). Triggers on empty state, loading state, error handling, offline support, ContentUnavailableView, 'what happens if no data?', capability gate, missing credential, unconfigured sign-in.
 ---
 
 # Universal Feature States
@@ -13,6 +13,8 @@ Every list, grid, search, sheet, or feature with content that loads must define 
 2. **Empty** — no content exists
 3. **Error** — fetch failed
 4. **Offline** — network unavailable
+
+A feature gated on a device capability, sign-in, permission or credential also defines a fifth: **Unavailable** (see below). Never a silently missing button.
 
 And five teaching surfaces that occupy distinct roles in the UI:
 
@@ -87,6 +89,28 @@ UI surfaces:
 - **Cached read paths must work** — search the catalog, browse owned items, etc. operate against local data
 
 The principle: offline is a degraded mode of the same app, not a separate failure mode. Don't show "no internet" splash screens.
+
+### Unavailable (a capability this device lacks)
+
+A fifth state, distinct from empty and error: the feature exists on
+the platform but THIS device or account cannot use it right now.
+
+- **Never a silently missing button.** A capability the device could
+  have and currently lacks (sign-in not configured, a camera not yet
+  permitted, an API credential the build does not carry) is a state
+  with a sentence on screen: what is missing and how to get it. An
+  absence written where a screen was needed is the defect (Archive
+  Watch Decision 128 found four in one unconfigured sign-in state).
+- **Never-capable hardware is omitted, with the reason in PARITY.md.**
+  If the hardware can never have it (no camera on a TV box), hide the
+  entry: a permanent apology is clutter. The explanation lives in the
+  parity matrix, where the question is asked (AW Decision 132).
+- **Gate on a hardware predicate, not form factor**, and apply it at
+  EVERY entry point in the same change (a phone overflow row and a TV
+  button are one decision).
+- **A missing credential is a state you must be able to reach.** A
+  feature gated on a credential nobody on the team has is never
+  tested; give the unconfigured path its own test or debug hook.
 
 ## The five teaching surfaces
 
@@ -200,4 +224,5 @@ Multiple teaching surfaces on the same first visit. Each fires on its own first 
 
 - [[mobile-first-density-design]] — empty/error states must obey density rules too
 - [[binding-design-doc-discipline]] — projects typically have a §6.7-style "Universal states" rule that this skill operationalizes
+- [[smart-tv-platform-expansion]] / [[multiplatform-expansion-method]]: capability tiers that decide which features reach the Unavailable state
 - [[native-platform-first]] — `ContentUnavailableView` is a native iOS primitive; `<dialog>` is native web

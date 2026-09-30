@@ -1,131 +1,119 @@
 """Drive a REAL iPhone/iPad and grade the app from the glass.
 
 The tvOS sibling is tools/atv_run.py and the Android one is tools/adb_run.py;
-the shared grading spine is tools/devharness.py. The doctrine is the same
-everywhere — the app's own claims are never the evidence for what a player
-sees; the screen is. What differs is the plumbing:
+the shared grading spine is tools/devharness.py and the Apple plumbing is
+tools/apple_device.py. The doctrine is the same everywhere — the app's own claims
+are never the evidence for what a user sees; the screen is. What differs is the
+plumbing:
 
   * There is NO remote wake on iOS. devicectl cannot wake a locked device and
     there is no Companion protocol to borrow. The arrangement is physical:
-    passcode OFF, Auto-Lock NEVER, device on a charger. A black capture is a
-    LOCKED SCREEN, not a failed launch, so this runner refuses to grade a run
-    it could not see rather than reporting confident nonsense.
+    passcode OFF, Auto-Lock NEVER, device on a charger. A LOCKED device installs
+    fine and refuses to launch (FBSOpenApplicationErrorDomain 7, "Locked"), which
+    otherwise arrives as an empty console plus a black screenshot — several
+    unrelated failures and a couple of vacuous passes. The launch names it once.
   * There is no press verb either, so scenarios reach their surface through the
-    DebugHooks env spine (APP_TAB=play|records|create, APP_SETTINGS=1,
-    …) or a deep link via --payload-url. Never by pressing blind.
+    DebugHooks env spine (launch doors) or a deep link via --url. Never by
+    pressing blind. The tap tier is XCUITest, not this runner.
+  * Every door launch is muted and time-bounded (app_config.DOOR_DEFAULTS).
+
+Every run holds one lease for the whole run and leaves the device as found: the
+app is terminated and the device is asked to confirm it is gone.
 
 Usage:
     python3 tools/ios_run.py --list
     python3 tools/ios_run.py --device ipad --scenario home
-    python3 tools/ios_run.py --device iphone --env APP_TAB=records \
-        --expect "Records|Streak" --name adhoc
+    python3 tools/ios_run.py --device iphone --env APP_START_TAB=search \
+        --expect "Search" --name adhoc
 """
 from app_config import *  # app identity + calibrated thresholds
 
 import argparse
 import json
-import subprocess
 import sys
 import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from devharness import Grader, ocr, qa_dir, sh   # noqa: E402
+import apple_device as ad  # noqa: E402
+import bench  # noqa: E402
+import devlease  # noqa: E402
+from devharness import Grader, ocr, qa_dir   # noqa: E402
 
-# Physical devices, by friendly name. `devicectl list devices` prints these
-# UUIDs; they are stable per pairing, not per build.
-DEVICES = {
-    "ipad":   "AC5377E9-6053-51DE-8E65-D88A4E9345FA",   # iPad Pro 12.9 (5th gen)
-    "iphone": "B4E756E2-CBFA-5F63-8CEE-21D226637AF7",   # iPhone 12
-}
 BUNDLE = APPLE_BUNDLE_ID
-PROCESS_MATCH = f"{APPLE_APP_NAME}.app/{APPLE_APP_NAME}"
-DEVELOPER_DIR = "/Applications/Xcode-beta.app/Contents/Developer"
 SHOT_EVERY = 3.0
 
-BASE_ENV = {"APP_SKIP_ONBOARD": "1", "APP_NO_GAMECENTER": "1"}
+BASE_ENV = {HOOK_SKIP_ONBOARD: "1", **DOOR_DEFAULTS}
 
 # Chrome that proves OUR app owns the glass rather than Springboard.
 APP_ANCHOR_RX = APP_ANCHOR_RX  # see tools/app_config.py
 
-# expect_any regexes are calibrated against real captures on the iPad Pro 12.9,
+# expect_any regexes are calibrated against real captures on your own device,
 # never guessed — an assertion written from imagination fails on correct pixels
-# and teaches the loop to be ignored.
+# and teaches the loop to be ignored. (Other keys devharness.Grader.grade_glass
+# reads: expect_end, forbid.)
+#
+# FILL IN: EXAMPLES matching what the template's starter honours (APP_START_TAB
+# home|search, APP_START_ITEM, APP_MUTE, APP_DOOR_SECONDS — see
+# apple/Core/Store/LaunchDoors.swift). Tab titles are on every screen, so replace
+# each regex with content unique to that surface, then add your app's surfaces.
 SCENARIOS = {
-    "home":     {"env": {"APP_TAB": "play"},    "minutes": 0.6,
-                 "expect_any": r"DAILY TIDBIT|TRIVIA NIGHT|Surprise me"},
-    "records":  {"env": {"APP_TAB": "records"}, "minutes": 0.6,
-                 "expect_any": r"Your games|DAY STREAK|Personal bests|No games yet"},
-    "create":   {"env": {"APP_TAB": "create"},  "minutes": 0.6,
-                 "expect_any": r"Generate Quiz|Your quizzes|Need a spark"},
-    "settings": {"env": {"APP_SETTINGS": "1"},  "minutes": 0.6,
-                 "expect_any": r"Sign in with Apple|Account|Feedback"},
-    "paywall":  {"env": {"APP_PAYWALL": "1"},   "minutes": 0.7,
-                 "expect_any": r"Get better, not just play more|Ranked Seasons"},
-    "clubhub":  {"env": {"APP_CLUB": "1", "APP_CLUB_HUB": "1"}, "minutes": 0.7,
-                 "expect_any": r"You.re a member|Link Wall"},
+    "home":        {"env": {HOOK_START_TAB: "home"},   "minutes": 0.6,
+                    "expect_any": r"Home"},                              # FILL IN
+    "search":      {"env": {HOOK_START_TAB: "search"}, "minutes": 0.6,
+                    "expect_any": r"Search"},                            # FILL IN
+    # Mute is in every launch already (DOOR_DEFAULTS); spelled out on the
+    # scenario most likely to start playback.
+    "item":        {"env": {HOOK_START_ITEM: QA_ITEM_ID, HOOK_MUTE: "1"}, "minutes": 0.6,
+                    "expect_any": QA_ITEM_RX},
+    # The door bounds itself: the app leaves the item on its own clock.
+    "door-return": {"env": {HOOK_START_ITEM: QA_ITEM_ID, HOOK_DOOR_SECONDS: "10"},
+                    "minutes": 0.6, "expect_any": QA_ITEM_RX,
+                    "expect_end": r"Home"},                              # FILL IN
 }
 
 
-def devicectl(*args, timeout=90):
-    return sh(["env", f"DEVELOPER_DIR={DEVELOPER_DIR}", "xcrun", "devicectl"] + list(args),
-              timeout=timeout)
-
-
-def launch(device, env, url=None):
-    full = dict(BASE_ENV)
-    full.update(env or {})
-    args = ["device", "process", "launch", "--terminate-existing",
-            "--device", device, "-e", json.dumps(full)]
-    if url:
-        args += ["--payload-url", url]
-    args.append(BUNDLE)
-    r = devicectl(*args, timeout=90)
-    if "Launched application" not in (r.stdout + r.stderr):
-        sys.exit(f"launch failed: {r.stdout[-300:]} {r.stderr[-300:]}")
-
-
-def app_alive(device):
-    r = devicectl("device", "info", "processes", "--device", device, timeout=90)
-    return PROCESS_MATCH in r.stdout
-
-
-def capture_loop(device, outdir, minutes):
+def capture_loop(udid, outdir, minutes):
     shots, i = [], 0
     deadline = time.time() + minutes * 60
     while time.time() < deadline:
         p = outdir / f"shot-{i:04d}.png"
-        try:
-            devicectl("device", "capture", "screenshot",
-                      "--device", device, "--destination", str(p), timeout=45)
-        except subprocess.TimeoutExpired:
-            # One flaky capture must not kill the scenario — skip the frame,
-            # keep the run, say so.
-            print(f"[ios] capture {p.name} timed out — skipping frame")
+        i += 1
+        ok, why = ad.capture(udid, p, timeout=45)
+        if not ok:
+            # One flaky capture must not kill the scenario — skip the frame, keep
+            # the run, say so. A stale file is refused, never graded.
+            print(f"[ios] capture {p.name}: {why} — skipping frame")
             time.sleep(2)
             continue
-        if p.exists():
-            shots.append((time.time(), p))
-        i += 1
+        shots.append((time.time(), p))
         time.sleep(max(0, SHOT_EVERY - 1.0))
     return shots
 
 
 def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--device", default="ipad", help="ipad|iphone or a raw UUID")
+    ap = argparse.ArgumentParser(description=__doc__,
+                                 formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--device", default="ipad", help="bench name or a raw UDID")
     ap.add_argument("--scenario")
     ap.add_argument("--list", action="store_true")
     ap.add_argument("--minutes", type=float)
     ap.add_argument("--env", action="append", default=[], help="K=V extra env")
-    ap.add_argument("--url", help="deep link, e.g. appname://daily")
+    ap.add_argument("--url", help="deep link, e.g. appname://item/example-item")
     ap.add_argument("--expect", help="ad-hoc expect_any regex")
     ap.add_argument("--name")
+    ap.add_argument("--owner-ok", action="store_true",
+                    help="allow a device whose role is owner-watches (ask first)")
+    ap.add_argument("--audible", action="store_true",
+                    help="drop the mute door (ask the owner first)")
+    ap.add_argument("--leave-running", action="store_true",
+                    help="skip teardown — only when the owner asked to look at it")
+    ap.add_argument("--lease-wait", type=int, default=0)
     a = ap.parse_args()
 
     if a.list:
         for k, v in SCENARIOS.items():
-            print(f"  {k:10s} {v['env']}")
+            print(f"  {k:12s} {v['env']}")
         return 0
 
     spec = dict(SCENARIOS.get(a.scenario, {"env": {}, "minutes": 0.6}))
@@ -138,22 +126,65 @@ def main():
     if a.minutes:
         spec["minutes"] = a.minutes
 
-    device = DEVICES.get(a.device, a.device)
+    entry = bench.require(a.device, allow_owner=a.owner_ok, platforms=("ios", "ipados"))
+    udid = entry.get("udid")
+    if not udid:
+        raise SystemExit(f"{entry['name']} has no udid in the bench manifest")
     name = a.name or a.scenario or "adhoc"
     outdir = qa_dir("ios", name)
-    print(f"[ios] {name} on {a.device} -> {outdir}")
+    print(f"[ios] {name} on {entry['name']} -> {outdir}")
 
-    launch(device, spec["env"], a.url)
-    time.sleep(6)   # let the first real frame render before the first capture
-    shots = capture_loop(device, outdir, spec.get("minutes", 0.6))
-    alive_end = app_alive(device)
-    texts = ocr(shots)
+    env = dict(BASE_ENV)
+    if a.audible:
+        env.pop(HOOK_MUTE, None)
+        print("[ios] AUDIBLE run — the owner should have been asked first")
+    env.update(spec["env"])
 
-    g = Grader(outdir, device=a.device, scenario=name, env=spec["env"],
-               shots=len(shots))
+    g = Grader(outdir, device=entry["name"], scenario=name, env=env)
+    try:
+        with devlease.hold([bench.lease_name(entry)], task=f"ios_run {name}",
+                           wait=a.lease_wait):
+            return _run(entry, udid, env, spec, outdir, g, a)
+    except RuntimeError as e:
+        g.grade("device_leased", False, f"{e} — this run covers NOTHING")
+        return g.finish()
+
+
+def _run(entry, udid, env, spec, outdir, g, a):
+    shots, alive_end, texts, launched = [], None, {}, False
+    # No `return g.finish()` inside the try: it would write the report BEFORE the
+    # finally graded the teardown, so a device left running could not fail the run.
+    try:
+        try:
+            events = ad.launch_guarded(entry, BUNDLE, env, outdir, settle=6)
+            g.report["launch_events"] = events
+            launched = True
+        except ad.LaunchFailed as e:
+            g.grade("launched", False, str(e))
+        if launched and a.url:
+            ok, out = ad.launch(udid, BUNDLE, env, url=a.url)
+            if not ok:
+                g.grade("deep_link_launched", False, out[-200:])
+                launched = False
+            else:
+                time.sleep(6)
+        if launched:
+            shots = capture_loop(udid, outdir, spec.get("minutes", 0.6))
+            alive_end = ad.app_alive(udid)
+            texts = ocr(shots)
+    finally:
+        if a.leave_running:
+            print("[ios] --leave-running: NOT tearing down (the owner asked to look)")
+        else:
+            ok, lines = ad.teardown(entry)
+            g.grade("left_as_found", ok, "; ".join(lines))
+    if not launched:
+        return g.finish()
+    g.report["shots"] = len(shots)
     g.grade("captured_frames", len(shots) >= 3, f"{len(shots)} frames")
-    g.grade("app_alive_to_end", alive_end, "process present at capture end"
-            if alive_end else "process GONE at capture end (crash or exit)")
+    g.grade("app_alive_to_end", alive_end is True, "process present at capture end"
+            if alive_end else ("could not ask the device" if alive_end is None
+                               else "process GONE at capture end (crash or exit)"))
     g.grade_glass(shots, texts, spec, APP_ANCHOR_RX)
     return g.finish()
 

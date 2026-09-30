@@ -1,6 +1,6 @@
 ---
 name: smart-tv-platform-expansion
-description: Take an existing app to the living room — Android TV / Google TV / Fire TV, Samsung Tizen, LG webOS, VIDAA, Roku, and the Cast/AirPlay routes. Covers the four-runtime-families map (two builds reach five stores), the ten-foot focus contract, the platform compliance gates that actually bite (TV-ML/MT/LB/BN/PS/G6/G1, TV-NP), the vanilla spatial-navigation engine for web-TV, per-platform key/lifecycle/packaging shims, store economics and the owner-gated steps, and the verification recipes (low-RAM headless TV emulator, no-cache dev server, in-browser acceptance suite). Triggers on Android TV, Google TV, Fire TV, leanback, Tizen, webOS, VIDAA, Roku, BrightScript, SceneGraph, Chromecast, Cast receiver, AirPlay, smart TV, 10-foot UI, D-pad, remote control, TV app store.
+description: Take an existing app to the living room — Android TV / Google TV / Fire TV, Samsung Tizen, LG webOS, VIDAA, Roku, and the Cast/AirPlay routes. Covers the four-runtime-families map (two builds reach five stores), the ten-foot focus contract, the platform compliance gates that actually bite (TV-ML/MT/LB/BN/PS/G6/G1, TV-NP), the vanilla spatial-navigation engine for web-TV, per-platform key/lifecycle/packaging shims, store economics and the owner-gated steps, the verification recipes (low-RAM headless TV emulator, no-cache dev server, in-browser acceptance suite), and capability tiers for one listing spanning a decade of hardware (named capabilities, gate the affordance, never a silently missing button). Triggers on Android TV, Google TV, Fire TV, leanback, Tizen, webOS, VIDAA, Roku, BrightScript, SceneGraph, Chromecast, Cast receiver, AirPlay, smart TV, 10-foot UI, D-pad, remote control, TV app store, legacy tier, old Roku, capability tier.
 ---
 
 # Smart-TV platform expansion
@@ -328,11 +328,50 @@ the network). Before committing budget, price two things:
 Deep linking is mandatory and feeds Roku Search. The no-code Direct Publisher
 path was sunset in 2024.
 
+### Capability tiers when one store spans a decade of hardware
+
+Roku, Fire TV and Android TV ship one listing to boxes from 2014 and
+2026. Tier by CAPABILITY, never by effort, and never let legacy set
+the ceiling (Archive Watch Roku, owner 2026-09-11: "There is no reason
+to do a bunch of work pushing the platform on for modern Roku users if
+it is going to be hamstrung by the older devices").
+
+- **One file decides the tier** (AW `roku/components/Capability.brs`):
+  `AWTier()` returns modern/legacy from a hardware proxy, and call
+  sites ask a NAMED capability, `AWCan("shareList")`, so the code reads
+  as what it needs, not which devices it distrusts. Each named
+  capability carries a comment: why it is off, what it cost, measured
+  on which box.
+- **Modern is built at full quality; legacy gets a working app, not
+  the same app.** Legacy keeps browse, Detail, playback; it loses
+  decoration and features that cost it frames.
+- **Gate the affordance, keep the implementation whole.** The row is
+  simply not offered on the legacy tier; the encoder behind it stays
+  complete, because a correct implementation is not conditional on a
+  product decision (AW Decision 122).
+- **Gate on a hardware predicate, not form factor.** Ask
+  `hasCamera && hasMicrophone` (`FEATURE_CAMERA_ANY`), never
+  `isTelevision()`: a TV with a camera should pass and a cameraless
+  tablet should fail (AW Decision 132).
+- **Never a silently missing button.** A capability the device could
+  have but currently lacks (sign-in not configured, permission not
+  granted) is a state with a sentence on screen. A capability the
+  hardware can NEVER have is omitted outright, and the reason lives in
+  PARITY.md, not as a permanent apology on a Detail screen (AW
+  Decisions 131, 132). See `universal-feature-states`.
+- **What the tier cannot gate:** a language feature the oldest
+  firmware cannot PARSE breaks the install everywhere (BrightScript
+  has no conditional compilation). Hold it with a syntax test (AW
+  `test_roku_legacy_syntax.py`); if legacy ever starts costing real
+  capability, raise the firmware floor instead of spreading
+  conditionals.
+
 ## See also
 
 - `roku-brightscript-app` — everything about actually building the Roku channel
 - `ten-foot-detail-design` — the Detail/Series/Search design shared across TV runtimes
 - `cross-platform-parity-discipline` — track TV as clients in the parity matrix
+- `multiplatform-expansion-method` (Step 3b): choosing floors by hardware reach and holding them in CI
 - `native-platform-first` — exhaust platform primitives before custom widgets
 - `resilient-media-streaming` — the streaming layer TV inherits
 - `store-submission-playbook` — the cross-store submission checklist

@@ -86,9 +86,7 @@ Common skipping consequence: shipping a feature that compiles but is visually br
 
 ## Step 5: Bump version
 
-If the project uses version tags (e.g., iOS `AppVersion.xcconfig`, package.json), bump the patch / build number.
-
-For BOBA Playbook style: `MARKETING_VERSION = 2.NNN` + `CURRENT_PROJECT_VERSION = NNN+1`.
+Bump `AppVersion.xcconfig`, the one version number every platform reads. The convention: every app-source commit bumps PATCH and the build number; a store release first sets MINOR +1 and PATCH 0; CI-only and docs-only commits do not bump. (Details: `docs/AUTONOMOUS-LOOPS.md` §3.)
 
 The bump connects the commit to a specific release artifact. Skipping makes git history harder to map to TestFlight builds / production releases.
 

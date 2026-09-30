@@ -1,90 +1,119 @@
-# CloudKit + Sign in with Apple setup (#11, Decision 022)
+# CloudKit and Sign in with Apple setup
 
-> **2026-06-11 rewrite — why sync never worked, and the new shape.** The
-> original design stored one CKRecord per favorite/playlist/progress row and
-> pulled with `CKQuery(predicate: NSPredicate(value: true))`. That query needs
-> a QUERYABLE INDEX on `recordName`, which CloudKit never creates by itself —
-> every pull failed ("recordName is not marked queryable") and the silent
-> catch hid it: pushes worked, pulls returned nothing, devices never converged.
-> The service now uses four FIXED-ID records of one type (`AWSync` /
-> `tombstones|favorites|playlists|progress`, JSON payloads) fetched directly
-> by record ID — no queries, no indexes, same merge semantics. Sync errors are
-> now SURFACED in Settings → Account ("Last sync" / error line + Sync Now).
->
-> **NEW ONE-TIME OWNER STEP — deploy the schema to Production.** TestFlight /
-> App Store builds talk to the PRODUCTION CloudKit environment, which never
-> auto-creates record types (only Xcode-run Development builds do, just-in-
-> time). After running any dev build once while signed in: CloudKit Dashboard
-> (icloud.developer.apple.com) → container `iCloud.<your-bundle-id>` →
-> Schema → **Deploy Schema Changes…** to Production. Until that's done, every
-> TestFlight build shows "CloudKit schema/container problem" under Settings →
-> Account. Also note: an Xcode-installed device build (Development) and a
-> TestFlight build (Production) are in DIFFERENT environments and will never
-> see each other's data — test cross-device sync with builds from the same
-> channel.
+I want a person's favorites, playlists and progress to follow them from
+one Apple device to the next, stored in their own iCloud account where
+we never see it. Decision 015 (per-ecosystem sync on the user's own
+cloud) is the rule. This runbook is the one-time setup that makes it
+real, plus the checks that prove it works.
 
-The code for cross-Apple-TV sync ships **gated off** so the simulator build stays
-clean (accessing `CKContainer` without the entitlement traps). To turn it on, the
-owner does these one-time steps on a Mac with the Apple Developer account, then
-verifies on real Apple TVs.
+In Archive Watch, where this lesson was learned, the first version never worked.
+It stored one CKRecord per favorite and pulled with
+`CKQuery(predicate: NSPredicate(value: true))`. That query needs a
+queryable index on `recordName`, which CloudKit never creates on its own.
+Every pull failed ("recordName is not marked queryable"), a silent
+`catch` hid it, pushes worked, pulls returned nothing, and devices never
+converged.
 
-## 1. Capabilities (Xcode → target AppName → Signing & Capabilities)
-- **+ Capability → Sign in with Apple.**
-- **+ Capability → iCloud** → check **CloudKit** → add container
-  **`iCloud.<your-bundle-id>`** (must match `CloudSync.containerID` in
-  `Services/CloudKitSyncService.swift` AND the container already declared in
-  `AppName/AppName.entitlements`). Do **NOT** use the old
-  `iCloud.com.bhwilkoff.archivewatch` id — it does not match the code/entitlements
-  and was the reason sync silently did nothing.
-- These also need enabling on the App ID in the Apple Developer portal (Xcode's
-  automatic signing usually does this).
+Fixed-ID records fetched by ID. No queries, no indexes.
 
-## 2. Flip the gate — DONE
-`CloudSync.entitlementConfigured` is now `true` in
-`Services/CloudKitSyncService.swift`. (With the gate off, Sign in with Apple still
-works in the UI but every CloudKit call no-ops — which is why saved data wasn't
-syncing.) If a device build now **crashes on launch**, the iCloud/CloudKit
-capability + container above is not provisioned on the App ID — complete step 1
-and rebuild.
+## The shape that works
 
-## 3. Verify on device (two Apple TVs on the same iCloud account)
-- Settings → Account → **Sign in with Apple**.
-- Favorite a title / make a playlist / watch a few minutes on TV A.
-- On TV B (signed into the same iCloud account), relaunch — those should appear.
-- CloudKit Dashboard (icloud.developer.apple.com) shows the `Favorite` /
-  `Playlist` / `WatchProgress` record types in the **private** database.
+- One record type (for example `AppSync`) with a few FIXED record IDs:
+  `tombstones`, `favorites`, `playlists`, `progress`. Each holds a JSON
+  payload.
+- Fetch those records directly by record ID. Merge semantics stay the
+  same as a per-row design.
+- Surface sync errors in Settings, Account: a "Last sync" line, the
+  error text when there is one, and a Sync Now button. A sync failure
+  that only reaches the console is a sync failure nobody fixes.
 
-## What sync does (updated #11b)
-- Two-way on launch, after sign-in, **on every foreground**, **after each edit**
-  (debounced ~2 s), and on a **60 s timer while active**: Favorites (union),
-  Playlists (last-writer-wins by `modifiedAt` — so removals propagate),
-  WatchProgress (LWW by `lastWatchedAt`).
-- **Deletions propagate** via `Tombstone` records (#11b): removing a favorite or
-  editing a playlist writes a tombstone that syncs to every device, so a deletion
-  beats a stale cloud copy instead of resurrecting. A re-add newer than the
-  tombstone clears it.
-- Records are fetched in one page (fine for personal-scale libraries; add cursor
-  pagination if a user's saved set grows past a few hundred).
-- NOT yet: APNs push subscriptions (instant cross-device while both idle on a
-  screen — the 60 s timer + foreground sync cover the realistic flow). Adding
-  `CKDatabaseSubscription` + remote-notification background mode is the next step.
+The cost: a whole collection is one record, so very large libraries
+eventually need to split into more fixed IDs. For personal-scale data
+(a few hundred saved items) one record per collection is fine.
 
-## #11b on-device test checklist (build 25+)
-Two Apple TVs on the SAME iCloud account, both signed in (Settings → Account):
-1. **Add** — favorite a film on TV A; within ~a minute (or on foregrounding B) it
-   appears in Library on TV B.
-2. **Delete** — un-favorite it on A; it disappears on B and does NOT come back
-   (the resurrection bug this fixes). Same for removing a title from a playlist
-   (the list shrinks on B).
-3. **Re-add wins** — favorite it again on A; it reappears on B and stays.
-4. **Progress** — watch 5 min on A; the resume point shows on B.
-5. CloudKit Dashboard → private DB shows a `Tombstone` record type after a delete.
-If a device CRASHES on launch: the iCloud(CloudKit) capability + container
-`iCloud.<your-bundle-id>` isn't on the App ID — add it and rebuild.
+## Owner step: deploy the schema to Production
+
+TestFlight and App Store builds talk to the PRODUCTION CloudKit
+environment, which never auto-creates record types. Only
+Xcode-run Development builds create them, just in time.
+
+1. Run any development build once while signed in to iCloud, so the
+   record types exist in Development.
+2. CloudKit Dashboard (icloud.developer.apple.com), container
+   `iCloud.com.example.appname`, Schema, **Deploy Schema Changes...** to
+   Production.
+
+Until this is done, every TestFlight build shows a schema or container
+error under Settings, Account.
+
+An Xcode-installed device build (Development) and a TestFlight build
+(Production) live in DIFFERENT environments and never see each other's
+data. Test cross-device sync with two builds from the same channel.
+
+## Step 1: capabilities
+
+In Xcode, target `AppName`, Signing & Capabilities:
+
+- **+ Capability, Sign in with Apple.**
+- **+ Capability, iCloud**, check **CloudKit**, add the container
+  `iCloud.com.example.appname`. It must match the container ID constant
+  in your sync service (you create this, for example
+  `apple/Core/Sync/CloudKitSyncService.swift`) AND the container in
+  `AppName.entitlements`. A container ID that differs between code and
+  entitlements is the classic reason sync silently does nothing.
+- These also need enabling on the App ID in the Apple Developer portal.
+  Xcode's automatic signing usually does this.
+
+## Step 2: the entitlement gate
+
+Ship the sync code gated off (a constant such as
+`CloudSync.entitlementConfigured = false`) until Step 1 is done.
+Touching `CKContainer` without the entitlement traps at launch, so the
+gate keeps simulator and unsigned builds clean. With the gate off, Sign
+in with Apple still works in the UI but every CloudKit call no-ops,
+which looks exactly like "saved data isn't syncing."
+
+Flip the gate to `true` once the capability is provisioned. If a device
+build then **crashes on launch**, the iCloud (CloudKit) capability and
+container are not on the App ID. Finish Step 1 and rebuild.
+
+## What sync does
+
+- Two-way sync on launch, after sign-in, on every foreground, after
+  each edit (debounced about 2 seconds), and on a 60-second timer while
+  active.
+- Favorites merge as a union. Playlists merge last-writer-wins by
+  `modifiedAt`, so removals propagate. Progress merges last-writer-wins
+  by `lastWatchedAt`.
+- Deletions propagate through tombstones. Removing a favorite or
+  editing a playlist writes a tombstone that syncs everywhere, so a
+  deletion beats a stale cloud copy instead of resurrecting. A re-add
+  newer than the tombstone clears it.
+- Not yet: APNs push subscriptions for instant sync while both devices
+  sit idle. The timer and foreground sync cover the realistic flow.
+  `CKDatabaseSubscription` plus the remote-notification background mode
+  is the next step when you want it.
+
+## Device test checklist
+
+Two devices on the SAME iCloud account, both signed in through
+Settings, Account, both from the same build channel:
+
+1. **Add.** Favorite an item on device A. Within about a minute (or on
+   foregrounding B) it appears in Library on device B.
+2. **Delete.** Un-favorite it on A. It disappears on B and does NOT come
+   back. Same for removing an item from a playlist.
+3. **Re-add wins.** Favorite it again on A. It reappears on B and stays.
+4. **Progress.** Watch or read for a few minutes on A. The resume point
+   shows on B.
+5. CloudKit Dashboard, private database, shows the tombstone payload
+   after a delete.
 
 ## Why this shape
-Decision 009 said "no accounts; all state local." Decision 022 reverses the
-"all-local" half: Apple-native auth only (no third-party), sync is **optional**
-and gates nothing but itself, and the data lives in the user's own private
-CloudKit DB (we never see it). See `DECISIONS.md` 022 and `docs/templates/TVOS-DESIGN-template.md`
-§10.2.
+
+Sign-in is Apple-native only and optional. It gates nothing but sync
+itself, and the data lives in the person's own private CloudKit
+database. See Decision 015, the `per-ecosystem-sync-islands` skill, and
+§10.2 of `docs/templates/TVOS-DESIGN-template.md`.
+
+Run the checklist on two real devices before you call it done.

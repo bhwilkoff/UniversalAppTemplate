@@ -16,7 +16,8 @@ Windows-specific realities, learned the same way the others were:
     luma), never as "the screen was off" — that phrasing cost a lot of wrong
     conclusions on the iPhone.
 
-    python3 tools/win_run.py --only home,records
+    python3 tools/win_run.py --list
+    python3 tools/win_run.py --only home,library
 """
 from app_config import *  # app identity + calibrated thresholds
 
@@ -34,37 +35,28 @@ from devharness import (OCR_FAILED, Grader, frame_darkness, ocr,  # noqa: E402
 
 ANCHOR = APP_ANCHOR_RX  # see tools/app_config.py
 
-# APP_* hooks are the same family Apple and Android use — the app.Core reads
-# them from the environment, so one spelling drives every platform.
+# APP_* hooks are the same family Apple and Android use — the app reads them
+# from the environment (windows/AppName.App/LaunchHooks.cs), so one spelling
+# drives every platform. A scenario whose hook the Windows app does not read
+# grades whatever screen happened to be showing, so list only hooks it honours.
+#
+# FILL IN: EXAMPLES matching the Windows starter: its sections are home|library
+# (+ settings in the footer; there is no search section yet), APP_START_ITEM shows
+# "Item: <id>", and APP_DOOR_SECONDS selects Home again. The home/library regexes
+# are the starter's own placeholder copy; replace them with content calibrated
+# against a real capture of YOUR screens. Light-grey text on white is read
+# unreliably by the OCR off a real display, so prefer high-contrast words.
 SCENARIOS = {
-    "home":        (dict(APP_TAB="play"),
-                    {"expect_any": r"Quick Play|Daily|Play|Start|Surprise"}),
-    "records":     (dict(APP_TAB="records"),
-                    # Calibrated against a real capture: a fresh profile shows
-                    # "Compete against your past self", not the games list the
-                    # other platforms' copy uses.
-                    # Calibrated against real captures. "Compete against your past
-                    # self" and "No games yet …" are LIGHT GREY on white and the OCR
-                    # does not read them reliably off this display, so an assertion
-                    # resting on them alone fails on a screen that rendered perfectly.
-                    # "Playing as Player" is high-contrast and Records-specific — the
-                    # nav word "Records" is on every screen and would pass everywhere.
-                    {"expect_any": r"Playing as Player|Compete against your past self|"
-                                   r"Your games|Personal bests|No games yet|DAY STREAK"}),
-    "create":      (dict(APP_TAB="create"),
-                    {"expect_any": r"Create|quiz|subject|Generate"}),
-    "leaderboard": (dict(APP_TAB="leaderboard"),
-                    {"expect_any": r"Leaderboard|standings|season|venue|rank|No standings"}),
-    "live":        (dict(APP_TAB="live"),
-                    {"expect_any": r"Live|Host|room|code|join|SCAN"}),
-    # NOTE: Windows reads only APP_CLUB, APP_LIVE_CODE,
-    # APP_MARATHON_LEN and the auth vars, plus APP_TAB as of this change.
-    # Apple's APP_SETTINGS / _PAYWALL / _AUTOPLAY / _LIVE_HOST have no Windows
-    # equivalent yet, so scenarios for them are NOT listed here — a scenario whose
-    # hook does not exist grades whatever screen happened to be showing, which is
-    # how the Mac "leaderboard" tab came to be reported as a defect.
-    "club":        (dict(APP_TAB="play", APP_CLUB="1"),
-                    {"expect_any": r"Play|Quick Play|Club|Trivia"}),
+    "home":        ({HOOK_START_TAB: "home"},
+                    {"expect_any": r"primary surface"}),                 # FILL IN
+    "library":     ({HOOK_START_TAB: "library"},
+                    {"expect_any": r"browsing surface"}),                # FILL IN
+    "item":        ({HOOK_START_ITEM: QA_ITEM_ID, HOOK_MUTE: "1"},
+                    {"expect_any": QA_ITEM_RX}),
+    # Each box step is a ~35 s round trip, so the first frame is already later
+    # than a short door: only the END state is observable here.
+    "door-return": ({HOOK_START_ITEM: QA_ITEM_ID, HOOK_DOOR_SECONDS: "10"},
+                    {"expect_end": r"primary surface"}),                 # FILL IN
 }
 
 
@@ -73,7 +65,7 @@ def crop_text(doc, rect):
 
     The desktop icons live at x < 0.06 and the taskbar at the bottom; the app is a
     centred window. Without this, `no_clipped_text` reported "Roblox Player" — a
-    truncated desktop shortcut label — as a the app defect.
+    truncated desktop shortcut label — as an app defect.
     """
     x, y, w, h = rect
     def inside(it):
@@ -113,11 +105,14 @@ def crop_text(doc, rect):
 def run(name, outdir, g):
     env, spec = SCENARIOS[name]
     env = dict(env)
-    env.setdefault("APP_SKIP_ONBOARD", "1")
+    env.setdefault(HOOK_SKIP_ONBOARD, "1")
+    # Doors are muted and time-bounded unless a scenario says otherwise.
+    for k, v in DOOR_DEFAULTS.items():
+        env.setdefault(k, v)
     # Say what this device is testing, on the device. Six machines on a desk all
     # running the app look identical, and a scenario left over from the previous run
     # is indistinguishable from the current one by eye.
-    env.setdefault("APP_QA_LABEL", f"windows - {name}")
+    env.setdefault(HOOK_QA_LABEL, f"windows - {name}")
 
     # Every step here is a scheduled-task round trip of ~35s, so a silent scenario
     # looks exactly like a hung one. It is: a six-scenario sweep spent thirteen
@@ -190,7 +185,13 @@ def main():
     ap.add_argument("--only", default="")
     ap.add_argument("--deploy", action="store_true",
                     help="publish on this Mac and copy to the box first")
+    ap.add_argument("--list", action="store_true", help="print the scenarios and exit")
     a = ap.parse_args()
+
+    if a.list:
+        for k, (env, _) in SCENARIOS.items():
+            print(f"  {k:12s} {env}")
+        return 0
 
     names = [n for n in (a.only.split(",") if a.only else SCENARIOS) if n in SCENARIOS]
     out = qa_dir("windows", "sweep")
@@ -209,7 +210,7 @@ def main():
 
     # Lease the box for the whole sweep (docs/DEVICE-LEASE.md). Another agent session
     # shares this bench; a device taken mid-sweep produces a screenshot of someone
-    # else's app and grades as a the app defect.
+    # else's app and grades as an app defect.
     leased, holder = devlease.try_lease("windows", task=f"win sweep: {','.join(names)}")
     if not g.grade("windows_leased", leased,
                    "held for this sweep" if leased

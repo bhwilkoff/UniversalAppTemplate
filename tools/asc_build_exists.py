@@ -14,9 +14,13 @@ ASC cannot be reached, it says so and exits 0 — a guard that blocks shipping
 because it could not check is worse than no guard.
 
 Usage: python3 tools/asc_build_exists.py <marketing_version> <build_number>
+Env:   APP_BUNDLE  bundle id to check (default: APPLE_BUNDLE_ID in tools/app_config.py)
 """
 import os
 import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 try:
     import asc_certs as C
@@ -24,7 +28,12 @@ except Exception as e:                      # pragma: no cover - import guard
     print(f"[asc] cannot load the ASC client ({e}); skipping the check")
     sys.exit(0)
 
-APP_BUNDLE = os.environ.get("APP_BUNDLE", "com.example.appname")  # FILL IN
+try:
+    from app_config import APPLE_BUNDLE_ID as _DEFAULT_BUNDLE
+except Exception:                           # pragma: no cover - import guard
+    _DEFAULT_BUNDLE = "com.example.appname"
+# The app's identity lives in tools/app_config.py; APP_BUNDLE still overrides it.
+APP_BUNDLE = os.environ.get("APP_BUNDLE") or _DEFAULT_BUNDLE
 
 
 def main() -> int:

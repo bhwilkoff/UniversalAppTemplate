@@ -214,14 +214,22 @@ if [ -d "$USER_SKILLS_SRC" ]; then
   for skill in "$USER_SKILLS_SRC"/*/; do
     [ -d "$skill" ] || continue
     name=$(basename "$skill")
-    if is_template_owned "$name"; then
+    # Every hand-authored skill already in this repo is canonical HERE: the
+    # template copies carry genericized, newer text than most global copies,
+    # and a blind rsync would silently roll them back. Only skills the
+    # template does not have yet are copied in. A global copy that differs is
+    # reported, so a newer lesson can be upstreamed by hand.
+    if is_template_owned "$name" || [ -d "$SKILLS_DIR/$name" ]; then
+      if ! diff -rq "$skill" "$SKILLS_DIR/$name/" >/dev/null 2>&1; then
+        warn "differs from ~/.claude/skills/$name (template copy kept; upstream by hand if newer)"
+      fi
       skipped=$((skipped + 1))
       continue
     fi
-    rsync -a --delete "$skill" "$SKILLS_DIR/$name/"
+    rsync -a "$skill" "$SKILLS_DIR/$name/"
     count=$((count + 1))
   done
-  ok "user skills: $count synced from ~/.claude/skills/ ($skipped template-owned skipped)"
+  ok "user skills: $count new skill(s) copied in ($skipped already in the template, kept)"
 else
   warn "$USER_SKILLS_SRC not found — no user-authored skills to sync"
 fi

@@ -59,6 +59,14 @@ shared `remember*Payload()` and have both render it. A second copy WILL drift.
    leaving one tile of context rather than snapping it flush to the edge.
 6. **Hide competing focus targets.** When a full-screen route is pushed, hide the
    nav rail — otherwise the D-pad walks into it from a detail page.
+7. **A held Select is a card's second verb** (tvOS: `.contextMenu`; Roku:
+   `*`). Compose has no remote long-press for you: on `KeyDown` of a select
+   key with `nativeKeyEvent.repeatCount > 0`, fire `onLongClick` once and set
+   a `longFired` flag; on `KeyUp`, call `onClick` only if the flag is clear
+   (then clear it). Without the flag the release that ends the hold ALSO
+   opens the card. The confirm that follows focuses Cancel, and on close
+   focus is requested back: the same card on Cancel, its neighbor on Remove.
+   Left alone, focus falls to the nav rail (AW, Google TV, 2026-09-29).
 
 ## Google quality gates — the ones that actually bite
 
@@ -131,12 +139,12 @@ beautifully, and is simply unreachable by D-pad.
 
 Three pieces, each of which pays for itself immediately:
 
-1. **Route directly to any surface.** `--es aw_start_tab <tab>` and
-   `--es aw_start_route <route>` intent extras. Steering by counting D-pad
+1. **Route directly to any surface.** `--es appname_start_tab <tab>` and
+   `--es appname_start_item <id>` intent extras. Steering by counting D-pad
    presses is unreliable — Left lands on the NEAREST item, not a fixed one — and
    will repeatedly land your checks on the wrong screen.
 2. **Emit a focus trace.** A `focusTag` on the focusable modifier plus a
-   `--ez aw_focus_log true` switch, logging `tile:<title>`, `rail:<label>`,
+   `--ez appname_focus_log true` switch, logging `tile:<title>`, `rail:<label>`,
    `collection:<title>`. Verify by IDENTITY, not by pixels.
 3. **Assert, don't eyeball.** A script that launches each surface, presses
    Down/Right/Down, and greps the trace for an expected pattern.

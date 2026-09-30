@@ -119,6 +119,11 @@ The engine is **geometric, not hierarchical**: it scores all on-screen focusable
 - **Auto-focus Play on entry** (the #1 complained-about miss in shipping apps).
 - Full-bleed backdrop top ~45–60% (in `.background`!). Poster lower-left, metadata right. Play pill at the seam (~Y=55%). "More Like This" shelf at bottom. Back = pop, don't intercept.
 
+### A card's second verb (held Select)
+- A card has ONE primary verb (Select). Its one secondary verb (Remove from History, Delete playlist) is a **held Select**: `.contextMenu` on the card, the tvOS idiom Android TV spells as a long press and Roku as `*`. Same verb on every TV, native idiom each.
+- The release that ends a hold never also opens the card.
+- A destructive second verb asks first, with **Cancel focused**. When the question closes, put focus back explicitly: the SAME card on Cancel, its NEIGHBOR on Remove. Left to the engine, focus falls to the sidebar (AW, 2026-09-29).
+
 ### Search
 - `.searchable` — directional keyboard + free Siri dictation. Live results. Never invent a grid keyboard.
 

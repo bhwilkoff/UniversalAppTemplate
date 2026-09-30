@@ -5,7 +5,7 @@
 # Why: the dispatch API intermittently returns HTTP 500/502/503. Under a job's
 # `bash -e`, a bare `gh workflow run X.yml` on such a blip fails the ENTIRE run
 # even though all real work already committed/published (this nuked a
-# fully-successful discover-content run on 2026-07-08, GitHub run 28921808254).
+# fully-successful discover-content run on 2026-07-08).
 #
 # A failed dispatch is NON-FATAL: every catalog-writer pipeline is idempotent
 # and publish-db.yml also runs on its own daily schedule, so the next scheduled

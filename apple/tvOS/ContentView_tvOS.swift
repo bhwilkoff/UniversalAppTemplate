@@ -27,14 +27,23 @@ struct ContentView_tvOS: View {
         // - The first screen's hero claims initial focus exactly ONCE
         //   (a hasClaimedInitialFocus guard) — a bare .task re-fires
         //   when lazy views recycle and yanks focus back mid-browse.
-        TabView {
-            Tab("Home", systemImage: "house") {
-                NavigationStack {
+        @Bindable var bindableStore = store
+        // Selection lives in the store so the inbox (deep links, Top Shelf,
+        // APP_START_TAB) can pick a tab without touching this view.
+        TabView(selection: Binding(
+            get: { store.selectedTab ?? "home" },
+            set: { store.selectedTab = $0; store.navigationPath = NavigationPath() }
+        )) {
+            Tab("Home", systemImage: "house", value: "home") {
+                NavigationStack(path: $bindableStore.navigationPath) {
                     HomeView_tvOS()
+                        .navigationDestination(for: String.self) { destination in
+                            Text(destination)  // FILL IN: your item route
+                        }
                 }
             }
             // FILL IN: more content-verb tabs
-            Tab("Search", systemImage: "magnifyingglass", role: .search) {
+            Tab("Search", systemImage: "magnifyingglass", value: "search", role: .search) {
                 NavigationStack {
                     // .searchable gives the directional keyboard AND
                     // free Siri dictation — never invent a grid keyboard.

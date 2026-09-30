@@ -8,6 +8,7 @@ import coil3.disk.DiskCache
 import coil3.memory.MemoryCache
 import coil3.request.crossfade
 import dagger.hilt.android.HiltAndroidApp
+import okio.Path.Companion.toOkioPath
 import okhttp3.OkHttpClient
 
 /**
@@ -54,7 +55,7 @@ class AppNameApplication : Application(), SingletonImageLoader.Factory {
             }
             .diskCache {
                 DiskCache.Builder()
-                    .directory(cacheDir.resolve("image_cache"))
+                    .directory(cacheDir.resolve("image_cache").toOkioPath())
                     .maxSizeBytes(500L * 1024 * 1024)  // 500 MB
                     .build()
             }

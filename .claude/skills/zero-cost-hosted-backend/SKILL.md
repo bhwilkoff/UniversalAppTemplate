@@ -1,6 +1,6 @@
 ---
 name: zero-cost-hosted-backend
-description: Use when an app needs SHARED user data — accounts, public profiles, cross-user features (shared collections, moderation, matching, social rows) — the case per-ecosystem-sync-islands explicitly does not cover. Carries the three-way split (hosted Postgres for auth + user data ONLY; catalog as static published artifacts; media on a zero-egress CDN), the one-worker-per-job serverless seam (API proxy, account deletion, media upload, push dispatcher with two transports), proxy cache-key discipline, RLS role gating, the single-field username rule with the two-layer banned-words gate, and UI-ahead-of-backend shipping. Triggers on Supabase, hosted backend, user accounts, public profiles, shared collections, moderation, RLS, Cloudflare Worker, API proxy, account deletion, avatar upload, push dispatcher, username, banned words, "do we need a backend".
+description: "Use when an app needs SHARED user data — accounts, public profiles, cross-user features (shared collections, moderation, matching, social rows) — the case per-ecosystem-sync-islands explicitly does not cover. Carries the three-way split (hosted Postgres for auth + user data ONLY; catalog as static published artifacts; media on a zero-egress CDN), the one-worker-per-job serverless seam (API proxy, account deletion, media upload, push dispatcher with two transports), proxy cache-key discipline, RLS role gating, the single-field username rule with the two-layer banned-words gate, and UI-ahead-of-backend shipping. Also static-first adapters on one free Worker (D1 rooms, /live 302, stateless MCP, tallies). Triggers on Supabase, hosted backend, user accounts, public profiles, shared collections, moderation, RLS, Cloudflare Worker, API proxy, account deletion, avatar upload, push dispatcher, username, banned words, \"do we need a backend\", D1, rate limit, cron sweep."
 ---
 
 # Zero-cost hosted backend
@@ -98,6 +98,60 @@ cache. Rules:
   accept (and document) the divergence.
 - When platforms disagree on displayed data, suspect the cache key
   before suspecting the upstream.
+
+## Static-first Worker adapters (one free Worker, many thin routes)
+
+The one-worker-per-job rule above is for jobs that hold SECRETS. A
+different family needs no secret: routes that only translate files
+the pipeline already publishes into a shape some other client
+speaks. Those share ONE free Worker (plus its D1), each a small
+module. Archive Watch runs six on one Worker (`index.js` counter,
+`together.js` rooms, `live.js`, `xtream.js`, `mcp.js`, `tally.js`):
+
+| Adapter | Shape | What makes it free |
+|---|---|---|
+| Watch-party rooms | D1 row per live room; host writes on state change, guests poll (see `cross-platform-multiplayer`) | D1 is strongly consistent; rows deleted when the room ends |
+| `/live/<channel>` | 302 to the program airing now, at `?start=<computed offset>` from the published schedule | "Live TV" with no streaming server: the origin serves a file from a second |
+| IPTV (Xtream / M3U / XMLTV) | Redirects + published list files | Lists are pre-built by the pipeline, one file per category |
+| MCP endpoint | Stateless Streamable HTTP (JSON, no session id), reads published shards only | No storage, says nothing the apps would not show |
+| Privacy tally | `day \| kind \| count`, nothing else | Counts what the server already receives to provide the feature |
+
+Rules, each learned in production:
+
+- **Pass lists through untouched.** `return new Response(r.body)`;
+  parsing a 6 MB list per request exceeds the free plan's CPU
+  allowance (10 ms). Pre-split in the pipeline (whole list,
+  per-category list, 256 lookup shards) instead of filtering in
+  the Worker.
+- **Build-stamp cache keys.** Fetch every published file as
+  `file?v=<build>` where `build` comes from a small manifest fetched
+  with a short TTL. Then the edge can cache the big file for a day
+  and still never serve a previous publish (a plain TTL served a
+  stale full list for over an hour).
+- **Rate-limit bindings on every unauthenticated route.** The free
+  daily request budget is PER ACCOUNT and shared by every adapter;
+  one looping script on one route takes all of them down.
+  `[[ratelimits]]` bindings count per address for the window and
+  store nothing. Size limits from real polling (a guest polling
+  ~32/min makes 300/min a household, not a device), with a tighter
+  second limiter on create routes.
+- **Cron sweep for anything that promises deletion.** A row deleted
+  "on the next read of that key" is never deleted if nobody reads it
+  again. `[triggers] crons` + `scheduled()` sweeping stale rows is
+  what makes a privacy-page promise ("deleted after six hours") true.
+- **A counter never fails the request it counts** (try/catch, no
+  rethrow), and never takes a new client-sent ping (the count comes
+  from what the server already serves).
+- **Know which host the Worker answers on.** AW's clients all
+  pointed at the Pages domain and would have 404'd on every route;
+  tests passed because they injected a base URL. Smoke-test against
+  the deployed `*.workers.dev` origin.
+
+Seed: `pulse/worker-example/` (counter + tallies + drop box, D1,
+`schema.sql`, `wrangler.example.toml`). Add adapters as sibling
+modules routed from its `fetch`; add `[triggers]` and
+`[[ratelimits]]` to the toml when the first stateful or open route
+lands.
 
 ## Auth conventions (per client)
 

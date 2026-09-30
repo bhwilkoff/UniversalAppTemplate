@@ -28,17 +28,59 @@ Rules, deliberately few enough that any other tool can implement them in an hour
 
     ok, holder = try_lease("firetv")
     if not ok:  print(f"skipping firetv — held by {holder}")
+
+HOLD IT FOR THE WHOLE RUN, IN ONE PROCESS. Install, launch, capture, assert and
+tear down under ONE lease. Taking a lease per invocation leaves a gap between calls,
+and the other session grabbed an Apple TV in exactly one of those gaps. `hold()`
+below is the runner form: it takes every device a run needs up front, renews them in
+the background for as long as the run lasts, and releases them on any exit.
+
+A suite that shells out to per-device runners (tools/qa_suite.py) holds the lease
+itself and hands it DOWN: children see DEVICE_LEASE_HOLDER_PID and treat a lease
+held by that pid as their own, without rewriting or releasing it. Otherwise the
+suite's lease would lock its own runners out — or, releasing per child, reopen the
+very gap this exists to close.
+
+THE DEVICE KEYS ARE A CONTRACT. The lease directory, the filename, the JSON fields
+and the KEYS are shared with every other repo on this machine that speaks this
+protocol; a unilateral change silently stops the interlock rather than failing
+loudly. The key for a device is its name in the bench manifest (tools/bench.py) —
+write the machine's table down ONCE, in ~/.device-bench.json, so two repos cannot
+disagree about what the Fire TV is called:
+
+    atv          the harness Apple TV          firetv      the Fire TV stick
+    atv-<room>   every further Apple TV        androidtv   the Google TV
+    ipad         the test iPad                 pixel       the test phone
+    iphone       the test iPhone               roku        the Roku (roku-<x> more)
+    mac          this Mac's window capture     windows     the Windows box
+
+    python3 tools/devlease.py              # who holds what
+    python3 tools/devlease.py release-all  # release only OUR leases
 """
 import contextlib
 import json
 import os
+import threading
 import time
 from pathlib import Path
 
 DIR = Path(os.environ.get("DEVICE_LEASE_DIR", Path.home() / ".device-lease"))
 DEFAULT_TTL = 900          # 15 min: longer than any single run here, short enough
                            # that a crashed session frees the bench on its own.
-OWNER = os.environ.get("DEVICE_LEASE_OWNER", "appname-trivia")
+# Who holds it, in words a PEER can read: the repo's directory name unless set.
+OWNER = os.environ.get("DEVICE_LEASE_OWNER",
+                       Path(__file__).resolve().parent.parent.name.lower())
+# Set by a parent process (a suite) that holds leases on behalf of its children.
+HOLDER_ENV = "DEVICE_LEASE_HOLDER_PID"
+
+
+def _ours(held):
+    """Held by this process, or by the parent that handed its lease down."""
+    if not held:
+        return False
+    pid = held.get("pid")
+    return pid == os.getpid() or (str(pid) == os.environ.get(HOLDER_ENV, "")
+                                  and pid is not None)
 
 
 def _path(dev):
@@ -83,6 +125,8 @@ def read(dev):
 def try_lease(dev, task="", ttl=DEFAULT_TTL):
     """Take `dev` if it is free. Returns (ok, holder_description)."""
     held = read(dev)
+    if held and _ours(held) and held.get("pid") != os.getpid():
+        return True, ""                 # inherited from the suite that spawned us
     if held and held.get("pid") != os.getpid():
         who = held.get("owner", "?")
         what = held.get("task") or "unnamed work"
@@ -124,6 +168,59 @@ def renew(dev, ttl=DEFAULT_TTL):
     held["expires"] = time.time() + ttl
     _path(dev).write_text(json.dumps(held))
     return True
+
+
+@contextlib.contextmanager
+def hold(devs, task="", ttl=DEFAULT_TTL, wait=0):
+    """Hold EVERY device in `devs` for the whole block, renewed in the background.
+
+    All-or-nothing: if one cannot be had within `wait` seconds the ones already
+    taken are released and RuntimeError names the holder — a half-leased run is a
+    run that will fight a peer for the other half. Inherited leases (see HOLDER_ENV)
+    count as held and are neither renewed nor released here."""
+    devs = [d for d in dict.fromkeys(devs) if d]
+    taken = []
+    try:
+        for d in devs:
+            deadline = time.time() + wait
+            while True:
+                ok, holder = try_lease(d, task, ttl)
+                if ok:
+                    break
+                if time.time() >= deadline:
+                    raise RuntimeError(f"{d} is leased by {holder}")
+                time.sleep(3)
+            if (read(d) or {}).get("pid") == os.getpid():
+                taken.append(d)
+    except BaseException:
+        for d in taken:
+            release(d)
+        raise
+
+    stop = threading.Event()
+
+    def _renew():
+        # Renew at a third of the TTL: a run longer than the TTL must not expire
+        # mid-flight and hand the device to a peer while we are still using it.
+        while not stop.wait(max(30, ttl / 3)):
+            for d in taken:
+                renew(d, ttl)
+
+    t = threading.Thread(target=_renew, daemon=True)
+    t.start()
+    try:
+        yield taken
+    finally:
+        stop.set()
+        for d in taken:
+            release(d)
+
+
+def child_env(env=None):
+    """The environment a child runner needs to inherit this process's leases."""
+    e = dict(os.environ if env is None else env)
+    e[HOLDER_ENV] = str(os.getpid())
+    return e
 
 
 @contextlib.contextmanager

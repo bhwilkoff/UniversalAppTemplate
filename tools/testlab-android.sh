@@ -5,7 +5,7 @@
 # app on either the internal or the closed track. It is the same engine underneath, it
 # just takes a CLI, and it works on the free Spark tier.
 #
-# Why it is not optional (Decision 055): an emulator and a Test Lab VIRTUAL device have
+# Why it is not optional (the physical-devices-only rule): an emulator and a Test Lab VIRTUAL device have
 # no Play Store, so they cannot see Play Billing, Play Integrity, Play Games, or a vendor
 # OS skin. Version codes 75 and 85 were both rejected for "the app opens, but it keeps
 # crashing" and both passed every local test; a single Robo run on a physical Galaxy A03s
@@ -34,7 +34,7 @@ while [ $# -gt 0 ]; do
 done
 
 # Low-RAM, Play-Store-bearing, and spread across the OS versions review actually uses.
-# a03su is first on purpose: it is the device that caught Decision 055.
+# a03su is first on purpose: it is the low-RAM device that caught the crash above.
 DEVICES=(
     "model=a03su,version=33,locale=en,orientation=portrait"        # Galaxy A03s — low RAM
     "model=OP535DL1,version=34,locale=en,orientation=portrait"     # OnePlus Nord CE 2 Lite

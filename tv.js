@@ -57,11 +57,15 @@
    * Focus engine (§3, §7.2)
    * ------------------------------------------------------------------ */
 
+  // tabindex="-1" is honoured on EVERY row, not just [tabindex]: it is the
+  // author's declaration "not keyboard-reachable" (e.g. off-screen carousel
+  // slides). Carried only on the last row, an <a href tabindex=-1> stayed in the
+  // spatial pool and the D-pad could land on a slide that was not in view.
   const FOCUSABLE = [
-    'a[href]',
-    'button:not([disabled])',
-    'input:not([disabled])',
-    'select:not([disabled])',
+    'a[href]:not([tabindex="-1"])',
+    'button:not([disabled]):not([tabindex="-1"])',
+    'input:not([disabled]):not([tabindex="-1"])',
+    'select:not([disabled]):not([tabindex="-1"])',
     '[tabindex]:not([tabindex="-1"])',
   ].join(',');
 
@@ -249,6 +253,16 @@
     const code = ev.keyCode;
 
     if (BACK_KEYS.has(code)) { ev.preventDefault(); goBack(); return; }
+
+    // A focused <select> OWNS Up/Down: spatial navigation on every arrow walked
+    // off the control, so its value could never change — filters that were
+    // reachable, looked right, and were dead on every TV. Left/Right still
+    // navigate, so nobody is trapped in the control.
+    const focused = document.activeElement;
+    if (focused && focused.tagName === 'SELECT' && !focused.disabled
+        && (code === KEY.UP || code === KEY.DOWN)) {
+      return;                       // let the browser change the value
+    }
 
     const video = activeVideo();
     if (video) {

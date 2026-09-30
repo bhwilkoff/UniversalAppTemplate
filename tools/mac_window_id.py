@@ -1,75 +1,45 @@
-"""Print the CoreGraphics window id of the app's main window.
+"""Print the CoreGraphics window id of the app's main window — and nothing else.
 
-Store screenshots capture the WINDOW (`screencapture -l <id>`), not a screen rectangle —
-a rectangle capture put whatever else happened to be on the desktop (in one run, the
-Android emulator) into the middle of the frame.
+Store screenshots and harness frames capture the WINDOW (`screencapture -l <id>`),
+never a screen rectangle and never the full screen. A rectangle capture photographs
+whatever is at those coordinates: an emulator in the middle of a store frame, and —
+worse — the owner's personal documents, when the app
+window was not in front. So there is NO fallback here: if the window id cannot be
+found, this exits 1 and says why. It never prints bounds for `-R`.
+
+The owning application is matched EXACTLY (APP_NAME, or tools/app_config.py). A
+title substring is not an identity — a terminal tab once carried the same words as
+the app window it was mistaken for.
+
+    python3 tools/mac_window_id.py            # prints e.g. 12345
+    APP_NAME="My App" python3 tools/mac_window_id.py
 """
 import os
 import subprocess
 import sys
+from pathlib import Path
 
-# The app's DISPLAY name (window owner + AppleScript application name).
-APP_NAME = os.environ.get("APP_NAME", "AppName")   # FILL IN or export APP_NAME
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import app_config  # noqa: E402
+
+# The app's DISPLAY name — the window OWNER, which can differ from the process name.
+APP_NAME = os.environ.get("APP_NAME", app_config.APPLE_APP_NAME)
+MIN_WIDTH = 600  # skip tiny panels/tooltips
 
 try:
     import Quartz
 except ImportError:                     # pyobjc is not installed on every machine
     Quartz = None
 
-# AppleScript fallback: window BOUNDS, for `screencapture -R`. Still the app's window only —
-# never a full-screen grab. A full-screen capture during a QA run swept the developer's
-# terminal and an emulator into the frame, which is exactly what this file exists to avoid.
-BOUNDS_SCRIPT = f'''
-tell application "System Events"
-  tell process "{APP_NAME}"
-    if (count of windows) = 0 then return ""
-    set p to position of window 1
-    set s to size of window 1
-    return (item 1 of p as text) & "," & (item 2 of p as text) & "," & \
-           (item 1 of s as text) & "," & (item 2 of s as text)
-  end tell
-end tell
-'''
 
-
-def raise_app():
-    """Bring the app to the front before any capture.
-
-    `-R` is window-SCOPED but not window-CONTENT: a bounds capture grabs whatever
-    pixels occupy that rectangle, so an editor or terminal sitting on top of the
-    app window lands in the frame exactly as a full-screen grab would. Activating
-    first is what actually makes the rectangle show the app.
-    """
-    subprocess.run(["osascript", "-e", f'tell application "{APP_NAME}" to activate'],
-                   capture_output=True, text=True)
-    subprocess.run(["sleep", "1"])
-
-
-def bounds_fallback():
-    """x,y,w,h of the app window, or "" — usable as `screencapture -R<x,y,w,h>`."""
-    raise_app()
-    out = subprocess.run(["osascript", "-e", BOUNDS_SCRIPT],
-                         capture_output=True, text=True).stdout.strip()
-    return out
-
-MIN_WIDTH = 600  # skip tiny panels/tooltips
-# The process name can differ from the WINDOW OWNER (the display name) —
-# filtering on the process name found nothing and every frame failed.
-OWNERS = {APP_NAME}
-
-if Quartz is None:
-    b = bounds_fallback()
-    print(f"RECT:{b}" if b else "", end="" if not b else "\n")
-    sys.exit(0 if b else 1)
-
-def main() -> int:
+def via_quartz():
     windows = Quartz.CGWindowListCopyWindowInfo(
         Quartz.kCGWindowListOptionOnScreenOnly | Quartz.kCGWindowListExcludeDesktopElements,
         Quartz.kCGNullWindowID,
     ) or []
     best, best_area = None, 0
     for w in windows:
-        if w.get("kCGWindowOwnerName") not in OWNERS:
+        if w.get("kCGWindowOwnerName") != APP_NAME:     # EXACT owner
             continue
         b = w.get(Quartz.kCGWindowBounds) or {}
         width, height = b.get("Width", 0), b.get("Height", 0)
@@ -77,10 +47,35 @@ def main() -> int:
             continue
         if width * height > best_area:
             best, best_area = int(w["kCGWindowNumber"]), width * height
-    if best is None:
+    return best
+
+
+def via_winshot():
+    """No pyobjc: ask the Swift helper (tools/mac_window_shot.swift), which does the
+    same exact-owner lookup natively."""
+    from devharness import ensure_winshot
+    ok, why = ensure_winshot()
+    if not ok:
+        print(f"no window-id instrument: {why}", file=sys.stderr)
+        return None
+    r = subprocess.run([str(app_config.WINSHOT_BIN), APP_NAME, "", "--id-only",
+                        "--min-width", str(MIN_WIDTH)], capture_output=True, text=True)
+    out = r.stdout.strip()
+    if r.returncode != 0 or not out.isdigit():
+        print(out or r.stderr.strip(), file=sys.stderr)
+        return None
+    return int(out)
+
+
+def main() -> int:
+    wid = via_quartz() if Quartz is not None else via_winshot()
+    if wid is None:
+        print(f"no on-screen window owned by exactly {APP_NAME!r} — nothing captured "
+              "(there is deliberately no region/full-screen fallback)", file=sys.stderr)
         return 1
-    print(best)
+    print(wid)
     return 0
+
 
 if __name__ == "__main__":
     sys.exit(main())

@@ -21,7 +21,7 @@ const API = (() => {
   }
 
   async function get(endpoint, params = {}) {
-    const url = new URL(BASE_URL + endpoint);
+    const url = new URL(BASE_URL + endpoint, window.location.href);
     Object.entries(params).forEach(([k, v]) => {
       if (v !== undefined && v !== null) url.searchParams.set(k, v);
     });

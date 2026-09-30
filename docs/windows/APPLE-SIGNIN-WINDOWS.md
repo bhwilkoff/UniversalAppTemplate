@@ -1,6 +1,6 @@
-# Sign in with Apple on Windows — the $0 HTTPS bounce
+# Sign in with Apple on Windows: the $0 HTTPS bounce
 
-**Status: COMPLETE 2026-07-20 — Worker deployed + live-verified, app path built (270 tests),
+**Status: COMPLETE 2026-07-20 (in Tidbits): Worker deployed + live-verified, app path built (270 tests),
 Apple Return URL registered + persistence-verified.** The only thing never exercised is a
 real Windows user clicking through Apple's consent screen.
 
@@ -15,7 +15,7 @@ Apple's `redirect_uri` doc, verbatim (the `protocool` typo is Apple's):
 > **must use the HTTPS protocool, include a domain name, can't be an IP address or
 > localhost**, and must not contain a fragment identifer (#).
 
-So `http://127.0.0.1:<port>` — the whole basis of the Google desktop flow — is excluded by
+So `http://127.0.0.1:<port>`, the whole basis of the Google desktop flow, is excluded by
 name, twice over (not HTTPS, and an IP address).
 
 And because we need the **email** (the identity spine is keyed on `sha256(verified email)`),
@@ -33,8 +33,8 @@ we must request scopes. Apple:
 
 | Host | POST | Verdict |
 |---|---|---|
-| GitHub Pages (`<your-domain>`) | **405** | ❌ Out — measured against the live site |
-| Firebase Hosting | — | ❌ Dynamic needs **Blaze (paid)**; breaks the $0 guardrail |
+| GitHub Pages (`<your-domain>`) | **405** | ❌ Out, measured against the live site |
+| Firebase Hosting | n/a | ❌ Dynamic needs **Blaze (paid)**; breaks the $0 guardrail |
 | Firebase `__/auth/handler` | **200** | ⚠️ Free + already Apple-registered, but it's strictly the Firebase **JS SDK** browser handshake; a native app can't harvest a token from it |
 | **Cloudflare Worker** | **200** | ✅ **Chosen** |
 
@@ -62,12 +62,12 @@ open browser ───────────▶ appleid.apple.com
 ```
 
 **`response_type=code id_token`** is load-bearing: Apple returns the `id_token` **directly
-in the form_post**, so we never exchange the code — which means we never need Apple's `.p8`
+in the form_post**, so we never exchange the code. That means we never need Apple's `.p8`
 client-secret JWT and **the Apple private key never ships inside a desktop binary**. The
 Worker holds **zero secrets** and **zero state**. This mirrors the Google flow's
 no-client-secret property (PKCE proves it there; the nonce proves it here).
 
-The final hop must be a **navigation (302)**, never a `fetch()` — browsers permit an HTTPS
+The final hop must be a **navigation (302)**, never a `fetch()`. Browsers permit an HTTPS
 page to *navigate* to loopback (the Google flow relies on exactly this in production today)
 but *block* an HTTPS→loopback fetch as mixed content / private-network access.
 
@@ -97,13 +97,13 @@ Proven in the source app by 9 unit tests *and* against the deployed Worker:
 ## Cost
 
 **$0.** Cloudflare Workers free tier: 100k requests/**day**, no credit card. This Worker
-fires **once per Apple sign-in on Windows** — a rounding error. Note the quota is per
+fires **once per Apple sign-in on Windows**: a rounding error. Note the quota is per
 **account**, shared with the other Workers on it.
 
 ## Deploy
 
 ```bash
-cd workers/<your-auth-worker> && npm test && npx wrangler deploy
+cd workers/<your-auth-worker>   # you create this; the template ships no Worker && npm test && npx wrangler deploy
 ```
 
 Deploy to your own `*.workers.dev` subdomain (free tier).
@@ -112,7 +112,7 @@ Deploy to your own `*.workers.dev` subdomain (free tier).
 > the app's stack (Apple, Google Cloud, Firebase) is under `<your-apple-id-email>`.
 > Functionally irrelevant; worth consolidating if the company's asset ownership ever matters.
 
-## Apple portal registration — DONE 2026-07-20
+## Apple portal registration (done 2026-07-20)
 
 Registered on the Services ID `<your-services-id>` (Team `<your-team-id>`,
 identifier confirmed from the DOM so a silent typo couldn't slip through):
@@ -122,8 +122,8 @@ identifier confirmed from the DOM so a silent typo couldn't slip through):
 | Domain added | `<your-auth-worker>.workers.dev` |
 | Return URL added | `https://<your-auth-worker>.workers.dev/apple/callback` |
 
-**Web sign-in was left untouched** — `<your-domain>` and
-`tidbits-trivia-f2ddb.firebaseapp.com` plus the Firebase `__/auth/handler` Return URL are
+**Web sign-in was left untouched**: `<your-domain>` and
+`<your-firebase-project>.firebaseapp.com` plus the Firebase `__/auth/handler` Return URL are
 all still registered (Apple confirmed "5 Website URLs" at save). Re-opened the config after
 a fresh page load to verify persistence, and read the stored Return URL back out of the DOM
 to confirm it matches `AppleSignIn.DefaultRedirectUri` character-for-character.
@@ -133,8 +133,8 @@ to confirm it matches `AppleSignIn.DefaultRedirectUri` character-for-character.
 
 ## The one thing still unverified
 
-Nobody has completed a real Apple sign-in from Windows. Every layer is proven in isolation
-— the Worker against its deployed URL, the pure app logic by 270 tests, the portal config
-read back from Apple — but the end-to-end handshake (real consent → real id_token → Firebase
+Nobody has completed a real Apple sign-in from Windows. Every layer is proven in isolation:
+the Worker against its deployed URL, the pure app logic by 270 tests, the portal config
+read back from Apple. But the end-to-end handshake (real consent → real id_token → Firebase
 → email-keyed profile) needs a human on a Windows machine. Expect the first run to surface
 something; the likely candidates are propagation delay and the nonce round-trip.

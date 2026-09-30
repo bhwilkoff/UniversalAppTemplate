@@ -1,311 +1,149 @@
 #!/usr/bin/env python3
 """External-observation scenario runner for a paired Apple TV.
 
-Ported from Archive Watch's atv_scenario.py and adapted to trivia: launches the
-app with DebugHooks env, screenshots the GLASS on an interval, OCRs every frame
-(/tmp/tbocr), optionally sends real remote presses (pyatv Companion), and grades
+Launches the app with DebugHooks env, screenshots the GLASS on an interval, OCRs
+every frame, optionally sends real remote presses (pyatv Companion), and grades
 explicit assertions. The app's own claims are never the evidence for what a
-player sees; the screen is.
+viewer sees; the screen is.
+
+Every run, in one process: lease the device -> note its power state -> wake
+(polled) -> launch (muted, time-bounded doors) -> prove alive AND frontmost ->
+capture (power checked before every capture and press; fresh files only) -> grade
+-> LEAVE IT AS FOUND (app terminated and verified gone; a TV that was off is
+turned back off and read back) -> release the lease.
 
 Usage:
   python3 tools/atv_run.py --list
-  python3 tools/atv_run.py --scenario quickplay-classic
-  python3 tools/atv_run.py --scenario picture-round --minutes 3
-  python3 tools/atv_run.py --env APP_AUTOPLAY=ladder:science --minutes 2 \
-      --expect "LADDER" --name adhoc-ladder
+  python3 tools/atv_run.py --scenario home
+  python3 tools/atv_run.py --device atv-control --scenario home   # another bench TV
+  python3 tools/atv_run.py --env APP_START_ITEM=example-item --minutes 1 \
+      --expect "Play|Details" --name adhoc-item
 
-Requires: /tmp/tbocr (swiftc -O tools/ScreenOCR/main.swift -o /tmp/tbocr),
-the paired ATV, the app installed (tools/atv_install.sh).
-Playbook + findings log: docs/TVOS-TEST-PLAYBOOK.md.
+Requires: a bench entry for the TV (tools/bench.py; default name "atv") with udid,
+and address + pyatv_id for wake/press/power; pyatv in ~/.pyatv-venv (Python 3.12);
+the app installed. The OCR binary is built on first use (build/bin/screenocr).
 """
 from app_config import *  # app identity + calibrated thresholds
 
 import argparse, json, re, subprocess, sys, time
 from pathlib import Path
 
-DEVICE = "YOUR-DEVICE-UDID"   # Your Apple TV (devicectl UDID)
-BUNDLE = APPLE_BUNDLE_ID
-OCR = "/tmp/tbocr"
-SHOT_EVERY = 4.0   # 4K captures pressure the device's screenshot daemon;
-                   # 2.5s coincided with jetsam events on Archive Watch
-PYATV = str(Path.home() / ".pyatv-venv/bin/atvremote")
-PYATV_ARGS = ["--id", "YOUR-COMPANION-ID", "--protocol", "companion"]
-DEVELOPER_DIR = "/Applications/Xcode-beta.app/Contents/Developer"
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import apple_device as ad  # noqa: E402
+import bench  # noqa: E402
+import devlease  # noqa: E402
+from devharness import OCR_FAILED, frame_darkness, frame_text, ocr, qa_dir  # noqa: E402
 
-BASE_ENV = {"APP_SKIP_ONBOARD": "1", "APP_NO_GAMECENTER": "1"}
+BUNDLE = APPLE_BUNDLE_ID
+SHOT_EVERY = 4.0   # 4K captures pressure the device's screenshot daemon;
+                   # 2.5s coincided with jetsam events on a previous app's bench
+
+BASE_ENV = {HOOK_SKIP_ONBOARD: "1", **DOOR_DEFAULTS}
 
 # Strings that must NEVER appear on the glass in a healthy run. Extend as
 # findings land — every user-visible error string the app can render belongs
 # here unless a scenario is specifically ABOUT that error.
 # Word-bound: bare "Error" matched inside "terrorists" in a question prompt
-# and failed a healthy run. Question CONTENT can contain any substring.
-FORBID_DEFAULT = r"No questions|Couldn.t load|Something went wrong|failed to|\berror\b|couldn.t be"
+# and failed a healthy run. Content can contain any substring.
+FORBID_DEFAULT = FORBIDDEN
 
 # ── Scenario table ─────────────────────────────────────────────────────────────
 # expect_any:  regex must match some frame's OCR text (anywhere).
 # expect_end:  regex must match one of the LAST 4 frames (final state).
 # expect_seq:  list of regexes that must first-match in this order over time.
-# forbid:      regex that must match NO frame (default FORBID_DEFAULT + extras).
-# min_center_stddev: at least `frames` frames must have centerLuma.stddev >= v
-#              (a loaded photo region; a flat/blank image area fails this).
-# presses:     [(seconds_after_launch, key), ...] real remote input via pyatv.
+# forbid_extra: regex added to FORBID_DEFAULT; it must match NO frame.
+# min_center_stddev: (thresh, frames) — at least `frames` frames must have
+#              centerLuma.stddev >= thresh (a loaded photo region; a flat/blank
+#              image area fails this). e.g. min_center_stddev=(28.0, 3) on a
+#              screen whose center is artwork.
+# presses:     [(seconds_after_launch, key), ...] real remote input via pyatv
+#              ("up"/"down"/"select"/...), or "sh:<command>" to start a helper.
+#              ONE pyatv press can block captures for 45-60 s on some boxes, so a
+#              multi-press navigation is better served by a launch door.
+# drop_env:    BASE_ENV keys this scenario must NOT send.
+#
+# FILL IN: these are EXAMPLES matching what the template's starter honours
+# (APP_START_TAB home|search, APP_START_ITEM, APP_MUTE, APP_DOOR_SECONDS — see
+# apple/Core/Store/LaunchDoors.swift). Replace each regex with words calibrated
+# against a real capture of YOUR screen, and add one scenario per surface your app
+# has. A regex written from imagination fails on correct pixels, or passes on the
+# wrong screen: tab titles are on every screen, so a signature must be content
+# unique to the surface.
 SCENARIOS = {
     "home": dict(
-        env={}, minutes=0.4,
-        expect_any=r"QUICK PLAY", expect_end=r"DAILY TIDBIT|TRIVIA NIGHT",
-        note="Home renders: hero, daily, night cards, Records/Settings chrome."),
-    "quickplay-classic": dict(
-        env={"APP_AUTOPLAY": "classic:mixed", "APP_AUTOPILOT": "1",
-             "APP_AUTOPILOT_CORRECT": "1"},
-        minutes=1.2,
-        expect_any=r"\d+/\d+",
-        expect_end=r"ACCURACY|Play Again|FLAWLESS|CORRECT",
-        note="A full classic round to the results screen on autopilot."),
-    "picture-round": dict(
-        # No autopilot: park on the FIRST picture question so every frame
-        # samples the image region while the photo should be up.
-        env={"APP_AUTOPLAY": "pictureId:mixed", "APP_AUTOPILOT": "1",
-             "APP_AUTOPILOT_STEPS": "0"},
-        minutes=1.0, min_center_stddev=(28.0, 3),
-        expect_any=r".",
-        forbid_extra=r"Couldn.t load the image",
-        note="Picture ID round: the image region must carry a real photo "
-             "(center luminance stddev), not a placeholder or blank."),
-    "daily": dict(
-        env={"APP_AUTOPLAY": "daily:mixed", "APP_AUTOPILOT": "1"},
-        minutes=1.2, expect_any=r"DAILY|Daily|\d+/\d+",
-        expect_end=r"ACCURACY|Play Again|streak|CORRECT",
-        note="Daily Tidbit plays to completion."),
-    "versus-cpu": dict(
-        # Tight assertions: the first run of this scenario false-passed by
-        # matching the word "you" on the HOME screen (the hook wasn't wired on
-        # tvOS). The versus HUD's own chrome is the only acceptable evidence.
-        env={"APP_VERSUS": "rookie", "APP_AUTOPILOT": "1"},
-        minutes=2.0,
-        expect_any=r"Rookie",
-        expect_end=r"You won|takes it|\d+/\d+ correct",
-        note="Versus CPU match runs and shows both scores."),
-    "records": dict(
-        env={"APP_TAB": "records", "APP_SEED_RECORDS": "12"},
-        minutes=0.5, expect_any=r"Records|Streak|day",
-        note="Records dashboard renders with data."),
-    "settings": dict(
-        env={"APP_SETTINGS": "1"}, minutes=0.4,
-        expect_any=r"Settings|Account|About",
-        note="Settings renders; account affordances present."),
-    "create": dict(
-        env={"APP_CREATE": "1"}, minutes=0.5,
-        expect_any=r"Create|topic|Wikipedia",
-        note="Create surface reachable and rendered."),
-    "night-host": dict(
-        # Tightened after a false pass on the word 'TIDBIT' (home screen):
-        # only the lobby's own chrome counts.
-        env={"APP_NIGHT_HOST": "1"}, minutes=1.0,
-        expect_any=r"SCAN TO JOIN|TRIVIA NIGHT|in the room",
-        forbid_extra=r"QUICK PLAY",
-        note="Trivia Night host lobby shows a join code (+ QR)."),
-    "night-join-crossplatform": dict(
-        # The TV hosts a networked night on a PINNED room code; a scripted
-        # cross-platform player (tools/rtdb_join.py — the web app's exact REST
-        # path) joins mid-run. The joiner's name on the TV's glass is the
-        # end-to-end evidence: host -> Firebase -> client, across platforms.
-        env={"APP_NIGHT_HOST": "1", "APP_LIVE_CODE": "QATV"},
-        minutes=1.6,
-        presses=[(20, "sh:python3 tools/rtdb_join.py --code QATV --name HarnessBot --stay 40 > build/qa/rtdb_join.log 2>&1 &")],
-        # The lobby shows a live COUNT; the bot leaves at ~+62s, so the count
-        # must rise to 1 mid-run (and dropping back after the leave is itself
-        # correct behaviour — don't assert on the final frames).
-        expect_seq=[r"SCAN TO JOIN", r"1 in the room"],
-        forbid_extra=r"QUICK PLAY",
-        note="Cross-platform Trivia Night: scripted RTDB player joins the "
-             "TV-hosted room; name must appear on the glass."),
-    "quickmatch": dict(
-        env={"APP_MULTIPLAYER": "1"}, minutes=1.2,
-        expect_any=r"Quick Match|Finding|Searching|opponent",
-        forbid_extra=r"QUICK PLAY",   # home-hero text = the sheet never opened
-        note="Online multiplayer sheet opens and searches/falls back."),
-    "records-drillin": dict(
-        # Real remote input: from the seeded Records dashboard, move focus down
-        # into the games list and select the top game — the per-answer drill-in
-        # must render (R-REC-1's interactive-records rule).
-        env={"APP_TAB": "records", "APP_SEED_RECORDS": "12"},
-        minutes=1.0,
-        presses=[(10, "down"), (13, "down"), (16, "select")],
-        expect_seq=[r"DAY STREAK", r"Sample question|ACCURACY|answers|CORRECT"],
-        note="Records drill-in via real remote presses."),
-    "quickmatch-full": dict(
-        # Start the search with a real press; a match against the live queue or
-        # the bot fallback are BOTH healthy outcomes — the sheet must never
-        # just sit there. Drops the NO_GAMECENTER base flag: Quick Match on
-        # Apple rides Game Center, and with the flag set the sheet correctly
-        # shows its sign-in gate instead (verified 2026-08-24).
-        env={"APP_MULTIPLAYER": "1"}, drop_env=("APP_NO_GAMECENTER",),
-        minutes=1.5,
-        # Apple Quick Match rides GameKit: the native matchmaker sheet is the
-        # correct surface (Automatch / Invite Friends / Start Game), not the
-        # The in-app search screen the web/Android queue shows.
-        expect_seq=[r"Multiplayer Game|Automatch", r"Start Game|Invite Friends"],
-        forbid_extra=r"QUICK PLAY",
-        note="Quick Match full flow: press to search, match or bot fallback."),
-    "paywall": dict(
-        env={"APP_PAYWALL": "1"}, minutes=0.5,
-        expect_any=r"Club", forbid_extra=r"\$0|nil",
-        note="Club paywall renders plans (or the honest empty state)."),
+        env={HOOK_START_TAB: "home"}, minutes=0.4,
+        expect_any=r"Home", expect_end=r"Home",                          # FILL IN
+        note="Home tab renders."),
+    "search": dict(
+        env={HOOK_START_TAB: "search"}, minutes=0.4,
+        expect_any=r"Search",                                            # FILL IN
+        note="Search tab renders."),
+    "item": dict(
+        # Mute is already in every launch (DOOR_DEFAULTS); it is spelled out here
+        # because this is the scenario most likely to start playback.
+        env={HOOK_START_ITEM: QA_ITEM_ID, HOOK_MUTE: "1"}, minutes=0.5,
+        expect_any=QA_ITEM_RX,
+        note="APP_START_ITEM opens the item's detail, muted."),
+    "door-return": dict(
+        # The door bound itself: the app must leave the item on its own clock.
+        env={HOOK_START_ITEM: QA_ITEM_ID, HOOK_DOOR_SECONDS: "15"}, minutes=0.8,
+        expect_seq=[QA_ITEM_RX, r"Home"], expect_end=r"Home",            # FILL IN
+        note="APP_DOOR_SECONDS ends the door and returns to Home by itself."),
 }
 
-# One scenario per remaining game mode — same shape: autopilot to the results
-# screen, question chrome seen, results chrome at the end, no error text.
-for _m in ["timeAttack", "survival", "stake", "sweep", "thisOrThat",
-           "closestCall", "ordering", "matching", "typeAnswer", "oddOneOut",
-           "ladder", "enumerate", "mix"]:
-    SCENARIOS[f"mode-{_m}"] = dict(
-        env={"APP_AUTOPLAY": f"{_m}:mixed", "APP_AUTOPILOT": "1",
-             "APP_AUTOPILOT_CORRECT": "1",
-             # Only read for mix: — pins the blend so the run is reproducible.
-             "APP_MIX": "classic,pictureId,closestCall"},
-        minutes=1.5,
-        expect_any=r"\d+/\d+|SCIENCE|HISTORY|GEOGRAPHY|MIXED|ARTS|MUSIC|SPORTS|SCREEN|BUSINESS",
-        expect_end=r"ACCURACY|Play Again|CORRECT|Done|Results",
-        note=f"{_m} round to results on autopilot.")
-# Survival never ends while every answer is right — the sweep proved 52
-# straight correct answers on-device. Answer wrong so the run reaches results.
-del SCENARIOS["mode-survival"]["env"]["APP_AUTOPILOT_CORRECT"]
-SCENARIOS["mode-survival"]["minutes"] = 1.0
 
-
-def sh(cmd, timeout=90, **kw):
-    return subprocess.run(cmd, capture_output=True, text=True, timeout=timeout, **kw)
-
-
-def devicectl(*args, timeout=90):
-    return sh(["env", f"DEVELOPER_DIR={DEVELOPER_DIR}", "xcrun", "devicectl"] + list(args),
-              timeout=timeout)
-
-
-def wake_tv():
-    """Installs work while the TV sleeps; launches and screenshots do NOT, and
-    devicectl has no wake verb. pyatv's Companion protocol does.
-
-    VERIFIED wake: the TV dozes BETWEEN scenarios in a long sweep, and a launch
-    landing in that window is denied ("System is asleep - foreground app launch
-    forbidden") or comes up backgrounded — the app stays alive while the HOME
-    SCREEN owns the glass, which mimics an app bug (F-004 was this). Poll until
-    the Companion actually reports On; give up loudly, never silently."""
-    for attempt in range(3):
-        try:
-            r = sh([PYATV] + PYATV_ARGS + ["power_state"], timeout=40)
-            if "PowerState.On" in r.stdout:
-                return True
-            print("[atv] TV asleep — waking it")
-            sh([PYATV] + PYATV_ARGS + ["turn_on"], timeout=40)
-            for _ in range(8):
-                time.sleep(3)
-                r = sh([PYATV] + PYATV_ARGS + ["power_state"], timeout=40)
-                if "PowerState.On" in r.stdout:
-                    time.sleep(2)   # let the home screen settle before a launch
-                    return True
-        except Exception as e:
-            print(f"[atv] wake attempt {attempt} failed: {e}")
-    print("[atv] WARNING: could not verify the TV awake — launches may background")
-    return False
-
-
-HOME_SCREEN_RX = r"prime video|pluto|fubo|Apple TV\+|Select up for full screen|\d{1,2}:\d{2} [AP]M"
-
-
-def frame_is_home_screen(png):
-    """OCR one frame and report whether the tvOS HOME SCREEN owns the glass —
-    the wrong-screen guard from atv_see.sh, inside the runner. A launched-but-
-    backgrounded app passes app_alive while every capture shows the system UI."""
-    r = sh([OCR, str(png)], timeout=120)
-    try:
-        d = json.loads(r.stdout.splitlines()[0])
-    except Exception:
-        return False
-    txt = " ".join(t["text"] for t in d.get("allText", []))
-    return bool(re.search(HOME_SCREEN_RX, txt, re.I))
-
-
-def press(key):
-    r = sh([PYATV] + PYATV_ARGS + [key], timeout=30)
-    if r.returncode != 0:
-        print(f"[atv] press {key} failed: {r.stderr.strip()[-120:]}")
-
-
-def launch(env, drop=()):
-    full = {k: v for k, v in BASE_ENV.items() if k not in drop}
-    full.update(env)
-    r = devicectl("device", "process", "launch", "--terminate-existing",
-                  "--device", DEVICE, "-e", json.dumps(full), BUNDLE, timeout=60)
-    if "Launched application" not in (r.stdout + r.stderr):
-        sys.exit(f"launch failed: {r.stdout[-300:]} {r.stderr[-300:]}")
-
-
-def app_alive():
-    r = devicectl("device", "info", "processes", "--device", DEVICE, timeout=60)
-    return "AppName.app/AppName" in r.stdout
-
-
-def capture_loop(outdir, minutes, presses):
+def capture_loop(entry, atv, outdir, minutes, presses, log):
+    """Capture on an interval. Power is checked BEFORE every capture and press: a
+    sleeping Apple TV returns a valid black PNG, so the frame cannot be trusted to
+    say the TV was off — the TV has to be asked. A frame taken while the TV was not
+    on is not captured at all; the blind window is logged instead."""
+    udid = entry["udid"]
     shots, i = [], 0
     t0 = time.time()
     deadline = t0 + minutes * 60
     pending = sorted(presses or [], key=lambda p: p[0])
     while time.time() < deadline:
+        state = atv.power_state() if atv.available else None
+        if state == "off":
+            log.append(f"{time.time() - t0:.0f}s TV off/dozing — frame skipped, waking")
+            print(f"[atv] TV reports Off at +{time.time() - t0:.0f}s — waking (blind window logged)")
+            atv.wake()
+            continue
         while pending and time.time() - t0 >= pending[0][0]:
             _, key = pending.pop(0)
             if key.startswith("sh:"):
                 print(f"[atv] action: {key[3:]}")
                 subprocess.Popen(key[3:], shell=True)
             else:
-                print(f"[atv] press: {key}")
-                press(key)
+                ok, why = atv.press(key)
+                print(f"[atv] press: {key}" + ("" if ok else f" — FAILED: {why}"))
+                log.append(f"press {key}: {'ok' if ok else why}")
         p = outdir / f"shot-{i:04d}.png"
-        try:
-            devicectl("device", "capture", "screenshot",
-                      "--device", DEVICE, "--destination", str(p), timeout=30)
-        except subprocess.TimeoutExpired:
-            # The 4K screenshot daemon hiccups under pressure (Archive Watch's
-            # jetsam class). One flaky capture must not kill the scenario —
-            # skip the frame, keep the run, say so.
-            print(f"[atv] capture {p.name} timed out — skipping frame")
+        ok, why = ad.capture(udid, p, timeout=30)
+        if not ok:
+            # One flaky capture must not kill the scenario — skip the frame, keep
+            # the run, say so. A stale file is refused, never graded.
+            print(f"[atv] capture {p.name}: {why} — skipping frame")
+            log.append(f"capture {p.name}: {why}")
             time.sleep(2)
+            i += 1
             continue
-        if p.exists():
-            shots.append((time.time(), p))
-            # The TV dozes during long captures parked on a static screen —
-            # late frames go black and the run gets graded on darkness. A tiny
-            # PNG is the doze signature: wake it and log the blind window
-            # honestly (the frames stay on disk either way).
-            if p.stat().st_size < 300_000:
-                print(f"[atv] frame {p.name} is {p.stat().st_size}B — TV dozing; waking")
-                wake_tv()
+        shots.append((time.time(), p))
+        # Doze signature as a SECOND opinion: a near-all-black frame while power
+        # said On is either a dark scene or the television (not the Apple TV) off.
+        dk = frame_darkness(p)
+        if dk and dk[1] > 99.5:
+            print(f"[atv] {p.name} is {dk[1]}% black — dark scene, or the TELEVISION "
+                  "is off / on another input (the Apple TV cannot fix that)")
+            log.append(f"{p.name} {dk[1]}% black")
         i += 1
         time.sleep(max(0, SHOT_EVERY - 1.0))
     return shots
 
 
-def ocr(shots):
-    out = {}
-    paths = [str(p) for _, p in shots]
-    for chunk in (paths[k:k + 20] for k in range(0, len(paths), 20)):
-        r = sh([OCR] + chunk, timeout=600)
-        for line in r.stdout.splitlines():
-            try:
-                d = json.loads(line)
-                out[d["file"]] = d
-            except json.JSONDecodeError:
-                pass
-    return out
-
-
-def frame_text(d):
-    return " ".join(t["text"] for t in d.get("allText", []))
-
-
 def main():
     try:
-        _main()
+        return _main()
     except SystemExit:
         raise
     except Exception:
@@ -314,16 +152,19 @@ def main():
         # A runner crash must leave a report naming itself — a missing report
         # reads as "interrupted" and hides the crash class entirely.
         try:
-            outdir = Path(getattr(_main, "outdir", "build/qa"))
+            outdir = Path(getattr(_main, "outdir", QA_ROOT))
+            outdir.mkdir(parents=True, exist_ok=True)
             (outdir / "report.json").write_text(json.dumps(
                 {"error": traceback.format_exc().splitlines()[-1]}))
         except Exception:
             pass
-        sys.exit(3)
+        return 3
 
 
 def _main():
-    ap = argparse.ArgumentParser()
+    ap = argparse.ArgumentParser(description=__doc__,
+                                 formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--device", default="atv", help="bench name (default atv) or UDID")
     ap.add_argument("--scenario")
     ap.add_argument("--list", action="store_true")
     ap.add_argument("--minutes", type=float)
@@ -332,18 +173,27 @@ def _main():
     ap.add_argument("--luma", help="ad-hoc image gate THRESH:FRAMES (e.g. 28:2)")
     ap.add_argument("--name", default=None)
     ap.add_argument("--outdir", default=None)
+    ap.add_argument("--owner-ok", action="store_true",
+                    help="allow a device whose role is owner-watches (ask first)")
+    ap.add_argument("--audible", action="store_true",
+                    help="drop the mute door (ask the owner first)")
+    ap.add_argument("--leave-running", action="store_true",
+                    help="skip teardown — only when the owner asked to look at it")
+    ap.add_argument("--lease-wait", type=int, default=0,
+                    help="seconds to wait for a leased device (default: skip now)")
     args = ap.parse_args()
 
     if args.list:
         for k, v in SCENARIOS.items():
             print(f"{k:20s} {v['note']}")
-        return
+        return 0
 
     spec = dict(SCENARIOS.get(args.scenario, {"env": {}, "minutes": 1.0}))
+    spec["env"] = dict(spec.get("env", {}))
     name = args.name or args.scenario or "adhoc"
     for kv in args.env:
         k, _, v = kv.partition("=")
-        spec.setdefault("env", {})[k] = v
+        spec["env"][k] = v
     if args.minutes:
         spec["minutes"] = args.minutes
     if args.expect:
@@ -352,49 +202,89 @@ def _main():
         t, n = args.luma.split(":")
         spec["min_center_stddev"] = (float(t), int(n))
 
-    day = time.strftime("%F")
-    outdir = Path(args.outdir or f"build/qa/atv-{day}/{name}-{int(time.time())}")
+    entry = bench.require(args.device, allow_owner=args.owner_ok, platforms=("tvos",))
+    if not entry.get("udid"):
+        raise SystemExit(f"{entry['name']} has no udid in the bench manifest")
+    outdir = Path(args.outdir) if args.outdir else qa_dir("atv", name)
     outdir.mkdir(parents=True, exist_ok=True)
     _main.outdir = outdir
-    print(f"[atv] scenario {name} -> {outdir}")
+    print(f"[atv] scenario {name} on {entry['name']} -> {outdir}")
 
-    wake_tv()
-    drop = spec.get("drop_env", ())
-    launch(spec.get("env", {}), drop)
-    time.sleep(6)
-    if not app_alive():   # launch-window death retry (Archive Watch: ~2 in 10)
-        print("[atv] app died in launch window — one retry")
-        wake_tv()
-        launch(spec.get("env", {}), drop)
-        time.sleep(6)
-    # Foreground guard: alive is not frontmost. One probe frame; if the home
-    # screen owns the glass, wake + relaunch once before burning the capture.
-    probe = outdir / "probe-foreground.png"
-    devicectl("device", "capture", "screenshot", "--device", DEVICE,
-              "--destination", str(probe), timeout=30)
-    if probe.exists() and frame_is_home_screen(probe):
-        print("[atv] launched but HOME SCREEN owns the glass — wake + relaunch")
-        wake_tv()
-        launch(spec.get("env", {}), drop)
-        time.sleep(6)
+    env = {k: v for k, v in BASE_ENV.items() if k not in spec.get("drop_env", ())}
+    if args.audible:
+        env.pop(HOOK_MUTE, None)
+        print("[atv] AUDIBLE run — the owner should have been asked first")
+    env.update(spec.get("env", {}))
 
-    shots = capture_loop(outdir, spec.get("minutes", 1.0), spec.get("presses"))
-    print(f"[atv] {len(shots)} screenshots")
-    alive_end = app_alive()
-    texts = ocr(shots)
+    # One lease, one process, the whole run (install/launch/capture/teardown).
+    try:
+        with devlease.hold([bench.lease_name(entry)], task=f"atv_run {name}",
+                           wait=args.lease_wait):
+            return _run(entry, spec, env, name, outdir, args)
+    except RuntimeError as e:
+        print(f"[atv] SKIP — {e}. This run covers NOTHING; never read it as a pass.")
+        (outdir / "report.json").write_text(json.dumps(
+            {"scenario": name, "result": "SKIP", "why": str(e)}))
+        return 2
 
-    report = {"scenario": name, "shots": len(shots), "assertions": {}}
+
+def _run(entry, spec, env, name, outdir, args):
+    atv = ad.ATV(entry)
+    found_power = atv.power_state()
+    print(f"[atv] found the TV: power {found_power or 'unknown'}"
+          + ("" if atv.available else f" ({atv.why_unavailable()})"))
+    report = {"scenario": name, "device": entry["name"], "found_power": found_power,
+              "env": env, "assertions": {}}
+    log = []
 
     def grade(k, ok, ev):
         report["assertions"][k] = {"pass": bool(ok), "evidence": ev}
         print(f"  [{'PASS' if ok else 'FAIL'}] {k}: {ev}")
 
+    shots, alive_end, texts, launched = [], None, {}, True
+    try:
+        try:
+            report["launch_events"] = ad.launch_guarded(entry, BUNDLE, env, outdir)
+        except ad.LaunchFailed as e:
+            grade("launched", False, str(e))
+            launched = False
+        if launched:
+            shots = capture_loop(entry, atv, outdir, spec.get("minutes", 1.0),
+                                 spec.get("presses"), log)
+            print(f"[atv] {len(shots)} screenshots")
+            alive_end = ad.app_alive(entry["udid"])
+            texts = ocr(shots)
+    finally:
+        # Graded like every other assertion, BEFORE the report is written: a TV
+        # left on, or an app left running, fails the run.
+        if args.leave_running:
+            print("[atv] --leave-running: NOT tearing down (the owner asked to look)")
+        else:
+            ok, lines = ad.teardown(entry, found_power=found_power)
+            grade("left_as_found", ok, "; ".join(lines))
+    if not launched:
+        return _finish(report, outdir)
+    report["shots"] = len(shots)
+    report["capture_log"] = log
+
     grade("captured_frames", len(shots) >= 3, f"{len(shots)} frames")
-    grade("app_alive_to_end", alive_end, "process present at capture end"
-          if alive_end else "process GONE at capture end (crash or exit)")
+    grade("app_alive_to_end", alive_end is True, "process present at capture end"
+          if alive_end else ("could not ask the device" if alive_end is None
+                             else "process GONE at capture end (crash or exit)"))
+    if OCR_FAILED in texts:
+        grade("ocr_available", False, texts[OCR_FAILED])
+        return _finish(report, outdir)
 
     ordered = [(w, frame_text(texts.get(p.name, {}))) for w, p in shots]
     all_text = " | ".join(t for _, t in ordered)
+    readable = max((len(texts.get(p.name, {}).get("allText", [])) for _, p in shots),
+                   default=0)
+    if readable < MIN_OCR_LINES:
+        dk = frame_darkness(shots[-1][1]) if shots else None
+        grade("screen_readable", False, f"best frame had {readable} OCR lines"
+              + (f"; last frame {dk[1]}% black (mean luma {dk[0]})" if dk else "")
+              + " — nothing below was graded")
+        return _finish(report, outdir)
 
     if "expect_any" in spec:
         m = re.search(spec["expect_any"], all_text, re.I)
@@ -410,30 +300,36 @@ def _main():
         grade(f"seq_{i}_{rx[:18]}", hit is not None,
               f"first match at frame {hit}" if hit is not None else "never matched")
         if hit is not None:
-            ordered_tail = ordered[hit:]
-            ordered = ordered_tail   # next regex must match at/after this frame
+            ordered = ordered[hit:]   # next regex must match at/after this frame
 
     forbid = FORBID_DEFAULT + ("|" + spec["forbid_extra"] if spec.get("forbid_extra") else "")
-    bad = [(p.name, re.search(forbid, frame_text(texts.get(p.name, {})), re.I).group(0))
-           for _, p in shots
-           if re.search(forbid, frame_text(texts.get(p.name, {})), re.I)]
+    bad = []
+    for _, p in shots:
+        m = re.search(forbid, frame_text(texts.get(p.name, {})), re.I)
+        if m:
+            bad.append((p.name, m.group(0)))
     grade("no_error_text", not bad,
           "clean" if not bad else f"{len(bad)} frames, e.g. {bad[0]}")
 
     if "min_center_stddev" in spec:
         thresh, need = spec["min_center_stddev"]
         rich = [p.name for _, p in shots
-                if texts.get(p.name, {}).get("centerLuma", {}).get("stddev", 0) >= thresh]
+                if (texts.get(p.name, {}).get("centerLuma") or {}).get("stddev", 0) >= thresh]
         grade("image_region_loaded", len(rich) >= need,
               f"{len(rich)} frames with center stddev >= {thresh} (need {need})")
 
-    (outdir / "report.json").write_text(json.dumps(report, indent=1))
     (outdir / "ocr.json").write_text(json.dumps(texts, indent=1))
+    return _finish(report, outdir)
+
+
+def _finish(report, outdir):
     failed = [k for k, v in report["assertions"].items() if not v["pass"]]
+    report["result"] = "OK" if not failed else "FAIL"
+    (outdir / "report.json").write_text(json.dumps(report, indent=1))
     print(f"\nRESULT: {'OK' if not failed else 'FAIL — ' + ', '.join(failed)}")
     print(f"report: {outdir}/report.json")
-    sys.exit(0 if not failed else 1)
+    return 0 if not failed else 1
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

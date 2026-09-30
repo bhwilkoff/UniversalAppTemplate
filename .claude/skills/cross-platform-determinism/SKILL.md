@@ -1,6 +1,6 @@
 ---
 name: cross-platform-determinism
-description: Use whenever a value must come out IDENTICAL on every platform — a "daily" content pick, a shared shuffle, a deterministic match plan, a hash used as a key. Carries the order-independent hash-rank pattern (never a seeded shuffle), the one-algorithm-N-mirrors rule, the golden-parity test that runs the REAL code on every stack and diffs, and the concrete language gotchas (Kotlin signed-Byte, JS 53-bit ints, locale/timezone). Triggers on "daily", deterministic, seed, shuffle, hash, "same on all platforms", golden test, parity test, FNV, cross-platform selection.
+description: Use whenever a value must come out IDENTICAL on every platform — a "daily" content pick, a shared shuffle, a deterministic match plan, a hash used as a key. Carries Rule 0 (if a pipeline can compute it, publish the result; mirror only what must run on device), the order-independent hash-rank pattern (never a seeded shuffle), the one-algorithm-N-mirrors rule, the golden-parity test that runs the REAL code on every stack and diffs, and the concrete language gotchas (Kotlin signed-Byte, JS 53-bit ints, locale/timezone). Triggers on "daily", deterministic, seed, shuffle, hash, "same on all platforms", golden test, parity test, FNV, cross-platform selection.
 ---
 
 # Cross-Platform Determinism
@@ -9,6 +9,25 @@ When web (JS), Apple (Swift), and Android (Kotlin) must independently compute th
 *same* answer — the same "Daily 7", the same match order, the same key — a shared
 seed is NOT enough. Each language's RNG, integer width, and sort stability differ.
 This is the discipline that makes cross-platform determinism actually hold.
+
+## Rule 0: if a pipeline can compute it, publish the result
+
+Mirroring an algorithm is the LAST resort. When a build step or server
+can compute the value (a daily pick, a channel schedule, a related
+list, a shuffle), compute it once and publish the result as data;
+every client reads it. Agreement then becomes a property of the file,
+not of N ports staying in sync.
+
+Archive Watch (Decision 144): channel schedules were computed on
+device from a "shared seed" in four ports (Swift, Kotlin, JS, Roku),
+each with a slightly different shuffle and a local-time day anchor.
+Two viewers agreed on 0 of 14 channels. Publishing the timeline fixed
+it in one change, and a client with no file shows an error with Retry,
+never a guessed local schedule.
+
+Mirror (Rules 1 to 3) only when the value must be computed on device:
+it depends on local or offline state, it must work before any
+download, or it is a wire protocol between peers.
 
 ## Rule 1 — Order-independent hash-rank, never a seeded shuffle
 

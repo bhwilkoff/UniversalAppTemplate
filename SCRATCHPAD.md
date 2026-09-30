@@ -1,61 +1,74 @@
-# Project Scratchpad — [APP NAME]
+# Project Scratchpad: [APP NAME]
 
-> Active working notes. When this file exceeds ~150 lines, move
-> completed milestone detail to ARCHIVE.md and keep this lean.
+> Active working notes, loaded into every session, so keep it small.
+> Keep only the two most recent session-log entries; roll older ones
+> word for word into `docs/SESSION-LOG.md` (create it on the first roll).
 >
-> See `PARITY.md` for the cross-platform feature matrix (single
-> source of truth — don't duplicate rows here).
+> See `PARITY.md` for the cross-platform feature matrix (the single
+> source of truth; don't duplicate rows here).
+>
+> New to this template? Start with `docs/path/00-why-we-build.md` and
+> `docs/path/01-first-prototype.md` before filling anything in.
 >
 > The Current State block below is injected at every session start.
-> If it drifts behind the code, fix it FIRST, then work — a stale
+> If it drifts behind the code, fix it FIRST, then work. A stale
 > scratchpad is worse than none.
 
 ## Current state
 
 - **Status**: NOT STARTED
 - **Active milestone**: M0
-- **Last session**: —
+- **Last session**: none yet
 - **Next actions**:
-  1. Decide the platform set (all five? skip tvOS?) → DECISIONS.md
-  2. Fill in CLAUDE.md project identity sections
-  3. Create the universal Xcode project at repo root (no spaces in
-     name; iPhone + iPad + Mac + Apple TV destinations — see
-     apple/README.md)
-  4. Open `android/` in Android Studio, rename `com.example.appname`
-  5. Enable GitHub Pages on main branch (+ `.nojekyll` if serving
+  1. Read `docs/path/00-why-we-build.md` and
+     `docs/path/01-first-prototype.md`
+  2. Decide the platform set (all five? skip tvOS? add Windows?)
+     → DECISIONS.md
+  3. Fill in CLAUDE.md project identity sections
+  4. Create the universal Xcode project at repo root (no spaces in
+     name; iPhone + iPad + Mac + Apple TV destinations) and move the
+     `apple/` starter files into it, per apple/README.md
+  5. Open `android/` in Android Studio, rename `com.example.appname`
+  6. Enable GitHub Pages on main branch (+ `.nojekyll` if serving
      `/.well-known/`)
-  6. Drop verification files in `/.well-known/` once the
+  7. Drop verification files in `/.well-known/` once the
      `appID` / `package_name` / fingerprints are known
-- **Open questions**: —
+- **Open questions**: none yet
 
 ---
 
 ## Milestones
 
-### M0 — Project setup
+### M0: Project setup
 
 - [ ] Platform set decided + logged in DECISIONS.md
 - [ ] CLAUDE.md filled in with project identity (app name, what it
       does, tech-stack specifics, design tokens)
 - [ ] PARITY.md skeleton sections filled in with intended verbs
-- [ ] **Web** — `index.html`, `css/styles.css`, `js/app.js` first
-      render; GitHub Pages enabled
-- [ ] **Apple (universal)** — Xcode project created at repo root
-      (no spaces); iPhone + iPad + Mac + Apple TV destinations on ONE
-      target; `apple/` files moved into the Xcode group preserving
+- [ ] **Web**: runs locally out of the box
+      (`python3 -m http.server 8080`, then http://localhost:8080);
+      `index.html`, `css/styles.css`, `js/app.js` render your first
+      view; GitHub Pages enabled
+- [ ] **Apple (universal)**: the repo ships starter files, not a
+      project. Create the Xcode project at repo root per
+      `apple/README.md` (no spaces in the name); iPhone + iPad + Mac +
+      Apple TV destinations on ONE target; `apple/` files moved into the Xcode group preserving
       the Core / iOS / macOS / tvOS split; `AppVersion.xcconfig`
       referenced by both Debug + Release configs; empty shell runs on
       the iOS, macOS, and tvOS destinations
-- [ ] **Android** — `android/` opened in Android Studio; package
-      renamed from `com.example.appname` to your reverse-DNS;
-      `:app:assembleDebug` succeeds; smoke-test on emulator
-- [ ] **CI / submission** — `appstore-build.yml` cloud workflow (one
-      covers iOS + macOS + tvOS) with the 7 signing secrets seeded
-      (see `docs/CLOUD-SUBMISSION.md`); GH Actions `android-build.yml`
-      + `tools/submit-play.sh` for Play
+- [ ] **Android**: `cd android && ./gradlew :app:assembleDebug`
+      builds out of the box; open `android/` in Android Studio; rename
+      the package from `com.example.appname` to your reverse-DNS and
+      rebuild; smoke-test on a device or emulator
+- [ ] **CI / submission**: `.github/workflows/appstore-build.yml`
+      (one workflow covers iOS + macOS + tvOS) with the seven signing
+      secrets seeded per `docs/CLOUD-SUBMISSION.md`;
+      `.github/workflows/android-build.yml` for CI builds and
+      `.github/workflows/play-release.yml` to publish to Play (internal
+      track first, then promote)
 - [ ] First commit pushed
 
-### M1 — [First user-visible capability]
+### M1: [First user-visible capability]
 
 <!-- One sentence: what can a user DO after this milestone? -->
 
@@ -70,18 +83,20 @@ Before implementing, run the `learning-orientation-design` skill:
 
 - [ ] Web: …
 - [ ] iOS: …
+- [ ] macOS: …
 - [ ] tvOS: …
 - [ ] Android: …
 
 **Parity check**: update PARITY.md row(s) for this capability in
 the same change set. Reject the PR if PARITY.md is silent.
 
-### M2 — [Second user-visible capability]
+### M2: [Second user-visible capability]
 
 - Learning-orientation check passed
 - **Acceptance**:
   - [ ] Web: …
   - [ ] iOS: …
+  - [ ] macOS: …
   - [ ] tvOS: …
   - [ ] Android: …
 
@@ -90,9 +105,9 @@ the same change set. Reject the PR if PARITY.md is silent.
 ## When to add a binding design doc
 
 When a platform crosses ~5 views OR you find yourself making
-inconsistent UI choices, create that platform's binding doc —
-`tvOS-DESIGN.md`, `iOS-DESIGN.md`, `macOS-DESIGN.md`, `WEB-DESIGN.md`,
-`ANDROID-DESIGN.md` — seeded from the matching per-platform template
+inconsistent UI choices, create that platform's binding doc
+(`tvOS-DESIGN.md`, `iOS-DESIGN.md`, `macOS-DESIGN.md`, `WEB-DESIGN.md`,
+`ANDROID-DESIGN.md`), seeded from the matching per-platform template
 in `docs/templates/` (start from `PLATFORM-DESIGN-template.md`, the
 index). Invoke
 `binding-design-doc-discipline` for the workflow. Treat as binding
@@ -109,7 +124,7 @@ never steals focus) are stated explicitly so they don't get
 ## Open questions
 
 <!-- Add questions as they arise; remove when resolved. Don't
-     accumulate — every question should have a path to resolution. -->
+     accumulate. Every question should have a path to resolution. -->
 
 ---
 
@@ -120,7 +135,7 @@ re-litigate them. "We thought about this and chose not to design it
 now" is far more useful than silently re-arriving at the same answer.
 
 When a request gets declined, write a row. Format:
-`**Idea** — Why declined. Revisit when …` (revisit condition lets
+`**Idea**: Why declined. Revisit when …` (revisit condition lets
 the entry retire when circumstances change).
 
 | Idea | Why declined | Revisit when |
@@ -132,14 +147,14 @@ the entry retire when circumstances change).
 ## Session log
 
 <!-- Append-only. Format: state found → work done → state left.
-     Keep entries short — one paragraph per session. -->
+     Keep entries short: one paragraph per session. -->
 
-**2026-08-24 — Windows scaffold + Tidbits lessons ported.** Found: sixth-gen
+**2026-08-24: Windows scaffold + Tidbits lessons ported.** Found: sixth-gen
 template with docs/windows/ present but no `windows/` source scaffold, a
 WINDOWS-STORE-SUBMISSION.md that was an unadapted Tidbits copy (real Store
 IDs), a playbook describing a pre-ship layout, and no vendored Windows skill.
 Done: committed the `windows/` scaffold (AppName.Core / .App / .HeadlessTests /
-.Windows — the as-shipped Tidbits architecture with every version gotcha
+.Windows: the as-shipped Tidbits architecture with every version gotcha
 pre-solved; builds clean, 11 headless tests pass, shell PNGs verified light +
 dark at 1180×760 and the 900×680 floor, versions stamped from
 AppVersion.xcconfig); generalized WINDOWS-STORE-SUBMISSION.md (placeholders +
@@ -153,8 +168,8 @@ shapes); README tree/step-12 + CONTRIBUTING now name the scaffold. Left: green;
 Store assets (7 PNGs) intentionally not generated (per-app branding);
 first-Windows-run baselines armed via `-f update_baselines=true` as documented.
 
-**2026-08-24 (second pass) — parity + store-approval robustness.** Found: the
-scaffold wave left three lesson families unported — multi-store IAP release
+**2026-08-24 (second pass): parity + store-approval hardening.** Found: the
+scaffold wave left three lesson families unported: multi-store IAP release
 choreography, Play pre-launch/publish traps, and the parity-audit method
 lessons. Done: new `docs/store/IAP-RELEASE-CHOREOGRAPHY.md` (financial
 paperwork as owner-only critical path, one-review-submission-per-IAP-product /

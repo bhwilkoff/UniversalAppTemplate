@@ -71,6 +71,10 @@ body {
   line-height: 1.5;
   color: var(--color-text);
   background: var(--color-bg);
+  /* 100vh first: a browser without dvh (Chromium < 108 — every 2022-and-older
+     Samsung TV) drops the dvh declaration entirely, and without a fallback the
+     whole flex layout collapses. */
+  height: 100vh;
   height: 100dvh;
   display: flex;
   flex-direction: column;

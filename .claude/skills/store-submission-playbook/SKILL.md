@@ -1,6 +1,6 @@
 ---
 name: store-submission-playbook
-description: Use when preparing ANY store submission — App Store (iOS/iPadOS/tvOS/macOS), Google Play, or the Microsoft Store — including TestFlight/internal-track setup, store listings, screenshots, signing, review prep, in-app purchase launches, and the post-approval follow-ups. Carries the cross-store checklist and the expensive gotchas pre-paid - layered tvOS icons, Play App Signing vs upload-key fingerprints, AASA/assetlinks serving, the personal-account 12-tester rule, screenshot automation via env hooks, privacy manifests, account-deletion requirements, the one-submission-per-IAP-product rule and the Ready-to-Submit trap, per-platform License Agreement settings, and the pre-launch-report-is-Test-Lab reality. Triggers on App Store submission, Play Console, TestFlight, app review, store listing, screenshots, signing, archive build, assetlinks, AASA, privacy manifest, release prep, in-app purchase, IAP, subscription launch, paywall empty, pre-launch report, Ready to Submit.
+description: "Use when preparing ANY store submission (App Store iOS/iPadOS/tvOS/macOS, Google Play, Amazon Appstore, Roku, Samsung Tizen, Microsoft Store): TestFlight/internal tracks, listings, screenshots, signing, review prep, IAP launches, post-approval follow-ups. Carries the cloud-and-CLI default pathway, floors chosen by hardware, layered tvOS icons, Play App Signing vs upload-key fingerprints, AASA/assetlinks serving, the 12-tester rule, screenshot env hooks, privacy manifests, account deletion, one-submission-per-IAP-product and Ready-to-Submit traps, pre-launch report = Test Lab, driving a store console in a browser, and the Roku / Amazon / Fire TV / Tizen traps. Triggers on App Store submission, Play Console, TestFlight, app review, store listing, screenshots, signing, assetlinks, AASA, privacy manifest, release prep, IAP, paywall empty, Ready to Submit, Roku dashboard, certification, Amazon Appstore, Fire TV, Tizen."
 ---
 
 # Store Submission Playbook
@@ -11,19 +11,16 @@ App Store (iOS + tvOS + macOS approved), Play (internal track +
 production prep), plus web (no gate — which is exactly why the web
 build ships first and continuously).
 
-## The DEFAULT pathway is now the cloud, not your Mac
+## The DEFAULT pathway is the cloud, and the whole ship is CLI
 
-**Build + upload from a hosted CI runner (a GitHub `macos-26`-class
-runner), not the dev Mac.** See the `cloud-appstore-submission` skill
-(Apple) and `play-cli-submission` (Play) — these are the primary
-paths; the manual/Xcode-Organizer steps below are the FALLBACK.
+**Build, upload AND submit from a hosted CI runner, not the dev Mac.** See `cloud-appstore-submission` (Apple build, sign, upload), `apple-app-store-cli-submission` (version, attach, review) and `play-cli-submission` (Play). The manual/Xcode-Organizer steps below are the FALLBACK.
 
-Why the flip: a dev Mac running a **beta OS** gets `ITMS-90301` on
-upload (App Store won't accept a build from a prerelease OS), and the
-installed Xcode version drifts below App Review's floor, so uploads
-recur `ITMS-90111`. A clean hosted runner sidesteps both. **TestFlight
-still accepts beta-Mac builds** — so local upload stays useful for
-internal testing, just not for submission-for-review.
+- **Apple:** `gh workflow run appstore-build.yml -f platform=all -f notes="..."` builds, waits for the build to go VALID, and submits every platform through `tools/asc_release.py` (three versions, three reviewSubmissions). Nobody opens App Store Connect to press Submit, and you never ask the owner to. `appstore-submit.yml -f mode=status` reads the result back.
+- **Play:** `gh workflow run play-release.yml` publishes to internal; a person uses it on a real device; `-f promote=<versionCode>` moves the same artifact to production.
+
+Why the cloud: a dev Mac running a **beta OS** gets `ITMS-90301` (App Store won't accept a build from a prerelease OS), and a local Xcode drifts below App Review's floor (`ITMS-90111`). **TestFlight still accepts beta-Mac builds**, so local upload stays useful for testing, just not for review.
+
+**Floors are chosen by hardware.** Pick each deployment target by the devices it reaches (test-build at each candidate floor), never by adoption share, and hold it with `tools/test_ios_floor.py` / `test_tvos_floor.py` in `appstore-build.yml`. A raised floor silently stops the store offering the app to older devices. The same holds for Android and Fire TV: Fire OS 7 is API 28, and a `minSdk` of 29 once hid an app from 60 of 98 Fire TV devices (`tools/audit_fire_tv_manifest.py`).
 
 ## Sequencing rule
 
@@ -42,8 +39,8 @@ them as an explicit OWNER list.
   A mismatched `versionName` in a store listing screenshot is a
   real, recurring embarrassment — check it in the artifact, not
   the source.
-- **Listing doc in the repo** (`docs/app-store-listing.md`,
-  `docs/play-store-listing.md`): every field paste-ready — name,
+- **Listing doc in the repo** (you create `docs/app-store-listing.md`
+  and `docs/play-store-listing.md`): every field paste-ready — name,
   subtitle/short description, full description, keywords, URLs,
   copyright, release notes. Written once, reused every release; the
   human pastes, never composes in the console.
@@ -153,6 +150,16 @@ Shares the Apple pre-flight above; the Mac-specific gates:
   release) rides the same submit, so check what the N contains
   before clicking.
 
+## Amazon Appstore, Fire TV, and Samsung Tizen
+
+- **Amazon: reuse the one open edit.** The App Submission API allows one open edit per app; creating another fails. Find and reuse it, and never delete an edit someone else opened.
+- **Amazon: a minSdk conflict needs delete-then-upload.** When the new APK's device targeting conflicts with the live one, remove the old APK from the edit first, then upload.
+- **Fire TV filters by manifest before anyone can download.** Run `tools/audit_fire_tv_manifest.py` before every Amazon upload: `minSdk <= 28`, every `<uses-feature>` optional, both `armeabi-v7a` and `arm64-v8a`, a leanback launcher activity. Amazon's "Target your app" page shows the device count ("Fire TV (98): 38 selected"); read it after every upload. A fix that is built but not uploaded is not a fix.
+- **Tizen: hide competing-store links.** Samsung rejects a TV app that links to another store.
+- **Tizen: anchor every `sed` on `config.xml`.** An unanchored version substitution rewrote `<?xml version="1.0"?>` and corrupted the manifest.
+- **Tizen: no spaces in the `.wgt` file name.** Install fails silently.
+- **Tizen: the certificate's DUID list is edited through the small `+`** in the certificate manager, and the certificate password is kept apart from the key file. Runbook: `docs/store/tizen-submission.md`.
+
 ## Web (the no-gate platform)
 
 No review — but the deep-link infrastructure other stores depend on
@@ -161,6 +168,88 @@ GitHub Pages — Jekyll silently drops dot-directories), HTTPS
 enforced, share URLs render a real landing (a 404-forwarder into
 the app router makes every native share URL meaningful even before
 the web feature exists).
+
+## Driving a store console in a browser (Roku, 2026-09-08)
+
+An agent can do most of a submission. What it cannot do is specific,
+and knowing which is which saves an hour of guessing.
+
+**Can:** create the app record, paste names and descriptions, upload
+images and the signed package through the `<input type=file>` (find
+the input by ref and upload to it — never click it, that opens a
+native dialog nothing can see), set every dropdown and radio, run
+the automated analyses, fix what they report, re-package and
+re-upload.
+
+**Cannot, and should hand back immediately:** sign-in and CAPTCHA;
+anything gated on an email the agent has no access to; a content
+judgement the owner owns.
+
+### The traps
+
+- **A console button can succeed and show you nothing.** Roku's
+  "Verify developer account email" fires
+  `POST /sendVerificationEmail` → 200 and renders no toast, no state
+  change, nothing. It looked broken for an hour. When a click appears
+  to do nothing, read the NETWORK LOG before concluding it failed.
+- **The gating email may be a different address than the one on the
+  developer record.** Roku wanted the ROKU ACCOUNT email verified;
+  the developer contact email was another address entirely, on
+  another page. The dashboard displayed the one it wanted — read it.
+- **Navigating away loses an unsaved form**, and a form whose
+  required fields are incomplete cannot be saved at all. Fill and
+  save one page before opening the next; if a required field is
+  missing (a phone number, say), look for it on the ACCOUNT record
+  before asking the owner — it is often already there.
+- **A required field can hide below the fold of a page you think you
+  finished.** Roku's content rating, kids designation and category
+  all live at the bottom of "Listing setup", under Countries. Read
+  the whole page text, not the first screen.
+- **A checklist in your own repo drifts into fiction.** Two rows of
+  a submission doc said an asset was missing when it had existed for
+  months (a privacy policy, a designed poster). Verify against the
+  repo and the live site before telling the owner to make something.
+
+### Pre-flight everything the console does not gate
+
+Run the local checks BEFORE touching the console — they are free and
+they catch things a reviewer would not forgive. On the last pass this
+found the manifest still declaring `major_version=0`, so the first
+store upload would have been named "0.1.51".
+
+### Judge the store assets by the REVIEWER's first impression
+
+A certification reviewer opens the deep link you hand them and the
+screenshots you upload. Those are chosen on evidence, not
+convenience:
+
+- **Pick the demo title on rights clarity, playability and
+  recognisability — in that order, all three measured.** A film that
+  is public domain by AGE (pre-1930) beats one that is public domain
+  by a notice defect, whatever its fame. Then verify it actually
+  plays on the device: the famous alternative failed with
+  `state=stop error=true` because it was a 4K upscale.
+- **Screenshots must not show your own test residue.** A sideload
+  keeps the channel's registry, so a "Continue Watching" row can
+  quietly display the film you deep-linked minutes earlier. DELETE
+  and re-install before shooting, not just redeploy.
+
+### Certification findings are a design conversation, not a checklist
+
+Roku static analysis went 12 findings (one Error) → 3 warnings. Two
+of the three survive DELIBERATELY: adopting `rsg_version=1.3` would
+silence them and force a minimum firmware of 15.1, locking out every
+older device — including the owner's own. Record the refusal and its
+reason in the manifest itself, or the next person "fixes" it.
+
+### Roku store lessons (certification and the dashboard)
+
+- **"Validated" is not "registered".** The search feed validator passing does not mean Roku ingested the feed. Confirm registration separately.
+- **Keep the beta channel's package in sync with the store package.** Deep-link certification runs against what is submitted; a stale beta package fails it.
+- **The package upload is automatable.** The dashboard's dropzone is an `input.dzu-input`; upload to it by ref like any other file input.
+- **App Behavior Analysis must be started by hand.** It does not run on upload; start it, wait, read it.
+- **Ask the device what it installs.** Query the device for its supported package formats before building for it, rather than assuming.
+- **Never automate `genkey`.** The signing key is created once, by a person, and its credentials live where the packaging tool looks (`~/.config/roku/signing.env`). A regenerated key orphans the published channel.
 
 ## In-app purchases (any store) — the launch choreography
 

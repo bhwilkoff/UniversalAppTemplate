@@ -1,6 +1,6 @@
 ---
 name: ios-share-extension
-description: Use when adding an iOS Share Extension (share-sheet target) to an app — receiving images/video/URLs/text from other apps, handing the payload to the containing app via an App Group, and the ONE working pattern for opening the containing app from the extension (UIResponder chain + open:options:completionHandler: with nil options). Every rejected approach is documented so it is never retried. Also carries the zero-cost web-app counterpart (a user-built iOS Shortcut that opens a compose URL). Triggers on Share Extension, share sheet, NSExtension, extensionContext, App Group handoff, "share to my app", openURL from extension, LSApplicationQueriesSchemes.
+description: "Use when adding an iOS Share Extension (share-sheet target) to an app — receiving images/video/URLs/text from other apps, handing the payload to the containing app via an App Group, and the ONE working pattern for opening the containing app from the extension (UIResponder chain + open:options:completionHandler: with nil options). Every rejected approach is documented so it is never retried. Also carries the zero-cost web-app counterpart (a user-built iOS Shortcut that opens a compose URL). Triggers on Share Extension, share sheet, NSExtension, extensionContext, App Group handoff, \"share to my app\", openURL from extension, LSApplicationQueriesSchemes."
 ---
 
 # iOS Share Extension

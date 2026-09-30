@@ -1,6 +1,8 @@
+using System;
 using System.Linq;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.Input;
 using FluentAvalonia.UI.Controls;
 using AppName.App.ViewModels;
@@ -24,7 +26,9 @@ public partial class MainWindow : Window
             if (ContentHost.Content is null)
                 Navigate((Nav.SelectedItem as FANavigationViewItem)?.Tag as string ?? "home");
             // Deep-link inbox: parse Program.LaunchUrl here and Select() the target —
-            // external entry points never mutate navigation directly.
+            // external entry points never mutate navigation directly. Test doors
+            // (LaunchHooks, DEBUG only) are consumed in the same place.
+            OpenDoors();
         };
 
         // App-level accelerators — the Windows twin of the macOS menu commands.
@@ -35,6 +39,18 @@ public partial class MainWindow : Window
             Gesture = new KeyGesture(Key.OemComma, KeyModifiers.Control),
             Command = new RelayCommand(() => Navigate("settings")),
         });
+    }
+
+    private void OpenDoors()
+    {
+        if (LaunchHooks.StartTab is { } tab)
+            Select(tab);
+        if (LaunchHooks.StartItem is { } item)
+            ContentHost.Content = new TextBlock { Text = $"Item: {item}" };  // FILL IN: open the item's detail view
+        // End the door's activity on the app's own clock (stop playback, leave the
+        // room) so a crashed harness cannot leave it running.
+        if (LaunchHooks.DoorSeconds is { } seconds)
+            DispatcherTimer.RunOnce(() => Select("home"), TimeSpan.FromSeconds(seconds));
     }
 
     /// Select a nav item by tag (keeps the sidebar highlight and the content in step).

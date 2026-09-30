@@ -1,6 +1,6 @@
 ---
 name: macos-platform-patterns
-description: Use before any macOS app shell / player / hero / browse / window / document / image work. The macOS umbrella skill — the pointer+keyboard+menu+resizable-multi-window rebuild of a shared app (never the iOS app resized), the NavigationSplitView shell, when to drop to AppKit, player-as-window-root, the no-externalMetadata trap, the full-width hero + fill-image layout trap, the ImagePipeline + grayscale-decode fix, structured-concurrency-not-Combine-timers, NSWorkspace companion deep links, Mac App Store sandbox/TCC requirements, and the Library≠Project frame for a heavy Mac-exclusive feature. Triggers on macOS, Mac app, NavigationSplitView, .commands, WindowGroup, DocumentGroup, NSView, NSCollectionView, AVPlayerView, NSWorkspace, App Sandbox, hardened runtime, macOS hero, "the player bleeds through", "hero doesn't extend", grayscale poster, "resized iOS app".
+description: "Use before any macOS app shell / player / hero / browse / window / document / image work. The macOS umbrella skill — the pointer+keyboard+menu+resizable-multi-window rebuild of a shared app (never the iOS app resized), the NavigationSplitView shell, when to drop to AppKit, player-as-window-root, the no-externalMetadata trap, the full-width hero + fill-image layout trap, the ImagePipeline + grayscale-decode fix, structured-concurrency-not-Combine-timers, NSWorkspace companion deep links, Mac App Store sandbox/TCC requirements, and the Library≠Project frame for a heavy Mac-exclusive feature. Triggers on macOS, Mac app, NavigationSplitView, .commands, WindowGroup, DocumentGroup, NSView, NSCollectionView, AVPlayerView, NSWorkspace, App Sandbox, hardened runtime, macOS hero, \"the player bleeds through\", \"hero doesn't extend\", grayscale poster, \"resized iOS app\", menu bar, truncated button, ViewThatFits, More menu, slider, scrollWheel, .offset hit-test, window close stops playback."
 ---
 
 # macOS Platform Patterns
@@ -79,6 +79,32 @@ If the Mac earns a feature the touch/TV/web platforms can't host (a document edi
 - **No-auto-edit learning gate.** Any "automatic" assist must yield an EDITABLE result the user shapes, never a one-tap finished artifact — automate the mechanical, preserve the meaningful (`learning-orientation-design`).
 
 Cross-link a project `macos-native-app-shell` skill if one exists.
+
+## Rule 12: Every command is in the menu bar
+
+HIG: *"Even when commands are available elsewhere in your app, it's important to list them in the menu bar."* AW's Mac app shipped with three custom menu items; sidebar sections, Search, Back and every Detail action had no item and no key. Build it through `.commands`:
+
+- **Order**: App, File, Edit, View, then the app's own menus general to specific (Go, the item's menu, player Controls, editor menus), then Window, Help.
+- **Go** carries the sidebar sections (⌘1…⌘9), Search ⌘F (focuses the field), Back ⌘[.
+- **No menu item takes a bare key** (a letter or arrow in the menu bar steals it from text fields); a canvas keeps its own bare keys while it has focus.
+- **One key, one live meaning**: a command that belongs to a kind of window is enabled only while that window is key, via `focusedSceneValue`. **Disable, never hide**: menus keep their shape in every window.
+- Help ▸ App Help ⌘? points somewhere real (a support page), never the system placeholder.
+- Verify by reading the menu bar back through Accessibility and pressing items there, not by pointer clicks.
+
+## Rule 13: A button says what it does at every window width
+
+No truncation ("Add to Pl…"), no wrapping (a flow layout reflows seven buttons into ragged rows), no icon-only fallback (an icon with a tooltip is an abbreviation with extra steps). A row of actions keeps a SMALL FIXED SET of primaries and folds the rest into one native **More** menu whose items keep their full names. Choose the arrangement with `ViewThatFits(in: .horizontal)` over arrangements each DESIGNED, and put `.fixedSize()` on every control AND the row: without it the first arrangement always "fits" by squeezing and `ViewThatFits` never chooses. Declare each action ONCE (an enum rendered as a control or as a menu item); two parallel lists drift. The rule reaches past buttons: names under portraits get two lines with `reservesSpace: true`, never an ellipsis. (AW Decision 134.)
+
+## Rule 14: Direct manipulation over sliders; the two AppKit event facts
+
+When a control describes something already on screen, put the control ON the thing: drag inside to move, a corner to resize, an edge to reshape, scroll to zoom, ⌥-drag to pan (OBS's canvas pattern). Sliders in another column are a second description of a picture the person is already looking at. Keep a readout and a Reset beside it for precision. Publish the geometry the renderer actually uses rather than re-deriving it in the view. (AW Decision 135.)
+
+- **`.offset` is a RENDER transform.** The `NSView` behind an offset SwiftUI view stays where it was laid out, so a representable backing an offset view reports the wrong frame. Move with layout (`.position`, frames), not `.offset`, when AppKit must hit-test it.
+- **`scrollWheel` needs a local `NSEvent` monitor.** AppKit sends it to `hitTest`'s view and up THAT responder chain; a representable in `.background` is a sibling of the hosting view and never on it (`.overlay` just trades it for a dead drag). A local monitor sees the event first and can check whether the pointer is over the target.
+
+## Rule 15: Closing a window ends what it was doing; a view being rebuilt is not a window being closed
+
+On macOS the red button is a close, not a quit. A player surface that goes away pauses, drops its item, releases its player, and tells every singleton holding it to let go; otherwise sound plays with no transport left to stop it and the next open starts a second copy. But SwiftUI also tears views down for reasons that have nothing to do with the window. Before releasing a resource a surface owns, ask whether something longer-lived is using it (an engine, a broadcast, a shared session). When the view's lifetime and the longer one disagree, the longer one wins and whatever ends it cleans up. AW's version of the bug: an unconditional teardown on rebuild blacked out a live broadcast in 2 of 8 runs while every log line read healthy, so guard it with a source-invariant test, not a run. (AW macOS-DESIGN §D12, §D12a.)
 
 ## See also
 

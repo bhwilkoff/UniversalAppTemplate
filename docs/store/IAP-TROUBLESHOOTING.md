@@ -10,7 +10,7 @@ show the same sentence for both:
 
 | what happened | `lastError` | means |
 |---|---|---|
-| the call **threw** | set | StoreKit could not reach the store — network, sandbox, entitlement |
+| the call **threw** | set | StoreKit could not reach the store (network, sandbox, entitlement) |
 | the call **succeeded with `[]`** | **nil** | the store answered, and had nothing to return for these ids |
 
 The screenshot showed the fallback sentence, not a StoreKit error, so `lastError`
@@ -25,7 +25,7 @@ empty case and prints an ordered checklist to the console.
 
 - **Product ids match.** Code and `Tidbits.storekit` agree exactly:
   `…club.lifetime`, `…club.annual`, `…club.monthly`.
-- **The local StoreKit config is well-formed** — lifetime as a non-consumable,
+- **The local StoreKit config is well-formed**: lifetime as a non-consumable,
   monthly/annual in the `Tidbits Club` group at P1M/P1Y.
 - **The client retries.** Three attempts with backoff; a cold-launch empty is
   already handled (that was the App Review fix in `appreview-2026-07-28`).
@@ -33,7 +33,7 @@ empty case and prints an ordered checklist to the console.
 
 ## The remaining causes, in order of likelihood
 
-1. **Agreements, Tax, and Banking — the Paid Applications agreement is not
+1. **Agreements, Tax, and Banking: the Paid Applications agreement is not
    Active.** Until it is, App Store Connect returns NOTHING for every product of
    every app on the account. This is the most common cause by a wide margin and
    it looks exactly like a broken client. Owner-only; it needs banking and tax

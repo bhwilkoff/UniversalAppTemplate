@@ -1,6 +1,6 @@
 ---
 name: multiplatform-expansion-method
-description: Use when planning to add a platform to an existing app (iOS app going to web/Android/tvOS, etc.), sequencing a multi-platform buildout, or scoping how much of an existing codebase a new platform can reuse. Carries the find-the-seam analysis (data plane vs platform layer), platform sequencing by reuse leverage, the hard-ports checklist, per-platform stack table, and when to author design docs and contracts. Triggers on "port to Android", "add a web version", "Apple TV version", multiplatform plan, platform expansion, "how much can we reuse", buildout sequencing.
+description: "Use when planning to add a platform to an existing app (iOS app going to web/Android/tvOS, etc.), sequencing a multi-platform buildout, or scoping how much of an existing codebase a new platform can reuse. Carries the find-the-seam analysis (data plane vs platform layer), platform sequencing by reuse leverage, the hard-ports checklist, choosing platform floors by hardware reach (test-build, CI-held floor, capability tiers), per-platform stack table, and when to author design docs and contracts. Triggers on 'port to Android', 'add a web version', 'Apple TV version', multiplatform plan, platform expansion, 'how much can we reuse', buildout sequencing, deployment target, minSdk, 'support older devices', platform floor, capability tiers, pure-function rule seam."
 ---
 
 # Multiplatform Expansion Method
@@ -75,15 +75,86 @@ views.
   "responsive web wrapper" per platform (violates feature parity,
   not design consistency).
 
+## Step 3b: Choose floors by hardware reach
+
+A deployment target is a list of devices, not a style preference.
+The template's 26 baseline is a default for a new app; lower it when
+the owner wants older hardware served, and measure before promising.
+
+1. **Floor by hardware reach, not by OS novelty.** Map each candidate
+   OS to the devices it runs on. Archive Watch (its Decision 155 and
+   `docs/research/IOS-FLOOR.md`): iOS 17 and 18 run on the SAME
+   iPhones (XS/XR and newer), iOS 26 is what dropped XS/XR, so 18 was
+   the floor that bought hardware; 17 bought nothing extra. tvOS 26
+   already covers every Apple TV that has an App Store (Decision 148),
+   so no lower tvOS floor. Android went 29 -> 23 once measured
+   (Decision 141).
+2. **Test-build and count errors; never commit the experiment.**
+   Build at the lower target from the CLI (`IPHONEOS_DEPLOYMENT_TARGET=`,
+   or a throwaway pbxproj edit restored with `git checkout`). AW: iOS
+   18 = 17 sites in 2 files; 17 = 55 errors in 6 files; 16 = 428
+   errors (SwiftData + Observation, i.e. rewrite the data layer).
+   Android: run `lint NewApi` at the candidate `minSdk` and check the
+   manifest merge (no dependency needed more than 23).
+3. **Check the invisible blockers.** The SDK's own minimum
+   (`SDKSettings.json` `MinimumDeploymentTarget`, iOS 15 on the iOS 27
+   SDK): nothing native goes below it. TLS roots: Android 6.0-7.0 do
+   not trust Let's Encrypt, so bundle ISRG Root X1/X2 in
+   `network_security_config.xml` or the app installs and then cannot
+   fetch its data.
+4. **Hold the floor with a CI test.** A floor nobody enforces drifts
+   upward in a "cleanup" and silently drops devices with no error
+   anywhere. AW: `test_ios_floor.py` / `test_tvos_floor.py` run before
+   archiving and refuse a target above the chosen floor; Android keeps
+   `lint NewApi` clean for every flavor before release.
+5. **Gate features above the floor; the floor is not a ceiling**
+   (Decision 154). New APIs go behind `#available` /
+   `Build.VERSION.SDK_INT` with a working floor path, or the feature
+   is simply absent below it. Never raise the floor for one feature.
+   A stored property cannot carry `@available`: store it untyped and
+   expose a gated accessor.
+6. **Pin libraries strictly or not at all.** Holding one library for
+   the floor while another drags its transitive dependency forward
+   compiles cleanly and crashes at runtime (AW: material3 held, Coil
+   pulled Compose foundation ahead, `AbstractMethodError` on Google
+   TV). Add a strict constraint so skew fails the BUILD, with a
+   negative control proving it does.
+7. **Very old OS versions are the website's job.** Below the SDK
+   minimum, serve the web app, and audit it for that browser (optional
+   chaining, `??`, flex `gap`, `dvh`, `aspect-ratio`,
+   `DecompressionStream` all have Safari floors).
+8. **The store's device count is the only visible minSdk
+   regression** (Decision 115). CI green, APK correct, store LIVE, and
+   Fire TV still showed 38 of 98 devices because an old high-minSdk
+   binary was the live one; after the fix, 91. Read the count after
+   every release on stores that publish it.
+9. **Record it.** An "Oldest hardware served" row in PARITY.md per
+   platform, and a DECISIONS entry naming the floor, the measurement,
+   and what is still unverified on real hardware.
+
+**Capability tiers, not effort tiers.** What a device offers is
+decided by what its hardware and OS permit, never by how much we have
+built. Legacy never sets the ceiling: gate the AFFORDANCE on the old
+tier and keep the implementation whole (AW Roku `AWCan("shareList")`
+hides the row; the QR encoder stays complete). Gate on a hardware
+predicate (`hasCamera && hasMicrophone`, `FEATURE_CAMERA_ANY`), never
+on form factor (`isTelevision()`). A capability a device can NEVER
+have is omitted, with the reason in PARITY.md; one it currently lacks
+(unconfigured sign-in, permission not granted) gets a sentence on
+screen. See `universal-feature-states` and
+`smart-tv-platform-expansion`.
+
 ## Step 4 — Plan the hard ports explicitly
 
 List the features that are NOT a view rewrite and decide each one's
 strategy before the wave starts:
 
-- **Deterministic engines** (schedulers, queues): port the LOGIC
-  with identical constants/seeds — same hash function, same anchor
-  times — then verify cross-platform agreement on a fixed seed.
-  Rebuild only the layout natively.
+- **Deterministic engines** (schedulers, queues): first ask whether
+  the pipeline can compute the result and publish it (Rule 0 in
+  `cross-platform-determinism`). Only when it must run on-device,
+  port the LOGIC with identical constants/seeds (same hash function,
+  same anchor times) and verify cross-platform agreement on a fixed
+  seed. Rebuild only the layout natively.
 - **Media playback**: each platform binds its native player
   (AVKit / Media3 / `<video>`); resilience strategy per
   `resilient-media-streaming`. Lock-screen/MediaSession integration
@@ -96,6 +167,27 @@ strategy before the wave starts:
   in PARITY.md.
 - **Shaders/visual effects**: per-platform implementations (Metal /
   AGSL / WebGL-CSS) — schedule last, optional.
+
+### The rule is a value; the platform is a caller
+
+Write every decision rule (a stall detector, a thermal step-down, a
+sync correction, a capability predicate) as a pure function or value
+type with its inputs injected: health ticks in, "re-attach?" out;
+offset and rate in, a correction out. The platform owns the camera,
+player, or clock and applies the returned value. That one shape is
+both the TEST seam (the rule runs in a unit test with no device) and
+the PLATFORM seam (each port calls the same rule). AW's
+`CameraStallRecovery` is a Swift value type ported to Kotlin
+"thresholds and all", and the Kotlin unit test asserts the same
+nine cases the spec lists.
+
+Two traps (AW Decision 133):
+- **A shared type is not a shared path.** Putting a behavior in a
+  shared type does not mean every platform executes it; AW added
+  stall recovery to a session type that iOS never started. Before
+  adding to a shared type, confirm which platforms run that code.
+- **Prove a control where its value lands** (the engine, the wire,
+  the recording), never by watching the control move.
 
 ## Step 5 — Keep the matrix true while you go
 

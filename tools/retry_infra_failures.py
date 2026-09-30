@@ -37,7 +37,7 @@ RUNNING, which always has jobs with steps. Zero jobs therefore means nothing was
 interrupted and nothing partially applied — the same "no side effect" property the
 first pass relies on.
 
-The same displacement also happens at JOB granularity to the Decision-066 split
+The same displacement also happens at JOB granularity to the compute/apply split
 workflows: a run's compute succeeds, and only its short pending `apply` job is
 destroyed in the queue. Every non-successful job having ZERO steps carries the
 identical no-side-effect guarantee, and such a run gets `rerun-failed-jobs` —
@@ -211,12 +211,12 @@ def supersession_shape(repo: str, run_id: int) -> str | None:
     before the check learned it).
 
     Returns "jobs" when SOME jobs succeeded and every non-successful job has
-    zero steps. This is the Decision-066 split's failure mode, measured
+    zero steps. This is the compute/apply split's failure mode, measured
     2026-08-24 on codec-audit: the probe job succeeded in 4 minutes and banked
     its deltas as an artifact, its 2-minute apply job then sat 70 minutes
     pending on `catalog-writers` behind a whole-run holder, and the moment the
     lock freed a newer arrival displaced it — GitHub keeps ONE pending job per
-    group (Decision 057, at job granularity). The old all-jobs test read the
+    group (the one-pending-run-per-group rule, at job granularity). The old all-jobs test read the
     probe's steps as "a running job was stopped" and left the work stranded.
     Re-running ONLY the displaced jobs repeats nothing: they never ran a step,
     the succeeded jobs are not re-run, and the artifact they banked persists.

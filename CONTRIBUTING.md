@@ -1,10 +1,10 @@
 # Contributing
 
-This is a quint-platform template — web + iOS/iPadOS + macOS + tvOS +
-Android in one repo, with Windows as an optional sixth platform
-(`windows/`). The contribution rules below keep the platforms in
-lockstep. (The three Apple platforms — iOS, macOS, tvOS — build from
-one universal target and one shared `Core/`.)
+This is the universal app template: web, iOS/iPadOS, macOS, tvOS and
+Android in one repo, with Windows (`windows/`), the smart-TV web
+platforms and Roku as optional additions. The contribution rules below
+keep the platforms in lockstep. (The three Apple platforms, iOS, macOS
+and tvOS, build from one universal target and one shared `Core/`.)
 
 ## The parity rule
 
@@ -21,15 +21,20 @@ Reject PRs that ship a user-facing change without touching PARITY.
 | | Web | iOS / macOS / tvOS (one target) | Android |
 |---|---|---|---|
 | Tests pass | `node js/api.test.js` | `⌘U` in Xcode | `./gradlew :app:testDebugUnitTest` |
-| Build clean | open in any browser | `xcodebuild build` against the iOS, macOS, AND tvOS destinations — a shared `Core/` change that breaks any Apple platform is not done | `./gradlew :app:assembleDebug` |
-| Version bumped (if shipping) | n/a — GitHub Pages | `AppVersion.xcconfig` | `app/build.gradle.kts` `versionCode` + `versionName` |
+| Build clean | open in any browser | `xcodebuild build` against the iOS, macOS, AND tvOS destinations. A shared `Core/` change that breaks any Apple platform is not done. | `./gradlew :app:assembleDebug` |
+| Version bumped (if shipping) | n/a (GitHub Pages) | `AppVersion.xcconfig` | `app/build.gradle.kts` `versionCode` + `versionName` |
 | Docs touched | `WEB-DESIGN.md` if UI/IA changed | `iOS-DESIGN.md` / `macOS-DESIGN.md` / `tvOS-DESIGN.md` if UI/IA changed | `ANDROID-DESIGN.md` if UI/IA changed |
 | PARITY.md row | ✅ | ✅ | ✅ |
 
 If the Windows column is enabled: tests via `cd windows && dotnet test`
-on any OS, gated on `windows-repl.yml` (real `windows-latest` pixels);
+on any OS, gated on `windows-repl.yml` (real `windows-latest` pixels;
+copy it from `docs/windows/workflows/` into `.github/workflows/` first);
 version via `AppVersion.xcconfig` + `tools/stamp_msix_version.py`;
 `WINDOWS-DESIGN.md` if UI/IA changed; PARITY.md row like every platform.
+
+**The template's own Android build must stay green.** Run
+`cd android && ./gradlew :app:assembleDebug` before any PR that touches
+`android/`, shared assets, or the Gradle catalog.
 
 ## Conventions
 
@@ -43,19 +48,28 @@ version via `AppVersion.xcconfig` + `tools/stamp_msix_version.py`;
 - **Default to skill invocation over re-deriving patterns.** The
   bundled skills in `.claude/skills/` exist because the patterns
   came from real iteration.
+- **Prose follows `docs/maintaining/WRITING.md`.** Every page a person
+  reads first (READMEs, `docs/path/`, the catalogs) uses that voice:
+  no em dashes, none of the words on its "do not use" list.
+- **A new tool gets a row in `tools/README.md`.**
+- **A new skill gets a row in `.claude/skills/README.md`**, and a
+  trigger row in CLAUDE.md if it should fire without being asked for.
+- **Lessons learned in an app repo are upstreamed here** per
+  `docs/PROVENANCE.md`: the generic form lands in the template in the
+  same session, and the coverage map is updated.
 
 ## Style
 
 `.editorconfig` enforces indentation across editors. Per-language:
 
-- **JavaScript** — no framework, no build step, no transpile.
+- **JavaScript**: no framework, no build step, no transpile.
   ES2022+ in the browser directly. JSDoc + `// @ts-check`
   comments cover what TypeScript would.
-- **Swift** — Apple's API Design Guidelines. 4-space indent.
-  Per-platform files end `_iOS.swift` / `_tvOS.swift` and wrap in
-  `#if os(...)`; `Core/` files compile for every destination and
-  never import per-platform UI.
-- **Kotlin** — official Kotlin style (4-space indent). Apply with
+- **Swift**: Apple's API Design Guidelines. 4-space indent.
+  Per-platform files end `_iOS.swift` / `_macOS.swift` / `_tvOS.swift`
+  and wrap in `#if os(...)`; `Core/` files compile for every
+  destination and never import per-platform UI.
+- **Kotlin**: official Kotlin style (4-space indent). Apply with
   `./gradlew ktlintFormat` once ktlint is added.
 
 ## Setting up after clone
@@ -64,19 +78,20 @@ version via `AppVersion.xcconfig` + `tools/stamp_msix_version.py`;
 # 1. Web
 python3 -m http.server 8080      # http://localhost:8080
 
-# 2. Apple — open Xcode project at root (one target: iPhone/iPad/TV)
-open AppName.xcodeproj
+# 2. Apple: create the universal Xcode project at the repo root, then
+#    move the apple/ starter files into it (steps in apple/README.md).
+#    One target covers iPhone, iPad, Mac and Apple TV.
 
-# 3. Android — first build downloads SDK + AGP + deps
+# 3. Android: first build downloads SDK + AGP + deps
 cd android && ./gradlew :app:assembleDebug
 ```
 
-If any of those fails on a fresh clone, the template is broken —
-that's a P0 fix.
+If the web or Android step fails on a fresh clone, the template is
+broken. That is a P0 fix.
 
 ## Reporting issues
 
 When filing an issue, name the platform(s) it affects in the
-title (`[ios]`, `[tvos]`, `[web]`, `[android]`, or `[all]`). The
-verb/idiom mapping table in README makes it cheap to say "this
-is a search bar issue on Find" — use that vocabulary.
+title (`[ios]`, `[macos]`, `[tvos]`, `[web]`, `[android]`, `[windows]`,
+or `[all]`). Use the verbs from PARITY.md so the report is cheap to
+place: "this is a search bar issue on Find."

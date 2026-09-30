@@ -1,6 +1,6 @@
 ---
 name: authentication
-description: "Implement iOS authentication patterns including Sign in with Apple (ASAuthorizationAppleIDProvider, ASAuthorizationController, ASAuthorizationAppleIDCredential), credential state checking, identity token validation, ASWebAuthenticationSession for OAuth and third-party auth flows, ASAuthorizationPasswordProvider for AutoFill credential suggestions, and biometric authentication with LAContext. Use when implementing Sign in with Apple, handling Apple ID credentials, building OAuth login flows, integrating Password AutoFill, checking credential revocation state, or validating identity tokens server-side."
+description: "Implement iOS authentication patterns including Sign in with Apple (ASAuthorizationAppleIDProvider, ASAuthorizationController, ASAuthorizationAppleIDCredential), credential state checking, identity token validation, ASWebAuthenticationSession for OAuth and third-party auth flows, ASAuthorizationPasswordProvider for AutoFill credential suggestions, and biometric authentication with LAContext. Use when implementing Sign in with Apple, handling Apple ID credentials, building OAuth login flows, integrating Password AutoFill, checking credential revocation state, or validating identity tokens server-side. Also installed-app OAuth to third-party providers (PKCE vs Device Code, bundle-id redirect scheme, request-shape proofs, refresh-token persistence, the missing-credential state)."
 ---
 
 # Authentication
@@ -17,6 +17,7 @@ Password AutoFill, and biometric authentication.
 - [Token Validation](#token-validation)
 - [Existing Account Setup Flows](#existing-account-setup-flows)
 - [ASWebAuthenticationSession (OAuth)](#aswebauthenticationsession-oauth)
+- [Installed-app OAuth to third-party providers](#installed-app-oauth-to-third-party-providers)
 - [Password AutoFill Credentials](#password-autofill-credentials)
 - [Biometric Authentication](#biometric-authentication)
 - [SwiftUI SignInWithAppleButton](#swiftui-signinwithapplebutton)
@@ -298,6 +299,44 @@ struct OAuthLoginView: View {
 
 Callback types: `.customScheme("myapp")` for URL scheme redirects;
 `.https(host:path:)` for universal link redirects (preferred).
+
+## Installed-app OAuth to third-party providers
+
+Production lessons (Archive Watch, signing in to YouTube and Twitch
+from iOS/macOS/tvOS/Android). An installed app is a PUBLIC client: it
+can hold no client secret.
+
+- **Use the flow each provider actually offers a public client.**
+  Authorization code + PKCE (S256) where offered (Google). Where it is
+  not (Twitch offers implicit or Device Code), use the **Device Code
+  Grant**: implicit returns no refresh token, so the user re-authorizes
+  every few hours. Device Code also runs unchanged on a TV (show the
+  code + URL, poll the token endpoint). Read the provider's public-client
+  docs first; "it's OAuth 2" is not an answer.
+- **Redirect scheme = the bundle identifier**, not the reversed client
+  id. The scheme must be in `Info.plist` at BUILD time and
+  `ASWebAuthenticationSession` refuses to start without it; the reversed
+  client id is unknown until someone pastes a client id into secrets.
+- **Clients are bound to their platform.** Google refuses an iOS-type
+  client from Android; Android needs its own client keyed on package +
+  signing SHA-1 (one per signing key; see `per-ecosystem-sync-islands`).
+- **Prove request SHAPES before credentials exist.** Send deliberately
+  invalid client ids to the real endpoints: "invalid client" means the
+  request was accepted; "missing required parameter" means it was not.
+  Negative-control the check (the same request minus `grant_type` must
+  read differently). Test PKCE against RFC 7636's published vector,
+  never a golden file this code produced.
+- **Always persist the refreshed token.** Some providers (Twitch) issue
+  one-time-use refresh tokens; dropping the new one signs the user out
+  on the next call. Tokens in the Keychain
+  (`AfterFirstUnlockThisDeviceOnly`), Tink DataStore on Android.
+- **A missing credential is a STATE with a sentence.** A build with no
+  client id configured says sign-in is not set up in this build and
+  disables the action; it never shows a button that fails. Same for a
+  revoked or expired token (see `universal-feature-states`).
+- **The client id identifies the APP and is public by design**, but any
+  per-app quota follows it and is spent for every user; see
+  `third-party-revocation-resilience` "Shared per-app quotas".
 
 ## Password AutoFill Credentials
 

@@ -1,6 +1,6 @@
 ---
 name: values-based-feed-ranking
-description: Use when building any algorithmic content surface — a feed, a discovery tab, a "for you" ranking, a multi-source merge — especially over a third-party social/content API. Carries the hybrid multi-source merge pattern (parallel fetch, silent-fail secondaries, dedup, trending score), the values-based ranking rebuild (honor the user's OWN moderation settings, personalize only from the user's own visible signals, weight conversation over virality, penalize reposts, show "why you're seeing this"), seen-item dedup with a session bypass, and the flat-tabs IA lesson. Triggers on feed ranking, discovery feed, for-you, algorithm, multi-source merge, trending score, engagement ranking, recommendation surface, seen posts, moderation preferences, filter bubble.
+description: Use when building any algorithmic content surface — a feed, a discovery tab, a "for you" ranking, a multi-source merge — especially over a third-party social/content API. Carries the hybrid multi-source merge pattern (parallel fetch, silent-fail secondaries, dedup, trending score), the values-based ranking rebuild (honor the user's OWN moderation settings, personalize only from the user's own visible signals, weight conversation over virality, penalize reposts, show "why you're seeing this"), seen-item dedup with a session bypass, the flat-tabs IA lesson, and the never-recommended-always-findable data flag. Triggers on feed ranking, discovery feed, for-you, algorithm, multi-source merge, trending score, engagement ranking, recommendation surface, seen posts, moderation preferences, filter bubble.
 ---
 
 # Values-Based Feed Ranking
@@ -87,6 +87,27 @@ pipeline differing only in base signal. A tab-inside-tab design
 (Following/Discover + a sub-toggle) was built and then flattened:
 the nested level was redundant the moment network-awareness became an
 always-on ranking input.
+
+## 5. Never recommended, always findable
+
+Some items belong in the catalog but should never be CHOSEN for the
+person (propaganda, a rights caveat, material that needs context a
+one-line caption cannot give). Hiding them outright guts the archive;
+promoting them is a recommendation you cannot stand behind. The answer
+is a data flag, not a ranking weight:
+
+- The pipeline sets it every build from sourced evidence (`noRecommend`
+  plus a reason); never widen it on a bare keyword. Archive Watch
+  Decision 149 narrowed "propaganda" from 200 tagged titles (Potemkin,
+  Why We Fight) to 60 with evidence a reader can open.
+- **Machine-chosen surfaces skip it**: feeds, heroes, shelves, related,
+  channels, widgets, surprise picks, social posts.
+- **Viewer-driven surfaces keep it**: search, browse filters,
+  collections, Detail.
+- Outbound broadcast (social, partner feeds) keeps its own stricter
+  do-not-promote list on top (see `shared-data-plane-contract`).
+- Rank in the pipeline once and store the why, so every platform shows
+  the same order and the same reason (Decision 139).
 
 ## Cost honesty
 

@@ -12,45 +12,61 @@ matrix, so "everything can be driven" is a measured claim rather than a hope.
 import re
 import pathlib
 import collections
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+from app_config import (APPLE_APP_NAME, WINDOWS_PROCESS, HOOK_START_TAB,  # noqa: E402
+                        HOOK_START_ITEM, HOOK_SKIP_ONBOARD, HOOK_FORCE_OFFLINE,
+                        HOOK_TYPE_SIZE, HOOK_MUTE, HOOK_DOOR_SECONDS, android_extra)
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 
-# Each platform: where its hooks live, and how a hook name appears there.
+# Each platform: where its hooks live, and how a hook name appears there. Each
+# pattern is (regex, prefix): the prefix is prepended to what the regex captures.
+# "apple" is the template's starter directory; an adopted app lives in <AppName>/.
 SOURCES = {
-    "apple":   (["AppName"], r'environment\["(APP_[A-Z_]+)"\]', {".swift"}),
-    "android": (["android/app/src/main"], r'"(appname_[a-z_]+)"', {".kt"}),
-    "windows": (["windows/the app.App", "windows/the app.Core"],
-                r'(?:GetEnvironmentVariable|Env|Flag)\("(APP_[A-Z_]+)"\)', {".cs"}),
-    "web":     (["js"], r"#/([a-z]+)", {".js"}),
+    "apple":   ([APPLE_APP_NAME, "apple"],
+                [(r'environment\["(APP_[A-Z_]+)"\]', "")], {".swift"}),
+    "android": (["android/app/src/main"], [(r'"(appname_[a-z_]+)"', "")], {".kt"}),
+    # The Windows projects are <Name>.App / <Name>.Core (windows/README.md).
+    "windows": ([f"windows/{WINDOWS_PROCESS}.App", f"windows/{WINDOWS_PROCESS}.Core"],
+                [(r'(?:GetEnvironmentVariable|Env|Flag)\("(APP_[A-Z_]+)"\)', "")], {".cs"}),
+    # The web's doors are its URL query params, which read as "?view", "?item"
+    # (params.get('view') in js/app.js's init()).
+    "web":     (["js"], [(r"params\.get\('([a-z_]+)'\)", "?")], {".js"}),
 }
 SKIP = {"bin", "obj", "artifacts", "publish", "node_modules", ".git"}
 
 # The canonical hook per capability, in the Apple spelling. Android/Windows names
-# are derived; the web is a route, since its "hook" is the URL.
+# are derived; the web is a query param, since its "hook" is the URL. None = no
+# equivalent on that platform ("-"), which is a design choice, not a gap.
+#
+# These are the GENERIC doors every app built from this template has (or should):
+# the starters honour the first four; skip-onboarding, force-offline and type-size
+# are the app_config hooks a real app wires as those surfaces land.
 CAPABILITIES = [
-    # The web's "hook" is the URL, so its column names a ROUTE. The home view is "/",
-    # not a hash route — asking for a route called "home" reported a gap that was only
-    # ever a flaw in this script.
-    ("open a tab/section",     "APP_TAB",          "appname_tab",          "APP_TAB",       "daily"),
-    ("skip the walkthrough",   "APP_SKIP_ONBOARD", "appname_skip_onboard", "APP_SKIP_ONBOARD", None),
-    ("start a round",          "APP_AUTOPLAY",     "appname_autoplay",     "APP_AUTOPLAY",  "daily"),
-    ("answer automatically",   "APP_AUTOPILOT",    "appname_autopilot",    "APP_AUTOPILOT", None),
-    # Android hosts a night, not a Live EVENT (no cockpit/projector on a phone), so its
-    # cell is "-" by design rather than a gap. Marking it NO would be a permanent red
-    # for a feature the platform deliberately does not have.
-    ("host the app Live",      "APP_LIVE_HOST",    None,                   "APP_LIVE_HOST", "live"),
-    ("host a Trivia Night",    "APP_NIGHT_HOST",   "appname_night_host",   "APP_NIGHT_HOST", "live"),
-    ("join a room by code",    "APP_LIVE_JOIN",    "appname_live_join",    "APP_LIVE_JOIN", "live"),
-    ("join under a set name",  "APP_LIVE_NAME",    "appname_live_name",    "APP_LIVE_NAME", None),
-    ("open Settings",          "APP_SETTINGS",     "appname_open",         "APP_SETTINGS",  "profile"),
-    ("open the Club paywall",  "APP_PAYWALL",      "appname_open",         "APP_PAYWALL",   None),
-    # Android spells this one `appname_club_debug`. Guessing the name from the Apple
-    # spelling reported a gap that did not exist — the third false positive this script
-    # produced by assuming a naming convention the platforms never agreed to. Every cell
-    # here is the name the code actually uses, verified by reading it.
-    ("grant Club entitlement", "APP_CLUB",         "appname_club_debug",   "APP_CLUB",      None),
-    ("open Pass & Play",       "APP_PARTY",        "appname_party",        "APP_PARTY",     None),
-    ("seed records",           "APP_SEED_RECORDS", "appname_seed_records", "APP_SEED_RECORDS", None),
+    ("open a tab/section",     HOOK_START_TAB,  android_extra(HOOK_START_TAB), HOOK_START_TAB, "?view"),
+    ("open an item",           HOOK_START_ITEM, android_extra(HOOK_START_ITEM), HOOK_START_ITEM, "?item"),
+    # Every harness launch sets these (app_config.DOOR_DEFAULTS). A client that does
+    # not honour them plays AUDIBLY and indefinitely on somebody's television.
+    ("mute the player (door default)", HOOK_MUTE, android_extra(HOOK_MUTE), HOOK_MUTE, "?mute"),
+    ("bound a door's duration", HOOK_DOOR_SECONDS, android_extra(HOOK_DOOR_SECONDS),
+     HOOK_DOOR_SECONDS, "?door_seconds"),
+    ("skip the walkthrough",   HOOK_SKIP_ONBOARD, android_extra(HOOK_SKIP_ONBOARD), HOOK_SKIP_ONBOARD, None),
+    ("render the offline state", HOOK_FORCE_OFFLINE, android_extra(HOOK_FORCE_OFFLINE),
+     HOOK_FORCE_OFFLINE, None),
+    ("one Dynamic Type size",  HOOK_TYPE_SIZE,  android_extra(HOOK_TYPE_SIZE), HOOK_TYPE_SIZE, None),
+]
+
+# FILL IN: your app's OWN surfaces, one row per door (same shape as above: label,
+# Apple env var, Android extra, Windows env var, web query param or None). Write
+# every cell as the name the code ACTUALLY uses, verified by reading it: guessing an
+# Android extra from the Apple spelling has reported gaps that did not exist. For
+# a Windows row, also add its accessor to WINDOWS_ACCESSOR below. Examples:
+#   ("start playback",        HOOK_AUTOPLAY,   android_extra(HOOK_AUTOPLAY), HOOK_AUTOPLAY, "?autoplay"),
+#   ("open Settings",         "APP_SETTINGS",  "appname_open",               "APP_SETTINGS", "?view"),
+#   ("open the paywall",      "APP_PAYWALL",   "appname_open",               "APP_PAYWALL",  None),
+APP_CAPABILITIES = [
 ]
 
 
@@ -61,19 +77,14 @@ CAPABILITIES = [
 # exists to find, in the instrument itself. So the Windows column additionally
 # requires the ACCESSOR to be referenced somewhere other than its own declaration.
 WINDOWS_ACCESSOR = {
-    "APP_TAB": "LaunchHooks.Tab",
-    "APP_SKIP_ONBOARD": "APP_SKIP_ONBOARD",     # read inline, not via LaunchHooks
-    "APP_LIVE_HOST": "LaunchHooks.LiveHost",
-    "APP_NIGHT_HOST": "LaunchHooks.NightHost",
-    "APP_LIVE_JOIN": "LaunchHooks.LiveJoin",
-    "APP_LIVE_NAME": "LaunchHooks.LiveName",
-    "APP_SETTINGS": "LaunchHooks.Settings",
-    "APP_PAYWALL": "LaunchHooks.Paywall",
-    "APP_PARTY": "LaunchHooks.Party",
-    "APP_AUTOPLAY": "LaunchHooks.Autoplay",
-    "APP_AUTOPILOT": "LaunchHooks.Autopilot",
-    "APP_SEED_RECORDS": "LaunchHooks.SeedRecords",
-    "APP_CLUB": "APP_CLUB",
+    HOOK_START_TAB: "LaunchHooks.StartTab",
+    HOOK_START_ITEM: "LaunchHooks.StartItem",
+    HOOK_MUTE: "LaunchHooks.Mute",
+    HOOK_DOOR_SECONDS: "LaunchHooks.DoorSeconds",
+    HOOK_SKIP_ONBOARD: "LaunchHooks.SkipOnboard",
+    HOOK_FORCE_OFFLINE: "LaunchHooks.ForceOffline",
+    HOOK_TYPE_SIZE: "LaunchHooks.TypeSize",
+    # FILL IN: one accessor per APP_CAPABILITIES row with a Windows cell.
 }
 
 
@@ -82,7 +93,7 @@ def windows_wired(key):
     accessor = WINDOWS_ACCESSOR.get(key)
     if accessor is None:
         return False
-    for d in ("windows/the app.App", "windows/the app.Core"):
+    for d in (f"windows/{WINDOWS_PROCESS}.App", f"windows/{WINDOWS_PROCESS}.Core"):
         base = ROOT / d
         for p in base.rglob("*.cs"):
             if SKIP & set(p.relative_to(base).parts) or p.name == "LaunchHooks.cs":
@@ -93,9 +104,9 @@ def windows_wired(key):
 
 
 def harvest(platform):
-    dirs, pattern, exts = SOURCES[platform]
+    dirs, patterns, exts = SOURCES[platform]
     found = collections.Counter()
-    rx = re.compile(pattern)
+    rxs = [(re.compile(rx), prefix) for rx, prefix in patterns]
     for d in dirs:
         base = ROOT / d
         if not base.exists():
@@ -105,18 +116,20 @@ def harvest(platform):
                 continue
             if SKIP & set(p.relative_to(base).parts):
                 continue
-            for m in rx.findall(p.read_text(errors="ignore")):
-                found[m] += 1
+            text = p.read_text(errors="ignore")
+            for rx, prefix in rxs:
+                for m in rx.findall(text):
+                    found[prefix + m] += 1
     return found
 
 
 def main():
     have = {p: harvest(p) for p in SOURCES}
     cols = ["apple", "android", "windows", "web"]
-    print(f"{'capability':24} " + " ".join(f"{c:>8}" for c in cols))
-    print("-" * 24 + " " + " ".join("-" * 8 for _ in cols))
+    print(f"{'capability':30} " + " ".join(f"{c:>8}" for c in cols))
+    print("-" * 30 + " " + " ".join("-" * 8 for _ in cols))
     gaps = []
-    for label, ap, an, wi, web in CAPABILITIES:
+    for label, ap, an, wi, web in CAPABILITIES + APP_CAPABILITIES:
         row, keys = [], {"apple": ap, "android": an, "windows": wi, "web": web}
         for c in cols:
             k = keys[c]
@@ -126,10 +139,10 @@ def main():
             row.append("  yes   " if ok else ("   -    " if k is None else "   NO   "))
             if k is not None and not ok:
                 gaps.append((label, c, k))
-        print(f"{label:24} " + " ".join(row))
+        print(f"{label:30} " + " ".join(row))
     print(f"\n{len(gaps)} surface(s) this system cannot reach:")
     for label, c, k in gaps:
-        print(f"  {c:8} {label:24} (needs {k})")
+        print(f"  {c:8} {label:30} (needs {k})")
     print("\n'-' = no equivalent on that platform. 'NO' = the capability exists in the "
           "app but nothing can drive it, so it is untested and reads as a pass.")
 

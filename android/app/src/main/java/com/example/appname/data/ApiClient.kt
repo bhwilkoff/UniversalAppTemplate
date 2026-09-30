@@ -30,7 +30,7 @@ import kotlinx.serialization.json.Json
 @Singleton
 class ApiClient @Inject constructor() {
 
-    private val client = HttpClient(OkHttp) {
+    @PublishedApi internal val client = HttpClient(OkHttp) {
         install(ContentNegotiation) {
             json(
                 Json {

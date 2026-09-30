@@ -1,4 +1,4 @@
-# apple/ — Swift starter for the universal Apple target
+# apple/: Swift starter for the universal Apple target
 
 One Xcode target builds **iPhone, iPad, Mac, and Apple TV**
 (Decision 013, amended by Decision 019). This directory holds the
@@ -15,13 +15,13 @@ apple/
 │   ├── Models/          ← data models (platform-agnostic)
 │   ├── Networking/      ← APIClient singleton
 │   └── Store/           ← @Observable global state
-├── iOS/                 ← iPhone/iPad views — #if os(iOS)
+├── iOS/                 ← iPhone/iPad views (#if os(iOS))
 │   ├── ContentView_iOS.swift
 │   ├── Views/
 │   └── Components/
-├── macOS/               ← Mac views — #if os(macOS)
+├── macOS/               ← Mac views (#if os(macOS))
 │   └── ContentView_macOS.swift
-├── tvOS/                ← Apple TV views — #if os(tvOS)
+├── tvOS/                ← Apple TV views (#if os(tvOS))
 │   └── ContentView_tvOS.swift
 ├── Assets.xcassets/     ← iOS icon; tvOS needs its OWN brandassets (below)
 ├── Resources/Fonts/
@@ -38,19 +38,19 @@ codebase shared instead of copy-drifting.
 `_macOS.swift` / `_tvOS.swift` and wrap their contents in `#if
 os(iOS)` / `#if os(macOS)` / `#if os(tvOS)`. All three view trees can
 then live in the same target without exclusion lists. `RootView` (in
-`AppNameApp.swift`) branches EXPLICITLY per platform — a bare `#else`
+`AppNameApp.swift`) branches EXPLICITLY per platform. A bare `#else`
 silently hands a new platform the iOS view.
 
 ## Creating the Xcode project (once, at M0)
 
 1. Xcode → File → New → Project → **Multiplatform → App**.
-2. Product Name: `AppName` — **no spaces** (Xcode Cloud requirement).
+2. Product Name: `AppName`, with **no spaces** (Xcode Cloud requirement).
 3. Save to the **repo root** (not a subdirectory). `.xcodeproj` at
    root is what makes Xcode Cloud auto-discovery work.
 4. In the target's **General → Supported Destinations**, confirm
    iPhone + iPad and **add Mac and Apple TV** (remove Vision unless
    you want it). Mac = "Mac (Designed for iPad)" is NOT what you
-   want — pick native **Mac**, then build the `macOS/` view tree.
+   want. Pick native **Mac**, then build the `macOS/` view tree.
 5. Drag the `apple/` subfolders into the Xcode group for the app,
    preserving the `Core/` / `iOS/` / `macOS/` / `tvOS/` split. Delete
    `apple/` when done.
@@ -65,7 +65,7 @@ silently hands a new platform the iOS view.
    three.
 
 If you're skipping a platform (Decision 014), still keep the full
-`Core/` / `iOS/` / `macOS/` / `tvOS/` split — it costs nothing now
+`Core/` / `iOS/` / `macOS/` / `tvOS/` split. It costs nothing now
 and is the door left open. macOS in particular is nearly free to add
 later since it reuses the whole Core.
 
@@ -73,11 +73,11 @@ later since it reuses the whole Core.
 
 - **App icon**: tvOS uses a **layered imagestack** ("App Icon & Top
   Shelf Image" brandassets), not a flat PNG. Layers are LANDSCAPE
-  (400×240 / 800×480 / 1280×768 @1x/@2x) — square renders fail
+  (400×240 / 800×480 / 1280×768 @1x/@2x). Square renders fail
   actool only on CLEAN builds, so verify with a from-scratch build.
   See `branding/README.md`.
 - **Persistence**: only `Library/Caches`, `tmp`, and App Group
-  containers are writable on device — the simulator is lenient and
+  containers are writable on device. The simulator is lenient and
   will not catch violations (Decision 017). Build your
   ModelContainer with an App Group `ModelConfiguration` + fallback
   chain (see `AppNameApp.swift`).
@@ -97,13 +97,13 @@ Read the `macos-platform-patterns` skill before writing any Mac view;
   `NavigationPath` → a single detail column), NOT the iOS per-tab
   stack. Menu-bar `.commands` for a keyboard-first scheme.
 - **Player** replaces the window root while playing (not an overlay).
-  macOS `AVPlayerItem` has NO `externalMetadata` — show the title via
+  macOS `AVPlayerItem` has NO `externalMetadata`, so show the title via
   the window title bar; NEVER an `AVMutableComposition`
   metadata-override (it blanks video over a resilient asset).
 - **Hero** = full-width `.aspectRatio(16/9, .fit)` with NO `maxHeight`
   cap (a resizable window crops with a fixed height and insets with a
   cap). The same fill-image layout blowup as iOS applies.
-- **Images**: never bare `AsyncImage` — route through an
+- **Images**: never bare `AsyncImage`. Route through an
   `ImagePipeline` (decoded `NSCache` + one capped `URLSession`);
   decode non-8-bit-RGB → sRGB (Metal renders grayscale as white).
 - **App Store**: App Sandbox (with only the scopes you use) +
@@ -118,6 +118,6 @@ Read the `macos-platform-patterns` skill before writing any Mac view;
 
 `AppVersion.xcconfig` defines `MARKETING_VERSION` +
 `CURRENT_PROJECT_VERSION` for every Apple target (app + any
-extensions). Never edit versions through Xcode's identity panel —
+extensions). Never edit versions through Xcode's identity panel:
 it writes per-target overrides into project.pbxproj that shadow the
 xcconfig and the targets drift (Decision 003).

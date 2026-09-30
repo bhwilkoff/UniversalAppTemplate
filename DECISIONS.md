@@ -91,6 +91,15 @@ with old guards, remove them. When adding new code, never write
 iOS 17 / 18 workarounds. For framework-level depth, invoke
 `all-ios-skills:<name>` rather than re-deriving.
 
+**Amended 2026-09-30 (from Archive Watch, measured)**: the floor is chosen
+by the hardware it reaches, not by adoption share. iOS 26 dropped the
+iPhone XS/XR, and moving to iOS 18 cost two files; below 17 SwiftData and
+Observation break. tvOS stays at 26 because 27 dropped the Apple TV HD and
+4K 1st gen. Newer APIs are used fully behind `#available`, and
+`tools/test_ios_floor.py` / `test_tvos_floor.py` hold the floor in CI. The
+"no guards, no workarounds" rule above is superseded. See
+`docs/path/03-going-native.md`.
+
 ---
 
 ## 005 — Cross-Platform Feature Parity
@@ -643,6 +652,19 @@ signed-`Byte` sign-extends non-ASCII bytes (mask `and 0xFF`); JS needs BigInt fo
 full 64-bit hash; compute `dateKey` in ONE agreed timezone; hash UTF-8 bytes not
 UTF-16. See `cross-platform-determinism`.
 
+**Amended 2026-09-30**: mirroring is the last resort, not the default.
+If a pipeline or server can compute the value, publish the result as
+data and have every client read it (`cross-platform-determinism` Rule
+0). **Why:** Archive Watch computed channel schedules on device from a
+shared seed in four ports, each with a slightly different shuffle and
+a local-time day anchor; two viewers agreed on 0 of 14 channels
+(Archive Watch Decision 144). Publishing the timeline made agreement a
+property of the file. **How to apply:** hash-rank plus golden tests
+still govern any value that must be computed on device (offline or
+local state, before any download, peer wire protocols); everything
+else ships as a published artifact, and a client with no file shows an
+error with Retry rather than a guessed local value.
+
 ## 026 — Persist per-event detail, not just aggregates
 
 *Date: 2026-07-03*
@@ -793,7 +815,9 @@ perturb what they measure, and identify their own configuration.
 This file is loaded into every session's context. When it grows past
 ~120 KB, roll the oldest full entries VERBATIM into
 `docs/decisions/DECISIONS-<range>.md` archives and keep a complete one-line
-index here. Append-only binds everywhere: a whole-entry move is the only
+index here. **Amended 2026-09-30**: roll at ~50 KB, not 120; Archive Watch
+lowered it after measuring that always-loaded files cost about 382 KB of
+every session. Append-only binds everywhere: a whole-entry move is the only
 permitted operation; never trim, edit, or summarize an entry in place.
 
 **Why**: at 262 KB the decision log had become the largest fixed cost of

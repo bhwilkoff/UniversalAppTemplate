@@ -30,12 +30,20 @@ import SwiftUI
 
 struct ContentView_macOS: View {
     @Environment(AppStore.self) private var store
-    @State private var section: SidebarSection? = .home
-    @State private var path = NavigationPath()
+
+    /// The sidebar selection IS the store's selectedTab, so the inbox (deep
+    /// links, APP_START_TAB) can select a section without touching this view.
+    private var section: Binding<SidebarSection?> {
+        Binding(
+            get: { store.selectedTab.flatMap(SidebarSection.init(rawValue:)) ?? .home },
+            set: { store.selectedTab = $0?.rawValue; store.navigationPath = NavigationPath() }
+        )
+    }
 
     var body: some View {
+        @Bindable var bindableStore = store
         NavigationSplitView {
-            List(SidebarSection.allCases, selection: $section) { item in
+            List(SidebarSection.allCases, selection: section) { item in
                 Label(item.title, systemImage: item.symbol)
             }
             .navigationSplitViewColumnWidth(min: 200, ideal: 220)
@@ -43,12 +51,17 @@ struct ContentView_macOS: View {
             // ONE NavigationPath feeds the single detail column. Every
             // pushable destination is a Hashable route resolved by a single
             // .navigationDestination — never a per-view destination.
-            NavigationStack(path: $path) {
-                switch section ?? .home {
-                case .home:     HomeView_macOS()
-                case .browse:   Text("Browse")   // FILL IN
-                case .search:   Text("Search")   // FILL IN
-                case .library:  Text("Library")  // FILL IN
+            NavigationStack(path: $bindableStore.navigationPath) {
+                Group {
+                    switch section.wrappedValue ?? .home {
+                    case .home:     HomeView_macOS()
+                    case .browse:   Text("Browse")   // FILL IN
+                    case .search:   Text("Search")   // FILL IN
+                    case .library:  Text("Library")  // FILL IN
+                    }
+                }
+                .navigationDestination(for: String.self) { destination in
+                    Text(destination)  // FILL IN: your item route
                 }
             }
         }

@@ -1,4 +1,4 @@
-/* Archive Watch — web-TV acceptance suite (run IN a browser).
+/* Web-TV acceptance suite (run IN a browser). Built for Archive Watch.
  *
  * The Node DOM shim (tools/test_tv_focus.mjs) proves the focus ALGORITHM.
  * It cannot prove the things that only exist in a real engine: computed CSS,
