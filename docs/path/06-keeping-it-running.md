@@ -189,12 +189,30 @@ watching.
    > users on this post to identify issues that need to be solved across
    > all platforms.
 
-5. **Run your first loop.** Pick a job too big for one sitting (a full
-   audit of every screen on one platform, say) and start it with
-   `/loop`, the goal, and where it should stop. Watch the first few
-   ticks. When a tick does nothing new, say so. When the job is done,
-   stop it and ask for a summary of what changed and what is waiting on
-   you.
+5. **Run your first loop.** Pick a job too big for one sitting, draft
+   the loop prompt in your notes, and start it with `/loop`. Give it the
+   goal, a numbered list of what to look for, and what "done" means. My
+   best one opened Archive Watch's full database audit in late
+   September:
+
+   > /loop It is now time to do a full audit of our database looking for
+   > the following issues and fixing them or further enhancing them
+   > wherever they exist:
+   > 1. Malformed metadata, including poorly structured
+   > descriptions/summaries, issues with years/dates, categorization,
+   > cast/crew info [...]
+   > 2. Non-professional posters or backdrops. [...]
+   > 3. Incorrect copyright data or incorrectly categorized films as
+   > Creative Commons, public domain, or otherwise copyright free works
+   > [...]
+   >
+   > The goal is that every single entry for every single title has
+   > exclusively accurate information and that the information will only
+   > improve over time with our processes set up on Github
+
+   Watch the first few ticks. When a tick does nothing new, say so. When
+   the job is done, stop it and ask for a summary of what changed and
+   what is waiting on you.
 
 **When you are ready to move on,** Pulse reads at least one store
 honestly, a failure email has become a fix instead of a habit, and you

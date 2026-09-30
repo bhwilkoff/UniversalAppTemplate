@@ -10,11 +10,11 @@ films from archive.org. On the third day the catalog held 799 real
 films, and only then did the Apple TV app start to look like something.
 Four days in, a run of that pipeline had built a catalog of 25,000.
 
-Tidbits Trivia went faster. I described the game in one prompt, named
-the Wikipedia API as the source, and said the session was done when a
-working iPhone version existed. Five and a half hours and four more
-prompts later, it played on four platforms with ten thousand real
-questions.
+Tidbits Trivia went faster. I pasted in a description I had been
+drafting in my notes: one sentence of wish, ten numbered features, a
+request for research, and what "done" meant for the session. Four and a
+half hours and three more prompts later, it played on four platforms
+with ten thousand real questions.
 
 Neither one started with me typing in data or building screens by
 hand. Both started with a wish, a real source, and a clear idea of what
@@ -76,20 +76,43 @@ You need one thing set up first: a GitHub account, with your copy of the
 template kept public so GitHub Pages can host the web app for free. The
 agent does the rest of the setup, and will tell you if it needs you.
 
-1. **The kickoff.** In one message, give the agent three things: the
-   wish, the source, and what "done" means for this sitting. Use your
-   own idea, of course. Mine, for Tidbits, sounded like this: "I want a trivia game built from facts in the open
-   Wikipedia API. Build the web version first and put it live on GitHub
-   Pages so I can open it on my phone. This session is done when I can
-   play a full round with real questions." The agent will research the
-   source, build the pipeline, build the first screens, and put it
-   live. The `web-platform-patterns` and `universal-feature-states`
-   skills do a lot of this work without you asking for them.
+1. **The kickoff.** Draft it in your notes first, then paste it in one
+   message. It needs the wish, the source, what you want researched
+   before anything is built, and what "done" means for this sitting.
+   Here is most of mine for Tidbits Trivia, June 16:
+
+   > A fully realized multi-player (both local and online) trivia game
+   > that is based entirely upon facts pulled from the open Wikipedia
+   > API.
+   >
+   > Full features should include: [ten numbered features, from Game
+   > Center support to "A huge number of questions (10,000+) ... to help
+   > make sure that you never see the same question twice."]
+   >
+   > Please research other quiz/trivia/game/competitions apps that are in
+   > the space and determine what key features are not listed above and
+   > would allow for this app to compete on its merits [...]
+   >
+   > Please use your repository documentation to help you build out the
+   > project/plan [...] A full parity matrix should be written with any
+   > important platform-specific decisions that will need to be
+   > considered.
+   >
+   > The final outcome of this session should be a working iOS version
+   > with all v1 versions of the features fully implemented.
+
+   Yours can start smaller. If you do not know where your people are,
+   ask for the web version first and for it to be put live on GitHub
+   Pages, so you can open it on your phone the same night. The agent
+   will research, build the pipeline for your source, build the first
+   screens, and put it live. The `web-platform-patterns` and
+   `universal-feature-states` skills do a lot of this without you
+   asking for them.
 
 2. **Keep it going.** When it reports back, do not polish yet. Ask for
-   the next round of the wish. The night I started Tidbits, three of my
-   next four prompts were some version of this, and each one added a
-   platform or a whole feature:
+   the next round of the wish. The night I started Tidbits, two of the
+   three prompts after the kickoff were some version of this, and each
+   one added a platform or a whole feature:
 
    > keep pushing forward with the next round of work to fully build
    > out this game/app

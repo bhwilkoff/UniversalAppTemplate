@@ -191,17 +191,29 @@ the detail:
    > links. I also think that the web app should redirect to the native
    > apps if you click on them on your phone/iPad/android.
 
-5. **Distrust the cells.** A matrix says what should be true. Ask for an
-   audit that reads the code, and check the ones you care about against
-   what people can actually install. On September 30, I wanted to know
-   whether a feature we had built for Android was really in the version
-   people could install, not just in the code:
+5. **Distrust the cells.** A matrix says what should be true. Your eyes
+   say what is. The first parity bug I ever caught came from reading
+   one number on two screens, two days into BOBA Playbook:
+
+   > Why does the iOS app say there are 17,838 items in the database but
+   > the web app says it has only 12,036? I would like there to be parity
+   > across both versions of the app and to have the most cards available
+   > to be searched
+
+   The agent proposed merging cards that shared a number. I decided what
+   actually made a card a card:
+
+   > You should always use the image file difference to determine if the
+   > card is different and not the card number.
+
+   That sentence became BOBA's rule for what makes a record unique, and
+   later the template's `canonical-entity-identity` skill.
+   Ask for audits that read the code, and check the cells you care about
+   against what people can actually install. On September 30, months
+   into Archive Watch:
 
    > Is the "Join a Room" feature on the library section available in
    > the currently live 1.42.699 version on Google Play?
-
-   Then pick one feature and check it yourself on two devices, even if
-   one of them is just a phone and a laptop browser.
 
 **When you are ready to move on,** there is a matrix you have read and
 trimmed, one rule about your data that you decided and the pipeline now

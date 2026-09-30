@@ -154,12 +154,34 @@ is a conversation. `docs/path/talking-to-your-agent.md` has the moves.
 3. **Test the idea against the four questions.** Ask the agent to run
    the `learning-orientation-design` skill against your idea and tell
    you where it fails. Where it does, change the idea now, while it is
-   only words.
+   only words. The same test applies to every feature later. Nine days
+   into BOBA Playbook, the agent built a price feature that leaned on
+   another site's prices, and I asked the question the four questions
+   are for:
 
-4. **Let it ask you the rest.** Ask the agent what it needs to know
-   before it can start building, as a set of multiple-choice questions.
-   Answer them. It records the answers as your first decisions, with
-   the why first.
+   > This is NOT what I want. I want my app to be indpendent from
+   > Radish. You can look at the stucture from Radish, but if we are
+   > just using Radish, there is no reason for this feature to exist.
+   > People should just go to radish, right?
+
+4. **Let it ask you the rest.** Ask the agent what it still needs to
+   know before it starts, and answer as a numbered list. This is how I
+   opened each early milestone of BOBA Playbook, the first evening:
+
+   > Great. Let's begin on M2. Do you have any question at the beginning
+   > of this milestone that are unanswered by the current documentation?
+
+   Answer in a list of your own, numbered to match, and say only what
+   the decision needs. From Archive Watch, months later, answering five
+   of the agent's questions in one message:
+
+   > 1. Yes. Move forward with a single clock. If you need a time zone
+   > to organize around, you can choose UTC, but all times should show
+   > as their local times when they look at channels. [...]
+   > 3. The wording is fine for now.
+   > 4. You can use the Apple TVs whenever you want right now.
+
+   The agent records your answers as decisions, with the why first.
 
 **When you are ready to move on,** the "Why we build" paragraph sounds
 like you, there is one rule in your own words, and the agent has what

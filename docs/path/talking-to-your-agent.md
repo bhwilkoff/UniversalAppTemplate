@@ -1,11 +1,12 @@
 # Talking to your agent
 
-On June 16, 2026, I made a new repository from an earlier version of
-this template at 6:12 in the evening. By 11:41 that night, Tidbits
-Trivia played on an iPhone, the web, an Apple TV and an Android phone,
-with more than ten thousand real questions built from Wikidata. I sent
-five prompts. The first described the game. The other four were some
-version of this:
+On June 16, 2026, at 6:12 in the evening, I made a new repository from
+an earlier version of this template. At 7:05 I pasted in a description
+of the game I had been drafting in my notes. By 11:41 that night,
+Tidbits Trivia played on an iPhone, the web, an Apple TV and an Android
+phone, with more than ten thousand real questions built from Wikidata.
+I sent four prompts that evening. The first was the description. Two of
+the other three were some version of this:
 
 > keep pushing forward with the next round of work to fully build out
 > this game/app
@@ -36,6 +37,30 @@ studio into the Mac app.
 A wish gives the agent room to find a better answer than the one you
 would have specified. A specification only gets you what you already
 thought of.
+
+## Keep a running note for each app
+
+Most of my best prompts were not typed into Claude Code. They were
+written in a plain note I kept for each app, while I was using the app,
+and pasted in when they were ready. Each note had the same rough shape:
+the description of the app at the top, a numbered list of feature
+ideas, a "Next:" list for the round I was collecting, a "Fix:" list, a
+"Done:" list, and prompts for long loops drafted ahead of time.
+
+A round from my Archive Watch note, collected while I used the Android
+TV version and sent on September 3:
+
+> We need to work on a few things within the Android TV version of the
+> app:
+> 1. The home loading is much quicker than it has ever been, but even
+> though the home screen loads within a couple of seconds, the posters
+> still take about 10 seconds longer to load, so it looks like it is
+> stuck/frozen.
+> 2. The first item on each shelf is inaccessible. If you try to access
+> it, it will take you directly to the sidebar items. This needs to be
+> fixed.
+
+The note is where you think. The prompt is where you send it.
 
 ## Name where the truth lives
 

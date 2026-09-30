@@ -120,19 +120,30 @@ Stage 04 is about why that matters.
    yourself and tell the agent when it exists. Everything after that is
    a conversation.
 
-2. **Ask for the native version of everything.** Name the platform and
-   ask for every feature, built the way that platform's people expect.
-   On June 9, after seven weeks of Archive Watch on the Apple TV alone,
-   this is close to what I asked for (the commit that recorded it
-   trimmed my words a little):
+2. **Ask for the native version of everything.** Name the platforms and
+   ask for every feature, built the way each platform's people expect,
+   with a plan and a parity matrix first. On June 9, the day Archive
+   Watch's Apple TV app went to App Store review after seven weeks on
+   its own:
 
-   > build native iOS/Android/web versions of every tvOS feature using
-   > the TriAppTemplate as the basis
+   > Alright, now that we have submitted the first version of the Apple
+   > TV app to the app store, it is now time to start building out a
+   > pathway to creating versions of Archive Watch for the other three
+   > platforms that would be hugely beneficial for making it as widely
+   > accessible as possible: iOS, Android, and a fully working version on
+   > the web. [...] I would like you to write up a fully formed
+   > implementation plan for what is possible on each platform (complete
+   > with a full parity matrix that keeps track of each feature) as well
+   > as the approaches you will take to use ONLY NATIVE DESIGN for each
+   > of the platforms. You should not build a plan to make the Apple TV
+   > version into the definitive version, but rather to build the
+   > features for the specific platform
 
-   The agent sets up the project, builds the app, and puts it on your
-   device. If it hands you a list of steps to click through in Xcode or
-   Android Studio, push back the way I did on June 23, when the agent
-   gave me a setup list for the new Mac app:
+   The agent sets up each project, builds the app, and puts it on your
+   device. In my first months I made the Xcode projects myself and
+   pasted every compiler error back into the chat, one at a time. You
+   do not have to. By June 23, starting the Mac app, I pushed back when
+   the agent handed me a setup list:
 
    > a lot of the instructions in the readme ... seem like things that
    > you can do programatically rather than having me do them in Xcode
@@ -148,7 +159,21 @@ Stage 04 is about why that matters.
    > accessible via menus and hardly anything is. That is the design for
    > desktop-class apps and it should be so for ours as well.
 
-4. **Ask what the oldest device could be, and what it would cost.** The
+4. **When it says the platform cannot, show it an app that does.**
+   Agents give up on platform features too early. In March, the agent
+   told me an iPhone share sheet could not open Bsky Dreams with a
+   shared image, and I answered with the apps on my own phone:
+
+   > NO! This is absolutely 100% not the case. When I share an image
+   > from the photos app to Bluesky, it launches the Bluesky app with the
+   > image contained within the Bluesky compose window. [...] I can do
+   > this for Facebook, Discord, Gmail, Notion and many others. Please
+   > stop telling me it isn't possible and implement it the same way that
+   > these other apps have.
+
+   An hour later: "It worked!!! Thank you."
+
+5. **Ask what the oldest device could be, and what it would cost.** The
    agent measures it with throwaway test builds and tells you which
    devices each choice reaches. The choice is yours. If you have an old
    device in a drawer, bring it in. In September I dug out a Roku 2 XD
@@ -159,7 +184,7 @@ Stage 04 is about why that matters.
    > hardware, right? If the videos can run on a web browser, surely
    > they can run on old hardware.
 
-5. **Keep the modern devices modern.** When the floor starts holding
+6. **Keep the modern devices modern.** When the floor starts holding
    back newer devices, say so, and ask for newer features behind a
    capability check instead of dropping them for everyone. I said this the
    day before, when supporting old Rokus started to look like it would
@@ -169,7 +194,7 @@ Stage 04 is about why that matters.
    > modern Roku users if it is going to be hamstrung by the older
    > devices that are mostly stuck in 2014.
 
-6. **Check the matrix against your hands.** Ask the agent to update the
+7. **Check the matrix against your hands.** Ask the agent to update the
    parity matrix for the new platform. Then open one feature on both
    platforms and see whether they really do the same thing.
 

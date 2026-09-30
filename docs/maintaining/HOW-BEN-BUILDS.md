@@ -27,17 +27,35 @@ Written 2026-09-30.
   Bsky Dreams (170 commits, 2026-02-20 to 2026-06-30).
 - **The memory folders** for Archive Watch and Tidbits Trivia, where the
   agent saved each correction with a "Why" line.
+- **The full prompt history (added for section F).** Every prompt Ben
+  typed into the Claude Code CLI on his Mac, verbatim and timestamped,
+  from each app's first CLI day: Bsky Dreams from 2026-03-03, BOBA
+  Playbook from 2026-04-03, Archive Watch from 2026-04-18, Tidbits
+  Trivia from 2026-06-16. 3,218 of those prompts come from before
+  2026-08-23, which is the period sections A to E could only see
+  through commit quotes. Section F is built from them, and sections A
+  to E have been corrected where they disagreed.
+- **Ben's working notes (added for section G).** Apple Notes exports:
+  one running note per app (Tidbits Trivia, Archive Watch, BOBA
+  Playbook) and three single-prompt notes, where most of his long
+  prompts were drafted before he pasted them. Section G matches them to
+  the prompt history where it can. The notes also held credentials;
+  none are reproduced.
 
 One honest caveat before anything else. Ben's practice changed a great
 deal between February and September. In the first weeks (Bsky Dreams,
-early BOBA, the first weeks of Archive Watch) he committed by hand
-("So much wow", "iOS updates", "Major fun times" are real Bsky Dreams
-commit subjects), created the first Xcode project himself when the
-agent's scratchpad told him to, and pasted Xcode compiler errors back
-into the chat. By June he had stopped doing all of that and was
-telling the agent to stop asking him to. The "what Ben never did"
-section below describes his mature practice, from roughly June onward,
-and says so where the early record differs.
+early BOBA, the first weeks of Archive Watch) he committed by hand in
+GitHub Desktop ("So much wow", "iOS updates", "Major fun times" are
+real Bsky Dreams commit subjects), created Xcode projects and targets
+himself, ran the simulator himself, built to his own iPhone from Xcode,
+pasted Xcode compiler errors and console logs back into the chat one
+message at a time, ran setup commands in the terminal himself, and
+installed skill packs himself. Some of the very first sessions happened
+on his phone or in Claude Code on the web, not at the Mac. By June he
+had stopped doing most of that and was telling the agent to stop
+asking him to. The "what Ben never did" section below describes his
+mature practice, from roughly June onward, and says so where the early
+record differs. Section F tells the early story in his own words.
 
 ---
 
@@ -55,10 +73,18 @@ The pieces, in detail.
 ### A1. How a project starts
 
 Every project began with a wish, a real data source, and a template.
-None began with a spec, a schema, a wireframe or a file Ben wrote.
+None began with a spec, a schema or a wireframe that Ben wrote by hand.
+Two honest qualifications from the early record: BOBA began from
+transition files and data he had built in a separate Claude Cowork
+session, and Tidbits began from a 22-line brief he pasted in (its text
+is lost; only the commit quote below survives). So "no spec" means no
+spec he typed himself, not no preparation.
 
 **Archive Watch, 2026-04-17.** The first session ran in Claude Code on
-the web (the branch was named `claude/archive-org-apple-tv-5bKXB`). The
+the web (the branch was named `claude/archive-org-apple-tv-5bKXB`), and
+by his own account at least part of it on his phone. The next morning
+at 07:11 he moved to the Mac: "I need to finish this up inside of claude
+code CLI because you can do things that the desktop app cannot." The
 first real commit was research, not code: "Add research docs for
 metadata sources and design reference," documenting how to layer TMDb,
 Wikidata, Commons and the Library of Congress on top of archive.org, and
@@ -80,32 +106,45 @@ kickoff prompt, as the first commit quotes it:
 > session should be a working iOS version with all v1 versions of the
 > features fully implemented." (Tidbits, 2026-06-16, commit quote)
 
-Then, the same evening, four more prompts, each a single line:
+Then, the same evening, three more prompts (the prompt log shows them
+at 20:00, 20:41 and 22:57; two commits quote the last one):
 
-> "keep pushing forward with the next round of work to fully build out
-> this game/app" (Tidbits, 2026-06-16, commit quote)
+> "Go ahead and commit and change my standing instruction to commit and
+> the communicate rather than ask and then commit. Also, keep pushing
+> forward with the next round of work to fully build out this game/app"
+> (Tidbits, 2026-06-16 20:00)
 
-> "Let's tackle the quality moat next." (Tidbits, 2026-06-16, commit quote)
+> "Let's tackle the quality moat next" (Tidbits, 2026-06-16 20:41)
 
-> "keep pushing forward with the next set of work to build this app!"
-> (Tidbits, 2026-06-16, commit quote, twice)
+> "I thought I told you to commmit and push and then communicate about
+> it. Please keeep pushing forward with the next set of work to build
+> this app!" (Tidbits, 2026-06-16 22:57)
 
-Those five prompts produced, in about five and a half hours: the iOS
+Those four prompts produced, in about five and a half hours: the iOS
 app, a web mirror of it, a 10,006-question corpus built from Wikidata,
 an Apple TV app, and an Android app. "ALL FOUR PLATFORMS PLAY," the last
 commit of the night says.
 
 **BOBA Playbook, 2026-04-03.** The first commits are "Cowork files" and
 "Checklists and Game Rules." The card catalog (17,793 cards) arrived
-from a separate Claude Cowork session, not from Ben typing. The web app's
-Search Mode shipped the same day. Later BOBA work ran across two AI
-surfaces with written handoffs (`COWORK_RETURN.md`, "Cowork handoff for
-the gap").
+from a separate Claude Cowork session, not from Ben typing. Ben did do
+the setup by hand that first afternoon: he placed the data files, ran
+`!brew install rclone` and a string of `! rclone` commands himself to
+upload the card images, pasted service keys, and ran `! git push`. The
+web app's Search Mode shipped the same day. Later BOBA work ran across
+two AI surfaces with written handoffs (`COWORK_RETURN.md`, "Cowork
+handoff for the gap").
 
 **Bsky Dreams, 2026-02-20.** The very first commit is "Add learning
 philosophy note and initial project scaffold." The values paragraph came
-before any feature. Work then ran as numbered milestones (M1 to M65)
-written into `SCRATCHPAD.md` by the agent from planning sessions.
+before any feature. The first eleven days ran in Claude Code on the web
+(the commits are on `claude/` branches and Ben merged them as pull
+requests); his CLI record starts 2026-03-03 with a working web app
+already in hand. Work ran as numbered milestones (M1 to M65) written
+into `SCRATCHPAD.md` by the agent from planning sessions, and Ben fed
+them back one or two at a time ("Please complete the next two
+milestones in terms of priority within the scratchpad document,"
+2026-03-11).
 
 **What he hands the agent at the start:**
 1. A wish in plain language ("a fully realized multi-player trivia game").
@@ -241,6 +280,21 @@ So the review loop has two layers: the agent proves its work on real
 devices with its own instruments, and Ben lives with the result and
 reports what the instruments missed.
 
+In the early months the first layer did not exist, and Ben was the
+instrument. He reviewed in the tvOS simulator ("I still cannot go
+"back" to the home view of the app once I'm looking at an individual
+title. Pressing the "back button" (escape on the simulator)...", AW,
+2026-04-19), on his own iPhone built from Xcode ("I'm using my iPhone 15
+Pro for testing," BOBA, 2026-04-03), in mobile Safari and as a
+home-screen web app ("when I add the web app to my homescreen on my
+iphone and then launch it, I get a github 404 page," BOBA, 2026-04-03),
+and on the live web app ("I'm testing on the web, which is the easiest
+way for me to see the progress," Tidbits, 2026-06-17). He ran the tests
+the agent wrote and pasted back the results and console logs ("Here are
+the test results: [Pasted text #1 +27 lines]", Bsky, 2026-03-18). The
+demand that the agent test its own work comes from these weeks: see F2,
+stage 04.
+
 ### A4. How feedback rounds work
 
 Two shapes.
@@ -274,7 +328,20 @@ killers made it through to the Xtreme feed." (2026-09-27).
 The April record shows the same rhythm from the first week: Archive
 Watch commit subjects on 2026-04-19 run "UI feedback pass", "UI feedback
 round 2", "round 3", "round 4", "UI round 5", "UI round 6", all in one
-day, each a batch of what Ben saw on the Apple TV.
+day, each a batch of what Ben saw in the tvOS simulator. The prompt log
+has the batches themselves: ten numbered items at 07:37, ten at 08:17,
+seven at 09:00. In Bsky Dreams and BOBA most early batches were written
+somewhere else and pasted in, so the log shows only "Please update the
+iOS app for the following pieces of feedback: [Pasted text #1 +10
+lines]"; the items themselves are lost.
+
+A third shape appears early and then fades: **answering the agent's
+questions at a milestone boundary.** "Great. Let's begin on M2. Do you
+have any question at the beginning of this milestone that are
+unanswered by the current documentation?" (BOBA, 2026-04-03), followed
+eight minutes later by four numbered answers. By September the same move
+had become "Can you ask me the owner items as a series of questions
+where I can see the options and choose from among them?"
 
 ### A5. How he corrects
 
@@ -1233,7 +1300,7 @@ implementations, binding design rules, and proof runs on real platforms
 (a real YouTube broadcast read back through the API).
 
 **What Ben looked at.** His own use: "Take that next batch and give me a
-new dev Mac build I can use for running the minerva game again with all
+new dev Mac build I can use for running [a live trivia event] again with all
 new features/design elements intact" (Tidbits, 2026-09-07); "Please
 resume the work you were doing, as I'm done with the game." (same
 night); "The audio now sounds great on Youtube! Now let's get the camera
@@ -1501,9 +1568,18 @@ nearest thing to hand-entered data is Archive Watch's first Editor's
 Picks shelf, seeded with his seven favorite films, which the agent
 entered. Even one specific quiz for a live event was extracted by code
 from the Kahoot page open in Chrome (Tidbits, 2026-09-07), not typed.
-BOBA's 17,793-card catalog came from a Cowork session. **Instead:** he
-said where the truth lives and judged what came out ("There should be
-thousands of documentaries").
+BOBA's 17,793-card catalog came from a Cowork session. The early record
+shows how much data work he did do, just never by typing rows into the
+app's repository: he rebuilt BOBA's card files in Cowork and handed
+them over ("We found a big issue here. I had to rebuild the cards.json
+files and also update the thumbnail and optimized images," 2026-04-04),
+did a schema and pipeline pass on Archive Watch's catalog on his own
+("I worked on a significant update to the video/movie database and the
+schema for how we find and serve up videos and I've placed it within
+the /SchemaWork/ directory," 2026-04-19), and later reviewed BOBA cards
+one by one in a review page the agent built and exported his approvals
+as patch files (2026-05-25). **Instead:** he said where the truth lives
+and judged what came out ("There should be thousands of documentaries").
 
 **Open code files to find a call site.** The course asks the student to
 "Open `js/api.js`. Find where the web app would call your data" (stage
@@ -1513,8 +1589,14 @@ product terms: screens, buttons, films, devices. The only code-shaped
 text he typed is pasted error output: compiler messages in the early
 months ("Property 'modelContext' is not available due to missing import
 of defining module 'SwiftData'", AW, 2026-06-10, commit quote), and Play
-Console and PowerShell errors later. **Instead:** he judged behavior,
-and asked for audits that read the code on his behalf.
+Console and PowerShell errors later. The early record has one
+exception: adding the Bsky Dreams share extension in March, the agent
+had him drag files into an Xcode target and copy code by hand ("I can't
+copy the shareviewcontroller with the line numbers. Can you make a copy
+without the line numbers?" then "CAn you modify the other temp files so
+that I don't have to change them manually?", Bsky, 2026-03-18). He
+pushed back within a minute, which is the pattern. **Instead:** he
+judged behavior, and asked for audits that read the code on his behalf.
 
 **Edit JSON, PARITY rows or decision entries by hand.** The course asks
 the student to write `DECISIONS.md` entries and `PARITY.md` rows
@@ -1528,10 +1610,19 @@ Decisions 139 onward.
 **Create Xcode targets or run Gradle himself.** The course asks the
 student to "follow `apple/README.md` to create the one universal
 target" and "open `android/` in Android Studio and run `./gradlew
-:app:assembleDebug`" (stage 03, step 2). This is the one place the early
-record differs: Archive Watch's April scratchpad told him to create the
-tvOS Xcode project, and he did, and he built from Xcode for a few
-weeks. By June he had stopped: "a lot of the instructions in the readme
+:app:assembleDebug`" (stage 03, step 2). This is the place the early record
+differs most. Archive Watch's April scratchpad told him to create the
+tvOS Xcode project, and he did. Bsky Dreams' iOS app (March) and BOBA's
+(April) were Xcode projects he created and built himself, relaying
+compiler errors one message at a time; on the first Bsky iOS night he
+sent a dozen error messages between 20:12 and 20:57. He learned Xcode's
+edges in public: "I was doing command+r, but it looks like it only
+works if I actually press the play button" (BOBA, 2026-04-04); "I
+think I added the destinations correctly" and a screenshot of Build
+Phases (AW, 2026-06-09, adding iPhone to the tvOS target); "How do I
+sync in the android studio (like clean build in Xcode)?" (BOBA,
+2026-05-19, after installing Android Studio himself). By June he had
+stopped: "a lot of the instructions in the readme
 ... seem like things that you can do programatically rather than having
 me do them in Xcode" (AW, 2026-06-23, commit quote), and "no one is
 going to rebuild the app on their computer using Xcode when the app is
@@ -1554,17 +1645,54 @@ test that fails on the old code (stage 04, step 5). Ben never wrote a
 test. He demanded the property the test provides: that "fixed" be
 proven ("I need when you tell me that things are working on a device,
 that they are actually working", 2026-08-27) and that rigs be
-deterministic. The agent wrote the tests and negative controls.
+deterministic. The agent wrote the tests and negative controls. The
+early record adds something the course can use: Ben asked for the test
+by name, before a fix, as early as his first iOS night. "Please create
+a test for how you will determine if a post is rendered a signgle time
+and continue to work until your code passes that test." (Bsky,
+2026-03-14). He then ran those tests in Xcode himself and pasted the
+results, and learned the hard way that a passing test is not a working
+feature: "I just did a clean build and even though the tests seem to
+have passed, the functionality within the constellation view still
+does not allow for dragging around a single selected node." (Bsky,
+2026-03-18).
 
 **Run the release commands himself.** The course has the student run
 `gh workflow run appstore-build.yml` and `asc_release.py status` (stage
 05, steps 2 and 3). Ben never ran them; he said "ship" and asked what
 the store said. He did run two `!gh secret set` commands himself
 (2026-09-07) and pasted API keys, because the agent would not handle
-credentials. **Instead:** "You can ship the new versions now."
+credentials. Early on, the release path was his hands: he archived in
+Xcode and distributed to App Store Connect ("These were the errors that
+happened when I tried to distribute the archive from xcode to app store
+connect," AW, 2026-06-04) and uploaded Android bundles to Play by hand
+until June. **Instead:** "You can ship the new versions now."
 
-**Click through store consoles.** He tried hard not to. The exceptions
-are real and worth teaching as "what stays human": he created developer
+**Run shell commands.** Not in the course, but worth recording because
+the early record is full of it. In BOBA's first hours he ran
+`!brew install rclone`, a series of `! rclone` configuration and upload
+commands, `! git add -A && git status` and `! git push`; the next day
+`! npm install -g wrangler` and `! npx wrangler login`; later
+`! firebase login` (Tidbits, 2026-07-03) and `! gh auth login`
+(AW, 2026-06-20). He also asked for help doing it: "It is very hard to
+copy and paste from claude code in macos because it doesn't copy
+cleanly" (BOBA, 2026-04-03), and "Can you save this script to a file so
+I don't have to worry about copying and pasting from terminal?" (BOBA,
+2026-04-04). **Instead, later:** "You always push my android and apple
+builds at the same time. Why would you need me to run a command to make
+it work now?" (Tidbits, 2026-07-04). The logins stayed his; everything
+else moved to the agent.
+
+**Click through store consoles.** From June on he tried hard not to.
+Before that he did it all himself with the agent as a guide: registering
+the Bsky Dreams bundle ID took five messages and the better part of
+an hour ("It is NOT
+registered to another developer... You need to investigate a different
+reason why this is failing." then "Alright, I figured it out.", Bsky,
+2026-03-20), and he asked for "every field that is possible within the
+App Store Connect submission" so he could "get this submission process
+right the first time" (same day). The exceptions that remained are real
+and worth teaching as "what stays human": he created developer
 accounts, logged in so the agent could drive Chrome ("I just logged in.
 You should be able to run those commands just fine", 2026-09-06),
 completed an email verification, dragged a file into an upload box
@@ -1589,7 +1717,16 @@ the agent to do both ("create any new skills necessary", 2026-09-08;
 Universal App Template", 2026-09-01). He asked the agent what state it
 was in rather than reading the file: "Is all documented work
 completed?" (2026-09-26), "What are the things you are wating on me
-for?" (2026-09-21).
+for?" (2026-09-21). He did, early on, **install** skills himself, which
+is a step the course can keep: `/plugin marketplace add
+nextlevelbuilder/ui-ux-pro-max-skill` was his very first act in the
+Bsky Dreams CLI record (2026-03-03 15:45), followed by
+`npx skills add https://github.com/twostraws/swiftui-agent-skill`
+(2026-03-14) and `/plugin install all-ios-skills@swift-ios-skills`
+(2026-03-15), and he invoked them by name (`/swiftui-pro`,
+`/KUI:review`). And when no skill existed, he told the agent to write
+one: "this would be you developing a world-class tvOS design and
+development skill" (AW, 2026-04-19).
 
 **Read the agent's code before accepting it.** No evidence. He accepted
 or rejected on behavior and on evidence of behavior, and escalated when
@@ -1638,6 +1775,17 @@ evidence was missing.
    releases, saying "ship."
 9. **Product decisions no rule settles.** Chosen from options the agent
    laid out.
+10. **Outside material the agent could not have found alone.** The early
+    record is full of it: the game's rules PDFs and a Cowork-built
+   strategy guide and playmat mockup (BOBA), a folder of brand
+   guidelines from a GIF provider (Bsky, "the original /Files/ folder"),
+   the URL format for an archive service and the Mozilla Readability
+   repository (Bsky, 2026-03-10), a public repository of Bluesky feed
+   experiments (Bsky, 2026-04-01), the three reference apps for tvOS
+   design (AW, 2026-04-19), a reply from another app's developer about
+   his URL scheme (AW, 2026-06-19), four GitHub repositories to start
+   subtitle research from (AW, 2026-06-22), and beta testers' messages
+   and spreadsheets (BOBA, May).
 
 ### What the agent did
 
@@ -1663,6 +1811,1811 @@ Pulse; memories, handoffs, skills and the template.
 
 ---
 
+## F. The early months, from the prompt history
+
+### What this record is, and what it is not
+
+Every prompt Ben typed into the Claude Code CLI on his Mac, verbatim,
+with the date and time it was sent. For the months before 2026-08-23
+that is 3,218 prompts: 454 in Bsky Dreams (from 2026-03-03), 1,646 in
+BOBA Playbook (from 2026-04-03), 782 in Archive Watch (from
+2026-04-18) and 336 in Tidbits Trivia (from 2026-06-16). The agent's
+replies do not survive for these months, so each prompt has to be read
+as the second half of a conversation whose first half is gone.
+
+Four limits to keep in mind when quoting from it:
+
+1. **Only the CLI on the Mac is recorded.** Claude Code on the web or on
+   his phone, the Claude desktop app, and Claude Cowork are not in it.
+   Bsky Dreams' first eleven days (2026-02-20 to 03-02) and Archive
+   Watch's first day (2026-04-17) happened on the web, and BOBA's data
+   work happened in Cowork. Where this section describes those days it
+   uses git commit subjects and says so.
+2. **"[Pasted text #N +M lines]" marks a lost paste.** The log keeps
+   only the fact that M lines arrived. In Bsky Dreams and BOBA, most of
+   the big feedback rounds were written somewhere else and pasted, so
+   the log says "Please update the iOS app for the following pieces of
+   feedback:" and nothing more. "[Image #N]" marks a lost screenshot.
+3. **Secrets are redacted.** In these months Ben pasted API keys,
+   tokens, client secrets, test-account passwords and device codes
+   straight into the chat. None are reproduced here; where one matters
+   to the story it appears as [redacted].
+4. **Slash commands and false starts are in it.** `/compact`, `/exit`,
+   `/login`, runs of `/rate-limit-options`, a typed `exity`, and
+   prompts sent to the wrong repository ("Sorry, I was in the wrong
+   repository. Please disregard.", Tidbits, 2026-06-18) are all part
+   of the record, and they are honest evidence of what a working day
+   looked like.
+
+Times are as logged on Ben's Mac (he lives in Mountain time).
+
+### F1. How each app began
+
+#### Bsky Dreams: begun on the web, continued in the CLI (2026-03-03 to 03-16)
+
+**Before the record.** The repository started from Ben's earlier
+`ContextTemplate` (he says so on 2026-04-01). The first commit,
+2026-02-20 20:34, is "Add learning philosophy note and initial project
+scaffold," made on a `claude/` branch in Claude Code on the web. By the
+next evening the agent had logged "milestones 8 to 27 and architecture
+decisions from planning session" (commit subject), and by 2026-03-02 it
+had implemented M1 to M65 of a web Bluesky client. Ben's part in those
+eleven days survives only as merged pull requests.
+
+**First CLI day, 2026-03-03.** He arrived with a working web app, and
+his first acts were tooling, not features:
+
+- 15:42 `/install-github-app`
+- 15:45 `/plugin marketplace add nextlevelbuilder/ui-ux-pro-max-skill`,
+  then `/plugin install ui-ux-pro-max@ui-ux-pro-max-skill`
+- 15:49, the wish, naming the skill he had just installed:
+
+> "I would like to revise the look and feel (branding, logo, interfaces,
+> animations, etc.) to better take advantage of the UI UX Pro Max skills
+> that I just added to Claude Code. In particular, I would like to
+> utilize a combination of the Brutalism, Neubrutalism, and Memphis
+> Design aesthentics in order to create a bold and distinctive app that
+> shows just how different Bsky Dreams is from the default BlueSky app
+> and functionality. The logo should be revised to be a simple and
+> iconic "fluffy cloud" that looks good at any size and looks
+> particularly good as a favicon and iphone app. Please let me know what
+> questions you have about this transformation of the interface for
+> this web app."
+
+- 16:31, the first review, forty minutes later. It opens with praise
+  and then lists six things, each with its reason:
+
+> "The updated brnading looks quite good, with the major exception of
+> any post that has been reposted, replied to, or otherwise has another
+> element outside of the post before the "post rectangle" is rendered.
+> [...] Additionally, the animation for each of the posts that you
+> scroll past is unnecessary and distracting. [...] Lastly, there needs
+> to be more space between the different comments within the
+> conversation view. The way it looks now makes it seem as though it is
+> all one big comment because each rectangle is undiferentiated."
+
+- 16:32 to 16:36, thirteen `/rate-limit-options` and two `/resume`. He
+  hit his usage limit within the first hour.
+- 16:37 "what was the last command that you receied?" and 16:38 "do you
+  have the command before the conversation was compacted?" His first
+  meeting with compaction.
+- 16:48, 17:08, 17:18, three more rounds, now from his phone as well as
+  the desktop: "On mobile, the Bsky Dreams name is missing from the
+  sidebar (it shows correctly in the sidebar on desktop)."
+- 17:27 "Can you make it so that when I add the web app to my homescreen
+  via safari, it pulls the favicon for the shortcut?"
+- 17:34 "I'm glad you figured out the aproach, but unfortunately the
+  rendered icon is nothing like the logo that you are using at the top
+  center of the mobile interface."
+- 17:55 a copy change and a link to the repository: "update the tagline
+  to say "Your Personal Bluesky Experience" instead of "A Better Window
+  Inot Bluesky"."
+
+Between these prompts he committed by hand in GitHub Desktop: "Updates
+for Style" (16:11), "Interface updates" (16:55, 17:23), "Favicons"
+(17:40), "auth update" (18:00), all commit subjects by bhwilkoff.
+
+**The rest of the first CLI week (03-04 to 03-12)** was web polish,
+driven by pasted lists and the scratchpad's milestones:
+
+- 03-04 13:01 "Please work on the following updates: [Pasted text #3 +6
+  lines]" (lost)
+- 03-04 13:59 "Can you revise the readme file [...] I'd also like it to
+  showcase the style of Bsky Dreams and emphasize the core beliefs
+  around learning and community that are baked into the project."
+- 03-05 13:52 a bug found by using the app in a specific order: "If I
+  interact with a post on the disccovery tab (opening the conversation
+  view, etc.) and then press the back button within the interface and
+  continue to scroll along the Discovery feed, I get to the bottom and
+  the refresh/reload doesn't happen"
+- 03-09 12:34 "Hmm... I no longer seem to be able to login to the site
+  and view the application. Did something get corrupted with the last
+  set of commits or is this an easy fix?"
+- 03-09 13:23 a long, precise description of a horizontal timeline
+  ("While the other interfaces of the app are vertical only, the
+  timeline interface should be thought of as horizontal only."), then
+  five more rounds on it that afternoon.
+- 03-10 10:18 "Neither the Bypass nor the Wayback features work as
+  advertised. I need you to research better options for accessing
+  articles via archived links."
+- 03-10 11:08 he supplies the source himself: the archive service's URL
+  format and "the readability repository/process [...]
+  https://github.com/mozilla/readability".
+- 03-10 14:21 "Can you update your documents (Claude, Scratchpad,
+  Decisions) for recent updates (simplifying for better token usage,
+  wherever possible)"
+- 03-10 14:44 pastes a GitHub Actions deprecation warning: "I see this
+  error when I pushed:"
+- 03-11 14:42 "Please complete the next two milestones in terms of
+  priority within the scratchpad document"
+- 03-11 15:08 "Can you turn off the auto-trigger code review?" (the
+  GitHub app he had installed on day one)
+- 03-11 17:06 "I need all of the interfaces to have their functional
+  equivelance of the URL structure for posts [...] using the native
+  forward and back keys of a browser appropriately"
+
+**Moving to iOS, 2026-03-14.** Eleven days into the CLI, from a skill:
+
+- 18:34 `npx skills add https://github.com/twostraws/swiftui-agent-skill
+  --skill swiftui-pro`, typed into the chat.
+- 18:52, the wish:
+
+> "/swiftui-pro I'm interested in rewriting this web app as a full
+> fledged iphone app, preserving the interfaces and the overall look and
+> feel, while ensuring that all of the native features of iOS/iPadOs are
+> taken advantage of. This includes things like native share sheet
+> support and local storage of progress and authentication within the
+> app. I also need to you to write an instructional how to for compiling
+> the app and getting it live on the app store."
+
+- 20:12 "I'm running into this issue with the initial build: "Multiple
+  commands produce [...] Info.plist"". He had created the Xcode project
+  himself and was building it.
+- 20:26 "Sorry, I had to move the folder to /BskyDreams-iOS/Bsky Dreams/
+  Can you fix it in there?"
+- 20:28 to 20:46, eight messages of pasted compiler errors: "More
+  issues:", "Issues:", "Now there are a bunch of Keypath issues:", "Two
+  more:", "More errors:", "This one is just a warning:".
+- 20:49 "The simulator says there is a Missing Bundle ID so it can't
+  load the app"
+- 21:06, the first look at the running app:
+
+> "It runs, but here are the fixes that need to be done: 1. The color of
+> the interface should be blue instead of orange. Also, many elements of
+> the interface are doubled-up (look blurry because they are doubled in
+> the interface). 2. No data is loading. It says The data couldn't be
+> read because it is missing on the home view. 3. Constellations is
+> called Network for some reason."
+
+- 21:54 "Perhaps you don't understand what I mean when I say that the
+  posts are "doubled". I mean that every piece of text within a post
+  and all of the cards and icons appear twice within the view off by a
+  few pixels so that it appears blurry. Please fix this!"
+- 22:12, the first demand for a test:
+
+> "Unfortunately, no. You still haven't fixed the rendering issue at
+> all. [...] You have clearly not found the root cause of the issue, nor
+> are you actually testing to make sure that it is fixed before telling
+> me that it works. Please create a test for how you will determine if a
+> post is rendered a signgle time and continue to work until your code
+> passes that test."
+
+- 03-15 07:50, the next morning:
+
+> "The "doubling" is now fixed. Thank you. However, none of the other
+> features are functional now. [...] The look and feel of the iOS app
+> has strayed very far from Neubrutalism and has made it looks like
+> every other app. The goal of the conversion is not to re-think the
+> app, but rather to re-create it as a native app with the same
+> functions and style."
+
+- 03-15 12:41 to 13:20 `/plugin marketplace add
+  dpearson2699/swift-ios-skills`, `/plugin install all-ios-skills`,
+  `/skills`, then "/swiftui-patterns Please revise the app for the
+  following updates: [Pasted text #1 +9 lines]".
+- 03-16 10:25 "Can you update the Claude.md, Decisions.md, and
+  Scratchpad.md for the newly updated iOS and Web App approach, so that
+  we can keep parity between the two versions but that we can run
+  development separately across the two platforms?"
+
+**What the first two weeks show.** He started from something that
+already worked and a tool he had just installed. He reviewed fast, from
+the phone and the desktop, with reasons. He fed the agent its own
+milestones back. He moved platforms by naming a skill and a wish, then
+did the Xcode half himself: creating the project, moving folders,
+relaying every compiler error. And on the first night of a new platform
+he asked for a test instead of another fix. Surfaces named: GitHub
+Desktop, Safari on the iPhone (home-screen web app), desktop browser,
+Xcode, the iOS simulator, and by 03-18 his own iPhone ("The four
+gestures you say pass, do not pass when I actually try them on a
+device.").
+
+#### Archive Watch: from the phone to the Mac to the simulator (2026-04-18 to 04-21, and again from 05-31)
+
+**Before the record.** The repository was created 2026-04-17 at 17:31.
+That evening Claude Code on the web wrote "Add research docs for
+metadata sources and design reference" and "Fill in project identity,
+log Decisions 006-010, scaffold enrichment pipeline" (commit subjects).
+Ben later said he did this on his phone.
+
+**First CLI morning, 2026-04-18.**
+
+- 07:11 "I need to finish this up inside of claude code CLI because you
+  can do things that the desktop app cannot. These are all things you
+  should be able to do, but let me know if you need any help with them:
+  [Pasted text #1 +10 lines]" (the pasted handoff is lost)
+- 07:14 pastes a TMDb read access token [redacted].
+- 07:21 he had tried the web-based catalog builder the phone session
+  left him and got errors: "Can you create a better process for
+  generating the catalog than running it from a web app? And then
+  figure out why things are failing."
+- 07:34, his answers to the agent's questions, numbered:
+
+> "1. We need more results, so please either research other data options
+> and build the port for wikidata.
+> 2. Please delete anything redundant or not useful. I was hampered by
+> being on claude code on my phone, so you can really make it a lot
+> better for the actual app build.
+> 3. Yes, I want to actually build a robust catalog to test in the
+> simulator on xcode."
+
+- 07:45 and 07:49, Xcode errors, pasted ("Many errors and warnings: [...]
+  They all look like this").
+
+**Day two, 2026-04-19: fifty-five prompts.**
+
+- 06:27, the first look:
+
+> "Okay, the app works in the simulator. The videos play, but there are
+> astonishingly few of them. We need to figure out a much better way to
+> source movies/videos than simply relying upon the API call. There must
+> be websites or other services that have done a fair amount of listing
+> movies, collections, and categories of films on archive.org. [...]
+> Please conduct exhaustive research and put together a multi-source
+> plan for increaseing the database to over 1000 items"
+
+- 06:40 "Yes, please implement this plan. I would also like for you to
+  come up with a strategy for videos that are not well recognized
+  films. TV shows, Government/Public Service Announcements, and Shorter
+  videos also need to be added"
+- 07:03 the design turn, with named references and named skills: "Can
+  you use the UX/UI Pro skill, the all-ios skills, the killerUI skills,
+  and the Axiom skills [...] Remember, the three best apps to look at
+  for inspiration are UHF [...], Channels [...], and the default Apple
+  TV app"
+- 07:37 the first numbered batch, ten items, beginning "1. The filters
+  (film types and decades) do not highlight correctly." Item 10 defers
+  work on purpose: "feel free to just document them for future sessions
+  if you have enough to do for this session."
+- 07:50 "I'm having trouble committing correctly within github desktop
+  because there are conflicts."
+- 08:17 ten more ("3. I don't know if it is an issue of the simulator
+  or not, but I still cannot go "back" to the home view [...]
+  (escape on the simulator)"); 09:00 seven more; 09:17, 09:31, 09:38
+  shorter rounds.
+- 15:20 to 15:37, a focus fight in six messages: "Nope. You haven't
+  solved for this.", "Now the focus stays on the top navigation and I
+  cannot access the play button.", "No. I already said that behavior
+  wasn't correct.", "Nope. You aren't investigating the issue at all."
+- 15:46, his own design answer, drawn from apps he uses: "I guess that
+  is why a lot of my favorite apps prefer a sidebar implementation for
+  navigation that allow syou to use the arrow buttons instead of the
+  back button to navigate."
+- 16:18 to 16:25, the skill conversation:
+
+> "I am really worried about your ability to competently do UI for the
+> apple tv. [...] I feel like you need to research apple tv specific
+> claude skills or UX/UI design pattern that provide for better and more
+> consistent results" (16:18)
+
+> "Do you feel like you now have the skills of a competent tvOS
+> developer/designer or did you just find the answers to these
+> particular questions? I want an overall upgrade of skills and not just
+> fixes for these individual items" (16:22)
+
+> "I think you will need to do the systematic study yourself given that
+> there doesn't seem to be a dedicated skill available. So, this would
+> be you developing a world-class tvOS design and development skill to
+> ensure that this app will be an incredible tvOS-first experience
+> whenever it is launched." (16:25)
+
+  The commit at 16:36 is "Add docs/tvos-playbook.md: durable tvOS design
+  and engineering reference" (subject lightly paraphrased), the seed of
+  the template's `tvos-platform-patterns` skill.
+- 16:56 "You are essentially making me the auditor rather than doing
+  this programatically. I want the "auditor" to fix all of the
+  interface elements, and not make me responsible for fixing them. That
+  feels backwards."
+- 17:19 "Is there a reason why we have focused so much on tvOS 17+ when
+  the modern version of tvOS is 26" and 17:24 "My app should absolutely
+  require an Apple TV 4k."
+- 20:00 "This looks and works SO MUCH BETTER!"
+- 22:00 he brings in work of his own: "I worked on a significant update
+  to the video/movie database and the schema for how we find and serve
+  up videos and I've placed it within the /SchemaWork/ directory"
+- 22:08 "I also think you should "teach" the pipeline all of the things
+  that you have learned throughout iteration within the app [...] The
+  goal is the have "the best of both worlds""
+- 22:39 "I just want to be clear, there is no "cellular users" on Apple
+  TV. Apple TV is a wifi only device. [...] Also, I'm about to go to
+  sleep, so you should be able to run all of this in the background"
+- 22:45 "Can you make it verbose so that I can see it happening?" and
+  23:58 "Is it still running?"
+
+**Days three and four.** 04-20: "Where are we at?", "How is the
+progress?", `/remote-control` at 13:56 (checking in from away from the
+desk). 04-21: "Can you research sources for tv art, if it is so hard to
+find in our current sources?"; "Can you push please. I don't need them
+locally. I need to test the app"; then a new capability answered as
+three separate one-line messages to the agent's three questions ("1.
+Definitely series should show and then let you dig into each episode
+individually", "2. Treat anthology as one series", "3. Deep end-to-end
+please"); and by afternoon "The app seems to just sit on the "Loading
+catalog" screen (spinning wheel) forever (so far, 10 minutes)."
+
+**The second start, 2026-05-31.** After five weeks away:
+
+> "It has been a while since we worked on this project, and I'd like to
+> see what we can do to pick up where we left off as we look to get
+> this app ready to submit to the app store (after testing on my own
+> Apple TVs first). Please read through all documentation and recommend
+> the best course of action [...] so that we end up with Apple TV's
+> premier app for discovering public domain movies, tv shows, and
+> ephemera from the past 100+ years."
+
+Then "We do have xcode command line tools that you can use to build
+simulators and test code, so don't forget about those." (05-31 13:05),
+and on 06-01 the first real hardware: "I don't see how to add my apple
+tv to xcode in order to push new builds over there, so can you please
+walk me through how to do that as well?" (08:27), followed thirty-five
+minutes later by the first device crash (see F3).
+
+**What the first two weeks show.** A start on the wrong device for the
+job, fixed by moving. Data before design. The first review in a
+simulator, with the simulator's quirks in the feedback. Six rounds in a
+day, numbered, with deferrals named. A refusal to accept fixes without
+understanding, turned into a request for a skill. Ben's own work (a
+schema, reference apps, taste) brought in, not typed out. And the
+background job and the "is it still running?" check that later became
+loops.
+
+#### BOBA Playbook: Cowork's files, Ben's hands, two platforms at once (2026-04-03 to 04-16)
+
+**First afternoon, 2026-04-03.**
+
+- 12:20, the kickoff:
+
+> "I'm starting work on a iOS/Web App regarding Bo Jackson's Battle
+> Arena cards. I have been working on it in Cowork and in the folder
+> FromCowork, you will find the transition files to help replace your
+> Decisions, Scratchpad, and Claude files. However, I have set up a
+> robust template repository that has very strong opinions already in
+> it for how development should happen and the values for all apps
+> created with the template. This needs to be presered (particularly the
+> values), so as you are merging the files and following the transition
+> instructions to fully realize this app, please make sure none of that
+> gets lost from the template files."
+
+- 12:32 "I'd like you to walk me through these steps one by one. I think
+  I put the 4 data JSONs you need into the right spot. Did I do it
+  correctly?"
+- 12:34 "I have a cloudflare account, but I don't think I have installed
+  rclone", then `!brew install rclone`, then eight `! rclone` commands
+  of his own between 12:42 and 12:55 to configure storage and upload
+  the card images (credentials [redacted]), with "(Bash completed with
+  no output)" pasted back once as if it were a message.
+- 13:01 "It is very hard to copy and paste from claude code in macos
+  because it doesn't copy cleanly. Is there any way to make it easier
+  to copy out of terminal cleanly?"
+- 13:03 pastes the database project URL and key [redacted].
+- 13:09 asks what to use as his organization identifier in Xcode.
+- 13:15 to 13:18 `! ls [...].xcodeproj`, `! git add -A && git status`,
+  "Github pages are live at [the github.io address]", `! git push`.
+- 13:19 "Shall we proceed?" then "Let's do it!"
+- 13:35, the first review of real data: "It seems as though the card
+  information and the images are entirely mismatched. There seem to be
+  duplicate entries. And the Loading Card Catalog spinning wheel is
+  persistent on the homepage."
+- 14:04 "Please iterate upon this first version with the following
+  pieces of feedback: [Pasted text #1 +7 lines]" (lost)
+- 14:27 a domain correction only he could make: "The power levels of
+  cards go up to 200, so the power ranges don't make sense (they go up
+  to 10 for elite)"
+- 14:50 and 14:57, the logo:
+
+> "Oh my, no. Animation on a logo?! That is incredibly busy and
+> unnecessary. Also, I don't love BOBA PB when the name is BOBA
+> Playbook. [...] This is the THE APP for collectors of the cards and
+> players of the game. You know all the plays. You know all the moves to
+> make for your collection. The logo and textmark should embrace that
+> and not something that is a "flash in the pan" as this shimmer does
+> now."
+
+- 15:14 "Can you check with the UIUX Pro skill and how well all of the
+  fonts we are using right now match with one another"
+- 15:21, the platform decision, three hours in: "Yes, Start M1 iOS. I'd
+  like to move both versions of the app together along the development
+  path"
+- 15:45 "Can you check to see if I added everything correctly?" (in
+  Xcode) and 15:49 "I want the fonts to work. I have put those files
+  into the correct folder, as far as I can tell."
+- 16:02 "The app says Could Not Load Cards, The data couldn't be read
+  because it is missing. This is from the console:" and the console
+  lines.
+- 16:25 "I'm using my iPhone 15 Pro for testing. The initial card
+  catalog loaded slower this time but the images loaded more quickly."
+- 16:55 "It is still not nearly good enough. The 500 cards show up as
+  loading after 10 seconds (and not less than one second)"
+- 17:05 "the "Rules" view should change to "Play" (because the rules
+  are about playing more than they are about staying within them). This
+  change should happen on the web app too."
+- 18:06 "For some reason when I add the web app to my homescreen on my
+  iphone and then launch it, I get a github 404 page."
+- 18:19 "Alright, it is finally time to start on the next milestone.
+  Before you do that, can you document everything we've worked on so
+  far and clean up anything that needs to be done on either the web app
+  or iOS app?"
+- 18:25 "Great. Let's begin on M2. Do you have any question at the
+  beginning of this milestone that are unanswered by the current
+  documentation?"
+- 18:37, four numbered answers, including a request for research: "3. I
+  think custom URL schemes don't work well on newer versions of iOS, so
+  I'd like to do the most modern version of authentication from email
+  to iOS app. This may require you to research what the most modern
+  solution of that is." (item 4 included marketplace credentials,
+  [redacted])
+
+**The rest of the first two weeks**, in brief:
+
+- 04-04: Sign in with Apple and email accounts, with Ben in the Apple
+  developer portal and the database dashboard ("I would prefer that
+  Xcode set up the Identifier, as it does a much better job. Can you
+  walk me through that?"); M3 opened the same way ("Alright, let's get
+  started on M3. What questions do you have for me before you begin?")
+  and answered with seven numbered items; the card scanner iterated on
+  his phone all evening, scored in his own numbers ("Well, now it is
+  recognizing 0 cards. I tested about 20 different cards and it found
+  0.", 21:11; "This version is very nearly perfect. I only had 1
+  problematic scan out of 20 this time.", 22:00).
+- 04-05: a research guide he wrote in Cowork arrives ("I worked on a
+  comprehensive guide that you should use to build the M4 features");
+  the first parity catch (see F2, stage 02).
+- 04-06: five failed fixes on one page end with "Still no. Can you
+  please build in a diagnostic tool to see what is happening. Good
+  lord." and then colored debug borders he reports back (see F2,
+  stage 04). `/remote-control` that evening.
+- 04-07: "Alright, I'm ready to get the app onto Testflight (App Store
+  Connect). Can you walk me through the remaining steps?" then "You
+  have already done a few of these things for me. Can you go through
+  and see how many of them I actually still have to do rather than just
+  showing the full process?" and "What should my SKU be?"
+- 04-09: App Store review preparation using two named skills, the
+  first privacy policy modeled on Bsky Dreams', a unique ID for every
+  card, and the first written handoff between Claude Code and Cowork.
+- 04-13 to 04-16: deck builder and practice battle built from a Cowork
+  mockup and the game's rules PDFs, with long numbered rounds from the
+  iPhone.
+
+**What the first two weeks show.** A beginner's setup afternoon, in the
+open: files placed by hand, commands run with `!`, keys pasted, "did I
+do it correctly?" asked three times. Two platforms from the first day,
+by decision. Milestones opened by inviting the agent's questions and
+closed by asking it to document. Research and data prepared in another
+tool and handed over as files. Review on his own iPhone from the first
+afternoon.
+
+#### Tidbits Trivia: the template does the setup (2026-06-16 to 06-30)
+
+By June the template carried the scaffolding, and the first day shows
+it.
+
+- 18:12 (commit) the repository is created from the template.
+- 19:05 "[Pasted text #1 +22 lines]". The history lost the kickoff
+  brief, but Ben's notes kept it (quoted in full in G2); the
+  first commit quotes it as "A fully realized multi-player trivia game
+  based entirely upon facts pulled from the open Wikipedia API ... The
+  final outcome of this session should be a working iOS version with
+  all v1 versions of the features fully implemented."
+- 20:00 "Go ahead and commit and change my standing instruction to
+  commit and the communicate rather than ask and then commit. Also,
+  keep pushing forward with the next round of work to fully build out
+  this game/app"
+- 20:41 "Let's tackle the quality moat next"
+- 22:57 "I thought I told you to commmit and push and then communicate
+  about it. Please keeep pushing forward with the next set of work to
+  build this app!"
+
+**Day two, 2026-06-17.**
+
+- 06:01 the first content critique and the first research request:
+  "It seems as though there are very vew different question types [...]
+  (you can figure out the right answer because of the way that the
+  distractors and correct answers are written). [...] "Is best
+  described" seems to be the most common cliche in the questions right
+  now [...] Please conduct additional research to understand all of
+  the options for creating truly great trivia questions and question
+  types."
+- 06:11 "Are you still waiting for the background agent to finish or
+  can you continue the work?"
+- 07:47 "Can you check on the progress?"; 09:16 "It has been over an
+  hour, and progress?"; 09:33 "I don't see any changes to the questions
+  on the web app"
+- 11:19 "Okay, can you prep for our first compaction by documenting
+  everything we need in order to push forward with the next iteration
+  of the apps across all platforms?"
+- 13:45 "I think before we head into the pursuing the launch of the
+  apps, we need to get the question asking and the game modes fully
+  functioning. I'm testing on the web, which is the easiest way for me
+  to see the progress, and I still see mostly the same kinds of
+  questions [...] If we have over 10,000 questions now, the likelihood
+  that I would see the same question twice should be almost 0."
+- 14:21 screenshots as evidence: "There are multiple instances of
+  questions were the answer is literally in the question: [Image #1]
+  [Image #2]"
+- 15:23 "The cardiff question has come up in every single question set
+  I've tried."
+
+**The rest of the first two weeks**, in brief:
+
+- 06-18 15:48 "We aren't the first to do it, but we are going to be the
+  best! Make your own skills if necessary."
+- 06-19 09:01 bought the domain and pointed the web app at it; 09:33
+  "We want the questions to feel like they are being asked in a bar
+  during trivia night."
+- 06-19 15:20 "Alright, let's get the first version of the iOS app ready
+  for my iPhone. What do we need to do in order to get it ready for
+  testing on testflight/" and 15:30 "Let's get it set up in xcode
+  rather than through the command line, shall we?"
+- 06-19 16:13 the first phone review; 16:16 "I don't know the name of
+  colors. Whatever color is behind the icon is what I want to fill the
+  full screen on the splash screen."; four icon rounds ending 17:18 "I
+  like the sqaure looking T. Let's ship it everywhere!"
+- 06-20 08:03 the first feature research: "please deeply research and
+  document all of the different types of "bar trivia" games so that
+  Tidbits Trivia can innovate on them"
+- 06-20 14:25 "I see that you have in fact stopped. I see nothing
+  running." and 15:13 "Have you instituted an autonomous loop to make it
+  all the way through the backlog?"
+- 06-22 09:16 managing cost: "I cannot just keep burning tokens to make
+  this happen [...] Can you strategize a way to allow a smaller model or
+  a more economic method of handling this task"
+- 06-22 15:00 "I just launched the app for the first time on Apple TV
+  and the interface is showing as far bigger than the screen size."
+- 06-23 11:55 the first multi-device play: "The buzzer from the iphone
+  to the apple tv seems to work very well, but I would prefer that the
+  first person to buzz in be able to answer the question on their
+  device"
+- 06-30 11:01 "I would like to submit the first beta of Tidbits Trivia
+  to google play [...] You should have documentation for how to submit
+  using the CI"
+
+**What the first two weeks show.** When the template carries the
+setup, the first day is four prompts and the second day is about the
+content. The first review happened on the live web app because it was
+easiest. The first corrections were about quality only real data could
+show. The phone and the TV came on days four and seven, and his
+standing instructions (commit then tell me; loop through the backlog)
+were set in the first forty-eight hours.
+
+### F2. Stage-by-stage harvest
+
+The best early examples for each stage of the course, chosen for how
+plainly they show a beginner the move. Each carries one sentence on
+what was happening.
+
+#### 00. Values and why
+
+- "However, I have set up a robust template repository that has very
+  strong opinions already in it for how development should happen and
+  the values for all apps created with the template. This needs to be
+  presered (particularly the values)" (BOBA, 2026-04-03 12:20). The
+  first sentence of a new app, before any feature, protects the values
+  paragraph while merging in files from another tool.
+- "I'd also like it to showcase the style of Bsky Dreams and emphasize
+  the core beliefs around learning and community that are baked into
+  the project." (Bsky, 2026-03-04 13:59). On his second CLI day he asks
+  for the README to say why the app exists, not just what it does.
+- "Please also make sure we are continuing to highlight the values and
+  the important decisions being made about how we build and not just
+  what we build." (BOBA, 2026-04-12 13:53). A routine request to tidy
+  the working docs carries an explicit instruction to keep the values
+  in them.
+- "This is NOT what I want. I want my app to be indpendent from Radish.
+  You can look at the stucture from Radish, but if we are just using
+  Radish, there is no reason for this feature to exist. People should
+  just go to radish, right?" (BOBA, 2026-04-12 12:33). The agent had
+  built a price feed by leaning on another site, and Ben rejects it on
+  the grounds of why the feature should exist at all.
+- "Can we try to ensure that the data from discord is not actually
+  being saved in the app but rather simply being used for that session
+  and then removed. This should ensure that Data is not actually being
+  used to track you." (BOBA, 2026-04-08 10:31, item 6 of his answers).
+  Answering the agent's design questions for a chat feature, he sets a
+  privacy line before any code exists.
+- "I did some more digging, and it looks like OpenSubtitles have
+  depricated opensubtitles.org in favor of a higher cost for
+  opensubtitles.com. This doesn't fit with my interest in keeping costs
+  at $0. So, we have to find another source." (Archive Watch,
+  2026-06-22 14:05). The $0 rule, stated as a reason to drop a source
+  he had just chosen.
+- "I'd like to make sure we are leaning into creating feeds that are
+  more about conversations, question asking, and authentic engagement
+  rather than rage baiting or simply re-posting the same things over
+  and over. This is a check to see how aligned the feed is with the
+  values for how we build software." (Bsky, 2026-06-17 11:58). He asks
+  for a values audit of a shipped feature by name.
+- "The free features should NEVER feel like a compromised experience.
+  Daily Tidbits and other casual gaming types on the mobile apps should
+  never cost money or be hidden behind a paywall." (Tidbits, 2026-07-19
+  10:10, rule 1 of 8). Before any pricing research, he writes the
+  values the monetization must meet as a numbered list.
+
+#### 01. First prototype
+
+- "1. We need more results, so please either research other data
+  options and build the port for wikidata. 2. Please delete anything
+  redundant or not useful. I was hampered by being on claude code on my
+  phone, so you can really make it a lot better for the actual app
+  build. 3. Yes, I want to actually build a robust catalog to test in
+  the simulator on xcode." (Archive Watch, 2026-04-18 07:34). The first
+  session had happened on his phone; he moves to the Mac, answers the
+  agent's questions by number, and names the first place he will look
+  at the app.
+- "Okay, the app works in the simulator. The videos play, but there are
+  astonishingly few of them. [...] Please conduct exhaustive research
+  and put together a multi-source plan for increaseing the database to
+  over 1000 items" (Archive Watch, 2026-04-19 06:27). His first look at
+  a running prototype judges the data, not the screens, and asks for
+  research before more code.
+- "I would like to revise the look and feel [...] Please let me know
+  what questions you have about this transformation of the interface
+  for this web app." (Bsky, 2026-03-03 15:49). A wish with a named
+  aesthetic and a named skill, closed by inviting questions.
+- "It seems as though the card information and the images are entirely
+  mismatched. There seem to be duplicate entries. And the Loading Card
+  Catalog spinning wheel is persistent on the homepage." (BOBA,
+  2026-04-03 13:35). The first review of the first build,
+  sixteen minutes after "Let's do it!": three plain observations, no
+  diagnosis.
+- "The power levels of cards go up to 200, so the power ranges don't
+  make sense (they go up to 10 for elite)" (BOBA, 2026-04-03 14:27). A
+  one-line correction that only someone who knows the domain could
+  make.
+- "Go ahead and commit and change my standing instruction to commit and
+  the communicate rather than ask and then commit. Also, keep pushing
+  forward with the next round of work to fully build out this game/app"
+  (Tidbits, 2026-06-16 20:00). Fifty-five minutes after the kickoff,
+  he sets a working rule and asks for the next round rather than polishing.
+- "I'm testing on the web, which is the easiest way for me to see the
+  progress, and I still see mostly the same kinds of questions [...] If
+  we have over 10,000 questions now, the likelihood that I would see
+  the same question twice should be almost 0." (Tidbits, 2026-06-17
+  13:45). He picks the easiest surface to review on and reasons from
+  the numbers to the bug.
+- "Great. Let's begin on M2. Do you have any question at the beginning
+  of this milestone that are unanswered by the current documentation?"
+  (BOBA, 2026-04-03 18:25). How he opened each early milestone: ask the
+  agent what it needs to know, then answer in a numbered list.
+
+#### 02. Shape: data plane and parity
+
+- "Yes, Start M1 iOS. I'd like to move both versions of the app
+  together along the development path" (BOBA, 2026-04-03 15:21). Three
+  hours in, he decides two platforms will advance in step rather than
+  one after the other.
+- "Why does the iOS app say there are 17,838 items in the database but
+  the web app says it has only 12,036? I would like there to be parity
+  across both versions of the app and to have the most cards available
+  to be searched" (BOBA, 2026-04-05 12:16). The first parity catch
+  comes from reading one number on two screens.
+- "I think this is the wrong approach because the art for each of these
+  cards is different (the image file is also different). You should
+  always use the image file difference to determine if the card is
+  different and not the card number." (BOBA, 2026-04-05 12:21). The
+  agent proposed deduplicating by card number; Ben defines what makes
+  a record distinct, which later became a unique ID for every card.
+- "I need all of the interfaces to have their functional equivelance of
+  the URL structure for posts [...] These url structures should be easy
+  to understand and should allow for the most usage throughout the
+  webapp (linking diretly to elements and using the native forward and
+  back keys of a browser appropriately)" (Bsky, 2026-03-11 17:06). He
+  asks for a canonical URL for every surface of the web app, the idea
+  behind the template's "every screen has a link" rule.
+- "First, I want it to be clear that the "seen posts" methodology from
+  the web app is the one that I would prefer, so please attempt to
+  match the way that "seen posts" are calculated [...] All of this
+  should be able to be synced across devices using the metadata within
+  the AT Protocol API." (Bsky, 2026-03-16 15:16). He names which
+  platform's behavior is the reference and where the shared data lives.
+- "I would like you to take a look at all of your documentation as well
+  as the web app itself [...] to write up a full list of all features
+  that are only available within the iOS app. And then I would like you
+  to systematically attempt to create parity for everything that is
+  possible to implement within the web app version" (Bsky, 2026-03-23
+  14:40). The first parity audit, asked for in plain words, a week
+  after the iOS app began.
+- "I noticed that the daily tidbit on android is different than it is
+  on iOS and it is also different than it is on the web. For it to be
+  truly daily across all platforms (and for the right and wrong answers
+  to mean the same thing), it has to be the same across all platforms."
+  (Tidbits, 2026-07-01 17:33). The origin of the cross-platform
+  determinism lesson, found by playing the daily game on two devices.
+- "If you anticipate a gigibyte size database, how are we going to
+  manage that within an Apple TV app? Should we rethink the archetecture
+  [...] Or, have we done good enough filtering on the data" (Archive
+  Watch, 2026-04-19 22:35). On day two, he asks the shape question
+  himself, in product terms.
+
+#### 03. Native platforms and floors
+
+- "The goal of the conversion is not to re-think the app, but rather to
+  re-create it as a native app with the same functions and style."
+  (Bsky, 2026-03-15 07:50). The morning after the first iOS build, he
+  states the difference between porting a design and rebuilding it
+  natively.
+- "Is there a reason why we have focused so much on tvOS 17+ when the
+  modern version of tvOS is 26 and has many design elements that are
+  new and much more modern looking (liquid glass, etc.)" then "My app
+  should absolutely require an Apple TV 4k." (Archive Watch,
+  2026-04-19 17:19 and 17:24). The floor decision, made in two
+  sentences on day two.
+- "I guess that is why a lot of my favorite apps prefer a sidebar
+  implementation for navigation that allow syou to use the arrow
+  buttons instead of the back button to navigate." (Archive Watch,
+  2026-04-19 15:46). After six failed focus fixes, he reaches for how
+  the platform's best apps solve it.
+- "NO! This is absolutely 100% not the case. When I share an image from
+  the photos app to Bluesky, it launches the Bluesky app with the image
+  contained within the Bluesky compose window. [...] I can do this for
+  Facebook, Discord, Gmail, Notion and many others. Please stop telling
+  me it isn't possible and implement it the same way that these other
+  apps have." (Bsky, 2026-03-19 11:31). The agent claimed a platform
+  limit; Ben answers with the apps on his own phone. It worked an hour
+  later ("It worked!!! Thank you.", 12:34).
+- "The universal gesture for "go back" a screen is to swipe in from the
+  left side of the screen toward the right. This gesture should be
+  preserved for every interface within the app" (Bsky, 2026-03-17
+  10:42). A platform convention stated as a rule, with the reason.
+- "Alright, given that we are releasing a version of the app for iPad,
+  we should probably optimize for those screen sizes [...] (iPads are
+  far more often used in landscape than portrait) [...] I'd like to make
+  that version of the app a first-class and native experience as well."
+  (BOBA, 2026-05-06 13:20). The iPad is not a big iPhone, said in May,
+  three months before he said it for Archive Watch.
+- "I don't want this to be a simple port of the iOS app. I want it to
+  feel native to Android and I want feature parity with the iOS version"
+  (BOBA, 2026-05-19 10:06). His first Android prompt: native and parity
+  in the same sentence, with research first.
+- "You should not build a plan to make the Apple TV version into the
+  definitive version, but rather to build the features for the specific
+  platform" (Archive Watch, 2026-06-09 10:55). Starting three new
+  platforms at once, he forbids the easy route of copying the first
+  one.
+
+#### 04. Seeing it work on devices
+
+- "Please create a test for how you will determine if a post is
+  rendered a signgle time and continue to work until your code passes
+  that test." (Bsky, 2026-03-14 22:12). The first night of a new
+  platform, after three failed fixes, he asks for a way to know, not
+  another attempt.
+- "Single taps do not work to select nodes unless I first tap and drag
+  outside of the network visualization. [...] I need you to create a
+  way for you to determine that the following actions will work before
+  implementing yet another fix that doesn't work. 1. Individual taps of
+  a node should select the node. 2. [...] 3. Pinch to zoom with two
+  fingers should function. 4. [...]" (Bsky, 2026-03-18 11:18). He turns
+  a stuck gesture bug into four numbered acceptance criteria.
+- "Can you update the Claude.md, Decisions.md, and Scratchpad.md for
+  the recent updates and to update an approach toward testing so that
+  we don't have to go through 16 iterations on any single feature
+  before you simply implement tests for me to do with results in the
+  console?" (Bsky, 2026-03-18 13:34). After the sixteenth attempt, he
+  asks for the lesson to be written into the working docs.
+- "The debug says: DBG: vsc=regular req=T land=F. The values do not
+  change when I tilt the phone to landscape view (as if it isn't even
+  listening for landscape orientation on that screen)" (Bsky,
+  2026-03-24 14:35). He reads a temporary on-screen debug overlay off
+  his phone and reports what it proves, the exact technique the
+  template's debugging section now teaches.
+- "Still no. Can you please build in a diagnostic tool to see what is
+  happening. Good lord." then "The Red border show on the Rookie and
+  Playmaker pages. However, A blue border and a green border show on
+  the substitution page." (BOBA, 2026-04-06 16:13 and 16:17). Five
+  blind fixes, then colored debug borders that gave him something
+  concrete to report within four minutes; the fix followed that
+  afternoon ("Finally, the rubber banding and horizontal scroll is
+  gone. Please document this so that it doesn't happen again.", 16:59).
+- "You are essentially making me the auditor rather than doing this
+  programatically. I want the "auditor" to fix all of the interface
+  elements, and not make me responsible for fixing them. That feels
+  backwards." (Archive Watch, 2026-04-19 16:56). The agent built a
+  validator that reported problems to Ben; he wants one that fixes
+  them.
+- "Alright, please read the handoff and divergence notes. I believe we
+  need to test the app on real hardware in order to finish the last
+  group of work before moving forward. I don't see how to add my apple
+  tv to xcode in order to push new builds over there, so can you please
+  walk me through how to do that as well?" (Archive Watch, 2026-06-01
+  08:27). Six weeks in, the first real device, and he asks to be walked
+  through it.
+- "Alright, I watched the same one that kept stalling for 5 minutes
+  without any stalls. I think it is fixed." (Archive Watch, 2026-06-03
+  19:27). After pasting stall logs from his Apple TV, he verifies the
+  fix by repeating the exact case that failed.
+
+#### 05. Shipping
+
+- "Okay, I think we are ready to upload the initial version of the app
+  to the app store. Can you update the App_Store_Guide.md for this
+  process, giving more detail to Part 3 and later, as I'm running into
+  errors with registering/finding my bundle ID" (Bsky, 2026-03-20
+  09:27). His first store submission, asked for as a guide he would
+  follow himself.
+- "It is NOT registered to another developer. Everything that I've
+  tried to put in there (this is now the fourth change including one
+  that had my name in it). You need to investigate a different reason
+  why this is failing." then "Alright, I figured it out." (Bsky,
+  2026-03-20 10:03 and 10:12). The bundle ID saga: most of an hour in
+  the developer portal, the agent guessing, and Ben solving it himself
+  (at 09:57 he had found he was signing with his personal team rather
+  than his company's; the final fix he never described).
+- "My version number won't increment even when I change it in the
+  identity section before archiving. Why does it still say version 1.0
+  when it archives instead of 1.01?" then "Can you make it so that when
+  I increment the identity field for the Bsky Dreams target (the
+  version number and the build number) that these numbers match
+  everywhere else that they need to?" (Bsky, 2026-03-21 08:11 and
+  2026-03-23 08:27). The origin of the template's single version file;
+  two weeks later he asked BOBA for "an AppVersion document" like the
+  one in Bsky Dreams (2026-04-07 14:47).
+- "My first version of the iOS app was rejected by Apple App Review.
+  [...] Can you please resolve the issues within the code and provide me
+  with a response that will allow the app to be accepted" then
+  "Doesn't the app have orientation lock and is only avaialble for
+  iPhone, so the orientation shouldn't matter on the iPad [...] Also,
+  shouldn't we point to other bluesky apps instead of email apps for
+  precedent?" (Bsky, 2026-03-24 06:53 and 06:56). The first rejection:
+  he asks for a fix and a reply, then corrects the agent's reasoning
+  before it goes to Apple.
+- "The iOS app is now live on the app store at [the App Store link].
+  Please add both a "Smart App Banner" to the web app version" (Bsky,
+  2026-03-31 08:44). Launch day's first request is to connect the web
+  app to the native one.
+- "You have already done a few of these things for me. Can you go
+  through and see how many of them I actually still have to do rather
+  than just showing the full process?" (BOBA, 2026-04-07 13:58). He
+  asks for the list of what only he must do, the seed of the later
+  "owner tasks" habit.
+- "Can you manage the file versioning and build numbers for each change
+  we make from here on out? I like the 1.001 structure for versioning
+  so that we don't get to 2.0 too quickly." and "Can you add the
+  compliance aspect (App Encryption documentation), so I don't have to
+  do it every time a new version drops?" (Archive Watch, 2026-06-04
+  09:19 and 09:30). Each repeated manual step becomes a request to
+  automate it.
+- "Please push to all of the app stores. I was asking you to do that so
+  that I could test." (Tidbits, 2026-07-01 15:05). By July a store
+  build is how he gets the app onto his own devices.
+
+#### 06. Keeping it running
+
+- "Also, I'm about to go to sleep, so you should be able to run all of
+  this in the background (assuming you auto approve things that might
+  come up while I'm asleep). Can we set that up once you update
+  things?" then "Can you make it verbose so that I can see it
+  happening?" (Archive Watch, 2026-04-19 22:39 and 22:45). The first
+  unattended job, on day two, and the first demand to see progress.
+- "The cannonical TV build failed: [the Actions run link] Can you
+  figure out why and fix it" (Archive Watch, 2026-06-02 11:42). The
+  earliest pattern for CI: paste the failing run, ask for the cause.
+- "Are you sure removing the weekly cron is the right move? We had set
+  up all of the crons so that the catalog continues to improve every
+  day/week on its own without my manual intervention." (Archive Watch,
+  2026-06-03 09:57). He defends the scheduled pipeline as the point of
+  the design.
+- "I don't see you doing anything. I need you to implement a loop to
+  continue tasks so that you don't just stop when you finish the first
+  set." (Archive Watch, 2026-06-03 20:14). The first request for a
+  loop, because the agent stopped after one batch.
+- "Are there any outstanding tasks that can be worked on in the
+  meantime, and did you build an hourly progress update for the
+  background tasks you are running? I always like to know just how
+  long things will take with regular progress updates." (Archive Watch,
+  2026-06-08 09:26). What he wants from long-running work, stated early.
+- "You were in the middle of a very large playbook task that made my
+  machine completely unusable AND caused it to shut down because of the
+  work you were doing. Can you research how to do this work in a less
+  resource intensive way" (Archive Watch, 2026-06-20 10:30). The
+  incident behind "keep the Mac light."
+- "I want to make sure that we are transitioning to the cloudflare
+  workers entirely for the future. I'm okay to run more locally now, but
+  the whole point is to make it so that the estimator and the data is
+  getting better over time without being dependent upon my mac running."
+  (BOBA, 2026-05-30 09:09). The reason work moves off his Mac.
+- "It seems like these loops are really circling around the same exact
+  features and are never expanding out into areas that actually need
+  work. [...] I'm not sure you ever investigated the research folder
+  for the discord exports to mine them for additional feature
+  ideas/requests." (BOBA, 2026-05-21 07:02). His first correction of a
+  loop's choice of work.
+
+#### 07. Raising the ceiling
+
+- "Yes, I would like you to set this up to ingest these commercials
+  into our database. [...] The real purpose of these commercials is to
+  suppliment and build out the Channels interface. [...] it should
+  actually look like an old school channel guide [...] Here is a modern
+  and a retro version of what I am talking about: [Image #3] [Image #4]"
+  (Archive Watch, 2026-06-05 08:33). A new feature described by its
+  purpose, with reference images and a request to research before
+  building.
+- "Can you investigate this github repository to determine if there are
+  any ways to further improve the discover (on the home interface),
+  reader, search [...] views" then "I'd really like to avoid
+  overcomplicating the Home feeds/view as much as possible with a lot of
+  different options (a significant drawback of the official Bluesky
+  app)." then "I'm open to [...] a self-hosted feed generator as long as
+  it can be done via a similar setup to the Github Pages web app
+  implementation (i.e., no implementation costs)." (Bsky, 2026-04-01
+  13:56, 14:04, 14:13). Research from a source he found, bounded by
+  simplicity and $0 within twenty minutes.
+- "How easy would it be to implement a single Discord channel chat from
+  the official BOBA discord [...] Let me know what questions you have
+  about this implementation." then "I don't want bot access. I want
+  people to be able to login with their own accounts and simply send
+  messages as themselves." (BOBA, 2026-04-08 10:21 and 10:24). A
+  feasibility question, then a correction on how people should
+  experience it.
+- "This request came from the following feedback from a beta tester:
+  [...]" and "Definitely Plan A is the way to go." (BOBA, 2026-05-15
+  13:37 and 13:40). A feature that started as a tester's sentence.
+- "I'd like to start working on alternative game modes, particularly
+  ones that let you use your phone as the "buzzer" [...] please deeply
+  research and document all of the different types of "bar trivia"
+  games so that Tidbits Trivia can innovate on them" (Tidbits,
+  2026-06-20 08:03). Research first, framed as learning from an
+  existing tradition.
+- "I think this interface needs a pretty fundamental rethink. All of
+  the elements are there, but it is not intuitive [...] You could learn
+  how to do this better by research how CapCut does their scrubbers and
+  clipping" (Archive Watch, 2026-06-16 09:27). A critique that names the
+  app people already know.
+- "Alright, I'd like to work on integration from my app to one of my
+  favorite apps (Callsheet [...]). I have written to the creator of
+  Callsheet [...] and this was his response when I asked about it:
+  [Pasted text #4 +14 lines]" (Archive Watch, 2026-06-19 15:09). He
+  wrote to another app's developer himself and handed the answer over.
+
+#### 08. Working with AI: memory, skills, handoff
+
+- `/plugin marketplace add nextlevelbuilder/ui-ux-pro-max-skill`
+  (Bsky, 2026-03-03 15:45). His first act in the CLI record was
+  installing a skill, and his first request used it by name.
+- "Befoore you compact again, can you please document everything you
+  have tried so far to fix the rounded rectangle outline for the post
+  button [...] I want you to be aware of what has been tried thus far."
+  (Bsky, 2026-03-17 08:48). Writing down failed attempts so the next
+  context does not repeat them.
+- "It worked!!! Thank you. Also, can you document this
+  process/iterations to ensure that all deprecated approaches are not
+  attempted again the future." (Bsky, 2026-03-19 12:34). The moment of
+  success used to capture the lesson.
+- "I think you will need to do the systematic study yourself given that
+  there doesn't seem to be a dedicated skill available. So, this would
+  be you developing a world-class tvOS design and development skill"
+  (Archive Watch, 2026-04-19 16:25). When no skill exists, the agent
+  writes one.
+- "I would like to be able to go back and forth between this claude
+  code instance and my research claude cowork instance [...] Can you
+  create a way that I can easily handoff changes from claude code to
+  Cowork and back so that nothing gets missed?" (BOBA, 2026-04-09
+  13:54). The first written handoff between two AI surfaces.
+- "I am looking to create a new web app and iOS app that is completely
+  different than Bsky Dreams [...] I would like to create a new version
+  of this template that takes the best things that we have learned"
+  (Bsky, 2026-04-01 15:16). The first upstreaming, the day after the
+  first app went live; the Xcode Cloud "project does not exist at the
+  root" error is named as a reason.
+- "Can you also look through all of your documentation for the lessons
+  learned and the way in which I do web, iOS and iPadOS development with
+  the values I have and make claude skills that will help to produce
+  repeatable and highly sophisticated results within this repository
+  and others?" (BOBA, 2026-05-18 09:50). Skills asked for as the
+  deliverable, not as a side effect.
+- "I'd like you to document a skill for autonomous loops that documents
+  the cadence we have established for updating all platforms, the
+  balance of fixes, new features, and optimization" (BOBA, 2026-05-21
+  09:49). The origin of the template's `autonomous-loop-cadence` skill.
+- "I need you to verify that you are both using the right model for
+  such work AND that you are using agents sequentially instead of
+  concurrently. If you do them concurrently, they will all hit the
+  session limit at the same time and return no useful information."
+  (Tidbits, 2026-07-14 11:10). A cost lesson turned into a rule.
+
+### F3. Moments that would make good stage-opening stories
+
+1. **The phone that could not finish the job (stage 01, Archive Watch,
+   2026-04-17 to 04-19).** Ben started Archive Watch in Claude Code on
+   his phone, then moved to the Mac the next morning because "you can do
+   things that the desktop app cannot." His first look at the app, in
+   the tvOS simulator a day later, was not about screens at all: "The
+   videos play, but there are astonishingly few of them," followed by a
+   request for exhaustive research.
+2. **Four prompts and a morning on the web (stage 01, Tidbits,
+   2026-06-16 to 06-17).** A pasted brief, "commit then tell me,"
+   "tackle the quality moat," "keep pushing," and by the next afternoon
+   Ben was playing the web version and noticing the same question about
+   Cardiff in every set. The lesson is that real data exposes the real
+   problem on day two.
+3. **"Oh my, no. Animation on a logo?!" (stage 00 or 01, BOBA,
+   2026-04-03 14:57).** Under three hours into a new app, Ben rejects a shimmer
+   logo by saying what the app is for: "This is the THE APP for
+   collectors of the cards and players of the game." Taste stated as
+   purpose.
+4. **Two numbers that should match (stage 02, BOBA, 2026-04-05
+   12:16).** The iOS app said 17,838 cards and the web app said 12,036.
+   The agent's fix would have merged cards by number; Ben said a card is
+   defined by its image, which led to a unique ID for every card four
+   days later.
+5. **"Not to re-think the app, but to re-create it" (stage 03, Bsky
+   Dreams, 2026-03-14 to 03-15).** Ben creates the Xcode project
+   himself, pastes a dozen messages of compiler errors, finds every post
+   drawn twice, asks for a test, and the next morning writes the
+   sentence that separates a native rebuild from a redesign.
+6. **"Why can other apps accomplish this?" (stage 03, Bsky Dreams,
+   2026-03-19).** The agent says a share sheet cannot open the app. Ben
+   answers with Bluesky, Facebook, Discord, Gmail and Notion on his own
+   phone, pastes console logs five times, and at 12:34 writes "It
+   worked!!!" and asks for the failed approaches to be documented.
+7. **Sixteen tries at one gesture (stage 04, Bsky Dreams, 2026-03-18).**
+   Dragging a node in a network graph failed for a whole morning. Ben
+   wrote four numbered acceptance criteria, reported that passing tests
+   did not mean a working feature, and ended by asking for the testing
+   approach itself to change "so that we don't have to go through 16
+   iterations on any single feature."
+8. **The first real Apple TV (stage 04, Archive Watch, 2026-06-01).**
+   Six weeks of simulator work, then "walk me through how to do that,"
+   and thirty-five minutes later a fatal error: the app could not write
+   to a folder the simulator had always allowed. It is the tvOS
+   writable-directory lesson in the template, found the first time the
+   app touched hardware.
+9. **Colored borders after five blind fixes (stage 04, BOBA,
+   2026-04-06).** One page scrolled sideways and five fixes changed
+   nothing. "Can you please build in a diagnostic tool to see what is
+   happening. Good lord." The agent drew colored borders; Ben reported a
+   blue and a green border that should not exist, and within the hour
+   wrote "Finally, the rubber banding and horizontal scroll is gone.
+   Please document this so that it doesn't happen again."
+10. **The bundle ID that would not register (stage 05, Bsky Dreams,
+    2026-03-20).** Four identifiers rejected, the agent apparently
+    suggesting the name was taken, Ben insisting it was not. Along the
+    way he found he had been signing with his personal team instead of
+    his company's, and ten minutes after his last complaint he wrote
+    "Alright, I figured it out." and moved straight on to a dark-mode
+    fix. A true account of what shipping the first time feels like.
+11. **The version number that would not change (stage 05, Bsky Dreams,
+    2026-03-21 to 03-23).** Ben changed the version in Xcode and the
+    archive still said 1.0; then the share extension's version stopped
+    matching the app's. His request to make the numbers "match
+    everywhere else that they need to" is where the template's single
+    version file comes from.
+12. **Going to sleep with the job running (stage 06, Archive Watch,
+    2026-04-19 22:39 to 04-20).** Ben asks for the catalog build to run
+    overnight, asks for it to be verbose "so that I can see it
+    happening," and checks at 23:58, 07:09, 08:37, 13:10 and 19:07. The
+    first unattended job, and every question a loop later has to answer.
+13. **"I need you to implement a loop" (stage 06, Archive Watch,
+    2026-06-03 19:42 to 20:14).** Ben hands over a pasted backlog (the
+    commit calls it "the 20 requested items") to be done autonomously, sees the agent ask him questions and then
+    stop, and says "I don't see you doing anything. I need you to
+    implement a loop to continue tasks so that you don't just stop when
+    you finish the first set."
+14. **The first rejection answered twice (stage 05, Bsky Dreams,
+    2026-03-24).** Apple rejected the first build. Ben asked for fixes
+    and a reply, then three minutes later corrected the agent's draft:
+    the app is iPhone only, and the precedent should be other Bluesky
+    apps, not email apps. The reply that goes to a reviewer is his.
+15. **"A check to see how aligned the feed is with the values" (stage
+    00, Bsky Dreams, 2026-06-17).** Three months after launch, Ben
+    notices what the Discover feed is showing, tests it with a second
+    account, and asks for research into a feed built around
+    "conversations, question asking, and authentic engagement rather
+    than rage baiting." Values used as an audit, not a slogan.
+
+### F4. What the early record changes about sections A to E
+
+In short, and already folded into the sections above:
+
+- **He started where a beginner starts.** On his phone, in the web
+  version of Claude Code, and in the simulator; with GitHub Desktop
+  commits and merge conflicts; with a usage limit hit in the first hour.
+- **He did the Xcode half by hand for three months.** Creating
+  projects and targets, moving folders, pasting compiler errors one
+  message at a time, pressing the Play button to reach his iPhone,
+  archiving and uploading.
+- **He ran commands and handled keys himself.** `!` commands for
+  storage, workers, git and logins; service keys pasted into the chat.
+  The later credential friction (sections B05 and D) is the other end
+  of this.
+- **He asked for tests and diagnostics from the first iOS night,** and
+  ran them himself, before he asked the agent to run them.
+- **He installed skills himself and named them in prompts,** and told
+  the agent to write one when none existed.
+- **He brought work from elsewhere:** Cowork data and guides, his own
+  schema pass, rules PDFs, reference repositories, a developer's reply,
+  testers' messages.
+- **His early feedback rounds were mostly pasted** from notes written
+  away from the chat, so the most detailed early critiques are the ones
+  the prompt history lost. Section G recovers many of them from the
+  notes themselves.
+
+## G. Ben's notes: where the prompts were drafted
+
+Sections A to F read Ben's prompts from the Claude Code side. This
+section reads them from the other side: the Apple Notes he kept while
+building, where most of his long prompts were written before they were
+pasted. Six exports were available:
+
+- **"Tidbits Trivia"**, the running note for Tidbits Trivia.
+- **"Public Domain Apple TV App"**, the running note for Archive Watch
+  (the app's working title before it had a name).
+- **"Boba App ideas"**, the running note for BOBA Playbook, by far the
+  longest (about 100 KB).
+- Three single-prompt notes, each titled by its first line because that
+  is how Notes names a note: "We need to work on a few things within
+  the Android TV version of the app", "1. Yes. Move forward with a single
+  clock", and "/loop It is now time to do a full audit of our
+  database". All three are Archive Watch.
+
+How the blocks were dated. The prompt history records a pasted block as
+"[Pasted text #N +M lines]", where M is one less than the block's line
+count, and keeps the sentence Ben typed around it. A note block is
+treated as matched when its line count fits, its content fits the
+prompts on either side, and (where there is one) a commit or a
+follow-up prompt refers to it. Blocks he typed or pasted as plain text
+match word for word. Where a block is not in the CLI history, this
+section says so; some sessions ran on other surfaces (the phone, the
+web, Cowork), and the history only covers the CLI on his Mac.
+
+The notes also held things that must never be copied: service keys,
+tokens, a keystore's certificate fingerprints, a database password, an
+OAuth secret, project numbers, channel URLs. All of it sat in the same
+note as the feedback rounds. None of it is reproduced here, and where a
+quote touched it, it reads [redacted]. Names of friends and testers are
+replaced with "a friend" or "a tester". Typographic quotes are
+normalized; Ben's spelling is kept.
+
+### G1. The practice: one running note per app
+
+**One note per app, kept for the life of the app.** Each running note
+starts with the wish and then grows downward, round by round, for
+months. The Archive Watch note runs from the April feature ideas to the
+September Roku search feed. The BOBA note runs from the first vision
+list, through thirteen numbered "Feedback" rounds, to the Android beta,
+a partner's data revocation in late May, and a CDN domain move after
+it.
+
+**The shape of a running note**, top to bottom:
+
+1. **The kickoff or vision at the top.** A one-sentence wish, then a
+   numbered feature list, then research asks, then what the session
+   should produce (G2 quotes all three).
+2. **Naming, before anything is built.** The BOBA note keeps two
+   numbered lists of candidate app names ("Alternative app names" and
+   "App Names", twenty-one in all, with his own verdicts in brackets
+   such as "(still too close)" and "(too close?)").
+3. **Numbered rounds with a plain heading.** "Next:", "Next feedback:",
+   "Next Feedback:", "Next round of updates:", and in BOBA "Feedback 2"
+   through "Feedback 13". Some rounds are named for their subject
+   instead: "Navigation Update:", "Streaming Features:", "Profile view
+   updates:", "Web App Updates:", "Updates to the Practice Battle setup
+   screen:", "Feedback on Pricing inconsistencies:", "Feedback on Web App
+   Version of Deck Builder and Practice Battle:". Each item is one
+   observation from using the app: where it is, what is wrong, what it
+   should be, and on which platforms.
+4. **A ledger.** The Archive Watch note has "Done:" (five items moved
+   there from the idea list), "Fix:" (two data errors he spotted), and
+   "Outstanding items:" (social media promotion). The BOBA note has
+   "Future:" (a long list of ideas with question marks) and checkboxes
+   for non-code tasks. Archive Watch ends with "Ideas for further
+   execution and/or monetization".
+5. **Loop charters drafted ahead.** Whole `/loop` prompts, written in
+   the note with the `/loop` already typed at the front, sometimes days
+   before they were sent (G3, stage 06).
+6. **Answers to the agent's numbered questions,** written as a numbered
+   list that mirrors the agent's numbering ("1. Yes. Move forward with
+   a single clock", G3 stage 08).
+7. **Outside voices.** A friend's request ("Request from [a friend]: Oh
+   please do Google home integration!"), testers' messages with Ben's
+   draft replies underneath, a partner's email pasted whole, and
+   experts' feedback on card terminology.
+8. **Owner actions the agent handed back.** Instructions Ben had to act
+   on himself, kept until he did: an OAuth client to create in a cloud
+   console ("One owner action: create a Desktop app OAuth client in
+   Google Cloud project [redacted] ..."), a DNS move written out as
+   numbered steps, the setup steps for connecting a second tool's
+   services to the CLI, and a table of Android Studio menu items next to
+   their Xcode equivalents.
+
+**How the notes relate to what reached Claude Code.** The notes are
+where the long prompts were written; the terminal is where they were
+sent. Ben wrote a round while using the app on a device, away from the
+chat, then pasted the whole block with a one-line preamble that set the
+scope. The preambles are the part he typed at the Mac:
+
+- "Please work on the following ten tasks as a set of large updates for
+  Tidbits Trivia across all platforms. However, before you start please
+  read through your documentation for how we build and where we are in
+  the progress of each platform:" (Tidbits, 2026-07-01 12:39)
+- "Here are the intitial pieces of feedback for the two new features.
+  Although they were written while only looking at the web app version
+  of the features, some of them also have implications for how the iOS
+  version is built, so please pay attention to both for any issues that
+  need to be resolved for b[oth]" (BOBA, 2026-04-13 14:29)
+- "Please use any iOS software building skills to make the following
+  updates on the iOS app (while paying attention to anything that would
+  also need to be updated on the web app to be completed in a
+  subsequent session):" (BOBA, 2026-04-14 12:03)
+- "Alright, it is now time to build out the big backlog to take this
+  app through to its first version I want to make available on the app
+  store. [...] I would like you to prioritize and group them so that
+  you are able to work on them across multiple sessions. I would also
+  like you to attempt to build out all of them prior to doing testing
+  them myself on device." (Archive Watch, 2026-06-03 19:42)
+- "I'll verify on device. Now it is time to genuinely move on from
+  subtitles to a new scope of work that I'm very excited about."
+  (Archive Watch, 2026-06-22 15:06)
+
+When he was not sure a round had landed, he pasted it again: "Did all
+of these issues get solved for? I think there was at least one
+compacting during that last session:" followed by the same thirteen
+items (BOBA, 2026-04-14 08:58).
+
+**The matches.** Where each note block reached Claude Code:
+
+| Note block | Reached Claude Code | How it was matched |
+|---|---|---|
+| Tidbits kickoff (22 lines) | 2026-06-16 19:05, the whole first message: "[Pasted text #1 +22 lines]" | Line count; the first commit quotes its opening and closing sentences |
+| Tidbits first "Next:" (10 items) | 2026-07-01 12:39, "the following ten tasks [...] [Pasted text #1 +9 lines]" | Ten items, ten lines |
+| Tidbits second "Next:" (6 items, Firebase) | Not in the CLI history | Its Firebase decision follows the 07-02 06:43 request to "research 3rd party matching services" and precedes his first `! firebase login` (07-03 06:03) |
+| Tidbits `/loop` for Tidbits Live | 2026-09-09 08:43, and again 09-10 11:43 | Word for word |
+| Tidbits "Next round of updates" (Windows) and the Chrome extension line | Not found | The extension line ends mid-sentence in the note: a prompt still being drafted |
+| Archive Watch feature ideas 1 to 20 | 2026-06-03 19:42, "[Pasted text #5 +19 lines]" | Twenty lines; the commit calls it "the 20 requested items"; at 19:47 Ben answers the agent on items 11 and 14 (Sign in with Apple, the BOBA repository) |
+| Archive Watch Creation Studio kickoff | 2026-06-22 15:06, "[Pasted text #4 +12 lines]" | Thirteen lines; the Creation Studio prompts start that week |
+| Archive Watch Roku search feed | 2026-09-10 11:22, after "Resume after API error. Also," (sent four times through API errors) | Word for word |
+| Archive Watch Android TV six items | 2026-09-03 09:47, the whole message: "[Pasted text #1 +16 lines]" | Seventeen lines as exported; the next prompt (10:14) adds "feedback from one my users on Android (phone)" |
+| Archive Watch "1. Yes. Move forward with a single clock" | Not in the CLI history | |
+| Archive Watch database audit `/loop` | Not in the CLI history word for word | Its closest typed relative is "/loop 5 minutes I continue to find descriptions and other metadata that are not appropriate for the films and titles that they are attached to" (09-16 08:55) |
+| BOBA vision list | Before the CLI record | BOBA began in Cowork; the CLI kickoff (04-03 12:20) is about merging Cowork's files |
+| BOBA search/share/swipe bullets, then the Play view bullets | 2026-04-06 10:48 and 13:54, "[Pasted text #1 +4 lines]" each | Five bullets each; the 13:54 preamble names "the "Play" view" |
+| BOBA "Feedback 2" (9 bullets) | 2026-04-06 21:25, "[Pasted text #1 +8 lines]" | Line count and preamble ("Please update both apps (iOS and Web App)") |
+| BOBA "Feedback 5" and "Feedback 6" | Typed directly, 04-08 07:50 and 04-11 21:03 | Word for word |
+| BOBA "Feedback on Web App Version of Deck Builder and Practice Battle" (12) | 2026-04-13 14:29, "[Pasted text #1 +11 lines]" | Line count; preamble quoted above |
+| BOBA "Feedback 9" to "Feedback 13" | 04-13 15:41 (+7), 04-14 08:17 (+12, resent 08:58), 04-14 12:03 (+9), 04-14 12:56 (+6), 04-15 11:58 (+7) | Each count is the round's item count minus one |
+| BOBA practice-battle and deck-builder "Next Feedback" (4 bullets) | 2026-04-21 08:58, "[Pasted text #1 +3 lines]" | Line count |
+| BOBA long deck-builder round with the deck CSV | 2026-04-22 07:54, pasted with the same CSV file's path | The CSV attachment in the note has the same file name |
+| BOBA "Navigation Update" (8 items) | 2026-04-22 09:04, "[Pasted text #1 +7 lines]" | Line count |
+| BOBA "Streaming Features" 1 to 5 | 2026-04-23 07:11, "[Pasted text #1 +7 lines]" | Next prompt, 07:33: "I don't see the ability to make any of the users into a "streamer" role" |
+| BOBA "Showcases" round (4 bullets) | 2026-04-23 09:57, "A couple of good updates for the next version of the iOS and Web App: [Pasted text #1 +3 lines]" | Line count |
+| BOBA practice battle / deck builder round (7 items) | 2026-04-24 11:54 to 11:55, pasted and then resent as plain text | Word for word (renumbered 4 to 10 in the terminal, and "Boba" corrected to "BoBA" in the resend) |
+| BOBA card-taxonomy round with the experts' CSV | 2026-04-24 14:23, "One more major update for today: [Pasted text #2 +10 lines]" plus the path to "Card Treatments.csv" | The note's expert quote says "See the CSV attached" |
+| BOBA "M0 Development for Android App" (11 answers) | 2026-05-19 11:24, "[Pasted text #1 +11 lines]" | Twenty-two minutes after "Can you list out the questions that you need answers to so that I can start answering them?" |
+| BOBA all-night loop charter | Not in the CLI history | It cites "the loop documentation/skills that is already available", which Ben asked for on 05-21 09:49; he stopped an overnight loop on 05-22 08:01 |
+| BOBA partner email and the replacement loop | Not in the CLI history | On 05-26 13:29 he asks about "the ongoing 30-day process to fully replace all of the radish functionality" |
+
+Two things follow from the table. First, the rounds were frequent and
+fast in April (BOBA had five pasted rounds between 04-13 15:41 and
+04-15 11:58), which means Ben was using the build between rounds, not
+waiting for a finished app. Second, the same practice ran through
+September: the Roku search feed and the Tidbits Live loop were drafted
+in notes and sent word for word, five months after the first BOBA
+round.
+
+### G2. The kickoffs, verbatim
+
+**Tidbits Trivia, the kickoff.** The whole first message of the
+project, 2026-06-16 19:05. Section F1 records it as lost because the
+history kept only "[Pasted text #1 +22 lines]"; this is that block.
+
+> # Tidbits Trivia:
+> A fully realized multi-player (both local and online) trivia game that is based entirely upon facts pulled from the open Wikipedia API.
+>
+> Full features should include:
+> 1. Game Center support on Apple TV and iOS
+> 2. Multiple game categories and modes (time-based, team-based, etc.)
+> 3. Ability to create quizzes on the fly from a given wikipedia article or topic
+> 4. Well constructed design aesthetic with pops of color, an intentional color pallete, and specific choices about text and backgrounds that are playful and somewhat 90's inspired.
+> 5. All game questions are well constructed from a repository of question templates to allow for easy conversion of wikipedia articles into engaging trivia questions.
+> 6. Ability to match people to compete against either head-to-head or in a group.
+> 7. Ways to share questions and scores via social media (although, never X/Twitter)
+> 8. Support for multiple platform play (TV, iPhone, Web, Android) to allow for playing across all platforms
+> 9. Single-player mode with the ability to keep records and compete against your previous scores.
+> 10. A huge number of questions (10,000+) in a responsive local database (on device, if possible) to help make sure that you never see the same question twice.
+>
+> Please research other quiz/trivia/game/competitions apps that are in the space and determine what key features are not listed above and would allow for this app to compete on its merits and also introduce a number of differentiating factors/features to set it apart from the rest (design should be a part of that too).
+>
+> Additionally, research quiz/trivia theory and look for best practices that best for using with digital-mediated trivia games (bar quizzes, online games, etc.). You should use all of the tools at your disposal (claude code skills, documentation, web search, etc.) to truly understand game theory and the best way to construct a mobile game for engagement, entertainment, and learning.
+>
+> Please use your repository documentation to help you build out the project/plan and determine the best plan for ensuring all features are well outlined and can be executed by claude code via markdown files. A full parity matrix should be written with any important platform-specific decisions that will need to be considered.
+>
+> The final outcome of this session should be a working iOS version with all v1 versions of the features fully implemented.
+
+Its parts, in order: one sentence of wish that names the data source;
+ten numbered features, each a capability rather than a screen; two
+research asks (the competition, and the theory of the form); an
+instruction to plan with the repository's own documentation, ending in
+a parity matrix; and what the session should produce. Right under it in
+the note sits the first outside request: "Request from [a friend]: Oh
+please do Google home integration! I used to get random facts from my
+Google home until they swapped to Gemini and now it just gives me one of
+like 5 canned facts". The CLI history shows no smart-speaker prompt; it
+stayed a note.
+
+**BOBA Playbook, the vision list.** Written before the CLI record,
+when the app was being shaped in Cowork. It is the top of the note,
+above the naming lists.
+
+> # Boba App ideas:
+> 1. The design of the app: Highly stylized view of cards with emphasis on bold colors and big stat/info text/numbers. The interface should be a combination of Retro-futurism, hyper-realism, cyberpunk UI, and glassmorphism. The emphasis should be on ease of use an intuitive look and feel, but with an opinionated design that draws you in and engages you with great artwork, just the same way that the BOBA cards do.
+> 2. Search Mode: A fully functional database of all BOBA cards that can be searched and filtered. It should also have pre-built categories based upon card taxonomy that can be independently browsed (sets, variations, etc.). Ideally, the app would have current pricing comps pulled for cards from both Radish Price Guide (https://radishpriceguide.com) and eBay. You should also be able to look up Boxes (hobby, double mega, jumbo, etc.) lookup and show comps on eBay.
+> 3. Scan Mode: Use the iOS camera to scan for the presence of a BOBA card, conducting photo scanning entirely with on-device processing based upon the knowledge of where the key features are within a BOBA card (numbers around the edges, product name in the bottom middle of the card, etc.) and that will automatically identify the card and pull up the correct information about set, hero, power, etc. There should be a mode to scan Multiple cards at once and create a queue of searches that will tally up the value of the cards based upon comps from Radish or eBay.
+> 4. Book Mode: Rules and strategy lookup for specific cards (providing advice for how to play). This should also produce advice for how to make decks of cards for playing the BOBA game. It should pull from your own collection to provide examples for how to use the cards you already own to play the game.
+> 5. Collection Mode: You should be able to add cards you have searched for or scanned to a collection in order to keep track of your portfolio of cards. This should keep track of how much your collection is worth as well as allow you to create different designations for cards (Personal Collection, To Sell, To Trade, etc.). This should be saved into your personal account and have it be synced/available on both iOS and the Web App.
+> 6. Feature for future release: Embedding a single Discord channel ([redacted]) form the BOBA discord for use in trading cards
+
+Design first, then four "modes" named for what a collector does, then
+one item deliberately labeled "for future release." Item 2's reliance on
+a third-party price guide is the dependency that was revoked in May
+(G3, "What stays human").
+
+**Archive Watch, the feature ideas list.** Headed "Scratchpad Feature
+Ideas:" under the working title. Items 1 to 20 are the block Ben pasted
+on 2026-06-03 19:42 as "the big backlog to take this app through to its
+first version". The "Done:" list below it is his ledger of what had
+already moved out of the list.
+
+> # Public Domain Apple TV App:
+> Scratchpad Feature Ideas:
+> 1. 24-hour programming channels for specific types of content (eras, genres, collections, and the ability to create your own based upon filters set for the full database)
+> 2. Cartoon-only overlay that turns your app into a cartoon wonderland (great for kids and ambient watching)
+> 3. A background/party play that shows video only with no audio (with the ability to turn on audio), but that focuses upon high contrast/high-interest videos that are visually interesting and that autoplays in the background.
+> 4. Full support for cast and crew connections (scrolling through images of cast and crew and allowing the selection of each one to navigate to other movies with those people in them). Also character support (multiple movies with the same characters should be connected too)
+> 5. Full support for subtitles (via API or automatically generated), video speed, audio language, and video quality.
+> 6. Ability to do on-device upscale videos for higher resolutions of televisions
+> 7. Category for documentary films
+> 8. Skip credits and intro options for tv shows and movies
+> 9. Info overlays on the video and the ability to go between episodes of tv shows
+> 10. Autoplay options for the same show, same category, same year, etc. You should be able to set these globally in settings or on an individual playing video in the settings for the video.
+> 11. Login with Apple ID and the ability to save favorites with cloud syncing of progress across multiple Apple TVs
+> 12. The ability to add playlists (beyond just favorites) or create your own collections that are saved to your account
+> 13. Cover image generation from videos with emphasis on actor faces and key scenes from the movie wherever posters are unavailable
+> 14. Movie cover art screen saver that mimics the old cover art visualization from iTunes (can use code from a similar feature built out within the BOBA-Playbook repository)
+> 15. Public domain day celebrations and the ability to see all movies/tv that entered the public domain in a particular year.
+> 16. Ability to share individual videos to your phone or to anywhere else
+> 17. Make it so you don't see titles that you have already watched on the home screen
+> 18. There are still many examples of individual TV episodes that show as movie/films. They need to be fixed to put them into their correct TV show and season.
+> 19. Sometimes when you attempt to play a title, it shows the player with a crossed out circle instead of playing the video. Please investigate.
+> 20. There are also still many examples of incorrect poster (for example, movies from the 2000s for a title that was from the 1960s) and the description matches the modern/incorrect poster and not the original title. We need better validation for the videos themselves and better matching from our sources of truth for the metadata and images. Other times the title and the video just do not match and so you aren't really sure what movie you are playing. We need validation at every step of the process (sourcing, metadata writing, poster alignment, etc.)
+>
+> Done:
+> 1. Full support for tv shows with episode navigation and plot summaries for individual episodes
+> 2. The focus of the app upon launch is still the sidebar instead of the home page hero content.
+> 3. The content is still "indented" by the size of the icons in the sidebar, when it should fill the full screen
+> 4. The surprise screen tiles still do not match the tiles on the other views and they should
+> 5. Full icon and logo development
+
+The list mixes kinds on purpose: features (1 to 17), bugs he had seen
+(18 to 20), and a reference to another of his own repositories (14).
+The "Done" items keep their original bug wording ("is still the
+sidebar"), which shows they were written as feedback and moved to the
+ledger once fixed, not rewritten.
+
+### G3. Stage by stage: the note excerpts that show the move
+
+Each excerpt is verbatim from the notes, with one sentence on what was
+happening. The date is when it reached Claude Code, where the history
+shows it.
+
+#### 00. Values and why
+
+- The values restated inside a loop charter, with the stop condition in
+  the same breath (Tidbits, sent 2026-09-09 08:43):
+
+  > "Remember, we build software for parity and our values fully out in front. Our trivia app is based upon the idea that everyone who uses it should be learning, so our connection to learn more from Wikipedia should be clear. We are also building for PEOPLE, so we want people to experience joy when they run an event, when they join a live experience, or when they are using the daily tidbit."
+
+- A content critique judged by what the player learns, not by whether
+  it works (Tidbits, second "Next:" round, item 5):
+
+  > "These are not only easy questions but are intensely uninteresting and do not cause the user to learn anything in the process."
+
+- A values line inside a feature list (Tidbits kickoff, item 7): "Ways
+  to share questions and scores via social media (although, never
+  X/Twitter)".
+- A rule stated as a mantra so the agent cannot trade it away for a
+  shortcut (BOBA, appended to the partner-revocation loop in late May):
+
+  > "Oh, and I want to be super clear about the card art. EVERY SINGLE CARD ART is different. We have to continue with the mantra of one card, one image, one BOBAid. We can never use another set of card art to represent a different card. Do not pursue options that will go against that mantra."
+
+- The audience named in an answer about data (Archive Watch, the single
+  clock answers, item 2): "We are creating/finding collections that
+  everyone will want to watch, so they need to be generally
+  understandable to the public."
+
+#### 01. First prototype
+
+- What the first session should produce, stated as the last line of the
+  kickoff (Tidbits, 2026-06-16): "The final outcome of this session
+  should be a working iOS version with all v1 versions of the features
+  fully implemented."
+- The first reaction to a first build, written in the note as item 1 of
+  the first BOBA round (early April), asking which skill was used:
+
+  > "1. I would like to iterate upon the look and feel. It feels very much like a "first draft effort", which makes sense, but it must have far more personality than a generic AI-built web app. Did you use the UXUI Pro Max skill or just the guidelines from the claude documentation? I want this platform to be truly unique and look specific to a BOBA Playbook App that is recognizable instantly as itself."
+
+- Plain first-look observations from the same round, one line each:
+  "4. Any text on the screen needs to be legible, so please figure out
+  ways to ensure there are no dark text on dark backgrounds." and "5. We
+  need to create a cool image for any "missing image" cards. Right now,
+  they are just question marks."
+- A first-look bug described by feel, from a phone (Tidbits, first
+  "Next:", item 3, sent 2026-07-01): "The iPhone app main screen has the
+  ability to partially scroll horizontally with a rubber banding
+  effect. This should not be possible. It should only allow for
+  vertical scrolling on the home page."
+
+#### 02. Shape: data plane and parity
+
+- The one-value-everywhere requirement, found by using the app (Tidbits,
+  first "Next:", item 2, sent 2026-07-01 12:39):
+
+  > "2. Although Daily Tidbits says that "everyone gets the same set", this doesn't seem to be the case. Every time I open the Daily Tidbit, it shows a different set of questions. I would like for there to be a single set of daily tidbits per category that you can select from, but that are selected and are the same for everyone for the full 24 hours. Additionally, when you share your score, it should link back to https://tidbitstrivia.com rather than just asking folks to compete and not giving a link."
+
+  Five hours later he typed the cross-platform half: "For it to be
+  truly daily across all platforms (and for the right and wrong answers
+  to mean the same thing), it has to be the same across all platforms."
+  (2026-07-01 17:33)
+- A shared clock decided in one line (Archive Watch, single clock
+  answers, item 1): "1. Yes. Move forward with a single clock. If you
+  need a time zone to organize around, you can choose UTC, but all
+  times should show as their local times when they look at channels.
+  This should only be to sync all titles to the same time."
+- Interoperability with another tool's file format as the data contract
+  (BOBA, web deck builder round, item 3, sent 2026-04-13 14:29):
+
+  > "3. The deck export button seems to simply generate a markdown list of cards that doesn't really seem to be useful. The web deck builder (https://deck-builder.bobattlearena.com) allows you to download as a csv complete with info about all of the cards in the deck and it allows you to import a json deck as well. I'd like to create a format for import/export of decks that is compatible with this tool and would allow for interoperability between these tools."
+
+- Validation named as a property of the pipeline, not of one record
+  (Archive Watch, idea 20): "We need validation at every step of the
+  process (sourcing, metadata writing, poster alignment, etc.)"
+- A parity catch between two platforms' own views (BOBA, a later
+  round): "3. I'd like to add the ability to see pricing info on the
+  grid view for the collection tab. Currently, you can only see this
+  info on the list view and I need full parity across both views."
+
+#### 03. Native platforms and floors
+
+- The macOS kickoff that asks for a platform-only feature set, not a
+  port (Archive Watch, sent 2026-06-22 15:06):
+
+  > "We need to start building out a brand new set of skills, design patterns, and API research in order to build a first-in-class MacOS app that has both parity with the current state of the other platforms as well as building out functionality that is specific to MacOS/desktop operating systems control of file APIs and the ability to run far more complex processes upon videos. The goal is not to simply make a MacOS app that works the same way on all of the other platforms, but to enable a new set of features that are only available within the MacOS version and to do so in a complete native way for the Mac (and not just a retread of old iOS/iPadOS/tvOS ways of doing things).
+  > Specifically, we are going to make a "Create" feature set on MacOS that will take the work we built for the "clip studio" and expand it to be a fully featured video/scene editor with the ability to combine multiple clips (across different titles) into a single unified video that can be exported/saved in multiple ways. The backlog of the "Creation Studio" feature should include the following, so please ensure that all of your research includes ways that we would look to implement the following (as well as documentation for all smaller features hidden within the ones I've enumerated):"
+
+  Followed by ten numbered items, of which these three show the range:
+
+  > "2. The ability to save "clips" from different video titles into a library without having to download the videos to your hard drive (i.e., using the archive.org videos as our source, but with the ability to create "proxy" clips that simply link to individual start and stop times. This will allow for far less hard drive space needed to make clips. It will also let you save key items for use in multiple different final exports.) This would look a lot like tagging specific scenes as a layer on top of archive.org's content. We would own the annotation layer, but Archive.org would own the file hosting."
+  >
+  > "9. Huge feature that would be a differentiator for our app: The ability to write out a sentence or two of text, and then have the app find those individual words and phrases that make up the custom text you entered within videos from the database (using subtitle and metadata). The app should then clip the videos together to have the final result be a single video of different characters all saying the custom text words. This would require a lot of different skills, but should be doable for a robust Mac app."
+  >
+  > "10. The ability to do most of the functions of a timeline video editor (please research modern functionality of Final Cut Pro, Adobe Premiere, or even CapCut)"
+
+- A new platform answered item by item, native idiom first (BOBA, "M0
+  Development for Android App", sent 2026-05-19 11:24):
+
+  > "4. Since I want to start testing quickly, I have access to a Chromebook right now, so Chromebook compatibility and Tablet support needs to be available in the first few versions. I don't need foldable to be a part of this, though, as it is such a small part of the market right now.
+  > [...]
+  > 10. Let's add Sign in with Google for Android and remove Sign in with Apple on Android. It doesn't make sense to keep it included for a platform that doesn't really want to use apple login that way.
+  > 11. I'd like to use native design cues/patterns from Android. We are translating the overall design colors and choices for a brand new platform and it should look perfectly at home on any android device but with the BOBA Playbook branding and design aesthetic."
+
+- A platform's own discovery channel treated as part of the platform
+  (Archive Watch, sent 2026-09-10 11:22):
+
+  > "Now that the Roku app is live, we need to build out a Search Feed for all of the content (or a large subset of verifiable public domain movies, at least) in our app. The goal would be to organically have people searching for the movies in our app and then have them download it in order to play the movies. Here is the documentation for search feeds from Roku, let's build a robust feed and use Claude in Chrome to write it up. Documentation: https://developer.roku.com/dev/docs/search. Search feed builder: https://developer.roku.com/apps/search/overview."
+
+- A platform kickoff caught mid-draft (Tidbits, the last line of the
+  note): "We need to build for one more platform that could really make
+  Tidbits Trivia special on the desktop. I'd like to build out a chrome
+  extension". The note is where the reason ("special on the desktop")
+  gets written before the scope does.
+- One canonical asset across platforms (Tidbits, first "Next:", item
+  5): "The iOS version should be the canonical icon and should be used
+  everywhere."
+
+#### 04. Seeing it work on devices
+
+- The Android TV round, written from the couch with the remote, sent
+  whole (Archive Watch, 2026-09-03 09:47):
+
+  > "We need to work on a few things within the Android TV version of the app:
+  > 1. The home loading is much quicker than it has ever been, but even though the home screen loads within a couple of seconds, the posters still take about 10 seconds longer to load, so it looks like it is stuck/frozen.
+  > 2. The first item on each shelf is inaccessible. If you try to access it, it will take you directly to the sidebar items. This needs to be fixed.
+  > 3. When I search for Archive Watch on the Google Play store, it shows up as Archive Watch - Beta. I would like for it to read as the full and non-beta version on Android TV now that we have it working much better.
+  > 4. I don't believe we have done a full audit of every screen, button, and interface element. Please write up a full audit for Android TV and test each component to be sure that it works as intended.
+  > 5. There doesn't seem to be any way to log in on Android (phone) or Google TV. The goal for this would be to allow for the same kind of syncing of content that happens on apple platforms between devices. We would implement Google Sign-in and syncing for this, and I'd like for it to be seemless across android devices.
+  > 6. A few issues unrelated to the Google/Android TV work - The titles in the Library section on Android (phone) do not flow correctly. They all seem to have their plurals on a second line rather than just allowing you to scroll across the full top bar. Also, I would love to be able to login with my apple login on the web app and have content sync across to that platform. Once we have the google login working, I'd like that to work on the web as well.
+  >
+  > Please make use of the full suite of devices you have access to in order to build out and test all of these features."
+
+  Six items, each a single observation with its expected behavior; one
+  item (4) asks the agent to own the audit; one (6) is labeled as
+  unrelated rather than left out; and the last line hands verification
+  to the devices.
+- The perceived-speed item, which only a person watching the screen
+  notices: item 1 above ("so it looks like it is stuck/frozen").
+- A phone's physical constraints written as requirements (BOBA,
+  "Feedback 11", item 8, sent 2026-04-14 12:03): "First, it should
+  respect the Dynamic Island area and not show any content there that
+  could be covered up by the camera. [...] Second, it should respect the
+  rounded corners on most phones and not put content all the way up
+  into the corners that is cut off by the rounded corners. [...]
+  Overall, the size of the screen should never hamper the ability to see
+  text or information about the cards".
+- A platform-specific round on a device the agent had not been watching
+  (Tidbits, "Next round of updates"): "The windows app has significant
+  parity issues, including the Daley Tidbits for multiple days show on
+  the play homepage, there is nothing that shows on the right side of
+  the app interface until you select an option in the left side bar,
+  and the buttons do not flow correctly on Tidbits live and the second
+  screen does not show correctly as a separate window when you are
+  doing Tidbits live".
+- A correction that asks why the check missed it, not only for the fix
+  (BOBA, a round filed under "Streaming Features", late April): "Play card
+  effects that aren't working correctly (I don't understand how these
+  effects are still not working correctly based upon the exhaustive
+  audit we worked on yesterday. Please investigate each individually as
+  well as figure out why the audit didn't catch these issues):"
+
+#### 05. Shipping
+
+- A store listing's wording noticed as a user would see it (Archive
+  Watch, Android TV round, item 3, above): "it shows up as Archive Watch
+  - Beta. I would like for it to read as the full and non-beta version".
+- The pre-beta list, headed by the thing that kept regressing (BOBA,
+  late May): "Things we still need to fix before we can launch the
+  initial beta of the android app: 1. The Android App Icon needs to be
+  fixed once and for all. You keep reverting back to a generated (and
+  incorrect) icon to show on the Home Screen. Please use the one that
+  we generated for the Google Play Console and include it within the
+  app to show everywhere."
+- The first public version named as the goal of a backlog (Archive
+  Watch, 2026-06-03 19:42 preamble, quoted in G1): "to take this app
+  through to its first version I want to make available on the app
+  store".
+- The ledger's reminder that shipping includes being found: "Outstanding
+  items: 1. Promotion on social media: 1. Automated posting to Threads,
+  Facebook," with a saved article about free streaming apps underneath
+  (Archive Watch).
+- A share that leads somewhere (Tidbits, first "Next:", item 2): "when
+  you share your score, it should link back to https://tidbitstrivia.com
+  rather than just asking folks to compete and not giving a link."
+
+#### 06. Keeping it running: Pulse, CI, loops
+
+- The database audit charter, drafted in full as a note of its own
+  (Archive Watch, September). A goal, five numbered areas, a stated end
+  state that includes the pipelines, and one explicit permission:
+
+  > "# /loop It is now time to do a full audit of our database looking for the following issues and fixing them or further enhancing them wherever they exist:
+  > 1. Malformed metadata, including poorly structured descriptions/summaries, issues with years/dates, categorization, cast/crew info, and any other copy that shows up on an individual detail view (look out for all caps information, user/uploader-specific text, etc.)
+  > 2. Non-professional posters or backdrops. Any place we can get the correct professional poster or backdrop (for use on the hero row or the individual view on some platforms)
+  > 3. Incorrect copyright data or incorrectly categorized films as Creative Commons, public domain, or otherwise copyright free works
+  > 4. Archive.org links and other video files that will ensure every video in our app plays correctly every time
+  > 5. Issues with the database build process, the "wanted titles" process, or any of the other Github workers/actions that touch the database
+  >
+  > The goal is that every single entry for every single title has exclusively accurate information and that the information will only improve over time with our processes set up on Github (and other runners/workers we are utilizing). Also, you are allowed to rewrite copy if that is the only way that you can make the data work for translating user-generated copy into workable copy for our app."
+
+- The all-night loop charter (BOBA, drafted around 2026-05-21, after
+  Ben had the agent write the loop skill it refers to). Goal,
+  environment, three ranked priorities, an anti-repetition rule, and a
+  morning file:
+
+  > "I would like you to start an autonomous loop to run all night without intervention from me. You should use the loop documentation/skills that is already available, which will tell you the right cadence and priorities to focus upon. The goal is to make real and substantive improvements to the apps across all platforms while ensuring there are no build errors on Github, Xcode, or Android Studio. You have access to command line tools and I also have the Mac apps for both Xcode and Android Studio. Feel free to use the simulators in either to confirm your work. You can also build simulators with the command line as needed. Your documentation should indicate this, but your priorities are:
+  > 1. Parity across all platforms: Web App (limitations on some elements like 3d modeling, but otherwise should be fully featured with anything android and iOS have), iOS (in many ways, the flagship app that receives the most sophisticated features and the most native implementation and design), Android (the newest platform with the most room for improvement - should also be considered a first-class mobile experience)
+  > 2. New Feature development - The ideas for this scope of work should be developed from the extensive exports from Discord available in the research folder, the blog post archive from the official Bo Jackson Battle Arena blog, and your ability to conduct research about other TCG-specific apps or BoBA content on the web. You should explicitly build in ticks of the loop to do this research and not just rely upon your first pull of this information. All new features should be built with claude skills for design and our documentation for how to build and important rules about how every interface/feature should be specifically built to  most take advantage of the platform-specific design language and native (iOS or Android) APIs to the fullest extent. For any new feature implemented, make sure that it is the "best" and most intuitive way to do it.
+  > 3. Code optimization - For the ticks dedicated to further streamlining the code and prioritizing efficient and error-free building, you should work to lower complexity and ensure that we are building this app to last rather than to keep on adding engineering debt as we build out more and more functionality without making the app experience slow or creating cruft or engineering debt.
+  >
+  > As you continue with this loop, please ensure that you do not keep iterating on the same few problems or ideas. The goal of this whole looping cycle is to allow me to wake up with a bunch of new things to try and not just a few super optimized and polished things that are already there. We are building for user need, so spending a tick on a regular cadence at doing additional research on the needs of TCG collecting apps or BoBA users is how to ensure this happens. If there are things that you need to have me do when I wake up, please keep a record of what I need to do in a markdown file I can check in the morning. If you need to compact, please make sure you documenting all actions thoroughly so that you can resume from where you left off."
+
+  The anti-repetition paragraph answers a complaint he had typed the
+  morning before: "It seems like these loops are really circling around
+  the same exact features and are never expanding out into areas that
+  actually need work." (2026-05-21 07:02). The note is where the lesson
+  became part of the next charter.
+- A loop with a finish line instead of a clock (Tidbits, sent
+  2026-09-09 08:43 and 09-10 11:43): "You should stop the loop only once
+  we have fully built out Tidbits Live on both Mac and Windows as well
+  as the ability to join those full experiences on all other platforms
+  (I'm particularly keen to see if we can have video questions or other
+  media types that get broadcast even on the web app)."
+
+#### 07. Raising the ceiling
+
+- Ideas parked in the ledger that became real work months later. The
+  Archive Watch note's last list:
+
+  > "Ideas for further execution and/or monetization:
+  > 1. SharePlay Event Builder (watch an old movie with friends or family)
+  > 2. Twitch/Youtube Streaming from the app to your own channel
+  > 3. Support for low end Google and Apple devices"
+
+  SharePlay was tested across his own devices on 2026-08-31, streaming
+  to your own channel became the "Watch Together" loops ("/loop Let's
+  move on to the documented work to create the feature set to stream
+  your watching of PD movies to Youtube and Twitch", 09-17), and older
+  devices came up with the Roku 2 XD ("I'd really like to find a way to
+  allow folks to get my app on their older devices", 09-14). All three
+  started as one line in the note.
+- A research-and-document ask for a feature that is not yet buildable
+  (Tidbits, first "Next:", item 10): "We need to start researching the
+  ability to play online with others (i.e., compete against one another
+  in real-time). [...] Please write a playbook for how we would develop
+  this possibility and also have a fallback for a CPU player for any
+  time that there isn't a human player who wants to play tidbits
+  together across the world. Please document all that you find out
+  about this possibility for Tidbits Trivia so that on a future
+  session, we can implement it."
+- A feature scoped by the user it serves (BOBA, "Streaming Features",
+  item 5): "The overall goal of this feature is to allow streamers to
+  prep for their shows on whatnot in order to determine the full amount
+  of their "giveaways" and the "chasers" that will be sent to folks who
+  buy cards within the show. All features should serve this purpose
+  within the app if you have a "streamer" role set for your user."
+- Records that explain themselves (Tidbits, first "Next:", item 8):
+  "Each item on the records page should be intentionally chosen to show
+  your skills and should be instantly understandable. No strange
+  abbreviations like "Lifetime Acc." should show on the page (what does
+  Acc. Mean?)"
+
+#### 08. Working with AI: memory, skills, handoff
+
+- **Research first, in the round itself.** "Please read through
+  official Game Center APIs to determine the way forward." (Tidbits,
+  first "Next:", item 1). "I believe that you should be able to use API
+  calls in order to set all of these achievements up for Game Center so
+  that I don't have to directly input them individually, so please
+  research that ability (and the ability to do it on the android side)."
+  (item 8). "I'd like you to research design language that will allow
+  for more simplified selections" (item 6). "Please research the best
+  way to accomplish this, as the current questions are either entirely
+  obvious or entirely nonsensical." (item 7).
+- **Find a better source instead of iterating.** "I really don't
+  understand the icons that have been developed as SVGs for either of
+  these features. I think we need to find a design source for SVG icons
+  that will work better. Please lookup a claude skill or repository of
+  well designed icons for this purpose, as none of them look like what
+  they are supposed to and I don't want to go back and forth on
+  development when better alternatives exist." (BOBA, web deck builder
+  round, item 9, 2026-04-13)
+- **Answering the agent's decisions as a numbered list.** The whole of
+  one Archive Watch note:
+
+  > "1. Yes. Move forward with a single clock. If you need a time zone to organize around, you can choose UTC, but all times should show as their local times when they look at channels. This should only be to sync all titles to the same time.
+  > 2. I don't mind if you touch up some of the collection descriptions from archive.org, but I'd like all of the collections to be written from archive.org language originally. I notice that a few collection titles will also need to be touched up (all capital letters, etc.). We are creating/finding collections that everyone will want to watch, so they need to be generally understandable to the public.
+  > 3.  The wording is fine for now.
+  > 4. You can use the Apple TVs whenever you want right now.
+  > 5. This seems like a bug. It shouldn't constantly ask for syncing all of the time."
+
+  Five answers, five kinds: a decision with its constraint (1), a
+  permission with its limit and reason (2), a short approval (3), device
+  access granted (4), and a reframing of a question as a bug (5). The
+  BOBA M0 answers (2026-05-19) follow the same form and were requested
+  that way: "Can you list out the questions that you need answers to so
+  that I can start answering them?" (11:02), then the eleven answers
+  pasted at 11:24, including "5. Since I don't have subscription
+  monetization set up for iOS or Web, it doesn't make sense to ship it
+  on Android first. Please differ." and "6. Personal Showcase, House of
+  Boba, and Hero Shot features can all be differed until later."
+- **Dividing work between two agents in the note.** A bullet that
+  begins "For cowork: the gum cards seem to be significantly mislabeled
+  with incorrect images." (BOBA, first round), and later, sent with a
+  pasted block: "Does it make more sense for you or claude cowork to
+  tackle this set of tasks first?" (2026-04-24 12:17).
+- **Hide, do not delete.** "Because I don't yet have the ability to
+  integrate that, we need to "hide" the feature from view until I can
+  add the bot to the discord server and get functionality working.
+  Please hide the feature but do not remove any of the code that will
+  make it work." (BOBA, "Feedback 7", item 3)
+- **Ask for the agent's view at the end of a spec.** "Let me know if
+  there is anything else that you think should go in this section (and
+  is currently unaccounted for either within the app or as a component
+  of a robust profile/account settings system in a top-tier native iOS
+  app)." (BOBA, "Profile view updates", item 4)
+
+#### What stays human, as the notes show it
+
+The notes are the clearest record of the work only Ben could do,
+because that work lives there rather than in the chat:
+
+- **Using the app.** Every round is a list of things seen on a device.
+  None of them could have come from the agent.
+- **Collecting other people's words.** A friend's feature request,
+  testers' messages copied in with a question-mark marker, card experts'
+  terminology feedback quoted at length, and his own replies drafted
+  under the testers' messages. One reply shows him turning a tester's
+  request into a design idea: "Yes! I need to think more about "custom
+  goals" or "custom rainbows" that you could set in the rainbows view so
+  that it would let you see exactly how close you are to getting what
+  you want rather than the entire universe of cards that exists. Great
+  suggestion."
+- **Receiving a partner's decision and turning it into requirements.**
+  In late May the price-guide partner behind BOBA's vision item 2 wrote
+  that its data could not be used in the app, only ordinary links out.
+  Ben pasted the email into the note and wrote the instruction around
+  it: "You should treat every statement in this email as a requirement
+  of our next shipping version on each platform", kept one link per
+  card that opens outside the app, and asked for a loop that would
+  "fundamentally recreate all of the functionality using only our own
+  IP and access. [...] If there are things that I need to do (signing
+  up for APIs, etc.), please let me know, but don't stop until the
+  requirements from the email have been met AND we have replaced the
+  full functionality".
+- **Accounts and owner actions.** Creating the cloud project ("I've
+  created a project within my firebase account with the following info
+  (please let me know what additional info you need in order to be able
+  to work within this project using the CLI)", Tidbits, details
+  [redacted]), creating an OAuth client, moving a domain's DNS. The
+  agent wrote the steps; the note held them until Ben did them.
+- **Deciding what is done.** The "Done:", "Fix:" and "Outstanding
+  items:" lists are his, not the agent's. The agent's own ledger lives
+  in the repository (SCRATCHPAD, PARITY); the note is the human's.
+- **Naming the app,** in two lists with his own verdicts.
+
+### G4. Implications for the course
+
+Offered as notes, like the list that follows.
+
+1. **Teach a running notes page per app as the human's backlog and
+   drafting space.** One page, opened on day one, kept for the life of
+   the app. The wish goes at the top; everything else is appended.
+   This is what Ben actually did for all three apps, and it is where his
+   best prompts were written.
+2. **Teach the round, not the message.** Use the app, write numbered
+   observations under a "Next:" heading while you use it (where, what is
+   wrong, what it should be, which platforms), then paste the whole
+   round with one line of scope in front ("across all platforms", "read
+   your documentation first", "I'll verify on device"). His rounds ran
+   from four items to thirteen.
+3. **Teach the kickoff as a template the learner fills in:** one-line
+   wish with the data source, numbered capabilities, research asks
+   about the field and the form, "use your repository documentation",
+   a parity matrix, and what this session should produce. Use the
+   Tidbits kickoff (G2) as the worked example.
+4. **Teach the ledger.** "Done", "Fix", "Outstanding", "Future". Ideas
+   left in the ledger are not lost: three one-line Archive Watch ideas
+   became features months later. Moving an item to "Done" without
+   rewriting it keeps a record of what was actually reported.
+5. **Teach drafting loop charters in the notes, ahead of time.** A goal,
+   ranked priorities, a stop condition or finish line, the permissions
+   granted, and a file for "what I need to do in the morning". Fold in
+   what went wrong in the last loop (the anti-repetition paragraph).
+6. **Teach answering the agent by number.** Ask for the questions as a
+   list, answer each by its number in the notes, and give each answer a
+   reason or a limit. "Please differ" is an answer too.
+7. **Teach the notes as the place outside voices land.** Friends,
+   testers, experts, partners: copy their words in first, decide second,
+   and draft replies there.
+8. **Do not model the notes' one bad habit.** Ben's notes mix keys,
+   tokens and certificate details with feedback. The course should say
+   plainly that secrets never go into a notes page or a chat; they go
+   into a password manager, the platform's secret store, or CI secrets,
+   and the agent is told where to find them.
+9. **Keep the stage timing honest.** In April Ben pasted five rounds in
+   two days while the builds were still rough; the notes were not a
+   plan written up front but a record kept while using each build. A
+   learner at stage 01 can start the page with one wish and one round.
+
+---
+
 ## Implications for the rewrite
 
 Offered as notes, not decisions.
@@ -1683,6 +3636,14 @@ Offered as notes, not decisions.
    and the few console clicks. Ben's own record shows those are the
    real remaining hand steps.
 5. **Be step-aware:** a learner at stage 01 has no devices bench, no
-   CI, no loops. Ben's first day on Tidbits used five prompts and a
-   simulator; his device bench came in August. The course can mirror
-   that growth rather than front-loading the bench.
+   CI, no loops. Ben's first evening on Tidbits used four prompts, and
+   the next morning he judged the result on the live web app; his
+   device bench came in August. The course can mirror that growth
+   rather than front-loading the bench.
+6. **Use the early months for stages 00 to 03 (section F).** Ben's
+   beginnings look much more like a beginner's than his September
+   practice does: a phone session that had to move to the Mac, a first
+   look in the simulator, compiler errors pasted one at a time, a
+   bundle ID that would not register, a sixteenth failed attempt at the
+   same gesture. Those are the moments a learner will recognize, and
+   each one ends with the move the course wants to teach.

@@ -132,7 +132,16 @@ build.
    > videos as I work and I realized that I wanted three different
    > features to be built into the view that don't currently exist
 
-   Write the want down the moment you have it, in those terms.
+   Party Play itself started the same way, as item 3 on the list of
+   feature ideas in my Archive Watch note, before it existed:
+
+   > A background/party play that shows video only with no audio (with
+   > the ability to turn on audio), but that focuses upon high
+   > contrast/high-interest videos that are visually interesting and that
+   > autoplays in the background.
+
+   Write the want down in your notes the moment you have it, in those
+   terms.
 
 2. **Ask for research before code.** Ask whether it is possible, on
    which platforms, and what it would cost, including whether it needs
