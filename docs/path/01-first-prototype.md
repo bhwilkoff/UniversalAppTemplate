@@ -52,7 +52,9 @@ that out now, while the design is a sketch.
 So, never type data in. Tell the agent where the truth lives (an open
 API, a public dataset, a site with a feed) and let it build the pipeline
 that brings the data in and keeps it fresh. Then steer the data the way
-I did, by looking at one real item:
+I did, by looking at one real item. In late August I was browsing
+Archive Watch's live site and found a film whose title had its cast
+pasted into it:
 
 > Why does https://archivewatch.org/item/shakedown-1950 have actors
 > names in the title?
@@ -85,7 +87,9 @@ agent does the rest of the setup, and will tell you if it needs you.
    skills do a lot of this work without you asking for them.
 
 2. **Keep it going.** When it reports back, do not polish yet. Ask for
-   the next round of the wish:
+   the next round of the wish. The night I started Tidbits, three of my
+   next four prompts were some version of this, and each one added a
+   platform or a whole feature:
 
    > keep pushing forward with the next round of work to fully build
    > out this game/app

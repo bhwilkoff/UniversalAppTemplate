@@ -122,22 +122,24 @@ Stage 04 is about why that matters.
 
 2. **Ask for the native version of everything.** Name the platform and
    ask for every feature, built the way that platform's people expect.
-   Here is close to what I said when Archive Watch went past the Apple
-   TV:
+   On June 9, after seven weeks of Archive Watch on the Apple TV alone,
+   this is close to what I asked for (the commit that recorded it
+   trimmed my words a little):
 
    > build native iOS/Android/web versions of every tvOS feature using
    > the TriAppTemplate as the basis
 
    The agent sets up the project, builds the app, and puts it on your
    device. If it hands you a list of steps to click through in Xcode or
-   Android Studio, push back the way I did:
+   Android Studio, push back the way I did on June 23, when the agent
+   gave me a setup list for the new Mac app:
 
    > a lot of the instructions in the readme ... seem like things that
    > you can do programatically rather than having me do them in Xcode
 
 3. **Hold the native bar on the device.** Use the new app and say where
-   it feels borrowed from the first platform. These are the kinds of
-   things I said:
+   it feels borrowed from the first platform. Two of mine, from
+   Archive Watch on the iPad and Tidbits Trivia on the Mac:
 
    > The iPad should not just be a blown up version of the phone, but
    > rather a distinct and first class experience.
@@ -149,14 +151,19 @@ Stage 04 is about why that matters.
 4. **Ask what the oldest device could be, and what it would cost.** The
    agent measures it with throwaway test builds and tells you which
    devices each choice reaches. The choice is yours. If you have an old
-   device in a drawer, bring it in:
+   device in a drawer, bring it in. In September I dug out a Roku 2 XD
+   from 2011, got it into developer mode, and asked:
 
-   > I have an iPhone 12 that I'd like to use for testing on older
-   > devices.
+   > I was able to get developer mode to work on the box. It is
+   > restarting. I think there are ways of making it thinner for older
+   > hardware, right? If the videos can run on a web browser, surely
+   > they can run on old hardware.
 
 5. **Keep the modern devices modern.** When the floor starts holding
    back newer devices, say so, and ask for newer features behind a
-   capability check instead of dropping them for everyone:
+   capability check instead of dropping them for everyone. I said this the
+   day before, when supporting old Rokus started to look like it would
+   hold back the new ones:
 
    > There is no reason to do a bunch of work pushing the platform on for
    > modern Roku users if it is going to be hamstrung by the older

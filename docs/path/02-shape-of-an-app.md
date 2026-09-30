@@ -152,8 +152,9 @@ the detail:
 
 1. **Ask for the matrix.** Tell the agent every platform you plan to
    reach, even the ones that are months away, and ask it to write the
-   parity matrix for everything your app already does. This is roughly
-   what I said:
+   parity matrix for everything your app already does. On June 10, the
+   day after Archive Watch's iPhone, web and Android versions started,
+   this is what I asked for:
 
    > continue working on our parity matrix across all platforms to make
    > sure we can launch on all platforms with the same features across
@@ -164,7 +165,9 @@ the detail:
 
 2. **Name the platform whose choices win.** When two platforms disagree
    about order, labels or which shelves appear, one of them should be
-   the reference. Say which:
+   the reference. Say which. In late June the same shelves had
+   different names and a different order on every Archive Watch
+   platform, and I picked the Apple TV's:
 
    > the shelves across platforms should have the same titles + order...
    > I prefer the order and titles of the Apple TV app (replicate
@@ -179,19 +182,23 @@ the detail:
 
 4. **Make the web the address.** Ask that every Share button, on every
    platform, share a link to your web app, and that the web app open the
-   native app when someone taps it on a phone:
+   native app when someone taps it on a phone. Archive Watch's Share
+   buttons were sending people to archive.org, where the films come
+   from, instead of to the app:
 
    > I would like the share functions inside each one of the apps [...]
    > to share the archivewatch.org links rather than the archive.org
    > links. I also think that the web app should redirect to the native
    > apps if you click on them on your phone/iPad/android.
 
-5. **Distrust the cells.** Ask for an audit that reads the code, not the
-   matrix:
+5. **Distrust the cells.** A matrix says what should be true. Ask for an
+   audit that reads the code, and check the ones you care about against
+   what people can actually install. On September 30, I wanted to know
+   whether a feature we had built for Android was really in the version
+   people could install, not just in the code:
 
-   > continue with your parity work and audit all features to ensure we
-   > have identified all of the items that should go in the parity
-   > matrix.
+   > Is the "Join a Room" feature on the library section available in
+   > the currently live 1.42.699 version on Google Play?
 
    Then pick one feature and check it yourself on two devices, even if
    one of them is just a phone and a laptop browser.

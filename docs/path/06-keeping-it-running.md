@@ -143,7 +143,8 @@ watching.
 ## Working with your agent
 
 1. **Ask for one page.** Tell the agent what you want to be able to see
-   without opening a single store console:
+   without opening a single store console. On September 9, this is how
+   I asked for Archive Watch's:
 
    > a single place for me to go in order to understand what our users
    > are enjoying or requesting of the app AND to understand the
@@ -154,24 +155,34 @@ watching.
    stage 05.
 
 2. **Read the page, not the stores.** Open Pulse each morning for a
-   week. When something looks wrong or missing, say what you see:
+   week, and ask the agent to act on what it shows. The first day
+   Archive Watch's Pulse was live:
 
-   > I don't see the data represented on the different areas of Pulse
-   > (No macOS or Roku items on Reach).
+   > Can you use this page to identify all of the crashes and other
+   > issues that need to be addressed. Additionally, all reviews that
+   > have been responded to should not show up under the 'needs you'
+   > section.
 
-   Then ask it to act on what the page shows:
+   Two weeks later, after it had been redesigned around a "Needs
+   attention" list:
 
    > Take a look at 'Needs Attention' section of the Archive Watch Pulse
    > and see what you can directly address and solve for?
 
+   When something looks wrong or missing, say what you see, the way the
+   story at the top of this page began.
+
 3. **Treat every failure email as a bug in the machinery.** Forward it,
-   and ask for the whole class of failure to end, not just this run:
+   and ask for the whole class of failure to end, not just this run.
+   On August 23, Archive Watch's scheduled workflows were emailing me
+   about failures that were not really failures:
 
    > I want to stop getting alerts for failed GitHub actions. Can you fix
    > it so that if it isn't broken, it doesn't fail?
 
 4. **Bring in real people.** Post about your app somewhere your people
-   are. Bring what they say back to the agent:
+   are. Bring what they say back to the agent. The day after I posted
+   Archive Watch on Reddit:
 
    > I posted about the app with links to all of the platforms on Reddit
    > yesterday [...] I'd like you to use the comments/feedback from the

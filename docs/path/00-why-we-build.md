@@ -123,26 +123,33 @@ is a conversation. `docs/path/talking-to-your-agent.md` has the moves.
 
 1. **Tell it why.** Before any feature, say what the app is for, who it
    is for, and what you hope it does for them. Talk the way you would to
-   a friend. Here is how I put one:
+   a friend. The reason matters most later, when it settles a question
+   you did not see coming. In July, Tidbits Trivia's agent was deciding
+   how much of a new paid club to put behind locks, and I answered with
+   the reason the app exists:
 
-   > It seems like a very good platform to build out for Tidbits,
-   > especially as we seek to create a positive habit for learning via
-   > trivia.
+   > the whole point of Tidbits Trivia is that we are the world's best
+   > trivia app with the least amount behind a paywall.
 
-   Then ask the agent to rewrite the "Why we build" paragraph in
-   `CLAUDE.md` from what you said, and to read it back to you. Correct
-   it until it sounds like you and not like a company. Five sentences
-   or fewer.
+   That one sentence decided the design: one quiet row for the club,
+   and everything else free. Then ask the agent to rewrite the "Why we
+   build" paragraph in `CLAUDE.md` from what you said, and to read it
+   back to you. Correct it until it sounds like you and not like a
+   company. Five sentences or fewer.
 
 2. **Name one line you will not cross.** Something the app will never
-   do, or never let AI do inside it. Say it plainly and say why:
+   do, or never let AI do inside it. Say it plainly and say why. Mine
+   usually came out the moment the agent proposed crossing one. In
+   September, the agent designed Archive Watch's Watch Together feature
+   around a paid voice server, and I stopped it:
 
    > It is absolutely not acceptable. The goal of this app (and all of
    > my apps) is for them to cost $0 to run.
 
-   Ask the agent to add it to the standing instructions in `CLAUDE.md`
+   You do not have to wait for the agent to cross yours. Say it now, and
+   ask the agent to add it to the standing instructions in `CLAUDE.md`
    with today's date and your words in quotes. You will add more of
-   these as you build, each one the moment you need it.
+   these as you build.
 
 3. **Test the idea against the four questions.** Ask the agent to run
    the `learning-orientation-design` skill against your idea and tell

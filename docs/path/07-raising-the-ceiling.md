@@ -125,7 +125,8 @@ build.
 ## Working with your agent
 
 1. **Notice the want while using the app.** The best features I built
-   started as a sentence like this one:
+   started as a sentence like this one, typed on September 14 while
+   Archive Watch played on the TV beside me:
 
    > I've been leaving the 'Party Play' going on my TVs to enjoy ambient
    > videos as I work and I realized that I wanted three different
@@ -135,7 +136,8 @@ build.
 
 2. **Ask for research before code.** Ask whether it is possible, on
    which platforms, and what it would cost, including whether it needs
-   a server:
+   a server. On August 31, wanting people to be able to watch Archive
+   Watch together:
 
    > Can you investigate the ability for the Apple versions of the app
    > to take advantage of SharePlay and synchronous viewing of movies
@@ -146,12 +148,15 @@ build.
 
 3. **Say build it, everywhere it can go.** When the research says yes,
    ask for the full feature on every platform that can have it, and an
-   honest row in the parity matrix for the ones that cannot:
+   honest row in the parity matrix for the ones that cannot. Seven
+   minutes after that research question, once the answer was yes:
 
    > I'd like you to fully implement SharePlay for all Apple platforms.
 
 4. **Hold the bars.** When the agent reaches for a custom control where
-   the platform has one, or a paid server where none is needed, stop it:
+   the platform has one, or a paid server where none is needed, stop it.
+   On August 27, the iPhone app grew its own captions button instead of
+   using the one the system already provides:
 
    > There is now a persistent captions icon on the screen rather than
    > using the build in captions UI on iPhone [...] The goal is native
@@ -159,7 +164,7 @@ build.
 
 5. **Use it for real, then critique.** Use the feature the way it is
    meant to be used, with the people it is meant for. Then send a
-   numbered round:
+   round. The day after SharePlay went in, after the first real call:
 
    > That worked. The videos were in sync while the call was live.
    > However, I noticed that I had to initiate the facetime call first

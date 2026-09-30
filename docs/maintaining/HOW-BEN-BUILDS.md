@@ -992,11 +992,11 @@ looking design elements." (Tidbits, 2026-09-08, recorded in memory).
 > something. Figure out how to make it work with you unlocking the
 > phone." (Archive Watch, 2026-08-28)
 
-> "My device pairing code for the Google tv is 705379" (Archive Watch, 2026-08-27)
+> "My device pairing code for the Google tv is [six digits]" (Archive Watch, 2026-08-27)
 
 > "I've got a Pixel 8a with wireless debugging enabled. Can you connect
 > to it now or do you need me to do the pairing code? The code is
-> 224242" (Archive Watch, 2026-08-28)
+> [six digits]" (Archive Watch, 2026-08-28)
 
 **Verbatim, the standard.**
 

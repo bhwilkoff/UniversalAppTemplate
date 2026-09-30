@@ -156,7 +156,8 @@ one device at a time, months into building. One phone is enough for
 this stage.
 
 1. **Hand over the testing.** Tell the agent, in your own words, what I
-   told mine:
+   told mine in August, after a version of Archive Watch it called
+   tested reached my Apple TV with stuttering audio and late captions:
 
    > You should be able to see stuttering and swallowed audio. You
    > should be able to see the captions and measure their timing and
@@ -176,17 +177,21 @@ this stage.
 3. **Ask for proof with every "fixed."** From now on, when the agent
    says something works, ask to see it: a screenshot from your device, a
    measurement, a run that could have failed. Look at the screenshot
-   yourself. When the report and your eyes disagree, say so:
+   yourself. When the report and your eyes disagree, say so. This was
+   the same August day, about that same build:
 
    > This version is a huge step backward and you keep claiming things
    > are fixed and you have fully tested them, but I see no evidence of
    > either.
 
 4. **When it guesses, stop it.** If a fix fails twice, ask for research,
-   or for a way to see the problem, before the next attempt:
+   or for a way to see the problem, before the next attempt. On
+   September 6, I was watching a film at home while the agent
+   chased an audio dropout, and it kept blaming AirPlay. I
+   checked the one thing I could check from the couch:
 
-   > you're guessing, build a simulator so you can iterate locally
-   > instead of making me test every tweak.
+   > I just confirmed. The audio went out on the TV speakers as well. It
+   > ISN'T Airplay. Please stop guessing and figure out the issue.
 
 5. **Keep living with the app.** The agent's instruments will miss
    things. You will catch them by using the app, and each one you report

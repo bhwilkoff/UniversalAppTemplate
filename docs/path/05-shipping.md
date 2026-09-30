@@ -24,7 +24,7 @@ be able to read, from the store itself, what is actually live.
 That turned out to be possible for almost everything, but it took me
 three months to get there. In June I was still creating App Store
 versions by hand and uploading Android builds myself. By September my
-whole release instruction was two words:
+whole release instruction for Tidbits Trivia was three words:
 
 > Ship every platform
 
@@ -122,8 +122,8 @@ form.
    Google Play if you have an Android app), pay for them, and agree to
    their terms. Tell the agent when they exist.
 
-2. **Ask for everything a submission needs.** In June, this is how I
-   started:
+2. **Ask for everything a submission needs.** In June, getting ready
+   for Archive Watch's first iPhone release, this is how I started:
 
    > Let's get all of the info (screenshots, description, etc.) that we
    > need to submit the iPhone version to the app store.
@@ -133,16 +133,27 @@ form.
    you can answer.
 
 3. **Make the words yours.** Read the store description and the release
-   notes out loud. Rewrite anything that sounds like a machine wrote it.
-   Your "no AI copy" rule from stage 00 applies to the store page too:
+   notes out loud. Rewrite anything that sounds like a machine wrote it,
+   and anything that is not true for that store. Your "no AI copy" rule
+   from stage 00 applies to the store page too. In September the
+   agent's release notes kept arriving with formatting that gave them
+   away:
 
    > I really don't want to have to remove strange formatting every time
    > I want to submit to the app store that shows that it was AI
    > generated.
 
+   And a few weeks later, when it wrote one set of notes for every
+   platform:
+
+   > The what's new text should be different by platform because the
+   > features are different.
+
 4. **Do the credential step together.** The build and submission run in
    the cloud and need keys from your accounts. Ask the agent to take you
-   to the exact screen for each one:
+   to the exact screen for each one. This is how I did it in September,
+   when Archive Watch's YouTube posting needed a token only I could
+   create:
 
    > I'd like you to use Chrome to take me to the right screen to
    > generate the oauth token and I'd like you to walk me through that
@@ -152,7 +163,8 @@ form.
    a `!` in front of the command the agent gives you, so the value goes
    straight where it belongs.
 
-5. **Say ship.** Then ask whether it is really done:
+5. **Say ship.** Then ask whether it is really done. This was me on
+   September 3, before moving Archive Watch on to its next piece of work:
 
    > Did you ship it fully? I'd like to move on to another scope of work.
 

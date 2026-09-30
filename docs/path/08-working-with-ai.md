@@ -127,12 +127,16 @@ to draw, in writing, where the agent will read them.
 ## Working with your agent
 
 1. **Before a session ends, ask it to write everything down.** Any time
-   you are about to stop, restart, or run low on context:
+   you are about to stop, restart, or run low on context. This was the
+   middle of a long Archive Watch session in September:
 
    > We are close to needing to compact, please document everything we
    > might need before I do that.
 
-2. **When you correct something twice, make it a rule.**
+2. **When you correct something twice, make it a rule.** The first of
+   these came after Archive Watch's loop kept re-arming without saying
+   when it would next wake; the second after a Tidbits loop stopped
+   itself, again, to report that its context was running low.
 
    > Can you make a memory so that after every tick when you re-arm the
    > loop, you give a time when the next tick should occur?
@@ -140,19 +144,25 @@ to draw, in writing, where the agent will read them.
    > If you are low on context, compact. Can't you simply add that as a
    > rule?
 
-3. **When it reinvents something, send it back to what it wrote.**
+3. **When it reinvents something, send it back to what it wrote.** On
+   September 7, the agent was rebuilding parts of Archive Watch's video
+   player to fix problems we had solved months earlier:
 
-   > You have fully documented device testing pathways for each device.
-   > Please stop trying to reinvent things you already know how to do.
+   > I feel like we had solved all of this so so long ago as we were
+   > building the last resilient player for apple's platforms. Are we
+   > redoing work that has already been done and is documented already?
 
-4. **Ask it what it is waiting on.** Instead of reading its notes, ask:
+4. **Ask it what it is waiting on.** Instead of reading its notes, ask.
+   I asked Archive Watch's agent exactly this on September 21:
 
    > What are the things you are wating on me for?
 
    And when there are decisions to make, ask for them as choices.
 
 5. **Turn this app's lessons into skills.** When you have learned
-   something the next app should not have to learn again, ask for it:
+   something the next app should not have to learn again, ask for it.
+   This was the end of a long day in September, most of it spent on
+   Archive Watch's social posting:
 
    > Document everything we have done today, as we are needing to
    > compact. (create any new skills necessary)
