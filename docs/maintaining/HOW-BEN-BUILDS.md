@@ -3572,7 +3572,7 @@ because that work lives there rather than in the chat:
 
 ### G4. Implications for the course
 
-Offered as notes, like the list that follows.
+Offered as notes, not decisions. They extend the list that follows.
 
 1. **Teach a running notes page per app as the human's backlog and
    drafting space.** One page, opened on day one, kept for the life of
