@@ -266,31 +266,43 @@ exactly that.
   app, for people they can name, and brings back what their values cost
   them.
 
-## Proposed changes to the template
+## How it became human-shaped
 
-These are proposals, for Ben to choose from. None has been made.
+On October 1, 2026, Ben named the method *human-shaped software* and
+asked for the useful parts of this research to come into the template,
+with one condition:
 
-1. **Stage 00 and `learning-orientation-design`:** add VBE's three
-   questions (consequences, character, duty), indirect stakeholders, and
-   "should this exist at all?" before the four questions.
-2. **`learning-orientation-design`:** add wide walls, "hard fun", and
-   "calm in the chrome, effortful in the core".
-3. **`CLAUDE.md` and stage 08:** teach the ladder from reason to rule to
-   check, and mark which standing instructions have a test behind them.
-4. **`DECISIONS.md` template entry:** add "Who participated? Who
-   benefited? Who was harmed?" to each decision.
-5. **A start-of-feature habit:** ask the agent to argue the strongest
-   case against a feature on behalf of the people it affects
-   indirectly, before building it.
-6. **The honesty checklist** for any bot or automated feature, drawn
-   from the human-AI interaction guidelines, in
-   `learning-orientation-design` or `universal-feature-states`.
-7. **A data promise** in `per-ecosystem-sync-islands` and stage 07: a
-   readable export, and what happens to people's data if the app stops
-   being maintained.
-8. **Stage 07, participation:** throwaway prototypes made with the agent,
-   used and reshaped by the people the app is for, with their words kept
-   in the note and something given back.
+> Pulling in their exact language doesn't really work because it isn't
+> authentic to the AI context and our learning orientation.
+
+So, each idea below was rewritten in the template's own words, tied to
+something that happened in a real app, and placed under one of the
+three moves: write it down, prove it, live with it. Learning (as a
+student, as a builder, as a human) is the frame for all of it. The
+credit lives here, so the stage pages can speak plainly.
+
+| In the template | Where it lives | Where it came from |
+|---|---|---|
+| Human-shaped software, learning three ways, the three moves | `README.md`, stage 00, `COURSE.md`, `CLAUDE.md` | Ben's March 2026 page on "computer-shaped problems"; constructionism (Papert, Resnick) |
+| Three questions of the idea: should it exist, who does it touch, what will people learn or stop learning | Stage 00 step 4, `learning-orientation-design` | VBE's three ethical lenses (consequences, character, duty), rewritten around learning. Duty became stage 00's "one line you will not cross". "Not building" from VBE; the wording from BOBA's Radish moment |
+| The people outside the screen | Stage 00, `learning-orientation-design`, the talking guide | VBE and Value Sensitive Design's indirect stakeholders |
+| Ask the agent to argue the other side | Stage 00, the talking guide, `learning-orientation-design` | VBE's User Advocate role, for a builder who holds every role alone |
+| A dated rule in your words is your name on it | Stage 00 | VBE's signed Value Register |
+| Reason, rule, check | Stage 00, stage 08, `CLAUDE.md` standing instructions | Value Sensitive Design's values hierarchy; VBE's value-to-requirement chain; Anthropic's constitution (reasons before rules); Claude Code's docs (`CLAUDE.md` is context, hooks enforce) |
+| Who was in the room, who gains, who pays | `DECISIONS.md`, `architectural-decision-log` | Design Justice's "Who participated? Who benefitted? Who was harmed?" |
+| The same honesty, inside the app | Stage 04, `learning-orientation-design` checklist | Microsoft's Guidelines for Human-AI Interaction (G1, G2, G10, G11) |
+| Many ways in | `learning-orientation-design` | Resnick's "wide walls" |
+| Quiet where it doesn't matter, effortful where the learning is | `learning-orientation-design` | Calm technology (Weiser and Brown, Case) against Rogers' engaging ubicomp; Papert's "hard fun" |
+| Build it with the people it is for, and give something back | Stage 07 | Scandinavian participatory design; its critique of extractive participation |
+| Their data outlives your interest | Stage 07, `per-ecosystem-sync-islands` | Ink & Switch's local-first ideals ("The Long Now") |
+| A value is worth what it changed | Stage 08, `COURSE.md` | Wong, Madaio and Merrill, "Seeing Like a Toolkit" (2023) |
+| How much to leave to discovery | `COURSE.md`, "What I am unsure about" | Kirschner, Sweller and Clark (2006) |
+
+Left out on purpose: certification, the Value Register as a document,
+Scheler's ranking and the seven criteria, the eight roles, stakeholder
+workshops, the EU AI Act framing, VBE's three risk paths, the card decks,
+and responsible research and innovation. They answer problems an
+organization has, not problems a learner building with an agent has.
 
 ## Sources
 

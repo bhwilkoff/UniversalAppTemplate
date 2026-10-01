@@ -57,6 +57,10 @@ incidents, constraints, alternatives rejected, references.
 decision? What should they do or not do?
 
 (Optional) **Consequences**: Forward-looking implications.
+
+(When the decision affects people, not just code) **Who was in the
+room, who gains, who pays**: who took part in deciding, who benefits,
+and who bears the cost (money, effort, or something people lose).
 ```
 
 The bold **Why** + **How to apply** keys are what make the entry skimmable when the log is long. Future contributors search for those bolded keys.

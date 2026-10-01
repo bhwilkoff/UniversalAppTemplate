@@ -50,6 +50,12 @@ existing one.
    what made it debuggable.
 4. **Account deletion** must exist once sign-in exists (App Store +
    Play requirement): delete all cloud data + sign out.
+5. **People's data outlives the owner's interest.** Offer an export of
+   everything a person made (favorites, lists, progress) in a form they
+   can read without the app (JSON or CSV), and state on the website what
+   happens to their data if the app stops being maintained. Data in the
+   person's own iCloud / Drive is most of this promise; the export and
+   the sentence are the rest.
 
 ## The CloudKit pattern that actually works
 

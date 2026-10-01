@@ -216,6 +216,20 @@ Ten minutes later:
 > Please fully build out and enable a tidbits trivia iMessages app and
 > prepare the App Store Connect settings to submit for review
 
+## Ask it to argue the other side
+
+When you work alone, nobody disagrees with you. Before a big feature, ask
+the agent to make the strongest case against it on behalf of the people
+outside the screen (stage 00 says who they are): the folks whose work
+the app shows, whose data it uses, or whose lives it changes without
+their opening it. Ask it to say what the feature would cost them, and
+whether the app should build it at all.
+
+Read the answer the way you would read a friend's objection. Some of it
+will be wrong. The rest is the part you would not have thought of
+alone. It is not a substitute for asking real people. It is a second
+voice where there was only yours.
+
 ## Give standing permission
 
 Once you have decided something, stop being asked about it. In the

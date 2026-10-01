@@ -22,7 +22,32 @@ open on the old one in the drawer. And I want to build it with an AI
 agent without handing the agent the parts that were supposed to be
 mine, or theirs.
 
-Those wants shaped every choice here:
+I call that *human-shaped software*. Some problems are computer-shaped:
+you can hand them to the agent and be done. Learning, community and
+relationships are not, because they only happen when a person does the
+work. Human-shaped software takes the mechanical work off people's hands
+and leaves them the learning.
+
+**Learning is the frame for all of it.**
+
+It runs three ways. As a student, you learn a way of building, one stage
+at a time, by bringing your work back and showing it. As a builder, you
+learn what your app is by deciding, judging and using, which are the
+parts the agent should never do for you. And as a human, you decide at
+every step what to hand to the machine and what to keep. The app should
+leave the people who use it more capable, and building it should leave
+you more capable too.
+
+Every round of the path makes the same three moves:
+
+1. **Write it down.** Values, rules and reasons live where the agent
+   reads them, because an agent keeps only the values you write down.
+2. **Prove it.** The agent is never the tester. Evidence that something
+   works comes from the real screen, a real device, or a person.
+3. **Live with it.** Use the app every day, with the people it is for.
+   That is where the next feature, and the next value, come from.
+
+Those moves shaped every choice in the template:
 
 - **Values come first, in writing.** Every feature answers four
   questions before it is built: does it deepen understanding, invite
@@ -31,13 +56,13 @@ Those wants shaped every choice here:
   every platform. The idioms are each platform's own.
 - **Native apps over one shared data plane.** The data is built once and
   published. Each platform is a native consumer of it.
-- **The agent is never the tester.** Evidence of "it works" comes from
-  the real screen, a real device, or a person, never the agent's report.
 - **A low floor and a high ceiling.** An app should open on old
   hardware, and the newest devices should get everything they can do.
 
-I am teaching a class on values-based app development with AI from
+I am teaching a class on building human-shaped software with AI from
 this template. The same path serves a class and a builder working alone.
+`docs/research/values-based-approaches.md` sets it beside other
+values-based ways of building, and says what it borrowed from each.
 
 ## Start here
 
@@ -123,4 +148,4 @@ describes.
 
 MIT licensed.
 
-Start with stage 00. It is short, and it is the part most worth keeping.
+Start with stage 00. It is the part most worth keeping.

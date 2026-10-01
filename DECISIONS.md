@@ -5,6 +5,11 @@ already shows that). Each entry should answer: **"what would the next
 developer get wrong if they didn't know this?"** Lead with the rule,
 follow with `**Why:**` and `**How to apply:**`. Append-only.
 
+When a decision affects people and not just code, add one line:
+**Who was in the room, who gains, who pays:** (who took part in the
+decision, who benefits, and who bears the cost, in money, effort, or
+something lost).
+
 Invoke the `architectural-decision-log` skill when adding a new entry.
 
 ---

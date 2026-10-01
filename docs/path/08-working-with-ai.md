@@ -76,6 +76,29 @@ else.
 - **Commit messages quote the request.** Months later, the words you
   actually used explain a change better than anyone's summary of them.
 
+## From reason to rule to check
+
+Stage 00 said values climb. Here is the whole ladder, because by now
+your app has values on every rung.
+
+1. **A reason.** The "Why we build" paragraph. The agent reads it and
+   weighs it, the way a person weighs advice.
+2. **A rule.** A standing instruction in your own words, with a date,
+   written the day the agent crossed a line. The agent reads it every
+   session, but reading is not the same as obeying. `CLAUDE.md` is
+   context, and an agent working hard on something else can still miss
+   a sentence in it.
+3. **A check.** A test, or a hook that runs before the agent acts, that
+   fails when the line is crossed. Now the agent cannot cross it without
+   being told.
+
+Not every value can climb all the way. "Only essential words on screen"
+needs a person's judgment, and probably always will. But, when a rule is
+specific enough to test, test it. "One spelling locale" climbed from a
+word I noticed on a label to a test that reads every string in the app.
+In `CLAUDE.md`, each value rule says what holds it: a check, or "no check
+yet."
+
 ## Honesty in the log
 
 An agent reports what it intended. So, the log keeps two words apart:
@@ -170,7 +193,14 @@ to draw, in writing, where the agent will read them.
 6. **Draw the line again.** Reread your "Why we build" paragraph and your
    standing rules from stage 00. Ask the agent whether anything you have
    built since crosses them. Decide what to do about each answer
-   yourself.
+   yourself. Then ask which of your rules are now specific enough to
+   become checks, and have it write them.
+
+7. **Find the decision each value changed.** Go through your values one
+   at a time and name a decision it changed: something you built
+   differently, or did not build, because of it. A value that never
+   changed a decision is decoration. Rewrite it until it does work, or
+   let it go.
 
 **When you are done with the path,** your app is shipped and running,
 your agent remembers what you taught it, and the lessons from this app
@@ -178,5 +208,5 @@ are waiting for the next one. The next app starts at stage 00 again,
 with a new note and a new why. It will go faster, because this time the
 repository remembers.
 
-Be ready to show one skill your app taught, and to say which mistake it
-will save the next person from.
+Be ready to show one skill your app taught, the mistake it will save the
+next person from, and one value with the decision it changed.

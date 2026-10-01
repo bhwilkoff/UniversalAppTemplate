@@ -12,8 +12,19 @@ product. It is a tool that makes someone more human.
 
 **Before implementing any feature**, invoke the
 `learning-orientation-design` skill: the four-question test that
-operationalizes this paragraph. The human-facing version of this
-section is `docs/path/00-why-we-build.md`.
+operationalizes this paragraph, after its three questions of the idea
+(should it exist, who does it touch, what will people learn or stop
+learning). The human-facing version of this section is
+`docs/path/00-why-we-build.md`.
+
+This template builds **human-shaped software**: it takes the mechanical
+work off people's hands and leaves them the learning. Learning is the
+frame three ways: the people who use the app, the owner as builder
+(deciding, judging and using stay theirs; propose, don't decide), and
+the owner as student of the method. Every round makes three moves:
+**write it down** (values live here, where you read them), **prove it**
+(you are never the tester), **live with it** (the owner's daily use and
+other people's feedback drive the next round).
 
 ---
 
@@ -842,14 +853,20 @@ drift, fix the Current State section first, then work.
   is non-obvious: a hidden constraint, a subtle invariant, a
   workaround for a specific bug.
 - **No emojis in code or commits** unless explicitly requested.
+- **Value rules say what holds them.** A value climbs from a reason
+  (Why we build) to a rule (here, dated, in the owner's words) to a
+  check (a test or hook that fails when the line is crossed). Each value
+  rule below names its check, or "no check yet". When one becomes
+  testable, write the check and update the mark.
 - **Only essential words on screen.** A caption must be a refusal, a
   warning, or a fact the person cannot discover by looking
-  (`mobile-first-density-design` rule 7).
+  (`mobile-first-density-design` rule 7). *No check yet.*
 - **No AI-written lists or copy in the product.** Lists and blurbs come
-  from data or a human editor (`learning-orientation-design`).
+  from data or a human editor (`learning-orientation-design`). *No check
+  yet.*
 - **Side doors (feeds, MCP) are findable on the website, never
-  featured in the apps.**
-- **One spelling locale, linted.**
+  featured in the apps.** *No check yet.*
+- **One spelling locale, linted.** *Check: `tools/test_us_english.py`.*
 - **Always ensure cross-platform parity.** When shipping on one
   platform, mirror on the others in the same change set where
   feasible AND update PARITY.md. Don't ship one and wait to be

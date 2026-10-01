@@ -51,6 +51,44 @@ reach for the blurb, and it is not wrong to: nobody told it otherwise.
 The values have to live where the agent reads them, at the moment it
 makes the choice.
 
+## Human-shaped software
+
+I call what this template builds *human-shaped software*. The name
+answers that March page. A computer-shaped problem is one you can hand
+to the window. Learning, community and relationships are not, because
+they only happen when a person does the work. Human-shaped software is
+built around those parts rather than over them. It takes the mechanical
+work off people's hands and leaves them the learning.
+
+Learning is the frame for everything in this template, and it runs in
+three directions at once.
+
+- **As a student,** you are learning a way of building, one stage at a
+  time. Every stage ends with something to bring back and show another
+  person, because a method is learned by showing it, not by reading it.
+- **As a builder,** you are learning what your app is. The agent writes
+  the code. Deciding what to build, judging what came back, and using it
+  every day are yours, and they are where you learn. Hand those to the
+  agent and the app gets built while you learn nothing.
+- **As a human,** you are deciding, at every step, what to hand to the
+  window and what to keep. The app should leave the people who use it
+  more capable, and building it should do the same for you.
+
+So, every round of the path makes the same three moves:
+
+1. **Write it down.** Writing is how you find out what you believe, and
+   a value you have not written down is one the agent cannot keep.
+2. **Prove it.** Proving is how you find out whether it is true. Every
+   "it works" points at something a person can look at (stage 04).
+3. **Live with it.** Living with the app is how you find out what you
+   missed. The values you could not have predicted show up when you use
+   it every day, with the people it is for.
+
+**Write it down, prove it, live with it.**
+
+The moves are not stages. Each lap of each stage makes all three, and
+this stage is where the first one starts.
+
 ## Where the values live in this template
 
 There are three places, and each one is read at a different moment.
@@ -111,6 +149,19 @@ There are three places, and each one is read at a different moment.
    A labeled bot is an honest way to get a game started. A bot dressed
    as a person manufactures a relationship that does not exist.
 
+   A rule in your own words, with a date, is also your name on the
+   decision. Anyone who reads it later, including the agent, knows who
+   drew the line and why.
+
+Values climb, too. A value starts as a reason in the paragraph. The day
+the agent crosses it, it becomes a standing instruction. Once you know
+exactly what it means, it can become a check: a test that fails when the
+line is crossed, so the agent cannot cross it without being told. In
+Archive Watch I found "programme" on a label and assumed there was
+already a rule about spelling. There was not. Now there is a rule, and
+`tools/test_us_english.py` checks every string a person can see, because
+a rule nobody checks drifts again. Stage 08 comes back to this ladder.
+
 ## What it costs
 
 These rules are slower. Pulling Archive Watch's notes from archive.org's
@@ -143,7 +194,8 @@ is a conversation, and `talking-to-your-agent.md` has the moves.
    fewer.
 
 3. **Name one line you will not cross.** Something the app will never
-   do, or never let AI do inside it. Say it plainly and say why. Mine
+   do, or never let AI do inside it, even if doing it would work. Say it
+   plainly and say why. Mine
    usually came out the moment the agent proposed crossing one. In
    September, the agent designed Archive Watch's Watch Together feature
    around a paid voice server, and I stopped it:
@@ -156,20 +208,41 @@ is a conversation, and `talking-to-your-agent.md` has the moves.
    with today's date and your words in quotes. You will add more of
    these as you build.
 
-4. **Test the idea against the four questions.** Ask the agent to run
-   the `learning-orientation-design` skill against your idea and tell
-   you where it fails. Where it does, change the idea now, while it is
-   only words. The same test will keep applying to every feature. Nine
-   days into BOBA Playbook, the agent built a price feature that leaned
-   on another site's prices, and I asked the question the four questions
-   are for:
+4. **Ask three questions of the idea.** Work through these with the
+   agent, and write your answers in your note.
 
-   > This is NOT what I want. I want my app to be indpendent from
-   > Radish. You can look at the stucture from Radish, but if we are
-   > just using Radish, there is no reason for this feature to exist.
-   > People should just go to radish, right?
+   1. **Should it exist at all?** If something already does this, what
+      does yours give people that it does not? This one comes back before
+      every big feature. Nine days into BOBA Playbook, the agent built a
+      price feature that leaned on another site's prices, and I asked it
+      out loud:
 
-5. **Let it ask you the rest.** Ask the agent what it still needs to
+      > This is NOT what I want. I want my app to be indpendent from
+      > Radish. You can look at the stucture from Radish, but if we are
+      > just using Radish, there is no reason for this feature to exist.
+      > People should just go to radish, right?
+
+   2. **Who does it touch?** Name the people who will use it. Then name
+      the people outside the screen: the ones whose work it shows, whose
+      data it uses, or whose lives it changes without their ever opening
+      it. For Archive Watch, those are the people who uploaded and
+      reviewed each film on archive.org, and the people on screen in the
+      films. For Tidbits Trivia, they are the volunteers who wrote every
+      fact on Wikipedia and Wikidata.
+   3. **What will people learn from using it every day, and what will
+      they stop learning?**
+
+   Then ask the agent to argue the strongest case against your idea, on
+   behalf of the people outside the screen. It is a second voice where
+   there was only yours. It does not replace asking real people, and
+   stage 07 comes back to that.
+
+5. **Test it against the four questions.** Ask the agent to run the
+   `learning-orientation-design` skill against your idea and tell you
+   where it fails. Where it does, change the idea now, while it is only
+   words. The same test applies to every feature from here on.
+
+6. **Let it ask you the rest.** Ask the agent what it still needs to
    know before it starts. This is how I opened each early milestone of
    BOBA Playbook, starting the first evening:
 
@@ -189,10 +262,12 @@ is a conversation, and `talking-to-your-agent.md` has the moves.
 
    The agent records your answers as decisions, with the why first.
 
-**When you are ready to move on,** your note starts with the why, the
-"Why we build" paragraph in `CLAUDE.md` sounds like you, there is one
-rule in your own words, and the agent has what it needs to start. Stage
-01 turns all of that into something you can hold.
+**When you are ready to move on,** your note starts with the why and
+your answers to the three questions, the "Why we build" paragraph in
+`CLAUDE.md` sounds like you, there is one rule in your own words, and
+the agent has what it needs to start. You have written it down. Stage 01
+is the first chance to prove it and live with it, in something you can
+hold.
 
-Be ready to share your "why we build" paragraph, your one rule, and what
-that rule will cost you.
+Be ready to share your "why we build" paragraph, the people outside your
+screen, your one rule, and what that rule will cost you.

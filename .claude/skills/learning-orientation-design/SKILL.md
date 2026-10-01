@@ -1,13 +1,27 @@
 ---
 name: learning-orientation-design
-description: "Use before implementing any new feature — the test is whether the feature serves human learning and growth, not replacement. Ask four questions: Does it deepen understanding? Invite participation? Support human agency? Pass the clarity-over-cleverness check? Features that fail these tests get refactored or rejected at proposal stage, not after shipping. Triggers on new feature proposal, building a tool, \"should we add X?\", AI feature, automation, learning product, AI-written copy, generated lists, MCP/feed surfaces in the app."
+description: "Use before implementing any new feature, and when starting a new app. The test is whether it is human-shaped: it serves human learning and growth, not replacement. First three questions of the idea (should it exist, who does it touch including people outside the screen, what will people learn or stop learning), then four questions: Does it deepen understanding? Invite participation? Support human agency? Pass the clarity-over-cleverness check? Features that fail these tests get refactored or rejected at proposal stage, not after shipping. Triggers on new feature proposal, building a tool, \"should we add X?\", AI feature, automation, learning product, AI-written copy, generated lists, MCP/feed surfaces in the app."
 ---
 
 # Learning-Orientation Feature Design
 
 ## The "why" frame
 
-Every feature should serve **human learning and growth — not replacement.** The tool exists to make someone more capable, more engaged, more themselves. Not to think for them, not to take over what they could do themselves.
+This template builds **human-shaped software**: software that takes the mechanical work off people's hands and leaves them the learning (`docs/path/00-why-we-build.md`). Every feature should serve **human learning and growth, not replacement.** The tool exists to make someone more capable, more engaged, more themselves. Not to think for them, not to take over what they could do themselves.
+
+Learning runs three ways, and a feature should respect all of them: the people who use the app (the four questions), the builder (deciding, judging and using stay with the owner; propose, don't decide), and the student learning the method (explain the why when you push back, so the owner learns it too).
+
+## Before the four questions: three questions of the idea
+
+Ask these of a new app, and again before any big feature. Write the owner's answers into the note or DECISIONS.md.
+
+1. **Should it exist at all?** If something already does this, what does ours give people that it does not? (BOBA Playbook: "if we are just using Radish, there is no reason for this feature to exist.") Not building is a normal outcome.
+2. **Who does it touch?** The people who use it, and the people outside the screen: those whose work it shows, whose data it uses, or whose lives it changes without their opening it (archive.org uploaders and reviewers; Wikipedia editors).
+3. **What will people learn from using it every day, and what will they stop learning?**
+
+Then argue the strongest case AGAINST the feature on behalf of the people outside the screen, before building. You are the second voice for a builder who works alone. Say so plainly; you do not replace asking real people.
+
+## The four questions
 
 Before implementing any feature, ask:
 
@@ -72,6 +86,14 @@ Examples:
 
 Pattern: **the user's mental model is the constraint, not the tool's capability**. A clever feature the user can't predict is worse than a simple one they can.
 
+## Many ways in
+
+A feature should open more than one path, not lead everyone to the same output. Search with visible filter tokens lets a collector, a player and a newcomer each find their own way through the catalog; a single "for you" row gives all three the same answer. Ask: does this feature work for people who think differently from the builder?
+
+## Quiet where it doesn't matter, effortful where the learning is
+
+The interface should stay out of the way: no chrome, no nagging, nothing that competes for attention (`mobile-first-density-design`). The learning should not. The part of the app where people think, guess, choose or make something is supposed to take effort ("hard fun"). Do not smooth away the effort that IS the point; do smooth away everything around it.
+
 ## The "what would we get wrong by automating this?" test
 
 Many features tempt automation. Before automating any user-facing action, ask: **what would the user lose by not doing this themselves?**
@@ -115,6 +137,18 @@ When the tool guesses what the user wants and silently does it, two failure mode
 ### ❌ Passing off automation as a human
 
 If a feature substitutes a bot/AI for a missing person — a CPU opponent while matchmaking is empty, an auto-reply, a synthetic "other user" — it must be **visibly labeled** as such. A labeled bot is an honest, graceful bootstrap; a bot disguised as a human is a dark pattern that manufactures a false social relationship. The test: *would the user feel deceived if they learned the truth?* If yes, label it. (This is a hard rule, not a preference — it applies to every synthetic stand-in for a human, no exceptions.)
+
+## The honesty checklist for anything automated
+
+Any part of the app that runs on its own (a bot, a suggestion, a guess-ahead search, a machine-written caption, an automated reply) must:
+
+1. **Say what it can do.** Its scope is visible where it acts.
+2. **Say how sure it is.** A guess looks like a guess. A transcript says it is machine-made.
+3. **Step back when unsure.** Below its confidence, it offers rather than acts, or stays quiet.
+4. **Say why it did what it did,** when someone asks.
+5. **Never pass as a person.** (See "Passing off automation as a human" above.)
+
+This is the app-side twin of the instrument-honesty rule in stage 04: a reader that cannot read says so.
 
 ## Standing rules from a shipped app
 

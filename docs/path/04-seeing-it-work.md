@@ -142,6 +142,18 @@ and `docs/DEVICE-HARNESSES.md`, and the skills that carry them are
 `device-observation-harness`, `autonomous-fleet-testing` and
 `concurrent-agent-device-leases`.
 
+## The same honesty, inside the app
+
+Everything above is honesty you ask of the agent's instruments. Your app
+owes the people who use it the same thing. Any part of it that runs on
+its own (a computer opponent, a suggestion, a search that guesses, a
+caption written by speech recognition) should say what it can do, say
+how sure it is, step back when it is not sure, and never pass itself off
+as a person. Tidbits Trivia's labeled computer opponent from stage 00 is
+this rule. A reader that says "I could not tell" is the same rule,
+turned toward you. The `learning-orientation-design` skill carries the
+checklist.
+
 ## What it costs
 
 A bench is hardware, and hardware is money and space. Archive Watch's

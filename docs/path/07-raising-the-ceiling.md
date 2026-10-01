@@ -105,6 +105,37 @@ ones, with a table of which operating system versions on which
 platforms can do what, and a checklist for bringing it to a new
 platform.
 
+## Build it with the people it is for
+
+Living with the app is the third move, and by now you are not the only
+one living with it. Across four apps, the people I brought in came as
+testers, through a Reddit thread, and at a trivia night. Other people
+want things from your app that you do not, and the only way to find out
+what they are is to hand it to them.
+
+People used to design with the folks they were building for using paper
+and cardboard, because real software was too expensive to throw away.
+It is not anymore. With an agent, a working rough version of a feature
+costs an afternoon, so the people it is for can use the real thing and
+reshape it before you settle on it.
+
+Two rules keep that honest. Keep their words, as they said them, in
+your note, the same way you keep your own. And give something back:
+their name in the credits, a reply to what they said, the feature they
+asked for. Asking for people's ideas and giving nothing back is not
+building with them. It is taking from them.
+
+## Their data outlives your interest
+
+Some day you will stop working on this app. The people who used it will
+still have what they made in it: their saved films, their lists, their
+scores. Archive Watch keeps that on people's own devices and in their own
+iCloud or Google Drive rather than on a server of mine, so it does not
+vanish when I stop paying for something. The rest of the promise belongs
+in writing: a way to export what people made, in a form they can read
+without the app, and a sentence on the website saying what happens to
+their data if the app stops being maintained.
+
 ## What it costs
 
 Every ceiling feature is a promise on every platform that has it, and
@@ -188,15 +219,27 @@ build.
    > you try to select 'Watch Together' without first having a call
    > going?
 
-6. **Check the older device.** Open the app on your oldest supported
+6. **Put a rough version in front of the people it is for.** Before the
+   next big feature is finished, ask the agent for a working rough
+   version you can hand to two or three of the people you named in stage
+   00. Watch them use it, write down what they say in their words, and
+   send it as a round. Then tell them what changed because of them.
+
+7. **Check the older device.** Open the app on your oldest supported
    device and make sure it says, in a sentence, what it cannot do,
    rather than showing a button that does nothing.
 
+8. **Make the data promise.** Ask the agent how someone would take what
+   they made in your app with them, and what happens to it if you stop.
+   If there is no answer yet, ask for an export and for the sentence on
+   your website.
+
 **When you are ready to move on,** a feature you wanted from your own
-use is live on every platform that can have it, and the older devices
-say honestly what they cannot do. By now you have built a lot, and
+use is live on every platform that can have it, someone other than you
+has shaped it, and the older devices say honestly what they cannot do. By now you have built a lot, and
 taught the agent a lot along the way. Stage 08 is about making sure it
 remembers.
 
-Be ready to show the feature on your newest device, and the sentence an
-older device shows instead.
+Be ready to show the feature on your newest device, the sentence an
+older device shows instead, and one thing someone else changed about
+it.
