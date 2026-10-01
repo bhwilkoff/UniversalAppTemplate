@@ -12,6 +12,10 @@ to all of them: how to ask, correct, and decide, in real prompts.
 
 ## By stage
 
+**00. Why we build**
+
+- `research/values-based-approaches.md`: Value Based Engineering (IEEE 7000) and other values-based traditions, set beside how this template works, with proposed changes. The sourced notes behind it are in `research/notes/`.
+
 **02. The shape of an app**
 
 - `templates/DATA-CONTRACT-template.md`: seed for your data contract, written the day a second app reads your data.
