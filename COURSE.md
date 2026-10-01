@@ -1,8 +1,10 @@
 # Teaching with this template
 
 I am building a class on human-shaped software around this repository:
-apps built with an AI agent that leave people more capable rather than
-more passive. I have not taught it yet. This page is the shape I expect
+apps built with an AI agent for human-shaped problems, that leave people
+more capable rather than more passive. The cohorts run from
+humanshaped.org, and they are free. Anyone can teach one. I have not
+taught it yet. This page is the shape I expect
 it to take, written down so that I can be wrong about it in specific
 ways.
 
@@ -25,33 +27,39 @@ Every week makes the same three moves as the path: write it down, prove
 it, live with it. Stage 00 explains them.
 
 The course is the path in `docs/path/`. Each stage already ends with a
-"Be ready to..." line, and that line is the week's work to bring back.
-What follows is how the stages map onto a ten-week term, and what each
-week asks a person to make.
+"Be ready to..." line, and that line is the challenge to bring back.
+What follows is how the stages map onto a cohort of about five weeks,
+with one live session each week, and what each week asks a person to
+make.
 
 ## The one requirement
 
-Every student builds one real app of their own choosing, for people
-they can actually name. Not a tutorial app. Something they want to
-exist. Every week's work is done on that app.
+Every student builds one real app of their own choosing, for a
+human-shaped problem and for people they can actually name. Not a
+tutorial app. Something they want to exist. Every week's work is done on
+that app.
 
-## Ten weeks
+## Five weeks, and a week before them
 
 Each week the same app gets further along, and each week's work is a
-set of conversations with the agent, not a set of files to edit.
+set of conversations with the agent, not a set of files to edit. Two
+stages share most weeks, so the pace is quick. That is on purpose: the
+path is built to be lapped more than once, and a cohort is the first
+lap, done with other people.
 
-| Week | Stage | Where the app gets to | What they bring back |
+| Week | Stages | Where the app gets to | What they bring back |
 |---|---|---|---|
-| 1 | 00. Why we build | A running note for the app, opened with the wish at the top, and an agent that knows why the app exists and who it is for, in the student's words, with one rule it will not cross. | The paragraph, the people outside their screen, the rule, and what the rule will cost. |
-| 2 | 01. The first prototype | One platform live at a real address, full of real data from a pipeline the agent built, after two rounds of feedback from the student's own phone. | The app on their phone, and one thing the real data taught them. |
-| 3 | 02. The shape of an app | A parity matrix the student has read and trimmed, and one data rule they decided that the pipeline now enforces. | The matrix, and one cell their own eyes proved wrong. |
-| 4 | 03. Going native | A second platform on the student's own device. | One verb shown on both platforms, each in its own idiom. |
-| 5 | 03, continued | A floor chosen from the agent's measurement, and the native bar held through a round of critique. | The oldest device the app runs on, and what it does not show there. |
-| 6 | 04. Seeing it work | The agent testing on the student's device itself, with roles for every device. | A screenshot that proved a fix. |
-| 7 | 05. Shipping | The app in a store's test track or live, with store words the student rewrote. | The app installed on a device they did not build it on. |
-| 8 | 06. Keeping it running | Pulse reading at least one store, and a first loop run from start to stop. | One honest number, one honest "could not read", and what the loop finished. |
-| 9 | 07. Raising the ceiling | A feature the student wanted from their own use, on every platform that can have it. | The feature, the sentence an older device shows instead, and one thing someone else changed about it. |
-| 10 | 08. Working with AI | Skills and memories that carry this app's lessons to the next one. | The skill, the mistake it will save the next person from, and one value with the decision it changed. |
+| Before | Setup | A GitHub account, a copy of the template, an AI agent (Claude or Gemini) connected to it, and a desktop computer set up to build and test both on the computer and in the cloud. The first win: their own app's address open on their phone, showing its name. | The address, on their phone. |
+| 1 | 00. Why we build, 01. The first prototype | An agent that knows why the app exists and who it is for, in the student's words, and one platform live at a real address with real data, after two rounds of feedback from their own phone. | The why, the people outside their screen, the one rule, and the app on their phone with one thing the real data taught them. |
+| 2 | 02. The shape of an app, 03. Going native | A parity matrix the student has read and trimmed, and a second platform running on their own device. | One verb shown on both platforms, each in its own idiom, and one cell their own eyes proved wrong. |
+| 3 | 04. Seeing it work, and making it look like itself | The agent testing on the student's device, and a look for the app that comes from its own why rather than the template's defaults. | A screenshot that proved a fix, and the app's own look beside the template's. |
+| 4 | 05. Shipping, 06. Keeping it running | The app installed on a device the student did not build it on, through a test track, a direct share, or a store, and one honest number about it. | The app on someone else's device, and what that person said. |
+| 5 | 07. Raising the ceiling, 08. Working with AI | A feature the student wanted from their own use, and skills and memories that carry this app's lessons forward. | The feature, and one value with the decision it changed. Shown to everyone, guests welcome. |
+
+Five weeks gets most people to a shared, working app on one or two
+platforms. Store listings and the later stages often land after the
+cohort ends, and that is fine. Nobody graduates out of the community,
+and the app's page stays open while it keeps growing.
 
 ## What each class session is for
 
@@ -84,11 +92,14 @@ nothing in the app needed to know who you were" is a value at work.
 
 ## What I am unsure about
 
-- **Ten weeks may be too few** for students who have never used a
-  terminal or Claude Code. Week 1 might need a setup session before it.
-- **Apple and Google developer accounts cost money** ($99 a year and $25
-  once). Week 7 may need a path that ends at an installable build shared
-  directly, for students who cannot or should not pay.
+- **Five weeks is fast** for people who have never used a terminal or an
+  AI agent. The week before exists for that reason, and some people
+  will need two laps of the path rather than one.
+- **Store accounts cost money** ($99 a year for Apple, $25 once for
+  Google). Week 4 ends at an app installed on someone else's device,
+  which a test track or a direct share can do for free. Android's free
+  limited-distribution accounts, for students, teachers and hobbyists,
+  share an app with up to 20 devices.
 - **How much to leave to discovery.** Research on teaching beginners
   is clear that open exploration without guidance leaves many of them
   lost. The path gives every stage numbered steps for that reason. I do
