@@ -65,6 +65,14 @@ verify what a person would see); push; log it below. "Fixed" and
   `DIRECTORY_SEARCH_TOKEN` secret on humanshaped/directory. Until then
   the directory still publishes, and the scan warns instead of failing.
 
+- **The site's own declaration and harm answer, in Ben's words.** The
+  test review found no `HUMAN-SHAPED.md` for the hub and no written
+  answer to "whom could this harm?" (principle 12). Both have to be
+  Ben's words (principle 13), so they wait for him.
+- **Confirm the licenses:** CC BY 4.0 for the words and MIT for the code
+  (`LICENSE.md`), chosen as the open default.
+- **A real test of the session recorder** before cohort 1, since the
+  site promises recorded sessions.
 - Approval screens when creating the Supabase project and the GitHub
   OAuth app.
 - The Google Admin and Cloud setup steps in `tools/README.md`.
@@ -90,3 +98,13 @@ verify what a person would see); push; log it below. "Fixed" and
   Verification in progress: an agent is running the skill against
   humanshaped.org itself, to see whether the output is useful and
   honest before calling it done.
+- 2026-10-02, item 2 verified. A test run of the skill against the hub
+  produced an honest review (2,600 words) and six problems with the
+  skill: template-only file paths, softened grades, an impossible
+  "visitor's view" from a fetch, no place for cross-cutting gaps, no
+  length target, and a conflict over sample prompts. All six fixed in
+  the template. Acting on the review's findings: the template LICENSE
+  placeholder is filled, the site now has LICENSE.md (CC BY 4.0 words,
+  MIT code) and a credit line in every footer naming the agent, the
+  typeface, and the license. Left for Ben: the hub's declaration and
+  harm answer, in his words.
