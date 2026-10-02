@@ -533,3 +533,11 @@ label.check { display: flex; gap: 0.5rem; align-items: center; font-weight: 400;
 @media (min-width: 48rem) { .cohort-grid { grid-template-columns: 1fr 1fr; } }
 .account.cohort-page { max-width: 62rem; }
 .cohort-page form.cohort-form, .cohort-page .prose-width { max-width: 44rem; }
+
+/* Live session */
+.live-page .notice { border-left: 3px solid var(--clay); padding: 0.4rem 0 0.4rem 0.9rem; max-width: 44rem; }
+.agenda { list-style: none; padding: 0; margin: 1rem 0 0; display: grid; gap: 0.75rem; }
+.agenda-part { background: var(--card); border: 1px solid var(--rule); border-radius: var(--radius); padding: 1rem 1.25rem; display: grid; gap: 0.35rem; justify-items: start; }
+.agenda-part h3 { font-size: 1.1rem; }
+.agenda-part p { margin: 0; }
+@media (min-width: 48rem) { .agenda { grid-template-columns: 1fr 1fr; } }

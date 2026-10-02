@@ -39,7 +39,33 @@
     return m ? m[1] + '/' + m[2] : null;
   }
 
-  var lib = { currentAndNext: currentAndNext, commitLine: commitLine, ago: ago, repoPath: repoPath };
+  // The live session's agenda, from the course's session shape: arrive,
+  // show what you brought back in your group, one value at work, read one
+  // real prompt together, build, and close. Built for 75 minutes and
+  // scaled to the cohort's own session length.
+  var PARTS = [
+    ['Arrive', 5, 'One line in the chat: what you shipped this week, or where you are stuck. Cameras welcome, never required.'],
+    ['Show what you brought back', 25, 'In your group, each person shows this week\u2019s bring-back on the real device, then hears three questions: where are you going, how is it going, and what comes next.'],
+    ['One value at work', 7, 'One person shares a decision their values changed this week, and what it cost them.'],
+    ['Read one real prompt', 20, 'Write the prompt you would send for the situation on screen, compare it with a partner, then see the real one and talk about what it fixed.'],
+    ['Build', 15, 'Quiet building time, with a room open for anyone who is stuck.'],
+    ['Close', 3, 'One line each: what you learned, why it matters, and what you will bring back next week.']
+  ];
+  function agenda(minutes) {
+    var total = 75, scale = (minutes || total) / total, start = 0;
+    return PARTS.map(function (p, i) {
+      var len = i === PARTS.length - 1 ? Math.max(1, Math.round((minutes || total) - start)) : Math.max(1, Math.round(p[1] * scale));
+      var part = { name: p[0], start: start, minutes: len, what: p[2] };
+      start += len;
+      return part;
+    });
+  }
+
+  // Which stages of the path each week covers (COURSE.md, five weeks).
+  var WEEK_STAGES = { 1: ['00', '01'], 2: ['02', '03'], 3: ['04'], 4: ['05', '06'], 5: ['07', '08'] };
+  function stagesForWeek(n) { return WEEK_STAGES[n] || []; }
+
+  var lib = { agenda: agenda, stagesForWeek: stagesForWeek, currentAndNext: currentAndNext, commitLine: commitLine, ago: ago, repoPath: repoPath };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
   else root.CohortLib = lib;
 })(this);

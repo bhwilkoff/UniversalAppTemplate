@@ -161,6 +161,7 @@
     if (t.next) {
       $('[data-next-when]').textContent = (t.live ? 'Happening now: ' : '') + when(t.next.starts_at) + ', for ' + cohort.session_minutes + ' minutes.';
       if (safe(t.next.meet_url)) { var j = link(t.next.meet_url, t.live ? 'Join the session now' : 'The Meet link'); j.className = 'btn-github'; na.appendChild(j); }
+      var lp = link('/live/?c=' + encodeURIComponent(cohort.slug), 'The session page'); lp.className = 'btn-quiet'; na.appendChild(lp);
     } else {
       $('[data-next-when]').textContent = sessions.length ? 'The last session has happened.' : 'The sessions have not been scheduled yet.';
     }

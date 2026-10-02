@@ -169,3 +169,27 @@ verify what a person would see); push; log it below. "Fixed" and
   /account/ links to it. Verified: 8 tests for the week and commit
   helpers; the page drawn against a stand-in database with real commits
   from GitHub. GitHub sign-in verified up to GitHub's Authorize screen.
+- 2026-10-02, item 7 (session page). /live/?c=<slug> built for keeping
+  open beside Meet: the week's title and challenge, Join and cohort-page
+  buttons, the recording notice, the agenda from the course's session
+  shape scaled to the cohort's session length with a silent timer for
+  each part, links to the week's stages of the path, and the
+  bring-backs shared since the last session. The Meet setup now points
+  at /live/?c=<slug> (a static site cannot serve /live/<slug>/). Ben's
+  account is promoted to teacher automatically on first sign-in
+  (migration 4, 31 database checks pass, applied). Verified: 19 page
+  logic tests; the page drawn against a stand-in database. Not yet
+  verified for real: everything behind sign-in, which waits for Ben's
+  one Authorize click.
+- 2026-10-02: **loop closed** at Ben's request (restart). Next session
+  starts here.
+
+## Where to pick up
+
+1. Confirm Ben authorized: `select github_login from public.profiles`
+   should list `bhwilkoff`, and `public.teachers` should hold him. If
+   not, ask him to visit humanshaped.org/account/ and click Authorize.
+2. Test for real, signed in as Ben: create a draft cohort in /teach/,
+   make its sessions, open it, see /cohort/ and /live/. Then point the
+   header "Sign in with GitHub" buttons (every page) at /account/.
+3. Continue the backlog at item 8 (toolkit), then 9 to 13.

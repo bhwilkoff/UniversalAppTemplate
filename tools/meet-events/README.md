@@ -36,7 +36,7 @@ these names:
   "sessions": 5,
   "members": "student@gmail.com, another@example.org",
   "teachers": "teacher@example.org",
-  "sessionUrl": "https://humanshaped.org/live/c1/"
+  "sessionUrl": "https://humanshaped.org/live/?c=c1"
 }
 ```
 

@@ -61,14 +61,14 @@ def main():
     su.execute(GRANTS)
 
     people = {}
-    for name in ["ben", "bea", "cal", "dee"]:
+    for name in ["bhwilkoff", "bea", "cal", "dee"]:
         uid = str(uuid.uuid4())
         su.execute(
             "insert into auth.users (id, raw_user_meta_data) values (%s, %s)",
             (uid, f'{{"user_name": "{name}", "provider_id": "{abs(hash(name)) % 10**8}", "avatar_url": "https://example.org/{name}.png"}}'),
         )
         people[name] = uid
-    su.execute("insert into public.teachers (user_id) values (%s)", (people["ben"],))
+    people["ben"] = people["bhwilkoff"]
 
     def as_user(name):
         cur = conn.cursor()
@@ -97,7 +97,9 @@ def main():
     conn.autocommit = False
 
     su.execute("select github_login from public.profiles order by github_login")
-    check("a profile is made from GitHub on first sign-in", [r[0] for r in su.fetchall()] == ["bea", "ben", "cal", "dee"])
+    check("a profile is made from GitHub on first sign-in", [r[0] for r in su.fetchall()] == ["bea", "bhwilkoff", "cal", "dee"])
+    su.execute("select count(*) from public.teachers")
+    check("Ben becomes the first teacher on his first sign-in, and no one else does", su.fetchone()[0] == 1)
 
     ben = as_user("ben")
     ok = attempt(ben, "insert into public.cohorts (slug, title, created_by) values ('fall-2026', 'Fall 2026', %s) returning id", (people["ben"],))

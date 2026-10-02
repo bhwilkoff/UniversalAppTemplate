@@ -94,7 +94,47 @@ as Ben's without his review, $0 to run.
 - Mobile-first, `min-width` media queries, test at 375px before 1440px.
 - Accessible contrast: text on the orange `--color-primary` is dark.
 
-## Sign-ups (not built yet)
+## The hub app (sign-in, cohorts, sessions)
+
+Read `LOOP-PLAN.md` first: it holds the backlog, what is verified, and
+what waits on Ben.
+
+- **Database:** Supabase project `humanshaped-hub` (ref
+  `bifrieqzkihuxfzttgvd`, free plan, us-west-1, org "Learning is Change,
+  Inc"). Schema and row-level security in `supabase/migrations/`, applied
+  in order. `supabase/tests/test_policies.py` runs them against a local
+  throwaway Postgres as four people (31 checks); run it before applying
+  any new migration, and see it fail when a rule is opened on purpose.
+  Access-rule helpers live in the `private` schema, out of the API.
+- **Sign-in:** GitHub, through the "Human Shaped" OAuth app owned by the
+  `humanshaped` org (client ID `Ov23li0LEW1AbQLRdNjs`; its secret lives
+  only in Supabase). Supabase Site URL is https://humanshaped.org and the
+  redirect allow-list is `https://humanshaped.org/**`. Ben's GitHub
+  account (`bhwilkoff`) becomes a teacher on its first sign-in; other
+  teachers are invited by adding a row to `public.teachers`.
+- **Pages:** `/account/` (sign in, cohorts, join, leave, delete),
+  `/teach/` (a teacher's cohorts, sessions, groups, roster, and the Meet
+  script setup), `/cohort/?c=<slug>` (this week, next session, group,
+  your app, classmates' apps with live GitHub commits, bring-backs and
+  feedback), `/live/?c=<slug>` (the page beside Google Meet: agenda with
+  timers, this week's stages, what people brought back). None are in the
+  header yet: header "Sign in with GitHub" buttons still go to
+  `/cohorts/#join` until a real sign-in has been tested end to end.
+- **Scripts:** `assets/hub-config.js` (public URL and publishable key),
+  `hub.js`, `teach.js` with `teach-lib.js`, `cohort.js` and `live.js`
+  with `cohort-lib.js`. Pure logic lives in the `-lib.js` files with
+  tests in `tools/test/` (`node --test tools/test/*.mjs`, 19 tests).
+- **Students own their work.** Repositories and commits are read live
+  from GitHub, never copied. The database holds membership, sessions,
+  groups, what people choose to share, feedback, calendar emails (only
+  the student and teachers can see them), and credentials.
+- **Directory:** github.com/humanshaped/directory (listings as files,
+  nightly scan, issue form). `/apps/` reads its `directory.json`.
+- **Meet tools:** `tools/meet-events` (Apps Script as
+  meet@humanshaped.org) and `tools/session-recorder` (the $0 host-side
+  recorder). Neither has run against the real Google services yet.
+
+## Sign-ups
 
 The sign-up backend is undecided. Whatever is chosen: student names,
 emails and any keys never go in this repository (it is public). Keep the

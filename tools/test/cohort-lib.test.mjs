@@ -43,3 +43,17 @@ test('a repository can be given as owner/name or as a GitHub link', () => {
   assert.equal(lib.repoPath('https://github.com/bea/garden-swap.git'), 'bea/garden-swap');
   assert.equal(lib.repoPath('not a repo'), null);
 });
+test('the agenda fills exactly the session length', () => {
+  for (const m of [60, 75, 90]) {
+    const a = lib.agenda(m);
+    assert.equal(a.at(-1).start + a.at(-1).minutes, m);
+    assert.equal(a[0].start, 0);
+  }
+});
+test('a 75 minute session keeps the course shape', () => {
+  assert.deepEqual(lib.agenda(75).map(p => p.minutes), [5, 25, 7, 20, 15, 3]);
+});
+test('each week points at its stages of the path', () => {
+  assert.deepEqual(lib.stagesForWeek(1), ['00', '01']);
+  assert.deepEqual(lib.stagesForWeek(9), []);
+});

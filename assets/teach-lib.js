@@ -64,7 +64,7 @@
       sessions: cohort.weeks,
       members: emails.join(', '),
       teachers: (teacherEmails || []).join(', '),
-      sessionUrl: 'https://humanshaped.org/live/' + cohort.slug + '/'
+      sessionUrl: 'https://humanshaped.org/live/?c=' + encodeURIComponent(cohort.slug)
     };
   }
 
