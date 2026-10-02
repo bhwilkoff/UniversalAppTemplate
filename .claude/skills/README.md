@@ -1,6 +1,6 @@
 # The skills
 
-There are 145 folders in this directory. 55 of them I wrote, one lesson
+There are 146 folders in this directory. 56 of them I wrote, one lesson
 at a time, while building BOBA Playbook, Bsky Dreams, Tidbits Trivia and
 Archive Watch. The other 90 came from people who wrote good skills
 before I needed them, and they are credited below.
@@ -93,6 +93,7 @@ them. "From" names the app where the lesson was learned.
 
 | Skill | What it is for | From |
 |---|---|---|
+| `make-it-look-like-itself` | Replace the template's placeholder look with one drawn from the app's own why: real references first, three directions on the real core screen, then the chosen one on every platform at once. Keeps a cohort's apps from looking like siblings and keeps the stores from rejecting look-alikes. | Ben's vision for humanshaped.org, and two rounds of designing the hub |
 | `multiplatform-expansion-method` | Find the seam between data and views, then add platforms in order of how much they reuse. | Archive Watch |
 | `ios-production-gotchas` | The iPhone and iPad lessons no framework skill carries: presentation races, dark-mode legibility, layout blowups from fill images, background audio. Read it first when a symptom matches. | four shipped apps |
 | `ios-share-extension` | Receiving things from the share sheet, and the one pattern that reliably opens the app afterward. | Bsky Dreams |

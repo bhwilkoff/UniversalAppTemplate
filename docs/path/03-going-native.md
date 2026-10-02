@@ -213,10 +213,25 @@ Stage 04 is about why that matters.
    parity matrix for the new platform. Then open one feature on both
    platforms and see whether they really do the same thing.
 
+8. **Make it look like itself.** Until now, your app has been wearing
+   the template's look, which is a placeholder, and every app made from
+   the template starts out wearing the same one. Tell the agent who the
+   app is for and how it should feel to them, and name three to five
+   things you love the look of. Then ask it, using the
+   `make-it-look-like-itself` skill, to research real apps in your
+   subject and come back with three different directions, each shown on
+   your app's real core screen. Choose one (or take parts from two), ask
+   for another round on it, and then ask for it on every platform at
+   once, so the look holds the same way the features do. If you are in a
+   cohort, bring the three directions to your classmates before you
+   choose.
+
 **When you are ready to move on,** the second platform is on your own
-device, it does the same things as the first in its own idiom, and you
-have chosen its floor from a measurement. So far, you have been the one
+device, it does the same things as the first in its own idiom, it looks
+like your app rather than the template, and you have chosen its floor
+from a measurement. So far, you have been the one
 checking that it all works. Stage 04 hands that job to the agent.
 
-Be ready to name the oldest device your app will run on, and the
-newest feature it will not show there.
+Be ready to name the oldest device your app will run on, the newest
+feature it will not show there, and why its new look fits the people it
+is for.

@@ -5,7 +5,8 @@
 
 /* ---- CSS Custom Properties ---- */
 :root {
-  /* Colors — edit these for your brand */
+  /* The template's placeholder look. Every app made from the template
+     starts here, so replace it: see the make-it-look-like-itself skill. */
   --color-accent: #0047FF;
   --color-bg: #FFFFFF;
   --color-surface: #FFFFFF;

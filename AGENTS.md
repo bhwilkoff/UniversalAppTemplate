@@ -60,6 +60,7 @@ Rows are grouped by the stage of `docs/path/` where they first apply.
 | Deriving a shipped corpus from a messy source (facts, cards, entries) | `content-corpus-derivation` |
 | **03 Going native** | |
 | Planning a new platform, sequencing the buildout, or choosing a deployment floor | `multiplatform-expansion-method` |
+| The app still wears the template's placeholder look, or the builder wants it to look like its own app | `make-it-look-like-itself` |
 | iOS / iPadOS symptom (see platform list below) | `ios-production-gotchas` |
 | Any Mac shell / window / player work | `macos-platform-patterns` (worked example: `macos-native-app-shell`) |
 | Any tvOS UI / focus / persistence work | `tvos-platform-patterns` |
