@@ -56,6 +56,12 @@ verify what a person would see); push; log it below. "Fixed" and
     through, lanes for agents other than Claude, COURSE.md pedagogy
     changes from the research (week 0, groups, checks for understanding).
 12. **Design iteration two** on the live site from Ben's notes.
+13. **One source for the template's design tokens.** Found while
+    writing item 3: the platforms' placeholder palettes disagree (the
+    web starter is white with a blue accent; Android's is dark navy with
+    an orange primary), which breaks the lockstep-token rule in
+    AGENTS.md. A `design-tokens.json` with a small tool that writes the
+    web, Apple, Android, and Windows token files, and a parity test.
 
 ## Needs Ben
 
@@ -108,3 +114,12 @@ verify what a person would see); push; log it below. "Fixed" and
   MIT code) and a credit line in every footer naming the agent, the
   typeface, and the license. Left for Ben: the hub's declaration and
   harm answer, in his words.
+- 2026-10-02, item 3 (look). Added `make-it-look-like-itself` to the
+  template (research real references first, three directions on the
+  real core screen, the chosen look on every platform at once, the
+  machine-made-design tells to avoid), stage 03 step 8, the catalog
+  (146 skills, 56 Ben's), an AGENTS.md row, and a comment in the web
+  stylesheet marking its look as a placeholder. Web tests pass. Fixed,
+  not yet verified on a real app: the first true test is a cohort
+  member's week 3. Found and logged item 13 (palettes disagree across
+  platforms).
