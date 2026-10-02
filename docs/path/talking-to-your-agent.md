@@ -230,6 +230,24 @@ will be wrong. The rest is the part you would not have thought of
 alone. It is not a substitute for asking real people. It is a second
 voice where there was only yours.
 
+## Ask for a human-shaped review
+
+Before you show your app to anyone, ask your agent for a human-shaped
+review. It walks the fifteen [Human-Shaped Principles](../human-shaped/PRINCIPLES.md)
+one at a time, looks through your repository for evidence of each, says
+plainly what it could not see (it cannot hold your phone or watch a
+person use the app), and ends each principle with a question that only
+you can answer. It never gives you a grade, because a grade would turn
+the principles into a checklist to game rather than a way to see your
+own work more clearly.
+
+The review lands in a file in your repository, and what happens to it is
+up to you: keep it to yourself, commit it, or bring it to your cohort
+beside the feedback from your teacher and classmates, which it is never
+meant to replace. The `human-shaped-review` skill carries the details,
+and it works the same way in Claude, Gemini, or any agent that reads the
+template's instructions.
+
 ## Give standing permission
 
 Once you have decided something, stop being asked about it. In the

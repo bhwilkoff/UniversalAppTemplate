@@ -1,6 +1,6 @@
 # The skills
 
-There are 144 folders in this directory. 54 of them I wrote, one lesson
+There are 145 folders in this directory. 55 of them I wrote, one lesson
 at a time, while building BOBA Playbook, Bsky Dreams, Tidbits Trivia and
 Archive Watch. The other 90 came from people who wrote good skills
 before I needed them, and they are credited below.
@@ -151,6 +151,7 @@ them. "From" names the app where the lesson was learned.
 
 | Skill | What it is for | From |
 |---|---|---|
+| `human-shaped-review` | Feedback on your app from your own AI agent, walking the fifteen Human-Shaped Principles as questions with evidence. It never grades, it says what it could not see, it labels itself as AI, and you decide whether to share it. | The Human-Shaped Principles, October 2026 |
 | `two-agent-handoff` | Two different AI agents working on one project through a single handoff file. | BOBA Playbook |
 | `third-party-revocation-resilience` | Every outside data source can be taken away. Plan the exit before you depend on it. | BOBA Playbook |
 | `third-party-ip-monetization` | Charging for an app built around something you do not own. | BOBA Playbook |

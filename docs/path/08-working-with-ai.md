@@ -202,6 +202,13 @@ to draw, in writing, where the agent will read them.
    changed a decision is decoration. Rewrite it until it does work, or
    let it go.
 
+8. **Ask for a human-shaped review, then declare.** Ask your agent for
+   a human-shaped review of your app, read what it found and what it
+   could not see, and answer its questions for yourself. Then copy
+   `docs/human-shaped/HUMAN-SHAPED-template.md` to the root of your
+   repository as `HUMAN-SHAPED.md`, and answer each principle in your own
+   words. The directory at humanshaped.org reads that file.
+
 **When you are done with the path,** your app is shipped and running,
 your agent remembers what you taught it, and the lessons from this app
 are waiting for the next one. The next app starts at stage 00 again,

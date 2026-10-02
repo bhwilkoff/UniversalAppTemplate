@@ -97,6 +97,7 @@ Rows are grouped by the stage of `docs/path/` where they first apply.
 | Identifying physical objects with the live camera | `camera-recognition-pipeline` |
 | 3D card rendering in RealityKit | `realitykit-3d-card-rendering` |
 | **08 Working with AI, and hard choices** | |
+| The builder asks for feedback on how human-shaped the app is, before sharing it or filling in HUMAN-SHAPED.md | `human-shaped-review` |
 | Coordinating work with a second AI agent surface | `two-agent-handoff` |
 | Adding a third-party data dependency, or a partner revokes one | `third-party-revocation-resilience` |
 | Monetizing an app built around IP/content you don't own | `third-party-ip-monetization` |

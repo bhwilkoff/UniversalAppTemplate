@@ -109,7 +109,7 @@ is the one page to keep open while you work.
 | `SCRATCHPAD.md`, `DECISIONS.md`, `PARITY.md`, `DEEP_LINKS.md` | The project's memory: current state, the reasons behind choices, what exists on which platform, and the link contract. |
 | `docs/path/` | The nine stages. |
 | `docs/` | The reference docs each stage points to. Map: [`docs/README.md`](docs/README.md). |
-| `.claude/skills/` | 144 skills, 54 of them written from shipped apps. Catalog: [`.claude/skills/README.md`](.claude/skills/README.md). |
+| `.claude/skills/` | 145 skills, 55 of them written from shipped apps. Catalog: [`.claude/skills/README.md`](.claude/skills/README.md). |
 | `tools/` | Device testing, store submission, CI and Pulse tooling. Catalog: [`tools/README.md`](tools/README.md). |
 | `index.html`, `css/`, `js/` | The web app: plain HTML, CSS and JavaScript, no build step. |
 | `apple/` | Swift starter for one universal Xcode target (iPhone, iPad, Mac, Apple TV). See `apple/README.md`. |
