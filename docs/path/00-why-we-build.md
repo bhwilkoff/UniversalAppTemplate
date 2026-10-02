@@ -11,7 +11,7 @@ standing instructions:
 > I don't want AI making lists and writing copy. Any time we can use
 > metadata or user copy/categorization from archive.org.
 
-Archive Watch had 4,285 commits by the end of that month, and 2,742 of
+Archive Watch had 4,306 commits by the end of that month, and 2,753 of
 them carry Claude's name as co-author. It runs on iPhones, iPads, Macs,
 Apple TVs, Android phones, Google TVs, Fire TVs, Rokus and the web. An
 AI wrote most of the code, and yet the rule I cared about most that week

@@ -60,6 +60,19 @@ real one, start with the plain claim instead.
 
 ## Sentences
 
+**The trap to avoid first.** On October 2, 2026, Ben read three design
+drafts for humanshaped.org and said the copy was "the AI 'short
+sentences and commands punctuated by periods'" and "doesn't read with
+any of the way that I would actually write or speak." Strings of short
+declaratives, two-word fragments ("Not stages. Laps."), and captions
+written as commands are the most recognizable sign of machine writing,
+and they are not Ben. His median sentence is about 16 words, and most of
+his sentences carry an idea through a clause or two ("because",
+"which", "so that", "and yet") before they stop. The short sentence is
+a landing he earns once or twice a page, never a rhythm. Before you
+ship, find any run of three short sentences in a row and join them into
+the one sentence they were trying to be.
+
 - Build, build, land. A long sentence that accumulates, then a short one.
 - Put the thesis of a section on a line by itself, in under ten words.
 - Turn with "But," / "And yet," / "So," / "Rather," at the start of a
