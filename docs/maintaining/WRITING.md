@@ -84,6 +84,15 @@ the one sentence they were trying to be.
 - Say "I am" and "it is" uncontracted where you want the reader to slow down.
 - Give the other side a fair sentence. Name the cost of our choice.
 
+## Grammar
+
+- **Always use the Oxford comma.** "Apple, Google, and Microsoft," never
+  "Apple, Google and Microsoft." Ben is a former English teacher, and he
+  asked for it by name on October 2, 2026.
+- A sentence that needs to be read twice is too long or too tangled.
+  Split it where the idea turns, or cut the clause that is only there to
+  sound thorough.
+
 ## Words
 
 Reach for: *build, make, connect, folks, one another, based upon,

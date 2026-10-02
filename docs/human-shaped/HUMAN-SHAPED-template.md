@@ -5,7 +5,7 @@
 app: "Your app's name"
 website: "https://"
 repository: "https://github.com/you/your-app"
-principles_version: "0.3"
+principles_version: "0.4"
 status: "working toward"   # declared | working toward | withdrawn
 declared_by: "Your name"
 date: "YYYY-MM-DD"         # the date of the last change to this file
@@ -14,7 +14,7 @@ platforms: []              # e.g. [web, ios, android]
 
 # [App name] is human-shaped
 
-*Answering the Human-Shaped Principles, version 0.3
+*Answering the Human-Shaped Principles, version 0.4
 (https://github.com/bhwilkoff/UniversalAppTemplate/blob/main/docs/human-shaped/PRINCIPLES.md).*
 
 **What it is for, and who it is for.** One or two sentences, in your
@@ -41,9 +41,9 @@ yourself.
 
 ## 1. A human-shaped problem
 
-**Start from a human-shaped problem, one that affects real people in the real world, people the builder can name.**
+**Start from a human-shaped problem, one that affects real people in the real world.**
 
-*How someone can tell:* the builder has written down, in their own words, what the problem is, who has it, and why it is not one a computer can simply solve for them.
+*How someone can tell:* the builder has written down what the problem is, who has it, and why a computer cannot simply solve it for them.
 
 **Answer:** meets / not yet / does not apply
 
@@ -55,7 +55,7 @@ yourself.
 
 **Increase what people are able to do, rather than how much profit can be made from them.**
 
-*How someone can tell:* the core of the app works without paying, any price is stated plainly, and nothing in it is designed to keep people using it longer than they want to.
+*How someone can tell:* the heart of the software works without payment, any price is stated plainly, and nothing in it is designed to keep people longer than they want to stay.
 
 **Answer:** meets / not yet / does not apply
 
@@ -65,9 +65,9 @@ yourself.
 
 ## 3. Values as guardrails
 
-**Have its values written down as guardrails that both the people and the AI agents building it follow.**
+**Have its values written down as guardrails for both the people and the AI agents who build it.**
 
-*How someone can tell:* the values are in the repository, in the file the agent reads, dated and in the builder's words, and at least one of them has visibly changed a decision.
+*How someone can tell:* the values are written in the project itself, where both people and agents read them, and at least one of them has visibly changed a decision.
 
 **Answer:** meets / not yet / does not apply
 
@@ -77,9 +77,9 @@ yourself.
 
 ## 4. Iteration, never a first draft
 
-**Get better through iteration, so that no first draft of a feature, a design or a piece of writing is ever what ships.**
+**Treat iteration as the path to innovation, so that no first draft of a feature, design, or piece of writing is ever shipped.**
 
-*How someone can tell:* the history shows rounds of feedback before each feature shipped, in commits, notes or design drafts.
+*How someone can tell:* the history of the project shows rounds of feedback and revision before each feature, design, or piece of writing went out.
 
 **Answer:** meets / not yet / does not apply
 
@@ -87,11 +87,11 @@ yourself.
 
 **Evidence:** [link]
 
-## 5. Built on research
+## 5. Grounded in research
 
-**Be built on research, so the builder always knows whose shoulders they stand on, from the services and frameworks it uses to the authors and design patterns it borrows.**
+**Be grounded in research, so that its builder always knows whose work they are building on, from tools and services to authors and design patterns.**
 
-*How someone can tell:* the repository records the research behind its major choices, and the data sources, services and borrowed ideas are named.
+*How someone can tell:* the research behind the major choices is recorded, and the tools, data sources, and borrowed ideas are named.
 
 **Answer:** meets / not yet / does not apply
 
@@ -101,9 +101,9 @@ yourself.
 
 ## 6. Decisions with feedback
 
-**Make every decision with feedback, from another person, an AI agent, or the project's own documentation, and never alone.**
+**Make every decision with feedback from another person, an AI agent, or a piece of documentation.**
 
-*How someone can tell:* major decisions are recorded with their reasons, and the record shows where the feedback came from.
+*How someone can tell:* the major decisions are written down with their reasons, and the record shows where the feedback came from.
 
 **Answer:** meets / not yet / does not apply
 
@@ -113,9 +113,9 @@ yourself.
 
 ## 7. Tested the way people use it
 
-**Be tested the way people will actually use it, on real devices, by what a person can see, hear and do, including people who use it differently from the builder, and not only by what a machine can check.**
+**Be tested the way people will actually see, hear, and use it, not only the way a machine would check it.**
 
-*How someone can tell:* claims that something works point to evidence from real devices or real people, and the app says plainly where it does not work yet.
+*How someone can tell:* every claim that something works points to evidence from a real device or a real person, and the software says plainly where it does not work yet.
 
 **Answer:** meets / not yet / does not apply
 
@@ -125,9 +125,9 @@ yourself.
 
 ## 8. Documentation as seriously as code
 
-**Treat its documentation as seriously as its code, so that it grows and changes along with the code, in the builder's own words and not only the agent's.**
+**Treat documentation as seriously as code, so that it grows and changes with the software, in the builder's own language.**
 
-*How someone can tell:* the repository has current documentation of its decisions, state and design, and the builder's own words appear in it.
+*How someone can tell:* the project has current documentation of its decisions, its state, and its design, and the builder's own words are in it.
 
 **Answer:** meets / not yet / does not apply
 
@@ -137,9 +137,9 @@ yourself.
 
 ## 9. Shared openly
 
-**Share its code, tools and lessons as openly as the problem it solves allows.**
+**Share its code, tools, and lessons as openly as the problem it solves allows.**
 
-*How someone can tell:* the code or at least the lessons are public, under a license that lets others use them, and anything kept private has a stated reason.
+*How someone can tell:* the code, or at least the lessons, are public under terms that let others use them, and anything kept private has a stated reason.
 
 **Answer:** meets / not yet / does not apply
 
@@ -147,9 +147,9 @@ yourself.
 
 **Evidence:** [link]
 
-## 10. Learning is success
+## 10. Learning as success
 
-**Count learning as success, so that if the builder learned at least one real thing in making it, the work was worth doing.**
+**Count learning as success, so that if at least one thing was learned in building it, the software has succeeded.**
 
 *How someone can tell:* the builder can say what they learned, and the lesson is written down where the next builder can find it.
 
@@ -161,9 +161,9 @@ yourself.
 
 ## 11. People own their data
 
-**Let people own their data, and make every decision about what happens to it.**
+**Let people own their data and make every decision about what happens to it.**
 
-*How someone can tell:* the app collects only what it needs, says what it keeps, and offers a way to export and delete it.
+*How someone can tell:* the software collects only what it needs, says what it keeps, and offers a way to export and delete it.
 
 **Answer:** meets / not yet / does not apply
 
@@ -175,7 +175,7 @@ yourself.
 
 **Create no new human-shaped problems while solving the one it set out to solve.**
 
-*How someone can tell:* the builder has asked, in writing, whom the app could harm, and has answered.
+*How someone can tell:* the builder has asked, in writing, whom the software could harm, and has answered.
 
 **Answer:** meets / not yet / does not apply
 
@@ -185,9 +185,9 @@ yourself.
 
 ## 13. The builder's own voice
 
-**Speak in the builder's own voice, so that every word people read in it was shaped by a human, and nothing a machine does in it pretends to be a person.**
+**Be written in the builder's own voice, so that every word is shaped by a human, and no machine pretends to be one.**
 
-*How someone can tell:* the words in the app were written or chosen by a person, and every automated part says what it is.
+*How someone can tell:* the words people read were written or chosen by a person, and every automated part of the software says what it is.
 
 **Answer:** meets / not yet / does not apply
 
@@ -197,9 +197,9 @@ yourself.
 
 ## 14. Credit everything
 
-**Credit everything that made it possible: the people, the communities, the AI agents, the tools and the process.**
+**Credit everyone and everything responsible for it, including people, communities, AI agents, tools, and processes.**
 
-*How someone can tell:* the app and its repository credit the people, sources, agents and tools behind it.
+*How someone can tell:* the software and its project credit the people, communities, sources, agents, and tools behind it.
 
 **Answer:** meets / not yet / does not apply
 
@@ -209,9 +209,9 @@ yourself.
 
 ## 15. Joy for at least one person
 
-**Bring joy to at least one person in the form it ships today, even if that person is only the builder.**
+**Bring joy to at least one person in the form it ships today, even if that person is the builder.**
 
-*How someone can tell:* the builder can name someone who enjoys the app as it is today, and that someone may be the builder.
+*How someone can tell:* the builder can name someone who enjoys the software as it is today, even if that someone is the builder.
 
 **Answer:** meets / not yet / does not apply
 
@@ -236,7 +236,7 @@ old lines.
 ## Questions about this declaration
 
 If you think something here is not true, open an issue on this
-repository, name the principle by number (for example, "principle 6"), and say what you
-saw. I will answer it in the issue.
+repository, name the principle by number (for example, "principle
+6"), and say what you saw. I will answer it in the issue.
 
 *Declared by [your name], [date].*
