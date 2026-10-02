@@ -167,6 +167,16 @@ def main():
     dee.execute("select count(*) from public.enrollments")
     check("someone outside the cohort sees no roster", dee.fetchone()[0] == 0)
 
+    bea = as_user("bea")
+    check("a student can give a calendar email for invitations",
+          attempt(bea, "insert into public.calendar_contacts (cohort_id, user_id, email) values (%s, %s, 'bea@example.org')", (cohort, people["bea"])))
+    cal = as_user("cal")
+    cal.execute("select count(*) from public.calendar_contacts where user_id = %s", (people["bea"],))
+    check("a classmate never sees another student's email", cal.fetchone()[0] == 0)
+    ben = as_user("ben")
+    ben.execute("select count(*) from public.calendar_contacts where cohort_id = %s", (cohort,))
+    check("the teacher can see the emails given for invitations", ben.fetchone()[0] == 1)
+
     ben = as_user("ben")
     ben.execute("select count(*) from public.shares where cohort_id = %s", (cohort,))
     check("the teacher sees the cohort's shares", ben.fetchone()[0] == 1)
@@ -176,6 +186,10 @@ def main():
     cal = as_user("cal")
     cal.execute("select count(*) from public.shares where user_id = %s", (people["bea"],))
     check("when someone leaves, what they shared leaves with them", cal.fetchone()[0] == 0)
+    su3 = conn.cursor(); su3.execute("reset role")
+    su3.execute("select count(*) from public.calendar_contacts where user_id = %s", (people["bea"],))
+    check("when someone leaves, their calendar email leaves too", su3.fetchone()[0] == 0)
+    cal = as_user("cal")  # the check above switched the session back to the superuser
     cal.execute("select count(*) from public.profiles where id = %s", (people["bea"],))
     check("after leaving, a former classmate's profile is no longer visible", cal.fetchone()[0] == 0)
 
