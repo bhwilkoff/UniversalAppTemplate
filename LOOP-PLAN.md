@@ -83,3 +83,10 @@ verify what a person would see); push; log it below. "Fixed" and
   fake listing in a local render). Fixed missing Oxford commas across
   the site (footer and five sentences). Not yet verified: a real
   candidate from someone else's template-born repo.
+- 2026-10-02, item 2 (AI review). Added `human-shaped-review` to the
+  template (.claude/skills, reachable from Gemini through the pointer
+  skill), registered in AGENTS.md and the catalog (145 skills, 55 Ben's),
+  and taught in the talking guide and stage 08 step 8. Fixed, pushed.
+  Verification in progress: an agent is running the skill against
+  humanshaped.org itself, to see whether the output is useful and
+  honest before calling it done.
