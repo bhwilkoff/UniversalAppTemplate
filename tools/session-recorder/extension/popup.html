@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Session recorder</title>
+    <link rel="stylesheet" href="ui.css" />
+    <script type="module" src="popup.js"></script>
+  </head>
+  <body class="popup">
+    <section id="not-meet" hidden>
+      <h1>Session recorder</h1>
+      <p>Open the Google Meet call in this tab, then press the extension button again from that tab.</p>
+      <div class="actions"><button id="open-recordings-1">Recordings on this computer</button></div>
+    </section>
+
+    <section id="ready" hidden>
+      <h1>Record this session</h1>
+      <label class="stack">Cohort folder
+        <select id="cohort"></select>
+      </label>
+      <label class="row"><input type="checkbox" id="mic" checked /> <span>Include my microphone (Meet does not play your own voice back, so without this you are silent in the recording)</span></label>
+      <label class="stack">Quality
+        <select id="quality">
+          <option value="standard">1080p, about 1.2 GB for 90 minutes</option>
+          <option value="smaller">720p, about 0.6 GB for 90 minutes</option>
+        </select>
+      </label>
+
+      <div class="box">
+        <p><strong>Before you start, tell everyone.</strong> Say it out loud, and paste this into the Meet chat:</p>
+        <p id="notice" class="muted"></p>
+        <div class="actions"><button id="copy-notice">Copy notice</button> <span id="copied" class="ok" hidden>Copied. Paste it into the chat.</span></div>
+        <label class="row"><input type="checkbox" id="announced" /> <span>I have told everyone in the call that I am recording, and posted the notice in the chat.</span></label>
+      </div>
+
+      <p id="start-error" class="error" hidden></p>
+      <div class="actions">
+        <button id="start" class="primary" disabled>Start recording</button>
+        <button id="open-options">Settings</button>
+      </div>
+    </section>
+
+    <section id="recording" hidden>
+      <p class="rec">Recording <span id="elapsed" class="tabular">0:00</span></p>
+      <p id="rec-cohort" class="muted"></p>
+      <p id="mic-status"></p>
+      <p class="muted">You can close this window. The red REC badge on the extension button stays on until you stop.</p>
+      <div class="actions">
+        <button id="stop" class="stop">Stop and save</button>
+        <button id="copy-stop">Copy "stopped" notice</button>
+      </div>
+      <p id="stop-error" class="error" hidden></p>
+    </section>
+
+    <section id="lost" hidden>
+      <h1>The recorder stopped on its own</h1>
+      <p>Chrome closed the recorder before you pressed stop. Everything it saved up to that point is kept on this computer.</p>
+      <div class="actions"><button id="open-lost" class="primary">See the recording</button></div>
+    </section>
+  </body>
+</html>

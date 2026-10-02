@@ -1,0 +1,10 @@
+{
+  "name": "humanshaped-session-recorder",
+  "private": true,
+  "type": "module",
+  "description": "Tests for the session recorder's pure logic. The extension itself is in extension/ and has no build step.",
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "check": "for f in extension/*.js; do node --check \"$f\" || exit 1; done && node -e \"JSON.parse(require('fs').readFileSync('extension/manifest.json','utf8'))\""
+  }
+}

@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Session recordings</title>
+    <link rel="stylesheet" href="ui.css" />
+    <script type="module" src="finish.js"></script>
+  </head>
+  <body class="page">
+    <h1>Session recordings</h1>
+    <p class="muted">Every recording stays on this computer until you delete it here, even after it is in Drive.</p>
+    <div id="list"></div>
+    <p id="empty" class="muted" hidden>No recordings on this computer.</p>
+
+    <template id="card">
+      <article class="recording-card">
+        <h2 class="name"></h2>
+        <p class="facts muted tabular"></p>
+        <p class="problem error" hidden></p>
+        <div class="actions">
+          <button type="button" class="save primary">Save to this computer</button>
+        </div>
+        <div class="box drive">
+          <label class="stack">Upload to the cohort folder in Drive
+            <select class="folder"></select>
+          </label>
+          <label class="stack other" hidden>Folder ID or link
+            <input type="text" class="folder-id" spellcheck="false" />
+          </label>
+          <div class="actions"><button type="button" class="upload">Upload to Drive</button></div>
+          <progress class="progress" max="1" value="0" hidden></progress>
+          <p class="upload-status"></p>
+        </div>
+        <div class="actions"><button type="button" class="delete">Delete from this computer</button></div>
+      </article>
+    </template>
+  </body>
+</html>
