@@ -5,7 +5,7 @@
 app: "Your app's name"
 website: "https://"
 repository: "https://github.com/you/your-app"
-principles_version: "0.2"
+principles_version: "0.3"
 status: "working toward"   # declared | working toward | withdrawn
 declared_by: "Your name"
 date: "YYYY-MM-DD"         # the date of the last change to this file
@@ -14,7 +14,7 @@ platforms: []              # e.g. [web, ios, android]
 
 # [App name] is human-shaped
 
-*Answering the Human-Shaped Principles, version 0.2
+*Answering the Human-Shaped Principles, version 0.3
 (https://github.com/bhwilkoff/UniversalAppTemplate/blob/main/docs/human-shaped/PRINCIPLES.md).*
 
 **What it is for, and who it is for.** One or two sentences, in your
@@ -39,138 +39,185 @@ yourself.
 
 ---
 
-## 1. A human-shaped problem, and everyone it touches
+## 1. A human-shaped problem
 
-**It starts from a human-shaped problem, for people the builder can name, and it cares for everyone it touches, even the people who will never open it.**
+**Start from a human-shaped problem, one that affects real people in the real world, people the builder can name.**
 
-**Answer:**
-
-**In my words:**
-
-**Evidence:**
-- My answers to the three questions of the idea: [link]
-- The people outside the screen, and what the app does for them: [link]
-- How people reach me: [link]
-
-## 2. Reasons written down
-
-**Its reasons are written down where anyone can read them, including the AI that helps to build it.**
+*How someone can tell:* the builder has written down, in their own words, what the problem is, who has it, and why it is not one a computer can simply solve for them.
 
 **Answer:** meets / not yet / does not apply
 
 **In my words:**
 
-**Evidence:**
-- "Why we build": [link to CLAUDE.md or AGENTS.md]
-- Standing instructions, dated and quoted: [link]
-- One value and the decision it changed: [link to the decision or commit]
+**Evidence:** [link]
 
-## 3. More capable, not more dependent
+## 2. More possible, not more profit
 
-**People come away from it more capable, not more dependent on it.**
+**Increase what people are able to do, rather than how much profit can be made from them.**
 
-**Answer:**
+*How someone can tell:* the core of the app works without paying, any price is stated plainly, and nothing in it is designed to keep people using it longer than they want to.
 
-**In my words:**
-
-**Evidence:**
-- One feature, and what the four questions changed about it: [link]
-- Any ranking or recommendation, and where it says why: [link or "none"]
-
-## 4. People decide
-
-**People keep the decisions that matter, and the machine does the work it is given.**
-
-**Answer:**
+**Answer:** meets / not yet / does not apply
 
 **In my words:**
 
-**Evidence:**
-- DECISIONS.md: [link]
-- A commit message that quotes my request: [link]
-- One verified fix, with the evidence from a real device: [link]
+**Evidence:** [link]
 
-## 5. Machines in the open
+## 3. Values as guardrails
 
-**Whatever a machine does in it happens in the open, and a machine never pretends to be a person.**
+**Have its values written down as guardrails that both the people and the AI agents building it follow.**
 
-**Answer:**
+*How someone can tell:* the values are in the repository, in the file the agent reads, dated and in the builder's words, and at least one of them has visibly changed a decision.
 
-**In my words:**
-
-**Evidence:**
-
-| Automated feature | Where it is labeled | Screenshot or link |
-|---|---|---|
-| | | |
-
-## 6. Words from people
-
-**The words people read in it were written or chosen by a person.**
-
-**Answer:**
+**Answer:** meets / not yet / does not apply
 
 **In my words:**
 
-**Evidence:**
-- The standing instruction: [link]
+**Evidence:** [link]
 
-| List or copy in the app | Where it comes from |
-|---|---|
-| | |
+## 4. Iteration, never a first draft
 
-## 7. People own what they make
+**Get better through iteration, so that no first draft of a feature, a design or a piece of writing is ever what ships.**
 
-**What people make in it belongs to them, and they can take it with them.**
+*How someone can tell:* the history shows rounds of feedback before each feature shipped, in commits, notes or design drafts.
 
-**Answer:**
+**Answer:** meets / not yet / does not apply
 
 **In my words:**
 
-**Evidence:**
-- Privacy page (what is collected, where it lives, how to delete it): [link]
-- Export: [link]
-- What happens to people's data if the app stops being maintained: [link]
-- Dependencies (no tracking libraries): [link]
+**Evidence:** [link]
 
-## 8. Honest about cost
+## 5. Built on research
 
-**It is honest about what it costs, and its heart stays free.**
+**Be built on research, so the builder always knows whose shoulders they stand on, from the services and frameworks it uses to the authors and design patterns it borrows.**
 
-**Answer:**
+*How someone can tell:* the repository records the research behind its major choices, and the data sources, services and borrowed ideas are named.
+
+**Answer:** meets / not yet / does not apply
 
 **In my words:**
 
-**Evidence:**
-- Monthly cost to run, and who pays it: [amount and link]
-- What is free and what is not, if anything is paid: [link or "nothing is paid"]
+**Evidence:** [link]
 
-## 9. Time and attention
+## 6. Decisions with feedback
 
-**It respects people's time and attention instead of trying to capture them.**
+**Make every decision with feedback, from another person, an AI agent, or the project's own documentation, and never alone.**
 
-**Answer:**
+*How someone can tell:* major decisions are recorded with their reasons, and the record shows where the feedback came from.
 
-**In my words:**
-
-**Evidence:**
-- The app's notifications, and what each is for: [list or "none"]
-- Any leaderboard or comparison, and where people opt in: [link or "none"]
-
-## 10. For as many people as it can
-
-**It works for as many people as it can, and it says plainly who it does not work for yet.**
-
-**Answer:**
+**Answer:** meets / not yet / does not apply
 
 **In my words:**
 
-**Evidence:**
-- PARITY.md, with the date of its last audit: [link]
-- Oldest hardware served: [link to the row]
-- Accessibility check (screen reader, text size, contrast), with its date: [link]
+**Evidence:** [link]
 
----
+## 7. Tested the way people use it
+
+**Be tested the way people will actually use it, on real devices, by what a person can see, hear and do, including people who use it differently from the builder, and not only by what a machine can check.**
+
+*How someone can tell:* claims that something works point to evidence from real devices or real people, and the app says plainly where it does not work yet.
+
+**Answer:** meets / not yet / does not apply
+
+**In my words:**
+
+**Evidence:** [link]
+
+## 8. Documentation as seriously as code
+
+**Treat its documentation as seriously as its code, so that it grows and changes along with the code, in the builder's own words and not only the agent's.**
+
+*How someone can tell:* the repository has current documentation of its decisions, state and design, and the builder's own words appear in it.
+
+**Answer:** meets / not yet / does not apply
+
+**In my words:**
+
+**Evidence:** [link]
+
+## 9. Shared openly
+
+**Share its code, tools and lessons as openly as the problem it solves allows.**
+
+*How someone can tell:* the code or at least the lessons are public, under a license that lets others use them, and anything kept private has a stated reason.
+
+**Answer:** meets / not yet / does not apply
+
+**In my words:**
+
+**Evidence:** [link]
+
+## 10. Learning is success
+
+**Count learning as success, so that if the builder learned at least one real thing in making it, the work was worth doing.**
+
+*How someone can tell:* the builder can say what they learned, and the lesson is written down where the next builder can find it.
+
+**Answer:** meets / not yet / does not apply
+
+**In my words:**
+
+**Evidence:** [link]
+
+## 11. People own their data
+
+**Let people own their data, and make every decision about what happens to it.**
+
+*How someone can tell:* the app collects only what it needs, says what it keeps, and offers a way to export and delete it.
+
+**Answer:** meets / not yet / does not apply
+
+**In my words:**
+
+**Evidence:** [link]
+
+## 12. No new problems
+
+**Create no new human-shaped problems while solving the one it set out to solve.**
+
+*How someone can tell:* the builder has asked, in writing, whom the app could harm, and has answered.
+
+**Answer:** meets / not yet / does not apply
+
+**In my words:**
+
+**Evidence:** [link]
+
+## 13. The builder's own voice
+
+**Speak in the builder's own voice, so that every word people read in it was shaped by a human, and nothing a machine does in it pretends to be a person.**
+
+*How someone can tell:* the words in the app were written or chosen by a person, and every automated part says what it is.
+
+**Answer:** meets / not yet / does not apply
+
+**In my words:**
+
+**Evidence:** [link]
+
+## 14. Credit everything
+
+**Credit everything that made it possible: the people, the communities, the AI agents, the tools and the process.**
+
+*How someone can tell:* the app and its repository credit the people, sources, agents and tools behind it.
+
+**Answer:** meets / not yet / does not apply
+
+**In my words:**
+
+**Evidence:** [link]
+
+## 15. Joy for at least one person
+
+**Bring joy to at least one person in the form it ships today, even if that person is only the builder.**
+
+*How someone can tell:* the builder can name someone who enjoys the app as it is today, and that someone may be the builder.
+
+**Answer:** meets / not yet / does not apply
+
+**In my words:**
+
+**Evidence:** [link]
 
 ## One value, and the decision it changed
 
