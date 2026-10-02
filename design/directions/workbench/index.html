@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Human Shaped (Workbench)</title>
+<meta name="description" content="Build apps with an AI agent that leave people more capable, not more passive. Free five-week cohorts.">
+<script>
+(function(){var q=location.search,t=/dark/.test(q)?'dark':/light/.test(q)?'light':null;try{t=t||localStorage.getItem('hs-theme')}catch(e){}if(t)document.documentElement.setAttribute('data-theme',t);})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:ital,wght@0,400;0,700;1,400&family=Big+Shoulders+Stencil:wght@800&family=Permanent+Marker&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="workbench.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to the page</a>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <!-- the mark: a parcel tag, the kind you tie to something you made, with a person drawn on it in marker -->
+    <symbol id="tag" viewBox="0 0 260 76">
+      <path d="M8.6 30.4c-4.4 4.4-4.2 11.6.2 15.8C14 51 22.6 52 28 46.8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      <path d="M38.4 12.6c-6.8 6.6-14 15.4-15.6 25 1.4 9.8 8.8 18.6 15.8 25.4 68.4 1.6 140 1.8 212.4.4 2-16.8 2.2-34.4.2-51.6-71-1.6-142.4-1.4-212.8.8z" fill="var(--card)" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/>
+      <circle cx="37.6" cy="38" r="5.6" fill="var(--board)" stroke="currentColor" stroke-width="2"/>
+      <g fill="none" stroke="var(--green)" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M64.6 21.8c4.2-.2 7 2.8 6.8 6.6-.2 3.8-3.2 6.4-7 6.2-3.6-.2-6.2-3.2-6-6.6.2-3.4 2.8-6 6.2-6.2z"/>
+        <path d="M52.4 56.6c-.4-6.4.6-12.4 3.6-15.6 2.4-2.6 5.6-3.4 9-3.2 3.4.2 6.4 1.4 8.4 4.2 2.6 3.6 3.2 9 2.8 14.8"/>
+      </g>
+      <text x="88" y="51.5" font-family="'Big Shoulders Stencil', 'Arial Narrow', sans-serif" font-weight="800" font-size="35" textLength="156" lengthAdjust="spacingAndGlyphs" fill="currentColor">HUMAN SHAPED</text>
+    </symbol>
+    <symbol id="pin" viewBox="0 0 26 26">
+      <path d="M13.4 2.6c5.6.2 10 4.6 9.8 10.2-.2 5.6-4.8 9.8-10.4 9.6-5.4-.2-9.6-4.8-9.4-10.2.2-5.4 4.6-9.8 10-9.6z" fill="var(--green)" stroke="var(--ink)" stroke-width="1.2"/>
+      <path d="M9 8.6c1.4-1.6 3.4-2.2 5.2-1.8" fill="none" stroke="var(--card)" stroke-width="1.8" stroke-linecap="round" opacity=".8"/>
+    </symbol>
+    <symbol id="gh" viewBox="0 0 16 16"><path fill="currentColor" d="M8 0a8 8 0 0 0-2.53 15.59c.4.07.55-.17.55-.38v-1.34c-2.23.48-2.7-1.07-2.7-1.07-.36-.92-.89-1.17-.89-1.17-.73-.5.06-.49.06-.49.8.06 1.23.83 1.23.83.72 1.22 1.87.87 2.33.66.07-.52.28-.87.5-1.07-1.78-.2-3.65-.89-3.65-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48v2.2c0 .21.15.46.55.38A8 8 0 0 0 8 0z"/></symbol>
+  </defs>
+</svg>
+
+<div class="wrap">
+  <header class="top">
+    <a class="logo" href="index.html" aria-label="Human Shaped, home"><svg aria-hidden="true"><use href="#tag"/></svg></a>
+    <nav aria-label="Site"><ul>
+      <li><a href="stage.html">The path</a></li>
+      <li><a href="#cohorts">Cohorts</a></li>
+      <li><a href="#apps">On the bench</a></li>
+      <li><a href="#toolkit">Toolkit</a></li>
+    </ul></nav>
+    <a class="btn" href="#join"><svg aria-hidden="true"><use href="#gh"/></svg>Sign in with GitHub</a>
+    <button class="toggle" type="button" data-theme-toggle>Dark</button>
+  </header>
+
+  <main id="main">
+    <div class="board hero">
+      <section class="paper poster" style="--r:-.5deg" aria-labelledby="t">
+        <svg class="pin" aria-hidden="true"><use href="#pin"/></svg>
+        <span class="marker">humanshaped.org</span>
+        <h1 id="t">Human-shaped software</h1>
+        <p class="lede">Build apps with an AI agent that <mark>leave people more capable,</mark> not more passive.</p>
+        <p>Some problems are computer-shaped. You can hand them to the window and be done. Learning, community and relationships are not, because they only happen when a person does the work.</p>
+        <p>Human-shaped software is built around those parts rather than over them. It takes the mechanical work off people's hands and leaves them the learning.</p>
+      </section>
+
+      <div>
+        <section class="paper compare" aria-labelledby="cmp">
+          <span class="tape" aria-hidden="true"></span>
+          <h2 id="cmp" class="caption" style="font:700 .8125rem var(--font-text);letter-spacing:.08em;color:var(--muted)">Two shapes of problem</h2>
+          <div class="two">
+            <div><h3>Computer-shaped</h3><p>A blurb for ten thousand films. Cheap to hand to the window.</p></div>
+            <div><h3>Human-shaped</h3><p>Each film's notes, from the people who uploaded and reviewed it.</p></div>
+          </div>
+          <p class="caption" style="margin:0">"Computer-shaped problems" comes from <a href="https://bsky.app/profile/mosheroperandi.bsky.social/post/3mgasswgabs23">a Bluesky post</a>.</p>
+        </section>
+
+        <section class="paper notice" id="join" aria-labelledby="next">
+          <span class="tape left" aria-hidden="true"></span>
+          <span class="marker" aria-hidden="true">Next cohort</span>
+          <h3 id="next">Dates are not set yet.</h3>
+          <p>Five weeks, one live session a week, free. Sign in to hear when it opens.</p>
+          <a class="btn" href="#join"><svg aria-hidden="true"><use href="#gh"/></svg>Sign in with GitHub</a>
+        </section>
+      </div>
+    </div>
+
+    <section class="section" aria-labelledby="moves-h">
+      <div class="head"><h2 id="moves-h">Three moves, every round</h2><span class="marker">not stages, laps</span></div>
+      <div class="strung">
+      <svg class="yarn" viewBox="0 0 1000 80" preserveAspectRatio="none" aria-hidden="true"><path d="M160 22C260 70 330 66 500 46S760 10 840 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg>
+      <ol class="string">
+        <li class="paper"><svg class="pin" aria-hidden="true"><use href="#pin"/></svg><span class="num">1</span><h3>Write it down</h3><p>An agent keeps only the values you write down, so they live where it reads them.</p></li>
+        <li class="paper"><svg class="pin" aria-hidden="true"><use href="#pin"/></svg><span class="num">2</span><h3>Prove it</h3><p>The agent is never the tester. "It works" points at something a person can look at.</p></li>
+        <li class="paper"><svg class="pin" aria-hidden="true"><use href="#pin"/></svg><span class="num">3</span><h3>Live with it</h3><p>Use the app every day, with the people it is for. That is where the next feature, and the next value, come from.</p></li>
+      </ol>
+      </div>
+    </section>
+
+    <section class="section split" id="cohorts" aria-labelledby="cohorts-h">
+      <div class="cohort-copy">
+        <h2 id="cohorts-h">Five weeks, side by side</h2>
+        <p style="margin-top:1rem">Each person builds one real app of their own, for people they can name. Partners see one another's work as it grows, and every week ends with something to show at least two others.</p>
+        <p>Cohorts are free. Anyone can learn to teach one.</p>
+      </div>
+      <div class="paper sheet">
+        <svg class="clip" viewBox="0 0 96 34" aria-hidden="true"><path d="M8 30c-.6-8 .4-15 2.4-21 22-2 52-2 75.2.2 2 6 2.6 13 2 20.6" fill="var(--edge)" stroke="var(--ink)" stroke-width="1.6"/><path d="M34 9c.4-4.6 2.8-6.6 14-6.6S62 4.4 62.4 9" fill="none" stroke="var(--ink)" stroke-width="2"/></svg>
+        <table>
+          <thead><tr><th scope="col">Week</th><th scope="col">What you bring back</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Before</th><td>Your own app's address, open on your phone.</td></tr>
+            <tr><th scope="row">1</th><td>The why, the people outside your screen, your one rule, and the app on your phone.</td></tr>
+            <tr><th scope="row">2</th><td>One verb shown on two platforms, each in its own idiom.</td></tr>
+            <tr><th scope="row">3</th><td>A screenshot that proved a fix, and the app's own look.</td></tr>
+            <tr><th scope="row">4</th><td>The app on someone else's device, and what that person said.</td></tr>
+            <tr><th scope="row">5</th><td>One value, and the decision it changed. Guests welcome.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section" id="apps" aria-labelledby="apps-h">
+      <div class="head"><h2 id="apps-h">On the bench</h2><span class="marker">Ben's four apps go up first</span></div>
+      <ul class="tickets">
+        <li class="paper ticket">
+          <span class="tape" aria-hidden="true"></span><span class="no">No. 1</span>
+          <h3>Archive Watch</h3>
+          <blockquote>A cinematheque for the Internet Archive. Free, public domain, no account.</blockquote>
+          <dl><dt>Since</dt><dd>April 17, 2026</dd><dt>Runs on</dt><dd>Apple TV, iPhone, iPad, Mac, Android, Google TV, Fire TV, Roku, the web</dd><dt>Gave</dt><dd>The shared data plane, the TV platforms, "only essential words on screen"</dd></dl>
+        </li>
+        <li class="paper ticket">
+          <span class="tape" aria-hidden="true" style="--tr:3deg"></span><span class="no">No. 2</span>
+          <h3>Tidbits Trivia</h3>
+          <blockquote>Tidbits turns the whole of Wikipedia into a trivia game.</blockquote>
+          <dl><dt>Runs on</dt><dd>The web, Apple platforms, Android, Windows</dd><dt>Gave</dt><dd>Multiplayer across platforms; a computer opponent is labeled as one</dd></dl>
+        </li>
+        <li class="paper ticket">
+          <span class="tape" aria-hidden="true"></span><span class="no">No. 3</span>
+          <h3>Bsky Dreams</h3>
+          <blockquote>Bsky Dreams is built for people who want to think more, not less.</blockquote>
+          <dl><dt>Runs on</dt><dd>The web, iPhone</dd><dt>Gave</dt><dd>Values-based feed ranking, reader mode</dd></dl>
+        </li>
+        <li class="paper ticket with-status">
+          <span class="tape" aria-hidden="true" style="--tr:5deg"></span><span class="no">No. 4</span>
+          <h3>BOBA Playbook</h3>
+          <blockquote>The definitive companion app for the Bo Jackson Battle Arena trading card game.</blockquote>
+          <dl><dt>Runs on</dt><dd>The web, Android</dd><dt>Proves</dt><dd>Large databases, camera scanning, 3D on iOS, pricing models</dd></dl>
+          <span class="status">Resting</span>
+        </li>
+        <li class="paper ticket blank">
+          <h3>Your app</h3>
+          <p>In a cohort, everyone's repository goes up here while it is being built: commits, the week's work, and the conversation around it.</p>
+        </li>
+      </ul>
+    </section>
+
+    <section class="section" id="toolkit" aria-labelledby="kit-h">
+      <div class="head"><h2 id="kit-h">Take one</h2><span class="marker">free to copy and pass on</span></div>
+      <div class="kit">
+        <div class="paper declare">
+          <span class="tape right" aria-hidden="true"></span>
+          <svg viewBox="0 0 150 150" role="img" aria-label="The declaration stamp: Human shaped, made for people">
+            <defs><path id="arc-t" d="M15.6 75a59.4 59.4 0 0 1 118.8 0"/><path id="arc-b" d="M8.2 75a66.8 66.8 0 0 0 133.6 0"/></defs>
+            <path d="M75.6 5.4c38.4.6 69.4 30.6 69 70-.4 38.6-31.4 69.6-70.4 69-38.4-.6-69-31.8-68.4-70.4C6.4 35.4 37.4 4.8 75.6 5.4z" fill="none" stroke="currentColor" stroke-width="3.4"/>
+            <path d="M75 17.6c31.6.4 57 25.4 56.6 57.6-.4 31.6-25.6 56.8-57.6 56.4-31.4-.4-56.6-26-56-57.4.6-31 25.8-57 57-56.6z" fill="none" stroke="currentColor" stroke-width="1.4"/>
+            <text font-family="'Big Shoulders Stencil', sans-serif" font-weight="800" font-size="14" letter-spacing="2.5" fill="currentColor"><textPath href="#arc-t" startOffset="50%" text-anchor="middle">HUMAN SHAPED</textPath></text>
+            <text font-family="'Big Shoulders Stencil', sans-serif" font-weight="800" font-size="13" letter-spacing="2" fill="currentColor"><textPath href="#arc-b" startOffset="50%" text-anchor="middle">MADE FOR PEOPLE</textPath></text>
+            <g fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"><path d="M75.6 52c5.4-.2 9 3.6 8.8 8.4-.2 4.8-4 8.2-9 8-4.6-.2-8-4-7.8-8.4.2-4.4 3.6-7.8 8-8z"/><path d="M60 98c-.4-8 .8-15 4.6-19 3-3.2 7-4.2 11.4-4 4.4.2 8.2 1.8 10.6 5.4 3.2 4.6 4 11.2 3.4 18.4"/></g>
+          </svg>
+          <div>
+            <h3>Declare your software human-shaped</h3>
+            <p>A set of specific principles, drafted from the template and the <a href="https://github.com/bhwilkoff/educational-model-spec">Educational Model Spec</a>. Software that meets them can carry the stamp.</p>
+            <p class="caption">The principles are being drafted now.</p>
+          </div>
+        </div>
+        <ul class="takeone">
+          <li class="paper"><h3><a href="#meetup">Start a meetup</a></h3><p class="caption" style="margin:.2rem 0 0">A conversation guide with the principles in front, for a library, a classroom or a kitchen table.</p></li>
+          <li class="paper"><h3><a href="#hackathon">Run a Human-Shaped Hackathon</a></h3><p class="caption" style="margin:.2rem 0 0">A day of building with the four questions on the wall, and a show-and-tell at the end.</p></li>
+          <li class="paper"><h3><a href="stage.html">Start before a cohort does</a></h3><p class="caption" style="margin:.2rem 0 0">The path and <a href="https://github.com/bhwilkoff/UniversalAppTemplate">the template</a> are open. No sign-in needed.</p></li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <div class="paper">
+      <p class="caption" style="margin:0">Made by <a href="https://learningischange.com">Ben Wilkoff</a>. The ideas, the method, the tools and the cohorts are free. <a href="#conduct">How we treat one another</a> · <a href="#privacy">What we keep, and what we never own</a></p>
+    </div>
+  </footer>
+</div>
+<script>
+(function(){var b=document.querySelector('[data-theme-toggle]');if(!b)return;var r=document.documentElement;function dark(){var t=r.getAttribute('data-theme');return t?t==='dark':matchMedia('(prefers-color-scheme: dark)').matches}function label(){b.textContent=dark()?'Light':'Dark'}label();b.addEventListener('click',function(){var t=dark()?'light':'dark';r.setAttribute('data-theme',t);try{localStorage.setItem('hs-theme',t)}catch(e){}label()});})();
+</script>
+</body>
+</html>

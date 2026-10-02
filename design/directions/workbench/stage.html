@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>00. Why we build (Workbench)</title>
+<script>
+(function(){var q=location.search,t=/dark/.test(q)?'dark':/light/.test(q)?'light':null;try{t=t||localStorage.getItem('hs-theme')}catch(e){}if(t)document.documentElement.setAttribute('data-theme',t);})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:ital,wght@0,400;0,700;1,400&family=Big+Shoulders+Stencil:wght@800&family=Permanent+Marker&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="workbench.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to the page</a>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="tag" viewBox="0 0 260 76">
+      <path d="M8.6 30.4c-4.4 4.4-4.2 11.6.2 15.8C14 51 22.6 52 28 46.8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      <path d="M38.4 12.6c-6.8 6.6-14 15.4-15.6 25 1.4 9.8 8.8 18.6 15.8 25.4 68.4 1.6 140 1.8 212.4.4 2-16.8 2.2-34.4.2-51.6-71-1.6-142.4-1.4-212.8.8z" fill="var(--card)" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/>
+      <circle cx="37.6" cy="38" r="5.6" fill="var(--board)" stroke="currentColor" stroke-width="2"/>
+      <g fill="none" stroke="var(--green)" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M64.6 21.8c4.2-.2 7 2.8 6.8 6.6-.2 3.8-3.2 6.4-7 6.2-3.6-.2-6.2-3.2-6-6.6.2-3.4 2.8-6 6.2-6.2z"/>
+        <path d="M52.4 56.6c-.4-6.4.6-12.4 3.6-15.6 2.4-2.6 5.6-3.4 9-3.2 3.4.2 6.4 1.4 8.4 4.2 2.6 3.6 3.2 9 2.8 14.8"/>
+      </g>
+      <text x="88" y="51.5" font-family="'Big Shoulders Stencil', 'Arial Narrow', sans-serif" font-weight="800" font-size="35" textLength="156" lengthAdjust="spacingAndGlyphs" fill="currentColor">HUMAN SHAPED</text>
+    </symbol>
+    <symbol id="pin" viewBox="0 0 26 26">
+      <path d="M13.4 2.6c5.6.2 10 4.6 9.8 10.2-.2 5.6-4.8 9.8-10.4 9.6-5.4-.2-9.6-4.8-9.4-10.2.2-5.4 4.6-9.8 10-9.6z" fill="var(--green)" stroke="var(--ink)" stroke-width="1.2"/>
+      <path d="M9 8.6c1.4-1.6 3.4-2.2 5.2-1.8" fill="none" stroke="var(--card)" stroke-width="1.8" stroke-linecap="round" opacity=".8"/>
+    </symbol>
+    <symbol id="gh" viewBox="0 0 16 16"><path fill="currentColor" d="M8 0a8 8 0 0 0-2.53 15.59c.4.07.55-.17.55-.38v-1.34c-2.23.48-2.7-1.07-2.7-1.07-.36-.92-.89-1.17-.89-1.17-.73-.5.06-.49.06-.49.8.06 1.23.83 1.23.83.72 1.22 1.87.87 2.33.66.07-.52.28-.87.5-1.07-1.78-.2-3.65-.89-3.65-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48v2.2c0 .21.15.46.55.38A8 8 0 0 0 8 0z"/></symbol>
+  </defs>
+</svg>
+
+<div class="wrap">
+  <header class="top">
+    <a class="logo" href="index.html" aria-label="Human Shaped, home"><svg aria-hidden="true"><use href="#tag"/></svg></a>
+    <nav aria-label="Site"><ul>
+      <li><a href="stage.html" aria-current="page">The path</a></li>
+      <li><a href="index.html#cohorts">Cohorts</a></li>
+      <li><a href="index.html#apps">On the bench</a></li>
+      <li><a href="index.html#toolkit">Toolkit</a></li>
+    </ul></nav>
+    <a class="btn" href="#signin"><svg aria-hidden="true"><use href="#gh"/></svg>Sign in with GitHub</a>
+    <button class="toggle" type="button" data-theme-toggle>Dark</button>
+  </header>
+
+  <main id="main" class="stage">
+    <article class="paper sheet-main" aria-labelledby="t">
+      <svg class="pin" aria-hidden="true" style="left:1.5rem"><use href="#pin"/></svg>
+      <svg class="pin" aria-hidden="true" style="left:auto;right:1.5rem"><use href="#pin"/></svg>
+      <span class="marker">Stage 00 of 08</span>
+      <h1 id="t">Why we build</h1>
+      <p><strong>Where you are.</strong> You have an idea for an app and your own copy of this template. Nothing is built yet, and that is exactly the right moment for this stage.</p>
+      <p>On September 26, 2026, deep into building Archive Watch, I told the agent I was working with this, and it became one of the project's standing instructions:</p>
+      <blockquote class="story">
+        <p>I don't want AI making lists and writing copy. Any time we can use metadata or user copy/categorization from archive.org.</p>
+        <cite>Ben, to the agent, Archive Watch, September 26, 2026</cite>
+      </blockquote>
+      <p>Archive Watch had 4,285 commits by the end of that month, and 2,742 of them carry Claude's name as co-author. It runs on iPhones, iPads, Macs, Apple TVs, Android phones, Google TVs, Fire TVs, Rokus and the web. An AI wrote most of the code, and yet the rule I cared about most that week was a limit on what AI is allowed to do <em>inside</em> the app.</p>
+
+      <h2 id="cs">Computer-shaped problems</h2>
+      <p>In March I typed a page about something I had read on Bluesky: that we are only looking to solve "computer-shaped problems." Community is not computer-shaped. Relationships are not. Learning is not. And yet there are so many computer-shaped problems, and making everything into something I can feed into the Claude Code window is "so seductive and more than a little thrilling."</p>
+      <p>The page ends here:</p>
+      <blockquote class="story">
+        <p>Sometimes the window isn't showing me the future. It is just showing me another way to avoid the hard work of living.</p>
+        <cite>Ben, March 2026</cite>
+      </blockquote>
+      <p>So, how do you keep the window from doing the part that was supposed to be yours, or your users' part, the part where the learning happens? You write it down.</p>
+      <p class="thesis">An agent keeps only the values you write down.</p>
+
+      <h2 id="hs">Human-shaped software</h2>
+      <p>A computer-shaped problem is one you can hand to the window. Learning, community and relationships are not, because they only happen when a person does the work. Human-shaped software is built around those parts rather than over them. It takes the mechanical work off people's hands and leaves them the learning.</p>
+      <p><strong>As a student,</strong> you are learning a way of building, one stage at a time. <strong>As a builder,</strong> you are learning what your app is. <strong>As a human,</strong> you are deciding, at every step, what to hand to the window and what to keep.</p>
+      <p class="thesis">Write it down, prove it, live with it.</p>
+
+      <h2 id="work">Working with your agent</h2>
+      <ol class="steps">
+        <li><strong>Start your note with the why.</strong> Open a plain note for your app, in whatever notes app you already use. At the top, write what the app is for, who it is for, and what you hope it does for them.</li>
+        <li><strong>Tell the agent why.</strong> Say what you wrote, the way you would to a friend. Then ask the agent to rewrite the "Why we build" paragraph in <code>CLAUDE.md</code> from what you said. Correct it until it sounds like you and not like a company.</li>
+        <li><strong>Name one line you will not cross.</strong> Something the app will never do, or never let AI do inside it, even if doing it would work.
+          <div class="turn">
+            <label for="rule">Your turn: write your one rule, and why, before you read mine.</label>
+            <textarea id="rule" rows="4"></textarea>
+            <details>
+              <summary>Then read the one I said to the agent</summary>
+              <blockquote class="story">
+                <p>It is absolutely not acceptable. The goal of this app (and all of my apps) is for them to cost $0 to run.</p>
+                <cite>Archive Watch, September 2026, when the agent designed Watch Together around a paid voice server</cite>
+              </blockquote>
+            </details>
+            <p class="caption" style="margin:0">Kept in this browser only. Nothing you write here is sent anywhere.</p>
+          </div>
+        </li>
+        <li><strong>Ask three questions of the idea.</strong> Should it exist at all? Who does it touch? What will people learn from using it every day, and what will they stop learning?</li>
+        <li><strong>Test it against the four questions.</strong> Ask the agent to run the <code>learning-orientation-design</code> skill against your idea and tell you where it fails.</li>
+        <li><strong>Let it ask you the rest.</strong> Ask the agent what it still needs to know before it starts. Answer in your note first, numbered to match its questions.</li>
+      </ol>
+
+      <h2 id="ready">When you are ready to move on</h2>
+      <ul class="checks">
+        <li><input type="checkbox" id="r1"><label for="r1">Your note starts with the why and your answers to the three questions.</label></li>
+        <li><input type="checkbox" id="r2"><label for="r2">The "Why we build" paragraph in <code>CLAUDE.md</code> sounds like you.</label></li>
+        <li><input type="checkbox" id="r3"><label for="r3">There is one rule in your own words.</label></li>
+        <li><input type="checkbox" id="r4"><label for="r4">The agent has what it needs to start.</label></li>
+      </ul>
+      <div class="paper bring">
+        <span class="tape" aria-hidden="true"></span>
+        <span class="marker">Bring back</span>
+        <p>Be ready to share your "why we build" paragraph, the people outside your screen, your one rule, and what that rule will cost you.</p>
+      </div>
+      <nav class="pager" aria-label="Stages">
+        <a href="index.html">Home</a>
+        <a href="#next">01. The first prototype</a>
+      </nav>
+    </article>
+
+    <aside class="side" aria-label="About this stage">
+      <div class="paper">
+        <span class="tape" aria-hidden="true"></span>
+        <h3>In this stage</h3>
+        <ol>
+          <li><a href="#cs">Computer-shaped problems</a></li>
+          <li><a href="#hs">Human-shaped software</a></li>
+          <li><a href="#work">Working with your agent</a></li>
+          <li><a href="#ready">Ready to move on</a></li>
+        </ol>
+      </div>
+      <div class="paper">
+        <svg class="pin" aria-hidden="true"><use href="#pin"/></svg>
+        <span class="marker">Week 1 in a cohort</span>
+        <p class="caption" style="margin:.25rem 0 0">Shown to your partners at the first live session. <a href="https://github.com/bhwilkoff/UniversalAppTemplate/blob/main/docs/path/00-why-we-build.md">Read this stage on GitHub</a>.</p>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="foot">
+    <div class="paper">
+      <p class="caption" style="margin:0">Made by <a href="https://learningischange.com">Ben Wilkoff</a>. The canonical text of this stage lives in <a href="https://github.com/bhwilkoff/UniversalAppTemplate/blob/main/docs/path/00-why-we-build.md">the template</a>.</p>
+    </div>
+  </footer>
+</div>
+<script>
+(function(){var b=document.querySelector('[data-theme-toggle]');if(!b)return;var r=document.documentElement;function dark(){var t=r.getAttribute('data-theme');return t?t==='dark':matchMedia('(prefers-color-scheme: dark)').matches}function label(){b.textContent=dark()?'Light':'Dark'}label();b.addEventListener('click',function(){var t=dark()?'light':'dark';r.setAttribute('data-theme',t);try{localStorage.setItem('hs-theme',t)}catch(e){}label()});})();
+</script>
+</body>
+</html>

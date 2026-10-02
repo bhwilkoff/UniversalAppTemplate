@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>00. Why we build (Margins)</title>
+<script>
+(function(){var q=location.search,t=/dark/.test(q)?'dark':/light/.test(q)?'light':null;try{t=t||localStorage.getItem('hs-theme')}catch(e){}if(t)document.documentElement.setAttribute('data-theme',t);})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="margins.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to the page</a>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="mark" viewBox="0 0 64 64">
+      <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <path stroke-width="2.6" d="M32.5 6.2c5.4-.3 9.3 3.6 9.1 8.8-.2 5-4.1 8.6-9.3 8.4-5-.2-8.7-4-8.5-8.9.2-4.6 3.8-8.1 8.9-8.3z"/>
+        <path stroke-width="2.6" d="M12.2 57.6c-.9-8.2-.6-17.5.3-24.4.6-4.3 3.4-6.6 7.6-6.9 8.2-.6 16.9-.7 24.6-.2 4.6.3 7.4 2.8 7.8 7.3.7 7.7.5 16.6-.2 24.1"/>
+        <path stroke-width="2.6" d="M8.6 57.9c13.8.9 31.6.4 47.1-.5"/>
+        <path stroke-width="1.2" opacity=".55" d="M13.4 56.8c-.4-7.6-.2-15.9.9-22.9.7-3.5 3-5.6 6.9-5.9"/>
+      </g>
+    </symbol>
+    <symbol id="underline" viewBox="0 0 160 10" preserveAspectRatio="none">
+      <path d="M2 6.5C38 3.2 84 4.6 157 3.4M30 8.2c34-1.6 72-1.9 104-1.3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="page">
+  <header class="masthead">
+    <a class="brand" href="index.html" aria-label="Human Shaped, home">
+      <svg aria-hidden="true"><use href="#mark"/></svg>
+      <span class="word">human shaped<svg aria-hidden="true" style="color:var(--red)"><use href="#underline"/></svg></span>
+    </a>
+    <nav aria-label="Site">
+      <ul class="nav">
+        <li><a href="stage.html" aria-current="page">The path</a></li>
+        <li><a href="index.html#cohorts">Cohorts</a></li>
+        <li><a href="index.html#apps">Apps</a></li>
+        <li><a href="index.html#toolkit">Toolkit</a></li>
+      </ul>
+    </nav>
+    <a class="signin" href="#signin">
+      <svg class="box" viewBox="0 0 160 48" preserveAspectRatio="none" aria-hidden="true"><path d="M5 6.5c40-2.5 101-2 150 .4 1.6 11 1.8 23.6.6 35.2-48 2.6-104 2.2-150.8-.4C3.6 30 3.6 17.6 5 6.5z" fill="none" stroke="currentColor" stroke-width="1.8" vector-effect="non-scaling-stroke"/></svg>
+      Sign in with GitHub
+    </a>
+    <button class="theme" type="button" data-theme-toggle>Dark pages</button>
+  </header>
+
+  <main id="main">
+    <section class="row opening" aria-labelledby="t">
+      <div class="margin">
+        <span class="hand">Week 1 in a cohort.</span>
+        <span class="hand"><a href="https://github.com/bhwilkoff/UniversalAppTemplate/blob/main/docs/path/00-why-we-build.md">Read this stage on GitHub</a></span>
+      </div>
+      <div class="text">
+        <p class="crumbs">The path · Stage 00 of 08</p>
+        <h1 id="t">Why we build</h1>
+        <p class="where"><strong>Where you are.</strong> You have an idea for an app and your own copy of this template. Nothing is built yet, and that is exactly the right moment for this stage.</p>
+        <p>On September 26, 2026, deep into building Archive Watch, I told the agent I was working with this, and it became one of the project's standing instructions:</p>
+        <blockquote class="story">
+          <p>I don't want AI making lists and writing copy. Any time we can use metadata or user copy/categorization from archive.org.</p>
+          <cite>Ben, to the agent, Archive Watch, September 26, 2026</cite>
+        </blockquote>
+        <p>Archive Watch had 4,285 commits by the end of that month, and 2,742 of them carry Claude's name as co-author. It runs on iPhones, iPads, Macs, Apple TVs, Android phones, Google TVs, Fire TVs, Rokus and the web. An AI wrote most of the code, and yet the rule I cared about most that week was a limit on what AI is allowed to do <em>inside</em> the app.</p>
+      </div>
+    </section>
+
+    <section class="row" aria-labelledby="cs">
+      <div class="margin">
+        <span class="hand">March 2026. A page typed after a Bluesky post.</span>
+      </div>
+      <div class="text">
+        <h2 id="cs">Computer-shaped problems</h2>
+        <p>In March I typed a page about something I had read on Bluesky: that we are only looking to solve "computer-shaped problems." Community is not computer-shaped. Relationships are not. Learning is not. And yet there are so many computer-shaped problems, and making everything into something I can feed into the Claude Code window is "so seductive and more than a little thrilling."</p>
+        <p>The page ends here:</p>
+        <blockquote class="story">
+          <p>Sometimes the window isn't showing me the future. It is just showing me another way to avoid the hard work of living.</p>
+          <cite>Ben, March 2026</cite>
+        </blockquote>
+        <p>So, how do you keep the window from doing the part that was supposed to be yours, or your users' part, the part where the learning happens?</p>
+        <p>You write it down.</p>
+        <p class="thesis">An agent keeps only the values you write down.</p>
+      </div>
+    </section>
+
+    <section class="row" aria-labelledby="hs">
+      <div class="margin">
+        <span class="hand">Student, builder, human. Three directions at once.</span>
+      </div>
+      <div class="text">
+        <h2 id="hs">Human-shaped software</h2>
+        <p>A computer-shaped problem is one you can hand to the window. Learning, community and relationships are not, because they only happen when a person does the work. Human-shaped software is built around those parts rather than over them. It takes the mechanical work off people's hands and leaves them the learning.</p>
+        <ul>
+          <li><strong>As a student,</strong> you are learning a way of building, one stage at a time.</li>
+          <li><strong>As a builder,</strong> you are learning what your app is. Deciding what to build, judging what came back, and using it every day are yours.</li>
+          <li><strong>As a human,</strong> you are deciding, at every step, what to hand to the window and what to keep.</li>
+        </ul>
+        <p class="thesis">Write it down, prove it, live with it.</p>
+      </div>
+    </section>
+
+    <section class="row" aria-labelledby="work">
+      <div class="margin">
+        <span class="hand">Everything here is a conversation with your agent.</span>
+      </div>
+      <div class="text">
+        <h2 id="work">Working with your agent</h2>
+        <ol class="steps">
+          <li><strong>Start your note with the why.</strong> Open a plain note for your app, in whatever notes app you already use. At the top, write what the app is for, who it is for, and what you hope it does for them.</li>
+          <li><strong>Tell the agent why.</strong> Say what you wrote, the way you would to a friend. Then ask the agent to rewrite the "Why we build" paragraph in <code>CLAUDE.md</code> from what you said. Correct it until it sounds like you and not like a company.</li>
+          <li><strong>Name one line you will not cross.</strong> Something the app will never do, or never let AI do inside it, even if doing it would work.
+            <div class="turn">
+              <label for="rule">Your turn: write your one rule, and why, before you read mine.</label>
+              <textarea id="rule" name="rule" rows="4"></textarea>
+              <details>
+                <summary>Then read the one I said to the agent</summary>
+                <blockquote class="story">
+                  <p>It is absolutely not acceptable. The goal of this app (and all of my apps) is for them to cost $0 to run.</p>
+                  <cite>Archive Watch, September 2026, when the agent designed Watch Together around a paid voice server</cite>
+                </blockquote>
+              </details>
+              <p class="caption">Kept in this browser only. Nothing you write here is sent anywhere.</p>
+            </div>
+          </li>
+          <li><strong>Ask three questions of the idea.</strong> Should it exist at all? Who does it touch? What will people learn from using it every day, and what will they stop learning?</li>
+          <li><strong>Test it against the four questions.</strong> Ask the agent to run the <code>learning-orientation-design</code> skill against your idea and tell you where it fails.</li>
+          <li><strong>Let it ask you the rest.</strong> Ask the agent what it still needs to know before it starts. Answer in your note first, numbered to match its questions.</li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="row" aria-labelledby="ready">
+      <div class="margin">
+        <span class="hand">Only you see these checks.</span>
+      </div>
+      <div class="text">
+        <h2 id="ready">When you are ready to move on</h2>
+        <ul class="ready">
+          <li><input type="checkbox" id="r1"><label for="r1">Your note starts with the why and your answers to the three questions.</label></li>
+          <li><input type="checkbox" id="r2"><label for="r2">The "Why we build" paragraph in <code>CLAUDE.md</code> sounds like you.</label></li>
+          <li><input type="checkbox" id="r3"><label for="r3">There is one rule in your own words.</label></li>
+          <li><input type="checkbox" id="r4"><label for="r4">The agent has what it needs to start.</label></li>
+        </ul>
+        <div class="bring">
+          <span class="tape" aria-hidden="true"></span>
+          <h3>Bring back</h3>
+          <p>Be ready to share your "why we build" paragraph, the people outside your screen, your one rule, and what that rule will cost you.</p>
+        </div>
+        <nav class="pager" aria-label="Stages">
+          <a href="index.html">Home</a>
+          <a href="#next">01. The first prototype</a>
+        </nav>
+      </div>
+    </section>
+  </main>
+
+  <footer class="row foot">
+    <div class="text">
+      <p class="caption">Made by <a href="https://learningischange.com">Ben Wilkoff</a>. The canonical text of this stage lives in <a href="https://github.com/bhwilkoff/UniversalAppTemplate/blob/main/docs/path/00-why-we-build.md">the template</a>.</p>
+    </div>
+  </footer>
+</div>
+<script>
+(function(){var b=document.querySelector('[data-theme-toggle]');if(!b)return;var r=document.documentElement;function dark(){var t=r.getAttribute('data-theme');return t?t==='dark':matchMedia('(prefers-color-scheme: dark)').matches}function label(){b.textContent=dark()?'Light pages':'Dark pages'}label();b.addEventListener('click',function(){var t=dark()?'light':'dark';r.setAttribute('data-theme',t);try{localStorage.setItem('hs-theme',t)}catch(e){}label()});})();
+</script>
+</body>
+</html>
