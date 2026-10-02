@@ -153,7 +153,7 @@ This is the app-side twin of the instrument-honesty rule in stage 04: a reader t
 ## Standing rules from a shipped app
 
 Two owner rules from Archive Watch that apply to any content app built
-on this template. Record your app's version of each in CLAUDE.md
+on this template. Record your app's version of each in AGENTS.md
 Standing instructions, with the owner's dated words.
 
 ### No AI-written lists or copy in the product

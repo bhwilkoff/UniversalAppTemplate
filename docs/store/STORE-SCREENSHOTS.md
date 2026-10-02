@@ -119,7 +119,7 @@ target everywhere: enough to tell the story, few enough that every one earns it.
 
 `tools/capture-screenshots.sh` runs a whole platform unattended (it is
 ported from Tidbits, so adapt its hooks and screen list to your app first). It leans on the
-`DebugHooks` env family (CLAUDE.md, *"Drive the app to a known state for
+`DebugHooks` env family (AGENTS.md, *"Drive the app to a known state for
 screenshots"*), so no screen needs a human tap.
 
 ```bash
@@ -169,7 +169,7 @@ frame comes back useless.
   expected pixel size and is not >99% one colour (which is what a splash screen,
   a black frame, or a covered window look like). A failed frame fails the run
   loudly rather than shipping a blank.
-- **One simulator at a time.** Booting two wedges both (CLAUDE.md).
+- **One simulator at a time.** Booting two wedges both (AGENTS.md).
 
 ### Manual legs
 

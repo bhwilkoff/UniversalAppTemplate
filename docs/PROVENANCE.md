@@ -25,7 +25,7 @@ nobody rediscovers an exclusion.
 
 | Domain | Lives in |
 |---|---|
-| Methodology (learning orientation, shipping discipline, parity, design docs, decision log) | Quint-era skills + `CLAUDE.md` (unchanged core) |
+| Methodology (learning orientation, shipping discipline, parity, design docs, decision log) | Quint-era skills + `AGENTS.md` (unchanged core) |
 | CI fleet engineering (locks, budgets, guards, sweeper, auditor, alert hygiene) | `docs/CI-FLEET.md`, `ci-fleet-engineering` skill, `tools/` guardian cluster, guardian workflows (dormant), split-writer template, Decisions 030–031 |
 | Autonomous loop discipline | `docs/AUTONOMOUS-LOOPS.md`, `autonomous-loop-cadence` skill, Decision 032 |
 | Device observation harnesses (all platforms) | `docs/DEVICE-HARNESSES.md`, `device-observation-harness` skill, `tools/` harness cluster |
@@ -42,7 +42,7 @@ nobody rediscovers an exclusion.
 | Algorithmic feeds / discovery ranking (multi-source merge, values pass, seen-dedup + bypass) | `values-based-feed-ranking` skill, Decision 043 |
 | Third-party page content (CORS proxy chains, reader-mode extraction, link previews, article-language detection) | `web-content-extraction` skill, cross-ref in `web-platform-patterns` |
 | iOS Share Extension (App Group handoff, responder-chain open, rejected-approach table, web Shortcut counterpart) | `ios-share-extension` skill |
-| iOS production additions from Bsky Dreams (synchronized-group build gotcha, recycled-cell image loading, NetworkMonitor + SwiftData fallback wiring, UIGestureRecognizer-subclass touch capture, AVKit animation crash, haptics taxonomy) | `ios-production-gotchas` skill (amended), CLAUDE.md §Shared design system (haptics), IOS-DESIGN template §4.7–4.8, Decisions 040–042 |
+| iOS production additions from Bsky Dreams (synchronized-group build gotcha, recycled-cell image loading, NetworkMonitor + SwiftData fallback wiring, UIGestureRecognizer-subclass touch capture, AVKit animation crash, haptics taxonomy) | `ios-production-gotchas` skill (amended), AGENTS.md §Shared design system (haptics), IOS-DESIGN template §4.7–4.8, Decisions 040–042 |
 | Provenance-honest market data (signal hierarchy, vanish-inference sold history, match-precision gates, audit-by-pattern, dead-affordance rule) | `provenance-honest-market-data` skill, Decisions 044 + 050 |
 | Canonical entity identity (one ID/one asset, single-source composite formula, collision audits, lockstep migration, md5 byte guard) | `canonical-entity-identity` + `image-cdn-discipline` skills, Decision 046 |
 | Two-tier image CDN (thumbs/full, helper-per-platform, no images in git, dev-domain-isn't-production, cache sizing) | `image-cdn-discipline` skill |
@@ -69,7 +69,7 @@ nobody rediscovers an exclusion.
 | State in the link; the web bridges the sync islands; $0 watch party; one free Worker of adapters | `DEEP_LINKS.md`, `per-ecosystem-sync-islands`, `cross-platform-multiplayer`, `zero-cost-hosted-backend`, `pulse/worker-example/` |
 | Engineering disciplines and loop working style | `docs/ENGINEERING-PROCESS.md`, `docs/AUTONOMOUS-LOOPS.md` |
 | iPad regular-width rules | `docs/templates/IPAD-DESIGN-template.md` |
-| Standing rules on words and AI in the product | `learning-orientation-design`, `mobile-first-density-design`, `CLAUDE.md` Standing instructions |
+| Standing rules on words and AI in the product | `learning-orientation-design`, `mobile-first-density-design`, `AGENTS.md` Standing instructions |
 
 ## Deliberate exclusions (do not "rediscover" these)
 

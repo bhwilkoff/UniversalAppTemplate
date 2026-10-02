@@ -25,7 +25,7 @@ a symptom matches.
   ("forehead bug") came from modifier-order drift.
 - One destination registry (a single shared `navigationDestination`
   modifier all stacks apply), router-owned `NavigationPath` per tab,
-  external entry points through an intent inbox — see CLAUDE.md;
+  external entry points through an intent inbox — see AGENTS.md;
   per-view destinations are how "this screen can't push that screen"
   bugs are born.
 - Settings is a sheet behind a toolbar gear, not a tab — tab bars
@@ -93,7 +93,7 @@ one appearance. Fixes:
   instrumentation exposed the state/render mismatch.)
 - When repeated fixes don't change a symptom, **instrument before
   iterating** — print the state you believe vs the state that
-  renders. The divergence point is the bug (CLAUDE.md debugging
+  renders. The divergence point is the bug (AGENTS.md debugging
   philosophy; it has paid off every time).
 - **First-frame data must load synchronously in the initializer.**
   Wrapping the initial catalog/content load in `Task {}` queues it

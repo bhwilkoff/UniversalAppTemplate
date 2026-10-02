@@ -40,7 +40,7 @@ four were new hard requirements and one was a shipped-code conflict.
    actual verification pass (`tools/audit_tv_g6.py`). It is not automatically
    satisfied.
 3. **TV-PS (since Dec 2025):** `minSdkVersion` must be **31 or lower**. The
-   template default (29, per CLAUDE.md) complies with Google TV. **Fire TV is
+   template default (29, per AGENTS.md) complies with Google TV. **Fire TV is
    stricter:** Fire OS 7 is API 28, so an app that targets Fire TV must drop
    `minSdk` to **28 or lower**. Archive Watch runs `minSdk` 23 on every Android
    surface for this reason.

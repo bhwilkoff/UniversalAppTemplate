@@ -188,7 +188,7 @@ lines, nothing else.
   scroll position.
 - System font stack when there's no build step — webfonts mean FOUT
   with no bundler to inline them.
-- The Safari body rule (CLAUDE.md): `100dvh` flex-column body,
+- The Safari body rule (AGENTS.md): `100dvh` flex-column body,
   `main { flex:1; overflow-y:auto; min-height:0 }`, no
   `viewport-fit=cover`.
 

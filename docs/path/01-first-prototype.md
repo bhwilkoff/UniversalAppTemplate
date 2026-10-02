@@ -2,7 +2,7 @@
 
 **Where you are.** You have a note for your app with the why at the top,
 the agent knows that why, and there is one rule in your own words in
-`CLAUDE.md`. There is no app yet.
+`AGENTS.md`. There is no app yet.
 
 Archive Watch began on April 17, 2026, and the first thing the agent
 made was not a screen. It was a set of research notes on where film

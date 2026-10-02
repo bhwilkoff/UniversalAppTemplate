@@ -109,7 +109,7 @@ shoot_android() {  # shoot_android <outdir> <NN-name> <w> <h> <settle> [--ez k v
   if verify "$out/$name.png" "$w" "$h"; then echo "  ✓ $name"; else fail "$name"; fi
 }
 
-boot_only() {  # exactly one simulator at a time (CLAUDE.md)
+boot_only() {  # exactly one simulator at a time (AGENTS.md)
   for s in $(xcrun simctl list devices booted -j | python3 -c 'import json,sys; print(" ".join(d["udid"] for v in json.load(sys.stdin)["devices"].values() for d in v))'); do
     [ "$s" = "$1" ] || xcrun simctl shutdown "$s" >/dev/null 2>&1
   done

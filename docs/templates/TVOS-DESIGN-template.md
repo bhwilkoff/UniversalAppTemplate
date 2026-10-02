@@ -121,7 +121,7 @@ replaces the shell while active, with a visible exit + Back.
 
 4.1 **Six levels, period.** Three weights × two sizes on the tvOS ramp
 (76/57/38/29/23). Body floor **29pt**; never below 23pt (ten-foot
-legibility). A seventh level is refused; refactor instead (CLAUDE.md density
+legibility). A seventh level is refused; refactor instead (AGENTS.md density
 rule). Use tokens, never hardcode.
 
 4.2 **No long body text on transient surfaces** (hero, row, banner).

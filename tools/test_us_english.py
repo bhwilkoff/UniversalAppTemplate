@@ -121,7 +121,7 @@ def main():
         print(f"\nFAIL: {len(failures)} British spelling(s) in text a person reads:\n")
         for where, got, want, ctx in failures:
             print(f"  {where}\n      '{got}' -> '{want}'   {ctx}")
-        print("\n  CLAUDE.md: one spelling locale, linted. If a string must")
+        print("\n  AGENTS.md: one spelling locale, linted. If a string must")
         print("  keep a British spelling because it matches somebody else's data,")
         print("  add it to ALLOWED in this file WITH THE REASON.")
         return 1

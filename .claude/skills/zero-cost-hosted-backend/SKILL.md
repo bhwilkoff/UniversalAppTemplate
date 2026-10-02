@@ -161,7 +161,7 @@ lands.
   call.** The auth SDK's auto-refresh covers only its own HTTP
   path; everything outside it gets a stale token that fails in
   confusing ways (storage errors that look like generic upload
-  failures). This rule is repeated in CLAUDE.md because it is the
+  failures). This rule is repeated in AGENTS.md because it is the
   single most re-learned backend gotcha.
 - **Tokens in the platform vault**: Keychain on Apple platforms,
   Tink-encrypted DataStore on Android — never UserDefaults /

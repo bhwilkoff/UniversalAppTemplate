@@ -102,7 +102,7 @@ otherwise:
   link that appeared partway through a manual release.
 - Recording a demo video when a reviewer asks for one.
 
-Everything else is the agent's. The rule in `CLAUDE.md` is plain: the
+Everything else is the agent's. The rule in `AGENTS.md` is plain: the
 full ship is the command line, and nobody is asked to press Submit.
 
 ## What it costs

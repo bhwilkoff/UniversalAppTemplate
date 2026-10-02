@@ -24,7 +24,7 @@ import kotlinx.serialization.json.Json
  * When the project uses Supabase + Cloudflare Workers:
  *  - Add SupabaseAuthInterceptor to the OkHttpClient builder so
  *    every Worker call refreshes the JWT first (the cross-platform
- *    "refresh-before-call" rule — see CLAUDE.md).
+ *    "refresh-before-call" rule — see AGENTS.md).
  *  - Share the OkHttpClient with Coil 3 via Application#sharedOkHttp.
  */
 @Singleton

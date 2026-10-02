@@ -3,7 +3,7 @@
 > **Single source of truth** for what's shipping where. Updated in
 > the SAME change set as any user-facing feature.
 >
-> Companion to `CLAUDE.md` (project context), `SCRATCHPAD.md` (active
+> Companion to `AGENTS.md` (project context), `SCRATCHPAD.md` (active
 > milestone), `DECISIONS.md` (architecture decisions). Per-platform
 > design rules live in `iOS-DESIGN.md` (iOS), `macOS-DESIGN.md` (macOS),
 > `tvOS-DESIGN.md` (tvOS), `WEB-DESIGN.md` (web), `ANDROID-DESIGN.md`

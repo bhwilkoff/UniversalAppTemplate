@@ -39,7 +39,7 @@ the agent to keep them, and to notice when it has not.
 
 | File | Its job | Read |
 |---|---|---|
-| `CLAUDE.md` | Who the app is for, the rules, and the table of which skill to use when. | At the start of every session |
+| `AGENTS.md` (`CLAUDE.md` imports it) | Who the app is for, the rules, and the table of which skill to use when. | At the start of every session |
 | `SCRATCHPAD.md` | The current state, the next actions, and the last two session-log entries (state found, work done, state left). Older entries move, word for word, to `docs/SESSION-LOG.md`. | At the start of every session |
 | `DECISIONS.md` | Why the app is built the way it is. Each entry leads with the rule, then why, then how to apply it. | Before changing anything it covers |
 | `PARITY.md` | What exists on which platform, honestly. | Before and after any feature |
@@ -85,7 +85,7 @@ your app has values on every rung.
    weighs it, the way a person weighs advice.
 2. **A rule.** A standing instruction in your own words, with a date,
    written the day the agent crossed a line. The agent reads it every
-   session, but reading is not the same as obeying. `CLAUDE.md` is
+   session, but reading is not the same as obeying. `AGENTS.md` is
    context, and an agent working hard on something else can still miss
    a sentence in it.
 3. **A check.** A test, or a hook that runs before the agent acts, that
@@ -96,7 +96,7 @@ Not every value can climb all the way. "Only essential words on screen"
 needs a person's judgment, and probably always will. But, when a rule is
 specific enough to test, test it. "One spelling locale" climbed from a
 word I noticed on a label to a test that reads every string in the app.
-In `CLAUDE.md`, each value rule says what holds it: a check, or "no check
+In `AGENTS.md`, each value rule says what holds it: a check, or "no check
 yet."
 
 ## Honesty in the log

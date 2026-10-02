@@ -1,10 +1,10 @@
 #!/bin/bash
 # Runs at every Claude Code session start. Claude Code already loads
-# CLAUDE.md on its own, so this only adds the live state from
+# CLAUDE.md (which imports AGENTS.md) on its own, so this only adds the live state from
 # SCRATCHPAD.md: the part of the project that changes between sessions.
 
-if [ ! -f "CLAUDE.md" ]; then
-  echo "=== CLAUDE.md not found. Fill it in to get started (see README.md) ==="
+if [ ! -f "AGENTS.md" ]; then
+  echo "=== AGENTS.md not found. Fill it in to get started (see README.md) ==="
   exit 0
 fi
 

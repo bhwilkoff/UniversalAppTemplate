@@ -1,4 +1,4 @@
-Read CLAUDE.md, SCRATCHPAD.md, and DECISIONS.md. Output a brief status:
+Read AGENTS.md, SCRATCHPAD.md, and DECISIONS.md. Output a brief status:
 
 **[App Name] — Status**
 - Active milestone: [from SCRATCHPAD current state]

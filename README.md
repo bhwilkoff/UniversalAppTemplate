@@ -90,8 +90,10 @@ Teaching with it? `COURSE.md` maps the stages to weeks.
 ## Using it for your app
 
 1. Click **Use this template** on GitHub to make your own copy.
-2. Open it in Claude Code. `CLAUDE.md` gives the agent the rules and the
-   skill table, so it already knows how this template builds.
+2. Open it with your agent: Claude Code, Gemini CLI, Antigravity, or
+   any agent that reads `AGENTS.md`. That file gives the agent the rules
+   and the skill table, so it already knows how this template builds.
+   (`CLAUDE.md` imports it, and `GEMINI.md` points to it.)
 3. Tell it why your app exists (stage 00), then what you want and where
    the truth lives (stage 01). It will build the first version and put
    it live at an address you can open on your phone.
@@ -103,7 +105,7 @@ is the one page to keep open while you work.
 
 | Where | What it is |
 |---|---|
-| `CLAUDE.md` | The agent's instructions: who the app is for, the rules, which skill to use when. |
+| `AGENTS.md` | The agent's instructions: who the app is for, the rules, which skill to use when. `CLAUDE.md` imports it and `GEMINI.md` points to it, so every agent reads the same file. |
 | `SCRATCHPAD.md`, `DECISIONS.md`, `PARITY.md`, `DEEP_LINKS.md` | The project's memory: current state, the reasons behind choices, what exists on which platform, and the link contract. |
 | `docs/path/` | The nine stages. |
 | `docs/` | The reference docs each stage points to. Map: [`docs/README.md`](docs/README.md). |

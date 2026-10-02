@@ -24,7 +24,7 @@
      `docs/path/01-first-prototype.md`
   2. Decide the platform set (all five? skip tvOS? add Windows?)
      → DECISIONS.md
-  3. Fill in CLAUDE.md project identity sections
+  3. Fill in AGENTS.md project identity sections (CLAUDE.md imports it)
   4. Rename the app in `project.yml`, then the agent runs
      `xcodegen generate` and builds iOS, tvOS, and macOS unsigned,
      per apple/README.md
@@ -42,7 +42,7 @@
 ### M0: Project setup
 
 - [ ] Platform set decided + logged in DECISIONS.md
-- [ ] CLAUDE.md filled in with project identity (app name, what it
+- [ ] AGENTS.md filled in with project identity (app name, what it
       does, tech-stack specifics, design tokens)
 - [ ] PARITY.md skeleton sections filled in with intended verbs
 - [ ] **Web**: runs locally out of the box

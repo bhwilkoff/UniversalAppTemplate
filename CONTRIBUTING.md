@@ -53,7 +53,8 @@ version via `AppVersion.xcconfig` + `tools/stamp_msix_version.py`;
   no em dashes, none of the words on its "do not use" list.
 - **A new tool gets a row in `tools/README.md`.**
 - **A new skill gets a row in `.claude/skills/README.md`**, and a
-  trigger row in CLAUDE.md if it should fire without being asked for.
+  trigger row in AGENTS.md (CLAUDE.md imports it) if it should fire
+  without being asked for.
 - **Lessons learned in an app repo are upstreamed here** per
   `docs/PROVENANCE.md`: the generic form lands in the template in the
   same session, and the coverage map is updated.

@@ -9,7 +9,7 @@ description: Use as the end-to-end workflow for shipping any feature change. The
 
 Every feature change follows this seven-step sequence. Each step prevents a specific failure mode:
 
-1. **Read relevant docs** (DESIGN.md / DECISIONS.md / CLAUDE.md / memory)
+1. **Read relevant docs** (DESIGN.md / DECISIONS.md / AGENTS.md / memory)
 2. **Propose the change** with the rule it implements quoted
 3. **Build** the change
 4. **Validate** — sim render / iOS build / web open in browser / etc.
@@ -30,7 +30,7 @@ Skipping any step is where bugs and trust-erosion enter.
 Before touching code, grep the project's binding/decision docs for keywords related to the feature:
 
 ```bash
-grep -ni "<keyword>" CLAUDE.md DESIGN.md WEB-DESIGN.md DECISIONS.md
+grep -ni "<keyword>" AGENTS.md DESIGN.md WEB-DESIGN.md DECISIONS.md
 ```
 
 What you're looking for:

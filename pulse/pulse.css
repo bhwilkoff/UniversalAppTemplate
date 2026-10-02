@@ -6,7 +6,7 @@
    style declarations of its own except a computed length. */
 
 :root {
-  /* The template's shared design tokens (CLAUDE.md). Chrome/CTA only. */
+  /* The template's shared design tokens (AGENTS.md). Chrome/CTA only. */
   --color-primary: #FF5C35;
   --color-accent:  #0047FF;
   --link:      #6E8BFF;

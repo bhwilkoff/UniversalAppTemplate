@@ -44,8 +44,8 @@ hand which is newer.
 
 ## How the agent finds the right one
 
-`CLAUDE.md` has a table ("How we build") that maps situations to skills:
-"Adding a list, grid, sheet or shelf" to `universal-feature-states`, and
+`AGENTS.md` (which `CLAUDE.md` imports) has a table ("How we build")
+that maps situations to skills: "Adding a list, grid, sheet or shelf" to `universal-feature-states`, and
 so on. The descriptions do most of the matching on their own. The table
 is there for the cases where a skill should fire *before* the agent would
 think to ask, like `learning-orientation-design` before any new feature.
@@ -219,7 +219,7 @@ learn again, write it down as a skill:
    the description in quotes.
 3. In the body, lead with the rule, then the story of how you learned
    it, then how to apply it.
-4. Add a row to the "How we build" table in `CLAUDE.md` if it should
+4. Add a row to the "How we build" table in `AGENTS.md` if it should
    fire before anyone thinks to ask.
 
 The first one you write will feel small. Write it anyway.

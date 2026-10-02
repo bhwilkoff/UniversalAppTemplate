@@ -185,7 +185,7 @@ cache or a third-party package.
 `light`·`medium`·`heavy` / `success`·`warning`·`error`, never a
 bare `UIImpactFeedbackGenerator` at a call site. `error` always
 pairs with a surfaced error banner; `selection` always pairs with a
-page/segment change (CLAUDE.md §Shared design system).
+page/segment change (AGENTS.md §Shared design system).
 
 ---
 
@@ -230,7 +230,7 @@ sanctioned custom sizes are inside compact navigation tiles (where the
 tile is an illustration). A `font(.system(size:))` outside a tile is a
 violation; refactor to a style.
 
-6.2 **Six hierarchy levels, period** (CLAUDE.md density rule).
+6.2 **Six hierarchy levels, period** (AGENTS.md density rule).
 
 6.3 **Body/long text lives on Detail.** Rows and tiles carry title +
 one meta line at most.

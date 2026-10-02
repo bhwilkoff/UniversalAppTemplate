@@ -43,7 +43,7 @@ chrome, not adding decoration. On a 10-foot screen this is not taste. An
 unfocusable or ambiguously focused element is *unusable*, and it fails Google's
 TV-DP and LG's and Samsung's function tests outright.
 
-**1.3 D-pad reachability is agency, not a checkbox.** CLAUDE.md's "Why we build"
+**1.3 D-pad reachability is agency, not a checkbox.** AGENTS.md's "Why we build"
 asks whether a design invites the user to engage more fully. On a TV, the remote
 *is* the entire vocabulary of engagement. Any function reachable only by pointer,
 gesture, or text entry is a function that platform's users do not have. This is
@@ -160,7 +160,7 @@ instead.
 UI is fatiguing at 10 feet. Light mode is not offered on TV.
 
 **4.5 Color follows the shared system.** Brand chrome (`--color-primary`,
-`--color-accent`) and any semantic accents are **exactly** those in CLAUDE.md
+`--color-accent`) and any semantic accents are **exactly** those in AGENTS.md
 and Decision 012. The split is binding: never a brand color for content
 meaning, never a semantic color for chrome.
 
@@ -236,7 +236,7 @@ containing the app name, localized per supported language (TV-LB / TV-BN);
 
 **6.4 Platform floors (binding).** `minSdk` 31 or lower (TV-PS). If the app
 also targets Fire TV, `minSdk` must be **28 or lower** (Fire OS 7 is API 28);
-the template's CLAUDE.md default of 29 must drop. **64-bit plus 16 KB page-size
+the template's AGENTS.md default of 29 must drop. **64-bit plus 16 KB page-size
 compliance across every bundled native library (TV-G6)**. Verify each native
 dependency ([FILL IN: e.g. `sqlite-bundled`, Media3, Coil]); do not assume.
 AAB is mandatory (TV-G1).
@@ -255,7 +255,7 @@ ExoPlayer port) is the player, validated on real Fire hardware.
 
 ## §7. Web-TV mechanics (binding where marked)
 
-**7.1 Vanilla, no build step (binding).** Inherited from CLAUDE.md and
+**7.1 Vanilla, no build step (binding).** Inherited from AGENTS.md and
 `docs/WEB-DESIGN.md` (you create this from
 `docs/templates/WEB-DESIGN-template.md`). The TV build is the **same** web app
 plus a TV layer (`tv.js` / `tv.css`, per `smarttv-web-app`), not a fork, not a
@@ -287,7 +287,7 @@ support. Hovering moves focus; the D-pad continues to work from wherever the
 pointer left focus. Two input models, one focus state.
 
 **7.5 TV breakpoint, not TV fork.** The mobile-first CSS gains a TV media query.
-Existing `min-width` discipline (CLAUDE.md) is preserved. The TV layer is
+Existing `min-width` discipline (AGENTS.md) is preserved. The TV layer is
 additive.
 
 **7.6 Service-worker discipline.** The TV build ships through the same versioned

@@ -106,7 +106,7 @@ One macOS target, multiple SwiftUI scenes:
 - **Rule A5a: the no-auto-do-it-all gate.** Any "automatic" feature
   MUST produce an **editable set of candidates**, never a one-tap
   finished output. Automate the mechanical; preserve the meaningful
-  choices (CLAUDE.md "Why we build" + `learning-orientation-design`).
+  choices (AGENTS.md "Why we build" + `learning-orientation-design`).
 - **Rule A5b: [provenance/attribution stance]**, if the app produces
   shareable output.
 - **Rule A5c: [eligibility gate].** Only eligible inputs enter the

@@ -190,7 +190,7 @@ hides data carries a banner routing to sign-in.
 ## 5. Design system (Fluent, brand-forward)
 
 5.1 **Shared tokens, Windows expression.** Reuse the palette values
-from CLAUDE.md (`--color-primary`, `--color-accent`, surface, text,
+from AGENTS.md (`--color-primary`, `--color-accent`, surface, text,
 border) as Avalonia `ThemeVariant` resource dictionaries (light and
 dark) in `windows/AppName.App/App.axaml`. The brand drives CTAs and
 active states. The **system accent** drives OS chrome only (focus

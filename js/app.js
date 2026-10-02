@@ -11,7 +11,7 @@
  *  - State is plain JS objects/variables (no framework)
  *  - DOM updates use textContent (safe) or innerHTML (only with escHtml)
  *
- * See CLAUDE.md for full conventions and DECISIONS.md for architecture choices.
+ * See AGENTS.md for full conventions and DECISIONS.md for architecture choices.
  */
 
 // Dark mode — flash-free init (runs before DOM renders)

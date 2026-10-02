@@ -141,7 +141,7 @@ share verbs, never idioms (PARITY "same verb, native idiom").
   Never a brand color for meaning, never a semantic accent for chrome.
 - **§6.3 M3 typography styles only:** `headlineSmall`, `titleMedium`,
   `bodyMedium/Small`, `labelMedium/Small` with weight modifiers; six
-  hierarchy levels, refuse a seventh (CLAUDE.md density rule).
+  hierarchy levels, refuse a seventh (AGENTS.md density rule).
 
 ## §7 Out of scope on Android v1 (intentional, next wave)
 

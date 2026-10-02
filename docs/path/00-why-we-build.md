@@ -93,9 +93,9 @@ this stage is where the first one starts.
 
 There are three places, and each one is read at a different moment.
 
-1. **`CLAUDE.md`, "Why we build."** Claude Code loads this file at the
-   start of every session. The paragraph at the top is the one I wrote
-   for every app I build:
+1. **`AGENTS.md`, "Why we build."** Your agent loads this file at the
+   start of every session (`CLAUDE.md` imports it for Claude Code). The
+   paragraph at the top is the one I wrote for every app I build:
 
    > Every feature in this app is built in service of human learning and
    > growth, not to replace thinking, but to deepen it. [...] The goal is
@@ -189,7 +189,7 @@ is a conversation, and `talking-to-your-agent.md` has the moves.
 
 2. **Tell the agent why.** Say what you wrote, the way you would to a
    friend. Then ask the agent to rewrite the "Why we build" paragraph in
-   `CLAUDE.md` from what you said, and to read it back to you. Correct it
+   `AGENTS.md` from what you said, and to read it back to you. Correct it
    until it sounds like you and not like a company. Five sentences or
    fewer.
 
@@ -204,7 +204,7 @@ is a conversation, and `talking-to-your-agent.md` has the moves.
    > my apps) is for them to cost $0 to run.
 
    You do not have to wait for the agent to cross yours. Say it now, and
-   ask the agent to add it to the standing instructions in `CLAUDE.md`
+   ask the agent to add it to the standing instructions in `AGENTS.md`
    with today's date and your words in quotes. You will add more of
    these as you build.
 
@@ -264,7 +264,7 @@ is a conversation, and `talking-to-your-agent.md` has the moves.
 
 **When you are ready to move on,** your note starts with the why and
 your answers to the three questions, the "Why we build" paragraph in
-`CLAUDE.md` sounds like you, there is one rule in your own words, and
+`AGENTS.md` sounds like you, there is one rule in your own words, and
 the agent has what it needs to start. You have written it down. Stage 01
 is the first chance to prove it and live with it, in something you can
 hold.

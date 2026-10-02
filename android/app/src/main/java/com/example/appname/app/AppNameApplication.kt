@@ -36,7 +36,7 @@ class AppNameApplication : Application(), SingletonImageLoader.Factory {
             // .addInterceptor(SupabaseAuthInterceptor(supabase)) — wire
             //   when Supabase is added; refreshes JWT before every call
             //   that hits a Worker / Storage / Edge Function. See the
-            //   shared "refresh-before-call" pattern in CLAUDE.md.
+            //   shared "refresh-before-call" pattern in AGENTS.md.
             .build()
     }
 
