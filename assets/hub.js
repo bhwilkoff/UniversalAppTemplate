@@ -83,6 +83,9 @@
     if (c.description) card.appendChild(el('p', null, c.description));
     var actions = el('div', 'actions');
     if (mine) {
+      var open = el('a', 'btn-github', 'Open your cohort');
+      open.href = '/cohort/?c=' + encodeURIComponent(c.slug);
+      actions.appendChild(open);
       var leave = el('button', 'btn-quiet', 'Leave this cohort');
       leave.type = 'button';
       leave.addEventListener('click', function () { leavingCohort = c.id; leaveDialog.showModal(); });
@@ -116,7 +119,7 @@
       var uid = session.user.id;
       return Promise.all([
         db.from('profiles').select('github_login, display_name, avatar_url').eq('id', uid).single(),
-        db.from('enrollments').select('status, cohorts(id, title, starts_on, weeks, description, status)').eq('user_id', uid).neq('status', 'left'),
+        db.from('enrollments').select('status, cohorts(id, slug, title, starts_on, weeks, description, status)').eq('user_id', uid).neq('status', 'left'),
         db.from('cohorts').select('id, title, starts_on, weeks, description, status').eq('status', 'open').order('starts_on')
       ]).then(function (res) {
         var bad = res.filter(function (r) { return r.error; })[0];

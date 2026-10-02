@@ -79,8 +79,11 @@ verify what a person would see); push; log it below. "Fixed" and
   (`LICENSE.md`), chosen as the open default.
 - **A real test of the session recorder** before cohort 1, since the
   site promises recorded sessions.
-- **Turn on GitHub sign-in (two minutes, needs a secret only Ben should
-  handle).** The GitHub sign-in app is registered under the humanshaped
+- **Authorize "Human Shaped" once on GitHub** (the secret is saved and
+  the hand-off to GitHub is verified; the agent's browser cannot click
+  Authorize for an account owner). Then the agent makes Ben the first
+  teacher and tests /account/, /teach/, and /cohort/ for real.
+- ~~Turn on GitHub sign-in~~ (done by Ben). The GitHub sign-in app is registered under the humanshaped
   organization (client ID `Ov23li0LEW1AbQLRdNjs`). On its settings page
   (github.com/organizations/humanshaped/settings/applications/3900551),
   click "Generate a new client secret". Then in Supabase, humanshaped-hub,
@@ -156,3 +159,13 @@ verify what a person would see); push; log it below. "Fixed" and
   template's known `[hidden]` versus `display` trap on the form, now
   fixed. Not yet verified against the real database: that waits for
   Ben's first sign-in.
+- 2026-10-02, item 6 (cohort page). /cohort/?c=<slug> built: this week's
+  challenge, the next session (with "Join the session now" while it is
+  live), recordings, your group and who is in it, your app's name,
+  repository, link, and an optional calendar email, everyone's app with
+  its three latest commits read live from GitHub (cached ten minutes,
+  using the visitor's own GitHub sign-in when present, and honest about
+  private or missing repositories), and bring-backs with feedback.
+  /account/ links to it. Verified: 8 tests for the week and commit
+  helpers; the page drawn against a stand-in database with real commits
+  from GitHub. GitHub sign-in verified up to GitHub's Authorize screen.
