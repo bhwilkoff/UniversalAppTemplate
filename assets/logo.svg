@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 14" width="112" height="56" color="#A23F22">
+  <title>Human Shaped: the joined hyphen</title>
+  <symbol id="arch" viewBox="0 0 28 14">
+    <path d="M3 12C4.2 6 8.2 2.6 14 2.6S23.8 6 25 12" fill="none" stroke="currentColor" stroke-width="4.2" stroke-linecap="round"/>
+  </symbol>
+  <use href="#arch" width="28" height="14"/>
+</svg>

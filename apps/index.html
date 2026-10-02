@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Apps | Human Shaped</title>
+  <meta name="description" content="Four apps built with an AI agent the human-shaped way, what each one taught the template, and where to try them.">
+  <link rel="canonical" href="https://humanshaped.org/apps/">
+  <meta property="og:url" content="https://humanshaped.org/apps/">
+  <meta property="og:site_name" content="Human Shaped">
+  <meta property="og:title" content="Apps">
+  <meta property="og:description" content="Four apps built with an AI agent the human-shaped way, what each one taught the template, and where to try them.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://humanshaped.org/assets/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="The human-shaped wordmark, with its hyphen drawn as an arch, above the line: build software for the parts of life only people can do.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#F7F6F2" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#141618" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/site.css">
+  <script>
+    (function () {
+      var q = location.search, t = null;
+      if (/[?&]dark\b/.test(q)) t = 'dark'; else if (/[?&]light\b/.test(q)) t = 'light';
+      else { try { t = localStorage.getItem('hs-theme'); } catch (e) {} }
+      if (t) document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+  <script src="/assets/site.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to the page</a>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
+      <nav class="nav" aria-label="Main">
+        <ul>
+          <li><a href="/path/">The path</a></li>
+          <li><a href="/why/">Why</a></li>
+          <li><a href="/principles/">Principles</a></li>
+          <li><a href="/cohorts/">Cohorts</a></li>
+          <li><a href="/apps/" aria-current="page">Apps</a></li>
+          <li><a href="/start/">Start something</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#moon"/></svg>
+        </button>
+        <a class="btn-github small" href="/cohorts/#join">
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>
+          <span>Sign in<span class="long"> with GitHub</span></span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <div class="wrap">
+      <header class="page-head">
+        <div>
+          <p class="kicker">Built this way</p>
+          <h1>Four apps came before the method.</h1>
+          <p class="lead">Before I asked anyone to build like this, I built four apps this way myself, each with an AI agent and each for a problem I cared about, and the template you will start from is what they taught me. Every one of them can be opened and used today.</p>
+        </div>
+      </header>
+
+      <section class="section first" aria-label="The four apps">
+        <ul class="apps">
+          <li class="app">
+            <h3>Archive Watch</h3>
+            <p class="own">&quot;A cinematheque for the Internet Archive. Free, public domain, no account.&quot;</p>
+            <p class="facts">Started April 17, 2026, and now on Apple TV, iPhone, iPad, Mac, Android, Google TV, Fire TV, Fire tablets, Roku and the web, with 4,306 commits by the end of September.</p>
+            <p class="story"><a href="/why/archive-watch/">How it was built, month by month</a></p>
+            <p class="gave">It gave the template most of what it knows about shared data, TV platforms and testing on real devices, and the rule that only essential words belong on screen.</p>
+            <ul class="links" aria-label="Archive Watch links"><li><a href="https://archivewatch.org">archivewatch.org</a></li><li><a href="https://apps.apple.com/us/app/archive-watch/id6776697407">App Store</a></li><li><a href="https://play.google.com/store/apps/details?id=com.archivewatch.app">Google Play</a></li><li><a href="https://www.amazon.com/gp/mas/dl/android?p=com.archivewatch.app">Amazon Appstore</a></li><li><a href="https://channelstore.roku.com/details/12a571a872732e40fe8d1d6c59f3849f:5ec8f46dcec2324229c8d096ea23c089/archive-watch">Roku</a></li></ul>
+          </li>
+          <li class="app">
+            <h3>Tidbits Trivia</h3>
+            <p class="own">&quot;Trivia from the whole of Wikipedia. Play solo, keep a daily streak, or pass the phone.&quot;</p>
+            <p class="facts">First built June 16, 2026, and now on the web, Apple&#x27;s platforms, Android, and Windows through the Microsoft Store.</p>
+            <p class="gave">It taught the template how to play together across platforms, and the rule that a computer opponent is always labeled as one.</p>
+            <ul class="links" aria-label="Tidbits Trivia links"><li><a href="https://tidbitstrivia.com">tidbitstrivia.com</a></li><li><a href="https://apps.apple.com/us/app/tidbits-trivia/id6782202277">App Store</a></li><li><a href="https://play.google.com/store/apps/details?id=com.tidbitstrivia.app">Google Play</a></li></ul>
+          </li>
+          <li class="app">
+            <h3>Bsky Dreams</h3>
+            <p class="own">&quot;Built for people who want to think more, not less.&quot;</p>
+            <p class="facts">A way to read Bluesky, on the web and the iPhone.</p>
+            <p class="gave">It gave the template a feed ranked by the reader&#x27;s own values rather than by engagement, and a reader mode for the links people share.</p>
+            <ul class="links" aria-label="Bsky Dreams links"><li><a href="https://bskydreams.com">bskydreams.com</a></li><li><a href="https://apps.apple.com/us/app/bsky-dreams/id6760909675">App Store</a></li></ul>
+          </li>
+          <li class="app">
+            <h3>BOBA Playbook</h3>
+            <p class="own">&quot;The definitive companion app for the Bo Jackson Battle Arena trading card game.&quot;</p>
+            <p class="facts">On the web and Android, and no longer in active development.</p>
+            <p class="note">BOBA Playbook was made independently, and not by the makers of the game.</p>
+            <p class="gave">It is where the four questions every feature has to answer came from, and it stands as the proof that this method holds for large databases, huge numbers of files, camera scanning, 3D on iOS and pricing.</p>
+            <ul class="links" aria-label="BOBA Playbook links"><li><a href="https://bobaplaybook.com">bobaplaybook.com</a></li><li><a href="https://play.google.com/store/apps/details?id=com.bobaplaybook.app">Google Play</a></li></ul>
+          </li>
+        </ul>
+      </section>
+    </div>
+
+    <section class="section idea" aria-labelledby="yours-title">
+      <div class="wrap">
+        <div>
+          <p class="kicker">Yours</p>
+          <h2 id="yours-title">Your app belongs beside these.</h2>
+        </div>
+        <div class="prose">
+          <p>When the first cohort begins, every app its people build will appear here beside these four, with a page that follows it as it grows. Apps made from the template are considered too, and so are apps built another way by people who hold themselves to <a href="/principles/">the principles</a>, and I read every one of them myself.</p>
+          <p>If you want to start one now, the template is free to copy and <a href="/path/00/">stage 00</a> is where every app begins.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
+      <p>Made by <a href="https://learningischange.com">Ben Wilkoff</a>. The ideas, the method, the tools and the cohorts are free, and what you build is yours.</p>
+      <ul>
+        <li><a href="/cohorts/#together">How we treat one another</a></li>
+        <li><a href="/cohorts/#data">What we keep, and what we never own</a></li>
+        <li><a href="https://github.com/orgs/humanshaped/discussions">Discussions on GitHub</a></li>
+        <li><a href="https://github.com/bhwilkoff/UniversalAppTemplate">The template on GitHub</a></li>
+      </ul>
+    </div>
+  </footer>
+</body>
+</html>

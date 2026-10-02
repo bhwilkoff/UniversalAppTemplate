@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The path | Human Shaped</title>
+  <meta name="description" content="Nine stages that take an app from a written why to every platform it belongs on, and how a five-week cohort walks them.">
+  <link rel="canonical" href="https://humanshaped.org/path/">
+  <meta property="og:url" content="https://humanshaped.org/path/">
+  <meta property="og:site_name" content="Human Shaped">
+  <meta property="og:title" content="The path">
+  <meta property="og:description" content="Nine stages that take an app from a written why to every platform it belongs on, and how a five-week cohort walks them.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://humanshaped.org/assets/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="The human-shaped wordmark, with its hyphen drawn as an arch, above the line: build software for the parts of life only people can do.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#F7F6F2" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#141618" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/site.css">
+  <script>
+    (function () {
+      var q = location.search, t = null;
+      if (/[?&]dark\b/.test(q)) t = 'dark'; else if (/[?&]light\b/.test(q)) t = 'light';
+      else { try { t = localStorage.getItem('hs-theme'); } catch (e) {} }
+      if (t) document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+  <script src="/assets/site.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to the page</a>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
+      <nav class="nav" aria-label="Main">
+        <ul>
+          <li><a href="/path/" aria-current="page">The path</a></li>
+          <li><a href="/why/">Why</a></li>
+          <li><a href="/principles/">Principles</a></li>
+          <li><a href="/cohorts/">Cohorts</a></li>
+          <li><a href="/apps/">Apps</a></li>
+          <li><a href="/start/">Start something</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#moon"/></svg>
+        </button>
+        <a class="btn-github small" href="/cohorts/#join">
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>
+          <span>Sign in<span class="long"> with GitHub</span></span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <div class="wrap">
+      <header class="page-head">
+        <div>
+          <p class="kicker">The path</p>
+          <h1>Nine stages, from a why to every platform.</h1>
+          <p class="lead">The path is the course, and it is the same path whether you walk it alone with the template or with a cohort. Each stage opens with something that really happened while I was building, says what I want from that stage, and ends with a "Be ready to..." line, which is what you bring back and show another person.</p>
+          <p class="fine">Every stage on this site is read straight from the template on GitHub, so it is always the current text.</p>
+        </div>
+      </header>
+
+      <section class="section first" aria-labelledby="stages-title">
+        <h2 id="stages-title" class="visually-hidden">The stages</h2>
+        <ol class="stages">
+          <li><a href="/path/00/"><span class="n">00</span><span class="t">Why we build</span><span class="l">An agent keeps only the values you write down.</span></a></li>
+          <li><a href="/path/01/"><span class="n">01</span><span class="t">The first prototype</span><span class="l">One platform, real data, this week.</span></a></li>
+          <li><a href="/path/02/"><span class="n">02</span><span class="t">The shape of an app</span><span class="l">Same verb, native idiom.</span></a></li>
+          <li><a href="/path/03/"><span class="n">03</span><span class="t">Going native</span><span class="l">The floor is a floor, not a ceiling.</span></a></li>
+          <li><a href="/path/04/"><span class="n">04</span><span class="t">Seeing it work</span><span class="l">The agent is never the tester.</span></a></li>
+          <li><a href="/path/05/"><span class="n">05</span><span class="t">Shipping</span><span class="l">A feature nobody can install is unfinished.</span></a></li>
+          <li><a href="/path/06/"><span class="n">06</span><span class="t">Keeping it running</span><span class="l">A confident zero is worse than no dashboard.</span></a></li>
+          <li><a href="/path/07/"><span class="n">07</span><span class="t">Raising the ceiling</span><span class="l">Raise the ceiling without raising the floor.</span></a></li>
+          <li><a href="/path/08/"><span class="n">08</span><span class="t">Working with AI</span><span class="l">The agent remembers only what the repository remembers.</span></a></li>
+          <li class="aside"><a href="/path/talking-to-your-agent/"><span class="n" aria-hidden="true"></span><span class="t">Talking to your agent</span><span class="l">The prompt is the work. The moves I actually use with an agent, alongside every stage.</span></a></li>
+        </ol>
+      </section>
+    </div>
+
+    <section class="section idea" id="weeks" aria-labelledby="weeks-title">
+      <div class="wrap">
+        <div>
+          <p class="kicker">In a cohort</p>
+          <h2 id="weeks-title">Five weeks, and a week before them.</h2>
+        </div>
+        <div class="prose">
+          <p>A cohort is the first lap of the path, done with other people. Each week the same app gets further along, and each week's work is a set of conversations with the agent rather than a set of files to edit. Two stages share most weeks, so the pace is quick, and that is on purpose, because the path is built to be lapped more than once.</p>
+        </div>
+        <div class="weeks-block">
+          <table class="weeks-table" role="table">
+            <caption class="visually-hidden">How the stages map onto a five-week cohort</caption>
+            <thead role="rowgroup">
+              <tr role="row"><th scope="col" role="columnheader">Week</th><th scope="col" role="columnheader">Stages</th><th scope="col" role="columnheader">Where the app gets to</th><th scope="col" role="columnheader">What they bring back</th></tr>
+            </thead>
+            <tbody role="rowgroup">
+            <tr role="row">
+              <th scope="row" role="rowheader">Before</th>
+              <td role="cell" data-label="Stages">Setup</td>
+              <td role="cell" data-label="Where the app gets to">A GitHub account, a copy of the template, an AI agent (Claude or Gemini) connected to it, and a desktop computer set up to build and test both on the computer and in the cloud. The first win: their own app&#x27;s address open on their phone, showing its name.</td>
+              <td role="cell" data-label="What they bring back">The address, on their phone.</td>
+            </tr>
+            <tr role="row">
+              <th scope="row" role="rowheader">Week 1</th>
+              <td role="cell" data-label="Stages">00. Why we build, 01. The first prototype</td>
+              <td role="cell" data-label="Where the app gets to">An agent that knows why the app exists and who it is for, in the student&#x27;s words, and one platform live at a real address with real data, after two rounds of feedback from their own phone.</td>
+              <td role="cell" data-label="What they bring back">The why, the people outside their screen, the one rule, and the app on their phone with one thing the real data taught them.</td>
+            </tr>
+            <tr role="row">
+              <th scope="row" role="rowheader">Week 2</th>
+              <td role="cell" data-label="Stages">02. The shape of an app, 03. Going native</td>
+              <td role="cell" data-label="Where the app gets to">A parity matrix the student has read and trimmed, and a second platform running on their own device.</td>
+              <td role="cell" data-label="What they bring back">One verb shown on both platforms, each in its own idiom, and one cell their own eyes proved wrong.</td>
+            </tr>
+            <tr role="row">
+              <th scope="row" role="rowheader">Week 3</th>
+              <td role="cell" data-label="Stages">04. Seeing it work, and making it look like itself</td>
+              <td role="cell" data-label="Where the app gets to">The agent testing on the student&#x27;s device, and a look for the app that comes from its own why rather than the template&#x27;s defaults.</td>
+              <td role="cell" data-label="What they bring back">A screenshot that proved a fix, and the app&#x27;s own look beside the template&#x27;s.</td>
+            </tr>
+            <tr role="row">
+              <th scope="row" role="rowheader">Week 4</th>
+              <td role="cell" data-label="Stages">05. Shipping, 06. Keeping it running</td>
+              <td role="cell" data-label="Where the app gets to">The app installed on a device the student did not build it on, through a test track, a direct share, or a store, and one honest number about it.</td>
+              <td role="cell" data-label="What they bring back">The app on someone else&#x27;s device, and what that person said.</td>
+            </tr>
+            <tr role="row">
+              <th scope="row" role="rowheader">Week 5</th>
+              <td role="cell" data-label="Stages">07. Raising the ceiling, 08. Working with AI</td>
+              <td role="cell" data-label="Where the app gets to">A feature the student wanted from their own use, and skills and memories that carry this app&#x27;s lessons forward.</td>
+              <td role="cell" data-label="What they bring back">The feature, and one value with the decision it changed. Shown to everyone, guests welcome.</td>
+            </tr>
+            </tbody>
+          </table>
+          <p class="prose table-note">Five weeks gets most people to a shared, working app on one or two platforms. Store listings and the later stages often land after the cohort ends, and that is fine, because nobody graduates out of the community, and the app's page stays open while it keeps growing. <a href="/cohorts/">How a cohort works</a></p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
+      <p>Made by <a href="https://learningischange.com">Ben Wilkoff</a>. The ideas, the method, the tools and the cohorts are free, and what you build is yours.</p>
+      <ul>
+        <li><a href="/cohorts/#together">How we treat one another</a></li>
+        <li><a href="/cohorts/#data">What we keep, and what we never own</a></li>
+        <li><a href="https://github.com/orgs/humanshaped/discussions">Discussions on GitHub</a></li>
+        <li><a href="https://github.com/bhwilkoff/UniversalAppTemplate">The template on GitHub</a></li>
+      </ul>
+    </div>
+  </footer>
+</body>
+</html>

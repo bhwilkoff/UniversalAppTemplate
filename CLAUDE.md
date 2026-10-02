@@ -76,8 +76,21 @@ as Ben's without his review, $0 to run.
 
 ## How it is built
 
-- Plain HTML and CSS, no framework, no build step. `styles.css` holds
-  the tokens in `:root` with a dark-mode override.
+- Plain HTML and CSS, no framework, no build step. One stylesheet,
+  `assets/site.css`, holds the tokens in `:root` with a dark-mode
+  override, for every page. The header and footer are plain HTML
+  repeated on each page, so change them everywhere at once.
+- Every page is a folder with an `index.html`, so each has a canonical
+  URL. Add new pages to `sitemap.xml`.
+- The reading pages (`/path/NN/`, `/principles/`, `/why/...`) never
+  copy the template's text. Each names its source file with `data-doc`,
+  and `assets/render.js` fetches that file from the template's `main`
+  branch on raw.githubusercontent.com and renders it with marked and
+  DOMPurify. Links to other path files become this site's URLs; links
+  to anything else in the repository go to GitHub. To give another
+  template file a page here, add it to the `SITE` map in `render.js`.
+- "Sign in with GitHub" links to `/cohorts/#join` until sign-in is
+  built.
 - Mobile-first, `min-width` media queries, test at 375px before 1440px.
 - Accessible contrast: text on the orange `--color-primary` is dark.
 
