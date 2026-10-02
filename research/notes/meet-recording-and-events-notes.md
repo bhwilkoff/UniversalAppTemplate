@@ -368,7 +368,7 @@ One object per cohort, read from the hub (for example
   "timeZone": "America/Denver", "firstStart": "2026-10-20T17:00:00",
   "minutes": 90, "weeks": 5, "byDay": "TU",
   "sessionUrl": "https://humanshaped.org/live/c1/",
-  "members": ["student@gmail.com", "..."], "teachers": ["ben@learningischange.com"] }
+  "members": ["student@gmail.com", "..."], "teachers": ["teacher@example.org"] }
 ```
 
 ### Sketch (Apps Script, V8)

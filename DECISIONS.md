@@ -39,7 +39,7 @@ Spec (https://github.com/bhwilkoff/educational-model-spec), said plainly
 where people meet, not in a code of conduct.
 
 **The organization exists:** github.com/humanshaped, contact
-ben@learningischange.com.
+Ben's own address.
 
 **Teachers:** Ben only at launch, then people he invites. A request form
 comes later.

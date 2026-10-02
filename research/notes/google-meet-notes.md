@@ -390,7 +390,7 @@ moderation controls in every plan.
 
 ## Open questions for Ben
 
-1. Which account will host the sessions: ben@learningischange.com (is that a
+1. Which account will host the sessions: Ben's own address (is that a
    Workspace domain, and on which edition?), a new humanshaped.org Workspace,
    or a personal Gmail account?
 2. Is there a nonprofit entity that could qualify for Workspace for Nonprofits
