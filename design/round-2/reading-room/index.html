@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Human Shaped</title>
+  <meta name="description" content="Free five-week cohorts for building software around people, rather than over them, with an AI agent and the Universal App Template.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232D5A4A'/%3E%3Cg transform='translate(3 3) scale(.8)'%3E%3Cg fill='none' stroke='%23FAF7F1' stroke-width='4.4' stroke-linecap='round'%3E%3Cpath d='M8.5 3.5v24'/%3E%3Cpath d='M8.5 27.5v-5c0-4.4 3.4-7 7.6-7s7.6 2.6 7.6 7v5'/%3E%3C/g%3E%3Ccircle cx='17.6' cy='8' r='4.1' fill='%23FAF7F1'/%3E%3C/g%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,300..700;1,7..72,300..700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script>
+    (function () {
+      var q = location.search, t = null;
+      if (/[?&]dark\b/.test(q)) t = 'dark'; else if (/[?&]light\b/.test(q)) t = 'light';
+      else { try { t = localStorage.getItem('hs-theme'); } catch (e) {} }
+      if (t) document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to the page</a>
+
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="mark" viewBox="0 0 32 32">
+      <g fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round">
+        <path d="M8.5 3.5v24"/>
+        <path d="M8.5 27.5v-5c0-4.4 3.4-7 7.6-7s7.6 2.6 7.6 7v5"/>
+      </g>
+      <circle cx="17.6" cy="8" r="3.9" fill="currentColor"/>
+    </symbol>
+    <symbol id="github" viewBox="0 0 16 16">
+      <path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+    </symbol>
+    <symbol id="moon" viewBox="0 0 20 20">
+      <path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" d="M16.5 12.6A7 7 0 0 1 7.4 3.5a7 7 0 1 0 9.1 9.1Z"/>
+    </symbol>
+  </svg>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="index.html" aria-label="Human Shaped, home">
+        <svg aria-hidden="true"><use href="#mark"/></svg>
+        <span class="brand-word">Human <i>Shaped</i></span>
+      </a>
+      <nav class="nav" aria-label="Main">
+        <ul>
+          <li><a href="stage.html">The path</a></li>
+          <li><a href="#cohorts">Cohorts</a></li>
+          <li><a href="#apps">Apps</a></li>
+          <li><a href="#start">Start something</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
+          <svg aria-hidden="true"><use href="#moon"/></svg>
+        </button>
+        <a class="btn-github small" href="#signin">
+          <svg aria-hidden="true"><use href="#github"/></svg>
+          <span>Sign in<span class="long"> with GitHub</span></span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <div class="wrap">
+
+      <section class="hero" aria-labelledby="hero-title">
+        <h1 id="hero-title">Software built around people, <em>rather than over them.</em></h1>
+        <div class="hero-side">
+        <p class="lede">I have spent this year building apps with an AI agent, and what I keep coming back to is how much of a life cannot be handed to a computer. Human Shaped is where we learn to build software for those parts together, in free five-week cohorts, starting from an idea you already have.</p>
+        <div class="hero-actions">
+          <a class="btn-github" href="#signin" id="signin">
+            <svg aria-hidden="true"><use href="#github"/></svg>
+            Sign in with GitHub
+          </a>
+          <a href="stage.html">Read why we build</a>
+        </div>
+        <p class="hero-note">You sign in with GitHub because that is where your app will live, and everything you build stays in your own account.</p>
+        </div>
+      </section>
+
+      <section class="section section-grid" aria-labelledby="idea-title">
+        <div class="head">
+          <p class="label">The idea</p>
+          <h2 id="idea-title">Some problems were never computer-shaped.</h2>
+        </div>
+        <div class="body">
+          <div class="prose">
+            <p>In March, I typed a page about a post I had read on Bluesky, which said that we are only looking to solve "computer-shaped problems." A computer-shaped problem is one you can hand to a machine and be done with. But, the things that matter most to most of us (learning, community, the people we love) only happen when a person does the work, and software that pretends otherwise quietly takes that work away.</p>
+            <p>Human-shaped software takes the mechanical work off people's hands and leaves them the learning. Here is the difference in one of my own apps:</p>
+          </div>
+          <ul class="shapes">
+            <li>
+              <svg class="figure" viewBox="0 0 240 96" aria-hidden="true">
+                <rect x="1" y="18" width="62" height="44" rx="4" class="f-line"/>
+                <path d="M26 32v16l13-8z" class="f-fill-muted"/>
+                <g class="f-bar"><rect x="84" y="10" width="150" height="6" rx="3"/><rect x="84" y="26" width="150" height="6" rx="3"/><rect x="84" y="42" width="150" height="6" rx="3"/><rect x="84" y="58" width="150" height="6" rx="3"/><rect x="84" y="74" width="150" height="6" rx="3"/></g>
+              </svg>
+              <span class="kind">Computer-shaped</span>
+              <p>A model writes a blurb for each of ten thousand films in an afternoon, and most folks would never know.</p>
+            </li>
+            <li>
+              <svg class="figure" viewBox="0 0 240 96" aria-hidden="true">
+                <rect x="1" y="18" width="62" height="44" rx="4" class="f-line"/>
+                <path d="M26 32v16l13-8z" class="f-fill-muted"/>
+                <g transform="translate(84 6)"><circle cx="6" cy="5" r="4.5" class="f-fill-accent"/><path d="M0 22v-3c0-4 2.6-6.2 6-6.2s6 2.2 6 6.2v3" class="f-line-accent"/></g><rect x="108" y="12" width="118" height="6" rx="3" class="f-bar-one"/><g transform="translate(84 36)"><circle cx="6" cy="5" r="4.5" class="f-fill-accent"/><path d="M0 22v-3c0-4 2.6-6.2 6-6.2s6 2.2 6 6.2v3" class="f-line-accent"/></g><rect x="108" y="42" width="64" height="6" rx="3" class="f-bar-one"/><g transform="translate(84 66)"><circle cx="6" cy="5" r="4.5" class="f-fill-accent"/><path d="M0 22v-3c0-4 2.6-6.2 6-6.2s6 2.2 6 6.2v3" class="f-line-accent"/></g><rect x="108" y="72" width="96" height="6" rx="3" class="f-bar-one"/>
+              </svg>
+              <span class="kind">Human-shaped</span>
+              <p>Archive Watch pulls each film's notes from the people who uploaded and reviewed it on archive.org, which is slower, and the words stay theirs.</p>
+            </li>
+          </ul>
+          <p class="credit">The phrase comes from <a href="https://bsky.app/profile/mosheroperandi.bsky.social/post/3mgasswgabs23">a post on Bluesky</a> that started all of this, and I am grateful for it.</p>
+        </div>
+      </section>
+
+      <section class="section section-grid" aria-labelledby="moves-title">
+        <div class="head">
+          <p class="label">The method</p>
+          <h2 id="moves-title">Write it down, prove it, live with it.</h2>
+        </div>
+        <div class="body">
+          <div class="prose">
+            <p>An agent will happily write most of your code, and yet there are three things it cannot do for you. Every round of building makes the same three moves, whether it is your first week or your fortieth, because they are where you actually learn.</p>
+          </div>
+          <ol class="moves">
+            <li>
+              <h3>Write it down</h3>
+              <p>Writing is how you find out what you believe, and a value you have not written down is one the agent building your app has no way to keep.</p>
+            </li>
+            <li>
+              <h3>Prove it</h3>
+              <p>Proving is how you find out whether it is true, so every "it works" points at something a person can look at on a real device, rather than the agent's word for it.</p>
+            </li>
+            <li>
+              <h3>Live with it</h3>
+              <p>Living with the app is how you find out what you missed, because the values you could not have predicted only show up when you use it every day, with the people it is for.</p>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="section section-grid" id="cohorts" aria-labelledby="cohort-title">
+        <div class="head">
+          <p class="label">Cohorts</p>
+          <h2 id="cohort-title">Five weeks, with other people, for free.</h2>
+        </div>
+        <div class="body">
+          <div class="prose">
+            <p>A cohort runs for about five weeks, with one live session each week on Google Meet, and every person in it builds one real app of their own for people they can actually name. You will be able to see one another's apps as they grow, talk them through on GitHub, and bring something back to show at the end of every week.</p>
+            <p>Every session is recorded, so missing a week never means falling behind. I want cohorts to stay free, and in time the people who finish one will be able to lead the next.</p>
+          </div>
+          <dl class="weeks" aria-label="What each week asks you to bring back">
+            <div><dt>Before</dt><dd>Your own app's address, open on your phone.</dd></div>
+            <div><dt>Week 1</dt><dd>Why the app exists, the people outside your screen, one rule in your own words, and the app running on your phone.</dd></div>
+            <div><dt>Week 2</dt><dd>One thing your app does, shown on two platforms, each in its own idiom.</dd></div>
+            <div><dt>Week 3</dt><dd>A screenshot that proved a fix, and your app's own look beside the template's.</dd></div>
+            <div><dt>Week 4</dt><dd>Your app on someone else's device, and what that person said about it.</dd></div>
+            <div><dt>Week 5</dt><dd>A feature you wanted from your own use, and one value with the decision it changed, shown to everyone (guests welcome).</dd></div>
+          </dl>
+          <div class="cohort-foot">
+            <p>The first cohort's dates will be posted here, and signing in is how you will hear about them first.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section-grid" id="apps" aria-labelledby="apps-title">
+        <div class="head">
+          <p class="label">Built this way</p>
+          <h2 id="apps-title">Four apps came before the method.</h2>
+        </div>
+        <div class="body">
+          <div class="prose">
+            <p>Before I asked anyone to build like this, I built four apps this way myself, and the template you will start from is what they taught me. In a cohort, your app gets a page like these, read straight from your repository with your permission, so your classmates can follow it as it grows.</p>
+          </div>
+          
+        </div>
+        <div class="apps-wide">
+          <ul class="apps">
+            <li class="app">
+              <h3>Archive Watch</h3>
+              <p class="own">"A cinematheque for the Internet Archive. Free, public domain, no account."</p>
+              <p class="facts">Started April 17, 2026, and now on Apple TV, iPhone, iPad, Mac, Android, Google TV, Fire TV, Fire tablets, Roku and the web, with 4,306 commits by the end of September.</p>
+              <p class="gave">It gave the template most of what it knows about shared data, TV platforms and testing on real devices, and the rule that only essential words belong on screen.</p>
+            </li>
+            <li class="app">
+              <h3>Tidbits Trivia</h3>
+              <p class="own">"Trivia from the whole of Wikipedia. Play solo, keep a daily streak, or pass the phone."</p>
+              <p class="facts">First built June 16, 2026, and now on the web, Apple's platforms, Android, and Windows through the Microsoft Store.</p>
+              <p class="gave">It taught the template how to play together across platforms, and the rule that a computer opponent is always labeled as one.</p>
+            </li>
+            <li class="app">
+              <h3>Bsky Dreams</h3>
+              <p class="own">"Built for people who want to think more, not less."</p>
+              <p class="facts">A way to read Bluesky, on the web and the iPhone.</p>
+              <p class="gave">It gave the template a feed ranked by the reader's own values rather than by engagement, and a reader mode for the links people share.</p>
+            </li>
+            <li class="app">
+              <h3>BOBA Playbook</h3>
+              <p class="own">"The definitive companion app for the Bo Jackson Battle Arena trading card game."</p>
+              <p class="facts">On the web and Android.</p>
+              <p class="gave">It is where the four questions every feature has to answer came from, and it stands as the proof that this method holds for large databases, huge numbers of files, camera scanning, 3D on iOS and pricing.</p>
+              <p class="status">No longer in active development.</p>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="section" id="start" aria-label="Other ways in">
+        <div class="paths">
+          <div>
+            <p class="label">Going alone</p>
+            <h2>The template is for going it alone.</h2>
+            <div class="prose">
+              <p>Not everyone wants a cohort, and that is fine. The Universal App Template holds the whole method, from your first "why we build" paragraph to shipping in every store, and you can copy it on GitHub today without signing in here.</p>
+            </div>
+            <ul class="links">
+              <li><a href="https://github.com/bhwilkoff/UniversalAppTemplate">The Universal App Template</a><p>Free to copy, and the same path a cohort follows.</p></li>
+              <li><a href="stage.html">Stage 00, Why we build</a><p>Where every app starts, whichever way you go.</p></li>
+            </ul>
+          </div>
+          <div>
+            <p class="label">Start something</p>
+            <h2>Bring it to a room of your own.</h2>
+            <div class="prose">
+              <p>The ideas are free to carry anywhere, and I am putting together what you need to lead a conversation or a day of building with the principles in front of everyone.</p>
+            </div>
+            <ul class="links">
+              <li><a href="#start">Start a meetup</a><p>An evening at a library, a classroom or a kitchen table, with a guide to the conversation.</p></li>
+              <li><a href="#start">Run a Human-Shaped Hackathon</a><p>A day of building with the four questions on the wall and a show-and-tell at the end.</p></li>
+              <li><a href="#start">Declare your software human-shaped</a><p>A short set of principles your app can meet, and a mark you can put on it once it does.</p></li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="closing" aria-label="Sign in">
+        <p class="big">Bring a problem that only people can solve.</p>
+        <a class="btn-github" href="#signin">
+          <svg aria-hidden="true"><use href="#github"/></svg>
+          Sign in with GitHub
+        </a>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <span class="footer-brand"><svg aria-hidden="true"><use href="#mark"/></svg> Human Shaped</span>
+      <p>Made by <a href="https://learningischange.com">Ben Wilkoff</a>. The ideas, the method, the tools and the cohorts are free, and what you build is yours.</p>
+      <ul>
+        <li><a href="#">How we treat one another</a></li>
+        <li><a href="#">What we keep, and what we never own</a></li>
+        <li><a href="https://github.com/bhwilkoff/UniversalAppTemplate">The template on GitHub</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <script>
+    document.querySelectorAll('[data-theme-toggle]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var root = document.documentElement;
+        var cur = root.getAttribute('data-theme') ||
+          (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        var next = cur === 'dark' ? 'light' : 'dark';
+        root.setAttribute('data-theme', next);
+        try { localStorage.setItem('hs-theme', next); } catch (e) {}
+      });
+    });
+  </script>
+</body>
+</html>

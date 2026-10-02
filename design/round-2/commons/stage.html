@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Why We Build</title>
+  <meta name="description" content="Free five-week cohorts for building an app of your own with an AI agent, for the parts of life only people can do.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23A23F22'/%3E%3Cpath d='M7.5 22c1-5.6 4.4-8.6 8.5-8.6s7.5 3 8.5 8.6' fill='none' stroke='%23F7F6F2' stroke-width='4.4' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script>
+    (function () {
+      var q = location.search, t = null;
+      if (/[?&]dark\b/.test(q)) t = 'dark'; else if (/[?&]light\b/.test(q)) t = 'light';
+      else { try { t = localStorage.getItem('hs-theme'); } catch (e) {} }
+      if (t) document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to the page</a>
+
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="arch" viewBox="0 0 28 14">
+      <path d="M3 12C4.2 6 8.2 2.6 14 2.6S23.8 6 25 12" fill="none" stroke="currentColor" stroke-width="4.2" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="github" viewBox="0 0 16 16">
+      <path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+    </symbol>
+    <symbol id="moon" viewBox="0 0 20 20">
+      <path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" d="M16.5 12.6A7 7 0 0 1 7.4 3.5a7 7 0 1 0 9.1 9.1Z"/>
+    </symbol>
+  </svg>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="wordmark" href="index.html" aria-label="Human Shaped, home">
+        <span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true"><use href="#arch"/></svg><span class="w" aria-hidden="true">shaped</span>
+      </a>
+      <nav class="nav" aria-label="Main">
+        <ul>
+          <li><a href="stage.html" aria-current="page">The path</a></li>
+          <li><a href="index.html#cohorts">Cohorts</a></li>
+          <li><a href="index.html#apps">Apps</a></li>
+          <li><a href="index.html#start">Start something</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
+          <svg aria-hidden="true"><use href="#moon"/></svg>
+        </button>
+        <a class="btn-github small" href="index.html#signin">
+          <svg aria-hidden="true"><use href="#github"/></svg>
+          <span>Sign in<span class="long"> with GitHub</span></span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <div class="wrap">
+      <p class="crumbs"><a href="stage.html">The path</a> &rsaquo; Stage 00</p>
+      <header class="stage-head">
+        <p class="num">Stage 00 of 08</p>
+        <h1>Why we build</h1>
+        <p class="where">You have an idea for an app and your own copy of the template. Nothing is built yet, and that is exactly the right moment for this stage.</p>
+      </header>
+
+      <div class="stage-layout">
+        <nav class="stage-toc" aria-label="The path">
+          <h2>The path</h2>
+          <ol>
+            <li><a href="stage.html" aria-current="page"><span>00</span>Why we build</a></li>
+            <li><a href="#"><span>01</span>The first prototype</a></li>
+            <li><a href="#"><span>02</span>The shape of an app</a></li>
+            <li><a href="#"><span>03</span>Going native</a></li>
+            <li><a href="#"><span>04</span>Seeing it work</a></li>
+            <li><a href="#"><span>05</span>Shipping</a></li>
+            <li><a href="#"><span>06</span>Keeping it running</a></li>
+            <li><a href="#"><span>07</span>Raising the ceiling</a></li>
+            <li><a href="#"><span>08</span>Working with AI</a></li>
+          </ol>
+        </nav>
+
+        <article class="article">
+          <p>On September 26, 2026, deep into building Archive Watch, I told the agent I was working with this, and it became one of the project's standing instructions:</p>
+          <blockquote><p>I don't want AI making lists and writing copy. Any time we can use metadata or user copy/categorization from archive.org.</p></blockquote>
+          <p>Archive Watch had 4,306 commits by the end of that month, and 2,753 of them carry Claude's name as co-author. It runs on iPhones, iPads, Macs, Apple TVs, Android phones, Google TVs, Fire TVs, Rokus and the web. An AI wrote most of the code, and yet the rule I cared about most that week was a limit on what AI is allowed to do <em>inside</em> the app.</p>
+          <p>Both of those are true at once. The template is built to hold them together, and the reason starts with something I wrote six months earlier.</p>
+
+          <h2>Computer-shaped problems</h2>
+          <p>In March I typed a page about something I had read on <a href="https://bsky.app/profile/mosheroperandi.bsky.social/post/3mgasswgabs23">Bluesky</a>: that we are only looking to solve "computer-shaped problems." Community is not computer-shaped, and neither are relationships or learning. And yet there are so many computer-shaped problems, and making everything into something I can feed into the Claude Code window is "so seductive and more than a little thrilling."</p>
+          <p>The page ends here:</p>
+          <blockquote><p>Sometimes the window isn't showing me the future. It is just showing me another way to avoid the hard work of living.</p></blockquote>
+          <p>The template is for building software with that window open. So, how do you keep the window from doing the part that was supposed to be yours, or the part that belongs to the people who use your app, the part where the learning happens? You write it down.</p>
+          <p class="thesis">An agent keeps only the values you write down.</p>
+          <p>An agent building your app will do whatever satisfies the request most cheaply. Writing a blurb for ten thousand films is cheap for a model, and building a pipeline that pulls each film's notes from the people who actually uploaded and reviewed it is not. Left alone, the agent will reach for the blurb, and it is not wrong to, because nobody told it otherwise. The values have to live where the agent reads them, at the moment it makes the choice.</p>
+
+          <h2>Human-shaped software</h2>
+          <p>I call what this template builds <em>human-shaped software</em>, and the name answers that March page. A computer-shaped problem is one you can hand to the window. Learning, community and relationships are not, because they only happen when a person does the work. Human-shaped software is built around those parts rather than over them, so that it takes the mechanical work off people's hands and leaves them the learning.</p>
+          <p>Learning is the frame for everything here, and it runs in three directions at once.</p>
+          <ul>
+            <li><strong>As a student,</strong> you are learning a way of building, one stage at a time. Every stage ends with something to bring back and show another person, because a method is learned by showing it, not by reading it.</li>
+            <li><strong>As a builder,</strong> you are learning what your app is. The agent writes the code, but deciding what to build, judging what came back and using it every day are yours, and they are where you learn.</li>
+            <li><strong>As a human,</strong> you are deciding, at every step, what to hand to the window and what to keep. The app should leave the people who use it more capable, and building it should do the same for you.</li>
+          </ul>
+          <p>So, every round of the path makes the same three moves:</p>
+          <ol>
+            <li><strong>Write it down.</strong> Writing is how you find out what you believe, and a value you have not written down is one the agent cannot keep.</li>
+            <li><strong>Prove it.</strong> Proving is how you find out whether it is true. Every "it works" points at something a person can look at.</li>
+            <li><strong>Live with it.</strong> Living with the app is how you find out what you missed, because the values you could not have predicted show up when you use it every day, with the people it is for.</li>
+          </ol>
+          <p class="thesis">Write it down, prove it, live with it.</p>
+          <p>The moves are not stages. Each lap of each stage makes all three, and this stage is where the first one starts.</p>
+
+          <h2>What it costs</h2>
+          <p>These rules are slower. Pulling Archive Watch's notes from archive.org's own metadata, and from the words of the people who uploaded and reviewed each film, meant building a pipeline and keeping it running. A model could have written ten thousand blurbs in an afternoon, and a lot of folks would never have known the difference.</p>
+          <p>I could be wrong about where the line sits for your app. Maybe a model summarizing a long document is exactly what your people need, and it leaves them more capable instead of less. But, I want you to draw the line on purpose, in writing, before the agent draws it for you by default.</p>
+
+          <h2>Working with your agent</h2>
+          <p>Everything in this stage is a conversation with the agent in your copy of the template.</p>
+          <ol>
+            <li><strong>Start your note with the why.</strong> Open a plain note for your app and write what it is for, who it is for, and what you hope it does for them. You will keep this note for the life of the app.</li>
+            <li><strong>Tell the agent why.</strong> Say what you wrote, the way you would to a friend, then ask the agent to rewrite the "Why we build" paragraph in <code>AGENTS.md</code> from what you said. Correct it until it sounds like you and not like a company.</li>
+            <li><strong>Name one line you will not cross.</strong> Something the app will never do, or never let AI do inside it, even if doing it would work. When the agent designed a feature for Archive Watch around a paid voice server, I stopped it: "The goal of this app (and all of my apps) is for them to cost $0 to run."</li>
+            <li><strong>Ask three questions of the idea.</strong> Should it exist at all? Who does it touch, including the people outside the screen? What will people learn from using it every day, and what will they stop learning?</li>
+            <li><strong>Test it against the four questions.</strong> Does it deepen understanding, invite participation, support human agency, and stay clear rather than clever? Where it fails, change the idea now, while it is only words.</li>
+            <li><strong>Let it ask you the rest.</strong> Ask the agent what it still needs to know before it starts, and answer in your note first.</li>
+          </ol>
+
+          <p class="bring-back"><strong>Be ready to share</strong> your "why we build" paragraph, the people outside your screen, your one rule, and what that rule will cost you.</p>
+
+          <div class="next-stage">
+            <a href="index.html">Back to the home page</a>
+            <a href="#">Stage 01, The first prototype</a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <span class="wordmark" aria-label="Human Shaped"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true"><use href="#arch"/></svg><span class="w" aria-hidden="true">shaped</span></span>
+      <p>Made by <a href="https://learningischange.com">Ben Wilkoff</a>. The ideas, the method, the tools and the cohorts are free, and what you build is yours.</p>
+      <ul>
+        <li><a href="#">How we treat one another</a></li>
+        <li><a href="#">What we keep, and what we never own</a></li>
+        <li><a href="https://github.com/bhwilkoff/UniversalAppTemplate">The template on GitHub</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <script>
+    document.querySelectorAll('[data-theme-toggle]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var root = document.documentElement;
+        var cur = root.getAttribute('data-theme') ||
+          (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        var next = cur === 'dark' ? 'light' : 'dark';
+        root.setAttribute('data-theme', next);
+        try { localStorage.setItem('hs-theme', next); } catch (e) {}
+      });
+    });
+  </script>
+</body>
+</html>

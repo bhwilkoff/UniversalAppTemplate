@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Human Shaped</title>
+  <meta name="description" content="Free five-week cohorts for building an app of your own with an AI agent, for the parts of life only people can do.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23A23F22'/%3E%3Cpath d='M7.5 22c1-5.6 4.4-8.6 8.5-8.6s7.5 3 8.5 8.6' fill='none' stroke='%23F7F6F2' stroke-width='4.4' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script>
+    (function () {
+      var q = location.search, t = null;
+      if (/[?&]dark\b/.test(q)) t = 'dark'; else if (/[?&]light\b/.test(q)) t = 'light';
+      else { try { t = localStorage.getItem('hs-theme'); } catch (e) {} }
+      if (t) document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to the page</a>
+
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="arch" viewBox="0 0 28 14">
+      <path d="M3 12C4.2 6 8.2 2.6 14 2.6S23.8 6 25 12" fill="none" stroke="currentColor" stroke-width="4.2" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="github" viewBox="0 0 16 16">
+      <path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+    </symbol>
+    <symbol id="moon" viewBox="0 0 20 20">
+      <path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" d="M16.5 12.6A7 7 0 0 1 7.4 3.5a7 7 0 1 0 9.1 9.1Z"/>
+    </symbol>
+  </svg>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="wordmark" href="index.html" aria-label="Human Shaped, home">
+        <span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true"><use href="#arch"/></svg><span class="w" aria-hidden="true">shaped</span>
+      </a>
+      <nav class="nav" aria-label="Main">
+        <ul>
+          <li><a href="stage.html">The path</a></li>
+          <li><a href="#cohorts">Cohorts</a></li>
+          <li><a href="#apps">Apps</a></li>
+          <li><a href="#start">Start something</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
+          <svg aria-hidden="true"><use href="#moon"/></svg>
+        </button>
+        <a class="btn-github small" href="#signin">
+          <svg aria-hidden="true"><use href="#github"/></svg>
+          <span>Sign in<span class="long"> with GitHub</span></span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+
+    <div class="wrap">
+      <section class="hero" aria-labelledby="hero-title">
+        <div>
+          <h1 id="hero-title">Build software for the parts of life only people can do.</h1>
+          <p class="lead">Human Shaped is a free, five-week way to build an app of your own with an AI agent, alongside other people doing the same, without handing over the parts of the work where you actually learn. I built four apps this way before asking anyone else to, and I want it to be open to anyone with a problem worth solving.</p>
+          <div class="hero-actions">
+            <a class="btn-github" href="#signin" id="signin">
+              <svg aria-hidden="true"><use href="#github"/></svg>
+              Sign in with GitHub
+            </a>
+            <a class="text" href="stage.html">Read why we build</a>
+          </div>
+          <p class="fine">You sign in with GitHub because that is where your app will live, and everything you build stays in your own account.</p>
+        </div>
+
+        <aside class="weeks-card" aria-labelledby="weeks-title">
+          <h2 id="weeks-title">A cohort, week by week</h2>
+          <p>One live session a week, and something to show at the end of each one.</p>
+          <ol>
+            <li><b>Before</b><span>Your app's own address, open on your phone</span></li>
+            <li><b>Week 1</b><span>Why it exists, and a first version running on real data</span></li>
+            <li><b>Week 2</b><span>The same app, on a second platform</span></li>
+            <li><b>Week 3</b><span>Proof that it works, and a look of its own</span></li>
+            <li><b>Week 4</b><span>Your app on someone else's device</span></li>
+            <li><b>Week 5</b><span>A feature you wanted, shown to everyone</span></li>
+          </ol>
+        </aside>
+      </section>
+    </div>
+
+    <section class="section idea" aria-labelledby="idea-title">
+      <div class="wrap">
+        <div>
+          <p class="kicker">The idea</p>
+          <h2 id="idea-title">Some problems were never computer-shaped.</h2>
+        </div>
+        <div class="prose">
+          <p>In March, I typed a page about a post I had read on Bluesky, which said that we are only looking to solve "computer-shaped problems." A computer-shaped problem is one you can hand to a machine and be done with. But, learning, community and the people we love are not like that, because they only happen when a person does the work.</p>
+          <p>Human-shaped software takes the mechanical work off people's hands and leaves them the learning. Here is the difference in one of my own apps.</p>
+        </div>
+        <div class="compare">
+          <div>
+            <svg viewBox="0 0 240 96" aria-hidden="true">
+              <rect x="1" y="18" width="62" height="44" rx="4" class="f-line"/>
+              <path d="M26 32v16l13-8z" class="f-fill-muted"/>
+              <g class="f-bar"><rect x="84" y="10" width="150" height="6" rx="3"/><rect x="84" y="26" width="150" height="6" rx="3"/><rect x="84" y="42" width="150" height="6" rx="3"/><rect x="84" y="58" width="150" height="6" rx="3"/><rect x="84" y="74" width="150" height="6" rx="3"/></g>
+            </svg>
+            <p class="tag">Computer-shaped</p>
+            <p class="big">A model writes a blurb for each of ten thousand films in an afternoon, and most folks would never know.</p>
+          </div>
+          <div class="human">
+            <svg viewBox="0 0 240 96" aria-hidden="true">
+              <rect x="1" y="18" width="62" height="44" rx="4" class="f-line"/>
+              <path d="M26 32v16l13-8z" class="f-fill-muted"/>
+              <g transform="translate(84 6)"><circle cx="6" cy="5" r="4.5" class="f-clay"/><path d="M0 22v-3c0-4 2.6-6.2 6-6.2s6 2.2 6 6.2v3" class="f-clay-line"/></g><rect x="108" y="12" width="118" height="6" rx="3" class="f-clay-bar"/>
+              <g transform="translate(84 36)"><circle cx="6" cy="5" r="4.5" class="f-clay"/><path d="M0 22v-3c0-4 2.6-6.2 6-6.2s6 2.2 6 6.2v3" class="f-clay-line"/></g><rect x="108" y="42" width="64" height="6" rx="3" class="f-clay-bar"/>
+              <g transform="translate(84 66)"><circle cx="6" cy="5" r="4.5" class="f-clay"/><path d="M0 22v-3c0-4 2.6-6.2 6-6.2s6 2.2 6 6.2v3" class="f-clay-line"/></g><rect x="108" y="72" width="96" height="6" rx="3" class="f-clay-bar"/>
+            </svg>
+            <p class="tag">Human-shaped</p>
+            <p class="big">Archive Watch pulls each film's notes from the people who uploaded and reviewed it on archive.org, which is slower, and the words stay theirs.</p>
+          </div>
+          <p class="credit">The phrase "computer-shaped problems" comes from <a href="https://bsky.app/profile/mosheroperandi.bsky.social/post/3mgasswgabs23">a post on Bluesky</a> that started all of this.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="moves-title">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <p class="kicker">The method</p>
+            <h2 id="moves-title">Three moves, every time you build.</h2>
+          </div>
+          <p class="prose">An agent will happily write most of your code, and yet there are three things it cannot do for you, which is exactly why every round of building comes back to them.</p>
+        </div>
+        <ol class="moves">
+          <li>
+            <span class="n" aria-hidden="true">1</span>
+            <h3>Write it down</h3>
+            <p>Writing is how you find out what you believe, and a value you have not written down is one the agent building your app has no way to keep.</p>
+          </li>
+          <li>
+            <span class="n" aria-hidden="true">2</span>
+            <h3>Prove it</h3>
+            <p>Proving is how you find out whether it is true, so every "it works" points at something a person can look at on a real device, rather than the agent's word for it.</p>
+          </li>
+          <li>
+            <span class="n" aria-hidden="true">3</span>
+            <h3>Live with it</h3>
+            <p>Living with the app is how you find out what you missed, because the values you could not have predicted only show up when you use it every day, with the people it is for.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="section idea" id="cohorts" aria-labelledby="cohort-title">
+      <div class="wrap">
+        <div>
+          <p class="kicker">Cohorts</p>
+          <h2 id="cohort-title">Five weeks, with other people, for free.</h2>
+        </div>
+        <div class="prose">
+          <p>A cohort runs for about five weeks, with one live session each week on Google Meet, and every person in it builds one real app of their own for people they can actually name. Every session is recorded, so missing a week never means falling behind.</p>
+        </div>
+        <ol class="flow">
+          <li>
+            <svg viewBox="0 0 48 48" aria-hidden="true"><path class="i-line" d="M8 14.5a3 3 0 0 1 3-3h8l3.5 4H37a3 3 0 0 1 3 3V35a3 3 0 0 1-3 3H11a3 3 0 0 1-3-3z"/><path class="i-clay" d="M16 30c1-3.6 3.8-5.6 8-5.6s7 2 8 5.6"/></svg>
+            <div><h3>Your app lives on GitHub</h3><p>You build in your own repository, with your own AI agent, and it stays yours after the cohort ends.</p></div>
+          </li>
+          <li>
+            <svg viewBox="0 0 48 48" aria-hidden="true"><rect class="i-line" x="10" y="7" width="28" height="34" rx="3"/><path class="i-line" d="M16 30h16M16 35h10"/><path class="i-clay" d="M17 23c1-4.4 3.6-7 7-7s6 2.6 7 7"/></svg>
+            <div><h3>It gets a page here</h3><p>The hub reads your progress from GitHub with your permission, so the cohort can follow your app as it grows.</p></div>
+          </li>
+          <li>
+            <svg viewBox="0 0 48 48" aria-hidden="true"><path class="i-line" d="M7 12a3 3 0 0 1 3-3h19a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H17l-6 5v-5h-1a3 3 0 0 1-3-3z"/><path class="i-clay" d="M36 18h2a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3h-1v5l-6-5h-9a3 3 0 0 1-3-3v-2"/></svg>
+            <div><h3>Your cohort talks it through</h3><p>Classmates, partners and your teacher see your work in progress and talk about it on GitHub, in the open or just among yourselves.</p></div>
+          </li>
+        </ol>
+        <div class="cohort-facts">
+          <p class="prose">I want cohorts to stay free, and in time the people who finish one will be able to lead the next, which is how a method like this gets to more people than one teacher ever could.</p>
+          <p class="prose">The first cohort's dates will be posted here, and signing in with GitHub is how you will hear about them first.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="apps" aria-labelledby="apps-title">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <p class="kicker">Built this way</p>
+            <h2 id="apps-title">Four apps came before the method.</h2>
+          </div>
+          <p class="prose">Before I asked anyone to build like this, I built four apps this way myself, and the template you will start from is what they taught me.</p>
+        </div>
+        <ul class="apps">
+          <li class="app">
+            <h3>Archive Watch</h3>
+            <p class="own">"A cinematheque for the Internet Archive. Free, public domain, no account."</p>
+            <p class="facts">Started April 17, 2026, and now on Apple TV, iPhone, iPad, Mac, Android, Google TV, Fire TV, Fire tablets, Roku and the web, with 4,306 commits by the end of September.</p>
+            <p class="gave">It gave the template most of what it knows about shared data, TV platforms and testing on real devices, and the rule that only essential words belong on screen.</p>
+          </li>
+          <li class="app">
+            <h3>Tidbits Trivia</h3>
+            <p class="own">"Trivia from the whole of Wikipedia. Play solo, keep a daily streak, or pass the phone."</p>
+            <p class="facts">First built June 16, 2026, and now on the web, Apple's platforms, Android, and Windows through the Microsoft Store.</p>
+            <p class="gave">It taught the template how to play together across platforms, and the rule that a computer opponent is always labeled as one.</p>
+          </li>
+          <li class="app">
+            <h3>Bsky Dreams</h3>
+            <p class="own">"Built for people who want to think more, not less."</p>
+            <p class="facts">A way to read Bluesky, on the web and the iPhone.</p>
+            <p class="gave">It gave the template a feed ranked by the reader's own values rather than by engagement, and a reader mode for the links people share.</p>
+          </li>
+          <li class="app">
+            <h3>BOBA Playbook</h3>
+            <p class="own">"The definitive companion app for the Bo Jackson Battle Arena trading card game."</p>
+            <p class="facts">On the web and Android, and no longer in active development.</p>
+            <p class="gave">It is where the four questions every feature has to answer came from, and it stands as the proof that this method holds for large databases, huge numbers of files, camera scanning, 3D on iOS and pricing.</p>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section ways-section" id="start" aria-label="Other ways in">
+      <div class="wrap ways">
+        <div>
+          <p class="kicker">Going alone</p>
+          <h2>The template is for going it alone.</h2>
+          <div class="prose">
+            <p>Not everyone wants a cohort, and that is fine. The Universal App Template holds the whole method, from your first "why we build" paragraph to shipping in every store, and you can copy it on GitHub today without signing in here.</p>
+          </div>
+          <ul>
+            <li><a href="https://github.com/bhwilkoff/UniversalAppTemplate">The Universal App Template</a><p>Free to copy, and the same path a cohort follows.</p></li>
+            <li><a href="stage.html">Stage 00, Why we build</a><p>Where every app starts, whichever way you go.</p></li>
+          </ul>
+        </div>
+        <div>
+          <p class="kicker">Start something</p>
+          <h2>Bring it to a room of your own.</h2>
+          <div class="prose">
+            <p>The ideas are free to carry anywhere, and I am putting together what you need to lead a conversation or a day of building with the principles in front of everyone.</p>
+          </div>
+          <ul>
+            <li><a href="#start">Start a meetup</a><p>An evening at a library, a classroom or a kitchen table, with a guide to the conversation.</p></li>
+            <li><a href="#start">Run a Human-Shaped Hackathon</a><p>A day of building with the four questions on the wall and a show-and-tell at the end.</p></li>
+            <li><a href="#start">Declare your software human-shaped</a><p>A short set of principles your app can meet, and a mark you can put on it once it does.</p></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="band" aria-label="Sign in">
+      <div class="wrap">
+        <p class="big">Bring a problem only people can solve.</p>
+        <div>
+          <p class="small">Cohorts are free, and so are the method and the tools, because I would rather more people build this way than fewer.</p>
+          <p class="band-action"><a class="btn-github" href="#signin"><svg aria-hidden="true"><use href="#github"/></svg>Sign in with GitHub</a></p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <span class="wordmark" aria-label="Human Shaped"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true"><use href="#arch"/></svg><span class="w" aria-hidden="true">shaped</span></span>
+      <p>Made by <a href="https://learningischange.com">Ben Wilkoff</a>. The ideas, the method, the tools and the cohorts are free, and what you build is yours.</p>
+      <ul>
+        <li><a href="#">How we treat one another</a></li>
+        <li><a href="#">What we keep, and what we never own</a></li>
+        <li><a href="https://github.com/bhwilkoff/UniversalAppTemplate">The template on GitHub</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <script>
+    document.querySelectorAll('[data-theme-toggle]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var root = document.documentElement;
+        var cur = root.getAttribute('data-theme') ||
+          (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        var next = cur === 'dark' ? 'light' : 'dark';
+        root.setAttribute('data-theme', next);
+        try { localStorage.setItem('hs-theme', next); } catch (e) {}
+      });
+    });
+  </script>
+</body>
+</html>
