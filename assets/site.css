@@ -483,3 +483,19 @@ h3 { font-size: 1.25rem; letter-spacing: -0.012em; line-height: 1.25; }
 .next-stage { max-width: var(--measure); }
 @media (min-width: 56rem) { .toc-stack .stage-toc { grid-column: auto; grid-row: auto; } }
 @media (min-width: 56rem) { .join .wrap { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+
+/* Account */
+.account { max-width: 44rem; display: grid; gap: 1rem; }
+.account h2 { margin-top: 2rem; font-size: 1.35rem; }
+.account .who { display: flex; gap: 1rem; align-items: center; }
+.account .avatar { border-radius: 50%; border: 1px solid var(--rule); }
+.account .name { margin: 0; font-weight: 600; font-size: 1.15rem; }
+.account .error { color: var(--clay); font-weight: 600; }
+.cohort-card { background: var(--card); border: 1px solid var(--rule); border-radius: var(--radius); padding: 1.25rem; margin-top: 0.75rem; }
+.cohort-card h3 { margin: 0 0 0.35rem; font-size: 1.15rem; }
+.btn-quiet.danger { color: var(--clay); }
+dialog.confirm { max-width: 30rem; border: 1px solid var(--rule); border-radius: var(--radius); background: var(--paper, var(--card)); color: var(--ink); padding: 1.5rem; }
+dialog.confirm::backdrop { background: rgb(0 0 0 / 0.45); }
+dialog.confirm h2 { margin-top: 0; font-size: 1.3rem; }
+.account .small { color: var(--muted); font-size: 0.95rem; }
+.account { padding-bottom: 4rem; }

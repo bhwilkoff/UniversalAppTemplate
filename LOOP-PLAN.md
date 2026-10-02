@@ -79,8 +79,14 @@ verify what a person would see); push; log it below. "Fixed" and
   (`LICENSE.md`), chosen as the open default.
 - **A real test of the session recorder** before cohort 1, since the
   site promises recorded sessions.
-- Approval screens when creating the Supabase project and the GitHub
-  OAuth app.
+- **Turn on GitHub sign-in (two minutes, needs a secret only Ben should
+  handle).** The GitHub sign-in app is registered under the humanshaped
+  organization (client ID `Ov23li0LEW1AbQLRdNjs`). On its settings page
+  (github.com/organizations/humanshaped/settings/applications/3900551),
+  click "Generate a new client secret". Then in Supabase, humanshaped-hub,
+  Authentication, Sign In / Providers, GitHub: switch it on, paste the
+  client ID and the secret, and save. Then sign in once at
+  humanshaped.org/account/ so the agent can make Ben the first teacher.
 - The Google Admin and Cloud setup steps in `tools/README.md`.
 
 ## Log
@@ -123,3 +129,16 @@ verify what a person would see); push; log it below. "Fixed" and
   not yet verified on a real app: the first true test is a cohort
   member's week 3. Found and logged item 13 (palettes disagree across
   platforms).
+- 2026-10-02, item 4 (sign-in), most of it. Supabase project
+  `humanshaped-hub` created on the free plan (us-west-1). Schema and row
+  level security written, tested locally against real Postgres as four
+  people (26 checks, seen to fail when a rule was opened on purpose; the
+  test caught a real bug where a teacher could not read back a new
+  cohort), and applied. Supabase's security check then flagged seven
+  helpers callable through the API; moved to a private schema, tests
+  still pass, only leave_cohort and delete_my_account remain, on
+  purpose. GitHub sign-in app registered under humanshaped; Supabase
+  Site URL and redirect allow-list set. /account/ built (sign in, your
+  cohorts, open cohorts, join, leave, sign out, delete account) and
+  checked signed out and with a GitHub error. Not linked from the header
+  until Ben switches the provider on and a real sign-in is verified.
