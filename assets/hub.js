@@ -3,12 +3,9 @@
 // rules about who can see and change what live in the database itself
 // (supabase/migrations), not here.
 (function () {
-  var HUB = {
-    url: 'https://bifrieqzkihuxfzttgvd.supabase.co',
-    key: 'sb_publishable_bdJoZ7bc6Lk0Ug2Z37yn2g_A8AjkjKC'
-  };
+  var HUB = window.HUB;
   var root = document.querySelector('[data-account]');
-  if (!root || !window.supabase) return;
+  if (!root || !window.supabase || !HUB) return;
   var db = window.supabase.createClient(HUB.url, HUB.key);
 
   function show(state) {

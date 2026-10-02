@@ -142,3 +142,17 @@ verify what a person would see); push; log it below. "Fixed" and
   cohorts, open cohorts, join, leave, sign out, delete account) and
   checked signed out and with a GitHub error. Not linked from the header
   until Ben switches the provider on and a real sign-in is verified.
+- 2026-10-02, item 5 (teacher tools). /teach/ built: a teacher's
+  cohorts, a form for a new one (title, address, description, first day,
+  weeks, session day, time, length, time zone, places, status, open
+  conversations), "make the weekly sessions" (each session's time kept
+  in the cohort's own time zone across daylight saving changes), each
+  week's title, challenge, Meet link, and recording link, the roster,
+  groups with checkboxes, and "copy the setup for the Meet script" in
+  exactly the shape tools/meet-events reads. calendar_contacts added so
+  invitations need no email on the roster (30 database checks pass).
+  Verified: 8 tests for the date and setup calculations; the page drawn
+  against a stand-in database in light and dark, which caught the
+  template's known `[hidden]` versus `display` trap on the form, now
+  fixed. Not yet verified against the real database: that waits for
+  Ben's first sign-in.

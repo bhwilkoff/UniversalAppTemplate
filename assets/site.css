@@ -499,3 +499,22 @@ dialog.confirm::backdrop { background: rgb(0 0 0 / 0.45); }
 dialog.confirm h2 { margin-top: 0; font-size: 1.3rem; }
 .account .small { color: var(--muted); font-size: 0.95rem; }
 .account { padding-bottom: 4rem; }
+
+/* Teaching */
+.teach h3 { margin-top: 2rem; font-size: 1.15rem; }
+.cohort-form:not([hidden]), .session-row, .inline-form { display: grid; gap: 0.9rem; margin-top: 1rem; }
+.cohort-form label, .session-row label, .inline-form label { display: grid; gap: 0.35rem; font-weight: 600; font-size: 0.95rem; }
+.cohort-form input, .cohort-form select, .cohort-form textarea,
+.session-row input, .session-row textarea, .inline-form input {
+  font: inherit; font-weight: 400; padding: 0.6rem 0.7rem; border: 1px solid var(--muted);
+  border-radius: 10px; background: var(--card); color: var(--ink); min-height: 44px;
+}
+.cohort-form .row { display: grid; gap: 0.9rem; }
+.cohort-form .hint { font-weight: 400; color: var(--muted); font-size: 0.9rem; }
+label.check { display: flex; gap: 0.5rem; align-items: center; font-weight: 400; }
+.session-row { border-top: 1px solid var(--rule); padding-top: 1rem; }
+.session-when { margin: 0; font-weight: 600; }
+.roster { padding-left: 1.1rem; }
+.roster li { margin: 0.35rem 0; }
+@media (min-width: 40rem) { .cohort-form .row { grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); } }
+.teach h2, .account h2 { max-width: none; }

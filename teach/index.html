@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Teach a cohort | Human Shaped</title>
+  <meta name="description" content="Create and run a Human Shaped cohort: its dates, its weekly sessions, its groups, and the people in it.">
+  <link rel="canonical" href="https://humanshaped.org/teach/">
+  <meta property="og:url" content="https://humanshaped.org/teach/">
+  <meta property="og:site_name" content="Human Shaped">
+  <meta property="og:title" content="Teach a cohort">
+  <meta property="og:description" content="Create and run a Human Shaped cohort: its dates, its weekly sessions, its groups, and the people in it.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://humanshaped.org/assets/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="The human-shaped wordmark, with its hyphen drawn as an arch, above the line: build software for the parts of life only people can do.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#F7F6F2" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#141618" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/site.css">
+  <script>
+    (function () {
+      var q = location.search, t = null;
+      if (/[?&]dark\b/.test(q)) t = 'dark'; else if (/[?&]light\b/.test(q)) t = 'light';
+      else { try { t = localStorage.getItem('hs-theme'); } catch (e) {} }
+      if (t) document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+  <script src="/assets/site.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to the page</a>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
+      <nav class="nav" aria-label="Main">
+        <ul>
+          <li><a href="/path/">The path</a></li>
+          <li><a href="/why/">Why</a></li>
+          <li><a href="/principles/">Principles</a></li>
+          <li><a href="/cohorts/">Cohorts</a></li>
+          <li><a href="/apps/">Apps</a></li>
+          <li><a href="/start/">Start something</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#moon"/></svg>
+        </button>
+        <a class="btn-github small" href="/cohorts/#join">
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>
+          <span>Sign in<span class="long"> with GitHub</span></span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <div class="wrap">
+      <header class="page-head">
+        <p class="kicker">Teaching</p>
+        <h1>Run a cohort.</h1>
+        <p class="lead">A cohort is something you make here rather than something written into the site, so every detail of it (its dates, its weekly sessions, its groups, and what each week asks of people) is yours to set and to change as the cohort goes.</p>
+      </header>
+
+      <div class="account teach" data-teach aria-live="polite">
+        <section class="account-state" data-state="loading"><p>Checking whether you are signed in…</p></section>
+
+        <section class="account-state" data-state="signed-out" hidden>
+          <p>Teaching starts with signing in, the same way everyone else does.</p>
+          <p><a class="btn-github" href="/account/"><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Sign in with GitHub</a></p>
+        </section>
+
+        <section class="account-state" data-state="not-teacher" hidden>
+          <p>Teaching here is by invitation for now, while the first cohorts find their shape. If you would like to lead one, say so in <a href="https://github.com/orgs/humanshaped/discussions">the community discussions</a>, and Ben will be in touch.</p>
+        </section>
+
+        <section class="account-state" data-state="error" hidden>
+          <p class="error" data-error-text></p>
+          <p><button class="btn-quiet" type="button" data-reload>Try again</button></p>
+        </section>
+
+        <section class="account-state" data-state="teacher" hidden>
+          <h2>Your cohorts</h2>
+          <div data-cohort-list></div>
+          <p><button class="btn-quiet" type="button" data-new-cohort>Start a new cohort</button></p>
+
+          <form class="cohort-form" data-cohort-form hidden>
+            <h2 data-form-title>A new cohort</h2>
+            <label>Title <input name="title" required maxlength="120"></label>
+            <label>Short name for its address <input name="slug" required pattern="[a-z0-9-]+" maxlength="60" placeholder="fall-2026"><span class="hint">Lowercase letters, numbers, and hyphens.</span></label>
+            <label>What it is, in your words <textarea name="description" rows="3" maxlength="2000"></textarea></label>
+            <div class="row">
+              <label>First day <input type="date" name="starts_on"></label>
+              <label>Weeks <input type="number" name="weeks" min="1" max="26" value="5"></label>
+            </div>
+            <div class="row">
+              <label>Session day <select name="session_weekday">
+                <option value="">Not set</option><option value="0">Sunday</option><option value="1">Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5">Friday</option><option value="6">Saturday</option>
+              </select></label>
+              <label>Time <input type="time" name="session_time"></label>
+              <label>Minutes <input type="number" name="session_minutes" min="15" max="240" value="75"></label>
+            </div>
+            <div class="row">
+              <label>Time zone <input name="time_zone" list="zones" required></label>
+              <label>Places <input type="number" name="capacity" min="1" placeholder="No limit"></label>
+            </div>
+            <datalist id="zones" data-zones></datalist>
+            <label>Status <select name="status">
+              <option value="draft">Draft: only you can see it</option>
+              <option value="open">Open: people can join</option>
+              <option value="running">Running</option>
+              <option value="finished">Finished</option>
+            </select></label>
+            <label class="check"><input type="checkbox" name="conversations_open"> Open this cohort's conversations to people outside it</label>
+            <div class="actions">
+              <button class="btn-github" type="submit">Save the cohort</button>
+              <button class="btn-quiet" type="button" data-cancel>Cancel</button>
+            </div>
+            <p class="small" data-form-message></p>
+          </form>
+
+          <div class="cohort-detail" data-detail hidden>
+            <h2 data-detail-title></h2>
+            <p class="small" data-detail-meta></p>
+            <div class="actions">
+              <button class="btn-quiet" type="button" data-edit>Edit the details</button>
+              <button class="btn-quiet" type="button" data-make-sessions>Make the weekly sessions</button>
+              <button class="btn-quiet" type="button" data-copy-meet>Copy the setup for the Meet script</button>
+            </div>
+            <p class="small" data-detail-message></p>
+
+            <h3>Sessions</h3>
+            <div data-sessions></div>
+
+            <h3>People</h3>
+            <div data-roster></div>
+
+            <h3>Groups</h3>
+            <p class="small">Pairs, trios, or small groups. Everyone can see their own group and what it is for, and you can change them whenever the cohort needs it.</p>
+            <div data-groups></div>
+            <form class="inline-form" data-group-form>
+              <label>New group <input name="name" required maxlength="60" placeholder="Group 1"></label>
+              <label>What it is for <input name="expectations" maxlength="400" placeholder="Show each other your bring-back before each session"></label>
+              <button class="btn-quiet" type="submit">Add the group</button>
+            </form>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" defer></script>
+  <script src="/assets/hub-config.js" defer></script>
+  <script src="/assets/teach-lib.js" defer></script>
+  <script src="/assets/teach.js" defer></script>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
+      <p>Made by <a href="https://learningischange.com">Ben Wilkoff</a>. The ideas, the method, the tools, and the cohorts are free, and what you build is yours.</p>
+      <p class="credit">Built by Ben with an AI agent, Claude, set in Commissioner, and shared under <a href="https://github.com/bhwilkoff/UniversalAppTemplate/blob/site/LICENSE.md">open licenses</a>, so you can borrow anything here.</p>
+      <ul>
+        <li><a href="/cohorts/#together">How we treat one another</a></li>
+        <li><a href="/cohorts/#data">What we keep, and what we never own</a></li>
+        <li><a href="https://github.com/orgs/humanshaped/discussions">Discussions on GitHub</a></li>
+        <li><a href="https://github.com/bhwilkoff/UniversalAppTemplate">The template on GitHub</a></li>
+      </ul>
+    </div>
+  </footer>
+</body>
+</html>
