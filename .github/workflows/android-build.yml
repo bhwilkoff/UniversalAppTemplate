@@ -12,18 +12,30 @@
 
 name: Android Build
 
+# Web- and docs-only changes do not build Android. The paths list is
+# everything this build reads: the module, the shared assets it mirrors,
+# the one version number (rootProject.file("../AppVersion.xcconfig")),
+# the version-contract test the job runs, and this file. Tag pushes
+# still release: "Path filters are not evaluated for pushes of tags"
+# (GitHub Actions workflow syntax docs).
 on:
   pull_request:
     paths:
       - 'android/**'
+      - 'assets/**'
+      - 'AppVersion.xcconfig'
+      - 'tools/test_version_contract.py'
       - '.github/workflows/android-build.yml'
   push:
     branches: [main]
     tags:
       - 'v*-android'
-    # No paths: filter on push — tag pushes carry no file diff, so a
-    # paths filter would suppress the release job. Job-level `if:`
-    # blocks below gate which steps run per event.
+    paths:
+      - 'android/**'
+      - 'assets/**'
+      - 'AppVersion.xcconfig'
+      - 'tools/test_version_contract.py'
+      - '.github/workflows/android-build.yml'
   workflow_dispatch:
 
 jobs:
