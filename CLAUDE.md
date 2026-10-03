@@ -127,7 +127,15 @@ what waits on Ben.
 - **Scripts:** `assets/hub-config.js` (public URL and publishable key),
   `hub.js`, `cohorts.js`, `teach.js` with `teach-lib.js`, `cohort.js` and `live.js`
   with `cohort-lib.js`. Pure logic lives in the `-lib.js` files with
-  tests in `tools/test/` (`node --test tools/test/*.mjs`, 36 tests).
+  tests in `tools/test/` (`node --test tools/test/*.mjs`, 43 tests).
+- **Students' own agents** (research/notes/agent-connection-notes.md):
+  the `mcp` Edge Function (`supabase/functions/mcp/`, answers in
+  `shape.js`) is a read-only MCP server reached through Supabase Auth's
+  OAuth server, with its consent page at `/oauth/consent/` and the steps
+  at `/connect/`. Deploy it with verify_jwt off and with
+  `assets/cohort-lib.js` and `assets/teach-lib.js` beside it, whole.
+  Agents' tokens carry a `client_id`, and migration 6 makes them
+  read-only everywhere.
 - **Cohort conversation** (research/notes/cohort-conversation-notes.md):
   each cohort gets a private repository in `humanshaped` with
   Discussions and a secret team. The `cohort-access` Edge Function
