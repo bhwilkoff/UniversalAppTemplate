@@ -93,3 +93,27 @@ test('the extension line round-trips through the recorder settings parser', asyn
   assert.equal(parsed.cohorts[0].id, 'c1');
   assert.equal(parsed.cohorts[0].label, cohort.title);
 });
+
+test('groups each get a quiet room of their own, at the cohort times', () => {
+  const { cohort, errors } = gs.normalizeCohort({ ...base, groups: [{ key: 'g-1a2b3c4d', name: 'Trio A', members: 'A@example.com, b@gmail.com' }] });
+  assert.deepEqual([...errors], []);
+  const ev = gs.buildGroupRoomResource(cohort, cohort.groups[0]);
+  assert.equal(ev.summary, 'Human Shaped Software, cohort 1, Trio A room');
+  assert.deepEqual([...ev.recurrence], ['RRULE:FREQ=WEEKLY;COUNT=5;BYDAY=TU']);
+  assert.equal(ev.start.dateTime, '2026-10-20T17:00:00');
+  assert.deepEqual([...ev.attendees.map((a) => a.email)], ['a@example.com', 'b@gmail.com', 'teacher@example.org']);
+  assert.equal(ev.guestsCanSeeOtherGuests, false);
+  assert.equal(ev.extendedProperties.private.hsGroup, 'g-1a2b3c4d');
+  assert.doesNotMatch(ev.description, /—/);
+  assert.match(gs.groupRoomLines(cohort, { 'g-1a2b3c4d': 'https://meet.google.com/x' }), /Trio A: https:\/\/meet\.google\.com\/x/);
+});
+
+test('groups from a Sheet cell are JSON, and bad ones say what is wrong', () => {
+  const ok = gs.normalizeCohort({ ...base, groups: '[{"key":"g-1","name":"Pair B","members":"c@example.org"}]' });
+  assert.equal(ok.cohort.groups[0].name, 'Pair B');
+  const bad = gs.normalizeCohort({ ...base, groups: '[{"key":"has space","name":""}]' }).errors.join(' | ');
+  assert.match(bad, /key/);
+  assert.match(bad, /no name/);
+  assert.match(gs.normalizeCohort({ ...base, groups: '{nope' }).errors.join(' '), /JSON/);
+  assert.equal(gs.normalizeCohort(base).cohort.groups.length, 0);
+});
