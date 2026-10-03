@@ -644,3 +644,13 @@ label.check { display: flex; gap: 0.5rem; align-items: center; font-weight: 400;
 .setup-steps li.done::before { background: var(--clay); border-color: var(--clay); }
 .setup-steps li.done a { color: var(--muted); text-decoration: line-through; text-decoration-thickness: 1px; }
 .setup-steps li.optional::before { border-style: dashed; }
+
+/* Before the first session, on /teach/: steps that act on the page are
+   buttons, drawn like the links beside them. */
+.setup-steps button.link {
+  font: inherit; color: var(--clay); background: none; border: 0; padding: 0; margin: 0; cursor: pointer;
+  text-align: left; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.2em;
+}
+.setup-steps button.link:hover { text-decoration-thickness: 2px; }
+.setup-steps li.done button.link { color: var(--muted); text-decoration: line-through; }
+.teach .setup-card h3 { margin-top: 0; }

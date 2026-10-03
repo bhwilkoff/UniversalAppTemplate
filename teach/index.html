@@ -75,12 +75,47 @@
         <section class="account-state" data-state="loading"><p>Checking whether you are signed in…</p></section>
 
         <section class="account-state" data-state="signed-out" hidden>
-          <p>Teaching starts with signing in, the same way everyone else does.</p>
+          <p>Teaching starts with signing in, the same way everyone else does, and that is also how you ask to teach. <a href="/teach/guide/">The teaching guide</a> says what leading a cohort asks of you.</p>
           <p><a class="btn-github" href="/account/"><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Sign in with GitHub</a></p>
         </section>
 
-        <section class="account-state" data-state="not-teacher" hidden>
-          <p>Teaching here is by invitation for now, while the first cohorts find their shape. If you would like to lead one, say so in <a href="https://github.com/orgs/humanshaped/discussions">the community discussions</a>, and Ben will be in touch.</p>
+        <!-- The words in the three request states below were written by
+             Claude for milestone M2 and await Ben's review. -->
+        <section class="account-state" data-state="ask" hidden>
+          <h2 id="ask">Ask to teach</h2>
+          <p>Teaching here is by invitation while the first cohorts find their shape, so leading one starts with asking. <a href="/teach/guide/">The teaching guide</a> says what a cohort asks of its teacher and what you need before the first session.</p>
+          <form class="cohort-form" data-ask-form>
+            <label>Why you would like to teach a cohort <textarea name="why" rows="4" required maxlength="2000"></textarea></label>
+            <label>What you would bring to it <span class="hint">The people you would teach, where you would find them, and anything you have built this way.</span><textarea name="brings" rows="3" maxlength="2000"></textarea></label>
+            <p class="small">Only you and the people who approve teachers can read this, and you can change it or take it back until it has an answer.</p>
+            <div class="actions">
+              <button class="btn-github" type="submit" data-ask-submit>Send my request</button>
+              <button class="btn-quiet" type="button" data-ask-cancel hidden>Keep it as it was</button>
+            </div>
+            <p class="small" data-ask-message></p>
+          </form>
+        </section>
+
+        <section class="account-state" data-state="asked" hidden>
+          <h2 id="asked">Your request to teach</h2>
+          <p data-asked-status></p>
+          <div class="cohort-card">
+            <p class="kicker">Why you would like to teach</p>
+            <p data-asked-why></p>
+            <div data-asked-brings-box>
+              <p class="kicker">What you would bring</p>
+              <p data-asked-brings></p>
+            </div>
+          </div>
+          <div class="cohort-card" data-asked-reply-box hidden>
+            <p class="kicker">The answer</p>
+            <p data-asked-reply></p>
+          </div>
+          <div class="actions">
+            <button class="btn-quiet" type="button" data-asked-edit>Change the words</button>
+            <button class="btn-quiet danger" type="button" data-asked-withdraw>Take it back</button>
+          </div>
+          <p class="small" data-asked-message></p>
         </section>
 
         <section class="account-state" data-state="error" hidden>
@@ -89,6 +124,12 @@
         </section>
 
         <section class="account-state" data-state="teacher" hidden>
+          <div class="queue" data-requests hidden>
+            <h2>Asking to teach</h2>
+            <p class="small">People who would like to lead a cohort, oldest first. Approving one makes them a teacher here, able to make cohorts of their own, and whatever you write in the answer is what they will read.</p>
+            <div data-request-list></div>
+          </div>
+
           <div class="queue" data-queue>
             <h2>Waiting for your feedback</h2>
             <p class="small" data-queue-intro>When someone in one of your cohorts asks for feedback or asks a question, it waits here until you answer, oldest first.</p>
@@ -150,6 +191,12 @@
               <button class="btn-quiet danger" type="button" data-delete-draft hidden>Delete this draft</button>
             </div>
             <p class="small" data-detail-message></p>
+
+            <section class="cohort-card setup-card" aria-labelledby="cohort-setup-title" data-cohort-setup hidden>
+              <h3 id="cohort-setup-title">Before the first session</h3>
+              <p class="small">What this cohort needs before people arrive. Each step checks itself off when the hub can see it is done, and <a href="/teach/guide/#need">the teaching guide</a> says more about each one.</p>
+              <ol class="setup-steps" data-cohort-setup-steps></ol>
+            </section>
 
             <h3>Sessions</h3>
             <div data-sessions></div>

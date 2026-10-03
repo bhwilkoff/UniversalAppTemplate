@@ -188,7 +188,8 @@
       db.from('cohorts').select('*').eq('id', id).single(),
       db.from('sessions').select('*').eq('cohort_id', id).order('number'),
       db.from('enrollments').select('user_id, role, status, app_name, app_repo, app_url, profiles(github_login, display_name)').eq('cohort_id', id),
-      db.from('groups').select('id, name, expectations, group_members(user_id)').eq('cohort_id', id).order('name')
+      db.from('groups').select('id, name, expectations, group_members(user_id)').eq('cohort_id', id).order('name'),
+      db.from('github_access').select('state').eq('cohort_id', id).eq('user_id', me.id).maybeSingle()
     ]).then(function (res) {
       var bad = res.filter(function (r) { return r.error; })[0];
       if (bad) return fail('This cohort could not be loaded: ' + bad.error.message);
@@ -203,6 +204,7 @@
       drawSessions(res[1].data);
       drawRoster(res[2].data, res[3].data);
       drawGroups(res[3].data, res[2].data);
+      drawCohortSetup(res[1].data, res[4].data);
       form.hidden = true;
       var del = $('[data-delete-draft]');
       del.hidden = c.status !== 'draft';
@@ -212,6 +214,30 @@
     });
   }
   $('[data-edit]').addEventListener('click', function () { fillForm(current); });
+
+  // Before the first session: the steps a teacher's cohort needs, each
+  // checked off by what the hub can see (TeachLib.cohortSetupSteps). The
+  // card goes away once every step is done.
+  function drawCohortSetup(sessions, access) {
+    var steps = lib.cohortSetupSteps(current, sessions, access);
+    $('[data-cohort-setup]').hidden = steps.every(function (x) { return x.done; });
+    var list = $('[data-cohort-setup-steps]');
+    list.replaceChildren();
+    steps.forEach(function (x) {
+      var li = el('li', x.done ? 'done' : null);
+      var target;
+      if (x.href) { target = el('a', null, x.label); target.href = x.href; }
+      else {
+        target = el('button', 'link', x.label); target.type = 'button';
+        target.addEventListener('click', function () {
+          if (x.action === 'sessions') $('[data-make-sessions]').click(); else fillForm(current);
+        });
+      }
+      li.appendChild(target);
+      if (x.done) li.appendChild(el('span', 'visually-hidden', ' (done)'));
+      list.appendChild(li);
+    });
+  }
 
   // Only a draft can be deleted (the database allows nothing else), and
   // the button asks once more on the page itself before it does.
@@ -345,6 +371,156 @@
     });
   });
 
+  // ---- asking to teach ----------------------------------------------
+  // Someone who does not teach yet sees the request form, or their own
+  // request and its answer. The database decides who may read and
+  // change what (teacher_requests in supabase/migrations).
+  var myRequest = null;
+  var askForm = $('[data-ask-form]');
+  function loadMyRequest() {
+    return db.from('teacher_requests').select('*').eq('user_id', me.id).maybeSingle().then(function (r) {
+      if (r.error) return fail('Your request to teach could not be loaded: ' + r.error.message);
+      myRequest = r.data;
+      drawMyRequest();
+    });
+  }
+  function drawMyRequest() {
+    var state = lib.requestState(false, myRequest);
+    if (state === 'ask') {
+      askForm.reset();
+      $('[data-ask-cancel]').hidden = true;
+      say('[data-ask-submit]', 'Send my request');
+      say('[data-ask-message]', '');
+      show('ask');
+      if (location.hash === '#ask') $('#ask').scrollIntoView();
+      return;
+    }
+    var waiting = state === 'waiting';
+    say('[data-asked-status]', waiting
+      ? 'Your request is waiting for an answer, which will appear here. Until then, you can change its words or take it back.'
+      : 'Your request has an answer, and it was not a yes this time. Taking the request back clears it, so that you can ask again later.');
+    say('[data-asked-why]', myRequest.why);
+    say('[data-asked-brings]', myRequest.brings || '');
+    $('[data-asked-brings-box]').hidden = !myRequest.brings;
+    say('[data-asked-reply]', myRequest.reply || '');
+    $('[data-asked-reply-box]').hidden = !myRequest.reply;
+    $('[data-asked-edit]').hidden = !waiting;
+    var w = $('[data-asked-withdraw]');
+    w.textContent = 'Take it back';
+    w.removeAttribute('data-armed');
+    say('[data-asked-message]', '');
+    show('asked');
+  }
+  askForm.addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var f = askForm.elements;
+    var row = { why: f.why.value.trim(), brings: f.brings.value.trim() || null };
+    if (!row.why) return say('[data-ask-message]', 'Say a little about why you would like to teach, and then send it.');
+    var editing = !!myRequest;
+    var q = editing
+      ? db.from('teacher_requests').update(Object.assign({ updated_at: new Date().toISOString() }, row)).eq('user_id', me.id).select().single()
+      : db.from('teacher_requests').insert(Object.assign({ user_id: me.id }, row)).select().single();
+    say('[data-ask-message]', 'Sending…');
+    q.then(function (r) {
+      if (r.error) return say('[data-ask-message]', 'It could not be sent: ' + r.error.message);
+      myRequest = r.data;
+      drawMyRequest();
+    });
+  });
+  $('[data-asked-edit]').addEventListener('click', function () {
+    var f = askForm.elements;
+    f.why.value = myRequest.why;
+    f.brings.value = myRequest.brings || '';
+    $('[data-ask-cancel]').hidden = false;
+    say('[data-ask-submit]', 'Save the changes');
+    say('[data-ask-message]', '');
+    show('ask');
+    f.why.focus();
+  });
+  $('[data-ask-cancel]').addEventListener('click', drawMyRequest);
+  // Taking a request back asks once more on the page itself.
+  $('[data-asked-withdraw]').addEventListener('click', function () {
+    var b = this;
+    if (!b.hasAttribute('data-armed')) {
+      b.setAttribute('data-armed', '');
+      b.textContent = 'Take my request back';
+      say('[data-asked-message]', 'Its words will be deleted. Click again to take it back.');
+      return;
+    }
+    b.disabled = true;
+    db.from('teacher_requests').delete().eq('user_id', me.id).select('user_id').then(function (r) {
+      b.disabled = false;
+      if (r.error || !r.data.length) return say('[data-asked-message]', 'It could not be taken back: ' + (r.error ? r.error.message : 'no request was found') + '.');
+      myRequest = null;
+      drawMyRequest();
+    });
+  });
+
+  // People who can approve teachers see every waiting request, with a
+  // place to answer, an approve button that asks once more on the page,
+  // and a decline button.
+  function loadRequests() {
+    var wrap = $('[data-requests]');
+    return db.from('teacher_requests')
+      .select('user_id, why, brings, state, created_at, profiles!teacher_requests_user_id_fkey(github_login, display_name)')
+      .eq('state', 'waiting').then(function (r) {
+        var box = $('[data-request-list]');
+        wrap.hidden = false;
+        if (r.error) { box.replaceChildren(el('p', 'small error', 'The requests to teach could not be loaded: ' + r.error.message)); return; }
+        var waiting = lib.waitingRequests(r.data);
+        box.replaceChildren();
+        if (!waiting.length) { box.appendChild(el('p', 'small', 'No one is waiting to hear about teaching right now.')); return; }
+        waiting.forEach(function (q) { box.appendChild(requestCard(q)); });
+      });
+  }
+  function requestCard(q) {
+    var p = q.profiles || {};
+    var login = p.github_login || 'someone';
+    var card = el('article', 'cohort-card share');
+    var who = el('p', 'kicker');
+    var gh = el('a', null, p.display_name ? p.display_name + ' (@' + login + ')' : '@' + login);
+    gh.href = 'https://github.com/' + encodeURIComponent(login);
+    who.appendChild(gh);
+    who.appendChild(document.createTextNode(' asks to teach'));
+    card.appendChild(who);
+    card.appendChild(el('p', 'small', 'Asked ' + new Date(q.created_at).toLocaleDateString(undefined, { month: 'long', day: 'numeric' }) + '.'));
+    card.appendChild(el('p', null, q.why));
+    if (q.brings) {
+      card.appendChild(el('p', 'small', 'What they would bring'));
+      card.appendChild(el('p', null, q.brings));
+    }
+    var form = el('form', 'inline-form');
+    var label = el('label', null, 'Your answer, which they will read');
+    var input = el('textarea'); input.rows = 3; input.maxLength = 2000;
+    label.appendChild(input); form.appendChild(label);
+    var approve = el('button', 'btn-quiet', 'Approve'); approve.type = 'submit';
+    var decline = el('button', 'btn-quiet danger', 'Decline'); decline.type = 'button';
+    var msg = el('p', 'small');
+    var actions = el('div', 'actions'); actions.appendChild(approve); actions.appendChild(decline);
+    form.appendChild(actions); form.appendChild(msg);
+    function decide(yes) {
+      approve.disabled = decline.disabled = true;
+      db.rpc('decide_teacher_request', { person: q.user_id, approve: yes, answer: input.value.trim() || null }).then(function (r) {
+        approve.disabled = decline.disabled = false;
+        if (r.error) { msg.textContent = 'That was not saved: ' + r.error.message; return; }
+        loadRequests();
+      });
+    }
+    form.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      if (!approve.hasAttribute('data-armed')) {
+        approve.setAttribute('data-armed', '');
+        approve.textContent = 'Approve, and make @' + login + ' a teacher';
+        msg.textContent = 'They will be able to make and run cohorts of their own. Click again to approve.';
+        return;
+      }
+      decide(true);
+    });
+    decline.addEventListener('click', function () { decide(false); });
+    card.appendChild(form);
+    return card;
+  }
+
   // ---- start --------------------------------------------------------
   function load() {
     show('loading');
@@ -352,11 +528,13 @@
       var session = s.data && s.data.session;
       if (!session) return show('signed-out');
       me = session.user;
-      return db.from('teachers').select('user_id').eq('user_id', me.id).maybeSingle().then(function (r) {
+      return db.from('teachers').select('user_id, can_approve').eq('user_id', me.id).maybeSingle().then(function (r) {
         if (r.error) return fail('Your teaching access could not be checked: ' + r.error.message);
-        if (!r.data) return show('not-teacher');
+        if (!r.data) return loadMyRequest();
         show('teacher');
-        return Promise.all([loadList(), loadQueue()]);
+        var jobs = [loadList(), loadQueue()];
+        if (r.data.can_approve) jobs.push(loadRequests());
+        return Promise.all(jobs);
       });
     }).catch(function (err) { fail('Something went wrong: ' + (err && err.message ? err.message : 'no details') + '.'); });
   }

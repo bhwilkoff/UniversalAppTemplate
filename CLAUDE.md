@@ -104,7 +104,7 @@ what waits on Ben.
   `bifrieqzkihuxfzttgvd`, free plan, us-west-1, org "Learning is Change,
   Inc"). Schema and row-level security in `supabase/migrations/`, applied
   in order. `supabase/tests/test_policies.py` runs them against a local
-  throwaway Postgres as four people and as a student's AI agent (49
+  throwaway Postgres as four people and as a student's AI agent (79
   checks; agents' tokens carry a `client_id` and can only read); run it
   before applying
   any new migration, and see it fail when a rule is opened on purpose.
@@ -113,8 +113,11 @@ what waits on Ben.
   `humanshaped` org (client ID `Ov23li0LEW1AbQLRdNjs`; its secret lives
   only in Supabase). Supabase Site URL is https://humanshaped.org and the
   redirect allow-list is `https://humanshaped.org/**`. Ben's GitHub
-  account (`bhwilkoff`) becomes a teacher on its first sign-in; other
-  teachers are invited by adding a row to `public.teachers`.
+  account (`bhwilkoff`) becomes a teacher on its first sign-in, with
+  `can_approve`. Others ask to teach on /teach/ (`teacher_requests`),
+  and a teacher with `can_approve` decides there through
+  `decide_teacher_request`, which adds the `public.teachers` row. Only
+  a change by hand gives someone `can_approve`.
 - **Pages:** `/account/` (sign in, cohorts, join, leave, delete),
   `/teach/` (a teacher's cohorts, sessions, groups, roster, and the Meet
   script setup), `/cohort/?c=<slug>` (this week, next session, group,
@@ -123,11 +126,14 @@ what waits on Ben.
   timers, this week's stages, what people brought back). `/cohorts/`
   lists open cohorts from the database, and its "Join with GitHub" goes
   to `/account/?join=<slug>`, where the person confirms. /teach/ opens
-  with the feedback queue.
+  with requests to teach (for approvers) and the feedback queue, shows
+  a cohort's "Before the first session" steps, and gives everyone else
+  the request form. `/teach/guide/` is the teaching guide, with
+  `COURSE.md` rendered live.
 - **Scripts:** `assets/hub-config.js` (public URL and publishable key),
   `hub.js`, `cohorts.js`, `teach.js` with `teach-lib.js`, `cohort.js` and `live.js`
   with `cohort-lib.js`. Pure logic lives in the `-lib.js` files with
-  tests in `tools/test/` (`node --test tools/test/*.mjs`, 45 tests).
+  tests in `tools/test/` (`node --test tools/test/*.mjs`, 50 tests).
 - **Students' own agents** (research/notes/agent-connection-notes.md):
   the `mcp` Edge Function (`supabase/functions/mcp/`, answers in
   `shape.js`) is a read-only MCP server reached through Supabase Auth's
