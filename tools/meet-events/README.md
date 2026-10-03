@@ -73,6 +73,57 @@ humanshaped.org is there. Being invited on the event should let them
 in; test it with the Gmail account below before the first cohort, and if
 it does not, the fallback is pasting rooms made by hand on /teach/.
 
+### Rooms through the Meet REST API (C2)
+
+*Written by Claude, awaiting Ben's review.*
+
+A room made as a Calendar event lets its invited guests in, but nobody
+can say who else may come in or who helps run the call. So setup can
+make each group's room another way: as a Meet space made through the
+Meet REST API, which Google made generally available for members on
+September 11, 2026 (its release notes). Each room is then:
+
+- **TRUSTED**, which Google describes as letting in "members of the
+  host's organization, invited external users, and dial-in users"
+  without knocking, while everyone else knocks;
+- given the group's people as **members**, who can "join without
+  knocking";
+- given the teachers as **co-hosts**, who can help run the call
+  (Google says co-hosts cannot change its recording or moderation
+  settings).
+
+It is off until you turn it on, and the Calendar rooms stay the
+fallback. To turn it on:
+
+1. As meet@humanshaped.org, in the Cloud project `human-shaped`, open
+   APIs and services, Library, and enable the **Google Meet REST API**.
+2. Push the code (`clasp push`), which adds two scopes:
+   `meetings.space.created` (make rooms and set their members) and
+   `script.external_request` (the script calls the Meet API itself).
+3. In the editor, run `whoAmI` once and press Allow on the new consent
+   screen, which now lists making Meet rooms.
+4. Add the Script Property `ROOMS_VIA_MEET_API` with the value `true`.
+5. Run `setupCohort`. It prints a line for each group, a Meet link and
+   the room's `spaces/` name, and `checkCohort` reports each room's
+   access and members. On /teach/, paste everything after the group's
+   name into that group's "Its own Meet room"; the page keeps both.
+
+Running `setupCohort` again after the groups change sets every room's
+members to match: it adds the new people, removes those who left, and
+fixes a teacher who is not yet a co-host.
+
+**Not verified yet, and each needs the test call:**
+
+- whether a member on a personal Gmail account counts as an "invited
+  external user" and joins without knocking when nobody from
+  humanshaped.org is in the room;
+- whether Workspace for Education Fundamentals allows the Meet REST API
+  for meet@ at all (the docs name no edition);
+- whether adding a member sends them any email (the docs do not say;
+  we hope not, because the session page is how people find their room);
+- the exact Admin console setting if Google refuses the API for the
+  organization.
+
 ## What each function does
 
 The editor's Run button cannot pass an argument, so every function uses
@@ -83,8 +134,8 @@ it an id.
 |---|---|
 | `whoAmI` | Says which account the script is running as. It should be meet@humanshaped.org. |
 | `previewCohort` | Reads the definition, finds its mistakes, and says what setup would do. Changes nothing. |
-| `setupCohort` | Makes (or updates) the event, the Meet link, the guest list and the folder, syncs the folder's sharing to the roster, prints the line for the recorder extension, then runs the check. Running it again after a roster change brings everything back in line. |
-| `checkCohort` | The "check it works" report: the event exists, repeats the right number of weeks, starts at the right time, links the session page, has a Meet link, and invites exactly the roster; the folder exists, belongs to meet@, is shared with exactly the roster, has no "anyone with the link" sharing, and has no cohort recordings stranded outside it. Changes nothing. |
+| `setupCohort` | Makes (or updates) the event, the Meet link, the guest list and the folder, syncs the folder's sharing to the roster, makes each group's room (see above), prints the line for the recorder extension, then runs the check. Running it again after a roster change brings everything back in line. |
+| `checkCohort` | The "check it works" report: the event exists, repeats the right number of weeks, starts at the right time, links the session page, has a Meet link, and invites exactly the roster; the folder exists, belongs to meet@, is shared with exactly the roster, has no "anyone with the link" sharing, and has no cohort recordings stranded outside it; and each group has its room (with the Meet API, TRUSTED and with the right members). Changes nothing. |
 | `fileStrayRecordings` | Moves recorder uploads that landed at the top of My Drive into the cohort's folder (see the recorder's README for why that can happen). |
 
 The report reads like this:
@@ -200,6 +251,8 @@ services and asks for exactly these scopes:
 | `drive` | Make the folder, share it, read its sharing, and move stray recordings into it. Drive's narrower `drive.file` scope may not see the recorder's uploads (Google's documentation does not say), so this one is needed; an Internal app does not need Google's review for it. |
 | `spreadsheets.readonly` | Read the Cohorts sheet, if you use one. |
 | `userinfo.email` | Confirm the script runs as meet@. |
+| `meetings.space.created` | Make each group's room as a Meet space, and set its access and members (only with `ROOMS_VIA_MEET_API`). |
+| `script.external_request` | Call the Meet REST API, which has no advanced service in Apps Script. |
 
 ## Tests
 

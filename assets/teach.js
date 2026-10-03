@@ -827,20 +827,27 @@
   function roomForm(g) {
     var f = el('form', 'inline-form group-room');
     var l = el('label', null, 'Its own Meet room');
-    var input = el('input'); input.type = 'url'; input.placeholder = 'https://meet.google.com/…'; input.maxLength = 500;
-    input.value = g.meet_url || '';
+    // The line setupCohort prints: the link, and the room's spaces/ name
+    // when meet@ made it through the Meet REST API (RoomsLib.parseRoomLine).
+    var hasSpace = 'meet_space' in g && window.RoomsLib;
+    var input = el('input'); input.type = hasSpace ? 'text' : 'url'; input.placeholder = 'https://meet.google.com/…'; input.maxLength = 620;
+    input.value = (g.meet_url || '') + (hasSpace && g.meet_space ? ' | ' + g.meet_space : '');
     l.appendChild(input); f.appendChild(l);
     var save = el('button', 'btn-quiet', 'Save the room'); save.type = 'submit';
     var msg = el('span', 'small'); msg.setAttribute('role', 'status');
     var a = el('div', 'actions'); a.appendChild(save); a.appendChild(msg); f.appendChild(a);
     f.addEventListener('submit', function (ev) {
       ev.preventDefault();
-      var url = input.value.trim();
-      if (url && !/^https:\/\//.test(url)) { msg.textContent = 'A Meet link starts with https://.'; return; }
+      var url = input.value.trim(), patch = { meet_url: url || null };
+      if (hasSpace) {
+        var parsed = window.RoomsLib.parseRoomLine(url);
+        if (parsed.error) { msg.textContent = parsed.error; return; }
+        url = parsed.url; patch = { meet_url: parsed.url, meet_space: parsed.space };
+      } else if (url && !/^https:\/\//.test(url)) { msg.textContent = 'A Meet link starts with https://.'; return; }
       msg.textContent = 'Saving…';
-      db.from('groups').update({ meet_url: url || null }).eq('id', g.id).select('id').then(function (r) {
+      db.from('groups').update(patch).eq('id', g.id).select('id').then(function (r) {
         msg.textContent = r.error || !r.data.length ? 'Not saved: ' + (r.error ? r.error.message : 'the database refused') + '.' : (url ? 'Saved.' : 'Removed.');
-        if (!r.error) g.meet_url = url || null;
+        if (!r.error && r.data.length) Object.assign(g, patch);
       });
     });
     return f;

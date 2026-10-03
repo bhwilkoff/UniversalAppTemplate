@@ -187,6 +187,16 @@
             <div data-now-body></div>
           </section>
 
+          <!-- The rooms (C2, assets/rooms.js): each group's room, where it is
+               in its turns, and "We would like the teacher". A teacher sees
+               every group; anyone else, their own. Words by Claude, awaiting
+               Ben's review. -->
+          <section class="live-block" aria-labelledby="rooms-title" data-rooms-section hidden>
+            <h2 id="rooms-title">The rooms</h2>
+            <p class="small" data-rooms-intro></p>
+            <div class="room-board" data-rooms></div>
+          </section>
+
           <!-- During class (C6), for the cohort's teachers alone (assets/live-commits.js).
                Words by Claude, awaiting Ben's review. -->
           <section class="live-block live-pushed" aria-labelledby="pushed-title" data-pushed-section hidden>
@@ -288,6 +298,8 @@
   <script src="/assets/signals-lib.js" defer></script>
   <script src="/assets/signals.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.4.16/purify.min.js" integrity="sha512-flQmhkXNRQ3iUfvtdCobtpMjCb6kE+zLnTiAulAQJ3WykVfy84JvCMOo6vhwWXHTXjR25h9Zj+LyGFRWKjRoag==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
+  <script src="/assets/rooms-lib.js" defer></script>
+  <script src="/assets/rooms.js" defer></script>
   <script src="/assets/discussions-lib.js" defer></script>
   <script src="/assets/session-thread-lib.js" defer></script>
   <script src="/assets/discussions.js" defer></script>

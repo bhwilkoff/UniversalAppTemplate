@@ -1288,6 +1288,93 @@ def main():
     su9 = conn.cursor(); su9.execute("reset role")
     su9.execute("select count(*) from public.boards where cohort_id = %s", (bc,))
     check("when the cohort is finished, its boards are deleted", su9.fetchone()[0] == 0)
+
+    # The room board (migration 20261003180000): each group's step, whose
+    # turn it is, and "we would like the teacher", moved by the group and
+    # its teachers, read by the cohort, never written by an agent, and
+    # gone when the cohort finishes. bea and eve are a group, fay is in
+    # another, dee teaches elsewhere.
+    ben = as_user("ben")
+    attempt(ben, "insert into public.cohorts (slug, title, created_by, status) values ('room-test', 'Rooms', %s, 'open') returning id", (people["ben"],))
+    rc = last_rows[0][0]
+    attempt(ben, "insert into public.sessions (cohort_id, number) values (%s, 1) returning id", (rc,))
+    r1 = last_rows[0][0]
+    for name in ["bea", "eve", "fay"]:
+        cur = as_user(name)
+        attempt(cur, "insert into public.enrollments (cohort_id, user_id) values (%s, %s)", (rc, people[name]))
+    ben = as_user("ben")
+    attempt(ben, "insert into public.groups (cohort_id, name) values (%s, 'Room trio') returning id", (rc,))
+    rg = last_rows[0][0]
+    attempt(ben, "insert into public.groups (cohort_id, name) values (%s, 'Other trio') returning id", (rc,))
+    rg2 = last_rows[0][0]
+    attempt(ben, "insert into public.group_members (group_id, user_id) values (%s, %s), (%s, %s), (%s, %s)",
+            (rg, people["bea"], rg, people["eve"], rg2, people["fay"]))
+    check("a teacher records a group's room in the Meet API",
+          attempt(ben, "update public.groups set meet_space = 'spaces/abc-DEF_1' where id = %s returning meet_space", (rg,)) and last_rows == [("spaces/abc-DEF_1",)])
+    check("a room's API name must look like one",
+          not attempt(ben, "update public.groups set meet_space = 'https://meet.google.com/abc' where id = %s", (rg,)))
+    bea = as_user("bea")
+    check("a student cannot change their group's room",
+          attempt(bea, "update public.groups set meet_space = 'spaces/mine' where id = %s returning id", (rg,)) and last_rows == [])
+
+    move = "insert into public.live_room_state (cohort_id, session_id, group_id, step, presenter) values (%s, %s, %s, %s, %s) on conflict (session_id, group_id) do update set step = excluded.step, presenter = excluded.presenter returning step, updated_by"
+    bea = as_user("bea")
+    check("someone in a group moves its step",
+          attempt(bea, move, (rc, r1, rg, 1, people["bea"])) and last_rows == [(1, people["bea"])])
+    eve = as_user("eve")
+    check("anyone else in the group moves it on",
+          attempt(eve, move, (rc, r1, rg, 2, people["bea"])) and last_rows == [(2, people["eve"])])
+    fay = as_user("fay")
+    check("someone in another group cannot move this group's step", not attempt(fay, move, (rc, r1, rg, 3, people["bea"])))
+    check("a turn belongs to someone in the group", not attempt(eve, move, (rc, r1, rg, 0, people["fay"])))
+    check("a step is one of the turn's steps", not attempt(eve, move, (rc, r1, rg, 40, people["bea"])))
+    check("a group's place belongs to a session of its own cohort", not attempt(eve, move, (rc, s1, rg, 0, people["bea"])))
+    check("a group's place belongs to a group of its own cohort", not attempt(as_user("ben"), move, (rc, r1, bg, 0, None)))
+    dee = as_user("dee")
+    check("someone outside the cohort cannot move a group", not attempt(dee, move, (rc, r1, rg, 0, None)))
+    agent = as_agent("eve")
+    check("a student's agent cannot move their group", not attempt(agent, move, (rc, r1, rg, 3, people["bea"])))
+    fay = as_user("fay")
+    fay.execute("select step from public.live_room_state where group_id = %s", (rg,))
+    check("everyone in the cohort sees where each group is", fay.fetchall() == [(2,)])
+    dee = as_user("dee")
+    dee.execute("select count(*) from public.live_room_state")
+    check("someone outside the cohort sees no rooms", dee.fetchone()[0] == 0)
+    check("the public cannot see the rooms",
+          not attempt(as_user(None), "select count(*) from public.live_room_state") or last_rows == [(0,)])
+
+    eve = as_user("eve")
+    eve.execute("update public.live_room_state set help_at = '2000-01-01' where group_id = %s returning help_at > now() - interval '1 minute'", (rg,))
+    check("asking for the teacher is stamped with the database's clock", eve.fetchall() == [(True,)])
+    eve.execute("select help_at from public.live_room_state where group_id = %s", (rg,))
+    asked = eve.fetchone()[0]
+    bea = as_user("bea")
+    bea.execute("update public.live_room_state set help_at = now() + interval '1 day' where group_id = %s returning help_at", (rg,))
+    check("asking again keeps the first time", bea.fetchall() == [(asked,)])
+    fay = as_user("fay")
+    check("someone in another group cannot take the request back",
+          attempt(fay, "update public.live_room_state set help_at = null where group_id = %s returning group_id", (rg,)) and last_rows == [])
+    ben = as_user("ben")
+    check("the teacher says they are there, which clears the request",
+          attempt(ben, "update public.live_room_state set help_at = null where group_id = %s returning help_at, updated_by", (rg,)) and last_rows == [(None, people["ben"])])
+    ben_agent = as_agent("ben")
+    check("a teacher's agent cannot move a group",
+          not attempt(ben_agent, "update public.live_room_state set step = 4 where group_id = %s returning step", (rg,)) or last_rows == [])
+    ben = as_user("ben")
+    check("a room's place cannot move to another group",
+          not attempt(ben, "update public.live_room_state set group_id = %s where group_id = %s", (rg2, rg)))
+    bea = as_user("bea")
+    check("a student cannot delete a group's place",
+          attempt(bea, "delete from public.live_room_state where group_id = %s returning group_id", (rg,)) and last_rows == [])
+
+    ben = as_user("ben")
+    ben.execute("delete from public.group_members where group_id = %s and user_id = %s", (rg, people["bea"]))
+    ben.execute("select presenter from public.live_room_state where group_id = %s", (rg,))
+    check("someone who leaves a group is no longer named as presenting", ben.fetchall() == [(None,)])
+    ben.execute("update public.cohorts set status = 'finished' where id = %s", (rc,))
+    su9 = conn.cursor(); su9.execute("reset role")
+    su9.execute("select count(*) from public.live_room_state where cohort_id = %s", (rc,))
+    check("when the cohort is finished, where each group was is deleted", su9.fetchone()[0] == 0)
     conn.rollback()
     conn.close()
     failed = [n for n, ok in results if not ok]
