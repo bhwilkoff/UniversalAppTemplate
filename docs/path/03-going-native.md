@@ -131,12 +131,33 @@ Stage 04 is about why that matters.
 
 ## Working with your agent
 
-1. **Do the human part first.** A native app needs a developer account:
-   Apple's is $99 a year, Google Play's is $25 once. Create the account
-   yourself and tell the agent when it exists. Everything after that is
-   a conversation.
+1. **Do the human part first.** Putting the app on your own phone or
+   tablet costs nothing (stage 05 says how long each free way lasts),
+   but a store needs a developer account: Apple's is $99 a year, Google
+   Play's is $25 once. Create the account yourself when you need it, and
+   tell the agent when it exists. Everything after that is a
+   conversation.
 
-2. **Ask for the native version of everything.** Name the platforms and
+2. **Give the app a name of its own.** Every app made from the template
+   starts out as `com.example.appname`, and a phone keeps only one app
+   with a given identifier, so if you and a classmate both install apps
+   still carrying that name, the second one replaces the first. No
+   store will take it either. Before the first native build, ask the
+   agent to give your app its own reverse-domain identifier (something
+   like `org.yourname.birdlog`, which is yours for as long as the app
+   lives, so choose it with care) and the name people will see under the
+   icon:
+
+   > Give the app its own identity with tools/set_app_identity.py. Its
+   > name is Bird Log, and its identifier should be under org.yourname.
+   > Then show me where the name appears on each platform.
+
+   The agent changes every platform at once, and from then on a check in
+   the Android build fails if the placeholder ever comes back. Look for
+   the new name under the icon on your device, because that is where a
+   missed platform shows.
+
+3. **Ask for the native version of everything.** Name the platforms and
    ask for every feature, built the way each platform's people expect,
    with a plan and a parity matrix first. This is the June 9 prompt
    from the top of this page:
@@ -163,7 +184,7 @@ Stage 04 is about why that matters.
    > a lot of the instructions in the readme ... seem like things that
    > you can do programatically rather than having me do them in Xcode
 
-3. **Hold the native bar on the device.** Use the new app and say where
+4. **Hold the native bar on the device.** Use the new app and say where
    it feels borrowed from the first platform. Two of mine, from
    Archive Watch on the iPad and Tidbits Trivia on the Mac:
 
@@ -174,7 +195,7 @@ Stage 04 is about why that matters.
    > accessible via menus and hardly anything is. That is the design for
    > desktop-class apps and it should be so for ours as well.
 
-4. **When it says the platform cannot, show it an app that does.**
+5. **When it says the platform cannot, show it an app that does.**
    Agents give up on platform features too early. In March, the agent
    told me an iPhone share sheet could not open Bsky Dreams with a
    shared image, and I answered with the apps on my own phone:
@@ -188,7 +209,7 @@ Stage 04 is about why that matters.
 
    An hour later: "It worked!!! Thank you."
 
-5. **Ask what the oldest device could be, and what it would cost.** The
+6. **Ask what the oldest device could be, and what it would cost.** The
    agent measures it with throwaway test builds and tells you which
    devices each choice reaches. The choice is yours. If you have an old
    device in a drawer, bring it in. In September I dug out a Roku 2 XD
@@ -199,7 +220,7 @@ Stage 04 is about why that matters.
    > hardware, right? If the videos can run on a web browser, surely
    > they can run on old hardware.
 
-6. **Keep the modern devices modern.** When the floor starts holding
+7. **Keep the modern devices modern.** When the floor starts holding
    back newer devices, say so, and ask for newer features behind a
    capability check instead of dropping them for everyone. I said this the
    day before, when supporting old Rokus started to look like it would
@@ -209,11 +230,11 @@ Stage 04 is about why that matters.
    > modern Roku users if it is going to be hamstrung by the older
    > devices that are mostly stuck in 2014.
 
-7. **Check the matrix against your hands.** Ask the agent to update the
+8. **Check the matrix against your hands.** Ask the agent to update the
    parity matrix for the new platform. Then open one feature on both
    platforms and see whether they really do the same thing.
 
-8. **Make it look like itself.** Until now, your app has been wearing
+9. **Make it look like itself.** Until now, your app has been wearing
    the template's look, which is a placeholder, and every app made from
    the template starts out wearing the same one. Tell the agent who the
    app is for and how it should feel to them, and name three to five

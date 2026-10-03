@@ -353,9 +353,11 @@ the rest open.
   will need two laps of the path rather than one.
 - **Store accounts cost money** ($99 a year for Apple, $25 once for
   Google). Week 4 ends at an app installed on someone else's device,
-  which a test track or a direct share can do for free. Android's free
-  limited-distribution accounts, for students, teachers and hobbyists,
-  share an app with up to 20 devices.
+  which a direct share can do for free on Android and the web version
+  can do on an iPhone (test tracks need the store accounts). Android's
+  free limited-distribution accounts, for students, teachers, and
+  hobbyists, share an app with up to 20 devices (stage 05, "Sharing it
+  for free").
 - **How much to leave to discovery.** Research on teaching beginners
   is clear that open exploration without guidance leaves many of them
   lost. The path gives every stage numbered steps for that reason. I do

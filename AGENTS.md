@@ -139,6 +139,8 @@ conventions, and which skill fires first.
   `appname://item/x` has an `https://…/item/x` twin (DEEP_LINKS.md).
 - **One version everywhere, bumped on every ship**, from
   `AppVersion.xcconfig` (`tools/test_version_contract.py`).
+- **One identity everywhere**, set once with
+  `tools/set_app_identity.py`; never leave `com.example.appname` in a copy.
 - **Native components first**; no third-party Swift packages.
 - **Secrets never in git**, and never in cleartext on disk.
 

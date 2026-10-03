@@ -89,6 +89,7 @@ The runbooks are `docs/CLOUD-SUBMISSION.md` (build, sign, upload) and
 | `test_ios_floor.py`, `test_tvos_floor.py` | Refuse a deployment target above the floor you chose (stage 03). |
 | `submit-play.sh`, `play-publish.py`, `play_promote.py` | Build, upload, and promote Android releases on Google Play. |
 | `test_version_contract.py` | Holds Android's version name to `AppVersion.xcconfig`, the one version number. |
+| `set_app_identity.py`, `test_app_identity.py` | Give the app its own identifier and name on every platform at once (stage 03), and fail the Android build while a copy of the template still says `com.example.appname`. |
 | `audit_fire_tv_manifest.py`, `audit_fire_tv_gms.py` | The Fire TV build reaches older Fire OS and has no Google Play Services. |
 | `audit_tv_g6.py` | Google's TV requirement for 64-bit and 16 KB page alignment. |
 | `stamp_msix_version.py` | Stamps the Windows package version from `AppVersion.xcconfig`. |
