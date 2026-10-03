@@ -89,6 +89,57 @@ Samsung televisions) each have their own path, and the
 still need a browser for parts of the process. The skill says which
 parts, and how to drive them without guessing.
 
+## Sharing it for free
+
+Before a store, there is a person: a classmate, someone in your family,
+or the one friend who said they would try it. Getting the app onto their
+phone does not have to wait for a store account, and on Android it does
+not have to cost anything. What each free way costs is a limit instead:
+
+- **Android, from a link.** Push a tag ending in `-share` (for example
+  `v1.2.0-share`) and `android-build.yml` builds an APK and publishes it
+  on your repository's Releases page, where anyone can download it and
+  install it by allowing their browser to install apps. Every other
+  build keeps its APK on the run's page for 30 days, which only people
+  signed in to GitHub can download. Without your upload key saved as a
+  secret, each share is signed by a key made fresh for that build, so
+  the person has to remove the last one before installing the next.
+- **Android, after September 30, 2026.** Google has started requiring
+  that apps installed outside a store come from a registered developer,
+  first in Brazil, Indonesia, Singapore, and Thailand, and everywhere in
+  2027. Its free *limited distribution* account is meant for exactly
+  this: students, teachers, and hobbyists sharing an app with up to 20
+  devices, with only an email address and no fee. Installing over a USB
+  cable with `adb`, the way your agent already does, is not affected.
+- **Google Play, before the store.** Internal testing reaches up to 100
+  people you name by email, and it can start right away, but it needs
+  the $25 Play account. A personal account opened after November 13,
+  2023 also needs twelve testers in a closed test for fourteen days in a
+  row before the app can go to everyone.
+- **Apple, on your own devices.** Signed in to Xcode with an ordinary
+  Apple Account, you can install your app on up to three of your own
+  devices, and it stops opening after seven days until it is built
+  again. There is no free way to put an iPhone app on someone else's
+  phone: TestFlight and the App Store both need the $99 Apple Developer
+  Program.
+- **The web, always.** The website version is a link, and it works on
+  every phone today. If your app has a web version, it is the free way
+  to reach an iPhone.
+
+The cost of the free ways is that they are not the store. Nobody finds
+your app by searching, a direct share asks the person to trust a file
+from you, and none of it updates by itself. They are how someone else
+uses your app this week, which is the point of this stage, and the store
+can come after.
+
+Sources: Google's [developer verification](https://developer.android.com/developer-verification)
+and [rollout](https://developer.android.com/blog/posts/android-developer-verification-rolling-out-to-all-developers-on-play-console-and-android-developer-console)
+pages, its [account types](https://support.google.com/android-developer-console/answer/16604405),
+[Play testing tracks](https://support.google.com/googleplay/android-developer/answer/9845334),
+and [new personal account testing](https://support.google.com/googleplay/android-developer/answer/14151465),
+and Apple's [membership comparison](https://developer.apple.com/support/compare-memberships/),
+all read on October 3, 2026.
+
 ## What stays human
 
 Some things only a person can do, and the template does not pretend
@@ -109,7 +160,7 @@ full ship is the command line, and nobody is asked to press Submit.
 
 An Apple developer account is $99 a year, and Google Play is $25 once.
 The other stores are cheaper or free. The cloud builds are free for a
-public repository.
+public repository, and so is sharing an Android app from a link.
 
 It also costs patience. The first submission to every store takes
 longer than any after it, because the first one is where you meet every
@@ -117,11 +168,19 @@ form.
 
 ## Working with your agent
 
-1. **Open the accounts.** Create the store accounts yourself (Apple, and
-   Google Play if you have an Android app), pay for them, and agree to
-   their terms. Tell the agent when they exist.
+1. **Share it with one person first.** Ask the agent for the free way
+   that reaches the person you have in mind (a `-share` release for an
+   Android phone, the web version for an iPhone), then watch them
+   install it without helping. If they live in a country where Google
+   now asks for a registered developer, open the free limited
+   distribution account yourself first.
 
-2. **Ask for everything a submission needs.** In June, getting ready
+2. **Open the accounts.** When you are ready for a store, create the
+   accounts yourself (Apple, and Google Play if you have an Android
+   app), pay for them, and agree to their terms. Tell the agent when they
+   exist.
+
+3. **Ask for everything a submission needs.** In June, getting ready
    for Archive Watch's first iPhone release, this is how I started:
 
    > Let's get all of the info (screenshots, description, etc.) that we
@@ -131,7 +190,7 @@ form.
    answers what it can of the privacy questions, and tells you what only
    you can answer.
 
-3. **Make the words yours.** Read the store description and the release
+4. **Make the words yours.** Read the store description and the release
    notes out loud. Rewrite anything that sounds like a machine wrote it,
    and anything that is not true for that store. Your "no AI copy" rule
    from stage 00 applies to the store page too. In September the
@@ -148,7 +207,7 @@ form.
    > The what's new text should be different by platform because the
    > features are different.
 
-4. **Do the credential step together.** The build and submission run in
+5. **Do the credential step together.** The build and submission run in
    the cloud and need keys from your accounts. Ask the agent to take you
    to the exact screen for each one. This is how I did it in September,
    when Archive Watch's YouTube posting needed a token only I could
@@ -166,25 +225,25 @@ form.
    a `!` in front of the command the agent gives you, so the value goes
    straight where it belongs.
 
-5. **Say ship.** Then ask whether it is really done. This was me on
+6. **Say ship.** Then ask whether it is really done. This was me on
    September 3, before moving Archive Watch on to its next piece of work:
 
    > Did you ship it fully? I'd like to move on to another scope of work.
 
-6. **Paste the rejection whole.** If a store rejects the build, copy the
+7. **Paste the rejection whole.** If a store rejects the build, copy the
    entire message to the agent. It diagnoses, fixes and resubmits. If it
    says something cannot be done by the command line, and you know
    other apps do it, say so.
 
-7. **Install it like a stranger.** Open your app's page in the store on a
+8. **Install it like a stranger.** Open your app's page in the store on a
    device you did not build it on, and install it. That, not the green
    checkmark, is shipped.
 
-**When you are ready to move on,** someone who has never met you could
-install your app from a store. Once they can, you can no longer see
-everything that happens to it by using it yourself. Stage 06 is about
-seeing the rest.
+**When you are ready to move on,** someone else has your app on their
+own device, from a link you shared or from a store. Once they do, you
+can no longer see everything that happens to it by using it yourself.
+Stage 06 is about seeing the rest.
 
-Be ready to show your app in a store, installed on a device you did not
-build it on, and to explain one thing you rewrote in its listing, and
-why.
+Be ready to show your app installed on a device you did not build it
+on, to say what that person did first, and, if it is in a store, to
+explain one thing you rewrote in its listing, and why.
