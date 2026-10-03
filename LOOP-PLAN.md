@@ -89,15 +89,13 @@ real).
 **In progress:**
 
 - **M3. Live sessions beyond a companion page** (agent, started October 3).
+- **M4. The credential** (agent, started October 3).
+- **M7. Works the same with Gemini** (agent, started October 3).
 
 **Next:**
 
-- **M4. The credential:** Open Badges 3.0 issued from humanshaped.org,
-  with a public verification page and the teacher's issuing flow.
 - **M5. The movement toolkit, finished:** a meetup guide, a
   Human-Shaped Hackathon kit, and brand assets.
-- **M7. Works the same with Gemini:** agent-neutral setup across the
-  path, tested on a fresh copy with Gemini CLI.
 - Smaller: show the cohort's discussions on /cohort/ and /live/ once the
   GitHub App exists; design iteration two from Ben's notes.
 
