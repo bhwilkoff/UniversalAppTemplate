@@ -140,3 +140,20 @@ test('the contexts kept on the site are the published ones, unchanged', async ()
   assert.equal(await hash('credential/contexts/credentials-v2.json'), '59955ced6697d61e03f2b2556febe5308ab16842846f5b586d7f1f7adec92734');
   assert.equal(await hash('credential/contexts/ob-v3p0-context-3.0.3.json'), '3d34f4d4ef1bce691106e63798beb5e7b862ba841423f5ee1e53ab7ddf3bca84');
 });
+
+test('a hub record becomes the signing request the tool reads', () => {
+  const rec = { id: row.credential, issued_at: '2026-09-20T18:30:00.123456+00:00', platforms: ['web', 'android'],
+    platform_links: { android: row.links.android }, evidence_repo: 'bea-example/garden-swap', app_name: 'Garden Swap', app_url: row.app.url };
+  const req = lib.requestFromRecord(rec, { github_login: 'bea-example', display_name: 'Bea Example' }, { title: 'Test cohort' });
+  assert.deepEqual(req, { ...row, issued_at: '2026-09-20T18:30:00+00:00' });
+  assert.equal(lib.buildCredential(req).validFrom, '2026-09-20T18:30:00Z');
+});
+
+test('where a credential stands: the live record first, then the latest revoked one', () => {
+  assert.equal(lib.recordState([]).state, 'none');
+  assert.equal(lib.recordState([{ id: 1 }]).state, 'waiting');
+  assert.equal(lib.recordState([{ id: 1, revoked_at: '2026-10-01' }, { id: 2, signed: {} }]).record.id, 2);
+  assert.equal(lib.recordState([{ id: 1, signed: {} }]).state, 'signed');
+  const r = lib.recordState([{ id: 1, revoked_at: '2026-10-01' }, { id: 2, revoked_at: '2026-10-02' }]);
+  assert.deepEqual([r.state, r.record.id], ['revoked', 2]);
+});

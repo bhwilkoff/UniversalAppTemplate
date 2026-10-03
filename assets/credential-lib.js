@@ -194,6 +194,35 @@
     return c;
   }
 
+  // ---- the hub's records ----------------------------------------------
+  // A public.credentials row, with the person's profile and the cohort,
+  // in the shape the signing tool reads (the "signing request").
+  function requestFromRecord(rec, profile, cohort) {
+    var links = {};
+    Object.keys(rec.platform_links || {}).forEach(function (k) { links[k] = rec.platform_links[k]; });
+    return {
+      credential: rec.id,
+      // Postgres gives microseconds, which not every browser parses; the
+      // credential is dated to the second anyway.
+      issued_at: String(rec.issued_at).replace(/\.\d+/, ''),
+      person: { github_login: profile.github_login, name: profile.display_name || null },
+      cohort: { title: cohort.title },
+      app: { name: rec.app_name || null, repo: rec.evidence_repo, url: rec.app_url },
+      platforms: (rec.platforms || []).slice(),
+      links: links
+    };
+  }
+
+  // Where one person's credential stands in a cohort, from all the
+  // records for them there: the live one if there is one, or else the
+  // most recently revoked.
+  function recordState(records) {
+    var live = (records || []).filter(function (r) { return !r.revoked_at; })[0];
+    if (live) return { state: live.signed ? 'signed' : 'waiting', record: live };
+    var revoked = (records || []).slice().sort(function (a, b) { return (b.revoked_at || '').localeCompare(a.revoked_at || ''); })[0];
+    return revoked ? { state: 'revoked', record: revoked } : { state: 'none', record: null };
+  }
+
   // ---- reading a signed credential, for people ----------------------
   function describe(doc) {
     var s = doc.credentialSubject || {};
@@ -427,6 +456,7 @@
     achievement: achievement, achievementDocument: achievementDocument, achievementUrl: achievementUrl,
     problems: problems, buildCredential: buildCredential, credentialUrl: credentialUrl,
     describe: describe, matchesRow: matchesRow, stable: stable,
+    requestFromRecord: requestFromRecord, recordState: recordState,
     base58Encode: base58Encode, base58Decode: base58Decode,
     publicKeyMultibase: publicKeyMultibase, secretKeyMultibase: secretKeyMultibase,
     publicKeyBytes: publicKeyBytes, secretKeyBytes: secretKeyBytes,

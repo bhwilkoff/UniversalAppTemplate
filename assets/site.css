@@ -706,3 +706,43 @@ label.check { display: flex; gap: 0.5rem; align-items: center; font-weight: 400;
 /* Showing your app in public, on /cohort/ */
 .public-choice { display: grid; gap: 0.35rem; }
 .public-choice .hint { margin: 0 0 0 1.6rem; }
+
+/* ------------------------------------------------------------------
+   The credential (M4): /credential/, /credential/issuer/, and issuing
+   it on /teach/
+   ------------------------------------------------------------------ */
+.credential-page .page-head h1 { max-width: 18ch; overflow-wrap: anywhere; }
+.check-card h2 { font-size: 1.15rem; margin: 0 0 0.5rem; max-width: none; }
+.check-line { margin: 0; padding-left: 1.6rem; position: relative; }
+.check-line::before {
+  content: ""; position: absolute; left: 0; top: 0.3em; width: 1rem; height: 1rem;
+  border: 2px solid var(--edge); border-radius: 50%;
+}
+.check-line.is-ok::before { background: var(--clay); border-color: var(--clay); }
+.check-line.is-bad { color: var(--clay); font-weight: 600; }
+.check-line.is-bad::before { border-color: var(--clay); border-style: dashed; }
+.evidence { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--rule); }
+.evidence li { display: grid; gap: 0.1rem; padding: 0.8rem 0; border-bottom: 1px solid var(--rule); }
+.evidence a { font-weight: 600; }
+.evidence .small { overflow-wrap: anywhere; }
+.levels { margin-top: 1rem; }
+.levels li { display: grid; grid-template-columns: 2rem minmax(0, 1fr) auto; gap: 0.1rem 0.75rem; padding: 0.75rem 0; align-items: baseline; scroll-margin-top: 1.5rem; }
+.levels li:target .t { color: var(--clay); }
+.levels .t { font-size: 1.05rem; }
+.levels .l { grid-column: auto; font-size: 0.9rem; white-space: nowrap; }
+.levels .l a { display: inline; padding: 0; color: var(--clay); }
+.credential-topics { padding-bottom: 4rem; max-width: 46rem; }
+.credential-topics code { font-size: 0.95em; overflow-wrap: anywhere; }
+
+/* Issuing on /teach/ */
+.credential-person .who-line { margin: 0 0 0.35rem; font-weight: 600; }
+.credential-person .small { margin: 0 0 0.5rem; }
+.credential-person ul.links { list-style: none; margin: 0 0 0.5rem; padding: 0; display: flex; flex-wrap: wrap; gap: 0 1.25rem; font-weight: 600; overflow-wrap: anywhere; }
+.platform-choices { border: 1px solid var(--rule); border-radius: 10px; padding: 1rem; margin: 0; display: grid; gap: 0.25rem; }
+.inline-form label.check { min-height: 2.25rem; }
+.inline-form label.check input { min-height: 0; }
+.platform-choices legend { font-weight: 600; padding: 0 0.35rem; }
+.platform-choices input[type="url"] { margin-left: 1.6rem; }
+.signing-request { width: 100%; font: 500 0.85rem/1.5 var(--sans); padding: 0.6rem; border: 1px solid var(--muted); border-radius: 10px; background: var(--surface); color: var(--ink); }
+.file-pick { position: relative; overflow: hidden; }
+.file-pick input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
