@@ -163,3 +163,30 @@ Ben, October 2: "You can make whatever changes are necessary to get us
 up and running with an incredible universal app template and a hub
 website at humanshaped.org in order to get people on board with the
 Human Shaped movement."
+
+## Showing apps in public (October 3, 2026)
+
+**A student shows their app when they say it is ready, and every
+student submits their app by the end of the cohort.** Ben, October 3:
+"The student should opt in when they say that the app is ready. But,
+every student must submit their app to be included by the end of the
+cohort." **How to apply:** the switch on /cohort/ is the student's "it is
+ready"; the cohort page and the teacher's view show who has not
+submitted yet as the cohort nears its end.
+
+**A teacher can hide an app from public view, and it stays part of the
+cohort.** Ben: "It will always be a part of the cohort, but there are
+many reasons to not include an app publicly." **How to apply:** hiding
+removes it from /apps/ and the feed, never from the cohort's own pages.
+
+**The template's placeholder look can change later, as long as every
+platform matches.** Ben, on the slate palette from design-tokens.json:
+"I want to make sure that it matches the design of the other surfaces."
+**How to apply:** one design-tokens.json, every platform generated from
+it, and the parity test keeps them together.
+
+**Teacher moves wait on more research.** Ben was not sure about the
+session moves drafted into COURSE.md (pairs or trios, fading the prompt
+reading, lessons sent back). Research on online facilitation,
+project-, challenge-, and performance-based assessment, and online
+social learning comes before the tools that depend on them.
