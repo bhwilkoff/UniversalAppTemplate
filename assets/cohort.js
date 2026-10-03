@@ -152,6 +152,7 @@
           if (!mine && !teaching) return show('not-member');
           draw(people, mine, res[1].data, res[2].data, res[3].data, res[4].data, res[5].data);
           drawTalk(res[6].data);
+          drawSetup(mine, res[6].data);
         });
       });
     }).catch(function (err) { fail('Something went wrong: ' + (err && err.message ? err.message : 'no details') + '.'); });
@@ -185,6 +186,23 @@
     }
     box.appendChild(actions);
   }
+  // Getting ready: only for people in the cohort, and only while a step
+  // the hub can see is still undone (CohortLib.setupSteps).
+  function drawSetup(mine, access) {
+    var box = $('[data-setup]');
+    var steps = mine ? lib.setupSteps(mine, access, cohort) : [];
+    box.hidden = !steps.some(function (s) { return s.done === false; });
+    var list = $('[data-setup-steps]');
+    list.replaceChildren();
+    steps.forEach(function (s) {
+      var li = el('li', s.done ? 'done' : s.done === null ? 'optional' : null);
+      var a = link(s.href, s.label);
+      li.appendChild(a);
+      if (s.done) li.appendChild(el('span', 'visually-hidden', ' (done)'));
+      list.appendChild(li);
+    });
+  }
+
   function askButton(label) {
     var b = el('button', 'btn-quiet', label);
     b.type = 'button';

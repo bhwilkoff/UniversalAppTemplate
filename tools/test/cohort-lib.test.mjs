@@ -57,3 +57,15 @@ test('each week points at its stages of the path', () => {
   assert.deepEqual(lib.stagesForWeek(1), ['00', '01']);
   assert.deepEqual(lib.stagesForWeek(9), []);
 });
+
+test('setup steps read their state from the hub, and the agent step is never marked', () => {
+  const none = lib.setupSteps({ app_repo: null, app_url: null }, null, { github_team: 'cohort-x' });
+  assert.deepEqual(none.map((s) => s.key), ['setup', 'repo', 'address', 'talk', 'agent']);
+  assert.ok(none.slice(0, 4).every((s) => s.done === false));
+  assert.equal(none[4].done, null);
+  const most = lib.setupSteps({ app_repo: 'bea/garden', app_url: 'https://bea.github.io/garden/' }, { state: 'member' }, { github_team: 'cohort-x' });
+  assert.ok(most.slice(0, 4).every((s) => s.done === true));
+});
+test('without a cohort team yet, there is no conversation step', () => {
+  assert.ok(!lib.setupSteps({}, null, { github_team: null }).some((s) => s.key === 'talk'));
+});

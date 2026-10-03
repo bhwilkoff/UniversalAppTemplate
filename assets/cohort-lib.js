@@ -65,7 +65,24 @@
   var WEEK_STAGES = { 1: ['00', '01'], 2: ['02', '03'], 3: ['04'], 4: ['05', '06'], 5: ['07', '08'] };
   function stagesForWeek(n) { return WEEK_STAGES[n] || []; }
 
-  var lib = { agenda: agenda, stagesForWeek: stagesForWeek, currentAndNext: currentAndNext, commitLine: commitLine, ago: ago, repoPath: repoPath };
+  // The steps a new member takes before week 1, each one's state read
+  // from what the hub already knows, so nobody ticks a box by hand.
+  // "unknown" means the hub cannot see it (a connected agent lives with
+  // the person, not here), so it is offered as a link and never marked.
+  function setupSteps(mine, access, cohort) {
+    var steps = [
+      { key: 'setup', label: 'Read Getting set up, and make your own copy of the template', href: '/path/setup/', done: !!(mine && mine.app_repo) },
+      { key: 'repo', label: 'Add your app\u2019s repository under Your app, so your classmates can follow it', href: '#mine-title', done: !!(mine && mine.app_repo) },
+      { key: 'address', label: 'Add the address where your app is live, the first win', href: '#mine-title', done: !!(mine && mine.app_url) }
+    ];
+    if (cohort && cohort.github_team) {
+      steps.push({ key: 'talk', label: 'Open the cohort\u2019s conversation on GitHub', href: '#talk-title', done: !!(access && access.state === 'member') });
+    }
+    steps.push({ key: 'agent', label: 'Connect your own AI agent, if you would like it to know what the cohort is doing', href: '/connect/', done: null });
+    return steps;
+  }
+
+  var lib = { setupSteps: setupSteps, agenda: agenda, stagesForWeek: stagesForWeek, currentAndNext: currentAndNext, commitLine: commitLine, ago: ago, repoPath: repoPath };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
   else root.CohortLib = lib;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

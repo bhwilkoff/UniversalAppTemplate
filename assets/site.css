@@ -632,3 +632,15 @@ label.check { display: flex; gap: 0.5rem; align-items: center; font-weight: 400;
 .connect pre { margin: 0.5rem 0 1rem; padding: 0.9rem 1rem; background: var(--surface); border-radius: 10px;
   font: 500 0.875rem/1.55 var(--sans); white-space: pre-wrap; overflow-wrap: anywhere; }
 .notice { border-left: 3px solid var(--clay); padding: 0.6rem 1rem; margin: 1.5rem 0; max-width: var(--measure); }
+
+/* Getting ready, on /cohort/ */
+.setup-card { margin: 0 0 1.5rem; }
+.setup-steps { list-style: none; margin: 0.75rem 0 0; padding: 0; display: grid; gap: 0.6rem; }
+.setup-steps li { position: relative; padding-left: 2rem; }
+.setup-steps li::before {
+  content: ""; position: absolute; left: 0; top: 0.2em; width: 1.15rem; height: 1.15rem;
+  border: 2px solid var(--edge); border-radius: 50%;
+}
+.setup-steps li.done::before { background: var(--clay); border-color: var(--clay); }
+.setup-steps li.done a { color: var(--muted); text-decoration: line-through; text-decoration-thickness: 1px; }
+.setup-steps li.optional::before { border-style: dashed; }
