@@ -89,7 +89,9 @@ asks you to be ready to show something, [Showing your
 work](docs/path/showing-your-work.md) says how to get feedback on it,
 in a cohort or on your own.
 
-Teaching with it? `COURSE.md` maps the stages to weeks.
+Teaching with it? [`COURSE.md`](COURSE.md) maps the stages to weeks,
+and [`docs/teaching/`](docs/teaching/README.md) has a guide for each
+live session.
 
 ## Using it for your app
 
@@ -116,6 +118,7 @@ is the one page to keep open while you work.
 | `AGENTS.md` | The agent's instructions: who the app is for, the rules, which skill to use when. `CLAUDE.md` and `GEMINI.md` both import it, so every agent reads the same file. |
 | `SCRATCHPAD.md`, `DECISIONS.md`, `PARITY.md`, `DEEP_LINKS.md` | The project's memory: current state, the reasons behind choices, what exists on which platform, and the link contract. |
 | `docs/path/` | The nine stages, and two companions: talking to your agent, and showing your work. |
+| `COURSE.md`, `docs/teaching/` | The five-week cohort built on the path, and a one-page guide for each of its live sessions. |
 | `docs/` | The reference docs each stage points to. Map: [`docs/README.md`](docs/README.md). |
 | `.claude/skills/` | 146 skills, 56 of them written from shipped apps. Catalog: [`.claude/skills/README.md`](.claude/skills/README.md). |
 | `tools/` | Device testing, store submission, CI and Pulse tooling. Catalog: [`tools/README.md`](tools/README.md). |

@@ -31,13 +31,34 @@ than the work. The same research found that giving feedback teaches the
 giver as much as getting it teaches the receiver, which is why the path
 asks you to show your work to people rather than hand it in.
 
+A bring-back has six steps, and in a cohort they fit in about eight
+minutes: say what you want to know, show it, explain one decision, hear
+one question, hear three answers, and say what is next and whether the
+stage is ready.
+
+## Judge it yourself first
+
+Before you show anyone, reread the paragraph near the end of the stage
+that begins "When you are ready to move on." That paragraph is the bar.
+For each thing it names, decide whether your app is there yet: ready, or
+not yet. Nobody else's judgment is worth as much to you as this one,
+because you are the person who will do the next round.
+
+## Say what you want to know
+
+Then, before you show anything, say in one line what you want to know
+from the people watching. "Does the home screen make sense to someone
+who has never seen it?" gets a better answer than "What do you think?",
+because it tells your partners where to look. If you do not know yet,
+"Where did you get lost?" is always a fair question.
+
 ## Explain one decision, with the agent closed
 
-Before anyone says anything about what you showed, take two minutes,
-with your agent closed, to explain one decision behind it: why this
-source, why this floor, why that line and not another. Explain the
-decision, not the code. The agent wrote the code, and nobody needs you
-to recite it, but the decision was supposed to be yours.
+Show your work on the device it runs on. Then take two minutes, with
+your agent closed, to explain one decision behind it: why this source,
+why this floor, why that line and not another. Explain the decision,
+not the code. The agent wrote the code, and nobody needs you to recite
+it, but the decision was supposed to be yours.
 
 The studies of people learning to build with AI agree on where the loss
 comes from: handing over the understanding while feeling as if you
@@ -53,10 +74,19 @@ next prompt, and it might sound like this:
 
 Then correct anything in the answer that does not match what you know.
 
+## One question before any answers
+
+Before anyone says what they think, each person watching may ask one
+question to understand what they saw. A good one asks about something
+the agent could not have decided for you: "What did you give up?" or
+"Who is this screen for?" The question is there so that the answers
+which follow are about the app you meant to build, not the one your
+partner guessed at.
+
 ## Three questions for every bring-back
 
-Once you have explained your decision, the people watching answer three
-questions, out loud or in a line each, while you listen:
+Then the people watching answer three questions, out loud or in a line
+each, while you listen:
 
 1. **Where is it going?** What the app is for, as they understood it
    from what you showed them. If their answer is not your "why we build"
@@ -65,19 +95,33 @@ questions, out loud or in a line each, while you listen:
    that did not.
 3. **What is next?** One thing they would try.
 
+"Great job," on its own, answers none of the three questions, so when
+you hear it, ask for one thing that worked and one that did not.
+
 Then you say, in a sentence, what you will do next, and you write it in
 your note under "Next:". Every stage's "Be ready to..." line is built to
 fit this shape. What it asks you to show is how it is going, the
 decision it asks you to explain is where you are taking it, and what
-you say last is what comes next. "Great job," on its own, answers none of the three questions, so
-when you hear it, ask for one thing that worked and one that did not.
+you say last is what comes next.
+
+## Ready, or not yet
+
+Last, say whether the stage is ready or not yet, against the paragraph
+you reread at the start. A partner who saw it on a device can confirm
+it, because "it works" is a claim and the app in someone's hand is
+evidence. "Not yet" is an ordinary answer. It says what is missing, it
+goes into your note as the next round, and doing the stage again costs
+nothing.
 
 ## In a cohort
 
-In a cohort, you show your work to your group, the same partners from
-week to week, so the people answering the three questions are people who saw
-last week's version. Your teacher gives feedback too, and `COURSE.md`
-says how each live session makes room for all of it.
+In a cohort, you show your work to your group of three, the same
+partners from week to week, so the people answering the three questions
+are people who saw last week's version. Your teacher gives feedback too,
+and looks closely when the app reaches someone else's device, at the
+final showing, and whenever you say "not yet" about the same stage for
+a second time. `COURSE.md` says how each live session makes room for all
+of it.
 
 ## On your own
 
@@ -104,6 +148,18 @@ together, because each one sees something the others cannot.
   06 has the prompt). Copy what people say into your note first, decide
   what you think of it, and only then bring it to the agent.
 
+## Before you act on an AI review
+
+Feedback from an AI is easy to agree with, and that is the trouble with
+it. One small study found that people take an AI's feedback more
+readily than a teacher's and improve from it the least. So, treat the
+human-shaped review the way you treat a public comment. Before you ask
+the agent to change anything because of it, write two short lists in
+your note: what you agree with, and what you do not, each with a reason.
+Then send only the first list, in your own words. If both lists are
+empty, read it again, because the review did not give you anything to
+decide yet.
+
 ## What it costs
 
 Showing unfinished work is uncomfortable, and it is supposed to be
@@ -111,7 +167,8 @@ unfinished. On Archive Watch's third day, the commits run from "UI
 feedback pass" to "UI feedback round 7", and every one of those rounds
 was me sending back a list of what was still wrong. A friend's time is
 a real thing to ask for, so give something back, the way stage 07 asks
-you to with anyone who shapes your app. And a public post brings in strangers, not all of them kind, so
-you decide which comments get an answer and which only get read.
+you to with anyone who shapes your app. And a public post brings in
+strangers, not all of them kind, so you decide which comments get an
+answer and which only get read.
 
 Who will see your next round?
