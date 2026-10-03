@@ -86,11 +86,22 @@ real).
   /path/showing-your-work/; stages 00 to 07 end by asking for one
   decision explained. Pushed to main; the page verified live.
 
+- **M7. Works the same with Gemini,** in the template. Found: Gemini
+  CLI stopped serving free and Google AI Pro accounts on June 18, 2026
+  (Google points them to Antigravity, which reads AGENTS.md and
+  GEMINI.md but cuts any rule file past 24,000 bytes; AGENTS.md is
+  about 49,900). GEMINI.md now imports AGENTS.md (loaded once, tested
+  with Gemini CLI 0.46 and its debug log), three skills are linked into
+  .agents/skills/ (symlinks: fine on Mac, Linux, and GitHub, but they
+  may arrive as text files on Windows without symlink support), the
+  path notes Antigravity where a step differs, and
+  tools/test_agent_files.py checks the imports, links, and named
+  skills. Antigravity itself is sourced, not tested. Pushed to main.
+
 **In progress:**
 
 - **M3. Live sessions beyond a companion page** (agent, started October 3).
 - **M4. The credential** (agent, started October 3).
-- **M7. Works the same with Gemini** (agent, started October 3).
 
 **Next:**
 
@@ -111,8 +122,14 @@ real).
      as an issue or pull request (M8, COURSE.md).
   4. The template's new placeholder palette, a quiet slate on neutral
      gray (M6).
-  5. All new copy from M1, M2, and M8 is drafted in Ben's voice and
-     waits for his read.
+  5. All new copy from M1, M2, M7, and M8 is drafted in Ben's voice and
+     waits for his read (Ben, October 3: a copy audit comes later).
+  6. Shorten AGENTS.md below 24,000 bytes so Antigravity reads all of
+     it (moving platform detail into docs it points to)? Recommended.
+  7. Which Google lane the course names, now that Gemini CLI is paid
+     and Antigravity's free limit is unpublished.
+  8. Link all of the template's skills into .agents/skills/, or keep
+     three links and the pointer skill?
 
 - **Connecting students' agents, once** (core item 3; the design and
   sources are in `research/notes/agent-connection-notes.md`). In the
