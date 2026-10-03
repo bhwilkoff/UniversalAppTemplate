@@ -60,6 +60,8 @@
 }
 
 *, *::before, *::after { box-sizing: border-box; }
+/* hidden always wins, whatever display a class sets (the trap this site has hit twice). */
+[hidden] { display: none !important; }
 html { -webkit-text-size-adjust: 100%; }
 
 body {

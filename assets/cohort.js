@@ -138,20 +138,21 @@
           db.from('sessions').select('*').eq('cohort_id', cohort.id).order('number'),
           db.from('groups').select('id, name, expectations, group_members(user_id)').eq('cohort_id', cohort.id),
           db.from('shares').select('id, user_id, kind, url, note, created_at, feedback(id, author_id, body, created_at)').eq('cohort_id', cohort.id).order('created_at', { ascending: false }).limit(40),
-          db.from('calendar_contacts').select('email').eq('cohort_id', cohort.id).eq('user_id', me.id).maybeSingle()
+          db.from('calendar_contacts').select('email').eq('cohort_id', cohort.id).eq('user_id', me.id).maybeSingle(),
+          db.from('cohort_teachers').select('user_id, profiles(github_login, display_name)').eq('cohort_id', cohort.id)
         ]).then(function (res) {
           var bad = res.filter(function (r) { return r.error; })[0];
           if (bad) return fail('This cohort could not be loaded: ' + bad.error.message);
           var people = res[0].data;
           var mine = people.filter(function (p) { return p.user_id === me.id; })[0];
           if (!mine && !res[1].data.length && !people.length) return show('not-member');
-          draw(people, mine, res[1].data, res[2].data, res[3].data, res[4].data);
+          draw(people, mine, res[1].data, res[2].data, res[3].data, res[4].data, res[5].data);
         });
       });
     }).catch(function (err) { fail('Something went wrong: ' + (err && err.message ? err.message : 'no details') + '.'); });
   }
 
-  function draw(people, mine, sessions, groups, shares, contact) {
+  function draw(people, mine, sessions, groups, shares, contact, teachers) {
     $('[data-title]').textContent = cohort.title;
     $('[data-lead]').textContent = cohort.description || '';
     var t = lib.currentAndNext(sessions, new Date(), cohort.session_minutes);
@@ -188,7 +189,10 @@
     var box = $('[data-people]'); box.replaceChildren();
     people.filter(function (p) { return p.role === 'student' || p.role === 'mentor'; }).forEach(function (p) { box.appendChild(personCard(p)); });
     if (!box.children.length) box.appendChild(el('p', 'small', 'No one has joined yet.'));
-    drawShares(shares, people);
+    // Teachers share and give feedback too, so their names are known here.
+    drawShares(shares, people.concat((teachers || []).filter(function (t) {
+      return !people.some(function (p) { return p.user_id === t.user_id; });
+    })));
     show('ready');
   }
 
