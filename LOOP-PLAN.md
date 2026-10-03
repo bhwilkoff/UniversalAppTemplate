@@ -136,6 +136,22 @@ dynamic client registration (and the authorization path) in the OAuth
 Server settings, and unchecking "Allow members to create teams". Not
 yet seen: the invitation a brand-new member gets.
 
+- **Cohort conversation on the site.** /cohort/ shows the five newest
+  discussions from the cohort's private repository, opens a thread in
+  place, and posts replies and new conversations as the student through
+  GitHub's GraphQL API with their own GitHub App token (kept in
+  sessionStorage, removed from supabase-js's saved copy); /live/ shows
+  the newest three with "Add it to the queue". **Verified for real as
+  Ben** with a labeled test cohort on the cohort-test team: the page read
+  the repository's discussions, and a conversation started on the page
+  reached GitHub as discussion #2 by bhwilkoff in General (then deleted,
+  with the test cohort). That settles the open question of whether the
+  App's Discussions permission covers posting. Note for testing: after a
+  deploy, browsers keep the old scripts for up to ten minutes.
+- Ben finished his setup: dynamic client registration is on (the OAuth
+  server lists /auth/v1/oauth/clients/register) and members can no
+  longer create teams.
+
 **In progress:**
 
 
