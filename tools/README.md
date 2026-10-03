@@ -18,6 +18,10 @@ session, so nothing depends on my personal login.
   only the host installs. After the host has told everyone, it records
   the Meet tab with the host's microphone, keeps the file on the host's
   computer, and uploads it to the cohort's folder.
+- [`meet-addon/`](meet-addon/) is the deployment file and setup steps
+  for the Human Shaped add-on inside Meet (the side panel at `/addon/`
+  and the main stage at `/addon/stage/`), tested on our own accounts
+  first and then listed publicly. It records nothing.
 
 Neither one keeps anything of a student's beyond the email address they
 gave us for the invite, which follows the rule that the hub owns only

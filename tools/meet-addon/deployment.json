@@ -1,0 +1,17 @@
+{
+  "addOns": {
+    "common": {
+      "name": "Human Shaped",
+      "logoUrl": "https://humanshaped.org/assets/brand/icon.png"
+    },
+    "meet": {
+      "web": {
+        "sidePanelUrl": "https://humanshaped.org/addon/",
+        "supportsScreenSharing": true,
+        "addOnOrigins": ["https://humanshaped.org"],
+        "logoUrl": "https://humanshaped.org/assets/brand/icon.png",
+        "darkModeLogoUrl": "https://humanshaped.org/assets/brand/icon.png"
+      }
+    }
+  }
+}
