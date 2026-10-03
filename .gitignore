@@ -1,2 +1,8 @@
 .DS_Store
 node_modules/
+
+# Copied in by tools/deploy-mcp.sh while deploying
+supabase/functions/mcp/cohort-lib.js
+supabase/functions/mcp/teach-lib.js
+supabase/functions/mcp/live-lib.js
+supabase/.temp/
