@@ -851,6 +851,128 @@ def main():
     su8.execute("select count(*) from public.share_confirmations where user_id = %s", (people["eve"],))
     check("when someone leaves, the confirmations they gave leave with them", su8.fetchone()[0] == 0)
 
+    # Live signals (migration 20261003110000): rooms, come back, a card,
+    # who is on stage, and "recording now". Ben teaches; bea, eve, and fay are
+    # in the cohort; dee teaches another cohort; anon is the public.
+    ben = as_user("ben")
+    attempt(ben, "insert into public.cohorts (slug, title, created_by, status) values ('signals-test', 'Signals', %s, 'open') returning id", (people["ben"],))
+    sc = last_rows[0][0]
+    attempt(ben, "insert into public.sessions (cohort_id, number) values (%s, 1) returning id", (sc,))
+    ss1 = last_rows[0][0]
+    for name in ["bea", "eve", "fay"]:
+        cur = as_user(name)
+        attempt(cur, "insert into public.enrollments (cohort_id, user_id) values (%s, %s)", (sc, people[name]))
+    send = "insert into public.live_signals (cohort_id, session_id, created_by, kind, body, people, ends_at) values (%s, %s, %s, %s, %s, %s::uuid[], now() + %s::interval) returning id"
+
+    def sig(who, kind, body=None, ppl=None, ends=None, session=None, by=None):
+        return attempt(who, send, (sc, session or ss1, people[by or "ben"], kind, body, ppl, ends))
+
+    ben = as_user("ben")
+    check("a teacher can send everyone to their rooms with a time to come back", sig(ben, "rooms", ends="25 minutes"))
+    rooms_sig = last_rows[0][0]
+    check("a teacher can show a card in their own words, with a countdown",
+          sig(ben, "card", body="You have 5 minutes of worktime left", ends="5 minutes"))
+    card_sig = last_rows[0][0]
+    check("a card must have words", not sig(ben, "card", body="   "))
+    check("only a card has words", not sig(ben, "together", body="hello"))
+    check("a countdown cannot end in the past", not sig(ben, "rooms", ends="-1 minute"))
+    check("a countdown ends within four hours", not sig(ben, "card", body="Long", ends="5 hours"))
+    check("only rooms and a card count down", not sig(ben, "recording", ends="10 minutes"))
+    check("a teacher can put people from the cohort on stage",
+          sig(ben, "stage", ppl="{%s,%s}" % (people["bea"], people["eve"])))
+    stage_sig = last_rows[0][0]
+    check("the stage names only people in the cohort",
+          not sig(ben, "stage", ppl="{%s}" % people["dee"]))
+    check("the stage names each person once",
+          not sig(ben, "stage", ppl="{%s,%s}" % (people["bea"], people["bea"])))
+    check("the stage holds at most three people",
+          not sig(ben, "stage", ppl="{%s,%s,%s,%s}" % (people["bea"], people["eve"], people["ben"], people["fay"])))
+    check("only the stage names people", not sig(ben, "card", body="Hi", ppl="{%s}" % people["bea"]))
+    check("a teacher can say the recording is running", sig(ben, "recording"))
+    rec_sig = last_rows[0][0]
+    check("a teacher sends signals only in their own name", not sig(ben, "together", by="bea"))
+    check("a signal belongs to one of the cohort's own sessions", not sig(ben, "together", session=other_session))
+
+    bea = as_user("bea")
+    check("a student cannot send a signal", not sig(bea, "together", by="bea"))
+    dee = as_user("dee")
+    check("a teacher of another cohort cannot send a signal here", not sig(dee, "together", by="dee"))
+    bea = as_user("bea")
+    bea.execute("select count(*) from public.live_signals where cohort_id = %s", (sc,))
+    check("everyone in the cohort sees the signals", bea.fetchone()[0] == 4)
+    dee = as_user("dee")
+    dee.execute("select count(*) from public.live_signals where cohort_id = %s", (sc,))
+    check("someone outside the cohort sees none of its signals", dee.fetchone()[0] == 0)
+    anon = as_user(None)
+    anon.execute("select count(*) from public.live_signals")
+    check("the public sees no signals", anon.fetchone()[0] == 0)
+    bea = as_user("bea")
+    bea.execute("update public.live_signals set cleared_at = now() where id = %s", (rooms_sig,))
+    check("a student cannot clear a signal", bea.rowcount == 0)
+    bea.execute("delete from public.live_signals where id = %s", (card_sig,))
+    check("a student cannot delete a signal", bea.rowcount == 0)
+
+    ben = as_user("ben")
+    check("a teacher can give the rooms five more minutes",
+          attempt(ben, "update public.live_signals set ends_at = ends_at + interval '5 minutes' where id = %s returning id", (rooms_sig,)) and len(last_rows) == 1)
+    check("a moved countdown still ends in the future",
+          not attempt(ben, "update public.live_signals set ends_at = now() - interval '1 minute' where id = %s", (rooms_sig,)))
+    check("a card's words cannot change once it is shown",
+          not attempt(ben, "update public.live_signals set body = 'Something else' where id = %s", (card_sig,)))
+    check("a teacher can take a card down",
+          attempt(ben, "update public.live_signals set cleared_at = '2000-01-01' where id = %s returning cleared_at > '2001-01-01'", (card_sig,)) and last_rows == [(True,)])
+    check("a cleared signal stays cleared",
+          not attempt(ben, "update public.live_signals set cleared_at = null where id = %s", (card_sig,)))
+
+    agent = as_agent("bea")
+    agent.execute("select count(*) from public.live_signals where cohort_id = %s", (sc,))
+    check("a student's agent can read the signals", agent.fetchone()[0] == 4)
+    ben_agent = as_agent("ben")
+    check("a teacher's agent cannot send a signal", not sig(ben_agent, "together"))
+    ben_agent.execute("update public.live_signals set cleared_at = now() where id = %s", (rec_sig,))
+    check("a teacher's agent cannot clear a signal", ben_agent.rowcount == 0)
+    ben_agent.execute("delete from public.live_signals where id = %s", (rec_sig,))
+    check("a teacher's agent cannot delete a signal", ben_agent.rowcount == 0)
+
+    # Saved cards are the teacher's own.
+    ben = as_user("ben")
+    check("a teacher can save a card to reuse",
+          attempt(ben, "insert into public.card_presets (user_id, body, minutes) values (%s, 'You have 5 minutes of worktime left', 5) returning id", (people["ben"],)))
+    preset = last_rows[0][0]
+    check("a saved card has words",
+          not attempt(ben, "insert into public.card_presets (user_id, body) values (%s, ' ')", (people["ben"],)))
+    bea = as_user("bea")
+    check("a student cannot save cards",
+          not attempt(bea, "insert into public.card_presets (user_id, body) values (%s, 'Mine')", (people["bea"],)))
+    check("no one saves a card in someone else's name",
+          not attempt(as_user("dee"), "insert into public.card_presets (user_id, body) values (%s, 'Yours')", (people["ben"],)))
+    dee = as_user("dee")
+    dee.execute("select count(*) from public.card_presets")
+    check("another teacher cannot see someone's saved cards", dee.fetchone()[0] == 0)
+    bea = as_user("bea")
+    bea.execute("select count(*) from public.card_presets")
+    check("a student cannot see a teacher's saved cards", bea.fetchone()[0] == 0)
+    ben_agent = as_agent("ben")
+    check("a teacher's agent cannot save a card",
+          not attempt(ben_agent, "insert into public.card_presets (user_id, body) values (%s, 'From the agent')", (people["ben"],)))
+    ben_agent.execute("delete from public.card_presets where id = %s", (preset,))
+    check("a teacher's agent cannot remove a saved card", ben_agent.rowcount == 0)
+    ben = as_user("ben")
+    ben.execute("delete from public.card_presets where id = %s", (preset,))
+    check("a teacher can remove a saved card", ben.rowcount == 1)
+
+    # Kept only as long as the session needs it.
+    eve = as_user("eve")
+    eve.execute("select public.leave_cohort(%s)", (sc,))
+    su9 = conn.cursor(); su9.execute("reset role")
+    su9.execute("select count(*) from public.live_signals where id = %s", (stage_sig,))
+    check("when someone leaves, a stage that names them goes", su9.fetchone()[0] == 0)
+    ben = as_user("ben")
+    ben.execute("update public.cohorts set status = 'finished' where id = %s", (sc,))
+    su9 = conn.cursor(); su9.execute("reset role")
+    su9.execute("select count(*) from public.live_signals where cohort_id = %s", (sc,))
+    check("when the cohort is finished, its signals are deleted", su9.fetchone()[0] == 0)
+
     conn.rollback()
     conn.close()
     failed = [n for n, ok in results if not ok]
