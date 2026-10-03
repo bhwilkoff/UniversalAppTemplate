@@ -161,6 +161,13 @@ what waits on Ben.
   from GitHub, never copied. The database holds membership, sessions,
   groups, what people choose to share, feedback, calendar emails (only
   the student and teachers can see them), and credentials.
+- **The credential:** Open Badges 3.0, issued by `did:web:humanshaped.org`
+  (`.well-known/did.json` holds only public keys), signed with
+  `eddsa-rdfc-2022` by `tools/credential/` on the signer's own computer.
+  The private key never goes in this repository or a web page. Logic in
+  `assets/credential-lib.js`; pages `/credential/?id=<id>` and
+  `/credential/issuer/`; issuing on `/teach/` for finished cohorts. See
+  `tools/credential/README.md` and `research/notes/credential-build-notes.md`.
 - **Directory:** github.com/humanshaped/directory (listings as files,
   nightly scan, issue form). `/apps/` reads its `directory.json`.
 - **Meet tools:** `tools/meet-events` (Apps Script as

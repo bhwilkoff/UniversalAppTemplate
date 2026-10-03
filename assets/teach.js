@@ -189,9 +189,10 @@
       db.from('sessions').select('*').eq('cohort_id', id).order('number'),
       db.from('enrollments').select('user_id, role, status, app_name, app_repo, app_url, profiles(github_login, display_name)').eq('cohort_id', id),
       db.from('groups').select('id, name, expectations, group_members(user_id)').eq('cohort_id', id).order('name'),
-      db.from('github_access').select('state').eq('cohort_id', id).eq('user_id', me.id).maybeSingle()
+      db.from('github_access').select('state').eq('cohort_id', id).eq('user_id', me.id).maybeSingle(),
+      db.from('credentials').select('*').eq('cohort_id', id)
     ]).then(function (res) {
-      var bad = res.filter(function (r) { return r.error; })[0];
+      var bad = res.slice(0, 5).filter(function (r) { return r.error; })[0];
       if (bad) return fail('This cohort could not be loaded: ' + bad.error.message);
       current = res[0].data;
       var c = current;
@@ -205,6 +206,7 @@
       drawRoster(res[2].data, res[3].data);
       drawGroups(res[3].data, res[2].data);
       drawCohortSetup(res[1].data, res[4].data);
+      drawCredentials(res[2].data, res[5]);
       form.hidden = true;
       var del = $('[data-delete-draft]');
       del.hidden = c.status !== 'draft';
@@ -370,6 +372,217 @@
       openCohort(current.id);
     });
   });
+
+  // ---- the credential -----------------------------------------------
+  // For a finished cohort, each person who stayed: record their
+  // credential once the teacher has opened the evidence, copy the signing
+  // request for the signing tool, attach the signed file when it comes
+  // back (checked here first), and revoke it if that is ever needed. The
+  // database decides who may do each of these (migration 20261003070000).
+  var cred = window.CredentialLib;
+  function drawCredentials(people, result) {
+    var finished = current.status === 'finished';
+    $('[data-credentials-later]').hidden = finished;
+    $('[data-credentials]').hidden = !finished;
+    if (!finished || !cred) return;
+    var box = $('[data-credential-list]');
+    box.replaceChildren();
+    if (result.error) { box.appendChild(el('p', 'small error', 'The credentials could not be loaded: ' + result.error.message)); return; }
+    var here = people.filter(function (p) { return p.status !== 'left'; });
+    if (!here.length) { box.appendChild(el('p', 'small', 'No one stayed in this cohort to the end.')); return; }
+    here.forEach(function (p) {
+      var mine = result.data.filter(function (r) { return r.user_id === p.user_id; });
+      box.appendChild(credentialCard(p, cred.recordState(mine)));
+    });
+  }
+
+  function linkList(items) {
+    var ul = el('ul', 'links');
+    items.forEach(function (x) {
+      var li = el('li'); var a = el('a', null, x[0]); a.href = x[1]; a.rel = 'noopener';
+      li.appendChild(a); ul.appendChild(li);
+    });
+    return ul;
+  }
+
+  function credentialCard(p, now) {
+    var card = el('article', 'cohort-card credential-person');
+    card.appendChild(el('p', 'who-line', personName(p) + (p.profiles ? ' (@' + p.profiles.github_login + ')' : '')));
+    var status = el('p', 'small');
+    card.appendChild(status);
+    var msg = el('p', 'small');
+    var rec = now.record;
+    var day = function (iso) { return new Date(iso).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' }); };
+
+    if (now.state === 'waiting' || now.state === 'signed') {
+      var links = [['The repository', 'https://github.com/' + rec.evidence_repo], ['On the web', rec.app_url]];
+      (rec.platforms || []).slice(1).forEach(function (id) {
+        links.push(['On ' + cred.platform(id).label, (rec.platform_links || {})[id]]);
+      });
+      card.appendChild(linkList(links));
+    }
+
+    if (now.state === 'signed') {
+      status.textContent = cred.levelName(cred.levelFor(rec.platforms)) + '. Signed on ' + day(rec.signed_at) + ', and public at its own page, which the holder can share.';
+      var actions = el('div', 'actions');
+      var open = el('a', 'btn-quiet', 'Open its page'); open.href = '/credential/?id=' + rec.id;
+      actions.appendChild(open);
+      var revoke = el('button', 'btn-quiet danger', 'Revoke it'); revoke.type = 'button';
+      actions.appendChild(revoke);
+      card.appendChild(actions);
+      var why = el('label', null, 'Why, for the record (only the cohort’s teachers and the holder read it)');
+      var whyInput = el('input'); whyInput.maxLength = 500; why.appendChild(whyInput);
+      var whyForm = el('div', 'inline-form'); whyForm.appendChild(why); whyForm.hidden = true;
+      card.appendChild(whyForm);
+      revoke.addEventListener('click', function () {
+        if (!revoke.hasAttribute('data-armed')) {
+          revoke.setAttribute('data-armed', '');
+          revoke.textContent = 'Revoke it for good';
+          whyForm.hidden = false;
+          msg.textContent = 'Its page will say it was revoked, and it will no longer open finished cohorts. Revoking cannot be undone, and a higher level is issued as a new credential afterwards. Click again to revoke.';
+          return;
+        }
+        revoke.disabled = true;
+        db.from('credentials').update({ revoked_at: new Date().toISOString(), revoked_reason: whyInput.value.trim() || null }).eq('id', rec.id).select('id').then(function (r) {
+          revoke.disabled = false;
+          if (r.error || !r.data.length) { msg.textContent = 'It was not revoked: ' + (r.error ? r.error.message : 'the database refused') + '.'; return; }
+          openCohort(current.id);
+        });
+      });
+      card.appendChild(msg);
+      return card;
+    }
+
+    if (now.state === 'waiting') {
+      status.textContent = cred.levelName(cred.levelFor(rec.platforms)) + '. Recorded on ' + day(rec.issued_at) + ', and waiting to be signed.';
+      var request = cred.requestFromRecord(rec, p.profiles || { github_login: '' }, current);
+      var acts = el('div', 'actions');
+      var copy = el('button', 'btn-quiet', 'Copy what the signing tool needs'); copy.type = 'button';
+      var pick = el('label', 'btn-quiet file-pick', 'Attach the signed file');
+      var file = el('input'); file.type = 'file'; file.accept = '.json,application/json,application/ld+json';
+      pick.appendChild(file);
+      var remove = el('button', 'btn-quiet danger', 'Remove this record'); remove.type = 'button';
+      acts.appendChild(copy); acts.appendChild(pick); acts.appendChild(remove);
+      card.appendChild(acts);
+      var shown = el('textarea', 'signing-request'); shown.readOnly = true; shown.rows = 8; shown.hidden = true;
+      shown.value = JSON.stringify(request, null, 2);
+      card.appendChild(shown);
+      card.appendChild(msg);
+
+      copy.addEventListener('click', function () {
+        var done = function () { msg.textContent = 'Copied. On the signer’s computer, run: pbpaste | node tools/credential/sign.mjs --key <the key file> > signed.json, then attach signed.json here.'; };
+        var fallback = function () { shown.hidden = false; shown.select(); msg.textContent = 'Copy the text above, then give it to the signing tool.'; };
+        if (navigator.clipboard) navigator.clipboard.writeText(shown.value).then(done, fallback); else fallback();
+      });
+
+      file.addEventListener('change', function () {
+        var f = file.files && file.files[0];
+        if (!f) return;
+        msg.textContent = 'Checking the signed file…';
+        f.text().then(function (text) {
+          var doc;
+          try { doc = JSON.parse(text); } catch (e) { throw new Error('That file is not JSON.'); }
+          if (!cred.matchesRow(doc, request)) throw new Error('That file is not the signed credential for this record. Its words or links differ from what was recorded here.');
+          return window.CredentialCheck.check(doc).then(function (r) {
+            if (!r.ok) throw new Error('Its signature does not check out. ' + r.reason);
+            return db.from('credentials').update({ signed: doc }).eq('id', rec.id).select('id');
+          });
+        }).then(function (r) {
+          if (r.error || !r.data.length) throw new Error('It was not saved: ' + (r.error ? r.error.message : 'the database refused') + '.');
+          openCohort(current.id);
+        }).catch(function (err) { msg.textContent = err.message; file.value = ''; });
+      });
+
+      remove.addEventListener('click', function () {
+        if (!remove.hasAttribute('data-armed')) {
+          remove.setAttribute('data-armed', '');
+          remove.textContent = 'Remove it, before it is signed';
+          msg.textContent = 'For a record made by mistake. Click again to remove it.';
+          return;
+        }
+        remove.disabled = true;
+        db.from('credentials').delete().eq('id', rec.id).select('id').then(function (r) {
+          remove.disabled = false;
+          if (r.error || !r.data.length) { msg.textContent = 'It was not removed: ' + (r.error ? r.error.message : 'the database refused') + '.'; return; }
+          openCohort(current.id);
+        });
+      });
+      return card;
+    }
+
+    // Nothing live yet (or only a revoked one): offer to record it.
+    var before = now.state === 'revoked' ? 'Their last credential was revoked on ' + day(rec.revoked_at) + '. ' : '';
+    if (!p.app_repo || !/^https:\/\//.test(p.app_url || '')) {
+      status.textContent = before + 'Waiting for their repository and the live address of their app, which they add on the cohort page.';
+      return card;
+    }
+    status.textContent = before + 'Not issued yet.';
+    card.appendChild(linkList([['The repository', 'https://github.com/' + p.app_repo], ['On the web', p.app_url]]));
+    var start = el('button', 'btn-quiet', 'Issue the credential'); start.type = 'button';
+    var startRow = el('div', 'actions'); startRow.appendChild(start); card.appendChild(startRow);
+
+    var f = el('form', 'inline-form'); f.hidden = true;
+    var set = el('fieldset', 'platform-choices');
+    set.appendChild(el('legend', null, 'Where else it is published, if anywhere'));
+    var inputs = {};
+    cred.PLATFORMS.slice(1).forEach(function (pl) {
+      var l = el('label', 'check');
+      var cb = el('input'); cb.type = 'checkbox';
+      l.appendChild(cb); l.appendChild(document.createTextNode(' ' + pl.label));
+      var url = el('input'); url.type = 'url'; url.placeholder = 'https:// where people get it'; url.hidden = true;
+      url.setAttribute('aria-label', 'Where people get it on ' + pl.label);
+      cb.addEventListener('change', function () { url.hidden = !cb.checked; url.required = cb.checked; level(); if (cb.checked) url.focus(); });
+      set.appendChild(l); set.appendChild(url);
+      inputs[pl.id] = { cb: cb, url: url };
+    });
+    f.appendChild(set);
+    var levelLine = el('p', 'small');
+    f.appendChild(levelLine);
+    var sure = el('label', 'check');
+    var sureBox = el('input'); sureBox.type = 'checkbox'; sureBox.required = true;
+    sure.appendChild(sureBox); sure.appendChild(document.createTextNode(' I opened the repository and every link, and they show this person’s own work.'));
+    f.appendChild(sure);
+    var save = el('button', 'btn-quiet', 'Record the credential'); save.type = 'submit';
+    var cancel = el('button', 'btn-quiet', 'Not now'); cancel.type = 'button';
+    var fa = el('div', 'actions'); fa.appendChild(save); fa.appendChild(cancel); f.appendChild(fa);
+    card.appendChild(f);
+    card.appendChild(msg);
+
+    function chosen() {
+      var platforms = ['web'], links = {};
+      cred.PLATFORMS.slice(1).forEach(function (pl) {
+        if (inputs[pl.id].cb.checked) { platforms.push(pl.id); links[pl.id] = inputs[pl.id].url.value.trim(); }
+      });
+      return { platforms: platforms, links: links };
+    }
+    function level() { levelLine.textContent = 'This is level ' + chosen().platforms.length + ': ' + cred.levelName(chosen().platforms.length) + '.'; }
+    level();
+    start.addEventListener('click', function () { startRow.hidden = true; f.hidden = false; });
+    cancel.addEventListener('click', function () { f.hidden = true; startRow.hidden = false; msg.textContent = ''; });
+    f.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      var c = chosen();
+      var draft = {
+        credential: '00000000-0000-4000-8000-000000000000', issued_at: new Date().toISOString(),
+        person: { github_login: p.profiles ? p.profiles.github_login : '' }, app: { repo: p.app_repo, url: p.app_url },
+        platforms: c.platforms, links: c.links
+      };
+      var wrong = cred.problems(draft);
+      if (wrong.length) { msg.textContent = wrong.join(' '); return; }
+      save.disabled = true;
+      msg.textContent = 'Recording…';
+      db.from('credentials').insert({
+        user_id: p.user_id, cohort_id: current.id, issued_by: me.id,
+        platforms: c.platforms, platform_links: c.links,
+        evidence_repo: p.app_repo, app_name: p.app_name || null, app_url: p.app_url
+      }).select('id').then(function (r) {
+        save.disabled = false;
+        if (r.error) { msg.textContent = 'It was not recorded: ' + r.error.message; return; }
+        openCohort(current.id);
+      });
+    });
+    return card;
+  }
 
   // ---- asking to teach ----------------------------------------------
   // Someone who does not teach yet sees the request form, or their own

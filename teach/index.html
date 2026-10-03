@@ -212,6 +212,15 @@
               <label>What it is for <input name="expectations" maxlength="400" placeholder="Show each other your bring-back before each session"></label>
               <button class="btn-quiet" type="submit">Add the group</button>
             </form>
+
+            <!-- The words in the credential section were written by Claude
+                 for milestone M4 and await Ben's review. -->
+            <h3 id="credential">The credential</h3>
+            <p class="small" data-credentials-later>Credentials are issued here once the cohort is finished, and <a href="/credential/issuer/">the credential&rsquo;s own page</a> says what each level asks for.</p>
+            <div data-credentials hidden>
+              <p class="small">Open each person&rsquo;s repository and every link before you record their credential. It is then signed on the signer&rsquo;s own computer, never on this page, because the key that signs must stay off the web, and the signed file comes back here to be attached. <a href="/credential/issuer/">What each level asks for</a></p>
+              <div data-credential-list></div>
+            </div>
           </div>
         </section>
       </div>
@@ -220,6 +229,8 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" defer></script>
   <script src="/assets/hub-config.js" defer></script>
   <script src="/assets/teach-lib.js" defer></script>
+  <script src="/assets/credential-lib.js" defer></script>
+  <script src="/assets/credential-check.js" defer></script>
   <script src="/assets/teach.js" defer></script>
 
   <footer class="site-footer">
