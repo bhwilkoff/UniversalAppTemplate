@@ -362,6 +362,15 @@ and Apps Script on, and Marketplace installs allowed. Next, as meet@
 project, its APIs and consent screen, clasp for meet-events, and the
 add-on deployment.
 
+**As meet@, done October 3 (Ben said yes to Google's API Services User
+Data Policy):** Cloud project `human-shaped` (number 1086485459450) with
+the Marketplace SDK, Workspace add-ons API, Apps Script API, and Meet
+REST API enabled; the consent screen created; HTTP deployment
+`human-shaped` created from tools/meet-addon/deployment.json and
+installed for meet@. Left: the Admin console's Meet add-ons setting
+(it asked for Ben's password again), clasp login for meet-events (Ben's
+browser click), Script Properties and whoAmI, and a test call.
+
 **Next:**
 
 - Smaller: show the cohort's discussions on /cohort/ and /live/ once the
