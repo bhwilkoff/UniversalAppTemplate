@@ -20,6 +20,12 @@ verify what a person would see); push; log it below. "Fixed" and
   no clipped command captions. Principles never name Ben's apps.
 - Design is Commons: one type family, clay red, calm, finished.
 - Push to production for review. Never commit secrets or private emails.
+- Test as Ben in his own Chrome, with test data labeled "(delete me)",
+  and clean it up through the site (the "Delete this draft" button on
+  /teach/), never with a DELETE through the Supabase connector: its
+  confirmation only appears in the Mac terminal, not in Remote Control.
+- One purpose per command (edit, then commit, then push). A refused
+  bundle says nothing about which part was refused.
 - Template audience: anyone building alone. Site audience: community,
   cohorts, teachers, events. Put each change where its audience is.
 
@@ -356,6 +362,10 @@ and waits on one real sign-in.
   not-set-up answer showed a library's error text (now a plain
   sentence, with the detail in the function's log). Test cohort
   deleted.
+
+- 2026-10-03: "Delete this draft" on /teach/ (drafts only, asks once on
+  the page). Verified on production: made a labeled draft, deleted it
+  with the button, and the list was empty again.
 
 ## Where to pick up
 
