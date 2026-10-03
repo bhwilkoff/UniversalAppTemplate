@@ -789,6 +789,14 @@ browser click), Script Properties and whoAmI, and a test call.
   users). For Ben before a public listing: the legal name and address
   (placeholders in comments on /terms/ and /support/), whether meet@ is
   read as the support address, and the words themselves.
+- 2026-10-03, C9 (merged): the welcome on the add-on's main stage
+  (cohort, week, challenge, "First: Arrive.") until a part starts, with
+  "Put the welcome on the stage" in the panel and a /card/ twin; four
+  1920x1080 Meet backgrounds (paper, evening, each with and without the
+  arch high on the right) from tools/mark/make_backgrounds.py on
+  /start/brand/; a cohort background drawn in the browser on /cohort/;
+  an OBS section on /teach/guide/. 211 node tests. For Ben: choose the
+  backgrounds, review the words. Not yet seen in a real call.
 
 ## Where to pick up
 
