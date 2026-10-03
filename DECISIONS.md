@@ -270,3 +270,13 @@ Meet work:
     records or measures is visible, explained, and in the teacher's
     hands, and students can see what is kept about them.
 14. A little Human Shaped branding inside Meet, with the cohort's people.
+
+## Notes to students (October 3, 2026)
+
+**Students keep the notes their teacher sends them, can remove any of
+them, and the teacher can edit a note to correct it.** Ben: "Students
+should be able to keep notes afterwards. They should be able to remove
+notes if they wish. And notes should be editable for typos and other
+corrections." **How to apply:** notes are not deleted when a cohort
+finishes or the student leaves; the author can edit the words, and an
+edited note says so.

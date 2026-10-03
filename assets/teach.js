@@ -431,6 +431,45 @@
     order.forEach(function (p) { box.appendChild(followupCard(p, byId[p.user_id], last, notesReady, who)); });
   }
 
+  // Correcting a note or feedback you sent (DECISIONS.md, "Notes to
+  // students"): only its words change, and the student sees it was edited.
+  function correctControl(g) {
+    var wrap = el('span', 'followup-correct');
+    var open = el('button', 'link', 'Edit');
+    open.type = 'button';
+    var form = el('form', 'inline-form');
+    form.hidden = true;
+    var label = el('label', null, 'Your corrected words');
+    var input = el('textarea'); input.rows = 3; input.required = true; input.maxLength = 8000; input.value = g.body;
+    label.appendChild(input); form.appendChild(label);
+    var save = el('button', 'btn-quiet', 'Save the correction'); save.type = 'submit';
+    var cancel = el('button', 'btn-quiet', 'Cancel'); cancel.type = 'button';
+    var msg = el('span', 'small'); msg.setAttribute('role', 'status');
+    var actions = el('div', 'actions'); actions.appendChild(save); actions.appendChild(cancel); actions.appendChild(msg);
+    form.appendChild(actions);
+    open.addEventListener('click', function () { form.hidden = false; open.hidden = true; input.focus(); });
+    cancel.addEventListener('click', function () { form.hidden = true; open.hidden = false; input.value = g.body; });
+    form.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      var body = input.value.trim();
+      if (!body) return;
+      save.disabled = true;
+      var q = g.note_id
+        ? db.from('teacher_notes').update({ body: body }).eq('id', g.note_id).select('id')
+        : db.from('feedback').update({ body: body }).eq('id', g.feedback_id).select('id');
+      q.then(function (r) {
+        save.disabled = false;
+        if (r.error || !r.data.length) { msg.textContent = 'Not saved: ' + (r.error ? r.error.message : 'the database refused') + '.'; return; }
+        g.body = body;
+        msg.textContent = 'Saved. They will see it was edited.';
+        form.hidden = true; open.hidden = false;
+      });
+    });
+    wrap.appendChild(document.createTextNode(' '));
+    wrap.appendChild(open); wrap.appendChild(form);
+    return wrap;
+  }
+
   function followupCard(p, c, last, notesReady, who) {
     var name = personName(p);
     var key = F.draftKey(current.id, last.id, p.user_id);
@@ -479,7 +518,11 @@
     block('What else they shared', c.otherShares.map(function (s) { return line((KIND[s.kind] || s.kind) + (s.note ? ': ' + s.note : ''), s.url); }));
     block('Feedback they gave', c.given.map(function (g) { return line('To ' + who(g.to) + ': ' + g.body); }));
     block('Feedback they received', c.received.map(function (g) { return line('From ' + who(g.from) + ': ' + g.body); }));
-    block('Already sent by a teacher', c.fromTeachers.map(function (g) { return line(who(g.from) + ': ' + g.body); }));
+    block('Already sent by a teacher', c.fromTeachers.map(function (g) {
+      var li = line(who(g.from) + ': ' + g.body);
+      if (g.from === me.id && (g.note_id || g.feedback_id)) li.appendChild(correctControl(g));
+      return li;
+    }));
     if (c.empty) body.appendChild(el('p', 'small', 'They did not share, queue, answer, or give feedback around this session, which is worth a kind, private word with an easy way back in.'));
     if (p.app_repo) {
       var repo = el('p', 'small'); var ra = el('a', null, 'Their repository on GitHub'); ra.href = 'https://github.com/' + p.app_repo; ra.rel = 'noopener'; ra.target = '_blank';

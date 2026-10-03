@@ -347,7 +347,7 @@
   // quietly and nothing shows. The person can remove any of them.
   function drawNotes(teachers) {
     var section = $('[data-notes-section]');
-    db.from('teacher_notes').select('id, author_id, body, created_at').eq('cohort_id', cohort.id).eq('student_id', me.id).order('created_at', { ascending: false }).then(function (r) {
+    db.from('teacher_notes').select('id, author_id, body, created_at, edited_at').eq('cohort_id', cohort.id).eq('student_id', me.id).order('created_at', { ascending: false }).then(function (r) {
       var notes = r.error ? [] : r.data;
       section.hidden = !notes.length;
       var box = $('[data-notes]');
@@ -357,7 +357,7 @@
       notes.forEach(function (n) {
         var q = el('blockquote', 'feedback');
         n.body.split(/\n{2,}/).forEach(function (para) { q.appendChild(el('p', null, para)); });
-        q.appendChild(el('p', 'small', (names[n.author_id] || 'Your teacher') + ', ' + lib.ago(n.created_at, new Date())));
+        q.appendChild(el('p', 'small', (names[n.author_id] || 'Your teacher') + ', ' + lib.ago(n.created_at, new Date()) + (n.edited_at ? ', edited ' + lib.ago(n.edited_at, new Date()) : '')));
         var msg = el('span', 'small'); msg.setAttribute('role', 'status');
         var rm = button('Remove it from my page', function () {
           rm.disabled = true;

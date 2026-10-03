@@ -738,6 +738,14 @@ add-on deployment.
   disappears once every step it can see is done. Verified against a
   stand-in at 375px and 430px, light and dark. The OAuth server was
   still off at the start of this tick.
+- 2026-10-03, notes to students (Ben's request). Notes are no longer
+  deleted when a cohort finishes or a student leaves; the student reads
+  every note on /account/ ("Notes from your teachers", across cohorts)
+  and can remove any. The author can correct a note's or feedback's
+  words from /teach/'s follow-ups (Edit), a trigger keeps everything but
+  the words fixed and sets `edited_at`, and /cohort/ and /account/ show
+  "edited". Migration 20261003160000 applied through the Management API;
+  351 database checks (2 fail with the edit rule opened), 190 node tests.
 
 ## Where to pick up
 

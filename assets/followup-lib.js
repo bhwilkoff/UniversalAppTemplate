@@ -151,7 +151,7 @@
         if (!within(f.created_at, w)) return;
         if (f.author_id === userId && s.user_id !== userId) given.push({ to: s.user_id, body: f.body, created_at: f.created_at });
         if (s.user_id === userId && f.author_id !== userId) {
-          var row = { from: f.author_id, body: f.body, created_at: f.created_at, share_id: s.id };
+          var row = { from: f.author_id, body: f.body, created_at: f.created_at, share_id: s.id, feedback_id: f.id };
           (teacherIds.indexOf(f.author_id) >= 0 ? fromTeachers : received).push(row);
         }
       });

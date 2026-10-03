@@ -224,11 +224,53 @@
           openBox.appendChild(card);
         });
         root.querySelector('[data-teach-link]').hidden = !res[3].data;
+        drawNotes(uid);
         show('signed-in');
       });
     }).catch(function (err) {
       fail('Something went wrong while signing in: ' + (err && err.message ? err.message : 'no details') + '.');
     });
+  }
+
+  // Every note a teacher sent you, in every cohort, including ones you
+  // have left or that have finished (DECISIONS.md, "Notes to students").
+  // A teacher's name shows when you can still read their profile.
+  function drawNotes(uid) {
+    var section = root.querySelector('[data-notes-section]');
+    var box = root.querySelector('[data-notes]');
+    db.from('teacher_notes').select('id, author_id, body, created_at, edited_at, cohorts(title, slug)')
+      .eq('student_id', uid).order('created_at', { ascending: false }).then(function (r) {
+        var notes = r.error ? [] : r.data;
+        section.hidden = !notes.length;
+        if (!notes.length) return;
+        var ids = notes.map(function (n) { return n.author_id; }).filter(function (v, i, a) { return a.indexOf(v) === i; });
+        return db.from('profiles').select('id, display_name, github_login').in('id', ids).then(function (pr) {
+          var names = {};
+          (pr.data || []).forEach(function (p) { names[p.id] = p.display_name || p.github_login; });
+          box.replaceChildren();
+          notes.forEach(function (n) {
+            var q = el('blockquote', 'feedback');
+            n.body.split(/\n{2,}/).forEach(function (para) { q.appendChild(el('p', null, para)); });
+            var line = (names[n.author_id] || 'Your teacher') + ', ' + new Date(n.created_at).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' });
+            if (n.cohorts && n.cohorts.title) line += ', in ' + n.cohorts.title;
+            if (n.edited_at) line += ' (edited)';
+            q.appendChild(el('p', 'small', line));
+            var msg = el('span', 'small'); msg.setAttribute('role', 'status');
+            var rm = el('button', 'btn-quiet', 'Remove this note');
+            rm.type = 'button';
+            rm.addEventListener('click', function () {
+              rm.disabled = true;
+              db.from('teacher_notes').delete().eq('id', n.id).select('id').then(function (d) {
+                rm.disabled = false;
+                if (d.error || !d.data.length) { msg.textContent = 'Not removed: ' + (d.error ? d.error.message : 'the database refused') + '.'; return; }
+                drawNotes(uid);
+              });
+            });
+            var a = el('div', 'actions'); a.appendChild(rm); a.appendChild(msg); q.appendChild(a);
+            box.appendChild(q);
+          });
+        });
+      });
   }
 
   load();
