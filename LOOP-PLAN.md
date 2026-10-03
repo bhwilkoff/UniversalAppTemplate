@@ -772,6 +772,14 @@ add-on deployment.
   2 seconds through Realtime. That test found and fixed a bug (a group
   with nobody on the hub stuck at step 1; 207 node tests now). Not yet
   seen: a student asking for the teacher, and the board inside Meet.
+- 2026-10-03, C0 pages (merged): /privacy/, /terms/, and /support/,
+  marked "Written by Claude, awaiting Ben's review", in the footer of
+  every page and the sitemap; deployment.json has termsUri. /cohorts/
+  #data no longer says leaving lets go of everything (notes stay).
+  Checked live: Supabase Auth does keep the email GitHub gives (1 of 1
+  users). For Ben before a public listing: the legal name and address
+  (placeholders in comments on /terms/ and /support/), whether meet@ is
+  read as the support address, and the words themselves.
 
 ## Where to pick up
 
