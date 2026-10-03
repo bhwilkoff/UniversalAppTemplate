@@ -51,8 +51,10 @@ test('the agenda fills exactly the session length', () => {
   }
 });
 test('a 75 minute session keeps the course shape', () => {
-  assert.deepEqual(lib.agenda(75).map(p => p.minutes), [7, 25, 6, 25, 12]);
-  assert.deepEqual(lib.agenda(75).map(p => p.key), ['arrive', 'show', 'value', 'prompt', 'start']);
+  assert.deepEqual(lib.agenda(75).map(p => p.minutes), [7, 25, 3, 6, 22, 9, 3]);
+  assert.deepEqual(lib.agenda(75).map(p => p.key), ['arrive', 'show', 'break', 'value', 'prompt', 'start', 'check']);
+  assert.ok(!lib.agenda(60).some(p => p.key === 'break'), 'an hour-long session has no break');
+  assert.equal(lib.agenda(75).reduce((n, p) => n + p.minutes, 0), 75);
 });
 test('each week points at its stages of the path', () => {
   assert.deepEqual(lib.stagesForWeek(1), ['00', '01']);
@@ -82,7 +84,8 @@ test('the part of the session comes from the clock, and a started timer wins', (
   assert.equal(lib.partNow(parts, start, at(3)).key, 'arrive');
   assert.equal(lib.partNow(parts, start, at(7)).key, 'show');
   assert.equal(lib.partNow(parts, start, at(31.9)).key, 'show');
-  assert.equal(lib.partNow(parts, start, at(74)).key, 'start');
+  assert.equal(lib.partNow(parts, start, at(74)).key, 'check');
+  assert.equal(lib.partNow(parts, start, at(65)).key, 'start');
   assert.equal(lib.partNow(parts, start, at(75)), null);
   assert.equal(lib.partNow(parts, start, at(40), 'show').key, 'show');
   assert.equal(lib.partNow(parts, null, at(0)), null);

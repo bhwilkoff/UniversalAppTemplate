@@ -47,15 +47,22 @@
   // cohort's own session length. The page finds its tools by each part's
   // key, never by its name or place, so the names, minutes, and order can
   // change here alone (COURSE.md is the source; awaiting Ben's review).
+  // The six parts of every session and the break between them, as
+  // COURSE.md and docs/teaching/README.md in the template describe them,
+  // with that guide's minutes for 75. Sessions of an hour or less drop
+  // the break, as the guide says.
   var PARTS = [
-    { key: 'arrive', name: 'Arrive', minutes: 7, what: 'One line each in the chat: what you shipped this week, or where you are stuck. Then your teacher says what they heard in last week\u2019s checks, and what they changed because of it. Cameras are welcome, and never required.' },
-    { key: 'show', name: 'Show what you brought back', minutes: 25, what: 'In your group\u2019s own room, each builder takes a turn: say what you want to know, show it on the real device, explain one decision with the agent closed, take one clarifying question, then listen while your partners answer the three questions, and say what you will do next.' },
-    { key: 'value', name: 'One decision your values changed', minutes: 6, what: 'Back together in the main session, one person shares a decision their values changed this week and what it cost them, and your teacher names one thing they heard across the groups.' },
-    { key: 'prompt', name: 'Read one real prompt, trying first', minutes: 25, what: 'Write the prompt you would send for the situation on screen, compare it with a partner, and then see the real one and talk about the difference.' },
-    { key: 'start', name: 'Start, then check', minutes: 12, what: 'Send this week\u2019s first prompt to your agent before you leave, with a room open for anyone who is stuck. In the last three minutes, answer your teacher\u2019s two questions privately, on this page.' }
+    { key: 'arrive', name: 'Arrive', minutes: 7, what: 'One line each in the chat: what you shipped this week, or where you are stuck. Then your teacher says what they read in last week\u2019s checks, and what they changed because of it. Cameras are welcome, and never required.' },
+    { key: 'show', name: 'Show what you brought back', minutes: 25, what: 'In your group of three, about eight minutes each: say what you want to know, show it on the real device, and explain one decision with the agent closed. Partners ask one clarifying question, then answer three: where is it going, how is it going, and what is next. End by saying what you will do next, and whether the stage is ready or not yet.' },
+    { key: 'break', name: 'A short break', minutes: 3, what: 'Stretch, refill, and come back to the main session.' },
+    { key: 'value', name: 'One value at work', minutes: 6, what: 'Back together, one person shares a decision their values changed this week and what it cost them, and your teacher names one thing they heard across the groups.' },
+    { key: 'prompt', name: 'Read one real prompt, trying first', minutes: 22, what: 'Write the prompt you would send for the situation on screen, compare it with a partner, and then see the real one and talk about the difference.' },
+    { key: 'start', name: 'Start', minutes: 9, what: 'Send this week\u2019s first prompt to your agent before you leave, with a room open for anyone who is stuck.' },
+    { key: 'check', name: 'Check for understanding', minutes: 3, what: 'Answer your teacher\u2019s two questions privately, on this page: this week\u2019s question, and what is still muddy.' }
   ];
   function agenda(minutes, parts) {
     parts = parts || PARTS;
+    if (minutes && minutes <= 60) parts = parts.filter(function (p) { return p.key !== 'break'; });
     var total = parts.reduce(function (n, p) { return n + p.minutes; }, 0);
     var want = minutes || total, scale = want / total, start = 0;
     return parts.map(function (p, i) {
