@@ -381,6 +381,125 @@ def main():
     bea.execute("delete from public.teacher_requests where user_id = %s", (people["bea"],))
     check("a person can take their request back", bea.rowcount == 1)
 
+    # The credential (migration 20261003070000): issued by a teacher of a
+    # finished cohort, signed outside the browser, public one at a time.
+    su6 = conn.cursor(); su6.execute("reset role")
+    for name in ["eve", "fay"]:
+        uid = str(uuid.uuid4())
+        su6.execute("insert into auth.users (id, raw_user_meta_data) values (%s, %s)",
+                    (uid, f'{{"user_name": "{name}", "provider_id": "{abs(hash(name)) % 10**8}"}}'))
+        people[name] = uid
+    ben = as_user("ben")
+    attempt(ben, "insert into public.cohorts (slug, title, created_by, status) values ('cred-cohort', 'Credential cohort', %s, 'open') returning id", (people["ben"],))
+    cc = last_rows[0][0]
+    for name in ["eve", "fay"]:
+        cur = as_user(name)
+        attempt(cur, "insert into public.enrollments (cohort_id, user_id, app_name, app_repo, app_url) values (%s, %s, 'Garden Swap', %s, 'https://example.org/app')",
+                (cc, people[name], f"{name}/garden-swap"))
+    ben = as_user("ben")
+    attempt(ben, "update public.cohorts set status = 'running' where id = %s", (cc,))
+    issue = ("insert into public.credentials (user_id, cohort_id, issued_by, platforms, platform_links, evidence_repo, app_name, app_url) "
+             "values (%s, %s, %s, %s, %s, %s, 'Garden Swap', 'https://example.org/app') returning id")
+    def issue_args(who, by="ben", platforms=("web",), links="{}", repo=None):
+        return (people[who], cc, people[by], list(platforms), links, repo or f"{who}/garden-swap")
+    check("no one is credentialed while the cohort is still running",
+          not attempt(ben, issue, issue_args("eve")))
+    attempt(ben, "update public.cohorts set status = 'finished' where id = %s", (cc,))
+    ben_agent = as_agent("ben")
+    check("a teacher's agent cannot issue a credential",
+          not attempt(ben_agent, issue, issue_args("eve")))
+    eve = as_user("eve")
+    check("a student cannot issue their own credential",
+          not attempt(eve, issue, issue_args("eve", by="eve")))
+    dee = as_user("dee")
+    check("a teacher of another cohort cannot issue one for this cohort",
+          not attempt(dee, issue, issue_args("eve", by="dee")))
+    ben = as_user("ben")
+    check("a credential cannot be issued to someone outside the cohort",
+          not attempt(ben, issue, issue_args("dee")))
+    check("every credential starts with the web",
+          not attempt(ben, issue, issue_args("eve", platforms=("android", "web"), links='{"android": "https://example.org/a"}')))
+    check("a platform outside the list is refused",
+          not attempt(ben, issue, issue_args("eve", platforms=("web", "gameboy"), links='{"gameboy": "https://example.org/g"}')))
+    check("a further platform needs an https link",
+          not attempt(ben, issue, issue_args("eve", platforms=("web", "android"), links='{"android": "http://example.org/a"}')))
+    check("a credential cannot be recorded as already signed",
+          not attempt(ben, issue.replace("app_url)", "app_url, signed)").replace("'https://example.org/app')", "'https://example.org/app', '{}')"), issue_args("eve")))
+    check("a teacher of the finished cohort can issue a credential to someone in it",
+          attempt(ben, issue, issue_args("eve", platforms=("web", "android"), links='{"android": "https://play.google.com/store/apps/details?id=x"}')))
+    cred = last_rows[0][0]
+    check("one credential per person per cohort",
+          not attempt(ben, issue, issue_args("eve")))
+
+    anon = as_user(None)
+    anon.execute("select count(*) from public.credentials")
+    check("the public cannot list who holds a credential", anon.fetchone()[0] == 0)
+    anon.execute("select state, signed from public.public_credential(%s)", (cred,))
+    check("an unsigned credential's public page says only that it is waiting", anon.fetchone() == ("waiting", None))
+    fay = as_user("fay")
+    fay.execute("select count(*) from public.credentials")
+    check("a classmate cannot read someone else's credential record", fay.fetchone()[0] == 0)
+    eve = as_user("eve")
+    eve.execute("select count(*) from public.credentials where id = %s", (cred,))
+    check("the holder can read their own credential", eve.fetchone()[0] == 1)
+    eve.execute("select private.is_alum()")
+    check("holding a credential makes someone an alum", eve.fetchone()[0] is True)
+    changed = attempt(eve, "update public.credentials set app_name = 'Renamed by the holder' where id = %s returning id", (cred,)) and len(last_rows) == 1
+    check("the holder cannot change their own credential", not changed)
+
+    ben = as_user("ben")
+    check("a teacher can correct the evidence before it is signed",
+          attempt(ben, "update public.credentials set app_name = 'Garden Swap!' where id = %s", (cred,)))
+    check("a file for another record cannot be attached",
+          not attempt(ben, """update public.credentials set signed = '{"id": "https://humanshaped.org/credential/?id=00000000-0000-0000-0000-000000000000", "issuer": {"id": "did:web:humanshaped.org"}, "proof": {"cryptosuite": "eddsa-rdfc-2022", "proofValue": "z1"}}' where id = %s""", (cred,)))
+    good = ('{"id": "https://humanshaped.org/credential/?id=%s", "issuer": {"id": "did:web:humanshaped.org"}, '
+            '"proof": {"cryptosuite": "eddsa-rdfc-2022", "proofValue": "z1"}}') % cred
+    ben_agent = as_agent("ben")
+    ben_agent.execute("update public.credentials set signed = %s where id = %s", (good, cred))
+    check("a teacher's agent cannot attach the signed file", ben_agent.rowcount == 0)
+    ben = as_user("ben")
+    check("a teacher can attach the signed file, and the time it was signed is recorded",
+          attempt(ben, "update public.credentials set signed = %s where id = %s returning signed_at is not null, credential_url", (good, cred))
+          and last_rows[0][0] is True and last_rows[0][1].endswith(str(cred)))
+    check("a signed credential cannot change",
+          not attempt(ben, "update public.credentials set platforms = '{web}', platform_links = '{}' where id = %s", (cred,)))
+    check("a teacher cannot delete a signed credential",
+          attempt(ben, "delete from public.credentials where id = %s returning id", (cred,)) and last_rows == [])
+    anon = as_user(None)
+    anon.execute("select state, signed ->> 'id' from public.public_credential(%s)", (cred,))
+    row = anon.fetchone()
+    check("anyone with the link can read a signed credential", row is not None and row[0] == "signed" and row[1].endswith(str(cred)))
+    agent = as_agent("eve")
+    agent.execute("select count(*) from public.credentials where id = %s", (cred,))
+    check("a holder's agent can read their credential", agent.fetchone()[0] == 1)
+    agent.execute("delete from public.credentials where id = %s", (cred,))
+    check("a holder's agent cannot delete their credential", agent.rowcount == 0)
+
+    ben_agent = as_agent("ben")
+    ben_agent.execute("update public.credentials set revoked_at = now() where id = %s", (cred,))
+    check("a teacher's agent cannot revoke a credential", ben_agent.rowcount == 0)
+    ben = as_user("ben")
+    check("a teacher can revoke a signed credential, with a reason",
+          attempt(ben, "update public.credentials set revoked_at = now(), revoked_reason = 'Replaced by a higher level.' where id = %s returning id", (cred,)) and len(last_rows) == 1)
+    anon = as_user(None)
+    anon.execute("select state, signed from public.public_credential(%s)", (cred,))
+    check("a revoked credential's public page says so, and no longer shows the file", anon.fetchone() == ("revoked", None))
+    eve = as_user("eve")
+    eve.execute("select private.is_alum()")
+    check("a revoked credential no longer makes someone an alum", eve.fetchone()[0] is False)
+    ben = as_user("ben")
+    check("a revoked credential stays revoked",
+          not attempt(ben, "update public.credentials set revoked_at = null, revoked_reason = null where id = %s", (cred,)))
+    check("after revoking, a new credential can be issued for the same cohort",
+          attempt(ben, issue, issue_args("eve", platforms=("web", "android", "windows"),
+                                         links='{"android": "https://example.org/a", "windows": "https://example.org/w"}')))
+    fresh = last_rows[0][0]
+    check("a teacher can remove an unsigned record made by mistake",
+          attempt(ben, "delete from public.credentials where id = %s returning id", (fresh,)) and len(last_rows) == 1)
+    eve = as_user("eve")
+    check("the holder can remove their own credential",
+          attempt(eve, "delete from public.credentials where id = %s returning id", (cred,)) and len(last_rows) == 1)
+
     conn.rollback()
     conn.close()
     failed = [n for n, ok in results if not ok]
