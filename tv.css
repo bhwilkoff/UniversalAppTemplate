@@ -21,16 +21,25 @@ html.tv {
   --tv-title: 32px;
   --tv-title-lg: 40px;
   --tv-hero: 64px;
-
-  --tv-focus-ring: #ffffff;
 }
+
+/* §4.4 colors come from design-tokens.json (the dark palette). */
+/* BEGIN design-tokens. Generated from design-tokens.json by tools/design_tokens.mjs. Do not edit by hand. */
+html.tv {
+  --tv-bg: #141619;
+  --tv-text: #ECEEF1;
+  --tv-text-muted: #A2A9B4;
+  --tv-accent: #A7BFD6;
+  --tv-focus-ring: #ECEEF1;
+}
+/* END design-tokens */
 
 /* §4.4 — dark-first. Living rooms are dark; a bright UI is fatiguing at ten
    feet. Light mode is not offered on TV. */
 html.tv,
 html.tv body {
-  background: #000;
-  color: #fff;
+  background: var(--tv-bg);
+  color: var(--tv-text);
   /* TVs do not scroll-bounce and a visible scrollbar reads as a bug. */
   overflow: hidden;
 }

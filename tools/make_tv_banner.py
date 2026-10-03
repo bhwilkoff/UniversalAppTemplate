@@ -46,10 +46,20 @@ MASTER = REPO / os.environ.get("APP_ICON_1024", "branding/icon-1024.png")  # FIL
 STORE_OUT = REPO / "assets/tv/tv-banner-1280x720.png"
 APK_OUT = REPO / "android/app/src/main/res/drawable-xhdpi/tv_banner.png"
 
-INK = (10, 10, 10)             # near-black field, matches the app's dark-first chrome
-ORANGE = (255, 92, 53)         # --color-primary
-WHITE = (255, 255, 255)
-MUTED = (176, 176, 176)
+# Colors come from design-tokens.json (the dark palette: TV is dark-first), so
+# the banner follows the app's look instead of keeping its own copy.
+import json as _json
+
+
+def _rgb(h):
+    return tuple(int(h[i:i + 2], 16) for i in (1, 3, 5))
+
+
+_BRAND = _json.loads((REPO / "design-tokens.json").read_text())["color"]["brand"]
+INK = _rgb(_BRAND["background"]["dark"])
+ACCENT = _rgb(_BRAND["primary"]["dark"])
+WHITE = _rgb(_BRAND["text"]["dark"])
+MUTED = _rgb(_BRAND["textMuted"]["dark"])
 
 # macOS system faces; the first that resolves wins.
 BOLD_FACES = ["/System/Library/Fonts/Supplemental/Futura.ttc",
@@ -130,7 +140,7 @@ def render(w: int, h: int) -> Image.Image:
     y += title_h
     if TITLE_2:
         y += line_gap
-        _tracked(draw, (tx, y), TITLE_2, f_title, ORANGE, trk)
+        _tracked(draw, (tx, y), TITLE_2, f_title, ACCENT, trk)
         y += title_h
     if TAGLINE:
         y += rule_gap

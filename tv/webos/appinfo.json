@@ -8,8 +8,8 @@
   "icon": "icon.png",
   "largeIcon": "largeIcon.png",
   "splashBackground": "splash.png",
-  "bgColor": "#101014",
-  "iconColor": "#3366FF",
+  "bgColor": "#141619",
+  "iconColor": "#A7BFD6",
   "disableBackHistoryAPI": false,
   "supportPortraitMode": false,
   "requiredMemory": 150

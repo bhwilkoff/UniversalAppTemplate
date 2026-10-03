@@ -31,9 +31,17 @@
     background: #000; color: #fff; overflow: hidden;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }
+  /* BEGIN design-tokens. Generated from design-tokens.json by tools/design_tokens.mjs. Do not edit by hand. */
+  :root {
+    --brand-primary: #A7BFD6;
+    --brand-text-muted: #A2A9B4;
+  }
   cast-media-player {
-    --theme-hue: 16;                       /* marquee orange family */
-    --progress-color: #FF5C35;
+    --theme-hue: 209;
+    --progress-color: #A7BFD6;
+  }
+  /* END design-tokens */
+  cast-media-player {
     --splash-image: url('../assets/app-icon/app-icon.png');
     --splash-size: contain;
     --background-color: #000;
@@ -44,7 +52,7 @@
   #credit {
     position: fixed; left: 0; right: 0; bottom: 3%;
     text-align: center; font-size: 1.6vh; letter-spacing: .08em;
-    color: #9a9a9a; text-transform: uppercase; pointer-events: none;
+    color: var(--brand-text-muted); text-transform: uppercase; pointer-events: none;
   }
   /* A cast that fails must SAY so. "Nothing happened" is the worst possible
      feedback on a screen the viewer is sitting ten feet from, with no controls
@@ -57,7 +65,7 @@
   #error.shown { display: flex; }
   #error h1 { font-size: 3.4vh; font-weight: 600; margin: 0; }
   #error p  { font-size: 2.2vh; color: #b9b9b9; margin: 0; max-width: 70ch; }
-  #error code { color: #FF5C35; font-size: 1.8vh; }
+  #error code { color: var(--brand-primary); font-size: 1.8vh; }
 </style>
 </head>
 <body>

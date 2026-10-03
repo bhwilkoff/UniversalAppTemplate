@@ -1,34 +1,23 @@
+// Design tokens, generated from design-tokens.json by tools/design_tokens.mjs. Do not edit by hand:
+// change design-tokens.json at the repository root and run `node tools/design_tokens.mjs`.
 package com.example.appname.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
-// FILL IN: replace with your brand font.
-// Drop the .ttf into res/font/ and reference R.font.<name>. Avoid
-// downloadable fonts in the splash path — they add a network
-// dependency to first paint.
-//
-// Bundled-font fallback to system-ui:
+// The system face. A custom face goes in res/font/ and replaces this line by
+// hand only if the chosen look truly needs one; keep fonts out of the splash path.
 private val BrandFontFamily = FontFamily.Default
 
-/**
- * Six hierarchy levels (per mobile-first-density-design). Refuse a
- * seventh — if a new level seems necessary, refactor existing ones
- * before adding.
- *
- * Keep these labels stable across iOS / web / Android so design
- * decisions translate. The pixel mapping differs per platform; the
- * NAMES don't.
- */
+/** The six-level ramp: refuse a seventh level; refactor instead. */
 val AppTypography = Typography(
-    displaySmall  = TextStyle(fontFamily = BrandFontFamily, fontWeight = FontWeight.Bold,   fontSize = 32.sp),  // L1 — page title
-    headlineSmall = TextStyle(fontFamily = BrandFontFamily, fontWeight = FontWeight.Bold,   fontSize = 24.sp),  // L2 — section header
-    titleMedium   = TextStyle(fontFamily = BrandFontFamily, fontWeight = FontWeight.Medium, fontSize = 16.sp),  // L3 — emphasized body
-    bodyMedium    = TextStyle(fontFamily = BrandFontFamily, fontWeight = FontWeight.Normal, fontSize = 14.sp),  // L4 — body
-    labelMedium   = TextStyle(fontFamily = BrandFontFamily, fontWeight = FontWeight.Normal, fontSize = 12.sp),  // L5 — caption
-    bodySmall     = TextStyle(fontFamily = BrandFontFamily, fontWeight = FontWeight.Normal, fontSize = 12.sp),  // L6 — tabular (use tnum modifier)
+    displaySmall = TextStyle(fontFamily = BrandFontFamily, fontWeight = FontWeight.Bold, fontSize = 28.sp), // L1 pageTitle
+    headlineSmall = TextStyle(fontFamily = BrandFontFamily, fontWeight = FontWeight.Bold, fontSize = 20.sp), // L2 sectionHeader
+    titleMedium = TextStyle(fontFamily = BrandFontFamily, fontWeight = FontWeight.SemiBold, fontSize = 16.sp), // L3 bodyStrong
+    bodyMedium = TextStyle(fontFamily = BrandFontFamily, fontWeight = FontWeight.Normal, fontSize = 16.sp), // L4 body
+    labelMedium = TextStyle(fontFamily = BrandFontFamily, fontWeight = FontWeight.Normal, fontSize = 13.sp), // L5 caption
+    bodySmall = TextStyle(fontFamily = BrandFontFamily, fontWeight = FontWeight.Normal, fontSize = 14.sp, fontFeatureSettings = "tnum"), // L6 tabular
 )

@@ -3,48 +3,86 @@
    Mobile-first. Custom properties for theming. WCAG AA.
 ================================================================ */
 
-/* ---- CSS Custom Properties ---- */
+/* ---- Design tokens ----
+   The template's placeholder look. Every value below comes from
+   design-tokens.json: change it there, run `node tools/design_tokens.mjs`,
+   and every platform follows (see the make-it-look-like-itself skill). */
+/* BEGIN design-tokens. Generated from design-tokens.json by tools/design_tokens.mjs. Do not edit by hand. */
 :root {
-  /* The template's placeholder look. Every app made from the template
-     starts here, so replace it: see the make-it-look-like-itself skill. */
-  --color-accent: #0047FF;
-  --color-bg: #FFFFFF;
-  --color-surface: #FFFFFF;
-  --color-surface-alt: #F5F5F5;
-  --color-text: #0A0A0A;
-  --color-text-muted: #6B7280;
-  --color-border: #E0E0E0;
-  --nb-black: #0A0A0A;
-
-  /* Shadows (neubrutalist) */
-  --shadow-card: 3px 3px 0 var(--nb-black);
-  --shadow-elevated: 5px 5px 0 var(--nb-black);
-
-  /* Typography */
-  --font-heading: 'Syne', system-ui, sans-serif;
-  --font-body: 'Inter', system-ui, sans-serif;
-
-  /* Spacing scale */
+  color-scheme: light;
+  --color-primary: #3F5E78;
+  --color-on-primary: #FFFFFF;
+  --color-background: #FFFFFF;
+  --color-surface: #F5F6F8;
+  --color-surface-alt: #EBEDF0;
+  --color-text: #1A1C1F;
+  --color-text-muted: #5B6270;
+  --color-border: #D3D7DE;
+  --color-success: #1E7A4F;
+  --color-warning: #8A5A00;
+  --color-error: #B42318;
+  --color-error-surface: #FDECEA;
+  --font-body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --type-page-title-size: 1.75rem;
+  --type-page-title-weight: 700;
+  --type-section-header-size: 1.25rem;
+  --type-section-header-weight: 700;
+  --type-body-strong-size: 1rem;
+  --type-body-strong-weight: 600;
+  --type-body-size: 1rem;
+  --type-body-weight: 400;
+  --type-caption-size: 0.8125rem;
+  --type-caption-weight: 400;
+  --type-tabular-size: 0.875rem;
+  --type-tabular-weight: 400;
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
   --space-4: 16px;
   --space-6: 24px;
   --space-8: 32px;
+  --radius-control: 8px;
+  --radius-card: 12px;
+}
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --color-primary: #A7BFD6;
+  --color-on-primary: #0F1720;
+  --color-background: #141619;
+  --color-surface: #1D2024;
+  --color-surface-alt: #272B30;
+  --color-text: #ECEEF1;
+  --color-text-muted: #A2A9B4;
+  --color-border: #3A3F47;
+  --color-success: #5CC593;
+  --color-warning: #E8B04B;
+  --color-error: #FF8A80;
+  --color-error-surface: #3A1D1B;
+}
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) {
+    color-scheme: dark;
+    --color-primary: #A7BFD6;
+    --color-on-primary: #0F1720;
+    --color-background: #141619;
+    --color-surface: #1D2024;
+    --color-surface-alt: #272B30;
+    --color-text: #ECEEF1;
+    --color-text-muted: #A2A9B4;
+    --color-border: #3A3F47;
+    --color-success: #5CC593;
+    --color-warning: #E8B04B;
+    --color-error: #FF8A80;
+    --color-error-surface: #3A1D1B;
+  }
+}
+/* END design-tokens */
 
-  /* Layout */
+/* Layout (not part of the look) */
+:root {
   --sidebar-width: 260px;
   --top-bar-height: 56px;
-}
-
-/* Dark mode — toggle via html[data-theme="dark"] */
-html[data-theme="dark"] {
-  --color-bg: #1C1C1E;
-  --color-surface: #2C2C2E;
-  --color-surface-alt: #3A3A3C;
-  --color-text: #EFEFEF;
-  --color-text-muted: #AEAEB2;
-  --color-border: #48484A;
 }
 
 /* ---- Reset ---- */
@@ -71,7 +109,7 @@ body {
   font-size: 16px;
   line-height: 1.5;
   color: var(--color-text);
-  background: var(--color-bg);
+  background: var(--color-background);
   /* 100vh first: a browser without dvh (Chromium < 108 — every 2022-and-older
      Samsung TV) drops the dvh declaration entirely, and without a fallback the
      whole flex layout collapses. */
@@ -105,7 +143,7 @@ button, input, select, textarea { font: inherit; }
 /* ---- Accessibility ---- */
 .skip-link {
   position: absolute; top: -100%; left: 0;
-  padding: 8px 16px; background: var(--color-accent); color: #fff;
+  padding: 8px 16px; background: var(--color-primary); color: var(--color-on-primary);
   z-index: 9999; font-weight: 700;
 }
 .skip-link:focus { top: 0; }
@@ -132,40 +170,41 @@ button, input, select, textarea { font: inherit; }
 /* ---- Auth Screen ---- */
 .auth-card {
   max-width: 400px; margin: 80px auto; padding: var(--space-6);
-  border: 2px solid var(--nb-black); background: var(--color-surface);
-  box-shadow: var(--shadow-card);
+  border: 1px solid var(--color-border); border-radius: var(--radius-card);
+  background: var(--color-surface);
 }
-.auth-title { font-family: var(--font-heading); font-size: 1.8rem; font-weight: 800; }
+.auth-title { font-size: var(--type-page-title-size); font-weight: var(--type-page-title-weight); }
 .auth-subtitle { color: var(--color-text-muted); margin-bottom: var(--space-4); }
 
 /* ---- Form Elements ---- */
 .field-group { margin-bottom: var(--space-4); }
 .field-label { display: block; font-weight: 600; margin-bottom: var(--space-1); font-size: 0.85rem; }
 .field-input {
-  width: 100%; padding: 10px 12px; border: 2px solid var(--nb-black);
-  background: var(--color-bg); font-size: 0.95rem;
+  width: 100%; padding: 10px 12px; border: 1px solid var(--color-border);
+  border-radius: var(--radius-control); color: var(--color-text);
+  background: var(--color-background); font-size: 1rem;
 }
-.field-input:focus { outline: 2px solid var(--color-accent); outline-offset: 1px; }
-.error-banner { padding: 8px 12px; background: #FEE2E2; border: 1px solid #DC2626; color: #DC2626; font-size: 0.85rem; margin-bottom: var(--space-3); }
+.field-input:focus { outline: 2px solid var(--color-primary); outline-offset: 1px; }
+.error-banner { padding: 8px 12px; background: var(--color-error-surface); border: 1px solid var(--color-error); border-radius: var(--radius-control); color: var(--color-error); font-size: 0.85rem; margin-bottom: var(--space-3); }
 
 /* ---- Buttons ---- */
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-  padding: 10px 16px; font-family: var(--font-heading); font-weight: 700;
-  text-transform: uppercase; letter-spacing: 0.5px; font-size: 0.82rem;
-  border: 2px solid var(--nb-black); cursor: pointer;
-  transition: transform 0.1s, box-shadow 0.1s;
+  padding: 10px 16px; font-weight: 600; font-size: 0.95rem;
+  border: 1px solid var(--color-border); border-radius: var(--radius-control);
+  color: var(--color-text); cursor: pointer;
+  transition: filter 0.1s, background-color 0.1s;
 }
-.btn:hover { transform: translate(-1px, -1px); box-shadow: var(--shadow-card); }
-.btn:active { transform: translate(1px, 1px); box-shadow: none; }
-.btn-primary { background: var(--color-accent); color: #fff; }
+.btn:hover { filter: brightness(0.95); }
+.btn-primary { background: var(--color-primary); border-color: var(--color-primary); color: var(--color-on-primary); }
 .btn-ghost { background: transparent; }
+.btn-ghost:hover { background: var(--color-surface-alt); filter: none; }
 .btn-full { width: 100%; }
 
 /* ---- Sidebar ---- */
 .channels-sidebar {
   position: fixed; top: 0; left: 0; bottom: 0; width: var(--sidebar-width);
-  background: var(--color-surface); border-right: 2px solid var(--nb-black);
+  background: var(--color-surface); border-right: 1px solid var(--color-border);
   z-index: 100; overflow-y: auto;
   transform: translateX(-100%); transition: transform 0.2s;
 }
@@ -173,15 +212,15 @@ button, input, select, textarea { font: inherit; }
 @media (min-width: 768px) {
   .channels-sidebar { transform: translateX(0); }
 }
-.sidebar-header { padding: var(--space-4); border-bottom: 2px solid var(--nb-black); }
-.sidebar-title { font-family: var(--font-heading); font-size: 1.2rem; font-weight: 800; }
+.sidebar-header { padding: var(--space-4); border-bottom: 1px solid var(--color-border); }
+.sidebar-title { font-size: var(--type-section-header-size); font-weight: var(--type-section-header-weight); }
 .sidebar-nav-item {
   display: flex; align-items: center; gap: 12px; width: 100%;
   padding: 11px 16px; border: none; background: none; cursor: pointer;
-  font-family: var(--font-heading); font-size: 0.85rem; font-weight: 700;
+  border-radius: var(--radius-control); font-size: 0.95rem; font-weight: 600;
   color: var(--color-text); text-align: left;
 }
-.sidebar-nav-item.active { background: var(--color-accent); color: #fff; }
+.sidebar-nav-item.active { background: var(--color-primary); color: var(--color-on-primary); }
 .sidebar-nav-item:hover:not(.active) { background: var(--color-surface-alt); }
 
 /* ---- App screen layout ----
@@ -205,18 +244,25 @@ button, input, select, textarea { font: inherit; }
   .view { padding-left: calc(var(--sidebar-width) + var(--space-4)); }
 }
 .view-inner { max-width: 640px; margin: 0 auto; }
-.view-heading { font-family: var(--font-heading); font-size: 1.4rem; font-weight: 800; margin-bottom: var(--space-4); }
 
-/* ---- Cards (neubrutalist) ---- */
+/* ---- The six-level type ramp (sizes and weights from the tokens) ---- */
+.view-heading { font-size: var(--type-page-title-size); font-weight: var(--type-page-title-weight); line-height: 1.2; margin-bottom: var(--space-4); }
+.section-header { font-size: var(--type-section-header-size); font-weight: var(--type-section-header-weight); line-height: 1.3; }
+.body-strong { font-size: var(--type-body-strong-size); font-weight: var(--type-body-strong-weight); }
+.body { font-size: var(--type-body-size); font-weight: var(--type-body-weight); }
+.caption { font-size: var(--type-caption-size); font-weight: var(--type-caption-weight); color: var(--color-text-muted); }
+.tabular { font-size: var(--type-tabular-size); font-weight: var(--type-tabular-weight); font-variant-numeric: tabular-nums; }
+
+/* ---- Cards ---- */
 .card {
-  border: 2px solid var(--nb-black); background: var(--color-surface);
-  box-shadow: var(--shadow-card); padding: var(--space-4);
+  border: 1px solid var(--color-border); border-radius: var(--radius-card);
+  background: var(--color-surface); padding: var(--space-4);
 }
 
 /* ---- Spinner ---- */
 .spinner {
   width: 24px; height: 24px; border: 3px solid var(--color-border);
-  border-top-color: var(--color-accent); border-radius: 50%;
+  border-top-color: var(--color-primary); border-radius: 50%;
   animation: spin 0.6s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }

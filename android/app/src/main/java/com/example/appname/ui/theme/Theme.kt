@@ -9,6 +9,9 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalContext
 
 /**
@@ -23,6 +26,9 @@ import androidx.compose.ui.platform.LocalContext
  * Pass `dynamicColor = true` from Settings when the user enables
  * "Use system colors" — overrides `primary` only on Android 12+;
  * the [AppSemantics] tokens never change.
+ *
+ * The colors come from Color.kt, which tools/design_tokens.mjs writes
+ * from design-tokens.json. Change the look there, not here.
  */
 @Composable
 fun AppTheme(
@@ -39,25 +45,51 @@ fun AppTheme(
         else -> BrandLightColors
     }
 
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = AppTypography,
-        content = content,
-    )
+    CompositionLocalProvider(
+        LocalSemanticColors provides if (darkTheme) DarkSemanticColors else LightSemanticColors,
+    ) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = AppTypography,
+            content = content,
+        )
+    }
+}
+
+private val LocalSemanticColors = staticCompositionLocalOf { LightSemanticColors }
+
+/** Semantic colors for content meaning (`AppSemantics.colors.error`), light or dark. */
+object AppSemantics {
+    val colors: SemanticColors
+        @Composable @ReadOnlyComposable get() = LocalSemanticColors.current
 }
 
 private val BrandLightColors = lightColorScheme(
-    primary = BrandPrimary,
-    secondary = BrandSecondary,
-    tertiary = BrandTertiary,
-    // background / surface left at M3 defaults for light theme; brand
-    // is built dark-first so customize only if you ship light mode.
+    primary = BrandPrimaryLight,
+    onPrimary = BrandOnPrimaryLight,
+    background = BrandBackgroundLight,
+    onBackground = BrandTextLight,
+    surface = BrandBackgroundLight,
+    onSurface = BrandTextLight,
+    surfaceVariant = BrandSurfaceLight,
+    onSurfaceVariant = BrandTextMutedLight,
+    surfaceContainer = BrandSurfaceLight,
+    surfaceContainerHigh = BrandSurfaceAltLight,
+    outline = BrandBorderLight,
+    outlineVariant = BrandBorderLight,
 )
 
 private val BrandDarkColors = darkColorScheme(
-    primary = BrandPrimary,
-    secondary = BrandSecondary,
-    tertiary = BrandTertiary,
-    background = BrandBackground,
-    surface = BrandSurface,
+    primary = BrandPrimaryDark,
+    onPrimary = BrandOnPrimaryDark,
+    background = BrandBackgroundDark,
+    onBackground = BrandTextDark,
+    surface = BrandBackgroundDark,
+    onSurface = BrandTextDark,
+    surfaceVariant = BrandSurfaceDark,
+    onSurfaceVariant = BrandTextMutedDark,
+    surfaceContainer = BrandSurfaceDark,
+    surfaceContainerHigh = BrandSurfaceAltDark,
+    outline = BrandBorderDark,
+    outlineVariant = BrandBorderDark,
 )

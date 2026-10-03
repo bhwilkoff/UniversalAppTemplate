@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Design tokens (light), generated from design-tokens.json by tools/design_tokens.mjs. Do not edit by hand. -->
+<!-- Compose reads Color.kt; these serve themes.xml (the splash) and the launcher icon. -->
 <resources>
-    <!--
-        Mirror the brand tokens from Compose Color.kt. XML referenced
-        from themes.xml + adaptive icon background. Keep in sync;
-        Compose uses the Color.kt copy, XML resources use these.
-    -->
-    <color name="brand_primary">#FFFF5C35</color>
-    <color name="brand_background">#FF080810</color>
-    <color name="brand_surface">#FF0D0D1A</color>
+    <color name="brand_primary">#FF3F5E78</color>
+    <color name="brand_background">#FFFFFFFF</color>
+    <color name="brand_surface">#FFF5F6F8</color>
 </resources>
