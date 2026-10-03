@@ -105,7 +105,48 @@
     return text + '.';
   }
 
-  var lib = { zonedToUtc: zonedToUtc, sessionDates: sessionDates, sessionRows: sessionRows, meetSetup: meetSetup, waitingForFeedback: waitingForFeedback, scheduleText: scheduleText, WEEKDAYS: WEEKDAYS };
+  // A teacher's setup before a cohort's first session, each step checked
+  // off by what the hub can see: the cohort's own fields, its sessions,
+  // and the teacher's own access to the cohort's conversation. A Meet
+  // link on a week is the hub's only sign that a host exists, so the
+  // host step is done when one week has a link, and the event step when
+  // every week has one.
+  function cohortSetupSteps(cohort, sessions, myAccess) {
+    sessions = sessions || [];
+    var slug = encodeURIComponent(cohort.slug || '');
+    var linked = sessions.filter(function (s) { return !!s.meet_url; }).length;
+    var steps = [
+      { key: 'schedule', label: 'Set the first day, the session day, and the time', action: 'edit',
+        done: !!(cohort.starts_on && cohort.session_weekday != null && cohort.session_time) },
+      { key: 'sessions', label: 'Make the weekly sessions', action: 'sessions', done: sessions.length > 0 },
+      { key: 'host', label: 'Choose the Google account you will host the sessions from', href: '/teach/guide/#host', done: linked > 0 },
+      { key: 'event', label: 'Make the weekly event with its Meet link, and put the link in each week', href: '/teach/guide/#event',
+        done: sessions.length > 0 && linked === sessions.length },
+      { key: 'repo', label: 'Name the cohort’s private repository and team, once Ben has made them in humanshaped', action: 'edit',
+        done: !!(cohort.github_repo && cohort.github_team) }
+    ];
+    if (cohort.github_repo && cohort.github_team) {
+      steps.push({ key: 'talk', label: 'Open the cohort’s conversation yourself, so you know it works', href: '/cohort/?c=' + slug + '#talk-title',
+        done: !!(myAccess && myAccess.state === 'member') });
+    }
+    steps.push({ key: 'open', label: 'Open the cohort, so people can join', action: 'edit', done: cohort.status !== 'draft' });
+    return steps;
+  }
+
+  // Which part of the request to teach a signed-in person sees.
+  function requestState(isTeacher, request) {
+    if (isTeacher) return 'teacher';
+    if (!request) return 'ask';
+    return request.state === 'declined' ? 'declined' : 'waiting';
+  }
+
+  // Requests still waiting for an answer, oldest first.
+  function waitingRequests(requests) {
+    return (requests || []).filter(function (r) { return r.state === 'waiting'; })
+      .sort(function (a, b) { return a.created_at.localeCompare(b.created_at); });
+  }
+
+  var lib = { zonedToUtc: zonedToUtc, sessionDates: sessionDates, sessionRows: sessionRows, meetSetup: meetSetup, waitingForFeedback: waitingForFeedback, scheduleText: scheduleText, cohortSetupSteps: cohortSetupSteps, requestState: requestState, waitingRequests: waitingRequests, WEEKDAYS: WEEKDAYS };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
   else root.TeachLib = lib;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

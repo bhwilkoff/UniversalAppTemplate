@@ -64,3 +64,41 @@ test('a schedule names the reader day when the session crosses midnight for them
 test('a schedule without a day or time says so', () => {
   assert.equal(lib.scheduleText({ session_minutes: 75, time_zone: 'UTC' }), 'The weekly session time is still to come.');
 });
+
+const draft = { slug: 'spring', status: 'draft', starts_on: null, session_weekday: null, session_time: null, github_repo: null, github_team: null };
+const keysDone = (steps) => steps.filter((s) => s.done).map((s) => s.key);
+test('a new draft cohort has every setup step still to do', () => {
+  const steps = lib.cohortSetupSteps(draft, [], null);
+  assert.deepEqual(steps.map((s) => s.key), ['schedule', 'sessions', 'host', 'event', 'repo', 'open']);
+  assert.deepEqual(keysDone(steps), []);
+});
+test('a Meet link on one week checks off the host, and on every week the event', () => {
+  const c = { ...draft, starts_on: '2026-10-19', session_weekday: 2, session_time: '17:00:00' };
+  const some = [{ meet_url: 'https://meet.google.com/abc-defg-hij' }, { meet_url: null }];
+  assert.deepEqual(keysDone(lib.cohortSetupSteps(c, some, null)), ['schedule', 'sessions', 'host']);
+  const all = [{ meet_url: 'https://meet.google.com/abc-defg-hij' }, { meet_url: 'https://meet.google.com/abc-defg-hij' }];
+  assert.deepEqual(keysDone(lib.cohortSetupSteps(c, all, null)), ['schedule', 'sessions', 'host', 'event']);
+});
+test('the conversation step appears once the repository and team are named, and checks off for a member', () => {
+  const c = { ...draft, status: 'open', github_repo: 'humanshaped/cohort-spring', github_team: 'cohort-spring' };
+  const invited = lib.cohortSetupSteps(c, [], { state: 'invited' });
+  const talk = invited.find((s) => s.key === 'talk');
+  assert.equal(talk.done, false);
+  assert.equal(talk.href, '/cohort/?c=spring#talk-title');
+  assert.deepEqual(keysDone(invited), ['repo', 'open']);
+  assert.equal(lib.cohortSetupSteps(c, [], { state: 'member' }).find((s) => s.key === 'talk').done, true);
+});
+test('a person sees the form, their waiting request, or the answer', () => {
+  assert.equal(lib.requestState(true, null), 'teacher');
+  assert.equal(lib.requestState(false, null), 'ask');
+  assert.equal(lib.requestState(false, { state: 'waiting' }), 'waiting');
+  assert.equal(lib.requestState(false, { state: 'declined' }), 'declined');
+});
+test('requests waiting for an answer come oldest first, and decided ones drop out', () => {
+  const r = [
+    { user_id: 'b', state: 'waiting', created_at: '2026-10-05T00:00:00Z' },
+    { user_id: 'a', state: 'waiting', created_at: '2026-10-04T00:00:00Z' },
+    { user_id: 'c', state: 'declined', created_at: '2026-10-01T00:00:00Z' }
+  ];
+  assert.deepEqual(lib.waitingRequests(r).map((x) => x.user_id), ['a', 'b']);
+});
