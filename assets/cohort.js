@@ -521,6 +521,34 @@
     syncShareForm();
     if (tools) drawBars();
     show('ready');
+    if (mine) openBringBack();
+  }
+
+  // A stage's "Bring it back" (assets/path-marks.js) opens the form here
+  // for that stage, once, with the person's own answer to the stage's
+  // bar already chosen if they gave one. They still write it and send it.
+  var bringOpened = false;
+  function openBringBack() {
+    var P = window.PathLib;
+    var stage = P && P.bringParam(location.search);
+    if (!stage || bringOpened) return;
+    bringOpened = true;
+    var form = $('[data-share-form]'), f = form.elements;
+    f.kind.value = 'bring-back';
+    var info = P.stageInfo(stage);
+    f.note.placeholder = 'What you are bringing back from ' + (stage === 'setup' ? 'getting set up' : 'stage ' + stage + ', ' + info.title) + ', in your own words';
+    syncShareForm();
+    var go = function () {
+      syncShareForm();
+      $('#share-title').scrollIntoView();
+      f.note.focus({ preventScroll: true });
+    };
+    if (!tools) { go(); return; }
+    db.from('stage_marks').select('state').eq('user_id', me.id).eq('stage', stage).eq('item', 'ready').maybeSingle().then(function (r) {
+      var state = !r.error && r.data ? r.data.state : null;
+      [].forEach.call(f.readiness, function (x) { x.checked = x.value === state; });
+      go();
+    });
   }
 
   $('[data-my-app]').addEventListener('submit', function (ev) {

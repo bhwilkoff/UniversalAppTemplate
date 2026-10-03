@@ -1427,6 +1427,58 @@ def main():
     ben.execute("update public.cohorts set status = 'finished' where id = %s", (tc,))
     su9.execute("select count(*) from public.session_notes where cohort_id = %s", (tc,))
     check("when the cohort is finished, the talk shares are deleted", su9.fetchone()[0] == 0)
+
+    # Marks on the path (G3): a person's own, read and written by them alone.
+    # Cal deleted their account above, so they come back as a new person.
+    su9 = conn.cursor(); su9.execute("reset role")
+    people["cal"] = str(uuid.uuid4())
+    su9.execute("insert into auth.users (id, raw_user_meta_data) values (%s, %s)",
+                (people["cal"], '{"user_name": "cal", "provider_id": "4242", "avatar_url": "https://example.org/cal.png"}'))
+    mark ="insert into public.stage_marks (user_id, stage, item, state, note) values (%s, %s, %s, %s, %s) returning stage, item, state"
+    cal = as_user("cal")
+    check("someone marks a step of a stage done",
+          attempt(cal, mark, (people["cal"], "01", "step-2", "done", None)) and last_rows == [("01", "step-2", "done")])
+    check("they mark themselves ready, or not yet",
+          attempt(cal, mark, (people["cal"], "01", "ready", "not-yet", None)))
+    check("they change their mind",
+          attempt(cal, "update public.stage_marks set state = 'ready' where user_id = %s and stage = '01' and item = 'ready' returning state", (people["cal"],))
+          and last_rows == [("ready",)])
+    check("they keep a note privately",
+          attempt(cal, mark, (people["cal"], "setup", "note", "kept", "The address opened on my phone.")))
+    check("a mark is one of the path's stages", not attempt(cal, mark, (people["cal"], "09", "ready", "ready", None)))
+    check("a step is not marked ready", not attempt(cal, mark, (people["cal"], "02", "step-1", "ready", None)))
+    check("a note has words", not attempt(cal, mark, (people["cal"], "02", "note", "kept", "  ")))
+    check("only a note carries words", not attempt(cal, mark, (people["cal"], "02", "ready", "ready", "hidden words")))
+    check("a stage has one mark of each kind", not attempt(cal, mark, (people["cal"], "01", "step-2", "done", None)))
+    check("nobody marks for someone else", not attempt(cal, mark, (people["bea"], "01", "ready", "ready", None)))
+    cal.execute("select count(*) from public.stage_marks")
+    check("a person reads their own marks", cal.fetchone()[0] == 3)
+    ben = as_user("ben")
+    ben.execute("select count(*) from public.stage_marks where user_id = %s", (people["cal"],))
+    check("a teacher cannot read a person's marks", ben.fetchone()[0] == 0)
+    bea = as_user("bea")
+    bea.execute("select count(*) from public.stage_marks where user_id = %s", (people["cal"],))
+    check("another student cannot read them", bea.fetchone()[0] == 0)
+    check("another student cannot change them",
+          attempt(bea, "update public.stage_marks set state = 'not-yet' where user_id = %s and item = 'ready' returning state", (people["cal"],)) and last_rows == [])
+    check("another student cannot remove them",
+          attempt(bea, "delete from public.stage_marks where user_id = %s returning item", (people["cal"],)) and last_rows == [])
+    anon = as_user(None)
+    check("no one signed out reads them", not attempt(anon, "select count(*) from public.stage_marks") or last_rows == [(0,)])
+    cal_agent = as_agent("cal")
+    cal_agent.execute("select count(*) from public.stage_marks")
+    check("a person's own agent reads their marks", cal_agent.fetchone()[0] == 3)
+    check("their agent cannot mark a step", not attempt(cal_agent, mark, (people["cal"], "03", "step-1", "done", None)))
+    check("their agent cannot change a mark",
+          not attempt(cal_agent, "update public.stage_marks set state = 'not-yet' where user_id = %s and item = 'ready' returning state", (people["cal"],)) or last_rows == [])
+    check("their agent cannot remove a mark",
+          not attempt(cal_agent, "delete from public.stage_marks where user_id = %s returning item", (people["cal"],)) or last_rows == [])
+    cal = as_user("cal")
+    check("a person removes their own mark",
+          attempt(cal, "delete from public.stage_marks where user_id = %s and stage = '01' and item = 'step-2' returning item", (people["cal"],)) and len(last_rows) == 1)
+    cal.execute("select public.delete_my_account()")
+    su9.execute("select count(*) from public.stage_marks where user_id = %s", (people["cal"],))
+    check("deleting the account deletes the marks", su9.fetchone()[0] == 0)
     conn.rollback()
     conn.close()
     failed = [n for n, ok in results if not ok]

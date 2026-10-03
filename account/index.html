@@ -117,8 +117,15 @@
             <div data-notes></div>
           </div>
 
+          <!-- Words by Claude, awaiting Ben's review (G3). -->
+          <div data-path-section hidden>
+            <h2>Your path</h2>
+            <p class="small">What you marked on the stages of the path. Only you can see it, and nothing here is counted or compared.</p>
+            <div data-path-marks></div>
+          </div>
+
           <h2>Your data</h2>
-          <p>This site keeps your GitHub name and picture, which cohorts you are in, whatever you choose to share with a cohort, and the notes your teachers send you. Leaving a cohort removes what you shared there but keeps your notes, which you can remove here. Deleting your account removes everything.</p>
+          <p>This site keeps your GitHub name and picture, which cohorts you are in, whatever you choose to share with a cohort, your own marks on the path, and the notes your teachers send you. Leaving a cohort removes what you shared there but keeps your notes, which you can remove here. Deleting your account removes everything.</p>
           <div class="actions">
             <button class="btn-quiet" type="button" data-sign-out>Sign out</button>
             <button class="btn-quiet danger" type="button" data-delete-open>Delete my account</button>
@@ -154,6 +161,7 @@
   <script src="/assets/teach-lib.js" defer></script>
   <script src="/assets/discussions-lib.js" defer></script>
   <script src="/assets/addon-lib.js" defer></script>
+  <script src="/assets/path-lib.js" defer></script>
   <script src="/assets/hub.js" defer></script>
 
   <footer class="site-footer">

@@ -225,6 +225,7 @@
         });
         root.querySelector('[data-teach-link]').hidden = !res[3].data;
         drawNotes(uid);
+        drawPath(uid);
         show('signed-in');
       });
     }).catch(function (err) {
@@ -271,6 +272,55 @@
           });
         });
       });
+  }
+
+  // Your own marks on the path (assets/path-lib.js): the stages you
+  // marked ready, and any note you kept of what you would bring back.
+  // Nobody else sees this, and it counts nothing.
+  function drawPath(uid) {
+    var P = window.PathLib;
+    var section = root.querySelector('[data-path-section]');
+    var box = root.querySelector('[data-path-marks]');
+    if (!P || !section) return;
+    db.from('stage_marks').select('stage, item, state, note, updated_at').eq('user_id', uid).then(function (r) {
+      // Before the database has the table, the section stays away.
+      var marks = r.error ? {} : P.fromRows(r.data);
+      var ready = P.readyStages(marks);
+      var notes = P.STAGES.map(function (s) { return { stage: s, mark: P.get(marks, s.id, 'note') }; }).filter(function (x) { return x.mark; });
+      section.hidden = !ready.length && !notes.length;
+      box.replaceChildren();
+      if (ready.length) {
+        var p = el('p', null, 'You marked ' + (ready.length === 1 ? 'this stage' : 'these stages') + ' ready to move on: ');
+        ready.forEach(function (s, i) {
+          if (i) p.appendChild(document.createTextNode(i === ready.length - 1 ? (ready.length > 2 ? ', and ' : ' and ') : ', '));
+          var a = el('a', null, s.title); a.href = s.href;
+          p.appendChild(a);
+        });
+        p.appendChild(document.createTextNode('.'));
+        box.appendChild(p);
+      }
+      notes.forEach(function (x) {
+        var q = el('blockquote', 'feedback');
+        x.mark.note.split(/\n{2,}/).forEach(function (para) { q.appendChild(el('p', null, para)); });
+        var line = el('p', 'small', 'Your note on ');
+        var a = el('a', null, x.stage.title); a.href = x.stage.href;
+        line.appendChild(a);
+        q.appendChild(line);
+        var msg = el('span', 'small'); msg.setAttribute('role', 'status');
+        var rm = el('button', 'btn-quiet', 'Remove this note');
+        rm.type = 'button';
+        rm.addEventListener('click', function () {
+          rm.disabled = true;
+          db.from('stage_marks').delete().eq('user_id', uid).eq('stage', x.stage.id).eq('item', 'note').select('item').then(function (d) {
+            rm.disabled = false;
+            if (d.error || !d.data.length) { msg.textContent = 'Not removed: ' + (d.error ? d.error.message : 'the database refused') + '.'; return; }
+            drawPath(uid);
+          });
+        });
+        var acts = el('div', 'actions'); acts.appendChild(rm); acts.appendChild(msg); q.appendChild(acts);
+        box.appendChild(q);
+      });
+    });
   }
 
   load();
