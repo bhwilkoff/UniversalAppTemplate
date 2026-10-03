@@ -93,6 +93,15 @@ and waits on one real sign-in.
 
 ## Needs Ben
 
+- **Connecting students' agents, once** (core item 3; the design and
+  sources are in `research/notes/agent-connection-notes.md`). In the
+  Supabase dashboard for humanshaped-hub: Authentication, OAuth Server,
+  switch on the OAuth 2.1 server and dynamic client registration, and
+  set the Authorization Path to `/oauth/consent/`. Then review the
+  consent page's words when it exists, and try connecting once yourself
+  from claude.ai, Claude Code, and Gemini CLI before anything links to
+  it.
+
 - **Cohort conversation setup, once** (core item 2; the design and its
   sources are in `research/notes/cohort-conversation-notes.md`). Each
   cohort gets a private repository in `humanshaped` with Discussions on
@@ -381,14 +390,30 @@ and waits on one real sign-in.
   the setup session) checked off on the cohort page. Research for core
   item 3 (connecting the student's agent) is running.
 
+- 2026-10-03, core item 3, research and the safety rule first. A
+  research agent recommended OAuth through Supabase Auth's own OAuth 2.1
+  server (no extra charge, registers MCP clients automatically) and an
+  MCP server on an Edge Function, because claude.ai's connectors (the
+  free plan included) can only identify a student through OAuth; a
+  connector added on claude.ai also reaches Claude Code. Checked the
+  deciding claims in Supabase's docs myself, including the client_id
+  claim on agents' tokens. Built the rule before the door: migration 6
+  makes every agent token read-only (restrictive policies on every
+  table, no reading calendar emails, and leave_cohort and
+  delete_my_account refuse agents). 10 new checks, 49 of 49, 8 failed
+  with the rule opened on purpose. Applied; /account/ and /teach/ work
+  as before.
+
 ## Where to pick up
 
-1. Core item 2, the conversation shown on the site: recent
-   discussions from the cohort's repository on /cohort/ and /live/,
-   read through GitHub's GraphQL API. Reading private discussions in
-   the browser needs the student's own GitHub App token, which only
-   exists after Ben's setup, so build it against a stand-in and keep
-   the "Open the conversation" link as the way in until then.
-2. Core item 3 (connect your AI agent) can go ahead in parallel, since
-   it needs nothing from Ben.
-3. Then core item 3 (connect your AI agent).
+1. Core item 3, the MCP server: an Edge Function `mcp` (Streamable
+   HTTP, the official TypeScript SDK) with read-only tools my_cohorts,
+   this_week, next_session, my_group, my_work, and method, and prompts
+   review_this_week and prepare_for_session, each tool reading through
+   the student's own token so row-level security decides. Tool logic in
+   a plain module tested by node. Then the consent page at
+   /oauth/consent/ and a "Connect your agent" page with the exact steps
+   for claude.ai, Claude Code, and Gemini CLI (`-s user`, so the setting
+   never lands in a public repository).
+2. Core item 2's last part (showing discussions on the site) waits on
+   Ben's GitHub App.

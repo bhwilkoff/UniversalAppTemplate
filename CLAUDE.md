@@ -104,7 +104,9 @@ what waits on Ben.
   `bifrieqzkihuxfzttgvd`, free plan, us-west-1, org "Learning is Change,
   Inc"). Schema and row-level security in `supabase/migrations/`, applied
   in order. `supabase/tests/test_policies.py` runs them against a local
-  throwaway Postgres as four people (39 checks); run it before applying
+  throwaway Postgres as four people and as a student's AI agent (49
+  checks; agents' tokens carry a `client_id` and can only read); run it
+  before applying
   any new migration, and see it fail when a rule is opened on purpose.
   Access-rule helpers live in the `private` schema, out of the API.
 - **Sign-in:** GitHub, through the "Human Shaped" OAuth app owned by the
