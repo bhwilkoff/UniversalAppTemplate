@@ -371,10 +371,33 @@ installed for meet@. Left: the Admin console's Meet add-ons setting
 (it asked for Ben's password again), clasp login for meet-events (Ben's
 browser click), Script Properties and whoAmI, and a test call.
 
-**Next:**
+**Next: the gaps against VISION.md and COURSE.md** (gap analysis,
+October 3, after every C milestone that does not wait on Ben merged):
 
-- Smaller: show the cohort's discussions on /cohort/ and /live/ once the
-  GitHub App exists; design iteration two from Ben's notes.
+- **G1. A teacher other than Ben sets up a cohort alone:** a provisioning
+  function makes the private repository (Discussions on) and secret
+  team through the GitHub App, and meet-events reads a queue of setup
+  requests as meet@. 4 to 6 days, migration, research first on App
+  permissions and Apps Script polling Supabase.
+- **G2. A builder outside a cohort has a place on the hub:** their own
+  app record and public switch, a builder page, and MCP context when
+  working alone. 4 to 5 days, migration, moderation notes first.
+- **G3. The path is interactive:** agent prompts as steps with copy
+  buttons, a "ready / not yet" self-check, "bring this back" into the
+  cohort or saved privately, and progress per person (no points). 3 to
+  5 days. Building now.
+- **G4. Reaching a person off the site:** the missed-session reach-out
+  and replies, through a $0 channel. 2 to 3 days, research first.
+- **G5. Events and community on the site:** a published events.json
+  and community threads by a nightly workflow, and each app's
+  conversation on its page. 3 to 4 days.
+- **G6. Template, week 4 for free, and each app its own identity:** an
+  identity step (applicationId and bundle ID were com.example.appname),
+  a signed APK artifact, and free sharing in stage 05. 2 days. Building
+  now.
+- **G7. Alumni and mentors:** credential holders return to finished
+  cohorts as mentors, and enrollments are marked finished. 2 days,
+  migration. Building now.
 
 ## Needs Ben
 
