@@ -9,6 +9,8 @@ before. This page lists every doc by the stage that sends you there.
 `path/00-why-we-build.md` through `path/08-working-with-ai.md`. Read them
 in order the first time. `path/talking-to-your-agent.md` is the companion
 to all of them: how to ask, correct, and decide, in real prompts.
+`path/showing-your-work.md` is the other: how to bring each stage's work
+back and get feedback on it, in a cohort or on your own.
 
 ## By stage
 
