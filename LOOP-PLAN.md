@@ -343,12 +343,28 @@ and waits on one real sign-in.
   which needs Ben's GitHub App and its three secrets
   (GITHUB_APP_ID, GITHUB_APP_PRIVATE_KEY, GITHUB_APP_INSTALLATION_ID).
 
+- 2026-10-03, core item 2, wiring. Joining on /account/ asks
+  cohort-access to open the cohort's GitHub team, and leaving asks it to
+  close it. /cohort/ has a "The cohort's conversation" section that
+  reads github_access: not set up yet, open it, accept GitHub's
+  invitation, or open the conversation on GitHub. /teach/ has fields for
+  the repository and the team. Verified on production as Ben with a
+  labeled test cohort: the fields saved, the button reached the live
+  function, and its answer stayed on screen. Two fixes from that test:
+  a teacher saw "not in this cohort" on a new cohort with no sessions
+  or people yet (the page now asks cohort_teachers directly), and the
+  not-set-up answer showed a library's error text (now a plain
+  sentence, with the detail in the function's log). Test cohort
+  deleted.
+
 ## Where to pick up
 
-1. Core item 2, wiring: /account/ calls cohort-access after joining
-   and after leaving; /cohort/ shows where the person's GitHub access
-   stands (invited: accept the email; member: the conversation is
-   open); /teach/ gets fields for the cohort's repository and team.
-2. Then the conversation itself on /cohort/ and /live/, read and
-   posted through GitHub's GraphQL API with the student's own token.
+1. Core item 2, the conversation shown on the site: recent
+   discussions from the cohort's repository on /cohort/ and /live/,
+   read through GitHub's GraphQL API. Reading private discussions in
+   the browser needs the student's own GitHub App token, which only
+   exists after Ben's setup, so build it against a stand-in and keep
+   the "Open the conversation" link as the way in until then.
+2. Core item 3 (connect your AI agent) can go ahead in parallel, since
+   it needs nothing from Ben.
 3. Then core item 3 (connect your AI agent).
