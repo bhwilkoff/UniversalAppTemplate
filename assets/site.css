@@ -1303,3 +1303,6 @@ label.check { min-height: 2.25rem; }
 .board-stage .board-status { font-size: 0.85rem; text-align: right; }
 .board-stage .board-ready { position: relative; }
 .board-stage .board-canvas { height: 100svh; max-height: none; border: 0; }
+
+/* A member's role beside their name: only mentors carry a word (mentor-lib.js). */
+.role-tag { margin-left: 0.4rem; font-size: 0.85em; font-weight: 600; color: var(--clay); }

@@ -1427,6 +1427,110 @@ def main():
     ben.execute("update public.cohorts set status = 'finished' where id = %s", (tc,))
     su9.execute("select count(*) from public.session_notes where cohort_id = %s", (tc,))
     check("when the cohort is finished, the talk shares are deleted", su9.fetchone()[0] == 0)
+
+    # ---- Alumni and mentors (migration 20261003200000) ------------------
+    # Every cursor shares one connection, so each act starts by becoming
+    # the person who does it.
+    u = as_user
+
+    def one(name, sql, args=()):
+        cur = u(name)
+        cur.execute(sql, args)
+        return cur.fetchone()
+
+    su10 = conn.cursor(); su10.execute("reset role")
+    for name in ["gil", "hal"]:
+        uid = str(uuid.uuid4())
+        su10.execute("insert into auth.users (id, raw_user_meta_data) values (%s, %s)",
+                     (uid, f'{{"user_name": "{name}", "provider_id": "{abs(hash(name)) % 10**8}"}}'))
+        people[name] = uid
+    attempt(u("ben"), "insert into public.cohorts (slug, title, created_by, status) values ('alum-from', 'Earlier', %s, 'open') returning id", (people["ben"],))
+    early = last_rows[0][0]
+    attempt(u("ben"), "insert into public.sessions (cohort_id, number, title) values (%s, 1, 'Week 1')", (early,))
+    for name in ["gil", "hal"]:
+        attempt(u(name), "insert into public.enrollments (cohort_id, user_id, app_name, app_repo, app_url) values (%s, %s, 'Seed Library', %s, 'https://example.org/seeds')",
+                (early, people[name], f"{name}/seed-library"))
+    attempt(u("ben"), "update public.cohorts set status = 'finished' where id = %s", (early,))
+    su10 = conn.cursor(); su10.execute("reset role")
+    su10.execute("select count(*) from public.enrollments where cohort_id = %s and status = 'finished'", (early,))
+    check("finishing a cohort marks everyone still in it finished", su10.fetchone()[0] == 2)
+    check("a finished member still reads their cohort's sessions",
+          one("gil", "select count(*) from public.sessions where cohort_id = %s", (early,))[0] == 1)
+    check("a finished member still sees who was in the cohort",
+          one("gil", "select count(*) from public.enrollments where cohort_id = %s", (early,))[0] == 2)
+    check("a finished member cannot mark themselves enrolled again",
+          not attempt(u("gil"), "update public.enrollments set status = 'enrolled' where cohort_id = %s and user_id = %s", (early, people["gil"])))
+    attempt(u("ben"), "update public.cohorts set status = 'running' where id = %s", (early,))
+    su10 = conn.cursor(); su10.execute("reset role")
+    su10.execute("select count(*) from public.enrollments where cohort_id = %s and status = 'enrolled'", (early,))
+    check("reopening a finished cohort puts its members back in it", su10.fetchone()[0] == 2)
+    attempt(u("ben"), "update public.cohorts set status = 'finished' where id = %s", (early,))
+    attempt(u("ben"), issue.replace("'Garden Swap', 'https://example.org/app'", "'Seed Library', 'https://example.org/seeds'"),
+            (people["gil"], early, people["ben"], ["web"], "{}", "gil/seed-library"))
+    gil_cred = last_rows[0][0] if last_rows else None
+    check("the teacher records the finished student's credential", gil_cred is not None)
+
+    attempt(u("ben"), "insert into public.cohorts (slug, title, created_by, status) values ('alum-to', 'Later', %s, 'open') returning id", (people["ben"],))
+    later = last_rows[0][0]
+    attempt(u("ben"), "insert into public.cohorts (slug, title, created_by) values ('alum-draft', 'Draft', %s) returning id", (people["ben"],))
+    draft = last_rows[0][0]
+    attempt(u("bea"), "insert into public.enrollments (cohort_id, user_id) values (%s, %s)", (later, people["bea"]))
+    check("a student cannot make themselves a mentor",
+          not attempt(u("bea"), "update public.enrollments set role = 'mentor' where cohort_id = %s and user_id = %s", (later, people["bea"])))
+    check("no one joins as a mentor directly (only as a student)",
+          not attempt(u("gil"), "insert into public.enrollments (cohort_id, user_id, role) values (%s, %s, 'mentor')", (later, people["gil"])))
+    check("someone without a credential is not offered mentoring", one("hal", "select public.can_mentor()")[0] is False)
+    check("someone without a credential cannot join as a mentor",
+          not attempt(u("hal"), "select public.join_as_mentor(%s)", (later,)))
+    check("a credential holder is offered mentoring", one("gil", "select public.can_mentor()")[0] is True)
+    check("a credential holder cannot mentor a draft cohort", not attempt(u("gil"), "select public.join_as_mentor(%s)", (draft,)))
+    check("a credential holder cannot mentor a finished cohort", not attempt(u("gil"), "select public.join_as_mentor(%s)", (early,)))
+    check("a credential holder's agent cannot join as a mentor",
+          not attempt(as_agent("gil"), "select public.join_as_mentor(%s)", (later,)))
+    check("a credential holder joins an open cohort as a mentor",
+          attempt(u("gil"), "select public.join_as_mentor(%s)", (later,)))
+    check("they are in it as a mentor",
+          one("gil", "select role::text, status::text from public.enrollments where cohort_id = %s and user_id = %s", (later, people["gil"])) == ("mentor", "enrolled"))
+    check("a mentor cannot join the same cohort twice", not attempt(u("gil"), "select public.join_as_mentor(%s)", (later,)))
+    check("a mentor can edit their own app details",
+          attempt(u("gil"), "update public.enrollments set app_name = 'Seed Library, again' where cohort_id = %s and user_id = %s returning app_name", (later, people["gil"])) and len(last_rows) == 1)
+    check("a mentor cannot make themselves a student",
+          not attempt(u("gil"), "update public.enrollments set role = 'student' where cohort_id = %s and user_id = %s", (later, people["gil"])))
+    check("a teacher cannot be a mentor in their own cohort", not attempt(u("ben"), "select public.join_as_mentor(%s)", (later,)))
+
+    attempt(u("ben"), "insert into public.teacher_notes (cohort_id, student_id, author_id, body) values (%s, %s, %s, 'For bea alone.')", (later, people["bea"], people["ben"]))
+    attempt(u("bea"), "insert into public.calendar_contacts (cohort_id, user_id, email) values (%s, %s, 'bea@example.org')", (later, people["bea"]))
+    check("a mentor cannot read a teacher's notes to students",
+          one("gil", "select count(*) from public.teacher_notes where cohort_id = %s", (later,))[0] == 0)
+    check("a mentor cannot read students' calendar emails",
+          one("gil", "select count(*) from public.calendar_contacts where cohort_id = %s and user_id <> %s", (later, people["gil"]))[0] == 0)
+    check("a mentor sees who is in the cohort, like any member",
+          one("gil", "select count(*) from public.enrollments where cohort_id = %s", (later,))[0] == 2)
+
+    check("a teacher can make a student a mentor",
+          attempt(u("ben"), "update public.enrollments set role = 'mentor' where cohort_id = %s and user_id = %s returning role::text", (later, people["bea"])) and last_rows == [("mentor",)])
+    check("and a mentor a student again",
+          attempt(u("ben"), "update public.enrollments set role = 'student' where cohort_id = %s and user_id = %s returning role::text", (later, people["bea"])) and last_rows == [("student",)])
+    check("a teacher of another cohort cannot change a role here",
+          attempt(u("dee"), "update public.enrollments set role = 'mentor' where cohort_id = %s and user_id = %s returning role", (later, people["bea"])) and last_rows == [])
+
+    attempt(u("gil"), "select public.leave_cohort(%s)", (later,))
+    check("a mentor can leave",
+          one("gil", "select status::text from public.enrollments where cohort_id = %s and user_id = %s", (later, people["gil"])) == ("left",))
+    check("someone who left cannot put themselves back",
+          not attempt(u("gil"), "update public.enrollments set status = 'enrolled' where cohort_id = %s and user_id = %s", (later, people["gil"])))
+    check("someone who left can come back as a mentor", attempt(u("gil"), "select public.join_as_mentor(%s)", (later,)))
+    check("and is a mentor again",
+          one("gil", "select role::text, status::text from public.enrollments where cohort_id = %s and user_id = %s", (later, people["gil"])) == ("mentor", "enrolled"))
+
+    attempt(u("ben"), "insert into public.cohorts (slug, title, created_by, status) values ('alum-run', 'Running', %s, 'open') returning id", (people["ben"],))
+    running = last_rows[0][0]
+    attempt(u("ben"), "update public.cohorts set status = 'running' where id = %s", (running,))
+    check("a credential holder can mentor a running cohort", attempt(u("gil"), "select public.join_as_mentor(%s)", (running,)))
+    attempt(u("ben"), "update public.credentials set revoked_at = now(), revoked_reason = 'Test.' where id = %s", (gil_cred,))
+    attempt(u("ben"), "insert into public.cohorts (slug, title, created_by, status) values ('alum-after', 'After', %s, 'open') returning id", (people["ben"],))
+    after = last_rows[0][0]
+    check("a revoked credential no longer opens mentoring", not attempt(u("gil"), "select public.join_as_mentor(%s)", (after,)))
     conn.rollback()
     conn.close()
     failed = [n for n, ok in results if not ok]
