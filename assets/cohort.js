@@ -285,6 +285,7 @@
           partnerIds = lib.partnersOf(me.id, res[2].data);
           draw(people, mine, res[1].data, res[2].data, res[3].data, res[4].data, res[5].data);
           drawTalk(res[6].data);
+          drawNotes(res[5].data);
           drawSetup(mine, res[6].data);
           drawPublicChoice(mine, res[1].data);
         });
@@ -338,6 +339,37 @@
       var why = $('[data-app-hidden-reason]');
       why.textContent = r.data && r.data.reason ? 'Their reason: ' + r.data.reason : '';
       why.hidden = !(r.data && r.data.reason);
+    });
+  }
+
+  // Follow-ups a teacher wrote to this person alone (teacher_notes,
+  // migration 20261003130000). Before the table exists, the read fails
+  // quietly and nothing shows. The person can remove any of them.
+  function drawNotes(teachers) {
+    var section = $('[data-notes-section]');
+    db.from('teacher_notes').select('id, author_id, body, created_at').eq('cohort_id', cohort.id).eq('student_id', me.id).order('created_at', { ascending: false }).then(function (r) {
+      var notes = r.error ? [] : r.data;
+      section.hidden = !notes.length;
+      var box = $('[data-notes]');
+      box.replaceChildren();
+      var names = {};
+      (teachers || []).forEach(function (t) { names[t.user_id] = nameOf(t.profiles); });
+      notes.forEach(function (n) {
+        var q = el('blockquote', 'feedback');
+        n.body.split(/\n{2,}/).forEach(function (para) { q.appendChild(el('p', null, para)); });
+        q.appendChild(el('p', 'small', (names[n.author_id] || 'Your teacher') + ', ' + lib.ago(n.created_at, new Date())));
+        var msg = el('span', 'small'); msg.setAttribute('role', 'status');
+        var rm = button('Remove it from my page', function () {
+          rm.disabled = true;
+          db.from('teacher_notes').delete().eq('id', n.id).select('id').then(function (d) {
+            rm.disabled = false;
+            if (d.error || !d.data.length) { msg.textContent = 'Not removed: ' + (d.error ? d.error.message : 'the database refused') + '.'; return; }
+            drawNotes(teachers);
+          });
+        });
+        var a = el('div', 'actions'); a.appendChild(rm); a.appendChild(msg); q.appendChild(a);
+        box.appendChild(q);
+      });
     });
   }
 

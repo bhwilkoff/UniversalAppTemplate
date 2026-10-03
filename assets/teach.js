@@ -366,6 +366,168 @@
         res[3].data.map(function (x) { return { user_id: x.author_id, at: x.created_at }; }));
       drawNotSeen(lib.notSeen(people, since, activity), last);
     });
+
+    loadFollowups(last, sessions, people, nameOf);
+  }
+
+  // ---- follow-ups ---------------------------------------------------
+  // For each student after a session, what they contributed on purpose
+  // (FollowupLib.contributions) and a follow-up the teacher writes. The
+  // draft lives only in this browser (localStorage) until it is sent, so
+  // the database never holds words about a student that the student
+  // cannot read. Sending puts it where the student will see it: feedback
+  // on their bring-back, or a note in teacher_notes (migration
+  // 20261003130000) that only they and the cohort's teachers can read.
+  // Nothing here writes a word for the teacher.
+  var F = window.FollowupLib;
+  var store = null;
+  try { store = window.localStorage; } catch (e) { store = null; }
+
+  function loadFollowups(last, sessions, people, nameOf) {
+    var box = $('[data-followups]');
+    if (!F || !box) return;
+    say('[data-followups-title]', 'Following up on week ' + last.number);
+    say('[data-followups-intro]', '');
+    box.replaceChildren(el('p', 'small', 'Gathering what each person did around the session…'));
+    var w = F.sessionWindow(sessions, last);
+    Promise.all([
+      db.from('shares').select('*, feedback(id, author_id, body, created_at)').eq('cohort_id', current.id),
+      db.from('live_queue').select('user_id, kind, url, note, state, created_at').eq('session_id', last.id),
+      db.from('live_checks').select('id, prompt, choices, created_at').eq('session_id', last.id),
+      db.from('cohort_teachers').select('user_id, profiles(github_login, display_name)').eq('cohort_id', current.id),
+      // Read on its own: before migration 20261003130000 the table is not
+      // there, and follow-ups can still go as feedback on a bring-back.
+      db.from('teacher_notes').select('id, student_id, author_id, body, created_at').eq('cohort_id', current.id)
+    ]).then(function (res) {
+      var bad = res.slice(0, 4).filter(function (r) { return r.error; })[0];
+      if (bad) { box.replaceChildren(el('p', 'small error', 'The follow-ups could not be gathered: ' + bad.error.message)); return; }
+      var ids = res[2].data.map(function (k) { return k.id; });
+      var answers = ids.length
+        ? db.from('live_answers').select('check_id, user_id, choice, body').in('check_id', ids)
+        : Promise.resolve({ data: [] });
+      return answers.then(function (a) {
+        if (a.error) { box.replaceChildren(el('p', 'small error', 'The answers could not be read: ' + a.error.message)); return; }
+        var teacherNames = {};
+        res[3].data.forEach(function (t) { if (t.profiles) teacherNames[t.user_id] = t.profiles.display_name || t.profiles.github_login; });
+        var who = function (id) { return id === me.id ? 'You' : (teacherNames[id] || nameOf(id)); };
+        drawFollowups(last, people, w, {
+          teacherIds: res[3].data.map(function (t) { return t.user_id; }),
+          shares: res[0].data, queue: res[1].data, checks: res[2].data, answers: a.data,
+          notes: res[4].error ? [] : res[4].data
+        }, !res[4].error, who);
+      });
+    });
+  }
+
+  function drawFollowups(last, people, w, data, notesReady, who) {
+    var box = $('[data-followups]');
+    box.replaceChildren();
+    var byId = {};
+    people.forEach(function (p) { byId[p.user_id] = F.contributions(p.user_id, w, data); });
+    var order = F.followupOrder(people, byId);
+    say('[data-followups-intro]', order.length
+      ? 'What each person did on purpose around week ' + last.number + '’s session, from what they brought back to the feedback they gave, with a place to write to them. Anyone who said something is still muddy comes first. A draft stays in this browser alone until you send it, and sending puts your words where they will see them: on their bring-back, or, if they brought nothing back, as a note on their cohort page that only they and the cohort’s teachers can read. Every word is yours to write.'
+      : 'Once people join, each of them is listed here after every session, with a place to write to them.');
+    order.forEach(function (p) { box.appendChild(followupCard(p, byId[p.user_id], last, notesReady, who)); });
+  }
+
+  function followupCard(p, c, last, notesReady, who) {
+    var name = personName(p);
+    var key = F.draftKey(current.id, last.id, p.user_id);
+    var card = el('details', 'cohort-card followup');
+    var sum = el('summary');
+    sum.appendChild(el('strong', null, name));
+    var gist = c.muddy ? 'Still muddy: ' + c.muddy.text
+      : c.bringBacks.length ? (c.bringBacks[0].readiness === 'ready' ? 'Brought something back, marked ready' : c.bringBacks[0].readiness === 'not-yet' ? 'Brought something back, marked not yet' : 'Brought something back')
+      : c.empty ? 'Nothing from them around this session' : 'Took part without a bring-back';
+    var gistEl = el('span', 'small followup-gist', gist);
+    sum.appendChild(gistEl);
+    var draftFlag = el('span', 'small followup-draft', 'Draft');
+    draftFlag.hidden = !F.loadDraft(store, key);
+    sum.appendChild(draftFlag);
+    card.appendChild(sum);
+
+    var body = el('div', 'followup-body');
+    function block(title, rows) {
+      if (!rows.length) return;
+      body.appendChild(el('p', 'kicker', title));
+      var ul = el('ul', 'answer-list');
+      rows.forEach(function (r) { ul.appendChild(r); });
+      body.appendChild(ul);
+    }
+    function line(text, href) {
+      var li = el('li');
+      if (href && /^https:\/\//.test(href)) {
+        li.appendChild(document.createTextNode(text ? text + ' ' : ''));
+        var a = el('a', null, href.replace(/^https:\/\//, '')); a.href = href; a.rel = 'noopener'; a.target = '_blank';
+        li.appendChild(a);
+      } else li.textContent = text;
+      return li;
+    }
+    block('What they brought back', c.bringBacks.map(function (s) {
+      var li = line(s.note || '', s.url);
+      if (s.want_to_know) li.appendChild(el('span', 'followup-line want', 'Their question: ' + s.want_to_know));
+      if (s.readiness === 'ready') li.appendChild(el('span', 'followup-line small', 'They marked it ready to move on.'));
+      if (s.readiness === 'not-yet') li.appendChild(el('span', 'followup-line small', 'They marked it not yet' + (s.missing ? ', because ' + s.missing.charAt(0).toLowerCase() + s.missing.slice(1) : '.')));
+      return li;
+    }));
+    block('What they asked to show', c.queue.map(function (q) { return line((q.note ? '“' + q.note + '”, ' : '') + (q.state === 'shown' ? 'shown:' : 'not shown:'), q.url); }));
+    block('Their answers to the checks', c.answers.map(function (x) {
+      var li = el('li'); li.appendChild(el('strong', null, x.prompt + ' ')); li.appendChild(document.createTextNode(x.text || '(no answer)')); return li;
+    }));
+    var KIND = { 'for-feedback': 'Asked for feedback', 'ai-review': 'Shared a review from their AI agent', question: 'Asked a question' };
+    block('What else they shared', c.otherShares.map(function (s) { return line((KIND[s.kind] || s.kind) + (s.note ? ': ' + s.note : ''), s.url); }));
+    block('Feedback they gave', c.given.map(function (g) { return line('To ' + who(g.to) + ': ' + g.body); }));
+    block('Feedback they received', c.received.map(function (g) { return line('From ' + who(g.from) + ': ' + g.body); }));
+    block('Already sent by a teacher', c.fromTeachers.map(function (g) { return line(who(g.from) + ': ' + g.body); }));
+    if (c.empty) body.appendChild(el('p', 'small', 'They did not share, queue, answer, or give feedback around this session, which is worth a kind, private word with an easy way back in.'));
+    if (p.app_repo) {
+      var repo = el('p', 'small'); var ra = el('a', null, 'Their repository on GitHub'); ra.href = 'https://github.com/' + p.app_repo; ra.rel = 'noopener'; ra.target = '_blank';
+      repo.appendChild(ra); body.appendChild(repo);
+    }
+
+    var target = F.followupTarget(c);
+    var form = el('form', 'inline-form followup-form');
+    var label = el('label', null, 'Your follow-up to ' + name);
+    var where = target.kind === 'feedback'
+      ? 'It goes as your feedback on their bring-back, where they and the cohort will see it.'
+      : notesReady ? 'It goes as a note on their cohort page that only they and the cohort’s teachers can read.'
+        : 'It can go only as feedback on a bring-back until the hub’s database has notes, and they brought nothing back this time.';
+    label.appendChild(el('span', 'hint', where));
+    var input = el('textarea'); input.rows = 4; input.maxLength = 8000;
+    input.value = F.loadDraft(store, key);
+    label.appendChild(input); form.appendChild(label);
+    var send = el('button', 'btn-quiet', 'Send it to ' + name); send.type = 'submit';
+    send.disabled = target.kind === 'note' && !notesReady;
+    var msg = el('span', 'small'); msg.setAttribute('role', 'status');
+    var acts = el('div', 'actions'); acts.appendChild(send); acts.appendChild(msg); form.appendChild(acts);
+    input.addEventListener('input', function () {
+      var kept = F.saveDraft(store, key, input.value);
+      draftFlag.hidden = !input.value.trim();
+      msg.textContent = !input.value.trim() ? '' : kept ? 'Draft kept in this browser only.' : 'This browser will not keep drafts, so send it before you leave the page.';
+    });
+    form.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      var checked = F.checkBody(input.value);
+      if (checked.error) { msg.textContent = checked.error; return; }
+      send.disabled = true;
+      msg.textContent = 'Sending…';
+      var q = target.kind === 'feedback'
+        ? db.from('feedback').insert({ share_id: target.share_id, author_id: me.id, body: checked.body })
+        : db.from('teacher_notes').insert({ cohort_id: current.id, student_id: p.user_id, author_id: me.id, session_id: last.id, body: checked.body });
+      q.then(function (r) {
+        send.disabled = false;
+        if (r.error) { msg.textContent = 'Not sent, and your draft is still here: ' + r.error.message; return; }
+        F.clearDraft(store, key);
+        input.value = '';
+        draftFlag.hidden = true;
+        msg.textContent = target.kind === 'feedback' ? 'Sent, as feedback on their bring-back.' : 'Sent, as a note on their cohort page.';
+        body.insertBefore(el('p', 'small followup-sent', 'You sent: ' + checked.body), form);
+      });
+    });
+    body.appendChild(form);
+    card.appendChild(body);
+    return card;
   }
 
   function drawCheckAnswers(checks, last) {
