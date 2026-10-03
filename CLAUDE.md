@@ -125,7 +125,14 @@ what waits on Ben.
 - **Scripts:** `assets/hub-config.js` (public URL and publishable key),
   `hub.js`, `cohorts.js`, `teach.js` with `teach-lib.js`, `cohort.js` and `live.js`
   with `cohort-lib.js`. Pure logic lives in the `-lib.js` files with
-  tests in `tools/test/` (`node --test tools/test/*.mjs`, 29 tests).
+  tests in `tools/test/` (`node --test tools/test/*.mjs`, 36 tests).
+- **Cohort conversation** (research/notes/cohort-conversation-notes.md):
+  each cohort gets a private repository in `humanshaped` with
+  Discussions and a secret team. The `cohort-access` Edge Function
+  (`supabase/functions/cohort-access/`, rules in `plan.js`) adds a
+  person to the team when they ask after joining and removes them after
+  leaving, and records it in `github_access`. Deploy it with the
+  Supabase tools; its GitHub App secrets live only in Supabase.
 - **Students own their work.** Repositories and commits are read live
   from GitHub, never copied. The database holds membership, sessions,
   groups, what people choose to share, feedback, calendar emails (only
