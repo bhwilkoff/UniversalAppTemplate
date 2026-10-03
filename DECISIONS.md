@@ -231,3 +231,42 @@ is unpublished.
 
 **Anyone may call an event a Human-Shaped Meetup or Hackathon without
 asking,** as long as it keeps the parts the guides name.
+
+## The classroom on Meet (October 3, 2026, evening)
+
+**Open, not private.** Ben: "I'm fine with publishing things privately
+for testing. But, the goal is to make things accessible, open, and free.
+Keeping things private doesn't really make sense for that." **How to
+apply:** private publishing is a test stage only; every add-on and tool
+is built to be listed publicly (privacy and terms pages, Google's
+review), and anyone teaching or taking a cohort can use it.
+
+**What Ben wants the session to do,** in his words, as the brief for the
+Meet work:
+1. Breakout groups that are easy (a temporary Meet he launches people
+   into and calls them back from, or another way).
+2. A collaborative drawing space, or a slideshow easily worked on
+   together.
+3. As deep a connection as possible with GitHub and the AI agents
+   working on each app and repository.
+4. Decent analytics for what happens in class, including talk time if
+   possible.
+5. Easily deciding who is "on stage" and who is observing, ideally with
+   several custom layouts that highlight who should be talking.
+6. Better use of the chat, which Meet throws away after the meeting.
+7. Running other apps inside the meeting, easy to choose among.
+8. Listening to, observing, or joining breakout sessions from a
+   dashboard.
+9. Checking code or getting feedback from his own AI agent during class.
+10. Cards and objects on screen ("you have 5 minutes of worktime left")
+    with custom text he defines.
+11. Recording locally rather than through Google Workspace, and clipping
+    moments from class.
+12. Following up with individual students based on what they
+    contributed and what was discussed.
+13. "I do not want a creepy AI recorder to be hovering and 'attending'
+    the meeting with us. It should feel safe and joyful throughout the
+    session." **How to apply:** no bot participant, ever; anything that
+    records or measures is visible, explained, and in the teacher's
+    hands, and students can see what is kept about them.
+14. A little Human Shaped branding inside Meet, with the cohort's people.
