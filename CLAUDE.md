@@ -144,7 +144,13 @@ what waits on Ben.
 - **Scripts:** `assets/hub-config.js` (public URL and publishable key),
   `hub.js`, `cohorts.js`, `teach.js` with `teach-lib.js`, `cohort.js` and `live.js`
   with `cohort-lib.js` and `live-lib.js`, and `apps.js` with `apps-lib.js`. Pure logic lives in the `-lib.js` files with
-  tests in `tools/test/` (`node --test tools/test/*.mjs`, 85 tests).
+  tests in `tools/test/` (`node --test tools/test/*.mjs`, 97 tests).
+- **The cohort's conversation:** `discussions.js` with `discussions-lib.js`
+  reads and posts the cohort repository's GitHub Discussions on /cohort/
+  and /live/ with the student's own GitHub token. That token is kept in
+  `sessionStorage` only (and removed from supabase-js's saved session in
+  `localStorage`), sent only to api.github.com, and treated as expired
+  after 7.5 hours; see part 7 of research/notes/cohort-conversation-notes.md.
 - **Students' own agents** (research/notes/agent-connection-notes.md):
   the `mcp` Edge Function (`supabase/functions/mcp/`, answers in
   `shape.js`) is a read-only MCP server reached through Supabase Auth's
