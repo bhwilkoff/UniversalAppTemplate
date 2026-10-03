@@ -442,6 +442,27 @@
     return b;
   }
 
+  // The cohort's own background for calls (assets/background.js), drawn
+  // in this browser from the brand kit's, with nothing sent anywhere.
+  var bgWired = false;
+  function drawBackground() {
+    var B = window.CohortBackground;
+    $('[data-bg-wrap]').hidden = !B;
+    if (!B || bgWired) return;
+    bgWired = true;
+    root.querySelectorAll('[data-bg]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var status = $('[data-bg-status]');
+        b.disabled = true; status.textContent = 'Drawing it…';
+        B.save(cohort.title, b.getAttribute('data-bg')).then(function () {
+          status.textContent = 'Saved. In Meet, choose Backgrounds and effects, then Add your own personal background.';
+        }, function (err) {
+          status.textContent = (err && err.message) || 'The background could not be drawn.';
+        }).then(function () { b.disabled = false; });
+      });
+    });
+  }
+
   function draw(people, mine, sessions, groups, shares, contact, teachers) {
     $('[data-title]').textContent = cohort.title;
     $('[data-lead]').textContent = cohort.description || '';
@@ -451,6 +472,7 @@
     var room = myGroup ? safe(myGroup.meet_url) : null;
     $('[data-week-title]').textContent = t.current ? 'Week ' + t.current.number + (t.current.title && t.current.title !== 'Week ' + t.current.number ? ': ' + t.current.title : '') : 'This week';
     $('[data-week-scope]').textContent = t.current && t.current.scope ? t.current.scope : 'Your teacher will put this week’s challenge here.';
+    drawBackground();
     var na = $('[data-next-actions]'); na.replaceChildren();
     if (t.next) {
       $('[data-next-when]').textContent = (t.live ? 'Happening now: ' : '') + when(t.next.starts_at) + ', for ' + cohort.session_minutes + ' minutes.';

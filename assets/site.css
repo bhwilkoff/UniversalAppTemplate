@@ -915,6 +915,8 @@ button.talk-title[aria-expanded="true"]::before { transform: rotate(90deg); }
 .kit .tile .stage.on-clay { background: #A23F22; }
 .kit .tile .stage.on-gray { background: #8A8E94; }
 .kit .tile .stage img { display: block; max-width: 100%; height: auto; }
+.kit .tile .stage.full { padding: 0; min-height: 0; }
+.kit .tile .stage.full img { width: 100%; }
 .kit .tile .stage img.wide { width: 15rem; }
 .kit .tile .stage img.event { width: 12rem; }
 .kit .tile .stage img.icon { width: 5rem; }
@@ -1177,6 +1179,7 @@ body.addon-body { min-height: 100vh; }
 .stage-choices .bar { display: block; height: 0.5em; border-radius: 999px; background: var(--rule); position: relative; overflow: hidden; }
 .stage-choices .bar::after { content: ""; position: absolute; inset: 0 auto 0 0; width: var(--share, 0%); background: var(--clay); border-radius: 999px; }
 .stage-choices .count { font-weight: 650; text-align: right; font-variant-numeric: tabular-nums; }
+.stage-welcome .stage-note { color: var(--ink); line-height: 1.35; max-width: 46ch; overflow-wrap: anywhere; }
 .stage-what { margin: 0; font-size: clamp(1.25rem, 3.6vmin, 2.5rem); font-weight: 600; overflow-wrap: anywhere; }
 .stage-note { margin: 0; font-size: clamp(1.1rem, 3vmin, 2rem); color: var(--muted); max-width: 40ch; }
 
@@ -1259,6 +1262,7 @@ label.check { min-height: 2.25rem; }
 .screen-title { font-size: clamp(1.9rem, 6.5vmin, 4.2rem); font-weight: 680; line-height: 1.1; letter-spacing: -0.03em; text-wrap: balance; max-width: none; overflow-wrap: anywhere; margin: 0; }
 .screen-sub, .screen-show .screen-sub { font-size: clamp(1.15rem, 3.4vmin, 2rem); color: var(--muted); margin: 0.75rem 0 0; }
 .screen-show .screen-sub:first-child { color: var(--clay); font-weight: 650; margin: 0 0 0.5rem; }
+.screen-show .screen-note { font-size: clamp(1.15rem, 3.2vmin, 1.9rem); line-height: 1.35; margin: 1.25rem 0 0; max-width: 46ch; overflow-wrap: anywhere; }
 .screen-card { font-size: clamp(2.1rem, 8.5vmin, 5.6rem); font-weight: 680; line-height: 1.08; letter-spacing: -0.035em; text-wrap: balance; overflow-wrap: anywhere; }
 .screen-show .screen-clock { font-size: clamp(2rem, 9vmin, 6rem); font-weight: 650; color: var(--clay); margin-top: 0.4em; line-height: 1; }
 .screen-show[data-kind="card"], .screen-show[data-kind="rooms"], .screen-show[data-kind="back"] { border-left: clamp(6px, 1vmin, 12px) solid var(--clay); padding-left: clamp(1rem, 3vmin, 2.5rem); }

@@ -43,6 +43,7 @@
         // On a shared screen, nobody is "you": every name is a name.
         window.LiveSignals.start({
           db: db, cohort: cohort, session: session, meId: me.id, teaching: teaching, groups: res[3].data,
+          welcome: window.CohortLib.welcome(cohort, session, window.CohortLib.agenda(cohort.session_minutes)),
           nameOf: function (id) { return names[id] || 'Someone'; }, people: [],
           mounts: { screen: $('[data-screen]'), screenRecording: $('[data-screen-rec]') }
         });

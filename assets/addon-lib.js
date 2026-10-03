@@ -92,10 +92,14 @@
   //   state.onStage  { kind: 'check', id } or { kind: 'item', id } or null
   //   state.checks   live_checks rows; state.tallies { [checkId]: check_tally rows }
   //   state.items    live_queue rows;  state.names { [userId]: name }
+  //   state.welcome  CohortLib.welcome(), shown when the teacher puts it
+  //                  on the stage, and before any part has begun
   function stageView(state) {
     state = state || {};
     var part = state.part ? { key: cut(state.part.key, 20), name: cut(state.part.name, 80), endsAt: num(state.part.endsAt) } : null;
     var on = state.onStage || null;
+    var w = welcomeOf(state.welcome);
+    if (w && ((on && on.kind === 'welcome') || (!on && !part))) return { mode: 'welcome', part: part, welcome: w };
     if (on && on.kind === 'check') {
       var k = (state.checks || []).filter(function (x) { return x.id === on.id; })[0];
       if (k && k.state === 'open') {
@@ -117,9 +121,19 @@
     return { mode: 'part', part: part };
   }
 
+  // A welcome, read back with every field checked and cut to size.
+  function welcomeOf(w) {
+    if (!w || typeof w.cohort !== 'string' || !w.cohort) return null;
+    var first = w.first && typeof w.first.name === 'string' ? { name: cut(w.first.name, 80), what: w.first.what ? cut(w.first.what, 300) : null } : null;
+    return {
+      cohort: cut(w.cohort, 120), week: num(w.week), title: w.title ? cut(w.title, 120) : null,
+      challenge: w.challenge ? cut(w.challenge, 400) : null, first: first
+    };
+  }
+
   // Messages from the panel to the stage, through the SDK's
   // notifyMainStage (a string). The stage trusts nothing it cannot read
-  // back into one of the three views above.
+  // back into one of the views above.
   var STAGE = 'hs-stage';
   function stageMessage(view) { return JSON.stringify({ type: STAGE, v: 1, view: view }); }
   function readStageMessage(payload) {
@@ -141,6 +155,7 @@
     if (v.mode === 'item' && typeof v.what === 'string') {
       return { mode: 'item', part: part, who: cut(v.who || 'Someone', 80), what: cut(v.what, 200), note: v.note ? cut(v.note, 300) : null };
     }
+    if (v.mode === 'welcome') { var w = welcomeOf(v.welcome); return w ? { mode: 'welcome', part: part, welcome: w } : null; }
     if (v.mode === 'part') return { mode: 'part', part: part };
     return null;
   }
