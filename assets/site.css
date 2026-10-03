@@ -1182,3 +1182,74 @@ label.check { min-height: 2.25rem; }
 .cohort-form label, .session-row label, .inline-form label { grid-template-columns: minmax(0, 1fr); }
 .cohort-form select, .cohort-form input:not([type="checkbox"]):not([type="radio"]), .cohort-form textarea,
 .inline-form select, .inline-form input:not([type="checkbox"]):not([type="radio"]), .inline-form textarea { max-width: 100%; min-width: 0; }
+
+/* ------------------------------------------------------------------
+   C1: live signals. On /live/, the banner that says where everyone
+   should be, the teacher's card, who is on stage, the "recording now"
+   line, and the teacher's controls; and /card/, the page a teacher
+   presents in Meet (sized for a 1280 by 720 shared screen).
+   ------------------------------------------------------------------ */
+.signal-where, .signal-card, .signal-stage, .signal-recording { max-width: 44rem; min-width: 0; margin-top: 0.75rem; }
+.signal-where {
+  position: sticky; top: 0; z-index: 3;
+  background: var(--card); border: 2px solid var(--clay); border-radius: var(--radius);
+  padding: 0.9rem 1rem 1rem; box-shadow: 0 6px 18px rgb(0 0 0 / 0.08);
+  animation: signal-in 240ms ease-out;
+}
+.signal-where.is-warn, .signal-where.is-back { background: color-mix(in srgb, var(--clay) 13%, var(--card)); border-width: 3px; }
+.signal-where p { margin: 0.25rem 0 0; }
+.signal-where .signal-title { margin: 0; font-weight: 680; font-size: 1.3rem; line-height: 1.25; letter-spacing: -0.015em; }
+.signal-where .actions { margin-top: 0.75rem; gap: 0.6rem 0.75rem; }
+.signal-time { font-weight: 650; font-size: 1.15rem; }
+.signal-clock { font-variant-numeric: tabular-nums; }
+.signal-card {
+  border-left: 6px solid var(--clay); background: var(--card); border-radius: var(--radius);
+  padding: 1.1rem 1.25rem; animation: signal-in 240ms ease-out;
+}
+.signal-card p { margin: 0; }
+.signal-card .signal-card-text { font-size: clamp(1.5rem, 1.1rem + 2vw, 2.3rem); font-weight: 650; line-height: 1.2; letter-spacing: -0.02em; overflow-wrap: anywhere; }
+.signal-card .signal-time { margin-top: 0.5rem; color: var(--clay); font-size: 1.35rem; }
+.signal-stage { border: 1px solid var(--rule); border-radius: var(--radius); background: var(--card); padding: 0.9rem 1rem 1rem; }
+.signal-stage p { margin: 0.25rem 0 0; }
+.signal-stage .kicker { font-size: 0.85rem; margin: 0; }
+.signal-stage .signal-stage-text { font-size: 1.2rem; font-weight: 650; line-height: 1.35; }
+.signal-recording p { margin: 0; font-weight: 600; padding-left: 1.25rem; position: relative; }
+.signal-recording p::before {
+  content: ""; position: absolute; left: 0; top: 0.5em; width: 0.6rem; height: 0.6rem; border-radius: 50%; background: var(--clay);
+}
+@keyframes signal-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+
+.signal-controls .signal-control { border-top: 1px solid var(--rule); padding-top: 1rem; margin-top: 1.25rem; min-width: 0; }
+.signal-controls .signal-control h3 { margin: 0 0 0.25rem; font-size: 1.15rem; }
+.signal-controls .signal-control > .small { margin: 0.6rem 0 0; }
+.signal-controls .actions { margin-top: 0.75rem; gap: 0.6rem 0.75rem; }
+.signal-controls .inline-form { margin-top: 0.5rem; }
+.signal-controls .inline-form input[data-sig-rooms-minutes], .signal-controls .inline-form input[data-sig-card-minutes] { max-width: 8rem; }
+.signal-controls .signal-now { margin: 0.25rem 0 0; font-weight: 600; overflow-wrap: anywhere; }
+.signal-controls p[role="status"]:empty { display: none; }
+.signal-presets { list-style: none; margin: 0.4rem 0 0; padding: 0; display: grid; gap: 0.5rem; }
+.signal-presets li { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; min-width: 0; }
+.signal-presets li > .btn-quiet:first-child { font-weight: 500; text-align: left; flex: 1 1 14rem; min-width: 0; overflow-wrap: anywhere; }
+.signal-controls .signal-presets-label { margin: 1rem 0 0; }
+.signal-confirm { display: inline-flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; font-weight: 600; }
+
+/* /card/: presented in Meet, so it scales with the window, not the page. */
+.card-screen { min-height: 100vh; min-height: 100dvh; }
+.card-frame {
+  min-height: 100vh; min-height: 100dvh; display: grid; grid-template-rows: auto 1fr auto;
+  padding: clamp(1rem, 3vmin, 2.5rem) clamp(1rem, 4vmin, 3.5rem); gap: 1rem;
+}
+.card-frame .wordmark { font-size: clamp(1.1rem, 2.6vmin, 1.6rem); justify-self: start; }
+.card-frame .screen-body { align-self: center; min-width: 0; }
+.screen-show { max-width: 62rem; min-width: 0; }
+.screen-show p { margin: 0; }
+.screen-title { font-size: clamp(1.9rem, 6.5vmin, 4.2rem); font-weight: 680; line-height: 1.1; letter-spacing: -0.03em; text-wrap: balance; max-width: none; overflow-wrap: anywhere; margin: 0; }
+.screen-sub, .screen-show .screen-sub { font-size: clamp(1.15rem, 3.4vmin, 2rem); color: var(--muted); margin: 0.75rem 0 0; }
+.screen-show .screen-sub:first-child { color: var(--clay); font-weight: 650; margin: 0 0 0.5rem; }
+.screen-card { font-size: clamp(2.1rem, 8.5vmin, 5.6rem); font-weight: 680; line-height: 1.08; letter-spacing: -0.035em; text-wrap: balance; overflow-wrap: anywhere; }
+.screen-show .screen-clock { font-size: clamp(2rem, 9vmin, 6rem); font-weight: 650; color: var(--clay); margin-top: 0.4em; line-height: 1; }
+.screen-show[data-kind="card"], .screen-show[data-kind="rooms"], .screen-show[data-kind="back"] { border-left: clamp(6px, 1vmin, 12px) solid var(--clay); padding-left: clamp(1rem, 3vmin, 2.5rem); }
+.screen-foot { margin: 0; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem 1.5rem; color: var(--muted); font-size: clamp(0.95rem, 2.2vmin, 1.3rem); }
+.card-frame:has(.screen-show[data-kind="idle"]) [data-card-cohort] { visibility: hidden; }
+.screen-rec { font-weight: 650; color: var(--ink); padding-left: 1.1em; position: relative; }
+.screen-rec::before { content: ""; position: absolute; left: 0; top: 0.42em; width: 0.6em; height: 0.6em; border-radius: 50%; background: var(--clay); }

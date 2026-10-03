@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Card | Human Shaped</title>
+  <meta name="description" content="The page a teacher presents in Google Meet during a Human Shaped session: the card they are showing, where everyone should be, and who is on stage, large enough to read from a shared screen.">
+  <link rel="canonical" href="https://humanshaped.org/card/">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#F7F6F2" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#141618" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/site.css">
+  <script>
+    (function () {
+      var q = location.search, t = null;
+      if (/[?&]dark\b/.test(q)) t = 'dark'; else if (/[?&]light\b/.test(q)) t = 'light';
+      else { try { t = localStorage.getItem('hs-theme'); } catch (e) {} }
+      if (t) document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+</head>
+<!-- The card page (C1): presented as a tab in Meet, or used as a browser
+     source in OBS, so it carries no header, footer, or controls. Words by
+     Claude, awaiting Ben's review. -->
+<body class="card-screen">
+  <main class="card-frame" data-card-page aria-live="polite">
+    <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
+
+    <section class="account-state screen-body" data-state="loading"><p class="screen-sub">Opening the card…</p></section>
+    <section class="account-state screen-body" data-state="signed-out" hidden>
+      <h1 class="screen-title">Sign in to show this cohort’s cards.</h1>
+      <p class="screen-sub"><a href="/account/">Sign in with GitHub</a>, then come back to this page.</p>
+    </section>
+    <section class="account-state screen-body" data-state="not-member" hidden>
+      <h1 class="screen-title">These cards are for the people in this cohort.</h1>
+    </section>
+    <section class="account-state screen-body" data-state="error" hidden>
+      <p class="screen-sub" data-error-text></p>
+    </section>
+    <section class="account-state screen-body" data-state="ready" hidden>
+      <h1 class="visually-hidden" data-card-heading></h1>
+      <div class="screen-show" data-screen></div>
+    </section>
+
+    <p class="screen-foot"><span data-card-cohort></span><span class="screen-rec" data-screen-rec hidden></span></p>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" defer></script>
+  <script src="/assets/hub-config.js" defer></script>
+  <script src="/assets/cohort-lib.js" defer></script>
+  <script src="/assets/signals-lib.js" defer></script>
+  <script src="/assets/signals.js" defer></script>
+  <script src="/assets/card.js" defer></script>
+</body>
+</html>
