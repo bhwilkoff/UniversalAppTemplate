@@ -49,35 +49,40 @@ the template; the mark and the printable sheets; the open directory.
 conversation for real) and the OAuth server switch (students' agents for
 real).
 
-**In progress (started October 3):**
+**Finished October 3:**
 
+- **M2. Becoming a teacher.** /teach/guide/ (COURSE.md read live), a
+  request to teach on /teach/ for anyone signed in, approval by teachers
+  with `can_approve` (Ben alone, set by hand), and each cohort's "Before
+  the first session" steps. Migration 7 (teacher_requests,
+  decide_teacher_request, agent-blocking policies): 79 database checks,
+  50 node tests, applied; /teach/ and the guide verified live as Ben.
+  Not yet exercised: a real request from a second account.
+- **M6. One source for the template's design tokens.** design-tokens.json
+  writes 14 platform files (tools/design_tokens.mjs) with a parity and
+  contrast test in CI (passed on its first GitHub run); web, Android,
+  Apple, and Windows build; the web app checked by eye at 375px in light
+  and dark. The placeholder is a quiet slate on neutral gray. Not yet
+  seen on an Apple or Android screen.
+
+**In progress:**
+
+- **M3. Live sessions beyond a companion page** (agent, started October 3).
+- **M8. The course changes from the research** (agent, started October 3).
 - **M1. The hub as a hub.** "A centralized hub of information about
   every app that's being built" (VISION.md). A page for every app (its
   declaration, live commits, builder's words, platforms, and
   conversation), a public feed of apps in progress across cohorts, and
   a home page that shows that life. Privacy decided in writing first.
-- **M2. Becoming a teacher.** "Anyone may become a teacher": a teaching
-  guide, a request form, Ben's approval in /teach/, and a teacher's own
-  setup (their Meet host, their cohort's repository and team).
-- **M6. One source for the template's design tokens.** The platforms'
-  placeholder palettes disagree; a design-tokens.json, a tool that
-  writes each platform's token files, and a parity test, so "make it
-  look like itself" changes every platform at once.
 
 **Next:**
 
-- **M3. Live sessions beyond a companion page:** a "show your work"
-  queue, checks for understanding, and polls on /live/; the Meet events
-  script and session recorder run for real.
 - **M4. The credential:** Open Badges 3.0 issued from humanshaped.org,
   with a public verification page and the teacher's issuing flow.
 - **M5. The movement toolkit, finished:** a meetup guide, a
   Human-Shaped Hackathon kit, and brand assets.
 - **M7. Works the same with Gemini:** agent-neutral setup across the
   path, tested on a fresh copy with Gemini CLI.
-- **M8. The course changes from the research,** in COURSE.md and the
-  stages: week 0, stable groups, checks for understanding, explain it
-  back, and a feedback shape for every bring-back.
 - Smaller: show the cohort's discussions on /cohort/ and /live/ once the
   GitHub App exists; design iteration two from Ben's notes.
 
