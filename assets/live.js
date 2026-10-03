@@ -20,7 +20,7 @@
   var POLL = 15000;
 
   // What the page knows about this session, filled in by load().
-  var S = { me: null, token: null, cohort: null, session: null, teaching: false, names: {}, mine: null, myShares: [] };
+  var S = { me: null, auth: null, token: null, cohort: null, session: null, teaching: false, names: {}, mine: null, myShares: [] };
   var drafts = {};          // what someone has typed into an answer box, by question
   var channel = null, poller = null, tallyPoller = null, nudgeTimer = null, deferred = {};
 
@@ -54,7 +54,9 @@
     db.auth.getSession().then(function (s) {
       if (!s.data || !s.data.session) return show('signed-out');
       S.me = s.data.session.user;
-      S.token = s.data.session.provider_token || null;
+      S.auth = s.data.session;
+      // The GitHub token lives in this tab only (DiscussionsLib).
+      S.token = window.CohortTalk ? window.CohortTalk.token(db, S.auth) : null;
       return db.from('cohorts').select('*').eq('slug', slug).maybeSingle().then(function (c) {
         if (c.error) return fail('This session could not be opened: ' + c.error.message);
         if (!c.data) return show('not-member');
@@ -132,6 +134,7 @@
     });
 
     drawAddForm();
+    drawTalk();
     $('[data-ask]').hidden = !S.teaching;
     $('[data-checks-intro]').textContent = S.teaching
       ? 'Ask a short question to see what is landing. Each person sees only their own answer, and the count of answers only if you choose to show it. Nothing here is graded, and the questions and answers are deleted when the cohort finishes.'
@@ -153,6 +156,21 @@
     });
     opt('link', 'A link, from GitHub or anywhere');
     syncAddForm();
+  }
+  // From the conversation: the newest threads in the cohort's GitHub
+  // Discussions, each one a link, and a quick way to put it in the queue.
+  function drawTalk() {
+    var repo = S.cohort.github_repo;
+    $('[data-talk-section]').hidden = !(repo && S.cohort.github_team && window.CohortTalk);
+    if (!repo || !window.CohortTalk) return;
+    window.CohortTalk.compact($('[data-talk]'), { db: db, session: S.auth, repo: repo, onShow: function (url) {
+      var sel = $('[data-add-what]');
+      sel.value = 'link'; syncAddForm();
+      $('[data-add-link]').value = url;
+      $('[data-add]').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      $('[data-add-note]').focus({ preventScroll: true });
+      $('[data-add-status]').textContent = 'Say what people should look at, if you like, then add it.';
+    } });
   }
   function syncAddForm() { $('[data-add-link-wrap]').hidden = $('[data-add-what]').value !== 'link'; }
 
