@@ -65,15 +65,30 @@ real).
   and dark. The placeholder is a quiet slate on neutral gray. Not yet
   seen on an Apple or Android screen.
 
+- **M1. The hub as a hub.** Every app's page at /apps/app/?r=owner/repo
+  (its own words, where it runs, live commits, its HUMAN-SHAPED.md
+  answers, its conversation on GitHub), drawn only for directory apps or
+  apps a student chose to show; a "being built right now" feed on /apps/
+  and the home page (at most 8 GitHub calls a visit, cached ten
+  minutes, automated commits left out). Privacy written first
+  (research/notes/hub-privacy-notes.md): a cohort app is public only by
+  the student's own switch, and the public reads three fields through
+  public_apps(), never enrollments. Migration 20261003055000 (renumbered
+  to follow the teacher requests), 88 database checks, 61 node tests,
+  applied; Archive Watch's page and /apps/ verified live, and a
+  signed-out read of enrollments returns nothing.
+- **M8. The course changes from the research,** in the template:
+  COURSE.md gains the week before, groups that stay together, a check
+  for understanding in every session, cameras and breaks, and one lesson
+  sent back from every cohort; a new docs/path/showing-your-work.md
+  (explain one decision with the agent closed, three questions for every
+  bring-back, and feedback without a cohort), presented at
+  /path/showing-your-work/; stages 00 to 07 end by asking for one
+  decision explained. Pushed to main; the page verified live.
+
 **In progress:**
 
 - **M3. Live sessions beyond a companion page** (agent, started October 3).
-- **M8. The course changes from the research** (agent, started October 3).
-- **M1. The hub as a hub.** "A centralized hub of information about
-  every app that's being built" (VISION.md). A page for every app (its
-  declaration, live commits, builder's words, platforms, and
-  conversation), a public feed of apps in progress across cohorts, and
-  a home page that shows that life. Privacy decided in writing first.
 
 **Next:**
 
@@ -87,6 +102,19 @@ real).
   GitHub App exists; design iteration two from Ben's notes.
 
 ## Needs Ben
+
+- **Decisions from the milestones,** all with a default already built:
+  1. Cohort apps in public: the default is the student's own opt-in;
+     DECISIONS.md says "included automatically" (M1, hub-privacy-notes).
+  2. May a teacher take down an app a student chose to show? (Built:
+     yes.)
+  3. Pairs or trios chosen by each teacher; students lead the prompt
+     reading by the last week; cohort lessons come back to the template
+     as an issue or pull request (M8, COURSE.md).
+  4. The template's new placeholder palette, a quiet slate on neutral
+     gray (M6).
+  5. All new copy from M1, M2, and M8 is drafted in Ben's voice and
+     waits for his read.
 
 - **Connecting students' agents, once** (core item 3; the design and
   sources are in `research/notes/agent-connection-notes.md`). In the
