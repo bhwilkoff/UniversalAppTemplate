@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The teaching guide | Human Shaped</title>
+  <meta name="description" content="What leading a free Human Shaped cohort asks of you, what you need before the first session, and how to ask to teach.">
+  <link rel="canonical" href="https://humanshaped.org/teach/guide/">
+  <meta property="og:url" content="https://humanshaped.org/teach/guide/">
+  <meta property="og:site_name" content="Human Shaped">
+  <meta property="og:title" content="The teaching guide">
+  <meta property="og:description" content="What leading a free Human Shaped cohort asks of you, what you need before the first session, and how to ask to teach.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://humanshaped.org/assets/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="The human-shaped wordmark, with its hyphen drawn as an arch, above the line: build software for the parts of life only people can do.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#F7F6F2" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#141618" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/site.css">
+  <script>
+    (function () {
+      var q = location.search, t = null;
+      if (/[?&]dark\b/.test(q)) t = 'dark'; else if (/[?&]light\b/.test(q)) t = 'light';
+      else { try { t = localStorage.getItem('hs-theme'); } catch (e) {} }
+      if (t) document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+  <script src="/assets/site.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/18.0.14/lib/marked.umd.min.js" integrity="sha512-trN9mtGYvoySPVI909KTnwbJI9AkKPydRCV/qAsUG1+q39hhpKltEag9b5JpdjeIZn5i8IH62hHRFdbKwMFh9w==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.4.16/purify.min.js" integrity="sha512-flQmhkXNRQ3iUfvtdCobtpMjCb6kE+zLnTiAulAQJ3WykVfy84JvCMOo6vhwWXHTXjR25h9Zj+LyGFRWKjRoag==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
+  <script src="/assets/render.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to the page</a>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
+      <nav class="nav" aria-label="Main">
+        <ul>
+          <li><a href="/path/">The path</a></li>
+          <li><a href="/why/">Why</a></li>
+          <li><a href="/principles/">Principles</a></li>
+          <li><a href="/cohorts/">Cohorts</a></li>
+          <li><a href="/apps/">Apps</a></li>
+          <li><a href="/start/">Start something</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#moon"/></svg>
+        </button>
+        <a class="btn-github small" href="/account/">
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>
+          <span>Sign in<span class="long"> with GitHub</span></span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- The words on this page outside the rendered course were written by
+       Claude for milestone M2 (October 3, 2026) and await Ben's review. -->
+  <main id="main">
+    <div class="wrap">
+      <p class="crumbs"><a href="/cohorts/#teach">Cohorts</a> &rsaquo; The teaching guide</p>
+      <header class="page-head">
+        <div>
+          <p class="kicker">Teaching</p>
+          <h1>Leading a cohort of your own.</h1>
+          <p class="lead">I want the cohorts to reach more people than one teacher ever could, so anyone who wants to lead one can ask to, and because the cohorts are free, what a teacher gives is time and attention rather than a fee. This page says what leading a cohort asks of you, what you need before the first session, and how to ask.</p>
+        </div>
+      </header>
+
+      <section class="section first" aria-label="What teaching asks">
+        <div class="topics single">
+          <div class="topic" id="asks">
+            <h2>What it asks of you.</h2>
+            <div class="prose">
+              <p>A cohort runs for about five weeks, with a week of setup before them and one live session every week on Google Meet, at a day and time you choose. Each session has the same three parts in the same order (people show what they brought back, everyone reads one real prompt together, and then everyone builds), and every one has moments to stop and check what people understood, where what they explain back is the decisions they made rather than the code the agent wrote.</p>
+              <p>Between sessions, people ask you for feedback on what they built and ask you questions, and each one waits on your teaching page until you answer it, oldest first, so nobody's request sinks under a newer one. You also set the cohort's groups (pairs, trios, or small groups, easy to change), and you write each week's challenge in your own words.</p>
+            </div>
+          </div>
+
+          <div class="topic" id="need">
+            <h2>What you need before the first session.</h2>
+            <div class="prose">
+              <p><strong>Time,</strong> first of all: five weekly sessions, plus the hours between them to read what people share and answer it.</p>
+              <p><strong>A GitHub account,</strong> because it is how you sign in here, where your students' apps live, and where your cohort talks. Each cohort's conversation is a private repository in the humanshaped organization, reached through a secret team of the cohort's people, and since only the organization's owners can make those, for now I make them for each cohort and you name them on your teaching page.</p>
+            </div>
+          </div>
+
+          <div class="topic" id="host">
+            <h2>A Google account to host from.</h2>
+            <div class="prose">
+              <p>Only the host needs one, because your students join from whatever account they already have. I host my own cohorts from meet@humanshaped.org, an account set aside for sessions so that nothing depends on my personal login, and an account of your own set aside the same way does the same for you.</p>
+              <p>The hub never pays for a seat, which keeps it free to run, and the cost of that choice falls on the host: a free personal Google account ends group calls at 60 minutes and has no breakout rooms. So either keep your sessions within the hour, or host from an account you already have through work or school, once you have checked that it allows longer calls.</p>
+            </div>
+          </div>
+
+          <div class="topic" id="event">
+            <h2>The weekly event and its Meet link.</h2>
+            <div class="prose">
+              <p>Once you have made the weekly sessions on your teaching page, each week needs its Meet link. The simplest way is one recurring Calendar event, made by hand from your host account with a Meet link, which keeps the same link every week. The <a href="https://github.com/bhwilkoff/UniversalAppTemplate/blob/site/tools/meet-events/README.md">Meet events script</a> does the same work and checks it for you, though it was written for meet@humanshaped.org and has not yet been run by another host. Either way, put the link in each week on your teaching page, and your cohort's pages will show it.</p>
+              <p>Sessions are recorded so that missing a week never means falling behind, and the <a href="https://github.com/bhwilkoff/UniversalAppTemplate/blob/site/tools/session-recorder/README.md">session recorder</a> is a free Chrome extension that only the host installs. It was built around meet@humanshaped.org too, and making it work for other hosts is still to come.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section first" aria-labelledby="course-title">
+        <div class="topics single">
+          <div class="topic" id="the-course">
+            <h2 id="course-title">The course itself.</h2>
+            <div class="prose"><p>The course lives in the template, written for anyone who teaches with it, and this part of the page is read from there each time it opens, so the two always say the same thing.</p></div>
+          </div>
+        </div>
+        <article class="article" data-doc="COURSE.md">
+          <div class="doc-status" data-doc-status aria-live="polite"></div>
+          <noscript>
+            <div class="doc-error">
+              <h2>This part of the page reads its text from GitHub.</h2>
+              <p>The course lives in the template on GitHub, and this page needs JavaScript to bring it here. You can read exactly the same text <a href="https://github.com/bhwilkoff/UniversalAppTemplate/blob/main/COURSE.md">on GitHub</a>.</p>
+            </div>
+          </noscript>
+          <div class="doc-body" data-doc-body></div>
+        </article>
+        <p class="source">This part is read from the template each time it opens, so it is always the current text. <a href="https://github.com/bhwilkoff/UniversalAppTemplate/blob/main/COURSE.md">Read it on GitHub</a></p>
+      </section>
+
+      <section class="section first" aria-labelledby="ask-title">
+        <div class="topics single">
+          <div class="topic" id="ask">
+            <h2 id="ask-title">Asking to teach.</h2>
+            <div class="prose">
+              <p>Teaching here is by invitation while the first cohorts find their shape, so leading one starts with a short request: why you would like to teach, and what you would bring. I read every request myself, and my answer appears on the same page where you asked.</p>
+            </div>
+            <p class="actions"><a class="btn-github" href="/teach/#ask"><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Ask to teach</a></p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
+      <p>Made by <a href="https://learningischange.com">Ben Wilkoff</a>. The ideas, the method, the tools, and the cohorts are free, and what you build is yours.</p>
+      <p class="credit">Built by Ben with an AI agent, Claude, set in Commissioner, and shared under <a href="https://github.com/bhwilkoff/UniversalAppTemplate/blob/site/LICENSE.md">open licenses</a>, so you can borrow anything here.</p>
+      <ul>
+        <li><a href="/cohorts/#together">How we treat one another</a></li>
+        <li><a href="/cohorts/#data">What we keep, and what we never own</a></li>
+        <li><a href="https://github.com/orgs/humanshaped/discussions">Discussions on GitHub</a></li>
+        <li><a href="https://github.com/bhwilkoff/UniversalAppTemplate">The template on GitHub</a></li>
+      </ul>
+    </div>
+  </footer>
+</body>
+</html>

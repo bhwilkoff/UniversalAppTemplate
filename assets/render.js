@@ -24,6 +24,7 @@
     'docs/path/07-raising-the-ceiling.md': '/path/07/',
     'docs/path/08-working-with-ai.md': '/path/08/',
     'docs/path/talking-to-your-agent.md': '/path/talking-to-your-agent/',
+    'COURSE.md': '/teach/guide/',
     'docs/path/README.md': '/path/',
     'docs/path/': '/path/',
     'docs/human-shaped/PRINCIPLES.md': '/principles/',
