@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sheets for the wall | Human Shaped</title>
+  <meta name="description" content="The Human-Shaped Principles and the four questions, each on a single sheet to print for the wall of a meetup, a classroom, or a hackathon.">
+  <link rel="canonical" href="https://humanshaped.org/start/sheets/">
+  <meta property="og:url" content="https://humanshaped.org/start/sheets/">
+  <meta property="og:site_name" content="Human Shaped">
+  <meta property="og:title" content="Sheets for the wall">
+  <meta property="og:description" content="The Human-Shaped Principles and the four questions, each on a single sheet to print for the wall of a meetup, a classroom, or a hackathon.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://humanshaped.org/assets/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="The human-shaped wordmark, with its hyphen drawn as an arch, above the line: build software for the parts of life only people can do.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#F7F6F2" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#141618" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/site.css">
+  <script>
+    (function () {
+      var q = location.search, t = null;
+      if (/[?&]dark\b/.test(q)) t = 'dark'; else if (/[?&]light\b/.test(q)) t = 'light';
+      else { try { t = localStorage.getItem('hs-theme'); } catch (e) {} }
+      if (t) document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+  <script src="/assets/site.js" defer></script>
+  <script src="/assets/sheet-lib.js" defer></script>
+  <script src="/assets/sheets.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to the page</a>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
+      <nav class="nav" aria-label="Main">
+        <ul>
+          <li><a href="/path/">The path</a></li>
+          <li><a href="/why/">Why</a></li>
+          <li><a href="/principles/">Principles</a></li>
+          <li><a href="/cohorts/">Cohorts</a></li>
+          <li><a href="/apps/">Apps</a></li>
+          <li><a href="/start/" aria-current="page">Start something</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#moon"/></svg>
+        </button>
+        <a class="btn-github small" href="/cohorts/#join">
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>
+          <span>Sign in<span class="long"> with GitHub</span></span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <div class="wrap">
+      <header class="page-head">
+        <div>
+          <p class="kicker"><a href="/start/">Start something</a></p>
+          <h1>Sheets for the wall.</h1>
+          <p class="lead">These are the principles and the four questions, each on a single sheet of paper, for the wall of a meetup, a classroom, or the room where a hackathon happens. Each sheet reads its words from the template when you open this page, so what you print is always the current version.</p>
+        </div>
+      </header>
+
+      <section class="section first sheets" aria-label="The sheets">
+        <div class="sheet-block" id="principles">
+          <div class="sheet-head">
+            <h2>The principles</h2>
+            <button class="btn-quiet" type="button" data-print-sheet="principles" disabled>Print this sheet</button>
+          </div>
+          <article class="sheet sheet-principles" aria-label="The principles, as a printed sheet">
+            <p class="sheet-mark"><span>human</span><svg aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span>shaped</span></p>
+            <h3 class="sheet-title">The Human-Shaped Principles</h3>
+            <p class="sheet-intro" data-sheet-intro></p>
+            <ol class="sheet-list" data-sheet-principles></ol>
+            <p class="sheet-status" data-sheet-status>Reading the principles from the template.</p>
+            <p class="sheet-foot"><span data-sheet-version></span>humanshaped.org/principles. Shared under CC BY 4.0, so copy it, change it, and say where it came from.</p>
+          </article>
+        </div>
+
+        <div class="sheet-block" id="questions">
+          <div class="sheet-head">
+            <h2>The four questions</h2>
+            <button class="btn-quiet" type="button" data-print-sheet="questions" disabled>Print this sheet</button>
+          </div>
+          <article class="sheet sheet-questions" aria-label="The four questions, as a printed sheet">
+            <p class="sheet-mark"><span>human</span><svg aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span>shaped</span></p>
+            <h3 class="sheet-title">Before anything is built, ask</h3>
+            <ol class="sheet-list" data-sheet-questions></ol>
+            <p class="sheet-after" data-sheet-after></p>
+            <p class="sheet-status" data-sheet-status>Reading the questions from the template.</p>
+            <p class="sheet-foot">humanshaped.org/path/00. Shared under CC BY 4.0, so copy it, change it, and say where it came from.</p>
+          </article>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
+      <p>Made by <a href="https://learningischange.com">Ben Wilkoff</a>. The ideas, the method, the tools, and the cohorts are free, and what you build is yours.</p>
+      <p class="credit">Built by Ben with an AI agent, Claude, set in Commissioner, and shared under <a href="https://github.com/bhwilkoff/UniversalAppTemplate/blob/site/LICENSE.md">open licenses</a>, so you can borrow anything here.</p>
+      <ul>
+        <li><a href="/cohorts/#together">How we treat one another</a></li>
+        <li><a href="/cohorts/#data">What we keep, and what we never own</a></li>
+        <li><a href="https://github.com/orgs/humanshaped/discussions">Discussions on GitHub</a></li>
+        <li><a href="https://github.com/bhwilkoff/UniversalAppTemplate">The template on GitHub</a></li>
+      </ul>
+    </div>
+  </footer>
+</body>
+</html>

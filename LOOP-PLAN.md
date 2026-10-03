@@ -25,43 +25,65 @@ verify what a person would see); push; log it below. "Fixed" and
 
 ## Backlog (in order)
 
-1. **Directory, static first.** A nightly GitHub Action on `site` that
-   finds `HUMAN-SHAPED.md` declarations and template-born repositories
-   (the `template_repository` field), reads cohort membership when it
-   exists, and publishes `data/directory.json`; an `/apps/` section that
-   renders it alongside the four founding apps. $0, no backend.
-2. **AI review skill in the template** (`human-shaped-review`): runs in
-   the student's own Claude or Gemini, asks the principles' questions
-   rather than grading, labels itself as AI, writes its notes to a file
-   the student can choose to share.
-3. **"Make it look like itself" step in the template**: a skill that
-   proposes three looks from the app's own why, plus a stage 03 step.
-4. **Sign in with GitHub (Supabase).** Free project, GitHub OAuth app
-   under the `humanshaped` org, a one-page proof from the static site,
-   then the schema: cohorts (with sessions, members, groups, metadata),
-   roles (teacher), shares, directory listings, credentials. Row-level
-   security. Needs Ben for the approval screens.
-5. **Teacher tools**: create and edit a cohort and its sessions in the
-   hub; hand the cohort to the Meet events script.
-6. **Cohort page**: classmates' repositories and recent commits from
-   GitHub, the next session, this week's challenge, groups.
-7. **Session page** beside Meet, and a small read-only Worker feed and
-   MCP endpoint so a student's AI knows what the session is about.
-8. **Toolkit**: printable principles, the "human-shaped" mark for
-   READMEs and sites, a meetup guide, and a Human-Shaped Hackathon kit.
-9. **Setup week** pages, ending at the first win.
-10. **Credential**: Open Badges 3.0, issued from humanshaped.org, a base
-    level for a live web app and a level for each further platform.
-11. **Template passes**: Oxford commas across the path, the vision woven
-    through, lanes for agents other than Claude, COURSE.md pedagogy
-    changes from the research (week 0, groups, checks for understanding).
-12. **Design iteration two** on the live site from Ben's notes.
-13. **One source for the template's design tokens.** Found while
-    writing item 3: the platforms' placeholder palettes disagree (the
-    web starter is white with a blue accent; Android's is dark navy with
-    an orange primary), which breaks the lockstep-token rule in
-    AGENTS.md. A `design-tokens.json` with a small tool that writes the
-    web, Apple, Android, and Windows token files, and a parity test.
+Reordered October 3, 2026, at Ben's request: "make sure we are doing the
+big stuff of the buildout (key functionality on the site) and not just
+side quests." The hub's core features come first; anything that is
+polish, print, or template housekeeping waits until they work for real.
+
+**Built so far:** the open directory and /apps/, the review skill and
+the look skill in the template, sign-in and the hub's schema, /account/,
+/teach/, /cohort/, /live/, the human-shaped mark, and the printable
+sheets. Everything behind sign-in is drawn against a stand-in database
+and waits on one real sign-in.
+
+**The core (do these first, in order):**
+
+1. **Real sign-in, end to end.** Waits on Ben's one Authorize click.
+   Then, signed in as Ben: a draft cohort in /teach/, its sessions,
+   /cohort/ and /live/ for real, and every header "Sign in with GitHub"
+   button pointed at /account/. Until Ben signs in, keep building the
+   items below against the stand-in database.
+2. **Cohort conversation on the site.** The vision asks for GitHub's own
+   discussions, shown in the hub, and DECISIONS.md makes cohort
+   conversation private to the cohort by default. Research first: a
+   private repository per cohort (or per teacher) in the humanshaped
+   organization with Discussions on; reading and posting through GitHub's
+   GraphQL API with the student's own GitHub token from Supabase sign-in
+   (which scopes, how the token is kept in the browser, how a student
+   gets access to the private repository when they join, at $0). Then
+   the conversation on /cohort/ and /live/.
+3. **Connect your AI agent.** A read-only context feed and a small MCP
+   endpoint (Cloudflare Worker or Supabase Edge Function, free tier) so
+   the student's Claude or Gemini knows their cohort, week, challenge,
+   next session, and the human-shaped review skill; the student can then
+   share what their agent said into the hub, labeled as AI. A page that
+   tells them how to connect it, in Claude and in Gemini.
+4. **Teacher feedback queue.** /teach/ lists everything shared "for
+   feedback" that the teacher has not answered, across their cohorts, so
+   no one's request waits unseen.
+5. **Joining a cohort, from the front door.** /cohorts/ shows open
+   cohorts from the database (not a hard-coded promise) with dates,
+   places left, and a Join button that signs in and enrolls, plus the
+   privacy note beside it.
+6. **Setup week**, ending at the first win: the pages a new member
+   follows before week 1, checked off on their own cohort page.
+7. **An app's own page** in the hub (/apps/?a=...): its declaration,
+   its live commits, its builder's words, and its conversation, for
+   cohort apps and directory apps alike.
+8. **Credential**: Open Badges 3.0 issued from humanshaped.org, a base
+   level for a live web app and a level for each further platform.
+
+**After the core works:**
+
+9. Toolkit, the rest: a meetup guide and a Human-Shaped Hackathon kit
+   (the mark and the sheets are done).
+10. Template passes: Oxford commas across the path, the vision woven
+    through, lanes for agents other than Claude, COURSE.md changes from
+    the research (week 0, groups, checks for understanding).
+11. Design iteration two on the live site from Ben's notes.
+12. One source for the template's design tokens (the platforms'
+    placeholder palettes disagree): a `design-tokens.json`, a tool that
+    writes each platform's token file, and a parity test.
 
 ## Needs Ben
 
@@ -203,15 +225,17 @@ verify what a person would see); push; log it below. "Fixed" and
   images, and after the push GitHub's image proxy served the live SVG
   (200, image/svg+xml). The template's PRINCIPLES.md now points
   declarers to the mark. Copy is mine and waits for Ben's review.
+- 2026-10-03, item 8 (toolkit), the sheets. /start/sheets/ prints the
+  fifteen principles and the four questions, one sheet each, with their
+  words read live from the template's markdown (assets/sheet-lib.js, 4
+  new tests, 23 in all, two of them against the real files). Verified by
+  printing to PDF: two pages, each on one sheet. Then Ben asked for the
+  core functionality before side quests, so the backlog is reordered.
 
 ## Where to pick up
 
-1. Confirm Ben authorized: `select github_login from public.profiles`
-   should list `bhwilkoff`, and `public.teachers` should hold him. If
-   not, ask him to visit humanshaped.org/account/ and click Authorize.
-2. Test for real, signed in as Ben: create a draft cohort in /teach/,
-   make its sessions, open it, see /cohort/ and /live/. Then point the
-   header "Sign in with GitHub" buttons (every page) at /account/.
-3. Continue item 8 (toolkit): the mark is done; next the printable
-   principles and four-questions wall sheet, then the meetup guide and
-   the Human-Shaped Hackathon kit. Then items 9 to 13.
+1. Ask whether Ben has signed in at humanshaped.org/account/ (the
+   session's permission check refuses reading the hub database). If he
+   has, run core item 1.
+2. Otherwise start core item 2 (cohort conversation): research, then
+   build against the stand-in database.
