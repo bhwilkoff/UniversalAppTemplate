@@ -191,11 +191,32 @@
               <button class="btn-quiet danger" type="button" data-delete-draft hidden>Delete this draft</button>
             </div>
             <p class="small" data-detail-message></p>
+            <textarea class="signing-request" readonly rows="10" aria-label="The setup for the Meet script" data-meet-text hidden></textarea>
 
             <section class="cohort-card setup-card" aria-labelledby="cohort-setup-title" data-cohort-setup hidden>
               <h3 id="cohort-setup-title">Before the first session</h3>
               <p class="small">What this cohort needs before people arrive. Each step checks itself off when the hub can see it is done, and <a href="/teach/guide/#need">the teaching guide</a> says more about each one.</p>
               <ol class="setup-steps" data-cohort-setup-steps></ol>
+            </section>
+
+            <!-- The words in the two sections below were written by Claude
+                 for milestone M12 (closing the loop on checks, and not seen
+                 this week) and await Ben's review. -->
+            <section class="since" aria-labelledby="checks-heard-title" data-since hidden>
+              <h3 id="checks-heard-title" data-checks-heard-title></h3>
+              <p class="small" data-checks-heard-intro></p>
+              <div data-check-answers></div>
+              <form class="inline-form" data-heard-form>
+                <label>What I heard, and what changes
+                  <span class="hint">Your own words to the whole cohort, which the session page shows while people arrive next time. Say what you noticed across the answers rather than who wrote what.</span>
+                  <textarea name="heard" rows="4" maxlength="2000"></textarea>
+                </label>
+                <div class="actions"><button class="btn-quiet" type="submit">Save it</button><span class="small" data-heard-message role="status"></span></div>
+              </form>
+
+              <h3 id="not-seen-title" data-not-seen-title></h3>
+              <p class="small" data-not-seen-intro></p>
+              <ul class="roster not-seen" data-not-seen></ul>
             </section>
 
             <h3>Sessions</h3>
@@ -211,7 +232,7 @@
             <div data-submissions></div>
 
             <h3>Groups</h3>
-            <p class="small">Pairs, trios, or small groups. Everyone can see their own group and what it is for, and you can change them whenever the cohort needs it.</p>
+            <p class="small">Pairs, trios, or small groups. Everyone can see their own group and what it is for, and you can change them whenever the cohort needs it. Each group can also have its own Meet link for the group part of every session (the Meet script can make one for each), which its members see on their cohort page and the session page.</p>
             <div data-groups></div>
             <form class="inline-form" data-group-form>
               <label>New group <input name="name" required maxlength="60" placeholder="Group 1"></label>
