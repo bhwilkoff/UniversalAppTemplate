@@ -230,10 +230,11 @@ free, and there is no deadline to miss. The cohort keeps its weekly
 rhythm either way, so a "not yet" travels with you into next week rather
 than holding you back from it.
 
-**The teacher looks closely three times:** at week 4, when the app
-reaches someone else's device; at week 5, the showing; and whenever
-someone says "not yet" about the same stage for the second time, because
-by then a conversation is worth more than another round alone.
+**The teacher looks closely at the moments that matter most.** That
+means week 4, when the app first reaches someone else's device, and
+week 5, at the final showing. It also means any time someone says "not
+yet" about the same stage for the second time, because by then a
+conversation is worth more than another round alone.
 
 The cost is that people who are new to building are judging work in a
 field they are new to. Seeing the app on a device does most of that
