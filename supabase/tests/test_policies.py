@@ -1262,6 +1262,27 @@ def main():
     check("no one but a teacher sends strokes to a locked board", not can_send(as_user("bea"), t_main) and can_send(as_user("ben"), t_main))
     check("on a locked board, people can still say they are here", can_send(as_user("bea"), t_main, "presence"))
 
+    # The session's thread (migration 20261003170000): a teacher records
+    # which GitHub discussion is this session's, and no one else does.
+    bea = as_user("bea")
+    bea.execute("update public.sessions set discussion_number = 7 where id = %s", (b1,))
+    check("a student cannot set the session's thread", bea.rowcount == 0)
+    agent = as_agent("ben")
+    agent.execute("update public.sessions set discussion_number = 7 where id = %s", (b1,))
+    check("a teacher's agent cannot set the session's thread", agent.rowcount == 0)
+    dee = as_user("dee")
+    dee.execute("update public.sessions set discussion_number = 7 where id = %s", (b1,))
+    check("someone outside the cohort cannot set the session's thread", dee.rowcount == 0)
+    ben = as_user("ben")
+    check("a teacher sets the session's thread",
+          attempt(ben, "update public.sessions set discussion_number = 7 where id = %s returning discussion_number", (b1,)) and last_rows == [(7,)])
+    check("one thread belongs to one session",
+          not attempt(ben, "update public.sessions set discussion_number = 7 where id = %s", (b2,)))
+    check("a thread's number is a real one", not attempt(ben, "update public.sessions set discussion_number = 0 where id = %s", (b2,)))
+    fay = as_user("fay")
+    fay.execute("select discussion_number from public.sessions where id = %s", (b1,))
+    check("everyone in the cohort reads which thread is the session's", fay.fetchall() == [(7,)])
+
     ben = as_user("ben")
     ben.execute("update public.cohorts set status = 'finished' where id = %s", (bc,))
     su9 = conn.cursor(); su9.execute("reset role")

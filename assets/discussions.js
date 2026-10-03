@@ -71,6 +71,15 @@
     return box;
   }
 
+  // One post in a thread, as GitHub gave it.
+  function post(p) {
+    var art = el('article', 'talk-post' + (p.reply ? ' reply' : ''));
+    art.appendChild(el('p', 'small talk-by', who(p.author) + ', ' + ago(p.createdAt)));
+    if (p.minimized) art.appendChild(el('p', 'small', 'This comment is hidden on GitHub.'));
+    else art.appendChild(body(p.html));
+    return art;
+  }
+
   function noToken(box, db, repo, expired, compact) {
     var p = el('p', compact ? 'small' : null, compact
       ? 'This page can read the conversation for a few hours after you sign in, and that time has passed, so sign in again or open it on GitHub.'
@@ -169,14 +178,6 @@
         if (!t) return box.appendChild(explain({ kind: 'not-visible' }, o.repo));
         drawThread(box, t);
       });
-    }
-
-    function post(p) {
-      var art = el('article', 'talk-post' + (p.reply ? ' reply' : ''));
-      art.appendChild(el('p', 'small talk-by', who(p.author) + ', ' + ago(p.createdAt)));
-      if (p.minimized) art.appendChild(el('p', 'small', 'This comment is hidden on GitHub.'));
-      else art.appendChild(body(p.html));
-      return art;
     }
 
     function drawThread(box, t) {
@@ -301,5 +302,182 @@
     });
   }
 
-  root.CohortTalk = { full: full, compact: compact, token: token, forget: forget };
+  // ------------------------------------------------------------------
+  // /live/: this session's thread (SessionThreadLib), opened by a
+  // teacher, read every twenty seconds while the page is seen, and
+  // posted to by anyone in the cohort as themselves.
+  //   o.db, o.session (the sign-in), o.repo, o.row (the session's row),
+  //   o.teaching, o.liveUrl
+  // ------------------------------------------------------------------
+  function sessionThread(box, o) {
+    var T = root.SessionThreadLib;
+    if (!T) return;
+    var tok = token(o.db, o.session);
+    var number = o.row.discussion_number || null;
+    var wait = null, posts = null, foot = null, drawnFor = null;
+    box.replaceChildren();
+
+    function later(fn) {
+      clearTimeout(wait);
+      var ms = T.nextRead(document.visibilityState !== 'hidden');
+      if (ms) wait = setTimeout(fn, ms);
+    }
+    document.addEventListener('visibilitychange', function () {
+      if (document.visibilityState !== 'hidden') { clearTimeout(wait); step(); }
+    });
+
+    function step() {
+      var st = T.state({ repo: o.repo, number: number, teaching: o.teaching, token: tok });
+      if (st === 'none') { box.replaceChildren(); return; }
+      if (st === 'show') return tok ? read() : linkOnly();
+      if (st === 'open') return offerToOpen();
+      if (st === 'signin') { box.replaceChildren(); noToken(box, o.db, o.repo, false, true); return; }
+      box.replaceChildren(el('p', 'small', 'Your teacher has not opened this session’s thread yet. It will be here when they do.'));
+      lookForNumber();
+    }
+
+    // Until a teacher opens it, ask the hub now and then whether they have.
+    function lookForNumber() {
+      later(function () {
+        o.db.from('sessions').select('discussion_number').eq('id', o.row.id).maybeSingle().then(function (r) {
+          if (r.data && r.data.discussion_number) { number = r.data.discussion_number; step(); } else lookForNumber();
+        });
+      });
+    }
+
+    function linkOnly() {
+      box.replaceChildren();
+      var p = el('p');
+      var a = link(T.threadUrl(o.repo, number), 'Open this session’s thread on GitHub'); a.target = '_blank'; a.rel = 'noopener';
+      p.appendChild(a); box.appendChild(p);
+      noToken(box, o.db, o.repo, false, true);
+    }
+
+    function offerToOpen(note) {
+      posts = null;
+      box.replaceChildren();
+      box.appendChild(el('p', 'small', note || 'Opening it starts a discussion in the cohort’s repository on GitHub, under your name, where links, questions for later, and what people are stuck on can stay after the call.'));
+      var acts = el('div', 'actions');
+      var msg = el('span', 'small'); msg.setAttribute('role', 'status');
+      var b = button('Open this session’s thread', 'btn-quiet', function () { open(b, msg, !!note); });
+      acts.appendChild(b); acts.appendChild(msg); box.appendChild(acts);
+    }
+
+    function trouble(p) {
+      clearTimeout(wait);
+      posts = null;
+      if (p.kind === 'expired') { forget(); tok = null; return step(); }
+      box.replaceChildren(explain(p, o.repo));
+      box.appendChild(el('div', 'actions')).appendChild(button('Try again', 'btn-quiet', function () { step(); }));
+    }
+
+    // Make the discussion as the teacher, then keep its number on the
+    // session, unless another teacher already did (SessionThreadLib.settle).
+    function open(b, msg, replacing) {
+      b.disabled = true; msg.textContent = 'Opening it on GitHub…';
+      D.ask(tok, T.BY_NUMBER, T.variables(o.repo, null)).then(function (r) {
+        if (r.problem) return trouble(r.problem);
+        var repo = T.shape(r.data);
+        if (!repo) return trouble({ kind: 'not-visible' });
+        var cat = T.category(repo.categories);
+        if (!cat) { b.disabled = false; msg.textContent = 'The cohort’s repository has no category a discussion can go in, so add one on GitHub first.'; return; }
+        return D.ask(tok, D.CREATE, { repositoryId: repo.repositoryId, categoryId: cat.id, title: T.title(o.row), body: T.body(o.row, o.liveUrl) }).then(function (c) {
+          if (c.problem) return trouble(c.problem);
+          var made = c.data && c.data.createDiscussion && c.data.createDiscussion.discussion;
+          if (!made) return trouble({ kind: 'github', message: 'GitHub did not say which discussion it made.' });
+          var q = o.db.from('sessions').update({ discussion_number: made.number }).eq('id', o.row.id);
+          if (!replacing) q = q.is('discussion_number', null);
+          return q.select('discussion_number').then(function (u) {
+            if (u.error) { b.disabled = false; msg.textContent = 'GitHub made it, but the hub did not keep it: ' + u.error.message + '. It is at ' + made.url + '.'; return; }
+            if (u.data.length) { number = made.number; return step(); }
+            return o.db.from('sessions').select('discussion_number').eq('id', o.row.id).maybeSingle().then(function (s) {
+              var kept = T.settle(s.data && s.data.discussion_number, made.number);
+              number = kept.keep;
+              step();
+              if (kept.extra) box.prepend(el('p', 'small', 'Another teacher opened the thread at the same moment, so this page shows theirs. Yours is still on GitHub as number ' + kept.extra + ', and you can delete it there.'));
+            });
+          });
+        });
+      });
+    }
+
+    function read() {
+      if (!posts || drawnFor !== number) box.replaceChildren(el('p', 'small', 'Reading the thread from GitHub…'));
+      D.ask(tok, T.BY_NUMBER, T.variables(o.repo, number)).then(function (r) {
+        if (r.problem) return trouble(r.problem);
+        var got = T.shape(r.data);
+        if (!got) return trouble({ kind: 'not-visible' });
+        if (!got.thread) {
+          if (o.teaching) return offerToOpen('This session’s thread is no longer on GitHub (someone may have deleted it), so you can open a new one.');
+          posts = null;
+          box.replaceChildren(el('p', 'small', 'This session’s thread is no longer on GitHub. Your teacher can open a new one.'));
+          return;
+        }
+        drawThread(got.thread);
+        later(read);
+      });
+    }
+
+    // The posts are drawn again on each read; the reply box is drawn
+    // once, so what someone is typing is never lost.
+    function drawThread(t) {
+      if (!posts || drawnFor !== number) {
+        box.replaceChildren();
+        posts = el('div', 'talk-thread session-thread');
+        box.appendChild(posts);
+        foot = el('p', 'small talk-foot');
+        box.appendChild(foot);
+        if (!t.locked) box.appendChild(replyForm(t));
+        drawnFor = number;
+      }
+      posts.replaceChildren();
+      if (t.more) posts.appendChild(el('p', 'small talk-more')).appendChild(link(t.url, t.more + ' earlier comments on GitHub'));
+      posts.appendChild(post(t));
+      t.comments.forEach(function (c) {
+        posts.appendChild(post(c));
+        c.replies.forEach(function (r) { r.reply = true; posts.appendChild(post(r)); });
+        if (c.moreReplies) posts.appendChild(el('p', 'small talk-more')).appendChild(link(c.url, c.moreReplies + ' more replies to this on GitHub'));
+      });
+      foot.replaceChildren();
+      var a = link(t.url, 'Open it on GitHub'); a.target = '_blank'; a.rel = 'noopener';
+      foot.appendChild(a);
+      foot.appendChild(button('Read it again', 'btn-link', function () { clearTimeout(wait); read(); }));
+      if (t.locked) foot.appendChild(el('span', null, 'It is locked, so no one can add to it.'));
+    }
+
+    function replyForm(t) {
+      var f = el('form', 'inline-form talk-form');
+      var label = el('label', null, 'Add to the thread');
+      var ta = el('textarea'); ta.rows = 2; ta.required = true; ta.maxLength = 65000;
+      label.appendChild(ta); f.appendChild(label);
+      f.appendChild(el('p', 'small hint', 'It goes to GitHub as yours, where only the cohort can see it, and you can edit or delete it there.'));
+      var acts = el('div', 'actions');
+      var b = el('button', 'btn-quiet', 'Post it'); b.type = 'submit';
+      var msg = el('span', 'small'); msg.setAttribute('role', 'status');
+      acts.appendChild(b); acts.appendChild(msg); f.appendChild(acts);
+      f.addEventListener('submit', function (ev) {
+        ev.preventDefault();
+        var text = ta.value.trim();
+        if (!text) return;
+        b.disabled = true; msg.textContent = 'Posting to GitHub…';
+        var old = f.querySelector('.talk-problem'); if (old) old.remove();
+        D.ask(tok, D.COMMENT, { discussionId: t.id, body: text }).then(function (r) {
+          b.disabled = false;
+          if (r.problem) {
+            if (r.problem.kind === 'expired') return trouble(r.problem);
+            msg.textContent = '';
+            f.appendChild(explain(r.problem, o.repo));
+            return;
+          }
+          ta.value = ''; msg.textContent = 'Posted.';
+          clearTimeout(wait); read();
+        });
+      });
+      return f;
+    }
+
+    step();
+  }
+
+  root.CohortTalk = { full: full, compact: compact, sessionThread: sessionThread, token: token, forget: forget };
 })(typeof globalThis !== 'undefined' ? globalThis : this);

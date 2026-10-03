@@ -391,9 +391,21 @@
     opt('link', 'A link, from GitHub or anywhere');
     syncAddForm();
   }
+  // This session's thread (C5): one discussion on GitHub for the session,
+  // opened by a teacher, read and posted to here as each person.
+  function drawThread() {
+    var repo = S.cohort.github_repo;
+    var on = !!(repo && S.cohort.github_team && window.CohortTalk && window.CohortTalk.sessionThread && 'discussion_number' in S.session);
+    $('[data-thread-section]').hidden = !on;
+    if (!on) return;
+    window.CohortTalk.sessionThread($('[data-thread]'), { db: db, session: S.auth, repo: repo, row: S.session, teaching: S.teaching,
+      liveUrl: location.origin + '/live/?c=' + encodeURIComponent(S.cohort.slug) });
+  }
+
   // From the conversation: the newest threads in the cohort's GitHub
   // Discussions, each one a link, and a quick way to put it in the queue.
   function drawTalk() {
+    drawThread();
     var repo = S.cohort.github_repo;
     $('[data-talk-section]').hidden = !(repo && S.cohort.github_team && window.CohortTalk);
     if (!repo || !window.CohortTalk) return;
