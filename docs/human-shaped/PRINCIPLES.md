@@ -309,6 +309,12 @@ Human Shaped cohort is included in the directory, software built from
 the Universal App Template is considered for it, and anyone else who
 builds by these principles can ask to be included.
 
+Once the file is in your repository, you can show it in your README or
+on your app's website with the human-shaped mark, from
+https://humanshaped.org/start/#mark. The mark links to your own
+declaration, so anyone who sees it can read your answers and check the
+evidence for themselves.
+
 When something changes, change your answer and record what changed and
 when, rather than deleting the old answer. A declaration that shows its
 own corrections is more trustworthy than one that never needed any.
