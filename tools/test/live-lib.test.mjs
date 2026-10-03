@@ -62,3 +62,35 @@ test('an answer reads as the choice or the words', () => {
   assert.equal(lib.itemLabel({ kind: 'app', url: 'https://bea.github.io/garden-swap/' }), 'The app, live at bea.github.io/garden-swap');
   assert.equal(lib.counted(1, 'answer', 'answers'), '1 answer');
 });
+
+// The trio protocol (M12).
+test('every builder gets a whole turn inside the part', () => {
+  const steps = lib.turnSteps(25, 3);
+  assert.deepEqual(steps.map(s => s.key), ['ask', 'show', 'clarify', 'three', 'next']);
+  const total = steps.reduce((n, s) => n + s.seconds, 0) * 3;
+  assert.ok(total <= 25 * 60 + 60 && total >= 25 * 60 - 60, String(total));
+  assert.ok(steps.every(s => s.seconds % 15 === 0 && s.seconds >= 30));
+  assert.ok(Math.abs(steps[1].seconds - 3 * steps[0].seconds) <= 15, 'showing gets about three times the question');
+});
+test('a short part still gives each step at least thirty seconds', () => {
+  assert.ok(lib.turnSteps(5, 4).every(s => s.seconds === 30));
+});
+test('the presenting order moves along by one each week, and keeps the same people', () => {
+  const ppl = [{ id: '3', name: 'cal' }, { id: '1', name: 'Bea' }, { id: '2', name: 'eve' }];
+  assert.deepEqual(lib.presentingOrder(ppl, 1).map(p => p.name), ['Bea', 'cal', 'eve']);
+  assert.deepEqual(lib.presentingOrder(ppl, 2).map(p => p.name), ['cal', 'eve', 'Bea']);
+  assert.deepEqual(lib.presentingOrder(ppl, 4).map(p => p.name), ['Bea', 'cal', 'eve']);
+  assert.deepEqual(lib.presentingOrder([], 3), []);
+});
+test("a builder's newest bring-back is the one their turn opens with", () => {
+  const shares = [
+    { user_id: 'bea', kind: 'bring-back', created_at: '2026-10-21T10:00:00Z', want_to_know: 'old' },
+    { user_id: 'bea', kind: 'question', created_at: '2026-10-23T10:00:00Z' },
+    { user_id: 'bea', kind: 'bring-back', created_at: '2026-10-22T10:00:00Z', want_to_know: 'new' },
+    { user_id: 'eve', kind: 'bring-back', created_at: '2026-10-24T10:00:00Z' }
+  ];
+  assert.equal(lib.latestBringBack(shares, 'bea').want_to_know, 'new');
+  assert.equal(lib.latestBringBack(shares, 'fay'), null);
+  assert.equal(lib.clock(75), '1:15');
+  assert.equal(lib.CLOSING_CHECKS.length, 2);
+});

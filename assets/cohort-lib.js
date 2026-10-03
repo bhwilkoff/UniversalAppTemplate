@@ -39,31 +39,118 @@
     return m ? m[1] + '/' + m[2] : null;
   }
 
-  // The live session's agenda, from the course's session shape: arrive,
-  // show what you brought back in your group, one value at work, read one
-  // real prompt together, build, and close. Built for 75 minutes and
-  // scaled to the cohort's own session length.
+  // The live session's agenda, from the session shape Ben adopted from the
+  // teaching research (research/notes/facilitation-assessment-social-
+  // learning-notes.md, 6.1): arrive, show what you brought back in your
+  // group, one decision your values changed, read one real prompt trying
+  // first, and start, then check. Built for 75 minutes and scaled to the
+  // cohort's own session length. The page finds its tools by each part's
+  // key, never by its name or place, so the names, minutes, and order can
+  // change here alone (COURSE.md is the source; awaiting Ben's review).
   var PARTS = [
-    ['Arrive', 5, 'One line in the chat: what you shipped this week, or where you are stuck. Cameras welcome, never required.'],
-    ['Show what you brought back', 25, 'In your group, each person shows this week\u2019s bring-back on the real device, then hears three questions: where are you going, how is it going, and what comes next.'],
-    ['One value at work', 7, 'One person shares a decision their values changed this week, and what it cost them.'],
-    ['Read one real prompt', 20, 'Write the prompt you would send for the situation on screen, compare it with a partner, then see the real one and talk about what it fixed.'],
-    ['Build', 15, 'Quiet building time, with a room open for anyone who is stuck.'],
-    ['Close', 3, 'One line each: what you learned, why it matters, and what you will bring back next week.']
+    { key: 'arrive', name: 'Arrive', minutes: 7, what: 'One line each in the chat: what you shipped this week, or where you are stuck. Then your teacher says what they heard in last week\u2019s checks, and what they changed because of it. Cameras are welcome, and never required.' },
+    { key: 'show', name: 'Show what you brought back', minutes: 25, what: 'In your group\u2019s own room, each builder takes a turn: say what you want to know, show it on the real device, explain one decision with the agent closed, take one clarifying question, then listen while your partners answer the three questions, and say what you will do next.' },
+    { key: 'value', name: 'One decision your values changed', minutes: 6, what: 'Back together in the main session, one person shares a decision their values changed this week and what it cost them, and your teacher names one thing they heard across the groups.' },
+    { key: 'prompt', name: 'Read one real prompt, trying first', minutes: 25, what: 'Write the prompt you would send for the situation on screen, compare it with a partner, and then see the real one and talk about the difference.' },
+    { key: 'start', name: 'Start, then check', minutes: 12, what: 'Send this week\u2019s first prompt to your agent before you leave, with a room open for anyone who is stuck. In the last three minutes, answer your teacher\u2019s two questions privately, on this page.' }
   ];
-  function agenda(minutes) {
-    var total = 75, scale = (minutes || total) / total, start = 0;
-    return PARTS.map(function (p, i) {
-      var len = i === PARTS.length - 1 ? Math.max(1, Math.round((minutes || total) - start)) : Math.max(1, Math.round(p[1] * scale));
-      var part = { name: p[0], start: start, minutes: len, what: p[2] };
+  function agenda(minutes, parts) {
+    parts = parts || PARTS;
+    var total = parts.reduce(function (n, p) { return n + p.minutes; }, 0);
+    var want = minutes || total, scale = want / total, start = 0;
+    return parts.map(function (p, i) {
+      var len = i === parts.length - 1 ? Math.max(1, Math.round(want - start)) : Math.max(1, Math.round(p.minutes * scale));
+      var part = { key: p.key, name: p.name, start: start, minutes: len, what: p.what };
       start += len;
       return part;
     });
   }
 
+  // Which part of the session it is, from the clock: the first part from
+  // an hour before the start (people arrive early), each part in its
+  // minutes, and none once the session is over or more than an hour away.
+  // A part someone started a timer for wins over the clock, because
+  // sessions run late and the room knows where it is better than a clock.
+  function partNow(parts, startsAt, now, chosenKey) {
+    if (chosenKey) {
+      var chosen = parts.filter(function (p) { return p.key === chosenKey; })[0];
+      if (chosen) return chosen;
+    }
+    if (!startsAt || !parts.length) return null;
+    var m = (now.getTime() - Date.parse(startsAt)) / 60000;
+    if (m < -60) return null;
+    if (m < 0) return parts[0];
+    for (var i = 0; i < parts.length; i++) {
+      if (m < parts[i].start + parts[i].minutes) return parts[i];
+    }
+    return null;
+  }
+
   // Which stages of the path each week covers (COURSE.md, five weeks).
   var WEEK_STAGES = { 1: ['00', '01'], 2: ['02', '03'], 3: ['04'], 4: ['05', '06'], 5: ['07', '08'] };
   function stagesForWeek(n) { return WEEK_STAGES[n] || []; }
+
+  // Each stage's file in the template, read live the way render.js does.
+  var STAGE_FILES = {
+    '00': 'docs/path/00-why-we-build.md', '01': 'docs/path/01-first-prototype.md',
+    '02': 'docs/path/02-shape-of-an-app.md', '03': 'docs/path/03-going-native.md',
+    '04': 'docs/path/04-seeing-it-work.md', '05': 'docs/path/05-shipping.md',
+    '06': 'docs/path/06-keeping-it-running.md', '07': 'docs/path/07-raising-the-ceiling.md',
+    '08': 'docs/path/08-working-with-ai.md'
+  };
+  function stageFile(n) { return STAGE_FILES[n] || null; }
+
+  // A stage's bar: the first sentence of its "When you are ready to move
+  // on" paragraph, as plain words. The rest of that paragraph points at
+  // the next stage, which is not part of the bar. Null when a stage has
+  // none (stage 08 does not, today).
+  function readyBar(markdown) {
+    var lines = String(markdown || '').split('\n');
+    var at = -1;
+    for (var i = 0; i < lines.length; i++) { if (/^\*\*When you are ready to move on,\*\*/.test(lines[i])) { at = i; break; } }
+    if (at < 0) return null;
+    var para = [];
+    for (var j = at; j < lines.length && lines[j].trim(); j++) para.push(lines[j].trim());
+    var text = para.join(' ')
+      .replace(/\*\*([^*]+)\*\*/g, '$1').replace(/\*([^*]+)\*/g, '$1').replace(/`([^`]+)`/g, '$1')
+      .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1').replace(/\s+/g, ' ');
+    var end = text.search(/\.(\s|$)/);
+    return end < 0 ? text : text.slice(0, end + 1);
+  }
+
+  // How a bring-back's mark reads, in the builder's own terms. Never a
+  // score: ready, or not yet with what is missing, or nothing at all.
+  function readinessText(share, isMine) {
+    if (!share || !share.readiness) return null;
+    if (share.readiness === 'ready') return isMine ? 'You marked it ready to move on.' : 'Ready to move on, by their own reading.';
+    return (isMine ? 'You marked it not yet' : 'Not yet, by their own reading') + (share.missing ? ': ' + share.missing : '.');
+  }
+
+  // Who saw it working on a device, as one line with names.
+  function seenText(names) {
+    if (!names || !names.length) return null;
+    var list = names.length < 3 ? names.join(' and ') : names.slice(0, -1).join(', ') + ', and ' + names[names.length - 1];
+    return 'Seen working on a device by ' + list + '.';
+  }
+
+  // Whether this person may confirm a bring-back: it is marked ready, it
+  // is not theirs, and they are in a group with its builder or teach the
+  // cohort (the database checks the same, in private.can_confirm).
+  function canConfirm(share, meId, partnerIds, teaching) {
+    if (!share || share.kind !== 'bring-back' || share.readiness !== 'ready' || share.user_id === meId) return false;
+    return !!teaching || (partnerIds || []).indexOf(share.user_id) >= 0;
+  }
+
+  // The people in my groups in this cohort, not counting me.
+  function partnersOf(meId, groups) {
+    var out = [];
+    (groups || []).forEach(function (g) {
+      var ids = (g.group_members || []).map(function (m) { return m.user_id; });
+      if (ids.indexOf(meId) < 0) return;
+      ids.forEach(function (id) { if (id !== meId && out.indexOf(id) < 0) out.push(id); });
+    });
+    return out;
+  }
 
   // The steps a new member takes before week 1, each one's state read
   // from what the hub already knows, so nobody ticks a box by hand.
@@ -82,7 +169,11 @@
     return steps;
   }
 
-  var lib = { setupSteps: setupSteps, agenda: agenda, stagesForWeek: stagesForWeek, currentAndNext: currentAndNext, commitLine: commitLine, ago: ago, repoPath: repoPath };
+  var lib = {
+    setupSteps: setupSteps, agenda: agenda, partNow: partNow, stagesForWeek: stagesForWeek, stageFile: stageFile,
+    readyBar: readyBar, readinessText: readinessText, seenText: seenText, canConfirm: canConfirm, partnersOf: partnersOf,
+    currentAndNext: currentAndNext, commitLine: commitLine, ago: ago, repoPath: repoPath, PARTS: PARTS
+  };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
   else root.CohortLib = lib;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

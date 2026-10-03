@@ -102,3 +102,35 @@ test('requests waiting for an answer come oldest first, and decided ones drop ou
   ];
   assert.deepEqual(lib.waitingRequests(r).map((x) => x.user_id), ['a', 'b']);
 });
+
+// The teaching tools (M12).
+test('the Meet setup asks for one room per group, by a key that survives a rename', () => {
+  const out = lib.meetSetup({ slug: 'f', title: 'F', starts_on: '2026-10-19', session_weekday: 2, session_time: '17:00:00', time_zone: 'America/Denver', session_minutes: 75, weeks: 5 }, [], [],
+    [{ id: '1a2b3c4d-0000-4000-8000-000000000000', name: 'Trio A', emails: ['a@example.org', 'b@example.org'] }]);
+  assert.deepEqual(out.groups, [{ key: 'g-1a2b3c4d', name: 'Trio A', members: 'a@example.org, b@example.org' }]);
+});
+test('the last session is the one that started most recently', () => {
+  const s = [{ number: 1, starts_at: '2026-10-20T23:00:00Z' }, { number: 2, starts_at: '2026-10-27T23:00:00Z' }];
+  assert.equal(lib.lastStarted(s, new Date('2026-10-28T00:00:00Z')).number, 2);
+  assert.equal(lib.lastStarted(s, new Date('2026-10-01T00:00:00Z')), null);
+});
+test('not seen this week: no share, queue item, answer, or feedback since the last session, in name order', () => {
+  const p = (id, name, extra) => ({ user_id: id, role: 'student', status: 'enrolled', profiles: { github_login: name }, ...extra });
+  const people = [p('z', 'zed'), p('a', 'amy'), p('b', 'bo'), p('l', 'lee', { status: 'left' }), p('m', 'mo', { role: 'mentor' }), p('c', 'cy')];
+  const since = '2026-10-20T23:00:00Z';
+  const activity = [
+    { user_id: 'b', at: '2026-10-21T10:00:00Z' },
+    { user_id: 'c', at: '2026-10-19T10:00:00Z' },
+    { user_id: 'm', at: '2026-10-20T23:30:00Z' }
+  ];
+  assert.deepEqual(lib.notSeen(people, since, activity).map(x => x.user_id), ['a', 'c', 'z']);
+  assert.deepEqual(lib.notSeen(people, null, []), []);
+});
+test("a session's checks come back with each answer in the person's words", () => {
+  const checks = [{ id: 'k2', prompt: 'Muddy?', choices: null, created_at: '2' }, { id: 'k1', prompt: 'Which?', choices: ['A', 'B'], created_at: '1' }];
+  const answers = [{ check_id: 'k1', user_id: 'u', choice: 2, updated_at: '1' }, { check_id: 'k2', user_id: 'u', body: 'Pipelines', updated_at: '1' }];
+  const out = lib.checkAnswers(checks, answers, (id) => id.toUpperCase());
+  assert.deepEqual(out.map(k => k.prompt), ['Which?', 'Muddy?']);
+  assert.deepEqual(out[0].answers, [{ user_id: 'u', name: 'U', text: 'B' }]);
+  assert.equal(out[1].answers[0].text, 'Pipelines');
+});
