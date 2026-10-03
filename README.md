@@ -71,6 +71,7 @@ make, why it is built that way, what to do, and what to bring back.
 
 | Stage | What you will do |
 |---|---|
+| [Getting set up](docs/path/setup.md) | A GitHub account, your own copy, an agent, and your app's address on your phone. |
 | [00. Why we build](docs/path/00-why-we-build.md) | Write down your values where the agent will read them. |
 | [01. The first prototype](docs/path/01-first-prototype.md) | One platform, real data, on a phone, this week. |
 | [02. The shape of an app](docs/path/02-shape-of-an-app.md) | One data plane, native apps, and `PARITY.md`. |
