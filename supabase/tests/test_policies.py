@@ -37,6 +37,31 @@ grant usage on schema auth to anon, authenticated;
 grant execute on function auth.uid(), auth.jwt() to anon, authenticated;
 """
 
+# Realtime Authorization reads the channel's name through realtime.topic()
+# and checks rules on realtime.messages (supabase.com/docs/guides/realtime/
+# authorization). This stands in for both, so the board's Realtime rules
+# are tested like every other rule.
+REALTIME_STUB = """
+create schema realtime;
+create table realtime.messages (
+  id bigserial primary key,
+  topic text not null,
+  extension text not null,
+  event text,
+  payload jsonb,
+  private boolean not null default true,
+  inserted_at timestamptz not null default now()
+);
+alter table realtime.messages enable row level security;
+create function realtime.topic() returns text language sql stable as $$
+  select nullif(current_setting('realtime.topic', true), '')
+$$;
+grant usage on schema realtime to anon, authenticated;
+grant select, insert on realtime.messages to authenticated;
+grant usage on sequence realtime.messages_id_seq to authenticated;
+grant execute on function realtime.topic() to anon, authenticated;
+"""
+
 GRANTS = """
 grant usage on schema public to anon, authenticated;
 grant select on all tables in schema public to anon, authenticated;
@@ -59,6 +84,7 @@ def main():
     conn.autocommit = True
     su = conn.cursor()
     su.execute(AUTH_STUB)
+    su.execute(REALTIME_STUB)
     for path in sorted((ROOT / "migrations").glob("*.sql")):
         su.execute(path.read_text())
     su.execute(GRANTS)
@@ -851,6 +877,179 @@ def main():
     su8.execute("select count(*) from public.share_confirmations where user_id = %s", (people["eve"],))
     check("when someone leaves, the confirmations they gave leave with them", su8.fetchone()[0] == 0)
 
+
+    # The board (migration 20261003120000): drawn on by the cohort, saved
+    # element by element, locked and cleared only by teachers, never
+    # written by an agent, and gone when the cohort finishes. bea and eve
+    # are a group, fay is a classmate outside it, dee teaches elsewhere.
+    import json, time
+    def el(eid, version, nonce, index="a0", deleted=False, updated=None, text=None):
+        e = {"id": eid, "type": "rectangle", "version": version, "versionNonce": nonce, "index": index,
+             "isDeleted": deleted, "updated": updated if updated is not None else int(time.time() * 1000)}
+        if text:
+            e["customData"] = {"note": text}
+        return e
+    def ids(cur, board):
+        cur.execute("select scene from public.boards where id = %s", (board,))
+        row = cur.fetchone()
+        return [(e["id"], e["version"]) for e in row[0]["elements"]] if row else None
+    def topic_is(cur, t):
+        cur.execute("select set_config('realtime.topic', %s, false)", (t,))
+    def can_send(cur, t, extension="broadcast"):
+        topic_is(cur, t)
+        return attempt(cur, "insert into realtime.messages (topic, extension, event, payload) values (%s, %s, 'scene', '{}')", (t, extension))
+    def can_listen(name, t):
+        # Every cursor shares one connection, so the person is set again
+        # after the stand-in message is written.
+        sur = conn.cursor(); sur.execute("reset role")
+        sur.execute("insert into realtime.messages (topic, extension, event, payload) values (%s, 'broadcast', 'scene', '{}')", (t,))
+        cur = as_user(name)
+        topic_is(cur, t)
+        cur.execute("select count(*) from realtime.messages where topic = %s", (t,))
+        return cur.fetchone()[0] > 0
+
+    ben = as_user("ben")
+    attempt(ben, "insert into public.cohorts (slug, title, created_by, status) values ('board-test', 'Board', %s, 'open') returning id", (people["ben"],))
+    bc = last_rows[0][0]
+    attempt(ben, "insert into public.sessions (cohort_id, number) values (%s, 1) returning id", (bc,))
+    b1 = last_rows[0][0]
+    attempt(ben, "insert into public.sessions (cohort_id, number) values (%s, 2) returning id", (bc,))
+    b2 = last_rows[0][0]
+    for name in ["bea", "eve", "fay"]:
+        cur = as_user(name)
+        attempt(cur, "insert into public.enrollments (cohort_id, user_id) values (%s, %s)", (bc, people[name]))
+    ben = as_user("ben")
+    attempt(ben, "insert into public.groups (cohort_id, name) values (%s, 'Board trio') returning id", (bc,))
+    bg = last_rows[0][0]
+    attempt(ben, "insert into public.group_members (group_id, user_id) values (%s, %s), (%s, %s)", (bg, people["bea"], bg, people["eve"]))
+
+    dee = as_user("dee")
+    dee.execute("select count(*) from public.open_board(%s, %s, null)", (bc, b1))
+    check("someone outside the cohort cannot open its board", dee.fetchone()[0] == 0)
+    agent = as_agent("bea")
+    check("a student's agent cannot open a new board",
+          attempt(agent, "select id from public.open_board(%s, %s, null)", (bc, b1)) and last_rows == [])
+    bea = as_user("bea")
+    check("anyone in the cohort opens the session's board, made on first arrival",
+          attempt(bea, "select id, generation, locked from public.open_board(%s, %s, null)", (bc, b1)) and len(last_rows) == 1)
+    board = last_rows[0][0]
+    eve = as_user("eve")
+    eve.execute("select id from public.open_board(%s, %s, null)", (bc, b1))
+    check("the second person to arrive gets the same board", eve.fetchall() == [(board,)])
+    check("a board starts empty, not someone's drawing",
+          not attempt(eve, "insert into public.boards (cohort_id, session_id, created_by, scene) values (%s, %s, %s, %s)",
+                      (bc, b2, people["eve"], json.dumps({"elements": [el("x", 1, 1)]}))))
+    check("a board belongs to a session of its own cohort",
+          not attempt(eve, "insert into public.boards (cohort_id, session_id, created_by) values (%s, %s, %s)", (bc, s1, people["eve"])))
+
+    bea = as_user("bea")
+    check("a student can save what they drew",
+          attempt(bea, "select saved from public.save_board(%s, 0, %s)", (board, json.dumps([el("r1", 3, 50, "a0"), el("r2", 1, 9, "a1")]))) and last_rows == [(True,)])
+    eve = as_user("eve")
+    attempt(eve, "select saved from public.save_board(%s, 0, %s)", (board, json.dumps([el("r1", 2, 10, "a0"), el("c1", 1, 4, "a2")])))
+    check("a save merges element by element: a classmate's older copy never erases a newer one",
+          ids(eve, board) == [("r1", 3), ("r2", 1), ("c1", 1)])
+    attempt(eve, "select saved from public.save_board(%s, 0, %s)", (board, json.dumps([el("r2", 4, 9, "a1")])))
+    attempt(eve, "select saved from public.save_board(%s, 0, %s)", (board, json.dumps([el("r2", 4, 2, "a1", text="lower nonce")])))
+    eve.execute("select e from public.boards, jsonb_array_elements(scene -> 'elements') e where id = %s and e ->> 'id' = 'r2'", (board,))
+    check("two edits at the same version settle the way Excalidraw settles them (the lower versionNonce)",
+          eve.fetchone()[0].get("customData", {}).get("note") == "lower nonce")
+    long_ago = int(time.time() * 1000) - 2 * 86400000
+    attempt(eve, "select saved from public.save_board(%s, 0, %s)", (board, json.dumps([el("c1", 2, 4, "a2", deleted=True, updated=long_ago)])))
+    check("an element erased more than a day ago is dropped from the saved board", ids(eve, board) == [("r1", 3), ("r2", 4)])
+    fay = as_user("fay")
+    fay.execute("select count(*) from public.boards where id = %s", (board,))
+    check("everyone in the cohort sees the session's board", fay.fetchone()[0] == 1)
+    dee = as_user("dee")
+    dee.execute("select count(*) from public.boards")
+    check("someone outside the cohort sees no boards", dee.fetchone()[0] == 0)
+    dee.execute("select generation, saved from public.save_board(%s, 0, %s)", (board, json.dumps([el("d1", 1, 1)])))
+    check("someone outside the cohort cannot draw on it", dee.fetchall() == [(None, False)] and ids(as_user("ben"), board) == [("r1", 3), ("r2", 4)])
+    anon = as_user(None)
+    check("the public cannot read a board", not attempt(anon, "select count(*) from public.boards") or last_rows == [(0,)])
+    check("the public cannot save a board", not attempt(anon, "select public.save_board(%s, 0, '[]')", (board,)))
+
+    agent = as_agent("bea")
+    agent.execute("select count(*) from public.boards where id = %s", (board,))
+    check("a student's agent can read the board", agent.fetchone()[0] == 1)
+    agent.execute("select generation, saved from public.save_board(%s, 0, %s)", (board, json.dumps([el("a1", 1, 1)])))
+    check("a student's agent cannot draw on the board", agent.fetchall() == [(None, False)] and len(ids(as_user("ben"), board)) == 2)
+    agent = as_agent("bea")
+    agent.execute("update public.boards set scene = '{\"elements\": []}' where id = %s", (board,))
+    check("a student's agent cannot write the board directly", agent.rowcount == 0)
+    agent.execute("delete from public.boards where id = %s", (board,))
+    check("a student's agent cannot delete a board", agent.rowcount == 0)
+    ben_agent = as_agent("ben")
+    ben_agent.execute("update public.boards set locked = true where id = %s", (board,))
+    check("a teacher's agent cannot lock a board", ben_agent.rowcount == 0)
+
+    bea = as_user("bea")
+    check("a student cannot lock the board", not attempt(bea, "update public.boards set locked = true where id = %s", (board,)))
+    check("a student cannot clear the board", not attempt(bea, "update public.boards set generation = 1, scene = '{\"elements\": []}' where id = %s", (board,)))
+    check("a board cannot move to another session", not attempt(bea, "update public.boards set session_id = %s where id = %s", (b2, board)))
+    ben = as_user("ben")
+    check("a teacher can lock the board", attempt(ben, "update public.boards set locked = true where id = %s returning locked", (board,)) and last_rows == [(True,)])
+    bea = as_user("bea")
+    bea.execute("select generation, saved from public.save_board(%s, 0, %s)", (board, json.dumps([el("r1", 9, 1)])))
+    check("no one but a teacher draws on a locked board", bea.fetchall() == [(None, False)] and ids(bea, board) == [("r1", 3), ("r2", 4)])
+    fay = as_user("fay")
+    fay.execute("select count(*) from public.boards where id = %s", (board,))
+    check("a locked board can still be read, and so downloaded", fay.fetchone()[0] == 1)
+    ben = as_user("ben")
+    check("a teacher can still draw on a locked board",
+          attempt(ben, "select saved from public.save_board(%s, 0, %s)", (board, json.dumps([el("t1", 1, 1, "a3")]))) and last_rows == [(True,)])
+    check("a clear must empty the board", not attempt(ben, "update public.boards set generation = 1 where id = %s", (board,)))
+    check("a clear moves one generation at a time", not attempt(ben, "update public.boards set generation = 5, scene = '{\"elements\": []}' where id = %s", (board,)))
+    check("a teacher can clear the board and unlock it",
+          attempt(ben, "update public.boards set generation = 1, scene = '{\"elements\": []}', locked = false where id = %s returning generation", (board,)) and last_rows == [(1,)])
+    eve = as_user("eve")
+    eve.execute("select generation, saved from public.save_board(%s, 0, %s)", (board, json.dumps([el("r1", 3, 50, "a0")])))
+    check("a save from before the clear cannot bring the old drawing back", eve.fetchall() == [(1, False)] and ids(eve, board) == [])
+
+    bea = as_user("bea")
+    check("only a teacher makes a group's board",
+          attempt(bea, "select id from public.open_board(%s, %s, %s)", (bc, b1, bg)) and last_rows == [])
+    ben = as_user("ben")
+    check("a teacher makes a board for a group",
+          attempt(ben, "select id from public.open_board(%s, %s, %s)", (bc, b1, bg)) and len(last_rows) == 1)
+    gboard = last_rows[0][0]
+    check("a group's board must be for a group in the cohort",
+          not attempt(ben, "insert into public.boards (cohort_id, session_id, group_id, created_by) values (%s, %s, %s, %s)", (bc, b2, ga, people["ben"])))
+    bea = as_user("bea")
+    bea.execute("select id from public.open_board(%s, %s, %s)", (bc, b1, bg))
+    check("the group opens its board once the teacher has made it", bea.fetchall() == [(gboard,)])
+    check("the group draws on its board",
+          attempt(bea, "select saved from public.save_board(%s, 0, %s)", (gboard, json.dumps([el("g1", 1, 1)]))) and last_rows == [(True,)])
+    fay = as_user("fay")
+    fay.execute("select count(*) from public.boards where id = %s", (gboard,))
+    check("a classmate outside the group cannot see the group's board", fay.fetchone()[0] == 0)
+    fay.execute("select generation, saved from public.save_board(%s, 0, %s)", (gboard, json.dumps([el("f1", 1, 1)])))
+    check("a classmate outside the group cannot draw on it", fay.fetchall() == [(None, False)])
+
+    # The live strokes: Realtime's private channels, checked against
+    # realtime.messages with the channel's name.
+    t_main, t_group = "board:" + str(board), "board:" + str(gboard)
+    check("everyone in the cohort can listen to the session's board", can_listen("fay", t_main))
+    check("someone outside the cohort cannot listen to it", not can_listen("dee", t_main))
+    check("the public cannot listen to it", not attempt(as_user(None), "select count(*) from realtime.messages") or last_rows == [(0,)])
+    check("a classmate outside a group cannot listen to the group's board", not can_listen("fay", t_group))
+    check("the group can listen to its board", can_listen("eve", t_group))
+    check("a student can send strokes to the session's board", can_send(as_user("bea"), t_main))
+    check("someone outside the cohort cannot send strokes", not can_send(as_user("dee"), t_main))
+    check("a classmate outside a group cannot send strokes to its board", not can_send(as_user("fay"), t_group))
+    check("a student's agent cannot send strokes", not can_send(as_agent("bea"), t_main))
+    check("a student's agent cannot say it is here", not can_send(as_agent("bea"), t_main, "presence"))
+    check("the rules name only board channels", not can_send(as_user("bea"), "live:" + str(bc)) and not can_send(as_user("bea"), "board:not-a-board"))
+    ben = as_user("ben")
+    ben.execute("update public.boards set locked = true where id = %s", (board,))
+    check("no one but a teacher sends strokes to a locked board", not can_send(as_user("bea"), t_main) and can_send(as_user("ben"), t_main))
+    check("on a locked board, people can still say they are here", can_send(as_user("bea"), t_main, "presence"))
+
+    ben = as_user("ben")
+    ben.execute("update public.cohorts set status = 'finished' where id = %s", (bc,))
+    su9 = conn.cursor(); su9.execute("reset role")
+    su9.execute("select count(*) from public.boards where cohort_id = %s", (bc,))
+    check("when the cohort is finished, its boards are deleted", su9.fetchone()[0] == 0)
     conn.rollback()
     conn.close()
     failed = [n for n, ok in results if not ok]
