@@ -262,13 +262,22 @@ and waits on one real sign-in.
   the person to click Join. /account/ now tells a teacher where /teach/
   is. Since Ben's real sign-in worked, the header's "Sign in with
   GitHub" on all 25 pages now goes to /account/. Verified against a
-  stand-in database at 375px and 430px. Not yet verified for real: a
-  real open cohort (the test cohort stays a draft).
+  stand-in database at 375px and 430px. Then verified on production,
+  signed in as Ben (reading only): /account/ shows the teacher link, and
+  /teach/ reads the real database for the queue without an error
+  ("Nothing is waiting for you right now"). Not yet verified for real: a
+  real open cohort (the test cohort stays a draft). Found: signed in,
+  /account/'s heading and the header button still say "Sign in with
+  GitHub"; they should say who you are.
 
 ## Where to pick up
 
 1. Ask whether Ben has signed in at humanshaped.org/account/ (the
    session's permission check refuses reading the hub database). If he
    has, run core item 1.
-2. Otherwise start core item 2 (cohort conversation): research, then
-   build against the stand-in database.
+2. Core item 2 (cohort conversation): the research is in
+   research/notes/cohort-conversation-notes.md when its agent finishes;
+   decide the design from it, then build.
+3. Small, while waiting: when signed in, the header button and the
+   /account/ heading name the person instead of "Sign in with GitHub".
+4. Then core item 3 (connect your AI agent).
