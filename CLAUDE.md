@@ -104,7 +104,7 @@ what waits on Ben.
   `bifrieqzkihuxfzttgvd`, free plan, us-west-1, org "Learning is Change,
   Inc"). Schema and row-level security in `supabase/migrations/`, applied
   in order. `supabase/tests/test_policies.py` runs them against a local
-  throwaway Postgres as four people and as a student's AI agent (88
+  throwaway Postgres as four people and as a student's AI agent (171
   checks; agents' tokens carry a `client_id` and can only read); run it
   before applying
   any new migration, and see it fail when a rule is opened on purpose.
@@ -123,7 +123,10 @@ what waits on Ben.
   script setup), `/cohort/?c=<slug>` (this week, next session, group,
   your app, classmates' apps with live GitHub commits, bring-backs and
   feedback), `/live/?c=<slug>` (the page beside Google Meet: agenda with
-  timers, this week's stages, what people brought back). `/cohorts/`
+  timers, this week's stages, the "show your work" queue, checks for
+  understanding with an anonymous count the teacher may show, and what
+  people brought back; Realtime nudges it to read again, with a
+  fifteen-second read as the fallback). `/cohorts/`
   lists open cohorts from the database, and its "Join with GitHub" goes
   to `/account/?join=<slug>`, where the person confirms. /teach/ opens
   with requests to teach (for approvers) and the feedback queue, shows
@@ -140,14 +143,15 @@ what waits on Ben.
   migration 20261003055000, `public_apps()`; see `research/notes/hub-privacy-notes.md`).
 - **Scripts:** `assets/hub-config.js` (public URL and publishable key),
   `hub.js`, `cohorts.js`, `teach.js` with `teach-lib.js`, `cohort.js` and `live.js`
-  with `cohort-lib.js`, and `apps.js` with `apps-lib.js`. Pure logic lives in the `-lib.js` files with
-  tests in `tools/test/` (`node --test tools/test/*.mjs`, 61 tests).
+  with `cohort-lib.js` and `live-lib.js`, and `apps.js` with `apps-lib.js`. Pure logic lives in the `-lib.js` files with
+  tests in `tools/test/` (`node --test tools/test/*.mjs`, 85 tests).
 - **Students' own agents** (research/notes/agent-connection-notes.md):
   the `mcp` Edge Function (`supabase/functions/mcp/`, answers in
   `shape.js`) is a read-only MCP server reached through Supabase Auth's
   OAuth server, with its consent page at `/oauth/consent/` and the steps
   at `/connect/`. Deploy it with verify_jwt off and with
-  `assets/cohort-lib.js` and `assets/teach-lib.js` beside it, whole.
+  `assets/cohort-lib.js`, `assets/teach-lib.js`, and `assets/live-lib.js`
+  beside it, whole.
   Agents' tokens carry a `client_id`, and migration 6 makes them
   read-only everywhere.
 - **Cohort conversation** (research/notes/cohort-conversation-notes.md):
@@ -160,7 +164,9 @@ what waits on Ben.
 - **Students own their work.** Repositories and commits are read live
   from GitHub, never copied. The database holds membership, sessions,
   groups, what people choose to share, feedback, calendar emails (only
-  the student and teachers can see them), and credentials.
+  the student and teachers can see them), credentials, and each live
+  session's queue, questions, and answers, which are deleted when the
+  cohort is marked finished.
 - **The credential:** Open Badges 3.0, issued by `did:web:humanshaped.org`
   (`.well-known/did.json` holds only public keys), signed with
   `eddsa-rdfc-2022` by `tools/credential/` on the signer's own computer.

@@ -500,6 +500,160 @@ def main():
     check("the holder can remove their own credential",
           attempt(eve, "delete from public.credentials where id = %s returning id", (cred,)) and len(last_rows) == 1)
 
+    # The live session: the "show your work" queue, and checks for
+    # understanding (migration 20261003080000).
+    ben = as_user("ben")
+    attempt(ben, "insert into public.cohorts (slug, title, created_by, status) values ('live-test', 'Live', %s, 'open') returning id", (people["ben"],))
+    live = last_rows[0][0]
+    attempt(ben, "insert into public.sessions (cohort_id, number) values (%s, 1) returning id", (live,))
+    s1 = last_rows[0][0]
+    attempt(ben, "insert into public.sessions (cohort_id, number) values (%s, 1) returning id", (cohort,))
+    other_session = last_rows[0][0]
+    for name in ["bea", "eve"]:
+        cur = as_user(name)
+        attempt(cur, "insert into public.enrollments (cohort_id, user_id) values (%s, %s)", (live, people[name]))
+    bea = as_user("bea")
+    attempt(bea, "insert into public.shares (cohort_id, user_id, kind, url, note) values (%s, %s, 'bring-back', 'https://bea.github.io/garden-swap', 'Round two') returning id", (live, people["bea"]))
+    bea_share = last_rows[0][0]
+
+    check("a person in the cohort can add their app to the queue",
+          attempt(bea, "insert into public.live_queue (cohort_id, session_id, user_id, kind, url, note) values (%s, %s, %s, 'app', 'https://bea.github.io/garden-swap', 'The new list') returning id", (live, s1, people["bea"])))
+    item = last_rows[0][0]
+    check("a person can add a share they already made",
+          attempt(bea, "insert into public.live_queue (cohort_id, session_id, user_id, kind, url, share_id) values (%s, %s, %s, 'share', 'https://bea.github.io/garden-swap', %s) returning id", (live, s1, people["bea"], bea_share)))
+    check("no one can add to the queue for someone else",
+          not attempt(bea, "insert into public.live_queue (cohort_id, session_id, user_id, kind, url) values (%s, %s, %s, 'link', 'https://example.org')", (live, s1, people["eve"])))
+    check("an item cannot be added as already shown",
+          not attempt(bea, "insert into public.live_queue (cohort_id, session_id, user_id, kind, url, state) values (%s, %s, %s, 'link', 'https://example.org', 'shown')", (live, s1, people["bea"])))
+    check("a queue item must link to https",
+          not attempt(bea, "insert into public.live_queue (cohort_id, session_id, user_id, kind, url) values (%s, %s, %s, 'link', 'javascript:alert(1)')", (live, s1, people["bea"])))
+    check("a queue item must belong to a session of its own cohort",
+          not attempt(bea, "insert into public.live_queue (cohort_id, session_id, user_id, kind, url) values (%s, %s, %s, 'link', 'https://example.org')", (live, other_session, people["bea"])))
+    fay = as_user("fay")
+    check("someone outside the cohort cannot add to its queue",
+          not attempt(fay, "insert into public.live_queue (cohort_id, session_id, user_id, kind, url) values (%s, %s, %s, 'link', 'https://example.org')", (live, s1, people["fay"])))
+    fay.execute("select count(*) from public.live_queue")
+    check("someone outside the cohort sees none of its queue", fay.fetchone()[0] == 0)
+    eve = as_user("eve")
+    eve.execute("select count(*) from public.live_queue where cohort_id = %s", (live,))
+    check("a classmate sees the whole queue", eve.fetchone()[0] == 2)
+    eve.execute("update public.live_queue set state = 'shown' where id = %s", (item,))
+    check("a classmate cannot mark someone else's item shown", eve.rowcount == 0)
+    eve.execute("delete from public.live_queue where id = %s", (item,))
+    check("a classmate cannot take someone else's item off", eve.rowcount == 0)
+    ben = as_user("ben")
+    ben.execute("update public.live_queue set state = 'shown' where id = %s returning shown_at", (item,))
+    check("the teacher can mark an item shown, and the time is kept", ben.rowcount == 1 and ben.fetchone()[0] is not None)
+    bea = as_user("bea")
+    check("an item's link cannot be changed once it is in the queue",
+          not attempt(bea, "update public.live_queue set url = 'https://example.org/else' where id = %s", (item,)))
+    bea.execute("update public.live_queue set state = 'waiting' where id = %s", (item,))
+    check("the person can put their own item back in the queue", bea.rowcount == 1)
+
+    ben = as_user("ben")
+    check("the teacher can ask a question with choices",
+          attempt(ben, "insert into public.live_checks (cohort_id, session_id, created_by, prompt, choices) values (%s, %s, %s, 'Which part is the parity matrix for?', array['Planning', 'Testing', 'Both']) returning id", (live, s1, people["ben"])))
+    q = last_rows[0][0]
+    check("the teacher can ask a question to answer in your own words",
+          attempt(ben, "insert into public.live_checks (cohort_id, session_id, created_by, prompt) values (%s, %s, %s, 'What would you ask the agent next?') returning id", (live, s1, people["ben"])))
+    q_words = last_rows[0][0]
+    check("a question has two to six choices",
+          not attempt(ben, "insert into public.live_checks (cohort_id, session_id, created_by, prompt, choices) values (%s, %s, %s, 'One?', array['Only'])", (live, s1, people["ben"])))
+    bea = as_user("bea")
+    check("a student cannot ask the cohort a question",
+          not attempt(bea, "insert into public.live_checks (cohort_id, session_id, created_by, prompt) values (%s, %s, %s, 'Mine?')", (live, s1, people["bea"])))
+    dee = as_user("dee")
+    check("a teacher of another cohort cannot ask this one a question",
+          not attempt(dee, "insert into public.live_checks (cohort_id, session_id, created_by, prompt) values (%s, %s, %s, 'Hello?')", (live, s1, people["dee"])))
+    fay = as_user("fay")
+    fay.execute("select count(*) from public.live_checks")
+    check("someone outside the cohort sees none of its questions", fay.fetchone()[0] == 0)
+
+    bea = as_user("bea")
+    check("a student can answer by choosing",
+          attempt(bea, "insert into public.live_answers (check_id, cohort_id, user_id, choice) values (%s, %s, %s, 3)", (q, live, people["bea"])))
+    check("a student can answer in their own words",
+          attempt(bea, "insert into public.live_answers (check_id, cohort_id, user_id, body) values (%s, %s, %s, 'Why it fails offline')", (q_words, live, people["bea"])))
+    check("a choice must be one of the question's choices",
+          not attempt(bea, "update public.live_answers set choice = 9 where check_id = %s and user_id = %s", (q, people["bea"])))
+    check("a student can change their answer while the question is open",
+          attempt(bea, "update public.live_answers set choice = 1 where check_id = %s and user_id = %s returning choice", (q, people["bea"])) and last_rows == [(1,)])
+    eve = as_user("eve")
+    check("no one can answer for someone else",
+          not attempt(eve, "insert into public.live_answers (check_id, cohort_id, user_id, choice) values (%s, %s, %s, 2)", (q, live, people["bea"])))
+    attempt(eve, "insert into public.live_answers (check_id, cohort_id, user_id, choice) values (%s, %s, %s, 1)", (q, live, people["eve"]))
+    eve.execute("select user_id from public.live_answers")
+    check("a student sees only their own answers", [str(r[0]) for r in eve.fetchall()] == [people["eve"]])
+    eve.execute("select count(*) from public.check_tally(%s)", (q,))
+    check("students see no tally until the teacher shows it", eve.fetchone()[0] == 0)
+    ben = as_user("ben")
+    ben.execute("select count(*) from public.live_answers where check_id = %s", (q,))
+    check("the teacher sees everyone's answers", ben.fetchone()[0] == 2)
+    ben.execute("select choice, answers from public.check_tally(%s)", (q,))
+    check("the teacher always sees the tally", ben.fetchall() == [(1, 2)])
+    ben.execute("update public.live_answers set choice = 2 where check_id = %s and user_id = %s", (q, people["eve"]))
+    check("the teacher cannot change a student's answer", ben.rowcount == 0)
+    check("a question cannot be reworded once it is asked",
+          not attempt(ben, "update public.live_checks set prompt = 'Something else' where id = %s", (q,)))
+    ben.execute("update public.live_checks set show_tally = true where id = %s", (q,))
+    eve = as_user("eve")
+    eve.execute("select choice, answers from public.check_tally(%s)", (q,))
+    check("once shown, students see the anonymous tally", eve.fetchall() == [(1, 2)])
+    eve.execute("select * from public.check_tally(%s)", (q,))
+    check("the tally names no one", [d[0] for d in eve.description] == ["choice", "answers"])
+    fay = as_user("fay")
+    fay.execute("select count(*) from public.check_tally(%s)", (q,))
+    check("someone outside the cohort sees no tally", fay.fetchone()[0] == 0)
+    bea = as_user("bea")
+    bea.execute("update public.live_checks set state = 'closed' where id = %s", (q,))
+    check("a student cannot close a question", bea.rowcount == 0)
+    ben = as_user("ben")
+    ben.execute("update public.live_checks set state = 'closed' where id = %s returning closed_at", (q,))
+    check("the teacher can close a question", ben.rowcount == 1 and ben.fetchone()[0] is not None)
+    bea = as_user("bea")
+    check("no one answers a closed question",
+          not attempt(bea, "update public.live_answers set choice = 2 where check_id = %s and user_id = %s", (q, people["bea"])))
+
+    # A student's agent can see what is happening in the session, and
+    # cannot act in it.
+    agent = as_agent("bea")
+    agent.execute("select count(*) from public.live_queue where cohort_id = %s", (live,))
+    check("a student's agent can read the session's queue", agent.fetchone()[0] == 2)
+    agent.execute("select count(*) from public.live_answers where user_id = %s", (people["bea"],))
+    check("a student's agent can read the student's own answers", agent.fetchone()[0] == 2)
+    check("a student's agent cannot add to the queue",
+          not attempt(agent, "insert into public.live_queue (cohort_id, session_id, user_id, kind, url) values (%s, %s, %s, 'link', 'https://example.org')", (live, s1, people["bea"])))
+    agent.execute("update public.live_queue set state = 'shown' where id = %s", (item,))
+    check("a student's agent cannot mark an item shown", agent.rowcount == 0)
+    agent.execute("delete from public.live_queue where id = %s", (item,))
+    check("a student's agent cannot take an item off", agent.rowcount == 0)
+    check("a student's agent cannot answer a question",
+          not attempt(agent, "insert into public.live_answers (check_id, cohort_id, user_id, body) values (%s, %s, %s, 'from the agent')", (q_words, live, people["eve"])) and
+          not attempt(as_agent("eve"), "insert into public.live_answers (check_id, cohort_id, user_id, body) values (%s, %s, %s, 'from the agent')", (q_words, live, people["eve"])))
+    agent = as_agent("bea")
+    agent.execute("update public.live_answers set body = 'rewritten by the agent' where check_id = %s and user_id = %s", (q_words, people["bea"]))
+    check("a student's agent cannot change an answer", agent.rowcount == 0)
+    agent.execute("delete from public.live_answers where user_id = %s", (people["bea"],))
+    check("a student's agent cannot take an answer back", agent.rowcount == 0)
+    ben_agent = as_agent("ben")
+    check("a teacher's agent cannot ask a question",
+          not attempt(ben_agent, "insert into public.live_checks (cohort_id, session_id, created_by, prompt) values (%s, %s, %s, 'From the agent?')", (live, s1, people["ben"])))
+    ben_agent.execute("update public.live_checks set state = 'open' where id = %s", (q,))
+    check("a teacher's agent cannot reopen a question", ben_agent.rowcount == 0)
+
+    # Kept only as long as the session needs it.
+    eve = as_user("eve")
+    attempt(eve, "insert into public.live_queue (cohort_id, session_id, user_id, kind, url) values (%s, %s, %s, 'link', 'https://example.org')", (live, s1, people["eve"]))
+    eve.execute("select public.leave_cohort(%s)", (live,))
+    su7 = conn.cursor(); su7.execute("reset role")
+    su7.execute("select (select count(*) from public.live_queue where user_id = %s) + (select count(*) from public.live_answers where user_id = %s)", (people["eve"], people["eve"]))
+    check("when someone leaves, their queue items and answers leave with them", su7.fetchone()[0] == 0)
+    ben = as_user("ben")
+    ben.execute("update public.cohorts set status = 'finished' where id = %s", (live,))
+    su7 = conn.cursor(); su7.execute("reset role")
+    su7.execute("select (select count(*) from public.live_queue where cohort_id = %s) + (select count(*) from public.live_checks where cohort_id = %s) + (select count(*) from public.live_answers where cohort_id = %s)", (live, live, live))
+    check("when the cohort is finished, its queue, questions, and answers are deleted", su7.fetchone()[0] == 0)
+
     conn.rollback()
     conn.close()
     failed = [n for n, ok in results if not ok]

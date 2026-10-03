@@ -4,12 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Live session | Human Shaped</title>
-  <meta name="description" content="The page to keep open beside a Human Shaped session on Google Meet: the agenda, this week's challenge, and what people brought back.">
+  <meta name="description" content="The page to keep open beside a Human Shaped session on Google Meet: the agenda, this week's challenge, a queue for showing your work, checks for understanding, and what people brought back.">
   <link rel="canonical" href="https://humanshaped.org/live/">
   <meta property="og:url" content="https://humanshaped.org/live/">
   <meta property="og:site_name" content="Human Shaped">
   <meta property="og:title" content="Live session">
-  <meta property="og:description" content="The page to keep open beside a Human Shaped session on Google Meet: the agenda, this week's challenge, and what people brought back.">
+  <meta property="og:description" content="The page to keep open beside a Human Shaped session on Google Meet: the agenda, this week's challenge, a queue for showing your work, checks for understanding, and what people brought back.">
   <meta property="og:type" content="website">
   <meta property="og:image" content="https://humanshaped.org/assets/og.png">
   <meta property="og:image:width" content="1200">
@@ -69,7 +69,7 @@
         <section class="account-state" data-state="loading"><p>Opening the session…</p></section>
         <section class="account-state" data-state="signed-out" hidden>
           <h1>Keep this page open beside the session.</h1>
-          <p>Sign in with the GitHub account you joined with, and this page will hold the session's agenda, this week's challenge, and what everyone brought back, while Google Meet holds the faces.</p>
+          <p>Sign in with the GitHub account you joined with, and this page will hold the session's agenda, this week's challenge, the queue of work people want to show, your teacher's questions, and what everyone brought back, while Google Meet holds the faces.</p>
           <p><a class="btn-github" href="/account/"><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Sign in with GitHub</a></p>
         </section>
         <section class="account-state" data-state="not-member" hidden>
@@ -90,6 +90,55 @@
           </header>
 
           <p class="notice small">Sessions are recorded so that anyone who misses one, or wants to come back to it, can watch it later. The host says so before the recording starts, and only the people in this cohort can see it.</p>
+
+          <!-- The queue and checks for understanding (M3): copy awaiting Ben's review. -->
+          <section class="live-block" aria-labelledby="queue-title">
+            <h2 id="queue-title">Show your work</h2>
+            <p class="small">Add what you want to show, and the whole cohort sees the queue in the order people asked. When it is your turn, open it in its own tab and present that tab from Meet, so everyone sees the real thing rather than a description of it.</p>
+            <ol class="live-queue" data-queue></ol>
+            <details class="live-shown" data-shown-wrap hidden>
+              <summary data-shown-summary></summary>
+              <ol class="live-queue shown" data-shown></ol>
+            </details>
+            <form class="inline-form live-add" data-add>
+              <label>What you want to show
+                <select data-add-what></select>
+              </label>
+              <label data-add-link-wrap hidden>The link, from GitHub or anywhere on the web
+                <input type="url" inputmode="url" placeholder="https://" data-add-link>
+              </label>
+              <label>What should people look at, if you want to say
+                <input type="text" maxlength="300" data-add-note>
+              </label>
+              <div class="actions"><button class="btn-quiet" type="submit">Add it to the queue</button><span class="small" data-add-status role="status"></span></div>
+            </form>
+          </section>
+
+          <section class="live-block" aria-labelledby="checks-title">
+            <h2 id="checks-title">Checks for understanding</h2>
+            <p class="small" data-checks-intro></p>
+            <form class="inline-form live-ask" data-ask hidden>
+              <label>Your question
+                <textarea rows="2" maxlength="500" required data-ask-prompt></textarea>
+              </label>
+              <fieldset class="live-mode">
+                <legend>People answer</legend>
+                <label class="check"><input type="radio" name="ask-mode" value="words" checked> In their own words</label>
+                <label class="check"><input type="radio" name="ask-mode" value="choices"> By choosing one</label>
+              </fieldset>
+              <label data-ask-choices-wrap hidden>Choices, one on each line
+                <textarea rows="4" data-ask-choices></textarea>
+              </label>
+              <label class="check"><input type="checkbox" data-ask-tally> Show everyone the count of answers as they come in</label>
+              <div class="actions"><button class="btn-quiet" type="submit">Ask the cohort</button><span class="small" data-ask-status role="status"></span></div>
+            </form>
+            <div class="live-checks" data-checks></div>
+            <details class="live-earlier" data-earlier-wrap hidden>
+              <summary>Earlier questions</summary>
+              <div class="live-checks" data-earlier></div>
+            </details>
+          </section>
+          <p class="small live-sync" data-sync></p>
 
           <section aria-labelledby="agenda-title">
             <h2 id="agenda-title">Today's agenda</h2>
@@ -113,6 +162,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" defer></script>
   <script src="/assets/hub-config.js" defer></script>
   <script src="/assets/cohort-lib.js" defer></script>
+  <script src="/assets/live-lib.js" defer></script>
   <script src="/assets/live.js" defer></script>
 
   <footer class="site-footer">

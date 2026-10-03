@@ -1,7 +1,7 @@
 // node --test tools/test/
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { chooseCohort, cohortsText, thisWeekText, nextSessionText, groupText, workText, methodUrls, stagePart } from '../../supabase/functions/mcp/shape.js';
+import { chooseCohort, cohortsText, thisWeekText, nextSessionText, groupText, workText, methodUrls, stagePart, thisSessionText } from '../../supabase/functions/mcp/shape.js';
 
 const a = { slug: 'fall-2026', title: 'Fall 2026', status: 'running', weeks: 5, starts_on: '2026-10-06', role: 'student' };
 const b = { slug: 'winter-2027', title: 'Winter 2027', status: 'open', weeks: 5, starts_on: null, role: 'teacher' };
@@ -62,4 +62,36 @@ test('method parts map to template files, and stage 00 is "why"', () => {
   assert.equal(methodUrls('nope'), null);
   assert.equal(stagePart('00'), 'why');
   assert.equal(stagePart('04'), 'stage-04');
+});
+
+test('this session gives your place in the queue and the open questions, and never answers for you', () => {
+  const queue = [
+    { user_id: 'c1', login: 'cal', label: 'Commit 9f3e2a1 in cal/seed-swap', url: 'https://github.com/cal/seed-swap/commit/9f3e2a1', note: 'The date picker', state: 'waiting', created_at: '2026-10-20T23:10:00Z' },
+    { user_id: 'me', login: 'bea', label: 'The app, live at bea.github.io/garden-swap', url: 'https://bea.github.io/garden-swap/', state: 'waiting', created_at: '2026-10-20T23:05:00Z' },
+    { user_id: 'd1', login: 'dee', label: 'x', url: 'https://x.org', state: 'shown', created_at: '2026-10-20T23:00:00Z' }
+  ];
+  const checks = [
+    { id: 'k1', prompt: 'Which platform next?', choices: ['Android', 'iPhone'], state: 'open' },
+    { id: 'k2', prompt: 'What is the matrix for?', choices: null, state: 'open' },
+    { id: 'k3', prompt: 'Closed one', choices: null, state: 'closed' }
+  ];
+  const t = thisSessionText(a, { number: 2 }, true, queue, checks, [{ check_id: 'k1', choice: 2 }], { k1: [{ choice: 1, answers: 3 }, { choice: 2, answers: '1' }] }, 'me');
+  assert.match(t, /week 2 \(happening now\)/);
+  assert.match(t, /2 waiting to be shown, 1 already shown\./);
+  assert.match(t, /Yours, number 1 in line: The app, live at bea\.github\.io\/garden-swap/);
+  assert.doesNotMatch(t, /cal|date picker/, 'classmates\' items are counted, never described');
+  assert.match(t, /You answered: iPhone/);
+  assert.match(t, /Count so far, with no names: Android 3, iPhone 1\./);
+  assert.match(t, /"What is the matrix for\?" \(answered in their own words\)\n  You have not answered yet\./);
+  assert.doesNotMatch(t, /Closed one/);
+  assert.match(t, /Do not write or suggest an answer/);
+  assert.match(t, /read-only/);
+});
+
+test('this session says plainly when nothing is happening', () => {
+  assert.match(thisSessionText(a, null, false, [], [], [], {}, 'me'), /no sessions are scheduled yet/);
+  const t = thisSessionText(a, { number: 1 }, false, [], [], [], {}, 'me');
+  assert.match(t, /not live yet/);
+  assert.match(t, /nothing is in the queue yet/);
+  assert.match(t, /no question is open right now/);
 });

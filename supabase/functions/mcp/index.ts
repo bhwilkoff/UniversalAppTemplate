@@ -10,8 +10,9 @@
 //
 // Deploy with verify_jwt off (the middleware checks tokens itself and must
 // answer the unauthenticated discovery request), and include
-// assets/cohort-lib.js and assets/teach-lib.js beside this file, so the
-// server and the site share one copy of the week and schedule logic.
+// assets/cohort-lib.js, assets/teach-lib.js, and assets/live-lib.js beside
+// this file, so the server and the site share one copy of the week,
+// schedule, and live session logic.
 
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { createMcpHandler, McpServer } from 'npm:@modelcontextprotocol/server@^2.0.0';
@@ -20,8 +21,9 @@ import { withOAuthProtectedResource, withSupabase } from 'npm:@supabase/server@1
 import { z } from 'npm:zod@^4.3.6';
 import './cohort-lib.js';
 import './teach-lib.js';
+import './live-lib.js';
 import {
-  chooseCohort, cohortsText, thisWeekText, nextSessionText, groupText, workText,
+  chooseCohort, cohortsText, thisWeekText, nextSessionText, groupText, workText, thisSessionText,
   METHOD, methodUrls,
 } from './shape.js';
 
@@ -29,6 +31,8 @@ import {
 const CohortLib = (globalThis as any).CohortLib;
 // deno-lint-ignore no-explicit-any
 const TeachLib = (globalThis as any).TeachLib;
+// deno-lint-ignore no-explicit-any
+const LiveLib = (globalThis as any).LiveLib;
 
 const COHORT_COLUMNS = 'id, slug, title, status, starts_on, weeks, time_zone, session_weekday, session_time, session_minutes';
 const cohortArg = z.object({
@@ -70,7 +74,7 @@ Deno.serve(
         return chooseCohort(await myCohorts(), slug);
       }
       async function sessionsOf(cohortId: string) {
-        const r = await supabase.from('sessions').select('number, starts_at, title, scope, meet_url').eq('cohort_id', cohortId);
+        const r = await supabase.from('sessions').select('id, number, starts_at, title, scope, meet_url').eq('cohort_id', cohortId);
         if (r.error) throw new Error(r.error.message);
         return r.data;
       }
@@ -131,6 +135,39 @@ Deno.serve(
             since = r.data;
           }
           return text(nextSessionText(c, t, CohortLib.agenda(c.session_minutes), t.next ? when(t.next.starts_at, c.time_zone) : '', since));
+        });
+
+        server.registerTool('this_session', {
+          title: 'This session',
+          description: 'What is happening in the live session: how many are waiting in the "show your work" queue and where this person\'s own items are in it, and the teacher\'s open checks for understanding with this person\'s own answers and any count the teacher has chosen to show. Read-only; answering and adding to the queue happen on the session page, by the person.',
+          inputSchema: cohortArg,
+          annotations: READ_ONLY,
+        }, async ({ cohort }) => {
+          const p = await pick(cohort);
+          if (!p.cohort) return text(p.text);
+          const c = p.cohort;
+          const t = CohortLib.currentAndNext(await sessionsOf(c.id), new Date(), c.session_minutes);
+          const session = t.live ? t.next : (t.next || t.current);
+          if (!session) return text(thisSessionText(c, null, false, [], [], [], {}, uid));
+          const [queue, checks, answers] = await Promise.all([
+            supabase.from('live_queue').select('user_id, kind, url, note, state, created_at').eq('session_id', session.id),
+            supabase.from('live_checks').select('id, prompt, choices, state, show_tally').eq('session_id', session.id),
+            supabase.from('live_answers').select('check_id, choice, body').eq('cohort_id', c.id).eq('user_id', uid),
+          ]);
+          const bad = [queue, checks, answers].find((r) => r.error);
+          if (bad) throw new Error(bad.error.message);
+          // Classmates' items are counted, never described (shape.js).
+          // deno-lint-ignore no-explicit-any
+          const items = queue.data.map((q: any) => ({ ...q, label: LiveLib.itemLabel(q) }));
+          // check_tally answers only when the teacher has shown the count (or to the cohort's teachers).
+          // deno-lint-ignore no-explicit-any
+          const counted = checks.data.filter((k: any) => k.state === 'open' && k.choices);
+          const tallies: Record<string, unknown[]> = {};
+          await Promise.all(counted.map(async (k: { id: string }) => {
+            const r = await supabase.rpc('check_tally', { c: k.id });
+            if (!r.error && r.data.length) tallies[k.id] = r.data;
+          }));
+          return text(thisSessionText(c, session, t.live, items, checks.data, answers.data, tallies, uid));
         });
 
         server.registerTool('my_group', {

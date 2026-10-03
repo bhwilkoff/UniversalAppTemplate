@@ -138,3 +138,52 @@ export function workText(cohort, mine, shares, teacherIds, myId) {
   });
   return lines.join('\n');
 }
+
+// What is happening in the live session right now: the "show your work"
+// queue and the teacher's open questions (migration 20261003080000). The
+// agent reads it so it knows what the person is in the middle of; adding
+// to the queue and answering stay the person's own acts, on the page.
+// Queue items arrive with a `label` (LiveLib.itemLabel) and a `login`.
+export function thisSessionText(cohort, session, live, queue, checks, myAnswers, tallies, myId) {
+  if (!session) return `${cohort.title}: no sessions are scheduled yet, so there is nothing happening live.`;
+  const lines = [
+    `${cohort.title}, week ${session.number}${live ? ' (happening now)' : ' (the next session; it is not live yet)'}`,
+    `Session page: ${SITE}/live/?c=${encodeURIComponent(cohort.slug)}`,
+    '',
+  ];
+  const waiting = queue.filter((q) => q.state !== 'shown').sort((x, y) => x.created_at.localeCompare(y.created_at));
+  const shown = queue.filter((q) => q.state === 'shown');
+  // Only the person's own items are described. Classmates' items are
+  // counted, never listed, because the consent page promises an agent
+  // never reads what classmates shared outside the person's group.
+  if (!waiting.length) {
+    lines.push(shown.length ? `Show your work: everything in the queue has been shown (${shown.length}).` : 'Show your work: nothing is in the queue yet.');
+  } else {
+    lines.push(`Show your work: ${waiting.length} waiting to be shown${shown.length ? `, ${shown.length} already shown` : ''}.`);
+    const mine = waiting.map((q, i) => ({ q, place: i + 1 })).filter((x) => x.q.user_id === myId);
+    if (!mine.length) lines.push('You have nothing in the queue.');
+    mine.forEach(({ q, place }) => lines.push(`- Yours, number ${place} in line: ${q.label} (${q.url})${q.note ? `. Your note: "${q.note}"` : ''}`));
+  }
+  shown.filter((q) => q.user_id === myId).forEach((q) => lines.push(`- Yours, already shown: ${q.label}`));
+  lines.push('');
+  const open = checks.filter((k) => k.state === 'open');
+  if (!open.length) {
+    lines.push('Checks for understanding: no question is open right now.');
+  } else {
+    lines.push('Checks for understanding, open now:');
+    open.forEach((k) => {
+      lines.push(`- "${k.prompt}"${k.choices ? ' Choices: ' + k.choices.map((c, i) => `${i + 1}. ${c}`).join('; ') + '.' : ' (answered in their own words)'}`);
+      const mine = myAnswers.find((x) => x.check_id === k.id);
+      const said = mine ? (k.choices ? k.choices[mine.choice - 1] : mine.body) : null;
+      lines.push(said ? `  You answered: ${said}` : '  You have not answered yet.');
+      const t = tallies[k.id];
+      if (k.choices && t) {
+        const by = Object.fromEntries(t.map((r) => [r.choice, Number(r.answers)]));
+        lines.push('  Count so far, with no names: ' + k.choices.map((c, i) => `${c} ${by[i + 1] || 0}`).join(', ') + '.');
+      }
+    });
+    lines.push('', 'A check for understanding is how the teacher sees what is landing, so it only helps if the answer is the person\'s own. Do not write or suggest an answer; if they ask, help them think it through with questions instead. Answering happens on the session page.');
+  }
+  lines.push('', 'This view is read-only. Adding to the queue happens on the session page, by the person.');
+  return lines.join('\n');
+}
