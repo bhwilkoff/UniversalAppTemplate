@@ -72,7 +72,7 @@
         <p class="lead">Your own Claude or Gemini can know what your cohort is working on, so that when you ask it for help, it starts from this week's challenge and your own work rather than from nothing. It reads as you, and it can only read.</p>
       </header>
 
-      <div class="account consent" data-consent aria-live="polite">
+      <div class="account consent" data-consent>
         <section class="account-state" data-state="loading"><p>Checking what is being asked…</p></section>
 
         <section class="account-state" data-state="signed-out" hidden>
@@ -117,11 +117,11 @@
         </section>
 
         <section class="account-state" data-state="done" hidden>
-          <p data-done-text>Done. You can go back to your agent.</p>
+          <p data-done-text role="status">Done. You can go back to your agent.</p>
         </section>
 
         <section class="account-state" data-state="error" hidden>
-          <p class="error" data-error-text>Something went wrong.</p>
+          <p class="error" data-error-text role="alert">Something went wrong.</p>
           <p class="small">Start again from your agent. If it keeps happening, the steps are on <a href="/connect/">Connect your agent</a>.</p>
         </section>
       </div>

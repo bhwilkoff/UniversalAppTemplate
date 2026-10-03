@@ -65,8 +65,8 @@
 
   <main id="main">
     <div class="wrap">
-      <div class="account cohort-page live-page" data-live aria-live="polite">
-        <section class="account-state" data-state="loading"><p>Opening the session…</p></section>
+      <div class="account cohort-page live-page" data-live>
+        <section class="account-state" data-state="loading"><h1 class="visually-hidden">The live session</h1><p>Opening the session…</p></section>
         <section class="account-state" data-state="signed-out" hidden>
           <h1>Keep this page open beside the session.</h1>
           <p>Sign in with the GitHub account you joined with, and this page will hold the session's agenda, this week's challenge, the queue of work people want to show, your teacher's questions, and what everyone brought back, while Google Meet holds the faces.</p>
@@ -77,7 +77,8 @@
           <p>If you are in it, open this page from <a href="/account/">your account</a>.</p>
         </section>
         <section class="account-state" data-state="error" hidden>
-          <p class="error" data-error-text></p>
+          <h1 class="visually-hidden">The live session</h1>
+          <p class="error" data-error-text role="alert"></p>
           <p><button class="btn-quiet" type="button" data-reload>Try again</button></p>
         </section>
 
