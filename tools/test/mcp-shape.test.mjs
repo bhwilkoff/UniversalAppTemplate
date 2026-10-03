@@ -1,7 +1,7 @@
 // node --test tools/test/
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { chooseCohort, cohortsText, thisWeekText, nextSessionText, groupText, workText, methodUrls, stagePart, thisSessionText } from '../../supabase/functions/mcp/shape.js';
+import { chooseCohort, cohortsText, thisWeekText, nextSessionText, groupText, workText, methodUrls, stagePart, thisSessionText, teacherCohort, rosterText, studentWorkText, classNowText, TEACHER_ASIDE } from '../../supabase/functions/mcp/shape.js';
 
 const a = { slug: 'fall-2026', title: 'Fall 2026', status: 'running', weeks: 5, starts_on: '2026-10-06', role: 'student' };
 const b = { slug: 'winter-2027', title: 'Winter 2027', status: 'open', weeks: 5, starts_on: null, role: 'teacher' };
@@ -94,4 +94,108 @@ test('this session says plainly when nothing is happening', () => {
   assert.match(t, /not live yet/);
   assert.match(t, /nothing is in the queue yet/);
   assert.match(t, /no question is open right now/);
+});
+
+test('a student sees the notes their teacher sent them, newest first', () => {
+  const t = workText(a, null, [], [], 'me', [{ body: 'Bring the sync question.', created_at: '2026-10-14T00:00:00Z' }, { body: 'Welcome.', created_at: '2026-10-07T00:00:00Z' }]);
+  assert.match(t, /Notes from your teacher, to you alone:\n- 2026-10-14: Bring the sync question\.\n- 2026-10-07: Welcome\./);
+  assert.doesNotMatch(workText(a, null, [], [], 'me'), /Notes from your teacher/);
+});
+
+// Teachers' tools (C6).
+const t1 = { slug: 'fall-2026', title: 'Fall 2026', status: 'running', role: 'teacher' };
+const t2 = { slug: 'spring-2027', title: 'Spring 2027', status: 'open', role: 'teacher' };
+const s1 = { slug: 'other', title: 'Other', status: 'running', role: 'student' };
+
+test('the teachers\' tools refuse anyone who does not teach the cohort', () => {
+  assert.match(teacherCohort([s1], undefined).text, /for the teachers of a cohort, and you are not one of Other's teachers/);
+  assert.match(teacherCohort([s1, t1], 'other').text, /not one of Other's teachers.*my_work/);
+  assert.match(teacherCohort([], undefined).text, /do not teach one/);
+  assert.match(teacherCohort([t1], 'nope').text, /do not teach a cohort called "nope"\. The cohorts you teach: fall-2026/);
+  assert.equal(teacherCohort([s1, t1], undefined).cohort, t1);
+  assert.equal(teacherCohort([t1, t2], undefined).cohort, t1);
+  assert.match(teacherCohort([t1, { ...t2, status: 'running' }], undefined).text, /say which one/);
+  assert.equal(teacherCohort([t1, t2], 'spring-2027').cohort, t2);
+});
+
+const people = [
+  { user_id: 'b', status: 'enrolled', role: 'student', app_name: 'Garden Swap', app_repo: 'bea/garden-swap', app_url: 'https://bea.github.io/garden-swap', app_public: true, profiles: { github_login: 'bea', display_name: 'Bea' }, email: 'bea@example.org' },
+  { user_id: 'c', status: 'enrolled', role: 'mentor', app_repo: null, profiles: { github_login: 'cal' } },
+  { user_id: 'd', status: 'left', role: 'student', profiles: { github_login: 'dee' } },
+];
+
+test('the roster names everyone still in the cohort with their app, and never an email', () => {
+  const t = rosterText(t1, people, [{ name: 'Trio A', expectations: 'Fridays', group_members: [{ user_id: 'b' }, { user_id: 'c' }] }]);
+  assert.match(t, /the people in it \(2\)/);
+  assert.match(t, /- Bea \(@bea\), student, building Garden Swap, https:\/\/github\.com\/bea\/garden-swap, live at https:\/\/bea\.github\.io\/garden-swap, they have said it is ready to show/);
+  assert.match(t, /- cal \(@cal\), mentor, no repository given yet/);
+  assert.match(t, /Trio A: Bea, cal\. For: Fridays/);
+  assert.doesNotMatch(t, /dee|example\.org/);
+  assert.match(t, /GitHub's own MCP server, connected read-only/);
+  assert.ok(t.endsWith(TEACHER_ASIDE));
+});
+
+test('the teacher aside says it is read-only and the feedback is the teacher\'s to give or not', () => {
+  assert.match(TEACHER_ASIDE, /read-only/);
+  assert.match(TEACHER_ASIDE, /the teacher's to give or not/);
+  assert.match(TEACHER_ASIDE, /never sends what an agent wrote/);
+});
+
+test('a student\'s work shows their marks, answers, queue, feedback both ways, and notes, by name', () => {
+  const work = {
+    shares: [{ id: 'bb', kind: 'bring-back', note: 'Round three', url: 'https://bea.github.io/garden-swap', created_at: '2026-10-12T00:00:00Z', want_to_know: 'Does the list read?', readiness: 'not-yet', missing: 'offline', feedback: [
+      { author_id: 't', body: 'Try it on the train.', created_at: '2026-10-14T00:00:00Z' }, { author_id: 'c', body: 'Nice.', created_at: '2026-10-13T00:00:00Z' }, { author_id: 'b', body: 'Thanks', created_at: '2026-10-15T00:00:00Z' }] }],
+    confirmations: [{ share_id: 'bb', user_id: 'c' }],
+    answers: [{ week: 2, prompt: 'What is still muddy?', text: 'Sync' }],
+    queue: [{ week: 2, label: 'The app, live at bea.github.io/garden-swap', url: 'https://bea.github.io/garden-swap', state: 'shown' }],
+    given: [{ to: 'c', body: 'The colors help.', created_at: '2026-10-13T00:00:00Z' }],
+    notes: [{ author_id: 't', body: 'Glad you came.', created_at: '2026-10-15T00:00:00Z' }],
+  };
+  const t = studentWorkText(t1, people[0], work, { t: 'Ben', c: 'Cal', b: 'Bea' }, ['t'], 't');
+  assert.match(t, /^Bea \(@bea\) in Fall 2026/);
+  assert.match(t, /Their question: Does the list read\?/);
+  assert.match(t, /Their own mark: not yet, because offline\./);
+  assert.match(t, /Seen working on a device by Cal\./);
+  assert.match(t, /Feedback from Cal \(a classmate\): Nice\.\n    Feedback from you \(a teacher\): Try it on the train\.\n    Feedback from Bea \(themselves\): Thanks/);
+  assert.match(t, /Week 2, "What is still muddy\?": Sync/);
+  assert.match(t, /Week 2, The app, live at bea\.github\.io\/garden-swap .*, shown/);
+  assert.match(t, /to Cal: The colors help\./);
+  assert.match(t, /from you: Glad you came\./);
+  assert.doesNotMatch(t, /example\.org/);
+  assert.ok(t.endsWith(TEACHER_ASIDE));
+  const empty = studentWorkText(t1, people[1], {}, {}, ['t'], 't');
+  assert.match(empty, /have not shared anything/);
+  assert.match(empty, /have not answered a check/);
+});
+
+test('class now gives the part, the queue by name, answers by name, and commits since the start', () => {
+  const t = classNowText(t1, {
+    session: { number: 2 }, live: true, started: true, part: { name: 'Start', start: 57, minutes: 9 },
+    queue: [
+      { name: 'Cal', label: 'Commit 9f3e2a1 in cal/x', url: 'https://github.com/cal/x/commit/9f3e2a1', state: 'waiting', created_at: '2026-10-13T23:20:00Z' },
+      { name: 'Bea', label: 'The app', url: 'https://bea.github.io/garden-swap', note: 'the list', state: 'waiting', created_at: '2026-10-13T23:10:00Z' },
+      { name: 'Fay', label: 'A link', url: 'https://x.org', state: 'shown', created_at: '2026-10-13T23:00:00Z' },
+    ],
+    checks: [{ prompt: 'What is still muddy?', choices: null, state: 'open', answers: [{ name: 'Bea', text: 'Sync' }] }, { prompt: 'Closed', state: 'closed', answers: [] }],
+    commits: [{ date: '2026-10-13T23:40:00Z', name: 'Bea', repo: 'bea/garden-swap', line: 'Sort the list', agent: 'Claude', url: 'https://github.com/bea/garden-swap/commit/abc' }],
+    unread: 'cal/x is private or moved, so its commits are not shown.',
+  });
+  assert.match(t, /week 2 \(happening now\)/);
+  assert.match(t, /the part now is "Start" \(minute 57, for 9 minutes\)/);
+  assert.match(t, /2 waiting, 1 shown\.\n1\. Bea: The app .*"the list"\n2\. Cal: /);
+  assert.match(t, /Open check: "What is still muddy\?" 1 answered\.\n- Bea: Sync/);
+  assert.doesNotMatch(t, /Closed/);
+  assert.match(t, /- 23:40 UTC, Bea in bea\/garden-swap: Sort the list \(with Claude\) https:\/\/github\.com\/bea\/garden-swap\/commit\/abc/);
+  assert.match(t, /cal\/x is private or moved/);
+  assert.ok(t.endsWith(TEACHER_ASIDE));
+});
+
+test('class now says plainly when there is no session, or it has not begun', () => {
+  assert.match(classNowText(t1, { session: null }), /no sessions are scheduled yet/);
+  const t = classNowText(t1, { session: { number: 1 }, live: false, started: false, queue: [], checks: [], commits: [] });
+  assert.match(t, /it has not begun yet/);
+  assert.match(t, /nothing is in the queue/);
+  assert.match(t, /no question is open/);
+  assert.match(t, /the session has not begun, so nothing has been pushed/);
+  assert.match(classNowText(t1, { session: { number: 1 }, live: false, started: true, queue: [], checks: [], commits: [] }), /since the session began: none yet/);
 });

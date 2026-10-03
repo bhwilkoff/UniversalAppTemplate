@@ -8,11 +8,18 @@
 // security, and migration 6 refuses any write from an agent's token.
 // Sharing what the agent said stays the student's own act, on the site.
 //
+// Teachers get three more tools (cohort_roster, student_work, class_now)
+// for their own agent, refused to anyone who does not teach the cohort
+// (research/notes/meet-classroom-design.md, C6). They are read-only too:
+// what a teacher's agent makes of a student's work is the teacher's to
+// give or not, and the hub never sends it.
+//
 // Deploy with verify_jwt off (the middleware checks tokens itself and must
 // answer the unauthenticated discovery request), and include
-// assets/cohort-lib.js, assets/teach-lib.js, and assets/live-lib.js beside
-// this file, so the server and the site share one copy of the week,
-// schedule, and live session logic.
+// assets/cohort-lib.js, assets/teach-lib.js, assets/live-lib.js, and
+// assets/followup-lib.js beside this file (tools/deploy-mcp.sh does), so
+// the server and the site share one copy of the week, schedule, live
+// session, and commits logic.
 
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { createMcpHandler, McpServer } from 'npm:@modelcontextprotocol/server@^2.0.0';
@@ -22,8 +29,10 @@ import { z } from 'npm:zod@^4.3.6';
 import './cohort-lib.js';
 import './teach-lib.js';
 import './live-lib.js';
+import './followup-lib.js';
 import {
   chooseCohort, cohortsText, thisWeekText, nextSessionText, groupText, workText, thisSessionText,
+  teacherCohort, rosterText, studentWorkText, classNowText,
   METHOD, methodUrls,
 } from './shape.js';
 
@@ -33,6 +42,8 @@ const CohortLib = (globalThis as any).CohortLib;
 const TeachLib = (globalThis as any).TeachLib;
 // deno-lint-ignore no-explicit-any
 const LiveLib = (globalThis as any).LiveLib;
+// deno-lint-ignore no-explicit-any
+const FollowupLib = (globalThis as any).FollowupLib;
 
 const COHORT_COLUMNS = 'id, slug, title, status, starts_on, weeks, time_zone, session_weekday, session_time, session_minutes';
 const cohortArg = z.object({
@@ -40,6 +51,8 @@ const cohortArg = z.object({
 });
 const text = (t: string) => ({ content: [{ type: 'text' as const, text: t }] });
 const READ_ONLY = { readOnlyHint: true, openWorldHint: false };
+const FOR_TEACHERS = ' Only for the people who teach the cohort; anyone else is told so and shown nothing. Read-only: it changes nothing, and whatever you make of it is the teacher\'s to give to the student or not, because the hub never sends what an agent wrote.';
+const PEOPLE = 'user_id, role, status, app_name, app_repo, app_url, app_public, profiles(github_login, display_name)';
 
 // The signed-in person's id, from the token the middleware has verified.
 function userId(req: Request): string {
@@ -89,6 +102,56 @@ Deno.serve(
         const r = await fetch(urls.raw);
         if (!r.ok) return `The template could not be reached just now. Read it at ${urls.github}`;
         return `${await r.text()}\n\n(Read live from the Universal App Template: ${urls.github})`;
+      }
+
+      // ---- for teachers ------------------------------------------------
+      // Every query below runs as the teacher, so row-level security
+      // already limits it to cohorts they teach; teacherCohort refuses
+      // everyone else first, because classmates can read a cohort's roster
+      // and shares, and these tools are not for them.
+      async function teacherPick(slug?: string) {
+        return teacherCohort(await myCohorts(), slug);
+      }
+      async function peopleOf(cohortId: string) {
+        const [people, teachers] = await Promise.all([
+          supabase.from('enrollments').select(PEOPLE).eq('cohort_id', cohortId).neq('status', 'left'),
+          supabase.from('cohort_teachers').select('user_id, profiles(github_login, display_name)').eq('cohort_id', cohortId),
+        ]);
+        if (people.error) throw new Error(people.error.message);
+        if (teachers.error) throw new Error(teachers.error.message);
+        const names: Record<string, string> = {};
+        // deno-lint-ignore no-explicit-any
+        people.data.concat(teachers.data).forEach((p: any) => {
+          if (p.profiles) names[p.user_id] = p.profiles.display_name || p.profiles.github_login;
+        });
+        // deno-lint-ignore no-explicit-any
+        return { people: people.data, teacherIds: teachers.data.map((t: any) => t.user_id), names };
+      }
+      // Commits pushed to the cohort's public repositories since a time,
+      // read live from GitHub's public API (no sign-in, so 60 requests an
+      // hour from this server's address) and never stored.
+      // deno-lint-ignore no-explicit-any
+      async function commitsSince(people: any[], since: string) {
+        const repos = FollowupLib.cohortRepos(people).slice(0, 40);
+        // deno-lint-ignore no-explicit-any
+        const results = await Promise.all(repos.map(async (who: any) => {
+          try {
+            const r = await fetch(FollowupLib.commitsUrl(who.repo, since), {
+              headers: { Accept: 'application/vnd.github+json', 'User-Agent': 'humanshaped-mcp' },
+            });
+            if (r.status === 404) return { repo: who.repo, missing: true };
+            if (r.status === 409) return { repo: who.repo, list: [] };   // nothing committed yet
+            if (!r.ok) return { repo: who.repo, unavailable: r.status };
+            return { repo: who.repo, list: FollowupLib.normalizeCommits(await r.json(), who) };
+          } catch {
+            return { repo: who.repo, unavailable: 0 };
+          }
+        }));
+        return {
+          // deno-lint-ignore no-explicit-any
+          commits: FollowupLib.pushedSince(results.filter((r: any) => r.list).map((r: any) => r.list), since, 40),
+          unread: FollowupLib.unreadText(results),
+        };
       }
 
       const handler = createMcpHandler(() => {
@@ -204,15 +267,127 @@ Deno.serve(
           const p = await pick(cohort);
           if (!p.cohort) return text(p.text);
           const c = p.cohort;
-          const [mine, shares, teachers] = await Promise.all([
+          const [mine, shares, teachers, notes] = await Promise.all([
             supabase.from('enrollments').select('app_name, app_repo, app_url').eq('cohort_id', c.id).eq('user_id', uid).maybeSingle(),
             supabase.from('shares').select('kind, note, url, created_at, feedback(author_id, body, created_at)').eq('cohort_id', c.id).eq('user_id', uid),
             supabase.from('cohort_teachers').select('user_id').eq('cohort_id', c.id),
+            // Read on its own: before migration 20261003130000, this fails quietly.
+            supabase.from('teacher_notes').select('body, created_at').eq('cohort_id', c.id).eq('student_id', uid),
           ]);
           const bad = [mine, shares, teachers].find((r) => r.error);
           if (bad) throw new Error(bad.error.message);
           // deno-lint-ignore no-explicit-any
-          return text(workText(c, mine.data, shares.data, teachers.data.map((t: any) => t.user_id), uid));
+          return text(workText(c, mine.data, shares.data, teachers.data.map((t: any) => t.user_id), uid, notes.error ? [] : notes.data));
+        });
+
+        server.registerTool('cohort_roster', {
+          title: 'Cohort roster (for teachers)',
+          description: 'Everyone in a cohort you teach: their names, GitHub logins, apps, repositories, and live links, and the groups. Never emails.' + FOR_TEACHERS,
+          inputSchema: cohortArg,
+          annotations: READ_ONLY,
+        }, async ({ cohort }) => {
+          const p = await teacherPick(cohort);
+          if (!p.cohort) return text(p.text);
+          const c = p.cohort;
+          const [who, groups] = await Promise.all([
+            peopleOf(c.id),
+            supabase.from('groups').select('name, expectations, group_members(user_id)').eq('cohort_id', c.id).order('name'),
+          ]);
+          if (groups.error) throw new Error(groups.error.message);
+          return text(rosterText(c, who.people, groups.data));
+        });
+
+        server.registerTool('student_work', {
+          title: 'One student\'s work (for teachers)',
+          description: 'One student in a cohort you teach: what they shared, with their question, their own ready or not-yet mark, and the feedback on it; their answers to checks for understanding; what they asked to show in sessions; the feedback they gave classmates; and the notes teachers sent them.' + FOR_TEACHERS,
+          inputSchema: z.object({
+            student: z.string().describe('The student\'s GitHub login, with or without the @.'),
+            cohort: z.string().optional().describe('The cohort\'s short name (its slug). Leave it out when you teach one cohort.'),
+          }),
+          annotations: READ_ONLY,
+        }, async ({ student, cohort }) => {
+          const p = await teacherPick(cohort);
+          if (!p.cohort) return text(p.text);
+          const c = p.cohort;
+          const login = student.trim().replace(/^@/, '').toLowerCase();
+          const who = await peopleOf(c.id);
+          // deno-lint-ignore no-explicit-any
+          const person = who.people.find((x: any) => (x.profiles?.github_login || '').toLowerCase() === login);
+          if (!person) return text(`No one with the GitHub login @${login} is in ${c.title}. cohort_roster lists who is.`);
+          const sid = person.user_id;
+          const [shares, answers, queue, given, notes] = await Promise.all([
+            supabase.from('shares').select('*, feedback(author_id, body, created_at)').eq('cohort_id', c.id).eq('user_id', sid),
+            supabase.from('live_answers').select('choice, body, live_checks(prompt, choices, created_at, sessions(number))').eq('cohort_id', c.id).eq('user_id', sid),
+            supabase.from('live_queue').select('kind, url, note, state, created_at, sessions(number)').eq('cohort_id', c.id).eq('user_id', sid).order('created_at'),
+            supabase.from('feedback').select('body, created_at, shares!inner(cohort_id, user_id)').eq('author_id', sid).eq('shares.cohort_id', c.id).order('created_at'),
+            // Read on its own: before migration 20261003130000, this fails quietly.
+            supabase.from('teacher_notes').select('author_id, body, created_at').eq('cohort_id', c.id).eq('student_id', sid).order('created_at'),
+          ]);
+          const bad = [shares, answers, queue, given].find((r) => r.error);
+          if (bad) throw new Error(bad.error.message);
+          // deno-lint-ignore no-explicit-any
+          const ids = shares.data.map((s: any) => s.id);
+          const confirmed = ids.length
+            ? await supabase.from('share_confirmations').select('share_id, user_id').in('share_id', ids)
+            : { data: [], error: null };
+          const work = {
+            shares: shares.data,
+            confirmations: confirmed.error ? [] : confirmed.data,
+            // deno-lint-ignore no-explicit-any
+            answers: answers.data.filter((a: any) => a.live_checks)
+              // deno-lint-ignore no-explicit-any
+              .sort((a: any, b: any) => a.live_checks.created_at.localeCompare(b.live_checks.created_at))
+              // deno-lint-ignore no-explicit-any
+              .map((a: any) => ({ week: a.live_checks.sessions?.number, prompt: a.live_checks.prompt, text: LiveLib.answerText(a.live_checks, a) })),
+            // deno-lint-ignore no-explicit-any
+            queue: queue.data.map((q: any) => ({ week: q.sessions?.number, label: LiveLib.itemLabel(q), url: q.url, note: q.note, state: q.state })),
+            // deno-lint-ignore no-explicit-any
+            given: given.data.filter((f: any) => f.shares.user_id !== sid).map((f: any) => ({ to: f.shares.user_id, body: f.body, created_at: f.created_at })),
+            notes: notes.error ? [] : notes.data,
+          };
+          return text(studentWorkText(c, person, work, who.names, who.teacherIds, uid));
+        });
+
+        server.registerTool('class_now', {
+          title: 'Class now (for teachers)',
+          description: 'The live session in a cohort you teach (or the most recent one): which part it is by the clock, the "show your work" queue with names, the open checks for understanding with each answer by name, and the commits pushed to the cohort\'s public repositories since the session began, read live from GitHub.' + FOR_TEACHERS,
+          inputSchema: cohortArg,
+          annotations: { readOnlyHint: true, openWorldHint: true },
+        }, async ({ cohort }) => {
+          const p = await teacherPick(cohort);
+          if (!p.cohort) return text(p.text);
+          const c = p.cohort;
+          const now = new Date();
+          const t = CohortLib.currentAndNext(await sessionsOf(c.id), now, c.session_minutes);
+          const session = t.live ? t.next : t.current;
+          if (!session) return text(classNowText(c, { session: null }));
+          const started = !!session.starts_at && Date.parse(session.starts_at) <= now.getTime();
+          const [who, queue, checks] = await Promise.all([
+            peopleOf(c.id),
+            supabase.from('live_queue').select('user_id, kind, url, note, state, created_at').eq('session_id', session.id),
+            supabase.from('live_checks').select('id, prompt, choices, state, created_at').eq('session_id', session.id),
+          ]);
+          if (queue.error) throw new Error(queue.error.message);
+          if (checks.error) throw new Error(checks.error.message);
+          // deno-lint-ignore no-explicit-any
+          const checkIds = checks.data.map((k: any) => k.id);
+          const answers = checkIds.length
+            ? await supabase.from('live_answers').select('check_id, user_id, choice, body, updated_at').in('check_id', checkIds)
+            : { data: [], error: null };
+          if (answers.error) throw new Error(answers.error.message);
+          const nameOf = (id: string) => who.names[id] || 'Someone';
+          const answered = TeachLib.checkAnswers(checks.data, answers.data, nameOf);
+          const pushed = started ? await commitsSince(who.people, session.starts_at) : { commits: [], unread: '' };
+          return text(classNowText(c, {
+            session, live: t.live, started,
+            part: t.live ? CohortLib.partNow(CohortLib.agenda(c.session_minutes), session.starts_at, now) : null,
+            // deno-lint-ignore no-explicit-any
+            queue: queue.data.map((q: any) => ({ ...q, name: nameOf(q.user_id), label: LiveLib.itemLabel(q) })),
+            // deno-lint-ignore no-explicit-any
+            checks: checks.data.map((k: any) => ({ ...k, answers: answered.find((x: any) => x.id === k.id).answers })),
+            commits: pushed.commits,
+            unread: pushed.unread,
+          }));
         });
 
         server.registerTool('method', {
@@ -261,6 +436,31 @@ Deno.serve(
                 `Help me get ready for my next Human Shaped session${cohort ? ` in "${cohort}"` : ''}.`,
                 'Call next_session and my_work first. Then ask me what I am proudest of and where I am stuck this week, and help me choose one thing to bring back that I can show on a real device.',
                 'Do not write what I will say. Ask me questions until I can say it in a sentence or two of my own, and remind me that I share it myself, on my cohort page.',
+              ].join('\n\n'),
+            },
+          }],
+        }));
+
+        // For a teacher during or after class (Wish 9): their own agent
+        // reads a student's public repository and helps them look, and the
+        // teacher decides what, if anything, to say.
+        server.registerPrompt('check_this_code', {
+          title: 'Look closely at a student\'s code (for teachers)',
+          description: 'Your agent reads a student\'s public repository, or one commit in it, explains what changed in plain words, and asks the method\'s questions about it. It is labeled as AI, it posts nothing, and what you say to the student is yours to write.',
+          argsSchema: z.object({
+            repo: z.string().describe('The repository as owner/name, for example bea/garden-swap.'),
+            commit: z.string().optional().describe('A commit\'s sha, to look at that change alone.'),
+          }),
+        }, ({ repo, commit }) => ({
+          messages: [{
+            role: 'user' as const,
+            content: {
+              type: 'text' as const,
+              text: [
+                `I teach a Human Shaped cohort, and I want to look closely at ${commit ? `commit ${commit} in ` : ''}https://github.com/${repo}${commit ? '' : ', starting with its recent commits'}.`,
+                'Read it through GitHub, read-only. If I teach this student\'s cohort, student_work and class_now tell you what they shared and asked; call method with part "review-skill" for the questions the method asks.',
+                'Explain in plain words what changed and which decisions it shows, then ask me the questions the method asks about it rather than answering them. Label everything you say as AI, naming yourself, your model, and today\'s date, and give no scores or grades.',
+                'Do not post, comment, open issues, or write to the student anywhere. I will decide what, if anything, to say to them, in my own words.',
               ].join('\n\n'),
             },
           }],
