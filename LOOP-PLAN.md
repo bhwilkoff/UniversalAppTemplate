@@ -191,9 +191,15 @@ yet seen: the invitation a brand-new member gets.
 - **M12. The five teaching tools** on the site: one Meet link per
   group, closing the loop on checks, the trio protocol on /live/, ready
   or not yet on bring-backs, and a teachers-only "not seen this week".
-- **M13. AGENTS.md under 24,000 bytes,** with platform playbooks moved
-  into linked docs and a test that fails past the limit, and the course
-  naming Antigravity as Google's route, labeled "may change".
+- **M13, finished.** AGENTS.md went from 49,871 to 21,820 bytes with no
+  rule dropped: platform sections moved unchanged into docs/platforms/
+  (web, apple, android, windows, tv, design-system, shared-data), with
+  an index in AGENTS.md saying when to read each and the hard rules
+  every platform shares kept in place. docs/maintaining/AGENTS-MD-MAP.md
+  maps every old line to its new home; tools/test_agent_files.py fails
+  at 24,000 bytes or on a missing linked doc (seen failing, then
+  passing). setup.md and the README name Antigravity as Google's route,
+  "for now, and this may change". Pushed to main; copy awaits Ben.
 
 
 **Proposed from the teaching research** (research/notes/
