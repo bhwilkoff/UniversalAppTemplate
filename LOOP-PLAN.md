@@ -200,7 +200,9 @@ verify what a person would see); push; log it below. "Fixed" and
   snippet that links the mark to the builder's own declaration, with a
   copy button. Verified: rendered in true 375px frames, light and dark;
   GitHub's Markdown renderer keeps the `<picture>` and proxies both
-  images. Copy is mine and waits for Ben's review.
+  images, and after the push GitHub's image proxy served the live SVG
+  (200, image/svg+xml). The template's PRINCIPLES.md now points
+  declarers to the mark. Copy is mine and waits for Ben's review.
 
 ## Where to pick up
 
@@ -210,4 +212,6 @@ verify what a person would see); push; log it below. "Fixed" and
 2. Test for real, signed in as Ben: create a draft cohort in /teach/,
    make its sessions, open it, see /cohort/ and /live/. Then point the
    header "Sign in with GitHub" buttons (every page) at /account/.
-3. Continue the backlog at item 8 (toolkit), then 9 to 13.
+3. Continue item 8 (toolkit): the mark is done; next the printable
+   principles and four-questions wall sheet, then the meetup guide and
+   the Human-Shaped Hackathon kit. Then items 9 to 13.
