@@ -842,6 +842,16 @@ October 3, after every C milestone that does not wait on Ben merged):
   (limited distribution, adb, Apple's 7-day personal team, the web).
   COURSE.md no longer says a test track is free. Not yet run: a share
   tag on GitHub, and a build after an identity change.
+- 2026-10-03, G7 (merged, migration 20261003200000 applied): finishing
+  a cohort marks its members finished (reopening undoes it), and they
+  keep reading it. `join_as_mentor` lets someone holding an unrevoked
+  credential join an open or running cohort as a mentor; only teachers
+  change roles (a trigger), which also closed a gap where someone who
+  left could re-enroll themselves. /account/ offers "Help a new cohort
+  as a mentor", /teach/'s roster switches roles, /cohort/ labels
+  mentors. Mentors can do what students can and nothing more. 432
+  database checks, 217 node tests. Not yet rendered with a real
+  credential holder.
 
 ## Where to pick up
 
