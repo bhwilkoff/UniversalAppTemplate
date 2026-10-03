@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta name="robots" content="noindex">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Connect your agent | Human Shaped</title>
+  <meta name="description" content="Let your own AI agent read your Human Shaped cohorts as you, so it knows this week's challenge, your next session, and your work.">
+  <link rel="canonical" href="https://humanshaped.org/oauth/consent/">
+  <meta property="og:url" content="https://humanshaped.org/oauth/consent/">
+  <meta property="og:site_name" content="Human Shaped">
+  <meta property="og:title" content="Connect your agent">
+  <meta property="og:description" content="Let your own AI agent read your Human Shaped cohorts as you, so it knows this week's challenge, your next session, and your work.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://humanshaped.org/assets/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="The human-shaped wordmark, with its hyphen drawn as an arch, above the line: build software for the parts of life only people can do.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#F7F6F2" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#141618" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/site.css">
+  <script>
+    (function () {
+      var q = location.search, t = null;
+      if (/[?&]dark\b/.test(q)) t = 'dark'; else if (/[?&]light\b/.test(q)) t = 'light';
+      else { try { t = localStorage.getItem('hs-theme'); } catch (e) {} }
+      if (t) document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+  <script src="/assets/site.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to the page</a>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
+      <nav class="nav" aria-label="Main">
+        <ul>
+          <li><a href="/path/">The path</a></li>
+          <li><a href="/why/">Why</a></li>
+          <li><a href="/principles/">Principles</a></li>
+          <li><a href="/cohorts/">Cohorts</a></li>
+          <li><a href="/apps/">Apps</a></li>
+          <li><a href="/start/">Start something</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#moon"/></svg>
+        </button>
+        <a class="btn-github small" href="/account/">
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>
+          <span>Sign in<span class="long"> with GitHub</span></span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <div class="wrap">
+      <header class="page-head">
+        <p class="kicker">Your agent</p>
+        <h1>Connect your AI agent.</h1>
+        <p class="lead">Your own Claude or Gemini can know what your cohort is working on, so that when you ask it for help, it starts from this week's challenge and your own work rather than from nothing. It reads as you, and it can only read.</p>
+      </header>
+
+      <div class="account consent" data-consent aria-live="polite">
+        <section class="account-state" data-state="loading"><p>Checking what is being asked…</p></section>
+
+        <section class="account-state" data-state="signed-out" hidden>
+          <p>Sign in with the same GitHub account you use for your cohort, and then you can decide.</p>
+          <button class="btn-github" type="button" data-sign-in>
+            <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Sign in with GitHub
+          </button>
+        </section>
+
+        <section class="account-state" data-state="ask" hidden>
+          <h2><span data-client-name>Your agent</span> wants to read your cohorts as you.</h2>
+          <p class="small">Signed in as <b data-who></b>. It will send you back to <b data-redirect></b>.</p>
+          <div class="consent-lists">
+            <div>
+              <h3>What it can read</h3>
+              <ul>
+                <li>The cohorts you are in or teach</li>
+                <li>This week's challenge and the stages it covers</li>
+                <li>The next session's time, agenda, and Meet link</li>
+                <li>Your group, with each partner's GitHub name, app, and repository</li>
+                <li>Your own app, what you have shared, and the feedback on it</li>
+                <li>The method itself, from the Universal App Template</li>
+              </ul>
+            </div>
+            <div>
+              <h3>What it can never do</h3>
+              <ul>
+                <li>Share anything with your cohort, or give feedback</li>
+                <li>Change, join, leave, or delete anything</li>
+                <li>See anyone's email address, including yours</li>
+                <li>Read what your classmates shared outside your group</li>
+              </ul>
+            </div>
+          </div>
+          <p class="small">What your agent says to you stays with you. If you want your cohort to see it, you share it yourself, on your cohort page. To disconnect it later, remove the Human Shaped connector in your agent's settings.</p>
+          <div class="actions">
+            <button class="btn-github" type="button" data-approve>Allow it to read</button>
+            <button class="btn-quiet" type="button" data-deny>Not now</button>
+          </div>
+        </section>
+
+        <section class="account-state" data-state="done" hidden>
+          <p data-done-text>Done. You can go back to your agent.</p>
+        </section>
+
+        <section class="account-state" data-state="error" hidden>
+          <p class="error" data-error-text>Something went wrong.</p>
+          <p class="small">Start again from your agent. If it keeps happening, the steps are on <a href="/connect/">Connect your agent</a>.</p>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
+      <p>Made by <a href="https://learningischange.com">Ben Wilkoff</a>. The ideas, the method, the tools, and the cohorts are free, and what you build is yours.</p>
+      <p class="credit">Built by Ben with an AI agent, Claude, set in Commissioner, and shared under <a href="https://github.com/bhwilkoff/UniversalAppTemplate/blob/site/LICENSE.md">open licenses</a>, so you can borrow anything here.</p>
+      <ul>
+        <li><a href="/cohorts/#together">How we treat one another</a></li>
+        <li><a href="/cohorts/#data">What we keep, and what we never own</a></li>
+        <li><a href="https://github.com/orgs/humanshaped/discussions">Discussions on GitHub</a></li>
+        <li><a href="https://github.com/bhwilkoff/UniversalAppTemplate">The template on GitHub</a></li>
+      </ul>
+    </div>
+  </footer>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" defer></script>
+  <script src="/assets/hub-config.js" defer></script>
+  <script src="/assets/consent.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Connect your agent | Human Shaped</title>
+  <meta name="description" content="Connect your own Claude or Gemini to Human Shaped, so it knows your cohort, this week's challenge, and your own work, and can only read.">
+  <link rel="canonical" href="https://humanshaped.org/connect/">
+  <meta property="og:url" content="https://humanshaped.org/connect/">
+  <meta property="og:site_name" content="Human Shaped">
+  <meta property="og:title" content="Connect your agent">
+  <meta property="og:description" content="Connect your own Claude or Gemini to Human Shaped, so it knows your cohort, this week's challenge, and your own work, and can only read.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://humanshaped.org/assets/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="The human-shaped wordmark, with its hyphen drawn as an arch, above the line: build software for the parts of life only people can do.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#F7F6F2" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#141618" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/site.css">
+  <script>
+    (function () {
+      var q = location.search, t = null;
+      if (/[?&]dark\b/.test(q)) t = 'dark'; else if (/[?&]light\b/.test(q)) t = 'light';
+      else { try { t = localStorage.getItem('hs-theme'); } catch (e) {} }
+      if (t) document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+  <script src="/assets/site.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to the page</a>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
+      <nav class="nav" aria-label="Main">
+        <ul>
+          <li><a href="/path/">The path</a></li>
+          <li><a href="/why/">Why</a></li>
+          <li><a href="/principles/">Principles</a></li>
+          <li><a href="/cohorts/">Cohorts</a></li>
+          <li><a href="/apps/">Apps</a></li>
+          <li><a href="/start/">Start something</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#moon"/></svg>
+        </button>
+        <a class="btn-github small" href="/account/">
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>
+          <span>Sign in<span class="long"> with GitHub</span></span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <div class="wrap">
+      <header class="page-head">
+        <div>
+          <p class="kicker">Your agent</p>
+          <h1>Connect your agent.</h1>
+          <p class="lead">When your own Claude or Gemini is connected to Human Shaped, it knows which cohort you are in, what this week asks of you, when the next session is, who is in your group, and what you have shared, so the help it gives starts from your work rather than from nothing. It reads as you, it can only read, and what it says stays with you unless you choose to share it.</p>
+        </div>
+      </header>
+
+      <p class="notice" data-not-yet>This is built and waiting for one setting to be switched on. Until then, connecting will stop at the sign-in step.</p>
+
+      <section class="section first connect" aria-label="How to connect">
+        <div class="topics single">
+          <div class="topic" id="address">
+            <h2>The address your agent needs.</h2>
+            <div class="prose"><p>Every way of connecting starts from this one address. Your agent will open a page on humanshaped.org where you sign in with GitHub and see exactly what it can read before you allow it.</p></div>
+            <pre id="mcp-url">https://bifrieqzkihuxfzttgvd.supabase.co/functions/v1/mcp</pre>
+            <p class="actions"><button class="btn-quiet" type="button" data-copy="mcp-url">Copy the address</button></p>
+          </div>
+
+          <div class="topic" id="claude">
+            <h2>Claude, in the app or on the web.</h2>
+            <ol class="steps">
+              <li>In Claude, open Customize, then Connectors, choose "+ Add," and then "Add custom connector." Custom connectors work on every Claude plan, including the free one, which allows one.</li>
+              <li>Name it Human Shaped, paste the address above, and add it.</li>
+              <li>Choose Connect. Claude opens humanshaped.org, where you sign in with GitHub and choose "Allow it to read."</li>
+              <li>In a new conversation, ask: "What is this week's challenge in my Human Shaped cohort?"</li>
+            </ol>
+            <p class="small">A connector added in Claude is also there in Claude Code when you are signed in to the same account.</p>
+          </div>
+
+          <div class="topic" id="claude-code">
+            <h2>Claude Code.</h2>
+            <div class="prose"><p>Ask Claude Code to do it for you, in your own words or in these:</p></div>
+            <pre id="claude-code-ask">Please add the Human Shaped MCP server for my user, not this project, with: claude mcp add --transport http --scope user humanshaped https://bifrieqzkihuxfzttgvd.supabase.co/functions/v1/mcp</pre>
+            <p class="actions"><button class="btn-quiet" type="button" data-copy="claude-code-ask">Copy the request</button></p>
+            <ol class="steps">
+              <li>Then type <b>/mcp</b>, choose humanshaped, and sign in on the page it opens.</li>
+              <li>Try the prompt it brings with it: <b>/humanshaped:review_this_week</b> asks your agent for a human-shaped review, written to a file and left for you to decide about.</li>
+            </ol>
+          </div>
+
+          <div class="topic" id="gemini">
+            <h2>Gemini CLI.</h2>
+            <div class="prose"><p>Ask Gemini to add it for your user. The <b>-s user</b> part matters: without it, Gemini saves the setting inside your app's repository, which is public.</p></div>
+            <pre id="gemini-ask">Please add the Human Shaped MCP server for my user, not this project, with: gemini mcp add --transport http -s user humanshaped https://bifrieqzkihuxfzttgvd.supabase.co/functions/v1/mcp</pre>
+            <p class="actions"><button class="btn-quiet" type="button" data-copy="gemini-ask">Copy the request</button></p>
+            <ol class="steps">
+              <li>Then type <b>/mcp auth humanshaped</b> and sign in on the page it opens.</li>
+            </ol>
+          </div>
+
+          <div class="topic" id="what">
+            <h2>What it can and cannot do.</h2>
+            <div class="prose">
+              <p>It can read your cohorts, this week's challenge and stages, the next session's agenda and Meet link, your group's GitHub names and apps, your own app, what you have shared and the feedback on it, and the method itself from the Universal App Template. It cannot share, give feedback, join or leave anything, or see anyone's email address, and the hub's database refuses those for any agent, whatever it asks.</p>
+              <p>Its feedback is labeled as coming from an AI, it never grades, and it never stands in for your teacher. When it says something worth your cohort's time, you share it yourself, on your cohort page.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
+      <p>Made by <a href="https://learningischange.com">Ben Wilkoff</a>. The ideas, the method, the tools, and the cohorts are free, and what you build is yours.</p>
+      <p class="credit">Built by Ben with an AI agent, Claude, set in Commissioner, and shared under <a href="https://github.com/bhwilkoff/UniversalAppTemplate/blob/site/LICENSE.md">open licenses</a>, so you can borrow anything here.</p>
+      <ul>
+        <li><a href="/cohorts/#together">How we treat one another</a></li>
+        <li><a href="/cohorts/#data">What we keep, and what we never own</a></li>
+        <li><a href="https://github.com/orgs/humanshaped/discussions">Discussions on GitHub</a></li>
+        <li><a href="https://github.com/bhwilkoff/UniversalAppTemplate">The template on GitHub</a></li>
+      </ul>
+    </div>
+  </footer>
+</body>
+</html>
