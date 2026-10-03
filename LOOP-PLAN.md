@@ -183,6 +183,24 @@ verify what a person would see); push; log it below. "Fixed" and
   one Authorize click.
 - 2026-10-02: **loop closed** at Ben's request (restart). Next session
   starts here.
+- 2026-10-03: loop resumed. Re-read the vision, decisions, research,
+  WRITING.md, COURSE.md, and the principles. Checking Ben's sign-in by
+  reading the hub's database was refused by the session's permission
+  check, so it waits for Ben to report what /account/ shows (opened for
+  him in Chrome; the Chrome extension was not connected).
+- 2026-10-03, item 8 (toolkit), the mark. Researched how other marks
+  earn trust (Not By AI links each badge to a page explaining how the
+  work was made, and asks that it not be altered) and how GitHub themes
+  README images (`<picture>` with prefers-color-scheme, github.com only).
+  Built two marks, "working toward" and "declared", matching the status
+  key in HUMAN-SHAPED.md, in light and dark, with every letter drawn as
+  an outline from Commissioner so they render without the web font
+  (`tools/mark/make_mark.py`, HarfBuzz shaping, arch position matched to
+  the live wordmark by eye at 3x). /start/#mark shows both and gives one
+  snippet that links the mark to the builder's own declaration, with a
+  copy button. Verified: rendered in true 375px frames, light and dark;
+  GitHub's Markdown renderer keeps the `<picture>` and proxies both
+  images. Copy is mine and waits for Ben's review.
 
 ## Where to pick up
 

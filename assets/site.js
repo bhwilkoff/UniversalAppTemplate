@@ -10,3 +10,18 @@
     });
   });
 })();
+
+(function () {
+  document.querySelectorAll('[data-copy]').forEach(function (b) {
+    var label = b.textContent;
+    b.addEventListener('click', function () {
+      var text = document.getElementById(b.getAttribute('data-copy')).textContent;
+      navigator.clipboard.writeText(text).then(function () {
+        b.textContent = 'Copied';
+        setTimeout(function () { b.textContent = label; }, 2000);
+      }, function () {
+        b.textContent = 'Select the code above to copy it';
+      });
+    });
+  });
+})();

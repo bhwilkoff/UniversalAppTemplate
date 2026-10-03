@@ -432,6 +432,24 @@ h3 { font-size: 1.25rem; letter-spacing: -0.012em; line-height: 1.25; }
 .steps { margin: 0.5rem 0 0; padding-left: 1.3rem; max-width: var(--measure); }
 .steps li { margin: 0 0 0.9rem; }
 .steps li::marker { color: var(--clay); font-weight: 600; }
+
+/* The human-shaped mark, on /start/ */
+.topic h3 { font-size: 1.25rem; margin: 2.25rem 0 0.75rem; scroll-margin-top: 1.5rem; }
+.marks { list-style: none; margin: 1.25rem 0 1.5rem; padding: 0; display: flex; flex-wrap: wrap; gap: 1rem; }
+.marks img { display: block; height: 44px; width: auto; }
+.mark-dark { display: none !important; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .mark-light { display: none !important; }
+  :root:not([data-theme="light"]) .mark-dark { display: block !important; }
+}
+:root[data-theme="dark"] .mark-light { display: none !important; }
+:root[data-theme="dark"] .mark-dark { display: block !important; }
+.snippet { max-width: var(--measure); }
+.snippet pre {
+  margin: 0; padding: 0.9rem 1rem; background: var(--surface); border-radius: 10px;
+  font: 500 0.875rem/1.55 var(--sans); white-space: pre-wrap; overflow-wrap: anywhere;
+}
+.snippet .actions { margin-top: 0.75rem; }
 .join { scroll-margin-top: 0; }
 .join .wrap { align-items: start; }
 .join h2 { color: var(--band-ink); font-size: clamp(2rem, 1.3rem + 3vw, 3.2rem); line-height: 1.05; letter-spacing: -0.035em; max-width: 14ch; }
