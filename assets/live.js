@@ -20,7 +20,12 @@
   var POLL = 15000;
 
   // What the page knows about this session, filled in by load().
-  var S = { me: null, auth: null, token: null, cohort: null, session: null, teaching: false, names: {}, mine: null, myShares: [] };
+  var S = { me: null, auth: null, token: null, cohort: null, session: null, teaching: false, names: {}, mine: null, myShares: [],
+    // The teaching tools (M12): the agenda's parts, the part someone chose
+    // by starting its timer, the previous session (for what the teacher
+    // heard), the groups and their rooms, the bring-backs since the last
+    // session, who confirmed them, and whether the database has them yet.
+    parts: [], chosenPart: null, drawnPart: undefined, prev: null, groups: [], people: [], brought: [], confirmations: [], tools: false };
   var drafts = {};          // what someone has typed into an answer box, by question
   var channel = null, poller = null, tallyPoller = null, nudgeTimer = null, deferred = {};
 
@@ -32,20 +37,30 @@
   function safe(u) { return /^https:\/\//.test(u || '') ? u : null; }
   function nameOf(id) { return id === S.me.id ? 'You' : (S.names[id] || 'Someone'); }
 
-  // A timer anyone can run for the part of the session they are in. It
-  // counts down quietly and says so when the time is up; it never
-  // makes a sound.
-  function runTimer(btn, minutes) {
-    if (timer) { clearInterval(timer.id); timer.button.textContent = 'Start ' + timer.minutes + ' min'; if (timer.button === btn) { timer = null; return; } }
-    var end = Date.now() + minutes * 60000;
+  // A timer anyone can run for the part of the session they are in, or a
+  // step of a turn in their group. It counts down quietly and says so when
+  // the time is up; it never makes a sound. One runs at a time, and it
+  // keeps running when the part of the page it sits in is drawn again
+  // (the new button with the same key takes it over).
+  function idleLabel(seconds) { return 'Start ' + (seconds % 60 ? L.clock(seconds) : seconds / 60 + ' min'); }
+  function runTimer(btn, seconds, key) {
+    if (timer) {
+      clearInterval(timer.id); timer.button.textContent = idleLabel(timer.seconds);
+      if (timer.key === key) { timer = null; return; }
+    }
+    var end = Date.now() + seconds * 1000;
     function tick() {
       var left = Math.max(0, end - Date.now());
-      var m = Math.floor(left / 60000), s = Math.floor((left % 60000) / 1000);
-      btn.textContent = left ? m + ':' + String(s).padStart(2, '0') + ' left (stop)' : 'Time is up';
+      timer.button.textContent = left ? L.clock(left / 1000) + ' left (stop)' : 'Time is up';
       if (!left) { clearInterval(timer.id); timer = null; }
     }
-    timer = { id: setInterval(tick, 1000), button: btn, minutes: minutes };
+    timer = { id: setInterval(tick, 1000), button: btn, seconds: seconds, key: key };
     tick();
+  }
+  function timerButton(seconds, key, onStart) {
+    var b = button(idleLabel(seconds), 'btn-quiet', function () { runTimer(b, seconds, key); if (onStart) onStart(); });
+    if (timer && timer.key === key) { timer.button = b; }
+    return b;
   }
 
   function load() {
@@ -64,11 +79,15 @@
         return Promise.all([
           db.from('sessions').select('*').eq('cohort_id', cohort.id).order('number'),
           db.from('enrollments').select('user_id, status, app_url, app_repo, profiles(github_login, display_name)').eq('cohort_id', cohort.id).neq('status', 'left'),
-          db.from('cohort_teachers').select('user_id, profiles(github_login, display_name)').eq('cohort_id', cohort.id)
+          db.from('cohort_teachers').select('user_id, profiles(github_login, display_name)').eq('cohort_id', cohort.id),
+          // Every column, so each group's room comes along once the database has it.
+          db.from('groups').select('*, group_members(user_id)').eq('cohort_id', cohort.id).order('name')
         ]).then(function (res) {
           var bad = res.filter(function (r) { return r.error; })[0];
           if (bad) return fail('The session could not be loaded: ' + bad.error.message);
           var ss = res[0].data, people = res[1].data, teachers = res[2].data;
+          S.groups = res[3].data;
+          S.people = people;
           if (!ss.length) return show('not-member');
           S.cohort = cohort;
           S.teaching = teachers.some(function (t) { return t.user_id === S.me.id; });
@@ -79,13 +98,20 @@
           var session = t.live ? t.next : (t.next || t.current);
           S.session = session;
           var prev = ss.filter(function (x) { return x.number === session.number - 1; })[0];
+          S.prev = prev || null;
           var since = prev && prev.starts_at ? prev.starts_at : new Date(Date.now() - 8 * 86400000).toISOString();
           return Promise.all([
-            db.from('shares').select('id, user_id, kind, url, note, created_at').eq('cohort_id', cohort.id).eq('kind', 'bring-back').gte('created_at', since).order('created_at', { ascending: false }),
-            db.from('shares').select('id, kind, url, note, created_at').eq('cohort_id', cohort.id).eq('user_id', S.me.id).not('url', 'is', null).order('created_at', { ascending: false }).limit(10)
+            // Every column, so each bring-back's question and mark come along.
+            db.from('shares').select('*').eq('cohort_id', cohort.id).eq('kind', 'bring-back').gte('created_at', since).order('created_at', { ascending: false }),
+            db.from('shares').select('id, kind, url, note, created_at').eq('cohort_id', cohort.id).eq('user_id', S.me.id).not('url', 'is', null).order('created_at', { ascending: false }).limit(10),
+            // On its own: before the table exists, this fails quietly.
+            db.from('share_confirmations').select('share_id, user_id').eq('cohort_id', cohort.id)
           ]).then(function (sh) {
             S.myShares = sh[1].data || [];
-            draw(t.live, sh[0].data || []);
+            S.brought = sh[0].data || [];
+            S.tools = !sh[2].error;
+            S.confirmations = S.tools ? sh[2].data : [];
+            draw(t.live, S.brought);
             return refreshLive().then(listen);
           });
         });
@@ -107,14 +133,17 @@
     var back = el('a', 'btn-quiet', 'Your cohort page'); back.href = '/cohort/?c=' + encodeURIComponent(cohort.slug); top.appendChild(back);
     $('[data-cohort-link]').href = back.href;
 
+    S.parts = lib.agenda(cohort.session_minutes);
     var ol = $('[data-agenda]'); ol.replaceChildren();
-    lib.agenda(cohort.session_minutes).forEach(function (p) {
+    S.parts.forEach(function (p) {
       var li = el('li', 'agenda-part');
+      li.setAttribute('data-part', p.key);
       li.appendChild(el('h3', null, p.name));
       li.appendChild(el('p', 'small', 'Minute ' + p.start + ', for ' + p.minutes + ' minutes'));
       li.appendChild(el('p', null, p.what));
-      var b = button('Start ' + p.minutes + ' min', 'btn-quiet', function () { runTimer(b, p.minutes); });
-      li.appendChild(b);
+      // Starting a part's timer also tells the page that this is the part
+      // the session is in, whatever the clock says.
+      li.appendChild(timerButton(p.minutes * 60, 'part:' + p.key, function () { S.chosenPart = p.key; drawNow(); }));
       ol.appendChild(li);
     });
 
@@ -123,6 +152,20 @@
     var ul = $('[data-stages]'); ul.replaceChildren();
     stages.forEach(function (n) { var li = el('li'); var a = el('a', null, 'Stage ' + n); a.href = '/path/' + n + '/'; li.appendChild(a); ul.appendChild(li); });
 
+    drawBrought(shares);
+    drawAddForm();
+    drawNow(true);
+    drawTalk();
+    $('[data-ask]').hidden = !S.teaching;
+    $('[data-checks-intro]').textContent = S.teaching
+      ? 'Ask a short question to see what is landing. Each person sees only their own answer, and the count of answers only if you choose to show it. Nothing here is graded, and the questions and answers are deleted when the cohort finishes.'
+      : 'Your teacher may ask a short question to see what is landing. Only you and your teacher see your answer, nothing here is graded, and the questions and answers are deleted when the cohort finishes.';
+    show('ready');
+  }
+
+  // What people brought back since the last session, with each one's
+  // question and mark (M12).
+  function drawBrought(shares) {
     var box = $('[data-brought]'); box.replaceChildren();
     if (!shares.length) box.appendChild(el('p', 'small', 'Nothing has been brought back yet for this session.'));
     shares.forEach(function (s) {
@@ -130,16 +173,168 @@
       card.appendChild(el('h3', null, nameOf(s.user_id)));
       if (s.note) card.appendChild(el('p', null, s.note));
       if (safe(s.url)) { var a = el('a', null, s.url.replace(/^https:\/\//, '')); a.href = s.url; card.appendChild(el('p')).appendChild(a); }
+      if (s.want_to_know) card.appendChild(el('p', 'small', 'Wants to know: ' + s.want_to_know));
+      markLines(s).forEach(function (n) { card.appendChild(n); });
       box.appendChild(card);
     });
+  }
 
-    drawAddForm();
-    drawTalk();
-    $('[data-ask]').hidden = !S.teaching;
-    $('[data-checks-intro]').textContent = S.teaching
-      ? 'Ask a short question to see what is landing. Each person sees only their own answer, and the count of answers only if you choose to show it. Nothing here is graded, and the questions and answers are deleted when the cohort finishes.'
-      : 'Your teacher may ask a short question to see what is landing. Only you and your teacher see your answer, nothing here is graded, and the questions and answers are deleted when the cohort finishes.';
-    show('ready');
+  // ------------------------------------------------------------------
+  // Now: what this part of the session needs (M12)
+  // ------------------------------------------------------------------
+
+  // Which part it is comes from the clock, unless someone started a
+  // part's timer (CohortLib.partNow). The block is drawn again only when
+  // the part changes, or when what it shows has changed (force), so a
+  // step's timer keeps running underneath it.
+  function drawNow(force) {
+    var part = lib.partNow(S.parts, S.session.starts_at, new Date(), S.chosenPart);
+    var key = part ? part.key : null;
+    root.querySelectorAll('[data-part]').forEach(function (li) { li.classList.toggle('now', li.getAttribute('data-part') === key); });
+    if (!force && key === S.drawnPart) return;
+    S.drawnPart = key;
+    var body = $('[data-now-body]');
+    body.replaceChildren();
+    var section = $('[data-now]');
+    if (key === 'arrive') drawArrive(body);
+    else if (key === 'show') drawGroups(body);
+    section.hidden = !body.children.length;
+    if (part) $('[data-now-title]').textContent = part.name;
+  }
+
+  // While people arrive: what the teacher heard in last week's checks,
+  // and what changes because of it (sessions.heard, written on /teach/).
+  function drawArrive(body) {
+    var heard = S.prev && S.prev.heard;
+    if (heard) {
+      var box = el('div', 'live-heard');
+      box.appendChild(el('p', 'kicker', 'What your teacher heard in week ' + S.prev.number + '’s checks, and what changes'));
+      heard.split(/\n{2,}/).forEach(function (para) { box.appendChild(el('p', null, para)); });
+      body.appendChild(box);
+    } else if (S.teaching && S.prev && 'heard' in S.prev) {
+      var hint = el('p', 'small');
+      hint.appendChild(document.createTextNode('What you heard in week ' + S.prev.number + '’s checks, and what you changed because of it, shows here while people arrive once you write it '));
+      var a = el('a', null, 'on your teaching page'); a.href = '/teach/';
+      hint.appendChild(a); hint.appendChild(document.createTextNode('.'));
+      body.appendChild(hint);
+    }
+  }
+
+  function peopleIn(g) {
+    var ids = g.group_members.map(function (m) { return m.user_id; });
+    return S.people.filter(function (p) { return ids.indexOf(p.user_id) >= 0; })
+      .map(function (p) { return { id: p.user_id, name: S.names[p.user_id] || 'Someone' }; });
+  }
+
+  // During "Show what you brought back": your group's room, the order of
+  // turns this week, each builder's question, and a timer for each step
+  // of a turn. A teacher sees every group, to visit each room in turn.
+  function drawGroups(body) {
+    var mine = S.groups.filter(function (g) { return g.group_members.some(function (m) { return m.user_id === S.me.id; }); });
+    var groups = S.teaching ? S.groups : mine;
+    if (!groups.length) {
+      body.appendChild(el('p', null, S.teaching
+        ? 'This cohort has no groups yet, so everyone stays in the main session. You can make groups on your teaching page.'
+        : 'You are not in a group yet, so stay in the main session, and your teacher will say where to go.'));
+      return;
+    }
+    body.appendChild(el('p', 'small', 'Each builder takes a turn, in the order below, which moves along by one each week. Run the step timers from any one screen in the group.'));
+    groups.forEach(function (g) { body.appendChild(groupCard(g, groups.length > 1)); });
+  }
+
+  function groupCard(g, named) {
+    var card = el('article', 'cohort-card live-group');
+    var isMine = g.group_members.some(function (m) { return m.user_id === S.me.id; });
+    card.appendChild(el('h3', null, named || S.teaching ? g.name : 'Your group, ' + g.name));
+    var acts = el('div', 'actions');
+    if (safe(g.meet_url)) {
+      var go = el('a', 'btn-github', S.teaching && !isMine ? 'Visit its room' : 'Join your group’s room');
+      go.href = g.meet_url; go.target = '_blank'; go.rel = 'noopener';
+      acts.appendChild(go);
+      if (safe(S.session.meet_url)) {
+        var back = el('a', 'btn-quiet', 'Back to the main session'); back.href = S.session.meet_url; back.target = '_blank'; back.rel = 'noopener';
+        acts.appendChild(back);
+      }
+      card.appendChild(acts);
+    } else {
+      card.appendChild(el('p', 'small', S.teaching ? 'This group has no room of its own yet, so it stays in the main session until you add one on your teaching page.' : 'Your group has no room of its own yet, so stay in the main session.'));
+    }
+
+    var order = L.presentingOrder(peopleIn(g), S.session.number);
+    card.appendChild(el('p', 'kicker', 'The order this week'));
+    var ol = el('ol', 'trio-order');
+    order.forEach(function (p) {
+      var li = el('li');
+      li.appendChild(el('p', 'live-who', p.id === S.me.id ? 'You' : p.name));
+      var bb = L.latestBringBack(S.brought, p.id);
+      var want = bb && bb.want_to_know;
+      li.appendChild(el('p', want ? 'want' : 'small', want ? 'Wants to know: ' + want
+        : p.id === S.me.id ? 'You can say what you want to know when your turn starts, or write it on your bring-back from your cohort page.'
+        : 'They will say what they want to know when their turn starts.'));
+      if (bb) {
+        if (safe(bb.url)) { var a = el('a', null, 'What they brought back'); if (p.id === S.me.id) a.textContent = 'What you brought back'; a.href = bb.url; a.target = '_blank'; a.rel = 'noopener'; li.appendChild(el('p', 'small')).appendChild(a); }
+        markLines(bb).forEach(function (n) { li.appendChild(n); });
+      }
+      ol.appendChild(li);
+    });
+    if (!order.length) ol.appendChild(el('li', 'small', 'No one is in this group yet.'));
+    card.appendChild(ol);
+
+    var steps = L.turnSteps(partMinutes('show'), order.length || 1);
+    var each = steps.reduce(function (n, s) { return n + s.seconds; }, 0);
+    card.appendChild(el('p', 'kicker', 'Each turn, about ' + Math.round(each / 60) + ' minutes'));
+    var sl = el('ol', 'turn-steps');
+    steps.forEach(function (s) {
+      var li = el('li');
+      li.appendChild(el('p', 'live-who', s.name));
+      li.appendChild(el('p', 'small', s.what));
+      li.appendChild(timerButton(s.seconds, 'step:' + g.id + ':' + s.key));
+      sl.appendChild(li);
+    });
+    card.appendChild(sl);
+    return card;
+  }
+
+  function partMinutes(key) {
+    var p = S.parts.filter(function (x) { return x.key === key; })[0];
+    return p ? p.minutes : 25;
+  }
+
+  // A bring-back's mark and who saw it working, with a way for a partner
+  // or a teacher to confirm (and take it back). Nothing here counts.
+  function markLines(s) {
+    if (!S.tools) return [];
+    var out = [];
+    var mine = s.user_id === S.me.id;
+    var ready = lib.readinessText(s, mine);
+    if (ready) out.push(el('p', 'small mark ' + (s.readiness === 'ready' ? 'is-ready' : 'is-not-yet'), ready));
+    var mineConfirmed = S.confirmations.some(function (c) { return c.share_id === s.id && c.user_id === S.me.id; });
+    var seen = lib.seenText(S.confirmations.filter(function (c) { return c.share_id === s.id; }).map(function (c) {
+      return c.user_id === S.me.id ? 'you' : (S.names[c.user_id] || 'someone');
+    }));
+    if (seen) out.push(el('p', 'small', seen));
+    var partners = lib.partnersOf(S.me.id, S.groups);
+    if (mineConfirmed) {
+      out.push(button('Take back my confirmation', 'btn-quiet', function () { setConfirmation(s, false); }));
+    } else if (lib.canConfirm(s, S.me.id, partners, S.teaching)) {
+      out.push(button('I saw it working on a device', 'btn-quiet', function () { setConfirmation(s, true); }));
+    }
+    return out;
+  }
+
+  function setConfirmation(s, yes) {
+    var q = yes
+      ? db.from('share_confirmations').insert({ share_id: s.id, user_id: S.me.id, cohort_id: S.cohort.id })
+      : db.from('share_confirmations').delete().eq('share_id', s.id).eq('user_id', S.me.id);
+    q.then(function (r) {
+      if (r.error) return;
+      return db.from('share_confirmations').select('share_id, user_id').eq('cohort_id', S.cohort.id).then(function (c) {
+        if (c.error) return;
+        S.confirmations = c.data;
+        drawBrought(S.brought);
+        drawNow(true);
+      });
+    });
   }
 
   // ------------------------------------------------------------------
@@ -476,6 +671,23 @@
   $('[data-add]').addEventListener('submit', addToQueue);
   $('[data-add-what]').addEventListener('change', syncAddForm);
   $('[data-ask]').addEventListener('submit', askCheck);
+  // The two closing questions, asked in order, answered privately, and
+  // read by the teacher before the next session (LiveLib.CLOSING_CHECKS).
+  $('[data-ask-closing]').addEventListener('click', function () {
+    var status = $('[data-ask-status]');
+    status.textContent = 'Asking…';
+    L.CLOSING_CHECKS.reduce(function (p, prompt) {
+      return p.then(function (r) {
+        if (r && r.error) return r;
+        return db.from('live_checks').insert({ cohort_id: S.cohort.id, session_id: S.session.id, created_by: S.me.id, prompt: prompt, choices: null, show_tally: false });
+      });
+    }, Promise.resolve(null)).then(function (r) {
+      status.textContent = r && r.error ? 'Not asked: ' + r.error.message : 'Asked both.';
+      refreshLive();
+    });
+  });
+  // The part of the session moves on with the clock.
+  setInterval(function () { if (S.session && S.parts.length) drawNow(); }, 20000);
   root.querySelectorAll('input[name="ask-mode"]').forEach(function (r) {
     r.addEventListener('change', function () { $('[data-ask-choices-wrap]').hidden = r.value !== 'choices' || !r.checked; });
   });

@@ -1008,3 +1008,42 @@ button.talk-title[aria-expanded="true"]::before { transform: rotate(90deg); }
 .submission .inline-form { margin-top: 0.75rem; }
 .submission .inline-form .small { margin: 0; }
 [data-submissions] > .kicker { margin: 1rem 0 0.5rem; font-size: 0.95rem; }
+
+/* ------------------------------------------------------------------
+   The teaching tools (M12): what the current part of a live session
+   needs (the teacher's "what I heard", each group's room and turns), a
+   bring-back's question and its ready or not yet, and, on /teach/, a
+   session's check answers and who has not been seen since it began.
+   ------------------------------------------------------------------ */
+.live-page .live-now { border: 2px solid var(--clay); border-radius: var(--radius); background: var(--card); padding: 1rem 1.25rem 1.25rem; margin-top: 1.5rem; max-width: 44rem; }
+.live-page .live-now > .kicker { font-size: 0.85rem; margin: 0; }
+.live-page .live-now > h2 { margin: 0.1rem 0 0.5rem; font-size: 1.35rem; }
+.live-page .live-now .cohort-card { background: var(--paper); }
+.live-page .live-heard p { margin: 0.5rem 0 0; }
+.live-page .live-heard .kicker { font-size: 0.9rem; margin: 0; }
+.agenda-part.now { border-color: var(--clay); border-width: 2px; }
+.agenda-part.now h3::after { content: " (now)"; color: var(--clay); font-weight: 600; font-size: 0.95rem; }
+.live-page .live-group .kicker { font-size: 0.85rem; margin: 1.1rem 0 0.4rem; }
+.live-page .live-group .actions { margin: 0.5rem 0 0; }
+.trio-order, .turn-steps { margin: 0; padding-left: 1.4rem; display: grid; gap: 0.75rem; }
+.trio-order p, .turn-steps p { margin: 0; }
+.trio-order li, .turn-steps li { min-width: 0; }
+.trio-order .want { font-style: italic; overflow-wrap: anywhere; }
+.trio-order .btn-quiet, .turn-steps .btn-quiet { margin-top: 0.35rem; }
+p.mark { margin: 0.35rem 0 0; font-weight: 600; font-size: 0.95rem; }
+p.mark.is-not-yet { font-weight: 500; }
+.bring-back-mark { border-top: 1px solid var(--rule); margin-top: 0.75rem; padding-top: 0.6rem; }
+.bring-back-mark p { margin: 0.25rem 0 0; overflow-wrap: anywhere; }
+.bring-back-mark .want { font-style: italic; }
+.bring-back-mark .actions { margin-top: 0.5rem; }
+.bring-back-extras:not([hidden]) { display: grid; gap: 0.9rem; }
+.cohort-form fieldset.ready-mark, .inline-form fieldset.ready-mark { border: 1px solid var(--rule); border-radius: 10px; padding: 1rem; margin: 0; display: grid; gap: 0.6rem; min-width: 0; }
+fieldset.ready-mark legend { font-weight: 600; padding: 0 0.35rem; font-size: 0.95rem; }
+fieldset.ready-mark .hint { margin: 0; font-size: 0.9rem; color: var(--muted); }
+.ready-bar p { margin: 0 0 0.4rem; border-left: 3px solid var(--rule); padding-left: 0.75rem; }
+.check-answers h4 { margin: 0 0 0.5rem; font-size: 1.05rem; }
+.answer-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.4rem; }
+.answer-list li { overflow-wrap: anywhere; }
+.inline-form .hint { font-weight: 400; color: var(--muted); font-size: 0.9rem; }
+.group-room { border-top: 1px solid var(--rule); padding-top: 0.75rem; }
+[data-meet-text] { margin-top: 0.5rem; }

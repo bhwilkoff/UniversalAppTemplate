@@ -7,6 +7,7 @@
   var lib = window.TeachLib;
   var me = null;
   var current = null;
+  var currentGroups = [];
   var DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
   function $(sel) { return root.querySelector(sel); }
@@ -188,13 +189,16 @@
       db.from('cohorts').select('*').eq('id', id).single(),
       db.from('sessions').select('*').eq('cohort_id', id).order('number'),
       db.from('enrollments').select('user_id, role, status, app_name, app_repo, app_url, app_public, profiles(github_login, display_name)').eq('cohort_id', id),
-      db.from('groups').select('id, name, expectations, group_members(user_id)').eq('cohort_id', id).order('name'),
+      // Every column, so a group's Meet link (meet_url) comes along once
+      // the database has it, and the page works the same before then.
+      db.from('groups').select('*, group_members(user_id)').eq('cohort_id', id).order('name'),
       db.from('github_access').select('state').eq('cohort_id', id).eq('user_id', me.id).maybeSingle(),
       db.from('credentials').select('*').eq('cohort_id', id)
     ]).then(function (res) {
       var bad = res.slice(0, 5).filter(function (r) { return r.error; })[0];
       if (bad) return fail('This cohort could not be loaded: ' + bad.error.message);
       current = res[0].data;
+      currentGroups = res[3].data;
       var c = current;
       say('[data-detail-title]', c.title);
       var meta = [statusText(c.status)];
@@ -207,6 +211,7 @@
       loadSubmissions(res[2].data, res[1].data);
       drawGroups(res[3].data, res[2].data);
       drawCohortSetup(res[1].data, res[4].data);
+      loadSince(res[1].data, res[2].data);
       drawCredentials(res[2].data, res[5]);
       form.hidden = true;
       var del = $('[data-delete-draft]');
@@ -272,16 +277,137 @@
     });
   });
 
+  // The setup the Meet script reads, with one room asked for per group
+  // (each group's members by the emails they gave for invitations). If
+  // the clipboard is not available, the text appears on the page to copy.
   $('[data-copy-meet]').addEventListener('click', function () {
-    db.from('calendar_contacts').select('email').eq('cohort_id', current.id).then(function (r) {
+    var shown = $('[data-meet-text]');
+    shown.hidden = true;
+    db.from('calendar_contacts').select('user_id, email').eq('cohort_id', current.id).then(function (r) {
       if (r.error) return say('[data-detail-message]', 'The emails could not be read: ' + r.error.message);
-      var setup = lib.meetSetup(current, r.data.map(function (x) { return x.email; }), []);
+      var byUser = {};
+      r.data.forEach(function (x) { byUser[x.user_id] = x.email; });
+      var groups = currentGroups.map(function (g) {
+        return { id: g.id, name: g.name, emails: g.group_members.map(function (m) { return byUser[m.user_id]; }).filter(Boolean) };
+      });
+      var setup = lib.meetSetup(current, r.data.map(function (x) { return x.email; }), [], groups);
       var text = JSON.stringify(setup, null, 2);
-      var done = function () { say('[data-detail-message]', 'Copied. Paste it into the Meet events script as this cohort’s setup, and add your own email under "teachers". ' + r.data.length + ' people have given an email for invitations.'); };
-      if (navigator.clipboard) navigator.clipboard.writeText(text).then(done, function () { window.prompt('Copy this setup:', text); });
-      else window.prompt('Copy this setup:', text);
+      var rooms = groups.length ? ', and the script will make a room for each of the ' + groups.length + (groups.length === 1 ? ' group' : ' groups') : '';
+      var told = r.data.length + (r.data.length === 1 ? ' person has' : ' people have') + ' given an email for invitations' + rooms + '.';
+      var done = function () { say('[data-detail-message]', 'Copied. Paste it into the Meet events script as this cohort’s setup, and add your own email under "teachers". ' + told); };
+      var fallback = function () {
+        shown.value = text; shown.hidden = false; shown.select();
+        say('[data-detail-message]', 'Copy the setup below, paste it into the Meet events script, and add your own email under "teachers". ' + told);
+      };
+      if (navigator.clipboard) navigator.clipboard.writeText(text).then(done, fallback); else fallback();
     });
   });
+
+  // ---- since the last session ---------------------------------------
+  // Two things for the days after a session, for the cohort's teachers
+  // alone: that session's check answers with one field to say what you
+  // heard and what changes (shown on /live/ while people arrive next
+  // time), and who has not been seen since it began, worked out here from
+  // what this page can already read and never stored (TeachLib.notSeen).
+  function loadSince(sessions, people) {
+    var box = $('[data-since]');
+    var last = lib.lastStarted(sessions, new Date());
+    box.hidden = !last;
+    if (!last) return;
+    var since = last.starts_at;
+    var names = {};
+    people.forEach(function (p) { names[p.user_id] = personName(p); });
+    var nameOf = function (id) { return id === me.id ? 'You' : (names[id] || 'Someone'); };
+    say('[data-checks-heard-title]', 'What week ' + last.number + '’s checks said');
+    say('[data-not-seen-title]', 'Not seen since week ' + last.number + ' began');
+    var heardForm = $('[data-heard-form]');
+    heardForm.hidden = !('heard' in last);   // until the database has the column
+    heardForm.elements.heard.value = last.heard || '';
+    heardForm.onsubmit = function (ev) {
+      ev.preventDefault();
+      say('[data-heard-message]', 'Saving…');
+      db.from('sessions').update({ heard: heardForm.elements.heard.value.trim() || null }).eq('id', last.id).select('id').then(function (r) {
+        say('[data-heard-message]', r.error || !r.data.length ? 'Not saved: ' + (r.error ? r.error.message : 'the database refused') + '.' : 'Saved. It shows on the session page while people arrive next time.');
+      });
+    };
+    say('[data-heard-message]', '');
+
+    var answersBox = $('[data-check-answers]');
+    answersBox.replaceChildren(el('p', 'small', 'Reading the answers…'));
+    var notSeenList = $('[data-not-seen]');
+    notSeenList.replaceChildren();
+    say('[data-not-seen-intro]', '');
+    db.from('live_checks').select('id, prompt, choices, created_at').eq('session_id', last.id).then(function (k) {
+      if (k.error) { answersBox.replaceChildren(el('p', 'small error', 'The checks could not be read: ' + k.error.message)); return; }
+      var ids = k.data.map(function (x) { return x.id; });
+      var answers = ids.length
+        ? db.from('live_answers').select('check_id, user_id, choice, body, updated_at').in('check_id', ids)
+        : Promise.resolve({ data: [] });
+      return answers.then(function (a) {
+        if (a.error) { answersBox.replaceChildren(el('p', 'small error', 'The answers could not be read: ' + a.error.message)); return; }
+        drawCheckAnswers(lib.checkAnswers(k.data, a.data, nameOf), last);
+      });
+    });
+
+    // Anything a person did since the session began: a share, an item in
+    // the queue, an answer, or feedback on someone's work.
+    Promise.all([
+      db.from('shares').select('user_id, created_at').eq('cohort_id', current.id).gte('created_at', since),
+      db.from('live_queue').select('user_id, created_at').eq('cohort_id', current.id).gte('created_at', since),
+      db.from('live_answers').select('user_id, updated_at').eq('cohort_id', current.id).gte('updated_at', since),
+      db.from('feedback').select('author_id, created_at, shares!inner(cohort_id)').eq('shares.cohort_id', current.id).gte('created_at', since)
+    ]).then(function (res) {
+      var bad = res.filter(function (r) { return r.error; })[0];
+      if (bad) { say('[data-not-seen-intro]', 'This list could not be worked out just now: ' + bad.error.message); return; }
+      var activity = [].concat(
+        res[0].data.map(function (x) { return { user_id: x.user_id, at: x.created_at }; }),
+        res[1].data.map(function (x) { return { user_id: x.user_id, at: x.created_at }; }),
+        res[2].data.map(function (x) { return { user_id: x.user_id, at: x.updated_at }; }),
+        res[3].data.map(function (x) { return { user_id: x.author_id, at: x.created_at }; }));
+      drawNotSeen(lib.notSeen(people, since, activity), last);
+    });
+  }
+
+  function drawCheckAnswers(checks, last) {
+    var box = $('[data-check-answers]');
+    box.replaceChildren();
+    say('[data-checks-heard-intro]', checks.length
+      ? 'Every answer from week ' + last.number + ', by name, for you alone. Read them before the next session, and then say in a few sentences what you heard and what you will change because of it.'
+      : 'No questions were asked in week ' + last.number + '’s session, so there is nothing to read. You can still tell the cohort what you noticed, and what changes.');
+    checks.forEach(function (k) {
+      var card = el('article', 'cohort-card check-answers');
+      card.appendChild(el('h4', null, k.prompt));
+      if (!k.answers.length) card.appendChild(el('p', 'small', 'No one answered this one.'));
+      else {
+        var ul = el('ul', 'answer-list');
+        k.answers.forEach(function (a) {
+          var li = el('li');
+          li.appendChild(el('strong', null, a.name + ': '));
+          li.appendChild(document.createTextNode(a.text));
+          ul.appendChild(li);
+        });
+        card.appendChild(ul);
+      }
+      box.appendChild(card);
+    });
+  }
+
+  function drawNotSeen(list, last) {
+    var ul = $('[data-not-seen]');
+    ul.replaceChildren();
+    say('[data-not-seen-intro]', list.length
+      ? 'No one listed here has shared, queued, answered a check, or given feedback since week ' + last.number + ' began, so these are the people to reach out to in the next two days, privately and kindly, with an easy way back in. Only you see this. It is worked out each time you open this page, from what you can already read, and it says nothing about who came to the session.'
+      : 'Everyone in the cohort has shared, queued, answered, or given feedback since week ' + last.number + ' began.');
+    list.forEach(function (p) {
+      var li = el('li');
+      li.appendChild(el('strong', null, personName(p)));
+      if (p.profiles) {
+        var gh = el('a', null, ' @' + p.profiles.github_login); gh.href = 'https://github.com/' + encodeURIComponent(p.profiles.github_login);
+        li.appendChild(gh);
+      }
+      ul.appendChild(li);
+    });
+  }
 
   function drawSessions(sessions) {
     var box = $('[data-sessions]');
@@ -487,8 +613,32 @@
         card.appendChild(l);
       });
       if (!here.length) card.appendChild(el('p', 'small', 'People will appear here as they join.'));
+      // The group's own Meet room, once the database has the column.
+      if ('meet_url' in g) card.appendChild(roomForm(g));
       box.appendChild(card);
     });
+  }
+
+  function roomForm(g) {
+    var f = el('form', 'inline-form group-room');
+    var l = el('label', null, 'Its own Meet room');
+    var input = el('input'); input.type = 'url'; input.placeholder = 'https://meet.google.com/…'; input.maxLength = 500;
+    input.value = g.meet_url || '';
+    l.appendChild(input); f.appendChild(l);
+    var save = el('button', 'btn-quiet', 'Save the room'); save.type = 'submit';
+    var msg = el('span', 'small'); msg.setAttribute('role', 'status');
+    var a = el('div', 'actions'); a.appendChild(save); a.appendChild(msg); f.appendChild(a);
+    f.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      var url = input.value.trim();
+      if (url && !/^https:\/\//.test(url)) { msg.textContent = 'A Meet link starts with https://.'; return; }
+      msg.textContent = 'Saving…';
+      db.from('groups').update({ meet_url: url || null }).eq('id', g.id).select('id').then(function (r) {
+        msg.textContent = r.error || !r.data.length ? 'Not saved: ' + (r.error ? r.error.message : 'the database refused') + '.' : (url ? 'Saved.' : 'Removed.');
+        if (!r.error) g.meet_url = url || null;
+      });
+    });
+    return f;
   }
 
   $('[data-group-form]').addEventListener('submit', function (ev) {

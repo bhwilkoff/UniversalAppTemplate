@@ -158,6 +158,19 @@
               </select></label>
               <label>A link <input name="url" type="url" placeholder="https://"></label>
               <label>In your words <textarea name="note" rows="3" maxlength="4000" required></textarea></label>
+              <!-- The bring-back's question and its mark (milestone M12): words
+                   by Claude, awaiting Ben's review. -->
+              <div class="bring-back-extras" data-bb-extras hidden>
+                <label>What you want your group to tell you <input name="want_to_know" maxlength="300"><span class="hint">One line, which opens your turn in your group at the next session.</span></label>
+                <fieldset class="ready-mark">
+                  <legend>Ready to move on, or not yet?</legend>
+                  <div class="ready-bar" data-ready-bar></div>
+                  <label class="check"><input type="radio" name="readiness" value="ready"> Ready, because it meets the bar</label>
+                  <label class="check"><input type="radio" name="readiness" value="not-yet"> Not yet</label>
+                  <label data-missing-wrap hidden>What is still missing <textarea name="missing" rows="2" maxlength="1000"></textarea></label>
+                  <p class="hint">Judge it yourself first, and a partner can confirm it once they have seen it working on a device. It is never a score, and changing it later costs nothing.</p>
+                </fieldset>
+              </div>
               <div class="actions"><button class="btn-github" type="submit">Share with the cohort</button><span class="small" data-share-message></span></div>
             </form>
             <div data-shares></div>

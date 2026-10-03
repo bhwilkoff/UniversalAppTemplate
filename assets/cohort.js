@@ -8,6 +8,9 @@
   var lib = window.CohortLib;
   var slug = new URLSearchParams(location.search).get('c') || '';
   var me = null, cohort = null, token = null, session = null;
+  // The teaching tools (M12): whether the database has them yet, who
+  // confirmed which bring-back, and who this person's partners are.
+  var tools = false, confirmations = [], amTeaching = false, partnerIds = [], week = null;
 
   function $(sel) { return root.querySelector(sel); }
   function el(tag, cls, text) {
@@ -97,6 +100,7 @@
       card.appendChild(el('p', 'kicker', KIND[s.kind] + ' from ' + nameOf(byId[s.user_id]) + ', ' + lib.ago(s.created_at, new Date())));
       if (s.note) card.appendChild(el('p', null, s.note));
       if (safe(s.url)) card.appendChild(el('p')).appendChild(link(s.url, s.url.replace(/^https:\/\//, '')));
+      if (s.kind === 'bring-back' && tools) card.appendChild(markBlock(s, byId));
       (s.feedback || []).sort(function (a, b) { return a.created_at.localeCompare(b.created_at); }).forEach(function (f) {
         var q = el('blockquote', 'feedback');
         q.appendChild(el('p', null, f.body));
@@ -121,6 +125,124 @@
     });
   }
 
+  // A bring-back's question, its builder's mark, and who saw it working,
+  // with a way for a partner (or a teacher) to confirm, and for the
+  // builder to change their mark. The database decides who may do each
+  // (migration 20261003100000); this only offers it.
+  function markBlock(s, byId) {
+    var mine = s.user_id === me.id;
+    var box = el('div', 'bring-back-mark');
+    if (s.want_to_know) box.appendChild(el('p', 'want', (mine ? 'Your question: ' : 'Their question: ') + s.want_to_know));
+    var ready = lib.readinessText(s, mine);
+    if (ready) box.appendChild(el('p', 'mark ' + (s.readiness === 'ready' ? 'is-ready' : 'is-not-yet'), ready));
+    var mineConfirmed = confirmations.some(function (c) { return c.share_id === s.id && c.user_id === me.id; });
+    var seen = lib.seenText(confirmations.filter(function (c) { return c.share_id === s.id; }).map(function (c) {
+      return c.user_id === me.id ? 'you' : nameOf(byId[c.user_id]);
+    }));
+    if (seen) box.appendChild(el('p', 'small', seen));
+    var acts = el('div', 'actions');
+    var msg = el('span', 'small'); msg.setAttribute('role', 'status');
+    if (mineConfirmed) {
+      acts.appendChild(button('Take back my confirmation', function () {
+        db.from('share_confirmations').delete().eq('share_id', s.id).eq('user_id', me.id).then(function (r) { if (r.error) msg.textContent = 'Not changed: ' + r.error.message; else load(); });
+      }));
+    } else if (lib.canConfirm(s, me.id, partnerIds, amTeaching)) {
+      acts.appendChild(button('I saw it working on a device', function () {
+        db.from('share_confirmations').insert({ share_id: s.id, user_id: me.id, cohort_id: cohort.id }).then(function (r) { if (r.error) msg.textContent = 'Not saved: ' + r.error.message; else load(); });
+      }));
+    }
+    if (mine) {
+      var change = button(s.readiness ? 'Change your mark' : 'Mark it ready or not yet', function () { change.hidden = true; form.hidden = false; });
+      acts.appendChild(change);
+      var form = markForm(s, function () { form.hidden = true; change.hidden = false; });
+      form.hidden = true;
+      box.appendChild(acts);
+      box.appendChild(form);
+    } else if (acts.children.length) {
+      box.appendChild(acts);
+    }
+    acts.appendChild(msg);
+    return box.children.length ? box : el('span');
+  }
+
+  function button(label, fn) { var b = el('button', 'btn-quiet', label); b.type = 'button'; b.addEventListener('click', fn); return b; }
+
+  // The builder's own mark, changed in place. Changing it clears what
+  // partners confirmed, so that they can look again.
+  var markCount = 0;
+  function markForm(s, onCancel) {
+    var n = ++markCount;
+    var f = el('form', 'inline-form ready-mark-form');
+    var fs = el('fieldset', 'ready-mark');
+    fs.appendChild(el('legend', null, 'Ready to move on, or not yet?'));
+    var radios = {};
+    [['ready', 'Ready, because it meets the bar'], ['not-yet', 'Not yet']].forEach(function (x) {
+      var l = el('label', 'check');
+      var r = el('input'); r.type = 'radio'; r.name = 'mark-' + n; r.value = x[0]; r.checked = s.readiness === x[0];
+      l.appendChild(r); l.appendChild(document.createTextNode(' ' + x[1]));
+      fs.appendChild(l); radios[x[0]] = r;
+    });
+    var ml = el('label', null, 'What is still missing');
+    var missing = el('textarea'); missing.rows = 2; missing.maxLength = 1000; missing.value = s.missing || '';
+    ml.appendChild(missing); fs.appendChild(ml);
+    function sync() { ml.hidden = !radios['not-yet'].checked; missing.required = radios['not-yet'].checked; }
+    radios.ready.addEventListener('change', sync); radios['not-yet'].addEventListener('change', sync); sync();
+    f.appendChild(fs);
+    var save = el('button', 'btn-quiet', 'Save my mark'); save.type = 'submit';
+    var cancel = button('Leave it as it was', onCancel);
+    var msg = el('span', 'small'); msg.setAttribute('role', 'status');
+    var a = el('div', 'actions'); a.appendChild(save); a.appendChild(cancel); a.appendChild(msg); f.appendChild(a);
+    f.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      var value = radios.ready.checked ? 'ready' : radios['not-yet'].checked ? 'not-yet' : null;
+      if (!value) { msg.textContent = 'Choose ready or not yet first.'; return; }
+      var patch = { readiness: value, missing: value === 'not-yet' ? missing.value.trim() : null };
+      if (value === 'not-yet' && !patch.missing) { msg.textContent = 'Say what is still missing, so it reads as your next step.'; return; }
+      msg.textContent = 'Saving…';
+      db.from('shares').update(patch).eq('id', s.id).then(function (r) { if (r.error) msg.textContent = 'Not saved: ' + r.error.message; else load(); });
+    });
+    return f;
+  }
+
+  // The bar for this week's stages, read live from each stage's own file in
+  // the template (its "When you are ready to move on" paragraph), and
+  // remembered for this visit.
+  var RAW = 'https://raw.githubusercontent.com/bhwilkoff/UniversalAppTemplate/main/';
+  function stageBar(n) {
+    var file = lib.stageFile(n);
+    if (!file) return Promise.resolve(null);
+    var key = 'hs-bar:' + n;
+    try { var hit = sessionStorage.getItem(key); if (hit) return Promise.resolve(hit); } catch (e) {}
+    return fetch(RAW + file).then(function (r) { return r.ok ? r.text() : ''; }).then(function (md) {
+      var bar = lib.readyBar(md);
+      if (bar) { try { sessionStorage.setItem(key, bar); } catch (e) {} }
+      return bar;
+    }).catch(function () { return null; });
+  }
+  function drawBars() {
+    var box = $('[data-ready-bar]');
+    box.replaceChildren();
+    var stages = week ? lib.stagesForWeek(week) : [];
+    if (!stages.length) { box.appendChild(el('p', 'small', 'Each stage of the path ends with a paragraph that begins "When you are ready to move on", and that paragraph is the bar.')); return; }
+    Promise.all(stages.map(stageBar)).then(function (bars) {
+      box.replaceChildren();
+      stages.forEach(function (n, i) {
+        var p = el('p', 'small');
+        p.appendChild(link('/path/' + n + '/', 'Stage ' + n));
+        p.appendChild(document.createTextNode(': ' + (bars[i] || 'its paragraph that begins "When you are ready to move on" is the bar.')));
+        box.appendChild(p);
+      });
+    });
+  }
+  function syncShareForm() {
+    var f = $('[data-share-form]').elements;
+    var bring = f.kind.value === 'bring-back';
+    $('[data-bb-extras]').hidden = !(bring && tools);
+    var notYet = f.readiness.value === 'not-yet';
+    $('[data-missing-wrap]').hidden = !notYet;
+    f.missing.required = bring && tools && notYet;
+  }
+
   function load() {
     if (!slug) return fail('This page needs to know which cohort to show. Open it from your account.');
     show('loading');
@@ -137,13 +259,19 @@
         return Promise.all([
           db.from('enrollments').select('user_id, role, status, app_name, app_repo, app_url, profiles(github_login, display_name)').eq('cohort_id', cohort.id).neq('status', 'left'),
           db.from('sessions').select('*').eq('cohort_id', cohort.id).order('number'),
-          db.from('groups').select('id, name, expectations, group_members(user_id)').eq('cohort_id', cohort.id),
-          db.from('shares').select('id, user_id, kind, url, note, created_at, feedback(id, author_id, body, created_at)').eq('cohort_id', cohort.id).order('created_at', { ascending: false }).limit(40),
+          // Every column of groups and shares, so a group's Meet room and a
+          // bring-back's question and mark come along once the database has
+          // them (migration 20261003100000), and the page works before then.
+          db.from('groups').select('*, group_members(user_id)').eq('cohort_id', cohort.id),
+          db.from('shares').select('*, feedback(id, author_id, body, created_at)').eq('cohort_id', cohort.id).order('created_at', { ascending: false }).limit(40),
           db.from('calendar_contacts').select('email').eq('cohort_id', cohort.id).eq('user_id', me.id).maybeSingle(),
           db.from('cohort_teachers').select('user_id, profiles(github_login, display_name)').eq('cohort_id', cohort.id),
-          db.from('github_access').select('state, detail').eq('cohort_id', cohort.id).eq('user_id', me.id).maybeSingle()
+          db.from('github_access').select('state, detail').eq('cohort_id', cohort.id).eq('user_id', me.id).maybeSingle(),
+          // Read on its own: before the table exists, this fails quietly and
+          // the ready marks simply do not show.
+          db.from('share_confirmations').select('share_id, user_id').eq('cohort_id', cohort.id)
         ]).then(function (res) {
-          var bad = res.filter(function (r) { return r.error; })[0];
+          var bad = res.slice(0, 7).filter(function (r) { return r.error; })[0];
           if (bad) return fail('This cohort could not be loaded: ' + bad.error.message);
           var people = res[0].data;
           var mine = people.filter(function (p) { return p.user_id === me.id; })[0];
@@ -151,6 +279,10 @@
           // has no sessions or people yet, so their absence proves nothing).
           var teaching = res[5].data.some(function (t) { return t.user_id === me.id; });
           if (!mine && !teaching) return show('not-member');
+          tools = !res[7].error;
+          confirmations = tools ? res[7].data : [];
+          amTeaching = teaching;
+          partnerIds = lib.partnersOf(me.id, res[2].data);
           draw(people, mine, res[1].data, res[2].data, res[3].data, res[4].data, res[5].data);
           drawTalk(res[6].data);
           drawSetup(mine, res[6].data);
@@ -282,12 +414,18 @@
     $('[data-title]').textContent = cohort.title;
     $('[data-lead]').textContent = cohort.description || '';
     var t = lib.currentAndNext(sessions, new Date(), cohort.session_minutes);
+    week = t.current ? t.current.number : null;
+    var myGroup = groups.filter(function (g) { return g.group_members.some(function (m) { return m.user_id === me.id; }); })[0];
+    var room = myGroup ? safe(myGroup.meet_url) : null;
     $('[data-week-title]').textContent = t.current ? 'Week ' + t.current.number + (t.current.title && t.current.title !== 'Week ' + t.current.number ? ': ' + t.current.title : '') : 'This week';
     $('[data-week-scope]').textContent = t.current && t.current.scope ? t.current.scope : 'Your teacher will put this week’s challenge here.';
     var na = $('[data-next-actions]'); na.replaceChildren();
     if (t.next) {
       $('[data-next-when]').textContent = (t.live ? 'Happening now: ' : '') + when(t.next.starts_at) + ', for ' + cohort.session_minutes + ' minutes.';
-      if (safe(t.next.meet_url)) { var j = link(t.next.meet_url, t.live ? 'Join the session now' : 'The Meet link'); j.className = 'btn-github'; na.appendChild(j); }
+      // During the group part, your group's own room comes first.
+      var part = t.live ? lib.partNow(lib.agenda(cohort.session_minutes), t.next.starts_at, new Date()) : null;
+      if (room && part && part.key === 'show') { var gr = link(room, 'Join your group’s room'); gr.className = 'btn-github'; na.appendChild(gr); }
+      if (safe(t.next.meet_url)) { var j = link(t.next.meet_url, t.live ? (part && part.key === 'show' && room ? 'The main session' : 'Join the session now') : 'The Meet link'); j.className = room && part && part.key === 'show' ? 'btn-quiet' : 'btn-github'; na.appendChild(j); }
       var lp = link('/live/?c=' + encodeURIComponent(cohort.slug), 'The session page'); lp.className = 'btn-quiet'; na.appendChild(lp);
     } else {
       $('[data-next-when]').textContent = sessions.length ? 'The last session has happened.' : 'The sessions have not been scheduled yet.';
@@ -295,13 +433,20 @@
     var past = sessions.filter(function (s) { return safe(s.recording_url); });
     past.forEach(function (s) { na.appendChild(link(s.recording_url, 'Week ' + s.number + ' recording')); });
 
-    var myGroup = groups.filter(function (g) { return g.group_members.some(function (m) { return m.user_id === me.id; }); })[0];
     $('[data-group-section]').hidden = !myGroup;
     if (myGroup) {
       var gb = $('[data-group]'); gb.replaceChildren();
       gb.appendChild(el('p', null, myGroup.name + (myGroup.expectations ? ': ' + myGroup.expectations : '')));
       var names = people.filter(function (p) { return p.user_id !== me.id && myGroup.group_members.some(function (m) { return m.user_id === p.user_id; }); }).map(function (p) { return nameOf(p.profiles); });
       gb.appendChild(el('p', 'small', names.length ? 'With ' + names.join(', ') + '.' : 'Your teacher will add the others soon.'));
+      // The group's own Meet room, for the group part of each session
+      // (Meet on our Google edition may have no breakout rooms).
+      if (room) {
+        var rp = el('p', 'small');
+        rp.appendChild(document.createTextNode('Your group meets in its own room for the group part of each session, and the session page sends you there when it is time: '));
+        rp.appendChild(link(room, room.replace(/^https:\/\//, '')));
+        gb.appendChild(rp);
+      }
     }
 
     var form = $('[data-my-app]');
@@ -319,6 +464,8 @@
     drawShares(shares, people.concat((teachers || []).filter(function (t) {
       return !people.some(function (p) { return p.user_id === t.user_id; });
     })));
+    syncShareForm();
+    if (tools) drawBars();
     show('ready');
   }
 
@@ -349,13 +496,26 @@
     var f = ev.target.elements, msg = $('[data-share-message]');
     var url = f.url.value.trim();
     if (url && !safe(url)) { msg.textContent = 'Links need to start with https://.'; return; }
+    var row = { cohort_id: cohort.id, user_id: me.id, kind: f.kind.value, url: url || null, note: f.note.value.trim() };
+    // A bring-back's question and mark, only when given, so a share
+    // without them works before the database has the columns.
+    if (row.kind === 'bring-back' && tools) {
+      var want = f.want_to_know.value.trim();
+      if (want) row.want_to_know = want;
+      if (f.readiness.value) row.readiness = f.readiness.value;
+      if (f.readiness.value === 'not-yet') {
+        row.missing = f.missing.value.trim();
+        if (!row.missing) { msg.textContent = 'Say what is still missing, so it reads as your next step.'; return; }
+      }
+    }
     msg.textContent = 'Sharing…';
-    db.from('shares').insert({ cohort_id: cohort.id, user_id: me.id, kind: f.kind.value, url: url || null, note: f.note.value.trim() }).then(function (r) {
+    db.from('shares').insert(row).then(function (r) {
       if (r.error) { msg.textContent = 'Not shared: ' + r.error.message; return; }
-      ev.target.reset(); msg.textContent = 'Shared with your cohort.';
+      ev.target.reset(); syncShareForm(); msg.textContent = 'Shared with your cohort.';
       load();
     });
   });
+  $('[data-share-form]').addEventListener('change', syncShareForm);
 
   $('[data-reload]').addEventListener('click', load);
   load();

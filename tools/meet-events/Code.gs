@@ -10,6 +10,10 @@
  *   fileStrayRecordings('c1')   moves recorder uploads that missed the folder into it
  *   whoAmI()                    logs the account this script runs as
  *
+ * With groups in the definition, setupCohort also makes one Meet room per
+ * group (a recurring event with the group invited) and prints the links
+ * to paste into /teach/.
+ *
  * Cohort definitions come from the Script Property COHORTS_JSON (a JSON
  * array) or from a Google Sheet (Script Property COHORT_SHEET_ID, tab
  * "Cohorts", one row per cohort, headers named like the fields below).
@@ -98,7 +102,22 @@ function normalizeCohort(raw) {
     members: splitEmails(raw.members),
     teachers: splitEmails(raw.teachers),
     sessionUrl: String(raw.sessionUrl || '').trim(),
+    groups: [],
   };
+  // Groups, each with its own Meet room (Meet on Workspace for Education
+  // Fundamentals has no breakout rooms). From /teach/'s setup they arrive
+  // as an array; from a Sheet, as JSON in a "groups" column.
+  var groups = raw.groups || [];
+  if (typeof groups === 'string') {
+    try { groups = groups.trim() ? JSON.parse(groups) : []; } catch (e) { errors.push('groups must be a JSON list, as /teach/ copies it'); groups = []; }
+  }
+  if (!Array.isArray(groups)) { errors.push('groups must be a list'); groups = []; }
+  groups.forEach(function (g, i) {
+    var group = { key: String(g.key || '').trim(), name: String(g.name || '').trim(), members: splitEmails(g.members) };
+    if (!/^[a-z0-9-]{1,40}$/i.test(group.key)) errors.push('group ' + (i + 1) + ' needs a key of letters, numbers and dashes');
+    if (!group.name) errors.push('group ' + (i + 1) + ' has no name');
+    c.groups.push(group);
+  });
   if (!/^[a-z0-9][a-z0-9-]{0,39}$/i.test(c.id)) errors.push('id must be letters, numbers and dashes (for example "c1")');
   if (!c.title) errors.push('title is empty');
   if (!parseLocalDate(c.startDate)) errors.push('startDate must look like 2026-10-20');
@@ -108,7 +127,7 @@ function normalizeCohort(raw) {
   if (!(c.minutes >= 15 && c.minutes <= 480)) errors.push('minutes must be between 15 and 480');
   if (!(c.sessions >= 1 && c.sessions <= 52 && Math.floor(c.sessions) === c.sessions)) errors.push('sessions must be a whole number from 1 to 52');
   if (!/^https:\/\//.test(c.sessionUrl)) errors.push('sessionUrl must start with https://');
-  c.members.concat(c.teachers).forEach(function (e) {
+  c.groups.reduce(function (all, g) { return all.concat(g.members); }, []).concat(c.members, c.teachers).filter(function (e, i, all) { return all.indexOf(e) === i; }).forEach(function (e) {
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)) errors.push('"' + e + '" is not an email address');
   });
   if (!errors.length) {
@@ -164,6 +183,44 @@ function buildEventResource(c, folderUrl) {
     guestsCanModify: false,
     extendedProperties: { private: { hsCohortId: c.id } },
   };
+}
+
+// A group's own room: the same weekly times as the cohort's event, with
+// the group's members and the teachers invited, so that they can join
+// without waiting to be let in while no host is there. Invited quietly
+// (setup sends no email for it), because the session page sends people
+// to their room when the group part starts.
+function buildGroupRoomResource(c, g) {
+  var guests = g.members.concat(c.teachers).filter(function (e, i, all) { return all.indexOf(e) === i; });
+  return {
+    summary: c.title + ', ' + g.name + ' room',
+    description: [
+      'The room for ' + g.name + ' during the group part of each session. The session page sends you here when the groups begin, and back to the main session afterward:',
+      c.sessionUrl,
+    ].join('\n'),
+    start: { dateTime: c.start, timeZone: c.timeZone },
+    end: { dateTime: c.end, timeZone: c.timeZone },
+    recurrence: [recurrenceRule(c)],
+    attendees: guests.map(function (email) { return { email: email }; }),
+    guestsCanSeeOtherGuests: false,
+    guestsCanInviteOthers: false,
+    guestsCanModify: false,
+    extendedProperties: { private: { hsCohortId: c.id, hsGroup: g.key } },
+  };
+}
+
+// What setup prints for the teacher to paste into each group on /teach/.
+function groupRoomLines(c, rooms) {
+  if (!c.groups.length) return '';
+  return ['Group rooms. On /teach/, paste each link into its group\'s "Its own Meet room":']
+    .concat(c.groups.map(function (g) { return '  ' + g.name + ': ' + (rooms[g.key] || '(no Meet link yet; run checkCohort in a minute)'); }))
+    .join('\n');
+}
+
+function meetLinkOf(event) {
+  var conf = (event && event.conferenceData) || {};
+  var video = (conf.entryPoints || []).filter(function (p) { return p.entryPointType === 'video'; })[0];
+  return video ? video.uri : null;
 }
 
 // want: emails that should have access; have: [{email, role, id, type}]
@@ -270,6 +327,7 @@ function previewCohort(idOrObject) {
     'Session page: ' + c.sessionUrl,
     saved_(c.id).eventId ? 'An event already exists; setupCohort would update it.' : 'setupCohort would create a new event with a Meet link.',
     saved_(c.id).folderId ? 'A folder already exists; setupCohort would sync its sharing.' : 'setupCohort would create a recordings folder and share it.',
+    c.groups.length ? 'Group rooms (' + c.groups.length + '): ' + c.groups.map(function (g) { return g.name + (saved_(c.id).groupEvents && saved_(c.id).groupEvents[g.key] ? ' (exists)' : ' (would be made)'); }).join(', ') : 'No groups, so no group rooms.',
   ];
   console.log(lines.join('\n'));
   return lines.join('\n');
@@ -362,10 +420,41 @@ function setupCohort(idOrObject) {
   }
   waitForMeet_(event.id);
 
+  var rooms = ensureGroupRooms_(c);
+  if (c.groups.length) console.log(groupRoomLines(c, rooms));
+
   var problems = syncFolderSharing_(c, folder.getId());
   if (problems.length) console.log('Sharing problems:\n' + problems.join('\n'));
   console.log('Paste this line into the recorder extension settings:\n' + extensionLine(c, folder.getId()));
   return checkCohort(c);
+}
+
+// One recurring event per group, each with its own Meet link, made once
+// and updated after that (saved by the group's key, so renaming a group
+// keeps its room). Returns { key: meet link }.
+function ensureGroupRooms_(c) {
+  var saved = saved_(c.id).groupEvents || {};
+  var rooms = {};
+  c.groups.forEach(function (g) {
+    var resource = buildGroupRoomResource(c, g);
+    var event = null;
+    if (saved[g.key]) {
+      try {
+        event = Calendar.Events.get('primary', saved[g.key]);
+        if (event.status === 'cancelled') event = null;
+      } catch (e) { event = null; }
+    }
+    if (event) {
+      event = Calendar.Events.patch(resource, 'primary', event.id, { sendUpdates: 'none', conferenceDataVersion: 1 });
+    } else {
+      resource.conferenceData = { createRequest: { requestId: 'hs-' + c.id + '-' + g.key + '-' + new Date().getTime(), conferenceSolutionKey: { type: 'hangoutsMeet' } } };
+      event = Calendar.Events.insert(resource, 'primary', { conferenceDataVersion: 1, sendUpdates: 'none' });
+      saved[g.key] = event.id;
+      save_(c.id, { groupEvents: saved });
+    }
+    rooms[g.key] = meetLinkOf(waitForMeet_(event.id));
+  });
+  return rooms;
 }
 
 function checkCohort(idOrObject) {
@@ -427,6 +516,20 @@ function checkCohort(idOrObject) {
     note('Replies so far: ' + Object.keys(counts).map(function (k) { return counts[k] + ' ' + k; }).join(', '));
     if (event.guestsCanSeeOtherGuests !== false) bad('Guests can see one another\'s email addresses on the invite.');
   }
+
+  // The group rooms
+  var groupEvents = s.groupEvents || {};
+  var rooms = {};
+  c.groups.forEach(function (g) {
+    if (!groupEvents[g.key]) { bad('No room made yet for ' + g.name + '. Run setupCohort("' + c.id + '").'); return; }
+    var ge = null;
+    try { ge = Calendar.Events.get('primary', groupEvents[g.key]); } catch (e) { bad('The room for ' + g.name + ' could not be found (' + e.message + ').'); return; }
+    var link = meetLinkOf(ge);
+    if (ge.status === 'cancelled') bad('The room for ' + g.name + ' was cancelled.');
+    else if (link) { ok(g.name + ' has its own room: ' + link); rooms[g.key] = link; }
+    else bad('The room for ' + g.name + ' has no Meet link yet.');
+  });
+  if (c.groups.length) note(groupRoomLines(c, rooms).split('\n').join('\n           '));
 
   // The folder
   var folder = null;

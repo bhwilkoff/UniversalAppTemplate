@@ -720,6 +720,137 @@ def main():
     su7.execute("select (select count(*) from public.live_queue where cohort_id = %s) + (select count(*) from public.live_checks where cohort_id = %s) + (select count(*) from public.live_answers where cohort_id = %s)", (live, live, live))
     check("when the cohort is finished, its queue, questions, and answers are deleted", su7.fetchone()[0] == 0)
 
+    # The teaching tools (migration 20261003100000): a room for each group,
+    # what the teacher heard, the builder's question, and ready or not yet.
+    # bea and eve are partners in one group, fay is a classmate in another,
+    # dee teaches elsewhere, and anon is the public.
+    ben = as_user("ben")
+    attempt(ben, "insert into public.cohorts (slug, title, created_by, status) values ('tools-test', 'Tools', %s, 'open') returning id", (people["ben"],))
+    tc = last_rows[0][0]
+    attempt(ben, "insert into public.sessions (cohort_id, number) values (%s, 1) returning id", (tc,))
+    t1 = last_rows[0][0]
+    for name in ["bea", "eve", "fay"]:
+        cur = as_user(name)
+        attempt(cur, "insert into public.enrollments (cohort_id, user_id) values (%s, %s)", (tc, people[name]))
+    ben = as_user("ben")
+    attempt(ben, "insert into public.groups (cohort_id, name) values (%s, 'Trio A') returning id", (tc,))
+    ga = last_rows[0][0]
+    attempt(ben, "insert into public.groups (cohort_id, name) values (%s, 'Trio B') returning id", (tc,))
+    gb = last_rows[0][0]
+    attempt(ben, "insert into public.group_members (group_id, user_id) values (%s, %s), (%s, %s), (%s, %s)",
+            (ga, people["bea"], ga, people["eve"], gb, people["fay"]))
+
+    check("a teacher can give a group its own Meet link",
+          attempt(ben, "update public.groups set meet_url = 'https://meet.google.com/aaa-bbbb-ccc' where id = %s returning id", (ga,)) and len(last_rows) == 1)
+    check("a group's Meet link must be https",
+          not attempt(ben, "update public.groups set meet_url = 'http://meet.google.com/aaa' where id = %s", (gb,)))
+    bea = as_user("bea")
+    bea.execute("update public.groups set meet_url = 'https://example.org/mine' where id = %s", (ga,))
+    check("a student cannot change their group's Meet link", bea.rowcount == 0)
+    bea.execute("select meet_url from public.groups where id = %s", (ga,))
+    check("a student reads their group's Meet link", bea.fetchone() == ("https://meet.google.com/aaa-bbbb-ccc",))
+    dee = as_user("dee")
+    dee.execute("select count(*) from public.groups where cohort_id = %s", (tc,))
+    check("someone outside the cohort sees none of its groups or rooms", dee.fetchone()[0] == 0)
+    anon = as_user(None)
+    anon.execute("select count(*) from public.groups")
+    check("the public sees no group rooms", anon.fetchone()[0] == 0)
+    ben_agent = as_agent("ben")
+    ben_agent.execute("update public.groups set meet_url = 'https://example.org/agent' where id = %s", (ga,))
+    check("a teacher's agent cannot change a group's Meet link", ben_agent.rowcount == 0)
+
+    ben = as_user("ben")
+    check("a teacher can write what they heard in a session's checks",
+          attempt(ben, "update public.sessions set heard = 'Most of you can name your one rule now. Next week starts with data.' where id = %s returning id", (t1,)) and len(last_rows) == 1)
+    bea = as_user("bea")
+    bea.execute("update public.sessions set heard = 'changed by a student' where id = %s", (t1,))
+    check("a student cannot write what the teacher heard", bea.rowcount == 0)
+    fay = as_user("fay")
+    fay.execute("select heard from public.sessions where id = %s", (t1,))
+    check("everyone in the cohort reads what the teacher heard", (fay.fetchone() or [""])[0].startswith("Most of you"))
+    dee = as_user("dee")
+    dee.execute("select count(*) from public.sessions where id = %s", (t1,))
+    check("someone outside the cohort cannot read what the teacher heard", dee.fetchone()[0] == 0)
+    ben_agent = as_agent("ben")
+    ben_agent.execute("update public.sessions set heard = 'from the agent' where id = %s", (t1,))
+    check("a teacher's agent cannot write what the teacher heard", ben_agent.rowcount == 0)
+
+    bea = as_user("bea")
+    check("a builder can bring something back with their question and a mark of ready",
+          attempt(bea, "insert into public.shares (cohort_id, user_id, kind, url, note, want_to_know, readiness) values (%s, %s, 'bring-back', 'https://bea.github.io/garden-swap', 'Round three', 'Does the list make sense without me there?', 'ready') returning id", (tc, people["bea"])))
+    bb = last_rows[0][0]
+    check("not yet must say what is missing",
+          not attempt(bea, "insert into public.shares (cohort_id, user_id, kind, note, readiness) values (%s, %s, 'bring-back', 'Round', 'not-yet')", (tc, people["bea"])))
+    check("not yet, with what is missing, is fine",
+          attempt(bea, "insert into public.shares (cohort_id, user_id, kind, note, readiness, missing) values (%s, %s, 'bring-back', 'Round', 'not-yet', 'Only one round from my phone so far.') returning id", (tc, people["bea"])))
+    bb_not_yet = last_rows[0][0]
+    check("only a bring-back carries a mark of ready",
+          not attempt(bea, "insert into public.shares (cohort_id, user_id, kind, note, readiness) values (%s, %s, 'for-feedback', 'Help', 'ready')", (tc, people["bea"])))
+    check("a mark is ready or not yet, and nothing else (never a score)",
+          not attempt(bea, "insert into public.shares (cohort_id, user_id, kind, note, readiness) values (%s, %s, 'bring-back', 'Round', '4')", (tc, people["bea"])))
+    eve = as_user("eve")
+    eve.execute("update public.shares set readiness = 'not-yet', missing = 'says eve' where id = %s", (bb,))
+    check("a partner cannot change the builder's own mark", eve.rowcount == 0)
+    agent = as_agent("bea")
+    agent.execute("update public.shares set want_to_know = 'from the agent' where id = %s", (bb,))
+    check("a builder's agent cannot write their question or their mark", agent.rowcount == 0)
+
+    agent = as_agent("eve")
+    check("a partner's agent cannot confirm for them",
+          not attempt(agent, "insert into public.share_confirmations (share_id, user_id, cohort_id) values (%s, %s, %s)", (bb, people["eve"], tc)))
+    bea = as_user("bea")
+    check("a builder cannot confirm their own bring-back",
+          not attempt(bea, "insert into public.share_confirmations (share_id, user_id, cohort_id) values (%s, %s, %s)", (bb, people["bea"], tc)))
+    fay = as_user("fay")
+    check("a classmate outside the builder's group cannot confirm it",
+          not attempt(fay, "insert into public.share_confirmations (share_id, user_id, cohort_id) values (%s, %s, %s)", (bb, people["fay"], tc)))
+    dee = as_user("dee")
+    check("someone outside the cohort cannot confirm",
+          not attempt(dee, "insert into public.share_confirmations (share_id, user_id, cohort_id) values (%s, %s, %s)", (bb, people["dee"], tc)))
+    eve = as_user("eve")
+    check("no one confirms a bring-back its builder marked not yet",
+          not attempt(eve, "insert into public.share_confirmations (share_id, user_id, cohort_id) values (%s, %s, %s)", (bb_not_yet, people["eve"], tc)))
+    check("no one confirms in someone else's name",
+          not attempt(eve, "insert into public.share_confirmations (share_id, user_id, cohort_id) values (%s, %s, %s)", (bb, people["fay"], tc)))
+    check("a partner can confirm they saw it working on a device",
+          attempt(eve, "insert into public.share_confirmations (share_id, user_id, cohort_id) values (%s, %s, %s)", (bb, people["eve"], tc)))
+    ben = as_user("ben")
+    check("a teacher of the cohort can confirm too",
+          attempt(ben, "insert into public.share_confirmations (share_id, user_id, cohort_id) values (%s, %s, %s)", (bb, people["ben"], tc)))
+    fay = as_user("fay")
+    fay.execute("select count(*) from public.share_confirmations where share_id = %s", (bb,))
+    check("the cohort sees who confirmed", fay.fetchone()[0] == 2)
+    dee = as_user("dee")
+    dee.execute("select count(*) from public.share_confirmations")
+    check("someone outside the cohort sees no confirmations", dee.fetchone()[0] == 0)
+    anon = as_user(None)
+    anon.execute("select count(*) from public.share_confirmations")
+    check("the public sees no confirmations", anon.fetchone()[0] == 0)
+    bea = as_user("bea")
+    bea.execute("delete from public.share_confirmations where share_id = %s and user_id = %s", (bb, people["eve"]))
+    check("a builder cannot remove a partner's confirmation", bea.rowcount == 0)
+    agent = as_agent("eve")
+    agent.execute("delete from public.share_confirmations where share_id = %s", (bb,))
+    check("a partner's agent cannot take a confirmation back", agent.rowcount == 0)
+    eve = as_user("eve")
+    eve.execute("delete from public.share_confirmations where share_id = %s and user_id = %s", (bb, people["eve"]))
+    check("a partner can take their own confirmation back", eve.rowcount == 1)
+    attempt(eve, "insert into public.share_confirmations (share_id, user_id, cohort_id) values (%s, %s, %s)", (bb, people["eve"], tc))
+    bea = as_user("bea")
+    check("redoing is free: a builder can change ready to not yet",
+          attempt(bea, "update public.shares set readiness = 'not-yet', missing = 'It breaks offline.' where id = %s returning id", (bb,)) and len(last_rows) == 1)
+    su8 = conn.cursor(); su8.execute("reset role")
+    su8.execute("select count(*) from public.share_confirmations where share_id = %s", (bb,))
+    check("changing the mark clears what partners confirmed, so they can look again", su8.fetchone()[0] == 0)
+    bea = as_user("bea")
+    attempt(bea, "update public.shares set readiness = 'ready', missing = null where id = %s", (bb,))
+    eve = as_user("eve")
+    attempt(eve, "insert into public.share_confirmations (share_id, user_id, cohort_id) values (%s, %s, %s)", (bb, people["eve"], tc))
+    eve.execute("select public.leave_cohort(%s)", (tc,))
+    su8 = conn.cursor(); su8.execute("reset role")
+    su8.execute("select count(*) from public.share_confirmations where user_id = %s", (people["eve"],))
+    check("when someone leaves, the confirmations they gave leave with them", su8.fetchone()[0] == 0)
+
     conn.rollback()
     conn.close()
     failed = [n for n, ok in results if not ok]

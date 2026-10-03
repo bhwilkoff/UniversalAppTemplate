@@ -84,7 +84,66 @@
 
   function counted(n, one, many) { return n + ' ' + (n === 1 ? one : many); }
 
-  var lib = { classifyLink: classifyLink, itemLabel: itemLabel, queue: queue, canManage: canManage, parseCheck: parseCheck, tally: tally, answerText: answerText, counted: counted };
+  // The two questions a teacher can ask at the close of every session,
+  // answered privately (the notes' 6.1 and 6.2, item 6; awaiting Ben's
+  // review). The teacher reads both before the next session.
+  var CLOSING_CHECKS = [
+    'What can you decide or judge about your app now that you could not last week?',
+    'What is still muddy?'
+  ];
+
+  // The trio protocol (the notes' 3.3 and 6.1: the Tuning protocol and
+  // Liz Lerman's Critical Response Process, in the course's own words):
+  // each builder's turn, in steps, with relative lengths that add up to
+  // eight. Data, so the steps can change in one place.
+  var TURN = [
+    { key: 'ask', name: 'Their question', weight: 1, what: 'The builder says, in a line, what they want to know.' },
+    { key: 'show', name: 'Show it, and one decision', weight: 3, what: 'On the real device, and then one decision explained with the agent closed.' },
+    { key: 'clarify', name: 'One clarifying question', weight: 1, what: 'Partners ask one question to understand it, not to judge it. “What did you give up?” is a good one.' },
+    { key: 'three', name: 'The three questions', weight: 2, what: 'Partners answer where it is going, how it is going, and what is next, while the builder listens.' },
+    { key: 'next', name: 'What comes next', weight: 1, what: 'The builder says what they will do next.' }
+  ];
+
+  // Each step's length in seconds, so that every builder in the group has
+  // a whole turn inside the part's minutes, rounded to quarter minutes and
+  // never under thirty seconds.
+  function turnSteps(partMinutes, builders) {
+    var n = Math.max(1, builders || 1);
+    var weights = TURN.reduce(function (s, t) { return s + t.weight; }, 0);
+    var unit = (partMinutes * 60) / (n * weights);
+    return TURN.map(function (t) {
+      return { key: t.key, name: t.name, what: t.what, seconds: Math.max(30, Math.round((t.weight * unit) / 15) * 15) };
+    });
+  }
+
+  // The order builders take their turns in a group: by name, moved along
+  // by one each week, so a different person goes first every session. It
+  // is the same order on every screen, and nobody's partners change.
+  function presentingOrder(people, week) {
+    var sorted = (people || []).slice().sort(function (a, b) {
+      return String(a.name).toLowerCase().localeCompare(String(b.name).toLowerCase()) || String(a.id).localeCompare(String(b.id));
+    });
+    if (!sorted.length) return sorted;
+    var k = ((Math.max(1, week || 1) - 1) % sorted.length + sorted.length) % sorted.length;
+    return sorted.slice(k).concat(sorted.slice(0, k));
+  }
+
+  // A builder's newest bring-back from a list already limited to this
+  // session's window.
+  function latestBringBack(shares, userId) {
+    return (shares || []).filter(function (s) { return s.user_id === userId && s.kind === 'bring-back'; })
+      .sort(function (a, b) { return b.created_at.localeCompare(a.created_at); })[0] || null;
+  }
+
+  function clock(seconds) {
+    var s = Math.max(0, Math.round(seconds));
+    return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+  }
+
+  var lib = {
+    classifyLink: classifyLink, itemLabel: itemLabel, queue: queue, canManage: canManage, parseCheck: parseCheck, tally: tally, answerText: answerText, counted: counted,
+    CLOSING_CHECKS: CLOSING_CHECKS, TURN: TURN, turnSteps: turnSteps, presentingOrder: presentingOrder, latestBringBack: latestBringBack, clock: clock
+  };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
   else root.LiveLib = lib;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

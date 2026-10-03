@@ -91,6 +91,16 @@
 
           <p class="notice small">Sessions are recorded so that anyone who misses one, or wants to come back to it, can watch it later. The host says so before the recording starts, and only the people in this cohort can see it.</p>
 
+          <!-- What this part of the session needs (M12): the teacher's
+               "what I heard" while people arrive, and each group's room and
+               turns during "Show what you brought back". Words by Claude,
+               awaiting Ben's review. -->
+          <section class="live-block live-now" aria-labelledby="now-title" data-now hidden>
+            <p class="kicker">Now</p>
+            <h2 id="now-title" data-now-title></h2>
+            <div data-now-body></div>
+          </section>
+
           <!-- The queue and checks for understanding (M3): copy awaiting Ben's review. -->
           <section class="live-block" aria-labelledby="queue-title">
             <h2 id="queue-title">Show your work</h2>
@@ -137,7 +147,7 @@
                 <textarea rows="4" data-ask-choices></textarea>
               </label>
               <label class="check"><input type="checkbox" data-ask-tally> Show everyone the count of answers as they come in</label>
-              <div class="actions"><button class="btn-quiet" type="submit">Ask the cohort</button><span class="small" data-ask-status role="status"></span></div>
+              <div class="actions"><button class="btn-quiet" type="submit">Ask the cohort</button><button class="btn-quiet" type="button" data-ask-closing>Ask the two closing questions</button><span class="small" data-ask-status role="status"></span></div>
             </form>
             <div class="live-checks" data-checks></div>
             <details class="live-earlier" data-earlier-wrap hidden>
@@ -149,6 +159,7 @@
 
           <section aria-labelledby="agenda-title">
             <h2 id="agenda-title">Today's agenda</h2>
+            <p class="small">Starting a part's timer tells this page which part the session is in, which matters when a session runs late.</p>
             <ol class="agenda" data-agenda></ol>
           </section>
 

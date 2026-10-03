@@ -51,7 +51,8 @@ test('the agenda fills exactly the session length', () => {
   }
 });
 test('a 75 minute session keeps the course shape', () => {
-  assert.deepEqual(lib.agenda(75).map(p => p.minutes), [5, 25, 7, 20, 15, 3]);
+  assert.deepEqual(lib.agenda(75).map(p => p.minutes), [7, 25, 6, 25, 12]);
+  assert.deepEqual(lib.agenda(75).map(p => p.key), ['arrive', 'show', 'value', 'prompt', 'start']);
 });
 test('each week points at its stages of the path', () => {
   assert.deepEqual(lib.stagesForWeek(1), ['00', '01']);
@@ -68,4 +69,51 @@ test('setup steps read their state from the hub, and the agent step is never mar
 });
 test('without a cohort team yet, there is no conversation step', () => {
   assert.ok(!lib.setupSteps({}, null, { github_team: null }).some((s) => s.key === 'talk'));
+});
+
+// The teaching tools (M12): which part of the session it is, each
+// stage's bar, and ready or not yet.
+test('the part of the session comes from the clock, and a started timer wins', () => {
+  const parts = lib.agenda(75);
+  const start = '2026-10-20T23:00:00Z';
+  const at = (min) => new Date(Date.parse(start) + min * 60000);
+  assert.equal(lib.partNow(parts, start, at(-30)).key, 'arrive');
+  assert.equal(lib.partNow(parts, start, at(-90)), null);
+  assert.equal(lib.partNow(parts, start, at(3)).key, 'arrive');
+  assert.equal(lib.partNow(parts, start, at(7)).key, 'show');
+  assert.equal(lib.partNow(parts, start, at(31.9)).key, 'show');
+  assert.equal(lib.partNow(parts, start, at(74)).key, 'start');
+  assert.equal(lib.partNow(parts, start, at(75)), null);
+  assert.equal(lib.partNow(parts, start, at(40), 'show').key, 'show');
+  assert.equal(lib.partNow(parts, null, at(0)), null);
+});
+test('a part list from elsewhere scales the same way', () => {
+  const a = lib.agenda(60, [{ key: 'x', name: 'X', minutes: 10, what: '' }, { key: 'y', name: 'Y', minutes: 20, what: '' }]);
+  assert.deepEqual(a.map(p => [p.key, p.start, p.minutes]), [['x', 0, 20], ['y', 20, 40]]);
+});
+test('a stage bar is the first sentence of its ready paragraph, in plain words', () => {
+  const md = 'Intro.\n\n**When you are ready to move on,** your app is live at a real address,\nit is full of `real` data, and [you](x.md) have sent two rounds. Stage 02 is next.\n\nBe ready to show it.';
+  assert.equal(lib.readyBar(md), 'When you are ready to move on, your app is live at a real address, it is full of real data, and you have sent two rounds.');
+  assert.equal(lib.readyBar('No bar here.'), null);
+  assert.equal(lib.stageFile('04'), 'docs/path/04-seeing-it-work.md');
+  assert.equal(lib.stageFile('99'), null);
+});
+test('ready or not yet reads as the builder wrote it, never as a score', () => {
+  assert.equal(lib.readinessText({ readiness: 'ready' }, true), 'You marked it ready to move on.');
+  assert.equal(lib.readinessText({ readiness: 'not-yet', missing: 'It breaks offline.' }, false), 'Not yet, by their own reading: It breaks offline.');
+  assert.equal(lib.readinessText({ readiness: null }, false), null);
+  assert.equal(lib.seenText(['Eve']), 'Seen working on a device by Eve.');
+  assert.equal(lib.seenText(['Eve', 'Ben', 'Fay']), 'Seen working on a device by Eve, Ben, and Fay.');
+  assert.equal(lib.seenText([]), null);
+});
+test('only a partner or a teacher confirms, and only what its builder marked ready', () => {
+  const groups = [{ group_members: [{ user_id: 'bea' }, { user_id: 'eve' }] }, { group_members: [{ user_id: 'fay' }] }];
+  assert.deepEqual(lib.partnersOf('eve', groups), ['bea']);
+  assert.deepEqual(lib.partnersOf('ben', groups), []);
+  const s = { kind: 'bring-back', readiness: 'ready', user_id: 'bea' };
+  assert.equal(lib.canConfirm(s, 'eve', ['bea'], false), true);
+  assert.equal(lib.canConfirm(s, 'fay', [], false), false);
+  assert.equal(lib.canConfirm(s, 'ben', [], true), true);
+  assert.equal(lib.canConfirm(s, 'bea', ['eve'], true), false);
+  assert.equal(lib.canConfirm({ ...s, readiness: 'not-yet' }, 'eve', ['bea'], false), false);
 });

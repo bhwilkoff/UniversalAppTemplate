@@ -45,6 +45,34 @@ The first session is the first `weekday` on or after `startDate`, at
 commas or new lines. Teachers are optional; they are invited too and get
 edit access to the folder so they can trim a recording.
 
+### A room for each group
+
+I want each group to show its work in a room of its own, and Meet on
+Workspace for Education Fundamentals (which we are likely on, though
+nobody has confirmed the edition yet) has no breakout rooms. So the
+setup that /teach/ copies can carry the cohort's groups:
+
+```json
+"groups": [
+  { "key": "g-1a2b3c4d", "name": "Trio A", "members": "a@example.org, b@example.org" }
+]
+```
+
+For each group, `setupCohort` makes one recurring event at the cohort's
+own times, with a Meet link, the group's members and the teachers
+invited (quietly, with no email, because the session page sends people
+to their room when the group part begins), and prints each room's link
+for the teacher to paste into that group on /teach/. The key is the
+start of the group's id, so renaming a group keeps its room. In a Sheet,
+put the same list as JSON in a `groups` column. `checkCohort` says
+whether every group has its room and link.
+
+**Not yet verified:** whether a group member on a personal Gmail account
+can join their room without being let in when nobody from
+humanshaped.org is there. Being invited on the event should let them
+in; test it with the Gmail account below before the first cohort, and if
+it does not, the fallback is pasting rooms made by hand on /teach/.
+
 ## What each function does
 
 The editor's Run button cannot pass an argument, so every function uses
