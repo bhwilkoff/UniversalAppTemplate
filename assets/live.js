@@ -112,6 +112,7 @@
             S.tools = !sh[2].error;
             S.confirmations = S.tools ? sh[2].data : [];
             draw(t.live, S.brought);
+            startSignals(teachers);
             return refreshLive().then(listen);
           });
         });
@@ -334,6 +335,31 @@
         drawBrought(S.brought);
         drawNow(true);
       });
+    });
+  }
+
+  // ------------------------------------------------------------------
+  // Live signals (C1): rooms, come back, a card, on stage, and recording
+  // now, drawn by LiveSignals from SignalsLib. Only teachers see the
+  // controls; the database lets only them send.
+  // ------------------------------------------------------------------
+
+  var signals = null;
+  function startSignals(teachers) {
+    if (signals || !window.LiveSignals) return;
+    var who = {};
+    S.people.concat(teachers).forEach(function (p) { who[p.user_id] = S.names[p.user_id] || 'Someone'; });
+    var people = Object.keys(who).map(function (id) { return { id: id, name: id === S.me.id ? who[id] + ' (you)' : who[id] }; })
+      .sort(function (a, b) { return a.name.toLowerCase().localeCompare(b.name.toLowerCase()); });
+    $('[data-sig-controls]').hidden = !S.teaching;
+    $('[data-sig-card-page]').href = '/card/?c=' + encodeURIComponent(S.cohort.slug);
+    signals = window.LiveSignals.start({
+      db: db, cohort: S.cohort, session: S.session, meId: S.me.id, teaching: S.teaching, groups: S.groups,
+      nameOf: nameOf, people: people, roomMinutes: partMinutes('show'),
+      mounts: {
+        recording: $('[data-sig-recording]'), where: $('[data-sig-where]'), card: $('[data-sig-card]'), stage: $('[data-sig-stage]'),
+        controls: S.teaching ? $('[data-sig-controls]') : null
+      }
     });
   }
 

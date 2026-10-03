@@ -178,3 +178,11 @@ test('saved cards come first in their own order, then defaults not already saved
   assert.equal(lib.presetLabel({ body: 'Break', minutes: 10 }), 'Break (10 min)');
   assert.equal(lib.presetLabel({ body: 'Hello', minutes: null }), 'Hello');
 });
+
+test('the live page and the card page read the same session', () => {
+  const a = { id: 'a' }, b = { id: 'b' };
+  assert.equal(lib.sessionFor({ live: true, next: b, current: a }), b);
+  assert.equal(lib.sessionFor({ live: false, next: b, current: a }), b);
+  assert.equal(lib.sessionFor({ live: false, next: null, current: a }), a);
+  assert.equal(lib.sessionFor({ live: false, next: null, current: null }), null);
+});

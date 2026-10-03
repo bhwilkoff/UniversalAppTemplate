@@ -89,7 +89,92 @@
             <div class="actions" data-top-actions></div>
           </header>
 
+          <!-- Live signals (C1): where everyone should be, the teacher's card,
+               who is on stage, and "recording now", sent from the teacher's
+               controls below. Words by Claude, awaiting Ben's review. -->
+          <div class="signal-recording" data-sig-recording hidden></div>
+          <section class="signal-where" aria-label="Where everyone should be" data-sig-where hidden></section>
+          <section class="signal-card" aria-label="A card from your teacher" data-sig-card hidden></section>
+          <section class="signal-stage" aria-label="Who is on stage" data-sig-stage hidden></section>
+
           <p class="notice small">Sessions are recorded so that anyone who misses one, or wants to come back to it, can watch it later. The host says so before the recording starts, and only the people in this cohort can see it.</p>
+
+          <section class="live-block signal-controls" aria-labelledby="sig-title" data-sig-controls hidden>
+            <h2 id="sig-title">What everyone sees</h2>
+            <p class="small">What you send here shows at once on every copy of this page in the cohort. To put it on everyone’s Meet screen too, open <a data-sig-card-page target="_blank" rel="noopener">the card page</a> and present that tab.</p>
+
+            <div class="signal-control">
+              <h3>Rooms</h3>
+              <div data-sig-rooms-idle>
+                <div class="inline-form">
+                  <label>Minutes in the rooms, if you want a clock
+                    <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" data-sig-rooms-minutes>
+                  </label>
+                </div>
+                <div class="actions"><button class="btn-quiet" type="button" data-sig-rooms-send>Send everyone to their rooms</button></div>
+                <div class="live-confirm" data-sig-rooms-ask hidden>
+                  <p data-sig-rooms-ask-text></p>
+                  <div class="actions"><button class="btn-quiet" type="button" data-sig-rooms-yes>Send them</button><button class="btn-quiet" type="button" data-sig-rooms-no>Not yet</button></div>
+                </div>
+              </div>
+              <div data-sig-rooms-live hidden>
+                <p class="signal-now" data-sig-rooms-now></p>
+                <div class="actions"><button class="btn-quiet" type="button" data-sig-rooms-back>Call everyone back now</button><button class="btn-quiet" type="button" data-sig-rooms-more>Five more minutes</button></div>
+              </div>
+              <div data-sig-back-live hidden>
+                <p class="signal-now">Everyone sees “Come back to the main room” for ten minutes.</p>
+                <div class="actions"><button class="btn-quiet" type="button" data-sig-back-clear>Take it down now</button></div>
+              </div>
+              <p class="small" role="status" data-sig-rooms-status></p>
+            </div>
+
+            <div class="signal-control">
+              <h3>A card</h3>
+              <div data-sig-card-live hidden>
+                <p class="signal-now" data-sig-card-now></p>
+                <div class="actions"><button class="btn-quiet" type="button" data-sig-card-clear>Take the card down</button></div>
+              </div>
+              <form class="inline-form" data-sig-card-form>
+                <label>The card’s words
+                  <textarea rows="2" maxlength="200" data-sig-card-words></textarea>
+                </label>
+                <label>Minutes to count down, if any
+                  <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" data-sig-card-minutes>
+                </label>
+                <div class="actions"><button class="btn-quiet" type="submit" data-sig-card-show>Show the card</button><button class="btn-quiet" type="button" data-sig-card-save hidden>Save it for next time</button></div>
+              </form>
+              <p class="small signal-presets-label">Saved cards, to fill in with one press</p>
+              <ul class="signal-presets" data-sig-presets></ul>
+              <p class="small" role="status" data-sig-card-status></p>
+            </div>
+
+            <div class="signal-control">
+              <h3>On stage</h3>
+              <div data-sig-stage-live hidden>
+                <p class="signal-now" data-sig-stage-now></p>
+                <div class="actions"><button class="btn-quiet" type="button" data-sig-stage-clear>Clear the stage</button></div>
+              </div>
+              <div class="inline-form">
+                <label>Presenting <select data-sig-stage-pick></select></label>
+                <label>Responding <select data-sig-stage-pick></select></label>
+                <label>Also responding <select data-sig-stage-pick></select></label>
+              </div>
+              <div class="actions"><button class="btn-quiet" type="button" data-sig-stage-send>Put them on stage</button></div>
+              <p class="small">Then pin the same people for everyone in Meet: open the menu on each person’s tile and choose “Pin for everyone.” Meet pins up to three tiles, and only people on a computer see them.</p>
+              <p class="small" role="status" data-sig-stage-status></p>
+            </div>
+
+            <div class="signal-control">
+              <h3>Recording</h3>
+              <p class="small">This only shows everyone a notice. The recorder runs on your own computer, so say aloud that you are starting it, and come back here when it stops.</p>
+              <div class="actions"><button class="btn-quiet" type="button" data-sig-rec-on>Tell everyone we are recording</button></div>
+              <div data-sig-rec-live hidden>
+                <p class="signal-now">Everyone sees that you are recording.</p>
+                <div class="actions"><button class="btn-quiet" type="button" data-sig-rec-off>The recording has stopped</button></div>
+              </div>
+              <p class="small" role="status" data-sig-rec-status></p>
+            </div>
+          </section>
 
           <!-- What this part of the session needs (M12): the teacher's
                "what I heard" while people arrive, and each group's room and
@@ -181,6 +266,8 @@
   <script src="/assets/hub-config.js" defer></script>
   <script src="/assets/cohort-lib.js" defer></script>
   <script src="/assets/live-lib.js" defer></script>
+  <script src="/assets/signals-lib.js" defer></script>
+  <script src="/assets/signals.js" defer></script>
   <script src="/assets/discussions-lib.js" defer></script>
   <script src="/assets/discussions.js" defer></script>
   <script src="/assets/live.js" defer></script>

@@ -215,12 +215,20 @@
 
   function presetLabel(p) { return p.body + (p.minutes ? ' (' + p.minutes + ' min)' : ''); }
 
+  // Which session a page is about, from CohortLib.currentAndNext's answer:
+  // the one happening now, or else the next one, or else the latest. The
+  // same rule on /live/ and /card/, so both read the same signals.
+  function sessionFor(t) {
+    if (!t) return null;
+    return t.live ? t.next : (t.next || t.current || null);
+  }
+
   var lib = {
     STALE_MS: STALE_MS, BACK_FOR_MS: BACK_FOR_MS, WARN_S: WARN_S, POLL_MS: POLL_MS, DEFAULT_CARDS: DEFAULT_CARDS,
     state: state, countdown: countdown, clock: clock, where: where, screen: screen, nextTick: nextTick,
     roomsFor: roomsFor, stageRoles: stageRoles, stageText: stageText, stagePeople: stagePeople, list: list,
     parseMinutes: parseMinutes, parseCard: parseCard, endsAt: endsAt, extend: extend,
-    presets: presets, isSaved: isSaved, presetLabel: presetLabel
+    presets: presets, isSaved: isSaved, presetLabel: presetLabel, sessionFor: sessionFor
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
   else root.SignalsLib = lib;
