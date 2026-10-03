@@ -33,6 +33,10 @@
     })();
   </script>
   <script src="/assets/site.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" defer></script>
+  <script src="/assets/hub-config.js" defer></script>
+  <script src="/assets/teach-lib.js" defer></script>
+  <script src="/assets/cohorts.js" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to the page</a>
@@ -54,7 +58,7 @@
         <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
           <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#moon"/></svg>
         </button>
-        <a class="btn-github small" href="/cohorts/#join">
+        <a class="btn-github small" href="/account/">
           <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>
           <span>Sign in<span class="long"> with GitHub</span></span>
         </a>
@@ -154,7 +158,9 @@
       <div class="wrap">
         <h2 id="join-title">Joining a cohort starts with GitHub.</h2>
         <div class="prose">
-          <p>Signing in to a cohort uses your GitHub account, because that is where your app will live and where your cohort will talk, and sign-in opens along with the first cohort. Its dates will be posted on this page.</p>
+          <p data-none-open>Signing in to a cohort uses your GitHub account, because that is where your app will live and where your cohort will talk, and sign-in opens along with the first cohort. Its dates will be posted on this page.</p>
+          <p data-some-open hidden>Joining uses your GitHub account, because that is where your app will live and where your cohort will talk. Choose a cohort below, sign in with GitHub, and you will be asked once more before you join.</p>
+          <div class="open-cohorts" data-open-list hidden></div>
           <p class="small">If you do not have a GitHub account yet, it is free, and it is the first thing you will need either way.</p>
           <div class="actions">
             <a class="btn-github" href="https://github.com/signup"><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Create a GitHub account</a>

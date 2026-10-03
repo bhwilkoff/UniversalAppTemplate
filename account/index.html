@@ -55,7 +55,7 @@
         <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
           <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#moon"/></svg>
         </button>
-        <a class="btn-github small" href="/cohorts/#join">
+        <a class="btn-github small" href="/account/">
           <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>
           <span>Sign in<span class="long"> with GitHub</span></span>
         </a>
@@ -97,6 +97,8 @@
             </div>
           </div>
 
+          <p class="teach-link" data-teach-link hidden>You teach here. <a href="/teach/">Run your cohorts and answer what is waiting for you</a>.</p>
+
           <h2>Your cohorts</h2>
           <div data-my-cohorts></div>
 
@@ -137,6 +139,7 @@
   </main>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" defer></script>
   <script src="/assets/hub-config.js" defer></script>
+  <script src="/assets/teach-lib.js" defer></script>
   <script src="/assets/hub.js" defer></script>
 
   <footer class="site-footer">

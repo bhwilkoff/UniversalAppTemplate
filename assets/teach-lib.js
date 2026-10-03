@@ -81,7 +81,31 @@
     }).sort(function (a, b) { return a.created_at.localeCompare(b.created_at); });
   }
 
-  var lib = { zonedToUtc: zonedToUtc, sessionDates: sessionDates, sessionRows: sessionRows, meetSetup: meetSetup, waitingForFeedback: waitingForFeedback, WEEKDAYS: WEEKDAYS };
+  // A cohort's weekly session in words, in the cohort's own time zone,
+  // and in the reader's when that is a different clock time:
+  // "Tuesdays at 5:00 PM MDT, for 75 minutes (7:00 PM EDT where you are)."
+  var DAY_NAMES = ['Sundays', 'Mondays', 'Tuesdays', 'Wednesdays', 'Thursdays', 'Fridays', 'Saturdays'];
+  function scheduleText(c, viewerZone, locale) {
+    if (c.session_weekday == null || !c.session_time) return 'The weekly session time is still to come.';
+    var day = c.starts_on || new Date().toISOString().slice(0, 10);
+    var at = zonedToUtc(day, c.session_time.slice(0, 5), c.time_zone);
+    function clock(zone) {
+      return new Intl.DateTimeFormat(locale, { timeZone: zone, hour: 'numeric', minute: '2-digit', timeZoneName: 'short' }).format(at);
+    }
+    var theirs = clock(c.time_zone);
+    var text = DAY_NAMES[c.session_weekday] + ' at ' + theirs + ', for ' + c.session_minutes + ' minutes';
+    if (viewerZone && viewerZone !== c.time_zone) {
+      var yours = clock(viewerZone);
+      var sameDay = new Intl.DateTimeFormat('en-US', { timeZone: viewerZone, weekday: 'long' }).format(at) ===
+        new Intl.DateTimeFormat('en-US', { timeZone: c.time_zone, weekday: 'long' }).format(at);
+      if (yours !== theirs) {
+        text += ' (' + (sameDay ? '' : new Intl.DateTimeFormat(locale, { timeZone: viewerZone, weekday: 'long' }).format(at) + 's at ') + yours + ' where you are)';
+      }
+    }
+    return text + '.';
+  }
+
+  var lib = { zonedToUtc: zonedToUtc, sessionDates: sessionDates, sessionRows: sessionRows, meetSetup: meetSetup, waitingForFeedback: waitingForFeedback, scheduleText: scheduleText, WEEKDAYS: WEEKDAYS };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
   else root.TeachLib = lib;
 })(this);

@@ -32,6 +32,9 @@
   // GitHub sends people back here with an error in the address when
   // something goes wrong (for example, if sign-in is not switched on).
   var params = new URLSearchParams(location.search + '&' + location.hash.replace(/^#/, ''));
+  // The cohorts page sends people here with ?join=<slug> for the cohort
+  // they chose; they still click Join themselves.
+  var joining = params.get('join');
   var arrivalError = params.get('error_description')
     ? 'GitHub sign-in did not finish: ' + params.get('error_description') + '. Nothing was saved.'
     : null;
@@ -39,11 +42,11 @@
   root.querySelector('[data-sign-in]').addEventListener('click', function () {
     db.auth.signInWithOAuth({
       provider: 'github',
-      options: { redirectTo: location.origin + '/account/' }
+      options: { redirectTo: location.origin + '/account/' + (joining ? '?join=' + encodeURIComponent(joining) : '') }
     }).then(function (r) { if (r.error) fail(r.error.message); });
   });
   root.querySelector('[data-retry]').addEventListener('click', function () {
-    history.replaceState(null, '', '/account/');
+    history.replaceState(null, '', '/account/' + (joining ? '?join=' + encodeURIComponent(joining) : ''));
     arrivalError = null;
     load();
   });
@@ -80,6 +83,7 @@
     card.appendChild(el('h3', null, c.title));
     var weeks = c.weeks + ' weeks';
     card.appendChild(el('p', 'small', when(c.starts_on) + ', ' + weeks + '.'));
+    if (window.TeachLib) card.appendChild(el('p', 'small', window.TeachLib.scheduleText(c, Intl.DateTimeFormat().resolvedOptions().timeZone)));
     if (c.description) card.appendChild(el('p', null, c.description));
     var actions = el('div', 'actions');
     if (mine) {
@@ -99,6 +103,8 @@
           return db.from('enrollments').insert({ cohort_id: c.id, user_id: u.data.user.id });
         }).then(function (r) {
           if (r.error) { join.disabled = false; return fail('You could not join just now: ' + r.error.message); }
+          joining = null;
+          history.replaceState(null, '', '/account/');
           load();
         });
       });
@@ -119,8 +125,9 @@
       var uid = session.user.id;
       return Promise.all([
         db.from('profiles').select('github_login, display_name, avatar_url').eq('id', uid).single(),
-        db.from('enrollments').select('status, cohorts(id, slug, title, starts_on, weeks, description, status)').eq('user_id', uid).neq('status', 'left'),
-        db.from('cohorts').select('id, title, starts_on, weeks, description, status').eq('status', 'open').order('starts_on')
+        db.from('enrollments').select('status, cohorts(id, slug, title, starts_on, weeks, description, status, session_weekday, session_time, session_minutes, time_zone)').eq('user_id', uid).neq('status', 'left'),
+        db.from('cohorts').select('id, slug, title, starts_on, weeks, description, status, session_weekday, session_time, session_minutes, time_zone').eq('status', 'open').order('starts_on'),
+        db.from('teachers').select('user_id').eq('user_id', uid).maybeSingle()
       ]).then(function (res) {
         var bad = res.filter(function (r) { return r.error; })[0];
         if (bad) return fail('Your account could not be loaded just now: ' + bad.error.message);
@@ -143,7 +150,24 @@
         var openBox = root.querySelector('[data-open-cohorts]');
         openBox.replaceChildren();
         if (!open.length) openBox.appendChild(el('p', 'small', 'No cohort is open for sign-up right now. When one opens, it will be here, and on the cohorts page.'));
-        open.forEach(function (c) { openBox.appendChild(cohortCard(c, false)); });
+        var chosen = joining && open.filter(function (c) { return c.slug === joining; })[0];
+        if (chosen) {
+          open = [chosen].concat(open.filter(function (c) { return c !== chosen; }));
+        } else if (joining && mine.some(function (c) { return c.slug === joining; })) {
+          myBox.prepend(el('p', 'small', 'You are already in this cohort.'));
+        } else if (joining) {
+          openBox.appendChild(el('p', 'small', 'The cohort you chose is not open for sign-up any more.'));
+        }
+        open.forEach(function (c) {
+          var card = cohortCard(c, false);
+          if (c === chosen) {
+            card.classList.add('chosen');
+            card.insertBefore(el('p', 'kicker', 'The cohort you chose'), card.firstChild);
+            card.querySelector('button').className = 'btn-github';
+          }
+          openBox.appendChild(card);
+        });
+        root.querySelector('[data-teach-link]').hidden = !res[3].data;
         show('signed-in');
       });
     }).catch(function (err) {

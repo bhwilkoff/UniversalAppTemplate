@@ -50,3 +50,17 @@ test('feedback from any teacher of the cohort answers a request', () => {
   const shares = [{ id: 'a', cohort_id: 'c2', kind: 'for-feedback', created_at: '2026-10-08T10:00:00Z', feedback: [{ author_id: 'ana' }] }];
   assert.deepEqual(lib.waitingForFeedback(shares, { c2: ['ben', 'ana'] }), []);
 });
+
+const C = { session_weekday: 2, session_time: '17:00:00', session_minutes: 75, time_zone: 'America/Denver', starts_on: '2026-10-06' };
+test('a schedule reads in the cohort time zone', () => {
+  assert.equal(lib.scheduleText(C, 'America/Denver', 'en-US'), 'Tuesdays at 5:00 PM MDT, for 75 minutes.');
+});
+test('a schedule adds the reader clock time when it differs', () => {
+  assert.equal(lib.scheduleText(C, 'America/New_York', 'en-US'), 'Tuesdays at 5:00 PM MDT, for 75 minutes (7:00 PM EDT where you are).');
+});
+test('a schedule names the reader day when the session crosses midnight for them', () => {
+  assert.equal(lib.scheduleText(C, 'Europe/Berlin', 'en-US'), 'Tuesdays at 5:00 PM MDT, for 75 minutes (Wednesdays at 1:00 AM GMT+2 where you are).');
+});
+test('a schedule without a day or time says so', () => {
+  assert.equal(lib.scheduleText({ session_minutes: 75, time_zone: 'UTC' }), 'The weekly session time is still to come.');
+});

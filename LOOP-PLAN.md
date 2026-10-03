@@ -252,6 +252,19 @@ and waits on one real sign-in.
   Not yet verified against the real database. Research for core item 2
   (cohort conversation) is running.
 
+- 2026-10-03, core item 5 (joining from the front door). /cohorts/
+  reads open cohorts from the hub (anyone may read non-draft cohorts) and
+  lists each with its dates, places, and weekly time in the cohort's
+  zone and the reader's own (TeachLib.scheduleText, 4 new tests, 29 in
+  all, including a session that falls on the next day for the reader).
+  "Join with GitHub" goes to /account/?join=<slug>, which carries the
+  choice through GitHub sign-in, puts that cohort first, and still asks
+  the person to click Join. /account/ now tells a teacher where /teach/
+  is. Since Ben's real sign-in worked, the header's "Sign in with
+  GitHub" on all 25 pages now goes to /account/. Verified against a
+  stand-in database at 375px and 430px. Not yet verified for real: a
+  real open cohort (the test cohort stays a draft).
+
 ## Where to pick up
 
 1. Ask whether Ben has signed in at humanshaped.org/account/ (the

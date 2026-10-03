@@ -604,3 +604,13 @@ label.check { display: flex; gap: 0.5rem; align-items: center; font-weight: 400;
 /* The feedback queue on /teach/ */
 .queue { margin-bottom: 3rem; }
 .queue .cohort-card .small { margin: 0 0 0.5rem; }
+
+/* Open cohorts on /cohorts/, and the chosen one on /account/ */
+.open-cohorts { display: grid; gap: 1rem; margin: 1.5rem 0; }
+.open-cohort { border: 1px solid var(--band-muted); border-radius: var(--radius); padding: 1.25rem; }
+.open-cohort h3 { margin: 0 0 0.35rem; font-size: 1.25rem; }
+.open-cohort p { margin: 0 0 0.5rem; }
+.band .open-cohort p.small { color: var(--band-muted); }
+.open-cohort .actions { margin-top: 1rem; }
+.cohort-card.chosen { border-color: var(--clay); border-width: 2px; }
+.teach-link { margin: 1.5rem 0 0; }

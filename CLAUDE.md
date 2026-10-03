@@ -89,8 +89,9 @@ as Ben's without his review, $0 to run.
   DOMPurify. Links to other path files become this site's URLs; links
   to anything else in the repository go to GitHub. To give another
   template file a page here, add it to the `SITE` map in `render.js`.
-- "Sign in with GitHub" links to `/cohorts/#join` until sign-in is
-  built.
+- The header's "Sign in with GitHub" goes to `/account/` on every page.
+  The home page's own sign-in buttons go to `/cohorts/#join`, where a
+  person chooses a cohort first.
 - Mobile-first, `min-width` media queries, test at 375px before 1440px.
 - Accessible contrast: text on the orange `--color-primary` is dark.
 
@@ -117,13 +118,14 @@ what waits on Ben.
   script setup), `/cohort/?c=<slug>` (this week, next session, group,
   your app, classmates' apps with live GitHub commits, bring-backs and
   feedback), `/live/?c=<slug>` (the page beside Google Meet: agenda with
-  timers, this week's stages, what people brought back). None are in the
-  header yet: header "Sign in with GitHub" buttons still go to
-  `/cohorts/#join` until a real sign-in has been tested end to end.
+  timers, this week's stages, what people brought back). `/cohorts/`
+  lists open cohorts from the database, and its "Join with GitHub" goes
+  to `/account/?join=<slug>`, where the person confirms. /teach/ opens
+  with the feedback queue.
 - **Scripts:** `assets/hub-config.js` (public URL and publishable key),
-  `hub.js`, `teach.js` with `teach-lib.js`, `cohort.js` and `live.js`
+  `hub.js`, `cohorts.js`, `teach.js` with `teach-lib.js`, `cohort.js` and `live.js`
   with `cohort-lib.js`. Pure logic lives in the `-lib.js` files with
-  tests in `tools/test/` (`node --test tools/test/*.mjs`, 25 tests).
+  tests in `tools/test/` (`node --test tools/test/*.mjs`, 29 tests).
 - **Students own their work.** Repositories and commits are read live
   from GitHub, never copied. The database holds membership, sessions,
   groups, what people choose to share, feedback, calendar emails (only
