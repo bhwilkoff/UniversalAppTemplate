@@ -187,7 +187,7 @@
     Promise.all([
       db.from('cohorts').select('*').eq('id', id).single(),
       db.from('sessions').select('*').eq('cohort_id', id).order('number'),
-      db.from('enrollments').select('user_id, role, status, app_name, app_repo, app_url, profiles(github_login, display_name)').eq('cohort_id', id),
+      db.from('enrollments').select('user_id, role, status, app_name, app_repo, app_url, app_public, profiles(github_login, display_name)').eq('cohort_id', id),
       db.from('groups').select('id, name, expectations, group_members(user_id)').eq('cohort_id', id).order('name'),
       db.from('github_access').select('state').eq('cohort_id', id).eq('user_id', me.id).maybeSingle(),
       db.from('credentials').select('*').eq('cohort_id', id)
@@ -204,6 +204,7 @@
       say('[data-detail-message]', '');
       drawSessions(res[1].data);
       drawRoster(res[2].data, res[3].data);
+      loadSubmissions(res[2].data, res[1].data);
       drawGroups(res[3].data, res[2].data);
       drawCohortSetup(res[1].data, res[4].data);
       drawCredentials(res[2].data, res[5]);
@@ -334,6 +335,133 @@
       ul.appendChild(li);
     });
     box.appendChild(ul);
+  }
+
+  // ---- their apps on humanshaped.org --------------------------------
+  // Who has submitted (their own "it is ready", with a repository and a
+  // live address), and, as the cohort nears its end, who has not yet, by
+  // name, for the cohort's teachers alone (SubmitLib). A teacher can keep
+  // a submitted app off /apps/ with a reason the student reads, and show
+  // it again; the student's own switch is never touched. Before app_hides
+  // exists, the lists still draw, without the hide controls.
+  function loadSubmissions(people, sessions) {
+    var box = $('[data-submissions]');
+    box.replaceChildren();
+    say('[data-submissions-intro]', '');
+    if (!window.SubmitLib) return;
+    db.from('app_hides').select('user_id, reason, hidden_at').eq('cohort_id', current.id).then(function (r) {
+      drawSubmissions(people, sessions, r.error ? null : r.data);
+    });
+  }
+
+  function drawSubmissions(people, sessions, hides) {
+    var S = window.SubmitLib;
+    var box = $('[data-submissions]');
+    box.replaceChildren();
+    var win = S.submissionWindow(current, sessions, new Date());
+    var view = S.teacherView(people, hides || []);
+    var opens = win.opensAt ? new Date(win.opensAt).toLocaleDateString(undefined, { timeZone: current.time_zone, month: 'long', day: 'numeric' }) : null;
+    say('[data-submissions-intro]', win.open
+      ? 'An app goes up on humanshaped.org/apps/ when its builder says it is ready, and every app in the cohort is up by the time the cohort ends. Who has not submitted yet is listed here for you alone, so that you can reach out.'
+      : 'An app goes up on humanshaped.org/apps/ when its builder says it is ready, and every app in the cohort is up by the time the cohort ends. ' +
+        (opens ? 'From ' + opens + ', a week before the last session,' : 'A week before the last session,') +
+        ' this also lists who has not submitted yet, for you alone, so that you can reach out.');
+    if (!view.submitted.length && !view.notYet.length) { box.appendChild(el('p', 'small', 'Apps appear here once people join.')); return; }
+
+    if (view.submitted.length) {
+      box.appendChild(el('p', 'kicker', 'Submitted'));
+      var ul = el('ul', 'submissions');
+      view.submitted.forEach(function (row) { ul.appendChild(submissionItem(row, hides, true)); });
+      box.appendChild(ul);
+    } else {
+      box.appendChild(el('p', 'small', 'No one has said their app is ready yet.'));
+    }
+
+    // Not yet: everyone, once the window is open; before then, only an
+    // app that a teacher has hidden, so the hide can still be lifted.
+    var notYet = win.open ? view.notYet : view.notYet.filter(function (row) { return row.hide; });
+    if (notYet.length) {
+      box.appendChild(el('p', 'kicker', win.open ? 'Not submitted yet' : 'Hidden, and not submitted'));
+      var ul2 = el('ul', 'submissions');
+      notYet.forEach(function (row) { ul2.appendChild(submissionItem(row, hides, false)); });
+      box.appendChild(ul2);
+    }
+  }
+
+  function submissionItem(row, hides, submitted) {
+    var S = window.SubmitLib;
+    var p = row.person;
+    var li = el('li', 'submission');
+    var who = el('p', 'who-line');
+    who.appendChild(document.createTextNode(personName(p)));
+    if (p.app_repo) {
+      who.appendChild(document.createTextNode(', '));
+      var a = el('a', null, p.app_name || p.app_repo); a.href = 'https://github.com/' + p.app_repo;
+      who.appendChild(a);
+    }
+    li.appendChild(who);
+    var status = el('p', 'small');
+    if (!submitted) status.textContent = 'Still needs ' + S.missingText(row.missing, 'teacher') + '.';
+    else if (!row.hide) status.textContent = 'Shown on humanshaped.org/apps/.';
+    if (status.textContent) li.appendChild(status);
+    if (row.hide) {
+      var hid = el('p', 'small');
+      hid.textContent = 'Kept off humanshaped.org/apps/' + (row.hide.reason ? ', with the reason they read: \u201c' + row.hide.reason + '\u201d' : ', with no reason given.');
+      li.appendChild(hid);
+    }
+    if (!hides) return li;   // the hide is not in this database yet
+    var msg = el('p', 'small');
+    var actions = el('div', 'actions');
+    li.appendChild(actions);
+
+    if (row.hide) {
+      var showBtn = el('button', 'btn-quiet', 'Show it again'); showBtn.type = 'button';
+      actions.appendChild(showBtn);
+      li.appendChild(msg);
+      showBtn.addEventListener('click', function () {
+        if (!showBtn.hasAttribute('data-armed')) {
+          showBtn.setAttribute('data-armed', '');
+          showBtn.textContent = 'Show it again, for anyone to see';
+          msg.textContent = submitted
+            ? 'It goes back on humanshaped.org/apps/ and the feed. Click again to show it.'
+            : 'It goes back on humanshaped.org/apps/ once its builder says it is ready. Click again to lift the hide.';
+          return;
+        }
+        showBtn.disabled = true;
+        db.from('app_hides').delete().eq('cohort_id', current.id).eq('user_id', p.user_id).select('user_id').then(function (r) {
+          showBtn.disabled = false;
+          if (r.error || !r.data.length) { msg.textContent = 'It was not changed: ' + (r.error ? r.error.message : 'the database refused') + '.'; return; }
+          openCohort(current.id);
+        });
+      });
+      return li;
+    }
+    if (!submitted) { li.removeChild(actions); return li; }
+
+    var hideBtn = el('button', 'btn-quiet', 'Keep it off /apps/'); hideBtn.type = 'button';
+    actions.appendChild(hideBtn);
+    var f = el('form', 'inline-form'); f.hidden = true;
+    var l = el('label', null, 'Why, in a sentence they will read (you may leave it empty)');
+    var input = el('input'); input.maxLength = 500;
+    l.appendChild(input); f.appendChild(l);
+    f.appendChild(el('p', 'small', 'It stays on the cohort’s own pages for everyone in the cohort, and their own word that it is ready stays as it is.'));
+    var go = el('button', 'btn-quiet', 'Keep it off /apps/ now'); go.type = 'submit';
+    var cancel = el('button', 'btn-quiet', 'Leave it shown'); cancel.type = 'button';
+    var fa = el('div', 'actions'); fa.appendChild(go); fa.appendChild(cancel); f.appendChild(fa);
+    li.appendChild(f);
+    li.appendChild(msg);
+    hideBtn.addEventListener('click', function () { actions.hidden = true; f.hidden = false; input.focus(); });
+    cancel.addEventListener('click', function () { f.hidden = true; actions.hidden = false; msg.textContent = ''; });
+    f.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      go.disabled = true;
+      db.from('app_hides').insert({ cohort_id: current.id, user_id: p.user_id, hidden_by: me.id, reason: input.value.trim() || null }).then(function (r) {
+        go.disabled = false;
+        if (r.error) { msg.textContent = 'It was not hidden: ' + r.error.message; return; }
+        openCohort(current.id);
+      });
+    });
+    return li;
   }
 
   function drawGroups(groups, people) {

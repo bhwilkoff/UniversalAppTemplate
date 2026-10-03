@@ -991,3 +991,20 @@ button.talk-title[aria-expanded="true"]::before { transform: rotate(90deg); }
   body.kit-print .card-sheet .card:first-child { padding-top: 0; }
 }
 .card-sheet .fill li.big { min-height: 15cqi; }
+
+/* ------------------------------------------------------------------
+   Submitting an app (M10): the note on /cohort/ as the cohort nears
+   its end, the teacher's hide shown to the student, and the apps list
+   with its hide and show controls on /teach/
+   ------------------------------------------------------------------ */
+.submit-note, .app-hidden-note { margin: 0.5rem 0 1.25rem; }
+.app-hidden-note p { margin: 0; }
+.app-hidden-note p + p { margin-top: 0.5rem; color: var(--muted); }
+.submissions { list-style: none; margin: 0 0 1.5rem; padding: 0; border-top: 1px solid var(--rule); }
+.submission { padding: 0.8rem 0; border-bottom: 1px solid var(--rule); }
+.submission .who-line { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
+.submission .small { margin: 0.25rem 0 0; color: var(--muted); }
+.submission .actions { margin-top: 0.5rem; }
+.submission .inline-form { margin-top: 0.75rem; }
+.submission .inline-form .small { margin: 0; }
+[data-submissions] > .kicker { margin: 1rem 0 0.5rem; font-size: 0.95rem; }

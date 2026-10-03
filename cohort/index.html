@@ -121,13 +121,20 @@
 
           <section aria-labelledby="mine-title">
             <h2 id="mine-title">Your app</h2>
+            <!-- The words about submitting and hiding were written by Claude
+                 for milestone M10 and await Ben's review. -->
+            <p class="notice submit-note" data-submit-note hidden></p>
+            <div class="notice app-hidden-note" data-app-hidden hidden>
+              <p>Your teacher has kept your app off humanshaped.org/apps/ for now. It is still part of this cohort, everyone here still sees it on this page, and your own word that it is ready still stands.</p>
+              <p data-app-hidden-reason hidden></p>
+            </div>
             <form class="cohort-form inline-form" data-my-app>
               <label>Its name <input name="app_name" maxlength="80"></label>
               <label>Its repository on GitHub <input name="app_repo" placeholder="you/your-app" maxlength="140"><span class="hint">Your classmates see your repository and its latest commits, read straight from GitHub.</span></label>
               <label>Where people can use it <input name="app_url" type="url" placeholder="https://" maxlength="300"></label>
               <div class="public-choice" data-app-public-wrap hidden>
-                <label class="check"><input type="checkbox" name="app_public"> Show my app on humanshaped.org/apps/, for anyone to see</label>
-                <p class="hint">This shows its name, its repository (which names your GitHub account), and where people can use it, and nothing about you or this cohort. You can turn it off whenever you like, and leaving the cohort turns it off.</p>
+                <label class="check"><input type="checkbox" name="app_public"> My app is ready, so show it on humanshaped.org/apps/ for anyone to see</label>
+                <p class="hint">Every app in the cohort goes up by the time the cohort ends, and this is where you say yours is ready. It shows the app&rsquo;s name, its repository (which names your GitHub account), and where people can use it, and nothing about you or this cohort. You can turn it off again, and leaving the cohort turns it off.</p>
               </div>
               <label>An email for calendar invitations, if you want them <input name="email" type="email" maxlength="254"><span class="hint">Only you and your teacher can see it, and it is removed when you leave.</span></label>
               <div class="actions"><button class="btn-quiet" type="submit">Save</button><span class="small" data-my-app-message></span></div>
@@ -163,6 +170,7 @@
   <script src="/assets/hub-config.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.4.16/purify.min.js" integrity="sha512-flQmhkXNRQ3iUfvtdCobtpMjCb6kE+zLnTiAulAQJ3WykVfy84JvCMOo6vhwWXHTXjR25h9Zj+LyGFRWKjRoag==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
   <script src="/assets/cohort-lib.js" defer></script>
+  <script src="/assets/submit-lib.js" defer></script>
   <script src="/assets/discussions-lib.js" defer></script>
   <script src="/assets/discussions.js" defer></script>
   <script src="/assets/cohort.js" defer></script>

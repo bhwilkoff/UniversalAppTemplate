@@ -154,7 +154,7 @@
           draw(people, mine, res[1].data, res[2].data, res[3].data, res[4].data, res[5].data);
           drawTalk(res[6].data);
           drawSetup(mine, res[6].data);
-          drawPublicChoice(mine);
+          drawPublicChoice(mine, res[1].data);
         });
       });
     }).catch(function (err) { fail('Something went wrong: ' + (err && err.message ? err.message : 'no details') + '.'); });
@@ -164,15 +164,48 @@
   // The choice is read on its own, so the rest of the page works before
   // the hub's database has the app_public column.
   var canShow = false;
-  function drawPublicChoice(mine) {
+  function drawPublicChoice(mine, sessions) {
     var wrap = $('[data-app-public-wrap]');
     wrap.hidden = true; canShow = false;
+    $('[data-submit-note]').hidden = true;
+    $('[data-app-hidden]').hidden = true;
     if (!mine) return;
     db.from('enrollments').select('app_public').eq('cohort_id', cohort.id).eq('user_id', me.id).maybeSingle().then(function (r) {
       if (r.error || !r.data) return;
       canShow = true;
       $('[data-my-app]').elements.app_public.checked = !!r.data.app_public;
       wrap.hidden = false;
+      drawSubmitNote(Object.assign({}, mine, { app_public: !!r.data.app_public }), sessions);
+    });
+    drawHidden();
+  }
+
+  // As the cohort nears its end, a student who has not submitted yet
+  // reads what their app still needs (SubmitLib.studentNote), once, here,
+  // and nowhere else: no reminders, no counts.
+  function drawSubmitNote(mine, sessions) {
+    var S = window.SubmitLib;
+    if (!S) return;
+    var win = S.submissionWindow(cohort, sessions, new Date());
+    var last = win.lastSessionAt && !win.ended
+      ? new Date(win.lastSessionAt).toLocaleDateString(undefined, { timeZone: cohort.time_zone, weekday: 'long', month: 'long', day: 'numeric' })
+      : null;
+    var note = S.studentNote(mine, win, last);
+    var box = $('[data-submit-note]');
+    box.textContent = note ? note.text : '';
+    box.hidden = !note;
+  }
+
+  // A teacher's hide (app_hides) is never hidden from the student: they
+  // see that it is in place, and the reason when the teacher gave one.
+  // Before the table exists, the read fails quietly and nothing shows.
+  function drawHidden() {
+    db.from('app_hides').select('reason').eq('cohort_id', cohort.id).eq('user_id', me.id).maybeSingle().then(function (r) {
+      var box = $('[data-app-hidden]');
+      box.hidden = !!(r.error || !r.data);
+      var why = $('[data-app-hidden-reason]');
+      why.textContent = r.data && r.data.reason ? 'Their reason: ' + r.data.reason : '';
+      why.hidden = !(r.data && r.data.reason);
     });
   }
 

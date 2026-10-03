@@ -76,7 +76,7 @@
     if (s.submitted) return null;
     var first;
     if (win.ended) {
-      first = 'The cohort has come to its end, and every app in it is meant to be shown on humanshaped.org/apps/, yours included.';
+      first = 'The cohort has come to its end, and every app in it is meant to be shown on humanshaped.org/apps/ once its builder says it is ready.';
     } else {
       first = 'Your app goes up on humanshaped.org/apps/ when you say it is ready, and every app in this cohort is up by the time the cohort ends' +
         (lastSessionText ? ', with the last session on ' + lastSessionText : '') + '.';
