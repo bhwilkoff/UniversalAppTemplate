@@ -202,3 +202,32 @@ as the top of a person's head." **How to apply:** an arch on its own
 proportions and sits in the upper part of its frame, with the empty
 space below it, so it reads as the top of a head. In the 32-unit
 favicon that is ends at y 16 and the top at y 7.5.
+
+## Teaching, agents, and events (October 3, 2026, afternoon)
+
+**Adopt the teaching research.** Ben chose to adopt all of the changes
+proposed in research/notes/facilitation-assessment-social-learning-notes.md:
+the COURSE.md moves (an "Arrive" part that closes the loop on last
+week's checks, the builder's question before the three questions, "one
+value at work" as its own part, fading the prompt reading through the
+cohort's own stuck moments, "Start" instead of "Build", private checks
+with "what is still muddy?", "Ready or not yet" against each stage's bar,
+trios by default, four social rules said aloud, reaching out within two
+days, writing down agreement before acting on an AI review, new teachers
+co-leading first) and the five tools in order (one Meet link per group,
+closing the loop on checks, the trio protocol on /live/, ready or not yet
+on bring-backs, a teachers-only "not seen this week" list). **How to
+apply:** drafts for Ben's copy audit; never build points, streaks,
+leaderboards, attendance or camera tracking, scored quizzes, AI grading,
+automatic partner rotation, or a second chat space.
+
+**AGENTS.md stays under 24,000 bytes.** Antigravity cuts off longer rule
+files. **How to apply:** rules and values stay in AGENTS.md; platform
+playbooks live in docs it links to.
+
+**The course names Antigravity as Google's route, labeled "may change".**
+Gemini CLI is paid-only since June 18, 2026, and Antigravity's free limit
+is unpublished.
+
+**Anyone may call an event a Human-Shaped Meetup or Hackathon without
+asking,** as long as it keeps the parts the guides name.
