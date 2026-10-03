@@ -30,8 +30,11 @@ create table auth.users (
 create function auth.uid() returns uuid language sql stable as $$
   select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid
 $$;
+create function auth.jwt() returns jsonb language sql stable as $$
+  select coalesce(nullif(current_setting('request.jwt.claims', true), ''), '{}')::jsonb
+$$;
 grant usage on schema auth to anon, authenticated;
-grant execute on function auth.uid() to anon, authenticated;
+grant execute on function auth.uid(), auth.jwt() to anon, authenticated;
 """
 
 GRANTS = """
@@ -70,9 +73,16 @@ def main():
         people[name] = uid
     people["ben"] = people["bhwilkoff"]
 
+    def as_agent(name):
+        """The same person, through their own AI agent's OAuth token."""
+        cur = as_user(name)
+        cur.execute("select set_config('request.jwt.claims', %s, false)", ('{"client_id": "claude-test"}',))
+        return cur
+
     def as_user(name):
         cur = conn.cursor()
         cur.execute("reset role")
+        cur.execute("select set_config('request.jwt.claims', '', false)")
         if name is None:
             cur.execute("set role anon")
             cur.execute("select set_config('request.jwt.claim.sub', '', false)")
@@ -207,6 +217,31 @@ def main():
     dee = as_user("dee")
     dee.execute("select count(*) from public.github_access")
     check("someone outside the cohort sees no GitHub access", dee.fetchone()[0] == 0)
+
+    # A student's own AI agent reads what they can read, and writes nothing.
+    agent = as_agent("bea")
+    agent.execute("select count(*) from public.shares where cohort_id = %s", (cohort,))
+    check("a student's agent can read what the student shared with the cohort", agent.fetchone()[0] == 1)
+    agent.execute("select count(*) from public.sessions where cohort_id = %s", (cohort,))
+    check("a student's agent reads the cohort without error", agent.fetchone() is not None)
+    check("a student's agent cannot share on their behalf",
+          not attempt(agent, "insert into public.shares (cohort_id, user_id, kind, note) values (%s, %s, 'ai-review', 'from the agent')", (cohort, people["bea"])))
+    check("a student's agent cannot give feedback",
+          not attempt(agent, "insert into public.feedback (share_id, author_id, body) values (%s, %s, 'from the agent')", (share, people["bea"])))
+    agent.execute("update public.enrollments set app_name = 'renamed by agent' where user_id = %s", (people["bea"],))
+    check("a student's agent cannot change their app details", agent.rowcount == 0)
+    agent.execute("select count(*) from public.calendar_contacts where user_id = %s", (people["bea"],))
+    check("a student's agent cannot read even their own calendar email", agent.fetchone()[0] == 0)
+    check("a student's agent cannot leave the cohort for them",
+          not attempt(agent, "select public.leave_cohort(%s)", (cohort,)))
+    check("a student's agent cannot delete their account",
+          not attempt(agent, "select public.delete_my_account()"))
+    ben_agent = as_agent("ben")
+    check("a teacher's agent cannot create a cohort",
+          not attempt(ben_agent, "insert into public.cohorts (slug, title, created_by) values ('agent-made', 'Agent', %s)", (people["ben"],)))
+    bea = as_user("bea")
+    bea.execute("select count(*) from public.calendar_contacts where user_id = %s", (people["bea"],))
+    check("signed in on the site, the student still sees their own calendar email", bea.fetchone()[0] == 1)
 
     bea = as_user("bea")
     bea.execute("select public.leave_cohort(%s)", (cohort,))
