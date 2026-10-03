@@ -103,6 +103,35 @@ real).
 - **M3. Live sessions beyond a companion page** (agent, started October 3).
 - **M4. The credential** (agent, started October 3).
 
+**Proposed from the teaching research** (research/notes/
+facilitation-assessment-social-learning-notes.md, October 3; waiting on
+Ben before COURSE.md or the tools change):
+
+- COURSE.md: an "Arrive" part where the teacher says what last week's
+  checks showed and what changed; the builder says what they want to
+  know and partners ask one clarifying question before the three
+  questions; "one value at work" as its own part; fade the prompt
+  reading through the cohort's own stuck moments, with a volunteer in
+  week 5; "Build" becomes "Start" (everyone sends the week's first
+  prompt before leaving); checks answered privately, with "what is
+  still muddy?"; a "Ready or not yet" section using each stage's bar;
+  a strong and a weak bring-back shown in the week before; trios by
+  default, checked at the end of week 2; four social rules said aloud;
+  the teacher reaches out within two days of a missed week; writing
+  down what you agree and disagree with before acting on an AI review;
+  new teachers co-lead one session first.
+- Tools, in order: one Meet link per group (Workspace for Education
+  Fundamentals has no breakout rooms, so check humanshaped.org's
+  edition first); close the loop on checks (/teach/ shows last
+  session's answers and one "what I heard, and what changes" line that
+  appears on /live/); the trio's protocol on /live/ with a timer and
+  each presenter's question; "Ready or not yet" on each bring-back; a
+  teachers-only "not seen this week" list; weekly facilitator guides in
+  the template; a week 3 look across groups.
+- Never build: points, streaks, leaderboards, like counts, attendance
+  or camera tracking, scored quizzes, AI summaries or grading of
+  students, automatic partner rotation, or a second chat space.
+
 **Next:**
 
 - **M5. The movement toolkit, finished:** a meetup guide, a
