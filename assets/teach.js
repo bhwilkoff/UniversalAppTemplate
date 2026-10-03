@@ -139,6 +139,8 @@
     f.capacity.value = c && c.capacity ? c.capacity : '';
     f.status.value = c ? c.status : 'draft';
     f.conversations_open.checked = c ? c.conversations_open : false;
+    f.github_repo.value = c && c.github_repo ? c.github_repo : '';
+    f.github_team.value = c && c.github_team ? c.github_team : '';
     form.hidden = false;
     $('[data-detail]').hidden = true;
     f.title.focus();
@@ -161,7 +163,9 @@
       time_zone: f.time_zone.value,
       capacity: f.capacity.value ? Number(f.capacity.value) : null,
       status: f.status.value,
-      conversations_open: f.conversations_open.checked
+      conversations_open: f.conversations_open.checked,
+      github_repo: f.github_repo.value.trim() || null,
+      github_team: f.github_team.value.trim() || null
     };
     var q = editing
       ? db.from('cohorts').update(row).eq('id', editing).select().single()

@@ -72,8 +72,12 @@
   var leavingCohort = null;
   leaveDialog.addEventListener('close', function () {
     if (leaveDialog.returnValue !== 'leave' || !leavingCohort) return;
-    db.rpc('leave_cohort', { c: leavingCohort }).then(function (r) {
+    var leaving = leavingCohort;
+    db.rpc('leave_cohort', { c: leaving }).then(function (r) {
       if (r.error) return fail('You could not leave just now: ' + r.error.message);
+      // Take them off the cohort's GitHub team too, so the conversation
+      // closes when membership does.
+      db.functions.invoke('cohort-access', { body: { action: 'leave', cohort_id: leaving } }).catch(function () {});
       load();
     });
   });
@@ -103,6 +107,9 @@
           return db.from('enrollments').insert({ cohort_id: c.id, user_id: u.data.user.id });
         }).then(function (r) {
           if (r.error) { join.disabled = false; return fail('You could not join just now: ' + r.error.message); }
+          // Open the cohort's conversation on GitHub. If the cohort has no
+          // team yet, the cohort page offers it again later.
+          db.functions.invoke('cohort-access', { body: { action: 'join', cohort_id: c.id } }).catch(function () {});
           joining = null;
           history.replaceState(null, '', '/account/');
           load();

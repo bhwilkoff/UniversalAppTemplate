@@ -139,7 +139,8 @@
           db.from('groups').select('id, name, expectations, group_members(user_id)').eq('cohort_id', cohort.id),
           db.from('shares').select('id, user_id, kind, url, note, created_at, feedback(id, author_id, body, created_at)').eq('cohort_id', cohort.id).order('created_at', { ascending: false }).limit(40),
           db.from('calendar_contacts').select('email').eq('cohort_id', cohort.id).eq('user_id', me.id).maybeSingle(),
-          db.from('cohort_teachers').select('user_id, profiles(github_login, display_name)').eq('cohort_id', cohort.id)
+          db.from('cohort_teachers').select('user_id, profiles(github_login, display_name)').eq('cohort_id', cohort.id),
+          db.from('github_access').select('state, detail').eq('cohort_id', cohort.id).eq('user_id', me.id).maybeSingle()
         ]).then(function (res) {
           var bad = res.filter(function (r) { return r.error; })[0];
           if (bad) return fail('This cohort could not be loaded: ' + bad.error.message);
@@ -147,9 +148,58 @@
           var mine = people.filter(function (p) { return p.user_id === me.id; })[0];
           if (!mine && !res[1].data.length && !people.length) return show('not-member');
           draw(people, mine, res[1].data, res[2].data, res[3].data, res[4].data, res[5].data);
+          drawTalk(res[6].data);
         });
       });
     }).catch(function (err) { fail('Something went wrong: ' + (err && err.message ? err.message : 'no details') + '.'); });
+  }
+
+  // Where this person's access to the cohort's private conversation on
+  // GitHub stands (github_access, written only by cohort-access).
+  function drawTalk(access) {
+    var box = $('[data-talk]');
+    box.replaceChildren();
+    var repo = cohort.github_repo;
+    if (!repo || !cohort.github_team) {
+      box.appendChild(el('p', 'small', 'The cohort talks in its own private space on GitHub, and your teacher is still setting it up.'));
+      return;
+    }
+    var state = access ? access.state : null;
+    var actions = el('div', 'actions');
+    if (state === 'member') {
+      box.appendChild(el('p', null, 'The conversation is open to you. It happens in GitHub Discussions, in a repository only this cohort can see, and what you write there is yours.'));
+      var go = link('https://github.com/' + repo + '/discussions', 'Open the conversation'); go.className = 'btn-github';
+      actions.appendChild(go);
+    } else if (state === 'invited') {
+      box.appendChild(el('p', null, 'GitHub has emailed you an invitation to the humanshaped organization. Accept it, and the conversation opens.'));
+      var inv = link('https://github.com/orgs/humanshaped/invitation', 'Accept the invitation'); inv.className = 'btn-github';
+      actions.appendChild(inv);
+      actions.appendChild(askButton('I accepted it'));
+    } else {
+      box.appendChild(el('p', null, 'The cohort talks in GitHub Discussions, in a repository only this cohort can see. Opening it adds you to the cohort\u2019s team on GitHub, which may send you an invitation to accept.'));
+      if (state === 'failed' && access.detail) box.appendChild(el('p', 'small error', access.detail));
+      actions.appendChild(askButton(state === 'failed' ? 'Try again' : 'Open the conversation'));
+    }
+    box.appendChild(actions);
+  }
+  function askButton(label) {
+    var b = el('button', 'btn-quiet', label);
+    b.type = 'button';
+    b.addEventListener('click', function () {
+      b.disabled = true;
+      b.textContent = 'Asking GitHub…';
+      db.functions.invoke('cohort-access', { body: { action: 'join', cohort_id: cohort.id } }).then(function (r) {
+        if (!r.error) return load();
+        // GitHub or the hub said no: keep the reason on screen, and let them try again.
+        var res = r.error.context;
+        return (res && res.json ? res.json() : Promise.resolve({})).catch(function () { return {}; }).then(function (body) {
+          b.disabled = false;
+          b.textContent = 'Try again';
+          $('[data-talk]').appendChild(el('p', 'small error', body.message || 'GitHub could not be reached just now.'));
+        });
+      });
+    });
+    return b;
   }
 
   function draw(people, mine, sessions, groups, shares, contact, teachers) {

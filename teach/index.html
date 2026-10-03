@@ -126,6 +126,12 @@
               <option value="running">Running</option>
               <option value="finished">Finished</option>
             </select></label>
+            <fieldset class="row">
+              <legend>The cohort's conversation on GitHub</legend>
+              <p class="small">A private repository in the humanshaped organization with Discussions on, and a secret team that can reach it. People are added to the team when they open the conversation from their cohort page.</p>
+              <label>Repository <input name="github_repo" placeholder="humanshaped/cohort-fall-2026" pattern="humanshaped/[A-Za-z0-9._-]+" autocomplete="off"></label>
+              <label>Team <input name="github_team" placeholder="cohort-fall-2026" pattern="[a-z0-9-]+" autocomplete="off"></label>
+            </fieldset>
             <label class="check"><input type="checkbox" name="conversations_open"> Open this cohort's conversations to people outside it</label>
             <div class="actions">
               <button class="btn-github" type="submit">Save the cohort</button>

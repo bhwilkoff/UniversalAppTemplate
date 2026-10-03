@@ -616,3 +616,8 @@ label.check { display: flex; gap: 0.5rem; align-items: center; font-weight: 400;
 .open-cohort .actions { margin-top: 1rem; }
 .cohort-card.chosen { border-color: var(--clay); border-width: 2px; }
 .teach-link { margin: 1.5rem 0 0; }
+
+/* The conversation fields on /teach/ */
+.cohort-form fieldset { border: 1px solid var(--rule); border-radius: 10px; padding: 1rem; margin: 0; display: grid; gap: 0.9rem; }
+.cohort-form legend { font-weight: 600; padding: 0 0.35rem; }
+.cohort-form fieldset .small { margin: 0; }
