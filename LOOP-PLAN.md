@@ -367,6 +367,20 @@ and waits on one real sign-in.
   the page). Verified on production: made a labeled draft, deleted it
   with the button, and the list was empty again.
 
+- 2026-10-03, core item 6 (setup week), first part. The template had no
+  page before stage 00, which assumes a copy and an agent already exist.
+  Wrote `docs/path/setup.md` in the template ("Getting set up"): the
+  honest costs, the three things only a person does (a GitHub account,
+  a copy, an agent subscription), two requests that let the agent do
+  the rest, the cloud way for anyone with only a phone, and the first
+  win. Linked from the template's README and COURSE.md, and presented
+  at /path/setup/ (read live, listed before stage 00 on all 11 path
+  pages). Verified rendering on production. Copy is mine, anchored in
+  the October 1 step count, and waits for Ben's review. Still to do for
+  setup week: the cohort-only steps (join, accept the GitHub invitation,
+  the setup session) checked off on the cohort page. Research for core
+  item 3 (connecting the student's agent) is running.
+
 ## Where to pick up
 
 1. Core item 2, the conversation shown on the site: recent
