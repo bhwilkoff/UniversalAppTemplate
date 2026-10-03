@@ -33,10 +33,16 @@ other people's feedback drive the next round).
 The method lives in **skills**, vendored in `.claude/skills/` so they
 travel with the repo (catalog: `.claude/skills/README.md`). Don't
 re-derive these patterns; invoke the skill when its trigger matches.
-Agents that look for skills in `.agents/skills/` (Gemini CLI,
-Antigravity) find a pointer skill there that leads back to this
-folder; if your agent has no skill mechanism, open
-`.claude/skills/<name>/SKILL.md` and follow it.
+This file is the one source of instructions for every agent: Claude
+Code reads it through the `@AGENTS.md` import in `CLAUDE.md`, Gemini CLI
+through the `@./AGENTS.md` import in `GEMINI.md` (tested on v0.46.0),
+and Antigravity reads it directly but cuts it at 24,000 bytes, so
+`GEMINI.md` tells it to read the rest. Agents that look for skills in
+`.agents/skills/` (Gemini CLI, Antigravity) find links there to the
+three skills a learner asks for by name, and a pointer skill,
+`template-skills`, that leads back to this folder for the rest. If your
+agent has no skill mechanism, open `.claude/skills/<name>/SKILL.md` and
+follow it. Sources: `docs/research/gemini-and-other-agents.md`.
 Rows are grouped by the stage of `docs/path/` where they first apply.
 
 | When | Skill |

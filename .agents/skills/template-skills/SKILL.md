@@ -9,6 +9,11 @@ This repository keeps one copy of its skills, in `.claude/skills/`, so
 they never drift apart. This folder exists only so that agents that
 look in `.agents/skills/` (Gemini CLI, Antigravity) can find them.
 
+The three skills a learner asks for by name
+(`learning-orientation-design`, `make-it-look-like-itself`, and
+`human-shaped-review`) are linked here, so they load on their own. For
+every other skill:
+
 1. Read the "How we build" table in `AGENTS.md`. Each row names the
    skill to use for a situation.
 2. Open `.claude/skills/<skill-name>/SKILL.md` and follow it as you
@@ -17,4 +22,7 @@ look in `.agents/skills/` (Gemini CLI, Antigravity) can find them.
    of every skill with what it is for.
 
 Do not copy skills into this folder. Add or change them in
-`.claude/skills/` and add a trigger row in `AGENTS.md`.
+`.claude/skills/` and add a trigger row in `AGENTS.md`. A link here
+(`ln -s ../../.claude/skills/<name> .agents/skills/<name>`) is for a
+skill the path asks a learner to call by name; `tools/test_agent_files.py`
+checks that every link resolves.
