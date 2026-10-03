@@ -219,5 +219,6 @@ you have stopped being the first person to find its mistakes. The app
 works, and you can prove it. Stage 05 puts it where other people can
 install it.
 
-Be ready to show the screenshot that proved a fix, and to say what it
-would have looked like if the fix had not worked.
+Be ready to show the screenshot that proved a fix, to say what it would
+have looked like if the fix had not worked, and to explain which of your
+devices the agent may never touch, and why.

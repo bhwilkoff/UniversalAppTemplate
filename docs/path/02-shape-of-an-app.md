@@ -230,5 +230,6 @@ trimmed, one rule about your data that you decided and the pipeline now
 enforces, and every Share button points at your web address. You know
 what "the same app" means. Stage 03 builds it on a second platform.
 
-Be ready to show your matrix, and one cell the audit or your own eyes
-proved wrong.
+Be ready to show your matrix and one cell the audit or your own eyes
+proved wrong, and to explain the rule about your data that you decided,
+and why you drew it where you did.

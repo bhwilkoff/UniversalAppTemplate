@@ -182,4 +182,5 @@ everything that happens to it by using it yourself. Stage 06 is about
 seeing the rest.
 
 Be ready to show your app in a store, installed on a device you did not
-build it on.
+build it on, and to explain one thing you rewrote in its listing, and
+why.

@@ -161,5 +161,6 @@ least two rounds from your own phone. The app works on one platform.
 Stage 02 is about deciding what it means for it to be the same app on
 the next one.
 
-Be ready to show the app on your phone, and to name one thing the real
-data taught you that fake data would have hidden.
+Be ready to show the app on your phone, to name one thing the real data
+taught you that fake data would have hidden, and to explain why you
+started on the platform you chose.

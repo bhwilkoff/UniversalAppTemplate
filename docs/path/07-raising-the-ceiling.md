@@ -242,4 +242,4 @@ remembers.
 
 Be ready to show the feature on your newest device, the sentence an
 older device shows instead, and one thing someone else changed about
-it.
+it, and to explain why you decided it should exist at all.

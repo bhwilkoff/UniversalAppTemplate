@@ -231,4 +231,5 @@ the app without living inside it. That frees you up for the part stage
 07 is about: making it better.
 
 Be ready to show one number Pulse read correctly, one reader that told
-you honestly it could not, and what your loop finished.
+you honestly it could not, and what your loop finished, and to explain
+why you stopped the loop when you did.

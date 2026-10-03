@@ -269,5 +269,10 @@ the agent has what it needs to start. You have written it down. Stage 01
 is the first chance to prove it and live with it, in something you can
 hold.
 
+Every stage ends the way this one does, with something to show and a
+decision to explain in your own words, with the agent closed. [Showing
+your work](showing-your-work.md) says how, in a cohort or on your own.
+
 Be ready to share your "why we build" paragraph, the people outside your
-screen, your one rule, and what that rule will cost you.
+screen, and your one rule, and to explain why you drew that line where
+you did and what it will cost you.

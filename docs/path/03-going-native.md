@@ -237,6 +237,6 @@ like your app rather than the template, and you have chosen its floor
 from a measurement. So far, you have been the one
 checking that it all works. Stage 04 hands that job to the agent.
 
-Be ready to name the oldest device your app will run on, the newest
-feature it will not show there, and why its new look fits the people it
-is for.
+Be ready to name the oldest device your app will run on and why you
+chose it, the newest feature it will not show there, and why its new
+look fits the people it is for.
