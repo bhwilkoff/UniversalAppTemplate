@@ -29,7 +29,7 @@
     root.querySelectorAll('[data-view]').forEach(function (v) { v.hidden = v.getAttribute('data-view') !== view.mode; });
     var part = view.part;
     // The part sits small at the top when something else has the stage.
-    $('[data-part]').hidden = view.mode === 'part' || !part;
+    $('[data-part]').hidden = view.mode === 'part' || view.mode === 'welcome' || !part;
     $('[data-part-name]').textContent = part ? part.name : '';
     $('[data-part-kicker]').textContent = part ? 'Now' : 'Welcome';
     $('[data-part-big]').textContent = part ? part.name : 'The session begins soon.';
@@ -50,6 +50,15 @@
       ul.classList.toggle('counted', !!view.count);
       $('[data-count-total]').hidden = !view.count;
       $('[data-count-total]').textContent = view.count ? L.counted(view.count.total, 'answer', 'answers') + ' so far, with no names.' : '';
+    }
+    if (view.mode === 'welcome') {
+      var w = view.welcome;
+      $('[data-w-cohort]').textContent = w.cohort;
+      $('[data-w-week]').textContent = (w.week ? 'Week ' + w.week : '') + (w.title ? (w.week ? ': ' : '') + w.title : '');
+      $('[data-w-challenge]').hidden = !w.challenge;
+      $('[data-w-challenge]').textContent = w.challenge || '';
+      $('[data-w-first]').hidden = !w.first;
+      $('[data-w-first]').textContent = w.first ? 'First: ' + w.first.name + '. ' + (w.first.what || '') : '';
     }
     if (view.mode === 'item') {
       $('[data-who]').textContent = view.who;

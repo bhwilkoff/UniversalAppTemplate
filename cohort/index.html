@@ -107,6 +107,15 @@
               <h2 id="next-title">The next session</h2>
               <p data-next-when></p>
               <div class="actions" data-next-actions></div>
+              <!-- A background for calls (C9): words by Claude, awaiting Ben's review. -->
+              <div data-bg-wrap hidden>
+                <p class="small">A background for Meet with your cohort's name on it, kept out of the middle where Meet puts you.</p>
+                <div class="actions">
+                  <button class="btn-quiet" type="button" data-bg="paper">Save the light one</button>
+                  <button class="btn-quiet" type="button" data-bg="evening">Save the dark one</button>
+                </div>
+                <p class="small" role="status" data-bg-status></p>
+              </div>
             </section>
           </div>
 
@@ -194,6 +203,7 @@
   <script src="/assets/submit-lib.js" defer></script>
   <script src="/assets/discussions-lib.js" defer></script>
   <script src="/assets/discussions.js" defer></script>
+  <script src="/assets/background.js" defer></script>
   <script src="/assets/cohort.js" defer></script>
 
   <footer class="site-footer">

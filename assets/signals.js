@@ -171,8 +171,15 @@
       box.replaceChildren();
       box.setAttribute('data-kind', sc ? sc.kind : 'idle');
       if (!sc) {
+        // The welcome, as people arrive (CohortLib.welcome, the twin of the
+        // add-on stage's welcome): the cohort, the week, its challenge,
+        // and how we begin.
+        var w = opts.welcome;
+        if (w) box.appendChild(el('p', 'screen-sub', 'Welcome'));
         box.appendChild(el('p', 'screen-title', opts.cohort.title));
         box.appendChild(el('p', 'screen-sub', 'Week ' + opts.session.number + (opts.session.title && opts.session.title !== 'Week ' + opts.session.number ? ': ' + opts.session.title : '')));
+        if (w && w.challenge) box.appendChild(el('p', 'screen-note', w.challenge));
+        if (w && w.first) box.appendChild(el('p', 'screen-sub', 'First: ' + w.first.name + '.'));
       } else if (sc.kind === 'card') {
         box.appendChild(el('p', 'screen-card', sc.signal.body));
         if (sc.signal.ends_at) box.appendChild(el('p', 'screen-clock')).appendChild(clockFor(sc.signal.ends_at, now, coarse, ''));

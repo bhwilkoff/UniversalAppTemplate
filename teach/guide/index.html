@@ -111,6 +111,25 @@
               <p>Sessions are recorded so that missing a week never means falling behind, and the <a href="https://github.com/bhwilkoff/UniversalAppTemplate/blob/site/tools/session-recorder/README.md">session recorder</a> is a free Chrome extension that only the host installs. It was built around meet@humanshaped.org too, and making it work for other hosts is still to come.</p>
             </div>
           </div>
+
+          <!-- Written by Claude for C9 (October 3, 2026), awaiting Ben's
+               review. The OBS names were checked against obsproject.com's
+               own guides; what they did not say is marked below. -->
+          <div class="topic" id="obs">
+            <h2>A card beside you, with OBS.</h2>
+            <div class="prose">
+              <p class="draft-note">Written by Claude, awaiting Ben's review.</p>
+              <p>The simplest way to put a card in front of everyone is to open the card page from your cohort's live page and present that tab in Meet, which needs nothing installed. Presenting takes your face off the main view, though, and when I want people to see me and the card at once, I make my camera into a scene with <a href="https://obsproject.com">OBS Studio</a>, which is free, and send that scene to Meet as if it were my camera.</p>
+              <ol>
+                <li>Open your cohort's card page in its own Chrome window, and make the window narrow and tall, about a third of your screen, since the card page arranges itself for whatever width it has.</li>
+                <li>In OBS, press the <strong>+</strong> under Sources, add a <strong>Video Capture Device</strong> for your camera, and drag its red handles so that you fill the left two thirds of the canvas.</li>
+                <li>Press <strong>+</strong> again and add the card's window: on Windows, Linux, and older Macs it is <strong>Window Capture</strong>, and on macOS 13 or later it is <strong>macOS Screen Capture</strong> with that one window chosen. Place it in the right third, and hold Alt (Option on a Mac) while dragging an edge to crop away the window's frame.</li>
+                <li>Press <strong>Start Virtual Camera</strong> in the Controls dock.</li>
+                <li>In Meet, open Video settings and choose the OBS camera instead of your own. Leave Meet's own backgrounds and effects off, because they would treat the card as part of the room behind you.</li>
+              </ol>
+              <p>The card page follows what you send from the live page, so you change the card there and the scene changes with it. Two things I have not checked yet: the exact name the OBS camera has in Meet's list, and whether OBS's own Browser Source can stay signed in to the hub, which would let you skip the separate window. On a Mac, OBS will also ask for permission to record the screen the first time.</p>
+            </div>
+          </div>
         </div>
       </section>
 

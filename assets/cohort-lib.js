@@ -176,7 +176,25 @@
     return steps;
   }
 
+  // What a shared screen shows as people arrive (the add-on's main stage
+  // and /card/, research/notes/meet-classroom-design.md, C9): the cohort,
+  // the week and its title, this week's challenge in the teacher's words,
+  // and the first part of the agenda, so the first minutes need no one to
+  // say where we are. Only what the whole cohort may already see.
+  function welcome(cohort, session, parts) {
+    function cut(x, n) { x = String(x == null ? '' : x).trim(); return x.length > n ? x.slice(0, n - 1) + '\u2026' : x; }
+    if (!cohort || !session) return null;
+    var n = session.number, first = (parts || [])[0] || null;
+    var title = session.title && session.title !== 'Week ' + n ? cut(session.title, 120) : null;
+    return {
+      cohort: cut(cohort.title, 120), week: n, title: title,
+      challenge: session.scope ? cut(session.scope, 400) : null,
+      first: first ? { name: cut(first.name, 80), what: cut(first.what, 300) } : null
+    };
+  }
+
   var lib = {
+    welcome: welcome,
     setupSteps: setupSteps, agenda: agenda, partNow: partNow, stagesForWeek: stagesForWeek, stageFile: stageFile,
     readyBar: readyBar, readinessText: readinessText, seenText: seenText, canConfirm: canConfirm, partnersOf: partnersOf,
     currentAndNext: currentAndNext, commitLine: commitLine, ago: ago, repoPath: repoPath, PARTS: PARTS

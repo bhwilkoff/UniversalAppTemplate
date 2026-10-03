@@ -309,6 +309,10 @@
     $('[data-part-what-wrap]').hidden = !part;
     if (part) $('[data-part-select]').value = part.key;
     tick();
+    // The welcome: on the stage by itself before any part begins, and
+    // the teacher's to put back up at any time (C9).
+    $('[data-welcome-wrap]').hidden = !S.teaching;
+    drawWelcomeToggle();
     var lead = $('[data-now-lead]'); lead.replaceChildren();
     if (S.plan && S.plan.lead === 'heard') drawHeard(lead);
     if (S.plan && S.plan.lead === 'groups') drawGroups(lead);
@@ -330,6 +334,15 @@
   setInterval(function () { if (S.session) { tick(); } }, 1000);
   setInterval(function () { if (S.session) drawPart(); }, 20000);
 
+  function drawWelcomeToggle() {
+    var welcoming = S.onStage && S.onStage.kind === 'welcome';
+    $('[data-welcome-toggle]').textContent = welcoming ? 'Take the welcome off the stage' : 'Put the welcome on the stage';
+  }
+  $('[data-welcome-toggle]').addEventListener('click', function () {
+    var welcoming = S.onStage && S.onStage.kind === 'welcome';
+    S.onStage = welcoming ? null : { kind: 'welcome' };
+    drawWelcomeToggle(); drawQueue(); drawChecks(); sendStage();
+  });
   $('[data-timer]').addEventListener('click', function () {
     var part = partNow();
     if (S.timerEnds && A.timeLeft(S.timerEnds, Date.now())) { S.timerEnds = null; }
@@ -622,10 +635,12 @@
     var part = partNow();
     return A.stageView({
       part: part ? { key: part.key, name: part.name, endsAt: S.timerEnds } : null,
-      onStage: S.onStage, checks: S.checks, tallies: S.tallies, items: S.items, names: S.names
+      onStage: S.onStage, checks: S.checks, tallies: S.tallies, items: S.items, names: S.names,
+      welcome: lib.welcome(S.cohort, S.session, S.parts)
     });
   }
   function sendStage() {
+    drawWelcomeToggle();
     if (!S.stageOn || !side || !S.session) return;
     try { Promise.resolve(side.notifyMainStage(A.stageMessage(currentView()))).catch(function () {}); } catch (e) {}
   }
