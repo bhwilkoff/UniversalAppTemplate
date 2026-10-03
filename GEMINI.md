@@ -8,11 +8,12 @@ that apply to Google's agents alone belong here. The research behind
 them is `docs/research/gemini-and-other-agents.md`.
 
 - **Loading.** Gemini CLI reads this file and expands the import at the
-  top. Antigravity reads `AGENTS.md` and this file on its own, but it
-  cuts any rule file at 24,000 bytes, and `AGENTS.md` is about twice
-  that, so its second half (from "Android app" through "Standing
-  instructions") never reaches you on its own. Read `AGENTS.md` in full
-  at the start of every session.
+  top. Antigravity reads `AGENTS.md` and this file on its own, and it
+  cuts any rule file at 24,000 bytes, so `AGENTS.md` is kept under that
+  (`tools/test_agent_files.py` checks it). Each platform's rules live in
+  `docs/platforms/`, and `AGENTS.md` says when to read each one. Read
+  that page before you touch the platform, because it does not load on
+  its own.
 - **Trust.** Gemini CLI loads neither this file nor the skills until the
   person trusts the folder. If you were started without these
   instructions, say so and ask them to trust it.

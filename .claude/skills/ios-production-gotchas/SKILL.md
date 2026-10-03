@@ -25,7 +25,7 @@ a symptom matches.
   ("forehead bug") came from modifier-order drift.
 - One destination registry (a single shared `navigationDestination`
   modifier all stacks apply), router-owned `NavigationPath` per tab,
-  external entry points through an intent inbox — see AGENTS.md;
+  external entry points through an intent inbox (see docs/platforms/apple.md);
   per-view destinations are how "this screen can't push that screen"
   bugs are born.
 - Settings is a sheet behind a toolbar gear, not a tab — tab bars

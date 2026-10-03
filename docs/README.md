@@ -27,6 +27,7 @@ back and get feedback on it, in a cohort or on your own.
 
 **03. Going native**
 
+- `platforms/`: each platform's rules for the agent (`web.md`, `apple.md`, `android.md`, `windows.md`, `tv.md`), plus `design-system.md` and `shared-data.md` in full. They moved out of `AGENTS.md` so that it fits under the 24,000 bytes Antigravity reads, and `AGENTS.md` says when to read each one.
 - `templates/IOS-DESIGN-template.md`, `MACOS-DESIGN-template.md`, `TVOS-DESIGN-template.md`, `ANDROID-DESIGN-template.md`, `WEB-DESIGN-template.md`, `WINDOWS-DESIGN-template.md`: seeds for each platform's binding design doc, once it passes about five screens.
 - `templates/IPAD-DESIGN-template.md`: the regular-width iPad rules that extend the iOS design doc.
 - `templates/PORT-PARITY-LEDGER-template.md`: the three-level ledger for a platform that ports another.
@@ -79,5 +80,6 @@ back and get feedback on it, in a cohort or on your own.
 ## For whoever maintains the template
 
 `maintaining/` holds the writing guide (`WRITING.md`), the plan and
-record of the September 2026 reorganization, and the audits it was
-built from.
+record of the September 2026 reorganization, the audits it was built
+from, and `AGENTS-MD-MAP.md`, which says where each rule went when
+`AGENTS.md` was cut below 24,000 bytes.

@@ -2,7 +2,8 @@
 """
 Every agent reads the same instructions and finds the same skills.
 
-AGENTS.md is the one source. CLAUDE.md imports it for Claude Code, and
+AGENTS.md is the one source, and it stays under 24,000 bytes so Antigravity
+reads all of it. CLAUDE.md imports it for Claude Code, and
 GEMINI.md imports it for Gemini CLI. An earlier setup listed AGENTS.md in
 .gemini/settings.json `context.fileName` instead; Gemini CLI ignores
 workspace settings until a folder is trusted (and under --skip-trust), and
@@ -33,6 +34,24 @@ def check(ok, what, detail=""):
 def first_line(path):
     return path.read_text().splitlines()[0].strip() if path.exists() else ""
 
+
+# Antigravity truncates any rule file at 24,000 bytes, so everything past
+# that point never reaches it. Rules and values stay in AGENTS.md; platform
+# detail lives in docs/platforms/ (docs/maintaining/AGENTS-MD-MAP.md).
+LIMIT = 24_000
+size = len((ROOT / "AGENTS.md").read_bytes())
+check(size < LIMIT, f"AGENTS.md is under {LIMIT:,} bytes", f"{size:,} bytes")
+
+# Every repository path AGENTS.md names under docs/, tools/, or .claude/
+# must exist, so a rule that moved out is always one link away. A few
+# files are written by the app later, the first time they are needed.
+CREATED_LATER = {"docs/DATA-CONTRACT.md", "docs/SESSION-LOG.md", "docs/IPAD-DESIGN.md"}
+agents_text = (ROOT / "AGENTS.md").read_text()
+linked = set(re.findall(r"`((?:docs|tools|\.claude)/[^`\s<>*{}]+)`", agents_text))
+linked |= set(re.findall(r"\]\(((?:docs|tools|\.claude)/[^)\s]+)\)", agents_text))
+gone = sorted(p for p in linked if p not in CREATED_LATER and not (ROOT / p.rstrip("/")).exists())
+check(not gone, "every doc and tool AGENTS.md links to exists", ", ".join(gone))
+check(any(p.startswith("docs/platforms/") for p in linked), "AGENTS.md links to docs/platforms/")
 
 check(first_line(ROOT / "CLAUDE.md") == "@AGENTS.md", "CLAUDE.md opens with @AGENTS.md")
 check(first_line(ROOT / "GEMINI.md") == "@./AGENTS.md", "GEMINI.md opens with @./AGENTS.md")
@@ -76,7 +95,8 @@ for entry in sorted(agents_skills.iterdir()):
 # A hyphenated name in backticks, on a line about skills or in the AGENTS.md
 # skill table, is a skill name. Each must exist.
 missing = set()
-for doc in [ROOT / "AGENTS.md", ROOT / "GEMINI.md", *sorted((ROOT / "docs/path").glob("*.md"))]:
+for doc in [ROOT / "AGENTS.md", ROOT / "GEMINI.md", *sorted((ROOT / "docs/path").glob("*.md")),
+            *sorted((ROOT / "docs/platforms").glob("*.md"))]:
     text = doc.read_text()
     table = re.search(r"^## How we build\n(.*?)^## ", text, re.M | re.S)
     table_lines = set(table.group(1).splitlines()) if table and doc.name == "AGENTS.md" else set()
@@ -89,7 +109,7 @@ for doc in [ROOT / "AGENTS.md", ROOT / "GEMINI.md", *sorted((ROOT / "docs/path")
             name = m.group(1)
             if not (SKILLS / name).is_dir() and not (agents_skills / name).is_dir():
                 missing.add((str(doc.relative_to(ROOT)), name))
-check(not missing, "every skill named in AGENTS.md, GEMINI.md, and docs/path exists",
+check(not missing, "every skill named in AGENTS.md, GEMINI.md, docs/path, and docs/platforms exists",
       ", ".join(f"{d}: {n}" for d, n in sorted(missing)))
 
 print(f"\n{'FAIL' if fails else 'PASS'}: {len(fails)} failure(s)")
