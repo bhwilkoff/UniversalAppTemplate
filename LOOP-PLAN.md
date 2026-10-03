@@ -746,6 +746,15 @@ add-on deployment.
   the words fixed and sets `edited_at`, and /cohort/ and /account/ show
   "edited". Migration 20261003160000 applied through the Management API;
   351 database checks (2 fail with the edit rule opened), 190 node tests.
+- 2026-10-03, C5, the session thread (merged). /live/ has "This
+  session's thread": a teacher opens a GitHub discussion in the cohort
+  repository with their own token, its number is kept on the session
+  (`sessions.discussion_number`, migration 20261003170000, applied), and
+  everyone reads it every 20 seconds and posts as themselves. The add-on
+  has a Thread tab that links to it. 358 database checks, 198 node
+  tests. Not yet tried live: creating the discussion in cohort-test, a
+  student's post landing as theirs, and the tab inside Meet. Wording
+  awaits Ben.
 
 ## Where to pick up
 
