@@ -1375,6 +1375,58 @@ def main():
     su9 = conn.cursor(); su9.execute("reset role")
     su9.execute("select count(*) from public.live_room_state where cohort_id = %s", (rc,))
     check("when the cohort is finished, where each group was is deleted", su9.fetchone()[0] == 0)
+
+    # The teacher's talk share (migration 20261003190000): one number per
+    # session, saved by a teacher of the cohort, read by the cohort, never
+    # written by an agent or a student, and gone when the cohort finishes.
+    # "talk" is a signal like "recording". bea is a student, dee teaches
+    # elsewhere and is not in the cohort.
+    ben = as_user("ben")
+    attempt(ben, "insert into public.cohorts (slug, title, created_by, status) values ('talk-test', 'Talk', %s, 'open') returning id", (people["ben"],))
+    tc = last_rows[0][0]
+    attempt(ben, "insert into public.sessions (cohort_id, number) values (%s, 1), (%s, 2) returning id", (tc, tc))
+    t1, t2 = last_rows[0][0], last_rows[1][0]
+    bea = as_user("bea")
+    attempt(bea, "insert into public.enrollments (cohort_id, user_id) values (%s, %s)", (tc, people["bea"]))
+    ben = as_user("ben")
+    check("a teacher can tell everyone they are measuring their talk",
+          attempt(ben, "insert into public.live_signals (cohort_id, session_id, created_by, kind) values (%s, %s, %s, 'talk') returning id", (tc, t1, people["ben"])))
+    check("measuring talk names nobody",
+          not attempt(ben, "insert into public.live_signals (cohort_id, session_id, created_by, kind, people) values (%s, %s, %s, 'talk', %s::uuid[])", (tc, t1, people["ben"], "{%s}" % people["bea"])))
+    note = "insert into public.session_notes (session_id, cohort_id, teacher_talk_share) values (%s, %s, %s) returning teacher_talk_share, saved_by"
+    check("a teacher saves their own talk share for a session, in their name",
+          attempt(ben, note + "", (t1, tc, 0.41)) and str(last_rows[0][0]) == "0.410" and last_rows[0][1] == people["ben"])
+    check("a share is between 0 and 1", not attempt(ben, note, (t2, tc, 1.2)))
+    check("a session has one share", not attempt(ben, note, (t1, tc, 0.5)))
+    check("a teacher can correct the share",
+          attempt(ben, "update public.session_notes set teacher_talk_share = 0.38 where session_id = %s returning teacher_talk_share", (t1,)) and str(last_rows[0][0]) == "0.380")
+    check("a share stays with its session",
+          not attempt(ben, "update public.session_notes set session_id = %s where session_id = %s", (t2, t1)))
+    bea = as_user("bea")
+    bea.execute("select teacher_talk_share from public.session_notes where session_id = %s", (t1,))
+    check("someone in the cohort reads the teacher's share", [str(r[0]) for r in bea.fetchall()] == ["0.380"])
+    check("a student cannot save a share", not attempt(bea, note, (t2, tc, 0.1)))
+    check("a student cannot change the share",
+          attempt(bea, "update public.session_notes set teacher_talk_share = 0 where session_id = %s returning session_id", (t1,)) and last_rows == [])
+    check("a student cannot delete the share",
+          attempt(bea, "delete from public.session_notes where session_id = %s returning session_id", (t1,)) and last_rows == [])
+    dee = as_user("dee")
+    dee.execute("select count(*) from public.session_notes where cohort_id = %s", (tc,))
+    check("someone outside the cohort cannot read the share", dee.fetchone()[0] == 0)
+    check("a teacher of another cohort cannot save one here", not attempt(dee, note, (t2, tc, 0.2)))
+    ben_agent = as_agent("ben")
+    check("a teacher's agent cannot save a share", not attempt(ben_agent, note, (t2, tc, 0.2)))
+    check("a teacher's agent cannot change a share",
+          not attempt(ben_agent, "update public.session_notes set teacher_talk_share = 0.9 where session_id = %s returning session_id", (t1,)) or last_rows == [])
+    ben = as_user("ben")
+    check("a share must belong to a session of the cohort",
+          not attempt(ben, note, (r1, tc, 0.3)))
+    check("a teacher can take the share back",
+          attempt(ben, "delete from public.session_notes where session_id = %s returning session_id", (t1,)) and len(last_rows) == 1)
+    attempt(ben, note, (t2, tc, 0.5))
+    ben.execute("update public.cohorts set status = 'finished' where id = %s", (tc,))
+    su9.execute("select count(*) from public.session_notes where cohort_id = %s", (tc,))
+    check("when the cohort is finished, the talk shares are deleted", su9.fetchone()[0] == 0)
     conn.rollback()
     conn.close()
     failed = [n for n, ok in results if not ok]

@@ -21,6 +21,19 @@
         <div class="actions">
           <button type="button" class="save primary">Save to this computer</button>
         </div>
+        <div class="box talk" hidden>
+          <p class="talk-sentence"></p>
+          <p class="muted talk-help"></p>
+          <div class="actions talk-actions">
+            <button type="button" class="talk-keep">Keep it to save on the session page</button>
+            <button type="button" class="talk-discard">Let it go</button>
+          </div>
+        </div>
+        <div class="box marks" hidden>
+          <p><strong>Moments you marked</strong></p>
+          <p class="muted">Each clip runs from 30 seconds before the mark to 90 seconds after. Making one plays that part of the recording here, silently, for as long as the clip lasts, so keep this tab open until it is saved. A clip goes only to this cohort, as the notice promised.</p>
+          <ol class="mark-list"></ol>
+        </div>
         <div class="box drive">
           <label class="stack">Upload to the cohort folder in Drive
             <select class="folder"></select>

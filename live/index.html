@@ -175,6 +175,30 @@
               </div>
               <p class="small" role="status" data-sig-rec-status></p>
             </div>
+
+            <div class="signal-control">
+              <h3>Your own talk</h3>
+              <p class="small">If you turn it on in the recorder, it counts how much you talk compared with everyone else in the call, from the sound alone, never who else talks and never anyone’s words. Say aloud that it is counting, and show everyone here too.</p>
+              <div class="actions"><button class="btn-quiet" type="button" data-sig-talk-on>Tell everyone I am counting my talk</button></div>
+              <div data-sig-talk-live hidden>
+                <p class="signal-now">Everyone sees that you are counting your talk.</p>
+                <div class="actions"><button class="btn-quiet" type="button" data-sig-talk-off>It has stopped counting</button></div>
+              </div>
+              <div data-sig-share-wrap hidden>
+                <p class="small">When the session ends, the recorder shows you your share. It is yours: keep it to yourself, or save it here, where the cohort can read it on this page.</p>
+                <form class="inline-form" data-sig-share-form>
+                  <label>The percent the recorder showed
+                    <input type="text" inputmode="decimal" maxlength="12" data-sig-share>
+                  </label>
+                  <div class="actions"><button class="btn-quiet" type="submit">Save it for this session</button></div>
+                </form>
+                <div data-sig-share-saved hidden>
+                  <p class="signal-now" data-sig-share-now></p>
+                  <div class="actions"><button class="btn-quiet" type="button" data-sig-share-remove>Take it back</button></div>
+                </div>
+              </div>
+              <p class="small" role="status" data-sig-talk-status></p>
+            </div>
           </section>
 
           <!-- What this part of the session needs (M12): the teacher's

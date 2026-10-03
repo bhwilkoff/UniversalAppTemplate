@@ -40,7 +40,7 @@ async function setState(state) {
   await chrome.storage.session.set({ recorder: state });
 }
 
-async function start({ tabId, cohort, includeMic, quality }) {
+async function start({ tabId, cohort, includeMic, quality, countTalk }) {
   const state = await getState();
   if (state.recording && (await offscreenExists())) {
     return { ok: false, error: 'A recording is already running. Stop it first.' };
@@ -66,12 +66,13 @@ async function start({ tabId, cohort, includeMic, quality }) {
     cohort,
     includeMic,
     quality,
+    countTalk: Boolean(countTalk && includeMic),
   });
   if (!reply || !reply.ok) {
     await closeOffscreen();
     return { ok: false, error: (reply && reply.error) || 'The recorder did not start.' };
   }
-  await setState({ recording: true, sessionId, tabId, startedAt: reply.startedAt, cohort, micIncluded: reply.micIncluded, micError: reply.micError });
+  await setState({ recording: true, sessionId, tabId, startedAt: reply.startedAt, cohort, micIncluded: reply.micIncluded, micError: reply.micError, countingTalk: reply.countingTalk });
   await showRecording(true);
   return reply;
 }
@@ -86,6 +87,26 @@ async function stop() {
   }
   return chrome.runtime.sendMessage({ target: 'offscreen', type: 'stop' });
 }
+
+// A mark is a moment to clip later (Wish 11), from the popup's button or
+// the keyboard shortcut. The badge says MARK for a moment so the host
+// knows it took, without opening anything.
+async function mark(word) {
+  if (!(await offscreenExists())) return { ok: false, error: 'Nothing is recording.' };
+  const reply = await chrome.runtime.sendMessage({ target: 'offscreen', type: 'mark', word: word || '' });
+  if (reply && reply.ok) {
+    await chrome.action.setBadgeText({ text: 'MARK' });
+    setTimeout(async () => {
+      const state = await getState();
+      await chrome.action.setBadgeText({ text: state.recording ? 'REC' : '' });
+    }, 1500);
+  }
+  return reply || { ok: false, error: 'The recorder did not answer.' };
+}
+
+chrome.commands.onCommand.addListener((command) => {
+  if (command === 'mark-moment') mark('');
+});
 
 function openFinish(sessionId) {
   chrome.tabs.create({ url: `finish.html?id=${encodeURIComponent(sessionId)}` });
@@ -108,6 +129,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   const handlers = {
     start: () => start(message),
     stop: () => stop(),
+    mark: () => mark(message.word),
     status: () => status(),
     'recorder-progress': async () => ({ ok: true }),
     'recorder-stopped': async () => {
