@@ -127,7 +127,7 @@ what waits on Ben.
 - **Scripts:** `assets/hub-config.js` (public URL and publishable key),
   `hub.js`, `cohorts.js`, `teach.js` with `teach-lib.js`, `cohort.js` and `live.js`
   with `cohort-lib.js`. Pure logic lives in the `-lib.js` files with
-  tests in `tools/test/` (`node --test tools/test/*.mjs`, 43 tests).
+  tests in `tools/test/` (`node --test tools/test/*.mjs`, 45 tests).
 - **Students' own agents** (research/notes/agent-connection-notes.md):
   the `mcp` Edge Function (`supabase/functions/mcp/`, answers in
   `shape.js`) is a read-only MCP server reached through Supabase Auth's
