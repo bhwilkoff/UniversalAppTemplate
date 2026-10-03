@@ -11,7 +11,8 @@
         "addOnOrigins": ["https://humanshaped.org"],
         "logoUrl": "https://humanshaped.org/assets/brand/icon.png",
         "darkModeLogoUrl": "https://humanshaped.org/assets/brand/icon.png"
-      }
+      },
+      "termsUri": "https://humanshaped.org/terms/"
     }
   }
 }
