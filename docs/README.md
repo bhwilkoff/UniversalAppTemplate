@@ -12,6 +12,13 @@ to all of them: how to ask, correct, and decide, in real prompts.
 `path/showing-your-work.md` is the other: how to bring each stage's work
 back and get feedback on it, in a cohort or on your own.
 
+## Teaching
+
+`../COURSE.md` maps the path onto a five-week cohort, and
+`teaching/README.md` is the guide for each of its live sessions: the
+minutes, the teacher's words, the check question, and what to look for
+in the bring-backs.
+
 ## By stage
 
 **00. Why we build**
