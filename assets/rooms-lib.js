@@ -19,6 +19,12 @@
   // presenter who is no longer in the group starts the order again.
   function advance(state, order, steps) {
     order = order || [];
+    // A group with nobody on the hub (they came only through Meet) still
+    // moves through the steps, once, with no one named.
+    if (!order.length) {
+      var at = state ? state.step : -1;
+      return at + 1 < steps ? { step: at + 1, presenter: null } : { step: steps, presenter: null };
+    }
     if (!state || (state.presenter == null && !isDone(state, steps))) state = start(order);
     if (isDone(state, steps)) return { step: steps, presenter: null };
     var i = order.indexOf(state.presenter);
@@ -44,10 +50,10 @@
     var who = state.presenter && (order || []).indexOf(state.presenter) >= 0 ? state.presenter : null;
     var step = turn[Math.min(state.step, steps - 1)];
     var name = who ? nameOf(who) : null;
-    var whose = name ? (name === 'You' ? 'Your turn' : name + '’s turn') : 'Between turns';
+    var whose = name ? (name === 'You' ? 'Your turn, s' : name + '’s turn, s') : (order && order.length ? 'Between turns, s' : 'S');
     return {
       done: false, started: true, step: state.step, presenter: who,
-      text: whose + ', step ' + (Math.min(state.step, steps - 1) + 1) + ' of ' + steps + ': ' + step.name + '.'
+      text: whose + 'tep ' + (Math.min(state.step, steps - 1) + 1) + ' of ' + steps + ': ' + step.name + '.'
     };
   }
 

@@ -74,3 +74,9 @@ test('the room line setup prints is read in either order', () => {
   assert.ok(R.parseRoomLine('meet.google.com/abc').error);
   assert.ok(R.parseRoomLine('https://meet.google.com/abc spaces/bad!').error);
 });
+
+test('a group with nobody on the hub still moves through the steps', () => {
+  assert.deepEqual(R.advance({ step: 0, presenter: null }, [], N), { step: 1, presenter: null });
+  assert.deepEqual(R.advance({ step: N - 1, presenter: null }, [], N), { step: N, presenter: null });
+  assert.deepEqual(R.advance(null, [], N), { step: 0, presenter: null });
+});
