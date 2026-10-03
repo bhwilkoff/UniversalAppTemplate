@@ -404,16 +404,32 @@ and waits on one real sign-in.
   with the rule opened on purpose. Applied; /account/ and /teach/ work
   as before.
 
+- 2026-10-03, core item 3, built and waiting on one setting. The `mcp`
+  Edge Function (deployed, verify_jwt off as Supabase's guide requires)
+  serves read-only tools my_cohorts, this_week, next_session, my_group,
+  my_work, and method, the method as resources, and two prompts
+  (review_this_week, prepare_for_session) that keep the words and the
+  choice to share with the student. Every query runs as the student
+  under row-level security. The answers live in shape.js with 7 tests
+  (43 in all), and cohort-lib.js and teach-lib.js now load in Deno so
+  the site and the server share the week and schedule logic (the first
+  deploy sent a trimmed teach-lib; the next deploy sends the whole
+  file). /oauth/consent/ (sign in, what it can and can never read,
+  Allow or Not now, all on the page) and /connect/ (steps for Claude,
+  Claude Code, and Gemini CLI, with `-s user`). Verified on production:
+  an unsigned call gets 401 with the protected-resource metadata, which
+  names the hub's Supabase Auth; the consent page reaches Supabase's
+  OAuth API ("OAuth server is disabled"); both pages render. Not yet
+  verified: a real agent connecting and calling a tool, which needs
+  Ben's setting, and then one approval in his browser.
+
 ## Where to pick up
 
-1. Core item 3, the MCP server: an Edge Function `mcp` (Streamable
-   HTTP, the official TypeScript SDK) with read-only tools my_cohorts,
-   this_week, next_session, my_group, my_work, and method, and prompts
-   review_this_week and prepare_for_session, each tool reading through
-   the student's own token so row-level security decides. Tool logic in
-   a plain module tested by node. Then the consent page at
-   /oauth/consent/ and a "Connect your agent" page with the exact steps
-   for claude.ai, Claude Code, and Gemini CLI (`-s user`, so the setting
-   never lands in a public repository).
-2. Core item 2's last part (showing discussions on the site) waits on
-   Ben's GitHub App.
+1. If Ben has switched on the OAuth server (try
+   `https://bifrieqzkihuxfzttgvd.supabase.co/.well-known/oauth-authorization-server/auth/v1`):
+   connect Claude Code to the mcp server, ask Ben once before approving
+   in his browser, call each tool, then remove the "waiting" notice on
+   /connect/ and link it from /account/ and /cohort/.
+2. Otherwise: setup week's cohort-only steps on /cohort/ (join, accept
+   the GitHub invitation, connect your agent, the setup session), then
+   core item 7 (an app's own page).
