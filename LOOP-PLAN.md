@@ -752,9 +752,10 @@ add-on deployment.
   (`sessions.discussion_number`, migration 20261003170000, applied), and
   everyone reads it every 20 seconds and posts as themselves. The add-on
   has a Thread tab that links to it. 358 database checks, 198 node
-  tests. Not yet tried live: creating the discussion in cohort-test, a
-  student's post landing as theirs, and the tab inside Meet. Wording
-  awaits Ben.
+  tests. Verified live as Ben on a "(delete me)" draft cohort linked to
+  cohort-test: the thread opened (category General), a post from /live/
+  landed on GitHub as bhwilkoff, and both were then deleted. Not yet
+  tried: a student's post, and the tab inside Meet. Wording awaits Ben.
 
 ## Where to pick up
 
