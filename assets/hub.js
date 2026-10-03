@@ -133,6 +133,8 @@
         if (bad) return fail('Your account could not be loaded just now: ' + bad.error.message);
         var p = res[0].data;
         root.querySelector('[data-name]').textContent = p.display_name || p.github_login;
+        var title = document.querySelector('[data-account-title]');
+        if (title) title.textContent = 'Your account.';
         var a = root.querySelector('[data-github-link]');
         a.textContent = '@' + p.github_login;
         a.href = 'https://github.com/' + encodeURIComponent(p.github_login);
