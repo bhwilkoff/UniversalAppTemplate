@@ -797,6 +797,18 @@ browser click), Script Properties and whoAmI, and a test call.
   /start/brand/; a cohort background drawn in the browser on /cohort/;
   an OBS section on /teach/guide/. 211 node tests. For Ben: choose the
   backgrounds, review the words. Not yet seen in a real call.
+- 2026-10-03, C8 (merged, migration 20261003190000 applied): the
+  recorder (0.2.0) marks moments (popup button, Alt+Shift+M) and makes
+  clips on its finish page; it counts the host's own talk share from
+  their microphone against the tab's mixed audio, opt-in, keeping no
+  sound and knowing nothing about who else spoke, with keep or let go.
+  /live/ "Your own talk": a `talk` signal everyone sees, and the share
+  typed and saved to `session_notes` (teachers write, cohort reads,
+  deleted at finish). STORE-LISTING.md drafted. 400 database checks,
+  214 node tests, 24 recorder tests. For Ben: the one-time $5 Chrome
+  Web Store fee (his decision; unpacked works free), an icon, and the
+  listing words. Only a real call shows clip seeking in WebM, the level
+  thresholds, and the shortcut inside Meet.
 
 ## Where to pick up
 
