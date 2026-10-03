@@ -184,7 +184,16 @@ yet seen: the invitation a brand-new member gets.
   repository), so deploys need no connector approval. Still to confirm:
   a tool's answer in a real conversation.
 
-**In progress:** nothing; every milestone agent has reported.
+**In progress (started October 3, afternoon, after Ben's decisions):**
+
+- **M11. The course moves and weekly facilitator guides** in the
+  template (COURSE.md, showing-your-work.md, a new docs/teaching/).
+- **M12. The five teaching tools** on the site: one Meet link per
+  group, closing the loop on checks, the trio protocol on /live/, ready
+  or not yet on bring-backs, and a teachers-only "not seen this week".
+- **M13. AGENTS.md under 24,000 bytes,** with platform playbooks moved
+  into linked docs and a test that fails past the limit, and the course
+  naming Antigravity as Google's route, labeled "may change".
 
 
 **Proposed from the teaching research** (research/notes/
