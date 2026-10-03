@@ -29,67 +29,57 @@ verify what a person would see); push; log it below. "Fixed" and
 - Template audience: anyone building alone. Site audience: community,
   cohorts, teachers, events. Put each change where its audience is.
 
-## Backlog (in order)
+## Milestones
 
-Reordered October 3, 2026, at Ben's request: "make sure we are doing the
-big stuff of the buildout (key functionality on the site) and not just
-side quests." The hub's core features come first; anything that is
-polish, print, or template housekeeping waits until they work for real.
+Reorganized October 3, 2026, after Ben asked why the changes were
+getting smaller: "Are there not larger scopes of work still to be built
+out on the site or within the template?" There are. The loop now works
+in milestones that span many ticks, runs two or three at once with
+background agents in their own worktrees, and merges each piece when it
+is verified, so a blocker on one never stalls the rest.
 
-**Built so far:** the open directory and /apps/, the review skill and
-the look skill in the template, sign-in and the hub's schema, /account/,
-/teach/, /cohort/, /live/, the human-shaped mark, and the printable
-sheets. Everything behind sign-in is drawn against a stand-in database
-and waits on one real sign-in.
+**Done:** sign-in and the hub's schema with tested access rules;
+/account/, /teach/ (with the feedback queue and draft deletion),
+/cohort/ (with Getting ready and the conversation section), /live/;
+joining from /cohorts/; cohort-access and the GitHub team design;
+the read-only MCP server, consent page, and /connect/; Getting set up in
+the template; the mark and the printable sheets; the open directory.
 
-**The core (do these first, in order):**
+**Waiting on Ben's setup** (see "Needs Ben"): the GitHub App (cohort
+conversation for real) and the OAuth server switch (students' agents for
+real).
 
-1. **Real sign-in, end to end.** Waits on Ben's one Authorize click.
-   Then, signed in as Ben: a draft cohort in /teach/, its sessions,
-   /cohort/ and /live/ for real, and every header "Sign in with GitHub"
-   button pointed at /account/. Until Ben signs in, keep building the
-   items below against the stand-in database.
-2. **Cohort conversation on the site.** The vision asks for GitHub's own
-   discussions, shown in the hub, and DECISIONS.md makes cohort
-   conversation private to the cohort by default. Research first: a
-   private repository per cohort (or per teacher) in the humanshaped
-   organization with Discussions on; reading and posting through GitHub's
-   GraphQL API with the student's own GitHub token from Supabase sign-in
-   (which scopes, how the token is kept in the browser, how a student
-   gets access to the private repository when they join, at $0). Then
-   the conversation on /cohort/ and /live/.
-3. **Connect your AI agent.** A read-only context feed and a small MCP
-   endpoint (Cloudflare Worker or Supabase Edge Function, free tier) so
-   the student's Claude or Gemini knows their cohort, week, challenge,
-   next session, and the human-shaped review skill; the student can then
-   share what their agent said into the hub, labeled as AI. A page that
-   tells them how to connect it, in Claude and in Gemini.
-4. **Teacher feedback queue.** /teach/ lists everything shared "for
-   feedback" that the teacher has not answered, across their cohorts, so
-   no one's request waits unseen.
-5. **Joining a cohort, from the front door.** /cohorts/ shows open
-   cohorts from the database (not a hard-coded promise) with dates,
-   places left, and a Join button that signs in and enrolls, plus the
-   privacy note beside it.
-6. **Setup week**, ending at the first win: the pages a new member
-   follows before week 1, checked off on their own cohort page.
-7. **An app's own page** in the hub (/apps/?a=...): its declaration,
-   its live commits, its builder's words, and its conversation, for
-   cohort apps and directory apps alike.
-8. **Credential**: Open Badges 3.0 issued from humanshaped.org, a base
-   level for a live web app and a level for each further platform.
+**In progress (started October 3):**
 
-**After the core works:**
+- **M1. The hub as a hub.** "A centralized hub of information about
+  every app that's being built" (VISION.md). A page for every app (its
+  declaration, live commits, builder's words, platforms, and
+  conversation), a public feed of apps in progress across cohorts, and
+  a home page that shows that life. Privacy decided in writing first.
+- **M2. Becoming a teacher.** "Anyone may become a teacher": a teaching
+  guide, a request form, Ben's approval in /teach/, and a teacher's own
+  setup (their Meet host, their cohort's repository and team).
+- **M6. One source for the template's design tokens.** The platforms'
+  placeholder palettes disagree; a design-tokens.json, a tool that
+  writes each platform's token files, and a parity test, so "make it
+  look like itself" changes every platform at once.
 
-9. Toolkit, the rest: a meetup guide and a Human-Shaped Hackathon kit
-   (the mark and the sheets are done).
-10. Template passes: Oxford commas across the path, the vision woven
-    through, lanes for agents other than Claude, COURSE.md changes from
-    the research (week 0, groups, checks for understanding).
-11. Design iteration two on the live site from Ben's notes.
-12. One source for the template's design tokens (the platforms'
-    placeholder palettes disagree): a `design-tokens.json`, a tool that
-    writes each platform's token file, and a parity test.
+**Next:**
+
+- **M3. Live sessions beyond a companion page:** a "show your work"
+  queue, checks for understanding, and polls on /live/; the Meet events
+  script and session recorder run for real.
+- **M4. The credential:** Open Badges 3.0 issued from humanshaped.org,
+  with a public verification page and the teacher's issuing flow.
+- **M5. The movement toolkit, finished:** a meetup guide, a
+  Human-Shaped Hackathon kit, and brand assets.
+- **M7. Works the same with Gemini:** agent-neutral setup across the
+  path, tested on a fresh copy with Gemini CLI.
+- **M8. The course changes from the research,** in COURSE.md and the
+  stages: week 0, stable groups, checks for understanding, explain it
+  back, and a feedback shape for every bring-back.
+- Smaller: show the cohort's discussions on /cohort/ and /live/ once the
+  GitHub App exists; design iteration two from Ben's notes.
 
 ## Needs Ben
 
@@ -436,11 +426,10 @@ and waits on one real sign-in.
 
 ## Where to pick up
 
-1. If Ben has switched on the OAuth server (try
-   `https://bifrieqzkihuxfzttgvd.supabase.co/.well-known/oauth-authorization-server/auth/v1`):
-   connect Claude Code to the mcp server, ask Ben once before approving
-   in his browser, call each tool, then remove the "waiting" notice on
-   /connect/ and link it from /account/ and /cohort/.
-2. Otherwise: core item 7, an app's own page (/apps/?a=...): its
-   declaration, live commits, its builder's words, and its
-   conversation, for cohort apps and directory apps alike.
+1. Check on the milestone agents (M1, M2, M6). Review each branch they
+   report, run its tests and look at it, merge what is verified into
+   `site` (or `main` for the template), apply any migration after the
+   policy tests pass, and push.
+2. If the OAuth server is on, test a real agent connection (ask Ben
+   before approving in his browser).
+3. When a milestone finishes, start the next one from the list.
