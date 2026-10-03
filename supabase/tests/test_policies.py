@@ -264,6 +264,88 @@ def main():
     su2.execute("select count(*) from auth.users where id = %s", (people["cal"],))
     check("deleting my account removes me everywhere", gone and su2.fetchone()[0] == 0)
 
+    # Becoming a teacher: a request on the site, decided by someone who
+    # can approve (only Ben at launch).
+    su5 = conn.cursor(); su5.execute("reset role")
+    su5.execute("select can_approve from public.teachers where user_id = %s", (people["ben"],))
+    check("Ben's first sign-in lets him approve new teachers", su5.fetchone()[0] is True)
+
+    agent = as_agent("dee")
+    check("a person's agent cannot ask to teach for them",
+          not attempt(agent, "insert into public.teacher_requests (user_id, why) values (%s, 'from the agent')", (people["dee"],)))
+    dee = as_user("dee")
+    check("someone who is not a teacher can ask to teach",
+          attempt(dee, "insert into public.teacher_requests (user_id, why, brings) values (%s, 'I run a maker space.', 'A room and a projector')", (people["dee"],)))
+    check("no one can ask to teach on someone else's behalf",
+          not attempt(dee, "insert into public.teacher_requests (user_id, why) values (%s, 'For bea')", (people["bea"],)))
+    bea = as_user("bea")
+    check("no one can ask as an already approved request",
+          not attempt(bea, "insert into public.teacher_requests (user_id, why, state) values (%s, 'Approve me', 'approved')", (people["bea"],)))
+    check("a second person can ask to teach",
+          attempt(bea, "insert into public.teacher_requests (user_id, why) values (%s, 'I teach adults to write.')", (people["bea"],)))
+    bea.execute("select count(*) from public.teacher_requests")
+    check("a person sees only their own request to teach", bea.fetchone()[0] == 1)
+    check("no one can approve their own request",
+          not attempt(bea, "update public.teacher_requests set state = 'approved' where user_id = %s", (people["bea"],)))
+    check("a person can change the words of their own waiting request",
+          attempt(bea, "update public.teacher_requests set why = 'I teach adults to write, at night.' where user_id = %s returning why", (people["bea"],)) and len(last_rows) == 1)
+    check("a person cannot decide their own request through the decision function",
+          not attempt(bea, "select public.decide_teacher_request(%s, true)", (people["bea"],)))
+    anon = as_user(None)
+    check("the public cannot read requests to teach",
+          not attempt(anon, "select count(*) from public.teacher_requests") or last_rows[0][0] == 0)
+
+
+    agent = as_agent("dee")
+    agent.execute("update public.teacher_requests set why = 'rewritten by the agent' where user_id = %s", (people["dee"],))
+    check("a person's agent cannot change their request", agent.rowcount == 0)
+    agent.execute("delete from public.teacher_requests where user_id = %s", (people["dee"],))
+    check("a person's agent cannot take their request back", agent.rowcount == 0)
+    ben_agent = as_agent("ben")
+    check("Ben's agent cannot approve a request",
+          not attempt(ben_agent, "select public.decide_teacher_request(%s, true)", (people["dee"],)))
+
+    ben = as_user("ben")
+    ben.execute("select count(*) from public.teacher_requests")
+    check("someone who can approve sees every request", ben.fetchone()[0] == 2)
+    ben.execute("select count(*) from public.profiles where id in (%s, %s)", (people["dee"], people["bea"]))
+    check("someone who can approve sees who is asking", ben.fetchone()[0] == 2)
+    check("Ben can approve a request",
+          attempt(ben, "select public.decide_teacher_request(%s, true, 'Welcome.')", (people["dee"],)))
+    ben.execute("select invited_by, can_approve from public.teachers where user_id = %s", (people["dee"],))
+    row = ben.fetchone()
+    check("approving adds the teacher, invited by the approver, who cannot approve others", row is not None and str(row[0]) == people["ben"] and row[1] is False)
+    check("a request cannot be decided twice",
+          not attempt(ben, "select public.decide_teacher_request(%s, false)", (people["dee"],)))
+
+    dee = as_user("dee")
+    check("a newly approved teacher can create a cohort",
+          attempt(dee, "insert into public.cohorts (slug, title, created_by) values ('dee-spring', 'Spring', %s) returning id", (people["dee"],)))
+    dee.execute("select count(*) from public.teacher_requests")
+    check("a teacher who cannot approve sees no one else's request", dee.fetchone()[0] == 1)
+    check("a teacher who cannot approve cannot decide a request",
+          not attempt(dee, "select public.decide_teacher_request(%s, true)", (people["bea"],)))
+    dee.execute("update public.teachers set can_approve = true where user_id = %s", (people["dee"],))
+    check("a teacher cannot give themselves the right to approve", dee.rowcount == 0)
+    check("a teacher cannot add another teacher by hand",
+          not attempt(dee, "insert into public.teachers (user_id, invited_by) values (%s, %s)", (people["bea"], people["dee"])))
+    attempt(dee, "delete from public.teacher_requests where user_id = %s", (people["dee"],))
+    check("someone who already teaches cannot ask to teach again",
+          not attempt(dee, "insert into public.teacher_requests (user_id, why) values (%s, 'again')", (people["dee"],)))
+
+    ben = as_user("ben")
+    check("Ben can decline a request with an answer",
+          attempt(ben, "select public.decide_teacher_request(%s, false, 'Take a cohort first.')", (people["bea"],)))
+    bea = as_user("bea")
+    bea.execute("select state, reply from public.teacher_requests where user_id = %s", (people["bea"],))
+    check("the person sees the answer to their request", bea.fetchone() == ("declined", "Take a cohort first."))
+    bea.execute("select count(*) from public.teachers where user_id = %s", (people["bea"],))
+    check("declining adds no teacher", bea.fetchone()[0] == 0)
+    bea.execute("update public.teacher_requests set why = 'changed after' where user_id = %s", (people["bea"],))
+    check("a decided request can no longer be changed", bea.rowcount == 0)
+    bea.execute("delete from public.teacher_requests where user_id = %s", (people["bea"],))
+    check("a person can take their request back", bea.rowcount == 1)
+
     conn.rollback()
     conn.close()
     failed = [n for n, ok in results if not ok]
