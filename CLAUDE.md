@@ -104,7 +104,7 @@ what waits on Ben.
   `bifrieqzkihuxfzttgvd`, free plan, us-west-1, org "Learning is Change,
   Inc"). Schema and row-level security in `supabase/migrations/`, applied
   in order. `supabase/tests/test_policies.py` runs them against a local
-  throwaway Postgres as four people and as a student's AI agent (49
+  throwaway Postgres as four people and as a student's AI agent (58
   checks; agents' tokens carry a `client_id` and can only read); run it
   before applying
   any new migration, and see it fail when a rule is opened on purpose.
@@ -124,10 +124,18 @@ what waits on Ben.
   lists open cohorts from the database, and its "Join with GitHub" goes
   to `/account/?join=<slug>`, where the person confirms. /teach/ opens
   with the feedback queue.
+- **The public hub:** `/apps/app/?r=<owner>/<repo>` is every app's page
+  (its words, where it runs, live commits, its HUMAN-SHAPED.md answers,
+  and its conversation on GitHub), drawn only for apps in the directory
+  or shown by their student; `/apps/` and the home page carry a feed of
+  recent work across apps (at most 8 GitHub calls a visit, cached ten
+  minutes, automated commits left out). Cohort apps appear in public
+  only by the student's own switch (`enrollments.app_public`, migration
+  7, `public_apps()`; see `research/notes/hub-privacy-notes.md`).
 - **Scripts:** `assets/hub-config.js` (public URL and publishable key),
   `hub.js`, `cohorts.js`, `teach.js` with `teach-lib.js`, `cohort.js` and `live.js`
-  with `cohort-lib.js`. Pure logic lives in the `-lib.js` files with
-  tests in `tools/test/` (`node --test tools/test/*.mjs`, 45 tests).
+  with `cohort-lib.js`, and `apps.js` with `apps-lib.js`. Pure logic lives in the `-lib.js` files with
+  tests in `tools/test/` (`node --test tools/test/*.mjs`, 56 tests).
 - **Students' own agents** (research/notes/agent-connection-notes.md):
   the `mcp` Edge Function (`supabase/functions/mcp/`, answers in
   `shape.js`) is a read-only MCP server reached through Supabase Auth's
