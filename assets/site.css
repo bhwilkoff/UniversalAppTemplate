@@ -874,7 +874,7 @@ label.check { display: flex; gap: 0.5rem; align-items: center; font-weight: 400;
 .kit .swatch p { margin: 0; padding: 0.6rem 0.8rem 0.7rem; font-size: 0.9rem; line-height: 1.4; }
 .kit .swatch b { display: block; font-size: 1rem; }
 .kit .swatch code { font-family: inherit; font-weight: 500; color: var(--muted); font-variant-numeric: tabular-nums; }
-.kit .space-demo { display: inline-block; margin: 1.25rem 0 0.5rem; padding: 1.6rem; background: #F7F6F2; border-radius: 12px; outline: 1px dashed #A23F22; outline-offset: -1px; max-width: 100%; }
+.kit .space-demo { display: inline-block; margin: 1.25rem 0 0.5rem; padding: 1.08rem; background: #F7F6F2; border-radius: 12px; outline: 1px dashed #A23F22; outline-offset: -1px; max-width: 100%; }
 .kit .space-demo img { display: block; width: 15rem; max-width: 100%; height: auto; outline: 1px solid #DDD8CF; }
 .kit .rules { margin: 0.5rem 0 0; padding-left: 1.3rem; max-width: var(--measure); }
 .kit .rules li { margin: 0 0 0.9rem; }
@@ -906,7 +906,7 @@ label.check { display: flex; gap: 0.5rem; align-items: center; font-weight: 400;
 .kit-sheet .sheet-rules li::marker { color: #A23F22; font-weight: 680; }
 
 @media (min-width: 40rem) {
-  .kit .brand-grid { grid-template-columns: 1fr 1fr; }
+  .kit .brand-grid { grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); }
 }
 @media (min-width: 56rem) {
   .kit .checklists { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2.5rem; }
