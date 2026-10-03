@@ -46,19 +46,22 @@
     return { code: c, cohortId: chosen, groupId: group ? group.id : null, room: group ? 'group' : 'main', ambiguous: cohorts.length > 1 };
   }
 
-  // What the panel puts first, by the part of the session (CohortLib.PARTS
-  // keys). The panel is narrow, so order matters more than on /live/:
-  // the part and its timer always lead, then what this part needs.
-  //   arrive  the teacher's "what I heard", then the queue
-  //   show    each group's order (only this group, in a group's room)
+  // The side panel is a small launcher of activities (the session now,
+  // the queue, the checks, and room for more later), and this chooses
+  // which one opens, by the part of the session (CohortLib.PARTS keys),
+  // and what "the session now" leads with. The panel is narrow, so it
+  // shows one activity at a time and never hides the others.
+  //   arrive  the session now, with the teacher's "what I heard"
+  //   show    the session now, with each group's order
   //   check   the checks, with the two closing questions ready to ask
-  //   others  the queue, then the checks
+  //   others  the queue
+  // In a group's room, that group's order leads whatever the clock says.
   function panelPlan(partKey, room) {
-    if (room === 'group') return { sections: ['groups', 'queue', 'checks'], closingFirst: false };
-    if (partKey === 'arrive') return { sections: ['heard', 'queue', 'checks'], closingFirst: false };
-    if (partKey === 'show') return { sections: ['groups', 'queue', 'checks'], closingFirst: false };
-    if (partKey === 'check') return { sections: ['checks', 'queue'], closingFirst: true };
-    return { sections: ['queue', 'checks'], closingFirst: false };
+    if (room === 'group') return { open: 'now', lead: 'groups', closingFirst: false };
+    if (partKey === 'arrive') return { open: 'now', lead: 'heard', closingFirst: false };
+    if (partKey === 'show') return { open: 'now', lead: 'groups', closingFirst: false };
+    if (partKey === 'check') return { open: 'checks', lead: null, closingFirst: true };
+    return { open: 'queue', lead: null, closingFirst: false };
   }
 
   // Seconds left on a timer that ends at endsAt (milliseconds), or null

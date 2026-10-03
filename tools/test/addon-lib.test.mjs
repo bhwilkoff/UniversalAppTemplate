@@ -66,14 +66,14 @@ test('when two cohorts share a code, the one this person teaches wins, and it sa
   assert.equal(r.ambiguous, true);
 });
 
-test('the panel leads with what each part of the session needs', () => {
-  assert.deepEqual(lib.panelPlan('arrive', 'main').sections, ['heard', 'queue', 'checks']);
-  assert.deepEqual(lib.panelPlan('show', 'main').sections, ['groups', 'queue', 'checks']);
-  assert.deepEqual(lib.panelPlan('check', 'main'), { sections: ['checks', 'queue'], closingFirst: true });
-  assert.deepEqual(lib.panelPlan('prompt', 'main').sections, ['queue', 'checks']);
-  assert.deepEqual(lib.panelPlan(null, 'main').sections, ['queue', 'checks']);
+test('the panel opens the activity each part of the session needs', () => {
+  assert.deepEqual(lib.panelPlan('arrive', 'main'), { open: 'now', lead: 'heard', closingFirst: false });
+  assert.deepEqual(lib.panelPlan('show', 'main'), { open: 'now', lead: 'groups', closingFirst: false });
+  assert.deepEqual(lib.panelPlan('check', 'main'), { open: 'checks', lead: null, closingFirst: true });
+  assert.equal(lib.panelPlan('prompt', 'main').open, 'queue');
+  assert.equal(lib.panelPlan(null, 'main').open, 'queue');
   // In a group's room, the group's order leads whatever the clock says.
-  assert.deepEqual(lib.panelPlan('prompt', 'group').sections, ['groups', 'queue', 'checks']);
+  assert.deepEqual(lib.panelPlan('prompt', 'group'), { open: 'now', lead: 'groups', closingFirst: false });
 });
 
 test('a timer counts down to zero, and no timer is null', () => {
