@@ -832,6 +832,16 @@ October 3, after every C milestone that does not wait on Ben merged):
   Web Store fee (his decision; unpacked works free), an icon, and the
   listing words. Only a real call shows clip seeking in WebM, the level
   thresholds, and the shortcut inside Meet.
+- 2026-10-03, G6 (template, merged to main as 51d94c2):
+  tools/set_app_identity.py sets each app's own identifier and name
+  everywhere a device or store reads them (Android, Apple, web, Windows,
+  Play upload), with --check failing in a copy that still says
+  com.example.appname; stage 03 asks for it as a conversation. The
+  Android workflow keeps the debug APK 30 days and publishes a shared
+  APK on a `v*-share` tag. Stage 05 "Sharing it for free", cited
+  (limited distribution, adb, Apple's 7-day personal team, the web).
+  COURSE.md no longer says a test track is free. Not yet run: a share
+  tag on GitHub, and a build after an identity change.
 
 ## Where to pick up
 
