@@ -332,6 +332,27 @@ it permanent). 139 node tests. Only a real Meet can show whether its
 frame allows storage access and popups, what startActivity shows others,
 and mobile.
 
+**Classroom milestones merged October 3, evening** (all applied
+through the Management API, 346 database checks and 190 node tests):
+- **C1, live signals** (20261003140000): "go to your rooms" with a
+  countdown and each person's own room first, "come back", cards with
+  the teacher's text and saved presets, /card/ for screen share, who is
+  on stage (with how to pin for everyone), and "recording now".
+- **C4, the board** (20261003150000): Excalidraw (MIT, bundled into the
+  site because the CDN build loads several Reacts) at /board/?c=&s=,
+  group boards, lock and clear for teachers, PNG/SVG/.excalidraw
+  downloads, a stage view for the add-on, element-by-element saves, and
+  private Realtime channels with rules that cover only board: topics. A
+  lock stops saving at once but not strokes from already-connected
+  people until they reconnect. The per-session Slides deck is not built.
+- **C6 and C7, teacher tools and follow-ups** (20261003130000):
+  cohort_roster, student_work, class_now, and a check_this_code prompt
+  on the MCP server for teachers only (redeployed), commits during class
+  on /live/, follow-up cards on /teach/ with drafts kept in the browser,
+  and notes the student reads under "From your teacher".
+- **M14, accessibility audit:** 0 axe violations in 192 runs; live
+  regions narrowed so screen readers no longer re-read whole pages.
+
 **Workspace admin, done October 3 with Ben signed in:** a "Live
 sessions" organizational unit, with meet@humanshaped.org moved into it.
 Already in place and checked: Drive sharing outside the organization,
