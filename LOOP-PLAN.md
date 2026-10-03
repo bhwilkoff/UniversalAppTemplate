@@ -98,10 +98,46 @@ real).
   tools/test_agent_files.py checks the imports, links, and named
   skills. Antigravity itself is sourced, not tested. Pushed to main.
 
+- **M3. Live sessions beyond a companion page.** /live/ gains a "show
+  your work" queue (a live app, a commit, an issue or discussion, a
+  share, or a link; up next, open it, mark shown) and checks for
+  understanding (free text or 2 to 6 choices; the teacher sees answers
+  by name, students see their own and an anonymous count only when the
+  teacher shows it; never scored). Live through Supabase Realtime,
+  polling every 15 seconds if that fails. Everything is deleted when the
+  cohort is marked finished. A read-only `this_session` view is written
+  for the MCP server but not yet deployed. Migration 20261003080000
+  (renumbered to follow the credential migration), applied on the second
+  try (the first expired waiting for a connector approval); the three
+  tables are in supabase_realtime. 171 database checks, 85 node tests.
+  Not yet seen in a real Meet session.
+- **M4. The credential.** Open Badges 3.0 signed with eddsa-rdfc-2022
+  as did:web:humanshaped.org (signatures byte-identical to the reference
+  libraries), ten levels (the web first, then one per platform),
+  /credential/?id= (checks the signature in the browser, offers the
+  file), /credential/issuer/, and issuing on /teach/ for finished
+  cohorts. The private key is made by Ben with
+  tools/credential/make-key.mjs and never enters the repository;
+  .well-known/did.json is live with no key yet. Migration 20261003070000
+  applied: credentials are no longer publicly listable, a signed one
+  cannot change, a revoked one stays revoked. Not yet tried in a real
+  wallet.
+
+**Ben's setup, October 3:** the organization's base permission is none
+and members cannot create repositories; humanshaped/cohort-test is
+private with Discussions on (so the free plan allows it); the "Human
+Shaped Hub" GitHub App (App ID 5177340, installation 167581097) has its
+three secrets in Supabase and is the sign-in provider, and Ben's account
+carried over without a duplicate. Verified end to end: a test cohort
+pointing at a secret test team (cohort-test, kept for the student-side
+test) opened its conversation through cohort-access, and GitHub shows
+Ben as an active maintainer. The OAuth server is on. Still to do:
+dynamic client registration (and the authorization path) in the OAuth
+Server settings, and unchecking "Allow members to create teams". Not
+yet seen: the invitation a brand-new member gets.
+
 **In progress:**
 
-- **M3. Live sessions beyond a companion page** (agent, started October 3).
-- **M4. The credential** (agent, started October 3).
 
 **Proposed from the teaching research** (research/notes/
 facilitation-assessment-social-learning-notes.md, October 3; waiting on
