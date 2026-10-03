@@ -156,6 +156,8 @@
     drawAddForm();
     drawNow(true);
     drawTalk();
+    // During class, for teachers: commits since the session began (C6).
+    if (window.LiveCommits) window.LiveCommits.draw(root, { teaching: S.teaching, people: S.people, since: session.starts_at, token: S.token });
     $('[data-ask]').hidden = !S.teaching;
     $('[data-checks-intro]').textContent = S.teaching
       ? 'Ask a short question to see what is landing. Each person sees only their own answer, and the count of answers only if you choose to show it. Nothing here is graded, and the questions and answers are deleted when the cohort finishes.'

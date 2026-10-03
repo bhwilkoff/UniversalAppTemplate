@@ -1044,6 +1044,26 @@ fieldset.ready-mark .hint { margin: 0; font-size: 0.9rem; color: var(--muted); }
 .check-answers h4 { margin: 0 0 0.5rem; font-size: 1.05rem; }
 .answer-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.4rem; }
 .answer-list li { overflow-wrap: anywhere; }
+/* Follow-ups on /teach/ (C7), commits during class on /live/ (C6), and a
+   teacher's notes on /cohort/ */
+.followups { display: grid; gap: 0.6rem; margin-top: 0.75rem; }
+.followup { padding: 0; }
+.followup > summary { cursor: pointer; padding: 0.85rem 1.1rem; min-width: 0; }
+.followup > summary .followup-gist { display: block; margin-top: 0.15rem; color: var(--muted); overflow-wrap: anywhere; }
+.followup > summary .followup-draft { display: inline-block; margin-left: 0.5rem; border: 1px solid var(--clay); color: var(--clay); border-radius: 999px; padding: 0 0.5rem; font-weight: 600; }
+.followup-line { display: block; margin-top: 0.3rem; }
+.followup-body { padding: 0 1.1rem 1rem; border-top: 1px solid var(--rule); min-width: 0; }
+.followup-body .kicker { font-size: 0.85rem; margin: 0.9rem 0 0.35rem; }
+.followup-body .want { font-style: italic; }
+.followup-form { margin-top: 1rem; }
+.followup-sent { border-left: 3px solid var(--rule); padding-left: 0.75rem; overflow-wrap: anywhere; }
+.live-pushed-list { margin-top: 0.75rem; }
+.live-pushed-list li { overflow-wrap: anywhere; }
+.live-pushed-list .small { display: block; }
+.teacher-notes { margin-top: 1rem; }
+.teacher-notes .feedback p { overflow-wrap: anywhere; }
+.teacher-notes .feedback p + p { margin-top: 0.5rem; }
+.teacher-notes .actions { margin-top: 0.5rem; }
 .inline-form .hint { font-weight: 400; color: var(--muted); font-size: 0.9rem; }
 .group-room { border-top: 1px solid var(--rule); padding-top: 0.75rem; }
 [data-meet-text] { margin-top: 0.5rem; }
