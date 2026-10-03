@@ -316,18 +316,29 @@ and waits on one real sign-in.
   settings. The header names the signed-in person (verified in
   production). CLAUDE.md now says 39 database checks.
 
+- 2026-10-03, **core item 1 done: the hub works end to end, for real.**
+  Signed in as Ben in his own Chrome: made a draft test cohort, made its
+  five weekly sessions (week 5 correctly moves from MDT to MST after
+  daylight saving ends), saved week 1's title and challenge, opened
+  /cohort/ as its teacher, shared a request for feedback, saw it in the
+  /teach/ queue, answered it there (it left the queue), saw the answer
+  on /cohort/, and opened /live/ with its agenda. Two bugs found and
+  fixed, both verified live: the cohort page called a teacher "Someone"
+  (it only knew enrolled students' names), and the "Your app" form
+  showed to people who had not joined because a class's display: grid
+  beat the hidden attribute (now `[hidden] { display: none !important }`
+  site-wide). The test cohort was then deleted; the hub holds no
+  cohorts, sessions, shares, or feedback. Still untested for real: a
+  student joining (needs a second GitHub account and an open cohort).
+
 ## Where to pick up
 
-1. Ask whether Ben has signed in at humanshaped.org/account/ (the
-   session's permission check refuses reading the hub database). If he
-   has, run core item 1.
-2. Core item 2 (cohort conversation), the parts that need no setup
-   from Ben: a migration for each cohort's repository and team; the
-   Edge Function that adds a member to the cohort's team on join and
-   removes them on leave; and the conversation on /cohort/ and /live/,
-   read and posted through GitHub's GraphQL API with the student's own
-   token kept only in sessionStorage. Build against a stand-in until Ben
-   finishes the setup under "Needs Ben".
-3. Small, while waiting: when signed in, the header button and the
-   /account/ heading name the person instead of "Sign in with GitHub".
-4. Then core item 3 (connect your AI agent).
+1. Core item 2, the server function: `supabase/functions/cohort-access`
+   adds a member to their cohort's GitHub team on join and removes them
+   on leave, recording the result in github_access. It needs Ben's
+   GitHub App (see "Needs Ben") before it can run for real; write it
+   with its decision logic in a plain module tested by node, and the
+   GitHub calls behind it.
+2. Then the conversation itself on /cohort/ and /live/, and the
+   teacher's fields for the repository and team in /teach/.
+3. Then core item 3 (connect your AI agent).
