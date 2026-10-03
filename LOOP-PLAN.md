@@ -284,6 +284,21 @@ Ben before COURSE.md or the tools change):
   phased plan and a first prototype. Known so far: tools/meet-events
   (events, per-group rooms, checks) and tools/session-recorder have
   never run against the real Google services.
+  **Research done** (research/notes/meet-addons-and-extensions-notes.md):
+  a Meet add-on published privately to Ben's organization (no review,
+  no fee; only accounts inside it can install it, so teachers first,
+  and students see its main stage through screen share); /live/ stays
+  the students' page (any browser, phones included); no student Chrome
+  extension (installs, phones, fragility, privacy); Education
+  Fundamentals confirmed to lack breakout rooms, polls, Q&A, recording,
+  transcripts, and attendance, but allows 24-hour meetings and
+  co-hosts; Google's Co-Doing API is closed to new signups, so shared
+  state stays on Supabase Realtime; Gemini in Meet is a paid add-on, so
+  students' own agents use the hub's this_session tool. Phases: 0, a dry
+  run of meet-events and the recorder; 1, the private teacher add-on
+  (building now); 2, TRUSTED room access and meeting codes stored so the
+  add-on knows the cohort and group; 3, a public listing only if cohort
+  1 asks, which needs /privacy/ and /terms/ and Google's review.
 
 **Next:**
 
