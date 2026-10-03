@@ -249,7 +249,7 @@ CSS, mobile-first. <!-- FILL IN: API / auth / hosting choices -->.
 GitHub Pages static hosting, branch `main`, root `/`.
 
 **Key directories**:
-- `/`: root; index.html, AGENTS.md (CLAUDE.md imports it), SCRATCHPAD.md, DECISIONS.md
+- `/`: root; index.html, AGENTS.md (CLAUDE.md imports it), SCRATCHPAD.md, DECISIONS.md, design-tokens.json (the look, for every platform)
 - `/css/styles.css`: single main stylesheet
 - `/js/api.js`, `/js/app.js`: API abstraction + view system
 - `/assets/`: static assets (shared with iOS + tvOS + Android)
@@ -261,7 +261,7 @@ automatically.
 **Conventions** (the load-bearing ones; see skills for the rest):
 - All API calls through `js/api.js`, never `fetch` directly
   elsewhere
-- CSS custom properties in `:root` in `styles.css`
+- CSS custom properties in `:root` in `styles.css`, written from `design-tokens.json` (never edit the generated block by hand)
 - Mobile-first; all media queries use `min-width`
 - No inline styles
 - Error states must be user-visible (not just console logs)
@@ -590,34 +590,30 @@ never "correct on Windows". Critical conventions (depth in
 
 ## Shared design system
 
-**Design tokens**: keep these in lockstep across web / Apple / Android /
-Windows. The Apple starter has no token file yet: create
-`Core/Design.swift` (next to `apple/Core/Networking/` and `Store/`) and
-all three Apple platforms share it. Until then the only Apple color is the `AccentColor` asset in
-`apple/Assets.xcassets/`.
+**Design tokens have one source: `design-tokens.json`** at the root. It
+holds the palette (light and dark), the six-level type ramp, spacing, and
+radius. `node tools/design_tokens.mjs` writes every platform's token file
+from it, and `node tools/test_design_tokens.mjs` (in `tools/test_web.sh`
+and the Design Tokens workflow) fails if any file drifts from the JSON or a
+text pair drops below WCAG AA. To change the look: **edit
+`design-tokens.json`, run the generator, then build and look at every
+platform**, light and dark. Never hand-edit a generated file or a
+`BEGIN design-tokens` block; the test will fail, and it should.
 
-| Token | Web | Apple (iOS/macOS/tvOS Core) | Android | Windows |
-|---|---|---|---|---|
-| Primary | `--color-primary` in `:root` | `Color.brandPrimary` in `Design.swift` (you create it; not `Color.primary`, which SwiftUI already defines) | `BrandPrimary` in `ui/theme/Color.kt` | `BrandPrimary` in `App.axaml` (+ the pinned `.accent` styles) |
-| Surface | `--color-surface` | `Color.brandSurface` | `BrandSurface` | `BrandSurface` / `Border.card` |
+| Platform | Generated from the JSON | Reads it as |
+|---|---|---|
+| Web | the `:root` block in `css/styles.css`; theme-color metas in `index.html`; `manifest.json` colors | `var(--color-primary)`, `--type-page-title-size`, `--space-4`, `--radius-card` |
+| Apple (iOS/iPadOS/macOS/tvOS) | `apple/Core/Design.swift`; `AccentColor.colorset` | `Color.brandPrimary` (never `Color.primary`, which SwiftUI already defines), `Color.semanticError`, `TypeRamp.pageTitle`, `Spacing.s4`, `Radius.card` |
+| Android | `ui/theme/Color.kt`, `Type.kt`; `res/values{,-night}/colors.xml` | `MaterialTheme.colorScheme` (mapped in the hand-written `Theme.kt`), `AppSemantics.colors.error`, `Spacing.S4` |
+| Windows | the two `design-tokens` blocks in `App.axaml`; the splash color in `AppxManifest.xml` | `{DynamicResource BrandPrimaryBrush}`, `RadiusCard`, the `TextBlock` ramp classes |
+| Smart-TV web, Cast, webOS | the `html.tv` block in `tv.css`; the block in `cast/index.html`; `tv/webos/appinfo.json` | the dark palette (`--tv-bg`, `--tv-accent`), since TV is dark-first |
 
-<!-- FILL IN your palette. Two systems, kept distinct:
-     - Brand (UI chrome only): primary CTA, accent, background, surface
-     - Semantic (content only): success / warning / error + domain-specific
-
-     The split is binding: never use a brand color for content meaning,
-     never use a semantic color for chrome. -->
-
-```css
-:root {
-  --color-primary:    #FF5C35;  /* CTAs, active states */
-  --color-accent:     #0047FF;  /* links, interactive */
-  --color-bg:         #FFFFFF;
-  --color-surface:    #F7F7F7;
-  --color-text:       #0A0A0A;
-  --color-border:     #E0E0E0;
-}
-```
+Two systems, kept distinct (Decision 012): **brand** colors (primary,
+background, surface, text, border) are UI chrome only, and **semantic**
+colors (success, warning, error) carry content meaning only. Never use a
+brand color for content meaning or a semantic color for chrome. Add a
+domain-specific semantic color to `color.semantic` in the JSON, and the
+generator carries it to every platform.
 
 **Typography hierarchy**: three weights × two sizes = six levels.
 Refuse a seventh; refactor instead. See `mobile-first-density-design`
@@ -625,13 +621,16 @@ for the discipline.
 
 | Level | Web class | iOS / macOS `Font.TextStyle` | tvOS | Android M3 token | Windows (`App.axaml`) |
 |---|---|---|---|---|---|
-| L1 Page title | `.view-heading` | `.largeTitle` | `.title1` (57pt) | `displaySmall` | `TextBlock.view-heading` (34/Black) |
-| L2 Section header | `.section-header` | `.title2` | `.title3` (38pt) | `headlineSmall` | `.section-header` (20/Bold) |
+| L1 Page title | `.view-heading` | `.largeTitle` | `.title1` (57pt) | `displaySmall` | `TextBlock.view-heading` |
+| L2 Section header | `.section-header` | `.title2` | `.title3` (38pt) | `headlineSmall` | `.section-header` |
 | L3 Emphasized body | `.body-strong` | `.headline` | `.headline` | `titleMedium` | `.body-strong` |
 | L4 Body | `.body` | `.body` | `.body` (29pt, the 10-ft floor) | `bodyMedium` | `.body` |
 | L5 Caption | `.caption` | `.caption` | `.caption1` (25pt) | `labelMedium` | `.caption` |
 | L6 Tabular | `.tabular` | `.body.monospacedDigit()` | same | `bodySmall` w/ tabular | `.tabular` |
 
+The sizes and weights live in `design-tokens.json` (`type`), and the
+generator applies them on the web, Android, and Windows. Apple keeps the
+system text styles so Dynamic Type works, with the JSON's weights.
 macOS shares the iOS `Font.TextStyle` ramp (same Core `Design.swift`).
 tvOS uses the same six levels but its own larger ramp: system tokens
 only, never hardcoded sizes. 29pt is the body floor at ten feet.

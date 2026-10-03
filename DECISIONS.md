@@ -1236,3 +1236,29 @@ enforceable in review instead of tribal.
 **How to apply**: fill the Display Vocabulary section of
 `docs/DATA-CONTRACT.md` (template §5.5); reject PRs that render a
 schema name the mapping translates.
+
+---
+
+## 053: The look has one source, and every platform's tokens are generated from it
+*Date: 2026-10-03*
+
+`design-tokens.json` at the repository root holds the palette (light and
+dark), the type ramp, spacing, and radius. `tools/design_tokens.mjs`
+writes every platform's token file from it, and
+`tools/test_design_tokens.mjs` fails when any of them differs from a
+fresh run or a text pair falls below WCAG AA.
+
+**Why**: the lockstep rule was a sentence, and the starter's own
+placeholders broke it: the web was white with a blue accent, Android was
+dark navy with an orange primary, Windows pinned orange, Apple's
+AccentColor was blue, and each type ramp had different sizes. A student
+whose agent changed the look in one file would see it on one platform
+only. A rule that a test holds cannot drift that way.
+
+**How to apply**: change the look in `design-tokens.json`, run the
+generator, run the test, then build and look at every platform. Never
+hand-edit a generated file or a `BEGIN design-tokens` block. Each
+platform still maps tokens into its own idiom by hand (Android's
+`Theme.kt` slots, Windows control styles, Apple views), and Apple keeps
+system text styles for Dynamic Type. A deleted platform folder is
+skipped, not recreated.

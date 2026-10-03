@@ -222,9 +222,14 @@ Stage 04 is about why that matters.
    subject and come back with three different directions, each shown on
    your app's real core screen. Choose one (or take parts from two), ask
    for another round on it, and then ask for it on every platform at
-   once, so the look holds the same way the features do. If you are in a
-   cohort, bring the three directions to your classmates before you
-   choose.
+   once, so the look holds the same way the features do. The agent makes
+   that change in one place, `design-tokens.json`, which every
+   platform's colors, type, and spacing are written from, and a test
+   fails if any platform drifts from it. The cost is that a color someone
+   changes by hand in one platform's file gets undone the next time the
+   tokens are written, so ask for every change to the look through that
+   one file. If you are in a cohort, bring the three directions to your
+   classmates before you choose.
 
 **When you are ready to move on,** the second platform is on your own
 device, it does the same things as the first in its own idiom, it looks

@@ -1,16 +1,16 @@
 ---
 name: make-it-look-like-itself
-description: "Use when an app built from this template still wears the template's look (its placeholder colors, fonts, shadows and icon), when the builder says 'it looks like every other app', 'make it ours', 'give it a look', 'design the brand', 'pick colors/fonts/icon', or at the stage 03 'make it look like itself' step. Researches real references first, proposes three distinct directions drawn from the app's own why, lets the builder choose or mix, then applies the chosen look in lockstep on every platform the app ships (web, Apple, Android, Windows) while keeping each platform's native idiom. Also the answer to store rejections for look-alike apps."
+description: "Use when an app built from this template still wears the template's look (its placeholder colors, type, and icon), when the builder says 'it looks like every other app', 'make it ours', 'give it a look', 'design the brand', 'pick colors/fonts/icon', or at the stage 03 'make it look like itself' step. Researches real references first, proposes three distinct directions drawn from the app's own why, lets the builder choose or mix, then applies the chosen look to every platform at once by changing design-tokens.json and running tools/design_tokens.mjs, while keeping each platform's native idiom. Also the answer to store rejections for look-alike apps."
 ---
 
 # Make it look like itself
 
 Every app built from this template starts out looking like the template:
-the web starter's neubrutalist shadows and Syne and Inter type, the
-placeholder brand colors in each platform's theme file, and an empty
-app icon. That look is a placeholder, and an app that ships wearing it
-says nothing about the people it is for. It also looks like every other
-app made from the same starting point, which the App Store (guideline
+a quiet slate on neutral gray, the system typeface, and an empty app
+icon, all of it from the placeholder values in `design-tokens.json`.
+That look is a placeholder, and an app that ships wearing it says
+nothing about the people it is for. It also looks like every other app
+made from the same starting point, which the App Store (guideline
 4.3) and Google Play both treat as a reason to reject.
 
 The look should come from the app's own why. A trivia game for a
@@ -54,9 +54,10 @@ skill exists to avoid.
 For each direction:
 
 - a short name and two sentences on how it feels, tied to the why;
-- a palette (background, surface, text, muted text, one accent, the
-  border, and dark-mode versions) with every text pair's contrast ratio
-  checked to WCAG 2.2 AA;
+- a palette in the shape of `design-tokens.json`'s `color.brand`
+  (primary, onPrimary, background, surface, surfaceAlt, text, textMuted,
+  border), light and dark, with every text pair's contrast ratio checked
+  to WCAG 2.2 AA;
 - type: one family, or at most two, on the web, and what native uses;
 - corner radius, density, and how the focused or selected thing stands
   out;
@@ -80,23 +81,33 @@ one at least once before it ships (principle 4). Record the decision in
 `DECISIONS.md` with the why first, and add it to the platform design
 docs if they exist.
 
-### 5. Apply it in lockstep
+### 5. Apply it to every platform at once
 
-Change every platform the app ships, in the same round, so that parity
-holds:
+The look has one source, `design-tokens.json` at the repository root, so
+it cannot drift between platforms:
 
-| Platform | Where the look lives |
+1. Change `design-tokens.json`: `color.brand` (light and dark), the
+   `type` ramp's sizes and weights, `font.body.web` and `font.mono`,
+   `space`, and `radius`. Leave `color.semantic` alone unless its meaning
+   changes (success, warning, and error carry meaning, not brand).
+2. Run `node tools/design_tokens.mjs`. It rewrites the web `:root` block,
+   `apple/Core/Design.swift` and AccentColor, Android `Color.kt`, `Type.kt`
+   and `colors.xml` (day and night), the Windows `App.axaml` blocks, and
+   the TV, Cast, and webOS colors.
+3. Run `node tools/test_design_tokens.mjs`. It fails if any file drifts or
+   a text pair falls below AA.
+4. Build and look at every platform the app ships, light and dark.
+
+Never hand-edit a generated file or a `BEGIN design-tokens` block. What
+the JSON does not hold stays hand-made, per platform:
+
+| Platform | By hand |
 |---|---|
-| Web | `css/styles.css` `:root` tokens; font links in `index.html`; remove the neubrutalist shadows if the direction does not use them |
-| Apple (iOS, iPadOS, macOS, tvOS) | `apple/Assets.xcassets` (AccentColor, AppIcon); create `apple/Core/Design.swift` for brand colors (`Color.brandPrimary`, never `Color.primary`) |
-| Android | `android/app/src/main/java/.../ui/theme/Color.kt`, `Type.kt`, `Theme.kt`; launcher icon resources |
-| Windows | `windows/AppName.App/App.axaml` brand resources and the pinned accent styles |
-| Stores and web share | the app icon in every required size, the Open Graph image, store screenshots |
-
-Keep the token names identical across platforms (the token table in
-`AGENTS.md`), and keep brand tokens separate from semantic ones (success,
-warning, and error colors carry meaning and do not change with the
-brand).
+| Web | font links in `index.html` if the face is not a system one; component shapes in `css/styles.css` |
+| Apple | `AppIcon` in `apple/Assets.xcassets`; views read `Color.brandPrimary`, `TypeRamp`, `Spacing`, `Radius` |
+| Android | which M3 slots each token fills (`Theme.kt`); a custom face in `res/font/`; launcher icon |
+| Windows | control styles in `App.axaml` (they read `{DynamicResource Brand...Brush}`); app icon assets |
+| Stores and web share | the app icon in every required size, the Open Graph image, store screenshots; `tools/make_tv_banner.py` reads the JSON |
 
 ### 6. Prove it
 
