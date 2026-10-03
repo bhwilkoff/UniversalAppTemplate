@@ -13,6 +13,7 @@
 
   // Template files that have a page of their own on this site.
   var SITE = {
+    'docs/path/setup.md': '/path/setup/',
     'docs/path/00-why-we-build.md': '/path/00/',
     'docs/path/01-first-prototype.md': '/path/01/',
     'docs/path/02-shape-of-an-app.md': '/path/02/',
