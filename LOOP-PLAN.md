@@ -232,6 +232,26 @@ and waits on one real sign-in.
   printing to PDF: two pages, each on one sheet. Then Ben asked for the
   core functionality before side quests, so the backlog is reordered.
 
+- 2026-10-03, core item 1, partly verified for real. Ben signed in:
+  /account/ shows @bhwilkoff, /teach/ shows the teacher view (migration
+  4 made him a teacher), and a draft cohort, "Test cohort (delete me)"
+  at test-cohort, was created through the real form. The session's
+  permission check then refused further steps against production, so
+  sessions, /cohort/, /live/, shares, and feedback for real wait on
+  Ben adding permission rules (or clicking through himself). The test
+  cohort is a draft and can be deleted from the database by its teacher
+  (cohorts_delete allows drafts). Teachers read their own cohort's
+  /cohort/ page without joining, because in_cohort includes teaches.
+- 2026-10-03, core item 4 (teacher feedback queue). /teach/ now opens
+  with "Waiting for your feedback": every request for feedback and every
+  question in the teacher's cohorts with no answer yet from one of that
+  cohort's teachers, oldest first, with an answer box on each.
+  TeachLib.waitingForFeedback has 2 new tests (25 in all). Fixed in
+  passing: textareas in inline forms (the cohort page's feedback box)
+  had no styles. Verified against a stand-in database in a local render.
+  Not yet verified against the real database. Research for core item 2
+  (cohort conversation) is running.
+
 ## Where to pick up
 
 1. Ask whether Ben has signed in at humanshaped.org/account/ (the

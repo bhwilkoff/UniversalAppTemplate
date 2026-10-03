@@ -32,3 +32,21 @@ test('the Meet setup matches what tools/meet-events reads', () => {
   const out = lib.meetSetup({ slug: 'fall-2026', title: 'Fall 2026', starts_on: '2026-10-19', session_weekday: 2, session_time: '17:00:00', time_zone: 'America/Denver', session_minutes: 75, weeks: 5 }, ['a@example.org', 'b@example.org'], ['t@example.org']);
   assert.deepEqual(out, { id: 'fall-2026', title: 'Fall 2026', startDate: '2026-10-20', weekday: 'TU', startTime: '17:00', timeZone: 'America/Denver', minutes: 75, sessions: 5, members: 'a@example.org, b@example.org', teachers: 't@example.org', sessionUrl: 'https://humanshaped.org/live/?c=fall-2026' });
 });
+
+test('the feedback queue holds unanswered requests and questions, oldest first', () => {
+  const shares = [
+    { id: 'a', cohort_id: 'c1', kind: 'for-feedback', created_at: '2026-10-08T10:00:00Z', feedback: [] },
+    { id: 'b', cohort_id: 'c1', kind: 'question', created_at: '2026-10-07T10:00:00Z' },
+    { id: 'c', cohort_id: 'c1', kind: 'bring-back', created_at: '2026-10-06T10:00:00Z', feedback: [] },
+    { id: 'd', cohort_id: 'c1', kind: 'for-feedback', created_at: '2026-10-05T10:00:00Z', feedback: [{ author_id: 'ben' }] },
+    { id: 'e', cohort_id: 'c2', kind: 'for-feedback', created_at: '2026-10-04T10:00:00Z', feedback: [{ author_id: 'classmate' }] },
+    { id: 'f', cohort_id: 'c2', kind: 'ai-review', created_at: '2026-10-03T10:00:00Z', feedback: [] }
+  ];
+  const teachers = { c1: ['ben'], c2: ['ben', 'ana'] };
+  assert.deepEqual(lib.waitingForFeedback(shares, teachers).map((s) => s.id), ['e', 'b', 'a']);
+});
+
+test('feedback from any teacher of the cohort answers a request', () => {
+  const shares = [{ id: 'a', cohort_id: 'c2', kind: 'for-feedback', created_at: '2026-10-08T10:00:00Z', feedback: [{ author_id: 'ana' }] }];
+  assert.deepEqual(lib.waitingForFeedback(shares, { c2: ['ben', 'ana'] }), []);
+});

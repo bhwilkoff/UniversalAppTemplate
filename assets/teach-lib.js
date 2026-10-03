@@ -68,7 +68,20 @@
     };
   }
 
-  var lib = { zonedToUtc: zonedToUtc, sessionDates: sessionDates, sessionRows: sessionRows, meetSetup: meetSetup, WEEKDAYS: WEEKDAYS };
+  // What is waiting for a teacher: every share that asks for feedback or
+  // asks a question, with no answer yet from anyone who teaches its
+  // cohort, oldest first so nobody's request sinks under newer ones.
+  // A classmate's feedback is welcome, and it does not take the request
+  // off the teacher's list.
+  function waitingForFeedback(shares, teachersByCohort) {
+    return shares.filter(function (s) {
+      if (s.kind !== 'for-feedback' && s.kind !== 'question') return false;
+      var teachers = teachersByCohort[s.cohort_id] || [];
+      return !(s.feedback || []).some(function (f) { return teachers.indexOf(f.author_id) >= 0; });
+    }).sort(function (a, b) { return a.created_at.localeCompare(b.created_at); });
+  }
+
+  var lib = { zonedToUtc: zonedToUtc, sessionDates: sessionDates, sessionRows: sessionRows, meetSetup: meetSetup, waitingForFeedback: waitingForFeedback, WEEKDAYS: WEEKDAYS };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
   else root.TeachLib = lib;
 })(this);

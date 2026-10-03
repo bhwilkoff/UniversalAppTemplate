@@ -523,7 +523,7 @@ dialog.confirm h2 { margin-top: 0; font-size: 1.3rem; }
 .cohort-form:not([hidden]), .session-row, .inline-form { display: grid; gap: 0.9rem; margin-top: 1rem; }
 .cohort-form label, .session-row label, .inline-form label { display: grid; gap: 0.35rem; font-weight: 600; font-size: 0.95rem; }
 .cohort-form input, .cohort-form select, .cohort-form textarea,
-.session-row input, .session-row textarea, .inline-form input {
+.session-row input, .session-row textarea, .inline-form input, .inline-form textarea {
   font: inherit; font-weight: 400; padding: 0.6rem 0.7rem; border: 1px solid var(--muted);
   border-radius: 10px; background: var(--card); color: var(--ink); min-height: 44px;
 }
@@ -600,3 +600,7 @@ label.check { display: flex; gap: 0.5rem; align-items: center; font-weight: 400;
   body[data-printing="principles"] #questions,
   body[data-printing="questions"] #principles { display: none; }
 }
+
+/* The feedback queue on /teach/ */
+.queue { margin-bottom: 3rem; }
+.queue .cohort-card .small { margin: 0 0 0.5rem; }
