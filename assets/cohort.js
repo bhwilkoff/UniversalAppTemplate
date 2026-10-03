@@ -146,7 +146,10 @@
           if (bad) return fail('This cohort could not be loaded: ' + bad.error.message);
           var people = res[0].data;
           var mine = people.filter(function (p) { return p.user_id === me.id; })[0];
-          if (!mine && !res[1].data.length && !people.length) return show('not-member');
+          // In the cohort means enrolled, or teaching it (a brand-new cohort
+          // has no sessions or people yet, so their absence proves nothing).
+          var teaching = res[5].data.some(function (t) { return t.user_id === me.id; });
+          if (!mine && !teaching) return show('not-member');
           draw(people, mine, res[1].data, res[2].data, res[3].data, res[4].data, res[5].data);
           drawTalk(res[6].data);
         });
