@@ -100,8 +100,14 @@ When the test call works, the public listing needs what we do not have
 yet, and each is a small piece of work for the agent and a few minutes
 for you:
 
-- a privacy page and a terms page on humanshaped.org, linked from the
-  consent screen, the listing, and the deployment (`termsUri`);
+- the privacy, terms, and support pages, drafted at
+  https://humanshaped.org/privacy/, /terms/, and /support/ and waiting
+  for your review: link the first two from the consent screen and the
+  listing, and the support page from the listing (the deployment
+  already carries `termsUri`, the only one of the three its manifest
+  has a field for). Google also asks the listing for a legal business
+  name, a physical address, and a monitored support email; the pages
+  use meet@humanshaped.org and leave a marked spot for the other two;
 - the consent screen published for External use (no scopes, so no
   verification of sensitive scopes is expected);
 - **Public** chosen once in the Marketplace SDK's App Configuration, as a
