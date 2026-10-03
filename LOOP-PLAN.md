@@ -164,6 +164,15 @@ yet seen: the invitation a brand-new member gets.
   Research in research/notes/toolkit-notes.md. Verified live; every page
   labels its copy as a draft awaiting Ben's read.
 
+- **Submitting and hiding** (Ben's decisions, October 3). The student's
+  switch is their "it is ready"; from the start of the second-to-last
+  session, anyone who has not submitted sees one calm note naming what
+  is missing, and their teacher sees who has not yet. A teacher can hide
+  an app from public view (app_hides, with a reason only the student and
+  their teachers see); it stays on the cohort's own pages. Migration
+  20261003090000 applied (after two expired connector approvals, with
+  Ben at the Mac). 194 database checks, 110 node tests.
+
 **In progress:** nothing; every milestone agent has reported.
 
 
