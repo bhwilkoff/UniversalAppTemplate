@@ -851,6 +851,84 @@ def main():
     su8.execute("select count(*) from public.share_confirmations where user_id = %s", (people["eve"],))
     check("when someone leaves, the confirmations they gave leave with them", su8.fetchone()[0] == 0)
 
+    # Follow-ups (migration 20261003130000): a note a teacher sends to one
+    # student, readable by that student and the cohort's teachers only.
+    # bea and eve are students in it, fay is a student elsewhere, dee
+    # teaches another cohort, and anon is the public.
+    ben = as_user("ben")
+    attempt(ben, "insert into public.cohorts (slug, title, created_by, status) values ('notes-test', 'Notes', %s, 'open') returning id", (people["ben"],))
+    nc = last_rows[0][0]
+    attempt(ben, "insert into public.sessions (cohort_id, number) values (%s, 1) returning id", (nc,))
+    n1 = last_rows[0][0]
+    for name in ["bea", "eve"]:
+        cur = as_user(name)
+        attempt(cur, "insert into public.enrollments (cohort_id, user_id) values (%s, %s)", (nc, people[name]))
+    ben = as_user("ben")
+    check("a teacher can send a follow-up note to a student in the cohort",
+          attempt(ben, "insert into public.teacher_notes (cohort_id, student_id, author_id, session_id, body) values (%s, %s, %s, %s, 'Your question about sync is the right one. Bring it next week.') returning id", (nc, people["bea"], people["ben"], n1)))
+    note = last_rows[0][0] if last_rows else None
+    check("a note cannot be empty",
+          not attempt(ben, "insert into public.teacher_notes (cohort_id, student_id, author_id, body) values (%s, %s, %s, '   ')", (nc, people["bea"], people["ben"])))
+    check("a teacher cannot send a note in someone else's name",
+          not attempt(ben, "insert into public.teacher_notes (cohort_id, student_id, author_id, body) values (%s, %s, %s, 'Hi')", (nc, people["bea"], people["dee"])))
+    check("a teacher cannot send a note to someone who is not in the cohort",
+          not attempt(ben, "insert into public.teacher_notes (cohort_id, student_id, author_id, body) values (%s, %s, %s, 'Hi')", (nc, people["fay"], people["ben"])))
+    check("a note must be about a session of the same cohort",
+          not attempt(ben, "insert into public.teacher_notes (cohort_id, student_id, author_id, session_id, body) values (%s, %s, %s, %s, 'Hi')", (nc, people["bea"], people["ben"], t1)))
+    ben.execute("update public.teacher_notes set body = 'rewritten' where id = %s", (note,))
+    check("a sent note is not rewritten", ben.rowcount == 0)
+    bea = as_user("bea")
+    bea.execute("select body from public.teacher_notes where cohort_id = %s", (nc,))
+    check("the student reads the note sent to them", [r[0] for r in bea.fetchall()] == ["Your question about sync is the right one. Bring it next week."])
+    check("a student cannot send a note",
+          not attempt(bea, "insert into public.teacher_notes (cohort_id, student_id, author_id, body) values (%s, %s, %s, 'From bea')", (nc, people["eve"], people["bea"])))
+    eve = as_user("eve")
+    eve.execute("select count(*) from public.teacher_notes")
+    check("a classmate cannot read a note sent to someone else", eve.fetchone()[0] == 0)
+    eve.execute("delete from public.teacher_notes where id = %s", (note,))
+    check("a classmate cannot remove a note sent to someone else", eve.rowcount == 0)
+    dee = as_user("dee")
+    dee.execute("select count(*) from public.teacher_notes")
+    check("a teacher of another cohort cannot read the notes", dee.fetchone()[0] == 0)
+    check("a teacher of another cohort cannot send a note in this one",
+          not attempt(dee, "insert into public.teacher_notes (cohort_id, student_id, author_id, body) values (%s, %s, %s, 'Hi')", (nc, people["bea"], people["dee"])))
+    anon = as_user(None)
+    anon.execute("select count(*) from public.teacher_notes")
+    check("the public sees no notes", anon.fetchone()[0] == 0)
+    ben = as_user("ben")
+    ben.execute("select count(*) from public.teacher_notes where cohort_id = %s", (nc,))
+    check("the cohort's teachers read the notes sent in it", ben.fetchone()[0] == 1)
+    ben_agent = as_agent("ben")
+    check("a teacher's agent cannot send a note",
+          not attempt(ben_agent, "insert into public.teacher_notes (cohort_id, student_id, author_id, body) values (%s, %s, %s, 'Written by the agent')", (nc, people["eve"], people["ben"])))
+    ben_agent.execute("delete from public.teacher_notes where id = %s", (note,))
+    check("a teacher's agent cannot take a note back", ben_agent.rowcount == 0)
+    agent = as_agent("bea")
+    agent.execute("select count(*) from public.teacher_notes where student_id = %s", (people["bea"],))
+    check("a student's agent can read the notes sent to the student", agent.fetchone()[0] == 1)
+    agent.execute("delete from public.teacher_notes where id = %s", (note,))
+    check("a student's agent cannot remove a note", agent.rowcount == 0)
+    bea = as_user("bea")
+    bea.execute("delete from public.teacher_notes where id = %s", (note,))
+    check("the student can remove a note sent to them", bea.rowcount == 1)
+    ben = as_user("ben")
+    attempt(ben, "insert into public.teacher_notes (cohort_id, student_id, author_id, body) values (%s, %s, %s, 'One for eve')", (nc, people["eve"], people["ben"]))
+    attempt(ben, "insert into public.teacher_notes (cohort_id, student_id, author_id, body) values (%s, %s, %s, 'One more for bea') returning id", (nc, people["bea"], people["ben"]))
+    bea_note = last_rows[0][0]
+    ben.execute("delete from public.teacher_notes where id = %s", (bea_note,))
+    check("the teacher who sent a note can take it back", ben.rowcount == 1)
+    attempt(ben, "insert into public.teacher_notes (cohort_id, student_id, author_id, body) values (%s, %s, %s, 'Again for bea')", (nc, people["bea"], people["ben"]))
+    eve = as_user("eve")
+    eve.execute("select public.leave_cohort(%s)", (nc,))
+    su9 = conn.cursor(); su9.execute("reset role")
+    su9.execute("select count(*) from public.teacher_notes where student_id = %s", (people["eve"],))
+    check("when a student leaves, the notes sent to them there leave too", su9.fetchone()[0] == 0)
+    ben = as_user("ben")
+    ben.execute("update public.cohorts set status = 'finished' where id = %s", (nc,))
+    su9 = conn.cursor(); su9.execute("reset role")
+    su9.execute("select count(*) from public.teacher_notes where cohort_id = %s", (nc,))
+    check("when the cohort is finished, its notes are deleted", su9.fetchone()[0] == 0)
+
     conn.rollback()
     conn.close()
     failed = [n for n, ok in results if not ok]
