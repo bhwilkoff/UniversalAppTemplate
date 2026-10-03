@@ -173,6 +173,17 @@ yet seen: the invitation a brand-new member gets.
   20261003090000 applied (after two expired connector approvals, with
   Ben at the Mac). 194 database checks, 110 node tests.
 
+- **Students' agents, connected for real** (October 3, 20:55 UTC). Ben
+  added "Human Shaped" as a custom connector on claude.ai: Claude
+  detected OAuth and dynamic registration by itself, registered as a
+  client named "Claude" (auth.oauth_clients, dynamic), Ben allowed it on
+  /oauth/consent/ (one consent recorded), and the mcp function answered
+  five signed-in requests with 200 after two expected 401s. The mcp
+  function now deploys with tools/deploy-mcp.sh through Supabase's own
+  CLI (Ben's access token in ~/.humanshaped/supabase-token, never in the
+  repository), so deploys need no connector approval. Still to confirm:
+  a tool's answer in a real conversation.
+
 **In progress:** nothing; every milestone agent has reported.
 
 
