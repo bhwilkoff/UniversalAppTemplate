@@ -285,6 +285,10 @@ posting on September 8:
 > I'd like you to use Chrome to take me to the right screen to generate
 > the oauth token and I'd like you to walk me through that process
 
+(Antigravity's browser is a separate, sandboxed one, so in Antigravity
+ask for the exact address and the steps, and open them in your own
+browser, where you are already signed in.)
+
 And adding two more Apple TVs to the test bench on September 11:
 
 > Let's get connected to all of the Apple TV's in my house via the known
@@ -317,6 +321,9 @@ does not. A Tidbits loop on August 26 kept repeating the same checks:
 
 > Stop the loop until you can tell me what you are actually doing with
 > it.
+
+In Antigravity, the same prompt starts with `/goal`, which keeps working
+until the goal is met, and `/schedule` runs one on a timer.
 
 ## What stays yours
 

@@ -39,12 +39,12 @@ the agent to keep them, and to notice when it has not.
 
 | File | Its job | Read |
 |---|---|---|
-| `AGENTS.md` (`CLAUDE.md` imports it) | Who the app is for, the rules, and the table of which skill to use when. | At the start of every session |
+| `AGENTS.md` (`CLAUDE.md` and `GEMINI.md` import it) | Who the app is for, the rules, and the table of which skill to use when. | At the start of every session |
 | `SCRATCHPAD.md` | The current state, the next actions, and the last two session-log entries (state found, work done, state left). Older entries move, word for word, to `docs/SESSION-LOG.md`. | At the start of every session |
 | `DECISIONS.md` | Why the app is built the way it is. Each entry leads with the rule, then why, then how to apply it. | Before changing anything it covers |
 | `PARITY.md` | What exists on which platform, honestly. | Before and after any feature |
-| The memory folder | Corrections and confirmations from you, each with a "Why" line. | At the start of every session |
-| `.claude/skills/` | Lessons that should travel to the next app. | When a request matches |
+| The agent's memory | Corrections and confirmations from you, each with a "Why" line. Claude keeps them in its memory folder. A rule for the whole project goes in `AGENTS.md`, which every agent reads. | At the start of every session |
+| `.claude/skills/` | Lessons that should travel to the next app. Gemini finds them through `.agents/skills/`. | When a request matches |
 
 Two rules keep these useful.
 

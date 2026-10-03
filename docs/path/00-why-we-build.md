@@ -94,8 +94,9 @@ this stage is where the first one starts.
 There are three places, and each one is read at a different moment.
 
 1. **`AGENTS.md`, "Why we build."** Your agent loads this file at the
-   start of every session (`CLAUDE.md` imports it for Claude Code). The
-   paragraph at the top is the one I wrote for every app I build:
+   start of every session (`CLAUDE.md` imports it for Claude Code, and
+   `GEMINI.md` for Gemini). The paragraph at the top is the one I wrote
+   for every app I build:
 
    > Every feature in this app is built in service of human learning and
    > growth, not to replace thinking, but to deepen it. [...] The goal is
@@ -178,8 +179,9 @@ default.
 
 ## Working with your agent
 
-Open Claude Code in your copy of the template. Everything in this stage
-is a conversation, and `talking-to-your-agent.md` has the moves.
+Open your agent (Claude Code, or Antigravity for Gemini) in your copy of
+the template. Everything in this stage is a conversation, and
+`talking-to-your-agent.md` has the moves.
 
 1. **Start your note with the why.** Open a plain note for your app, in
    whatever notes app you already use. At the top, write what the app is

@@ -224,6 +224,13 @@ watching.
    what is waiting on you. Then write what went wrong this time into
    the note, so the next loop's charter can say it up front.
 
+   In Antigravity, start the same prompt with `/goal`, which keeps
+   working until the goal is met, or use `/schedule` to run it on a
+   timer. On a free or entry plan, the weekly limit can run out partway
+   through a job this size, so you may do better sending it in rounds:
+   one numbered list at a time, with the next one drafted in your note
+   while the limit resets.
+
 **When you are ready to move on,** Pulse reads at least one store
 honestly, a failure email has become a fix instead of a habit, and you
 have run a loop from start to stop. You can see what is happening to

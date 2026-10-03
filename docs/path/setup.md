@@ -33,10 +33,13 @@ through.
   Pages.
 - **An AI agent that can work in your repository** is the one real
   cost. Claude's free plan does not include Claude Code, so the
-  cheapest way in is Claude Pro, at about $20 a month. Google's paid AI
-  plan, at about the same price, gives Gemini CLI room to work. Bring
+  cheapest way in is Claude Pro, at about $20 a month. Google's agent is
+  now Antigravity, because Gemini CLI stopped serving free and Google AI
+  Pro accounts in June 2026. Antigravity's free plan comes with a weekly
+  limit, and Google AI Pro, also about $20 a month, raises it. Bring
   whichever you already have. I build with Claude Code, so that is the
-  one these pages describe first.
+  one these pages describe first, with a note for Antigravity wherever a
+  step works differently there.
 - **A desktop or laptop computer** is the setup I recommend, because it
   lets you build both on your own machine and in the cloud. A Mac lets
   you build for Apple's devices later; Windows and Linux reach the web,
@@ -60,8 +63,10 @@ them is a conversation.
    GitHub Pages put it on the web for free.
 3. **Get your agent.** For Claude, subscribe to Claude Pro at claude.ai,
    then install the Claude desktop app on your computer and sign in. Its
-   Code tab is Claude Code. For Gemini, follow Google's instructions for
-   Gemini CLI and sign in with your Google account.
+   Code tab is Claude Code. For Gemini, download Antigravity from
+   antigravity.google and sign in with your Google account. Whichever
+   you use, if it asks whether you trust a folder, say yes, because
+   until you do it cannot read the template's instructions.
 4. **Point the agent at an empty folder** on your computer (a new one
    called `Apps` in your home folder is fine), and say:
 

@@ -158,6 +158,10 @@ form.
    > generate the oauth token and I'd like you to walk me through that
    > process
 
+   Antigravity opens a separate, sandboxed browser of its own, so there
+   ask for the exact address and the steps instead, and open them in
+   your own browser, where you are already signed in.
+
    When a secret has to be saved, type it into the prompt yourself with
    a `!` in front of the command the agent gives you, so the value goes
    straight where it belongs.
