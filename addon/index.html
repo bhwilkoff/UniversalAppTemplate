@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Human Shaped in Meet</title>
+  <meta name="description" content="The Human Shaped side panel inside Google Meet: the part of the session now, the queue of work to show, and checks for understanding.">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#F7F6F2" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#141618" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/site.css">
+  <script>
+    (function () {
+      var q = location.search, t = null;
+      if (/[?&]dark\b/.test(q)) t = 'dark'; else if (/[?&]light\b/.test(q)) t = 'light';
+      if (t) document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+</head>
+<body class="addon-body">
+  <!-- The Meet add-on's side panel (M15). A small launcher of activities:
+       the session now, the queue, and the checks, with room for more.
+       Words by Claude, awaiting Ben's review. -->
+  <main class="addon-panel live-page" data-addon aria-live="polite">
+    <section class="account-state" data-state="loading"><p class="small">Opening the session…</p></section>
+
+    <section class="account-state addon-outside" data-state="outside" hidden>
+      <p class="addon-mark"><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg>Human Shaped</p>
+      <h1>This page runs inside Google Meet.</h1>
+      <p>In any other browser, the same session is on your cohort’s live page, which you can open from <a href="/account/" data-outside-link>your account</a>.</p>
+    </section>
+
+    <section class="account-state" data-state="signed-out" hidden>
+      <p class="addon-mark"><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg>Human Shaped</p>
+      <h1>Sign in to see this call’s session.</h1>
+      <p class="small">Meet keeps this panel apart from the rest of your browser, so it needs your permission to use your humanshaped.org sign-in.</p>
+      <div class="addon-signin">
+        <button class="btn-github" type="button" data-use-site hidden>Use my humanshaped.org sign-in</button>
+        <button class="btn-quiet" type="button" data-popup>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Sign in with GitHub in a small window
+        </button>
+      </div>
+      <p class="small" data-signin-status role="status"></p>
+      <p class="small" data-fallback hidden>If neither works here, <a data-fallback-link href="/account/" target="_blank" rel="noopener">open your cohort’s live page in a new tab</a> and keep it beside Meet.</p>
+    </section>
+
+    <section class="account-state" data-state="no-room" hidden>
+      <p class="addon-mark"><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg>Human Shaped</p>
+      <h1>This call is not one of your cohort’s rooms yet.</h1>
+      <p class="small" data-no-room-text></p>
+      <p><a class="btn-quiet" href="/teach/" target="_blank" rel="noopener">Open your teaching page</a></p>
+    </section>
+
+    <section class="account-state" data-state="error" hidden>
+      <p class="error" data-error-text></p>
+      <p><button class="btn-quiet" type="button" data-reload>Try again</button></p>
+    </section>
+
+    <section class="account-state" data-state="ready" hidden>
+      <header class="addon-head">
+        <p class="addon-mark"><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span data-cohort-title></span></p>
+        <p class="addon-where" data-where></p>
+      </header>
+
+      <nav class="addon-launcher" aria-label="Activities" data-launcher></nav>
+
+      <!-- The session now: the part, its timer, and what this part needs. -->
+      <section class="addon-activity" data-activity="now" aria-labelledby="now-h" hidden>
+        <h2 id="now-h" class="visually-hidden">The session now</h2>
+        <div class="addon-part">
+          <p class="kicker" data-part-kicker></p>
+          <p class="addon-part-name" data-part-name></p>
+          <p class="addon-clock" data-clock aria-live="off"></p>
+          <div class="addon-teacher-only" data-part-controls hidden>
+            <label class="addon-field">Part
+              <select data-part-select></select>
+            </label>
+            <div class="actions">
+              <button class="btn-github" type="button" data-timer>Start the timer</button>
+              <button class="btn-quiet" type="button" data-next-part>Next part</button>
+            </div>
+          </div>
+          <details class="addon-what" data-part-what-wrap>
+            <summary>What happens in this part</summary>
+            <p class="small" data-part-what></p>
+          </details>
+        </div>
+        <div data-now-lead></div>
+      </section>
+
+      <!-- Show your work: the queue in order, with what is up next. -->
+      <section class="addon-activity" data-activity="queue" aria-labelledby="queue-h" hidden>
+        <h2 id="queue-h">Show your work</h2>
+        <ol class="live-queue" data-queue></ol>
+        <p class="small" data-shown-count></p>
+      </section>
+
+      <!-- Checks for understanding. -->
+      <section class="addon-activity" data-activity="checks" aria-labelledby="checks-h" hidden>
+        <h2 id="checks-h">Checks for understanding</h2>
+        <div class="actions addon-closing" data-closing-wrap hidden>
+          <button class="btn-quiet" type="button" data-ask-closing>Ask the two closing questions</button>
+        </div>
+        <div class="live-checks" data-checks></div>
+        <details class="addon-ask" data-ask-wrap hidden>
+          <summary>Ask a question</summary>
+          <form class="inline-form" data-ask>
+            <label>Your question
+              <textarea rows="3" maxlength="500" required data-ask-prompt></textarea>
+            </label>
+            <fieldset class="live-mode">
+              <legend>People answer</legend>
+              <label class="check"><input type="radio" name="ask-mode" value="words" checked> In their own words</label>
+              <label class="check"><input type="radio" name="ask-mode" value="choices"> By choosing one</label>
+            </fieldset>
+            <label data-ask-choices-wrap hidden>Choices, one on each line
+              <textarea rows="4" data-ask-choices></textarea>
+            </label>
+            <label class="check"><input type="checkbox" data-ask-tally> Show everyone the count as answers come in</label>
+            <div class="actions"><button class="btn-quiet" type="submit">Ask the cohort</button></div>
+          </form>
+        </details>
+        <p class="small" data-ask-status role="status"></p>
+      </section>
+
+      <footer class="addon-foot">
+        <div class="actions">
+          <button class="btn-quiet" type="button" data-open-stage hidden>Open the main stage</button>
+          <a class="btn-quiet" data-full-link target="_blank" rel="noopener">The full live page</a>
+        </div>
+        <p class="small" data-stage-status role="status"></p>
+        <p class="small" data-sync></p>
+      </footer>
+    </section>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" defer></script>
+  <script src="https://www.gstatic.com/meetjs/addons/1.1.0/meet.addons.js" defer></script>
+  <script src="/assets/hub-config.js" defer></script>
+  <script src="/assets/addon-config.js" defer></script>
+  <script src="/assets/cohort-lib.js" defer></script>
+  <script src="/assets/live-lib.js" defer></script>
+  <script src="/assets/addon-lib.js" defer></script>
+  <script src="/assets/addon.js" defer></script>
+</body>
+</html>

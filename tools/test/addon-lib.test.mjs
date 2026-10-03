@@ -88,6 +88,13 @@ const closed = { id: 'k3', state: 'closed', prompt: 'Old', choices: null, show_t
 const tallies = { k1: [{ choice: 1, answers: 3 }, { choice: 2, answers: 1 }] };
 const part = { key: 'value', name: 'One value at work', endsAt: 1000 };
 
+test('a part with no timer running has no end, never a timer that already ran out', () => {
+  const v = lib.stageView({ part: { key: 'show', name: 'Show', endsAt: null } });
+  assert.equal(v.part.endsAt, null);
+  assert.equal(lib.readStageMessage(lib.stageMessage(v)).part.endsAt, null);
+  assert.equal(lib.timeLeft(undefined, 0), null);
+});
+
 test('the stage shows the part and its timer when nothing is on it', () => {
   assert.deepEqual(lib.stageView({ part }), { mode: 'part', part });
   assert.deepEqual(lib.stageView({}), { mode: 'part', part: null });

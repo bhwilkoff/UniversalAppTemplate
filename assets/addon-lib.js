@@ -67,7 +67,7 @@
   // Seconds left on a timer that ends at endsAt (milliseconds), or null
   // when no timer is running.
   function timeLeft(endsAt, now) {
-    if (endsAt == null || !isFinite(endsAt)) return null;
+    if (num(endsAt) == null) return null;
     return Math.max(0, Math.round((endsAt - now) / 1000));
   }
 
@@ -76,6 +76,8 @@
     if (root.LiveLib) return root.LiveLib;
     try { return typeof require === 'function' ? require('./live-lib.js') : null; } catch (e) { return null; }
   }
+
+  function num(x) { return typeof x === 'number' && isFinite(x) ? x : null; }
 
   function cut(s, n) { s = String(s == null ? '' : s); return s.length > n ? s.slice(0, n - 1) + '…' : s; }
 
@@ -92,7 +94,7 @@
   //   state.items    live_queue rows;  state.names { [userId]: name }
   function stageView(state) {
     state = state || {};
-    var part = state.part ? { key: cut(state.part.key, 20), name: cut(state.part.name, 80), endsAt: isFinite(state.part.endsAt) ? Number(state.part.endsAt) : null } : null;
+    var part = state.part ? { key: cut(state.part.key, 20), name: cut(state.part.name, 80), endsAt: num(state.part.endsAt) } : null;
     var on = state.onStage || null;
     if (on && on.kind === 'check') {
       var k = (state.checks || []).filter(function (x) { return x.id === on.id; })[0];
@@ -125,11 +127,11 @@
     try { m = typeof payload === 'string' ? JSON.parse(payload) : payload; } catch (e) { return null; }
     if (!m || m.type !== STAGE || m.v !== 1 || !m.view) return null;
     var v = m.view;
-    var part = v.part && typeof v.part.name === 'string' ? { key: String(v.part.key || ''), name: cut(v.part.name, 80), endsAt: isFinite(v.part.endsAt) && v.part.endsAt !== null ? Number(v.part.endsAt) : null } : null;
+    var part = v.part && typeof v.part.name === 'string' ? { key: String(v.part.key || ''), name: cut(v.part.name, 80), endsAt: num(v.part.endsAt) } : null;
     if (v.mode === 'check' && typeof v.prompt === 'string') {
       var choices = Array.isArray(v.choices) ? v.choices.slice(0, 6).map(function (c) { return cut(c, 120); }) : null;
       var count = null;
-      if (v.count && isFinite(v.count.total) && Array.isArray(v.count.rows)) {
+      if (v.count && num(v.count.total) != null && Array.isArray(v.count.rows)) {
         count = { total: Number(v.count.total), rows: v.count.rows.slice(0, 6).map(function (r) {
           return { label: cut(r.label, 120), count: Number(r.count) || 0, share: Math.max(0, Math.min(100, Number(r.share) || 0)) };
         }) };
