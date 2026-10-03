@@ -568,3 +568,71 @@ approve. (https://support.google.com/gemini/answer/17209137)
   should be a spike: enable the OAuth server on the real project, deploy
   Supabase's `whoami` example, and connect from claude.ai Free, Claude Code,
   and Gemini CLI, before writing the real tools.
+
+---
+
+## 7. A teacher's own agent (added October 3, 2026, for C6)
+
+Built for `research/notes/meet-classroom-design.md`, Wishes 3, 9, and 12.
+Not site copy.
+
+**Three tools on the same server, for teachers only.** `cohort_roster`
+(names, GitHub logins, apps, repositories, live links, and groups; never
+emails), `student_work` (one student, by GitHub login: shares with their
+question, their own ready or not-yet mark, confirmations, and feedback
+by name; check answers; queue items; feedback they gave; notes teachers
+sent them), and `class_now` (the session's part by the clock, the queue
+with names, open checks with each answer by name, and commits pushed to
+the cohort's public repositories since the session began). Plus a prompt,
+`check_this_code`, that asks the teacher's agent to read a repository or
+one commit through GitHub, explain it plainly, ask the method's questions,
+label itself as AI, and post nothing.
+
+- **Who gets an answer.** `teacherCohort` in `shape.js` picks among the
+  cohorts the person teaches (from `cohort_teachers`) and gives anyone
+  else a plain sentence and nothing more. This check matters: classmates
+  can read a cohort's roster and shares under row-level security, so RLS
+  alone would let a student's agent read the roster through these tools.
+  RLS still backs it up for what only teachers can read (everyone's check
+  answers, notes).
+- **Read-only.** Every tool is annotated `readOnlyHint`, writes nothing,
+  and migration 6's restrictive policies refuse writes from any agent's
+  token, the teacher's included (tested for `teacher_notes`). Each answer
+  ends with the same paragraph (`TEACHER_ASIDE`): whatever the agent
+  makes of it is the teacher's to give or not, the hub never sends what an
+  agent wrote, and a follow-up is written and sent by the teacher on
+  `/teach/`.
+- **Commits.** `class_now` reads GitHub's public commits API from the
+  Edge Function with no sign-in, so it shares GitHub's 60 requests an hour
+  per address (https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api)
+  with whatever else runs from Supabase's address. **(unverified:** whether
+  that address is shared with other projects, which would make the limit
+  run out sooner.) It reads at most 40 repositories and shows at most 40
+  commits. The `/live/` strip reads in the teacher's own browser instead,
+  with their GitHub token when the page has one.
+
+**Reading code more deeply: GitHub's own MCP server, read-only.** The hub
+does not rebuild repository reading. The teacher connects GitHub's
+official server beside ours (MIT, https://github.com/github/github-mcp-server),
+in read-only mode, which its remote-server guide
+(https://github.com/github/github-mcp-server/blob/main/docs/remote-server.md,
+read October 3, 2026) sets either by adding `/readonly` to the address or
+with the header `X-MCP-Readonly: true`, and it can be limited to one
+toolset with `/x/repos`. For Claude Code, the address would be:
+
+```
+claude mcp add --transport http --scope user github https://api.githubcopilot.com/mcp/x/repos/readonly
+```
+
+**(unverified:** that exact command, and how claude.ai's custom connector
+signs in to GitHub's remote server; the guide shows JSON configurations,
+not this command.) With both connected, a teacher can ask their agent
+"what did Bea push during class?" (`class_now`), then have it read that
+commit through GitHub, and then decide, in their own words, what to say
+on `/teach/`.
+
+**Not yet verified against the real project:** none of the three tools
+has run on Supabase; the shapes are tested (`tools/test/mcp-shape.test.mjs`),
+the TypeScript only transpiled, and Deno was not available here. The test
+in C6 still stands: call each as a teacher and as a student of the same
+cohort, and the student gets the refusal.

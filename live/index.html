@@ -101,6 +101,15 @@
             <div data-now-body></div>
           </section>
 
+          <!-- During class (C6), for the cohort's teachers alone (assets/live-commits.js).
+               Words by Claude, awaiting Ben's review. -->
+          <section class="live-block live-pushed" aria-labelledby="pushed-title" data-pushed-section hidden>
+            <h2 id="pushed-title">During class</h2>
+            <p class="small">What people have pushed to their repositories since the session began, newest first, read from GitHub while you look and kept nowhere, so you can open a commit and ask about it while it is still warm. Only the cohort's teachers see this.</p>
+            <ol class="commit-list live-pushed-list" data-pushed></ol>
+            <div class="actions"><button class="btn-quiet" type="button" data-pushed-reload hidden>Read GitHub again</button><span class="small" data-pushed-status role="status"></span></div>
+          </section>
+
           <!-- The queue and checks for understanding (M3): copy awaiting Ben's review. -->
           <section class="live-block" aria-labelledby="queue-title">
             <h2 id="queue-title">Show your work</h2>
@@ -181,6 +190,8 @@
   <script src="/assets/hub-config.js" defer></script>
   <script src="/assets/cohort-lib.js" defer></script>
   <script src="/assets/live-lib.js" defer></script>
+  <script src="/assets/followup-lib.js" defer></script>
+  <script src="/assets/live-commits.js" defer></script>
   <script src="/assets/discussions-lib.js" defer></script>
   <script src="/assets/discussions.js" defer></script>
   <script src="/assets/live.js" defer></script>
