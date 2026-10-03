@@ -215,11 +215,72 @@ def main():
     cols = [d[0] for d in anon.description]
     check("a shown app is public with only its name, repository, and address",
           cols == ["app_name", "app_repo", "app_url"] and [r[1] for r in rows] == ["bea/garden-swap"])
+    # The student's "it is ready" and the teacher's hide are two switches,
+    # and neither person can move the other's (migration 20261003090000).
     ben = as_user("ben")
-    check("a teacher can take a shown app down",
-          attempt(ben, "update public.enrollments set app_public = false where user_id = %s", (people["bea"],)))
+    check("a teacher cannot turn off a student's word that their app is ready",
+          not attempt(ben, "update public.enrollments set app_public = false where user_id = %s", (people["bea"],)))
+    cal = as_user("cal")
+    check("a classmate cannot hide someone else's app",
+          not attempt(cal, "insert into public.app_hides (cohort_id, user_id, hidden_by) values (%s, %s, %s)", (cohort, people["bea"], people["cal"])))
+    dee = as_user("dee")
+    check("someone outside the cohort cannot hide an app in it",
+          not attempt(dee, "insert into public.app_hides (cohort_id, user_id, hidden_by) values (%s, %s, %s)", (cohort, people["bea"], people["dee"])))
     bea = as_user("bea")
-    bea.execute("update public.enrollments set app_public = true where user_id = %s", (people["bea"],))
+    check("a student cannot use the teacher's hide on their own app",
+          not attempt(bea, "insert into public.app_hides (cohort_id, user_id, hidden_by) values (%s, %s, %s)", (cohort, people["bea"], people["bea"])))
+    ben = as_user("ben")
+    check("a teacher cannot hide an app in someone else's name",
+          not attempt(ben, "insert into public.app_hides (cohort_id, user_id, hidden_by) values (%s, %s, %s)", (cohort, people["bea"], people["cal"])))
+    ben_agent = as_agent("ben")
+    check("a teacher's agent cannot hide an app",
+          not attempt(ben_agent, "insert into public.app_hides (cohort_id, user_id, hidden_by) values (%s, %s, %s)", (cohort, people["bea"], people["ben"])))
+    ben = as_user("ben")
+    check("a teacher can hide an app from public view, with a reason",
+          attempt(ben, "insert into public.app_hides (cohort_id, user_id, hidden_by, reason) values (%s, %s, %s, 'It names a client.')", (cohort, people["bea"], people["ben"])))
+    anon = as_user(None)
+    anon.execute("select count(*) from public.public_apps()")
+    check("a hidden app is no longer in the public list", anon.fetchone()[0] == 0)
+    anon.execute("select count(*) from public.app_hides")
+    check("the public cannot read what is hidden, or why", anon.fetchone()[0] == 0)
+    cal = as_user("cal")
+    cal.execute("select app_repo, app_public from public.enrollments where user_id = %s", (people["bea"],))
+    check("a hidden app stays on the cohort's own pages, still marked ready", cal.fetchone() == ("bea/garden-swap", True))
+    cal.execute("select count(*) from public.app_hides")
+    check("a classmate cannot see that an app is hidden, or why", cal.fetchone()[0] == 0)
+    cal.execute("delete from public.app_hides where user_id = %s", (people["bea"],))
+    check("a classmate cannot show a hidden app again", cal.rowcount == 0)
+    dee = as_user("dee")
+    dee.execute("select count(*) from public.app_hides")
+    check("someone outside the cohort sees no hides", dee.fetchone()[0] == 0)
+    bea = as_user("bea")
+    bea.execute("select reason from public.app_hides where user_id = %s", (people["bea"],))
+    check("the student sees that their app is hidden, and why", bea.fetchone() == ("It names a client.",))
+    bea.execute("delete from public.app_hides where user_id = %s", (people["bea"],))
+    check("a student cannot undo the teacher's hide", bea.rowcount == 0)
+    bea.execute("update public.app_hides set reason = null where user_id = %s", (people["bea"],))
+    check("a student cannot change the teacher's reason", bea.rowcount == 0)
+    check("a student can still turn their own switch while the app is hidden",
+          attempt(bea, "update public.enrollments set app_public = false where user_id = %s", (people["bea"],))
+          and attempt(bea, "update public.enrollments set app_public = true where user_id = %s", (people["bea"],)))
+    anon = as_user(None)
+    anon.execute("select count(*) from public.public_apps()")
+    check("turning it back on does not undo the hide", anon.fetchone()[0] == 0)
+    agent = as_agent("bea")
+    agent.execute("delete from public.app_hides where user_id = %s", (people["bea"],))
+    check("a student's agent cannot undo the hide", agent.rowcount == 0)
+    agent.execute("select count(*) from public.app_hides where user_id = %s", (people["bea"],))
+    check("a student's agent can read that the student's app is hidden", agent.fetchone()[0] == 1)
+    ben_agent = as_agent("ben")
+    ben_agent.execute("delete from public.app_hides where user_id = %s", (people["bea"],))
+    check("a teacher's agent cannot show a hidden app again", ben_agent.rowcount == 0)
+    ben = as_user("ben")
+    ben.execute("update public.app_hides set reason = 'It names a client, for now.' where user_id = %s", (people["bea"],))
+    check("a teacher can change the reason", ben.rowcount == 1)
+    ben.execute("delete from public.app_hides where user_id = %s", (people["bea"],))
+    anon = as_user(None)
+    anon.execute("select app_repo from public.public_apps()")
+    check("a teacher can show it again, and it is back in the public list", ben.rowcount == 1 and anon.fetchall() == [("bea/garden-swap",)])
 
     ben = as_user("ben")
     check("a teacher can name the cohort's private repository and team",
@@ -273,8 +334,13 @@ def main():
     bea.execute("select count(*) from public.calendar_contacts where user_id = %s", (people["bea"],))
     check("signed in on the site, the student still sees their own calendar email", bea.fetchone()[0] == 1)
 
+    ben = as_user("ben")
+    ben.execute("insert into public.app_hides (cohort_id, user_id, hidden_by) values (%s, %s, %s)", (cohort, people["bea"], people["ben"]))
     bea = as_user("bea")
     bea.execute("select public.leave_cohort(%s)", (cohort,))
+    su3 = conn.cursor(); su3.execute("reset role")
+    su3.execute("select count(*) from public.app_hides where user_id = %s", (people["bea"],))
+    check("when someone leaves, the teacher's hide on their app leaves too", su3.fetchone()[0] == 0)
     cal = as_user("cal")
     cal.execute("select count(*) from public.shares where user_id = %s", (people["bea"],))
     check("when someone leaves, what they shared leaves with them", cal.fetchone()[0] == 0)
