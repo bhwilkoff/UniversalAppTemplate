@@ -852,6 +852,16 @@ October 3, after every C milestone that does not wait on Ben merged):
   mentors. Mentors can do what students can and nothing more. 432
   database checks, 217 node tests. Not yet rendered with a real
   credential holder.
+- 2026-10-03, G3 (merged, migration 20261003210000 applied): each
+  stage's numbered steps get "Done", each quoted prompt "Copy these
+  words", the bar a private "Ready to move on / Not yet", and "Be ready
+  to" a "Bring it back" link into the cohort's bring-back form (or a
+  private note when not in a cohort). Read from the rendered Markdown's
+  shape only, no markers in the template. Marks live in the browser when
+  signed out and in `stage_marks` (owner only) when signed in, merged on
+  sign-in. /path/ shows "Marked ready", /account/ "Your path". 454
+  database checks, 226 node tests. Checked signed out at 375px; signed
+  in not yet tried.
 
 ## Where to pick up
 
