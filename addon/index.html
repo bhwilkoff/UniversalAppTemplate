@@ -127,6 +127,12 @@
         <p class="small" data-ask-status role="status"></p>
       </section>
 
+      <!-- This session's thread (C5): a link out; copy awaiting Ben's review. -->
+      <section class="addon-activity" data-activity="thread" aria-labelledby="thread-h" hidden>
+        <h2 id="thread-h">This session's thread</h2>
+        <div data-thread></div>
+      </section>
+
       <footer class="addon-foot">
         <div class="actions">
           <button class="btn-quiet" type="button" data-open-stage hidden>Open the main stage</button>
@@ -144,6 +150,8 @@
   <script src="/assets/cohort-lib.js" defer></script>
   <script src="/assets/live-lib.js" defer></script>
   <script src="/assets/addon-lib.js" defer></script>
+  <script src="/assets/discussions-lib.js" defer></script>
+  <script src="/assets/session-thread-lib.js" defer></script>
   <script src="/assets/addon.js" defer></script>
 </body>
 </html>

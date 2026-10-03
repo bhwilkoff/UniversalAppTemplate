@@ -219,6 +219,13 @@
             </form>
           </section>
 
+          <!-- This session's thread (C5): copy awaiting Ben's review. -->
+          <section class="live-block" aria-labelledby="thread-title" data-thread-section hidden>
+            <h2 id="thread-title">This session's thread</h2>
+            <p class="small">Links, questions for later, and what you are stuck on, kept on GitHub under your own name after the call ends. Meet's chat is for the moment.</p>
+            <div data-thread></div>
+          </section>
+
           <!-- From the conversation (M9): copy awaiting Ben's review. -->
           <section class="live-block" aria-labelledby="talk-title" data-talk-section hidden>
             <h2 id="talk-title">From the conversation</h2>
@@ -280,7 +287,9 @@
   <script src="/assets/live-commits.js" defer></script>
   <script src="/assets/signals-lib.js" defer></script>
   <script src="/assets/signals.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.4.16/purify.min.js" integrity="sha512-flQmhkXNRQ3iUfvtdCobtpMjCb6kE+zLnTiAulAQJ3WykVfy84JvCMOo6vhwWXHTXjR25h9Zj+LyGFRWKjRoag==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
   <script src="/assets/discussions-lib.js" defer></script>
+  <script src="/assets/session-thread-lib.js" defer></script>
   <script src="/assets/discussions.js" defer></script>
   <script src="/assets/live.js" defer></script>
 

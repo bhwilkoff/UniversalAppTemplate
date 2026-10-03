@@ -207,12 +207,14 @@
   var ACTIVITIES = [
     { key: 'now', name: 'Now', draw: drawNowActivity },
     { key: 'queue', name: 'Queue', draw: drawQueue, badge: function () { return L.queue(S.items).waiting.length; } },
-    { key: 'checks', name: 'Checks', draw: drawChecks, badge: function () { return S.checks.filter(function (k) { return k.state === 'open'; }).length; } }
+    { key: 'checks', name: 'Checks', draw: drawChecks, badge: function () { return S.checks.filter(function (k) { return k.state === 'open'; }).length; } },
+    { key: 'thread', name: 'Thread', draw: drawThreadActivity, when: function () { return !!(S.cohort.github_repo && S.cohort.github_team && 'discussion_number' in S.session); } }
   ];
 
   function drawLauncher() {
     var nav = $('[data-launcher]'); nav.replaceChildren();
     ACTIVITIES.forEach(function (a) {
+      if (a.when && !a.when()) return;
       var b = button('', 'addon-tab', function () { S.picked = true; openActivity(a.key); });
       b.setAttribute('aria-pressed', String(S.active === a.key));
       b.appendChild(el('span', null, a.name));
@@ -225,6 +227,36 @@
     S.active = key;
     root.querySelectorAll('[data-activity]').forEach(function (p) { p.hidden = p.getAttribute('data-activity') !== key; });
     drawLauncher();
+    if (key === 'thread') drawThreadActivity();
+  }
+
+  // ------------------------------------------------------------------
+  // This session's thread (C5). Meet keeps the panel's storage apart and
+  // the sign-in hands over only the hub's tokens, never a GitHub token,
+  // so the panel links to the thread instead of reading it; /live/ reads
+  // and posts to it.
+  // ------------------------------------------------------------------
+
+  function drawThreadActivity() {
+    var box = $('[data-thread]');
+    if (!box || !S.session) return;
+    db.from('sessions').select('discussion_number').eq('id', S.session.id).maybeSingle().then(function (r) {
+      var n = r.data && r.data.discussion_number;
+      var T = window.SessionThreadLib;
+      var url = n && T ? T.threadUrl(S.cohort.github_repo, n) : null;
+      box.replaceChildren();
+      if (!url) {
+        box.appendChild(el('p', 'small', S.teaching
+          ? 'This session has no thread yet. Open it on the session page, and it will be linked here for everyone.'
+          : 'Your teacher has not opened this session’s thread yet.'));
+      } else {
+        box.appendChild(el('p', 'small', 'Links, questions for later, and what you are stuck on go here, and they stay on GitHub under your own name.'));
+        var a = el('a', 'btn-github', 'Open the thread on GitHub'); a.href = url; a.target = '_blank'; a.rel = 'noopener';
+        box.appendChild(el('p')).appendChild(a);
+      }
+      var live = el('a', null, 'Read and post on the session page'); live.href = '/live/?c=' + encodeURIComponent(S.cohort.slug); live.target = '_blank'; live.rel = 'noopener';
+      box.appendChild(el('p', 'small')).appendChild(live);
+    });
   }
 
   function drawFrame() {
