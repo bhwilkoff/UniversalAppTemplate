@@ -131,6 +131,8 @@
     var top = $('[data-top-actions]'); top.replaceChildren();
     if (safe(session.meet_url)) { var j = el('a', 'btn-github', live ? 'Join the session' : 'The Meet link'); j.href = session.meet_url; j.target = '_blank'; j.rel = 'noopener'; top.appendChild(j); }
     var back = el('a', 'btn-quiet', 'Your cohort page'); back.href = '/cohort/?c=' + encodeURIComponent(cohort.slug); top.appendChild(back);
+    // The session's drawing board (C4), in its own tab so this page stays open.
+    var board = el('a', 'btn-quiet', 'The board'); board.href = '/board/?c=' + encodeURIComponent(cohort.slug) + '&s=week-' + session.number; board.target = '_blank'; board.rel = 'noopener'; top.appendChild(board);
     $('[data-cohort-link]').href = back.href;
 
     S.parts = lib.agenda(cohort.session_minutes);

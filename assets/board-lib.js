@@ -150,7 +150,13 @@
   // (for the page closing); cancel() drops it. The clock is passed in so
   // the tests can move time by hand.
   function throttle(fn, wait, clock) {
-    var c = clock || { now: function () { return Date.now(); }, set: setTimeout, clear: clearTimeout };
+    // Wrapped, because a browser refuses setTimeout called as a method of
+    // another object ("Illegal invocation").
+    var c = clock || {
+      now: function () { return Date.now(); },
+      set: function (f, ms) { return setTimeout(f, ms); },
+      clear: function (t) { clearTimeout(t); }
+    };
     var last = -Infinity, timer = null, pending = null;
     function run() {
       timer = null; last = c.now();

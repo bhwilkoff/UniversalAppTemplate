@@ -1047,3 +1047,36 @@ fieldset.ready-mark .hint { margin: 0; font-size: 0.9rem; color: var(--muted); }
 .inline-form .hint { font-weight: 400; color: var(--muted); font-size: 0.9rem; }
 .group-room { border-top: 1px solid var(--rule); padding-top: 0.75rem; }
 [data-meet-text] { margin-top: 0.5rem; }
+
+/* ------------------------------------------------------------------
+   C4: the board (/board/). Excalidraw fills .board-canvas, which needs a
+   real height. Self-contained: every rule here is scoped to the board.
+   ------------------------------------------------------------------ */
+.board-states { padding-top: 2rem; }
+.board-head { display: grid; gap: 0.75rem; padding-top: 1.25rem; padding-bottom: 1rem; }
+.board-head .kicker { margin: 0 0 0.25rem; font-size: 0.95rem; }
+.board-head h1 { font-size: clamp(1.6rem, 1.2rem + 1.5vw, 2.2rem); }
+.board-actions, .board-teach { display: flex; flex-wrap: wrap; gap: 0.5rem 0.75rem; align-items: center; }
+.board-actions .btn-quiet, .board-teach .btn-quiet { font-size: 0.95rem; padding: 0.5rem 0.85rem; }
+.board-head .small, .board-foot .small { color: var(--muted); font-size: 0.95rem; margin: 0; max-width: 44rem; }
+.board-status:empty { display: none; }
+.board-group-pick { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; font-weight: 600; font-size: 0.95rem; }
+.board-group-pick select {
+  font: inherit; font-weight: 400; padding: 0.5rem 0.7rem; border: 1px solid var(--muted);
+  border-radius: 10px; background: var(--card); color: var(--ink); min-height: 44px; max-width: 100%;
+}
+.board-canvas {
+  position: relative; height: calc(100svh - 4rem); min-height: 26rem; max-height: 60rem;
+  border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule);
+}
+.board-canvas .excalidraw { font-family: inherit; }
+.board-foot { display: grid; gap: 0.5rem; padding-top: 1rem; padding-bottom: 3rem; }
+
+/* The stage view (?view=stage): the board alone, for the Meet add-on's
+   main stage or a tab shared in Meet. */
+.board-stage .skip, .board-stage .site-header, .board-stage .site-footer,
+.board-stage .board-head > :not(.board-status), .board-stage .board-foot { display: none; }
+.board-stage .board-head { padding: 0.35rem var(--gutter); position: absolute; z-index: 5; right: 0; bottom: 3.5rem; max-width: 22rem; pointer-events: none; }
+.board-stage .board-status { font-size: 0.85rem; text-align: right; }
+.board-stage .board-ready { position: relative; }
+.board-stage .board-canvas { height: 100svh; max-height: none; border: 0; }
