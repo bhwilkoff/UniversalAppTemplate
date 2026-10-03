@@ -109,3 +109,32 @@ public sees nothing until a student shows their app, the roster stays
 private, a teacher, a classmate, and an agent cannot turn it on, the
 student can, the public reads exactly three fields, a teacher can turn
 it off, and leaving turns it off).
+
+## After Ben's decision (October 3, 2026)
+
+Ben settled both open questions: the student opts in "when they say that
+the app is ready", every student submits by the end of the cohort, and a
+teacher can keep an app out of public view while it stays part of the
+cohort. Migration `20261003090000_app_submissions.sql` builds that.
+
+- **Two switches, never crossed.** `app_public` is the student's "it is
+  ready", and only the student moves it, in either direction (until now
+  a teacher could turn it off). A teacher's hide is a row in
+  `app_hides`, so hiding an app never makes a student look as if they
+  had not submitted.
+- **Why a table of its own.** Classmates can read every column of one
+  another's enrollment, and a teacher's reason for hiding an app is
+  between the teacher and the student. The student and the cohort's
+  teachers read it; nobody else does, and no student or agent can write
+  it.
+- **Near the end, not all along.** The cohort page tells a student what
+  their app still needs only from the second-to-last session (week 4,
+  where the course has the app on someone else's device), and the
+  teacher sees who has not submitted, by name, from the same day. It is
+  one note and one list, with no reminders, counts, or streaks, in line
+  with the "never build" list in
+  `facilitation-assessment-social-learning-notes.md`.
+- **Leaving** takes the hide with it, as it already takes the app's name,
+  repository, and address.
+
+The database checks gain 23 for this (171 to 194).

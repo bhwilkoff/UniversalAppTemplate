@@ -104,7 +104,7 @@ what waits on Ben.
   `bifrieqzkihuxfzttgvd`, free plan, us-west-1, org "Learning is Change,
   Inc"). Schema and row-level security in `supabase/migrations/`, applied
   in order. `supabase/tests/test_policies.py` runs them against a local
-  throwaway Postgres as four people and as a student's AI agent (171
+  throwaway Postgres as four people and as a student's AI agent (194
   checks; agents' tokens carry a `client_id` and can only read); run it
   before applying
   any new migration, and see it fail when a rule is opened on purpose.
@@ -140,11 +140,11 @@ what waits on Ben.
   recent work across apps (at most 8 GitHub calls a visit, cached ten
   minutes, automated commits left out). Cohort apps appear in public
   only by the student's own switch (`enrollments.app_public`,
-  migration 20261003055000, `public_apps()`; see `research/notes/hub-privacy-notes.md`).
+  migration 20261003055000, `public_apps()`; see `research/notes/hub-privacy-notes.md`), which is also their "it is ready": every app is submitted by the cohort's end (`submit-lib.js`, loaded on /cohort/ and /teach/). A teacher can keep an app off /apps/ with `app_hides` (migration 20261003090000), which never touches the student's switch.
 - **Scripts:** `assets/hub-config.js` (public URL and publishable key),
   `hub.js`, `cohorts.js`, `teach.js` with `teach-lib.js`, `cohort.js` and `live.js`
   with `cohort-lib.js` and `live-lib.js`, and `apps.js` with `apps-lib.js`. Pure logic lives in the `-lib.js` files with
-  tests in `tools/test/` (`node --test tools/test/*.mjs`, 97 tests).
+  tests in `tools/test/` (`node --test tools/test/*.mjs`, 110 tests).
 - **The cohort's conversation:** `discussions.js` with `discussions-lib.js`
   reads and posts the cohort repository's GitHub Discussions on /cohort/
   and /live/ with the student's own GitHub token. That token is kept in
