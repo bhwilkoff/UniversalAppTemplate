@@ -55,8 +55,8 @@ or Linux, or a PowerShell one-liner on Windows. It signs in through the
 browser on first launch ([install and auth](https://antigravity.google/docs/cli/install/)).
 Whether the web version works on a phone is **(unverified)**.
 
-**Plans.** The Individual plan is $0, with "Basic weekly rate limits";
-Google AI Pro and Ultra add "More rate limits" and a credit pool
+**Plans.** The Individual plan is $0, with "Basic weekly rate limits",
+and Google AI Pro and Ultra add "More rate limits" and a credit pool
 ([pricing](https://antigravity.google/pricing)). The plans page says the
 free tier's quota is "refreshed weekly", Pro's is "refreshed every five
 hours until the weekly limit is reached", and that the CLI and
@@ -65,7 +65,7 @@ only ("Gemini 3.1 Pro, Gemini 3.8 Flash") ([plans](https://antigravity.google/do
 Google AI Pro is $19.99 a month in the US and includes "Entry rate
 limits to agent model in Google Antigravity" ([Google AI plans](https://gemini.google/subscriptions/)).
 The site's earlier notes listed Claude and `gpt-oss-120b` among
-Antigravity's models; the current plans page does not, so which
+Antigravity's models. The current plans page does not, so which
 non-Gemini models a student can pick is **(unverified)**. If
 `gpt-oss-120b` is offered, it is OpenAI's model, and the course does not
 recommend OpenAI.
@@ -86,7 +86,7 @@ folder, workspace settings, MCP servers, and custom commands are off
 ([trusted folders](https://geminicli.com/docs/cli/trusted-folders/)).
 The bundled settings reference gives `security.folderTrust.enabled` a
 default of `true`, while the trusted folders page says the feature is
-off by default; v0.46.0 behaved as if it were on.
+off by default. v0.46.0 behaved as if it were on.
 
 *Tested on v0.46.0,* with a throwaway home folder and a fake API key so
 that no account was touched, reading the CLI's own debug log of which
@@ -101,7 +101,7 @@ context files it loaded:
 In an untrusted folder, v0.46.0 printed "project settings, hooks, MCPs,
 and GEMINI.md files will not be applied for this folder", so no
 arrangement of files helps there. The person has to trust the folder
-when Gemini CLI asks. The current release is v0.62.0; none of this was
+when Gemini CLI asks. The current release is v0.62.0, and none of this was
 rerun on it **(unverified on v0.62.0)**.
 
 **Antigravity** reads `AGENTS.md`, `GEMINI.md`, and `.md` files in
@@ -110,18 +110,18 @@ folder winning a conflict. Two limits matter for this template:
 "Antigravity truncates any single rule file that exceeds 24,000 bytes",
 and global plus always-on rules share a 20,000-token budget, past which
 the largest files become pointers the agent reads on demand. Its
-`@filename` syntax does not inline a file, it only rewrites the path;
-`@[label](path)` inlines ([rules](https://antigravity.google/docs/rules/)).
+`@filename` syntax only rewrites the path without inlining the file,
+while `@[label](path)` inlines ([rules](https://antigravity.google/docs/rules/)).
 The CLI reads the same files as Gemini CLI did, with "no modifications
 needed for existing files" ([migration guide](https://antigravity.google/docs/cli/gcli-migration/)).
 
 So, `AGENTS.md`, at 49,411 bytes, reaches Antigravity cut roughly in
 half: everything from "Android app" on, including "How we collaborate"
 and "Standing instructions", falls past the 24,000-byte mark. This is
-from the documentation; Antigravity was not run here **(unverified in
+from the documentation. Antigravity was not run here **(unverified in
 practice)**.
 
-**Claude Code** reads `CLAUDE.md`; it reads `AGENTS.md` on its own only
+**Claude Code** reads `CLAUDE.md`. It reads `AGENTS.md` on its own only
 when there is no `CLAUDE.md` (v2.1.277 and later), and a `CLAUDE.md`
 that starts with `@AGENTS.md` never loads it twice
 ([Claude Code memory](https://code.claude.com/docs/en/memory)).
@@ -166,7 +166,7 @@ duplicate name is **(unverified)**.
 Gemini CLI loads project commands from `.gemini/commands/*.toml`, each
 with a `prompt` and an optional `description`, and can inject a file
 with `@{path}` ([custom commands](https://geminicli.com/docs/cli/custom-commands/)).
-Antigravity does not list them; its migration guide mentions converting
+Antigravity does not list them. Its migration guide mentions converting
 "legacy commands" to skills on plugin import, and a skill is already a
 `/<skill-name>` command there ([migration guide](https://antigravity.google/docs/cli/gcli-migration/)).
 
