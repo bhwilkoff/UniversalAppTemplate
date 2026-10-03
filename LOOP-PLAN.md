@@ -314,9 +314,7 @@ and waits on one real sign-in.
   to production; Supabase's security check shows only the two functions
   that are callable on purpose. Ben added this project to his auto mode
   settings. The header names the signed-in person (verified in
-  production). CLAUDE.md still says 31 database checks and 25 logic
-  tests (now 39 and 29): edits to CLAUDE.md are refused as
-  self-modification, so Ben updates it.
+  production). CLAUDE.md now says 39 database checks.
 
 ## Where to pick up
 
