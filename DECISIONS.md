@@ -190,3 +190,15 @@ session moves drafted into COURSE.md (pairs or trios, fading the prompt
 reading, lessons sent back). Research on online facilitation,
 project-, challenge-, and performance-based assessment, and online
 social learning comes before the tools that depend on them.
+
+## The arch (October 3, 2026)
+
+**The arch is either the hyphen between "human" and "shaped", or it sits
+high in its space, never centered low.** Ben, October 3, on the icon:
+"when the arch shows on the emoticon in the center, it looks like a
+frown. When it is in the word mark, the arch shows as higher so it reads
+as the top of a person's head." **How to apply:** an arch on its own
+(the favicon, the home-screen icon, anything new) uses the wordmark's
+proportions and sits in the upper part of its frame, with the empty
+space below it, so it reads as the top of a head. In the 32-unit
+favicon that is ends at y 16 and the top at y 7.5.
