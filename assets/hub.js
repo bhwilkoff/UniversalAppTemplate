@@ -50,7 +50,17 @@
     arrivalError = null;
     load();
   });
+  // GitHub hands over the person's GitHub token once, right after sign-in.
+  // Keep it for this tab only, so the cohort page can read the cohort's
+  // conversation, and take it out of the long-lived saved session
+  // (DiscussionsLib; research/notes/cohort-conversation-notes.md, part 7).
+  var stores = {};
+  try { stores.session = window.sessionStorage; stores.local = window.localStorage; } catch (e) {}
+  function keepGitHubToken(session) {
+    if (window.DiscussionsLib) window.DiscussionsLib.tokenFrom(session, stores, Date.now(), db.auth.storageKey);
+  }
   root.querySelector('[data-sign-out]').addEventListener('click', function () {
+    if (window.DiscussionsLib) window.DiscussionsLib.forget(stores.session);
     db.auth.signOut().then(load);
   });
 
@@ -60,6 +70,7 @@
     if (deleteDialog.returnValue !== 'delete') return;
     db.rpc('delete_my_account').then(function (r) {
       if (r.error) return fail('Your account could not be deleted just now: ' + r.error.message);
+      if (window.DiscussionsLib) window.DiscussionsLib.forget(stores.session);
       db.auth.signOut().then(function () {
         show('signed-out');
         root.querySelector('[data-state="signed-out"] .small').textContent =
@@ -130,6 +141,7 @@
         return;
       }
       var uid = session.user.id;
+      keepGitHubToken(session);
       return Promise.all([
         db.from('profiles').select('github_login, display_name, avatar_url').eq('id', uid).single(),
         db.from('enrollments').select('status, cohorts(id, slug, title, starts_on, weeks, description, status, session_weekday, session_time, session_minutes, time_zone)').eq('user_id', uid).neq('status', 'left'),

@@ -804,3 +804,58 @@ label.check { display: flex; gap: 0.5rem; align-items: center; font-weight: 400;
 .live-page .live-who { font-weight: 650; }
 .live-page .live-what { overflow-wrap: anywhere; }
 .live-page .live-note { color: var(--muted); }
+
+/* ------------------------------------------------------------------
+   M9: the cohort's conversation (GitHub Discussions) on /cohort/ and
+   /live/ (assets/discussions.js). Every rule here starts with .talk,
+   .talk-*, or .btn-link.
+   ------------------------------------------------------------------ */
+.btn-link {
+  appearance: none; background: none; border: 0; padding: 0.35rem 0; min-height: 44px; font: inherit;
+  font-weight: 600; color: var(--clay); cursor: pointer; text-decoration: underline;
+  text-decoration-thickness: 1px; text-underline-offset: 0.2em;
+}
+.btn-link:hover { text-decoration-thickness: 2px; }
+.talk { margin-top: 1rem; max-width: 44rem; min-width: 0; }
+.talk-list { list-style: none; margin: 1rem 0 0; padding: 0; border-top: 1px solid var(--rule); }
+.talk-item { border-bottom: 1px solid var(--rule); padding: 0.75rem 0; min-width: 0; }
+.talk-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.1rem 1rem; align-items: baseline; }
+.talk-title {
+  appearance: none; background: none; border: 0; padding: 0.25rem 0; margin: 0; font: inherit;
+  font-weight: 650; font-size: 1.05rem; line-height: 1.4; color: var(--ink); text-align: left;
+  cursor: pointer; overflow-wrap: anywhere; min-height: 44px;
+}
+a.talk-title { display: inline-block; min-height: 0; padding: 0.15rem 0; color: var(--ink); text-decoration-color: var(--edge); }
+button.talk-title { display: grid; grid-template-columns: 1.1em minmax(0, 1fr); align-items: baseline; }
+button.talk-title::before { content: "\25B8"; color: var(--muted); transition: transform 0.15s; justify-self: start; }
+button.talk-title[aria-expanded="true"]::before { transform: rotate(90deg); }
+.talk-title:hover { color: var(--clay); }
+.talk-head .talk-meta { grid-column: 1; margin: 0 0 0 1.1em; }
+.talk-head .talk-gh { grid-column: 2; grid-row: 1; white-space: nowrap; }
+.talk-meta { color: var(--muted); font-size: 0.9rem; margin: 0; }
+.talk-thread { margin: 0.75rem 0 0.25rem 1.1em; display: grid; gap: 0.75rem; }
+.talk-post { background: var(--card); border: 1px solid var(--rule); border-radius: var(--radius); padding: 0.85rem 1rem; min-width: 0; }
+.talk-post.reply { margin-left: 1.25rem; background: var(--surface); }
+.talk-post .talk-by { margin: 0 0 0.35rem; font-weight: 600; color: var(--muted); }
+.talk-body { overflow-wrap: anywhere; font-size: 1rem; }
+.talk-body > :first-child { margin-top: 0; }
+.talk-body > :last-child { margin-bottom: 0; }
+.talk-body h1, .talk-body h2, .talk-body h3 { font-size: 1.05rem; margin: 0.75rem 0 0.35rem; }
+.talk-body img { max-width: 100%; height: auto; }
+.talk-body pre { overflow-x: auto; background: var(--surface); padding: 0.6rem; border-radius: 8px; font-size: 0.9rem; }
+.talk-body blockquote { margin: 0.5rem 0; padding-left: 0.8rem; border-left: 3px solid var(--rule); color: var(--muted); }
+.talk-more { margin: 0; }
+.talk-foot { display: flex; flex-wrap: wrap; gap: 0 1.25rem; align-items: center; margin: 0.5rem 0 0; }
+.talk-start { margin-top: 1rem; }
+.talk-start > summary { cursor: pointer; font-weight: 600; padding: 0.6rem 0; min-height: 44px; }
+.talk-form { margin-top: 0.5rem; }
+.talk-form .hint { margin: 0; color: var(--muted); font-weight: 400; }
+.talk-form select {
+  font: inherit; font-weight: 400; padding: 0.6rem 0.7rem; border: 1px solid var(--muted);
+  border-radius: 10px; background: var(--card); color: var(--ink); min-height: 44px; max-width: 100%;
+}
+.talk-problem { border-left: 3px solid var(--clay); padding: 0.1rem 0 0.1rem 0.9rem; margin-top: 0.75rem; }
+.talk-problem p { margin: 0.25rem 0; }
+.talk-list.compact .talk-item { display: grid; gap: 0.1rem; justify-items: start; }
+.talk-list.compact .btn-link { min-height: 36px; padding: 0.2rem 0; font-size: 0.95rem; }
+.live-page .talk-problem p { font-size: 0.95rem; }

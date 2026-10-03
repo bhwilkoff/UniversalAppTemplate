@@ -7,7 +7,7 @@
   var db = window.supabase.createClient(window.HUB.url, window.HUB.key);
   var lib = window.CohortLib;
   var slug = new URLSearchParams(location.search).get('c') || '';
-  var me = null, cohort = null, token = null;
+  var me = null, cohort = null, token = null, session = null;
 
   function $(sel) { return root.querySelector(sel); }
   function el(tag, cls, text) {
@@ -125,10 +125,11 @@
     if (!slug) return fail('This page needs to know which cohort to show. Open it from your account.');
     show('loading');
     db.auth.getSession().then(function (s) {
-      var session = s.data && s.data.session;
+      session = s.data && s.data.session;
       if (!session) return show('signed-out');
       me = session.user;
-      token = session.provider_token || null;
+      // The GitHub token lives in this tab only (DiscussionsLib).
+      token = window.CohortTalk ? window.CohortTalk.token(db, session) : null;
       return db.from('cohorts').select('*').eq('slug', slug).maybeSingle().then(function (c) {
         if (c.error) return fail('This cohort could not be opened: ' + c.error.message);
         if (!c.data) return show('not-member');
@@ -189,8 +190,12 @@
     var actions = el('div', 'actions');
     if (state === 'member') {
       box.appendChild(el('p', null, 'The conversation is open to you. It happens in GitHub Discussions, in a repository only this cohort can see, and what you write there is yours.'));
-      var go = link('https://github.com/' + repo + '/discussions', 'Open the conversation'); go.className = 'btn-github';
+      var go = link('https://github.com/' + repo + '/discussions', 'Open the conversation on GitHub'); go.className = 'btn-github';
       actions.appendChild(go);
+      box.appendChild(actions);
+      // The newest conversations, read and posted here as this person.
+      if (window.CohortTalk) window.CohortTalk.full(box, { db: db, session: session, repo: repo });
+      return;
     } else if (state === 'invited') {
       box.appendChild(el('p', null, 'GitHub has emailed you an invitation to the humanshaped organization. Accept it, and the conversation opens.'));
       var inv = link('https://github.com/orgs/humanshaped/invitation', 'Accept the invitation'); inv.className = 'btn-github';
