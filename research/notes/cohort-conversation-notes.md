@@ -277,3 +277,71 @@ depends on each person's own setting; I did not verify the default.
   delete it on GitHub. Say so beside "Leave."
 - **Two first-build checks:** the Discussions permission really covers
   the two mutations, and the Supabase switch keeps existing accounts.
+
+## 7. Showing and posting the conversation on the site (October 3, 2026)
+
+*Research for the build that reads a cohort's discussions on /cohort/
+and /live/ and posts to them as the student. Sources read on this date.
+"Checked" means I read it in the source or ran it myself.*
+
+### GitHub's GraphQL API
+
+| Question | Answer | Source |
+|---|---|---|
+| How are a repository's discussions listed? | `repository.discussions(first, after, categoryId, answered, orderBy)`, and `orderBy` defaults to `{field: UPDATED_AT, direction: DESC}`; the other field is `CREATED_AT`. | https://docs.github.com/en/graphql/guides/using-the-graphql-api-for-discussions (Checked) |
+| Categories? | `repository.discussionCategories(first)`, each with `id`, `name`, `slug`, `emoji`, `emojiHTML`, `isAnswerable`, and `description`. No field says whether a category uses the announcement format, or whether the viewer may start a discussion in it. | https://docs.github.com/en/graphql/reference/discussions (Checked) |
+| Posting | `createDiscussion(input: {repositoryId, categoryId, title, body})` and `addDiscussionComment(input: {discussionId, body, replyToId})`. | same guide (Checked) |
+| Do the queries the site uses actually run? | Yes. I ran the list query (five discussions with author, category, comment count, and the newest comment's time, plus the categories and `rateLimit`) and the thread query (body, comments, and replies) against humanshaped/cohort-test with Ben's own `gh` sign-in, read only. Each cost 1 point. The repository has the six default categories: Announcements, General, Ideas, Polls, Q&A, and Show and tell. | Run on October 3 (Checked) |
+| What does GitHub return for a repository the person cannot see? | The same as for one that does not exist: HTTP 200, `data.repository` null, and an error of type `NOT_FOUND` ("Could not resolve to a Repository with the name ..."). So the site cannot tell "your invitation is not accepted" from "the repository is gone", and should say both. | Run on October 3 (Checked) |
+| An expired or wrong token? | HTTP 401, `{"message": "Bad credentials"}`. | Run on October 3 (Checked) |
+| Can a web page call it? | Yes. `api.github.com/graphql` answers a preflight with `access-control-allow-origin: *` and allows the `Authorization` and `Content-Type` headers. | Run on October 3 (Checked) |
+| Rate limits for a user's token | 5,000 points an hour per user; a query costs the connections it could fetch divided by 100, at least 1. Secondary limits: 2,000 points a minute, 100 concurrent requests, mutations cost 5 points, and "no more than 80 content-generating requests per minute and no more than 500 content-generating requests per hour". Over the primary limit the status is still 200 with an error and `x-ratelimit-remaining: 0`; over a secondary limit it is 200 or 403 with a message. | https://docs.github.com/en/graphql/overview/rate-limits-and-query-limits-for-the-graphql-api (Checked) |
+
+So a student opening the cohort page spends 1 point, and opening a
+thread another 1; the hourly limit is far away. The content limit is
+the only one a person could reach, and only by posting more than once a
+second.
+
+**Not verified.**
+
+- Whether `UPDATED_AT` moves when someone comments. GitHub does not say.
+  The site reads the newest comment's time as well and shows whichever
+  is later as "last activity", so the label is right either way, though
+  the order is GitHub's.
+- The exact error `type` for a rate limit. The docs say only "an error
+  message". The site treats an HTTP 403, a `RATE_LIMITED` type, or the
+  words "rate limit" in a message as a rate limit, and shows GitHub's
+  own message.
+- Whether a student can start a discussion in a category that uses the
+  announcement format (GitHub says only maintainers can) or in Polls
+  (the API has no way to give a poll its choices). The site leaves both
+  out of the "start a conversation" choices, so a student never picks
+  one that fails.
+- That the GitHub App's "Discussions: read and write" covers both
+  mutations. This still needs one real post by a student (section 2).
+
+### The token in the browser
+
+| Question | Answer | Source |
+|---|---|---|
+| Where does the GitHub token arrive? | supabase-js 2.117.2 starts in the implicit flow by default (`flowType: 'implicit'`), reads `provider_token` and `provider_refresh_token` from the address the person returns to, and puts them on the session it saves. | https://cdn.jsdelivr.net/npm/@supabase/auth-js@2.117.2/dist/main/GoTrueClient.js, `_getSessionFromURL` (Checked) |
+| Where does supabase-js keep it? | In the stored session, which in a browser is `localStorage` under the client's storage key: `_saveSession` writes the whole session object. | same file, `_saveSession` (Checked) |
+| For how long? | Until Supabase refreshes its own session (about hourly): the refreshed session comes from the auth server, which never stores provider tokens, so it has none. The library's own documentation says it "will emit these values **only once** immediately after the user signs in" and tells you to keep them yourself. | same file, the `signInWithOAuth` comment; https://supabase.com/docs/guides/auth/social-login ("Provider tokens are intentionally not stored"); third party: https://github.com/orgs/supabase/discussions/30045 (Checked) |
+| How long does GitHub honor it? | Eight hours for a GitHub App user token with expiry on, which "Human Shaped Hub" has. | https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/refreshing-user-access-tokens (Checked) |
+
+**What the site does with that.** The first page that sees a
+`provider_token` copies it, with the time, into `sessionStorage` (this
+tab only, gone when the tab closes), and then removes
+`provider_token` and `provider_refresh_token` from the session
+supabase-js saved in `localStorage`, so the student's GitHub key never
+sits in long-lived storage. The refresh token is thrown away: it is
+useless without the app's client secret, which never leaves Supabase.
+The page treats the token as expired after seven and a half hours, or
+as soon as GitHub answers 401, and then offers "Sign in again to read it
+here", which sends the person through GitHub (one quick redirect, since
+they already authorized the app) and back to the same page.
+
+**Not verified.** That GitHub skips its consent screen on that second
+trip, and that supabase-js 2.117.2 is not confused by the edit to its
+stored session (it parses the stored JSON on load, and only two fields
+the server never sends again are removed). Both need a real sign-in.
