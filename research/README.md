@@ -14,6 +14,7 @@ weeks.*
 | `notes/github-onboarding-and-ai-access-notes.md` | 4. GitHub for course delivery. 5. Lanes without a $100 plan. 10. Onboarding. |
 | `notes/assessment-and-credentials-notes.md` | 8. Self-paced, live and challenge-based work. 9. Portable credentials. |
 | `notes/pedagogy-and-showcase-notes.md` | 11. The showcase. 12. Pedagogy for active, project-based, online learning. |
+| `notes/cohort-conversation-notes.md` | Cohort conversation in private GitHub Discussions, shown on the site (2026-10-03). |
 
 ## What Ben's vision changed
 

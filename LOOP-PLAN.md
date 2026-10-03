@@ -87,6 +87,31 @@ and waits on one real sign-in.
 
 ## Needs Ben
 
+- **Cohort conversation setup, once** (core item 2; the design and its
+  sources are in `research/notes/cohort-conversation-notes.md`). Each
+  cohort gets a private repository in `humanshaped` with Discussions on
+  and a secret team of its members, and sign-in moves from the OAuth app
+  to a GitHub App, because an OAuth app can only reach private
+  discussions with the `repo` scope (full access to every private
+  repository a student can reach, confirmed in GitHub's GraphQL guide),
+  while a GitHub App's token reaches only discussions, only where the
+  app is installed. Ben's steps:
+  1. Organization settings, Member privileges: base permission "No
+     permission"; members cannot create repositories or teams.
+  2. Make one private test repository and switch on Discussions (this
+     confirms Discussions works on private repositories on the free
+     plan, which no GitHub page states outright).
+  3. Create a GitHub App owned by `humanshaped`: callback
+     `https://bifrieqzkihuxfzttgvd.supabase.co/auth/v1/callback`, user
+     token expiry on, webhooks off; permissions Discussions read and
+     write, Members read and write (organization), Email addresses read.
+  4. Install it on the organization.
+  5. Put its client ID and secret into Supabase's GitHub provider, and
+     its private key and app ID into Edge Function secrets (never the
+     repository). The agent can do this step if Ben pastes nothing into
+     chat and enters the secrets himself.
+  6. After a test sign-in works, delete the old OAuth app.
+
 - **A search token for the directory scan.** GitHub's code search
   refuses a workflow's built-in token. Create a fine-grained personal
   access token (public repositories, read-only) and add it as the
@@ -270,14 +295,27 @@ and waits on one real sign-in.
   /account/'s heading and the header button still say "Sign in with
   GitHub"; they should say who you are.
 
+- 2026-10-03, core item 2, research. A research agent read GitHub's
+  and Supabase's docs (34 sources) and recommended private repositories
+  per cohort with Discussions, secret teams, and a GitHub App for
+  sign-in. Checked the deciding claim myself in GitHub's GraphQL guide:
+  private discussions need the `repo` scope through an OAuth app. Still
+  to prove on the first real build: one real post through the App's
+  Discussions permission, and that moving sign-in to the App keeps
+  existing Supabase accounts.
+
 ## Where to pick up
 
 1. Ask whether Ben has signed in at humanshaped.org/account/ (the
    session's permission check refuses reading the hub database). If he
    has, run core item 1.
-2. Core item 2 (cohort conversation): the research is in
-   research/notes/cohort-conversation-notes.md when its agent finishes;
-   decide the design from it, then build.
+2. Core item 2 (cohort conversation), the parts that need no setup
+   from Ben: a migration for each cohort's repository and team; the
+   Edge Function that adds a member to the cohort's team on join and
+   removes them on leave; and the conversation on /cohort/ and /live/,
+   read and posted through GitHub's GraphQL API with the student's own
+   token kept only in sessionStorage. Build against a stand-in until Ben
+   finishes the setup under "Needs Ben".
 3. Small, while waiting: when signed in, the header button and the
    /account/ heading name the person instead of "Sign in with GitHub".
 4. Then core item 3 (connect your AI agent).
