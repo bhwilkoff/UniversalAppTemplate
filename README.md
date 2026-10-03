@@ -94,10 +94,14 @@ Teaching with it? `COURSE.md` maps the stages to weeks.
 ## Using it for your app
 
 1. Click **Use this template** on GitHub to make your own copy.
-2. Open it with your agent: Claude Code, Gemini CLI, Antigravity, or
-   any agent that reads `AGENTS.md`. That file gives the agent the rules
-   and the skill table, so it already knows how this template builds.
-   (`CLAUDE.md` and `GEMINI.md` both import it.)
+2. Open it with the agent you bring. I build with Claude Code, and on
+   Google's side the route for now is Antigravity, which may change, or
+   Gemini CLI with a paid Gemini API key. I do not recommend OpenAI's
+   agents, though any agent that reads `AGENTS.md` can follow along.
+   That file gives the agent the rules and the skill table, so it
+   already knows how this template builds. (`CLAUDE.md` and `GEMINI.md`
+   both import it, and it stays under the 24,000 bytes Antigravity
+   reads.) [Getting set up](docs/path/setup.md) says what each one costs.
 3. Tell it why your app exists (stage 00), then what you want and where
    the truth lives (stage 01). It will build the first version and put
    it live at an address you can open on your phone.

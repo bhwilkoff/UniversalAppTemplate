@@ -233,10 +233,15 @@ would write project rules into `GEMINI.md`, and the whole point of
 2. **Shorten `AGENTS.md` below 24,000 bytes?** Moving the platform
    sections into their skills or docs would let Antigravity load the
    whole file without being told. That is a larger edit to the one file
-   every agent reads.
+   every agent reads. *Decided October 3, 2026: yes.* The platform rules
+   moved to `docs/platforms/`, `AGENTS.md` is about 21,800 bytes, and
+   `tools/test_agent_files.py` holds it there
+   (`docs/maintaining/AGENTS-MD-MAP.md`).
 3. **Which Google lane the course names.** Antigravity's free plan has
    a weekly limit Google does not publish in numbers, and it has changed
-   its free terms twice this year.
+   its free terms twice this year. *Decided October 3, 2026:* the course
+   names Antigravity as Google's route, labeled as something that may
+   change, with Gemini CLI as the paid option (`docs/path/setup.md`).
 
 ## What I could not verify
 

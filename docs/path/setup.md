@@ -32,14 +32,23 @@ through.
 - **GitHub** is free, and so is putting your app on the web with GitHub
   Pages.
 - **An AI agent that can work in your repository** is the one real
-  cost. Claude's free plan does not include Claude Code, so the
-  cheapest way in is Claude Pro, at about $20 a month. Google's agent is
-  now Antigravity, because Gemini CLI stopped serving free and Google AI
-  Pro accounts in June 2026. Antigravity's free plan comes with a weekly
-  limit, and Google AI Pro, also about $20 a month, raises it. Bring
-  whichever you already have. I build with Claude Code, so that is the
-  one these pages describe first, with a note for Antigravity wherever a
-  step works differently there.
+  cost, and you bring your own, so start with whichever you already
+  have. Claude's free plan does not include Claude Code, so the cheapest
+  way in is Claude Pro, at about $20 a month. I build with Claude Code,
+  so that is the one these pages describe first.
+- **Google's route is Antigravity, for now, and this may change.**
+  Gemini CLI stopped serving free and Google AI Pro accounts on June 18,
+  2026, and it now works only with a paid Gemini API key or a Gemini
+  Code Assist license. Antigravity took its place, and its free plan
+  comes with a weekly limit that Google does not publish in numbers and
+  has changed twice this year, so check what it offers on the day you
+  start. Google AI Pro, also about $20 a month, raises that limit.
+  Wherever a step works differently in Antigravity, these pages have a
+  note for it. The research behind this, with its sources, is
+  `docs/research/gemini-and-other-agents.md`.
+- **I do not recommend OpenAI's tools** for this path. Any agent that
+  reads `AGENTS.md` can follow it, but Claude and Google's agents are
+  the ones it is written and tested for.
 - **A desktop or laptop computer** is the setup I recommend, because it
   lets you build both on your own machine and in the cloud. A Mac lets
   you build for Apple's devices later; Windows and Linux reach the web,
