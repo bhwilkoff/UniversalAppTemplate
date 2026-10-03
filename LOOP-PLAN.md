@@ -331,14 +331,24 @@ and waits on one real sign-in.
   cohorts, sessions, shares, or feedback. Still untested for real: a
   student joining (needs a second GitHub account and an open cohort).
 
+- 2026-10-03, core item 2, the server function. `cohort-access`
+  (Supabase Edge Function, deployed) adds a person to their cohort's
+  GitHub team when they ask to join and takes them off when they have
+  left, as a member or, for teachers, a maintainer, and records the
+  answer (member, invited, removed, failed) in github_access. Nobody can
+  ask for someone else. Its rules live in plan.js with 7 node tests (36
+  in all). Verified live from Ben's browser: no cohort 400, unknown
+  cohort 404, signed out 401, and the call from humanshaped.org passes
+  the browser's cross-site check. Not yet verified: the GitHub step,
+  which needs Ben's GitHub App and its three secrets
+  (GITHUB_APP_ID, GITHUB_APP_PRIVATE_KEY, GITHUB_APP_INSTALLATION_ID).
+
 ## Where to pick up
 
-1. Core item 2, the server function: `supabase/functions/cohort-access`
-   adds a member to their cohort's GitHub team on join and removes them
-   on leave, recording the result in github_access. It needs Ben's
-   GitHub App (see "Needs Ben") before it can run for real; write it
-   with its decision logic in a plain module tested by node, and the
-   GitHub calls behind it.
-2. Then the conversation itself on /cohort/ and /live/, and the
-   teacher's fields for the repository and team in /teach/.
+1. Core item 2, wiring: /account/ calls cohort-access after joining
+   and after leaving; /cohort/ shows where the person's GitHub access
+   stands (invited: accept the email; member: the conversation is
+   open); /teach/ gets fields for the cohort's repository and team.
+2. Then the conversation itself on /cohort/ and /live/, read and
+   posted through GitHub's GraphQL API with the student's own token.
 3. Then core item 3 (connect your AI agent).
