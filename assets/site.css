@@ -644,3 +644,55 @@ label.check { display: flex; gap: 0.5rem; align-items: center; font-weight: 400;
 .setup-steps li.done::before { background: var(--clay); border-color: var(--clay); }
 .setup-steps li.done a { color: var(--muted); text-decoration: line-through; text-decoration-thickness: 1px; }
 .setup-steps li.optional::before { border-style: dashed; }
+
+/* The public hub: each app's page (/apps/app/), and the feed of work in
+   progress on /apps/ and the home page */
+.app-page { padding-bottom: 4rem; }
+.app-page .small, .feed-block .small { color: var(--muted); font-size: 0.95rem; }
+.app-page .page-head { padding-top: 1.5rem; }
+.app-page .page-head h1 { overflow-wrap: anywhere; }
+.app-page .lead.own { font-size: 1.3rem; line-height: 1.45; }
+.app-page .fine { margin-top: 0.75rem; }
+.where h2 { font-size: 1.15rem; margin: 0 0 0.5rem; max-width: none; }
+.where p { margin: 0 0 0.75rem; color: var(--muted); }
+.where .links, .app-page .links { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0 1.25rem; font-weight: 600; }
+.where .links a { display: inline-block; padding: 0.3rem 0; }
+.app-section { max-width: 46rem; margin-top: 3rem; }
+.app-section > h2 { font-size: 1.5rem; max-width: none; margin-bottom: 0.5rem; }
+.app-section > .small { margin: 0 0 1rem; }
+.app-section p { margin: 0 0 1rem; }
+.app h3 a { color: inherit; text-decoration: none; }
+.app h3 a:hover { text-decoration: underline; text-decoration-thickness: 2px; }
+
+.feed { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--rule); }
+.feed li { display: grid; gap: 0.1rem 1rem; padding: 0.7rem 0; border-bottom: 1px solid var(--rule); align-items: baseline; }
+.feed .feed-app { grid-column: 1 / -1; font-size: 0.9rem; font-weight: 600; color: var(--muted); text-decoration: none; }
+.feed .feed-app:hover { color: var(--clay); text-decoration: underline; }
+.feed .feed-line { color: var(--ink); text-decoration: none; overflow-wrap: anywhere; }
+.feed .feed-line:hover { color: var(--clay); text-decoration: underline; }
+.feed .feed-when { color: var(--muted); font-size: 0.9rem; white-space: nowrap; }
+.feed-block { margin: 3rem 0 4rem; max-width: 46rem; }
+.feed-block + .section-more { margin-top: 0; }
+.feed-block h3 { font-size: 1.25rem; margin: 0 0 0.35rem; }
+.feed-block > p { margin: 0 0 1rem; }
+.feed-block [data-feed-note]:empty { display: none; }
+
+.answers { list-style: none; margin: 1rem 0 0; padding: 0; border-top: 1px solid var(--rule); }
+.answer { padding: 0.9rem 0; border-bottom: 1px solid var(--rule); }
+.answer p { margin: 0.35rem 0 0; }
+.answer .answer-head { margin: 0; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0.25rem 1rem; }
+.answer-title { font-weight: 600; }
+.answer-tag { font-size: 0.9rem; font-weight: 600; color: var(--muted); border: 1px solid var(--edge); border-radius: 999px; padding: 0.05rem 0.6rem; white-space: nowrap; }
+.answer-tag.is-meets { color: var(--clay); border-color: var(--clay); }
+.answer-tag.is-not-yet { border-style: dashed; }
+
+@media (min-width: 40rem) {
+  .feed li { grid-template-columns: minmax(0, 1fr) auto; }
+}
+@media (min-width: 56rem) {
+  .app-page .page-head.split { padding-top: 2.5rem; padding-bottom: 3rem; align-items: start; }
+}
+
+/* Showing your app in public, on /cohort/ */
+.public-choice { display: grid; gap: 0.35rem; }
+.public-choice .hint { margin: 0 0 0 1.6rem; }
