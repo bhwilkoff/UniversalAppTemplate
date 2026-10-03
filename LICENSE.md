@@ -18,7 +18,10 @@ The site is built with help from an AI agent (Claude), it is set in the
 Commissioner typeface (SIL Open Font License), and its reading pages use
 [marked](https://github.com/markedjs/marked) and
 [DOMPurify](https://github.com/cure53/DOMPurify), each under its own open
-license.
+license. The board that cohorts draw on together is
+[Excalidraw](https://github.com/excalidraw/excalidraw) (MIT License),
+with [React](https://github.com/facebook/react) (MIT License); the copy
+in `assets/vendor/` keeps their licenses beside it, in `LICENSE.txt`.
 
 ## MIT License
 

@@ -1,0 +1,19 @@
+{
+  "name": "humanshaped-board-vendor",
+  "private": true,
+  "description": "Builds the copy of Excalidraw and React that /board/ loads from humanshaped.org. Run by hand when Excalidraw is upgraded; the site itself has no build step.",
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "check-sync": "node sync-check.mjs"
+  },
+  "dependencies": {
+    "@excalidraw/excalidraw": "0.18.1",
+    "react": "19.2.5",
+    "react-dom": "19.2.5"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.12",
+    "playwright-core": "1.56.1"
+  }
+}
