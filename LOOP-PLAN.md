@@ -304,6 +304,20 @@ and waits on one real sign-in.
   Discussions permission, and that moving sign-in to the App keeps
   existing Supabase accounts.
 
+- 2026-10-03, core item 2, the database. Migration 5 gives each cohort
+  a private repository and team name (teachers set them; the repository
+  must be in humanshaped) and adds github_access, where the server
+  function records whether each person is invited, a member, or
+  removed; only that function writes it, and only the person and their
+  teachers read it. 8 new database checks, 39 of 39 pass, and opening
+  the read rule on purpose failed the two checks that guard it. Applied
+  to production; Supabase's security check shows only the two functions
+  that are callable on purpose. Ben added this project to his auto mode
+  settings. The header names the signed-in person (verified in
+  production). CLAUDE.md still says 31 database checks and 25 logic
+  tests (now 39 and 29): edits to CLAUDE.md are refused as
+  self-modification, so Ben updates it.
+
 ## Where to pick up
 
 1. Ask whether Ben has signed in at humanshaped.org/account/ (the

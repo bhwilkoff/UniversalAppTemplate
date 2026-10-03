@@ -183,6 +183,31 @@ def main():
     ben.execute("select count(*) from public.shares where cohort_id = %s", (cohort,))
     check("the teacher sees the cohort's shares", ben.fetchone()[0] == 1)
 
+    ben = as_user("ben")
+    check("a teacher can name the cohort's private repository and team",
+          attempt(ben, "update public.cohorts set github_repo = 'humanshaped/cohort-fall-2026', github_team = 'cohort-fall-2026' where id = %s", (cohort,)))
+    check("a cohort's repository must be in the humanshaped organization",
+          not attempt(ben, "update public.cohorts set github_repo = 'someone/else' where id = %s", (cohort,)))
+    bea = as_user("bea")
+    bea.execute("update public.cohorts set github_team = 'mine' where id = %s", (cohort,))
+    check("a student cannot change the cohort's team", bea.rowcount == 0)
+    check("a student cannot mark themselves a member of the cohort's team",
+          not attempt(bea, "insert into public.github_access (cohort_id, user_id, state) values (%s, %s, 'member')", (cohort, people["bea"])))
+    su4 = conn.cursor(); su4.execute("reset role")
+    su4.execute("insert into public.github_access (cohort_id, user_id, state) values (%s, %s, 'invited'), (%s, %s, 'member')",
+                (cohort, people["bea"], cohort, people["cal"]))
+    bea = as_user("bea")
+    bea.execute("select user_id from public.github_access")
+    check("a student sees only their own GitHub access", [str(r[0]) for r in bea.fetchall()] == [people["bea"]])
+    bea.execute("update public.github_access set state = 'member' where user_id = %s", (people["bea"],))
+    check("a student cannot change their own GitHub access", bea.rowcount == 0)
+    ben = as_user("ben")
+    ben.execute("select count(*) from public.github_access where cohort_id = %s", (cohort,))
+    check("the teacher sees everyone's GitHub access", ben.fetchone()[0] == 2)
+    dee = as_user("dee")
+    dee.execute("select count(*) from public.github_access")
+    check("someone outside the cohort sees no GitHub access", dee.fetchone()[0] == 0)
+
     bea = as_user("bea")
     bea.execute("select public.leave_cohort(%s)", (cohort,))
     cal = as_user("cal")
