@@ -55,13 +55,17 @@ export function recordingFilename({ cohortId, startedAt }) {
   return `humanshaped-${cohort}-${stamp}.webm`;
 }
 
-export function consentNotice({ cohortTitle } = {}) {
+export function consentNotice({ cohortTitle, countingTalk = false } = {}) {
   const where = cohortTitle ? ` for ${cohortTitle}` : '';
   return (
     `I am recording this session${where} now, so that anyone who misses it can watch it later. ` +
     'The recording goes only to this cohort\'s members, in our shared Google Drive folder, and nowhere else. ' +
+    'I may mark moments to share back with you as short clips, and any clip goes only to this cohort too. ' +
     'If you would rather not appear, turn your camera off and use the chat, or tell me and I will trim your part. ' +
-    'Breakout rooms are not recorded, and I will stop the recording before we split up.'
+    'Breakout rooms are not recorded, and I will stop the recording before we split up.' +
+    (countingTalk
+      ? ' My recorder is also counting how much I talk compared with everyone else, from the sound alone, never who else talks or what anyone says, and only I see that number unless I choose to share it with the cohort.'
+      : '')
   );
 }
 
@@ -172,4 +176,119 @@ export function isPlaceholderClientId(clientId) {
 
 export function newSessionId(now = Date.now(), rand = Math.random) {
   return `${now.toString(36)}-${Math.floor(rand() * 1e9).toString(36)}`;
+}
+
+// ---------------------------------------------------------------------
+// Clip marks (Wish 11). The host marks a moment while recording, with an
+// optional word; afterwards the finish page cuts a clip from a little
+// before the mark to a while after it, inside the recording's length.
+// ---------------------------------------------------------------------
+
+export const CLIP_BEFORE_MS = 30_000;
+export const CLIP_AFTER_MS = 90_000;
+export const MARK_WORD_MAX = 80;
+
+export function newMark(atMs, word) {
+  const at = Math.max(0, Math.round(Number(atMs) || 0));
+  const w = String(word || '').replace(/\s+/g, ' ').trim().slice(0, MARK_WORD_MAX);
+  return { atMs: at, word: w };
+}
+
+// Marks in time order, one per moment: two marks within two seconds of
+// each other are the same moment pressed twice, and the first word wins.
+export function addMark(marks, mark) {
+  const list = (marks || []).slice();
+  const near = list.find((m) => Math.abs(m.atMs - mark.atMs) < 2000);
+  if (near) {
+    if (!near.word && mark.word) near.word = mark.word;
+    return list.sort((a, b) => a.atMs - b.atMs);
+  }
+  list.push(mark);
+  return list.sort((a, b) => a.atMs - b.atMs);
+}
+
+// The clip's range for a mark, clamped to the recording. Without a known
+// length (an unfinished recording), the end is not clamped.
+export function clipRange(atMs, lengthMs, before = CLIP_BEFORE_MS, after = CLIP_AFTER_MS) {
+  const start = Math.max(0, atMs - before);
+  let end = atMs + after;
+  if (Number.isFinite(lengthMs) && lengthMs > 0) end = Math.min(end, lengthMs);
+  return { startMs: start, endMs: Math.max(start, end) };
+}
+
+export function clipFilename(recordingName, mark) {
+  const base = String(recordingName || 'recording.webm').replace(/\.webm$/i, '');
+  const t = formatDuration(mark.atMs).replace(/:/g, '-');
+  const word = slug(mark.word);
+  return `${base}-clip-${t}${word ? `-${word}` : ''}.webm`;
+}
+
+// ---------------------------------------------------------------------
+// The host's own talk share (Wish 4). Measured on the host's computer
+// from two levels only: the host's microphone, and the call's mixed
+// audio from the tab (Meet never plays the host's own voice back, so the
+// tab is everyone else together). It cannot tell who else spoke, and it
+// keeps no sound. Nothing about any other person is counted.
+// ---------------------------------------------------------------------
+
+// Root mean square of a block of samples between -1 and 1.
+export function rms(samples) {
+  if (!samples || !samples.length) return 0;
+  let sum = 0;
+  for (let i = 0; i < samples.length; i += 1) sum += samples[i] * samples[i];
+  return Math.sqrt(sum / samples.length);
+}
+
+export const TALK_DEFAULTS = {
+  // Levels above these count as someone talking. A quiet room sits near
+  // 0.003; normal speech into a headset or laptop microphone is 0.02 to
+  // 0.2. Tuned on synthetic levels only; a real call may move them.
+  micThreshold: 0.02,
+  tabThreshold: 0.015,
+  // Speech has gaps between words. A voice counts as still talking for
+  // this long after its level drops, so a sentence is one stretch.
+  holdMs: 400,
+};
+
+// Counts milliseconds of: the host talking, anyone else talking, both at
+// once, and nobody. Feed it one pair of levels per tick.
+export function createTalkCounter(options = {}) {
+  const o = { ...TALK_DEFAULTS, ...options };
+  const totals = { hostMs: 0, othersMs: 0, bothMs: 0, quietMs: 0 };
+  let hostHeld = 0;
+  let othersHeld = 0;
+  return {
+    add(micLevel, tabLevel, dtMs) {
+      const dt = Math.max(0, Math.min(Number(dtMs) || 0, 1000));
+      hostHeld = micLevel >= o.micThreshold ? o.holdMs : Math.max(0, hostHeld - dt);
+      othersHeld = tabLevel >= o.tabThreshold ? o.holdMs : Math.max(0, othersHeld - dt);
+      const host = hostHeld > 0;
+      const others = othersHeld > 0;
+      if (host && others) totals.bothMs += dt;
+      else if (host) totals.hostMs += dt;
+      else if (others) totals.othersMs += dt;
+      else totals.quietMs += dt;
+    },
+    totals() {
+      return { ...totals };
+    },
+  };
+}
+
+// The host's share of the time anyone was talking: the host's time
+// (including talking over someone) over all talking time. Null when there
+// was too little talk to say anything (under a minute).
+export const TALK_MIN_MS = 60_000;
+export function talkShare(totals) {
+  if (!totals) return null;
+  const host = (totals.hostMs || 0) + (totals.bothMs || 0);
+  const anyone = host + (totals.othersMs || 0);
+  if (anyone < TALK_MIN_MS) return null;
+  return host / anyone;
+}
+
+export function talkSentence(share) {
+  if (share == null) return 'There was too little talking to count a share.';
+  const p = Math.round(share * 100);
+  return `You talked ${p} percent of the time anyone was talking.`;
 }

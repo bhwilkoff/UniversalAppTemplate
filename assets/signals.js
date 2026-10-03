@@ -1,6 +1,8 @@
 // Live signals on a page (migration 20261003140000): the banner that says
 // where everyone should be, the card, who is on stage, the "recording
-// now" notice, and, for a teacher, the controls that send them. Used by
+// now" and "measuring my talk" notices, the teacher's saved talk share
+// (migration 20261003190000), and, for a teacher, the controls that send
+// them. Used by
 // /live/ and /card/; the Meet add-on can mount the same view. The logic
 // (which signal shows, the clock, the order of rooms) is SignalsLib's.
 //
@@ -28,19 +30,22 @@
   // left out; /card/ uses only screen).
   function start(opts) {
     var db = opts.db, m = opts.mounts || {};
-    var rows = [], saved = [], seen = null, st = K.state([], Date.now()), sig = '', tickTimer = null, channel = null, poller = null, nudgeTimer = null;
+    var rows = [], saved = [], note = null, seen = null, st = K.state([], Date.now()), sig = '', tickTimer = null, channel = null, poller = null, nudgeTimer = null;
     var mainUrl = safe(opts.session.meet_url);
     var C = m.controls ? controls() : null;
 
     function refresh() {
-      var reads = [db.from('live_signals').select('*').eq('session_id', opts.session.id).order('created_at')];
+      var reads = [db.from('live_signals').select('*').eq('session_id', opts.session.id).order('created_at'),
+        // On its own: before the table exists, this fails quietly.
+        db.from('session_notes').select('teacher_talk_share, saved_at').eq('session_id', opts.session.id).maybeSingle()];
       if (C) reads.push(db.from('card_presets').select('*').order('created_at'));
       return Promise.all(reads).then(function (res) {
         if (res[0].error) return;
         var before = seen;
         rows = res[0].data || [];
-        if (res[1] && !res[1].error) saved = res[1].data || [];
-        seen = JSON.stringify([rows, saved]);
+        note = res[1].error ? undefined : res[1].data;
+        if (res[2] && !res[2].error) saved = res[2].data || [];
+        seen = JSON.stringify([rows, saved, note]);
         // Redraw in full only when something changed, so a nudge that
         // changed nothing never moves anyone's focus.
         draw(seen !== before);
@@ -58,7 +63,7 @@
       st = K.state(rows, now);
       var w = K.where(st, now, coarse), sc = K.screen(st, now, coarse);
       var next = [w && w.kind, w && w.because, w && w.warn, w && w.signal.id, st.card && st.card.id, st.stage && st.stage.id,
-        st.recording && st.recording.id, sc && sc.kind, sc && sc.clock && sc.clock.done, coarse].join('|');
+        st.recording && st.recording.id, st.talk && st.talk.id, note && note.teacher_talk_share, sc && sc.kind, sc && sc.clock && sc.clock.done, coarse].join('|');
       if (force || next !== sig) {
         sig = next;
         if (m.recording) drawRecording();
@@ -92,10 +97,15 @@
 
     function drawRecording() {
       m.recording.replaceChildren();
-      m.recording.hidden = !st.recording;
+      var share = note ? K.shareText(note.teacher_talk_share, opts.teaching) : '';
+      m.recording.hidden = !st.recording && !st.talk && !share;
       if (st.recording) m.recording.appendChild(el('p', null, opts.teaching
         ? 'You are recording now, and everyone in the cohort sees this line until you say it has stopped.'
         : 'Your teacher is recording now, on their own computer, and only the people in this cohort will see it.'));
+      if (st.talk) m.recording.appendChild(el('p', null, opts.teaching
+        ? 'You are counting how much you talk, and everyone in the cohort sees this line until you say it has stopped.'
+        : 'Your teacher’s recorder is counting how much they talk compared with everyone else, not who else talks, and it keeps no one’s words for this.'));
+      if (share) m.recording.appendChild(el('p', 'small', share));
     }
 
     function drawWhere(w) {
@@ -206,7 +216,7 @@
     function send(kind, fields, status) {
       var me = opts.meId, sid = opts.session.id;
       // Sending clears what it replaces, so the database says what shows.
-      var clears = { rooms: ['rooms', 'together'], together: ['rooms', 'together'], card: ['card'], stage: ['stage'], recording: ['recording'] }[kind];
+      var clears = { rooms: ['rooms', 'together'], together: ['rooms', 'together'], card: ['card'], stage: ['stage'], recording: ['recording'], talk: ['talk'] }[kind];
       status.textContent = 'Sending…';
       return db.from('live_signals').update({ cleared_at: new Date().toISOString() }).eq('session_id', sid).in('kind', clears).is('cleared_at', null)
         .then(function () {
@@ -229,7 +239,7 @@
       function q(s) { return box.querySelector(s); }
       var status = {
         rooms: q('[data-sig-rooms-status]'), card: q('[data-sig-card-status]'),
-        stage: q('[data-sig-stage-status]'), rec: q('[data-sig-rec-status]')
+        stage: q('[data-sig-stage-status]'), rec: q('[data-sig-rec-status]'), talk: q('[data-sig-talk-status]')
       };
 
       // Rooms: send, with an optional clock, or call everyone back.
@@ -305,6 +315,29 @@
       q('[data-sig-rec-on]').addEventListener('click', function () { send('recording', {}, status.rec); });
       q('[data-sig-rec-off]').addEventListener('click', function () { if (st.recording) clear(st.recording, status.rec); });
 
+      // Measuring the teacher's own talk: a notice while the recorder
+      // counts, and afterwards the share it showed, kept only if the
+      // teacher saves it here, and taken back whenever they like.
+      q('[data-sig-talk-on]').addEventListener('click', function () { send('talk', {}, status.talk); });
+      q('[data-sig-talk-off]').addEventListener('click', function () { if (st.talk) clear(st.talk, status.talk); });
+      q('[data-sig-share-form]').addEventListener('submit', function (ev) {
+        ev.preventDefault();
+        var p = K.parseShare(q('[data-sig-share]').value);
+        if (p.error) { status.talk.textContent = p.error; return; }
+        status.talk.textContent = 'Saving…';
+        db.from('session_notes').upsert({ session_id: opts.session.id, cohort_id: opts.cohort.id, teacher_talk_share: p.share }).then(function (r) {
+          status.talk.textContent = r.error ? 'Not saved: ' + r.error.message : 'Saved. The cohort sees it on this page.';
+          if (!r.error) q('[data-sig-share]').value = '';
+          refresh();
+        });
+      });
+      q('[data-sig-share-remove]').addEventListener('click', function () {
+        db.from('session_notes').delete().eq('session_id', opts.session.id).then(function (r) {
+          status.talk.textContent = r.error ? 'Not removed: ' + r.error.message : 'Removed. Nobody sees it now.';
+          refresh();
+        });
+      });
+
       function drawPresets() {
         var list = q('[data-sig-presets]'); list.replaceChildren();
         K.presets(saved).forEach(function (p) {
@@ -350,6 +383,12 @@
         q('[data-sig-stage-now]').textContent = st.stage ? K.stageText(st.stage, opts.nameOf) : '';
         q('[data-sig-rec-on]').hidden = !!st.recording;
         q('[data-sig-rec-live]').hidden = !st.recording;
+        q('[data-sig-talk-on]').hidden = !!st.talk;
+        q('[data-sig-talk-live]').hidden = !st.talk;
+        // Before the database has session_notes, the share is not offered.
+        q('[data-sig-share-wrap]').hidden = note === undefined;
+        q('[data-sig-share-saved]').hidden = !note;
+        q('[data-sig-share-now]').textContent = note ? 'Saved for this session: ' + K.percent(note.teacher_talk_share) + ' percent.' : '';
         drawPresets();
       }
       return { sync: sync };
@@ -366,9 +405,9 @@
     function listen() {
       if (!db.channel) return poll(true);
       channel = db.channel('signals:' + opts.cohort.id);
-      channel.on('postgres_changes', { event: '*', schema: 'public', table: 'live_signals', filter: 'cohort_id=eq.' + opts.cohort.id }, function () {
-        clearTimeout(nudgeTimer); nudgeTimer = setTimeout(refresh, 200);
-      });
+      function nudge() { clearTimeout(nudgeTimer); nudgeTimer = setTimeout(refresh, 200); }
+      channel.on('postgres_changes', { event: '*', schema: 'public', table: 'live_signals', filter: 'cohort_id=eq.' + opts.cohort.id }, nudge);
+      channel.on('postgres_changes', { event: '*', schema: 'public', table: 'session_notes', filter: 'cohort_id=eq.' + opts.cohort.id }, nudge);
       poll(true);
       channel.subscribe(function (s) {
         if (s === 'SUBSCRIBED') { poll(false); refresh(); }

@@ -32,11 +32,37 @@ Google Drive folder.
   computer and, if you want, upload it to the cohort's Drive folder as
   meet@humanshaped.org. An upload that fails keeps the local copy, tells
   you what went wrong, and picks up where it stopped when you try again.
+- Lets you mark a moment while you record, with "Mark it" in the popup
+  (and a word about it, if you like) or a keyboard shortcut in any tab
+  (Alt+Shift+M is suggested; whatever is set shows in the popup, and
+  `chrome://extensions/shortcuts` changes it). The badge says MARK for a
+  moment so you know it took. On the finish page, each mark has "Make a
+  clip", which saves a WebM from 30 seconds before the mark to 90 seconds
+  after. The clip is made by playing that part of the recording silently
+  in the page and recording it again, so it takes as long as the clip,
+  and it needs no encoder library.
+- If you tick "Count how much I talk", counts how much you talk compared
+  with everyone else in the call, and nothing else (Wish 4 in
+  `research/notes/meet-classroom-design.md`). Ten times a second it reads
+  two levels, your microphone and the call's sound from the tab, which is
+  everyone else mixed together, because Meet never plays your own voice
+  back to you. It keeps the counts, never the sound, and it cannot tell
+  who else talked. When you stop, the finish page says "You talked 41
+  percent of the time anyone was talking," and you keep it or let it go.
+  Keeping it means typing the number on the session page on
+  humanshaped.org, under "Your own talk", where the cohort can read it
+  until the cohort is finished; the recorder cannot sign in to the hub,
+  so it never sends the number anywhere itself. The notice you read out
+  says that it is counting, and the session page has "Tell everyone I am
+  counting my talk", which shows a line to everyone while it runs.
 
 ## What it does not do
 
 It does not press Meet's Record button, read Meet's page, post into the
-chat for you, or do anything for the other people in the call. It does
+chat for you, or do anything for the other people in the call. It never
+counts anything about anyone but the host: not who talks, not for how
+long, and not who is there (DECISIONS.md, "The classroom on Meet", item
+13). It does
 not record breakout rooms on its own, but it records whatever your tab
 shows, so stop the recording before you join a breakout room (the notice
 promises this). It does not edit or trim, and it never deletes a
@@ -64,6 +90,13 @@ a way to stay out of frame. The notice the extension copies is:
 > me and I will trim your part. Breakout rooms are not recorded, and I
 > will stop the recording before we split up.
 
+Before the sentence about the camera, it adds: "I may mark moments to
+share back with you as short clips, and any clip goes only to this
+cohort too." When the host ticks "Count how much I talk", it ends with:
+"My recorder is also counting how much I talk compared with everyone
+else, from the sound alone, never who else talks or what anyone says,
+and only I see that number unless I choose to share it with the cohort."
+
 The same promise belongs on the cohort sign-up page and in the covenant,
 so nobody hears it for the first time in the call. (I am not a lawyer,
 and this is not legal advice. It is the most careful version of the rule
@@ -79,8 +112,9 @@ I know.)
 | `identity` | Sign in to Drive as the account this Chrome profile uses. |
 | `storage` | Remember the cohort folder list and the last cohort you chose. |
 
-There is no host permission and no content script, because nothing here
-touches Meet's page. The only OAuth scope is `drive.file`, which lets the
+The keyboard shortcut for marking a moment uses the `commands` key in
+the manifest, which needs no permission. There is no host permission
+and no content script, because nothing here touches Meet's page. The only OAuth scope is `drive.file`, which lets the
 extension create files and see only the files it made, never the rest of
 meet@'s Drive.
 
@@ -127,6 +161,37 @@ matching. To pin the ID, generate a key once and add it to the manifest:
 that output in a `"key"` field in `manifest.json`. Keep `key.pem` out of
 the repository.
 
+Once the extension is in the Chrome Web Store, the store's ID is the one
+that matters, so pin that one instead: in the store's developer
+dashboard, open the item, then Package, then "View public key", and put
+that key (the text between the BEGIN and END lines, on one line) in the
+manifest's `"key"` field. The unpacked copy then has the store's ID, and
+one OAuth client works for both. The `"key"` field is a public key and
+is safe in this public repository; the private key stays with the store.
+(Chrome's guide: https://developer.chrome.com/docs/extensions/how-to/integrate/oauth,
+"Keep a consistent extension ID".)
+
+## Listing it in the Chrome Web Store
+
+`STORE-LISTING.md` holds the listing's words, drafted for Ben's review:
+the descriptions, the single purpose, why each permission is needed,
+and the privacy answers. What waits on Ben:
+
+1. **Whether to pay the store's one-time $5 registration fee**
+   (https://developer.chrome.com/docs/webstore/register). It is not an
+   ongoing cost, but it is a cost, so it is Ben's decision. Until then,
+   hosts load the extension unpacked, as in "Set it up" above, which
+   works and costs nothing.
+2. **Which account owns the listing.** meet@humanshaped.org keeps the
+   listing apart from anyone's own login, as for everything else here.
+3. **The pictures:** an icon (the extension has none yet, and Chrome
+   shows a letter), and screenshots of the popup and the finish page.
+4. **Unlisted first.** The store reviews every visibility the same way;
+   Unlisted means only people with the link can install it, which is
+   everyone who hosts a cohort.
+5. **Pin the store's key** in the manifest once the item exists (above),
+   and add the store's ID to the OAuth client.
+
 ## Record a session
 
 Open the call in the meet@ profile, press the extension's button, choose
@@ -151,7 +216,8 @@ file into its cohort's folder, where the cohort can see it.
 ## Tests
 
 `npm test` in this folder runs the pure logic (file names, the notice,
-folder-link parsing, chunk sizes) and runs the real upload code against a
+folder-link parsing, chunk sizes, marks and clip ranges, and the talk
+counter on synthetic levels) and runs the real upload code against a
 fake Drive that drops a connection, accepts a short write, expires a
 token and refuses a folder. `npm run check` runs `node --check` on every
 script and parses the manifest. Neither needs Chrome or a network.
@@ -190,5 +256,23 @@ set up by meet-events with the Gmail account as its only member.
     running). In Chrome's Task Manager the extension's memory should stay
     flat, and the file should come out near the size the popup estimated.
 
+12. Start a recording with "Count how much I talk" ticked. Mark three
+    moments: one with "Mark it", one with a word, and one with the
+    keyboard shortcut while the Meet tab is in front. Talk for about a
+    minute, then let the second device talk for about a minute, then both
+    at once for a moment, and stop.
+13. On the finish page, the three marks should be listed in order with
+    their clip ranges. Make a clip of each and play it: picture and both
+    voices, starting about 30 seconds before the mark, and no sound from
+    your speakers while it was made. The talk share should read near 50
+    percent. Press "Let it go" on one recording and "Keep it" on another.
+14. Record once more, counting talk, with your speakers on rather than
+    headphones. Stay silent while the second device talks for two
+    minutes, then stop. The share should be near 0 percent, which tells
+    us the microphone's echo cancelling keeps others' voices, coming out
+    of your speakers, from counting as yours.
+
 Bring back what step 11 measured; it tells us whether the 1080p setting
-is the right default.
+is the right default. From steps 13 and 14, bring back the talk shares,
+and whether any clip started in the wrong place, since the recording has
+no index to seek by.

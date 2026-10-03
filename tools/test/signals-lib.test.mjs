@@ -186,3 +186,31 @@ test('the live page and the card page read the same session', () => {
   assert.equal(lib.sessionFor({ live: false, next: null, current: a }), a);
   assert.equal(lib.sessionFor({ live: false, next: null, current: null }), null);
 });
+
+test('measuring talk shows until the teacher clears it, like recording', () => {
+  const talk = sig('talk', T0);
+  assert.equal(lib.state([talk], T0 + min(5)).talk, talk);
+  assert.equal(lib.state([{ ...talk, cleared_at: iso(T0 + min(6)) }], T0 + min(7)).talk, null);
+  assert.equal(lib.state([talk], T0 + min(5)).recording, null);
+});
+
+test('the teacher types the percent the recorder showed, and the database keeps a share', () => {
+  assert.deepEqual(lib.parseShare('41'), { share: 0.41 });
+  assert.deepEqual(lib.parseShare(' 41 % '), { share: 0.41 });
+  assert.deepEqual(lib.parseShare('37.5 percent'), { share: 0.375 });
+  assert.deepEqual(lib.parseShare('0'), { share: 0 });
+  assert.deepEqual(lib.parseShare('100'), { share: 1 });
+  assert.ok(lib.parseShare('').error);
+  assert.ok(lib.parseShare('120').error);
+  assert.ok(lib.parseShare('-3').error);
+  assert.ok(lib.parseShare('forty').error);
+});
+
+test('the saved share reads as a whole percent, about the teacher only', () => {
+  assert.equal(lib.percent('0.380'), 38);
+  assert.equal(lib.percent(null), null);
+  assert.match(lib.shareText(0.41, false), /^Your teacher talked 41 percent/);
+  assert.match(lib.shareText(0.41, true), /^You talked 41 percent/);
+  assert.doesNotMatch(lib.shareText(0.41, false), /—/);
+  assert.equal(lib.shareText(null, false), '');
+});

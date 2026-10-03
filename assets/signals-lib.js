@@ -29,7 +29,7 @@
   //              after its time runs out
   //   together   for ten minutes, unless the teacher sends people to
   //              their rooms again or takes it down
-  //   card, stage, recording   until the teacher clears them or sends a
+  //   card, stage, recording, talk   until the teacher clears them or sends a
   //              newer one of the same kind
   // Nothing older than four hours shows.
   function state(rows, now) {
@@ -43,7 +43,7 @@
     function newest(kind, alsoCleared) {
       return fresh.filter(function (r) { return r.kind === kind && (alsoCleared || !r.cleared_at); })[0] || null;
     }
-    var out = { rooms: null, together: null, card: newest('card'), stage: newest('stage'), recording: newest('recording') };
+    var out = { rooms: null, together: null, card: newest('card'), stage: newest('stage'), recording: newest('recording'), talk: newest('talk') };
     var lastRooms = newest('rooms', true), lastBack = newest('together', true);
     var roomsNewer = lastRooms && (!lastBack || ms(lastRooms.created_at) >= ms(lastBack.created_at));
     if (roomsNewer && !lastRooms.cleared_at) {
@@ -223,12 +223,38 @@
     return t.live ? t.next : (t.next || t.current || null);
   }
 
+  // The teacher's own talk share (migration 20261003190000), which the
+  // session recorder counts on their computer and shows as a whole
+  // percent. The teacher types that percent on /live/ to keep it; the
+  // database keeps a share between 0 and 1.
+  function parseShare(text) {
+    var t = String(text == null ? '' : text).trim().replace(/\s*(%|percent)$/i, '');
+    if (!t) return { error: 'Write the percent the recorder showed you, such as 41.' };
+    if (!/^\d{1,3}(\.\d+)?$/.test(t)) return { error: 'Write it as a number from 0 to 100, such as 41.' };
+    var n = Number(t);
+    if (n > 100) return { error: 'A share is at most 100 percent.' };
+    return { share: Math.round(n * 10) / 1000 };
+  }
+  function percent(share) {
+    if (share == null || share === '') return null;
+    var n = Number(share);
+    return isFinite(n) ? Math.round(n * 100) : null;
+  }
+  // The line the cohort reads on /live/ once the teacher has saved it.
+  function shareText(share, teaching) {
+    var p = percent(share);
+    if (p == null) return '';
+    return (teaching ? 'You' : 'Your teacher') + ' talked ' + p + ' percent of the time anyone was talking in this session, counted on '
+      + (teaching ? 'your' : 'their') + ' own computer from the sound alone, without anyone’s words and without who else spoke.';
+  }
+
   var lib = {
     STALE_MS: STALE_MS, BACK_FOR_MS: BACK_FOR_MS, WARN_S: WARN_S, POLL_MS: POLL_MS, DEFAULT_CARDS: DEFAULT_CARDS,
     state: state, countdown: countdown, clock: clock, where: where, screen: screen, nextTick: nextTick,
     roomsFor: roomsFor, stageRoles: stageRoles, stageText: stageText, stagePeople: stagePeople, list: list,
     parseMinutes: parseMinutes, parseCard: parseCard, endsAt: endsAt, extend: extend,
-    presets: presets, isSaved: isSaved, presetLabel: presetLabel, sessionFor: sessionFor
+    presets: presets, isSaved: isSaved, presetLabel: presetLabel, sessionFor: sessionFor,
+    parseShare: parseShare, percent: percent, shareText: shareText
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
   else root.SignalsLib = lib;

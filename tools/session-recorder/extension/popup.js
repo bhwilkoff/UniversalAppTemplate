@@ -28,7 +28,7 @@ function selectedCohort(cohorts) {
 
 function renderNotice(cohorts) {
   const c = selectedCohort(cohorts);
-  $('notice').textContent = consentNotice({ cohortTitle: c ? c.label : '' });
+  $('notice').textContent = consentNotice({ cohortTitle: c ? c.label : '', countingTalk: $('talk').checked && $('mic').checked });
 }
 
 async function copy(text, confirmEl) {
@@ -36,11 +36,22 @@ async function copy(text, confirmEl) {
   if (confirmEl) confirmEl.hidden = false;
 }
 
+// The shortcut is whatever the host set in chrome://extensions/shortcuts,
+// which may not be the one suggested, or none if another extension has it.
+async function showShortcut() {
+  const commands = await chrome.commands.getAll().catch(() => []);
+  const c = commands.find((x) => x.name === 'mark-moment');
+  $('mark-key').textContent = c && c.shortcut ? `(or press ${c.shortcut} in any tab)` : '(a shortcut can be set in chrome://extensions/shortcuts)';
+}
+
 function renderRecording(state) {
+  showShortcut();
   show('recording');
   $('rec-cohort').textContent = state.cohort ? `Saving for ${state.cohort.label}` : 'Saving on this computer only (no cohort folder chosen)';
   $('mic-status').textContent = state.micIncluded ? 'Your microphone is in the recording.' : state.micError || 'Your microphone is not in this recording.';
   $('mic-status').className = state.micIncluded ? 'ok' : 'error';
+  $('talk-status').hidden = !state.countingTalk;
+  $('marked').textContent = state.marks ? `${state.marks} marked so far.` : '';
   const tick = () => ($('elapsed').textContent = formatDuration(Date.now() - state.startedAt));
   tick();
   clearInterval(tickTimer);
@@ -75,7 +86,15 @@ async function init() {
     opt.textContent = `${opt.value === 'standard' ? '1080p' : '720p'}, about ${formatBytes(estimateBytes(opt.value, 90))} for 90 minutes`;
   }
 
-  renderNotice(cohorts);
+  // Counting talk listens to your microphone, so it needs it.
+  const syncTalk = () => {
+    $('talk').disabled = !$('mic').checked;
+    if (!$('mic').checked) $('talk').checked = false;
+    renderNotice(cohorts);
+  };
+  $('mic').onchange = syncTalk;
+  $('talk').onchange = () => renderNotice(cohorts);
+  syncTalk();
   select.onchange = () => renderNotice(cohorts);
   $('copy-notice').onclick = () => copy($('notice').textContent, $('copied')).catch(() => {});
   $('announced').onchange = () => ($('start').disabled = !$('announced').checked);
@@ -91,6 +110,7 @@ async function init() {
       cohort,
       includeMic: $('mic').checked,
       quality: $('quality').value,
+      countTalk: $('talk').checked,
     }).catch((err) => ({ ok: false, error: String(err.message || err) }));
     if (!reply || !reply.ok) {
       $('start-error').textContent = (reply && reply.error) || 'The recording did not start.';
@@ -114,5 +134,16 @@ $('stop').onclick = async () => {
   window.close();
 };
 $('copy-stop').onclick = () => copy(stopNotice()).catch(() => {});
+$('mark').onclick = async () => {
+  $('mark').disabled = true;
+  const reply = await send('mark', { word: $('mark-word').value }).catch((err) => ({ ok: false, error: String(err.message || err) }));
+  $('mark').disabled = false;
+  if (!reply || !reply.ok) {
+    $('marked').textContent = (reply && reply.error) || 'The mark did not save.';
+    return;
+  }
+  $('mark-word').value = '';
+  $('marked').textContent = `Marked at ${formatDuration(reply.mark.atMs)}. ${reply.marks} so far.`;
+};
 
 init();

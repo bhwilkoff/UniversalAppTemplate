@@ -2,10 +2,16 @@
   "manifest_version": 3,
   "name": "Human Shaped session recorder",
   "short_name": "HS recorder",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Records a Google Meet session you host, after you announce it, and saves it to this computer and the cohort's Drive folder.",
   "minimum_chrome_version": "116",
-  "permissions": ["tabCapture", "offscreen", "identity", "storage", "activeTab"],
+  "permissions": [
+    "tabCapture",
+    "offscreen",
+    "identity",
+    "storage",
+    "activeTab"
+  ],
   "background": {
     "service_worker": "background.js",
     "type": "module"
@@ -14,9 +20,19 @@
     "default_title": "Record a Human Shaped session",
     "default_popup": "popup.html"
   },
+  "commands": {
+    "mark-moment": {
+      "suggested_key": {
+        "default": "Alt+Shift+M"
+      },
+      "description": "Mark this moment in the recording, to make a clip of it later"
+    }
+  },
   "options_page": "options.html",
   "oauth2": {
     "client_id": "REPLACE_WITH_CLIENT_ID.apps.googleusercontent.com",
-    "scopes": ["https://www.googleapis.com/auth/drive.file"]
+    "scopes": [
+      "https://www.googleapis.com/auth/drive.file"
+    ]
   }
 }

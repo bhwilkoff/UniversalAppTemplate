@@ -19,6 +19,7 @@
         <select id="cohort"></select>
       </label>
       <label class="row"><input type="checkbox" id="mic" checked /> <span>Include my microphone (Meet does not play your own voice back, so without this you are silent in the recording)</span></label>
+      <label class="row"><input type="checkbox" id="talk" /> <span>Count how much I talk compared with everyone else (from the sound alone, never who else talks or what anyone says; only you see the number at the end)</span></label>
       <label class="stack">Quality
         <select id="quality">
           <option value="standard">1080p, about 1.2 GB for 90 minutes</option>
@@ -44,6 +45,13 @@
       <p class="rec">Recording <span id="elapsed" class="tabular">0:00</span></p>
       <p id="rec-cohort" class="muted"></p>
       <p id="mic-status"></p>
+      <p id="talk-status" class="muted" hidden>Counting how much you talk. Say so aloud, and show it on the session page.</p>
+      <div class="box">
+        <label class="stack">Mark this moment to clip later <span class="muted" id="mark-key"></span>
+          <input type="text" id="mark-word" maxlength="80" placeholder="A word about it, if you like" />
+        </label>
+        <div class="actions"><button id="mark">Mark it</button> <span id="marked" class="ok" role="status"></span></div>
+      </div>
       <p class="muted">You can close this window. The red REC badge on the extension button stays on until you stop.</p>
       <div class="actions">
         <button id="stop" class="stop">Stop and save</button>

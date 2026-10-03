@@ -1,4 +1,4 @@
-import { formatBytes, formatDuration, parseFolderId, isPlaceholderClientId } from './lib.js';
+import { formatBytes, formatDuration, parseFolderId, isPlaceholderClientId, clipRange, clipFilename, talkShare, talkSentence } from './lib.js';
 import { listSessions, assembleRecording, deleteRecording, updateSession, getSession } from './store.js';
 import { startSession, sendChunks, queryOffset } from './drive.js';
 import { getToken } from './auth.js';
@@ -95,6 +95,10 @@ async function renderCard(session, cohorts) {
 
   uploadBtn.onclick = () => upload(card, session.id, blob, select);
 
+  const lengthMs = session.endedAt ? session.endedAt - session.startedAt : null;
+  if (blob.size > 0) renderMarks(card, session, url, lengthMs);
+  renderTalk(card, session);
+
   card.querySelector('.delete').onclick = async () => {
     const inDrive = session.upload && session.upload.fileId;
     const warning = inDrive
@@ -106,6 +110,156 @@ async function renderCard(session, cohorts) {
     render();
   };
   return card;
+}
+
+// ---------------------------------------------------------------------
+// Clips (Wish 11)
+// ---------------------------------------------------------------------
+
+function renderMarks(card, session, url, lengthMs) {
+  const marks = session.marks || [];
+  const box = card.querySelector('.marks');
+  box.hidden = !marks.length;
+  const list = box.querySelector('.mark-list');
+  list.replaceChildren();
+  for (const m of marks) {
+    const range = clipRange(m.atMs, lengthMs);
+    const li = document.createElement('li');
+    const text = document.createElement('span');
+    text.className = 'tabular';
+    text.textContent = `${formatDuration(m.atMs)}${m.word ? `, ${m.word}` : ''} (clip ${formatDuration(range.startMs)} to ${formatDuration(range.endMs)})`;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = 'Make a clip';
+    const status = document.createElement('span');
+    status.className = 'muted';
+    status.setAttribute('role', 'status');
+    btn.onclick = async () => {
+      btn.disabled = true;
+      status.textContent = 'Making the clip…';
+      try {
+        const clip = await makeClip(url, range, session.mimeType, (done) => {
+          status.textContent = `Making the clip: ${Math.round(done * 100)} percent.`;
+        });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(clip);
+        a.download = clipFilename(session.filename, m);
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 60_000);
+        status.textContent = `Saved as ${a.download}, ${formatBytes(clip.size)}.`;
+      } catch (err) {
+        status.textContent = `The clip was not made: ${err.message || err}`;
+      }
+      btn.disabled = false;
+    };
+    li.append(text, ' ', btn, ' ', status);
+    list.append(li);
+  }
+}
+
+function once(target, event) {
+  return new Promise((resolve, reject) => {
+    const ok = () => { target.removeEventListener('error', bad); resolve(); };
+    const bad = () => { target.removeEventListener(event, ok); reject(new Error('this recording could not be read here')); };
+    target.addEventListener(event, ok, { once: true });
+    target.addEventListener('error', bad, { once: true });
+  });
+}
+
+// Plays the part of the recording in a hidden video and records what it
+// plays, with no encoder library: the picture from captureStream, the
+// sound through Web Audio so it never reaches the speakers. It takes as
+// long as the clip. MediaRecorder's WebM has no index, so Chrome first
+// learns the length by seeking to the end, then seeks to the start.
+async function makeClip(url, range, mimeType, onProgress) {
+  const video = document.createElement('video');
+  video.preload = 'auto';
+  video.playsInline = true;
+  video.src = url;
+  await once(video, 'loadedmetadata');
+  if (!Number.isFinite(video.duration)) {
+    video.currentTime = 1e101;
+    await once(video, 'durationchange');
+  }
+  const start = range.startMs / 1000;
+  const end = Math.min(range.endMs / 1000, Number.isFinite(video.duration) ? video.duration : Infinity);
+  if (!(end > start)) throw new Error('the marked moment is past the end of the recording');
+  video.currentTime = start;
+  await once(video, 'seeked');
+
+  const audio = new AudioContext();
+  const sound = audio.createMediaStreamDestination();
+  audio.createMediaElementSource(video).connect(sound);
+  const picture = video.captureStream();
+  const stream = new MediaStream([...picture.getVideoTracks(), ...sound.stream.getAudioTracks()]);
+  const type = MediaRecorder.isTypeSupported(mimeType) ? mimeType : 'video/webm';
+  const recorder = new MediaRecorder(stream, { mimeType: type });
+  const parts = [];
+  recorder.ondataavailable = (e) => { if (e.data && e.data.size) parts.push(e.data); };
+  const stopped = new Promise((resolve) => recorder.addEventListener('stop', resolve, { once: true }));
+
+  recorder.start(1000);
+  await video.play();
+  await new Promise((resolve) => {
+    const tick = () => {
+      onProgress(Math.min(1, (video.currentTime - start) / (end - start)));
+      if (video.currentTime >= end || video.ended) { video.removeEventListener('timeupdate', tick); resolve(); }
+    };
+    video.addEventListener('timeupdate', tick);
+    video.addEventListener('ended', tick, { once: true });
+  });
+  video.pause();
+  recorder.stop();
+  await stopped;
+  stream.getTracks().forEach((t) => t.stop());
+  await audio.close().catch(() => {});
+  video.removeAttribute('src');
+  video.load();
+  return new Blob(parts, { type: type.split(';')[0] });
+}
+
+// ---------------------------------------------------------------------
+// The host's own talk share (Wish 4). It is the host's to keep or let go;
+// the recorder cannot sign in to the hub, so keeping it means typing the
+// percent on the session page, where the cohort can read it.
+// ---------------------------------------------------------------------
+
+function renderTalk(card, session) {
+  const box = card.querySelector('.talk');
+  if (!session.countingTalk && !session.talk) { box.hidden = true; return; }
+  box.hidden = false;
+  const share = talkShare(session.talk);
+  const sentence = box.querySelector('.talk-sentence');
+  const help = box.querySelector('.talk-help');
+  const actions = box.querySelector('.talk-actions');
+  if (session.talkChoice === 'discarded') {
+    sentence.textContent = 'You let your talk share for this session go.';
+    help.textContent = '';
+    actions.hidden = true;
+    return;
+  }
+  sentence.textContent = session.status === 'recording' && !session.talk
+    ? 'The recorder stopped before it saved a talk count.'
+    : talkSentence(share);
+  if (share == null) {
+    help.textContent = 'Nothing about it is kept.';
+    actions.hidden = true;
+    return;
+  }
+  const percent = Math.round(share * 100);
+  help.textContent = session.talkChoice === 'kept'
+    ? `To keep it where the cohort can read it, open this session's page on humanshaped.org, and under "Your own talk" type ${percent}. Until you do, it is only on this computer.`
+    : 'It counts only you, against everyone else together, never who else talked or what anyone said. Only you see it unless you save it on the session page.';
+  box.querySelector('.talk-keep').hidden = session.talkChoice === 'kept';
+  box.querySelector('.talk-keep').onclick = async () => {
+    await updateSession(session.id, { talkChoice: 'kept' });
+    await navigator.clipboard.writeText(String(percent)).catch(() => {});
+    render();
+  };
+  box.querySelector('.talk-discard').onclick = async () => {
+    await updateSession(session.id, { talk: null, talkChoice: 'discarded' });
+    render();
+  };
 }
 
 function showUploaded(card, upload) {
