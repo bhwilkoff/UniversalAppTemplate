@@ -318,6 +318,20 @@ Slides deck per session; C5 the session's GitHub thread; C6 teacher MCP
 tools and commits during class; C7 follow-ups; C8 recorder clips and a
 Chrome Web Store listing; C9 branding.
 
+**The Meet add-on prototype (M15, merged October 3):** /addon/ is the
+side panel, a launcher of activities (Now, Queue, Checks; new tools join
+its ACTIVITIES list), with each part's timer, the "what I heard" note,
+the trio order (only that group in a group room), "put it on the stage",
+and the teacher's check controls; /addon/stage/ is the main stage, told
+what to show by the teacher's panel and reading no data itself. Sign-in
+inside Meet tries the Storage Access API, then a popup to
+/account/?handoff=meet that posts the session back to this origin only.
+tools/meet-addon/deployment.json and README carry Ben's setup (test with
+Install; choose public or private visibility later, since Google makes
+it permanent). 139 node tests. Only a real Meet can show whether its
+frame allows storage access and popups, what startActivity shows others,
+and mobile.
+
 **Workspace admin, done October 3 with Ben signed in:** a "Live
 sessions" organizational unit, with meet@humanshaped.org moved into it.
 Already in place and checked: Drive sharing outside the organization,
