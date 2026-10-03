@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Every web test in one command: the API layer, the TV focus engine, the
-# packaged-TV origin rules, Pulse's charts and page, and two checks a browser
+# packaged-TV origin rules, Pulse's charts and page, the design tokens (every
+# platform's token file matches design-tokens.json), and two checks a browser
 # will not show you. Each suite runs the SHIPPED files, so a test can never
 # drift from what actually runs.
 set -uo pipefail
@@ -12,7 +13,8 @@ for t in js/api.test.js \
          tools/test_tv_ua.mjs \
          tools/test_packaged_origin.mjs \
          tools/test_pulse_charts.mjs \
-         tools/test_pulse_render.mjs; do
+         tools/test_pulse_render.mjs \
+         tools/test_design_tokens.mjs; do
   out=$(node "$t" 2>&1); rc=$?
   last=$(printf '%s\n' "$out" | tail -1)
   if [ $rc -ne 0 ] || printf '%s' "$out" | grep -q FAIL; then
