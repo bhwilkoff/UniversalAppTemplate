@@ -68,4 +68,4 @@
   var lib = { agenda: agenda, stagesForWeek: stagesForWeek, currentAndNext: currentAndNext, commitLine: commitLine, ago: ago, repoPath: repoPath };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
   else root.CohortLib = lib;
-})(this);
+})(typeof globalThis !== 'undefined' ? globalThis : this);

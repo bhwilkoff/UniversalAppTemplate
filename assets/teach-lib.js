@@ -108,4 +108,4 @@
   var lib = { zonedToUtc: zonedToUtc, sessionDates: sessionDates, sessionRows: sessionRows, meetSetup: meetSetup, waitingForFeedback: waitingForFeedback, scheduleText: scheduleText, WEEKDAYS: WEEKDAYS };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
   else root.TeachLib = lib;
-})(this);
+})(typeof globalThis !== 'undefined' ? globalThis : this);
