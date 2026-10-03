@@ -766,8 +766,12 @@ add-on deployment.
   Script Property ROOMS_VIA_MEET_API is true; Calendar rooms stay the
   fallback. 382 database checks, 206 node tests, 15 meet-events tests.
   Waits on Ben: enable the Meet REST API in human-shaped and allow the
-  new scopes on the next whoAmI. Not yet seen: the board at 375px, in
-  Meet, and Realtime on the new table.
+  new scopes on the next whoAmI. Verified live as Ben on a "(delete
+  me)" draft cohort, then deleted: the board at 375px with no sideways
+  scroll, Start and Next step, and a second page seeing the change in
+  2 seconds through Realtime. That test found and fixed a bug (a group
+  with nobody on the hub stuck at step 1; 207 node tests now). Not yet
+  seen: a student asking for the teacher, and the board inside Meet.
 
 ## Where to pick up
 
