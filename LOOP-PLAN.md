@@ -270,6 +270,21 @@ Ben before COURSE.md or the tools change):
   or camera tracking, scored quizzes, AI summaries or grading of
   students, automatic partner rotation, or a second chat space.
 
+**Running (October 3, evening):**
+
+- **M14. Site-wide accessibility and quality audit** (WCAG 2.2 AA, axe on
+  every page in both themes at 375 and 1280, links, headers, mechanical
+  copy fixes; voice rewrites listed for Ben's copy audit).
+- **M15. The classroom on Meet, research first** (Ben, October 3: "we
+  might need to do some research on how to make add-ons for Meet and/or
+  chrome extensions"): Meet add-ons (side panel, main stage, shared
+  state, private-to-domain publishing, outside guests), the Meet REST
+  API and meet@ automation on Education Fundamentals, Chrome extensions
+  on meet.google.com, and the student's own AI in the session. Then a
+  phased plan and a first prototype. Known so far: tools/meet-events
+  (events, per-group rooms, checks) and tools/session-recorder have
+  never run against the real Google services.
+
 **Next:**
 
 - Smaller: show the cohort's discussions on /cohort/ and /live/ once the
