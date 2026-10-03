@@ -300,6 +300,33 @@ Ben before COURSE.md or the tools change):
   add-on knows the cohort and group; 3, a public listing only if cohort
   1 asks, which needs /privacy/ and /terms/ and Google's review.
 
+**The classroom on Meet, designed** (research/notes/meet-classroom-design.md,
+October 3): Ben's 14 wishes mapped to $0 mechanisms. Shared state stays
+in the hub (Supabase Realtime), seen on /live/, in the add-on, and
+through the teacher's screen share. Not possible on Meet today, with
+the alternatives: rearranging others' video tiles (pin for everyone,
+roles on /live/), silent listening to a room (the teacher joins
+visibly), saving Meet's chat on Education Fundamentals (a GitHub thread
+per session). Per-student talk time is declined on purpose (Ben's item
+13); the teacher's own talk time is measured on their computer only.
+Milestones: C0 dry run and /privacy/, /terms/, /support/ (Ben approves
+the words); C1 live_signals (send to rooms, call back, cards, on stage,
+recording notice); C2 rooms made by meet@ through the Meet REST API with
+members added, and a room board; C3 the add-on submitted for public
+listing early; C4 an Excalidraw board synced through Realtime, plus a
+Slides deck per session; C5 the session's GitHub thread; C6 teacher MCP
+tools and commits during class; C7 follow-ups; C8 recorder clips and a
+Chrome Web Store listing; C9 branding.
+
+**Workspace admin, done October 3 with Ben signed in:** a "Live
+sessions" organizational unit, with meet@humanshaped.org moved into it.
+Already in place and checked: Drive sharing outside the organization,
+outside guests joining Meet, external Calendar invitations, Google Cloud
+and Apps Script on, and Marketplace installs allowed. Next, as meet@
+(Ben signs meet@ into Chrome; Claude never types passwords): the Cloud
+project, its APIs and consent screen, clasp for meet-events, and the
+add-on deployment.
+
 **Next:**
 
 - Smaller: show the cohort's discussions on /cohort/ and /live/ once the
