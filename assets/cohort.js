@@ -153,9 +153,26 @@
           draw(people, mine, res[1].data, res[2].data, res[3].data, res[4].data, res[5].data);
           drawTalk(res[6].data);
           drawSetup(mine, res[6].data);
+          drawPublicChoice(mine);
         });
       });
     }).catch(function (err) { fail('Something went wrong: ' + (err && err.message ? err.message : 'no details') + '.'); });
+  }
+
+  // Showing your app in public is your own choice (hub-privacy-notes.md).
+  // The choice is read on its own, so the rest of the page works before
+  // the hub's database has the app_public column.
+  var canShow = false;
+  function drawPublicChoice(mine) {
+    var wrap = $('[data-app-public-wrap]');
+    wrap.hidden = true; canShow = false;
+    if (!mine) return;
+    db.from('enrollments').select('app_public').eq('cohort_id', cohort.id).eq('user_id', me.id).maybeSingle().then(function (r) {
+      if (r.error || !r.data) return;
+      canShow = true;
+      $('[data-my-app]').elements.app_public.checked = !!r.data.app_public;
+      wrap.hidden = false;
+    });
   }
 
   // Where this person's access to the cohort's private conversation on
@@ -278,7 +295,10 @@
       db.from('enrollments').update({ app_name: f.app_name.value.trim() || null, app_repo: repo, app_url: f.app_url.value.trim() || null }).eq('cohort_id', cohort.id).eq('user_id', me.id),
       email
         ? db.from('calendar_contacts').upsert({ cohort_id: cohort.id, user_id: me.id, email: email })
-        : db.from('calendar_contacts').delete().eq('cohort_id', cohort.id).eq('user_id', me.id)
+        : db.from('calendar_contacts').delete().eq('cohort_id', cohort.id).eq('user_id', me.id),
+      canShow
+        ? db.from('enrollments').update({ app_public: f.app_public.checked }).eq('cohort_id', cohort.id).eq('user_id', me.id)
+        : Promise.resolve({})
     ]).then(function (res) {
       var bad = res.filter(function (r) { return r.error; })[0];
       msg.textContent = bad ? 'Not saved: ' + bad.error.message : 'Saved.';

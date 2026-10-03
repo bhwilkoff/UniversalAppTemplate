@@ -193,6 +193,34 @@ def main():
     ben.execute("select count(*) from public.shares where cohort_id = %s", (cohort,))
     check("the teacher sees the cohort's shares", ben.fetchone()[0] == 1)
 
+    # Showing an app in public is the student's own choice, and the public
+    # reads three fields of it, never the roster (hub-privacy-notes.md).
+    anon = as_user(None)
+    anon.execute("select * from public.public_apps()")
+    check("the public sees no cohort app until its student chooses to show it", anon.fetchall() == [])
+    anon.execute("select count(*) from public.enrollments")
+    check("the public still cannot read who is in a cohort", anon.fetchone()[0] == 0)
+    ben = as_user("ben")
+    check("a teacher cannot show a student's app in public",
+          not attempt(ben, "update public.enrollments set app_public = true where user_id = %s", (people["bea"],)))
+    cal = as_user("cal")
+    cal.execute("update public.enrollments set app_public = true where user_id = %s", (people["bea"],))
+    check("a classmate cannot show someone else's app in public", cal.rowcount == 0)
+    bea = as_user("bea")
+    check("a student can choose to show their app in public",
+          attempt(bea, "update public.enrollments set app_public = true where user_id = %s", (people["bea"],)))
+    anon = as_user(None)
+    anon.execute("select * from public.public_apps()")
+    rows = anon.fetchall()
+    cols = [d[0] for d in anon.description]
+    check("a shown app is public with only its name, repository, and address",
+          cols == ["app_name", "app_repo", "app_url"] and [r[1] for r in rows] == ["bea/garden-swap"])
+    ben = as_user("ben")
+    check("a teacher can take a shown app down",
+          attempt(ben, "update public.enrollments set app_public = false where user_id = %s", (people["bea"],)))
+    bea = as_user("bea")
+    bea.execute("update public.enrollments set app_public = true where user_id = %s", (people["bea"],))
+
     ben = as_user("ben")
     check("a teacher can name the cohort's private repository and team",
           attempt(ben, "update public.cohorts set github_repo = 'humanshaped/cohort-fall-2026', github_team = 'cohort-fall-2026' where id = %s", (cohort,)))
@@ -230,6 +258,8 @@ def main():
           not attempt(agent, "insert into public.feedback (share_id, author_id, body) values (%s, %s, 'from the agent')", (share, people["bea"])))
     agent.execute("update public.enrollments set app_name = 'renamed by agent' where user_id = %s", (people["bea"],))
     check("a student's agent cannot change their app details", agent.rowcount == 0)
+    agent.execute("update public.enrollments set app_public = false where user_id = %s", (people["bea"],))
+    check("a student's agent cannot change whether their app is shown", agent.rowcount == 0)
     agent.execute("select count(*) from public.calendar_contacts where user_id = %s", (people["bea"],))
     check("a student's agent cannot read even their own calendar email", agent.fetchone()[0] == 0)
     check("a student's agent cannot leave the cohort for them",
@@ -251,6 +281,11 @@ def main():
     su3 = conn.cursor(); su3.execute("reset role")
     su3.execute("select count(*) from public.calendar_contacts where user_id = %s", (people["bea"],))
     check("when someone leaves, their calendar email leaves too", su3.fetchone()[0] == 0)
+    su3.execute("select app_public from public.enrollments where user_id = %s", (people["bea"],))
+    still_shown = su3.fetchone()[0]
+    anon = as_user(None)
+    anon.execute("select count(*) from public.public_apps()")
+    check("when someone leaves, their app is no longer shown in public", anon.fetchone()[0] == 0 and still_shown is False)
     cal = as_user("cal")  # the check above switched the session back to the superuser
     cal.execute("select count(*) from public.profiles where id = %s", (people["bea"],))
     check("after leaving, a former classmate's profile is no longer visible", cal.fetchone()[0] == 0)

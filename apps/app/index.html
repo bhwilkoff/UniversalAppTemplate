@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>An app | Human Shaped</title>
+  <meta name="description" content="One app built the human-shaped way: what it is for in its builder&#x27;s own words, where it runs, its latest work on GitHub, how it meets the principles, and where to talk about it.">
+  <link rel="canonical" href="https://humanshaped.org/apps/app/">
+  <meta property="og:url" content="https://humanshaped.org/apps/app/">
+  <meta property="og:site_name" content="Human Shaped">
+  <meta property="og:title" content="An app built the human-shaped way">
+  <meta property="og:description" content="One app built the human-shaped way: what it is for in its builder&#x27;s own words, where it runs, its latest work on GitHub, how it meets the principles, and where to talk about it.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://humanshaped.org/assets/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="The human-shaped wordmark, with its hyphen drawn as an arch, above the line: build software for the parts of life only people can do.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#F7F6F2" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#141618" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/site.css">
+  <script>
+    (function () {
+      var q = location.search, t = null;
+      if (/[?&]dark\b/.test(q)) t = 'dark'; else if (/[?&]light\b/.test(q)) t = 'light';
+      else { try { t = localStorage.getItem('hs-theme'); } catch (e) {} }
+      if (t) document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+  <script src="/assets/site.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to the page</a>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
+      <nav class="nav" aria-label="Main">
+        <ul>
+          <li><a href="/path/">The path</a></li>
+          <li><a href="/why/">Why</a></li>
+          <li><a href="/principles/">Principles</a></li>
+          <li><a href="/cohorts/">Cohorts</a></li>
+          <li><a href="/apps/" aria-current="page">Apps</a></li>
+          <li><a href="/start/">Start something</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#moon"/></svg>
+        </button>
+        <a class="btn-github small" href="/account/">
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>
+          <span>Sign in<span class="long"> with GitHub</span></span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <div class="wrap app-page" data-app-page>
+      <p class="crumbs"><a href="/apps/">Apps</a> &rsaquo; <span data-crumb>An app</span></p>
+
+      <div data-state="loading">
+        <p class="small">Reading this app from the directory and from GitHub&hellip;</p>
+      </div>
+
+      <div data-state="unknown" hidden>
+        <header class="page-head">
+          <div>
+            <h1>This app is not in the directory yet.</h1>
+            <p class="lead">A page here follows an app from the open directory, or one that its builder chose to show from a cohort<span data-unknown-repo-wrap hidden>, and <b data-unknown-repo></b> is not one of them yet</span>.</p>
+            <p class="fine">If it was built by the principles, its builder can <a href="https://github.com/humanshaped/directory/issues/new?template=list-my-app.yml">ask to have it listed</a>, and in the meantime <a href="/apps/">every app in the directory</a> has a page of its own.</p>
+          </div>
+        </header>
+      </div>
+
+      <div data-state="error" hidden>
+        <header class="page-head">
+          <div>
+            <h1>The directory could not be reached.</h1>
+            <p class="lead">This page reads the open directory on GitHub each time it opens, and GitHub did not answer just now, so trying again in a minute is the best next step.</p>
+          </div>
+        </header>
+      </div>
+
+      <div data-state="ready" hidden>
+        <header class="page-head split">
+          <div>
+            <p class="kicker" data-status></p>
+            <h1 data-name></h1>
+            <p class="lead own" data-own hidden></p>
+            <p class="fine" data-own-from hidden></p>
+          </div>
+          <aside class="cohort-card where" aria-labelledby="where-title">
+            <h2 id="where-title">Where it runs</h2>
+            <p data-facts></p>
+            <ul class="links" data-links aria-label="Where to find it"></ul>
+          </aside>
+        </header>
+
+        <section class="app-section" aria-labelledby="work-title">
+          <h2 id="work-title">Its latest work</h2>
+          <p class="small">Read live from the app&#x27;s repository on GitHub each time this page opens, so it is always the builder&#x27;s own record.</p>
+          <div data-commits><p class="small">Reading its recent commits from GitHub&hellip;</p></div>
+        </section>
+
+        <section class="app-section" aria-labelledby="principles-title">
+          <h2 id="principles-title">How it meets the principles</h2>
+          <div data-declaration><p class="small">Looking for its declaration&hellip;</p></div>
+        </section>
+
+        <section class="app-section" aria-labelledby="talk-title">
+          <h2 id="talk-title">Its conversation</h2>
+          <div data-talk><p class="small">Asking GitHub where its conversation happens&hellip;</p></div>
+        </section>
+      </div>
+    </div>
+  </main>
+  <script src="/assets/hub-config.js" defer></script>
+  <script src="/assets/cohort-lib.js" defer></script>
+  <script src="/assets/apps-lib.js" defer></script>
+  <script src="/assets/apps.js" defer></script>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
+      <p>Made by <a href="https://learningischange.com">Ben Wilkoff</a>. The ideas, the method, the tools, and the cohorts are free, and what you build is yours.</p>
+      <p class="credit">Built by Ben with an AI agent, Claude, set in Commissioner, and shared under <a href="https://github.com/bhwilkoff/UniversalAppTemplate/blob/site/LICENSE.md">open licenses</a>, so you can borrow anything here.</p>
+      <ul>
+        <li><a href="/cohorts/#together">How we treat one another</a></li>
+        <li><a href="/cohorts/#data">What we keep, and what we never own</a></li>
+        <li><a href="https://github.com/orgs/humanshaped/discussions">Discussions on GitHub</a></li>
+        <li><a href="https://github.com/bhwilkoff/UniversalAppTemplate">The template on GitHub</a></li>
+      </ul>
+    </div>
+  </footer>
+</body>
+</html>

@@ -125,6 +125,10 @@
               <label>Its name <input name="app_name" maxlength="80"></label>
               <label>Its repository on GitHub <input name="app_repo" placeholder="you/your-app" maxlength="140"><span class="hint">Your classmates see your repository and its latest commits, read straight from GitHub.</span></label>
               <label>Where people can use it <input name="app_url" type="url" placeholder="https://" maxlength="300"></label>
+              <div class="public-choice" data-app-public-wrap hidden>
+                <label class="check"><input type="checkbox" name="app_public"> Show my app on humanshaped.org/apps/, for anyone to see</label>
+                <p class="hint">This shows its name, its repository (which names your GitHub account), and where people can use it, and nothing about you or this cohort. You can turn it off whenever you like, and leaving the cohort turns it off.</p>
+              </div>
               <label>An email for calendar invitations, if you want them <input name="email" type="email" maxlength="254"><span class="hint">Only you and your teacher can see it, and it is removed when you leave.</span></label>
               <div class="actions"><button class="btn-quiet" type="submit">Save</button><span class="small" data-my-app-message></span></div>
             </form>

@@ -198,35 +198,41 @@
         </div>
         <ul class="apps">
           <li class="app">
-            <h3>Archive Watch</h3>
+            <h3><a href="/apps/app/?r=bhwilkoff/Archive-Watch">Archive Watch</a></h3>
             <p class="own">&quot;A cinematheque for the Internet Archive. Free, public domain, no account.&quot;</p>
             <p class="facts">Started April 17, 2026, and now on Apple TV, iPhone, iPad, Mac, Android, Google TV, Fire TV, Fire tablets, Roku, and the web, with 4,306 commits by the end of September.</p>
             <p class="gave">It gave the template most of what it knows about shared data, TV platforms, and testing on real devices, and the rule that only essential words belong on screen.</p>
             <ul class="links" aria-label="Archive Watch website"><li><a href="https://archivewatch.org">archivewatch.org</a></li></ul>
           </li>
           <li class="app">
-            <h3>Tidbits Trivia</h3>
+            <h3><a href="/apps/app/?r=bhwilkoff/Tidbits-Trivia">Tidbits Trivia</a></h3>
             <p class="own">&quot;Trivia from the whole of Wikipedia. Play solo, keep a daily streak, or pass the phone.&quot;</p>
             <p class="facts">First built June 16, 2026, and now on the web, Apple&#x27;s platforms, Android, and Windows through the Microsoft Store.</p>
             <p class="gave">It taught the template how to play together across platforms, and the rule that a computer opponent is always labeled as one.</p>
             <ul class="links" aria-label="Tidbits Trivia website"><li><a href="https://tidbitstrivia.com">tidbitstrivia.com</a></li></ul>
           </li>
           <li class="app">
-            <h3>Bsky Dreams</h3>
+            <h3><a href="/apps/app/?r=bhwilkoff/Bsky-Dreams">Bsky Dreams</a></h3>
             <p class="own">&quot;Built for people who want to think more, not less.&quot;</p>
             <p class="facts">A way to read Bluesky, on the web and the iPhone.</p>
             <p class="gave">It gave the template a feed ranked by the reader&#x27;s own values rather than by engagement, and a reader mode for the links people share.</p>
             <ul class="links" aria-label="Bsky Dreams website"><li><a href="https://bskydreams.com">bskydreams.com</a></li></ul>
           </li>
           <li class="app">
-            <h3>BOBA Playbook</h3>
+            <h3><a href="/apps/app/?r=bhwilkoff/BOBA-Playbook">BOBA Playbook</a></h3>
             <p class="own">&quot;The definitive companion app for the Bo Jackson Battle Arena trading card game.&quot;</p>
             <p class="facts">On the web and Android, and no longer in active development.</p>
             <p class="gave">It is where the four questions every feature has to answer came from, and it stands as the proof that this method holds for large databases, huge numbers of files, camera scanning, 3D on iOS, and pricing.</p>
             <ul class="links" aria-label="BOBA Playbook website"><li><a href="https://bobaplaybook.com">bobaplaybook.com</a></li></ul>
           </li>
         </ul>
-        <p class="section-more"><a href="/apps/">More about the four apps, and where yours will go</a></p>
+        <div class="feed-block" aria-labelledby="now-title" data-feed="5" data-feed-quiet hidden>
+          <h3 id="now-title">Being built right now</h3>
+          <p class="small">The latest work on apps in the directory, read live from GitHub.</p>
+          <ol class="feed" data-feed-list></ol>
+          <p class="small" data-feed-note></p>
+        </div>
+        <p class="section-more"><a href="/apps/">Every app, its latest work, and where yours will go</a></p>
       </div>
     </section>
 
@@ -269,6 +275,10 @@
     </section>
 
   </main>
+  <script src="/assets/hub-config.js" defer></script>
+  <script src="/assets/cohort-lib.js" defer></script>
+  <script src="/assets/apps-lib.js" defer></script>
+  <script src="/assets/apps.js" defer></script>
 
   <footer class="site-footer">
     <div class="wrap">
