@@ -423,6 +423,17 @@ and waits on one real sign-in.
   verified: a real agent connecting and calling a tool, which needs
   Ben's setting, and then one approval in his browser.
 
+- 2026-10-03, core item 6 (setup week), second part. /cohort/ opens
+  with "Getting ready" for people in the cohort: read Getting set up and
+  make a copy, add the app's repository, add its live address (the
+  first win), open the cohort's conversation, and connect an agent.
+  Each step is checked off by what the hub can already see
+  (CohortLib.setupSteps, 2 new tests, 45 in all); the agent step is
+  offered and never marked, because the hub cannot see it. The card
+  disappears once every step it can see is done. Verified against a
+  stand-in at 375px and 430px, light and dark. The OAuth server was
+  still off at the start of this tick.
+
 ## Where to pick up
 
 1. If Ben has switched on the OAuth server (try
@@ -430,6 +441,6 @@ and waits on one real sign-in.
    connect Claude Code to the mcp server, ask Ben once before approving
    in his browser, call each tool, then remove the "waiting" notice on
    /connect/ and link it from /account/ and /cohort/.
-2. Otherwise: setup week's cohort-only steps on /cohort/ (join, accept
-   the GitHub invitation, connect your agent, the setup session), then
-   core item 7 (an app's own page).
+2. Otherwise: core item 7, an app's own page (/apps/?a=...): its
+   declaration, live commits, its builder's words, and its
+   conversation, for cohort apps and directory apps alike.
