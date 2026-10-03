@@ -204,10 +204,34 @@
       drawRoster(res[2].data, res[3].data);
       drawGroups(res[3].data, res[2].data);
       form.hidden = true;
+      var del = $('[data-delete-draft]');
+      del.hidden = c.status !== 'draft';
+      del.textContent = 'Delete this draft';
+      del.removeAttribute('data-armed');
       $('[data-detail]').hidden = false;
     });
   }
   $('[data-edit]').addEventListener('click', function () { fillForm(current); });
+
+  // Only a draft can be deleted (the database allows nothing else), and
+  // the button asks once more on the page itself before it does.
+  $('[data-delete-draft]').addEventListener('click', function () {
+    var b = this;
+    if (!b.hasAttribute('data-armed')) {
+      b.setAttribute('data-armed', '');
+      b.textContent = 'Delete ' + current.title + ', with its sessions and groups';
+      say('[data-detail-message]', 'This cannot be undone. Click again to delete it.');
+      return;
+    }
+    b.disabled = true;
+    db.from('cohorts').delete().eq('id', current.id).eq('status', 'draft').select('id').then(function (r) {
+      b.disabled = false;
+      if (r.error || !r.data.length) return say('[data-detail-message]', 'It could not be deleted: ' + (r.error ? r.error.message : 'only drafts can be deleted') + '.');
+      current = null;
+      $('[data-detail]').hidden = true;
+      loadList();
+    });
+  });
 
   $('[data-make-sessions]').addEventListener('click', function () {
     var rows = lib.sessionRows(current);
