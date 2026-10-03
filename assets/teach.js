@@ -435,7 +435,7 @@
   // students"): only its words change, and the student sees it was edited.
   function correctControl(g) {
     var wrap = el('span', 'followup-correct');
-    var open = el('button', 'link', 'Edit');
+    var open = el('button', 'btn-link', 'Edit');
     open.type = 'button';
     var form = el('form', 'inline-form');
     form.hidden = true;

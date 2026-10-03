@@ -243,6 +243,11 @@
 
     status.innerHTML = '';
     article.removeAttribute('aria-busy');
+    article.setAttribute('data-doc-ready', '');
+
+    // Anything that builds on the rendered page (the path's steps and
+    // marks, assets/path-marks.js) starts from here.
+    document.dispatchEvent(new CustomEvent('hs:doc-rendered', { detail: { src: src, body: body } }));
 
     if (location.hash) {
       var target = document.getElementById(decodeURIComponent(location.hash.slice(1)));

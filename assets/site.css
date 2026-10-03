@@ -1306,3 +1306,15 @@ label.check { min-height: 2.25rem; }
 
 /* A member's role beside their name: only mentors carry a word (mentor-lib.js). */
 .role-tag { margin-left: 0.4rem; font-size: 0.85em; font-weight: 600; color: var(--clay); }
+/* Working through the path (G3, assets/path-marks.js): controls beside
+   the template's words, never in place of them, and quiet. */
+.path-where { color: var(--muted); }
+.article .path-step .step-actions, .article .prompt-actions { margin-top: 0.6rem; }
+.article .path-step.is-done > p:first-child > strong:first-child, .article .path-step.is-done > strong:first-child { color: var(--muted); }
+.path-ready { border: 1px solid var(--rule); border-radius: 10px; padding: 1rem; margin: 1rem 0 1.5rem; display: grid; gap: 0.6rem; }
+.path-ready legend { font-weight: 600; padding: 0 0.35rem; }
+.path-ready .actions { margin-top: 0.25rem; }
+.path-ready .hint { margin: 0; color: var(--muted); font-size: 0.9rem; }
+.path-bring { margin: 0.75rem 0 0; }
+.path-bring .hint { color: var(--muted); font-size: 0.9rem; }
+.stages .path-mark { grid-column: 2; font-size: 0.85rem; color: var(--clay); font-weight: 600; }
