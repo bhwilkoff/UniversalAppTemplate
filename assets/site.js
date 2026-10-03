@@ -12,15 +12,32 @@
 })();
 
 (function () {
-  document.querySelectorAll('[data-copy]').forEach(function (b) {
+  // A button's own words changing is not announced, so the result is
+  // also said once in a quiet line that screen readers read out.
+  var said = null;
+  function say(text) {
+    if (!said) {
+      said = document.createElement('p');
+      said.className = 'visually-hidden';
+      said.setAttribute('role', 'status');
+      document.body.appendChild(said);
+    }
+    said.textContent = '';
+    setTimeout(function () { said.textContent = text; }, 50);
+  }
+  var buttons = document.querySelectorAll('[data-copy]');
+  if (buttons.length) say('');
+  buttons.forEach(function (b) {
     var label = b.textContent;
     b.addEventListener('click', function () {
       var text = document.getElementById(b.getAttribute('data-copy')).textContent;
       navigator.clipboard.writeText(text).then(function () {
         b.textContent = 'Copied';
+        say('Copied.');
         setTimeout(function () { b.textContent = label; }, 2000);
       }, function () {
         b.textContent = 'Select the code above to copy it';
+        say('It could not be copied, so select the code above to copy it.');
       });
     });
   });

@@ -197,8 +197,28 @@
     });
 
     // Tables scroll inside themselves on a phone, never the page.
+    // Each one is named for the heading above it, so a screen reader's list
+    // of regions tells them apart, and a header row left empty in the
+    // Markdown is dropped rather than read as blank headers.
+    var named = {};
     root.querySelectorAll('table').forEach(function (table) {
-      var wrap = el('div', { 'class': 'table-wrap', tabindex: '0', role: 'region', 'aria-label': 'Table, scrolls sideways' });
+      var head = table.querySelector('thead');
+      if (head) {
+        var ths = head.querySelectorAll('th');
+        var blank = [].filter.call(ths, function (th) { return !th.textContent.trim(); });
+        if (blank.length === ths.length) head.remove();
+        else blank.forEach(function (th) { th.replaceWith(el('td')); });
+      }
+      var near = null, n = table;
+      while (n && !near) {
+        var p = n.previousElementSibling;
+        while (p && !/^H[2-4]$/.test(p.tagName)) p = p.previousElementSibling;
+        if (p) near = p; else n = n.parentElement === root ? null : n.parentElement;
+      }
+      var name = near ? near.textContent.trim().replace(/[.:]$/, '') : 'A table';
+      named[name] = (named[name] || 0) + 1;
+      if (named[name] > 1) name += ' (' + named[name] + ')';
+      var wrap = el('div', { 'class': 'table-wrap', tabindex: '0', role: 'region', 'aria-label': name + ', a table that scrolls sideways' });
       table.parentNode.insertBefore(wrap, table);
       wrap.appendChild(table);
     });

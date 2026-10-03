@@ -505,7 +505,8 @@ h3 { font-size: 1.25rem; letter-spacing: -0.012em; line-height: 1.25; }
 @media (min-width: 56rem) { .join .wrap { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
 
 /* Account */
-.account { max-width: 44rem; display: grid; gap: 1rem; }
+.account { max-width: 44rem; display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; }
+.account > * { min-width: 0; }
 .account h2 { margin-top: 2rem; font-size: 1.35rem; }
 .account .who { display: flex; gap: 1rem; align-items: center; }
 .account .avatar { border-radius: 50%; border: 1px solid var(--rule); }
@@ -683,7 +684,7 @@ label.check { display: flex; gap: 0.5rem; align-items: center; font-weight: 400;
 .feed .feed-when { color: var(--muted); font-size: 0.9rem; white-space: nowrap; }
 .feed-block { margin: 3rem 0 4rem; max-width: 46rem; }
 .feed-block + .section-more { margin-top: 0; }
-.feed-block h3 { font-size: 1.25rem; margin: 0 0 0.35rem; }
+.feed-block h2, .feed-block h3 { font-size: 1.25rem; letter-spacing: -0.012em; line-height: 1.25; max-width: none; margin: 0 0 0.35rem; }
 .feed-block > p { margin: 0 0 1rem; }
 .feed-block [data-feed-note]:empty { display: none; }
 
@@ -705,7 +706,7 @@ label.check { display: flex; gap: 0.5rem; align-items: center; font-weight: 400;
 
 /* Showing your app in public, on /cohort/ */
 .public-choice { display: grid; gap: 0.35rem; }
-.public-choice .hint { margin: 0 0 0 1.6rem; }
+.public-choice .hint { margin: 0 0 0 1.75rem; }
 
 /* ------------------------------------------------------------------
    The credential (M4): /credential/, /credential/issuer/, and issuing
@@ -742,7 +743,7 @@ label.check { display: flex; gap: 0.5rem; align-items: center; font-weight: 400;
 .inline-form label.check { min-height: 2.25rem; }
 .inline-form label.check input { min-height: 0; }
 .platform-choices legend { font-weight: 600; padding: 0 0.35rem; }
-.platform-choices input[type="url"] { margin-left: 1.6rem; }
+.platform-choices input[type="url"] { margin-left: 1.75rem; }
 .signing-request { width: 100%; font: 500 0.85rem/1.5 var(--sans); padding: 0.6rem; border: 1px solid var(--muted); border-radius: 10px; background: var(--surface); color: var(--ink); }
 .file-pick { position: relative; overflow: hidden; }
 .file-pick input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
@@ -860,6 +861,7 @@ button.talk-title[aria-expanded="true"]::before { transform: rotate(90deg); }
 .talk-list.compact .btn-link { min-height: 36px; padding: 0.2rem 0; font-size: 0.95rem; }
 .live-page .talk-problem p { font-size: 0.95rem; }
 
+/* ------------------------------------------------------------------
    M5: the movement toolkit (/start/meetup/, /start/hackathon/,
    /start/brand/). Self-contained: every rule here is scoped to .kit,
    except the print rules at the end, which only act on pages whose
@@ -1164,3 +1166,19 @@ body.addon-body { min-height: 100vh; }
 .stage-choices .count { font-weight: 650; text-align: right; font-variant-numeric: tabular-nums; }
 .stage-what { margin: 0; font-size: clamp(1.25rem, 3.6vmin, 2.5rem); font-weight: 600; overflow-wrap: anywhere; }
 .stage-note { margin: 0; font-size: clamp(1.1rem, 3vmin, 2rem); color: var(--muted); max-width: 40ch; }
+
+/* ------------------------------------------------------------------
+   Accessibility audit (October 3, 2026): targets at least 24 px tall
+   (WCAG 2.2, 2.5.8) for links that stand alone on a line, and check
+   boxes and radio buttons large enough to hit, in the clay.
+   ------------------------------------------------------------------ */
+.site-footer ul a, .crumbs a, .kicker a, .next-stage a, .source a { display: inline-block; padding: 0.15rem 0; }
+input[type="checkbox"], input[type="radio"] { width: 1.25rem; height: 1.25rem; margin: 0; flex: none; accent-color: var(--clay); }
+label.check { min-height: 2.25rem; }
+/* The file picker's real input is invisible, so its focus shows on the label around it. */
+.file-pick:focus-within { outline: 3px solid var(--clay); outline-offset: 3px; }
+/* Forms shrink with the screen: a long choice in a select never pushes the page sideways at 320 px. */
+.cohort-form:not([hidden]), .session-row, .inline-form,
+.cohort-form label, .session-row label, .inline-form label { grid-template-columns: minmax(0, 1fr); }
+.cohort-form select, .cohort-form input:not([type="checkbox"]):not([type="radio"]), .cohort-form textarea,
+.inline-form select, .inline-form input:not([type="checkbox"]):not([type="radio"]), .inline-form textarea { max-width: 100%; min-width: 0; }

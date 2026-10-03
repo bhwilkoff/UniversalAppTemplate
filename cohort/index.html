@@ -65,8 +65,8 @@
 
   <main id="main">
     <div class="wrap">
-      <div class="account cohort-page" data-cohort-page aria-live="polite">
-        <section class="account-state" data-state="loading"><p>Opening your cohort…</p></section>
+      <div class="account cohort-page" data-cohort-page>
+        <section class="account-state" data-state="loading"><h1 class="visually-hidden">Your cohort</h1><p>Opening your cohort…</p></section>
 
         <section class="account-state" data-state="signed-out" hidden>
           <h1>Your cohort lives here.</h1>
@@ -80,7 +80,8 @@
         </section>
 
         <section class="account-state" data-state="error" hidden>
-          <p class="error" data-error-text></p>
+          <h1 class="visually-hidden">Your cohort</h1>
+          <p class="error" data-error-text role="alert"></p>
           <p><button class="btn-quiet" type="button" data-reload>Try again</button></p>
         </section>
 

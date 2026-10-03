@@ -42,6 +42,15 @@
   // the time is up; it never makes a sound. One runs at a time, and it
   // keeps running when the part of the page it sits in is drawn again
   // (the new button with the same key takes it over).
+  // A quiet line for screen readers, since the timer's button changes
+  // its own words without announcing them.
+  var said = el('p', 'visually-hidden');
+  said.setAttribute('role', 'status');
+  root.appendChild(said);
+  function say(text) {
+    said.textContent = '';
+    setTimeout(function () { said.textContent = text; }, 50);
+  }
   function idleLabel(seconds) { return 'Start ' + (seconds % 60 ? L.clock(seconds) : seconds / 60 + ' min'); }
   function runTimer(btn, seconds, key) {
     if (timer) {
@@ -52,7 +61,7 @@
     function tick() {
       var left = Math.max(0, end - Date.now());
       timer.button.textContent = left ? L.clock(left / 1000) + ' left (stop)' : 'Time is up';
-      if (!left) { clearInterval(timer.id); timer = null; }
+      if (!left) { clearInterval(timer.id); timer = null; say('Time is up.'); }
     }
     timer = { id: setInterval(tick, 1000), button: btn, seconds: seconds, key: key };
     tick();
@@ -364,7 +373,7 @@
       var sel = $('[data-add-what]');
       sel.value = 'link'; syncAddForm();
       $('[data-add-link]').value = url;
-      $('[data-add]').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      $('[data-add]').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'center' });
       $('[data-add-note]').focus({ preventScroll: true });
       $('[data-add-status]').textContent = 'Say what people should look at, if you like, then add it.';
     } });

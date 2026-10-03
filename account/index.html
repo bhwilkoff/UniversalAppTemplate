@@ -71,7 +71,7 @@
         <p class="lead">Your GitHub account is where your app lives and where your cohort talks, so it is also how you sign in here. This site keeps only what a cohort needs, and everything you build stays in your own account.</p>
       </header>
 
-      <div class="account" data-account aria-live="polite">
+      <div class="account" data-account>
         <section class="account-state" data-state="loading">
           <p>Checking whether you are signed in…</p>
         </section>
@@ -90,7 +90,7 @@
         </section>
 
         <section class="account-state" data-state="error" hidden>
-          <p class="error" data-error-text>Something went wrong while signing in.</p>
+          <p class="error" data-error-text role="alert">Something went wrong while signing in.</p>
           <p><button class="btn-quiet" type="button" data-retry>Try again</button></p>
         </section>
 
