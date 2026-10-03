@@ -4,5 +4,5 @@
 // stage can open. Ben fills it in after step 3 of
 // tools/meet-addon/README.md; until then the add-on says it is not set up.
 window.MEET_ADDON = {
-  cloudProjectNumber: ''
+  cloudProjectNumber: '1086485459450'
 };
