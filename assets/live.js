@@ -28,6 +28,7 @@
     parts: [], chosenPart: null, drawnPart: undefined, prev: null, groups: [], people: [], brought: [], confirmations: [], tools: false };
   var drafts = {};          // what someone has typed into an answer box, by question
   var channel = null, poller = null, tallyPoller = null, nudgeTimer = null, deferred = {};
+  var rooms = null, roomPlaces = {};  // the room board (C2), and where each group is
 
   function $(s) { return root.querySelector(s); }
   function el(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
@@ -122,6 +123,7 @@
             S.confirmations = S.tools ? sh[2].data : [];
             draw(t.live, S.brought);
             startSignals(teachers);
+            startRooms();
             return refreshLive().then(listen);
           });
         });
@@ -298,15 +300,46 @@
     var each = steps.reduce(function (n, s) { return n + s.seconds; }, 0);
     card.appendChild(el('p', 'kicker', 'Each turn, about ' + Math.round(each / 60) + ' minutes'));
     var sl = el('ol', 'turn-steps');
-    steps.forEach(function (s) {
+    sl.setAttribute('data-steps-of', g.id);
+    steps.forEach(function (s, i) {
       var li = el('li');
       li.appendChild(el('p', 'live-who', s.name));
       li.appendChild(el('p', 'small', s.what));
-      li.appendChild(timerButton(s.seconds, 'step:' + g.id + ':' + s.key));
+      // Starting a step's timer also tells the room board which step the
+      // group is on, so the teacher can see it from another room.
+      li.appendChild(timerButton(s.seconds, 'step:' + g.id + ':' + s.key, function () { if (rooms) rooms.setStep(g.id, i); }));
       sl.appendChild(li);
     });
     card.appendChild(sl);
+    markSteps(sl, roomPlaces[g.id]);
     return card;
+  }
+
+  // The step a group is on, lit in its list of steps.
+  function markSteps(list, place) {
+    Array.prototype.forEach.call(list.children, function (li, i) {
+      li.classList.toggle('now', !!place && place.step === i);
+    });
+  }
+
+  // The room board (C2): each group's place in its turns, and whether it
+  // would like the teacher, for everyone in the cohort to see.
+  function startRooms() {
+    if (rooms || !window.RoomBoard) return;
+    var mine = S.groups.some(function (g) { return g.group_members.some(function (m) { return m.user_id === S.me.id; }); });
+    if (!S.groups.length || (!S.teaching && !mine)) return;
+    $('[data-rooms-intro]').textContent = S.teaching
+      ? 'Where each group is in its turns, from the step timers and the Next step button in each room. A group that would like you lights up. Join its room, say that you are there, and press I am here.'
+      : 'Where your group is in its turns, which your teacher can see from any room. Press Next step as you go, and ask for your teacher here if you would like them to come.';
+    rooms = window.RoomBoard.start({
+      db: db, cohort: S.cohort, session: S.session, meId: S.me.id, teaching: S.teaching, groups: S.groups, people: S.people,
+      names: S.names, nameOf: nameOf, mount: $('[data-rooms]'),
+      onChange: function (byGroup) {
+        roomPlaces = byGroup;
+        $('[data-rooms-section]').hidden = $('[data-rooms]').hidden;
+        root.querySelectorAll('[data-steps-of]').forEach(function (list) { markSteps(list, byGroup[list.getAttribute('data-steps-of')]); });
+      }
+    });
   }
 
   function partMinutes(key) {

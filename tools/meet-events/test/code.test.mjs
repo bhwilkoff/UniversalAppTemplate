@@ -117,3 +117,60 @@ test('groups from a Sheet cell are JSON, and bad ones say what is wrong', () => 
   assert.match(gs.normalizeCohort({ ...base, groups: '{nope' }).errors.join(' '), /JSON/);
   assert.equal(gs.normalizeCohort(base).cohort.groups.length, 0);
 });
+
+// ---- Rooms through the Meet REST API (C2) ----
+
+const withGroups = { ...base, groups: [{ key: 'g-1a2b', name: 'Trio A', members: 'a@example.com, Teacher@example.org, meet@humanshaped.org' }] };
+const plain = (x) => JSON.parse(JSON.stringify(x));
+
+test('only the word "true" switches rooms to the Meet REST API', () => {
+  assert.equal(gs.roomsViaMeetApi('true'), true);
+  assert.equal(gs.roomsViaMeetApi(' TRUE '), true);
+  assert.equal(gs.roomsViaMeetApi('yes'), false);
+  assert.equal(gs.roomsViaMeetApi(null), false);
+});
+
+test('a new room is TRUSTED, so invited people do not knock', () => {
+  assert.deepEqual(plain(gs.spaceRequestBody()), { config: { accessType: 'TRUSTED' } });
+});
+
+test('a room’s members are the group, with teachers as co-hosts and never the host', () => {
+  const { cohort } = gs.normalizeCohort(withGroups);
+  const want = plain(gs.wantedSpaceMembers(cohort, cohort.groups[0], 'meet@humanshaped.org'));
+  assert.deepEqual(want, [
+    { email: 'a@example.com', role: 'ROLE_UNSPECIFIED' },
+    { email: 'teacher@example.org', role: 'COHOST' },
+  ]);
+  assert.deepEqual(plain(gs.memberBody(want[0])), { email: 'a@example.com' });
+  assert.deepEqual(plain(gs.memberBody(want[1])), { email: 'teacher@example.org', role: 'COHOST' });
+});
+
+test('setting a room’s members adds, removes, and fixes roles', () => {
+  const want = [
+    { email: 'a@example.com', role: 'ROLE_UNSPECIFIED' },
+    { email: 'b@example.com', role: 'ROLE_UNSPECIFIED' },
+    { email: 't@example.org', role: 'COHOST' },
+  ];
+  const have = [
+    { name: 'spaces/x/members/1', email: 'A@example.com' },
+    { name: 'spaces/x/members/2', email: 'gone@example.com', role: 'ROLE_UNSPECIFIED' },
+    { name: 'spaces/x/members/3', email: 't@example.org', role: 'ROLE_UNSPECIFIED' },
+  ];
+  const d = plain(gs.diffSpaceMembers(want, have));
+  assert.deepEqual(d.add, [{ email: 'b@example.com', role: 'ROLE_UNSPECIFIED' }]);
+  assert.deepEqual(d.remove, ['spaces/x/members/2']);
+  assert.deepEqual(d.change, [{ name: 'spaces/x/members/3', role: 'COHOST' }]);
+  assert.deepEqual(plain(gs.diffSpaceMembers(want.slice(0, 1), have.slice(0, 1))), { add: [], remove: [], change: [] });
+});
+
+test('setup prints each room as the line /teach/ reads', async () => {
+  const { cohort } = gs.normalizeCohort(withGroups);
+  const lines = gs.spaceRoomLines(cohort, { 'g-1a2b': { name: 'spaces/AbC', uri: 'https://meet.google.com/abc-defg-hij' } });
+  assert.match(lines, /Trio A: https:\/\/meet\.google\.com\/abc-defg-hij \| spaces\/AbC/);
+  assert.match(gs.spaceRoomLines(cohort, {}), /Trio A: \(no room yet\)/);
+  // What follows the group's name is what /teach/ takes.
+  const { createRequire } = await import('node:module');
+  const R = createRequire(import.meta.url)('../../../assets/rooms-lib.js');
+  const pasted = lines.split('\n')[1].replace(/^\s*Trio A: /, '');
+  assert.deepEqual(R.parseRoomLine(pasted), { url: 'https://meet.google.com/abc-defg-hij', space: 'spaces/AbC' });
+});

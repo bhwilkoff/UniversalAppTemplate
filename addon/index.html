@@ -99,6 +99,14 @@
         <p class="small" data-shown-count></p>
       </section>
 
+      <!-- The rooms (C2, assets/rooms.js): where each group is in its turns,
+           and which would like the teacher. In a group's own room, that
+           group alone. -->
+      <section class="addon-activity" data-activity="rooms" aria-labelledby="rooms-h" hidden>
+        <h2 id="rooms-h">Rooms</h2>
+        <div class="room-board" data-rooms></div>
+      </section>
+
       <!-- Checks for understanding. -->
       <section class="addon-activity" data-activity="checks" aria-labelledby="checks-h" hidden>
         <h2 id="checks-h">Checks for understanding</h2>
@@ -144,6 +152,8 @@
   <script src="/assets/cohort-lib.js" defer></script>
   <script src="/assets/live-lib.js" defer></script>
   <script src="/assets/addon-lib.js" defer></script>
+  <script src="/assets/rooms-lib.js" defer></script>
+  <script src="/assets/rooms.js" defer></script>
   <script src="/assets/addon.js" defer></script>
 </body>
 </html>

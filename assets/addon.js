@@ -126,7 +126,7 @@
 
   var S = { me: null, room: null, cohort: null, session: null, prev: null, teaching: false, names: {}, people: [], groups: [], brought: [],
     parts: [], chosenPart: null, timerEnds: null, drawnPart: undefined, picked: false, active: null,
-    items: [], checks: [], answers: [], tallies: {}, onStage: null, stageOn: false };
+    items: [], checks: [], answers: [], tallies: {}, onStage: null, stageOn: false, rooms: null, roomPlaces: {} };
   var channel = null, poller = null, nudgeTimer = null, deferred = {}, drafts = {};
 
   function nameOf(id) { return S.me && id === S.me.id ? 'You' : (S.names[id] || 'Someone'); }
@@ -191,6 +191,7 @@
         return db.from('shares').select('*').eq('cohort_id', id).eq('kind', 'bring-back').gte('created_at', since).order('created_at', { ascending: false }).then(function (sh) {
           S.brought = sh.data || [];
           drawFrame();
+          startRooms();
           show('ready');
           return refreshLive().then(listen);
         });
@@ -207,12 +208,17 @@
   var ACTIVITIES = [
     { key: 'now', name: 'Now', draw: drawNowActivity },
     { key: 'queue', name: 'Queue', draw: drawQueue, badge: function () { return L.queue(S.items).waiting.length; } },
-    { key: 'checks', name: 'Checks', draw: drawChecks, badge: function () { return S.checks.filter(function (k) { return k.state === 'open'; }).length; } }
+    { key: 'checks', name: 'Checks', draw: drawChecks, badge: function () { return S.checks.filter(function (k) { return k.state === 'open'; }).length; } },
+    // Only when there are groups to show (startRooms); for a teacher, the
+    // badge is how many groups would like them.
+    { key: 'rooms', name: 'Rooms', draw: function () {}, when: function () { return !!S.rooms; },
+      badge: function () { return S.teaching ? Object.keys(S.roomPlaces).filter(function (k) { return S.roomPlaces[k].asking; }).length : 0; } }
   ];
 
   function drawLauncher() {
     var nav = $('[data-launcher]'); nav.replaceChildren();
     ACTIVITIES.forEach(function (a) {
+      if (a.when && !a.when()) return;
       var b = button('', 'addon-tab', function () { S.picked = true; openActivity(a.key); });
       b.setAttribute('aria-pressed', String(S.active === a.key));
       b.appendChild(el('span', null, a.name));
@@ -326,6 +332,20 @@
       hint.appendChild(document.createTextNode('.'));
       box.appendChild(hint);
     }
+  }
+
+  // The room board (C2): every group for a teacher in the main room, the
+  // group alone in a group's own room, and your own group otherwise.
+  function startRooms() {
+    if (S.rooms || !window.RoomBoard) return;
+    var mine = S.groups.some(function (g) { return g.group_members.some(function (m) { return m.user_id === S.me.id; }); });
+    if (!S.groups.length || (!S.teaching && !mine && !S.room.groupId)) return;
+    S.rooms = window.RoomBoard.start({
+      db: db, cohort: S.cohort, session: S.session, meId: S.me.id, teaching: S.teaching, groups: S.groups, people: S.people,
+      names: S.names, nameOf: nameOf, mount: $('[data-rooms]'), onlyGroup: S.room.groupId || null, showLinks: !S.room.groupId,
+      onChange: function (byGroup) { S.roomPlaces = byGroup; drawLauncher(); }
+    });
+    drawLauncher();
   }
 
   // During "Show what you brought back", and always in a group's room:

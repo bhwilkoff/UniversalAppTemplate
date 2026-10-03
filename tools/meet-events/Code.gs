@@ -11,8 +11,12 @@
  *   whoAmI()                    logs the account this script runs as
  *
  * With groups in the definition, setupCohort also makes one Meet room per
- * group (a recurring event with the group invited) and prints the links
- * to paste into /teach/.
+ * group and prints the lines to paste into /teach/. By default each room
+ * is a recurring event with the group invited. With the Script Property
+ * ROOMS_VIA_MEET_API set to "true", each room is instead a Meet space
+ * made through the Meet REST API, set to TRUSTED, with the group's
+ * members added (so they join without knocking) and the teachers added
+ * as co-hosts; the Calendar rooms stay the fallback when it is off.
  *
  * Cohort definitions come from the Script Property COHORTS_JSON (a JSON
  * array) or from a Google Sheet (Script Property COHORT_SHEET_ID, tab
@@ -26,6 +30,8 @@
  *   Meet links on events: https://developers.google.com/workspace/calendar/api/guides/create-events
  *   Advanced Calendar:    https://developers.google.com/apps-script/advanced/calendar
  *   Advanced Drive (v3):  https://developers.google.com/apps-script/advanced/drive
+ *   Meet spaces:          https://developers.google.com/workspace/meet/api/guides/meeting-spaces
+ *   Space members:        https://developers.google.com/workspace/meet/api/guides/meeting-space-members
  */
 
 var HOST_EMAIL_DEFAULT = 'meet@humanshaped.org';
@@ -217,6 +223,66 @@ function groupRoomLines(c, rooms) {
     .join('\n');
 }
 
+// ---- Rooms through the Meet REST API (C2) ----
+
+// The switch: only the exact word "true" turns it on.
+function roomsViaMeetApi(value) {
+  return String(value || '').trim().toLowerCase() === 'true';
+}
+
+// A new room: TRUSTED lets members of the host's organization, invited
+// external users, and dial-in users in without knocking; everyone else
+// knocks (Meet REST API, "Manage meeting space members").
+function spaceRequestBody() {
+  return { config: { accessType: 'TRUSTED' } };
+}
+
+// Who a group's room should have as members: the group's people, and the
+// teachers as co-hosts (a teacher who is also in the group is a
+// co-host). The host owns the space and is never a member.
+function wantedSpaceMembers(c, g, hostEmail) {
+  var host = String(hostEmail || '').toLowerCase();
+  var want = {};
+  g.members.forEach(function (e) { if (e !== host) want[e] = 'ROLE_UNSPECIFIED'; });
+  c.teachers.forEach(function (e) { if (e !== host) want[e] = 'COHOST'; });
+  return Object.keys(want).sort().map(function (e) { return { email: e, role: want[e] }; });
+}
+
+// What to change: members to add, members to remove (by their resource
+// name), and members whose role is wrong. have: [{name, email, role}]
+// from spaces.members.list.
+function diffSpaceMembers(want, have) {
+  var byEmail = {};
+  (have || []).forEach(function (m) { if (m.email) byEmail[String(m.email).toLowerCase()] = m; });
+  var wanted = {};
+  want.forEach(function (w) { wanted[w.email] = w; });
+  function roleOf(m) { return m.role && m.role !== 'ROLE_UNSPECIFIED' ? m.role : 'ROLE_UNSPECIFIED'; }
+  return {
+    add: want.filter(function (w) { return !byEmail[w.email]; }),
+    remove: (have || []).filter(function (m) { return !m.email || !wanted[String(m.email).toLowerCase()]; }).map(function (m) { return m.name; }),
+    change: want.filter(function (w) { return byEmail[w.email] && roleOf(byEmail[w.email]) !== w.role; })
+      .map(function (w) { return { name: byEmail[w.email].name, role: w.role }; }),
+  };
+}
+
+// A member as the API takes it: the email, and a role only when it is
+// one (an unspecified role is left out).
+function memberBody(w) {
+  return w.role === 'ROLE_UNSPECIFIED' ? { email: w.email } : { email: w.email, role: w.role };
+}
+
+// What setup prints for each Meet API room: the link, and the space's
+// name, which /teach/ keeps with the room so its members can be set again.
+function spaceRoomLines(c, rooms) {
+  if (!c.groups.length) return '';
+  return ['Group rooms. On /teach/, paste everything after each group\'s name into that group\'s "Its own Meet room":']
+    .concat(c.groups.map(function (g) {
+      var r = rooms[g.key];
+      return '  ' + g.name + ': ' + (r && r.uri ? r.uri + ' | ' + r.name : '(no room yet)');
+    }))
+    .join('\n');
+}
+
 function meetLinkOf(event) {
   var conf = (event && event.conferenceData) || {};
   var video = (conf.entryPoints || []).filter(function (p) { return p.entryPointType === 'video'; })[0];
@@ -327,7 +393,7 @@ function previewCohort(idOrObject) {
     'Session page: ' + c.sessionUrl,
     saved_(c.id).eventId ? 'An event already exists; setupCohort would update it.' : 'setupCohort would create a new event with a Meet link.',
     saved_(c.id).folderId ? 'A folder already exists; setupCohort would sync its sharing.' : 'setupCohort would create a recordings folder and share it.',
-    c.groups.length ? 'Group rooms (' + c.groups.length + '): ' + c.groups.map(function (g) { return g.name + (saved_(c.id).groupEvents && saved_(c.id).groupEvents[g.key] ? ' (exists)' : ' (would be made)'); }).join(', ') : 'No groups, so no group rooms.',
+    c.groups.length ? 'Group rooms (' + c.groups.length + ', ' + (useMeetApi_() ? 'as Meet spaces through the Meet REST API' : 'as Calendar events') + '): ' + c.groups.map(function (g) { var made = useMeetApi_() ? saved_(c.id).groupSpaces : saved_(c.id).groupEvents; return g.name + (made && made[g.key] ? ' (exists)' : ' (would be made)'); }).join(', ') : 'No groups, so no group rooms.',
   ];
   console.log(lines.join('\n'));
   return lines.join('\n');
@@ -420,8 +486,13 @@ function setupCohort(idOrObject) {
   }
   waitForMeet_(event.id);
 
-  var rooms = ensureGroupRooms_(c);
-  if (c.groups.length) console.log(groupRoomLines(c, rooms));
+  if (useMeetApi_()) {
+    var spaces = ensureGroupSpaces_(c);
+    if (c.groups.length) console.log(spaceRoomLines(c, spaces));
+  } else {
+    var rooms = ensureGroupRooms_(c);
+    if (c.groups.length) console.log(groupRoomLines(c, rooms));
+  }
 
   var problems = syncFolderSharing_(c, folder.getId());
   if (problems.length) console.log('Sharing problems:\n' + problems.join('\n'));
@@ -453,6 +524,68 @@ function ensureGroupRooms_(c) {
       save_(c.id, { groupEvents: saved });
     }
     rooms[g.key] = meetLinkOf(waitForMeet_(event.id));
+  });
+  return rooms;
+}
+
+function useMeetApi_() {
+  return roomsViaMeetApi(props_().getProperty('ROOMS_VIA_MEET_API'));
+}
+
+// One call to the Meet REST API as this account. Throws with Google's own
+// message when it says no.
+function meetApi_(method, path, body) {
+  var res = UrlFetchApp.fetch('https://meet.googleapis.com/v2/' + path, {
+    method: method,
+    contentType: 'application/json',
+    headers: { Authorization: 'Bearer ' + ScriptApp.getOAuthToken() },
+    payload: body ? JSON.stringify(body) : undefined,
+    muteHttpExceptions: true,
+  });
+  var code = res.getResponseCode();
+  var text = res.getContentText();
+  var data = text ? JSON.parse(text) : {};
+  if (code >= 300) throw new Error('Meet API ' + method.toUpperCase() + ' ' + path + ' said ' + code + ': ' + ((data.error && data.error.message) || text));
+  return data;
+}
+
+function listSpaceMembers_(spaceName) {
+  var all = [], token = '';
+  do {
+    var page = meetApi_('get', spaceName + '/members?pageSize=100' + (token ? '&pageToken=' + encodeURIComponent(token) : ''));
+    all = all.concat(page.members || []);
+    token = page.nextPageToken || '';
+  } while (token);
+  return all;
+}
+
+// One Meet space per group, made once (saved by the group's key, so
+// renaming a group keeps its room), kept TRUSTED, with its members set to
+// the group and its teachers each time setup runs. Returns
+// { key: { name, uri } }.
+function ensureGroupSpaces_(c) {
+  var saved = saved_(c.id).groupSpaces || {};
+  var rooms = {};
+  c.groups.forEach(function (g) {
+    var space = null;
+    if (saved[g.key]) {
+      try { space = meetApi_('get', saved[g.key]); } catch (e) { space = null; }
+    }
+    if (!space) {
+      space = meetApi_('post', 'spaces', spaceRequestBody());
+      saved[g.key] = space.name;
+      save_(c.id, { groupSpaces: saved });
+    } else if (!space.config || space.config.accessType !== 'TRUSTED') {
+      space = meetApi_('patch', space.name + '?updateMask=config.accessType', spaceRequestBody());
+    }
+    var diff = diffSpaceMembers(wantedSpaceMembers(c, g, hostEmail_()), listSpaceMembers_(space.name));
+    diff.add.forEach(function (w) {
+      try { meetApi_('post', space.name + '/members', memberBody(w)); }
+      catch (e) { console.log('Could not add ' + w.email + ' to ' + g.name + '\'s room: ' + e.message); }
+    });
+    diff.change.forEach(function (m) { meetApi_('patch', m.name + '?updateMask=role', { role: m.role }); });
+    diff.remove.forEach(function (name) { meetApi_('delete', name); });
+    rooms[g.key] = { name: space.name, uri: space.meetingUri };
   });
   return rooms;
 }
@@ -517,10 +650,32 @@ function checkCohort(idOrObject) {
     if (event.guestsCanSeeOtherGuests !== false) bad('Guests can see one another\'s email addresses on the invite.');
   }
 
-  // The group rooms
+  // The group rooms, as Meet spaces when ROOMS_VIA_MEET_API is on
+  if (useMeetApi_()) {
+    var groupSpaces = s.groupSpaces || {};
+    var spaceRooms = {};
+    c.groups.forEach(function (g) {
+      if (!groupSpaces[g.key]) { bad('No Meet space made yet for ' + g.name + '. Run setupCohort("' + c.id + '").'); return; }
+      var sp = null;
+      try { sp = meetApi_('get', groupSpaces[g.key]); } catch (e) { bad('The room for ' + g.name + ' could not be read (' + e.message + ').'); return; }
+      spaceRooms[g.key] = { name: sp.name, uri: sp.meetingUri };
+      if (sp.config && sp.config.accessType === 'TRUSTED') ok(g.name + ' has its own room, TRUSTED: ' + sp.meetingUri);
+      else bad('The room for ' + g.name + ' is ' + ((sp.config && sp.config.accessType) || 'not set') + ', not TRUSTED, so the group may have to knock. Run setupCohort.');
+      var d;
+      try { d = diffSpaceMembers(wantedSpaceMembers(c, g, hostEmail_()), listSpaceMembers_(sp.name)); }
+      catch (e) { bad('The members of ' + g.name + '\'s room could not be read (' + e.message + ').'); return; }
+      if (!d.add.length && !d.remove.length && !d.change.length) ok('Its members are the group, with the teachers as co-hosts.');
+      if (d.add.length) bad('Not members of ' + g.name + '\'s room yet: ' + d.add.map(function (w) { return w.email; }).join(', ') + '. Run setupCohort.');
+      if (d.remove.length) bad(d.remove.length + ' member(s) of ' + g.name + '\'s room are not in the group. Run setupCohort.');
+      if (d.change.length) bad(d.change.length + ' member(s) of ' + g.name + '\'s room have the wrong role. Run setupCohort.');
+    });
+    if (c.groups.length) note(spaceRoomLines(c, spaceRooms).split('\n').join('\n           '));
+  }
+
+  // The group rooms, as Calendar events otherwise
   var groupEvents = s.groupEvents || {};
   var rooms = {};
-  c.groups.forEach(function (g) {
+  if (!useMeetApi_()) c.groups.forEach(function (g) {
     if (!groupEvents[g.key]) { bad('No room made yet for ' + g.name + '. Run setupCohort("' + c.id + '").'); return; }
     var ge = null;
     try { ge = Calendar.Events.get('primary', groupEvents[g.key]); } catch (e) { bad('The room for ' + g.name + ' could not be found (' + e.message + ').'); return; }
@@ -529,7 +684,7 @@ function checkCohort(idOrObject) {
     else if (link) { ok(g.name + ' has its own room: ' + link); rooms[g.key] = link; }
     else bad('The room for ' + g.name + ' has no Meet link yet.');
   });
-  if (c.groups.length) note(groupRoomLines(c, rooms).split('\n').join('\n           '));
+  if (c.groups.length && !useMeetApi_()) note(groupRoomLines(c, rooms).split('\n').join('\n           '));
 
   // The folder
   var folder = null;

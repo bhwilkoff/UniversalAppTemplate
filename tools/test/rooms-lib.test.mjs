@@ -1,0 +1,76 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { createRequire } from 'node:module';
+const require = createRequire(import.meta.url);
+const R = require('../../assets/rooms-lib.js');
+const { TURN } = require('../../assets/live-lib.js');
+
+const order = ['bea', 'eve', 'fay'];
+const N = TURN.length;
+
+test('a group starts on the first step of the first person’s turn', () => {
+  assert.deepEqual(R.start(order), { step: 0, presenter: 'bea' });
+  assert.deepEqual(R.start([]), { step: 0, presenter: null });
+});
+
+test('next moves through the steps, then to the next person, then to done', () => {
+  assert.deepEqual(R.advance(null, order, N), { step: 1, presenter: 'bea' });
+  assert.deepEqual(R.advance({ step: 1, presenter: 'bea' }, order, N), { step: 2, presenter: 'bea' });
+  assert.deepEqual(R.advance({ step: N - 1, presenter: 'bea' }, order, N), { step: 0, presenter: 'eve' });
+  assert.deepEqual(R.advance({ step: N - 1, presenter: 'fay' }, order, N), { step: N, presenter: null });
+  assert.ok(R.isDone({ step: N, presenter: null }, N));
+  assert.deepEqual(R.advance({ step: N, presenter: null }, order, N), { step: N, presenter: null });
+});
+
+test('a presenter who left the group starts the order again', () => {
+  assert.deepEqual(R.advance({ step: 3, presenter: 'gone' }, order, N), { step: 0, presenter: 'bea' });
+  assert.deepEqual(R.advance({ step: 2, presenter: null }, order, N), { step: 1, presenter: 'bea' });
+});
+
+test('starting a step’s timer keeps the turn the group is in', () => {
+  assert.deepEqual(R.atStep({ step: 0, presenter: 'eve' }, order, 3), { step: 3, presenter: 'eve' });
+  assert.deepEqual(R.atStep(null, order, 2), { step: 2, presenter: 'bea' });
+  assert.deepEqual(R.atStep({ step: 1, presenter: 'gone' }, order, 1), { step: 1, presenter: 'bea' });
+});
+
+test('a group’s place reads in words', () => {
+  const nameOf = (id) => (id === 'eve' ? 'You' : id.toUpperCase());
+  assert.equal(R.placeText(null, order, TURN, nameOf).text, 'Not started yet.');
+  assert.equal(R.placeText({ step: 1, presenter: 'bea' }, order, TURN, nameOf).text, 'BEA’s turn, step 2 of 5: Show it, and one decision.');
+  assert.equal(R.placeText({ step: 0, presenter: 'eve' }, order, TURN, nameOf).text, 'Your turn, step 1 of 5: Their question.');
+  assert.equal(R.placeText({ step: N, presenter: null }, order, TURN, nameOf).text, 'Every turn is done.');
+  assert.equal(R.placeText({ step: 2, presenter: 'gone' }, order, TURN, nameOf).text, 'Between turns, step 3 of 5: One clarifying question.');
+});
+
+test('a teacher sees every group, anyone else only their own, and asking never reorders', () => {
+  const groups = [
+    { id: 'g2', name: 'Trio B', meet_url: 'https://meet.google.com/bbb', group_members: [{ user_id: 'fay' }] },
+    { id: 'g1', name: 'trio a', meet_url: 'http://not-safe', group_members: [{ user_id: 'bea' }, { user_id: 'eve' }] }
+  ];
+  const states = [{ group_id: 'g2', step: 2, presenter: 'fay', help_at: '2026-10-03T10:00:00Z' }];
+  const teacher = R.board(groups, states, 'ben', true);
+  assert.deepEqual(teacher.map((r) => r.id), ['g1', 'g2']);
+  assert.equal(teacher[0].url, null);
+  assert.equal(teacher[1].helpAt, '2026-10-03T10:00:00Z');
+  assert.deepEqual(teacher[1].state, { step: 2, presenter: 'fay' });
+  const student = R.board(groups, states, 'eve', false);
+  assert.deepEqual(student.map((r) => [r.id, r.mine, r.state]), [['g1', true, null]]);
+  assert.deepEqual(R.board(groups, states, 'fay', true).map((r) => r.id), ['g2', 'g1']);
+});
+
+test('how long ago a group asked', () => {
+  const now = Date.parse('2026-10-03T10:05:30Z');
+  assert.equal(R.agoText('2026-10-03T10:05:10Z', now), 'just now');
+  assert.equal(R.agoText('2026-10-03T10:04:20Z', now), 'a minute ago');
+  assert.equal(R.agoText('2026-10-03T09:55:00Z', now), '10 minutes ago');
+});
+
+test('the room line setup prints is read in either order', () => {
+  assert.deepEqual(R.parseRoomLine('https://meet.google.com/abc-defg-hij | spaces/AbC_1-2'), { url: 'https://meet.google.com/abc-defg-hij', space: 'spaces/AbC_1-2' });
+  assert.deepEqual(R.parseRoomLine('spaces/x https://meet.google.com/abc'), { url: 'https://meet.google.com/abc', space: 'spaces/x' });
+  assert.deepEqual(R.parseRoomLine('https://meet.google.com/abc'), { url: 'https://meet.google.com/abc', space: null });
+  assert.deepEqual(R.parseRoomLine('  '), { url: null, space: null });
+  assert.ok(R.parseRoomLine('spaces/x').error);
+  assert.ok(R.parseRoomLine('meet.google.com/abc').error);
+  assert.ok(R.parseRoomLine('https://meet.google.com/abc spaces/bad!').error);
+});
