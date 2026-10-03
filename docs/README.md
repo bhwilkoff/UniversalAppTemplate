@@ -74,6 +74,7 @@ back and get feedback on it, in a cohort or on your own.
 **08. Working with AI**
 
 - `PROVENANCE.md`: where every lesson in this template came from, and what was left out on purpose.
+- `research/gemini-and-other-agents.md`: what Gemini CLI, Antigravity, and Claude Code each read in this template (instructions, skills, commands, MCP), tested where it could be, and the Gemini equivalent of each Claude-only step in the path.
 
 ## For whoever maintains the template
 
