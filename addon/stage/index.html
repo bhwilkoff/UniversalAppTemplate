@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Human Shaped on the main stage</title>
+  <meta name="description" content="The Human Shaped main stage inside Google Meet, meant to be presented to the whole cohort.">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/site.css">
+  <script>
+    (function () {
+      var q = location.search, t = null;
+      if (/[?&]dark\b/.test(q)) t = 'dark'; else if (/[?&]light\b/.test(q)) t = 'light';
+      if (t) document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+</head>
+<body class="addon-body">
+  <!-- The Meet add-on's main stage (M15): a large, calm view the teacher
+       presents to everyone. It shows only what the whole cohort may see,
+       and it is told what to show by the teacher's own side panel.
+       Words by Claude, awaiting Ben's review. -->
+  <main class="addon-stage" data-stage aria-live="polite">
+    <section class="stage-state" data-state="loading"><p class="stage-quiet">Opening the stage…</p></section>
+
+    <section class="stage-state addon-outside" data-state="outside" hidden>
+      <p class="addon-mark"><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg>Human Shaped</p>
+      <h1>This page runs inside Google Meet.</h1>
+      <p>In any other browser, the same session is on your cohort’s live page, which you can open from <a href="/account/">your account</a>.</p>
+    </section>
+
+    <section class="stage-state" data-state="error" hidden>
+      <p class="stage-quiet" data-error-text></p>
+    </section>
+
+    <section class="stage-state stage-ready" data-state="ready" hidden>
+      <header class="stage-head">
+        <p class="addon-mark"><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg>Human Shaped</p>
+        <p class="stage-part" data-part hidden><span data-part-name></span><span class="stage-clock" data-clock></span></p>
+      </header>
+
+      <div class="stage-body" data-view="part">
+        <p class="kicker" data-part-kicker>Now</p>
+        <h1 class="stage-title" data-part-big></h1>
+        <p class="stage-clock-big" data-clock-big></p>
+      </div>
+
+      <div class="stage-body" data-view="check" hidden>
+        <p class="kicker">A question for everyone</p>
+        <h1 class="stage-title" data-prompt></h1>
+        <ul class="stage-choices" data-choices></ul>
+        <p class="stage-quiet" data-count-total hidden></p>
+        <p class="stage-quiet">Answer on your cohort’s live page, where only you and your teacher see what you said.</p>
+      </div>
+
+      <div class="stage-body" data-view="item" hidden>
+        <p class="kicker">Showing their work</p>
+        <h1 class="stage-title" data-who></h1>
+        <p class="stage-what" data-what></p>
+        <p class="stage-note" data-note hidden></p>
+      </div>
+    </section>
+  </main>
+  <script src="https://www.gstatic.com/meetjs/addons/1.1.0/meet.addons.js" defer></script>
+  <script src="/assets/addon-config.js" defer></script>
+  <script src="/assets/live-lib.js" defer></script>
+  <script src="/assets/addon-lib.js" defer></script>
+  <script src="/assets/addon-stage.js" defer></script>
+</body>
+</html>

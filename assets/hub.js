@@ -39,10 +39,18 @@
     ? 'GitHub sign-in did not finish: ' + params.get('error_description') + '. Nothing was saved.'
     : null;
 
+  // The Meet add-on's sign-in window opens /account/?handoff=meet: once
+  // signed in, this page hands the session to the panel that opened it
+  // (window.opener, this origin only) and closes (assets/addon.js).
+  var handoffMode = params.get('handoff') === 'meet';
+  var handoffNote = root.querySelector('[data-handoff-note]');
+  if (handoffNote) handoffNote.hidden = !handoffMode;
+
   root.querySelector('[data-sign-in]').addEventListener('click', function () {
+    if (handoffMode) { try { window.sessionStorage.setItem('hs-handoff', '1'); } catch (e) {} }
     db.auth.signInWithOAuth({
       provider: 'github',
-      options: { redirectTo: location.origin + '/account/' + (joining ? '?join=' + encodeURIComponent(joining) : '') }
+      options: { redirectTo: location.origin + '/account/' + (handoffMode ? '?handoff=meet' : joining ? '?join=' + encodeURIComponent(joining) : '') }
     }).then(function (r) { if (r.error) fail(r.error.message); });
   });
   root.querySelector('[data-retry]').addEventListener('click', function () {
@@ -132,6 +140,32 @@
     return card;
   }
 
+  // Hand the session to the Meet panel that opened this window: only the
+  // two Supabase tokens (AddonLib.handoff), only to this site's origin.
+  // If this window signed in only for the panel, it then forgets the
+  // session itself, so the panel and this browser never refresh the same
+  // session from two places (Supabase would end it). If someone was
+  // already signed in here, they stay signed in here.
+  function handOff(session) {
+    var msg = window.AddonLib ? window.AddonLib.handoff(session) : null;
+    var opener = null;
+    try { opener = window.opener && !window.opener.closed ? window.opener : null; } catch (e) { opener = null; }
+    var text = root.querySelector('[data-handoff-text]');
+    var signedInHere = false;
+    try { signedInHere = window.sessionStorage.getItem('hs-handoff') === '1'; window.sessionStorage.removeItem('hs-handoff'); } catch (e) {}
+    if (!opener || !msg) {
+      text.textContent = 'You are signed in on humanshaped.org, but this window lost track of Meet along the way. Go back to Meet, and in the panel choose “Use my humanshaped.org sign-in”, which can work now.';
+      return show('handoff');
+    }
+    opener.postMessage(msg, location.origin);
+    if (signedInHere) {
+      try { db.auth.stopAutoRefresh(); window.localStorage.removeItem(db.auth.storageKey); } catch (e) {}
+    }
+    text.textContent = 'You are signed in inside Meet, and this window can close now.';
+    show('handoff');
+    setTimeout(function () { window.close(); }, 1500);
+  }
+
   function load() {
     show('loading');
     db.auth.getSession().then(function (s) {
@@ -140,6 +174,7 @@
         if (arrivalError) fail(arrivalError); else show('signed-out');
         return;
       }
+      if (handoffMode) return handOff(session);
       var uid = session.user.id;
       keepGitHubToken(session);
       return Promise.all([

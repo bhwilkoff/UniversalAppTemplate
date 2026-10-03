@@ -81,6 +81,12 @@
             <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Sign in with GitHub
           </button>
           <p class="small">GitHub will ask whether to share your public profile with Human Shaped. That is all we ask for, and you can take it back at any time from your GitHub settings.</p>
+          <p class="small" data-handoff-note hidden>Once you are signed in, this window hands your sign-in back to the Human Shaped panel in Google Meet and closes.</p>
+        </section>
+
+        <!-- The Meet add-on's sign-in window (M15): words by Claude, awaiting Ben's review. -->
+        <section class="account-state" data-state="handoff" hidden>
+          <p data-handoff-text></p>
         </section>
 
         <section class="account-state" data-state="error" hidden>
@@ -141,6 +147,7 @@
   <script src="/assets/hub-config.js" defer></script>
   <script src="/assets/teach-lib.js" defer></script>
   <script src="/assets/discussions-lib.js" defer></script>
+  <script src="/assets/addon-lib.js" defer></script>
   <script src="/assets/hub.js" defer></script>
 
   <footer class="site-footer">
