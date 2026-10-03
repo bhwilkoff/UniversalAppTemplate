@@ -186,8 +186,22 @@ yet seen: the invitation a brand-new member gets.
 
 **In progress (started October 3, afternoon, after Ben's decisions):**
 
-- **M11. The course moves and weekly facilitator guides** in the
-  template (COURSE.md, showing-your-work.md, a new docs/teaching/).
+- **M11, finished.** COURSE.md carries every adopted move (six session
+  parts: Arrive, Show, One value at work, Read one real prompt, Start,
+  and a private check with "what is still muddy?"; "Ready, or not yet";
+  groups of three; four rules for how we talk; when someone goes quiet;
+  feedback from your own agent; teaching a cohort of your own), and
+  showing-your-work.md matches. docs/teaching/ holds an index (the arc
+  at 60, 75, and 90 minutes) and a guide for the week before and each
+  of weeks 1 to 5. Sessions come at the end of their week (a decision
+  for Ben to confirm). Pushed to main; copy awaits Ben.
+  **To align the site after M12 merges:** cohort-lib.js PARTS (Build
+  becomes Start, Close becomes the private check, a 3-minute break after
+  Show, the guides' minutes 7/25/3/6/22/9/3, the bring-back steps in
+  Show's text, week 5's different agenda); /cohort/'s "this week" stages
+  with end-of-week sessions; render.js SITE entries and pages for
+  docs/teaching/; /cohorts/ copy that still says "a pair, a trio" and
+  "everyone builds".
 - **M12. The five teaching tools** on the site: one Meet link per
   group, closing the loop on checks, the trio protocol on /live/, ready
   or not yet on bring-backs, and a teachers-only "not seen this week".
