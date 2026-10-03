@@ -108,6 +108,7 @@
     card.appendChild(el('p', 'small', when(c.starts_on) + ', ' + weeks + '.'));
     if (window.TeachLib) card.appendChild(el('p', 'small', window.TeachLib.scheduleText(c, Intl.DateTimeFormat().resolvedOptions().timeZone)));
     if (c.description) card.appendChild(el('p', null, c.description));
+    if (mine && c.myRole === 'mentor') card.appendChild(el('p', 'small', 'You are a mentor in this cohort.'));
     var actions = el('div', 'actions');
     if (mine) {
       var open = el('a', 'btn-github', 'Open your cohort');
@@ -179,7 +180,7 @@
       keepGitHubToken(session);
       return Promise.all([
         db.from('profiles').select('github_login, display_name, avatar_url').eq('id', uid).single(),
-        db.from('enrollments').select('status, cohorts(id, slug, title, starts_on, weeks, description, status, session_weekday, session_time, session_minutes, time_zone)').eq('user_id', uid).neq('status', 'left'),
+        db.from('enrollments').select('status, role, cohorts(id, slug, title, starts_on, weeks, description, status, session_weekday, session_time, session_minutes, time_zone)').eq('user_id', uid).neq('status', 'left'),
         db.from('cohorts').select('id, slug, title, starts_on, weeks, description, status, session_weekday, session_time, session_minutes, time_zone').eq('status', 'open').order('starts_on'),
         db.from('teachers').select('user_id').eq('user_id', uid).maybeSingle()
       ]).then(function (res) {
@@ -195,7 +196,9 @@
         var img = root.querySelector('[data-avatar]');
         if (p.avatar_url && /^https:\/\//.test(p.avatar_url)) img.src = p.avatar_url; else img.hidden = true;
 
-        var mine = res[1].data.map(function (e) { return e.cohorts; }).filter(Boolean);
+        var mine = res[1].data.filter(function (e) { return e.cohorts; }).map(function (e) {
+          return Object.assign({}, e.cohorts, { myRole: e.role });
+        });
         var mineIds = mine.map(function (c) { return c.id; });
         var myBox = root.querySelector('[data-my-cohorts]');
         myBox.replaceChildren();
@@ -225,11 +228,59 @@
         });
         root.querySelector('[data-teach-link]').hidden = !res[3].data;
         drawNotes(uid);
+        drawMentoring(uid);
         show('signed-in');
       });
     }).catch(function (err) {
       fail('Something went wrong while signing in: ' + (err && err.message ? err.message : 'no details') + '.');
     });
+  }
+
+  // Mentoring (DECISIONS.md, "Alumni"; migration 20261003200000): someone
+  // who holds the credential can join an open or running cohort as a
+  // mentor. The database decides who may (can_mentor, join_as_mentor);
+  // this only offers it. Before the migration, can_mentor is missing and
+  // the section stays away.
+  function drawMentoring(uid) {
+    var section = root.querySelector('[data-mentor-section]');
+    var box = root.querySelector('[data-mentor-cohorts]');
+    if (!window.MentorLib) return;
+    db.rpc('can_mentor').then(function (r) {
+      if (r.error || !r.data) { section.hidden = true; return; }
+      return Promise.all([
+        db.from('cohorts').select('id, slug, title, starts_on, weeks, description, status, session_weekday, session_time, session_minutes, time_zone').in('status', ['open', 'running']).order('starts_on'),
+        db.from('enrollments').select('cohort_id, status').eq('user_id', uid),
+        db.from('cohort_teachers').select('cohort_id').eq('user_id', uid)
+      ]).then(function (res) {
+        if (res.some(function (x) { return x.error; })) { section.hidden = true; return; }
+        var choices = window.MentorLib.mentorChoices(res[0].data, res[1].data, res[2].data.map(function (t) { return t.cohort_id; }));
+        section.hidden = !choices.length;
+        box.replaceChildren();
+        choices.forEach(function (c) { box.appendChild(mentorCard(c)); });
+      });
+    });
+  }
+
+  function mentorCard(c) {
+    var card = el('article', 'cohort-card');
+    card.appendChild(el('h3', null, c.title));
+    card.appendChild(el('p', 'small', (c.status === 'running' ? 'Running now. ' : 'Open for sign-up. ') + when(c.starts_on) + ', ' + c.weeks + ' weeks.'));
+    if (c.description) card.appendChild(el('p', null, c.description));
+    var actions = el('div', 'actions');
+    var join = el('button', 'btn-quiet', 'Mentor this cohort');
+    join.type = 'button';
+    var msg = el('span', 'small'); msg.setAttribute('role', 'status');
+    join.addEventListener('click', function () {
+      join.disabled = true;
+      db.rpc('join_as_mentor', { c: c.id }).then(function (r) {
+        if (r.error) { join.disabled = false; msg.textContent = 'Not joined: ' + r.error.message; return; }
+        db.functions.invoke('cohort-access', { body: { action: 'join', cohort_id: c.id } }).catch(function () {});
+        load();
+      });
+    });
+    actions.appendChild(join); actions.appendChild(msg);
+    card.appendChild(actions);
+    return card;
   }
 
   // Every note a teacher sent you, in every cohort, including ones you

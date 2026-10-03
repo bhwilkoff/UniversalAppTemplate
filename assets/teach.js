@@ -658,14 +658,41 @@
         var gh = el('a', null, ' @' + p.profiles.github_login); gh.href = 'https://github.com/' + encodeURIComponent(p.profiles.github_login);
         li.appendChild(gh);
       }
+      if (p.role === 'mentor') li.appendChild(el('span', 'role-tag', 'Mentor'));
       if (p.app_repo) {
         li.appendChild(document.createTextNode(', building '));
         var r = el('a', null, p.app_name || p.app_repo); r.href = 'https://github.com/' + p.app_repo;
         li.appendChild(r);
       }
+      if (window.MentorLib && (p.role === 'student' || p.role === 'mentor')) li.appendChild(roleSwitch(p, people));
       ul.appendChild(li);
     });
     box.appendChild(ul);
+  }
+
+  // A teacher moves someone between student and mentor (DECISIONS.md,
+  // "Alumni"): a mentor has no app to submit, and everyone in the cohort
+  // sees the word beside their name. The database lets only this cohort's
+  // teachers change it (migration 20261003200000). Its words were written
+  // by Claude for G7 and await Ben's review.
+  function roleSwitch(p, people) {
+    var wrap = el('span', 'roster-role');
+    var next = window.MentorLib.otherRole(p.role);
+    var b = el('button', 'link', next === 'mentor' ? 'Make them a mentor' : 'Make them a student again');
+    b.type = 'button';
+    var msg = el('span', 'small'); msg.setAttribute('role', 'status');
+    b.addEventListener('click', function () {
+      b.disabled = true;
+      db.from('enrollments').update({ role: next }).eq('cohort_id', current.id).eq('user_id', p.user_id).select('role').then(function (r) {
+        b.disabled = false;
+        if (r.error || !r.data.length) { msg.textContent = ' Not changed: ' + (r.error ? r.error.message : 'the database refused') + '.'; return; }
+        p.role = r.data[0].role;
+        drawRoster(people);
+      });
+    });
+    wrap.appendChild(document.createTextNode(' '));
+    wrap.appendChild(b); wrap.appendChild(msg);
+    return wrap;
   }
 
   // ---- their apps on humanshaped.org --------------------------------

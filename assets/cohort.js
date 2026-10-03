@@ -61,7 +61,13 @@
     var by = el('p', 'facts');
     by.appendChild(document.createTextNode((e.app_name ? 'Built by ' + nameOf(e.profiles) + ', ' : '')));
     if (e.profiles) by.appendChild(link('https://github.com/' + encodeURIComponent(e.profiles.github_login), '@' + e.profiles.github_login));
+    var role = window.MentorLib ? window.MentorLib.roleLabel(e.role) : '';
+    if (role) by.appendChild(el('span', 'role-tag', role));
     card.appendChild(by);
+    if (e.role === 'mentor' && !e.app_repo) {
+      card.appendChild(el('p', 'small', 'Here as a mentor, to help.'));
+      return card;
+    }
     var repo = lib.repoPath(e.app_repo);
     var links = el('ul', 'links');
     if (safe(e.app_url)) links.appendChild(el('li')).appendChild(link(e.app_url, 'Use it'));
