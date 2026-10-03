@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Run a Human-Shaped Hackathon | Human Shaped</title>
+  <meta name="description" content="A one-day or half-day hackathon where learning counts as success, everyone builds one real app for people they can name, and nobody wins a prize for speed or polish.">
+  <link rel="canonical" href="https://humanshaped.org/start/hackathon/">
+  <meta property="og:url" content="https://humanshaped.org/start/hackathon/">
+  <meta property="og:site_name" content="Human Shaped">
+  <meta property="og:title" content="Run a Human-Shaped Hackathon">
+  <meta property="og:description" content="A one-day or half-day hackathon where learning counts as success, everyone builds one real app for people they can name, and nobody wins a prize for speed or polish.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://humanshaped.org/assets/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="The human-shaped wordmark, with its hyphen drawn as an arch, above the line: build software for the parts of life only people can do.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#F7F6F2" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#141618" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/site.css">
+  <script>
+    (function () {
+      var q = location.search, t = null;
+      if (/[?&]dark\b/.test(q)) t = 'dark'; else if (/[?&]light\b/.test(q)) t = 'light';
+      else { try { t = localStorage.getItem('hs-theme'); } catch (e) {} }
+      if (t) document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+  <script src="/assets/site.js" defer></script>
+  <script src="/assets/kit.js" defer></script>
+</head>
+<body class="kit-print">
+  <!-- Copy drafted with an AI agent on 2026-10-03 (M5), waiting for Ben's review. -->
+  <a class="skip" href="#main">Skip to the page</a>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
+      <nav class="nav" aria-label="Main">
+        <ul>
+          <li><a href="/path/">The path</a></li>
+          <li><a href="/why/">Why</a></li>
+          <li><a href="/principles/">Principles</a></li>
+          <li><a href="/cohorts/">Cohorts</a></li>
+          <li><a href="/apps/">Apps</a></li>
+          <li><a href="/start/" aria-current="page">Start something</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#moon"/></svg>
+        </button>
+        <a class="btn-github small" href="/account/">
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>
+          <span>Sign in<span class="long"> with GitHub</span></span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main" class="kit">
+    <div class="wrap">
+      <header class="page-head print-hide">
+        <div>
+          <p class="kicker"><a href="/start/">Start something</a></p>
+          <h1>A day of building where learning counts.</h1>
+          <p class="lead">A Human-Shaped Hackathon is a day, or half of one, in which every person builds one real app of their own for people they can name, and what they learned while building it is what counts as success. This kit has the schedule for both lengths, the words to open the day, the show-and-tell that closes it, a checklist for the organizer, and the sheets to print.</p>
+          <p class="draft-note">This kit is a draft, written with an AI agent from the research behind it, and Ben has not read it yet.</p>
+        </div>
+      </header>
+
+      <ul class="jumps print-hide" aria-label="On this page">
+        <li><a href="#keep">What makes it one</a></li>
+        <li><a href="#who">Who comes</a></li>
+        <li><a href="#day">The day</a></li>
+        <li><a href="#half">The half day</a></li>
+        <li><a href="#show">The show-and-tell</a></li>
+        <li><a href="#prizes">No prizes</a></li>
+        <li><a href="#checklist">The checklist</a></li>
+        <li><a href="#announce">The announcement</a></li>
+        <li><a href="#print">The sheets</a></li>
+      </ul>
+
+      <section class="section first print-hide" aria-label="The kit">
+        <div class="topics">
+          <div class="topic" id="keep">
+            <h2>What makes it a Human-Shaped Hackathon.</h2>
+            <div class="prose">
+              <p>I want anyone to be able to run one of these without asking anyone's permission, and to change almost everything about it to fit their own room. These five things are what make it human-shaped, so keep them, and if you keep them, you can call it a Human-Shaped Hackathon.</p>
+            </div>
+            <ol class="steps">
+              <li><b>Learning is what counts as success,</b> so an app that only half works at the end of the day can still be a success, as long as its builder can say what they learned.</li>
+              <li><b>Each person builds one real app of their own, for people they can name,</b> in their own GitHub account, where it stays theirs after the day is over.</li>
+              <li><b><a href="/start/sheets/#questions">The four questions</a> are on the wall all day:</b> does it deepen understanding, does it invite participation, does it support human agency, and is it clear rather than clever?</li>
+              <li><b>The day ends with a show-and-tell,</b> in which each person shows what they built and one decision their values changed.</li>
+              <li><b>Nobody wins a prize for speed or polish,</b> for reasons <a href="#prizes">below</a>.</li>
+            </ol>
+          </div>
+
+          <div class="topic" id="who">
+            <h2>Who comes, and what they bring.</h2>
+            <div class="prose">
+              <p>Anyone who has a problem worth building for is welcome, including people who have never built an app, because the method is written for them. Ask everyone to bring a computer, their phone, a GitHub account, and an AI agent they can use (<a href="/path/setup/">Getting set up</a> shows the cheapest ways that work), and to bring a problem rather than a solution: a person or a group they know, and something in their lives that software could make easier without taking the human part away.</p>
+              <p>Setup happens before the day, never on the morning of it, because an hour lost to installing tools is an hour nobody gets back. Send the setup steps a week ahead, and still open the doors half an hour early with a table where helpers sit with anyone who is not ready yet. Plan on one helper for every eight to ten people. Helpers do not need to be experts, only people who have built something with an agent before and are glad to sit beside someone who has not.</p>
+              <p>Each person builds their own app, and people sit in threes, so that everyone has two people to show their work to through the day. Friends who want to sit together can, but each of them still builds their own.</p>
+            </div>
+          </div>
+
+          <div class="topic" id="day">
+            <h2>The day, from 9:30 to 4:30.</h2>
+            <div class="prose">
+              <p>Change the clock to suit your room, and keep the order and the lengths, since the breaks and the looking back are where most of the learning happens.</p>
+            </div>
+            <ol class="arc">
+              <li>
+                <p class="min"><b>30 min</b><span>9:30</span></p>
+                <div>
+                  <h3>Doors and setup</h3>
+                  <p>Hand out name tags and coffee, and open the setup table. Anyone whose agent cannot yet open their own repository gets a helper first, so that nobody starts the day behind.</p>
+                </div>
+              </li>
+              <li>
+                <p class="min"><b>15 min</b><span>10:00</span></p>
+                <div>
+                  <h3>The opening</h3>
+                  <p>Give <a href="#opening">the opening words</a>, point to the four questions on the wall, and hand out the sticky notes and the show-and-tell cards.</p>
+                </div>
+              </li>
+              <li>
+                <p class="min"><b>45 min</b><span>10:15</span></p>
+                <div>
+                  <h3>Write it down</h3>
+                  <p>Before choosing anything, each person writes three ideas, each one a problem for people they can name, and then picks the one whose people they can see most clearly, because a room in a hurry settles on its first idea. Then everyone starts <a href="/path/00/">stage 00</a>: why the app exists, who it is for, and one line it will never cross, all written down before the agent writes any code, and then tested against the four questions.</p>
+                </div>
+              </li>
+              <li>
+                <p class="min"><b>15 min</b><span>11:00</span></p>
+                <div>
+                  <h3>Read it to two people</h3>
+                  <p>In threes, each person reads their "why" aloud, and the other two ask the four questions back.</p>
+                </div>
+              </li>
+              <li>
+                <p class="min"><b>45 min</b><span>11:15</span></p>
+                <div>
+                  <h3>The first build</h3>
+                  <p>Everyone builds toward <a href="/path/01/">stage 01</a>: one platform, with real data, open on the builder's own phone. Helpers go to the stuck sticky notes first.</p>
+                </div>
+              </li>
+              <li>
+                <p class="min"><b>15 min</b><span>12:00</span></p>
+                <div>
+                  <h3>Look back</h3>
+                  <p>In threes, each person says what they learned, one thing the agent got wrong, and what they will ask it for next.</p>
+                </div>
+              </li>
+              <li>
+                <p class="min"><b>45 min</b><span>12:15</span></p>
+                <div>
+                  <h3>Lunch</h3>
+                  <p>Eat away from the screens if the room allows it, and nobody has to talk about their app.</p>
+                </div>
+              </li>
+              <li>
+                <p class="min"><b>60 min</b><span>1:00</span></p>
+                <div>
+                  <h3>The second build</h3>
+                  <p>Keep going toward the app working on the phone, and ask the agent why it did what it did as often as you ask it to do something.</p>
+                </div>
+              </li>
+              <li>
+                <p class="min"><b>20 min</b><span>2:00</span></p>
+                <div>
+                  <h3>Show it to your three</h3>
+                  <p>Each person shows the app on their phone and explains one decision in it with the agent closed, and the other two ask one question each, of which the best is usually "what did you give up?"</p>
+                </div>
+              </li>
+              <li>
+                <p class="min"><b>10 min</b><span>2:20</span></p>
+                <div>
+                  <h3>A break</h3>
+                </div>
+              </li>
+              <li>
+                <p class="min"><b>60 min</b><span>2:30</span></p>
+                <div>
+                  <h3>The last build</h3>
+                  <p>Stop adding things and finish the one thing you want to show. In the last fifteen minutes, everyone fills in the front of their show-and-tell card.</p>
+                </div>
+              </li>
+              <li>
+                <p class="min"><b>45 min</b><span>3:30</span></p>
+                <div>
+                  <h3>The show-and-tell</h3>
+                  <p>Three minutes each, as <a href="#show">described below</a>.</p>
+                </div>
+              </li>
+              <li>
+                <p class="min"><b>15 min</b><span>4:15</span></p>
+                <div>
+                  <h3>The closing circle</h3>
+                  <p>Each person answers three questions in a sentence or two: what did you learn, what surprised you, and what will you do differently? Then give <a href="#close">the closing words</a>.</p>
+                </div>
+              </li>
+            </ol>
+          </div>
+
+          <div class="topic" id="half">
+            <h2>The half day, from 1:00 to 5:00.</h2>
+            <div class="prose">
+              <p>Four hours is enough for one real round of building, as long as everyone arrives already set up, so for a half day the setup steps are not optional, and an online setup hour in the week before is worth offering. People write two ideas instead of three, and the trio check-in folds into the look back.</p>
+            </div>
+            <ol class="arc">
+              <li><p class="min"><b>15 min</b><span>1:00</span></p><div><h3>The opening</h3><p>The opening words, the four questions, the sticky notes, and the cards.</p></div></li>
+              <li><p class="min"><b>30 min</b><span>1:15</span></p><div><h3>Write it down</h3><p>Two ideas, then one, then why it exists, who it is for, and the line it will never cross, tested against the four questions.</p></div></li>
+              <li><p class="min"><b>45 min</b><span>1:45</span></p><div><h3>The first build</h3><p>Toward one platform, with real data, on the builder's own phone.</p></div></li>
+              <li><p class="min"><b>10 min</b><span>2:30</span></p><div><h3>Look back</h3><p>In threes: what you learned, what the agent got wrong, and what you will ask for next.</p></div></li>
+              <li><p class="min"><b>10 min</b><span>2:40</span></p><div><h3>A break</h3></div></li>
+              <li><p class="min"><b>60 min</b><span>2:50</span></p><div><h3>The last build</h3><p>Finish the one thing you want to show, and fill in the card in the last ten minutes.</p></div></li>
+              <li><p class="min"><b>50 min</b><span>3:50</span></p><div><h3>The show-and-tell</h3><p>Three minutes each, for up to about twelve people; with more, split into two rooms.</p></div></li>
+              <li><p class="min"><b>20 min</b><span>4:40</span></p><div><h3>The closing circle</h3><p>What you learned, what surprised you, and what you will do differently, then the closing words.</p></div></li>
+            </ol>
+          </div>
+
+          <div class="topic" id="words">
+            <h2>The words for the opening and the close.</h2>
+            <div class="prose">
+              <p>Say them your own way. The opening tells people how the day ends before it starts, because the ending is what makes this hackathon different from the ones most people have been to, and it is also where the room hears, out loud, how we treat one another.</p>
+            </div>
+            <div class="say" id="opening">
+              <p class="who">The opening, about three minutes</p>
+              <p>Good morning, and thank you for giving a whole day to this. I want to tell you how today ends before it starts, because it is different from most hackathons. At the end of the day, each of you will show the room what you built, on your own phone, and tell us one decision your values changed along the way. Nobody is judging and there are no prizes, and an app that only half works is welcome at the show-and-tell, because what counts today is what you learned while building it.</p>
+              <p>Everything you make today is yours, in your own GitHub account, and you can keep building it tomorrow or let it go. The four questions on the wall are the only rules for what you build: does it deepen understanding, does it invite participation, does it support human agency, and is it clear rather than clever?</p>
+              <p>Here is how we treat one another today, said out loud rather than signed. Let people finish their thought, nobody acts surprised that someone else has not heard of something, and nobody takes over someone else's keyboard, even to help. If something lands badly, say so kindly and we will keep going. When you are stuck, put the <i>(color)</i> sticky note on the lid of your laptop, and a helper will come to you.</p>
+            </div>
+            <div class="say" id="close">
+              <p class="who">The close, about a minute</p>
+              <p>Thank you for showing us what you made, and especially for showing us the parts that did not work yet, which is where most of today's learning was. What you built is yours to keep going with, and there are three places to take it from here: the humanshaped discussions on GitHub, where you can show it to people who build this way; a free five-week cohort, if you want to take it all the way to an app people can install; or the template, if you want to keep going on your own. I will post what we made and what we learned, with your permission, so that the next room can start from it.</p>
+            </div>
+          </div>
+
+          <div class="topic" id="show">
+            <h2>The show-and-tell, and one decision your values changed.</h2>
+            <div class="prose">
+              <p>Each person has three minutes. They open the app on their own phone (on the screen if the room has a way to show a phone, or passed around if it does not), say who it is for, show it doing one real thing, and then tell the room one decision their values changed: what they wanted to build, what one of their values said about it, and what they did instead. That last part is the heart of the day, because a value that never changed a decision is decoration.</p>
+              <p>An app that does not work yet is shown the same way, with what happened and what its builder learned from it, and that counts. The room asks one question at most, and everyone is thanked the same way. Afterward, two people write on the back of each builder's card one thing that worked and one that did not, so that everyone leaves with feedback in someone else's handwriting.</p>
+            </div>
+          </div>
+
+          <div class="topic" id="prizes">
+            <h2>Why there are no prizes for speed or polish.</h2>
+            <div class="prose">
+              <p>Most hackathons end with judges and prizes, and that format is good at what it was built for, which is finding the most promising new product in a room. This day is built for something else. Research on how hackathons are planned finds that competition suits events meant to produce new products, while events meant for learning, for meeting people, or for welcoming newcomers work better with cooperation and small prizes or none at all.</p>
+              <p>There is a second reason, which is particular to building with an AI agent. An agent can make something look finished in minutes, so a prize for polish rewards the agent's work rather than the builder's, and a prize for speed rewards skipping exactly the parts of the day that are about thinking: writing down why, asking the four questions, and looking back. The person who learned the most is often the one whose app only half works by the afternoon, and no judge would pick them. Ranking people in front of one another also tends to lower the motivation of everyone who did not win, which is most of the room.</p>
+              <p>The cost is real, since some people come to hackathons for the contest, and this one will not be for them. What everyone gets instead is the show-and-tell, written feedback from two people, and, if they want it, help before they leave with adding a declaration and <a href="/start/#mark">the working toward mark</a> to their repository.</p>
+            </div>
+          </div>
+
+          <div class="topic" id="checklist">
+            <h2>The organizer's checklist.</h2>
+            <div class="checklists">
+              <div>
+                <h3>Before</h3>
+                <ul class="checklist">
+                  <li>Decide what you want people to leave with, before you plan anything else, and put it at the top of the announcement.</li>
+                  <li>Find a room with a step-free entrance, an accessible restroom, a power outlet within reach of every seat (or enough power strips), wifi that can carry everyone at once, and a quiet corner.</li>
+                  <li>Find one helper for every eight to ten people.</li>
+                  <li>Send <a href="#announce">the announcement</a> at least three weeks ahead.</li>
+                  <li>A week ahead, send <a href="/path/setup/">the setup steps</a>, ask people to reply when their agent can open their own repository, and offer a short online setup hour for anyone who cannot.</li>
+                  <li>Print <a href="/start/sheets/">the four questions and the principles</a> for the wall, <a href="#print">the day's sheet</a>, and a show-and-tell card for each person, with spares.</li>
+                  <li>Buy sticky notes in two colors, and arrange food, labeled with what is in it.</li>
+                </ul>
+              </div>
+              <div>
+                <h3>On the day</h3>
+                <ul class="checklist">
+                  <li>Arrive an hour early, test the wifi on your own laptop and phone, and put the sheets on the wall where every seat can see them.</li>
+                  <li>Run the setup table until the opening, so that nobody starts building until they can talk to their agent in their own repository.</li>
+                  <li>Give the opening words, and keep time for every part, with a five-minute warning before each change.</li>
+                  <li>Send helpers to the stuck color first, and ask them to say when they arrive, so that nobody has to perform for them.</li>
+                  <li>Keep the breaks and lunch, even when people would rather keep building.</li>
+                  <li>Run the show-and-tell in the order people signed up, three minutes each, with one question at most.</li>
+                  <li>Close with the circle and the closing words, and end on time.</li>
+                </ul>
+              </div>
+              <div>
+                <h3>After</h3>
+                <ul class="checklist">
+                  <li>Within a week, post in <a href="https://github.com/orgs/humanshaped/discussions">the humanshaped discussions</a>: where and when, how many came, what people built (linking only the apps whose builders said yes), what the closing circle learned, and one thing to change next time.</li>
+                  <li>Send everyone a short note with those links, the discussions, the <a href="/cohorts/">cohorts</a>, and <a href="https://github.com/bhwilkoff/UniversalAppTemplate">the template</a>.</li>
+                  <li>Remind builders that an app made from the template is considered for <a href="/apps/">the directory</a> without anyone having to ask.</li>
+                  <li>Say in the same discussion what in this kit did not work, so that it gets better for the next person.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="topic" id="announce">
+            <h2>The announcement, ready to adapt.</h2>
+            <div class="prose">
+              <p>Change everything in square brackets, and keep the line about access, even if it only says what the room does not have yet.</p>
+            </div>
+            <div class="snippet">
+              <pre id="hackathon-announcement">Human-Shaped Hackathon: a day of building software for people you know
+
+[Day and date], [start time] to [end time], at [the place, the room, and how to find it].
+
+Bring a problem rather than a solution: a person or a group you know, and something in their lives that an app could make easier without taking the human part away. You will spend the day building one real app of your own for them with an AI agent, using the free method at humanshaped.org, and at the end of the day everyone shows what they made. You do not need to have built an app before.
+
+There are no judges and no prizes. What counts is what you learn, and everything you build stays yours.
+
+Bring a laptop, your phone, a GitHub account, and an AI agent you can use. A week before, we will send you the setup steps, and helpers will be there early on the day for anyone who needs a hand.
+
+Access: [a step-free entrance, an accessible restroom, power at every seat, a quiet space, and food labeled with what is in it]. If something else would help you take part, tell [your name] at [how to reach you] and we will do what we can.
+
+It is free. Say you are coming at [link or email].</pre>
+              <p class="actions"><button class="btn-quiet" type="button" data-copy="hackathon-announcement">Copy the announcement</button></p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section first sheets" id="print" aria-labelledby="print-title">
+        <div class="print-hide">
+          <h2 id="print-title" class="sheets-title">The sheets to print.</h2>
+          <div class="prose">
+            <p>Put <a href="/start/sheets/#questions">the four questions</a> and <a href="/start/sheets/#principles">the principles</a> on the wall from Sheets for the wall. The two below are this kit's own: the day at a glance, for the wall beside them, and the show-and-tell card, two to a page, so that one sheet makes cards for two people.</p>
+          </div>
+        </div>
+
+        <div class="sheet-block" id="day-sheet">
+          <div class="sheet-head print-hide">
+            <h3>The day at a glance</h3>
+            <button class="btn-quiet" type="button" data-print-sheet="day-sheet">Print this sheet</button>
+          </div>
+          <article class="sheet kit-sheet" aria-label="The day at a glance, as a printed page">
+            <p class="sheet-mark"><span>human</span><svg aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span>shaped</span></p>
+            <h3 class="sheet-title">A Human-Shaped Hackathon</h3>
+            <p class="sheet-sub">Every person builds one real app of their own, for people they can name, and what you learn is what counts.</p>
+            <div class="sheet-cols">
+              <div>
+                <h4>The day</h4>
+                <table>
+                  <tr><th>9:30</th><td><b>Doors and setup</b></td></tr>
+                  <tr><th>10:00</th><td><b>The opening</b></td></tr>
+                  <tr><th>10:15</th><td><b>Write it down:</b> three ideas, then one; why it exists, who it is for, and the line it will never cross</td></tr>
+                  <tr><th>11:00</th><td><b>Read it to two people</b></td></tr>
+                  <tr><th>11:15</th><td><b>The first build</b></td></tr>
+                  <tr><th>12:00</th><td><b>Look back</b> in threes</td></tr>
+                  <tr><th>12:15</th><td><b>Lunch</b></td></tr>
+                  <tr><th>1:00</th><td><b>The second build</b></td></tr>
+                  <tr><th>2:00</th><td><b>Show it to your three,</b> with the agent closed</td></tr>
+                  <tr><th>2:20</th><td><b>A break</b></td></tr>
+                  <tr><th>2:30</th><td><b>The last build,</b> and fill in your card</td></tr>
+                  <tr><th>3:30</th><td><b>The show-and-tell</b></td></tr>
+                  <tr><th>4:15</th><td><b>The closing circle</b></td></tr>
+                </table>
+              </div>
+              <div>
+                <h4>The half day</h4>
+                <table>
+                  <tr><th>1:00</th><td><b>The opening</b></td></tr>
+                  <tr><th>1:15</th><td><b>Write it down</b></td></tr>
+                  <tr><th>1:45</th><td><b>The first build</b></td></tr>
+                  <tr><th>2:30</th><td><b>Look back</b> in threes</td></tr>
+                  <tr><th>2:40</th><td><b>A break</b></td></tr>
+                  <tr><th>2:50</th><td><b>The last build</b></td></tr>
+                  <tr><th>3:50</th><td><b>The show-and-tell</b></td></tr>
+                  <tr><th>4:40</th><td><b>The closing circle</b></td></tr>
+                </table>
+                <h4>At the show-and-tell</h4>
+                <p class="sheet-words">Three minutes each: who it is for, one real thing it does, and one decision your values changed. One question from the room, at most.</p>
+                <h4>When you are stuck</h4>
+                <p class="sheet-words">Put the stuck color on your laptop lid, and a helper will come to you.</p>
+              </div>
+            </div>
+            <h4>The four questions, for everything you build</h4>
+            <p class="sheet-words">Does it deepen understanding? Does it invite participation? Does it support human agency? Is it clear rather than clever?</p>
+            <h4>How we treat one another</h4>
+            <p class="sheet-words">Let people finish their thought, nobody acts surprised that someone has not heard of something, and nobody takes over someone else's keyboard, even to help. If something lands badly, say so kindly and keep going.</p>
+            <p class="sheet-foot">No judges and no prizes: everyone shows, and everyone leaves with feedback. humanshaped.org/start/hackathon. Shared under CC BY 4.0, so copy it, change it, and say where it came from.</p>
+          </article>
+        </div>
+
+        <div class="sheet-block" id="card-sheet">
+          <div class="sheet-head print-hide">
+            <h3>The show-and-tell card</h3>
+            <button class="btn-quiet" type="button" data-print-sheet="card-sheet">Print this sheet</button>
+          </div>
+          <article class="sheet kit-sheet card-sheet" aria-label="Two show-and-tell cards, as a printed page">
+            <div class="card">
+              <p class="sheet-mark"><span>human</span><svg aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span>shaped</span></p>
+              <h3 class="sheet-title">My show-and-tell</h3>
+              <ol class="fill">
+                <li>My app is called</li>
+                <li>It is for<span>Name the people, or the group you know.</span></li>
+                <li>One real thing it does today</li>
+                <li class="big">One decision my values changed<span>What I wanted to build, what the value said, and what I did instead.</span></li>
+                <li>What I learned</li>
+              </ol>
+              <p class="card-back">On the back, two people write one thing that worked and one that did not.</p>
+            </div>
+            <div class="card">
+              <p class="sheet-mark"><span>human</span><svg aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span>shaped</span></p>
+              <h3 class="sheet-title">My show-and-tell</h3>
+              <ol class="fill">
+                <li>My app is called</li>
+                <li>It is for<span>Name the people, or the group you know.</span></li>
+                <li>One real thing it does today</li>
+                <li class="big">One decision my values changed<span>What I wanted to build, what the value said, and what I did instead.</span></li>
+                <li>What I learned</li>
+              </ol>
+              <p class="card-back">On the back, two people write one thing that worked and one that did not.</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section first print-hide" aria-label="Where this comes from">
+        <p class="credit">This day borrows its rhythm of building and looking back, and its closing circle, from the Global Day of Coderetreat; its checklists, helpers, and colored sticky notes from The Carpentries; its case against prizes from Alexander Nolte and colleagues' planning kit for hackathons; and its three ideas before one from a study of a one-day hackathon built with AI agents, in which teams settled on their first idea too quickly. All of it is restated in our own words, and the sources are in <a href="https://github.com/bhwilkoff/UniversalAppTemplate/blob/site/research/notes/toolkit-notes.md">the research notes</a>.</p>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
+      <p>Made by <a href="https://learningischange.com">Ben Wilkoff</a>. The ideas, the method, the tools, and the cohorts are free, and what you build is yours.</p>
+      <p class="credit">Built by Ben with an AI agent, Claude, set in Commissioner, and shared under <a href="https://github.com/bhwilkoff/UniversalAppTemplate/blob/site/LICENSE.md">open licenses</a>, so you can borrow anything here.</p>
+      <ul>
+        <li><a href="/cohorts/#together">How we treat one another</a></li>
+        <li><a href="/cohorts/#data">What we keep, and what we never own</a></li>
+        <li><a href="https://github.com/orgs/humanshaped/discussions">Discussions on GitHub</a></li>
+        <li><a href="https://github.com/bhwilkoff/UniversalAppTemplate">The template on GitHub</a></li>
+      </ul>
+    </div>
+  </footer>
+</body>
+</html>

@@ -922,3 +922,18 @@ label.check { display: flex; gap: 0.5rem; align-items: center; font-weight: 400;
   body.kit-print[data-printing] .sheet-block:not(.printing) { display: none !important; }
 }
 .kit .arc-after { margin-top: 1.5rem; }
+.kit .sheet-head h3 { margin: 0; font-size: 1.35rem; }
+.kit .sheets-title { font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2rem); max-width: none; margin-bottom: 1rem; }
+.kit-sheet.card-sheet { padding: 0; }
+.card-sheet .card { flex: 1 1 0; min-height: 0; padding: 5.5cqi 7.5cqi 4cqi; display: flex; flex-direction: column; }
+.card-sheet .card + .card { border-top: 1px dashed #8A8E94; }
+.card-sheet .sheet-title { font-size: 3.6cqi; margin-top: 2cqi; }
+.card-sheet .fill { padding: 0; margin-top: 1cqi; }
+.card-sheet .fill li { min-height: 7.4cqi; padding-top: 1.6cqi; font-size: 1.9cqi; }
+.card-sheet .fill li span { font-size: 1.6cqi; }
+.card-sheet .card-back { margin: auto 0 0; padding-top: 1.5cqi; font-size: 1.6cqi; color: #585C62; }
+@media print {
+  body.kit-print .card-sheet .card { padding: 0.35in 0.1in 0.2in; }
+  body.kit-print .card-sheet .card:first-child { padding-top: 0; }
+}
+.card-sheet .fill li.big { min-height: 15cqi; }
