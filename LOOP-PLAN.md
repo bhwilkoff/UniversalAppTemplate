@@ -756,6 +756,18 @@ add-on deployment.
   cohort-test: the thread opened (category General), a post from /live/
   landed on GitHub as bhwilkoff, and both were then deleted. Not yet
   tried: a student's post, and the tab inside Meet. Wording awaits Ben.
+- 2026-10-03, C2, rooms and the room board (merged, migration
+  20261003180000 applied). /live/ "The rooms" and the add-on's Rooms
+  activity: each group's room link, trio step and whose turn, "We would
+  like the teacher" (the teacher's "I am here" clears it), and a step
+  timer records its step (`live_room_state`, in Realtime, deleted at
+  finish; `groups.meet_space`). tools/meet-events makes TRUSTED rooms
+  through the Meet REST API (members, teachers as co-hosts) when the
+  Script Property ROOMS_VIA_MEET_API is true; Calendar rooms stay the
+  fallback. 382 database checks, 206 node tests, 15 meet-events tests.
+  Waits on Ben: enable the Meet REST API in human-shaped and allow the
+  new scopes on the next whoAmI. Not yet seen: the board at 375px, in
+  Meet, and Realtime on the new table.
 
 ## Where to pick up
 
