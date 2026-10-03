@@ -72,7 +72,8 @@ Deno.serve(async (req) => {
     });
     token = (await auth({ type: 'installation' })).token;
   } catch (err) {
-    return reply(503, { message: 'The GitHub App is not set up yet: ' + (err as Error).message });
+    console.error('cohort-access: GitHub App auth failed:', (err as Error).message);
+    return reply(503, { message: 'The cohort\u2019s conversation is not connected to GitHub yet. Try again later, or tell your teacher.' });
   }
 
   const gh = await fetch('https://api.github.com' + p.path, {
