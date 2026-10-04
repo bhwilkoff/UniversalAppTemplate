@@ -2,15 +2,17 @@
   "addOns": {
     "common": {
       "name": "Human Shaped",
-      "logoUrl": "https://humanshaped.org/assets/brand/icon.png"
+      "logoUrl": "https://humanshaped.org/assets/brand/meet-logo-light.png"
     },
     "meet": {
       "web": {
         "sidePanelUrl": "https://humanshaped.org/addon/",
         "supportsScreenSharing": true,
-        "addOnOrigins": ["https://humanshaped.org"],
-        "logoUrl": "https://humanshaped.org/assets/brand/icon.png",
-        "darkModeLogoUrl": "https://humanshaped.org/assets/brand/icon.png"
+        "addOnOrigins": [
+          "https://humanshaped.org"
+        ],
+        "logoUrl": "https://humanshaped.org/assets/brand/meet-logo-light.png",
+        "darkModeLogoUrl": "https://humanshaped.org/assets/brand/meet-logo-dark.png"
       },
       "termsUri": "https://humanshaped.org/terms/"
     }

@@ -1,0 +1,30 @@
+<!doctype html>
+<!-- One Marketplace screenshot: the add-on's real main stage and side
+     panel, side by side, drawn with SAMPLE DATA (fixture/sample-*.js).
+     tools/mark/make_listing.py serves this and fills ?stage= and ?panel=. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>
+  html, body { margin: 0; width: 1280px; height: 800px; overflow: hidden; background: #141618; font-family: system-ui, sans-serif; }
+  .wrap { display: grid; grid-template-columns: 1fr 360px; gap: 16px; padding: 20px; height: 800px; box-sizing: border-box; }
+  iframe { border: 0; border-radius: 14px; width: 100%; height: 100%; background: #141618; }
+  .stage { display: grid; grid-template-rows: 1fr auto; gap: 10px; }
+  .note { color: #9a958d; font-size: 13px; margin: 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="stage">
+    <iframe id="stage" title="Main stage"></iframe>
+    <p class="note">The main stage, with the side panel beside it. Sample data, not real people.</p>
+  </div>
+  <iframe id="panel" title="Side panel"></iframe>
+</div>
+<script>
+  var p = new URLSearchParams(location.search);
+  document.getElementById('stage').src = '/addon/stage/?scene=' + encodeURIComponent(p.get('stage') || 'welcome');
+  document.getElementById('panel').src = '/addon/?tab=' + encodeURIComponent(p.get('panel') || 'Now');
+</script>
+</body>
+</html>

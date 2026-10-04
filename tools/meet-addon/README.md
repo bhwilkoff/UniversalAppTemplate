@@ -145,6 +145,10 @@ choose once, after the test call.
 
 ## Listing it publicly, later
 
+The whole listing, step by step, with its words and images, is in
+`LISTING.md` beside this file.
+
+
 When the test call works, the public listing needs what we do not have
 yet, and each is a small piece of work for the agent and a few minutes
 for you:
