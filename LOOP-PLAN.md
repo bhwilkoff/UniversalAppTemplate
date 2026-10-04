@@ -891,7 +891,16 @@ October 3, after every C milestone that does not wait on Ben merged):
   NOTICES_SECRET (from ~/.humanshaped/notices-secret, copied to his
   clipboard), run whoAmI and press Allow, then a test cohort for
   setupCohort.
-- Next: G1 and G2 (building).
+- 2026-10-04, G2 (merged, migration 20261004010000 applied, mcp
+  redeployed): a builder outside any cohort keeps one app on /account/
+  ("Your own app", off until they switch "Show it on the apps page"),
+  shown on /apps/ as "Shown here by the person building it"; teachers
+  with can_approve can hide one with a reason; reports go to public
+  issues in the directory. public_apps() gained a `kind` column (checked
+  live as anon: 200). The MCP server's `my_app` gives the builder's own
+  context. 498 database checks, 245 node tests. Not yet rendered signed
+  in.
+- Next: G1 (building).
 
 ## Where to pick up
 
