@@ -138,3 +138,64 @@ cohort. Migration `20261003090000_app_submissions.sql` builds that.
   repository, and address.
 
 The database checks gain 23 for this (171 to 194).
+
+## Apps outside a cohort (October 4, 2026)
+
+*Written by Claude, awaiting Ben's review.* VISION.md asks the hub to be
+"a digital hub for anyone building software for people instead of
+profit", with "many different entry points." Until now an app reached
+the hub in two ways only: a cohort enrollment, where a teacher stands
+beside the student, or the directory's "Ask to list my app" issue form,
+which Ben reads himself before a listing goes in. Someone building on
+their own, with no cohort running, had neither a teacher nor a place.
+Migration `20261004010000_builder_apps.sql` gives them one, built from
+the same two switches as cohort apps.
+
+**Who can show what.**
+
+- **The builder's own switch.** A signed-in person keeps one app of
+  their own in `builder_apps`: its repository, a name, and where it runs.
+  It is private until they turn on "Show it on the apps page," and only
+  they can move that switch, either way. One app each keeps the account
+  page simple; a builder with several can list the rest through the
+  directory.
+- **What the public sees** is exactly what it sees of a cohort app: the
+  name, the repository, and the address, through `public_apps()`, which
+  now also says whether each app comes from a cohort or from its builder,
+  so /apps/ can say "Shown here by the person building it" rather than
+  claim a cohort or a review that did not happen. Nothing names the
+  person; the public cannot read `builder_apps` at all.
+- **A cohort app wins.** If the same repository is both, /apps/ lists it
+  once, as the cohort's, since that is the one a teacher has seen.
+
+**Moderation without a teacher.**
+
+- **Who decides.** With no teacher, the hide belongs to the people who
+  already decide who teaches here: teachers with `can_approve` (Ben
+  first). They can read builders' apps that are shown, and only those,
+  so they can hide one; they never see an app its builder kept private.
+- **The hide is its own row** (`builder_app_hides`), as with `app_hides`,
+  so taking an app off the page never moves the builder's switch, and the
+  builder always sees on their account page that it is hidden and why.
+  Only an approver writes it, in their own name, and no AI agent can.
+- **Anyone can say something is wrong.** A builder's app page carries one
+  line, "tell us in the open directory," which opens a new issue in
+  github.com/humanshaped/directory with only the app named. The directory
+  is already where Ben reads listings, so reports land beside them, in
+  the open, where the builder can answer too. Cohort apps and directory
+  listings do not carry the line: their teachers and their listing are
+  already the way to raise it.
+- **Not built, on purpose:** a reporting form that collects anything
+  about the person reporting, automatic hiding after some number of
+  reports (a pile-on could take down anyone's work), and any review
+  before a builder's app appears. The trade is the same one the open
+  directory makes: shown first, and taken down by a person who has read
+  why, with the reason given to the builder.
+
+**For the builder's own agent.** The hub's MCP server has a `my_app` tool,
+and `my_work` answers with it for someone in no cohort, instead of only
+saying they are not in one: their app, whether it shows and why not, and
+their own marks on the path. It says plainly that there is no teacher, so
+the agent asks the method's questions and labels its feedback as an AI's.
+
+The database checks gain 22 for this.

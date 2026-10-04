@@ -189,6 +189,8 @@
     $('[data-status]').textContent = lib.statusText(app, null);
     drawWhere(app, null);
     drawCommits(repo);
+    var report = lib.reportHref(app);
+    if (report && $('[data-report]')) { $('[data-report-link]').href = report; $('[data-report]').hidden = false; }
 
     Promise.all([declaration, info]).then(function (res) {
       var d = res[0], meta = res[1].data || null;

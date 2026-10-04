@@ -131,6 +131,32 @@
             <div data-path-marks></div>
           </div>
 
+          <!-- Written by Claude, awaiting Ben's review (G2, hub-privacy-notes.md "Apps outside a cohort"). -->
+          <div data-own-app-section id="own-app" hidden>
+            <h2>Your own app</h2>
+            <p class="small">For an app you are building on your own, outside any cohort. It stays yours alone until you choose to show it, and then the apps page shows its name, repository, and address, with a page that follows its work, and never anything about you.</p>
+            <form class="inline-form" data-own-app-form>
+              <label>Its repository on GitHub
+                <span class="hint">As owner/name, or paste its address.</span>
+                <input type="text" name="repo" required maxlength="200" autocomplete="off" spellcheck="false" placeholder="you/your-app">
+              </label>
+              <label>Its name
+                <input type="text" name="name" maxlength="120" autocomplete="off">
+              </label>
+              <label>Where it runs, if it runs somewhere
+                <input type="url" name="url" maxlength="500" placeholder="https://">
+              </label>
+              <label class="check"><input type="checkbox" name="public"> Show it on the apps page</label>
+              <p class="small" data-own-app-standing></p>
+              <div class="actions">
+                <button class="btn-quiet" type="submit">Save my app</button>
+                <button class="btn-quiet" type="button" data-own-app-remove hidden>Take it off the hub</button>
+                <a class="btn-link" data-own-app-page hidden>See its page</a>
+                <span class="small" role="status" data-own-app-status></span>
+              </div>
+            </form>
+          </div>
+
           <!-- Written by Claude, awaiting Ben's review (research/notes/reach-notes.md). -->
           <div data-reach-section hidden>
             <h2>How your teachers can reach you</h2>
@@ -152,7 +178,7 @@
           </div>
 
           <h2>Your data</h2>
-          <p>This site keeps your GitHub name and picture, which cohorts you are in, whatever you choose to share with a cohort, your own marks on the path, the notes your teachers send you, and, only if you give it above, the address your teachers may use. Leaving a cohort removes what you shared there but keeps your notes, which you can remove here. Deleting your account removes everything.</p>
+          <p>This site keeps your GitHub name and picture, which cohorts you are in, whatever you choose to share with a cohort, your own marks on the path, your own app if you add one, the notes your teachers send you, and, only if you give it above, the address your teachers may use. Leaving a cohort removes what you shared there but keeps your notes, which you can remove here. Deleting your account removes everything.</p>
           <div class="actions">
             <button class="btn-quiet" type="button" data-sign-out>Sign out</button>
             <button class="btn-quiet danger" type="button" data-delete-open>Delete my account</button>
@@ -191,6 +217,7 @@
   <script src="/assets/mentor-lib.js" defer></script>
   <script src="/assets/path-lib.js" defer></script>
   <script src="/assets/reach-lib.js" defer></script>
+  <script src="/assets/builder-lib.js" defer></script>
   <script src="/assets/hub.js" defer></script>
 
   <footer class="site-footer">

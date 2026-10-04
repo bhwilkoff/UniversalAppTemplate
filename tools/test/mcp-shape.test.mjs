@@ -1,7 +1,7 @@
 // node --test tools/test/
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { chooseCohort, cohortsText, thisWeekText, nextSessionText, groupText, workText, methodUrls, stagePart, thisSessionText, teacherCohort, rosterText, studentWorkText, classNowText, TEACHER_ASIDE } from '../../supabase/functions/mcp/shape.js';
+import { chooseCohort, cohortsText, thisWeekText, nextSessionText, groupText, workText, methodUrls, stagePart, thisSessionText, teacherCohort, rosterText, studentWorkText, classNowText, TEACHER_ASIDE, ownAppText } from '../../supabase/functions/mcp/shape.js';
 
 const a = { slug: 'fall-2026', title: 'Fall 2026', status: 'running', weeks: 5, starts_on: '2026-10-06', role: 'student' };
 const b = { slug: 'winter-2027', title: 'Winter 2027', status: 'open', weeks: 5, starts_on: null, role: 'teacher' };
@@ -198,4 +198,30 @@ test('class now says plainly when there is no session, or it has not begun', () 
   assert.match(t, /no question is open/);
   assert.match(t, /the session has not begun, so nothing has been pushed/);
   assert.match(classNowText(t1, { session: { number: 1 }, live: false, started: true, queue: [], checks: [], commits: [] }), /since the session began: none yet/);
+});
+
+test('someone building on their own hears about their own app and their own marks, never compared with anyone', () => {
+  const app = { app_repo: 'kim/tide-log', app_name: 'Tide Log', app_url: 'https://kim.github.io/tide-log/', public: true };
+  const marks = [
+    { stage: '02', item: 'ready', state: 'not-yet', note: null },
+    { stage: '01', item: 'ready', state: 'ready', note: null },
+    { stage: '01', item: 'step-2', state: 'done', note: null },
+    { stage: '01', item: 'note', state: 'kept', note: 'The tide chart on my phone.' },
+  ];
+  const t = ownAppText(app, null, marks);
+  assert.match(t, /^Working on your own, outside any cohort/);
+  assert.match(t, /Repository: https:\/\/github\.com\/kim\/tide-log/);
+  assert.match(t, /shown, at https:\/\/humanshaped\.org\/apps\/app\/\?r=kim\/tide-log/);
+  assert.ok(t.indexOf('Stage 01: ready to move on') < t.indexOf('Stage 02: not yet'));
+  assert.match(t, /method part "stage-01"/);
+  assert.match(t, /Stage 01: The tide chart on my phone\./);
+  assert.doesNotMatch(t, /step-2/);
+  assert.match(t, /its feedback is an AI's/);
+});
+
+test('a private, hidden, or missing own app is said plainly', () => {
+  assert.match(ownAppText({ app_repo: 'a/b', public: false }, null, []), /private to you/);
+  assert.match(ownAppText({ app_repo: 'a/b', public: true }, { reason: 'unsafe' }, []), /kept off the apps page.*because: unsafe\. Your own switch is unchanged/);
+  assert.match(ownAppText(null, null, []), /account\/#own-app/);
+  assert.match(ownAppText(null, null, [{ stage: 'setup', item: 'ready', state: 'ready' }]), /Setup: ready to move on \(method part "setup"\)/);
 });

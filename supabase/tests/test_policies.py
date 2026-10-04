@@ -240,8 +240,8 @@ def main():
     anon.execute("select * from public.public_apps()")
     rows = anon.fetchall()
     cols = [d[0] for d in anon.description]
-    check("a shown app is public with only its name, repository, and address",
-          cols == ["app_name", "app_repo", "app_url"] and [r[1] for r in rows] == ["bea/garden-swap"])
+    check("a shown app is public with only its name, repository, address, and that it is from a cohort",
+          cols == ["app_name", "app_repo", "app_url", "kind"] and [(r[1], r[3]) for r in rows] == [("bea/garden-swap", "cohort")])
     # The student's "it is ready" and the teacher's hide are two switches,
     # and neither person can move the other's (migration 20261003090000).
     ben = as_user("ben")
@@ -1674,6 +1674,73 @@ def main():
     sv = conn.cursor(); sv.execute("reset role")
     sv.execute("select count(*) from public.reach_choices where user_id = %s", (people["ivy"],))
     check("deleting the account deletes the choice", sv.fetchone()[0] == 0)
+
+    # ---- A builder's own app, outside any cohort (migration 20261004010000)
+    su12 = conn.cursor(); su12.execute("reset role")
+    for name in ["kim", "lou"]:
+        uid = str(uuid.uuid4())
+        su12.execute("insert into auth.users (id, raw_user_meta_data) values (%s, %s)",
+                     (uid, f'{{"user_name": "{name}", "provider_id": "{abs(hash(name)) % 10**8}"}}'))
+        people[name] = uid
+
+    def builder_rows():
+        cur = as_user(None)
+        cur.execute("select app_repo, kind from public.public_apps() where kind = 'builder'")
+        return cur.fetchall()
+
+    check("a builder outside any cohort can add their own app, kept private at first",
+          attempt(u("kim"), "insert into public.builder_apps (user_id, app_repo, app_name, app_url) values (%s, 'kim/tide-log', 'Tide Log', 'https://kim.github.io/tide-log/')", (people["kim"],))
+          and builder_rows() == [])
+    check("no one can add an app in someone else's name",
+          not attempt(u("lou"), "insert into public.builder_apps (user_id, app_repo) values (%s, 'lou/not-kims')", (people["kim"],)))
+    check("a builder's own AI agent cannot add or change their app",
+          not attempt(as_agent("lou"), "insert into public.builder_apps (user_id, app_repo) values (%s, 'lou/by-agent')", (people["lou"],))
+          and (lambda ok: not ok or last_rows == [])(attempt(as_agent("kim"), "update public.builder_apps set public = true where user_id = %s returning user_id", (people["kim"],))))
+    check("a repository must be written as owner/name",
+          not attempt(u("lou"), "insert into public.builder_apps (user_id, app_repo) values (%s, 'not a repo')", (people["lou"],)))
+    check("an app's address must be https",
+          not attempt(u("lou"), "insert into public.builder_apps (user_id, app_repo, app_url) values (%s, 'lou/x', 'javascript:alert(1)')", (people["lou"],)))
+    check("a builder can choose to show their app in public",
+          attempt(u("kim"), "update public.builder_apps set public = true where user_id = %s", (people["kim"],))
+          and builder_rows() == [("kim/tide-log", "builder")])
+    check("a shown builder's app comes after cohort apps, and says it is a builder's own",
+          (lambda c: (c.execute("select kind from public.public_apps()"), [r[0] for r in c.fetchall()])[1])(as_user(None))[-1] == "builder")
+    check("another person cannot read a builder's row, only the public list",
+          one("lou", "select count(*) from public.builder_apps where user_id = %s", (people["kim"],))[0] == 0)
+    anon = as_user(None)
+    check("the public cannot read the table of builders' apps, which names who they are",
+          not attempt(anon, "select user_id from public.builder_apps") or last_rows == [])
+    lou = u("lou")
+    lou.execute("update public.builder_apps set public = false where user_id = %s", (people["kim"],))
+    check("another person cannot hide a builder's app by changing it", lou.rowcount == 0)
+    check("an app stays with the person who added it",
+          not attempt(u("kim"), "update public.builder_apps set user_id = %s where user_id = %s", (people["lou"], people["kim"])))
+    attempt(u("lou"), "insert into public.builder_apps (user_id, app_repo) values (%s, 'lou/quiet-one')", (people["lou"],))
+    check("an approver can read shown builders' apps, so they can hide one, and not private ones",
+          one("ben", "select count(*) from public.builder_apps where user_id = %s", (people["kim"],))[0] == 1
+          and one("ben", "select count(*) from public.builder_apps where user_id = %s", (people["lou"],))[0] == 0)
+    check("a teacher who does not approve teachers cannot hide a builder's app",
+          not attempt(u("bea"), "insert into public.builder_app_hides (user_id, reason, hidden_by) values (%s, 'no', %s)", (people["kim"], people["bea"])))
+    check("an approver can hide a builder's app, in their own name, with a reason",
+          attempt(u("ben"), "insert into public.builder_app_hides (user_id, reason, hidden_by) values (%s, 'It asks for a password before it says what it is.', %s)", (people["kim"], people["ben"]))
+          and builder_rows() == [])
+    check("an approver cannot hide in someone else's name",
+          not attempt(u("ben"), "update public.builder_app_hides set hidden_by = %s where user_id = %s", (people["bea"], people["kim"])))
+    check("the builder sees that their app is hidden, and why",
+          one("kim", "select reason from public.builder_app_hides where user_id = %s", (people["kim"],))[0].startswith("It asks for a password"))
+    check("the hide never moves the builder's own switch",
+          one("kim", "select public from public.builder_apps where user_id = %s", (people["kim"],))[0] is True)
+    check("the builder cannot take the hide down themselves",
+          not attempt(u("kim"), "delete from public.builder_app_hides where user_id = %s returning user_id", (people["kim"],)) or last_rows == [])
+    check("another person cannot read why an app was hidden",
+          one("lou", "select count(*) from public.builder_app_hides")[0] == 0)
+    check("an approver can show it again",
+          attempt(u("ben"), "delete from public.builder_app_hides where user_id = %s returning user_id", (people["kim"],)) and len(last_rows) == 1
+          and builder_rows() == [("kim/tide-log", "builder")])
+    check("a builder can take their app off the hub",
+          attempt(u("lou"), "delete from public.builder_apps where user_id = %s returning user_id", (people["lou"],)) and len(last_rows) == 1)
+    attempt(u("kim"), "select public.delete_my_account()")
+    check("deleting the account deletes the builder's app, and it leaves the public list", builder_rows() == [])
     conn.rollback()
     conn.close()
     failed = [n for n, ok in results if not ok]
