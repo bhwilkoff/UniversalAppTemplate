@@ -145,10 +145,13 @@
   function sceneOf(p) {
     if (!p || typeof p.title !== 'string' || !p.title) return null;
     function lines(a, n, len) { return Array.isArray(a) ? a.filter(function (x) { return typeof x === 'string' && x; }).slice(0, n).map(function (x) { return cut(x, len); }) : []; }
-    return {
+    var out = {
       eyebrow: typeof p.eyebrow === 'string' ? cut(p.eyebrow, 40) : '', title: cut(p.title, 120),
       lines: lines(p.lines, 4, 300), items: lines(p.items, 8, 120), note: typeof p.note === 'string' && p.note ? cut(p.note, 200) : null
     };
+    // The design stage (R5): the board itself, on the main stage.
+    if (typeof p.board === 'string' && STAGE_BOARD.test(p.board)) out.board = p.board;
+    return out;
   }
 
   // A welcome, read back with every field checked and cut to size.
@@ -230,13 +233,21 @@
   // because it needs the hub's sign-in and Meet keeps the panel's and the
   // stage's storage apart from the site's (board-lib.js reads these links).
   var BOARD_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-  function boardLinks(cohort, session, groupId) {
+  // A design scene's template (R5, BoardLib.TEMPLATES) rides along, so
+  // the board is laid with it the first time it opens.
+  var TEMPLATE_KEY = /^[a-z][a-z-]{0,39}$/;
+  function boardLinks(cohort, session, groupId, template) {
     if (!cohort || !cohort.slug || !session || session.number == null) return null;
     var q = '/board/?c=' + encodeURIComponent(cohort.slug) + '&s=week-' + Number(session.number);
     var g = groupId && BOARD_UUID.test(groupId) ? groupId.toLowerCase() : null;
     if (g) q += '&g=' + g;
-    return { board: q, stage: q + '&view=stage', group: !!g };
+    var t = template && template !== 'blank' && TEMPLATE_KEY.test(template) ? '&t=' + template : '';
+    return { board: q + t, stage: q + '&view=stage' + t, group: !!g };
   }
+
+  // The only board a stage message may put on the main stage: a stage
+  // view of a board on this site, in exactly the shape boardLinks makes.
+  var STAGE_BOARD = /^\/board\/\?c=[A-Za-z0-9%._~-]{1,120}&s=week-\d{1,2}(&g=[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})?&view=stage(&t=[a-z][a-z-]{0,39})?$/;
 
   var lib = {
     meetingCode: meetingCode, findRoom: findRoom, panelPlan: panelPlan, timeLeft: timeLeft,

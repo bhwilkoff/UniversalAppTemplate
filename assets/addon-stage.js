@@ -32,6 +32,7 @@
     $('[data-part]').hidden = view.mode === 'part' || view.mode === 'welcome' || view.mode === 'scene' || view.mode === 'blank' || !part;
     if (view.mode === 'scene') {
       var sc = view.scene;
+      drawBoard(sc.board || null);
       $('[data-s-eyebrow]').textContent = sc.eyebrow;
       $('[data-s-title]').textContent = sc.title;
       var lines = $('[data-s-lines]'); lines.replaceChildren();
@@ -87,6 +88,24 @@
       $('[data-note]').textContent = view.note || '';
     }
     tick();
+  }
+
+  // The board in its own frame, made once per board so a new message (a
+  // clock tick, a title edit) never reloads it while people draw.
+  var boardSrc = null;
+  function drawBoard(src) {
+    var box = $('[data-s-board]');
+    root.querySelector('[data-view="scene"]').classList.toggle('has-board', !!src);
+    box.hidden = !src;
+    if (src === boardSrc) return;
+    boardSrc = src;
+    box.replaceChildren();
+    if (!src) return;
+    var f = document.createElement('iframe');
+    f.src = src;
+    f.title = 'The design stage';
+    f.setAttribute('allow', 'clipboard-read; clipboard-write');
+    box.appendChild(f);
   }
 
   function tick() {

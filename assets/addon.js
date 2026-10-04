@@ -327,7 +327,8 @@
 
   function drawBoardActivity() {
     var box = $('[data-board]');
-    var links = A.boardLinks(S.cohort, S.session, S.room.groupId);
+    var part = partNow();
+    var links = A.boardLinks(S.cohort, S.session, S.room.groupId, part && part.kind === 'design' ? (part.config || {}).template : null);
     if (!box || !links) return;
     box.replaceChildren();
     box.appendChild(el('p', 'small', links.group
@@ -337,7 +338,7 @@
     var open = newTab(el('a', 'btn-github', 'Open the design stage')); open.href = links.board; acts.appendChild(open);
     if (S.teaching) { var stage = newTab(el('a', 'btn-quiet', 'Open it to present')); stage.href = links.stage; acts.appendChild(stage); }
     box.appendChild(acts);
-    if (S.teaching) box.appendChild(el('p', 'small', 'To show it on the main stage, open it to present, then share that tab from Meet.'));
+    if (S.teaching) box.appendChild(el('p', 'small', 'During a design stage scene, the main stage shows this board to everyone who has it open. You can also open it to present, and share that tab from Meet.'));
   }
 
   // ------------------------------------------------------------------
@@ -419,6 +420,7 @@
     drawPart(true);
     drawQueue(); drawChecks();
     if (S.checks) drawSceneQuestion();
+    drawBoardActivity();
   }
 
   // Back and next without the show (before R3): the panel's own place.
@@ -849,6 +851,12 @@
     if (part && SL && V && (shared() || part.own)) {
       var s = S.draft && S.draft.key === part.key ? V.draft(part, S.draft.fields) : part;
       scene = SL.stagePreview(V.asRow(s));
+      // A design scene puts the board itself on the main stage (R5): the
+      // room's own board in a trio's call, the session's in the main room.
+      if (s.kind === 'design') {
+        var links = A.boardLinks(S.cohort, S.session, S.room.groupId, (s.config || {}).template);
+        if (links) scene.board = links.stage;
+      }
     }
     return A.stageView({
       part: part ? { key: part.key, name: part.name, endsAt: endsNow() } : null,

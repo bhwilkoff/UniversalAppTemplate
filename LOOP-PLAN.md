@@ -1085,13 +1085,37 @@ student).
   check_tally), and they turn the kinds on by themselves after.
   **Do not redeploy the mcp function before 80100 is applied** (its
   selects name the new columns). Not yet seen signed in or in a call.
+- **R5, the design stage on the main stage (merged, no migration,
+  October 4, cloud session):** board templates in BoardLib from the
+  course's own words (Read one real prompt: the situation, the prompt I
+  would send, my partner's, the real one; the three moves; the three
+  questions), laid as locked frames with fixed ids only on a board that
+  has never had anything on it, so two people opening it at once make
+  one copy. A design scene's template rides in the board link (`&t=`).
+  During a design scene the Meet add-on's main stage shows the live
+  board itself in a frame (AddonLib checks the link's exact shape; a new
+  message never reloads it): the trio's own board in a room's call, the
+  session's in the main room. The board fits the screen once when it
+  opens on the stage or from a template. The class builder picks the
+  template from a list and previews its frames; /live/ and the panel
+  link to the board with the current scene's template. 320 node tests;
+  tools/board/sync-check.mjs grew from 15 to 25 checks (template laid
+  once by two pages at once, saved, never over a used board; the stage
+  framed as Meet frames it shows the board with its template and drops
+  it on the next scene). **Not verified:** that the board inside Meet's
+  main stage finds the panel's sign-in (if it does not, it says to sign
+  in from the panel; the design note's fallback is the panel handing
+  its session to its own stage with notifyMainStage). **Found, not
+  fixed:** sync-check's "both draw at once" check fails about three
+  runs in four in the cloud container on the code before R5 too (it
+  passed on the Mac); worth a look before R6 leans on the board.
 
 ## Handoff (October 4, 2026, evening)
 
-Merged and live: G1 to G7, H1 to H6, C0 to C9, R1 to R3, R4's pages,
+Merged and live: G1 to G7, H1 to H6, C0 to C9, R1 to R3, R4's pages, R5,
 Google sign-in beside GitHub, the listing materials, meet@'s script
 with its triggers, the community repository, and the credential
-signing key. 675 database checks, 318 node tests.
+signing key. 675 database checks, 320 node tests.
 
 R4, the question bank, is merged (see its log entry). Half of its
 database change is applied; **the first step on this Mac is to apply
@@ -1104,11 +1128,16 @@ agents read the new kinds, then try the six kinds signed in on /teach/
 R3's known gap stands: "Send everyone to their rooms" still defaults its
 minutes from the six parts, not the session's own rooms scene.
 
-Next, from research/notes/run-of-show-design.md: R5 (the design stage
-on the main stage), R6 (rehearsal rooms rebuilt around scenes), R7 (the
-wings and the presenter), R8 (follow-up built from the show), then the
-listing (tools/meet-addon/LISTING.md) once a real call with the Gmail
-test student has gone well.
+R5, the design stage on the main stage, is merged (see its log entry);
+in the next real call, check that the board on the main stage is signed
+in.
+
+Next, from research/notes/run-of-show-design.md: R6 (rehearsal rooms
+rebuilt around scenes), R7 (the wings and the presenter), R8 (follow-up
+built from the show), then the listing (tools/meet-addon/LISTING.md)
+once a real call with the Gmail test student has gone well. The loop
+arms each next tick with send_later, which survives a container
+restart (ScheduleWakeup did not).
 
 What only this Mac has: ~/.humanshaped/supabase-token (Management API),
 ~/.humanshaped/credential-key-1.json (signing), ~/.humanshaped/test-student,

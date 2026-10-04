@@ -18,7 +18,7 @@
 
   var UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-  // ?c=<slug>&s=<session id or week-N>&g=<group id>&view=stage
+  // ?c=<slug>&s=<session id or week-N>&g=<group id>&view=stage&t=<template>
   function params(search) {
     var q = new URLSearchParams(search || '');
     var s = (q.get('s') || '').trim().toLowerCase();
@@ -30,7 +30,8 @@
       week: week ? Number(week[1]) : null,
       sessionId: UUID.test(s) ? s : null,
       group: UUID.test(g) ? g.toLowerCase() : null,
-      stage: view === 'stage' || q.has('stage')
+      stage: view === 'stage' || q.has('stage'),
+      template: template(q.get('t')) ? q.get('t') : null
     };
   }
 
@@ -47,11 +48,110 @@
   function topic(boardId) { return 'board:' + boardId; }
 
   // A link to a board, for /live/, the cohort page, and the add-on.
-  function link(slug, session, group, stage) {
+  function link(slug, session, group, stage, templateKey) {
     var u = '/board/?c=' + encodeURIComponent(slug) + '&s=week-' + session.number;
     if (group) u += '&g=' + encodeURIComponent(group);
     if (stage) u += '&view=stage';
+    if (template(templateKey) && templateKey !== 'blank') u += '&t=' + templateKey;
     return u;
+  }
+
+  // ------------------------------------------------------------------
+  // Templates for the design stage (R5): a few frames with the course's
+  // own words in them, laid on an empty board when a design scene opens
+  // it. Each comes from the template repository: the fourth part of a
+  // session (COURSE.md, "Read one real prompt together, trying it
+  // first"), the three moves (docs/path/00-why-we-build.md), and the
+  // three questions partners answer (COURSE.md, "Showing your work").
+  // Words by Claude, awaiting Ben's review.
+  // ------------------------------------------------------------------
+
+  var TEMPLATES = [
+    { key: 'blank', name: 'Blank', line: 'An empty board.', frames: [] },
+    { key: 'prompt', name: 'Read one real prompt', line: 'The situation, the prompt each person would send, a partner’s, and then the real one.',
+      frames: [
+        { title: 'The situation', hint: 'The screenshot, the bug, or what the agent said.' },
+        { title: 'The prompt I would send', hint: 'Written on your own, first.' },
+        { title: 'My partner’s prompt', hint: 'Compared after.' },
+        { title: 'The real prompt', hint: 'What the builder wanted, what the agent got wrong, and how the prompt fixed it.' }
+      ] },
+    { key: 'moves', name: 'The three moves', line: 'Write it down, prove it, and live with it, side by side.',
+      frames: [
+        { title: 'Write it down', hint: 'What do you believe the app is for?' },
+        { title: 'Prove it', hint: 'How will you find out whether it is true?' },
+        { title: 'Live with it', hint: 'What did using it teach you?' }
+      ] },
+    { key: 'questions', name: 'The three questions', line: 'Where is it going, how is it going, and what is next.',
+      frames: [
+        { title: 'Where is it going?', hint: '' },
+        { title: 'How is it going?', hint: '' },
+        { title: 'What is next?', hint: '' }
+      ] }
+  ];
+  function template(key) {
+    for (var i = 0; i < TEMPLATES.length; i++) if (TEMPLATES[i].key === key) return TEMPLATES[i];
+    return null;
+  }
+
+  // A template's elements, for Excalidraw's restoreElements to finish:
+  // a frame for each part in a row (two rows for four), its title, and
+  // its hint, all locked so drawing never moves them (a teacher can
+  // unlock one from its menu). Their ids are fixed, so two people laying
+  // the same template on the same empty board at once make one copy.
+  function templateElements(key, now) {
+    var t = template(key);
+    if (!t || !t.frames.length) return [];
+    var at = now == null ? 0 : now;
+    var W = 420, H = 320, GAP = 40;
+    var perRow = t.frames.length === 4 ? 2 : t.frames.length;
+    var out = [], n = 0;
+    var DIGITS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+    function base(type, x, y, w, h) {
+      var id = 'tpl-' + t.key + '-' + n;
+      var e = {
+        id: id, type: type, x: x, y: y, width: w, height: h, angle: 0,
+        strokeColor: '#1e1e1e', backgroundColor: 'transparent', fillStyle: 'solid', strokeWidth: 2, strokeStyle: 'solid',
+        roughness: 1, opacity: 100, groupIds: ['tpl-' + t.key], frameId: null, roundness: type === 'rectangle' ? { type: 3 } : null,
+        seed: 1000 + n, version: 1, versionNonce: 2000 + n, isDeleted: false, boundElements: null, updated: at,
+        link: null, locked: true, index: 'a' + DIGITS[n]
+      };
+      n++;
+      return e;
+    }
+    function text(x, y, words, size, color) {
+      var lines = wrap(words, Math.floor((W - 40) / (size * 0.55)));
+      var e = base('text', x, y, Math.min(W - 40, Math.max.apply(null, lines.map(function (l) { return l.length; })) * size * 0.55), lines.length * size * 1.25);
+      e.strokeColor = color;
+      return Object.assign(e, {
+        text: lines.join('\n'), originalText: lines.join('\n'), fontSize: size, fontFamily: 5, textAlign: 'left', verticalAlign: 'top',
+        containerId: null, autoResize: true, lineHeight: 1.25
+      });
+    }
+    t.frames.forEach(function (f, i) {
+      var x = (i % perRow) * (W + GAP), y = Math.floor(i / perRow) * (H + GAP);
+      out.push(base('rectangle', x, y, W, H));
+      out.push(text(x + 20, y + 18, f.title, 28, '#a23f22'));
+      if (f.hint) out.push(text(x + 20, y + 62, f.hint, 18, '#5a5f66'));
+    });
+    return out;
+  }
+
+  // Words broken into lines of at most `width` characters.
+  function wrap(words, width) {
+    var lines = [], cur = '';
+    String(words).split(/\s+/).forEach(function (w) {
+      if (cur && (cur + ' ' + w).length > width) { lines.push(cur); cur = w; }
+      else cur = cur ? cur + ' ' + w : w;
+    });
+    if (cur) lines.push(cur);
+    return lines.length ? lines : [''];
+  }
+
+  // Whether a board should be laid with its template: only a board that
+  // has never had anything on it, so nothing anyone drew, and nothing
+  // anyone erased, is ever drawn over.
+  function needsTemplate(sceneElements, key) {
+    return !!template(key) && key !== 'blank' && !(sceneElements || []).length;
   }
 
   // The elements that changed since this page last sent or received them,
@@ -204,6 +304,7 @@
   var lib = {
     DAY: DAY, MAX_MESSAGE_BYTES: MAX_MESSAGE_BYTES, SAVE_EVERY: SAVE_EVERY, MESSAGES_PER_SECOND: MESSAGES_PER_SECOND,
     params: params, pickSession: pickSession, topic: topic, link: link,
+    TEMPLATES: TEMPLATES, template: template, templateElements: templateElements, needsTemplate: needsTemplate,
     unsent: unsent, markSeen: markSeen, syncable: syncable, keepLocal: keepLocal, merge: merge,
     bytes: bytes, batches: batches, sendInterval: sendInterval, pointerInterval: pointerInterval, throttle: throttle,
     sameGeneration: sameGeneration, canDraw: canDraw, colorFor: colorFor, fileName: fileName

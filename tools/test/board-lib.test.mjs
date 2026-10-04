@@ -7,10 +7,10 @@ const el = (id, version, versionNonce, index = 'a0', extra = {}) => ({ id, versi
 
 test('a board link names its cohort, its week or session, its group, and the stage view', () => {
   const id = '3f2b8c1e-0a4d-4e9b-8f6a-1c2d3e4f5a6b';
-  assert.deepEqual(lib.params('?c=Fall-2026&s=week-3'), { slug: 'fall-2026', week: 3, sessionId: null, group: null, stage: false });
-  assert.deepEqual(lib.params(`?c=fall&s=${id}&g=${id.toUpperCase()}&view=stage`), { slug: 'fall', week: null, sessionId: id, group: id, stage: true });
+  assert.deepEqual(lib.params('?c=Fall-2026&s=week-3'), { slug: 'fall-2026', week: 3, sessionId: null, group: null, stage: false, template: null });
+  assert.deepEqual(lib.params(`?c=fall&s=${id}&g=${id.toUpperCase()}&view=stage`), { slug: 'fall', week: null, sessionId: id, group: id, stage: true, template: null });
   assert.equal(lib.params('?c=fall&stage').stage, true);
-  assert.deepEqual(lib.params('?c=fall&s=week-x&g=nope'), { slug: 'fall', week: null, sessionId: null, group: null, stage: false });
+  assert.deepEqual(lib.params('?c=fall&s=week-x&g=nope'), { slug: 'fall', week: null, sessionId: null, group: null, stage: false, template: null });
   assert.equal(lib.link('fall 2026', { number: 2 }, null, false), '/board/?c=fall%202026&s=week-2');
   assert.equal(lib.link('fall', { number: 2 }, id, true), `/board/?c=fall&s=week-2&g=${id}&view=stage`);
 });
@@ -138,4 +138,31 @@ test('each person keeps one pointer color, and downloads are named for the cohor
   assert.match(lib.colorFor('someone'), /^#[0-9A-F]{6}$/);
   assert.equal(lib.fileName('fall-2026', { number: 3 }, null, 'png'), 'fall-2026-week-3-board.png');
   assert.equal(lib.fileName('fall-2026', { number: 3 }, 'Trio A!', 'svg'), 'fall-2026-week-3-trio-a-board.svg');
+});
+
+test('a design stage template is the course’s words, laid once, with ids that never collide (R5)', () => {
+  assert.deepEqual(lib.TEMPLATES.map((t) => t.key), ['blank', 'prompt', 'moves', 'questions']);
+  assert.equal(lib.params('?c=fall&s=week-2&t=moves').template, 'moves');
+  assert.equal(lib.params('?c=fall&s=week-2&t=<script>').template, null);
+  assert.equal(lib.link('fall', { number: 2 }, null, true, 'prompt'), '/board/?c=fall&s=week-2&view=stage&t=prompt');
+  assert.equal(lib.link('fall', { number: 2 }, null, false, 'blank'), '/board/?c=fall&s=week-2');
+  const els = lib.templateElements('moves', 7);
+  assert.equal(els.length, 9);
+  assert.equal(new Set(els.map((e) => e.id)).size, 9);
+  assert.deepEqual(lib.templateElements('moves', 99).map((e) => e.id), els.map((e) => e.id), 'the same ids every time');
+  assert.ok(els.every((e) => e.locked && e.version === 1 && e.updated === 7));
+  assert.deepEqual(els.filter((e) => e.type === 'text' && e.fontSize === 28).map((e) => e.text), ['Write it down', 'Prove it', 'Live with it']);
+  const idx = els.map((e) => e.index);
+  assert.deepEqual(idx, idx.slice().sort(), 'in z-order');
+  assert.deepEqual(lib.templateElements('blank'), []);
+  assert.deepEqual(lib.templateElements('nope'), []);
+  assert.equal(lib.needsTemplate([], 'prompt'), true);
+  assert.equal(lib.needsTemplate([{ id: 'x', isDeleted: true }], 'prompt'), false, 'never over something erased');
+  assert.equal(lib.needsTemplate([], 'blank'), false);
+  assert.equal(lib.needsTemplate([], null), false);
+  // Four frames sit in two rows, and a long hint wraps inside its frame.
+  const prompt = lib.templateElements('prompt');
+  const frames = prompt.filter((e) => e.type === 'rectangle');
+  assert.deepEqual(frames.map((f) => [f.x, f.y]), [[0, 0], [460, 0], [0, 360], [460, 360]]);
+  assert.ok(prompt.filter((e) => e.type === 'text').every((t) => t.width <= 380));
 });

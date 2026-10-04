@@ -201,7 +201,9 @@
     } else if (k.key === 'presenter') {
       p.note = c.prompt ? 'The audience: ' + c.prompt : 'The presenter’s work fills the stage.';
     } else if (k.key === 'design') {
-      p.note = c.template ? 'The board, from the ' + c.template + ' template.' : 'The board, blank.';
+      var BL = root.BoardLib, t = c.template && BL ? BL.template(c.template) : null;
+      p.note = c.template ? 'The board, from the ' + (t ? t.name : c.template) + ' template, live on the main stage.' : 'The board, blank, live on the main stage.';
+      if (t) p.items = t.frames.map(function (f) { return f.title; });
     } else if (k.key === 'rooms') {
       p.note = 'Everyone is in their room for ' + p.minutes + ' minutes.';
       p.items = (c.room_scenes || []).map(function (r) { return r.title + ', ' + r.minutes + ' min'; });

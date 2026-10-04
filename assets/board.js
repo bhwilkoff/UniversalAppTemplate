@@ -60,7 +60,18 @@
     if (!P.slug) return fail('This page needs to know which cohort’s board to open. Open it from the session page.');
     show('loading');
     db.auth.getSession().then(function (s) {
-      if (!s.data || !s.data.session) return show('signed-out');
+      if (!s.data || !s.data.session) {
+        // On the Meet add-on's main stage (R5), the board reads the sign-in
+        // the panel made; there is nowhere to sign in inside the stage.
+        if (P.stage) {
+          var out = root.querySelector('[data-state="signed-out"]');
+          out.replaceChildren();
+          var h = document.createElement('h1'); h.textContent = 'The board opens here once you are signed in.';
+          var p = document.createElement('p'); p.textContent = 'Sign in from the Human Shaped panel beside the call, then come back to this scene. The board is also in its own tab from the panel.';
+          out.appendChild(h); out.appendChild(p);
+        }
+        return show('signed-out');
+      }
       S.auth = s.data.session;
       S.me = S.auth.user;
       return db.from('cohorts').select('*').eq('slug', P.slug).maybeSingle().then(function (c) {
@@ -159,11 +170,11 @@
       var line = $('[data-other]');
       line.replaceChildren();
       var links = [];
-      if (S.group) links.push({ text: 'The session’s board', href: B.link(S.cohort.slug, S.session, null, P.stage) });
+      if (S.group) links.push({ text: 'The session’s board', href: B.link(S.cohort.slug, S.session, null, P.stage, P.template) });
       r.data.forEach(function (b) {
         if (!b.group_id || (S.group && b.group_id === S.group.id)) return;
         var g = S.groups.filter(function (x) { return x.id === b.group_id; })[0];
-        if (g) links.push({ text: 'The board for ' + g.name, href: B.link(S.cohort.slug, S.session, g.id, P.stage) });
+        if (g) links.push({ text: 'The board for ' + g.name, href: B.link(S.cohort.slug, S.session, g.id, P.stage, P.template) });
       });
       if (!links.length) { line.hidden = true; return; }
       line.append('Also this session: ');
@@ -187,7 +198,17 @@
     var X = S.X;
     return {
       // window.__board is read by tools/board/sync-check.mjs, the two-page test.
-      excalidrawAPI: function (api) { if (api && !S.api) { S.api = api; window.__board = { api: api, state: S }; syncLine(); } },
+      excalidrawAPI: function (api) {
+        if (api && !S.api) {
+          S.api = api; window.__board = { api: api, state: S }; syncLine();
+          // A template laid on an empty board goes to everyone and is saved.
+          if (S.seeded) setTimeout(function () { sendScene(); saveSoon(); }, 0);
+          // On the main stage, or with a template just laid, everything on
+          // the board fits the screen when it opens (once, so no one's view
+          // jumps while they draw).
+          S.fitPending = !!(S.seeded || P.stage);
+        }
+      },
       initialData: S.initial,
       onChange: onChange,
       onPointerUpdate: onPointer,
@@ -210,9 +231,15 @@
 
   function mount() {
     var X = S.X;
-    S.initial = { elements: X.restoreElements(sceneOf(S.board), null), appState: { viewBackgroundColor: '#ffffff' }, scrollToContent: true };
-    B.markSeen(S.seen, S.initial.elements);
-    B.markSeen(S.saved, S.initial.elements);
+    var existing = X.restoreElements(sceneOf(S.board), null);
+    B.markSeen(S.seen, existing);
+    B.markSeen(S.saved, existing);
+    // A design scene's template (R5), laid only on a board that has never
+    // had anything on it, by anyone who may draw. Its ids are fixed, so
+    // two people opening the same empty board make one copy.
+    S.seeded = canDraw() && B.needsTemplate(sceneOf(S.board), P.template);
+    var elements = S.seeded ? existing.concat(X.restoreElements(B.templateElements(P.template, Date.now()), null)) : existing;
+    S.initial = { elements: elements, appState: { viewBackgroundColor: '#ffffff' }, scrollToContent: true };
     S.reactRoot = X.createRoot($('[data-canvas]'));
     render();
     new MutationObserver(render).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
@@ -223,6 +250,10 @@
 
   function onChange(elements) {
     if (!S.api) return;
+    if (S.fitPending && S.api.scrollToContent && elements.some(function (e) { return !e.isDeleted; })) {
+      S.fitPending = false;
+      setTimeout(function () { S.api.scrollToContent(S.api.getSceneElements(), { fitToViewport: true, viewportZoomFactor: 0.8 }); }, 50);
+    }
     var v = S.X.getSceneVersion(elements);
     if (v === S.lastVersion) return;
     S.lastVersion = v;
@@ -480,7 +511,7 @@
     if (!g) return;
     db.rpc('open_board', { c: S.cohort.id, s: S.session.id, g: g }).then(function (r) {
       if (r.error || !(r.data || []).length) return status('That group’s board could not be made: ' + (r.error ? r.error.message : 'no board came back') + '.');
-      location.href = B.link(S.cohort.slug, S.session, g, P.stage);
+      location.href = B.link(S.cohort.slug, S.session, g, P.stage, P.template);
     });
   });
 

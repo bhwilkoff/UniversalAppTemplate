@@ -24,6 +24,7 @@ import { mkdirSync } from 'node:fs';
 const here = dirname(fileURLToPath(import.meta.url));
 const site = resolve(here, '../..');
 const BoardLib = createRequire(import.meta.url)('../../assets/board-lib.js');
+const AddonLib = createRequire(import.meta.url)('../../assets/addon-lib.js');
 const shots = process.argv[2] ? resolve(process.argv[2]) : null;
 if (shots) mkdirSync(shots, { recursive: true });
 const CHROME = process.env.CHROME || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
@@ -57,6 +58,7 @@ const hub = {
   sessions: [], groups: [{ id: GROUP, name: 'Trio A', group_members: [{ user_id: BEA }] }], boards: []
 };
 hub.sessions.push({ id: randomUUID(), cohort_id: hub.cohort.id, number: 1, starts_at: new Date(Date.now() - 600000).toISOString(), title: 'Week 1' });
+hub.sessions.push({ id: randomUUID(), cohort_id: hub.cohort.id, number: 2, starts_at: new Date(Date.now() + 6 * 86400000).toISOString(), title: 'Week 2' });
 const copy = (v) => JSON.parse(JSON.stringify(v));
 const teaches = (uid) => uid === BEN;
 const seesBoard = (uid, b) => teaches(uid) || !b.group_id || hub.groups.some(g => g.id === b.group_id && g.group_members.some(m => m.user_id === uid));
@@ -118,8 +120,19 @@ async function presenceSync(topic) {
 }
 
 const browser = await chromium.launch({ executablePath: CHROME, headless: true });
-async function open(who, query, size = { width: 1280, height: 800 }) {
+async function open(who, query, size = { width: 1280, height: 800 }, harness = null) {
   const ctx = await browser.newContext({ viewport: size });
+  if (harness) {
+    await ctx.route(origin + '/__harness', route => route.fulfill({ contentType: 'text/html', body: harness }));
+    // A stand-in for Meet's add-on SDK: the main stage's client, whose
+    // message handler the test calls the way the panel's notifyMainStage would.
+    await ctx.addInitScript(() => {
+      window.meet = { addon: { createAddonSession: async () => ({ createMainStageClient: async () => ({
+        on: (e, cb) => { if (e === 'frameToFrameMessage') window.__stageMessage = cb; }, notifySidePanel: async () => {}
+      }) }) } };
+    });
+    await ctx.route(/meetjs\/addons/, route => route.fulfill({ contentType: 'text/javascript', body: '' }));
+  }
   await ctx.route(/cdn\.jsdelivr\.net\/npm\/@supabase\/supabase-js/, async route => {
     route.fulfill({ contentType: 'text/javascript', body: await readFile(join(here, 'fake-supabase.js'), 'utf8') });
   });
@@ -140,7 +153,7 @@ async function open(who, query, size = { width: 1280, height: 800 }) {
     (presence[topic] = presence[topic] || {})[people[who].id] = [meta];
     await presenceSync(topic);
   });
-  await page.goto(origin + '/board/' + query);
+  await page.goto(harness ? origin + '/__harness' : origin + '/board/' + query);
   return page;
 }
 
@@ -294,6 +307,65 @@ const [png] = await Promise.all([bea.waitForEvent('download'), bea.click('[data-
 const [svg] = await Promise.all([bea.waitForEvent('download'), bea.click('[data-download="svg"]')]);
 check('a student can download the board as PNG and SVG',
   png.suggestedFilename() === 'stand-in-week-1-board.png' && svg.suggestedFilename() === 'stand-in-week-1-board.svg');
+
+// A design scene's template (R5): two people open the same empty board
+// from the scene at once, and it is laid once, saved, and never laid
+// again over what anyone drew or erased.
+const tq = '?c=stand-in&s=week-2&t=prompt';
+const [tBen, tBea] = await Promise.all([open('ben', tq), open('bea', tq)]);
+await until(async () => (await live(tBen)) && (await live(tBea)), 20000);
+const tIds = (page) => page.evaluate(() => window.__board.api.getSceneElements().filter(e => e.id.startsWith('tpl-')).map(e => e.id).sort().join());
+const want = BoardLib.templateElements('prompt').map(e => e.id).sort().join();
+check('a template is laid once on an empty board, even when two people open it at once',
+  await until(async () => (await tIds(tBen)) === want && (await tIds(tBea)) === want));
+const week2 = () => hub.boards.find(b => b.session_id === hub.sessions[1].id && !b.group_id);
+check('the template is saved with the board',
+  await until(() => week2() && week2().scene.elements.filter(e => e.id.startsWith('tpl-')).length === want.split(',').length, 10000));
+check('its frames are locked, so drawing never moves them',
+  await tBea.evaluate(() => window.__board.api.getSceneElements().filter(e => e.id.startsWith('tpl-')).every(e => e.locked)));
+check('the template’s titles are the course’s words',
+  await tBea.evaluate(() => window.__board.api.getSceneElements().some(e => e.type === 'text' && e.text === 'The real prompt')));
+await drawRect(tBea, 300, 520, 420, 600);
+await until(() => week2().scene.elements.length > want.split(',').length, 10000);
+const count = week2().scene.elements.length;
+const again = await open('ben', '?c=stand-in&s=week-2&t=moves');
+await until(() => live(again), 20000);
+await new Promise(r => setTimeout(r, 1500));
+check('a board that already has something on it is never laid with a template again',
+  !(await again.evaluate(() => window.__board.api.getSceneElements().some(e => e.id.startsWith('tpl-moves'))))
+  && week2().scene.elements.length === count);
+for (const p of [tBen, tBea, again]) { pages.delete(p); await p.context().close(); }
+
+// The main stage (R5): the Meet add-on's stage, framed as Meet frames
+// it, told by its panel that the current scene is a design stage, shows
+// that live board, with its template, where the scene's words would be.
+const stagePage = await open('bea', null, { width: 1280, height: 720 },
+  '<!doctype html><body style="margin:0"><iframe src="/addon/stage/" style="border:0;width:100vw;height:100vh"></iframe></body>');
+const stageFrame = () => stagePage.frames().find(f => /\/addon\/stage\//.test(f.url()));
+await until(async () => stageFrame() && await stageFrame().evaluate(() => !!window.__stageMessage).catch(() => false), 15000);
+const view = AddonLib.stageView({ part: { key: 's', name: 'Design stage', endsAt: null },
+  scene: { eyebrow: 'Design stage', title: 'The three questions', lines: ['Where is it going?'], items: [], board: AddonLib.boardLinks(hub.cohort, { number: 3 }, null, 'questions').stage } });
+hub.sessions.push({ id: randomUUID(), cohort_id: hub.cohort.id, number: 3, starts_at: new Date(Date.now() + 13 * 86400000).toISOString(), title: 'Week 3' });
+await stageFrame().evaluate((m) => window.__stageMessage({ payload: m }), AddonLib.stageMessage(view));
+const boardInStage = () => stagePage.frames().find(f => /\/board\/\?.*view=stage/.test(f.url()));
+check('a design scene puts its live board on the main stage',
+  await until(async () => boardInStage() && await boardInStage().evaluate(() => !!(window.__board && window.__board.api)).catch(() => false), 20000));
+check('and the board there is laid with the scene’s template',
+  await until(async () => (await boardInStage().evaluate(() => window.__board.api.getSceneElements().filter(e => e.id.startsWith('tpl-questions')).length)) === BoardLib.templateElements('questions').length));
+check('the scene’s own lines step aside for the board',
+  await stageFrame().evaluate(() => getComputedStyle(document.querySelector('[data-s-lines]')).display === 'none'));
+const src = await stageFrame().evaluate(() => document.querySelector('[data-s-board] iframe').src);
+await stageFrame().evaluate((m) => window.__stageMessage({ payload: m }), AddonLib.stageMessage({ ...view, part: { ...view.part, name: 'Design stage, edited' } }));
+await new Promise(r => setTimeout(r, 500));
+check('a new message for the same scene keeps the board as it is, without reloading it',
+  await stageFrame().evaluate(() => document.querySelectorAll('[data-s-board] iframe').length) === 1
+  && await stageFrame().evaluate(() => document.querySelector('[data-s-board] iframe').src) === src
+  && await boardInStage().evaluate(() => !!window.__board));
+if (shots) await stagePage.screenshot({ path: join(shots, 'main-stage-design-1280.png') });
+await stageFrame().evaluate((m) => window.__stageMessage({ payload: m }), AddonLib.stageMessage({ mode: 'scene', part: null, scene: { eyebrow: 'Talk', title: 'Arrive', lines: ['Welcome back.'], items: [] } }));
+check('moving on to a talk scene takes the board off the stage',
+  await until(() => stageFrame().evaluate(() => document.querySelector('[data-s-board]').hidden && !document.querySelector('[data-s-board] iframe'))));
+pages.delete(stagePage); await stagePage.context().close();
 
 check('no page threw an error', [...pages.values()].every(i => !i.errors.length) || (console.log([...pages.values()].map(i => i.errors)), false));
 console.log(`\n${stats.messages} messages relayed, the largest ${stats.largest} bytes; ${stats.saves} saves.`);

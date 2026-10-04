@@ -194,8 +194,21 @@
         qf.fill(LL.questionFields(s && s.kind === 'question' ? c : null));
         f.insertBefore(qf.el, optionsL.nextSibling);
       }
-      var template = el('input'); template.name = 'template'; template.maxLength = 60; template.value = c.template || '';
-      var templateL = field('Design stage template', template, 'Its name, or empty for a blank board.');
+      // The design stage's templates (R5, BoardLib.TEMPLATES), laid on the
+      // board the first time the scene opens it.
+      var BL = window.BoardLib, template;
+      if (BL) {
+        template = el('select'); template.name = 'template';
+        BL.TEMPLATES.forEach(function (t) { var o = el('option', null, t.name); o.value = t.key === 'blank' ? '' : t.key; template.appendChild(o); });
+        template.value = BL.template(c.template) ? (c.template === 'blank' ? '' : c.template) : '';
+      } else {
+        template = el('input'); template.name = 'template'; template.maxLength = 60; template.value = c.template || '';
+      }
+      var templateHint = BL ? (BL.template(template.value || 'blank') || {}).line : 'Its name, or empty for a blank board.';
+      var templateL = field('Design stage template', template, templateHint);
+      if (BL) template.addEventListener('change', function () {
+        templateL.querySelector('.hint').textContent = (BL.template(template.value || 'blank') || {}).line || '';
+      });
       var rooms = el('textarea'); rooms.name = 'room_scenes'; rooms.rows = 5; rooms.value = S.roomScenesToText(c.room_scenes);
       var roomsL = field('The room’s own scenes', rooms, 'One per line, a title and its minutes, such as “Their question, 2”.');
       var note = el('textarea'); note.name = 'note'; note.rows = 2; note.maxLength = 4000; note.value = (s && notes[s.id]) || '';

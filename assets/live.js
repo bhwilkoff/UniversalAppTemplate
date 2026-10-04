@@ -212,6 +212,7 @@
     body.hidden = !body.children.length;
     if (show) show.update(key, runInfo());
     if (S.checks) drawSceneQuestion();
+    designHref();
   }
 
   // ------------------------------------------------------------------
@@ -307,7 +308,9 @@
     if (S.teaching) show.slot('pushed', $('[data-pushed-section]'));
     var board = el('div');
     board.appendChild(el('p', 'small', 'This week’s design stage for the whole cohort. Everyone draws on it at once, and it is kept with the session.'));
-    var open = el('a', 'btn-github', 'Open the design stage'); open.href = '/board/?c=' + encodeURIComponent(S.cohort.slug) + '&s=week-' + S.session.number; open.target = '_blank'; open.rel = 'noopener';
+    var open = el('a', 'btn-github', 'Open the design stage'); open.target = '_blank'; open.rel = 'noopener';
+    S.designLink = open;
+    designHref();
     board.appendChild(el('p')).appendChild(open);
     show.slot('design', board);
   }
@@ -836,6 +839,17 @@
       askFields = Q.fields({ bank: bank, basic: !S.kinds });
       $('[data-ask-fields]').replaceChildren(askFields.el);
     });
+  }
+
+  // The design stage's link carries the current design scene's template
+  // (R5), so the board is laid with it the first time it opens.
+  function designHref() {
+    if (!S.designLink) return;
+    var part = typeof partNow === 'function' && S.session ? partNow() : null;
+    var t = part && part.kind === 'design' ? (part.config || {}).template : null;
+    var B = window.BoardLib;
+    S.designLink.href = B ? B.link(S.cohort.slug, S.session, null, false, t)
+      : '/board/?c=' + encodeURIComponent(S.cohort.slug) + '&s=week-' + S.session.number;
   }
 
   // A question scene in the run of show (R2) holds the question the

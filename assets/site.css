@@ -1219,6 +1219,13 @@ body.addon-body { min-height: 100vh; }
 .stage-lines { display: grid; gap: 1.6vmin; max-width: 46ch; }
 .stage-lines .stage-what { font-weight: 450; line-height: 1.35; }
 .stage-clock-scene { font-size: clamp(2rem, 9vmin, 6rem); }
+/* The design stage (R5): the live board fills the stage under a small
+   title, and the scene's own lines step aside for it. */
+[data-view="scene"].has-board:not([hidden]) { max-width: none; align-content: stretch; grid-template-rows: auto auto 1fr; gap: 1vmin; }
+[data-view="scene"].has-board .stage-title { font-size: clamp(1.25rem, 3.6vmin, 2.25rem); max-width: none; }
+[data-view="scene"].has-board .stage-lines, [data-view="scene"].has-board [data-s-items], [data-view="scene"].has-board .stage-note, [data-view="scene"].has-board .stage-clock-scene { display: none; }
+.stage-board:not([hidden]) { display: block; min-height: 60vh; border: 1px solid var(--rule); border-radius: var(--radius); overflow: hidden; background: #fff; }
+.stage-board iframe { display: block; width: 100%; height: 100%; min-height: 60vh; border: 0; }
 
 /* ------------------------------------------------------------------
    Accessibility audit (October 3, 2026): targets at least 24 px tall

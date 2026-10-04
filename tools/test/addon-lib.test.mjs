@@ -190,3 +190,18 @@ test('every kind of question goes on the stage with its results and no names (R4
   assert.equal(lib.stageView({ onStage: { kind: 'check', id: 'q' }, checks: [short], results: { q: { total: 4 } } }).count, null);
   assert.equal(lib.readStageMessage(JSON.stringify({ type: 'hs-stage', v: 1, view: { mode: 'check', prompt: 'x', kind: 'essay' } })).kind, 'choice');
 });
+
+test('a design scene puts its own board on the main stage, and nothing else gets through (R5)', () => {
+  const cohort = { slug: 'fall-2026' }, session = { number: 2 };
+  const links = lib.boardLinks(cohort, session, null, 'prompt');
+  assert.equal(links.stage, '/board/?c=fall-2026&s=week-2&view=stage&t=prompt');
+  assert.equal(lib.boardLinks(cohort, session, null, 'blank').stage, '/board/?c=fall-2026&s=week-2&view=stage');
+  assert.equal(lib.boardLinks(cohort, session, null, 'x&y=1').stage, '/board/?c=fall-2026&s=week-2&view=stage');
+  const view = lib.stageView({ part: { key: 's', name: 'Design', endsAt: null }, scene: { eyebrow: 'Design stage', title: 'Read one real prompt', lines: [], items: [], board: links.stage } });
+  assert.equal(view.scene.board, links.stage);
+  assert.deepEqual(lib.readStageMessage(lib.stageMessage(view)), view);
+  for (const bad of ['https://evil.example/board/?c=x&s=week-1&view=stage', '/board/?c=x&s=week-1', 'javascript:alert(1)', '/board/?c=x&s=week-1&view=stage&t=a"b', '/account/']) {
+    const v = lib.readStageMessage(JSON.stringify({ type: 'hs-stage', v: 1, view: { mode: 'scene', scene: { title: 'x', board: bad } } }));
+    assert.equal(v.scene.board, undefined, bad);
+  }
+});
