@@ -31,7 +31,13 @@
 
   // The visitor's own GitHub sign-in, when they have one on this site,
   // raises GitHub's limit from 60 calls an hour to 5,000.
+  // The tab keeps it in sessionStorage for 7.5 hours (discussions-lib.js),
+  // and older sign-ins may still have it in the saved session.
   function githubToken() {
+    try {
+      var held = JSON.parse(sessionStorage.getItem('hs-github-token') || 'null');
+      if (held && typeof held.token === 'string' && Date.now() - held.at < 7.5 * 3600000) return held.token;
+    } catch (e) {}
     try {
       var s = JSON.parse(localStorage.getItem('sb-bifrieqzkihuxfzttgvd-auth-token') || 'null');
       return s && s.provider_token || null;
@@ -280,9 +286,57 @@
       box.appendChild(el('p', null, talk.kind === 'discussions'
         ? 'Conversation about this app happens in its repository’s Discussions on GitHub, where anyone with a GitHub account can ask a question, share what they noticed, or say what it meant to them.'
         : 'Conversation about this app happens in its repository’s Issues on GitHub, where anyone with a GitHub account can ask a question or say what they noticed.'));
+      var recent = el('div', 'app-threads');
+      box.appendChild(recent);
       var a = el('div', 'actions');
       var go = link(talk.href, talk.kind === 'discussions' ? 'Join the conversation' : 'Open its Issues', 'btn-github');
       a.appendChild(go); box.appendChild(a);
+      drawThreads(recent, repo, talk.kind);
+    }
+
+    // Its newest few threads, read live and never kept beyond the ten
+    // minutes every GitHub answer is remembered. Issues need no sign-in;
+    // GitHub only lists Discussions to someone signed in, so without a
+    // GitHub sign-in this page keeps to the link.
+    function drawThreads(box, repo, kind) {
+      var C = window.CommunityLib;
+      if (!C) return;
+      function show(list, trouble) {
+        box.replaceChildren();
+        if (trouble) { if (trouble.kind === 'limited') box.appendChild(el('p', 'small', lib.troubleText(trouble))); return; }
+        if (!list.length) { box.appendChild(el('p', 'small', kind === 'discussions' ? 'No one has started a discussion here yet.' : 'No one has opened an issue here yet.')); return; }
+        var ol = el('ol', 'feed');
+        list.forEach(function (t) {
+          var item = el('li');
+          item.appendChild(link(t.url, t.title, 'feed-line'));
+          item.appendChild(el('span', 'feed-when', C.threadLine(t, function (iso) { return clib.ago(iso, new Date()); })));
+          ol.appendChild(item);
+        });
+        box.appendChild(ol);
+      }
+      if (kind === 'issues') {
+        github('repos/' + repo + '/issues?state=all&sort=updated&direction=desc&per_page=30', function (list) { return C.fromIssues(list, 3); })
+          .then(function (r) { show(r.data || [], r.trouble); });
+        return;
+      }
+      var token = githubToken();
+      if (!token) { box.appendChild(el('p', 'small', 'Sign in with GitHub on this site and its newest discussions will show here.')); return; }
+      var key = 'hs-gh:discussions:' + repo;
+      var hit = remember(key, TTL);
+      if (hit !== undefined) return show(hit);
+      var parts = repo.split('/');
+      fetch('https://api.github.com/graphql', {
+        method: 'POST',
+        headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: C.DISCUSSIONS, variables: { owner: parts[0], name: parts[1], n: 3 } })
+      }).then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (data) {
+          if (!data) return;
+          var list = C.fromDiscussions(data, 3);
+          keep(key, list);
+          show(list);
+        })
+        .catch(function () {});
     }
   }
 
