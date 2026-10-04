@@ -164,8 +164,13 @@
   // meetRequest is the cohort's newest request to meet@ (setup_requests,
   // migration 20261004000000), or null. Words by Claude, awaiting Ben's
   // review.
-  function cohortSetupSteps(cohort, sessions, myAccess, meetRequest) {
+  // `more` carries what the page knows besides the database rows above:
+  // groups (the cohort's groups, each with meet_url) and rehearsed (this
+  // browser has opened the cohort's live page as its teacher). A step
+  // marked optional never keeps the card open.
+  function cohortSetupSteps(cohort, sessions, myAccess, meetRequest, more) {
     sessions = sessions || [];
+    more = more || {};
     var slug = encodeURIComponent(cohort.slug || '');
     var linked = sessions.filter(function (s) { return !!s.meet_url; }).length;
     var eventDone = sessions.length > 0 && linked === sessions.length;
@@ -184,6 +189,16 @@
         done: !!(myAccess && myAccess.state === 'member') });
     }
     steps.push({ key: 'open', label: 'Open the cohort, so people can join', action: 'edit', done: cohort.status !== 'draft' });
+    // Rooms are made for groups that exist, and groups wait for people,
+    // so this comes after opening: make the trios, then ask meet@ again.
+    var groups = more.groups || [];
+    var roomed = groups.length > 0 && groups.every(function (g) { return !!g.meet_url; });
+    steps.push({ key: 'groups', label: 'Once people have joined, make the trios, then ask meet@ again so each one has its room', action: 'groups',
+      done: roomed, note: groups.length && !roomed ? 'A group without a room still needs one.' : null });
+    steps.push({ key: 'rehearse', label: 'Open the live page once before the first session, and try a timer and a check, so nothing in the session is new to you',
+      href: '/live/?c=' + slug, done: !!more.rehearsed });
+    steps.push({ key: 'agent', label: 'Connect your own AI agent, if you would like it to read the cohort with you', href: '/connect/',
+      done: false, optional: true });
     return steps;
   }
 

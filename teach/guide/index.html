@@ -66,7 +66,8 @@
   </header>
 
   <!-- The words on this page outside the rendered course were written by
-       Claude for milestone M2 (October 3, 2026) and await Ben's review. -->
+       Claude for milestone M2 (October 3, 2026), rewritten for H1 (October
+       4) to match the hub as it is now, and await Ben's review. -->
   <main id="main">
     <div class="wrap">
       <p class="crumbs"><a href="/cohorts/#teach">Cohorts</a> &rsaquo; The teaching guide</p>
@@ -80,11 +81,15 @@
 
       <section class="section first" aria-label="What teaching asks">
         <div class="topics single">
+          <!-- Rewritten by Claude for H1 (October 4, 2026) so that every
+               line matches what the hub does now; awaiting Ben's review. -->
+          <p class="draft-note">Written by Claude, awaiting Ben's review.</p>
           <div class="topic" id="asks">
             <h2>What it asks of you.</h2>
             <div class="prose">
-              <p>A cohort runs for about five weeks, with a week of setup before them and one live session every week on Google Meet, at a day and time you choose. Each session has the same three parts in the same order (people show what they brought back, everyone reads one real prompt together, and then everyone builds), and every one has moments to stop and check what people understood, where what they explain back is the decisions they made rather than the code the agent wrote.</p>
-              <p>Between sessions, people ask you for feedback on what they built and ask you questions, and each one waits on your teaching page until you answer it, oldest first, so nobody's request sinks under a newer one. You also set the cohort's groups (pairs, trios, or small groups, easy to change), and you write each week's challenge in your own words.</p>
+              <p>A cohort runs for five weeks, with a week of setup before them and one live session every week on Google Meet, at a day and time you choose. Every session has the same six parts in the same order, so nobody spends the first ten minutes wondering what happens next: people arrive with one line in the chat, show what they brought back to their trio, hear one value at work, read one real prompt together after trying it first, start the coming week before they leave, and answer a check for understanding in the last three minutes. The course below gives each part its reasons, and the weekly guides give each one its minutes.</p>
+              <p>The cohort works in trios, because a trio still has two people to show when one is away, and you make them once people have joined and change them whenever the cohort needs it. Between sessions, people ask you for feedback on what they built and ask you questions, and each one waits on your teaching page until you answer it, oldest first, so nobody's request sinks under a newer one. You also write each week's challenge in your own words, and you read the checks for understanding before the next session, because the first thing you say when people arrive is what you read in them and what you changed because of it.</p>
+              <p>Nobody needs to be an expert in building apps to teach, since the work is running the session, reading the checks, and noticing who needs a word. A new teacher's first session goes best when it feels familiar, so the course asks you to co-lead one session of someone else's cohort first, taking the parts you are most comfortable with. A cohort's teacher can add you as a co-teacher on their teaching page, and you can step away again afterwards.</p>
             </div>
           </div>
 
@@ -92,26 +97,43 @@
             <h2>What you need before the first session.</h2>
             <div class="prose">
               <p><strong>Time,</strong> first of all: five weekly sessions, plus the hours between them to read what people share and answer it.</p>
-              <p><strong>A GitHub account,</strong> because it is how you sign in here, where your students' apps live, and where your cohort talks. Each cohort's conversation is a private repository in the humanshaped organization, reached through a secret team of the cohort's people, and since only the organization's owners can make those, for now I make them for each cohort and you name them on your teaching page.</p>
+              <p><strong>A GitHub account,</strong> because it is how you sign in here, where your students' apps live, and where your cohort talks. Each cohort's conversation is a private repository in the humanshaped organization, reached through a secret team of the cohort's people, and the "Before the first session" list on your teaching page makes both with one button, then adds you to the team.</p>
+              <p>The same list walks you through the rest in order: the schedule, the weekly sessions, the calls, opening the cohort, making the trios once people have joined, and opening the live page once to try a timer and a check before anyone else is there. Each step checks itself off when the hub can see it is done.</p>
             </div>
           </div>
 
           <div class="topic" id="host">
-            <h2>A Google account to host from.</h2>
+            <h2>The calls, and who hosts them.</h2>
             <div class="prose">
-              <p>Only the host needs one, because your students join from whatever account they already have. I host my own cohorts from meet@humanshaped.org, an account set aside for sessions so that nothing depends on my personal login, and an account of your own set aside the same way does the same for you.</p>
-              <p>The hub never pays for a seat, which keeps it free to run, and the cost of that choice falls on the host: a free personal Google account ends group calls at 60 minutes and has no breakout rooms. So either keep your sessions within the hour, or host from an account you already have through work or school, once you have checked that it allows longer calls.</p>
+              <p>Every cohort's calls are hosted from meet@humanshaped.org, an account set aside for sessions so that nothing depends on anyone's personal login, and your students join from whatever Google account they already have. You do not need a Google account of your own to host. From your teaching page you ask meet@ to set up the calls, and within the hour it makes the weekly event with its Meet link, puts that link on every week, and makes a room for each trio, which its members find on their cohort page and the live page. If you make the trios after asking, ask again and the rooms follow.</p>
+              <p>Sessions are recorded so that missing a week never means falling behind. The <a href="https://github.com/bhwilkoff/UniversalAppTemplate/blob/site/tools/session-recorder/README.md">session recorder</a> is a free Chrome extension that only the host installs, and it will not start until the host has read its notice aloud and pasted it into the chat. It saves the recording to the host's own computer and, if they choose, uploads it to the cohort's own folder, which only the cohort can open. It can also count your own share of the talking, from your microphone alone and only if you turn that on, and it never measures anyone else.</p>
             </div>
           </div>
 
           <div class="topic" id="event">
-            <h2>The weekly event and its Meet link.</h2>
+            <h2>During a session.</h2>
             <div class="prose">
-              <p>Once you have made the weekly sessions on your teaching page, each week needs its Meet link. The simplest way is one recurring Calendar event, made by hand from your host account with a Meet link, which keeps the same link every week. The <a href="https://github.com/bhwilkoff/UniversalAppTemplate/blob/site/tools/meet-events/README.md">Meet events script</a> does the same work and checks it for you, though it was written for meet@humanshaped.org and has not yet been run by another host. Either way, put the link in each week on your teaching page, and your cohort's pages will show it.</p>
-              <p>Sessions are recorded so that missing a week never means falling behind, and the <a href="https://github.com/bhwilkoff/UniversalAppTemplate/blob/site/tools/session-recorder/README.md">session recorder</a> is a free Chrome extension that only the host installs. It was built around meet@humanshaped.org too, and making it work for other hosts is still to come.</p>
+              <p>Keep your cohort's <strong>live page</strong> open beside Meet. It has the agenda with a timer for each part, the queue of work people want to show, the checks for understanding with an anonymous count you may choose to show, and what people brought back. From it you send everyone to their trios' rooms with a countdown and call them back, put a card in front of everyone, say who is on stage, and say when the session is being recorded, and every student's live page shows the same thing at the same moment.</p>
+              <p>The rooms board on the live page shows where each trio is in its turns and whose turn it is, and a trio that would like you lights up, so you join its room, say that you are there, and press "I am here". The session's thread is a discussion in the cohort's repository, opened from the live page, where links and questions for later stay after the call under each person's own name. The <a href="/board/">board</a> is a drawing space the whole cohort, or one trio, can draw on at once.</p>
+              <p>The <strong>Human Shaped add-on for Meet</strong> puts the same agenda, queue, checks, thread, and rooms in Meet's own side panel, with a welcome and a calm main stage you can present. It is still being tested on our own accounts and is not yet listed for everyone, so until it is, the live page in a second tab does all of the same work.</p>
             </div>
           </div>
 
+          <div class="topic" id="after">
+            <h2>After a session.</h2>
+            <div class="prose">
+              <p>Your teaching page gathers what each person did on purpose during the session (what they showed, asked, answered, and said to their partners) with a place to write each of them a follow-up. A follow-up stays in your own browser until you send it, and it reaches the student as feedback on what they brought back, or as a note to them alone. Students keep their notes after the cohort ends or they leave it, they can remove any of them, and you can correct the words of anything you sent, which shows them it was edited.</p>
+              <p>The course asks you to write privately, within two days, to anyone who missed a session or brought nothing back, with an easy way back in and an easy way out. People choose on their account page whether their teachers may email them, and for those who do, your teaching page opens your own email with your words already in it. For everyone else, a note on their cohort page is how to reach them.</p>
+              <p>When a cohort finishes, the people who stayed are marked finished and can still read it, you record the credential for each person whose work earned it, and anyone holding a credential can come back to a later cohort as a mentor.</p>
+            </div>
+          </div>
+
+          <div class="topic" id="agent">
+            <h2>Your own agent, if you would like one.</h2>
+            <div class="prose">
+              <p>Your students connect their own Claude or Gemini to the hub, and so can you, on the <a href="/connect/">connect page</a>. For a teacher it adds a few things a student's agent cannot see: the cohort's roster and apps, one student's work across the weeks, and the class as it stands right now, with prompts for preparing a session and for checking a piece of code with you during class. It only reads, it is labeled as AI wherever it speaks, and it never stands in for what you say to your students yourself.</p>
+            </div>
+          </div>
           <!-- Written by Claude for C9 (October 3, 2026), awaiting Ben's
                review. The OBS names were checked against obsproject.com's
                own guides; what they did not say is marked below. -->

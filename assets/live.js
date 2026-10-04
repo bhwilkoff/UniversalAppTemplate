@@ -101,6 +101,9 @@
           if (!ss.length) return show('not-member');
           S.cohort = cohort;
           S.teaching = teachers.some(function (t) { return t.user_id === S.me.id; });
+          // /teach/'s "Before the first session" checks off rehearsing
+          // once this browser has opened the live page as its teacher.
+          if (S.teaching) { try { localStorage.setItem('hs-rehearsed:' + cohort.id, '1'); } catch (e) {} }
           S.mine = people.filter(function (p) { return p.user_id === S.me.id; })[0] || null;
           if (!S.mine && !S.teaching) return show('not-member');
           people.concat(teachers).forEach(function (p) { if (p.profiles) S.names[p.user_id] = p.profiles.display_name || p.profiles.github_login; });

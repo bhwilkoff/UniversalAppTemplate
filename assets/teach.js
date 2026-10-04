@@ -208,6 +208,8 @@
       say('[data-detail-message]', '');
       drawSessions(res[1].data);
       drawRoster(res[2].data, res[3].data);
+      drawTeachers();
+      $('[data-live-link]').href = '/live/?c=' + encodeURIComponent(c.slug);
       loadSubmissions(res[2].data, res[1].data);
       drawGroups(res[3].data, res[2].data);
       drawCohortSetup(res[1].data, res[4].data, null);
@@ -233,8 +235,11 @@
   // checked off by what the hub can see (TeachLib.cohortSetupSteps). The
   // card goes away once every step is done.
   function drawCohortSetup(sessions, access, meetRequest) {
-    var steps = lib.cohortSetupSteps(current, sessions, access, meetRequest);
-    $('[data-cohort-setup]').hidden = steps.every(function (x) { return x.done; });
+    // /live/ remembers, in this browser only, that its teacher opened it.
+    var rehearsed = false;
+    try { rehearsed = !!localStorage.getItem('hs-rehearsed:' + current.id); } catch (e) {}
+    var steps = lib.cohortSetupSteps(current, sessions, access, meetRequest, { groups: currentGroups, rehearsed: rehearsed });
+    $('[data-cohort-setup]').hidden = steps.every(function (x) { return x.done || x.optional; });
     var list = $('[data-cohort-setup-steps]');
     list.replaceChildren();
     steps.forEach(function (x) {
@@ -247,10 +252,12 @@
           if (x.action === 'sessions') $('[data-make-sessions]').click();
           else if (x.action === 'meet') askMeet(target);
           else if (x.action === 'provision') provision(target);
+          else if (x.action === 'groups') { var g = $('#groups'); if (g) g.scrollIntoView({ block: 'start' }); }
           else fillForm(current);
         });
       }
       li.appendChild(target);
+      if (x.optional) li.appendChild(el('span', 'small', ' (if you would like)'));
       if (x.note) li.appendChild(el('span', 'small', ' ' + x.note));
       if (x.done) li.appendChild(el('span', 'visually-hidden', ' (done)'));
       list.appendChild(li);
@@ -737,6 +744,72 @@
   }
 
   function personName(e) { return e.profiles ? (e.profiles.display_name || e.profiles.github_login) : 'Someone'; }
+
+  // Co-teachers (H1; migration 20261004020000). Anyone in public.teachers
+  // can be added; anyone but the cohort's maker can be taken off, and
+  // the database refuses to leave a cohort with no teacher. Words by
+  // Claude, awaiting Ben's review.
+  function drawTeachers() {
+    var c = current;
+    Promise.all([
+      db.from('cohort_teachers').select('user_id, profiles(github_login, display_name)').eq('cohort_id', c.id),
+      db.from('teachers').select('user_id, profiles(github_login, display_name)')
+    ]).then(function (res) {
+      if (!current || current.id !== c.id) return;
+      var box = $('[data-teachers]');
+      box.replaceChildren();
+      var form = $('[data-co-teacher-form]');
+      if (res[0].error) { box.appendChild(el('li', 'small', 'The teachers could not be read just now.')); form.hidden = true; return; }
+      var here = res[0].data;
+      var ids = here.map(function (t) { return t.user_id; });
+      here.forEach(function (t) {
+        var li = el('li');
+        li.appendChild(el('strong', null, t.user_id === me.id ? 'You' : personName(t)));
+        if (t.user_id === c.created_by) { li.appendChild(el('span', 'small', ' made this cohort')); box.appendChild(li); return; }
+        var msg = el('span', 'small'); msg.setAttribute('role', 'status');
+        var rm = el('button', 'btn-link', t.user_id === me.id ? 'Step away from this cohort' : 'Take them off');
+        rm.type = 'button';
+        rm.addEventListener('click', function () {
+          if (!rm.hasAttribute('data-armed')) {
+            rm.setAttribute('data-armed', '');
+            rm.textContent = t.user_id === me.id ? 'Step away: you will no longer teach it' : 'Take ' + personName(t) + ' off this cohort';
+            return;
+          }
+          rm.disabled = true;
+          db.from('cohort_teachers').delete().eq('cohort_id', c.id).eq('user_id', t.user_id).select('user_id').then(function (r) {
+            rm.disabled = false;
+            if (r.error || !r.data.length) { msg.textContent = ' Not removed: ' + (r.error ? r.error.message : 'the database refused') + '.'; return; }
+            if (t.user_id === me.id) { current = null; $('[data-detail]').hidden = true; loadList(); return; }
+            drawTeachers();
+          });
+        });
+        li.appendChild(document.createTextNode(' '));
+        li.appendChild(rm); li.appendChild(msg);
+        box.appendChild(li);
+      });
+      var choices = (res[1].data || []).filter(function (t) { return ids.indexOf(t.user_id) === -1; });
+      var select = $('[data-co-teacher-choices]');
+      select.replaceChildren();
+      choices.forEach(function (t) {
+        var o = document.createElement('option');
+        o.value = t.user_id;
+        o.textContent = personName(t) + (t.profiles ? ' (@' + t.profiles.github_login + ')' : '');
+        select.appendChild(o);
+      });
+      form.hidden = !choices.length;
+    });
+  }
+  $('[data-co-teacher-form]').addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var f = ev.target, uid = f.user_id.value, msg = $('[data-co-teacher-message]');
+    if (!uid || !current) return;
+    var btn = f.querySelector('button'); btn.disabled = true;
+    db.from('cohort_teachers').insert({ cohort_id: current.id, user_id: uid }).then(function (r) {
+      btn.disabled = false;
+      msg.textContent = r.error ? 'Not added: ' + r.error.message + '.' : 'Added. They will find the cohort on their own teaching page.';
+      if (!r.error) drawTeachers();
+    });
+  });
 
   function drawRoster(people) {
     var box = $('[data-roster]');

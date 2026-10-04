@@ -188,6 +188,7 @@
             <div class="actions">
               <button class="btn-quiet" type="button" data-edit>Edit the details</button>
               <button class="btn-quiet" type="button" data-make-sessions>Make the weekly sessions</button>
+              <a class="btn-quiet" data-live-link href="/live/">Open the live page</a>
               <button class="btn-quiet" type="button" data-copy-meet>Copy the setup for the Meet script</button>
               <button class="btn-quiet danger" type="button" data-delete-draft hidden>Delete this draft</button>
             </div>
@@ -231,14 +232,28 @@
             <h3>People</h3>
             <div data-roster></div>
 
+            <!-- Co-teachers (H1): words by Claude, awaiting Ben's review. -->
+            <h3 id="teachers">Teachers</h3>
+            <p class="small">A cohort can have more than one teacher, and a new teacher leads best after co-leading a session of someone else's cohort first. Anyone who teaches here can be added, and a co-teacher sees and does everything you do on this page.</p>
+            <ul class="roster" data-teachers></ul>
+            <form class="inline-form" data-co-teacher-form hidden>
+              <label>Add a co-teacher
+                <select name="user_id" required data-co-teacher-choices></select>
+              </label>
+              <div class="actions">
+                <button class="btn-quiet" type="submit">Add them</button>
+                <span class="small" role="status" data-co-teacher-message></span>
+              </div>
+            </form>
+
             <!-- The words in the apps section were written by Claude for
                  milestone M10 and await Ben's review. -->
             <h3 id="apps">Their apps on humanshaped.org</h3>
             <p class="small" data-submissions-intro></p>
             <div data-submissions></div>
 
-            <h3>Groups</h3>
-            <p class="small">Pairs, trios, or small groups. Everyone can see their own group and what it is for, and you can change them whenever the cohort needs it. Each group can also have its own Meet link for the group part of every session (the Meet script can make one for each), which its members see on their cohort page and the session page.</p>
+            <h3 id="groups">Groups</h3>
+            <p class="small">Trios, because a trio still has two people to show when one is away. Everyone can see their own group and what it is for, and you can change them whenever the cohort needs it. Each group has its own Meet room for the group part of every session, which meet@ makes when you ask it to set up the calls, and its members see it on their cohort page and the live page.</p>
             <div data-groups></div>
             <form class="inline-form" data-group-form>
               <label>New group <input name="name" required maxlength="60" placeholder="Group 1"></label>
