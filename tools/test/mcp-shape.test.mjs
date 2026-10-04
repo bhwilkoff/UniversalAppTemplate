@@ -1,7 +1,7 @@
 // node --test tools/test/
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { chooseCohort, cohortsText, thisWeekText, nextSessionText, groupText, workText, methodUrls, stagePart, thisSessionText, teacherCohort, rosterText, studentWorkText, classNowText, TEACHER_ASIDE, ownAppText } from '../../supabase/functions/mcp/shape.js';
+import { chooseCohort, cohortsText, thisWeekText, nextSessionText, groupText, workText, methodUrls, stagePart, thisSessionText, teacherCohort, rosterText, studentWorkText, classNowText, TEACHER_ASIDE, ownAppText, ownReviewPrompt } from '../../supabase/functions/mcp/shape.js';
 
 const a = { slug: 'fall-2026', title: 'Fall 2026', status: 'running', weeks: 5, starts_on: '2026-10-06', role: 'student' };
 const b = { slug: 'winter-2027', title: 'Winter 2027', status: 'open', weeks: 5, starts_on: null, role: 'teacher' };
@@ -224,4 +224,22 @@ test('a private, hidden, or missing own app is said plainly', () => {
   assert.match(ownAppText({ app_repo: 'a/b', public: true }, { reason: 'unsafe' }, []), /kept off the apps page.*because: unsafe\. Your own switch is unchanged/);
   assert.match(ownAppText(null, null, []), /account\/#own-app/);
   assert.match(ownAppText(null, null, [{ stage: 'setup', item: 'ready', state: 'ready' }]), /Setup: ready to move on \(method part "setup"\)/);
+});
+
+test('the review for someone on their own reads my_app and the method, labels itself as AI, and shares nothing', () => {
+  const t = ownReviewPrompt();
+  assert.match(t, /call my_app/);
+  assert.match(t, /method with part "review-skill"/);
+  assert.match(t, /first one I have not marked ready/);
+  assert.match(t, /AI feedback/);
+  assert.match(t, /no scores or grades/);
+  assert.match(t, /do not compare me with anyone/);
+  assert.match(t, /Do not share it anywhere/);
+  assert.doesNotMatch(t, /cohort page|this_week/);
+});
+
+test('the own review can be pointed at one stage, and setup by name', () => {
+  assert.match(ownReviewPrompt('03'), /method part "stage-03"/);
+  assert.match(ownReviewPrompt('setup'), /method part "setup"/);
+  assert.match(chooseCohort([], undefined).text, /review_my_own_work/);
 });
