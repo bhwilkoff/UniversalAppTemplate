@@ -309,3 +309,17 @@ people sign in with Google in one tap, and the first time they link their
 GitHub account in a small window, so GitHub stays the identity for
 repositories and discussions. The Google sign-in client lives in the
 `human-shaped` Cloud project, at no cost.
+
+## The vocabulary, and who offers the site (October 4, 2026)
+
+Ben on the run-of-show vocabulary: "The vocabulary does feel right,
+although I'm not totally sure about 'board scenes'. Maybe 'Design
+Stage' is better?" So the board scene is the **design stage**, beside
+the main stage. Every other word in research/notes/run-of-show-design.md
+stands.
+
+The site is offered by Learning is Change, Inc., 8287 S Pennsylvania
+Ct., Littleton, CO 80122, the entity on Ben's app store accounts; /terms/
+and /support/ say so, as Google's listing requires. The Gmail account for
+testing as a student is kept in ~/.humanshaped/test-student on Ben's Mac,
+never in this repository.
