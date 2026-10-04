@@ -33,7 +33,7 @@ import './followup-lib.js';
 import {
   chooseCohort, cohortsText, thisWeekText, nextSessionText, groupText, workText, thisSessionText,
   teacherCohort, rosterText, studentWorkText, classNowText,
-  METHOD, methodUrls,
+  METHOD, methodUrls, ownAppText,
 } from './shape.js';
 
 // deno-lint-ignore no-explicit-any
@@ -154,6 +154,17 @@ Deno.serve(
         };
       }
 
+      // A person's own app outside any cohort, and their own path marks.
+      // Each is read on its own, so an older database answers without them.
+      async function ownApp() {
+        const [app, hide, marks] = await Promise.all([
+          supabase.from('builder_apps').select('app_repo, app_name, app_url, public').eq('user_id', uid).maybeSingle(),
+          supabase.from('builder_app_hides').select('reason').eq('user_id', uid).maybeSingle(),
+          supabase.from('stage_marks').select('stage, item, state, note').eq('user_id', uid),
+        ]);
+        return ownAppText(app.error ? null : app.data, hide.error ? null : hide.data, marks.error ? [] : marks.data);
+      }
+
       const handler = createMcpHandler(() => {
         const server = new McpServer({ name: 'humanshaped', version: '0.1.0' });
 
@@ -264,7 +275,9 @@ Deno.serve(
           inputSchema: cohortArg,
           annotations: READ_ONLY,
         }, async ({ cohort }) => {
-          const p = await pick(cohort);
+          const all = await myCohorts();
+          if (!all.length && !cohort) return text(await ownApp());
+          const p = chooseCohort(all, cohort);
           if (!p.cohort) return text(p.text);
           const c = p.cohort;
           const [mine, shares, teachers, notes] = await Promise.all([
@@ -279,6 +292,13 @@ Deno.serve(
           // deno-lint-ignore no-explicit-any
           return text(workText(c, mine.data, shares.data, teachers.data.map((t: any) => t.user_id), uid, notes.error ? [] : notes.data));
         });
+
+        server.registerTool('my_app', {
+          title: 'My own app',
+          description: 'This person\'s own app outside any cohort, whether it shows on the hub, and their own marks on the human-shaped path. For someone building on their own.',
+          inputSchema: z.object({}),
+          annotations: READ_ONLY,
+        }, async () => text(await ownApp()));
 
         server.registerTool('cohort_roster', {
           title: 'Cohort roster (for teachers)',

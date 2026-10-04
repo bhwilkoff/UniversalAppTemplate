@@ -145,6 +145,40 @@ export function workText(cohort, mine, shares, teacherIds, myId, notes) {
   return lines.join('\n');
 }
 
+// A person working on their own, outside any cohort (G2): their own app
+// from builder_apps, whether it shows on the hub (and why not, if it was
+// kept off), and where they stand on the path from their own marks
+// (stage_marks: ready, not yet, and notes of what they would bring back).
+// Nothing here compares them with anyone.
+export function ownAppText(app, hide, marks) {
+  const lines = ['Working on your own, outside any cohort'];
+  if (app) {
+    lines.push(`App: ${app.app_name || '(no name yet)'}`);
+    lines.push(`Repository: https://github.com/${app.app_repo}`);
+    if (app.app_url) lines.push(`Live at: ${app.app_url}`);
+    if (hide) lines.push(`On the hub: kept off the apps page by the people who approve teachers${hide.reason ? ', because: ' + hide.reason : ''}. Your own switch is unchanged.`);
+    else if (app.public) lines.push(`On the hub: shown, at ${SITE}/apps/app/?r=${app.app_repo}`);
+    else lines.push('On the hub: private to you. Only you can choose to show it.');
+  } else {
+    lines.push(`No app of your own on the hub yet. You can add one, private until you choose to show it, at ${SITE}/account/#own-app.`);
+  }
+  const label = (stage) => (stage === 'setup' ? 'Setup' : 'Stage ' + stage);
+  const part = (stage) => (stage === 'setup' ? 'setup' : stagePart(stage));
+  const ready = (marks || []).filter((m) => m.item === 'ready');
+  const notes = (marks || []).filter((m) => m.item === 'note');
+  if (ready.length) {
+    lines.push('', 'Your own marks on the path (private to you):');
+    [...ready].sort((a, b) => a.stage.localeCompare(b.stage)).forEach((m) =>
+      lines.push(`- ${label(m.stage)}: ${m.state === 'ready' ? 'ready to move on' : 'not yet'} (method part "${part(m.stage)}")`));
+  }
+  if (notes.length) {
+    lines.push('', 'What you noted you would bring back:');
+    [...notes].sort((a, b) => a.stage.localeCompare(b.stage)).forEach((m) => lines.push(`- ${label(m.stage)}: ${m.note}`));
+  }
+  lines.push('', `Without a cohort there is no teacher here, so an agent asks the method's questions (method part "review-skill") and says plainly that its feedback is an AI's. Open cohorts are at ${SITE}/cohorts/.`);
+  return lines.join('\n');
+}
+
 // What is happening in the live session right now: the "show your work"
 // queue and the teacher's open questions (migration 20261003080000). The
 // agent reads it so it knows what the person is in the middle of; adding

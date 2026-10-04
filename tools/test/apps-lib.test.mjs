@@ -105,6 +105,34 @@ test('directory apps and shown cohort apps make one list, without repeats', () =
   assert.equal(lib.findApp(apps, 'someone/else'), null);
 });
 
+test('a builder\'s own app is labeled as theirs, and a cohort app of the same repository wins', () => {
+  const apps = lib.mergeApps([], [
+    { app_name: 'Garden Swap', app_repo: 'bea/garden-swap', app_url: null, kind: 'cohort' },
+    { app_name: 'Tide Log', app_repo: 'kim/tide-log', app_url: 'https://kim.github.io/tide-log/', kind: 'builder' },
+    { app_name: 'Again', app_repo: 'Bea/Garden-Swap', app_url: null, kind: 'builder' },
+    { app_name: 'Odd', app_repo: 'x/odd', app_url: null, kind: 'something else' }
+  ]);
+  assert.deepEqual(apps.map(a => [a.repo, a.status, a.source]), [
+    ['bea/garden-swap', 'cohort', 'cohort'],
+    ['kim/tide-log', 'builder', 'builder'],
+    ['x/odd', 'cohort', 'cohort']
+  ]);
+  assert.equal(lib.statusText(apps[1], null), 'Shown here by the person building it');
+  assert.equal(lib.statusText(apps[0], null), 'Being built in a cohort');
+  assert.equal(lib.statusText(apps[1], { status: 'declared' }), 'Declared human-shaped');
+});
+
+test('only a builder\'s own app carries a way to report it, naming the app and nothing else', () => {
+  const href = lib.reportHref({ repo: 'kim/tide-log', source: 'builder' });
+  assert.ok(href.startsWith('https://github.com/humanshaped/directory/issues/new?title='));
+  const q = new URL(href).searchParams;
+  assert.equal(q.get('title'), 'Something is wrong with kim/tide-log on humanshaped.org');
+  assert.match(q.get('body'), /humanshaped\.org\/apps\/app\/\?r=kim\/tide-log/);
+  assert.equal(lib.reportHref({ repo: 'bea/garden-swap', source: 'cohort' }), null);
+  assert.equal(lib.reportHref({ repo: 'a/b', source: 'directory' }), null);
+  assert.equal(lib.reportHref(null), null);
+});
+
 test('the feed reads active apps first and never more than its cap', () => {
   const apps = [{ repo: 'a/old', active: false }, { repo: 'a/one' }, { repo: null }, { repo: 'a/two', active: true }];
   assert.deepEqual(lib.feedRepos(apps, 2).map(a => a.repo), ['a/one', 'a/two']);

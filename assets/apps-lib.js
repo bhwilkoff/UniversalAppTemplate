@@ -31,7 +31,8 @@
       .filter(function (n) { if (seen[n]) return false; seen[n] = true; return true; });
   }
 
-  // One list of apps from the directory and from the hub's public_apps(),
+  // One list of apps from the directory and from the hub's public_apps()
+  // (cohort apps, then builders' own apps outside any cohort),
   // each with its repository as owner/repo, keyed case-insensitively so a
   // cohort app already in the directory is not listed twice.
   function mergeApps(directoryApps, cohortApps) {
@@ -46,7 +47,10 @@
       var repo = repoPath(c.app_repo);
       if (!repo || seen[repo.toLowerCase()]) return;
       seen[repo.toLowerCase()] = true;
-      out.push({ name: c.app_name || repo.split('/')[1], repo: repo, website: safeUrl(c.app_url), status: 'cohort', active: true, source: 'cohort' });
+      // A builder's own app (outside any cohort) says so; anything else
+      // from the hub is a cohort's, as before the hub said which.
+      var kind = c.kind === 'builder' ? 'builder' : 'cohort';
+      out.push({ name: c.app_name || repo.split('/')[1], repo: repo, website: safeUrl(c.app_url), status: kind, active: true, source: kind });
     });
     return out;
   }
@@ -227,8 +231,21 @@
     if (declaration && declaration.status === 'working toward') return 'Working toward human-shaped';
     if (app && app.status === 'founding') return 'One of the four apps the method came from';
     if (app && app.status === 'cohort') return 'Being built in a cohort';
+    if (app && app.status === 'builder') return 'Shown here by the person building it';
     if (app && app.status === 'template') return 'Made from the template';
     return 'In the directory';
+  }
+
+  // A builder's own app has no teacher watching over it, so its page says
+  // how anyone can tell the people who decide what the hub shows: an
+  // issue in the open directory, with the app named and nothing else
+  // filled in. Cohort apps have their teachers, and directory apps their
+  // listing, so they get no such link.
+  function reportHref(app) {
+    if (!app || app.source !== 'builder' || !app.repo) return null;
+    var title = 'Something is wrong with ' + app.repo + ' on humanshaped.org';
+    var body = 'The app: https://humanshaped.org' + appHref(app.repo) + '\n\nWhat is wrong:\n';
+    return 'https://github.com/humanshaped/directory/issues/new?title=' + encodeURIComponent(title) + '&body=' + encodeURIComponent(body);
   }
 
   // Where to talk about it: the repository's Discussions if it has them,
@@ -251,7 +268,7 @@
     joinWithAnd: joinWithAnd, repoPath: repoPath, safeUrl: safeUrl, platformNames: platformNames,
     mergeApps: mergeApps, findApp: findApp, feedRepos: feedRepos, commitFrom: commitFrom, isWork: isWork,
     feed: feed, trouble: trouble, troubleText: troubleText, parseDeclaration: parseDeclaration,
-    ownWords: ownWords, statusText: statusText, conversation: conversation, storeLinks: storeLinks, appHref: appHref
+    ownWords: ownWords, statusText: statusText, conversation: conversation, storeLinks: storeLinks, appHref: appHref, reportHref: reportHref
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
   else root.AppsLib = lib;
