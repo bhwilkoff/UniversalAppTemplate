@@ -11,6 +11,10 @@
 // QuestionView.answer(check, answer, { draft, onDraft(input), onSend(row) })
 //   returns a form; onSend resolves to an error sentence or null.
 // QuestionView.results(check, summary, { teaching }) returns the results.
+// QuestionView.ready(db) says whether the database has the six kinds yet
+// (migration 20261004080000), and readResults(db, check) reads a
+// question's results, from check_tally before then.
+// QuestionView.askRow(row, q, ready) is the live_checks row to ask q.
 // Words by Claude, awaiting Ben's review.
 (function () {
   var L = window.LiveLib;
@@ -50,7 +54,9 @@
       });
     }
     var kind = el('select'); kind.name = 'kind';
-    L.QUESTION_KINDS.forEach(function (k) { var o = el('option', null, k.name); o.value = k.key; kind.appendChild(o); });
+    // Before the database has the six kinds, the two it always had.
+    L.QUESTION_KINDS.filter(function (k) { return !opts.basic || k.key === 'choice' || k.key === 'short'; })
+      .forEach(function (k) { var o = el('option', null, k.name); o.value = k.key; kind.appendChild(o); });
     var kindLine = el('span', 'hint');
     var kindL = labelled('Kind of question', kind); kindL.insertBefore(kindLine, kind);
     var prompt = el('textarea'); prompt.name = 'prompt'; prompt.rows = 2; prompt.maxLength = 500; prompt.required = true;
@@ -181,6 +187,9 @@
       ev.preventDefault();
       var row = L.answerRow(check, read());
       if (row.error) { status.textContent = row.error; return; }
+      // Only a list goes in value, which a database before migration
+      // 20261004080000 does not have.
+      if (row.value == null) delete row.value;
       status.textContent = 'Sending…'; send.disabled = true;
       Promise.resolve(opts.onSend(row)).then(function (err) {
         send.disabled = false;
@@ -225,5 +234,35 @@
     return wrap;
   }
 
-  window.QuestionView = { fields: fields, answer: answer, results: results };
+  // ------------------------------------------------------------------
+  // The database, before and after migration 20261004080000
+  // ------------------------------------------------------------------
+
+  var readyOnce = null;
+  function ready(db) {
+    if (!readyOnce) readyOnce = db.from('live_checks').select('kind').limit(1).then(function (r) { return !r.error; }, function () { return false; });
+    return readyOnce;
+  }
+
+  function readResults(db, check) {
+    return db.rpc('check_results', { c: check.id }).then(function (r) {
+      if (!r.error) return r.data || null;
+      if (!check.choices) return null;
+      return db.rpc('check_tally', { c: check.id }).then(function (t) {
+        if (t.error) return null;
+        var x = L.tally(check, t.data || []);
+        return { total: x.total, counts: x.rows.map(function (row) { return row.count; }) };
+      });
+    });
+  }
+
+  // A question to ask, as live_checks' columns; before the database has
+  // the kinds, only the columns it always had.
+  function askRow(row, q, isReady) {
+    var out = Object.assign({}, row, { prompt: q.prompt, choices: q.choices || null });
+    if (isReady) { out.kind = q.kind || (q.choices ? 'choice' : 'short'); out.points = q.points || null; out.question_id = q.question_id || null; }
+    return out;
+  }
+
+  window.QuestionView = { fields: fields, answer: answer, results: results, ready: ready, readResults: readResults, askRow: askRow };
 })();

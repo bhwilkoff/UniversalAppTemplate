@@ -595,16 +595,16 @@
       db.from('live_queue').select('*').eq('session_id', sid),
       db.from('live_checks').select('*').eq('session_id', sid).order('created_at', { ascending: false }),
       // Row-level security returns only your own answers, or everyone's to a teacher.
-      db.from('live_answers').select('id, check_id, user_id, choice, body, value, updated_at').eq('cohort_id', S.cohort.id)
+      db.from('live_answers').select('*').eq('cohort_id', S.cohort.id)
     ]).then(function (res) {
       var bad = res.filter(function (r) { return r.error; })[0];
       if (bad) { $('[data-sync]').textContent = 'The page could not read the latest changes: ' + bad.error.message; return; }
       var checks = res[1].data;
       S.checks = checks;
       var visible = checks.filter(function (k) { return L.kindOf(k) !== 'short' && (S.teaching || k.show_tally); });
-      return Promise.all(visible.map(function (k) { return db.rpc('check_results', { c: k.id }); })).then(function (got) {
+      return Promise.all(visible.map(function (k) { return Q.readResults(db, k); })).then(function (got) {
         var byCheck = {};
-        visible.forEach(function (k, i) { byCheck[k.id] = (got[i] && got[i].data) || null; });
+        visible.forEach(function (k, i) { byCheck[k.id] = got[i] || null; });
         render('[data-queue]', function () { drawQueue(res[0].data); });
         render('[data-checks]', function () { drawChecks(checks, res[2].data, byCheck); });
         drawSceneQuestion();
@@ -718,7 +718,7 @@
     ask.appendChild(askActs);
     card.appendChild(acts);
     card.appendChild(ask);
-    if (check.state === 'open' && !mine.length) card.appendChild(editCheck(check));
+    if (check.state === 'open' && !mine.length && S.kinds) card.appendChild(editCheck(check));
     return card;
   }
 
@@ -813,10 +813,9 @@
   // Asking a question: a copy of it goes to everyone, so changing it in
   // the moment never changes the bank or the run of show.
   function ask(q, showResults) {
-    return db.from('live_checks').insert({
-      cohort_id: S.cohort.id, session_id: S.session.id, created_by: S.me.id, kind: q.kind,
-      prompt: q.prompt, choices: q.choices, points: q.points, question_id: q.question_id || null, show_tally: !!showResults
-    }).then(function (r) {
+    return db.from('live_checks').insert(Q.askRow({
+      cohort_id: S.cohort.id, session_id: S.session.id, created_by: S.me.id, show_tally: !!showResults
+    }, q, S.kinds)).then(function (r) {
       if (r.error) return r.error.message;
       refreshLive();
       return null;
@@ -828,9 +827,13 @@
   // the form works as before, without it.
   function startAsking() {
     if (!Q || askFields) return;
-    db.from('questions').select('id, cohort_id, kind, prompt, choices, points, updated_at').order('updated_at', { ascending: false }).then(function (r) {
+    Q.ready(db).then(function (ok) {
+      S.kinds = ok;
+      if (!ok) return { error: true, basic: true };
+      return db.from('questions').select('id, cohort_id, kind, prompt, choices, points, updated_at').order('updated_at', { ascending: false });
+    }).then(function (r) {
       bank = r.error ? [] : (r.data || []).filter(function (q) { return !q.cohort_id || q.cohort_id === S.cohort.id; });
-      askFields = Q.fields({ bank: bank });
+      askFields = Q.fields({ bank: bank, basic: !S.kinds });
       $('[data-ask-fields]').replaceChildren(askFields.el);
     });
   }
@@ -896,7 +899,7 @@
     L.CLOSING_CHECKS.reduce(function (p, prompt) {
       return p.then(function (r) {
         if (r && r.error) return r;
-        return db.from('live_checks').insert({ cohort_id: S.cohort.id, session_id: S.session.id, created_by: S.me.id, kind: 'short', prompt: prompt, choices: null, show_tally: false });
+        return db.from('live_checks').insert({ cohort_id: S.cohort.id, session_id: S.session.id, created_by: S.me.id, prompt: prompt, choices: null, show_tally: false });
       });
     }, Promise.resolve(null)).then(function (r) {
       status.textContent = r && r.error ? 'Not asked: ' + r.error.message : 'Asked both.';

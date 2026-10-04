@@ -25,8 +25,13 @@
     function say(t) { status.textContent = t || ''; }
 
     function load() {
-      return db.from('questions').select('id, owner_id, cohort_id, kind, prompt, choices, points, updated_at')
-        .order('updated_at', { ascending: false }).then(function (r) {
+      // Until the database has the six kinds, a bank question could not
+      // be asked, so the section waits.
+      return Q.ready(db).then(function (ok) {
+        if (!ok) return { error: true };
+        return db.from('questions').select('id, owner_id, cohort_id, kind, prompt, choices, points, updated_at')
+        .order('updated_at', { ascending: false });
+      }).then(function (r) {
           // Before the database has the bank, the section stays hidden.
           if (r.error) { section.hidden = true; return; }
           section.hidden = false;

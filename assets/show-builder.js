@@ -33,7 +33,7 @@
   // `agenda` is CohortLib.agenda(cohort.session_minutes), `turn` LiveLib.TURN.
   function mount(box, opts) {
     var db = opts.db, cohort = opts.cohort, session = opts.session;
-    var scenes = [], notes = {}, withScenes = [], editing = null, previewing = null, busy = false, dragId = null, bank = [];
+    var scenes = [], notes = {}, withScenes = [], editing = null, previewing = null, busy = false, dragId = null, bank = [], kinds = false;
     var status = el('p', 'small'); status.setAttribute('role', 'status');
     var fit = el('p', 'small show-fit');
     var list = el('ol', 'show-list');
@@ -51,7 +51,8 @@
         db.from('scenes').select('session_id').eq('cohort_id', cohort.id),
         // The teacher's own questions and this cohort's (R4); before the
         // database has the bank, a question is written here as before.
-        db.from('questions').select('id, cohort_id, kind, prompt, choices, points, updated_at').order('updated_at', { ascending: false })
+        db.from('questions').select('id, cohort_id, kind, prompt, choices, points, updated_at').order('updated_at', { ascending: false }),
+        QV ? QV.ready(db) : Promise.resolve(false)
       ]).then(function (res) {
         // Before the database has the run of show, the builder stays away.
         if (res[0].error) { box.hidden = true; return; }
@@ -61,6 +62,7 @@
         (res[1].data || []).forEach(function (n) { notes[n.scene_id] = n.body; });
         withScenes = (res[2].data || []).map(function (r) { return r.session_id; });
         bank = res[3].error ? [] : (res[3].data || []).filter(function (q) { return !q.cohort_id || q.cohort_id === cohort.id; });
+        kinds = res[4];
         draw();
       });
     }
@@ -187,7 +189,7 @@
       var promptL = field('Prompt', prompt);
       var options = el('textarea'); options.name = 'options'; options.rows = 3; options.value = (c.options || []).join('\n');
       var optionsL = field('Choices', options, 'One per line, two to eight. Leave empty for an answer in their own words.');
-      var qf = QV && LL ? QV.fields({ bank: bank }) : null;
+      var qf = QV && LL && kinds ? QV.fields({ bank: bank }) : null;
       if (qf) {
         qf.fill(LL.questionFields(s && s.kind === 'question' ? c : null));
         f.insertBefore(qf.el, optionsL.nextSibling);

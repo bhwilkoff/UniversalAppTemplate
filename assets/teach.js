@@ -397,11 +397,11 @@
     var notSeenList = $('[data-not-seen]');
     notSeenList.replaceChildren();
     say('[data-not-seen-intro]', '');
-    db.from('live_checks').select('id, kind, prompt, choices, points, created_at').eq('session_id', last.id).then(function (k) {
+    db.from('live_checks').select('*').eq('session_id', last.id).then(function (k) {
       if (k.error) { answersBox.replaceChildren(el('p', 'small error', 'The checks could not be read: ' + k.error.message)); return; }
       var ids = k.data.map(function (x) { return x.id; });
       var answers = ids.length
-        ? db.from('live_answers').select('check_id, user_id, choice, body, value, updated_at').in('check_id', ids)
+        ? db.from('live_answers').select('*').in('check_id', ids)
         : Promise.resolve({ data: [] });
       return answers.then(function (a) {
         if (a.error) { answersBox.replaceChildren(el('p', 'small error', 'The answers could not be read: ' + a.error.message)); return; }
@@ -479,7 +479,7 @@
     Promise.all([
       db.from('shares').select('*, feedback(id, author_id, body, created_at)').eq('cohort_id', current.id),
       db.from('live_queue').select('user_id, kind, url, note, state, created_at').eq('session_id', last.id),
-      db.from('live_checks').select('id, kind, prompt, choices, points, created_at').eq('session_id', last.id),
+      db.from('live_checks').select('*').eq('session_id', last.id),
       db.from('cohort_teachers').select('user_id, profiles(github_login, display_name)').eq('cohort_id', current.id),
       // Read on its own: before migration 20261003130000 the table is not
       // there, and follow-ups can still go as feedback on a bring-back.
@@ -489,7 +489,7 @@
       if (bad) { box.replaceChildren(el('p', 'small error', 'The follow-ups could not be gathered: ' + bad.error.message)); return; }
       var ids = res[2].data.map(function (k) { return k.id; });
       var answers = ids.length
-        ? db.from('live_answers').select('check_id, user_id, choice, body, value').in('check_id', ids)
+        ? db.from('live_answers').select('*').in('check_id', ids)
         : Promise.resolve({ data: [] });
       return answers.then(function (a) {
         if (a.error) { box.replaceChildren(el('p', 'small error', 'The answers could not be read: ' + a.error.message)); return; }

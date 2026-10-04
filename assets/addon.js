@@ -590,15 +590,15 @@
     return Promise.all([
       db.from('live_queue').select('*').eq('session_id', sid),
       db.from('live_checks').select('*').eq('session_id', sid).order('created_at', { ascending: false }),
-      db.from('live_answers').select('id, check_id, user_id, choice, body, value, updated_at').eq('cohort_id', S.cohort.id)
+      db.from('live_answers').select('*').eq('cohort_id', S.cohort.id)
     ]).then(function (res) {
       var bad = res.filter(function (r) { return r.error; })[0];
       if (bad) { $('[data-sync]').textContent = 'The panel could not read the latest changes: ' + bad.error.message; return; }
       S.items = res[0].data; S.checks = res[1].data; S.answers = res[2].data;
       var visible = S.checks.filter(function (k) { return L.kindOf(k) !== 'short' && (S.teaching || k.show_tally); });
-      return Promise.all(visible.map(function (k) { return db.rpc('check_results', { c: k.id }); })).then(function (t) {
+      return Promise.all(visible.map(function (k) { return Q.readResults(db, k); })).then(function (t) {
         S.results = {};
-        visible.forEach(function (k, i) { S.results[k.id] = (t[i] && t[i].data) || null; });
+        visible.forEach(function (k, i) { S.results[k.id] = t[i] || null; });
         render('[data-queue]', drawQueue);
         render('[data-checks]', drawChecks);
         drawSceneQuestion();
@@ -701,7 +701,7 @@
     if (!short) acts.appendChild(button(k.show_tally ? 'Hide the results' : 'Show everyone the results', 'btn-quiet', function () { changeCheck(k, { show_tally: !k.show_tally }); }));
     acts.appendChild(button('Close it', 'btn-quiet', function () { if (S.onStage && S.onStage.id === k.id) setPin(null); changeCheck(k, { state: 'closed' }); }));
     card.appendChild(acts);
-    if (!mine.length) card.appendChild(editCheck(k));
+    if (!mine.length && S.kinds) card.appendChild(editCheck(k));
     return card;
   }
 
@@ -772,10 +772,9 @@
     return questions.reduce(function (p, q) {
       return p.then(function (r) {
         if (r && r.error) return r;
-        return db.from('live_checks').insert({
-          cohort_id: S.cohort.id, session_id: S.session.id, created_by: S.me.id, kind: q.kind || 'short',
-          prompt: q.prompt, choices: q.choices || null, points: q.points || null, question_id: q.question_id || null, show_tally: !!q.show_tally
-        });
+        return db.from('live_checks').insert(Q.askRow({
+          cohort_id: S.cohort.id, session_id: S.session.id, created_by: S.me.id, show_tally: !!q.show_tally
+        }, q, S.kinds));
       });
     }, Promise.resolve(null)).then(function (r) {
       status.textContent = r && r.error ? 'Not asked: ' + r.error.message : questions.length > 1 ? 'Asked both.' : 'Asked.';
@@ -802,9 +801,13 @@
   // the form works as before, without it.
   function startAsking() {
     if (!Q || askFields) return;
-    db.from('questions').select('id, cohort_id, kind, prompt, choices, points, updated_at').order('updated_at', { ascending: false }).then(function (r) {
+    Q.ready(db).then(function (ok) {
+      S.kinds = ok;
+      if (!ok) return { error: true, basic: true };
+      return db.from('questions').select('id, cohort_id, kind, prompt, choices, points, updated_at').order('updated_at', { ascending: false });
+    }).then(function (r) {
       var bank = r.error ? [] : (r.data || []).filter(function (q) { return !q.cohort_id || q.cohort_id === S.cohort.id; });
-      askFields = Q.fields({ bank: bank });
+      askFields = Q.fields({ bank: bank, basic: !S.kinds });
       $('[data-ask-fields]').replaceChildren(askFields.el);
     });
   }

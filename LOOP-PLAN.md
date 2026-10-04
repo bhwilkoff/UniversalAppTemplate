@@ -1058,44 +1058,65 @@ student).
   every 15 minutes, sendNotices daily 5 to 6 pm.
 - Seams: /teach/ to /live/, classmates' apps to /apps/app/, the event
   issue form not yet in humanshaped/community.
+- **R4, the question bank (merged; migration half applied, October 4,
+  cloud session):** six kinds of question (choose one, choose any, a
+  scale, a few words, put in order, in their own words). `questions`
+  holds a teacher's own bank or a cohort's (students never read it;
+  agents only read); a question asked is a copy, editable until the
+  first answer; answers fit their kind (multi and rank in
+  `live_answers.value`); `check_results()` gives results with no names
+  (counts, average places, a word cloud; short answers only counted).
+  LiveLib has the logic; assets/question-view.js draws the fields, the
+  answer, and the results for the Meet panel, /live/, and /teach/;
+  assets/question-bank.js is the bank on /teach/; a question scene in
+  the class builder starts from the bank, and the current question
+  scene is asked with "Ask it now". The stage draws bars and a cloud.
+  The mcp text and follow-ups read every kind. 675 database checks (51
+  new, and two opened rules seen failing), 318 node tests, and a
+  16-check page check of every kind at 375 px (light and dark). Words
+  by Claude, awaiting Ben's review.
+  **Applied:** 20261004080000 (the shape function and the empty
+  `questions` table, as two migrations, question_bank_probe and
+  question_bank_table). **Not applied:** 20261004080100_question_kinds:
+  its drops wait on a confirmation that only the Mac terminal shows, so
+  the Supabase connector timed out. Until it is applied the pages work
+  exactly as before (QuestionView.ready finds no `kind` column; only
+  choose one and own words, no bank section, results from
+  check_tally), and they turn the kinds on by themselves after.
+  **Do not redeploy the mcp function before 80100 is applied** (its
+  selects name the new columns). Not yet seen signed in or in a call.
 
-## Handoff (October 4, 2026, 12:00)
+## Handoff (October 4, 2026, evening)
 
-Merged and live: G1 to G7, H1 to H6, C0 to C9, R1 (run of show in the
-panel and /live/), R2 (class builder), Google sign-in beside GitHub
-(migration 20261004060000; email sign-up turned off), the listing
-materials, meet@'s script with its triggers, the community repository,
-and the credential signing key. 599 database checks, 298 node tests.
+Merged and live: G1 to G7, H1 to H6, C0 to C9, R1 to R3, R4's pages,
+Google sign-in beside GitHub, the listing materials, meet@'s script
+with its triggers, the community repository, and the credential
+signing key. 675 database checks, 318 node tests.
 
-R3, running the show, is merged and its migration (20261004070000,
-table `show_state`, in Realtime) is applied: one shared current scene
-per session with its clock set by the database; the teacher steps
-through the timeline (back, next, jump, clock) and edits any scene from
-the side panel, seeing a draft on their own main stage while typing and
-"Show it to everyone" to save; the main stage follows the current scene
-unless the teacher pins the welcome, a question's answers, the wings, or
-blank. assets/show-run.js; 624 database checks, 307 node tests, R3's
-517-check page check passes on the merged code. Not yet seen in a real
-Meet call. Known gap: "Send everyone to their rooms" still defaults its
+R4, the question bank, is merged (see its log entry). Half of its
+database change is applied; **the first step on this Mac is to apply
+supabase/migrations/20261004080100_question_kinds.sql** (run the policy
+tests first, then apply it through the Supabase tools and confirm the
+drops in the terminal), then run `sh tools/deploy-mcp.sh` so students'
+agents read the new kinds, then try the six kinds signed in on /teach/
+(bank), /live/ (as teacher and as the Gmail test student), and in Meet.
+
+R3's known gap stands: "Send everyone to their rooms" still defaults its
 minutes from the six parts, not the session's own rooms scene.
 
-Next, from research/notes/run-of-show-design.md: R4 (question bank with
-multiple choice, multi-select, short text, scale, word cloud, ranking,
-prepared on the class page and answered in the panel), R5 (the design
-stage on the main stage), R6 (rehearsal rooms rebuilt around scenes),
-R7 (the wings and the presenter), R8 (follow-up built from the show),
-then the listing (tools/meet-addon/LISTING.md) once a real call with the
-Gmail test student has gone well. Ben approved the vocabulary with
-"design stage" for the board scene (DECISIONS.md).
+Next, from research/notes/run-of-show-design.md: R5 (the design stage
+on the main stage), R6 (rehearsal rooms rebuilt around scenes), R7 (the
+wings and the presenter), R8 (follow-up built from the show), then the
+listing (tools/meet-addon/LISTING.md) once a real call with the Gmail
+test student has gone well.
 
 What only this Mac has: ~/.humanshaped/supabase-token (Management API),
 ~/.humanshaped/credential-key-1.json (signing), ~/.humanshaped/test-student,
 clasp signed in as meet@ (tools/meet-events/.clasp.json), gh signed in
 as bhwilkoff, and Chrome signed in to Ben's GitHub, ben@ admin (/u/1),
-and meet@ (authuser=3). A cloud session has none of these: it can write
-and test code, push branches, and merge to `site`, but cannot apply
-migrations, deploy functions, sign credentials, push the Meet script, or
-drive Chrome. Leave those steps logged here for a session on this Mac.
+and meet@ (authuser=3). A cloud session has none of these, but it does
+have the Supabase connector: additive migrations apply from there, and
+anything with a drop or delete waits on the terminal's confirmation.
 
 ## Where to pick up
 
