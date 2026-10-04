@@ -916,9 +916,41 @@ October 3, after every C milestone that does not wait on Ben merged):
   permissions, Administration: Read and write, accepted on the
   installation; then SETUP_QUEUE_URL, SETUP_QUEUE_SECRET, and
   SETUP_QUEUE_ON in Script Properties and a trigger, as meet@.
-- Every gap from the October 3 analysis (G1 to G7) is built. Next:
-  live checks signed in (account sections, /teach/ buttons), then a
-  fresh gap read.
+- G1 checked live, October 4: the GitHub App already had Administration
+  write on its installation. On a "(delete me)" draft cohort, "Make the
+  cohort's private repository and team" made humanshaped/provision-test
+  (private, Discussions on) and a secret team with read access and Ben
+  in it, and saved both on the cohort. The team and cohort are deleted;
+  the repository waits for Ben to delete it (Ben's gh token cannot).
+- Every gap from the October 3 analysis (G1 to G7) is built.
+
+**Next: the second gap analysis (October 4)**
+- **H1. Teachers other than Ben:** /teach/guide/ predates six-part
+  sessions, trios, G1, /live/, the add-on, the board, rooms, follow-ups,
+  and teacher MCP tools; setup steps miss "make groups before asking
+  for rooms", "rehearse /live/", "connect your agent"; no screen to add
+  a co-teacher (COURSE: co-lead before leading). 2 days. Building.
+- **H2. The credential's last step:** the holder never finds it on
+  /account/ or /cohort/; signing is one person by hand; Ben cannot
+  attach a signed file for a cohort he does not teach. 2 days,
+  migration. Waits on the signing key.
+- **H3. The solo builder's route:** /connect/ still says it waits on a
+  setting; /account/ and /path/ do not link /connect/; no review prompt
+  built on `my_app`; the home page's "Going alone" skips /path/setup/;
+  the template README and "On your own" never point to humanshaped.org.
+  1.5 days. Building.
+- **H4. The add-on behind /live/:** no C1 signals, board, or talk share
+  in the panel; /teach/ and the guide never mention it; teachers outside
+  humanshaped.org cannot use a private add-on. 2 to 3 days, research on
+  distribution.
+- **H5. Week 5 guests and lessons sent back:** a public showcase page
+  with guests, /events/ fed by it, and a prefilled "send a lesson back"
+  issue. 2 days, migration.
+- **H6. Template contradicts the free path:** stage 06's bar needs a
+  store; stage 08 has no ready bar; week 3's "look like itself" is
+  hidden by WEEK_STAGES. 1 day. Building.
+- Seams: /teach/ to /live/, classmates' apps to /apps/app/, the event
+  issue form not yet in humanshaped/community.
 
 ## Where to pick up
 
