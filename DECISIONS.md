@@ -280,3 +280,22 @@ notes if they wish. And notes should be editable for typos and other
 corrections." **How to apply:** notes are not deleted when a cohort
 finishes or the student leaves; the author can edit the words, and an
 edited note says so.
+
+## The live classroom, after the first test call (October 4, 2026)
+
+Ben tested the Meet add-on in a real call as meet@ and wrote:
+
+> 1. The Main stage seems to work well, but I don't like that I cannot edit things within the sidebar to display on the main stage.
+> 2. The connection betweeen the "full live page" and the live session don't entirely make sense to me. I like the idea of having a course/class page that you can keep coming back to, but for a live session (and it might make sense to prep the session on that page from the teacher perspective, but the interactivity should happen within the session iteself rather than on a separate page. Can we create a "teacher view" for the Human Shaped add on and a Student view as well and all of the components be fully visible (from the full live page) within the add-on?
+> 3. I like the metaphor of a timeline for live classes. The expectations are easy to understand since synchronous events are based upon things happening at a particular time. It might make sense to have it show linearly as we progress through the session. This way, we don't get bogged down in the different items (Now, Queeu, Checks, etc. - What do they mean individually? Does it actually make sense for them to be separate? Or, perhaps the different functions simply need to be explained better.)
+> 4. I really like the idea of asking questions and having them display on the screen. I like the way that you can either use the built-in questions or choose your own, but I'd like to be able to set up questions ahead of time and select from them (perhaps the course page should allow for teachers to prep questions ahead of time). I'd also like to see more robust question types and the ability to do more sophisticated editing of the questions in the moment. However, answering on the cohort's live page is pretty wonky instead of answering in the Meet interface or the sidebar.
+> 5. The board seems extremely disconnected from the add-on as well. I love the idea of using the board for collaboration, but if it opens in a separate window, it does make it harder. Is there any way that we can let folks interact with the board within the Meet interface?
+> 6. The rooms seem very cool, but it seems overly conveluted to both create the rooms, launch people into them, and call people back. I'm not really sure what the different steps of the rooms mean and what I'm doing by puttin them into those steps. How do the rooms get generated and how does my "main stage room" interact with them (calling them back, putting them into a different step, etc.)? What kind of tools do the students get within their rooms that would help them to present to one another and discuss things that I've laid out for them.
+>
+> Overall, we need a MUCH better sidebar interface that allows for multiple different controls for during the live event, we need a much more robust class page that allows for laying out content (almost like a class builder interface that can decide what will show up in the sidebar for a given session), and we need better interactions betwen the different elements of the class including the Board, the main stage, the rooms, the content being displayed on the main stage and in the rooms, and the ability to control all of these elements easily (turning things on and off) with a consistent metaphor that functions throughout (i.e., Main Stage, Rehersal Room, Presenter, Audience, Run of Show, Acts, Scenes, etc.). The goal is for us to be able to set up the class ahead of time, run the class adaptably with a fully intuitive interface, and follow up from class afterwards with each of the individual students.
+
+What this decides: the session is prepared ahead of time on the class
+page, run entirely inside Meet (a teacher view and a student view of the
+add-on, with everything /live/ has), and followed up afterwards; one
+timeline-shaped metaphor runs through all of it. The design is in
+research/notes/run-of-show-design.md.
