@@ -970,7 +970,16 @@ October 3, after every C milestone that does not wait on Ben merged):
   in the panel; /teach/ and the guide never mention it; teachers outside
   humanshaped.org cannot use a private add-on. 2 to 3 days, research on
   distribution.
-- **H5. Week 5 guests and lessons sent back:** a public showcase page
+- **H5 (merged, migration 20261004030000 applied):** a teacher opens a
+  session to guests as a public showing (and may share its Meet link);
+  /showcase/?c= tells guests when, how to come (Ask to join, honestly),
+  the apps students chose to show, and how to be a good guest;
+  /events/ and /start/ list showings beside community events; /teach/
+  and /cohort/ offer "Send a lesson back to the template" as a
+  prefilled issue carrying only the cohort's title. Also fixed /cohort/'s
+  stale line that said notes are deleted at the end. 536 database
+  checks, 272 node tests. Not yet tried signed in.
+- **H5, as planned:** a public showcase page
   with guests, /events/ fed by it, and a prefilled "send a lesson back"
   issue. 2 days, migration.
 - **H6 (merged to main as ab37f0c):** stage 06's bar accepts the free
