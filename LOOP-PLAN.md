@@ -1059,6 +1059,31 @@ student).
 - Seams: /teach/ to /live/, classmates' apps to /apps/app/, the event
   issue form not yet in humanshaped/community.
 
+## Handoff (October 4, 2026, 12:00)
+
+Merged and live: G1 to G7, H1 to H6, C0 to C9, R1 (run of show in the
+panel and /live/), R2 (class builder), Google sign-in beside GitHub
+(migration 20261004060000; email sign-up turned off), the listing
+materials, meet@'s script with its triggers, the community repository,
+and the credential signing key. 599 database checks, 298 node tests.
+
+In flight: R3, running the show (branch `r3-run`, migration
+20261004070000_live_show.sql, not applied). When it lands: merge (expect
+conflicts in assets/addon.js with the Google sign-in code, keep both),
+run the tests, apply the migration through the Management API, push,
+then R4 (question bank), R5 (design stage on the main stage), R6
+(rehearsal rooms), R7 (the wings), R8 (follow-up), from
+research/notes/run-of-show-design.md.
+
+What only this Mac has: ~/.humanshaped/supabase-token (Management API),
+~/.humanshaped/credential-key-1.json (signing), ~/.humanshaped/test-student,
+clasp signed in as meet@ (tools/meet-events/.clasp.json), gh signed in
+as bhwilkoff, and Chrome signed in to Ben's GitHub, ben@ admin (/u/1),
+and meet@ (authuser=3). A cloud session has none of these: it can write
+and test code, push branches, and merge to `site`, but cannot apply
+migrations, deploy functions, sign credentials, push the Meet script, or
+drive Chrome. Leave those steps logged here for a session on this Mac.
+
 ## Where to pick up
 
 1. Check on the milestone agents (M1, M2, M6). Review each branch they
