@@ -1926,6 +1926,108 @@ def main():
           attempt(as_user("ben"), "update public.credentials set revoked_at = now() where id = %s returning id", (kcred,)) and last_rows == [])
     check("a teacher cannot make themselves a signer",
           attempt(as_user("kofi"), "update public.teachers set can_sign = true where user_id = %s returning user_id", (people["kofi"],)) and last_rows == [])
+
+    # The run of show (migration 20261004050000): a session's scenes,
+    # written by the cohort's teachers, read by the cohort; the teacher's
+    # notes for a scene read by teachers only; agents read and never
+    # write; reordering and copying through two functions. bea is a
+    # student here; dee is not in the cohort.
+    ben = as_user("ben")
+    attempt(ben, "insert into public.cohorts (slug, title, created_by, status) values ('show-test', 'Show', %s, 'open') returning id", (people["ben"],))
+    sc = last_rows[0][0]
+    attempt(ben, "insert into public.sessions (cohort_id, number) values (%s, 1), (%s, 2) returning id", (sc, sc))
+    s1, s2 = last_rows[0][0], last_rows[1][0]
+    attempt(ben, "insert into public.cohorts (slug, title, created_by, status) values ('show-other', 'Other', %s, 'open') returning id", (people["ben"],))
+    oc = last_rows[0][0]
+    attempt(ben, "insert into public.sessions (cohort_id, number) values (%s, 1) returning id", (oc,))
+    o1 = last_rows[0][0]
+    bea = as_user("bea")
+    attempt(bea, "insert into public.enrollments (cohort_id, user_id) values (%s, %s)", (sc, people["bea"]))
+    ben = as_user("ben")
+    scene = "insert into public.scenes (cohort_id, session_id, position, kind, title, minutes, body, config) values (%s, %s, %s, %s, %s, %s, %s, %s::jsonb) returning id, created_by"
+    check("a teacher adds a scene to a session's run of show, in their own name",
+          attempt(ben, scene, (sc, s1, 0, "talk", "Arrive", 7, "One line each in the chat.", "{}")) and last_rows[0][1] == people["ben"])
+    a1 = last_rows[0][0]
+    attempt(ben, scene, (sc, s1, 1, "rooms", "Show what you brought back", 25, None,
+                         '{"prompt": "Show it on the real device.", "room_scenes": [{"title": "Their question", "minutes": 2}]}'))
+    a2 = last_rows[0][0]
+    attempt(ben, scene, (sc, s1, 2, "question", "Check", 3, None, '{"prompt": "Which one?", "options": ["This", "That"]}'))
+    a3 = last_rows[0][0]
+    check("a scene's kind must be one the run of show knows",
+          not attempt(ben, scene, (sc, s1, 3, "lecture", "Talk", 5, None, "{}")))
+    check("the design stage is a kind of scene, with a template",
+          attempt(ben, scene, (oc, o1, 0, "design", "Sketch the screen", 10, None, '{"template": "Phone screen"}')))
+    check("the old name, board, is not a kind of scene",
+          not attempt(ben, scene, (sc, s1, 3, "board", "Board", 5, None, "{}")))
+    check("a talk scene carries no configuration",
+          not attempt(ben, scene, (sc, s1, 3, "talk", "Talk", 5, None, '{"options": ["a", "b"]}')))
+    check("a question's options are two to eight short words",
+          not attempt(ben, scene, (sc, s1, 3, "question", "Q", 2, None, '{"options": ["only one"]}')))
+    check("a room's own scenes each need a title and minutes",
+          not attempt(ben, scene, (sc, s1, 3, "rooms", "R", 20, None, '{"room_scenes": [{"title": "No minutes"}]}')))
+    check("two scenes cannot share a place in the run of show",
+          not attempt(ben, scene, (sc, s1, 0, "break", "Break", 3, None, "{}")))
+    check("a scene belongs to a session of its own cohort",
+          not attempt(ben, scene, (sc, o1, 0, "talk", "Elsewhere", 5, None, "{}")))
+    check("a teacher can edit a scene's words and minutes",
+          attempt(ben, "update public.scenes set title = 'Arrive, and say hello', minutes = 6 where id = %s returning minutes", (a1,)) and last_rows == [(6,)])
+    check("a scene cannot move to another session",
+          not attempt(ben, "update public.scenes set session_id = %s where id = %s", (s2, a1)))
+    note = "insert into public.scene_notes (scene_id, cohort_id, body) values (%s, %s, %s) returning updated_by"
+    check("a teacher keeps a private note for a scene",
+          attempt(ben, note, (a1, sc, "Remember to name last week's muddy point.")) and last_rows[0][0] == people["ben"])
+    check("a note is only for a scene of the same cohort",
+          not attempt(ben, note, (a2, oc, "Wrong cohort.")))
+    bea = as_user("bea")
+    bea.execute("select title from public.scenes where session_id = %s order by position", (s1,))
+    check("someone in the cohort reads the run of show", [r[0] for r in bea.fetchall()] == ["Arrive, and say hello", "Show what you brought back", "Check"])
+    bea.execute("select count(*) from public.scene_notes where cohort_id = %s", (sc,))
+    check("a student cannot read the teacher's notes for a scene", bea.fetchone()[0] == 0)
+    check("a student cannot add a scene", not attempt(bea, scene, (sc, s1, 5, "talk", "Mine", 5, None, "{}")))
+    check("a student cannot change a scene",
+          attempt(bea, "update public.scenes set title = 'Mine' where id = %s returning id", (a1,)) and last_rows == [])
+    check("a student cannot remove a scene",
+          attempt(bea, "delete from public.scenes where id = %s returning id", (a1,)) and last_rows == [])
+    check("a student cannot reorder the run of show",
+          not attempt(bea, "select public.reorder_scenes(%s, %s::uuid[])", (s1, "{%s,%s,%s}" % (a3, a2, a1))))
+    dee = as_user("dee")
+    dee.execute("select count(*) from public.scenes where cohort_id = %s", (sc,))
+    check("someone outside the cohort cannot read its run of show", dee.fetchone()[0] == 0)
+    check("someone outside the cohort cannot add a scene", not attempt(dee, scene, (sc, s1, 6, "talk", "Hi", 5, None, "{}")))
+    ben_agent = as_agent("ben")
+    ben_agent.execute("select count(*) from public.scenes where session_id = %s", (s1,))
+    check("a teacher's agent reads the run of show", ben_agent.fetchone()[0] == 3)
+    check("a teacher's agent cannot add a scene", not attempt(ben_agent, scene, (sc, s1, 7, "talk", "Agent", 5, None, "{}")))
+    check("a teacher's agent cannot change a scene",
+          attempt(ben_agent, "update public.scenes set title = 'Agent' where id = %s returning id", (a1,)) and last_rows == [])
+    check("a teacher's agent cannot reorder the run of show",
+          not attempt(ben_agent, "select public.reorder_scenes(%s, %s::uuid[])", (s1, "{%s,%s,%s}" % (a3, a2, a1))))
+    check("a teacher's agent cannot write a scene note", not attempt(ben_agent, note, (a2, sc, "Agent note.")))
+    ben = as_user("ben")
+    check("a teacher reorders the whole run of show at once",
+          attempt(ben, "select public.reorder_scenes(%s, %s::uuid[])", (s1, "{%s,%s,%s}" % (a3, a1, a2))))
+    ben.execute("select id from public.scenes where session_id = %s order by position", (s1,))
+    check("and the scenes are in the new order", [r[0] for r in ben.fetchall()] == [a3, a1, a2])
+    check("reordering refuses a list that leaves a scene out",
+          not attempt(ben, "select public.reorder_scenes(%s, %s::uuid[])", (s1, "{%s,%s}" % (a1, a2))))
+    check("a teacher copies last week's run of show into an empty session",
+          attempt(ben, "select public.copy_scenes(%s, %s)", (s1, s2)) and last_rows == [(3,)])
+    ben.execute("select kind from public.scenes where session_id = %s order by position", (s2,))
+    check("the copy keeps the order and kinds", [r[0] for r in ben.fetchall()] == ["question", "talk", "rooms"])
+    ben.execute("select count(*) from public.scene_notes n join public.scenes s on s.id = n.scene_id where s.session_id = %s", (s2,))
+    check("and the teacher's notes come with it", ben.fetchone()[0] == 1)
+    check("copying never overwrites a run of show that is already there",
+          not attempt(ben, "select public.copy_scenes(%s, %s)", (s1, s2)))
+    bea = as_user("bea")
+    check("a student cannot copy a run of show",
+          not attempt(bea, "select public.copy_scenes(%s, %s)", (s1, o1)))
+    ben = as_user("ben")
+    ben.execute("update public.cohorts set status = 'finished' where id = %s", (sc,))
+    ben.execute("select count(*) from public.scenes where cohort_id = %s", (sc,))
+    check("the run of show stays when the cohort finishes, for a later cohort to copy", ben.fetchone()[0] == 6)
+    ben.execute("delete from public.sessions where id = %s", (s2,))
+    ben.execute("select count(*) from public.scenes where session_id = %s", (s2,))
+    check("a session's scenes go with it", ben.fetchone()[0] == 0)
     conn.rollback()
     conn.close()
     failed = [n for n, ok in results if not ok]

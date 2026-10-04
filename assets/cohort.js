@@ -530,6 +530,32 @@
     });
   }
 
+  // The next session's run of show (R2; migration 20261004050000): its
+  // scenes' kinds, titles, and minutes, read-only, so everyone knows how
+  // the session will go. The teacher's notes are never readable here.
+  // Words by Claude, awaiting Ben's review.
+  function drawRunOfShow(next) {
+    var box = $('[data-run-of-show]');
+    var S = window.ShowLib;
+    if (!box || !S) return;
+    box.hidden = true;
+    if (!next) return;
+    db.from('scenes').select('id, position, kind, title, minutes').eq('session_id', next.id).order('position').then(function (r) {
+      if (r.error || !r.data.length) return;
+      var list = $('[data-run-of-show-list]');
+      list.replaceChildren();
+      var at = S.startTimes(r.data);
+      r.data.forEach(function (sc, i) {
+        var k = S.kind(sc.kind);
+        var li = el('li', null);
+        li.appendChild(el('span', 'scene-at', Math.floor(at[i] / 60) + ':' + ('0' + (at[i] % 60)).slice(-2)));
+        li.appendChild(el('span', 'scene-glance', sc.title + (k ? ', ' + k.name.toLowerCase() : '') + ', ' + sc.minutes + ' min'));
+        list.appendChild(li);
+      });
+      box.hidden = false;
+    });
+  }
+
   function draw(people, mine, sessions, groups, shares, contact, teachers) {
     $('[data-title]').textContent = cohort.title;
     $('[data-lead]').textContent = cohort.description || '';
@@ -551,6 +577,7 @@
     } else {
       $('[data-next-when]').textContent = sessions.length ? 'The last session has happened.' : 'The sessions have not been scheduled yet.';
     }
+    drawRunOfShow(t.next);
     var past = sessions.filter(function (s) { return safe(s.recording_url); });
     past.forEach(function (s) { na.appendChild(link(s.recording_url, 'Week ' + s.number + ' recording')); });
 

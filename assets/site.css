@@ -1337,3 +1337,36 @@ label.check { min-height: 2.25rem; }
 .path-bring { margin: 0.75rem 0 0; }
 .path-bring .hint { color: var(--muted); font-size: 0.9rem; }
 .stages .path-mark { grid-column: 2; font-size: 0.85rem; color: var(--clay); font-weight: 600; }
+
+/* The class builder (R2, assets/show-builder.js): each week's run of
+   show under its session on /teach/, and a glance at it on /cohort/. The
+   preview is the main stage in miniature, in the stage's own dark band. */
+.show-builder { margin-top: 0.75rem; border-top: 1px solid var(--rule); padding-top: 0.75rem; }
+.show-builder > summary { cursor: pointer; font-weight: 600; }
+.show-box { display: grid; gap: 0.5rem; margin-top: 0.5rem; min-width: 0; }
+.show-fit { margin: 0; }
+.show-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
+.scene-item { border: 1px solid var(--rule); border-radius: 10px; padding: 0.7rem 0.8rem; background: var(--card); min-width: 0; }
+.scene-item.is-dragging { opacity: 0.5; }
+.scene-item:focus { outline: 2px solid var(--clay); outline-offset: 2px; }
+.scene-head { display: flex; gap: 0.75rem; align-items: baseline; min-width: 0; }
+.scene-at { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 0.9rem; flex: none; }
+.scene-words { display: flex; flex-wrap: wrap; gap: 0.15rem 0.5rem; align-items: baseline; min-width: 0; }
+.scene-kind { font-size: 0.8rem; font-weight: 600; color: var(--clay); text-transform: uppercase; letter-spacing: 0.04em; }
+.scene-title { overflow-wrap: anywhere; }
+.scene-note { margin: 0.35rem 0 0; }
+.scene-actions { margin-top: 0.5rem; flex-wrap: wrap; gap: 0.35rem; }
+.scene-actions .btn-quiet { font-size: 0.9rem; padding: 0.3rem 0.6rem; }
+.scene-form { display: grid; gap: 0.6rem; }
+.scene-form label { display: grid; gap: 0.25rem; }
+.scene-form .hint { color: var(--muted); font-size: 0.85rem; font-weight: 400; }
+.stage-preview { margin-top: 0.6rem; background: var(--band); color: var(--band-ink); border-radius: 10px; padding: 1rem 1.1rem; aspect-ratio: 16 / 9; overflow: hidden; display: flex; flex-direction: column; gap: 0.35rem; }
+.stage-preview p { margin: 0; }
+.stage-eyebrow { color: var(--band-clay); font-weight: 600; font-size: 0.85rem; }
+.stage-title { font-size: 1.25rem; font-weight: 700; line-height: 1.2; }
+.stage-line { color: var(--band-ink); }
+.stage-items { margin: 0; padding-left: 1.1rem; color: var(--band-ink); }
+.stage-note { color: var(--band-muted); font-size: 0.9rem; margin-top: auto; }
+.run-of-show h3 { font-size: 1rem; margin: 0.75rem 0 0.35rem; }
+.show-glance { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.25rem; }
+.show-glance li { display: flex; gap: 0.6rem; align-items: baseline; }

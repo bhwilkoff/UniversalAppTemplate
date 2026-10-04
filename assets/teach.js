@@ -760,6 +760,25 @@
       var save = el('button', 'btn-quiet', 'Save week ' + s.number); save.type = 'submit';
       var msg = el('span', 'small');
       var a = el('div', 'actions'); a.appendChild(save); a.appendChild(msg); f.appendChild(a);
+      // The run of show (R2): the class builder, opened under each week.
+      // Words by Claude, awaiting Ben's review.
+      if (window.ShowBuilder && window.ShowLib) {
+        var show = el('details', 'show-builder');
+        show.appendChild(el('summary', null, 'Run of show for week ' + s.number));
+        var showBox = el('div', 'show-box');
+        show.appendChild(showBox);
+        var mounted = false;
+        show.addEventListener('toggle', function () {
+          if (!show.open || mounted) return;
+          mounted = true;
+          window.ShowBuilder.mount(showBox, {
+            db: db, cohort: current, session: s, sessions: sessions,
+            agenda: window.CohortLib ? window.CohortLib.agenda(current.session_minutes) : [],
+            turn: window.LiveLib ? window.LiveLib.TURN : []
+          });
+        });
+        f.appendChild(show);
+      }
       f.addEventListener('submit', function (ev) {
         ev.preventDefault();
         var e = f.elements;
