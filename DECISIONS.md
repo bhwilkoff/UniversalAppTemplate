@@ -299,3 +299,13 @@ page, run entirely inside Meet (a teacher view and a student view of the
 add-on, with everything /live/ has), and followed up afterwards; one
 timeline-shaped metaphor runs through all of it. The design is in
 research/notes/run-of-show-design.md.
+
+## Google sign-in beside GitHub (October 4, 2026)
+
+Google lists a Meet add-on publicly only if it offers Google's One Tap
+sign-in to someone who is not signed in (tools/meet-addon/LISTING.md).
+Asked how to handle that, Ben chose "Add Google sign-in": inside Meet,
+people sign in with Google in one tap, and the first time they link their
+GitHub account in a small window, so GitHub stays the identity for
+repositories and discussions. The Google sign-in client lives in the
+`human-shaped` Cloud project, at no cost.
