@@ -883,7 +883,15 @@ October 3, after every C milestone that does not wait on Ben merged):
   476 database checks, 238 node tests, 19 meet-events tests.
 - Admin console, October 4: Meet's "Supplemental add-ons" (Google's and
   third-party) were already on for All Users, so Live sessions has them.
-- Next: G1 and G2.
+- meet-events as meet@, October 4: clasp signed in as meet@ (Ben's
+  click), the Apps Script API turned on in meet@'s settings, the project
+  "Human Shaped live sessions" created and pushed (the server copy
+  matches Code.gs; .clasp.json stays out of git), linked to Cloud
+  project 1086485459450, and NOTICES_URL set. Left for Ben: paste
+  NOTICES_SECRET (from ~/.humanshaped/notices-secret, copied to his
+  clipboard), run whoAmI and press Allow, then a test cohort for
+  setupCohort.
+- Next: G1 and G2 (building).
 
 ## Where to pick up
 
