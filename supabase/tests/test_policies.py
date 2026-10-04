@@ -1799,6 +1799,40 @@ def main():
     check("the teacher can clear a finished request and ask again",
           attempt(u("ben"), "delete from public.setup_requests where id = %s returning id", (rid,)) and len(last_rows) == 1
           and attempt(u("ben"), "insert into public.setup_requests (cohort_id) values (%s)", (qc,)))
+
+    # ---- Co-teachers (migration 20261004020000) -------------------------
+    if "kofi" not in people:
+        uid = str(uuid.uuid4())
+        su.execute("reset role")
+        su.execute("insert into auth.users (id, raw_user_meta_data) values (%s, %s)",
+                   (uid, '{"user_name": "kofi", "provider_id": "%d"}' % (abs(hash("kofi")) % 10**8)))
+        people["kofi"] = uid
+    su.execute("reset role")
+    su.execute("insert into public.teachers (user_id) values (%s) on conflict do nothing", (people["kofi"],))
+    attempt(as_user("ben"), "insert into public.cohorts (slug, title, created_by) values ('co-teach', 'Co-teach', %s) returning id", (people["ben"],))
+    ct = last_rows[0][0]
+    check("a teacher can add another teacher to their cohort",
+          attempt(as_user("ben"), "insert into public.cohort_teachers (cohort_id, user_id) values (%s, %s)", (ct, people["kofi"])))
+    check("a student cannot remove a cohort's teacher",
+          attempt(as_user("bea"), "delete from public.cohort_teachers where cohort_id = %s and user_id = %s returning user_id", (ct, people["kofi"])) and last_rows == [])
+    check("a teacher's agent cannot remove a co-teacher",
+          attempt(as_agent("ben"), "delete from public.cohort_teachers where cohort_id = %s and user_id = %s returning user_id", (ct, people["kofi"])) and last_rows == [])
+    check("a teacher of the cohort can remove a co-teacher",
+          attempt(as_user("ben"), "delete from public.cohort_teachers where cohort_id = %s and user_id = %s returning user_id", (ct, people["kofi"])) and len(last_rows) == 1)
+    check("the cohort's maker cannot be taken off it, even by themselves",
+          not attempt(as_user("ben"), "delete from public.cohort_teachers where cohort_id = %s and user_id = %s returning user_id", (ct, people["ben"])))
+    attempt(as_user("ben"), "insert into public.cohort_teachers (cohort_id, user_id) values (%s, %s)", (ct, people["kofi"]))
+    check("nor by a co-teacher",
+          not attempt(as_user("kofi"), "delete from public.cohort_teachers where cohort_id = %s and user_id = %s returning user_id", (ct, people["ben"])))
+    check("a co-teacher can step away from the cohort",
+          attempt(as_user("kofi"), "delete from public.cohort_teachers where cohort_id = %s and user_id = %s returning user_id", (ct, people["kofi"])) and len(last_rows) == 1)
+    check("and then no longer teaches it",
+          attempt(as_user("kofi"), "update public.cohorts set title = 'Taken' where id = %s returning id", (ct,)) and last_rows == [])
+    check("deleting the cohort still takes its teachers' rows with it",
+          attempt(as_user("ben"), "delete from public.cohorts where id = %s returning id", (ct,)) and len(last_rows) == 1)
+    su.execute("reset role")
+    su.execute("select count(*) from public.cohort_teachers where cohort_id = %s", (ct,))
+    check("and leaves none behind", su.fetchone()[0] == 0)
     conn.rollback()
     conn.close()
     failed = [n for n, ok in results if not ok]

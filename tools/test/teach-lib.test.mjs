@@ -69,7 +69,7 @@ const draft = { slug: 'spring', status: 'draft', starts_on: null, session_weekda
 const keysDone = (steps) => steps.filter((s) => s.done).map((s) => s.key);
 test('a new draft cohort has every setup step still to do', () => {
   const steps = lib.cohortSetupSteps(draft, [], null);
-  assert.deepEqual(steps.map((s) => s.key), ['schedule', 'sessions', 'host', 'event', 'repo', 'open']);
+  assert.deepEqual(steps.map((s) => s.key), ['schedule', 'sessions', 'host', 'event', 'repo', 'open', 'groups', 'rehearse', 'agent']);
   assert.deepEqual(keysDone(steps), []);
 });
 test('a Meet link on one week checks off the host, and on every week the event', () => {
@@ -87,6 +87,27 @@ test('the conversation step appears once the repository and team are named, and 
   assert.equal(talk.href, '/cohort/?c=spring#talk-title');
   assert.deepEqual(keysDone(invited), ['repo', 'open']);
   assert.equal(lib.cohortSetupSteps(c, [], { state: 'member' }).find((s) => s.key === 'talk').done, true);
+});
+test('the trios step checks off only when every group has its room', () => {
+  const c = { ...draft, status: 'open' };
+  const step = (groups) => lib.cohortSetupSteps(c, [], null, null, { groups }).find((s) => s.key === 'groups');
+  assert.equal(step([]).done, false);
+  assert.equal(step([]).note, null);
+  const half = step([{ meet_url: 'https://meet.google.com/aaa-bbbb-ccc' }, { meet_url: null }]);
+  assert.equal(half.done, false);
+  assert.match(half.note, /without a room/);
+  assert.equal(step([{ meet_url: 'https://meet.google.com/aaa-bbbb-ccc' }]).done, true);
+});
+test('rehearsing the live page links there and checks off once this browser has opened it', () => {
+  const r = lib.cohortSetupSteps(draft, [], null, null, { rehearsed: true }).find((s) => s.key === 'rehearse');
+  assert.equal(r.href, '/live/?c=spring');
+  assert.equal(r.done, true);
+  assert.equal(lib.cohortSetupSteps(draft, [], null).find((s) => s.key === 'rehearse').done, false);
+});
+test('connecting an agent is optional, so it never keeps the card open', () => {
+  const a = lib.cohortSetupSteps(draft, [], null).find((s) => s.key === 'agent');
+  assert.equal(a.optional, true);
+  assert.equal(a.href, '/connect/');
 });
 test('a person sees the form, their waiting request, or the answer', () => {
   assert.equal(lib.requestState(true, null), 'teacher');
