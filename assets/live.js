@@ -151,18 +151,7 @@
     $('[data-cohort-link]').href = back.href;
 
     S.parts = lib.agenda(cohort.session_minutes);
-    var ol = $('[data-agenda]'); ol.replaceChildren();
-    S.parts.forEach(function (p) {
-      var li = el('li', 'agenda-part');
-      li.setAttribute('data-part', p.key);
-      li.appendChild(el('h3', null, p.name));
-      li.appendChild(el('p', 'small', 'Minute ' + p.start + ', for ' + p.minutes + ' minutes'));
-      li.appendChild(el('p', null, p.what));
-      // Starting a part's timer also tells the page that this is the part
-      // the session is in, whatever the clock says.
-      li.appendChild(timerButton(p.minutes * 60, 'part:' + p.key, function () { S.chosenPart = p.key; drawNow(); }));
-      ol.appendChild(li);
-    });
+    startShow();
 
     var stages = lib.stagesForWeek(session.number);
     $('[data-stages-section]').hidden = !stages.length;
@@ -209,16 +198,54 @@
   function drawNow(force) {
     var part = lib.partNow(S.parts, S.session.starts_at, new Date(), S.chosenPart);
     var key = part ? part.key : null;
-    root.querySelectorAll('[data-part]').forEach(function (li) { li.classList.toggle('now', li.getAttribute('data-part') === key); });
+    if (clockLine) clockLine.textContent = part ? 'Minute ' + part.start + ' of ' + S.cohort.session_minutes + ', for ' + part.minutes + ' minutes' : 'Before the session, week ' + S.session.number;
     if (!force && key === S.drawnPart) return;
     S.drawnPart = key;
     var body = $('[data-now-body]');
     body.replaceChildren();
-    var section = $('[data-now]');
     if (key === 'arrive') drawArrive(body);
     else if (key === 'show') drawGroups(body);
-    section.hidden = !body.children.length;
-    if (part) $('[data-now-title]').textContent = part.name;
+    body.hidden = !body.children.length;
+    if (show) show.update(key);
+  }
+
+  // ------------------------------------------------------------------
+  // The run of show (R1): the same component as the Meet add-on's panel
+  // (ShowView), for the teacher's view or the student's. Each part of
+  // this page is drawn by its own code and handed to it to place.
+  // ------------------------------------------------------------------
+
+  var show = null, clockLine = null;
+  function startShow() {
+    if (show || !window.ShowView) return;
+    show = window.ShowView.mount({
+      mount: $('[data-show]'), parts: S.parts, teaching: S.teaching,
+      onPick: function (key) { S.chosenPart = key; drawNow(); },
+      // A scene's timer also tells the page that this is the scene the
+      // session is in, whatever the clock says.
+      tools: function (key) {
+        var p = S.parts.filter(function (x) { return x.key === key; })[0];
+        return p ? timerButton(p.minutes * 60, 'part:' + p.key, function () { S.chosenPart = p.key; drawNow(); }) : null;
+      }
+    });
+    var clock = el('div', 'addon-part');
+    clockLine = el('p', 'kicker');
+    clock.appendChild(clockLine);
+    show.slot('clock', clock);
+    show.slot('lead', $('[data-now-body]'));
+    show.slot('wings', $('[data-wings]'));
+    show.slot('questions', $('[data-questions]'));
+    show.slot('rooms', $('[data-rooms]'));
+    show.slot('brought', $('[data-brought-section]'));
+    show.slot('path', $('[data-stages-section]'));
+    show.slot('thread', $('[data-thread-section]'));
+    show.slot('conversation', $('[data-talk-section]'));
+    if (S.teaching) show.slot('pushed', $('[data-pushed-section]'));
+    var board = el('div');
+    board.appendChild(el('p', 'small', 'This week’s design stage for the whole cohort. Everyone draws on it at once, and it is kept with the session.'));
+    var open = el('a', 'btn-github', 'Open the design stage'); open.href = '/board/?c=' + encodeURIComponent(S.cohort.slug) + '&s=week-' + S.session.number; open.target = '_blank'; open.rel = 'noopener';
+    board.appendChild(el('p')).appendChild(open);
+    show.slot('design', board);
   }
 
   // While people arrive: what the teacher heard in last week's checks,
@@ -331,15 +358,12 @@
     if (rooms || !window.RoomBoard) return;
     var mine = S.groups.some(function (g) { return g.group_members.some(function (m) { return m.user_id === S.me.id; }); });
     if (!S.groups.length || (!S.teaching && !mine)) return;
-    $('[data-rooms-intro]').textContent = S.teaching
-      ? 'Where each group is in its turns, from the step timers and the Next step button in each room. A group that would like you lights up. Join its room, say that you are there, and press I am here.'
-      : 'Where your group is in its turns, which your teacher can see from any room. Press Next step as you go, and ask for your teacher here if you would like them to come.';
     rooms = window.RoomBoard.start({
       db: db, cohort: S.cohort, session: S.session, meId: S.me.id, teaching: S.teaching, groups: S.groups, people: S.people,
       names: S.names, nameOf: nameOf, mount: $('[data-rooms]'),
       onChange: function (byGroup) {
         roomPlaces = byGroup;
-        $('[data-rooms-section]').hidden = $('[data-rooms]').hidden;
+        if (show) show.count('rooms', S.teaching ? Object.keys(byGroup).filter(function (k) { return byGroup[k].asking; }).length : 0);
         root.querySelectorAll('[data-steps-of]').forEach(function (list) { markSteps(list, byGroup[list.getAttribute('data-steps-of')]); });
       }
     });
@@ -401,15 +425,16 @@
     var people = Object.keys(who).map(function (id) { return { id: id, name: id === S.me.id ? who[id] + ' (you)' : who[id] }; })
       .sort(function (a, b) { return a.name.toLowerCase().localeCompare(b.name.toLowerCase()); });
     $('[data-sig-controls]').hidden = !S.teaching;
-    $('[data-sig-card-page]').href = '/card/?c=' + encodeURIComponent(S.cohort.slug);
     signals = window.LiveSignals.start({
       db: db, cohort: S.cohort, session: S.session, meId: S.me.id, teaching: S.teaching, groups: S.groups,
       nameOf: nameOf, people: people, roomMinutes: partMinutes('show'),
       mounts: {
         recording: $('[data-sig-recording]'), where: $('[data-sig-where]'), card: $('[data-sig-card]'), stage: $('[data-sig-stage]'),
-        controls: S.teaching ? $('[data-sig-controls]') : null
+        controls: S.teaching ? root.querySelector('[data-state="ready"]') : null
       }
     });
+    // Each cue group sits in the scene it belongs to (ShowLib.SLOTS).
+    if (S.teaching && show) show.cues($('[data-sig-controls-body]'), { cardHref: '/card/?c=' + encodeURIComponent(S.cohort.slug) });
   }
 
   // ------------------------------------------------------------------
@@ -552,7 +577,7 @@
 
   function queueItem(item, i, isShown) {
     var li = el('li', 'live-item' + (!isShown && i === 0 ? ' next' : ''));
-    if (!isShown && i === 0) li.appendChild(el('p', 'kicker', 'Up next'));
+    if (!isShown && i === 0) li.appendChild(el('p', 'kicker', 'Next to present'));
     li.appendChild(el('p', 'live-who', nameOf(item.user_id)));
     li.appendChild(el('p', 'live-what', L.itemLabel(item)));
     if (item.note) li.appendChild(el('p', 'live-note', item.note));
@@ -561,8 +586,8 @@
     open.setAttribute('aria-label', 'Open ' + L.itemLabel(item) + ' in a new tab');
     acts.appendChild(open);
     if (L.canManage(item, S.me.id, S.teaching)) {
-      if (isShown) acts.appendChild(button('Back in the queue', 'btn-quiet', function () { setItem(item, { state: 'waiting' }); }));
-      else acts.appendChild(button('It has been shown', 'btn-quiet', function () { setItem(item, { state: 'shown' }); }));
+      if (isShown) acts.appendChild(button('Back in the wings', 'btn-quiet', function () { setItem(item, { state: 'waiting' }); }));
+      else acts.appendChild(button('They have presented', 'btn-quiet', function () { setItem(item, { state: 'shown' }); }));
       acts.appendChild(button('Take it off', 'btn-quiet', function () { removeItem(item); }));
     }
     li.appendChild(acts);
@@ -572,10 +597,11 @@
   function drawQueue(items) {
     var q = L.queue(items);
     var list = $('[data-queue]'); list.replaceChildren();
-    if (!q.waiting.length) list.appendChild(el('li', 'live-empty small', q.shown.length ? 'Everything in the queue has been shown.' : 'Nothing is in the queue yet.'));
+    if (!q.waiting.length) list.appendChild(el('li', 'live-empty small', q.shown.length ? 'Everyone in the wings has presented.' : 'No one is in the wings yet. Ask to present below.'));
     q.waiting.forEach(function (item, i) { list.appendChild(queueItem(item, i, false)); });
     $('[data-shown-wrap]').hidden = !q.shown.length;
-    $('[data-shown-summary]').textContent = 'Shown so far (' + q.shown.length + ')';
+    $('[data-shown-summary]').textContent = 'Presented so far (' + q.shown.length + ')';
+    if (show) show.count('wings', q.waiting.length);
     var shown = $('[data-shown]'); shown.replaceChildren();
     q.shown.forEach(function (item, i) { shown.appendChild(queueItem(item, i, true)); });
   }
@@ -699,6 +725,7 @@
   function drawChecks(checks, answers, tallies) {
     var open = checks.filter(function (k) { return k.state === 'open'; });
     var closed = checks.filter(function (k) { return k.state !== 'open'; });
+    if (show) show.count('questions', open.length);
     function card(k) {
       if (S.teaching) return teacherCard(k, answers, tallies[k.id]);
       return studentCard(k, answers.filter(function (a) { return a.check_id === k.id && a.user_id === S.me.id; })[0], tallies[k.id]);
