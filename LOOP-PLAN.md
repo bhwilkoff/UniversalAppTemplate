@@ -938,6 +938,17 @@ decision), must work with third-party cookies blocked (untested), and
 must not be a work in progress (submit after a real call with a Gmail
 student).
 
+- **R2 (merged, migration 20261004050000 applied):** "Run of show for
+  week N" on /teach/: start from the six parts or copy last week; each
+  scene (talk, presenter, question, design stage, rehearsal rooms,
+  break, reflection) with start time, minutes, kind-specific fields,
+  teacher-only notes (scene_notes), reorder by buttons, Alt+arrow, or
+  drag, and a main-stage preview; /cohort/ shows "How it will go"
+  read-only. Scenes stay when a cohort finishes so later cohorts can
+  copy them (they hold no student data; the design note said delete,
+  so this waits on Ben's word). 586 database checks, 283 node tests.
+  Not yet tried signed in.
+
 **Next: the second gap analysis (October 4)**
 - **H1 (merged, migration 20261004020000 applied):** /teach/guide/
   rewritten to match the hub (six parts, trios, the repository button,
