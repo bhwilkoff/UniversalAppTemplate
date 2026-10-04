@@ -314,6 +314,7 @@
           drawSetup(mine, res[6].data);
           drawPublicChoice(mine, res[1].data);
           drawShowcase(res[1].data);
+          drawCredentialNote();
         });
       });
     }).catch(function (err) { fail('Something went wrong: ' + (err && err.message ? err.message : 'no details') + '.'); });
@@ -334,6 +335,29 @@
     $('[data-lesson-line]').hidden = !lesson;
     if (lesson) $('[data-lesson-link]').href = S.lessonIssueUrl(cohort.title);
     box.hidden = !open && !lesson;
+  }
+
+  // Your credential from this cohort, once a teacher has recorded it
+  // (the holder reads their own; migration 20261003070000). Words by
+  // Claude, awaiting Ben's review (H2).
+  function drawCredentialNote() {
+    var p = $('[data-credential-note]');
+    if (!p) return;
+    p.hidden = true;
+    db.from('credentials').select('id, signed_at, revoked_at').eq('cohort_id', cohort.id).eq('user_id', me.id)
+      .is('revoked_at', null).maybeSingle().then(function (r) {
+        if (r.error || !r.data) return;
+        p.replaceChildren();
+        if (r.data.signed_at) {
+          p.appendChild(document.createTextNode('Your credential from this cohort is signed. '));
+          var a = document.createElement('a'); a.href = '/credential/?id=' + encodeURIComponent(r.data.id);
+          a.textContent = 'Open it to share, download, or check it'; p.appendChild(a);
+          p.appendChild(document.createTextNode('.'));
+        } else {
+          p.textContent = 'Your teacher has recorded your credential from this cohort, and it is waiting to be signed. It will be on your account page once it is.';
+        }
+        p.hidden = false;
+      });
   }
 
   // Showing your app in public is your own choice (hub-privacy-notes.md).

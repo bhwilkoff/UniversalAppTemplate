@@ -130,6 +130,13 @@
             <div data-request-list></div>
           </div>
 
+          <!-- Written by Claude, awaiting Ben's review (H2). -->
+          <div class="queue" data-signing hidden>
+            <h2>Waiting to be signed</h2>
+            <p class="small">Credentials the teachers of any cohort have recorded, oldest first. Copy one, run <code>node tools/credential/sign-waiting.mjs</code> in the site folder on the computer that holds the key, and paste what it puts back on your clipboard here. The page checks the signature before it saves anything.</p>
+            <div data-signing-list></div>
+          </div>
+
           <div class="queue" data-queue>
             <h2>Waiting for your feedback</h2>
             <p class="small" data-queue-intro>When someone in one of your cohorts asks for feedback or asks a question, it waits here until you answer, oldest first.</p>
