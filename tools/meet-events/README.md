@@ -151,25 +151,31 @@ recipients a day on a Workspace account
 
 The script never reads the database itself. It asks the hub's `notices`
 Edge Function, which hands back an address and two counts per person and
-nothing else, and only to a caller holding a shared secret. Ben's steps,
-once, in order:
+nothing else, and only to meet@humanshaped.org itself.
 
-1. **Make the secret.** Any long random string, for example from
-   `openssl rand -hex 32`. It goes in two places below and nowhere else,
-   never in this repository.
-2. **Give it to the hub.** In Supabase, Edge Functions, Secrets, add
-   `NOTICES_SECRET`. (The agent deploys the `notices` function with
-   verify_jwt off, the same way as `mcp`.)
-3. **Give it to the script.** Script Properties: `NOTICES_SECRET` (the
-   same string), `NOTICES_URL`
-   (`https://bifrieqzkihuxfzttgvd.supabase.co/functions/v1/notices`), and
-   `NOTICES_ON` = `true`.
-4. **Allow the new scope.** `appsscript.json` now asks for
-   `script.send_mail`; run `whoAmI` and press Allow.
-5. **Run `sendNotices` once from the editor.** With no one waiting it
-   says "Sent 0 notice(s)" and how much mail is left today.
-6. **Add the daily trigger.** Triggers, Add Trigger, `sendNotices`,
-   time-driven, day timer, at an hour that suits the cohort.
+**How the hub knows it is meet@, with nothing to paste.** The script sends
+the Google ID token Apps Script gives the account it runs as
+(`ScriptApp.getIdentityToken()`, which needs the `openid` scope in
+`appsscript.json`). The hub checks Google's signature against Google's
+published keys, that the token is current, that it speaks for a verified
+meet@humanshaped.org in humanshaped.org, and that it was issued to this
+script's own Cloud project (an OAuth client ID beginning
+`1086485459450-`). `whoAmI` prints the exact client ID; the agent can then
+pin it in Supabase as `GOOGLE_ID_AUDIENCES`. The function addresses are
+built into `Code.gs` (`HUB_FUNCTIONS`), so there are no URLs to set either.
+The older shared secrets still work while they are set in Supabase, and
+can be removed once the token has worked.
+
+Ben's steps, once:
+
+1. **Run `whoAmI` from the editor and press Allow** as meet@. That one
+   consent covers everything here: email (`script.send_mail`), the
+   identity token (`openid`), and calling the hub.
+
+The agent's steps, after that: set `NOTICES_ON` = `true` in Script
+Properties, run `sendNotices` once (with no one waiting it says "Sent 0
+notice(s)" and how much mail is left today), and add the daily trigger
+(Triggers, Add Trigger, `sendNotices`, time-driven, day timer).
 
 *Check:* sign in as a test student, turn on "Email me ... when a teacher
 writes me a note" on /account/ with an address you can read, have a
@@ -195,21 +201,13 @@ the weekly Meet link and each group's room back, and the hub puts them on
 every week and every group, so the teacher's steps check themselves off.
 A request that fails says why on /teach/, and the teacher asks again.
 
-Ben's steps, once, in order:
-
-1. **Make the secret,** a different one from the notices secret, for
-   example with `openssl rand -hex 32`.
-2. **Give it to the hub.** In Supabase, Edge Functions, Secrets, add
-   `SETUP_QUEUE_SECRET`. (The agent deploys `setup-queue` with
-   `tools/deploy-setup-queue.sh`, verify_jwt off.)
-3. **Give it to the script.** Script Properties: `SETUP_QUEUE_SECRET`
-   (the same string), `SETUP_QUEUE_URL`
-   (`https://bifrieqzkihuxfzttgvd.supabase.co/functions/v1/setup-queue`),
-   and `SETUP_QUEUE_ON` = `true`.
-4. **Run `processSetupRequests` once from the editor.** With nothing
-   waiting it says "No requests are waiting."
-5. **Add the hourly trigger.** Triggers, Add Trigger,
-   `processSetupRequests`, time-driven, hour timer, every hour.
+It proves it is meet@ the same way as the notices above, with its Google
+ID token, so there is nothing to paste. Ben's only step is the same
+`whoAmI` and Allow. The agent's steps, after that: set `SETUP_QUEUE_ON` =
+`true` in Script Properties, run `processSetupRequests` once (with nothing
+waiting it says "No requests are waiting."), and add the hourly trigger
+(Triggers, Add Trigger, `processSetupRequests`, time-driven, hour timer,
+every hour).
 
 *Check:* as a test teacher, make a draft cohort with dates, make its
 weekly sessions, give your own email for invitations on its cohort page,
