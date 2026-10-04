@@ -207,6 +207,7 @@
       say('[data-detail-meta]', meta.join('. ') + '.');
       say('[data-detail-message]', '');
       drawSessions(res[1].data);
+      drawLesson(c, res[1].data);
       drawRoster(res[2].data, res[3].data);
       drawTeachers();
       $('[data-live-link]').href = '/live/?c=' + encodeURIComponent(c.slug);
@@ -729,6 +730,33 @@
         if (/url/.test(x[0])) { input.type = 'url'; input.placeholder = 'https://'; }
         l.appendChild(input); f.appendChild(l);
       });
+      // The showing, open to guests (H5; migration 20261004030000): only
+      // once the database has the columns, so the page works before then.
+      // Words by Claude, awaiting Ben's review.
+      var showcase = 'public_showcase' in s;
+      if (showcase) {
+        var open = el('label', 'check');
+        var openBox = el('input'); openBox.type = 'checkbox'; openBox.name = 'public_showcase'; openBox.checked = !!s.public_showcase;
+        open.appendChild(openBox); open.appendChild(document.createTextNode(' Open this session to guests, as a public showing'));
+        f.appendChild(open);
+        var share = el('label', 'check');
+        var shareBox = el('input'); shareBox.type = 'checkbox'; shareBox.name = 'showcase_shares_link'; shareBox.checked = !!s.showcase_shares_link;
+        share.appendChild(shareBox); share.appendChild(document.createTextNode(' Show its Meet link on the public page, so anyone can ask to join'));
+        f.appendChild(share);
+        var where = el('p', 'small');
+        function drawWhere() {
+          share.hidden = !openBox.checked;
+          where.replaceChildren();
+          if (!openBox.checked) return;
+          where.appendChild(document.createTextNode('Guests read only when it is, the way in if you share it, and the apps your students chose to show. '));
+          var page = el('a', null, 'Its public page'); page.href = '/showcase/?c=' + encodeURIComponent(current.slug);
+          where.appendChild(page);
+          where.appendChild(document.createTextNode(' appears on Events once the cohort is open or running.'));
+        }
+        openBox.addEventListener('change', drawWhere);
+        drawWhere();
+        f.appendChild(where);
+      }
       var save = el('button', 'btn-quiet', 'Save week ' + s.number); save.type = 'submit';
       var msg = el('span', 'small');
       var a = el('div', 'actions'); a.appendChild(save); a.appendChild(msg); f.appendChild(a);
@@ -736,11 +764,24 @@
         ev.preventDefault();
         var e = f.elements;
         var patch = { title: e.title.value.trim() || null, scope: e.scope.value.trim() || null, meet_url: e.meet_url.value.trim() || null, recording_url: e.recording_url.value.trim() || null };
+        if (showcase) { patch.public_showcase = e.public_showcase.checked; patch.showcase_shares_link = e.public_showcase.checked && e.showcase_shares_link.checked; }
         msg.textContent = 'Saving…';
         db.from('sessions').update(patch).eq('id', s.id).then(function (r) { msg.textContent = r.error ? 'Not saved: ' + r.error.message : 'Saved.'; });
       });
       box.appendChild(f);
     });
+  }
+
+  // The lesson the cohort sends back to the template (COURSE.md, "What
+  // a cohort gives back"), offered once the last session has begun or
+  // the cohort is finished. It opens a new issue on GitHub that carries
+  // the cohort's title and nothing about anyone. Words by Claude,
+  // awaiting Ben's review.
+  function drawLesson(c, sessions) {
+    var box = $('[data-lesson]');
+    if (!box || !window.ShowcaseLib) return;
+    box.hidden = !window.ShowcaseLib.lessonTime(c, sessions, new Date());
+    $('[data-lesson-link]').href = window.ShowcaseLib.lessonIssueUrl(c.title);
   }
 
   function personName(e) { return e.profiles ? (e.profiles.display_name || e.profiles.github_login) : 'Someone'; }

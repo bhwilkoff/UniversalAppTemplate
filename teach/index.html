@@ -231,6 +231,13 @@
             <h3>Sessions</h3>
             <div data-sessions></div>
 
+            <!-- The lesson sent back (H5): words by Claude, awaiting Ben's review. -->
+            <div class="lesson" data-lesson hidden>
+              <h3 id="lesson">The lesson this cohort sends back</h3>
+              <p class="small">In the last week, the cohort chooses together one thing it learned that the next builder should not have to learn again: a prompt that worked, a step that broke, or a correction that kept coming up. Send it to the template as an issue, and credit the people who learned it only if each of them said yes. Everything on GitHub is public, so leave out anything private about anyone.</p>
+              <p class="actions"><a class="btn-quiet" data-lesson-link href="https://github.com/bhwilkoff/UniversalAppTemplate/issues/new"><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Send a lesson back to the template</a></p>
+            </div>
+
             <h3>People</h3>
             <div data-roster></div>
 
@@ -286,6 +293,7 @@
   <script src="/assets/credential-check.js" defer></script>
   <script src="/assets/mentor-lib.js" defer></script>
   <script src="/assets/reach-lib.js" defer></script>
+  <script src="/assets/showcase-lib.js" defer></script>
   <script src="/assets/teach.js" defer></script>
 
   <footer class="site-footer">
