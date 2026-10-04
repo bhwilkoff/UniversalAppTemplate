@@ -2175,6 +2175,177 @@ def main():
     check("the show goes when the cohort finishes", su9.fetchone()[0] == 0)
     su9.execute("select count(*) from public.show_state where cohort_id = %s", (roc,))
     check("and another cohort's show stays", su9.fetchone()[0] == 1)
+
+    # The question bank (migration 20261004080000): a teacher's own
+    # questions and a cohort's, six kinds asked in the moment, answers
+    # that fit their kind, edits until the first answer, and results with
+    # no names. bea is a student; kofi is a teacher who co-teaches; dee is
+    # outside the cohort.
+    def rows_as(name, sql, args=()):
+        cur = as_user(name)
+        cur.execute(sql, args)
+        return cur.fetchall()
+
+    if "hana" not in people:
+        uid = str(uuid.uuid4())
+        su.execute("reset role")
+        su.execute("insert into auth.users (id, raw_user_meta_data) values (%s, %s)",
+                   (uid, '{"user_name": "hana", "provider_id": "%d"}' % (abs(hash("hana")) % 10**8)))
+        people["hana"] = uid
+    ben = as_user("ben")
+    attempt(as_user("ben"), "insert into public.cohorts (slug, title, created_by, status) values ('bank-test', 'Bank', %s, 'open') returning id", (people["ben"],))
+    bc = last_rows[0][0]
+    attempt(as_user("ben"), "insert into public.sessions (cohort_id, number) values (%s, 1) returning id", (bc,))
+    b1 = last_rows[0][0]
+    attempt(as_user("kofi"), "insert into public.cohorts (slug, title, created_by, status) values ('bank-kofi', 'Kofi', %s, 'open') returning id", (people["kofi"],))
+    kc = last_rows[0][0]
+    bea = as_user("bea")
+    attempt(as_user("bea"), "insert into public.enrollments (cohort_id, user_id) values (%s, %s)", (bc, people["bea"]))
+    attempt(as_user("hana"), "insert into public.enrollments (cohort_id, user_id) values (%s, %s)", (bc, people["hana"]))
+    addq = "insert into public.questions (cohort_id, kind, prompt, choices, points, owner_id) values (%s, %s, %s, %s, %s, %s) returning id, owner_id"
+    ben = as_user("ben")
+    check("a teacher keeps a question of their own in the bank",
+          attempt(as_user("ben"), addq, (None, "choice", "Which part is hardest?", ["Writing it down", "Proving it", "Living with it"], None, people["ben"])) and last_rows[0][1] == people["ben"])
+    own_q = last_rows[0][0]
+    check("and one for a cohort they teach",
+          attempt(as_user("ben"), addq, (bc, "rank", "Put these in order", ["Speed", "Care", "Cost"], None, people["ben"])))
+    cohort_q = last_rows[0][0]
+    check("a scale question with words for its ends",
+          attempt(as_user("ben"), addq, (None, "scale", "How sure are you?", ["Not at all", "Completely"], 5, people["ben"])))
+    check("a words question, with no choices",
+          attempt(as_user("ben"), addq, (None, "words", "One word for today", None, None, people["ben"])))
+    check("a question with one choice is refused",
+          not attempt(as_user("ben"), addq, (None, "choice", "Only one?", ["Only"], None, people["ben"])))
+    check("a question in someone's own words has no choices",
+          not attempt(as_user("ben"), addq, (None, "short", "Why?", ["A", "B"], None, people["ben"])))
+    check("a scale has three to ten points",
+          not attempt(as_user("ben"), addq, (None, "scale", "How sure?", None, 2, people["ben"])) and
+          not attempt(as_user("ben"), addq, (None, "scale", "How sure?", None, 11, people["ben"])))
+    check("nine choices is too many",
+          not attempt(as_user("ben"), addq, (None, "multi", "Which?", list("abcdefghi"), None, people["ben"])))
+    check("a question is only of the six kinds",
+          not attempt(as_user("ben"), addq, (None, "essay", "Write", None, None, people["ben"])))
+    check("a teacher cannot put a question in a cohort they do not teach",
+          not attempt(as_user("ben"), addq, (kc, "short", "Hello?", None, None, people["ben"])))
+    check("a question is written in the name of the person writing it",
+          attempt(as_user("ben"), addq, (None, "short", "Who wrote this?", None, None, people["kofi"])) and last_rows[0][1] == people["ben"])
+    check("a student cannot keep a bank",
+          not attempt(as_user("bea"), addq, (None, "short", "Mine?", None, None, people["bea"])))
+    check("a student never reads the bank, their cohort's included", rows_as("bea", "select count(*) from public.questions") == [(0,)])
+    check("another teacher reads neither someone's own questions nor a cohort they do not teach",
+          rows_as("kofi", "select count(*) from public.questions where id in (%s, %s)", (own_q, cohort_q)) == [(0,)])
+    attempt(as_user("ben"), "insert into public.cohort_teachers (cohort_id, user_id) values (%s, %s)", (bc, people["kofi"]))
+    check("a co-teacher reads the cohort's questions, and not the other teacher's own",
+          rows_as("kofi", "select id from public.questions where id in (%s, %s)", (own_q, cohort_q)) == [(cohort_q,)])
+    check("a co-teacher edits a cohort question",
+          attempt(as_user("kofi"), "update public.questions set prompt = 'Put these in your order' where id = %s returning prompt", (cohort_q,)) and len(last_rows) == 1)
+    check("but cannot take it into their own library, since they did not write it",
+          not attempt(as_user("kofi"), "update public.questions set cohort_id = null where id = %s", (cohort_q,)))
+    check("a question cannot change hands",
+          not attempt(as_user("kofi"), "update public.questions set owner_id = %s where id = %s", (people["kofi"], cohort_q)))
+    check("a teacher moves their own question into a cohort they teach",
+          attempt(as_user("ben"), "update public.questions set cohort_id = %s where id = %s returning cohort_id", (bc, own_q)) and last_rows == [(bc,)])
+    attempt(as_user("ben"), "update public.questions set cohort_id = null where id = %s", (own_q,))
+    check("a teacher's agent reads their bank",
+          (lambda c: (c.execute("select count(*) from public.questions where id = %s", (own_q,)), c.fetchone()[0])[1])(as_agent("ben")) == 1)
+    check("and cannot add to it, change it, or delete from it",
+          not attempt(as_agent("ben"), addq, (None, "short", "Agent?", None, None, people["ben"]))
+          and attempt(as_agent("ben"), "update public.questions set prompt = 'x' where id = %s returning id", (own_q,)) and last_rows == []
+          and attempt(as_agent("ben"), "delete from public.questions where id = %s returning id", (own_q,)) and last_rows == [])
+
+    ask = "insert into public.live_checks (cohort_id, session_id, created_by, kind, prompt, choices, points, question_id) values (%s, %s, %s, %s, %s, %s, %s, %s) returning id, kind"
+    ben = as_user("ben")
+    check("a page that does not say the kind asks the old way",
+          attempt(as_user("ben"), "insert into public.live_checks (cohort_id, session_id, created_by, prompt, choices) values (%s, %s, %s, 'Which?', array['A', 'B']) returning kind", (bc, b1, people["ben"])) and last_rows == [("choice",)]
+          and attempt(as_user("ben"), "insert into public.live_checks (cohort_id, session_id, created_by, prompt) values (%s, %s, %s, 'Why?') returning kind", (bc, b1, people["ben"])) and last_rows == [("short",)])
+    check("a teacher asks a question from the bank, as a copy",
+          attempt(as_user("ben"), ask, (bc, b1, people["ben"], "rank", "Put these in order", ["Speed", "Care", "Cost"], None, cohort_q)))
+    k_rank = last_rows[0][0]
+    attempt(as_user("ben"), ask, (bc, b1, people["ben"], "multi", "Which did you try?", ["Tests", "Docs", "Logs"], None, None)); k_multi = last_rows[0][0]
+    attempt(as_user("ben"), ask, (bc, b1, people["ben"], "scale", "How sure?", None, 5, None)); k_scale = last_rows[0][0]
+    attempt(as_user("ben"), ask, (bc, b1, people["ben"], "words", "One word", None, None, None)); k_words = last_rows[0][0]
+    attempt(as_user("ben"), ask, (bc, b1, people["ben"], "choice", "Pick one", ["Yes", "No"], None, None)); k_choice = last_rows[0][0]
+    check("a question asked must have its kind's shape",
+          not attempt(as_user("ben"), ask, (bc, b1, people["ben"], "scale", "How sure?", None, None, None)))
+    check("a teacher edits a question before anyone answers",
+          attempt(as_user("ben"), "update public.live_checks set prompt = 'Which did you use?', choices = array['Tests', 'Docs', 'Logs', 'Nothing'] where id = %s returning prompt", (k_multi,)) and last_rows == [("Which did you use?",)])
+    check("and the bank question it came from stays as it was",
+          attempt(as_user("ben"), "update public.live_checks set prompt = 'Order these' where id = %s returning id", (k_rank,))
+          and rows_as("ben", "select prompt from public.questions where id = %s", (cohort_q,)) == [("Put these in your order",)])
+    answer = "insert into public.live_answers (check_id, cohort_id, user_id, choice, body, value) values (%s, %s, %s, %s, %s, %s::jsonb) returning id"
+    bea = as_user("bea")
+    check("a student picks more than one",
+          attempt(as_user("bea"), answer, (k_multi, bc, people["bea"], None, None, "[1, 4]")))
+    check("but not the same choice twice, none, or one that does not exist",
+          not attempt(as_user("bea"), "update public.live_answers set value = '[1, 1]' where check_id = %s returning id", (k_multi,))
+          and not attempt(as_user("bea"), "update public.live_answers set value = '[]' where check_id = %s returning id", (k_multi,))
+          and not attempt(as_user("bea"), "update public.live_answers set value = '[5]' where check_id = %s returning id", (k_multi,)))
+    check("nor a choice number in place of a list",
+          not attempt(as_user("bea"), "update public.live_answers set value = null, choice = 1 where check_id = %s returning id", (k_multi,)))
+    check("a student puts every choice in their order",
+          attempt(as_user("bea"), answer, (k_rank, bc, people["bea"], None, None, "[2, 1, 3]")))
+    check("and must place every one",
+          not attempt(as_user("bea"), "update public.live_answers set value = '[2, 1]' where check_id = %s returning id", (k_rank,)))
+    check("a student picks a point on the scale",
+          attempt(as_user("bea"), answer, (k_scale, bc, people["bea"], 5, None, None)))
+    check("and not one past its end",
+          not attempt(as_user("bea"), "update public.live_answers set choice = 6 where check_id = %s returning id", (k_scale,)))
+    check("a student gives a few words",
+          attempt(as_user("bea"), answer, (k_words, bc, people["bea"], None, "Calm", None)))
+    check("and not a paragraph",
+          not attempt(as_user("bea"), "update public.live_answers set body = %s where check_id = %s returning id", ("x" * 61, k_words)))
+    check("a one-choice answer cannot carry a list besides",
+          not attempt(as_user("bea"), answer, (k_choice, bc, people["bea"], 1, None, "[1]")))
+    hana = as_user("hana")
+    attempt(as_user("hana"), answer, (k_multi, bc, people["hana"], None, None, "[1]"))
+    attempt(as_user("hana"), answer, (k_rank, bc, people["hana"], None, None, "[1, 2, 3]"))
+    attempt(as_user("hana"), answer, (k_words, bc, people["hana"], None, "  CALM ", None))
+    ben = as_user("ben")
+    check("once someone has answered, the question cannot change",
+          not attempt(as_user("ben"), "update public.live_checks set prompt = 'Something else' where id = %s", (k_multi,))
+          and not attempt(as_user("ben"), "update public.live_checks set choices = array['A', 'B'] where id = %s", (k_multi,)))
+    check("but it can still be closed and opened again",
+          attempt(as_user("ben"), "update public.live_checks set state = 'closed' where id = %s returning state", (k_scale,)) and last_rows == [("closed",)]
+          and attempt(as_user("ben"), "update public.live_checks set state = 'open' where id = %s returning state", (k_scale,)))
+    check("a question stays with the bank question it was asked from",
+          not attempt(as_user("ben"), "update public.live_checks set question_id = %s where id = %s", (own_q, k_multi)))
+    def outcome(cur, k):
+        cur.execute("select public.check_results(%s)", (k,))
+        return cur.fetchone()[0]
+    r = outcome(as_user("ben"), k_multi)
+    check("the teacher sees how many chose each choice, with no names",
+          r == {"kind": "multi", "total": 2, "counts": [2, 0, 0, 1]})
+    check("each choice's average place, for an order",
+          outcome(as_user("ben"), k_rank) == {"kind": "rank", "total": 2, "places": [1.5, 1.5, 3]})
+    check("the words together, however they were typed",
+          outcome(as_user("ben"), k_words) == {"kind": "words", "total": 2, "words": [{"word": "calm", "count": 2}]})
+    check("each point on a scale",
+          outcome(as_user("ben"), k_scale) == {"kind": "scale", "total": 1, "counts": [0, 0, 0, 0, 1]})
+    attempt(as_user("bea"), "insert into public.live_checks (cohort_id, session_id, created_by, prompt) values (%s, %s, %s, 'x')", (bc, b1, people["bea"]))
+    bea = as_user("bea")
+    check("a student sees no results until the teacher shows them", outcome(as_user("bea"), k_multi) is None)
+    as_user("ben").execute("update public.live_checks set show_tally = true where id = %s", (k_words,))
+    check("and then the same results everyone sees", outcome(as_user("bea"), k_words)["words"] == [{"word": "calm", "count": 2}])
+    attempt(as_user("ben"), "insert into public.live_checks (cohort_id, session_id, created_by, prompt, show_tally) values (%s, %s, %s, 'In your words?', true) returning id", (bc, b1, people["ben"]))
+    k_short = last_rows[0][0]
+    attempt(as_user("bea"), answer, (k_short, bc, people["bea"], None, "Because I could not tell", None))
+    check("short answers are only ever counted, never shown",
+          outcome(as_user("bea"), k_short) == {"kind": "short", "total": 1})
+    check("someone outside the cohort sees no results", outcome(as_user("dee"), k_words) is None)
+    scene = "insert into public.scenes (cohort_id, session_id, position, kind, title, minutes, config) values (%s, %s, %s, 'question', 'Check', 5, %s::jsonb) returning id"
+    check("a question scene carries its kind, its scale, and the bank question it came from",
+          attempt(as_user("ben"), scene, (bc, b1, 0, json.dumps({"prompt": "How sure?", "kind": "scale", "points": 5, "options": ["Not at all", "Completely"], "question_id": str(own_q)}))))
+    check("and not a kind there is not",
+          not attempt(as_user("ben"), scene, (bc, b1, 1, json.dumps({"prompt": "x", "kind": "essay"})))
+          and not attempt(as_user("ben"), scene, (bc, b1, 1, json.dumps({"prompt": "x", "kind": "scale", "points": 12})))
+          and not attempt(as_user("ben"), scene, (bc, b1, 1, json.dumps({"prompt": "x", "question_id": "not-an-id"}))))
+    as_user("ben").execute("delete from public.questions where id = %s", (cohort_q,))
+    check("deleting a bank question leaves what was asked from it",
+          rows_as("ben", "select question_id, prompt from public.live_checks where id = %s", (k_rank,)) == [(None, "Order these")])
+    as_user("ben").execute("update public.cohorts set status = 'finished' where id = %s", (bc,))
+    su10 = conn.cursor(); su10.execute("reset role")
+    su10.execute("select (select count(*) from public.live_checks where cohort_id = %s), (select count(*) from public.questions where id = %s)", (bc, own_q))
+    check("the questions asked go when the cohort finishes, and the bank stays", su10.fetchone() == (0, 1))
     conn.rollback()
     conn.close()
     failed = [n for n, ok in results if not ok]
