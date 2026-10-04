@@ -78,6 +78,25 @@
     });
   }
 
+  // Who is presenting and what everyone else in the room does, for the
+  // person reading (R6): their own turn, or someone else's with the
+  // step's line as the audience's job. place: placeText's answer.
+  function roleText(place, meId, nameOf, step) {
+    if (!place || !place.started || place.done || !place.presenter) return null;
+    var what = step && step.what ? step.what : '';
+    if (place.presenter === meId) return { presenting: true, text: 'You are presenting.', job: what };
+    return { presenting: false, text: nameOf(place.presenter) + ' is presenting, and you are the audience.', job: what };
+  }
+
+  // Seconds left in a room's step, counted from when the database
+  // started its clock (step_started_at), or null without one.
+  function stepLeft(row, seconds, now) {
+    if (!row || !row.step_started_at || !seconds) return null;
+    var t = Date.parse(row.step_started_at);
+    if (!isFinite(t)) return null;
+    return Math.max(0, Math.round((t + seconds * 1000 - now) / 1000));
+  }
+
   // How long ago a group asked, in whole minutes, in words.
   function agoText(iso, now) {
     var m = Math.max(0, Math.floor((now - Date.parse(iso)) / 60000));
@@ -101,7 +120,7 @@
     return { url: url, space: space };
   }
 
-  var lib = { start: start, isDone: isDone, advance: advance, atStep: atStep, placeText: placeText, board: board, agoText: agoText, parseRoomLine: parseRoomLine };
+  var lib = { start: start, isDone: isDone, advance: advance, atStep: atStep, placeText: placeText, board: board, agoText: agoText, parseRoomLine: parseRoomLine, roleText: roleText, stepLeft: stepLeft };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
   else root.RoomsLib = lib;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

@@ -252,7 +252,18 @@
 
       // Rooms: send, with an optional clock, or call everyone back.
       var minutes = q('[data-sig-rooms-minutes]');
-      if (opts.roomMinutes && !minutes.value) minutes.value = String(opts.roomMinutes);
+      // The current rooms scene's own minutes (R6), when the page knows it.
+      var rm = typeof opts.roomMinutes === 'function' ? opts.roomMinutes() : opts.roomMinutes;
+      if (rm && !minutes.value) minutes.value = String(rm);
+      // Until the teacher types their own, the minutes follow the run of
+      // show to whichever rooms scene is current when they press send.
+      var typedMinutes = false;
+      minutes.addEventListener('input', function () { typedMinutes = true; });
+      q('[data-sig-rooms-send]').addEventListener('click', function () {
+        if (typedMinutes) return;
+        var now = typeof opts.roomMinutes === 'function' ? opts.roomMinutes() : opts.roomMinutes;
+        if (now) minutes.value = String(now);
+      });
       var ask = q('[data-sig-rooms-ask]');
       function sendRooms() {
         var parsed = K.parseMinutes(minutes.value);

@@ -213,6 +213,7 @@
     if (show) show.update(key, runInfo());
     if (S.checks) drawSceneQuestion();
     designHref();
+    if (rooms && rooms.setPlan) rooms.setPlan({ turn: L.roomTurn(roomsScene(), 3), prompt: roomsPrompt() });
   }
 
   // ------------------------------------------------------------------
@@ -393,7 +394,7 @@
     if (!order.length) ol.appendChild(el('li', 'small', 'No one is in this group yet.'));
     card.appendChild(ol);
 
-    var steps = L.turnSteps(partMinutes('show'), order.length || 1);
+    var steps = L.roomTurn(roomsScene(), order.length || 1);
     var each = steps.reduce(function (n, s) { return n + s.seconds; }, 0);
     card.appendChild(el('p', 'kicker', 'Each turn, about ' + Math.round(each / 60) + ' minutes'));
     var sl = el('ol', 'turn-steps');
@@ -428,6 +429,8 @@
     rooms = window.RoomBoard.start({
       db: db, cohort: S.cohort, session: S.session, meId: S.me.id, teaching: S.teaching, groups: S.groups, people: S.people,
       names: S.names, nameOf: nameOf, mount: $('[data-rooms]'),
+      turn: L.roomTurn(roomsScene(), 3), prompt: roomsPrompt(),
+      boardLink: window.BoardLib ? function (gid) { return window.BoardLib.link(S.cohort.slug, S.session, gid, false); } : null,
       onChange: function (byGroup) {
         roomPlaces = byGroup;
         if (show) show.count('rooms', S.teaching ? Object.keys(byGroup).filter(function (k) { return byGroup[k].asking; }).length : 0);
@@ -435,6 +438,16 @@
       }
     });
   }
+
+  // The rooms scene the rehearsal rooms run (R6): the current scene when
+  // it is one, or else the run of show's first, or the six parts' own.
+  function roomsScene() {
+    var list = V ? V.scenes(S.list || S.parts) : [];
+    var now = typeof partNow === 'function' && S.session ? partNow() : null;
+    if (now && now.kind === 'rooms') return now;
+    return list.filter(function (x) { return x.kind === 'rooms'; })[0] || null;
+  }
+  function roomsPrompt() { var r = roomsScene(); return r && r.config && r.config.prompt ? r.config.prompt : null; }
 
   function partMinutes(key) {
     var p = S.parts.filter(function (x) { return x.key === key; })[0];
@@ -494,7 +507,7 @@
     $('[data-sig-controls]').hidden = !S.teaching;
     signals = window.LiveSignals.start({
       db: db, cohort: S.cohort, session: S.session, meId: S.me.id, teaching: S.teaching, groups: S.groups,
-      nameOf: nameOf, people: people, roomMinutes: partMinutes('show'),
+      nameOf: nameOf, people: people, roomMinutes: function () { var r = roomsScene(); return r && r.minutes ? r.minutes : partMinutes('show'); },
       mounts: {
         recording: $('[data-sig-recording]'), where: $('[data-sig-where]'), card: $('[data-sig-card]'), stage: $('[data-sig-stage]'),
         controls: S.teaching ? root.querySelector('[data-state="ready"]') : null

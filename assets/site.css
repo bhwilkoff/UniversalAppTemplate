@@ -1080,6 +1080,14 @@ button.talk-title[aria-expanded="true"]::before { transform: rotate(90deg); }
 .room-card p { margin: 0.35rem 0 0; }
 .room-card .actions { margin-top: 0.6rem; gap: 0.5rem 0.6rem; }
 .room-card.is-asking { border-color: var(--clay); border-width: 3px; background: color-mix(in srgb, var(--clay) 10%, var(--card)); }
+/* Inside a rehearsal room (R6): whose turn, the audience's job, the
+   step's clock, and what the rooms scene asks. */
+.room-card .room-role { font-weight: 650; }
+.room-card .room-role.is-presenting { color: var(--clay); }
+.room-card .room-job { margin-top: 0.15rem; }
+.room-card .room-clock { font-variant-numeric: tabular-nums; font-weight: 600; }
+.room-card .room-clock.is-over { color: var(--clay); }
+.room-card .room-prompt { border-left: 3px solid var(--clay); padding-left: 0.6rem; margin-top: 0.6rem; }
 .room-asking { font-weight: 600; color: var(--clay); }
 @media (min-width: 40rem) { .room-board { grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr)); } }
 p.mark { margin: 0.35rem 0 0; font-weight: 600; font-size: 0.95rem; }

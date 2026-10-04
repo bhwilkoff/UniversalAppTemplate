@@ -27,11 +27,17 @@
   // group_members), people (enrollments with user_id), names { id: name }
   // (for the order of turns, the same on every screen), nameOf(id) ("You"
   // for the reader, for what the board says), mount, onlyGroup (the add-on in one group's room),
-  // showLinks (false inside a room's own call), onChange(byGroup).
+  // showLinks (false inside a room's own call), onChange(byGroup),
+  // turn (the room's own scenes, LiveLib.roomTurn; the trio protocol's
+  // steps without it), prompt (what the rooms scene asks the rooms to
+  // do), and boardLink(groupId) (a group's board, or null).
+  // setPlan({ turn, prompt }) changes the room's scenes when the run of
+  // show moves to another rooms scene (R6).
   function start(opts) {
     var db = opts.db, box = opts.mount;
-    var rows = [], seen = null, channel = null, poller = null, nudgeTimer = null, available = true;
-    var steps = L.TURN.length;
+    var rows = [], seen = null, channel = null, poller = null, nudgeTimer = null, available = true, boards = {};
+    var turn = opts.turn && opts.turn.length ? opts.turn : L.TURN;
+    var steps = turn.length;
 
     function groups() {
       return opts.onlyGroup ? opts.groups.filter(function (g) { return g.id === opts.onlyGroup; }) : opts.groups;
@@ -42,6 +48,7 @@
         .map(function (p) { return { id: p.user_id, name: (opts.names || {})[p.user_id] || 'Someone' }; }), opts.session.number)
         .map(function (p) { return p.id; });
     }
+    function rowOf(groupId) { return rows.filter(function (x) { return x.group_id === groupId; })[0] || null; }
     function stateOf(groupId) {
       var r = rows.filter(function (x) { return x.group_id === groupId; })[0];
       return r ? { step: r.step, presenter: r.presenter } : null;
@@ -57,8 +64,14 @@
         available = true;
         var before = seen;
         rows = r.data || [];
-        seen = JSON.stringify(rows);
-        if (seen !== before) draw();
+        // Which groups have a board this session: a student can open only
+        // one their teacher has made (open_board), a teacher any.
+        return (opts.boardLink ? db.from('boards').select('group_id').eq('session_id', opts.session.id) : Promise.resolve({ data: [] })).then(function (b) {
+          boards = {};
+          ((b && b.data) || []).forEach(function (x) { if (x.group_id) boards[x.group_id] = true; });
+          seen = JSON.stringify([rows, boards, steps, opts.prompt || '']);
+          if (seen !== before) draw();
+        });
       });
     }
 
@@ -99,12 +112,28 @@
       cards.forEach(function (c) {
         var g = opts.groups.filter(function (x) { return x.id === c.id; })[0];
         var order = orderOf(g);
-        var place = R.placeText(c.state, order, L.TURN, opts.nameOf);
+        var place = R.placeText(c.state, order, turn, opts.nameOf);
         byGroup[c.id] = { step: c.state && !place.done ? c.state.step : null, presenter: place.presenter || null, done: place.done, asking: !!c.helpAt };
         var card = el('article', 'room-card' + (c.helpAt ? ' is-asking' : ''));
         card.setAttribute('data-group', c.id);
         card.appendChild(el('h3', null, opts.teaching || !c.mine ? c.name : 'Your group, ' + c.name));
         card.appendChild(el('p', 'room-place', place.text));
+        // Inside the room (R6): whose turn it is, what everyone else does,
+        // and the step's clock, the same on every screen in the room.
+        if (c.mine || opts.onlyGroup) {
+          var step = place.started && !place.done ? turn[Math.min(c.state.step, steps - 1)] : null;
+          var role = R.roleText(place, opts.meId, opts.nameOf, step);
+          if (role) {
+            card.appendChild(el('p', 'room-role' + (role.presenting ? ' is-presenting' : ''), role.text));
+            if (role.job) card.appendChild(el('p', 'small room-job', role.job));
+          }
+        }
+        if (place.started && !place.done) {
+          var clock = el('p', 'room-clock');
+          clock.setAttribute('data-room-clock', c.id);
+          card.appendChild(clock);
+        }
+        if (opts.prompt && (c.mine || opts.onlyGroup) && !place.done) card.appendChild(el('p', 'room-prompt', opts.prompt));
         if (c.helpAt) {
           var asking = el('p', 'room-asking', askingText(c.helpAt, now));
           asking.setAttribute('data-asked', c.helpAt);
@@ -112,6 +141,8 @@
         }
         var acts = el('div', 'actions');
         if (opts.showLinks !== false && c.url) acts.appendChild(link(opts.teaching && !c.mine ? 'Visit its room' : 'Join your group’s room', c.mine ? 'btn-github' : 'btn-quiet', c.url));
+        var boardHref = opts.boardLink && (opts.teaching || boards[c.id]) ? opts.boardLink(c.id) : null;
+        if (boardHref) acts.appendChild(link(opts.teaching && !boards[c.id] ? 'Make its board' : 'The room’s board', 'btn-quiet', boardHref));
         var status = el('span', 'small'); status.setAttribute('role', 'status');
         if (canMove(g)) {
           if (!place.done) {
@@ -143,7 +174,33 @@
         var same = btns.filter(function (b) { return b.textContent === focusText; })[0] || btns[0];
         if (same) same.focus();
       }
+      tickClocks();
       if (opts.onChange) opts.onChange(byGroup);
+    }
+
+    // Each room's step clock, rewritten in place every second so nothing
+    // a person is pointing at moves.
+    function tickClocks() {
+      var now = Date.now();
+      box.querySelectorAll('[data-room-clock]').forEach(function (p) {
+        var id = p.getAttribute('data-room-clock');
+        var st = stateOf(id);
+        var stepNow = st ? turn[Math.min(st.step, steps - 1)] : null;
+        var left = stepNow ? R.stepLeft(rowOf(id), stepNow.seconds, now) : null;
+        p.hidden = left == null;
+        p.classList.toggle('is-over', left === 0);
+        p.textContent = left == null ? '' : left === 0 ? 'This step’s time is up. Move on when you are ready.' : L.clock(left) + ' left in this step';
+      });
+    }
+    setInterval(tickClocks, 1000);
+
+    function setPlan(plan) {
+      var t = plan && plan.turn && plan.turn.length ? plan.turn : L.TURN;
+      var p = plan && plan.prompt ? String(plan.prompt) : null;
+      if (JSON.stringify([t, p]) === JSON.stringify([turn, opts.prompt || null])) return;
+      turn = t; steps = t.length; opts.prompt = p;
+      seen = null;
+      if (available) draw();
     }
 
     function poll(on) {
@@ -171,7 +228,7 @@
     }, 60000);
 
     refresh().then(listen);
-    return { refresh: refresh, setStep: setStep };
+    return { refresh: refresh, setStep: setStep, setPlan: setPlan };
   }
 
   root.RoomBoard = { start: start };

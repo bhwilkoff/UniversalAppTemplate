@@ -1373,6 +1373,33 @@ def main():
     ben = as_user("ben")
     check("a room's place cannot move to another group",
           not attempt(ben, "update public.live_room_state set group_id = %s where group_id = %s", (rg2, rg)))
+
+    # The room's own clock (migration 20261004090000): set by the database
+    # when the step or the presenter changes, and by nothing else.
+    def clock_of(name):
+        cur = as_user(name)
+        cur.execute("select step_started_at from public.live_room_state where group_id = %s", (rg,))
+        return cur.fetchone()[0]
+    started = clock_of("bea")
+    check("a room's step has a clock from the database", started is not None)
+    attempt(as_user("eve"), "update public.live_room_state set help_at = now() where group_id = %s returning group_id", (rg,))
+    check("asking for the teacher leaves the step's clock alone", clock_of("bea") == started)
+    attempt(as_user("eve"), "update public.live_room_state set step_started_at = '2000-01-01' where group_id = %s returning group_id", (rg,))
+    check("no one can set a room's clock themselves", clock_of("bea") == started)
+    # The tests run in one transaction, where now() stands still, so the
+    # clock is set back by hand (as the database's owner) before each move.
+    def set_back():
+        su_clock = conn.cursor(); su_clock.execute("reset role")
+        su_clock.execute("alter table public.live_room_state disable trigger live_room_state_step_clock")
+        su_clock.execute("update public.live_room_state set step_started_at = '2000-01-01' where group_id = %s", (rg,))
+        su_clock.execute("alter table public.live_room_state enable trigger live_room_state_step_clock")
+    set_back()
+    attempt(as_user("bea"), "update public.live_room_state set step = 3 where group_id = %s returning step", (rg,))
+    check("moving to the next step starts its clock again", clock_of("bea").year > 2000)
+    set_back()
+    attempt(as_user("bea"), "update public.live_room_state set presenter = %s where group_id = %s returning step", (people["eve"], rg))
+    check("so does the next person's turn", clock_of("bea").year > 2000)
+    attempt(as_user("bea"), "update public.live_room_state set presenter = %s where group_id = %s returning step", (people["bea"], rg))
     bea = as_user("bea")
     check("a student cannot delete a group's place",
           attempt(bea, "delete from public.live_room_state where group_id = %s returning group_id", (rg,)) and last_rows == [])

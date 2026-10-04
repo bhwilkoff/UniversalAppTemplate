@@ -309,7 +309,7 @@
     var show = S.parts.filter(function (p) { return p.key === 'show'; })[0];
     S.signals = window.LiveSignals.start({
       db: db, cohort: S.cohort, session: S.session, meId: S.me.id, teaching: S.teaching, groups: S.groups,
-      nameOf: nameOf, people: people, roomMinutes: show ? show.minutes : 25,
+      nameOf: nameOf, people: people, roomMinutes: function () { var r = roomsScene(); return r && r.minutes ? r.minutes : (show ? show.minutes : 25); },
       mounts: {
         recording: $('[data-sig-recording]'), where: $('[data-sig-where]'), card: $('[data-sig-card]'), stage: $('[data-sig-stage]'),
         controls: S.teaching ? root.querySelector('[data-state="ready"]') : null
@@ -421,6 +421,7 @@
     drawQueue(); drawChecks();
     if (S.checks) drawSceneQuestion();
     drawBoardActivity();
+    if (S.rooms && S.rooms.setPlan) S.rooms.setPlan({ turn: L.roomTurn(roomsScene(), 3), prompt: roomsPrompt() });
   }
 
   // Back and next without the show (before R3): the panel's own place.
@@ -549,9 +550,21 @@
     S.rooms = window.RoomBoard.start({
       db: db, cohort: S.cohort, session: S.session, meId: S.me.id, teaching: S.teaching, groups: S.groups, people: S.people,
       names: S.names, nameOf: nameOf, mount: $('[data-rooms]'), onlyGroup: S.room.groupId || null, showLinks: !S.room.groupId,
+      turn: L.roomTurn(roomsScene(), 3), prompt: roomsPrompt(),
+      boardLink: function (gid) { var l = A.boardLinks(S.cohort, S.session, gid); return l ? l.board : null; },
       onChange: function (byGroup) { S.roomPlaces = byGroup; drawCounts(); }
     });
   }
+
+  // The rooms scene the rehearsal rooms run (R6): the current scene when
+  // it is one, or else the run of show's first, or the six parts' own.
+  function roomsScene() {
+    var list = V ? V.scenes(S.list || S.parts) : [];
+    var now = S.session ? partNow() : null;
+    if (now && now.kind === 'rooms') return now;
+    return list.filter(function (x) { return x.kind === 'rooms'; })[0] || null;
+  }
+  function roomsPrompt() { var r = roomsScene(); return r && r.config && r.config.prompt ? r.config.prompt : null; }
 
   // During "Show what you brought back", and always in a group's room:
   // each group's order this week, and each builder's question.

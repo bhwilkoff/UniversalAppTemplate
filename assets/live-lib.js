@@ -307,6 +307,22 @@
     });
   }
 
+  // A rehearsal room's own scenes (R6): one turn's steps, from the rooms
+  // scene the teacher planned on the class page (its room_scenes, each a
+  // title and minutes), or, for a scene with none, the trio protocol's
+  // steps fitted to the scene's minutes. A step named like one of the
+  // protocol's keeps that step's line about what happens in it.
+  function roomTurn(scene, builders) {
+    var planned = scene && scene.config && Array.isArray(scene.config.room_scenes) ? scene.config.room_scenes : [];
+    if (planned.length) {
+      return planned.slice(0, 20).map(function (r, i) {
+        var known = TURN.filter(function (t) { return t.name.toLowerCase() === String(r.title || '').trim().toLowerCase(); })[0];
+        return { key: known ? known.key : 'scene-' + i, name: String(r.title || 'Step ' + (i + 1)), what: known ? known.what : '', seconds: Math.max(30, Math.round((Number(r.minutes) || 1) * 60)) };
+      });
+    }
+    return turnSteps(scene && scene.minutes ? scene.minutes : 25, builders);
+  }
+
   // The order builders take their turns in a group: by name, moved along
   // by one each week, so a different person goes first every session. It
   // is the same order on every screen, and nobody's partners change.
@@ -335,7 +351,7 @@
     classifyLink: classifyLink, itemLabel: itemLabel, queue: queue, canManage: canManage, parseCheck: parseCheck, tally: tally, answerText: answerText, counted: counted,
     QUESTION_KINDS: QUESTION_KINDS, questionKind: questionKind, kindOf: kindOf, parseQuestion: parseQuestion, questionFields: questionFields,
     sceneQuestion: sceneQuestion, fromScene: fromScene, scaleLabels: scaleLabels, answerRow: answerRow, results: results,
-    CLOSING_CHECKS: CLOSING_CHECKS, TURN: TURN, turnSteps: turnSteps, presentingOrder: presentingOrder, latestBringBack: latestBringBack, clock: clock
+    CLOSING_CHECKS: CLOSING_CHECKS, TURN: TURN, turnSteps: turnSteps, roomTurn: roomTurn, presentingOrder: presentingOrder, latestBringBack: latestBringBack, clock: clock
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
   else root.LiveLib = lib;

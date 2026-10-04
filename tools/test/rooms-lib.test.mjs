@@ -80,3 +80,36 @@ test('a group with nobody on the hub still moves through the steps', () => {
   assert.deepEqual(R.advance({ step: N - 1, presenter: null }, [], N), { step: N, presenter: null });
   assert.deepEqual(R.advance(null, [], N), { step: 0, presenter: null });
 });
+
+test('a room runs the rooms scene’s own scenes, or the trio protocol without them (R6)', () => {
+  const L = createRequire(import.meta.url)('../../assets/live-lib.js');
+  const planned = L.roomTurn({ minutes: 25, config: { room_scenes: [{ title: 'Their question', minutes: 1 }, { title: 'Free talk', minutes: 2.5 }] } }, 3);
+  assert.deepEqual(planned.map((s) => [s.key, s.name, s.seconds]), [['ask', 'Their question', 60], ['scene-1', 'Free talk', 150]]);
+  assert.match(planned[0].what, /what they want to know/, 'a step named like the protocol keeps its line');
+  assert.equal(planned[1].what, '');
+  const fallback = L.roomTurn({ minutes: 24, config: {} }, 3);
+  assert.deepEqual(fallback.map((s) => s.key), L.TURN.map((t) => t.key));
+  assert.deepEqual(L.roomTurn(null, 3).map((s) => s.key), L.TURN.map((t) => t.key));
+  const many = L.roomTurn({ config: { room_scenes: Array.from({ length: 25 }, (_, i) => ({ title: 'S' + i, minutes: 1 })) } }, 3);
+  assert.equal(many.length, 20, 'never more steps than the database keeps');
+});
+
+test('inside a room, the person reading sees whose turn it is and what everyone else does (R6)', () => {
+  const step = { name: 'One clarifying question', what: 'Partners ask one question to understand it.' };
+  const nameOf = (id) => (id === 'me' ? 'You' : 'Bea');
+  assert.deepEqual(R.roleText({ started: true, done: false, presenter: 'me' }, 'me', nameOf, step), { presenting: true, text: 'You are presenting.', job: step.what });
+  assert.deepEqual(R.roleText({ started: true, done: false, presenter: 'bea' }, 'me', nameOf, step), { presenting: false, text: 'Bea is presenting, and you are the audience.', job: step.what });
+  assert.equal(R.roleText({ started: false }, 'me', nameOf, step), null);
+  assert.equal(R.roleText({ started: true, done: true, presenter: null }, 'me', nameOf, step), null);
+  assert.equal(R.roleText({ started: true, done: false, presenter: null }, 'me', nameOf, step), null);
+});
+
+test('a room’s step clock counts down from when the database started it (R6)', () => {
+  const at = Date.parse('2026-10-20T23:00:00Z');
+  const row = { step_started_at: '2026-10-20T23:00:00Z' };
+  assert.equal(R.stepLeft(row, 120, at + 30000), 90);
+  assert.equal(R.stepLeft(row, 120, at + 999999), 0);
+  assert.equal(R.stepLeft({ step_started_at: null }, 120, at), null, 'no clock before the database has one');
+  assert.equal(R.stepLeft(row, 0, at), null);
+  assert.equal(R.stepLeft(null, 120, at), null);
+});
