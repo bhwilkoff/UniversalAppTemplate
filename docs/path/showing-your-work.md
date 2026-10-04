@@ -148,6 +148,16 @@ together, because each one sees something the others cannot.
   06 has the prompt). Copy what people say into your note first, decide
   what you think of it, and only then bring it to the agent.
 
+<!-- Written by Claude, awaiting Ben's review (H3). -->
+When you want more people than a friend, the community at
+[humanshaped.org](https://humanshaped.org) is open without a cohort.
+You can keep your app on its [apps page](https://humanshaped.org/apps/),
+private until you choose to show it, ask a question in
+[Discussions](https://github.com/orgs/humanshaped/discussions), find or
+start a meetup on [events](https://humanshaped.org/events/), and
+[connect your agent](https://humanshaped.org/connect/) so the
+human-shaped review reads your own app and your marks on the path.
+
 ## Before you act on an AI review
 
 Feedback from an AI is easy to agree with, and that is the trouble with

@@ -93,6 +93,20 @@ Teaching with it? [`COURSE.md`](COURSE.md) maps the stages to weeks,
 and [`docs/teaching/`](docs/teaching/README.md) has a guide for each
 live session.
 
+<!-- Written by Claude, awaiting Ben's review (H3). -->
+## The community
+
+[humanshaped.org](https://humanshaped.org) is where people building
+human-shaped software find one another. It runs the free cohorts, and
+you do not need one to use it. Its [apps page](https://humanshaped.org/apps/)
+follows apps in progress, including yours if you choose to show it, and
+[events](https://humanshaped.org/events/) lists meetups and hackathons
+you can join or start. The conversation happens in
+[Discussions](https://github.com/orgs/humanshaped/discussions), and
+[Connect your agent](https://humanshaped.org/connect/) shows how to let
+your own Claude or Gemini read your work there, read-only, so its review
+starts from your app.
+
 ## Using it for your app
 
 1. Click **Use this template** on GitHub to make your own copy.
