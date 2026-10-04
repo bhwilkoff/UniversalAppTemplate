@@ -87,10 +87,48 @@
     return sessionOf(db).then(function (s) { return s || useSiteSignIn(true); });
   }
 
+  // Google sign-in beside GitHub (DECISIONS.md): signed out, the panel
+  // offers Google's One Tap and its button (what Meet asks of add-ons),
+  // beside GitHub. Someone signed in without GitHub links it once in a
+  // small window, because cohorts work through GitHub.
+  var GL = window.GoogleSignInLib;
+  var current = null;      // the session to lend the link window
+  function signedOut() {
+    show('signed-out');
+    if (!window.HSGoogle || !GL) return;
+    window.HSGoogle.mount({
+      db: db, button: $('[data-google-signin]'), prompt: true,
+      theme: document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark',
+      onSession: function (s) { if (s) proceed(s); },
+      onError: function (e) { $('[data-signin-status]').textContent = 'Google sign-in did not finish: ' + (e && e.message ? e.message : e) + '.'; }
+    });
+  }
+  function proceed(session) {
+    current = session;
+    if (!GL) return start(session);
+    return db.from('profiles').select('github_login').eq('id', session.user.id).maybeSingle().then(function (p) {
+      if (!p.error && GL.needsGitHub(p.data)) return show('link-github');
+      start(session);
+    }, function () { start(session); });
+  }
+
+  $('[data-link-github]').addEventListener('click', function () {
+    var status = $('[data-link-status]');
+    popup = window.open(GL.linkWindowUrl(location.origin), 'hs-link', 'popup,width=480,height=720');
+    if (!popup) { status.textContent = 'Your browser blocked the small window.'; return; }
+    status.textContent = 'Link your GitHub in the small window, and this panel will follow.';
+  });
+  // The link window asks for this panel's sign-in, to link GitHub to it.
+  window.addEventListener('message', function (event) {
+    if (!GL || !current || !GL.isWant(event, location.origin, popup)) return;
+    var msg = A.handoff(current);
+    if (msg) popup.postMessage(msg, location.origin);
+  });
+
   $('[data-use-site]').hidden = !document.requestStorageAccess;
   $('[data-use-site]').addEventListener('click', function () {
     $('[data-signin-status]').textContent = 'Asking your browser…';
-    useSiteSignIn(false).then(function (s) { if (s) start(s); });
+    useSiteSignIn(false).then(function (s) { if (s) proceed(s); });
   });
 
   $('[data-popup]').addEventListener('click', function () {
@@ -116,7 +154,7 @@
     db.auth.setSession(tokens).then(function (r) {
       if (r.error || !r.data || !r.data.session) { $('[data-signin-status]').textContent = 'The sign-in could not be used here: ' + (r.error ? r.error.message : 'no session') + '.'; $('[data-fallback]').hidden = false; return; }
       clearInterval(popupWatch);
-      start(r.data.session);
+      proceed(r.data.session);
     });
   });
 
@@ -744,7 +782,7 @@
       side.on('frameToFrameMessage', function (m) {
         if (m && A.isHello(m.payload)) { S.stageOn = true; sendStage(); }
       });
-      return signIn().then(function (s) { if (s) start(s); else show('signed-out'); });
+      return signIn().then(function (s) { if (s) proceed(s); else signedOut(); });
     }, function () {
       show('outside');
     });

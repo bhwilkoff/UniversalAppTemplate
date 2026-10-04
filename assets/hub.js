@@ -46,6 +46,165 @@
   var handoffNote = root.querySelector('[data-handoff-note]');
   if (handoffNote) handoffNote.hidden = !handoffMode;
 
+  // Google sign-in beside GitHub (DECISIONS.md, "Google sign-in beside
+  // GitHub"). Google's button signs in with an ID token, never a
+  // redirect. The add-on opens /account/?link=github&handoff=meet after a
+  // Google sign-in in Meet, to link the person's GitHub once.
+  var G = window.GoogleSignInLib, AL = window.AddonLib;
+  var linkMode = handoffMode && params.get('link') === 'github';
+  function theme() {
+    var t = document.documentElement.getAttribute('data-theme');
+    if (t) return t;
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  function said(e) { return e && e.message ? e.message : String(e || 'no details'); }
+  var googleShown = false;
+  function showGoogleSignIn() {
+    if (googleShown || !window.HSGoogle) return;
+    googleShown = true;
+    var status = root.querySelector('[data-google-status]');
+    window.HSGoogle.mount({
+      db: db, button: root.querySelector('[data-google-signin]'), prompt: false, theme: theme(),
+      onSession: function () {
+        if (handoffMode) { try { window.sessionStorage.setItem('hs-handoff', '1'); } catch (e) {} }
+        load();
+      },
+      onError: function (e) { status.textContent = 'Google sign-in did not finish: ' + said(e) + '.'; }
+    }).then(function (ok) { root.querySelector('[data-google-note]').hidden = !ok; });
+  }
+  function linkGitHub(redirect) {
+    return db.auth.linkIdentity({ provider: 'github', options: { redirectTo: redirect } }).then(function (r) {
+      if (r.error) throw r.error;
+    });
+  }
+
+  // The add-on's window for linking GitHub: it asks the panel that opened
+  // it for the panel's sign-in, links GitHub to that account, and, back
+  // from GitHub, hands the sign-in (now with GitHub) to the panel.
+  function linkFlow() {
+    var text = root.querySelector('[data-linking-text]');
+    var opener = null;
+    try { opener = window.opener && !window.opener.closed ? window.opener : null; } catch (e) { opener = null; }
+    show('linking');
+    if (params.get('back') === '1' || params.get('error_description')) {
+      var err = params.get('error_description');
+      if (err) return linkFailed({ message: err, code: params.get('error_code') });
+      return load();
+    }
+    if (!opener || !AL || !G) { text.textContent = 'This window lost track of Meet. Close it, and choose Link my GitHub account in the panel again.'; return; }
+    window.addEventListener('message', function onMessage(event) {
+      var tokens = AL.acceptHandoff(event, location.origin, opener);
+      if (!tokens) return;
+      window.removeEventListener('message', onMessage);
+      try { window.sessionStorage.setItem('hs-handoff', '1'); } catch (e) {}
+      db.auth.setSession(tokens).then(function (r) {
+        if (r.error) { text.textContent = 'Your sign-in from Meet could not be used here: ' + r.error.message + '.'; return; }
+        text.textContent = 'Taking you to GitHub…';
+        return linkGitHub(location.origin + '/account/?link=github&handoff=meet&back=1');
+      }).catch(linkFailed);
+    });
+    opener.postMessage(G.wantMessage(), location.origin);
+  }
+
+  // GitHub refused because that GitHub account already has an account
+  // here. If the one signed in now is the empty Google-only account just
+  // made, it can go, and the person signs in with their GitHub account.
+  function linkFailed(err) {
+    if (!G || !G.alreadyLinkedElsewhere(err)) return fail('Linking GitHub did not finish: ' + said(err) + '.');
+    show('link-elsewhere');
+    var text = root.querySelector('[data-elsewhere-text]');
+    var useGitHub = root.querySelector('[data-use-github-account]');
+    text.textContent = 'Sign in with your GitHub account instead, then link Google to it from your account page, so Google and GitHub both reach the same account.';
+    db.auth.getUser().then(function (u) {
+      var user = u.data && u.data.user;
+      if (!user) return null;
+      return db.from('profiles').select('github_login').eq('id', user.id).maybeSingle().then(function (p) {
+        if (!G.emptyGoogleOnly(user.identities, p.data)) return;
+        text.textContent = 'The Google sign-in made a new, empty account a moment ago. Using your GitHub account removes that empty one, signs you in with GitHub, and hands that back to Meet. Then, on your account page, link Google, so the next Google sign-in reaches your GitHub account.';
+        useGitHub.hidden = false;
+      });
+    });
+    useGitHub.addEventListener('click', function () {
+      useGitHub.disabled = true;
+      var status = root.querySelector('[data-elsewhere-status]');
+      db.rpc('delete_my_account').then(function (r) {
+        if (r.error) { useGitHub.disabled = false; status.textContent = 'The empty account could not be removed: ' + r.error.message + '.'; return; }
+        return db.auth.signOut({ scope: 'local' }).then(function () {
+          try { window.sessionStorage.setItem('hs-handoff', '1'); } catch (e) {}
+          return db.auth.signInWithOAuth({ provider: 'github', options: { redirectTo: location.origin + '/account/?handoff=meet' } });
+        });
+      });
+    });
+  }
+
+  // The ways to sign in to this account, with linking and unlinking. The
+  // last one cannot be taken away (Supabase refuses that too).
+  var googleLinkShown = false;
+  function drawLinked() {
+    var list = root.querySelector('[data-linked]');
+    var status = root.querySelector('[data-linked-status]');
+    if (!G || !list) return;
+    db.auth.getUserIdentities().then(function (r) {
+      var ids = (r.data && r.data.identities) || [];
+      list.replaceChildren();
+      [['github', 'GitHub'], ['google', 'Google']].forEach(function (pv) {
+        var idn = G.identityFor(ids, pv[0]);
+        var data = (idn && idn.identity_data) || {};
+        var li = el('li');
+        li.appendChild(el('strong', null, pv[1]));
+        li.appendChild(document.createTextNode(idn
+          ? (pv[0] === 'github' && data.user_name ? ', linked as @' + data.user_name : data.email ? ', linked as ' + data.email : ', linked')
+          : ', not linked'));
+        if (idn && G.canUnlink(ids, pv[0])) {
+          var b = el('button', 'btn-link', 'Unlink');
+          b.type = 'button';
+          b.addEventListener('click', function () {
+            if (!b.hasAttribute('data-armed')) {
+              b.setAttribute('data-armed', '');
+              b.textContent = pv[0] === 'github'
+                ? 'Without GitHub, your cohorts cannot reach you. Press again to unlink it.'
+                : 'Press again to unlink Google.';
+              return;
+            }
+            b.disabled = true;
+            db.auth.unlinkIdentity(idn).then(function (u) {
+              if (u.error) { b.disabled = false; status.textContent = 'Not unlinked: ' + u.error.message + '.'; return; }
+              status.textContent = pv[1] + ' is unlinked.';
+              load();
+            });
+          });
+          li.appendChild(document.createTextNode(' '));
+          li.appendChild(b);
+        }
+        if (!idn && pv[0] === 'github') {
+          var l = el('button', 'btn-link', 'Link GitHub');
+          l.type = 'button';
+          l.addEventListener('click', function () {
+            linkGitHub(location.origin + '/account/').catch(function (e) { status.textContent = 'Linking GitHub did not start: ' + said(e) + '.'; });
+          });
+          li.appendChild(document.createTextNode(' '));
+          li.appendChild(l);
+        }
+        list.appendChild(li);
+      });
+      var googleBox = root.querySelector('[data-google-link]');
+      var hasGoogle = !!G.identityFor(ids, 'google');
+      googleBox.hidden = hasGoogle;
+      if (!hasGoogle && !googleLinkShown && window.HSGoogle) {
+        googleLinkShown = true;
+        window.HSGoogle.mount({
+          db: db, button: googleBox, link: true, prompt: false, theme: theme(),
+          onSession: function () { status.textContent = 'Google is linked. Signing in with Google now reaches this same account.'; googleLinkShown = false; drawLinked(); },
+          onError: function (e) {
+            status.textContent = G.alreadyLinkedElsewhere(e)
+              ? 'That Google account already signs in to a different account here. Sign in with Google, delete that account from its account page, then link Google here.'
+              : 'Linking Google did not finish: ' + said(e) + '.';
+          }
+        });
+      }
+    });
+  }
+
   root.querySelector('[data-sign-in]').addEventListener('click', function () {
     if (handoffMode) { try { window.sessionStorage.setItem('hs-handoff', '1'); } catch (e) {} }
     db.auth.signInWithOAuth({
@@ -172,7 +331,7 @@
     db.auth.getSession().then(function (s) {
       var session = s.data && s.data.session;
       if (!session) {
-        if (arrivalError) fail(arrivalError); else show('signed-out');
+        if (arrivalError) fail(arrivalError); else { show('signed-out'); showGoogleSignIn(); }
         return;
       }
       if (handoffMode) return handOff(session);
@@ -187,12 +346,18 @@
         var bad = res.filter(function (r) { return r.error; })[0];
         if (bad) return fail('Your account could not be loaded just now: ' + bad.error.message);
         var p = res[0].data;
-        root.querySelector('[data-name]').textContent = p.display_name || p.github_login;
+        root.querySelector('[data-name]').textContent = p.display_name || p.github_login || 'You';
         var title = document.querySelector('[data-account-title]');
         if (title) title.textContent = 'Your account.';
         var a = root.querySelector('[data-github-link]');
-        a.textContent = '@' + p.github_login;
-        a.href = 'https://github.com/' + encodeURIComponent(p.github_login);
+        if (p.github_login) {
+          a.textContent = '@' + p.github_login;
+          a.href = 'https://github.com/' + encodeURIComponent(p.github_login);
+        } else {
+          root.querySelector('[data-signed-in-as]').textContent = 'Signed in with Google.';
+        }
+        root.querySelector('[data-needs-github]').hidden = !(G && G.needsGitHub(p));
+        drawLinked();
         var img = root.querySelector('[data-avatar]');
         if (p.avatar_url && /^https:\/\//.test(p.avatar_url)) img.src = p.avatar_url; else img.hidden = true;
 
@@ -521,5 +686,11 @@
     });
   }
 
-  load();
+  root.querySelector('[data-link-github]').addEventListener('click', function () {
+    linkGitHub(location.origin + '/account/').catch(function (e) {
+      root.querySelector('[data-linked-status]').textContent = 'Linking GitHub did not start: ' + said(e) + '.';
+    });
+  });
+
+  if (linkMode) linkFlow(); else load();
 })();

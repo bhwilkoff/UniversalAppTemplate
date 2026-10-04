@@ -81,7 +81,24 @@
             <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Sign in with GitHub
           </button>
           <p class="small">GitHub will ask whether to share your public profile with Human Shaped. That is all we ask for, and you can take it back at any time from your GitHub settings.</p>
+          <!-- Google sign-in beside GitHub (DECISIONS.md): words by Claude, awaiting Ben's review. -->
+          <div class="google-signin" data-google-signin hidden></div>
+          <p class="small" data-google-note hidden>You can also sign in with Google. Cohorts work through GitHub, so the first time, you will be asked to link your GitHub account too.</p>
+          <p class="small" data-google-status role="status"></p>
           <p class="small" data-handoff-note hidden>Once you are signed in, this window hands your sign-in back to the Human Shaped panel in Google Meet and closes.</p>
+        </section>
+
+        <!-- Linking GitHub for the Meet add-on, after a Google sign-in there (DECISIONS.md, "Google sign-in beside GitHub"). Words by Claude, awaiting Ben's review. -->
+        <section class="account-state" data-state="linking" hidden>
+          <p data-linking-text>Getting your sign-in from Meet…</p>
+        </section>
+        <section class="account-state" data-state="link-elsewhere" hidden>
+          <p>That GitHub account already has a Human Shaped account of its own.</p>
+          <p class="small" data-elsewhere-text></p>
+          <div class="actions">
+            <button class="btn-github" type="button" data-use-github-account hidden>Use my GitHub account instead</button>
+          </div>
+          <p class="small" data-elsewhere-status role="status"></p>
         </section>
 
         <!-- The Meet add-on's sign-in window (M15): words by Claude, awaiting Ben's review. -->
@@ -99,8 +116,16 @@
             <img class="avatar" data-avatar alt="" width="56" height="56">
             <div>
               <p class="name" data-name></p>
-              <p class="small">Signed in as <a data-github-link></a>.</p>
+              <p class="small" data-signed-in-as>Signed in as <a data-github-link></a>.</p>
             </div>
+          </div>
+
+          <!-- Words by Claude, awaiting Ben's review (Google sign-in beside GitHub). -->
+          <div class="notice" data-needs-github hidden>
+            <p><strong>Link your GitHub account to join a cohort.</strong> Your app lives on GitHub, and your cohort talks there, so a cohort needs your GitHub as well as your Google sign-in.</p>
+            <p><button class="btn-github" type="button" data-link-github>
+              <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Link my GitHub account
+            </button></p>
           </div>
 
           <p class="teach-link" data-teach-link hidden>You teach here. <a href="/teach/">Run your cohorts and answer what is waiting for you</a>.</p>
@@ -186,6 +211,13 @@
             </form>
           </div>
 
+          <!-- Words by Claude, awaiting Ben's review (Google sign-in beside GitHub). -->
+          <h2>Linked accounts</h2>
+          <p class="small">The ways you can sign in to this one account. You can add or take one away, but never the last.</p>
+          <ul class="linked-accounts" data-linked></ul>
+          <div class="google-signin" data-google-link hidden></div>
+          <p class="small" data-linked-status role="status"></p>
+
           <h2>Your data</h2>
           <p>This site keeps your GitHub name and picture, which cohorts you are in, whatever you choose to share with a cohort, your own marks on the path, your own app if you add one, the notes your teachers send you, and, only if you give it above, the address your teachers may use. Leaving a cohort removes what you shared there but keeps your notes, which you can remove here. Deleting your account removes everything.</p>
           <div class="actions">
@@ -228,6 +260,8 @@
   <script src="/assets/reach-lib.js" defer></script>
   <script src="/assets/builder-lib.js" defer></script>
   <script src="/assets/credential-lib.js" defer></script>
+  <script src="/assets/google-signin-lib.js" defer></script>
+  <script src="/assets/google-signin.js" defer></script>
   <script src="/assets/hub.js" defer></script>
 
   <footer class="site-footer">

@@ -1337,3 +1337,8 @@ label.check { min-height: 2.25rem; }
 .path-bring { margin: 0.75rem 0 0; }
 .path-bring .hint { color: var(--muted); font-size: 0.9rem; }
 .stages .path-mark { grid-column: 2; font-size: 0.85rem; color: var(--clay); font-weight: 600; }
+
+/* Google sign-in beside GitHub: Google draws its own button inside. */
+.google-signin { margin: 0.75rem 0 0.25rem; min-height: 44px; }
+.linked-accounts { list-style: none; padding: 0; margin: 0.5rem 0; display: grid; gap: 0.4rem; }
+.linked-accounts .btn-link { margin-left: 0.25rem; }
