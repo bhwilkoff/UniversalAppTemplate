@@ -232,6 +232,7 @@
         drawPath(uid);
         drawReach(uid);
         drawOwnApp(uid);
+        drawCredential(uid);
         show('signed-in');
       });
     }).catch(function (err) {
@@ -296,6 +297,40 @@
   // A builder's own app, outside any cohort (G2, BuilderLib). Before the
   // hub's database has builder_apps, the section stays away.
   var ownAppWired = false;
+  // The credentials recorded for you (migration 20261003070000; the
+  // holder reads their own). Each links to its own page once signed,
+  // where the file itself can be downloaded or checked.
+  function drawCredential(uid) {
+    var C = window.CredentialLib;
+    var section = root.querySelector('[data-credential-section]');
+    if (!C || !section) return;
+    db.from('credentials').select('id, platforms, issued_at, signed_at, revoked_at, revoked_reason, cohorts(title)')
+      .eq('user_id', uid).order('issued_at', { ascending: false }).then(function (r) {
+        var rows = r.error ? [] : r.data;
+        section.hidden = !rows.length;
+        var box = root.querySelector('[data-credential-list]');
+        box.replaceChildren();
+        var day = function (iso) { return new Date(iso).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' }); };
+        rows.forEach(function (c) {
+          var card = el('article', 'cohort-card');
+          var state = C.standing({ signed: c.signed_at, revoked_at: c.revoked_at });
+          var from = c.cohorts && c.cohorts.title ? ', from ' + c.cohorts.title : '';
+          card.appendChild(el('p', 'who-line', C.levelName(C.levelFor(c.platforms)) + from));
+          if (state === 'signed') {
+            card.appendChild(el('p', 'small', 'Signed on ' + day(c.signed_at) + '.'));
+            var a = el('a', 'btn-quiet', 'Open it, to share, download, or check it');
+            a.href = '/credential/?id=' + encodeURIComponent(c.id);
+            var acts = el('div', 'actions'); acts.appendChild(a); card.appendChild(acts);
+          } else if (state === 'waiting') {
+            card.appendChild(el('p', 'small', 'Recorded on ' + day(c.issued_at) + ', and waiting to be signed. It will be here, with its own page, once it is.'));
+          } else {
+            card.appendChild(el('p', 'small', 'Revoked on ' + day(c.revoked_at) + (c.revoked_reason ? ': ' + c.revoked_reason : '.')));
+          }
+          box.appendChild(card);
+        });
+      });
+  }
+
   function drawOwnApp(uid) {
     var B = window.BuilderLib;
     var section = root.querySelector('[data-own-app-section]');

@@ -157,3 +157,24 @@ test('where a credential stands: the live record first, then the latest revoked 
   const r = lib.recordState([{ id: 1, revoked_at: '2026-10-01' }, { id: 2, revoked_at: '2026-10-02' }]);
   assert.deepEqual([r.state, r.record.id], ['revoked', 2]);
 });
+
+test('a credential waiting for a signer becomes the same signing request', () => {
+  const w = { id: row.credential, issued_at: '2026-09-20T18:30:00.123456+00:00', platforms: ['web', 'android'],
+    platform_links: { android: row.links.android }, evidence_repo: 'bea-example/garden-swap', app_name: 'Garden Swap', app_url: row.app.url,
+    github_login: 'bea-example', display_name: 'Bea Example', cohort_title: 'Test cohort' };
+  assert.deepEqual(lib.requestFromWaiting(w), { ...row, issued_at: '2026-09-20T18:30:00+00:00' });
+});
+
+test('where one credential stands, for its holder', () => {
+  assert.equal(lib.standing(null), 'none');
+  assert.equal(lib.standing({ id: 1 }), 'waiting');
+  assert.equal(lib.standing({ id: 1, signed: {} }), 'signed');
+  assert.equal(lib.standing({ id: 1, signed: {}, revoked_at: '2026-10-02' }), 'revoked');
+});
+
+test('a pasted signed file is read, or refused in plain words', () => {
+  assert.deepEqual(lib.readSigned('{"proof": {"proofValue": "z1"}}'), { proof: { proofValue: 'z1' } });
+  assert.throws(() => lib.readSigned('not json'), /not a signed credential file/);
+  assert.throws(() => lib.readSigned('{"id": "x"}'), /no signature/);
+  assert.throws(() => lib.readSigned(''), /not a signed credential file/);
+});

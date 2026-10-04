@@ -1833,6 +1833,50 @@ def main():
     su.execute("reset role")
     su.execute("select count(*) from public.cohort_teachers where cohort_id = %s", (ct,))
     check("and leaves none behind", su.fetchone()[0] == 0)
+
+    # Signers (migration 20261004040000): a signer reads every credential
+    # waiting to be signed and attaches the signed file, across cohorts,
+    # and gains no other right.
+    su.execute("reset role")
+    su.execute("select can_sign from public.teachers where user_id = %s", (people["ben"],))
+    check("Ben signs, from his first sign-in", su.fetchone()[0] is True)
+    attempt(as_user("kofi"), "insert into public.cohorts (slug, title, created_by, status) values ('kofi-cohort', 'Kofi''s cohort', %s, 'open') returning id", (people["kofi"],))
+    kc = last_rows[0][0]
+    attempt(as_user("fay"), "insert into public.enrollments (cohort_id, user_id, app_name, app_repo, app_url) values (%s, %s, 'Seed Library', 'fay/seed-library', 'https://example.org/seeds')", (kc, people["fay"]))
+    attempt(as_user("kofi"), "update public.cohorts set status = 'finished' where id = %s", (kc,))
+    check("a teacher who does not sign records a credential in their own cohort",
+          attempt(as_user("kofi"), "insert into public.credentials (user_id, cohort_id, issued_by, platforms, platform_links, evidence_repo, app_name, app_url) "
+                  "values (%s, %s, %s, '{web}', '{}', 'fay/seed-library', 'Seed Library', 'https://example.org/seeds') returning id", (people["fay"], kc, people["kofi"])))
+    kcred = last_rows[0][0]
+    to_sign = "select id, github_login, cohort_title from public.credentials_to_sign()"
+    check("a teacher who does not sign sees nothing waiting to be signed",
+          attempt(as_user("kofi"), to_sign) and last_rows == [])
+    check("a student sees nothing waiting to be signed",
+          attempt(as_user("bea"), to_sign) and last_rows == [])
+    check("the signer sees it, in a cohort they do not teach, with what the request needs",
+          attempt(as_user("ben"), to_sign) and any(r[0] == kcred and r[1] == "fay" and r[2] == "Kofi's cohort" for r in last_rows))
+    kgood = ('{"id": "https://humanshaped.org/credential/?id=%s", "issuer": {"id": "did:web:humanshaped.org"}, '
+             '"proof": {"cryptosuite": "eddsa-rdfc-2022", "proofValue": "z1"}}') % kcred
+    attach = "select public.attach_signed_credential(%s, %s)"
+    check("a teacher who does not sign cannot attach a signed file through the signer's door",
+          not attempt(as_user("kofi"), attach, (kcred, kgood)))
+    check("the signer's agent cannot attach one",
+          not attempt(as_agent("ben"), attach, (kcred, kgood)))
+    check("the signer cannot attach a file for another record",
+          not attempt(as_user("ben"), attach, (kcred, kgood.replace(str(kcred), "00000000-0000-0000-0000-000000000000"))))
+    check("the signer can attach the signed file",
+          attempt(as_user("ben"), attach, (kcred, kgood)))
+    su.execute("reset role")
+    su.execute("select signed_at is not null from public.credentials where id = %s", (kcred,))
+    check("and the time it was signed is recorded", su.fetchone()[0] is True)
+    check("a signed credential is no longer waiting",
+          attempt(as_user("ben"), to_sign) and all(r[0] != kcred for r in last_rows))
+    check("nor can it be signed again",
+          not attempt(as_user("ben"), attach, (kcred, kgood)))
+    check("signing gives no right to revoke in a cohort the signer does not teach",
+          attempt(as_user("ben"), "update public.credentials set revoked_at = now() where id = %s returning id", (kcred,)) and last_rows == [])
+    check("a teacher cannot make themselves a signer",
+          attempt(as_user("kofi"), "update public.teachers set can_sign = true where user_id = %s returning user_id", (people["kofi"],)) and last_rows == [])
     conn.rollback()
     conn.close()
     failed = [n for n, ok in results if not ok]

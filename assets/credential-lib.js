@@ -223,6 +223,32 @@
     return revoked ? { state: 'revoked', record: revoked } : { state: 'none', record: null };
   }
 
+  // A credential waiting to be signed, as public.credentials_to_sign()
+  // returns it to a signer (migration 20261004040000), becomes the same
+  // signing request /teach/ makes for a cohort's own teachers.
+  function requestFromWaiting(w) {
+    return requestFromRecord(w, { github_login: w.github_login, display_name: w.display_name }, { title: w.cohort_title });
+  }
+
+  // The one command a signer runs on their own computer (tools/credential/).
+  var SIGN_COMMAND = 'node tools/credential/sign-waiting.mjs';
+
+  // Where one record stands, for the person who holds it.
+  function standing(rec) {
+    if (!rec) return 'none';
+    if (rec.revoked_at) return 'revoked';
+    return rec.signed ? 'signed' : 'waiting';
+  }
+
+  // A signed file pasted or chosen by a signer, read as JSON, with the
+  // reason in plain words when it is not.
+  function readSigned(text) {
+    var doc;
+    try { doc = JSON.parse(String(text || '')); } catch (e) { throw new Error('That is not a signed credential file. It should be the JSON the signing tool printed.'); }
+    if (!doc || typeof doc !== 'object' || !doc.proof) throw new Error('That has no signature in it. It should be the JSON the signing tool printed.');
+    return doc;
+  }
+
   // ---- reading a signed credential, for people ----------------------
   function describe(doc) {
     var s = doc.credentialSubject || {};
@@ -457,6 +483,7 @@
     problems: problems, buildCredential: buildCredential, credentialUrl: credentialUrl,
     describe: describe, matchesRow: matchesRow, stable: stable,
     requestFromRecord: requestFromRecord, recordState: recordState,
+    requestFromWaiting: requestFromWaiting, SIGN_COMMAND: SIGN_COMMAND, standing: standing, readSigned: readSigned,
     base58Encode: base58Encode, base58Decode: base58Decode,
     publicKeyMultibase: publicKeyMultibase, secretKeyMultibase: secretKeyMultibase,
     publicKeyBytes: publicKeyBytes, secretKeyBytes: secretKeyBytes,

@@ -1417,6 +1417,76 @@
     return card;
   }
 
+  // ---- signing, for a signer (migration 20261004040000) --------------
+  // Every credential waiting to be signed, across cohorts. The signer
+  // copies its request, signs it on the computer that holds the key
+  // (tools/credential/sign-waiting.mjs), and pastes or chooses the signed
+  // file, which is checked here before the database takes it.
+  function loadSigning() {
+    var wrap = $('[data-signing]');
+    if (!cred) return Promise.resolve();
+    return db.rpc('credentials_to_sign').then(function (r) {
+      var box = $('[data-signing-list]');
+      wrap.hidden = false;
+      if (r.error) { box.replaceChildren(el('p', 'small error', 'What is waiting to be signed could not be loaded: ' + r.error.message)); return; }
+      box.replaceChildren();
+      if (!r.data.length) { box.appendChild(el('p', 'small', 'Nothing is waiting to be signed right now.')); return; }
+      r.data.forEach(function (w) { box.appendChild(signingCard(w)); });
+    });
+  }
+  function signingCard(w) {
+    var card = el('article', 'cohort-card credential-person');
+    var who = (w.display_name ? w.display_name + ' (@' + w.github_login + ')' : '@' + w.github_login);
+    card.appendChild(el('p', 'who-line', who + ', ' + w.cohort_title));
+    card.appendChild(el('p', 'small', cred.levelName(cred.levelFor(w.platforms)) + '. Recorded on ' +
+      new Date(w.issued_at).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' }) + '.'));
+    var links = [['The repository', 'https://github.com/' + w.evidence_repo], ['On the web', w.app_url]];
+    (w.platforms || []).slice(1).forEach(function (id) { links.push(['On ' + cred.platform(id).label, (w.platform_links || {})[id]]); });
+    card.appendChild(linkList(links));
+    var request = cred.requestFromWaiting(w);
+    var msg = el('p', 'small'); msg.setAttribute('role', 'status');
+    var copy = el('button', 'btn-quiet', 'Copy the signing request'); copy.type = 'button';
+    var shown = el('textarea', 'signing-request'); shown.readOnly = true; shown.rows = 8; shown.hidden = true;
+    shown.value = JSON.stringify(request, null, 2);
+    copy.addEventListener('click', function () {
+      var done = function () { msg.textContent = 'Copied. Now run ' + cred.SIGN_COMMAND + ' in the site folder, and paste what it puts on your clipboard below.'; };
+      var fallback = function () { shown.hidden = false; shown.select(); msg.textContent = 'Copy the text above, then give it to the signing tool.'; };
+      if (navigator.clipboard) navigator.clipboard.writeText(shown.value).then(done, fallback); else fallback();
+    });
+    var form = el('form', 'inline-form');
+    var label = el('label', null, 'The signed file');
+    var pasted = el('textarea'); pasted.rows = 4; pasted.placeholder = 'Paste the signed credential here';
+    label.appendChild(pasted); form.appendChild(label);
+    var pick = el('label', 'btn-quiet file-pick', 'Or choose the file');
+    var file = el('input'); file.type = 'file'; file.accept = '.json,application/json,application/ld+json';
+    pick.appendChild(file);
+    var save = el('button', 'btn-quiet', 'Check and attach it'); save.type = 'submit';
+    var acts = el('div', 'actions'); acts.appendChild(copy); acts.appendChild(save); acts.appendChild(pick);
+    form.appendChild(acts);
+    function attach(text) {
+      save.disabled = true;
+      msg.textContent = 'Checking the signature…';
+      Promise.resolve().then(function () {
+        var doc = cred.readSigned(text);
+        if (!cred.matchesRow(doc, request)) throw new Error('That file is not the signed credential for this record. Its words or links differ from what was recorded.');
+        return window.CredentialCheck.check(doc).then(function (c) {
+          if (!c.ok) throw new Error('Its signature does not check out. ' + c.reason);
+          return db.rpc('attach_signed_credential', { credential: w.id, file: doc });
+        });
+      }).then(function (r) {
+        if (r.error) throw new Error('It was not saved: ' + r.error.message);
+        card.replaceChildren(el('p', 'who-line', who + ', ' + w.cohort_title),
+          el('p', 'small', 'Signed and saved. Its holder can find it on their account page now.'));
+      }).catch(function (err) { msg.textContent = err.message; save.disabled = false; file.value = ''; });
+    }
+    form.addEventListener('submit', function (ev) { ev.preventDefault(); attach(pasted.value); });
+    file.addEventListener('change', function () { var f = file.files && file.files[0]; if (f) f.text().then(attach); });
+    card.appendChild(form);
+    card.appendChild(shown);
+    card.appendChild(msg);
+    return card;
+  }
+
   // ---- start --------------------------------------------------------
   function load() {
     show('loading');
@@ -1424,12 +1494,14 @@
       var session = s.data && s.data.session;
       if (!session) return show('signed-out');
       me = session.user;
-      return db.from('teachers').select('user_id, can_approve').eq('user_id', me.id).maybeSingle().then(function (r) {
+      // Every column, so can_sign comes along once the database has it.
+      return db.from('teachers').select('*').eq('user_id', me.id).maybeSingle().then(function (r) {
         if (r.error) return fail('Your teaching access could not be checked: ' + r.error.message);
         if (!r.data) return loadMyRequest();
         show('teacher');
         var jobs = [loadList(), loadQueue()];
         if (r.data.can_approve) jobs.push(loadRequests());
+        if (r.data.can_sign) jobs.push(loadSigning());
         return Promise.all(jobs);
       });
     }).catch(function (err) { fail('Something went wrong: ' + (err && err.message ? err.message : 'no details') + '.'); });

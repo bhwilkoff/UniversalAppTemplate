@@ -14,6 +14,7 @@ These tools do three things, and the credential logic itself lives in
 |---|---|
 | `make-key.mjs` | Makes the signing key once, outside this repository, and adds only its public half to `.well-known/did.json`. |
 | `sign.mjs` | Reads the signing request that `/teach/` copies, builds the credential, signs it with `eddsa-rdfc-2022`, checks the new signature, and prints the signed file. |
+| `sign-waiting.mjs` | Signs the request on the clipboard with the key on this computer, checks it against the live `did.json`, and puts the signed file back on the clipboard. |
 | `verify.mjs` | Checks a signed file against the live `did.json`, or a local copy with `--did-json`. |
 | `write-files.mjs` | Rewrites the ten achievement files in `credential/achievements/` after a level's words change. |
 
@@ -38,6 +39,25 @@ refuses to overwrite one. If a key is ever lost or leaked, make
 (which makes everything it signed stop checking out, so re-sign those).
 
 ## Signing a credential
+
+*The signer's way, written by Claude, awaiting Ben's review.* A teacher
+whose row has `can_sign` (migration 20261004040000; Ben's does, and
+anyone else's only by a change made by hand) sees "Waiting to be signed"
+on `/teach/`, with every credential recorded in any cohort:
+
+1. Press "Copy the signing request" on one.
+2. In this folder of the `site` branch, on the computer that holds the
+   key: `node tools/credential/sign-waiting.mjs`. It reads the request
+   from the clipboard, shows what it is signing, signs it with
+   `~/.humanshaped/credential-key-1.json` (or `--key`), checks the new
+   signature against the live `did.json`, and puts the signed file back
+   on the clipboard.
+3. Paste it into the card on `/teach/` and press "Check and attach it".
+   The page checks the file says exactly what was recorded and that its
+   signature checks out, and only then saves it. Its holder finds it on
+   their account page and on the cohort page from then on.
+
+A teacher of the cohort can still do it the older way, below.
 
 1. On `/teach/`, open the finished cohort, record the person's
    credential, and click "Copy what the signing tool needs".
