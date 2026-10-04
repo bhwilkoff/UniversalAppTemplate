@@ -161,18 +161,22 @@
   // link on a week is the hub's only sign that a host exists, so the
   // host step is done when one week has a link, and the event step when
   // every week has one.
-  function cohortSetupSteps(cohort, sessions, myAccess) {
+  // meetRequest is the cohort's newest request to meet@ (setup_requests,
+  // migration 20261004000000), or null. Words by Claude, awaiting Ben's
+  // review.
+  function cohortSetupSteps(cohort, sessions, myAccess, meetRequest) {
     sessions = sessions || [];
     var slug = encodeURIComponent(cohort.slug || '');
     var linked = sessions.filter(function (s) { return !!s.meet_url; }).length;
+    var eventDone = sessions.length > 0 && linked === sessions.length;
     var steps = [
       { key: 'schedule', label: 'Set the first day, the session day, and the time', action: 'edit',
         done: !!(cohort.starts_on && cohort.session_weekday != null && cohort.session_time) },
       { key: 'sessions', label: 'Make the weekly sessions', action: 'sessions', done: sessions.length > 0 },
       { key: 'host', label: 'Choose the Google account you will host the sessions from', href: '/teach/guide/#host', done: linked > 0 },
-      { key: 'event', label: 'Make the weekly event with its Meet link, and put the link in each week', href: '/teach/guide/#event',
-        done: sessions.length > 0 && linked === sessions.length },
-      { key: 'repo', label: 'Name the cohort’s private repository and team, once Ben has made them in humanshaped', action: 'edit',
+      { key: 'event', label: 'Ask meet@humanshaped.org to make the weekly event, its Meet link, and a room for each group', action: 'meet',
+        done: eventDone, note: eventDone ? null : meetRequestNote(meetRequest) },
+      { key: 'repo', label: 'Make the cohort’s private repository and team on GitHub', action: 'provision',
         done: !!(cohort.github_repo && cohort.github_team) }
     ];
     if (cohort.github_repo && cohort.github_team) {
@@ -181,6 +185,15 @@
     }
     steps.push({ key: 'open', label: 'Open the cohort, so people can join', action: 'edit', done: cohort.status !== 'draft' });
     return steps;
+  }
+
+  // Where a request to meet@ stands, in a line beside its step.
+  function meetRequestNote(r) {
+    if (!r) return null;
+    if (r.state === 'waiting' || r.state === 'working') return 'Asked. meet@ picks it up within the hour, and the links appear on each week by themselves.';
+    if (r.state === 'failed') return 'It did not work: ' + (r.detail || 'no reason given') + ' Fix that, and ask again.';
+    if (r.state === 'done') return 'Done' + (r.detail ? ': ' + r.detail : '.') + ' If a week is still missing its link, make the weekly sessions first and ask again.';
+    return null;
   }
 
   // Which part of the request to teach a signed-in person sees.
@@ -196,7 +209,7 @@
       .sort(function (a, b) { return a.created_at.localeCompare(b.created_at); });
   }
 
-  var lib = { zonedToUtc: zonedToUtc, sessionDates: sessionDates, sessionRows: sessionRows, meetSetup: meetSetup, lastStarted: lastStarted, notSeen: notSeen, checkAnswers: checkAnswers, waitingForFeedback: waitingForFeedback, scheduleText: scheduleText, cohortSetupSteps: cohortSetupSteps, requestState: requestState, waitingRequests: waitingRequests, WEEKDAYS: WEEKDAYS };
+  var lib = { zonedToUtc: zonedToUtc, sessionDates: sessionDates, sessionRows: sessionRows, meetSetup: meetSetup, lastStarted: lastStarted, notSeen: notSeen, checkAnswers: checkAnswers, waitingForFeedback: waitingForFeedback, scheduleText: scheduleText, cohortSetupSteps: cohortSetupSteps, meetRequestNote: meetRequestNote, requestState: requestState, waitingRequests: waitingRequests, WEEKDAYS: WEEKDAYS };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
   else root.TeachLib = lib;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

@@ -484,15 +484,13 @@ function setupCohort(idOrObject) {
     event = Calendar.Events.insert(resource, 'primary', { conferenceDataVersion: 1, sendUpdates: 'all' });
     save_(c.id, { eventId: event.id });
   }
-  waitForMeet_(event.id);
+  var meetUrl = meetLinkOf(waitForMeet_(event.id));
 
-  if (useMeetApi_()) {
-    var spaces = ensureGroupSpaces_(c);
-    if (c.groups.length) console.log(spaceRoomLines(c, spaces));
-  } else {
-    var rooms = ensureGroupRooms_(c);
-    if (c.groups.length) console.log(groupRoomLines(c, rooms));
-  }
+  var viaApi = useMeetApi_();
+  var rooms = viaApi ? ensureGroupSpaces_(c) : ensureGroupRooms_(c);
+  if (c.groups.length) console.log(viaApi ? spaceRoomLines(c, rooms) : groupRoomLines(c, rooms));
+  // Kept so processSetupRequests can hand the links back to the hub.
+  save_(c.id, { lastLinks: { meetUrl: meetUrl, rooms: roomsForHub(rooms, viaApi) } });
 
   var problems = syncFolderSharing_(c, folder.getId());
   if (problems.length) console.log('Sharing problems:\n' + problems.join('\n'));
@@ -823,6 +821,78 @@ function sendNotices() {
   });
   if (sent.length) askNotices_('sent', { ids: sent });
   var msg = 'Sent ' + sent.length + ' notice(s). Mail left today: ' + MailApp.getRemainingDailyQuota() + '.';
+  console.log(msg);
+  return msg;
+}
+
+// ---------------------------------------------------------------------
+// Requests from /teach/ (migration 20261004000000). A teacher who is not
+// Ben asks on /teach/ for their cohort's calls, and this account makes
+// them: processSetupRequests, run by a time-driven trigger (see the
+// README), takes the waiting requests through the setup-queue function,
+// runs setupCohort on each one's setup (the same shape /teach/ copies),
+// and reports the weekly Meet link and each group's room back, which the
+// hub puts on the sessions and groups. Off unless the Script Property
+// SETUP_QUEUE_ON is "true"; SETUP_QUEUE_URL and SETUP_QUEUE_SECRET say
+// where to ask and prove it is us. Written by Claude, awaiting Ben's review.
+
+function setupQueueOn(value) {
+  return String(value || '').trim().toLowerCase() === 'true';
+}
+
+// The group rooms setup made, in the shape the hub reads:
+// { key: { url, space } }, where a Calendar room has no space.
+function roomsForHub(rooms, viaApi) {
+  var out = {};
+  Object.keys(rooms || {}).forEach(function (key) {
+    var r = rooms[key];
+    if (viaApi) { if (r && r.uri) out[key] = { url: r.uri, space: r.name || null }; }
+    else if (r) out[key] = { url: r, space: null };
+  });
+  return out;
+}
+
+// What the teacher reads on /teach/ about how it went: the check's first
+// line, which says how many problems it found.
+function setupSummary(report) {
+  var first = String(report || '').split('\n')[0].trim();
+  return (first || 'Set up.').slice(0, 300);
+}
+
+function askSetupQueue_(action, extra) {
+  var url = props_().getProperty('SETUP_QUEUE_URL');
+  var secret = props_().getProperty('SETUP_QUEUE_SECRET');
+  if (!url || !secret) throw new Error('Set SETUP_QUEUE_URL and SETUP_QUEUE_SECRET in Script Properties first.');
+  var payload = { action: action };
+  Object.keys(extra || {}).forEach(function (k) { payload[k] = extra[k]; });
+  var res = UrlFetchApp.fetch(url, {
+    method: 'post', contentType: 'application/json', payload: JSON.stringify(payload),
+    headers: { 'x-setup-secret': secret }, muteHttpExceptions: true
+  });
+  var body = JSON.parse(res.getContentText() || '{}');
+  if (res.getResponseCode() !== 200) throw new Error('The hub said ' + res.getResponseCode() + ': ' + (body.message || 'no reason'));
+  return body;
+}
+
+function processSetupRequests() {
+  if (!setupQueueOn(props_().getProperty('SETUP_QUEUE_ON'))) {
+    console.log('The setup queue is off. Set SETUP_QUEUE_ON to true in Script Properties to take requests.');
+    return 'off';
+  }
+  var requests = askSetupQueue_('claim').requests || [];
+  var lines = [];
+  requests.forEach(function (r) {
+    try {
+      var report = setupCohort(r.setup);
+      var links = saved_(r.setup.id).lastLinks || {};
+      askSetupQueue_('finish', { id: r.id, ok: true, detail: setupSummary(report), meet_url: links.meetUrl || null, rooms: links.rooms || null });
+      lines.push(r.setup.id + ': done');
+    } catch (e) {
+      askSetupQueue_('finish', { id: r.id, ok: false, detail: String(e.message || e).slice(0, 900) });
+      lines.push(r.setup.id + ': failed, ' + e.message);
+    }
+  });
+  var msg = requests.length ? lines.join('\n') : 'No requests are waiting.';
   console.log(msg);
   return msg;
 }

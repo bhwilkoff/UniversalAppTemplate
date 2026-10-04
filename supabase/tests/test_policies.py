@@ -1741,6 +1741,64 @@ def main():
           attempt(u("lou"), "delete from public.builder_apps where user_id = %s returning user_id", (people["lou"],)) and len(last_rows) == 1)
     attempt(u("kim"), "select public.delete_my_account()")
     check("deleting the account deletes the builder's app, and it leaves the public list", builder_rows() == [])
+
+    # ---- A teacher asks meet@ to set up the calls (migration 20261004000000)
+    attempt(u("ben"), "insert into public.cohorts (slug, title, created_by, status, time_zone) values ('queue', 'Queue', %s, 'open', 'America/Denver') returning id", (people["ben"],))
+    qc = last_rows[0][0]
+    attempt(u("jon"), "insert into public.enrollments (cohort_id, user_id) values (%s, %s)", (qc, people["jon"]))
+    attempt(u("jon"), "insert into public.calendar_contacts (cohort_id, user_id, email) values (%s, %s, 'jon@example.org')", (qc, people["jon"]))
+    attempt(u("ben"), "insert into public.calendar_contacts (cohort_id, user_id, email) values (%s, %s, 'ben@example.org')", (qc, people["ben"]))
+    attempt(u("ben"), "insert into public.sessions (cohort_id, number) values (%s, 1), (%s, 2)", (qc, qc))
+    attempt(u("ben"), "insert into public.groups (cohort_id, name) values (%s, 'Trio Q') returning id", (qc,))
+    qg = last_rows[0][0]
+    attempt(u("ben"), "insert into public.group_members (group_id, user_id) values (%s, %s)", (qg, people["jon"]))
+
+    check("a student cannot ask meet@ to set up the calls",
+          not attempt(u("jon"), "insert into public.setup_requests (cohort_id) values (%s)", (qc,)))
+    check("a teacher of another cohort cannot ask for this one",
+          not attempt(u("dee"), "insert into public.setup_requests (cohort_id) values (%s)", (qc,)))
+    check("a teacher's agent cannot ask",
+          not attempt(as_agent("ben"), "insert into public.setup_requests (cohort_id) values (%s)", (qc,)))
+    check("a request cannot carry an email address",
+          not attempt(u("ben"), "insert into public.setup_requests (cohort_id, payload) values (%s, '{\"note\": \"x@example.org\"}')", (qc,)))
+    check("the cohort's teacher can ask, and it starts waiting whatever they send",
+          attempt(u("ben"), "insert into public.setup_requests (cohort_id, state, detail) values (%s, 'done', 'made up') returning state, detail, requested_by", (qc,))
+          and last_rows == [("waiting", None, people["ben"])])
+    check("asking twice does not queue two",
+          not attempt(u("ben"), "insert into public.setup_requests (cohort_id) values (%s)", (qc,)))
+    check("a student cannot see the request",
+          one("jon", "select count(*) from public.setup_requests where cohort_id = %s", (qc,))[0] == 0)
+    check("the teacher cannot mark their own request done",
+          attempt(u("ben"), "update public.setup_requests set state = 'done' where cohort_id = %s returning id", (qc,)) and last_rows == [])
+    check("no one signed in can claim requests",
+          not attempt(u("ben"), "select * from public.claim_setup_requests(5)"))
+
+    sv = as_server()
+    sv.execute("select id, cohort ->> 'slug', members, teachers, groups from public.claim_setup_requests(5)")
+    got = sv.fetchall()
+    check("meet@'s script claims it with the invitation emails read at that moment",
+          len(got) == 1 and got[0][1] == "queue" and list(got[0][2]) == ["jon@example.org"] and list(got[0][3]) == ["ben@example.org"]
+          and got[0][4][0]["emails"] == ["jon@example.org"])
+    rid = got[0][0]
+    sv.execute("select count(*) from public.claim_setup_requests(5)")
+    check("a claimed request is not handed out twice", sv.fetchone()[0] == 0)
+    key = "g-" + str(qg).replace("-", "")[:8]
+    sv.execute("select public.finish_setup_request(%s, true, 'Made.', 'https://meet.google.com/abc-defg-hij', %s::jsonb)",
+               (rid, '{"%s": {"url": "https://meet.google.com/qqq-rrrr-sss", "space": "spaces/AbC_12"}}' % key))
+    sv.execute("reset role")
+    sv.execute("select count(*) from public.sessions where cohort_id = %s and meet_url = 'https://meet.google.com/abc-defg-hij'", (qc,))
+    check("the weekly Meet link goes on every session", sv.fetchone()[0] == 2)
+    sv.execute("select meet_url, meet_space from public.groups where id = %s", (qg,))
+    check("and the group's room goes on its group", sv.fetchone() == ("https://meet.google.com/qqq-rrrr-sss", "spaces/AbC_12"))
+    check("the teacher sees it done",
+          one("ben", "select state from public.setup_requests where id = %s", (rid,))[0] == "done")
+    sv = as_server()
+    sv.execute("select public.finish_setup_request(%s, true, 'again', 'https://meet.google.com/zzz-zzzz-zzz', null)", (rid,))
+    check("a finished request cannot be finished again", sv.fetchone()[0] == "not working")
+    sv.execute("reset role")
+    check("the teacher can clear a finished request and ask again",
+          attempt(u("ben"), "delete from public.setup_requests where id = %s returning id", (rid,)) and len(last_rows) == 1
+          and attempt(u("ben"), "insert into public.setup_requests (cohort_id) values (%s)", (qc,)))
     conn.rollback()
     conn.close()
     failed = [n for n, ok in results if not ok]
