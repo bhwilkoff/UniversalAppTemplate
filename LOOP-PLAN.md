@@ -900,7 +900,23 @@ October 3, after every C milestone that does not wait on Ben merged):
   live as anon: 200). The MCP server's `my_app` gives the builder's own
   context. 498 database checks, 245 node tests. Not yet rendered signed
   in.
-- Next: G1 (building).
+- 2026-10-04, G1 (merged, migration 20261004000000 applied,
+  cohort-access redeployed, setup-queue deployed with its secret from
+  ~/.humanshaped/setup-queue-secret): /teach/'s "Before the first
+  session" makes the cohort's private repository (Discussions on) and
+  secret team through the GitHub App, idempotent and refusing names it
+  did not make; and asks meet@ for the weekly event, Meet link, and
+  group rooms through `setup_requests`, which meet@'s script claims
+  through setup-queue (processSetupRequests, off until SETUP_QUEUE_ON).
+  Checked live: setup-queue refuses a wrong secret and answers the right
+  one. 514 database checks, 254 node tests, 24 meet-events tests.
+  Waits on Ben: the GitHub App "Human Shaped Hub" needs Repository
+  permissions, Administration: Read and write, accepted on the
+  installation; then SETUP_QUEUE_URL, SETUP_QUEUE_SECRET, and
+  SETUP_QUEUE_ON in Script Properties and a trigger, as meet@.
+- Every gap from the October 3 analysis (G1 to G7) is built. Next:
+  live checks signed in (account sections, /teach/ buttons), then a
+  fresh gap read.
 
 ## Where to pick up
 
