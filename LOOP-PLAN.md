@@ -946,9 +946,20 @@ October 3, after every C milestone that does not wait on Ben merged):
 - **H5. Week 5 guests and lessons sent back:** a public showcase page
   with guests, /events/ fed by it, and a prefilled "send a lesson back"
   issue. 2 days, migration.
-- **H6. Template contradicts the free path:** stage 06's bar needs a
-  store; stage 08 has no ready bar; week 3's "look like itself" is
-  hidden by WEEK_STAGES. 1 day. Building.
+- **H6 (merged to main as ab37f0c):** stage 06's bar accepts the free
+  readers Pulse already has (web counter, GitHub) when there is no
+  store; stage 04 names week 3's "make it look like itself" (stage 03
+  step 9). Stage 08 already had its bar ("When you are done with the
+  path"), which path-lib.js reads. WEEK_STAGES left as is.
+- **meet@ by its own Google identity (merged, deployed October 4):**
+  notices and setup-queue accept meet@'s Google ID token (signature,
+  issuer, expiry, the project's audience, verified email, meet@, and
+  hd humanshaped.org; supabase/functions/_shared/google-id.js, tested),
+  with the old secret only as a fallback, so Ben pastes nothing. The
+  script carries the function URLs. Checked live: a bad token gets 401
+  "shape", the old secret still answers. Pushed to meet@'s script;
+  waits on Ben's Allow, then whoAmI's printed aud can be pinned in
+  GOOGLE_ID_AUDIENCES.
 - Seams: /teach/ to /live/, classmates' apps to /apps/app/, the event
   issue form not yet in humanshaped/community.
 
