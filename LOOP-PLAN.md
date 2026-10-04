@@ -864,10 +864,26 @@ October 3, after every C milestone that does not wait on Ben merged):
   signed in as Ben: a step and the ready choice were saved to
   stage_marks, then removed. Not yet tried: merging browser marks on
   sign-in, and "Bring it back" from a real cohort.
-- Still building when the loop paused (October 3): G4 (reach, branch
-  `g4-reach`) and G5 (events and community, branch `g5-community`).
-  Review, merge, and apply their migrations on the next tick. G1 and G2
-  are next after them.
+- 2026-10-04, G5 (merged): /events/ (coming up and already happened,
+  with write-ups), the next events and newest community threads on
+  /start/, and each app's newest issues on /apps/app/ (Discussions only
+  for visitors signed in with GitHub). The data comes from community.json,
+  built nightly by tools/community/ once its four files are copied into
+  the public humanshaped/community repository (waits on Ben's yes, since
+  it is a push to another repository).
+- 2026-10-04, G4 (merged, migration 20261003220000 applied, `notices`
+  deployed with its secret set from ~/.humanshaped/notices-secret): each
+  person chooses on /account/ whether teachers may email them and
+  whether meet@ may send a once-a-day "something is waiting" notice;
+  /teach/ opens the teacher's own mail with their draft for people who
+  allowed it. research/notes/reach-notes.md holds the reasons. Checked
+  live: a wrong secret gets 401, the right one answers. Left: the Script
+  Properties (NOTICES_URL, NOTICES_SECRET, NOTICES_ON), the mail
+  permission on whoAmI, and a daily trigger, all as meet@.
+  476 database checks, 238 node tests, 19 meet-events tests.
+- Admin console, October 4: Meet's "Supplemental add-ons" (Google's and
+  third-party) were already on for All Users, so Live sessions has them.
+- Next: G1 and G2.
 
 ## Where to pick up
 
