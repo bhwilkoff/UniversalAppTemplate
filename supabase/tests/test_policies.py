@@ -1833,6 +1833,55 @@ def main():
     su.execute("reset role")
     su.execute("select count(*) from public.cohort_teachers where cohort_id = %s", (ct,))
     check("and leaves none behind", su.fetchone()[0] == 0)
+
+    # ---- The week-5 showing, open to guests (migration 20261004030000) ---
+    su.execute("reset role")
+    su.execute("insert into public.cohorts (slug, title, created_by, status) values ('show-off', 'Show off', %s, 'running') returning id", (people["ben"],))
+    sc = su.fetchone()[0]
+    su.execute("insert into public.sessions (cohort_id, number, starts_at, title, meet_url) values (%s, 5, now() + interval '3 days', 'The showing', 'https://meet.google.com/abc-defg-hij') returning id", (sc,))
+    s5 = su.fetchone()[0]
+    su.execute("insert into public.sessions (cohort_id, number, starts_at, title, meet_url) values (%s, 4, now() - interval '4 days', 'Week four', 'https://meet.google.com/zzz-zzzz-zzz')", (sc,))
+    for name in ["ola", "pim"]:
+        if name not in people:
+            uid = str(uuid.uuid4())
+            su.execute("insert into auth.users (id, raw_user_meta_data) values (%s, %s)",
+                       (uid, '{"user_name": "%s", "provider_id": "%d"}' % (name, abs(hash(name)) % 10**8)))
+            people[name] = uid
+    su.execute("insert into public.enrollments (cohort_id, user_id, app_name, app_repo, app_public) values (%s, %s, 'Shown app', 'ola/shown', true), (%s, %s, 'Quiet app', 'pim/quiet', false)",
+               (sc, people["ola"], sc, people["pim"]))
+
+    def showcases(name):
+        cur = as_user(name)
+        cur.execute("select cohort_slug, session_number, guest_link, apps from public.public_showcases() where cohort_slug = 'show-off'")
+        return cur.fetchall()
+
+    check("before a teacher marks it, no session of the cohort is a public showcase", showcases(None) == [])
+    check("a student cannot mark a session as a public showcase",
+          attempt(as_user("ola"), "update public.sessions set public_showcase = true where id = %s returning id", (s5,)) and last_rows == [])
+    check("a teacher's agent cannot mark one either",
+          attempt(as_agent("ben"), "update public.sessions set public_showcase = true where id = %s returning id", (s5,)) and last_rows == [])
+    check("the cohort's teacher can mark the showing as public",
+          attempt(as_user("ben"), "update public.sessions set public_showcase = true where id = %s returning id", (s5,)) and len(last_rows) == 1)
+    rows = showcases(None)
+    check("a guest who is not signed in sees that one session, and only that one", [(r[0], r[1]) for r in rows] == [("show-off", 5)])
+    check("the Meet link stays hidden until the teacher chooses to share it", rows and rows[0][2] is None)
+    check("only the apps their students chose to show appear, never a private one",
+          rows and [a["app_repo"] for a in rows[0][3]] == ["ola/shown"])
+    attempt(as_user("ben"), "update public.sessions set showcase_shares_link = true where id = %s", (s5,))
+    rows = showcases(None)
+    check("once the teacher shares it, guests see the Meet link", rows and rows[0][2] == "https://meet.google.com/abc-defg-hij")
+    su.execute("reset role")
+    su.execute("insert into public.app_hides (cohort_id, user_id, hidden_by) values (%s, %s, %s)", (sc, people["ola"], people["ben"]))
+    rows = showcases(None)
+    check("an app a teacher hid from /apps/ is hidden from the showcase too", rows and rows[0][3] == [])
+    su.execute("reset role")
+    su.execute("update public.cohorts set status = 'draft' where id = %s", (sc,))
+    check("a draft cohort's showcase is never public", showcases(None) == [])
+    su.execute("reset role")
+    su.execute("update public.cohorts set status = 'running' where id = %s", (sc,))
+    check("an agent can read the public showcases, like anyone", (lambda c: (c.execute("select count(*) from public.public_showcases() where cohort_slug = 'show-off'"), c.fetchone()[0])[1])(as_agent("ola")) == 1)
+    check("guests still cannot read the session itself",
+          attempt(as_user(None), "select id from public.sessions where id = %s", (s5,)) and last_rows == [])
     conn.rollback()
     conn.close()
     failed = [n for n, ok in results if not ok]

@@ -313,9 +313,27 @@
           drawNotes(res[5].data);
           drawSetup(mine, res[6].data);
           drawPublicChoice(mine, res[1].data);
+          drawShowcase(res[1].data);
         });
       });
     }).catch(function (err) { fail('Something went wrong: ' + (err && err.message ? err.message : 'no details') + '.'); });
+  }
+
+  // The last week (H5): the cohort's public showing, if its teacher
+  // opened one to guests, and the one lesson the cohort sends back to the
+  // template. Words by Claude, awaiting Ben's review.
+  function drawShowcase(sessions) {
+    var S = window.ShowcaseLib;
+    var box = $('[data-last-week]');
+    if (!S || !box) return;
+    var open = (sessions || []).filter(function (s) { return s.public_showcase; })[0];
+    var guests = $('[data-showcase-line]');
+    guests.hidden = !open;
+    if (open) $('[data-showcase-page]').href = '/showcase/?c=' + encodeURIComponent(cohort.slug);
+    var lesson = S.lessonTime(cohort, sessions, new Date());
+    $('[data-lesson-line]').hidden = !lesson;
+    if (lesson) $('[data-lesson-link]').href = S.lessonIssueUrl(cohort.title);
+    box.hidden = !open && !lesson;
   }
 
   // Showing your app in public is your own choice (hub-privacy-notes.md).

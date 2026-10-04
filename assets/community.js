@@ -50,8 +50,7 @@
     return li;
   }
 
-  function drawEvents(data) {
-    var split = C.splitEvents(data.events, new Date());
+  function drawEvents(split) {
     var up = events.querySelector('[data-upcoming]'), past = events.querySelector('[data-past]');
     up.replaceChildren(); past.replaceChildren();
     if (!split.upcoming.length) up.appendChild(el('p', 'small', 'Nothing is on the calendar right now. If you are planning something, tell us about it below, and it will be listed here.'));
@@ -60,8 +59,8 @@
     if (split.past.length) { var ol2 = el('ol', 'events'); split.past.forEach(function (e) { ol2.appendChild(eventItem(e, true)); }); past.appendChild(ol2); }
   }
 
-  function drawNext(data) {
-    var soon = C.splitEvents(data.events, new Date()).upcoming.slice(0, 2);
+  function drawNext(split) {
+    var soon = split.upcoming.slice(0, 2);
     next.replaceChildren();
     if (!soon.length) return;
     var ol = el('ol', 'events');
@@ -85,13 +84,30 @@
     }
   }
 
-  fetch(SOURCE, { cache: 'no-cache' })
+  // Cohorts' public showings (H5) come from the hub rather than
+  // community.json, read with its public key and no sign-in. Either
+  // source may fail on its own, and the other still shows.
+  function showcases() {
+    var S = window.ShowcaseLib, HUB = window.HUB;
+    if (!S || !HUB || !HUB.url || (!events && !next)) return Promise.resolve({ upcoming: [], past: [] });
+    return fetch(HUB.url + '/rest/v1/rpc/public_showcases', { method: 'POST', headers: { apikey: HUB.key, 'Content-Type': 'application/json' }, body: '{}' })
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function (rows) { return S.splitShowcases(rows, new Date()); })
+      .catch(function () { return { upcoming: [], past: [] }; });
+  }
+
+  var community = fetch(SOURCE, { cache: 'no-cache' })
     .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
-    .then(function (data) {
-      data = data && typeof data === 'object' ? data : {};
-      if (events) drawEvents(data);
-      if (next) drawNext(data);
-      if (threads) drawThreads(data);
-    })
-    .catch(trouble);
+    .then(function (data) { return data && typeof data === 'object' ? data : {}; })
+    .catch(function () { return null; });
+
+  Promise.all([community, showcases()]).then(function (res) {
+    var data = res[0], shows = res[1];
+    var split = C.splitEvents(data ? data.events : [], new Date());
+    if (window.ShowcaseLib) split = window.ShowcaseLib.mergeSplits(split, shows);
+    if (!data && !shows.upcoming.length && !shows.past.length) { trouble(); return; }
+    if (events) drawEvents(split);
+    if (next) drawNext(split);
+    if (threads && data) drawThreads(data);
+  });
 })();
