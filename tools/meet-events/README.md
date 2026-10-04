@@ -138,6 +138,7 @@ it an id.
 | `checkCohort` | The "check it works" report: the event exists, repeats the right number of weeks, starts at the right time, links the session page, has a Meet link, and invites exactly the roster; the folder exists, belongs to meet@, is shared with exactly the roster, has no "anyone with the link" sharing, and has no cohort recordings stranded outside it; and each group has its room (with the Meet API, TRUSTED and with the right members). Changes nothing. |
 | `fileStrayRecordings` | Moves recorder uploads that landed at the top of My Drive into the cohort's folder (see the recorder's README for why that can happen). |
 | `sendNotices` | Off unless `NOTICES_ON` is `true`. Asks the hub who asked to hear when something is waiting for them, emails each of them one short line with a link (never the words of a note or feedback), and tells the hub who was sent one. Meant for a daily trigger. |
+| `processSetupRequests` | Off unless `SETUP_QUEUE_ON` is `true`. Takes the requests teachers made on /teach/ (see "Requests from /teach/" above), runs `setupCohort` on each one's setup, and reports the Meet link and the group rooms back to the hub. Meant for an hourly trigger. |
 
 ### "Something is waiting for you" emails (G4)
 
@@ -177,6 +178,46 @@ teacher send that student a note, wait 20 hours (or, for a test, run
 the note in it. Run `sendNotices` again and nothing more is sent.
 
 To stop it at once, set `NOTICES_ON` to anything but `true`.
+
+### Requests from /teach/ (G1)
+
+*Written by Claude, awaiting Ben's review.* A teacher who is not Ben
+cannot run this script, because the events, rooms, and folders belong to
+meet@. So on /teach/, under "Before the first session", a teacher presses
+"Ask meet@humanshaped.org to make the weekly event, its Meet link, and a
+room for each group". The request waits in the hub (`setup_requests`,
+migration 20261004000000), with no email address in it.
+`processSetupRequests`, run every hour by a trigger, takes the waiting
+requests through the hub's `setup-queue` Edge Function, which hands over
+each cohort's setup in the same shape /teach/ copies, with the invitation
+emails read at that moment. It runs `setupCohort` on each, then reports
+the weekly Meet link and each group's room back, and the hub puts them on
+every week and every group, so the teacher's steps check themselves off.
+A request that fails says why on /teach/, and the teacher asks again.
+
+Ben's steps, once, in order:
+
+1. **Make the secret,** a different one from the notices secret, for
+   example with `openssl rand -hex 32`.
+2. **Give it to the hub.** In Supabase, Edge Functions, Secrets, add
+   `SETUP_QUEUE_SECRET`. (The agent deploys `setup-queue` with
+   `tools/deploy-setup-queue.sh`, verify_jwt off.)
+3. **Give it to the script.** Script Properties: `SETUP_QUEUE_SECRET`
+   (the same string), `SETUP_QUEUE_URL`
+   (`https://bifrieqzkihuxfzttgvd.supabase.co/functions/v1/setup-queue`),
+   and `SETUP_QUEUE_ON` = `true`.
+4. **Run `processSetupRequests` once from the editor.** With nothing
+   waiting it says "No requests are waiting."
+5. **Add the hourly trigger.** Triggers, Add Trigger,
+   `processSetupRequests`, time-driven, hour timer, every hour.
+
+*Check:* as a test teacher, make a draft cohort with dates, make its
+weekly sessions, give your own email for invitations on its cohort page,
+and press the button on /teach/. Within the hour (or after running
+`processSetupRequests` by hand), each week on /teach/ shows the Meet link,
+and the invitation is in your mail.
+
+To stop it at once, set `SETUP_QUEUE_ON` to anything but `true`.
 
 The report reads like this:
 

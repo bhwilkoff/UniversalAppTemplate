@@ -210,7 +210,13 @@
       drawRoster(res[2].data, res[3].data);
       loadSubmissions(res[2].data, res[1].data);
       drawGroups(res[3].data, res[2].data);
-      drawCohortSetup(res[1].data, res[4].data);
+      drawCohortSetup(res[1].data, res[4].data, null);
+      // On its own, so the page works the same before the database has
+      // setup_requests (migration 20261004000000).
+      var setupSessions = res[1].data, setupAccess = res[4].data;
+      db.from('setup_requests').select('state, detail, created_at').eq('cohort_id', id).order('created_at', { ascending: false }).limit(1).maybeSingle().then(function (q) {
+        if (!q.error && q.data && current && current.id === id) drawCohortSetup(setupSessions, setupAccess, q.data);
+      });
       loadSince(res[1].data, res[2].data);
       drawCredentials(res[2].data, res[5]);
       form.hidden = true;
@@ -226,8 +232,8 @@
   // Before the first session: the steps a teacher's cohort needs, each
   // checked off by what the hub can see (TeachLib.cohortSetupSteps). The
   // card goes away once every step is done.
-  function drawCohortSetup(sessions, access) {
-    var steps = lib.cohortSetupSteps(current, sessions, access);
+  function drawCohortSetup(sessions, access, meetRequest) {
+    var steps = lib.cohortSetupSteps(current, sessions, access, meetRequest);
     $('[data-cohort-setup]').hidden = steps.every(function (x) { return x.done; });
     var list = $('[data-cohort-setup-steps]');
     list.replaceChildren();
@@ -238,12 +244,56 @@
       else {
         target = el('button', 'link', x.label); target.type = 'button';
         target.addEventListener('click', function () {
-          if (x.action === 'sessions') $('[data-make-sessions]').click(); else fillForm(current);
+          if (x.action === 'sessions') $('[data-make-sessions]').click();
+          else if (x.action === 'meet') askMeet(target);
+          else if (x.action === 'provision') provision(target);
+          else fillForm(current);
         });
       }
       li.appendChild(target);
+      if (x.note) li.appendChild(el('span', 'small', ' ' + x.note));
       if (x.done) li.appendChild(el('span', 'visually-hidden', ' (done)'));
       list.appendChild(li);
+    });
+  }
+
+  // A teacher who is not Ben sets up a cohort alone (LOOP-PLAN G1). Words
+  // by Claude, awaiting Ben's review.
+  //
+  // The calls: a request for meet@humanshaped.org's script, which makes
+  // the weekly event, its Meet link, and the group rooms, and puts the
+  // links on each week here. A request holds no email; the script reads
+  // the invitation emails when it takes the request.
+  function askMeet(button) {
+    button.disabled = true;
+    db.from('setup_requests').insert({ cohort_id: current.id }).then(function (r) {
+      button.disabled = false;
+      if (r.error && r.error.code === '23505') return say('[data-detail-message]', 'You have asked already, and meet@ has not finished yet.');
+      if (r.error) return say('[data-detail-message]', 'The request could not be made: ' + r.error.message);
+      say('[data-detail-message]', 'Asked. meet@humanshaped.org picks it up within the hour, invites everyone who gave an email for invitations, and puts the Meet link on each week here. People who give their email later are added when you ask again.');
+      openCohort(current.id);
+    });
+  }
+
+  // The conversation: the hub makes the private repository with
+  // Discussions on and the secret team (the cohort-access function), and
+  // then adds you to the team, as it does for everyone who opens it.
+  function provision(button) {
+    var id = current.id;
+    button.disabled = true;
+    say('[data-detail-message]', 'Making the repository and team on GitHub…');
+    db.functions.invoke('cohort-access', { body: { action: 'provision', cohort_id: id } }).then(function (r) {
+      if (r.error) {
+        var res = r.error.context;
+        return (res && res.json ? res.json() : Promise.resolve({})).catch(function () { return {}; }).then(function (body) {
+          button.disabled = false;
+          say('[data-detail-message]', body.message || 'GitHub could not be reached just now. Try again in a minute.');
+        });
+      }
+      return db.functions.invoke('cohort-access', { body: { action: 'join', cohort_id: id } }).then(function () {
+        say('[data-detail-message]', 'The repository ' + r.data.github_repo + ' and its team are ready, with Discussions on. Open the cohort’s conversation from its page to check it works.');
+        openCohort(id);
+      });
     });
   }
 

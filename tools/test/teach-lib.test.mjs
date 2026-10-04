@@ -134,3 +134,17 @@ test("a session's checks come back with each answer in the person's words", () =
   assert.deepEqual(out[0].answers, [{ user_id: 'u', name: 'U', text: 'B' }]);
   assert.equal(out[1].answers[0].text, 'Pipelines');
 });
+
+// G1: a teacher asks meet@ for the calls, and the hub makes the repository.
+test('the event step asks meet@, and says where the request stands', () => {
+  const c = { ...draft, starts_on: '2026-10-19', session_weekday: 2, session_time: '17:00:00' };
+  const ev = (r) => lib.cohortSetupSteps(c, [{ meet_url: null }], null, r).find((s) => s.key === 'event');
+  assert.equal(ev(null).action, 'meet');
+  assert.equal(ev(null).note, null);
+  assert.match(ev({ state: 'waiting' }).note, /within the hour/);
+  assert.match(ev({ state: 'failed', detail: 'No start date.' }).note, /No start date\./);
+  const linked = lib.cohortSetupSteps(c, [{ meet_url: 'https://meet.google.com/abc-defg-hij' }], null, { state: 'done' }).find((s) => s.key === 'event');
+  assert.equal(linked.done, true);
+  assert.equal(linked.note, null);
+  assert.equal(lib.cohortSetupSteps(c, [], null).find((s) => s.key === 'repo').action, 'provision');
+});

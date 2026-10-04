@@ -345,3 +345,75 @@ they already authorized the app) and back to the same page.
 trip, and that supabase-js 2.117.2 is not confused by the edit to its
 stored session (it parses the stored JSON on load, and only two fields
 the server never sends again are removed). Both need a real sign-in.
+
+## 8. A teacher sets up the conversation alone (October 4, 2026)
+
+*Written by Claude, awaiting Ben's review.* LOOP-PLAN G1: until now Ben
+made each cohort's private repository and secret team by hand, and the
+teacher typed their names on /teach/. VISION.md asks that "other people
+should be able to become teachers within the website and lead their own
+cohort", so the hub now makes them, through the same GitHub App that
+already adds people to the team (cohort-access, `provision` action).
+
+### What the App can do today
+
+Read with `gh api /orgs/humanshaped/installations` on October 4, 2026:
+the "human-shaped-hub" installation has `discussions: write`,
+`members: write`, and `metadata: read`, on all repositories. (Checked.)
+
+### What making the conversation needs
+
+From GitHub's table of permissions for GitHub Apps,
+https://docs.github.com/en/rest/authentication/permissions-required-for-github-apps
+(read October 4, 2026):
+
+| Step | Endpoint | Permission the App needs |
+|---|---|---|
+| Make the private repository | `POST /orgs/{org}/repos` | Repository **Administration: write** (the table also marks "additional permissions" for this endpoint without naming them here; not verified which) |
+| Turn Discussions on | GraphQL `updateRepository(input: {hasDiscussionsEnabled: true})` | Administration: write (the REST "Update a repository" endpoint needs it, and the GraphQL mutation changes the same setting; not verified separately) |
+| Make the secret team | `POST /orgs/{org}/teams` with `privacy: "secret"` | Organization **Members: write** (already granted) |
+| Let the team read the repository | `PUT /orgs/{org}/teams/{team}/repos/{owner}/{repo}` with `permission: "pull"` | Members: read, plus additional permissions; on the repository side that is Administration (not verified exactly) |
+| Add people to the team | `PUT /orgs/{org}/teams/{team}/memberships/{user}` | Members: write (already granted, in use) |
+
+REST has no switch for Discussions: GitHub's own REST description
+(github/rest-api-description, `api.github.com.json`, read October 4) lists
+no `has_discussions` field on "Create an organization repository" or
+"Update a repository", while GraphQL's `UpdateRepositoryInput` has
+`hasDiscussionsEnabled` (checked by introspection with `gh api graphql`).
+So the function makes the repository with REST and turns Discussions on
+with GraphQL, using the same installation token.
+
+The existing team for `cohort-test` is `secret` with the `read` role on
+its repository, so the hub copies exactly that. (Checked with `gh api`.)
+
+### What Ben has to change, once
+
+At https://github.com/organizations/humanshaped/settings/apps, the "Human
+Shaped Hub" app, Permissions and events, Repository permissions:
+**Administration: Read and write**. Save, and then accept the new
+permissions for the installation (GitHub asks the organization's owner to
+approve an App's added permissions before they apply; the installation's
+page shows the request). Until then, the button on /teach/ stops at the
+first step and says the App may need this permission.
+
+### How it stays safe
+
+- Only a teacher of the cohort can ask, never an AI agent (the function
+  refuses a token carrying an OAuth `client_id`), and never for a
+  finished cohort.
+- The repository and team carry the cohort's id in their descriptions.
+  A name already taken by anything without that mark is refused and never
+  reused, so a teacher cannot take over another cohort's repository by
+  choosing its short name. A public repository is never used.
+- Every step checks what exists first, so pressing the button again
+  finishes what an earlier try left undone and makes nothing twice.
+- Nothing is ever deleted by the hub.
+
+### Not verified
+
+- That Administration: write is enough for all three repository steps,
+  and which "additional permissions" GitHub's table means.
+- That Discussions can be turned on in a repository with no commits (the
+  hub makes it without `auto_init`, so it needs no Contents permission).
+- That a team made by an App has no maintainer until the teacher joins it
+  through cohort-access, which /teach/ does right after.
