@@ -10,6 +10,7 @@ then acts as different people and checks what each can see and do.
 """
 import sys
 import tempfile
+import json
 import uuid
 from pathlib import Path
 
@@ -26,7 +27,15 @@ create schema auth;
 create table auth.users (
   id uuid primary key,
   email text,
-  raw_user_meta_data jsonb not null default '{}'::jsonb
+  raw_user_meta_data jsonb not null default '{}'::jsonb,
+  raw_app_meta_data jsonb not null default '{}'::jsonb
+);
+create table auth.identities (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  provider text not null,
+  provider_id text,
+  identity_data jsonb not null default '{}'::jsonb
 );
 create function auth.uid() returns uuid language sql stable as $$
   select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid
@@ -2028,6 +2037,63 @@ def main():
     ben.execute("delete from public.sessions where id = %s", (s2,))
     ben.execute("select count(*) from public.scenes where session_id = %s", (s2,))
     check("a session's scenes go with it", ben.fetchone()[0] == 0)
+
+    # ---- Google sign-in beside GitHub (migration 20261004060000) -------
+    # The sign-in system writes identities with no signed-in person in the
+    # database session; every cursor shares one connection, so clear it.
+    def as_system():
+        su.execute("reset role")
+        su.execute("select set_config('request.jwt.claim.sub', '', false)")
+        su.execute("select set_config('request.jwt.claims', '', false)")
+    as_system()
+    def new_account(name, app_meta, user_meta):
+        uid = str(uuid.uuid4())
+        su.execute("insert into auth.users (id, raw_app_meta_data, raw_user_meta_data) values (%s, %s, %s)",
+                   (uid, json.dumps(app_meta), json.dumps(user_meta)))
+        people[name] = uid
+        return uid
+    def profile(name):
+        su.execute("select github_login, github_id, display_name, avatar_url from public.profiles where id = %s", (people[name],))
+        return su.fetchone()
+    gail = new_account("gail", {"provider": "google", "providers": ["google"]},
+                       {"name": "Gail Example", "picture": "https://example.org/gail.png",
+                        "provider_id": "107691503500061507151130823", "email": "gail@example.org"})
+    g = profile("gail")
+    check("a Google-first sign-up gets a profile, with its name and picture", g is not None and g[2] == "Gail Example" and g[3] == "https://example.org/gail.png")
+    check("and no GitHub name or number until GitHub is linked", g[0] is None and g[1] is None)
+    new_account("eve", {"provider": "email", "providers": ["email"]}, {"user_name": "bhwilkoff", "provider_id": "42"})
+    e = profile("eve")
+    check("an email sign-up cannot claim a GitHub name by typing it", e is not None and e[0] is None and e[1] is None)
+    su.execute("select count(*) from public.teachers where user_id = %s", (people["eve"],))
+    check("nor become a teacher by claiming Ben's", su.fetchone()[0] == 0)
+    gopen = str(uuid.uuid4())
+    su.execute("insert into public.cohorts (id, slug, title, status, created_by, time_zone) values (%s, 'google-open', 'Open for Google', 'open', %s, 'America/Denver')",
+               (gopen, people["ben"]))
+    join = "insert into public.enrollments (cohort_id, user_id) values (%s, %s) returning user_id"
+    check("someone without a linked GitHub cannot join a cohort",
+          not attempt(as_user("gail"), join, (gopen, gail)))
+    as_system()
+    su.execute("insert into auth.identities (user_id, provider, provider_id, identity_data) values (%s, 'github', '777', %s)",
+               (gail, json.dumps({"user_name": "gail-gh", "provider_id": "777", "avatar_url": "https://example.org/gh.png"})))
+    g = profile("gail")
+    check("linking GitHub fills in the GitHub name and number", g[0] == "gail-gh" and g[1] == 777)
+    check("and keeps the picture the account already had", g[3] == "https://example.org/gail.png")
+    check("then they can join a cohort", attempt(as_user("gail"), join, (gopen, gail)))
+    as_system()
+    su.execute("insert into auth.identities (user_id, provider, provider_id, identity_data) values (%s, 'google', '1076915035000615', %s)",
+               (people["bea"], json.dumps({"name": "Bea G", "email": "bea@example.org"})))
+    check("linking Google to a GitHub account leaves its GitHub name alone", profile("bea")[0] == "bea")
+    su.execute("delete from auth.identities where user_id = %s and provider = 'github'", (gail,))
+    g = profile("gail")
+    check("unlinking GitHub takes the GitHub name off the profile", g[0] is None and g[1] is None)
+    check("a person cannot write a GitHub name onto their own profile",
+          not attempt(as_user("gail"), "update public.profiles set github_login = 'someone-else' where id = %s returning id", (gail,)))
+    check("nor change the GitHub name their profile already has",
+          not attempt(as_user("bea"), "update public.profiles set github_login = 'someone-else' where id = %s returning id", (people["bea"],)))
+    check("but they can still change their display name",
+          attempt(as_user("bea"), "update public.profiles set display_name = 'Bea B' where id = %s returning id", (people["bea"],)) and len(last_rows) == 1)
+    as_system()
+
     conn.rollback()
     conn.close()
     failed = [n for n, ok in results if not ok]

@@ -1435,3 +1435,8 @@ label.check { min-height: 2.25rem; }
 /* On /live/, the run of show sits in the reading column like the rest. */
 .live-page .show { margin-top: 1.25rem; }
 .live-page .show-parts:empty { display: none; }
+
+/* Google sign-in beside GitHub: Google draws its own button inside. */
+.google-signin { margin: 0.75rem 0 0.25rem; min-height: 44px; }
+.linked-accounts { list-style: none; padding: 0; margin: 0.5rem 0; display: grid; gap: 0.4rem; }
+.linked-accounts .btn-link { margin-left: 0.25rem; }
