@@ -100,48 +100,40 @@
 
           <p class="notice small">Sessions are recorded so that anyone who misses one, or wants to come back to it, can watch it later. The host says so before the recording starts, and only the people in this cohort can see it.</p>
 
-          <section class="live-block signal-controls" aria-labelledby="sig-title" data-sig-controls hidden>
-            <h2 id="sig-title">What everyone sees</h2>
-            <p class="small">What you send here shows at once on every copy of this page in the cohort. To put it on everyone’s Meet screen too, open <a data-sig-card-page target="_blank" rel="noopener">the card page</a> and present that tab.</p>
+          <!-- The run of show (R1, research/notes/run-of-show-design.md): the
+               session as a timeline of scenes, the current one open with what
+               it needs, and everything else under "Any time in the show". The
+               same component draws the Meet add-on's panel (assets/show-view.js),
+               and the parts below are moved into it by scene. Words by Claude,
+               awaiting Ben's review. -->
+          <div data-show></div>
 
-            <!-- The controls come from SignalsLib.controlsHtml(), so this page and
-                 the Meet add-on's panel always show the same ones (H4). -->
-            <div data-sig-controls-body></div>
-          </section>
+          <div class="show-parts">
+          <!-- The teacher's cues, from SignalsLib.controlsHtml() (H4), split by scene. -->
+          <div class="signal-controls" data-sig-controls hidden><div data-sig-controls-body></div></div>
 
           <!-- What this part of the session needs (M12): the teacher's
                "what I heard" while people arrive, and each group's room and
                turns during "Show what you brought back". Words by Claude,
                awaiting Ben's review. -->
-          <section class="live-block live-now" aria-labelledby="now-title" data-now hidden>
-            <p class="kicker">Now</p>
-            <h2 id="now-title" data-now-title></h2>
-            <div data-now-body></div>
-          </section>
+          <div data-now-body></div>
 
           <!-- The rooms (C2, assets/rooms.js): each group's room, where it is
                in its turns, and "We would like the teacher". A teacher sees
                every group; anyone else, their own. Words by Claude, awaiting
                Ben's review. -->
-          <section class="live-block" aria-labelledby="rooms-title" data-rooms-section hidden>
-            <h2 id="rooms-title">The rooms</h2>
-            <p class="small" data-rooms-intro></p>
-            <div class="room-board" data-rooms></div>
-          </section>
+          <div class="room-board" data-rooms hidden></div>
 
           <!-- During class (C6), for the cohort's teachers alone (assets/live-commits.js).
                Words by Claude, awaiting Ben's review. -->
-          <section class="live-block live-pushed" aria-labelledby="pushed-title" data-pushed-section hidden>
-            <h2 id="pushed-title">During class</h2>
-            <p class="small">What people have pushed to their repositories since the session began, newest first, read from GitHub while you look and kept nowhere, so you can open a commit and ask about it while it is still warm. Only the cohort's teachers see this.</p>
+          <div class="live-pushed" data-pushed-section hidden>
             <ol class="commit-list live-pushed-list" data-pushed></ol>
             <div class="actions"><button class="btn-quiet" type="button" data-pushed-reload hidden>Read GitHub again</button><span class="small" data-pushed-status role="status"></span></div>
-          </section>
+          </div>
 
           <!-- The queue and checks for understanding (M3): copy awaiting Ben's review. -->
-          <section class="live-block" aria-labelledby="queue-title">
-            <h2 id="queue-title">Show your work</h2>
-            <p class="small">Add what you want to show, and the whole cohort sees the queue in the order people asked. When it is your turn, open it in its own tab and present that tab from Meet, so everyone sees the real thing rather than a description of it.</p>
+          <div data-wings>
+            <p class="small">When it is your turn, open your work in its own tab and present that tab from Meet, so everyone sees the real thing rather than a description of it.</p>
             <ol class="live-queue" data-queue></ol>
             <details class="live-shown" data-shown-wrap hidden>
               <summary data-shown-summary></summary>
@@ -157,26 +149,17 @@
               <label>What should people look at, if you want to say
                 <input type="text" maxlength="300" data-add-note>
               </label>
-              <div class="actions"><button class="btn-quiet" type="submit">Add it to the queue</button><span class="small" data-add-status role="status"></span></div>
+              <div class="actions"><button class="btn-quiet" type="submit">Ask to present it</button><span class="small" data-add-status role="status"></span></div>
             </form>
-          </section>
+          </div>
 
           <!-- This session's thread (C5): copy awaiting Ben's review. -->
-          <section class="live-block" aria-labelledby="thread-title" data-thread-section hidden>
-            <h2 id="thread-title">This session's thread</h2>
-            <p class="small">Links, questions for later, and what you are stuck on, kept on GitHub under your own name after the call ends. Meet's chat is for the moment.</p>
-            <div data-thread></div>
-          </section>
+          <div data-thread-section hidden><div data-thread></div></div>
 
           <!-- From the conversation (M9): copy awaiting Ben's review. -->
-          <section class="live-block" aria-labelledby="talk-title" data-talk-section hidden>
-            <h2 id="talk-title">From the conversation</h2>
-            <p class="small">The newest threads in the cohort's discussions on GitHub, so any of them can be opened and shown.</p>
-            <div data-talk></div>
-          </section>
+          <div data-talk-section hidden><div data-talk></div></div>
 
-          <section class="live-block" aria-labelledby="checks-title">
-            <h2 id="checks-title">Checks for understanding</h2>
+          <div data-questions>
             <p class="small" data-checks-intro></p>
             <form class="inline-form live-ask" data-ask hidden>
               <label>Your question
@@ -191,32 +174,24 @@
                 <textarea rows="4" data-ask-choices></textarea>
               </label>
               <label class="check"><input type="checkbox" data-ask-tally> Show everyone the count of answers as they come in</label>
-              <div class="actions"><button class="btn-quiet" type="submit">Ask the cohort</button><button class="btn-quiet" type="button" data-ask-closing>Ask the two closing questions</button><span class="small" data-ask-status role="status"></span></div>
+              <div class="actions"><button class="btn-quiet" type="submit">Ask everyone</button><button class="btn-quiet" type="button" data-ask-closing>Ask the two closing questions</button><span class="small" data-ask-status role="status"></span></div>
             </form>
             <div class="live-checks" data-checks></div>
             <details class="live-earlier" data-earlier-wrap hidden>
               <summary>Earlier questions</summary>
               <div class="live-checks" data-earlier></div>
             </details>
-          </section>
+          </div>
           <p class="small live-sync" data-sync></p>
 
-          <section aria-labelledby="agenda-title">
-            <h2 id="agenda-title">Today's agenda</h2>
-            <p class="small">Starting a part's timer tells this page which part the session is in, which matters when a session runs late.</p>
-            <ol class="agenda" data-agenda></ol>
-          </section>
 
-          <section aria-labelledby="stages-title" data-stages-section hidden>
-            <h2 id="stages-title">This week on the path</h2>
-            <ul class="links" data-stages></ul>
-          </section>
+          <div data-stages-section hidden><ul class="links" data-stages></ul></div>
 
-          <section aria-labelledby="brought-title">
-            <h2 id="brought-title">What people brought back</h2>
-            <p class="small">Bring-backs shared since the last session, newest first. You can share yours from <a data-cohort-link>your cohort page</a>.</p>
+          <div data-brought-section>
+            <p class="small">Shared since the last session, newest first. You can share yours from <a data-cohort-link>your cohort page</a>.</p>
             <div data-brought></div>
-          </section>
+          </div>
+          </div>
         </section>
       </div>
     </div>
@@ -235,6 +210,8 @@
   <script src="/assets/discussions-lib.js" defer></script>
   <script src="/assets/session-thread-lib.js" defer></script>
   <script src="/assets/discussions.js" defer></script>
+  <script src="/assets/show-view-lib.js" defer></script>
+  <script src="/assets/show-view.js" defer></script>
   <script src="/assets/live.js" defer></script>
 
   <footer class="site-footer">

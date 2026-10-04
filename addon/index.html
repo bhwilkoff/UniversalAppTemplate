@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Human Shaped in Meet</title>
-  <meta name="description" content="The Human Shaped side panel inside Google Meet: the part of the session now, the queue of work to show, and checks for understanding.">
+  <meta name="description" content="The Human Shaped side panel inside Google Meet: the session&#39;s run of show, with the current scene and everything it needs.">
   <meta name="robots" content="noindex, nofollow">
   <meta name="theme-color" content="#F7F6F2" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#141618" media="(prefers-color-scheme: dark)">
@@ -22,9 +22,9 @@
   </script>
 </head>
 <body class="addon-body">
-  <!-- The Meet add-on's side panel (M15). A small launcher of activities:
-       the session now, the queue, and the checks, with room for more.
-       Words by Claude, awaiting Ben's review. -->
+  <!-- The Meet add-on's side panel (M15), laid out as the run of show
+       (R1): the teacher's view or the student's, from the same parts as
+       /live/. Words by Claude, awaiting Ben's review. -->
   <main class="addon-panel live-page" data-addon aria-live="polite">
     <section class="account-state" data-state="loading"><p class="small">Opening the session…</p></section>
 
@@ -74,104 +74,79 @@
       <section class="signal-card" aria-label="A card from your teacher" data-sig-card hidden></section>
       <section class="signal-stage" aria-label="Who is on stage" data-sig-stage hidden></section>
 
-      <nav class="addon-launcher" aria-label="Activities" data-launcher></nav>
+      <!-- The run of show (R1, research/notes/run-of-show-design.md): the
+           session as a timeline of scenes, the current one open with what
+           it needs, and everything else under "Any time in the show". The
+           same component draws /live/ (assets/show-view.js). The parts
+           below are moved into it by scene. Words by Claude, awaiting Ben's
+           review. -->
+      <div data-show></div>
 
-      <!-- What everyone sees (H4): the teacher's controls, the same ones as on
-           /live/, from SignalsLib.controlsHtml(). Words by Claude, awaiting
-           Ben's review. -->
-      <section class="addon-activity signal-controls" data-activity="signals" aria-labelledby="signals-h" hidden>
-        <h2 id="signals-h">What everyone sees</h2>
-        <p class="small">What you send here shows at once in this panel and on every copy of the session page. To put a card on everyone’s Meet screen, open <a data-sig-card-page target="_blank" rel="noopener">the card page</a> and present that tab.</p>
-        <div data-sig-controls-body></div>
-      </section>
-
-      <!-- The drawing board (C4, H4): it opens in its own tab, since it needs
-           the hub's sign-in. Words by Claude, awaiting Ben's review. -->
-      <section class="addon-activity" data-activity="board" aria-labelledby="board-h" hidden>
-        <h2 id="board-h">The board</h2>
-        <div data-board></div>
-      </section>
-
-      <!-- The session now: the part, its timer, and what this part needs. -->
-      <section class="addon-activity" data-activity="now" aria-labelledby="now-h" hidden>
-        <h2 id="now-h" class="visually-hidden">The session now</h2>
-        <div class="addon-part">
+      <div class="show-parts">
+        <!-- This scene: its clock, and the teacher's cues to start it and move on. -->
+        <div class="addon-part" data-part-clock>
           <p class="kicker" data-part-kicker></p>
-          <p class="addon-part-name" data-part-name></p>
           <p class="addon-clock" data-clock aria-live="off"></p>
-          <div class="addon-teacher-only" data-part-controls hidden>
-            <label class="addon-field">Part
-              <select data-part-select></select>
-            </label>
-            <div class="actions">
-              <button class="btn-github" type="button" data-timer>Start the timer</button>
-              <button class="btn-quiet" type="button" data-next-part>Next part</button>
-            </div>
+          <div class="actions addon-teacher-only" data-part-controls hidden>
+            <button class="btn-github" type="button" data-timer>Start this scene’s clock</button>
+            <button class="btn-quiet" type="button" data-next-part>Next scene</button>
+            <button class="btn-quiet" type="button" data-welcome-toggle>Put the welcome on the main stage</button>
           </div>
-          <details class="addon-what" data-part-what-wrap>
-            <summary>What happens in this part</summary>
-            <p class="small" data-part-what></p>
-          </details>
         </div>
+
+        <!-- For this scene: last week's notes while people arrive, and each trio's order. -->
         <div data-now-lead></div>
-        <div class="actions" data-welcome-wrap hidden>
-          <button class="btn-quiet" type="button" data-welcome-toggle>Put the welcome on the stage</button>
+
+        <!-- The teacher's cues, from SignalsLib.controlsHtml(), split by scene. -->
+        <div class="signal-controls" data-sig-controls-body></div>
+
+        <!-- The design stage (C4's board): opened in a tab until R5 puts it on the main stage. -->
+        <div data-board></div>
+
+        <!-- The wings: who is ready to present, in order. -->
+        <div data-wings>
+          <ol class="live-queue" data-queue></ol>
+          <p class="small" data-shown-count></p>
         </div>
-      </section>
 
-      <!-- Show your work: the queue in order, with what is up next. -->
-      <section class="addon-activity" data-activity="queue" aria-labelledby="queue-h" hidden>
-        <h2 id="queue-h">Show your work</h2>
-        <ol class="live-queue" data-queue></ol>
-        <p class="small" data-shown-count></p>
-      </section>
+        <!-- The rehearsal rooms (C2, assets/rooms.js). -->
+        <div class="room-board" data-rooms hidden></div>
 
-      <!-- The rooms (C2, assets/rooms.js): where each group is in its turns,
-           and which would like the teacher. In a group's own room, that
-           group alone. -->
-      <section class="addon-activity" data-activity="rooms" aria-labelledby="rooms-h" hidden>
-        <h2 id="rooms-h">Rooms</h2>
-        <div class="room-board" data-rooms></div>
-      </section>
-
-      <!-- Checks for understanding. -->
-      <section class="addon-activity" data-activity="checks" aria-labelledby="checks-h" hidden>
-        <h2 id="checks-h">Checks for understanding</h2>
-        <div class="actions addon-closing" data-closing-wrap hidden>
-          <button class="btn-quiet" type="button" data-ask-closing>Ask the two closing questions</button>
+        <!-- Questions (checks for understanding). -->
+        <div data-questions>
+          <div class="actions addon-closing" data-closing-wrap hidden>
+            <button class="btn-quiet" type="button" data-ask-closing>Ask the two closing questions</button>
+          </div>
+          <div class="live-checks" data-checks></div>
+          <details class="addon-ask" data-ask-wrap hidden>
+            <summary>Ask a question</summary>
+            <form class="inline-form" data-ask>
+              <label>Your question
+                <textarea rows="3" maxlength="500" required data-ask-prompt></textarea>
+              </label>
+              <fieldset class="live-mode">
+                <legend>People answer</legend>
+                <label class="check"><input type="radio" name="ask-mode" value="words" checked> In their own words</label>
+                <label class="check"><input type="radio" name="ask-mode" value="choices"> By choosing one</label>
+              </fieldset>
+              <label data-ask-choices-wrap hidden>Choices, one on each line
+                <textarea rows="4" data-ask-choices></textarea>
+              </label>
+              <label class="check"><input type="checkbox" data-ask-tally> Show everyone the count as answers come in</label>
+              <div class="actions"><button class="btn-quiet" type="submit">Ask everyone</button></div>
+            </form>
+          </details>
+          <p class="small" data-ask-status role="status"></p>
         </div>
-        <div class="live-checks" data-checks></div>
-        <details class="addon-ask" data-ask-wrap hidden>
-          <summary>Ask a question</summary>
-          <form class="inline-form" data-ask>
-            <label>Your question
-              <textarea rows="3" maxlength="500" required data-ask-prompt></textarea>
-            </label>
-            <fieldset class="live-mode">
-              <legend>People answer</legend>
-              <label class="check"><input type="radio" name="ask-mode" value="words" checked> In their own words</label>
-              <label class="check"><input type="radio" name="ask-mode" value="choices"> By choosing one</label>
-            </fieldset>
-            <label data-ask-choices-wrap hidden>Choices, one on each line
-              <textarea rows="4" data-ask-choices></textarea>
-            </label>
-            <label class="check"><input type="checkbox" data-ask-tally> Show everyone the count as answers come in</label>
-            <div class="actions"><button class="btn-quiet" type="submit">Ask the cohort</button></div>
-          </form>
-        </details>
-        <p class="small" data-ask-status role="status"></p>
-      </section>
 
-      <!-- This session's thread (C5): a link out; copy awaiting Ben's review. -->
-      <section class="addon-activity" data-activity="thread" aria-labelledby="thread-h" hidden>
-        <h2 id="thread-h">This session's thread</h2>
-        <div data-thread></div>
-      </section>
+        <!-- This session's thread (C5). -->
+        <div data-thread hidden></div>
+      </div>
 
       <footer class="addon-foot">
         <div class="actions">
           <button class="btn-quiet" type="button" data-open-stage hidden>Open the main stage</button>
-          <a class="btn-quiet" data-full-link target="_blank" rel="noopener">The full live page</a>
+          <a class="btn-quiet" data-full-link target="_blank" rel="noopener">This view in a browser tab</a>
         </div>
         <p class="small" data-stage-status role="status"></p>
         <p class="small" data-sync></p>
@@ -191,6 +166,8 @@
   <script src="/assets/rooms.js" defer></script>
   <script src="/assets/signals-lib.js" defer></script>
   <script src="/assets/signals.js" defer></script>
+  <script src="/assets/show-view-lib.js" defer></script>
+  <script src="/assets/show-view.js" defer></script>
   <script src="/assets/addon.js" defer></script>
 </body>
 </html>

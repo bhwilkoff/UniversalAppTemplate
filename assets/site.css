@@ -1104,8 +1104,8 @@ fieldset.ready-mark .hint { margin: 0; font-size: 0.9rem; color: var(--muted); }
 [data-meet-text] { margin-top: 0.5rem; }
 
 /* ------------------------------------------------------------------
-   The Meet add-on (M15): the side panel (/addon/), a narrow launcher of
-   activities about 300 to 400px wide inside Google Meet, and the main
+   The Meet add-on (M15): the side panel (/addon/), a narrow run of show
+   about 300 to 400px wide inside Google Meet, and the main
    stage (/addon/stage/), a large, calm view meant to be presented.
    The panel reuses the live session's queue and check styles through
    .live-page, and only adds what a narrow panel needs.
@@ -1131,19 +1131,6 @@ body.addon-body { min-height: 100vh; }
 .addon-head { display: grid; gap: 0.15rem; }
 .addon-where { color: var(--muted); font-size: 0.9rem; }
 
-/* The launcher: one row of activities, the open one filled. */
-.addon-launcher { display: flex; flex-wrap: wrap; gap: 0.25rem; padding: 0.25rem; background: var(--surface); border-radius: 12px; position: sticky; top: 0; z-index: 1; }
-.addon-tab {
-  appearance: none; flex: 1 1 0; min-width: 0; min-height: 40px; border: 0; border-radius: 9px; background: transparent;
-  color: var(--ink); font: inherit; font-weight: 600; font-size: 0.92rem; cursor: pointer;
-  display: inline-flex; align-items: center; justify-content: center; gap: 0.35rem;
-}
-.addon-tab:hover { background: var(--card); }
-.addon-tab[aria-pressed="true"] { background: var(--ink); color: var(--on-ink); }
-.addon-badge { min-width: 1.3rem; height: 1.3rem; padding: 0 0.3rem; border-radius: 999px; background: var(--clay); color: var(--on-ink); font-size: 0.75rem; display: inline-grid; place-items: center; font-variant-numeric: tabular-nums; }
-.addon-tab[aria-pressed="true"] .addon-badge { background: var(--on-ink); color: var(--ink); }
-
-.addon-activity:not([hidden]) { display: grid; gap: 0.75rem; min-width: 0; }
 .addon-part { border: 2px solid var(--clay); border-radius: var(--radius); background: var(--card); padding: 0.9rem; display: grid; gap: 0.35rem; }
 .addon-part .kicker { font-size: 0.85rem; margin: 0; }
 .addon-part-name { font-size: 1.25rem; font-weight: 650; line-height: 1.2; letter-spacing: -0.012em; }
@@ -1370,3 +1357,81 @@ label.check { min-height: 2.25rem; }
 .run-of-show h3 { font-size: 1rem; margin: 0.75rem 0 0.35rem; }
 .show-glance { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.25rem; }
 .show-glance li { display: flex; gap: 0.6rem; align-items: baseline; }
+
+/* ------------------------------------------------------------------
+   The run of show (R1, assets/show-view.js): the same layout in the Meet
+   add-on's side panel and on /live/. A timeline of scenes, the current
+   one open and outlined in clay; done scenes fold to one line; parts of
+   the view are details with their name and a count. Narrow first: it
+   has to work at about 320px inside Meet.
+   ------------------------------------------------------------------ */
+.show { display: grid; gap: 0.9rem; min-width: 0; }
+.show-head { display: grid; gap: 0.2rem; }
+.show-head h2, .show-anytime h2 { font-size: 1.15rem; margin: 0; max-width: none; }
+.show-head p, .show-anytime > p { margin: 0; }
+.show-timeline { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; counter-reset: scene; }
+.show-scene {
+  position: relative; border: 1px solid var(--rule); border-radius: var(--radius); background: var(--card);
+  padding: 0.7rem 0.8rem 0.7rem 2.4rem; display: grid; gap: 0.35rem; min-width: 0; counter-increment: scene;
+}
+.show-scene::before {
+  content: counter(scene); position: absolute; left: 0.7rem; top: 0.75rem; width: 1.15rem; height: 1.15rem;
+  border-radius: 999px; border: 1px solid var(--edge); color: var(--muted); font-size: 0.72rem; font-weight: 650;
+  display: grid; place-items: center; font-variant-numeric: tabular-nums;
+}
+.show-scene-head { display: grid; gap: 0.05rem; min-width: 0; }
+.show-kind { margin: 0; font-size: 0.78rem; font-weight: 650; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.show-mins { font-weight: 500; letter-spacing: 0; text-transform: none; }
+.show-name { margin: 0; font-size: 1.02rem; line-height: 1.25; overflow-wrap: anywhere; }
+.show-line { margin: 0; }
+.show-what > summary { font-size: 0.88rem; color: var(--muted); font-weight: 600; cursor: pointer; }
+.show-what p { margin: 0.25rem 0 0; }
+.show-body { display: grid; gap: 0.6rem; min-width: 0; }
+.show-body:empty { display: none; }
+.show-tools { margin-top: 0.15rem; gap: 0.4rem; }
+.show-tools .btn-quiet { font-size: 0.88rem; min-height: 40px; }
+
+/* Done: one quiet line. Later: name and kind only. Now: everything, outlined. */
+.show-scene.is-done { padding-top: 0.45rem; padding-bottom: 0.45rem; background: transparent; }
+.show-scene.is-done::before { content: "\2713"; border-color: var(--rule); }
+.show-scene.is-done .show-name { font-size: 0.92rem; font-weight: 500; color: var(--muted); }
+.show-scene.is-done .show-line, .show-scene.is-done .show-what, .show-scene.is-done .show-kind,
+.show-scene.is-later .show-line, .show-scene.is-later .show-what,
+.show-scene.is-next .show-what { display: none; }
+.show-scene.is-done .show-body, .show-scene.is-next .show-body, .show-scene.is-later .show-body { display: none; }
+.show-scene.is-done .show-tools { display: none; }
+.show-scene.is-now { border: 2px solid var(--clay); padding-left: calc(2.4rem - 1px); box-shadow: 0 1px 0 var(--rule); }
+.show-scene.is-now::before { background: var(--clay); border-color: var(--clay); color: var(--on-ink); }
+.show-scene.is-now .show-kind { color: var(--clay); }
+.show-scene.is-now .show-name { font-size: 1.2rem; letter-spacing: -0.01em; }
+.show-scene.is-next .show-kind::after { content: "Next"; color: var(--clay); letter-spacing: 0.04em; }
+
+/* A part of the view: its name (and count), its one line, then itself. */
+.show-slot { border-top: 1px solid var(--rule); padding-top: 0.5rem; min-width: 0; }
+.show-body > .show-slot:first-child { border-top: 0; padding-top: 0; }
+.show-slot > summary { cursor: pointer; font-weight: 650; display: flex; align-items: center; gap: 0.4rem; min-height: 32px; list-style-position: inside; }
+.show-slot-name { overflow-wrap: anywhere; }
+.show-count {
+  min-width: 1.3rem; height: 1.3rem; padding: 0 0.3rem; border-radius: 999px; background: var(--clay); color: var(--on-ink);
+  font-size: 0.75rem; display: inline-grid; place-items: center; font-variant-numeric: tabular-nums;
+}
+.show-slot-line { margin: 0.1rem 0 0.5rem; }
+.show-slot > :not(summary):not(.show-slot-line) { min-width: 0; }
+.show-slot .addon-part { border-width: 1px; }
+.show-slot .signal-control { border: 0; padding: 0; background: transparent; }
+.show-slot .signal-control > h3 { display: none; }
+.show-before:not([hidden]) { display: grid; gap: 0.6rem; border: 2px solid var(--clay); border-radius: var(--radius); background: var(--card); padding: 0.8rem; }
+
+.show-anytime { display: grid; gap: 0.5rem; min-width: 0; }
+.show-anytime-list { display: grid; gap: 0.35rem; }
+.show-anytime-list > .show-slot { background: var(--card); border: 1px solid var(--rule); border-radius: 12px; padding: 0.4rem 0.75rem; }
+.show-anytime-list > .show-slot[open] { padding-bottom: 0.75rem; }
+
+.show-words > summary { font-size: 0.9rem; color: var(--muted); font-weight: 600; cursor: pointer; }
+.show-words dl { margin: 0.4rem 0 0; display: grid; gap: 0.35rem; }
+.show-words dt { font-weight: 650; }
+.show-words dd { margin: 0; color: var(--muted); font-size: 0.92rem; }
+
+/* On /live/, the run of show sits in the reading column like the rest. */
+.live-page .show { margin-top: 1.25rem; }
+.live-page .show-parts:empty { display: none; }

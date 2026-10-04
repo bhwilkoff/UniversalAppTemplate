@@ -4,9 +4,10 @@
 // without a second window, and without the panel ever asking which
 // cohort this is: Meet tells it the call's code (getMeetingInfo), and the
 // code is in the meet_url of the cohort's sessions, or of one group's room
-// (AddonLib.findRoom). The panel is a small launcher of activities (the
-// session now, the queue, and the checks), so new tools can slot in
-// later beside them (ACTIVITIES, below).
+// (AddonLib.findRoom). The panel is laid out as the run of show (R1,
+// research/notes/run-of-show-design.md): the session's scenes as a
+// timeline, the current one open with what it needs, drawn by the same
+// component as /live/ (ShowView), for the teacher's view or the student's.
 //
 // Signing in. Meet frames this page, so its storage is kept apart from
 // humanshaped.org's (storage partitioning), and GitHub cannot be framed.
@@ -34,7 +35,7 @@
   function safe(u) { return /^https:\/\//.test(u || '') ? u : null; }
   function newTab(a) { a.target = '_blank'; a.rel = 'noopener'; return a; }
 
-  if (!window.supabase || !window.HUB || !A || !lib || !L) return fail('The panel could not load all of its parts. Close it and open it again.');
+  if (!window.supabase || !window.HUB || !A || !lib || !L || !window.ShowView) return fail('The panel could not load all of its parts. Close it and open it again.');
 
   // ------------------------------------------------------------------
   // Inside Meet, or not
@@ -125,7 +126,7 @@
   // ------------------------------------------------------------------
 
   var S = { me: null, room: null, cohort: null, session: null, prev: null, teaching: false, names: {}, people: [], groups: [], brought: [],
-    parts: [], chosenPart: null, timerEnds: null, drawnPart: undefined, picked: false, active: null,
+    parts: [], chosenPart: null, timerEnds: null, drawnPart: undefined, show: null,
     items: [], checks: [], answers: [], tallies: {}, onStage: null, stageOn: false, rooms: null, roomPlaces: {}, signals: null };
   var channel = null, poller = null, nudgeTimer = null, deferred = {}, drafts = {};
 
@@ -191,8 +192,10 @@
         return db.from('shares').select('*').eq('cohort_id', id).eq('kind', 'bring-back').gte('created_at', since).order('created_at', { ascending: false }).then(function (sh) {
           S.brought = sh.data || [];
           drawFrame();
+          startShow();
           startRooms();
           startSignals(res[2].data);
+          drawPart(true);
           show('ready');
           return refreshLive().then(listen);
         });
@@ -201,44 +204,35 @@
   }
 
   // ------------------------------------------------------------------
-  // The launcher. Each activity is a key, a name, and a pane in the
-  // page; new ones (breakouts, a shared drawing board, cards on screen,
-  // the chat kept) are one more entry here and one more pane.
+  // The run of show (R1). Each part of the panel is drawn by its own code
+  // below and handed to ShowView, which puts it in the current scene or
+  // under "Any time in the show". Counts on a part say what is waiting.
   // ------------------------------------------------------------------
 
-  var ACTIVITIES = [
-    { key: 'now', name: 'Now', draw: drawNowActivity },
-    { key: 'queue', name: 'Queue', draw: drawQueue, badge: function () { return L.queue(S.items).waiting.length; } },
-    { key: 'checks', name: 'Checks', draw: drawChecks, badge: function () { return S.checks.filter(function (k) { return k.state === 'open'; }).length; } },
-    { key: 'thread', name: 'Thread', draw: drawThreadActivity, when: function () { return !!(S.cohort.github_repo && S.cohort.github_team && 'discussion_number' in S.session); } },
-    // The teacher's controls for what everyone sees (H4), the same ones as
-    // on /live/: rooms, a card, on stage, recording, and their own talk.
-    { key: 'signals', name: 'Everyone', draw: function () {}, when: function () { return S.teaching && !!S.signals; } },
-    { key: 'board', name: 'Board', draw: drawBoardActivity, when: function () { return !!A.boardLinks(S.cohort, S.session, S.room.groupId); } },
-    // Only when there are groups to show (startRooms); for a teacher, the
-    // badge is how many groups would like them.
-    { key: 'rooms', name: 'Rooms', draw: function () {}, when: function () { return !!S.rooms; },
-      badge: function () { return S.teaching ? Object.keys(S.roomPlaces).filter(function (k) { return S.roomPlaces[k].asking; }).length : 0; } }
-  ];
-
-  function drawLauncher() {
-    var nav = $('[data-launcher]'); nav.replaceChildren();
-    ACTIVITIES.forEach(function (a) {
-      if (a.when && !a.when()) return;
-      var b = button('', 'addon-tab', function () { S.picked = true; openActivity(a.key); });
-      b.setAttribute('aria-pressed', String(S.active === a.key));
-      b.appendChild(el('span', null, a.name));
-      var n = a.badge ? a.badge() : 0;
-      if (n) { var badge = el('span', 'addon-badge', String(n)); b.appendChild(badge); b.setAttribute('aria-label', a.name + ', ' + n); }
-      nav.appendChild(b);
+  function startShow() {
+    S.show = window.ShowView.mount({
+      mount: $('[data-show]'), parts: S.parts, teaching: S.teaching,
+      onPick: function (key) { S.chosenPart = key; S.timerEnds = null; drawPart(true); }
     });
+    S.show.slot('clock', $('[data-part-clock]'));
+    S.show.slot('lead', $('[data-now-lead]'));
+    S.show.slot('wings', $('[data-wings]'));
+    S.show.slot('questions', $('[data-questions]'));
+    if (A.boardLinks(S.cohort, S.session, S.room.groupId)) S.show.slot('design', $('[data-board]'));
+    S.show.slot('rooms', $('[data-rooms]'));
+    if (S.cohort.github_repo && S.cohort.github_team && 'discussion_number' in S.session) {
+      $('[data-thread]').hidden = false;
+      S.show.slot('thread', $('[data-thread]'));
+      drawThreadActivity();
+    }
+    drawBoardActivity();
   }
-  function openActivity(key) {
-    S.active = key;
-    root.querySelectorAll('[data-activity]').forEach(function (p) { p.hidden = p.getAttribute('data-activity') !== key; });
-    drawLauncher();
-    if (key === 'thread') drawThreadActivity();
-    if (key === 'board') drawBoardActivity();
+
+  function drawCounts() {
+    if (!S.show) return;
+    S.show.count('wings', L.queue(S.items).waiting.length);
+    S.show.count('questions', S.checks.filter(function (k) { return k.state === 'open'; }).length);
+    S.show.count('rooms', S.teaching ? Object.keys(S.roomPlaces).filter(function (k) { return S.roomPlaces[k].asking; }).length : 0);
   }
 
   // ------------------------------------------------------------------
@@ -253,16 +247,16 @@
     var people = Object.keys(who).map(function (id) { return { id: id, name: id === S.me.id ? who[id] + ' (you)' : who[id] }; })
       .sort(function (a, b) { return a.name.toLowerCase().localeCompare(b.name.toLowerCase()); });
     var show = S.parts.filter(function (p) { return p.key === 'show'; })[0];
-    $('[data-sig-card-page]').href = '/card/?c=' + encodeURIComponent(S.cohort.slug);
     S.signals = window.LiveSignals.start({
       db: db, cohort: S.cohort, session: S.session, meId: S.me.id, teaching: S.teaching, groups: S.groups,
       nameOf: nameOf, people: people, roomMinutes: show ? show.minutes : 25,
       mounts: {
         recording: $('[data-sig-recording]'), where: $('[data-sig-where]'), card: $('[data-sig-card]'), stage: $('[data-sig-stage]'),
-        controls: S.teaching ? $('[data-activity="signals"]') : null
+        controls: S.teaching ? root.querySelector('[data-state="ready"]') : null
       }
     });
-    drawLauncher();
+    // Each cue group sits in the scene it belongs to (ShowViewLib.SLOTS).
+    if (S.teaching) S.show.cues($('[data-sig-controls-body]'), { cardHref: '/card/?c=' + encodeURIComponent(S.cohort.slug) });
   }
 
   // ------------------------------------------------------------------
@@ -277,13 +271,13 @@
     if (!box || !links) return;
     box.replaceChildren();
     box.appendChild(el('p', 'small', links.group
-      ? 'Your group’s own board for this week. Everyone in the group draws on it at once, and it is kept with the session.'
-      : 'This week’s board for the whole cohort. Everyone draws on it at once, and it is kept with the session.'));
+      ? 'Your trio’s own design stage for this week. Everyone in the trio draws on it at once, and it is kept with the session.'
+      : 'This week’s design stage for the whole cohort. Everyone draws on it at once, and it is kept with the session.'));
     var acts = el('div', 'actions');
-    var open = newTab(el('a', 'btn-github', 'Open the board')); open.href = links.board; acts.appendChild(open);
+    var open = newTab(el('a', 'btn-github', 'Open the design stage')); open.href = links.board; acts.appendChild(open);
     if (S.teaching) { var stage = newTab(el('a', 'btn-quiet', 'Open it to present')); stage.href = links.stage; acts.appendChild(stage); }
     box.appendChild(acts);
-    if (S.teaching) box.appendChild(el('p', 'small', 'To show it to everyone, open it to present, then share that tab from Meet.'));
+    if (S.teaching) box.appendChild(el('p', 'small', 'To show it on the main stage, open it to present, then share that tab from Meet.'));
   }
 
   // ------------------------------------------------------------------
@@ -324,9 +318,6 @@
     $('[data-open-stage]').hidden = !S.teaching;
     $('[data-part-controls]').hidden = !S.teaching;
     $('[data-ask-wrap]').hidden = !S.teaching;
-    var sel = $('[data-part-select]'); sel.replaceChildren();
-    S.parts.forEach(function (p) { var o = el('option', null, p.name); o.value = p.key; sel.appendChild(o); });
-    drawPart(true);
   }
 
   // ------------------------------------------------------------------
@@ -341,12 +332,11 @@
   function drawPart(force) {
     var part = partNow();
     var key = part ? part.key : null;
-    if (!force && key === S.drawnPart) return;
-    if (key !== S.drawnPart) S.picked = false;
+    if (!S.show || (!force && key === S.drawnPart)) return;
     S.drawnPart = key;
-    var plan = A.panelPlan(key, S.room.room);
-    if (!S.picked) openActivity(plan.open); else drawLauncher();
-    S.plan = plan;
+    S.plan = A.panelPlan(key, S.room.room);
+    // In a trio's own room, its order leads whatever the main room is doing.
+    S.show.update(S.room.room === 'group' ? 'show' : key);
     drawNowActivity();
     drawChecksChrome();
     sendStage();
@@ -354,15 +344,10 @@
 
   function drawNowActivity() {
     var part = partNow();
-    $('[data-part-kicker]').textContent = part ? 'Now, minute ' + part.start + ' of ' + S.cohort.session_minutes : 'Before the session';
-    $('[data-part-name]').textContent = part ? part.name : 'Week ' + S.session.number;
-    $('[data-part-what]').textContent = part ? part.what : '';
-    $('[data-part-what-wrap]').hidden = !part;
-    if (part) $('[data-part-select]').value = part.key;
+    $('[data-part-kicker]').textContent = part ? 'Minute ' + part.start + ' of ' + S.cohort.session_minutes : 'Before the session, week ' + S.session.number;
     tick();
-    // The welcome: on the stage by itself before any part begins, and
-    // the teacher's to put back up at any time (C9).
-    $('[data-welcome-wrap]').hidden = !S.teaching;
+    // The welcome: on the main stage by itself before any scene begins,
+    // and the teacher's to put back up at any time (C9).
     drawWelcomeToggle();
     var lead = $('[data-now-lead]'); lead.replaceChildren();
     if (S.plan && S.plan.lead === 'heard') drawHeard(lead);
@@ -375,11 +360,11 @@
     var clock = $('[data-clock]'), btn = $('[data-timer]');
     if (left != null) {
       clock.textContent = left ? L.clock(left) : 'Time is up';
-      btn.textContent = left ? 'Stop the timer' : 'Start the timer';
+      btn.textContent = left ? 'Stop the clock' : 'Start this scene’s clock';
       if (!left) S.timerEnds = null;
     } else {
       clock.textContent = part ? part.minutes + ' minutes' : '';
-      btn.textContent = 'Start the timer';
+      btn.textContent = 'Start this scene’s clock';
     }
   }
   setInterval(function () { if (S.session) { tick(); } }, 1000);
@@ -387,7 +372,7 @@
 
   function drawWelcomeToggle() {
     var welcoming = S.onStage && S.onStage.kind === 'welcome';
-    $('[data-welcome-toggle]').textContent = welcoming ? 'Take the welcome off the stage' : 'Put the welcome on the stage';
+    $('[data-welcome-toggle]').textContent = welcoming ? 'Take the welcome off the main stage' : 'Put the welcome on the main stage';
   }
   $('[data-welcome-toggle]').addEventListener('click', function () {
     var welcoming = S.onStage && S.onStage.kind === 'welcome';
@@ -399,9 +384,6 @@
     if (S.timerEnds && A.timeLeft(S.timerEnds, Date.now())) { S.timerEnds = null; }
     else if (part) { S.chosenPart = part.key; S.timerEnds = Date.now() + part.minutes * 60000; }
     tick(); sendStage();
-  });
-  $('[data-part-select]').addEventListener('change', function (ev) {
-    S.chosenPart = ev.target.value; S.timerEnds = null; drawPart(true);
   });
   $('[data-next-part]').addEventListener('click', function () {
     var part = partNow();
@@ -438,9 +420,8 @@
     S.rooms = window.RoomBoard.start({
       db: db, cohort: S.cohort, session: S.session, meId: S.me.id, teaching: S.teaching, groups: S.groups, people: S.people,
       names: S.names, nameOf: nameOf, mount: $('[data-rooms]'), onlyGroup: S.room.groupId || null, showLinks: !S.room.groupId,
-      onChange: function (byGroup) { S.roomPlaces = byGroup; drawLauncher(); }
+      onChange: function (byGroup) { S.roomPlaces = byGroup; drawCounts(); }
     });
-    drawLauncher();
   }
 
   // During "Show what you brought back", and always in a group's room:
@@ -448,12 +429,12 @@
   function drawGroups(box) {
     var groups = S.room.groupId ? S.groups.filter(function (g) { return g.id === S.room.groupId; })
       : S.teaching ? S.groups : S.groups.filter(function (g) { return g.group_members.some(function (m) { return m.user_id === S.me.id; }); });
-    if (!groups.length) { box.appendChild(el('p', 'small', 'There are no groups yet, so everyone stays in the main room.')); return; }
+    if (!groups.length) { box.appendChild(el('p', 'small', 'There are no trios yet, so everyone stays in the main room.')); return; }
     groups.forEach(function (g) {
       var card = el('article', 'addon-card');
       card.appendChild(el('h3', null, g.name));
       if (!S.room.groupId && safe(g.meet_url)) {
-        var go = newTab(el('a', null, S.teaching ? 'Visit its room' : 'Go to your group’s room')); go.href = g.meet_url;
+        var go = newTab(el('a', null, S.teaching ? 'Visit its rehearsal room' : 'Go to your rehearsal room')); go.href = g.meet_url;
         card.appendChild(el('p', 'small')).appendChild(go);
       }
       var ids = g.group_members.map(function (m) { return m.user_id; });
@@ -493,7 +474,7 @@
         visible.forEach(function (k, i) { S.tallies[k.id] = (t[i] && t[i].data) || []; });
         render('[data-queue]', drawQueue);
         render('[data-checks]', drawChecks);
-        drawLauncher();
+        drawCounts();
         sendStage();
       });
     });
@@ -519,10 +500,10 @@
   function drawQueue() {
     var q = L.queue(S.items);
     var list = $('[data-queue]'); list.replaceChildren();
-    if (!q.waiting.length) list.appendChild(el('li', 'live-empty small', q.shown.length ? 'Everything in the queue has been shown.' : 'Nothing is in the queue yet. People add to it from the live page.'));
+    if (!q.waiting.length) list.appendChild(el('li', 'live-empty small', q.shown.length ? 'Everyone in the wings has presented.' : 'No one is in the wings yet. People ask to present from their own view.'));
     q.waiting.forEach(function (item, i) {
       var li = el('li', 'live-item' + (i === 0 ? ' next' : ''));
-      if (i === 0) li.appendChild(el('p', 'kicker', 'Up next'));
+      if (i === 0) li.appendChild(el('p', 'kicker', 'Next to present'));
       li.appendChild(el('p', 'live-who', nameOf(item.user_id)));
       li.appendChild(el('p', 'live-what', L.itemLabel(item)));
       if (item.note) li.appendChild(el('p', 'live-note', item.note));
@@ -530,9 +511,9 @@
       var open = newTab(el('a', 'btn-quiet', 'Open it')); open.href = item.url;
       open.setAttribute('aria-label', 'Open ' + L.itemLabel(item) + ' in a new tab');
       acts.appendChild(open);
-      if (S.teaching) acts.appendChild(stageToggle('item', item.id, 'Put it on the stage', 'Take it off the stage'));
+      if (S.teaching) acts.appendChild(stageToggle('item', item.id, 'Put it on the main stage', 'Take it off the main stage'));
       if (L.canManage(item, S.me.id, S.teaching)) {
-        acts.appendChild(button('It has been shown', 'btn-quiet', function () {
+        acts.appendChild(button('They have presented', 'btn-quiet', function () {
           if (S.onStage && S.onStage.id === item.id) S.onStage = null;
           db.from('live_queue').update({ state: 'shown' }).eq('id', item.id).then(function (r) { if (!r.error) refreshLive(); });
         }));
@@ -540,7 +521,7 @@
       li.appendChild(acts);
       list.appendChild(li);
     });
-    $('[data-shown-count]').textContent = q.shown.length ? L.counted(q.shown.length, 'item', 'items') + ' shown so far.' : '';
+    $('[data-shown-count]').textContent = q.shown.length ? L.counted(q.shown.length, 'presentation', 'presentations') + ' so far.' : '';
   }
 
   function drawChecksChrome() {
@@ -548,7 +529,7 @@
     $('[data-closing-wrap]').hidden = !S.teaching;
     $('[data-ask-closing]').className = closingFirst ? 'btn-github' : 'btn-quiet';
     // Before the closing part, the button sits below the checks.
-    var wrap = $('[data-closing-wrap]'), pane = root.querySelector('[data-activity="checks"]');
+    var wrap = $('[data-closing-wrap]'), pane = $('[data-questions]');
     if (closingFirst) pane.insertBefore(wrap, $('[data-checks]')); else pane.insertBefore(wrap, $('[data-ask-status]'));
   }
 
@@ -589,7 +570,7 @@
       card.appendChild(details);
     }
     var acts = el('div', 'actions');
-    acts.appendChild(stageToggle('check', k.id, 'Put it on the stage', 'Take it off the stage'));
+    acts.appendChild(stageToggle('check', k.id, 'Put it on the main stage', 'Take it off the main stage'));
     if (k.choices) acts.appendChild(button(k.show_tally ? 'Hide the count' : 'Show everyone the count', 'btn-quiet', function () { changeCheck(k, { show_tally: !k.show_tally }); }));
     acts.appendChild(button('Close it', 'btn-quiet', function () { if (S.onStage && S.onStage.id === k.id) S.onStage = null; changeCheck(k, { state: 'closed' }); }));
     card.appendChild(acts);
