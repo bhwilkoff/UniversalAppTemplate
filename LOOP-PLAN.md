@@ -1067,13 +1067,26 @@ panel and /live/), R2 (class builder), Google sign-in beside GitHub
 materials, meet@'s script with its triggers, the community repository,
 and the credential signing key. 599 database checks, 298 node tests.
 
-In flight: R3, running the show (branch `r3-run`, migration
-20261004070000_live_show.sql, not applied). When it lands: merge (expect
-conflicts in assets/addon.js with the Google sign-in code, keep both),
-run the tests, apply the migration through the Management API, push,
-then R4 (question bank), R5 (design stage on the main stage), R6
-(rehearsal rooms), R7 (the wings), R8 (follow-up), from
-research/notes/run-of-show-design.md.
+R3, running the show, is merged and its migration (20261004070000,
+table `show_state`, in Realtime) is applied: one shared current scene
+per session with its clock set by the database; the teacher steps
+through the timeline (back, next, jump, clock) and edits any scene from
+the side panel, seeing a draft on their own main stage while typing and
+"Show it to everyone" to save; the main stage follows the current scene
+unless the teacher pins the welcome, a question's answers, the wings, or
+blank. assets/show-run.js; 624 database checks, 307 node tests, R3's
+517-check page check passes on the merged code. Not yet seen in a real
+Meet call. Known gap: "Send everyone to their rooms" still defaults its
+minutes from the six parts, not the session's own rooms scene.
+
+Next, from research/notes/run-of-show-design.md: R4 (question bank with
+multiple choice, multi-select, short text, scale, word cloud, ranking,
+prepared on the class page and answered in the panel), R5 (the design
+stage on the main stage), R6 (rehearsal rooms rebuilt around scenes),
+R7 (the wings and the presenter), R8 (follow-up built from the show),
+then the listing (tools/meet-addon/LISTING.md) once a real call with the
+Gmail test student has gone well. Ben approved the vocabulary with
+"design stage" for the board scene (DECISIONS.md).
 
 What only this Mac has: ~/.humanshaped/supabase-token (Management API),
 ~/.humanshaped/credential-key-1.json (signing), ~/.humanshaped/test-student,
