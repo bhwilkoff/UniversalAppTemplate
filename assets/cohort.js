@@ -55,6 +55,22 @@
       });
   }
 
+  // Which repositories have a page on the hub (/apps/app/), read once:
+  // only apps their builders chose to show and nobody kept off
+  // (public_apps). A classmate's private app gets no link to a page
+  // that would not draw it. It fails quietly to no links.
+  var hubPages = null;
+  function hubPageSet() {
+    if (!hubPages) {
+      hubPages = db.rpc('public_apps').then(function (r) {
+        var set = {};
+        (r.error ? [] : r.data || []).forEach(function (a) { if (a.app_repo) set[a.app_repo.toLowerCase()] = true; });
+        return set;
+      }, function () { return {}; });
+    }
+    return hubPages;
+  }
+
   function personCard(e) {
     var card = el('article', 'app');
     card.appendChild(el('h3', null, e.app_name || nameOf(e.profiles)));
@@ -72,6 +88,9 @@
     var links = el('ul', 'links');
     if (safe(e.app_url)) links.appendChild(el('li')).appendChild(link(e.app_url, 'Use it'));
     if (repo) links.appendChild(el('li')).appendChild(link('https://github.com/' + repo, 'Its repository'));
+    if (repo) hubPageSet().then(function (set) {
+      if (set[repo.toLowerCase()]) links.appendChild(el('li')).appendChild(link('/apps/app/?r=' + encodeURIComponent(repo), 'Its page on the hub'));
+    });
     card.appendChild(links);
     var log = el('div', 'commits');
     card.appendChild(log);

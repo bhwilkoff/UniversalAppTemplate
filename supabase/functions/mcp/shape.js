@@ -45,7 +45,7 @@ export function chooseCohort(cohorts, slug) {
 }
 
 function noCohorts() {
-  return `You are not in a cohort yet. Open cohorts are listed at ${SITE}/cohorts/, and joining happens on ${SITE}/account/.`;
+  return `You are not in a cohort yet. Open cohorts are listed at ${SITE}/cohorts/, and joining happens on ${SITE}/account/. Working on your own, my_app reads your own app and your marks on the path, and the review_my_own_work prompt reviews it the way the method does.`;
 }
 function listText(cohorts) {
   return cohorts.length ? 'Your cohorts: ' + cohorts.map((c) => `${c.slug} (${c.title})`).join(', ') + '.' : noCohorts();
@@ -177,6 +177,21 @@ export function ownAppText(app, hide, marks) {
   }
   lines.push('', `Without a cohort there is no teacher here, so an agent asks the method's questions (method part "review-skill") and says plainly that its feedback is an AI's. Open cohorts are at ${SITE}/cohorts/.`);
   return lines.join('\n');
+}
+
+// The review a person working on their own asks for (H3): the same
+// questions the human-shaped review asks a cohort's student, built on
+// their own app and their own marks on the path instead of a cohort's
+// week, since there is no week, no teacher, and no classmates to share
+// it with. It is labeled as AI and kept by the person who asked.
+export function ownReviewPrompt(stage) {
+  const part = stage ? (stage === 'setup' ? 'setup' : stagePart(stage)) : null;
+  return [
+    `Please give me a human-shaped review of the app I am building on my own${part ? `, at the point of the path's method part "${part}"` : ''}.`,
+    `First call my_app to see my app and my own marks on the path. If it has no app yet, ask me which repository to read, and tell me I can keep it on the hub at ${SITE}/account/#own-app if I want to. Then call method with part "review-skill" and follow that skill exactly${part ? `, and call method with part "${part}" for what that stage asks` : ', choosing the stage from my marks (the first one I have not marked ready)'}, reading my repository for evidence.`,
+    'Open the review with a line that says it is AI feedback, naming yourself, your model, and today\'s date. Give no scores or grades, and do not compare me with anyone. Say plainly what you could not see. Ask the questions the method asks rather than answering them for me.',
+    `Write the review to a file in my repository and stop there. Do not share it anywhere. Without a cohort there is no teacher reading this, so if I want people to see the work, I can show the app on the hub or bring it to an event (${SITE}/events/).`,
+  ].join('\n\n');
 }
 
 // What is happening in the live session right now: the "show your work"

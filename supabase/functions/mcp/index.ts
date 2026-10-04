@@ -33,7 +33,7 @@ import './followup-lib.js';
 import {
   chooseCohort, cohortsText, thisWeekText, nextSessionText, groupText, workText, thisSessionText,
   teacherCohort, rosterText, studentWorkText, classNowText,
-  METHOD, methodUrls, ownAppText,
+  METHOD, methodUrls, ownAppText, ownReviewPrompt,
 } from './shape.js';
 
 // deno-lint-ignore no-explicit-any
@@ -440,6 +440,21 @@ Deno.serve(
                 'Write the review to a file in my repository and stop there. Do not share it anywhere. I will decide whether to share it with my cohort, and my teacher\'s feedback is separate from yours.',
               ].join('\n\n'),
             },
+          }],
+        }));
+
+        // For someone building on their own (H3): the same review,
+        // built on my_app and their own path marks instead of a week.
+        server.registerPrompt('review_my_own_work', {
+          title: 'A human-shaped review of the app you are building on your own',
+          description: 'For someone outside any cohort: your agent reads your own app and your marks on the path, asks the method\'s questions, labels itself as AI, and leaves the review with you.',
+          argsSchema: z.object({
+            stage: z.string().optional().describe('A stage of the path to review against, such as 03 or setup. Without one, your agent starts from the first stage you have not marked ready.'),
+          }),
+        }, ({ stage }) => ({
+          messages: [{
+            role: 'user' as const,
+            content: { type: 'text' as const, text: ownReviewPrompt(stage) },
           }],
         }));
 
