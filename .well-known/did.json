@@ -4,6 +4,15 @@
     "https://w3id.org/security/multikey/v1"
   ],
   "id": "did:web:humanshaped.org",
-  "verificationMethod": [],
-  "assertionMethod": []
+  "verificationMethod": [
+    {
+      "id": "did:web:humanshaped.org#key-1",
+      "type": "Multikey",
+      "controller": "did:web:humanshaped.org",
+      "publicKeyMultibase": "z6MkjzN9T3KBuhHgD8K5joeZvsTyNR1buK8m3p2GxPB5BxYJ"
+    }
+  ],
+  "assertionMethod": [
+    "did:web:humanshaped.org#key-1"
+  ]
 }
