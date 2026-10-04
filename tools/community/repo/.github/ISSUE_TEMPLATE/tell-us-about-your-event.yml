@@ -1,0 +1,64 @@
+name: Tell us about your event
+description: A meetup, a hackathon, or a showcase you are hosting, so it can be listed on humanshaped.org/events/.
+title: "Event: "
+labels: ["event listing"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for gathering people around this work. A maintainer reads every request and adds the event to [humanshaped.org/events](https://humanshaped.org/events/) as a small file in this repository, usually within a few days. Everything you write here is public, so leave out anything you would not put on a flyer. The guides for a [meetup](https://humanshaped.org/start/meetup/) and a [hackathon](https://humanshaped.org/start/hackathon/) are there if you want them.
+  - type: input
+    id: title
+    attributes:
+      label: What it is called
+      placeholder: Human-Shaped Meetup, Denver
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What kind of event it is
+      options:
+        - Meetup
+        - Hackathon
+        - Showcase of what a cohort built
+        - Something else
+    validations:
+      required: true
+  - type: input
+    id: when
+    attributes:
+      label: When it starts and ends, and the time zone
+      placeholder: November 7, 2026, 6:30 to 8 pm, Mountain time
+    validations:
+      required: true
+  - type: input
+    id: place
+    attributes:
+      label: Where, if it meets in person
+      description: A public place is best. Leave this empty for an event that is only online.
+  - type: input
+    id: online
+    attributes:
+      label: A link to join online, if there is one
+  - type: input
+    id: link
+    attributes:
+      label: A page where people can find out more or say they are coming, if there is one
+  - type: textarea
+    id: about
+    attributes:
+      label: A sentence or two about it, for the listing
+    validations:
+      required: true
+  - type: checkboxes
+    id: host
+    attributes:
+      label: Hosting
+      options:
+        - label: I am hosting this event, and the GitHub account I am using is the one to list as its host.
+          required: true
+  - type: markdown
+    attributes:
+      value: |
+        Afterward, start a discussion in this repository about what the room learned, and comment here with its link, so the listing can point to it.

@@ -1,0 +1,59 @@
+name: Publish community.json
+
+# Rebuilds community.json from events/*.json and the newest threads in
+# this repository's Discussions, for humanshaped.org/events/ and
+# humanshaped.org/start/. Nothing is listed automatically: an event is a
+# file in events/, added by a maintainer or a pull request they merge.
+on:
+  schedule:
+    - cron: '41 9 * * *'
+  push:
+    branches: [main]
+    paths: ['events/**', 'tools/build_community.py']
+  pull_request:
+    paths: ['events/**', 'tools/build_community.py']
+  discussion:
+    types: [created, edited, deleted, category_changed]
+  discussion_comment:
+    types: [created, deleted]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  discussions: read
+
+concurrency:
+  group: community-publish
+  cancel-in-progress: false
+
+jobs:
+  check:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check the event listings
+        run: python3 tools/build_community.py --check && python3 tools/test_build_community.py
+
+  publish:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build community.json
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 tools/build_community.py
+      - name: Publish what changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add community.json
+          if git diff --cached --quiet; then
+            echo "Nothing changed."
+          else
+            git commit -m "Refresh community.json"
+            git push
+          fi

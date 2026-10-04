@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>The first prototype | Human Shaped</title>
-  <meta name="description" content="Stage 01 of the human-shaped path: The first prototype. One platform, real data, this week.">
-  <link rel="canonical" href="https://humanshaped.org/path/01/">
-  <meta property="og:url" content="https://humanshaped.org/path/01/">
+  <title>Events | Human Shaped</title>
+  <meta name="description" content="Meetups, hackathons, and showcases people are hosting around human-shaped software, and what each room learned.">
+  <link rel="canonical" href="https://humanshaped.org/events/">
+  <meta property="og:url" content="https://humanshaped.org/events/">
   <meta property="og:site_name" content="Human Shaped">
-  <meta property="og:title" content="The first prototype">
-  <meta property="og:description" content="Stage 01 of the human-shaped path: The first prototype. One platform, real data, this week.">
-  <meta property="og:type" content="article">
+  <meta property="og:title" content="Events">
+  <meta property="og:description" content="Meetups, hackathons, and showcases people are hosting around human-shaped software, and what each room learned.">
+  <meta property="og:type" content="website">
   <meta property="og:image" content="https://humanshaped.org/assets/og.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -33,13 +33,9 @@
     })();
   </script>
   <script src="/assets/site.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/18.0.14/lib/marked.umd.min.js" integrity="sha512-trN9mtGYvoySPVI909KTnwbJI9AkKPydRCV/qAsUG1+q39hhpKltEag9b5JpdjeIZn5i8IH62hHRFdbKwMFh9w==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.4.16/purify.min.js" integrity="sha512-flQmhkXNRQ3iUfvtdCobtpMjCb6kE+zLnTiAulAQJ3WykVfy84JvCMOo6vhwWXHTXjR25h9Zj+LyGFRWKjRoag==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
-  <script src="/assets/render.js" defer></script>
-  <script src="/assets/path-lib.js" defer></script>
-  <script src="/assets/path-marks.js" defer></script>
 </head>
 <body>
+  <!-- Events (G5): words by Claude, awaiting Ben's review. -->
   <a class="skip" href="#main">Skip to the page</a>
 
   <header class="site-header">
@@ -47,7 +43,7 @@
       <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
       <nav class="nav" aria-label="Main">
         <ul>
-          <li><a href="/path/" aria-current="true">The path</a></li>
+          <li><a href="/path/">The path</a></li>
           <li><a href="/why/">Why</a></li>
           <li><a href="/principles/">Principles</a></li>
           <li><a href="/cohorts/">Cohorts</a></li>
@@ -69,51 +65,39 @@
 
   <main id="main">
     <div class="wrap">
-      <p class="crumbs"><a href="/path/">The path</a> &rsaquo; Stage 01</p>
-      <header class="stage-head">
-        <p class="num" data-doc-num>Stage 01 of 08</p>
-        <h1 data-doc-title>The first prototype</h1>
-        <p class="where" data-doc-lede hidden></p>
-        <p class="meta" data-doc-meta hidden></p>
+      <header class="page-head">
+        <div>
+          <p class="kicker">Events</p>
+          <h1>Rooms where people build this way.</h1>
+          <p class="lead">These are the meetups, hackathons, and showcases that people are hosting around human-shaped software, wherever they happen to be, along with what each room learned once it was over.</p>
+          <p class="small">Written by Claude, awaiting Ben's review.</p>
+        </div>
       </header>
 
-      <div class="stage-layout">
-        <nav class="stage-toc" aria-label="The path">
-          <h2>The path</h2>
-          <ol>
-            <li><a href="/path/setup/"><span>&middot;</span>Getting set up</a></li>
-            <li><a href="/path/00/"><span>00</span>Why we build</a></li>
-            <li><a href="/path/01/" aria-current="page"><span>01</span>The first prototype</a></li>
-            <li><a href="/path/02/"><span>02</span>The shape of an app</a></li>
-            <li><a href="/path/03/"><span>03</span>Going native</a></li>
-            <li><a href="/path/04/"><span>04</span>Seeing it work</a></li>
-            <li><a href="/path/05/"><span>05</span>Shipping</a></li>
-            <li><a href="/path/06/"><span>06</span>Keeping it running</a></li>
-            <li><a href="/path/07/"><span>07</span>Raising the ceiling</a></li>
-            <li><a href="/path/08/"><span>08</span>Working with AI</a></li>
-            <li><a href="/path/talking-to-your-agent/"><span aria-hidden="true"></span>Talking to your agent</a></li>
-            <li><a href="/path/showing-your-work/"><span aria-hidden="true"></span>Showing your work</a></li>
-          </ol>
-        </nav>
+      <div data-events>
+        <section class="section first" aria-labelledby="upcoming-title">
+          <h2 id="upcoming-title">Coming up</h2>
+          <div data-upcoming><p class="small">Reading the list of events&hellip;</p></div>
+        </section>
 
-        <div class="article-col">
-          <article class="article" data-doc="docs/path/01-first-prototype.md">
-            <div class="doc-status" data-doc-status aria-live="polite"></div>
-            <noscript>
-              <div class="doc-error">
-                <h2>This page reads its text from GitHub.</h2>
-                <p>The text lives in the template on GitHub, and this page needs JavaScript to bring it here. You can read exactly the same page <a href="https://github.com/bhwilkoff/UniversalAppTemplate/blob/main/docs/path/01-first-prototype.md">on GitHub</a>.</p>
-              </div>
-            </noscript>
-            <div class="doc-body" data-doc-body></div>
-          </article>
-          <p class="source">This page is read from the template each time it opens, so it is always the current text. <a href="https://github.com/bhwilkoff/UniversalAppTemplate/blob/main/docs/path/01-first-prototype.md">Read it on GitHub</a></p>
-          <nav class="next-stage" aria-label="Previous and next">
-            <a href="/path/00/">Stage 00, Why we build</a>
-            <a href="/path/02/">Stage 02, The shape of an app</a>
-          </nav>
-        </div>
+        <section class="section" aria-labelledby="past-title" data-past-section hidden>
+          <h2 id="past-title">Already happened</h2>
+          <div data-past></div>
+        </section>
       </div>
+
+      <section class="section" aria-labelledby="yours-title">
+        <div class="topics">
+          <div class="topic" id="yours">
+            <h2 id="yours-title">Put yours on the calendar.</h2>
+            <div class="prose">
+              <p>If you are hosting a gathering about this work, tell us about it on GitHub, and it will be listed here once someone has read it, usually within a few days. Everything you write there is public, so leave out anything you would not put on a flyer. When it is over, start a discussion about what the room learned and add its link, so the next person who hosts one can start from it.</p>
+              <p>The guides for <a href="/start/meetup/">a meetup</a> and <a href="/start/hackathon/">a hackathon</a> have everything else you need, from the first words to the sheets to print.</p>
+            </div>
+            <p class="actions"><a class="btn-quiet" href="https://github.com/humanshaped/community/issues/new?template=tell-us-about-your-event.yml"><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Tell us about your event</a></p>
+          </div>
+        </div>
+      </section>
     </div>
   </main>
 
@@ -132,5 +116,8 @@
       </ul>
     </div>
   </footer>
+  <script src="/assets/cohort-lib.js" defer></script>
+  <script src="/assets/community-lib.js" defer></script>
+  <script src="/assets/community.js" defer></script>
 </body>
 </html>

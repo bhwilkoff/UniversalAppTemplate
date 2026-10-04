@@ -35,7 +35,7 @@
   <script src="/assets/site.js" defer></script>
 </head>
 <body>
-  <!-- The links to the M5 guides and the brand kit were drafted with an AI agent on 2026-10-03, waiting for Ben's review. -->
+  <!-- The links to the M5 guides and the brand kit were drafted with an AI agent on 2026-10-03, waiting for Ben's review. The events topic and the newest conversations (G5) are words by Claude, awaiting Ben's review. -->
   <a class="skip" href="#main">Skip to the page</a>
 
   <header class="site-header">
@@ -147,10 +147,23 @@
             <p class="actions"><a class="btn-quiet" href="/start/brand/">Open the brand kit</a></p>
           </div>
 
+          <div class="topic" id="events">
+            <h2>Find a room, or put yours on the calendar.</h2>
+            <div class="prose">
+              <p>The events page lists the meetups, hackathons, and showcases people are hosting, and what each room learned once it was over. If you are planning one, it can be listed there too.</p>
+            </div>
+            <div class="next-events" data-next-events hidden></div>
+            <p class="actions"><a class="btn-quiet" href="/events/">See every event</a></p>
+          </div>
+
           <div class="topic" id="discuss">
             <h2>Talk about it with everyone else.</h2>
             <div class="prose">
               <p>The <a href="https://github.com/humanshaped">humanshaped organization</a> on GitHub holds every conversation about this work, and its discussions are open to anyone. Tell people about the meetup you are planning, ask for a second pair of eyes on a declaration, or show what your hackathon made.</p>
+            </div>
+            <div class="feed-block community-threads" data-threads hidden>
+              <h3>The newest conversations</h3>
+              <div data-threads-list></div>
             </div>
             <p class="actions"><a class="btn-quiet" href="https://github.com/orgs/humanshaped/discussions"><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Open the discussions</a></p>
           </div>
@@ -168,10 +181,14 @@
         <li><a href="/cohorts/#together">How we treat one another</a></li>
         <li><a href="/privacy/">What we keep, and what we never own</a></li>
         <li><a href="/terms/">Terms</a> and <a href="/support/">help</a></li>
+        <li><a href="/events/">Events</a></li>
         <li><a href="https://github.com/orgs/humanshaped/discussions">Discussions on GitHub</a></li>
         <li><a href="https://github.com/bhwilkoff/UniversalAppTemplate">The template on GitHub</a></li>
       </ul>
     </div>
   </footer>
+  <script src="/assets/cohort-lib.js" defer></script>
+  <script src="/assets/community-lib.js" defer></script>
+  <script src="/assets/community.js" defer></script>
 </body>
 </html>

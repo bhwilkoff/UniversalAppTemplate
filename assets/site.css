@@ -688,6 +688,24 @@ label.check { display: flex; gap: 0.5rem; align-items: center; font-weight: 400;
 .feed-block > p { margin: 0 0 1rem; }
 .feed-block [data-feed-note]:empty { display: none; }
 
+/* Events and the community's newest conversations (/events/, /start/) */
+.events { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--rule); max-width: 46rem; }
+.event { padding: 1.25rem 0; border-bottom: 1px solid var(--rule); }
+.event h3 { font-size: 1.3rem; line-height: 1.25; margin: 0.15rem 0 0.35rem; max-width: none; overflow-wrap: anywhere; }
+.event h3 a { color: inherit; text-decoration: none; }
+.event h3 a:hover { text-decoration: underline; text-decoration-thickness: 2px; }
+.event p { margin: 0 0 0.4rem; }
+.event .event-kind { font-size: 0.85rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--clay); margin: 0; }
+.event .event-when { font-weight: 600; }
+.event .event-where, .event .small { color: var(--muted); }
+.event .links { list-style: none; margin: 0.5rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0 1.25rem; font-weight: 600; }
+.event .links a { display: inline-block; padding: 0.3rem 0; }
+.next-events { margin: 0 0 1.25rem; }
+.community-threads { margin: 0 0 1.5rem; }
+.app-threads { margin: 0 0 1rem; }
+.app-threads .feed li, .community-threads .feed li { grid-template-columns: minmax(0, 1fr); }
+.app-threads .feed-when, .community-threads .feed-when { white-space: normal; }
+
 .answers { list-style: none; margin: 1rem 0 0; padding: 0; border-top: 1px solid var(--rule); }
 .answer { padding: 0.9rem 0; border-bottom: 1px solid var(--rule); }
 .answer p { margin: 0.35rem 0 0; }
