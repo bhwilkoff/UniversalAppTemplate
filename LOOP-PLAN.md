@@ -945,7 +945,16 @@ October 3, after every C milestone that does not wait on Ben merged):
   out against the live did.json and was discarded. `sh tools/doctor.sh`
   reports what this Mac has ready (tools, accounts, keys, published
   files) without printing a secret.
-- **H2. The credential's last step:** the holder never finds it on
+- **H2 (merged, migration 20261004040000 applied; Ben can_sign):**
+  /account/ "Your credential" (signed, waiting, or revoked) and a line on
+  /cohort/; signers (teachers.can_sign, Ben's set on first sign-in, no
+  one can give it to themselves) see "Waiting to be signed" on /teach/
+  across cohorts, copy the request, run `node tools/credential/sign-waiting.mjs`
+  (clipboard in, signed and checked against the live did.json, clipboard
+  out), and attach the file, checked before saving. 550 database
+  checks, 275 node tests, 19 credential tests. The /teach/ flow and the
+  clipboard run are not yet tried with a real credential.
+- **H2, as planned:** the holder never finds it on
   /account/ or /cohort/; signing is one person by hand; Ben cannot
   attach a signed file for a cohort he does not teach. 2 days,
   migration. Building (the key exists).
