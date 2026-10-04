@@ -66,7 +66,31 @@
         <p class="addon-where" data-where></p>
       </header>
 
+      <!-- Live signals (C1, H4): where everyone should be, the teacher's
+           card, who is on stage, and "recording now", the same lines /live/
+           shows. Words by Claude, awaiting Ben's review. -->
+      <div class="signal-recording" data-sig-recording hidden></div>
+      <section class="signal-where" aria-label="Where everyone should be" data-sig-where hidden></section>
+      <section class="signal-card" aria-label="A card from your teacher" data-sig-card hidden></section>
+      <section class="signal-stage" aria-label="Who is on stage" data-sig-stage hidden></section>
+
       <nav class="addon-launcher" aria-label="Activities" data-launcher></nav>
+
+      <!-- What everyone sees (H4): the teacher's controls, the same ones as on
+           /live/, from SignalsLib.controlsHtml(). Words by Claude, awaiting
+           Ben's review. -->
+      <section class="addon-activity signal-controls" data-activity="signals" aria-labelledby="signals-h" hidden>
+        <h2 id="signals-h">What everyone sees</h2>
+        <p class="small">What you send here shows at once in this panel and on every copy of the session page. To put a card on everyone’s Meet screen, open <a data-sig-card-page target="_blank" rel="noopener">the card page</a> and present that tab.</p>
+        <div data-sig-controls-body></div>
+      </section>
+
+      <!-- The drawing board (C4, H4): it opens in its own tab, since it needs
+           the hub's sign-in. Words by Claude, awaiting Ben's review. -->
+      <section class="addon-activity" data-activity="board" aria-labelledby="board-h" hidden>
+        <h2 id="board-h">The board</h2>
+        <div data-board></div>
+      </section>
 
       <!-- The session now: the part, its timer, and what this part needs. -->
       <section class="addon-activity" data-activity="now" aria-labelledby="now-h" hidden>
@@ -165,6 +189,8 @@
   <script src="/assets/session-thread-lib.js" defer></script>
   <script src="/assets/rooms-lib.js" defer></script>
   <script src="/assets/rooms.js" defer></script>
+  <script src="/assets/signals-lib.js" defer></script>
+  <script src="/assets/signals.js" defer></script>
   <script src="/assets/addon.js" defer></script>
 </body>
 </html>

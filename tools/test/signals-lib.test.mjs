@@ -214,3 +214,16 @@ test('the saved share reads as a whole percent, about the teacher only', () => {
   assert.doesNotMatch(lib.shareText(0.41, false), /—/);
   assert.equal(lib.shareText(null, false), '');
 });
+
+test('the teacher’s controls are one piece of markup with every hook signals.js wires', () => {
+  const html = lib.controlsHtml();
+  const hooks = ['rooms-minutes', 'rooms-send', 'rooms-ask', 'rooms-yes', 'rooms-no', 'rooms-back', 'rooms-more', 'back-clear',
+    'card-form', 'card-words', 'card-minutes', 'card-save', 'card-clear', 'presets', 'stage-pick', 'stage-send', 'stage-clear',
+    'rec-on', 'rec-off', 'talk-on', 'talk-off', 'share-form', 'share', 'share-remove',
+    'rooms-status', 'card-status', 'stage-status', 'rec-status', 'talk-status'];
+  for (const h of hooks) assert.match(html, new RegExp('data-sig-' + h + '[\\s>]'), h);
+  assert.equal((html.match(/data-sig-stage-pick/g) || []).length, 3);
+  // Fixed words only: nothing a person typed ever goes into it.
+  assert.doesNotMatch(html, /\$\{|<script/i);
+  assert.doesNotMatch(html, /—/);
+});

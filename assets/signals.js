@@ -32,6 +32,14 @@
     var db = opts.db, m = opts.mounts || {};
     var rows = [], saved = [], note = null, seen = null, st = K.state([], Date.now()), sig = '', tickTimer = null, channel = null, poller = null, nudgeTimer = null;
     var mainUrl = safe(opts.session.meet_url);
+    // /live/ and the add-on's panel each leave an empty body for the
+    // controls, and both fill it from the same markup (SignalsLib.controlsHtml).
+    var body = m.controls && m.controls.querySelector('[data-sig-controls-body]');
+    if (body && !body.firstElementChild) {
+      var t = document.createElement('template');
+      t.innerHTML = K.controlsHtml();
+      body.appendChild(t.content);
+    }
     var C = m.controls ? controls() : null;
 
     function refresh() {

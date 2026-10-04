@@ -154,3 +154,19 @@ test('the sign-in window hands back only the two tokens, to the window that open
   assert.equal(lib.acceptHandoff({ origin, source: opened, data: { type: 'hs-session', access_token: 'a' } }, origin, opened), null);
   assert.equal(lib.handoff(null), null);
 });
+
+test('the board activity links to the session board, or a group room’s own board', () => {
+  const cohort = { slug: 'Cohort One' }, session = { number: 3 };
+  const g = '6F1E2D3C-1111-4222-8333-944455556666';
+  assert.deepEqual(lib.boardLinks(cohort, session, null), {
+    board: '/board/?c=Cohort%20One&s=week-3', stage: '/board/?c=Cohort%20One&s=week-3&view=stage', group: false
+  });
+  const gl = lib.boardLinks(cohort, session, g);
+  assert.equal(gl.board, '/board/?c=Cohort%20One&s=week-3&g=' + g.toLowerCase());
+  assert.equal(gl.stage, gl.board + '&view=stage');
+  assert.equal(gl.group, true);
+  // Anything but a group id is left out rather than passed along.
+  assert.equal(lib.boardLinks(cohort, session, 'g-1&x=1').group, false);
+  assert.equal(lib.boardLinks(null, session, null), null);
+  assert.equal(lib.boardLinks(cohort, {}, null), null);
+});

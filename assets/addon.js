@@ -126,7 +126,7 @@
 
   var S = { me: null, room: null, cohort: null, session: null, prev: null, teaching: false, names: {}, people: [], groups: [], brought: [],
     parts: [], chosenPart: null, timerEnds: null, drawnPart: undefined, picked: false, active: null,
-    items: [], checks: [], answers: [], tallies: {}, onStage: null, stageOn: false, rooms: null, roomPlaces: {} };
+    items: [], checks: [], answers: [], tallies: {}, onStage: null, stageOn: false, rooms: null, roomPlaces: {}, signals: null };
   var channel = null, poller = null, nudgeTimer = null, deferred = {}, drafts = {};
 
   function nameOf(id) { return S.me && id === S.me.id ? 'You' : (S.names[id] || 'Someone'); }
@@ -192,6 +192,7 @@
           S.brought = sh.data || [];
           drawFrame();
           startRooms();
+          startSignals(res[2].data);
           show('ready');
           return refreshLive().then(listen);
         });
@@ -210,6 +211,10 @@
     { key: 'queue', name: 'Queue', draw: drawQueue, badge: function () { return L.queue(S.items).waiting.length; } },
     { key: 'checks', name: 'Checks', draw: drawChecks, badge: function () { return S.checks.filter(function (k) { return k.state === 'open'; }).length; } },
     { key: 'thread', name: 'Thread', draw: drawThreadActivity, when: function () { return !!(S.cohort.github_repo && S.cohort.github_team && 'discussion_number' in S.session); } },
+    // The teacher's controls for what everyone sees (H4), the same ones as
+    // on /live/: rooms, a card, on stage, recording, and their own talk.
+    { key: 'signals', name: 'Everyone', draw: function () {}, when: function () { return S.teaching && !!S.signals; } },
+    { key: 'board', name: 'Board', draw: drawBoardActivity, when: function () { return !!A.boardLinks(S.cohort, S.session, S.room.groupId); } },
     // Only when there are groups to show (startRooms); for a teacher, the
     // badge is how many groups would like them.
     { key: 'rooms', name: 'Rooms', draw: function () {}, when: function () { return !!S.rooms; },
@@ -233,6 +238,52 @@
     root.querySelectorAll('[data-activity]').forEach(function (p) { p.hidden = p.getAttribute('data-activity') !== key; });
     drawLauncher();
     if (key === 'thread') drawThreadActivity();
+    if (key === 'board') drawBoardActivity();
+  }
+
+  // ------------------------------------------------------------------
+  // What everyone sees (C1, H4): the same view and controls as /live/
+  // (assets/signals.js), mounted in this panel.
+  // ------------------------------------------------------------------
+
+  function startSignals(teachers) {
+    if (S.signals || !window.LiveSignals) return;
+    var who = {};
+    S.people.concat(teachers).forEach(function (p) { who[p.user_id] = S.names[p.user_id] || 'Someone'; });
+    var people = Object.keys(who).map(function (id) { return { id: id, name: id === S.me.id ? who[id] + ' (you)' : who[id] }; })
+      .sort(function (a, b) { return a.name.toLowerCase().localeCompare(b.name.toLowerCase()); });
+    var show = S.parts.filter(function (p) { return p.key === 'show'; })[0];
+    $('[data-sig-card-page]').href = '/card/?c=' + encodeURIComponent(S.cohort.slug);
+    S.signals = window.LiveSignals.start({
+      db: db, cohort: S.cohort, session: S.session, meId: S.me.id, teaching: S.teaching, groups: S.groups,
+      nameOf: nameOf, people: people, roomMinutes: show ? show.minutes : 25,
+      mounts: {
+        recording: $('[data-sig-recording]'), where: $('[data-sig-where]'), card: $('[data-sig-card]'), stage: $('[data-sig-stage]'),
+        controls: S.teaching ? $('[data-activity="signals"]') : null
+      }
+    });
+    drawLauncher();
+  }
+
+  // ------------------------------------------------------------------
+  // The drawing board (C4, H4). It needs the hub's sign-in, which Meet
+  // keeps apart from this panel and from the main stage, so it opens in
+  // its own tab; the teacher presents that tab's stage view.
+  // ------------------------------------------------------------------
+
+  function drawBoardActivity() {
+    var box = $('[data-board]');
+    var links = A.boardLinks(S.cohort, S.session, S.room.groupId);
+    if (!box || !links) return;
+    box.replaceChildren();
+    box.appendChild(el('p', 'small', links.group
+      ? 'Your group’s own board for this week. Everyone in the group draws on it at once, and it is kept with the session.'
+      : 'This week’s board for the whole cohort. Everyone draws on it at once, and it is kept with the session.'));
+    var acts = el('div', 'actions');
+    var open = newTab(el('a', 'btn-github', 'Open the board')); open.href = links.board; acts.appendChild(open);
+    if (S.teaching) { var stage = newTab(el('a', 'btn-quiet', 'Open it to present')); stage.href = links.stage; acts.appendChild(stage); }
+    box.appendChild(acts);
+    if (S.teaching) box.appendChild(el('p', 'small', 'To show it to everyone, open it to present, then share that tab from Meet.'));
   }
 
   // ------------------------------------------------------------------
