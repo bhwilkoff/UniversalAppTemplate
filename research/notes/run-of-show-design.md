@@ -129,7 +129,7 @@ the student's part on the other.
   gets one prompt.
 - **Question:** a question from the bank, answered in the student view,
   with the tally shown on the stage when the teacher cues it.
-- **Board:** the shared board on the main stage, from a template or
+- **Design stage:** the shared board, shown on the main stage, from a template or
   blank.
 - **Rehearsal rooms:** everyone goes to their room for a set time; the
   room runs its own scenes; a countdown brings them back.
@@ -138,7 +138,7 @@ the student's part on the other.
 
 COURSE.md's six parts become the default run of show for every session:
 Arrive (talk), Show what you brought back (rehearsal rooms), One value at
-work (presenter), Read one real prompt together (talk, then board),
+work (presenter), Read one real prompt together (talk, then design stage),
 Start (reflection), and Check for understanding (question). A teacher
 reorders, edits, adds, or removes scenes from there.
 
@@ -152,7 +152,7 @@ reorders, edits, adds, or removes scenes from there.
 | Everyone (rooms, cards, on stage, recording) | Cues, inside the scene they belong to; the recording light stays one cue |
 | Cards | Talk scenes, edited in the panel |
 | On stage | Presenter |
-| Board | Board scenes, on the main stage |
+| Board | The design stage: a scene kind whose board shows on the main stage |
 | Rooms, its steps, "Next step" | Rehearsal rooms, whose steps become the room's own scenes (below) |
 | Thread | Stays, as the place for links during the show; read again in the follow-up |
 | Talk share | The teacher's own note after the show, unchanged and private |
@@ -209,7 +209,7 @@ keeps it.
 New:
 
 - `scenes`: id, cohort_id, session_id, position, kind (`talk`,
-  `presenter`, `question`, `board`, `rooms`, `break`, `reflection`),
+  `presenter`, `question`, `design`, `rooms`, `break`, `reflection`),
   title, minutes, body (what the stage shows), config jsonb (question
   id, board template, room scenes, audience prompt), created_by,
   updated_at. The cohort's teachers write; the cohort reads; agents read
@@ -259,7 +259,7 @@ Each is one to three days, ships on its own, and ends with a real call.
 4. **R4. The question bank.** `questions` and the new kinds; prepared on
    the class page, edited in the moment, answered in the student view,
    shown on the stage.
-5. **R5. The board on the main stage.** Excalidraw in the stage frame
+5. **R5. The design stage on the main stage.** Excalidraw in the stage frame
    for everyone in the activity, board templates, and each room's board.
 6. **R6. Rehearsal rooms.** The rooms scene, the room view with its own
    scenes, roles, timer, prompt, board, and "ask the teacher," and one
