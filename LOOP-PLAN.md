@@ -935,10 +935,20 @@ October 3, after every C milestone that does not wait on Ben merged):
   one teacher); "Open the live page" on each cohort. 524 database
   checks. The new delete rule was not seen failing when opened (the
   agent's attempt was refused by the classifier as weakening security).
+- **Ben's go-ahead, October 4:** humanshaped/community now holds the
+  publish workflow, its builder and tests, the "Tell us about your
+  event" form, and events/ (e75da2a); the first run published
+  community.json (0 events, 0 threads, since its Discussions are empty).
+  The credential signing key exists at ~/.humanshaped/credential-key-1.json
+  (mode 600; Ben should keep a copy in his password manager), its public
+  half is live in did.json, and a test credential signed with it checked
+  out against the live did.json and was discarded. `sh tools/doctor.sh`
+  reports what this Mac has ready (tools, accounts, keys, published
+  files) without printing a secret.
 - **H2. The credential's last step:** the holder never finds it on
   /account/ or /cohort/; signing is one person by hand; Ben cannot
   attach a signed file for a cohort he does not teach. 2 days,
-  migration. Waits on the signing key.
+  migration. Building (the key exists).
 - **H3. The solo builder's route:** /connect/ still says it waits on a
   setting; /account/ and /path/ do not link /connect/; no review prompt
   built on `my_app`; the home page's "Going alone" skips /path/setup/;

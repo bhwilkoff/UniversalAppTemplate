@@ -186,6 +186,13 @@ what waits on Ben.
   meet@humanshaped.org) and `tools/session-recorder` (the $0 host-side
   recorder). Neither has run against the real Google services yet.
 
+## This Mac
+
+`sh tools/doctor.sh` says what is ready here (node, gh, clasp as meet@,
+the Supabase token, the credential signing key, the published did.json
+and community.json) and how to fix anything missing. Keys live only in
+`~/.humanshaped/`, never in this repository.
+
 ## Sign-ups
 
 The sign-up backend is undecided. Whatever is chosen: student names,
