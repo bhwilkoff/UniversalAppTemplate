@@ -925,11 +925,16 @@ October 3, after every C milestone that does not wait on Ben merged):
 - Every gap from the October 3 analysis (G1 to G7) is built.
 
 **Next: the second gap analysis (October 4)**
-- **H1. Teachers other than Ben:** /teach/guide/ predates six-part
-  sessions, trios, G1, /live/, the add-on, the board, rooms, follow-ups,
-  and teacher MCP tools; setup steps miss "make groups before asking
-  for rooms", "rehearse /live/", "connect your agent"; no screen to add
-  a co-teacher (COURSE: co-lead before leading). 2 days. Building.
+- **H1 (merged, migration 20261004020000 applied):** /teach/guide/
+  rewritten to match the hub (six parts, trios, the repository button,
+  meet@ calls and rooms, /live/, the board, the add-on in testing,
+  follow-ups, notes, reaching out, finishing, credentials, mentors, the
+  teacher's agent), all marked for Ben's review; setup steps gain
+  groups, rehearse /live/, and connect your agent; a Teachers section
+  adds and removes co-teachers (a trigger keeps the maker and at least
+  one teacher); "Open the live page" on each cohort. 524 database
+  checks. The new delete rule was not seen failing when opened (the
+  agent's attempt was refused by the classifier as weakening security).
 - **H2. The credential's last step:** the holder never finds it on
   /account/ or /cohort/; signing is one person by hand; Ben cannot
   attach a signed file for a cohort he does not teach. 2 days,
@@ -938,7 +943,10 @@ October 3, after every C milestone that does not wait on Ben merged):
   setting; /account/ and /path/ do not link /connect/; no review prompt
   built on `my_app`; the home page's "Going alone" skips /path/setup/;
   the template README and "On your own" never point to humanshaped.org.
-  1.5 days. Building.
+  1.5 days. **Merged** (site; template README and "On your own" on
+  main): /connect/ fixed and linked from /account/ and /path/, "Going
+  alone" starts at /path/setup/, classmates' shown apps link to their
+  hub pages, and the MCP prompt `review_my_own_work` (mcp redeployed).
 - **H4. The add-on behind /live/:** no C1 signals, board, or talk share
   in the panel; /teach/ and the guide never mention it; teachers outside
   humanshaped.org cannot use a private add-on. 2 to 3 days, research on
@@ -960,6 +968,13 @@ October 3, after every C milestone that does not wait on Ben merged):
   "shape", the old secret still answers. Pushed to meet@'s script;
   waits on Ben's Allow, then whoAmI's printed aud can be pinned in
   GOOGLE_ID_AUDIENCES.
+- **meet@'s script live, October 4:** Ben pressed Allow; whoAmI runs as
+  meet@ with hd humanshaped.org and the project's audience (pinned in
+  GOOGLE_ID_AUDIENCES). sendNotices and processSetupRequests both
+  reached the hub by meet@'s identity (0 notices, no requests). The old
+  shared secrets are unset and deleted, and a secret call now gets 401.
+  NOTICES_ON and SETUP_QUEUE_ON are true; triggers: processSetupRequests
+  every 15 minutes, sendNotices daily 5 to 6 pm.
 - Seams: /teach/ to /live/, classmates' apps to /apps/app/, the event
   issue form not yet in humanshaped/community.
 
