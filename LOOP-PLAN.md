@@ -924,6 +924,20 @@ October 3, after every C milestone that does not wait on Ben merged):
   the repository waits for Ben to delete it (Ben's gh token cannot).
 - Every gap from the October 3 analysis (G1 to G7) is built.
 
+**The live classroom redesign (October 4, after Ben's first test call):**
+DECISIONS.md "The live classroom, after the first test call" holds his
+words; research/notes/run-of-show-design.md the design (class page, run
+of show, scenes, cues, main stage, presenter and audience, the wings,
+rehearsal rooms, follow-up) and milestones R1 to R9. R1 (shared teacher
+and student views) and R2 (the class builder) are building. C3 listing
+materials merged: tools/meet-addon/LISTING.md, tools/mark/make_listing.py,
+icons, banner, and sample screenshots (retake after the redesign).
+Review blockers found: Meet add-ons must offer Google One Tap sign-in
+when someone is not signed in (the hub signs in with GitHub; Ben's
+decision), must work with third-party cookies blocked (untested), and
+must not be a work in progress (submit after a real call with a Gmail
+student).
+
 **Next: the second gap analysis (October 4)**
 - **H1 (merged, migration 20261004020000 applied):** /teach/guide/
   rewritten to match the hub (six parts, trios, the repository button,
