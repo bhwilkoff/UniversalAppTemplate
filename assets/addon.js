@@ -210,10 +210,31 @@
   // ------------------------------------------------------------------
 
   function startShow() {
+    S.list = S.parts;
     S.show = window.ShowView.mount({
-      mount: $('[data-show]'), parts: S.parts, teaching: S.teaching,
-      onPick: function (key) { S.chosenPart = key; S.timerEnds = null; drawPart(true); }
+      mount: $('[data-show]'), parts: S.list, teaching: S.teaching,
+      onPick: function (key) {
+        if (shared()) { S.run.go(key); return; }
+        S.chosenPart = key; S.timerEnds = null; drawPart(true);
+      },
+      run: S.teaching ? {
+        onStep: function (d) { if (shared()) S.run.step(d); else stepLocal(d); },
+        onClock: function (on) { if (shared()) S.run.clock(on); else $('[data-timer]').click(); },
+        onFollow: function () { setPin(null); },
+        canEdit: function (key) {
+          if (!S.run) return null;
+          var s = sceneOf(key);
+          if (s && s.own) return 'own';
+          return S.run.canOwn() ? 'parts' : null;
+        },
+        onDraft: function (key, fields) { S.draft = fields ? { key: key, fields: fields } : null; sendStage(); },
+        onSave: function (key, fields) { return S.run.save(key, fields); },
+        onStartOwn: function () { return S.run.startOwn(); }
+      } : {}
     });
+    // The show everyone follows (R3): the session's own run of show if it
+    // has one, and where the teacher has moved it.
+    if (window.ShowRun) S.run = window.ShowRun.start({ db: db, cohort: S.cohort, session: S.session, parts: S.parts, teaching: S.teaching, onChange: showChanged });
     S.show.slot('clock', $('[data-part-clock]'));
     S.show.slot('lead', $('[data-now-lead]'));
     S.show.slot('wings', $('[data-wings]'));
@@ -324,7 +345,66 @@
   // The session now
   // ------------------------------------------------------------------
 
-  function partNow() { return lib.partNow(S.parts, S.session.starts_at, new Date(), S.chosenPart); }
+  // ------------------------------------------------------------------
+  // Running the show (R3)
+  // ------------------------------------------------------------------
+
+  var V = window.ShowViewLib, SL = window.ShowLib;
+  function shared() { return !!(S.run && S.run.shared); }
+  function sceneOf(key) { return (S.list || []).filter(function (s) { return s.key === key; })[0] || null; }
+
+  // The scene happening now: where the teacher moved the show, or, before
+  // anyone has, the one the clock says (as before R3).
+  function partNow() {
+    if (shared() && S.run.state() && S.run.current()) return sceneOf(S.run.current());
+    return lib.partNow(S.list || S.parts, S.session.starts_at, new Date(), S.chosenPart);
+  }
+
+  // When the current scene's clock runs out: the show's own clock, or the
+  // panel's (before R3).
+  function endsNow() {
+    if (shared() && S.run.state()) return V.endsAt(S.run.state(), partNow());
+    return S.timerEnds;
+  }
+
+  function showChanged() {
+    if (!S.show || !S.run) return;
+    var list = V.scenes(S.run.list());
+    var changed = JSON.stringify(list) !== JSON.stringify(S.list);
+    S.list = list;
+    if (shared()) S.onStage = V.pinOf(S.run.state());
+    $('[data-timer]').hidden = shared();
+    $('[data-next-part]').hidden = shared();
+    if (changed) { S.drawnPart = undefined; S.show.setScenes(S.list); }
+    drawPart(true);
+    drawQueue(); drawChecks();
+  }
+
+  // Back and next without the show (before R3): the panel's own place.
+  function stepLocal(d) {
+    var key = V.step(S.list || S.parts, (partNow() || {}).key, d);
+    if (!key) return;
+    var s = sceneOf(key);
+    S.chosenPart = key;
+    S.timerEnds = s ? Date.now() + s.minutes * 60000 : null;
+    drawPart(true);
+  }
+
+  // The clock and what the main stage shows instead, on the current scene.
+  function drawRunInfo() {
+    if (!S.show || !S.show.tick) return;
+    var left = A.timeLeft(endsNow(), Date.now());
+    S.show.tick({ left: V.leftText(left), clockOn: left != null, pinned: pinnedText() });
+  }
+  function pinnedText() {
+    var on = S.onStage;
+    if (!on) return null;
+    if (on.kind === 'welcome') return 'the welcome';
+    if (on.kind === 'blank') return 'nothing';
+    if (on.kind === 'check') return 'a question';
+    if (on.kind === 'item') { var i = S.items.filter(function (x) { return x.id === on.id; })[0]; return i ? nameOf(i.user_id) + '’s work' : 'someone’s work'; }
+    return null;
+  }
 
   // Drawn again when the part changes (from the clock, or a teacher's
   // choice), and on force. A change of part opens the activity that part
@@ -334,9 +414,12 @@
     var key = part ? part.key : null;
     if (!S.show || (!force && key === S.drawnPart)) return;
     S.drawnPart = key;
-    S.plan = A.panelPlan(key, S.room.room);
+    var list = S.list || S.parts;
+    S.plan = A.panelPlan(V ? V.partKeyOf(part, list.indexOf(part)) : key, S.room.room);
     // In a trio's own room, its order leads whatever the main room is doing.
-    S.show.update(S.room.room === 'group' ? 'show' : key);
+    var rooms = list.filter(function (s) { return (V ? V.partKeyOf(s, list.indexOf(s)) : s.key) === 'show'; })[0];
+    S.show.update(S.room.room === 'group' && rooms ? rooms.key : key);
+    drawRunInfo();
     drawNowActivity();
     drawChecksChrome();
     sendStage();
@@ -356,6 +439,10 @@
 
   function tick() {
     var part = partNow();
+    drawRunInfo();
+    // With the show running, the current scene carries the clock (R3).
+    $('[data-clock]').hidden = shared();
+    if (shared()) return;
     var left = A.timeLeft(S.timerEnds, Date.now());
     var clock = $('[data-clock]'), btn = $('[data-timer]');
     if (left != null) {
@@ -376,8 +463,7 @@
   }
   $('[data-welcome-toggle]').addEventListener('click', function () {
     var welcoming = S.onStage && S.onStage.kind === 'welcome';
-    S.onStage = welcoming ? null : { kind: 'welcome' };
-    drawWelcomeToggle(); drawQueue(); drawChecks(); sendStage();
+    setPin(welcoming ? null : { kind: 'welcome' });
   });
   $('[data-timer]').addEventListener('click', function () {
     var part = partNow();
@@ -492,9 +578,18 @@
 
   function stageToggle(kind, id, onLabel, offLabel) {
     var on = S.onStage && S.onStage.kind === kind && S.onStage.id === id;
-    var b = button(on ? offLabel : onLabel, 'btn-quiet', function () { S.onStage = on ? null : { kind: kind, id: id }; drawQueue(); drawChecks(); sendStage(); });
+    var b = button(on ? offLabel : onLabel, 'btn-quiet', function () { setPin(on ? null : { kind: kind, id: id }); });
     b.setAttribute('aria-pressed', String(on));
     return b;
+  }
+
+  // What the main stage shows instead of the current scene, if anything.
+  // With the show running (R3) this is the show everyone follows, so
+  // every main stage changes with the teacher's.
+  function setPin(v) {
+    S.onStage = v;
+    if (S.run && S.run.shared && S.teaching) S.run.pin(v);
+    drawQueue(); drawChecks(); sendStage(); drawRunInfo();
   }
 
   function drawQueue() {
@@ -514,7 +609,7 @@
       if (S.teaching) acts.appendChild(stageToggle('item', item.id, 'Put it on the main stage', 'Take it off the main stage'));
       if (L.canManage(item, S.me.id, S.teaching)) {
         acts.appendChild(button('They have presented', 'btn-quiet', function () {
-          if (S.onStage && S.onStage.id === item.id) S.onStage = null;
+          if (S.onStage && S.onStage.id === item.id) setPin(null);
           db.from('live_queue').update({ state: 'shown' }).eq('id', item.id).then(function (r) { if (!r.error) refreshLive(); });
         }));
       }
@@ -572,7 +667,7 @@
     var acts = el('div', 'actions');
     acts.appendChild(stageToggle('check', k.id, 'Put it on the main stage', 'Take it off the main stage'));
     if (k.choices) acts.appendChild(button(k.show_tally ? 'Hide the count' : 'Show everyone the count', 'btn-quiet', function () { changeCheck(k, { show_tally: !k.show_tally }); }));
-    acts.appendChild(button('Close it', 'btn-quiet', function () { if (S.onStage && S.onStage.id === k.id) S.onStage = null; changeCheck(k, { state: 'closed' }); }));
+    acts.appendChild(button('Close it', 'btn-quiet', function () { if (S.onStage && S.onStage.id === k.id) setPin(null); changeCheck(k, { state: 'closed' }); }));
     card.appendChild(acts);
     return card;
   }
@@ -663,12 +758,20 @@
   // delivers these messages only to this same person's stage.
   // ------------------------------------------------------------------
 
+  // The main stage follows the current scene (R3), as the class builder
+  // previews it; while the teacher edits a scene, their own stage shows
+  // the words as they type, before anyone else sees them.
   function currentView() {
     var part = partNow();
+    var scene = null;
+    if (part && SL && V && (shared() || part.own)) {
+      var s = S.draft && S.draft.key === part.key ? V.draft(part, S.draft.fields) : part;
+      scene = SL.stagePreview(V.asRow(s));
+    }
     return A.stageView({
-      part: part ? { key: part.key, name: part.name, endsAt: S.timerEnds } : null,
+      part: part ? { key: part.key, name: part.name, endsAt: endsNow() } : null,
       onStage: S.onStage, checks: S.checks, tallies: S.tallies, items: S.items, names: S.names,
-      welcome: lib.welcome(S.cohort, S.session, S.parts)
+      welcome: lib.welcome(S.cohort, S.session, S.parts), scene: scene
     });
   }
   function sendStage() {

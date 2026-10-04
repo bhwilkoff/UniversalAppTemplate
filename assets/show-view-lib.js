@@ -78,12 +78,159 @@
 
   function slot(key) { return SLOTS.filter(function (s) { return s.key === key; })[0] || null; }
 
-  // The scenes, from the session's parts ({ key, name, start, minutes, what }).
+  // The scenes, from the session's parts ({ key, name, start, minutes,
+  // what }), or from its own run of show (fromRows), which already says
+  // what kind each scene is.
   function scenes(parts) {
     return (parts || []).map(function (p) {
-      var kind = PART_KIND[p.key] || 'talk';
-      return { key: p.key, name: p.name, start: p.start, minutes: p.minutes, what: p.what || '', kind: kind, kindName: KINDS[kind].name, kindLine: KINDS[kind].line };
+      var kind = p.kind && KINDS[p.kind] ? p.kind : (PART_KIND[p.key] || 'talk');
+      return Object.assign({}, p, { key: p.key, name: p.name, start: p.start, minutes: p.minutes, what: p.what || '', kind: kind, kindName: KINDS[kind].name, kindLine: KINDS[kind].line });
     });
+  }
+
+  // ------------------------------------------------------------------
+  // Running the show (R3)
+  // ------------------------------------------------------------------
+
+  // A session's own run of show (the scenes table, R2) as the view's
+  // scenes: each keyed by its id, starting where the one before ends.
+  // Rows from the database come in position order; this sorts anyway.
+  function fromRows(rows) {
+    var at = 0;
+    return (rows || []).slice().sort(function (a, b) { return a.position - b.position; }).map(function (r) {
+      var m = Number(r.minutes) || 0;
+      var s = { key: r.id, id: r.id, name: r.title, kind: r.kind, minutes: m, start: at, what: r.body || '', config: r.config || {}, own: true };
+      at += m;
+      return s;
+    });
+  }
+
+  // The part each scene stands in for, so the code that knows COURSE.md's
+  // six parts (last week's notes while people arrive, the trios' order,
+  // the closing questions) knows a scene of the teacher's own too: a
+  // part's own key; the first scene, if it is a talk, as arriving; and
+  // otherwise by its kind.
+  function partKeyOf(scene, index) {
+    if (!scene) return null;
+    if (!scene.own) return scene.key;
+    if (index === 0 && scene.kind === 'talk') return 'arrive';
+    return { rooms: 'show', question: 'check', presenter: 'value', reflection: 'start', 'break': 'break', design: 'prompt', talk: 'prompt' }[scene.kind] || null;
+  }
+
+  // The scene happening now, from the show everyone follows: its key, or
+  // null before the show begins, or when the scene it names is gone.
+  function currentKey(state, list) {
+    var key = state && state.current_scene;
+    if (!key) return null;
+    return (list || []).some(function (s) { return s.key === key; }) ? key : null;
+  }
+
+  // The scene before or after this one (delta -1 or 1), staying within
+  // the show. With no current scene, forward is the first.
+  function step(list, key, delta) {
+    list = list || [];
+    if (!list.length) return null;
+    var i = -1;
+    list.forEach(function (s, n) { if (s.key === key) i = n; });
+    if (i < 0) return delta > 0 ? list[0].key : null;
+    var j = Math.max(0, Math.min(list.length - 1, i + delta));
+    return j === i ? null : list[j].key;
+  }
+
+  // Seconds left in the current scene, counted from when its clock
+  // started (the database's own time), or null when its clock is stopped.
+  function secondsLeft(state, scene, nowMs) {
+    if (!state || !state.scene_started_at || !scene || !scene.minutes) return null;
+    var started = Date.parse(state.scene_started_at);
+    if (!isFinite(started)) return null;
+    return Math.max(0, Math.round((started + scene.minutes * 60000 - nowMs) / 1000));
+  }
+
+  // When the current scene's clock runs out, in milliseconds, or null.
+  function endsAt(state, scene) {
+    if (!state || !state.scene_started_at || !scene || !scene.minutes) return null;
+    var started = Date.parse(state.scene_started_at);
+    return isFinite(started) ? started + scene.minutes * 60000 : null;
+  }
+
+  // What the main stage is told to show, from the show everyone follows,
+  // in the panel's own terms (AddonLib.stageView's onStage): null when it
+  // follows the current scene.
+  function pinOf(state) {
+    var stage = state && state.stage;
+    if (!stage || stage === 'scene') return null;
+    if (stage === 'answers') return { kind: 'check', id: state.stage_ref };
+    if (stage === 'presenter') return { kind: 'item', id: state.stage_ref };
+    if (stage === 'welcome' || stage === 'blank') return { kind: stage };
+    return null;
+  }
+
+  // And back: the change to the show for pinning something on the main
+  // stage (onStage), or for following the scene again (null).
+  function stageChange(onStage) {
+    if (!onStage) return { stage: 'scene', stage_ref: null };
+    if (onStage.kind === 'check') return { stage: 'answers', stage_ref: onStage.id };
+    if (onStage.kind === 'item') return { stage: 'presenter', stage_ref: onStage.id };
+    if (onStage.kind === 'welcome' || onStage.kind === 'blank') return { stage: onStage.kind, stage_ref: null };
+    return { stage: 'scene', stage_ref: null };
+  }
+
+  // A scene in the shape the class builder keeps it in (ShowLib's
+  // stagePreview and problem read this), for a scene of either kind.
+  function asRow(scene) {
+    if (!scene) return null;
+    return { kind: scene.kind, title: scene.name, minutes: scene.minutes, body: scene.what || null, config: scene.config || {} };
+  }
+
+  // The words a teacher edits for a scene in the moment, as the form
+  // starts: title, minutes, what the main stage says, the prompt, and a
+  // question's choices one to a line.
+  function editFields(scene) {
+    var c = (scene && scene.config) || {};
+    return {
+      title: scene ? scene.name || '' : '', minutes: scene ? String(scene.minutes || '') : '',
+      body: scene ? scene.what || '' : '', prompt: c.prompt || '', options: (c.options || []).join('\n')
+    };
+  }
+
+  // Which of those words a kind of scene has: every scene has a title,
+  // minutes, and words for the stage; some have a prompt; a question has
+  // choices.
+  function editable(kind) {
+    return {
+      prompt: ['presenter', 'question', 'rooms', 'reflection'].indexOf(kind) >= 0,
+      options: kind === 'question'
+    };
+  }
+
+  // The change to save for a scene from the form's words, and the first
+  // problem with it as a sentence (ShowLib.problem, passed in so this
+  // stays testable), or null. A prompt or choices the kind does not use
+  // are left out; the rest of the scene's configuration (a room's own
+  // scenes, a template) is kept as it was.
+  function edited(scene, fields, show) {
+    var have = editable(scene.kind);
+    var config = Object.assign({}, scene.config || {});
+    if (have.prompt) { var p = String(fields.prompt || '').trim(); if (p) config.prompt = p; else delete config.prompt; }
+    if (have.options) {
+      var opts = String(fields.options || '').split('\n').map(function (s) { return s.trim(); }).filter(Boolean);
+      if (opts.length) config.options = opts; else delete config.options;
+    }
+    var change = {
+      title: String(fields.title || '').trim(),
+      minutes: Number(String(fields.minutes || '').trim()),
+      body: String(fields.body || '').trim() || null,
+      config: config
+    };
+    var problem = show && show.problem ? show.problem(Object.assign({ kind: scene.kind }, change)) : null;
+    return { change: change, problem: problem };
+  }
+
+  // A scene with the form's words in place, for the teacher's own main
+  // stage while they type, before anyone else sees it.
+  function draft(scene, fields) {
+    var e = edited(scene, fields, null).change;
+    return Object.assign({}, scene, { name: e.title || scene.name, minutes: e.minutes > 0 ? e.minutes : scene.minutes, what: e.body || '', config: e.config });
   }
 
   // The scenes with where each stands: done, now, next, or later. With no
@@ -132,7 +279,19 @@
   // "25 min", "1 min", or "" for none.
   function minutesText(n) { return typeof n === 'number' && n > 0 ? n + ' min' : ''; }
 
-  var lib = { WORDS: WORDS, KINDS: KINDS, PART_KIND: PART_KIND, SLOTS: SLOTS, scenes: scenes, timeline: timeline, layout: layout, slotText: slotText, nextScene: nextScene, minutesText: minutesText };
+  // "12:30 left" or "Time is up" for a clock, or "" with none.
+  function leftText(seconds) {
+    if (seconds == null) return '';
+    if (seconds <= 0) return 'Time is up';
+    var m = Math.floor(seconds / 60), s = seconds % 60;
+    return m + ':' + (s < 10 ? '0' : '') + s + ' left';
+  }
+
+  var lib = {
+    WORDS: WORDS, KINDS: KINDS, PART_KIND: PART_KIND, SLOTS: SLOTS, scenes: scenes, timeline: timeline, layout: layout, slotText: slotText, nextScene: nextScene, minutesText: minutesText,
+    fromRows: fromRows, partKeyOf: partKeyOf, currentKey: currentKey, step: step, secondsLeft: secondsLeft, endsAt: endsAt,
+    pinOf: pinOf, stageChange: stageChange, asRow: asRow, editFields: editFields, editable: editable, edited: edited, draft: draft, leftText: leftText
+  };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
   else root.ShowViewLib = lib;
 })(typeof globalThis !== 'undefined' ? globalThis : this);
