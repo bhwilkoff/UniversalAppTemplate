@@ -1,7 +1,10 @@
 # 04. Seeing it work
 
 **Where you are.** Two platforms run on your own devices, and so far you
-have been the one checking every fix. That stops here.
+have been the one checking every fix. That stops here. If you are in a
+cohort, this is also the week your app gets a look of its own, so if
+you have not yet done step 9 of stage 03, "Make it look like itself,"
+do it alongside this stage.
 
 On August 14, 2026, a version of Archive Watch reached my Apple TV with
 stuttering audio and captions that ran late. The agent had called it

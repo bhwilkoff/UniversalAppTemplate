@@ -142,7 +142,10 @@ them safe:
 Pulse needs a key from every store it reads, and each store hands them
 out differently. The agent knows the way to each one
 (`docs/PRODUCT-PULSE.md`), but only you can log in and create them.
-Until you do, the page is honest and mostly empty.
+Until you do, the page is honest and mostly empty. If you share the app
+for free (stage 05), there is no store to read yet, and Pulse can still
+read the two places that cost nothing: the web version's own page
+counter and the app's repository on GitHub.
 
 The CI fleet costs attention. Every scheduled workflow is one more thing
 that can fail quietly. Add one only when the work it does is worth
@@ -231,8 +234,9 @@ watching.
    one numbered list at a time, with the next one drafted in your note
    while the limit resets.
 
-**When you are ready to move on,** Pulse reads at least one store
-honestly, a failure email has become a fix instead of a habit, and you
+**When you are ready to move on,** Pulse reads at least one place the
+app lives honestly (a store, or, if you share it for free, its web
+counter or its repository on GitHub), a failure email has become a fix instead of a habit, and you
 have run a loop from start to stop. You can see what is happening to
 the app without living inside it. That frees you up for the part stage
 07 is about: making it better.
