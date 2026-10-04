@@ -898,8 +898,10 @@ October 3, after every C milestone that does not wait on Ben merged):
   with can_approve can hide one with a reason; reports go to public
   issues in the directory. public_apps() gained a `kind` column (checked
   live as anon: 200). The MCP server's `my_app` gives the builder's own
-  context. 498 database checks, 245 node tests. Not yet rendered signed
-  in.
+  context. 498 database checks, 245 node tests. Checked live as Ben:
+  /account/ shows "Your own app" and "How your teachers can reach you";
+  a pasted GitHub address saved as owner/name with show off, stayed out
+  of public_apps(), and "Take it off the hub" removed it.
 - 2026-10-04, G1 (merged, migration 20261004000000 applied,
   cohort-access redeployed, setup-queue deployed with its secret from
   ~/.humanshaped/setup-queue-secret): /teach/'s "Before the first
