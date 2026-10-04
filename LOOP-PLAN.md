@@ -938,6 +938,25 @@ decision), must work with third-party cookies blocked (untested), and
 must not be a work in progress (submit after a real call with a Gmail
 student).
 
+- **R1 (merged):** the run of show (assets/show-view.js with
+  show-view-lib.js, global ShowViewLib, kept apart from R2's ShowLib)
+  draws the same timeline in the Meet panel and on /live/: done scenes
+  fold, the current scene is open, every existing part sits in its scene
+  (the wings in presenter, questions in question, rooms and cues in
+  rehearsal rooms, the design stage in design), the rest under "Any time
+  in the show", and "What the words mean". Teacher and student views;
+  students get no cues. The Now/Queue/Checks/Everyone/Board/Rooms tabs
+  are gone. 292 node tests; a page check of both views on both pages
+  passes on the merged code. R1 still lays out COURSE's six parts; R3
+  connects it to R2's scenes. Not yet seen in a real call.
+- **Google sign-in, configured October 4:** OAuth web client "Human
+  Shaped sign-in" (ID 1086485459450-me3ejointl1dq4kd2qpq4d6tqla696uf,
+  public) in human-shaped, origin https://humanshaped.org, redirect the
+  Supabase callback; Supabase's Google provider on with that ID and no
+  secret (ID-token sign-in only), manual linking on. The consent screen
+  stays in Testing until Branding and domain verification are done, so
+  only test users (Ben's Gmail test student and meet@) can sign in with
+  Google for now. The code is building on `google-signin`.
 - **R2 (merged, migration 20261004050000 applied):** "Run of show for
   week N" on /teach/: start from the six parts or copy last week; each
   scene (talk, presenter, question, design stage, rehearsal rooms,
