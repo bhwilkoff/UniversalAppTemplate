@@ -86,3 +86,30 @@ test('the shared drawing scene is the design stage, and the main stage keeps its
   assert.ok(S.layout(parts, 'prompt', { teaching: false }).now.includes('design'));
   assert.ok(S.WORDS.some((w) => w.name === 'Main stage'));
 });
+
+test('the main stage says whose work is on it, and the audience their part (R7)', () => {
+  const V = createRequire(import.meta.url)('../../assets/show-view-lib.js');
+  const items = [
+    { id: 'i1', user_id: 'bea', url: 'https://bea.github.io/swap', note: 'The new list', state: 'waiting', created_at: '2026-10-20T23:05:00Z' },
+    { id: 'i2', user_id: 'me', url: 'https://me.github.io/app', note: null, state: 'waiting', created_at: '2026-10-20T23:01:00Z' },
+    { id: 'i3', user_id: 'cal', url: 'https://cal.github.io/x', note: null, state: 'shown', created_at: '2026-10-20T22:59:00Z' }
+  ];
+  const scene = { kind: 'presenter', config: { prompt: 'Listen for the value at work, and what it cost.' } };
+  const nameOf = (id) => ({ bea: 'Bea', cal: 'Cal' })[id] || 'Someone';
+  const label = (i) => 'Work at ' + i.url;
+  const theirs = V.onStageNow({ stage: 'presenter', stage_ref: 'i1' }, items, scene, 'me', nameOf, label);
+  assert.equal(theirs.line, 'Bea is presenting.');
+  assert.equal(theirs.audience, 'Listen for the value at work, and what it cost.');
+  assert.equal(theirs.what, 'Work at https://bea.github.io/swap');
+  assert.equal(theirs.note, 'The new list');
+  const mine = V.onStageNow({ stage: 'presenter', stage_ref: 'i2' }, items, scene, 'me', nameOf, label);
+  assert.ok(mine.mine && /You are presenting/.test(mine.line) && mine.audience === null);
+  assert.equal(V.onStageNow({ stage: 'presenter', stage_ref: 'i1' }, items, { kind: 'talk', config: {} }, 'me', nameOf, label).audience, null, 'only a presenter scene has an audience part');
+  assert.equal(V.onStageNow({ stage: 'scene' }, items, scene, 'me', nameOf, label), null);
+  assert.equal(V.onStageNow({ stage: 'presenter', stage_ref: 'gone' }, items, scene, 'me', nameOf, label), null);
+  assert.equal(V.nextFromWings(items, null).id, 'i2', 'the first to ask, still waiting');
+  assert.equal(V.nextFromWings(items, 'i2').id, 'i1', 'never whoever is on the stage now');
+  assert.equal(V.nextFromWings([items[2]], null), null);
+  assert.equal(V.audienceOf(scene), scene.config.prompt);
+  assert.equal(V.audienceOf({ kind: 'talk', config: { prompt: 'x' } }), null);
+});

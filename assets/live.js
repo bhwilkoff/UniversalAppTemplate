@@ -248,6 +248,8 @@
     S.list = list;
     if (changed) { S.drawnPart = undefined; show.setScenes(S.list); }
     drawNow(true);
+    // A pin moved the main stage (R7): the wings and their card follow.
+    if (S.items) render('[data-queue]', function () { drawQueue(S.items); });
   }
   setInterval(function () { if (show && show.tick && shared()) show.tick(runInfo()); }, 1000);
 
@@ -673,11 +675,50 @@
       else acts.appendChild(button('They have presented', 'btn-quiet', function () { setItem(item, { state: 'shown' }); }));
       acts.appendChild(button('Take it off', 'btn-quiet', function () { removeItem(item); }));
     }
+    // With the show running (R3), a teacher puts work from the wings on
+    // every main stage, and takes it off again (R7).
+    if (S.teaching && shared() && !isShown) {
+      var pinned = V.pinOf(run.state());
+      var on = !!pinned && pinned.kind === 'item' && pinned.id === item.id;
+      var t = button(on ? 'Take it off the main stage' : 'Put it on the main stage', 'btn-quiet', function () { run.pin(on ? null : { kind: 'item', id: item.id }); });
+      t.setAttribute('aria-pressed', String(on));
+      acts.insertBefore(t, acts.children[1] || null);
+    }
     li.appendChild(acts);
     return li;
   }
 
+  // Whose work is on the main stage, for everyone, and, for a teacher,
+  // one cue to thank them and bring up the next from the wings (R7).
+  function drawOnStage() {
+    var box = $('[data-on-stage]');
+    var items = S.items || [];
+    var now = V && shared() ? V.onStageNow(run.state(), items, partNow(), S.me.id, nameOf, L.itemLabel) : null;
+    var next = V && shared() && S.teaching ? V.nextFromWings(items, now ? now.id : null) : null;
+    box.replaceChildren();
+    box.hidden = !now && !next;
+    if (now) {
+      box.appendChild(el('p', 'kicker', 'On the main stage'));
+      box.appendChild(el('p', 'on-stage-line', now.line));
+      box.appendChild(el('p', 'live-what', now.what));
+      if (now.audience) box.appendChild(el('p', 'on-stage-audience', 'Your part: ' + now.audience));
+    }
+    if (next) {
+      var acts = el('div', 'actions');
+      acts.appendChild(button(now ? 'Thank them, and bring up ' + nameOf(next.user_id) : 'Bring up ' + nameOf(next.user_id) + ' from the wings', 'btn-github', function () {
+        var done = now ? db.from('live_queue').update({ state: 'shown' }).eq('id', now.id) : Promise.resolve({});
+        done.then(function () { run.pin({ kind: 'item', id: next.id }); refreshLive(); });
+      }));
+      if (now) acts.appendChild(button('Thank them, and clear the stage', 'btn-quiet', function () {
+        db.from('live_queue').update({ state: 'shown' }).eq('id', now.id).then(function () { run.pin(null); refreshLive(); });
+      }));
+      box.appendChild(acts);
+    }
+  }
+
   function drawQueue(items) {
+    S.items = items;
+    drawOnStage();
     var q = L.queue(items);
     var list = $('[data-queue]'); list.replaceChildren();
     if (!q.waiting.length) list.appendChild(el('li', 'live-empty small', q.shown.length ? 'Everyone in the wings has presented.' : 'No one is in the wings yet. Ask to present below.'));

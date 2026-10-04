@@ -205,3 +205,11 @@ test('a design scene puts its own board on the main stage, and nothing else gets
     assert.equal(v.scene.board, undefined, bad);
   }
 });
+
+test('a presenter on the main stage carries the audience’s part (R7)', () => {
+  const items = [{ id: 'i1', user_id: 'u1', kind: 'app', url: 'https://bea.github.io/swap', note: null }];
+  const v = lib.stageView({ onStage: { kind: 'item', id: 'i1' }, items, names: { u1: 'Bea' }, audience: 'Listen for the value at work.' });
+  assert.equal(v.audience, 'Listen for the value at work.');
+  assert.deepEqual(lib.readStageMessage(lib.stageMessage(v)), v);
+  assert.equal(lib.stageView({ onStage: { kind: 'item', id: 'i1' }, items, names: { u1: 'Bea' } }).audience, undefined);
+});

@@ -175,6 +175,43 @@
     return { stage: 'scene', stage_ref: null };
   }
 
+  // ------------------------------------------------------------------
+  // The wings and the presenter (R7)
+  // ------------------------------------------------------------------
+
+  // Whose work is on the main stage, for the person reading: the
+  // presenter's name and what they are showing, and, for everyone else,
+  // the audience's part from the current presenter scene. Null when no
+  // one's work is on the stage. items: live_queue rows; labelOf(item):
+  // LiveLib.itemLabel; nameOf(id): a name.
+  function onStageNow(state, items, scene, meId, nameOf, labelOf) {
+    var pin = pinOf(state);
+    if (!pin || pin.kind !== 'item') return null;
+    var item = (items || []).filter(function (i) { return i.id === pin.id; })[0];
+    if (!item) return null;
+    var mine = item.user_id === meId;
+    var c = scene && scene.kind === 'presenter' ? scene.config || {} : {};
+    var name = mine ? 'You' : nameOf(item.user_id);
+    return {
+      id: item.id, mine: mine, who: name, what: labelOf ? labelOf(item) : item.url, url: item.url, note: item.note || null,
+      line: mine ? 'You are presenting. Everyone sees your work on the main stage.' : name + ' is presenting.',
+      audience: !mine && c.prompt ? c.prompt : null
+    };
+  }
+
+  // Who comes up next from the wings: the first still waiting, in the
+  // order they asked, other than whoever is on the stage now.
+  function nextFromWings(items, onStageId) {
+    return (items || []).filter(function (i) { return i.state !== 'shown' && i.id !== onStageId; })
+      .sort(function (a, b) { return String(a.created_at).localeCompare(String(b.created_at)); })[0] || null;
+  }
+
+  // The audience's part for the main stage itself, from the current
+  // scene when it is a presenter scene.
+  function audienceOf(scene) {
+    return scene && scene.kind === 'presenter' && scene.config && scene.config.prompt ? String(scene.config.prompt) : null;
+  }
+
   // A scene in the shape the class builder keeps it in (ShowLib's
   // stagePreview and problem read this), for a scene of either kind.
   function asRow(scene) {
@@ -292,7 +329,7 @@
   var lib = {
     WORDS: WORDS, KINDS: KINDS, PART_KIND: PART_KIND, SLOTS: SLOTS, scenes: scenes, timeline: timeline, layout: layout, slotText: slotText, nextScene: nextScene, minutesText: minutesText,
     fromRows: fromRows, partKeyOf: partKeyOf, currentKey: currentKey, step: step, secondsLeft: secondsLeft, endsAt: endsAt,
-    pinOf: pinOf, stageChange: stageChange, asRow: asRow, editFields: editFields, editable: editable, edited: edited, draft: draft, leftText: leftText
+    pinOf: pinOf, stageChange: stageChange, onStageNow: onStageNow, nextFromWings: nextFromWings, audienceOf: audienceOf, asRow: asRow, editFields: editFields, editable: editable, edited: edited, draft: draft, leftText: leftText
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
   else root.ShowViewLib = lib;

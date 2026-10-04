@@ -86,6 +86,8 @@
       $('[data-what]').textContent = view.what;
       $('[data-note]').hidden = !view.note;
       $('[data-note]').textContent = view.note || '';
+      $('[data-audience]').hidden = !view.audience;
+      $('[data-audience]').textContent = view.audience ? 'Everyone else: ' + view.audience : '';
     }
     tick();
   }

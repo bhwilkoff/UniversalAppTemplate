@@ -1126,13 +1126,25 @@ student).
   which closes R3's known gap. 680 database checks (the forged-clock
   rule seen failing when opened), 323 node tests, and a 12-check browser
   check of the room card at 375 px. Not yet seen in a real call.
+- **R7, the wings and the presenter (merged, no migration, October 4,
+  cloud session):** an "On the main stage" card at the top of the wings
+  in the Meet panel and on /live/, for everyone: who is presenting and
+  what they are showing ("You are presenting." for them), and, for
+  everyone else, "Your part:" with the current presenter scene's prompt.
+  A teacher on /live/ can now put work from the wings on every main
+  stage (as the panel already could), and on both, one cue thanks the
+  presenter (marks them presented) and brings up the next from the
+  wings, or clears the stage. The main stage shows the audience's part
+  under the presenter's work. ShowViewLib.onStageNow, nextFromWings,
+  audienceOf; 325 node tests. Not seen in a browser beyond the tests,
+  and not yet in a real call.
 
 ## Handoff (October 4, 2026, evening)
 
-Merged and live: G1 to G7, H1 to H6, C0 to C9, R1 to R3, R4's pages, R5, R6,
+Merged and live: G1 to G7, H1 to H6, C0 to C9, R1 to R3, R4's pages, R5, R6, R7,
 Google sign-in beside GitHub, the listing materials, meet@'s script
 with its triggers, the community repository, and the credential
-signing key. 680 database checks, 323 node tests.
+signing key. 680 database checks, 325 node tests.
 
 R4, the question bank, is merged (see its log entry). Half of its
 database change is applied; **the first step on this Mac is to apply
@@ -1149,8 +1161,10 @@ in.
 R6, rehearsal rooms around scenes, is merged and its migration applied
 (see its log entry).
 
-Next, from research/notes/run-of-show-design.md: R7 (the wings and the
-presenter), R8 (follow-up built from the show), then the listing (tools/meet-addon/LISTING.md)
+R7, the wings and the presenter, is merged (see its log entry).
+
+Next, from research/notes/run-of-show-design.md: R8 (follow-up built
+from the show), then the listing (tools/meet-addon/LISTING.md)
 once a real call with the Gmail test student has gone well. The loop
 arms each next tick with send_later, which survives a container
 restart (ScheduleWakeup did not).

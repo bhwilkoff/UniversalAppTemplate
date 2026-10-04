@@ -129,7 +129,10 @@
       var i = (state.items || []).filter(function (x) { return x.id === on.id; })[0];
       if (i) {
         var label = live() ? live().itemLabel(i) : i.url;
-        return { mode: 'item', part: part, who: cut((state.names || {})[i.user_id] || 'Someone', 80), what: cut(label, 200), note: i.note ? cut(i.note, 300) : null };
+        var itemView = { mode: 'item', part: part, who: cut((state.names || {})[i.user_id] || 'Someone', 80), what: cut(label, 200), note: i.note ? cut(i.note, 300) : null };
+        // The audience's part, from the current presenter scene (R7).
+        if (typeof state.audience === 'string' && state.audience) itemView.audience = cut(state.audience, 300);
+        return itemView;
       }
     }
     // The run of show (R3): a stage the teacher cleared, or the current
@@ -194,7 +197,9 @@
       return { mode: 'check', part: part, kind: kinds.indexOf(v.kind) >= 0 ? v.kind : 'choice', prompt: cut(v.prompt, 500), choices: choices, count: count };
     }
     if (v.mode === 'item' && typeof v.what === 'string') {
-      return { mode: 'item', part: part, who: cut(v.who || 'Someone', 80), what: cut(v.what, 200), note: v.note ? cut(v.note, 300) : null };
+      var iv = { mode: 'item', part: part, who: cut(v.who || 'Someone', 80), what: cut(v.what, 200), note: v.note ? cut(v.note, 300) : null };
+      if (typeof v.audience === 'string' && v.audience) iv.audience = cut(v.audience, 300);
+      return iv;
     }
     if (v.mode === 'welcome') { var w = welcomeOf(v.welcome); return w ? { mode: 'welcome', part: part, welcome: w } : null; }
     if (v.mode === 'part') return { mode: 'part', part: part };

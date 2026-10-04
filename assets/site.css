@@ -829,6 +829,12 @@ label.check { display: flex; gap: 0.5rem; align-items: center; font-weight: 400;
 .live-page .question-edit { margin-top: 0.75rem; }
 .live-page .live-scene-question:not([hidden]) { border: 2px solid var(--clay); border-radius: var(--radius); background: var(--card); padding: 0.9rem; display: grid; gap: 0.35rem; margin-top: 0.75rem; }
 .live-page .live-scene-question p { margin: 0; }
+/* Whose work is on the main stage, and the audience's part (R7). */
+.live-page .on-stage:not([hidden]) { border: 2px solid var(--clay); border-radius: var(--radius); background: var(--card); padding: 0.9rem; display: grid; gap: 0.35rem; margin: 0.5rem 0 0.75rem; }
+.live-page .on-stage p { margin: 0; }
+.live-page .on-stage .kicker { font-size: 0.85rem; }
+.live-page .on-stage-line { font-weight: 650; }
+.live-page .on-stage-audience { border-left: 3px solid var(--clay); padding-left: 0.6rem; }
 .live-page .live-scene-question .kicker { font-size: 0.85rem; }
 .live-page .live-answers { margin: 0.75rem 0 0; padding: 0; list-style: none; display: grid; gap: 0.4rem; border-top: 1px solid var(--rule); padding-top: 0.75rem; }
 .live-page .live-confirm { margin-top: 0.75rem; padding: 0.75rem 1rem; border-left: 3px solid var(--clay); }
@@ -1223,6 +1229,8 @@ body.addon-body { min-height: 100vh; }
 .stage-welcome .stage-note { color: var(--ink); line-height: 1.35; max-width: 46ch; overflow-wrap: anywhere; }
 .stage-what { margin: 0; font-size: clamp(1.25rem, 3.6vmin, 2.5rem); font-weight: 600; overflow-wrap: anywhere; }
 .stage-note { margin: 0; font-size: clamp(1.1rem, 3vmin, 2rem); color: var(--muted); max-width: 40ch; }
+/* The audience's part, under a presenter's work (R7). */
+.stage-audience { margin: 1vmin 0 0; font-size: clamp(1.1rem, 3vmin, 2rem); color: var(--ink); max-width: 46ch; border-left: 4px solid var(--clay); padding-left: 0.6em; }
 /* The current scene (R3): its words read as words, not as a headline. */
 .stage-lines { display: grid; gap: 1.6vmin; max-width: 46ch; }
 .stage-lines .stage-what { font-weight: 450; line-height: 1.35; }

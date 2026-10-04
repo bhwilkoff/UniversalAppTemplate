@@ -649,7 +649,35 @@
     drawQueue(); drawChecks(); sendStage(); drawRunInfo();
   }
 
+  // Whose work is on the main stage, for everyone, and, for a teacher,
+  // one cue to thank them and bring up the next from the wings (R7).
+  function drawOnStage() {
+    var box = $('[data-on-stage]');
+    var now = V ? V.onStageNow(V.stageChange(S.onStage), S.items, partNow(), S.me.id, nameOf, L.itemLabel) : null;
+    var next = V ? V.nextFromWings(S.items, now ? now.id : null) : null;
+    box.replaceChildren();
+    box.hidden = !now && !(S.teaching && next);
+    if (now) {
+      box.appendChild(el('p', 'kicker', 'On the main stage'));
+      box.appendChild(el('p', 'on-stage-line', now.line));
+      box.appendChild(el('p', 'live-what', now.what));
+      if (now.audience) box.appendChild(el('p', 'on-stage-audience', 'Your part: ' + now.audience));
+    }
+    if (S.teaching && next) {
+      var acts = el('div', 'actions');
+      acts.appendChild(button(now ? 'Thank them, and bring up ' + nameOf(next.user_id) : 'Bring up ' + nameOf(next.user_id) + ' from the wings', 'btn-github', function () {
+        var done = now ? db.from('live_queue').update({ state: 'shown' }).eq('id', now.id) : Promise.resolve({});
+        done.then(function () { setPin({ kind: 'item', id: next.id }); refreshLive(); });
+      }));
+      if (now) acts.appendChild(button('Thank them, and clear the stage', 'btn-quiet', function () {
+        db.from('live_queue').update({ state: 'shown' }).eq('id', now.id).then(function () { setPin(null); refreshLive(); });
+      }));
+      box.appendChild(acts);
+    }
+  }
+
   function drawQueue() {
+    drawOnStage();
     var q = L.queue(S.items);
     var list = $('[data-queue]'); list.replaceChildren();
     if (!q.waiting.length) list.appendChild(el('li', 'live-empty small', q.shown.length ? 'Everyone in the wings has presented.' : 'No one is in the wings yet. People ask to present from their own view.'));
@@ -873,7 +901,7 @@
     }
     return A.stageView({
       part: part ? { key: part.key, name: part.name, endsAt: endsNow() } : null,
-      onStage: S.onStage, checks: S.checks, results: S.results, items: S.items, names: S.names,
+      onStage: S.onStage, checks: S.checks, results: S.results, items: S.items, names: S.names, audience: V ? V.audienceOf(part) : null,
       welcome: lib.welcome(S.cohort, S.session, S.parts), scene: scene
     });
   }
