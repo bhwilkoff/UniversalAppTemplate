@@ -229,6 +229,7 @@
         root.querySelector('[data-teach-link]').hidden = !res[3].data;
         drawNotes(uid);
         drawMentoring(uid);
+        drawReach(uid);
         show('signed-in');
       });
     }).catch(function (err) {
@@ -241,6 +242,55 @@
   // mentor. The database decides who may (can_mentor, join_as_mentor);
   // this only offers it. Before the migration, can_mentor is missing and
   // the section stays away.
+  // How a teacher may reach you when you are not on the site
+  // (research/notes/reach-notes.md). Read on its own, so the page works
+  // before the hub's database has reach_choices.
+  var reachWired = false;
+  function drawReach(uid) {
+    var R = window.ReachLib;
+    var section = root.querySelector('[data-reach-section]');
+    if (!R || !section) return;
+    var form = root.querySelector('[data-reach-form]');
+    var status = root.querySelector('[data-reach-status]');
+    var clear = root.querySelector('[data-reach-clear]');
+    db.from('reach_choices').select('email, teachers_may_email, notices').eq('user_id', uid).maybeSingle().then(function (r) {
+      if (r.error) { section.hidden = true; return; }
+      var row = r.data || {};
+      form.elements.email.value = row.email || '';
+      form.elements.teachers_may_email.checked = !!row.teachers_may_email;
+      form.elements.notices.checked = !!row.notices;
+      clear.hidden = !r.data;
+      section.hidden = false;
+      if (reachWired) return;
+      reachWired = true;
+      form.addEventListener('submit', function (ev) {
+        ev.preventDefault();
+        var checked = R.checkChoice({
+          email: form.elements.email.value,
+          teachers_may_email: form.elements.teachers_may_email.checked,
+          notices: form.elements.notices.checked
+        });
+        if (checked.error) { status.textContent = checked.error; return; }
+        status.textContent = 'Saving…';
+        db.from('reach_choices').upsert(Object.assign({ user_id: uid }, checked.row)).select('user_id').then(function (s) {
+          if (s.error) { status.textContent = 'Not saved: ' + s.error.message + '.'; return; }
+          var row = checked.row;
+          status.textContent = row.teachers_may_email || row.notices ? 'Saved.' : 'Saved. Both are off, so your teachers’ words wait for you here.';
+          clear.hidden = false;
+        });
+      });
+      clear.addEventListener('click', function () {
+        status.textContent = 'Forgetting…';
+        db.from('reach_choices').delete().eq('user_id', uid).then(function (d) {
+          if (d.error) { status.textContent = 'Not forgotten: ' + d.error.message + '.'; return; }
+          form.reset();
+          clear.hidden = true;
+          status.textContent = 'Forgotten. The hub no longer has this address.';
+        });
+      });
+    });
+  }
+
   function drawMentoring(uid) {
     var section = root.querySelector('[data-mentor-section]');
     var box = root.querySelector('[data-mentor-cohorts]');

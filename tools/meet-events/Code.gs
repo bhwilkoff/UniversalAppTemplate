@@ -754,3 +754,75 @@ function fileStrayRecordings(idOrObject) {
   console.log(msg);
   return msg;
 }
+
+// ---- "Something is waiting for you" emails (G4) ----
+//
+// Once a day, for people who asked on /account/, an email from this
+// account saying a teacher wrote them a note or someone answered what
+// they shared, with a link back. It never carries the words, which stay
+// on the hub (research/notes/reach-notes.md). Off unless the Script
+// Property NOTICES_ON is "true"; NOTICES_URL and NOTICES_SECRET say
+// where to ask and prove it is us. Written by Claude, awaiting Ben's review.
+
+function noticesOn(value) {
+  return String(value || '').trim().toLowerCase() === 'true';
+}
+
+function plural_(n, one, many) { return n + ' ' + (n === 1 ? one : many); }
+
+// The email for one person, from the counts the hub sent. Null when there
+// is nothing to say or no sensible address.
+function noticeEmail(person) {
+  var notes = Math.max(0, Number(person && person.notes) || 0);
+  var answers = Math.max(0, Number(person && person.answers) || 0);
+  var to = String((person && person.email) || '').trim();
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(to) || (!notes && !answers)) return null;
+  var parts = [];
+  if (notes) parts.push(notes === 1 ? 'a teacher wrote you a note' : 'your teachers wrote you ' + plural_(notes, 'note', 'notes'));
+  if (answers) parts.push(answers === 1 ? 'someone answered what you shared' : plural_(answers, 'answer', 'answers') + ' came in on what you shared');
+  var what = parts.join(', and ');
+  return {
+    to: to,
+    subject: notes ? 'A note is waiting for you on Human Shaped' : 'Someone answered what you shared on Human Shaped',
+    body: 'Hello,\n\nSince we last wrote, ' + what + '. The words themselves are on the site, so they stay where you and your cohort keep your work:\n\n' +
+      'https://humanshaped.org/account/\n\n' +
+      'You asked for these emails on that page, and you can turn them off there at any time.\n\nHuman Shaped\n'
+  };
+}
+
+function askNotices_(action, extra) {
+  var url = props_().getProperty('NOTICES_URL');
+  var secret = props_().getProperty('NOTICES_SECRET');
+  if (!url || !secret) throw new Error('Set NOTICES_URL and NOTICES_SECRET in Script Properties first.');
+  var payload = { action: action };
+  Object.keys(extra || {}).forEach(function (k) { payload[k] = extra[k]; });
+  var res = UrlFetchApp.fetch(url, {
+    method: 'post', contentType: 'application/json', payload: JSON.stringify(payload),
+    headers: { 'x-notices-secret': secret }, muteHttpExceptions: true
+  });
+  var body = JSON.parse(res.getContentText() || '{}');
+  if (res.getResponseCode() !== 200) throw new Error('The hub said ' + res.getResponseCode() + ': ' + (body.message || 'no reason'));
+  return body;
+}
+
+// Run by a daily time-driven trigger (see the README). Sends at most one
+// email per person per run, and tells the hub who was sent one, so the
+// same note is never sent twice.
+function sendNotices() {
+  if (!noticesOn(props_().getProperty('NOTICES_ON'))) {
+    console.log('Notices are off. Set NOTICES_ON to true in Script Properties to send them.');
+    return 'off';
+  }
+  var people = askNotices_('digest').people || [];
+  var sent = [];
+  people.forEach(function (p) {
+    var mail = noticeEmail(p);
+    if (!mail) return;
+    MailApp.sendEmail({ to: mail.to, subject: mail.subject, body: mail.body, name: 'Human Shaped' });
+    sent.push(p.user_id);
+  });
+  if (sent.length) askNotices_('sent', { ids: sent });
+  var msg = 'Sent ' + sent.length + ' notice(s). Mail left today: ' + MailApp.getRemainingDailyQuota() + '.';
+  console.log(msg);
+  return msg;
+}

@@ -137,6 +137,46 @@ it an id.
 | `setupCohort` | Makes (or updates) the event, the Meet link, the guest list and the folder, syncs the folder's sharing to the roster, makes each group's room (see above), prints the line for the recorder extension, then runs the check. Running it again after a roster change brings everything back in line. |
 | `checkCohort` | The "check it works" report: the event exists, repeats the right number of weeks, starts at the right time, links the session page, has a Meet link, and invites exactly the roster; the folder exists, belongs to meet@, is shared with exactly the roster, has no "anyone with the link" sharing, and has no cohort recordings stranded outside it; and each group has its room (with the Meet API, TRUSTED and with the right members). Changes nothing. |
 | `fileStrayRecordings` | Moves recorder uploads that landed at the top of My Drive into the cohort's folder (see the recorder's README for why that can happen). |
+| `sendNotices` | Off unless `NOTICES_ON` is `true`. Asks the hub who asked to hear when something is waiting for them, emails each of them one short line with a link (never the words of a note or feedback), and tells the hub who was sent one. Meant for a daily trigger. |
+
+### "Something is waiting for you" emails (G4)
+
+*Written by Claude, awaiting Ben's review.* On /account/, a person can ask
+for a short email when a teacher writes them a note or someone answers
+what they shared (research/notes/reach-notes.md). This script sends it,
+as meet@, at most once a day per person. Apps Script allows 1,500 email
+recipients a day on a Workspace account
+(https://developers.google.com/apps-script/guides/services/quotas).
+
+The script never reads the database itself. It asks the hub's `notices`
+Edge Function, which hands back an address and two counts per person and
+nothing else, and only to a caller holding a shared secret. Ben's steps,
+once, in order:
+
+1. **Make the secret.** Any long random string, for example from
+   `openssl rand -hex 32`. It goes in two places below and nowhere else,
+   never in this repository.
+2. **Give it to the hub.** In Supabase, Edge Functions, Secrets, add
+   `NOTICES_SECRET`. (The agent deploys the `notices` function with
+   verify_jwt off, the same way as `mcp`.)
+3. **Give it to the script.** Script Properties: `NOTICES_SECRET` (the
+   same string), `NOTICES_URL`
+   (`https://bifrieqzkihuxfzttgvd.supabase.co/functions/v1/notices`), and
+   `NOTICES_ON` = `true`.
+4. **Allow the new scope.** `appsscript.json` now asks for
+   `script.send_mail`; run `whoAmI` and press Allow.
+5. **Run `sendNotices` once from the editor.** With no one waiting it
+   says "Sent 0 notice(s)" and how much mail is left today.
+6. **Add the daily trigger.** Triggers, Add Trigger, `sendNotices`,
+   time-driven, day timer, at an hour that suits the cohort.
+
+*Check:* sign in as a test student, turn on "Email me ... when a teacher
+writes me a note" on /account/ with an address you can read, have a
+teacher send that student a note, wait 20 hours (or, for a test, run
+`sendNotices` the next day), and see one email arrive with no words of
+the note in it. Run `sendNotices` again and nothing more is sent.
+
+To stop it at once, set `NOTICES_ON` to anything but `true`.
 
 The report reads like this:
 
@@ -252,7 +292,8 @@ services and asks for exactly these scopes:
 | `spreadsheets.readonly` | Read the Cohorts sheet, if you use one. |
 | `userinfo.email` | Confirm the script runs as meet@. |
 | `meetings.space.created` | Make each group's room as a Meet space, and set its access and members (only with `ROOMS_VIA_MEET_API`). |
-| `script.external_request` | Call the Meet REST API, which has no advanced service in Apps Script. |
+| `script.external_request` | Call the Meet REST API, which has no advanced service in Apps Script, and ask the hub's `notices` function who to email. |
+| `script.send_mail` | Send the "something is waiting for you" email, only to people who asked for it, and only when `NOTICES_ON` is `true`. |
 
 ## Tests
 

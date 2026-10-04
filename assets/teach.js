@@ -315,6 +315,7 @@
     box.hidden = !last;
     if (!last) return;
     var since = last.starts_at;
+    var reachLoaded = loadReach();
     var names = {};
     people.forEach(function (p) { names[p.user_id] = personName(p); });
     var nameOf = function (id) { return id === me.id ? 'You' : (names[id] || 'Someone'); };
@@ -364,10 +365,36 @@
         res[1].data.map(function (x) { return { user_id: x.user_id, at: x.created_at }; }),
         res[2].data.map(function (x) { return { user_id: x.user_id, at: x.updated_at }; }),
         res[3].data.map(function (x) { return { user_id: x.author_id, at: x.created_at }; }));
-      drawNotSeen(lib.notSeen(people, since, activity), last);
+      reachLoaded.then(function () { drawNotSeen(lib.notSeen(people, since, activity), last); });
     });
 
-    loadFollowups(last, sessions, people, nameOf);
+    reachLoaded.then(function () { loadFollowups(last, sessions, people, nameOf); });
+  }
+
+  // How each person chose to be reached when they are not on the site
+  // (research/notes/reach-notes.md): an address only for someone who said
+  // their teachers may email them. Before the hub's database has
+  // reach_choices, everyone is reached through notes, as before.
+  var R = window.ReachLib;
+  var reachBy = {};
+  function loadReach() {
+    reachBy = {};
+    if (!R) return Promise.resolve();
+    return db.rpc('reach_for', { c: current.id }).then(function (r) {
+      reachBy = r.error ? {} : R.byPerson(r.data);
+    }, function () { reachBy = {}; });
+  }
+
+  // A link that opens the teacher's own mail to this person, with their
+  // draft in it, or null if the person has not allowed email.
+  function emailLink(p, draft) {
+    var way = reachBy[p.user_id];
+    if (!R || !way || !way.mayEmail) return null;
+    var href = R.mailtoHref(way.email, R.reachSubject(current.title), draft || '');
+    if (!href) return null;
+    var a = el('a', null, 'Write to ' + personName(p) + ' from your own email');
+    a.href = href;
+    return a;
   }
 
   // ---- follow-ups ---------------------------------------------------
@@ -544,7 +571,18 @@
     send.disabled = target.kind === 'note' && !notesReady;
     var msg = el('span', 'small'); msg.setAttribute('role', 'status');
     var acts = el('div', 'actions'); acts.appendChild(send); acts.appendChild(msg); form.appendChild(acts);
+    // When they said their teachers may email them, the same draft can go
+    // privately from the teacher's own mail instead (reach-notes.md).
+    var mail = emailLink(p, input.value);
+    if (mail) {
+      var alt = el('p', 'small');
+      alt.appendChild(document.createTextNode('Or, privately, since they said you may email them: '));
+      alt.appendChild(mail);
+      alt.appendChild(document.createTextNode('. It opens your own mail with this draft in it, and nothing is sent until you send it there.'));
+      form.appendChild(alt);
+    }
     input.addEventListener('input', function () {
+      if (mail) mail.href = R.mailtoHref(reachBy[p.user_id].email, R.reachSubject(current.title), input.value);
       var kept = F.saveDraft(store, key, input.value);
       draftFlag.hidden = !input.value.trim();
       msg.textContent = !input.value.trim() ? '' : kept ? 'Draft kept in this browser only.' : 'This browser will not keep drafts, so send it before you leave the page.';
@@ -610,6 +648,11 @@
         var gh = el('a', null, ' @' + p.profiles.github_login); gh.href = 'https://github.com/' + encodeURIComponent(p.profiles.github_login);
         li.appendChild(gh);
       }
+      var mail = emailLink(p, '');
+      var how = el('span', 'small followup-line');
+      if (mail) { how.appendChild(document.createTextNode('They said you may email them. ')); how.appendChild(mail); }
+      else how.textContent = 'They have not chosen email, so a note to them, in their follow-up below, is how your words reach them.';
+      li.appendChild(how);
       ul.appendChild(li);
     });
   }
