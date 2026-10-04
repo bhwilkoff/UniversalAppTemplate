@@ -144,7 +144,7 @@ what waits on Ben.
 - **Scripts:** `assets/hub-config.js` (public URL and publishable key),
   `hub.js`, `cohorts.js`, `teach.js` with `teach-lib.js`, `cohort.js` and `live.js`
   with `cohort-lib.js` and `live-lib.js`, and `apps.js` with `apps-lib.js`. Pure logic lives in the `-lib.js` files with
-  tests in `tools/test/` (`node --test tools/test/*.mjs`, 325 tests).
+  tests in `tools/test/` (`node --test tools/test/*.mjs`, 326 tests).
 - **The cohort's conversation:** `discussions.js` with `discussions-lib.js`
   reads and posts the cohort repository's GitHub Discussions on /cohort/
   and /live/ with the student's own GitHub token. That token is kept in

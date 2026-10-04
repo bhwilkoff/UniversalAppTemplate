@@ -151,7 +151,7 @@
     (data.checks || []).forEach(function (k) { checks[k.id] = k; });
     var answers = (data.answers || []).filter(function (a) { return a.user_id === userId && checks[a.check_id]; }).map(function (a) {
       var k = checks[a.check_id];
-      return { prompt: k.prompt, text: answerText(k, a), muddy: isMuddy(k.prompt), at: k.created_at };
+      return { prompt: k.prompt, kind: k.kind || (k.choices ? 'choice' : 'short'), text: answerText(k, a), muddy: isMuddy(k.prompt), at: k.created_at };
     }).sort(function (a, b) { return (b.muddy - a.muddy) || String(a.at).localeCompare(String(b.at)); });
     var given = [], received = [], fromTeachers = [];
     (data.shares || []).forEach(function (s) {
@@ -181,6 +181,36 @@
     c.empty = !c.bringBacks.length && !c.otherShares.length && !c.queue.length && !c.answers.length && !c.given.length;
     c.muddy = answers.filter(function (a) { return a.muddy && a.text; })[0] || null;
     return c;
+  }
+
+  // ------------------------------------------------------------------
+  // The follow-up built from the show (R8)
+  // ------------------------------------------------------------------
+
+  var KIND_NAMES = { talk: 'Talk', presenter: 'Presenter', question: 'Question', design: 'Design stage', rooms: 'Rehearsal rooms', 'break': 'Break', reflection: 'Reflection' };
+
+  // The session's run of show as it was planned, in order, for the top
+  // of the follow-ups: each scene's kind, title, and minutes.
+  function showAsRun(scenes) {
+    return (scenes || []).slice().sort(function (a, b) { return a.position - b.position; }).map(function (s) {
+      return { kind: KIND_NAMES[s.kind] || s.kind, title: s.title, minutes: s.minutes };
+    });
+  }
+
+  // A student's trio for this session, with their partners' names, or
+  // null when they are in no group.
+  function roomOf(userId, groups, nameOf) {
+    var g = (groups || []).filter(function (x) { return (x.group_members || []).some(function (m) { return m.user_id === userId; }); })[0];
+    if (!g) return null;
+    var partners = g.group_members.map(function (m) { return m.user_id; }).filter(function (id) { return id !== userId; });
+    return { name: g.name, partners: partners.map(nameOf) };
+  }
+
+  // What they put in the wings, split into what they presented to
+  // everyone and what the session ran out of time for.
+  function presented(queue) {
+    var q = queue || [];
+    return { shown: q.filter(function (x) { return x.state === 'shown'; }), waiting: q.filter(function (x) { return x.state !== 'shown'; }) };
   }
 
   // Where a follow-up goes so the student will see it: as feedback on
@@ -247,7 +277,7 @@
 
   var lib = {
     cohortRepos: cohortRepos, commitsUrl: commitsUrl, agentOf: agentOf, normalizeCommits: normalizeCommits, pushedSince: pushedSince, unreadText: unreadText,
-    sessionWindow: sessionWindow, within: within, contributions: contributions, followupTarget: followupTarget, followupOrder: followupOrder, checkBody: checkBody,
+    sessionWindow: sessionWindow, within: within, contributions: contributions, showAsRun: showAsRun, roomOf: roomOf, presented: presented, followupTarget: followupTarget, followupOrder: followupOrder, checkBody: checkBody,
     draftKey: draftKey, loadDraft: loadDraft, saveDraft: saveDraft, clearDraft: clearDraft, draftCount: draftCount
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;

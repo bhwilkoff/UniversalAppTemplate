@@ -171,3 +171,21 @@ test('drafts fail quietly when the browser refuses storage', () => {
   assert.equal(lib.saveDraft(null, 'k', 'x'), false);
   assert.equal(lib.draftCount(refusing, 'co1'), 0);
 });
+
+test('the follow-up is built from the show: its scenes, each student’s room, and what they presented (R8)', () => {
+  const F = createRequire(import.meta.url)('../../assets/followup-lib.js');
+  assert.deepEqual(F.showAsRun([{ position: 1, kind: 'rooms', title: 'Show what you brought back', minutes: 25 }, { position: 0, kind: 'talk', title: 'Arrive', minutes: 5 }]),
+    [{ kind: 'Talk', title: 'Arrive', minutes: 5 }, { kind: 'Rehearsal rooms', title: 'Show what you brought back', minutes: 25 }]);
+  const groups = [{ name: 'Trio A', group_members: [{ user_id: 'bea' }, { user_id: 'cal' }, { user_id: 'dee' }] }];
+  const nameOf = (id) => ({ cal: 'Cal', dee: 'Dee' })[id];
+  assert.deepEqual(F.roomOf('bea', groups, nameOf), { name: 'Trio A', partners: ['Cal', 'Dee'] });
+  assert.equal(F.roomOf('eve', groups, nameOf), null);
+  const p = F.presented([{ id: 1, state: 'shown' }, { id: 2, state: 'waiting' }]);
+  assert.deepEqual([p.shown.map((x) => x.id), p.waiting.map((x) => x.id)], [[1], [2]]);
+  const c = F.contributions('bea', { start: '2026-10-01T00:00:00Z', end: '2026-10-30T00:00:00Z' }, {
+    checks: [{ id: 'k', kind: 'scale', prompt: 'How sure?', points: 5, created_at: '2026-10-20T23:00:00Z' }],
+    answers: [{ check_id: 'k', user_id: 'bea', choice: 4 }]
+  });
+  assert.equal(c.answers[0].kind, 'scale');
+  assert.equal(c.answers[0].text, '4 of 5');
+});

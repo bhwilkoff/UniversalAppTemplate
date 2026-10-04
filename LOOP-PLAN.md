@@ -1138,13 +1138,23 @@ student).
   under the presenter's work. ShowViewLib.onStageNow, nextFromWings,
   audienceOf; 325 node tests. Not seen in a browser beyond the tests,
   and not yet in a real call.
+- **R8, the follow-up built from the show (merged, no migration,
+  October 4, cloud session):** C7's follow-ups on /teach/ gain the
+  session's run of show as it was planned (a folded list above the
+  cards), and on each student's card their trio and partners, what they
+  presented to everyone apart from what the session did not reach, and
+  each answer with its question's kind. FollowupLib.showAsRun, roomOf,
+  presented; 326 node tests. Not built: the design note's "their
+  room's notes" (rooms keep no notes today) and the session thread
+  inside the follow-up (reading it needs the teacher's GitHub token,
+  which /teach/ does not hold). Not yet tried signed in.
 
 ## Handoff (October 4, 2026, evening)
 
-Merged and live: G1 to G7, H1 to H6, C0 to C9, R1 to R3, R4's pages, R5, R6, R7,
+Merged and live: G1 to G7, H1 to H6, C0 to C9, R1 to R3, R4's pages, R5 to R8,
 Google sign-in beside GitHub, the listing materials, meet@'s script
 with its triggers, the community repository, and the credential
-signing key. 680 database checks, 325 node tests.
+signing key. 680 database checks, 326 node tests.
 
 R4, the question bank, is merged (see its log entry). Half of its
 database change is applied; **the first step on this Mac is to apply
@@ -1163,11 +1173,22 @@ R6, rehearsal rooms around scenes, is merged and its migration applied
 
 R7, the wings and the presenter, is merged (see its log entry).
 
-Next, from research/notes/run-of-show-design.md: R8 (follow-up built
-from the show), then the listing (tools/meet-addon/LISTING.md)
-once a real call with the Gmail test student has gone well. The loop
-arms each next tick with send_later, which survives a container
-restart (ScheduleWakeup did not).
+R8, the follow-up built from the show, is merged (see its log entry),
+so R1 to R8 are all built. What is left of the run of show waits on a
+real call: the next one should exercise R3 to R8 with the Gmail test
+student (question kinds, the board on the main stage and whether it is
+signed in there, a rehearsal room's clock, the wings, and the
+follow-ups afterwards), and then the listing
+(tools/meet-addon/LISTING.md).
+
+The one unblocked item left for a cloud session: the board's two-page
+check (tools/board/sync-check.mjs) fails "both draw at once" about
+three runs in four in the cloud container, on code from before R5 as
+well. Find whether it is the check's timing or a real convergence bug,
+and fix whichever it is. After that, the loop has nothing it can do
+without Ben, and should stop and say so. The loop arms each next tick
+with send_later, which survives a container restart (ScheduleWakeup
+did not).
 
 What only this Mac has: ~/.humanshaped/supabase-token (Management API),
 ~/.humanshaped/credential-key-1.json (signing), ~/.humanshaped/test-student,

@@ -483,7 +483,10 @@
       db.from('cohort_teachers').select('user_id, profiles(github_login, display_name)').eq('cohort_id', current.id),
       // Read on its own: before migration 20261003130000 the table is not
       // there, and follow-ups can still go as feedback on a bring-back.
-      db.from('teacher_notes').select('id, student_id, author_id, body, created_at').eq('cohort_id', current.id)
+      db.from('teacher_notes').select('id, student_id, author_id, body, created_at').eq('cohort_id', current.id),
+      // The session's run of show (R8), on its own: a week with none, or a
+      // database before migration 20261004050000, simply has no list.
+      db.from('scenes').select('position, kind, title, minutes').eq('session_id', last.id)
     ]).then(function (res) {
       var bad = res.slice(0, 4).filter(function (r) { return r.error; })[0];
       if (bad) { box.replaceChildren(el('p', 'small error', 'The follow-ups could not be gathered: ' + bad.error.message)); return; }
@@ -499,7 +502,8 @@
         drawFollowups(last, people, w, {
           teacherIds: res[3].data.map(function (t) { return t.user_id; }),
           shares: res[0].data, queue: res[1].data, checks: res[2].data, answers: a.data,
-          notes: res[4].error ? [] : res[4].data
+          notes: res[4].error ? [] : res[4].data,
+          scenes: res[5].error ? [] : res[5].data
         }, !res[4].error, who);
       });
     });
@@ -514,6 +518,22 @@
     say('[data-followups-intro]', order.length
       ? 'What each person did on purpose around week ' + last.number + '’s session, from what they brought back to the feedback they gave, with a place to write to them. Anyone who said something is still muddy comes first. A draft stays in this browser alone until you send it, and sending puts your words where they will see them: on their bring-back, or, if they brought nothing back, as a note on their cohort page that only they and the cohort’s teachers can read. Every word is yours to write.'
       : 'Once people join, each of them is listed here after every session, with a place to write to them.');
+    // The show as it ran (R8): what everyone did together, above what each
+    // person did.
+    var show = F.showAsRun(data.scenes);
+    if (show.length) {
+      var ran = el('details', 'followup-show');
+      ran.appendChild(el('summary', null, 'Week ' + last.number + '’s run of show'));
+      var ol = el('ol', 'show-glance');
+      show.forEach(function (s) {
+        var li = el('li');
+        li.appendChild(el('span', 'scene-kind', s.kind));
+        li.appendChild(document.createTextNode(' ' + s.title + ', ' + s.minutes + ' min'));
+        ol.appendChild(li);
+      });
+      ran.appendChild(ol);
+      box.appendChild(ran);
+    }
     order.forEach(function (p) { box.appendChild(followupCard(p, byId[p.user_id], last, notesReady, who)); });
   }
 
@@ -596,9 +616,19 @@
       if (s.readiness === 'not-yet') li.appendChild(el('span', 'followup-line small', 'They marked it not yet' + (s.missing ? ', because ' + s.missing.charAt(0).toLowerCase() + s.missing.slice(1) : '.')));
       return li;
     }));
-    block('What they asked to show', c.queue.map(function (q) { return line((q.note ? '“' + q.note + '”, ' : '') + (q.state === 'shown' ? 'shown:' : 'not shown:'), q.url); }));
-    block('Their answers to the checks', c.answers.map(function (x) {
-      var li = el('li'); li.appendChild(el('strong', null, x.prompt + ' ')); li.appendChild(document.createTextNode(x.text || '(no answer)')); return li;
+    // Their room and what they presented (R8), from the show.
+    var room = F.roomOf(p.user_id, currentGroups, who);
+    if (room) body.appendChild(el('p', 'small followup-room', 'In ' + room.name + (room.partners.length ? ', with ' + room.partners.join(' and ') : '') + '.'));
+    var pres = F.presented(c.queue);
+    block('What they presented to everyone', pres.shown.map(function (q) { return line(q.note ? '“' + q.note + '”' : '', q.url); }));
+    block('What they asked to show and the session did not reach', pres.waiting.map(function (q) { return line(q.note ? '“' + q.note + '”' : '', q.url); }));
+    var QK = window.LiveLib ? window.LiveLib.questionKind : null;
+    block('Their answers to the questions', c.answers.map(function (x) {
+      var li = el('li'); li.appendChild(el('strong', null, x.prompt + ' '));
+      li.appendChild(document.createTextNode(x.text || '(no answer)'));
+      var k = QK ? QK(x.kind) : null;
+      if (k && x.kind !== 'short') li.appendChild(el('span', 'followup-line small', k.name));
+      return li;
     }));
     var KIND = { 'for-feedback': 'Asked for feedback', 'ai-review': 'Shared a review from their AI agent', question: 'Asked a question' };
     block('What else they shared', c.otherShares.map(function (s) { return line((KIND[s.kind] || s.kind) + (s.note ? ': ' + s.note : ''), s.url); }));

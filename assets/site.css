@@ -1425,6 +1425,11 @@ label.check { min-height: 2.25rem; }
 .question-scale:not([hidden]) { display: grid; gap: 0.6rem; }
 .show-glance { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.25rem; }
 .show-glance li { display: flex; gap: 0.6rem; align-items: baseline; }
+/* The show as it ran, above the follow-ups (R8). */
+.followup-show { margin: 0 0 1rem; }
+.followup-show > summary { cursor: pointer; font-weight: 600; padding: 0.4rem 0; }
+.followup-show .show-glance { margin-top: 0.4rem; }
+.followup-room { margin: 0 0 0.5rem; }
 
 /* ------------------------------------------------------------------
    The run of show (R1, assets/show-view.js): the same layout in the Meet
