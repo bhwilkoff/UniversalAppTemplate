@@ -184,10 +184,24 @@
     return { access_token: d.access_token, refresh_token: d.refresh_token };
   }
 
+  // The drawing board for this call (H4): the group's own board in a
+  // group's room, the session's board in the main room, and that board's
+  // stage view, the tab a teacher presents. The board opens in its own tab,
+  // because it needs the hub's sign-in and Meet keeps the panel's and the
+  // stage's storage apart from the site's (board-lib.js reads these links).
+  var BOARD_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  function boardLinks(cohort, session, groupId) {
+    if (!cohort || !cohort.slug || !session || session.number == null) return null;
+    var q = '/board/?c=' + encodeURIComponent(cohort.slug) + '&s=week-' + Number(session.number);
+    var g = groupId && BOARD_UUID.test(groupId) ? groupId.toLowerCase() : null;
+    if (g) q += '&g=' + g;
+    return { board: q, stage: q + '&view=stage', group: !!g };
+  }
+
   var lib = {
     meetingCode: meetingCode, findRoom: findRoom, panelPlan: panelPlan, timeLeft: timeLeft,
     stageView: stageView, stageMessage: stageMessage, readStageMessage: readStageMessage, HELLO: HELLO, isHello: isHello,
-    handoff: handoff, acceptHandoff: acceptHandoff
+    handoff: handoff, acceptHandoff: acceptHandoff, boardLinks: boardLinks
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
   else root.AddonLib = lib;

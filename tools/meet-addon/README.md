@@ -94,6 +94,55 @@ nothing depends on your own login.
    the choice between private and public "can't" be changed once it is
    saved. Testing needs only step 6, so leave this until we list it.
 
+## Who can use it
+
+*Written by Claude, awaiting Ben's review. Read on October 4, 2026.*
+
+Right now, only meet@humanshaped.org. The add-on is an HTTP deployment
+installed for testing, and Google's guide says that to test it "you must
+first install it for the signed-in user," which is one person, the one
+who presses Install in the Cloud project
+([Deploy a Meet add-on](https://developers.google.com/workspace/meet/add-ons/guides/deploy-add-on)).
+That guide does not say whether someone added to the Cloud project could
+press Install for themselves; we have not tried it.
+
+The people in the call do not need it installed to follow along. When
+someone starts an activity, Google says everyone in the call is told it
+started, and anyone without the add-on is "directed to install" it
+([Collaborate using a Meet add-on](https://developers.google.com/workspace/meet/add-ons/guides/collaborate-in-the-add-on)).
+Students do not need the add-on at all: everything it shows is also on
+the session page, /live/.
+
+A teacher outside humanshaped.org (a G1 teacher on their own school's
+account, or on a personal Gmail) has three ways, and only one of them
+works today:
+
+1. **The session page, now.** Everything in the panel, including the
+   teacher's controls for rooms, cards, the stage, and recording (H4),
+   is on /live/ in a tab beside Meet. This is the way for every
+   teacher who is not meet@ until the add-on is listed.
+2. **Private visibility does not reach them.** Google's Marketplace SDK
+   says a private app is one where "only people within your domain can
+   find and install your app"
+   ([Configure your app](https://developers.google.com/workspace/marketplace/enable-configure-sdk)),
+   so a private listing would reach humanshaped.org accounts and nobody
+   else.
+3. **Public, or Unlisted, reaches them, after Google's review.** Public
+   "can be found and installed by people outside your domain," and
+   Google reviews it before it is published. Unlisted keeps the listing
+   out of search, so only people with its link can install it; the page
+   does not say whether Unlisted is reviewed the same way, so plan as if
+   it is. With "Individual + Admin Install" (the default), a teacher can
+   install it for themselves, or their own school's administrator can
+   install it for the whole school.
+
+Google says the visibility choice is permanent: "Once you choose a
+visibility option and save the App Configuration page, you can't change
+your selection later." Since the goal is open and free, Public is the
+choice that fits, and Unlisted is the careful step if you want teachers
+to have it by link before anyone can find it by searching. Either way,
+choose once, after the test call.
+
 ## Listing it publicly, later
 
 When the test call works, the public listing needs what we do not have
