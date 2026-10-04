@@ -860,8 +860,14 @@ October 3, after every C milestone that does not wait on Ben merged):
   shape only, no markers in the template. Marks live in the browser when
   signed out and in `stage_marks` (owner only) when signed in, merged on
   sign-in. /path/ shows "Marked ready", /account/ "Your path". 454
-  database checks, 226 node tests. Checked signed out at 375px; signed
-  in not yet tried.
+  database checks, 226 node tests. Checked signed out at 375px, and live
+  signed in as Ben: a step and the ready choice were saved to
+  stage_marks, then removed. Not yet tried: merging browser marks on
+  sign-in, and "Bring it back" from a real cohort.
+- Still building when the loop paused (October 3): G4 (reach, branch
+  `g4-reach`) and G5 (events and community, branch `g5-community`).
+  Review, merge, and apply their migrations on the next tick. G1 and G2
+  are next after them.
 
 ## Where to pick up
 
