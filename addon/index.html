@@ -132,22 +132,13 @@
           <div class="actions addon-closing" data-closing-wrap hidden>
             <button class="btn-quiet" type="button" data-ask-closing>Ask the two closing questions</button>
           </div>
+          <div class="live-scene-question" data-scene-question hidden></div>
           <div class="live-checks" data-checks></div>
           <details class="addon-ask" data-ask-wrap hidden>
             <summary>Ask a question</summary>
             <form class="inline-form" data-ask>
-              <label>Your question
-                <textarea rows="3" maxlength="500" required data-ask-prompt></textarea>
-              </label>
-              <fieldset class="live-mode">
-                <legend>People answer</legend>
-                <label class="check"><input type="radio" name="ask-mode" value="words" checked> In their own words</label>
-                <label class="check"><input type="radio" name="ask-mode" value="choices"> By choosing one</label>
-              </fieldset>
-              <label data-ask-choices-wrap hidden>Choices, one on each line
-                <textarea rows="4" data-ask-choices></textarea>
-              </label>
-              <label class="check"><input type="checkbox" data-ask-tally> Show everyone the count as answers come in</label>
+              <div data-ask-fields></div>
+              <label class="check"><input type="checkbox" data-ask-tally> Show everyone the results as answers come in</label>
               <div class="actions"><button class="btn-quiet" type="submit">Ask everyone</button></div>
             </form>
           </details>
@@ -174,6 +165,7 @@
   <script src="/assets/addon-config.js" defer></script>
   <script src="/assets/cohort-lib.js" defer></script>
   <script src="/assets/live-lib.js" defer></script>
+  <script src="/assets/question-view.js" defer></script>
   <script src="/assets/addon-lib.js" defer></script>
   <script src="/assets/discussions-lib.js" defer></script>
   <script src="/assets/session-thread-lib.js" defer></script>

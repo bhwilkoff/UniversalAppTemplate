@@ -1,6 +1,14 @@
 // Pure calculations for the teacher page, kept apart from the page so
 // they can be tested on their own (tools/test/teach-lib.test.mjs).
 (function (root) {
+  // What someone answered, in words, for every kind of question (R4):
+  // LiveLib knows them all; without it, a choice or their own words.
+  function answerText(k, a) {
+    var L = root.LiveLib || (typeof require === 'function' ? require('./live-lib.js') : null);
+    if (L) return L.answerText(k, a) || '';
+    return k.choices ? (k.choices[a.choice - 1] || '') : (a.body || '');
+  }
+
   var WEEKDAYS = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
 
   // The UTC instant for a wall-clock date and time in a time zone, so a
@@ -111,10 +119,10 @@
       var rows = (answers || []).filter(function (a) { return a.check_id === k.id; })
         .sort(function (a, b) { return String(a.updated_at || a.created_at).localeCompare(String(b.updated_at || b.created_at)); })
         .map(function (a) {
-          var text = k.choices ? (k.choices[a.choice - 1] || '') : (a.body || '');
+          var text = answerText(k, a);
           return { user_id: a.user_id, name: nameOf(a.user_id), text: text };
         });
-      return { id: k.id, prompt: k.prompt, choices: k.choices || null, answers: rows };
+      return { id: k.id, kind: k.kind || null, prompt: k.prompt, choices: k.choices || null, points: k.points || null, answers: rows };
     });
   }
 

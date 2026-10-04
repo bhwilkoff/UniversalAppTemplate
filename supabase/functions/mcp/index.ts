@@ -225,21 +225,21 @@ Deno.serve(
           if (!session) return text(thisSessionText(c, null, false, [], [], [], {}, uid));
           const [queue, checks, answers] = await Promise.all([
             supabase.from('live_queue').select('user_id, kind, url, note, state, created_at').eq('session_id', session.id),
-            supabase.from('live_checks').select('id, prompt, choices, state, show_tally').eq('session_id', session.id),
-            supabase.from('live_answers').select('check_id, choice, body').eq('cohort_id', c.id).eq('user_id', uid),
+            supabase.from('live_checks').select('id, kind, prompt, choices, points, state, show_tally').eq('session_id', session.id),
+            supabase.from('live_answers').select('check_id, choice, body, value').eq('cohort_id', c.id).eq('user_id', uid),
           ]);
           const bad = [queue, checks, answers].find((r) => r.error);
           if (bad) throw new Error(bad.error.message);
           // Classmates' items are counted, never described (shape.js).
           // deno-lint-ignore no-explicit-any
           const items = queue.data.map((q: any) => ({ ...q, label: LiveLib.itemLabel(q) }));
-          // check_tally answers only when the teacher has shown the count (or to the cohort's teachers).
+          // check_results answers only when the teacher has shown the results (or to the cohort's teachers).
           // deno-lint-ignore no-explicit-any
-          const counted = checks.data.filter((k: any) => k.state === 'open' && k.choices);
-          const tallies: Record<string, unknown[]> = {};
+          const counted = checks.data.filter((k: any) => k.state === 'open' && LiveLib.kindOf(k) !== 'short');
+          const tallies: Record<string, unknown> = {};
           await Promise.all(counted.map(async (k: { id: string }) => {
-            const r = await supabase.rpc('check_tally', { c: k.id });
-            if (!r.error && r.data.length) tallies[k.id] = r.data;
+            const r = await supabase.rpc('check_results', { c: k.id });
+            if (!r.error && r.data) tallies[k.id] = r.data;
           }));
           return text(thisSessionText(c, session, t.live, items, checks.data, answers.data, tallies, uid));
         });
@@ -337,7 +337,7 @@ Deno.serve(
           const sid = person.user_id;
           const [shares, answers, queue, given, notes] = await Promise.all([
             supabase.from('shares').select('*, feedback(author_id, body, created_at)').eq('cohort_id', c.id).eq('user_id', sid),
-            supabase.from('live_answers').select('choice, body, live_checks(prompt, choices, created_at, sessions(number))').eq('cohort_id', c.id).eq('user_id', sid),
+            supabase.from('live_answers').select('choice, body, value, live_checks(kind, prompt, choices, points, created_at, sessions(number))').eq('cohort_id', c.id).eq('user_id', sid),
             supabase.from('live_queue').select('kind, url, note, state, created_at, sessions(number)').eq('cohort_id', c.id).eq('user_id', sid).order('created_at'),
             supabase.from('feedback').select('body, created_at, shares!inner(cohort_id, user_id)').eq('author_id', sid).eq('shares.cohort_id', c.id).order('created_at'),
             // Read on its own: before migration 20261003130000, this fails quietly.
@@ -385,14 +385,14 @@ Deno.serve(
           const [who, queue, checks] = await Promise.all([
             peopleOf(c.id),
             supabase.from('live_queue').select('user_id, kind, url, note, state, created_at').eq('session_id', session.id),
-            supabase.from('live_checks').select('id, prompt, choices, state, created_at').eq('session_id', session.id),
+            supabase.from('live_checks').select('id, kind, prompt, choices, points, state, created_at').eq('session_id', session.id),
           ]);
           if (queue.error) throw new Error(queue.error.message);
           if (checks.error) throw new Error(checks.error.message);
           // deno-lint-ignore no-explicit-any
           const checkIds = checks.data.map((k: any) => k.id);
           const answers = checkIds.length
-            ? await supabase.from('live_answers').select('check_id, user_id, choice, body, updated_at').in('check_id', checkIds)
+            ? await supabase.from('live_answers').select('check_id, user_id, choice, body, value, updated_at').in('check_id', checkIds)
             : { data: [], error: null };
           if (answers.error) throw new Error(answers.error.message);
           const nameOf = (id: string) => who.names[id] || 'Someone';

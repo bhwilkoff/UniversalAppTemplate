@@ -90,7 +90,8 @@
   // name on /live/.
   //   state.part     { key, name, endsAt }   endsAt in ms, or null
   //   state.onStage  { kind: 'check', id } or { kind: 'item', id } or null
-  //   state.checks   live_checks rows; state.tallies { [checkId]: check_tally rows }
+  //   state.checks   live_checks rows; state.results { [checkId]: check_results }
+  //                  (or, from a page before R4, state.tallies { [checkId]: check_tally rows })
   //   state.items    live_queue rows;  state.names { [userId]: name }
   //   state.welcome  CohortLib.welcome(), shown when the teacher puts it
   //                  on the stage, and before any part has begun
@@ -103,10 +104,23 @@
     if (on && on.kind === 'check') {
       var k = (state.checks || []).filter(function (x) { return x.id === on.id; })[0];
       if (k && k.state === 'open') {
-        var view = { mode: 'check', part: part, prompt: cut(k.prompt, 500), choices: k.choices ? k.choices.map(function (c) { return cut(c, 120); }) : null, count: null };
-        if (k.show_tally && k.choices && live()) {
-          var t = live().tally(k, (state.tallies || {})[k.id] || []);
-          view.count = { total: t.total, rows: t.rows.map(function (r) { return { label: cut(r.label, 120), count: r.count, share: r.share }; }) };
+        var L = live();
+        var kind = L ? L.kindOf(k) : (k.choices ? 'choice' : 'short');
+        var labels = kind === 'scale' && L ? L.scaleLabels(k) : kind === 'short' || kind === 'words' ? null : k.choices;
+        var view = { mode: 'check', part: part, kind: kind, prompt: cut(k.prompt, 500), choices: labels ? labels.map(function (c) { return cut(c, 120); }) : null, count: null };
+        if (k.show_tally && kind !== 'short' && L) {
+          var summary = (state.results || {})[k.id];
+          if (!summary && state.tallies) {
+            var t = L.tally(k, state.tallies[k.id] || []);
+            summary = { total: t.total, counts: t.rows.map(function (r) { return r.count; }) };
+          }
+          var r = L.results(k, summary);
+          view.count = {
+            total: r.total,
+            rows: r.rows.map(function (x) { return { label: cut(x.label, 120), count: x.count, share: x.share, text: cut(x.text, 20) }; }),
+            words: r.words.slice(0, 30).map(function (w) { return { word: cut(w.word, 60), size: w.size }; }),
+            note: r.note ? cut(r.note, 200) : null
+          };
         }
         return view;
       }
@@ -159,14 +173,22 @@
     var v = m.view;
     var part = v.part && typeof v.part.name === 'string' ? { key: String(v.part.key || ''), name: cut(v.part.name, 80), endsAt: num(v.part.endsAt) } : null;
     if (v.mode === 'check' && typeof v.prompt === 'string') {
-      var choices = Array.isArray(v.choices) ? v.choices.slice(0, 6).map(function (c) { return cut(c, 120); }) : null;
+      var choices = Array.isArray(v.choices) ? v.choices.slice(0, 10).map(function (c) { return cut(c, 120); }) : null;
+      var kinds = ['choice', 'multi', 'short', 'scale', 'words', 'rank'];
       var count = null;
       if (v.count && num(v.count.total) != null && Array.isArray(v.count.rows)) {
-        count = { total: Number(v.count.total), rows: v.count.rows.slice(0, 6).map(function (r) {
-          return { label: cut(r.label, 120), count: Number(r.count) || 0, share: Math.max(0, Math.min(100, Number(r.share) || 0)) };
-        }) };
+        count = {
+          total: Number(v.count.total),
+          rows: v.count.rows.slice(0, 10).map(function (r) {
+            return { label: cut(r.label, 120), count: Number(r.count) || 0, share: Math.max(0, Math.min(100, Number(r.share) || 0)), text: cut(r.text == null ? String(Number(r.count) || 0) : r.text, 20) };
+          }),
+          words: Array.isArray(v.count.words) ? v.count.words.slice(0, 30).filter(function (w) { return w && typeof w.word === 'string'; }).map(function (w) {
+            return { word: cut(w.word, 60), size: Math.max(1, Math.min(5, Math.round(Number(w.size) || 1))) };
+          }) : [],
+          note: typeof v.count.note === 'string' && v.count.note ? cut(v.count.note, 200) : null
+        };
       }
-      return { mode: 'check', part: part, prompt: cut(v.prompt, 500), choices: choices, count: count };
+      return { mode: 'check', part: part, kind: kinds.indexOf(v.kind) >= 0 ? v.kind : 'choice', prompt: cut(v.prompt, 500), choices: choices, count: count };
     }
     if (v.mode === 'item' && typeof v.what === 'string') {
       return { mode: 'item', part: part, who: cut(v.who || 'Someone', 80), what: cut(v.what, 200), note: v.note ? cut(v.note, 300) : null };

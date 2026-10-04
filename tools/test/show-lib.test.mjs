@@ -77,3 +77,18 @@ test('the shared board is the design stage', () => {
   assert.equal(S.problem({ kind: 'design', title: 'Sketch the screen', minutes: 10, config: { template: 'Phone screen' } }), null);
   assert.match(S.stagePreview({ kind: 'design', title: 'Sketch', minutes: 10, config: {} }).note, /blank/);
 });
+
+test('a question scene carries its kind, and the stage preview says how it is answered (R4)', () => {
+  const ok = { kind: 'question', title: 'Check', minutes: 5, config: { prompt: 'How sure?', kind: 'scale', points: 4, options: ['Not', 'Very'] } };
+  assert.equal(S.problem(ok), null);
+  assert.deepEqual(S.stagePreview(ok).items, ['1 (Not)', '2', '3', '4 (Very)']);
+  assert.match(S.problem({ ...ok, config: { prompt: 'x', kind: 'scale' } }), /three to ten/);
+  assert.match(S.problem({ ...ok, config: { prompt: 'x', kind: 'rank' } }), /two to eight/);
+  assert.match(S.problem({ ...ok, config: { prompt: 'x', kind: 'essay' } }), /kind of question/);
+  assert.match(S.problem({ ...ok, config: { prompt: 'x', points: 5 } }), /Only a scale/);
+  assert.match(S.problem({ ...ok, config: { prompt: 'x', kind: 'words', options: ['a', 'b'] } }), /no choices/);
+  const words = S.stagePreview({ kind: 'question', title: 'Word', minutes: 3, config: { prompt: 'One word', kind: 'words' } });
+  assert.deepEqual(words.items, []);
+  assert.match(words.note, /words show here together/);
+  assert.deepEqual(S.cleanConfig('question', { prompt: 'x', kind: 'multi', options: ['a', 'b'], question_id: 'q', template: 't' }), { prompt: 'x', kind: 'multi', options: ['a', 'b'], question_id: 'q' });
+});

@@ -12,7 +12,7 @@
   var KINDS = [
     { key: 'talk', name: 'Talk', what: 'You explain. The main stage shows a title and a few lines.', keys: [] },
     { key: 'presenter', name: 'Presenter', what: 'Someone from the wings shows their work, and the audience gets one thing to do.', keys: ['prompt'] },
-    { key: 'question', name: 'Question', what: 'Everyone answers, and the answers go on the main stage when you show them.', keys: ['prompt', 'options'] },
+    { key: 'question', name: 'Question', what: 'Everyone answers, and the answers go on the main stage when you show them.', keys: ['prompt', 'options', 'kind', 'points', 'question_id'] },
     { key: 'design', name: 'Design stage', what: 'The shared board on the main stage, where everyone draws together, blank or from a template.', keys: ['template'] },
     { key: 'rooms', name: 'Rehearsal rooms', what: 'Everyone goes to their trio’s room for a set time, and the room runs its own scenes.', keys: ['prompt', 'room_scenes'] },
     { key: 'break', name: 'Break', what: 'A pause, with the clock on the main stage.', keys: [] },
@@ -146,6 +146,16 @@
         if (!o || o.length > 120) return 'Keep each choice to one line, under 120 characters.';
       }
     }
+    // A question's kind (R4): the ones with choices need them, a scale
+    // needs its points, and its two ends are the only options it takes.
+    if (c.kind != null) {
+      if (['choice', 'multi', 'short', 'scale', 'words', 'rank'].indexOf(c.kind) === -1) return 'Choose what kind of question it is.';
+      if (['multi', 'rank'].indexOf(c.kind) >= 0 && !c.options) return 'A question with choices needs two to eight of them.';
+      if (c.kind === 'scale' && !(Number.isInteger(c.points) && c.points >= 3 && c.points <= 10)) return 'A scale has from three to ten points.';
+      if (c.kind === 'scale' && c.options && c.options.length !== 2) return 'A scale takes words for its two ends, or none.';
+      if (c.kind === 'words' && c.options) return 'A words question has no choices.';
+    }
+    if (c.points != null && c.kind !== 'scale') return 'Only a scale has points.';
     if (c.room_scenes) {
       if (c.room_scenes.length > 12) return 'A room can run at most twelve scenes.';
       for (var j = 0; j < c.room_scenes.length; j++) {
@@ -175,8 +185,19 @@
     if (scene.body) p.lines = String(scene.body).split(/\n{2,}/).map(function (x) { return x.trim(); }).filter(Boolean).slice(0, 4);
     if (k.key === 'question') {
       if (c.prompt) p.lines = [c.prompt];
-      p.items = (c.options || []).slice(0, 8);
-      p.note = p.items.length ? 'Answers show here, without names, when you show them.' : 'Answers in their own words, read by you, shown only if you choose.';
+      var qk = c.kind || (c.options && c.options.length ? 'choice' : 'short');
+      if (qk === 'scale') {
+        var n = Number(c.points) || 0, ends = c.options || [];
+        for (var i = 1; i <= n && i <= 10; i++) p.items.push(i === 1 && ends[0] ? '1 (' + ends[0] + ')' : i === n && ends[1] ? i + ' (' + ends[1] + ')' : String(i));
+      } else if (qk !== 'words' && qk !== 'short') p.items = (c.options || []).slice(0, 8);
+      p.note = {
+        choice: 'Everyone chooses one. The count shows here, without names, when you show it.',
+        multi: 'Everyone chooses any that fit. The count shows here, without names, when you show it.',
+        scale: 'Everyone picks a point. The count shows here, without names, when you show it.',
+        rank: 'Everyone puts these in order. The average order shows here, without names, when you show it.',
+        words: 'Everyone gives a word or a few. The words show here together, without names, when you show them.',
+        short: 'Answers in their own words, read by you, shown only if you choose.'
+      }[qk];
     } else if (k.key === 'presenter') {
       p.note = c.prompt ? 'The audience: ' + c.prompt : 'The presenter’s work fills the stage.';
     } else if (k.key === 'design') {

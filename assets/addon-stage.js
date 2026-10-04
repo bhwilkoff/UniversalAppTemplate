@@ -47,21 +47,29 @@
     $('[data-part-big]').textContent = part ? part.name : 'The session begins soon.';
     if (view.mode === 'check') {
       $('[data-prompt]').textContent = view.prompt;
+      // With the results shown, the bars come from them (an order is
+      // sorted, first place at the top); before, the choices alone.
+      var count = view.count;
+      var rows = count && count.rows.length ? count.rows : (view.choices || []).map(function (c) { return { label: c }; });
       var ul = $('[data-choices]'); ul.replaceChildren();
-      ul.hidden = !view.choices;
-      (view.choices || []).forEach(function (c, i) {
+      ul.hidden = !rows.length;
+      rows.forEach(function (row) {
         var li = el('li');
-        li.appendChild(el('span', 'label', c));
-        var row = view.count && view.count.rows[i];
-        if (row) {
+        li.appendChild(el('span', 'label', row.label));
+        if (count && row.text != null) {
           var bar = el('span', 'bar'); bar.style.setProperty('--share', row.share + '%'); li.appendChild(bar);
-          li.appendChild(el('span', 'count', String(row.count)));
+          li.appendChild(el('span', 'count', row.text));
         }
         ul.appendChild(li);
       });
-      ul.classList.toggle('counted', !!view.count);
-      $('[data-count-total]').hidden = !view.count;
-      $('[data-count-total]').textContent = view.count ? L.counted(view.count.total, 'answer', 'answers') + ' so far, with no names.' : '';
+      ul.classList.toggle('counted', !!(count && count.rows.length));
+      var words = $('[data-words]'); words.replaceChildren();
+      words.hidden = !(count && count.words.length);
+      if (count) count.words.forEach(function (w) { words.appendChild(el('li', 'size-' + w.size, w.word)); });
+      $('[data-count-note]').hidden = !(count && count.note);
+      $('[data-count-note]').textContent = count && count.note ? count.note : '';
+      $('[data-count-total]').hidden = !count;
+      $('[data-count-total]').textContent = count ? L.counted(count.total, 'answer', 'answers') + ' so far, with no names.' : '';
     }
     if (view.mode === 'welcome') {
       var w = view.welcome;

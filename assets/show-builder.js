@@ -8,6 +8,9 @@
 // Words by Claude, awaiting Ben's review.
 (function () {
   var S = window.ShowLib;
+  // A question scene is written with the question bank's own fields
+  // (R4, question-view.js), when the page has them.
+  var QV = window.QuestionView, LL = window.LiveLib;
 
   function el(tag, cls, text) {
     var e = document.createElement(tag);
@@ -30,7 +33,7 @@
   // `agenda` is CohortLib.agenda(cohort.session_minutes), `turn` LiveLib.TURN.
   function mount(box, opts) {
     var db = opts.db, cohort = opts.cohort, session = opts.session;
-    var scenes = [], notes = {}, withScenes = [], editing = null, previewing = null, busy = false, dragId = null;
+    var scenes = [], notes = {}, withScenes = [], editing = null, previewing = null, busy = false, dragId = null, bank = [];
     var status = el('p', 'small'); status.setAttribute('role', 'status');
     var fit = el('p', 'small show-fit');
     var list = el('ol', 'show-list');
@@ -45,7 +48,10 @@
       return Promise.all([
         db.from('scenes').select('*').eq('session_id', session.id).order('position'),
         db.from('scene_notes').select('scene_id, body').eq('cohort_id', cohort.id),
-        db.from('scenes').select('session_id').eq('cohort_id', cohort.id)
+        db.from('scenes').select('session_id').eq('cohort_id', cohort.id),
+        // The teacher's own questions and this cohort's (R4); before the
+        // database has the bank, a question is written here as before.
+        db.from('questions').select('id, cohort_id, kind, prompt, choices, points, updated_at').order('updated_at', { ascending: false })
       ]).then(function (res) {
         // Before the database has the run of show, the builder stays away.
         if (res[0].error) { box.hidden = true; return; }
@@ -54,6 +60,7 @@
         notes = {};
         (res[1].data || []).forEach(function (n) { notes[n.scene_id] = n.body; });
         withScenes = (res[2].data || []).map(function (r) { return r.session_id; });
+        bank = res[3].error ? [] : (res[3].data || []).filter(function (q) { return !q.cohort_id || q.cohort_id === cohort.id; });
         draw();
       });
     }
@@ -180,6 +187,11 @@
       var promptL = field('Prompt', prompt);
       var options = el('textarea'); options.name = 'options'; options.rows = 3; options.value = (c.options || []).join('\n');
       var optionsL = field('Choices', options, 'One per line, two to eight. Leave empty for an answer in their own words.');
+      var qf = QV && LL ? QV.fields({ bank: bank }) : null;
+      if (qf) {
+        qf.fill(LL.questionFields(s && s.kind === 'question' ? c : null));
+        f.insertBefore(qf.el, optionsL.nextSibling);
+      }
       var template = el('input'); template.name = 'template'; template.maxLength = 60; template.value = c.template || '';
       var templateL = field('Design stage template', template, 'Its name, or empty for a blank board.');
       var rooms = el('textarea'); rooms.name = 'room_scenes'; rooms.rows = 5; rooms.value = S.roomScenesToText(c.room_scenes);
@@ -192,8 +204,10 @@
         var k = S.kind(kindSel.value);
         kindHint.textContent = k ? k.what : '';
         var uses = k ? k.keys : [];
-        promptL.hidden = uses.indexOf('prompt') === -1;
-        optionsL.hidden = uses.indexOf('options') === -1;
+        var asQuestion = !!qf && kindSel.value === 'question';
+        promptL.hidden = uses.indexOf('prompt') === -1 || asQuestion;
+        optionsL.hidden = uses.indexOf('options') === -1 || asQuestion;
+        if (qf) qf.el.hidden = !asQuestion;
         templateL.hidden = uses.indexOf('template') === -1;
         roomsL.hidden = uses.indexOf('room_scenes') === -1;
         promptLabel.textContent = { presenter: 'What the audience does', question: 'The question', rooms: 'What the rooms are for', reflection: 'The closing question' }[kindSel.value] || 'Prompt';
@@ -214,6 +228,11 @@
         ev.preventDefault();
         var k = kindSel.value;
         var raw = { prompt: prompt.value, options: S.optionsFromText(options.value), template: template.value, room_scenes: S.roomScenesFromText(rooms.value) };
+        if (k === 'question' && qf) {
+          var qr = qf.read(), parsed = LL.parseQuestion(qr);
+          if (parsed.error) { msg.textContent = parsed.error; return; }
+          raw = LL.sceneQuestion(parsed, qr.question_id);
+        }
         var row = {
           kind: k, title: title.value.trim(), minutes: parseInt(minutes.value, 10),
           body: k === 'question' ? null : (body.value.trim() || null), config: S.cleanConfig(k, raw)

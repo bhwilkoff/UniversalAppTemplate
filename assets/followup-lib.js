@@ -8,6 +8,14 @@
 // Nothing here writes a word to a student. The follow-up is the
 // teacher's own text, kept in the teacher's browser until they send it.
 (function (root) {
+  // What someone answered, in words, for every kind of question (R4):
+  // LiveLib knows them all; without it, a choice or their own words.
+  function answerText(k, a) {
+    var L = root.LiveLib || (typeof require === 'function' ? require('./live-lib.js') : null);
+    if (L) return L.answerText(k, a) || '';
+    return k.choices ? (k.choices[a.choice - 1] || '') : (a.body || '');
+  }
+
   // ------------------------------------------------------------------
   // Commits during class
   // ------------------------------------------------------------------
@@ -143,7 +151,7 @@
     (data.checks || []).forEach(function (k) { checks[k.id] = k; });
     var answers = (data.answers || []).filter(function (a) { return a.user_id === userId && checks[a.check_id]; }).map(function (a) {
       var k = checks[a.check_id];
-      return { prompt: k.prompt, text: k.choices ? (k.choices[a.choice - 1] || '') : (a.body || ''), muddy: isMuddy(k.prompt), at: k.created_at };
+      return { prompt: k.prompt, text: answerText(k, a), muddy: isMuddy(k.prompt), at: k.created_at };
     }).sort(function (a, b) { return (b.muddy - a.muddy) || String(a.at).localeCompare(String(b.at)); });
     var given = [], received = [], fromTeachers = [];
     (data.shares || []).forEach(function (s) {

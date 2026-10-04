@@ -195,11 +195,13 @@
 
   // Which of those words a kind of scene has: every scene has a title,
   // minutes, and words for the stage; some have a prompt; a question has
-  // choices.
-  function editable(kind) {
+  // choices, unless it is of a kind that has none (a scale, a few words,
+  // their own words; its kind is changed on the class page).
+  function editable(kind, config) {
+    var qk = config && config.kind;
     return {
       prompt: ['presenter', 'question', 'rooms', 'reflection'].indexOf(kind) >= 0,
-      options: kind === 'question'
+      options: kind === 'question' && (!qk || qk === 'choice' || qk === 'multi' || qk === 'rank')
     };
   }
 
@@ -209,7 +211,7 @@
   // are left out; the rest of the scene's configuration (a room's own
   // scenes, a template) is kept as it was.
   function edited(scene, fields, show) {
-    var have = editable(scene.kind);
+    var have = editable(scene.kind, scene.config);
     var config = Object.assign({}, scene.config || {});
     if (have.prompt) { var p = String(fields.prompt || '').trim(); if (p) config.prompt = p; else delete config.prompt; }
     if (have.options) {

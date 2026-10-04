@@ -161,19 +161,10 @@
 
           <div data-questions>
             <p class="small" data-checks-intro></p>
+            <div class="live-scene-question" data-scene-question hidden></div>
             <form class="inline-form live-ask" data-ask hidden>
-              <label>Your question
-                <textarea rows="2" maxlength="500" required data-ask-prompt></textarea>
-              </label>
-              <fieldset class="live-mode">
-                <legend>People answer</legend>
-                <label class="check"><input type="radio" name="ask-mode" value="words" checked> In their own words</label>
-                <label class="check"><input type="radio" name="ask-mode" value="choices"> By choosing one</label>
-              </fieldset>
-              <label data-ask-choices-wrap hidden>Choices, one on each line
-                <textarea rows="4" data-ask-choices></textarea>
-              </label>
-              <label class="check"><input type="checkbox" data-ask-tally> Show everyone the count of answers as they come in</label>
+              <div data-ask-fields></div>
+              <label class="check"><input type="checkbox" data-ask-tally> Show everyone the results as answers come in</label>
               <div class="actions"><button class="btn-quiet" type="submit">Ask everyone</button><button class="btn-quiet" type="button" data-ask-closing>Ask the two closing questions</button><span class="small" data-ask-status role="status"></span></div>
             </form>
             <div class="live-checks" data-checks></div>
@@ -200,6 +191,7 @@
   <script src="/assets/hub-config.js" defer></script>
   <script src="/assets/cohort-lib.js" defer></script>
   <script src="/assets/live-lib.js" defer></script>
+  <script src="/assets/question-view.js" defer></script>
   <script src="/assets/followup-lib.js" defer></script>
   <script src="/assets/live-commits.js" defer></script>
   <script src="/assets/signals-lib.js" defer></script>

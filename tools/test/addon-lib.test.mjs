@@ -170,3 +170,23 @@ test('the board activity links to the session board, or a group room’s own boa
   assert.equal(lib.boardLinks(null, session, null), null);
   assert.equal(lib.boardLinks(cohort, {}, null), null);
 });
+
+test('every kind of question goes on the stage with its results and no names (R4)', () => {
+  const words = { id: 'w', state: 'open', kind: 'words', prompt: 'One word', choices: null, show_tally: true };
+  const v = lib.stageView({ onStage: { kind: 'check', id: 'w' }, checks: [words], results: { w: { kind: 'words', total: 3, words: [{ word: 'calm', count: 2 }, { word: 'tired', count: 1 }] } }, names: { u1: 'Bea' } });
+  assert.equal(v.kind, 'words');
+  assert.equal(v.choices, null);
+  assert.deepEqual(v.count.words, [{ word: 'calm', size: 5 }, { word: 'tired', size: 3 }]);
+  assert.deepEqual(lib.readStageMessage(lib.stageMessage(v)), v);
+  const rank = { id: 'r', state: 'open', kind: 'rank', prompt: 'Order', choices: ['Speed', 'Care'], show_tally: true };
+  const rv = lib.stageView({ onStage: { kind: 'check', id: 'r' }, checks: [rank], results: { r: { total: 2, places: [2, 1] } } });
+  assert.deepEqual(rv.count.rows.map((r) => r.label), ['Care', 'Speed']);
+  assert.match(rv.count.note, /order/);
+  const scale = { id: 's', state: 'open', kind: 'scale', prompt: 'Sure?', choices: ['No', 'Yes'], points: 3, show_tally: false };
+  const sv = lib.stageView({ onStage: { kind: 'check', id: 's' }, checks: [scale] });
+  assert.deepEqual(sv.choices, ['1 (No)', '2', '3 (Yes)']);
+  assert.equal(sv.count, null);
+  const short = { id: 'q', state: 'open', kind: 'short', prompt: 'Why?', choices: null, show_tally: true };
+  assert.equal(lib.stageView({ onStage: { kind: 'check', id: 'q' }, checks: [short], results: { q: { total: 4 } } }).count, null);
+  assert.equal(lib.readStageMessage(JSON.stringify({ type: 'hs-stage', v: 1, view: { mode: 'check', prompt: 'x', kind: 'essay' } })).kind, 'choice');
+});

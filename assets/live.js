@@ -27,6 +27,7 @@
     // session, who confirmed them, and whether the database has them yet.
     parts: [], chosenPart: null, drawnPart: undefined, prev: null, groups: [], people: [], brought: [], confirmations: [], tools: false };
   var drafts = {};          // what someone has typed into an answer box, by question
+  var Q = window.QuestionView, askFields = null, bank = [];  // the question bank (R4)
   var channel = null, poller = null, tallyPoller = null, nudgeTimer = null, deferred = {};
   var rooms = null, roomPlaces = {};  // the room board (C2), and where each group is
 
@@ -165,6 +166,7 @@
     // During class, for teachers: commits since the session began (C6).
     if (window.LiveCommits) window.LiveCommits.draw(root, { teaching: S.teaching, people: S.people, since: session.starts_at, token: S.token });
     $('[data-ask]').hidden = !S.teaching;
+    if (S.teaching) startAsking();
     $('[data-checks-intro]').textContent = S.teaching
       ? 'Ask a short question to see what is landing. Each person sees only their own answer, and the count of answers only if you choose to show it. Nothing here is graded, and the questions and answers are deleted when the cohort finishes.'
       : 'Your teacher may ask a short question to see what is landing. Only you and your teacher see your answer, nothing here is graded, and the questions and answers are deleted when the cohort finishes.';
@@ -209,6 +211,7 @@
     else if (lead === 'show') drawGroups(body);
     body.hidden = !body.children.length;
     if (show) show.update(key, runInfo());
+    if (S.checks) drawSceneQuestion();
   }
 
   // ------------------------------------------------------------------
@@ -592,20 +595,22 @@
       db.from('live_queue').select('*').eq('session_id', sid),
       db.from('live_checks').select('*').eq('session_id', sid).order('created_at', { ascending: false }),
       // Row-level security returns only your own answers, or everyone's to a teacher.
-      db.from('live_answers').select('id, check_id, user_id, choice, body, updated_at').eq('cohort_id', S.cohort.id)
+      db.from('live_answers').select('id, check_id, user_id, choice, body, value, updated_at').eq('cohort_id', S.cohort.id)
     ]).then(function (res) {
       var bad = res.filter(function (r) { return r.error; })[0];
       if (bad) { $('[data-sync]').textContent = 'The page could not read the latest changes: ' + bad.error.message; return; }
       var checks = res[1].data;
-      var visible = checks.filter(function (k) { return k.choices && (S.teaching || k.show_tally); });
-      return Promise.all(visible.map(function (k) { return db.rpc('check_tally', { c: k.id }); })).then(function (tallies) {
+      S.checks = checks;
+      var visible = checks.filter(function (k) { return L.kindOf(k) !== 'short' && (S.teaching || k.show_tally); });
+      return Promise.all(visible.map(function (k) { return db.rpc('check_results', { c: k.id }); })).then(function (got) {
         var byCheck = {};
-        visible.forEach(function (k, i) { byCheck[k.id] = (tallies[i] && tallies[i].data) || []; });
+        visible.forEach(function (k, i) { byCheck[k.id] = (got[i] && got[i].data) || null; });
         render('[data-queue]', function () { drawQueue(res[0].data); });
         render('[data-checks]', function () { drawChecks(checks, res[2].data, byCheck); });
+        drawSceneQuestion();
         // Classmates' answers do not reach a student through Realtime (they
-        // cannot read them), so a shown count is read again on its own.
-        var wantTally = !S.teaching && checks.some(function (k) { return k.state === 'open' && k.show_tally && k.choices; });
+        // cannot read them), so shown results are read again on their own.
+        var wantTally = !S.teaching && checks.some(function (k) { return k.state === 'open' && k.show_tally && L.kindOf(k) !== 'short'; });
         if (wantTally && !tallyPoller) tallyPoller = setInterval(refreshLive, 10000);
         if (!wantTally && tallyPoller) { clearInterval(tallyPoller); tallyPoller = null; }
       });
@@ -617,7 +622,8 @@
   function render(sel, fn) {
     var box = $(sel).closest('section');
     var a = document.activeElement;
-    if (a && box.contains(a) && /^(TEXTAREA|INPUT|SELECT)$/.test(a.tagName) && !a.closest('[data-add]') && !a.closest('[data-ask]')) {
+    var typing = a && box.contains(a) && (/^(TEXTAREA|INPUT|SELECT)$/.test(a.tagName) || !!a.closest('.question-answer, .question-edit'));
+    if (typing && !a.closest('[data-add]') && !a.closest('[data-ask]')) {
       deferred[sel] = fn;
       return;
     }
@@ -671,33 +677,21 @@
   // Checks for understanding
   // ------------------------------------------------------------------
 
-  function tallyBars(check, rows) {
-    var t = L.tally(check, rows);
-    var wrap = el('div', 'live-tally');
-    wrap.appendChild(el('p', 'small', L.counted(t.total, 'answer', 'answers') + (S.teaching ? '' : ', with no names')));
-    var ul = el('ul');
-    t.rows.forEach(function (r) {
-      var li = el('li');
-      li.appendChild(el('span', 'label', r.label));
-      var bar = el('span', 'bar'); bar.style.setProperty('--share', r.share + '%');
-      li.appendChild(bar);
-      li.appendChild(el('span', 'count', String(r.count)));
-      ul.appendChild(li);
-    });
-    wrap.appendChild(ul);
-    return wrap;
+  function resultsOf(check, summary) {
+    return Q.results(check, summary, { teaching: S.teaching });
   }
 
   function changeCheck(check, change) {
     return db.from('live_checks').update(change).eq('id', check.id).then(function (r) { if (!r.error) return refreshLive(); });
   }
 
-  function teacherCard(check, answers, tallyRows) {
+  function teacherCard(check, answers, summary) {
     var card = el('article', 'cohort-card live-check');
-    card.appendChild(el('p', 'kicker', check.state === 'open' ? 'Open' : 'Closed'));
+    var kind = L.questionKind(L.kindOf(check));
+    card.appendChild(el('p', 'kicker', (check.state === 'open' ? 'Open' : 'Closed') + ', ' + kind.name.toLowerCase()));
     card.appendChild(el('h3', null, check.prompt));
     var mine = answers.filter(function (a) { return a.check_id === check.id; });
-    if (check.choices) card.appendChild(tallyBars(check, tallyRows || []));
+    if (L.kindOf(check) !== 'short') card.appendChild(resultsOf(check, summary));
     else card.appendChild(el('p', 'small', L.counted(mine.length, 'answer', 'answers')));
     if (mine.length) {
       var ul = el('ul', 'live-answers');
@@ -710,7 +704,7 @@
       card.appendChild(ul);
     }
     var acts = el('div', 'actions');
-    if (check.choices) acts.appendChild(button(check.show_tally ? 'Hide the count from everyone' : 'Show everyone the count', 'btn-quiet', function () { changeCheck(check, { show_tally: !check.show_tally }); }));
+    if (L.kindOf(check) !== 'short') acts.appendChild(button(check.show_tally ? 'Hide the results from everyone' : 'Show everyone the results', 'btn-quiet', function () { changeCheck(check, { show_tally: !check.show_tally }); }));
     acts.appendChild(button(check.state === 'open' ? 'Close it' : 'Open it again', 'btn-quiet', function () { changeCheck(check, { state: check.state === 'open' ? 'closed' : 'open' }); }));
     var del = button('Delete it', 'btn-quiet danger', function () { del.hidden = true; ask.hidden = false; });
     acts.appendChild(del);
@@ -724,63 +718,67 @@
     ask.appendChild(askActs);
     card.appendChild(acts);
     card.appendChild(ask);
+    if (check.state === 'open' && !mine.length) card.appendChild(editCheck(check));
     return card;
   }
 
-  function studentCard(check, answer, tallyRows) {
+  // A question asked in the moment can be changed until someone answers
+  // it (the database says the same); the bank keeps its own copy.
+  function editCheck(check) {
+    var d = el('details', 'question-edit');
+    d.appendChild(el('summary', null, 'Change the question'));
+    var f = el('form', 'inline-form');
+    var fl = Q.fields();
+    fl.fill(L.questionFields(check));
+    f.appendChild(fl.el);
+    var acts = el('div', 'actions');
+    var save = el('button', 'btn-quiet', 'Save the change'); save.type = 'submit';
+    var status = el('span', 'small'); status.setAttribute('role', 'status');
+    acts.appendChild(save); acts.appendChild(status);
+    f.appendChild(acts);
+    f.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      var p = L.parseQuestion(fl.read());
+      if (p.error) { status.textContent = p.error; return; }
+      status.textContent = 'Saving…';
+      db.from('live_checks').update({ kind: p.kind, prompt: p.prompt, choices: p.choices, points: p.points }).eq('id', check.id).then(function (r) {
+        status.textContent = r.error ? 'Not changed: ' + r.error.message : 'Changed.';
+        if (!r.error) refreshLive();
+      });
+    });
+    d.appendChild(f);
+    return d;
+  }
+
+  function studentCard(check, answer, summary) {
     var card = el('article', 'cohort-card live-check');
     card.appendChild(el('p', 'kicker', check.state === 'open' ? 'Your teacher asks' : 'Closed'));
     card.appendChild(el('h3', null, check.prompt));
     var said = L.answerText(check, answer);
     if (check.state === 'open') {
-      var form = el('form', 'inline-form');
-      if (check.choices) {
-        var fs = el('fieldset', 'live-mode');
-        fs.appendChild(el('legend', 'visually-hidden', 'Choose one'));
-        check.choices.forEach(function (c, i) {
-          var lab = el('label', 'check');
-          var r = el('input'); r.type = 'radio'; r.name = 'check-' + check.id; r.value = String(i + 1); r.required = true;
-          var d = drafts[check.id];
-          r.checked = d != null ? d === r.value : !!(answer && answer.choice === i + 1);
-          r.addEventListener('change', function () { drafts[check.id] = r.value; });
-          lab.appendChild(r); lab.appendChild(document.createTextNode(' ' + c));
-          fs.appendChild(lab);
-        });
-        form.appendChild(fs);
-      } else {
-        var lab2 = el('label', null, 'Your answer');
-        var ta = el('textarea'); ta.rows = 2; ta.maxLength = 1000; ta.required = true;
-        ta.value = drafts[check.id] != null ? drafts[check.id] : (answer ? answer.body : '');
-        ta.addEventListener('input', function () { drafts[check.id] = ta.value; });
-        lab2.appendChild(ta); form.appendChild(lab2);
-      }
-      var acts = el('div', 'actions');
-      var send = el('button', 'btn-quiet', answer ? 'Change my answer' : 'Send my answer'); send.type = 'submit';
-      var status = el('span', 'small'); status.setAttribute('role', 'status');
-      acts.appendChild(send); acts.appendChild(status);
-      form.appendChild(acts);
-      form.addEventListener('submit', function (ev) {
-        ev.preventDefault();
-        var row = { check_id: check.id, cohort_id: S.cohort.id, user_id: S.me.id };
-        if (check.choices) { var picked = form.querySelector('input:checked'); if (!picked) return; row.choice = Number(picked.value); row.body = null; }
-        else { row.body = ta.value.trim(); row.choice = null; if (!row.body) return; }
-        status.textContent = 'Sending…';
-        var write = answer
-          ? db.from('live_answers').update({ choice: row.choice, body: row.body }).eq('id', answer.id)
-          : db.from('live_answers').insert(row);
-        write.then(function (r) {
-          if (r.error) { status.textContent = 'Not sent: ' + r.error.message; return; }
-          delete drafts[check.id];
-          refreshLive();
-        });
-      });
       if (said) card.appendChild(el('p', 'small', 'You answered: ' + said));
-      card.appendChild(form);
+      card.appendChild(Q.answer(check, answer, {
+        draft: drafts[check.id],
+        onDraft: function (input) { drafts[check.id] = input; },
+        onSend: function (row) { return sendAnswer(check, answer, row); }
+      }));
     } else {
       card.appendChild(el('p', 'small', said ? 'You answered: ' + said : 'You did not answer this one.'));
     }
-    if (check.choices && check.show_tally) card.appendChild(tallyBars(check, tallyRows || []));
+    if (check.show_tally && L.kindOf(check) !== 'short') card.appendChild(resultsOf(check, summary));
     return card;
+  }
+
+  function sendAnswer(check, answer, row) {
+    var write = answer
+      ? db.from('live_answers').update(row).eq('id', answer.id)
+      : db.from('live_answers').insert(Object.assign({ check_id: check.id, cohort_id: S.cohort.id, user_id: S.me.id }, row));
+    return write.then(function (r) {
+      if (r.error) return r.error.message;
+      delete drafts[check.id];
+      refreshLive();
+      return null;
+    });
   }
 
   function drawChecks(checks, answers, tallies) {
@@ -801,20 +799,64 @@
 
   function askCheck(ev) {
     ev.preventDefault();
-    var mode = root.querySelector('input[name="ask-mode"]:checked').value;
     var status = $('[data-ask-status]');
-    var parsed = L.parseCheck($('[data-ask-prompt]').value, mode, $('[data-ask-choices]').value);
+    var f = askFields.read();
+    var parsed = L.parseQuestion(f);
     if (parsed.error) { status.textContent = parsed.error; return; }
     status.textContent = 'Asking…';
-    db.from('live_checks').insert({
-      cohort_id: S.cohort.id, session_id: S.session.id, created_by: S.me.id,
-      prompt: parsed.prompt, choices: parsed.choices, show_tally: $('[data-ask-tally]').checked
-    }).then(function (r) {
-      if (r.error) { status.textContent = 'Not asked: ' + r.error.message; return; }
-      status.textContent = 'Asked.';
-      $('[data-ask-prompt]').value = ''; $('[data-ask-choices]').value = '';
-      refreshLive();
+    ask(Object.assign({ question_id: f.question_id }, parsed), $('[data-ask-tally]').checked).then(function (err) {
+      status.textContent = err ? 'Not asked: ' + err : 'Asked.';
+      if (!err) askFields.reset();
     });
+  }
+
+  // Asking a question: a copy of it goes to everyone, so changing it in
+  // the moment never changes the bank or the run of show.
+  function ask(q, showResults) {
+    return db.from('live_checks').insert({
+      cohort_id: S.cohort.id, session_id: S.session.id, created_by: S.me.id, kind: q.kind,
+      prompt: q.prompt, choices: q.choices, points: q.points, question_id: q.question_id || null, show_tally: !!showResults
+    }).then(function (r) {
+      if (r.error) return r.error.message;
+      refreshLive();
+      return null;
+    });
+  }
+
+  // The teacher's question bank (R4): their own questions and this
+  // cohort's, to start a question from. Before the database has the bank,
+  // the form works as before, without it.
+  function startAsking() {
+    if (!Q || askFields) return;
+    db.from('questions').select('id, cohort_id, kind, prompt, choices, points, updated_at').order('updated_at', { ascending: false }).then(function (r) {
+      bank = r.error ? [] : (r.data || []).filter(function (q) { return !q.cohort_id || q.cohort_id === S.cohort.id; });
+      askFields = Q.fields({ bank: bank });
+      $('[data-ask-fields]').replaceChildren(askFields.el);
+    });
+  }
+
+  // A question scene in the run of show (R2) holds the question the
+  // teacher planned. When it is the current scene, the teacher can ask it
+  // in one press, and it says so once it has been asked.
+  function drawSceneQuestion() {
+    var box = $('[data-scene-question]');
+    var part = typeof partNow === 'function' ? partNow() : null;
+    var q = S.teaching && part && part.own && part.kind === 'question' ? L.fromScene(part.config) : null;
+    box.hidden = !q;
+    box.replaceChildren();
+    if (!q) return;
+    var asked = (S.checks || []).some(function (k) { return k.prompt === q.prompt && k.state === 'open'; });
+    box.appendChild(el('p', 'kicker', 'Planned for this scene, ' + L.questionKind(q.kind).name.toLowerCase()));
+    box.appendChild(el('p', 'live-what', q.prompt));
+    var status = el('span', 'small'); status.setAttribute('role', 'status');
+    var acts = el('div', 'actions');
+    if (asked) status.textContent = 'Asked. The answers are below.';
+    else acts.appendChild(button('Ask it now', 'btn-github', function () {
+      status.textContent = 'Asking…';
+      ask(q, $('[data-ask-tally]').checked).then(function (err) { status.textContent = err ? 'Not asked: ' + err : ''; });
+    }));
+    acts.appendChild(status);
+    box.appendChild(acts);
   }
 
   // ------------------------------------------------------------------
@@ -854,7 +896,7 @@
     L.CLOSING_CHECKS.reduce(function (p, prompt) {
       return p.then(function (r) {
         if (r && r.error) return r;
-        return db.from('live_checks').insert({ cohort_id: S.cohort.id, session_id: S.session.id, created_by: S.me.id, prompt: prompt, choices: null, show_tally: false });
+        return db.from('live_checks').insert({ cohort_id: S.cohort.id, session_id: S.session.id, created_by: S.me.id, kind: 'short', prompt: prompt, choices: null, show_tally: false });
       });
     }, Promise.resolve(null)).then(function (r) {
       status.textContent = r && r.error ? 'Not asked: ' + r.error.message : 'Asked both.';
@@ -863,9 +905,6 @@
   });
   // The part of the session moves on with the clock.
   setInterval(function () { if (S.session && S.parts.length) drawNow(); }, 20000);
-  root.querySelectorAll('input[name="ask-mode"]').forEach(function (r) {
-    r.addEventListener('change', function () { $('[data-ask-choices-wrap]').hidden = r.value !== 'choices' || !r.checked; });
-  });
   $('[data-reload]').addEventListener('click', load);
   load();
 })();

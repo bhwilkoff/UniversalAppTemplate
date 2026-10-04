@@ -194,6 +194,49 @@ export function ownReviewPrompt(stage) {
   ].join('\n\n');
 }
 
+// The question bank's six kinds (R4, migration 20261004080000), in words
+// for the agent. A question asked before there were kinds has choices
+// (choose one) or none (their own words).
+function kindOf(k) {
+  return ['choice', 'multi', 'short', 'scale', 'words', 'rank'].includes(k.kind) ? k.kind : (k.choices ? 'choice' : 'short');
+}
+function checkHow(k) {
+  const kind = kindOf(k);
+  const list = (k.choices || []).map((c, i) => `${i + 1}. ${c}`).join('; ');
+  if (kind === 'choice') return ` Choices: ${list}.`;
+  if (kind === 'multi') return ` Choose any that fit: ${list}.`;
+  if (kind === 'rank') return ` Put these in order, first to last: ${list}.`;
+  if (kind === 'scale') return ` A scale from 1 to ${k.points}${k.choices ? `, where 1 is "${k.choices[0]}" and ${k.points} is "${k.choices[1]}"` : ''}.`;
+  if (kind === 'words') return ' (answered in a word or a few, shown together with no names if the teacher chooses)';
+  return ' (answered in their own words)';
+}
+function answerSaid(k, a) {
+  const kind = kindOf(k), ch = k.choices || [];
+  if (kind === 'choice') return ch[a.choice - 1] || null;
+  if (kind === 'scale') return a.choice ? `${a.choice} of ${k.points}` : null;
+  if (kind === 'multi' || kind === 'rank') {
+    const names = (Array.isArray(a.value) ? a.value : []).map((i) => ch[i - 1]).filter(Boolean);
+    return names.length ? names.join(kind === 'rank' ? ', then ' : '; ') : null;
+  }
+  return a.body || null;
+}
+// The results with no names: check_results (an object), or check_tally's
+// rows from before R4 (an array).
+function resultsLine(k, t) {
+  if (!t) return null;
+  const kind = kindOf(k), ch = k.choices || [];
+  if (Array.isArray(t)) {
+    if (!k.choices) return null;
+    const by = Object.fromEntries(t.map((r) => [r.choice, Number(r.answers)]));
+    return '  Count so far, with no names: ' + ch.map((c, i) => `${c} ${by[i + 1] || 0}`).join(', ') + '.';
+  }
+  if ((kind === 'choice' || kind === 'multi') && t.counts) return '  Count so far, with no names: ' + ch.map((c, i) => `${c} ${t.counts[i] || 0}`).join(', ') + '.';
+  if (kind === 'scale' && t.counts) return '  Count so far, with no names: ' + t.counts.map((n, i) => `${i + 1}: ${n}`).join(', ') + '.';
+  if (kind === 'rank' && t.places) return '  Average place so far, with no names (1 is first): ' + ch.map((c, i) => `${c} ${t.places[i] ?? 'none yet'}`).join(', ') + '.';
+  if (kind === 'words' && t.words) return t.words.length ? '  Words so far, with no names: ' + t.words.map((w) => `${w.word} (${w.count})`).join(', ') + '.' : '  No words yet.';
+  return null;
+}
+
 // What is happening in the live session right now: the "show your work"
 // queue and the teacher's open questions (migration 20261003080000). The
 // agent reads it so it knows what the person is in the middle of; adding
@@ -227,15 +270,12 @@ export function thisSessionText(cohort, session, live, queue, checks, myAnswers,
   } else {
     lines.push('Checks for understanding, open now:');
     open.forEach((k) => {
-      lines.push(`- "${k.prompt}"${k.choices ? ' Choices: ' + k.choices.map((c, i) => `${i + 1}. ${c}`).join('; ') + '.' : ' (answered in their own words)'}`);
+      lines.push(`- "${k.prompt}"${checkHow(k)}`);
       const mine = myAnswers.find((x) => x.check_id === k.id);
-      const said = mine ? (k.choices ? k.choices[mine.choice - 1] : mine.body) : null;
+      const said = mine ? answerSaid(k, mine) : null;
       lines.push(said ? `  You answered: ${said}` : '  You have not answered yet.');
-      const t = tallies[k.id];
-      if (k.choices && t) {
-        const by = Object.fromEntries(t.map((r) => [r.choice, Number(r.answers)]));
-        lines.push('  Count so far, with no names: ' + k.choices.map((c, i) => `${c} ${by[i + 1] || 0}`).join(', ') + '.');
-      }
+      const r = resultsLine(k, tallies[k.id]);
+      if (r) lines.push(r);
     });
     lines.push('', 'A check for understanding is how the teacher sees what is landing, so it only helps if the answer is the person\'s own. Do not write or suggest an answer; if they ask, help them think it through with questions instead. Answering happens on the session page.');
   }
@@ -388,7 +428,7 @@ export function classNowText(cohort, now) {
   const open = (now.checks || []).filter((k) => k.state === 'open');
   if (!open.length) lines.push('Checks for understanding: no question is open.');
   open.forEach((k) => {
-    lines.push(`Open check: "${k.prompt}"${k.choices ? ' Choices: ' + k.choices.join('; ') + '.' : ''} ${k.answers.length} answered.`);
+    lines.push(`Open check: "${k.prompt}"${kindOf(k) === 'short' ? '' : checkHow(k)} ${k.answers.length} answered.`);
     k.answers.forEach((x) => lines.push(`- ${x.name}: ${x.text}`));
   });
   lines.push('');

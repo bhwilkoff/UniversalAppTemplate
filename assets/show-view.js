@@ -157,7 +157,7 @@
         return d;
       }
       var f = el('form', 'show-edit-form');
-      var start = K.editFields(s), have = K.editable(s.kind);
+      var start = K.editFields(s), have = K.editable(s.kind, s.config);
       function field(name, label, kind, hint) {
         var l = el('label');
         l.appendChild(document.createTextNode(label));

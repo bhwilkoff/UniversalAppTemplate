@@ -813,6 +813,23 @@ label.check { display: flex; gap: 0.5rem; align-items: center; font-weight: 400;
 .live-page .live-tally .bar::after { content: ""; position: absolute; inset: 0 auto 0 0; width: var(--share, 0%); background: var(--clay); border-radius: 999px; }
 .live-page .live-tally .count { font-weight: 650; text-align: right; font-variant-numeric: tabular-nums; }
 .live-page .live-tally p { margin: 0.35rem 0 0; }
+/* The question bank (R4): the kinds' own pieces, in the panel and on /live/. */
+.live-page .live-tally li { grid-template-columns: minmax(0, 1fr) auto; }
+.live-page .question-words { margin-top: 0.75rem; font-size: 0.95rem; }
+.live-page .question-scale-points { grid-template-columns: repeat(auto-fill, minmax(4.5rem, 1fr)); }
+.live-page .question-rank { margin: 0.5rem 0 0; padding: 0; list-style: none; display: grid; gap: 0.4rem; counter-reset: rank; }
+.live-page .question-rank li { counter-increment: rank; display: grid; grid-template-columns: 1.75rem minmax(0, 1fr); gap: 0.35rem 0.5rem; align-items: center; padding: 0.5rem 0.75rem; border: 1px solid var(--rule); border-radius: var(--radius); background: var(--card); }
+.live-page .question-rank li::before { content: counter(rank) "."; font-weight: 650; color: var(--clay); font-variant-numeric: tabular-nums; }
+.live-page .question-rank .label { overflow-wrap: anywhere; }
+.live-page .question-rank-moves { grid-column: 2; display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.live-page .question-rank-moves .btn-quiet { min-height: 2.25rem; font-size: 0.9rem; padding: 0.25rem 0.75rem; }
+.live-page .question-fields { display: grid; gap: 0.75rem; }
+.question-fields .hint { display: block; }
+.live-page .question-scale:not([hidden]) { display: grid; gap: 0.75rem; }
+.live-page .question-edit { margin-top: 0.75rem; }
+.live-page .live-scene-question:not([hidden]) { border: 2px solid var(--clay); border-radius: var(--radius); background: var(--card); padding: 0.9rem; display: grid; gap: 0.35rem; margin-top: 0.75rem; }
+.live-page .live-scene-question p { margin: 0; }
+.live-page .live-scene-question .kicker { font-size: 0.85rem; }
 .live-page .live-answers { margin: 0.75rem 0 0; padding: 0; list-style: none; display: grid; gap: 0.4rem; border-top: 1px solid var(--rule); padding-top: 0.75rem; }
 .live-page .live-confirm { margin-top: 0.75rem; padding: 0.75rem 1rem; border-left: 3px solid var(--clay); }
 .live-page .live-confirm p { margin: 0; font-weight: 600; }
@@ -1185,6 +1202,16 @@ body.addon-body { min-height: 100vh; }
 .stage-choices .bar { display: block; height: 0.5em; border-radius: 999px; background: var(--rule); position: relative; overflow: hidden; }
 .stage-choices .bar::after { content: ""; position: absolute; inset: 0 auto 0 0; width: var(--share, 0%); background: var(--clay); border-radius: 999px; }
 .stage-choices .count { font-weight: 650; text-align: right; font-variant-numeric: tabular-nums; }
+.stage-choices.counted li { grid-template-columns: minmax(0, 1fr) auto; }
+/* A words question (R4): the words together, larger where more people gave them. */
+.stage-words, .question-words { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.4em 0.9em; }
+.stage-words { font-size: clamp(1.1rem, 3vmin, 2rem); max-width: 60rem; }
+.stage-words li, .question-words li { font-weight: 600; line-height: 1.1; color: var(--ink); overflow-wrap: anywhere; }
+.stage-words .size-1, .question-words .size-1 { font-size: 1em; color: var(--muted); }
+.stage-words .size-2, .question-words .size-2 { font-size: 1.3em; }
+.stage-words .size-3, .question-words .size-3 { font-size: 1.65em; }
+.stage-words .size-4, .question-words .size-4 { font-size: 2.05em; color: var(--clay); }
+.stage-words .size-5, .question-words .size-5 { font-size: 2.5em; color: var(--clay); }
 .stage-welcome .stage-note { color: var(--ink); line-height: 1.35; max-width: 46ch; overflow-wrap: anywhere; }
 .stage-what { margin: 0; font-size: clamp(1.25rem, 3.6vmin, 2.5rem); font-weight: 600; overflow-wrap: anywhere; }
 .stage-note { margin: 0; font-size: clamp(1.1rem, 3vmin, 2rem); color: var(--muted); max-width: 40ch; }
@@ -1361,6 +1388,18 @@ label.check { min-height: 2.25rem; }
 .stage-preview .stage-items { margin: 0; padding-left: 1.1rem; color: var(--band-ink); }
 .stage-preview .stage-note { color: var(--band-muted); font-size: 0.9rem; margin-top: auto; max-width: none; }
 .run-of-show h3 { font-size: 1rem; margin: 0.75rem 0 0.35rem; }
+/* The question bank on /teach/ (R4, assets/question-bank.js). */
+.question-bank { margin-top: 1.5rem; }
+.bank-list { list-style: none; margin: 0.75rem 0 0; padding: 0; display: grid; gap: 0.5rem; }
+.bank-item { border: 1px solid var(--rule); border-radius: 10px; padding: 0.7rem 0.8rem; background: var(--card); min-width: 0; }
+.bank-item p { margin: 0; }
+.bank-head { display: flex; flex-wrap: wrap; gap: 0.15rem 0.6rem; align-items: baseline; }
+.bank-prompt { font-weight: 600; margin-top: 0.25rem !important; overflow-wrap: anywhere; }
+.bank-sure:not([hidden]) { display: inline-flex; flex-wrap: wrap; gap: 0.35rem; align-items: center; }
+.question-fields { display: grid; gap: 0.6rem; }
+.question-fields label { display: grid; gap: 0.25rem; }
+.question-fields .hint { color: var(--muted); font-size: 0.85rem; font-weight: 400; }
+.question-scale:not([hidden]) { display: grid; gap: 0.6rem; }
 .show-glance { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.25rem; }
 .show-glance li { display: flex; gap: 0.6rem; align-items: baseline; }
 

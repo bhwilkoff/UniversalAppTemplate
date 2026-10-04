@@ -1,5 +1,5 @@
 // Pure helpers for the live session page (/live/): the "show your work"
-// queue and checks for understanding. Tested in tools/test/live-lib.test.mjs.
+// queue and checks for understanding, with the question bank's six kinds. Tested in tools/test/live-lib.test.mjs.
 (function (root) {
   // What a link is, read from its address alone, so a person can paste
   // anything from GitHub and the queue says what it is.
@@ -76,10 +76,201 @@
     };
   }
 
+  // ------------------------------------------------------------------
+  // The question bank (R4): six kinds of question, each asked the same
+  // way, answered in each person's own view, and shown with no names.
+  // The database checks the same shapes (migration 20261004080000).
+  // ------------------------------------------------------------------
+
+  var QUESTION_KINDS = [
+    { key: 'choice', name: 'Choose one', line: 'Everyone picks one of a few choices.', choices: true },
+    { key: 'multi', name: 'Choose any', line: 'Everyone picks as many of the choices as fit.', choices: true },
+    { key: 'scale', name: 'A scale', line: 'Everyone picks a point on a scale, from three to ten points long.', points: true },
+    { key: 'words', name: 'A few words', line: 'Everyone gives a word or a few, and the words show together, largest where most people agree.' },
+    { key: 'rank', name: 'Put in order', line: 'Everyone puts the choices in their own order, first to last.', choices: true },
+    { key: 'short', name: 'In their own words', line: 'Everyone answers in a sentence or a few. Only the teachers read the answers.' }
+  ];
+  var KIND_BY = {};
+  QUESTION_KINDS.forEach(function (k) { KIND_BY[k.key] = k; });
+  function questionKind(key) { return KIND_BY[key] || null; }
+
+  // A question's kind, for one asked before there were kinds too.
+  function kindOf(q) {
+    if (q && KIND_BY[q.kind]) return q.kind;
+    return q && q.choices ? 'choice' : 'short';
+  }
+
+  // A question from the words a teacher typed: { kind, prompt, choices
+  // (one per line), points, low, high } becomes { kind, prompt, choices,
+  // points }, or { error } as one plain sentence.
+  function parseQuestion(f) {
+    f = f || {};
+    var kind = KIND_BY[f.kind] ? f.kind : null;
+    if (!kind) return { error: 'Choose what kind of question it is.' };
+    var p = String(f.prompt || '').trim();
+    if (!p) return { error: 'Write the question first.' };
+    if (p.length > 500) return { error: 'Keep the question under 500 characters.' };
+    var k = KIND_BY[kind];
+    if (k.choices) {
+      var list = (Array.isArray(f.choices) ? f.choices : String(f.choices || '').split('\n'))
+        .map(function (x) { return String(x).trim(); }).filter(Boolean);
+      if (list.length < 2) return { error: 'Give at least two choices, one on each line.' };
+      if (list.length > 8) return { error: 'Eight choices is the most a question can have.' };
+      if (list.some(function (x) { return x.length > 120; })) return { error: 'Keep each choice under 120 characters.' };
+      return { kind: kind, prompt: p, choices: list, points: null };
+    }
+    if (k.points) {
+      var n = Number(String(f.points == null ? '' : f.points).trim());
+      if (!Number.isInteger(n) || n < 3 || n > 10) return { error: 'A scale has from three to ten points.' };
+      var low = String(f.low || '').trim(), high = String(f.high || '').trim();
+      if (!low !== !high) return { error: 'Give words for both ends of the scale, or for neither.' };
+      if (low.length > 60 || high.length > 60) return { error: 'Keep the words for each end under 60 characters.' };
+      return { kind: kind, prompt: p, choices: low ? [low, high] : null, points: n };
+    }
+    return { kind: kind, prompt: p, choices: null, points: null };
+  }
+
+  // The words a form starts from, for a question in the bank, a question
+  // asked, or a question scene's configuration ({ prompt, options, kind,
+  // points }).
+  function questionFields(q) {
+    q = q || {};
+    var kind = q.kind && KIND_BY[q.kind] ? q.kind : (q.choices || q.options ? 'choice' : 'short');
+    var choices = q.choices || q.options || [];
+    var scale = kind === 'scale';
+    return {
+      kind: kind, prompt: q.prompt || '',
+      choices: scale ? '' : choices.join('\n'),
+      points: scale ? String(q.points || 5) : '5',
+      low: scale ? choices[0] || '' : '', high: scale ? choices[1] || '' : '',
+      question_id: q.question_id || null
+    };
+  }
+
+  // A question scene's configuration, from a parsed question: the words
+  // stay in the scene, so the run of show reads the same everywhere. A
+  // scene with choices and no kind is choose one, and with neither, in
+  // their own words, as scenes were before there were kinds.
+  function sceneQuestion(parsed, questionId) {
+    var c = { prompt: parsed.prompt };
+    if (parsed.kind !== 'choice' && parsed.kind !== 'short') c.kind = parsed.kind;
+    if (parsed.choices) c.options = parsed.choices;
+    if (parsed.points) c.points = parsed.points;
+    if (questionId) c.question_id = questionId;
+    return c;
+  }
+
+  // The question a scene asks, as a row to ask (live_checks' columns), or
+  // null when the scene has no question written yet.
+  function fromScene(config) {
+    var c = config || {};
+    if (!c.prompt) return null;
+    var p = parseQuestion(Object.assign(questionFields(c), { prompt: c.prompt }));
+    if (p.error) return null;
+    return { kind: p.kind, prompt: p.prompt, choices: p.choices, points: p.points, question_id: c.question_id || null };
+  }
+
+  // The points on a scale, each with its words: "1", "2", ... and the two
+  // ends' words beside the first and last.
+  function scaleLabels(q) {
+    var n = Number(q.points) || 0, ends = q.choices || [];
+    var out = [];
+    for (var i = 1; i <= n; i++) {
+      var w = i === 1 ? ends[0] : i === n ? ends[1] : null;
+      out.push(w ? i + ' (' + w + ')' : String(i));
+    }
+    return out;
+  }
+
+  // An answer from what a person did in their view, as live_answers'
+  // columns { choice, body, value }, or { error }.
+  //   choice, scale: { choice: n }; short, words: { body }; multi:
+  //   { picks: [n, ...] }; rank: { order: [n, ...] } (choice numbers,
+  //   counted from one).
+  function answerRow(q, input) {
+    input = input || {};
+    var kind = kindOf(q), n = (q.choices || []).length;
+    if (kind === 'choice' || kind === 'scale') {
+      var max = kind === 'scale' ? Number(q.points) : n;
+      var c = Number(input.choice);
+      if (!Number.isInteger(c) || c < 1 || c > max) return { error: kind === 'scale' ? 'Choose a point on the scale.' : 'Choose one.' };
+      return { choice: c, body: null, value: null };
+    }
+    if (kind === 'short' || kind === 'words') {
+      var b = String(input.body || '').trim();
+      if (!b) return { error: kind === 'words' ? 'Write a word or a few.' : 'Write your answer first.' };
+      var lim = kind === 'words' ? 60 : 1000;
+      if (b.length > lim) return { error: kind === 'words' ? 'Keep it to a few words, under 60 characters.' : 'Keep your answer under 1,000 characters.' };
+      return { choice: null, body: b, value: null };
+    }
+    var list = (kind === 'multi' ? input.picks : input.order) || [];
+    list = list.map(Number);
+    var fine = list.every(function (x, i) { return Number.isInteger(x) && x >= 1 && x <= n && list.indexOf(x) === i; });
+    if (!fine) return { error: 'Choose from the choices given.' };
+    if (kind === 'multi' && !list.length) return { error: 'Choose at least one.' };
+    if (kind === 'rank' && list.length !== n) return { error: 'Put every choice in your order.' };
+    return { choice: null, body: null, value: list };
+  }
+
+  // What a person answered, in words: the choice, the point, the choices
+  // picked, the order, or their words.
   function answerText(check, answer) {
     if (!answer) return null;
-    if (check.choices) return check.choices[answer.choice - 1] || null;
-    return answer.body;
+    var kind = kindOf(check), ch = check.choices || [];
+    if (kind === 'choice') return ch[answer.choice - 1] || null;
+    if (kind === 'scale') {
+      if (answer.choice == null) return null;
+      var label = scaleLabels(check)[answer.choice - 1];
+      return label ? label + ' of ' + check.points : null;
+    }
+    if (kind === 'multi' || kind === 'rank') {
+      var v = Array.isArray(answer.value) ? answer.value : [];
+      var names = v.map(function (i) { return ch[i - 1]; }).filter(Boolean);
+      if (!names.length) return null;
+      return kind === 'rank' ? names.map(function (x, i) { return (i + 1) + '. ' + x; }).join('; ') : names.join('; ');
+    }
+    return answer.body || null;
+  }
+
+  // The results with no names, from check_results, ready to draw:
+  //   { kind, total, rows: [{ label, count, share, text }], words:
+  //     [{ word, count, size }], note }
+  // rows are bars (choice, multi, scale, rank, the first place first for
+  // rank); words a cloud, sized one to five; note one line about them.
+  function results(check, summary) {
+    var kind = kindOf(check), ch = check.choices || [];
+    summary = summary || {};
+    var total = Number(summary.total) || 0;
+    var out = { kind: kind, total: total, rows: [], words: [], note: '' };
+    if (kind === 'choice' || kind === 'multi' || kind === 'scale') {
+      var labels = kind === 'scale' ? scaleLabels(check) : ch;
+      var counts = summary.counts || [];
+      out.rows = labels.map(function (label, i) {
+        var n = Number(counts[i]) || 0;
+        return { label: label, count: n, share: total ? Math.round((n / total) * 100) : 0, text: String(n) };
+      });
+      if (kind === 'multi') out.note = 'Each person could choose more than one.';
+      if (kind === 'scale' && total) {
+        var sum = out.rows.reduce(function (s, r, i) { return s + r.count * (i + 1); }, 0);
+        out.note = 'The middle of the answers is ' + (Math.round((sum / total) * 10) / 10) + ' of ' + check.points + '.';
+      }
+    } else if (kind === 'rank') {
+      var places = summary.places || [], n = ch.length;
+      out.rows = ch.map(function (label, i) {
+        var at = places[i] == null ? null : Number(places[i]);
+        var share = at == null || n < 2 ? 0 : Math.round(((n - at) / (n - 1)) * 100);
+        return { label: label, count: at == null ? 0 : at, share: share, text: at == null ? '' : 'about ' + (Math.round(at * 10) / 10) };
+      }).sort(function (a, b) { return (a.text ? a.count : 99) - (b.text ? b.count : 99); });
+      out.note = 'In the order people put them, on average, first at the top.';
+    } else if (kind === 'words') {
+      var ws = (summary.words || []).filter(function (w) { return w && typeof w.word === 'string'; });
+      var top = ws.reduce(function (m, w) { return Math.max(m, Number(w.count) || 0); }, 0);
+      out.words = ws.map(function (w) {
+        var c = Number(w.count) || 0;
+        return { word: w.word, count: c, size: top ? Math.max(1, Math.round((c / top) * 5)) : 1 };
+      });
+    }
+    return out;
   }
 
   function counted(n, one, many) { return n + ' ' + (n === 1 ? one : many); }
@@ -142,6 +333,8 @@
 
   var lib = {
     classifyLink: classifyLink, itemLabel: itemLabel, queue: queue, canManage: canManage, parseCheck: parseCheck, tally: tally, answerText: answerText, counted: counted,
+    QUESTION_KINDS: QUESTION_KINDS, questionKind: questionKind, kindOf: kindOf, parseQuestion: parseQuestion, questionFields: questionFields,
+    sceneQuestion: sceneQuestion, fromScene: fromScene, scaleLabels: scaleLabels, answerRow: answerRow, results: results,
     CLOSING_CHECKS: CLOSING_CHECKS, TURN: TURN, turnSteps: turnSteps, presentingOrder: presentingOrder, latestBringBack: latestBringBack, clock: clock
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;

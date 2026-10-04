@@ -243,3 +243,21 @@ test('the own review can be pointed at one stage, and setup by name', () => {
   assert.match(ownReviewPrompt('setup'), /method part "setup"/);
   assert.match(chooseCohort([], undefined).text, /review_my_own_work/);
 });
+
+test('an agent reads every kind of question, its own answer, and the results with no names (R4)', () => {
+  const checks = [
+    { id: 'm', kind: 'multi', prompt: 'Which did you try?', choices: ['Tests', 'Docs'], state: 'open' },
+    { id: 'r', kind: 'rank', prompt: 'Order these', choices: ['Speed', 'Care'], state: 'open' },
+    { id: 's', kind: 'scale', prompt: 'How sure?', choices: ['Not', 'Very'], points: 5, state: 'open' },
+    { id: 'w', kind: 'words', prompt: 'One word', choices: null, state: 'open' }
+  ];
+  const mine = [{ check_id: 'm', value: [2, 1] }, { check_id: 'r', value: [2, 1] }, { check_id: 's', choice: 4 }];
+  const results = { m: { kind: 'multi', total: 2, counts: [2, 1] }, w: { kind: 'words', total: 2, words: [{ word: 'calm', count: 2 }] } };
+  const t = thisSessionText(a, { number: 2 }, true, [], checks, mine, results, 'me');
+  assert.match(t, /Choose any that fit: 1\. Tests; 2\. Docs\./);
+  assert.match(t, /You answered: Docs; Tests/);
+  assert.match(t, /You answered: Care, then Speed/);
+  assert.match(t, /A scale from 1 to 5, where 1 is "Not" and 5 is "Very"\.\n  You answered: 4 of 5/);
+  assert.match(t, /Count so far, with no names: Tests 2, Docs 1\./);
+  assert.match(t, /Words so far, with no names: calm \(2\)\./);
+});

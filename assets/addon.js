@@ -165,8 +165,9 @@
 
   var S = { me: null, room: null, cohort: null, session: null, prev: null, teaching: false, names: {}, people: [], groups: [], brought: [],
     parts: [], chosenPart: null, timerEnds: null, drawnPart: undefined, show: null,
-    items: [], checks: [], answers: [], tallies: {}, onStage: null, stageOn: false, rooms: null, roomPlaces: {}, signals: null };
+    items: [], checks: [], answers: [], results: {}, onStage: null, stageOn: false, rooms: null, roomPlaces: {}, signals: null };
   var channel = null, poller = null, nudgeTimer = null, deferred = {}, drafts = {};
+  var Q = window.QuestionView, askFields = null;  // the question bank (R4)
 
   function nameOf(id) { return S.me && id === S.me.id ? 'You' : (S.names[id] || 'Someone'); }
 
@@ -377,6 +378,7 @@
     $('[data-open-stage]').hidden = !S.teaching;
     $('[data-part-controls]').hidden = !S.teaching;
     $('[data-ask-wrap]').hidden = !S.teaching;
+    if (S.teaching) startAsking();
   }
 
   // ------------------------------------------------------------------
@@ -416,6 +418,7 @@
     if (changed) { S.drawnPart = undefined; S.show.setScenes(S.list); }
     drawPart(true);
     drawQueue(); drawChecks();
+    if (S.checks) drawSceneQuestion();
   }
 
   // Back and next without the show (before R3): the panel's own place.
@@ -587,17 +590,18 @@
     return Promise.all([
       db.from('live_queue').select('*').eq('session_id', sid),
       db.from('live_checks').select('*').eq('session_id', sid).order('created_at', { ascending: false }),
-      db.from('live_answers').select('id, check_id, user_id, choice, body, updated_at').eq('cohort_id', S.cohort.id)
+      db.from('live_answers').select('id, check_id, user_id, choice, body, value, updated_at').eq('cohort_id', S.cohort.id)
     ]).then(function (res) {
       var bad = res.filter(function (r) { return r.error; })[0];
       if (bad) { $('[data-sync]').textContent = 'The panel could not read the latest changes: ' + bad.error.message; return; }
       S.items = res[0].data; S.checks = res[1].data; S.answers = res[2].data;
-      var visible = S.checks.filter(function (k) { return k.choices && (S.teaching || k.show_tally); });
-      return Promise.all(visible.map(function (k) { return db.rpc('check_tally', { c: k.id }); })).then(function (t) {
-        S.tallies = {};
-        visible.forEach(function (k, i) { S.tallies[k.id] = (t[i] && t[i].data) || []; });
+      var visible = S.checks.filter(function (k) { return L.kindOf(k) !== 'short' && (S.teaching || k.show_tally); });
+      return Promise.all(visible.map(function (k) { return db.rpc('check_results', { c: k.id }); })).then(function (t) {
+        S.results = {};
+        visible.forEach(function (k, i) { S.results[k.id] = (t[i] && t[i].data) || null; });
         render('[data-queue]', drawQueue);
         render('[data-checks]', drawChecks);
+        drawSceneQuestion();
         drawCounts();
         sendStage();
       });
@@ -607,7 +611,7 @@
   // Redraw part of the panel, unless someone is typing an answer in it.
   function render(sel, fn) {
     var a = document.activeElement;
-    if (a && $(sel).contains(a) && /^(TEXTAREA|INPUT|SELECT)$/.test(a.tagName)) { deferred[sel] = fn; return; }
+    if (a && $(sel).contains(a) && (/^(TEXTAREA|INPUT|SELECT)$/.test(a.tagName) || a.closest('.question-answer, .question-edit'))) { deferred[sel] = fn; return; }
     fn();
   }
   root.addEventListener('focusout', function () {
@@ -666,20 +670,8 @@
     if (closingFirst) pane.insertBefore(wrap, $('[data-checks]')); else pane.insertBefore(wrap, $('[data-ask-status]'));
   }
 
-  function tallyBars(check) {
-    var t = L.tally(check, S.tallies[check.id] || []);
-    var wrap = el('div', 'live-tally');
-    wrap.appendChild(el('p', 'small', L.counted(t.total, 'answer', 'answers') + (S.teaching ? '' : ', with no names')));
-    var ul = el('ul');
-    t.rows.forEach(function (r) {
-      var li = el('li');
-      li.appendChild(el('span', 'label', r.label));
-      var bar = el('span', 'bar'); bar.style.setProperty('--share', r.share + '%'); li.appendChild(bar);
-      li.appendChild(el('span', 'count', String(r.count)));
-      ul.appendChild(li);
-    });
-    wrap.appendChild(ul);
-    return wrap;
+  function resultsOf(check) {
+    return Q.results(check, S.results[check.id], { teaching: S.teaching });
   }
 
   function changeCheck(check, change) {
@@ -688,9 +680,11 @@
 
   function teacherCheck(k) {
     var card = el('article', 'cohort-card live-check');
+    card.appendChild(el('p', 'kicker', L.questionKind(L.kindOf(k)).name));
     card.appendChild(el('h3', null, k.prompt));
     var mine = S.answers.filter(function (a) { return a.check_id === k.id; });
-    if (k.choices) card.appendChild(tallyBars(k));
+    var short = L.kindOf(k) === 'short';
+    if (!short) card.appendChild(resultsOf(k));
     else card.appendChild(el('p', 'small', L.counted(mine.length, 'answer', 'answers') + ', which only you and the other teachers see'));
     if (mine.length) {
       var details = el('details', 'addon-answers');
@@ -704,53 +698,62 @@
     }
     var acts = el('div', 'actions');
     acts.appendChild(stageToggle('check', k.id, 'Put it on the main stage', 'Take it off the main stage'));
-    if (k.choices) acts.appendChild(button(k.show_tally ? 'Hide the count' : 'Show everyone the count', 'btn-quiet', function () { changeCheck(k, { show_tally: !k.show_tally }); }));
+    if (!short) acts.appendChild(button(k.show_tally ? 'Hide the results' : 'Show everyone the results', 'btn-quiet', function () { changeCheck(k, { show_tally: !k.show_tally }); }));
     acts.appendChild(button('Close it', 'btn-quiet', function () { if (S.onStage && S.onStage.id === k.id) setPin(null); changeCheck(k, { state: 'closed' }); }));
     card.appendChild(acts);
+    if (!mine.length) card.appendChild(editCheck(k));
     return card;
+  }
+
+  // A question asked in the moment can be changed until someone answers
+  // it (the database says the same); the bank keeps its own copy.
+  function editCheck(check) {
+    var d = el('details', 'question-edit');
+    d.appendChild(el('summary', null, 'Change the question'));
+    var f = el('form', 'inline-form');
+    var fl = Q.fields();
+    fl.fill(L.questionFields(check));
+    f.appendChild(fl.el);
+    var acts = el('div', 'actions');
+    var save = el('button', 'btn-quiet', 'Save the change'); save.type = 'submit';
+    var status = el('span', 'small'); status.setAttribute('role', 'status');
+    acts.appendChild(save); acts.appendChild(status);
+    f.appendChild(acts);
+    f.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      var p = L.parseQuestion(fl.read());
+      if (p.error) { status.textContent = p.error; return; }
+      status.textContent = 'Saving…';
+      db.from('live_checks').update({ kind: p.kind, prompt: p.prompt, choices: p.choices, points: p.points }).eq('id', check.id).then(function (r) {
+        status.textContent = r.error ? 'Not changed: ' + r.error.message : 'Changed.';
+        if (!r.error) refreshLive();
+      });
+    });
+    d.appendChild(f);
+    return d;
   }
 
   function studentCheck(k) {
     var answer = S.answers.filter(function (a) { return a.check_id === k.id && a.user_id === S.me.id; })[0];
     var card = el('article', 'cohort-card live-check');
     card.appendChild(el('h3', null, k.prompt));
-    var form = el('form', 'inline-form');
-    var ta = null;
-    if (k.choices) {
-      var fs = el('fieldset', 'live-mode');
-      fs.appendChild(el('legend', 'visually-hidden', 'Choose one'));
-      k.choices.forEach(function (c, i) {
-        var lab = el('label', 'check');
-        var r = el('input'); r.type = 'radio'; r.name = 'check-' + k.id; r.value = String(i + 1); r.required = true;
-        r.checked = drafts[k.id] != null ? drafts[k.id] === r.value : !!(answer && answer.choice === i + 1);
-        r.addEventListener('change', function () { drafts[k.id] = r.value; });
-        lab.appendChild(r); lab.appendChild(document.createTextNode(' ' + c)); fs.appendChild(lab);
-      });
-      form.appendChild(fs);
-    } else {
-      var lab2 = el('label', null, 'Your answer, which only you and your teacher see');
-      ta = el('textarea'); ta.rows = 3; ta.maxLength = 1000; ta.required = true;
-      ta.value = drafts[k.id] != null ? drafts[k.id] : (answer ? answer.body : '');
-      ta.addEventListener('input', function () { drafts[k.id] = ta.value; });
-      lab2.appendChild(ta); form.appendChild(lab2);
-    }
-    var acts = el('div', 'actions');
-    var send = el('button', 'btn-quiet', answer ? 'Change my answer' : 'Send my answer'); send.type = 'submit';
-    var status = el('span', 'small'); status.setAttribute('role', 'status');
-    acts.appendChild(send); acts.appendChild(status); form.appendChild(acts);
-    form.addEventListener('submit', function (ev) {
-      ev.preventDefault();
-      var row = { check_id: k.id, cohort_id: S.cohort.id, user_id: S.me.id };
-      if (k.choices) { var picked = form.querySelector('input:checked'); if (!picked) return; row.choice = Number(picked.value); row.body = null; }
-      else { row.body = ta.value.trim(); row.choice = null; if (!row.body) return; }
-      status.textContent = 'Sending…';
-      (answer ? db.from('live_answers').update({ choice: row.choice, body: row.body }).eq('id', answer.id) : db.from('live_answers').insert(row)).then(function (r) {
-        if (r.error) { status.textContent = 'Not sent: ' + r.error.message; return; }
-        delete drafts[k.id]; refreshLive();
-      });
-    });
-    card.appendChild(form);
-    if (k.choices && k.show_tally) card.appendChild(tallyBars(k));
+    var said = L.answerText(k, answer);
+    if (said) card.appendChild(el('p', 'small', 'You answered: ' + said));
+    card.appendChild(Q.answer(k, answer, {
+      draft: drafts[k.id],
+      onDraft: function (input) { drafts[k.id] = input; },
+      onSend: function (row) {
+        var write = answer
+          ? db.from('live_answers').update(row).eq('id', answer.id)
+          : db.from('live_answers').insert(Object.assign({ check_id: k.id, cohort_id: S.cohort.id, user_id: S.me.id }, row));
+        return write.then(function (r) {
+          if (r.error) return r.error.message;
+          delete drafts[k.id]; refreshLive();
+          return null;
+        });
+      }
+    }));
+    if (k.show_tally && L.kindOf(k) !== 'short') card.appendChild(resultsOf(k));
     return card;
   }
 
@@ -761,35 +764,73 @@
     open.forEach(function (k) { box.appendChild(S.teaching ? teacherCheck(k) : studentCheck(k)); });
   }
 
-  function ask(prompts) {
-    var status = $('[data-ask-status]');
+  // Asking questions, in order: a copy of each goes to everyone, so
+  // changing one in the moment never changes the bank or the run of show.
+  function ask(questions, statusBox) {
+    var status = statusBox || $('[data-ask-status]');
     status.textContent = 'Asking…';
-    return prompts.reduce(function (p, q) {
+    return questions.reduce(function (p, q) {
       return p.then(function (r) {
         if (r && r.error) return r;
-        return db.from('live_checks').insert({ cohort_id: S.cohort.id, session_id: S.session.id, created_by: S.me.id, prompt: q.prompt, choices: q.choices, show_tally: !!q.show_tally });
+        return db.from('live_checks').insert({
+          cohort_id: S.cohort.id, session_id: S.session.id, created_by: S.me.id, kind: q.kind || 'short',
+          prompt: q.prompt, choices: q.choices || null, points: q.points || null, question_id: q.question_id || null, show_tally: !!q.show_tally
+        });
       });
     }, Promise.resolve(null)).then(function (r) {
-      status.textContent = r && r.error ? 'Not asked: ' + r.error.message : prompts.length > 1 ? 'Asked both.' : 'Asked.';
+      status.textContent = r && r.error ? 'Not asked: ' + r.error.message : questions.length > 1 ? 'Asked both.' : 'Asked.';
       if (!(r && r.error)) refreshLive();
       return !(r && r.error);
     });
   }
   $('[data-ask]').addEventListener('submit', function (ev) {
     ev.preventDefault();
-    var mode = root.querySelector('input[name="ask-mode"]:checked').value;
-    var parsed = L.parseCheck($('[data-ask-prompt]').value, mode, $('[data-ask-choices]').value);
+    if (!askFields) return;
+    var f = askFields.read();
+    var parsed = L.parseQuestion(f);
     if (parsed.error) { $('[data-ask-status]').textContent = parsed.error; return; }
-    ask([{ prompt: parsed.prompt, choices: parsed.choices, show_tally: $('[data-ask-tally]').checked }]).then(function (ok) {
-      if (ok) { $('[data-ask-prompt]').value = ''; $('[data-ask-choices]').value = ''; $('[data-ask-wrap]').open = false; }
+    ask([Object.assign({ question_id: f.question_id, show_tally: $('[data-ask-tally]').checked }, parsed)]).then(function (ok) {
+      if (ok) { askFields.reset(); $('[data-ask-wrap]').open = false; }
     });
   });
   $('[data-ask-closing]').addEventListener('click', function () {
-    ask(L.CLOSING_CHECKS.map(function (p) { return { prompt: p, choices: null }; }));
+    ask(L.CLOSING_CHECKS.map(function (p) { return { kind: 'short', prompt: p }; }));
   });
-  root.querySelectorAll('input[name="ask-mode"]').forEach(function (r) {
-    r.addEventListener('change', function () { $('[data-ask-choices-wrap]').hidden = !(r.value === 'choices' && r.checked); });
-  });
+
+  // The teacher's question bank (R4): their own questions and this
+  // cohort's, to start a question from. Before the database has the bank,
+  // the form works as before, without it.
+  function startAsking() {
+    if (!Q || askFields) return;
+    db.from('questions').select('id, cohort_id, kind, prompt, choices, points, updated_at').order('updated_at', { ascending: false }).then(function (r) {
+      var bank = r.error ? [] : (r.data || []).filter(function (q) { return !q.cohort_id || q.cohort_id === S.cohort.id; });
+      askFields = Q.fields({ bank: bank });
+      $('[data-ask-fields]').replaceChildren(askFields.el);
+    });
+  }
+
+  // A question scene in the run of show holds the question the teacher
+  // planned. When it is the current scene, the teacher asks it in one
+  // press, and the panel says so once it has been asked.
+  function drawSceneQuestion() {
+    var box = $('[data-scene-question]');
+    var part = partNow();
+    var q = S.teaching && part && part.own && part.kind === 'question' ? L.fromScene(part.config) : null;
+    box.hidden = !q;
+    box.replaceChildren();
+    if (!q) return;
+    var asked = (S.checks || []).some(function (k) { return k.prompt === q.prompt && k.state === 'open'; });
+    box.appendChild(el('p', 'kicker', 'Planned for this scene, ' + L.questionKind(q.kind).name.toLowerCase()));
+    box.appendChild(el('p', 'live-what', q.prompt));
+    var status = el('span', 'small'); status.setAttribute('role', 'status');
+    var acts = el('div', 'actions');
+    if (asked) status.textContent = 'Asked. The answers are below.';
+    else acts.appendChild(button('Ask it now', 'btn-github', function () {
+      ask([Object.assign({ show_tally: $('[data-ask-tally]').checked }, q)], status);
+    }));
+    acts.appendChild(status);
+    box.appendChild(acts);
+  }
 
   // ------------------------------------------------------------------
   // The main stage: opened by the teacher, and told what to show. Meet
@@ -808,7 +849,7 @@
     }
     return A.stageView({
       part: part ? { key: part.key, name: part.name, endsAt: endsNow() } : null,
-      onStage: S.onStage, checks: S.checks, tallies: S.tallies, items: S.items, names: S.names,
+      onStage: S.onStage, checks: S.checks, results: S.results, items: S.items, names: S.names,
       welcome: lib.welcome(S.cohort, S.session, S.parts), scene: scene
     });
   }
