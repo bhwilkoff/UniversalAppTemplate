@@ -21,6 +21,7 @@ ROOT = Path(__file__).resolve().parents[1]
 AUTH_STUB = """
 create role anon nologin;
 create role authenticated nologin;
+create role service_role nologin bypassrls;
 create schema auth;
 create table auth.users (
   id uuid primary key,
@@ -1583,6 +1584,96 @@ def main():
     cal.execute("select public.delete_my_account()")
     su9.execute("select count(*) from public.stage_marks where user_id = %s", (people["cal"],))
     check("deleting the account deletes the marks", su9.fetchone()[0] == 0)
+
+    # ---- Reaching someone off the site (migration 20261003220000) -------
+    su11 = conn.cursor(); su11.execute("reset role")
+    for name in ["ivy", "jon"]:
+        uid = str(uuid.uuid4())
+        su11.execute("insert into auth.users (id, raw_user_meta_data) values (%s, %s)",
+                     (uid, f'{{"user_name": "{name}", "provider_id": "{abs(hash(name)) % 10**8}"}}'))
+        people[name] = uid
+    attempt(u("ben"), "insert into public.cohorts (slug, title, created_by, status) values ('reach', 'Reach', %s, 'open') returning id", (people["ben"],))
+    rc = last_rows[0][0]
+    for name in ["ivy", "jon"]:
+        attempt(u(name), "insert into public.enrollments (cohort_id, user_id) values (%s, %s)", (rc, people[name]))
+
+    def count_as(cur, sql, args=()):
+        cur.execute(sql, args)
+        return cur.fetchone()[0]
+
+    check("nothing is on until a person chooses it",
+          one("ivy", "select count(*) from public.reach_choices")[0] == 0)
+    check("a person cannot allow email without giving an address",
+          not attempt(u("ivy"), "insert into public.reach_choices (user_id, teachers_may_email) values (%s, true)", (people["ivy"],)))
+    check("a person can let their teachers email them",
+          attempt(u("ivy"), "insert into public.reach_choices (user_id, email, teachers_may_email) values (%s, 'ivy@example.org', true)", (people["ivy"],)))
+    check("no one can choose for someone else",
+          not attempt(u("jon"), "insert into public.reach_choices (user_id, email, teachers_may_email) values (%s, 'x@example.org', true)", (people["ivy"],)))
+    check("a classmate cannot read someone's address",
+          one("jon", "select count(*) from public.reach_choices where user_id = %s", (people["ivy"],))[0] == 0)
+    check("a teacher cannot read the table directly either",
+          one("ben", "select count(*) from public.reach_choices")[0] == 0)
+    check("a person's own agent cannot read their address",
+          count_as(as_agent("ivy"), "select count(*) from public.reach_choices") == 0)
+    check("an agent cannot change the choice",
+          attempt(as_agent("ivy"), "update public.reach_choices set teachers_may_email = false returning user_id") and last_rows == [])
+
+    ok = attempt(u("ben"), "select user_id, may_email, email from public.reach_for(%s)", (rc,))
+    got = {r[0]: (r[1], r[2]) for r in last_rows} if ok else {}
+    check("a teacher sees the address of someone who chose it",
+          got.get(people["ivy"]) == (True, "ivy@example.org"))
+    check("and no address for someone who did not choose it",
+          got.get(people["jon"]) == (False, None))
+    check("a student cannot ask how to reach classmates",
+          not attempt(u("jon"), "select * from public.reach_for(%s)", (rc,)))
+    check("a teacher of another cohort cannot ask",
+          not attempt(u("dee"), "select * from public.reach_for(%s)", (rc,)))
+    check("a teacher's agent cannot ask",
+          not attempt(as_agent("ben"), "select * from public.reach_for(%s)", (rc,)))
+
+    attempt(u("ivy"), "update public.reach_choices set teachers_may_email = false where user_id = %s", (people["ivy"],))
+    attempt(u("ben"), "select user_id, may_email, email from public.reach_for(%s)", (rc,))
+    check("turning it off hides the address from teachers at once",
+          {r[0]: r[2] for r in last_rows}.get(people["ivy"], "missing") is None)
+
+    attempt(u("jon"), "select public.leave_cohort(%s)", (rc,))
+    attempt(u("ben"), "select user_id from public.reach_for(%s)", (rc,))
+    check("someone who left is not listed", people["jon"] not in [r[0] for r in last_rows])
+
+    check("a person can ask for notices",
+          attempt(u("ivy"), "update public.reach_choices set notices = true where user_id = %s returning notified_at is not null", (people["ivy"],)) and last_rows == [(True,)])
+    check("a person cannot move their own notice clock",
+          attempt(u("ivy"), "update public.reach_choices set notified_at = now() - interval '9 days' where user_id = %s returning notified_at > now() - interval '1 minute'", (people["ivy"],)) and last_rows == [(True,)])
+    check("no one signed in can read the digest",
+          not attempt(u("ben"), "select * from public.notice_digest()"))
+    check("no one signed in can mark notices sent",
+          not attempt(u("ivy"), "select public.mark_notified(array[%s]::uuid[])", (people["ivy"],)))
+
+    def as_server():
+        """The service role, as the notices function calls it: no one signed in."""
+        cur = conn.cursor()
+        cur.execute("reset role")
+        cur.execute("select set_config('request.jwt.claim.sub', '', false), set_config('request.jwt.claims', '', false)")
+        cur.execute("set role service_role")
+        return cur
+
+    attempt(u("ben"), "insert into public.teacher_notes (cohort_id, student_id, author_id, body) values (%s, %s, %s, 'We missed you. Here is the recording.')", (rc, people["ivy"], people["ben"]))
+    sv = as_server(); sv.execute("reset role")
+    sv.execute("update public.reach_choices set notified_at = now() - interval '2 days' where user_id = %s", (people["ivy"],))
+    sv = as_server()
+    sv.execute("select user_id, email, notes, answers from public.notice_digest()")
+    rows = [(str(r[0]), r[1], r[2], r[3]) for r in sv.fetchall()]
+    check("the server's digest names who has something waiting, with counts and no words",
+          rows == [(people["ivy"], "ivy@example.org", 1, 0)])
+    sv.execute("select public.mark_notified(array[%s]::uuid[])", (people["ivy"],))
+    sv.execute("select count(*) from public.notice_digest()")
+    check("once sent, the same note is not sent again", sv.fetchone()[0] == 0)
+    sv.execute("reset role")
+
+    attempt(u("ivy"), "select public.delete_my_account()")
+    sv = conn.cursor(); sv.execute("reset role")
+    sv.execute("select count(*) from public.reach_choices where user_id = %s", (people["ivy"],))
+    check("deleting the account deletes the choice", sv.fetchone()[0] == 0)
     conn.rollback()
     conn.close()
     failed = [n for n, ok in results if not ok]

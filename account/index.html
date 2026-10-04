@@ -131,8 +131,28 @@
             <div data-path-marks></div>
           </div>
 
+          <!-- Written by Claude, awaiting Ben's review (research/notes/reach-notes.md). -->
+          <div data-reach-section hidden>
+            <h2>How your teachers can reach you</h2>
+            <p class="small">A teacher who has not seen you in a while may want to write to you privately. Until you choose otherwise, their words wait for you here and on your cohort page. Both choices below are off until you turn them on, and you can turn them off at any time.</p>
+            <form class="inline-form" data-reach-form>
+              <label>The email address to use
+                <span class="hint">It can be different from the one on your calendar invites. Only the teachers of cohorts you are in see it, and only if you tick the first box.</span>
+                <input type="email" name="email" autocomplete="email" maxlength="254">
+              </label>
+              <label class="check"><input type="checkbox" name="teachers_may_email"> My teachers may email me, from their own email</label>
+              <label class="check"><input type="checkbox" name="notices"> Email me, at most once a day, when a teacher writes me a note or someone answers what I shared</label>
+              <p class="small">That second email comes from meet@humanshaped.org and says only that something is waiting, never the words themselves.</p>
+              <div class="actions">
+                <button class="btn-quiet" type="submit">Save how to reach me</button>
+                <button class="btn-quiet" type="button" data-reach-clear hidden>Forget my address</button>
+                <span class="small" role="status" data-reach-status></span>
+              </div>
+            </form>
+          </div>
+
           <h2>Your data</h2>
-          <p>This site keeps your GitHub name and picture, which cohorts you are in, whatever you choose to share with a cohort, your own marks on the path, and the notes your teachers send you. Leaving a cohort removes what you shared there but keeps your notes, which you can remove here. Deleting your account removes everything.</p>
+          <p>This site keeps your GitHub name and picture, which cohorts you are in, whatever you choose to share with a cohort, your own marks on the path, the notes your teachers send you, and, only if you give it above, the address your teachers may use. Leaving a cohort removes what you shared there but keeps your notes, which you can remove here. Deleting your account removes everything.</p>
           <div class="actions">
             <button class="btn-quiet" type="button" data-sign-out>Sign out</button>
             <button class="btn-quiet danger" type="button" data-delete-open>Delete my account</button>
@@ -170,6 +190,7 @@
   <script src="/assets/addon-lib.js" defer></script>
   <script src="/assets/mentor-lib.js" defer></script>
   <script src="/assets/path-lib.js" defer></script>
+  <script src="/assets/reach-lib.js" defer></script>
   <script src="/assets/hub.js" defer></script>
 
   <footer class="site-footer">
