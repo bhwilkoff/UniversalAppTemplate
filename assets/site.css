@@ -1115,7 +1115,8 @@ body.addon-body { min-height: 100vh; }
 .addon-mark .arch { width: 1.3rem; height: 0.65rem; flex: none; color: var(--clay); }
 .addon-mark span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-.addon-panel { padding: 0.9rem 0.9rem 2rem; display: grid; gap: 0.75rem; font-size: 1rem; }
+.addon-panel { padding: 0.9rem 0.9rem 2rem; display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.75rem; font-size: 1rem; }
+.addon-panel > *, .addon-panel .account-state > * { min-width: 0; }
 .addon-panel .account-state:not([hidden]) { display: grid; gap: 0.75rem; min-width: 0; }
 .addon-panel h1 { font-size: 1.3rem; line-height: 1.2; letter-spacing: -0.015em; }
 .addon-panel h2 { font-size: 1.15rem; max-width: none; margin: 0.25rem 0 0; }
@@ -1131,7 +1132,7 @@ body.addon-body { min-height: 100vh; }
 .addon-where { color: var(--muted); font-size: 0.9rem; }
 
 /* The launcher: one row of activities, the open one filled. */
-.addon-launcher { display: flex; gap: 0.25rem; padding: 0.25rem; background: var(--surface); border-radius: 12px; position: sticky; top: 0; z-index: 1; }
+.addon-launcher { display: flex; flex-wrap: wrap; gap: 0.25rem; padding: 0.25rem; background: var(--surface); border-radius: 12px; position: sticky; top: 0; z-index: 1; }
 .addon-tab {
   appearance: none; flex: 1 1 0; min-width: 0; min-height: 40px; border: 0; border-radius: 9px; background: transparent;
   color: var(--ink); font: inherit; font-weight: 600; font-size: 0.92rem; cursor: pointer;
