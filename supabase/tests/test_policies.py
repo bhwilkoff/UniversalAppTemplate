@@ -2094,6 +2094,87 @@ def main():
           attempt(as_user("bea"), "update public.profiles set display_name = 'Bea B' where id = %s returning id", (people["bea"],)) and len(last_rows) == 1)
     as_system()
 
+
+    # Running the show (migration 20261004070000): one show_state row per
+    # session, which scene is happening now and what the main stage
+    # shows; the cohort's teachers move it, the cohort follows it, agents
+    # only read it, and it goes when the cohort finishes. bea is a
+    # student here; dee is not in the cohort.
+    ben = as_user("ben")
+    attempt(ben, "insert into public.cohorts (slug, title, created_by, status) values ('run-test', 'Run', %s, 'open') returning id", (people["ben"],))
+    rc = last_rows[0][0]
+    attempt(ben, "insert into public.sessions (cohort_id, number) values (%s, 1) returning id", (rc,))
+    r1 = last_rows[0][0]
+    attempt(ben, "insert into public.cohorts (slug, title, created_by, status) values ('run-other', 'Other', %s, 'open') returning id", (people["ben"],))
+    roc = last_rows[0][0]
+    attempt(ben, "insert into public.sessions (cohort_id, number) values (%s, 1) returning id", (roc,))
+    ro1 = last_rows[0][0]
+    bea = as_user("bea")
+    attempt(bea, "insert into public.enrollments (cohort_id, user_id) values (%s, %s)", (rc, people["bea"]))
+    attempt(bea, "insert into public.live_queue (cohort_id, session_id, user_id, kind, url, note) values (%s, %s, %s, 'app', 'https://bea.github.io/garden-swap', 'The new list') returning id", (rc, r1, people["bea"]))
+    rq = last_rows[0][0]
+    ben = as_user("ben")
+    attempt(ben, "insert into public.live_checks (cohort_id, session_id, created_by, prompt, choices) values (%s, %s, %s, 'Which one?', array['This', 'That']) returning id", (rc, r1, people["ben"]))
+    rk = last_rows[0][0]
+    attempt(ben, "insert into public.live_checks (cohort_id, session_id, created_by, prompt) values (%s, %s, %s, 'Elsewhere?') returning id", (roc, ro1, people["ben"]))
+    rk_other = last_rows[0][0]
+    start = "insert into public.show_state (session_id, cohort_id, current_scene) values (%s, %s, %s) returning current_scene, scene_started_at is not null, stage, updated_by"
+    check("a teacher starts the show at a scene, and its clock starts with it",
+          attempt(ben, start, (r1, rc, "arrive")) and last_rows == [("arrive", True, "scene", people["ben"])])
+    check("a session has one show", not attempt(ben, start, (r1, rc, "show")))
+    check("a show belongs to a session of its own cohort", not attempt(ben, start, (ro1, rc, "arrive")))
+    check("a teacher moves the show to the next scene, and the clock starts again",
+          attempt(ben, "update public.show_state set current_scene = 'show' where session_id = %s returning current_scene, scene_started_at is not null", (r1,))
+          and last_rows == [("show", True)])
+    check("a teacher stops this scene's clock",
+          attempt(ben, "update public.show_state set scene_started_at = null where session_id = %s returning scene_started_at", (r1,)) and last_rows == [(None,)])
+    check("and restarts it from the database's own time, not the one the page sends",
+          attempt(ben, "update public.show_state set scene_started_at = '2000-01-01' where session_id = %s returning scene_started_at > '2001-01-01'", (r1,)) and last_rows == [(True,)])
+    check("a teacher pins a question of this session on the main stage",
+          attempt(ben, "update public.show_state set stage = 'answers', stage_ref = %s where session_id = %s returning stage", (rk, r1)) and last_rows == [("answers",)])
+    check("a question from another session cannot go on this main stage",
+          not attempt(ben, "update public.show_state set stage = 'answers', stage_ref = %s where session_id = %s", (rk_other, r1)))
+    check("a teacher pins someone's work from the wings",
+          attempt(ben, "update public.show_state set stage = 'presenter', stage_ref = %s where session_id = %s returning stage", (rq, r1)) and last_rows == [("presenter",)])
+    check("a pin must name what it pins",
+          not attempt(ben, "update public.show_state set stage = 'answers', stage_ref = null where session_id = %s", (r1,)))
+    check("the main stage can only show what it knows how to",
+          not attempt(ben, "update public.show_state set stage = 'video', stage_ref = null where session_id = %s", (r1,)))
+    check("a teacher returns the main stage to following the scene",
+          attempt(ben, "update public.show_state set stage = 'scene', stage_ref = null where session_id = %s returning stage", (r1,)) and last_rows == [("scene",)])
+    check("a show cannot move to another session",
+          not attempt(ben, "update public.show_state set session_id = %s where session_id = %s", (ro1, r1)))
+    bea = as_user("bea")
+    bea.execute("select current_scene, stage from public.show_state where session_id = %s", (r1,))
+    check("someone in the cohort follows the show", bea.fetchall() == [("show", "scene")])
+    check("a student cannot move the show",
+          attempt(bea, "update public.show_state set current_scene = 'value' where session_id = %s returning session_id", (r1,)) and last_rows == [])
+    check("a student cannot start a show",
+          not attempt(bea, start, (ro1, roc, "arrive")))
+    check("a student cannot end the show",
+          attempt(bea, "delete from public.show_state where session_id = %s returning session_id", (r1,)) and last_rows == [])
+    dee = as_user("dee")
+    dee.execute("select count(*) from public.show_state where cohort_id = %s", (rc,))
+    check("someone outside the cohort cannot see its show", dee.fetchone()[0] == 0)
+    anon = as_user(None)
+    anon.execute("select count(*) from public.show_state")
+    check("someone signed out cannot see any show", anon.fetchone()[0] == 0)
+    ben_agent = as_agent("ben")
+    ben_agent.execute("select current_scene from public.show_state where session_id = %s", (r1,))
+    check("a teacher's agent can see where the show is", ben_agent.fetchall() == [("show",)])
+    check("a teacher's agent cannot move the show",
+          attempt(ben_agent, "update public.show_state set current_scene = 'value' where session_id = %s returning session_id", (r1,)) and last_rows == [])
+    check("a teacher's agent cannot start a show", not attempt(ben_agent, start, (ro1, roc, "arrive")))
+    check("a teacher's agent cannot end the show",
+          attempt(ben_agent, "delete from public.show_state where session_id = %s returning session_id", (r1,)) and last_rows == [])
+    ben = as_user("ben")
+    attempt(ben, start, (ro1, roc, "arrive"))
+    ben.execute("update public.cohorts set status = 'finished' where id = %s", (rc,))
+    su9 = conn.cursor(); su9.execute("reset role")
+    su9.execute("select count(*) from public.show_state where cohort_id = %s", (rc,))
+    check("the show goes when the cohort finishes", su9.fetchone()[0] == 0)
+    su9.execute("select count(*) from public.show_state where cohort_id = %s", (roc,))
+    check("and another cohort's show stays", su9.fetchone()[0] == 1)
     conn.rollback()
     conn.close()
     failed = [n for n, ok in results if not ok]

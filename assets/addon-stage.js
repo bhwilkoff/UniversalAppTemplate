@@ -29,7 +29,19 @@
     root.querySelectorAll('[data-view]').forEach(function (v) { v.hidden = v.getAttribute('data-view') !== view.mode; });
     var part = view.part;
     // The part sits small at the top when something else has the stage.
-    $('[data-part]').hidden = view.mode === 'part' || view.mode === 'welcome' || !part;
+    $('[data-part]').hidden = view.mode === 'part' || view.mode === 'welcome' || view.mode === 'scene' || view.mode === 'blank' || !part;
+    if (view.mode === 'scene') {
+      var sc = view.scene;
+      $('[data-s-eyebrow]').textContent = sc.eyebrow;
+      $('[data-s-title]').textContent = sc.title;
+      var lines = $('[data-s-lines]'); lines.replaceChildren();
+      sc.lines.forEach(function (t) { lines.appendChild(el('p', 'stage-what', t)); });
+      var items = $('[data-s-items]'); items.replaceChildren();
+      items.hidden = !sc.items.length;
+      sc.items.forEach(function (t) { var li = el('li'); li.appendChild(el('span', 'label', t)); items.appendChild(li); });
+      $('[data-s-note]').hidden = !sc.note;
+      $('[data-s-note]').textContent = sc.note || '';
+    }
     $('[data-part-name]').textContent = part ? part.name : '';
     $('[data-part-kicker]').textContent = part ? 'Now' : 'Welcome';
     $('[data-part-big]').textContent = part ? part.name : 'The session begins soon.';
@@ -74,6 +86,8 @@
     var t = clockText(view.part);
     $('[data-clock]').textContent = t ? ', ' + t : '';
     $('[data-clock-big]').textContent = t;
+    $('[data-s-clock]').hidden = !(view.mode === 'scene' && t);
+    $('[data-s-clock]').textContent = t;
   }
   setInterval(tick, 1000);
 

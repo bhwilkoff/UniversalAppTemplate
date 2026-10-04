@@ -196,18 +196,55 @@
   // the part changes, or when what it shows has changed (force), so a
   // step's timer keeps running underneath it.
   function drawNow(force) {
-    var part = lib.partNow(S.parts, S.session.starts_at, new Date(), S.chosenPart);
+    var part = partNow();
     var key = part ? part.key : null;
     if (clockLine) clockLine.textContent = part ? 'Minute ' + part.start + ' of ' + S.cohort.session_minutes + ', for ' + part.minutes + ' minutes' : 'Before the session, week ' + S.session.number;
     if (!force && key === S.drawnPart) return;
     S.drawnPart = key;
+    var list = S.list || S.parts;
+    var lead = V ? V.partKeyOf(part, list.indexOf(part)) : key;
     var body = $('[data-now-body]');
     body.replaceChildren();
-    if (key === 'arrive') drawArrive(body);
-    else if (key === 'show') drawGroups(body);
+    if (lead === 'arrive') drawArrive(body);
+    else if (lead === 'show') drawGroups(body);
     body.hidden = !body.children.length;
-    if (show) show.update(key);
+    if (show) show.update(key, runInfo());
   }
+
+  // ------------------------------------------------------------------
+  // Running the show (R3): the show everyone follows, moved by a teacher
+  // from here or from the Meet add-on's panel (assets/show-run.js).
+  // ------------------------------------------------------------------
+
+  var V = window.ShowViewLib, run = null;
+  function shared() { return !!(run && run.shared); }
+  function sceneOf(key) { return (S.list || S.parts).filter(function (s) { return s.key === key; })[0] || null; }
+
+  // Where the teacher moved the show, or, before anyone has, the scene the
+  // clock says (or one whose timer someone started here, as before R3).
+  function partNow() {
+    if (shared() && run.state() && run.current()) return sceneOf(run.current());
+    return lib.partNow(S.list || S.parts, S.session.starts_at, new Date(), S.chosenPart);
+  }
+
+  function runInfo() {
+    if (!shared() || !V) return undefined;
+    var st = run.state();
+    var left = st ? V.secondsLeft(st, partNow(), Date.now()) : null;
+    var pin = V.pinOf(st);
+    var pinned = !pin ? null : pin.kind === 'welcome' ? 'the welcome' : pin.kind === 'blank' ? 'nothing' : pin.kind === 'check' ? 'a question' : 'someone’s work';
+    return { left: V.leftText(left), clockOn: left != null, pinned: pinned };
+  }
+
+  function showChanged() {
+    if (!show || !run) return;
+    var list = V.scenes(run.list());
+    var changed = JSON.stringify(list) !== JSON.stringify(S.list);
+    S.list = list;
+    if (changed) { S.drawnPart = undefined; show.setScenes(S.list); }
+    drawNow(true);
+  }
+  setInterval(function () { if (show && show.tick && shared()) show.tick(runInfo()); }, 1000);
 
   // ------------------------------------------------------------------
   // The run of show (R1): the same component as the Meet add-on's panel
@@ -218,16 +255,40 @@
   var show = null, clockLine = null;
   function startShow() {
     if (show || !window.ShowView) return;
+    S.list = S.parts;
     show = window.ShowView.mount({
-      mount: $('[data-show]'), parts: S.parts, teaching: S.teaching,
-      onPick: function (key) { S.chosenPart = key; drawNow(); },
+      mount: $('[data-show]'), parts: S.list, teaching: S.teaching,
+      onPick: function (key) {
+        if (shared()) { run.go(key); return; }
+        S.chosenPart = key; drawNow();
+      },
       // A scene's timer also tells the page that this is the scene the
-      // session is in, whatever the clock says.
+      // session is in, whatever the clock says. Once the show runs (R3),
+      // each scene's clock is the show's own, on the current scene.
       tools: function (key) {
-        var p = S.parts.filter(function (x) { return x.key === key; })[0];
+        if (shared()) return null;
+        var p = sceneOf(key);
         return p ? timerButton(p.minutes * 60, 'part:' + p.key, function () { S.chosenPart = p.key; drawNow(); }) : null;
-      }
+      },
+      run: S.teaching ? {
+        onStep: function (d) {
+          if (shared()) { run.step(d); return; }
+          var key = V.step(S.list || S.parts, (partNow() || {}).key, d);
+          if (key) { S.chosenPart = key; drawNow(); }
+        },
+        onClock: function (on) { if (shared()) run.clock(on); },
+        onFollow: function () { if (shared()) run.pin(null); },
+        canEdit: function (key) {
+          if (!run) return null;
+          var s = sceneOf(key);
+          if (s && s.own) return 'own';
+          return run.canOwn() ? 'parts' : null;
+        },
+        onSave: function (key, fields) { return run.save(key, fields); },
+        onStartOwn: function () { return run.startOwn(); }
+      } : {}
     });
+    if (window.ShowRun) run = window.ShowRun.start({ db: db, cohort: S.cohort, session: S.session, parts: S.parts, teaching: S.teaching, onChange: showChanged });
     var clock = el('div', 'addon-part');
     clockLine = el('p', 'kicker');
     clock.appendChild(clockLine);

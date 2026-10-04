@@ -64,6 +64,19 @@
         <p class="stage-quiet">Answer on your cohort’s live page, where only you and your teacher see what you said.</p>
       </div>
 
+      <!-- The current scene of the run of show, as the teacher wrote it (R3). -->
+      <div class="stage-body" data-view="scene" hidden>
+        <p class="kicker" data-s-eyebrow></p>
+        <h1 class="stage-title" data-s-title></h1>
+        <div class="stage-lines" data-s-lines></div>
+        <ul class="stage-choices" data-s-items hidden></ul>
+        <p class="stage-note" data-s-note hidden></p>
+        <p class="stage-clock-big stage-clock-scene" data-s-clock hidden></p>
+      </div>
+
+      <!-- The teacher cleared the stage. -->
+      <div class="stage-body" data-view="blank" hidden></div>
+
       <div class="stage-body" data-view="item" hidden>
         <p class="kicker">Showing their work</p>
         <h1 class="stage-title" data-who></h1>

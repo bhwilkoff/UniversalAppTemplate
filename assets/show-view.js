@@ -39,38 +39,171 @@
     var ol = el('ol', 'show-timeline');
     box.appendChild(ol);
     var items = {};
-    K.scenes(parts).forEach(function (s) {
-      var li = el('li', 'show-scene');
-      li.setAttribute('data-scene', s.key);
-      var top = el('div', 'show-scene-head');
-      var kind = el('p', 'show-kind', s.kindName);
-      var mins = K.minutesText(s.minutes);
-      if (mins) kind.appendChild(el('span', 'show-mins', mins));
-      top.appendChild(kind);
-      top.appendChild(el('h3', 'show-name', s.name));
-      li.appendChild(top);
-      var line = el('p', 'small show-line', s.kindLine);
-      li.appendChild(line);
-      if (s.what) {
-        var what = el('details', 'show-what');
-        what.appendChild(el('summary', null, 'What happens in this scene'));
-        what.appendChild(el('p', 'small', s.what));
-        li.appendChild(what);
+    var run = opts.run || null, info = {};
+
+    // The scenes, drawn again whenever the run of show changes (a scene
+    // edited, added, or moved). Each part of the view is moved out first
+    // and put back by place(), so nothing a person was typing is lost.
+    function build(list) {
+      Object.keys(wraps).forEach(function (k) { var w = wraps[k].box; if (w.parentNode) w.parentNode.removeChild(w); });
+      ol.replaceChildren();
+      items = {};
+      K.scenes(list).forEach(function (s) {
+        var li = el('li', 'show-scene');
+        li.setAttribute('data-scene', s.key);
+        var top = el('div', 'show-scene-head');
+        var kind = el('p', 'show-kind', s.kindName);
+        var mins = K.minutesText(s.minutes);
+        if (mins) kind.appendChild(el('span', 'show-mins', mins));
+        top.appendChild(kind);
+        top.appendChild(el('h3', 'show-name', s.name));
+        li.appendChild(top);
+        var line = el('p', 'small show-line', s.kindLine);
+        li.appendChild(line);
+        if (s.what) {
+          var what = el('details', 'show-what');
+          what.appendChild(el('summary', null, 'What happens in this scene'));
+          what.appendChild(el('p', 'small', s.what));
+          li.appendChild(what);
+        }
+        // The current scene's clock, and the teacher's moves through the show.
+        var bar = run ? runBar(s) : null;
+        if (bar) li.appendChild(bar.box);
+        var body = el('div', 'show-body');
+        li.appendChild(body);
+        var tools = el('div', 'actions show-tools');
+        if (teaching && opts.onPick) {
+          var pick = el('button', 'btn-quiet show-pick', 'Make this the current scene');
+          pick.type = 'button';
+          pick.addEventListener('click', function () { opts.onPick(s.key); });
+          tools.appendChild(pick);
+        }
+        if (teaching && opts.tools) { var extra = opts.tools(s.key); if (extra) tools.appendChild(extra); }
+        if (tools.children.length) li.appendChild(tools);
+        if (teaching && run && run.canEdit) { var ed = editor(s); if (ed) li.appendChild(ed); }
+        items[s.key] = { li: li, body: body, bar: bar };
+        ol.appendChild(li);
+      });
+    }
+
+    // ------------------------------------------------------------------
+    // Running the show (R3)
+    // ------------------------------------------------------------------
+
+    function btn(label, cls, fn) { var b = el('button', cls || 'btn-quiet', label); b.type = 'button'; b.addEventListener('click', fn); return b; }
+
+    // Shown on the current scene: its clock for everyone; for a teacher,
+    // back and next, the clock's start and stop, and, when something else
+    // is pinned on the main stage, the way back to following the scene.
+    function runBar(s) {
+      var box = el('div', 'show-run');
+      box.hidden = true;
+      var clock = el('p', 'show-clock');
+      clock.setAttribute('aria-live', 'off');
+      box.appendChild(clock);
+      var pinned = el('p', 'small show-pinned');
+      pinned.hidden = true;
+      box.appendChild(pinned);
+      var follow = null, clockBtn = null;
+      if (teaching) {
+        follow = btn('Show this scene on the main stage again', 'btn-quiet show-follow', function () { if (run.onFollow) run.onFollow(); });
+        follow.hidden = true;
+        box.appendChild(follow);
+        var acts = el('div', 'actions show-moves');
+        acts.appendChild(btn('Back', 'btn-quiet show-back', function () { if (run.onStep) run.onStep(-1); }));
+        acts.appendChild(btn('Next scene', 'btn-github show-next', function () { if (run.onStep) run.onStep(1); }));
+        clockBtn = btn('Start the clock', 'btn-quiet show-clock-btn', function () { if (run.onClock) run.onClock(!info.clockOn); });
+        acts.appendChild(clockBtn);
+        box.appendChild(acts);
       }
-      var body = el('div', 'show-body');
-      li.appendChild(body);
-      var tools = el('div', 'actions show-tools');
-      if (teaching && opts.onPick) {
-        var pick = el('button', 'btn-quiet show-pick', 'Make this the current scene');
-        pick.type = 'button';
-        pick.addEventListener('click', function () { opts.onPick(s.key); });
-        tools.appendChild(pick);
+      return { box: box, clock: clock, pinned: pinned, follow: follow, clockBtn: clockBtn, key: s.key };
+    }
+
+    function drawRun() {
+      Object.keys(items).forEach(function (key) {
+        var b = items[key].bar;
+        if (!b) return;
+        var here = key === current;
+        b.box.hidden = !here;
+        if (!here) return;
+        b.clock.textContent = info.left || (info.clockOn ? '' : (teaching ? 'The clock is stopped.' : ''));
+        b.clock.hidden = !b.clock.textContent;
+        b.pinned.hidden = !info.pinned;
+        b.pinned.textContent = info.pinned ? 'The main stage shows ' + info.pinned + ' instead of this scene.' : '';
+        if (b.follow) b.follow.hidden = !info.pinned;
+        if (b.clockBtn) b.clockBtn.textContent = info.clockOn ? 'Stop the clock' : 'Start the clock';
+      });
+    }
+
+    // Editing a scene in the moment: its title, minutes, the words the main
+    // stage shows, and, for the kinds that have them, the prompt and a
+    // question's choices. The teacher's own main stage shows the words as
+    // they type; saving shows them to everyone at once. A session running
+    // on the six parts first makes a run of show of its own.
+    function editor(s) {
+      var mode = run.canEdit(s.key);
+      if (!mode) return null;
+      var d = el('details', 'show-edit');
+      d.appendChild(el('summary', null, 'Edit this scene'));
+      if (mode === 'parts') {
+        d.appendChild(el('p', 'small', 'This week is running on the six parts. To change a scene in the moment, give this week a run of show of its own, starting from the same scenes. Everyone stays where they are.'));
+        var msg0 = el('p', 'small'); msg0.setAttribute('role', 'status');
+        var make = btn('Give this week its own run of show', 'btn-quiet', function () {
+          make.disabled = true; msg0.textContent = 'Making it…';
+          Promise.resolve(run.onStartOwn()).then(function (err) { make.disabled = false; msg0.textContent = err ? 'Not made: ' + err : ''; });
+        });
+        d.appendChild(el('div', 'actions')).appendChild(make);
+        d.appendChild(msg0);
+        return d;
       }
-      if (teaching && opts.tools) { var extra = opts.tools(s.key); if (extra) tools.appendChild(extra); }
-      if (tools.children.length) li.appendChild(tools);
-      items[s.key] = { li: li, body: body };
-      ol.appendChild(li);
-    });
+      var f = el('form', 'show-edit-form');
+      var start = K.editFields(s), have = K.editable(s.kind);
+      function field(name, label, kind, hint) {
+        var l = el('label');
+        l.appendChild(document.createTextNode(label));
+        if (hint) l.appendChild(el('span', 'hint', hint));
+        var input = kind === 'area' ? el('textarea') : el('input');
+        if (kind === 'area') input.rows = name === 'body' ? 3 : 4;
+        if (kind === 'number') { input.type = 'number'; input.min = '1'; input.max = '240'; input.inputMode = 'numeric'; }
+        input.name = name;
+        input.value = start[name];
+        l.appendChild(input);
+        f.appendChild(l);
+      }
+      field('title', 'Title', 'text');
+      field('minutes', 'Minutes', 'number');
+      field('body', 'What the main stage says', 'area', 'A few lines, with a blank line between them.');
+      if (have.prompt) field('prompt', s.kind === 'question' ? 'The question' : 'The prompt', 'area');
+      if (have.options) field('options', 'Choices', 'area', 'One to a line, two to eight. Leave empty for an answer in their own words.');
+      var msg = el('p', 'small'); msg.setAttribute('role', 'status');
+      var acts = el('div', 'actions');
+      var save = el('button', 'btn-github', 'Show it to everyone'); save.type = 'submit';
+      acts.appendChild(save);
+      acts.appendChild(btn('Put it back as it was', 'btn-quiet', function () {
+        Object.keys(start).forEach(function (k) { if (f.elements[k]) f.elements[k].value = start[k]; });
+        if (run.onDraft) run.onDraft(s.key, null);
+        msg.textContent = '';
+      }));
+      f.appendChild(acts);
+      f.appendChild(msg);
+      function values() {
+        var v = {};
+        Object.keys(start).forEach(function (k) { v[k] = f.elements[k] ? f.elements[k].value : start[k]; });
+        return v;
+      }
+      f.addEventListener('input', function () { if (run.onDraft) run.onDraft(s.key, values()); msg.textContent = 'Your own main stage shows this as you type. Everyone else sees it when you choose Show it to everyone.'; });
+      f.addEventListener('submit', function (ev) {
+        ev.preventDefault();
+        save.disabled = true; msg.textContent = 'Saving…';
+        Promise.resolve(run.onSave(s.key, values())).then(function (err) {
+          save.disabled = false;
+          msg.textContent = err ? 'Not shown yet: ' + err : 'Everyone sees it now.';
+          if (!err && run.onDraft) run.onDraft(s.key, null);
+        });
+      });
+      d.appendChild(f);
+      return d;
+    }
 
     // Before the first scene, or when the parts are not known, the
     // current scene's parts wait in a box of their own above the list.
@@ -138,6 +271,8 @@
       w.box.querySelector('summary').setAttribute('aria-label', w.name + (counts[key] ? ', ' + counts[key] : ''));
     }
 
+    build(parts);
+
     function place() {
       var l = K.layout(parts, current || null, { teaching: teaching, available: Object.keys(slots) });
       var target = current && items[current] ? items[current].body : before;
@@ -160,8 +295,13 @@
       before.hidden = !Array.prototype.some.call(before.children, function (c) { return !c.hidden; });
     }
 
-    function update(key) {
+    // update(key) marks the current scene; with the show running (R3),
+    // update(key, { left, clockOn, pinned }) also says its clock and what
+    // the main stage shows instead of it, if anything.
+    function update(key, more) {
       current = key || null;
+      if (more) info = more;
+      drawRun();
       K.timeline(parts, current).forEach(function (s) {
         var it = items[s.key];
         if (!it) return;
@@ -193,7 +333,21 @@
       });
     }
 
-    return { slot: slot, count: count, update: update, cues: cues };
+    // The run of show changed (R3): draw its scenes again, keep each part
+    // of the view, and mark the current scene.
+    function setScenes(list, key, more) {
+      parts = list || [];
+      build(parts);
+      update(key === undefined ? current : key, more);
+    }
+
+    // Just the clock, once a second, without moving anything.
+    function tick(more) {
+      if (more) info = Object.assign({}, info, more);
+      drawRun();
+    }
+
+    return { slot: slot, count: count, update: update, cues: cues, setScenes: setScenes, tick: tick };
   }
 
   window.ShowView = { mount: mount };
