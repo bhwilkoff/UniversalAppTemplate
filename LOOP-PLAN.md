@@ -957,7 +957,16 @@ October 3, after every C milestone that does not wait on Ben merged):
   main): /connect/ fixed and linked from /account/ and /path/, "Going
   alone" starts at /path/setup/, classmates' shown apps link to their
   hub pages, and the MCP prompt `review_my_own_work` (mcp redeployed).
-- **H4. The add-on behind /live/:** no C1 signals, board, or talk share
+- **H4 (merged):** the controls for rooms, cards with presets, on
+  stage, recording, and talk share come from one place
+  (SignalsLib.controlsHtml) on both /live/ and the add-on, which gains
+  an Everyone activity for teachers and a Board activity (opened in a
+  tab; the stage cannot sign in). /teach/ says the add-on is meet@-only
+  until listed. tools/meet-addon/README.md "Who can use it": private
+  reaches humanshaped.org only, public or unlisted needs Google's review
+  and is permanent, so teachers elsewhere use /live/ beside Meet. 266
+  node tests. Not yet seen in a real call.
+- **H4, as planned:** no C1 signals, board, or talk share
   in the panel; /teach/ and the guide never mention it; teachers outside
   humanshaped.org cannot use a private add-on. 2 to 3 days, research on
   distribution.
