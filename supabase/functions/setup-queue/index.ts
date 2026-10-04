@@ -6,16 +6,18 @@
 // script" gives, built by the same TeachLib.meetSetup, so the script
 // treats it exactly as a pasted setup.
 //
-// Secrets (set in Supabase, never in this repository):
-//   SETUP_QUEUE_SECRET, the same long random string kept in the Apps
-//   Script's Script Properties. Without it set, this function refuses
-//   everything.
+// Who may call: meet@humanshaped.org itself, shown by the Google ID token
+// its Apps Script sends (ScriptApp.getIdentityToken(), checked in
+// ../_shared/google-id.js), so nobody pastes a secret anywhere. While the
+// older SETUP_QUEUE_SECRET is still set in Supabase, that secret in the
+// x-setup-secret header is accepted too.
 // Supabase provides SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY itself.
 // Deploy with tools/deploy-setup-queue.sh (verify_jwt off: the caller is a
 // script, not a person), which puts assets/teach-lib.js beside this file.
 
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import './teach-lib.js';
+import { callerAllowed } from '../_shared/google-id.js';
 
 // deno-lint-ignore no-explicit-any
 const TeachLib = (globalThis as any).TeachLib;
@@ -34,9 +36,10 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 Deno.serve(async (req) => {
   if (req.method !== 'POST') return reply(405, { message: 'Use POST.' });
-  const secret = Deno.env.get('SETUP_QUEUE_SECRET') || '';
-  if (secret.length < 32) return reply(503, { message: 'The setup queue is not set up.' });
-  if (!sameSecret(req.headers.get('x-setup-secret') || '', secret)) return reply(401, { message: 'No.' });
+  const who = await callerAllowed(req, {
+    get: (k: string) => Deno.env.get(k), secretName: 'SETUP_QUEUE_SECRET', secretHeader: 'x-setup-secret', sameSecret, fetchFn: fetch,
+  });
+  if (!who.ok) return reply(401, { message: 'No.', reason: who.reason });
 
   let input: { action?: string; id?: string; ok?: boolean; detail?: string; meet_url?: string; rooms?: unknown };
   try { input = await req.json(); } catch { return reply(400, { message: 'Send JSON.' }); }

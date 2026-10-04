@@ -4,13 +4,16 @@
 // migration 20261003220000). It hands over an address and two counts per
 // person, never the words of a note or of feedback.
 //
-// Secrets (set in Supabase, never in this repository):
-//   NOTICES_SECRET, the same long random string kept in the Apps Script's
-//   Script Properties. Without it set, this function refuses everything.
+// Who may call: meet@humanshaped.org itself, shown by the Google ID token
+// its Apps Script sends (ScriptApp.getIdentityToken(), checked in
+// ../_shared/google-id.js), so nobody pastes a secret anywhere. While the
+// older NOTICES_SECRET is still set in Supabase, that secret in the
+// x-notices-secret header is accepted too.
 // Supabase provides SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY itself.
 // Deploy with verify_jwt off: the caller is a script, not a person.
 
 import { createClient } from 'npm:@supabase/supabase-js@2';
+import { callerAllowed } from '../_shared/google-id.js';
 
 const json = { 'Content-Type': 'application/json' };
 const reply = (status: number, body: unknown) => new Response(JSON.stringify(body), { status, headers: json });
@@ -27,9 +30,10 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 Deno.serve(async (req) => {
   if (req.method !== 'POST') return reply(405, { message: 'Use POST.' });
-  const secret = Deno.env.get('NOTICES_SECRET') || '';
-  if (secret.length < 32) return reply(503, { message: 'Notices are not set up.' });
-  if (!sameSecret(req.headers.get('x-notices-secret') || '', secret)) return reply(401, { message: 'No.' });
+  const who = await callerAllowed(req, {
+    get: (k: string) => Deno.env.get(k), secretName: 'NOTICES_SECRET', secretHeader: 'x-notices-secret', sameSecret, fetchFn: fetch,
+  });
+  if (!who.ok) return reply(401, { message: 'No.', reason: who.reason });
 
   let input: { action?: string; ids?: unknown };
   try { input = await req.json(); } catch { return reply(400, { message: 'Send JSON.' }); }

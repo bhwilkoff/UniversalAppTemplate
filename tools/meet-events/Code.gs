@@ -336,6 +336,10 @@ function whoAmI() {
   var me = me_();
   var ok = me === hostEmail_();
   console.log(ok ? 'Running as ' + me + ', the host account. Good.' : 'Running as ' + (me || 'an unknown account') + ', but events and folders should belong to ' + hostEmail_() + '. Sign in as that account and run it again.');
+  // The identity the hub checks. Its aud is this script's own client, which
+  // can be pinned in the hub as GOOGLE_ID_AUDIENCES.
+  var id = identityTokenFacts_();
+  console.log(id ? 'Identity for the hub: ' + id.email + ' (' + id.hd + '), audience ' + id.aud + '.' : 'No identity token yet: the openid scope was not allowed.');
   return me;
 }
 
@@ -753,14 +757,69 @@ function fileStrayRecordings(idOrObject) {
   return msg;
 }
 
+// ---- Calling the hub as this account ----
+//
+// The hub's notices and setup-queue functions let in meet@humanshaped.org
+// by the Google ID token Apps Script gives this account
+// (ScriptApp.getIdentityToken(), which needs the openid scope in
+// appsscript.json). The hub checks Google's signature, that the token
+// speaks for meet@ in humanshaped.org, and that it was issued to this
+// script's own Cloud project. Nobody pastes a secret. The addresses below
+// are the defaults; a Script Property of the same name overrides one.
+
+var HUB_FUNCTIONS = {
+  NOTICES: { url: 'https://bifrieqzkihuxfzttgvd.supabase.co/functions/v1/notices', header: 'x-notices-secret' },
+  SETUP_QUEUE: { url: 'https://bifrieqzkihuxfzttgvd.supabase.co/functions/v1/setup-queue', header: 'x-setup-secret' }
+};
+
+// Where to call and with which headers, from the Script Properties and an
+// identity token. The token is the proof; an older secret, if one is still
+// in Script Properties, is used only when there is no token. Pure, so the
+// tests can check it.
+function hubRequest(name, props, idToken) {
+  var fn = HUB_FUNCTIONS[name];
+  if (!fn) throw new Error('No hub function called ' + name + '.');
+  var url = String((props && props[name + '_URL']) || fn.url).trim();
+  var headers = {};
+  if (idToken) headers.Authorization = 'Bearer ' + idToken;
+  else if (props && props[name + '_SECRET']) headers[fn.header] = props[name + '_SECRET'];
+  else throw new Error('No Google identity token. Run whoAmI once from the editor and press Allow, so this script may use it.');
+  return { url: url, headers: headers };
+}
+
+function hubCall_(name, action, extra) {
+  var props = {};
+  [name + '_URL', name + '_SECRET'].forEach(function (k) { props[k] = props_().getProperty(k); });
+  var req = hubRequest(name, props, ScriptApp.getIdentityToken());
+  var payload = { action: action };
+  Object.keys(extra || {}).forEach(function (k) { payload[k] = extra[k]; });
+  var res = UrlFetchApp.fetch(req.url, {
+    method: 'post', contentType: 'application/json', payload: JSON.stringify(payload),
+    headers: req.headers, muteHttpExceptions: true
+  });
+  var body = JSON.parse(res.getContentText() || '{}');
+  if (res.getResponseCode() !== 200) throw new Error('The hub said ' + res.getResponseCode() + ': ' + (body.message || 'no reason') + (body.reason ? ' (' + body.reason + ')' : ''));
+  return body;
+}
+
+// The audience (aud) and address inside this account's identity token, so
+// the hub can be pinned to exactly this script's client (GOOGLE_ID_AUDIENCES).
+function identityTokenFacts_() {
+  var t = ScriptApp.getIdentityToken();
+  if (!t) return null;
+  var claims = JSON.parse(Utilities.newBlob(Utilities.base64DecodeWebSafe(t.split('.')[1])).getDataAsString());
+  return { aud: claims.aud, email: claims.email, hd: claims.hd };
+}
+
 // ---- "Something is waiting for you" emails (G4) ----
 //
 // Once a day, for people who asked on /account/, an email from this
 // account saying a teacher wrote them a note or someone answered what
 // they shared, with a link back. It never carries the words, which stay
 // on the hub (research/notes/reach-notes.md). Off unless the Script
-// Property NOTICES_ON is "true"; NOTICES_URL and NOTICES_SECRET say
-// where to ask and prove it is us. Written by Claude, awaiting Ben's review.
+// Property NOTICES_ON is "true". It proves it is us with this account's
+// own Google ID token (hubCall_ below), so there is no secret to paste.
+// Written by Claude, awaiting Ben's review.
 
 function noticesOn(value) {
   return String(value || '').trim().toLowerCase() === 'true';
@@ -789,18 +848,7 @@ function noticeEmail(person) {
 }
 
 function askNotices_(action, extra) {
-  var url = props_().getProperty('NOTICES_URL');
-  var secret = props_().getProperty('NOTICES_SECRET');
-  if (!url || !secret) throw new Error('Set NOTICES_URL and NOTICES_SECRET in Script Properties first.');
-  var payload = { action: action };
-  Object.keys(extra || {}).forEach(function (k) { payload[k] = extra[k]; });
-  var res = UrlFetchApp.fetch(url, {
-    method: 'post', contentType: 'application/json', payload: JSON.stringify(payload),
-    headers: { 'x-notices-secret': secret }, muteHttpExceptions: true
-  });
-  var body = JSON.parse(res.getContentText() || '{}');
-  if (res.getResponseCode() !== 200) throw new Error('The hub said ' + res.getResponseCode() + ': ' + (body.message || 'no reason'));
-  return body;
+  return hubCall_('NOTICES', action, extra);
 }
 
 // Run by a daily time-driven trigger (see the README). Sends at most one
@@ -833,8 +881,8 @@ function sendNotices() {
 // runs setupCohort on each one's setup (the same shape /teach/ copies),
 // and reports the weekly Meet link and each group's room back, which the
 // hub puts on the sessions and groups. Off unless the Script Property
-// SETUP_QUEUE_ON is "true"; SETUP_QUEUE_URL and SETUP_QUEUE_SECRET say
-// where to ask and prove it is us. Written by Claude, awaiting Ben's review.
+// SETUP_QUEUE_ON is "true". It proves it is us with this account's own
+// Google ID token (hubCall_ below). Written by Claude, awaiting Ben's review.
 
 function setupQueueOn(value) {
   return String(value || '').trim().toLowerCase() === 'true';
@@ -860,18 +908,7 @@ function setupSummary(report) {
 }
 
 function askSetupQueue_(action, extra) {
-  var url = props_().getProperty('SETUP_QUEUE_URL');
-  var secret = props_().getProperty('SETUP_QUEUE_SECRET');
-  if (!url || !secret) throw new Error('Set SETUP_QUEUE_URL and SETUP_QUEUE_SECRET in Script Properties first.');
-  var payload = { action: action };
-  Object.keys(extra || {}).forEach(function (k) { payload[k] = extra[k]; });
-  var res = UrlFetchApp.fetch(url, {
-    method: 'post', contentType: 'application/json', payload: JSON.stringify(payload),
-    headers: { 'x-setup-secret': secret }, muteHttpExceptions: true
-  });
-  var body = JSON.parse(res.getContentText() || '{}');
-  if (res.getResponseCode() !== 200) throw new Error('The hub said ' + res.getResponseCode() + ': ' + (body.message || 'no reason'));
-  return body;
+  return hubCall_('SETUP_QUEUE', action, extra);
 }
 
 function processSetupRequests() {
