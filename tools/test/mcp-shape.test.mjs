@@ -1,6 +1,7 @@
 // node --test tools/test/
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import * as S from '../../supabase/functions/mcp/shape.js';
 import { chooseCohort, cohortsText, thisWeekText, nextSessionText, groupText, workText, methodUrls, stagePart, thisSessionText, teacherCohort, rosterText, studentWorkText, classNowText, TEACHER_ASIDE, ownAppText, ownReviewPrompt } from '../../supabase/functions/mcp/shape.js';
 
 const a = { slug: 'fall-2026', title: 'Fall 2026', status: 'running', weeks: 5, starts_on: '2026-10-06', role: 'student' };
@@ -260,4 +261,14 @@ test('an agent reads every kind of question, its own answer, and the results wit
   assert.match(t, /A scale from 1 to 5, where 1 is "Not" and 5 is "Very"\.\n  You answered: 4 of 5/);
   assert.match(t, /Count so far, with no names: Tests 2, Docs 1\./);
   assert.match(t, /Words so far, with no names: calm \(2\)\./);
+});
+
+test('an agent hears where the run of show is and what the main stage shows', () => {
+  const now = Date.parse('2026-10-05T18:10:00Z');
+  const line = S.showLine({ scene: { title: 'Check what landed', kind: 'question', minutes: 10 }, startedAt: '2026-10-05T18:06:30Z', stage: 'rooms', now });
+  assert.equal(line, 'The run of show is on "Check what landed" (a question, minute 4 of 10). The main stage shows every rehearsal room.');
+  assert.equal(S.showLine(null), null);
+  assert.equal(S.showLine({ scene: { title: 'Arrive', kind: 'talk', minutes: 5 }, startedAt: null, stage: 'scene' }), 'The run of show is on "Arrive" (a talk).');
+  const text = S.thisSessionText({ title: 'Fall', slug: 'fall' }, { number: 2 }, true, [], [], [], {}, 'me', { scene: { title: 'Arrive', kind: 'talk', minutes: 5 }, stage: 'path' });
+  assert.match(text, /run of show is on "Arrive".*main stage shows where everyone said they are/);
 });

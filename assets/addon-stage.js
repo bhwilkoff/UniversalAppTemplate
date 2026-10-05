@@ -189,6 +189,12 @@
       stage.on('frameToFrameMessage', function (m) {
         var react = m && window.ReactLib ? window.ReactLib.readStage(m.payload) : null;
         if (react) return drawReactions(react);
+        var code = m && window.CodeLib ? window.CodeLib.readStage(m.payload) : null;
+        if (code) {
+          $('[data-code-view]').hidden = !code.code;
+          if (code.code) { $('[data-code-lang]').textContent = window.CodeLib.LANGS[code.code.lang]; $('[data-code-text]').textContent = code.code.text; }
+          return;
+        }
         if (!m || m.payload === last) return;
         var v = A.readStageMessage(m.payload);
         if (!v) return;

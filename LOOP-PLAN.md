@@ -454,7 +454,22 @@ panel at 360px and the stage at 1280px) and pushed before the next.
   25 two-page checks. Not yet in a real call.
 - **R14, code and agents:** a code scene everyone can run and change in
   their own browser; "Share what my agent said," marked AI; the MCP
-  server's `live_now` tool. (pending)
+  server's `live_now` tool. **Built October 5:** assets/code-lib.js (4
+  tests) and assets/code-runner.js: a teacher sends a JavaScript or
+  Python program (up to 4,000 characters) in their presence on the class
+  channel, so late arrivals get it too; everyone has their own copy to
+  change and run, JavaScript in a sandboxed frame that cannot reach the
+  page (checked: a reach for the parent page is blocked, and an endless
+  loop is stopped at five seconds while the panel keeps running), Python
+  in Pyodide 0.26.4 from jsDelivr in a worker (thirty seconds; not
+  checked here, since this container cannot reach jsDelivr's Pyodide).
+  "Also show it on the main stage" lays the program over the stage.
+  Instead of a seventh MCP tool, this_session and class_now now say where
+  the run of show is (showLine in shape.js, one test): the scene, its
+  minute, and what the main stage shows. The panel links to /connect/.
+  Sharing what an agent said goes in the R15 chat, marked as AI.
+  **Needs Ben:** run `sh tools/deploy-mcp.sh` on the Mac, since this
+  container cannot type-check the Deno function.
 - **R15, in-class chat that lives in GitHub:** Ben, October 5: "In-class
   messages/chat is different than ongoing discussion. I don't think there
   is any way to bring in the chat from Github, that would be INCREDIBLE.

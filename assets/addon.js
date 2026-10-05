@@ -222,6 +222,7 @@
         S.people = res[1].data;
         S.groups = res[3].data;
         S.teaching = res[2].data.some(function (t) { return t.user_id === S.me.id; });
+        S.teacherIds = res[2].data.map(function (t) { return t.user_id; });
         S.people.concat(res[2].data).forEach(function (p) { if (p.profiles) S.names[p.user_id] = p.profiles.display_name || p.profiles.github_login; });
         var t = lib.currentAndNext(ss, new Date(), cohort.session_minutes);
         S.session = t.live ? t.next : (t.next || t.current);
@@ -235,6 +236,7 @@
           startRooms();
           startSignals(res[2].data);
           startClass();
+          drawCode();
           drawPart(true);
           show('ready');
           return refreshLive().then(listen);
@@ -306,9 +308,29 @@
       onPresence: function (state) {
         S.presence = state;
         drawRoster();
+        drawCode();
         if (S.onStage && S.onStage.kind === 'path') sendStage();
       }
     });
+  }
+
+  // Code everyone can run (R14): the teacher's program rides in their
+  // presence on the class channel; every panel shows its own copy, and
+  // passes it to its own main stage while the teacher has it there.
+  function drawCode() {
+    var CL = window.CodeLib;
+    if (!CL || !window.CodeRunner) return;
+    if (!S.code) S.code = window.CodeRunner.start({
+      mount: $('[data-code]'), teaching: S.teaching,
+      onSend: function (m) { if (S.classChannel) S.classChannel.setPresence({ code: m }); }
+    });
+    var shared = CL.shared(S.presence || {}, S.teacherIds || []);
+    S.code.show(shared);
+    var msg = CL.stageMessage(shared);
+    if (msg !== S.codeStageSent && S.stageOn && side) {
+      S.codeStageSent = msg;
+      try { Promise.resolve(side.notifyMainStage(msg)).catch(function () {}); } catch (e) {}
+    }
   }
 
   function rosterNow() {
@@ -1037,7 +1059,7 @@
     }).then(function (client) {
       side = client;
       side.on('frameToFrameMessage', function (m) {
-        if (m && A.isHello(m.payload)) { S.stageOn = true; sendStage(); }
+        if (m && A.isHello(m.payload)) { S.stageOn = true; sendStage(); S.codeStageSent = null; drawCode(); }
       });
       return signIn().then(function (s) { if (s) proceed(s); else signedOut(); });
     }, function () {

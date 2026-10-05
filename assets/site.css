@@ -1699,3 +1699,17 @@ label.check { min-height: 2.25rem; }
 .board-library-row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.4rem; }
 .board-library-row input { flex: 1 1 14rem; min-height: 40px; font: inherit; border: 1px solid var(--rule); border-radius: 8px; padding: 0 0.6rem; background: var(--card); color: var(--ink); }
 .board-library-files { list-style: none; margin: 0.5rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.4rem; }
+
+/* Code everyone can run (R14). */
+.code-box:empty { display: none; }
+.code-compose summary { font-weight: 600; cursor: pointer; padding: 0.3rem 0; }
+.code-compose select { min-height: 36px; margin: 0.4rem 0; font: inherit; border: 1px solid var(--rule); border-radius: 8px; background: var(--card); color: var(--ink); }
+.code-text { width: 100%; box-sizing: border-box; font: 0.85rem/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; tab-size: 4; padding: 0.6rem; border: 1px solid var(--rule); border-radius: 8px; background: var(--card); color: var(--ink); resize: vertical; }
+.code-check { display: flex; gap: 0.4rem; align-items: center; font-size: 0.9rem; margin-top: 0.4rem; }
+.code-card { border: 1px solid var(--rule); border-radius: var(--radius); background: var(--card); padding: 0.7rem 0.8rem; display: grid; gap: 0.5rem; }
+.code-card .kicker { margin: 0; }
+.code-out { margin: 0; max-height: 14rem; overflow: auto; white-space: pre-wrap; word-break: break-word; font: 0.82rem/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; background: var(--surface); border-radius: 8px; padding: 0.6rem; }
+.code-err { color: var(--clay); }
+.stage-code { position: absolute; inset: 9vmin 4vmin 5vmin; z-index: 12; background: var(--card); border: 1px solid var(--rule); border-radius: var(--radius); padding: 3vmin 4vmin; overflow: auto; box-shadow: 0 30px 60px -40px rgba(0,0,0,0.5); }
+.stage-code[hidden] { display: none; }
+.stage-code pre { margin: 0; font: clamp(1rem, 2.4vmin, 1.8rem)/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; white-space: pre-wrap; }

@@ -32,7 +32,7 @@ import './live-lib.js';
 import './followup-lib.js';
 import {
   chooseCohort, cohortsText, thisWeekText, nextSessionText, groupText, workText, thisSessionText,
-  teacherCohort, rosterText, studentWorkText, classNowText,
+  teacherCohort, rosterText, studentWorkText, classNowText, showLine,
   METHOD, methodUrls, ownAppText, ownReviewPrompt,
 } from './shape.js';
 
@@ -211,6 +211,23 @@ Deno.serve(
           return text(nextSessionText(c, t, CohortLib.agenda(c.session_minutes), t.next ? when(t.next.starts_at, c.time_zone) : '', since));
         });
 
+        // The run of show for a session (R14): its show_state and the
+        // scene it is on, read through the cohort's own read rules.
+        async function showOf(sessionId: string, minutes: number) {
+          const st = await supabase.from('show_state').select('current_scene, scene_started_at, stage').eq('session_id', sessionId).maybeSingle();
+          if (st.error || !st.data || !st.data.current_scene) return null;
+          const key = st.data.current_scene;
+          // A scene the teacher wrote is named by its id; otherwise the
+          // show runs the six parts of the agenda, named by their keys.
+          const sc = await supabase.from('scenes').select('id, title, kind, minutes').eq('session_id', sessionId);
+          // deno-lint-ignore no-explicit-any
+          const own = sc.error ? null : (sc.data || []).find((x: any) => x.id === key) || null;
+          // deno-lint-ignore no-explicit-any
+          const part = own ? null : (CohortLib.agenda(minutes) || []).find((x: any) => x.key === key) || null;
+          const scene = own ? { title: own.title, kind: own.kind, minutes: own.minutes } : part ? { title: part.name, kind: 'talk', minutes: part.minutes } : null;
+          return scene ? { scene, startedAt: st.data.scene_started_at, stage: st.data.stage, now: Date.now() } : null;
+        }
+
         server.registerTool('this_session', {
           title: 'This session',
           description: 'What is happening in the live session: how many are waiting in the "show your work" queue and where this person\'s own items are in it, and the teacher\'s open checks for understanding with this person\'s own answers and any count the teacher has chosen to show. Read-only; answering and adding to the queue happen on the session page, by the person.',
@@ -241,7 +258,7 @@ Deno.serve(
             const r = await supabase.rpc('check_results', { c: k.id });
             if (!r.error && r.data) tallies[k.id] = r.data;
           }));
-          return text(thisSessionText(c, session, t.live, items, checks.data, answers.data, tallies, uid));
+          return text(thisSessionText(c, session, t.live, items, checks.data, answers.data, tallies, uid, await showOf(session.id, c.session_minutes)));
         });
 
         server.registerTool('my_group', {
@@ -407,6 +424,7 @@ Deno.serve(
             checks: checks.data.map((k: any) => ({ ...k, answers: answered.find((x: any) => x.id === k.id).answers })),
             commits: pushed.commits,
             unread: pushed.unread,
+            show: await showOf(session.id, c.session_minutes),
           }));
         });
 

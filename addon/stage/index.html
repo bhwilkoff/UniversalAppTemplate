@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261005j">
+  <link rel="stylesheet" href="/assets/site.css?v=20261005k">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -97,6 +97,11 @@
 
       <!-- Reactions the class sends, floating up, and where people stand
            while someone talks (R10). Nothing here is kept. -->
+      <!-- The teacher's program, over whatever else is on the stage (R14). -->
+      <div class="stage-code" data-code-view hidden>
+        <p class="kicker" data-code-lang></p>
+        <pre data-code-text></pre>
+      </div>
       <div class="react-layer" data-react-layer aria-hidden="true"></div>
       <div class="stance-bar" data-stance hidden>
         <span class="stance-track"><span class="stance-part agree" data-st="agree"></span><span class="stance-part unsure" data-st="unsure"></span><span class="stance-part disagree" data-st="disagree"></span></span>
@@ -117,6 +122,7 @@
   <script src="/assets/live-lib.js" defer></script>
   <script src="/assets/addon-lib.js" defer></script>
   <script src="/assets/react-lib.js" defer></script>
+  <script src="/assets/code-lib.js" defer></script>
   <script src="/assets/addon-stage.js" defer></script>
 </body>
 </html>

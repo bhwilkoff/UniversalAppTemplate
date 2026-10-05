@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261005j">
+  <link rel="stylesheet" href="/assets/site.css?v=20261005k">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -84,6 +84,15 @@
       <!-- The room at a glance (R11), for the teacher: who is here, who is
            not yet, who answered, and where people said they are. Live only. -->
       <section class="roster" aria-label="Who is here" data-roster hidden></section>
+
+      <!-- Code everyone can run (R14): the teacher's program, and each
+           person's own copy, run in their own browser. -->
+      <section class="code-box" aria-label="Code to run" data-code></section>
+
+      <!-- Each person's own AI agent (R14): it reads the class through the
+           hub's read-only connection, and what it says reaches the class
+           only if its person shares it. -->
+      <p class="small addon-agent">Your own AI agent can follow this class with you: where the show is, the open questions, and your own work. <a href="/connect/" target="_blank" rel="noopener">Connect it</a>. What it says reaches the class only if you share it.</p>
 
       <!-- Live signals (C1, H4): where everyone should be, the teacher's
            card, who is on stage, and "recording now", the same lines /live/
@@ -192,6 +201,8 @@
   <script src="/assets/show-run.js" defer></script>
   <script src="/assets/react-lib.js" defer></script>
   <script src="/assets/roster-lib.js" defer></script>
+  <script src="/assets/code-lib.js" defer></script>
+  <script src="/assets/code-runner.js" defer></script>
   <script src="/assets/class-channel.js" defer></script>
   <script src="/assets/addon.js" defer></script>
 </body>

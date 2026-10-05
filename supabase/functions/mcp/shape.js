@@ -242,13 +242,34 @@ function resultsLine(k, t) {
 // agent reads it so it knows what the person is in the middle of; adding
 // to the queue and answering stay the person's own acts, on the page.
 // Queue items arrive with a `label` (LiveLib.itemLabel) and a `login`.
-export function thisSessionText(cohort, session, live, queue, checks, myAnswers, tallies, myId) {
+// The run of show now (R14): the scene everyone follows, how far into its
+// minutes it is, and what the main stage shows instead of it, if anything.
+// show: { scene: { title, kind, minutes } | null, startedAt, stage, now }.
+const SCENE_KIND = { talk: 'a talk', presenter: 'someone presenting', question: 'a question', design: 'a design stage on the shared board', rooms: 'rehearsal rooms', break: 'a break', reflection: 'a reflection' };
+const STAGE_SHOWS = { welcome: 'the welcome', answers: 'a question\'s answers', presenter: 'someone\'s work', blank: 'nothing (the teacher cleared it)', path: 'where everyone said they are on the path, as counts', rooms: 'every rehearsal room' };
+export function showLine(show) {
+  if (!show || !show.scene) return null;
+  const sc = show.scene;
+  let line = `The run of show is on "${sc.title}" (${SCENE_KIND[sc.kind] || 'a scene'}`;
+  const started = show.startedAt ? Date.parse(show.startedAt) : NaN;
+  if (isFinite(started) && sc.minutes) {
+    const m = Math.max(0, Math.floor(((show.now || Date.now()) - started) / 60000));
+    line += `, minute ${Math.min(m + 1, 999)} of ${sc.minutes}`;
+  }
+  line += ').';
+  if (show.stage && STAGE_SHOWS[show.stage]) line += ` The main stage shows ${STAGE_SHOWS[show.stage]}.`;
+  return line;
+}
+
+export function thisSessionText(cohort, session, live, queue, checks, myAnswers, tallies, myId, show) {
   if (!session) return `${cohort.title}: no sessions are scheduled yet, so there is nothing happening live.`;
   const lines = [
     `${cohort.title}, week ${session.number}${live ? ' (happening now)' : ' (the next session; it is not live yet)'}`,
     `Session page: ${SITE}/live/?c=${encodeURIComponent(cohort.slug)}`,
     '',
   ];
+  const sl = showLine(show);
+  if (sl) lines.splice(2, 0, sl);
   const waiting = queue.filter((q) => q.state !== 'shown').sort((x, y) => x.created_at.localeCompare(y.created_at));
   const shown = queue.filter((q) => q.state === 'shown');
   // Only the person's own items are described. Classmates' items are
@@ -413,7 +434,9 @@ export function classNowText(cohort, now) {
     `${cohort.title}, week ${s.number}${now.live ? ' (happening now)' : now.started ? ' (the most recent session, which is over)' : ' (it has not begun yet)'}`,
     `Session page: ${SITE}/live/?c=${encodeURIComponent(cohort.slug)}`,
   ];
-  if (now.live && now.part) lines.push(`By the clock, the part now is "${now.part.name}" (minute ${now.part.start}, for ${now.part.minutes} minutes), though a teacher who started a part's timer on the session page may be somewhere else.`);
+  const sl = showLine(now.show);
+  if (sl) lines.push(sl);
+  else if (now.live && now.part) lines.push(`By the clock, the part now is "${now.part.name}" (minute ${now.part.start}, for ${now.part.minutes} minutes), though a teacher who started a part's timer on the session page may be somewhere else.`);
   lines.push('');
   const queue = now.queue || [];
   const waiting = queue.filter((q) => q.state !== 'shown').sort((x, y) => x.created_at.localeCompare(y.created_at));
