@@ -89,9 +89,8 @@ as Ben's without his review, $0 to run.
   DOMPurify. Links to other path files become this site's URLs; links
   to anything else in the repository go to GitHub. To give another
   template file a page here, add it to the `SITE` map in `render.js`.
-- The header's "Sign in with GitHub" goes to `/account/` on every page.
-  The home page's own sign-in buttons go to `/cohorts/#join`, where a
-  person chooses a cohort first.
+- Every "Sign in with GitHub" goes to `/account/`, which only signs a
+  person in. Joining a cohort starts on `/cohorts/`.
 - Mobile-first, `min-width` media queries, test at 375px before 1440px.
 - Accessible contrast: text on the orange `--color-primary` is dark.
 
@@ -144,7 +143,7 @@ what waits on Ben.
 - **Scripts:** `assets/hub-config.js` (public URL and publishable key),
   `hub.js`, `cohorts.js`, `teach.js` with `teach-lib.js`, `cohort.js` and `live.js`
   with `cohort-lib.js` and `live-lib.js`, and `apps.js` with `apps-lib.js`. Pure logic lives in the `-lib.js` files with
-  tests in `tools/test/` (`node --test tools/test/*.mjs`, 326 tests).
+  tests in `tools/test/` (`node --test tools/test/*.mjs`, 332 tests).
 - **The cohort's conversation:** `discussions.js` with `discussions-lib.js`
   reads and posts the cohort repository's GitHub Discussions on /cohort/
   and /live/ with the student's own GitHub token. That token is kept in

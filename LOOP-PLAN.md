@@ -1165,12 +1165,34 @@ student).
   draw at once" failed 3 runs in 4 here. After: 12 of 12 full runs of
   tools/board/sync-check.mjs passed (25 checks each).
 
+- 2026-10-05, Ben's site review (twelve points, recorded as rules in
+  DECISIONS.md, "The site's voice and order, after Ben's review"). On
+  main: computer-shaped-problems.md now starts from Nilay Patel's
+  "software brain" and says why people write the film notes (Dead
+  Internet, Google Zero, "Humanity is inefficient, and that is the
+  point."); the three moves are Write, Play, Publish everywhere;
+  PRINCIPLES.md 0.5 has two marks, Aligned with and Endorsed by Human
+  Shaped, with no gatekeeper. On site: the home page leads with the
+  idea, the fifteen principles (read live from PRINCIPLES.md by
+  principles-lib.js), the method, and the apps; the cohorts page drops
+  the teaching pitch and the code-of-conduct line; visible "written by
+  Claude" notes became comments and first person left the pages that
+  were not Ben's own; every sign-in goes to /account/; the apps page
+  draws cards with covers from the directory (an `image` in a listing,
+  else GitHub's preview picture, else initials); new mark files
+  (assets/mark/aligned-*, endorsed-*), og.png redrawn (tools/og/). Every
+  standalone arch sits high in its frame. 332 node tests, 0 failing;
+  home, apps, cohorts, and start drawn at 375 and 1440, light and dark,
+  with no sideways scroll and no page errors.
+
 ## Handoff (October 4, 2026, evening)
 
 Merged and live: G1 to G7, H1 to H6, C0 to C9, R1 to R3, R4's pages, R5 to R8,
 Google sign-in beside GitHub, the listing materials, meet@'s script
 with its triggers, the community repository, and the credential
-signing key. 680 database checks, 326 node tests.
+signing key. 680 database checks, 332 node tests. Ben's October 5
+site review is done (see the log); its unverified parts are app covers
+loading from GitHub in production and the signed-in pages' new copy.
 
 R4, the question bank, is merged (see its log entry). Half of its
 database change is applied; **done on this Mac October 5: applied (all 680 policy tests passed first; its drops are a check, two rules, and a function, each recreated in the same file) and mcp redeployed; was: apply
