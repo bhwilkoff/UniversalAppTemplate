@@ -203,6 +203,8 @@ proportions and sits in the upper part of its frame, with the empty
 space below it, so it reads as the top of a head. In the 32-unit
 favicon that is ends at y 16 and the top at y 7.5.
 
+*Narrowed October 5, 2026; see "The arch joins, or stands alone" below.*
+
 ## Teaching, agents, and events (October 3, 2026, afternoon)
 
 **Adopt the teaching research.** Ben chose to adopt all of the changes
@@ -413,3 +415,37 @@ its builder wrote their commitment to the principles; either one earns
 it at once. "I don't want to be a gatekeeper on this idea. We want as
 many people as possible to align themselves or become endorsed by
 answering the principles."
+
+## The home page's claim, the principles' grammar, and the arch (October 5, 2026, evening)
+
+Ben chose the first of the three tries in `design/round-3/` (the
+principles themselves as the picture) and changed its headline.
+
+**The headline centers the builder.** "Apps that wear the builder's
+values on their sleeves." In Ben's words: "since we are talking about
+humans being the ones doing things, we have to center the builder as
+the one who actually holds the values. They are not generic and they
+don't mean anything without humans actually believing in them and
+making things that utilize the values." **How to apply:** values on the
+site belong to a person who holds them and builds by them, never to the
+software alone or to the method in the abstract.
+
+**Every principle says what human-shaped software does.** "The
+principles should always be written as 'Human Shaped Software...' does
+each of these things (this ensures that they are always active and that
+they can be measured against other software development efforts)."
+**How to apply:** each principle, wherever it appears (PRINCIPLES.md,
+HUMAN-SHAPED-template.md, the site, the sheets), is a full sentence that
+starts "Human-shaped software" and uses an active verb: "Human-shaped
+software starts from a human-shaped problem." PRINCIPLES.md 0.6 does
+this. Lists may set the subject quieter, but never drop it.
+
+**The arch joins, or stands alone.** "The Human Shaped 'arch' should
+really only be used when it highlights something about either joining
+together two things (Human and Shaped) or as a logo that doesn't have
+other things connected to it. The way it shows in the design image makes
+it look like it is hanging the principles on a hook." **How to apply:**
+the arch is the hyphen between "human" and "shaped", or it is the logo
+on its own (the favicon, the app icon, a corner of a Meet background).
+It is never a head on a drawn person, a hook or handle on a card, a
+bullet, or a prefix to other words. Drawn people get round heads.

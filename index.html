@@ -4,17 +4,17 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Human Shaped</title>
-  <meta name="description" content="Software for the parts of life only people can do: human-shaped software uses AI as a tool people wield for human purposes, with its values written down. The principles, the method, and free ways to build.">
+  <meta name="description" content="Apps that wear the builder's values on their sleeves: human-shaped software is built with AI as a tool in the builder's hands, by the principles anyone can measure it against.">
   <link rel="canonical" href="https://humanshaped.org/">
   <meta property="og:url" content="https://humanshaped.org/">
   <meta property="og:site_name" content="Human Shaped">
   <meta property="og:title" content="Human Shaped">
-  <meta property="og:description" content="Software for the parts of life only people can do: human-shaped software uses AI as a tool people wield for human purposes, with its values written down. The principles, the method, and free ways to build.">
+  <meta property="og:description" content="Apps that wear the builder's values on their sleeves: human-shaped software is built with AI as a tool in the builder's hands, by the principles anyone can measure it against.">
   <meta property="og:type" content="website">
   <meta property="og:image" content="https://humanshaped.org/assets/og.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="The human-shaped wordmark, with its hyphen drawn as an arch, above the line: build software for the parts of life only people can do.">
+  <meta property="og:image:alt" content="The human-shaped wordmark, with its hyphen drawn as an arch, above the line: apps that wear the builder&#x27;s values on their sleeves.">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="theme-color" content="#F7F6F2" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#141618" media="(prefers-color-scheme: dark)">
@@ -67,30 +67,25 @@
     <!-- The home page, rewritten after Ben's review of October 5, 2026
          (DECISIONS.md): the idea, the principles, and the why first,
          and the ways in after. Words by Claude, awaiting Ben's review. -->
-    <div class="wrap">
-      <section class="hero" aria-labelledby="hero-title">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="wrap hero-grid">
         <div>
-          <h1 id="hero-title">Build software for the parts of life only people can do.</h1>
-          <p class="lead">Human-shaped software uses AI as a tool that people wield for human purposes. It writes its values down and wears them on its sleeve, and it takes the mechanical work off people's hands so that learning, community, and care have more room rather than less.</p>
+          <p class="kicker">Human-shaped software</p>
+          <h1 id="hero-title">Apps that wear the builder's values on their sleeves.</h1>
+          <p class="lead">Every app is built on values, whether or not anyone wrote them down. In human-shaped software, the builder writes their own values down where the people who use the app, and the AI agents that help build it, can read them, and then makes something that lives by them. AI is a tool in the builder's hands, and never a replacement for the people involved.</p>
           <div class="hero-actions">
             <a class="btn-github" href="/principles/">Read the principles</a>
             <a class="text" href="/why/">Why build this way</a>
           </div>
         </div>
-        <figure class="hero-figure" aria-hidden="true">
-          <svg viewBox="0 0 320 280" focusable="false">
-            <g class="hf-grid">
-              <rect x="14" y="170" width="54" height="10" rx="5"/><rect x="14" y="188" width="38" height="10" rx="5"/><rect x="14" y="206" width="48" height="10" rx="5"/>
-              <rect x="252" y="170" width="54" height="10" rx="5"/><rect x="268" y="188" width="38" height="10" rx="5"/><rect x="258" y="206" width="48" height="10" rx="5"/>
-            </g>
-            <path class="hf-arch" d="M112 118C118 78 136 56 160 56S202 78 208 118"/>
-            <path class="hf-body" d="M40 278C44 212 78 172 128 166h64c50 6 84 46 88 112"/>
-            <rect class="hf-tool" x="128" y="208" width="64" height="44" rx="7"/>
-            <path class="hf-spark" d="M160 220v20M150 230h20"/>
-          </svg>
-        </figure>
-      </section>
-    </div>
+        <aside class="sleeve" aria-labelledby="sleeve-title">
+          <p class="sleeve-head" id="sleeve-title"><span>The Human-Shaped Principles</span><a href="/principles/">What each one means</a></p>
+          <ol class="sleeve-list" data-principles hidden></ol>
+          <p class="sleeve-fallback" data-principles-fallback>Fifteen principles say what human-shaped software does, so that any app can be measured against them. <a href="/principles/">Read them</a>.</p>
+          <p class="sleeve-more"><a href="/principles/">All fifteen principles</a></p>
+        </aside>
+      </div>
+    </section>
 
     <section class="section idea" aria-labelledby="idea-title">
       <div class="wrap">
@@ -128,21 +123,6 @@
             <p class="credit"><a href="/why/">The longer story of computer-shaped problems</a></p>
           </div>
         </div>
-      </div>
-    </section>
-
-    <section class="section" id="principles" aria-labelledby="principles-title">
-      <div class="wrap">
-        <div class="section-head">
-          <div>
-            <p class="kicker">The principles</p>
-            <h2 id="principles-title">Fifteen values, worn on the sleeve.</h2>
-          </div>
-          <p class="prose">These are the values every piece of human-shaped software shares. Each one is something you can do while building, and something another person can check, and each builder adds the values their own problem needs.</p>
-        </div>
-        <ol class="principles-list" data-principles hidden></ol>
-        <p class="prose" data-principles-fallback><a href="/principles/">Read the fifteen Human-Shaped Principles</a>, which start with a human-shaped problem, one that affects real people in the real world.</p>
-        <p class="section-more"><a href="/principles/">What each principle means, and how you can tell</a></p>
       </div>
     </section>
 
@@ -187,17 +167,17 @@
         </div>
         <ul class="ways-in">
           <li>
-            <svg viewBox="0 0 48 48" aria-hidden="true" focusable="false"><path class="i-clay" d="M8.5 21c.9-4.6 3.3-7 6.5-7s5.6 2.4 6.5 7"/><path class="i-clay" d="M26.5 21c.9-4.6 3.3-7 6.5-7s5.6 2.4 6.5 7"/><path class="i-clay" d="M17.5 15c.9-4.6 3.3-7 6.5-7s5.6 2.4 6.5 7"/><path class="i-line" d="M5 40c1-8 5-12 10-12s9 4 10 12M23 40c1-8 5-12 10-12s9 4 10 12"/></svg>
+            <svg viewBox="0 0 48 48" aria-hidden="true" focusable="false"><circle class="i-line" cx="15" cy="21" r="4"/><circle class="i-line" cx="33" cy="21" r="4"/><circle class="i-clay" cx="24" cy="9" r="4"/><path class="i-line" d="M5 40c1-8 5-12 10-12s9 4 10 12M23 40c1-8 5-12 10-12s9 4 10 12"/></svg>
             <h3><a href="/cohorts/">Join a cohort</a></h3>
             <p>Five weeks of building an app of your own with an AI agent, alongside other people doing the same, with one live session each week.</p>
           </li>
           <li>
-            <svg viewBox="0 0 48 48" aria-hidden="true" focusable="false"><path class="i-clay" d="M16 17c1.2-6 4.2-9 8-9s6.8 3 8 9"/><path class="i-line" d="M12 42c1.4-9 6-13.5 12-13.5S34.6 33 36 42"/><rect class="i-line" x="17" y="34" width="14" height="9" rx="1.5"/></svg>
+            <svg viewBox="0 0 48 48" aria-hidden="true" focusable="false"><circle class="i-clay" cx="24" cy="14" r="6"/><path class="i-line" d="M12 42c1.4-9 6-13.5 12-13.5S34.6 33 36 42"/><rect class="i-line" x="17" y="34" width="14" height="9" rx="1.5"/></svg>
             <h3><a href="/path/setup/">Build on your own</a></h3>
             <p>The Universal App Template holds the whole method, and you can copy it on GitHub today and follow the path at your own pace.</p>
           </li>
           <li>
-            <svg viewBox="0 0 48 48" aria-hidden="true" focusable="false"><path class="i-clay" d="M10 19c1.2-6 4.2-9 8-9s6.8 3 8 9"/><path class="i-line" d="M6 42c1.4-9 6-13.5 12-13.5S28.6 33 30 42"/><path class="i-line" d="M30 8h12v9h-6l-3 3v-3h-3z"/></svg>
+            <svg viewBox="0 0 48 48" aria-hidden="true" focusable="false"><circle class="i-clay" cx="18" cy="16" r="6"/><path class="i-line" d="M6 42c1.4-9 6-13.5 12-13.5S28.6 33 30 42"/><path class="i-line" d="M30 8h12v9h-6l-3 3v-3h-3z"/></svg>
             <h3><a href="/start/">Start something</a></h3>
             <p>A meetup, a day of building, or a mark for your own software, with the principles in front of everyone.</p>
           </li>

@@ -1185,6 +1185,17 @@ student).
   home, apps, cohorts, and start drawn at 375 and 1440, light and dark,
   with no sideways scroll and no page errors.
 
+- 2026-10-05, evening: Ben chose round 3's first try for the home page,
+  as "Apps that wear the builder's values on their sleeves." The hero's
+  picture is the fifteen principles, read live, on a card with a clay
+  edge and no arch; the principles section below it is gone. On main,
+  PRINCIPLES.md 0.6 writes every principle as "Human-shaped software
+  [does this]", and the declaration template follows; the sheets read
+  the list's whole intro paragraph now. The arch is only the hyphen in
+  "human-shaped" or the logo alone: the home page's three icons have
+  round heads, and the Meet add-on shows the joined wordmark. og.png
+  carries the new headline. Rules in DECISIONS.md.
+
 ## Handoff (October 4, 2026, evening)
 
 Merged and live: G1 to G7, H1 to H6, C0 to C9, R1 to R3, R4's pages, R5 to R8,

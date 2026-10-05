@@ -22,7 +22,7 @@ seedlings in spring, and this keeps the list of [who has what](https://example.o
 
 ## 1. A human-shaped problem
 
-**Start from a human-shaped problem.**
+**Human-shaped software starts from a human-shaped problem.**
 
 *How someone can tell:* the builder has written it down.
 

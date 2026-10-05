@@ -149,10 +149,29 @@ h3 { font-size: 1.25rem; letter-spacing: -0.012em; line-height: 1.25; }
 
 /* Hero */
 
-.hero { padding: 3rem 0 4rem; display: grid; gap: 2.5rem; }
-.hero h1 { font-size: clamp(2.6rem, 1.5rem + 5vw, 5rem); line-height: 1.02; letter-spacing: -0.035em; max-width: 13ch; font-weight: 680; }
+.hero { padding: 2.5rem 0 4rem; }
+.hero-grid { display: grid; gap: 2.5rem; }
+.hero .kicker { margin-bottom: 1rem; }
+.hero h1 { font-size: clamp(2.5rem, 1.4rem + 4.6vw, 4.75rem); line-height: 1.03; letter-spacing: -0.035em; max-width: 14ch; font-weight: 680; margin: 0; }
 
-.hero .lead { margin: 1.5rem 0 2rem; max-width: 34rem; }
+.hero .lead { margin: 1.5rem 0 2rem; max-width: 36rem; }
+
+/* The sleeve: the principles themselves, read live from the template,
+   each one a sentence about what human-shaped software does. */
+.sleeve { background: var(--card); border: 1px solid var(--rule); border-top: 4px solid var(--clay); border-radius: 18px; padding: 1.25rem 1.25rem 1.1rem; box-shadow: 0 24px 48px -36px rgba(26, 29, 33, 0.4); }
+.sleeve-head { margin: 0 0 0.75rem; display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; flex-wrap: wrap; font-size: 0.95rem; font-weight: 600; color: var(--muted); }
+.sleeve-head a { font-size: 0.9rem; }
+.sleeve-list { list-style: none; margin: 0; padding: 0; counter-reset: p; }
+.sleeve-list li { counter-increment: p; border-top: 1px solid var(--rule); }
+.sleeve-list a { display: grid; grid-template-columns: 1.75rem 1fr; gap: 0.4rem; padding: 0.5rem 0; color: var(--ink); text-decoration: none; font-size: 0.975rem; line-height: 1.35; font-weight: 600; }
+.sleeve-list a::before { content: counter(p); color: var(--clay); font-weight: 400; font-variant-numeric: tabular-nums; }
+.sleeve-list a:hover .p-lead { text-decoration: underline; text-decoration-color: var(--clay); text-underline-offset: 0.2em; }
+.sleeve-list .p-subject { color: var(--muted); font-weight: 450; }
+.sleeve-list .p-rest { display: none; }
+.sleeve-list li:nth-child(n+6) { display: none; }
+.sleeve-fallback { margin: 0; font-size: 1rem; }
+.sleeve-more { margin: 0.75rem 0 0; font-weight: 600; font-size: 0.975rem; }
+.sleeve-list[hidden] ~ .sleeve-more { display: none; }
 .hero-actions { display: flex; flex-wrap: wrap; gap: 1rem 1.5rem; align-items: center; }
 .hero-actions a.text { font-weight: 600; }
 .fine { color: var(--muted); font-size: 0.95rem; margin: 1rem 0 0; max-width: 30rem; }
@@ -289,28 +308,12 @@ h3 { font-size: 1.25rem; letter-spacing: -0.012em; line-height: 1.25; }
 .bring-back strong { color: var(--clay); }
 .next-stage { margin-top: 2rem; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem; font-weight: 600; }
 
-/* The home page after Ben's review of October 5 (DECISIONS.md): a
-   drawn person wielding a tool, the principles read live from the
-   template, the why under the comparison, and three ways in. The arch
-   is always the top of a head. */
+/* The home page after Ben's review of October 5 (DECISIONS.md): the
+   why under the comparison, and three ways in. */
 .tint { background: var(--surface); }
-.hero-figure { margin: 0; justify-self: center; width: 100%; max-width: 22rem; }
-.hero-figure svg { display: block; width: 100%; height: auto; }
-.hf-arch { fill: none; stroke: var(--clay); stroke-width: 18; stroke-linecap: round; }
-.hf-body { fill: none; stroke: var(--ink); stroke-width: 6; stroke-linecap: round; }
-.hf-tool { fill: var(--card); stroke: var(--ink); stroke-width: 4; }
-.hf-spark { fill: none; stroke: var(--clay); stroke-width: 4; stroke-linecap: round; }
-.hf-grid rect { fill: var(--rule); }
 .compare-why { background: none !important; padding: 0.5rem 0 0 !important; max-width: var(--measure); }
 .compare-why p { margin: 0 0 0.75rem; font-size: 1.1rem; line-height: 1.55; }
 .compare-why .credit { font-size: 1rem; font-weight: 600; }
-.principles-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.75rem; counter-reset: p; }
-.principles-list li { counter-increment: p; }
-.principles-list a { display: grid; align-content: start; grid-template-columns: 2.25rem 1fr; gap: 0 0.75rem; padding: 1rem 1.1rem; background: var(--card); border: 1px solid var(--rule); border-radius: var(--radius); color: var(--ink); text-decoration: none; height: 100%; }
-.principles-list a::before { content: counter(p); grid-row: span 2; font-size: 1.6rem; font-weight: 300; line-height: 1; color: var(--clay); font-variant-numeric: tabular-nums; }
-.principles-list a:hover { border-color: var(--clay); }
-.principles-list .p-lead { font-weight: 650; line-height: 1.3; }
-.principles-list .p-rest { color: var(--muted); font-size: 0.95rem; line-height: 1.45; }
 .ways-in { list-style: none; margin: 0; padding: 0; display: grid; gap: 1rem; }
 .ways-in li { background: var(--card); border: 1px solid var(--rule); border-radius: var(--radius); padding: 1.5rem; }
 .ways-in svg { width: 3rem; height: 3rem; display: block; margin-bottom: 0.75rem; }
@@ -319,7 +322,6 @@ h3 { font-size: 1.25rem; letter-spacing: -0.012em; line-height: 1.25; }
 
 @media (min-width: 40rem) {
   :root { --gutter: 1.5rem; }
-  .principles-list { grid-template-columns: 1fr 1fr; }
   .compare { grid-template-columns: 1fr 1fr; }
   .apps { grid-template-columns: 1fr 1fr; }
 }
@@ -331,7 +333,7 @@ h3 { font-size: 1.25rem; letter-spacing: -0.012em; line-height: 1.25; }
   .nav { order: 0; width: auto; margin-left: auto; }
   .theme-toggle { width: 44px; height: 44px; }
   .btn-github.small .long { display: inline; }
-  .hero { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 4rem; padding: 5rem 0 6rem; align-items: center; }
+  .hero { padding: 4.5rem 0 6rem; }
   .weeks-card { padding: 1.75rem 1.75rem 1.25rem; }
   .section { padding: 6rem 0; }
   .section-head { grid-template-columns: minmax(0, 6fr) minmax(0, 6fr); gap: 4rem; align-items: end; margin-bottom: 3rem; }
@@ -339,7 +341,6 @@ h3 { font-size: 1.25rem; letter-spacing: -0.012em; line-height: 1.25; }
   .idea .compare { grid-column: 1 / -1; }
   .idea .prose { margin-top: 2.1rem; }
   .moves { grid-template-columns: repeat(3, 1fr); gap: 2.5rem; }
-  .principles-list { grid-template-columns: repeat(3, 1fr); }
   .ways-in { grid-template-columns: repeat(3, 1fr); }
   .flow { grid-template-columns: repeat(3, 1fr); gap: 1rem; }
   .flow li { grid-template-columns: 1fr; padding: 1.5rem; }
@@ -1198,7 +1199,8 @@ fieldset.ready-mark .hint { margin: 0; font-size: 0.9rem; color: var(--muted); }
    ------------------------------------------------------------------ */
 body.addon-body { min-height: 100vh; }
 .addon-mark { display: flex; align-items: center; gap: 0.4rem; margin: 0; font-weight: 650; font-size: 0.95rem; color: var(--ink); min-width: 0; }
-.addon-mark .arch { width: 1.3rem; height: 0.65rem; flex: none; color: var(--clay); }
+.addon-mark .arch { width: 0.78em; height: 0.39em; margin: 0 0.02em; flex: none; color: var(--clay); }
+.addon-mark:has(.arch) { gap: 0; font-weight: 680; letter-spacing: -0.025em; }
 .addon-mark span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 .addon-panel { padding: 0.9rem 0.9rem 2rem; display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.75rem; font-size: 1rem; }
@@ -1254,7 +1256,6 @@ body.addon-body { min-height: 100vh; }
 .stage-ready:not([hidden]) { grid-template-rows: auto 1fr; padding: 3vmin 4vmin 5vmin; gap: 2vmin; }
 .stage-head { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; }
 .stage-head .addon-mark { font-size: clamp(1rem, 2.2vmin, 1.5rem); }
-.stage-head .addon-mark .arch { width: 2em; height: 1em; }
 .stage-part { margin: 0; font-size: clamp(1rem, 2.4vmin, 1.6rem); font-weight: 600; color: var(--muted); }
 .stage-clock { font-variant-numeric: tabular-nums; color: var(--ink); }
 .stage-body:not([hidden]) { display: grid; align-content: center; gap: 2.5vmin; max-width: 70rem; width: 100%; margin: 0 auto; }
@@ -1583,3 +1584,9 @@ label.check { min-height: 2.25rem; }
 .google-signin { margin: 0.75rem 0 0.25rem; min-height: 44px; }
 .linked-accounts { list-style: none; padding: 0; margin: 0.5rem 0; display: grid; gap: 0.4rem; }
 .linked-accounts .btn-link { margin-left: 0.25rem; }
+
+@media (min-width: 64rem) {
+  .hero-grid { grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); gap: 4.5rem; align-items: center; }
+  .sleeve-list li:nth-child(n+6) { display: block; }
+  .sleeve-more { display: none; }
+}

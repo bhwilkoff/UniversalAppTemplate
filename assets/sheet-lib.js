@@ -25,8 +25,8 @@
     return items;
   }
 
-  // "**Start from a human-shaped problem,** one that ..." becomes
-  // { lead: 'Start from a human-shaped problem,', rest: 'one that ...' }.
+  // "**Human-shaped software starts from a human-shaped problem,** one that ..." becomes
+  // { lead: 'Human-shaped software starts from a human-shaped problem,', rest: 'one that ...' }.
   function splitBold(text) {
     var m = text.match(/^\*\*(.+?)\*\*\s*(.*)$/);
     return m ? { lead: m[1], rest: m[2] } : { lead: '', rest: text };
@@ -35,8 +35,11 @@
   function parsePrinciples(md) {
     var lines = section(md, 'The principles');
     var intro = '';
+    // The paragraph before the list, which may wrap over several lines.
     for (var i = 0; i < lines.length; i++) {
-      if (lines[i].trim() && !/^\d+\. /.test(lines[i])) { intro = lines[i].trim(); break; }
+      if (/^\d+\. /.test(lines[i])) break;
+      if (lines[i].trim()) intro += (intro ? ' ' : '') + lines[i].trim();
+      else if (intro) break;
     }
     var version = (md.match(/\*Version ([\d.]+)/) || [])[1] || '';
     return {

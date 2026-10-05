@@ -19,3 +19,8 @@ template's README, not new claims.
 Each page is noindex. Pick one, or take a headline from one and a
 picture from another; whichever is chosen moves into `index.html` and
 `assets/site.css`, and this folder stays as the record.
+
+**Chosen, October 5:** A, with the headline "Apps that wear the
+builder's values on their sleeves." and no arch on the card (see
+DECISIONS.md, "The home page's claim, the principles' grammar, and the
+arch"). It is now the live home page.

@@ -10,10 +10,10 @@ const T = new URL('../../../UniversalAppTemplate/', import.meta.url);
 const real = (p) => existsSync(new URL(p, T)) ? readFileSync(new URL(p, T), 'utf8') : null;
 
 test('wrapped principle lines join, and the bold lead splits from the rest', () => {
-  const md = '*Version 0.4, Oct*\n\n## The principles\n\nHuman-shaped software should:\n\n1. **Start here,** one that\n   wraps.\n2. **Then this.**\n\n## Next\n3. **Not this.**\n';
+  const md = '*Version 0.4, Oct*\n\n## The principles\n\nEach principle says what it does,\nso it can be measured.\n\n1. **Start here,** one that\n   wraps.\n2. **Then this.**\n\n## Next\n3. **Not this.**\n';
   const p = lib.parsePrinciples(md);
   assert.equal(p.version, '0.4');
-  assert.equal(p.intro, 'Human-shaped software should:');
+  assert.equal(p.intro, 'Each principle says what it does, so it can be measured.');
   assert.deepEqual(p.items, [
     { n: 1, lead: 'Start here,', rest: 'one that wraps.' },
     { n: 2, lead: 'Then this.', rest: '' }

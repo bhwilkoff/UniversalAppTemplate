@@ -8,14 +8,15 @@ const md = `# The Human-Shaped Principles
 
 ## The principles
 
-Human-shaped software should:
+Each principle says what human-shaped software does, so that any piece
+of software, and the way it was made, can be measured against it.
 
-1. **Start from a human-shaped problem,** one that affects real people
-   in the real world.
-2. **Increase what people are able to do,** rather than how much profit
-   can be made from them.
-15. **Bring joy to at least one person** in the form it ships today,
-    even if that person is the builder.
+1. **Human-shaped software starts from a human-shaped problem,** one
+   that affects real people in the real world.
+2. **Human-shaped software increases what people are able to do,**
+   rather than how much profit can be made from them.
+15. **Human-shaped software brings joy to at least one person** in the
+    form it ships today, even if that person is the builder.
 
 ## What each principle means
 `;
@@ -23,9 +24,9 @@ Human-shaped software should:
 test('the principles are read from the template’s own list, lead and sentence', () => {
   const p = lib.parse(md);
   assert.equal(p.length, 3);
-  assert.deepEqual(p[0], { n: 1, lead: 'Start from a human-shaped problem', rest: 'one that affects real people in the real world.', anchor: null });
+  assert.deepEqual(p[0], { n: 1, lead: 'Human-shaped software starts from a human-shaped problem', rest: 'one that affects real people in the real world.', anchor: null });
   assert.equal(p[2].n, 15);
-  assert.equal(p[2].lead, 'Bring joy to at least one person');
+  assert.equal(p[2].lead, 'Human-shaped software brings joy to at least one person');
   assert.deepEqual(lib.parse('nothing here'), []);
 });
 

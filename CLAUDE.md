@@ -60,7 +60,7 @@ writing copy:
 
 - `../UniversalAppTemplate/docs/path/00-why-we-build.md`: human-shaped
   software, learning three ways (student, builder, human), and the
-  three moves (write it down, prove it, live with it).
+  three moves (write, play, publish).
 - `../UniversalAppTemplate/COURSE.md`: the five-week cohort.
 - `research/README.md`: the build-out plan, its decisions and its open
   questions.

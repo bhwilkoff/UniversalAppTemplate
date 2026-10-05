@@ -13,7 +13,14 @@
       var li = document.createElement('li');
       var a = document.createElement('a');
       a.href = '/principles/' + (p.anchor ? '#' + p.anchor : '');
-      var lead = document.createElement('span'); lead.className = 'p-lead'; lead.textContent = p.lead;
+      var lead = document.createElement('span'); lead.className = 'p-lead';
+      // Every principle starts "Human-shaped software ..."; the subject is
+      // kept, set quieter, so the verb that can be checked stands out.
+      var m = /^(Human-shaped software)\s+(.*)$/.exec(p.lead);
+      if (m) {
+        var subject = document.createElement('span'); subject.className = 'p-subject'; subject.textContent = m[1] + ' ';
+        lead.append(subject, m[2]);
+      } else lead.textContent = p.lead;
       a.appendChild(lead);
       if (p.rest) { var rest = document.createElement('span'); rest.className = 'p-rest'; rest.textContent = ' ' + p.rest; a.appendChild(rest); }
       li.appendChild(a);
