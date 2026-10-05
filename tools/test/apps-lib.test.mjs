@@ -119,7 +119,7 @@ test('a builder\'s own app is labeled as theirs, and a cohort app of the same re
   ]);
   assert.equal(lib.statusText(apps[1], null), 'Shown here by the person building it');
   assert.equal(lib.statusText(apps[0], null), 'Being built in a cohort');
-  assert.equal(lib.statusText(apps[1], { status: 'declared' }), 'Declared human-shaped');
+  assert.equal(lib.statusText(apps[1], { status: 'declared' }), 'Aligned with Human Shaped');
 });
 
 test('only a builder\'s own app carries a way to report it, naming the app and nothing else', () => {
@@ -174,7 +174,7 @@ test('the builder\'s own words come from the declaration, then the directory, th
 
 test('where an app stands, and where to talk about it', () => {
   assert.equal(lib.statusText({ status: 'founding' }, null), 'One of the four apps the method came from');
-  assert.equal(lib.statusText({ status: 'founding' }, { status: 'declared' }), 'Declared human-shaped');
+  assert.equal(lib.statusText({ status: 'founding' }, { status: 'declared' }), 'Aligned with Human Shaped');
   assert.equal(lib.statusText({ status: 'cohort' }, { status: '' }), 'Being built in a cohort');
   assert.deepEqual(lib.conversation('a/b', { has_discussions: true, has_issues: true }), { href: 'https://github.com/a/b/discussions', kind: 'discussions' });
   assert.deepEqual(lib.conversation('a/b', { has_discussions: false, has_issues: true }), { href: 'https://github.com/a/b/issues', kind: 'issues' });
@@ -195,4 +195,10 @@ test('automated commits are recognized, people are not', () => {
   assert.equal(c('Ben Wilkoff', 'ben@example.org', 'bhwilkoff').bot, false);
   assert.equal(c('Abbott Lee', 'abbott@example.org', 'abbot').bot, false);
   assert.equal(c('Robotics Club', 'robots@example.org', 'robotics').bot, false);
+});
+
+test('an app says which mark is true of it, with no one approving it (October 5)', () => {
+  assert.equal(lib.statusText({ status: 'template' }, null), 'Endorsed by Human Shaped, made from the template');
+  assert.equal(lib.statusText({ status: 'cohort' }, { status: 'working toward', principles: [{ n: 1 }] }), 'Aligned with Human Shaped');
+  assert.equal(lib.statusText({ status: 'cohort' }, { status: 'withdrawn', principles: [{ n: 1 }] }), 'Its answers to the principles have been withdrawn');
 });

@@ -240,8 +240,8 @@
       var box = $('[data-declaration]'); box.replaceChildren();
       var file = 'https://github.com/' + repo + '/blob/HEAD/HUMAN-SHAPED.md';
       if (!d || !d.principles.length) {
-        box.appendChild(el('p', null, 'This app has not declared itself human-shaped yet. A declaration is a file in the app’s own repository that answers each of the principles in the builder’s words, with evidence anyone can open.'));
-        var p = el('p'); p.appendChild(link('/start/#declare', 'How to declare your software human-shaped')); box.appendChild(p);
+        box.appendChild(el('p', null, 'This app has not answered the principles yet. Its builder can do that in a file called HUMAN-SHAPED.md in the app’s own repository, answering each principle in their own words, with evidence anyone can open.'));
+        var p = el('p'); p.appendChild(link('/start/#declare', 'How to show that your software is human-shaped')); box.appendChild(p);
         return;
       }
       var c = d.counts, parts = [];

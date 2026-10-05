@@ -470,6 +470,13 @@ h3 { font-size: 1.25rem; letter-spacing: -0.012em; line-height: 1.25; }
 .topic h3 { font-size: 1.25rem; margin: 2.25rem 0 0.75rem; scroll-margin-top: 1.5rem; }
 .marks { list-style: none; margin: 1.25rem 0 1.5rem; padding: 0; display: flex; flex-wrap: wrap; gap: 1rem; }
 .marks img { display: block; height: 44px; width: auto; }
+/* The two marks, side by side (DECISIONS.md, October 5, 2026). */
+.mark-kinds { list-style: none; margin: 1.25rem 0 1.5rem; padding: 0; display: grid; gap: 1rem; }
+.mark-kinds li { background: var(--card); border: 1px solid var(--rule); border-radius: var(--radius); padding: 1.25rem; }
+.mark-kinds img { display: block; height: 44px; width: auto; margin-bottom: 0.9rem; }
+.mark-kinds h3 { font-size: 1.1rem; margin-bottom: 0.35rem; }
+.mark-kinds p { margin: 0; color: var(--muted); line-height: 1.5; }
+@media (min-width: 40rem) { .mark-kinds { grid-template-columns: 1fr 1fr; } }
 .mark-dark { display: none !important; }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) .mark-light { display: none !important; }

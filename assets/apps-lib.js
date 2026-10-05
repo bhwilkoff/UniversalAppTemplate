@@ -224,15 +224,19 @@
     return null;
   }
 
-  // One line that says where an app stands.
+  // One line that says where an app stands, in the two marks' words
+  // (DECISIONS.md, October 5, 2026): an app whose HUMAN-SHAPED.md
+  // answers the principles is aligned with Human Shaped, whether every
+  // answer is "meets" yet or not, and one made from the template is
+  // endorsed by it.
   function statusText(app, declaration) {
-    if (declaration && declaration.status === 'declared') return 'Declared human-shaped';
-    if (declaration && declaration.status === 'withdrawn') return 'Its declaration has been withdrawn';
-    if (declaration && declaration.status === 'working toward') return 'Working toward human-shaped';
+    if (declaration && declaration.status === 'withdrawn') return 'Its answers to the principles have been withdrawn';
+    if (declaration && declaration.principles && declaration.principles.length) return 'Aligned with Human Shaped';
+    if (declaration && (declaration.status === 'declared' || declaration.status === 'working toward')) return 'Aligned with Human Shaped';
     if (app && app.status === 'founding') return 'One of the four apps the method came from';
     if (app && app.status === 'cohort') return 'Being built in a cohort';
     if (app && app.status === 'builder') return 'Shown here by the person building it';
-    if (app && app.status === 'template') return 'Made from the template';
+    if (app && app.status === 'template') return 'Endorsed by Human Shaped, made from the template';
     return 'In the directory';
   }
 

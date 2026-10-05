@@ -29,10 +29,15 @@ THEMES = {
     "dark": {"bg": "#1B1E21", "edge": "#3A3F44", "ink": "#EEEAE3", "clay": "#F0A184"},
 }
 
-# The status words match the status key in HUMAN-SHAPED.md.
+# The two marks (DECISIONS.md, October 5, 2026): "aligned with" for
+# software whose HUMAN-SHAPED.md answers the principles, and "endorsed
+# by" for software started from the template or committed to the
+# principles in writing. No one approves either; each is true or not.
+# The older declared and working-toward files stay in assets/mark/ for
+# the READMEs that already show them, and are no longer drawn here.
 STATUSES = {
-    "declared": "declared",
-    "working-toward": "working toward",
+    "aligned": ("aligned with", "Aligned with Human Shaped"),
+    "endorsed": ("endorsed by", "Endorsed by Human Shaped"),
 }
 
 HEIGHT = 44
@@ -95,7 +100,8 @@ def arch(x, baseline, em):
 
 def draw(word_font, label_font, status, theme):
     c = THEMES[theme]
-    label_d, label_w = shape(label_font, STATUSES[status], LABEL_SIZE, PAD_X, LABEL_BASE)
+    label, title = STATUSES[status]
+    label_d, label_w = shape(label_font, label, LABEL_SIZE, PAD_X, LABEL_BASE)
     gap = 0.02 * WORD_SIZE
     human_d, human_w = shape(word_font, "human", WORD_SIZE, PAD_X, WORD_BASE, TRACK)
     ax = PAD_X + human_w + gap
@@ -103,8 +109,6 @@ def draw(word_font, label_font, status, theme):
     sx = ax + arch_w + gap
     shaped_d, shaped_w = shape(word_font, "shaped", WORD_SIZE, sx, WORD_BASE, TRACK)
     width = round(max(sx + shaped_w, PAD_X + label_w) + PAD_X)
-    title = ("Human-shaped: declared" if status == "declared"
-             else "Working toward human-shaped")
     return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{HEIGHT}" viewBox="0 0 {width} {HEIGHT}" role="img" aria-label="{title}">
 <title>{title}</title>
 <rect x="0.5" y="0.5" width="{width - 1}" height="{HEIGHT - 1}" rx="10" fill="{c['bg']}" stroke="{c['edge']}"/>
