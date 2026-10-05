@@ -323,3 +323,93 @@ Ct., Littleton, CO 80122, the entity on Ben's app store accounts; /terms/
 and /support/ say so, as Google's listing requires. The Gmail account for
 testing as a student is kept in ~/.humanshaped/test-student on Ben's Mac,
 never in this repository.
+
+## The site's voice and order, after Ben's review (October 5, 2026)
+
+Ben's twelve points on the whole site, as rules.
+
+**Lead with the idea, not the cohort.** "People have to buy into the
+concept of what Human Shaped Software is before they can knowingly [say]
+if they are on board or not." **How to apply:** the home page opens on
+human-shaped software, the principles, and the why; cohorts come after,
+as one way in.
+
+**The story starts from software brain, and AI is a tool people wield
+for human purposes.** The Bluesky post is "relevant but not essential,"
+and the idea is not original: Nilay Patel has long described "software
+brain" (https://www.theverge.com/podcast/917029/software-brain-ai-backlash-databases-automation),
+seeing every problem as a database waiting to be leveraged. "The goal
+in making Human Shaped software is to use AI as a tool, one that humans
+should [wield] for human purposes. It should not be used to replace
+humans or destroy human creativity," and first drafts are "soul-less
+slop" until people work them. "Value-based approaches to using AI are
+the only way forward, and it needs to be clear what values every piece
+of software should 'wear on its sleeves.'" **How to apply:** credit
+Patel for the frame, keep the Bluesky post as a credit for the phrase
+only, and say plainly that the values come first.
+
+**Lead with the why, not with what Ben's apps did.** The film notes
+example is about why: human-written notes value human contributions,
+even when they need correcting. "10,000 movie summaries written by AI
+is more efficient, and yet it is a worse experience for the internet
+(Dead Internet Theory or 'Google Zero') and a worse experience for
+people because it removes the people who actually watched and enjoyed
+the movies." "Humanity is inefficient and that is the point. Learning
+is inefficient, but we have great tools to make it work better while we
+use our values to guide the work." **How to apply:** a principle and
+how it shows up in building comes first; a specific app's moment only
+when it is the clearest illustration, and never as the headline.
+
+**The method is Write, Play, Publish**, replacing "write it down, prove
+it, live with it." "Writing gets it out of my head. Playing makes my
+thinking tangible. Publishing is about releasing things into the world
+and letting others play. It is about having an authentic audience for
+your work." Publishing matters because human-shaped problems "are not
+just limited to one person, they tend to be identifiable to many people
+and possibly even universal." It is iteration, and the principles drive
+how we build. **How to apply:** in the template (README, AGENTS.md,
+COURSE.md, stage 00) and on the site, the same three words.
+
+**The arch never frowns.** The folder icon on the home page put the arch
+in the middle. **How to apply:** see "The arch" above; every icon puts
+the arch at the top of its shape, or leaves it out.
+
+**No meta-commentary, and not one person telling people how to think.**
+Copy that summarizes how the site was made, or what Ben told Claude,
+does not belong on it. "We are trying to ensure that real people see
+themselves in this movement." **How to apply:** the site speaks to the
+reader as "you"; "we" means everyone building this way; "I" appears
+only in Ben's own signed words (a quote, the principles' byline).
+Teacher pages speak to the teacher as "you" and call students
+"students." No sentence fragments as statements ("Five weeks, and a week
+before them.").
+
+**Sign in just signs you in.** Every "Sign in with GitHub" goes to
+/account/, which signs you in and nothing else competes with it.
+
+**Principles over particulars.** People browsing will not know the
+apps. Lead with the broader principle and how it shows up while
+building. "Once you have identified the 'Human Shaped Problem' you are
+trying to solve, you aren't constantly questioning the AI for whether or
+not they are solving in computer-shaped ways. The human being involved
+is what keeps it human-shaped." **How to apply:** no "How to use the
+phrase" checklist; the person in the loop is the safeguard.
+
+**The cohorts page is for people deciding to join.** No teaching-a-
+cohort pitch, no notes meant for Claude. "Our code of conduct is baked
+into the model itself, the principles we have written out. Anything we
+would formalize beyond that would be up to the cohort." **How to
+apply:** the principles are the shared agreement; each cohort makes its
+own rules.
+
+**Pages that feel alive, and say each thing once.** The apps page needs
+real design, with images from the apps themselves. Content lives in one
+place and other pages link to it.
+
+**Two marks, no gatekeeping.** "Aligned with Human Shaped": the builder
+has written how their software lines up with the fifteen principles.
+"Endorsed by Human Shaped": the software started from the template, or
+its builder wrote their commitment to the principles; either one earns
+it at once. "I don't want to be a gatekeeper on this idea. We want as
+many people as possible to align themselves or become endorsed by
+answering the principles."
