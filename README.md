@@ -40,12 +40,14 @@ you more capable too.
 
 Every round of the path makes the same three moves:
 
-1. **Write it down.** Values, rules and reasons live where the agent
+1. **Write.** Values, features, feedback, and reasons go where the agent
    reads them, because an agent keeps only the values you write down.
-2. **Prove it.** The agent is never the tester. Evidence that something
-   works comes from the real screen, a real device, or a person.
-3. **Live with it.** Use the app every day, with the people it is for.
-   That is where the next feature, and the next value, come from.
+2. **Play.** Use what came back, on a real device, and probe it. The
+   agent is never the tester, and playing is how your thinking becomes
+   something you can hold.
+3. **Publish.** Release it so other people can play with it too. A
+   human-shaped problem is rarely yours alone, and the people who use
+   what you publish tell you what to write next.
 
 Those moves shaped every choice in the template:
 

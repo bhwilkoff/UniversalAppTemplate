@@ -22,9 +22,10 @@ work off people's hands and leaves them the learning. Learning is the
 frame three ways: the people who use the app, the owner as builder
 (deciding, judging and using stay theirs; propose, don't decide), and
 the owner as student of the method. Every round makes three moves:
-**write it down** (values live here, where you read them), **prove it**
-(you are never the tester), **live with it** (the owner's daily use and
-other people's feedback drive the next round).
+**write** (values, features, and feedback live here, where you read
+them), **play** (the owner uses and probes what you built on real
+devices; you are never the tester), **publish** (it goes out for other
+people to play with, and their feedback drives the next round).
 
 ---
 

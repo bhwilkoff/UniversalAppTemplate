@@ -1,6 +1,6 @@
 # The Human-Shaped Principles
 
-*Version 0.4, October 2, 2026. Written by Ben Wilkoff, and open to
+*Version 0.5, October 5, 2026. Written by Ben Wilkoff, and open to
 argument.*
 
 I want anyone to be able to say "my software is human-shaped" and have
@@ -300,20 +300,26 @@ software as it is today, even if that someone is the builder.
 
 ## Declaring software human-shaped
 
-To declare your software human-shaped, copy `HUMAN-SHAPED-template.md`
-from this folder into the root of your project as `HUMAN-SHAPED.md`.
-Then answer each principle with *meets*, *not yet*, or *does not
-apply*, a sentence or two in your own words, and a link to the evidence.
-The directory at humanshaped.org reads that file. Software built in a
-Human Shaped cohort is included in the directory, software built from
-the Universal App Template is considered for it, and anyone else who
-builds by these principles can ask to be included.
+There are two marks, and nobody stands at the door. Each one says
+something true about how a piece of software was made, and you can use
+either one as soon as it is true of yours.
 
-Once the file is in your repository, you can show it in your README or
-on your app's website with the human-shaped mark, from
-https://humanshaped.org/start/#mark. The mark links to your own
-declaration, so anyone who sees it can read your answers and check the
-evidence for themselves.
+- **Aligned with Human Shaped.** You have written down how your software
+  lines up with each of the fifteen principles. Copy
+  `HUMAN-SHAPED-template.md` from this folder into the root of your
+  project as `HUMAN-SHAPED.md`, and answer each principle with *meets*,
+  *not yet*, or *does not apply*, a sentence or two in your own words,
+  and a link to the evidence.
+- **Endorsed by Human Shaped.** Your software started from the Universal
+  App Template, or you have written your commitment to the principles
+  into your project. Either one is enough, and the mark is yours from
+  that moment.
+
+Both marks, and how to show them in your README or on your app's
+website, are at https://humanshaped.org/start/#mark. A mark links to
+your own `HUMAN-SHAPED.md`, so anyone who sees it can read your answers
+and check the evidence for themselves. The directory at humanshaped.org
+reads that file, and any software with either mark can ask to be listed.
 
 When something changes, change your answer and record what changed and
 when, rather than deleting the old answer. A declaration that shows its

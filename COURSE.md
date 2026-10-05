@@ -24,8 +24,8 @@ three.
   keep, and they build something that does the same for the people who
   use it.
 
-Every week makes the same three moves as the path: write it down, prove
-it, live with it. Stage 00 explains them.
+Every week makes the same three moves as the path: write, play, and
+publish. Stage 00 explains them.
 
 The course is the path in `docs/path/`. Each stage already ends with a
 "Be ready to..." line, and that line is the challenge to bring back.

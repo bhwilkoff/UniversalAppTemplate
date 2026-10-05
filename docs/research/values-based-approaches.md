@@ -277,13 +277,14 @@ with one condition:
 
 So, each idea below was rewritten in the template's own words, tied to
 something that happened in a real app, and placed under one of the
-three moves: write it down, prove it, live with it. Learning (as a
+three moves: write, play, publish (named on October 5, 2026, replacing
+"write it down, prove it, live with it"). Learning (as a
 student, as a builder, as a human) is the frame for all of it. The
 credit lives here, so the stage pages can speak plainly.
 
 | In the template | Where it lives | Where it came from |
 |---|---|---|
-| Human-shaped software, learning three ways, the three moves | `README.md`, stage 00, `COURSE.md`, `CLAUDE.md` | Ben's March 2026 page on "computer-shaped problems"; constructionism (Papert, Resnick) |
+| Human-shaped software, learning three ways, the three moves | `README.md`, stage 00, `COURSE.md`, `CLAUDE.md` | Ben's March 2026 page on "computer-shaped problems"; Nilay Patel's "software brain"; constructionism (Papert, Resnick) |
 | Three questions of the idea: should it exist, who does it touch, what will people learn or stop learning | Stage 00 step 4, `learning-orientation-design` | VBE's three ethical lenses (consequences, character, duty), rewritten around learning. Duty became stage 00's "one line you will not cross". "Not building" from VBE; the wording from BOBA's Radish moment |
 | The people outside the screen | Stage 00, `learning-orientation-design`, the talking guide | VBE and Value Sensitive Design's indirect stakeholders |
 | Ask the agent to argue the other side | Stage 00, the talking guide, `learning-orientation-design` | VBE's User Advocate role, for a builder who holds every role alone |

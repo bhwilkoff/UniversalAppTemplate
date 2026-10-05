@@ -23,12 +23,13 @@ earlier.
 
 ## Computer-shaped problems
 
-In March I typed a page about something I had read on Bluesky: that
-we are only looking to solve "computer-shaped problems." Community is not
-computer-shaped. Relationships are not. Learning is not. And yet there
-are so many computer-shaped problems, and making everything into
-something I can feed into the Claude Code window is "so seductive and
-more than a little thrilling."
+Nilay Patel calls it software brain: seeing the whole world as a set of
+databases, each one waiting for the right code to take control of it.
+In March I typed a page about that habit in myself. Community is not a
+computer-shaped problem, and neither are relationships or learning. And
+yet there are so many computer-shaped problems, and making everything
+into something I can feed into the Claude Code window is "so seductive
+and more than a little thrilling."
 
 The page ends here:
 
@@ -53,12 +54,15 @@ makes the choice.
 
 ## Human-shaped software
 
-I call what this template builds *human-shaped software*. The name
-answers that March page. A computer-shaped problem is one you can hand
-to the window. Learning, community and relationships are not, because
-they only happen when a person does the work. Human-shaped software is
-built around those parts rather than over them. It takes the mechanical
-work off people's hands and leaves them the learning.
+I call what this template builds *human-shaped software*. A
+computer-shaped problem is one you can hand to the window. Learning,
+community, and relationships are not, because they only happen when a
+person does the work. Human-shaped software uses AI as a tool that
+people wield for human purposes, built around those parts rather than
+over them. It takes the mechanical work off people's hands and leaves
+them the learning
+([computer-shaped problems](../human-shaped/computer-shaped-problems.md)
+tells the longer story).
 
 Learning is the frame for everything in this template, and it runs in
 three directions at once.
@@ -76,18 +80,27 @@ three directions at once.
 
 So, every round of the path makes the same three moves:
 
-1. **Write it down.** Writing is how you find out what you believe, and
-   a value you have not written down is one the agent cannot keep.
-2. **Prove it.** Proving is how you find out whether it is true. Every
-   "it works" points at something a person can look at (stage 04).
-3. **Live with it.** Living with the app is how you find out what you
-   missed. The values you could not have predicted show up when you use
-   it every day, with the people it is for.
+1. **Write.** Writing gets it out of your head. The values, the
+   features you want, the feedback you hear, and everything else you
+   think is important go where you and the agent can both read them,
+   because a value you have not written down is one the agent cannot
+   keep.
+2. **Play.** Playing makes your thinking tangible. Whatever came back
+   from the agent, you use it, test it, and probe it on a real device,
+   and you think about what to try next. The agent is never the tester
+   (stage 04), so every "it works" is something you have played with
+   yourself.
+3. **Publish.** Publishing releases the work into the world so that
+   other people can play with it too, which gives your work a real
+   audience. Human-shaped problems are rarely yours alone. They tend to
+   be shared by many people, and sometimes by nearly everyone, so the
+   people who play with what you publish tell you what to write next.
 
-**Write it down, prove it, live with it.**
+**Write, play, publish.**
 
-The moves are not stages. Each lap of each stage makes all three, and
-this stage is where the first one starts.
+The moves are not stages. Each round of each stage makes all three, and
+the principles decide what you write, what you play with, and what is
+ready to publish. This stage is where the first move starts.
 
 ## Where the values live in this template
 
@@ -267,9 +280,9 @@ the template. Everything in this stage is a conversation, and
 **When you are ready to move on,** your note starts with the why and
 your answers to the three questions, the "Why we build" paragraph in
 `AGENTS.md` sounds like you, there is one rule in your own words, and
-the agent has what it needs to start. You have written it down. Stage 01
-is the first chance to prove it and live with it, in something you can
-hold.
+the agent has what it needs to start. You have written. Stage 01 is the
+first chance to play with something you can hold, and to publish it for
+someone else to try.
 
 Every stage ends the way this one does, with something to show and a
 decision to explain in your own words, with the agent closed. [Showing

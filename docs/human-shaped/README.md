@@ -11,11 +11,11 @@ website presents them, and this folder is where they change.
 
 | Page | What it is for |
 |---|---|
-| [Computer-shaped problems](computer-shaped-problems.md) | The movement's shorthand in plain words, with examples from four apps, and the Bluesky post it came from. |
+| [Computer-shaped problems](computer-shaped-problems.md) | Software brain, the habit of seeing every problem as a database, and why human-shaped software uses AI as a tool for human purposes instead. |
 | [More than asking an AI for an app](not-vibe-coding.md) | The case for building this way rather than vibe coding, made fairly, with a side-by-side table. |
 | [Case study: Archive Watch](case-study-archive-watch.md) | One app from April 17 to nine platforms, told from its public git history. Its data is in [`data/archive-watch-timeline.json`](data/archive-watch-timeline.json). |
 | [The Human-Shaped Principles](PRINCIPLES.md) | The specific principles an app meets in order to call itself human-shaped. A draft. |
-| [HUMAN-SHAPED template](HUMAN-SHAPED-template.md) | The file you copy into your own repository to declare your app human-shaped, principle by principle. |
+| [HUMAN-SHAPED template](HUMAN-SHAPED-template.md) | The file you copy into your own repository to answer the principles one by one, which earns the Aligned with Human Shaped mark. |
 
 ## Where to start
 

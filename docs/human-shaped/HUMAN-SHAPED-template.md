@@ -5,7 +5,7 @@
 app: "Your app's name"
 website: "https://"
 repository: "https://github.com/you/your-app"
-principles_version: "0.4"
+principles_version: "0.5"
 status: "working toward"   # declared | working toward | withdrawn
 declared_by: "Your name"
 date: "YYYY-MM-DD"         # the date of the last change to this file
@@ -14,7 +14,7 @@ platforms: []              # e.g. [web, ios, android]
 
 # [App name] is human-shaped
 
-*Answering the Human-Shaped Principles, version 0.4
+*Answering the Human-Shaped Principles, version 0.5
 (https://github.com/bhwilkoff/UniversalAppTemplate/blob/main/docs/human-shaped/PRINCIPLES.md).*
 
 **What it is for, and who it is for.** One or two sentences, in your
@@ -36,6 +36,12 @@ an honest place to be.
 
 Ask your agent to help you find the evidence links. Write the sentences
 yourself.
+
+Once every principle has an answer, your software is **Aligned with
+Human Shaped**, and you can show that mark from
+https://humanshaped.org/start/#mark. If it started from the Universal
+App Template, or this file says your commitment to the principles in
+your own words, it is also **Endorsed by Human Shaped**.
 
 ---
 

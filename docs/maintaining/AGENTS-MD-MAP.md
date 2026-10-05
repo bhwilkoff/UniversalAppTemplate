@@ -44,7 +44,7 @@ wording, with the examples, is in the linked page.
 | Invoke `learning-orientation-design` before any feature (three questions, then four) | Kept, word for word |
 | Human-facing version is `docs/path/00-why-we-build.md` | Kept |
 | Human-shaped software; learning three ways; propose, don't decide | Kept, word for word |
-| Three moves: write it down, prove it, live with it | Kept, word for word |
+| Three moves: write, play, publish (renamed October 5, 2026, from "write it down, prove it, live with it") | Changed with Ben's review |
 
 ### How we build
 
