@@ -202,3 +202,19 @@ test('an app says which mark is true of it, with no one approving it (October 5)
   assert.equal(lib.statusText({ status: 'cohort' }, { status: 'working toward', principles: [{ n: 1 }] }), 'Aligned with Human Shaped');
   assert.equal(lib.statusText({ status: 'cohort' }, { status: 'withdrawn', principles: [{ n: 1 }] }), 'Its answers to the principles have been withdrawn');
 });
+
+test('every app card has a picture, from its listing or its repository, over a drawn cover (October 5)', () => {
+  assert.equal(lib.imageOf({ repository: 'https://github.com/bhwilkoff/Archive-Watch' }), 'https://opengraph.githubassets.com/humanshaped/bhwilkoff/Archive-Watch');
+  assert.equal(lib.imageOf({ repo: 'a/b', image: 'https://example.org/shot.png' }), 'https://example.org/shot.png');
+  assert.equal(lib.imageOf({ repo: 'a/b', image: 'docs/shot.png' }), 'https://raw.githubusercontent.com/a/b/HEAD/docs/shot.png');
+  assert.equal(lib.imageOf({ repo: 'a/b', image: '../secrets.png' }), 'https://opengraph.githubassets.com/humanshaped/a/b');
+  assert.equal(lib.imageOf({ repo: 'a/b', image: 'javascript:alert(1)' }), 'https://opengraph.githubassets.com/humanshaped/a/b');
+  assert.equal(lib.imageOf({ name: 'No repo' }), null);
+  const c = lib.coverOf({ name: 'Archive Watch' });
+  assert.equal(c.initials, 'AW');
+  assert.deepEqual(lib.coverOf({ name: 'Archive Watch' }), c, 'the same every visit');
+  assert.equal(lib.coverOf({ name: 'Bsky-Dreams' }).initials, 'BD');
+  assert.equal(lib.coverOf({ name: 'Zed' }).initials, 'ZE');
+  const tones = [0, 1, 2, 3].map((i) => lib.coverOf({ name: 'Same' }, i).tone);
+  assert.equal(new Set(tones).size, 4, 'neighbors in a list never share a tone');
+});

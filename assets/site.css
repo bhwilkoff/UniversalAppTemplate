@@ -220,6 +220,20 @@ h3 { font-size: 1.25rem; letter-spacing: -0.012em; line-height: 1.25; }
 .app .facts { margin: 0; color: var(--muted); font-size: 0.975rem; }
 .app .gave { margin: 0; font-size: 0.975rem; border-top: 1px solid var(--rule); padding-top: 0.75rem; margin-top: auto; }
 .app .status { margin: 0; font-size: 0.95rem; font-weight: 600; color: var(--muted); }
+/* Every app's card, with a picture of the app over a drawn cover in its
+   own tone (October 5, 2026: pages that feel alive). */
+.app-grid .app { padding: 0 0 1.25rem; overflow: hidden; }
+.app-grid .app > :not(.app-cover-link):not(.app-cover) { margin-left: 1.25rem; margin-right: 1.25rem; }
+.app-cover-link { display: block; text-decoration: none; }
+.app-cover { position: relative; aspect-ratio: 2 / 1; background: var(--tone, var(--clay)); background-image: radial-gradient(circle at 85% 20%, rgba(255,255,255,0.18), transparent 55%); display: grid; place-items: center; overflow: hidden; margin-bottom: 0.4rem; }
+.app-initials { font-size: clamp(2.5rem, 2rem + 3vw, 4rem); font-weight: 680; letter-spacing: -0.04em; color: rgba(255,255,255,0.92); }
+.app-cover img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.3s; }
+.app-cover.has-image img { opacity: 1; }
+.app-cover-link:hover .app-cover { filter: brightness(1.05); }
+.app-grid { margin-bottom: 2rem; }
+.app-cover-wide { aspect-ratio: 3 / 1; border-radius: var(--radius); margin: 0 0 2rem; }
+@media (max-width: 40rem) { .app-cover-wide { aspect-ratio: 2 / 1; } }
+.app-fallback { margin: 0; padding-left: 1.25rem; display: grid; gap: 0.5rem; }
 
 /* Other ways in */
 

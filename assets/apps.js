@@ -130,30 +130,70 @@
   }
 
   // ---------------------------------------------------------------------
-  // /apps/: the directory's other apps, beside the four on the page.
+  // An app's card, wherever apps are listed (/apps/ and the home page):
+  // a picture of the app over a drawn cover, its own words, where it
+  // runs, and where to follow and use it. Everything comes from the
+  // directory listing, so each fact lives in one place.
   // ---------------------------------------------------------------------
-  function drawDirectory(list, apps) {
-    var others = apps.filter(function (a) { return a.status !== 'founding'; });
-    if (!others.length) return;
-    others.forEach(function (app) {
-      var card = el('li', 'app');
-      var h = el('h3'); h.appendChild(link(lib.appHref(app.repo), app.name)); card.appendChild(h);
-      if (!app.repo) h.replaceChildren(document.createTextNode(app.name));
-      card.appendChild(el('p', 'status', lib.statusText(app, null)));
-      if (app.in_its_own_words) card.appendChild(el('p', 'own', '“' + app.in_its_own_words + '”'));
-      var names = lib.platformNames(app.platforms);
-      var facts = [];
-      if (app.builder) facts.push('Built by ' + app.builder);
-      if (names.length) facts.push('on ' + lib.joinWithAnd(names));
-      if (facts.length) card.appendChild(el('p', 'facts', facts.join(', ') + '.'));
+  function appCard(app, opts) {
+    opts = opts || {};
+    var card = el('li', 'app');
+    var cover = drawCover(el('div', 'app-cover'), app, opts.index);
+    var href = app.repo ? lib.appHref(app.repo) : null;
+    if (href) { var a = link(href, ''); a.className = 'app-cover-link'; a.setAttribute('aria-hidden', 'true'); a.tabIndex = -1; a.appendChild(cover); card.appendChild(a); }
+    else card.appendChild(cover);
+    var h = el('h3'); h.appendChild(href ? link(href, app.name) : document.createTextNode(app.name)); card.appendChild(h);
+    card.appendChild(el('p', 'status', lib.statusText(app, app.declaration && typeof app.declaration === 'object' ? app.declaration : null)));
+    if (app.in_its_own_words) card.appendChild(el('p', 'own', '“' + app.in_its_own_words + '”'));
+    var names = lib.platformNames(app.platforms);
+    var facts = [];
+    if (app.builder) facts.push('Built by ' + app.builder);
+    if (names.length) facts.push((facts.length ? 'on ' : 'On ') + lib.joinWithAnd(names));
+    if (facts.length) card.appendChild(el('p', 'facts', facts.join(', ') + '.'));
+    if (!opts.short) {
       var links = el('ul', 'links');
       links.setAttribute('aria-label', app.name + ' links');
-      if (app.repo) links.appendChild(li(link(lib.appHref(app.repo), 'Follow its work')));
+      if (href) links.appendChild(li(link(href, 'Follow its work')));
       if (lib.safeUrl(app.website)) links.appendChild(li(link(app.website, app.website.replace(/^https:\/\//, '').replace(/\/$/, ''))));
+      lib.storeLinks(app.stores).forEach(function (st) { links.appendChild(li(link(st.href, st.text))); });
       card.appendChild(links);
-      list.appendChild(card);
-    });
-    document.getElementById('more-apps').hidden = false;
+    }
+    return card;
+  }
+
+  // The picture over the drawn cover, for a card or an app's own page.
+  function drawCover(cover, app, index) {
+    if (!cover) return cover;
+    var c = lib.coverOf(app, index);
+    cover.replaceChildren();
+    cover.style.setProperty('--tone', c.tone);
+    cover.appendChild(el('span', 'app-initials', c.initials));
+    var src = lib.imageOf(app);
+    if (src) {
+      var img = el('img');
+      img.alt = '';
+      img.loading = 'lazy';
+      img.decoding = 'async';
+      img.referrerPolicy = 'no-referrer';
+      img.addEventListener('error', function () { img.remove(); });
+      img.addEventListener('load', function () { cover.classList.add('has-image'); });
+      img.src = src;
+      cover.appendChild(img);
+    }
+    return cover;
+  }
+
+  // Every app in the directory, the founding four first, on /apps/; or
+  // the first few (data-apps-grid="4") on the home page.
+  function drawGrid(list, apps) {
+    var n = Number(list.getAttribute('data-apps-grid')) || 0;
+    var shown = n ? apps.slice(0, n) : apps;
+    if (!shown.length) return;
+    list.replaceChildren();
+    shown.forEach(function (app, i) { list.appendChild(appCard(app, { short: !!n, index: i })); });
+    list.hidden = false;
+    var fb = document.querySelector('[data-apps-fallback]');
+    if (fb) fb.hidden = true;
   }
 
   // ---------------------------------------------------------------------
@@ -186,6 +226,7 @@
     });
 
     show('ready');
+    drawCover($('[data-app-cover]'), app, apps.indexOf(app));
     $('[data-status]').textContent = lib.statusText(app, null);
     drawWhere(app, null);
     drawCommits(repo);
@@ -344,11 +385,11 @@
 
   var page = document.querySelector('[data-app-page]');
   var feeds = document.querySelectorAll('[data-feed]');
-  var directory = document.querySelector('[data-directory]');
-  if (!page && !feeds.length && !directory) return;
+  var grids = Array.prototype.slice.call(document.querySelectorAll("[data-apps-grid]"));
+  if (!page && !feeds.length && !grids.length) return;
   allApps().then(function (apps) {
     if (page) drawAppPage(page, apps);
-    if (directory) drawDirectory(directory, apps);
+    grids.forEach(function (g) { drawGrid(g, apps); });
     feeds.forEach(function (box) { drawFeed(box, apps); });
   }).catch(function () {
     if (page) page.querySelectorAll('[data-state]').forEach(function (s) { s.hidden = s.getAttribute('data-state') !== 'error'; });

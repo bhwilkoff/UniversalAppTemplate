@@ -261,6 +261,37 @@
     return null;
   }
 
+  // A picture of the app for its card (Ben, October 5: pages that feel
+  // alive): a screenshot the listing names (an https address, or a path
+  // in the app's own repository), else GitHub's own preview of the
+  // repository, which the page already reads from. A drawn cover sits
+  // behind either one, so a card never shows an empty box.
+  function imageOf(app) {
+    var img = app && typeof app.image === 'string' ? app.image.trim() : '';
+    var repo = app && (app.repo || repoPath(app.repository));
+    if (img && safeUrl(img)) return img;
+    if (img && repo && /^[A-Za-z0-9._\/-]+\.(png|jpe?g|webp|gif|svg)$/i.test(img) && img.indexOf('..') < 0) {
+      return 'https://raw.githubusercontent.com/' + repo + '/HEAD/' + img.replace(/^\/+/, '');
+    }
+    return repo ? 'https://opengraph.githubassets.com/humanshaped/' + repo : null;
+  }
+
+  // The drawn cover: the app's initials on one of the site's tones, picked
+  // by the card's place in the list (index) so that neighbors always
+  // differ, or by the app's name when it stands alone.
+  var COVER_TONES = ['#A23F22', '#2F6D8C', '#6A5A8C', '#3F7A4F', '#8C6A1F', '#8C3F6A', '#3F6F7A', '#5A5F66'];
+  function coverOf(app, index) {
+    var name = String((app && app.name) || '?').trim();
+    var words = name.split(/[\s-]+/).filter(Boolean);
+    var initials = (words.length > 1 ? words[0][0] + words[1][0] : name.slice(0, 2)).toUpperCase();
+    // FNV-1a, which spreads short names across the tones better than a
+    // plain multiply.
+    var h = 2166136261;
+    for (var i = 0; i < name.length; i++) { h ^= name.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
+    var at = typeof index === 'number' && index >= 0 ? index : h;
+    return { initials: initials, tone: COVER_TONES[at % COVER_TONES.length] };
+  }
+
   function storeLinks(stores) {
     return Object.keys(stores || {}).filter(function (k) { return safeUrl(stores[k]); })
       .map(function (k) { return { href: stores[k], text: STORES[k] || k }; });
@@ -269,6 +300,7 @@
   function appHref(repo) { return '/apps/app/?r=' + repo; }
 
   var lib = {
+    imageOf: imageOf, coverOf: coverOf,
     joinWithAnd: joinWithAnd, repoPath: repoPath, safeUrl: safeUrl, platformNames: platformNames,
     mergeApps: mergeApps, findApp: findApp, feedRepos: feedRepos, commitFrom: commitFrom, isWork: isWork,
     feed: feed, trouble: trouble, troubleText: troubleText, parseDeclaration: parseDeclaration,
