@@ -1690,3 +1690,12 @@ label.check { min-height: 2.25rem; }
 .stage-room.is-asking { border: 2px solid var(--clay); }
 .stage-room-asking { margin: 0; font-weight: 680; color: var(--clay); font-size: clamp(1rem, 2vmin, 1.4rem); }
 .stage-room.is-done { opacity: 0.7; }
+
+/* Pages on the board (R13). */
+.board-pages { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: flex-start; }
+.board-pages input[type="file"] { display: none; }
+.board-library { flex-basis: 100%; }
+.board-library summary { cursor: pointer; font-weight: 600; padding: 0.3rem 0; }
+.board-library-row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.4rem; }
+.board-library-row input { flex: 1 1 14rem; min-height: 40px; font: inherit; border: 1px solid var(--rule); border-radius: 8px; padding: 0 0.6rem; background: var(--card); color: var(--ink); }
+.board-library-files { list-style: none; margin: 0.5rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.4rem; }

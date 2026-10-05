@@ -72,6 +72,29 @@ grant usage on sequence realtime.messages_id_seq to authenticated;
 grant execute on function realtime.topic() to anon, authenticated;
 """
 
+# Supabase Storage keeps each file as a row of storage.objects, named by
+# its path, and checks rules on that table (supabase.com/docs/guides/
+# storage/security/access-control). This stands in for it, with the same
+# storage.foldername(), so the board's file rules are tested too.
+STORAGE_STUB = """
+create schema storage;
+create table storage.buckets (id text primary key, name text, public boolean default false, file_size_limit bigint, allowed_mime_types text[]);
+create table storage.objects (
+  id uuid primary key default gen_random_uuid(),
+  bucket_id text references storage.buckets (id),
+  name text not null,
+  owner uuid,
+  created_at timestamptz not null default now()
+);
+alter table storage.objects enable row level security;
+create function storage.foldername(name text) returns text[] language sql immutable as $$
+  select (string_to_array(name, '/'))[1:array_length(string_to_array(name, '/'), 1) - 1]
+$$;
+grant usage on schema storage to anon, authenticated;
+grant select, insert, delete on storage.objects to authenticated;
+grant execute on function storage.foldername(text) to anon, authenticated;
+"""
+
 GRANTS = """
 grant usage on schema public to anon, authenticated;
 grant select on all tables in schema public to anon, authenticated;
@@ -95,6 +118,7 @@ def main():
     su = conn.cursor()
     su.execute(AUTH_STUB)
     su.execute(REALTIME_STUB)
+    su.execute(STORAGE_STUB)
     for path in sorted((ROOT / "migrations").glob("*.sql")):
         su.execute(path.read_text())
     su.execute(GRANTS)
@@ -1168,6 +1192,27 @@ def main():
                       (bc, b2, people["eve"], json.dumps({"elements": [el("x", 1, 1)]}))))
     check("a board belongs to a session of its own cohort",
           not attempt(eve, "insert into public.boards (cohort_id, session_id, created_by) values (%s, %s, %s)", (bc, s1, people["eve"])))
+
+    # Pages on the board (R13, migration 20261005030000): files at
+    # '<cohort>/<board>/<file>' in the private 'board-files' bucket.
+    def add_file(cur, name):
+        return attempt(cur, "insert into storage.objects (bucket_id, name, owner) values ('board-files', %s, auth.uid())", (name,))
+    def sees_file(cur, name):
+        cur.execute("select count(*) from storage.objects where bucket_id = 'board-files' and name = %s", (name,))
+        return cur.fetchone()[0] > 0
+    fpath = "%s/%s/page-1.png" % (bc, board)
+    check("someone who can draw on the board adds a page to it", add_file(as_user("bea"), fpath))
+    check("a classmate in the cohort sees the page", sees_file(as_user("fay"), fpath))
+    check("someone outside the cohort does not", not sees_file(as_user("dee"), fpath))
+    check("an agent cannot add a page", not add_file(as_agent("bea"), "%s/%s/page-2.png" % (bc, board)))
+    check("a page cannot claim another cohort's folder", not add_file(as_user("bea"), "%s/%s/page-3.png" % (people["dee"], board)))
+    check("a page must sit in a board's folder", not add_file(as_user("bea"), "%s/page-4.png" % (bc,)))
+    as_user("ben").execute("update public.boards set locked = true where id = %s", (board,))
+    check("a locked board takes pages only from a teacher",
+          not add_file(as_user("bea"), "%s/%s/page-5.png" % (bc, board)) and add_file(as_user("ben"), "%s/%s/page-6.png" % (bc, board)))
+    as_user("ben").execute("update public.boards set locked = false where id = %s", (board,))
+    check("a student cannot remove a page", not attempt(as_user("bea"), "delete from storage.objects where name = %s returning name", (fpath,)) or last_rows == [])
+    check("a teacher of the cohort can", attempt(as_user("ben"), "delete from storage.objects where name = %s returning name", (fpath,)) and last_rows == [(fpath,)])
 
     bea = as_user("bea")
     check("a student can save what they drew",

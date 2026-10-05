@@ -400,7 +400,7 @@
     var open = newTab(el('a', 'btn-github', 'Open the design stage')); open.href = links.board; acts.appendChild(open);
     if (S.teaching) { var stage = newTab(el('a', 'btn-quiet', 'Open it to present')); stage.href = links.stage; acts.appendChild(stage); }
     box.appendChild(acts);
-    if (S.teaching) box.appendChild(el('p', 'small', 'During a design stage scene, the main stage shows this board to everyone who has it open. You can also open it to present, and share that tab from Meet.'));
+    if (S.teaching) box.appendChild(el('p', 'small', 'During a design stage scene, the main stage shows this board to everyone who has it open. On the board you can add a PDF, slides saved as a PDF, or pictures as pages to draw on, from your computer or your library folder on GitHub.'));
   }
 
   // ------------------------------------------------------------------

@@ -140,6 +140,7 @@
     back.href = '/live/?c=' + encodeURIComponent(c.slug);
     $('[data-teach]').hidden = !S.teaching;
     $('[data-lock]').textContent = S.board.locked ? 'Unlock the board' : 'Lock the board';
+    if (S.pages) S.pages.refresh();
     if (S.teaching && !S.group && S.groups.length) {
       var sel = $('[data-group-select]');
       sel.replaceChildren();
@@ -201,6 +202,14 @@
       excalidrawAPI: function (api) {
         if (api && !S.api) {
           S.api = api; window.__board = { api: api, state: S }; syncLine();
+          // Pages on the board (R13): PDFs and pictures, placed and fetched.
+          if (window.BoardPages && $('[data-pages]')) try {
+            S.pages = window.BoardPages.start({
+              db: db, X: S.X, api: function () { return S.api; }, board: function () { return S.board; }, cohort: S.cohort,
+              canDraw: canDraw, teaching: S.teaching, mount: $('[data-pages]'), status: status
+            });
+            setTimeout(function () { S.pages.sync(api.getSceneElements()); }, 0);
+          } catch (e) { S.pages = null; }
           // A template laid on an empty board goes to everyone and is saved.
           if (S.seeded) setTimeout(function () { sendScene(); saveSoon(); }, 0);
           // On the main stage, or with a template just laid, everything on
@@ -250,6 +259,7 @@
 
   function onChange(elements) {
     if (!S.api) return;
+    if (S.pages) S.pages.sync(elements);
     if (S.fitPending && S.api.scrollToContent && elements.some(function (e) { return !e.isDeleted; })) {
       S.fitPending = false;
       setTimeout(function () { S.api.scrollToContent(S.api.getSceneElements(), { fitToViewport: true, viewportZoomFactor: 0.8 }); }, 50);
@@ -525,6 +535,14 @@
     saveSoon.cancel(); sendScene.cancel();
     db.from('boards').update({ generation: S.board.generation + 1, scene: { elements: [] } }).eq('id', S.board.id).select().maybeSingle().then(function (r) {
       if (r.error) return status('Not cleared: ' + r.error.message);
+      // The pages placed on it (R13) go too.
+      if (db.storage) {
+        var store = db.storage.from('board-files'), folder = S.cohort.id + '/' + S.board.id;
+        store.list(folder, { limit: 1000 }).then(function (l) {
+          var names = ((l && l.data) || []).map(function (f) { return folder + '/' + f.name; });
+          if (names.length) store.remove(names);
+        }).catch(function () {});
+      }
       nudge('cleared');
       reread();
     });

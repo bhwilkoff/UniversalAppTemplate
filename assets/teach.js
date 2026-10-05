@@ -148,6 +148,19 @@
   }
   $('[data-new-cohort]').addEventListener('click', function () { fillForm(null); });
   $('[data-cancel]').addEventListener('click', function () { form.hidden = true; if (current) $('[data-detail]').hidden = false; });
+  function removeBoardFiles(cohortId) {
+    var store = db.storage.from('board-files');
+    return db.from('boards').select('id').eq('cohort_id', cohortId).then(function (b) {
+      return Promise.all(((b && b.data) || []).map(function (board) {
+        var folder = cohortId + '/' + board.id;
+        return store.list(folder, { limit: 1000 }).then(function (l) {
+          var names = ((l && l.data) || []).map(function (f) { return folder + '/' + f.name; });
+          return names.length ? store.remove(names) : null;
+        });
+      }));
+    }).catch(function () {});
+  }
+
   form.addEventListener('submit', function (ev) {
     ev.preventDefault();
     var f = form.elements;
@@ -168,8 +181,12 @@
       github_repo: f.github_repo.value.trim() || null,
       github_team: f.github_team.value.trim() || null
     };
+    // Finishing a cohort deletes its boards (migration 20261003150000), so
+    // the pages placed on them go first (R13): a file in storage cannot be
+    // removed from SQL.
+    var before = editing && row.status === 'finished' ? removeBoardFiles(editing) : Promise.resolve();
     var q = editing
-      ? db.from('cohorts').update(row).eq('id', editing).select().single()
+      ? before.then(function () { return db.from('cohorts').update(row).eq('id', editing).select().single(); })
       : db.from('cohorts').insert(Object.assign({ slug: f.slug.value.trim(), created_by: me.id }, row)).select().single();
     say('[data-form-message]', 'Saving…');
     q.then(function (r) {

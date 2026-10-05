@@ -436,7 +436,22 @@ panel at 360px and the stage at 1280px) and pushed before the next.
   than drawing a second copy. One addon-lib test.
 - **R13, content on the stage:** PDF and image pages placed on the
   scene's board (annotate, zoom, together or locked), from an upload or
-  the teacher's GitHub library folder. (pending)
+  the teacher's GitHub library folder. **Built October 5:** migration
+  20261005030000_board_files.sql (applied; the private 'board-files'
+  bucket at '<cohort>/<board>/<file>', read by whoever sees the board,
+  added to by whoever may draw on it, never an agent, removed by a
+  teacher; 701 policy checks with a Storage stand-in, which fail when the
+  add rule is opened). assets/board-pages-lib.js (5 tests) and
+  assets/board-pages.js: "Add a PDF or pictures" on the board turns each
+  PDF page (pdf.js 3.11.174 from cdnjs) or picture into a locked page,
+  laid under what is there, uploaded, and fetched by every other screen;
+  drawing on top, zoom, and together-or-locked are the board's own. A
+  teacher's library is a public GitHub folder (owner/repo/folder),
+  remembered in their browser. Slides go in as PDFs; Google Drive would
+  need Google permissions the listing promises not to ask for. Clearing
+  a board and finishing a cohort remove its pages. Checked: a printed
+  three-page PDF through the whole path in a browser, and the board's
+  25 two-page checks. Not yet in a real call.
 - **R14, code and agents:** a code scene everyone can run and change in
   their own browser; "Share what my agent said," marked AI; the MCP
   server's `live_now` tool. (pending)

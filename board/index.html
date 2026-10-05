@@ -25,7 +25,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/assets/vendor/excalidraw-0.18.1/excalidraw.css">
-  <link rel="stylesheet" href="/assets/site.css?v=20261005i">
+  <link rel="stylesheet" href="/assets/site.css?v=20261005j">
   <link rel="modulepreload" href="/assets/vendor/excalidraw-0.18.1/excalidraw.js">
   <script>
     (function () {
@@ -99,6 +99,8 @@
             <button class="btn-quiet" type="button" data-download="svg">Download SVG</button>
             <button class="btn-quiet" type="button" data-download="excalidraw">Download the .excalidraw file</button>
           </div>
+          <!-- Pages on the board (R13): PDFs and pictures to draw on. -->
+          <div class="board-pages" data-pages></div>
           <p class="small board-status" role="status" data-status></p>
           <div class="board-teach" data-teach hidden>
             <button class="btn-quiet" type="button" data-lock></button>
@@ -112,7 +114,7 @@
         </div>
         <div class="board-canvas" data-canvas aria-label="The drawing board"></div>
         <div class="wrap board-foot">
-          <p class="small">Everyone in the cohort sees what you draw here as you draw it, and the board is saved every few seconds and when you leave, so it is still here after the session. It is deleted with the rest of the session when the cohort finishes, so download anything you want to keep. Pictures cannot be added, only drawing and writing.</p>
+          <p class="small">Everyone in the cohort sees what you draw here as you draw it, and the board is saved every few seconds and when you leave, so it is still here after the session. It is deleted with the rest of the session when the cohort finishes, so download anything you want to keep. You can add a PDF or pictures as pages to draw on, and a teacher can lock the board so only they can add or draw.</p>
           <p class="small">The board is <a href="https://github.com/excalidraw/excalidraw">Excalidraw</a>, which is open source under the MIT License.</p>
         </div>
       </section>
@@ -132,6 +134,8 @@
   <script src="/assets/hub-config.js" defer></script>
   <script src="/assets/cohort-lib.js" defer></script>
   <script src="/assets/board-lib.js" defer></script>
+  <script src="/assets/board-pages-lib.js" defer></script>
+  <script src="/assets/board-pages.js" defer></script>
   <script src="/assets/board.js" defer></script>
 
   <footer class="site-footer">
