@@ -430,15 +430,18 @@ making things that utilize the values." **How to apply:** values on the
 site belong to a person who holds them and builds by them, never to the
 software alone or to the method in the abstract.
 
-**Every principle says what human-shaped software does.** "The
-principles should always be written as 'Human Shaped Software...' does
-each of these things (this ensures that they are always active and that
-they can be measured against other software development efforts)."
-**How to apply:** each principle, wherever it appears (PRINCIPLES.md,
-HUMAN-SHAPED-template.md, the site, the sheets), is a full sentence that
-starts "Human-shaped software" and uses an active verb: "Human-shaped
-software starts from a human-shaped problem." PRINCIPLES.md 0.6 does
-this. Lists may set the subject quieter, but never drop it.
+**Every principle finishes the sentence "Human-shaped software...".**
+Ben: "The whole point of having principles that utilize a parallel
+structure is so that you can put 'Human Shaped Software:' at the top and
+have all of the verbs start the beginning of each principle. It makes it
+so that each one is action oriented from the very beginning." And: "each
+principle should finish the sentence 'Human Shaped Software...'"
+**How to apply:** wherever the principles appear (PRINCIPLES.md, each
+principle's own section, HUMAN-SHAPED-template.md, the home page card,
+the sheets), "Human-shaped software:" is said once, as the stem, and
+every principle starts with its verb: "Starts from a human-shaped
+problem", "Increases what people are able to do". Never repeat the
+subject in front of each one.
 
 **The arch joins, or stands alone.** "The Human Shaped 'arch' should
 really only be used when it highlights something about either joining

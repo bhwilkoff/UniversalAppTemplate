@@ -78,7 +78,9 @@ as Ben's without his review, $0 to run.
 
 - Plain HTML and CSS, no framework, no build step. One stylesheet,
   `assets/site.css`, holds the tokens in `:root` with a dark-mode
-  override, for every page. The header and footer are plain HTML
+  override, for every page. Its links carry `?v=<date><letter>`; change
+  that stamp on every page whenever `site.css` changes, so no browser
+  draws a new page with an old stylesheet. The header and footer are plain HTML
   repeated on each page, so change them everywhere at once.
 - Every page is a folder with an `index.html`, so each has a canonical
   URL. Add new pages to `sitemap.xml`.

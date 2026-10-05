@@ -23,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css">
+  <link rel="stylesheet" href="/assets/site.css?v=20261005c">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -79,9 +79,27 @@
           </div>
         </div>
         <aside class="sleeve" aria-labelledby="sleeve-title">
-          <p class="sleeve-head" id="sleeve-title"><span>The Human-Shaped Principles</span><a href="/principles/">What each one means</a></p>
-          <ol class="sleeve-list" data-principles hidden></ol>
-          <p class="sleeve-fallback" data-principles-fallback>Fifteen principles say what human-shaped software does, so that any app can be measured against them. <a href="/principles/">Read them</a>.</p>
+          <p class="sleeve-head"><span>The Human-Shaped Principles</span><a href="/principles/">What each one means</a></p>
+          <p class="sleeve-stem" id="sleeve-title">Human-shaped software:</p>
+          <!-- Drawn here so the card never depends on the network; principles.js
+               replaces these with the template's current PRINCIPLES.md. -->
+          <ol class="sleeve-list" data-principles>
+            <li><a href="/principles/#1-a-human-shaped-problem"><span class="p-lead">Starts from a human-shaped problem</span></a></li>
+            <li><a href="/principles/#2-more-possible-not-more-profit"><span class="p-lead">Increases what people are able to do</span></a></li>
+            <li><a href="/principles/#3-values-as-guardrails"><span class="p-lead">Has its values written down as guardrails</span></a></li>
+            <li><a href="/principles/#4-iteration-never-a-first-draft"><span class="p-lead">Treats iteration as the path to innovation</span></a></li>
+            <li><a href="/principles/#5-grounded-in-research"><span class="p-lead">Is grounded in research</span></a></li>
+            <li><a href="/principles/#6-decisions-with-feedback"><span class="p-lead">Makes every decision with feedback</span></a></li>
+            <li><a href="/principles/#7-tested-the-way-people-use-it"><span class="p-lead">Is tested the way people will actually see, hear, and use it</span></a></li>
+            <li><a href="/principles/#8-documentation-as-seriously-as-code"><span class="p-lead">Treats documentation as seriously as code</span></a></li>
+            <li><a href="/principles/#9-shared-openly"><span class="p-lead">Shares its code, tools, and lessons</span></a></li>
+            <li><a href="/principles/#10-learning-as-success"><span class="p-lead">Counts learning as success</span></a></li>
+            <li><a href="/principles/#11-people-own-their-data"><span class="p-lead">Lets people own their data</span></a></li>
+            <li><a href="/principles/#12-no-new-problems"><span class="p-lead">Creates no new human-shaped problems</span></a></li>
+            <li><a href="/principles/#13-the-builders-own-voice"><span class="p-lead">Is written in the builder&#x27;s own voice</span></a></li>
+            <li><a href="/principles/#14-credit-everything"><span class="p-lead">Credits everyone and everything responsible for it</span></a></li>
+            <li><a href="/principles/#15-joy-for-at-least-one-person"><span class="p-lead">Brings joy to at least one person</span></a></li>
+          </ol>
           <p class="sleeve-more"><a href="/principles/">All fifteen principles</a></p>
         </aside>
       </div>
@@ -220,8 +238,8 @@
   <script src="/assets/cohort-lib.js" defer></script>
   <script src="/assets/apps-lib.js" defer></script>
   <script src="/assets/apps.js" defer></script>
-  <script src="/assets/principles-lib.js" defer></script>
-  <script src="/assets/principles.js" defer></script>
+  <script src="/assets/principles-lib.js?v=20261005c" defer></script>
+  <script src="/assets/principles.js?v=20261005c" defer></script>
 
   <footer class="site-footer">
     <div class="wrap">

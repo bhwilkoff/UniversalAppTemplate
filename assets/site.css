@@ -159,19 +159,17 @@ h3 { font-size: 1.25rem; letter-spacing: -0.012em; line-height: 1.25; }
 /* The sleeve: the principles themselves, read live from the template,
    each one a sentence about what human-shaped software does. */
 .sleeve { background: var(--card); border: 1px solid var(--rule); border-top: 4px solid var(--clay); border-radius: 18px; padding: 1.25rem 1.25rem 1.1rem; box-shadow: 0 24px 48px -36px rgba(26, 29, 33, 0.4); }
-.sleeve-head { margin: 0 0 0.75rem; display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; flex-wrap: wrap; font-size: 0.95rem; font-weight: 600; color: var(--muted); }
+.sleeve-head { margin: 0 0 1rem; display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; flex-wrap: wrap; font-size: 0.95rem; font-weight: 600; color: var(--muted); }
 .sleeve-head a { font-size: 0.9rem; }
 .sleeve-list { list-style: none; margin: 0; padding: 0; counter-reset: p; }
 .sleeve-list li { counter-increment: p; border-top: 1px solid var(--rule); }
 .sleeve-list a { display: grid; grid-template-columns: 1.75rem 1fr; gap: 0.4rem; padding: 0.5rem 0; color: var(--ink); text-decoration: none; font-size: 0.975rem; line-height: 1.35; font-weight: 600; }
 .sleeve-list a::before { content: counter(p); color: var(--clay); font-weight: 400; font-variant-numeric: tabular-nums; }
 .sleeve-list a:hover .p-lead { text-decoration: underline; text-decoration-color: var(--clay); text-underline-offset: 0.2em; }
-.sleeve-list .p-subject { color: var(--muted); font-weight: 450; }
 .sleeve-list .p-rest { display: none; }
 .sleeve-list li:nth-child(n+6) { display: none; }
-.sleeve-fallback { margin: 0; font-size: 1rem; }
 .sleeve-more { margin: 0.75rem 0 0; font-weight: 600; font-size: 0.975rem; }
-.sleeve-list[hidden] ~ .sleeve-more { display: none; }
+.sleeve-stem { margin: 0 0 0.5rem; font-size: 1.3rem; font-weight: 680; letter-spacing: -0.015em; }
 .hero-actions { display: flex; flex-wrap: wrap; gap: 1rem 1.5rem; align-items: center; }
 .hero-actions a.text { font-weight: 600; }
 .fine { color: var(--muted); font-size: 0.95rem; margin: 1rem 0 0; max-width: 30rem; }
@@ -635,6 +633,7 @@ label.check { display: flex; gap: 0.5rem; align-items: center; font-weight: 400;
 .sheet-mark svg { width: 0.78em; height: 0.39em; margin: 0 0.02em; color: #A23F22; }
 .sheet-title { margin: 3cqi 0 0; font-size: 5.6cqi; line-height: 1.05; letter-spacing: -0.02em; font-weight: 680; max-width: none; }
 .sheet-intro { margin: 2cqi 0 0; font-size: 2.2cqi; color: #585C62; }
+.sheet-stem { margin: 3cqi 0 0; font-size: 2.6cqi; font-weight: 680; color: #1A1D21; }
 .sheet-list { margin: 3cqi 0 0; padding: 0 0 0 3.4cqi; }
 .sheet-list li::marker { color: #A23F22; font-weight: 680; }
 .sheet-list b { font-weight: 640; }

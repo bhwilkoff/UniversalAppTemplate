@@ -25,8 +25,8 @@
     return items;
   }
 
-  // "**Human-shaped software starts from a human-shaped problem,** one that ..." becomes
-  // { lead: 'Human-shaped software starts from a human-shaped problem,', rest: 'one that ...' }.
+  // "**Starts from a human-shaped problem,** one that ..." becomes
+  // { lead: 'Starts from a human-shaped problem,', rest: 'one that ...' }.
   function splitBold(text) {
     var m = text.match(/^\*\*(.+?)\*\*\s*(.*)$/);
     return m ? { lead: m[1], rest: m[2] } : { lead: '', rest: text };
@@ -34,17 +34,23 @@
 
   function parsePrinciples(md) {
     var lines = section(md, 'The principles');
-    var intro = '';
-    // The paragraph before the list, which may wrap over several lines.
+    // The paragraphs before the list: the first is the intro, and a last
+    // one ending in a colon ("Human-shaped software:") is the stem every
+    // principle finishes.
+    var paras = [], cur = '';
     for (var i = 0; i < lines.length; i++) {
       if (/^\d+\. /.test(lines[i])) break;
-      if (lines[i].trim()) intro += (intro ? ' ' : '') + lines[i].trim();
-      else if (intro) break;
+      if (lines[i].trim()) cur += (cur ? ' ' : '') + lines[i].trim();
+      else if (cur) { paras.push(cur); cur = ''; }
     }
+    if (cur) paras.push(cur);
+    var stem = paras.length && /:$/.test(paras[paras.length - 1]) ? paras.pop() : '';
+    var intro = paras[0] || '';
     var version = (md.match(/\*Version ([\d.]+)/) || [])[1] || '';
     return {
       version: version,
       intro: intro,
+      stem: stem,
       items: numbered(lines, '').map(function (it) {
         var s = splitBold(it.text);
         return { n: it.n, lead: s.lead, rest: s.rest };

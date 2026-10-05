@@ -32,6 +32,8 @@
     var p = SheetLib.parsePrinciples(md);
     if (!p.items.length) return false;
     block.querySelector('[data-sheet-intro]').textContent = p.intro;
+    var stem = block.querySelector('[data-sheet-stem]');
+    if (stem) { stem.textContent = p.stem; stem.hidden = !p.stem; }
     if (p.version) block.querySelector('[data-sheet-version]').textContent = 'Version ' + p.version + '. ';
     var list = block.querySelector('[data-sheet-principles]');
     p.items.forEach(function (i) { list.appendChild(li(i.n, i.lead, i.rest)); });
