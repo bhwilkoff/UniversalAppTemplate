@@ -1173,7 +1173,7 @@ with its triggers, the community repository, and the credential
 signing key. 680 database checks, 326 node tests.
 
 R4, the question bank, is merged (see its log entry). Half of its
-database change is applied; **the first step on this Mac is to apply
+database change is applied; **done on this Mac October 5: applied (all 680 policy tests passed first; its drops are a check, two rules, and a function, each recreated in the same file) and mcp redeployed; was: apply
 supabase/migrations/20261004080100_question_kinds.sql** (run the policy
 tests first, then apply it through the Supabase tools and confirm the
 drops in the terminal), then run `sh tools/deploy-mcp.sh` so students'
