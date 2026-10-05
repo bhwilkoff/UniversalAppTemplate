@@ -471,3 +471,34 @@ links there.
 - "More than asking an AI for an app" and the Archive Watch case study
   are read on GitHub; their old site addresses redirect there.
 
+## Icons by people, the apps' own screens, and nothing said twice (October 5, 2026, night)
+
+**Icons come from people, not from Claude's shapes.** Ben: "I'd much
+rather lean on tools like The Noun Project or other human-developed
+creative commons or public domain icons rather than ones that you are
+drawing out of shapes on your own." **How to apply:** icons come from
+Phosphor (phosphoricons.com, by Helena Zhang and Tobias Fried, MIT
+License), kept in `assets/icons.svg` with the credit in the file and in
+every page's footer. Add an icon by copying its SVG from the Phosphor
+package into the sprite; never draw one. The Noun Project is the next
+place to look for anything Phosphor does not have, with its credit.
+
+**Show the working software.** Ben: "the screenshots for each of the
+apps ... were the actual screenshots from the app store that I had to
+submit. These can be used and reused to show the working software."
+**How to apply:** the founding apps' store screenshots are copied small
+into `assets/apps/` (sources in its README) and drawn by `shotsOf` in
+apps-lib.js on every card, every app's page, and the home page's "Built
+this way" band.
+
+**The home page's sections each look like their own place,** with their
+own background or band, a short head, and cards rather than paragraphs.
+
+**Say each thing once, and never describe the machinery.** Lines that
+explained how a page loads ("read from the template each time it opens",
+"read live from GitHub", "From its listing in the directory") and the
+visible "draft, written with an AI agent" notes are gone. The start page
+links to the meetup and hackathon kits rather than retelling them, the
+founding apps' status is said once rather than on every card, and the
+cohorts page says joining uses GitHub once.
+

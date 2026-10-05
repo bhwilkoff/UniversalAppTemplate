@@ -23,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261005d">
+  <link rel="stylesheet" href="/assets/site.css?v=20261005f">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -74,6 +74,27 @@
 
       <section class="section first" aria-label="The toolkit">
         <div class="topics">
+          <div class="topic topic-wide" id="gather">
+            <h2>Gather people.</h2>
+            <ul class="ways-in">
+              <li id="meetup">
+                <svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons.svg#chats-circle"/></svg>
+                <h3><a href="/start/meetup/">Start a meetup</a></h3>
+                <p>An evening at a library, a classroom, or a kitchen table, for people with apps they wish existed. Nobody has to have written code.</p>
+              </li>
+              <li id="hackathon">
+                <svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons.svg#hammer"/></svg>
+                <h3><a href="/start/hackathon/">Run a hackathon</a></h3>
+                <p>A day of building in which what people learn counts as success, and every person builds one real app of their own.</p>
+              </li>
+              <li id="brand">
+                <svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons.svg#palette"/></svg>
+                <h3><a href="/start/brand/">Use the brand kit</a></h3>
+                <p>The wordmark, the icon, the names for meetups and hackathons, the colors, and the typeface, free to download.</p>
+              </li>
+            </ul>
+          </div>
+
           <div class="topic" id="declare">
             <h2>Show that your software is human-shaped.</h2>
             <div class="prose">
@@ -109,48 +130,6 @@
             </div>
           </div>
 
-          <div class="topic" id="meetup">
-            <h2>Start a meetup.</h2>
-            <div class="prose">
-              <p>A meetup can be an evening at a library, a classroom, or a kitchen table, and it needs nothing more than a room, a screen, and a few people with apps they wish existed. Nobody has to have written code.</p>
-            </div>
-            <ol class="steps">
-              <li>Read <a href="/principles/#why">Computer-shaped problems</a> together, and talk about where software brain shows up in the apps you use every day.</li>
-              <li>Ask each person to pick one feature they want in an app they use, and name its shape: what the computer can carry, and what the person has to keep.</li>
-              <li>Read one real prompt from <a href="/path/talking-to-your-agent/">Talking to your agent</a>, and talk about what the builder wanted, what the agent got wrong, and how the prompt fixed it.</li>
-              <li>End with each person bringing back one question, and post the best of them in the discussions so the next room can start from them.</li>
-            </ol>
-            <div class="prose">
-              <p>The whole evening is written out in the meetup guide, in a 90-minute and a 60-minute version, with the words for the opening and the close, what to bring, an announcement to copy, and a run sheet to print.</p>
-            </div>
-            <p class="actions"><a class="btn-quiet" href="/start/meetup/">Read the meetup guide</a></p>
-          </div>
-
-          <div class="topic" id="hackathon">
-            <h2>Run a Human-Shaped Hackathon.</h2>
-            <div class="prose">
-              <p>A Human-Shaped Hackathon is a day of building in which what people learn is what counts as success, and every person builds one real app of their own for people they can name. Ask everyone to arrive with a GitHub account, an AI agent they can use, and a computer, and to bring the problem rather than the solution.</p>
-            </div>
-            <ol class="steps">
-              <li>Put <a href="/start/sheets/#questions">the four questions</a> on the wall where everyone can see them: does it deepen understanding, does it invite participation, does it support human agency, and is it clear rather than clever?</li>
-              <li>Start everyone at <a href="/path/00/">stage 00</a>, writing why their app exists and who it is for before the agent writes any code, and naming one line the app will never cross.</li>
-              <li>Build toward <a href="/path/01/">stage 01</a>: one platform, with real data, open on the builder's own phone.</li>
-              <li>Close with a show-and-tell where each person shows what they built and one decision their values changed, because a value that never changed a decision is decoration.</li>
-            </ol>
-            <div class="prose">
-              <p>The hackathon kit has a one-day and a half-day schedule, the words to open the day, why there are no prizes for speed or polish, the organizer's checklist, an announcement to copy, and the sheets to print, including a show-and-tell card for every builder.</p>
-            </div>
-            <p class="actions"><a class="btn-quiet" href="/start/hackathon/">Open the hackathon kit</a></p>
-          </div>
-
-          <div class="topic" id="brand">
-            <h2>Make it look like it came from here.</h2>
-            <div class="prose">
-              <p>The brand kit has the wordmark, the icon, the names for meetups and hackathons, the colors, and the typeface, all free to download and drawn so that they look right anywhere, along with the few rules that keep them recognizable.</p>
-            </div>
-            <p class="actions"><a class="btn-quiet" href="/start/brand/">Open the brand kit</a></p>
-          </div>
-
           <div class="topic" id="events">
             <h2>Find a room, or put yours on the calendar.</h2>
             <div class="prose">
@@ -180,7 +159,7 @@
     <div class="wrap">
       <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
       <p>Made by <a href="https://learningischange.com">Ben Wilkoff</a>. The ideas, the method, the tools, and the cohorts are free, and what you build is yours.</p>
-      <p class="credit">Built by Ben with an AI agent, Claude, set in Commissioner, and shared under <a href="https://github.com/bhwilkoff/UniversalAppTemplate/blob/site/LICENSE.md">open licenses</a>, so you can borrow anything here.</p>
+      <p class="credit">Built by Ben with an AI agent, Claude, set in Commissioner, with icons from <a href="https://phosphoricons.com">Phosphor</a>, and shared under <a href="https://github.com/bhwilkoff/UniversalAppTemplate/blob/site/LICENSE.md">open licenses</a>, so you can borrow anything here.</p>
       <ul>
         <li><a href="/principles/">The principles we build by</a></li>
         <li><a href="/privacy/">What we keep, and what we never own</a></li>

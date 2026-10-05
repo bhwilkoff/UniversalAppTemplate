@@ -23,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261005d">
+  <link rel="stylesheet" href="/assets/site.css?v=20261005f">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -63,22 +63,20 @@
 
   <main id="main">
 
-    <!-- The home page, rewritten after Ben's review of October 5, 2026
-         (DECISIONS.md): the idea, the principles, and the why first,
-         and the ways in after. Words by Claude, awaiting Ben's review. -->
+    <!-- The home page (DECISIONS.md): the claim and the principles, the
+         working software, the idea, the method, and the ways in, each
+         one said here once and in full on its own page. -->
     <section class="hero" aria-labelledby="hero-title">
       <div class="wrap hero-grid">
         <div>
-          <p class="kicker">Human-shaped software</p>
           <h1 id="hero-title">Apps that wear the builder's values on their sleeves.</h1>
-          <p class="lead">Every app is built on values, whether or not anyone wrote them down. In human-shaped software, the builder writes their own values down where the people who use the app, and the AI agents that help build it, can read them, and then makes something that lives by them. AI is a tool in the builder's hands, and never a replacement for the people involved.</p>
+          <p class="lead">The builder writes down what they value, where people and AI agents can both read it, and then makes something that lives by it. AI is a tool in the builder's hands, and never a replacement for the people involved.</p>
           <div class="hero-actions">
             <a class="btn-github" href="/principles/#the-principles">Read the principles</a>
             <a class="text" href="/principles/#why">Why build this way</a>
           </div>
         </div>
         <aside class="sleeve" aria-labelledby="sleeve-title">
-          <p class="sleeve-head"><span>The Human-Shaped Principles</span><a href="/principles/">What each one means</a></p>
           <p class="sleeve-stem" id="sleeve-title">Human-shaped software:</p>
           <!-- Drawn here so the card never depends on the network; principles.js
                replaces these with the template's current PRINCIPLES.md. -->
@@ -104,41 +102,67 @@
       </div>
     </section>
 
-    <section class="section idea" aria-labelledby="idea-title">
+    <section class="showcase" aria-labelledby="built-title">
       <div class="wrap">
-        <div>
-          <p class="kicker">The idea</p>
-          <h2 id="idea-title">Some problems were never computer-shaped.</h2>
+        <div class="showcase-head">
+          <p class="kicker">Built this way</p>
+          <h2 id="built-title">Working software, in the stores today.</h2>
         </div>
-        <div class="prose">
-          <p>Nilay Patel calls it <a href="https://www.theverge.com/podcast/917029/software-brain-ai-backlash-databases-automation">software brain</a>: seeing the whole world as a set of databases, each one waiting for the right code to take control of it. AI has turned that habit up as far as it will go, because an agent can write the code and the words for almost anything you can describe. But, learning, community, friendship, and the people we love only happen when a person does the work, and a first draft that no person has wrestled with is not the start of that work.</p>
+        <ul class="shots">
+          <li class="shot-tv">
+            <a href="/apps/app/?r=bhwilkoff/Archive-Watch">
+              <img src="/assets/apps/archive-watch-1.webp" width="1280" height="720" loading="lazy" alt="Archive Watch on a television, showing a silent film from the public domain.">
+              <span class="shot-name">Archive Watch</span>
+            </a>
+          </li>
+          <li class="shot-phone">
+            <a href="/apps/app/?r=bhwilkoff/Tidbits-Trivia">
+              <img src="/assets/apps/tidbits-trivia-1.webp" width="600" height="1304" loading="lazy" alt="Tidbits Trivia's home screen on an iPhone.">
+              <span class="shot-name">Tidbits Trivia</span>
+            </a>
+          </li>
+          <li class="shot-phone">
+            <a href="/apps/app/?r=bhwilkoff/Bsky-Dreams">
+              <img src="/assets/apps/bsky-dreams-1.webp" width="600" height="1304" loading="lazy" alt="Bsky Dreams' reader on an iPhone.">
+              <span class="shot-name">Bsky Dreams</span>
+            </a>
+          </li>
+          <li class="shot-phone">
+            <a href="/apps/app/?r=bhwilkoff/BOBA-Playbook">
+              <img src="/assets/apps/boba-playbook-1.webp" width="600" height="1301" loading="lazy" alt="BOBA Playbook's card search on an iPhone.">
+              <span class="shot-name">BOBA Playbook</span>
+            </a>
+          </li>
+        </ul>
+        <p class="section-more"><a href="/apps/">Every app built this way, and how to add yours</a></p>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="idea-title">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <p class="kicker">The idea</p>
+            <h2 id="idea-title">Some problems were never computer-shaped.</h2>
+          </div>
+          <p class="prose">Nilay Patel calls it <a href="https://www.theverge.com/podcast/917029/software-brain-ai-backlash-databases-automation">software brain</a>: seeing the whole world as databases waiting for the right code. AI has turned that habit up as far as it will go, but learning, community, friendship, and the people we love only happen when a person does the work.</p>
         </div>
         <div class="compare">
           <div>
-            <svg viewBox="0 0 240 96" aria-hidden="true" focusable="false">
-              <rect x="1" y="18" width="62" height="44" rx="4" class="f-line"/>
-              <path d="M26 32v16l13-8z" class="f-fill-muted"/>
-              <g class="f-bar"><rect x="84" y="10" width="150" height="6" rx="3"/><rect x="84" y="26" width="150" height="6" rx="3"/><rect x="84" y="42" width="150" height="6" rx="3"/><rect x="84" y="58" width="150" height="6" rx="3"/><rect x="84" y="74" width="150" height="6" rx="3"/></g>
-            </svg>
+            <svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons.svg#database"/></svg>
             <p class="tag">Software brain</p>
-            <p class="big">Ten thousand film summaries written by AI in an afternoon is efficient, and every one of them was written by something that never watched the film.</p>
+            <p class="big">AI can write ten thousand film summaries in an afternoon, and not one of them comes from someone who watched the film.</p>
           </div>
           <div class="human">
-            <svg viewBox="0 0 240 96" aria-hidden="true" focusable="false">
-              <rect x="1" y="18" width="62" height="44" rx="4" class="f-line"/>
-              <path d="M26 32v16l13-8z" class="f-fill-muted"/>
-              <g transform="translate(84 6)"><circle cx="6" cy="5" r="4.5" class="f-clay"/><path d="M0 22v-3c0-4 2.6-6.2 6-6.2s6 2.2 6 6.2v3" class="f-clay-line"/></g><rect x="108" y="12" width="118" height="6" rx="3" class="f-clay-bar"/>
-              <g transform="translate(84 36)"><circle cx="6" cy="5" r="4.5" class="f-clay"/><path d="M0 22v-3c0-4 2.6-6.2 6-6.2s6 2.2 6 6.2v3" class="f-clay-line"/></g><rect x="108" y="42" width="64" height="6" rx="3" class="f-clay-bar"/>
-              <g transform="translate(84 66)"><circle cx="6" cy="5" r="4.5" class="f-clay"/><path d="M0 22v-3c0-4 2.6-6.2 6-6.2s6 2.2 6 6.2v3" class="f-clay-line"/></g><rect x="108" y="72" width="96" height="6" rx="3" class="f-clay-bar"/>
-            </svg>
+            <svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons.svg#hand-heart"/></svg>
             <p class="tag">Human-shaped</p>
-            <p class="big">Notes written by the people who watched and reviewed each film are slower, and sometimes need correcting, and yet they keep the people who actually loved those films in the story.</p>
-          </div>
-          <div class="compare-why">
-            <p>A web full of words no one wrote is worse for everyone who reads it, and an answer that sends no one on to the people who did the work leaves those people out. <strong>Humanity is inefficient, and that is the point.</strong> Learning is inefficient too, and we have great tools for making it work better, as long as our values decide where those tools belong.</p>
-            <p class="credit"><a href="/principles/#why">The longer story of computer-shaped problems</a></p>
+            <p class="big">Notes from the people who watched each film are slower and sometimes need correcting, and they keep the people who loved those films in the story.</p>
           </div>
         </div>
+        <blockquote class="pull">
+          <p>Humanity is inefficient, and that is the point.</p>
+          <footer>Learning is inefficient too. We have great tools for making it better, and our values decide where those tools belong. <a href="/principles/#why">Why build this way</a></footer>
+        </blockquote>
       </div>
     </section>
 
@@ -149,26 +173,29 @@
             <p class="kicker">The method</p>
             <h2 id="moves-title">Write, play, publish.</h2>
           </div>
-          <p class="prose">Building this way is iteration, and the principles decide what each round is for. Every round makes the same three moves, whether it takes an afternoon or a month.</p>
+          <p class="prose">Every round of building makes the same three moves, and the principles decide what each round is for.</p>
         </div>
         <ol class="moves">
           <li>
-            <span class="n" aria-hidden="true">1</span>
+            <svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons.svg#pencil-simple-line"/></svg>
             <h3>Write</h3>
-            <p>Writing gets it out of your head. The values, the features you want, and the feedback you hear go where you and your agent can both read them, because a value no one wrote down is one the agent has no way to keep.</p>
+            <p class="first">Writing gets it out of your head.</p>
+            <p>Values, features, and feedback go where you and your agent can both read them.</p>
           </li>
           <li>
-            <span class="n" aria-hidden="true">2</span>
+            <svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons.svg#hand-tap"/></svg>
             <h3>Play</h3>
-            <p>Playing makes your thinking tangible. You use what came back on a real device, test it, probe it, and think about what to try next, because the agent is never the one who decides that something works.</p>
+            <p class="first">Playing makes your thinking tangible.</p>
+            <p>You use what came back on a real device, and you decide whether it works.</p>
           </li>
           <li>
-            <span class="n" aria-hidden="true">3</span>
+            <svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons.svg#paper-plane-tilt"/></svg>
             <h3>Publish</h3>
-            <p>Publishing releases the work so that other people can play with it too. A human-shaped problem is rarely yours alone, and the people who use what you publish tell you what to write next.</p>
+            <p class="first">Publishing lets other people play too.</p>
+            <p>A human-shaped problem is rarely yours alone, and the people who use your work tell you what to write next.</p>
           </li>
         </ol>
-        <p class="section-more"><a href="/path/">Follow the method through every stage of the path</a></p>
+        <p class="section-more"><a href="/path/">The method, stage by stage</a></p>
       </div>
     </section>
 
@@ -179,45 +206,24 @@
             <p class="kicker">Ways in</p>
             <h2 id="ways-title">Build with others, on your own, or start something.</h2>
           </div>
-          <p class="prose">The ideas, the method, and the tools are free, and so is every cohort.</p>
         </div>
         <ul class="ways-in">
           <li>
-            <svg viewBox="0 0 48 48" aria-hidden="true" focusable="false"><circle class="i-line" cx="15" cy="21" r="4"/><circle class="i-line" cx="33" cy="21" r="4"/><circle class="i-clay" cx="24" cy="9" r="4"/><path class="i-line" d="M5 40c1-8 5-12 10-12s9 4 10 12M23 40c1-8 5-12 10-12s9 4 10 12"/></svg>
+            <svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons.svg#users-three"/></svg>
             <h3><a href="/cohorts/">Join a cohort</a></h3>
-            <p>Five weeks of building an app of your own with an AI agent, alongside other people doing the same, with one live session each week.</p>
+            <p>Five weeks of building your own app beside other people, with one live session each week.</p>
           </li>
           <li>
-            <svg viewBox="0 0 48 48" aria-hidden="true" focusable="false"><circle class="i-clay" cx="24" cy="14" r="6"/><path class="i-line" d="M12 42c1.4-9 6-13.5 12-13.5S34.6 33 36 42"/><rect class="i-line" x="17" y="34" width="14" height="9" rx="1.5"/></svg>
+            <svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons.svg#laptop"/></svg>
             <h3><a href="/path/setup/">Build on your own</a></h3>
-            <p>The Universal App Template holds the whole method, and you can copy it on GitHub today and follow the path at your own pace.</p>
+            <p>Copy the Universal App Template on GitHub, and follow the path at your own pace.</p>
           </li>
           <li>
-            <svg viewBox="0 0 48 48" aria-hidden="true" focusable="false"><circle class="i-clay" cx="18" cy="16" r="6"/><path class="i-line" d="M6 42c1.4-9 6-13.5 12-13.5S28.6 33 30 42"/><path class="i-line" d="M30 8h12v9h-6l-3 3v-3h-3z"/></svg>
+            <svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons.svg#megaphone-simple"/></svg>
             <h3><a href="/start/">Start something</a></h3>
-            <p>A meetup, a day of building, or a mark for your own software, with the principles in front of everyone.</p>
+            <p>Host a meetup or a day of building, or show the mark on your own software.</p>
           </li>
         </ul>
-      </div>
-    </section>
-
-    <section class="section tint" id="apps" aria-labelledby="apps-title">
-      <div class="wrap">
-        <div class="section-head">
-          <div>
-            <p class="kicker">Built this way</p>
-            <h2 id="apps-title">Human-shaped software, in progress.</h2>
-          </div>
-          <p class="prose">Apps built this way show their work in the open, from the first commit to the stores.</p>
-        </div>
-        <ul class="apps app-grid" data-apps-grid="4" hidden></ul>
-        <section class="feed-block" aria-labelledby="now-title" data-feed="5" data-feed-quiet hidden>
-          <h3 id="now-title">Being built right now</h3>
-          <p class="small">The latest work on apps in the directory, read live from GitHub.</p>
-          <ol class="feed" data-feed-list></ol>
-          <p class="small" data-feed-note></p>
-        </section>
-        <p class="section-more"><a href="/apps/">See every app, and how to add yours</a></p>
       </div>
     </section>
 
@@ -232,10 +238,6 @@
     </section>
 
   </main>
-  <script src="/assets/hub-config.js" defer></script>
-  <script src="/assets/cohort-lib.js" defer></script>
-  <script src="/assets/apps-lib.js" defer></script>
-  <script src="/assets/apps.js?v=20261005d" defer></script>
   <script src="/assets/principles-lib.js?v=20261005c" defer></script>
   <script src="/assets/principles.js?v=20261005c" defer></script>
 
@@ -243,7 +245,7 @@
     <div class="wrap">
       <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
       <p>Made by <a href="https://learningischange.com">Ben Wilkoff</a>. The ideas, the method, the tools, and the cohorts are free, and what you build is yours.</p>
-      <p class="credit">Built by Ben with an AI agent, Claude, set in Commissioner, and shared under <a href="https://github.com/bhwilkoff/UniversalAppTemplate/blob/site/LICENSE.md">open licenses</a>, so you can borrow anything here.</p>
+      <p class="credit">Built by Ben with an AI agent, Claude, set in Commissioner, with icons from <a href="https://phosphoricons.com">Phosphor</a>, and shared under <a href="https://github.com/bhwilkoff/UniversalAppTemplate/blob/site/LICENSE.md">open licenses</a>, so you can borrow anything here.</p>
       <ul>
         <li><a href="/principles/">The principles we build by</a></li>
         <li><a href="/privacy/">What we keep, and what we never own</a></li>

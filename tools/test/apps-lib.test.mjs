@@ -218,3 +218,12 @@ test('every app card has a picture, from its listing or its repository, over a d
   const tones = [0, 1, 2, 3].map((i) => lib.coverOf({ name: 'Same' }, i).tone);
   assert.equal(new Set(tones).size, 4, 'neighbors in a list never share a tone');
 });
+
+test('the founding apps show their store screens, and other apps none', () => {
+  const aw = lib.shotsOf({ repo: 'bhwilkoff/Archive-Watch' });
+  assert.equal(aw.wide, true);
+  assert.deepEqual(aw.files, ['/assets/apps/archive-watch-1.webp', '/assets/apps/archive-watch-2.webp']);
+  assert.equal(lib.shotsOf({ slug: 'tidbits-trivia' }).wide, false);
+  assert.equal(lib.shotsOf({ repo: 'someone/their-app' }), null);
+  assert.equal(lib.shotsOf(null), null);
+});

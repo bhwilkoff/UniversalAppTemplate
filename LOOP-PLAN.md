@@ -1206,6 +1206,15 @@ student).
   the path's week list moved to /cohorts/ only, and the home page's
   idea section lost the paragraph the hero already says.
 
+- 2026-10-05, night: home page rebuilt into distinct sections (the claim
+  and principles card without its extra titles, a dark "Built this way"
+  band of the four apps' store screens, the idea with a pull quote, the
+  method and ways in as cards). Icons are Phosphor's, credited; no
+  drawn icons remain. Store screenshots from the four app repositories
+  (assets/apps/) are every app's cover. Redundancy sweep: page-mechanics
+  lines and draft notes removed, start page links to the kits instead of
+  retelling them, repeated status and GitHub lines cut.
+
 ## Handoff (October 4, 2026, evening)
 
 Merged and live: G1 to G7, H1 to H6, C0 to C9, R1 to R3, R4's pages, R5 to R8,

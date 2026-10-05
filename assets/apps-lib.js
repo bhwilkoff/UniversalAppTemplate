@@ -276,6 +276,25 @@
     return repo ? 'https://opengraph.githubassets.com/humanshaped/' + repo : null;
   }
 
+  // Screens from the stores: the screenshots each founding app submitted
+  // to its store listings, copied small into assets/apps/ (sources in
+  // assets/apps/README.md). A wide set is a TV app; the rest are phones.
+  var SHOTS = {
+    'archive-watch': { wide: true, n: 2 },
+    'tidbits-trivia': { n: 2 },
+    'boba-playbook': { n: 2 },
+    'bsky-dreams': { n: 2 }
+  };
+  function shotsOf(app) {
+    var repo = app && (app.repo || repoPath(app.repository));
+    var key = String((app && app.slug) || (repo ? repo.split('/')[1] : '') || '').toLowerCase();
+    var s = SHOTS[key];
+    if (!s) return null;
+    var files = [];
+    for (var i = 1; i <= s.n; i++) files.push('/assets/apps/' + key + '-' + i + '.webp');
+    return { wide: !!s.wide, files: files };
+  }
+
   // The drawn cover: the app's initials on one of the site's tones, picked
   // by the card's place in the list (index) so that neighbors always
   // differ, or by the app's name when it stands alone.
@@ -300,7 +319,7 @@
   function appHref(repo) { return '/apps/app/?r=' + repo; }
 
   var lib = {
-    imageOf: imageOf, coverOf: coverOf,
+    imageOf: imageOf, coverOf: coverOf, shotsOf: shotsOf,
     joinWithAnd: joinWithAnd, repoPath: repoPath, safeUrl: safeUrl, platformNames: platformNames,
     mergeApps: mergeApps, findApp: findApp, feedRepos: feedRepos, commitFrom: commitFrom, isWork: isWork,
     feed: feed, trouble: trouble, troubleText: troubleText, parseDeclaration: parseDeclaration,

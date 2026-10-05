@@ -99,6 +99,10 @@ as Ben's without his review, $0 to run.
   method on /path/, the weeks on /cohorts/.
 - Every "Sign in with GitHub" goes to `/account/`, which only signs a
   person in. Joining a cohort starts on `/cohorts/`.
+- Icons are Phosphor's (MIT, credited in `assets/icons.svg` and the
+  footer), used as `<svg class="icon"><use href="/assets/icons.svg#name"/></svg>`.
+  Never draw an icon from shapes. The founding apps' store screenshots
+  live small in `assets/apps/` (sources in its README).
 - Mobile-first, `min-width` media queries, test at 375px before 1440px.
 - Accessible contrast: text on the orange `--color-primary` is dark.
 
@@ -151,7 +155,7 @@ what waits on Ben.
 - **Scripts:** `assets/hub-config.js` (public URL and publishable key),
   `hub.js`, `cohorts.js`, `teach.js` with `teach-lib.js`, `cohort.js` and `live.js`
   with `cohort-lib.js` and `live-lib.js`, and `apps.js` with `apps-lib.js`. Pure logic lives in the `-lib.js` files with
-  tests in `tools/test/` (`node --test tools/test/*.mjs`, 332 tests).
+  tests in `tools/test/` (`node --test tools/test/*.mjs`, 333 tests).
 - **The cohort's conversation:** `discussions.js` with `discussions-lib.js`
   reads and posts the cohort repository's GitHub Discussions on /cohort/
   and /live/ with the student's own GitHub token. That token is kept in

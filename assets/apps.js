@@ -143,7 +143,8 @@
     if (href) { var a = link(href, ''); a.className = 'app-cover-link'; a.setAttribute('aria-hidden', 'true'); a.tabIndex = -1; a.appendChild(cover); card.appendChild(a); }
     else card.appendChild(cover);
     var h = el('h3'); h.appendChild(href ? link(href, app.name) : document.createTextNode(app.name)); card.appendChild(h);
-    card.appendChild(el('p', 'status', lib.statusText(app, app.declaration && typeof app.declaration === 'object' ? app.declaration : null)));
+    // The founding apps' status is said once, on /apps/ and their own pages.
+    if (app.status !== 'founding') card.appendChild(el('p', 'status', lib.statusText(app, app.declaration && typeof app.declaration === 'object' ? app.declaration : null)));
     if (app.in_its_own_words) card.appendChild(el('p', 'own', '“' + app.in_its_own_words + '”'));
     var names = lib.platformNames(app.platforms);
     var facts = [];
@@ -168,6 +169,16 @@
     cover.replaceChildren();
     cover.style.setProperty('--tone', c.tone);
     cover.appendChild(el('span', 'app-initials', c.initials));
+    var shots = lib.shotsOf(app);
+    if (shots) {
+      cover.classList.add('has-image', 'has-shots', shots.wide ? 'shots-wide' : 'shots-phone');
+      (shots.wide ? shots.files.slice(0, 1) : shots.files).forEach(function (f) {
+        var s = el('img');
+        s.alt = ''; s.loading = 'lazy'; s.decoding = 'async'; s.src = f;
+        cover.appendChild(s);
+      });
+      return cover;
+    }
     var src = lib.imageOf(app);
     if (src) {
       var img = el('img');
@@ -240,8 +251,6 @@
       var own = $('[data-own]');
       own.hidden = !words;
       if (words) own.textContent = '“' + words.text + '”';
-      $('[data-own-from]').hidden = !words;
-      if (words) $('[data-own-from]').textContent = words.from === 'declaration' ? 'From its declaration.' : words.from === 'repository' ? 'From its repository on GitHub.' : 'From its listing in the directory.';
       drawWhere(app, d);
       drawDeclaration(repo, d);
       drawTalk(repo, meta, res[1].trouble);
