@@ -66,7 +66,8 @@
   // own words in them, laid on an empty board when a design scene opens
   // it. Each comes from the template repository: the fourth part of a
   // session (COURSE.md, "Read one real prompt together, trying it
-  // first"), the three moves (docs/path/00-why-we-build.md), and the
+  // first"), the three moves, write, play, publish (docs/path/
+  // 00-why-we-build.md, renamed October 5, 2026), and the
   // three questions partners answer (COURSE.md, "Showing your work").
   // Words by Claude, awaiting Ben's review.
   // ------------------------------------------------------------------
@@ -80,11 +81,11 @@
         { title: 'My partner’s prompt', hint: 'Compared after.' },
         { title: 'The real prompt', hint: 'What the builder wanted, what the agent got wrong, and how the prompt fixed it.' }
       ] },
-    { key: 'moves', name: 'The three moves', line: 'Write it down, prove it, and live with it, side by side.',
+    { key: 'moves', name: 'Write, play, publish', line: 'The three moves of every round, side by side.',
       frames: [
-        { title: 'Write it down', hint: 'What do you believe the app is for?' },
-        { title: 'Prove it', hint: 'How will you find out whether it is true?' },
-        { title: 'Live with it', hint: 'What did using it teach you?' }
+        { title: 'Write', hint: 'What do you value, and what do you want it to do?' },
+        { title: 'Play', hint: 'What happened when you used it on a real device?' },
+        { title: 'Publish', hint: 'Who will play with it next, and what did they tell you?' }
       ] },
     { key: 'questions', name: 'The three questions', line: 'Where is it going, how is it going, and what is next.',
       frames: [

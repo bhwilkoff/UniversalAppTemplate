@@ -151,7 +151,7 @@ test('a design stage template is the course’s words, laid once, with ids that 
   assert.equal(new Set(els.map((e) => e.id)).size, 9);
   assert.deepEqual(lib.templateElements('moves', 99).map((e) => e.id), els.map((e) => e.id), 'the same ids every time');
   assert.ok(els.every((e) => e.locked && e.version === 1 && e.updated === 7));
-  assert.deepEqual(els.filter((e) => e.type === 'text' && e.fontSize === 28).map((e) => e.text), ['Write it down', 'Prove it', 'Live with it']);
+  assert.deepEqual(els.filter((e) => e.type === 'text' && e.fontSize === 28).map((e) => e.text), ['Write', 'Play', 'Publish']);
   const idx = els.map((e) => e.index);
   assert.deepEqual(idx, idx.slice().sort(), 'in z-order');
   assert.deepEqual(lib.templateElements('blank'), []);
