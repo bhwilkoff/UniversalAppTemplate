@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261005k">
+  <link rel="stylesheet" href="/assets/site.css?v=20261005l">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -173,6 +173,10 @@
         <p class="small" data-sync></p>
       </footer>
 
+      <!-- The class chat (R15): every message is a comment on the session's
+           "Week N, in class" discussion on GitHub, posted as its writer. -->
+      <section class="chat" aria-label="The class chat" data-chat hidden></section>
+
       <!-- Reactions and stance (R10, research/notes/active-learning-notes.md):
            always at the foot of the panel, one key away, never stored. -->
       <section class="react-bar" aria-label="React" data-react></section>
@@ -201,6 +205,8 @@
   <script src="/assets/show-run.js" defer></script>
   <script src="/assets/react-lib.js" defer></script>
   <script src="/assets/roster-lib.js" defer></script>
+  <script src="/assets/chat-lib.js" defer></script>
+  <script src="/assets/chat-view.js" defer></script>
   <script src="/assets/code-lib.js" defer></script>
   <script src="/assets/code-runner.js" defer></script>
   <script src="/assets/class-channel.js" defer></script>

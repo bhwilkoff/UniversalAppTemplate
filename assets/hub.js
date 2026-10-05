@@ -43,6 +43,11 @@
   // signed in, this page hands the session to the panel that opened it
   // (window.opener, this origin only) and closes (assets/addon.js).
   var handoffMode = params.get('handoff') === 'meet';
+  // The add-on's in-class chat (R15) opens /account/?handoff=github: this
+  // window signs in with GitHub (at once, when the app is already
+  // authorized), and hands only the GitHub token to the panel that opened
+  // it, which keeps it in its own tab for the class (ChatLib).
+  var githubMode = params.get('handoff') === 'github';
   var handoffNote = root.querySelector('[data-handoff-note]');
   if (handoffNote) handoffNote.hidden = !handoffMode;
 
@@ -326,10 +331,31 @@
     setTimeout(function () { window.close(); }, 1500);
   }
 
+  function githubHandOff(session) {
+    var text = root.querySelector('[data-handoff-text]');
+    var D = window.DiscussionsLib, CL = window.ChatLib;
+    var opener = null;
+    try { opener = window.opener && !window.opener.closed ? window.opener : null; } catch (e) { opener = null; }
+    var token = D && session ? D.tokenFrom(session, stores, Date.now(), db.auth.storageKey) : null;
+    if (!token) {
+      if (params.get('fresh') === '1') { text.textContent = 'GitHub did not hand over a token. Close this window and choose Connect GitHub in the panel again.'; return show('handoff'); }
+      text.textContent = 'Taking you to GitHub…';
+      show('handoff');
+      return db.auth.signInWithOAuth({ provider: 'github', options: { redirectTo: location.origin + '/account/?handoff=github&fresh=1' } });
+    }
+    var msg = CL ? CL.tokenMessage(token) : null;
+    if (!opener || !msg) { text.textContent = 'This window lost track of Meet. Close it, and choose Connect GitHub in the panel again.'; return show('handoff'); }
+    opener.postMessage(msg, location.origin);
+    text.textContent = 'The class chat in Meet can post as you now, and this window can close.';
+    show('handoff');
+    setTimeout(function () { window.close(); }, 1500);
+  }
+
   function load() {
     show('loading');
     db.auth.getSession().then(function (s) {
       var session = s.data && s.data.session;
+      if (githubMode) return githubHandOff(session);
       if (!session) {
         if (arrivalError) fail(arrivalError); else { show('signed-out'); showGoogleSignIn(); }
         return;

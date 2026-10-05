@@ -486,7 +486,21 @@ panel at 360px and the stage at 1280px) and pushed before the next.
   questions, and the class channel nudges every panel the moment a
   message lands, so it feels live and stays in GitHub afterward. Each
   person connects GitHub once per call in the panel (the panel's
-  sign-in deliberately carries no GitHub token). (pending)
+  sign-in deliberately carries no GitHub token). **Built October 5:**
+  migration 20261005040000_class_chat.sql (sessions.chat_number,
+  applied; 706 policy checks); assets/chat-lib.js (4 tests) and
+  assets/chat-view.js in the panel: a teacher opens "Week N, in class"
+  as a discussion in the cohort's repository from the panel; everyone
+  connects GitHub once (/account/?handoff=github hands only the GitHub
+  token back to the panel that opened it, on this origin, kept 7.5 hours
+  in the tab); messages, threaded replies, and GitHub's eight reactions,
+  each posted as its writer; "This is what my AI agent said" marks a
+  message as AI in its own text, so it reads that way on GitHub too; a
+  teacher's quick poll asks a run-of-show question with its count shown
+  and says so in the chat. The class channel's new nudge makes every
+  panel read the chat at once, with a fifteen-second read behind it.
+  Checked with GitHub's API stubbed in a browser; not yet against
+  GitHub or in a real call.
 - **R16, recognition:** a teacher names a skill a person showed, with
   the moment; shown on the class page; carried into credential evidence.
   (pending)

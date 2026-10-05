@@ -19,7 +19,7 @@
 
   function start(o) {
     var mount = o.mount, me = o.me, live = false, channel = null;
-    var mine = [], seen = {}, pending = [], flushTimer = null, held = null, extra = {};
+    var mine = [], seen = {}, pending = [], flushTimer = null, held = null, extra = {}, nudged = {};
 
     // The row: eight reactions and three stances, each with its key.
     mount.replaceChildren();
@@ -130,6 +130,13 @@
       channel = o.db.channel('class:' + o.cohort.id, { config: { private: true, broadcast: { self: true }, presence: { key: me.id } } });
       channel
         .on('broadcast', { event: 'react' }, heard)
+        // A nudge that something changed elsewhere (the chat, R15), so
+        // every panel reads it again at once; the nudge itself carries
+        // nothing but its name.
+        .on('broadcast', { event: 'nudge' }, function (m) {
+          var what = m && m.payload && typeof m.payload.what === 'string' ? m.payload.what : null;
+          (nudged[what] || []).forEach(function (fn) { try { fn(); } catch (e) {} });
+        })
         .on('presence', { event: 'sync' }, function () {
           if (!flushTimer) flushTimer = setTimeout(flush, 400);
           if (o.onPresence) o.onPresence(channel.presenceState());
@@ -144,6 +151,8 @@
     return {
       // Other parts of the panel (R11) add to what this person shares.
       setPresence: function (fields) { extra = Object.assign({}, extra, fields || {}); track(); },
+      nudge: function (what) { if (live && channel) channel.send({ type: 'broadcast', event: 'nudge', payload: { what: String(what) } }); },
+      onNudge: function (what, fn) { (nudged[what] = nudged[what] || []).push(fn); },
       presence: function () { return channel ? channel.presenceState() : {}; },
       stop: function () { if (channel) { o.db.removeChannel(channel); channel = null; } }
     };

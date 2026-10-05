@@ -237,6 +237,7 @@
           startSignals(res[2].data);
           startClass();
           drawCode();
+          startChat();
           drawPart(true);
           show('ready');
           return refreshLive().then(listen);
@@ -310,6 +311,19 @@
         drawRoster();
         drawCode();
         if (S.onStage && S.onStage.kind === 'path') sendStage();
+      }
+    });
+  }
+
+  // The class chat (R15): in GitHub, posted by each person as themselves.
+  function startChat() {
+    if (S.chat || !window.ChatView || !S.cohort.github_repo) return;
+    S.chat = window.ChatView.start({
+      db: db, mount: $('[data-chat]'), cohort: S.cohort, session: S.session, me: S.me, teaching: S.teaching, channel: S.classChannel,
+      onPoll: function (prompt, choices) {
+        return db.from('live_checks').insert({
+          cohort_id: S.cohort.id, session_id: S.session.id, created_by: S.me.id, prompt: prompt, choices: choices, kind: 'choice', show_tally: true
+        }).then(function (r) { if (r.error) return r.error.message; refreshLive(); return null; });
       }
     });
   }
