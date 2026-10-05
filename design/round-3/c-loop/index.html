@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Human Shaped</title>
+  <meta name="description" content="Software for the parts of life only people can do: human-shaped software uses AI as a tool people wield for human purposes, with its values written down. The principles, the method, and free ways to build.">
+  <link rel="canonical" href="https://humanshaped.org/">
+  <meta property="og:url" content="https://humanshaped.org/">
+  <meta property="og:site_name" content="Human Shaped">
+  <meta property="og:title" content="Human Shaped">
+  <meta property="og:description" content="Software for the parts of life only people can do: human-shaped software uses AI as a tool people wield for human purposes, with its values written down. The principles, the method, and free ways to build.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://humanshaped.org/assets/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="The human-shaped wordmark, with its hyphen drawn as an arch, above the line: build software for the parts of life only people can do.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#F7F6F2" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#141618" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/site.css">
+  <link rel="stylesheet" href="/design/round-3/round-3.css">
+  <meta name="robots" content="noindex">
+  <script>
+    (function () {
+      var q = location.search, t = null;
+      if (/[?&]dark\b/.test(q)) t = 'dark'; else if (/[?&]light\b/.test(q)) t = 'light';
+      else { try { t = localStorage.getItem('hs-theme'); } catch (e) {} }
+      if (t) document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+  <script src="/assets/site.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to the page</a>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
+      <nav class="nav" aria-label="Main">
+        <ul>
+          <li><a href="/path/">The path</a></li>
+          <li><a href="/why/">Why</a></li>
+          <li><a href="/principles/">Principles</a></li>
+          <li><a href="/cohorts/">Cohorts</a></li>
+          <li><a href="/apps/">Apps</a></li>
+          <li><a href="/start/">Start something</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#moon"/></svg>
+        </button>
+        <a class="btn-github small" href="/account/">
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>
+          <span>Sign in<span class="long"> with GitHub</span></span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+
+    <!-- The home page, rewritten after Ben's review of October 5, 2026
+         (DECISIONS.md): the idea, the principles, and the why first,
+         and the ways in after. Words by Claude, awaiting Ben's review. -->
+    <section class="r3 r3-c" aria-labelledby="hero-title">
+      <div class="wrap r3c-grid">
+        <div>
+          <p class="kicker">Human-shaped software</p>
+          <h1 id="hero-title">Build with AI, and keep the human parts human.</h1>
+          <p class="lead">Human-shaped software starts from a problem only people can solve, like learning something hard or watching a film with a friend. An AI agent can write most of the code, and you keep the parts that make the app worth having: you write down what you value, play with what comes back, and publish it so other people can play with it too.</p>
+          <div class="hero-actions">
+            <a class="btn-github" href="/principles/">Read the principles</a>
+            <a class="text" href="/why/">Why build this way</a>
+          </div>
+        </div>
+        <figure class="r3c-loop">
+          <svg viewBox="0 0 360 340" aria-hidden="true" focusable="false">
+            <defs><marker id="r3c-head" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="var(--clay)"/></marker></defs>
+            <circle class="r3c-ring" cx="180" cy="180" r="128"/>
+            <path class="r3c-arc" marker-end="url(#r3c-head)" d="M236.1 65.0A128 128 0 0 1 307.7 188.9"/>
+            <path class="r3c-arc" marker-end="url(#r3c-head)" d="M251.6 286.1A128 128 0 0 1 108.4 286.1"/>
+            <path class="r3c-arc" marker-end="url(#r3c-head)" d="M52.3 188.9A128 128 0 0 1 123.9 65.0"/>
+            <rect class="r3c-node" x="125" y="30" width="110" height="44" rx="22"/><text class="r3c-word" x="180" y="52">Write</text>
+            <rect class="r3c-node" x="236" y="222" width="110" height="44" rx="22"/><text class="r3c-word" x="291" y="244">Play</text>
+            <rect class="r3c-node" x="14" y="222" width="110" height="44" rx="22"/><text class="r3c-word" x="69" y="244">Publish</text>
+            <text class="r3c-mid" x="180" y="172">every round,</text><text class="r3c-mid" x="180" y="194">with you in it</text>
+          </svg>
+          <ol class="r3c-moves">
+            <li><b>Write</b> gets the idea out of your head and onto the page, where your agent reads it.</li>
+            <li><b>Play</b> makes your thinking tangible, on a real device, in your own hands.</li>
+            <li><b>Publish</b> lets other people play with it too, because a human-shaped problem is rarely yours alone.</li>
+          </ol>
+        </figure>
+      </div>
+    </section>
+
+    <section class="section idea" aria-labelledby="idea-title">
+      <div class="wrap">
+        <div>
+          <p class="kicker">The idea</p>
+          <h2 id="idea-title">Some problems were never computer-shaped.</h2>
+        </div>
+        <div class="prose">
+          <p>Nilay Patel calls it <a href="https://www.theverge.com/podcast/917029/software-brain-ai-backlash-databases-automation">software brain</a>: seeing the whole world as a set of databases, each one waiting for the right code to take control of it. AI has turned that habit up as far as it will go, because an agent can write the code and the words for almost anything you can describe. But, learning, community, friendship, and the people we love only happen when a person does the work, and a first draft that no person has wrestled with is not the start of that work.</p>
+          <p>Every piece of software is built on values, whether or not anyone wrote them down. Human-shaped software writes them down, so that the people who use it and the AI agents that help build it can both see what it is for.</p>
+        </div>
+        <div class="compare">
+          <div>
+            <svg viewBox="0 0 240 96" aria-hidden="true" focusable="false">
+              <rect x="1" y="18" width="62" height="44" rx="4" class="f-line"/>
+              <path d="M26 32v16l13-8z" class="f-fill-muted"/>
+              <g class="f-bar"><rect x="84" y="10" width="150" height="6" rx="3"/><rect x="84" y="26" width="150" height="6" rx="3"/><rect x="84" y="42" width="150" height="6" rx="3"/><rect x="84" y="58" width="150" height="6" rx="3"/><rect x="84" y="74" width="150" height="6" rx="3"/></g>
+            </svg>
+            <p class="tag">Software brain</p>
+            <p class="big">Ten thousand film summaries written by AI in an afternoon is efficient, and every one of them was written by something that never watched the film.</p>
+          </div>
+          <div class="human">
+            <svg viewBox="0 0 240 96" aria-hidden="true" focusable="false">
+              <rect x="1" y="18" width="62" height="44" rx="4" class="f-line"/>
+              <path d="M26 32v16l13-8z" class="f-fill-muted"/>
+              <g transform="translate(84 6)"><circle cx="6" cy="5" r="4.5" class="f-clay"/><path d="M0 22v-3c0-4 2.6-6.2 6-6.2s6 2.2 6 6.2v3" class="f-clay-line"/></g><rect x="108" y="12" width="118" height="6" rx="3" class="f-clay-bar"/>
+              <g transform="translate(84 36)"><circle cx="6" cy="5" r="4.5" class="f-clay"/><path d="M0 22v-3c0-4 2.6-6.2 6-6.2s6 2.2 6 6.2v3" class="f-clay-line"/></g><rect x="108" y="42" width="64" height="6" rx="3" class="f-clay-bar"/>
+              <g transform="translate(84 66)"><circle cx="6" cy="5" r="4.5" class="f-clay"/><path d="M0 22v-3c0-4 2.6-6.2 6-6.2s6 2.2 6 6.2v3" class="f-clay-line"/></g><rect x="108" y="72" width="96" height="6" rx="3" class="f-clay-bar"/>
+            </svg>
+            <p class="tag">Human-shaped</p>
+            <p class="big">Notes written by the people who watched and reviewed each film are slower, and sometimes need correcting, and yet they keep the people who actually loved those films in the story.</p>
+          </div>
+          <div class="compare-why">
+            <p>A web full of words no one wrote is worse for everyone who reads it, and an answer that sends no one on to the people who did the work leaves those people out. <strong>Humanity is inefficient, and that is the point.</strong> Learning is inefficient too, and we have great tools for making it work better, as long as our values decide where those tools belong.</p>
+            <p class="credit"><a href="/why/">The longer story of computer-shaped problems</a></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="principles" aria-labelledby="principles-title">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <p class="kicker">The principles</p>
+            <h2 id="principles-title">Fifteen values, worn on the sleeve.</h2>
+          </div>
+          <p class="prose">These are the values every piece of human-shaped software shares. Each one is something you can do while building, and something another person can check, and each builder adds the values their own problem needs.</p>
+        </div>
+        <ol class="principles-list" data-principles hidden></ol>
+        <p class="prose" data-principles-fallback><a href="/principles/">Read the fifteen Human-Shaped Principles</a>, which start with a human-shaped problem, one that affects real people in the real world.</p>
+        <p class="section-more"><a href="/principles/">What each principle means, and how you can tell</a></p>
+      </div>
+    </section>
+
+
+    <section class="section" id="ways" aria-labelledby="ways-title">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <p class="kicker">Ways in</p>
+            <h2 id="ways-title">Build with others, on your own, or start something.</h2>
+          </div>
+          <p class="prose">The ideas, the method, and the tools are free, and so is every cohort.</p>
+        </div>
+        <ul class="ways-in">
+          <li>
+            <svg viewBox="0 0 48 48" aria-hidden="true" focusable="false"><path class="i-clay" d="M8.5 21c.9-4.6 3.3-7 6.5-7s5.6 2.4 6.5 7"/><path class="i-clay" d="M26.5 21c.9-4.6 3.3-7 6.5-7s5.6 2.4 6.5 7"/><path class="i-clay" d="M17.5 15c.9-4.6 3.3-7 6.5-7s5.6 2.4 6.5 7"/><path class="i-line" d="M5 40c1-8 5-12 10-12s9 4 10 12M23 40c1-8 5-12 10-12s9 4 10 12"/></svg>
+            <h3><a href="/cohorts/">Join a cohort</a></h3>
+            <p>Five weeks of building an app of your own with an AI agent, alongside other people doing the same, with one live session each week.</p>
+          </li>
+          <li>
+            <svg viewBox="0 0 48 48" aria-hidden="true" focusable="false"><path class="i-clay" d="M16 17c1.2-6 4.2-9 8-9s6.8 3 8 9"/><path class="i-line" d="M12 42c1.4-9 6-13.5 12-13.5S34.6 33 36 42"/><rect class="i-line" x="17" y="34" width="14" height="9" rx="1.5"/></svg>
+            <h3><a href="/path/setup/">Build on your own</a></h3>
+            <p>The Universal App Template holds the whole method, and you can copy it on GitHub today and follow the path at your own pace.</p>
+          </li>
+          <li>
+            <svg viewBox="0 0 48 48" aria-hidden="true" focusable="false"><path class="i-clay" d="M10 19c1.2-6 4.2-9 8-9s6.8 3 8 9"/><path class="i-line" d="M6 42c1.4-9 6-13.5 12-13.5S28.6 33 30 42"/><path class="i-line" d="M30 8h12v9h-6l-3 3v-3h-3z"/></svg>
+            <h3><a href="/start/">Start something</a></h3>
+            <p>A meetup, a day of building, or a mark for your own software, with the principles in front of everyone.</p>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section tint" id="apps" aria-labelledby="apps-title">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <p class="kicker">Built this way</p>
+            <h2 id="apps-title">Human-shaped software, in progress.</h2>
+          </div>
+          <p class="prose">Apps built this way show their work in the open, from the first commit to the stores.</p>
+        </div>
+        <ul class="apps app-grid" data-apps-grid="4" hidden></ul>
+        <section class="feed-block" aria-labelledby="now-title" data-feed="5" data-feed-quiet hidden>
+          <h3 id="now-title">Being built right now</h3>
+          <p class="small">The latest work on apps in the directory, read live from GitHub.</p>
+          <ol class="feed" data-feed-list></ol>
+          <p class="small" data-feed-note></p>
+        </section>
+        <p class="section-more"><a href="/apps/">See every app, and how to add yours</a></p>
+      </div>
+    </section>
+
+    <section class="band" aria-label="Sign in">
+      <div class="wrap">
+        <p class="big">Bring a problem only people can solve.</p>
+        <div>
+          <p class="small">You sign in with GitHub, because that is where your app will live, and everything you build stays in your own account.</p>
+          <p class="band-action"><a class="btn-github" href="/account/"><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Sign in with GitHub</a></p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+  <script src="/assets/hub-config.js" defer></script>
+  <script src="/assets/cohort-lib.js" defer></script>
+  <script src="/assets/apps-lib.js" defer></script>
+  <script src="/assets/apps.js" defer></script>
+  <script src="/assets/principles-lib.js" defer></script>
+  <script src="/assets/principles.js" defer></script>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
+      <p>Made by <a href="https://learningischange.com">Ben Wilkoff</a>. The ideas, the method, the tools, and the cohorts are free, and what you build is yours.</p>
+      <p class="credit">Built by Ben with an AI agent, Claude, set in Commissioner, and shared under <a href="https://github.com/bhwilkoff/UniversalAppTemplate/blob/site/LICENSE.md">open licenses</a>, so you can borrow anything here.</p>
+      <ul>
+        <li><a href="/principles/">The principles we build by</a></li>
+        <li><a href="/privacy/">What we keep, and what we never own</a></li>
+        <li><a href="/terms/">Terms</a> and <a href="/support/">help</a></li>
+        <li><a href="/events/">Events</a></li>
+        <li><a href="https://github.com/orgs/humanshaped/discussions">Discussions on GitHub</a></li>
+        <li><a href="https://github.com/bhwilkoff/UniversalAppTemplate">The template on GitHub</a></li>
+      </ul>
+    </div>
+  </footer>
+</body>
+</html>

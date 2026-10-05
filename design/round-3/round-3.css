@@ -1,0 +1,68 @@
+/* Round 3: three tries at the top of the home page (October 5, 2026).
+   Everything else on these pages is the live home page. */
+
+.r3 { padding: 2.5rem 0 3.5rem; }
+.r3 h1 { letter-spacing: -0.035em; line-height: 1.02; font-weight: 680; margin: 0; }
+.r3 .lead { margin: 1.5rem 0 2rem; max-width: 36rem; }
+.r3 .kicker { margin-bottom: 1rem; }
+
+/* A: the sleeve. The principles themselves are the picture. */
+.r3a-grid { display: grid; gap: 2.5rem; }
+.r3-a h1 { font-size: clamp(2.6rem, 1.4rem + 5vw, 5.25rem); max-width: 12ch; }
+.r3a-sleeve { position: relative; background: var(--card); border: 1px solid var(--rule); border-radius: 22px; padding: 2.75rem 1.25rem 1.25rem; box-shadow: 0 1px 0 var(--rule), 0 24px 48px -32px rgba(26, 29, 33, 0.35); }
+.r3a-sleeve .arch-top { position: absolute; top: -1.95rem; left: 50%; width: 4.5rem; height: 2.25rem; transform: translateX(-50%); color: var(--clay); }
+.r3a-head { margin: 0 0 1rem; font-size: 0.95rem; font-weight: 600; color: var(--muted); display: flex; justify-content: space-between; gap: 1rem; }
+.r3a-list { list-style: none; margin: 0; padding: 0; counter-reset: p; }
+.r3a-list li { counter-increment: p; border-top: 1px solid var(--rule); }
+.r3a-list a { display: grid; grid-template-columns: 1.9rem 1fr; gap: 0.5rem; padding: 0.55rem 0; color: var(--ink); text-decoration: none; font-size: 1rem; line-height: 1.35; font-weight: 560; }
+.r3a-list a::before { content: counter(p); color: var(--clay); font-weight: 400; font-variant-numeric: tabular-nums; }
+.r3a-list a:hover .p-lead { text-decoration: underline; text-decoration-color: var(--clay); text-underline-offset: 0.2em; }
+.r3a-list .p-rest { display: none; }
+.r3a-list li:nth-child(n+7) { display: none; }
+.r3a-more { margin: 0.75rem 0 0; font-weight: 600; font-size: 0.975rem; }
+
+/* B: the claim, then the two kinds of work side by side. */
+.r3-b h1 { font-size: clamp(2.8rem, 1.2rem + 6.6vw, 7rem); max-width: 13ch; }
+.r3b-under { display: grid; gap: 0 3rem; }
+.r3b-split { display: grid; gap: 1rem; margin-top: 3rem; align-items: start; }
+.r3b-split h2 { font-size: 1rem; font-weight: 600; letter-spacing: 0; margin: 0 0 1rem; }
+.r3b-machine { border: 1px solid var(--rule); border-radius: var(--radius); padding: 1.25rem; }
+.r3b-machine h2 { color: var(--muted); }
+.r3b-machine ol { list-style: none; margin: 0; padding: 0; counter-reset: row; }
+.r3b-machine li { counter-increment: row; display: grid; grid-template-columns: 2.75rem 1fr; border-top: 1px solid var(--rule); padding: 0.7rem 0; color: var(--muted); font-size: 1.02rem; line-height: 1.4; }
+.r3b-machine li::before { content: "00" counter(row); font-variant-numeric: tabular-nums; color: var(--edge); font-size: 0.9rem; padding-top: 0.1rem; }
+.r3b-human { background: var(--clay); color: #fff; border-radius: var(--radius); padding: 1.25rem; }
+.r3b-human h2 { color: inherit; opacity: 0.85; }
+.r3b-human ul { list-style: none; margin: 0; padding: 0; }
+.r3b-human li { font-size: clamp(1.35rem, 1rem + 1.4vw, 1.9rem); line-height: 1.2; font-weight: 600; letter-spacing: -0.015em; padding: 0.55rem 0; }
+.r3b-human p { margin: 1rem 0 0; font-size: 1rem; line-height: 1.5; opacity: 0.92; }
+:root[data-theme="dark"] .r3b-human { color: #141618; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .r3b-human { color: #141618; } }
+
+/* C: the person in the loop. */
+.r3c-grid { display: grid; gap: 2.5rem; align-items: center; }
+.r3-c h1 { font-size: clamp(2.5rem, 1.4rem + 4.2vw, 4.5rem); max-width: 14ch; }
+.r3c-loop { margin: 0; display: grid; gap: 1.5rem; }
+.r3c-loop svg { display: block; width: 100%; max-width: 24rem; height: auto; justify-self: center; overflow: visible; }
+.r3c-ring { fill: none; stroke: var(--rule); stroke-width: 2; }
+.r3c-arc { fill: none; stroke: var(--clay); stroke-width: 3; stroke-linecap: round; }
+.r3c-node { fill: var(--card); stroke: var(--ink); stroke-width: 2; }
+.r3c-word { font: 650 22px var(--sans); fill: var(--ink); text-anchor: middle; dominant-baseline: central; letter-spacing: -0.01em; }
+.r3c-mid { font: 500 15px var(--sans); fill: var(--muted); text-anchor: middle; }
+.r3c-moves { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.75rem; max-width: 24rem; justify-self: center; }
+.r3c-moves li { font-size: 1.05rem; line-height: 1.45; }
+.r3c-moves b { color: var(--clay); }
+
+@media (min-width: 48rem) {
+  .r3 { padding: 4.5rem 0 5.5rem; }
+  .r3b-split { grid-template-columns: 1fr 1fr; }
+  .r3b-under { grid-template-columns: minmax(0, 36rem) auto; align-items: end; }
+  .r3b-under .lead { margin-bottom: 0; }
+  .r3b-under .hero-actions { padding-bottom: 0.35rem; }
+}
+@media (min-width: 64rem) {
+  .r3a-grid { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 4.5rem; align-items: center; }
+  .r3a-list li:nth-child(n+7) { display: block; }
+  .r3a-more { display: none; }
+  .r3c-grid { grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); gap: 4rem; }
+}
