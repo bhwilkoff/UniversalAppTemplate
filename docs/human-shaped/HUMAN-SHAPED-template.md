@@ -22,7 +22,8 @@ own words.
 
 ## How to fill this in
 
-For each principle, write one of three answers, then a sentence or two
+Each principle finishes the sentence "Human-shaped software...". For
+each one, write one of three answers, then a sentence or two
 in your own words, then at least one link to evidence someone else can
 open.
 
@@ -47,7 +48,7 @@ your own words, it is also **Endorsed by Human Shaped**.
 
 ## 1. A human-shaped problem
 
-**Human-shaped software starts from a human-shaped problem, one that affects real people in the real world.**
+**Starts from a human-shaped problem, one that affects real people in the real world.**
 
 *How someone can tell:* the builder has written down what the problem is, who has it, and why a computer cannot simply solve it for them.
 
@@ -59,7 +60,7 @@ your own words, it is also **Endorsed by Human Shaped**.
 
 ## 2. More possible, not more profit
 
-**Human-shaped software increases what people are able to do, rather than how much profit can be made from them.**
+**Increases what people are able to do, rather than how much profit can be made from them.**
 
 *How someone can tell:* the heart of the software works without payment, any price is stated plainly, and nothing in it is designed to keep people longer than they want to stay.
 
@@ -71,7 +72,7 @@ your own words, it is also **Endorsed by Human Shaped**.
 
 ## 3. Values as guardrails
 
-**Human-shaped software has its values written down as guardrails for both the people and the AI agents who build it.**
+**Has its values written down as guardrails for both the people and the AI agents who build it.**
 
 *How someone can tell:* the values are written in the project itself, where both people and agents read them, and at least one of them has visibly changed a decision.
 
@@ -83,7 +84,7 @@ your own words, it is also **Endorsed by Human Shaped**.
 
 ## 4. Iteration, never a first draft
 
-**Human-shaped software treats iteration as the path to innovation, so that no first draft of a feature, design, or piece of writing is ever shipped.**
+**Treats iteration as the path to innovation, so that no first draft of a feature, design, or piece of writing is ever shipped.**
 
 *How someone can tell:* the history of the project shows rounds of feedback and revision before each feature, design, or piece of writing went out.
 
@@ -95,7 +96,7 @@ your own words, it is also **Endorsed by Human Shaped**.
 
 ## 5. Grounded in research
 
-**Human-shaped software is grounded in research, so that its builder always knows whose work they are building on, from tools and services to authors and design patterns.**
+**Is grounded in research, so that its builder always knows whose work they are building on, from tools and services to authors and design patterns.**
 
 *How someone can tell:* the research behind the major choices is recorded, and the tools, data sources, and borrowed ideas are named.
 
@@ -107,7 +108,7 @@ your own words, it is also **Endorsed by Human Shaped**.
 
 ## 6. Decisions with feedback
 
-**Human-shaped software makes every decision with feedback from another person, an AI agent, or a piece of documentation.**
+**Makes every decision with feedback from another person, an AI agent, or a piece of documentation.**
 
 *How someone can tell:* the major decisions are written down with their reasons, and the record shows where the feedback came from.
 
@@ -119,7 +120,7 @@ your own words, it is also **Endorsed by Human Shaped**.
 
 ## 7. Tested the way people use it
 
-**Human-shaped software is tested the way people will actually see, hear, and use it, not only the way a machine would check it.**
+**Is tested the way people will actually see, hear, and use it, not only the way a machine would check it.**
 
 *How someone can tell:* every claim that something works points to evidence from a real device or a real person, and the software says plainly where it does not work yet.
 
@@ -131,7 +132,7 @@ your own words, it is also **Endorsed by Human Shaped**.
 
 ## 8. Documentation as seriously as code
 
-**Human-shaped software treats documentation as seriously as code, so that it grows and changes with the software, in the builder's own language.**
+**Treats documentation as seriously as code, so that it grows and changes with the software, in the builder's own language.**
 
 *How someone can tell:* the project has current documentation of its decisions, its state, and its design, and the builder's own words are in it.
 
@@ -143,7 +144,7 @@ your own words, it is also **Endorsed by Human Shaped**.
 
 ## 9. Shared openly
 
-**Human-shaped software shares its code, tools, and lessons as openly as the problem it solves allows.**
+**Shares its code, tools, and lessons as openly as the problem it solves allows.**
 
 *How someone can tell:* the code, or at least the lessons, are public under terms that let others use them, and anything kept private has a stated reason.
 
@@ -155,7 +156,7 @@ your own words, it is also **Endorsed by Human Shaped**.
 
 ## 10. Learning as success
 
-**Human-shaped software counts learning as success, so that if at least one thing was learned in building it, the software has succeeded.**
+**Counts learning as success, so that if at least one thing was learned in building it, the software has succeeded.**
 
 *How someone can tell:* the builder can say what they learned, and the lesson is written down where the next builder can find it.
 
@@ -167,7 +168,7 @@ your own words, it is also **Endorsed by Human Shaped**.
 
 ## 11. People own their data
 
-**Human-shaped software lets people own their data and make every decision about what happens to it.**
+**Lets people own their data and make every decision about what happens to it.**
 
 *How someone can tell:* the software collects only what it needs, says what it keeps, and offers a way to export and delete it.
 
@@ -179,7 +180,7 @@ your own words, it is also **Endorsed by Human Shaped**.
 
 ## 12. No new problems
 
-**Human-shaped software creates no new human-shaped problems while solving the one it set out to solve.**
+**Creates no new human-shaped problems while solving the one it set out to solve.**
 
 *How someone can tell:* the builder has asked, in writing, whom the software could harm, and has answered.
 
@@ -191,7 +192,7 @@ your own words, it is also **Endorsed by Human Shaped**.
 
 ## 13. The builder's own voice
 
-**Human-shaped software is written in the builder's own voice, so that every word is shaped by a human, and no machine pretends to be one.**
+**Is written in the builder's own voice, so that every word is shaped by a human, and no machine pretends to be one.**
 
 *How someone can tell:* the words people read were written or chosen by a person, and every automated part of the software says what it is.
 
@@ -203,7 +204,7 @@ your own words, it is also **Endorsed by Human Shaped**.
 
 ## 14. Credit everything
 
-**Human-shaped software credits everyone and everything responsible for it, including people, communities, AI agents, tools, and processes.**
+**Credits everyone and everything responsible for it, including people, communities, AI agents, tools, and processes.**
 
 *How someone can tell:* the software and its project credit the people, communities, sources, agents, and tools behind it.
 
@@ -215,7 +216,7 @@ your own words, it is also **Endorsed by Human Shaped**.
 
 ## 15. Joy for at least one person
 
-**Human-shaped software brings joy to at least one person in the form it ships today, even if that person is the builder.**
+**Brings joy to at least one person in the form it ships today, even if that person is the builder.**
 
 *How someone can tell:* the builder can name someone who enjoys the software as it is today, even if that someone is the builder.
 

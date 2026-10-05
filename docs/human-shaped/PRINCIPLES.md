@@ -12,48 +12,46 @@ your fiftieth, and whether or not you have ever worked with an AI agent.
 
 ## The principles
 
-Each principle says what human-shaped software does, so that any piece
-of software, and the way it was made, can be measured against it.
+Each principle starts with what human-shaped software does, so that any
+piece of software, and the way it was made, can be measured against it.
 
-1. **Human-shaped software starts from a human-shaped problem,** one
-   that affects real people in the real world.
-2. **Human-shaped software increases what people are able to do,**
-   rather than how much profit can be made from them.
-3. **Human-shaped software has its values written down as guardrails**
-   for both the people and the AI agents who build it.
-4. **Human-shaped software treats iteration as the path to innovation,**
-   so that no first draft of a feature, design, or piece of writing is
-   ever shipped.
-5. **Human-shaped software is grounded in research,** so that its
-   builder always knows whose work they are building on, from tools and
-   services to authors and design patterns.
-6. **Human-shaped software makes every decision with feedback** from
-   another person, an AI agent, or a piece of documentation.
-7. **Human-shaped software is tested the way people will actually see,
-   hear, and use it,** not only the way a machine would check it.
-8. **Human-shaped software treats documentation as seriously as code,**
-   so that it grows and changes with the software, in the builder's own
-   language.
-9. **Human-shaped software shares its code, tools, and lessons** as
-   openly as the problem it solves allows.
-10. **Human-shaped software counts learning as success,** so that if at
-    least one thing was learned in building it, the software has
-    succeeded.
-11. **Human-shaped software lets people own their data** and make every
-    decision about what happens to it.
-12. **Human-shaped software creates no new human-shaped problems** while
-    solving the one it set out to solve.
-13. **Human-shaped software is written in the builder's own voice,** so
-    that every word is shaped by a human, and no machine pretends to be
-    one.
-14. **Human-shaped software credits everyone and everything responsible
-    for it,** including people, communities, AI agents, tools, and
-    processes.
-15. **Human-shaped software brings joy to at least one person** in the
-    form it ships today, even if that person is the builder.
+Human-shaped software:
+
+1. **Starts from a human-shaped problem,** one that affects real people
+   in the real world.
+2. **Increases what people are able to do,** rather than how much profit
+   can be made from them.
+3. **Has its values written down as guardrails** for both the people and
+   the AI agents who build it.
+4. **Treats iteration as the path to innovation,** so that no first
+   draft of a feature, design, or piece of writing is ever shipped.
+5. **Is grounded in research,** so that its builder always knows whose
+   work they are building on, from tools and services to authors and
+   design patterns.
+6. **Makes every decision with feedback** from another person, an AI
+   agent, or a piece of documentation.
+7. **Is tested the way people will actually see, hear, and use it,** not
+   only the way a machine would check it.
+8. **Treats documentation as seriously as code,** so that it grows and
+   changes with the software, in the builder's own language.
+9. **Shares its code, tools, and lessons** as openly as the problem it
+   solves allows.
+10. **Counts learning as success,** so that if at least one thing was
+    learned in building it, the software has succeeded.
+11. **Lets people own their data** and make every decision about what
+    happens to it.
+12. **Creates no new human-shaped problems** while solving the one it
+    set out to solve.
+13. **Is written in the builder's own voice,** so that every word is
+    shaped by a human, and no machine pretends to be one.
+14. **Credits everyone and everything responsible for it,** including
+    people, communities, AI agents, tools, and processes.
+15. **Brings joy to at least one person** in the form it ships today,
+    even if that person is the builder.
 
 ## What each principle means
 
+Each principle below finishes the sentence "Human-shaped software...".
 The principles are meant to stand on their own. What follows is for
 when you want to know why each one matters, what it looks like while
 you are building, and how someone else could tell whether your software
@@ -63,7 +61,7 @@ Silence is not.
 
 ## 1. A human-shaped problem
 
-**Human-shaped software starts from a human-shaped problem, one that affects real people in
+**Starts from a human-shaped problem, one that affects real people in
 the real world.**
 
 Some problems are computer-shaped. You can hand them to a machine and
@@ -81,7 +79,7 @@ who has it, and why a computer cannot simply solve it for them.
 
 ## 2. More possible, not more profit
 
-**Human-shaped software increases what people are able to do, rather than how much profit can
+**Increases what people are able to do, rather than how much profit can
 be made from them.**
 
 Software can make money and still be human-shaped. What it cannot do is
@@ -98,7 +96,7 @@ people longer than they want to stay.
 
 ## 3. Values as guardrails
 
-**Human-shaped software has its values written down as guardrails for both the people and
+**Has its values written down as guardrails for both the people and
 the AI agents who build it.**
 
 An AI agent keeps only the values you write down. Left alone, it will
@@ -115,7 +113,7 @@ visibly changed a decision.
 
 ## 4. Iteration, never a first draft
 
-**Human-shaped software treats iteration as the path to innovation, so that no first draft of
+**Treats iteration as the path to innovation, so that no first draft of
 a feature, design, or piece of writing is ever shipped.**
 
 An AI agent will happily hand you a first draft that looks finished.
@@ -131,7 +129,7 @@ went out.
 
 ## 5. Grounded in research
 
-**Human-shaped software is grounded in research, so that its builder always knows whose work
+**Is grounded in research, so that its builder always knows whose work
 they are building on, from tools and services to authors and design
 patterns.**
 
@@ -148,7 +146,7 @@ recorded, and the tools, data sources, and borrowed ideas are named.
 
 ## 6. Decisions with feedback
 
-**Human-shaped software makes every decision with feedback from another person, an AI agent,
+**Makes every decision with feedback from another person, an AI agent,
 or a piece of documentation.**
 
 Building alone does not have to mean deciding alone. An AI agent can
@@ -164,7 +162,7 @@ reasons, and the record shows where the feedback came from.
 
 ## 7. Tested the way people use it
 
-**Human-shaped software is tested the way people will actually see, hear, and use it, not
+**Is tested the way people will actually see, hear, and use it, not
 only the way a machine would check it.**
 
 An AI agent will tell you something is fixed and fully tested when what
@@ -182,7 +180,7 @@ plainly where it does not work yet.
 
 ## 8. Documentation as seriously as code
 
-**Human-shaped software treats documentation as seriously as code, so that it grows and
+**Treats documentation as seriously as code, so that it grows and
 changes with the software, in the builder's own language.**
 
 For an AI agent, the documentation is the only memory there is. Every
@@ -199,7 +197,7 @@ in it.
 
 ## 9. Shared openly
 
-**Human-shaped software shares its code, tools, and lessons as openly as the problem it solves
+**Shares its code, tools, and lessons as openly as the problem it solves
 allows.**
 
 Most of what I know about building software, I learned from people who
@@ -215,7 +213,7 @@ stated reason.
 
 ## 10. Learning as success
 
-**Human-shaped software counts learning as success, so that if at least one thing was learned
+**Counts learning as success, so that if at least one thing was learned
 in building it, the software has succeeded.**
 
 Building software this way is a form of learning in three directions at
@@ -231,7 +229,7 @@ lesson is written down where the next builder can find it.
 
 ## 11. People own their data
 
-**Human-shaped software lets people own their data and make every decision about what happens
+**Lets people own their data and make every decision about what happens
 to it.**
 
 What people make and save in a piece of software belongs to them, not to
@@ -246,7 +244,7 @@ what it keeps, and offers a way to export and delete it.
 
 ## 12. No new problems
 
-**Human-shaped software creates no new human-shaped problems while solving the one it set out
+**Creates no new human-shaped problems while solving the one it set out
 to solve.**
 
 Solving one problem can quietly create another: a feature that leaves
@@ -262,7 +260,7 @@ software could harm, and has answered.
 
 ## 13. The builder's own voice
 
-**Human-shaped software is written in the builder's own voice, so that every word is shaped
+**Is written in the builder's own voice, so that every word is shaped
 by a human, and no machine pretends to be one.**
 
 An AI agent can write copy, labels, and lists faster than any person
@@ -278,7 +276,7 @@ person, and every automated part of the software says what it is.
 
 ## 14. Credit everything
 
-**Human-shaped software credits everyone and everything responsible for it, including people,
+**Credits everyone and everything responsible for it, including people,
 communities, AI agents, tools, and processes.**
 
 No software is made by one person anymore, if it ever was. It is made
@@ -292,7 +290,7 @@ communities, sources, agents, and tools behind it.
 
 ## 15. Joy for at least one person
 
-**Human-shaped software brings joy to at least one person in the form it ships today, even if
+**Brings joy to at least one person in the form it ships today, even if
 that person is the builder.**
 
 Software does not have to be finished to be good, and it does not have
