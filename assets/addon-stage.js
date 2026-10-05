@@ -110,6 +110,33 @@
     box.appendChild(f);
   }
 
+  // Reactions rise from the foot of the stage and fade; each starts at a
+  // different place so a burst reads as many people, not one.
+  var R = window.ReactLib, lane = 0;
+  function drawReactions(m) {
+    var layer = $('[data-react-layer]');
+    m.floats.forEach(function (f, i) {
+      var r = R.reaction(f.r);
+      if (!r || layer.childElementCount > 40) return;
+      var d = el('span', 'react-float');
+      d.appendChild(el('span', 'react-emoji', r.emoji));
+      if (f.n) d.appendChild(el('span', 'react-name', f.n));
+      lane = (lane + 37) % 90;
+      d.style.left = (5 + lane) + '%';
+      d.style.animationDelay = (i * 120) + 'ms';
+      d.addEventListener('animationend', function () { d.remove(); });
+      layer.appendChild(d);
+    });
+    var bar = $('[data-stance]'), sh = R.shares(m.stance);
+    bar.hidden = !sh;
+    if (sh) {
+      ['agree', 'unsure', 'disagree'].forEach(function (k) {
+        bar.querySelector('[data-st="' + k + '"]').style.flexGrow = String(sh[k]);
+        bar.querySelector('[data-stk="' + k + '"]').textContent = R.stance(k).label + ' ' + m.stance[k];
+      });
+    }
+  }
+
   function tick() {
     if (!view) return;
     var t = clockText(view.part);
@@ -129,6 +156,8 @@
       return session.createMainStageClient();
     }).then(function (stage) {
       stage.on('frameToFrameMessage', function (m) {
+        var react = m && window.ReactLib ? window.ReactLib.readStage(m.payload) : null;
+        if (react) return drawReactions(react);
         if (!m || m.payload === last) return;
         var v = A.readStageMessage(m.payload);
         if (!v) return;

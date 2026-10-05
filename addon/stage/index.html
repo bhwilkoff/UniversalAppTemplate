@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261005f">
+  <link rel="stylesheet" href="/assets/site.css?v=20261005g">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -81,6 +81,14 @@
       <!-- The teacher cleared the stage. -->
       <div class="stage-body" data-view="blank" hidden></div>
 
+      <!-- Reactions the class sends, floating up, and where people stand
+           while someone talks (R10). Nothing here is kept. -->
+      <div class="react-layer" data-react-layer aria-hidden="true"></div>
+      <div class="stance-bar" data-stance hidden>
+        <span class="stance-track"><span class="stance-part agree" data-st="agree"></span><span class="stance-part unsure" data-st="unsure"></span><span class="stance-part disagree" data-st="disagree"></span></span>
+        <p class="stance-key"><span data-stk="agree"></span><span data-stk="unsure"></span><span data-stk="disagree"></span></p>
+      </div>
+
       <div class="stage-body" data-view="item" hidden>
         <p class="kicker">Showing their work</p>
         <h1 class="stage-title" data-who></h1>
@@ -94,6 +102,7 @@
   <script src="/assets/addon-config.js" defer></script>
   <script src="/assets/live-lib.js" defer></script>
   <script src="/assets/addon-lib.js" defer></script>
+  <script src="/assets/react-lib.js" defer></script>
   <script src="/assets/addon-stage.js" defer></script>
 </body>
 </html>

@@ -1623,3 +1623,36 @@ label.check { min-height: 2.25rem; }
 
 /* A topic that holds a row of cards takes the whole width. */
 .topics > .topic-wide { grid-column: 1 / -1; }
+
+/* Reactions and stance (R10). In the panel, a row at its foot that stays
+   in reach; on the stage, reactions float up and fade, and a thin bar
+   shows where people stand while someone talks. */
+.react-bar { position: sticky; bottom: 0; z-index: 5; margin: 0.5rem -0.9rem -2rem; padding: 0.6rem 0.9rem 0.8rem; background: var(--paper); border-top: 1px solid var(--rule); display: grid; gap: 0.5rem; }
+.react-row { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 0.25rem; }
+.react-btn { position: relative; display: grid; place-items: center; min-height: 44px; padding: 0.2rem 0 0.35rem; border: 1px solid var(--rule); border-radius: 10px; background: var(--card); cursor: pointer; font: inherit; color: var(--ink); }
+.react-btn:hover { border-color: var(--clay); }
+.react-btn .react-emoji { font-size: 1.25rem; line-height: 1; }
+.react-btn .react-key { font-size: 0.7rem; color: var(--muted); line-height: 1; margin-top: 0.15rem; }
+.react-btn.sent { animation: react-sent 0.45s ease-out; }
+@keyframes react-sent { 0% { transform: scale(1); } 40% { transform: scale(1.18); background: var(--surface); } 100% { transform: scale(1); } }
+.stance-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.35rem; }
+.stance-btn { min-height: 40px; border: 1px solid var(--rule); border-radius: 999px; background: var(--card); color: var(--ink); font: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer; }
+.stance-btn[aria-pressed="true"] { background: var(--ink); color: var(--on-ink); border-color: var(--ink); }
+.react-line { font-size: 0.8rem !important; }
+@media (prefers-reduced-motion: reduce) { .react-btn.sent { animation: none; outline: 2px solid var(--clay); } }
+
+.stage-ready { position: relative; overflow: hidden; }
+.react-layer { position: absolute; inset: 0; pointer-events: none; z-index: 20; }
+.react-float { position: absolute; bottom: 4vmin; display: grid; justify-items: center; gap: 0.2em; animation: react-rise 3.2s ease-out forwards; }
+.react-float .react-emoji { font-size: clamp(2rem, 5vmin, 4rem); line-height: 1; }
+.react-float .react-name { font-size: clamp(0.8rem, 1.6vmin, 1.1rem); font-weight: 600; color: var(--ink); background: var(--card); border-radius: 999px; padding: 0.1em 0.6em; }
+@keyframes react-rise { 0% { transform: translateY(0); opacity: 0; } 10% { opacity: 1; } 75% { opacity: 1; } 100% { transform: translateY(-55vh); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .react-float { animation: react-fade 3s ease-out forwards; } @keyframes react-fade { 0%, 70% { opacity: 1; } 100% { opacity: 0; } } }
+.stance-bar { position: absolute; left: 4vmin; right: 4vmin; bottom: 1.5vmin; z-index: 15; }
+.stance-track { display: flex; gap: 2px; }
+.stance-bar[hidden] { display: none; }
+.stance-part { height: 0.8vmin; min-height: 6px; transition: flex-grow 0.6s ease; flex-basis: 0; }
+.stance-part.agree { background: #3F7A4F; border-radius: 999px 0 0 999px; }
+.stance-part.unsure { background: var(--edge); }
+.stance-part.disagree { background: var(--clay); border-radius: 0 999px 999px 0; }
+.stance-key { display: flex; justify-content: space-between; margin: 0.4vmin 0 0; font-size: clamp(0.75rem, 1.4vmin, 1rem); color: var(--muted); font-weight: 600; }

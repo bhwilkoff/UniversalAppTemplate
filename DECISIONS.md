@@ -502,3 +502,29 @@ links to the meetup and hackathon kits rather than retelling them, the
 founding apps' status is said once rather than on every card, and the
 cohorts page says joining uses GitHub once.
 
+## Active learning in the add-on (October 5, 2026, night)
+
+Ben asked for eight things in the Meet add-on (reactions with keys and
+agree or disagree, content shown without screen sharing, who answered
+and where people are, attendance, code and agents in the call, richer
+chat, badges for skills, and a rooms dashboard on the main stage), read
+against the Active Learning Forum chapter (research/notes/active-learning-notes.md).
+Some of these come near earlier rules, and his newer, explicit request
+wins; each is built the human-shaped way:
+
+- **Attendance** is a live roster of who has the class open, so the
+  teacher can welcome whoever is missing. It is never stored, never
+  reads cameras, and never becomes a record of absence. This narrows
+  "never build attendance tracking": presence while the call runs, yes;
+  a register, no.
+- **Reactions and stance** are sent by a person, never measured about
+  them, and are not stored or counted per person.
+- **Where people are on the path** shows only what each person chose to
+  share.
+- **Chat** stays the cohort's GitHub Discussion; no second chat space.
+- **Badges** are recognition for a named skill at a named moment, with
+  no points, counts, or ranking.
+- **Agents** never join the call. A person's own agent can read the
+  class, and what it says reaches others only when that person shares
+  it, marked as AI.
+

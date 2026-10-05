@@ -2369,6 +2369,29 @@ def main():
     as_user("ben").execute("delete from public.questions where id = %s", (cohort_q,))
     check("deleting a bank question leaves what was asked from it",
           rows_as("ben", "select question_id, prompt from public.live_checks where id = %s", (k_rank,)) == [(None, "Order these")])
+    # The class channel (R10, R11): reactions, stance, and presence for
+    # one cohort, sent by people in it, heard by people in it, and never
+    # by an agent or anyone outside.
+    def class_send(cur, t, extension="broadcast"):
+        cur.execute("select set_config('realtime.topic', %s, false)", (t,))
+        return attempt(cur, "insert into realtime.messages (topic, extension, event, payload) values (%s, %s, 'react', '{}')", (t, extension))
+    def class_hears(name, t):
+        sur = conn.cursor(); sur.execute("reset role")
+        sur.execute("insert into realtime.messages (topic, extension, event, payload) values (%s, 'broadcast', 'react', '{}')", (t,))
+        cur = as_user(name)
+        cur.execute("select set_config('realtime.topic', %s, false)", (t,))
+        cur.execute("select count(*) from realtime.messages where topic = %s", (t,))
+        return cur.fetchone()[0] > 0
+    ct = "class:" + str(bc)
+    check("a student sends a reaction on their cohort's class channel", class_send(as_user("bea"), ct))
+    check("and is present on it", class_send(as_user("bea"), ct, "presence"))
+    check("the teacher sends on it too", class_send(as_user("ben"), ct))
+    check("someone outside the cohort cannot send on it", not class_send(as_user("dee"), ct))
+    check("an agent cannot send on it, even for a student", not class_send(as_agent("bea"), ct))
+    check("a student hears the class channel", class_hears("bea", ct))
+    check("someone outside the cohort hears nothing on it", not class_hears("dee", ct))
+    check("the public hears nothing on it", not attempt(as_user(None), "select count(*) from realtime.messages where topic = %s", (ct,)) or last_rows == [(0,)])
+    check("a channel that is not a cohort's lets no one send", not class_send(as_user("bea"), "class:not-a-cohort"))
     as_user("ben").execute("update public.cohorts set status = 'finished' where id = %s", (bc,))
     su10 = conn.cursor(); su10.execute("reset role")
     su10.execute("select (select count(*) from public.live_checks where cohort_id = %s), (select count(*) from public.questions where id = %s)", (bc, own_q))

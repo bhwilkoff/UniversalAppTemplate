@@ -399,6 +399,43 @@ October 3, after every C milestone that does not wait on Ben merged):
   cohorts as mentors, and enrollments are marked finished. 2 days,
   migration. Building now.
 
+**Active learning in the add-on (October 5, 2026, night).** Ben's eight
+requests for the Meet add-on, read against the Active Learning Forum
+chapter he shared (research/notes/active-learning-notes.md, which says
+how each is built and why). One milestone per tick, each verified
+(node tests, the policy tests for any migration, screenshots of the
+panel at 360px and the stage at 1280px) and pushed before the next.
+
+- **R10, reactions and stance:** the panel's reaction row with number
+  keys (1 smile, 2 laugh, 3 love, 4 clap, 5 snaps, 6 pondering, 7 mind
+  blown, 8 frown), and agree, unsure, disagree held with A, U, D; sent
+  by Realtime broadcast on the cohort's private `class:<cohort id>`
+  channel, floated on every open main stage, the stance shown as a live
+  bar. Nothing stored. **Built October 5:** migration
+  20261005010000_class_channel.sql (applied; 689 policy checks, which
+  fail when the send rule is opened), assets/react-lib.js (6 tests),
+  assets/class-channel.js, the panel's reaction bar, the stage's floats
+  and stance bar. Seen on a test page; not yet in a real call.
+- **R11, the room at a glance:** Realtime presence on the cohort's
+  channel; the teacher's panel and the stage overlay show who is here,
+  who is not yet, who answered the question on the stage, and the path
+  stage each person chose to share. Live only. (pending)
+- **R12, rooms on the main stage:** a `rooms` stage mode and a rooms
+  view on /cohort/ for the teacher. (pending)
+- **R13, content on the stage:** PDF and image pages placed on the
+  scene's board (annotate, zoom, together or locked), from an upload or
+  the teacher's GitHub library folder. (pending)
+- **R14, code and agents:** a code scene everyone can run and change in
+  their own browser; "Share what my agent said," marked AI; the MCP
+  server's `live_now` tool. (pending)
+- **R15, conversation:** replies and GitHub reactions on the session's
+  Discussion in the panel; a quick poll from the panel. (pending)
+- **R16, recognition:** a teacher names a skill a person showed, with
+  the moment; shown on the class page; carried into credential evidence.
+  (pending)
+- **R17, the rerun:** ask a question again and show how answers moved.
+  (pending)
+
 ## Needs Ben
 
 - **Decisions from the milestones,** all with a default already built:

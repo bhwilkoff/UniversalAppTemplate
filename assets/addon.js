@@ -234,6 +234,7 @@
           startShow();
           startRooms();
           startSignals(res[2].data);
+          startClass();
           drawPart(true);
           show('ready');
           return refreshLive().then(listen);
@@ -286,6 +287,24 @@
       drawThreadActivity();
     }
     drawBoardActivity();
+  }
+
+  // ------------------------------------------------------------------
+  // The class channel (R10, R11): reactions, stance, and who is here.
+  // What it hears goes to this person's own main stage when it is open.
+  // ------------------------------------------------------------------
+
+  function startClass() {
+    if (!window.ClassChannel || S.classChannel) return;
+    S.classChannel = window.ClassChannel.start({
+      db: db, auth: current, cohort: S.cohort, me: S.me, name: S.names[S.me.id] || null,
+      mount: $('[data-react]'),
+      onStage: function (payload) {
+        if (!S.stageOn || !side) return;
+        try { Promise.resolve(side.notifyMainStage(payload)).catch(function () {}); } catch (e) {}
+      },
+      onPresence: function (state) { S.presence = state; }
+    });
   }
 
   function drawCounts() {
