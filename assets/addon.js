@@ -303,8 +303,51 @@
         if (!S.stageOn || !side) return;
         try { Promise.resolve(side.notifyMainStage(payload)).catch(function () {}); } catch (e) {}
       },
-      onPresence: function (state) { S.presence = state; }
+      onPresence: function (state) {
+        S.presence = state;
+        drawRoster();
+        if (S.onStage && S.onStage.kind === 'path') sendStage();
+      }
     });
+  }
+
+  function rosterNow() {
+    var RL = window.RosterLib;
+    if (!RL) return null;
+    var people = S.people.map(function (p) { return { user_id: p.user_id, name: S.names[p.user_id] || 'Someone' }; });
+    return RL.roster(people, S.presence || {}, S.answers, RL.askingNow(S.checks, S.onStage));
+  }
+
+  // The teacher's roster: one line, opened for names. It is drawn from
+  // presence while the call runs, and it never writes anything down.
+  function drawRoster() {
+    var box = $('[data-roster]'), RL = window.RosterLib;
+    if (!S.teaching || !RL || !box) return;
+    var r = rosterNow(), asking = RL.askingNow(S.checks, S.onStage);
+    box.hidden = false;
+    var open = box.querySelector('details') && box.querySelector('details').open;
+    box.replaceChildren();
+    var d = el('details'); d.open = !!open;
+    d.appendChild(el('summary', null, RL.summary(r, asking)));
+    function list(title, rows, missing) {
+      if (!rows.length) return;
+      d.appendChild(el('p', 'kicker', title));
+      var ul = el('ul', 'roster-list');
+      rows.forEach(function (x) {
+        var li = el('li', missing ? 'is-missing' : null);
+        li.appendChild(el('span', 'roster-name', x.name));
+        if (x.stage) li.appendChild(el('span', 'roster-stage', RL.STAGE_SHORT[x.stage]));
+        if (asking) li.appendChild(el('span', x.answered ? 'roster-answered' : 'roster-waiting', x.answered ? 'Answered' : 'Not yet'));
+        ul.appendChild(li);
+      });
+      d.appendChild(ul);
+    }
+    list('Here now', r.here, false);
+    list('Not here yet', r.missing, true);
+    var acts = el('div', 'actions');
+    acts.appendChild(stageToggle('path', undefined, 'Put where everyone is on the main stage', 'Take it off the main stage'));
+    d.appendChild(acts);
+    box.appendChild(d);
   }
 
   function drawCounts() {
@@ -637,6 +680,7 @@
         render('[data-checks]', drawChecks);
         drawSceneQuestion();
         drawCounts();
+        drawRoster();
         sendStage();
       });
     });
@@ -665,7 +709,7 @@
   function setPin(v) {
     S.onStage = v;
     if (S.run && S.run.shared && S.teaching) S.run.pin(v);
-    drawQueue(); drawChecks(); sendStage(); drawRunInfo();
+    drawQueue(); drawChecks(); drawRoster(); sendStage(); drawRunInfo();
   }
 
   // Whose work is on the main stage, for everyone, and, for a teacher,
@@ -921,7 +965,8 @@
     return A.stageView({
       part: part ? { key: part.key, name: part.name, endsAt: endsNow() } : null,
       onStage: S.onStage, checks: S.checks, results: S.results, items: S.items, names: S.names, audience: V ? V.audienceOf(part) : null,
-      welcome: lib.welcome(S.cohort, S.session, S.parts), scene: scene
+      welcome: lib.welcome(S.cohort, S.session, S.parts), scene: scene,
+      path: window.RosterLib && S.onStage && S.onStage.kind === 'path' ? window.RosterLib.pathView(rosterNow()) : null
     });
   }
   function sendStage() {

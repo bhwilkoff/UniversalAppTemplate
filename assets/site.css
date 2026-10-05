@@ -1656,3 +1656,25 @@ label.check { min-height: 2.25rem; }
 .stance-part.unsure { background: var(--edge); }
 .stance-part.disagree { background: var(--clay); border-radius: 0 999px 999px 0; }
 .stance-key { display: flex; justify-content: space-between; margin: 0.4vmin 0 0; font-size: clamp(0.75rem, 1.4vmin, 1rem); color: var(--muted); font-weight: 600; }
+
+/* The room at a glance (R11): the teacher's roster in the panel, and
+   everyone's "where I am on the path". */
+.roster { border: 1px solid var(--rule); border-radius: var(--radius); background: var(--card); padding: 0.6rem 0.8rem; }
+.roster summary { font-weight: 600; cursor: pointer; }
+.roster .kicker { margin: 0.75rem 0 0.35rem; font-size: 0.85rem; }
+.roster-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.3rem; }
+.roster-list li { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.35rem 0.5rem; font-size: 0.95rem; }
+.roster-list li.is-missing .roster-name { color: var(--muted); }
+.roster-name { font-weight: 600; margin-right: auto; }
+.roster-stage, .roster-answered, .roster-waiting { font-size: 0.78rem; font-weight: 600; border-radius: 999px; padding: 0.05rem 0.5rem; }
+.roster-stage { background: var(--surface); color: var(--ink); }
+.roster-answered { background: #3F7A4F; color: #fff; }
+.roster-waiting { border: 1px solid var(--rule); color: var(--muted); }
+.path-pick { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; font-size: 0.9rem; font-weight: 600; }
+.path-pick select { min-height: 36px; max-width: 60%; font: inherit; font-weight: 400; border: 1px solid var(--rule); border-radius: 8px; background: var(--card); color: var(--ink); padding: 0 0.4rem; }
+.stage-path { list-style: none; margin: 3vmin 0 2vmin; padding: 0; display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 1.5vmin; align-items: end; height: 42vh; }
+.stage-path li { display: grid; grid-template-rows: auto 1fr auto; gap: 1vmin; height: 100%; text-align: center; }
+.stage-path .count { font-size: clamp(1.2rem, 3vmin, 2.4rem); font-weight: 680; }
+.stage-path .col { display: flex; align-items: flex-end; background: var(--surface); border-radius: 10px; overflow: hidden; }
+.stage-path .bar { display: block; width: 100%; height: var(--share); background: var(--clay); border-radius: 10px 10px 0 0; transition: height 0.6s ease; }
+.stage-path .label { font-size: clamp(0.7rem, 1.6vmin, 1.1rem); font-weight: 600; color: var(--muted); line-height: 1.2; }

@@ -161,7 +161,7 @@
     if (!stage || stage === 'scene') return null;
     if (stage === 'answers') return { kind: 'check', id: state.stage_ref };
     if (stage === 'presenter') return { kind: 'item', id: state.stage_ref };
-    if (stage === 'welcome' || stage === 'blank') return { kind: stage };
+    if (stage === 'welcome' || stage === 'blank' || stage === 'path' || stage === 'rooms') return { kind: stage };
     return null;
   }
 
@@ -171,7 +171,7 @@
     if (!onStage) return { stage: 'scene', stage_ref: null };
     if (onStage.kind === 'check') return { stage: 'answers', stage_ref: onStage.id };
     if (onStage.kind === 'item') return { stage: 'presenter', stage_ref: onStage.id };
-    if (onStage.kind === 'welcome' || onStage.kind === 'blank') return { stage: onStage.kind, stage_ref: null };
+    if (['welcome', 'blank', 'path', 'rooms'].indexOf(onStage.kind) >= 0) return { stage: onStage.kind, stage_ref: null };
     return { stage: 'scene', stage_ref: null };
   }
 

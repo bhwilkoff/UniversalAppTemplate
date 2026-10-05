@@ -75,6 +75,9 @@ test('the main stage follows the scene unless the teacher pins something, and ba
   assert.deepEqual(S.pinOf({ stage: 'answers', stage_ref: 'k1' }), { kind: 'check', id: 'k1' });
   assert.deepEqual(S.pinOf({ stage: 'presenter', stage_ref: 'q1' }), { kind: 'item', id: 'q1' });
   assert.deepEqual(S.pinOf({ stage: 'welcome' }), { kind: 'welcome' });
+  assert.deepEqual(S.pinOf({ stage: 'path' }), { kind: 'path' });
+  assert.deepEqual(S.pinOf({ stage: 'rooms' }), { kind: 'rooms' });
+  assert.deepEqual(S.stageChange({ kind: 'path' }), { stage: 'path', stage_ref: null });
   for (const pin of [null, { kind: 'check', id: 'k1' }, { kind: 'item', id: 'q1' }, { kind: 'welcome' }, { kind: 'blank' }]) {
     assert.deepEqual(S.pinOf(S.stageChange(pin)), pin, JSON.stringify(pin));
   }

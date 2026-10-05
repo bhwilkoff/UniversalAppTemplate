@@ -419,7 +419,13 @@ panel at 360px and the stage at 1280px) and pushed before the next.
 - **R11, the room at a glance:** Realtime presence on the cohort's
   channel; the teacher's panel and the stage overlay show who is here,
   who is not yet, who answered the question on the stage, and the path
-  stage each person chose to share. Live only. (pending)
+  stage each person chose to share. Live only. **Built October 5:**
+  assets/roster-lib.js (3 tests), the teacher's roster in the panel
+  (here now, not here yet, answered or not, path stage), "Where I am on
+  the path" beside the reactions (shared by choice, remembered in the
+  browser), and a 'path' main stage of columns with counts and no names.
+  Migration 20261005020000_stage_path_rooms.sql (applied; 692 policy
+  checks) lets show_state pin 'path' and 'rooms'.
 - **R12, rooms on the main stage:** a `rooms` stage mode and a rooms
   view on /cohort/ for the teacher. (pending)
 - **R13, content on the stage:** PDF and image pages placed on the
@@ -428,8 +434,23 @@ panel at 360px and the stage at 1280px) and pushed before the next.
 - **R14, code and agents:** a code scene everyone can run and change in
   their own browser; "Share what my agent said," marked AI; the MCP
   server's `live_now` tool. (pending)
-- **R15, conversation:** replies and GitHub reactions on the session's
-  Discussion in the panel; a quick poll from the panel. (pending)
+- **R15, in-class chat that lives in GitHub:** Ben, October 5: "In-class
+  messages/chat is different than ongoing discussion. I don't think there
+  is any way to bring in the chat from Github, that would be INCREDIBLE.
+  If not, we may need to build upon the in-class messages that are a
+  default part of google meet." Meet's own chat cannot be read or written
+  by an add-on (the Add-ons SDK has no chat, and the Meet REST API has
+  participants, recordings, transcripts, and smart notes, but no chat;
+  only a Chrome extension scraping Meet's page could, which every student
+  would have to install and which breaks without notice). So the panel
+  gets its own in-class chat whose every message is a comment on a
+  "Week N, in class" Discussion in the cohort's repository, apart from
+  the session's ongoing discussion: replies are GitHub's threaded
+  replies, reactions are GitHub's, quick polls are run-of-show
+  questions, and the class channel nudges every panel the moment a
+  message lands, so it feels live and stays in GitHub afterward. Each
+  person connects GitHub once per call in the panel (the panel's
+  sign-in deliberately carries no GitHub token). (pending)
 - **R16, recognition:** a teacher names a skill a person showed, with
   the moment; shown on the class page; carried into credential evidence.
   (pending)

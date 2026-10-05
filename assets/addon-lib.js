@@ -138,6 +138,8 @@
     // The run of show (R3): a stage the teacher cleared, or the current
     // scene as the class builder previews it (ShowLib.stagePreview).
     if (on && on.kind === 'blank') return { mode: 'blank', part: part };
+    // Where everyone said they are on the path (R11): counts, never names.
+    if (on && on.kind === 'path') return { mode: 'path', part: part, path: pathOf(state.path) };
     if (!on && state.scene) { var sc = sceneOf(state.scene); if (sc) return { mode: 'scene', part: part, scene: sc }; }
     return { mode: 'part', part: part };
   }
@@ -204,9 +206,19 @@
     if (v.mode === 'welcome') { var w = welcomeOf(v.welcome); return w ? { mode: 'welcome', part: part, welcome: w } : null; }
     if (v.mode === 'part') return { mode: 'part', part: part };
     if (v.mode === 'blank') return { mode: 'blank', part: part };
+    if (v.mode === 'path') return { mode: 'path', part: part, path: pathOf(v.path) };
     if (v.mode === 'scene') { var sc = sceneOf(v.scene); return sc ? { mode: 'scene', part: part, scene: sc } : null; }
     return null;
   }
+  // The path view's rows (RosterLib.pathView): a label, a count, and a
+  // share of the longest bar, for each stage, and how many are sharing.
+  function pathOf(p) {
+    var rows = p && Array.isArray(p.rows) ? p.rows.slice(0, 12).filter(function (r) { return r && typeof r.label === 'string'; }).map(function (r) {
+      return { label: cut(r.label, 40), count: Math.max(0, Number(r.count) | 0), share: Math.max(0, Math.min(100, Number(r.share) | 0)) };
+    }) : [];
+    return { rows: rows, sharing: Math.max(0, Number(p && p.sharing) | 0) };
+  }
+
   // The stage asks the panel for what to show when it opens, because a
   // message only reaches a frame that is already listening.
   var HELLO = JSON.stringify({ type: STAGE + '-hello', v: 1 });

@@ -2167,6 +2167,12 @@ def main():
           not attempt(ben, "update public.show_state set stage = 'answers', stage_ref = null where session_id = %s", (r1,)))
     check("the main stage can only show what it knows how to",
           not attempt(ben, "update public.show_state set stage = 'video', stage_ref = null where session_id = %s", (r1,)))
+    check("a teacher puts where everyone is on the path on the main stage",
+          attempt(ben, "update public.show_state set stage = 'path', stage_ref = null where session_id = %s returning stage", (r1,)) and last_rows == [("path",)])
+    check("and every rehearsal room at a glance",
+          attempt(ben, "update public.show_state set stage = 'rooms', stage_ref = null where session_id = %s returning stage", (r1,)) and last_rows == [("rooms",)])
+    check("neither names a row",
+          not attempt(ben, "update public.show_state set stage = 'rooms', stage_ref = %s where session_id = %s", (rk, r1)))
     check("a teacher returns the main stage to following the scene",
           attempt(ben, "update public.show_state set stage = 'scene', stage_ref = null where session_id = %s returning stage", (r1,)) and last_rows == [("scene",)])
     check("a show cannot move to another session",

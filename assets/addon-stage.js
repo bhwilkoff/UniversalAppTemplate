@@ -72,6 +72,19 @@
       $('[data-count-total]').hidden = !count;
       $('[data-count-total]').textContent = count ? L.counted(count.total, 'answer', 'answers') + ' so far, with no names.' : '';
     }
+    if (view.mode === 'path') {
+      var pr = $('[data-path-rows]'); pr.replaceChildren();
+      view.path.rows.forEach(function (row) {
+        var li = el('li');
+        li.appendChild(el('span', 'count', String(row.count)));
+        var col = el('span', 'col'); var bar = el('span', 'bar'); bar.style.setProperty('--share', row.share + '%'); col.appendChild(bar); li.appendChild(col);
+        li.appendChild(el('span', 'label', row.label));
+        pr.appendChild(li);
+      });
+      $('[data-path-note]').textContent = view.path.sharing
+        ? L.counted(view.path.sharing, 'person', 'people') + ' chose to say where they are. Anyone can, from the panel.'
+        : 'Nobody has said where they are yet. Anyone can, from the panel.';
+    }
     if (view.mode === 'welcome') {
       var w = view.welcome;
       $('[data-w-cohort]').textContent = w.cohort;

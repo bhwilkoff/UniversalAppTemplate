@@ -51,6 +51,24 @@
       stances.appendChild(b);
     });
     mount.appendChild(stances);
+    // Where I am on the path (R11), shared only if the person picks it,
+    // and remembered in this browser for the next call.
+    var RL = window.RosterLib, memKey = o.cohort ? 'hs-path-stage:' + o.cohort.id : null;
+    if (RL) {
+      var where = el('label', 'path-pick');
+      where.appendChild(el('span', null, 'Where I am on the path'));
+      var sel = el('select');
+      sel.appendChild(new Option('Not sharing', ''));
+      RL.STAGE_IDS.forEach(function (id) { sel.appendChild(new Option(RL.STAGE_SHORT[id], id)); });
+      try { var saved = memKey && localStorage.getItem(memKey); if (saved && RL.isStage(saved)) { sel.value = saved; extra.stage = saved; } } catch (e) {}
+      sel.addEventListener('change', function () {
+        extra.stage = sel.value || null;
+        try { if (memKey) { if (sel.value) localStorage.setItem(memKey, sel.value); else localStorage.removeItem(memKey); } } catch (e) {}
+        track();
+      });
+      where.appendChild(sel);
+      mount.appendChild(where);
+    }
     var line = el('p', 'react-line small', 'Keys 1 to 8 react, and A, U, and D say where you stand, while this panel has focus.');
     mount.appendChild(line);
 

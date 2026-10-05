@@ -213,3 +213,13 @@ test('a presenter on the main stage carries the audience’s part (R7)', () => {
   assert.deepEqual(lib.readStageMessage(lib.stageMessage(v)), v);
   assert.equal(lib.stageView({ onStage: { kind: 'item', id: 'i1' }, items, names: { u1: 'Bea' } }).audience, undefined);
 });
+
+test('the path view goes on the stage as counts only, in a checked shape', () => {
+  const path = { rows: [{ stage: '01', label: '01 Prototype', count: 3, share: 100, names: ['Bea'] }, { label: 7 }], sharing: 3 };
+  const v = lib.stageView({ onStage: { kind: 'path' }, path });
+  assert.equal(v.mode, 'path');
+  assert.deepEqual(v.path, { rows: [{ label: '01 Prototype', count: 3, share: 100 }], sharing: 3 });
+  const back = lib.readStageMessage(lib.stageMessage(v));
+  assert.deepEqual(back.path, v.path);
+  assert.equal(JSON.stringify(back).includes('Bea'), false);
+});

@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261005g">
+  <link rel="stylesheet" href="/assets/site.css?v=20261005h">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -80,6 +80,10 @@
         <p class="addon-mark"><span data-cohort-title></span></p>
         <p class="addon-where" data-where></p>
       </header>
+
+      <!-- The room at a glance (R11), for the teacher: who is here, who is
+           not yet, who answered, and where people said they are. Live only. -->
+      <section class="roster" aria-label="Who is here" data-roster hidden></section>
 
       <!-- Live signals (C1, H4): where everyone should be, the teacher's
            card, who is on stage, and "recording now", the same lines /live/
@@ -186,6 +190,7 @@
   <script src="/assets/google-signin.js" defer></script>
   <script src="/assets/show-run.js" defer></script>
   <script src="/assets/react-lib.js" defer></script>
+  <script src="/assets/roster-lib.js" defer></script>
   <script src="/assets/class-channel.js" defer></script>
   <script src="/assets/addon.js" defer></script>
 </body>
