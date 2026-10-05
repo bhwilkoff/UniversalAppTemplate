@@ -255,12 +255,20 @@
       setTimeout(function () { S.api.scrollToContent(S.api.getSceneElements(), { fitToViewport: true, viewportZoomFactor: 0.8 }); }, 50);
     }
     var v = S.X.getSceneVersion(elements);
-    if (v === S.lastVersion) return;
+    var same = v === S.lastVersion;
     S.lastVersion = v;
     if (!canDraw()) return;
+    // The same version can still hold a change of this page's own: when
+    // someone else's stroke is merged in the same moment as this page's
+    // last edit, the merge counts that edit in the version before this
+    // page has sent it. So an unchanged version still checks for unsent
+    // elements (found October 4: two people drawing at once could settle
+    // a version apart and stay that way).
+    if (same && !hasUnsent(elements)) return;
     sendScene();
     saveSoon();
   }
+  function hasUnsent(elements) { return B.unsent(B.syncable(elements), S.seen).length > 0; }
 
   // Elements from someone else, merged the way Excalidraw's own
   // collaboration merges them. Marking them seen first keeps this page
@@ -274,6 +282,9 @@
     var merged = X.reconcileElements(local, restored, S.api.getAppState());
     S.lastVersion = X.getSceneVersion(merged);
     S.api.updateScene({ elements: merged, captureUpdate: X.CaptureUpdateAction.NEVER });
+    // An edit of this page's own that the merge carried along still goes
+    // to everyone and is saved.
+    if (canDraw() && hasUnsent(merged)) { sendScene(); saveSoon(); }
   }
 
   // ------------------------------------------------------------------
@@ -337,6 +348,7 @@
         var msg = m.payload || {};
         if (B.sameGeneration(msg, S.board)) applyRemote(msg.elements);
         else if (msg.gen > S.board.generation) reread();
+        catchUpSoon();
       })
       .on('broadcast', { event: 'pointer' }, function (m) { showPointer(m.payload); })
       .on('broadcast', { event: 'board' }, function () { reread(); })
@@ -367,6 +379,18 @@
       syncLine();
     });
   }
+
+  // Realtime broadcast does not promise every message arrives, so a lost
+  // stroke would leave two screens a version apart for good (found
+  // October 4). Each page reads the saved board once when the strokes
+  // from others stop, after the sender's next save has landed, and every
+  // half minute while live: about one read a second for twenty people.
+  var catchUpTimer = null;
+  function catchUpSoon() {
+    clearTimeout(catchUpTimer);
+    catchUpTimer = setTimeout(function () { if (S.live) reread(); }, B.CATCH_UP_AFTER);
+  }
+  setInterval(function () { if (S.live && !document.hidden) reread(); }, B.CATCH_UP_EVERY);
 
   function poll(on) {
     if (on && !S.poller) S.poller = setInterval(reread, POLL);

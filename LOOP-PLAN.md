@@ -1148,6 +1148,22 @@ student).
   room's notes" (rooms keep no notes today) and the session thread
   inside the follow-up (reading it needs the teacher's GitHub token,
   which /teach/ does not hold). Not yet tried signed in.
+- **The board's "both draw at once" flake, found and fixed (October 4
+  to 5, cloud session):** two real bugs, not test timing. (1) When
+  someone else's stroke was merged in the same moment as this page's
+  last edit, the merge counted the edit in the scene's version before
+  the page sent it, and onChange then skipped it; an unchanged version
+  now still checks for unsent elements, and a merge that carried an
+  unsent edit sends it. (2) Realtime broadcast does not promise every
+  message arrives, and a live page never read the saved board, so one
+  lost message left two screens a version apart for good; a live page
+  now reads the saved board once 6.5 seconds after strokes from others
+  stop (after the sender's next save) and every 30 seconds (BoardLib.
+  CATCH_UP_AFTER and CATCH_UP_EVERY; about one read a second for twenty
+  people). The dropped-connection check now waits for the presenter's
+  strokes before asserting the other page missed them. Before: "both
+  draw at once" failed 3 runs in 4 here. After: 12 of 12 full runs of
+  tools/board/sync-check.mjs passed (25 checks each).
 
 ## Handoff (October 4, 2026, evening)
 
@@ -1181,14 +1197,12 @@ signed in there, a rehearsal room's clock, the wings, and the
 follow-ups afterwards), and then the listing
 (tools/meet-addon/LISTING.md).
 
-The one unblocked item left for a cloud session: the board's two-page
-check (tools/board/sync-check.mjs) fails "both draw at once" about
-three runs in four in the cloud container, on code from before R5 as
-well. Find whether it is the check's timing or a real convergence bug,
-and fix whichever it is. After that, the loop has nothing it can do
-without Ben, and should stop and say so. The loop arms each next tick
-with send_later, which survives a container restart (ScheduleWakeup
-did not).
+The board's "both draw at once" flake was two real bugs, now fixed
+(see the log). Nothing unblocked is left for a cloud session: the loop
+stopped on October 5 and waits on Ben (the R4 migration and mcp deploy
+on this Mac, then a real call). Restart it with /loop when there is
+more to build. Each tick arms the next with send_later, which survives
+a container restart (ScheduleWakeup did not).
 
 What only this Mac has: ~/.humanshaped/supabase-token (Management API),
 ~/.humanshaped/credential-key-1.json (signing), ~/.humanshaped/test-student,

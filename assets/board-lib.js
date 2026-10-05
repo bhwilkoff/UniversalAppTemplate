@@ -12,6 +12,11 @@
   // Each page saves this often while someone is drawing, and again when
   // the person leaves.
   var SAVE_EVERY = 5000;
+  // While live, a page reads the saved board this long after the last
+  // stroke from someone else arrives (after their next save), and this
+  // often in any case, so a lost broadcast message is made good.
+  var CATCH_UP_AFTER = SAVE_EVERY + 1500;
+  var CATCH_UP_EVERY = 30000;
   // The free plan allows 100 messages a second across the project, so
   // the board keeps a cohort's strokes and pointers well under half of it.
   var MESSAGES_PER_SECOND = 40;
@@ -302,7 +307,7 @@
   }
 
   var lib = {
-    DAY: DAY, MAX_MESSAGE_BYTES: MAX_MESSAGE_BYTES, SAVE_EVERY: SAVE_EVERY, MESSAGES_PER_SECOND: MESSAGES_PER_SECOND,
+    DAY: DAY, MAX_MESSAGE_BYTES: MAX_MESSAGE_BYTES, SAVE_EVERY: SAVE_EVERY, CATCH_UP_AFTER: CATCH_UP_AFTER, CATCH_UP_EVERY: CATCH_UP_EVERY, MESSAGES_PER_SECOND: MESSAGES_PER_SECOND,
     params: params, pickSession: pickSession, topic: topic, link: link,
     TEMPLATES: TEMPLATES, template: template, templateElements: templateElements, needsTemplate: needsTemplate,
     unsent: unsent, markSeen: markSeen, syncable: syncable, keepLocal: keepLocal, merge: merge,

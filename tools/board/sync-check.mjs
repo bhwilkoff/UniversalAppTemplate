@@ -238,10 +238,12 @@ check('moving a shape reaches the other screen as the newer version', await unti
 
 // Both draw at the same moment.
 await Promise.all([drawRect(ben, 320, 420, 420, 500), drawRect(bea, 900, 420, 1020, 520)]);
+// Realtime may drop a message, so the screens may settle through the
+// saved board instead: after the next save and the catch-up read.
 check('when both draw at once, both screens settle on the same four elements', await until(async () => {
   const a = await sceneAll(ben), b = await sceneAll(bea);
   return a === b && (await scene(ben)).length === 4;
-}));
+}, BoardLib.SAVE_EVERY + BoardLib.CATCH_UP_AFTER + 4000));
 
 check('the board is saved, element by element, within a few seconds', await until(async () => {
   const saved = board.scene.elements.filter(e => !e.isDeleted).map(e => e.id + '@' + e.version).sort().join();
@@ -255,7 +257,9 @@ beaInfo.dropped = true;
 await bea.evaluate((t) => window.__fakeStatus(t, 'CHANNEL_ERROR'), beaInfo.topic);
 await drawRect(ben, 700, 120, 800, 170);
 await drawLine(ben, 300, 560, 380, 600);
-const missed = await until(async () => (await scene(bea)).length === 4 && (await scene(ben)).length === 6, 3000);
+// Ben's strokes may take a while on a busy computer; once he has them
+// all, Bea, with no connection, must not.
+const missed = await until(async () => (await scene(ben)).length === 6, 10000) && (await scene(bea)).length === 4;
 await until(async () => board.scene.elements.filter(e => !e.isDeleted).length === 6, 12000);
 beaInfo.dropped = false;
 await bea.evaluate((t) => window.__fakeStatus(t, 'SUBSCRIBED'), beaInfo.topic);
