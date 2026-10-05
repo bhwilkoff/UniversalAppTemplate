@@ -1337,6 +1337,18 @@ def main():
     fay = as_user("fay")
     fay.execute("select discussion_number from public.sessions where id = %s", (b1,))
     check("everyone in the cohort reads which thread is the session's", fay.fetchall() == [(7,)])
+    # The in-class chat (R15, migration 20261005040000): its own
+    # discussion, set by a teacher alone, and one per session.
+    def chat_of(name, sid):
+        cur = as_user(name); cur.execute("select chat_number from public.sessions where id = %s", (sid,)); return cur.fetchall()
+    as_user("bea").execute("update public.sessions set chat_number = 8 where id = %s", (b1,))
+    check("a student cannot set the session's in-class chat", chat_of("ben", b1) == [(None,)])
+    as_agent("ben").execute("update public.sessions set chat_number = 8 where id = %s", (b1,))
+    check("a teacher's agent cannot either", chat_of("ben", b1) == [(None,)])
+    check("a teacher sets the session's in-class chat",
+          attempt(as_user("ben"), "update public.sessions set chat_number = 8 where id = %s returning chat_number", (b1,)) and last_rows == [(8,)])
+    check("one chat belongs to one session", not attempt(as_user("ben"), "update public.sessions set chat_number = 8 where id = %s", (b2,)))
+    check("everyone in the cohort reads which discussion is the chat", chat_of("fay", b1) == [(8,)])
 
     ben = as_user("ben")
     ben.execute("update public.cohorts set status = 'finished' where id = %s", (bc,))
