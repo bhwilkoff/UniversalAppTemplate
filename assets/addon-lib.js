@@ -140,6 +140,9 @@
     if (on && on.kind === 'blank') return { mode: 'blank', part: part };
     // Where everyone said they are on the path (R11): counts, never names.
     if (on && on.kind === 'path') return { mode: 'path', part: part, path: pathOf(state.path) };
+    // Every rehearsal room at a glance (R12): its name, where its turns
+    // are, its step's clock, and whether it asked for the teacher.
+    if (on && on.kind === 'rooms') return { mode: 'rooms', part: part, rooms: roomsOf(state.rooms) };
     if (!on && state.scene) { var sc = sceneOf(state.scene); if (sc) return { mode: 'scene', part: part, scene: sc }; }
     return { mode: 'part', part: part };
   }
@@ -207,6 +210,7 @@
     if (v.mode === 'part') return { mode: 'part', part: part };
     if (v.mode === 'blank') return { mode: 'blank', part: part };
     if (v.mode === 'path') return { mode: 'path', part: part, path: pathOf(v.path) };
+    if (v.mode === 'rooms') return { mode: 'rooms', part: part, rooms: roomsOf(v.rooms) };
     if (v.mode === 'scene') { var sc = sceneOf(v.scene); return sc ? { mode: 'scene', part: part, scene: sc } : null; }
     return null;
   }
@@ -217,6 +221,13 @@
       return { label: cut(r.label, 40), count: Math.max(0, Number(r.count) | 0), share: Math.max(0, Math.min(100, Number(r.share) | 0)) };
     }) : [];
     return { rows: rows, sharing: Math.max(0, Number(p && p.sharing) | 0) };
+  }
+
+  // The rooms view's rows, from RoomBoard's onChange: at most twelve.
+  function roomsOf(list) {
+    return (Array.isArray(list) ? list : []).slice(0, 12).filter(function (r) { return r && typeof r.name === 'string'; }).map(function (r) {
+      return { name: cut(r.name, 60), text: cut(r.text || '', 160), endsAt: num(r.endsAt), asking: !!r.asking, done: !!r.done };
+    });
   }
 
   // The stage asks the panel for what to show when it opens, because a

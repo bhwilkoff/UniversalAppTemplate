@@ -113,7 +113,11 @@
         var g = opts.groups.filter(function (x) { return x.id === c.id; })[0];
         var order = orderOf(g);
         var place = R.placeText(c.state, order, turn, opts.nameOf);
-        byGroup[c.id] = { step: c.state && !place.done ? c.state.step : null, presenter: place.presenter || null, done: place.done, asking: !!c.helpAt };
+        // What the main stage's rooms view shows of this room (R12).
+        var stepNow = place.started && !place.done ? turn[Math.min(c.state.step, steps - 1)] : null;
+        var startedAt = rowOf(c.id) && rowOf(c.id).step_started_at ? Date.parse(rowOf(c.id).step_started_at) : NaN;
+        byGroup[c.id] = { step: c.state && !place.done ? c.state.step : null, presenter: place.presenter || null, done: place.done, asking: !!c.helpAt,
+          name: c.name, text: place.text, endsAt: stepNow && stepNow.seconds && isFinite(startedAt) ? startedAt + stepNow.seconds * 1000 : null };
         var card = el('article', 'room-card' + (c.helpAt ? ' is-asking' : ''));
         card.setAttribute('data-group', c.id);
         card.appendChild(el('h3', null, opts.teaching || !c.mine ? c.name : 'Your group, ' + c.name));

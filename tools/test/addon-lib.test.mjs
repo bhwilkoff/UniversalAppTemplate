@@ -223,3 +223,12 @@ test('the path view goes on the stage as counts only, in a checked shape', () =>
   assert.deepEqual(back.path, v.path);
   assert.equal(JSON.stringify(back).includes('Bea'), false);
 });
+
+test('every rehearsal room goes on the stage in a checked shape', () => {
+  const rooms = [{ name: 'Group 1', text: 'Bea is presenting. Step 2 of 4.', endsAt: 1700000000000, asking: true, done: false, secret: 'x' }, { nope: 1 }];
+  const v = lib.stageView({ onStage: { kind: 'rooms' }, rooms });
+  assert.equal(v.mode, 'rooms');
+  assert.deepEqual(v.rooms, [{ name: 'Group 1', text: 'Bea is presenting. Step 2 of 4.', endsAt: 1700000000000, asking: true, done: false }]);
+  assert.deepEqual(lib.readStageMessage(lib.stageMessage(v)).rooms, v.rooms);
+  assert.equal(lib.stageView({ onStage: { kind: 'rooms' }, rooms: Array.from({ length: 20 }, (_, i) => ({ name: 'G' + i })) }).rooms.length, 12);
+});

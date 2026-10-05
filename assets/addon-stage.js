@@ -72,6 +72,18 @@
       $('[data-count-total]').hidden = !count;
       $('[data-count-total]').textContent = count ? L.counted(count.total, 'answer', 'answers') + ' so far, with no names.' : '';
     }
+    if (view.mode === 'rooms') {
+      var grid = $('[data-rooms-grid]'); grid.replaceChildren();
+      if (!view.rooms.length) grid.appendChild(el('li', 'stage-quiet', 'No room has started its turns yet.'));
+      view.rooms.forEach(function (r) {
+        var li = el('li', 'stage-room' + (r.asking ? ' is-asking' : '') + (r.done ? ' is-done' : ''));
+        li.appendChild(el('h2', null, r.name));
+        li.appendChild(el('p', 'stage-room-place', r.text));
+        var c = el('p', 'stage-room-clock'); c.setAttribute('data-ends', r.endsAt == null ? '' : String(r.endsAt)); li.appendChild(c);
+        if (r.asking) li.appendChild(el('p', 'stage-room-asking', 'Would like the teacher'));
+        grid.appendChild(li);
+      });
+    }
     if (view.mode === 'path') {
       var pr = $('[data-path-rows]'); pr.replaceChildren();
       view.path.rows.forEach(function (row) {
@@ -152,6 +164,12 @@
 
   function tick() {
     if (!view) return;
+    root.querySelectorAll('[data-ends]').forEach(function (p) {
+      var ends = Number(p.getAttribute('data-ends'));
+      var left = p.getAttribute('data-ends') ? A.timeLeft(ends, Date.now()) : null;
+      p.textContent = left == null ? '' : left ? L.clock(left) + ' left in this step' : 'Time to move on';
+      p.classList.toggle('is-over', left === 0);
+    });
     var t = clockText(view.part);
     $('[data-clock]').textContent = t ? ', ' + t : '';
     $('[data-clock-big]').textContent = t;

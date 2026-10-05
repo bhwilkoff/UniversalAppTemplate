@@ -427,7 +427,13 @@ panel at 360px and the stage at 1280px) and pushed before the next.
   Migration 20261005020000_stage_path_rooms.sql (applied; 692 policy
   checks) lets show_state pin 'path' and 'rooms'.
 - **R12, rooms on the main stage:** a `rooms` stage mode and a rooms
-  view on /cohort/ for the teacher. (pending)
+  view on /cohort/ for the teacher. **Built October 5:** from the main
+  room's panel, "Put every room on the main stage" pins a grid of every
+  rehearsal room (its name, whose turn and which step, the step's clock,
+  and "Would like the teacher" in clay) on every open main stage;
+  RoomBoard now reports each room's line and when its step ends. The
+  class page (/teach/) links to the same rooms on /live/#rooms rather
+  than drawing a second copy. One addon-lib test.
 - **R13, content on the stage:** PDF and image pages placed on the
   scene's board (annotate, zoom, together or locked), from an upload or
   the teacher's GitHub library folder. (pending)

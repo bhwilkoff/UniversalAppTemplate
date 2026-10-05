@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261005h">
+  <link rel="stylesheet" href="/assets/site.css?v=20261005i">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -84,6 +84,12 @@
         <h1 class="stage-title">On the path today.</h1>
         <ul class="stage-path" data-path-rows></ul>
         <p class="stage-quiet" data-path-note></p>
+      </div>
+
+      <!-- Every rehearsal room at a glance (R12). -->
+      <div class="stage-body" data-view="rooms" hidden>
+        <p class="kicker">The rehearsal rooms</p>
+        <ul class="stage-rooms" data-rooms-grid></ul>
       </div>
 
       <!-- The teacher cleared the stage. -->

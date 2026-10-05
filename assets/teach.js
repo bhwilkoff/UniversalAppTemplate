@@ -212,6 +212,7 @@
       drawRoster(res[2].data, res[3].data);
       drawTeachers();
       $('[data-live-link]').href = '/live/?c=' + encodeURIComponent(c.slug);
+      $('[data-rooms-link]').href = '/live/?c=' + encodeURIComponent(c.slug) + '#rooms';
       loadSubmissions(res[2].data, res[1].data);
       drawGroups(res[3].data, res[2].data);
       drawCohortSetup(res[1].data, res[4].data, null);

@@ -1678,3 +1678,15 @@ label.check { min-height: 2.25rem; }
 .stage-path .col { display: flex; align-items: flex-end; background: var(--surface); border-radius: 10px; overflow: hidden; }
 .stage-path .bar { display: block; width: 100%; height: var(--share); background: var(--clay); border-radius: 10px 10px 0 0; transition: height 0.6s ease; }
 .stage-path .label { font-size: clamp(0.7rem, 1.6vmin, 1.1rem); font-weight: 600; color: var(--muted); line-height: 1.2; }
+
+/* Every rehearsal room on the main stage (R12). */
+.stage-rooms { list-style: none; margin: 2vmin 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); gap: 2vmin; }
+.stage-room { background: var(--card); border: 1px solid var(--rule); border-radius: var(--radius); padding: 2.2vmin 2.6vmin; display: grid; gap: 0.8vmin; align-content: start; }
+.stage-room h2 { margin: 0; font-size: clamp(1.2rem, 2.8vmin, 2.2rem); }
+.stage-room-place { margin: 0; font-size: clamp(1rem, 2vmin, 1.5rem); line-height: 1.35; }
+.stage-room-clock { margin: 0; font-size: clamp(1rem, 2.2vmin, 1.6rem); font-weight: 680; font-variant-numeric: tabular-nums; color: var(--muted); }
+.stage-room-clock:empty { display: none; }
+.stage-room-clock.is-over { color: var(--clay); }
+.stage-room.is-asking { border: 2px solid var(--clay); }
+.stage-room-asking { margin: 0; font-weight: 680; color: var(--clay); font-size: clamp(1rem, 2vmin, 1.4rem); }
+.stage-room.is-done { opacity: 0.7; }

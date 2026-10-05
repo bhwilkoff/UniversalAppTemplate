@@ -614,8 +614,23 @@
       names: S.names, nameOf: nameOf, mount: $('[data-rooms]'), onlyGroup: S.room.groupId || null, showLinks: !S.room.groupId,
       turn: L.roomTurn(roomsScene(), 3), prompt: roomsPrompt(),
       boardLink: function (gid) { var l = A.boardLinks(S.cohort, S.session, gid); return l ? l.board : null; },
-      onChange: function (byGroup) { S.roomPlaces = byGroup; drawCounts(); }
+      onChange: function (byGroup) {
+        S.roomPlaces = byGroup; drawCounts();
+        if (S.onStage && S.onStage.kind === 'rooms') sendStage();
+      }
     });
+    drawRoomsToggle();
+  }
+
+  // From the main room, a teacher can put every room on the main stage
+  // (R12), so the class and the teacher see where each one is at once.
+  function drawRoomsToggle() {
+    var box = $('[data-rooms-stage]'), list = $('[data-rooms]');
+    if (!box || !list) return;
+    if (box.nextSibling !== list) list.parentNode.insertBefore(box, list);
+    box.hidden = !(S.teaching && S.rooms && !S.room.groupId);
+    box.replaceChildren();
+    if (!box.hidden) box.appendChild(stageToggle('rooms', undefined, 'Put every room on the main stage', 'Take the rooms off the main stage'));
   }
 
   // The rooms scene the rehearsal rooms run (R6): the current scene when
@@ -709,7 +724,7 @@
   function setPin(v) {
     S.onStage = v;
     if (S.run && S.run.shared && S.teaching) S.run.pin(v);
-    drawQueue(); drawChecks(); drawRoster(); sendStage(); drawRunInfo();
+    drawQueue(); drawChecks(); drawRoster(); drawRoomsToggle(); sendStage(); drawRunInfo();
   }
 
   // Whose work is on the main stage, for everyone, and, for a teacher,
@@ -966,7 +981,8 @@
       part: part ? { key: part.key, name: part.name, endsAt: endsNow() } : null,
       onStage: S.onStage, checks: S.checks, results: S.results, items: S.items, names: S.names, audience: V ? V.audienceOf(part) : null,
       welcome: lib.welcome(S.cohort, S.session, S.parts), scene: scene,
-      path: window.RosterLib && S.onStage && S.onStage.kind === 'path' ? window.RosterLib.pathView(rosterNow()) : null
+      path: window.RosterLib && S.onStage && S.onStage.kind === 'path' ? window.RosterLib.pathView(rosterNow()) : null,
+      rooms: S.onStage && S.onStage.kind === 'rooms' ? Object.keys(S.roomPlaces).map(function (k) { return S.roomPlaces[k]; }) : null
     });
   }
   function sendStage() {
