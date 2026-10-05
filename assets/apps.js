@@ -259,7 +259,7 @@
       if (site) links.appendChild(li(link(site, site.replace(/^https:\/\//, '').replace(/\/$/, ''))));
       lib.storeLinks(app.stores).forEach(function (s) { links.appendChild(li(link(s.href, s.text))); });
       links.appendChild(li(link('https://github.com/' + repo, 'Its repository')));
-      if (app.slug === 'archive-watch') links.appendChild(li(link('/why/archive-watch/', 'How it was built, month by month')));
+      if (app.slug === 'archive-watch') links.appendChild(li(link('https://github.com/bhwilkoff/UniversalAppTemplate/blob/main/docs/human-shaped/case-study-archive-watch.md', 'How it was built, month by month')));
     }
 
     function drawCommits(repo) {

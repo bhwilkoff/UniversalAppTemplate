@@ -37,21 +37,28 @@
     'docs/path/README.md': '/path/',
     'docs/path/': '/path/',
     'docs/human-shaped/PRINCIPLES.md': '/principles/',
-    'docs/human-shaped/computer-shaped-problems.md': '/why/',
-    'docs/human-shaped/not-vibe-coding.md': '/why/not-vibe-coding/',
-    'docs/human-shaped/case-study-archive-watch.md': '/why/archive-watch/'
+    'docs/human-shaped/computer-shaped-problems.md': '/principles/#why'
   };
 
-  var article = document.querySelector('[data-doc]');
-  if (!article) return;
+  // A page renders one template file, or several: the first article
+  // without data-doc-part owns the page's title, lede and contents, and
+  // each data-doc-part article is a section of the same page. Heading
+  // anchors are shared, so no two sections give the same id.
+  var articles = document.querySelectorAll('[data-doc]');
+  if (!articles.length) return;
+  var seen = {};
+  Array.prototype.forEach.call(articles, mount);
+
+  function mount(article) {
+  var part = article.hasAttribute('data-doc-part');
   var src = article.getAttribute('data-doc');
   var body = article.querySelector('[data-doc-body]');
   var status = article.querySelector('[data-doc-status]');
-  var titleEl = document.querySelector('[data-doc-title]');
-  var numEl = document.querySelector('[data-doc-num]');
-  var ledeEl = document.querySelector('[data-doc-lede]');
-  var metaEl = document.querySelector('[data-doc-meta]');
-  var tocEl = document.querySelector('[data-doc-toc]');
+  var titleEl = part ? null : document.querySelector('[data-doc-title]');
+  var numEl = part ? null : document.querySelector('[data-doc-num]');
+  var ledeEl = part ? null : document.querySelector('[data-doc-lede]');
+  var metaEl = part ? null : document.querySelector('[data-doc-meta]');
+  var tocEl = part ? null : document.querySelector('[data-doc-toc]');
   var githubUrl = BLOB + src;
 
   function el(tag, attrs, text) {
@@ -67,7 +74,7 @@
     try { u = new URL(href, 'https://repo.invalid/' + src); } catch (e) { return null; }
     if (u.host !== 'repo.invalid') return null;
     var path = u.pathname.replace(/^\//, '');
-    if (SITE[path]) return SITE[path] + u.hash;
+    if (SITE[path]) return u.hash ? SITE[path].split('#')[0] + u.hash : SITE[path];
     if (path === '' || /\/$/.test(path)) return TREE + path + u.hash;
     return BLOB + path + u.hash;
   }
@@ -224,7 +231,6 @@
     });
 
     // Headings get the same anchors GitHub gives them.
-    var seen = {};
     root.querySelectorAll('h2, h3').forEach(function (h) { h.id = slug(h.textContent, seen); });
 
     body.innerHTML = '';
@@ -232,6 +238,13 @@
 
     if (tocEl) {
       tocEl.innerHTML = '';
+      // A section of the page that another file fills (data-toc-entry on
+      // its heading) comes first in the contents.
+      document.querySelectorAll('[data-toc-entry]').forEach(function (h) {
+        var li = el('li');
+        li.appendChild(el('a', { href: '#' + h.id }, h.textContent));
+        tocEl.appendChild(li);
+      });
       body.querySelectorAll('h2').forEach(function (h) {
         var li = el('li');
         li.appendChild(el('a', { href: '#' + h.id }, h.textContent));
@@ -271,4 +284,5 @@
   }
 
   load();
+  }
 })();

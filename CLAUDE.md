@@ -84,13 +84,19 @@ as Ben's without his review, $0 to run.
   repeated on each page, so change them everywhere at once.
 - Every page is a folder with an `index.html`, so each has a canonical
   URL. Add new pages to `sitemap.xml`.
-- The reading pages (`/path/NN/`, `/principles/`, `/why/...`) never
+- The reading pages (`/path/NN/`, `/principles/`) never
   copy the template's text. Each names its source file with `data-doc`,
   and `assets/render.js` fetches that file from the template's `main`
   branch on raw.githubusercontent.com and renders it with marked and
   DOMPurify. Links to other path files become this site's URLs; links
   to anything else in the repository go to GitHub. To give another
-  template file a page here, add it to the `SITE` map in `render.js`.
+  template file a page here, add it to the `SITE` map in `render.js`. A
+  page can carry a second file as a section (`data-doc-part`):
+  /principles/ opens with the why (computer-shaped-problems.md) and
+  then the principles. `/why/` and its two old pages only redirect.
+- Each idea has one full page, and the home page only summarizes it
+  and links there: the why and the principles on /principles/, the
+  method on /path/, the weeks on /cohorts/.
 - Every "Sign in with GitHub" goes to `/account/`, which only signs a
   person in. Joining a cohort starts on `/cohorts/`.
 - Mobile-first, `min-width` media queries, test at 375px before 1440px.

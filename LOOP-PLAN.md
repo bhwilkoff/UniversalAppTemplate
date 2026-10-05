@@ -1196,6 +1196,16 @@ student).
   round heads, and the Meet add-on shows the joined wordmark. og.png
   carries the new headline. Rules in DECISIONS.md.
 
+- 2026-10-05, late: every principle now finishes the sentence
+  "Human-shaped software..." (the stem once, then verbs; main 2dffdef).
+  The home card draws its fifteen lines in the page and refreshes them
+  live, and site.css carries a version stamp so a cached stylesheet can
+  no longer leave it unstyled. Consolidated: /principles/ carries the
+  why and the principles (render.js mounts a second file with
+  data-doc-part), /why/ and its two pages redirect, Why left the nav,
+  the path's week list moved to /cohorts/ only, and the home page's
+  idea section lost the paragraph the hero already says.
+
 ## Handoff (October 4, 2026, evening)
 
 Merged and live: G1 to G7, H1 to H6, C0 to C9, R1 to R3, R4's pages, R5 to R8,

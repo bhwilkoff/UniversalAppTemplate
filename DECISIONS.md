@@ -452,3 +452,22 @@ the arch is the hyphen between "human" and "shaped", or it is the logo
 on its own (the favicon, the app icon, a corner of a Meet background).
 It is never a head on a drawn person, a hook or handle on a card, a
 bullet, or a prefix to other words. Drawn people get round heads.
+
+## Fewer pages, each idea in one place (October 5, 2026, evening)
+
+Ben: "there is now significant overlap between the homepage, 'the
+path', 'Why', and 'Principles'. Can you work to consolidate everything
+into a smaller number of pages." **How to apply:** each idea has one
+full page, and every other page summarizes it in a line or two and
+links there.
+
+- **Home** is the pitch: the claim, the principles card, the idea in
+  brief, the three moves in brief, the ways in, and the apps.
+- **/principles/** is the why and the principles together: the
+  computer-shaped problems essay, then PRINCIPLES.md, both read live.
+  "Why" left the navigation; /why/ redirects to /principles/#why.
+- **/path/** is the method, stage by stage. The week-by-week list lives
+  only on /cohorts/.
+- "More than asking an AI for an app" and the Archive Watch case study
+  are read on GitHub; their old site addresses redirect there.
+
