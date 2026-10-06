@@ -1320,7 +1320,7 @@ body.addon-body { min-height: 100vh; }
 .stage-what { margin: 0; font-size: clamp(1.25rem, 3.6vmin, 2.5rem); font-weight: 600; overflow-wrap: anywhere; }
 .stage-note { margin: 0; font-size: clamp(1.1rem, 3vmin, 2rem); color: var(--muted); max-width: 40ch; }
 /* The audience's part, under a presenter's work (R7). */
-.stage-audience { margin: 1vmin 0 0; font-size: clamp(1.1rem, 3vmin, 2rem); color: var(--ink); max-width: 46ch; border-left: 4px solid var(--clay); padding-left: 0.6em; }
+.stage-audience { margin: 1vmin 0 0; font-size: clamp(1.1rem, 3vmin, 2rem); color: var(--ink); max-width: 46ch; }
 /* The current scene (R3): its words read as words, not as a headline. */
 .stage-lines { display: grid; gap: 1.6vmin; max-width: 46ch; }
 .stage-lines .stage-what { font-weight: 450; line-height: 1.35; }
@@ -1370,7 +1370,7 @@ label.check { min-height: 2.25rem; }
 .signal-time { font-weight: 650; font-size: 1.15rem; }
 .signal-clock { font-variant-numeric: tabular-nums; }
 .signal-card {
-  border-left: 6px solid var(--clay); background: var(--card); border-radius: var(--radius);
+  background: var(--card); border-radius: var(--radius); border: 1px solid var(--rule);
   padding: 1.1rem 1.25rem; animation: signal-in 240ms ease-out;
 }
 .signal-card p { margin: 0; }

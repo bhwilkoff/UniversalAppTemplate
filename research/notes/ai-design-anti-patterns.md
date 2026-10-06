@@ -152,3 +152,28 @@ now sit almost exactly on it. Three ways to go:
 Recommendation: start with C (passes 1 to 3 are needed anyway), look at
 the result together, and decide between A and B with the page in front
 of us.
+
+## Where the audit stands (October 6, evening)
+
+- **Pass 1, template chrome: done.** Labels above headings only where they
+  carry information; no tracked capitals; no arrows on links; no colored
+  stripes.
+- **Pass 2, card rows: done.** The home page's three card rows became one
+  idea each (a typographic contrast, the three moves as rows, and one
+  closing band with the cohort as the main way in); Events' hosting row
+  became two guides and a line. The scanner now reports only shadows on
+  the app screenshots and the principles card, which are things that
+  really sit above the page.
+- **Pass 3, the site's own copy: done for the public pages.** The visible
+  "these words are a draft, written with an AI agent" note on the brand
+  kit is gone (the page is listed for Ben's review instead); the
+  free-and-yours reassurance and "a problem only people can solve" are
+  each said once; colon-led threes, stacked "rather than," and the
+  aphorism endings were rewritten. The meetup and hackathon guides keep
+  their lists, which are real agendas.
+- **Pass 4, the palette: waiting on Ben** (options A, B, C above). With
+  the chrome and the cards gone, the cream and clay are now the main
+  signal left from the second-order cluster.
+- **Pass 5, people: waiting on Ben.** A photo of Ben, a real quote from a
+  builder, or a screenshot of a real session would do more than any
+  remaining style change.
