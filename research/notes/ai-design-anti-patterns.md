@@ -252,3 +252,9 @@ the brand-colors data set (github.com/reimertz/brand-colors: 698 brands,
 - Layout rule from Ben's note: pages stay on white or near-white; the
   light color appears only in highlights, stickers, and buttons on dark,
   never as a ground for paragraphs.
+- **Families (Ben liked oxblood and butter, and forest and lavender).**
+  Ten deep reds against ten pale-to-golden yellows gave 41 clear
+  pairings; every golden yellow fell out, because deep red with gold is
+  Arizona State and the Washington Commanders. Ten deep greens against
+  ten pale violets gave 94 clear pairings; wisteria fell out for sitting
+  within 3 of Twitch's purple. Seven of each are drawn on the canvas.
