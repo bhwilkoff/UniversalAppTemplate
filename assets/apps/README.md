@@ -8,11 +8,11 @@ listings, 600 pixels wide, and rewrites the table below.
 
 | File | Source |
 |---|---|
-| archive-watch-1.webp | bhwilkoff/Archive-Watch `docs/roku-store-home.jpg` |
-| archive-watch-2.webp | bhwilkoff/Archive-Watch `docs/roku-store-detail.jpg` |
-| tidbits-trivia-1.webp | bhwilkoff/Tidbits-Trivia `branding/store-screenshots/ios-iphone-6.9/01-home.png` |
-| tidbits-trivia-2.webp | bhwilkoff/Tidbits-Trivia `branding/store-screenshots/ios-iphone-6.9/02-question.png` |
+| archive-watch-1.webp | Archive Watch, App Store (id6776697407), iPhone screenshot 1 |
+| archive-watch-2.webp | Archive Watch, App Store (id6776697407), iPhone screenshot 2 |
+| tidbits-trivia-1.webp | Tidbits Trivia, App Store (id6782202277), iPhone screenshot 1 |
+| tidbits-trivia-2.webp | Tidbits Trivia, App Store (id6782202277), iPhone screenshot 2 |
+| bsky-dreams-1.webp | Bsky Dreams, App Store (id6760909675), iPhone screenshot 1 |
+| bsky-dreams-2.webp | Bsky Dreams, App Store (id6760909675), iPhone screenshot 2 |
 | boba-playbook-1.webp | bhwilkoff/BOBA-Playbook `tools/screenshots/public/screenshots/home.png` |
 | boba-playbook-2.webp | bhwilkoff/BOBA-Playbook `tools/screenshots/public/screenshots/play.png` |
-| bsky-dreams-1.webp | bhwilkoff/Bsky-Dreams `BskyDreams-iOS/screenshots-generator/public/screenshots/reader.png` |
-| bsky-dreams-2.webp | bhwilkoff/Bsky-Dreams `BskyDreams-iOS/screenshots-generator/public/screenshots/timeline.png` |

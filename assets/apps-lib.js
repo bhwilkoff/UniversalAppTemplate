@@ -289,7 +289,7 @@
   // to its store listings, copied small into assets/apps/ (sources in
   // assets/apps/README.md). A wide set is a TV app; the rest are phones.
   var SHOTS = {
-    'archive-watch': { wide: true, n: 2 },
+    'archive-watch': { n: 2 },
     'tidbits-trivia': { n: 2 },
     'boba-playbook': { n: 2 },
     'bsky-dreams': { n: 2 }
