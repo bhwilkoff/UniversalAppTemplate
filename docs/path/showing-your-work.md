@@ -28,7 +28,7 @@ when it says where you are going, how it is going, and what to try next.
 And yet, in more than a third of the cases studied, feedback made the
 work worse, mostly when it turned into a comment on the person rather
 than the work. The same research found that giving feedback teaches the
-giver as much as getting it teaches the receiver, which is why the path
+giver as much as getting it teaches the receiver, which is why the method
 asks you to show your work to people rather than hand it in.
 
 A bring-back has six steps, and in a cohort they fit in about eight
@@ -156,7 +156,7 @@ private until you choose to show it, ask a question in
 [Discussions](https://github.com/orgs/humanshaped/discussions), find or
 start a meetup on [events](https://humanshaped.org/events/), and
 [connect your agent](https://humanshaped.org/connect/) so the
-human-shaped review reads your own app and your marks on the path.
+human-shaped review reads your own app and your marks on the stages.
 
 ## Before you act on an AI review
 

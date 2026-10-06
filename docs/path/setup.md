@@ -104,7 +104,7 @@ repository, and send the same two requests. In the cloud, the agent
 works on its own branch and asks you to merge its pull request, which is
 one button on GitHub. Merging is how its work reaches your app, and
 learning to read a pull request before you merge it is one of the
-GitHub skills the path keeps coming back to.
+GitHub skills the stages keep coming back to.
 
 ## When something goes wrong
 

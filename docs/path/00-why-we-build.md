@@ -78,7 +78,7 @@ three directions at once.
   window and what to keep. The app should leave the people who use it
   more capable, and building it should do the same for you.
 
-So, every round of the path makes the same three moves:
+So, every round of every stage makes the same three moves:
 
 1. **Write.** Writing gets it out of your head. The values, the
    features you want, the feedback you hear, and everything else you

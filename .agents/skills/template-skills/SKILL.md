@@ -24,5 +24,5 @@ every other skill:
 Do not copy skills into this folder. Add or change them in
 `.claude/skills/` and add a trigger row in `AGENTS.md`. A link here
 (`ln -s ../../.claude/skills/<name> .agents/skills/<name>`) is for a
-skill the path asks a learner to call by name, and
+skill a stage asks a learner to call by name, and
 `tools/test_agent_files.py` checks that every link resolves.

@@ -8,7 +8,7 @@ black image. A workflow stayed green while publishing nothing for two
 days. Each tool here is the one-liner, plus the check that would have
 caught the lie.
 
-This page says what each tool does, and which stage of the path
+This page says what each tool does, and which stage
 (`docs/path/`) you will first reach for it in.
 
 ## Four habits every tool shares

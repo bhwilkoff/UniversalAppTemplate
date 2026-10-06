@@ -24,7 +24,7 @@ first. If someone has asked you why you do not simply ask an AI to make
 the app, send them `not-vibe-coding.md`. If you want to see what the
 method looks like over months, read the case study.
 
-When you are ready to build, the path starts at
+When you are ready to build, the stages start at
 [`../path/00-why-we-build.md`](../path/00-why-we-build.md).
 
 ## Writing these pages

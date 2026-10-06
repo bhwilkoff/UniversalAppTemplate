@@ -11,7 +11,7 @@ from outside their group.
 This is the week the prompt reading starts to come from the cohort
 itself. Tonight's situation is a classmate's real stuck moment, shared
 with their permission, which is a bigger thing to ask of someone than a
-story from the path, so handle it with care.
+story from the stages, so handle it with care.
 
 **The agent is never the tester.**
 

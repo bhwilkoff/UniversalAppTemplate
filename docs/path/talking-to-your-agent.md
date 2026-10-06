@@ -19,7 +19,7 @@ with it. Over and over, until it is right.
 **The prompt is the work.**
 
 This page is the set of moves I actually use, each with the words I
-typed. Every stage of the path points back here.
+typed. Every stage points back here.
 
 ## Say what you want before what it does
 

@@ -38,7 +38,7 @@ every step what to hand to the machine and what to keep. The app should
 leave the people who use it more capable, and building it should leave
 you more capable too.
 
-Every round of the path makes the same three moves:
+Every round of every stage makes the same three moves:
 
 1. **Write.** Values, features, feedback, and reasons go where the agent
    reads them, because an agent keeps only the values you write down.
@@ -68,7 +68,7 @@ values-based ways of building, and says what it borrowed from each.
 
 ## Start here
 
-The path is nine stages, in `docs/path/`. Each one says what you will
+The method is nine stages, in `docs/path/`. Each one says what you will
 make, why it is built that way, what to do, and what to bring back.
 
 | Stage | What you will do |
@@ -134,7 +134,7 @@ is the one page to keep open while you work.
 | `AGENTS.md` | The agent's instructions: who the app is for, the rules, which skill to use when. `CLAUDE.md` and `GEMINI.md` both import it, so every agent reads the same file. |
 | `SCRATCHPAD.md`, `DECISIONS.md`, `PARITY.md`, `DEEP_LINKS.md` | The project's memory: current state, the reasons behind choices, what exists on which platform, and the link contract. |
 | `docs/path/` | The nine stages, and two companions: talking to your agent, and showing your work. |
-| `COURSE.md`, `docs/teaching/` | The five-week cohort built on the path, and a one-page guide for each of its live sessions. |
+| `COURSE.md`, `docs/teaching/` | The five-week cohort built on the stages, and a one-page guide for each of its live sessions. |
 | `docs/` | The reference docs each stage points to. Map: [`docs/README.md`](docs/README.md). |
 | `.claude/skills/` | 146 skills, 56 of them written from shipped apps. Catalog: [`.claude/skills/README.md`](.claude/skills/README.md). |
 | `tools/` | Device testing, store submission, CI and Pulse tooling. Catalog: [`tools/README.md`](tools/README.md). |

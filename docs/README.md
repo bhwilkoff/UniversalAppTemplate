@@ -4,7 +4,7 @@
 reference: the detail a stage points to when you need it, and not
 before. This page lists every doc by the stage that sends you there.
 
-## The path
+## The stages
 
 `path/00-why-we-build.md` through `path/08-working-with-ai.md`. Read them
 in order the first time. `path/talking-to-your-agent.md` is the companion
@@ -14,7 +14,7 @@ back and get feedback on it, in a cohort or on your own.
 
 ## Teaching
 
-`../COURSE.md` maps the path onto a five-week cohort, and
+`../COURSE.md` maps the stages onto a five-week cohort, and
 `teaching/README.md` is the guide for each of its live sessions: the
 minutes, the teacher's words, the check question, and what to look for
 in the bring-backs.

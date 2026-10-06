@@ -209,7 +209,7 @@ to draw, in writing, where the agent will read them.
    repository as `HUMAN-SHAPED.md`, and answer each principle in your own
    words. The directory at humanshaped.org reads that file.
 
-**When you are done with the path,** your app is shipped and running,
+**When you are done with the stages,** your app is shipped and running,
 your agent remembers what you taught it, and the lessons from this app
 are waiting for the next one. The next app starts at stage 00 again,
 with a new note and a new why. It will go faster, because this time the

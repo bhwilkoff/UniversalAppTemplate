@@ -24,10 +24,10 @@ three.
   keep, and they build something that does the same for the people who
   use it.
 
-Every week makes the same three moves as the path: write, play, and
+Every week makes the same three moves as the stages: write, play, and
 publish. Stage 00 explains them.
 
-The course is the path in `docs/path/`. Each stage already ends with a
+The course is the stages in `docs/path/`. Each stage already ends with a
 "Be ready to..." line, and that line is the challenge to bring back.
 What follows is how the stages map onto a cohort of about five weeks,
 with one live session each week, and what each week asks a person to
@@ -49,7 +49,7 @@ to
 Each week the same app gets further along, and each week's work is a
 set of conversations with the agent, not a set of files to edit. Two
 stages share most weeks, so the pace is quick. That is on purpose: the
-path is built to be lapped more than once, and a cohort is the first
+stages are built to be lapped more than once, and a cohort is the first
 lap, done with other people.
 
 Each live session comes at the end of its week, so it is where that
@@ -191,7 +191,7 @@ part its minutes, and say how to fit the session into 60 or 90.
    how the prompt fixed it. For the deeper part of a skill, trying first
    and comparing after teaches more than seeing the answer first. The
    situations move toward the cohort's own work as the weeks go on. In
-   the first two weeks they come from the path. In weeks 3 and 4 they
+   the first two weeks they come from the stages. In weeks 3 and 4 they
    come from a classmate's real stuck moment, shared with their
    permission. In week 5, someone who wants to leads with a moment of
    their own. Nobody is required to lead.
@@ -251,7 +251,7 @@ A partner who notices first reaches out first, kindly. The teacher does
 too: within two days of a missed session, or a week with no bring-back,
 the teacher writes to that person privately, with an easy way back in
 and an easy way out. Life happens in five weeks, and leaving a cohort
-should never feel like failing it. The recording and the path are both
+should never feel like failing it. The recording and the stages are both
 there when someone comes back, and so is their group.
 
 ## Cameras and breaks
@@ -353,8 +353,8 @@ the rest open.
   answers most of it. I do not yet know how well people who are new to
   building can judge the rest of a stage's bar for one another.
 - **Five weeks is fast** for people who have never used a terminal or an
-  AI agent. The week before exists for that reason, and some people
-  will need two laps of the path rather than one.
+  AI agent. Cohort Prep exists for that reason, and some people
+  will need two laps of the stages rather than one.
 - **Store accounts cost money** ($99 a year for Apple, $25 once for
   Google). Week 4 ends at an app installed on someone else's device,
   which a direct share can do for free on Android and the web version
@@ -364,7 +364,7 @@ the rest open.
   for free").
 - **How much to leave to discovery.** Research on teaching beginners
   is clear that open exploration without guidance leaves many of them
-  lost. The path gives every stage numbered steps for that reason. I do
+  lost. The method gives every stage numbered steps for that reason. I do
   not yet know how much room to leave inside them for students to find
   their own way.
 - **Real devices are unevenly distributed.** Some students own three,

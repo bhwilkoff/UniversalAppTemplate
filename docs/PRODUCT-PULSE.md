@@ -8,7 +8,7 @@ build step. There is no tracking in the app.
 
 This page is the reference: why it is built the way it is, the rules it
 lives by, how to adopt it, and what every reader needs. The shorter
-teaching version is stage 06 of the path (`docs/path/06-keeping-it-running.md`).
+teaching version is stage 06 of the method (`docs/path/06-keeping-it-running.md`).
 The reasoning an agent needs lives in the `product-pulse-dashboard` and
 `store-metrics-pipelines` skills.
 

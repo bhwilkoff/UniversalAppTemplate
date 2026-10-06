@@ -76,7 +76,7 @@ one."
 **Signs of "not yet."** A value with no decision behind it. A feature
 nobody but the builder has touched. A lesson the student can describe
 but has not asked the agent to write down. Many apps will be "not yet"
-on some part of these stages tonight, and that is ordinary. The path is
+on some part of these stages tonight, and that is ordinary. The stages are
 built to be lapped more than once, and the app's page stays open.
 
 ## The prompt to read together
@@ -135,7 +135,7 @@ Read the checks, and post what you heard to the cohort's conversation,
 with what you would change for the next cohort. Send the cohort's
 lesson back to the template as an issue or a pull request, with the
 people who learned it credited. Write, privately, to anyone who left
-with a "not yet," to say that the path and the community stay open.
+with a "not yet," to say that the stages and the community stay open.
 Then tell me what broke, as an issue on the template, so the next
 teacher does not have to learn it again.
 
