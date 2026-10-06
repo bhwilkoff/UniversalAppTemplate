@@ -209,3 +209,25 @@ apart, under 10 reads as the same color).
   trademarked color.
 - Every pairing also matches some sports team; teams were counted but
   are outside this site's lane.
+
+## Looking for color no brand holds (October 6, later)
+
+Ben found the purple pen's plum too close to Ally Bank's purples and
+asked for combinations no brand owns. The check widened to 3,604 brand
+colors: the Simple Icons data set (3,465 brands, mostly software and
+technology, cloned from github.com/simple-icons/simple-icons), the 70
+palettes above, and Ally (`#852EF2`, `#954293`, `#50104A`). Every hue
+around the wheel was counted for brands within ΔE 10.
+
+- Blue holds up to 294 brands, orange 192, green 133. Yellow is held by
+  the brands above; plum by Ally and Slack.
+- Two parts of the wheel are nearly empty: **olive-gold** (2 to 6
+  brands at mid tones, none at all for deep olive) and **orchid to
+  lilac** (9 to 13, all small software projects). They sit across the
+  wheel from each other.
+- The chosen colors: olive `#4B3C00` (nearest brand 13.3 away), pear
+  `#A7AC12` (nearest 9.1, MainWP), lilac `#C0A1FB` (nearest 7.6,
+  Obtainium; Gumroad 14.7, Ally over 20). An orchid nearer pink was
+  dropped for sitting 8.2 from Gumroad.
+- Three directions from them: Bloom (all three), olive and lilac, olive
+  and pear. All text meets AA in light and dark.
