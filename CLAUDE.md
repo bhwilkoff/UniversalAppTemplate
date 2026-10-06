@@ -99,11 +99,16 @@ as Ben's without his review, $0 to run.
   DOMPurify. Links to other path files become this site's URLs; links
   to anything else in the repository go to GitHub. To give another
   template file a page here, add it to the `SITE` map in `render.js`. A
-  page can carry a second file as a section (`data-doc-part`):
-  /principles/ opens with the why (computer-shaped-problems.md) and
-  then the principles. `/why/` and its two old pages only redirect.
+  page can carry a second file as a section (`data-doc-part`): /about/
+  carries the why (computer-shaped-problems.md) that way. `/why/` and its
+  two old pages only redirect. /principles/ holds only the principles
+  (Ben, October 6), drawn by `assets/principles-page.js` from
+  PRINCIPLES.md through `PrinciplesLib.page`: each statement whole and
+  alike, opening to what it means and how you can tell; old
+  /principles/#why links land on /about/.
 - Each idea has one full page, and the home page only summarizes it
-  and links there: the why and the principles on /principles/, the
+  and links there: the why and what Human Shaped is on /about/, the
+  principles on /principles/, the
   method's stages and the weeks on /cohorts/#weeks.
 - Every "Sign in with GitHub" goes to `/account/`, which only signs a
   person in. Joining a cohort starts on `/cohorts/`.

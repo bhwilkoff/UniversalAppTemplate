@@ -219,9 +219,9 @@ test('every app card has a picture, from its listing or its repository, over a d
   assert.equal(new Set(tones).size, 4, 'neighbors in a list never share a tone');
 });
 
-test('the founding apps show their store screens, and other apps none', () => {
+test('the founding apps show their iPhone store screens, and other apps none', () => {
   const aw = lib.shotsOf({ repo: 'bhwilkoff/Archive-Watch' });
-  assert.equal(aw.wide, true);
+  assert.equal(aw.wide, false); // every app is shown on an iPhone (October 6)
   assert.deepEqual(aw.files, ['/assets/apps/archive-watch-1.webp', '/assets/apps/archive-watch-2.webp']);
   assert.equal(lib.shotsOf({ slug: 'tidbits-trivia' }).wide, false);
   assert.equal(lib.shotsOf({ repo: 'someone/their-app' }), null);

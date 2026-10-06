@@ -560,3 +560,18 @@ with his review):
 > Human-Shaped problems see the world as interrelated stories to be told, experienced, and added to.
 >
 > Computer-Shaped problems see the world as disparate data points to be aggregated, quantified, and leveraged.
+
+## The pitch, and principles that stand alone (October 6, 2026)
+
+Ben, on the home page's first words under the headline: "If anyone can
+build their own apps (with AI), it matters even more which apps they
+choose to build and how they choose to build them. We exist to ensure
+that the future continues to be shaped by humans." The home page now
+says it that way, lightly edited for his review, instead of leading
+with one principle (writing values down).
+
+Ben, on /principles/: "The principles page should not be the entry
+point into the template or a justification for all of Human-Shaped as
+an organization. It should be about the Principles themselves." So
+/principles/ shows only the fifteen, each drawn the same way, and the
+why and what Human Shaped is moved to a new /about/ page.

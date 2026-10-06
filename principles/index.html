@@ -4,12 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>The Human-Shaped Principles | Human Shaped</title>
-  <meta name="description" content="Why software should be human-shaped, and the fifteen principles any app, and the way it was made, can be measured against.">
+  <meta name="description" content="The fifteen Human-Shaped Principles: what human-shaped software does, and how anyone can tell.">
   <link rel="canonical" href="https://humanshaped.org/principles/">
   <meta property="og:url" content="https://humanshaped.org/principles/">
   <meta property="og:site_name" content="Human Shaped">
   <meta property="og:title" content="The Human-Shaped Principles">
-  <meta property="og:description" content="Why software should be human-shaped, and the fifteen principles any app, and the way it was made, can be measured against.">
+  <meta property="og:description" content="The fifteen Human-Shaped Principles: what human-shaped software does, and how anyone can tell.">
   <meta property="og:type" content="article">
   <meta property="og:image" content="https://humanshaped.org/assets/og.png">
   <meta property="og:image:width" content="1200">
@@ -23,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261006h">
+  <link rel="stylesheet" href="/assets/site.css?v=20261006j">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -35,7 +35,9 @@
   <script src="/assets/site.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/18.0.14/lib/marked.umd.min.js" integrity="sha512-trN9mtGYvoySPVI909KTnwbJI9AkKPydRCV/qAsUG1+q39hhpKltEag9b5JpdjeIZn5i8IH62hHRFdbKwMFh9w==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.4.16/purify.min.js" integrity="sha512-flQmhkXNRQ3iUfvtdCobtpMjCb6kE+zLnTiAulAQJ3WykVfy84JvCMOo6vhwWXHTXjR25h9Zj+LyGFRWKjRoag==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
-  <script src="/assets/render.js?v=20261005d" defer></script>
+  <script src="/assets/render.js?v=20261006i" defer></script>
+  <script src="/assets/principles-lib.js?v=20261006i" defer></script>
+  <script src="/assets/principles-page.js?v=20261006i" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to the page</a>
@@ -65,57 +67,45 @@
 
   <main id="main">
     <div class="wrap">
-      <p class="crumbs"><a href="/">Home</a> &rsaquo; Principles</p>
-      <header class="stage-head">
-        <p class="num">Principles</p>
-        <h1 data-doc-title>The Human-Shaped Principles</h1>
-        <p class="where" data-doc-lede>Why software should be human-shaped, and the fifteen principles that any app, and the way it was made, can be measured against.</p>
-        <p class="meta" data-doc-meta hidden></p>
+      <!-- Only the principles (Ben, October 6): the why lives on /about/,
+           and declaring one's software in the brand kit. Every word here is
+           read live from the template's PRINCIPLES.md (assets/principles-page.js);
+           what is written below is only what shows before it arrives. -->
+      <header class="page-head principles-head">
+        <div>
+          <p class="kicker">Principles</p>
+          <h1>The Human-Shaped Principles</h1>
+          <p class="lead" data-p-intro>I want anyone to be able to say "my software is human-shaped" and have it mean something about how that software was made, not just about what its builder hoped it would be. So, these principles are guidelines for making and shipping. Each one is something you can actually do, and something another person can check, whether this is your first app or your fiftieth, and whether or not you have ever worked with an AI agent.</p>
+          <p class="fine" data-p-version>Version 0.6, by Ben Wilkoff, and open to argument.</p>
+        </div>
       </header>
 
-      <div class="stage-layout">
-        <div class="toc-stack">
-          <nav class="stage-toc" aria-label="On this page" hidden>
-            <h2>On this page</h2>
-            <ol class="doc-toc" data-doc-toc></ol>
-          </nav>
-          <aside class="stage-toc" aria-labelledby="declare-title">
-            <h2 id="declare-title">Declare yours</h2>
-            <p>You can say how your own app meets them, principle by principle, in its repository. <a href="/start/brand/#declare">How to declare it</a></p>
-          </aside>
+      <section class="section first principles-block" aria-labelledby="the-principles">
+        <h2 class="p-stem" id="the-principles" data-p-stem>Human-shaped software:</h2>
+        <ol class="principles" data-p-list>
+          <li id="1-a-human-shaped-problem"><details><summary><span class="p-n">1</span><span class="p-s">Starts from a human-shaped problem, one that affects real people in the real world.</span><svg class="icon p-caret" aria-hidden="true" focusable="false"><use href="/assets/icons.svg#caret-down"/></svg></summary><div class="p-more" data-p-more></div></details></li>
+          <li id="2-more-possible-not-more-profit"><details><summary><span class="p-n">2</span><span class="p-s">Increases what people are able to do, rather than how much profit can be made from them.</span><svg class="icon p-caret" aria-hidden="true" focusable="false"><use href="/assets/icons.svg#caret-down"/></svg></summary><div class="p-more" data-p-more></div></details></li>
+          <li id="3-values-as-guardrails"><details><summary><span class="p-n">3</span><span class="p-s">Has its values written down as guardrails for both the people and the AI agents who build it.</span><svg class="icon p-caret" aria-hidden="true" focusable="false"><use href="/assets/icons.svg#caret-down"/></svg></summary><div class="p-more" data-p-more></div></details></li>
+          <li id="4-iteration-never-a-first-draft"><details><summary><span class="p-n">4</span><span class="p-s">Treats iteration as the path to innovation, so that no first draft of a feature, design, or piece of writing is ever shipped.</span><svg class="icon p-caret" aria-hidden="true" focusable="false"><use href="/assets/icons.svg#caret-down"/></svg></summary><div class="p-more" data-p-more></div></details></li>
+          <li id="5-grounded-in-research"><details><summary><span class="p-n">5</span><span class="p-s">Is grounded in research, so that its builder always knows whose work they are building on, from tools and services to authors and design patterns.</span><svg class="icon p-caret" aria-hidden="true" focusable="false"><use href="/assets/icons.svg#caret-down"/></svg></summary><div class="p-more" data-p-more></div></details></li>
+          <li id="6-decisions-with-feedback"><details><summary><span class="p-n">6</span><span class="p-s">Makes every decision with feedback from another person, an AI agent, or a piece of documentation.</span><svg class="icon p-caret" aria-hidden="true" focusable="false"><use href="/assets/icons.svg#caret-down"/></svg></summary><div class="p-more" data-p-more></div></details></li>
+          <li id="7-tested-the-way-people-use-it"><details><summary><span class="p-n">7</span><span class="p-s">Is tested the way people will actually see, hear, and use it, not only the way a machine would check it.</span><svg class="icon p-caret" aria-hidden="true" focusable="false"><use href="/assets/icons.svg#caret-down"/></svg></summary><div class="p-more" data-p-more></div></details></li>
+          <li id="8-documentation-as-seriously-as-code"><details><summary><span class="p-n">8</span><span class="p-s">Treats documentation as seriously as code, so that it grows and changes with the software, in the builder&#x27;s own language.</span><svg class="icon p-caret" aria-hidden="true" focusable="false"><use href="/assets/icons.svg#caret-down"/></svg></summary><div class="p-more" data-p-more></div></details></li>
+          <li id="9-shared-openly"><details><summary><span class="p-n">9</span><span class="p-s">Shares its code, tools, and lessons as openly as the problem it solves allows.</span><svg class="icon p-caret" aria-hidden="true" focusable="false"><use href="/assets/icons.svg#caret-down"/></svg></summary><div class="p-more" data-p-more></div></details></li>
+          <li id="10-learning-as-success"><details><summary><span class="p-n">10</span><span class="p-s">Counts learning as success, so that if at least one thing was learned in building it, the software has succeeded.</span><svg class="icon p-caret" aria-hidden="true" focusable="false"><use href="/assets/icons.svg#caret-down"/></svg></summary><div class="p-more" data-p-more></div></details></li>
+          <li id="11-people-own-their-data"><details><summary><span class="p-n">11</span><span class="p-s">Lets people own their data and make every decision about what happens to it.</span><svg class="icon p-caret" aria-hidden="true" focusable="false"><use href="/assets/icons.svg#caret-down"/></svg></summary><div class="p-more" data-p-more></div></details></li>
+          <li id="12-no-new-problems"><details><summary><span class="p-n">12</span><span class="p-s">Creates no new human-shaped problems while solving the one it set out to solve.</span><svg class="icon p-caret" aria-hidden="true" focusable="false"><use href="/assets/icons.svg#caret-down"/></svg></summary><div class="p-more" data-p-more></div></details></li>
+          <li id="13-the-builders-own-voice"><details><summary><span class="p-n">13</span><span class="p-s">Is written in the builder&#x27;s own voice, so that every word is shaped by a human, and no machine pretends to be one.</span><svg class="icon p-caret" aria-hidden="true" focusable="false"><use href="/assets/icons.svg#caret-down"/></svg></summary><div class="p-more" data-p-more></div></details></li>
+          <li id="14-credit-everything"><details><summary><span class="p-n">14</span><span class="p-s">Credits everyone and everything responsible for it, including people, communities, AI agents, tools, and processes.</span><svg class="icon p-caret" aria-hidden="true" focusable="false"><use href="/assets/icons.svg#caret-down"/></svg></summary><div class="p-more" data-p-more></div></details></li>
+          <li id="15-joy-for-at-least-one-person"><details><summary><span class="p-n">15</span><span class="p-s">Brings joy to at least one person in the form it ships today, even if that person is the builder.</span><svg class="icon p-caret" aria-hidden="true" focusable="false"><use href="/assets/icons.svg#caret-down"/></svg></summary><div class="p-more" data-p-more></div></details></li>
+        </ol>
+        <p class="p-notyet" data-p-notyet>Not every principle will be met on the first day, and "not yet, and here is what I am doing about it" is an honest answer. Silence is not.</p>
+        <div class="p-next">
+          <p class="section-more"><a href="/start/brand/#declare">Declare your software human-shaped</a></p>
+          <p><a class="go-text" href="/about/">Why Human Shaped exists</a></p>
         </div>
-
-        <div class="article-col">
-          <section class="doc-part" aria-labelledby="why">
-            <h2 class="part-title" id="why" data-toc-entry>Why build this way</h2>
-            <article class="article" data-doc="docs/human-shaped/computer-shaped-problems.md" data-doc-part>
-              <div class="doc-status" data-doc-status aria-live="polite"></div>
-              <noscript>
-                <div class="doc-error">
-                  <h2>This page reads its text from GitHub.</h2>
-                  <p>The text lives in the template on GitHub, and this page needs JavaScript to bring it here. You can read exactly the same page <a href="https://github.com/bhwilkoff/UniversalAppTemplate/blob/main/docs/human-shaped/computer-shaped-problems.md">on GitHub</a>.</p>
-                </div>
-              </noscript>
-              <div class="doc-body" data-doc-body></div>
-            </article>
-          </section>
-          <article class="article" data-doc="docs/human-shaped/PRINCIPLES.md">
-            <div class="doc-status" data-doc-status aria-live="polite"></div>
-            <noscript>
-              <div class="doc-error">
-                <h2>This page reads its text from GitHub.</h2>
-                <p>The text lives in the template on GitHub, and this page needs JavaScript to bring it here. You can read exactly the same page <a href="https://github.com/bhwilkoff/UniversalAppTemplate/blob/main/docs/human-shaped/PRINCIPLES.md">on GitHub</a>.</p>
-              </div>
-            </noscript>
-            <div class="doc-body" data-doc-body></div>
-          </article>
-          <p class="source">Read <a href="https://github.com/bhwilkoff/UniversalAppTemplate/blob/main/docs/human-shaped/computer-shaped-problems.md">the why</a> and <a href="https://github.com/bhwilkoff/UniversalAppTemplate/blob/main/docs/human-shaped/PRINCIPLES.md">the principles</a> on GitHub.</p>
-          <nav class="next-stage" aria-label="Previous and next">
-            <a href="/cohorts/#weeks">Build this way, stage by stage</a>
-            <a href="/start/brand/#declare">Declare your software human-shaped</a>
-          </nav>
-        </div>
-      </div>
+        <p class="source">Read <a href="https://github.com/bhwilkoff/UniversalAppTemplate/blob/main/docs/human-shaped/PRINCIPLES.md">the principles on GitHub</a>, where they are written and argued about.</p>
+      </section>
     </div>
   </main>
 
@@ -124,6 +114,7 @@
       <div class="footer-brand">
         <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
         <p>The ideas, the method, the tools, and the cohorts are free, and what you build is yours.</p>
+        <p><a class="go-text" href="/about/">About Human Shaped</a></p>
       </div>
       <nav class="footer-links" aria-label="More of the site">
         <div>

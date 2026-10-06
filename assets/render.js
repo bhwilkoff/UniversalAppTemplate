@@ -37,8 +37,22 @@
     'docs/path/README.md': '/cohorts/#weeks',
     'docs/path/': '/cohorts/#weeks',
     'docs/human-shaped/PRINCIPLES.md': '/principles/',
-    'docs/human-shaped/computer-shaped-problems.md': '/principles/#why'
+    'docs/human-shaped/computer-shaped-problems.md': '/about/'
   };
+
+  // Where a link in a template file goes on this site: its own page here,
+  // or the file on GitHub. Shared with pages that draw template text
+  // themselves (assets/principles-page.js).
+  function siteHref(fromFile, href) {
+    var u;
+    try { u = new URL(href, 'https://repo.invalid/' + fromFile); } catch (e) { return null; }
+    if (u.host !== 'repo.invalid') return href;
+    var path = u.pathname.replace(/^\//, '');
+    if (SITE[path]) return u.hash ? SITE[path].split('#')[0] + u.hash : SITE[path];
+    if (path === '' || /\/$/.test(path)) return TREE + path + u.hash;
+    return BLOB + path + u.hash;
+  }
+  window.HSDocs = { siteHref: siteHref, RAW: RAW, BLOB: BLOB };
 
   // A page renders one template file, or several: the first article
   // without data-doc-part owns the page's title, lede and contents, and
