@@ -92,6 +92,13 @@ at the start. This holds whatever the sizes or font. Browsers without
 text-box (Firefox, for now) align the boxes' tops, a few pixels off.
 A button beside a heading lines its top edge up with the capitals.
 
+## 11. A heading for the whole section is centered
+
+When a section's heading has no words beside it and introduces
+everything under it (the apps in the stores, the three moves), it is
+centered across both columns from 56rem up (`.head-center`), and left
+on phones, where everything below it is one column.
+
 ## Checking a page
 
 At 375 and 1280 pixels, light and dark: does color stay inside panels,

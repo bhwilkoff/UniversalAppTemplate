@@ -2080,3 +2080,13 @@ ol.principles summary:focus-visible { outline: 2px solid var(--accent); outline-
   .about-why .doc-body > h2 + *, .article.hang .doc-body > h2 + * { margin-top: 3rem; }
 }
 @media (min-width: 64rem) { .topics.single > .topic > h2 + .actions { margin-top: 0; } }
+
+/* A heading that introduces the whole section, centered across both
+   columns (Ben, October 6). Used where the section has no words beside
+   its heading. */
+@media (min-width: 56rem) {
+  .head-center { text-align: center; }
+  .section-head.head-center { grid-template-columns: 1fr; }
+  .head-center > div { grid-column: 1 / -1; }
+  .head-center h2 { margin-left: auto; margin-right: auto; max-width: 26ch; }
+}
