@@ -34,8 +34,8 @@
     'docs/path/talking-to-your-agent.md': '/path/talking-to-your-agent/',
     'docs/path/showing-your-work.md': '/path/showing-your-work/',
     'COURSE.md': '/teach/guide/',
-    'docs/path/README.md': '/path/',
-    'docs/path/': '/path/',
+    'docs/path/README.md': '/cohorts/#weeks',
+    'docs/path/': '/cohorts/#weeks',
     'docs/human-shaped/PRINCIPLES.md': '/principles/',
     'docs/human-shaped/computer-shaped-problems.md': '/principles/#why'
   };

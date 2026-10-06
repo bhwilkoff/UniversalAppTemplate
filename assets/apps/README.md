@@ -1,9 +1,10 @@
 # Store screens
 
-Small copies of the screenshots each founding app submitted to its store
-listings, used as the app's cover on /apps/, its own page, and the home
-page (`shotsOf` in `assets/apps-lib.js`). Each is resized with ImageMagick
-to WebP; the originals stay in the app's own repository.
+Small copies of each founding app's iPhone screenshots from its App
+Store listing, used as the app's cover on /apps/, its own page, and the
+home page (`shotsOf` in `assets/apps-lib.js`), so every app is shown on
+the same device. `node tools/app-shots.mjs` fetches them again from the
+listings, 600 pixels wide, and rewrites the table below.
 
 | File | Source |
 |---|---|

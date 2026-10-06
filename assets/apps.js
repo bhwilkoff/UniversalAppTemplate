@@ -7,8 +7,8 @@
   var lib = window.AppsLib, clib = window.CohortLib;
   if (!lib || !clib) return;
   var DIRECTORY = 'https://raw.githubusercontent.com/humanshaped/directory/main/directory.json';
-  var FEED_REPOS = 8;      // at most this many GitHub calls for one visit's feed
-  var COMMITS = 20;        // one page of commits, shared by the feed and the app page
+  var FEED_REPOS = 8;      // at most this many apps in one visit's feed
+  var COMMITS = 100;       // one page of commits (one call, at any size), shared by the feed and the app page
   var TTL = 600000;        // remember GitHub's answers for ten minutes
 
   function el(tag, cls, text) {
@@ -69,10 +69,23 @@
     return call(githubToken()).catch(function () { return { trouble: { kind: 'unavailable' } }; });
   }
 
-  function commits(repo) {
-    return github('repos/' + repo + '/commits?per_page=' + COMMITS, function (list) {
+  function commitList(path) {
+    return github(path, function (list) {
       return (Array.isArray(list) ? list : []).map(lib.commitFrom);
     }).then(function (r) { return r.data ? { list: r.data } : r; });
+  }
+
+  // An app's recent work. Many apps commit automatic updates (catalogs,
+  // prices, daily boards) many times a day, so a page of the newest
+  // commits can hold no work by a person at all. Then a second call asks
+  // for the owner's own commits, which reach back to their latest work.
+  function commits(repo) {
+    return commitList('repos/' + repo + '/commits?per_page=' + COMMITS).then(function (r) {
+      if (!lib.needsOwnerLook(r.list)) return r;
+      return commitList(lib.ownerCommitsPath(repo)).then(function (o) {
+        return o.list ? { list: o.list.concat(r.list) } : r;
+      });
+    });
   }
 
   // Cohort apps their students chose to show. Before that rule exists in
@@ -291,7 +304,7 @@
       var file = 'https://github.com/' + repo + '/blob/HEAD/HUMAN-SHAPED.md';
       if (!d || !d.principles.length) {
         box.appendChild(el('p', null, 'This app has not answered the principles yet. Its builder can do that in a file called HUMAN-SHAPED.md in the app’s own repository, answering each principle in their own words, with evidence anyone can open.'));
-        var p = el('p'); p.appendChild(link('/start/#declare', 'How to show that your software is human-shaped')); box.appendChild(p);
+        var p = el('p'); p.appendChild(link('/start/brand/#declare', 'How to show that your software is human-shaped')); box.appendChild(p);
         return;
       }
       var c = d.counts, parts = [];

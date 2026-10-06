@@ -3,177 +3,19 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Start something | Human Shaped</title>
-  <meta name="description" content="Declare your software human-shaped, start a meetup, or run a Human-Shaped Hackathon, with the principles in front of everyone.">
-  <link rel="canonical" href="https://humanshaped.org/start/">
-  <meta property="og:url" content="https://humanshaped.org/start/">
-  <meta property="og:site_name" content="Human Shaped">
-  <meta property="og:title" content="Start something">
-  <meta property="og:description" content="Declare your software human-shaped, start a meetup, or run a Human-Shaped Hackathon, with the principles in front of everyone.">
-  <meta property="og:type" content="website">
-  <meta property="og:image" content="https://humanshaped.org/assets/og.png">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="The human-shaped wordmark, with its hyphen drawn as an arch, above the line: apps that wear the builder&#x27;s values on their sleeves.">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="theme-color" content="#F7F6F2" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#141618" media="(prefers-color-scheme: dark)">
+  <title>Events | Human Shaped</title>
+  <meta name="robots" content="noindex">
+  <link rel="canonical" href="https://humanshaped.org/events/">
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261006d">
-  <script>
-    (function () {
-      var q = location.search, t = null;
-      if (/[?&]dark\b/.test(q)) t = 'dark'; else if (/[?&]light\b/.test(q)) t = 'light';
-      else { try { t = localStorage.getItem('hs-theme'); } catch (e) {} }
-      if (t) document.documentElement.setAttribute('data-theme', t);
-    })();
-  </script>
-  <script src="/assets/site.js" defer></script>
+  <link rel="stylesheet" href="/assets/site.css?v=20261006e">
+  <!-- "Start something" became Events (Ben, October 6). The marks and how
+       to show one moved to the brand kit, so old links to them land there. -->
+  <script>location.replace(/^#(declare|mark)$/.test(location.hash) ? '/start/brand/' + (location.hash === '#mark' ? '#declare' : '#marks') : '/events/' + location.hash);</script>
+  <noscript><meta http-equiv="refresh" content="0; url=/events/"></noscript>
 </head>
 <body>
-  <!-- The links to the M5 guides and the brand kit were drafted with an AI agent on 2026-10-03, waiting for Ben's review. The events topic and the newest conversations (G5) are words by Claude, awaiting Ben's review. -->
-  <a class="skip" href="#main">Skip to the page</a>
-
-  <header class="site-header">
-    <div class="wrap">
-      <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
-      <nav class="nav" aria-label="Main">
-        <ul>
-          <li><a href="/path/">The path</a></li>
-          <li><a href="/principles/">Principles</a></li>
-          <li><a href="/cohorts/">Cohorts</a></li>
-          <li><a href="/apps/">Apps</a></li>
-          <li><a href="/start/" aria-current="page">Start something</a></li>
-        </ul>
-      </nav>
-      <div class="header-actions">
-        <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#moon"/></svg>
-        </button>
-        <a class="btn-github small" href="/account/">
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>
-          <span>Sign in<span class="long"> with GitHub</span></span>
-        </a>
-      </div>
-    </div>
-  </header>
-
-  <main id="main">
-    <div class="wrap">
-      <header class="page-head">
-        <div>
-          <p class="kicker">Start something</p>
-          <h1>Bring it to a room of your own.</h1>
-          <p class="lead">The ideas are free to carry anywhere, and this is what you need to show that your own software is human-shaped, to gather people for a conversation about it, or to spend a day building this way, wherever you are.</p>
-        </div>
-      </header>
-
-      <section class="section first" aria-label="The toolkit">
-        <div class="topics">
-          <div class="topic topic-wide" id="gather">
-            <h2>Gather people.</h2>
-            <ul class="ways-in">
-              <li id="meetup">
-                <svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons.svg#chats-circle"/></svg>
-                <h3><a href="/start/meetup/">Start a meetup</a></h3>
-                <p>An evening at a library, a classroom, or a kitchen table, for people with apps they wish existed. Nobody has to have written code.</p>
-              </li>
-              <li id="hackathon">
-                <svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons.svg#hammer"/></svg>
-                <h3><a href="/start/hackathon/">Run a hackathon</a></h3>
-                <p>A day of building in which what people learn counts as success, and every person builds one real app of their own.</p>
-              </li>
-              <li id="brand">
-                <svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons.svg#palette"/></svg>
-                <h3><a href="/start/brand/">Use the brand kit</a></h3>
-                <p>The wordmark, the icon, the names for meetups and hackathons, the colors, and the typeface, free to download.</p>
-              </li>
-            </ul>
-          </div>
-
-          <div class="topic" id="declare">
-            <h2>Show that your software is human-shaped.</h2>
-            <div class="prose">
-              <p><a href="/principles/">The Human-Shaped Principles</a> belong to anyone who builds by them, and there are two marks for saying so. Nobody approves either one. Each mark says something true about how your software was made, and you can use it as soon as it is true of yours.</p>
-            </div>
-            <ul class="mark-kinds">
-              <li>
-                <img class="mark-light" src="/assets/mark/aligned-light.svg" width="161" height="44" alt="Aligned with Human Shaped"><img class="mark-dark" src="/assets/mark/aligned-dark.svg" width="161" height="44" alt="Aligned with Human Shaped">
-                <h3>Aligned with Human Shaped</h3>
-                <p>You have written down how your software lines up with each of the fifteen principles, in a file called HUMAN-SHAPED.md in your own repository.</p>
-              </li>
-              <li>
-                <img class="mark-light" src="/assets/mark/endorsed-light.svg" width="161" height="44" alt="Endorsed by Human Shaped"><img class="mark-dark" src="/assets/mark/endorsed-dark.svg" width="161" height="44" alt="Endorsed by Human Shaped">
-                <h3>Endorsed by Human Shaped</h3>
-                <p>Your software started from <a href="https://github.com/bhwilkoff/UniversalAppTemplate">the Universal App Template</a>, or you have written your commitment to the principles into your project. Either one is enough.</p>
-              </li>
-            </ul>
-            <ol class="steps">
-              <li>Read <a href="/principles/">the principles</a> against your own software, and notice the ones it does not meet yet.</li>
-              <li>Copy <a href="https://github.com/bhwilkoff/UniversalAppTemplate/blob/main/docs/human-shaped/HUMAN-SHAPED-template.md">HUMAN-SHAPED.md</a> into your repository.</li>
-              <li>For each principle, say whether your software meets it, does not meet it yet, or does not apply, in a sentence or two of your own, with a link to evidence someone else can open. Your agent can help you find the evidence, and the sentences are yours to write.</li>
-              <li>Show the mark that is true of your software, linked to that file.</li>
-            </ol>
-
-            <h3 id="mark">The marks, for your README and your site.</h3>
-            <div class="prose">
-              <p>Show a mark wherever people meet your software, in its README on GitHub or at the foot of its website. The mark links to your own HUMAN-SHAPED.md, so anyone who wonders what it means can read your answers and the evidence behind them, which is what makes a mark like this worth trusting. Please keep its colors and its shape as they are, because people only learn to recognize a mark when it looks the same everywhere they see it.</p>
-              <p>Paste this where you want the mark, and change the first address to your own file. It follows the reader's light or dark setting on GitHub and on most websites. For the endorsed mark, change <b>aligned</b> to <b>endorsed</b> in both image addresses and in the alt text.</p>
-            </div>
-            <div class="snippet">
-              <pre id="mark-snippet">&lt;a href="https://github.com/you/your-app/blob/main/HUMAN-SHAPED.md"&gt;&lt;picture&gt;&lt;source media="(prefers-color-scheme: dark)" srcset="https://humanshaped.org/assets/mark/aligned-dark.svg"&gt;&lt;img src="https://humanshaped.org/assets/mark/aligned-light.svg" height="44" alt="Aligned with Human Shaped"&gt;&lt;/picture&gt;&lt;/a&gt;</pre>
-              <p class="actions"><button class="btn-quiet" type="button" data-copy="mark-snippet">Copy the code</button></p>
-            </div>
-          </div>
-
-          <div class="topic" id="events">
-            <h2>Find a room, or put yours on the calendar.</h2>
-            <div class="prose">
-              <p>The events page lists the meetups, hackathons, and showcases people are hosting, and what each room learned once it was over. If you are planning one, it can be listed there too.</p>
-            </div>
-            <div class="next-events" data-next-events hidden></div>
-            <p class="actions"><a class="btn-quiet" href="/events/">See every event</a></p>
-          </div>
-
-          <div class="topic" id="discuss">
-            <h2>Talk about it with everyone else.</h2>
-            <div class="prose">
-              <p>The <a href="https://github.com/humanshaped">humanshaped organization</a> on GitHub holds every conversation about this work, and its discussions are open to anyone. Tell people about the meetup you are planning, ask for a second pair of eyes on a declaration, or show what your hackathon made.</p>
-            </div>
-            <div class="feed-block community-threads" data-threads hidden>
-              <h3>The newest conversations</h3>
-              <div data-threads-list></div>
-            </div>
-            <p class="actions"><a class="btn-quiet" href="https://github.com/orgs/humanshaped/discussions"><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Open the discussions</a></p>
-          </div>
-        </div>
-      </section>
-    </div>
+  <main id="main" class="wrap section first">
+    <p>Starting something now lives on the events page. <a href="/events/">Go there now</a>, or find <a href="/start/brand/#marks">the marks for your software</a> in the brand kit.</p>
   </main>
-
-  <footer class="site-footer">
-    <div class="wrap">
-      <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
-      <p>Made by <a href="https://learningischange.com">Ben Wilkoff</a>. The ideas, the method, the tools, and the cohorts are free, and what you build is yours.</p>
-      <p class="credit">Built by Ben with an AI agent, Claude, set in Commissioner, with icons from <a href="https://phosphoricons.com">Phosphor</a>, and shared under <a href="https://github.com/bhwilkoff/UniversalAppTemplate/blob/site/LICENSE.md">open licenses</a>, so you can borrow anything here.</p>
-      <ul>
-        <li><a href="/principles/">The principles we build by</a></li>
-        <li><a href="/privacy/">What we keep, and what we never own</a></li>
-        <li><a href="/terms/">Terms</a> and <a href="/support/">help</a></li>
-        <li><a href="/events/">Events</a></li>
-        <li><a href="https://github.com/orgs/humanshaped/discussions">Discussions on GitHub</a></li>
-        <li><a href="https://github.com/bhwilkoff/UniversalAppTemplate">The template on GitHub</a></li>
-      </ul>
-    </div>
-  </footer>
-  <script src="/assets/cohort-lib.js" defer></script>
-  <script src="/assets/community-lib.js" defer></script>
-  <script src="/assets/hub-config.js" defer></script>
-  <script src="/assets/showcase-lib.js" defer></script>
-  <script src="/assets/community.js" defer></script>
 </body>
 </html>

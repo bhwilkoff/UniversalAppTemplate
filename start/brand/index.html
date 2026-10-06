@@ -23,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261006d">
+  <link rel="stylesheet" href="/assets/site.css?v=20261006e">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -43,11 +43,10 @@
       <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
       <nav class="nav" aria-label="Main">
         <ul>
-          <li><a href="/path/">The path</a></li>
           <li><a href="/principles/">Principles</a></li>
           <li><a href="/cohorts/">Cohorts</a></li>
           <li><a href="/apps/">Apps</a></li>
-          <li><a href="/start/" aria-current="true">Start something</a></li>
+          <li><a href="/events/" aria-current="true">Events</a></li>
         </ul>
       </nav>
       <div class="header-actions">
@@ -66,7 +65,7 @@
     <div class="wrap">
       <header class="page-head">
         <div>
-          <p class="kicker"><a href="/start/">Start something</a></p>
+          <p class="kicker"><a href="/events/">Events</a></p>
           <h1>The brand kit, free to use.</h1>
           <p class="lead">These are the files that make a flyer, a slide, or a website look like it belongs to the same movement: the wordmark, the icon, the names for meetups and hackathons, and the two marks for declaring an app human-shaped. Every letter in them is drawn as an outline, so they look right anywhere, even where the typeface is not installed.</p>
           <p class="draft-note">These words are a draft, written with an AI agent, and Ben has not read them yet. The files are drawn from the same shapes as the site's own wordmark and icon.</p>
@@ -79,6 +78,7 @@
         <li><a href="#calls">Backgrounds for calls</a></li>
         <li><a href="#events">Event names</a></li>
         <li><a href="#marks">The marks</a></li>
+        <li><a href="#declare">Showing a mark</a></li>
         <li><a href="#colors">Colors</a></li>
         <li><a href="#type">Typeface</a></li>
         <li><a href="#rules">Using them well</a></li>
@@ -233,7 +233,8 @@
           <div class="topic" id="marks">
             <h2>The marks for your software.</h2>
             <div class="prose">
-              <p>These two are not for events. They belong on software whose builders have written a HUMAN-SHAPED.md, and each one links to that file, so that anyone who sees the mark can read the answers behind it. <a href="/start/#declare">Showing that your software is human-shaped</a> says which one is yours, with code to paste.</p>
+              <p>These two are not for events. <a href="/principles/">The Human-Shaped Principles</a> belong to anyone who builds by them, and these marks are how you say so on your software. Nobody approves either one. Each mark says something true about how your software was made, and you can use it as soon as it is true of yours.</p>
+              <p><b>Aligned with Human Shaped</b> means you have written down how your software lines up with each of the fifteen principles, in a file called HUMAN-SHAPED.md in your own repository. <b>Endorsed by Human Shaped</b> means your software started from <a href="https://github.com/bhwilkoff/UniversalAppTemplate">the Universal App Template</a>, or you have written your commitment to the principles into your project. Either one is enough.</p>
             </div>
             <div class="brand-grid">
               <div class="tile">
@@ -256,6 +257,24 @@
                   </ul>
                 </div>
               </div>
+            </div>
+          </div>
+
+          <div class="topic" id="declare">
+            <h2>Showing a mark on your software.</h2>
+            <ol class="steps">
+              <li>Read <a href="/principles/">the principles</a> against your own software, and notice the ones it does not meet yet.</li>
+              <li>Copy <a href="https://github.com/bhwilkoff/UniversalAppTemplate/blob/main/docs/human-shaped/HUMAN-SHAPED-template.md">HUMAN-SHAPED.md</a> into your repository.</li>
+              <li>For each principle, say whether your software meets it, does not meet it yet, or does not apply, in a sentence or two of your own, with a link to evidence someone else can open. Your agent can help you find the evidence, and the sentences are yours to write.</li>
+              <li>Show the mark that is true of your software, linked to that file.</li>
+            </ol>
+            <div class="prose" id="mark">
+              <p>Show a mark wherever people meet your software, in its README on GitHub or at the foot of its website. The mark links to your own HUMAN-SHAPED.md, so anyone who wonders what it means can read your answers and the evidence behind them, which is what makes a mark like this worth trusting. Please keep its colors and its shape as they are, because people only learn to recognize a mark when it looks the same everywhere they see it.</p>
+              <p>Paste this where you want the mark, and change the first address to your own file. It follows the reader's light or dark setting on GitHub and on most websites. For the endorsed mark, change <b>aligned</b> to <b>endorsed</b> in both image addresses and in the alt text.</p>
+            </div>
+            <div class="snippet">
+              <pre id="mark-snippet">&lt;a href="https://github.com/you/your-app/blob/main/HUMAN-SHAPED.md"&gt;&lt;picture&gt;&lt;source media="(prefers-color-scheme: dark)" srcset="https://humanshaped.org/assets/mark/aligned-dark.svg"&gt;&lt;img src="https://humanshaped.org/assets/mark/aligned-light.svg" height="44" alt="Aligned with Human Shaped"&gt;&lt;/picture&gt;&lt;/a&gt;</pre>
+              <p class="actions"><button class="btn-quiet" type="button" data-copy="mark-snippet">Copy the code</button></p>
             </div>
           </div>
 
@@ -314,17 +333,36 @@
 
   <footer class="site-footer">
     <div class="wrap">
-      <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
-      <p>Made by <a href="https://learningischange.com">Ben Wilkoff</a>. The ideas, the method, the tools, and the cohorts are free, and what you build is yours.</p>
-      <p class="credit">Built by Ben with an AI agent, Claude, set in Commissioner, with icons from <a href="https://phosphoricons.com">Phosphor</a>, and shared under <a href="https://github.com/bhwilkoff/UniversalAppTemplate/blob/site/LICENSE.md">open licenses</a>, so you can borrow anything here.</p>
-      <ul>
-        <li><a href="/principles/">The principles we build by</a></li>
-        <li><a href="/privacy/">What we keep, and what we never own</a></li>
-        <li><a href="/terms/">Terms</a> and <a href="/support/">help</a></li>
-        <li><a href="/events/">Events</a></li>
-        <li><a href="https://github.com/orgs/humanshaped/discussions">Discussions on GitHub</a></li>
-        <li><a href="https://github.com/bhwilkoff/UniversalAppTemplate">The template on GitHub</a></li>
-      </ul>
+      <div class="footer-brand">
+        <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
+        <p>The ideas, the method, the tools, and the cohorts are free, and what you build is yours.</p>
+      </div>
+      <nav class="footer-links" aria-label="More of the site">
+        <div>
+          <p class="footer-head">Take part</p>
+          <ul>
+            <li><a href="/account/">Your account</a></li>
+            <li><a href="/teach/">Teach a cohort</a></li>
+            <li><a href="/connect/">Connect your agent</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="footer-head">On GitHub</p>
+          <ul>
+            <li><a href="https://github.com/bhwilkoff/UniversalAppTemplate">The template</a></li>
+            <li><a href="https://github.com/orgs/humanshaped/discussions">Discussions</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="footer-head">The fine print</p>
+          <ul>
+            <li><a href="/support/">Help</a></li>
+            <li><a href="/privacy/">Privacy</a></li>
+            <li><a href="/terms/">Terms</a></li>
+          </ul>
+        </div>
+      </nav>
+      <p class="footer-made">Made by <a href="https://learningischange.com">Ben Wilkoff</a>, with <a href="/support/#credits">help from people and tools</a>.</p>
     </div>
   </footer>
 </body>

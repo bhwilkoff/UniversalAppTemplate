@@ -95,6 +95,15 @@
   // Work people did: no merge commits and no automated accounts.
   function isWork(c) { return !c.merge && !c.bot && !!c.date; }
 
+  // A page of commits with nothing but automatic updates in it sends the
+  // pages to the owner's own commits (apps.js), which GitHub filters by
+  // author for the same one call.
+  function needsOwnerLook(list) { return !!list && list.length > 0 && !list.some(isWork); }
+  function ownerCommitsPath(repo, n) {
+    var owner = String(repo || '').split('/')[0];
+    return 'repos/' + repo + '/commits?author=' + encodeURIComponent(owner) + '&per_page=' + (n || 20);
+  }
+
   // The feed: the newest work across apps, at most `perApp` from any one
   // app so a busy repository does not drown the others out.
   function feed(perRepo, limit, perApp) {
@@ -322,7 +331,7 @@
     imageOf: imageOf, coverOf: coverOf, shotsOf: shotsOf,
     joinWithAnd: joinWithAnd, repoPath: repoPath, safeUrl: safeUrl, platformNames: platformNames,
     mergeApps: mergeApps, findApp: findApp, feedRepos: feedRepos, commitFrom: commitFrom, isWork: isWork,
-    feed: feed, trouble: trouble, troubleText: troubleText, parseDeclaration: parseDeclaration,
+    feed: feed, needsOwnerLook: needsOwnerLook, ownerCommitsPath: ownerCommitsPath, trouble: trouble, troubleText: troubleText, parseDeclaration: parseDeclaration,
     ownWords: ownWords, statusText: statusText, conversation: conversation, storeLinks: storeLinks, appHref: appHref, reportHref: reportHref
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;

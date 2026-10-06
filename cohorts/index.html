@@ -4,12 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Cohorts | Human Shaped</title>
-  <meta name="description" content="Free five-week cohorts with a live session each week on Google Meet, recorded for everyone in them, where each person builds one real app of their own.">
+  <meta name="description" content="Free 5-week cohorts where each person builds one real app of their own, beside a small group of people doing the same work.">
   <link rel="canonical" href="https://humanshaped.org/cohorts/">
   <meta property="og:url" content="https://humanshaped.org/cohorts/">
   <meta property="og:site_name" content="Human Shaped">
   <meta property="og:title" content="Cohorts">
-  <meta property="og:description" content="Free five-week cohorts with a live session each week on Google Meet, recorded for everyone in them, where each person builds one real app of their own.">
+  <meta property="og:description" content="Free 5-week cohorts where each person builds one real app of their own, beside a small group of people doing the same work.">
   <meta property="og:type" content="website">
   <meta property="og:image" content="https://humanshaped.org/assets/og.png">
   <meta property="og:image:width" content="1200">
@@ -23,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261006d">
+  <link rel="stylesheet" href="/assets/site.css?v=20261006e">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -37,6 +37,8 @@
   <script src="/assets/hub-config.js" defer></script>
   <script src="/assets/teach-lib.js" defer></script>
   <script src="/assets/cohorts.js" defer></script>
+  <script src="/assets/path-lib.js" defer></script>
+  <script src="/assets/path-marks.js" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to the page</a>
@@ -46,11 +48,10 @@
       <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
       <nav class="nav" aria-label="Main">
         <ul>
-          <li><a href="/path/">The path</a></li>
           <li><a href="/principles/">Principles</a></li>
-          <li><a href="/cohorts/" aria-current="page">Cohorts</a></li>
+          <li><a href="/cohorts/" aria-current="true">Cohorts</a></li>
           <li><a href="/apps/">Apps</a></li>
-          <li><a href="/start/">Start something</a></li>
+          <li><a href="/events/">Events</a></li>
         </ul>
       </nav>
       <div class="header-actions">
@@ -71,7 +72,7 @@
         <div>
           <p class="kicker">Cohorts</p>
           <h1>Five weeks, with other people, for free.</h1>
-          <p class="lead">A cohort is about five weeks of building one real app of your own with an AI agent, with a live session each week and a small group of people doing the same work beside you. It is for adults who have never built an app and have a human-shaped problem in mind: something in their life that has gone unsolved for months or even years, that they cannot do themselves with the tools they have now, and that touches real people they can name (<a href="/principles/#computer-shaped-and-human-shaped">examples of each shape</a>).</p>
+          <p class="lead">A cohort is five weeks of building one real app of your own with an AI agent, beside a small group of people doing the same work. It is for adults who have never built an app and have a human-shaped problem in mind: something in their life that has gone unsolved for months or even years, that they cannot do themselves with the tools they have now, and that touches real people they can name (<a href="/principles/#computer-shaped-and-human-shaped">examples of each shape</a>).</p>
           <p class="fine">Open cohorts are listed <a href="#join">at the bottom of this page</a>.</p>
         </div>
 
@@ -79,7 +80,7 @@
           <h2 id="weeks-card-title">A cohort, week by week</h2>
           <p>One live session a week, and something to show at the end of each one.</p>
           <ol>
-            <li><b>Before</b><span>Your app's own address, open on your phone</span></li>
+            <li><b>Cohort Prep</b><span>Your app's own address, open on your phone</span></li>
             <li><b>Week 1</b><span>Why it exists, and a first version running on real data</span></li>
             <li><b>Week 2</b><span>The same app, on a second platform</span></li>
             <li><b>Week 3</b><span>Seeing it work, and a look of its own</span></li>
@@ -91,16 +92,19 @@
 
       <section class="section first" aria-label="How a cohort works">
         <div class="topics">
-          <div class="topic" id="sessions">
-            <h2>One live session a week, and every one recorded.</h2>
+          <!-- From Ben's October 6 message: each session is shaped by the
+               cohort's work that week, so this page sets expectations for
+               a week rather than describing a session. Awaiting his review. -->
+          <div class="topic" id="week">
+            <h2>What a week asks of you.</h2>
             <div class="prose">
-              <p>Each week the cohort meets once on Google Meet. You show what you published that week to at least two other people, because the conversation is the point, and then the cohort reads one real prompt together and talks about what the builder wanted, what the agent got wrong, and how the prompt fixed it. Before you leave, you send your agent the first prompt of the coming week, so the next round of writing, playing, and publishing has already begun.</p>
-              <p>What you explain back each week is the decisions you made rather than the code the agent wrote, and nothing you answer is ever graded. Sessions are recorded for everyone in the cohort, so missing a week never means falling behind.</p>
+              <p>Each week you build in conversation with your agent, and you publish what you made. Once a week the cohort meets live, and you show that week's work to at least two other people, because the conversation is the point. What you explain is the decisions you made rather than the code the agent wrote, and nothing you answer is ever graded.</p>
+              <p>Every session is shaped by what the cohort needs that week, so no two are alike. Before you leave one, you send your agent the first prompt of the coming week, so the next round of writing, playing, and publishing has already begun.</p>
             </div>
           </div>
 
           <div class="topic" id="need">
-            <h2>What you need before the first week.</h2>
+            <h2>What you need for Cohort Prep.</h2>
             <div class="prose">
               <p>You need a GitHub account, your own copy of the template, an AI agent that can work in your repository, and a desktop computer. You bring your own AI, and it can be anything from a model running on your own computer to a Claude or Gemini subscription. The course shows the cheapest ways that work, and it never asks you to buy from one company.</p>
               <p>You do not have to pay for an app store account to finish, either. Week four ends with your app on someone else's device, which a test track or a direct share can do for free.</p>
@@ -135,15 +139,44 @@
             </div>
           </div>
 
-          <div class="topic" id="path">
-            <h2>The path is open before you join.</h2>
-            <div class="prose">
-              <p>Everything a cohort follows is already written down, so you can read <a href="/path/">the whole path</a> today, or copy <a href="https://github.com/bhwilkoff/UniversalAppTemplate">the template</a> and start on your own.</p>
-            </div>
-          </div>
         </div>
       </section>
     </div>
+
+    <section class="section tint" id="weeks" aria-labelledby="weeks-title">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <p class="kicker">Week by week</p>
+            <h2 id="weeks-title">Every week is already written down.</h2>
+          </div>
+          <p class="prose">Each week's work is a stage or two of the method in the Universal App Template. Each stage opens with something that really happened while an app was being built this way, and ends with a "Be ready to..." line, which is what you bring back and show. You can read every one before you join, or <a href="https://github.com/bhwilkoff/UniversalAppTemplate">copy the template</a> and start on your own.</p>
+        </div>
+        <ol class="stages by-week">
+          <li class="week-row">Cohort Prep</li>
+          <li><a href="/path/setup/"><span class="n">&middot;</span><span class="t">Getting set up</span><span class="l">A GitHub account, your own copy, an agent, and your app's address on your phone.</span></a></li>
+          <li class="week-row">Week 1</li>
+          <li><a href="/path/00/"><span class="n">00</span><span class="t">Why we build</span><span class="l">An agent keeps only the values you write down.</span></a></li>
+          <li><a href="/path/01/"><span class="n">01</span><span class="t">The first prototype</span><span class="l">One platform, real data, this week.</span></a></li>
+          <li class="week-row">Week 2</li>
+          <li><a href="/path/02/"><span class="n">02</span><span class="t">The shape of an app</span><span class="l">Same verb, native idiom.</span></a></li>
+          <li><a href="/path/03/"><span class="n">03</span><span class="t">Going native</span><span class="l">The floor is a floor, not a ceiling.</span></a></li>
+          <li class="week-row">Week 3</li>
+          <li><a href="/path/04/"><span class="n">04</span><span class="t">Seeing it work</span><span class="l">The agent is never the tester.</span></a></li>
+          <li class="week-row">Week 4</li>
+          <li><a href="/path/05/"><span class="n">05</span><span class="t">Shipping</span><span class="l">A feature nobody can install is unfinished.</span></a></li>
+          <li><a href="/path/06/"><span class="n">06</span><span class="t">Keeping it running</span><span class="l">A confident zero is worse than no dashboard.</span></a></li>
+          <li class="week-row">Week 5</li>
+          <li><a href="/path/07/"><span class="n">07</span><span class="t">Raising the ceiling</span><span class="l">Raise the ceiling without raising the floor.</span></a></li>
+          <li><a href="/path/08/"><span class="n">08</span><span class="t">Working with AI</span><span class="l">The agent remembers only what the repository remembers.</span></a></li>
+          <li class="week-row">Every week</li>
+          <li class="aside"><a href="/path/talking-to-your-agent/"><span class="n" aria-hidden="true"></span><span class="t">Talking to your agent</span><span class="l">The prompt is the work, so this page gathers the moves that work with an agent.</span></a></li>
+          <li class="aside"><a href="/path/showing-your-work/"><span class="n" aria-hidden="true"></span><span class="t">Showing your work</span><span class="l">Explain one decision, ask three questions, and find feedback with or without a cohort.</span></a></li>
+        </ol>
+        <p class="small path-where" data-path-progress hidden></p>
+        <p class="small">Every stage is a set of conversations with your agent. <a href="/connect/">Connect it to Human Shaped</a> and it can read your cohort's week, or your own app if you are building alone, and review your work the way the method does.</p>
+      </div>
+    </section>
 
     <section class="band join" id="join" aria-labelledby="join-title">
       <div class="wrap">
@@ -155,7 +188,7 @@
           <p class="small">If you do not have a GitHub account yet, it is free, and it is the first thing you will need either way.</p>
           <div class="actions">
             <a class="btn-github" href="https://github.com/signup"><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Create a GitHub account</a>
-            <a class="btn-quiet" href="/path/00/">Start with stage 00</a>
+            <a class="btn-quiet" href="/path/setup/">Start Cohort Prep</a>
           </div>
         </div>
       </div>
@@ -164,17 +197,36 @@
 
   <footer class="site-footer">
     <div class="wrap">
-      <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
-      <p>Made by <a href="https://learningischange.com">Ben Wilkoff</a>. The ideas, the method, the tools, and the cohorts are free, and what you build is yours.</p>
-      <p class="credit">Built by Ben with an AI agent, Claude, set in Commissioner, with icons from <a href="https://phosphoricons.com">Phosphor</a>, and shared under <a href="https://github.com/bhwilkoff/UniversalAppTemplate/blob/site/LICENSE.md">open licenses</a>, so you can borrow anything here.</p>
-      <ul>
-        <li><a href="/principles/">The principles we build by</a></li>
-        <li><a href="/privacy/">What we keep, and what we never own</a></li>
-        <li><a href="/terms/">Terms</a> and <a href="/support/">help</a></li>
-        <li><a href="/events/">Events</a></li>
-        <li><a href="https://github.com/orgs/humanshaped/discussions">Discussions on GitHub</a></li>
-        <li><a href="https://github.com/bhwilkoff/UniversalAppTemplate">The template on GitHub</a></li>
-      </ul>
+      <div class="footer-brand">
+        <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
+        <p>The ideas, the method, the tools, and the cohorts are free, and what you build is yours.</p>
+      </div>
+      <nav class="footer-links" aria-label="More of the site">
+        <div>
+          <p class="footer-head">Take part</p>
+          <ul>
+            <li><a href="/account/">Your account</a></li>
+            <li><a href="/teach/">Teach a cohort</a></li>
+            <li><a href="/connect/">Connect your agent</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="footer-head">On GitHub</p>
+          <ul>
+            <li><a href="https://github.com/bhwilkoff/UniversalAppTemplate">The template</a></li>
+            <li><a href="https://github.com/orgs/humanshaped/discussions">Discussions</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="footer-head">The fine print</p>
+          <ul>
+            <li><a href="/support/">Help</a></li>
+            <li><a href="/privacy/">Privacy</a></li>
+            <li><a href="/terms/">Terms</a></li>
+          </ul>
+        </div>
+      </nav>
+      <p class="footer-made">Made by <a href="https://learningischange.com">Ben Wilkoff</a>, with <a href="/support/#credits">help from people and tools</a>.</p>
     </div>
   </footer>
 </body>

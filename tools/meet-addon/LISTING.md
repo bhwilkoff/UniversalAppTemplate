@@ -13,8 +13,9 @@ do it in one sitting, with the exact words and files for each field.
 
 - **Your legal name or the organization's**, as the developer, and a
   **physical address**. Google asks for both in the developer details,
-  and /terms/ and /support/ now name Learning is Change, Inc., 8287 S
-  Pennsylvania Ct., Littleton, CO 80122 (Ben, October 4).
+  and /terms/ and /support/ name Learning is Change, Inc. The street
+  address goes only in Google's developer form, never on the site (Ben,
+  October 6).
 - **A support email that someone reads.** The pages say
   meet@humanshaped.org today. If nobody reads it, give me the address
   that is read and I will change the pages.

@@ -23,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261006d">
+  <link rel="stylesheet" href="/assets/site.css?v=20261006e">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -45,11 +45,10 @@
       <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
       <nav class="nav" aria-label="Main">
         <ul>
-          <li><a href="/path/" aria-current="true">The path</a></li>
           <li><a href="/principles/">Principles</a></li>
-          <li><a href="/cohorts/">Cohorts</a></li>
+          <li><a href="/cohorts/" aria-current="true">Cohorts</a></li>
           <li><a href="/apps/">Apps</a></li>
-          <li><a href="/start/">Start something</a></li>
+          <li><a href="/events/">Events</a></li>
         </ul>
       </nav>
       <div class="header-actions">
@@ -66,7 +65,7 @@
 
   <main id="main">
     <div class="wrap">
-      <p class="crumbs"><a href="/path/">The path</a> &rsaquo; Alongside every stage</p>
+      <p class="crumbs"><a href="/cohorts/#weeks">The weeks</a> &rsaquo; Every week</p>
       <header class="stage-head">
         <p class="num">Alongside every stage</p>
         <h1 data-doc-title>Talking to your agent</h1>
@@ -107,7 +106,7 @@
           <p class="source"><a href="https://github.com/bhwilkoff/UniversalAppTemplate/blob/main/docs/path/talking-to-your-agent.md">Read it on GitHub</a></p>
           <nav class="next-stage" aria-label="Previous and next">
             <a href="/path/08/">Stage 08, Working with AI</a>
-            <a href="/path/">Back to the whole path</a>
+            <a href="/cohorts/#weeks">Back to the weeks</a>
           </nav>
         </div>
       </div>
@@ -116,17 +115,36 @@
 
   <footer class="site-footer">
     <div class="wrap">
-      <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
-      <p>Made by <a href="https://learningischange.com">Ben Wilkoff</a>. The ideas, the method, the tools, and the cohorts are free, and what you build is yours.</p>
-      <p class="credit">Built by Ben with an AI agent, Claude, set in Commissioner, with icons from <a href="https://phosphoricons.com">Phosphor</a>, and shared under <a href="https://github.com/bhwilkoff/UniversalAppTemplate/blob/site/LICENSE.md">open licenses</a>, so you can borrow anything here.</p>
-      <ul>
-        <li><a href="/principles/">The principles we build by</a></li>
-        <li><a href="/privacy/">What we keep, and what we never own</a></li>
-        <li><a href="/terms/">Terms</a> and <a href="/support/">help</a></li>
-        <li><a href="/events/">Events</a></li>
-        <li><a href="https://github.com/orgs/humanshaped/discussions">Discussions on GitHub</a></li>
-        <li><a href="https://github.com/bhwilkoff/UniversalAppTemplate">The template on GitHub</a></li>
-      </ul>
+      <div class="footer-brand">
+        <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
+        <p>The ideas, the method, the tools, and the cohorts are free, and what you build is yours.</p>
+      </div>
+      <nav class="footer-links" aria-label="More of the site">
+        <div>
+          <p class="footer-head">Take part</p>
+          <ul>
+            <li><a href="/account/">Your account</a></li>
+            <li><a href="/teach/">Teach a cohort</a></li>
+            <li><a href="/connect/">Connect your agent</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="footer-head">On GitHub</p>
+          <ul>
+            <li><a href="https://github.com/bhwilkoff/UniversalAppTemplate">The template</a></li>
+            <li><a href="https://github.com/orgs/humanshaped/discussions">Discussions</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="footer-head">The fine print</p>
+          <ul>
+            <li><a href="/support/">Help</a></li>
+            <li><a href="/privacy/">Privacy</a></li>
+            <li><a href="/terms/">Terms</a></li>
+          </ul>
+        </div>
+      </nav>
+      <p class="footer-made">Made by <a href="https://learningischange.com">Ben Wilkoff</a>, with <a href="/support/#credits">help from people and tools</a>.</p>
     </div>
   </footer>
 </body>

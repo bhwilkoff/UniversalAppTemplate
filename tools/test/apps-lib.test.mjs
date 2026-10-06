@@ -227,3 +227,13 @@ test('the founding apps show their store screens, and other apps none', () => {
   assert.equal(lib.shotsOf({ repo: 'someone/their-app' }), null);
   assert.equal(lib.shotsOf(null), null);
 });
+
+test('a page of nothing but automatic updates sends the feed to the owner\'s own commits', () => {
+  const bot = { sha: 'a', merge: false, bot: true, date: '2026-10-06T00:00:00Z' };
+  const work = { sha: 'b', merge: false, bot: false, date: '2026-10-03T00:00:00Z' };
+  assert.equal(lib.needsOwnerLook([bot, bot]), true);
+  assert.equal(lib.needsOwnerLook([bot, work]), false);
+  assert.equal(lib.needsOwnerLook([]), false);
+  assert.equal(lib.needsOwnerLook(undefined), false);
+  assert.equal(lib.ownerCommitsPath('bhwilkoff/Archive-Watch'), 'repos/bhwilkoff/Archive-Watch/commits?author=bhwilkoff&per_page=20');
+});

@@ -320,9 +320,11 @@ Stage' is better?" So the board scene is the **design stage**, beside
 the main stage. Every other word in research/notes/run-of-show-design.md
 stands.
 
-The site is offered by Learning is Change, Inc., 8287 S Pennsylvania
-Ct., Littleton, CO 80122, the entity on Ben's app store accounts; /terms/
-and /support/ say so, as Google's listing requires. The Gmail account for
+The site is offered by Learning is Change, Inc., the entity on Ben's
+app store accounts; /terms/ and /support/ say so. Its street address goes
+to the stores' developer forms only, never on the site or in this
+repository (Ben, October 6: "please take my address off of the
+webpage"). The Gmail account for
 testing as a student is kept in ~/.humanshaped/test-student on Ben's Mac,
 never in this repository.
 

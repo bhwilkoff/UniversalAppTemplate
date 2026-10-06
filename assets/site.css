@@ -265,11 +265,27 @@ h3 { font-size: 1.25rem; letter-spacing: -0.012em; line-height: 1.25; }
 
 /* Footer */
 
-.site-footer { padding: 2.5rem 0 3rem; color: var(--muted); font-size: 0.95rem; }
-.site-footer .wrap { display: grid; gap: 1.25rem; }
-.site-footer .wordmark { font-size: 1.1rem; }
+/* The footer: the wordmark and one line, three short columns of what
+   people come back for, and who made it. Credits live on /support/. */
+.site-footer { padding: 3rem 0 2.5rem; color: var(--muted); font-size: 0.95rem; border-top: 1px solid var(--rule); background: var(--surface); }
+.site-footer .wrap { display: grid; gap: 2rem; }
+.site-footer .wordmark { font-size: 1.2rem; }
 .site-footer p { margin: 0; max-width: 40rem; }
-.site-footer ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; }
+.footer-brand { display: grid; gap: 0.75rem; align-content: start; }
+.footer-brand p { color: var(--ink); max-width: 22rem; }
+.footer-links { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem 1rem; }
+.footer-head { font-size: 0.8rem; font-weight: 650; letter-spacing: 0.08em; text-transform: uppercase; color: var(--clay); margin: 0 0 0.6rem; }
+.site-footer ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.15rem; }
+.site-footer ul a { color: var(--ink); text-decoration: none; }
+.site-footer ul a:hover { color: var(--clay); text-decoration: underline; text-underline-offset: 0.2em; }
+.site-footer .footer-made { max-width: none; padding-top: 1.25rem; border-top: 1px solid var(--rule); font-size: 0.9rem; }
+@media (min-width: 720px) {
+  .footer-links { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (min-width: 1000px) {
+  .site-footer .wrap { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); column-gap: 3rem; }
+  .footer-made { grid-column: 1 / -1; }
+}
 
 /* Stage page */
 
@@ -364,6 +380,36 @@ h3 { font-size: 1.25rem; letter-spacing: -0.012em; line-height: 1.25; }
 .section.first { padding-top: 0; }
 .section-more { margin: 2rem 0 0; font-weight: 600; }
 
+/* Links that stand on their own, to more of an idea: a quiet pill with
+   Phosphor's arrow (assets/arrow.svg) where a section hands off, and the
+   words with the arrow beside a button or at the end of a page. A link
+   inside a sentence stays a plain underlined link. */
+.section-more a, .sleeve-more a, .compare-more a, a.go {
+  display: inline-flex; align-items: center; gap: 0.55rem; min-height: 44px;
+  padding: 0.55rem 1.1rem; border: 1px solid color-mix(in srgb, currentColor 35%, transparent);
+  border-radius: 999px; color: var(--clay); font-weight: 600; text-decoration: none; line-height: 1.25;
+  transition: border-color 0.15s, background-color 0.15s;
+}
+.section-more a:hover, .sleeve-more a:hover, .compare-more a:hover, a.go:hover {
+  border-color: currentColor; background: color-mix(in srgb, currentColor 8%, transparent);
+}
+.section-more a::after, .sleeve-more a::after, .compare-more a::after, a.go::after,
+.source a::after, .hero-actions a.text::after, a.go-text::after {
+  content: ""; flex: none; width: 1em; height: 1em; background: currentColor;
+  -webkit-mask: url(/assets/arrow.svg) center / contain no-repeat; mask: url(/assets/arrow.svg) center / contain no-repeat;
+  transition: transform 0.15s;
+}
+.section-more a:hover::after, .sleeve-more a:hover::after, .compare-more a:hover::after, a.go:hover::after,
+.source a:hover::after, .hero-actions a.text:hover::after, a.go-text:hover::after { transform: translateX(3px); }
+.source a, .hero-actions a.text, a.go-text {
+  display: inline-flex; align-items: center; gap: 0.45rem; color: var(--clay); font-weight: 600; text-decoration: none;
+}
+.source a:hover, .hero-actions a.text:hover, a.go-text:hover { text-decoration: underline; text-underline-offset: 0.2em; }
+@media (prefers-reduced-motion: reduce) {
+  .section-more a::after, .sleeve-more a::after, .compare-more a::after, a.go::after,
+  .source a::after, .hero-actions a.text::after, a.go-text::after { transition: none; }
+}
+
 /* Reading view: what the renderer adds */
 
 .stage-head .meta { color: var(--muted); margin: 1rem 0 0; max-width: 36rem; }
@@ -440,6 +486,10 @@ h3 { font-size: 1.25rem; letter-spacing: -0.012em; line-height: 1.25; }
 .stages .l { grid-column: 2; color: var(--muted); }
 .stages a:hover .t { color: var(--clay); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 0.2em; }
 .stages .aside .n { font-size: 1rem; }
+/* /cohorts/: the stages, grouped by the week a cohort reads them. */
+.stages .week-row { padding: 1.5rem 0 0.4rem; color: var(--clay); font-weight: 650; font-size: 0.9rem; letter-spacing: 0.06em; text-transform: uppercase; border-bottom: 0; }
+.stages .week-row:first-child { padding-top: 1rem; }
+.stages.by-week { border-top: 0; }
 
 /* The cohort table */
 
@@ -478,6 +528,9 @@ h3 { font-size: 1.25rem; letter-spacing: -0.012em; line-height: 1.25; }
 .mark-kinds { list-style: none; margin: 1.25rem 0 1.5rem; padding: 0; display: grid; gap: 1rem; }
 .mark-kinds li { background: var(--card); border: 1px solid var(--rule); border-radius: var(--radius); padding: 1.25rem; }
 .mark-kinds img { display: block; height: 44px; width: auto; margin-bottom: 0.9rem; }
+.mark-kinds.just-marks { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 0; }
+.mark-kinds.just-marks li { padding: 1rem 1.25rem; }
+.mark-kinds.just-marks img { margin: 0; }
 .mark-kinds h3 { font-size: 1.1rem; margin-bottom: 0.35rem; }
 .mark-kinds p { margin: 0; color: var(--muted); line-height: 1.5; }
 @media (min-width: 40rem) { .mark-kinds { grid-template-columns: 1fr 1fr; } }
@@ -1291,7 +1344,8 @@ body.addon-body { min-height: 100vh; }
    (WCAG 2.2, 2.5.8) for links that stand alone on a line, and check
    boxes and radio buttons large enough to hit, in the clay.
    ------------------------------------------------------------------ */
-.site-footer ul a, .crumbs a, .kicker a, .next-stage a, .source a { display: inline-block; padding: 0.15rem 0; }
+.site-footer ul a, .crumbs a, .kicker a, .next-stage a { display: inline-block; padding: 0.15rem 0; }
+.source a { padding: 0.15rem 0; }
 input[type="checkbox"], input[type="radio"] { width: 1.25rem; height: 1.25rem; margin: 0; flex: none; accent-color: var(--clay); }
 label.check { min-height: 2.25rem; }
 /* The file picker's real input is invisible, so its focus shows on the label around it. */
