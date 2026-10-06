@@ -2024,12 +2024,27 @@ ol.principles summary:focus-visible { outline: 2px solid var(--accent); outline-
   .hang-section > .photo { grid-column: 1 / -1; }
 }
 
-/* The weeks: each week is the group's heading, its stages sit under it. */
-.stages.by-week .week-row { padding: 2rem 0 0.5rem; gap: 0.15rem 0.85rem; }
-.stages.by-week .week-row .wk { color: var(--muted); font-size: 0.95rem; font-weight: 650; }
-.stages.by-week .week-row .wk-what { font-size: clamp(1.2rem, 1.05rem + 0.6vw, 1.45rem); font-weight: 650; letter-spacing: -0.015em; line-height: 1.3; flex-basis: 100%; }
-.stages.by-week a .t { font-size: 1.05rem; font-weight: 600; }
-.stages.by-week a .n { font-size: 1rem; }
+/* The weeks: one row per week, the week on the left and its stages
+   listed close together on the right, so the list reads as five weeks,
+   not fifteen rows. */
+.stages.by-week { list-style: none; margin: 0; padding: 0; }
+.stages.by-week > li.week { display: grid; gap: 0.75rem; padding: 1.5rem 0; border-top: 1px solid var(--rule); border-bottom: 0; }
+.stages.by-week > li.week:first-child { border-top: 0; padding-top: 0.5rem; }
+.stages.by-week .week-head .wk { margin: 0 0 0.2rem; color: var(--muted); font-size: 0.95rem; font-weight: 650; }
+.stages.by-week .week-head .wk-what { margin: 0; font-size: clamp(1.15rem, 1.05rem + 0.4vw, 1.35rem); font-weight: 650; letter-spacing: -0.015em; line-height: 1.3; max-width: 24ch; }
+.stages.by-week .week-stages { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.25rem; }
+.stages.by-week .week-stages li { border: 0; }
+.stages.by-week .week-stages a { display: grid; grid-template-columns: 2.5rem minmax(0, 1fr); gap: 0.1rem 0.75rem; padding: 0.5rem 0; align-items: baseline; }
+.stages.by-week .week-stages .n { grid-row: span 2; color: var(--muted); font-size: 0.95rem; font-weight: 600; }
+.stages.by-week .week-stages .t { font-size: 1.05rem; font-weight: 600; }
+.stages.by-week .week-stages .l { grid-column: 2; color: var(--muted); font-size: 0.97rem; line-height: 1.5; }
+.stages.by-week .week-stages .path-mark { grid-column: 2; }
+@media (min-width: 64rem) {
+  .stages.by-week > li.week { grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); column-gap: 4rem; padding: 1.75rem 0; }
+  .stages.by-week .week-stages a { grid-template-columns: 2.5rem minmax(0, 5fr) minmax(0, 7fr); gap: 1.5rem; padding: 0.4rem 0; }
+  .stages.by-week .week-stages .n { grid-row: auto; }
+  .stages.by-week .week-stages .l { grid-column: 3; }
+}
 .section-head > .head-side > .prose { padding-top: 0.45rem; margin: 0 0 1.5rem; }
 .section-head > .head-side .photo { margin: 0; }
 [data-events] h2 { font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2rem); margin-bottom: 1rem; }

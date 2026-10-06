@@ -23,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261006v">
+  <link rel="stylesheet" href="/assets/site.css?v=20261006w">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -78,7 +78,7 @@
       </header>
 
       <section class="section first" aria-label="How a cohort works">
-        <div class="topics">
+        <div class="topics single">
           <!-- From Ben's October 6 message: each session is shaped by the
                cohort's work that week, so this page sets expectations for
                a week rather than describing a session. Awaiting his review. -->
@@ -145,25 +145,53 @@
           </div>
         </div>
         <ol class="stages by-week">
-          <li class="week-row"><span class="wk">Cohort Prep</span><span class="wk-what">Your app&rsquo;s own address, open on your phone</span></li>
-          <li><a href="/path/setup/"><span class="n" aria-hidden="true"></span><span class="t">Getting set up</span><span class="l">A GitHub account, your own copy, an agent, and your app's address on your phone.</span></a></li>
-          <li class="week-row"><span class="wk">Week 1</span><span class="wk-what">Why it exists, and a first version running on real data</span></li>
-          <li><a href="/path/00/"><span class="n">00</span><span class="t">Why we build</span><span class="l">An agent keeps only the values you write down.</span></a></li>
-          <li><a href="/path/01/"><span class="n">01</span><span class="t">The first prototype</span><span class="l">One platform, real data, this week.</span></a></li>
-          <li class="week-row"><span class="wk">Week 2</span><span class="wk-what">The same app, on a second platform</span></li>
-          <li><a href="/path/02/"><span class="n">02</span><span class="t">The shape of an app</span><span class="l">Same verb, native idiom.</span></a></li>
-          <li><a href="/path/03/"><span class="n">03</span><span class="t">Going native</span><span class="l">The floor is a floor, not a ceiling.</span></a></li>
-          <li class="week-row"><span class="wk">Week 3</span><span class="wk-what">Seeing it work, and a look of its own</span></li>
-          <li><a href="/path/04/"><span class="n">04</span><span class="t">Seeing it work</span><span class="l">The agent is never the tester.</span></a></li>
-          <li class="week-row"><span class="wk">Week 4</span><span class="wk-what">Your app on someone else&rsquo;s device</span></li>
-          <li><a href="/path/05/"><span class="n">05</span><span class="t">Shipping</span><span class="l">A feature nobody can install is unfinished.</span></a></li>
-          <li><a href="/path/06/"><span class="n">06</span><span class="t">Keeping it running</span><span class="l">A confident zero is worse than no dashboard.</span></a></li>
-          <li class="week-row"><span class="wk">Week 5</span><span class="wk-what">A feature you wanted, shown to everyone</span></li>
-          <li><a href="/path/07/"><span class="n">07</span><span class="t">Raising the ceiling</span><span class="l">Raise the ceiling without raising the floor.</span></a></li>
-          <li><a href="/path/08/"><span class="n">08</span><span class="t">Working with AI</span><span class="l">The agent remembers only what the repository remembers.</span></a></li>
-          <li class="week-row"><span class="wk">Every week</span></li>
-          <li class="aside"><a href="/path/talking-to-your-agent/"><span class="n" aria-hidden="true"></span><span class="t">Talking to your agent</span><span class="l">The prompt is the work, so this page gathers the moves that work with an agent.</span></a></li>
-          <li class="aside"><a href="/path/showing-your-work/"><span class="n" aria-hidden="true"></span><span class="t">Showing your work</span><span class="l">Explain one decision, ask three questions, and find feedback with or without a cohort.</span></a></li>
+          <li class="week">
+            <div class="week-head"><p class="wk">Cohort Prep</p><h3 class="wk-what">Your app&rsquo;s own address, open on your phone</h3></div>
+            <ol class="week-stages">
+              <li><a href="/path/setup/"><span class="n" aria-hidden="true"></span><span class="t">Getting set up</span><span class="l">A GitHub account, your own copy, an agent, and your app's address on your phone.</span></a></li>
+            </ol>
+          </li>
+          <li class="week">
+            <div class="week-head"><p class="wk">Week 1</p><h3 class="wk-what">Why it exists, and a first version running on real data</h3></div>
+            <ol class="week-stages">
+              <li><a href="/path/00/"><span class="n">00</span><span class="t">Why we build</span><span class="l">An agent keeps only the values you write down.</span></a></li>
+              <li><a href="/path/01/"><span class="n">01</span><span class="t">The first prototype</span><span class="l">One platform, real data, this week.</span></a></li>
+            </ol>
+          </li>
+          <li class="week">
+            <div class="week-head"><p class="wk">Week 2</p><h3 class="wk-what">The same app, on a second platform</h3></div>
+            <ol class="week-stages">
+              <li><a href="/path/02/"><span class="n">02</span><span class="t">The shape of an app</span><span class="l">Same verb, native idiom.</span></a></li>
+              <li><a href="/path/03/"><span class="n">03</span><span class="t">Going native</span><span class="l">The floor is a floor, not a ceiling.</span></a></li>
+            </ol>
+          </li>
+          <li class="week">
+            <div class="week-head"><p class="wk">Week 3</p><h3 class="wk-what">Seeing it work, and a look of its own</h3></div>
+            <ol class="week-stages">
+              <li><a href="/path/04/"><span class="n">04</span><span class="t">Seeing it work</span><span class="l">The agent is never the tester.</span></a></li>
+            </ol>
+          </li>
+          <li class="week">
+            <div class="week-head"><p class="wk">Week 4</p><h3 class="wk-what">Your app on someone else&rsquo;s device</h3></div>
+            <ol class="week-stages">
+              <li><a href="/path/05/"><span class="n">05</span><span class="t">Shipping</span><span class="l">A feature nobody can install is unfinished.</span></a></li>
+              <li><a href="/path/06/"><span class="n">06</span><span class="t">Keeping it running</span><span class="l">A confident zero is worse than no dashboard.</span></a></li>
+            </ol>
+          </li>
+          <li class="week">
+            <div class="week-head"><p class="wk">Week 5</p><h3 class="wk-what">A feature you wanted, shown to everyone</h3></div>
+            <ol class="week-stages">
+              <li><a href="/path/07/"><span class="n">07</span><span class="t">Raising the ceiling</span><span class="l">Raise the ceiling without raising the floor.</span></a></li>
+              <li><a href="/path/08/"><span class="n">08</span><span class="t">Working with AI</span><span class="l">The agent remembers only what the repository remembers.</span></a></li>
+            </ol>
+          </li>
+          <li class="week">
+            <div class="week-head"><p class="wk">Every week</p></div>
+            <ol class="week-stages">
+              <li><a href="/path/talking-to-your-agent/"><span class="n" aria-hidden="true"></span><span class="t">Talking to your agent</span><span class="l">The prompt is the work, so this page gathers the moves that work with an agent.</span></a></li>
+              <li><a href="/path/showing-your-work/"><span class="n" aria-hidden="true"></span><span class="t">Showing your work</span><span class="l">Explain one decision, ask three questions, and find feedback with or without a cohort.</span></a></li>
+            </ol>
+          </li>
         </ol>
         <p class="small path-where" data-path-progress hidden></p>
         <p class="small">Every stage is a set of conversations with your agent. <a href="/connect/">Connect it to Human Shaped</a> and it can read your cohort's week, or your own app if you are building alone, and review your work the way the method does.</p>
