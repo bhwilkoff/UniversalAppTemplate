@@ -1076,11 +1076,13 @@ button.talk-title[aria-expanded="true"]::before { transform: rotate(90deg); }
 .kit .rules { margin: 0.5rem 0 0; padding-left: 1.3rem; max-width: var(--measure); }
 .kit .rules li { margin: 0 0 0.9rem; }
 .kit .rules li::marker { color: var(--clay); font-weight: 600; }
-.kit .type-sample { margin: 1.25rem 0 0; display: grid; gap: 0.35rem; }
-.kit .type-sample p { margin: 0; line-height: 1.2; }
+.kit .type-sample { margin: 1.25rem 0 0; display: grid; gap: 0; border-top: 1px solid var(--rule); }
+.kit .type-sample > div { display: grid; gap: 0.35rem; padding: 1rem 0; border-bottom: 1px solid var(--rule); }
+.kit .type-sample dt { font-size: 0.8rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.kit .type-sample dd { margin: 0; line-height: 1.25; }
 .kit .type-sample .w680 { font-weight: 680; font-size: 2rem; letter-spacing: -0.025em; }
-.kit .type-sample .w600 { font-weight: 600; font-size: 1.25rem; color: var(--clay); }
-.kit .type-sample .w400 { font-weight: 400; font-size: 1.0625rem; color: var(--muted); }
+.kit .type-sample .w600 { font-weight: 600; font-size: 1.25rem; }
+.kit .type-sample .w400 { font-weight: 400; font-size: 1.0625rem; max-width: 36rem; }
 
 /* Sheets on the guide pages reuse the .sheet look from /start/sheets/ */
 .kit .sheets { margin-top: 1.5rem; }
@@ -1923,3 +1925,18 @@ ol.principles summary:focus-visible { outline: 2px solid var(--clay); outline-of
 .about-why .article { max-width: var(--measure); }
 .about-why .part-title { margin: 0 0 1rem; }
 .home .hero .pitch strong, .hero .pitch strong { font-weight: 650; color: var(--ink); }
+
+/* A "Case study: ..." section in a rendered template page (render.js):
+   set apart as a card, with the app's iPhone screen floated beside it. */
+.article .case-study { margin: 2.5rem 0; padding: 1.5rem 1.25rem; background: var(--card); border: 1px solid var(--rule); border-radius: var(--radius); display: flow-root; }
+.article .case-study > :last-child { margin-bottom: 0; }
+.article .case-study h2 { margin-top: 0.25rem; }
+.case-label { margin: 0 !important; font-size: 0.8rem; font-weight: 650; letter-spacing: 0.08em; text-transform: uppercase; color: var(--clay); }
+.case-shot { float: right; width: 7rem; margin: 0 0 1rem 1.25rem; }
+.case-shot img { display: block; width: 100%; height: auto; border-radius: 12px; box-shadow: 0 16px 32px -20px rgba(0, 0, 0, 0.6); }
+.article .case-study blockquote { border-left-color: var(--clay); }
+.case-more { margin: 1rem 0 0 !important; clear: both; }
+@media (min-width: 40rem) {
+  .article .case-study { padding: 2rem; }
+  .case-shot { width: 9.5rem; margin-left: 1.75rem; }
+}

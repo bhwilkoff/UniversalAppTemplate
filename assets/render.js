@@ -40,6 +40,11 @@
     'docs/human-shaped/computer-shaped-problems.md': '/about/'
   };
 
+  // The founding apps a case study can show (assets/apps/).
+  var CASE_APPS = {
+    'Archive Watch': { shot: '/assets/apps/archive-watch-1.webp', page: '/apps/app/?r=bhwilkoff/Archive-Watch' }
+  };
+
   // Where a link in a template file goes on this site: its own page here,
   // or the file on GitHub. Shared with pages that draw template text
   // themselves (assets/principles-page.js).
@@ -246,6 +251,33 @@
 
     // Headings get the same anchors GitHub gives them.
     root.querySelectorAll('h2, h3').forEach(function (h) { h.id = slug(h.textContent, seen); });
+
+    // A section titled "Case study: ..." is drawn as a case study: set
+    // apart, and, for one of the founding apps, with its iPhone screen
+    // and a link to its page here.
+    Array.prototype.slice.call(root.querySelectorAll('h2')).forEach(function (h) {
+      var m = /^Case study:\s*(.+)$/.exec(h.textContent.trim());
+      if (!m) return;
+      var box = el('section', { 'class': 'case-study', 'aria-labelledby': h.id });
+      h.parentNode.insertBefore(box, h);
+      var label = el('p', { 'class': 'case-label' }, 'Case study');
+      box.appendChild(label);
+      h.textContent = m[1];
+      box.appendChild(h);
+      var n = box.nextSibling;
+      while (n && !(n.nodeType === 1 && /^H[12]$/.test(n.nodeName))) { var next = n.nextSibling; box.appendChild(n); n = next; }
+      var app = Object.keys(CASE_APPS).filter(function (name) { return m[1].indexOf(name) === 0; })[0];
+      if (app) {
+        var a = CASE_APPS[app];
+        box.classList.add('has-shot');
+        var fig = el('a', { 'class': 'case-shot', href: a.page, 'aria-label': app + ', its page on Human Shaped' });
+        fig.appendChild(el('img', { src: a.shot, alt: app + ' on an iPhone.', width: '600', height: '1304', loading: 'lazy' }));
+        box.insertBefore(fig, label);
+        var more = el('p', { 'class': 'case-more' });
+        more.appendChild(el('a', { 'class': 'go-text', href: a.page }, app + ' on Human Shaped'));
+        box.appendChild(more);
+      }
+    });
 
     body.innerHTML = '';
     body.appendChild(root);
