@@ -174,6 +174,11 @@ of us.
 - **Pass 4, the palette: waiting on Ben** (options A, B, C above). With
   the chrome and the cards gone, the cream and clay are now the main
   signal left from the second-order cluster.
-- **Pass 5, people: waiting on Ben.** A photo of Ben, a real quote from a
-  builder, or a screenshot of a real session would do more than any
-  remaining style change.
+- **Pass 4, palette directions drawn (October 6, night):** Pencil (write),
+  Sleeve (the headline), and Riso (publish), each on the real hero, the
+  arch and the marks, light and dark, on a design canvas for Ben to choose.
+- **Pass 5, people: begun.** Ben's own photos (September 30): his desk on
+  /about/ under "Who makes it" and his testing devices beside the weeks on
+  /cohorts/. Both were cropped below the menu bars, so no bookmarks or
+  window titles show, and saved without metadata. Still wanted: a real
+  quote from a builder and a screenshot of a real session.
