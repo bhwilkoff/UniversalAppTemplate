@@ -62,7 +62,7 @@ people wield for human purposes, built around those parts rather than
 over them. It takes the mechanical work off people's hands and leaves
 them the learning
 ([computer-shaped problems](../human-shaped/computer-shaped-problems.md)
-tells the longer story).
+tells the longer story, with examples of each shape).
 
 Learning is the frame for everything in this template, and it runs in
 three directions at once.
@@ -197,8 +197,14 @@ the template. Everything in this stage is a conversation, and
 `talking-to-your-agent.md` has the moves.
 
 1. **Start your note with the why.** Open a plain note for your app, in
-   whatever notes app you already use. At the top, write what the app is
-   for, who it is for, and what you hope it does for them. You will keep
+   whatever notes app you already use. At the top, write the
+   human-shaped problem it is for: the gentle hum of worry or concern you
+   have about an area of your life, something that has gone unsolved for
+   months or even years, and that you cannot do yourself with the tools
+   and resources you have now
+   ([computer-shaped problems](../human-shaped/computer-shaped-problems.md#computer-shaped-and-human-shaped)
+   has examples of both shapes). Then write who it is for, and what you
+   hope it does for them. You will keep
    this note for the life of the app, and it is where your prompts will
    be drafted from now on.
 

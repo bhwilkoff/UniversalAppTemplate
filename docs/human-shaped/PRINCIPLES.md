@@ -68,7 +68,13 @@ Some problems are computer-shaped. You can hand them to a machine and
 be done with them, and there is nothing wrong with that. But, learning,
 community, relationships, and most of the things that make a life worth
 living are not like that, because they only happen when a person does
-the work. Human-shaped software is built for those problems. I have
+the work. Human-shaped software is built for those problems. A
+human-shaped problem is the gentle hum of worry or concern you have
+about an area of your life: it has gone unsolved for months or even
+years, and you cannot do it yourself with the tools and resources you
+have now
+([examples of each shape](computer-shaped-problems.md#computer-shaped-and-human-shaped)).
+I have
 found that it helps to name the actual people who have the problem,
 because software built for "users" tends to drift toward whatever is
 easiest to build, while software built for the people you know has to

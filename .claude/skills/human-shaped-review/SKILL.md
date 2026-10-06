@@ -92,6 +92,18 @@ can tell" line of each in `docs/human-shaped/PRINCIPLES.md`. For each:
 - **What I did not find, or could not check:** said plainly.
 - **A question for you:** one question only the builder can answer.
 
+For principle 1, also read the section "Computer-shaped and
+human-shaped" in `docs/human-shaped/computer-shaped-problems.md` (fetch
+it from the same place as the principles if the project does not have
+it). It describes a human-shaped problem in Ben Wilkoff's words, with
+his examples of each shape. Look for where the builder wrote down their
+problem, in their own words, and ask about it in those terms: has it gone
+unsolved for months or years, and is it something they could not do
+themselves with the tools they had? Does the app treat the world as
+stories to be told, experienced, and added to, or as data points to be
+aggregated and quantified? Never decide the shape for them, and never
+offer Ben's examples as theirs.
+
 Keep each principle to about 60 to 100 words, and leave out "What I
 looked at" when it is the same as the principle before. The whole review
 should come to roughly 1,200 to 1,800 words, short enough to read in one

@@ -109,7 +109,7 @@ what holding that line costs.
 ## Start
 
 Everyone opens their note and begins [stage 00](../path/00-why-we-build.md):
-the why at the top, then its second step, telling the agent why in
+the human-shaped problem and the why at the top, then its second step, telling the agent why in
 their own words and asking it to rewrite the "Why we build" paragraph in
 `AGENTS.md`. Everyone sends that prompt before they leave.
 

@@ -38,7 +38,11 @@ make.
 Every student builds one real app of their own choosing, for a
 human-shaped problem and for people they can actually name. Not a
 tutorial app, but something they want to exist, and every week's work is
-done on that app.
+done on that app. A human-shaped problem is one they have lived with: the
+gentle hum of worry or concern about an area of their life, unsolved for
+months or even years, that their current tools and resources are not up
+to
+([examples of each shape](docs/human-shaped/computer-shaped-problems.md#computer-shaped-and-human-shaped)).
 
 ## Five weeks, and a week before them
 

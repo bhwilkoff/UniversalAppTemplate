@@ -64,21 +64,56 @@ better, and our values are how we decide where those tools belong.
 
 ## Computer-shaped and human-shaped
 
-A **computer-shaped problem** has a clear input and a clear right
-answer, and doing it faster or at a bigger scale is simply better.
-Sorting ten thousand films by decade is computer-shaped. So is checking
-that a caption appears at the moment the words are spoken, or keeping
-two devices on the same second of the same film. Hand those to the
-machine, and be glad you can.
+A human-shaped problem is something, really anything, in your life that
+will in some way make your life better, happier, or more deeply resonant
+with the universe if you could only solve for it. It is something that
+is the gentle hum of worry or concern that you have about an area of
+your life. It is a thing that you wonder and question about often. It is
+something that has gone unsolved for months or even years, something
+that is present in a gnawing way. And most of all, it is something that
+you cannot do yourself. Your current tools and resources are
+insufficiently up to the challenge.
 
-A **human-shaped problem** only gets solved when a person does part of
-the work. Deciding what is worth your evening, learning something hard,
-and watching a film with a friend are all human-shaped. A computer can
-set the table for them, but it cannot eat the meal for you.
+Good human-shaped problems:
+
+- I do not have time to read books in my life. I need something that
+  fits my way of existing that will still let me enjoy great novels and
+  non-fiction every day.
+- I lack inspiration for what to do with my child to entertain them
+  without screens. I need something that will constantly suggest new
+  things to do that cater to both of our interests.
+- I read a lot of news and "takes" from people online and I even see
+  newsworthy things out in the real world, and I would love a way to
+  chronicle it all into a cohesive narrative, an understanding of how I
+  see things to remind myself why I believe what I believe.
+- I want an easy way to align my political beliefs with who and what
+  I'm voting for when I get my ballot or vote in person.
+
+Computer-shaped problems:
+
+- I want to measure the amount of negative sentiment online for any
+  given public figure.
+- I want to find the best price for my grocery list on delivery apps so
+  that I can comparison shop and combine trips for the cheapest (and
+  least convenient) trips for the delivery drivers.
+- I want to categorize every conversation I have and chronicle them as a
+  way of measuring my impact on others.
+- I want to map socioeconomic data by neighborhood so that I can use it
+  to choose the optimal route for Halloween trick or treating to ensure
+  high-end candy.
+
+**Human-shaped problems see the world as interrelated stories to be
+told, experienced, and added to.**
+
+**Computer-shaped problems see the world as disparate data points to be
+aggregated, quantified, and leveraged.**
 
 Almost every app is both. Most of its code is computer-shaped work, and
-an agent can write nearly all of it. The human-shaped part is small, and
-it is the reason the app exists.
+an agent can write nearly all of it. Sorting ten thousand films by
+decade is computer-shaped. So is checking that a caption appears at the
+moment the words are spoken, or keeping two devices on the same second
+of the same film. Hand those to the machine, and be glad you can. The
+human-shaped part is small, and it is the reason the app exists.
 
 ## The person keeps it human-shaped
 
