@@ -595,8 +595,10 @@ liked.
   is thistle.
 - **The band** is forest in both modes, with white type and thistle for
   its accent. Thistle is never a ground for paragraphs; it is for the
-  one highlighted word, stickers, and buttons on dark (Ben: a full lilac
+  what is current, stickers, and buttons on dark (Ben: a full lilac
   ground "is incredibly hard to read").
 - Only the colors changed in this pass; every shape and position, the
   arch high in every icon included, is as "The arch" above and the brand
   kit say.
+- No highlighted words (Ben, later the same night): the thistle
+  highlight on "sleeves" read as AI-written and was removed.

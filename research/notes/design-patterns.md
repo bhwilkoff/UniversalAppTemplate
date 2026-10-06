@@ -38,16 +38,16 @@ alone at the left of a wide, empty page: either it hangs from a heading
 (pattern 2), sits beside a contents list (the stage pages), or shares a
 row with a second column (`.topics` on Privacy and Help).
 
-## 4. One highlighted phrase
+## 4. No highlighted words
 
-A page may mark one phrase as its point, in thistle (`.hl`): behind the
-type on light pages, as the type's color on dark ones. Only the home
-page's "sleeves" uses it so far. One per page, never a whole sentence.
+Headings and sentences carry their own weight; no word is picked out
+with a colored background or color (Ben, October 6: highlighting
+"sleeves" "reads as AI written").
 
 ## 5. Two colors with jobs
 
 Forest is for what can be clicked and for the arch; thistle is for what
-is current or highlighted (this week, the marked phrase, stickers).
+is current (this week, a chosen answer) and for stickers.
 Text sits on white or on the thistle tint, never on full thistle except
 in a short label (DECISIONS.md, "Forest and thistle").
 
@@ -84,6 +84,6 @@ bolded to stand out; only a link that stands alone uses `a.go-text`.
 
 At 375 and 1280 pixels, light and dark: does color stay inside panels,
 does every long text hang from a heading or share its row, is there at
-most one forest panel and one highlighted phrase, do compared things
+most one forest panel, no highlighted words, do compared things
 look alike, does each section keep to three text styles, and is
 everything shown real?

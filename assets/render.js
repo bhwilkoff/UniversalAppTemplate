@@ -176,9 +176,10 @@
       }
     }
 
-    // A paragraph that is one bold line is a thesis.
-    root.querySelectorAll('p').forEach(function (p) {
-      if (onlyChild(p, 'STRONG') && p.textContent.length < 140) p.classList.add('thesis');
+    // A paragraph of its own that is one bold line is a thesis (never one
+    // inside a list item or a quote).
+    Array.prototype.forEach.call(root.children, function (p) {
+      if (p.nodeName === 'P' && onlyChild(p, 'STRONG') && p.textContent.length < 140) p.classList.add('thesis');
     });
 
     // The closing line: "Be ready to..." on a stage, or a short last line elsewhere.

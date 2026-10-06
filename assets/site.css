@@ -139,11 +139,6 @@ a:hover { text-decoration-thickness: 2px; }
 .band .btn-github { background: var(--band-ink); color: var(--band); }
 .band .btn-github:hover { background: var(--band-accent); color: var(--on-thistle); }
 
-/* The one highlighted word: thistle behind it in light, thistle type in dark. */
-.hl { background: var(--thistle); color: var(--on-thistle); border-radius: 0.12em; padding: 0 0.1em; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .hl { background: none; color: var(--thistle); padding: 0; } }
-:root[data-theme="dark"] .hl { background: none; color: var(--thistle); padding: 0; }
-
 /* Type */
 
 h1, h2, h3 { text-wrap: balance; margin: 0; line-height: 1.1; letter-spacing: -0.025em; font-weight: 650; }
@@ -325,7 +320,7 @@ h3 { font-size: 1.25rem; letter-spacing: -0.012em; line-height: 1.25; }
 .article li::marker { color: var(--accent); font-weight: 600; }
 .article blockquote { margin: 1.5rem 0; padding: 1.1rem 1.25rem; background: var(--surface); border-radius: 12px; font-size: 1.075rem; }
 .article blockquote p { margin: 0; }
-.article .thesis { font-size: clamp(1.4rem, 1.15rem + 1.1vw, 1.8rem); line-height: 1.25; font-weight: 600; letter-spacing: -0.02em; color: var(--accent); margin: 2rem 0; }
+.article .thesis { font-size: clamp(1.3rem, 1.15rem + 0.6vw, 1.6rem); line-height: 1.3; font-weight: 600; letter-spacing: -0.015em; color: var(--ink); margin: 2rem 0; }
 .article code { font-family: inherit; font-weight: 600; }
 .bring-back { margin: 3rem 0 0; padding: 1.5rem 1.25rem; background: var(--surface); border-radius: var(--radius); font-size: 1.15rem; line-height: 1.5; }
 .bring-back strong { color: var(--accent); }
@@ -1894,7 +1889,7 @@ label.check { min-height: 2.25rem; }
 .principles-head h1 { max-width: 14ch; }
 .principles-head .lead { max-width: 40rem; }
 .principles-block { display: grid; gap: 1.5rem; max-width: 52rem; }
-.p-stem { margin: 0; font-size: clamp(1.5rem, 1.2rem + 1.4vw, 2.1rem); font-weight: 680; letter-spacing: -0.02em; color: var(--accent); }
+.p-stem { margin: 0; font-size: clamp(1.5rem, 1.2rem + 1.4vw, 2.1rem); font-weight: 680; letter-spacing: -0.02em; color: var(--ink); }
 ol.principles { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--rule); counter-reset: none; }
 ol.principles > li { border-bottom: 1px solid var(--rule); scroll-margin-top: 1.5rem; }
 ol.principles summary { list-style: none; display: grid; grid-template-columns: 2.5rem minmax(0, 1fr) 1.5rem; align-items: baseline; gap: 0.75rem; padding: 1.1rem 0; cursor: pointer; min-height: 44px; }
@@ -1954,11 +1949,12 @@ ol.principles summary:focus-visible { outline: 2px solid var(--accent); outline-
 /* Events: hosting, as two guides of equal standing and the kit as a line
    (anti-pattern pass 2: no row of identical icon cards). */
 .host { display: grid; gap: 1.75rem; }
-.host h3 { font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2rem); letter-spacing: -0.02em; margin: 0 0 0.4rem; }
-.host h3 a { color: var(--ink); text-decoration: underline; text-decoration-color: var(--accent); text-decoration-thickness: 3px; text-underline-offset: 0.2em; }
+.host > div { padding-top: 1.25rem; border-top: 1px solid var(--rule); }
+.host h3 { font-size: clamp(1.3rem, 1.1rem + 0.8vw, 1.65rem); letter-spacing: -0.015em; margin: 0 0 0.5rem; }
+.host h3 a { color: var(--ink); text-decoration-color: var(--accent); }
 .host h3 a:hover { color: var(--accent); }
-.host p { margin: 0; max-width: 32rem; color: var(--muted); }
-.host-kit { margin: 2rem 0 0; max-width: 44rem; }
+.host p { margin: 0; max-width: 32rem; }
+.host-kit { margin: 2rem 0 0; max-width: var(--measure); }
 @media (min-width: 48rem) { .host { grid-template-columns: 1fr 1fr; gap: 3rem; } }
 
 /* Real photographs (Ben's desk and testing devices). */
@@ -1980,18 +1976,18 @@ ol.principles summary:focus-visible { outline: 2px solid var(--accent); outline-
    ------------------------------------------------------------------ */
 :root { --panel-radius: 28px; }
 
-.band, .showcase, .section.tint { background: none; padding-left: var(--gutter); padding-right: var(--gutter); }
+.band, .showcase, .section.tint, .section.idea { background: none; padding-left: var(--gutter); padding-right: var(--gutter); }
 .band { padding-top: 1rem; padding-bottom: 4rem; }
 .showcase { padding-top: 1rem; padding-bottom: 1rem; }
-.section.tint { padding-top: 1rem; padding-bottom: 1rem; }
-.band > .wrap, .showcase > .wrap, .section.tint > .wrap {
+.section.tint, .section.idea { padding-top: 1rem; padding-bottom: 1rem; }
+.band > .wrap, .showcase > .wrap, .section.tint > .wrap, .section.idea > .wrap {
   border-radius: var(--panel-radius);
   padding: clamp(2.25rem, 1.5rem + 3vw, 4.5rem) clamp(1.25rem, 0.5rem + 3.5vw, 4rem);
   max-width: calc(var(--wide) + 2rem);
 }
 .band > .wrap { background: var(--band); }
 .showcase > .wrap { background: var(--band); }
-.section.tint > .wrap { background: var(--surface); }
+.section.tint > .wrap, .section.idea > .wrap { background: var(--surface); }
 @media (min-width: 64rem) { .band > .wrap { padding-top: 4.5rem; padding-bottom: 4.5rem; } }
 
 .site-footer { background: none; }
@@ -2008,15 +2004,36 @@ ol.principles summary:focus-visible { outline: 2px solid var(--accent); outline-
   .topics.single > .topic > h2 { grid-column: 1; grid-row: 1 / span 30; align-self: start; position: sticky; top: 1.5rem; margin: 0; }
 
   /* A rendered document with no contents beside it: the same spine. */
-  .about-why .article, .article.hang {
+  .article.hang {
     max-width: none; display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); column-gap: 4rem;
   }
-  .about-why .article > *, .article.hang > * { grid-column: 2; max-width: var(--measure); }
-  .about-why .article .doc-body, .article.hang .doc-body { display: contents; }
-  .about-why .article .doc-body > *, .article.hang .doc-body > * { grid-column: 2; max-width: var(--measure); }
-  .about-why .article .doc-body > h2, .article.hang .doc-body > h2 { grid-column: 1; margin-top: 3rem; }
+  .article.hang > *, .article.hang .doc-body > * { grid-column: 2; max-width: var(--measure); }
+  .article.hang .doc-body { display: contents; }
+  .article.hang .doc-body > h2 { grid-column: 1; margin-top: 3rem; }
+  .article.hang .doc-body > .table-wrap { grid-column: 1 / -1; max-width: none; margin: 1rem 0 2rem; }
+  /* About's why: the section's own heading starts the same spine. */
+  .about-why { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); column-gap: 4rem; }
+  .about-why .article, .about-why .article .doc-body { display: contents; }
+  .about-why .doc-status:empty { display: none; }
+  .about-why > .part-title { grid-column: 1; margin: 0; }
+  .about-why .article > *, .about-why .doc-body > *, .about-why > .source { grid-column: 2; max-width: var(--measure); }
+  .about-why .doc-body > h2 { grid-column: 1; margin-top: 3rem; }
   .hang-section { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); column-gap: 4rem; border-top: 1px solid var(--rule); }
   .hang-section > * { grid-column: 2; }
   .hang-section > h2 { grid-column: 1; grid-row: 1 / span 4; }
   .hang-section > .photo { grid-column: 1 / -1; }
 }
+
+/* The weeks: each week is the group's heading, its stages sit under it. */
+.stages.by-week .week-row { padding: 2rem 0 0.5rem; gap: 0.15rem 0.85rem; }
+.stages.by-week .week-row .wk { color: var(--muted); font-size: 0.95rem; font-weight: 650; }
+.stages.by-week .week-row .wk-what { font-size: clamp(1.2rem, 1.05rem + 0.6vw, 1.45rem); font-weight: 650; letter-spacing: -0.015em; line-height: 1.3; flex-basis: 100%; }
+.stages.by-week a .t { font-size: 1.05rem; font-weight: 600; }
+.stages.by-week a .n { font-size: 1rem; }
+.section-head > .head-side > .prose { padding-top: 0.45rem; margin: 0 0 1.5rem; }
+.section-head > .head-side .photo { margin: 0; }
+[data-events] h2 { font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2rem); margin-bottom: 1rem; }
+[data-events] .small, [data-upcoming] p { max-width: var(--measure); }
+#now > h2 { font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2rem); margin-bottom: 0.5rem; }
+.page-head .fine { max-width: 38rem; }
+@media (min-width: 64rem) { .topics.single > .topic > .checklists { grid-column: 1 / -1; margin-top: 2rem; } }
