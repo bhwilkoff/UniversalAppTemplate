@@ -145,7 +145,7 @@ test('a hub record becomes the signing request the tool reads', () => {
   const rec = { id: row.credential, issued_at: '2026-09-20T18:30:00.123456+00:00', platforms: ['web', 'android'],
     platform_links: { android: row.links.android }, evidence_repo: 'bea-example/garden-swap', app_name: 'Garden Swap', app_url: row.app.url };
   const req = lib.requestFromRecord(rec, { github_login: 'bea-example', display_name: 'Bea Example' }, { title: 'Test cohort' });
-  assert.deepEqual(req, { ...row, issued_at: '2026-09-20T18:30:00+00:00' });
+  assert.deepEqual(req, { ...row, issued_at: '2026-09-20T18:30:00+00:00', recognitions: [] });
   assert.equal(lib.buildCredential(req).validFrom, '2026-09-20T18:30:00Z');
 });
 
@@ -162,7 +162,60 @@ test('a credential waiting for a signer becomes the same signing request', () =>
   const w = { id: row.credential, issued_at: '2026-09-20T18:30:00.123456+00:00', platforms: ['web', 'android'],
     platform_links: { android: row.links.android }, evidence_repo: 'bea-example/garden-swap', app_name: 'Garden Swap', app_url: row.app.url,
     github_login: 'bea-example', display_name: 'Bea Example', cohort_title: 'Test cohort' };
-  assert.deepEqual(lib.requestFromWaiting(w), { ...row, issued_at: '2026-09-20T18:30:00+00:00' });
+  assert.deepEqual(lib.requestFromWaiting(w), { ...row, issued_at: '2026-09-20T18:30:00+00:00', recognitions: [] });
+});
+
+// Recognitions in the credential (migration 20261006020000).
+const recognized = [
+  { skill: 'Tested it the way people will actually use it', by: 'Ben Wilkoff', week: 2, moment: 'During “Show your work”, week 2' },
+  { skill: 'Shared what they learned', by: 'Ben Wilkoff', week: null, moment: null },
+  { skill: 'Helped a classmate see their work more clearly', by: null, week: 3, moment: null }
+];
+
+test('each recognition is named in the evidence, with who gave it and the moment, and no link', () => {
+  const c = lib.buildCredential({ ...row, recognitions: recognized });
+  const recs = c.evidence.filter(e => e.genre === 'Recognized in class');
+  assert.equal(c.evidence.length, 3 + 3);
+  assert.deepEqual(recs[0], { type: ['Evidence'], name: 'Recognized in class: Tested it the way people will actually use it',
+    genre: 'Recognized in class', narrative: 'Recognized by Ben Wilkoff. During “Show your work”, week 2.' });
+  assert.equal(recs[1].narrative, 'Recognized by Ben Wilkoff, in class.');
+  assert.equal(recs[2].narrative, 'Recognized by a teacher, in week 3.');
+  assert.ok(recs.every(e => !('id' in e)));
+  // The work comes first, then what was recognized, in the order given.
+  assert.equal(c.evidence[0].genre, 'Repository');
+});
+
+test('a credential with no recognitions is the same as before they existed', () => {
+  assert.deepEqual(lib.buildCredential({ ...row, recognitions: [] }), lib.buildCredential(row));
+});
+
+test('the holder reads the work and the recognitions apart', () => {
+  const d = lib.describe(lib.buildCredential({ ...row, recognitions: recognized }));
+  assert.equal(d.evidence.length, 3);
+  assert.ok(d.evidence.every(e => /^https:/.test(e.url)));
+  assert.deepEqual(d.recognitions[0], { skill: 'Tested it the way people will actually use it', narrative: 'Recognized by Ben Wilkoff. During “Show your work”, week 2.' });
+  assert.equal(d.recognitions.length, 3);
+});
+
+test('a recognition that cannot be read is a problem, in plain words', () => {
+  assert.deepEqual(lib.problems({ ...row, recognitions: recognized }), []);
+  assert.ok(lib.problems({ ...row, recognitions: 'yes' }).some(x => /list of at most 30/.test(x)));
+  assert.ok(lib.problems({ ...row, recognitions: Array(31).fill(recognized[0]) }).some(x => /at most 30/.test(x)));
+  assert.ok(lib.problems({ ...row, recognitions: [{ skill: '' }] }).includes('Recognition 1 has no skill, or one longer than 120 characters.'));
+  assert.ok(lib.problems({ ...row, recognitions: [{ skill: 'x', week: 'two' }] }).includes('Recognition 1 has a week that is not a number.'));
+});
+
+test('a record carries its recognitions into the request, and the signer gets each its own', () => {
+  const rec = { id: row.credential, issued_at: '2026-09-20T18:30:00+00:00', platforms: ['web'], platform_links: {},
+    evidence_repo: 'bea-example/garden-swap', app_name: 'Garden Swap', app_url: row.app.url, recognitions: [{ skill: 'Shared what they learned', by: 'Ben' }] };
+  const req = lib.requestFromRecord(rec, { github_login: 'bea-example' }, { title: 'T' });
+  assert.deepEqual(req.recognitions, [{ skill: 'Shared what they learned', by: 'Ben', week: null, moment: null }]);
+  const merged = lib.withRecognitions([{ id: 'a', x: 1 }, { id: 'b' }], [{ id: 'a', recognitions: [{ skill: 's' }] }]);
+  assert.deepEqual(merged, [{ id: 'a', x: 1, recognitions: [{ skill: 's' }] }, { id: 'b', recognitions: [] }]);
+  // A signed file checks against a request with the same recognitions, and not one without.
+  const signed = { ...lib.buildCredential(req), proof: { proofValue: 'z1' } };
+  assert.equal(lib.matchesRow(signed, req), true);
+  assert.equal(lib.matchesRow(signed, { ...req, recognitions: [] }), false);
 });
 
 test('where one credential stands, for its holder', () => {

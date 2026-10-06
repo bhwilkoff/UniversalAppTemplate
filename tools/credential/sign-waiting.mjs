@@ -45,6 +45,7 @@ try {
   const d = lib.describe(unsigned);
   console.error(`Signing "${d.title}" for ${d.name} (@${d.login}), ${d.description}`);
   d.evidence.forEach(e => console.error(`  ${e.name}: ${e.url}`));
+  d.recognitions.forEach(r => console.error(`  Recognized in class: ${r.skill}. ${r.narrative}`));
   const signed = await lib.sign(unsigned, { key, subtle, canonize });
 
   const r = await fetch('https://humanshaped.org/.well-known/did.json');

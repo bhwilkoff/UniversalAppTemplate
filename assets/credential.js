@@ -78,6 +78,16 @@
       list.appendChild(li);
     });
 
+    var recs = $('[data-recognized]');
+    recs.replaceChildren();
+    d.recognitions.forEach(function (r) {
+      var li = el('li');
+      li.appendChild(el('span', null, r.skill));
+      if (r.narrative) li.appendChild(el('span', 'small', r.narrative));
+      recs.appendChild(li);
+    });
+    $('[data-recognized-section]').hidden = !d.recognitions.length;
+
     $('[data-achievement]').textContent = d.achievement;
     $('[data-criteria]').textContent = d.criteria;
     if (d.level) $('[data-criteria-link]').href = '/credential/issuer/#level-' + d.level;

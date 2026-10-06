@@ -127,6 +127,31 @@ test('Digital Bazaar’s verifier accepts our signature', async () => {
   assert.equal(r.verified, true, String(r.error && (r.error.errors || [r.error]).map(e => e.stack || e.message)));
 });
 
+// Recognitions in the credential (migration 20261006020000): evidence
+// with no link, which must still be signed, every word of it.
+const recognizedRow = { ...row, recognitions: [
+  { skill: 'Tested it the way people will actually use it', by: 'Ben Wilkoff', week: 2, moment: 'During “Show your work”, week 2' },
+  { skill: 'Shared what they learned', by: null, week: null, moment: null }
+] };
+const recognizedSigned = await lib.sign(lib.buildCredential(recognizedRow), { key, subtle, canonize, created: '2026-09-21T09:00:00Z' });
+
+test('a credential with recognitions signs and checks out, here and in Digital Bazaar’s verifier', async () => {
+  assert.equal((await check(recognizedSigned)).ok, true);
+  assert.equal(lib.matchesRow(recognizedSigned, recognizedRow), true);
+  const suite = new DataIntegrityProof({ cryptosuite: eddsaRdfc2022 });
+  const r = await vc.verifyCredential({ credential: recognizedSigned, suite, documentLoader: loader });
+  assert.equal(r.verified, true, String(r.error && (r.error.errors || [r.error]).map(e => e.stack || e.message)));
+});
+
+test('changing a recognition, or removing one, fails', async () => {
+  const d = clone(recognizedSigned);
+  d.evidence[3].narrative = 'Recognized by someone else.';
+  assert.equal((await check(d)).ok, false);
+  const e = clone(recognizedSigned);
+  e.evidence.pop();
+  assert.equal((await check(e)).ok, false);
+});
+
 test('Digital Bazaar’s verifier rejects a changed copy', async () => {
   const d = clone(signed);
   d.description = 'For something else.';

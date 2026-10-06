@@ -115,7 +115,7 @@ what waits on Ben.
   `bifrieqzkihuxfzttgvd`, free plan, us-west-1, org "Learning is Change,
   Inc"). Schema and row-level security in `supabase/migrations/`, applied
   in order. `supabase/tests/test_policies.py` runs them against a local
-  throwaway Postgres as four people and as a student's AI agent (720
+  throwaway Postgres as four people and as a student's AI agent (728
   checks; agents' tokens carry a `client_id` and can only read); run it
   before applying
   any new migration, and see it fail when a rule is opened on purpose.
@@ -155,7 +155,7 @@ what waits on Ben.
 - **Scripts:** `assets/hub-config.js` (public URL and publishable key),
   `hub.js`, `cohorts.js`, `teach.js` with `teach-lib.js`, `cohort.js` and `live.js`
   with `cohort-lib.js` and `live-lib.js`, and `apps.js` with `apps-lib.js`. Pure logic lives in the `-lib.js` files with
-  tests in `tools/test/` (`node --test tools/test/*.mjs`, 365 tests).
+  tests in `tools/test/` (`node --test tools/test/*.mjs`, 370 tests).
 - **The cohort's conversation:** `discussions.js` with `discussions-lib.js`
   reads and posts the cohort repository's GitHub Discussions on /cohort/
   and /live/ with the student's own GitHub token. That token is kept in
@@ -191,6 +191,9 @@ what waits on Ben.
   `assets/credential-lib.js`; pages `/credential/?id=<id>` and
   `/credential/issuer/`; issuing on `/teach/` for finished cohorts. See
   `tools/credential/README.md` and `research/notes/credential-build-notes.md`.
+  Each in-class recognition the holder received is named in the evidence
+  (migration 20261006020000): the database copies them onto the record
+  and keeps them in step until it is signed.
 - **Directory:** github.com/humanshaped/directory (listings as files,
   nightly scan, issue form). `/apps/` reads its `directory.json`.
 - **Meet tools:** `tools/meet-events` (Apps Script as

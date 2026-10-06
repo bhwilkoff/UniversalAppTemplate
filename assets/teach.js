@@ -1197,6 +1197,23 @@
     return ul;
   }
 
+  // The recognitions a credential carries as evidence (migration
+  // 20261006020000), so the teacher and the signer see what will be
+  // signed with the work.
+  function recognitionList(recs) {
+    if (!recs || !recs.length) return null;
+    var wrap = el('div', 'credential-recognitions');
+    wrap.appendChild(el('p', 'small', 'Recognized in class, and named in its evidence:'));
+    var ul = el('ul', 'links');
+    recs.forEach(function (r) {
+      var e = cred.recognitionEvidence(r);
+      var li = el('li'); li.appendChild(el('span', null, r.skill)); li.appendChild(el('span', 'small', ' ' + e.narrative));
+      ul.appendChild(li);
+    });
+    wrap.appendChild(ul);
+    return wrap;
+  }
+
   function credentialCard(p, now) {
     var card = el('article', 'cohort-card credential-person');
     card.appendChild(el('p', 'who-line', personName(p) + (p.profiles ? ' (@' + p.profiles.github_login + ')' : '')));
@@ -1212,6 +1229,8 @@
         links.push(['On ' + cred.platform(id).label, (rec.platform_links || {})[id]]);
       });
       card.appendChild(linkList(links));
+      var recs = recognitionList(rec.recognitions);
+      if (recs) card.appendChild(recs);
     }
 
     if (now.state === 'signed') {
@@ -1534,13 +1553,14 @@
   function loadSigning() {
     var wrap = $('[data-signing]');
     if (!cred) return Promise.resolve();
-    return db.rpc('credentials_to_sign').then(function (r) {
-      var box = $('[data-signing-list]');
+    return Promise.all([db.rpc('credentials_to_sign'), db.rpc('credential_recognitions_to_sign')]).then(function (res) {
+      var r = res[0], box = $('[data-signing-list]');
       wrap.hidden = false;
-      if (r.error) { box.replaceChildren(el('p', 'small error', 'What is waiting to be signed could not be loaded: ' + r.error.message)); return; }
+      var err = r.error || res[1].error;
+      if (err) { box.replaceChildren(el('p', 'small error', 'What is waiting to be signed could not be loaded: ' + err.message)); return; }
       box.replaceChildren();
       if (!r.data.length) { box.appendChild(el('p', 'small', 'Nothing is waiting to be signed right now.')); return; }
-      r.data.forEach(function (w) { box.appendChild(signingCard(w)); });
+      cred.withRecognitions(r.data, res[1].data).forEach(function (w) { box.appendChild(signingCard(w)); });
     });
   }
   function signingCard(w) {
@@ -1552,6 +1572,8 @@
     var links = [['The repository', 'https://github.com/' + w.evidence_repo], ['On the web', w.app_url]];
     (w.platforms || []).slice(1).forEach(function (id) { links.push(['On ' + cred.platform(id).label, (w.platform_links || {})[id]]); });
     card.appendChild(linkList(links));
+    var recs = recognitionList(w.recognitions);
+    if (recs) card.appendChild(recs);
     var request = cred.requestFromWaiting(w);
     var msg = el('p', 'small'); msg.setAttribute('role', 'status');
     var copy = el('button', 'btn-quiet', 'Copy the signing request'); copy.type = 'button';

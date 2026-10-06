@@ -1409,6 +1409,19 @@ anything with a drop or delete waits on the terminal's confirmation.
    copies; tests in tools/credential and tools/test; the holder sees
    them on /credential/. Any migration waits for this Mac only if it
    drops something.
+   **Built October 6.** Migration 20261006020000 (additive, applied):
+   `credentials.recognitions`, copied from public.recognitions by the
+   database when the record is made, following a recognition given or
+   removed until it is signed, never written by a browser, and read by a
+   signer through `credential_recognitions_to_sign()` beside
+   credentials_to_sign(). Each becomes Evidence with no link ("Recognized
+   in class: <skill>", "Recognized by <teacher>. <moment>."). Policy tests
+   728 of 728 (two fail when the guard or the signer check is opened);
+   node tests 368; tools/credential 21 of 21, including Digital Bazaar's
+   verifier on a credential with recognitions. /teach/ and the signing
+   tools show them; /credential/ has a "Recognized in class" section;
+   /cohort/ tells the student they go in the public evidence and can be
+   removed before signing.
 2. **Human-shaped problems** (DECISIONS.md "Human-shaped problems"):
    revise the hub for clarity with Ben's language and thinking: what a
    human-shaped problem is (a gentle hum of worry, unsolved for months or

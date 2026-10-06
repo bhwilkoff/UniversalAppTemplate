@@ -105,8 +105,12 @@
   // The shape the teacher page copies and the signing tool reads:
   //   { credential, issued_at, person: { github_login, name },
   //     cohort: { title }, app: { name, repo, url }, platforms: [...],
-  //     links: { <platform>: "https://..." } }
+  //     links: { <platform>: "https://..." },
+  //     recognitions: [{ skill, by, week, moment }] }
   // `app.url` is the live web app; `links` holds every other platform.
+  // `recognitions` are the skills a teacher recognized in class (R16),
+  // copied onto the record by the database (migration 20261006020000);
+  // a request without them has none.
   var REPO = /^[A-Za-z0-9-]+\/[A-Za-z0-9._-]+$/;
   var UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
   var LOGIN = /^[A-Za-z0-9-]{1,39}$/;
@@ -137,7 +141,37 @@
     Object.keys(row.links || {}).forEach(function (id) {
       if (!seen[id]) out.push('There is a link for ' + id + ', which is not one of the platforms chosen.');
     });
+    var recs = row.recognitions == null ? [] : row.recognitions;
+    if (!Array.isArray(recs) || recs.length > MAX_RECOGNITIONS) out.push('The recognitions should be a list of at most ' + MAX_RECOGNITIONS + '.');
+    else recs.forEach(function (r, i) {
+      var n = 'Recognition ' + (i + 1);
+      if (!r || typeof r !== 'object') { out.push(n + ' is not a recognition.'); return; }
+      if (typeof r.skill !== 'string' || !r.skill.trim() || r.skill.length > 120) out.push(n + ' has no skill, or one longer than 120 characters.');
+      if (r.by != null && (typeof r.by !== 'string' || r.by.length > 200)) out.push(n + ' names who gave it in a way that cannot be read.');
+      if (r.week != null && !(Number.isInteger(r.week) && r.week > 0)) out.push(n + ' has a week that is not a number.');
+      if (r.moment != null && (typeof r.moment !== 'string' || r.moment.length > 300)) out.push(n + ' has a moment longer than 300 characters.');
+    });
     return out;
+  }
+
+  // ---- recognitions as evidence ---------------------------------------
+  // Each skill a teacher recognized in class (R16; DECISIONS.md,
+  // "Recognitions in the credential") is named in the evidence, with who
+  // recognized it and when. It has no link: the moment was in class.
+  var MAX_RECOGNITIONS = 30;
+  var RECOGNIZED = 'Recognized in class';
+  var RECOGNIZED_PREFIX = RECOGNIZED + ': ';
+  function oneLine(t) { return String(t == null ? '' : t).replace(/\s+/g, ' ').trim(); }
+  function recognitionEvidence(r) {
+    var by = oneLine(r.by) || 'a teacher';
+    var moment = oneLine(r.moment).replace(/[.!?]+$/, '');
+    var when = moment ? '. ' + moment : (r.week ? ', in week ' + r.week : ', in class');
+    return {
+      type: ['Evidence'],
+      name: RECOGNIZED_PREFIX + oneLine(r.skill),
+      genre: RECOGNIZED,
+      narrative: 'Recognized by ' + by + when + '.'
+    };
   }
 
   function levelFor(platforms) { return (platforms || []).length; }
@@ -162,6 +196,7 @@
     row.platforms.slice(1).forEach(function (id) {
       list.push({ id: row.links[id], type: ['Evidence'], name: name + ' on ' + platform(id).label, genre: 'Published app' });
     });
+    (row.recognitions || []).forEach(function (r) { list.push(recognitionEvidence(r)); });
     return list;
   }
 
@@ -209,7 +244,10 @@
       cohort: { title: cohort.title },
       app: { name: rec.app_name || null, repo: rec.evidence_repo, url: rec.app_url },
       platforms: (rec.platforms || []).slice(),
-      links: links
+      links: links,
+      recognitions: (rec.recognitions || []).map(function (r) {
+        return { skill: r.skill, by: r.by == null ? null : r.by, week: r.week == null ? null : r.week, moment: r.moment == null ? null : r.moment };
+      })
     };
   }
 
@@ -228,6 +266,20 @@
   // signing request /teach/ makes for a cohort's own teachers.
   function requestFromWaiting(w) {
     return requestFromRecord(w, { github_login: w.github_login, display_name: w.display_name }, { title: w.cohort_title });
+  }
+
+  // credentials_to_sign() and credential_recognitions_to_sign() are two
+  // lists of the same credentials; each waiting one takes its
+  // recognitions from the second.
+  function withRecognitions(waiting, recs) {
+    var by = {};
+    (recs || []).forEach(function (r) { by[r.id] = r.recognitions || []; });
+    return (waiting || []).map(function (w) {
+      var copy = {};
+      Object.keys(w).forEach(function (k) { copy[k] = w[k]; });
+      copy.recognitions = by[w.id] || [];
+      return copy;
+    });
   }
 
   // The one command a signer runs on their own computer (tools/credential/).
@@ -267,7 +319,12 @@
       criteriaUrl: a.criteria ? a.criteria.id : null,
       level: level ? Number(level[1]) : null,
       validFrom: doc.validFrom || null,
-      evidence: (doc.evidence || []).map(function (e) { return { url: e.id, name: e.name || e.id, genre: e.genre || '' }; })
+      evidence: (doc.evidence || []).filter(function (e) { return e.genre !== RECOGNIZED; })
+        .map(function (e) { return { url: e.id, name: e.name || e.id, genre: e.genre || '' }; }),
+      recognitions: (doc.evidence || []).filter(function (e) { return e.genre === RECOGNIZED; }).map(function (e) {
+        var n = String(e.name || '');
+        return { skill: n.indexOf(RECOGNIZED_PREFIX) === 0 ? n.slice(RECOGNIZED_PREFIX.length) : n, narrative: e.narrative || '' };
+      })
     };
   }
 
@@ -480,7 +537,8 @@
     SITE: SITE, ISSUER_DID: ISSUER_DID, ISSUER: ISSUER, CONTEXTS: CONTEXTS, CONTEXT_FILES: CONTEXT_FILES,
     PLATFORMS: PLATFORMS, platform: platform, levelFor: levelFor, levelName: levelName,
     achievement: achievement, achievementDocument: achievementDocument, achievementUrl: achievementUrl,
-    problems: problems, buildCredential: buildCredential, credentialUrl: credentialUrl,
+    problems: problems, buildCredential: buildCredential, recognitionEvidence: recognitionEvidence,
+    withRecognitions: withRecognitions, MAX_RECOGNITIONS: MAX_RECOGNITIONS, credentialUrl: credentialUrl,
     describe: describe, matchesRow: matchesRow, stable: stable,
     requestFromRecord: requestFromRecord, recordState: recordState,
     requestFromWaiting: requestFromWaiting, SIGN_COMMAND: SIGN_COMMAND, standing: standing, readSigned: readSigned,

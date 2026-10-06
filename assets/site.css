@@ -783,7 +783,7 @@ label.check { display: flex; gap: 0.5rem; align-items: center; font-weight: 400;
 .check-line.is-bad::before { border-color: var(--clay); border-style: dashed; }
 .evidence { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--rule); }
 .evidence li { display: grid; gap: 0.1rem; padding: 0.8rem 0; border-bottom: 1px solid var(--rule); }
-.evidence a { font-weight: 600; }
+.evidence a, .evidence li > span:first-child { font-weight: 600; }
 .evidence .small { overflow-wrap: anywhere; }
 .levels { margin-top: 1rem; }
 .levels li { display: grid; grid-template-columns: 2rem minmax(0, 1fr) auto; gap: 0.1rem 0.75rem; padding: 0.75rem 0; align-items: baseline; scroll-margin-top: 1.5rem; }

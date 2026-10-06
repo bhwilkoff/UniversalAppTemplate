@@ -2492,6 +2492,39 @@ def main():
     check("the questions asked go when the cohort finishes, and the bank stays", su10.fetchone() == (0, 1))
     su10.execute("select count(*) from public.recognitions where cohort_id = %s", (bc,))
     check("a student's recognition stays after the cohort finishes", su10.fetchone()[0] == 1)
+
+    # Recognitions in the credential (migration 20261006020000): the
+    # credential row carries them from the database, follows them until
+    # it is signed, and no one writes them by hand.
+    issue = ("insert into public.credentials (user_id, cohort_id, issued_by, platforms, platform_links, evidence_repo, app_name, app_url, recognitions) "
+             "values (%s, %s, %s, '{web}', '{}', 'bea/tide-clock', 'Tide Clock', 'https://example.org/tides', %s::jsonb) returning id, recognitions")
+    check("a credential recorded at the cohort's end carries the student's recognitions, from the database, not from the browser",
+          attempt(as_user("ben"), issue, (people["bea"], bc, people["ben"], '[{"skill": "Made up", "by": "Nobody"}]'))
+          and last_rows[0][1] == [{"skill": "Tested it the way people use it", "by": "bhwilkoff", "week": 1, "moment": "Showed it on her own phone"}])
+    bcred = last_rows[0][0]
+    def cred_recs():
+        cur = conn.cursor(); cur.execute("reset role")
+        cur.execute("select recognitions from public.credentials where id = %s", (bcred,)); return cur.fetchone()[0]
+    check("a teacher cannot write a credential's recognitions by hand",
+          not attempt(as_user("ben"), "update public.credentials set recognitions = '[]' where id = %s returning id", (bcred,)))
+    check("nor can the student",
+          not attempt(as_user("bea"), "update public.credentials set recognitions = '[]' where id = %s returning id", (bcred,)) or last_rows == [])
+    attempt(as_user("bea"), "delete from public.recognitions where id = %s returning id", (rec,))
+    check("one the student removes before it is signed leaves the credential", cred_recs() == [])
+    attempt(as_user("ben"), give, (bc, None, people["bea"], "Shared what they learned", "shared-lessons", None))
+    late = last_rows[0][0] if last_rows else None
+    check("one a teacher gives before it is signed joins it",
+          cred_recs() == [{"skill": "Shared what they learned", "by": "bhwilkoff", "week": None, "moment": None}])
+    recs_to_sign = "select id, recognitions from public.credential_recognitions_to_sign()"
+    check("the signer reads the recognitions of a credential waiting to be signed",
+          attempt(as_user("ben"), recs_to_sign) and any(r[0] == bcred and len(r[1]) == 1 for r in last_rows))
+    check("no one else does",
+          attempt(as_user("bea"), recs_to_sign) and last_rows == [] and attempt(as_user("hana"), recs_to_sign) and last_rows == [])
+    bgood = ('{"id": "https://humanshaped.org/credential/?id=%s", "issuer": {"id": "did:web:humanshaped.org"}, '
+             '"proof": {"cryptosuite": "eddsa-rdfc-2022", "proofValue": "z1"}}') % bcred
+    attempt(as_user("ben"), "select public.attach_signed_credential(%s, %s)", (bcred, bgood))
+    attempt(as_user("bea"), "delete from public.recognitions where id = %s returning id", (late,))
+    check("once it is signed, its recognitions are what was signed", len(cred_recs()) == 1)
     conn.rollback()
     conn.close()
     failed = [n for n, ok in results if not ok]
