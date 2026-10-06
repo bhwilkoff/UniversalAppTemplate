@@ -232,7 +232,30 @@
       .sort(function (a, b) { return a.created_at.localeCompare(b.created_at); });
   }
 
-  var lib = { zonedToUtc: zonedToUtc, sessionDates: sessionDates, sessionRows: sessionRows, meetSetup: meetSetup, lastStarted: lastStarted, notSeen: notSeen, checkAnswers: checkAnswers, waitingForFeedback: waitingForFeedback, scheduleText: scheduleText, cohortSetupSteps: cohortSetupSteps, meetRequestNote: meetRequestNote, requestState: requestState, waitingRequests: waitingRequests, WEEKDAYS: WEEKDAYS };
+  // A cohort's short name for its address, made from its title:
+  // lowercase letters, numbers, and single hyphens, as the database
+  // requires (cohorts_slug_check). "Fall 2026: Evenings!" -> "fall-2026-evenings".
+  function slugFrom(text) {
+    return String(text || '').normalize('NFKD').replace(/[̀-ͯ]/g, '').toLowerCase()
+      .replace(/&/g, ' and ').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60).replace(/-+$/, '');
+  }
+  // Why a short name cannot be used, in plain words, or null when it can.
+  function slugProblem(slug) {
+    if (!slug) return 'Give the cohort a short name for its address.';
+    if (!/^[a-z0-9-]+$/.test(slug)) return 'The short name can only use lowercase letters, numbers, and hyphens.';
+    if (slug.length > 60) return 'The short name can be at most 60 characters.';
+    return null;
+  }
+  // The line under a cohort's title on /cohorts/, and in the teacher's
+  // preview of it.
+  function openingLine(c, locale) {
+    var first = c.starts_on
+      ? 'Begins ' + new Date(c.starts_on + 'T12:00:00').toLocaleDateString(locale, { month: 'long', day: 'numeric', year: 'numeric' })
+      : 'Dates to come';
+    return first + ', for ' + c.weeks + ' weeks' + (c.capacity ? ', with room for ' + c.capacity + ' people' : '') + '.';
+  }
+
+  var lib = { zonedToUtc: zonedToUtc, sessionDates: sessionDates, sessionRows: sessionRows, meetSetup: meetSetup, lastStarted: lastStarted, notSeen: notSeen, checkAnswers: checkAnswers, waitingForFeedback: waitingForFeedback, scheduleText: scheduleText, slugFrom: slugFrom, slugProblem: slugProblem, openingLine: openingLine, cohortSetupSteps: cohortSetupSteps, meetRequestNote: meetRequestNote, requestState: requestState, waitingRequests: waitingRequests, WEEKDAYS: WEEKDAYS };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
   else root.TeachLib = lib;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

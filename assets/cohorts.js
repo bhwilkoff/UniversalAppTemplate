@@ -22,10 +22,7 @@
       r.data.forEach(function (c) {
         var card = el('article', 'open-cohort');
         card.appendChild(el('h3', null, c.title));
-        var first = c.starts_on
-          ? 'Begins ' + new Date(c.starts_on + 'T12:00:00').toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })
-          : 'Dates to come';
-        card.appendChild(el('p', 'small', first + ', for ' + c.weeks + ' weeks' + (c.capacity ? ', with room for ' + c.capacity + ' people' : '') + '.'));
+        card.appendChild(el('p', 'small', TeachLib.openingLine(c)));
         card.appendChild(el('p', 'small', TeachLib.scheduleText(c, zone)));
         if (c.description) card.appendChild(el('p', null, c.description));
         var join = el('a', 'btn-github', 'Join with GitHub');

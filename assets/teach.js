@@ -120,31 +120,100 @@
   }
 
   // ---- the form -----------------------------------------------------
+  // Every answer changes how the cohort runs. The address is made from the
+  // name until the teacher changes it, and a preview shows the cohort as
+  // /cohorts/ will list it.
   var form = $('[data-cohort-form]');
-  var editing = null;
+  var editing = null, slugTouched = false;
+  var TL = window.TeachLib;
+  function showSlug() {
+    var f = form.elements, slug = f.slug.value;
+    $('[data-slug-show]').textContent = slug || '…';
+  }
+  function drawPreview() {
+    var f = form.elements;
+    var c = {
+      title: f.title.value.trim(), description: f.description.value.trim(), starts_on: f.starts_on.value || null,
+      weeks: Number(f.weeks.value) || 5, capacity: f.capacity.value ? Number(f.capacity.value) : null,
+      session_weekday: f.session_weekday.value === '' ? null : Number(f.session_weekday.value),
+      session_time: f.session_time.value || null, session_minutes: Number(f.session_minutes.value) || 75, time_zone: f.time_zone.value
+    };
+    $('[data-preview-title]').textContent = c.title || 'Your cohort’s name';
+    $('[data-preview-line]').textContent = TL.openingLine(c);
+    var when;
+    try { new Intl.DateTimeFormat('en-US', { timeZone: c.time_zone }); when = TL.scheduleText(c, null); }
+    catch (e) { when = 'The weekly session time is still to come.'; }
+    $('[data-preview-time]').textContent = when;
+    $('[data-preview-desc]').textContent = c.description || 'Who it is for, in your words.';
+    $('[data-preview-desc]').classList.toggle('placeholder', !c.description);
+    var st = f.status.value;
+    $('[data-preview-note]').textContent = st === 'open' ? 'This is how it is listed on the cohorts page now.'
+      : st === 'draft' ? 'People see it here once it is Open.' : 'It is not listed on the cohorts page while it is ' + (st === 'running' ? 'running.' : 'finished.');
+  }
   function fillForm(c) {
     editing = c ? c.id : null;
+    slugTouched = !!c;
     say('[data-form-title]', c ? 'Edit ' + c.title : 'A new cohort');
     say('[data-form-message]', '');
     var f = form.elements;
     f.title.value = c ? c.title : '';
     f.slug.value = c ? c.slug : '';
     f.slug.readOnly = !!c;
+    $('[data-slug-field]').hidden = true;
+    $('[data-slug-edit]').hidden = !!c;
     f.description.value = c && c.description ? c.description : '';
     f.starts_on.value = c && c.starts_on ? c.starts_on : '';
     f.weeks.value = c ? c.weeks : 5;
     f.session_weekday.value = c && c.session_weekday != null ? String(c.session_weekday) : '';
     f.session_time.value = c && c.session_time ? c.session_time.slice(0, 5) : '';
-    f.session_minutes.value = c ? c.session_minutes : 75;
+    var minutes = String(c ? c.session_minutes : 75);
+    if (!Array.prototype.some.call(f.session_minutes.options, function (o) { return o.value === minutes; })) {
+      f.session_minutes.appendChild(new Option(minutes + ' minutes', minutes));
+    }
+    f.session_minutes.value = minutes;
     f.time_zone.value = c ? c.time_zone : Intl.DateTimeFormat().resolvedOptions().timeZone;
     f.capacity.value = c && c.capacity ? c.capacity : '';
     f.status.value = c ? c.status : 'draft';
     f.conversations_open.checked = c ? c.conversations_open : false;
     f.github_repo.value = c && c.github_repo ? c.github_repo : '';
     f.github_team.value = c && c.github_team ? c.github_team : '';
+    form.querySelector('.by-hand').open = !!(c && (c.github_repo || c.github_team));
+    showSlug();
+    drawPreview();
     form.hidden = false;
     $('[data-detail]').hidden = true;
-    f.title.focus();
+    form.scrollIntoView({ block: 'start' });
+    f.title.focus({ preventScroll: true });
+  }
+  form.elements.title.addEventListener('input', function () {
+    if (!slugTouched && !editing) { form.elements.slug.value = TL.slugFrom(form.elements.title.value); showSlug(); }
+  });
+  form.elements.slug.addEventListener('input', function () { slugTouched = true; showSlug(); });
+  form.elements.slug.addEventListener('blur', function () {
+    if (!editing) { form.elements.slug.value = TL.slugFrom(form.elements.slug.value); showSlug(); }
+  });
+  $('[data-slug-edit]').addEventListener('click', function () {
+    $('[data-slug-field]').hidden = false;
+    form.elements.slug.focus();
+  });
+  form.addEventListener('input', drawPreview);
+  form.addEventListener('change', drawPreview);
+
+  // What is wrong with the answers, in plain words, or null.
+  function formProblem(f) {
+    if (!f.title.value.trim()) return { field: f.title, text: 'Give the cohort a name people will recognize.' };
+    if (!editing) {
+      var slugWrong = TL.slugProblem(f.slug.value);
+      if (slugWrong) { $('[data-slug-field]').hidden = false; return { field: f.slug, text: slugWrong }; }
+    }
+    if (!f.time_zone.value.trim()) return { field: f.time_zone, text: 'Choose the time zone the class meets in, such as America/Denver.' };
+    try { new Intl.DateTimeFormat('en-US', { timeZone: f.time_zone.value.trim() }); }
+    catch (e) { return { field: f.time_zone, text: 'That time zone is not one the calendar knows. Choose one from the list, such as America/Denver.' }; }
+    if (f.capacity.value && !(Number(f.capacity.value) >= 1)) return { field: f.capacity, text: 'The number of places should be 1 or more, or empty for no limit.' };
+    var repo = f.github_repo.value.trim(), team = f.github_team.value.trim();
+    if (repo && !/^humanshaped\/[A-Za-z0-9._-]+$/.test(repo)) return { field: f.github_repo, text: 'The repository should be written as humanshaped/its-name.' };
+    if (team && !/^[a-z0-9-]+$/.test(team)) return { field: f.github_team, text: 'The team’s name can only use lowercase letters, numbers, and hyphens.' };
+    return null;
   }
   $('[data-new-cohort]').addEventListener('click', function () { fillForm(null); });
   $('[data-cancel]').addEventListener('click', function () { form.hidden = true; if (current) $('[data-detail]').hidden = false; });
@@ -164,8 +233,8 @@
   form.addEventListener('submit', function (ev) {
     ev.preventDefault();
     var f = form.elements;
-    try { new Intl.DateTimeFormat('en-US', { timeZone: f.time_zone.value }); }
-    catch (e) { return say('[data-form-message]', 'That time zone is not one the calendar knows. Choose one from the list, such as America/Denver.'); }
+    var wrong = formProblem(f);
+    if (wrong) { say('[data-form-message]', wrong.text); wrong.field.focus(); return; }
     var row = {
       title: f.title.value.trim(),
       description: f.description.value.trim() || null,
@@ -174,7 +243,7 @@
       session_weekday: f.session_weekday.value === '' ? null : Number(f.session_weekday.value),
       session_time: f.session_time.value || null,
       session_minutes: Number(f.session_minutes.value) || 75,
-      time_zone: f.time_zone.value,
+      time_zone: f.time_zone.value.trim(),
       capacity: f.capacity.value ? Number(f.capacity.value) : null,
       status: f.status.value,
       conversations_open: f.conversations_open.checked,

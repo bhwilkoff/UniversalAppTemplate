@@ -169,3 +169,18 @@ test('the event step asks meet@, and says where the request stands', () => {
   assert.equal(linked.note, null);
   assert.equal(lib.cohortSetupSteps(c, [], null).find((s) => s.key === 'repo').action, 'provision');
 });
+
+test('a short name for the address comes from the title, the way the database allows', () => {
+  assert.equal(lib.slugFrom('Fall 2026: Evenings!'), 'fall-2026-evenings');
+  assert.equal(lib.slugFrom('  Café & Code  '), 'cafe-and-code');
+  assert.equal(lib.slugFrom('---'), '');
+  assert.equal(lib.slugFrom('x'.repeat(80)).length, 60);
+  assert.equal(lib.slugProblem('fall-2026'), null);
+  assert.match(lib.slugProblem('Fall 2026'), /lowercase letters/);
+  assert.match(lib.slugProblem(''), /short name/);
+});
+
+test('the line under a cohort on /cohorts/ says when it begins, how long, and how many', () => {
+  assert.equal(lib.openingLine({ starts_on: '2026-11-02', weeks: 5, capacity: 12 }, 'en-US'), 'Begins November 2, 2026, for 5 weeks, with room for 12 people.');
+  assert.equal(lib.openingLine({ starts_on: null, weeks: 5, capacity: null }, 'en-US'), 'Dates to come, for 5 weeks.');
+});

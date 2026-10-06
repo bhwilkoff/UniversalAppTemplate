@@ -1655,6 +1655,9 @@ label.check { min-height: 2.25rem; }
 .shots a { display: block; color: var(--band-ink); text-decoration: none; }
 .shots img { display: block; width: 100%; height: auto; border-radius: 12px; background: #000; box-shadow: 0 20px 40px -24px rgba(0, 0, 0, 0.8); }
 .shot-tv { grid-column: 1 / -1; }
+/* Every app on the same device (iPhone App Store screenshots): two by two,
+   then four across. */
+.shots:not(:has(.shot-tv)) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .shot-phone img { aspect-ratio: 600 / 1000; object-fit: cover; object-position: top; border-radius: 16px; }
 .shot-name { display: block; margin-top: 0.6rem; font-weight: 600; font-size: 0.95rem; }
 .shots a:hover .shot-name { text-decoration: underline; text-decoration-color: var(--band-clay); text-underline-offset: 0.2em; }
@@ -1676,6 +1679,7 @@ label.check { min-height: 2.25rem; }
   .showcase { padding: 5rem 0 4rem; }
   .shots { grid-template-columns: minmax(0, 2.6fr) repeat(3, minmax(0, 1fr)); gap: 1.25rem; }
   .shot-tv { grid-column: auto; }
+  .shots:not(:has(.shot-tv)) { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .pull { margin-top: 4rem; }
 }
 
@@ -1819,3 +1823,63 @@ label.check { min-height: 2.25rem; }
 .stage-choices .bar.has-before::after { inset: 0 auto 40% 0; }
 .stage-choices .bar.has-before::before { content: ""; position: absolute; left: 0; bottom: 0; height: 22%; width: var(--before, 0%); background: var(--edge); border-radius: 999px; }
 .rerun-kicker { color: var(--clay); }
+
+/* The cohort form on /teach/ (Ben, October 6): seven questions, each one
+   about how the cohort runs, beside a preview of its card on /cohorts/. */
+.cohort-builder:not([hidden]) { display: grid; gap: 1.75rem; margin-top: 1.5rem; padding: 1.5rem 1.25rem; background: var(--card); border: 1px solid var(--rule); border-radius: var(--radius); }
+.builder-head { display: grid; gap: 0.5rem; max-width: 40rem; }
+.builder-head h2 { margin: 0; font-size: clamp(1.6rem, 1.3rem + 1.2vw, 2.1rem); letter-spacing: -0.02em; }
+.builder-head p:not(.kicker) { margin: 0; color: var(--muted); }
+.builder-grid { display: grid; gap: 2rem; }
+.builder-steps { display: grid; gap: 0; min-width: 0; }
+.cohort-builder fieldset.q { border: 0; border-top: 1px solid var(--rule); margin: 0; padding: 1.4rem 0; display: grid; gap: 0.65rem; min-width: 0; }
+.cohort-builder fieldset.q:first-child { border-top: 0; padding-top: 0; }
+.cohort-builder legend { float: left; width: 100%; padding: 0; margin: 0 0 0.15rem; display: flex; align-items: baseline; gap: 0.7rem; font-size: 1.15rem; font-weight: 650; letter-spacing: -0.01em; line-height: 1.3; }
+.cohort-builder legend + * { clear: both; }
+.q-n { flex: none; display: inline-grid; place-items: center; width: 1.75rem; height: 1.75rem; border-radius: 999px; background: var(--clay); color: var(--paper); font-size: 0.85rem; font-weight: 700; transform: translateY(-0.1rem); }
+.cohort-builder .hint { margin: 0; color: var(--muted); font-size: 0.93rem; font-weight: 400; max-width: 40rem; }
+.cohort-builder label { display: grid; gap: 0.35rem; font-weight: 600; font-size: 0.95rem; min-width: 0; }
+.cohort-builder label.sub { margin-top: 0.35rem; }
+.cohort-builder input:not([type="checkbox"]):not([type="radio"]), .cohort-builder select, .cohort-builder textarea {
+  width: 100%; max-width: 36rem; font: inherit; font-weight: 400; color: var(--ink); background: var(--paper);
+  border: 1px solid var(--rule); border-radius: 10px; padding: 0.7rem 0.85rem; min-height: 48px;
+}
+.cohort-builder input#cohort-title { font-size: 1.15rem; font-weight: 600; }
+.cohort-builder input:focus-visible, .cohort-builder select:focus-visible, .cohort-builder textarea:focus-visible { outline: 2px solid var(--clay); outline-offset: 1px; border-color: var(--clay); }
+.cohort-builder .row { display: grid; gap: 0.75rem; }
+.cohort-builder .addr { margin: 0; font-size: 0.92rem; color: var(--muted); display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.25rem 0.6rem; }
+.cohort-builder .addr .url { overflow-wrap: anywhere; }
+.cohort-builder .addr b { color: var(--ink); }
+.link-btn { background: none; border: 0; padding: 0.25rem 0; font: inherit; font-weight: 600; color: var(--clay); text-decoration: underline; text-underline-offset: 0.2em; cursor: pointer; min-height: 44px; }
+.cohort-builder .choices { display: grid; gap: 0.6rem; }
+.cohort-builder label.choice { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.85rem 1rem; border: 1px solid var(--rule); border-radius: 10px; background: var(--paper); font-weight: 400; cursor: pointer; }
+.cohort-builder label.choice input { margin-top: 0.15rem; }
+.cohort-builder label.choice b { display: block; font-weight: 650; }
+.cohort-builder label.choice span { color: var(--muted); font-size: 0.93rem; }
+.cohort-builder label.choice b { color: var(--ink); font-size: 1rem; }
+.cohort-builder label.choice:has(input:checked) { border-color: var(--clay); box-shadow: inset 0 0 0 1px var(--clay); }
+.cohort-builder label.check { display: flex; gap: 0.6rem; align-items: center; font-weight: 500; }
+.cohort-builder .by-hand { margin-top: 0.4rem; }
+.cohort-builder .by-hand summary { cursor: pointer; color: var(--muted); font-size: 0.93rem; min-height: 44px; display: flex; align-items: center; }
+.cohort-builder .by-hand[open] { display: grid; gap: 0.65rem; }
+.builder-preview { display: grid; gap: 0.75rem; align-content: start; min-width: 0; }
+.builder-preview .open-cohort { background: var(--band); color: var(--band-ink); border-color: transparent; }
+.builder-preview .open-cohort .small { color: var(--band-muted); }
+.builder-preview .open-cohort .placeholder { color: var(--band-muted); font-style: italic; }
+.builder-preview .open-cohort .btn-github { pointer-events: none; background: var(--band-ink); color: var(--band); border-color: var(--band-ink); }
+.builder-preview > .small { margin: 0; color: var(--muted); }
+.builder-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 1rem; padding-top: 1.25rem; border-top: 1px solid var(--rule); }
+.builder-actions p { margin: 0; flex: 1 1 16rem; }
+.cohort-builder { container-type: inline-size; }
+@container (min-width: 34rem) {
+  .builder-grid { gap: 2.5rem; }
+  .cohort-builder .row { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .cohort-builder .choices { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@container (min-width: 58rem) {
+  .builder-grid { grid-template-columns: minmax(0, 1fr) 19rem; gap: 3rem; }
+  .builder-preview { position: sticky; top: 1.5rem; }
+}
+@media (min-width: 40rem) {
+  .cohort-builder:not([hidden]) { padding: 2rem; }
+}

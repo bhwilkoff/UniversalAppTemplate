@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261006f">
+  <link rel="stylesheet" href="/assets/site.css?v=20261006h">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -145,46 +145,104 @@
           <div data-cohort-list></div>
           <p><button class="btn-quiet" type="button" data-new-cohort>Start a new cohort</button></p>
 
-          <form class="cohort-form" data-cohort-form hidden>
-            <h2 data-form-title>A new cohort</h2>
-            <label>Title <input name="title" required maxlength="120"></label>
-            <label>Short name for its address <input name="slug" required pattern="[a-z0-9-]+" maxlength="60" placeholder="fall-2026"><span class="hint">Lowercase letters, numbers, and hyphens.</span></label>
-            <label>What it is, in your words <textarea name="description" rows="3" maxlength="2000"></textarea></label>
-            <div class="row">
-              <label>First day <input type="date" name="starts_on"></label>
-              <label>Weeks <input type="number" name="weeks" min="1" max="26" value="5"></label>
+          <!-- The cohort form (Ben, October 6): every question is one that
+               changes how the cohort runs. Words by Claude, awaiting Ben's review. -->
+          <form class="cohort-builder" data-cohort-form hidden novalidate>
+            <header class="builder-head">
+              <p class="kicker">Teach a cohort</p>
+              <h2 data-form-title>A new cohort</h2>
+              <p>Each answer shapes how the cohort runs: who it is for, when it meets, how many people can join, and who can see it. You can change any of them later, except its address.</p>
+            </header>
+            <div class="builder-grid">
+              <div class="builder-steps">
+                <fieldset class="q">
+                  <legend><span class="q-n">1</span>What will people call it?</legend>
+                  <p class="hint" id="q-title-hint">Its name on the cohorts page and at the top of its own page.</p>
+                  <input id="cohort-title" name="title" maxlength="120" placeholder="Fall 2026, Tuesday evenings" aria-describedby="q-title-hint" aria-label="The cohort's name" autocomplete="off">
+                  <p class="addr" data-slug-line>Its address: <span class="url">humanshaped.org/cohort/?c=<b data-slug-show>&hellip;</b></span> <button class="link-btn" type="button" data-slug-edit>Change it</button></p>
+                  <label class="sub" data-slug-field hidden>The short name in its address <input id="cohort-slug" name="slug" maxlength="60" autocomplete="off" spellcheck="false" autocapitalize="off"><span class="hint">Lowercase letters, numbers, and hyphens. It stays the same once the cohort is saved, so links to it keep working.</span></label>
+                </fieldset>
+
+                <fieldset class="q">
+                  <legend><span class="q-n">2</span>Who is it for, and what will they build?</legend>
+                  <p class="hint" id="q-desc-hint">A sentence or two in your own words, shown under its name. Say who you hope will join and the kind of problem they might bring.</p>
+                  <textarea id="cohort-description" name="description" rows="3" maxlength="2000" aria-describedby="q-desc-hint" aria-label="Who it is for" placeholder="Teachers who want a tool their students would actually use, built in the evenings after school."></textarea>
+                </fieldset>
+
+                <fieldset class="q">
+                  <legend><span class="q-n">3</span>When does week 1 begin?</legend>
+                  <p class="hint" id="q-start-hint">Cohort Prep is the week before it, and the cohort runs for 5 weeks from here.</p>
+                  <input id="cohort-starts" type="date" name="starts_on" aria-describedby="q-start-hint" aria-label="The day week 1 begins">
+                  <input type="hidden" name="weeks" value="5">
+                </fieldset>
+
+                <fieldset class="q">
+                  <legend><span class="q-n">4</span>When does the class meet each week?</legend>
+                  <p class="hint">One live session a week. The first is on the first of these days on or after week 1 begins, and everyone sees the time in their own time zone too.</p>
+                  <div class="row">
+                    <label>Day <select id="cohort-day" name="session_weekday">
+                      <option value="">Not decided yet</option><option value="0">Sunday</option><option value="1">Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5">Friday</option><option value="6">Saturday</option>
+                    </select></label>
+                    <label>Time <input id="cohort-time" type="time" name="session_time"></label>
+                    <label>Time zone <input id="cohort-zone" name="time_zone" list="zones" autocomplete="off"></label>
+                  </div>
+                  <label class="sub">How long <select id="cohort-minutes" name="session_minutes">
+                    <option value="60">An hour</option>
+                    <option value="75">75 minutes, as the weekly guides are written</option>
+                    <option value="90">90 minutes</option>
+                    <option value="120">Two hours</option>
+                  </select><span class="hint">Sessions of an hour or less leave out the break.</span></label>
+                  <datalist id="zones" data-zones></datalist>
+                </fieldset>
+
+                <fieldset class="q">
+                  <legend><span class="q-n">5</span>How many people can join?</legend>
+                  <p class="hint" id="q-cap-hint">Everyone works in a group of three that stays together, so a multiple of three keeps everyone in a group. Leave it empty for no limit.</p>
+                  <input id="cohort-capacity" type="number" name="capacity" min="1" max="500" inputmode="numeric" placeholder="No limit" aria-describedby="q-cap-hint" aria-label="How many people can join">
+                </fieldset>
+
+                <fieldset class="q">
+                  <legend><span class="q-n">6</span>Where does it stand?</legend>
+                  <div class="choices">
+                    <label class="choice"><input type="radio" name="status" value="draft"><span><b>Draft</b> Only its teachers can see it. Start here.</span></label>
+                    <label class="choice"><input type="radio" name="status" value="open"><span><b>Open</b> Listed on the cohorts page, and people can join.</span></label>
+                    <label class="choice"><input type="radio" name="status" value="running"><span><b>Running</b> The weeks have begun, and it leaves the cohorts page.</span></label>
+                    <label class="choice"><input type="radio" name="status" value="finished"><span><b>Finished</b> The weeks are over. Each live session's questions and answers are deleted, and you can issue credentials.</span></label>
+                  </div>
+                </fieldset>
+
+                <fieldset class="q">
+                  <legend><span class="q-n">7</span>Who can read its conversation?</legend>
+                  <p class="hint">The cohort talks in Discussions in its own private repository on GitHub, which the hub makes for you under Before the first session.</p>
+                  <label class="check"><input type="checkbox" name="conversations_open"> People outside the cohort can read it too</label>
+                  <details class="by-hand">
+                    <summary>Using a repository and team you made by hand</summary>
+                    <p class="hint">Fill these in only if you made them yourself in the humanshaped organization on GitHub.</p>
+                    <div class="row">
+                      <label>Repository <input name="github_repo" placeholder="humanshaped/cohort-fall-2026" autocomplete="off" spellcheck="false" autocapitalize="off"></label>
+                      <label>Team <input name="github_team" placeholder="cohort-fall-2026" autocomplete="off" spellcheck="false" autocapitalize="off"></label>
+                    </div>
+                  </details>
+                </fieldset>
+              </div>
+
+              <aside class="builder-preview" aria-label="How it will look on the cohorts page">
+                <p class="kicker">On the cohorts page</p>
+                <article class="open-cohort" data-preview>
+                  <h3 data-preview-title>Your cohort's name</h3>
+                  <p class="small" data-preview-line></p>
+                  <p class="small" data-preview-time></p>
+                  <p data-preview-desc></p>
+                  <div class="actions"><span class="btn-github" aria-hidden="true">Join with GitHub</span></div>
+                </article>
+                <p class="small" data-preview-note>People see it here once it is Open.</p>
+              </aside>
             </div>
-            <div class="row">
-              <label>Session day <select name="session_weekday">
-                <option value="">Not set</option><option value="0">Sunday</option><option value="1">Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5">Friday</option><option value="6">Saturday</option>
-              </select></label>
-              <label>Time <input type="time" name="session_time"></label>
-              <label>Minutes <input type="number" name="session_minutes" min="15" max="240" value="75"></label>
-            </div>
-            <div class="row">
-              <label>Time zone <input name="time_zone" list="zones" required></label>
-              <label>Places <input type="number" name="capacity" min="1" placeholder="No limit"></label>
-            </div>
-            <datalist id="zones" data-zones></datalist>
-            <label>Status <select name="status">
-              <option value="draft">Draft: only you can see it</option>
-              <option value="open">Open: people can join</option>
-              <option value="running">Running</option>
-              <option value="finished">Finished</option>
-            </select></label>
-            <fieldset class="row">
-              <legend>The cohort's conversation on GitHub</legend>
-              <p class="small">A private repository in the humanshaped organization with Discussions on, and a secret team that can reach it. People are added to the team when they open the conversation from their cohort page. The hub makes both when you press "Make the cohort’s private repository and team on GitHub" under Before the first session, so fill these in only for a repository and team made by hand.</p>
-              <!-- Words by Claude, awaiting Ben's review (G1). -->
-              <label>Repository <input name="github_repo" placeholder="humanshaped/cohort-fall-2026" pattern="humanshaped/[A-Za-z0-9._-]+" autocomplete="off"></label>
-              <label>Team <input name="github_team" placeholder="cohort-fall-2026" pattern="[a-z0-9-]+" autocomplete="off"></label>
-            </fieldset>
-            <label class="check"><input type="checkbox" name="conversations_open"> Open this cohort's conversations to people outside it</label>
-            <div class="actions">
+            <div class="builder-actions">
               <button class="btn-github" type="submit">Save the cohort</button>
               <button class="btn-quiet" type="button" data-cancel>Cancel</button>
+              <p class="small" data-form-message role="status"></p>
             </div>
-            <p class="small" data-form-message></p>
           </form>
 
           <div class="cohort-detail" data-detail hidden>
@@ -300,7 +358,7 @@
   </main>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" defer></script>
   <script src="/assets/hub-config.js" defer></script>
-  <script src="/assets/teach-lib.js" defer></script>
+  <script src="/assets/teach-lib.js?v=20261006g" defer></script>
   <script src="/assets/rooms-lib.js" defer></script>
   <script src="/assets/followup-lib.js" defer></script>
   <script src="/assets/submit-lib.js" defer></script>
@@ -316,7 +374,7 @@
   <script src="/assets/board-lib.js" defer></script>
   <script src="/assets/show-lib.js" defer></script>
   <script src="/assets/show-builder.js" defer></script>
-  <script src="/assets/teach.js?v=20261006c" defer></script>
+  <script src="/assets/teach.js?v=20261006g" defer></script>
 
   <footer class="site-footer">
     <div class="wrap">

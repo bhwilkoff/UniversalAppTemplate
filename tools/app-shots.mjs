@@ -20,7 +20,9 @@ const APPS = [
   { key: 'archive-watch', name: 'Archive Watch', bundle: 'app.archivewatch.tvos' },
   { key: 'tidbits-trivia', name: 'Tidbits Trivia', bundle: 'com.learningischange.tidbitstrivia' },
   { key: 'bsky-dreams', name: 'Bsky Dreams', bundle: 'app.bskydreams.ios' },
-  { key: 'boba-playbook', name: 'BOBA Playbook', bundle: 'app.bobaplaybook.ios' }
+  // Not on the App Store: its pictures stay the store screenshots already in
+  // assets/apps/ (Ben, October 6).
+  { key: 'boba-playbook', name: 'BOBA Playbook', bundle: 'app.bobaplaybook.ios', keep: true }
 ];
 const WIDTH = 600;
 
@@ -50,7 +52,9 @@ function webpSize(buf) {
 
 const sources = [];
 const sizes = {};
+const kept = [];
 for (const app of APPS) {
+  if (app.keep) { kept.push(app); continue; }
   const hit = await listing(app);
   const urls = hit.screenshotUrls.slice(0, 2);
   for (let i = 0; i < urls.length; i++) {
@@ -71,6 +75,7 @@ writeFileSync(libPath, readFileSync(libPath, 'utf8').replace("'archive-watch': {
 const homePath = join(ROOT, 'index.html');
 let home = readFileSync(homePath, 'utf8').replace('<li class="shot-tv">', '<li class="shot-phone">');
 for (const app of APPS) {
+  if (!sizes[`${app.key}-1`]) continue;
   const [w, h] = sizes[`${app.key}-1`];
   home = home.replace(new RegExp(`(src="/assets/apps/${app.key}-1\\.webp") width="\\d+" height="\\d+"`), `$1 width="${w}" height="${h}"`);
 }
@@ -78,6 +83,10 @@ home = home.replace(/alt="Archive Watch on a television[^"]*"/, 'alt="Archive Wa
 writeFileSync(homePath, home);
 
 const readmePath = join(ROOT, 'assets/apps/README.md');
-const readme = readFileSync(readmePath, 'utf8').replace(/\| File \| Source \|[\s\S]*$/, '| File | Source |\n|---|---|\n' + sources.join('\n') + '\n');
+const old = readFileSync(readmePath, 'utf8');
+const keptRows = old.split('\n').filter(l => kept.some(a => l.startsWith(`| ${a.key}-`)));
+const readme = old.replace(/\| File \| Source \|[\s\S]*$/, '| File | Source |\n|---|---|\n' + sources.concat(keptRows).join('\n') + '\n');
 writeFileSync(readmePath, readme);
-console.log('Written to assets/apps/. Look at them, then commit and push.');
+kept.forEach(a => console.log(`${a.name}: kept its current screenshots`));
+console.log('Written to assets/apps/. Look at them, then commit and push:');
+console.log('  git add assets/apps index.html assets/apps-lib.js && git commit -m "The apps\' iPhone App Store screenshots" && git push');
