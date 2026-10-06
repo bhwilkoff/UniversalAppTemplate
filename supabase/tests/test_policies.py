@@ -2418,6 +2418,15 @@ def main():
     check("and then the same results everyone sees", outcome(as_user("bea"), k_words)["words"] == [{"word": "calm", "count": 2}])
     attempt(as_user("ben"), "insert into public.live_checks (cohort_id, session_id, created_by, prompt, show_tally) values (%s, %s, %s, 'In your words?', true) returning id", (bc, b1, people["ben"]))
     k_short = last_rows[0][0]
+    # The rerun (R17, migration 20261006010000): asked again in its own session only.
+    rerun = "insert into public.live_checks (cohort_id, session_id, created_by, prompt, choices, rerun_of) values (%s, %s, %s, 'Which?', array['A', 'B'], %s) returning rerun_of"
+    check("a teacher asks a question again, naming the one it repeats",
+          attempt(as_user("ben"), rerun, (bc, b1, people["ben"], k_short)) and last_rows == [(k_short,)])
+    attempt(as_user("ben"), "insert into public.sessions (cohort_id, number) values (%s, 9) returning id", (bc,))
+    other_session = last_rows[0][0]
+    check("a rerun cannot repeat a question from another session",
+          not attempt(as_user("ben"), rerun, (bc, other_session, people["ben"], k_short)))
+    check("a student still cannot ask one", not attempt(as_user("bea"), rerun, (bc, b1, people["bea"], k_short)))
     attempt(as_user("bea"), answer, (k_short, bc, people["bea"], None, "Because I could not tell", None))
     check("short answers are only ever counted, never shown",
           outcome(as_user("bea"), k_short) == {"kind": "short", "total": 1})
