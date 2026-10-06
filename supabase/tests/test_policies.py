@@ -2432,6 +2432,28 @@ def main():
     as_user("ben").execute("delete from public.questions where id = %s", (cohort_q,))
     check("deleting a bank question leaves what was asked from it",
           rows_as("ben", "select question_id, prompt from public.live_checks where id = %s", (k_rank,)) == [(None, "Order these")])
+    # Recognition for a skill shown in class (R16, migration
+    # 20261005050000): given by a teacher, read only by the student and the
+    # cohort's teachers, kept by the student after the cohort finishes.
+    give = "insert into public.recognitions (cohort_id, session_id, user_id, skill, skill_key, moment) values (%s, %s, %s, %s, %s, %s) returning id, given_by"
+    check("a teacher recognizes a skill a student showed",
+          attempt(as_user("ben"), give, (bc, b1, people["bea"], "Tested it the way people use it", "tested-like-people", "Showed it on her own phone")) and last_rows[0][1] == people["ben"])
+    rec = last_rows[0][0]
+    check("a student cannot recognize a classmate", not attempt(as_user("hana"), give, (bc, b1, people["bea"], "x", None, None)))
+    check("a teacher's agent cannot give one", not attempt(as_agent("ben"), give, (bc, b1, people["bea"], "x", None, None)))
+    check("someone outside the cohort cannot be recognized in it", not attempt(as_user("ben"), give, (bc, b1, people["dee"], "x", None, None)))
+    check("a teacher cannot recognize themselves", not attempt(as_user("ben"), give, (bc, b1, people["ben"], "x", None, None)))
+    def recs(name):
+        cur = as_user(name); cur.execute("select count(*) from public.recognitions where id = %s", (rec,)); return cur.fetchone()[0]
+    check("the student reads it", recs("bea") == 1)
+    check("a classmate does not", recs("hana") == 0)
+    check("someone outside the cohort does not", recs("dee") == 0)
+    check("no one changes it after it is given",
+          not attempt(as_user("ben"), "update public.recognitions set skill = 'Other' where id = %s returning id", (rec,)) or last_rows == [])
+    attempt(as_user("ben"), give, (bc, b1, people["bea"], "Wrote it in her own voice", "own-voice", None))
+    rec2 = last_rows[0][0]
+    check("the student can take one back", attempt(as_user("bea"), "delete from public.recognitions where id = %s returning id", (rec2,)) and len(last_rows) == 1)
+
     # The class channel (R10, R11): reactions, stance, and presence for
     # one cohort, sent by people in it, heard by people in it, and never
     # by an agent or anyone outside.
@@ -2459,6 +2481,8 @@ def main():
     su10 = conn.cursor(); su10.execute("reset role")
     su10.execute("select (select count(*) from public.live_checks where cohort_id = %s), (select count(*) from public.questions where id = %s)", (bc, own_q))
     check("the questions asked go when the cohort finishes, and the bank stays", su10.fetchone() == (0, 1))
+    su10.execute("select count(*) from public.recognitions where cohort_id = %s", (bc,))
+    check("a student's recognition stays after the cohort finishes", su10.fetchone()[0] == 1)
     conn.rollback()
     conn.close()
     failed = [n for n, ok in results if not ok]
