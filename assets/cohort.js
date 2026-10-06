@@ -311,6 +311,7 @@
           draw(people, mine, res[1].data, res[2].data, res[3].data, res[4].data, res[5].data);
           drawTalk(res[6].data);
           drawNotes(res[5].data);
+          drawRecognized(res[5].data);
           drawSetup(mine, res[6].data);
           drawPublicChoice(mine, res[1].data);
           drawShowcase(res[1].data);
@@ -436,6 +437,37 @@
         });
         var a = el('div', 'actions'); a.appendChild(rm); a.appendChild(msg); q.appendChild(a);
         box.appendChild(q);
+      });
+    });
+  }
+
+  // Skills a teacher recognized in class (recognitions, R16). Only this
+  // person and the cohort's teachers read them; the person can remove any.
+  function drawRecognized(teachers) {
+    var RL = window.RecognitionLib, section = $('[data-recognized-section]');
+    if (!RL || !section) return;
+    db.from('recognitions').select('id, skill, skill_key, moment, given_by, given_at').eq('cohort_id', cohort.id).eq('user_id', me.id).then(function (r) {
+      var names = {};
+      (teachers || []).forEach(function (t) { names[t.user_id] = nameOf(t.profiles); });
+      var lines = r.error ? [] : RL.lines(r.data, function (id) { return names[id] || 'Your teacher'; });
+      section.hidden = !lines.length;
+      var ul = $('[data-recognized]');
+      ul.replaceChildren();
+      lines.forEach(function (l) {
+        var li = el('li', 'recognize-card');
+        li.appendChild(el('p', 'recognize-skill', l.skill));
+        li.appendChild(el('p', 'small', (l.moment ? l.moment + '. ' : '') + 'From ' + l.by + ', ' + lib.ago(l.at, new Date()) + '.' + (l.principle ? ' It shows principle ' + l.principle + '.' : '')));
+        var msg = el('span', 'small'); msg.setAttribute('role', 'status');
+        var rm = button('Remove it', function () {
+          rm.disabled = true;
+          db.from('recognitions').delete().eq('id', l.id).select('id').then(function (d) {
+            rm.disabled = false;
+            if (d.error || !d.data.length) { msg.textContent = 'Not removed: ' + (d.error ? d.error.message : 'the database refused') + '.'; return; }
+            drawRecognized(teachers);
+          });
+        });
+        var a = el('div', 'actions'); a.appendChild(rm); a.appendChild(msg); li.appendChild(a);
+        ul.appendChild(li);
       });
     });
   }

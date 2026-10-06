@@ -502,8 +502,18 @@ panel at 360px and the stage at 1280px) and pushed before the next.
   Checked with GitHub's API stubbed in a browser; not yet against
   GitHub or in a real call.
 - **R16, recognition:** a teacher names a skill a person showed, with
-  the moment; shown on the class page; carried into credential evidence.
-  (pending)
+  the moment; shown on the class page. **Built October 6:** migration
+  20261005050000_recognitions.sql (applied; 717 policy checks, which
+  fail when the read rule is opened): given only by a teacher of the
+  cohort, to someone in it, never by an agent; read only by the student
+  and the cohort's teachers; the student can remove one; it stays with
+  the student after the cohort finishes. assets/recognition-lib.js (3
+  tests): eleven skills tied to principles 3 to 14, or the teacher's own
+  words, and the moment (filled with the current scene). In the panel, a
+  teacher's "Recognize someone"; the student's panel shows it at once
+  (the class channel nudges it) and /cohort/ lists every one with
+  "Remove it". Not yet carried into the signed credential's evidence:
+  that changes what is signed, so it waits for Ben.
 - **R17, the rerun:** ask a question again and show how answers moved.
   (pending)
 

@@ -238,6 +238,7 @@
           startClass();
           drawCode();
           startChat();
+          startRecognition();
           drawPart(true);
           show('ready');
           return refreshLive().then(listen);
@@ -313,6 +314,74 @@
         if (S.onStage && S.onStage.kind === 'path') sendStage();
       }
     });
+  }
+
+  // Recognition for a skill shown in class (R16). A teacher names the
+  // skill and the moment; the student sees it here at once (the class
+  // channel nudges their panel to read again) and on their class page.
+  // No one else sees it, and nothing counts or compares.
+  function startRecognition() {
+    var RL = window.RecognitionLib, box = $('[data-recognize]');
+    if (!RL || !box || S.recognizing) return;
+    S.recognizing = true;
+    box.hidden = false;
+    if (S.teaching) {
+      var d = el('details', 'recognize-give');
+      d.appendChild(el('summary', null, 'Recognize someone'));
+      d.appendChild(el('p', 'small', 'Name a skill someone just showed, and when. Only they and the cohort’s teachers see it.'));
+      var who = el('select'); who.setAttribute('aria-label', 'Who showed it');
+      who.appendChild(new Option('Who showed it?', ''));
+      S.people.map(function (p) { return { id: p.user_id, name: S.names[p.user_id] || 'Someone' }; })
+        .sort(function (a, b) { return a.name.localeCompare(b.name); })
+        .forEach(function (p) { who.appendChild(new Option(p.name, p.id)); });
+      var what = el('select'); what.setAttribute('aria-label', 'The skill');
+      what.appendChild(new Option('Which skill?', ''));
+      RL.SKILLS.forEach(function (s) { what.appendChild(new Option(s.label, s.key)); });
+      what.appendChild(new Option('In my own words…', 'own'));
+      var own = el('input'); own.type = 'text'; own.maxLength = 120; own.hidden = true; own.placeholder = 'The skill, in your words';
+      own.setAttribute('aria-label', 'The skill, in your own words');
+      what.addEventListener('change', function () { own.hidden = what.value !== 'own'; });
+      var moment = el('input'); moment.type = 'text'; moment.maxLength = 300; moment.setAttribute('aria-label', 'The moment');
+      d.addEventListener('toggle', function () { if (d.open && !moment.value) { var part = partNow(); moment.value = RL.momentFor(part && part.name, S.session.number); } });
+      var status = el('p', 'small'); status.setAttribute('role', 'status');
+      var give = button('Give it', 'btn-github', function () {
+        var r = RL.row({ cohortId: S.cohort.id, sessionId: S.session.id, userId: who.value, key: what.value === 'own' ? null : what.value, ownWords: own.value, moment: moment.value });
+        if (r.why) { status.textContent = r.why; return; }
+        give.disabled = true;
+        db.from('recognitions').insert(r.row).then(function (res) {
+          give.disabled = false;
+          if (res.error) { status.textContent = 'Not given: ' + res.error.message + '.'; return; }
+          status.textContent = 'Given to ' + (S.names[who.value] || 'them') + '. Only they and the cohort’s teachers see it.';
+          if (S.classChannel) S.classChannel.nudge('recognition');
+          who.value = ''; what.value = ''; own.value = ''; own.hidden = true; moment.value = '';
+        });
+      });
+      [who, what, own, moment, give, status].forEach(function (n) { d.appendChild(n); });
+      box.appendChild(d);
+      return;
+    }
+    var mineBox = el('div', 'recognize-mine'); box.appendChild(mineBox);
+    var seen = null;
+    function readMine() {
+      db.from('recognitions').select('id, skill, skill_key, moment, given_by, given_at, session_id').eq('cohort_id', S.cohort.id).eq('user_id', S.me.id).then(function (r) {
+        if (r.error) return;
+        var today = (r.data || []).filter(function (x) { return x.session_id === S.session.id; });
+        var lines = RL.lines(today, function (id) { return S.names[id] || 'Your teacher'; });
+        mineBox.replaceChildren();
+        box.hidden = !lines.length;
+        if (!lines.length) return;
+        mineBox.appendChild(el('p', 'kicker', 'Recognized in class today'));
+        lines.forEach(function (l) {
+          var card = el('div', 'recognize-card' + (seen && seen.indexOf(l.id) < 0 ? ' is-new' : ''));
+          card.appendChild(el('p', 'recognize-skill', l.skill));
+          card.appendChild(el('p', 'small', (l.moment ? l.moment + '. ' : '') + 'From ' + l.by + '.'));
+          mineBox.appendChild(card);
+        });
+        seen = lines.map(function (l) { return l.id; });
+      });
+    }
+    readMine();
+    if (S.classChannel) S.classChannel.onNudge('recognition', readMine);
   }
 
   // The class chat (R15): in GitHub, posted by each person as themselves.

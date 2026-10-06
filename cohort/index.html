@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261005l">
+  <link rel="stylesheet" href="/assets/site.css?v=20261006a">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -142,6 +142,13 @@
             <div data-notes></div>
           </section>
 
+          <!-- Recognition for a skill shown in class (R16). -->
+          <section class="cohort-card" aria-labelledby="recognized-title" data-recognized-section hidden>
+            <h2 id="recognized-title">Recognized in class</h2>
+            <p class="small">Skills your teacher saw you show, and when. Only you and the cohort's teachers see these; they stay yours after the cohort ends, and you can remove any of them.</p>
+            <ul class="recognized-list" data-recognized></ul>
+          </section>
+
           <section aria-labelledby="talk-title">
             <h2 id="talk-title">The cohort's conversation</h2>
             <div data-talk></div>
@@ -225,6 +232,7 @@
   <script src="/assets/path-lib.js" defer></script>
   <script src="/assets/showcase-lib.js" defer></script>
   <script src="/assets/show-lib.js" defer></script>
+  <script src="/assets/recognition-lib.js" defer></script>
   <script src="/assets/cohort.js" defer></script>
 
   <footer class="site-footer">

@@ -1741,3 +1741,17 @@ label.check { min-height: 2.25rem; }
 .chat-poll summary { font-weight: 600; cursor: pointer; font-size: 0.9rem; }
 .chat-poll { display: grid; gap: 0.35rem; }
 .chat-foot { margin: 0; }
+
+/* Recognition for a skill shown in class (R16). */
+.recognize { display: grid; gap: 0.5rem; }
+.recognize-give { border: 1px solid var(--rule); border-radius: var(--radius); background: var(--card); padding: 0.6rem 0.8rem; }
+.recognize-give summary { font-weight: 600; cursor: pointer; }
+.recognize-give[open] { display: grid; gap: 0.45rem; }
+.recognize-give select, .recognize-give input { width: 100%; box-sizing: border-box; min-height: 38px; font: inherit; font-size: 0.95rem; border: 1px solid var(--rule); border-radius: 8px; background: var(--paper); color: var(--ink); padding: 0 0.5rem; }
+.recognize-give .btn-github { justify-self: start; }
+.recognize-card { border: 1px solid var(--rule); border-left: 4px solid #3F7A4F; border-radius: 10px; background: var(--card); padding: 0.6rem 0.8rem; }
+.recognize-card.is-new { animation: recognize-in 1.2s ease-out; }
+@keyframes recognize-in { 0% { background: var(--surface); transform: scale(0.98); } 100% { background: var(--card); transform: none; } }
+@media (prefers-reduced-motion: reduce) { .recognize-card.is-new { animation: none; } }
+.recognize-skill { font-weight: 680; }
+.recognized-list { list-style: none; margin: 0.75rem 0 0; padding: 0; display: grid; gap: 0.6rem; }
