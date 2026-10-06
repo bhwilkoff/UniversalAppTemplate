@@ -191,6 +191,8 @@ h3 { font-size: 1.25rem; letter-spacing: -0.012em; line-height: 1.25; }
 .compare .tag { font-weight: 600; font-size: 0.975rem; margin: 0 0 0.5rem; color: var(--muted); }
 .compare .human .tag { color: var(--clay); }
 .compare p.big { margin: 0; font-size: 1.15rem; line-height: 1.5; }
+.compare p.example { margin: 0.9rem 0 0; padding-top: 0.9rem; border-top: 1px solid var(--rule); color: var(--muted); font-size: 0.95rem; font-style: italic; }
+.compare-more { margin: 1rem 0 0; }
 .credit { color: var(--muted); font-size: 0.95rem; margin: 1.5rem 0 0; }
 
 /* Three moves */

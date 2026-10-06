@@ -1438,6 +1438,10 @@ anything with a drop or delete waits on the terminal's confirmation.
    typos, marked for his review), never invent examples in his voice,
    and follow WRITING.md. Show Ben the changed passages before calling it
    done.
+   **Drafted October 6, waiting on Ben's review.** Template commit
+   89ef6bb on `main` and the home page and /cohorts/ on `site`; every
+   changed passage, the typo fixes in his piece, and what was removed
+   are in research/notes/human-shaped-problems-review.md.
 
 ## Where to pick up
 
