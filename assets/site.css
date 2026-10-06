@@ -1299,8 +1299,8 @@ body.addon-body { min-height: 100vh; }
 .addon-stage { min-height: 100vh; display: grid; }
 .stage-state:not([hidden]) { display: grid; min-height: 100vh; }
 .stage-ready:not([hidden]) { grid-template-rows: auto 1fr; padding: 3vmin 4vmin 5vmin; gap: 2vmin; }
-.stage-head { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; }
-.stage-head .addon-mark { font-size: clamp(1rem, 2.2vmin, 1.5rem); }
+.addon-stage .stage-head { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; }
+.addon-stage .stage-head .addon-mark { font-size: clamp(1rem, 2.2vmin, 1.5rem); }
 .stage-part { margin: 0; font-size: clamp(1rem, 2.4vmin, 1.6rem); font-weight: 600; color: var(--muted); }
 .stage-clock { font-variant-numeric: tabular-nums; color: var(--ink); }
 .stage-body:not([hidden]) { display: grid; align-content: center; gap: 2.5vmin; max-width: 70rem; width: 100%; margin: 0 auto; }
@@ -1967,3 +1967,56 @@ ol.principles summary:focus-visible { outline: 2px solid var(--accent); outline-
 .photo figcaption { margin-top: 0.6rem; font-size: 0.9rem; color: var(--muted); max-width: var(--measure); }
 #weeks .photo { max-width: 40rem; }
 .about-head + .photo, section[aria-labelledby="who-title"] .photo { margin-top: 1.5rem; }
+
+/* ------------------------------------------------------------------
+   The site's own patterns (October 6, 2026; research/notes/design-patterns.md).
+   1. One continuous page. Color never runs edge to edge: a colored
+      section is a panel, inset to the page's width with round corners,
+      so the page reads as paper with things placed on it.
+   2. Hanging headings. On reading pages, from 64rem up, each heading
+      sits in a left column beside the words it introduces, so long text
+      has a spine instead of hugging the left edge.
+   3. The footer is part of the page: paper, with one rule above it.
+   ------------------------------------------------------------------ */
+:root { --panel-radius: 28px; }
+
+.band, .showcase, .section.tint { background: none; padding-left: var(--gutter); padding-right: var(--gutter); }
+.band { padding-top: 1rem; padding-bottom: 4rem; }
+.showcase { padding-top: 1rem; padding-bottom: 1rem; }
+.section.tint { padding-top: 1rem; padding-bottom: 1rem; }
+.band > .wrap, .showcase > .wrap, .section.tint > .wrap {
+  border-radius: var(--panel-radius);
+  padding: clamp(2.25rem, 1.5rem + 3vw, 4.5rem) clamp(1.25rem, 0.5rem + 3.5vw, 4rem);
+  max-width: calc(var(--wide) + 2rem);
+}
+.band > .wrap { background: var(--band); }
+.showcase > .wrap { background: var(--band); }
+.section.tint > .wrap { background: var(--surface); }
+@media (min-width: 64rem) { .band > .wrap { padding-top: 4.5rem; padding-bottom: 4.5rem; } }
+
+.site-footer { background: none; }
+
+@media (min-width: 64rem) {
+  /* Topics that stand one under another: the heading hangs on the left. */
+  .topics.single { gap: 0; }
+  .topics.single > .topic {
+    display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); column-gap: 4rem;
+    padding: 3rem 0; border-top: 1px solid var(--rule);
+  }
+  .topics.single > .topic:first-child { border-top: 0; padding-top: 1rem; }
+  .topics.single > .topic > * { grid-column: 2; }
+  .topics.single > .topic > h2 { grid-column: 1; grid-row: 1 / span 30; align-self: start; position: sticky; top: 1.5rem; margin: 0; }
+
+  /* A rendered document with no contents beside it: the same spine. */
+  .about-why .article, .article.hang {
+    max-width: none; display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); column-gap: 4rem;
+  }
+  .about-why .article > *, .article.hang > * { grid-column: 2; max-width: var(--measure); }
+  .about-why .article .doc-body, .article.hang .doc-body { display: contents; }
+  .about-why .article .doc-body > *, .article.hang .doc-body > * { grid-column: 2; max-width: var(--measure); }
+  .about-why .article .doc-body > h2, .article.hang .doc-body > h2 { grid-column: 1; margin-top: 3rem; }
+  .hang-section { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); column-gap: 4rem; border-top: 1px solid var(--rule); }
+  .hang-section > * { grid-column: 2; }
+  .hang-section > h2 { grid-column: 1; grid-row: 1 / span 4; }
+  .hang-section > .photo { grid-column: 1 / -1; }
+}

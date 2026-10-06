@@ -96,6 +96,9 @@ as Ben's without his review, $0 to run.
   looks or reads, check research/notes/ai-design-anti-patterns.md: no
   label above a heading unless it carries information, no tracked
   capitals, no colored stripes, no identical icon-card rows.
+  What to do instead is research/notes/design-patterns.md: color in
+  inset panels, never edge to edge; headings that hang beside long
+  text; one highlighted phrase; real pictures. Use them on new pages.
 - The reading pages (`/path/NN/`, `/principles/`) never
   copy the template's text. Each names its source file with `data-doc`,
   and `assets/render.js` fetches that file from the template's `main`
