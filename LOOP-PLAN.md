@@ -1399,6 +1399,33 @@ and meet@ (authuser=3). A cloud session has none of these, but it does
 have the Supabase connector: additive migrations apply from there, and
 anything with a drop or delete waits on the terminal's confirmation.
 
+## Next for the cloud session (Ben, October 6)
+
+1. **Recognitions as credential evidence** (DECISIONS.md "Recognitions in
+   the credential"): at the cohort's end, the signed credential's
+   evidence includes each in-class recognition the student received
+   (the skill, who recognized it, the session), through
+   credential-lib.js's buildCredential and the signing request /teach/
+   copies; tests in tools/credential and tools/test; the holder sees
+   them on /credential/. Any migration waits for this Mac only if it
+   drops something.
+2. **Human-shaped problems** (DECISIONS.md "Human-shaped problems"):
+   revise the hub for clarity with Ben's language and thinking: what a
+   human-shaped problem is (a gentle hum of worry, unsolved for months or
+   years, something you cannot do yourself with your current tools), his
+   good and computer-shaped examples, and the closing contrast (stories
+   to be told, experienced, and added to, against data points to be
+   aggregated, quantified, and leveraged). Start where a newcomer meets
+   the idea (the home page, /why/, /path/ and stage 00 on the site, the
+   start of the cohort on /cohorts/ and /cohort/, the class builder's
+   first-week defaults, and the review prompts on the MCP server), then
+   the template (docs/path/00-why-we-build.md, the stage where a builder
+   chooses their problem, COURSE.md week 1, the review skill), on `main`
+   for the template. Quote Ben only as he wrote it (fix only obvious
+   typos, marked for his review), never invent examples in his voice,
+   and follow WRITING.md. Show Ben the changed passages before calling it
+   done.
+
 ## Where to pick up
 
 1. Check on the milestone agents (M1, M2, M6). Review each branch they

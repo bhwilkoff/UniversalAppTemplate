@@ -528,3 +528,33 @@ wins; each is built the human-shaped way:
   class, and what it says reaches others only when that person shares
   it, marked as AI.
 
+
+## Recognitions in the credential (October 6, 2026)
+
+Asked whether a recognition belongs in the signed credential's evidence,
+Ben: "Yes. An in-class recognition would be great to include as evidence
+on the final credential at the end of the cohort."
+
+## Human-shaped problems (October 6, 2026)
+
+Ben's own piece, to be used to revise the hub for clarity (his words,
+kept as he wrote them; any page that quotes him fixes only obvious typos,
+with his review):
+
+> A human-shaped problem is something, really anything, in your life that will in some way make your life better, happier, or more deeply resonant with the universe if you could only solve for it. It is something that is the gentle hum of worry or concern that you have about an area of your life. It is a thing that you wonder and question about often. It'is something that has gone unsolved for months or even years, something that is present in a inawing way. And most of all, it is something that you cannot do yourself. Your current tools and resources are insufficiently up to the challenge.
+>
+> Good Human-Shaped problems:
+> - I do not have time to read books in my life. I need something that fits my way of existing that will still let me enjoy great novels and non-fiction every day.
+> - I lack inspiration for what to do with my child to entertain them without screens. I need something that will constantly suggest new things to do that cater to both of our interests.
+> - I read a lot of news and "takes" from people online and I even see newsworthy things out in the real world, and I would love a way to chronicle it all into a cohesive narrative, an understanding of how I see things to remind myself why I believe what I believe.
+> - I want an easy way to align my political beliefs with who and what I'm voting for when I get my ballot or bote in person.
+>
+> Computer-Shaped Problems:
+> - I want to measure the amount of negative sentiment online for any given public figure.
+> - I want to find the best price for my grocery list on delivery apps so that I can comparison shop and combine trips for the cheapest (and least convenient) trips for the delivery drivers.
+> - I want to categorize every conversation I have and chronicle them as a way of measuring my impact on others.
+> - I want to map socieoeconomic data by neighborhood so that I can use it to choose the optimal route for halloween trick or treating to ensure high-end candy.
+>
+> Human-Shaped problems see the world as interrelated stories to be told, experienced, and added to.
+>
+> Computer-Shaped problems see the world as disparate data points to be aggregated, quantified, and leveraged.
