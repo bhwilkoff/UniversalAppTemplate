@@ -84,6 +84,14 @@ as Ben's without his review, $0 to run.
   repeated on each page, so change them everywhere at once.
 - Every page is a folder with an `index.html`, so each has a canonical
   URL. Add new pages to `sitemap.xml`.
+- The menu is Principles, Cohorts, Apps, Events (Ben, October 6). The
+  path has no page of its own: /cohorts/#weeks lists every stage by week
+  (Cohort Prep, weeks 1 to 5) and /path/ redirects there. "Start
+  something" became /events/; /start/ redirects, and the marks and how to
+  show one live in the brand kit (/start/brand/#marks, #declare). The
+  footer is the same short block on every page; credits live on
+  /support/#credits. Links that stand on their own use the arrow look
+  (`.section-more`, `a.go`, `a.go-text`, assets/arrow.svg).
 - The reading pages (`/path/NN/`, `/principles/`) never
   copy the template's text. Each names its source file with `data-doc`,
   and `assets/render.js` fetches that file from the template's `main`
@@ -96,13 +104,14 @@ as Ben's without his review, $0 to run.
   then the principles. `/why/` and its two old pages only redirect.
 - Each idea has one full page, and the home page only summarizes it
   and links there: the why and the principles on /principles/, the
-  method on /path/, the weeks on /cohorts/.
+  method's stages and the weeks on /cohorts/#weeks.
 - Every "Sign in with GitHub" goes to `/account/`, which only signs a
   person in. Joining a cohort starts on `/cohorts/`.
 - Icons are Phosphor's (MIT, credited in `assets/icons.svg` and the
   footer), used as `<svg class="icon"><use href="/assets/icons.svg#name"/></svg>`.
-  Never draw an icon from shapes. The founding apps' store screenshots
-  live small in `assets/apps/` (sources in its README).
+  Never draw an icon from shapes. The founding apps' iPhone App Store
+  screenshots live small in `assets/apps/`; `node tools/app-shots.mjs`
+  fetches them again from the listings (sources in its README).
 - Mobile-first, `min-width` media queries, test at 375px before 1440px.
 - Accessible contrast: text on the orange `--color-primary` is dark.
 
@@ -148,14 +157,15 @@ what waits on Ben.
   (its words, where it runs, live commits, its HUMAN-SHAPED.md answers,
   and its conversation on GitHub), drawn only for apps in the directory
   or shown by their student; `/apps/` and the home page carry a feed of
-  recent work across apps (at most 8 GitHub calls a visit, cached ten
-  minutes, automated commits left out). Cohort apps appear in public
+  recent work across apps (up to 8 apps a visit, one call each for 100
+  commits, and a second for the owner's own commits when those are all
+  automatic updates; cached ten minutes, automated commits left out). Cohort apps appear in public
   only by the student's own switch (`enrollments.app_public`,
   migration 20261003055000, `public_apps()`; see `research/notes/hub-privacy-notes.md`), which is also their "it is ready": every app is submitted by the cohort's end (`submit-lib.js`, loaded on /cohort/ and /teach/). A teacher can keep an app off /apps/ with `app_hides` (migration 20261003090000), which never touches the student's switch.
 - **Scripts:** `assets/hub-config.js` (public URL and publishable key),
   `hub.js`, `cohorts.js`, `teach.js` with `teach-lib.js`, `cohort.js` and `live.js`
   with `cohort-lib.js` and `live-lib.js`, and `apps.js` with `apps-lib.js`. Pure logic lives in the `-lib.js` files with
-  tests in `tools/test/` (`node --test tools/test/*.mjs`, 370 tests).
+  tests in `tools/test/` (`node --test tools/test/*.mjs`, 371 tests).
 - **The cohort's conversation:** `discussions.js` with `discussions-lib.js`
   reads and posts the cohort repository's GitHub Discussions on /cohort/
   and /live/ with the student's own GitHub token. That token is kept in

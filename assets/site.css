@@ -487,7 +487,9 @@ h3 { font-size: 1.25rem; letter-spacing: -0.012em; line-height: 1.25; }
 .stages a:hover .t { color: var(--clay); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 0.2em; }
 .stages .aside .n { font-size: 1rem; }
 /* /cohorts/: the stages, grouped by the week a cohort reads them. */
-.stages .week-row { padding: 1.5rem 0 0.4rem; color: var(--clay); font-weight: 650; font-size: 0.9rem; letter-spacing: 0.06em; text-transform: uppercase; border-bottom: 0; }
+.stages .week-row { padding: 1.75rem 0 0.4rem; border-bottom: 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.25rem 1rem; }
+.stages .week-row .wk { color: var(--clay); font-weight: 650; font-size: 0.9rem; letter-spacing: 0.06em; text-transform: uppercase; }
+.stages .week-row .wk-what { color: var(--ink); font-weight: 600; }
 .stages .week-row:first-child { padding-top: 1rem; }
 .stages.by-week { border-top: 0; }
 
