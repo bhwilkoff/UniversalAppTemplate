@@ -115,9 +115,22 @@
             summary = { total: t.total, counts: t.rows.map(function (r) { return r.count; }) };
           }
           var r = L.results(k, summary);
+          // A question asked again (R17): each bar carries the first
+          // time's share, matched by label, when those results are known.
+          var firstShare = null;
+          var first = k.rerun_of ? (state.checks || []).filter(function (x) { return x.id === k.rerun_of; })[0] : null;
+          if (first && (state.results || {})[first.id]) {
+            firstShare = {};
+            L.results(first, state.results[first.id]).rows.forEach(function (x) { firstShare[x.label] = x.share; });
+          }
+          if (k.rerun_of) view.rerun = true;
           view.count = {
             total: r.total,
-            rows: r.rows.map(function (x) { return { label: cut(x.label, 120), count: x.count, share: x.share, text: cut(x.text, 20) }; }),
+            rows: r.rows.map(function (x) {
+              var row = { label: cut(x.label, 120), count: x.count, share: x.share, text: cut(x.text, 20) };
+              if (firstShare && x.label in firstShare) row.before = firstShare[x.label];
+              return row;
+            }),
             words: r.words.slice(0, 30).map(function (w) { return { word: cut(w.word, 60), size: w.size }; }),
             note: r.note ? cut(r.note, 200) : null
           };
@@ -191,7 +204,9 @@
         count = {
           total: Number(v.count.total),
           rows: v.count.rows.slice(0, 10).map(function (r) {
-            return { label: cut(r.label, 120), count: Number(r.count) || 0, share: Math.max(0, Math.min(100, Number(r.share) || 0)), text: cut(r.text == null ? String(Number(r.count) || 0) : r.text, 20) };
+            var row = { label: cut(r.label, 120), count: Number(r.count) || 0, share: Math.max(0, Math.min(100, Number(r.share) || 0)), text: cut(r.text == null ? String(Number(r.count) || 0) : r.text, 20) };
+            if (r.before != null && isFinite(Number(r.before))) row.before = Math.max(0, Math.min(100, Number(r.before)));
+            return row;
           }),
           words: Array.isArray(v.count.words) ? v.count.words.slice(0, 30).filter(function (w) { return w && typeof w.word === 'string'; }).map(function (w) {
             return { word: cut(w.word, 60), size: Math.max(1, Math.min(5, Math.round(Number(w.size) || 1))) };
@@ -199,7 +214,9 @@
           note: typeof v.count.note === 'string' && v.count.note ? cut(v.count.note, 200) : null
         };
       }
-      return { mode: 'check', part: part, kind: kinds.indexOf(v.kind) >= 0 ? v.kind : 'choice', prompt: cut(v.prompt, 500), choices: choices, count: count };
+      var cv = { mode: 'check', part: part, kind: kinds.indexOf(v.kind) >= 0 ? v.kind : 'choice', prompt: cut(v.prompt, 500), choices: choices, count: count };
+      if (v.rerun === true) cv.rerun = true;
+      return cv;
     }
     if (v.mode === 'item' && typeof v.what === 'string') {
       var iv = { mode: 'item', part: part, who: cut(v.who || 'Someone', 80), what: cut(v.what, 200), note: v.note ? cut(v.note, 300) : null };

@@ -232,3 +232,15 @@ test('every rehearsal room goes on the stage in a checked shape', () => {
   assert.deepEqual(lib.readStageMessage(lib.stageMessage(v)).rooms, v.rooms);
   assert.equal(lib.stageView({ onStage: { kind: 'rooms' }, rooms: Array.from({ length: 20 }, (_, i) => ({ name: 'G' + i })) }).rooms.length, 12);
 });
+
+test('a question asked again shows the first time beside each bar, by label', () => {
+  const first = { id: 'k1', kind: 'choice', prompt: 'Which?', choices: ['A', 'B'], state: 'closed', show_tally: true };
+  const again = { id: 'k2', kind: 'choice', prompt: 'Which?', choices: ['A', 'B'], state: 'open', show_tally: true, rerun_of: 'k1' };
+  const v = lib.stageView({ onStage: { kind: 'check', id: 'k2' }, checks: [first, again],
+    results: { k1: { total: 4, counts: [3, 1] }, k2: { total: 4, counts: [1, 3] } } });
+  assert.equal(v.rerun, true);
+  assert.deepEqual(v.count.rows.map(r => [r.label, r.share, r.before]), [['A', 25, 75], ['B', 75, 25]]);
+  const back = lib.readStageMessage(lib.stageMessage(v));
+  assert.equal(back.rerun, true);
+  assert.deepEqual(back.count.rows.map(r => r.before), [75, 25]);
+});

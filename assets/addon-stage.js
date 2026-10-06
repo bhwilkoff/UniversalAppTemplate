@@ -48,6 +48,7 @@
     $('[data-part-big]').textContent = part ? part.name : 'The session begins soon.';
     if (view.mode === 'check') {
       $('[data-prompt]').textContent = view.prompt;
+      $('[data-check-kicker]').textContent = view.rerun ? 'Asked again: how have the answers moved?' : 'A question for everyone';
       // With the results shown, the bars come from them (an order is
       // sorted, first place at the top); before, the choices alone.
       var count = view.count;
@@ -58,7 +59,10 @@
         var li = el('li');
         li.appendChild(el('span', 'label', row.label));
         if (count && row.text != null) {
-          var bar = el('span', 'bar'); bar.style.setProperty('--share', row.share + '%'); li.appendChild(bar);
+          var bar = el('span', 'bar'); bar.style.setProperty('--share', row.share + '%');
+          // The first time this was asked (R17), as a faint bar beneath.
+          if (row.before != null) { bar.classList.add('has-before'); bar.style.setProperty('--before', row.before + '%'); }
+          li.appendChild(bar);
           li.appendChild(el('span', 'count', row.text));
         }
         ul.appendChild(li);
@@ -70,6 +74,7 @@
       $('[data-count-note]').hidden = !(count && count.note);
       $('[data-count-note]').textContent = count && count.note ? count.note : '';
       $('[data-count-total]').hidden = !count;
+      $('[data-rerun-key]').hidden = !(count && count.rows.some(function (r) { return r.before != null; }));
       $('[data-count-total]').textContent = count ? L.counted(count.total, 'answer', 'answers') + ' so far, with no names.' : '';
     }
     if (view.mode === 'rooms') {

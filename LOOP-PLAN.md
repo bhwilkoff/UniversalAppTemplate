@@ -515,7 +515,26 @@ panel at 360px and the stage at 1280px) and pushed before the next.
   "Remove it". Not yet carried into the signed credential's evidence:
   that changes what is signed, so it waits for Ben.
 - **R17, the rerun:** ask a question again and show how answers moved.
-  (pending)
+  **Built October 6:** migration 20261006010000_rerun.sql
+  (live_checks.rerun_of, same session only; applied; 720 policy checks,
+  which fail when the session rule is opened); assets/rerun-lib.js (3
+  tests). On a question with choices, a teacher's "Ask it again" asks it
+  unanswered with its count hidden; once the count is shown, the main
+  stage draws each bar with a grey line for the first time's share,
+  matched by label, under "Asked again: how have the answers moved?";
+  the teacher's card says how many of those who answered both times
+  changed, and, opened, who changed from what to what.
+
+**After R10 to R17 (October 6):** all eight of Ben's requests are built
+and pushed, and none has been in a real call. The next real call should
+try, in order: reactions and stance (keys 1 to 8, A, U, D), the roster
+and "Where I am on the path", every room on the main stage, a PDF on
+the board, code for everyone (JavaScript and Python), the class chat
+(Connect GitHub, a message, a reply, a reaction, a message marked as
+from an agent, a quick poll), recognizing someone, and asking a
+question again. Waits on Ben: `sh tools/deploy-mcp.sh` (R14's run of
+show for agents), and whether a recognition belongs in the signed
+credential's evidence.
 
 ## Needs Ben
 

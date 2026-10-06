@@ -793,6 +793,12 @@
       if (bad) { $('[data-sync]').textContent = 'The panel could not read the latest changes: ' + bad.error.message; return; }
       S.items = res[0].data; S.checks = res[1].data; S.answers = res[2].data;
       var visible = S.checks.filter(function (k) { return L.kindOf(k) !== 'short' && (S.teaching || k.show_tally); });
+      // A question asked again (R17) needs its first results too, even closed.
+      S.checks.forEach(function (k) {
+        if (!k.rerun_of || visible.indexOf(k) < 0) return;
+        var first = S.checks.filter(function (x) { return x.id === k.rerun_of; })[0];
+        if (first && visible.indexOf(first) < 0) visible.push(first);
+      });
       return Promise.all(visible.map(function (k) { return Q.readResults(db, k); })).then(function (t) {
         S.results = {};
         visible.forEach(function (k, i) { S.results[k.id] = t[i] || null; });
@@ -922,8 +928,31 @@
       details.appendChild(ul);
       card.appendChild(details);
     }
+    // A question asked again (R17): who changed their answer, for the
+    // teacher alone, to ask them why.
+    var RR = window.RerunLib;
+    var first = k.rerun_of ? S.checks.filter(function (x) { return x.id === k.rerun_of; })[0] : null;
+    if (RR && first) {
+      var moved = RR.changes(first, k, S.answers, S.answers, L.answerText);
+      var dm = el('details', 'addon-answers rerun-moved');
+      dm.appendChild(el('summary', null, RR.changesLine(moved)));
+      var ulm = el('ul', 'live-answers');
+      moved.changed.forEach(function (c) {
+        var li = el('li'); li.appendChild(el('strong', null, nameOf(c.user_id) + ': '));
+        li.appendChild(document.createTextNode(c.from + ' → ' + c.to)); ulm.appendChild(li);
+      });
+      if (moved.changed.length) dm.appendChild(ulm);
+      card.insertBefore(el('p', 'kicker rerun-kicker', 'Asked again'), card.firstChild);
+      card.appendChild(dm);
+    }
     var acts = el('div', 'actions');
     acts.appendChild(stageToggle('check', k.id, 'Put it on the main stage', 'Take it off the main stage'));
+    if (RR && RR.canRerun(L.kindOf(k))) acts.appendChild(button('Ask it again', 'btn-quiet', function () {
+      db.from('live_checks').insert(RR.againRow(k, { cohortId: S.cohort.id, sessionId: S.session.id, me: S.me.id })).then(function (r) {
+        if (r.error) { window.alert('Not asked again: ' + r.error.message); return; }
+        refreshLive();
+      });
+    }));
     if (!short) acts.appendChild(button(k.show_tally ? 'Hide the results' : 'Show everyone the results', 'btn-quiet', function () { changeCheck(k, { show_tally: !k.show_tally }); }));
     acts.appendChild(button('Close it', 'btn-quiet', function () { if (S.onStage && S.onStage.id === k.id) setPin(null); changeCheck(k, { state: 'closed' }); }));
     card.appendChild(acts);

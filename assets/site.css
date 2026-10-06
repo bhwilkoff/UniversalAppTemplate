@@ -1755,3 +1755,9 @@ label.check { min-height: 2.25rem; }
 @media (prefers-reduced-motion: reduce) { .recognize-card.is-new { animation: none; } }
 .recognize-skill { font-weight: 680; }
 .recognized-list { list-style: none; margin: 0.75rem 0 0; padding: 0; display: grid; gap: 0.6rem; }
+
+/* The rerun (R17): the first time's share as a thin line under each bar. */
+.stage-choices .bar.has-before { height: 0.85em; background: transparent; overflow: visible; }
+.stage-choices .bar.has-before::after { inset: 0 auto 40% 0; }
+.stage-choices .bar.has-before::before { content: ""; position: absolute; left: 0; bottom: 0; height: 22%; width: var(--before, 0%); background: var(--edge); border-radius: 999px; }
+.rerun-kicker { color: var(--clay); }
