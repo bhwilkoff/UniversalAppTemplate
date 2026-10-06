@@ -80,15 +80,17 @@ and the heading-left, words-right layout, with a 1px rule, not a heavier
 one. A link inside reading text looks like every other link and is not
 bolded to stand out; only a link that stands alone uses `a.go-text`.
 
-## 10. Side-by-side text starts on one line
+## 10. Side-by-side text starts at the same height
 
-When a heading and smaller text sit in two columns, the first line of
-each sits on the same baseline, never the tops of their boxes (Ben,
-October 6). Every two-column grid uses `align-items: first baseline`
-(section heads, the closing panels, pull quotes, hanging topics and
-documents, the weeks), so it stays true whatever the type sizes or the
-font that loads. Nudging with padding does not, because the space above
-a first line changes with the font.
+When a heading and smaller text sit in two columns, the top of the
+heading's capitals is level with the top of the first line beside it
+(Ben, October 6, twice: baselines were the wrong edge, since a small
+first line on the heading's baseline sits far below the heading's top).
+Each column's first element loses its top margin and is trimmed to its
+cap height (`text-box: trim-start cap alphabetic`), and the grid aligns
+at the start. This holds whatever the sizes or font. Browsers without
+text-box (Firefox, for now) align the boxes' tops, a few pixels off.
+A button beside a heading lines its top edge up with the capitals.
 
 ## Checking a page
 
@@ -96,4 +98,4 @@ At 375 and 1280 pixels, light and dark: does color stay inside panels,
 does every long text hang from a heading or share its row, is there at
 most one forest panel, no highlighted words, do compared things
 look alike, does each section keep to three text styles, does text
-beside a heading start on its line, and is everything shown real?
+beside a heading start at its height, and is everything shown real?

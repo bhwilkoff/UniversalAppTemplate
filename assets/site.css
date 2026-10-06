@@ -2000,7 +2000,7 @@ ol.principles summary:focus-visible { outline: 2px solid var(--accent); outline-
   }
   .topics.single > .topic:first-child { border-top: 0; padding-top: 1rem; }
   .topics.single > .topic > * { grid-column: 2; }
-  .topics.single > .topic > h2 { grid-column: 1; grid-row: 1 / span 30; align-self: first baseline; position: sticky; top: 1.5rem; margin: 0; }
+  .topics.single > .topic > h2 { grid-column: 1; grid-row: 1 / span 30; align-self: start; position: sticky; top: 1.5rem; margin: 0; }
 
   /* A rendered document with no contents beside it: the same spine. */
   .article.hang {
@@ -2052,15 +2052,31 @@ ol.principles summary:focus-visible { outline: 2px solid var(--accent); outline-
 .page-head .fine { max-width: 38rem; }
 @media (min-width: 64rem) { .topics.single > .topic > .checklists { grid-column: 1 / -1; margin-top: 2rem; } }
 
-/* Text in side-by-side columns starts on the same line: every two-column
-   block lines up the baselines of its first lines, whatever the sizes
-   (Ben, October 6: the smaller text started at a different height than
-   the heading beside it). */
+/* Text in side-by-side columns starts at the same height: the top of
+   the heading's capitals is level with the top of the first line beside
+   it (Ben, October 6). Each column's first line is trimmed down to its
+   cap height (text-box), and the columns align at the top. Where
+   text-box is not supported, the tops of the boxes align instead. */
 @media (min-width: 56rem) {
-  .section-head, .band > .wrap { align-items: first baseline; }
+  .section-head, .band > .wrap { align-items: start; }
+  .section-head > *, .section-head > * > :first-child, .band > .wrap > *, .band > .wrap > * > :first-child { text-box: trim-start cap alphabetic; margin-top: 0; }
 }
 @media (min-width: 64rem) {
   .pull, .topics.single > .topic, .hang-section, .about-why, .article.hang,
-  .stages.by-week > li.week { align-items: first baseline; }
+  .stages.by-week > li.week { align-items: start; }
+  .pull > *, .topics.single > .topic > h2, .topics.single > .topic > h2 + *,
+  .hang-section > h2, .hang-section > h2 + *, .about-why > .part-title,
+  .about-why .doc-body > :first-child, .about-why .doc-body > h2, .about-why .doc-body > h2 + *,
+  .article.hang .doc-body > :first-child, .article.hang .doc-body > h2, .article.hang .doc-body > h2 + *,
+  .stages.by-week .week-head > :first-child, .stages.by-week .week-stages > li:first-child a > * { text-box: trim-start cap alphabetic; }
+  .topics.single > .topic > h2 + *, .topics.single > .topic > h2 + ol > li:first-child, .topics.single > .topic > h2 + ul > li:first-child,
+  .topics.single > .topic > h2 + * > :first-child, .hang-section > h2 + * > :first-child,
+  .stages.by-week .week-head > :first-child, .stages.by-week .week-stages > li:first-child a,
+  .pull > * { text-box: trim-start cap alphabetic; margin-top: 0; padding-top: 0; }
+  .band-ways > li:first-child, .band-ways > li:first-child > :first-child { text-box: trim-start cap alphabetic; margin-top: 0; }
+  .hang-section > h2, .hang-section > h2 + * { margin-top: 0; }
+  /* A hanging heading and the words beside it start on the same row, so
+     they take the same space above them. */
+  .about-why .doc-body > h2 + *, .article.hang .doc-body > h2 + * { margin-top: 3rem; }
 }
 @media (min-width: 64rem) { .topics.single > .topic > h2 + .actions { margin-top: 0; } }
