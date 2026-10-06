@@ -351,7 +351,6 @@ h3 { font-size: 1.25rem; letter-spacing: -0.012em; line-height: 1.25; }
   .weeks-card { padding: 1.75rem 1.75rem 1.25rem; }
   .section { padding: 6rem 0; }
   .section-head { grid-template-columns: minmax(0, 6fr) minmax(0, 6fr); gap: 4rem; align-items: start; margin-bottom: 3rem; }
-  .section-head > .prose { padding-top: 0.45rem; }
   .idea .wrap { display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 6fr); gap: 0 4rem; }
   .idea .compare { grid-column: 1 / -1; }
   .idea .prose { margin-top: 2.1rem; }
@@ -1666,7 +1665,7 @@ label.check { min-height: 2.25rem; }
 .pull { margin: 3rem 0 0; padding: 2.5rem 0 0; border-top: 1px solid var(--rule); display: grid; gap: 1rem; }
 .pull p { margin: 0; font-size: clamp(1.85rem, 1.3rem + 2.4vw, 2.9rem); line-height: 1.1; letter-spacing: -0.025em; font-weight: 650; max-width: 18ch; }
 .pull footer { max-width: var(--measure); color: var(--muted); font-size: 1.0625rem; line-height: 1.6; }
-@media (min-width: 64rem) { .pull { grid-template-columns: minmax(0, 6fr) minmax(0, 6fr); gap: 4rem; align-items: start; } .pull footer { padding-top: 0.45rem; } }
+@media (min-width: 64rem) { .pull { grid-template-columns: minmax(0, 6fr) minmax(0, 6fr); gap: 4rem; align-items: start; } }
 
 /* The method's three moves, each a card. */
 .moves li { background: var(--card); border: 1px solid var(--rule); border-radius: var(--radius); padding: 1.5rem 1.4rem; }
@@ -2001,7 +2000,7 @@ ol.principles summary:focus-visible { outline: 2px solid var(--accent); outline-
   }
   .topics.single > .topic:first-child { border-top: 0; padding-top: 1rem; }
   .topics.single > .topic > * { grid-column: 2; }
-  .topics.single > .topic > h2 { grid-column: 1; grid-row: 1 / span 30; align-self: start; position: sticky; top: 1.5rem; margin: 0; }
+  .topics.single > .topic > h2 { grid-column: 1; grid-row: 1 / span 30; align-self: first baseline; position: sticky; top: 1.5rem; margin: 0; }
 
   /* A rendered document with no contents beside it: the same spine. */
   .article.hang {
@@ -2045,10 +2044,23 @@ ol.principles summary:focus-visible { outline: 2px solid var(--accent); outline-
   .stages.by-week .week-stages .n { grid-row: auto; }
   .stages.by-week .week-stages .l { grid-column: 3; }
 }
-.section-head > .head-side > .prose { padding-top: 0.45rem; margin: 0 0 1.5rem; }
+.section-head > .head-side > .prose { margin: 0 0 1.5rem; }
 .section-head > .head-side .photo { margin: 0; }
 [data-events] h2 { font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2rem); margin-bottom: 1rem; }
 [data-events] .small, [data-upcoming] p { max-width: var(--measure); }
 #now > h2 { font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2rem); margin-bottom: 0.5rem; }
 .page-head .fine { max-width: 38rem; }
 @media (min-width: 64rem) { .topics.single > .topic > .checklists { grid-column: 1 / -1; margin-top: 2rem; } }
+
+/* Text in side-by-side columns starts on the same line: every two-column
+   block lines up the baselines of its first lines, whatever the sizes
+   (Ben, October 6: the smaller text started at a different height than
+   the heading beside it). */
+@media (min-width: 56rem) {
+  .section-head, .band > .wrap { align-items: first baseline; }
+}
+@media (min-width: 64rem) {
+  .pull, .topics.single > .topic, .hang-section, .about-why, .article.hang,
+  .stages.by-week > li.week { align-items: first baseline; }
+}
+@media (min-width: 64rem) { .topics.single > .topic > h2 + .actions { margin-top: 0; } }
