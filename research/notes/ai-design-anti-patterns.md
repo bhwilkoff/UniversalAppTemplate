@@ -231,3 +231,24 @@ around the wheel was counted for brands within ΔE 10.
   dropped for sitting 8.2 from Gumroad.
 - Three directions from them: Bloom (all three), olive and lilac, olive
   and pear. All text meets AA in light and dark.
+
+## Pairings, not single colors (October 6, latest)
+
+Ben found pear unattractive and a full lilac ground hard to read. The
+lesson: the colors no brand uses are often empty because they are
+unappealing. So the search moved from single colors to pairings, using
+the brand-colors data set (github.com/reimertz/brand-colors: 698 brands,
+427 of them with two to five colors) plus the 70 palettes above.
+
+- A pairing counts as taken when one brand has a color within ΔE 12 of
+  each of its two colors.
+- From a hand-picked set of 17 deep colors and 25 light ones, twelve
+  attractive pairings came out with no brand using them, among them
+  oxblood and butter, forest and lavender, espresso and periwinkle.
+- Left out as someone's already: bubblegum (Klarna), apricot (the
+  current light clay), seafoam (Tiffany), navy (Monzo), cobalt and
+  ultramarine (Unilever, Malwarebytes), tangerine (Dribbble), sky blue
+  (LangChain), and bright yellow with dark green, brown or black.
+- Layout rule from Ben's note: pages stay on white or near-white; the
+  light color appears only in highlights, stickers, and buttons on dark,
+  never as a ground for paragraphs.
