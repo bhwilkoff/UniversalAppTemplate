@@ -182,3 +182,30 @@ of us.
   /cohorts/. Both were cropped below the menu bars, so no bookmarks or
   window titles show, and saved without metadata. Still wanted: a real
   quote from a builder and a screenshot of a real session.
+
+## The palette against other brands (October 6, night)
+
+Ben liked Pencil best and asked whether any direction overlaps a known
+brand. Each palette was measured against 70 brand palettes from public
+brand-color listings (CIEDE2000 color difference; under 2 is hard to tell
+apart, under 10 reads as the same color).
+
+- **Pencil as drawn fails.** `#FFC300` is Caterpillar's yellow exactly,
+  within 3 of Bumble, McDonald's, DeWalt, Ticonderoga and IMDb. Yellow
+  with near-black is shared by 11 brands, among them Codecademy (coding
+  education: yellow buttons on navy) and Mailchimp; yellow, pink and
+  black is Gumroad's whole identity.
+- **No bright yellow is free.** Every yellow from amber to lemon sits
+  within 10 of a major brand, so the yellow can stay only if its partner
+  is one no brand in this site's lane uses. A sweep of dark partners
+  found only a few open ones: a reddish plum, a cedar brown, an olive.
+- **Two reworked Pencils, both clear in learning, creator tools and AI:**
+  Pencil and purple pen (`#FFC300` with `#6B3A5E`; only Slack is near,
+  at 11.2), from the "purple pen of progress" UK schools use for
+  students' own revisions; and Pencil, sharpened (`#FFC300` with cedar
+  `#6B4A2E`; no brand pairs them).
+- **Sleeve is clear** (denim is 8.4 from Michigan's blue, but nobody pairs
+  it with this gold). **Riso's pink is 4.8 from Barbie pink**, a
+  trademarked color.
+- Every pairing also matches some sports team; teams were counted but
+  are outside this site's lane.
