@@ -468,8 +468,7 @@ panel at 360px and the stage at 1280px) and pushed before the next.
   the run of show is (showLine in shape.js, one test): the scene, its
   minute, and what the main stage shows. The panel links to /connect/.
   Sharing what an agent said goes in the R15 chat, marked as AI.
-  **Needs Ben:** run `sh tools/deploy-mcp.sh` on the Mac, since this
-  container cannot type-check the Deno function.
+  Deployed from the Mac October 6 (mcp-shape tests 22 of 22 first).
 - **R15, in-class chat that lives in GitHub:** Ben, October 5: "In-class
   messages/chat is different than ongoing discussion. I don't think there
   is any way to bring in the chat from Github, that would be INCREDIBLE.
@@ -532,8 +531,7 @@ and "Where I am on the path", every room on the main stage, a PDF on
 the board, code for everyone (JavaScript and Python), the class chat
 (Connect GitHub, a message, a reply, a reaction, a message marked as
 from an agent, a quick poll), recognizing someone, and asking a
-question again. Waits on Ben: `sh tools/deploy-mcp.sh` (R14's run of
-show for agents), and whether a recognition belongs in the signed
+question again. The mcp deploy for R14 was done on the Mac October 6. Waits on Ben: whether a recognition belongs in the signed
 credential's evidence.
 
 ## Needs Ben
