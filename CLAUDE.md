@@ -122,7 +122,7 @@ as Ben's without his review, $0 to run.
   screenshots live small in `assets/apps/`; `node tools/app-shots.mjs`
   fetches them again from the listings (sources in its README).
 - Mobile-first, `min-width` media queries, test at 375px before 1440px.
-- Accessible contrast: text on the orange `--color-primary` is dark.
+- Colors: forest and thistle on white (DECISIONS.md, "Forest and thistle"). `--accent` is forest in light and thistle in dark; thistle is never a ground for paragraphs, and text on it is ink.
 
 ## The hub app (sign-in, cohorts, sessions)
 

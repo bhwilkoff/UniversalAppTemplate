@@ -27,10 +27,10 @@ W, H = 1920, 1080
 # The site's tokens (assets/site.css): paper, surface, and rule for the
 # light ones; the dark mode's paper, surface, and rule for the evening.
 VARIANTS = {
-    "paper": {"bg": "#F7F6F2", "floor": "#ECE7DE", "mark": "light", "arch": None},
-    "paper-arch": {"bg": "#F7F6F2", "floor": "#ECE7DE", "mark": "light", "arch": "#DDD8CF"},
-    "evening": {"bg": "#141618", "floor": "#1E2124", "mark": "dark", "arch": None},
-    "evening-arch": {"bg": "#141618", "floor": "#1E2124", "mark": "dark", "arch": "#2F3337"},
+    "paper": {"bg": "#FFFFFF", "floor": "#F6F1FA", "mark": "light", "arch": None},
+    "paper-arch": {"bg": "#FFFFFF", "floor": "#F6F1FA", "mark": "light", "arch": "#DDE3E0"},
+    "evening": {"bg": "#0D1E17", "floor": "#13261E", "mark": "dark", "arch": None},
+    "evening-arch": {"bg": "#0D1E17", "floor": "#13261E", "mark": "dark", "arch": "#23382E"},
 }
 
 # The arch's own path, from the wordmark (make_mark.arch), in its units.

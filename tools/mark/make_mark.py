@@ -25,8 +25,8 @@ OUT = Path(__file__).resolve().parents[2] / "assets" / "mark"
 
 # The site's own tokens (assets/site.css), light and dark.
 THEMES = {
-    "light": {"bg": "#FFFFFF", "edge": "#DDD8CF", "ink": "#1A1D21", "clay": "#A23F22"},
-    "dark": {"bg": "#1B1E21", "edge": "#3A3F44", "ink": "#EEEAE3", "clay": "#F0A184"},
+    "light": {"bg": "#FFFFFF", "edge": "#DDE3E0", "ink": "#162019", "accent": "#1F4D3A"},
+    "dark": {"bg": "#112219", "edge": "#2F4A3E", "ink": "#E6EEEA", "accent": "#DCC4F0"},
 }
 
 # The two marks (DECISIONS.md, October 5, 2026): "aligned with" for
@@ -112,9 +112,9 @@ def draw(word_font, label_font, status, theme):
     return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{HEIGHT}" viewBox="0 0 {width} {HEIGHT}" role="img" aria-label="{title}">
 <title>{title}</title>
 <rect x="0.5" y="0.5" width="{width - 1}" height="{HEIGHT - 1}" rx="10" fill="{c['bg']}" stroke="{c['edge']}"/>
-<path fill="{c['clay']}" d="{label_d}"/>
+<path fill="{c['accent']}" d="{label_d}"/>
 <path fill="{c['ink']}" d="{human_d}{shaped_d}"/>
-<path fill="none" stroke="{c['clay']}" stroke-width="{stroke:.2f}" stroke-linecap="round" d="{arch_d}"/>
+<path fill="none" stroke="{c['accent']}" stroke-width="{stroke:.2f}" stroke-linecap="round" d="{arch_d}"/>
 </svg>
 """
 

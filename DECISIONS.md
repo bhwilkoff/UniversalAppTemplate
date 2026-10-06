@@ -575,3 +575,28 @@ point into the template or a justification for all of Human-Shaped as
 an organization. It should be about the Principles themselves." So
 /principles/ shows only the fifteen, each drawn the same way, and the
 why and what Human Shaped is moved to a new /about/ page.
+
+## Forest and thistle (October 6, 2026, night)
+
+**The palette is forest green and thistle on white, chosen as a pairing no
+brand uses.** Ben asked for colors "recognized around the world as
+uniquely ours" and not the cream-and-clay look AI-made sites default to.
+Every bright single color turned out to belong to someone (pencil yellow
+is Caterpillar's exactly), so the search moved to pairings and checked
+them against 427 multi-color brand palettes, 3,465 Simple Icons colors,
+and 70 hand-checked palettes (research/notes/ai-design-anti-patterns.md).
+Ben chose forest `#1F4D3A` with thistle `#DCC4F0` from the families he
+liked.
+
+- **Light:** white paper, ink `#162019`, muted `#4E5B55`, a thistle tint
+  `#F6F1FA` for tinted sections. `--accent` (links, buttons, focus, the
+  arch) is forest.
+- **Dark:** paper `#0D1E17`, ink `#E6EEEA`, muted `#9DB3A9`. `--accent`
+  is thistle.
+- **The band** is forest in both modes, with white type and thistle for
+  its accent. Thistle is never a ground for paragraphs; it is for the
+  one highlighted word, stickers, and buttons on dark (Ben: a full lilac
+  ground "is incredibly hard to read").
+- Only the colors changed in this pass; every shape and position, the
+  arch high in every icon included, is as "The arch" above and the brand
+  kit say.

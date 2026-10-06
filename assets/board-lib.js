@@ -136,7 +136,7 @@
     t.frames.forEach(function (f, i) {
       var x = (i % perRow) * (W + GAP), y = Math.floor(i / perRow) * (H + GAP);
       out.push(base('rectangle', x, y, W, H));
-      out.push(text(x + 20, y + 18, f.title, 28, '#a23f22'));
+      out.push(text(x + 20, y + 18, f.title, 28, '#1f4d3a'));
       if (f.hint) out.push(text(x + 20, y + 62, f.hint, 18, '#5a5f66'));
     });
     return out;
@@ -293,7 +293,7 @@
   function canDraw(board, teaching) { return !!board && (teaching || !board.locked); }
 
   // A pointer's color, the same for one person on every screen.
-  var COLORS = ['#A23F22', '#2F6D8C', '#6A5A8C', '#3F7A4F', '#8C6A1F', '#8C3F6A', '#3F6F7A', '#5A5F66'];
+  var COLORS = ['#1F4D3A', '#2F6D8C', '#6A5A8C', '#3F7A4F', '#8C6A1F', '#8C3F6A', '#3F6F7A', '#5A5F66'];
   function colorFor(id) {
     var h = 0, s = String(id || '');
     for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;

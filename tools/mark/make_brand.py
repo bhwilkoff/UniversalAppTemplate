@@ -34,13 +34,14 @@ OUT = ROOT / "assets" / "brand"
 # "dark" for dark ones; the one-color versions are for photocopies,
 # stamps, and anything printed in a single ink.
 COLORS = {
-    "light": {"ink": "#1A1D21", "clay": "#A23F22"},
-    "dark": {"ink": "#EEEAE3", "clay": "#F0A184"},
-    "black": {"ink": "#000000", "clay": "#000000"},
-    "white": {"ink": "#FFFFFF", "clay": "#FFFFFF"},
+    "light": {"ink": "#162019", "accent": "#1F4D3A"},
+    "dark": {"ink": "#E6EEEA", "accent": "#DCC4F0"},
+    "black": {"ink": "#000000", "accent": "#000000"},
+    "white": {"ink": "#FFFFFF", "accent": "#FFFFFF"},
 }
-PAPER = "#F7F6F2"
-CLAY = "#A23F22"
+PAPER = "#FFFFFF"
+FOREST = "#1F4D3A"
+THISTLE = "#DCC4F0"
 
 SIZE = 100          # the wordmark's type size, in SVG units
 TRACK = -0.025      # the wordmark's letter-spacing, in em
@@ -103,7 +104,7 @@ def draw_wordmark(word_font, colors):
     width, height = w["right"] - w["left"], w["bottom"] - w["top"]
     body = (f'<g transform="translate({dx:.2f} {dy:.2f})">\n'
             f'<path fill="{colors["ink"]}" d="{w["letters"]}"/>\n'
-            f'<path fill="none" stroke="{colors["clay"]}" stroke-width="{w["stroke"]:.2f}" '
+            f'<path fill="none" stroke="{colors["accent"]}" stroke-width="{w["stroke"]:.2f}" '
             f'stroke-linecap="round" d="{w["arch"]}"/>\n</g>\n')
     return svg(width, height, "Human Shaped", body)
 
@@ -120,18 +121,18 @@ def draw_event(word_font, label_font, event, colors):
     height = lb[3] - w["top"]
     body = (f'<g transform="translate({-left:.2f} {-w["top"]:.2f})">\n'
             f'<path fill="{colors["ink"]}" d="{w["letters"]}"/>\n'
-            f'<path fill="none" stroke="{colors["clay"]}" stroke-width="{w["stroke"]:.2f}" '
+            f'<path fill="none" stroke="{colors["accent"]}" stroke-width="{w["stroke"]:.2f}" '
             f'stroke-linecap="round" d="{w["arch"]}"/>\n'
-            f'<path fill="{colors["clay"]}" d="{label_d}"/>\n</g>\n')
+            f'<path fill="{colors["accent"]}" d="{label_d}"/>\n</g>\n')
     return svg(width, height, f"Human-Shaped {event.capitalize()}", body)
 
 
 def draw_icon():
-    """The favicon's geometry: the arch high in a clay square, so it reads
+    """The favicon's geometry: the arch high in a forest square, so it reads
     as the top of a head and never as a frown."""
-    body = (f'<rect width="32" height="32" rx="8" fill="{CLAY}"/>\n'
+    body = (f'<rect width="32" height="32" rx="8" fill="{FOREST}"/>\n'
             f'<path d="M7.5 16C8.43 10.56 11.52 7.5 16 7.5S23.57 10.56 24.5 16" fill="none" '
-            f'stroke="{PAPER}" stroke-width="4.4" stroke-linecap="round"/>\n')
+            f'stroke="{THISTLE}" stroke-width="4.4" stroke-linecap="round"/>\n')
     return (f'<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 32 32" '
             f'role="img" aria-label="Human Shaped">\n<title>Human Shaped</title>\n{body}</svg>\n')
 

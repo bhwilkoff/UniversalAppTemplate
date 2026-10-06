@@ -6,8 +6,8 @@
 (function (root) {
   var W = 1920, H = 1080;
   var LOOKS = {
-    paper: { src: '/assets/brand/backgrounds/paper.png', ink: '#585C62' },
-    evening: { src: '/assets/brand/backgrounds/evening.png', ink: '#A7ABB0' }
+    paper: { src: '/assets/brand/backgrounds/paper.png', ink: '#4E5B55' },
+    evening: { src: '/assets/brand/backgrounds/evening.png', ink: '#9DB3A9' }
   };
 
   // The name in at most two lines of the given width, the second cut short.

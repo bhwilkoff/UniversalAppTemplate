@@ -171,7 +171,7 @@ of us.
   each said once; colon-led threes, stacked "rather than," and the
   aphorism endings were rewritten. The meetup and hackathon guides keep
   their lists, which are real agendas.
-- **Pass 4, the palette: waiting on Ben** (options A, B, C above). With
+- **Pass 4, the palette: done October 6, night.** Forest and thistle (DECISIONS.md). Before that: waiting on Ben (options A, B, C above). With
   the chrome and the cards gone, the cream and clay are now the main
   signal left from the second-order cluster.
 - **Pass 4, palette directions drawn (October 6, night):** Pencil (write),

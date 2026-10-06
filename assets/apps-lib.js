@@ -307,7 +307,7 @@
   // The drawn cover: the app's initials on one of the site's tones, picked
   // by the card's place in the list (index) so that neighbors always
   // differ, or by the app's name when it stands alone.
-  var COVER_TONES = ['#A23F22', '#2F6D8C', '#6A5A8C', '#3F7A4F', '#8C6A1F', '#8C3F6A', '#3F6F7A', '#5A5F66'];
+  var COVER_TONES = ['#1F4D3A', '#2F6D8C', '#6A5A8C', '#3F7A4F', '#8C6A1F', '#8C3F6A', '#3F6F7A', '#5A5F66'];
   function coverOf(app, index) {
     var name = String((app && app.name) || '?').trim();
     var words = name.split(/[\s-]+/).filter(Boolean);

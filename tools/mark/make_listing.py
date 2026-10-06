@@ -34,7 +34,7 @@ BRAND = ROOT / "assets" / "brand"
 OUT = ROOT / "tools" / "meet-addon" / "listing"
 FIXTURE = "/tools/meet-addon/listing/fixture/"
 
-PAPER, INK, CLAY, CLAY_DARK, NIGHT = "#F7F6F2", "#1A1D21", "#A23F22", "#F0A184", "#141618"
+PAPER, INK, FOREST, THISTLE, NIGHT = "#FFFFFF", "#162019", "#1F4D3A", "#DCC4F0", "#0D1E17"
 
 # The tile and arch from assets/brand/icon.svg, in its 32-unit square.
 ARCH = "M7.5 16C8.43 10.56 11.52 7.5 16 7.5S23.57 10.56 24.5 16"
@@ -123,7 +123,7 @@ SCREENS = [
 def main():
     browser = chrome()
     OUT.mkdir(parents=True, exist_ok=True)
-    icons = {"light": tile(CLAY, PAPER), "dark": tile(CLAY_DARK, NIGHT)}
+    icons = {"light": tile(FOREST, THISTLE), "dark": tile(THISTLE, FOREST)}
     with tempfile.TemporaryDirectory() as tmp:
         for kind, svg in icons.items():
             (OUT / f"logo-{kind}.svg").write_text(svg + "\n")
