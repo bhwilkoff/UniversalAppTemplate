@@ -21,47 +21,6 @@ and the people we love are not like that. They only happen when a person
 does the work, and a first draft that no person has wrestled with is not
 the start of that work. Until someone shapes it, it is just slop.
 
-## What we want instead
-
-I want software that uses AI as a tool, one that people wield for human
-purposes. It should take the mechanical work off people's hands so that
-the human part has more room, and it should never be used to replace the
-people involved or to flatten what they make.
-
-The way there is values. Every piece of software is built on values,
-whether or not anyone wrote them down, and software brain has values of
-its own: efficiency, scale, and whatever is cheapest to produce.
-Human-shaped software writes its values down and wears them on its
-sleeve, so that the people who use it, and the AI agents that help build
-it, can both see what it is for. The
-[Human-Shaped Principles](PRINCIPLES.md) are the values every piece of
-software built this way shares, and each builder adds the ones their own
-problem needs.
-
-## Why people write the film notes
-
-Archive Watch is a free app for watching public-domain films from the
-Internet Archive. Each film's notes come from the people who uploaded
-and reviewed it on archive.org, rather than from a summary written by
-AI. Those notes are sometimes wrong, and correcting them takes time that
-a model would never need.
-
-And yet, ten thousand summaries written by AI would be more efficient
-and a worse experience, both for the internet and for people. It is
-worse for the internet because the web is filling with words that no one
-wrote and no one reads (the "Dead Internet Theory"), and because search
-is learning to answer every question itself and send no one on to the
-people who did the work ("Google Zero"). It is worse for people because
-it removes the folks who actually watched those films and loved them.
-The AI did not watch the movies, and it cannot enjoy them the way a
-person can. Keeping their words is how the app says what it values: the
-people who watched, and the writing they did about it.
-
-**Humanity is inefficient, and that is the point.**
-
-Learning is inefficient too. We have great tools for making it work
-better, and our values are how we decide where those tools belong.
-
 ## Computer-shaped and human-shaped
 
 A human-shaped problem is something, really anything, in your life that
@@ -115,6 +74,29 @@ moment the words are spoken, or keeping two devices on the same second
 of the same film. Hand those to the machine, and be glad you can. The
 human-shaped part is small, and it is the reason the app exists.
 
+The phrase "computer-shaped problem" comes from a
+[reply on Bluesky](https://bsky.app/profile/mosheroperandi.bsky.social/post/3mgasswgabs23)
+by @mosheroperandi.bsky.social on March 4, 2026, which said we have
+spent decades turning everything we can into computer-shaped problems.
+When you use the phrase, credit the reply and link to it.
+
+## What we want instead
+
+I want software that uses AI as a tool, one that people wield for human
+purposes. It should take the mechanical work off people's hands so that
+the human part has more room, and it should never be used to replace the
+people involved or to flatten what they make.
+
+The way there is values. Every piece of software is built on values,
+whether or not anyone wrote them down, and software brain has values of
+its own: efficiency, scale, and whatever is cheapest to produce.
+Human-shaped software writes its values down and wears them on its
+sleeve, so that the people who use it, and the AI agents that help build
+it, can both see what it is for. The
+[Human-Shaped Principles](PRINCIPLES.md) are the values every piece of
+software built this way shares, and each builder adds the ones their own
+problem needs.
+
 ## The person keeps it human-shaped
 
 Once you have named the human-shaped problem you are building for, you
@@ -125,31 +107,54 @@ right, and you publish it so that other people can play with it too
 (stage 00 calls this **write, play, publish**). Software brain leaves
 the person out, and this method is built around them.
 
-## What it costs
+## Case study: Archive Watch's film notes
 
-Keeping the human-shaped part is slower. Pulling Archive Watch's notes
-from the people who wrote them meant building and maintaining a
-pipeline, when a model could have written every note in an afternoon.
-And the line is not always obvious, because a summary of a long document
-might be exactly what someone needs, and leave them more capable rather
-than less. Naming the shape of a problem does not decide for you. It
-makes you decide on purpose.
+[Archive Watch](case-study-archive-watch.md) is a free app for watching
+public-domain films from the Internet Archive, on phones, computers, and
+TVs. Every film in it needs a few lines of notes, so that people can
+decide what is worth their evening, and there are tens of thousands of
+films. On September 26, 2026, I made this a standing instruction for the
+agent building it:
 
-## Where the phrase comes from
+> I don't want AI making lists and writing copy. Any time we can use
+> metadata or user copy/categorization from archive.org.
 
-The phrase "computer-shaped problem" comes from a
-[reply on Bluesky](https://bsky.app/profile/mosheroperandi.bsky.social/post/3mgasswgabs23)
-by @mosheroperandi.bsky.social on March 4, 2026, which said we have
-spent decades turning everything we can into computer-shaped problems.
-When you use the phrase, credit the reply and link to it.
+So, each film's notes come from the people who uploaded and reviewed it
+on archive.org, rather than from a summary written by AI. Those notes
+are sometimes wrong, and correcting them takes time that a model would
+never need.
+
+And yet, ten thousand summaries written by AI would be more efficient
+and a worse experience, both for the internet and for people. It is
+worse for the internet because the web is filling with words that no one
+wrote and no one reads (the
+"[Dead Internet Theory](https://en.wikipedia.org/wiki/Dead_Internet_theory)"),
+and because search is learning to answer every question itself and send
+no one on to the people who did the work
+("[Google Zero](https://www.theverge.com/24167865/google-zero-search-crash-housefresh-ai-overviews-traffic-data-audience)").
+It is worse for people because it removes the folks who actually watched
+those films and loved them. The AI did not watch the movies, and it
+cannot enjoy them the way a person can. Keeping their words is how the
+app says what it values: the people who watched, and the writing they
+did about it.
+
+Keeping the human-shaped part is slower. Pulling the notes from the
+people who wrote them meant building and maintaining a pipeline, when a
+model could have written every note in an afternoon. And the line is not
+always obvious, because a summary of a long document might be exactly
+what someone needs, and leave them more capable rather than less. Naming
+the shape of a problem does not decide for you. It makes you decide on
+purpose.
 
 ## Where to go next
 
-- `../path/00-why-we-build.md` puts this idea to work on the first day
-  of an app.
-- `PRINCIPLES.md` lists the values every human-shaped app wears on its
-  sleeve.
-- `not-vibe-coding.md` says why building this way differs from asking an
-  AI to make you an app.
+- [Stage 00, Why we build](../path/00-why-we-build.md) puts this idea to
+  work on the first day of an app.
+- [The Human-Shaped Principles](PRINCIPLES.md) are the values every
+  human-shaped app wears on its sleeve.
+- [More than asking an AI for an app](not-vibe-coding.md) says why
+  building this way differs from asking an AI to make you one.
+- [The Archive Watch case study](case-study-archive-watch.md) tells how
+  one app was built this way, month by month.
 
 Pick one thing you want to build, and name its shape.
