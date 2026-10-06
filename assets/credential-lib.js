@@ -58,7 +58,7 @@
 
   // The words of each level. Drafted by Claude for milestone M4, awaiting
   // Ben's review.
-  var CRITERIA = 'The holder took part in a Human Shaped cohort and built an app for a ' +
+  var CRITERIA = 'The holder took part in a cohort at humanshaped.org and built an app for a ' +
     'human-shaped problem, one that belongs to people rather than to computers. The evidence ' +
     'is the app’s repository, which holds the app and the record of how it was made, and ' +
     'an app live on the web at a real address is enough for the first level. Each further ' +
@@ -72,7 +72,7 @@
       : 'Human-shaped software, live on ' + NUMBERS[level] + ' platforms';
   }
   function levelDescription(level) {
-    var base = 'Built an app for a human-shaped problem in a Human Shaped cohort, and put it live on the web';
+    var base = 'Built an app for a human-shaped problem in a cohort at humanshaped.org, and put it live on the web';
     return level === 1
       ? base + ', at an address anyone can open.'
       : base + ' and on ' + NUMBERS[level - 1] + ' more platform' + (level > 2 ? 's' : '') + ', where other people can get it for themselves.';
