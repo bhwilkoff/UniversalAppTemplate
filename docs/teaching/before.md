@@ -1,4 +1,4 @@
-# The week before: getting set up and meeting your group
+# Cohort Prep: getting set up and meeting your group
 
 **Where the cohort is.** Everyone has spent the week on [Getting set
 up](../path/setup.md), which counts nine steps on a Mac from "no GitHub

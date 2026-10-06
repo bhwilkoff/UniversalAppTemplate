@@ -326,7 +326,7 @@ either one as soon as it is true of yours.
   that moment.
 
 Both marks, and how to show them in your README or on your app's
-website, are at https://humanshaped.org/start/#mark. A mark links to
+website, are at https://humanshaped.org/start/brand/#declare. A mark links to
 your own `HUMAN-SHAPED.md`, so anyone who sees it can read your answers
 and check the evidence for themselves. The directory at humanshaped.org
 reads that file, and any software with either mark can ask to be listed.

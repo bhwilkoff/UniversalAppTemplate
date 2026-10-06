@@ -59,7 +59,7 @@ Each week in the table links to the guide for its session, in
 
 | Week | Stages | Where the app gets to | What they bring back |
 |---|---|---|---|
-| [Before](docs/teaching/before.md) | [Getting set up](docs/path/setup.md) | A GitHub account, a copy of the template, an AI agent (Claude or Gemini) connected to it, and a desktop computer set up to build and test both on the computer and in the cloud. The first win: their own app's address open on their phone, showing its name. | The address, on their phone. |
+| [Cohort Prep](docs/teaching/before.md) | [Getting set up](docs/path/setup.md) | A GitHub account, a copy of the template, an AI agent (Claude or Gemini) connected to it, and a desktop computer set up to build and test both on the computer and in the cloud. The first win: their own app's address open on their phone, showing its name. | The address, on their phone. |
 | [1](docs/teaching/week-1.md) | 00. Why we build, 01. The first prototype | An agent that knows why the app exists and who it is for, in the student's words, and one platform live at a real address with real data, after two rounds of feedback from their own phone. | The why, the people outside their screen, the one rule, and the app on their phone with one thing the real data taught them. |
 | [2](docs/teaching/week-2.md) | 02. The shape of an app, 03. Going native | A parity matrix the student has read and trimmed, and a second platform running on their own device. | One verb shown on both platforms, each in its own idiom, and one cell their own eyes proved wrong. |
 | [3](docs/teaching/week-3.md) | 04. Seeing it work, and making it look like itself | The agent testing on the student's device, and a look for the app that comes from its own why rather than the template's defaults. | A screenshot that proved a fix, and the app's own look beside the template's. |
@@ -71,7 +71,7 @@ platforms. Store listings and the later stages often land after the
 cohort ends, and that is fine. Nobody graduates out of the community,
 and the app's page stays open while it keeps growing.
 
-## The week before
+## Cohort Prep
 
 The week before week 1 is for getting set up and for meeting the people
 you will build beside, because nobody should be asked to say what they

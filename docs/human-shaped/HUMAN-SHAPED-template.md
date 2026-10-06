@@ -40,7 +40,7 @@ yourself.
 
 Once every principle has an answer, your software is **Aligned with
 Human Shaped**, and you can show that mark from
-https://humanshaped.org/start/#mark. If it started from the Universal
+https://humanshaped.org/start/brand/#declare. If it started from the Universal
 App Template, or this file says your commitment to the principles in
 your own words, it is also **Endorsed by Human Shaped**.
 
