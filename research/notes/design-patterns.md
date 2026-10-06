@@ -62,9 +62,27 @@ stock, no decorative shapes; icons are Phosphor's.
 One filled button per view (forest), everything else a quiet outlined
 button or a bold underlined link (`.section-more`, `a.go`, `a.go-text`).
 
+## 8. Things that are compared look alike
+
+When a block sets two things side by side (computer-shaped and
+human-shaped problems), both sides share one structure and one type
+style, start at the same height, and sit under the same thin rule. The
+difference is carried by the words, never by one side being bigger,
+bolder, or a different color (Ben, October 6, on the home page's
+comparison).
+
+## 9. A short type ramp
+
+Within a section there are at most three text styles: the heading, the
+reading text, and one small label or caption style. A second large
+statement in the same section (a pull quote) takes the heading's size
+and the heading-left, words-right layout, with a 1px rule, not a heavier
+one. Links look like links everywhere; they are not bolded to stand out.
+
 ## Checking a page
 
 At 375 and 1280 pixels, light and dark: does color stay inside panels,
 does every long text hang from a heading or share its row, is there at
-most one forest panel and one highlighted phrase, and is everything
-shown real?
+most one forest panel and one highlighted phrase, do compared things
+look alike, does each section keep to three text styles, and is
+everything shown real?
