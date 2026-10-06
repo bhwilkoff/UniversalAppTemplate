@@ -77,7 +77,8 @@ Within a section there are at most three text styles: the heading, the
 reading text, and one small label or caption style. A second large
 statement in the same section (a pull quote) takes the heading's size
 and the heading-left, words-right layout, with a 1px rule, not a heavier
-one. Links look like links everywhere; they are not bolded to stand out.
+one. A link inside reading text looks like every other link and is not
+bolded to stand out; only a link that stands alone uses `a.go-text`.
 
 ## Checking a page
 
