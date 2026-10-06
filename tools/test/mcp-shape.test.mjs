@@ -270,5 +270,5 @@ test('an agent hears where the run of show is and what the main stage shows', ()
   assert.equal(S.showLine(null), null);
   assert.equal(S.showLine({ scene: { title: 'Arrive', kind: 'talk', minutes: 5 }, startedAt: null, stage: 'scene' }), 'The run of show is on "Arrive" (a talk).');
   const text = S.thisSessionText({ title: 'Fall', slug: 'fall' }, { number: 2 }, true, [], [], [], {}, 'me', { scene: { title: 'Arrive', kind: 'talk', minutes: 5 }, stage: 'path' });
-  assert.match(text, /run of show is on "Arrive".*main stage shows where everyone said they are/);
+  assert.match(text, /run of show is on "Arrive".*main stage shows which stage everyone said they are on/);
 });

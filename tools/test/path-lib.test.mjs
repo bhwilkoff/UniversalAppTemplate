@@ -24,6 +24,7 @@ test('the steps and the bar are found by their words, as the stages write them',
   assert.ok(!P.isStepsHeading('What I want'));
   assert.ok(P.isReadyLead('When you are ready to move on,'));
   assert.ok(P.isReadyLead('When you are done with the path,'));
+  assert.ok(P.isReadyLead('When you are done with the stages,'));
   assert.ok(!P.isReadyLead('When something goes wrong'));
   assert.equal(P.stepTitle('Add the wish to your note.'), 'Add the wish to your note');
 });

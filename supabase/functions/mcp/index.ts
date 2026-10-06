@@ -177,7 +177,7 @@ Deno.serve(
 
         server.registerTool('this_week', {
           title: 'This week',
-          description: 'This week in a cohort: the teacher\'s challenge, the stages of the human-shaped path it covers, and the weekly session time.',
+          description: 'This week in a cohort: the teacher\'s challenge, the stages of the method it covers, and the weekly session time.',
           inputSchema: cohortArg,
           annotations: READ_ONLY,
         }, async ({ cohort }) => {
@@ -465,9 +465,9 @@ Deno.serve(
         // built on my_app and their own path marks instead of a week.
         server.registerPrompt('review_my_own_work', {
           title: 'A human-shaped review of the app you are building on your own',
-          description: 'For someone outside any cohort: your agent reads your own app and your marks on the path, asks the method\'s questions, labels itself as AI, and leaves the review with you.',
+          description: 'For someone outside any cohort: your agent reads your own app and your marks on the stages, asks the method\'s questions, labels itself as AI, and leaves the review with you.',
           argsSchema: z.object({
-            stage: z.string().optional().describe('A stage of the path to review against, such as 03 or setup. Without one, your agent starts from the first stage you have not marked ready.'),
+            stage: z.string().optional().describe('A stage to review against, such as 03 or setup. Without one, your agent starts from the first stage you have not marked ready.'),
           }),
         }, ({ stage }) => ({
           messages: [{

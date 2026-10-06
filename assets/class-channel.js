@@ -51,12 +51,12 @@
       stances.appendChild(b);
     });
     mount.appendChild(stances);
-    // Where I am on the path (R11), shared only if the person picks it,
+    // The stage I am on (R11), shared only if the person picks it,
     // and remembered in this browser for the next call.
     var RL = window.RosterLib, memKey = o.cohort ? 'hs-path-stage:' + o.cohort.id : null;
     if (RL) {
       var where = el('label', 'path-pick');
-      where.appendChild(el('span', null, 'Where I am on the path'));
+      where.appendChild(el('span', null, 'The stage I am on'));
       var sel = el('select');
       sel.appendChild(new Option('Not sharing', ''));
       RL.STAGE_IDS.forEach(function (id) { sel.appendChild(new Option(RL.STAGE_SHORT[id], id)); });

@@ -157,7 +157,7 @@
       '',
       '## Where it came from',
       '',
-      'Which stage or step of the path it belongs to, and what happened.',
+      'Which stage or step it belongs to, and what happened.',
       '',
       '## What should change',
       '',

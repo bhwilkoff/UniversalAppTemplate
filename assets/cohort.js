@@ -248,7 +248,7 @@
     var box = $('[data-ready-bar]');
     box.replaceChildren();
     var stages = week ? lib.stagesForWeek(week) : [];
-    if (!stages.length) { box.appendChild(el('p', 'small', 'Each stage of the path ends with a paragraph that begins "When you are ready to move on", and that paragraph is the bar.')); return; }
+    if (!stages.length) { box.appendChild(el('p', 'small', 'Each stage ends with a paragraph that begins "When you are ready to move on", and that paragraph is the bar.')); return; }
     Promise.all(stages.map(stageBar)).then(function (bars) {
       box.replaceChildren();
       stages.forEach(function (n, i) {

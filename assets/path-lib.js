@@ -43,7 +43,7 @@
   // The bar for moving on: a paragraph that opens with these words in
   // bold on a stage, or a heading of its own on the setup page.
   function isReadyLead(text) {
-    return /^when you are (ready to move on|done with the path)/i.test(String(text || '').trim());
+    return /^when you are (ready to move on|done with the (path|stages))/i.test(String(text || '').trim());
   }
 
   // A step's name is its bold opening, without the full stop.

@@ -72,7 +72,7 @@
       line: { teacher: 'This session’s thread on GitHub, for links and questions that should outlast the call.', student: 'This session’s thread on GitHub, for links and questions that should outlast the call.' } },
     { key: 'conversation', name: 'From the conversation', teacher: false, kinds: [],
       line: { teacher: 'The cohort’s newest discussions, so any of them can be opened and shown.', student: 'The cohort’s newest discussions, so any of them can be opened and shown.' } },
-    { key: 'path', name: 'This week on the path', teacher: false, kinds: [],
+    { key: 'path', name: 'Where everyone is in the stages', teacher: false, kinds: [],
       line: { teacher: 'The stages this week’s work comes from.', student: 'The stages this week’s work comes from.' } }
   ];
 

@@ -45,7 +45,7 @@ export function chooseCohort(cohorts, slug) {
 }
 
 function noCohorts() {
-  return `You are not in a cohort yet. Open cohorts are listed at ${SITE}/cohorts/, and joining happens on ${SITE}/account/. Working on your own, my_app reads your own app and your marks on the path, and the review_my_own_work prompt reviews it the way the method does.`;
+  return `You are not in a cohort yet. Open cohorts are listed at ${SITE}/cohorts/, and joining happens on ${SITE}/account/. Working on your own, my_app reads your own app and your marks on the stages, and the review_my_own_work prompt reviews it the way the method does.`;
 }
 function listText(cohorts) {
   return cohorts.length ? 'Your cohorts: ' + cohorts.map((c) => `${c.slug} (${c.title})`).join(', ') + '.' : noCohorts();
@@ -72,7 +72,7 @@ export function thisWeekText(cohort, t, stages, schedule) {
   lines.push(`Week ${s.number}${s.title && s.title !== 'Week ' + s.number ? ': ' + s.title : ''}`);
   lines.push(s.scope ? `This week's challenge, in the teacher's words: ${s.scope}` : 'The teacher has not written this week\'s challenge yet.');
   if (stages.length) {
-    lines.push('Stages of the path this week: ' + stages.map((n) => `${n} (method part "${stagePart(n)}", ${SITE}/path/${n}/)`).join(', ') + '.');
+    lines.push('Stages this week: ' + stages.map((n) => `${n} (method part "${stagePart(n)}", ${SITE}/path/${n}/)`).join(', ') + '.');
   }
   lines.push('Weekly session: ' + schedule);
   lines.push(`Cohort page: ${SITE}/cohort/?c=${encodeURIComponent(cohort.slug)}`);
@@ -147,7 +147,7 @@ export function workText(cohort, mine, shares, teacherIds, myId, notes) {
 
 // A person working on their own, outside any cohort (G2): their own app
 // from builder_apps, whether it shows on the hub (and why not, if it was
-// kept off), and where they stand on the path from their own marks
+// kept off), and which stages they have reached, from their own marks
 // (stage_marks: ready, not yet, and notes of what they would bring back).
 // Nothing here compares them with anyone.
 export function ownAppText(app, hide, marks) {
@@ -167,7 +167,7 @@ export function ownAppText(app, hide, marks) {
   const ready = (marks || []).filter((m) => m.item === 'ready');
   const notes = (marks || []).filter((m) => m.item === 'note');
   if (ready.length) {
-    lines.push('', 'Your own marks on the path (private to you):');
+    lines.push('', 'Your own marks on the stages (private to you):');
     [...ready].sort((a, b) => a.stage.localeCompare(b.stage)).forEach((m) =>
       lines.push(`- ${label(m.stage)}: ${m.state === 'ready' ? 'ready to move on' : 'not yet'} (method part "${part(m.stage)}")`));
   }
@@ -181,14 +181,14 @@ export function ownAppText(app, hide, marks) {
 
 // The review a person working on their own asks for (H3): the same
 // questions the human-shaped review asks a cohort's student, built on
-// their own app and their own marks on the path instead of a cohort's
+// their own app and their own marks on the stages instead of a cohort's
 // week, since there is no week, no teacher, and no classmates to share
 // it with. It is labeled as AI and kept by the person who asked.
 export function ownReviewPrompt(stage) {
   const part = stage ? (stage === 'setup' ? 'setup' : stagePart(stage)) : null;
   return [
-    `Please give me a human-shaped review of the app I am building on my own${part ? `, at the point of the path's method part "${part}"` : ''}.`,
-    `First call my_app to see my app and my own marks on the path. If it has no app yet, ask me which repository to read, and tell me I can keep it on the hub at ${SITE}/account/#own-app if I want to. Then call method with part "review-skill" and follow that skill exactly${part ? `, and call method with part "${part}" for what that stage asks` : ', choosing the stage from my marks (the first one I have not marked ready)'}, reading my repository for evidence.`,
+    `Please give me a human-shaped review of the app I am building on my own${part ? `, at the method part "${part}"` : ''}.`,
+    `First call my_app to see my app and my own marks on the stages. If it has no app yet, ask me which repository to read, and tell me I can keep it on the hub at ${SITE}/account/#own-app if I want to. Then call method with part "review-skill" and follow that skill exactly${part ? `, and call method with part "${part}" for what that stage asks` : ', choosing the stage from my marks (the first one I have not marked ready)'}, reading my repository for evidence.`,
     'Open the review with a line that says it is AI feedback, naming yourself, your model, and today\'s date. Give no scores or grades, and do not compare me with anyone. Say plainly what you could not see. Ask the questions the method asks rather than answering them for me.',
     `Write the review to a file in my repository and stop there. Do not share it anywhere. Without a cohort there is no teacher reading this, so if I want people to see the work, I can show the app on the hub or bring it to an event (${SITE}/events/).`,
   ].join('\n\n');
@@ -246,7 +246,7 @@ function resultsLine(k, t) {
 // minutes it is, and what the main stage shows instead of it, if anything.
 // show: { scene: { title, kind, minutes } | null, startedAt, stage, now }.
 const SCENE_KIND = { talk: 'a talk', presenter: 'someone presenting', question: 'a question', design: 'a design stage on the shared board', rooms: 'rehearsal rooms', break: 'a break', reflection: 'a reflection' };
-const STAGE_SHOWS = { welcome: 'the welcome', answers: 'a question\'s answers', presenter: 'someone\'s work', blank: 'nothing (the teacher cleared it)', path: 'where everyone said they are on the path, as counts', rooms: 'every rehearsal room' };
+const STAGE_SHOWS = { welcome: 'the welcome', answers: 'a question\'s answers', presenter: 'someone\'s work', blank: 'nothing (the teacher cleared it)', path: 'which stage everyone said they are on, as counts', rooms: 'every rehearsal room' };
 export function showLine(show) {
   if (!show || !show.scene) return null;
   const sc = show.scene;
