@@ -1,5 +1,7 @@
 # 01. The first prototype
 
+<!-- The screenshots on this page, and the one-line notes under them, were placed by Claude on October 7, 2026, from docs/images/agents/, and await Ben's review. -->
+
 **Where you are.** Your note starts with a problem statement you revised
 after two conversations, with who has it and why a computer cannot
 simply solve it. The agent knows the why, and there is one rule in your
@@ -163,6 +165,10 @@ on your phone, and the last one publishes to a person.
    your source, build the first screens, and put it live. The
    `web-platform-patterns` and `universal-feature-states` skills carry a
    lot of that work without you asking for them.
+
+   ![Antigravity has written a plan, lists three questions for the builder, and waits behind a Proceed button](../images/agents/antigravity-plan-review.png)
+
+   If the agent shows you a plan first, answer its questions before you say go: that is your decision, not its.
 
 5. **Play: keep it going.** When the agent reports back, do not polish yet.
    Ask for the next round of the wish. The night I started Tidbits, two

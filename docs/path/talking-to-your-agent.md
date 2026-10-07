@@ -1,5 +1,7 @@
 # Talking to your agent
 
+<!-- The screenshots on this page, and the one-line notes under them, were placed by Claude on October 7, 2026, from docs/images/agents/, and await Ben's review. -->
+
 On June 16, 2026, at 6:12 in the evening, I made a new repository from
 an earlier version of this template. At 7:05 I pasted in a description
 of the game I had been drafting in my notes. By 11:41 that night,
@@ -223,6 +225,8 @@ in the terminal, or **Plan** in the desktop app's selector,
 In Antigravity, `/plan` writes the plan as an artifact you can comment
 on, line by line, before it starts
 ([slash commands](https://antigravity.google/docs/slash-commands/)).
+
+![Antigravity's plan open beside the conversation, with a User Review Required section](../images/agents/antigravity-plan-document.png)
 Anthropic's own rule for when to skip it is a good one: "If you could
 describe the diff in one sentence, skip the plan"
 ([best practices](https://code.claude.com/docs/en/best-practices)).
@@ -267,6 +271,10 @@ meant to replace. The `human-shaped-review` skill carries the details,
 and it works the same way in Claude, Gemini, or any agent that reads the
 template's instructions.
 
+![Antigravity's slash menu offering plan, grill-me, and human-shaped-review](../images/agents/antigravity-slash-menu.png)
+
+In Antigravity, typing `/` shows the skills the template carries, the review among them.
+
 ## Give standing permission
 
 Once you have decided something, stop being asked about it. In the
@@ -279,6 +287,10 @@ whether it should fix what it found:
 
 > The goal of the audit is to fix every incorrect thing you are
 > finding. Why are you asking me if you should fix things?
+
+![Claude asks "Allow Claude to edit index.html?" and shows the one-line change, with Deny, Always allow, and Allow once](../images/agents/claude-allow-edit.png)
+
+**Allow once** keeps you deciding each time; **Always allow** is the standing permission, for the kinds of change you have already decided about.
 
 ## Make it write things down
 
@@ -323,6 +335,8 @@ September 25, six product decisions had piled up waiting on me:
 > see the options and choose from among them?
 
 Then answer briefly. "Do 2 and 3." "Great. Go for it."
+
+![Claude says it has not changed anything yet, shows the one-line edit it would make, and asks whether to change only the heading or the other places too](../images/agents/claude-shows-change-first.png)
 
 ## Put big work on a loop, and hold it to real work
 

@@ -1,5 +1,7 @@
 # 08. Working with AI
 
+<!-- The screenshots on this page, and the one-line notes under them, were placed by Claude on October 7, 2026, from docs/images/agents/, and await Ben's review. -->
+
 **Where you are.** You have been building for weeks. By now the agent
 has forgotten something you told it at least once, and you have had to
 explain it again. This stage is about making that stop.
@@ -145,6 +147,8 @@ A check is the honest log's partner: it is how **fixed** turns into
 when you ask for something, ask for its check too, and ask the agent to
 show you what the check returned rather than telling you it passed.
 
+![Antigravity's list of what it did: each file it edited with lines added and removed, then the template's checks it ran](../images/agents/antigravity-agent-checks.png)
+
 Both tools can also take a step back, and both are careful about what
 that means.
 
@@ -160,6 +164,10 @@ that means.
   conversation and leave your files alone. `/fork` lets you try
   something without losing where you were
   ([changelog](https://antigravity.google/docs/changelog/)).
+
+![Claude reports the one line it changed, says its browser preview loaded without styles so you should open the site yourself, and shows an Undo beside the change](../images/agents/claude-checked-with-undo.png)
+
+The honest report names what the check could not show, and the Undo beside the change takes back only that change.
 
 **Checkpoints are not git.** A commit is the only undo that covers every
 change, whoever or whatever made it, so ask the agent to commit each

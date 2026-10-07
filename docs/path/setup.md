@@ -1,5 +1,7 @@
 # Getting set up
 
+<!-- The screenshots on this page, and the one-line notes under them, were placed by Claude on October 7, 2026, from docs/images/agents/, and await Ben's review. -->
+
 **Where you are.** You have an idea for an app, or the beginning of one,
 and nothing else yet: maybe not a GitHub account, and maybe not an AI
 agent. This page gets you from there to your own copy of this template,
@@ -80,6 +82,10 @@ them is a conversation.
    antigravity.google and sign in with your Google account. Whichever
    you use, if it asks whether you trust a folder, say yes, because
    until you do it cannot read the template's instructions.
+
+   ![Claude's "Trust this workspace?" box, naming the folder, with Cancel and Trust workspace](../images/agents/claude-trust-workspace.png)
+
+   Read the folder's name before you trust it: it should be your app's folder.
 4. **Decide what happens to your words before you send any.** Both
    companies can use what you type to train their next models unless you
    say no, so make that choice now, while there is nothing to take back.
@@ -88,12 +94,16 @@ them is a conversation.
      it on, what you send is kept for five years and used for training;
      with it off, it is kept for 30 days
      ([Claude Code data usage](https://code.claude.com/docs/en/data-usage)).
+
+     ![Claude's Privacy settings, with "Help improve our AI models" switched off](../images/agents/claude-privacy-training.png)
    - **Antigravity:** turn off **Enable Telemetry** under Settings,
      Account ([Antigravity settings](https://antigravity.google/docs/settings/)).
      People on Google's own forum report that this is not the same as
      training, and that **Gemini Apps Activity**, in your Google account,
      has to be off too. I could not find Google saying so plainly, so
      turn off both.
+
+     ![Antigravity's Account settings, with Enable Telemetry and Marketing Emails switched off](../images/agents/antigravity-telemetry.png)
 5. **Start where you can see every change.** In Claude's Code tab, the
    selector beside the send button offers Auto, Manual, Accept edits,
    and Plan. Choose **Manual** for your first night, so every change
@@ -105,6 +115,10 @@ them is a conversation.
    you its plan before it builds
    ([permissions](https://antigravity.google/docs/permissions/),
    [agent settings](https://antigravity.google/docs/agent-settings/)).
+
+   ![Claude's mode menu: Auto, Manual, Accept edits, Plan, and Bypass permissions](../images/agents/claude-permission-modes.png)
+
+   ![Antigravity's Permission Preset menu: Request Review, Default (checked), and Turbo](../images/agents/antigravity-permission-presets.png)
 6. **Point the agent at an empty folder** on your computer (a new one
    called `Apps` in your home folder is fine), and say:
 
@@ -117,6 +131,10 @@ them is a conversation.
    The agent will ask you to approve a few things, and once it will
    open a browser window for you to sign in to GitHub. That sign-in is
    yours to do. The rest is the agent's.
+
+   ![Antigravity's answer after reading AGENTS.md: you remain the judge, decider, and tester, and no files have been changed](../images/agents/antigravity-first-answer.png)
+
+   A good first answer tells you what it read, what it needs from you, and that it has not changed anything yet.
 7. **Ask for your app's name and its address:**
 
    > Please change the web app's name everywhere it shows to [your
