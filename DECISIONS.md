@@ -620,3 +620,31 @@ spiral; the Question Formulation Technique; productive failure) are
 taken in only as ways of doing one of the three moves well, credited
 where they are used, never as the frame. Ben's own process, apps, and
 words come first; research supports and sharpens them.
+
+## The first lessons missed; instructional design comes first (October 7, 2026)
+
+Ben, after reading stages 00 and 01 as rewritten by the curriculum loop:
+"Okay, the content and the approach is pretty off. First, 'the hum' is a
+metaphor. It doesn't work as an instructional move. No one is going to
+understand what 'has hummed in your life for months?' What does that even
+mean? I've given you a bunch of different ways to identify Human-shaped
+problems. If you need more ways to do it, research them. But, don't make a
+single line in my writing into the entirety of the approach for how
+students should learn. As for the hum sort, you are asking for students to
+do something that I have already given them answers to (i.e., I've already
+listed things that are human shaped or computer shaped on the website and
+you are asking them to recategorize them as if it is a new piece of
+information). This whole approach needs better instructional design.
+Please research inquiry-based learning or project-based learning if you
+don't know how to make activities meaningful from the content (the whole
+template and website!!) that I've given you."
+
+**How to apply:** no metaphor is an instructional move; a lesson's
+question is one a novice can answer in plain words. Finding a problem
+draws on every way Ben has written about it across the template and the
+site, plus researched methods, never one line. An activity never asks
+students to reproduce an answer Ben has already published; his content is
+material students use (as models, criteria, and examples to reason from)
+toward their own problem and their own app. Activities are designed with
+inquiry-based and project-based learning practice, cited, before any
+lesson is rewritten, and the design is shown to Ben before the stages are.
