@@ -1,0 +1,232 @@
+{
+  "about": "Each session's default run of show, for a 75-minute session. The site seeds a new cohort's sessions from this file, and every scene stays editable in the class builder. Scenes use the site's shape (assets/show-lib.js on the site branch): kind, title, minutes, body (what the main stage shows), and config. Written by Claude from docs/research/curriculum/00-curriculum-design.md, October 7, 2026, awaiting Ben's review.",
+  "source": "docs/research/curriculum/00-curriculum-design.md",
+  "minutes": 75,
+  "sessions": [
+    {
+      "key": "prep",
+      "week": 0,
+      "title": "Cohort Prep: getting set up and meeting your group",
+      "move": "Publish",
+      "question": "What do I need in order to build at all?",
+      "guide": "before.md",
+      "scenes": [
+        { "kind": "talk", "title": "Arrive", "minutes": 10,
+          "body": "Your name, and in one sentence, what you want your app to do for someone you know.", "config": {} },
+        { "kind": "talk", "title": "How we talk to one another", "minutes": 8,
+          "body": "The four rules, said aloud.\n\nAnd one true story about a rough first week.", "config": {} },
+        { "kind": "rooms", "title": "Meet your group", "minutes": 20,
+          "body": "Groups of three. Each person opens their app's address on their phone and shows it.",
+          "config": {
+            "prompt": "Show your app's address on your phone, and say one thing that hums in your life.",
+            "room_scenes": [
+              { "title": "Show the address on your phone", "minutes": 3 },
+              { "title": "One thing that hums in your life", "minutes": 2 },
+              { "title": "One question to understand it", "minutes": 1 }
+            ]
+          } },
+        { "kind": "break", "title": "Break", "minutes": 3, "body": null, "config": {} },
+        { "kind": "design", "title": "A strong bring-back and a weak one", "minutes": 18,
+          "body": "Both shown, then everyone practices the three questions on the weak one, on the board.",
+          "config": { "template": "questions" } },
+        { "kind": "reflection", "title": "Start", "minutes": 11,
+          "body": "Everyone begins stage 00 and sends its first prompt.",
+          "config": { "prompt": "What has hummed in your life for months? Write three before you open the agent." } },
+        { "kind": "question", "title": "Check for understanding", "minutes": 3, "body": null,
+          "config": { "prompt": "What do you hope this app will do for someone?", "kind": "short" } },
+        { "kind": "question", "title": "How ready do you feel?", "minutes": 2, "body": null,
+          "config": { "prompt": "How ready do you feel to build?", "kind": "scale", "points": 5, "options": ["Not ready yet", "Ready to build"] } }
+      ]
+    },
+    {
+      "key": "week-1",
+      "week": 1,
+      "title": "Week 1: the hum, the why, and a first version on real data",
+      "move": "Write",
+      "question": "What has hummed in my life for months, and who else hears it?",
+      "guide": "week-1.md",
+      "scenes": [
+        { "kind": "talk", "title": "Arrive", "minutes": 7,
+          "body": "One line in the chat: shipped or stuck.\n\nThen what I heard in last week's answers, and what I changed because of it.", "config": {} },
+        { "kind": "rooms", "title": "Show what you brought back", "minutes": 30,
+          "body": "Groups of three, about ten minutes each, with the steps on screen. One person keeps time.",
+          "config": {
+            "prompt": "Show the first platform, and read your why aloud. What will it refuse to do?",
+            "room_scenes": [
+              { "title": "Their question", "minutes": 1 },
+              { "title": "Show it, and one decision", "minutes": 4 },
+              { "title": "One clarifying question", "minutes": 1 },
+              { "title": "The three questions", "minutes": 3 },
+              { "title": "What comes next", "minutes": 1 }
+            ]
+          } },
+        { "kind": "break", "title": "Break", "minutes": 3, "body": null, "config": {} },
+        { "kind": "presenter", "title": "One value at work", "minutes": 7,
+          "body": "One person shares the line they drew in stage 00, and what holding it will cost them.",
+          "config": { "prompt": "Listen for the value at work, and what it cost." } },
+        { "kind": "design", "title": "Hum sort", "minutes": 15,
+          "body": "Eight problems, and two sides. Sort them alone, then with your trio, before anyone names the difference. Then add your own.",
+          "config": { "template": "hum-sort" } },
+        { "kind": "reflection", "title": "Start", "minutes": 8,
+          "body": "Tell your agent every platform you plan to reach, even the ones months away, and ask it for the parity matrix before you leave.",
+          "config": { "prompt": "What is the first prompt you will send this week?" } },
+        { "kind": "question", "title": "Check for understanding", "minutes": 3, "body": null,
+          "config": { "prompt": "Is your problem human-shaped or computer-shaped?", "kind": "choice", "options": ["Human-shaped", "Computer-shaped", "Not sure yet"] } },
+        { "kind": "question", "title": "What is still muddy?", "minutes": 2, "body": null,
+          "config": { "prompt": "What is still muddy?", "kind": "short" } }
+      ]
+    },
+    {
+      "key": "week-2",
+      "week": 2,
+      "title": "Week 2: rounds, and the same app on a second platform",
+      "move": "Play",
+      "question": "What is still wrong, and how do I say it so it gets fixed?",
+      "guide": "week-2.md",
+      "scenes": [
+        { "kind": "talk", "title": "Arrive", "minutes": 7,
+          "body": "One line in the chat: shipped or stuck.\n\nThen what I heard in last week's answers, and what I changed because of it.", "config": {} },
+        { "kind": "rooms", "title": "Show what you brought back", "minutes": 30,
+          "body": "Groups of three, about ten minutes each. Two devices in hand where you can.",
+          "config": {
+            "prompt": "Show one verb on both platforms, and one cell your eyes proved wrong.",
+            "room_scenes": [
+              { "title": "Their question", "minutes": 1 },
+              { "title": "Show it, and one decision", "minutes": 4 },
+              { "title": "One clarifying question", "minutes": 1 },
+              { "title": "The three questions", "minutes": 3 },
+              { "title": "What comes next", "minutes": 1 }
+            ]
+          } },
+        { "kind": "break", "title": "Break", "minutes": 3, "body": null, "config": {} },
+        { "kind": "presenter", "title": "One value at work", "minutes": 7,
+          "body": "One decision a value changed this week, and what it cost.",
+          "config": { "prompt": "Listen for the value at work, and what it cost." } },
+        { "kind": "design", "title": "Read one real prompt", "minutes": 15,
+          "body": "A doubled-up feed, three fixes in, from stage 04. Write the prompt you would send before you see the real one.",
+          "config": { "template": "prompt" } },
+        { "kind": "reflection", "title": "Start", "minutes": 8,
+          "body": "Hand the testing to your agent: ask it to prove its next fix on your device before it tells you it is done.",
+          "config": { "prompt": "What is the first prompt you will send this week?" } },
+        { "kind": "question", "title": "Check for understanding", "minutes": 3, "body": null,
+          "config": { "prompt": "Which of these real commit messages is a round, and which is a first draft? Choose every round.", "kind": "multi", "options": ["UX round 7", "Round 3", "UI feedback pass", "M0 setup", "M1: Search Mode"] } },
+        { "kind": "question", "title": "What is still muddy?", "minutes": 2, "body": null,
+          "config": { "prompt": "What is still muddy?", "kind": "short" } }
+      ]
+    },
+    {
+      "key": "week-3",
+      "week": 3,
+      "title": "Week 3: proof that it works, and a look of its own",
+      "move": "Play, then Write",
+      "question": "How do I know it works, and what does it look like when it comes from its why?",
+      "guide": "week-3.md",
+      "scenes": [
+        { "kind": "talk", "title": "Arrive", "minutes": 7,
+          "body": "One line in the chat: shipped or stuck.\n\nThen what I heard in last week's answers, and what I changed because of it.", "config": {} },
+        { "kind": "rooms", "title": "Show what you brought back", "minutes": 30,
+          "body": "Groups of three, about ten minutes each.",
+          "config": {
+            "prompt": "Show the screenshot that proved a fix, and the look beside the template's.",
+            "room_scenes": [
+              { "title": "Their question", "minutes": 1 },
+              { "title": "Show it, and one decision", "minutes": 4 },
+              { "title": "One clarifying question", "minutes": 1 },
+              { "title": "The three questions", "minutes": 3 },
+              { "title": "What comes next", "minutes": 1 }
+            ]
+          } },
+        { "kind": "break", "title": "Break", "minutes": 3, "body": null, "config": {} },
+        { "kind": "presenter", "title": "One value at work", "minutes": 7,
+          "body": "One decision a value changed this week, and what it cost. Then the one thing I heard across groups.",
+          "config": { "prompt": "Listen for the value at work, and what it cost." } },
+        { "kind": "design", "title": "Read one real prompt", "minutes": 15,
+          "body": "A classmate's real stuck moment, shared with their permission. Write the prompt you would send before you see theirs.",
+          "config": { "template": "prompt" } },
+        { "kind": "reflection", "title": "Start", "minutes": 8,
+          "body": "Begin the work of getting your app onto a device you did not build it on.",
+          "config": { "prompt": "What is the first prompt you will send this week?" } },
+        { "kind": "question", "title": "Check for understanding", "minutes": 3, "body": null,
+          "config": { "prompt": "How do you know your last fix is real?", "kind": "short" } },
+        { "kind": "question", "title": "What is still muddy?", "minutes": 2, "body": null,
+          "config": { "prompt": "What is still muddy?", "kind": "short" } }
+      ]
+    },
+    {
+      "key": "week-4",
+      "week": 4,
+      "title": "Week 4: the app on someone else's device",
+      "move": "Publish",
+      "question": "What happens when someone I did not build it with holds it?",
+      "guide": "week-4.md",
+      "scenes": [
+        { "kind": "talk", "title": "Arrive", "minutes": 7,
+          "body": "One line in the chat: shipped or stuck.\n\nThen what I heard in last week's answers, and what I changed because of it.", "config": {} },
+        { "kind": "rooms", "title": "Show what you brought back", "minutes": 30,
+          "body": "Groups of three, about ten minutes each. I will visit every group tonight.",
+          "config": {
+            "prompt": "Show the app on someone else's device, or tell us what they said.",
+            "room_scenes": [
+              { "title": "Their question", "minutes": 1 },
+              { "title": "Show it, and one decision", "minutes": 4 },
+              { "title": "One clarifying question", "minutes": 1 },
+              { "title": "The three questions", "minutes": 3 },
+              { "title": "What comes next", "minutes": 1 }
+            ]
+          } },
+        { "kind": "break", "title": "Break", "minutes": 3, "body": null, "config": {} },
+        { "kind": "presenter", "title": "One value at work", "minutes": 7,
+          "body": "One decision a value changed this week, and what it cost. Then the one thing I heard across groups.",
+          "config": { "prompt": "Listen for the value at work, and what it cost." } },
+        { "kind": "design", "title": "Write, play, publish, this week", "minutes": 15,
+          "body": "Fill in your own week: what you wrote, what you played with, and who you published to.",
+          "config": { "template": "moves" } },
+        { "kind": "reflection", "title": "Start", "minutes": 8,
+          "body": "Write down one thing you wanted from your own use of the app this week.",
+          "config": { "prompt": "What is the first prompt you will send this week?" } },
+        { "kind": "question", "title": "What did they notice first?", "minutes": 3, "body": null,
+          "config": { "prompt": "Rank what the other person noticed first.", "kind": "rank", "options": ["What it is for", "How it looks", "What it does first", "Something that broke", "How fast it is"] } },
+        { "kind": "question", "title": "Handing it over", "minutes": 2, "body": null,
+          "config": { "prompt": "In one word, how did it feel to hand it over?", "kind": "words" } }
+      ]
+    },
+    {
+      "key": "week-5",
+      "week": 5,
+      "title": "Week 5: a feature you wanted, shown to everyone",
+      "move": "Write, then Publish",
+      "question": "What did I learn that the next builder should not have to, and is this version enough for its people?",
+      "guide": "week-5.md",
+      "scenes": [
+        { "kind": "talk", "title": "Arrive", "minutes": 5,
+          "body": "Guests, welcome.\n\nThe four rules, said once more, for everyone. Then what I heard in last week's answers.", "config": {} },
+        { "kind": "rooms", "title": "Show what you brought back", "minutes": 20,
+          "body": "Groups of three, one last time, about six minutes each.",
+          "config": {
+            "prompt": "Explain every part of your app, even the parts the agent wrote.",
+            "room_scenes": [
+              { "title": "Their question", "minutes": 1 },
+              { "title": "Show it, and one decision", "minutes": 2 },
+              { "title": "One clarifying question", "minutes": 1 },
+              { "title": "The three questions", "minutes": 1 },
+              { "title": "What comes next", "minutes": 1 }
+            ]
+          } },
+        { "kind": "break", "title": "Break", "minutes": 3, "body": null, "config": {} },
+        { "kind": "presenter", "title": "The showing", "minutes": 25,
+          "body": "Everyone, about two minutes each: the feature you wanted, and one value with the decision it changed.",
+          "config": { "prompt": "Guests may ask one question each. Listen for what is enough, for now." } },
+        { "kind": "design", "title": "The three questions, on the showing", "minutes": 10,
+          "body": "Where is it going, how is it going, and what is next, for the apps you just saw.",
+          "config": { "template": "questions" } },
+        { "kind": "reflection", "title": "Start", "minutes": 7,
+          "body": "The cohort chooses its one lesson to send back to the template. Then everyone sends the first prompt of whatever comes next.",
+          "config": { "prompt": "What is the first prompt of whatever comes next?" } },
+        { "kind": "question", "title": "What waits", "minutes": 3, "body": null,
+          "config": { "prompt": "What waits for the next version?", "kind": "short" } },
+        { "kind": "question", "title": "What is still muddy?", "minutes": 2, "body": null,
+          "config": { "prompt": "What is still muddy?", "kind": "short" } }
+      ]
+    }
+  ]
+}
