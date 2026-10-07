@@ -75,6 +75,8 @@
         ? S.fitText(scenes, cohort.session_minutes) + ' Students see the scenes’ titles and minutes on their cohort page; your notes stay with the teachers.'
         : 'Week ' + session.number + ' has no run of show yet.';
       if (!scenes.length) {
+        var C = window.CurriculumLib, week = C ? C.weekOf(session.number) : null;
+        if (week != null && window.CurriculumSeed) start.appendChild(button(C.startLabel(week), 'btn-github', startPlan));
         start.appendChild(button('Start from the six parts', 'btn-quiet', startDefault));
         var from = S.copySource(opts.sessions, session, withScenes);
         if (from) start.appendChild(button('Copy week ' + from.number + '’s run of show', 'btn-quiet', function () { copyFrom(from); }));
@@ -316,6 +318,18 @@
       db.from('scenes').insert(rows).then(function (r) {
         if (r.error) { say('Not added: ' + r.error.message); return; }
         say('Week ' + session.number + ' starts from the six parts. Change anything.');
+        load();
+      });
+    }
+
+    // The course's plan for this week (curriculum milestone C6): its
+    // scenes, the note on what to watch for, and its prepared questions.
+    function startPlan() {
+      say('Adding the course’s plan…');
+      window.CurriculumSeed.seedSession(db, cohort, session).then(function (r) {
+        if (r.error) { say('Not added: ' + r.error); return; }
+        if (r.skipped) { say('This week already has a run of show.'); load(); return; }
+        say(window.CurriculumLib.summary({ weeks: 1, scenes: r.scenes, questions: r.questions, errors: [] }) + ' Change anything.');
         load();
       });
     }

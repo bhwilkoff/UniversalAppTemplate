@@ -141,7 +141,7 @@ test('each person keeps one pointer color, and downloads are named for the cohor
 });
 
 test('a design stage template is the course’s words, laid once, with ids that never collide (R5)', () => {
-  assert.deepEqual(lib.TEMPLATES.map((t) => t.key), ['blank', 'prompt', 'moves', 'questions']);
+  assert.deepEqual(lib.TEMPLATES.map((t) => t.key), ['blank', 'prompt', 'moves', 'hum', 'questions']);
   assert.equal(lib.params('?c=fall&s=week-2&t=moves').template, 'moves');
   assert.equal(lib.params('?c=fall&s=week-2&t=<script>').template, null);
   assert.equal(lib.link('fall', { number: 2 }, null, true, 'prompt'), '/board/?c=fall&s=week-2&view=stage&t=prompt');

@@ -416,10 +416,20 @@
   $('[data-make-sessions]').addEventListener('click', function () {
     var rows = lib.sessionRows(current);
     if (!rows) return say('[data-detail-message]', 'Set the first day, the session day, and the time first, and the sessions will follow from them.');
-    db.from('sessions').upsert(rows, { onConflict: 'cohort_id,number' }).then(function (r) {
+    var cohort = current;
+    db.from('sessions').upsert(rows, { onConflict: 'cohort_id,number' }).select('id, number').then(function (r) {
       if (r.error) return say('[data-detail-message]', 'The sessions could not be made: ' + r.error.message);
-      say('[data-detail-message]', rows.length + ' weekly sessions are set. Changing the dates later and making them again keeps what you wrote in each.');
-      openCohort(current.id);
+      var made = rows.length + ' weekly sessions are set. Changing the dates later and making them again keeps what you wrote in each.';
+      say('[data-detail-message]', made);
+      // Each week that has no run of show yet starts from the course's
+      // plan (curriculum milestone C6). Words by Claude, awaiting Ben's review.
+      var seeding = window.CurriculumSeed && r.data && r.data.length
+        ? window.CurriculumSeed.seedAll(db, cohort, r.data).then(function (done) {
+            var line = window.CurriculumLib.summary(done);
+            if (line) say('[data-detail-message]', made + ' ' + line);
+          }).catch(function () {})
+        : Promise.resolve();
+      seeding.then(function () { openCohort(cohort.id); });
     });
   });
 
