@@ -347,7 +347,8 @@ can't observe the result, build an offline sim that produces a PNG and
 look at it. Type checks and tests confirm code, not features; "compiles"
 is not "works." **After touching any shared file, re-build every platform
 that consumes it**: the tvOS build going green after an iOS change is
-part of "done."
+part of "done." **Show the evidence, not the claim:** the command you
+ran and what it returned, or a screenshot of the result.
 
 **Capture the ratchet.** When a recurring failure mode surfaces, the fix
 lands in DECISIONS.md or a memory, not just the code. The lesson is the

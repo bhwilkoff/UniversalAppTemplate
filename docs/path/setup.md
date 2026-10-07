@@ -49,6 +49,10 @@ through.
 - **I do not recommend OpenAI's tools** for this path. Any agent that
   reads `AGENTS.md` can follow it, but Claude and Google's agents are
   the ones it is written and tested for.
+- **If you will not use any AI company at all,** there is a third way,
+  with a model that runs on your own computer, and it costs nothing but
+  the computer. It is slower and asks more of you, and it has its own
+  section below.
 - **A desktop or laptop computer** is the setup I recommend, because it
   lets you build both on your own machine and in the cloud. A Mac lets
   you build for Apple's devices later; Windows and Linux reach the web,
@@ -76,7 +80,32 @@ them is a conversation.
    antigravity.google and sign in with your Google account. Whichever
    you use, if it asks whether you trust a folder, say yes, because
    until you do it cannot read the template's instructions.
-4. **Point the agent at an empty folder** on your computer (a new one
+4. **Decide what happens to your words before you send any.** Both
+   companies can use what you type to train their next models unless you
+   say no, so make that choice now, while there is nothing to take back.
+   - **Claude:** the setting is at claude.ai, Settings, Privacy
+     (claude.ai/settings/data-privacy-controls). Anthropic says that with
+     it on, what you send is kept for five years and used for training;
+     with it off, it is kept for 30 days
+     ([Claude Code data usage](https://code.claude.com/docs/en/data-usage)).
+   - **Antigravity:** turn off **Enable Telemetry** under Settings,
+     Account ([Antigravity settings](https://antigravity.google/docs/settings/)).
+     People on Google's own forum report that this is not the same as
+     training, and that **Gemini Apps Activity**, in your Google account,
+     has to be off too. I could not find Google saying so plainly, so
+     turn off both.
+5. **Start where you can see every change.** In Claude's Code tab, the
+   selector beside the send button offers Auto, Manual, Accept edits,
+   and Plan. Choose **Manual** for your first night, so every change
+   shows up as a before and after that you accept or reject, and move to
+   Auto once you know what you are looking at
+   ([permission modes](https://code.claude.com/docs/en/permission-modes)).
+   In Antigravity, keep the **Default** permissions, which run commands
+   in a sandbox, and keep plans on **Request review**, so the agent shows
+   you its plan before it builds
+   ([permissions](https://antigravity.google/docs/permissions/),
+   [agent settings](https://antigravity.google/docs/agent-settings/)).
+6. **Point the agent at an empty folder** on your computer (a new one
    called `Apps` in your home folder is fine), and say:
 
    > I just made a copy of the Universal App Template on GitHub, at
@@ -88,23 +117,102 @@ them is a conversation.
    The agent will ask you to approve a few things, and once it will
    open a browser window for you to sign in to GitHub. That sign-in is
    yours to do. The rest is the agent's.
-5. **Ask for your app's name and its address:**
+7. **Ask for your app's name and its address:**
 
    > Please change the web app's name everywhere it shows to [your
    > app's name], push it, turn on GitHub Pages for this repository,
    > and tell me the address when it is live.
 
-6. **Open that address on your phone.** That is the first win: your
+8. **Open that address on your phone.** That is the first win: your
    app's own name, at its own address, on a device you carry with you.
+   It is also how you know the agent is really working: not because it
+   said so, but because you can see the name on your own screen.
 
-**If you only have a phone, or would rather work in the cloud,** steps
-3 to 5 happen at claude.ai/code instead, in a browser or in the Claude
+<!-- Steps 4 and 5, the last two sentences of step 8, and the cloud
+paragraph's Chromebook lines were written by Claude on October 7, 2026,
+from docs/research/curriculum/03-claude-code-and-antigravity.md, and
+await Ben's review. -->
+
+**If you only have a phone, a Chromebook, or an iPad, or would rather
+work in the cloud,** steps 3 to 7 happen at claude.ai/code instead, in a
+browser or in the Claude
 phone app. Connect your GitHub account there, choose your new
 repository, and send the same two requests. In the cloud, the agent
 works on its own branch and asks you to merge its pull request, which is
 one button on GitHub. Merging is how its work reaches your app, and
 learning to read a pull request before you merge it is one of the
-GitHub skills the stages keep coming back to.
+GitHub skills the stages keep coming back to. Antigravity on a
+Chromebook or a tablet is something I could not confirm, so for now the
+cloud way is Claude's.
+
+## If you will not use an AI company
+
+*Written by Claude, awaiting Ben's review.*
+
+Some people come to human-shaped software because they will not hand
+their work to Anthropic, OpenAI, Google, or any company like them, and
+I think that is a reasonable place to stand. You can still do every
+stage of this path. The model runs on your own computer, nothing you
+type leaves it, and it costs nothing but the computer. It is slower,
+the model is smaller, and you will do more of the looking and running
+yourself, which, honestly, is a lot of what the path is trying to teach
+anyway. The research behind this section, with every source, is
+`docs/research/curriculum/04-open-pathway.md`.
+
+**What your computer needs.** A computer with 8 GB of memory can run a
+small model for conversation and one change at a time, and 16 GB is
+comfortable. A Chromebook cannot run one, so if that is what you have,
+use the third choice below.
+
+**Choose one of three, and write down why** in your app's
+`DECISIONS.md`, because the choice is part of your app's story and you
+can change it later.
+
+1. **Fully open, and nothing leaves your computer.** Olmo 3, from Ai2, a
+   nonprofit, publishes its model, its training data, and its training
+   code ([Ai2](https://allenai.org/blog/olmo3)). You run it with Ollama
+   and work with it through Aider, both open source.
+   - Install Ollama from ollama.com, then in a terminal:
+     `ollama pull olmo-3:7b-instruct` (a 4.5 GB download,
+     [Ollama](https://ollama.com/library/olmo-3)).
+   - Install Aider: `python -m pip install aider-install`, then
+     `aider-install` ([Aider](https://aider.chat/docs/llms/ollama.html)).
+   - In your app's folder, run `aider --model ollama_chat/olmo-3:7b-instruct`.
+     This template already tells Aider to read `AGENTS-SHORT.md`, the
+     short version of the instructions, and gives the model enough room
+     to hold it (`.aider.conf.yml` and `.aider.model.settings.yml`).
+     Without that setting, Ollama gives a model only 2,000 tokens and
+     quietly drops what does not fit.
+   - Apertus, from Swiss public universities, is just as open and
+     better in languages other than English
+     ([ETH Zurich](https://ethz.ch/en/news-and-events/eth-news/news/2025/09/press-release-apertus-a-fully-open-transparent-multilingual-language-model.html)),
+     but it is not in Ollama's own library yet, so start with Olmo 3
+     unless you need it.
+2. **Open models from AI companies, still on your own computer.**
+   Devstral Small 2 (from Mistral) and Qwen3-Coder (from Alibaba) can
+   use tools the way Claude does, so they can run your commands and
+   change several files. They need 32 GB of memory or more. Run one with
+   Ollama and work with it through opencode, which reads this template's
+   `AGENTS.md`; `opencode.json` already points it at Ollama
+   ([opencode providers](https://opencode.ai/docs/providers/)).
+3. **Your computer cannot run a model.** The Public AI Inference Utility
+   runs Apertus and Olmo on donated public computing
+   ([Public AI](https://publicai.co/stories/utility)), and Aider can
+   connect to it. Your code does leave your computer this way, to public
+   models rather than to a large company. Keep its key in your terminal,
+   never in a file in your repository.
+
+**Then make the same first two requests** from step 6 and step 7 above.
+A small model does exactly what you ask rather than what you meant, so
+ask for one thing at a time, and if it writes a command, run it yourself
+and tell it what happened. When your app's name shows up at its address
+on your phone, you know it works.
+
+**What this path does not escape.** GitHub, where your app lives, is
+owned by Microsoft, and the downloads come from companies even when the
+model is from a public institution. Nobody has taken a whole cohort
+this way yet, so if you do, you are the person who will tell the next
+one what broke.
 
 ## When something goes wrong
 

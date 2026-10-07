@@ -216,6 +216,25 @@ Ten minutes later:
 > Please fully build out and enable a tidbits trivia iMessages app and
 > prepare the App Store Connect settings to submit for review
 
+Both tools have a way to hold the agent to research before it builds.
+In Claude Code, plan mode changes nothing until you say go (`Shift+Tab`
+in the terminal, or **Plan** in the desktop app's selector,
+[permission modes](https://code.claude.com/docs/en/permission-modes)).
+In Antigravity, `/plan` writes the plan as an artifact you can comment
+on, line by line, before it starts
+([slash commands](https://antigravity.google/docs/slash-commands/)).
+Anthropic's own rule for when to skip it is a good one: "If you could
+describe the diff in one sentence, skip the plan"
+([best practices](https://code.claude.com/docs/en/best-practices)).
+
+And when a correction does not take, twice, stop correcting. Start a
+fresh session (`/clear` in Claude Code), or `/fork` in Antigravity, and
+send one better request that says what you learned from the two that
+failed. Anthropic puts it plainly: "A clean session with a better prompt
+almost always outperforms a long session with accumulated corrections"
+([best practices](https://code.claude.com/docs/en/best-practices)).
+*(These two paragraphs were written by Claude, awaiting Ben's review.)*
+
 ## Ask it to argue the other side
 
 When you work alone, nobody disagrees with you. Before a big feature, ask

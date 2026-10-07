@@ -53,6 +53,39 @@ gone = sorted(p for p in linked if p not in CREATED_LATER and not (ROOT / p.rstr
 check(not gone, "every doc and tool AGENTS.md links to exists", ", ".join(gone))
 check(any(p.startswith("docs/platforms/") for p in linked), "AGENTS.md links to docs/platforms/")
 
+# AGENTS-SHORT.md is for small local models on the open path, where all of
+# AGENTS.md would fill most of an 8K context
+# (docs/research/curriculum/04-open-pathway.md). It stays short, defers to
+# AGENTS.md, and only names files that exist. The open path's configs hold
+# no key, and Aider's reads the short file.
+SHORT_LIMIT = 4_000
+short = ROOT / "AGENTS-SHORT.md"
+check(short.is_file(), "AGENTS-SHORT.md exists")
+if short.is_file():
+    short_text = short.read_text()
+    check(len(short.read_bytes()) < SHORT_LIMIT, f"AGENTS-SHORT.md is under {SHORT_LIMIT:,} bytes",
+          f"{len(short.read_bytes()):,} bytes")
+    check("`AGENTS.md`" in short_text and "wins" in short_text,
+          "AGENTS-SHORT.md says AGENTS.md is the source and wins")
+    named = set(re.findall(r"`([A-Za-z0-9_./-]+\.(?:md|html)|[a-z]+/)`", short_text))
+    absent = sorted(n for n in named if not (ROOT / n.rstrip("/")).exists())
+    check(not absent, "every file AGENTS-SHORT.md names exists", ", ".join(absent))
+aider = ROOT / ".aider.conf.yml"
+if aider.is_file():
+    check(re.search(r"^read:\s*\n\s*-\s*AGENTS-SHORT\.md\s*$", aider.read_text(), re.M) is not None,
+          ".aider.conf.yml reads AGENTS-SHORT.md")
+oc = ROOT / "opencode.json"
+if oc.is_file():
+    try:
+        json.loads(oc.read_text())
+        check(True, "opencode.json parses")
+    except json.JSONDecodeError as e:
+        check(False, "opencode.json parses", str(e))
+for cfg in [aider, ROOT / ".aider.model.settings.yml", oc]:
+    if cfg.is_file():
+        secret = re.search(r"(?im)^[^#\n]*(api[_-]?key|token|secret|password)\s*[:=]", cfg.read_text())
+        check(secret is None, f"{cfg.name} holds no key", secret.group(0) if secret else "")
+
 check(first_line(ROOT / "CLAUDE.md") == "@AGENTS.md", "CLAUDE.md opens with @AGENTS.md")
 check(first_line(ROOT / "GEMINI.md") == "@./AGENTS.md", "GEMINI.md opens with @./AGENTS.md")
 

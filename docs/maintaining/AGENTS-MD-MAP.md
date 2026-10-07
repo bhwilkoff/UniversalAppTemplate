@@ -186,6 +186,7 @@ the full ship command.
 | Trust but verify subagent summaries | Kept |
 | Auto-pace decisiveness | Kept |
 | Verify before declaring done; rebuild every platform after a shared file changes | Kept |
+| Show the evidence, not the claim (the command and what it returned, or a screenshot) | Added October 7, 2026, from both tools' docs (`docs/research/curriculum/03-claude-code-and-antigravity.md`) |
 | Capture the ratchet in DECISIONS.md or memory | Kept |
 | Session log: two entries, roll to `docs/SESSION-LOG.md`, fix drift first | Kept |
 
@@ -206,6 +207,17 @@ on the website only, one spelling locale, cross-platform parity, and
 | `SCRATCHPAD.md`, `DECISIONS.md`, `PARITY.md` | Kept |
 | Cloud submission, CI, loops, harnesses, TV stores, Windows docs | Under "Automation, CI, and verification" and "Where each platform's rules live" |
 | Humans start at `docs/path/` and `COURSE.md` | Kept |
+
+## The short version, for small models
+
+`AGENTS-SHORT.md` is a few hundred words for agents running a small
+local model, where all of `AGENTS.md` would fill most of an 8,000-token
+context before the student says a word
+(`docs/research/curriculum/04-open-pathway.md`). It holds the why, the
+three moves, the few rules that matter most, and where the rest lives.
+It is not a second source: when a rule in it changes, `AGENTS.md`
+changes first, and `tools/test_agent_files.py` fails if the short file
+grows past 4,000 bytes or stops pointing to `AGENTS.md`.
 
 ## When you add a rule
 
