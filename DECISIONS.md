@@ -648,3 +648,21 @@ material students use (as models, criteria, and examples to reason from)
 toward their own problem and their own app. Activities are designed with
 inquiry-based and project-based learning practice, cited, before any
 lesson is rewritten, and the design is shown to Ben before the stages are.
+
+## Note 06 is the basis for the curriculum (October 7, 2026)
+
+Ben, on research note 06 (template docs/research/curriculum/06-instructional-design.md):
+"This new pass is MUCH improved and feels far more deeply rooted in both
+the way that I've talked about my development, the way I've actually built
+the apps so far, and the research that folds it all together (on
+project-based/inquiry-based approaches). Please continue the loop based
+upon this better understanding."
+
+**How to apply:** every lesson, guide, run of show, and hub page is
+redesigned by note 06's method: backward design from each stage's "Be
+ready to" line, Ben's own definitions, tests, questions, examples, and
+process as the material students reason with, cited project-based and
+inquiry-based practice for the activities, plain questions, real people
+outside the screen, and a published product, all inside Write, Play,
+Publish. Note 06's section 5 lists the files that still carry the
+rejected "hum" approach.
