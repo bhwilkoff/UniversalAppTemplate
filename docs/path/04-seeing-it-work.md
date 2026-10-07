@@ -3,8 +3,14 @@
 **Where you are.** Two platforms run on your own devices, and so far you
 have been the one checking every fix. That stops here. If you are in a
 cohort, this is also the week your app gets a look of its own, so if
-you have not yet done step 9 of stage 03, "Make it look like itself,"
+you have not yet done step 10 of stage 03, "Make it look like itself,"
 do it alongside this stage.
+
+<!-- The question, the first two steps, the step labels, the last step,
+the per-agent lines, and everything between the bar and the last line:
+written by Claude, awaiting Ben's review (curriculum C8, the lesson page
+template in docs/templates/LESSON-template.md). -->
+**The question.** How do you know your last fix is real?
 
 On August 14, 2026, a version of Archive Watch reached my Apple TV with
 stuttering audio and captions that ran late. The agent had called it
@@ -173,20 +179,38 @@ Start with what you have. My bench grew to fourteen devices, but it grew
 one device at a time, months into building. One phone is enough for
 this stage.
 
-1. **Hand over the testing.** Tell the agent, in your own words, what I
+The steps are one round of write, play, publish. The first two come
+before the agent is open, the middle ones are play, with the agent and
+on your devices, and the last one publishes to your group.
+
+1. **Write your first answer.** Before any prompt, answer this stage's
+   question in two or three sentences in your note, about the last thing
+   the agent told you it fixed. Being wrong is fine. Trying first, before
+   you are shown, is what helps the rest of the stage stick (the research
+   on productive failure, gathered in the
+   [curriculum research](../research/curriculum/05-inquiry-and-evidence.md)).
+
+2. **Write your questions.** For five minutes, write as many questions
+   as you can about how you would know a fix is real, without stopping
+   to answer or judge any of them. Then mark the one you most want
+   answered by the end of the stage. (These are the Right Question
+   Institute's rules for asking your own questions, also in the
+   [curriculum research](../research/curriculum/05-inquiry-and-evidence.md).)
+
+3. **Play: hand over the testing.** Tell the agent, in your own words, what I
    said on August 14: that it should see what you see, and that you
    should not be the one testing its work. Ask it to set itself up to
    test on your device. It will tell you the physical steps only you can
    do: turning on developer mode, trusting the computer, reading it a
    pairing code. Do those, and read it the codes.
 
-2. **Say whose devices are whose.** Tell the agent which device is yours
+4. **Play: say whose devices are whose.** Tell the agent which device is yours
    and must never be touched, which ones people in your home actually
    use and need asking about first, and which it may use freely. It
    writes those down as roles, and its tools refuse the devices you
    protected.
 
-3. **Ask for proof with every "fixed."** From now on, when the agent
+5. **Play: ask for proof with every "fixed."** From now on, when the agent
    says something works, ask to see it: a screenshot from your device, a
    measurement, a test that could have failed. Look at the screenshot
    yourself. If there is no way to prove the fix yet, ask for one. One
@@ -199,7 +223,7 @@ this stage.
    > post is rendered a signgle time and continue to work until your
    > code passes that test.
 
-4. **When it guesses, stop it.** If a fix fails twice, ask for research,
+6. **Play: when it guesses, stop it.** If a fix fails twice, ask for research,
    or for a way to see the problem, before the next attempt. On
    September 6, I was watching a film at home while the agent chased an
    audio dropout, and it kept blaming AirPlay. I checked the one thing I
@@ -208,19 +232,64 @@ this stage.
    > I just confirmed. The audio went out on the TV speakers as well. It
    > ISN'T Airplay. Please stop guessing and figure out the issue.
 
-5. **Keep living with the app.** The agent's instruments will miss
+7. **Play: keep living with the app.** The agent's instruments will miss
    things. You will catch them by using the app, and each one you report
    becomes a check the agent adds, so it does not miss that one again.
 
-6. **Correct its manners.** If it leaves something playing, drives a
+8. **Play: correct its manners.** If it leaves something playing, drives a
    device someone is using, or wakes a TV in the wrong room, say so, and
    ask for a rule so it never happens again.
 
+9. **Publish: show the proof.** Show your group (or, working alone, one
+   of the two people who hear your hum) the screenshot that proved a fix,
+   and say what it would have shown if the fix had not worked. Write down
+   the first thing they asked. Then, with the agent closed, write two
+   sentences in your note: one check you decided the agent must always
+   run, and what it costs you in time.
+
+Where the agents differ, one line each
+([curriculum research, 03 and 04](../research/curriculum/03-claude-code-and-antigravity.md)):
+
+- **Claude Code:** ask for the check by name, a test, a build, or a
+  screenshot, which is Anthropic's own advice ("Give Claude a check it
+  can run"), and use the desktop app's Browser pane to see a web fix.
+- **Antigravity:** ask for `/browser`, which takes screenshots and
+  records the browser as artifacts you can open and comment on.
+- **The open path:** the model reads text only and cannot look at a
+  screenshot, so you are its eyes: describe what you see or paste the
+  error, which makes "the agent is never the tester" literal
+  ([the open pathway](../research/curriculum/04-open-pathway.md)).
+
 **When you are ready to move on,** the agent has proven a fix to you
-with a screenshot from your own device, your devices have roles, and
-you have stopped being the first person to find its mistakes. The app
+with a screenshot from your own device, your devices have roles, you
+have stopped being the first person to find its mistakes, and someone
+else has seen the proof and asked about it. The app
 works, and you can prove it. Stage 05 puts it where other people can
 install it.
+
+**Go deeper.** Pick one check the agent added, and ask it to break the
+code on purpose and show you the check failing, then put the code back.
+That is the rule above, "a test is not a test until you have seen it
+fail," done once with your own eyes. It is never required, and it is
+never counted.
+
+**If you get stuck.**
+
+- *The agent says it is fixed, and you still see the bug.* Ask yourself:
+  what would the proof look like, and has it shown me one? Then try
+  [the agent fixes what I cannot see](../stuck/playing/cannot-see-the-fix.md).
+- *The same fix fails twice.* Ask yourself: is it guessing? Then ask for
+  research or a way to see the problem, the way step 6 does, and try
+  [the same bug keeps coming back](../stuck/playing/same-bug.md).
+- *The agent cannot reach your device.* Ask yourself: is this the app or
+  the tools around it? Then try
+  [the tools themselves are stuck](../stuck/playing/tools-stuck.md), and
+  ask your group.
+
+**Before you close your note.** Four short lines, from my
+[Educational Model Spec's AI Disclosure Protocol](https://github.com/bhwilkoff/educational-model-spec/blob/main/docs/implementation-tools/ai_disclosure_protocol.md):
+the agent's role, your essential work, one thing you learned, and your
+growth edge.
 
 Be ready to show the screenshot that proved a fix, to say what it would
 have looked like if the fix had not worked, and to explain which of your

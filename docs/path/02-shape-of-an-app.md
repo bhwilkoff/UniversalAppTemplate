@@ -2,8 +2,17 @@
 
 **Where you are.** One platform is live, full of real data, and you have
 sent it a few rounds of feedback from your own phone. Before a second
-platform exists, it is time to decide what "the same app" means. Here
-is why that decision matters, from much later in Archive Watch's life.
+platform exists, it is time to decide what "the same app" means.
+
+<!-- The question, the first two steps, the step labels, the last step,
+the per-agent lines, and everything between the bar and the last line:
+written by Claude, awaiting Ben's review (curriculum C8, the lesson page
+template in docs/templates/LESSON-template.md). -->
+**The question.** What has to be the same for every person who uses your
+app, on any device, and what should feel different?
+
+Here is why that decision matters, from much later in Archive Watch's
+life.
 
 In September 2026, Roku's store analytics showed Archive Watch crashing
 16 times in two days, always on the same line:
@@ -158,7 +167,25 @@ the detail:
 
 ## Working with your agent
 
-1. **Ask for the matrix.** Tell the agent every platform you plan to
+The steps are one round of write, play, publish. The first two come
+before the agent is open, the middle ones are play, with the agent and
+on your devices, and the last one publishes to your group.
+
+1. **Write your first answer.** Before any prompt, answer this stage's
+   question in two or three sentences in your note: what must be the
+   same everywhere, and what should not be. Being wrong is fine. Trying
+   first, before you are shown, is what helps the rest of the stage stick
+   (the research on productive failure, gathered in the
+   [curriculum research](../research/curriculum/05-inquiry-and-evidence.md)).
+
+2. **Write your questions.** For five minutes, write as many questions
+   as you can about what "the same app" means for yours, without
+   stopping to answer or judge any of them. Then mark the one you most
+   want answered by the end of the stage. (These are the Right Question
+   Institute's rules for asking your own questions, also in the
+   [curriculum research](../research/curriculum/05-inquiry-and-evidence.md).)
+
+3. **Play: ask for the matrix.** Tell the agent every platform you plan to
    reach, even the ones that are months away, and ask it to write the
    parity matrix for everything your app already does. On June 10, the
    day after Archive Watch's iPhone, web and Android versions started,
@@ -171,7 +198,7 @@ the detail:
    Read what comes back as a list of promises. Strike anything you do
    not actually want. Ask why about any cell you do not understand.
 
-2. **Name the platform whose choices win.** When two platforms disagree
+4. **Play: name the platform whose choices win.** When two platforms disagree
    about order, labels or which shelves appear, one of them should be
    the reference. Say which. In late June the same shelves had
    different names and a different order on every Archive Watch
@@ -181,14 +208,14 @@ the detail:
    > I prefer the order and titles of the Apple TV app (replicate
    > everywhere).
 
-3. **Move the answers into the data.** Ask the agent to make sure that
+5. **Play: move the answers into the data.** Ask the agent to make sure that
    every rule about what exists and what is allowed (what counts as
    appropriate, what a person can see, what is featured) is decided once
    in the pipeline and published, so no app decides it for itself. The
    `shared-data-plane-contract` skill carries how. The agent will ask you
    for the rules themselves. Those are yours.
 
-4. **Make the web the address.** Ask that every Share button, on every
+6. **Play: make the web the address.** Ask that every Share button, on every
    platform, share a link to your web app, and that the web app open the
    native app when someone taps it on a phone. Archive Watch's Share
    buttons were sending people to archive.org, where the films come
@@ -199,7 +226,7 @@ the detail:
    > links. I also think that the web app should redirect to the native
    > apps if you click on them on your phone/iPad/android.
 
-5. **Distrust the cells.** A matrix says what should be true. Your eyes
+7. **Play: distrust the cells.** A matrix says what should be true. Your eyes
    say what is. The first parity bug I ever caught came from reading
    one number on two screens, two days into BOBA Playbook:
 
@@ -225,10 +252,56 @@ the detail:
    > Is the "Join a Room" feature on the library section available in
    > the currently live 1.42.699 version on Google Play?
 
+8. **Publish: show the matrix to someone else.** Bring your trimmed
+   matrix, and the one cell your own eyes proved wrong, to your group (or,
+   working alone, to one of the two people who hear your hum). Ask them
+   which promise they would check first, and write down what they said.
+   Then, with the agent closed, write two sentences in your note: the
+   rule about your data that you decided, and what it cost.
+
+Where the agents differ, one line each
+([curriculum research, 03 and 04](../research/curriculum/03-claude-code-and-antigravity.md)):
+
+- **Claude Code:** ask for the matrix in plan mode (`Shift+Tab`), so you
+  read the promises before anything is built.
+- **Antigravity:** use `/plan` and leave a comment on any row you want
+  struck before it builds.
+- **The open path:** a small local model holds only a few thousand words
+  at once (8,192 tokens in this template's `.aider.model.settings.yml`),
+  so ask for the matrix one platform's column at a time, and keep the
+  rows you trimmed in your note
+  ([the open pathway](../research/curriculum/04-open-pathway.md)).
+
 **When you are ready to move on,** there is a matrix you have read and
 trimmed, one rule about your data that you decided and the pipeline now
-enforces, and every Share button points at your web address. You know
+enforces, every Share button points at your web address, and someone
+other than you has read the matrix and asked about it. You know
 what "the same app" means. Stage 03 builds it on a second platform.
+
+**Go deeper.** Ask the agent to write a test that checks the shape of one
+file your pipeline publishes against `docs/DATA-CONTRACT.md`, the way
+Archive Watch's contract is tested after the Roku crash above. Then ask
+it to break the data on purpose and show you the test failing. It is
+never required, and it is never counted.
+
+**If you get stuck.**
+
+- *The matrix says a feature is done, and your device says it is not.*
+  Ask yourself: which cell, on which device, and what did I see? Then
+  try [the agent fixes what I cannot see](../stuck/playing/cannot-see-the-fix.md).
+  Ask your group if it keeps happening.
+- *The two platforms keep drifting apart in the same way.* Ask yourself:
+  is this the same complaint I sent last round? Then try
+  [the same bug keeps coming back](../stuck/playing/same-bug.md).
+- *You do not know which platform should come second.* Ask yourself:
+  where are the people who hear my hum? Then try
+  [I do not know what I want it to do next](../stuck/writing/what-next.md),
+  and ask the teacher.
+
+**Before you close your note.** Four short lines, from my
+[Educational Model Spec's AI Disclosure Protocol](https://github.com/bhwilkoff/educational-model-spec/blob/main/docs/implementation-tools/ai_disclosure_protocol.md):
+the agent's role, your essential work, one thing you learned, and your
+growth edge.
 
 Be ready to show your matrix and one cell the audit or your own eyes
 proved wrong, and to explain the rule about your data that you decided,

@@ -4,6 +4,13 @@
 parity matrix listing what every other platform must do, and the rules
 about your data live in the pipeline. Now the app gets a second home.
 
+<!-- The question, the first two steps, the step labels, the last step,
+the per-agent lines, and everything between the bar and the last line:
+written by Claude, awaiting Ben's review (curriculum C8, the lesson page
+template in docs/templates/LESSON-template.md). -->
+**The question.** What would your app feel like if it had been born on
+this second device, and how old a device should it still reach?
+
 On June 9, 2026, Archive Watch's Apple TV app went to App Store review.
 It had spent seven weeks as the only version of the app. That same day
 I asked for three more (the iPhone and iPad, Android, and the web), each
@@ -131,14 +138,32 @@ Stage 04 is about why that matters.
 
 ## Working with your agent
 
-1. **Do the human part first.** Putting the app on your own phone or
-   tablet costs nothing (stage 05 says how long each free way lasts),
-   but a store needs a developer account: Apple's is $99 a year, Google
-   Play's is $25 once. Create the account yourself when you need it, and
-   tell the agent when it exists. Everything after that is a
-   conversation.
+Do the human part first. Putting the app on your own phone or tablet
+costs nothing (stage 05 says how long each free way lasts), but a store
+needs a developer account: Apple's is $99 a year, Google Play's is $25
+once. Create the account yourself when you need it, and tell the agent
+when it exists. Everything after that is a conversation.
 
-2. **Give the app a name of its own.** Every app made from the template
+The steps are one round of write, play, publish. The first two come
+before the agent is open, the middle ones are play, with the agent and
+on your devices, and the last one publishes to a person.
+
+1. **Write your first answer.** Before any prompt, answer this stage's
+   question in two or three sentences in your note: how your app should
+   feel on its second device, and the oldest device you guess it should
+   reach. Being wrong is fine. Trying first, before you are shown, is
+   what helps the rest of the stage stick (the research on productive
+   failure, gathered in the
+   [curriculum research](../research/curriculum/05-inquiry-and-evidence.md)).
+
+2. **Write your questions.** For five minutes, write as many questions
+   as you can about your app on its second device, without stopping to
+   answer or judge any of them. Then mark the one you most want answered
+   by the end of the stage. (These are the Right Question Institute's
+   rules for asking your own questions, also in the
+   [curriculum research](../research/curriculum/05-inquiry-and-evidence.md).)
+
+3. **Play: give the app a name of its own.** Every app made from the template
    starts out as `com.example.appname`, and a phone keeps only one app
    with a given identifier, so if you and a classmate both install apps
    still carrying that name, the second one replaces the first. No
@@ -157,7 +182,7 @@ Stage 04 is about why that matters.
    the new name under the icon on your device, because that is where a
    missed platform shows.
 
-3. **Ask for the native version of everything.** Name the platforms and
+4. **Play: ask for the native version of everything.** Name the platforms and
    ask for every feature, built the way each platform's people expect,
    with a plan and a parity matrix first. This is the June 9 prompt
    from the top of this page:
@@ -184,7 +209,7 @@ Stage 04 is about why that matters.
    > a lot of the instructions in the readme ... seem like things that
    > you can do programatically rather than having me do them in Xcode
 
-4. **Hold the native bar on the device.** Use the new app and say where
+5. **Play: hold the native bar on the device.** Use the new app and say where
    it feels borrowed from the first platform. Two of mine, from
    Archive Watch on the iPad and Tidbits Trivia on the Mac:
 
@@ -195,7 +220,7 @@ Stage 04 is about why that matters.
    > accessible via menus and hardly anything is. That is the design for
    > desktop-class apps and it should be so for ours as well.
 
-5. **When it says the platform cannot, show it an app that does.**
+6. **Play: when it says the platform cannot, show it an app that does.**
    Agents give up on platform features too early. In March, the agent
    told me an iPhone share sheet could not open Bsky Dreams with a
    shared image, and I answered with the apps on my own phone:
@@ -209,7 +234,7 @@ Stage 04 is about why that matters.
 
    An hour later: "It worked!!! Thank you."
 
-6. **Ask what the oldest device could be, and what it would cost.** The
+7. **Play: ask what the oldest device could be, and what it would cost.** The
    agent measures it with throwaway test builds and tells you which
    devices each choice reaches. The choice is yours. If you have an old
    device in a drawer, bring it in. In September I dug out a Roku 2 XD
@@ -220,7 +245,7 @@ Stage 04 is about why that matters.
    > hardware, right? If the videos can run on a web browser, surely
    > they can run on old hardware.
 
-7. **Keep the modern devices modern.** When the floor starts holding
+8. **Play: keep the modern devices modern.** When the floor starts holding
    back newer devices, say so, and ask for newer features behind a
    capability check instead of dropping them for everyone. I said this the
    day before, when supporting old Rokus started to look like it would
@@ -230,11 +255,11 @@ Stage 04 is about why that matters.
    > modern Roku users if it is going to be hamstrung by the older
    > devices that are mostly stuck in 2014.
 
-8. **Check the matrix against your hands.** Ask the agent to update the
+9. **Play: check the matrix against your hands.** Ask the agent to update the
    parity matrix for the new platform. Then open one feature on both
    platforms and see whether they really do the same thing.
 
-9. **Make it look like itself.** Until now, your app has been wearing
+10. **Write, then play: make it look like itself.** Until now, your app has been wearing
    the template's look, which is a placeholder, and every app made from
    the template starts out wearing the same one. Tell the agent who the
    app is for and how it should feel to them, and name three to five
@@ -252,11 +277,56 @@ Stage 04 is about why that matters.
    one file. If you are in a cohort, bring the three directions to your
    classmates before you choose.
 
+11. **Publish: put the second platform in someone's hand.** Give the
+    second platform to one of the two people who hear your hum, or to
+    your group, and ask them to do the one thing your app is for. Write
+    down what they did first, and anywhere it felt borrowed from the
+    first platform. Then, with the agent closed, write two sentences in
+    your note: the floor you chose, and what it cost.
+
+Where the agents differ, one line each
+([curriculum research, 03 and 04](../research/curriculum/03-claude-code-and-antigravity.md)):
+
+- **Claude Code:** ask for the plan and the parity matrix in plan mode
+  (`Shift+Tab`) before it creates any project, and read both.
+- **Antigravity:** use `/plan`, and comment on the platform order before
+  it builds.
+- **The open path:** building a native app while a model is loaded can
+  run a laptop out of memory, so close the model during builds, and on 8
+  or 16 GB make the installable web app your second platform instead of
+  Xcode or Android Studio
+  ([the open pathway](../research/curriculum/04-open-pathway.md)).
+
 **When you are ready to move on,** the second platform is on your own
 device, it does the same things as the first in its own idiom, it looks
-like your app rather than the template, and you have chosen its floor
-from a measurement. So far, you have been the one
+like your app rather than the template, you have chosen its floor
+from a measurement, and one other person has used it, with what they did
+first written in your note. So far, you have been the one
 checking that it all works. Stage 04 hands that job to the agent.
+
+**Go deeper.** Ask the agent to show you the same screen in both
+platforms' code side by side, and to point at the shared part and the
+native part. Write down one thing you would move from one side to the
+other, and why. It is never required, and it is never counted.
+
+**If you get stuck.**
+
+- *The agent tells you the platform cannot do something.* Ask yourself:
+  have I seen another app on this device do it? Then show it that app,
+  the way step 6 does, and try
+  [the agent keeps stopping](../stuck/playing/agent-stops.md).
+- *Xcode, Android Studio, or a build keeps failing.* Ask yourself: is
+  this my app, or the tools around it? Then try
+  [the tools themselves are stuck](../stuck/playing/tools-stuck.md), and
+  ask your group before you lose an evening to it.
+- *It works on the new device, and still feels wrong.* Ask yourself:
+  where exactly does it feel borrowed from the first platform? Then try
+  [it works, and it still feels wrong](../stuck/playing/feels-wrong.md).
+
+**Before you close your note.** Four short lines, from my
+[Educational Model Spec's AI Disclosure Protocol](https://github.com/bhwilkoff/educational-model-spec/blob/main/docs/implementation-tools/ai_disclosure_protocol.md):
+the agent's role, your essential work, one thing you learned, and your
+growth edge.
 
 Be ready to name the oldest device your app will run on and why you
 chose it, the newest feature it will not show there, and why its new
