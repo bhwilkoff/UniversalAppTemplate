@@ -19,14 +19,14 @@ about Xcode or Google Play, because the job is to keep the session's
 shape, to read what people write, and to notice who needs a word, and
 that is what every guide is built around.
 
-| Session | What gets brought back | Guide |
-|---|---|---|
-| The week before | The app's address, open on a phone | [The week before](before.md) |
-| Week 1 | 00. Why we build, 01. The first prototype | [Week 1](week-1.md) |
-| Week 2 | 02. The shape of an app, 03. Going native | [Week 2](week-2.md) |
-| Week 3 | 04. Seeing it work, and the app's own look | [Week 3](week-3.md) |
-| Week 4 | 05. Shipping, 06. Keeping it running | [Week 4](week-4.md) |
-| Week 5 | 07. Raising the ceiling, 08. Working with AI, shown to everyone | [Week 5](week-5.md) |
+| Session | Leads with | What gets brought back | Guide |
+|---|---|---|---|
+| The week before | Publish | The app's address, open on a phone | [The week before](before.md) |
+| Week 1 | Write | The hum and its twin; 00. Why we build, 01. The first prototype | [Week 1](week-1.md) |
+| Week 2 | Play | 02. The shape of an app, 03. Going native | [Week 2](week-2.md) |
+| Week 3 | Play, then write | 04. Seeing it work, and the app's own look | [Week 3](week-3.md) |
+| Week 4 | Publish | 05. Shipping, 06. Keeping it running | [Week 4](week-4.md) |
+| Week 5 | Write, then publish | 07. Raising the ceiling, 08. Working with AI, shown to everyone | [Week 5](week-5.md) |
 
 Each session comes at the end of its week. It is where that week's work
 gets shown, and where the next week's work gets started, so every guide
@@ -44,21 +44,36 @@ is the center of every session.
 
 ## The shape of every session
 
-Each guide uses the same six parts, with a short break when the session
-runs longer than an hour. These are the minutes for 75, and how they
-change for 60 and 90.
+*Written by Claude, awaiting Ben's review (curriculum milestone C5, October 7, 2026).*
 
-| Part | 75 minutes | 60 minutes | 90 minutes |
-|---|---|---|---|
-| Arrive | 0-7 | 0-5 | 0-8 |
-| Show what you brought back (groups of three) | 7-32 | 5-26 | 8-38 |
-| Break | 32-35 | none | 38-43 |
-| One value at work | 35-41 | 26-31 | 43-50 |
-| Read one real prompt, trying first | 41-63 | 31-48 | 50-77 |
-| Start | 63-72 | 48-57 | 77-87 |
-| Check for understanding | 72-75 | 57-60 | 87-90 |
+Every session is one round of Write, Play, Publish, the same three moves
+as stage 00, at the size of a week, and each guide names the move its
+session leads with and the one question it turns on. The session itself
+is a run of show of scenes, in the words the hub uses: a talk, the
+rehearsal rooms, a break, a presenter, the design stage, a reflection,
+and the question scenes. Prep and week 5 change the middle (meeting the
+group, and the showing), and the rest keep this shape. These are the
+minutes for 75, and how they change for 60 and 90.
 
-When time is short, the prompt reading gives up minutes first. The
+| Scene | Kind | 75 minutes | 60 minutes | 90 minutes |
+|---|---|---|---|---|
+| Arrive | Talk | 0-7 | 0-5 | 0-8 |
+| Show what you brought back | Rehearsal rooms | 7-37 | 5-29 | 8-41 |
+| Break | Break | 37-40 | none | 41-46 |
+| One value at work | Presenter | 40-47 | 29-35 | 46-54 |
+| Read one real prompt, or the week's board | Design stage | 47-62 | 35-47 | 54-74 |
+| Start | Reflection | 62-70 | 47-55 | 74-84 |
+| Check for understanding, and what is still muddy | Question | 70-75 | 55-60 | 84-90 |
+
+The same scenes are in [`runs-of-show.json`](runs-of-show.json), and the
+hub makes every new cohort's sessions from that file, so a teacher opens
+the class builder to a plan that matches this page and can change any
+scene, before the session or during it. Each guide also says what to
+watch for, the week's task and the evidence it leaves for the
+credential, and which pages of the [stuck library](../stuck/README.md)
+to point people to.
+
+When time is short, the design stage gives up minutes first. The
 bring-back and the check never do, because the bring-back is the only
 time anyone sees the app in someone's hands, and the check is how you
 find out what the session actually taught.

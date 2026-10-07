@@ -16,23 +16,41 @@ grows into a showing for the whole room.
 
 **Everyone's work, shown to everyone.**
 
-## The session
+## The move and the question
 
-| Minutes (75) | Part | This week |
-|---|---|---|
-| 0-5 | Arrive | Guests welcomed. The four rules said once more, for them. Your two sentences from last week's checks. |
-| 5-25 | Show what you brought back | Groups of three, one last time, about six minutes each. |
-| 25-28 | Break | |
-| 28-53 | The showing | Everyone, in the main room, about two minutes each: the feature, and one value with the decision it changed. Guests may ask one question. |
-| 53-63 | Read one real prompt | Led by a volunteer, with a moment of their own. |
-| 63-72 | Start | The cohort chooses its one lesson, then everyone sends the first prompt of whatever comes next. |
-| 72-75 | Check for understanding | Two questions, answered privately. |
+*Written by Claude, awaiting Ben's review (curriculum milestone C5, October 7, 2026).*
 
-Two minutes each in the showing fits about twelve people. With more,
-use 90 minutes, or hold the showing in two rooms. **At 60 minutes,**
-give the groups 15, the showing 20, the prompt 8, and Start 10, with
-Arrive at 4 and no break. **At 90,** give the groups 24, a five-minute
-break, the showing 30, and the prompt 12.
+**Write, then publish.** This week writes down what the builder learned, so the agent and the next builder keep it, and then publishes the app to everyone, guests welcome.
+
+The question the whole session turns on: **What did I learn that the next builder should not have to, and is this version enough for its people?**
+
+Every session is one round of Write, Play, Publish at a larger size,
+the same three moves as stage 00, and the principles decide what gets
+written, played with, and published
+([`00-curriculum-design.md`](../research/curriculum/00-curriculum-design.md)).
+
+## The run of show
+
+| Minutes (75) | Scene | Kind | What happens |
+|---|---|---|---|
+| 0-5 | Arrive | Talk | Guests, welcome. The four rules, said once more, for everyone. Then what I heard in last week's answers. |
+| 5-25 | Show what you brought back | Rehearsal rooms | Groups of three. The room's prompt: "Explain every part of your app, even the parts the agent wrote." |
+| 25-28 | Break | Break |  |
+| 28-53 | The showing | Presenter | Everyone, about two minutes each: the feature you wanted, and one value with the decision it changed. The audience: "Guests may ask one question each. Listen for what is enough, for now." |
+| 53-63 | The three questions, on the showing | Design stage | Where is it going, how is it going, and what is next, for the apps you just saw. On the board: *The three questions*. |
+| 63-70 | Start | Reflection | The cohort chooses its one lesson to send back to the template. Then everyone sends the first prompt of whatever comes next. Then: "What is the first prompt of whatever comes next?" |
+| 70-73 | What waits | Question | "What waits for the next version?" (in their own words) |
+| 73-75 | What is still muddy? | Question | "What is still muddy?" (in their own words) |
+
+**In the rehearsal rooms,** each builder's turn runs these scenes, 6 minutes in all: their question (1), show it, and one decision (2), one clarifying question (1), the three questions (1), what comes next (1). The room's prompt is on screen the whole time.
+
+These are the scenes a new cohort is made with on humanshaped.org, from
+[`runs-of-show.json`](runs-of-show.json), and every one of them can be
+changed in the class builder, before the session and during it. Two minutes each in the showing fits about twelve people. With more, use 90 minutes, or hold the showing in two rooms. **At 60 minutes,** give Arrive 4, the groups 15, no break, the showing 20, the board 8, Start 8, and the check 5. **At 90,** give Arrive 5, the groups 24, a five-minute break, the showing 30, the board 12, Start 9, and the check 5.
+
+**What to watch for tonight.**
+
+- Whether each student can name what is enough, for now, for the people they named in week 1.
 
 ## The opening
 
@@ -79,7 +97,21 @@ but has not asked the agent to write down. Many apps will be "not yet"
 on some part of these stages tonight, and that is ordinary. The stages are
 built to be lapped more than once, and the app's page stays open.
 
-## The prompt to read together
+## On the design stage: the three questions, on the showing
+
+*Written by Claude, awaiting Ben's review (curriculum milestone C5, October 7, 2026).*
+
+Put the board on the main stage from the *The three questions*
+template, right after the showing. Everyone, guests included, writes
+for the apps they just saw: where is it going, how is it going, and what
+is next. The builders read the board, and nobody talks over it.
+
+**What to talk about.** Read one "what is next" aloud for each app, and
+ask its builder whether that is enough, for now, or what waits.
+
+## The volunteer's prompt, in a 90-minute session
+
+In a 90-minute session, the volunteer leads this after the board.
 
 **The situation** comes from whoever volunteered last week, from a
 moment of their own: what they saw and what the agent said, then
@@ -114,12 +146,43 @@ a second lap.
 
 ## The check
 
-1. **What will your agent know at the start of your next app that it
-   did not know in week 1, and where does that knowledge live?**
-2. **What is still muddy?**
+The question scenes at the end of the run of show, answered privately, and
+shown on the main stage without names only if you choose:
+
+1. **What waits for the next version?** (in their own words).
+2. **What is still muddy?** (in their own words).
+
+**Also prepared,** from this guide's first version, for when you want the stage's own question instead: "What will your agent know at the start of your next app that it did not know in week 1, and where does that knowledge live?"
 
 There is no next session to open with what you heard, so this week the
 teacher writes it to the cohort's conversation instead.
+
+## The task, and its evidence
+
+*Written by Claude, awaiting Ben's review (curriculum milestone C5, October 7, 2026).*
+
+**The task.** Build one feature from your own use. Write a skill and a handoff. Fill in `HUMAN-SHAPED.md`. Decide what is enough, for now.
+
+**Evidence a person can open.** The feature; the skill; the declaration; the list of what waits.
+
+**On the credential.** Recognitions: "Shared what they learned," "Credited the people and tools behind it," "Found whose work they are building on." Students do the thing itself, and what they
+make is the evidence; nobody writes a report about it
+([`05-inquiry-and-evidence.md`](../research/curriculum/05-inquiry-and-evidence.md)).
+
+## When someone is stuck
+
+Every entry in the [stuck library](../stuck/README.md) starts with a
+question to ask yourself, then what to try, then who to ask. This week,
+point people to:
+
+- [Stuck writing](../stuck/stuck-writing.md), for when the hum, the why, or what comes next will not come.
+- [Stuck publishing](../stuck/stuck-publishing.md), for when you are not ready to show anyone, cannot get it onto another device, or do not know when it is enough.
+
+And the ladder for any of them: name the kind of stuck, write three
+lines (what you tried, what you expected, what you saw), ask the agent
+for a way to understand it rather than the fix, look on the device and
+at the last thing that worked, then your trio, then the teacher. About
+twenty minutes before the trio is a default each person can move.
 
 ## The close
 

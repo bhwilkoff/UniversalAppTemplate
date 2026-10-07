@@ -15,20 +15,42 @@ story from the stages, so handle it with care.
 
 **The agent is never the tester.**
 
-## The session
+## The move and the question
 
-| Minutes (75) | Part | This week |
-|---|---|---|
-| 0-7 | Arrive | One line in the chat: shipped or stuck. Then your two sentences from last week's checks. |
-| 7-32 | Show what you brought back | Groups of three, about eight minutes each. |
-| 32-35 | Break | |
-| 35-41 | One value at work | One decision a value changed this week, and its cost. Then the one thing you heard across groups. |
-| 41-63 | Read one real prompt | A classmate's stuck moment, with their permission. |
-| 63-72 | Start | Everyone begins the work of getting the app onto someone else's device. |
-| 72-75 | Check for understanding | Two questions, answered privately. |
+*Written by Claude, awaiting Ben's review (curriculum milestone C5, October 7, 2026).*
 
-To fit 60 or 90 minutes, use the table in the [guides'
-index](README.md).
+**Play, then write.** This week plays until a fix is proved on the device, then writes: a look that comes from the app's why rather than the template's.
+
+The question the whole session turns on: **How do I know it works, and what does it look like when it comes from its why?**
+
+Every session is one round of Write, Play, Publish at a larger size,
+the same three moves as stage 00, and the principles decide what gets
+written, played with, and published
+([`00-curriculum-design.md`](../research/curriculum/00-curriculum-design.md)).
+
+## The run of show
+
+| Minutes (75) | Scene | Kind | What happens |
+|---|---|---|---|
+| 0-7 | Arrive | Talk | One line in the chat: shipped or stuck. Then what I heard in last week's answers, and what I changed because of it. |
+| 7-37 | Show what you brought back | Rehearsal rooms | Groups of three. The room's prompt: "Show the screenshot that proved a fix, and the look beside the template's." |
+| 37-40 | Break | Break |  |
+| 40-47 | One value at work | Presenter | One decision a value changed this week, and what it cost. Then the one thing I heard across groups. The audience: "Listen for the value at work, and what it cost." |
+| 47-62 | Read one real prompt | Design stage | A classmate's real stuck moment, shared with their permission. Write the prompt you would send before you see theirs. On the board: *Read one real prompt*. |
+| 62-70 | Start | Reflection | Begin the work of getting your app onto a device you did not build it on. Then: "What is the first prompt you will send this week?" |
+| 70-73 | Check for understanding | Question | "How do you know your last fix is real?" (in their own words) |
+| 73-75 | What is still muddy? | Question | "What is still muddy?" (in their own words) |
+
+**In the rehearsal rooms,** each builder's turn runs these scenes, 10 minutes in all: their question (1), show it, and one decision (4), one clarifying question (1), the three questions (3), what comes next (1). The room's prompt is on screen the whole time.
+
+These are the scenes a new cohort is made with on humanshaped.org, from
+[`runs-of-show.json`](runs-of-show.json), and every one of them can be
+changed in the class builder, before the session and during it. To fit 60 or 90 minutes, use the table in the [guides' index](README.md).
+
+**What to watch for tonight.**
+
+- "It works," with no evidence from outside the agent.
+- A look borrowed from somewhere else rather than drawn from the app's why.
 
 ## The opening
 
@@ -73,7 +95,9 @@ from stage 03: the app "looks like your app rather than the template."
 to look at. A screenshot from a simulator standing in for the device.
 An app that still wears the template's colors and type.
 
-## The prompt to read together
+## On the design stage: one real prompt
+
+Put the board on the main stage from the *Read one real prompt* template, filled with the situation below.
 
 **Choosing the situation.** Use a stuck moment from last week's checks
 or the cohort's conversation, and ask its owner privately, before the
@@ -108,13 +132,44 @@ the app will reach.
 
 ## The check
 
-1. **When your agent says something is fixed, what do you ask to see,
-   and why is its word not enough?**
-2. **What is still muddy?**
+The question scenes at the end of the run of show, answered privately, and
+shown on the main stage without names only if you choose:
+
+1. **How do you know your last fix is real?** (in their own words).
+2. **What is still muddy?** (in their own words).
+
+**Also prepared,** from this guide's first version, for when you want the stage's own question instead: "When your agent says something is fixed, what do you ask to see, and why is its word not enough?"
 
 The answer you hope for names evidence from outside the agent: a
 screenshot from the device, a measurement, or a test that could have
 failed. An answer that trusts the agent's report is worth a word.
+
+## The task, and its evidence
+
+*Written by Claude, awaiting Ben's review (curriculum milestone C5, October 7, 2026).*
+
+**The task.** Have the agent prove a fix on your device. Make a look that comes from your why.
+
+**Evidence a person can open.** The screenshot that proved the fix, and what it would have shown if the fix had failed; the look beside the template's.
+
+**On the credential.** Recognitions: "Tested it the way people will actually use it," "Wrote it in their own voice," "Helped a classmate see their work more clearly." Students do the thing itself, and what they
+make is the evidence; nobody writes a report about it
+([`05-inquiry-and-evidence.md`](../research/curriculum/05-inquiry-and-evidence.md)).
+
+## When someone is stuck
+
+Every entry in the [stuck library](../stuck/README.md) starts with a
+question to ask yourself, then what to try, then who to ask. This week,
+point people to:
+
+- [Stuck playing](../stuck/stuck-playing.md), for when the agent fixes what you cannot see, a bug keeps returning, or the tools themselves are stuck.
+- [Stuck writing](../stuck/stuck-writing.md), for when the hum, the why, or what comes next will not come.
+
+And the ladder for any of them: name the kind of stuck, write three
+lines (what you tried, what you expected, what you saw), ask the agent
+for a way to understand it rather than the fix, look on the device and
+at the last thing that worked, then your trio, then the teacher. About
+twenty minutes before the trio is a default each person can move.
 
 ## The close
 
