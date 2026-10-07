@@ -1378,6 +1378,22 @@ moves, credited where used). Phase 3: write the lessons in the template, the
 per-session run-of-show defaults and stuck resources on the hub, and the
 evidence map into the credential.
 
+Progress, October 7: all five research notes and the design
+(docs/research/curriculum/00 to 05) are on main. Merged: C1 (stage 00
+and COURSE.md begin with the hum; docs/human-shaped/hum-sort.md), C2
+(docs/templates/LESSON-template.md; stage 01 rewritten onto it), C3
+(docs/stuck/: writing, playing, publishing), C4 (setup for Claude Code,
+Antigravity, and the open path; AGENTS-SHORT.md; Aider and opencode
+configs), C5 (docs/teaching/ as runs of show; runs-of-show.json, all six
+weeks accepted by the site's ShowLib), and C6 on site (new cohorts
+seeded from runs-of-show.json, falling back to curriculum-lib.js; the
+Hum sort board). Building: C7 (site pages and /stuck/), C8 (stages 02
+to 08 on the lesson page). Then C9 (the 20 screenshots on Ben's Mac).
+Waits on Ben: voice review starting with stages 00 and 01, the two
+credential proposals (HUMAN-SHAPED.md as its own evidence; the level
+narrative in the student's words), whether to try the open path on this
+Mac (Ollama), and being signed in for the screenshots.
+
 ## Handoff (October 4, 2026, evening)
 
 Merged and live: G1 to G7, H1 to H6, C0 to C9, R1 to R3, R4's pages, R5 to R8,
