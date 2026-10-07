@@ -69,8 +69,10 @@ One round of write, play, publish, in this order.
    same wish, the one that measures or ranks or optimizes, so you can see
    what your app will have to steer away from.
 3. **Publish: trade it for critique.** Read your statement to your trio,
-   or to one person you trust, and ask for their response. Berger's
-   rules for critique are short: "Be kind; be specific; be helpful," and
+   or to one person you trust, and ask for their response. Ron Berger's
+   rules for critique
+   ([Berger, "Fostering an Ethic of Excellence"](https://jaymctighe.com/wp-content/uploads/2011/04/Ron-Berger-Article.pdf))
+   are short: "Be kind; be specific; be helpful," and
    suggestions go in as questions: "Have you considered...?" Then revise
    once, and keep both versions in your note.
 

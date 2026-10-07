@@ -195,7 +195,7 @@ on your phone, and the last one publishes to a person.
 
 9. **Play: try it the hard way.** Turn on airplane mode and open the app. Run
    a search that should find nothing. Tell the agent what you saw. Every
-   list in this template has a loading, empty, error and offline state,
+   list in this template has a loading, empty, error, and offline state,
    and this is how you find out whether yours are real.
 
 10. **Publish it to one person you talked to.** Send the live address to

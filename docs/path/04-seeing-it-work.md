@@ -1,10 +1,10 @@
 # 04. Seeing it work
 
 **Where you are.** Two platforms run on your own devices, and so far you
-have been the one checking every fix. That stops here. If you are in a
-cohort, this is also the week your app gets a look of its own, so if
-you have not yet done step 10 of stage 03, "Make it look like itself,"
-do it alongside this stage.
+have been the one checking every fix. That stops here. If you have not yet
+done step 10 of stage 03, "Make it look like itself," do it before this
+stage, because in a cohort the look is shown at the session that starts
+this one.
 
 <!-- The question, the first two steps, the step labels, the last step,
 the per-agent lines, and everything between the bar and the last line:

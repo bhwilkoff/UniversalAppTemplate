@@ -59,7 +59,7 @@ the agent bumps the one number on every release, and a test
 
 ## Apple, from a GitHub runner
 
-The Apple apps are built, signed and uploaded by a GitHub Actions
+The Apple apps are built, signed, and uploaded by a GitHub Actions
 workflow (`appstore-build.yml`) running on a released version of macOS
 with a released Xcode. There is a reason you do not do this from your
 own Mac.
@@ -181,7 +181,7 @@ form.
 
 ## Working with your agent
 
-This week leads with publish. The steps are one round of write, play,
+This stage leads with publish. The steps are one round of write, play,
 publish: the first two come before the agent is open, the middle ones
 are play, with the agent and on devices, and the last one is someone
 else holding your app.
