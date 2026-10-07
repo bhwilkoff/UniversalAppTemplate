@@ -87,6 +87,16 @@
         { title: 'Play', hint: 'What happened when you used it on a real device?' },
         { title: 'Publish', hint: 'Who will play with it next, and what did they tell you?' }
       ] },
+    // Hum sort (curriculum design, week 1): Ben's own eight examples from
+    // his piece on human-shaped problems (October 6, 2026, DECISIONS.md),
+    // shortened to labels, and his closing contrast as the two sides.
+    { key: 'hum', name: 'Hum sort', line: 'Eight problems and your own, sorted into human-shaped and computer-shaped.',
+      frames: [
+        { title: 'To sort', hint: 'Time to read books every day\nScreen-free ideas for my child and me\nThe news, as a story of what I believe\nMy beliefs, matched to my ballot\nNegative sentiment about a public figure\nThe cheapest grocery delivery\nEvery conversation, categorized\nThe neighborhoods with the best candy' },
+        { title: 'Human-shaped', hint: 'The world as interrelated stories to be told, experienced, and added to.' },
+        { title: 'Computer-shaped', hint: 'The world as disparate data points to be aggregated, quantified, and leveraged.' },
+        { title: 'Mine', hint: 'Write the hum in your own life, then sort it. Not sure yet is a fine place to start.' }
+      ] },
     { key: 'questions', name: 'The three questions', line: 'Where is it going, how is it going, and what is next.',
       frames: [
         { title: 'Where is it going?', hint: '' },
@@ -143,13 +153,18 @@
   }
 
   // Words broken into lines of at most `width` characters.
+  // Wraps each line the words already have (a hint may list things, one
+  // to a line) to the frame's width.
   function wrap(words, width) {
-    var lines = [], cur = '';
-    String(words).split(/\s+/).forEach(function (w) {
-      if (cur && (cur + ' ' + w).length > width) { lines.push(cur); cur = w; }
-      else cur = cur ? cur + ' ' + w : w;
+    var lines = [];
+    String(words).split('\n').forEach(function (para) {
+      var cur = '';
+      para.split(/\s+/).filter(Boolean).forEach(function (w) {
+        if (cur && (cur + ' ' + w).length > width) { lines.push(cur); cur = w; }
+        else cur = cur ? cur + ' ' + w : w;
+      });
+      if (cur) lines.push(cur);
     });
-    if (cur) lines.push(cur);
     return lines.length ? lines : [''];
   }
 
