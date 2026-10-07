@@ -1,5 +1,12 @@
 # 07. Raising the ceiling
 
+<!-- Rebuilt by the method of curriculum research note 06
+(docs/research/curriculum/06-instructional-design.md, section 4), which
+Ben approved on October 7, 2026: designed backward from the "Be ready to"
+line, with Ben's own wants and his stage 00 questions as the models and
+criteria, a log kept while using the app, and a rough version watched in
+real hands. Written by Claude, awaiting Ben's review. -->
+
 **Where you are.** Your app is shipped, Pulse is watching it, and you use
 it every day. Using it is where the next feature comes from.
 
@@ -204,8 +211,13 @@ for, and the last one shows the feature and the reason it exists.
    > contrast/high-interest videos that are visually interesting and that
    > autoplays in the background.
 
-   Write the want down in your notes the moment you have it, in those
-   terms.
+   Both of mine name the moment, what I was doing, and what was missing.
+   Use them as your models. For a week, keep the same kind of log you kept
+   before week 1, while you use your own app: each time you reach for
+   something it does not do, write the moment, what you were doing, and
+   what was missing, the moment it happens (an event-based diary study,
+   [Kim Flaherty, "Diary Studies," Nielsen Norman Group, March 29, 2024](https://www.nngroup.com/articles/diary-studies/)).
+   At the end of the week, choose the want that came back most often.
 
 4. **Play: ask for research before code.** Ask whether it is possible, on
    which platforms, and what it would cost, including whether it needs
@@ -216,8 +228,9 @@ for, and the last one shows the feature and the reason it exists.
    > to take advantage of SharePlay and synchronous viewing of movies
    > together using Apple's API's and version 27 platform features?
 
-   Read the answer against the four questions from stage 00 before you
-   say yes.
+   Read the answer against the three questions you asked of the idea in
+   stage 00, starting with "Should it exist at all?", before you say
+   yes.
 
 5. **Play: say build it, everywhere it can go.** When the research says yes,
    ask for the full feature on every platform that can have it, and an
@@ -249,8 +262,10 @@ for, and the last one shows the feature and the reason it exists.
 8. **Publish: put a rough version in front of the people it is for.** Before the
    next big feature is finished, ask the agent for a working rough
    version you can hand to two or three of the people you named in stage
-   00. Watch them use it, write down what they say in their words, and
-   send it as a round. Then tell them what changed because of them.
+   00. Watch them use it the way you watched in stage 05: they say out
+   loud what they expect, and you do not help. Write down what they say
+   in their words, and send it as a round. Then tell them what changed
+   because of them.
 
 9. **Play: check the older device.** Open the app on your oldest supported
    device and make sure it says, in a sentence, what it cannot do,
@@ -263,7 +278,9 @@ for, and the last one shows the feature and the reason it exists.
 
 11. **Publish: show the feature, and why it exists.** Show it to your
     group, or at the cohort's last session, on the device it was made
-    for. Say one thing someone else changed about it. Then, with the
+    for. Say one thing someone else changed about it, and ask the group
+    for feedback by Ron Berger's rules: kind, specific, and helpful
+    ([Berger, "Fostering an Ethic of Excellence"](https://jaymctighe.com/wp-content/uploads/2011/04/Ron-Berger-Article.pdf)). Then, with the
     agent closed, write two sentences in your note: why you decided it
     should exist at all, and what it cost.
 

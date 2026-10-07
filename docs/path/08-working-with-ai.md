@@ -9,7 +9,12 @@ the per-agent lines, and everything between the bar and the last line:
 written by Claude, awaiting Ben's review (curriculum C8, the lesson page
 template in docs/templates/LESSON-template.md). The bar's opening words
 changed from "When you are done with the stages," to "When you are done
-with the path," which is what humanshaped.org's path pages read. -->
+with the path," which is what humanshaped.org's path pages read. Rebuilt
+by the method of curriculum research note 06 (docs/research/curriculum/
+06-instructional-design.md, section 4), which Ben approved on October 7,
+2026: designed backward from the "Be ready to" line, with Ben's Archive
+Watch case study as the model of a value tied to a decision, and the
+declaration shown to everyone, guests welcome. -->
 **The question.** What did this app teach you that your next app, and
 the next builder, should not have to learn again?
 
@@ -261,7 +266,13 @@ agent, and the last one shows your app and your declaration to everyone.
    yourself. Then ask which of your rules are now specific enough to
    become checks, and have it write them.
 
-9. **Write: find the decision each value changed.** Go through your values one
+9. **Write: find the decision each value changed.** First read the
+   September section of my
+   [Archive Watch case study](../human-shaped/case-study-archive-watch.md),
+   "nine platforms, and the values written down," as a model: notice
+   that the $0 rule is tied to a dated thing I refused to build (the paid
+   voice server, September 20), and that the section ends with values
+   climbing "from a reason, to a standing instruction, to a test." Then go through your own values one
    at a time and name a decision it changed: something you built
    differently, or did not build, because of it. A value that never
    changed a decision is decoration. Rewrite it until it does work, or
@@ -276,7 +287,13 @@ agent, and the last one shows your app and your declaration to everyone.
 
 11. **Publish: show it to everyone, guests welcome.** At the cohort's
     last session, show your app on the device it was made for, your
-    `HUMAN-SHAPED.md`, and one value with the decision it changed. Then,
+    `HUMAN-SHAPED.md`, and one value with the decision it changed. Ask
+    the room, guests included, for one kind, specific, and helpful note
+    by Ron Berger's rules
+    ([Berger, "Fostering an Ethic of Excellence"](https://jaymctighe.com/wp-content/uploads/2011/04/Ron-Berger-Article.pdf)).
+    A public product shown to people beyond the cohort, and a reflection
+    on it, are what project-based learning ends with
+    ([PBLWorks, Gold Standard Project Design Elements](https://www.pblworks.org/what-is-pbl/gold-standard-project-design)). Then,
     with the agent closed, write two sentences in your note: what is
     enough about this version, for now, for the people you named in stage
     00, and what waits, written down rather than built.

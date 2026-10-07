@@ -17,39 +17,67 @@ worth more than anything the builder could say about it.
 
 ## The move and the question
 
-*Written by Claude, awaiting Ben's review (curriculum milestone C5, October 7, 2026).*
+*Written by Claude, awaiting Ben's review (rebuilt by the method of
+curriculum research note 06, October 7, 2026).*
 
-**Publish.** This week leads with publishing: the app leaves the builder's hands, and the person holding it tells them what to write next.
+**Publish.** This week leads with publishing: the app leaves the
+builder's hands, and the person holding it tells them what to write
+next.
 
-The question the whole session turns on: **What happens when someone I did not build it with holds it?**
+The question the whole session turns on, in plain words: **What happens
+when someone you did not build it with holds your app, and what does an
+honest number say about it?**
 
-Every session is one round of Write, Play, Publish at a larger size,
-the same three moves as stage 00, and the principles decide what gets
-written, played with, and published
-([`00-curriculum-design.md`](../research/curriculum/00-curriculum-design.md)).
+The session is designed backward from the week's bring-back
+([note 06](../research/curriculum/06-instructional-design.md), section 4):
+the app in someone else's hands, what they did first beside the guess
+the student wrote, one change made because of it, and one honest number
+taken back to a person. Ben's own material is what students reason with
+tonight: the forty-one versions Archive Watch had verified and shipped to
+nobody (stage 05), and the three rules Pulse follows for an honest
+number (stage 06). Neither is an answer to repeat. Each is a test the
+student holds their own work to.
+
+Every session is one round of Write, Play, Publish at a larger size, the
+same three moves as stage 00, and the principles decide what gets
+written, played with, and published.
 
 ## The run of show
 
 | Minutes (75) | Scene | Kind | What happens |
 |---|---|---|---|
-| 0-7 | Arrive | Talk | One line in the chat: shipped or stuck. Then what I heard in last week's answers, and what I changed because of it. |
-| 7-37 | Show what you brought back | Rehearsal rooms | Groups of three. The room's prompt: "Show the app on someone else's device, or tell us what they said." |
-| 37-40 | Break | Break |  |
-| 40-47 | One value at work | Presenter | One decision a value changed this week, and what it cost. Then the one thing I heard across groups. The audience: "Listen for the value at work, and what it cost." |
-| 47-62 | Write, play, publish, this week | Design stage | Fill in your own week: what you wrote, what you played with, and who you published to. On the board: *Write, play, publish*. |
-| 62-70 | Start | Reflection | Write down one thing you wanted from your own use of the app this week. Then: "What is the first prompt you will send this week?" |
-| 70-73 | What did they notice first? | Question | "Rank what the other person noticed first." (a ranking) |
-| 73-75 | Handing it over | Question | "In one word, how did it feel to hand it over?" (a word or a few) |
+| 0-5 | Arrive | Talk | One line in the chat: who held your app this week, or what is in the way. Then what I heard in last week's answers. |
+| 5-8 | Forty-one versions shipped to nobody | Talk | Archive Watch on September 13, 2026: 1.42.53 in the App Store, 1.42.94 in the repository. |
+| 8-11 | Verified or shipped? | Question | "What is the difference between a fix that is verified and a fix that is shipped?" (in their own words) |
+| 11-35 | What they did first | Rehearsal rooms | Groups of three. The room's prompt: "Show what the person did first, beside the guess you wrote before they held it." |
+| 35-38 | Break | Break |  |
+| 38-42 | What makes a number honest | Talk | Pulse's three rules, quoted from `docs/PRODUCT-PULSE.md`. |
+| 42-52 | Hold your number to the rules | Design stage | Each person's one number, its source, and three questions. On the board: *Blank*. |
+| 52-57 | Plan to take it back | Reflection | Who you will show the number to, and the two questions you will ask them. |
+| 57-64 | One value at work | Presenter | One decision a value changed this week, and what it cost. The audience: "Listen for the value at work, and what it cost." |
+| 64-69 | Start | Reflection | The log for stage 07 begins tonight: the moment, what you were doing, and what was missing. |
+| 69-72 | What did they notice first? | Question | "Rank what the other person noticed first." (a ranking) |
+| 72-75 | What is still muddy? | Question | "What is still muddy?" (in their own words) |
 
-**In the rehearsal rooms,** each builder's turn runs these scenes, 10 minutes in all: their question (1), show it, and one decision (4), one clarifying question (1), the three questions (3), what comes next (1). The room's prompt is on screen the whole time.
+**In the rehearsal rooms,** each builder's turn runs these scenes, 8
+minutes in all: your guess, and what they did (2), what is strong in it
+(1), "Have you considered...?" (3), one change you will make (2). The
+critique follows Ron Berger's rules: be kind, be specific, be helpful,
+and offer suggestions as questions
+([Berger, "Fostering an Ethic of Excellence"](https://jaymctighe.com/wp-content/uploads/2011/04/Ron-Berger-Article.pdf)).
 
 These are the scenes a new cohort is made with on humanshaped.org, from
 [`runs-of-show.json`](runs-of-show.json), and every one of them can be
-changed in the class builder, before the session and during it. To fit 60 or 90 minutes, use the table in the [guides' index](README.md).
+changed in the class builder, before the session and during it. To fit
+60 or 90 minutes, use the table in the [guides' index](README.md).
 
 **What to watch for tonight.**
 
-- Anyone who has not published to another person yet. Visit every group, and ask them privately what is in the way.
+- Anyone who has not handed the app to another person yet. Visit every
+  group, and ask them privately what is in the way.
+- A guess that matched exactly what the person did. It usually means the
+  guess was written after, or the person was helped.
+- A number nobody questioned, especially a zero.
 
 ## The opening
 
@@ -64,9 +92,9 @@ changed in the class builder, before the session and during it. To fit 60 or 90 
 The cohort's bring-back: the app on someone else's device, and what
 that person said. The stages' own lines:
 
-> Be ready to show your app in a store, installed on a device you did
-> not build it on, and to explain one thing you rewrote in its listing,
-> and why.
+> Be ready to show your app installed on a device you did not build it
+> on, to say what that person did first, and, if it is in a store, to
+> explain one thing you rewrote in its listing, and why.
 
 > Be ready to show one number Pulse read correctly, one reader that told
 > you honestly it could not, and what your loop finished, and to explain
@@ -95,19 +123,28 @@ yet" to those tonight is ordinary and costs nothing.
 number nobody questioned, especially a zero. A store listing the agent
 wrote that the student has not read aloud.
 
-## On the design stage: your week, in three moves
+## On the design stage: an honest number
 
-*Written by Claude, awaiting Ben's review (curriculum milestone C5, October 7, 2026).*
+*Written by Claude, awaiting Ben's review (note 06, October 7, 2026).*
 
-Put the board on the main stage from the *Write, play, publish*
-template. Everyone fills in their own week in the three columns: what
-they wrote down, what they played with on a device, and who they
-published to and what that person said. Give it eight minutes alone,
-then read across the board together.
+First, read Pulse's three rules aloud, in Ben's words from
+[`docs/PRODUCT-PULSE.md`](../PRODUCT-PULSE.md): "A reader that cannot
+read says so, and never renders as a zero." "A missing column is null,
+never zero." "Zero is drawn, absence is written." They came from two
+days when Archive Watch's dashboard drew a Mac at zero and a Roku as a
+flat line (the story at the top of [stage 06](../path/06-keeping-it-running.md)).
 
-**What to talk about.** The publish column. Whoever handed the app to
-someone this week has the most to teach tonight, and whoever has not
-yet has the clearest next step.
+Then put a blank board on the main stage. Each person writes their one
+number and where it comes from, and under it answers three questions:
+if the source could not be read, would it say so? Is a missing value
+shown as empty, not zero? Would you be tempted to make it go up for its
+own sake? The third is Goodhart's law in Marilyn Strathern's words,
+"When a measure becomes a target, it ceases to be a good measure"
+("'Improving ratings': audit in the British University system,"
+*European Review* 5, no. 3, 1997). If the answer to it is yes, they
+choose another number.
+
+**What to talk about.** The number someone changed tonight, and why.
 
 ## A prompt to read, in a 90-minute session
 
@@ -135,20 +172,26 @@ because that is where stage 08 starts.
 ## Start
 
 Everyone begins [stage 07](../path/07-raising-the-ceiling.md) the way it
-begins: with a want noticed while using the app, written down in their
-note in their own terms. Then they ask the agent for research before
-code (whether it is possible, on which platforms, and what it would
-cost), and send that before they leave.
+begins: a log kept while using their own app, each time they reach for
+something it does not do (the moment, what they were doing, and what was
+missing). And before next week, each person shows their number to the
+person they named tonight, and asks what it means to them and what it
+misses.
 
 ## The check
 
-The question scenes at the end of the run of show, answered privately, and
-shown on the main stage without names only if you choose:
+The question scenes at the end of the run of show, answered privately,
+and shown on the main stage without names only if you choose:
 
-1. **Rank what the other person noticed first.** (a ranking). Choices: What it is for; How it looks; What it does first; Something that broke; How fast it is.
-2. **In one word, how did it feel to hand it over?** (a word or a few).
+1. **Rank what the other person noticed first.** (a ranking). Choices:
+   What it is for; How it looks; What it does first; Something that
+   broke; How fast it is.
+2. **What is still muddy?** (in their own words).
 
-**Also prepared,** from this guide's first version, for when you want the stage's own question instead: "What is one thing about your app you can no longer see by using it yourself, and how will you find out about it?"
+**Also prepared,** in the cohort's question bank: "In one word, how did
+it feel to hand it over?" and "What is one thing about your app you can
+no longer see by using it yourself, and how will you find out about
+it?"
 
 Good answers name something real (a crash on a device they do not own,
 what strangers say about it, a store's numbers) and an honest way to
@@ -159,9 +202,9 @@ word.
 
 *Written by Claude, awaiting Ben's review (curriculum milestone C5, October 7, 2026).*
 
-**The task.** Get the app onto a device you did not build it on, through a store, a test track, or a direct share. Read one honest number.
+**The task.** Get the app onto a device you did not build it on, through a store, a test track, or a direct share, watch one person use it without helping, and ship one change because of what they did. Read one honest number, hold it to Pulse's rules, and take it back to a person.
 
-**Evidence a person can open.** The install link and what the person did first; the number.
+**Evidence a person can open.** The install link; what the person did first, beside the guess written before; the change that shipped because of it; the number, its source, and what the person said it misses.
 
 **On the credential.** A further platform adds a level. Recognitions: "Got it onto someone else's device," "Asked for feedback and used it." Students do the thing itself, and what they
 make is the evidence; nobody writes a report about it
