@@ -3,6 +3,13 @@
 *Curriculum design, phase 2. Written by Claude from the five research
 notes beside this page, October 7, 2026, awaiting Ben's review.*
 
+> **Superseded for week 1, October 7, 2026.** Ben rejected this design's
+> week 1 ("the hum" as an instruction, and the hum sort). Week 1, and the
+> method for every stage, now come from
+> [note 06, instructional design](06-instructional-design.md), which Ben
+> approved (site `DECISIONS.md`, "Note 06 is the basis for the
+> curriculum"). Where this page and note 06 disagree, note 06 wins.
+
 This page turns five research notes into one curriculum: the five weeks
 of a cohort, the shape of every lesson, the default live session for
 each week, the tasks that leave evidence for the credential, a library

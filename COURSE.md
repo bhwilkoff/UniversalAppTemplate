@@ -47,14 +47,20 @@ make.
 Every student builds one real app of their own choosing, for a
 human-shaped problem and for people they can actually name. Not a
 tutorial app, but something they want to exist, and every week's work is
-done on that app. A human-shaped problem is one they have lived with: the
-gentle hum of worry or concern about an area of their life, unsolved for
-months or even years, that their current tools and resources are not up
-to
-([examples of each shape](docs/human-shaped/computer-shaped-problems.md#computer-shaped-and-human-shaped)).
-Nobody arrives with the app already chosen. Week 1 begins with finding
-the hum, sorting it, and naming who else hears it, before anyone writes a
-word about an app ([Sort the hum](docs/human-shaped/hum-sort.md)).
+done on that app. A human-shaped problem is one they have lived with,
+in my words "something that has gone unsolved for months or even years,"
+and "something that you cannot do yourself" with the tools and resources
+they have now
+([my definition, and examples of each shape](docs/human-shaped/computer-shaped-problems.md#computer-shaped-and-human-shaped)).
+Nobody arrives with the app already chosen.
+<!-- Written by Claude, awaiting Ben's review (note 06). -->
+Week 1 is for choosing the problem well, before anyone writes a word
+about an app: a five-day noticing log, five candidates held to the ten
+tests drawn from my writing, a problem statement written in the same
+form as my published examples and revised after critique, and two
+conversations with people who have the problem
+([stage 00](docs/path/00-why-we-build.md#choosing-the-problem), designed
+from [curriculum research note 06](docs/research/curriculum/06-instructional-design.md)).
 
 ## Five weeks, and a week before them
 
@@ -71,8 +77,8 @@ Each week in the table links to the guide for its session, in
 
 | Week | Leads with, and the week's question | Stages | Where the app gets to | What they bring back |
 |---|---|---|---|---|
-| [Cohort Prep](docs/teaching/before.md) | **Publish.** What do I need in order to build at all? | [Getting set up](docs/path/setup.md) | A GitHub account, a copy of the template, an AI agent (Claude or Gemini) connected to it, and a desktop computer set up to build and test both on the computer and in the cloud. The first win: their own app's address open on their phone, showing its name. | The address, on their phone, and one thing that hums in their life. |
-| [1](docs/teaching/week-1.md) | **Write.** What has hummed in my life for months, and who else hears it? | Find your hum, 00. Why we build, 01. The first prototype | A hum chosen from three and sorted, its computer-shaped twin, two people who hear it too, an agent that knows why the app exists and who it is for, in the student's words, and one platform live at a real address with real data, after two rounds of feedback from their own phone and one person who hears the same hum opening it. | The hum and its twin, the why, the one rule, and the app on their phone with one thing the real data taught them and what the first other person did with it. |
+| [Cohort Prep](docs/teaching/before.md) | **Publish.** What do I need in order to build at all? | [Getting set up](docs/path/setup.md) | A GitHub account, a copy of the template, an AI agent (Claude or Gemini) connected to it, and a desktop computer set up to build and test both on the computer and in the cloud. The first win: their own app's address open on their phone, showing its name. | The address, on their phone, and the first days of their noticing log. |
+| [1](docs/teaching/week-1.md) | **Write.** What problem in my own life is worth building something for, and who else has it? | 00. Why we build, 01. The first prototype | A problem chosen from five candidates held to the ten tests, a problem statement in their own words revised after critique and two real conversations, why a computer cannot simply solve it, an agent that knows why the app exists and who it is for, in the student's words, and one platform live at a real address with real data, after two rounds of feedback from their own phone and one of the people they talked to opening it. | The problem statement and the version before it, what they heard in their conversations, the why, the one rule, and the app on their phone with one thing the real data taught them and what the first other person did with it. |
 | [2](docs/teaching/week-2.md) | **Play.** What is still wrong, and how do I say it so it gets fixed? | 02. The shape of an app, 03. Going native | A parity matrix the student has read and trimmed, and a second platform running on their own device. | One verb shown on both platforms, each in its own idiom, and one cell their own eyes proved wrong. |
 | [3](docs/teaching/week-3.md) | **Play, then write.** How do I know it works, and what does it look like when it comes from its why? | 04. Seeing it work, and making it look like itself | The agent testing on the student's device, and a look for the app that comes from its own why rather than the template's defaults. | A screenshot that proved a fix, and the app's own look beside the template's. |
 | [4](docs/teaching/week-4.md) | **Publish.** What happens when someone I did not build it with holds it? | 05. Shipping, 06. Keeping it running | The app installed on a device the student did not build it on, through a test track, a direct share, or a store, and one honest number about it. | The app on someone else's device, and what that person said. |
@@ -91,8 +97,12 @@ think of someone's work before they know who is in the room. [Getting
 set up](docs/path/setup.md) takes each student from no GitHub account to
 their own app's address on their phone, and the setup session is where
 anything still stuck gets unstuck, in front of people who will need the
-same answer. It is also when each student starts a list of what hums in
-their life, so that week 1 begins with more than one to choose from.
+same answer. It is also when each student starts a five-day noticing
+log, one line whenever they wished something worked differently, gave up
+on something they care about, did something the long way because nothing
+helped, or saw someone they know struggle with the same thing, so that
+week 1 begins with real material to choose from
+([stage 00, Notice before you choose](docs/path/00-why-we-build.md#notice-before-you-choose)).
 
 It is also when each student meets their group and hears three things
 said aloud. The first is the four rules below for how we talk to one
