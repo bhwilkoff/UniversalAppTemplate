@@ -32,7 +32,12 @@ for them.
 5. **The builder decides what happens next.** Write the review to a
    file and stop. Do not commit it, post it, or change the app because
    of it unless the builder asks. Tell them they can keep it private,
-   commit it, or share it with their cohort.
+   commit it, or share it with their cohort. In Claude Code, write the
+   file and show its path. In Antigravity, also return the review as an
+   artifact, so the builder can comment on it line by line before
+   deciding anything. With a small local model, keep each principle's
+   part short, and write the file one principle at a time if the
+   context runs out.
 6. **Their voice, not yours.** Never draft their `HUMAN-SHAPED.md`
    answers or the words in their app (principle 13). You may point at
    evidence they could link, and you may offer a sample prompt for the

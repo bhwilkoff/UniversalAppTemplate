@@ -115,6 +115,43 @@ two-click setting. So now, **a negative finding says how it was found
 and when it should be checked again.** An absence you searched for once
 is weak evidence, and consoles change.
 
+## Give it a check, and keep git as the undo
+
+*Written by Claude, awaiting Ben's review.*
+
+Anthropic's own advice for Claude Code starts with one line: "Give Claude
+a check it can run: tests, a build, a screenshot to compare. It's the
+difference between a session you watch and one you walk away from"
+([best practices](https://code.claude.com/docs/en/best-practices)).
+Antigravity asks for the same thing in its own way, by showing you its
+plan and the screenshots its browser took as artifacts you can comment
+on ([Antigravity, browser](https://antigravity.google/docs/ide/browser/)).
+A check is the honest log's partner: it is how **fixed** turns into
+**verified** without you having to be the one who looks every time. So
+when you ask for something, ask for its check too, and ask the agent to
+show you what the check returned rather than telling you it passed.
+
+Both tools can also take a step back, and both are careful about what
+that means.
+
+- **In Claude Code,** `Esc` twice or `/rewind` takes the conversation,
+  the code, or both back to an earlier prompt. But "Checkpoints only
+  track changes made through Claude's file editing tools," and Anthropic
+  says plainly, "This isn't a replacement for git." After two
+  corrections that did not take, `/clear` and a better first request
+  usually do more than a third correction
+  ([best practices](https://code.claude.com/docs/en/best-practices)).
+- **In Antigravity,** `/rewind` (also `/undo`) goes back to an earlier
+  checkpoint, and since September 30, 2026 it can take back only the
+  conversation and leave your files alone. `/fork` lets you try
+  something without losing where you were
+  ([changelog](https://antigravity.google/docs/changelog/)).
+
+**Checkpoints are not git.** A commit is the only undo that covers every
+change, whoever or whatever made it, so ask the agent to commit each
+small step that works. The research behind this section is
+`docs/research/curriculum/03-claude-code-and-antigravity.md`.
+
 ## Why loops depend on all of this
 
 The loops from stage 06 are where memory matters most, because a loop
