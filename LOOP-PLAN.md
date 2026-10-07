@@ -1350,6 +1350,32 @@ student).
   lines and draft notes removed, start page links to the kits instead of
   retelling them, repeated status and GitHub lines cut.
 
+## The curriculum, in a major way (Ben, October 7, 2026)
+
+Ben's brief (the /loop of October 7): build the full step-by-step
+curriculum for going from a human-shaped problem to an app that tries to
+solve it, including the template for each live class that is made when a
+cohort is created, with resources for people who get stuck. Mine Ben's
+own apps and process for the chunking; research exhaustively who else is
+doing aligned work; learn Claude Code and Google Antigravity best
+practice properly; explore an open-source, open-weights, on-device
+pathway for people who avoid every major AI company; pull or make
+screenshots (Antigravity and the Claude app are on Ben's Mac); lean on
+Ben's Educational Model Spec (~/Documents/GitHub/educational-model-spec);
+questions and inquiry at the center of every lesson; Ben's voice, as
+simple as possible for novices, with extensions for going deeper; improve
+the template and update the hub as we go; cite every source; and make
+the assignments performance-based, each one producing evidence for the
+credential.
+
+Phase 1, research (October 7, five agents, notes in the template at
+docs/research/curriculum/): 01 mining Ben's process and apps, 02 the
+landscape of aligned work, 03 Claude Code and Antigravity, 04 the open
+pathway, 05 inquiry and evidence. Phase 2: a curriculum architecture
+from those notes. Phase 3: write the lessons in the template, the
+per-session run-of-show defaults and stuck resources on the hub, and the
+evidence map into the credential.
+
 ## Handoff (October 4, 2026, evening)
 
 Merged and live: G1 to G7, H1 to H6, C0 to C9, R1 to R3, R4's pages, R5 to R8,
