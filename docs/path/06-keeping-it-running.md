@@ -1,5 +1,12 @@
 # 06. Keeping it running
 
+<!-- Rebuilt by the method of curriculum research note 06
+(docs/research/curriculum/06-instructional-design.md, section 4), which
+Ben approved on October 7, 2026: designed backward from the "Be ready to"
+line, with Pulse's own rules and the story at the top as the model of an
+honest number, and the number taken back to a real person. Written by
+Claude, awaiting Ben's review. -->
+
 **Where you are.** Your app is in a store, and strangers are installing
 it on devices you will never see.
 
@@ -261,12 +268,29 @@ your app, and the last one takes one honest number back to a person.
    one numbered list at a time, with the next one drafted in your note
    while the limit resets.
 
-8. **Publish: take one honest number back to the people.** Choose one
-   number Pulse read correctly, and one reader that told you it could
-   not read. Show both to the person from stage 05 or to your group, and
-   ask what the number means to them. Write down what they said. Then,
-   with the agent closed, write two sentences in your note: one thing
-   you decided in this stage, and what it cost.
+8. **Write: hold your number to Pulse's own rules.** Reread the story at
+   the top of this page: a Mac that read zero because nothing knew where
+   its sales were filed, and a Roku drawn as a flat line because a
+   missing column was read as zero. Those two days gave Pulse its rules,
+   and they are your test. In `docs/PRODUCT-PULSE.md`: "A reader that
+   cannot read says so, and never renders as a zero," "A missing column
+   is null, never zero," and "Zero is drawn, absence is written." Choose
+   one number Pulse read correctly, and one reader that told you it
+   could not read, and check both against those three rules. Then ask
+   yourself one more thing about the number you chose: would you be
+   tempted to make it go up for its own sake? A number you would chase
+   stops telling you the truth (Marilyn Strathern's statement of
+   Goodhart's law, "When a measure becomes a target, it ceases to be a
+   good measure," in "'Improving ratings': audit in the British
+   University system," *European Review* 5, no. 3, 1997). If you would,
+   choose another.
+
+9. **Publish: take one honest number back to the people.** Show both,
+   the number and the reader that could not read, to the person from
+   stage 05 or to your group, and ask two things: what the number means
+   to them, and what it misses about them. Write down what they said, in
+   their words. Then, with the agent closed, write two sentences in your
+   note: one thing you decided in this stage, and what it cost.
 
 Where the agents differ, one line each
 ([curriculum research, 03 and 04](../research/curriculum/03-claude-code-and-antigravity.md)):

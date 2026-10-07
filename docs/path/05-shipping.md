@@ -1,5 +1,11 @@
 # 05. Shipping
 
+<!-- Rebuilt by the method of curriculum research note 06
+(docs/research/curriculum/06-instructional-design.md, section 4), which
+Ben approved on October 7, 2026: designed backward from the "Be ready to"
+line, with Ben's own release notes as criteria and a watched first use
+with a real person. Written by Claude, awaiting Ben's review. -->
+
 **Where you are.** Your app runs on your devices, and the agent can prove
 its own fixes. Nobody else can install it yet, and it turns out that
 those are two different kinds of done.
@@ -232,6 +238,11 @@ else holding your app.
    > The what's new text should be different by platform because the
    > features are different.
 
+   Use those two complaints of mine as your test: does any line give
+   away that a machine wrote it, and does each platform's text describe
+   what that platform actually has? Read your listing against both, and
+   change what fails.
+
 7. **Play: do the credential step together.** The build and submission
    run in the cloud and need keys from your accounts. Ask the agent to
    take you to the exact screen for each one. This is how I did it in
@@ -261,12 +272,27 @@ else holding your app.
     store or from your shared link, on a device you did not build it on,
     and install it. That, not the green checkmark, is shipped.
 
-11. **Publish: watch one person who hears your hum hold it.** Send the
-    link to one of the two people you named in stage 00, and watch them
-    install it and use it without helping. Write down what they did
-    first, and what they said, in their words, beside the guess you wrote
-    in step 1. Then, with the agent closed, write two sentences in your
-    note: one thing you decided in this stage, and what it cost.
+11. **Publish: watch one person you talked to in stage 00 hold it.** Send
+    the link to one of the two people you talked to in stage 00, and
+    watch them install it and use it. Ask them to say out loud what they
+    are looking at, what they expect, and what surprises them, and do
+    not help, even when they get stuck: their getting stuck is the
+    finding. (This is the think-aloud method, which Nielsen Norman Group
+    calls the most useful single tool in usability work,
+    [Jakob Nielsen, "Thinking Aloud: The #1 Usability Tool," January 16, 2012](https://www.nngroup.com/articles/thinking-aloud-the-1-usability-tool/);
+    Steve Krug's *Rocket Surgery Made Easy*, New Riders, 2010, makes the
+    same case for doing it with one person at a time.) Write down what
+    they did first, and what they said, in their words, beside the guess
+    you wrote in step 1.
+
+12. **Publish: show your group, then change one thing.** Show your group
+    what the person did first and your guess beside it. Ask for feedback
+    by Ron Berger's rules: be kind, be specific, be helpful
+    ([Berger, "Fostering an Ethic of Excellence"](https://jaymctighe.com/wp-content/uploads/2011/04/Ron-Berger-Article.pdf)).
+    Decide one change from what you saw and heard, ask the agent to make
+    it, and ship it again. Then, with the agent closed, write two
+    sentences in your note: one thing you decided in this stage, and what
+    it cost.
 
 Where the agents differ, one line each
 ([curriculum research, 03 and 04](../research/curriculum/03-claude-code-and-antigravity.md)):
@@ -283,8 +309,9 @@ Where the agents differ, one line each
   ([the open pathway](../research/curriculum/04-open-pathway.md)).
 
 **When you are ready to move on,** someone else has your app on their
-own device, from a link you shared or from a store, and what they did
-first is written in your note beside your guess. Once they have it, you
+own device, from a link you shared or from a store, what they did first
+is written in your note beside your guess, and one change you made
+because of it has shipped. Once they have it, you
 can no longer see everything that happens to it by using it yourself.
 Stage 06 is about seeing the rest.
 

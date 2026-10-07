@@ -18,39 +18,73 @@ grows into a showing for the whole room.
 
 ## The move and the question
 
-*Written by Claude, awaiting Ben's review (curriculum milestone C5, October 7, 2026).*
+*Written by Claude, awaiting Ben's review (rebuilt by the method of
+curriculum research note 06, October 7, 2026).*
 
-**Write, then publish.** This week writes down what the builder learned, so the agent and the next builder keep it, and then publishes the app to everyone, guests welcome.
+**Write, then publish.** This week writes down what the builder learned,
+so the agent and the next builder keep it, and then publishes the app to
+everyone, guests welcome.
 
-The question the whole session turns on: **What did I learn that the next builder should not have to, and is this version enough for its people?**
+The question the whole session turns on, in plain words: **What did you
+learn that the next builder should not have to, and is this version
+enough for its people?**
 
-Every session is one round of Write, Play, Publish at a larger size,
-the same three moves as stage 00, and the principles decide what gets
-written, played with, and published
-([`00-curriculum-design.md`](../research/curriculum/00-curriculum-design.md)).
+The session is designed backward from the week's bring-back
+([note 06](../research/curriculum/06-instructional-design.md), section 4):
+the feature from the student's own use, one value with the decision it
+changed, `HUMAN-SHAPED.md` in their own words, and two sentences on what
+is enough, for now, and for whom. Ben's own material is the model
+students reason with: the night he refused a paid voice server for
+Archive Watch because his apps cost $0 to run, from the September
+section of the [Archive Watch case study](../human-shaped/case-study-archive-watch.md),
+which ends with values climbing "from a reason, to a standing
+instruction, to a test." It is a model of what a value tied to a decision
+looks like, not an answer to copy. A public product, shown to people
+beyond the cohort, with a reflection on it, is how a project ends
+([PBLWorks, Gold Standard Project Design Elements](https://www.pblworks.org/what-is-pbl/gold-standard-project-design)).
+
+Every session is one round of Write, Play, Publish at a larger size, the
+same three moves as stage 00, and the principles decide what gets
+written, played with, and published.
 
 ## The run of show
 
 | Minutes (75) | Scene | Kind | What happens |
 |---|---|---|---|
 | 0-5 | Arrive | Talk | Guests, welcome. The four rules, said once more, for everyone. Then what I heard in last week's answers. |
-| 5-25 | Show what you brought back | Rehearsal rooms | Groups of three. The room's prompt: "Explain every part of your app, even the parts the agent wrote." |
+| 5-8 | A value that changed a decision | Talk | Archive Watch, September 20: the paid voice server refused, and why. |
+| 8-25 | Last look in your trio | Rehearsal rooms | Groups of three. The room's prompt: "Explain every part of your app, even the parts the agent wrote, and one value with the decision it changed." |
 | 25-28 | Break | Break |  |
 | 28-53 | The showing | Presenter | Everyone, about two minutes each: the feature you wanted, and one value with the decision it changed. The audience: "Guests may ask one question each. Listen for what is enough, for now." |
-| 53-63 | The three questions, on the showing | Design stage | Where is it going, how is it going, and what is next, for the apps you just saw. On the board: *The three questions*. |
-| 63-70 | Start | Reflection | The cohort chooses its one lesson to send back to the template. Then everyone sends the first prompt of whatever comes next. Then: "What is the first prompt of whatever comes next?" |
+| 53-61 | The three questions, on the showing | Design stage | Where is it going, how is it going, and what is next, for the apps you just saw. On the board: *The three questions*. |
+| 61-66 | Enough, for now | Reflection | With the agent closed, two sentences: what is enough, for now, for the people you talked to in week 1, and what waits. |
+| 66-70 | Start | Reflection | The cohort chooses its one lesson to send back to the template. Then everyone sends the first prompt of whatever comes next. |
 | 70-73 | What waits | Question | "What waits for the next version?" (in their own words) |
 | 73-75 | What is still muddy? | Question | "What is still muddy?" (in their own words) |
 
-**In the rehearsal rooms,** each builder's turn runs these scenes, 6 minutes in all: their question (1), show it, and one decision (2), one clarifying question (1), the three questions (1), what comes next (1). The room's prompt is on screen the whole time.
+**In the rehearsal rooms,** each builder's turn runs these scenes, 5
+minutes in all: show it, and one decision (2), what is strong in it (1),
+"Have you considered...?" (2). The critique follows Ron Berger's rules:
+be kind, be specific, be helpful, and offer suggestions as questions
+([Berger, "Fostering an Ethic of Excellence"](https://jaymctighe.com/wp-content/uploads/2011/04/Ron-Berger-Article.pdf)).
+Each builder leaves the room with one thing to say differently in the
+showing.
 
 These are the scenes a new cohort is made with on humanshaped.org, from
 [`runs-of-show.json`](runs-of-show.json), and every one of them can be
-changed in the class builder, before the session and during it. Two minutes each in the showing fits about twelve people. With more, use 90 minutes, or hold the showing in two rooms. **At 60 minutes,** give Arrive 4, the groups 15, no break, the showing 20, the board 8, Start 8, and the check 5. **At 90,** give Arrive 5, the groups 24, a five-minute break, the showing 30, the board 12, Start 9, and the check 5.
+changed in the class builder, before the session and during it. If the
+teacher opened this session to guests, the cohort's public page on
+humanshaped.org (/showcase/) is where guests learned when and how to
+come. Two minutes each in the showing fits about twelve people. With
+more, use 90 minutes, or hold the showing in two rooms.
 
 **What to watch for tonight.**
 
-- Whether each student can name what is enough, for now, for the people they named in week 1.
+- A part of the app its builder cannot explain, even one the agent
+  wrote.
+- A value that never changed a decision.
+- Whether each student can name what is enough, for now, for the people
+  they talked to in week 1.
 
 ## The opening
 
@@ -99,7 +133,7 @@ built to be lapped more than once, and the app's page stays open.
 
 ## On the design stage: the three questions, on the showing
 
-*Written by Claude, awaiting Ben's review (curriculum milestone C5, October 7, 2026).*
+*Written by Claude, awaiting Ben's review (note 06, October 7, 2026).*
 
 Put the board on the main stage from the *The three questions*
 template, right after the showing. Everyone, guests included, writes
@@ -136,7 +170,13 @@ whether they believe it.
 
 ## Start
 
-First, the cohort chooses its one lesson to send back to the template:
+Before Start, give everyone five quiet minutes, agent closed, for two
+sentences: what is enough about this version, for now, for the people
+they talked to in week 1, and what waits, written down rather than
+built. Principle 15 is the measure: an app that "brings joy to at least
+one person in the form it ships today" is enough, for now.
+
+Then the cohort chooses its one lesson to send back to the template:
 a prompt that worked, a step that broke, or a correction that kept
 coming up. Offer two or three candidates you saw in the weeks' checks,
 let the cohort choose, and ask who would like to be credited. Then
@@ -146,13 +186,16 @@ a second lap.
 
 ## The check
 
-The question scenes at the end of the run of show, answered privately, and
-shown on the main stage without names only if you choose:
+The question scenes at the end of the run of show, answered privately,
+and shown on the main stage without names only if you choose:
 
 1. **What waits for the next version?** (in their own words).
 2. **What is still muddy?** (in their own words).
 
-**Also prepared,** from this guide's first version, for when you want the stage's own question instead: "What will your agent know at the start of your next app that it did not know in week 1, and where does that knowledge live?"
+**Also prepared,** in the cohort's question bank: "What is enough about
+this version, for now, and for whom?" and "What will your agent know at
+the start of your next app that it did not know in week 1, and where
+does that knowledge live?"
 
 There is no next session to open with what you heard, so this week the
 teacher writes it to the cohort's conversation instead.
@@ -161,9 +204,9 @@ teacher writes it to the cohort's conversation instead.
 
 *Written by Claude, awaiting Ben's review (curriculum milestone C5, October 7, 2026).*
 
-**The task.** Build one feature from your own use. Write a skill and a handoff. Fill in `HUMAN-SHAPED.md`. Decide what is enough, for now.
+**The task.** Build one feature from a want you logged while using your own app, and put a rough version in front of people it is for. Write a skill and a handoff. Fill in `HUMAN-SHAPED.md`, with one value tied to the decision it changed. Show it to everyone. Decide what is enough, for now, and for whom.
 
-**Evidence a person can open.** The feature; the skill; the declaration; the list of what waits.
+**Evidence a person can open.** The feature and the log entry it came from; one thing someone else changed about it; the skill; the declaration; the two sentences on what is enough; the list of what waits.
 
 **On the credential.** Recognitions: "Shared what they learned," "Credited the people and tools behind it," "Found whose work they are building on." Students do the thing itself, and what they
 make is the evidence; nobody writes a report about it
@@ -175,7 +218,7 @@ Every entry in the [stuck library](../stuck/README.md) starts with a
 question to ask yourself, then what to try, then who to ask. This week,
 point people to:
 
-- [Stuck writing](../stuck/writing/README.md), for when the hum, the why, or what comes next will not come.
+- [Stuck writing](../stuck/writing/README.md), for when the problem, the why, or what comes next will not come.
 - [Stuck publishing](../stuck/publishing/README.md), for when you are not ready to show anyone, cannot get it onto another device, or do not know when it is enough.
 
 And the ladder for any of them: name the kind of stuck, write three
