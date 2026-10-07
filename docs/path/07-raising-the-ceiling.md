@@ -3,6 +3,13 @@
 **Where you are.** Your app is shipped, Pulse is watching it, and you use
 it every day. Using it is where the next feature comes from.
 
+<!-- The question, the first two steps, the step labels, the last step,
+the per-agent lines, and everything between the bar and the last line:
+written by Claude, awaiting Ben's review (curriculum C8, the lesson page
+template in docs/templates/LESSON-template.md). -->
+**The question.** What do you want from your app now that you live with
+it, and does it need anything new to give you that?
+
 On September 12, 2026, I asked for something that sounded like it needed
 a server:
 
@@ -161,7 +168,27 @@ build.
 
 ## Working with your agent
 
-1. **Notice the want while using the app.** The best features I built
+This week leads with write, then publishes to everyone. The steps are
+one round of write, play, publish: the first two come before the agent
+is open, the middle ones are play, with the agent and the people it is
+for, and the last one shows the feature and the reason it exists.
+
+1. **Write your first answer.** Before any prompt, answer this stage's
+   question in two or three sentences in your note: the one thing you
+   want most from your app, and whether you think it needs a server, an
+   account, or anything else new. Being wrong is fine. Guessing first is
+   what lets the research in step 4 change your mind (the research on
+   productive failure, gathered in the
+   [curriculum research](../research/curriculum/05-inquiry-and-evidence.md)).
+
+2. **Write your questions.** For five minutes, write as many questions
+   as you can about that want, without stopping to answer or judge any
+   of them. Then mark the one you most want answered by the end of the
+   stage. (These are the Right Question Institute's rules for asking
+   your own questions, also in the
+   [curriculum research](../research/curriculum/05-inquiry-and-evidence.md).)
+
+3. **Write: notice the want while using the app.** The best features I built
    started as a sentence like this one, typed on September 14 while
    Archive Watch played on the TV beside me:
 
@@ -180,7 +207,7 @@ build.
    Write the want down in your notes the moment you have it, in those
    terms.
 
-2. **Ask for research before code.** Ask whether it is possible, on
+4. **Play: ask for research before code.** Ask whether it is possible, on
    which platforms, and what it would cost, including whether it needs
    a server. On August 31, wanting people to be able to watch Archive
    Watch together:
@@ -192,14 +219,14 @@ build.
    Read the answer against the four questions from stage 00 before you
    say yes.
 
-3. **Say build it, everywhere it can go.** When the research says yes,
+5. **Play: say build it, everywhere it can go.** When the research says yes,
    ask for the full feature on every platform that can have it, and an
    honest row in the parity matrix for the ones that cannot. Seven
    minutes after that research question, once the answer was yes:
 
    > I'd like you to fully implement SharePlay for all Apple platforms.
 
-4. **Hold the bars.** When the agent reaches for a custom control where
+6. **Play: hold the bars.** When the agent reaches for a custom control where
    the platform has one, or a paid server where none is needed, stop it.
    On August 27, the iPhone app grew its own captions button instead of
    using the one the system already provides:
@@ -208,7 +235,7 @@ build.
    > using the build in captions UI on iPhone [...] The goal is native
    > support for all features using native UI and APIs
 
-5. **Use it for real, then critique.** Use the feature the way it is
+7. **Play: use it for real, then critique.** Use the feature the way it is
    meant to be used, with the people it is meant for. Then send a
    round. The day after SharePlay went in, after the first real call:
 
@@ -219,26 +246,68 @@ build.
    > you try to select 'Watch Together' without first having a call
    > going?
 
-6. **Put a rough version in front of the people it is for.** Before the
+8. **Publish: put a rough version in front of the people it is for.** Before the
    next big feature is finished, ask the agent for a working rough
    version you can hand to two or three of the people you named in stage
    00. Watch them use it, write down what they say in their words, and
    send it as a round. Then tell them what changed because of them.
 
-7. **Check the older device.** Open the app on your oldest supported
+9. **Play: check the older device.** Open the app on your oldest supported
    device and make sure it says, in a sentence, what it cannot do,
    rather than showing a button that does nothing.
 
-8. **Make the data promise.** Ask the agent how someone would take what
+10. **Write: make the data promise.** Ask the agent how someone would take what
    they made in your app with them, and what happens to it if you stop.
    If there is no answer yet, ask for an export and for the sentence on
    your website.
 
+11. **Publish: show the feature, and why it exists.** Show it to your
+    group, or at the cohort's last session, on the device it was made
+    for. Say one thing someone else changed about it. Then, with the
+    agent closed, write two sentences in your note: why you decided it
+    should exist at all, and what it cost.
+
+Where the agents differ, one line each
+([curriculum research, 03 and 04](../research/curriculum/03-claude-code-and-antigravity.md)):
+
+- **Claude Code:** ask for the research in step 4 in plan mode, so
+  nothing is built until you have read the plan and said yes.
+- **Antigravity:** keep plans on **Request review**, so the research
+  comes back as an artifact you can comment on before step 5.
+- **The open path:** a small model may not know the newest platform
+  features, so ask it to name the documentation page each answer comes
+  from, and keep ceiling features to what your computer can build and
+  test ([the open pathway](../research/curriculum/04-open-pathway.md)).
+
 **When you are ready to move on,** a feature you wanted from your own
 use is live on every platform that can have it, someone other than you
-has shaped it, and the older devices say honestly what they cannot do. By now you have built a lot, and
-taught the agent a lot along the way. Stage 08 is about making sure it
-remembers.
+has shaped it, and the older devices say honestly what they cannot do.
+Why it exists is written in your note, in two sentences of your own. By
+now you have built a lot, and taught the agent a lot along the way.
+Stage 08 is about making sure it remembers.
+
+**Go deeper.** Before the next feature, write down what the app already
+has that could carry it, the way the playlist link did, and ask the
+agent to argue for the version that adds nothing new. It is never
+required, and it is never counted.
+
+**If you get stuck.**
+
+- *You do not know what you want it to do next.* Ask yourself: what did
+  I reach for the last time I used it? Try
+  [I do not know what I want it to do next](../stuck/writing/what-next.md).
+- *It works, and it still feels wrong.* Ask yourself: what would the
+  person it is for say? Try
+  [it works, and it still feels wrong](../stuck/playing/feels-wrong.md).
+- *You do not know when it is enough.* Ask yourself: does it bring joy to
+  one person in the form it has today? Try
+  [I do not know when it is enough](../stuck/publishing/when-is-it-enough.md),
+  then ask your group.
+
+**Before you close your note.** Four short lines, from my
+[Educational Model Spec's AI Disclosure Protocol](https://github.com/bhwilkoff/educational-model-spec/blob/main/docs/implementation-tools/ai_disclosure_protocol.md):
+the agent's role, your essential work, one thing you learned, and your
+growth edge.
 
 Be ready to show the feature on your newest device, the sentence an
 older device shows instead, and one thing someone else changed about

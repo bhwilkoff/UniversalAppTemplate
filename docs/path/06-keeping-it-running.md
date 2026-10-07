@@ -3,6 +3,13 @@
 **Where you are.** Your app is in a store, and strangers are installing
 it on devices you will never see.
 
+<!-- The question, the first two steps, the step labels, the last step,
+the per-agent lines, and everything between the bar and the last line:
+written by Claude, awaiting Ben's review (curriculum C8, the lesson page
+template in docs/templates/LESSON-template.md). -->
+**The question.** What is happening to your app when you are not the one
+holding it, and how would you know honestly?
+
 On September 14, 2026, five days after Archive Watch's dashboard went
 live, I sent the agent this:
 
@@ -153,7 +160,27 @@ watching.
 
 ## Working with your agent
 
-1. **Ask for one page.** Tell the agent what you want to be able to see
+This stage is still the publishing week. The steps are one round of
+write, play, publish: the first two come before the agent is open, the
+middle ones are play, with the agent, the page, and the people using
+your app, and the last one takes one honest number back to a person.
+
+1. **Write your first answer.** Before any prompt, answer this stage's
+   question in two or three sentences in your note: what you think is
+   happening to your app right now, and which part of it you are only
+   guessing. Being wrong is fine. Writing the guess first is what lets
+   the first real reading surprise you (the research on productive
+   failure, gathered in the
+   [curriculum research](../research/curriculum/05-inquiry-and-evidence.md)).
+
+2. **Write your questions.** For five minutes, write as many questions
+   as you can about what happens to your app when you are not holding
+   it, without stopping to answer or judge any of them. Then mark the one
+   you most want answered by the end of the stage. (These are the Right
+   Question Institute's rules for asking your own questions, also in the
+   [curriculum research](../research/curriculum/05-inquiry-and-evidence.md).)
+
+3. **Play: ask for one page.** Tell the agent what you want to be able to see
    without opening a single store console. On September 9, this is how
    I asked for Archive Watch's:
 
@@ -165,7 +192,7 @@ watching.
    accounts it needs a key from. Do the key steps the way you did in
    stage 05.
 
-2. **Read the page, not the stores.** Open Pulse each morning for a
+4. **Play: read the page, not the stores.** Open Pulse each morning for a
    week, and ask the agent to act on what it shows. The first day
    Archive Watch's Pulse was live:
 
@@ -183,7 +210,7 @@ watching.
    When something looks wrong or missing, say what you see, the way the
    story at the top of this page began.
 
-3. **Treat every failure email as a bug in the machinery.** Forward it,
+5. **Play: treat every failure email as a bug in the machinery.** Forward it,
    and ask for the whole class of failure to end, not just this run.
    On August 23, Archive Watch's scheduled workflows were emailing me
    about failures that were not really failures:
@@ -191,7 +218,7 @@ watching.
    > I want to stop getting alerts for failed GitHub actions. Can you fix
    > it so that if it isn't broken, it doesn't fail?
 
-4. **Bring in real people.** Post about your app somewhere your people
+6. **Publish: bring in real people.** Post about your app somewhere your people
    are. Copy what they say into your note first, decide what you think
    of it, then bring it to the agent. The day after I posted
    Archive Watch on Reddit:
@@ -201,7 +228,7 @@ watching.
    > users on this post to identify issues that need to be solved across
    > all platforms.
 
-5. **Run your first loop.** Pick a job too big for one sitting, draft
+7. **Play: run your first loop.** Pick a job too big for one sitting, draft
    the loop prompt in your notes, and start it with `/loop`. Give it the
    goal, a numbered list of what to look for, and what "done" means. My
    best one opened Archive Watch's full database audit in late
@@ -234,12 +261,58 @@ watching.
    one numbered list at a time, with the next one drafted in your note
    while the limit resets.
 
+8. **Publish: take one honest number back to the people.** Choose one
+   number Pulse read correctly, and one reader that told you it could
+   not read. Show both to the person from stage 05 or to your group, and
+   ask what the number means to them. Write down what they said. Then,
+   with the agent closed, write two sentences in your note: one thing
+   you decided in this stage, and what it cost.
+
+Where the agents differ, one line each
+([curriculum research, 03 and 04](../research/curriculum/03-claude-code-and-antigravity.md)):
+
+- **Claude Code:** start the loop with `/loop`, and stop it the same way
+  when a tick does nothing new.
+- **Antigravity:** start the same prompt with `/goal`, or use `/schedule`
+  for a timer, and send it in rounds if the weekly limit runs low, as in
+  step 7.
+- **The open path:** a small model on your own computer does not run
+  unattended for hours, so run the job in rounds: one numbered list per
+  sitting, the next one drafted in your note. Pulse itself runs on
+  GitHub, the same as on any path
+  ([the open pathway](../research/curriculum/04-open-pathway.md)).
+
 **When you are ready to move on,** Pulse reads at least one place the
 app lives honestly (a store, or, if you share it for free, its web
 counter or its repository on GitHub), a failure email has become a fix instead of a habit, and you
-have run a loop from start to stop. You can see what is happening to
-the app without living inside it. That frees you up for the part stage
-07 is about: making it better.
+have run a loop from start to stop. One honest number has gone back to
+a person, with what they said in your note. You can see what is
+happening to the app without living inside it. That frees you up for the
+part stage 07 is about: making it better.
+
+**Go deeper.** Ask the agent to show you, in Pulse's own code, what it
+does when a reader cannot read: where the failure is written down, and
+why a missing column is empty rather than zero. Then read the story of
+how those rules came to be in `docs/PRODUCT-PULSE.md`. It is never
+required, and it is never counted.
+
+**If you get stuck.**
+
+- *A store key or a console will not work.* Ask yourself: is this a step
+  only a person can do? Try
+  [the tools themselves are stuck](../stuck/playing/tools-stuck.md).
+- *The loop stops, or keeps doing nothing new.* Ask yourself: did I say
+  what "done" means? Try
+  [the agent keeps stopping](../stuck/playing/agent-stops.md).
+- *The same failure keeps coming back.* Ask yourself: did I ask for the
+  class of failure to end, or only this run? Try
+  [the same bug keeps coming back](../stuck/playing/same-bug.md), then ask
+  your group.
+
+**Before you close your note.** Four short lines, from my
+[Educational Model Spec's AI Disclosure Protocol](https://github.com/bhwilkoff/educational-model-spec/blob/main/docs/implementation-tools/ai_disclosure_protocol.md):
+the agent's role, your essential work, one thing you learned, and your
+growth edge.
 
 Be ready to show one number Pulse read correctly, one reader that told
 you honestly it could not, and what your loop finished, and to explain

@@ -4,6 +4,15 @@
 has forgotten something you told it at least once, and you have had to
 explain it again. This stage is about making that stop.
 
+<!-- The question, the first two steps, the step labels, the last step,
+the per-agent lines, and everything between the bar and the last line:
+written by Claude, awaiting Ben's review (curriculum C8, the lesson page
+template in docs/templates/LESSON-template.md). The bar's opening words
+changed from "When you are done with the stages," to "When you are done
+with the path," which is what humanshaped.org's path pages read. -->
+**The question.** What did this app teach you that your next app, and
+the next builder, should not have to learn again?
+
 On September 24, 2026, I wrote this to the agent working on Archive
 Watch:
 
@@ -183,14 +192,33 @@ to draw, in writing, where the agent will read them.
 
 ## Working with your agent
 
-1. **Before a session ends, ask it to write everything down.** Any time
+This week leads with write, then publishes to everyone, guests welcome.
+The steps are one round of write, play, publish: the first two come
+before the agent is open, the middle ones are play and writing with the
+agent, and the last one shows your app and your declaration to everyone.
+
+1. **Write your first answer.** Before any prompt, answer this stage's
+   question in two or three sentences in your note: the one lesson from
+   this app you would most want carried forward. Being wrong is fine.
+   Naming it first is what lets you see whether the agent's files
+   actually hold it (the research on productive failure, gathered in the
+   [curriculum research](../research/curriculum/05-inquiry-and-evidence.md)).
+
+2. **Write your questions.** For five minutes, write as many questions
+   as you can about what your agent remembers and what it forgets,
+   without stopping to answer or judge any of them. Then mark the one you
+   most want answered by the end of the stage. (These are the Right
+   Question Institute's rules for asking your own questions, also in the
+   [curriculum research](../research/curriculum/05-inquiry-and-evidence.md).)
+
+3. **Write: before a session ends, ask it to write everything down.** Any time
    you are about to stop, restart, or run low on context. This was the
    middle of a long Archive Watch session in September:
 
    > We are close to needing to compact, please document everything we
    > might need before I do that.
 
-2. **When you correct something twice, make it a rule.** The first of
+4. **Write: when you correct something twice, make it a rule.** The first of
    these came after Archive Watch's loop kept re-arming without saying
    when it would next wake; the second after a Tidbits loop stopped
    itself, again, to report that its context was running low.
@@ -201,7 +229,7 @@ to draw, in writing, where the agent will read them.
    > If you are low on context, compact. Can't you simply add that as a
    > rule?
 
-3. **When it reinvents something, send it back to what it wrote.** On
+5. **Play: when it reinvents something, send it back to what it wrote.** On
    September 7, the agent was rebuilding parts of Archive Watch's video
    player to fix problems we had solved months earlier:
 
@@ -209,14 +237,14 @@ to draw, in writing, where the agent will read them.
    > building the last resilient player for apple's platforms. Are we
    > redoing work that has already been done and is documented already?
 
-4. **Ask it what it is waiting on.** Instead of reading its notes, ask.
+6. **Play: ask it what it is waiting on.** Instead of reading its notes, ask.
    I asked Archive Watch's agent exactly this on September 21:
 
    > What are the things you are wating on me for?
 
    And when there are decisions to make, ask for them as choices.
 
-5. **Turn this app's lessons into skills.** When you have learned
+7. **Write: turn this app's lessons into skills.** When you have learned
    something the next app should not have to learn again, ask for it.
    This was the end of a long day in September, most of it spent on
    Archive Watch's social posting:
@@ -227,30 +255,74 @@ to draw, in writing, where the agent will read them.
    Then ask the agent to bring those skills back into your copy of the
    template, so your next app starts with them.
 
-6. **Draw the line again.** Reread your "Why we build" paragraph and your
+8. **Write: draw the line again.** Reread your "Why we build" paragraph and your
    standing rules from stage 00. Ask the agent whether anything you have
    built since crosses them. Decide what to do about each answer
    yourself. Then ask which of your rules are now specific enough to
    become checks, and have it write them.
 
-7. **Find the decision each value changed.** Go through your values one
+9. **Write: find the decision each value changed.** Go through your values one
    at a time and name a decision it changed: something you built
    differently, or did not build, because of it. A value that never
    changed a decision is decoration. Rewrite it until it does work, or
    let it go.
 
-8. **Ask for a human-shaped review, then declare.** Ask your agent for
+10. **Publish: ask for a human-shaped review, then declare.** Ask your agent for
    a human-shaped review of your app, read what it found and what it
    could not see, and answer its questions for yourself. Then copy
    `docs/human-shaped/HUMAN-SHAPED-template.md` to the root of your
    repository as `HUMAN-SHAPED.md`, and answer each principle in your own
    words. The directory at humanshaped.org reads that file.
 
-**When you are done with the stages,** your app is shipped and running,
-your agent remembers what you taught it, and the lessons from this app
-are waiting for the next one. The next app starts at stage 00 again,
-with a new note and a new why. It will go faster, because this time the
+11. **Publish: show it to everyone, guests welcome.** At the cohort's
+    last session, show your app on the device it was made for, your
+    `HUMAN-SHAPED.md`, and one value with the decision it changed. Then,
+    with the agent closed, write two sentences in your note: what is
+    enough about this version, for now, for the people you named in stage
+    00, and what waits, written down rather than built.
+
+Where the agents differ, one line each
+([curriculum research, 03 and 04](../research/curriculum/03-claude-code-and-antigravity.md)):
+
+- **Claude Code:** corrections become memories in its memory folder, and
+  a rule for the whole project goes in `AGENTS.md`, which `CLAUDE.md`
+  imports.
+- **Antigravity:** `/learn` turns a session's corrections into rules or
+  skills in your repository (`.agents/rules/`, `.agents/skills/`), where
+  you can read them.
+- **The open path:** a small model reads `AGENTS-SHORT.md`, so the most
+  important lessons go there in a line each, and the full ones in
+  `AGENTS.md` and `DECISIONS.md`
+  ([the open pathway](../research/curriculum/04-open-pathway.md)).
+
+**When you are done with the path,** your app is shipped and running,
+your agent remembers what you taught it, your `HUMAN-SHAPED.md` answers
+each principle in your own words, and the lessons from this app are
+waiting for the next one. The next app starts at stage 00 again, with a
+new note and a new why. It will go faster, because this time the
 repository remembers.
+
+**Go deeper.** Pick one rule from your `AGENTS.md` that says "no check
+yet", and ask the agent to make it a check: a test or a hook that fails
+when the line is crossed. It is never required, and it is never counted.
+
+**If you get stuck.**
+
+- *The agent keeps forgetting.* Ask yourself: is the lesson written where
+  every session reads it? Try
+  [the same bug keeps coming back](../stuck/playing/same-bug.md).
+- *You cannot say what your app refuses to do.* Ask yourself: what did I
+  stop the agent from doing? Try
+  [I cannot say what it refuses to do](../stuck/writing/what-it-refuses.md).
+- *You do not know when it is enough.* Ask yourself: does it bring joy to
+  one person in the form it has today? Try
+  [I do not know when it is enough](../stuck/publishing/when-is-it-enough.md),
+  then ask your group.
+
+**Before you close your note.** Four short lines, from my
+[Educational Model Spec's AI Disclosure Protocol](https://github.com/bhwilkoff/educational-model-spec/blob/main/docs/implementation-tools/ai_disclosure_protocol.md):
+the agent's role, your essential work, one thing you learned, and your
+growth edge.
 
 Be ready to show one skill your app taught, the mistake it will save the
 next person from, and one value with the decision it changed.
