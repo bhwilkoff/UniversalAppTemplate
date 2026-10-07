@@ -4,6 +4,13 @@
 the agent knows that why, and there is one rule in your own words in
 `AGENTS.md`. There is no app yet.
 
+<!-- The question, the first two steps, the step labels, the last step,
+the per-agent lines, and everything between the bar and the last line:
+written by Claude, awaiting Ben's review (curriculum C2, the lesson page
+template in docs/templates/LESSON-template.md). -->
+**The question.** What is the smallest real thing that someone who hears
+your hum could hold this week?
+
 Archive Watch began on April 17, 2026, and the first thing the agent
 made was not a screen. It was a set of research notes on where film
 metadata could come from. The next day brought a pipeline to gather
@@ -84,15 +91,34 @@ You need one thing set up first: a GitHub account, with your copy of the
 template kept public so GitHub Pages can host the web app for free. The
 agent does the rest of the setup, and will tell you if it needs you.
 
-1. **Add the wish to your note.** Under the why you wrote in stage 00,
+The steps are one round of write, play, publish. The first three come
+before the agent is open, the middle ones are play, with the agent and
+on your phone, and the last one publishes to a person.
+
+1. **Write your first answer.** Before any prompt, answer this stage's
+   question in two or three sentences in your note. Being wrong is fine.
+   Trying first, before you are shown, is what helps the rest of the
+   stage stick (the research on productive failure, gathered in the
+   [curriculum research](../research/curriculum/05-inquiry-and-evidence.md)).
+
+2. **Write your questions.** For five minutes, write as many questions
+   as you can about the smallest thing someone could hold this week,
+   without stopping to answer or judge any of them. Then mark the one you
+   most want answered by the end of the stage. (These are the Right
+   Question Institute's rules for asking your own questions, also in the
+   [curriculum research](../research/curriculum/05-inquiry-and-evidence.md).)
+
+3. **Write the wish.** Under the why you wrote in stage 00,
    write the wish in one sentence. Under it, list what the app should
    do, numbered. (`talking-to-your-agent.md` shows the shape my notes
    took.)
 
-2. **Draft the kickoff, then send it.** Turn that list into a kickoff in
+4. **Play: draft the kickoff, then send it.** Turn that list into a kickoff in
    your note: the wish, the source, what you want researched before
    anything is built, and what "done" means for this sitting. Then paste
-   it in one message. Here is most of mine for Tidbits Trivia, June 16:
+   it in one message. If this is your first app, read mine first. If it
+   is not, write yours first and read mine after. Here is most of mine
+   for Tidbits Trivia, June 16:
 
    > A fully realized multi-player (both local and online) trivia game
    > that is based entirely upon facts pulled from the open Wikipedia
@@ -121,7 +147,7 @@ agent does the rest of the setup, and will tell you if it needs you.
    `web-platform-patterns` and `universal-feature-states` skills carry a
    lot of that work without you asking for them.
 
-3. **Keep it going.** When the agent reports back, do not polish yet.
+5. **Play: keep it going.** When the agent reports back, do not polish yet.
    Ask for the next round of the wish. The night I started Tidbits, two
    of the three prompts after the kickoff were some version of this, and
    each one added a platform or a whole feature:
@@ -129,13 +155,13 @@ agent does the rest of the setup, and will tell you if it needs you.
    > keep pushing forward with the next round of work to fully build
    > out this game/app
 
-4. **Use it, with your note open.** Open the live address on your phone
+6. **Play: use it, with your note open.** Open the live address on your phone
    and use the app for real, for ten minutes, the way the person you are
    building it for would. Under a "Next:" heading in your note, write
    each thing you notice as its own numbered item: where it is, what is
    wrong, what it should be.
 
-5. **Send the round.** Paste the whole list, with one line in front of
+7. **Play: send the round.** Paste the whole list, with one line in front of
    it that sets the scope. In BOBA's first week, mine was as short as
    this:
 
@@ -145,22 +171,68 @@ agent does the rest of the setup, and will tell you if it needs you.
    done. Move those to a "Done:" list in your note, use the app again,
    and start the next round. Do at least two laps.
 
-6. **Steer the data with one real item.** Somewhere in those laps, find
+8. **Play: steer the data with one real item.** Somewhere in those laps, find
    one record that is wrong (a bad title, a missing image, a question
    that makes no sense). Paste its link, ask why, and ask the agent to
    look for the same problem everywhere.
 
-7. **Try it the hard way.** Turn on airplane mode and open the app. Run
+9. **Play: try it the hard way.** Turn on airplane mode and open the app. Run
    a search that should find nothing. Tell the agent what you saw. Every
    list in this template has a loading, empty, error and offline state,
    and this is how you find out whether yours are real.
 
+10. **Publish it to one person who hears your hum.** Send the live
+    address to one of the two people you named in stage 00, and ask them
+    to use it once, however they like. Write down what they did first,
+    and what they said, in their words. Then, with the agent closed,
+    write two sentences in your note: one thing you decided in this
+    stage, and what it cost.
+
+Where the agents differ, one line each
+([curriculum research, 03 and 04](../research/curriculum/03-claude-code-and-antigravity.md)):
+
+- **Claude Code:** in the desktop app's Code tab, start the first night
+  in **Manual**, so you see each change before it is made.
+- **Antigravity:** start in the **Default** preset, which runs the
+  agent's commands in a sandbox, and use `/plan` to read its plan and
+  comment on it before it builds.
+- **The open path:** use Aider with a fully open model in Ollama. These
+  models cannot see your phone, so in step 6 you are the agent's eyes:
+  describe what you see in words. Start on the web
+  ([the open pathway](../research/curriculum/04-open-pathway.md)).
+
 **When you are ready to move on,** your app is live at a real address,
-it is full of real data that a pipeline brought in, and you have sent at
-least two rounds from your own phone. The app works on one platform.
+it is full of real data that a pipeline brought in, you have sent at
+least two rounds from your own phone, and one person who hears the same
+hum has used it, with what they did first written in your note. The app works on one platform.
 Stage 02 is about deciding what it means for it to be the same app on
 the next one.
 
+**Go deeper.** Ask the agent to walk you through the pipeline it built:
+where the data comes from, how often it refreshes, and what the app does
+when the source is down. Write one thing you would change, and why. It
+is never required, and it is never counted.
+
+**If you get stuck.**
+
+- *The agent says it fixed something you still see.* Ask yourself: did I
+  say what I saw, where, and on which device? Try a screenshot, and check
+  that your phone is not showing an old cached version of the page. Ask
+  your group if it keeps happening.
+- *There is not enough real data, or it is not the right kind.* Ask
+  yourself: what is this app actually about, in real things? Try asking
+  the agent to research sources before it builds anything more. Ask the
+  teacher if no open source seems to exist.
+- *You are not ready to show anyone.* Ask yourself: what would one person
+  learn from it as it is? Try showing your group first, then the person
+  who hears your hum.
+
+**Before you close your note.** Four short lines, from my
+[Educational Model Spec's AI Disclosure Protocol](https://github.com/bhwilkoff/educational-model-spec/blob/main/docs/implementation-tools/ai_disclosure_protocol.md):
+the agent's role, your essential work, one thing you learned, and your
+growth edge.
+
 Be ready to show the app on your phone, to name one thing the real data
-taught you that fake data would have hidden, and to explain why you
-started on the platform you chose.
+taught you that fake data would have hidden, to say what the first person
+who hears your hum did with it, and to explain why you started on the
+platform you chose.
