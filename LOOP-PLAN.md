@@ -1387,8 +1387,13 @@ Antigravity, and the open path; AGENTS-SHORT.md; Aider and opencode
 configs), C5 (docs/teaching/ as runs of show; runs-of-show.json, all six
 weeks accepted by the site's ShowLib), and C6 on site (new cohorts
 seeded from runs-of-show.json, falling back to curriculum-lib.js; the
-Hum sort board). Building: C7 (site pages and /stuck/), C8 (stages 02
-to 08 on the lesson page). Then C9 (the 20 screenshots on Ben's Mac).
+Hum sort board). C7 (site: /stuck/ with 17 pages, each stage's question
+panel, /cohorts/ and /teach/guide/ by move, Stuck? links on /cohort/ and
+for students in the run of show; checked live on /path/00/) and C8
+(stages 02 to 08 on the lesson page) are merged too. Left: C9 (the 20
+screenshots on Ben's Mac, once he is signed in to Antigravity and the
+Claude app) and the open path tried on this Mac (Ollama, if Ben says
+yes).
 Waits on Ben: voice review starting with stages 00 and 01, the two
 credential proposals (HUMAN-SHAPED.md as its own evidence; the level
 narrative in the student's words), whether to try the open path on this
