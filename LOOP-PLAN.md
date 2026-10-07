@@ -1441,7 +1441,11 @@ anything with a drop or delete waits on the terminal's confirmation.
    **Drafted October 6, waiting on Ben's review.** Template commit
    89ef6bb on `main` and the home page and /cohorts/ on `site`; every
    changed passage, the typo fixes in his piece, and what was removed
-   are in research/notes/human-shaped-problems-review.md.
+   are in research/notes/human-shaped-problems-review.md. The mcp
+   function's new review wording was deployed from the Mac October 7
+   (node tests 374 of 374 first). The app-store screenshots tool
+   (tools/app-shots.mjs) ran on the Mac October 7; its output matched
+   what was already committed.
 
 ## Where to pick up
 
