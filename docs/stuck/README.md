@@ -49,7 +49,7 @@ the page says so.
 **[Stuck writing](writing/README.md):** you do not know what to write
 down yet.
 
-- [I cannot find my hum](writing/find-your-hum.md)
+- [I cannot find a problem worth building for](writing/find-a-problem.md)
 - [I cannot say what it refuses to do](writing/what-it-refuses.md)
 - [I do not know what I want it to do next](writing/what-next.md)
 

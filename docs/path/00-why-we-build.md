@@ -1,13 +1,18 @@
 # 00. Why we build
 
+<!-- Rebuilt from curriculum research note 06 (docs/research/curriculum/
+06-instructional-design.md), which Ben approved on October 7, 2026 (site
+DECISIONS.md, "Note 06 is the basis for the curriculum"). New prose is
+written by Claude, awaiting Ben's review. Ben's own words, stories, and
+his original steps from commit d70c674 are kept as he wrote them. -->
+
 **Where you are.** You have your own copy of this template, and maybe an
-idea for an app, or maybe only a feeling that something in your life
+idea for an app, or maybe only a sense that some part of your life
 should be easier than it is. Nothing is built yet, and that is exactly
 the right moment for this stage.
 
-<!-- Written by Claude, awaiting Ben's review (curriculum C1). -->
-**The question.** What has hummed in your life for months, and who else
-hears it?
+**The question.** What problem in your own life is worth building
+something for, and who else has it?
 
 On September 26, 2026, deep into building Archive Watch, I told the
 agent I was working with this, and it became one of the project's
@@ -105,49 +110,106 @@ So, every round of every stage makes the same three moves:
 
 The moves are not stages. Each round of each stage makes all three, and
 the principles decide what you write, what you play with, and what is
-ready to publish. This stage is where the first move starts.
+ready to publish. This stage is where the first move starts, and it
+starts before there is anything to build.
 
-## Find your hum
+## Choosing the problem
 
-<!-- Written by Claude, awaiting Ben's review (curriculum C1). The
-definition is Ben's October 6, 2026 piece, as quoted in
-computer-shaped-problems.md, where "inawing" and "It'is" were corrected to
-"gnawing" and "It is". -->
+<!-- Written by Claude, awaiting Ben's review (note 06, sections 1 and
+3). -->
 
-Every app in this course starts before the app. It starts with a
-problem you have lived with, and in October I wrote down what I mean by
-that:
+Every app in this course starts with a problem in someone's life, and
+the first job is choosing that problem well. It is also the step my own
+record says least about. None of my four apps began as an idea for an
+app, and for each one I wrote the why and did the research before
+building ([curriculum research, note 01](../research/curriculum/01-mining-bens-process.md)).
+Archive Watch started on an evening in April "for watching old
+public-domain films on an Apple TV"
+([the case study](../human-shaped/case-study-archive-watch.md)). Bsky
+Dreams' README asks of every feature, "does this invite deeper
+engagement, more critical thinking, or more meaningful connection?" BOBA
+Playbook's pitch says its goal is "to help you engage with the game more
+deeply." How I chose those problems over others happened in my head, so
+this stage gives you the steps I never wrote down.
+
+This is what I mean by a human-shaped problem:
 
 > A human-shaped problem is something, really anything, in your life
 > that will in some way make your life better, happier, or more deeply
-> resonant with the universe if you could only solve for it. It is
-> something that is the gentle hum of worry or concern that you have
-> about an area of your life. [...] It is something that has gone
-> unsolved for months or even years, something that is present in a
-> gnawing way. And most of all, it is something that you cannot do
-> yourself. Your current tools and resources are insufficiently up to
-> the challenge.
+> resonant with the universe if you could only solve for it. [...] It is
+> a thing that you wonder and question about often. It is something that
+> has gone unsolved for months or even years [...]. And most of all, it
+> is something that you cannot do yourself. Your current tools and
+> resources are insufficiently up to the challenge.
 
-So, before you write a single thing about an app, you write down hums.
-Not one, three, because the first one you think of is usually the
-loudest rather than the truest. Then you sort, because most problems can
-be told in either shape, and the shape you tell it in decides what you
-will build: stories to be told and added to, or data points to be
-counted. [Sort the hum](../human-shaped/hum-sort.md) has my eight
-examples, mixed together, for sorting before you read my answer.
+That definition, my principles, and my published examples are not a
+quiz to pass. They are the tools you use on the one thing only you can
+answer: which problem in *your* life is worth building for.
 
-Then you write the other shape of your own problem: its computer-shaped
-twin, the version that counts and ranks and optimizes. Writing the twin
-is how you see what your app must never become.
+### Notice before you choose
 
-Last, two questions, and they are older than any agent. Neil Postman
-asked them of every new technology: "What is the problem to which this
-technology is the solution?" and "Whose problem is it?" (*Building a
-Bridge to the 18th Century*, 1999, as gathered in the
-[curriculum research](../research/curriculum/02-landscape.md)). A
-human-shaped problem is rarely yours alone, so name two people outside
-your screen who hear the same hum. They are who you will publish to
-first, at the end of the next stage.
+Ideas for problems come from noticing, not from thinking one up on the
+spot. Paul Graham's version is that "the verb you want to be using [...]
+is not 'think up' but 'notice'" ([How to Get Startup Ideas, 2012](http://www.paulgraham.com/startupideas.html)).
+So, before you choose, you keep a short log for five days, a small
+version of what researchers call a diary study, where a person writes an
+entry whenever something happens ([Nielsen Norman Group, 2024](https://www.nngroup.com/articles/diary-studies/)).
+The log has four prompts, in plain words. Write one line whenever one of
+these happens:
+
+- I wished something worked differently.
+- I gave up on something I care about.
+- I did something the long way because nothing helped.
+- Someone I know struggled with the same thing.
+
+No app ideas in the log. Just what happened.
+
+### Ten things to hold a problem to
+
+These come from what I have already written about human-shaped problems.
+I never wrote them as a checklist, but each is something I say plainly
+([note 06, section 1](../research/curriculum/06-instructional-design.md)).
+Hold each of your candidates to them, and mark each one "yes," "not
+yet," or "I don't know."
+
+| | The test | Where I wrote it |
+|---|---|---|
+| 1 | Solving it would make your life better, happier, or more resonant. | [computer-shaped problems](../human-shaped/computer-shaped-problems.md#computer-shaped-and-human-shaped) |
+| 2 | You wonder and question about it often. | the same |
+| 3 | It has gone unsolved for months or even years. | the same |
+| 4 | You cannot do it yourself with the tools and resources you have now. | the same, and [principle 1](../human-shaped/PRINCIPLES.md) |
+| 5 | Real people have it, and you can name them. | principle 1 |
+| 6 | It is rarely yours alone: other people would recognize it. | "Write, play, publish," above |
+| 7 | A computer cannot simply solve it for them. | principle 1, "How you can tell" |
+| 8 | It is about people's stories, not about counting data points. | computer-shaped problems, its closing lines |
+| 9 | Solving it would not create a new problem for someone else. | [principle 12](../human-shaped/PRINCIPLES.md) |
+| 10 | At least one person would be glad of a first version. | [principle 15](../human-shaped/PRINCIPLES.md) |
+
+A "not yet" or an "I don't know" is not a failure. It is the next thing
+to find out, and most of them are answered by talking to people.
+
+### Say it the way my examples say it
+
+My [four human-shaped problems](../human-shaped/problem-statements.md)
+are worth studying before you write your own, the way you would study a
+good paragraph before writing one. Which shape each one is, I have
+already said. What you are looking for is what makes them strong enough
+to build from. Ron Berger calls this studying "examples of excellence,"
+and it comes before critique and revision
+([Berger, 2006](https://jaymctighe.com/wp-content/uploads/2011/04/Ron-Berger-Article.pdf)).
+
+### Talk to people who have it
+
+A problem you have only thought about is a guess about other people. So,
+you talk to two of them before you build anything. The rules are simple,
+and they come from people who do this for a living: ask about a
+specific time in the past ("Tell me about the last time you..."), ask
+why, and listen more than you talk (the Stanford d.school's interview
+rules and Rob Fitzpatrick's *The Mom Test*, both gathered in
+[note 06](../research/curriculum/06-instructional-design.md)). Do not
+pitch an app. You are listening for their story, because human-shaped
+problems "see the world as interrelated stories to be told, experienced,
+and added to."
 
 ## Where the values live in this template
 
@@ -239,128 +301,223 @@ default.
 
 ## Working with your agent
 
-<!-- Steps 1 to 4 and the intro line: written by Claude, awaiting Ben's
-review (curriculum C1). -->
-Steps 1 to 4 are yours alone, with the agent closed, because they are
-writing, and the hum has to be yours before anyone helps you shape it.
-From step 5 on, open your agent (Claude Code, or Antigravity for Gemini)
-in your copy of the template. Those steps are conversations, and
-`talking-to-your-agent.md` has the moves.
+<!-- Steps 1 to 12 and step 18: written by Claude, awaiting Ben's
+review (note 06, section 3). Steps 13 to 17 are Ben's original steps 1
+to 6 from commit d70c674, kept as he wrote them. -->
 
-1. **Write down three hums.** Open a plain note, in whatever notes app
-   you already use. You will keep it for the life of the app, and it is
-   where your prompts will be drafted from now on. At the top, write
-   three things that have hummed in your life for months, each in a
-   sentence or two, in your own words. Then write your first answer to
-   this stage's question, before you read further.
+This stage takes about a week, because noticing takes days and talking
+to people takes time. Steps 1 to 12 are yours, with the agent closed:
+they are writing and listening, and the problem has to be yours before
+anyone helps you shape it. From step 13 on, open your agent (Claude
+Code, or Antigravity for Gemini) in your copy of the template. Those
+steps are conversations, and `talking-to-your-agent.md` has the moves.
+Keep everything in one plain note, in whatever notes app you already
+use. You will keep it for the life of the app, and it is where your
+prompts will be drafted from now on.
 
-2. **Sort before you choose.** Sort my eight examples in
-   [Sort the hum](../human-shaped/hum-sort.md), with your group if you
-   are in a cohort, then put your own three on the same two sides. Choose
-   one hum that is human-shaped. If none of yours is, that is worth
-   knowing: write three more.
+1. **Write your first answer.** At the top of your note, answer this
+   stage's question in two or three sentences: what problem in your own
+   life is worth building something for, and who else has it? Being wrong
+   is fine. You will come back to it at the end.
 
-3. **Write its computer-shaped twin.** Under the hum you chose, write
-   the same problem in the other shape, the version that counts, ranks,
-   or optimizes. Keep it in your note. It is the app you are choosing not
-   to build.
+2. **Write your questions.** Read the line from my pitch that this course
+   starts from: "If anyone can build their own apps (with AI), it matters
+   even more which apps they choose to build and how they choose to build
+   them." For five minutes, write as many questions about it as you can.
+   Do not stop to discuss, judge, or answer them, write each one exactly
+   as it came, and change any statement into a question (the Question
+   Formulation Technique's four rules,
+   [Right Question Institute](https://rightquestion.org/what-is-the-qft/)).
+   Then mark the three you most want answered by the end of the course.
+   In a cohort, these become the group's list of what we need to know.
 
-4. **Name two people who hear the same hum.** Write their names, and
-   one line each on how you know it hums for them too. Then answer
-   Postman's two questions about your hum in your note: what is the
-   problem to which this app is the solution, and whose problem is it?
+3. **Write: keep the log for five days.** Use the four prompts from
+   [Notice before you choose](#notice-before-you-choose), one line each
+   time something happens. In a cohort, the log starts in the week
+   before week 1. On your own, give it five days anyway.
 
-5. **Start your note with the why.** Above the hum, write the why: who
-   the app is for, and what you hope it does for them.
+4. **Write: five candidates.** From the log, write five problems in your
+   own words, one or two sentences each. Do not name an app or a
+   technology yet.
 
-6. **Tell the agent why.** Say what you wrote, the way you would to a
-   friend. Then ask the agent to rewrite the "Why we build" paragraph in
-   `AGENTS.md` from what you said, and to read it back to you. Correct it
-   until it sounds like you and not like a company. Five sentences or
-   fewer.
+5. **Play: hold them to the ten tests.** Put your five candidates beside
+   [the ten tests](#ten-things-to-hold-a-problem-to) and mark each one
+   "yes," "not yet," or "I don't know." Choose the two that hold up best.
 
-7. **Name one line you will not cross.** Something the app will never
-   do, or never let AI do inside it, even if doing it would work. Say it
-   plainly and say why. Mine
-   usually came out the moment the agent proposed crossing one. In
-   September, the agent designed Archive Watch's Watch Together feature
-   around a paid voice server, and I stopped it:
+6. **Publish: say the two out loud.** Read your two candidates to your
+   trio, or to one person you trust, and say in a sentence why each might
+   matter. Write down what they asked you.
 
-   > It is absolutely not acceptable. The goal of this app (and all of
-   > my apps) is for them to cost $0 to run.
+7. **Play: study my examples as models.** Work through
+   [What a strong problem statement looks like](../human-shaped/problem-statements.md):
+   list what makes my four human-shaped statements strong enough to
+   build from, and what my four computer-shaped ones have in common.
 
-   You do not have to wait for the agent to cross yours. Say it now, and
-   ask the agent to add it to the standing instructions in `AGENTS.md`
-   with today's date and your words in quotes. You will add more of
-   these as you build.
+8. **Write: your problem statement.** Rewrite the stronger of your two
+   candidates in the same form as my examples: your situation, in the
+   first person, then "I need something that..." Under it, write one
+   sentence for the computer-shaped version of the same wish, the one
+   that measures, ranks, or optimizes. That is the app you are choosing
+   not to build.
 
-8. **Ask three questions of the idea.** Work through these with the
-   agent, and write your answers in your note.
+9. **Publish: trade it for critique, then revise.** Read your statement
+   to your trio, or to one person you trust. Ask them to "be kind; be
+   specific; be helpful," with suggestions as questions: "Have you
+   considered...?" ([Berger, 2006](https://jaymctighe.com/wp-content/uploads/2011/04/Ron-Berger-Article.pdf)).
+   Revise once, and keep both versions in your note.
 
-   1. **Should it exist at all?** If something already does this, what
-      does yours give people that it does not? This one comes back before
-      every big feature. Nine days into BOBA Playbook, the agent built a
-      price feature that leaned on another site's prices, and I asked it
-      out loud:
+10. **Write: a short conversation guide.** Three questions that begin
+    "Tell me about the last time you..." and one that asks why. Nothing
+    about an app.
 
-      > This is NOT what I want. I want my app to be indpendent from
-      > Radish. You can look at the stucture from Radish, but if we are
-      > just using Radish, there is no reason for this feature to exist.
-      > People should just go to radish, right?
+11. **Play: two conversations.** Talk to two people who might have the
+    same problem, in person or on a call, for ten or fifteen minutes
+    each. Listen more than you talk, and write down their stories in your
+    own words afterward. Keep the notes private unless they agree you can
+    share them.
 
-   2. **Who does it touch?** Name the people who will use it. Then name
-      the people outside the screen: the ones whose work it shows, whose
-      data it uses, or whose lives it changes without their ever opening
-      it. For Archive Watch, those are the people who uploaded and
-      reviewed each film on archive.org, and the people on screen in the
-      films. For Tidbits Trivia, they are the volunteers who wrote every
-      fact on Wikipedia and Wikidata.
-   3. **What will people learn from using it every day, and what will
-      they stop learning?**
+12. **Write: revise, and say why it is human-shaped.** Change your
+    problem statement with what you heard. Then, under it, write who has
+    this problem and why a computer cannot simply solve it for them. That
+    sentence is what principle 1 asks for.
 
-   Then ask the agent to argue the strongest case against your idea, on
-   behalf of the people outside the screen. It is a second voice where
-   there was only yours. It does not replace asking real people, and
-   stage 07 comes back to that.
+13. **Start your note with the why.** Move your problem statement to the
+    top of your note. Under it, write who the app is for, and what you
+    hope it does for them.
 
-9. **Test it against the four questions.** Ask the agent to run the
-   `learning-orientation-design` skill against your idea and tell you
-   where it fails. Where it does, change the idea now, while it is only
-   words. The same test applies to every feature from here on.
+14. **Tell the agent why.** Say what you wrote, the way you would to a
+    friend. Then ask the agent to rewrite the "Why we build" paragraph in
+    `AGENTS.md` from what you said, and to read it back to you. Correct
+    it until it sounds like you and not like a company. Five sentences
+    or fewer.
 
-10. **Let it ask you the rest.** Ask the agent what it still needs to
-   know before it starts. This is how I opened each early milestone of
-   BOBA Playbook, starting the first evening:
+15. **Name one line you will not cross.** Something the app will never
+    do, or never let AI do inside it, even if doing it would work. Say it
+    plainly and say why. Mine usually came out the moment the agent
+    proposed crossing one. In September, the agent designed Archive
+    Watch's Watch Together feature around a paid voice server, and I
+    stopped it:
 
-   > Great. Let's begin on M2. Do you have any question at the beginning
-   > of this milestone that are unanswered by the current documentation?
+    > It is absolutely not acceptable. The goal of this app (and all of
+    > my apps) is for them to cost $0 to run.
 
-   Answer in your note first, numbered to match its questions, saying
-   only what each decision needs. It is a habit that lasts. Here is
-   Archive Watch, months later, answering five of the agent's questions
-   in one message:
+    You do not have to wait for the agent to cross yours. Say it now,
+    and ask the agent to add it to the standing instructions in
+    `AGENTS.md` with today's date and your words in quotes. You will add
+    more of these as you build.
 
-   > 1. Yes. Move forward with a single clock. If you need a time zone
-   > to organize around, you can choose UTC, but all times should show
-   > as their local times when they look at channels. [...]
-   > 3. The wording is fine for now.
-   > 4. You can use the Apple TVs whenever you want right now.
+16. **Ask three questions of the idea.** Work through these with the
+    agent, and write your answers in your note.
 
-   The agent records your answers as decisions, with the why first.
+    1. **Should it exist at all?** If something already does this, what
+       does yours give people that it does not? This one comes back
+       before every big feature. Nine days into BOBA Playbook, the agent
+       built a price feature that leaned on another site's prices, and I
+       asked it out loud:
 
-**When you are ready to move on,** your note holds three hums, the one
-you chose with its computer-shaped twin, and the two people who hear it
-too. It starts with the why and your answers to the three questions, the
-"Why we build" paragraph in `AGENTS.md` sounds like you, there is one
-rule in your own words, and the agent has what it needs to start. You have written. Stage 01 is the
-first chance to play with something you can hold, and to publish it for
-someone else to try.
+       > This is NOT what I want. I want my app to be indpendent from
+       > Radish. You can look at the stucture from Radish, but if we are
+       > just using Radish, there is no reason for this feature to exist.
+       > People should just go to radish, right?
+
+    2. **Who does it touch?** Name the people who will use it. Then name
+       the people outside the screen: the ones whose work it shows, whose
+       data it uses, or whose lives it changes without their ever opening
+       it. For Archive Watch, those are the people who uploaded and
+       reviewed each film on archive.org, and the people on screen in the
+       films. For Tidbits Trivia, they are the volunteers who wrote every
+       fact on Wikipedia and Wikidata.
+    3. **What will people learn from using it every day, and what will
+       they stop learning?**
+
+    Then ask the agent to argue the strongest case against your idea, on
+    behalf of the people outside the screen. It is a second voice where
+    there was only yours. It does not replace the two people you talked
+    to, and stage 07 comes back to that.
+
+17. **Test it against the four questions, and let it ask you the rest.**
+    Ask the agent to run the `learning-orientation-design` skill against
+    your idea and tell you where it fails. Where it does, change the idea
+    now, while it is only words. Then ask the agent what it still needs
+    to know before it starts. This is how I opened each early milestone
+    of BOBA Playbook, starting the first evening:
+
+    > Great. Let's begin on M2. Do you have any question at the beginning
+    > of this milestone that are unanswered by the current documentation?
+
+    Answer in your note first, numbered to match its questions, saying
+    only what each decision needs. It is a habit that lasts. Here is
+    Archive Watch, months later, answering five of the agent's questions
+    in one message:
+
+    > 1. Yes. Move forward with a single clock. If you need a time zone
+    > to organize around, you can choose UTC, but all times should show
+    > as their local times when they look at channels. [...]
+    > 3. The wording is fine for now.
+    > 4. You can use the Apple TVs whenever you want right now.
+
+    The agent records your answers as decisions, with the why first.
+
+18. **Publish: post the problem.** Write a short post, in your own words:
+    your problem statement, who has it, and why a computer cannot simply
+    solve it for them. Post it where your cohort shares work, or in the
+    community discussions if you are on your own
+    ([Showing your work](showing-your-work.md) says where), and offer it
+    to the two people you talked to, if they would like to see it. Then
+    reread your first answer from step 1, and write one line on what
+    changed.
+
+Where the agents differ, one line each
+([curriculum research, 03 and 04](../research/curriculum/03-claude-code-and-antigravity.md)):
+
+- **Claude Code:** in the desktop app's Code tab, start in **Manual**, so
+  you see each change to `AGENTS.md` before it is made.
+- **Antigravity:** start in the **Default** preset, and ask for a plan
+  you can comment on before it edits `AGENTS.md`.
+- **The open path:** a small model holds only the start of a long file,
+  so keep your why and your one rule near the top of `AGENTS-SHORT.md`
+  as well as in `AGENTS.md`
+  ([the open pathway](../research/curriculum/04-open-pathway.md)).
+
+**When you are ready to move on,** your note starts with a problem
+statement in your own words, revised after critique and after two real
+conversations, with who has it and why a computer cannot simply solve it
+for them. The "Why we build" paragraph in `AGENTS.md` sounds like you,
+there is one rule in your own words, your answers to the three questions
+are written down, and the problem is posted where other people can read
+it. Ready, or not yet: you judge first. You have written. Stage 01 is
+the first chance to play with something you can hold, and to publish it
+to one of the people you talked to.
 
 Every stage ends the way this one does, with something to show and a
 decision to explain in your own words, with the agent closed. [Showing
 your work](showing-your-work.md) says how, in a cohort or on your own.
 
-Be ready to share your hum and its computer-shaped twin, your "why we
-build" paragraph, the two people who hear the same hum, and your one
-rule, and to explain why you drew that line where you did and what it
-will cost you.
+**Go deeper.** Spend an hour with one of the people you talked to while
+they do the thing your problem is about, in their own setting, and ask
+them to show you rather than tell you. Researchers call this contextual
+inquiry ([note 06](../research/curriculum/06-instructional-design.md)).
+Or keep the log for a second week, and see what changes. Neither is
+required, and neither is counted.
+
+**If you get stuck.**
+
+- *You cannot find a problem worth building for.* Ask yourself: which
+  line in my log would I most like to never write again? Then try
+  [I cannot find a problem worth building for](../stuck/writing/find-a-problem.md).
+- *You cannot say what your app will never do.* Ask yourself: what would
+  the cheapest version of this app do to the people I talked to? Then try
+  [I cannot say what it refuses to do](../stuck/writing/what-it-refuses.md).
+- *You are not ready to talk to anyone.* Ask yourself: what is the
+  smallest thing I could ask one person about a time it happened to
+  them? Then try [I am not ready to show anyone](../stuck/publishing/not-ready.md).
+
+**Before you close your note.** Four short lines, from my
+[Educational Model Spec's AI Disclosure Protocol](https://github.com/bhwilkoff/educational-model-spec/blob/main/docs/implementation-tools/ai_disclosure_protocol.md):
+the agent's role, your essential work, one thing you learned, and your
+growth edge.
+
+Be ready to share your problem statement and the version before it, what
+you heard in your two conversations, your "why we build" paragraph, and
+your one rule, and to explain why you drew that line where you did and
+what it will cost you.

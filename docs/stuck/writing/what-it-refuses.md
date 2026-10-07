@@ -31,7 +31,6 @@ why, where your agent reads it at the start of every session.
 time on the platform: "does this invite deeper engagement, more critical
 thinking, or more meaningful connection?" (Bsky-Dreams README, read in
 [research note 01](../../research/curriculum/01-mining-bens-process.md#1-living-with-the-hum)).
-That question has told its agent no more times than I can count.
 
 **In any tool.** The rule goes in `AGENTS.md`, which Claude Code (through
 `CLAUDE.md`), Antigravity, and the open path's agents all read. On the
