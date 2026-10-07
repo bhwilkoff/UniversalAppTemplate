@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
@@ -76,15 +77,15 @@ test('a published week that does not fit falls back to the defaults', () => {
   const bad = { weeks: { 2: [{ kind: 'board', title: 'Old name', minutes: 5 }] } };
   const got = K.plan(2, agenda, L.TURN, S, bad);
   assert.equal(got.from, 'defaults');
-  assert.equal(got.scenes.find(s => s.kind === 'design').config.template, 'prompt');
+  assert.equal(got.scenes.find(s => s.kind === 'design').config.template, K.WEEKS[2].template);
   assert.equal(K.plan(7, agenda, L.TURN, S, null), null);
 });
 
 test('making the sessions again adds no second copy of a question', () => {
   const wanted = K.defaultQuestions(1);
-  assert.equal(K.newQuestions(wanted, []).length, 3);
-  assert.equal(K.newQuestions(wanted, [{ kind: 'short', prompt: '  what is still MUDDY for you? ' }]).length, 2);
-  assert.equal(K.newQuestions(wanted.concat(wanted), []).length, 3);
+  assert.equal(K.newQuestions(wanted, []).length, wanted.length);
+  assert.equal(K.newQuestions(wanted, [{ kind: 'short', prompt: '  what is still MUDDY? ' }]).length, wanted.length - 1);
+  assert.equal(K.newQuestions(wanted.concat(wanted), []).length, wanted.length);
 });
 
 test('the page’s sentences say what was planned', () => {
@@ -116,9 +117,27 @@ test('Problem tests lays the student’s problem, Ben’s tests, and the convers
   }
 });
 
-test('week 1 asks for the student’s own problem and how they know others have it', () => {
+test('week 1 asks how sure the student is that others have their problem, and never says hum', () => {
   const qs = K.WEEKS[1].questions;
-  assert.equal(qs[0].prompt, 'What problem in your own life is worth building something for, and who else has it?');
+  assert.ok(qs.some(q => q.kind === 'scale' && /someone besides you has this problem/.test(q.prompt)));
+  assert.equal(K.WEEKS[1].template, 'problem-tests');
   for (const q of qs.concat(K.WEEKS.prep.questions)) assert.ok(K.bankQuestion(q), q.prompt);
   assert.ok(!/hum/i.test(JSON.stringify([K.WEEKS.prep, K.WEEKS[1]])), 'no hum instruction');
+});
+
+test('the fallback is the published plan: same board, rooms, note, and questions for every week', () => {
+  const published = JSON.parse(readFileSync(new URL('./fixtures-runs-of-show-main.json', import.meta.url), 'utf8'));
+  for (const w of published.weeks) {
+    const key = w.week === 0 ? 'prep' : String(w.week);
+    const mine = K.WEEKS[key];
+    assert.ok(mine, 'week ' + key);
+    const design = w.scenes.find(s => s.kind === 'design');
+    const rooms = w.scenes.find(s => s.kind === 'rooms');
+    assert.equal(mine.template, design.config.template, 'week ' + key + ' board');
+    assert.equal(mine.room, rooms.config.prompt, 'week ' + key + ' room');
+    assert.equal(mine.watch, rooms.note || '', 'week ' + key + ' note');
+    assert.deepEqual(mine.questions.map(q => q.prompt), (w.questions || []).map(q => q.prompt), 'week ' + key + ' questions');
+    const got = K.fromPublished(published, w.week, S);
+    assert.ok(got && got.scenes.length, 'week ' + key + ' passes the hub’s own scene rules');
+  }
 });

@@ -18,12 +18,14 @@ test('every week from Prep to 5 leads with one of the three moves and asks one q
     assert.equal(w.move.slice(0, 4), w.lead.toLowerCase().slice(0, 4));
     assert.match(w.question, /\?$/);
   }
-  assert.equal(L.weekOf(1).question, 'What problem in your own life is worth building something for, and who else has it?');
+  assert.equal(L.weekOf(1).question, 'What problem in my own life is worth building something for, and who else has it?');
 });
 
 test('a week is found from its session number, and nothing else is a week', () => {
   assert.equal(L.weekOf(0).name, 'Cohort Prep');
-  assert.equal(L.weekOf('3').lead, 'Play, then write');
+  assert.equal(L.weekOf('3').lead, 'Play, then publish');
+  assert.deepEqual(L.weekOf(3).starts, ['04', '05']);
+  assert.deepEqual(L.weekOf(3).shows, ['02', '03']);
   for (const n of [null, undefined, '', 6, -1, 2.5, 'two']) assert.equal(L.weekOf(n), null);
 });
 
@@ -31,7 +33,7 @@ test('"Stuck?" goes to the page for the move the week leads with, or the whole l
   assert.deepEqual(L.stuckFor(1), { url: '/stuck/writing/', label: 'Stuck writing', move: 'writing', lead: 'Write' });
   assert.equal(L.stuckFor(2).url, '/stuck/playing/');
   assert.equal(L.stuckFor(4).url, '/stuck/publishing/');
-  assert.equal(L.stuckFor(5).url, '/stuck/writing/');
+  assert.equal(L.stuckFor(5).url, '/stuck/publishing/');
   assert.deepEqual(L.stuckFor(null), { url: '/stuck/', label: 'When you are stuck', move: null });
   assert.equal(L.stuckFor(9).url, '/stuck/');
 });

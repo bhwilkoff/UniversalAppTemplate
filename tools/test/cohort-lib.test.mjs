@@ -58,7 +58,14 @@ test('a 75 minute session keeps the course shape', () => {
 });
 test('each week points at its stages of the path', () => {
   assert.deepEqual(lib.stagesForWeek(1), ['00', '01']);
+  assert.deepEqual(lib.stagesForWeek(3), ['04', '05']);
+  assert.deepEqual(lib.stagesForWeek(5), ['08']);
   assert.deepEqual(lib.stagesForWeek(9), []);
+  // COURSE.md's map: each session shows the stages the week before started.
+  assert.deepEqual(lib.stagesShownAt(1), []);
+  assert.deepEqual(lib.stagesShownAt(4), ['04', '05']);
+  assert.deepEqual(lib.stagesShownAt(5), ['06', '07']);
+  for (let w = 2; w <= 5; w++) assert.deepEqual(lib.stagesShownAt(w), lib.stagesForWeek(w - 1));
 });
 
 test('setup steps read their state from the hub, and the agent step is never marked', () => {

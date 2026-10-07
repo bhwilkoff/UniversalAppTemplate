@@ -12,9 +12,10 @@
   // When the cohort is "near its end", and so when the cohort page tells
   // a student what their app still needs, and the teacher sees who has
   // not submitted yet: from the start of the second-to-last session (week
-  // 4 of 5) to the end. Week 4 is where COURSE.md has the app installed
-  // on someone else's device, so asking earlier would ask for something
-  // the path has not reached yet, and week 5's showing is where every app
+  // 4 of 5) to the end. Week 4's session is where COURSE.md's week table
+  // shows the app installed on someone else's device (stage 05, started in
+  // week 3), so asking earlier would ask for something the path has not
+  // reached yet, and week 5's showing is where every app
   // is seen, so this leaves a full week, and one more session, to get
   // there. With one session, the week before it; with no sessions yet,
   // the same week counted from the cohort's first day. A finished cohort
