@@ -197,7 +197,7 @@ to draw, in writing, where the agent will read them.
 
 ## Working with your agent
 
-This week leads with write, then publishes to everyone, guests welcome.
+This stage leads with write, then publishes to everyone, guests welcome.
 The steps are one round of write, play, publish: the first two come
 before the agent is open, the middle ones are play and writing with the
 agent, and the last one shows your app and your declaration to everyone.

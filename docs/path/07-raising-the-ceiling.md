@@ -175,7 +175,7 @@ build.
 
 ## Working with your agent
 
-This week leads with write, then publishes to everyone. The steps are
+This stage leads with write, then publishes to everyone. The steps are
 one round of write, play, publish: the first two come before the agent
 is open, the middle ones are play, with the agent and the people it is
 for, and the last one shows the feature and the reason it exists.

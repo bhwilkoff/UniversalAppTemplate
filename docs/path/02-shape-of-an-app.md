@@ -199,7 +199,7 @@ on your devices, and the last one publishes to your group.
    not actually want. Ask why about any cell you do not understand.
 
 4. **Play: name the platform whose choices win.** When two platforms disagree
-   about order, labels or which shelves appear, one of them should be
+   about order, labels, or which shelves appear, one of them should be
    the reference. Say which. In late June the same shelves had
    different names and a different order on every Archive Watch
    platform, and I picked the Apple TV's:
