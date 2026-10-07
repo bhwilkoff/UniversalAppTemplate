@@ -2,8 +2,8 @@
 """
 Each session's default run of show is one the hub will accept.
 
-docs/teaching/runs-of-show.json holds the six sessions of a cohort (Prep
-and weeks 1 to 5) as scenes in the hub's own shape, and humanshaped.org
+docs/teaching/runs-of-show.json holds the six sessions of a cohort under
+`weeks` (Prep is week 0, then weeks 1 to 5) as scenes in the hub's own shape, and humanshaped.org
 seeds a new cohort from it. This checks the file's shape here, and then,
 when the hub's code is reachable (the `site` branch of this repository, or
 a path in HUB_SHOW_LIB), runs every scene through the hub's own
@@ -46,9 +46,9 @@ def check(ok, what, detail=""):
 
 
 data = json.loads(FILE.read_text())
-sessions = data.get("sessions", [])
-check([s["key"] for s in sessions] == ["prep", "week-1", "week-2", "week-3", "week-4", "week-5"],
-      "the six sessions, in order", ", ".join(s.get("key", "?") for s in sessions))
+sessions = data.get("weeks", [])
+check([s.get("week") for s in sessions] == [0, 1, 2, 3, 4, 5],
+      "`weeks` holds the six sessions, Prep (0) to week 5, in order", ", ".join(str(s.get("week")) for s in sessions))
 
 for s in sessions:
     scenes = s.get("scenes", [])
@@ -59,6 +59,8 @@ for s in sessions:
     check((ROOT / "docs/teaching" / s.get("guide", "")).exists(), f"{name}: its guide exists", s.get("guide", ""))
     for sc in scenes:
         k = sc.get("kind")
+        check(set(sc) <= {"kind", "title", "minutes", "body", "config", "note"},
+              f"{name}: {sc.get('title')} carries only the hub's scene fields", ", ".join(sorted(set(sc) - {"kind", "title", "minutes", "body", "config", "note"})))
         extra = set(sc.get("config", {})) - KEYS.get(k, set())
         check(k in KEYS and not extra, f"{name}: {sc.get('title')} is a {k} scene with only its own settings",
               ", ".join(sorted(extra)))
@@ -71,6 +73,10 @@ for s in sessions:
                   f"{inner} x 3 > {sc['minutes']}")
     check(any(sc["kind"] == "question" for sc in scenes), f"{name}: has a question scene")
     check(any(sc["kind"] == "design" for sc in scenes), f"{name}: has a design stage scene")
+    for q in s.get("questions", []):
+        check(set(q) <= {"kind", "prompt", "choices", "points"} and q.get("prompt"),
+              f"{name}: bank question has the bank's shape", q.get("prompt", "?"))
+    check(len(s.get("questions", [])) >= 2, f"{name}: prepares questions for the bank")
 
 
 # The hub's own rules, when its code can be reached.
@@ -98,13 +104,16 @@ else:
             "const L = require(process.argv[1]);"
             "const d = require(process.argv[2]);"
             "const out = [];"
-            "for (const s of d.sessions) for (const sc of s.scenes) {"
-            "  const p = L.problem(sc); if (p) out.push(s.key + ': ' + sc.title + ': ' + p); }"
+            "for (const s of d.weeks) {"
+            "  for (const sc of s.scenes) { const p = L.problem(sc); if (p) out.push(s.key + ': ' + sc.title + ': ' + p); }"
+            "  for (const q of (s.questions || [])) {"
+            "    const c = { prompt: q.prompt, kind: q.kind }; if (q.choices) c.options = q.choices; if (q.points) c.points = q.points;"
+            "    const p = L.problem({ kind: 'question', title: 'bank', minutes: 1, config: c }); if (p) out.push(s.key + ': bank: ' + q.prompt + ': ' + p); } }"
             "console.log(JSON.stringify(out));"
         )
         r = subprocess.run([node, "-e", script, str(lib), str(FILE)], capture_output=True, text=True)
         problems = json.loads(r.stdout or "[\"node failed: " + r.stderr.strip().replace('"', "'") + "\"]")
-        check(not problems, "every scene passes the hub's ShowLib.problem", "; ".join(problems))
+        check(not problems, "every scene and bank question passes the hub's ShowLib.problem", "; ".join(problems))
 
 print()
 if fails:
