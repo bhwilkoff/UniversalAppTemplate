@@ -10,7 +10,7 @@
   // Each week's move and question, in the course's own words.
   var WEEKS = [
     { week: 0, name: 'Cohort Prep', lead: 'Publish', move: 'publishing', question: 'What do I need in order to build at all?' },
-    { week: 1, name: 'Week 1', lead: 'Write', move: 'writing', question: 'What has hummed in my life for months, and who else hears it?' },
+    { week: 1, name: 'Week 1', lead: 'Write', move: 'writing', question: 'What problem in your own life is worth building something for, and who else has it?' },
     { week: 2, name: 'Week 2', lead: 'Play', move: 'playing', question: 'What is still wrong, and how do I say it so it gets fixed?' },
     { week: 3, name: 'Week 3', lead: 'Play, then write', move: 'playing', question: 'How do I know it works, and what does it look like when it comes from its why?' },
     { week: 4, name: 'Week 4', lead: 'Publish', move: 'publishing', question: 'What happens when someone I did not build it with holds it?' },
@@ -27,7 +27,7 @@
   var STUCK = [
     { doc: 'docs/stuck/README.md', url: '/stuck/', title: 'When you are stuck', move: null },
     { doc: 'docs/stuck/writing/README.md', url: '/stuck/writing/', title: 'Stuck writing', move: 'writing' },
-    { doc: 'docs/stuck/writing/find-your-hum.md', url: '/stuck/writing/find-your-hum/', title: 'I cannot find my hum', move: 'writing' },
+    { doc: 'docs/stuck/writing/find-a-problem.md', url: '/stuck/writing/find-a-problem/', title: 'I cannot find a problem worth building for', move: 'writing' },
     { doc: 'docs/stuck/writing/what-it-refuses.md', url: '/stuck/writing/what-it-refuses/', title: 'I cannot say what it refuses to do', move: 'writing' },
     { doc: 'docs/stuck/writing/what-next.md', url: '/stuck/writing/what-next/', title: 'I do not know what I want it to do next', move: 'writing' },
     { doc: 'docs/stuck/playing/README.md', url: '/stuck/playing/', title: 'Stuck playing', move: 'playing' },

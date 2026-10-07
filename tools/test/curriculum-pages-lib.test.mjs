@@ -18,7 +18,7 @@ test('every week from Prep to 5 leads with one of the three moves and asks one q
     assert.equal(w.move.slice(0, 4), w.lead.toLowerCase().slice(0, 4));
     assert.match(w.question, /\?$/);
   }
-  assert.equal(L.weekOf(1).question, 'What has hummed in my life for months, and who else hears it?');
+  assert.equal(L.weekOf(1).question, 'What problem in your own life is worth building something for, and who else has it?');
 });
 
 test('a week is found from its session number, and nothing else is a week', () => {

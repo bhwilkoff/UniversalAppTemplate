@@ -40,7 +40,7 @@ test('each week has its design stage, room prompt, watch note, and question', ()
     const q = show.find(s => s.kind === 'question');
     assert.equal(q.config.prompt, K.WEEKS[w].questions[0].prompt);
   }
-  assert.equal(K.weekShow(1, agenda, L.TURN, S).find(s => s.kind === 'design').config.template, 'hum');
+  assert.equal(K.weekShow(1, agenda, L.TURN, S).find(s => s.kind === 'design').config.template, 'problem-tests');
 });
 
 test('a shorter session still fits, without its break', () => {
@@ -82,9 +82,9 @@ test('a published week that does not fit falls back to the defaults', () => {
 
 test('making the sessions again adds no second copy of a question', () => {
   const wanted = K.defaultQuestions(1);
-  assert.equal(K.newQuestions(wanted, []).length, 2);
-  assert.equal(K.newQuestions(wanted, [{ kind: 'short', prompt: '  what is still MUDDY for you? ' }]).length, 1);
-  assert.equal(K.newQuestions(wanted.concat(wanted), []).length, 2);
+  assert.equal(K.newQuestions(wanted, []).length, 3);
+  assert.equal(K.newQuestions(wanted, [{ kind: 'short', prompt: '  what is still MUDDY for you? ' }]).length, 2);
+  assert.equal(K.newQuestions(wanted.concat(wanted), []).length, 3);
 });
 
 test('the page’s sentences say what was planned', () => {
@@ -95,14 +95,30 @@ test('the page’s sentences say what was planned', () => {
   assert.equal(K.startLabel(3), 'Start from the course’s plan for week 3');
 });
 
-test('Hum sort lays four frames, every word inside its frame', () => {
-  const t = B.template('hum');
-  assert.equal(t.frames.length, 4);
-  const els = B.templateElements('hum', 0);
+test('Problem tests lays the student’s problem, Ben’s tests, and the conversations, every word inside its frame', () => {
+  assert.equal(B.template('hum'), null, 'the hum sort is retired');
+  const t = B.template('problem-tests');
+  assert.equal(t.frames.length, 12);
+  assert.equal(t.frames[0].title, 'My problem');
+  assert.equal(t.frames[11].title, 'What the conversations showed');
+  for (const f of t.frames.slice(1, 11)) assert.match(f.title, /\?$/, 'each test is a plain question');
+  // It never asks anyone to sort Ben's published examples.
+  assert.ok(!/sort/i.test(JSON.stringify(t)));
+  const els = B.templateElements('problem-tests', 0);
+  assert.equal(els.length, 36);
+  assert.equal(new Set(els.map(e => e.id)).size, 36, 'ids never collide');
   const rects = els.filter(e => e.type === 'rectangle');
+  assert.equal(new Set(rects.map(r => r.y)).size, 3, 'four frames to a row');
   for (const e of els.filter(e => e.type === 'text')) {
     const frame = rects.find(r => e.x >= r.x && e.x < r.x + r.width && e.y >= r.y && e.y < r.y + r.height);
     assert.ok(frame && e.y + e.height <= frame.y + frame.height, e.text.slice(0, 20));
+    assert.ok(e.x + e.width <= frame.x + frame.width, e.text.slice(0, 20));
   }
-  assert.equal(t.frames[0].hint.split('\n').length, 8);
+});
+
+test('week 1 asks for the student’s own problem and how they know others have it', () => {
+  const qs = K.WEEKS[1].questions;
+  assert.equal(qs[0].prompt, 'What problem in your own life is worth building something for, and who else has it?');
+  for (const q of qs.concat(K.WEEKS.prep.questions)) assert.ok(K.bankQuestion(q), q.prompt);
+  assert.ok(!/hum/i.test(JSON.stringify([K.WEEKS.prep, K.WEEKS[1]])), 'no hum instruction');
 });

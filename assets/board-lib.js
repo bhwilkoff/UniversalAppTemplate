@@ -87,15 +87,35 @@
         { title: 'Play', hint: 'What happened when you used it on a real device?' },
         { title: 'Publish', hint: 'Who will play with it next, and what did they tell you?' }
       ] },
-    // Hum sort (curriculum design, week 1): Ben's own eight examples from
-    // his piece on human-shaped problems (October 6, 2026, DECISIONS.md),
-    // shortened to labels, and his closing contrast as the two sides.
-    { key: 'hum', name: 'Hum sort', line: 'Eight problems and your own, sorted into human-shaped and computer-shaped.',
+    // Problem tests (week 1, the template's docs/research/curriculum/
+    // 06-instructional-design.md, round 1): one candidate problem from the
+    // student's own life, in Ben's form (a first-person situation, then "I
+    // need something that..."), held to the tests Ben states in his own
+    // writing, one frame each as a plain question, and what two
+    // conversations with real people showed. It never asks anyone to sort
+    // Ben's published examples, which he has already labeled. The tests,
+    // in the template: docs/human-shaped/computer-shaped-problems.md:26-34
+    // (better or happier, wondered about often, unsolved for months, cannot
+    // do it yourself) and :64-68 (stories, not data points);
+    // docs/human-shaped/PRINCIPLES.md:64-65 and :78-81 (real people you
+    // can name), :83-84 (why a computer cannot simply solve it), :251-262
+    // (no new problem made), and :297-309 (one person glad of it as it
+    // ships); shared by many, the site's DECISIONS.md, "The method is
+    // Write, Play, Publish." Words by Claude, awaiting Ben's review.
+    { key: 'problem-tests', name: 'Problem tests', line: 'Your own problem, held to Ben’s tests one at a time, and what real people told you.',
       frames: [
-        { title: 'To sort', hint: 'Time to read books every day\nScreen-free ideas for my child and me\nThe news, as a story of what I believe\nMy beliefs, matched to my ballot\nNegative sentiment about a public figure\nThe cheapest grocery delivery\nEvery conversation, categorized\nThe neighborhoods with the best candy' },
-        { title: 'Human-shaped', hint: 'The world as interrelated stories to be told, experienced, and added to.' },
-        { title: 'Computer-shaped', hint: 'The world as disparate data points to be aggregated, quantified, and leveraged.' },
-        { title: 'Mine', hint: 'Write the hum in your own life, then sort it. Not sure yet is a fine place to start.' }
+        { title: 'My problem', hint: 'In your own words: I... and then, I need something that... Name a part of your life, not an app or a technology.' },
+        { title: 'Would solving it make my life better?', hint: 'Yes, not yet, or I don’t know, and why.' },
+        { title: 'Do I keep wondering about it?', hint: 'Yes, not yet, or I don’t know, and why.' },
+        { title: 'Has it gone unsolved for months or years?', hint: 'Yes, not yet, or I don’t know, and why.' },
+        { title: 'Is it something I cannot do with the tools I have now?', hint: 'Yes, not yet, or I don’t know, and why.' },
+        { title: 'Who else has it, and can I name them?', hint: 'Real people, by name or by who they are to you.' },
+        { title: 'Do many people have it?', hint: 'Yes, not yet, or I don’t know, and why.' },
+        { title: 'Why can’t a computer simply solve it for them?', hint: 'What part only people can do.' },
+        { title: 'Does it see people as stories, not data points?', hint: 'Yes, not yet, or I don’t know, and why.' },
+        { title: 'Would solving it make a new problem for someone?', hint: 'Who might it hurt, and how would you know?' },
+        { title: 'Would one person be glad of it as it ships?', hint: 'Who, and what would they do with it first?' },
+        { title: 'What the conversations showed', hint: 'What two people told you about the last time it happened to them.' }
       ] },
     { key: 'questions', name: 'The three questions', line: 'Where is it going, how is it going, and what is next.',
       frames: [
@@ -119,7 +139,7 @@
     if (!t || !t.frames.length) return [];
     var at = now == null ? 0 : now;
     var W = 420, H = 320, GAP = 40;
-    var perRow = t.frames.length === 4 ? 2 : t.frames.length;
+    var perRow = t.frames.length === 4 ? 2 : t.frames.length > 4 ? 4 : t.frames.length;
     var out = [], n = 0;
     var DIGITS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
     function base(type, x, y, w, h) {
