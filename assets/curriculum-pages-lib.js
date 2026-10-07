@@ -7,14 +7,16 @@
 // one of the three moves and makes all three. Tested in
 // tools/test/curriculum-pages-lib.test.mjs.
 (function (root) {
-  // Each week's move and question, in the course's own words.
+  // Each week's move and question, in the course's own words (COURSE.md's
+  // week table, October 7, 2026), with the stages it starts and the ones
+  // shown at its session.
   var WEEKS = [
-    { week: 0, name: 'Cohort Prep', lead: 'Publish', move: 'publishing', question: 'What do I need in order to build at all?' },
-    { week: 1, name: 'Week 1', lead: 'Write', move: 'writing', question: 'What problem in your own life is worth building something for, and who else has it?' },
-    { week: 2, name: 'Week 2', lead: 'Play', move: 'playing', question: 'What is still wrong, and how do I say it so it gets fixed?' },
-    { week: 3, name: 'Week 3', lead: 'Play, then write', move: 'playing', question: 'How do I know it works, and what does it look like when it comes from its why?' },
-    { week: 4, name: 'Week 4', lead: 'Publish', move: 'publishing', question: 'What happens when someone I did not build it with holds it?' },
-    { week: 5, name: 'Week 5', lead: 'Write, then publish', move: 'writing', question: 'What did I learn that the next builder should not have to, and is this version enough for its people?' }
+    { week: 0, name: 'Cohort Prep', lead: 'Publish', move: 'publishing', question: 'What do I need in order to build at all?', starts: ['setup'], shows: [] },
+    { week: 1, name: 'Week 1', lead: 'Write', move: 'writing', question: 'What problem in my own life is worth building something for, and who else has it?', starts: ['00', '01'], shows: [] },
+    { week: 2, name: 'Week 2', lead: 'Play', move: 'playing', question: 'What has to be the same on every device, and what should feel as if it was born there?', starts: ['02', '03'], shows: ['00', '01'] },
+    { week: 3, name: 'Week 3', lead: 'Play, then publish', move: 'playing', question: 'How do I know it works, and what happens when someone I did not build it with holds it?', starts: ['04', '05'], shows: ['02', '03'] },
+    { week: 4, name: 'Week 4', lead: 'Publish, then write', move: 'publishing', question: 'What is happening to it when I am not holding it, and what do I want now that I live with it?', starts: ['06', '07'], shows: ['04', '05'] },
+    { week: 5, name: 'Week 5', lead: 'Publish', move: 'publishing', question: 'Is this version enough for its people, and what should the next builder not have to learn?', starts: ['08'], shows: ['06', '07'] }
   ];
 
   var MOVES = {

@@ -12,77 +12,81 @@
 (function (root) {
   var SOURCE = 'https://raw.githubusercontent.com/bhwilkoff/UniversalAppTemplate/main/docs/teaching/runs-of-show.json';
 
-  var MUDDY = { kind: 'short', prompt: 'What is still muddy for you?' };
-
-  // Each week, from the design's table. The questions' first is the one
-  // the closing question scene asks; every one goes into the cohort's
-  // question bank, ready to ask instead. Week 2's choices are real
-  // commit messages: Archive Watch 2436f65, a805664, and b3249db, and
-  // Bsky Dreams 25385f0.
+  // Each week, as the template's docs/teaching/runs-of-show.json
+  // publishes it (COURSE.md's week table and research note 06, which Ben
+  // approved on October 7, 2026): the design stage's board, the rehearsal
+  // rooms' prompt and the teacher's note, and the week's questions. This is
+  // only the fallback for when that file cannot be read, so it is copied
+  // from it by tools/sync_curriculum_fallback.py, never written by hand;
+  // tools/test/curriculum-lib.test.mjs checks the two still agree. The
+  // questions' first is the one the closing question scene asks; every one
+  // goes into the cohort's question bank, ready to ask instead.
   var WEEKS = {
-    // Prep and week 1 follow the template's docs/research/curriculum/
-    // 06-instructional-design.md, section 3 (Ben approved it on October
-    // 7, 2026): a noticing log before week 1, then a problem from the
-    // student's own life held to Ben's tests, conversations with real
-    // people, and critique in the trio.
     prep: {
-      template: 'questions',
-      room: 'Show your app’s address on your phone, then read one line from your noticing log: a time you did something the long way because nothing helped.',
-      watch: 'Anyone whose setup is still stuck, anyone who has not met their trio, and anyone who has not started a noticing log.',
+      template: "questions",
+      room: "Show your app's address on your phone, and say one thing in your life you wish worked differently.",
+      watch: "Watch for anyone whose setup is still stuck, and anyone who has not met their trio yet.",
       questions: [
-        { kind: 'short', prompt: 'What is one thing you did the long way this week because nothing helped?' },
-        { kind: 'scale', prompt: 'How ready do you feel to build?', points: 5, choices: ['Not yet', 'Ready'] }
+        {"kind": "short", "prompt": "What do you hope this app will do for someone?"},
+        {"kind": "scale", "prompt": "How ready do you feel to build?", "choices": ["Not ready yet", "Ready to build"], "points": 5},
+        {"kind": "short", "prompt": "What did your agent do for you during setup that you expected to have to do yourself?"},
+        {"kind": "choice", "prompt": "Where will you keep your noticing log this week?", "choices": ["A notes app on my phone", "Paper", "My app's note", "Somewhere else"]}
       ]
     },
     1: {
-      template: 'problem-tests',
-      room: 'Read your problem statement aloud, then say what one conversation showed. Partners: be kind, specific, and helpful, and offer ideas as “Have you considered...?”',
-      watch: 'A problem statement that names an app or a technology instead of a part of someone’s life, a problem no one else was asked about, and a why with no people in it.',
+      template: "problem-tests",
+      room: "Read your problem statement aloud. Then listen to the questions, and write down the one you want to answer.",
+      watch: "Critique rules from Ron Berger. Watch for a statement that names a technology instead of a situation, and for a room where nobody asks a question.",
       questions: [
-        { kind: 'short', prompt: 'What problem in your own life is worth building something for, and who else has it?' },
-        { kind: 'choice', prompt: 'How do you know other people have your problem?', choices: ['Someone told me about a time it happened to them', 'I think so, but I have not asked yet', 'I am not sure anyone else has it'] },
-        MUDDY
+        {"kind": "short", "prompt": "Which would you rather read, and what would be lost if the app only had the first kind?"},
+        {"kind": "words", "prompt": "In a few words, what do these four problem statements do well?"},
+        {"kind": "scale", "prompt": "How sure are you, right now, that someone besides you has this problem?", "choices": ["Not sure at all", "I could name them"], "points": 5},
+        {"kind": "short", "prompt": "What is still muddy?"},
+        {"kind": "multi", "prompt": "Which of these does your problem statement do?", "choices": ["Starts from something that happens in my life", "Says what a better life would look like", "Names who else has it", "Never names a technology"]},
+        {"kind": "rank", "prompt": "Which questions for your two conversations will tell you the most?", "choices": ["Tell me about the last time you...", "What did you try?", "What happened next?", "Who else deals with this?"]}
       ]
     },
     2: {
-      template: 'prompt',
-      room: 'Show one verb on both platforms, and one cell your eyes proved wrong.',
-      watch: 'Play that is not being written down, and the same complaint sent three times.',
+      template: "blank",
+      room: "Read your problem statement, show the app on your phone, and say what the person you talked to did first.",
+      watch: "Watch for a problem statement that has not changed since week 1, \"my friend liked it\" with nothing about what the person did, and a first version that grew past the smallest thing.",
       questions: [
-        { kind: 'multi', prompt: 'Which of these real commit messages is a round?', choices: [
-          'UX round 7: sidebar selection, hero cleanup, detail focus lock, resume text',
-          'UI round 6: remove title-height cap, remove BackChip, up-arrow dismisses Detail',
-          'Last MVP updates',
-          'Four real fixes: collection titles, sidebar flash, sidebar ghost text, up-from-related'
-        ] },
-        MUDDY
+        {"kind": "short", "prompt": "Which device will the people you talked to reach for, and why that one second?"},
+        {"kind": "multi", "prompt": "Which of these belong in the data, so every platform gets them the same way? Choose every one.", "choices": ["A film's title and year", "Whether a film is saved", "A trivia question's correct answer", "Swipe to go back", "The size of the play button"]},
+        {"kind": "short", "prompt": "What is still muddy?"}
       ]
     },
     3: {
-      template: 'prompt',
-      room: 'Show the screenshot that proved a fix, and the look beside the template’s.',
-      watch: '“It works” with no evidence, and a look borrowed from somewhere else.',
+      template: "prompt",
+      room: "Show one verb on both platforms, the cell your eyes proved wrong, and your app's look beside the template's.",
+      watch: "Watch for a second platform that only runs in a simulator, a look with no line back to the people it is for, and anyone who has not named a person outside the cohort whose device the app could reach.",
       questions: [
-        { kind: 'short', prompt: 'How do you know your last fix is real?' },
-        MUDDY
+        {"kind": "short", "prompt": "When your agent says something is fixed, what do you ask to see, and why is its word not enough?"},
+        {"kind": "short", "prompt": "How do you know your last fix is real?"},
+        {"kind": "short", "prompt": "What is still muddy?"}
       ]
     },
     4: {
-      template: 'moves',
-      room: 'Show the app on someone else’s device, or tell us what they said.',
-      watch: 'Anyone who has not published to another person yet.',
+      template: "blank",
+      room: "Show what the person did first, beside the guess you wrote before they held it.",
+      watch: "Critique rules from Ron Berger: be kind, be specific, be helpful, and offer suggestions as questions. Visit every group tonight. Watch for anyone who has not handed the app to another person yet, and ask them privately what is in the way.",
       questions: [
-        { kind: 'rank', prompt: 'Put these in the order the other person noticed them.', choices: ['What it is for', 'How it looks', 'What it does', 'Something that broke'] },
-        { kind: 'words', prompt: 'In a word, how did it feel to hand it over?' }
+        {"kind": "short", "prompt": "What is the difference between a fix that is verified and a fix that is shipped?"},
+        {"kind": "rank", "prompt": "Rank what the other person noticed first.", "choices": ["What it is for", "How it looks", "What it does first", "Something that broke", "How fast it is"]},
+        {"kind": "words", "prompt": "In one word, how did it feel to hand it over?"},
+        {"kind": "short", "prompt": "What is one thing about your app you can no longer see by using it yourself, and how will you find out about it?"},
+        {"kind": "short", "prompt": "What is still muddy?"}
       ]
     },
     5: {
-      template: 'questions',
-      room: 'Explain every part of your app, even the parts the agent wrote.',
-      watch: 'Whether each student can name what is enough, for now.',
+      template: "questions",
+      room: "Explain every part of your app, even the parts the agent wrote, and the number and the feature you will show.",
+      watch: "Critique rules from Ron Berger: be kind, be specific, be helpful, and offer suggestions as questions. Watch for a part of the app its builder cannot explain, and for a value that never changed a decision.",
       questions: [
-        { kind: 'short', prompt: 'What waits for the next version?' },
-        MUDDY
+        {"kind": "short", "prompt": "What is enough about this version, for now, and for whom?"},
+        {"kind": "short", "prompt": "What waits for the next version?"},
+        {"kind": "short", "prompt": "What will your agent know at the start of your next app that it did not know in week 1, and where does that knowledge live?"},
+        {"kind": "short", "prompt": "What is still muddy?"}
       ]
     }
   };

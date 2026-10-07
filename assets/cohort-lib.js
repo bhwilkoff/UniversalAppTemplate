@@ -93,9 +93,14 @@
     return null;
   }
 
-  // Which stages of the path each week covers (COURSE.md, five weeks).
-  var WEEK_STAGES = { 1: ['00', '01'], 2: ['02', '03'], 3: ['04'], 4: ['05', '06'], 5: ['07', '08'] };
+  // Which stages of the path each week works on (COURSE.md's week table,
+  // October 7, 2026): each session opens its week and starts these; the
+  // stages before them are shown at that session (WEEK_SHOWS). Week 5
+  // shows 06 and 07 at the showing, and stage 08 is written after.
+  var WEEK_STAGES = { 1: ['00', '01'], 2: ['02', '03'], 3: ['04', '05'], 4: ['06', '07'], 5: ['08'] };
+  var WEEK_SHOWS = { 2: ['00', '01'], 3: ['02', '03'], 4: ['04', '05'], 5: ['06', '07'] };
   function stagesForWeek(n) { return WEEK_STAGES[n] || []; }
+  function stagesShownAt(n) { return WEEK_SHOWS[n] || []; }
 
   // Each stage's file in the template, read live the way render.js does.
   var STAGE_FILES = {
@@ -195,7 +200,7 @@
 
   var lib = {
     welcome: welcome,
-    setupSteps: setupSteps, agenda: agenda, partNow: partNow, stagesForWeek: stagesForWeek, stageFile: stageFile,
+    setupSteps: setupSteps, agenda: agenda, partNow: partNow, stagesForWeek: stagesForWeek, stagesShownAt: stagesShownAt, stageFile: stageFile,
     readyBar: readyBar, readinessText: readinessText, seenText: seenText, canConfirm: canConfirm, partnersOf: partnersOf,
     currentAndNext: currentAndNext, commitLine: commitLine, ago: ago, repoPath: repoPath, PARTS: PARTS
   };
