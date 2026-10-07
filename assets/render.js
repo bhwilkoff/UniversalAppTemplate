@@ -43,7 +43,7 @@
     'docs/stuck/': '/stuck/',
     'docs/stuck/README.md': '/stuck/',
     'docs/stuck/writing/README.md': '/stuck/writing/',
-    'docs/stuck/writing/find-your-hum.md': '/stuck/writing/find-your-hum/',
+    'docs/stuck/writing/find-a-problem.md': '/stuck/writing/find-a-problem/',
     'docs/stuck/writing/what-it-refuses.md': '/stuck/writing/what-it-refuses/',
     'docs/stuck/writing/what-next.md': '/stuck/writing/what-next/',
     'docs/stuck/playing/README.md': '/stuck/playing/',

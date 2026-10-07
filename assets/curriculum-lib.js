@@ -20,21 +20,27 @@
   // commit messages: Archive Watch 2436f65, a805664, and b3249db, and
   // Bsky Dreams 25385f0.
   var WEEKS = {
+    // Prep and week 1 follow the template's docs/research/curriculum/
+    // 06-instructional-design.md, section 3 (Ben approved it on October
+    // 7, 2026): a noticing log before week 1, then a problem from the
+    // student's own life held to Ben's tests, conversations with real
+    // people, and critique in the trio.
     prep: {
       template: 'questions',
-      room: 'Show your app’s address on your phone, and say one thing that hums in your life.',
-      watch: 'Anyone whose setup is still stuck, and anyone who has not met their trio yet.',
+      room: 'Show your app’s address on your phone, then read one line from your noticing log: a time you did something the long way because nothing helped.',
+      watch: 'Anyone whose setup is still stuck, anyone who has not met their trio, and anyone who has not started a noticing log.',
       questions: [
-        { kind: 'short', prompt: 'What do you hope this app will do for someone?' },
+        { kind: 'short', prompt: 'What is one thing you did the long way this week because nothing helped?' },
         { kind: 'scale', prompt: 'How ready do you feel to build?', points: 5, choices: ['Not yet', 'Ready'] }
       ]
     },
     1: {
-      template: 'hum',
-      room: 'Show the first platform, and read your why aloud. What will it refuse to do?',
-      watch: 'A problem that is really computer-shaped, and a why with no people in it.',
+      template: 'problem-tests',
+      room: 'Read your problem statement aloud, then say what one conversation showed. Partners: be kind, specific, and helpful, and offer ideas as “Have you considered...?”',
+      watch: 'A problem statement that names an app or a technology instead of a part of someone’s life, a problem no one else was asked about, and a why with no people in it.',
       questions: [
-        { kind: 'choice', prompt: 'Is your problem human-shaped or computer-shaped?', choices: ['Human-shaped', 'Computer-shaped', 'Not sure yet'] },
+        { kind: 'short', prompt: 'What problem in your own life is worth building something for, and who else has it?' },
+        { kind: 'choice', prompt: 'How do you know other people have your problem?', choices: ['Someone told me about a time it happened to them', 'I think so, but I have not asked yet', 'I am not sure anyone else has it'] },
         MUDDY
       ]
     },
