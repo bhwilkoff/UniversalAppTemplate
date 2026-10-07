@@ -12,8 +12,17 @@ this note reads them for one thing: the order in which a nagging problem
 actually became a running app, so that a cohort can follow that order on
 purpose instead of by accident.
 
-The curriculum should teach the sequence I actually used, not the one I
-would have described.
+The method stays the one we already teach: **Write, Play, Publish**
+(stage 00, [`00-why-we-build.md`](../../path/00-why-we-build.md), and the
+site's DECISIONS.md, where I put it this way: "Writing gets it out of my
+head. Playing makes my thinking tangible. Publishing is about releasing
+things into the world and letting others play."). This note does not add
+a loop beside it. It reads the record to show where my real work already
+followed that loop, where it bent, and how a cohort's chunks can each be
+one honest round of it.
+
+The curriculum should teach Write, Play, Publish in the order I actually
+used it, not the order I would have described.
 
 ## Where this comes from
 
@@ -190,6 +199,42 @@ Watch, June 3), and the same complaint in Tidbits Trivia on June 20.
 Handoffs before a context reset are a habit by then ("Docs: compaction
 handoff", Tidbits-Trivia a9502f1, June 17).
 
+## The phases are Write, Play, Publish, at different sizes
+
+Every phase above is a round of the same three moves, and the record
+shows each one starting from a different move. That is the loop doing
+what stage 00 says it does: the moves are not stages, and every round
+makes all three.
+
+| Phase | Leads with | The round inside it, from the record |
+|---|---|---|
+| 1. Living with the hum | Write (late) | The hum lived in my head for months; it became writing only when a README's why was written, and nothing was played or published until then |
+| 2. The why and research | **Write** | Values note and research docs (Bsky-Dreams 9df79a3, Archive-Watch 32217eb), played against the first decisions (4162f80), published as the repository itself |
+| 3. Real data | **Play** | Played the catalog in the simulator ("astonishingly few", April 19), wrote the research that answered it, published a bigger catalog (6c5c931) |
+| 4. One platform | **Publish** | Published early to the web, where I could see it (BOBA-Playbook c7c5b6f), so playing it on my phone was possible the same day |
+| 5. Rounds | **Play** | Played on my device, wrote the round as a list, published the fix; seven of these in one day (Archive-Watch 36daef9 to 2436f65) |
+| 6. Milestones and decisions | **Write** | Wrote milestones 8 to 27 (Bsky-Dreams 14d0678), played them by number (ba8d912), and the commit history published the result |
+| 7. Second platform and parity | **Play** | Played the two side by side, wrote PARITY.md, published the second app |
+| 8. Seeing it work | **Play**, then **Write** | Played until the same bug kept returning, then wrote it down as a validator and a playbook (ddf6393, 2c0be46) |
+| 9. Someone else's device | **Publish** | Published to TestFlight, a tester played it, and his call became six written fixes (94ac478) |
+| 10. Loops | **Write** | Wrote the backlog and the handoff so the agent could play through it without me (Tidbits-Trivia a9502f1) |
+
+**Where the loop bent.** Three bends show up in the record, and each is
+something the curriculum should correct rather than copy.
+
+- **Publishing came last for the people, first for me.** I published to
+  myself (the web, my phone) within a day, but to another person only
+  after two days (Tidbits) to seven weeks (Archive Watch). The method
+  says the people who play with what you publish tell you what to write
+  next; most of my early rounds had only one player.
+- **Play often outran Write.** 8 to 18 percent of my prompts are some
+  form of "still" or "I don't see", rounds of play where what I saw was
+  not yet written anywhere the agent could keep it. The repeated focus
+  bug ended only when play turned into writing (phase 8).
+- **Write sometimes started without me.** The hum (phase 1) was never
+  written at all, so the problem's choosing is the one round the record
+  cannot show. That is the round the first week has to add.
+
 ## Where I got stuck, and what got me out
 
 Five patterns repeat across the four apps. Each one is a lesson a cohort
@@ -229,35 +274,37 @@ them, and the curriculum has to supply them.
 
 ## A chunking for five weeks
 
-Each chunk centers on one question, is done as conversations with the
-agent and looks at a real device (never hand-edited files or local
-servers), and leaves an artifact. The week numbers match
-[`COURSE.md`](../../../COURSE.md); the chunks inside them are new.
+Each chunk is one round of Write, Play, Publish, led by the move named
+below, and centered on one question. It is done as conversations with the
+agent and by looking at a real device (never hand-edited files or local
+servers), and it leaves an artifact. The week numbers match
+[`COURSE.md`](../../../COURSE.md); the chunks inside them are new, and
+they lean on Publish earlier than I did, to correct the first bend.
 
-| Week | Chunk | The question it centers on | What it leaves |
-|---|---|---|---|
-| Prep | Set up | What do I need in order to build at all? | Their app's address open on their own phone |
-| 1 | Find the hum | What has bothered me for months that my current tools cannot fix? | Three candidate problems, in their own words |
-| 1 | Human-shaped or computer-shaped | Does this problem see people as stories or as data points? | One problem chosen, with the computer-shaped version written beside it |
-| 1 | The why, written first | Who is it for, and what will it refuse to do? | A values note in the repository, before any feature |
-| 1 | Real data | What is this app actually about, in real things? | A working source of real data, with one surprise it taught them |
-| 1 | One platform you can see | What is the smallest version I can hold in my hand this week? | One platform live, and the first round of feedback |
-| 2 | Rounds | What is still wrong, and how do I say it so it gets fixed? | Two or more numbered feedback rounds, with screenshots |
-| 2 | Milestones and decisions | What comes next, and why did I choose this over that? | A milestone list and three decisions with reasons |
-| 2 | A second platform | What does this app become on a different device? | A second platform, and one parity gap they found themselves |
-| 3 | Seeing it work | How do I know a fix is real without taking the agent's word? | A check or screenshot that proved a fix |
-| 3 | Its own look | What does this app look like when it comes from its why? | The app's look beside the template's default |
-| 4 | Someone else's hand | What happens when a person I did not build it for uses it? | The app on another person's device, and what they said |
-| 4 | One honest number | What can I learn from the app in the world without watching anyone? | One number, read honestly |
-| 5 | A feature from living with it | What do I want now that I have used it for a week? | A feature that came from their own use |
-| 5 | Teaching the agent to remember | What would the next session get wrong if I did not write this down? | A handoff note and one skill or memory |
-| 5 | Enough, for now | What does this version need to be finished for its people? | A shown app, and the decision about what waits |
+| Week | Chunk | Leads with | The question | One round of write, play, publish | What it leaves |
+|---|---|---|---|---|---|
+| Prep | Set up | Publish | What do I need in order to build at all? | Write the app's name; play the address on the phone; publish it to the group | Their app's address open on their own phone |
+| 1 | Find the hum | Write | What has bothered me for months that my current tools cannot fix? | Write three candidate problems; play them aloud with their trio; publish the one they chose and why | Three candidates, in their own words |
+| 1 | Human-shaped or computer-shaped | Play | Does this problem see people as stories or as data points? | Write the computer-shaped version beside it; play with both against Ben's examples; publish the contrast to the trio | One problem chosen, with its computer-shaped twin |
+| 1 | The why, written first | Write | Who is it for, and what will it refuse to do? | Write the values note; play it against the agent's first plan; publish it in the repository | A values note committed before any feature |
+| 1 | Real data | Play | What is this app actually about, in real things? | Write where the data comes from; play the real items on the device; publish one surprise they taught | A working source of real data, and the surprise |
+| 1 | One platform you can see | Publish | What is the smallest version I can hold this week? | Write the one verb; play it on the phone; publish the address to someone the app is for | One platform live, and the first outside reaction |
+| 2 | Rounds | Play | What is still wrong, and how do I say it so it gets fixed? | Play on the device; write the round with screenshots; publish the fixed build | Two or more numbered rounds |
+| 2 | Milestones and decisions | Write | What comes next, and why this over that? | Write milestones and three decisions; play the first milestone; publish the decisions with the bring-back | A milestone list and three decisions with reasons |
+| 2 | A second platform | Play | What does this app become on another device? | Play both side by side; write the parity gap; publish the second platform | A second platform, and one gap they found themselves |
+| 3 | Seeing it work | Play | How do I know a fix is real without taking the agent's word? | Play until a bug returns; write the check that catches it; publish the screenshot that proved it | A check or screenshot that proved a fix |
+| 3 | Its own look | Publish | What does this app look like when it comes from its why? | Write the look from the why; play it on the device; publish it beside the template's default | The app's look beside the default |
+| 4 | Someone else's hand | Publish | What happens when a person I did not build it for uses it? | Publish to another person's device; play beside them; write what they said | The app on another person's device, and their words |
+| 4 | One honest number | Write | What can I learn without watching anyone? | Write what the number should mean; play with what Pulse reads; publish the number honestly | One number, read honestly |
+| 5 | A feature from living with it | Play | What do I want now that I have used it for a week? | Play it in daily life; write the feature; publish it to the people from week 4 | A feature from their own use |
+| 5 | Teaching the agent to remember | Write | What would the next session get wrong if I did not write it down? | Write the handoff and one skill; play a fresh session with it; publish it in the repository | A handoff and one skill or memory |
+| 5 | Enough, for now | Publish | What does this version need to be finished for its people? | Write what waits; play the finished version once more; publish it to everyone, guests welcome | A shown app, and the decision about what waits |
 
 The first week carries more chunks than the others because the record
-says that is where the real work is, and because the problem-finding
-steps are the ones I never had to do with an agent. If that is too much
-for one week, "Real data" and "One platform" can move into week 2
-without changing anything else.
+says that is where the real work is, and because "Find the hum" and its
+twin are the rounds my record never shows. If that is too much for one
+week, "Real data" and "One platform" can move into week 2 without
+changing anything else.
 
 ## The evidence each chunk leaves
 
