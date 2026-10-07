@@ -588,6 +588,29 @@
     });
   }
 
+  // The move this week leads with, its question, and the stuck library's
+  // page for that move (curriculum C7, CurriculumPagesLib). Words by
+  // Claude, awaiting Ben's review.
+  function drawWeekMove(n) {
+    var C = window.CurriculumPagesLib;
+    var q = $('[data-week-question]'), st = $('[data-stuck-line]');
+    if (!C || !q || !st) return;
+    var w = C.weekOf(n);
+    q.hidden = !w;
+    if (w) q.textContent = 'This week leads with ' + w.lead.toLowerCase() + ': ' + w.question;
+    var s = C.stuckFor(n);
+    st.replaceChildren();
+    st.appendChild(document.createTextNode('Stuck? Ask yourself one question first, then try what '));
+    var a = document.createElement('a'); a.href = s.url; a.textContent = s.label;
+    st.appendChild(a);
+    st.appendChild(document.createTextNode(' suggests' + (s.move ? ', or look through ' : '.')));
+    if (s.move) {
+      var all = document.createElement('a'); all.href = '/stuck/'; all.textContent = 'the whole library';
+      st.appendChild(all); st.appendChild(document.createTextNode('.'));
+    }
+    st.hidden = false;
+  }
+
   function draw(people, mine, sessions, groups, shares, contact, teachers) {
     $('[data-title]').textContent = cohort.title;
     $('[data-lead]').textContent = cohort.description || '';
@@ -597,6 +620,7 @@
     var room = myGroup ? safe(myGroup.meet_url) : null;
     $('[data-week-title]').textContent = t.current ? 'Week ' + t.current.number + (t.current.title && t.current.title !== 'Week ' + t.current.number ? ': ' + t.current.title : '') : 'This week';
     $('[data-week-scope]').textContent = t.current && t.current.scope ? t.current.scope : 'Your teacher will put this week’s challenge here.';
+    drawWeekMove(t.current ? t.current.number : null);
     drawBackground();
     var na = $('[data-next-actions]'); na.replaceChildren();
     if (t.next) {

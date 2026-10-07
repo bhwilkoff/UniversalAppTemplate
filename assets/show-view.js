@@ -10,7 +10,7 @@
 // moves the element to where it belongs as the scenes change, so nothing
 // a person was typing is redrawn or lost.
 //
-// ShowView.mount({ mount, parts, teaching, onPick(key), tools(key) })
+// ShowView.mount({ mount, parts, teaching, onPick(key), tools(key), stuck })
 // returns { slot(key, element), count(key, n), update(currentKey),
 // cues(container, { cardHref }) }.
 // onPick is the teacher's "make this the current scene"; tools(key), if
@@ -216,6 +216,20 @@
     var anyList = el('div', 'show-anytime-list');
     any.appendChild(anyList);
     box.appendChild(any);
+
+    // A student's way out when stuck (curriculum C7): the stuck library's
+    // page for the move this week leads with (CurriculumPagesLib.stuckFor).
+    if (!teaching && opts.stuck && opts.stuck.url) {
+      var stuck = el('p', 'small show-stuck');
+      stuck.appendChild(document.createTextNode('Stuck? Ask yourself one question first, then try what '));
+      var sa = el('a', null, opts.stuck.label);
+      sa.href = opts.stuck.url;
+      sa.target = '_blank';
+      sa.rel = 'noopener';
+      stuck.appendChild(sa);
+      stuck.appendChild(document.createTextNode(' suggests, and bring it to your trio if it is still stuck after twenty minutes.'));
+      box.appendChild(stuck);
+    }
 
     var words = el('details', 'show-words');
     words.appendChild(el('summary', null, 'What the words mean'));

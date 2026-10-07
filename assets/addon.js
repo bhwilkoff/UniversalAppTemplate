@@ -257,6 +257,7 @@
     S.list = S.parts;
     S.show = window.ShowView.mount({
       mount: $('[data-show]'), parts: S.list, teaching: S.teaching,
+      stuck: window.CurriculumPagesLib && S.session ? window.CurriculumPagesLib.stuckFor(S.session.number) : null,
       onPick: function (key) {
         if (shared()) { S.run.go(key); return; }
         S.chosenPart = key; S.timerEnds = null; drawPart(true);

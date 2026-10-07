@@ -37,7 +37,30 @@
     'docs/path/README.md': '/cohorts/#weeks',
     'docs/path/': '/cohorts/#weeks',
     'docs/human-shaped/PRINCIPLES.md': '/principles/',
-    'docs/human-shaped/computer-shaped-problems.md': '/about/'
+    'docs/human-shaped/computer-shaped-problems.md': '/about/',
+    // The stuck library (curriculum C7), kept equal to
+    // CurriculumPagesLib.stuckSiteMap() by tools/test/curriculum-pages-lib.test.mjs.
+    'docs/stuck/': '/stuck/',
+    'docs/stuck/README.md': '/stuck/',
+    'docs/stuck/writing/README.md': '/stuck/writing/',
+    'docs/stuck/writing/find-your-hum.md': '/stuck/writing/find-your-hum/',
+    'docs/stuck/writing/what-it-refuses.md': '/stuck/writing/what-it-refuses/',
+    'docs/stuck/writing/what-next.md': '/stuck/writing/what-next/',
+    'docs/stuck/playing/README.md': '/stuck/playing/',
+    'docs/stuck/playing/cannot-see-the-fix.md': '/stuck/playing/cannot-see-the-fix/',
+    'docs/stuck/playing/same-bug.md': '/stuck/playing/same-bug/',
+    'docs/stuck/playing/not-enough-data.md': '/stuck/playing/not-enough-data/',
+    'docs/stuck/playing/feels-wrong.md': '/stuck/playing/feels-wrong/',
+    'docs/stuck/playing/agent-stops.md': '/stuck/playing/agent-stops/',
+    'docs/stuck/playing/tools-stuck.md': '/stuck/playing/tools-stuck/',
+    'docs/stuck/publishing/README.md': '/stuck/publishing/',
+    'docs/stuck/publishing/not-ready.md': '/stuck/publishing/not-ready/',
+    'docs/stuck/publishing/someone-elses-device.md': '/stuck/publishing/someone-elses-device/',
+    'docs/stuck/publishing/when-is-it-enough.md': '/stuck/publishing/when-is-it-enough/',
+    'docs/stuck/publishing/life.md': '/stuck/publishing/life/',
+    'docs/stuck/writing/': '/stuck/writing/',
+    'docs/stuck/playing/': '/stuck/playing/',
+    'docs/stuck/publishing/': '/stuck/publishing/'
   };
 
   // The founding apps a case study can show (assets/apps/).
@@ -175,6 +198,22 @@
         first.remove();
       }
     }
+
+    // "The question." opening a paragraph is the stage's question
+    // (docs/templates/LESSON-template.md), drawn as a panel of its own.
+    Array.prototype.forEach.call(root.children, function (p) {
+      if (p.nodeName !== 'P') return;
+      var q = p.firstElementChild;
+      if (!q || q.nodeName !== 'STRONG' || p.firstChild !== q) return;
+      if (!/^the question\.?$/i.test(q.textContent.replace(/\s+/g, ' ').trim())) return;
+      var box = el('div', { 'class': 'stage-question' });
+      box.appendChild(el('p', { 'class': 'stage-question-label' }, 'The question'));
+      q.remove();
+      var text = el('p', { 'class': 'stage-question-text' });
+      text.innerHTML = p.innerHTML.trim();
+      box.appendChild(text);
+      p.replaceWith(box);
+    });
 
     // A paragraph of its own that is one bold line is a thesis (never one
     // inside a list item or a quote).

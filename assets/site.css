@@ -324,6 +324,18 @@ h3 { font-size: 1.25rem; letter-spacing: -0.012em; line-height: 1.25; }
 .article code { font-family: inherit; font-weight: 600; }
 .bring-back { margin: 3rem 0 0; padding: 1.5rem 1.25rem; background: var(--surface); border-radius: var(--radius); font-size: 1.15rem; line-height: 1.5; }
 .bring-back strong { color: var(--accent); }
+/* A stage's question (curriculum C7): the lesson starts here, so it sits
+   apart, before the steps, in the same quiet panel as the bring-back. */
+.prose ol.rounds { padding-left: 1.2rem; display: grid; gap: 0.6rem; }
+.wk-move { margin: 0.35rem 0 0; color: var(--muted); font-size: 0.95rem; line-height: 1.4; }
+.wk-lead { color: var(--ink); font-weight: 600; }
+.stage-question { margin: 1.5rem 0 2rem; padding: 1.25rem; background: var(--surface); border-radius: var(--radius); border-left: 3px solid var(--accent); }
+.stage-question p { margin: 0; }
+.stage-question-label { font-size: 0.85rem; font-weight: 650; letter-spacing: 0.04em; text-transform: uppercase; color: var(--accent); }
+.stage-question-text { margin-top: 0.35rem !important; font-size: clamp(1.15rem, 1.05rem + 0.4vw, 1.35rem); line-height: 1.35; font-weight: 600; color: var(--ink); overflow-wrap: anywhere; }
+/* The "Stuck?" line on /cohort/ and in the run of show. */
+.stuck-line { margin: 0.75rem 0 0; }
+.show-stuck { margin: 0; padding: 0.6rem 0.8rem; border: 1px solid var(--rule); border-radius: var(--radius); }
 .next-stage { margin-top: 2rem; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem; font-weight: 600; }
 
 /* The home page after Ben's review of October 5 (DECISIONS.md): the
