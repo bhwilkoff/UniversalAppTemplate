@@ -1372,7 +1372,9 @@ Phase 1, research (October 7, five agents, notes in the template at
 docs/research/curriculum/): 01 mining Ben's process and apps, 02 the
 landscape of aligned work, 03 Claude Code and Antigravity, 04 the open
 pathway, 05 inquiry and evidence. Phase 2: a curriculum architecture
-from those notes. Phase 3: write the lessons in the template, the
+from those notes, inside Write, Play, Publish (DECISIONS.md "Our method
+leads the curriculum": no second loop; research only serves the three
+moves, credited where used). Phase 3: write the lessons in the template, the
 per-session run-of-show defaults and stuck resources on the hub, and the
 evidence map into the credential.
 

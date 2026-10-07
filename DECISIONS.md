@@ -602,3 +602,21 @@ liked.
   kit say.
 - No highlighted words (Ben, later the same night): the thistle
   highlight on "sleeves" read as AI-written and was removed.
+
+## Our method leads the curriculum (October 7, 2026)
+
+While the curriculum research came in, Ben: "Make sure any new loops
+that we are creating work with the one we have already established:
+Write, Play, Publish. We have to make sure that OUR processes and ideas
+are at the forefront. The research is incredibly helpful (it is one of
+the principles!), but we have to stay true to Human Shaped Software."
+
+**How to apply:** the curriculum introduces no second loop. Every
+lesson, live session, assignment, and stuck resource is a round of
+Write, Play, Publish, with the fifteen principles deciding what is
+written, played with, and published. Outside ideas found in research
+(an agent's explore, plan, build, check; Resnick's creative learning
+spiral; the Question Formulation Technique; productive failure) are
+taken in only as ways of doing one of the three moves well, credited
+where they are used, never as the frame. Ben's own process, apps, and
+words come first; research supports and sharpens them.
