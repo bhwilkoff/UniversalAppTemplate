@@ -22,7 +22,7 @@ that is what every guide is built around.
 | Session | Leads with | What gets brought back | Guide |
 |---|---|---|---|
 | The week before | Publish | The app's address, open on a phone | [The week before](before.md) |
-| Week 1 | Write | The hum and its twin; 00. Why we build, 01. The first prototype | [Week 1](week-1.md) |
+| Week 1 | Write | The noticing log, which the session turns into one problem statement, held to the tests and critiqued in the trio | [Week 1](week-1.md) |
 | Week 2 | Play | 02. The shape of an app, 03. Going native | [Week 2](week-2.md) |
 | Week 3 | Play, then write | 04. Seeing it work, and the app's own look | [Week 3](week-3.md) |
 | Week 4 | Publish | 05. Shipping, 06. Keeping it running | [Week 4](week-4.md) |
@@ -51,8 +51,9 @@ as stage 00, at the size of a week, and each guide names the move its
 session leads with and the one question it turns on. The session itself
 is a run of show of scenes, in the words the hub uses: a talk, the
 rehearsal rooms, a break, a presenter, the design stage, a reflection,
-and the question scenes. Prep and week 5 change the middle (meeting the
-group, and the showing), and the rest keep this shape. These are the
+and the question scenes. Prep, week 1, and week 5 change the middle
+(meeting the group, finding a problem, and the showing), and the rest
+keep this shape. These are the
 minutes for 75, and how they change for 60 and 90.
 
 | Scene | Kind | 75 minutes | 60 minutes | 90 minutes |

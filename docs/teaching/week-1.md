@@ -1,227 +1,352 @@
-# Week 1: the hum, the why, and a first version on real data
+# Week 1: finding a problem worth building for
 
-**Where the cohort is.** This week everyone wrote down why their app
-exists, drew one line the agent may not cross, and got a first version
-running at a real address with real data in it, after at least two
-rounds of feedback sent from their own phone. That is stages
-[00](../path/00-why-we-build.md) and [01](../path/01-first-prototype.md),
-and it is a lot for one week, which is why tonight's bring-back will
-be rough, and should be.
+<!-- Written by Claude, awaiting Ben's review. Rebuilt on October 7, 2026,
+from docs/research/curriculum/06-instructional-design.md, section 3, which
+Ben approved as the basis for the curriculum (site DECISIONS.md, "Note 06
+is the basis for the curriculum"). It replaces the first version of this
+guide, which Ben rejected (site DECISIONS.md, "The first lessons missed"). -->
 
-This is the first time anyone shows their work to their group, so the
-session's whole shape is new to them. I want the first bring-back to be
-low stakes and very clearly structured, so that by the end of tonight
-everyone has done it once and knows it is survivable.
+*Written by Claude, awaiting Ben's review (from research note 06, October 7, 2026).*
 
-**The first bring-back is practice for all the others.**
+**Where the cohort is.** Everyone has kept a noticing log for five days,
+one line whenever one of its four prompts happened: "I wished something
+worked differently," "I gave up on something I care about," "I did
+something the long way because nothing helped," or "someone I know
+struggled with the same thing." Nobody has chosen a problem, and nobody
+has an idea for an app yet. That is on purpose. None of my apps began as
+an idea for an app. Each began with part of my life that kept bothering
+me, and I wrote down why it mattered and looked around before I built
+anything ([`01-mining-bens-process.md`](../research/curriculum/01-mining-bens-process.md),
+phases 1 and 2).
+
+Tonight turns those logs into one problem each, held to real tests,
+written as well as the models we study, and sharpened by two other
+people. The week after tonight takes it outside the screen.
+
+**Find the problem before the app.**
 
 ## The move and the question
 
-*Written by Claude, awaiting Ben's review (curriculum milestone C5, October 7, 2026).*
+**Write.** This week leads with writing: from the log, to candidate
+problems, to one problem statement that has been critiqued and revised.
+Playing comes in the middle, when each candidate is held to the tests
+and when the trio asks questions of it. Publishing comes at the end of
+the week, when each person shares their problem, who has it, and why a
+computer cannot simply solve it for them.
 
-**Write.** This week leads with writing. Before anyone builds more, they write the hum, the people outside their screen, the why, and one rule, and then they publish the first platform to one person who hears the same hum.
+The question the whole week turns on, the driving question for the
+project: **What problem in your own life is worth building something
+for, and who else has it?**
 
-The question the whole session turns on: **What has hummed in my life for months, and who else hears it?**
+It comes straight from my definition of a human-shaped problem and from
+the first principle, which asks that the builder has "written down what
+the problem is, who has it, and why a computer cannot simply solve it
+for them" ([`PRINCIPLES.md`](../human-shaped/PRINCIPLES.md), principle
+1). It names who acts (you), what you make (a problem worth building
+for), and who it is for (you, and the others who have it), which is
+how PBLWorks builds a driving question
+([Driving Question Tubric](https://my.pblworks.org/resource/document/driving_question_tubric)).
 
 Every session is one round of Write, Play, Publish at a larger size,
 the same three moves as stage 00, and the principles decide what gets
 written, played with, and published
-([`00-curriculum-design.md`](../research/curriculum/00-curriculum-design.md)).
+([`00-curriculum-design.md`](../research/curriculum/00-curriculum-design.md),
+[`06-instructional-design.md`](../research/curriculum/06-instructional-design.md)).
 
 ## The run of show
 
 | Minutes (75) | Scene | Kind | What happens |
 |---|---|---|---|
-| 0-7 | Arrive | Talk | One line in the chat: shipped or stuck. Then what I heard in last week's answers, and what I changed because of it. |
-| 7-37 | Show what you brought back | Rehearsal rooms | Groups of three. The room's prompt: "Show the first platform, and read your why aloud. What will it refuse to do?" |
-| 37-40 | Break | Break |  |
-| 40-47 | One value at work | Presenter | One person shares the line they drew in stage 00, and what holding it will cost them. The audience: "Listen for the value at work, and what it cost." |
-| 47-62 | Hum sort | Design stage | Eight problems, and two sides. Sort them alone, then with your trio, before anyone names the difference. Then add your own. On the board: *Hum sort* (new, coming to the hub). |
-| 62-70 | Start | Reflection | Tell your agent every platform you plan to reach, even the ones months away, and ask it for the parity matrix before you leave. Then: "What is the first prompt you will send this week?" |
-| 70-73 | Check for understanding | Question | "Is your problem human-shaped or computer-shaped?" (one choice) |
+| 0-5 | Arrive | Talk | One line in the chat from your log, one you are willing to share. Then what I heard in last week's answers, and what I changed because of it. |
+| 5-8 | Two notes for one film | Talk | Two notes for the same film in Archive Watch, side by side, labeled A and B. |
+| 8-11 | What would be lost? | Question | "Which would you rather read, and what would be lost if the app only had the first kind?" (in their own words) |
+| 11-17 | Our questions | Reflection | My pitch on screen as the focus. Everyone asks as many questions about it as they can, by four rules. They become the cohort's list of what we need to know. |
+| 17-22 | Five from your log | Reflection | With the agent closed, five lines from the log, each rewritten as a problem in your own words. |
+| 22-32 | Hold them to the tests | Design stage | Your two strongest, on the board, held to the ten tests: yes, not yet, or I don't know. On the board: *Problem tests* (new, coming to the hub). |
+| 32-35 | Break | Break |  |
+| 35-39 | What makes a problem statement strong | Talk | My four human-shaped problems, read as models: what do they do that you could do in yours? |
+| 39-42 | What do they do well? | Question | "In a few words, what do these four problem statements do well?" (a few words, shown together) |
+| 42-47 | Rewrite yours | Reflection | Your strongest candidate, rewritten in the same form, and one sentence on its computer-shaped version. |
+| 47-65 | Critique in your trio | Rehearsal rooms | Groups of three. The room's prompt: "Read your problem statement aloud. Then listen to the questions, and write down the one you want to answer." |
+| 65-70 | Plan two conversations | Reflection | Two people who might have this problem too, and three questions that start "Tell me about the last time you..." |
+| 70-73 | Who else has it? | Question | "How sure are you, right now, that someone besides you has this problem?" (a scale) |
 | 73-75 | What is still muddy? | Question | "What is still muddy?" (in their own words) |
 
-**In the rehearsal rooms,** each builder's turn runs these scenes, 10 minutes in all: their question (1), show it, and one decision (4), one clarifying question (1), the three questions (3), what comes next (1). The room's prompt is on screen the whole time.
+**In the rehearsal rooms,** each builder's turn runs these scenes, 6
+minutes in all: read your problem statement (1), what is strong in it
+(1), "Have you considered...?" (3), revise one line (1). The room's
+prompt is on screen the whole time.
 
 These are the scenes a new cohort is made with on humanshaped.org, from
 [`runs-of-show.json`](runs-of-show.json), and every one of them can be
-changed in the class builder, before the session and during it. To fit 60 or 90 minutes, use the table in the [guides' index](README.md). Tonight, if anything has to give, give it from the board, because everyone needs a whole turn for their first bring-back.
+changed in the class builder, before the session and during it. To fit
+60 or 90 minutes, see the [guides' index](README.md). Tonight, if
+anything has to give, take it from "Our questions" and the study of the
+models, never from the critique, because the critique is where the
+statements actually get better.
 
 **What to watch for tonight.**
 
-- A problem that is really computer-shaped: a measurement or a ranking with nobody's story in it. The sort is where this gets said kindly, before anyone is told.
-- A why with no people in it.
+- A problem that is really a measurement or a ranking, with nobody's
+  story in it. Ask about it with a question, not a verdict: "Who is in
+  this, and what happens to them?"
+- A problem statement that names a technology ("an app that uses AI
+  to...") instead of a situation in someone's life.
+- A trio where nobody asks a question, only gives advice.
+- Anyone who arrives without a log. Give them the five prompts and five
+  minutes to write from memory. Most people can remember a week.
 
 ## The opening
 
 > Welcome back. Here is what I read in last week's answers: [what you
-> heard], and so [what you changed]. Tonight is the first time you show
-> your work to your group, and I want to say one honest thing before
-> you do. Nobody I know of has yet studied people who have never
-> programmed as they ship a real app with an agent over several weeks.
-> What the research does show is that the understanding is easy to hand
-> over to the agent without noticing, and that explaining a decision
-> yourself, with the agent closed, is how you find out whether it is
-> still yours. So, that is what we will do. The steps are on screen, and
-> one person in each group keeps time.
+> heard], and so [what you changed]. Tonight you will not build
+> anything. Everything we make this week starts with a problem, and the
+> problem starts with your log, so I want you to keep it open the whole
+> session. By the end of tonight, each of you will have one problem from
+> your own life written as well as you can write it, held up against
+> some real tests, and two people outside this call you are going to
+> talk to about it. Let's start with one line from your log, in the chat,
+> one you don't mind sharing.
 
 ## What they bring back
 
-Two "Be ready to..." lines, one from each stage:
+The noticing log, five days of it, started at the end of the
+[week before](before.md). Nobody shows the whole log, and nobody is
+asked to. It is the raw material for the session, and each person
+decides which lines leave it.
 
-> Be ready to share your "why we build" paragraph, the people outside
-> your screen, and your one rule, and to explain why you drew that line
-> where you did and what it will cost you.
+**What to look for.** Lines about what happened, not ideas for apps.
+Lines that come back more than once across the five days, because a
+thing that keeps happening is closer to my definition ("something that
+has gone unsolved for months or even years") than a thing that happened
+once. Lines about someone else, because human-shaped problems are
+rarely one person's alone.
 
-> Be ready to show the app on your phone, to name one thing the real
-> data taught you that fake data would have hidden, and to explain why
-> you started on the platform you chose.
+**Signs of "not yet."** A log that is a list of app ideas. A log with
+nothing in it but "nothing happened." Neither is a problem tonight. The
+first is the habit the log is meant to break, and the second is what
+the prompts on screen are for.
 
-**New this week: the hum.** Before the first platform, each person brings back three hums written before the agent was opened, the one they chose, and its computer-shaped twin beside it, and names two people outside their screen who hear the same hum (curriculum design, "The three gaps, filled with my own words").
+## Two notes for one film
 
-**The bar.** For stage 00: "your note starts with the why and your
-answers to the three questions, the 'Why we build' paragraph in
-`AGENTS.md` sounds like you, there is one rule in your own words, and
-the agent has what it needs to start." For stage 01: "your app is live
-at a real address, it is full of real data that a pipeline brought in,
-and you have sent at least two rounds from your own phone."
+This is the entry event, the thing that opens the project and raises
+the questions the rest of it answers (John Larmer and John R.
+Mergendoller, ["Seven Essentials for Project-Based Learning,"](https://www.ascd.org/el/articles/seven-essentials-for-project-based-learning)
+*Educational Leadership*, 2010). It comes from the decision I made for
+Archive Watch, that each film's notes come from the people who watched
+and shared it rather than from AI
+([`computer-shaped-problems.md`](../human-shaped/computer-shaped-problems.md#case-study-archive-watchs-film-notes)).
 
-**What to look for.**
+**Prepare it before the session.** Choose one film in
+[Archive Watch](../human-shaped/case-study-archive-watch.md). Copy its
+notes from the film's page on archive.org, written by the person who
+uploaded or reviewed it. Then ask your agent for a three-sentence
+summary of the same film. Put the two side by side, labeled A and B,
+and do not say which is which. Do not write either one yourself, and do
+not edit the person's note, even where it is wrong.
 
-- The paragraph, read aloud, sounds like the person reading it and not
-  like a company.
-- The people outside the screen are specific: whose work the app shows,
-  whose data it uses, or whose lives it changes.
-- The rule is a line the app will never cross, not a value with no
-  line in it, and the student can say what holding it will cost.
-- The data came from a source they can name. Nobody typed it in, and
-  the agent did not invent it.
-- Two rounds show up in the note, under "Next:" and "Done:", written
-  while using the app on the phone.
+**In the session.** Put both on the main stage, read them aloud, and ask
+the question scene's one question: "Which would you rather read, and
+what would be lost if the app only had the first kind?" Show the
+answers without names. Then say which was which, and read my one line
+about it:
 
-**Signs of "not yet."** Sample data, or data the agent made up. A rule
-that reads like "I care about privacy." A "Why we build" paragraph the
-student has not reread since the agent wrote it. Rounds that came from
-looking at the laptop rather than using the app on the phone. None of
-these is a problem tonight, because each one is simply the next
-round.
+> I don't want AI making lists and writing copy. Any time we can use
+> metadata or user copy/categorization from archive.org.
 
-## On the design stage: the hum sort
+**What to talk about.** Nobody has to agree with me. What matters is
+that the question is now in the room before anyone has an app: which
+parts of the thing you build should a person do, and which should the
+machine? Every problem tonight gets held up to that.
 
-*Written by Claude, awaiting Ben's review (curriculum milestone C5, October 7, 2026).*
+## Our questions
 
-Put the board on the main stage from the *Hum sort* template (new; until
-the hub has it, a blank board with two sides, labeled only "A" and "B").
-On it are eight problems. Four are human-shaped and four are
-computer-shaped, and the two sides are not named yet. The eight are
-mine, from October 6, with only the spelling fixed:
+Put my pitch on the main stage as the focus, the way the Right Question
+Institute's Question Formulation Technique starts
+([What is the QFT?](https://rightquestion.org/what-is-the-qft/)):
 
-- I do not have time to read books in my life. I need something that
-  fits my way of existing that will still let me enjoy great novels and
-  non-fiction every day.
-- I lack inspiration for what to do with my child to entertain them
-  without screens. I need something that will constantly suggest new
-  things to do that cater to both of our interests.
-- I read a lot of news and "takes" from people online and I even see
-  newsworthy things out in the real world, and I would love a way to
-  chronicle it all into a cohesive narrative, an understanding of how I
-  see things to remind myself why I believe what I believe.
-- I want an easy way to align my political beliefs with who and what
-  I'm voting for when I get my ballot or vote in person.
-- I want to measure the amount of negative sentiment online for any
-  given public figure.
-- I want to find the best price for my grocery list on delivery apps so
-  that I can comparison shop and combine trips for the cheapest (and
-  least convenient) trips for the delivery drivers.
-- I want to categorize every conversation I have and chronicle them as
-  a way of measuring my impact on others.
-- I want to map socioeconomic data by neighborhood so that I can use it
-  to choose the optimal route for Halloween trick or treating to ensure
-  high-end candy.
+> If anyone can build their own apps (with AI), it matters even more
+> which apps they choose to build and how they choose to build them.
 
-Mix them up on the board. Everyone sorts them onto the two sides alone
-for three minutes, then with their trio, and only then does anyone name
-the difference. Then read my two closing lines aloud:
+Then the four rules, on screen and said aloud:
 
-> Human-Shaped problems see the world as interrelated stories to be
-> told, experienced, and added to.
->
-> Computer-Shaped problems see the world as disparate data points to be
-> aggregated, quantified, and leveraged.
+1. Ask as many questions as you can.
+2. Do not stop to discuss, judge, or answer the questions.
+3. Write down every question exactly as it is stated.
+4. Change any statement into a question.
 
-Last, each person adds their own hum to the human side, and writes its
-computer-shaped twin on the other: the same worry, turned into a
-measurement. The sorting before the naming comes from the curriculum
-design's research ([`02-landscape.md`](../research/curriculum/02-landscape.md),
-curriculum idea 2). For anyone who wants to go deeper afterward,
-Morozov's word for the computer-shaped habit is "solutionism."
+Five minutes, in the chat or the session's thread. Then ask everyone to
+star the three questions they most want answered by the end of the
+cohort. Those starred questions are the cohort's list of what we need
+to know, the second half of an entry event in a project (PBLWorks,
+[Need to Knows](https://my.pblworks.org/resource/ntks)). Keep the list
+in the session's thread, read it at the start of each week, and cross
+questions off out loud as the cohort answers them.
 
-**What to talk about.** Which side was hard to sort, and why? A problem
-that sits between the two is worth more conversation than one that
-sorts cleanly, because most of ours start there.
+## Five from your log, and the tests
 
-## The prompt behind tonight's start
+**Five from your log** is written alone, with the agent closed, because
+the problem has to be the student's own before anyone, person or agent,
+helps with it. Each of five lines from the log becomes a problem in one
+or two sentences.
 
-Read this inside Start, in about two minutes, or after the sort in a 90-minute session. It is why tonight's start asks for a parity matrix.
+Then **hold them to the tests,** on the design stage, from the *Problem
+tests* template: a column for each person's two strongest candidates,
+and the ten tests down the side. Each test is one I have written down
+somewhere, and none of them is a checklist I wrote as one
+([`06-instructional-design.md`](../research/curriculum/06-instructional-design.md),
+"Tests a problem can be held to"). In plain words:
 
-**The situation.** From stage 02, two days into BOBA Playbook, a
-trading-card app. Put up the two numbers and nothing else: the iPhone
-app counted 17,838 cards, and the web app, reading the same data,
-counted 12,036.
+1. Solving it would make my life better, happier, or more resonant.
+2. I wonder and question about it often.
+3. It has gone unsolved for months or even years.
+4. I cannot solve it myself with the tools and resources I have now.
+5. Real people have it, and I can name them.
+6. It is not mine alone. Other people would know it when they heard it.
+7. A computer cannot simply solve it for me.
+8. It is about people's stories, not about data points.
+9. Solving it would not make a new problem for someone else.
+10. At least one person would be glad of even a first version.
 
-Ask everyone to write the prompt they would send, on their own, for two
-minutes. Then compare with a partner. Then show the real one:
+The first four come from my definition of a human-shaped problem, and
+the eighth from its closing lines
+([`computer-shaped-problems.md`](../human-shaped/computer-shaped-problems.md#computer-shaped-and-human-shaped)).
+The fifth, seventh, ninth, and tenth come from principles 1, 12, and 15
+([`PRINCIPLES.md`](../human-shaped/PRINCIPLES.md)), and the sixth from
+how I describe the method: human-shaped problems "tend to be
+identifiable to many people and possibly even universal."
 
-> Why does the iOS app say there are 17,838 items in the database but
-> the web app says it has only 12,036? I would like there to be parity
-> across both versions of the app and to have the most cards available
-> to be searched
+Each test gets one of three marks: yes, not yet, or I don't know. Say
+this out loud: **"I don't know" is the most useful mark on the board,**
+because it is a question to take outside the screen this week. The
+tests are tools for thinking about the student's own life, and nobody's
+problem passes or fails tonight.
 
-Then the second turn. The agent proposed merging cards that shared a
-number. Ask what they would say back, and give them a minute before
-showing the answer that became BOBA's rule for what makes a card a
-card:
+## What makes a problem statement strong
 
-> You should always use the image file difference to determine if the
-> card is different and not the card number.
+Put my four human-shaped problems on the main stage, from
+[`computer-shaped-problems.md`](../human-shaped/computer-shaped-problems.md#computer-shaped-and-human-shaped),
+exactly as written. They are not here to be sorted. I already said
+which shape they are. They are here as models, the way Ron Berger asks
+students to study examples of excellence before making their own and to
+ask what makes them so good (["Fostering an Ethic of Excellence,"](https://jaymctighe.com/wp-content/uploads/2011/04/Ron-Berger-Article.pdf)
+2006).
 
-**What to talk about.** The first prompt asks why and says what the
-builder wants, without guessing at the fix. The second is a decision
-only the builder could make, because only the builder knew what a card
-is. Ask where in their own app a decision like that is waiting.
+Ask the question scene's question, "In a few words, what do these four
+problem statements do well?", and show the answers together. Then name
+what people found, adding anything they missed. Each one:
 
-## Start
+- starts from something that actually happens in my life, in the first
+  person ("I do not have time to read books in my life");
+- says what a better life would look like ("still let me enjoy great
+  novels and non-fiction every day");
+- turns on "I need something that...";
+- never names a technology.
 
-Everyone begins [stage 02](../path/02-shape-of-an-app.md) by telling
-their agent every platform they plan to reach, even the ones months
-away, and asking it to write the parity matrix for everything the app
-already does. They send it before they leave, and read the matrix this
-week as a list of promises.
+Then put my four computer-shaped problems beside them for one minute,
+and ask only what their first verbs are: measure, find the best price,
+categorize, map. That is the difference to steer away from, and it is
+already in the student's hands from my own words.
+
+## Rewrite yours
+
+Alone, with the agent closed: the strongest candidate, rewritten in the
+same form, what happens in your life and then "I need something
+that..." Then one more sentence: what would the computer-shaped version
+of the same wish be? Writing it down makes it easy to see, and easy to
+avoid.
+
+## Critique in your trio
+
+Send everyone to their rehearsal rooms. Each person reads their problem
+statement aloud, and the other two follow Berger's three rules for
+critique: be kind, be specific, be helpful, with suggestions phrased as
+questions, "Have you considered...?" The writer does not answer the
+questions in the room. They write down the one they most want to answer,
+and revise one line before the next person starts.
+
+This is the first time anyone in the cohort says what they think of
+someone else's work, so say plainly that the job is to help the writer
+see their own problem more clearly, not to improve it for them.
+
+## Plan two conversations
+
+Each person names two people who might have this problem too, and
+writes three questions to ask them. The questions follow two sets of
+rules that agree with each other: ask people to tell you about a
+specific time in the past, never about what they usually do or would
+do, and never describe an app (Stanford d.school's interview guidance;
+Rob Fitzpatrick, *The Mom Test*, 2013, both summarized in
+[`06-instructional-design.md`](../research/curriculum/06-instructional-design.md),
+"Finding a problem worth solving"). A good first question starts "Tell
+me about the last time you..." and then stops. Stories are what we are
+listening for, because human-shaped problems "see the world as
+interrelated stories."
+
+## Between tonight and next week
+
+This is the rest of the week's round, done on their own and with their
+agent:
+
+1. **Have the two conversations.** Write notes in your own words, and
+   keep them private unless you choose to share them.
+2. **Revise the problem statement** with what you heard. Then write who
+   has it, and why a computer cannot simply solve it for them.
+3. **Write the why with your agent,** in
+   [stage 00](../path/00-why-we-build.md): tell the agent why the app
+   should exist and have it draft the "Why we build" paragraph in
+   `AGENTS.md` until it sounds like you, name one line it will not
+   cross, ask the three questions of the idea, and have the agent make
+   the strongest case against it on behalf of the people outside the
+   screen.
+4. **Publish** a short post to the cohort: your problem, who has it, and
+   why a computer cannot simply solve it. If you like, send it back to
+   the two people you talked to.
 
 ## The check
 
-The question scenes at the end of the run of show, answered privately, and
-shown on the main stage without names only if you choose:
+The question scenes at the end of the run of show, answered privately,
+and shown on the main stage without names only if you choose:
 
-1. **Is your problem human-shaped or computer-shaped?** (one choice). Choices: Human-shaped; Computer-shaped; Not sure yet.
+1. **How sure are you, right now, that someone besides you has this
+   problem?** (a scale of 5, from "Not sure at all" to "I could name
+   them").
 2. **What is still muddy?** (in their own words).
 
-**Also prepared,** from this guide's first version, for when you want the stage's own question instead: "Why does your agent need your values written down, rather than only in your head?"
+The scale is not a score. It tells you who is going into the
+conversations with a guess and who is going in with names, and the
+people at the low end are the ones to write to first.
 
-An answer that says the agent will "remember" what they told it in
-conversation is worth a word next week, because stage 00's whole point
-is that an agent keeps only the values you write down.
+**Also prepared,** in the cohort's question bank: "Which of these does
+your problem statement do?" (several choices, from the four things the
+models do), and "Which questions for your two conversations will tell
+you the most?" (a ranking).
 
 ## The task, and its evidence
 
-*Written by Claude, awaiting Ben's review (curriculum milestone C5, October 7, 2026).*
+**The task.** Turn your log into one problem statement in the form of
+the models, hold it to the tests, revise it after your trio's
+questions, and have two conversations about it with people who might
+share it. Then write the why, and publish your problem, who has it, and
+why a computer cannot simply solve it.
 
-**The task.** Choose one hum and write its computer-shaped twin beside it. Write the why, the people outside your screen, and one rule. Publish the first platform to one of those people.
+**Evidence a person can open.** The problem statement, first version
+and revised, kept in the app's note and the repository. Notes from two
+conversations, each about a specific time in the past, which stay with
+the student unless they choose to share them. The "Why we build"
+paragraph in `AGENTS.md`, with one line the app will not cross, dated
+and in the student's words. The published post. Together these are the
+first principle's own evidence ([`PRINCIPLES.md`](../human-shaped/PRINCIPLES.md),
+principle 1, "How you can tell"), and the first entries in the
+credential's record.
 
-**Evidence a person can open.** The note's first page; the twin; the live address; two rounds in the history.
-
-**On the credential.** Level 1, the web. Recognitions this week can name "Wrote down what they value" and "Explained a decision their values made." Students do the thing itself, and what they
-make is the evidence; nobody writes a report about it
+**On the credential.** Recognitions this week can name "Asked for
+feedback and used it," for a statement revised after the trio's
+questions; "Helped a classmate see their work more clearly," for a
+question in the critique that changed someone's statement; and "Wrote
+it in their own voice," for a problem statement nobody could mistake
+for anyone else's. Students do the thing itself, and what they make is
+the evidence; nobody writes a report about it
 ([`05-inquiry-and-evidence.md`](../research/curriculum/05-inquiry-and-evidence.md)).
 
 ## When someone is stuck
@@ -230,30 +355,32 @@ Every entry in the [stuck library](../stuck/README.md) starts with a
 question to ask yourself, then what to try, then who to ask. This week,
 point people to:
 
-- [Stuck writing](../stuck/writing/README.md), for when the hum, the why, or what comes next will not come.
-- [Stuck publishing](../stuck/publishing/README.md), for when you are not ready to show anyone, cannot get it onto another device, or do not know when it is enough.
+- [Stuck writing](../stuck/writing/README.md), for when no line in the
+  log looks like a problem, the statement will not come, or the
+  conversations feel too awkward to ask for.
+- [Stuck publishing](../stuck/publishing/README.md), for when sharing
+  the problem with the cohort feels too exposed.
 
 And the ladder for any of them: name the kind of stuck, write three
-lines (what you tried, what you expected, what you saw), ask the agent
-for a way to understand it rather than the fix, look on the device and
-at the last thing that worked, then your trio, then the teacher. About
-twenty minutes before the trio is a default each person can move.
+lines (what you tried, what you expected, what you saw), look at the
+last thing that worked, then your trio, then the teacher. This week
+most of it happens with the agent closed, so the first rung is usually
+the log itself: read it again from the start.
 
 ## The close
 
 > Answer the two questions on the live page before you go, and I will
-> read every one. This week your app goes from one platform to two.
-> Read the matrix your agent writes as a list of promises, strike out
-> what you do not want, and next week show your group one thing working
-> on both, each the way its own platform does it.
+> read every one. This week, have your two conversations before you
+> write anything else. Ask about the last time it happened, and listen
+> for the story. Then come back to your statement, and let what you
+> heard change it.
 
 ## After the session
 
-Read the checks, write your two sentences, and reach out within two
-days to anyone who missed the session or brought nothing back. Then
-start watching for week 3's prompt situation: when someone writes that
-they are stuck, in a check or in the cohort's conversation, ask them
-privately whether you may use their stuck moment with the cohort in
-week 3.
+Read the checks and write your two sentences. Copy the starred
+questions into the cohort's list of what we need to know, where
+everyone can see it. Reach out within two days to anyone who missed the
+session, came without a log, or put themselves at the low end of the
+scale, and offer to help them find their two people.
 
-Next week, the same app on a second platform.
+Next week, everyone brings back a problem that has met real people.
