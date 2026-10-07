@@ -72,6 +72,13 @@ nobody stops to perform for you. You are listening for one thing that
 comes up in more than one group, which you name for everyone during
 "one value at work."
 
+When a group is stuck, ask which move it is stuck in (writing, playing,
+or publishing) and point them to that page of the
+[stuck library](../stuck/README.md), which starts every entry with a
+question to ask yourself before anyone fixes anything. A stuck moment
+the library does not have yet is worth writing down, with the person's
+permission, so that it can become the next entry.
+
 ## After every session
 
 1. **Read every check before the next session.** Both answers, from
