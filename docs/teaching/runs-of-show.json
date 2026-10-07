@@ -599,8 +599,8 @@
       "key": "week-4",
       "week": 4,
       "title": "Week 4: the app on someone else's device",
-      "move": "Publish",
-      "question": "What happens when someone you did not build it with holds your app, and what does an honest number say about it?",
+      "move": "Publish, then Write",
+      "question": "What is happening to it when I am not holding it, and what do I want now that I live with it?",
       "guide": "week-4.md",
       "scenes": [
         {
@@ -673,9 +673,9 @@
         },
         {
           "kind": "design",
-          "title": "Hold your number to the rules",
+          "title": "Choose your number, and hold it to the rules",
           "minutes": 10,
-          "body": "Write your one number and where it comes from. Under it, answer three questions: if the source could not be read, would it say so? Is a missing value shown as empty, not zero? Would you be tempted to make it go up for its own sake? If the last answer is yes, choose another number.",
+          "body": "Stage 06 starts here. Write the one number you will read this week and where it comes from. Under it, answer three questions: if the source could not be read, would it say so? Is a missing value shown as empty, not zero? Would you be tempted to make it go up for its own sake? If the last answer is yes, choose another number.",
           "config": {
             "template": "blank"
           },
@@ -703,7 +703,7 @@
           "kind": "reflection",
           "title": "Start",
           "minutes": 5,
-          "body": "Stage 07 starts with a want you notice while using your own app. Keep a log this week: the moment, what you were doing, and what was missing.",
+          "body": "Stage 06 starts with the number you chose tonight, read the way Pulse reads it. Stage 07 starts with a want you notice while using your own app. Keep a log this week: the moment, what you were doing, and what was missing.",
           "config": {
             "prompt": "What is the first thing you will write in this week's log?"
           }
@@ -770,8 +770,8 @@
       "key": "week-5",
       "week": 5,
       "title": "Week 5: a feature you wanted, shown to everyone",
-      "move": "Write, then Publish",
-      "question": "What did I learn that the next builder should not have to, and is this version enough for its people?",
+      "move": "Publish",
+      "question": "Is this version enough for its people, and what should the next builder not have to learn?",
       "guide": "week-5.md",
       "scenes": [
         {
@@ -787,7 +787,7 @@
           "minutes": 3,
           "body": "On September 20, the agent designed Archive Watch's Watch Together around a paid voice server, and I refused: \"The goal of this app (and all of my apps) is for them to cost $0 to run.\"\n\nValues climb from a reason, to a standing instruction, to a test.",
           "config": {},
-          "note": "From the September section of docs/human-shaped/case-study-archive-watch.md. It is a model of what tonight's showing asks for, not an answer to copy."
+          "note": "From the September section of docs/human-shaped/case-study-archive-watch.md. It is a model for stage 08, which starts tonight and is written in the days after the showing, not an answer to copy."
         },
         {
           "kind": "rooms",
@@ -795,7 +795,7 @@
           "minutes": 17,
           "body": "Groups of three, one last time, about five minutes each. Be kind, be specific, be helpful.",
           "config": {
-            "prompt": "Explain every part of your app, even the parts the agent wrote, and one value with the decision it changed.",
+            "prompt": "Explain every part of your app, even the parts the agent wrote, and the number and the feature you will show.",
             "room_scenes": [
               {
                 "title": "Show it, and one decision",
@@ -824,7 +824,7 @@
           "kind": "presenter",
           "title": "The showing",
           "minutes": 25,
-          "body": "Everyone, about two minutes each: the feature you wanted, and one value with the decision it changed. The cohort's public page on humanshaped.org (/showcase/) is where guests found us.",
+          "body": "Everyone, about two minutes each: the feature you wanted from your own use, and your one honest number with what its people said. The cohort's public page on humanshaped.org (/showcase/) is where guests found us.",
           "config": {
             "prompt": "Guests may ask one question each. Listen for what is enough, for now."
           }
@@ -851,9 +851,9 @@
           "kind": "reflection",
           "title": "Start",
           "minutes": 4,
-          "body": "The cohort chooses its one lesson to send back to the template. Then everyone sends the first prompt of whatever comes next.",
+          "body": "The cohort chooses its one lesson to send back to the template. Then everyone sends the first prompt of stage 08.",
           "config": {
-            "prompt": "What is the first prompt of whatever comes next?"
+            "prompt": "What is the first prompt of your stage 08?"
           }
         },
         {

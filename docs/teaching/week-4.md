@@ -1,12 +1,24 @@
 # Week 4: the app on someone else's device
 
-**Where the cohort is.** This week everyone's app left their hands. Some
-went through a store, and more went through a test track or a direct
-share, which cost nothing. Everyone also started looking for one honest
-number about how the app is doing out in the world. That is stages
-[05](../path/05-shipping.md) and [06](../path/06-keeping-it-running.md),
-whose lines are "A feature nobody can install is unfinished" and "A
-confident zero is worse than no dashboard."
+<!-- Reconciled to COURSE.md's week map by Claude, awaiting Ben's review,
+October 7, 2026: this session shows stages 04 and 05 and launches 06 and
+07. -->
+
+**Where the cohort is.** Week 3 was [stage 04](../path/04-seeing-it-work.md)
+and [stage 05](../path/05-shipping.md). The agent started proving its
+fixes with screenshots from the builder's own devices, and everyone's app
+left their hands. Some went through a store, and more went through a
+test track or a direct share, which cost nothing. Each builder watched
+one person hold it without helping, and shipped one change because of
+what that person did. Stage 05's line is "A feature nobody can install
+is unfinished."
+
+Tonight shows that work, and starts the week ahead: [stage
+06](../path/06-keeping-it-running.md), one honest number about how the
+app is doing out in the world ("A confident zero is worse than no
+dashboard"), and [stage 07](../path/07-raising-the-ceiling.md), a log
+kept while living with the app that ends in one feature the builder
+wants.
 
 This is the first of the two weeks when the teacher looks closely at
 every bring-back, because it is the first time the app has been in the
@@ -20,19 +32,22 @@ worth more than anything the builder could say about it.
 *Written by Claude, awaiting Ben's review (rebuilt by the method of
 curriculum research note 06, October 7, 2026).*
 
-**Publish.** This week leads with publishing: the app leaves the
-builder's hands, and the person holding it tells them what to write
-next.
+**Publish, then write.** This week leads with publishing: tonight the
+app is shown in someone else's hands, and in the week ahead an honest
+number goes back to its people. Then it writes: a log of what the
+builder wants, kept while using the app.
 
-The question the whole session turns on, in plain words: **What happens
-when someone you did not build it with holds your app, and what does an
-honest number say about it?**
+The question the whole session turns on, in plain words: **What is
+happening to it when I am not holding it, and what do I want now that I
+live with it?**
 
-The session is designed backward from the week's bring-back
-([note 06](../research/curriculum/06-instructional-design.md), section 4):
+The session is designed backward
+([note 06](../research/curriculum/06-instructional-design.md), section 4)
+from two things: tonight's bring-back (the screenshot that proved a fix,
 the app in someone else's hands, what they did first beside the guess
-the student wrote, one change made because of it, and one honest number
-taken back to a person. Ben's own material is what students reason with
+the student wrote, and one change made because of it) and next week's
+(one honest number taken back to a person, and one feature from the
+student's own use). Ben's own material is what students reason with
 tonight: the forty-one versions Archive Watch had verified and shipped to
 nobody (stage 05), and the three rules Pulse follows for an honest
 number (stage 06). Neither is an answer to repeat. Each is a test the
@@ -52,7 +67,7 @@ written, played with, and published.
 | 11-35 | What they did first | Rehearsal rooms | Groups of three. The room's prompt: "Show what the person did first, beside the guess you wrote before they held it." |
 | 35-38 | Break | Break |  |
 | 38-42 | What makes a number honest | Talk | Pulse's three rules, quoted from `docs/PRODUCT-PULSE.md`. |
-| 42-52 | Hold your number to the rules | Design stage | Each person's one number, its source, and three questions. On the board: *Blank*. |
+| 42-52 | Choose your number, and hold it to the rules | Design stage | Each person's one number for the week ahead, its source, and three questions. On the board: *Blank*. |
 | 52-57 | Plan to take it back | Reflection | Who you will show the number to, and the two questions you will ask them. |
 | 57-64 | One value at work | Presenter | One decision a value changed this week, and what it cost. The audience: "Listen for the value at work, and what it cost." |
 | 64-69 | Start | Reflection | The log for stage 07 begins tonight: the moment, what you were doing, and what was missing. |
@@ -89,23 +104,24 @@ changed in the class builder, before the session and during it. To fit
 
 ## What they bring back
 
-The cohort's bring-back: the app on someone else's device, and what
-that person said. The stages' own lines:
+The cohort's bring-back: the proof that a fix worked, the app on
+someone else's device, and what that person said. The stages' own lines:
+
+> Be ready to show the screenshot that proved a fix, to say what it would
+> have looked like if the fix had not worked, and to explain which of your
+> devices the agent may never touch, and why.
 
 > Be ready to show your app installed on a device you did not build it
 > on, to say what that person did first, and, if it is in a store, to
 > explain one thing you rewrote in its listing, and why.
 
-> Be ready to show one number Pulse read correctly, one reader that told
-> you honestly it could not, and what your loop finished, and to explain
-> why you stopped the loop when you did.
-
-**The bar, in the cohort's version.** The app installed on a device the
-student did not build it on, through a test track, a direct share, or a
-store, and one honest number about it. The stages' full bars (a store
-listing a stranger could install from, Pulse reading a store, a loop
-run from start to stop) often land after the cohort ends. Saying "not
-yet" to those tonight is ordinary and costs nothing.
+**The bar, in the cohort's version.** A fix the agent proved with a
+screenshot from the student's own device, and the app installed on a
+device the student did not build it on, through a test track, a direct
+share, or a store, with one change shipped because of what that person
+did. The stages' full bars (a store listing a stranger could install
+from, every device given a role) often land after the cohort ends.
+Saying "not yet" to those tonight is ordinary and costs nothing.
 
 **What to look for.**
 
@@ -114,16 +130,16 @@ yet" to those tonight is ordinary and costs nothing.
   person's words copied into the note.
 - One thing the student decided about what that person said: what they
   will change, and what they will not.
-- One number with its source named, and the student able to say what it
-  would look like if the source could not be read.
+- A screenshot from the student's own device that proved a fix, and the
+  student able to say what it would have shown if the fix had failed.
 - If they are in a store, one thing in the listing they rewrote in their
   own words.
 
 **Signs of "not yet."** The app only on the student's own devices. A
-number nobody questioned, especially a zero. A store listing the agent
+fix the agent called done with no screenshot behind it. A store listing the agent
 wrote that the student has not read aloud.
 
-## On the design stage: an honest number
+## On the design stage: choosing an honest number
 
 *Written by Claude, awaiting Ben's review (note 06, October 7, 2026).*
 
@@ -134,8 +150,9 @@ never zero." "Zero is drawn, absence is written." They came from two
 days when Archive Watch's dashboard drew a Mac at zero and a Roku as a
 flat line (the story at the top of [stage 06](../path/06-keeping-it-running.md)).
 
-Then put a blank board on the main stage. Each person writes their one
-number and where it comes from, and under it answers three questions:
+Then put a blank board on the main stage. Stage 06 starts here: each
+person writes the one number they will read this week and where it
+comes from, and under it answers three questions:
 if the source could not be read, would it say so? Is a missing value
 shown as empty, not zero? Would you be tempted to make it go up for its
 own sake? The third is Goodhart's law in Marilyn Strathern's words,
@@ -171,7 +188,9 @@ because that is where stage 08 starts.
 
 ## Start
 
-Everyone begins [stage 07](../path/07-raising-the-ceiling.md) the way it
+Everyone begins [stage 06](../path/06-keeping-it-running.md) with the
+number they chose on the board tonight, read the way Pulse reads it.
+And everyone begins [stage 07](../path/07-raising-the-ceiling.md) the way it
 begins: a log kept while using their own app, each time they reach for
 something it does not do (the moment, what they were doing, and what was
 missing). And before next week, each person shows their number to the
@@ -202,11 +221,11 @@ word.
 
 *Written by Claude, awaiting Ben's review (curriculum milestone C5, October 7, 2026).*
 
-**The task.** Get the app onto a device you did not build it on, through a store, a test track, or a direct share, watch one person use it without helping, and ship one change because of what they did. Read one honest number, hold it to Pulse's rules, and take it back to a person.
+**The task, this week.** Read one honest number about your app, hold it to Pulse's rules, and take it back to a person. Keep a log while using your own app, and let it lead you to one feature you want.
 
-**Evidence a person can open.** The install link; what the person did first, beside the guess written before; the change that shipped because of it; the number, its source, and what the person said it misses.
+**Evidence a person can open.** The number, its source, and what the person said it misses; the log, with the moment each want came from; the first sketch of the feature and the want it traces to.
 
-**On the credential.** A further platform adds a level. Recognitions: "Got it onto someone else's device," "Asked for feedback and used it." Students do the thing itself, and what they
+**On the credential.** Recognitions: "Asked for feedback and used it." Tonight's bring-back (the proof, the install link, what the person did first, and the change it led to) is already evidence for "Got it onto someone else's device" and "Tested it the way people will actually use it." Students do the thing itself, and what they
 make is the evidence; nobody writes a report about it
 ([`05-inquiry-and-evidence.md`](../research/curriculum/05-inquiry-and-evidence.md)).
 
@@ -228,8 +247,8 @@ twenty minutes before the trio is a default each person can move.
 
 > Answer the two questions on the live page before you go. Next week is
 > the last session, and it is open to anyone you would like to invite.
-> Bring the feature you wanted from your own use, and one value with the
-> decision it changed. And if you would like to lead the prompt
+> Bring your one honest number with what its people said about it, and
+> the feature you wanted from your own use. And if you would like to lead the prompt
 > reading next week with a moment of your own, tell me this week. Nobody
 > has to.
 

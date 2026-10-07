@@ -1,12 +1,20 @@
 # Week 5: a feature you wanted, shown to everyone
 
-**Where the cohort is.** This week everyone built a feature they wanted
-from their own use of the app, put a rough version of it in front of
-someone it is for, and taught their agent to remember what this app
-taught them. That is stages [07](../path/07-raising-the-ceiling.md) and
-[08](../path/08-working-with-ai.md), and stage 08 ends by asking for
-one value with the decision it changed, because a value that never
-changed a decision is decoration.
+<!-- Reconciled to COURSE.md's week map by Claude, awaiting Ben's review,
+October 7, 2026: this session shows stages 06 and 07 at the showing, and
+stage 08 is written in the days after. -->
+
+**Where the cohort is.** Week 4 was [stage 06](../path/06-keeping-it-running.md)
+and [stage 07](../path/07-raising-the-ceiling.md). Everyone read one
+honest number about their app and took it back to a person, kept a log
+while using the app, and built a feature they wanted from their own
+use, with a rough version in front of someone it is for.
+
+Tonight shows that work, and starts the last stage:
+[stage 08](../path/08-working-with-ai.md), written in the days after the
+showing, where the agent learns to remember what this app taught, and
+the builder names one value with the decision it changed, because a
+value that never changed a decision is decoration.
 
 Tonight is the final showing, open to everyone, guests welcome. It is
 also the second week the teacher looks closely at every bring-back,
@@ -21,20 +29,22 @@ grows into a showing for the whole room.
 *Written by Claude, awaiting Ben's review (rebuilt by the method of
 curriculum research note 06, October 7, 2026).*
 
-**Write, then publish.** This week writes down what the builder learned,
-so the agent and the next builder keep it, and then publishes the app to
-everyone, guests welcome.
+**Publish.** This week publishes the app to everyone, guests welcome,
+and the writing that follows (stage 08) keeps what the builder learned
+for the agent and the next builder.
 
-The question the whole session turns on, in plain words: **What did you
-learn that the next builder should not have to, and is this version
-enough for its people?**
+The question the whole session turns on, in plain words: **Is this
+version enough for its people, and what should the next builder not
+have to learn?**
 
-The session is designed backward from the week's bring-back
-([note 06](../research/curriculum/06-instructional-design.md), section 4):
-the feature from the student's own use, one value with the decision it
-changed, `HUMAN-SHAPED.md` in their own words, and two sentences on what
-is enough, for now, and for whom. Ben's own material is the model
-students reason with: the night he refused a paid voice server for
+The session is designed backward
+([note 06](../research/curriculum/06-instructional-design.md), section 4)
+from the showing's bring-back (the honest number with what its people
+said, the feature from the student's own use, and two sentences on what
+is enough, for now, and for whom) and from what stage 08 asks for in
+the days after (one value with the decision it changed, and
+`HUMAN-SHAPED.md` in the student's own words). For stage 08, Ben's own
+material is the model students reason with: the night he refused a paid voice server for
 Archive Watch because his apps cost $0 to run, from the September
 section of the [Archive Watch case study](../human-shaped/case-study-archive-watch.md),
 which ends with values climbing "from a reason, to a standing
@@ -52,13 +62,13 @@ written, played with, and published.
 | Minutes (75) | Scene | Kind | What happens |
 |---|---|---|---|
 | 0-5 | Arrive | Talk | Guests, welcome. The four rules, said once more, for everyone. Then what I heard in last week's answers. |
-| 5-8 | A value that changed a decision | Talk | Archive Watch, September 20: the paid voice server refused, and why. |
-| 8-25 | Last look in your trio | Rehearsal rooms | Groups of three. The room's prompt: "Explain every part of your app, even the parts the agent wrote, and one value with the decision it changed." |
+| 5-8 | A value that changed a decision | Talk | Archive Watch, September 20: the paid voice server refused, and why. The model for stage 08, which starts tonight. |
+| 8-25 | Last look in your trio | Rehearsal rooms | Groups of three. The room's prompt: "Explain every part of your app, even the parts the agent wrote, and the number and the feature you will show." |
 | 25-28 | Break | Break |  |
-| 28-53 | The showing | Presenter | Everyone, about two minutes each: the feature you wanted, and one value with the decision it changed. The audience: "Guests may ask one question each. Listen for what is enough, for now." |
+| 28-53 | The showing | Presenter | Everyone, about two minutes each: the feature you wanted from your own use, and your one honest number with what its people said. The audience: "Guests may ask one question each. Listen for what is enough, for now." |
 | 53-61 | The three questions, on the showing | Design stage | Where is it going, how is it going, and what is next, for the apps you just saw. On the board: *The three questions*. |
 | 61-66 | Enough, for now | Reflection | With the agent closed, two sentences: what is enough, for now, for the people you talked to in week 1, and what waits. |
-| 66-70 | Start | Reflection | The cohort chooses its one lesson to send back to the template. Then everyone sends the first prompt of whatever comes next. |
+| 66-70 | Start | Reflection | The cohort chooses its one lesson to send back to the template. Then everyone sends the first prompt of stage 08. |
 | 70-73 | What waits | Question | "What waits for the next version?" (in their own words) |
 | 73-75 | What is still muddy? | Question | "What is still muddy?" (in their own words) |
 
@@ -82,7 +92,7 @@ more, use 90 minutes, or hold the showing in two rooms.
 
 - A part of the app its builder cannot explain, even one the agent
   wrote.
-- A value that never changed a decision.
+- A number nobody questioned, especially a zero.
 - Whether each student can name what is enough, for now, for the people
   they talked to in week 1.
 
@@ -98,36 +108,36 @@ more, use 90 minutes, or hold the showing in two rooms.
 
 ## What they bring back
 
-The cohort's bring-back: the feature, and one value with the decision
-it changed. The stages' own lines:
+The cohort's bring-back: the honest number with what its people said,
+and the feature. The stages' own lines:
+
+> Be ready to show one number Pulse read correctly, one reader that told
+> you honestly it could not, and what your loop finished, and to explain
+> why you stopped the loop when you did.
 
 > Be ready to show the feature on your newest device, the sentence an
 > older device shows instead, and one thing someone else changed about
 > it, and to explain why you decided it should exist at all.
 
-> Be ready to show one skill your app taught, the mistake it will save
-> the next person from, and one value with the decision it changed.
-
-**The bar.** For stage 07: "a feature you wanted from your own use is
-live on every platform that can have it, someone other than you has
-shaped it, and the older devices say honestly what they cannot do." For
-stage 08: "your app is shipped and running, your agent remembers what
-you taught it, and the lessons from this app are waiting for the next
-one."
+**The bar.** For stage 06: Pulse "reads at least one place the app lives
+honestly," and "one honest number has gone back to a person, with what
+they said in your note." For stage 07: "a feature you wanted from your
+own use is live on every platform that can have it, someone other than
+you has shaped it, and the older devices say honestly what they cannot
+do." Stage 08 follows the showing, and its bar is met in the days after.
 
 **What to look for.**
 
+- One number with its source named, the student able to say what it
+  would look like if the source could not be read, and what the person
+  they showed it to said it misses.
 - A feature the student can trace back to a want they wrote down while
   using the app.
 - One thing someone else changed about it, and what the student gave
   back to them.
-- A value with a decision it changed, and what that decision cost.
-- Something the agent now remembers (a rule, a memory, a skill) that it
-  did not know in week 1, and where it lives in the repository.
 
-**Signs of "not yet."** A value with no decision behind it. A feature
-nobody but the builder has touched. A lesson the student can describe
-but has not asked the agent to write down. Many apps will be "not yet"
+**Signs of "not yet."** A number nobody questioned, especially a zero.
+A feature nobody but the builder has touched. Many apps will be "not yet"
 on some part of these stages tonight, and that is ordinary. The stages are
 built to be lapped more than once, and the app's page stays open.
 
@@ -180,9 +190,10 @@ Then the cohort chooses its one lesson to send back to the template:
 a prompt that worked, a step that broke, or a correction that kept
 coming up. Offer two or three candidates you saw in the weeks' checks,
 let the cohort choose, and ask who would like to be credited. Then
-everyone sends the first prompt of whatever comes next for their app,
-whether that is the next round, a store listing, or the first stage of
-a second lap.
+everyone sends the first prompt of [stage 08](../path/08-working-with-ai.md),
+which they write in the days after the showing. Whatever comes next for
+the app (the next round, a store listing, or the first stage of a second
+lap) waits until stage 08 has kept what this one taught.
 
 ## The check
 
@@ -204,9 +215,9 @@ teacher writes it to the cohort's conversation instead.
 
 *Written by Claude, awaiting Ben's review (curriculum milestone C5, October 7, 2026).*
 
-**The task.** Build one feature from a want you logged while using your own app, and put a rough version in front of people it is for. Write a skill and a handoff. Fill in `HUMAN-SHAPED.md`, with one value tied to the decision it changed. Show it to everyone. Decide what is enough, for now, and for whom.
+**The task.** Show the honest number and the feature to everyone. Decide what is enough, for now, and for whom. Then, in the days after the showing, write stage 08: a skill and a handoff, and `HUMAN-SHAPED.md`, with one value tied to the decision it changed.
 
-**Evidence a person can open.** The feature and the log entry it came from; one thing someone else changed about it; the skill; the declaration; the two sentences on what is enough; the list of what waits.
+**Evidence a person can open.** The number and what its people said; the feature and the log entry it came from; one thing someone else changed about it; the two sentences on what is enough; the list of what waits; and, after the showing, the skill and the declaration.
 
 **On the credential.** Recognitions: "Shared what they learned," "Credited the people and tools behind it," "Found whose work they are building on." Students do the thing itself, and what they
 make is the evidence; nobody writes a report about it

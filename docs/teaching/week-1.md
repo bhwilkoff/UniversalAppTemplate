@@ -21,7 +21,11 @@ phases 1 and 2).
 
 Tonight turns those logs into one problem each, held to real tests,
 written as well as the models we study, and sharpened by two other
-people. The week after tonight takes it outside the screen.
+people. The week after tonight takes it outside the screen: it is
+[stage 00](../path/00-why-we-build.md) and [stage
+01](../path/01-first-prototype.md), the problem tested in two real
+conversations and then the smallest real version of the app in the
+hands of one of those people.
 
 **Find the problem before the app.**
 
