@@ -4,6 +4,13 @@
 its own fixes. Nobody else can install it yet, and it turns out that
 those are two different kinds of done.
 
+<!-- The question, the first two steps, the step labels, the last step,
+the per-agent lines, and everything between the bar and the last line:
+written by Claude, awaiting Ben's review (curriculum C8, the lesson page
+template in docs/templates/LESSON-template.md). -->
+**The question.** What happens when someone you did not build it with
+holds your app, and what will they do first?
+
 On September 13, 2026, the App Store version of Archive Watch was
 1.42.53. The repository was at 1.42.94. That is 41 versions, including
 the whole shared-playlist feature, all of it verified on real devices
@@ -168,20 +175,38 @@ form.
 
 ## Working with your agent
 
-1. **Share it with one person first.** Ask the agent for the free way
-   that reaches the person you have in mind (a `-share` release for an
-   Android phone, the web version for an iPhone), then watch them
-   install it without helping. If they live in a country where Google
-   now asks for a registered developer, open the free limited
-   distribution account yourself first.
+This week leads with publish. The steps are one round of write, play,
+publish: the first two come before the agent is open, the middle ones
+are play, with the agent and on devices, and the last one is someone
+else holding your app.
 
-2. **Open the accounts.** When you are ready for a store, create the
-   accounts yourself (Apple, and Google Play if you have an Android
+1. **Write your first answer.** Before any prompt, answer this stage's
+   question in two or three sentences in your note: who will hold it
+   first, and what you think they will do. Being wrong is fine. Guessing
+   first is what makes their real first move teach you something (the
+   research on productive failure, gathered in the
+   [curriculum research](../research/curriculum/05-inquiry-and-evidence.md)).
+
+2. **Write your questions.** For five minutes, write as many questions
+   as you can about someone else holding your app, without stopping to
+   answer or judge any of them. Then mark the one you most want answered
+   by the end of the stage. (These are the Right Question Institute's
+   rules for asking your own questions, also in the
+   [curriculum research](../research/curriculum/05-inquiry-and-evidence.md).)
+
+3. **Play: find the free way that reaches one person.** Ask the agent for
+   the free way that reaches the person you have in mind (a `-share`
+   release for an Android phone, the web version for an iPhone). If they
+   live in a country where Google now asks for a registered developer,
+   open the free limited distribution account yourself first.
+
+4. **Publish: open the accounts, when you are ready for a store.** Create
+   the accounts yourself (Apple, and Google Play if you have an Android
    app), pay for them, and agree to their terms. Tell the agent when they
-   exist.
+   exist. A store can wait until after this cohort; a person cannot.
 
-3. **Ask for everything a submission needs.** In June, getting ready
-   for Archive Watch's first iPhone release, this is how I started:
+5. **Play: ask for everything a submission needs.** In June, getting
+   ready for Archive Watch's first iPhone release, this is how I started:
 
    > Let's get all of the info (screenshots, description, etc.) that we
    > need to submit the iPhone version to the app store.
@@ -190,11 +215,11 @@ form.
    answers what it can of the privacy questions, and tells you what only
    you can answer.
 
-4. **Make the words yours.** Read the store description and the release
-   notes out loud. Rewrite anything that sounds like a machine wrote it,
-   and anything that is not true for that store. Your "no AI copy" rule
-   from stage 00 applies to the store page too. In September the
-   agent's release notes kept arriving with formatting that gave them
+6. **Write: make the words yours.** Read the store description and the
+   release notes out loud. Rewrite anything that sounds like a machine
+   wrote it, and anything that is not true for that store. Your "no AI
+   copy" rule from stage 00 applies to the store page too. In September
+   the agent's release notes kept arriving with formatting that gave them
    away:
 
    > I really don't want to have to remove strange formatting every time
@@ -207,42 +232,85 @@ form.
    > The what's new text should be different by platform because the
    > features are different.
 
-5. **Do the credential step together.** The build and submission run in
-   the cloud and need keys from your accounts. Ask the agent to take you
-   to the exact screen for each one. This is how I did it in September,
-   when Archive Watch's YouTube posting needed a token only I could
-   create:
+7. **Play: do the credential step together.** The build and submission
+   run in the cloud and need keys from your accounts. Ask the agent to
+   take you to the exact screen for each one. This is how I did it in
+   September, when Archive Watch's YouTube posting needed a token only I
+   could create:
 
    > I'd like you to use Chrome to take me to the right screen to
    > generate the oauth token and I'd like you to walk me through that
    > process
 
-   Antigravity opens a separate, sandboxed browser of its own, so there
-   ask for the exact address and the steps instead, and open them in
-   your own browser, where you are already signed in.
-
    When a secret has to be saved, type it into the prompt yourself with
    a `!` in front of the command the agent gives you, so the value goes
    straight where it belongs.
 
-6. **Say ship.** Then ask whether it is really done. This was me on
-   September 3, before moving Archive Watch on to its next piece of work:
+8. **Publish: say ship.** Then ask whether it is really done. This was me
+   on September 3, before moving Archive Watch on to its next piece of
+   work:
 
    > Did you ship it fully? I'd like to move on to another scope of work.
 
-7. **Paste the rejection whole.** If a store rejects the build, copy the
-   entire message to the agent. It diagnoses, fixes and resubmits. If it
-   says something cannot be done by the command line, and you know
-   other apps do it, say so.
+9. **Play: paste the rejection whole.** If a store rejects the build,
+   copy the entire message to the agent. It diagnoses, fixes and
+   resubmits. If it says something cannot be done by the command line,
+   and you know other apps do it, say so.
 
-8. **Install it like a stranger.** Open your app's page in the store on a
-   device you did not build it on, and install it. That, not the green
-   checkmark, is shipped.
+10. **Play: install it like a stranger.** Open your app's page, in the
+    store or from your shared link, on a device you did not build it on,
+    and install it. That, not the green checkmark, is shipped.
+
+11. **Publish: watch one person who hears your hum hold it.** Send the
+    link to one of the two people you named in stage 00, and watch them
+    install it and use it without helping. Write down what they did
+    first, and what they said, in their words, beside the guess you wrote
+    in step 1. Then, with the agent closed, write two sentences in your
+    note: one thing you decided in this stage, and what it cost.
+
+Where the agents differ, one line each
+([curriculum research, 03 and 04](../research/curriculum/03-claude-code-and-antigravity.md)):
+
+- **Claude Code:** with Claude in Chrome, it can open the exact screen
+  for a store key in your own browser, where you are already signed in,
+  as in step 7.
+- **Antigravity:** its browser is a separate, sandboxed one, so for step
+  7 ask for the exact address and the steps instead, and open them in
+  your own browser.
+- **The open path:** the release workflows run on GitHub, not on the
+  model, so they work the same; a small model cannot drive a browser, so
+  ask it to write the steps for each screen
+  ([the open pathway](../research/curriculum/04-open-pathway.md)).
 
 **When you are ready to move on,** someone else has your app on their
-own device, from a link you shared or from a store. Once they do, you
+own device, from a link you shared or from a store, and what they did
+first is written in your note beside your guess. Once they have it, you
 can no longer see everything that happens to it by using it yourself.
 Stage 06 is about seeing the rest.
+
+**Go deeper.** Ask the agent to read, from the store itself, which
+version is live on each platform, and to compare it with the version in
+your repository. My September 13 gap of 41 versions is what that check
+is for. It is never required, and it is never counted.
+
+**If you get stuck.**
+
+- *It will not install on their device.* Ask yourself: which device is
+  it, and which free way did I use? Try
+  [I cannot get it onto someone else's device](../stuck/publishing/someone-elses-device.md),
+  then ask your group.
+- *You are not ready to show anyone.* Ask yourself: what would one person
+  learn from it as it is? Try
+  [I am not ready to show anyone](../stuck/publishing/not-ready.md).
+- *A store form or a console will not cooperate.* Ask yourself: is this a
+  step only a person can do? Try
+  [the tools themselves are stuck](../stuck/playing/tools-stuck.md), then
+  ask the teacher.
+
+**Before you close your note.** Four short lines, from my
+[Educational Model Spec's AI Disclosure Protocol](https://github.com/bhwilkoff/educational-model-spec/blob/main/docs/implementation-tools/ai_disclosure_protocol.md):
+the agent's role, your essential work, one thing you learned, and your
+growth edge.
 
 Be ready to show your app installed on a device you did not build it
 on, to say what that person did first, and, if it is in a store, to
