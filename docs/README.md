@@ -19,6 +19,14 @@ back and get feedback on it, in a cohort or on your own.
 minutes, the teacher's words, the check question, and what to look for
 in the bring-backs.
 
+## When you are stuck
+
+`stuck/README.md` is the library for the moments when the work stops:
+stuck writing, stuck playing, and stuck publishing, one page per stuck
+moment, each starting with a question to ask yourself and ending with
+who to ask. It also holds the ladder to climb when none of the pages
+fits.
+
 ## By stage
 
 **00. Why we build**
