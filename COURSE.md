@@ -27,6 +27,15 @@ three.
 Every week makes the same three moves as the stages: write, play, and
 publish. Stage 00 explains them.
 
+<!-- Written by Claude, awaiting Ben's review (curriculum C1). -->
+Write, play, publish is the only loop in this course. Each week is one
+larger round of it, so each week leads with one of the three moves, makes
+all three, and asks one question that the student answers about their
+own app. The habits the research turned up (asking your own questions
+first, trying before you are shown, having the agent prove its work) are
+ways of making one of the moves well, and the stages credit them where
+they are used.
+
 The course is the stages in `docs/path/`. Each stage already ends with a
 "Be ready to..." line, and that line is the challenge to bring back.
 What follows is how the stages map onto a cohort of about five weeks,
@@ -43,6 +52,9 @@ gentle hum of worry or concern about an area of their life, unsolved for
 months or even years, that their current tools and resources are not up
 to
 ([examples of each shape](docs/human-shaped/computer-shaped-problems.md#computer-shaped-and-human-shaped)).
+Nobody arrives with the app already chosen. Week 1 begins with finding
+the hum, sorting it, and naming who else hears it, before anyone writes a
+word about an app ([Sort the hum](docs/human-shaped/hum-sort.md)).
 
 ## Five weeks, and a week before them
 
@@ -57,14 +69,14 @@ week's work gets shown and where the next week's work gets started.
 Each week in the table links to the guide for its session, in
 [`docs/teaching/`](docs/teaching/README.md).
 
-| Week | Stages | Where the app gets to | What they bring back |
-|---|---|---|---|
-| [Cohort Prep](docs/teaching/before.md) | [Getting set up](docs/path/setup.md) | A GitHub account, a copy of the template, an AI agent (Claude or Gemini) connected to it, and a desktop computer set up to build and test both on the computer and in the cloud. The first win: their own app's address open on their phone, showing its name. | The address, on their phone. |
-| [1](docs/teaching/week-1.md) | 00. Why we build, 01. The first prototype | An agent that knows why the app exists and who it is for, in the student's words, and one platform live at a real address with real data, after two rounds of feedback from their own phone. | The why, the people outside their screen, the one rule, and the app on their phone with one thing the real data taught them. |
-| [2](docs/teaching/week-2.md) | 02. The shape of an app, 03. Going native | A parity matrix the student has read and trimmed, and a second platform running on their own device. | One verb shown on both platforms, each in its own idiom, and one cell their own eyes proved wrong. |
-| [3](docs/teaching/week-3.md) | 04. Seeing it work, and making it look like itself | The agent testing on the student's device, and a look for the app that comes from its own why rather than the template's defaults. | A screenshot that proved a fix, and the app's own look beside the template's. |
-| [4](docs/teaching/week-4.md) | 05. Shipping, 06. Keeping it running | The app installed on a device the student did not build it on, through a test track, a direct share, or a store, and one honest number about it. | The app on someone else's device, and what that person said. |
-| [5](docs/teaching/week-5.md) | 07. Raising the ceiling, 08. Working with AI | A feature the student wanted from their own use, and skills and memories that carry this app's lessons forward. | The feature, and one value with the decision it changed. Shown to everyone, guests welcome. |
+| Week | Leads with, and the week's question | Stages | Where the app gets to | What they bring back |
+|---|---|---|---|---|
+| [Cohort Prep](docs/teaching/before.md) | **Publish.** What do I need in order to build at all? | [Getting set up](docs/path/setup.md) | A GitHub account, a copy of the template, an AI agent (Claude or Gemini) connected to it, and a desktop computer set up to build and test both on the computer and in the cloud. The first win: their own app's address open on their phone, showing its name. | The address, on their phone, and one thing that hums in their life. |
+| [1](docs/teaching/week-1.md) | **Write.** What has hummed in my life for months, and who else hears it? | Find your hum, 00. Why we build, 01. The first prototype | A hum chosen from three and sorted, its computer-shaped twin, two people who hear it too, an agent that knows why the app exists and who it is for, in the student's words, and one platform live at a real address with real data, after two rounds of feedback from their own phone and one person who hears the same hum opening it. | The hum and its twin, the why, the one rule, and the app on their phone with one thing the real data taught them and what the first other person did with it. |
+| [2](docs/teaching/week-2.md) | **Play.** What is still wrong, and how do I say it so it gets fixed? | 02. The shape of an app, 03. Going native | A parity matrix the student has read and trimmed, and a second platform running on their own device. | One verb shown on both platforms, each in its own idiom, and one cell their own eyes proved wrong. |
+| [3](docs/teaching/week-3.md) | **Play, then write.** How do I know it works, and what does it look like when it comes from its why? | 04. Seeing it work, and making it look like itself | The agent testing on the student's device, and a look for the app that comes from its own why rather than the template's defaults. | A screenshot that proved a fix, and the app's own look beside the template's. |
+| [4](docs/teaching/week-4.md) | **Publish.** What happens when someone I did not build it with holds it? | 05. Shipping, 06. Keeping it running | The app installed on a device the student did not build it on, through a test track, a direct share, or a store, and one honest number about it. | The app on someone else's device, and what that person said. |
+| [5](docs/teaching/week-5.md) | **Write, then publish.** What did I learn that the next builder should not have to, and is this version enough for its people? | 07. Raising the ceiling, 08. Working with AI | A feature the student wanted from their own use, and skills and memories that carry this app's lessons forward. | The feature, and one value with the decision it changed. Shown to everyone, guests welcome. |
 
 Five weeks gets most people to a shared, working app on one or two
 platforms. Store listings and the later stages often land after the
@@ -79,7 +91,8 @@ think of someone's work before they know who is in the room. [Getting
 set up](docs/path/setup.md) takes each student from no GitHub account to
 their own app's address on their phone, and the setup session is where
 anything still stuck gets unstuck, in front of people who will need the
-same answer.
+same answer. It is also when each student starts a list of what hums in
+their life, so that week 1 begins with more than one to choose from.
 
 It is also when each student meets their group and hears three things
 said aloud. The first is the four rules below for how we talk to one

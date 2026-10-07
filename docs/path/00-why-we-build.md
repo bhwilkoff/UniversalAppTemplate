@@ -1,8 +1,13 @@
 # 00. Why we build
 
-**Where you are.** You have an idea for an app and your own copy of this
-template. Nothing is built yet, and that is exactly the right moment for
-this stage.
+**Where you are.** You have your own copy of this template, and maybe an
+idea for an app, or maybe only a feeling that something in your life
+should be easier than it is. Nothing is built yet, and that is exactly
+the right moment for this stage.
+
+<!-- Written by Claude, awaiting Ben's review (curriculum C1). -->
+**The question.** What has hummed in your life for months, and who else
+hears it?
 
 On September 26, 2026, deep into building Archive Watch, I told the
 agent I was working with this, and it became one of the project's
@@ -102,6 +107,48 @@ The moves are not stages. Each round of each stage makes all three, and
 the principles decide what you write, what you play with, and what is
 ready to publish. This stage is where the first move starts.
 
+## Find your hum
+
+<!-- Written by Claude, awaiting Ben's review (curriculum C1). The
+definition is Ben's October 6, 2026 piece, as quoted in
+computer-shaped-problems.md, where "inawing" and "It'is" were corrected to
+"gnawing" and "It is". -->
+
+Every app in this course starts before the app. It starts with a
+problem you have lived with, and in October I wrote down what I mean by
+that:
+
+> A human-shaped problem is something, really anything, in your life
+> that will in some way make your life better, happier, or more deeply
+> resonant with the universe if you could only solve for it. It is
+> something that is the gentle hum of worry or concern that you have
+> about an area of your life. [...] It is something that has gone
+> unsolved for months or even years, something that is present in a
+> gnawing way. And most of all, it is something that you cannot do
+> yourself. Your current tools and resources are insufficiently up to
+> the challenge.
+
+So, before you write a single thing about an app, you write down hums.
+Not one, three, because the first one you think of is usually the
+loudest rather than the truest. Then you sort, because most problems can
+be told in either shape, and the shape you tell it in decides what you
+will build: stories to be told and added to, or data points to be
+counted. [Sort the hum](../human-shaped/hum-sort.md) has my eight
+examples, mixed together, for sorting before you read my answer.
+
+Then you write the other shape of your own problem: its computer-shaped
+twin, the version that counts and ranks and optimizes. Writing the twin
+is how you see what your app must never become.
+
+Last, two questions, and they are older than any agent. Neil Postman
+asked them of every new technology: "What is the problem to which this
+technology is the solution?" and "Whose problem is it?" (*Building a
+Bridge to the 18th Century*, 1999, as gathered in the
+[curriculum research](../research/curriculum/02-landscape.md)). A
+human-shaped problem is rarely yours alone, so name two people outside
+your screen who hear the same hum. They are who you will publish to
+first, at the end of the next stage.
+
 ## Where the values live in this template
 
 There are three places, and each one is read at a different moment.
@@ -192,29 +239,47 @@ default.
 
 ## Working with your agent
 
-Open your agent (Claude Code, or Antigravity for Gemini) in your copy of
-the template. Everything in this stage is a conversation, and
+<!-- Steps 1 to 4 and the intro line: written by Claude, awaiting Ben's
+review (curriculum C1). -->
+Steps 1 to 4 are yours alone, with the agent closed, because they are
+writing, and the hum has to be yours before anyone helps you shape it.
+From step 5 on, open your agent (Claude Code, or Antigravity for Gemini)
+in your copy of the template. Those steps are conversations, and
 `talking-to-your-agent.md` has the moves.
 
-1. **Start your note with the why.** Open a plain note for your app, in
-   whatever notes app you already use. At the top, write the
-   human-shaped problem it is for: the gentle hum of worry or concern you
-   have about an area of your life, something that has gone unsolved for
-   months or even years, and that you cannot do yourself with the tools
-   and resources you have now
-   ([computer-shaped problems](../human-shaped/computer-shaped-problems.md#computer-shaped-and-human-shaped)
-   has examples of both shapes). Then write who it is for, and what you
-   hope it does for them. You will keep
-   this note for the life of the app, and it is where your prompts will
-   be drafted from now on.
+1. **Write down three hums.** Open a plain note, in whatever notes app
+   you already use. You will keep it for the life of the app, and it is
+   where your prompts will be drafted from now on. At the top, write
+   three things that have hummed in your life for months, each in a
+   sentence or two, in your own words. Then write your first answer to
+   this stage's question, before you read further.
 
-2. **Tell the agent why.** Say what you wrote, the way you would to a
+2. **Sort before you choose.** Sort my eight examples in
+   [Sort the hum](../human-shaped/hum-sort.md), with your group if you
+   are in a cohort, then put your own three on the same two sides. Choose
+   one hum that is human-shaped. If none of yours is, that is worth
+   knowing: write three more.
+
+3. **Write its computer-shaped twin.** Under the hum you chose, write
+   the same problem in the other shape, the version that counts, ranks,
+   or optimizes. Keep it in your note. It is the app you are choosing not
+   to build.
+
+4. **Name two people who hear the same hum.** Write their names, and
+   one line each on how you know it hums for them too. Then answer
+   Postman's two questions about your hum in your note: what is the
+   problem to which this app is the solution, and whose problem is it?
+
+5. **Start your note with the why.** Above the hum, write the why: who
+   the app is for, and what you hope it does for them.
+
+6. **Tell the agent why.** Say what you wrote, the way you would to a
    friend. Then ask the agent to rewrite the "Why we build" paragraph in
    `AGENTS.md` from what you said, and to read it back to you. Correct it
    until it sounds like you and not like a company. Five sentences or
    fewer.
 
-3. **Name one line you will not cross.** Something the app will never
+7. **Name one line you will not cross.** Something the app will never
    do, or never let AI do inside it, even if doing it would work. Say it
    plainly and say why. Mine
    usually came out the moment the agent proposed crossing one. In
@@ -229,7 +294,7 @@ the template. Everything in this stage is a conversation, and
    with today's date and your words in quotes. You will add more of
    these as you build.
 
-4. **Ask three questions of the idea.** Work through these with the
+8. **Ask three questions of the idea.** Work through these with the
    agent, and write your answers in your note.
 
    1. **Should it exist at all?** If something already does this, what
@@ -258,12 +323,12 @@ the template. Everything in this stage is a conversation, and
    there was only yours. It does not replace asking real people, and
    stage 07 comes back to that.
 
-5. **Test it against the four questions.** Ask the agent to run the
+9. **Test it against the four questions.** Ask the agent to run the
    `learning-orientation-design` skill against your idea and tell you
    where it fails. Where it does, change the idea now, while it is only
    words. The same test applies to every feature from here on.
 
-6. **Let it ask you the rest.** Ask the agent what it still needs to
+10. **Let it ask you the rest.** Ask the agent what it still needs to
    know before it starts. This is how I opened each early milestone of
    BOBA Playbook, starting the first evening:
 
@@ -283,10 +348,11 @@ the template. Everything in this stage is a conversation, and
 
    The agent records your answers as decisions, with the why first.
 
-**When you are ready to move on,** your note starts with the why and
-your answers to the three questions, the "Why we build" paragraph in
-`AGENTS.md` sounds like you, there is one rule in your own words, and
-the agent has what it needs to start. You have written. Stage 01 is the
+**When you are ready to move on,** your note holds three hums, the one
+you chose with its computer-shaped twin, and the two people who hear it
+too. It starts with the why and your answers to the three questions, the
+"Why we build" paragraph in `AGENTS.md` sounds like you, there is one
+rule in your own words, and the agent has what it needs to start. You have written. Stage 01 is the
 first chance to play with something you can hold, and to publish it for
 someone else to try.
 
@@ -294,6 +360,7 @@ Every stage ends the way this one does, with something to show and a
 decision to explain in your own words, with the agent closed. [Showing
 your work](showing-your-work.md) says how, in a cohort or on your own.
 
-Be ready to share your "why we build" paragraph, the people outside your
-screen, and your one rule, and to explain why you drew that line where
-you did and what it will cost you.
+Be ready to share your hum and its computer-shaped twin, your "why we
+build" paragraph, the two people who hear the same hum, and your one
+rule, and to explain why you drew that line where you did and what it
+will cost you.
