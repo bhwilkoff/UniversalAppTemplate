@@ -230,8 +230,8 @@ Every entry in the [stuck library](../stuck/README.md) starts with a
 question to ask yourself, then what to try, then who to ask. This week,
 point people to:
 
-- [Stuck writing](../stuck/stuck-writing.md), for when the hum, the why, or what comes next will not come.
-- [Stuck publishing](../stuck/stuck-publishing.md), for when you are not ready to show anyone, cannot get it onto another device, or do not know when it is enough.
+- [Stuck writing](../stuck/writing/README.md), for when the hum, the why, or what comes next will not come.
+- [Stuck publishing](../stuck/publishing/README.md), for when you are not ready to show anyone, cannot get it onto another device, or do not know when it is enough.
 
 And the ladder for any of them: name the kind of stuck, write three
 lines (what you tried, what you expected, what you saw), ask the agent

@@ -162,8 +162,8 @@ Every entry in the [stuck library](../stuck/README.md) starts with a
 question to ask yourself, then what to try, then who to ask. This week,
 point people to:
 
-- [Stuck playing](../stuck/stuck-playing.md), for when the agent fixes what you cannot see, a bug keeps returning, or the tools themselves are stuck.
-- [Stuck writing](../stuck/stuck-writing.md), for when the hum, the why, or what comes next will not come.
+- [Stuck playing](../stuck/playing/README.md), for when the agent fixes what you cannot see, a bug keeps returning, or the tools themselves are stuck.
+- [Stuck writing](../stuck/writing/README.md), for when the hum, the why, or what comes next will not come.
 
 And the ladder for any of them: name the kind of stuck, write three
 lines (what you tried, what you expected, what you saw), ask the agent
