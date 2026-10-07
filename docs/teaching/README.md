@@ -23,13 +23,13 @@ that is what every guide is built around.
 |---|---|---|---|
 | The week before | Publish | The app's address, open on a phone | [The week before](before.md) |
 | Week 1 | Write | The noticing log, which the session turns into one problem statement, held to the tests and critiqued in the trio | [Week 1](week-1.md) |
-| Week 2 | Play | 02. The shape of an app, 03. Going native | [Week 2](week-2.md) |
-| Week 3 | Play, then write | 04. Seeing it work, and the app's own look | [Week 3](week-3.md) |
-| Week 4 | Publish | 05. Shipping, 06. Keeping it running | [Week 4](week-4.md) |
-| Week 5 | Write, then publish | 07. Raising the ceiling, 08. Working with AI, shown to everyone | [Week 5](week-5.md) |
+| Week 2 | Play | 00 and 01: the problem statement, the two conversations, and the first app in the hands of a person they talked to | [Week 2](week-2.md) |
+| Week 3 | Play, then publish | 02 and 03: one verb on both platforms, one cell proved wrong, and the app's own look | [Week 3](week-3.md) |
+| Week 4 | Publish, then write | 04 and 05: a screenshot that proved a fix, and the app on someone else's device | [Week 4](week-4.md) |
+| Week 5 | Publish | 06 and 07: one honest number and one feature from their own use, shown to everyone; 08 follows the showing | [Week 5](week-5.md) |
 
-Each session comes at the end of its week. It is where that week's work
-gets shown, and where the next week's work gets started, so every guide
+Each session opens its week. It is where the week before's work gets
+shown, and where the week ahead's work gets started, so every guide
 looks back at one pair of stages and forward to the next.
 
 ## Before your first cohort

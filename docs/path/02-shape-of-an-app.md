@@ -254,7 +254,7 @@ on your devices, and the last one publishes to your group.
 
 8. **Publish: show the matrix to someone else.** Bring your trimmed
    matrix, and the one cell your own eyes proved wrong, to your group (or,
-   working alone, to one of the two people who hear your hum). Ask them
+   working alone, to one of the two people you talked to). Ask them
    which promise they would check first, and write down what they said.
    Then, with the agent closed, write two sentences in your note: the
    rule about your data that you decided, and what it cost.
@@ -294,7 +294,8 @@ never required, and it is never counted.
   is this the same complaint I sent last round? Then try
   [the same bug keeps coming back](../stuck/playing/same-bug.md).
 - *You do not know which platform should come second.* Ask yourself:
-  where are the people who hear my hum? Then try
+  where are the people who have this problem, and what do they already
+  hold in their hands? Then try
   [I do not know what I want it to do next](../stuck/writing/what-next.md),
   and ask the teacher.
 
