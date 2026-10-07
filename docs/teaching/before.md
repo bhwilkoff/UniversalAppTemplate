@@ -20,7 +20,7 @@ seeing what a good bring-back looks like before anyone has to make one.
 
 *Written by Claude, awaiting Ben's review (curriculum milestone C5, October 7, 2026).*
 
-**Publish.** This session leads with publishing, before anything is built: everyone opens the app's address on their own phone and shows it to two people they have only just met. Writing starts at the end, with the first hums.
+**Publish.** This session leads with publishing, before anything is built: everyone opens the app's address on their own phone and shows it to two people they have only just met. Writing starts at the end, with a noticing log that everyone keeps for the five days before week 1.
 
 The question the whole session turns on: **What do I need in order to build at all?**
 
@@ -35,14 +35,14 @@ written, played with, and published
 |---|---|---|---|
 | 0-10 | Arrive | Talk | Your name, and in one sentence, what you want your app to do for someone you know. |
 | 10-18 | How we talk to one another | Talk | The four rules, said aloud. And one true story about a rough first week. |
-| 18-38 | Meet your group | Rehearsal rooms | Groups of three. The room's prompt: "Show your app's address on your phone, and say one thing that hums in your life." |
+| 18-38 | Meet your group | Rehearsal rooms | Groups of three. The room's prompt: "Show your app's address on your phone, and say one thing in your life you wish worked differently." |
 | 38-41 | Break | Break |  |
 | 41-59 | A strong bring-back and a weak one | Design stage | Both shown, then everyone practices the three questions on the weak one, on the board. On the board: *The three questions*. |
-| 59-70 | Start | Reflection | Everyone begins stage 00 and sends its first prompt. Then: "What has hummed in your life for months? Write three before you open the agent." |
+| 59-70 | Start your noticing log | Reflection | The four prompts of the log, on screen. Then: "What is one thing that happened today that could go in your log?" |
 | 70-73 | Check for understanding | Question | "What do you hope this app will do for someone?" (in their own words) |
 | 73-75 | How ready do you feel? | Question | "How ready do you feel to build?" (a scale) |
 
-**In the rehearsal rooms,** each builder's turn runs these scenes, 6 minutes in all: show the address on your phone (3), one thing that hums in your life (2), one question to understand it (1). The room's prompt is on screen the whole time.
+**In the rehearsal rooms,** each builder's turn runs these scenes, 6 minutes in all: show the address on your phone (3), one thing you wish worked differently (2), one question to understand it (1). The room's prompt is on screen the whole time.
 
 These are the scenes a new cohort is made with on humanshaped.org, from
 [`runs-of-show.json`](runs-of-show.json), and every one of them can be
@@ -105,10 +105,10 @@ This is the design stage scene. Put the board on the main stage from the
 *The three questions* template, so everyone writes their three answers
 for the weak example where the others can see them.
 
-Show both, on screen, for half of what week 1 will ask: stage 00's "Be
-ready to share your 'why we build' paragraph, the people outside your
-screen, and your one rule, and to explain why you drew that line where
-you did and what it will cost you."
+Show both, on screen, for half of what stage 00 will ask once each
+person has found their problem: "Be ready to share your 'why we build'
+paragraph, the people outside your screen, and your one rule, and to
+explain why you drew that line where you did and what it will cost you."
 
 **The strong one** is built from Archive Watch, from stage 00 itself.
 The rule is "No AI-written lists or copy in the product," dated, and in
@@ -131,12 +131,48 @@ answers people reach for are the reasons the strong one is strong: it
 names who the app touches, it draws a line with a reason, and it says
 what holding that line costs.
 
-## Start
+## Start your noticing log
 
-Everyone opens their note and begins [stage 00](../path/00-why-we-build.md):
-the human-shaped problem and the why at the top, then its second step, telling the agent why in
-their own words and asking it to rewrite the "Why we build" paragraph in
-`AGENTS.md`. Everyone sends that prompt before they leave.
+*Written by Claude, awaiting Ben's review (from research note 06, October 7, 2026).*
+
+Nobody chooses a problem tonight. None of my apps began as an idea for
+an app: each began with part of my life that kept bothering me, and I
+lived with it before I built anything
+([`01-mining-bens-process.md`](../research/curriculum/01-mining-bens-process.md),
+phase 1). A cohort cannot give anyone months, so it gives them five
+days of noticing. Put these four prompts on screen, and ask everyone to
+write one line, for the next five days, whenever one of them happens:
+
+- I wished something worked differently.
+- I gave up on something I care about.
+- I did something the long way because nothing helped.
+- Someone I know struggled with the same thing.
+
+Each prompt is one of the tests in my own definition of a human-shaped
+problem, in plain words: it would make life better, it has gone
+unsolved, the tools at hand are not up to it, and it is rarely one
+person's alone
+([`computer-shaped-problems.md`](../human-shaped/computer-shaped-problems.md#computer-shaped-and-human-shaped);
+research note 06, section 1). Logging what happens, as it happens, is
+what researchers call a diary study, kept here on oneself (Kim
+Flaherty, ["Diary Studies,"](https://www.nngroup.com/articles/diary-studies/)
+Nielsen Norman Group, 2024), and the habit it builds is noticing rather
+than thinking things up (Paul Graham,
+["How to Get Startup Ideas,"](http://www.paulgraham.com/startupideas.html)
+2012).
+
+Say three things about the log before anyone leaves:
+
+1. **No app ideas yet.** Write what happened, not what to build. An
+   idea for an app on day one closes the door on the problem underneath
+   it.
+2. **Keep it anywhere.** A notes app on the phone, paper, or the app's
+   own note. The log is private, and nobody reads it unless its owner
+   reads a line aloud.
+3. **Bring it to week 1.** The whole session starts from it.
+
+Then ask everyone to write the first line before they go, while you
+watch the clock.
 
 ## The check
 
@@ -157,9 +193,9 @@ hand.
 
 *Written by Claude, awaiting Ben's review (curriculum milestone C5, October 7, 2026).*
 
-**The task.** Set up, and open the app's address on your phone. Begin your list of hums.
+**The task.** Set up, and open the app's address on your phone. Then keep a noticing log for five days, one line whenever one of its four prompts happens, with no app ideas in it.
 
-**Evidence a person can open.** The repository, and the address open on a phone.
+**Evidence a person can open.** The repository, and the address open on a phone. The log stays private; what it becomes in week 1 is the evidence.
 
 **On the credential.** The repository is the credential's first evidence. Students do the thing itself, and what they
 make is the evidence; nobody writes a report about it
@@ -172,6 +208,7 @@ question to ask yourself, then what to try, then who to ask. This week,
 point people to:
 
 - [Stuck playing](../stuck/playing/README.md), for when the agent fixes what you cannot see, a bug keeps returning, or the tools themselves are stuck.
+- [Stuck writing](../stuck/writing/README.md), for when a day goes by and nothing seems worth a line in the log.
 
 And the ladder for any of them: name the kind of stuck, write three
 lines (what you tried, what you expected, what you saw), ask the agent
@@ -183,9 +220,10 @@ twenty minutes before the trio is a default each person can move.
 
 > Before you go, answer the two questions on the live page. Only I will
 > see them, and I will read every one before next week. This week you
-> will write down why your app exists and get a first version of it
-> running on real data, and next week you will show it to your group.
-> It will not be finished, and it is not supposed to be.
+> will not build anything new. You will keep your log, one line at a
+> time, and next week we start from it, together, to find the problem in
+> your life that is worth building something for. Nobody has to know
+> what it is yet, and it is better if you don't.
 
 ## After the session
 
@@ -195,4 +233,4 @@ without their address on their phone, and offer them half an hour
 before week 1. Then confirm the groups of three, and send each group
 its names, so everyone knows who they will be showing next week.
 
-Next week, the first real bring-back.
+Next week, everyone starts from their log.

@@ -35,8 +35,10 @@ KEYS = {
     "break": set(),
     "reflection": {"prompt"},
 }
-# The board templates the hub has, and the one this curriculum adds.
-TEMPLATES = {"blank", "prompt", "moves", "questions", "hum-sort"}
+# The board templates the hub has, and the one this curriculum adds
+# (`problem-tests`, a board for holding a candidate problem against the
+# tests in docs/research/curriculum/06-instructional-design.md).
+TEMPLATES = {"blank", "prompt", "moves", "questions", "problem-tests"}
 
 
 def check(ok, what, detail=""):

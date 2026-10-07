@@ -31,14 +31,14 @@
           "minutes": 20,
           "body": "Groups of three. Each person opens their app's address on their phone and shows it.",
           "config": {
-            "prompt": "Show your app's address on your phone, and say one thing that hums in your life.",
+            "prompt": "Show your app's address on your phone, and say one thing in your life you wish worked differently.",
             "room_scenes": [
               {
                 "title": "Show the address on your phone",
                 "minutes": 3
               },
               {
-                "title": "One thing that hums in your life",
+                "title": "One thing you wish worked differently",
                 "minutes": 2
               },
               {
@@ -67,11 +67,11 @@
         },
         {
           "kind": "reflection",
-          "title": "Start",
+          "title": "Start your noticing log",
           "minutes": 11,
-          "body": "Everyone begins stage 00 and sends its first prompt.",
+          "body": "For five days, write one line whenever one of these happens:\n\nI wished something worked differently.\nI gave up on something I care about.\nI did something the long way because nothing helped.\nSomeone I know struggled with the same thing.\n\nNo app ideas yet. Just what happened.",
           "config": {
-            "prompt": "What has hummed in your life for months? Write three before you open the agent."
+            "prompt": "What is one thing that happened today that could go in your log?"
           }
         },
         {
@@ -117,55 +117,80 @@
         {
           "kind": "short",
           "prompt": "What did your agent do for you during setup that you expected to have to do yourself?"
+        },
+        {
+          "kind": "choice",
+          "prompt": "Where will you keep your noticing log this week?",
+          "choices": [
+            "A notes app on my phone",
+            "Paper",
+            "My app's note",
+            "Somewhere else"
+          ]
         }
       ]
     },
     {
       "key": "week-1",
       "week": 1,
-      "title": "Week 1: the hum, the why, and a first version on real data",
+      "title": "Week 1: finding a problem worth building for",
       "move": "Write",
-      "question": "What has hummed in my life for months, and who else hears it?",
+      "question": "What problem in your own life is worth building something for, and who else has it?",
       "guide": "week-1.md",
       "scenes": [
         {
           "kind": "talk",
           "title": "Arrive",
-          "minutes": 7,
-          "body": "One line in the chat: shipped or stuck.\n\nThen what I heard in last week's answers, and what I changed because of it.",
+          "minutes": 5,
+          "body": "One line in the chat from your noticing log, one you are willing to share.\n\nThen what I heard in last week's answers, and what I changed because of it.",
           "config": {}
         },
         {
-          "kind": "rooms",
-          "title": "Show what you brought back",
-          "minutes": 30,
-          "body": "Groups of three, about ten minutes each, with the steps on screen. One person keeps time.",
+          "kind": "talk",
+          "title": "Two notes for one film",
+          "minutes": 3,
+          "body": "Two notes for the same film in Archive Watch, side by side.\n\nOne was written in a second by an AI. The other was written by someone who watched the film and shared it on archive.org.",
+          "config": {},
+          "note": "Prepare these before the session: copy one film's notes from its archive.org page, and ask your agent for a three-sentence summary of the same film. Label them A and B, and do not say which is which until people have answered."
+        },
+        {
+          "kind": "question",
+          "title": "What would be lost?",
+          "minutes": 3,
+          "body": null,
           "config": {
-            "prompt": "Show the first platform, and read your why aloud. What will it refuse to do?",
-            "room_scenes": [
-              {
-                "title": "Their question",
-                "minutes": 1
-              },
-              {
-                "title": "Show it, and one decision",
-                "minutes": 4
-              },
-              {
-                "title": "One clarifying question",
-                "minutes": 1
-              },
-              {
-                "title": "The three questions",
-                "minutes": 3
-              },
-              {
-                "title": "What comes next",
-                "minutes": 1
-              }
-            ]
+            "prompt": "Which would you rather read, and what would be lost if the app only had the first kind?",
+            "kind": "short"
+          }
+        },
+        {
+          "kind": "reflection",
+          "title": "Our questions",
+          "minutes": 6,
+          "body": "Ask as many questions as you can.\n\nDo not stop to discuss, judge, or answer them.\n\nWrite each one down exactly as it was said.\n\nChange any statement into a question.",
+          "config": {
+            "prompt": "If anyone can build their own apps, it matters even more which apps they choose to build. What questions does that raise for you?"
           },
-          "note": "Watch for a problem that is really computer-shaped, and a why with no people in it."
+          "note": "These are the Question Formulation Technique's four rules (Right Question Institute). Collect every question in the session's thread. They become the cohort's list of what we need to know, and you come back to it every week."
+        },
+        {
+          "kind": "reflection",
+          "title": "Five from your log",
+          "minutes": 5,
+          "body": "With your agent closed, choose five lines from your log and write each as a problem, in your own words, one or two sentences each.",
+          "config": {
+            "prompt": "Which five things in your log would you most like to be different?"
+          }
+        },
+        {
+          "kind": "design",
+          "title": "Hold them to the tests",
+          "minutes": 10,
+          "body": "Put your two strongest on the board. For each test, mark yes, not yet, or I don't know. \"I don't know\" is an honest answer, and it is what this week's conversations are for.",
+          "config": {
+            "template": "problem-tests"
+          },
+          "note": "Watch for a problem that is really a measurement or a ranking, with nobody's story in it, and ask about it with a question, not a verdict."
         },
         {
           "kind": "break",
@@ -175,44 +200,80 @@
           "config": {}
         },
         {
-          "kind": "presenter",
-          "title": "One value at work",
-          "minutes": 7,
-          "body": "One person shares the line they drew in stage 00, and what holding it will cost them.",
-          "config": {
-            "prompt": "Listen for the value at work, and what it cost."
-          }
+          "kind": "talk",
+          "title": "What makes a problem statement strong",
+          "minutes": 4,
+          "body": "Four problems I wrote, in my own words. Each starts from a real situation in my life, says what a better life would look like, and then says \"I need something that...\"\n\nRead them as models, not answers. What do they do that you could do in yours?",
+          "config": {}
         },
         {
-          "kind": "design",
-          "title": "Hum sort",
-          "minutes": 15,
-          "body": "Eight problems, and two sides. Sort them alone, then with your trio, before anyone names the difference. Then add your own.",
+          "kind": "question",
+          "title": "What do they do well?",
+          "minutes": 3,
+          "body": null,
           "config": {
-            "template": "hum-sort"
+            "prompt": "In a few words, what do these four problem statements do well?",
+            "kind": "words"
           }
         },
         {
           "kind": "reflection",
-          "title": "Start",
-          "minutes": 8,
-          "body": "Tell your agent every platform you plan to reach, even the ones months away, and ask it for the parity matrix before you leave.",
+          "title": "Rewrite yours",
+          "minutes": 5,
+          "body": "Rewrite your strongest candidate in the same form: what happens in your life, then \"I need something that...\"\n\nThen one sentence on what the computer-shaped version of the same wish would be, so you can see what to steer away from.",
           "config": {
-            "prompt": "What is the first prompt you will send this week?"
+            "prompt": "What happens in your life, and what do you need?"
+          }
+        },
+        {
+          "kind": "rooms",
+          "title": "Critique in your trio",
+          "minutes": 18,
+          "body": "Groups of three. Be kind, be specific, be helpful, and offer suggestions as questions: \"Have you considered...?\"",
+          "config": {
+            "prompt": "Read your problem statement aloud. Then listen to the questions, and write down the one you want to answer.",
+            "room_scenes": [
+              {
+                "title": "Read your problem statement",
+                "minutes": 1
+              },
+              {
+                "title": "What is strong in it",
+                "minutes": 1
+              },
+              {
+                "title": "Have you considered...?",
+                "minutes": 3
+              },
+              {
+                "title": "Revise one line",
+                "minutes": 1
+              }
+            ]
+          },
+          "note": "Critique rules from Ron Berger. Watch for a statement that names a technology instead of a situation, and for a room where nobody asks a question."
+        },
+        {
+          "kind": "reflection",
+          "title": "Plan two conversations",
+          "minutes": 5,
+          "body": "Name two people who might have this problem too. Write three questions that start \"Tell me about the last time you...\" Do not describe an app.",
+          "config": {
+            "prompt": "Who are your two people, and what is your first question for them?"
           }
         },
         {
           "kind": "question",
-          "title": "Check for understanding",
+          "title": "Who else has it?",
           "minutes": 3,
           "body": null,
           "config": {
-            "prompt": "Is your problem human-shaped or computer-shaped?",
-            "kind": "choice",
+            "prompt": "How sure are you, right now, that someone besides you has this problem?",
+            "kind": "scale",
+            "points": 5,
             "options": [
-              "Human-shaped",
-              "Computer-shaped",
-              "Not sure yet"
+              "Not sure at all",
+              "I could name them"
             ]
           }
         },
@@ -229,21 +290,45 @@
       ],
       "questions": [
         {
-          "kind": "choice",
-          "prompt": "Is your problem human-shaped or computer-shaped?",
+          "kind": "short",
+          "prompt": "Which would you rather read, and what would be lost if the app only had the first kind?"
+        },
+        {
+          "kind": "words",
+          "prompt": "In a few words, what do these four problem statements do well?"
+        },
+        {
+          "kind": "scale",
+          "prompt": "How sure are you, right now, that someone besides you has this problem?",
           "choices": [
-            "Human-shaped",
-            "Computer-shaped",
-            "Not sure yet"
-          ]
+            "Not sure at all",
+            "I could name them"
+          ],
+          "points": 5
         },
         {
           "kind": "short",
           "prompt": "What is still muddy?"
         },
         {
-          "kind": "short",
-          "prompt": "Why does your agent need your values written down, rather than only in your head?"
+          "kind": "multi",
+          "prompt": "Which of these does your problem statement do?",
+          "choices": [
+            "Starts from something that happens in my life",
+            "Says what a better life would look like",
+            "Names who else has it",
+            "Never names a technology"
+          ]
+        },
+        {
+          "kind": "rank",
+          "prompt": "Which questions for your two conversations will tell you the most?",
+          "choices": [
+            "Tell me about the last time you...",
+            "What did you try?",
+            "What happened next?",
+            "Who else deals with this?"
+          ]
         }
       ]
     },
