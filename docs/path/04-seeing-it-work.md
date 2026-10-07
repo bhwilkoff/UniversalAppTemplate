@@ -241,7 +241,7 @@ on your devices, and the last one publishes to your group.
    ask for a rule so it never happens again.
 
 9. **Publish: show the proof.** Show your group (or, working alone, one
-   of the two people who hear your hum) the screenshot that proved a fix,
+   of the two people you talked to) the screenshot that proved a fix,
    and say what it would have shown if the fix had not worked. Write down
    the first thing they asked. Then, with the agent closed, write two
    sentences in your note: one check you decided the agent must always

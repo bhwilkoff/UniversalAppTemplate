@@ -335,16 +335,164 @@
     {
       "key": "week-2",
       "week": 2,
-      "title": "Week 2: rounds, and the same app on a second platform",
+      "title": "Week 2: the first app, and the same app on a second device",
       "move": "Play",
-      "question": "What is still wrong, and how do I say it so it gets fixed?",
+      "question": "What has to be the same on every device, and what should feel as if it was born there?",
       "guide": "week-2.md",
       "scenes": [
         {
           "kind": "talk",
           "title": "Arrive",
-          "minutes": 7,
-          "body": "One line in the chat: shipped or stuck.\n\nThen what I heard in last week's answers, and what I changed because of it.",
+          "minutes": 5,
+          "body": "One line in the chat: what the person you talked to did first with your app.\n\nThen what I heard in last week's answers, and what I changed because of it.",
+          "config": {}
+        },
+        {
+          "kind": "rooms",
+          "title": "Show what you brought back",
+          "minutes": 30,
+          "body": "Groups of three, about ten minutes each. Your problem statement, then the app on your phone.",
+          "config": {
+            "prompt": "Read your problem statement, show the app on your phone, and say what the person you talked to did first.",
+            "room_scenes": [
+              {
+                "title": "Their question",
+                "minutes": 1
+              },
+              {
+                "title": "Show it, and one decision",
+                "minutes": 4
+              },
+              {
+                "title": "One clarifying question",
+                "minutes": 1
+              },
+              {
+                "title": "The three questions",
+                "minutes": 3
+              },
+              {
+                "title": "What comes next",
+                "minutes": 1
+              }
+            ]
+          },
+          "note": "Watch for a problem statement that has not changed since week 1, \"my friend liked it\" with nothing about what the person did, and a first version that grew past the smallest thing."
+        },
+        {
+          "kind": "break",
+          "title": "Break",
+          "minutes": 3,
+          "body": null,
+          "config": {}
+        },
+        {
+          "kind": "presenter",
+          "title": "What surprised us",
+          "minutes": 5,
+          "body": "One or two people: what a real person did with your app that you did not expect.",
+          "config": {
+            "prompt": "Listen for what the person did that the builder did not plan for."
+          }
+        },
+        {
+          "kind": "talk",
+          "title": "Where Archive Watch went next",
+          "minutes": 4,
+          "body": "Apple TV on April 17, where its people were. iPhone and iPad, the web, and Android on June 9. Mac on June 22. Roku on September 3.\n\nUse the order as a model, not an answer: where do the people you talked to already reach?",
+          "config": {}
+        },
+        {
+          "kind": "question",
+          "title": "Your second device",
+          "minutes": 3,
+          "body": null,
+          "config": {
+            "prompt": "Which device will the people you talked to reach for, and why that one second?",
+            "kind": "short"
+          }
+        },
+        {
+          "kind": "design",
+          "title": "One verb, twice",
+          "minutes": 12,
+          "body": "The one thing your app must do everywhere, drawn twice: the way it works on your first platform, and the way it should feel on the second, with that device's own controls.\n\nPartners write one question beside each drawing.",
+          "config": {
+            "template": "blank"
+          }
+        },
+        {
+          "kind": "reflection",
+          "title": "Start",
+          "minutes": 8,
+          "body": "Write the one verb that must be the same everywhere, and one rule about your data. Then send the first prompt of stage 02.",
+          "config": {
+            "prompt": "What is the first prompt you will send this week?"
+          }
+        },
+        {
+          "kind": "question",
+          "title": "Data, or idiom?",
+          "minutes": 3,
+          "body": null,
+          "config": {
+            "prompt": "Which of these belong in the data, so every platform gets them the same way? Choose every one.",
+            "kind": "multi",
+            "options": [
+              "A film's title and year",
+              "Whether a film is saved",
+              "A trivia question's correct answer",
+              "Swipe to go back",
+              "The size of the play button"
+            ]
+          }
+        },
+        {
+          "kind": "question",
+          "title": "What is still muddy?",
+          "minutes": 2,
+          "body": null,
+          "config": {
+            "prompt": "What is still muddy?",
+            "kind": "short"
+          }
+        }
+      ],
+      "questions": [
+        {
+          "kind": "short",
+          "prompt": "Which device will the people you talked to reach for, and why that one second?"
+        },
+        {
+          "kind": "multi",
+          "prompt": "Which of these belong in the data, so every platform gets them the same way? Choose every one.",
+          "choices": [
+            "A film's title and year",
+            "Whether a film is saved",
+            "A trivia question's correct answer",
+            "Swipe to go back",
+            "The size of the play button"
+          ]
+        },
+        {
+          "kind": "short",
+          "prompt": "What is still muddy?"
+        }
+      ]
+    },
+    {
+      "key": "week-3",
+      "week": 3,
+      "title": "Week 3: proof that it works, and someone else's hands",
+      "move": "Play, then Publish",
+      "question": "How do I know it works, and what happens when someone I did not build it with holds it?",
+      "guide": "week-3.md",
+      "scenes": [
+        {
+          "kind": "talk",
+          "title": "Arrive",
+          "minutes": 5,
+          "body": "One line in the chat: the one cell your own eyes proved wrong this week.\n\nThen what I heard in last week's answers, and what I changed because of it.",
           "config": {}
         },
         {
@@ -353,7 +501,7 @@
           "minutes": 30,
           "body": "Groups of three, about ten minutes each. Two devices in hand where you can.",
           "config": {
-            "prompt": "Show one verb on both platforms, and one cell your eyes proved wrong.",
+            "prompt": "Show one verb on both platforms, the cell your eyes proved wrong, and your app's look beside the template's.",
             "room_scenes": [
               {
                 "title": "Their question",
@@ -377,7 +525,7 @@
               }
             ]
           },
-          "note": "Watch for play that is not being written down, and the same complaint sent three times."
+          "note": "Watch for a second platform that only runs in a simulator, a look with no line back to the people it is for, and anyone who has not named a person outside the cohort whose device the app could reach."
         },
         {
           "kind": "break",
@@ -387,170 +535,37 @@
           "config": {}
         },
         {
-          "kind": "presenter",
-          "title": "One value at work",
-          "minutes": 7,
-          "body": "One decision a value changed this week, and what it cost.",
-          "config": {
-            "prompt": "Listen for the value at work, and what it cost."
-          }
-        },
-        {
           "kind": "design",
           "title": "Read one real prompt",
           "minutes": 15,
-          "body": "A doubled-up feed, three fixes in, from stage 04. Write the prompt you would send before you see the real one.",
+          "body": "A classmate's stuck moment, with their permission, or the doubled-up feed from stage 04. Write the prompt you would send before you see the real one.",
           "config": {
             "template": "prompt"
           }
         },
-        {
-          "kind": "reflection",
-          "title": "Start",
-          "minutes": 8,
-          "body": "Hand the testing to your agent: ask it to prove its next fix on your device before it tells you it is done.",
-          "config": {
-            "prompt": "What is the first prompt you will send this week?"
-          }
-        },
-        {
-          "kind": "question",
-          "title": "Check for understanding",
-          "minutes": 3,
-          "body": null,
-          "config": {
-            "prompt": "Which of these real commit messages is a round, and which is a first draft? Choose every round.",
-            "kind": "multi",
-            "options": [
-              "UX round 7",
-              "Round 3",
-              "UI feedback pass",
-              "M0 setup",
-              "M1: Search Mode"
-            ]
-          }
-        },
-        {
-          "kind": "question",
-          "title": "What is still muddy?",
-          "minutes": 2,
-          "body": null,
-          "config": {
-            "prompt": "What is still muddy?",
-            "kind": "short"
-          }
-        }
-      ],
-      "questions": [
-        {
-          "kind": "multi",
-          "prompt": "Which of these real commit messages is a round, and which is a first draft? Choose every round.",
-          "choices": [
-            "UX round 7",
-            "Round 3",
-            "UI feedback pass",
-            "M0 setup",
-            "M1: Search Mode"
-          ]
-        },
-        {
-          "kind": "short",
-          "prompt": "What is still muddy?"
-        },
-        {
-          "kind": "short",
-          "prompt": "What has to be the same about your app on both platforms, and what should be different?"
-        }
-      ]
-    },
-    {
-      "key": "week-3",
-      "week": 3,
-      "title": "Week 3: proof that it works, and a look of its own",
-      "move": "Play, then Write",
-      "question": "How do I know it works, and what does it look like when it comes from its why?",
-      "guide": "week-3.md",
-      "scenes": [
         {
           "kind": "talk",
-          "title": "Arrive",
-          "minutes": 7,
-          "body": "One line in the chat: shipped or stuck.\n\nThen what I heard in last week's answers, and what I changed because of it.",
+          "title": "Watching someone hold it",
+          "minutes": 4,
+          "body": "Give one person one thing to do with your app. Then watch, without explaining, and write down what they did, where they paused, and what they said, in their words.",
           "config": {}
-        },
-        {
-          "kind": "rooms",
-          "title": "Show what you brought back",
-          "minutes": 30,
-          "body": "Groups of three, about ten minutes each.",
-          "config": {
-            "prompt": "Show the screenshot that proved a fix, and the look beside the template's.",
-            "room_scenes": [
-              {
-                "title": "Their question",
-                "minutes": 1
-              },
-              {
-                "title": "Show it, and one decision",
-                "minutes": 4
-              },
-              {
-                "title": "One clarifying question",
-                "minutes": 1
-              },
-              {
-                "title": "The three questions",
-                "minutes": 3
-              },
-              {
-                "title": "What comes next",
-                "minutes": 1
-              }
-            ]
-          },
-          "note": "Watch for \"it works\" with no evidence, and a look borrowed from somewhere else."
-        },
-        {
-          "kind": "break",
-          "title": "Break",
-          "minutes": 3,
-          "body": null,
-          "config": {}
-        },
-        {
-          "kind": "presenter",
-          "title": "One value at work",
-          "minutes": 7,
-          "body": "One decision a value changed this week, and what it cost. Then the one thing I heard across groups.",
-          "config": {
-            "prompt": "Listen for the value at work, and what it cost."
-          }
-        },
-        {
-          "kind": "design",
-          "title": "Read one real prompt",
-          "minutes": 15,
-          "body": "A classmate's real stuck moment, shared with their permission. Write the prompt you would send before you see theirs.",
-          "config": {
-            "template": "prompt"
-          }
         },
         {
           "kind": "reflection",
           "title": "Start",
-          "minutes": 8,
-          "body": "Begin the work of getting your app onto a device you did not build it on.",
+          "minutes": 13,
+          "body": "Ask your agent to prove its next fix on your device. Then plan who will hold your app, on which device, and how it gets there for free.",
           "config": {
-            "prompt": "What is the first prompt you will send this week?"
+            "prompt": "Who will hold it, on which device, and how will it get there?"
           }
         },
         {
           "kind": "question",
-          "title": "Check for understanding",
+          "title": "What do you ask to see?",
           "minutes": 3,
           "body": null,
           "config": {
-            "prompt": "How do you know your last fix is real?",
+            "prompt": "When your agent says something is fixed, what do you ask to see, and why is its word not enough?",
             "kind": "short"
           }
         },
@@ -566,6 +581,10 @@
         }
       ],
       "questions": [
+        {
+          "kind": "short",
+          "prompt": "When your agent says something is fixed, what do you ask to see, and why is its word not enough?"
+        },
         {
           "kind": "short",
           "prompt": "How do you know your last fix is real?"
@@ -573,10 +592,6 @@
         {
           "kind": "short",
           "prompt": "What is still muddy?"
-        },
-        {
-          "kind": "short",
-          "prompt": "When your agent says something is fixed, what do you ask to see, and why is its word not enough?"
         }
       ]
     },

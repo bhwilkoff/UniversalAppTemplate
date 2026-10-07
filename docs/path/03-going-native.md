@@ -278,7 +278,7 @@ on your devices, and the last one publishes to a person.
    classmates before you choose.
 
 11. **Publish: put the second platform in someone's hand.** Give the
-    second platform to one of the two people who hear your hum, or to
+    second platform to one of the two people you talked to, or to
     your group, and ask them to do the one thing your app is for. Write
     down what they did first, and anywhere it felt borrowed from the
     first platform. Then, with the agent closed, write two sentences in

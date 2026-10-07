@@ -1,15 +1,17 @@
 # 01. The first prototype
 
-**Where you are.** You have a note for your app with the why at the top,
-the agent knows that why, and there is one rule in your own words in
-`AGENTS.md`. There is no app yet.
+**Where you are.** Your note starts with a problem statement you revised
+after two conversations, with who has it and why a computer cannot
+simply solve it. The agent knows the why, and there is one rule in your
+own words in `AGENTS.md`. There is no app yet.
 
-<!-- The question, the first two steps, the step labels, the last step,
-the per-agent lines, and everything between the bar and the last line:
-written by Claude, awaiting Ben's review (curriculum C2, the lesson page
-template in docs/templates/LESSON-template.md). -->
-**The question.** What is the smallest real thing that someone who hears
-your hum could hold this week?
+<!-- The question, the first two steps, step 4's model study, the step
+labels, the last step, the per-agent lines, and everything between the
+bar and the last line: written by Claude, awaiting Ben's review
+(curriculum C2, then rebuilt from research note 06, section 4, October
+7, 2026). -->
+**The question.** What is the smallest thing you could put in the hands
+of one person you talked to this week?
 
 Archive Watch began on April 17, 2026, and the first thing the agent
 made was not a screen. It was a set of research notes on where film
@@ -31,6 +33,13 @@ sitting. Those three things are the whole first stage, and they fit in a
 single line:
 
 **One platform, real data, this week.**
+
+How small can that first thing be? Tidbits Trivia went from its first
+commit to a TestFlight build in two days, because it started from a
+template three other apps had already built
+([curriculum research, note 01](../research/curriculum/01-mining-bens-process.md)).
+Yours starts from the same template, so the first version can be that
+small too, and it should be.
 
 ## What I want
 
@@ -102,7 +111,8 @@ on your phone, and the last one publishes to a person.
    [curriculum research](../research/curriculum/05-inquiry-and-evidence.md)).
 
 2. **Write your questions.** For five minutes, write as many questions
-   as you can about the smallest thing someone could hold this week,
+   as you can about the smallest version of your app that one of the
+   people you talked to could use this week,
    without stopping to answer or judge any of them. Then mark the one you
    most want answered by the end of the stage. (These are the Right
    Question Institute's rules for asking your own questions, also in the
@@ -113,12 +123,17 @@ on your phone, and the last one publishes to a person.
    do, numbered. (`talking-to-your-agent.md` shows the shape my notes
    took.)
 
-4. **Play: draft the kickoff, then send it.** Turn that list into a kickoff in
-   your note: the wish, the source, what you want researched before
-   anything is built, and what "done" means for this sitting. Then paste
-   it in one message. If this is your first app, read mine first. If it
-   is not, write yours first and read mine after. Here is most of mine
-   for Tidbits Trivia, June 16:
+4. **Play: study my kickoff as a model, then write and send yours.** A
+   good kickoff has four parts: the wish, the source of real data, what
+   you want researched before anything is built, and what "done" means
+   for this sitting. Find all four in mine below, and mark where each one
+   starts. Then hold your draft to the same four parts and fill in any
+   that are missing, so you are borrowing the shape, never the app (this
+   is how models of strong work are used in project-based classrooms,
+   Ron Berger's practice, gathered in
+   [note 06](../research/curriculum/06-instructional-design.md)). If this
+   is your first app, read mine first. If it is not, write yours first
+   and read mine after. Here is most of mine for Tidbits Trivia, June 16:
 
    > A fully realized multi-player (both local and online) trivia game
    > that is based entirely upon facts pulled from the open Wikipedia
@@ -140,9 +155,11 @@ on your phone, and the last one publishes to a person.
    > The final outcome of this session should be a working iOS version
    > with all v1 versions of the features fully implemented.
 
-   Yours can be smaller. If you are starting on the web, make "done" mean
-   that the web version is live on GitHub Pages and you can open it on
-   your phone. The agent will do the research, build the pipeline for
+   Yours can be smaller, and it should be: the smallest thing that does
+   what your problem statement says for the person you have in mind. If
+   you are starting on the web, make "done" mean that the web version is
+   live on GitHub Pages and you can open it on your phone. Then paste the
+   whole kickoff in one message. The agent will do the research, build the pipeline for
    your source, build the first screens, and put it live. The
    `web-platform-patterns` and `universal-feature-states` skills carry a
    lot of that work without you asking for them.
@@ -181,12 +198,13 @@ on your phone, and the last one publishes to a person.
    list in this template has a loading, empty, error and offline state,
    and this is how you find out whether yours are real.
 
-10. **Publish it to one person who hears your hum.** Send the live
-    address to one of the two people you named in stage 00, and ask them
-    to use it once, however they like. Write down what they did first,
-    and what they said, in their words. Then, with the agent closed,
-    write two sentences in your note: one thing you decided in this
-    stage, and what it cost.
+10. **Publish it to one person you talked to.** Send the live address to
+    one of the two people you talked to in stage 00, and ask them to use
+    it once, however they like, without you explaining it first. Write
+    down what they did first and what they said, in their words, and
+    then one line on whether it did what your problem statement says.
+    Then, with the agent closed, write two sentences in your note: one
+    thing you decided in this stage, and what it cost.
 
 Where the agents differ, one line each
 ([curriculum research, 03 and 04](../research/curriculum/03-claude-code-and-antigravity.md)):
@@ -203,8 +221,9 @@ Where the agents differ, one line each
 
 **When you are ready to move on,** your app is live at a real address,
 it is full of real data that a pipeline brought in, you have sent at
-least two rounds from your own phone, and one person who hears the same
-hum has used it, with what they did first written in your note. The app works on one platform.
+least two rounds from your own phone, and one of the people you talked
+to has used it, with what they did first and what they said written in
+your note. The app works on one platform.
 Stage 02 is about deciding what it means for it to be the same app on
 the next one.
 
@@ -218,14 +237,14 @@ is never required, and it is never counted.
 - *The agent says it fixed something you still see.* Ask yourself: did I
   say what I saw, where, and on which device? Try a screenshot, and check
   that your phone is not showing an old cached version of the page. Ask
-  your group if it keeps happening.
+  your group if it keeps happening ([stuck playing](../stuck/playing/cannot-see-the-fix.md)).
 - *There is not enough real data, or it is not the right kind.* Ask
   yourself: what is this app actually about, in real things? Try asking
   the agent to research sources before it builds anything more. Ask the
-  teacher if no open source seems to exist.
+  teacher if no open source seems to exist ([stuck playing](../stuck/playing/not-enough-data.md)).
 - *You are not ready to show anyone.* Ask yourself: what would one person
-  learn from it as it is? Try showing your group first, then the person
-  who hears your hum.
+  learn from it as it is? Try showing your group first, then one of the
+  people you talked to ([stuck publishing](../stuck/publishing/not-ready.md)).
 
 **Before you close your note.** Four short lines, from my
 [Educational Model Spec's AI Disclosure Protocol](https://github.com/bhwilkoff/educational-model-spec/blob/main/docs/implementation-tools/ai_disclosure_protocol.md):
@@ -233,6 +252,6 @@ the agent's role, your essential work, one thing you learned, and your
 growth edge.
 
 Be ready to show the app on your phone, to name one thing the real data
-taught you that fake data would have hidden, to say what the first person
-who hears your hum did with it, and to explain why you started on the
-platform you chose.
+taught you that fake data would have hidden, to say what the person you
+talked to did with it and whether it did what your problem statement
+says, and to explain why you started on the platform you chose.
