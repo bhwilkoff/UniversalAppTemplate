@@ -15,6 +15,7 @@ weeks.*
 | `notes/assessment-and-credentials-notes.md` | 8. Self-paced, live and challenge-based work. 9. Portable credentials. |
 | `notes/pedagogy-and-showcase-notes.md` | 11. The showcase. 12. Pedagogy for active, project-based, online learning. |
 | `notes/cohort-conversation-notes.md` | Cohort conversation in private GitHub Discussions, shown on the site (2026-10-03). |
+| `notes/movement-allies-notes.md` | Who is already doing this work, the critique, and how Human Shaped joins in; round files in `notes/allies/` (2026-10-08). |
 
 ## What Ben's vision changed
 
