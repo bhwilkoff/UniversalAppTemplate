@@ -591,8 +591,9 @@ liked.
 - **Light:** white paper, ink `#162019`, muted `#4E5B55`, a thistle tint
   `#F6F1FA` for tinted sections. `--accent` (links, buttons, focus, the
   arch) is forest.
-- **Dark:** paper `#0D1E17`, ink `#E6EEEA`, muted `#9DB3A9`. `--accent`
-  is thistle.
+- **Dark:** paper `#131916`, ink `#E8EDEA`, muted `#C1CAC5`. `--accent`
+  is thistle. (Was paper `#0D1E17` and muted `#9DB3A9` until October 9;
+  see "A green-black ground in dark mode" below.)
 - **The band** is forest in both modes, with white type and thistle for
   its accent. Thistle is never a ground for paragraphs; it is for the
   what is current, stickers, and buttons on dark (Ben: a full lilac
@@ -602,6 +603,32 @@ liked.
   kit say.
 - No highlighted words (Ben, later the same night): the thistle
   highlight on "sleeves" read as AI-written and was removed.
+
+## A green-black ground in dark mode (October 9, 2026)
+
+**Dark mode's ground is a green-black, not a green, and thistle is never
+small text on forest.** Ben: "I'm a little worried that the green
+(Thistle) background is making it hard to read things, especially when
+the purple color is present. It seems like it clashes." Every pair
+already passed WCAG AA, so the trouble was not contrast. The dark ground
+carried real green (OKLCH chroma 0.027 at hue 166) and thistle sits 144
+degrees from it, near opposite, so each pushed the other: the page read
+greener, the thistle pinker. Dark hints measured APCA Lc 57, below the
+75 small text wants, and were green-gray on green. Thistle text on the
+forest band (Lc 65) paired two saturated near-opposites, the case that
+reads as vibrating.
+
+- Dark: paper `#131916` (chroma 0.011, same hue), surface `#19201D`,
+  card `#171D1A`, rule `#28302C`, edge `#747D78`, ink `#E8EDEA`, muted
+  `#C1CAC5` (Lc 72). Forest and thistle are unchanged.
+- On the band, link text, the stage eyebrow, and the showcase label are
+  white; thistle stays as their underline, focus ring, and hover fill.
+- Light mode is unchanged (renders identical before and after).
+
+**How to apply:** a colored ground under its near-opposite hue reads as
+a clash even at high contrast. Keep grounds close to neutral and let
+forest appear as panels and thistle as fills, marks, and buttons; check
+APCA as well as WCAG for small text.
 
 ## Our method leads the curriculum (October 7, 2026)
 

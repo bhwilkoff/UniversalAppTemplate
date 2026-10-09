@@ -32,15 +32,15 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --paper: #0D1E17;
-    --surface: #13261E;
-    --card: #112219;
-    --ink: #E6EEEA;
-    --muted: #9DB3A9;
-    --rule: #23382E;
-    --edge: #6B8278;
+    --paper: #131916;
+    --surface: #19201D;
+    --card: #171D1A;
+    --ink: #E8EDEA;
+    --muted: #C1CAC5;
+    --rule: #28302C;
+    --edge: #747D78;
     --accent: #DCC4F0;
-    --on-ink: #0D1E17;
+    --on-ink: #131916;
     --band: #1F4D3A;
     --band-ink: #FFFFFF;
     --band-muted: #C5D6CD;
@@ -49,15 +49,15 @@
   }
 }
 :root[data-theme="dark"] {
-  --paper: #0D1E17;
-  --surface: #13261E;
-  --card: #112219;
-  --ink: #E6EEEA;
-  --muted: #9DB3A9;
-  --rule: #23382E;
-  --edge: #6B8278;
+  --paper: #131916;
+  --surface: #19201D;
+  --card: #171D1A;
+  --ink: #E8EDEA;
+  --muted: #C1CAC5;
+  --rule: #28302C;
+  --edge: #747D78;
   --accent: #DCC4F0;
-  --on-ink: #0D1E17;
+  --on-ink: #131916;
   --band: #1F4D3A;
   --band-ink: #FFFFFF;
   --band-muted: #C5D6CD;
@@ -562,7 +562,7 @@ h3 { font-size: 1.25rem; letter-spacing: -0.012em; line-height: 1.25; }
 .join h2 { color: var(--band-ink); font-size: clamp(2rem, 1.3rem + 3vw, 3.2rem); line-height: 1.05; letter-spacing: -0.035em; max-width: 14ch; }
 .join .prose p { color: var(--band-ink); margin: 0 0 1rem; }
 .join .prose p.small { color: var(--band-muted); }
-.join a:not(.btn-github):not(.btn-quiet) { color: var(--band-accent); }
+.join a:not(.btn-github):not(.btn-quiet) { color: var(--band-ink); text-decoration-color: var(--band-accent); }
 .join .btn-github { margin-right: 0.25rem; }
 
 /* 404 */
@@ -1058,7 +1058,7 @@ button.talk-title[aria-expanded="true"]::before { transform: rotate(90deg); }
 .kit .tile .stage { display: grid; place-items: center; padding: 2.25rem 1.5rem; min-height: 9rem; }
 .kit .tile .stage.on-light { background: #FFFFFF; }
 .kit .tile .stage.on-white { background: #FFFFFF; }
-.kit .tile .stage.on-dark { background: #0D1E17; }
+.kit .tile .stage.on-dark { background: #131916; }
 .kit .tile .stage.on-forest { background: #1F4D3A; }
 .kit .tile .stage.on-gray { background: #7C8A84; }
 .kit .tile .stage img { display: block; max-width: 100%; height: auto; }
@@ -1514,7 +1514,7 @@ label.check { min-height: 2.25rem; }
 .stage-preview p { margin: 0; }
 /* Scoped to the preview: the real main stage (/addon/stage/) uses
    .stage-title and .stage-note at full size. */
-.stage-preview .stage-eyebrow { color: var(--band-accent); font-weight: 600; font-size: 0.85rem; }
+.stage-preview .stage-eyebrow { color: var(--band-ink); font-weight: 600; font-size: 0.85rem; }
 .stage-preview .stage-title { font-size: 1.25rem; font-weight: 700; line-height: 1.2; max-width: none; letter-spacing: 0; }
 .stage-preview .stage-line { color: var(--band-ink); }
 .stage-preview .stage-items { margin: 0; padding-left: 1.1rem; color: var(--band-ink); }
@@ -1657,7 +1657,7 @@ label.check { min-height: 2.25rem; }
 /* The home page's working software: the founding apps' store screens on
    a dark band, right after the claim. */
 .showcase { background: var(--band); color: var(--band-ink); padding: 3.5rem 0 3rem; }
-.showcase .kicker { color: var(--band-accent); }
+.showcase .kicker { color: var(--band-ink); }
 .showcase h2 { color: var(--band-ink); margin: 0 0 2rem; max-width: 22ch; }
 .showcase .section-more a { color: var(--band-ink); border-color: var(--band-muted); }
 .showcase .section-more a:hover { background: transparent; border-color: var(--band-ink); }
@@ -1954,7 +1954,7 @@ ol.principles summary:focus-visible { outline: 2px solid var(--accent); outline-
 .band-ways { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.25rem; align-content: end; }
 .band-ways li { display: grid; gap: 0.2rem; }
 .band-ways a { color: var(--band-ink); font-weight: 650; font-size: 1.1rem; text-decoration: underline; text-decoration-color: var(--band-accent); text-decoration-thickness: 2px; text-underline-offset: 0.25em; }
-.band-ways a:hover { color: var(--band-accent); }
+.band-ways a:hover { text-decoration-thickness: 3px; }
 .band-ways span { color: var(--band-muted); }
 
 /* Events: hosting, as two guides of equal standing and the kit as a line
