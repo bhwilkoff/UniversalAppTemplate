@@ -22,7 +22,7 @@
   if (!root || !window.supabase || !window.HUB || !window.CohortLib || !window.BoardLib) return;
   var B = window.BoardLib;
   var lib = window.CohortLib;
-  var db = window.supabase.createClient(window.HUB.url, window.HUB.key);
+  var db = (window.HUB.client ? window.HUB.client() : window.supabase.createClient(window.HUB.url, window.HUB.key));
   var P = B.params(location.search);
   var VENDOR = '/assets/vendor/excalidraw-0.18.1/excalidraw.js';
   // Excalidraw's fonts, from the same version on jsDelivr (fixed files).

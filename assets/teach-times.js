@@ -6,7 +6,7 @@
   var root = document.querySelector('[data-teach-times]');
   if (!root || !window.supabase || !window.HUB || !window.TimesLib || !window.TimesGrid) return;
   var T = window.TimesLib, G = window.TimesGrid;
-  var db = window.supabase.createClient(window.HUB.url, window.HUB.key);
+  var db = (window.HUB.client ? window.HUB.client() : window.supabase.createClient(window.HUB.url, window.HUB.key));
   var me = null, myName = '', hostMarks = {}, hostTable = null, polls = [], current = null, answers = [], zone = G.myZone(), picked = null, table = null;
   var form = root.querySelector('[data-poll-form]');
 

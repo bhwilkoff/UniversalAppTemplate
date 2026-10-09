@@ -12,7 +12,7 @@
     .diag .verdict { font-weight: 650; font-size: 1.15rem; }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js"></script>
-  <script src="/assets/hub-config.js"></script>
+  <script src="/assets/hub-config.js?v=20261009a"></script>
 </head>
 <body>
   <!-- A temporary diagnostic (October 9, 2026): Safari waits forever while
@@ -56,6 +56,14 @@
         } catch (e) { log(k, '-> unreadable:', e.message); }
       });
     } catch (e) { log('localStorage unreadable:', e.message); }
+    try {
+      var stall = JSON.parse(localStorage.getItem('hs-last-stall') || 'null');
+      if (stall) {
+        log('LAST STALL in this browser:', stall.at, 'on', stall.page, '| sign-in check:', stall.signin, '| online:', stall.online, '| visible:', stall.visible);
+        (stall.trace || []).forEach(function (t) { log('   ' + t); });
+        log('(end of last stall)');
+      } else log('no stall recorded in this browser');
+    } catch (e) { log('last stall unreadable:', e.message); }
     document.addEventListener('visibilitychange', function () { log('visibility changed:', document.visibilityState); });
 
     var realFetch = window.fetch;

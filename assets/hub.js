@@ -6,7 +6,7 @@
   var HUB = window.HUB;
   var root = document.querySelector('[data-account]');
   if (!root || !window.supabase || !HUB) return;
-  var db = window.supabase.createClient(HUB.url, HUB.key);
+  var db = (HUB.client ? HUB.client() : window.supabase.createClient(HUB.url, HUB.key));
 
   function show(state) {
     root.querySelectorAll('.account-state').forEach(function (s) {

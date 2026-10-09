@@ -56,7 +56,7 @@
 
   // The panel's own storage first. A second client is made only when the
   // browser lends the panel humanshaped.org's own storage.
-  var db = window.supabase.createClient(window.HUB.url, window.HUB.key);
+  var db = (window.HUB.client ? window.HUB.client() : window.supabase.createClient(window.HUB.url, window.HUB.key));
   var popup = null, popupWatch = null;
 
   function siteStorage() {

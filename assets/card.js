@@ -6,7 +6,7 @@
 (function () {
   var root = document.querySelector('[data-card-page]');
   if (!root || !window.supabase || !window.HUB || !window.CohortLib || !window.LiveSignals) return;
-  var db = window.supabase.createClient(window.HUB.url, window.HUB.key);
+  var db = (window.HUB.client ? window.HUB.client() : window.supabase.createClient(window.HUB.url, window.HUB.key));
   var slug = new URLSearchParams(location.search).get('c') || '';
 
   function $(s) { return root.querySelector(s); }

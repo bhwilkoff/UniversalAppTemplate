@@ -7,7 +7,7 @@
 (function () {
   var root = document.querySelector('[data-consent]');
   if (!root || !window.supabase || !window.HUB) return;
-  var db = window.supabase.createClient(window.HUB.url, window.HUB.key);
+  var db = (window.HUB.client ? window.HUB.client() : window.supabase.createClient(window.HUB.url, window.HUB.key));
   var id = new URLSearchParams(location.search).get('authorization_id');
 
   function $(sel) { return root.querySelector(sel); }

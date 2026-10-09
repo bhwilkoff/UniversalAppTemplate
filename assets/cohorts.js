@@ -4,7 +4,7 @@
 (function () {
   var box = document.querySelector('[data-open-list]');
   if (!box || !window.supabase || !window.HUB || !window.TeachLib) return;
-  var db = window.supabase.createClient(window.HUB.url, window.HUB.key);
+  var db = (window.HUB.client ? window.HUB.client() : window.supabase.createClient(window.HUB.url, window.HUB.key));
   var zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   function el(tag, cls, text) {

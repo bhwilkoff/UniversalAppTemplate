@@ -4,7 +4,7 @@
 (function () {
   var root = document.querySelector('[data-cohort-page]');
   if (!root || !window.supabase || !window.HUB || !window.CohortLib) return;
-  var db = window.supabase.createClient(window.HUB.url, window.HUB.key);
+  var db = (window.HUB.client ? window.HUB.client() : window.supabase.createClient(window.HUB.url, window.HUB.key));
   var lib = window.CohortLib;
   var slug = new URLSearchParams(location.search).get('c') || '';
   var me = null, cohort = null, token = null, session = null;

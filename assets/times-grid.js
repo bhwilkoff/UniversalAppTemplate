@@ -126,6 +126,12 @@
         ]).catch(function () { return 'failed'; }) : Promise.resolve('none');
         probe.then(function (auth) {
           console.log('[times] no answer after ' + LIMIT / 1000 + 's; sign-in check: ' + auth + '; online: ' + navigator.onLine);
+          try {
+            localStorage.setItem('hs-last-stall', JSON.stringify({
+              at: new Date().toISOString(), page: location.pathname, signin: auth, online: navigator.onLine,
+              visible: document.visibilityState, trace: window.HUB && window.HUB.trace ? window.HUB.trace() : []
+            }));
+          } catch (e) { /* the message still says what happened */ }
           reject(new Error(auth === 'silent' || auth === 'failed'
             ? 'your sign-in in this browser stopped answering, so nothing was sent. Try once more, and if it happens again, reload the page'
             : (navigator.onLine === false ? 'this browser is offline' : 'the hub did not answer within ' + LIMIT / 1000 + ' seconds. Try again')));

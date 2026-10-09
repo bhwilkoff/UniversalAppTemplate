@@ -12,7 +12,7 @@
 (function () {
   var root = document.querySelector('[data-live]');
   if (!root || !window.supabase || !window.HUB || !window.CohortLib || !window.LiveLib) return;
-  var db = window.supabase.createClient(window.HUB.url, window.HUB.key);
+  var db = (window.HUB.client ? window.HUB.client() : window.supabase.createClient(window.HUB.url, window.HUB.key));
   var lib = window.CohortLib;
   var L = window.LiveLib;
   var slug = new URLSearchParams(location.search).get('c') || '';
