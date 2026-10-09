@@ -2192,3 +2192,6 @@ ol.principles summary:focus-visible { outline: 2px solid var(--accent); outline-
 @media (min-width: 40rem) { .times-part-list { grid-template-columns: 1fr 1fr; column-gap: 1.5rem; } }
 .times-step { max-width: 16rem; }
 .times-new .row { align-items: start; }
+.times-wake { margin: 0; max-width: var(--measure); line-height: 2.4; }
+.times-wake input { font: inherit; font-size: 0.95rem; padding: 0.3rem 0.5rem; border: 1px solid var(--muted); border-radius: 8px; background: var(--card); color: var(--ink); min-height: 40px; }
+.times-calendar .times-status, .times-wake { font-size: 0.95rem; }

@@ -231,12 +231,23 @@
     return { weeks: n, busy: out };
   }
 
+  // The times to mark after a calendar check: free in every week checked,
+  // and starting within the person's waking hours on their own clock
+  // (from and to are minutes after midnight, both included).
+  function freeInHours(poll, checked, zone, from, to, today) {
+    return slotsOf(poll).filter(function (slot) {
+      if (checked.busy[slot]) return false;
+      var m = placeIn(poll, slot, zone, today).minute;
+      return m >= from && m <= to;
+    });
+  }
+
   var api = {
     DAYS: DAYS, SHORT: SHORT, slotOf: slotOf, dayOf: dayOf, minuteOf: minuteOf, slotsOf: slotsOf,
     offsetAt: offsetAt, instantOf: instantOf, placeIn: placeIn, gridFor: gridFor,
     timeText: timeText, slotText: slotText, PARTS: PARTS, partsMinutes: partsMinutes, hoursText: hoursText, minutesOfPoll: minutesOfPoll, zoneName: zoneName, parseHash: parseHash,
     minutesOf: minutesOf, checkPoll: checkPoll, tallyOf: tallyOf, bestTimes: bestTimes,
-    CHECK_WEEKS: CHECK_WEEKS, checkSpan: checkSpan, busyWeeks: busyWeeks
+    CHECK_WEEKS: CHECK_WEEKS, freeInHours: freeInHours, checkSpan: checkSpan, busyWeeks: busyWeeks
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.TimesLib = api;

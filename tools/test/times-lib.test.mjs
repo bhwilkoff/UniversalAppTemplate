@@ -127,3 +127,14 @@ test('a poll from before parts of the day still reads as its one window', () => 
   assert.equal(T.hoursText(poll, 'en-US'), '5:00 PM to 8:00 PM');
   assert.equal(T.hoursText({ ...poll, minutes: [480] }, 'en-US'), '8:00 AM');
 });
+
+test('after a calendar check, free times in waking hours on the person\'s own clock are the ones marked', () => {
+  const p = { ...poll, minutes: T.partsMinutes(['morning', 'evening'], 60), days: [1] };
+  const checked = { weeks: 4, busy: { [1440 + 540]: 1 } }; // Monday 9 AM Denver is busy once
+  // In Denver, 8 AM to 8 PM: 8, 10, 11 AM and 5, 6, 7, 8 PM (9 AM is busy).
+  assert.deepEqual(T.freeInHours(p, checked, 'America/Denver', 480, 1200).map((s) => s % 1440),
+    [480, 600, 660, 1020, 1080, 1140, 1200]);
+  // In New York the same times read two hours later, so 7 and 8 PM Denver (9 and 10 PM there) drop out.
+  assert.deepEqual(T.freeInHours(p, checked, 'America/New_York', 480, 1200).map((s) => s % 1440),
+    [480, 600, 660, 1020, 1080]);
+});

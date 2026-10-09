@@ -12,6 +12,9 @@
   var poll = null, link = null, mine = null, tally = null, table = null, dragTo = null;
   var marks = {};
   var busy = null;
+  // Times the calendar check marked, and times the person changed by hand,
+  // so new waking hours re-mark only what the page marked.
+  var auto = {}, touched = {};
   var zone = G.myZone();
 
   function $(sel) { return root.querySelector(sel); }
@@ -48,12 +51,14 @@
     return c;
   }
   function toggle(slot) {
+    touched[slot] = true;
     var want = mode();
     marks[slot] = marks[slot] === want ? null : want;
     if (!marks[slot]) delete marks[slot];
     G.refresh(table, cell);
   }
   function drag(slot, first) {
+    touched[slot] = true;
     if (first) dragTo = marks[slot] === mode() ? null : mode();
     if (dragTo) marks[slot] = dragTo; else delete marks[slot];
     G.refresh(table, cell);
@@ -193,7 +198,7 @@
     if (!mine) return;
     db.rpc('withdraw_time_poll_answer', { t: link.token, answer: mine.id, secret: mine.secret }).then(function (r) {
       if (r.error) throw r.error;
-      mine = null; tally = null; marks = {};
+      mine = null; tally = null; marks = {}; auto = {}; touched = {};
       remember(null);
       form.reset();
       $('[data-zone]').value = zone;
@@ -251,12 +256,8 @@
             if (!resp || resp.error || !resp.access_token) { calLine('Your calendar was not checked' + (resp && resp.error ? ' (' + resp.error + ')' : '') + '.'); return; }
             readCalendar(resp.access_token).then(function (blocks) {
               busy = T.busyWeeks(poll, blocks);
-              G.refresh(table, cell);
-              var n = Object.keys(busy.busy).filter(function (s) { return busy.busy[s]; }).length;
-              calLine(n
-                ? 'Times with a corner mark are busy on your calendar in at least one of the first ' + busy.weeks + ' weeks. You still choose which to mark.'
-                : 'Your calendar is free at every one of these times for the first ' + busy.weeks + ' weeks.');
-              $('[data-cal-mark]').hidden = !poll.open;
+              $('[data-cal-wake]').hidden = !poll.open;
+              markFree();
             }).catch(function (e) {
               calLine('Your calendar was not checked: ' + said(e) + '.');
             }).then(function () {
@@ -267,11 +268,28 @@
         }).requestAccessToken();
       }).catch(function (e) { calLine('Your calendar was not checked: ' + said(e) + '.'); });
     });
-    $('[data-cal-mark]').addEventListener('click', function () {
-      if (!busy) return;
-      Object.keys(busy.busy).forEach(function (s) { if (!busy.busy[s] && !marks[s]) marks[s] = 'works'; });
+    function markFree() {
+      var from = T.minutesOf($('[data-wake-from]').value), to = T.minutesOf($('[data-wake-to]').value);
+      Object.keys(auto).forEach(function (s) { if (!touched[s] && marks[s] === 'works') delete marks[s]; });
+      auto = {};
+      var marked = 0;
+      if (poll.open && from != null && to != null) {
+        T.freeInHours(poll, busy, G.myZone(), from, to).forEach(function (s) {
+          if (touched[s] || marks[s]) return;
+          marks[s] = 'works';
+          auto[s] = true;
+          marked++;
+        });
+      }
       G.refresh(table, cell);
-      calLine('Every free time is marked as working for you. Look them over, and clear any you cannot make.');
+      var n = Object.keys(busy.busy).filter(function (s) { return busy.busy[s]; }).length;
+      var line = poll.open ? (marked ? marked + (marked === 1 ? ' free time is' : ' free times are') + ' marked.' : 'No free times in those hours were left to mark.') : '';
+      line += n ? ' A corner mark means busy in at least one of the first ' + busy.weeks + ' weeks.' : ' You are free at all of these times for the first ' + busy.weeks + ' weeks.';
+      if (poll.open) line += ' Look them over before you send.';
+      calLine(line.trim());
+    }
+    ['[data-wake-from]', '[data-wake-to]'].forEach(function (sel) {
+      $(sel).addEventListener('change', function () { if (busy) markFree(); });
     });
   }
 
