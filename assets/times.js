@@ -11,10 +11,8 @@
   var form = root.querySelector('[data-form]');
   var poll = null, link = null, mine = null, tally = null, table = null, dragTo = null;
   var marks = {};
-  var busy = null;
-  // Times the calendar check marked, and times the person changed by hand,
-  // so new waking hours re-mark only what the page marked.
-  var auto = {}, touched = {};
+  // Times the person changed by hand, which a calendar check never changes.
+  var touched = {};
   var zone = G.myZone();
 
   function $(sel) { return root.querySelector(sel); }
@@ -49,6 +47,7 @@
       c.cls += h === 'works' ? ' host-yes' : ' host-maybe';
       c.label += ', ' + poll.teacher + (h === 'works' ? ' can make it' : ' could if need be');
     }
+    var busy = cal.busy();
     if (busy && busy.busy[slot]) {
       c.cls += ' busy';
       c.label += ', busy on your calendar ' + (busy.busy[slot] === busy.weeks ? 'every week' : 'in ' + busy.busy[slot] + ' of ' + busy.weeks + ' weeks');
@@ -222,7 +221,7 @@
     if (!mine) return;
     G.within(db.rpc('withdraw_time_poll_answer', { t: link.token, answer: mine.id, secret: mine.secret }), db).then(function (r) {
       if (r.error) throw r.error;
-      mine = null; tally = null; marks = {}; auto = {}; touched = {};
+      mine = null; tally = null; marks = {}; touched = {}; cal.reset();
       remember(null);
       form.reset();
       $('[data-zone]').value = zone;
@@ -235,87 +234,15 @@
     }).catch(function (err) { status('Your answer was not taken back: ' + said(err) + '.'); });
   });
 
-  // ---- checking a Google Calendar ----------------------------------
-  // Free/busy only, asked for when the person presses the button, read in
-  // this browser, and let go as soon as it is read.
-  var SCOPE = 'https://www.googleapis.com/auth/calendar.freebusy';
-  var gis = null;
-  function loadGoogle() {
-    if (window.google && window.google.accounts && window.google.accounts.oauth2) return Promise.resolve(window.google.accounts.oauth2);
-    if (gis) return gis;
-    gis = new Promise(function (resolve, reject) {
-      var s = document.createElement('script');
-      s.src = 'https://accounts.google.com/gsi/client'; s.async = true;
-      s.onload = function () { window.google && window.google.accounts ? resolve(window.google.accounts.oauth2) : reject(new Error('Google did not load')); };
-      s.onerror = function () { gis = null; reject(new Error('Google could not be reached')); };
-      document.head.appendChild(s);
-    });
-    return gis;
-  }
-  function calLine(text) { $('[data-cal-line]').textContent = text; }
-  function readCalendar(token) {
-    var span = T.checkSpan(poll);
-    return fetch('https://www.googleapis.com/calendar/v3/freeBusy', {
-      method: 'POST',
-      headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ timeMin: span.timeMin, timeMax: span.timeMax, items: [{ id: 'primary' }] })
-    }).then(function (r) {
-      return r.json().then(function (body) {
-        if (!r.ok) throw new Error((body.error && body.error.message) || ('Google answered ' + r.status));
-        var cal = body.calendars && body.calendars.primary;
-        if (cal && cal.errors && cal.errors.length) throw new Error('Google could not read that calendar (' + cal.errors[0].reason + ')');
-        return (cal && cal.busy) || [];
-      });
-    });
-  }
-  if (window.HUB.googleClientId) {
-    $('[data-calendar]').hidden = false;
-    $('[data-cal-check]').addEventListener('click', function () {
-      calLine('Asking Google…');
-      loadGoogle().then(function (oauth) {
-        oauth.initTokenClient({
-          client_id: window.HUB.googleClientId,
-          scope: SCOPE,
-          callback: function (resp) {
-            if (!resp || resp.error || !resp.access_token) { calLine('Your calendar was not checked' + (resp && resp.error ? ' (' + resp.error + ')' : '') + '.'); return; }
-            readCalendar(resp.access_token).then(function (blocks) {
-              busy = T.busyWeeks(poll, blocks);
-              $('[data-cal-wake]').hidden = !poll.open;
-              markFree();
-            }).catch(function (e) {
-              calLine('Your calendar was not checked: ' + said(e) + '.');
-            }).then(function () {
-              try { oauth.revoke(resp.access_token, function () {}); } catch (e) { /* it expires within the hour anyway */ }
-            });
-          },
-          error_callback: function (e) { calLine('Your calendar was not checked' + (e && e.type ? ' (' + e.type.replace(/_/g, ' ') + ')' : '') + '.'); }
-        }).requestAccessToken();
-      }).catch(function (e) { calLine('Your calendar was not checked: ' + said(e) + '.'); });
-    });
-    function markFree() {
-      var from = T.minutesOf($('[data-wake-from]').value), to = T.minutesOf($('[data-wake-to]').value);
-      Object.keys(auto).forEach(function (s) { if (!touched[s] && marks[s] === 'works') delete marks[s]; });
-      auto = {};
-      var marked = 0;
-      if (poll.open && from != null && to != null) {
-        T.freeInHours(poll, busy, G.myZone(), from, to).forEach(function (s) {
-          if (touched[s] || marks[s]) return;
-          marks[s] = 'works';
-          auto[s] = true;
-          marked++;
-        });
-      }
-      G.refresh(table, cell);
-      var n = Object.keys(busy.busy).filter(function (s) { return busy.busy[s]; }).length;
-      var line = poll.open ? (marked ? marked + (marked === 1 ? ' free time is' : ' free times are') + ' marked.' : 'No free times in those hours were left to mark.') : '';
-      line += n ? ' A corner mark means busy in at least one of the first ' + busy.weeks + ' weeks.' : ' You are free at all of these times for the first ' + busy.weeks + ' weeks.';
-      if (poll.open) line += ' Look them over before you send.';
-      calLine(line.trim());
-    }
-    ['[data-wake-from]', '[data-wake-to]'].forEach(function (sel) {
-      $(sel).addEventListener('change', function () { if (busy) markFree(); });
-    });
-  }
+  // ---- checking a Google Calendar (times-calendar.js) ----------------
+  var cal = window.TimesCalendar ? window.TimesCalendar.mount($('[data-calendar]'), {
+    poll: function () { return poll; },
+    marks: function () { return marks; },
+    touched: function () { return touched; },
+    canMark: function () { return poll.open; },
+    refresh: function () { G.refresh(table, cell); },
+    after: 'Look them over before you send.'
+  }) : { busy: function () { return null; }, reset: function () {} };
 
   window.addEventListener('hashchange', load);
   load();

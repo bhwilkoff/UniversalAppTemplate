@@ -7,7 +7,7 @@
   if (!root || !window.supabase || !window.HUB || !window.TimesLib || !window.TimesGrid) return;
   var T = window.TimesLib, G = window.TimesGrid;
   var db = (window.HUB.client ? window.HUB.client() : window.supabase.createClient(window.HUB.url, window.HUB.key));
-  var me = null, myName = '', hostMarks = {}, hostTable = null, polls = [], current = null, answers = [], zone = G.myZone(), picked = null, table = null;
+  var me = null, myName = '', hostMarks = {}, hostTouched = {}, lastHostPoll = null, hostTable = null, polls = [], current = null, answers = [], zone = G.myZone(), picked = null, table = null;
   var form = root.querySelector('[data-poll-form]');
 
   function $(sel) { return root.querySelector(sel); }
@@ -193,6 +193,7 @@
       $('[data-host-name-form]').elements.host_name.value = current.host_name || myName;
       $('[data-host-name-status]').textContent = '';
       $('[data-host-status]').textContent = '';
+      if (!current || current.id !== lastHostPoll) { hostCal.reset(); hostTouched = {}; lastHostPoll = current.id; }
       hostMarks = {};
       answers.filter(function (a) { return a.host; }).forEach(function (a) {
         a.works.forEach(function (x) { hostMarks[x] = 'works'; });
@@ -207,23 +208,38 @@
   // ---- the teacher's own name and times ---------------------------------
   function hostMode() { return root.querySelector('input[name="host_mode"]:checked').value; }
   function hostCell(slot) {
-    var m = hostMarks[slot];
-    return {
+    var m = hostMarks[slot], busy = hostCal.busy();
+    var c = {
       cls: m === 'works' ? 'works' : m === 'if_need_be' ? 'maybe' : '',
       pressed: m === 'works' ? 'true' : m === 'if_need_be' ? 'mixed' : 'false',
       label: m === 'works' ? 'works for you' : m === 'if_need_be' ? 'if need be' : 'not marked'
     };
+    if (busy && busy.busy[slot]) {
+      c.cls += ' busy';
+      c.label += ', busy on your calendar ' + (busy.busy[slot] === busy.weeks ? 'every week' : 'in ' + busy.busy[slot] + ' of ' + busy.weeks + ' weeks');
+    }
+    return c;
   }
+  var hostCal = window.TimesCalendar ? window.TimesCalendar.mount($('[data-host-calendar]'), {
+    poll: function () { return current; },
+    marks: function () { return hostMarks; },
+    touched: function () { return hostTouched; },
+    canMark: function () { return true; },
+    refresh: function () { G.refresh(hostTable, hostCell); },
+    after: 'Look them over, then save your times.'
+  }) : { busy: function () { return null; }, reset: function () {} };
   var hostDragTo = null;
   function drawHost() {
     hostTable = G.render($('[data-host-grid]'), {
       poll: current, zone: zone, cell: hostCell,
       onCell: function (slot) {
+        hostTouched[slot] = true;
         var want = hostMode();
         if (hostMarks[slot] === want) delete hostMarks[slot]; else hostMarks[slot] = want;
         G.refresh(hostTable, hostCell);
       },
       onDrag: function (slot, first) {
+        hostTouched[slot] = true;
         if (first) hostDragTo = hostMarks[slot] === hostMode() ? null : hostMode();
         if (hostDragTo) hostMarks[slot] = hostDragTo; else delete hostMarks[slot];
         G.refresh(hostTable, hostCell);

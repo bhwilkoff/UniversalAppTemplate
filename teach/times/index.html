@@ -24,9 +24,10 @@
   <script src="/assets/site.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" defer></script>
   <script src="/assets/hub-config.js?v=20261009a" defer></script>
-  <script src="/assets/times-lib.js?v=20261009f" defer></script>
-  <script src="/assets/times-grid.js?v=20261009f" defer></script>
-  <script src="/assets/teach-times.js?v=20261009f" defer></script>
+  <script src="/assets/times-lib.js?v=20261009g" defer></script>
+  <script src="/assets/times-grid.js?v=20261009g" defer></script>
+  <script src="/assets/times-calendar.js?v=20261009a" defer></script>
+  <script src="/assets/teach-times.js?v=20261009g" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to the page</a>
@@ -122,6 +123,12 @@
             <section class="times-host" aria-labelledby="host-times-title">
               <h3 id="host-times-title">Your own times</h3>
               <p class="hint" data-host-hint>Mark the times you could make. They count like everyone else's, and the people answering see a dot on each one, so they know which times could really work.</p>
+              <div class="times-calendar" data-host-calendar hidden>
+                <button class="btn-quiet" type="button" data-cal-check>Check my Google Calendar</button>
+                <p class="hint">Google tells this page only when you are busy, never what you are doing, and nothing from your calendar is saved.</p>
+                <p class="times-status" role="status" aria-live="polite" data-cal-line></p>
+                <p class="times-wake" data-cal-wake hidden>Marking free times between <input type="time" value="08:00" step="900" data-wake-from aria-label="The earliest start time to mark"> and <input type="time" value="20:00" step="900" data-wake-to aria-label="The latest start time to mark">, your time.</p>
+              </div>
               <div class="times-mode" role="radiogroup" aria-label="What tapping a time marks">
                 <label class="times-mode-opt"><input type="radio" name="host_mode" value="works" checked><span class="swatch works" aria-hidden="true"></span>Works for me</label>
                 <label class="times-mode-opt"><input type="radio" name="host_mode" value="if_need_be"><span class="swatch maybe" aria-hidden="true"></span>If need be</label>
