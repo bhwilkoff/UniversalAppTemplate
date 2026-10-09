@@ -2208,3 +2208,5 @@ ol.principles summary:focus-visible { outline: 2px solid var(--accent); outline-
 .times-host-key { display: flex; flex-wrap: wrap; gap: 0.25rem 1rem; margin: 0; font-size: 0.9rem; color: var(--muted); }
 .times-host-key .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--ink); margin-right: 0.4rem; vertical-align: middle; }
 .times-host-key .dot.hollow { background: none; border: 1.5px solid var(--ink); }
+.times-cal-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.1rem; }
+.times-cal-list label.check { min-height: 40px; font-size: 0.95rem; }
