@@ -14,12 +14,49 @@
   function minuteOf(slot) { return slot % 1440; }
 
   // Every time a poll offers, in its own zone, in order.
-  function slotsOf(poll) {
+  function minutesOfPoll(poll) {
+    if (poll.minutes && poll.minutes.length) return poll.minutes.slice().sort(function (a, b) { return a - b; });
     var out = [];
+    for (var m = poll.first_minute; m <= poll.last_minute; m += poll.step_minutes) out.push(m);
+    return out;
+  }
+  function slotsOf(poll) {
+    var out = [], mins = minutesOfPoll(poll);
     poll.days.slice().sort().forEach(function (d) {
-      for (var m = poll.first_minute; m <= poll.last_minute; m += poll.step_minutes) out.push(slotOf(d, m));
+      mins.forEach(function (m) { out.push(slotOf(d, m)); });
     });
     return out;
+  }
+
+  // The parts of the day a teacher can offer, as the start times in each
+  // (from, up to but not including to).
+  var PARTS = [
+    { key: 'early', name: 'Early morning', from: 360, to: 480 },
+    { key: 'morning', name: 'Morning', from: 480, to: 720 },
+    { key: 'midday', name: 'Midday', from: 720, to: 840 },
+    { key: 'afternoon', name: 'Afternoon', from: 840, to: 1020 },
+    { key: 'evening', name: 'Evening', from: 1020, to: 1260 },
+    { key: 'late', name: 'Late evening', from: 1260, to: 1380 }
+  ];
+  function partsMinutes(keys, step) {
+    var out = [];
+    PARTS.forEach(function (p) {
+      if (keys.indexOf(p.key) < 0) return;
+      for (var m = p.from; m < p.to; m += step) out.push(m);
+    });
+    return out;
+  }
+
+  // "8:00 AM to 11:30 AM and 5:00 PM to 8:30 PM": the start times a poll
+  // offers, run together where they follow one another.
+  function hoursText(poll, locale) {
+    var mins = minutesOfPoll(poll), runs = [];
+    mins.forEach(function (m) {
+      var last = runs[runs.length - 1];
+      if (last && m - last[1] === poll.step_minutes) last[1] = m; else runs.push([m, m]);
+    });
+    var parts = runs.map(function (r) { return r[0] === r[1] ? timeText(r[0], locale) : timeText(r[0], locale) + ' to ' + timeText(r[1], locale); });
+    return parts.length > 1 ? parts.slice(0, -1).join(', ') + (parts.length > 2 ? ',' : '') + ' and ' + parts[parts.length - 1] : parts[0] || '';
   }
 
   // Minutes a zone is ahead of UTC at an instant.
@@ -112,14 +149,13 @@
   function checkPoll(input) {
     var title = String(input.title || '').trim();
     var days = (input.days || []).map(Number).filter(function (d) { return d >= 0 && d <= 6; });
-    var first = minutesOf(input.from), last = minutesOf(input.to);
     var step = +input.step || 30;
+    var mins = partsMinutes(input.parts || [], step);
     if (!title) return { error: 'Give the poll a name people will recognize.' };
     if (!days.length) return { error: 'Choose at least one day.' };
-    if (first == null || last == null) return { error: 'Choose the earliest and latest start times.' };
-    if (last < first) return { error: 'The latest start time comes before the earliest.' };
-    if ((last - first) % step) return { error: 'The latest start time should be a whole number of steps after the earliest.' };
+    if (!mins.length) return { error: 'Choose at least one part of the day.' };
     if (!input.time_zone) return { error: 'Choose the time zone these times are in.' };
+    var first = mins[0], last = mins[mins.length - 1];
     return {
       row: {
         title: title,
@@ -129,6 +165,7 @@
         first_minute: first,
         last_minute: last,
         step_minutes: step,
+        minutes: mins,
         session_minutes: +input.session_minutes || 75,
         starts_on: input.starts_on || null,
         cohort_id: input.cohort_id || null
@@ -197,7 +234,7 @@
   var api = {
     DAYS: DAYS, SHORT: SHORT, slotOf: slotOf, dayOf: dayOf, minuteOf: minuteOf, slotsOf: slotsOf,
     offsetAt: offsetAt, instantOf: instantOf, placeIn: placeIn, gridFor: gridFor,
-    timeText: timeText, slotText: slotText, zoneName: zoneName, parseHash: parseHash,
+    timeText: timeText, slotText: slotText, PARTS: PARTS, partsMinutes: partsMinutes, hoursText: hoursText, minutesOfPoll: minutesOfPoll, zoneName: zoneName, parseHash: parseHash,
     minutesOf: minutesOf, checkPoll: checkPoll, tallyOf: tallyOf, bestTimes: bestTimes,
     CHECK_WEEKS: CHECK_WEEKS, checkSpan: checkSpan, busyWeeks: busyWeeks
   };

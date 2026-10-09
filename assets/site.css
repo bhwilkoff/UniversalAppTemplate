@@ -2187,3 +2187,7 @@ ol.principles summary:focus-visible { outline: 2px solid var(--accent); outline-
 .times-answers thead th { border-top: 0; font-weight: 600; color: var(--muted); }
 .times-answers td .link-btn { min-height: 0; }
 .times [data-saved]:focus { outline: none; }
+.times-grid tr.times-gap > * { padding-top: 1.25rem; }
+.times-part-list { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0; }
+@media (min-width: 40rem) { .times-part-list { grid-template-columns: 1fr 1fr; column-gap: 1.5rem; } }
+.times-step { max-width: 16rem; }

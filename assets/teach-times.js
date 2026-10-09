@@ -24,9 +24,7 @@
   function said(e) { return e && e.message ? e.message : String(e || 'no details'); }
   function shareUrl(p) { return location.origin + '/times/#' + p.token; }
   function daysText(p) { return p.days.map(function (d) { return T.DAYS[d]; }).join(', '); }
-  function windowText(p) {
-    return T.timeText(p.first_minute) + (p.last_minute > p.first_minute ? ' to ' + T.timeText(p.last_minute) : '');
-  }
+  function windowText(p) { return T.hoursText(p); }
 
   // ---- the list -----------------------------------------------------
   function loadList() {
@@ -77,7 +75,8 @@
     var checked = T.checkPoll({
       title: f.title.value, note: f.note.value, cohort_id: f.cohort_id.value,
       days: Array.prototype.filter.call(form.querySelectorAll('input[name="days"]'), function (c) { return c.checked; }).map(function (c) { return c.value; }),
-      from: f.from.value, to: f.to.value, step: f.step.value, time_zone: f.time_zone.value,
+      parts: Array.prototype.filter.call(form.querySelectorAll('input[name="parts"]'), function (c) { return c.checked; }).map(function (c) { return c.value; }),
+      step: f.step.value, time_zone: f.time_zone.value,
       session_minutes: f.session_minutes.value, starts_on: f.starts_on.value
     });
     var err = $('[data-form-error]');
@@ -178,7 +177,7 @@
       answers = r.data;
       var d = $('[data-detail]');
       $('[data-detail-title]').textContent = current.title;
-      $('[data-detail-facts]').textContent = (current.open ? 'Taking answers. ' : 'Closed. ') + daysText(current) + ', starting ' + windowText(current) + ' every ' + current.step_minutes + ' minutes, in ' + T.zoneName(current.time_zone) + '. Sessions of ' + current.session_minutes + ' minutes' + (current.starts_on ? ', beginning the week of ' + current.starts_on : '') + '.';
+      $('[data-detail-facts]').textContent = (current.open ? 'Taking answers. ' : 'Closed. ') + daysText(current) + ', starting ' + windowText(current) + ', every ' + current.step_minutes + ' minutes, in ' + T.zoneName(current.time_zone) + '. Sessions of ' + current.session_minutes + ' minutes' + (current.starts_on ? ', beginning the week of ' + current.starts_on : '') + '.';
       $('[data-share-link]').value = shareUrl(current);
       $('[data-open-share]').href = shareUrl(current);
       $('[data-toggle-open]').textContent = current.open ? 'Stop taking answers' : 'Take answers again';

@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261009a">
+  <link rel="stylesheet" href="/assets/site.css?v=20261009b">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -24,9 +24,9 @@
   <script src="/assets/site.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" defer></script>
   <script src="/assets/hub-config.js" defer></script>
-  <script src="/assets/times-lib.js?v=20261009a" defer></script>
-  <script src="/assets/times-grid.js?v=20261009a" defer></script>
-  <script src="/assets/teach-times.js?v=20261009a" defer></script>
+  <script src="/assets/times-lib.js?v=20261009b" defer></script>
+  <script src="/assets/times-grid.js?v=20261009b" defer></script>
+  <script src="/assets/teach-times.js?v=20261009b" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to the page</a>
@@ -92,11 +92,12 @@
               <legend>Days to offer</legend>
               <div class="times-day-list"><label class="check"><input type="checkbox" name="days" value="0"> Sunday</label><label class="check"><input type="checkbox" name="days" value="1" checked> Monday</label><label class="check"><input type="checkbox" name="days" value="2" checked> Tuesday</label><label class="check"><input type="checkbox" name="days" value="3" checked> Wednesday</label><label class="check"><input type="checkbox" name="days" value="4" checked> Thursday</label><label class="check"><input type="checkbox" name="days" value="5"> Friday</label><label class="check"><input type="checkbox" name="days" value="6"> Saturday</label></div>
             </fieldset>
-            <div class="row">
-              <label>Earliest start <input type="time" name="from" value="17:00" step="900"></label>
-              <label>Latest start <input type="time" name="to" value="20:00" step="900"></label>
-              <label>Every <select name="step"><option value="15">15 minutes</option><option value="30" selected>30 minutes</option><option value="60">hour</option></select></label>
-            </div>
+            <fieldset class="times-days">
+              <legend>Parts of the day to offer</legend>
+              <p class="hint">Choose as many as you like, in the time zone below. Each offers its start times; a session may run past the end.</p>
+              <div class="times-day-list times-part-list"><label class="check"><input type="checkbox" name="parts" value="early"> Early morning, 6 to 8 AM</label><label class="check"><input type="checkbox" name="parts" value="morning"> Morning, 8 AM to noon</label><label class="check"><input type="checkbox" name="parts" value="midday"> Midday, noon to 2 PM</label><label class="check"><input type="checkbox" name="parts" value="afternoon"> Afternoon, 2 to 5 PM</label><label class="check"><input type="checkbox" name="parts" value="evening"> Evening, 5 to 9 PM</label><label class="check"><input type="checkbox" name="parts" value="late"> Late evening, 9 to 11 PM</label></div>
+            </fieldset>
+            <label class="times-step">Start times every <select name="step"><option value="15">15 minutes</option><option value="30" selected>30 minutes</option><option value="60">hour</option></select></label>
             <div class="row">
               <label>In the time zone <select name="time_zone" data-zone-pick></select></label>
               <label>Sessions last <select name="session_minutes"><option value="60">an hour</option><option value="75" selected>75 minutes</option><option value="90">90 minutes</option><option value="120">two hours</option></select></label>

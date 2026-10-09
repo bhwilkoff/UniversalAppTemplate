@@ -697,10 +697,19 @@ time, which helps them decide what "if need be" is worth.
 grid, who can make any time, and the five times the most people can
 make, but it never picks the cohort's time.
 
+**A poll offers parts of the day, in any mix.** Ben, the same day: "it
+only has times in the evening, but some cohorts might meet during the
+day." The teacher ticks early morning, morning, midday, afternoon,
+evening, or late evening, so mornings and evenings can be offered without
+the afternoon, and the grid leaves a gap where hours are skipped
+(migration 20261009020000, `minutes`).
+
 **The calendar check is free/busy only, and the person still marks.**
 Google's `calendar.freebusy` scope shows when someone is busy, never
 what they are doing; the page reads the first four weeks in the browser,
 revokes the permission once read, and saves nothing. Busy times get a
 corner mark, and marking every free time is a separate button the person
-presses. It needs the Calendar API turned on in the `human-shaped` Cloud
-project and the scope on its consent screen.
+presses. `calendar.freebusy` is a non-sensitive scope, so with no logo the
+`human-shaped` Google app needs no review; it was moved from Testing to
+In production on October 9 (with Ben's yes), which also opens Google
+sign-in to everyone.

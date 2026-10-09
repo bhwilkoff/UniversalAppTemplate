@@ -71,14 +71,15 @@ test('the link carries the token, and optionally an answer to change', () => {
 });
 
 test('a teacher\'s form is checked before it is saved', () => {
-  const ok = { title: ' Fall ', days: ['3', '1'], from: '17:00', to: '20:00', step: '60', time_zone: 'America/Denver' };
+  const ok = { title: ' Fall ', days: ['3', '1'], parts: ['evening'], step: '60', time_zone: 'America/Denver' };
   assert.deepEqual(T.checkPoll(ok).row.days, [1, 3]);
   assert.equal(T.checkPoll(ok).row.title, 'Fall');
+  assert.deepEqual(T.checkPoll(ok).row.minutes, [1020, 1080, 1140, 1200]);
   assert.equal(T.checkPoll(ok).row.first_minute, 1020);
+  assert.equal(T.checkPoll(ok).row.last_minute, 1200);
   assert.match(T.checkPoll({ ...ok, title: '' }).error, /name/);
   assert.match(T.checkPoll({ ...ok, days: [] }).error, /day/);
-  assert.match(T.checkPoll({ ...ok, to: '16:00' }).error, /before/);
-  assert.match(T.checkPoll({ ...ok, to: '20:30' }).error, /steps/);
+  assert.match(T.checkPoll({ ...ok, parts: [] }).error, /part of the day/);
   assert.match(T.checkPoll({ ...ok, time_zone: '' }).error, /time zone/);
 });
 
@@ -112,4 +113,17 @@ test('a time is busy in each week a calendar block overlaps the whole session', 
   assert.equal(r.busy[2520], 3); // 6 PM to 7:15 overlaps all three blocks
   assert.equal(r.busy[2580], 2); // 7 PM: Oct 19, and Nov 2 (7 PM MST = 02:00 UTC)
   assert.equal(r.busy[5340], 0);
+});
+
+test('mornings and evenings without the afternoon', () => {
+  const p = { ...poll, minutes: T.partsMinutes(['morning', 'evening'], 60) };
+  assert.deepEqual(T.minutesOfPoll(p), [480, 540, 600, 660, 1020, 1080, 1140, 1200]);
+  assert.equal(T.slotsOf(p).length, 16);
+  assert.deepEqual(T.gridFor(p, 'America/Denver').minutes, [480, 540, 600, 660, 1020, 1080, 1140, 1200]);
+  assert.equal(T.hoursText(p, 'en-US'), '8:00 AM to 11:00 AM and 5:00 PM to 8:00 PM');
+});
+
+test('a poll from before parts of the day still reads as its one window', () => {
+  assert.equal(T.hoursText(poll, 'en-US'), '5:00 PM to 8:00 PM');
+  assert.equal(T.hoursText({ ...poll, minutes: [480] }, 'en-US'), '8:00 AM');
 });

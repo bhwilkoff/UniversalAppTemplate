@@ -2587,6 +2587,17 @@ def main():
           and last_rows == [("Ivy (delete me)", None), ("Jo", None)])
     check("nobody reads an answer's secret, not even the teacher",
           not attempt(as_user("ben"), "select secret from private.time_poll_secrets"))
+    # Parts of the day (migration 20261009020000): a poll offers any set
+    # of start times, and only those can be answered.
+    attempt(as_user("ben"), "insert into public.time_polls (title, time_zone, days, first_minute, last_minute, step_minutes, minutes) "
+            "values ('Mornings or evenings (delete me)', 'America/Denver', '{2}', 480, 1020, 30, '{480,510,1020}') returning token")
+    ptok = last_rows[0][0]
+    check("signed out, a poll's parts of the day come with it",
+          attempt(as_user(None), "select public.time_poll(%s)", (ptok,)) and last_rows[0][0]["minutes"] == [480, 510, 1020])
+    check("a time in one of its parts of the day is taken (Tuesday 5 PM)",
+          attempt(as_user(None), ans, (ptok, "Mo", "{3900}", "{}", None, None, None)))
+    check("a time between its parts of the day is refused (Tuesday 9 AM)",
+          not attempt(as_user(None), ans, (ptok, "Mo", "{3420}", "{}", None, None, None)))
     check("a poll keeps its link",
           not attempt(as_user("ben"), "update public.time_polls set token = repeat('a', 32) where id = %s returning id", (tp,)))
     check("someone who is not its teacher cannot close it",

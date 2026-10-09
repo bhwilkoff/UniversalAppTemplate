@@ -30,8 +30,10 @@
     head.appendChild(hr);
     table.appendChild(head);
     var body = el('tbody');
-    grid.minutes.forEach(function (m) {
+    grid.minutes.forEach(function (m, i) {
       var tr = el('tr');
+      // Hours the poll skips leave a gap, so mornings and evenings read apart.
+      if (i && m - grid.minutes[i - 1] > opts.poll.step_minutes) tr.className = 'times-gap';
       var th = el('th', null, T.timeText(m));
       th.scope = 'row';
       tr.appendChild(th);
