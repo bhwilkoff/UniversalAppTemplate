@@ -2598,6 +2598,39 @@ def main():
           attempt(as_user(None), ans, (ptok, "Mo", "{3900}", "{}", None, None, None)))
     check("a time between its parts of the day is refused (Tuesday 9 AM)",
           not attempt(as_user(None), ans, (ptok, "Mo", "{3420}", "{}", None, None, None)))
+    # The teacher's own name and times (migration 20261009030000).
+    host = "select public.set_host_times(%s, %s::int[], %s::int[])"
+    check("someone who is not its teacher cannot set the teacher's times",
+          not attempt(as_user("cal"), host, (tp, "{2460}", "{}")))
+    check("nor can the teacher's agent", not attempt(as_agent("ben"), host, (tp, "{2460}", "{}")))
+    check("nor can anyone signed out", not attempt(as_user(None), host, (tp, "{2460}", "{}")))
+    check("the teacher's times must be the poll's times", not attempt(as_user("ben"), host, (tp, "{3900}", "{}")))
+    check("the poll's teacher sets their own times",
+          attempt(as_user("ben"), host, (tp, "{2460,2520}", "{5460}")))
+    attempt(as_user("ben"), host, (tp, "{2460}", "{5460}"))
+    check("setting them again changes the one answer rather than adding one",
+          attempt(as_user("ben"), "select works, if_need_be, name from public.time_poll_answers where poll_id = %s and host", (tp,))
+          and last_rows == [([2460], [5460], "bhwilkoff")])
+    check("a co-teacher of the cohort can set them too", attempt(as_user("kofi"), host, (tp, "{2460}", "{5460}")))
+    attempt(as_user("ben"), "update public.time_polls set host_name = 'Ben Wilkoff' where id = %s returning id", (tp,))
+    check("signed out, the link shows the teacher's chosen name and their times",
+          attempt(as_user(None), "select public.time_poll(%s)", (tok,))
+          and last_rows[0][0]["teacher"] == "Ben Wilkoff" and last_rows[0][0]["host_works"] == [2460]
+          and last_rows[0][0]["host_if_need_be"] == [5460])
+    check("renaming the poll renames the teacher's answer",
+          attempt(as_user("ben"), "select name from public.time_poll_answers where poll_id = %s and host", (tp,))
+          and last_rows == [("Ben Wilkoff",)])
+    check("the teacher's times count with everyone's",
+          attempt(as_user(None), "select public.my_time_poll_answer(%s, %s, %s)", (tok, jo["id"], jo["secret"]))
+          and last_rows[0][0]["tally"]["works"]["2460"] == 2)
+    check("no one can use the public way to change the teacher's answer",
+          attempt(as_user("ben"), "select id from public.time_poll_answers where poll_id = %s and host", (tp,))
+          and not attempt(as_user(None), ans, (tok, "Not Ben", "{2460}", "{}", None, last_rows[0][0], jo["secret"])))
+    check("clearing every time removes the teacher's answer",
+          attempt(as_user("ben"), host, (tp, "{}", "{}"))
+          and attempt(as_user("ben"), "select count(*) from public.time_poll_answers where poll_id = %s and host", (tp,))
+          and last_rows == [(0,)])
+    attempt(as_user("ben"), host, (tp, "{2460}", "{}"))
     check("a poll keeps its link",
           not attempt(as_user("ben"), "update public.time_polls set token = repeat('a', 32) where id = %s returning id", (tp,)))
     check("someone who is not its teacher cannot close it",

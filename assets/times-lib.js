@@ -159,6 +159,7 @@
     return {
       row: {
         title: title,
+        host_name: String(input.host_name || '').trim().slice(0, 80) || null,
         note: String(input.note || '').trim() || null,
         time_zone: input.time_zone,
         days: days.sort(),

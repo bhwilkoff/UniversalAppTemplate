@@ -7,7 +7,7 @@
   if (!root || !window.supabase || !window.HUB || !window.TimesLib || !window.TimesGrid) return;
   var T = window.TimesLib, G = window.TimesGrid;
   var db = window.supabase.createClient(window.HUB.url, window.HUB.key);
-  var me = null, polls = [], current = null, answers = [], zone = G.myZone(), picked = null, table = null;
+  var me = null, myName = '', hostMarks = {}, hostTable = null, polls = [], current = null, answers = [], zone = G.myZone(), picked = null, table = null;
   var form = root.querySelector('[data-poll-form]');
 
   function $(sel) { return root.querySelector(sel); }
@@ -73,7 +73,7 @@
     e.preventDefault();
     var f = form.elements;
     var checked = T.checkPoll({
-      title: f.title.value, note: f.note.value, cohort_id: f.cohort_id.value,
+      title: f.title.value, host_name: f.host_name.value, note: f.note.value, cohort_id: f.cohort_id.value,
       days: Array.prototype.filter.call(form.querySelectorAll('input[name="days"]'), function (c) { return c.checked; }).map(function (c) { return c.value; }),
       parts: Array.prototype.filter.call(form.querySelectorAll('input[name="parts"]'), function (c) { return c.checked; }).map(function (c) { return c.value; }),
       step: f.step.value, time_zone: f.time_zone.value,
@@ -89,6 +89,7 @@
       err.textContent = '';
       form.reset();
       form.elements.time_zone.value = zone;
+      form.elements.host_name.value = myName;
       form.hidden = true;
       return loadList().then(function () { return openPoll(r.data.id); });
     }).catch(function (e) {
@@ -151,11 +152,14 @@
     body.replaceChildren();
     answers.forEach(function (a) {
       var tr = el('tr');
-      tr.appendChild(el('td', null, a.name));
+      tr.appendChild(el('td', null, a.host ? a.name + (current.created_by === me.id ? ' (you)' : ' (teacher)') : a.name));
       tr.appendChild(el('td', null, a.contact || ''));
       tr.appendChild(el('td', null, a.works.length + (a.if_need_be.length ? ', and ' + a.if_need_be.length + ' if need be' : '')));
       tr.appendChild(el('td', null, a.comment || ''));
       var td = el('td');
+      tr.appendChild(td);
+      body.appendChild(tr);
+      if (a.host) return;
       var rm = el('button', 'link-btn', 'Remove');
       rm.type = 'button';
       rm.setAttribute('aria-label', 'Remove ' + a.name + "'s answer");
@@ -168,8 +172,6 @@
         });
       });
       td.appendChild(rm);
-      tr.appendChild(td);
-      body.appendChild(tr);
     });
   }
   function openPoll(id) {
@@ -177,7 +179,7 @@
     if (!current) return Promise.resolve();
     picked = null;
     $('[data-who]').replaceChildren();
-    return db.from('time_poll_answers').select('id, name, contact, comment, works, if_need_be, created_at').eq('poll_id', id).order('created_at').then(function (r) {
+    return db.from('time_poll_answers').select('id, name, contact, comment, works, if_need_be, created_at, host').eq('poll_id', id).order('created_at').then(function (r) {
       if (r.error) return fail('The answers could not be loaded: ' + r.error.message);
       answers = r.data;
       var d = $('[data-detail]');
@@ -188,12 +190,72 @@
       $('[data-toggle-open]').textContent = current.open ? 'Stop taking answers' : 'Take answers again';
       $('[data-detail-status]').textContent = '';
       G.fillZones($('[data-detail-zone]'), zone);
+      $('[data-host-name-form]').elements.host_name.value = current.host_name || myName;
+      $('[data-host-name-status]').textContent = '';
+      $('[data-host-status]').textContent = '';
+      hostMarks = {};
+      answers.filter(function (a) { return a.host; }).forEach(function (a) {
+        a.works.forEach(function (x) { hostMarks[x] = 'works'; });
+        a.if_need_be.forEach(function (x) { hostMarks[x] = 'if_need_be'; });
+      });
+      drawHost();
       drawGrid();
       drawAnswers();
       d.hidden = false;
     });
   }
-  $('[data-detail-zone]').addEventListener('change', function (e) { zone = e.target.value; picked = null; $('[data-who]').replaceChildren(); drawGrid(); });
+  // ---- the teacher's own name and times ---------------------------------
+  function hostMode() { return root.querySelector('input[name="host_mode"]:checked').value; }
+  function hostCell(slot) {
+    var m = hostMarks[slot];
+    return {
+      cls: m === 'works' ? 'works' : m === 'if_need_be' ? 'maybe' : '',
+      pressed: m === 'works' ? 'true' : m === 'if_need_be' ? 'mixed' : 'false',
+      label: m === 'works' ? 'works for you' : m === 'if_need_be' ? 'if need be' : 'not marked'
+    };
+  }
+  var hostDragTo = null;
+  function drawHost() {
+    hostTable = G.render($('[data-host-grid]'), {
+      poll: current, zone: zone, cell: hostCell,
+      onCell: function (slot) {
+        var want = hostMode();
+        if (hostMarks[slot] === want) delete hostMarks[slot]; else hostMarks[slot] = want;
+        G.refresh(hostTable, hostCell);
+      },
+      onDrag: function (slot, first) {
+        if (first) hostDragTo = hostMarks[slot] === hostMode() ? null : hostMode();
+        if (hostDragTo) hostMarks[slot] = hostDragTo; else delete hostMarks[slot];
+        G.refresh(hostTable, hostCell);
+      },
+      caption: 'Your own times, in ' + T.zoneName(zone)
+    });
+  }
+  $('[data-host-save]').addEventListener('click', function (e) {
+    var works = [], maybe = [], btn = e.target, say = $('[data-host-status]');
+    Object.keys(hostMarks).forEach(function (x) { (hostMarks[x] === 'works' ? works : maybe).push(+x); });
+    btn.disabled = true;
+    say.textContent = 'Saving…';
+    var id = current.id;
+    G.within(db.rpc('set_host_times', { poll: id, works: works, if_need_be: maybe }), db).then(function (r) {
+      if (r.error) throw r.error;
+      return loadList().then(function () { return openPoll(id); }).then(function () {
+        $('[data-host-status]').textContent = works.length + maybe.length ? 'Your times are saved.' : 'Your times are cleared.';
+      });
+    }).catch(function (err) { say.textContent = 'Your times were not saved: ' + said(err) + '.'; })
+      .then(function () { btn.disabled = false; });
+  });
+  $('[data-host-name-form]').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var name = e.target.elements.host_name.value.trim(), say = $('[data-host-name-status]'), id = current.id;
+    say.textContent = 'Saving…';
+    G.within(db.from('time_polls').update({ host_name: name || null }).eq('id', id), db).then(function (r) {
+      if (r.error) throw r.error;
+      return loadList().then(function () { return openPoll(id); }).then(function () { $('[data-host-name-status]').textContent = 'Saved.'; });
+    }).catch(function (err) { say.textContent = 'The name was not saved: ' + said(err) + '.'; });
+  });
+
+  $('[data-detail-zone]').addEventListener('change', function (e) { zone = e.target.value; picked = null; $('[data-who]').replaceChildren(); drawHost(); drawGrid(); });
   $('[data-copy-share]').addEventListener('click', function (e) {
     var input = $('[data-share-link]');
     if (navigator.clipboard) navigator.clipboard.writeText(input.value).then(function () { e.target.textContent = 'Copied'; setTimeout(function () { e.target.textContent = 'Copy the link'; }, 2000); }, function () { input.select(); });
@@ -228,6 +290,10 @@
         if (!r.data) return show('not-teacher');
         G.fillZones(form.elements.time_zone, zone);
         show('teacher');
+        db.from('profiles').select('display_name, github_login').eq('id', me.id).maybeSingle().then(function (pr) {
+          if (pr.data) myName = (pr.data.display_name || '').trim() || pr.data.github_login || '';
+          if (!form.elements.host_name.value) form.elements.host_name.value = myName;
+        });
         return Promise.all([loadList(), loadCohorts()]);
       });
     }).catch(function (err) { fail('Something went wrong: ' + said(err) + '.'); });

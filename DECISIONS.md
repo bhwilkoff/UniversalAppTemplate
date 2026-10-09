@@ -693,6 +693,15 @@ Someone who has not answered yet sees an empty grid, so their first
 choices are their own, and afterward they see how many can make each
 time, which helps them decide what "if need be" is worth.
 
+**The teacher answers too, and is seen doing so.** Ben: "allow for the
+teacher to add their name (from the poll setup page) and their own
+availability. I feel like that is an important part too." The poll shows
+the name the teacher gives it, and the teacher marks their own times on
+/teach/times/. Those count like anyone's, and everyone with the link sees
+a dot on each time the teacher can make from the start, because the
+teacher's times are a constraint on the choice, not a vote that could
+lean on it (migration 20261009030000).
+
 **The page counts; the teacher chooses.** /teach/times/ shows a heat
 grid, who can make any time, and the five times the most people can
 make, but it never picks the cohort's time.

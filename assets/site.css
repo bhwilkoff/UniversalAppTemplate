@@ -2120,9 +2120,9 @@ ol.principles summary:focus-visible { outline: 2px solid var(--accent); outline-
 .times-zone select { max-width: 100%; min-width: 0; flex: 1 1 12rem; font: inherit; font-weight: 400; padding: 0.5rem 0.6rem; border: 1px solid var(--muted); border-radius: 10px; background: var(--card); color: var(--ink); min-height: 44px; }
 .times-calendar { display: grid; gap: 0.4rem; justify-items: start; }
 .times-mode { display: flex; flex-wrap: wrap; gap: 0.5rem; }
-.times-form label.times-mode-opt { display: inline-flex; align-items: center; gap: 0.6rem; padding: 0.55rem 0.9rem; min-height: 44px; border: 1px solid var(--rule); border-radius: 10px; background: var(--paper); cursor: pointer; }
-.times-form label.times-mode-opt:has(input:checked) { border-color: var(--ink); }
-.times-form .times-mode-opt input { margin: 0; padding: 0; min-height: 0; width: 1.1rem; height: 1.1rem; accent-color: var(--forest); }
+.times-form label.times-mode-opt, .times-host label.times-mode-opt { display: inline-flex; align-items: center; gap: 0.6rem; padding: 0.55rem 0.9rem; min-height: 44px; border: 1px solid var(--rule); border-radius: 10px; background: var(--paper); cursor: pointer; }
+.times-form label.times-mode-opt:has(input:checked), .times-host label.times-mode-opt:has(input:checked) { border-color: var(--ink); }
+.times-form .times-mode-opt input, .times-host .times-mode-opt input { margin: 0; padding: 0; min-height: 0; width: 1.1rem; height: 1.1rem; accent-color: var(--forest); }
 .swatch { width: 1.1rem; height: 1.1rem; border-radius: 4px; flex: none; }
 .swatch.works { background: var(--thistle); }
 .swatch.maybe { border: 2px dashed var(--thistle); }
@@ -2195,3 +2195,16 @@ ol.principles summary:focus-visible { outline: 2px solid var(--accent); outline-
 .times-wake { margin: 0; max-width: var(--measure); line-height: 2.4; }
 .times-wake input { font: inherit; font-size: 0.95rem; padding: 0.3rem 0.5rem; border: 1px solid var(--muted); border-radius: 8px; background: var(--card); color: var(--ink); min-height: 40px; }
 .times-calendar .times-status, .times-wake { font-size: 0.95rem; }
+/* The teacher's own times: a dot on each time they can make, hollow for
+   "if need be". Shown to everyone with the link. */
+.times-host { display: grid; gap: 0.75rem; }
+.times-host h3 { margin: 0.5rem 0 0; }
+.times-host-name { max-width: 30rem; }
+.times-cell.host-yes::before, .times-cell.host-maybe::before { content: ""; position: absolute; left: 6px; bottom: 6px; width: 7px; height: 7px; border-radius: 50%; }
+.times-cell.host-yes::before { background: var(--ink); }
+.times-cell.host-maybe::before { border: 1.5px solid var(--ink); }
+.times-cell.works.host-yes::before, .times-cell.h3.host-yes::before, .times-cell.h4.host-yes::before { background: var(--on-thistle); }
+.times-cell.works.host-maybe::before, .times-cell.h3.host-maybe::before, .times-cell.h4.host-maybe::before { border-color: var(--on-thistle); }
+.times-host-key { display: flex; flex-wrap: wrap; gap: 0.25rem 1rem; margin: 0; font-size: 0.9rem; color: var(--muted); }
+.times-host-key .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--ink); margin-right: 0.4rem; vertical-align: middle; }
+.times-host-key .dot.hollow { background: none; border: 1.5px solid var(--ink); }

@@ -34,11 +34,21 @@
 
   function mode() { return form.querySelector('input[name="mode"]:checked').value; }
 
+  function hostAt(slot) {
+    if ((poll.host_works || []).indexOf(slot) >= 0) return 'works';
+    if ((poll.host_if_need_be || []).indexOf(slot) >= 0) return 'if_need_be';
+    return null;
+  }
   function cell(slot) {
     var m = marks[slot];
     var c = { pressed: m === 'works' ? 'true' : m === 'if_need_be' ? 'mixed' : 'false', disabled: !poll.open };
     c.cls = m === 'works' ? 'works' : m === 'if_need_be' ? 'maybe' : '';
     c.label = m === 'works' ? 'works for you' : m === 'if_need_be' ? 'if need be' : 'not marked';
+    var h = hostAt(slot);
+    if (h) {
+      c.cls += h === 'works' ? ' host-yes' : ' host-maybe';
+      c.label += ', ' + poll.teacher + (h === 'works' ? ' can make it' : ' could if need be');
+    }
     if (busy && busy.busy[slot]) {
       c.cls += ' busy';
       c.label += ', busy on your calendar ' + (busy.busy[slot] === busy.weeks ? 'every week' : 'in ' + busy.busy[slot] + ' of ' + busy.weeks + ' weeks');
@@ -73,6 +83,20 @@
       ? 'The teacher set these times in ' + T.zoneName(poll.time_zone) + '.'
       : '';
     $('[data-count-line]').hidden = !tally;
+    var key = $('[data-host-key]'), hasHost = (poll.host_works || []).length + (poll.host_if_need_be || []).length > 0;
+    key.hidden = !hasHost;
+    if (hasHost) {
+      key.replaceChildren();
+      var a = document.createElement('span'), b = document.createElement('span');
+      a.innerHTML = '<i class="dot" aria-hidden="true"></i>';
+      a.appendChild(document.createTextNode(poll.teacher + ' can make it'));
+      key.appendChild(a);
+      if ((poll.host_if_need_be || []).length) {
+        b.innerHTML = '<i class="dot hollow" aria-hidden="true"></i>';
+        b.appendChild(document.createTextNode(poll.teacher + ' could if need be'));
+        key.appendChild(b);
+      }
+    }
   }
 
   function fill() {

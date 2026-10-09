@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign-in check | Human Shaped</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="/assets/site.css?v=20261009e">
+  <style>
+    .diag { max-width: 46rem; margin: 2rem auto; padding: 0 1rem 4rem; }
+    .diag pre { white-space: pre-wrap; word-break: break-word; font-size: 0.8rem; line-height: 1.45; background: var(--surface); padding: 1rem; border-radius: 10px; }
+    .diag .verdict { font-weight: 650; font-size: 1.15rem; }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js"></script>
+  <script src="/assets/hub-config.js"></script>
+</head>
+<body>
+  <!-- A temporary diagnostic (October 9, 2026): Safari waits forever while
+       checking whether Ben is signed in; Chrome does not. This page runs
+       the same check with the auth library's own trace on screen, with
+       every token removed. Remove it once the cause is known. -->
+  <main class="diag">
+    <h1>Sign-in check</h1>
+    <p>This page checks how this browser signs in to humanshaped.org and shows each step. It never shows your tokens. When it finishes (or after 30 seconds), copy what is below and send it, or take a screenshot.</p>
+    <p class="verdict" data-verdict>Running…</p>
+    <p><button class="btn-quiet" type="button" data-copy>Copy the report</button></p>
+    <pre data-out></pre>
+  </main>
+  <script>
+  (function () {
+    var out = document.querySelector('[data-out]'), t0 = performance.now(), lines = [];
+    var SECRET = /^(access_token|refresh_token|provider_token|provider_refresh_token|id_token|code_verifier|token|nonce)$/;
+    function clean(v) {
+      try {
+        var s = typeof v === 'string' ? v : JSON.stringify(v, function (k, x) { return SECRET.test(k) ? '[hidden]' : x; });
+        return String(s).replace(/eyJ[\w-]+\.[\w-]+\.[\w-]+/g, '[jwt hidden]').replace(/[a-z0-9]{40,}/gi, '[hidden]').slice(0, 400);
+      } catch (e) { return '[unprintable]'; }
+    }
+    function log() {
+      var line = ((performance.now() - t0) / 1000).toFixed(2) + 's  ' + Array.prototype.map.call(arguments, clean).join(' ');
+      lines.push(line); out.textContent = lines.join('\n');
+    }
+    function verdict(t) { document.querySelector('[data-verdict]').textContent = t; log('VERDICT: ' + t); }
+    log('browser:', navigator.userAgent);
+    log('visible:', document.visibilityState, '| online:', navigator.onLine, '| BroadcastChannel:', !!window.BroadcastChannel, '| navigator.locks:', !!(navigator.locks));
+    try {
+      var keys = Object.keys(localStorage).filter(function (k) { return /^sb-|supabase/.test(k); });
+      log('stored sign-in keys:', keys.join(', ') || 'none');
+      keys.forEach(function (k) {
+        try {
+          var v = JSON.parse(localStorage.getItem(k));
+          if (v && v.expires_at) {
+            var left = v.expires_at - Math.floor(Date.now() / 1000);
+            log(k, '-> user', v.user && v.user.id ? v.user.id.slice(0, 8) : '?', '| providers', v.user && v.user.app_metadata ? (v.user.app_metadata.providers || []).join('+') : '?', '| access token', left > 0 ? 'good for ' + left + 's' : 'EXPIRED ' + (-left) + 's ago', '| has refresh token:', !!v.refresh_token);
+          } else log(k, '-> (no session shape)', typeof v);
+        } catch (e) { log(k, '-> unreadable:', e.message); }
+      });
+    } catch (e) { log('localStorage unreadable:', e.message); }
+    document.addEventListener('visibilitychange', function () { log('visibility changed:', document.visibilityState); });
+
+    var realFetch = window.fetch;
+    window.fetch = function (url, opts) {
+      var u = String(url).replace(/\?.*/, '');
+      log('fetch start:', (opts && opts.method) || 'GET', u.replace(window.HUB.url, ''));
+      return realFetch.apply(this, arguments).then(function (r) { log('fetch done:', r.status, u.replace(window.HUB.url, '')); return r; },
+        function (e) { log('fetch FAILED:', u.replace(window.HUB.url, ''), e && e.message); throw e; });
+    };
+
+    var db = window.supabase.createClient(window.HUB.url, window.HUB.key, { auth: { debug: function () { log.apply(null, ['[auth]'].concat(Array.prototype.slice.call(arguments, 1))); } } });
+    var done = false;
+    setTimeout(function () { if (!done) verdict('STUCK: the sign-in check did not finish in 30 seconds. The last [auth] line above is where it waits.'); }, 30000);
+    log('calling getSession()');
+    db.auth.getSession().then(function (r) {
+      done = true;
+      if (r.error) return verdict('Finished with an error: ' + r.error.message);
+      var s = r.data && r.data.session;
+      verdict(s ? 'Signed in, and the check finished normally.' : 'Not signed in, and the check finished normally.');
+    }, function (e) { done = true; verdict('Threw: ' + (e && e.message)); });
+
+    document.querySelector('[data-copy]').addEventListener('click', function (e) {
+      if (navigator.clipboard) navigator.clipboard.writeText(lines.join('\n')).then(function () { e.target.textContent = 'Copied'; });
+    });
+  })();
+  </script>
+</body>
+</html>

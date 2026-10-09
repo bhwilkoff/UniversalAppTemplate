@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261009d">
+  <link rel="stylesheet" href="/assets/site.css?v=20261009e">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -24,9 +24,9 @@
   <script src="/assets/site.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" defer></script>
   <script src="/assets/hub-config.js" defer></script>
-  <script src="/assets/times-lib.js?v=20261009d" defer></script>
-  <script src="/assets/times-grid.js?v=20261009d" defer></script>
-  <script src="/assets/teach-times.js?v=20261009d" defer></script>
+  <script src="/assets/times-lib.js?v=20261009e" defer></script>
+  <script src="/assets/times-grid.js?v=20261009e" defer></script>
+  <script src="/assets/teach-times.js?v=20261009e" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to the page</a>
@@ -85,6 +85,7 @@
 
           <form class="cohort-form times-new" data-poll-form hidden novalidate>
             <h2>A new poll</h2>
+            <label>Your name, as people will see it <input name="host_name" maxlength="80" autocomplete="name"></label>
             <label>What people will see at the top <input name="title" maxlength="120" placeholder="A Tuesday or Thursday evening cohort, this winter" autocomplete="off"></label>
             <label>A note to them, if you would like one <span class="hint">Who the cohort is for, or anything that would help someone decide.</span><textarea name="note" rows="3" maxlength="1500"></textarea></label>
             <label data-cohort-field hidden>The cohort it is for <span class="hint">Its other teachers will see the answers too.</span><select name="cohort_id"><option value="">Not a cohort yet</option></select></label>
@@ -113,6 +114,21 @@
           <section class="times-detail" data-detail hidden aria-labelledby="detail-title">
             <h2 id="detail-title" data-detail-title></h2>
             <p class="small" data-detail-facts></p>
+            <form class="inline-form times-host-name" data-host-name-form>
+              <label>Your name on this poll <input name="host_name" maxlength="80" autocomplete="name"></label>
+              <div class="actions"><button class="btn-quiet" type="submit">Save the name</button><span class="small" role="status" data-host-name-status></span></div>
+            </form>
+
+            <section class="times-host" aria-labelledby="host-times-title">
+              <h3 id="host-times-title">Your own times</h3>
+              <p class="hint" data-host-hint>Mark the times you could make. They count like everyone else's, and the people answering see a dot on each one, so they know which times could really work.</p>
+              <div class="times-mode" role="radiogroup" aria-label="What tapping a time marks">
+                <label class="times-mode-opt"><input type="radio" name="host_mode" value="works" checked><span class="swatch works" aria-hidden="true"></span>Works for me</label>
+                <label class="times-mode-opt"><input type="radio" name="host_mode" value="if_need_be"><span class="swatch maybe" aria-hidden="true"></span>If need be</label>
+              </div>
+              <div class="times-grid-wrap" data-host-grid></div>
+              <div class="actions"><button class="btn-quiet" type="button" data-host-save>Save my times</button><span class="small" role="status" data-host-status></span></div>
+            </section>
             <div class="times-share">
               <label>The link to share <input readonly data-share-link></label>
               <div class="actions">

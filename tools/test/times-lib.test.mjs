@@ -74,6 +74,8 @@ test('a teacher\'s form is checked before it is saved', () => {
   const ok = { title: ' Fall ', days: ['3', '1'], parts: ['evening'], step: '60', time_zone: 'America/Denver' };
   assert.deepEqual(T.checkPoll(ok).row.days, [1, 3]);
   assert.equal(T.checkPoll(ok).row.title, 'Fall');
+  assert.equal(T.checkPoll(ok).row.host_name, null);
+  assert.equal(T.checkPoll({ ...ok, host_name: '  Ben Wilkoff ' }).row.host_name, 'Ben Wilkoff');
   assert.deepEqual(T.checkPoll(ok).row.minutes, [1020, 1080, 1140, 1200]);
   assert.equal(T.checkPoll(ok).row.first_minute, 1020);
   assert.equal(T.checkPoll(ok).row.last_minute, 1200);
