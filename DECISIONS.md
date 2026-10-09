@@ -704,12 +704,17 @@ evening, or late evening, so mornings and evenings can be offered without
 the afternoon, and the grid leaves a gap where hours are skipped
 (migration 20261009020000, `minutes`).
 
-**The calendar check is free/busy only, and the person still marks.**
+**The calendar check is free/busy only, and what it marks stays the person's to change.**
 Google's `calendar.freebusy` scope shows when someone is busy, never
 what they are doing; the page reads the first four weeks in the browser,
 revokes the permission once read, and saves nothing. Busy times get a
-corner mark, and marking every free time is a separate button the person
-presses. `calendar.freebusy` is a non-sensitive scope, so with no logo the
+corner mark. Ben, the same day: "if you sync your availability on your
+google calendar, that all of the other times show up as available (during
+my normal waking hours - 8:00 am to 8:00 pm)." So free times that start
+between 8 AM and 8 PM on the person's own clock are marked as working; the
+two hours can be changed right there, and changing them re-marks only
+what the page marked, never a time the person set by hand.
+`calendar.freebusy` is a non-sensitive scope, so with no logo the
 `human-shaped` Google app needs no review; it was moved from Testing to
 In production on October 9 (with Ben's yes), which also opens Google
 sign-in to everyone.
