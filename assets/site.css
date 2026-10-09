@@ -2102,3 +2102,88 @@ ol.principles summary:focus-visible { outline: 2px solid var(--accent); outline-
   .head-center > div { grid-column: 1 / -1; }
   .head-center h2 { margin-left: auto; margin-right: auto; max-width: 26ch; }
 }
+
+/* Finding a weekly time (/times/ and /teach/times/). Thistle marks what a
+   person has chosen and, for the teacher, how many chose it; forest stays
+   for what can be clicked. */
+.account.times { max-width: 46rem; }
+.times-head { padding-bottom: 0; }
+.times-note { white-space: pre-line; max-width: var(--measure); margin: 0.75rem 0 0; }
+.times-form { gap: 1.75rem; grid-template-columns: minmax(0, 1fr); }
+.times-state, .times-form > * { min-width: 0; }
+.times-form fieldset { border: 0; padding: 0; margin: 0; min-width: 0; display: grid; gap: 0.75rem; }
+.times-who { max-width: 30rem; }
+.times-pick legend { padding: 0; }
+.times-pick legend h2 { margin: 0; }
+.times-form .hint, .times-teach .hint { margin: 0; font-weight: 400; color: var(--muted); font-size: 0.9rem; max-width: var(--measure); }
+.times-zone label { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; font-weight: 600; font-size: 0.95rem; }
+.times-zone select { max-width: 100%; min-width: 0; flex: 1 1 12rem; font: inherit; font-weight: 400; padding: 0.5rem 0.6rem; border: 1px solid var(--muted); border-radius: 10px; background: var(--card); color: var(--ink); min-height: 44px; }
+.times-calendar { display: grid; gap: 0.4rem; justify-items: start; }
+.times-mode { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.times-form label.times-mode-opt { display: inline-flex; align-items: center; gap: 0.6rem; padding: 0.55rem 0.9rem; min-height: 44px; border: 1px solid var(--rule); border-radius: 10px; background: var(--paper); cursor: pointer; }
+.times-form label.times-mode-opt:has(input:checked) { border-color: var(--ink); }
+.times-form .times-mode-opt input { margin: 0; padding: 0; min-height: 0; width: 1.1rem; height: 1.1rem; accent-color: var(--forest); }
+.swatch { width: 1.1rem; height: 1.1rem; border-radius: 4px; flex: none; }
+.swatch.works { background: var(--thistle); }
+.swatch.maybe { border: 2px dashed var(--thistle); }
+.times-status { min-height: 1.5em; margin: 0; color: var(--muted); }
+.times-comment { max-width: 30rem; }
+
+.times-scroll { overflow-x: auto; }
+.times-grid { border-collapse: separate; border-spacing: 4px; width: 100%; max-width: 38rem; table-layout: fixed; margin-left: -4px; }
+.times-grid th { font-size: 0.9rem; font-weight: 600; color: var(--muted); }
+.times-grid thead th { text-align: center; padding: 0 0 0.2rem; }
+.times-grid abbr { text-decoration: none; }
+.times-grid .times-corner, .times-grid tbody th { width: 4.5rem; }
+.times-grid tbody th { text-align: right; padding-right: 0.35rem; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.times-grid td { padding: 0; }
+.times-cell {
+  appearance: none; display: block; width: 100%; height: 44px; padding: 0; position: relative;
+  border: 1px solid var(--rule); border-radius: 8px; background: var(--card);
+  font: inherit; font-weight: 600; font-size: 0.95rem; color: var(--on-thistle);
+  font-variant-numeric: tabular-nums; cursor: pointer; user-select: none; touch-action: manipulation;
+}
+.times-cell:not(:disabled):hover { border-color: var(--ink); }
+.times-cell:focus-visible { outline: 3px solid var(--forest); outline-offset: 2px; }
+:root[data-theme="dark"] .times-cell:focus-visible { outline-color: var(--thistle); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .times-cell:focus-visible { outline-color: var(--thistle); } }
+.times-cell:disabled { cursor: default; }
+.times-cell:not(.works):not(.h3):not(.h4) { color: var(--ink); }
+.times-cell.works { background: var(--thistle); border-color: var(--thistle); }
+.times-cell.maybe { border: 2px dashed var(--thistle); }
+.times-cell.busy::after { content: ""; position: absolute; top: 4px; right: 4px; border-style: solid; border-width: 0 8px 8px 0; border-color: transparent var(--muted) transparent transparent; }
+.times-cell.works.busy::after { border-right-color: var(--on-thistle); }
+.times-cell.h1 { background: color-mix(in srgb, var(--thistle) 22%, var(--card)); }
+.times-cell.h2 { background: color-mix(in srgb, var(--thistle) 45%, var(--card)); }
+.times-cell.h3 { background: color-mix(in srgb, var(--thistle) 72%, var(--card)); border-color: transparent; }
+.times-cell.h4 { background: var(--thistle); border-color: var(--thistle); }
+.times-cell.picked { outline: 2px solid var(--ink); outline-offset: 2px; }
+.times-legend { display: flex; align-items: center; gap: 0.6rem; font-size: 0.9rem; color: var(--muted); }
+.times-ramp { display: inline-flex; gap: 3px; }
+.times-ramp i { width: 1.5rem; height: 0.9rem; border-radius: 3px; }
+.times-ramp .h1 { background: color-mix(in srgb, var(--thistle) 22%, var(--card)); }
+.times-ramp .h2 { background: color-mix(in srgb, var(--thistle) 45%, var(--card)); }
+.times-ramp .h3 { background: color-mix(in srgb, var(--thistle) 72%, var(--card)); }
+.times-ramp .h4 { background: var(--thistle); }
+
+.times-keep { border-top: 1px solid var(--rule); margin-top: 1rem; }
+.times-link, .times-share { display: grid; gap: 0.6rem; }
+.times-link { grid-template-columns: minmax(0, 1fr) auto; align-items: center; max-width: 34rem; }
+.times-link input, .times-share input { font: inherit; font-size: 0.95rem; padding: 0.6rem 0.7rem; border: 1px solid var(--muted); border-radius: 10px; background: var(--surface); color: var(--ink); min-height: 44px; min-width: 0; width: 100%; }
+.times-share label { display: grid; gap: 0.35rem; font-weight: 600; font-size: 0.95rem; }
+.times-detail { display: grid; gap: 0.9rem; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--rule); }
+.times-detail h3 { margin: 1.25rem 0 0; }
+.times-detail .actions { margin-top: 0.25rem; }
+.times-who-list h4 { margin: 0 0 0.25rem; font-size: 1rem; }
+.times-who-list p { margin: 0.2rem 0; }
+.times-best { margin: 0; padding-left: 1.4rem; }
+.times-best li { margin: 0.3rem 0; }
+.times-days { border: 0; padding: 0; margin: 0; }
+.times-days legend { font-weight: 600; font-size: 0.95rem; padding: 0; margin-bottom: 0.4rem; }
+.times-day-list { display: flex; flex-wrap: wrap; gap: 0.25rem 1.25rem; }
+.times-day-list label.check { min-height: 44px; }
+.times-answers { border-collapse: collapse; width: 100%; font-size: 0.95rem; }
+.times-answers th, .times-answers td { text-align: left; vertical-align: top; padding: 0.6rem 0.8rem; border-top: 1px solid var(--rule); }
+.times-answers thead th { border-top: 0; font-weight: 600; color: var(--muted); }
+.times-answers td .link-btn { min-height: 0; }
+.times [data-saved]:focus { outline: none; }

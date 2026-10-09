@@ -136,7 +136,7 @@ what waits on Ben.
   `bifrieqzkihuxfzttgvd`, free plan, us-west-1, org "Learning is Change,
   Inc"). Schema and row-level security in `supabase/migrations/`, applied
   in order. `supabase/tests/test_policies.py` runs them against a local
-  throwaway Postgres as four people and as a student's AI agent (728
+  throwaway Postgres as four people and as a student's AI agent (761
   checks; agents' tokens carry a `client_id` and can only read); run it
   before applying
   any new migration, and see it fail when a rule is opened on purpose.
@@ -165,6 +165,19 @@ what waits on Ben.
   a cohort's "Before the first session" steps, and gives everyone else
   the request form. `/teach/guide/` is the teaching guide, with
   `COURSE.md` rendered live.
+- **Finding a weekly time** (migration 20261009010000): a teacher makes
+  a poll of weekly times on `/teach/times/` and shares
+  `/times/#<token>`, which anyone answers without an account (the token
+  rides after the #, so no server sees it; neither page is in the
+  sitemap, and both are noindex). Signed-out people never touch the
+  tables: `time_poll`, `answer_time_poll`, `my_time_poll_answer`, and
+  `withdraw_time_poll_answer` check the token and each answer's secret,
+  which lives in `private.time_poll_secrets`. A time is
+  `weekday * 1440 + minute` in the poll's zone, and everyone sees the
+  grid on their own clock, converted on the dates of the cohort's first
+  week (`times-lib.js`). The optional Google Calendar check asks for
+  `calendar.freebusy` only, reads the first four weeks in the browser,
+  and saves nothing.
 - **The public hub:** `/apps/app/?r=<owner>/<repo>` is every app's page
   (its words, where it runs, live commits, its HUMAN-SHAPED.md answers,
   and its conversation on GitHub), drawn only for apps in the directory
@@ -176,7 +189,7 @@ what waits on Ben.
   migration 20261003055000, `public_apps()`; see `research/notes/hub-privacy-notes.md`), which is also their "it is ready": every app is submitted by the cohort's end (`submit-lib.js`, loaded on /cohort/ and /teach/). A teacher can keep an app off /apps/ with `app_hides` (migration 20261003090000), which never touches the student's switch.
 - **Scripts:** `assets/hub-config.js` (public URL and publishable key),
   `hub.js`, `cohorts.js`, `teach.js` with `teach-lib.js`, `cohort.js` and `live.js`
-  with `cohort-lib.js` and `live-lib.js`, and `apps.js` with `apps-lib.js`. Pure logic lives in the `-lib.js` files with
+  with `cohort-lib.js` and `live-lib.js`, and `apps.js` with `apps-lib.js`, and `times.js` and `teach-times.js` with `times-lib.js` and `times-grid.js`. Pure logic lives in the `-lib.js` files with
   tests in `tools/test/` (`node --test tools/test/*.mjs`, 371 tests).
 - **The cohort's conversation:** `discussions.js` with `discussions-lib.js`
   reads and posts the cohort repository's GitHub Discussions on /cohort/

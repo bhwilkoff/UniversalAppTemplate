@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Finding a time | Human Shaped</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0D1E17" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="/assets/favicon.svg?v=20261006q" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20261006q">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/site.css?v=20261009a">
+  <script>
+    (function () {
+      var q = location.search, t = null;
+      if (/[?&]dark\b/.test(q)) t = 'dark'; else if (/[?&]light\b/.test(q)) t = 'light';
+      else { try { t = localStorage.getItem('hs-theme'); } catch (e) {} }
+      if (t) document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+  <script src="/assets/site.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" defer></script>
+  <script src="/assets/hub-config.js" defer></script>
+  <script src="/assets/times-lib.js?v=20261009a" defer></script>
+  <script src="/assets/times-grid.js?v=20261009a" defer></script>
+  <script src="/assets/teach-times.js?v=20261009a" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to the page</a>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
+      <nav class="nav" aria-label="Main">
+        <ul>
+          <li><a href="/principles/">Principles</a></li>
+          <li><a href="/cohorts/" aria-current="true">Cohorts</a></li>
+          <li><a href="/apps/">Apps</a></li>
+          <li><a href="/events/">Events</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#moon"/></svg>
+        </button>
+        <a class="btn-github small" href="/account/">
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>
+          <span>Sign in<span class="long"> with GitHub</span></span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <div class="wrap">
+      <header class="page-head">
+        <h1>Find a weekly time.</h1>
+        <p class="lead">Before a cohort forms, the people who might join can say which weekly times they could make. You choose the days and hours to offer, share the poll's link however you like, and decide the time yourself from what people say. No one needs an account to answer, and the link is never listed anywhere on the site.</p>
+      </header>
+
+      <div class="account teach times-teach" data-teach-times>
+        <section class="account-state" data-state="loading"><p>Checking whether you are signed in…</p></section>
+
+        <section class="account-state" data-state="signed-out" hidden>
+          <p>Polls are made by teachers, so this starts with signing in.</p>
+          <p><a class="btn-github" href="/account/"><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Sign in with GitHub</a></p>
+        </section>
+
+        <section class="account-state" data-state="not-teacher" hidden>
+          <p>Polls are made by teachers. <a href="/teach/">Ask to teach a cohort</a>, and once you are approved you can make one here.</p>
+        </section>
+
+        <section class="account-state" data-state="error" hidden>
+          <p class="error" data-error-text></p>
+          <p><button class="btn-quiet" type="button" data-reload>Try again</button></p>
+        </section>
+
+        <section class="account-state" data-state="teacher" hidden>
+          <h2>Your polls</h2>
+          <div data-poll-list></div>
+          <p><button class="btn-quiet" type="button" data-new-poll>Make a new poll</button></p>
+
+          <form class="cohort-form times-new" data-poll-form hidden novalidate>
+            <h2>A new poll</h2>
+            <label>What people will see at the top <input name="title" maxlength="120" placeholder="A Tuesday or Thursday evening cohort, this winter" autocomplete="off"></label>
+            <label>A note to them, if you would like one <span class="hint">Who the cohort is for, or anything that would help someone decide.</span><textarea name="note" rows="3" maxlength="1500"></textarea></label>
+            <label data-cohort-field hidden>The cohort it is for <span class="hint">Its other teachers will see the answers too.</span><select name="cohort_id"><option value="">Not a cohort yet</option></select></label>
+            <fieldset class="times-days">
+              <legend>Days to offer</legend>
+              <div class="times-day-list"><label class="check"><input type="checkbox" name="days" value="0"> Sunday</label><label class="check"><input type="checkbox" name="days" value="1" checked> Monday</label><label class="check"><input type="checkbox" name="days" value="2" checked> Tuesday</label><label class="check"><input type="checkbox" name="days" value="3" checked> Wednesday</label><label class="check"><input type="checkbox" name="days" value="4" checked> Thursday</label><label class="check"><input type="checkbox" name="days" value="5"> Friday</label><label class="check"><input type="checkbox" name="days" value="6"> Saturday</label></div>
+            </fieldset>
+            <div class="row">
+              <label>Earliest start <input type="time" name="from" value="17:00" step="900"></label>
+              <label>Latest start <input type="time" name="to" value="20:00" step="900"></label>
+              <label>Every <select name="step"><option value="15">15 minutes</option><option value="30" selected>30 minutes</option><option value="60">hour</option></select></label>
+            </div>
+            <div class="row">
+              <label>In the time zone <select name="time_zone" data-zone-pick></select></label>
+              <label>Sessions last <select name="session_minutes"><option value="60">an hour</option><option value="75" selected>75 minutes</option><option value="90">90 minutes</option><option value="120">two hours</option></select></label>
+              <label>Week 1 begins <input type="date" name="starts_on"><span class="hint">Optional. Times are converted for each person using this week's daylight saving.</span></label>
+            </div>
+            <p class="error" role="status" data-form-error></p>
+            <div class="actions">
+              <button class="btn-github" type="submit">Make the poll</button>
+              <button class="link-btn" type="button" data-cancel>Cancel</button>
+            </div>
+          </form>
+
+          <section class="times-detail" data-detail hidden aria-labelledby="detail-title">
+            <h2 id="detail-title" data-detail-title></h2>
+            <p class="small" data-detail-facts></p>
+            <div class="times-share">
+              <label>The link to share <input readonly data-share-link></label>
+              <div class="actions">
+                <button class="btn-github" type="button" data-copy-share>Copy the link</button>
+                <a class="btn-quiet" data-open-share target="_blank" rel="noopener">See it as they will</a>
+              </div>
+              <p class="hint">Anyone with this link can answer, so share it with the people you are inviting rather than posting it in public.</p>
+            </div>
+
+            <h3>What people said</h3>
+            <p class="small" data-answer-count></p>
+            <div class="times-zone">
+              <label>Shown in <select data-detail-zone></select></label>
+            </div>
+            <div class="times-legend" aria-hidden="true"><span>Fewer people</span><span class="times-ramp"><i class="h1"></i><i class="h2"></i><i class="h3"></i><i class="h4"></i></span><span>More</span></div>
+            <div class="times-grid-wrap" data-detail-grid></div>
+            <div class="times-who-list" data-who aria-live="polite"></div>
+
+            <h3>The times the most people can make</h3>
+            <ol class="times-best" data-best></ol>
+
+            <h3>Everyone who answered</h3>
+            <div class="table-wrap"><table class="times-answers"><thead><tr><th scope="col">Name</th><th scope="col">Email</th><th scope="col">Times</th><th scope="col">Note</th><th scope="col"><span class="visually-hidden">Remove</span></th></tr></thead><tbody data-answers></tbody></table></div>
+
+            <div class="actions">
+              <button class="btn-quiet" type="button" data-toggle-open></button>
+              <button class="btn-quiet danger" type="button" data-delete>Delete this poll</button>
+            </div>
+            <p class="small" role="status" data-detail-status></p>
+          </section>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="footer-brand">
+        <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
+        <p>The ideas, the method, the tools, and the cohorts are free, and what you build is yours.</p>
+        <p><a class="go-text" href="/about/">About Human Shaped</a></p>
+      </div>
+      <nav class="footer-links" aria-label="More of the site">
+        <div>
+          <p class="footer-head">Take part</p>
+          <ul>
+            <li><a href="/account/">Your account</a></li>
+            <li><a href="/teach/">Teach a cohort</a></li>
+            <li><a href="/connect/">Connect your agent</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="footer-head">On GitHub</p>
+          <ul>
+            <li><a href="https://github.com/bhwilkoff/UniversalAppTemplate">The template</a></li>
+            <li><a href="https://github.com/orgs/humanshaped/discussions">Discussions</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="footer-head">The fine print</p>
+          <ul>
+            <li><a href="/support/">Help</a></li>
+            <li><a href="/privacy/">Privacy</a></li>
+            <li><a href="/terms/">Terms</a></li>
+          </ul>
+        </div>
+      </nav>
+      <p class="footer-made">Made by <a href="https://learningischange.com">Ben Wilkoff</a>, with <a href="/support/#credits">help from people and tools</a>.</p>
+    </div>
+  </footer>
+</body>
+</html>

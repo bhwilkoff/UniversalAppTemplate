@@ -2525,6 +2525,80 @@ def main():
     attempt(as_user("ben"), "select public.attach_signed_credential(%s, %s)", (bcred, bgood))
     attempt(as_user("bea"), "delete from public.recognitions where id = %s returning id", (late,))
     check("once it is signed, its recognitions are what was signed", len(cred_recs()) == 1)
+
+    # Finding a weekly time (migration 20261009010000): a teacher's poll
+    # anyone with the link answers without an account; names stay with the
+    # poll's teachers, and each answer changes only with its own secret.
+    mk = ("insert into public.time_polls (title, time_zone, days, first_minute, last_minute, step_minutes, cohort_id) "
+          "values ('When (delete me)', 'America/Denver', '{1,3}', 1020, 1200, 60, %s) returning id, token")
+    check("someone who is not a teacher cannot make a time poll", not attempt(as_user("cal"), mk, (None,)))
+    check("a teacher cannot make one for a cohort they do not teach", not attempt(as_user("ben"), mk, (kc,)))
+    check("nor can a teacher's agent", not attempt(as_agent("ben"), mk, (None,)))
+    check("a teacher makes a time poll for their cohort", attempt(as_user("ben"), mk, (bc,)))
+    tp, tok = last_rows[0]
+    check("its link is 32 random characters", len(tok) == 32)
+    anon = lambda: as_user(None)
+    check("signed out, the table itself shows nothing",
+          attempt(anon(), "select id from public.time_polls") and last_rows == [])
+    check("no one reads a poll without its link",
+          attempt(anon(), "select public.time_poll(%s)", (tok[:-1] + ("0" if tok[-1] != "0" else "1"),)) and last_rows == [(None,)])
+    check("signed out, the link reads the poll and its teacher",
+          attempt(anon(), "select public.time_poll(%s)", (tok,)) and last_rows[0][0]["teacher"] == "bhwilkoff" and last_rows[0][0]["days"] == [1, 3])
+    ans = "select public.answer_time_poll(%s, %s, %s::int[], %s::int[], %s, null, %s, %s)"
+    check("a time the poll does not offer is refused (Tuesday)",
+          not attempt(anon(), ans, (tok, "Ivy", "{3900}", "{}", None, None, None)))
+    check("as is one off the step (5:30 PM)",
+          not attempt(anon(), ans, (tok, "Ivy", "{2490}", "{}", None, None, None)))
+    check("and one past the window (9 PM)",
+          not attempt(anon(), ans, (tok, "Ivy", "{2700}", "{}", None, None, None)))
+    check("an answer needs a name", not attempt(anon(), ans, (tok, "  ", "{2460}", "{}", None, None, None)))
+    check("signed out, a person answers with Monday 6 PM and, if need be, Wednesday 7 PM",
+          attempt(anon(), ans, (tok, "Ivy (delete me)", "{2460,2520}", "{5460,2520}", "ivy@example.org", None, None)))
+    ivy = last_rows[0][0]
+    check("and gets back an id and a secret", set(ivy) == {"id", "secret"})
+    check("a time can only be one of works or if need be",
+          attempt(anon(), "select public.my_time_poll_answer(%s, %s, %s)", (tok, ivy["id"], ivy["secret"]))
+          and last_rows[0][0]["works"] == [2460, 2520] and last_rows[0][0]["if_need_be"] == [5460])
+    attempt(anon(), ans, (tok, "Jo", "{2460}", "{2520}", None, None, None))
+    jo = last_rows[0][0]
+    check("someone who answered sees counts, not names",
+          attempt(anon(), "select public.my_time_poll_answer(%s, %s, %s)", (tok, jo["id"], jo["secret"]))
+          and last_rows[0][0]["tally"] == {"answers": 2, "works": {"2460": 2, "2520": 1}, "if_need_be": {"2520": 1, "5460": 1}}
+          and "Ivy" not in json.dumps(last_rows[0][0]["tally"]))
+    check("no one reads an answer without its secret",
+          attempt(anon(), "select public.my_time_poll_answer(%s, %s, %s)", (tok, ivy["id"], jo["secret"])) and last_rows == [(None,)])
+    check("no one changes an answer without its secret",
+          not attempt(anon(), ans, (tok, "Not Ivy", "{2460}", "{}", None, ivy["id"], jo["secret"])))
+    check("the answerer changes their own with it",
+          attempt(anon(), ans, (tok, "Ivy (delete me)", "{5460}", "{}", None, ivy["id"], ivy["secret"])) and last_rows[0][0] == ivy)
+    check("no one writes an answer to the table directly",
+          not attempt(anon(), "insert into public.time_poll_answers (poll_id, name) values (%s, 'x') returning id", (tp,))
+          and not attempt(as_user("cal"), "insert into public.time_poll_answers (poll_id, name) values (%s, 'x') returning id", (tp,)))
+    check("an agent cannot answer for a person", not attempt(as_agent("bea"), ans, (tok, "Bea", "{2460}", "{}", None, None, None)))
+    check("signed out, the answers table shows nothing",
+          attempt(anon(), "select name from public.time_poll_answers") and last_rows == [])
+    check("a signed-in person who is not its teacher sees no names",
+          attempt(as_user("cal"), "select name from public.time_poll_answers") and last_rows == []
+          and attempt(as_user("cal"), "select id from public.time_polls where id = %s", (tp,)) and last_rows == [])
+    check("a co-teacher of its cohort sees its answers too",
+          attempt(as_user("kofi"), "select name from public.time_poll_answers where poll_id = %s", (tp,)) and len(last_rows) == 2)
+    check("the poll's teacher sees names and addresses",
+          attempt(as_user("ben"), "select name, contact from public.time_poll_answers where poll_id = %s order by name", (tp,))
+          and last_rows == [("Ivy (delete me)", None), ("Jo", None)])
+    check("nobody reads an answer's secret, not even the teacher",
+          not attempt(as_user("ben"), "select secret from private.time_poll_secrets"))
+    check("a poll keeps its link",
+          not attempt(as_user("ben"), "update public.time_polls set token = repeat('a', 32) where id = %s returning id", (tp,)))
+    check("someone who is not its teacher cannot close it",
+          attempt(as_user("cal"), "update public.time_polls set open = false where id = %s returning id", (tp,)) and last_rows == [])
+    check("its teacher closes it", attempt(as_user("ben"), "update public.time_polls set open = false where id = %s returning id", (tp,)) and len(last_rows) == 1)
+    check("a closed poll takes no new answers", not attempt(anon(), ans, (tok, "Late", "{2460}", "{}", None, None, None)))
+    check("someone takes back their answer with its secret",
+          attempt(anon(), "select public.withdraw_time_poll_answer(%s, %s, %s)", (tok, jo["id"], jo["secret"])) and last_rows == [(True,)])
+    check("its teacher removes an answer",
+          attempt(as_user("ben"), "delete from public.time_poll_answers where id = %s returning id", (ivy["id"],)) and len(last_rows) == 1)
+    check("its teacher deletes the poll",
+          attempt(as_user("ben"), "delete from public.time_polls where id = %s returning id", (tp,)) and len(last_rows) == 1)
     conn.rollback()
     conn.close()
     failed = [n for n, ok in results if not ok]

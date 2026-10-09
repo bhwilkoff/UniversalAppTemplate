@@ -666,3 +666,41 @@ inquiry-based practice for the activities, plain questions, real people
 outside the screen, and a published product, all inside Write, Play,
 Publish. Note 06's section 5 lists the files that still carry the
 rejected "hum" approach.
+
+## Finding a weekly time, without an account (October 9, 2026)
+
+Ben: "a page that allows for a cohort teacher to create a page for the
+potential participants to weigh in on the best time/day for such an
+ongoing meeting. The page should be accessible and usable for people who
+are not logged in and do not yet have an account... security by
+obscurity (obscure URL that doesn't get listed anywhere)." Then: "make
+sure that it works well across time zones too," and "is it possible to
+have it check a google calendar for availability if you give it access?"
+
+**The poll asks for weekly times, never dates,** because a cohort meets
+at the same time every week. A time is one number in the teacher's zone,
+and each person sees the grid on their own clock, converted on the dates
+of the cohort's first week so daylight saving comes out right.
+
+**The link is the key, and it rides after the #.** 122 random bits that
+no server log or referrer carries, on pages that are noindex and out of
+the sitemap. Signed-out people reach the poll only through four
+functions that check the token, and change an answer only with its own
+secret, which no one can read through the API, the teacher included.
+
+**Names stay with the teacher; counts go to people who have answered.**
+Someone who has not answered yet sees an empty grid, so their first
+choices are their own, and afterward they see how many can make each
+time, which helps them decide what "if need be" is worth.
+
+**The page counts; the teacher chooses.** /teach/times/ shows a heat
+grid, who can make any time, and the five times the most people can
+make, but it never picks the cohort's time.
+
+**The calendar check is free/busy only, and the person still marks.**
+Google's `calendar.freebusy` scope shows when someone is busy, never
+what they are doing; the page reads the first four weeks in the browser,
+revokes the permission once read, and saves nothing. Busy times get a
+corner mark, and marking every free time is a separate button the person
+presses. It needs the Calendar API turned on in the `human-shaped` Cloud
+project and the scope on its consent screen.

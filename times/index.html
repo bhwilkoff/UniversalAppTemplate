@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Finding a time | Human Shaped</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="referrer" content="no-referrer">
+  <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0D1E17" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="/assets/favicon.svg?v=20261006q" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20261006q">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/site.css?v=20261009a">
+  <script>
+    (function () {
+      var q = location.search, t = null;
+      if (/[?&]dark\b/.test(q)) t = 'dark'; else if (/[?&]light\b/.test(q)) t = 'light';
+      else { try { t = localStorage.getItem('hs-theme'); } catch (e) {} }
+      if (t) document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+  <script src="/assets/site.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" defer></script>
+  <script src="/assets/hub-config.js" defer></script>
+  <script src="/assets/times-lib.js?v=20261009a" defer></script>
+  <script src="/assets/times-grid.js?v=20261009a" defer></script>
+  <script src="/assets/times.js?v=20261009a" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to the page</a>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
+      <nav class="nav" aria-label="Main">
+        <ul>
+          <li><a href="/principles/">Principles</a></li>
+          <li><a href="/cohorts/">Cohorts</a></li>
+          <li><a href="/apps/">Apps</a></li>
+          <li><a href="/events/">Events</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#moon"/></svg>
+        </button>
+        <a class="btn-github small" href="/account/">
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>
+          <span>Sign in<span class="long"> with GitHub</span></span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <div class="wrap">
+      <div class="account times" data-times>
+        <section class="times-state" data-state="loading"><p>Finding the poll…</p></section>
+
+        <section class="times-state" data-state="missing" hidden>
+          <h1>There is no poll at this link.</h1>
+          <p class="lead">The link may have been cut short when it was copied, or the teacher may have deleted the poll. Ask whoever sent it for the whole link.</p>
+        </section>
+
+        <section class="times-state" data-state="error" hidden>
+          <h1>The poll could not be loaded.</h1>
+          <p class="lead" data-error-text></p>
+          <p><button class="btn-quiet" type="button" data-retry>Try again</button></p>
+        </section>
+
+        <section class="times-state" data-state="poll" hidden>
+          <header class="page-head times-head">
+            <h1 data-title></h1>
+            <p class="lead" data-from></p>
+            <p class="times-note" data-note hidden></p>
+          </header>
+
+          <p class="notice" data-closed hidden>This poll has closed, so it no longer takes answers. The teacher is choosing a time from the answers they have.</p>
+          <p class="notice" data-saved hidden tabindex="-1"></p>
+
+          <form class="cohort-form times-form" data-form novalidate>
+            <fieldset class="times-who">
+              <legend class="visually-hidden">About you</legend>
+              <label>Your name <input name="name" maxlength="80" autocomplete="name" required></label>
+              <label>Your email, if you would like to hear when the cohort forms <input name="contact" type="email" maxlength="254" autocomplete="email" inputmode="email"></label>
+              <p class="hint">Only the teacher sees your name and email.</p>
+            </fieldset>
+
+            <fieldset class="times-pick">
+              <legend><h2>Which weekly times could you make?</h2></legend>
+              <p class="hint" data-session-line></p>
+              <div class="times-zone">
+                <label>Shown in <select name="zone" data-zone></select></label>
+                <p class="hint" data-zone-line></p>
+              </div>
+              <div class="times-calendar" data-calendar hidden>
+                <button class="btn-quiet" type="button" data-cal-check>Check my Google Calendar</button>
+                <p class="hint">Google tells this page only when you are busy, never what you are doing. Nothing from your calendar is saved or sent to the teacher.</p>
+                <p class="times-status" role="status" aria-live="polite" data-cal-line></p>
+                <button class="link-btn" type="button" data-cal-mark hidden>Mark every time my calendar is free</button>
+              </div>
+              <div class="times-mode" role="radiogroup" aria-label="What tapping a time marks">
+                <label class="times-mode-opt"><input type="radio" name="mode" value="works" checked><span class="swatch works" aria-hidden="true"></span>Works for me</label>
+                <label class="times-mode-opt"><input type="radio" name="mode" value="if_need_be"><span class="swatch maybe" aria-hidden="true"></span>If need be</label>
+              </div>
+              <div class="times-grid-wrap" data-grid></div>
+              <p class="hint" data-count-line hidden>The number in each time is how many people can make it, counting those who said if need be.</p>
+            </fieldset>
+
+            <label class="times-comment">Anything the teacher should know <span class="hint">For example, a week you know you will miss.</span><textarea name="comment" rows="3" maxlength="1000"></textarea></label>
+
+            <p class="times-status" role="status" aria-live="polite" data-status></p>
+            <div class="actions">
+              <button class="btn-github" type="submit" data-submit>Send my answer</button>
+              <button class="link-btn" type="button" data-withdraw hidden>Take back my answer</button>
+            </div>
+          </form>
+
+          <div class="times-keep" data-keep hidden>
+            <h2>Changing your answer later</h2>
+            <p>This browser remembers your answer. To change it from another phone or computer, keep this link, which is yours alone.</p>
+            <p class="times-link"><input readonly data-keep-link aria-label="Your link for changing your answer"> <button class="btn-quiet" type="button" data-copy-keep>Copy</button></p>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="footer-brand">
+        <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
+        <p>The ideas, the method, the tools, and the cohorts are free, and what you build is yours.</p>
+        <p><a class="go-text" href="/about/">About Human Shaped</a></p>
+      </div>
+      <nav class="footer-links" aria-label="More of the site">
+        <div>
+          <p class="footer-head">Take part</p>
+          <ul>
+            <li><a href="/account/">Your account</a></li>
+            <li><a href="/teach/">Teach a cohort</a></li>
+            <li><a href="/connect/">Connect your agent</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="footer-head">On GitHub</p>
+          <ul>
+            <li><a href="https://github.com/bhwilkoff/UniversalAppTemplate">The template</a></li>
+            <li><a href="https://github.com/orgs/humanshaped/discussions">Discussions</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="footer-head">The fine print</p>
+          <ul>
+            <li><a href="/support/">Help</a></li>
+            <li><a href="/privacy/">Privacy</a></li>
+            <li><a href="/terms/">Terms</a></li>
+          </ul>
+        </div>
+      </nav>
+      <p class="footer-made">Made by <a href="https://learningischange.com">Ben Wilkoff</a>, with <a href="/support/#credits">help from people and tools</a>.</p>
+    </div>
+  </footer>
+</body>
+</html>
