@@ -168,12 +168,12 @@
     var btn = $('[data-submit]');
     btn.disabled = true;
     status('Saving…');
-    db.rpc('answer_time_poll', {
+    G.within(db.rpc('answer_time_poll', {
       t: link.token, name: name, works: works, if_need_be: maybe,
       contact: form.elements.contact.value.trim() || null,
       comment: form.elements.comment.value.trim() || null,
       answer: mine ? mine.id : null, secret: mine ? mine.secret : null
-    }).then(function (r) {
+    }), db).then(function (r) {
       if (r.error) throw r.error;
       var first = !mine;
       mine = r.data;
@@ -190,13 +190,13 @@
         saved.focus();
       });
     }).catch(function (err) {
-      status('Your answer was not saved: ' + said(err));
+      status('Your answer was not saved: ' + said(err) + '.');
     }).then(function () { btn.disabled = !poll.open; });
   });
 
   $('[data-withdraw]').addEventListener('click', function () {
     if (!mine) return;
-    db.rpc('withdraw_time_poll_answer', { t: link.token, answer: mine.id, secret: mine.secret }).then(function (r) {
+    G.within(db.rpc('withdraw_time_poll_answer', { t: link.token, answer: mine.id, secret: mine.secret }), db).then(function (r) {
       if (r.error) throw r.error;
       mine = null; tally = null; marks = {}; auto = {}; touched = {};
       remember(null);
@@ -208,7 +208,7 @@
       saved.textContent = 'Your answer has been taken back, and the teacher no longer sees it.';
       saved.hidden = false;
       saved.focus();
-    }).catch(function (err) { status('Your answer was not taken back: ' + said(err)); });
+    }).catch(function (err) { status('Your answer was not taken back: ' + said(err) + '.'); });
   });
 
   // ---- checking a Google Calendar ----------------------------------

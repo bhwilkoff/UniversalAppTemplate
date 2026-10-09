@@ -82,14 +82,19 @@
     var err = $('[data-form-error]');
     if (checked.error) { err.textContent = checked.error; return; }
     err.textContent = 'Saving…';
-    db.from('time_polls').insert(checked.row).select('id').single().then(function (r) {
+    var btn = form.querySelector('button[type="submit"]');
+    btn.disabled = true;
+    G.within(db.from('time_polls').insert(checked.row).select('id').single(), db).then(function (r) {
       if (r.error) { err.textContent = 'The poll was not made: ' + r.error.message; return; }
       err.textContent = '';
       form.reset();
       form.elements.time_zone.value = zone;
       form.hidden = true;
       return loadList().then(function () { return openPoll(r.data.id); });
-    });
+    }).catch(function (e) {
+      err.textContent = 'The poll may not have been made: ' + said(e) + '. Your answers are still in the form. If it appears in your polls above, it was saved.';
+      loadList();
+    }).then(function () { btn.disabled = false; });
   });
 
   // ---- one poll -----------------------------------------------------
@@ -156,7 +161,7 @@
       rm.setAttribute('aria-label', 'Remove ' + a.name + "'s answer");
       rm.addEventListener('click', function () {
         if (!window.confirm('Remove ' + a.name + "'s answer? This cannot be undone.")) return;
-        db.from('time_poll_answers').delete().eq('id', a.id).then(function (r) {
+        G.within(db.from('time_poll_answers').delete().eq('id', a.id), db).catch(function (e) { return { error: { message: said(e) } }; }).then(function (r) {
           if (r.error) { $('[data-detail-status]').textContent = 'It was not removed: ' + r.error.message; return; }
           openPoll(current.id);
           loadList();
@@ -195,7 +200,7 @@
     else input.select();
   });
   $('[data-toggle-open]').addEventListener('click', function () {
-    db.from('time_polls').update({ open: !current.open }).eq('id', current.id).then(function (r) {
+    G.within(db.from('time_polls').update({ open: !current.open }).eq('id', current.id), db).catch(function (e) { return { error: { message: said(e) } }; }).then(function (r) {
       if (r.error) { $('[data-detail-status]').textContent = 'Nothing changed: ' + r.error.message; return; }
       var id = current.id;
       loadList().then(function () { openPoll(id); });
@@ -203,7 +208,7 @@
   });
   $('[data-delete]').addEventListener('click', function () {
     if (!window.confirm('Delete "' + current.title + '" and every answer to it? The link will stop working. This cannot be undone.')) return;
-    db.from('time_polls').delete().eq('id', current.id).then(function (r) {
+    G.within(db.from('time_polls').delete().eq('id', current.id), db).catch(function (e) { return { error: { message: said(e) } }; }).then(function (r) {
       if (r.error) { $('[data-detail-status]').textContent = 'It was not deleted: ' + r.error.message; return; }
       $('[data-detail]').hidden = true;
       current = null;
