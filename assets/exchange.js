@@ -1,0 +1,339 @@
+// An exchange (/exchange/#<link>): a thread of short videos, oldest first,
+// as Threadit arranged its replies. Each video lives in its maker's own
+// Google Drive and plays here through Drive's player. The database decides
+// who may see and add to an exchange (migration 20261011010000); this page
+// only asks.
+(function () {
+  var root = document.querySelector('[data-exchange]');
+  if (!root || !window.supabase || !window.HUB || !window.ExchangeLib) return;
+  var X = window.ExchangeLib;
+  var db = window.HUB.client ? window.HUB.client() : window.supabase.createClient(window.HUB.url, window.HUB.key);
+  var token = null, ex = null, me = null, current = null, replyTo = null, recorder = null, posting = false;
+  var RETURN = 'hs-exchange-return';
+
+  function $(sel) { return root.querySelector(sel); }
+  function el(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text != null) n.textContent = text;
+    return n;
+  }
+  function said(e) { return e && e.message ? e.message : String(e || 'no details'); }
+  function show(state) {
+    root.querySelectorAll('.x-state').forEach(function (s) { s.hidden = s.getAttribute('data-state') !== state; });
+  }
+  function fail(text) { $('[data-error-text]').textContent = text; show('error'); }
+  // The shared hub client gives every request 20 seconds (hub-config.js).
+  function within(p) { return Promise.resolve(p); }
+
+  function tokenFromHash() {
+    var m = /^#?([0-9a-f]{32})(?:\/([0-9a-f-]{36}))?$/.exec(location.hash);
+    return m ? { token: m[1], post: m[2] || null } : null;
+  }
+
+  function face(person, size) {
+    var wrap = el('span', 'x-face');
+    wrap.style.setProperty('--size', size + 'px');
+    var initials = el('span', 'x-initials', String(person.name || '?').split(/\s+/).map(function (w) { return w[0]; }).join('').slice(0, 2).toUpperCase());
+    initials.setAttribute('aria-hidden', 'true');
+    wrap.appendChild(initials);
+    if (person.avatar && /^https:\/\//.test(person.avatar)) {
+      var img = el('img');
+      img.alt = ''; img.width = size; img.height = size; img.loading = 'lazy'; img.referrerPolicy = 'no-referrer';
+      img.onerror = function () { img.remove(); };
+      img.src = person.avatar;
+      wrap.appendChild(img);
+    }
+    return wrap;
+  }
+
+  // ---- the thread -----------------------------------------------------
+  function byId(id) { return ex.posts.filter(function (p) { return p.id === id; })[0]; }
+  function drawHead() {
+    $('[data-title]').textContent = ex.title;
+    document.title = ex.title + ' | Human Shaped';
+    var prompt = $('[data-prompt]');
+    prompt.textContent = ex.prompt || '';
+    prompt.hidden = !ex.prompt;
+    $('[data-summary]').textContent = X.summary(ex);
+    var where = $('[data-where]');
+    where.replaceChildren();
+    if (ex.cohort) {
+      where.appendChild(document.createTextNode('Only the people in '));
+      var a = el('a', null, ex.cohort.title);
+      a.href = '/cohort/?c=' + encodeURIComponent(ex.cohort.slug);
+      where.appendChild(a);
+      where.appendChild(document.createTextNode(' can see this exchange.'));
+    } else {
+      where.textContent = 'Anyone with this page\'s link can watch, and anyone signed in can add a video' + (ex.replies_open ? '.' : ' once its maker opens replies again.');
+    }
+    $('[data-tools]').hidden = !ex.mine;
+    $('[data-toggle-replies]').textContent = ex.replies_open ? 'Close replies' : 'Open replies again';
+  }
+
+  function drawThread() {
+    var list = $('[data-thread]');
+    list.replaceChildren();
+    ex.posts.forEach(function (p, i) {
+      var li = el('li', 'x-clip');
+      var b = el('button', 'x-clip-btn');
+      b.type = 'button';
+      if (current && current.id === p.id) b.setAttribute('aria-current', 'true');
+      var thumb = el('span', 'x-thumb');
+      var links = X.drive(p.drive_file_id);
+      var fresh = Date.now() - new Date(p.created_at).getTime() < 10 * 60000;
+      if (links && !fresh) {
+        var img = el('img');
+        img.alt = ''; img.loading = 'lazy'; img.referrerPolicy = 'no-referrer';
+        img.onerror = function () { img.remove(); };
+        img.src = links.thumb;
+        thumb.appendChild(img);
+      }
+      thumb.appendChild(face(p.author, 36));
+      var len = el('span', 'x-len', p.seconds != null ? X.clock(p.seconds) : '');
+      if (p.seconds != null) thumb.appendChild(len);
+      var words = el('span', 'x-clip-words');
+      words.appendChild(el('span', 'x-clip-name', p.author.name + (p.mine ? ' (you)' : '')));
+      var reply = p.reply_to && byId(p.reply_to);
+      words.appendChild(el('span', 'x-clip-when', (i === 0 ? 'Opened the exchange ' : reply ? 'Answered ' + reply.author.name + ' ' : 'Added a video ') + X.ago(p.created_at)));
+      if (p.note) words.appendChild(el('span', 'x-clip-note', p.note));
+      b.appendChild(thumb); b.appendChild(words);
+      b.setAttribute('aria-label', p.author.name + ', ' + X.ago(p.created_at) + (p.seconds != null ? ', ' + X.lengthWords(p.seconds) : '') + (p.note ? '. ' + p.note : ''));
+      b.addEventListener('click', function () { play(p, true); });
+      li.appendChild(b);
+      list.appendChild(li);
+    });
+    var empty = $('[data-thread-empty]');
+    empty.hidden = ex.posts.length > 0;
+    empty.textContent = ex.mine ? 'No videos yet. Record the first one to open the exchange.' : 'No videos yet.';
+    var add = $('[data-add]');
+    add.hidden = !ex.can_reply || !$('[data-compose]').hidden;
+    add.textContent = ex.posts.length ? 'Add your video' : 'Record the first video';
+    $('[data-closed]').hidden = ex.replies_open || ex.mine;
+    $('[data-signin]').hidden = !!me || !ex.replies_open;
+  }
+
+  function play(p, focus) {
+    current = p;
+    var stage = $('[data-player]');
+    stage.replaceChildren();
+    var now = $('[data-now]');
+    now.replaceChildren();
+    if (!p) {
+      stage.appendChild(el('p', 'x-player-empty', ex.mine ? 'Your opening video will play here.' : 'The first video will play here.'));
+      now.hidden = true;
+      drawThread();
+      return;
+    }
+    var links = X.drive(p.drive_file_id);
+    var frame = el('iframe');
+    frame.src = links.preview;
+    frame.title = 'Video by ' + p.author.name;
+    frame.allow = 'autoplay; fullscreen';
+    frame.setAttribute('allowfullscreen', '');
+    frame.loading = 'lazy';
+    stage.appendChild(frame);
+
+    now.hidden = false;
+    var who = el('div', 'x-now-who');
+    who.appendChild(face(p.author, 44));
+    var lines = el('div');
+    lines.appendChild(el('p', 'x-now-name', p.author.name + (p.mine ? ' (you)' : '')));
+    lines.appendChild(el('p', 'x-now-when', X.ago(p.created_at) + (p.seconds != null ? ', ' + X.lengthWords(p.seconds) : '') + (p.kind === 'screen' ? ', sharing their screen' : '')));
+    who.appendChild(lines);
+    now.appendChild(who);
+    var reply = p.reply_to && byId(p.reply_to);
+    if (reply) {
+      var r = el('p', 'x-now-reply');
+      r.appendChild(document.createTextNode('In answer to '));
+      var rb = el('button', 'link-btn', reply.author.name + '\'s video');
+      rb.type = 'button';
+      rb.addEventListener('click', function () { play(reply, true); });
+      r.appendChild(rb);
+      now.appendChild(r);
+    }
+    if (p.note) now.appendChild(el('p', 'x-now-note', p.note));
+    if (Date.now() - new Date(p.created_at).getTime() < 10 * 60000) {
+      now.appendChild(el('p', 'hint', 'Drive can take a few minutes to prepare a new video. If it does not play yet, open it in Google Drive or come back shortly.'));
+    }
+    var acts = el('div', 'actions');
+    var open = el('a', 'go-text', 'Open in Google Drive');
+    open.href = links.view; open.target = '_blank'; open.rel = 'noopener';
+    acts.appendChild(open);
+    if (ex.can_reply) {
+      var ans = el('button', 'btn-quiet', 'Answer this video');
+      ans.type = 'button';
+      ans.addEventListener('click', function () { compose(p); });
+      acts.appendChild(ans);
+    }
+    if (p.mine || ex.can_moderate) {
+      var rm = el('button', 'link-btn', 'Remove from the exchange');
+      rm.type = 'button';
+      rm.addEventListener('click', function () { removePost(p); });
+      acts.appendChild(rm);
+    }
+    now.appendChild(acts);
+    drawThread();
+    if (focus) {
+      try { history.replaceState(null, '', location.pathname + '#' + token + '/' + p.id); } catch (e) { /* the link still works */ }
+      if (window.matchMedia && window.matchMedia('(max-width: 56rem)').matches) stage.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  // ---- adding a video -------------------------------------------------
+  function compose(to) {
+    replyTo = to || null;
+    var box = $('[data-compose]');
+    box.hidden = false;
+    $('[data-add]').hidden = true;
+    $('[data-compose-title]').textContent = ex.posts.length ? (to ? 'Answer ' + to.author.name : 'Add your video') : 'Record the first video';
+    var line = $('[data-replying]');
+    line.replaceChildren();
+    if (to) {
+      line.appendChild(document.createTextNode('Your video will answer ' + to.author.name + '\'s, and join the end of the exchange. '));
+      var whole = el('button', 'link-btn', 'Answer the whole exchange instead');
+      whole.type = 'button';
+      whole.addEventListener('click', function () { compose(null); });
+      line.appendChild(whole);
+    } else {
+      line.textContent = ex.posts.length ? 'Your video joins the end of the exchange.' : (ex.prompt ? 'Your video opens the exchange, under its prompt.' : 'Your video opens the exchange.');
+    }
+    if (!recorder) recorder = window.ExchangeRecorder.mount($('[data-recorder]'), { onChange: function (r) { $('[data-post]').disabled = !r || posting; } });
+    $('[data-post]').disabled = !recorder.result();
+    box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    $('[data-compose-title]').focus();
+  }
+  function closeCompose() {
+    if (recorder) recorder.reset();
+    $('[data-compose]').hidden = true;
+    $('[data-note]').value = '';
+    $('[data-progress]').hidden = true;
+    $('[data-post-status]').textContent = '';
+    drawThread();
+  }
+
+  function post() {
+    var r = recorder && recorder.result();
+    if (!r || posting) return;
+    posting = true;
+    var btn = $('[data-post]'), bar = $('[data-progress]'), say = $('[data-post-status]');
+    btn.disabled = true;
+    say.textContent = 'Connecting your Google Drive…';
+    var email = me && me.email;
+    window.ExchangeDrive.connect(email).then(function (gtoken) {
+      bar.hidden = false; bar.value = 0;
+      say.textContent = 'Saving to your Google Drive…';
+      return window.ExchangeDrive.save(gtoken, r.blob, {
+        name: X.fileName(ex.title, new Date(), r.mime), mime: r.mime,
+        description: 'Recorded for "' + ex.title + '" on humanshaped.org.'
+      }, function (f) {
+        bar.value = Math.round(f * 100);
+        say.textContent = 'Saving to your Google Drive… ' + Math.round(f * 100) + '%';
+      });
+    }).then(function (fileId) {
+      say.textContent = 'Adding it to the exchange…';
+      return within(db.rpc('add_exchange_post', {
+        t: token, drive_file_id: fileId, mime: X.baseType(r.mime), kind: r.kind,
+        seconds: r.seconds, note: $('[data-note]').value.trim() || null, reply_to: replyTo ? replyTo.id : null
+      })).then(function (res) {
+        if (res.error) throw new Error('your video is in your Drive, but the exchange did not take it: ' + res.error.message);
+        return res.data;
+      });
+    }).then(function (postId) {
+      posting = false;
+      closeCompose();
+      return load(postId);
+    }).catch(function (e) {
+      posting = false;
+      btn.disabled = !recorder.result();
+      bar.hidden = true;
+      say.textContent = 'Not posted: ' + said(e) + '. Your recording is still here, so you can try again.';
+    });
+  }
+
+  function removePost(p) {
+    if (!window.confirm('Take this video out of the exchange? It stays in ' + (p.mine ? 'your' : 'its maker\'s') + ' Google Drive, where it can be deleted.')) return;
+    within(db.rpc('remove_exchange_post', { post: p.id })).then(function (r) {
+      if (r.error) throw r.error;
+      return load();
+    }).catch(function (e) { window.alert('It was not removed: ' + said(e) + '.'); });
+  }
+
+  // ---- the maker's tools ------------------------------------------------
+  function copyLink(btn) {
+    var url = location.origin + location.pathname + '#' + token;
+    var done = function () { btn.textContent = 'Copied'; setTimeout(function () { btn.textContent = 'Copy the link'; }, 2000); };
+    if (navigator.clipboard) navigator.clipboard.writeText(url).then(done, function () { window.prompt('Copy this link', url); });
+    else window.prompt('Copy this link', url);
+  }
+
+  // ---- signing in to reply ----------------------------------------------
+  function mountSignIn() {
+    var gbox = $('[data-google]');
+    if (window.HSGoogle && gbox && !gbox.dataset.mounted) {
+      gbox.dataset.mounted = '1';
+      window.HSGoogle.mount({
+        db: db, button: gbox, prompt: false,
+        theme: document.documentElement.getAttribute('data-theme') === 'dark' || (!document.documentElement.getAttribute('data-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light',
+        onSession: function () { load(); },
+        onError: function (e) { $('[data-signin-status]').textContent = 'Google sign-in did not finish: ' + said(e) + '.'; }
+      });
+    }
+  }
+  $('[data-github]').addEventListener('click', function () {
+    try { sessionStorage.setItem(RETURN, location.hash.replace(/^#/, '')); } catch (e) { /* comes back to /exchange/ without it */ }
+    db.auth.signInWithOAuth({ provider: 'github', options: { redirectTo: location.origin + '/exchange/' } });
+  });
+
+  // ---- loading ------------------------------------------------------------
+  function load(selectId) {
+    return db.auth.getSession().then(function (s) {
+      me = s.data && s.data.session ? s.data.session.user : null;
+      var t = tokenFromHash();
+      if (!t) {
+        var back = null;
+        try { back = sessionStorage.getItem(RETURN); sessionStorage.removeItem(RETURN); } catch (e) { /* none */ }
+        if (back) { history.replaceState(null, '', location.pathname + '#' + back); t = tokenFromHash(); }
+      }
+      if (!t) return show('missing');
+      token = t.token;
+      return within(db.rpc('exchange', { t: token })).then(function (r) {
+        if (r.error) throw r.error;
+        if (!r.data) return show('missing');
+        if (r.data.private) {
+          $('[data-private-signin]').hidden = !!me;
+          return show('private');
+        }
+        ex = r.data;
+        drawHead();
+        show('ready');
+        var pick = byId(selectId || t.post) || (current && byId(current.id)) || ex.posts[0] || null;
+        play(pick, false);
+        mountSignIn();
+        if (ex.mine && !ex.posts.length && $('[data-compose]').hidden) compose(null);
+      });
+    }).catch(function (e) { fail('The exchange could not be loaded: ' + said(e) + '.'); });
+  }
+
+  $('[data-add]').addEventListener('click', function () { compose(null); });
+  $('[data-post]').addEventListener('click', post);
+  $('[data-cancel]').addEventListener('click', closeCompose);
+  $('[data-copy]').addEventListener('click', function (e) { copyLink(e.target); });
+  $('[data-toggle-replies]').addEventListener('click', function () {
+    within(db.from('exchanges').update({ replies_open: !ex.replies_open }).eq('token', token)).then(function (r) {
+      if (r.error) throw r.error;
+      return load();
+    }).catch(function (e) { window.alert('Nothing changed: ' + said(e) + '.'); });
+  });
+  $('[data-delete]').addEventListener('click', function () {
+    if (!window.confirm('Delete "' + ex.title + '" for everyone? The videos stay in each person\'s Google Drive. This cannot be undone.')) return;
+    within(db.from('exchanges').delete().eq('token', token)).then(function (r) {
+      if (r.error) throw r.error;
+      location.href = '/account/#exchanges';
+    }).catch(function (e) { window.alert('It was not deleted: ' + said(e) + '.'); });
+  });
+  $('[data-retry]').addEventListener('click', function () { load(); });
+  window.addEventListener('hashchange', function () { var t = tokenFromHash(); if (!t || t.token !== token) { current = null; load(); } });
+  window.addEventListener('pagehide', function () { if (recorder) recorder.release(); });
+  load();
+})();

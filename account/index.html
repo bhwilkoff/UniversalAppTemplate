@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261009g">
+  <link rel="stylesheet" href="/assets/site.css?v=20261011a">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -131,6 +131,20 @@
 
           <h2>Your cohorts</h2>
           <div data-my-cohorts></div>
+
+          <section id="exchanges" class="x-section" data-exchanges-account hidden>
+            <h2>Exchanges</h2>
+            <p class="small">Short videos back and forth, in a cohort between sessions or with anyone you send the link to. Each video is saved in its maker's own Google Drive.</p>
+            <div data-x-list></div>
+            <p><button class="btn-quiet" type="button" data-x-new>Start an exchange</button></p>
+            <form class="cohort-form x-form" data-x-form hidden novalidate>
+              <label>What to call it <input name="title" maxlength="120" autocomplete="off" placeholder="Tell us about the problem you want to build for"></label>
+              <label>What you are asking, if you like <span class="hint">Shown under its name, so the first person to answer knows where to begin.</span><textarea name="prompt" rows="3" maxlength="2000"></textarea></label>
+              <label>Who can see it <select name="where"><option value="">Anyone with its link (people sign in to add a video)</option></select></label>
+              <p class="small" role="status" data-x-status></p>
+              <div class="actions"><button class="btn-github" type="submit">Start it, and record the first video</button><button class="link-btn" type="button" data-x-cancel>Cancel</button></div>
+            </form>
+          </section>
 
           <h2>Cohorts you can join</h2>
           <div data-open-cohorts></div>
@@ -261,6 +275,8 @@
   <script src="/assets/google-signin-lib.js" defer></script>
   <script src="/assets/google-signin.js" defer></script>
   <script src="/assets/hub.js" defer></script>
+  <script src="/assets/exchange-lib.js?v=20261011a" defer></script>
+  <script src="/assets/exchange-list.js?v=20261011a" defer></script>
 
   <footer class="site-footer">
     <div class="wrap">

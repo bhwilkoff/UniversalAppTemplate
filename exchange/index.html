@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Exchange | Human Shaped</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="referrer" content="no-referrer">
+  <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#131916" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="/assets/favicon.svg?v=20261006q" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20261006q">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/site.css?v=20261011a">
+  <script>
+    (function () {
+      var q = location.search, t = null;
+      if (/[?&]dark\b/.test(q)) t = 'dark'; else if (/[?&]light\b/.test(q)) t = 'light';
+      else { try { t = localStorage.getItem('hs-theme'); } catch (e) {} }
+      if (t) document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+  <script src="/assets/site.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" defer></script>
+  <script src="/assets/hub-config.js?v=20261009a" defer></script>
+  <script src="/assets/google-signin-lib.js" defer></script>
+  <script src="/assets/google-signin.js" defer></script>
+  <script src="/assets/exchange-lib.js?v=20261011a" defer></script>
+  <script src="/assets/exchange-recorder.js?v=20261011a" defer></script>
+  <script src="/assets/exchange-drive.js?v=20261011a" defer></script>
+  <script src="/assets/exchange.js?v=20261011a" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to the page</a>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
+      <nav class="nav" aria-label="Main">
+        <ul>
+          <li><a href="/principles/">Principles</a></li>
+          <li><a href="/cohorts/">Cohorts</a></li>
+          <li><a href="/apps/">Apps</a></li>
+          <li><a href="/events/">Events</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#moon"/></svg>
+        </button>
+        <a class="btn-github small" href="/account/">
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>
+          <span>Sign in<span class="long"> with GitHub</span></span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <div class="wrap">
+      <div class="exchange" data-exchange>
+        <section class="x-state" data-state="loading"><p>Opening the exchange…</p></section>
+
+        <section class="x-state" data-state="missing" hidden>
+          <h1>There is no exchange at this link.</h1>
+          <p class="lead">The link may have been cut short when it was copied, or the exchange may have been deleted. Ask whoever sent it for the whole link.</p>
+        </section>
+
+        <section class="x-state" data-state="private" hidden>
+          <h1>This exchange is for a cohort.</h1>
+          <p class="lead">Only the people in the cohort it belongs to can watch it and add to it.</p>
+          <p data-private-signin><a class="btn-github" href="/account/"><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Sign in</a></p>
+        </section>
+
+        <section class="x-state" data-state="error" hidden>
+          <h1>The exchange could not be opened.</h1>
+          <p class="lead" data-error-text></p>
+          <p><button class="btn-quiet" type="button" data-retry>Try again</button></p>
+        </section>
+
+        <section class="x-state" data-state="ready" hidden>
+          <header class="x-head">
+            <h1 data-title></h1>
+            <p class="x-prompt" data-prompt hidden></p>
+            <p class="x-summary"><span data-summary></span> <span data-where></span></p>
+            <div class="x-tools" data-tools hidden>
+              <button class="btn-quiet" type="button" data-copy>Copy the link</button>
+              <button class="btn-quiet" type="button" data-toggle-replies></button>
+              <button class="link-btn" type="button" data-delete>Delete this exchange</button>
+            </div>
+          </header>
+
+          <div class="x-layout">
+            <section class="x-stage" aria-label="The video playing now">
+              <div class="x-player" data-player></div>
+              <div class="x-now" data-now hidden></div>
+            </section>
+
+            <section class="x-thread" aria-labelledby="thread-title">
+              <h2 id="thread-title" class="x-thread-title">The exchange</h2>
+              <ol class="x-clips" data-thread></ol>
+              <p class="x-empty" data-thread-empty hidden></p>
+              <p><button class="btn-github" type="button" data-add hidden>Add your video</button></p>
+              <p class="hint" data-closed hidden>Its maker has closed this exchange to new videos.</p>
+              <div class="x-signin" data-signin hidden>
+                <p>Sign in to add a video of your own. Your video is saved in your own Google Drive.</p>
+                <div class="google-signin" data-google></div>
+                <p><button class="link-btn" type="button" data-github>Sign in with GitHub instead</button></p>
+                <p class="hint" role="status" data-signin-status></p>
+              </div>
+            </section>
+          </div>
+
+          <section class="x-compose" data-compose hidden aria-labelledby="compose-title">
+            <h2 id="compose-title" tabindex="-1" data-compose-title>Add your video</h2>
+            <p class="hint" data-replying></p>
+            <div data-recorder></div>
+            <label class="x-note">A few words with it, if you like <span class="hint">Shown beside your video, and read aloud to people who use a screen reader.</span><textarea data-note rows="2" maxlength="1000"></textarea></label>
+            <p class="hint">Your video is saved in your own Google Drive, in a folder called Human Shaped exchanges, and anyone with its link can watch it. Taking it out of the exchange later leaves it in your Drive.</p>
+            <progress class="x-progress" data-progress max="100" value="0" hidden></progress>
+            <p class="x-post-status" role="status" aria-live="polite" data-post-status></p>
+            <div class="actions">
+              <button class="btn-github" type="button" data-post disabled>Post this video</button>
+              <button class="link-btn" type="button" data-cancel>Cancel</button>
+            </div>
+          </section>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="footer-brand">
+        <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
+        <p>The ideas, the method, the tools, and the cohorts are free, and what you build is yours.</p>
+        <p><a class="go-text" href="/about/">About Human Shaped</a></p>
+      </div>
+      <nav class="footer-links" aria-label="More of the site">
+        <div>
+          <p class="footer-head">Take part</p>
+          <ul>
+            <li><a href="/account/">Your account</a></li>
+            <li><a href="/teach/">Teach a cohort</a></li>
+            <li><a href="/connect/">Connect your agent</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="footer-head">On GitHub</p>
+          <ul>
+            <li><a href="https://github.com/bhwilkoff/UniversalAppTemplate">The template</a></li>
+            <li><a href="https://github.com/orgs/humanshaped/discussions">Discussions</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="footer-head">The fine print</p>
+          <ul>
+            <li><a href="/support/">Help</a></li>
+            <li><a href="/privacy/">Privacy</a></li>
+            <li><a href="/terms/">Terms</a></li>
+          </ul>
+        </div>
+      </nav>
+      <p class="footer-made">Made by <a href="https://learningischange.com">Ben Wilkoff</a>, with <a href="/support/#credits">help from people and tools</a>.</p>
+    </div>
+  </footer>
+</body>
+</html>

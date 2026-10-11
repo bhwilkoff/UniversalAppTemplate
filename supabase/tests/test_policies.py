@@ -2643,6 +2643,79 @@ def main():
           attempt(as_user("ben"), "delete from public.time_poll_answers where id = %s returning id", (ivy["id"],)) and len(last_rows) == 1)
     check("its teacher deletes the poll",
           attempt(as_user("ben"), "delete from public.time_polls where id = %s returning id", (tp,)) and len(last_rows) == 1)
+
+    # Exchanges (migration 20261011010000): threads of videos kept in each
+    # maker's Drive; a cohort's are for the cohort, others for anyone with
+    # the link, and replying needs an account.
+    for name, app_meta, user_meta in [
+        ("xan", "{}", '{"user_name": "xan", "provider_id": "777001"}'),
+        ("yara", '{"provider": "google"}', '{"full_name": "Yara Quill", "email": "yara@example.org", "picture": "https://example.org/y.png"}'),
+    ]:
+        uid = str(uuid.uuid4())
+        su.execute("reset role")
+        su.execute("insert into auth.users (id, email, raw_app_meta_data, raw_user_meta_data) values (%s, %s, %s, %s)",
+                   (uid, name + "@example.org", app_meta, user_meta))
+        people[name] = uid
+    mkx = "select public.create_exchange(%s, %s, %s)"
+    check("signed out, no one starts an exchange", not attempt(as_user(None), mkx, ("Hi", None, None)))
+    check("an agent cannot start one", not attempt(as_agent("xan"), mkx, ("Hi", None, None)))
+    check("anyone signed in starts an open exchange", attempt(as_user("xan"), mkx, ("Open hello (delete me)", "Say hello", None)))
+    xo = last_rows[0][0]
+    check("someone outside a cohort cannot start an exchange inside it", not attempt(as_user("xan"), mkx, ("In", None, bc)))
+    check("a teacher starts one inside their cohort", attempt(as_user("ben"), mkx, ("Week 2 check-in (delete me)", None, bc)))
+    xc = last_rows[0][0]
+    see = "select public.exchange(%s)"
+    check("signed out, an open exchange reads by its link",
+          attempt(as_user(None), see, (xo,)) and last_rows[0][0]["title"] == "Open hello (delete me)" and last_rows[0][0]["can_reply"] is False)
+    check("no link, no exchange", attempt(as_user(None), see, ("0" * 32,)) and last_rows == [(None,)])
+    check("signed out, a cohort's exchange says only that it is private",
+          attempt(as_user(None), see, (xc,)) and last_rows[0][0] == {"private": True})
+    check("so does it for someone signed in outside the cohort",
+          attempt(as_user("xan"), see, (xc,)) and last_rows[0][0] == {"private": True})
+    check("a co-teacher of the cohort sees it", attempt(as_user("kofi"), see, (xc,)) and last_rows[0][0]["title"] == "Week 2 check-in (delete me)")
+    post = "select public.add_exchange_post(%s, %s, %s, %s, %s, %s, %s)"
+    check("signed out, no one posts", not attempt(as_user(None), post, (xo, "abcdefghij123", "video/mp4", "camera", 30, None, None)))
+    check("an agent cannot post", not attempt(as_agent("yara"), post, (xo, "abcdefghij123", "video/mp4", "camera", 30, None, None)))
+    check("a Drive id must look like one", not attempt(as_user("yara"), post, (xo, "../../etc", "video/mp4", "camera", 30, None, None)))
+    check("anyone signed in replies to an open exchange",
+          attempt(as_user("xan"), post, (xo, "calfirstvideo01", "video/mp4", "camera", 42, "Hello all", None)))
+    first = last_rows[0][0]
+    check("and replies to a video in it",
+          attempt(as_user("yara"), post, (xo, "deereplyvideo01", "video/webm", "screen", 61, None, first)))
+    deep = last_rows[0][0]
+    check("a reply must answer a video in the same exchange",
+          not attempt(as_user("ben"), post, (xc, "benvideo000001", "video/mp4", "camera", 10, None, first)))
+    check("someone outside the cohort cannot post in its exchange",
+          not attempt(as_user("xan"), post, (xc, "calvideo000001", "video/mp4", "camera", 10, None, None)))
+    check("the exchange reads back its videos in order, with names, never emails",
+          attempt(as_user(None), see, (xo,)) and [p["drive_file_id"] for p in last_rows[0][0]["posts"]] == ["calfirstvideo01", "deereplyvideo01"]
+          and last_rows[0][0]["posts"][1]["reply_to"] == str(first) and "@" not in json.dumps(last_rows[0][0]))
+    check("signed out, the tables themselves show nothing",
+          attempt(as_user(None), "select id from public.exchanges") and last_rows == []
+          and attempt(as_user(None), "select id from public.exchange_posts") and last_rows == [])
+    check("signed in, no one reads another's exchanges from the table",
+          attempt(as_user("yara"), "select id from public.exchanges") and last_rows == []
+          and attempt(as_user("yara"), "select id from public.exchange_posts") and last_rows == [])
+    sx = conn.cursor(); sx.execute("reset role"); sx.execute("select id from public.exchanges where token = %s", (xo,)); xo_id = sx.fetchone()[0]
+    check("no one writes a video to the table directly",
+          not attempt(as_user("yara"), "insert into public.exchange_posts (exchange_id, drive_file_id) values (%s, 'zzzzzzzzzzzz') returning id", (xo_id,)))
+    check("someone who made one or replied finds it among their exchanges",
+          attempt(as_user("yara"), "select token, made, mine from public.my_exchanges()") and last_rows == [(xo, False, 1)]
+          and attempt(as_user("xan"), "select token, made from public.my_exchanges()") and (xo, True) in last_rows)
+    check("a cohort's exchanges list for its people only",
+          attempt(as_user("kofi"), "select token from public.cohort_exchanges(%s)", (bc,)) and last_rows == [(xc,)]
+          and attempt(as_user("xan"), "select token from public.cohort_exchanges(%s)", (bc,)) and last_rows == [])
+    check("someone else cannot remove a video", not attempt(as_user("yara"), "select public.remove_exchange_post(%s)", (first,)))
+    check("the exchange's maker can", attempt(as_user("xan"), "select public.remove_exchange_post(%s)", (deep,)) and last_rows == [(True,)])
+    check("another person cannot close the exchange",
+          attempt(as_user("yara"), "update public.exchanges set replies_open = false where token = %s returning id", (xo,)) and last_rows == [])
+    check("its maker closes replies", attempt(as_user("xan"), "update public.exchanges set replies_open = false where token = %s returning id", (xo,)) and len(last_rows) == 1)
+    check("then no one else can reply", not attempt(as_user("yara"), post, (xo, "deelatevideo01", "video/mp4", "camera", 5, None, None)))
+    check("but its maker still can", attempt(as_user("xan"), post, (xo, "callatevideo01", "video/mp4", "camera", 5, None, None)))
+    check("an exchange keeps its link", not attempt(as_user("xan"), "update public.exchanges set token = repeat('b', 32) where token = %s returning id", (xo,)))
+    check("its maker deletes it, and its videos go with it",
+          attempt(as_user("xan"), "delete from public.exchanges where token = %s returning id", (xo,)) and len(last_rows) == 1
+          and attempt(as_user(None), see, (xo,)) and last_rows == [(None,)])
     conn.rollback()
     conn.close()
     failed = [n for n, ok in results if not ok]

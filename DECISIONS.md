@@ -754,3 +754,43 @@ what the page marked, never a time the person set by hand.
 `human-shaped` Google app needs no review; it was moved from Testing to
 In production on October 9 (with Ben's yes), which also opens Google
 sign-in to everyone.
+
+## Exchanges: threads of short videos, kept in each maker's own Drive (October 11, 2026)
+
+Ben: "an asynchronous video system that utlizes the ability to record and
+upload a video to Google Drive and then embed it as a response to a
+privously posted video. Ideally, it would work as Threadit did ... the
+recording system has to work in desktop browser and on a phone, but
+because we are hosting the site on Github Pages, the uploads should be
+directly to the Google Drive account that you logged in with and then
+embedded dirctly into the page ... They should be called exchanges."
+
+**An exchange is Threadit's shape:** short clips (five minutes at most),
+the camera or the screen, re-recorded as often as the person likes before
+posting, kept oldest first as one conversation, each able to answer an
+earlier one, and shared by link, with the maker deciding whether others
+may still add to it.
+
+**The video goes from the browser to the person's own Drive, never
+through the site.** The site asks Google only for `drive.file` (the files
+it makes, nothing else, and non-sensitive, so no review), puts each video
+in a "Human Shaped exchanges" folder, uploads it in resumable 8 MiB
+pieces, and shares it "anyone with the link" so Drive's player can embed
+it. The hub keeps only the file's id. A new video needs a few minutes of
+Drive's processing before others can play it, and Drive's player can fail
+where third-party cookies are blocked, so every video also links to Drive.
+
+**MP4 first.** It plays most reliably in Drive, Safari only records it, and
+Chrome records it too; WebM is the fallback, and a phone's own camera app
+or a file the person already has is always offered.
+
+**A cohort's exchanges are for the cohort; others for anyone with the
+link.** Watching an open exchange needs no account; adding a video does,
+so people find their exchanges again on /account/. Anyone in a cohort can
+start one there. A video comes out by its poster, the exchange's maker,
+or a cohort teacher; its file stays in its maker's Drive.
+
+**How to apply:** migration 20261011010000 (all reads through `exchange()`,
+`my_exchanges()`, and `cohort_exchanges()`), `exchange-lib.js` (tested),
+`exchange-drive.js`, `exchange-recorder.js`, `exchange.js`, and
+`exchange-list.js` on /account/ and /cohort/.

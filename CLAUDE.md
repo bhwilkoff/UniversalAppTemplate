@@ -178,6 +178,12 @@ what waits on Ben.
   week (`times-lib.js`). The optional Google Calendar check asks for
   `calendar.freebusy` only, reads the first four weeks in the browser,
   and saves nothing.
+- **Exchanges** (DECISIONS.md, "Exchanges"; migration 20261011010000):
+  threads of short videos at `/exchange/#<link>`, listed and started on
+  /account/ (#exchanges) and on each /cohort/ page. Videos are recorded in
+  the browser (`exchange-recorder.js`, MP4 first) and saved to the
+  poster's own Google Drive with `drive.file` (`exchange-drive.js`,
+  resumable uploads, shared by link); the hub keeps only Drive file ids.
 - **The public hub:** `/apps/app/?r=<owner>/<repo>` is every app's page
   (its words, where it runs, live commits, its HUMAN-SHAPED.md answers,
   and its conversation on GitHub), drawn only for apps in the directory

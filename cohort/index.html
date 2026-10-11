@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261009g">
+  <link rel="stylesheet" href="/assets/site.css?v=20261011a">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -157,6 +157,19 @@
             <div data-talk></div>
           </section>
 
+          <section aria-labelledby="exchanges-title" class="x-section" data-exchanges-cohort hidden>
+            <h2 id="exchanges-title">Exchanges</h2>
+            <p class="small">Short videos back and forth between sessions, seen only by this cohort. Each video is saved in its maker's own Google Drive.</p>
+            <div data-x-list></div>
+            <p><button class="btn-quiet" type="button" data-x-new>Start an exchange</button></p>
+            <form class="cohort-form x-form" data-x-form hidden novalidate>
+              <label>What to call it <input name="title" maxlength="120" autocomplete="off" placeholder="What surprised you when someone else used your app?"></label>
+              <label>What you are asking, if you like <span class="hint">Shown under its name, so the first person to answer knows where to begin.</span><textarea name="prompt" rows="3" maxlength="2000"></textarea></label>
+              <p class="small" role="status" data-x-status></p>
+              <div class="actions"><button class="btn-github" type="submit">Start it, and record the first video</button><button class="link-btn" type="button" data-x-cancel>Cancel</button></div>
+            </form>
+          </section>
+
           <section aria-labelledby="group-title" data-group-section hidden>
             <h2 id="group-title">Your group</h2>
             <div data-group></div>
@@ -238,6 +251,8 @@
   <script src="/assets/recognition-lib.js" defer></script>
   <script src="/assets/curriculum-pages-lib.js" defer></script>
   <script src="/assets/cohort.js" defer></script>
+  <script src="/assets/exchange-lib.js?v=20261011a" defer></script>
+  <script src="/assets/exchange-list.js?v=20261011a" defer></script>
 
   <footer class="site-footer">
     <div class="wrap">
