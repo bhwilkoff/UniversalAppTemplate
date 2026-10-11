@@ -227,14 +227,20 @@
       stopTracks();
       var probe = document.createElement('video');
       probe.preload = 'metadata';
-      var url = URL.createObjectURL(f);
+      probe.muted = true;
+      var url = URL.createObjectURL(f), settled = false;
+      // Browsers may hold off reading a video in a background tab; the
+      // review should not wait on its length forever.
+      var late = setTimeout(function () { if (settled) return; settled = true; URL.revokeObjectURL(url); showReview(f, null, 'upload'); }, 4000);
       probe.onloadedmetadata = function () {
+        if (settled) return;
+        settled = true; clearTimeout(late);
         var s = isFinite(probe.duration) ? Math.round(probe.duration) : null;
         URL.revokeObjectURL(url);
         if (s && s > X.MAX_SECONDS + 5) { say('That video is ' + X.lengthWords(s) + ' long. Exchanges keep each video to five minutes.'); return; }
         showReview(f, s, 'upload');
       };
-      probe.onerror = function () { URL.revokeObjectURL(url); showReview(f, null, 'upload'); };
+      probe.onerror = function () { if (settled) return; settled = true; clearTimeout(late); URL.revokeObjectURL(url); showReview(f, null, 'upload'); };
       probe.src = url;
     }
     useFile.addEventListener('click', function () { pick.click(); });
