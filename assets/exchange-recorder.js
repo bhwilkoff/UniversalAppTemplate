@@ -44,7 +44,7 @@
     var review = el('video', 'xr-review');
     review.controls = true; review.playsInline = true; review.setAttribute('playsinline', ''); review.hidden = true;
     var idle = el('div', 'xr-idle');
-    var idleText = el('p', null, canRecord ? 'Your camera turns on when you press the button below, and nothing is recorded until you press Record.' : 'This browser cannot record in the page. Use your camera app, or a video you already have.');
+    var idleText = el('p', null, canRecord ? 'Record a new video, or upload one you already have. Your camera turns on only when you ask it to, and nothing is recorded until you press Record.' : 'This browser cannot record in the page. Upload a video you already have, or record one with your camera app.');
     idle.appendChild(idleText);
     var count = el('div', 'xr-count');
     count.setAttribute('aria-hidden', 'true');
@@ -58,9 +58,11 @@
     var recBtn = button('xr-rec', 'Record');
     var stopBtn = button('xr-rec stop', 'Stop');
     var againBtn = button('btn-quiet', 'Record again');
-    recBtn.hidden = stopBtn.hidden = againBtn.hidden = true;
+    var upBtn = button('btn-quiet', 'Upload a video');
+    var otherBtn = button('btn-quiet', 'Choose a different video');
+    recBtn.hidden = stopBtn.hidden = againBtn.hidden = otherBtn.hidden = true;
     if (!canRecord) onBtn.hidden = true;
-    controls.appendChild(onBtn); controls.appendChild(recBtn); controls.appendChild(stopBtn); controls.appendChild(againBtn);
+    controls.appendChild(onBtn); controls.appendChild(upBtn); controls.appendChild(recBtn); controls.appendChild(stopBtn); controls.appendChild(againBtn); controls.appendChild(otherBtn);
 
     var status = el('p', 'xr-status');
     status.setAttribute('role', 'status');
@@ -72,12 +74,11 @@
     var shoot = el('input');
     shoot.type = 'file'; shoot.accept = 'video/*'; shoot.setAttribute('capture', 'user'); shoot.hidden = true;
     var altLine = el('p', 'hint');
-    var useApp = button('link-btn', 'record with your camera app');
-    var useFile = button('link-btn', 'choose a video you already have');
+    var useApp = button('link-btn', 'record with your phone\'s camera app');
     altLine.appendChild(document.createTextNode('Or '));
-    if (phone) { altLine.appendChild(useApp); altLine.appendChild(document.createTextNode(', or ')); }
-    altLine.appendChild(useFile);
-    altLine.appendChild(document.createTextNode('.'));
+    altLine.appendChild(useApp);
+    altLine.appendChild(document.createTextNode(' and come back here to post it.'));
+    altLine.hidden = !phone;
     alt.appendChild(altLine); alt.appendChild(pick); alt.appendChild(shoot);
 
     wrap.appendChild(sources); wrap.appendChild(stage); wrap.appendChild(controls); wrap.appendChild(status); wrap.appendChild(alt);
@@ -96,9 +97,11 @@
       live.hidden = what !== 'live';
       review.hidden = what !== 'review';
       onBtn.hidden = !canRecord || what !== 'idle';
+      upBtn.hidden = what !== 'idle';
       recBtn.hidden = what !== 'live';
       stopBtn.hidden = what !== 'recording';
-      againBtn.hidden = what !== 'review';
+      againBtn.hidden = what !== 'review' || !result || result.kind === 'upload';
+      otherBtn.hidden = what !== 'review' || !result || result.kind !== 'upload';
       sources.querySelectorAll('button').forEach(function (b) { b.disabled = what === 'recording' || what === 'countdown'; });
       alt.hidden = what === 'recording' || what === 'countdown';
       if (what === 'recording' || what === 'countdown') live.hidden = false;
@@ -112,7 +115,7 @@
       scrBtn.setAttribute('aria-pressed', String(m === 'screen'));
       onBtn.textContent = m === 'camera' ? 'Turn on the camera' : 'Choose what to share';
       idleText.textContent = m === 'camera'
-        ? 'Your camera turns on when you press the button below, and nothing is recorded until you press Record.'
+        ? 'Record a new video, or upload one you already have. Your camera turns on only when you ask it to, and nothing is recorded until you press Record.'
         : 'Choose a window, a tab, or your whole screen to share. Your microphone records your voice with it.';
       stopTracks();
       show('idle');
@@ -207,9 +210,11 @@
       if (reviewUrl) URL.revokeObjectURL(reviewUrl);
       reviewUrl = URL.createObjectURL(blob);
       review.src = reviewUrl;
-      show('review');
       set({ blob: blob, mime: blob.type || 'video/mp4', seconds: seconds, kind: kind });
-      say('Here is your video (' + X.lengthWords(seconds) + '). Watch it back, then post it, or record again.');
+      show('review');
+      say(kind === 'upload'
+        ? 'Here is your video' + (seconds != null ? ' (' + X.lengthWords(seconds) + ')' : '') + '. Watch it back, then post it, or choose a different one.'
+        : 'Here is your video (' + X.lengthWords(seconds) + '). Watch it back, then post it, or record again.');
     }
     againBtn.addEventListener('click', function () {
       set(null);
@@ -237,13 +242,14 @@
         settled = true; clearTimeout(late);
         var s = isFinite(probe.duration) ? Math.round(probe.duration) : null;
         URL.revokeObjectURL(url);
-        if (s && s > X.MAX_SECONDS + 5) { say('That video is ' + X.lengthWords(s) + ' long. Exchanges keep each video to five minutes.'); return; }
+        if (s && s > X.MAX_UPLOAD_SECONDS) { say('That video is ' + X.lengthWords(s) + ' long. An exchange takes videos of up to 30 minutes.'); return; }
         showReview(f, s, 'upload');
       };
       probe.onerror = function () { if (settled) return; settled = true; clearTimeout(late); URL.revokeObjectURL(url); showReview(f, null, 'upload'); };
       probe.src = url;
     }
-    useFile.addEventListener('click', function () { pick.click(); });
+    upBtn.addEventListener('click', function () { pick.click(); });
+    otherBtn.addEventListener('click', function () { pick.click(); });
     useApp.addEventListener('click', function () { shoot.click(); });
     pick.addEventListener('change', function () { fromFile(pick); });
     shoot.addEventListener('change', function () { fromFile(shoot); });

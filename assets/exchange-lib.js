@@ -7,6 +7,9 @@
   // Five minutes a video, as Threadit kept its clips short: long enough to
   // show something and say why, short enough that people watch the thread.
   var MAX_SECONDS = 300;
+  // A video someone already has may run longer, up to the 30 minutes the
+  // hub keeps per video.
+  var MAX_UPLOAD_SECONDS = 1800;
 
   // MP4 plays most reliably in Drive's player, and Safari only records it;
   // Chrome records it now too. WebM is the fallback.
@@ -104,7 +107,7 @@
   }
 
   var api = {
-    MAX_SECONDS: MAX_SECONDS, FORMATS: FORMATS, pickFormat: pickFormat, baseType: baseType, extFor: extFor,
+    MAX_SECONDS: MAX_SECONDS, MAX_UPLOAD_SECONDS: MAX_UPLOAD_SECONDS, FORMATS: FORMATS, pickFormat: pickFormat, baseType: baseType, extFor: extFor,
     clock: clock, lengthWords: lengthWords, ago: ago, drive: drive, fileName: fileName,
     CHUNK: CHUNK, chunkEnd: chunkEnd, resumeFrom: resumeFrom, checkExchange: checkExchange, summary: summary
   };

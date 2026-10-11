@@ -68,3 +68,8 @@ test('an exchange is summed up in a sentence', () => {
   assert.equal(X.summary({ maker: { name: 'Ben' }, posts: [] }), 'Started by Ben, with no videos yet.');
   assert.equal(X.summary({ maker: { name: 'Ben' }, cohort: { title: 'Fall 2026' }, posts: [{}, {}] }), 'Started by Ben in Fall 2026, with 2 videos so far.');
 });
+
+test('recordings stop at five minutes; an existing video may run to thirty', () => {
+  assert.equal(X.MAX_SECONDS, 300);
+  assert.equal(X.MAX_UPLOAD_SECONDS, 1800);
+});
