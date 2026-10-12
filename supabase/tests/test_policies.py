@@ -2656,13 +2656,18 @@ def main():
         su.execute("insert into auth.users (id, email, raw_app_meta_data, raw_user_meta_data) values (%s, %s, %s, %s)",
                    (uid, name + "@example.org", app_meta, user_meta))
         people[name] = uid
-    mkx = "select public.create_exchange(%s, %s, %s)"
-    check("signed out, no one starts an exchange", not attempt(as_user(None), mkx, ("Hi", None, None)))
-    check("an agent cannot start one", not attempt(as_agent("xan"), mkx, ("Hi", None, None)))
-    check("anyone signed in starts an open exchange", attempt(as_user("xan"), mkx, ("Open hello (delete me)", "Say hello", None)))
+    mkx = "select public.start_exchange(%s, %s, %s, %s, %s, %s, %s)"
+    check("signed out, no one starts an exchange", not attempt(as_user(None), mkx, ("Hi", None, "xanopening0001", "video/mp4", "camera", 20, None)))
+    check("an agent cannot start one", not attempt(as_agent("xan"), mkx, ("Hi", None, "xanopening0001", "video/mp4", "camera", 20, None)))
+    check("an exchange cannot start without its opening video", not attempt(as_user("xan"), mkx, ("Hi", None, None, None, None, None, None)))
+    check("nor without a name", not attempt(as_user("xan"), mkx, ("  ", None, "xanopening0001", "video/mp4", "camera", 20, None)))
+    check("anyone signed in starts an open exchange with a video",
+          attempt(as_user("xan"), mkx, ("Open hello (delete me)", None, "xanopening0001", "video/mp4", "upload", 20, "Say hello")))
     xo = last_rows[0][0]
-    check("someone outside a cohort cannot start an exchange inside it", not attempt(as_user("xan"), mkx, ("In", None, bc)))
-    check("a teacher starts one inside their cohort", attempt(as_user("ben"), mkx, ("Week 2 check-in (delete me)", None, bc)))
+    check("someone outside a cohort cannot start an exchange inside it",
+          not attempt(as_user("xan"), mkx, ("In", bc, "xanopening0002", "video/mp4", "camera", 20, None)))
+    check("a teacher starts one inside their cohort",
+          attempt(as_user("ben"), mkx, ("Week 2 check-in (delete me)", bc, "benopening0001", "video/mp4", "camera", 30, None)))
     xc = last_rows[0][0]
     see = "select public.exchange(%s)"
     check("signed out, an open exchange reads by its link",
@@ -2688,8 +2693,8 @@ def main():
     check("someone outside the cohort cannot post in its exchange",
           not attempt(as_user("xan"), post, (xc, "calvideo000001", "video/mp4", "camera", 10, None, None)))
     check("the exchange reads back its videos in order, with names, never emails",
-          attempt(as_user(None), see, (xo,)) and [p["drive_file_id"] for p in last_rows[0][0]["posts"]] == ["calfirstvideo01", "deereplyvideo01"]
-          and last_rows[0][0]["posts"][1]["reply_to"] == str(first) and "@" not in json.dumps(last_rows[0][0]))
+          attempt(as_user(None), see, (xo,)) and [p["drive_file_id"] for p in last_rows[0][0]["posts"]] == ["xanopening0001", "calfirstvideo01", "deereplyvideo01"]
+          and last_rows[0][0]["posts"][0]["note"] == "Say hello" and last_rows[0][0]["posts"][2]["reply_to"] == str(first) and "@" not in json.dumps(last_rows[0][0]))
     check("signed out, the tables themselves show nothing",
           attempt(as_user(None), "select id from public.exchanges") and last_rows == []
           and attempt(as_user(None), "select id from public.exchange_posts") and last_rows == [])

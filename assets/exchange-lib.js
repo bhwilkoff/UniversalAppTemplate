@@ -97,9 +97,8 @@
     var title = String(input.title || '').trim();
     if (!title) return { error: 'Give the exchange a name people will recognize.' };
     if (title.length > 120) return { error: 'Keep the name under 120 characters.' };
-    var prompt = String(input.prompt || '').trim();
-    if (prompt.length > 2000) return { error: 'Keep the prompt under 2,000 characters.' };
-    return { row: { title: title, prompt: prompt || null, cohort: input.cohort || null } };
+    if (!input.video) return { error: 'Record or choose the opening video. It is the exchange\'s prompt.' };
+    return { row: { title: title, cohort: input.cohort || null } };
   }
 
   // A sentence about an exchange, never an "A · B · C" string.

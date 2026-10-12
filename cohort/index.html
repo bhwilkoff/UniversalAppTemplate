@@ -164,9 +164,16 @@
             <p><button class="btn-quiet" type="button" data-x-new>Start an exchange</button></p>
             <form class="cohort-form x-form" data-x-form hidden novalidate>
               <label>What to call it <input name="title" maxlength="120" autocomplete="off" placeholder="What surprised you when someone else used your app?"></label>
-              <label>What you are asking, if you like <span class="hint">Shown under its name, so the first person to answer knows where to begin.</span><textarea name="prompt" rows="3" maxlength="2000"></textarea></label>
-              <p class="small" role="status" data-x-status></p>
-              <div class="actions"><button class="btn-github" type="submit">Start it, and record the first video</button><button class="link-btn" type="button" data-x-cancel>Cancel</button></div>
+              <fieldset>
+                <legend>The opening video</legend>
+                <p class="small">It is the exchange's prompt, so ask your question or show what you want answered.</p>
+                <div data-x-recorder></div>
+              </fieldset>
+              <label>A few words with it, if you like <span class="hint">Shown beside your video, and read aloud to people who use a screen reader.</span><textarea name="note" rows="2" maxlength="1000"></textarea></label>
+              <p class="hint">Your video is saved in your own Google Drive, in a folder called Human Shaped exchanges, and anyone with its link can watch it.</p>
+              <progress class="x-progress" data-x-progress max="100" value="0" hidden></progress>
+              <p class="small" role="status" aria-live="polite" data-x-status></p>
+              <div class="actions"><button class="btn-github" type="submit" disabled>Start the exchange</button><button class="link-btn" type="button" data-x-cancel>Cancel</button></div>
             </form>
           </section>
 
@@ -252,7 +259,9 @@
   <script src="/assets/curriculum-pages-lib.js" defer></script>
   <script src="/assets/cohort.js" defer></script>
   <script src="/assets/exchange-lib.js?v=20261012a" defer></script>
-  <script src="/assets/exchange-list.js?v=20261011a" defer></script>
+  <script src="/assets/exchange-recorder.js?v=20261011c" defer></script>
+  <script src="/assets/exchange-drive.js?v=20261012a" defer></script>
+  <script src="/assets/exchange-list.js?v=20261012a" defer></script>
 
   <footer class="site-footer">
     <div class="wrap">

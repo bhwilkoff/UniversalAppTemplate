@@ -59,10 +59,11 @@ test('a resumable upload picks up after what Drive already has', () => {
   assert.equal(X.CHUNK % (256 * 1024), 0);
 });
 
-test('a new exchange needs a name, and its prompt is optional', () => {
-  assert.match(X.checkExchange({ title: '  ' }).error, /name/);
-  assert.deepEqual(X.checkExchange({ title: ' Hello ', prompt: ' ' }).row, { title: 'Hello', prompt: null, cohort: null });
-  assert.match(X.checkExchange({ title: 'x'.repeat(121) }).error, /120/);
+test('a new exchange needs a name and its opening video', () => {
+  assert.match(X.checkExchange({ title: '  ', video: true }).error, /name/);
+  assert.match(X.checkExchange({ title: 'Hello' }).error, /opening video/);
+  assert.deepEqual(X.checkExchange({ title: ' Hello ', video: true }).row, { title: 'Hello', cohort: null });
+  assert.match(X.checkExchange({ title: 'x'.repeat(121), video: true }).error, /120/);
 });
 
 test('an exchange is summed up in a sentence', () => {

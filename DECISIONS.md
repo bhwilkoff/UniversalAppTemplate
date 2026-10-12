@@ -790,7 +790,20 @@ so people find their exchanges again on /account/. Anyone in a cohort can
 start one there. A video comes out by its poster, the exchange's maker,
 or a cohort teacher; its file stays in its maker's Drive.
 
-**How to apply:** migration 20261011010000 (all reads through `exchange()`,
+**An exchange opens with its maker's video, which is its prompt** (Ben,
+October 12, 2026: "When you start an exchange, you should be able to
+upload/record the first video because that forms the 'prompt' of the
+video."). The new-exchange form asks for a name, where it lives, and the
+opening video, with no written prompt; `start_exchange` makes the exchange
+and that video in one step, so no exchange starts empty.
+
+**A video its owner stops sharing keeps its place, marked.** Later videos
+may answer it, so hiding it would break the thread. The page asks Drive
+for the video's picture without cookies (an image comes back only while
+anyone with the link may watch), shows "No longer shared" in its place,
+and offers its owner "Share it again".
+
+**How to apply:** migrations 20261011010000 and 20261012010000 (all reads through `exchange()`,
 `my_exchanges()`, and `cohort_exchanges()`), `exchange-lib.js` (tested),
 `exchange-drive.js`, `exchange-recorder.js`, `exchange.js`, and
 `exchange-list.js` on /account/ and /cohort/.
