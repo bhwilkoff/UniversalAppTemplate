@@ -249,6 +249,7 @@
   function drawReactions(p, box) {
     box = box || $('.x-reactions');
     if (!box || !R) return;
+    var focused = box.contains(document.activeElement) ? document.activeElement.getAttribute('data-r') : null;
     box.replaceChildren();
     var felt = reactionsOf(p);
     if (ex.can_react) {
@@ -269,6 +270,7 @@
         row.appendChild(b);
       });
       box.appendChild(row);
+      if (focused) { var again = row.querySelector('[data-r="' + focused + '"]'); if (again) again.focus(); }
     }
     if (felt.length) {
       var who = el('ul', 'x-reacted');
