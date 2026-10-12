@@ -797,13 +797,24 @@ video."). The new-exchange form asks for a name, where it lives, and the
 opening video, with no written prompt; `start_exchange` makes the exchange
 and that video in one step, so no exchange starts empty.
 
+**An exchange can also be for Human Shaped members** (Ben, October 12,
+2026: "...or people who logged in to HumanShaped.org (i.e., they are a part
+of the Human Shaped Organization on Github or have been a part of a cohort
+previously)"). A member is someone signed in who is a hub teacher, teaches
+or taught a cohort, is or was in one (not counting someone who left), or
+whom cohort-access made a member of a cohort's team. People join the
+humanshaped GitHub organization through those teams, so the hub knows its
+members without asking GitHub; someone added to the organization by hand,
+outside any cohort, counts only once they teach or join one. Outsiders
+opening a members' exchange learn only that it is for members.
+
 **A video its owner stops sharing keeps its place, marked.** Later videos
 may answer it, so hiding it would break the thread. The page asks Drive
 for the video's picture without cookies (an image comes back only while
 anyone with the link may watch), shows "No longer shared" in its place,
 and offers its owner "Share it again".
 
-**How to apply:** migrations 20261011010000 and 20261012010000 (all reads through `exchange()`,
+**How to apply:** migrations 20261011010000, 20261012010000, and 20261012020000 (all reads through `exchange()`,
 `my_exchanges()`, and `cohort_exchanges()`), `exchange-lib.js` (tested),
 `exchange-drive.js`, `exchange-recorder.js`, `exchange.js`, and
 `exchange-list.js` on /account/ and /cohort/.

@@ -2674,9 +2674,9 @@ def main():
           attempt(as_user(None), see, (xo,)) and last_rows[0][0]["title"] == "Open hello (delete me)" and last_rows[0][0]["can_reply"] is False)
     check("no link, no exchange", attempt(as_user(None), see, ("0" * 32,)) and last_rows == [(None,)])
     check("signed out, a cohort's exchange says only that it is private",
-          attempt(as_user(None), see, (xc,)) and last_rows[0][0] == {"private": True})
+          attempt(as_user(None), see, (xc,)) and last_rows[0][0] == {"private": True, "members": False})
     check("so does it for someone signed in outside the cohort",
-          attempt(as_user("xan"), see, (xc,)) and last_rows[0][0] == {"private": True})
+          attempt(as_user("xan"), see, (xc,)) and last_rows[0][0] == {"private": True, "members": False})
     check("a co-teacher of the cohort sees it", attempt(as_user("kofi"), see, (xc,)) and last_rows[0][0]["title"] == "Week 2 check-in (delete me)")
     post = "select public.add_exchange_post(%s, %s, %s, %s, %s, %s, %s)"
     check("signed out, no one posts", not attempt(as_user(None), post, (xo, "abcdefghij123", "video/mp4", "camera", 30, None, None)))
@@ -2718,6 +2718,44 @@ def main():
     check("then no one else can reply", not attempt(as_user("yara"), post, (xo, "deelatevideo01", "video/mp4", "camera", 5, None, None)))
     check("but its maker still can", attempt(as_user("xan"), post, (xo, "callatevideo01", "video/mp4", "camera", 5, None, None)))
     check("an exchange keeps its link", not attempt(as_user("xan"), "update public.exchanges set token = repeat('b', 32) where token = %s returning id", (xo,)))
+    # Exchanges for Human Shaped members (migration 20261012020000).
+    for name, status in [("zed", "enrolled"), ("wren", "left")]:
+        uid = str(uuid.uuid4())
+        su.execute("reset role")
+        su.execute("insert into auth.users (id, email, raw_app_meta_data, raw_user_meta_data) values (%s, %s, '{}', %s)",
+                   (uid, name + "@example.org", json.dumps({"user_name": name})))
+        people[name] = uid
+        su.execute("insert into public.enrollments (cohort_id, user_id, status) values (%s, %s, %s)", (bc, uid, status))
+    member = "select public.am_i_a_member()"
+    check("a hub teacher is a member", attempt(as_user("ben"), member) and last_rows == [(True,)])
+    check("someone in a cohort is a member", attempt(as_user("zed"), member) and last_rows == [(True,)])
+    check("someone who left their cohort is not", attempt(as_user("wren"), member) and last_rows == [(False,)])
+    check("nor is someone never in a cohort", attempt(as_user("xan"), member) and last_rows == [(False,)])
+    check("signed out, no one is", not attempt(as_user(None), member) or last_rows == [(False,)])
+    mkm = "select public.start_exchange(%s, %s, %s, %s, %s, %s, %s, %s)"
+    check("someone who is not a member cannot start a members' exchange",
+          not attempt(as_user("xan"), mkm, ("Members (delete me)", None, "xanmembers0001", "video/mp4", "camera", 9, None, True)))
+    check("an exchange is not for a cohort and for members at once",
+          not attempt(as_user("ben"), mkm, ("Both (delete me)", bc, "benmembers0001", "video/mp4", "camera", 9, None, True)))
+    check("a member starts one for members",
+          attempt(as_user("zed"), mkm, ("For members (delete me)", None, "zedmembers0001", "video/mp4", "camera", 9, None, True)))
+    xm = last_rows[0][0]
+    check("signed out, a members' exchange says only that it is for members",
+          attempt(as_user(None), see, (xm,)) and last_rows[0][0] == {"private": True, "members": True})
+    check("so does it for someone who left their cohort",
+          attempt(as_user("wren"), see, (xm,)) and last_rows[0][0] == {"private": True, "members": True})
+    check("another member watches it", attempt(as_user("kofi"), see, (xm,)) and last_rows[0][0]["members"] is True)
+    check("and adds a video", attempt(as_user("kofi"), post, (xm, "kofimembers001", "video/mp4", "camera", 9, None, None)))
+    check("someone who is not a member cannot add one",
+          not attempt(as_user("xan"), post, (xm, "xanmembers0002", "video/mp4", "camera", 9, None, None)))
+    su.execute("reset role")
+    su.execute("insert into public.github_access (cohort_id, user_id, state) values (%s, %s, 'member')", (bc, people["yara"]))
+    check("someone the cohort-access function put on a team is a member",
+          attempt(as_user("yara"), see, (xm,)) and last_rows[0][0]["title"] == "For members (delete me)")
+    check("its maker finds it among their exchanges, marked for members",
+          attempt(as_user("zed"), "select token, for_members from public.my_exchanges()") and last_rows == [(xm, True)])
+    check("a members' exchange stays one",
+          not attempt(as_user("zed"), "update public.exchanges set members_only = false where token = %s returning id", (xm,)))
     check("its maker deletes it, and its videos go with it",
           attempt(as_user("xan"), "delete from public.exchanges where token = %s returning id", (xo,)) and len(last_rows) == 1
           and attempt(as_user(None), see, (xo,)) and last_rows == [(None,)])

@@ -68,6 +68,8 @@
       a.href = '/cohort/?c=' + encodeURIComponent(ex.cohort.slug);
       where.appendChild(a);
       where.appendChild(document.createTextNode(' can see this exchange.'));
+    } else if (ex.members) {
+      where.textContent = 'Only Human Shaped members can see this exchange: people in a cohort, now or before, and teachers.';
     } else {
       where.textContent = 'Anyone with this page\'s link can watch, and anyone signed in can add a video' + (ex.replies_open ? '.' : ' once its maker opens replies again.');
     }
@@ -377,6 +379,10 @@
         if (r.error) throw r.error;
         if (!r.data) return show('missing');
         if (r.data.private) {
+          $('[data-private-title]').textContent = r.data.members ? 'This exchange is for Human Shaped members.' : 'This exchange is for a cohort.';
+          $('[data-private-lead]').textContent = r.data.members
+            ? 'Only people who are in a cohort, now or before, and teachers can watch it and add to it.'
+            : 'Only the people in the cohort it belongs to can watch it and add to it.';
           $('[data-private-signin]').hidden = !!me;
           return show('private');
         }

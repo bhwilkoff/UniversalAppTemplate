@@ -56,10 +56,9 @@
       e.preventDefault();
       if (busy) return;
       var r = recorder && recorder.result();
-      var checked = X.checkExchange({
-        title: form.elements.title.value, video: !!r,
-        cohort: opts.cohort || (form.elements.where ? form.elements.where.value : '')
-      });
+      var where = opts.cohort || (form.elements.where ? form.elements.where.value : '');
+      var members = where === 'members';
+      var checked = X.checkExchange({ title: form.elements.title.value, video: !!r, cohort: members ? '' : where });
       if (checked.error) { status.textContent = checked.error; return; }
       busy = true; ready();
       status.textContent = 'Connecting your Google Drive…';
@@ -79,7 +78,7 @@
         status.textContent = 'Starting the exchange…';
         return db.rpc('start_exchange', {
           title: checked.row.title, cohort: checked.row.cohort, drive_file_id: fileId, mime: X.baseType(r.mime),
-          kind: r.kind, seconds: r.seconds, note: form.elements.note.value.trim() || null
+          kind: r.kind, seconds: r.seconds, note: form.elements.note.value.trim() || null, members: members
         });
       }).then(function (res) {
         if (res.error) throw new Error('your video is in your Drive, but the exchange did not start: ' + res.error.message);
@@ -112,28 +111,41 @@
       var form = box.querySelector('[data-x-form]');
       wireForm(form, { email: me.email });
       toggle(box.querySelector('[data-x-new]'), form);
-      // Where it can live: anywhere by link, or a cohort the person is in.
+      // Where it can live: anywhere by link, for Human Shaped members, or
+      // in a cohort the person is in or teaches.
+      var sel = form.elements.where;
       Promise.all([
+        db.rpc('am_i_a_member'),
         db.from('enrollments').select('cohorts(id, title, status)').eq('user_id', me.id).neq('status', 'left'),
         db.from('cohort_teachers').select('cohorts(id, title, status)').eq('user_id', me.id)
       ]).then(function (res) {
-        var seen = {}, sel = form.elements.where;
-        res.forEach(function (r) {
+        if (res[0].data === true) {
+          var m = el('option', null, 'Human Shaped members (people in a cohort, now or before, and teachers)');
+          m.value = 'members';
+          sel.appendChild(m);
+        }
+        var seen = {}, any = false;
+        res.slice(1).forEach(function (r) {
           (r.data || []).forEach(function (x) {
             var c = x.cohorts;
             if (!c || seen[c.id] || c.status === 'finished') return;
-            seen[c.id] = true;
+            seen[c.id] = any = true;
             var o = el('option', null, 'Only the people in ' + c.title);
             o.value = c.id;
             sel.appendChild(o);
           });
         });
+        if (!any) {
+          var none = el('option', null, 'Only the people in one of your cohorts (you are in none yet)');
+          none.disabled = true;
+          sel.appendChild(none);
+        }
       });
       return db.rpc('my_exchanges').then(function (r) {
         if (r.error) throw r.error;
         var any = drawList(list, r.data, function (x) {
           var who = x.made ? 'You started it' : 'You added ' + (x.mine === 1 ? 'a video' : x.mine + ' videos');
-          return who + (x.cohort_title ? ' in ' + x.cohort_title : '') + ', and it has ' + count(+x.videos) + '. Last active ' + X.ago(x.active_at) + '.';
+          return who + (x.cohort_title ? ' in ' + x.cohort_title : x.for_members ? ' for Human Shaped members' : '') + ', and it has ' + count(+x.videos) + '. Last active ' + X.ago(x.active_at) + '.';
         });
         if (!any) list.appendChild(el('p', 'small', 'Exchanges you start or add a video to will be here.'));
         if (location.hash === '#exchanges') box.scrollIntoView();
