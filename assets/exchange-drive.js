@@ -11,6 +11,7 @@
 //
 //   ExchangeDrive.connect(email)                -> Promise<token>
 //   ExchangeDrive.save(token, blob, meta, onProgress(0..1)) -> Promise<fileId>
+//   ExchangeDrive.share(token, fileId)          -> Promise<fileId>
 (function () {
   var X = window.ExchangeLib;
   var SCOPE = 'https://www.googleapis.com/auth/drive.file';
@@ -164,9 +165,16 @@
       return send(where, blob, onProgress);
     }).then(function (id) {
       onProgress(1);
-      return call(token, 'POST', API + '/files/' + id + '/permissions?fields=id', { role: 'reader', type: 'anyone' }).then(function () { return id; });
+      return share(token, id);
     });
   }
 
-  window.ExchangeDrive = { connect: connect, save: save };
+  // Anyone with the link may watch. Also used to share a video again after
+  // its owner stopped sharing it in Drive; drive.file still reaches it,
+  // since this site made it.
+  function share(token, id) {
+    return call(token, 'POST', API + '/files/' + id + '/permissions?fields=id', { role: 'reader', type: 'anyone' }).then(function () { return id; });
+  }
+
+  window.ExchangeDrive = { connect: connect, save: save, share: share };
 })();

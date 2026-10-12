@@ -2228,7 +2228,9 @@ ol.principles summary:focus-visible { outline: 2px solid var(--accent); outline-
 }
 .x-player { aspect-ratio: 16 / 9; border-radius: var(--radius); overflow: hidden; background: var(--surface); display: grid; place-items: center; scroll-margin-top: 1rem; }
 .x-player iframe { width: 100%; height: 100%; border: 0; display: block; background: #000; }
-.x-player-empty { color: var(--muted); margin: 0; padding: 1.5rem; text-align: center; }
+.x-player-empty { color: var(--muted); margin: 0; padding: 1.5rem; text-align: center; max-width: 32rem; }
+.x-player-empty p { margin: 0 0 1rem; }
+.x-player-empty .hint { margin: 0.75rem 0 0; }
 .x-now { display: grid; gap: 0.6rem; margin-top: 1rem; }
 .x-now p { margin: 0; }
 .x-now-who { display: flex; gap: 0.75rem; align-items: center; }
@@ -2255,6 +2257,7 @@ ol.principles summary:focus-visible { outline: 2px solid var(--accent); outline-
 .x-clip-words { display: grid; gap: 0.15rem; min-width: 0; padding-top: 0.1rem; }
 .x-clip-name { font-weight: 650; }
 .x-clip-when { color: var(--muted); font-size: 0.9rem; }
+.x-clip-closed-note { color: var(--muted); font-size: 0.9rem; font-style: italic; }
 .x-clip-note { font-size: 0.92rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .x-empty { color: var(--muted); }
 .x-signin { display: grid; gap: 0.5rem; border-top: 1px solid var(--rule); padding-top: 1rem; margin-top: 0.5rem; }

@@ -66,7 +66,11 @@
     return {
       preview: 'https://drive.google.com/file/d/' + id + '/preview',
       view: 'https://drive.google.com/file/d/' + id + '/view',
-      thumb: 'https://drive.google.com/thumbnail?id=' + id + '&sz=w640'
+      thumb: 'https://drive.google.com/thumbnail?id=' + id + '&sz=w640',
+      // Asked without cookies, this answers with an image only while anyone
+      // with the link may watch; once its owner stops sharing it, Google
+      // sends a sign-in page instead.
+      shared: 'https://lh3.googleusercontent.com/d/' + id + '=w64'
     };
   }
 

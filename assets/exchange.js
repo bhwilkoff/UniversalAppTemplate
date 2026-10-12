@@ -10,6 +10,9 @@
   var db = window.HUB.client ? window.HUB.client() : window.supabase.createClient(window.HUB.url, window.HUB.key);
   var token = null, ex = null, me = null, current = null, replyTo = null, recorder = null, posting = false;
   var RETURN = 'hs-exchange-return';
+  // Whether each video is still shared with anyone who has its link:
+  // post id -> 'open' | 'closed', or 'asking' while the check runs.
+  var reach = {};
 
   function $(sel) { return root.querySelector(sel); }
   function el(tag, cls, text) {
@@ -71,6 +74,23 @@
     $('[data-toggle-replies]').textContent = ex.replies_open ? 'Close replies' : 'Open replies again';
   }
 
+  function isFresh(p) { return Date.now() - new Date(p.created_at).getTime() < 10 * 60000; }
+  // A new video has no picture until Drive has prepared it, so it is not
+  // checked until it is ten minutes old.
+  function checkShared(p) {
+    var links = X.drive(p.drive_file_id);
+    if (!links || reach[p.id] || isFresh(p) || !window.fetch) return;
+    reach[p.id] = 'asking';
+    fetch(links.shared, { credentials: 'omit' }).then(function (r) {
+      return r.ok && /^image\//.test(r.headers.get('content-type') || '');
+    }, function () { return false; }).then(function (open) {
+      reach[p.id] = open ? 'open' : 'closed';
+      if (open || !ex || !byId(p.id)) return;
+      if (current && current.id === p.id) play(current, false);
+      else drawThread();
+    });
+  }
+
   function drawThread() {
     var list = $('[data-thread]');
     list.replaceChildren();
@@ -81,8 +101,11 @@
       if (current && current.id === p.id) b.setAttribute('aria-current', 'true');
       var thumb = el('span', 'x-thumb');
       var links = X.drive(p.drive_file_id);
-      var fresh = Date.now() - new Date(p.created_at).getTime() < 10 * 60000;
-      if (links && !fresh) {
+      var fresh = isFresh(p);
+      var closed = reach[p.id] === 'closed';
+      if (!closed) checkShared(p);
+      if (closed) li.classList.add('x-clip-closed');
+      if (links && !fresh && !closed) {
         var img = el('img');
         img.alt = ''; img.loading = 'lazy'; img.referrerPolicy = 'no-referrer';
         img.onerror = function () { img.remove(); };
@@ -97,6 +120,7 @@
       var reply = p.reply_to && byId(p.reply_to);
       words.appendChild(el('span', 'x-clip-when', (i === 0 ? 'Opened the exchange ' : reply ? 'Answered ' + reply.author.name + ' ' : 'Added a video ') + X.ago(p.created_at)));
       if (p.note) words.appendChild(el('span', 'x-clip-note', p.note));
+      if (closed) words.appendChild(el('span', 'x-clip-closed-note', 'No longer shared'));
       b.appendChild(thumb); b.appendChild(words);
       b.setAttribute('aria-label', p.author.name + ', ' + X.ago(p.created_at) + (p.seconds != null ? ', ' + X.lengthWords(p.seconds) : '') + (p.note ? '. ' + p.note : ''));
       b.addEventListener('click', function () { play(p, true); });
@@ -126,13 +150,17 @@
       return;
     }
     var links = X.drive(p.drive_file_id);
-    var frame = el('iframe');
-    frame.src = links.preview;
-    frame.title = 'Video by ' + p.author.name;
-    frame.allow = 'autoplay; fullscreen';
-    frame.setAttribute('allowfullscreen', '');
-    frame.loading = 'lazy';
-    stage.appendChild(frame);
+    if (reach[p.id] === 'closed') {
+      stage.appendChild(closedNotice(p));
+    } else {
+      var frame = el('iframe');
+      frame.src = links.preview;
+      frame.title = 'Video by ' + p.author.name;
+      frame.allow = 'autoplay; fullscreen';
+      frame.setAttribute('allowfullscreen', '');
+      frame.loading = 'lazy';
+      stage.appendChild(frame);
+    }
 
     now.hidden = false;
     var who = el('div', 'x-now-who');
@@ -178,6 +206,37 @@
       try { history.replaceState(null, '', location.pathname + '#' + token + '/' + p.id); } catch (e) { /* the link still works */ }
       if (window.matchMedia && window.matchMedia('(max-width: 56rem)').matches) stage.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
+  }
+
+  // Shown in place of the player when a video's owner has stopped sharing
+  // it in Google Drive, or has deleted it there. The video keeps its place
+  // in the thread, since later videos may answer it.
+  function closedNotice(p) {
+    var box = el('div', 'x-player-empty');
+    box.appendChild(el('p', null, p.mine
+      ? 'This video is no longer shared in your Google Drive, so nobody else can watch it here.'
+      : 'This video can\'t play here, because ' + p.author.name + ' is no longer sharing it in Google Drive.'));
+    if (p.mine) {
+      var again = el('button', 'btn-quiet', 'Share it again');
+      again.type = 'button';
+      var say = el('p', 'hint');
+      again.addEventListener('click', function () {
+        again.disabled = true;
+        say.textContent = 'Connecting your Google Drive…';
+        window.ExchangeDrive.connect(me && me.email).then(function (gtoken) {
+          return window.ExchangeDrive.share(gtoken, p.drive_file_id);
+        }).then(function () {
+          reach[p.id] = 'open';
+          play(p, false);
+        }).catch(function (e) {
+          again.disabled = false;
+          say.textContent = 'It was not shared again: ' + said(e) + '. If you deleted it in Drive, remove it from the exchange instead.';
+        });
+      });
+      box.appendChild(again);
+      box.appendChild(say);
+    }
+    return box;
   }
 
   // ---- adding a video -------------------------------------------------
