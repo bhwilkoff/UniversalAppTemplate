@@ -112,10 +112,20 @@
     return 'Started by ' + e.maker.name + where + ', with ' + count + '.';
   }
 
+  // Who sent a reaction, as words: "Ana", "Ana and Ben", "Ana, Ben, and
+  // Cy", and past three, "Ana, Ben, and 4 others".
+  function names(list) {
+    var n = (list || []).filter(Boolean);
+    if (n.length <= 2) return n.join(' and ');
+    if (n.length === 3) return n[0] + ', ' + n[1] + ', and ' + n[2];
+    var rest = n.length - 2;
+    return n[0] + ', ' + n[1] + ', and ' + rest + (rest === 1 ? ' other' : ' others');
+  }
+
   var api = {
     MAX_SECONDS: MAX_SECONDS, MAX_UPLOAD_SECONDS: MAX_UPLOAD_SECONDS, FORMATS: FORMATS, pickFormat: pickFormat, baseType: baseType, extFor: extFor,
     clock: clock, lengthWords: lengthWords, ago: ago, drive: drive, fileName: fileName,
-    CHUNK: CHUNK, chunkEnd: chunkEnd, resumeFrom: resumeFrom, checkExchange: checkExchange, summary: summary
+    CHUNK: CHUNK, chunkEnd: chunkEnd, resumeFrom: resumeFrom, checkExchange: checkExchange, summary: summary, names: names
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.ExchangeLib = api;

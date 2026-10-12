@@ -2226,7 +2226,7 @@ ol.principles summary:focus-visible { outline: 2px solid var(--accent); outline-
   .x-layout { grid-template-columns: minmax(0, 1.75fr) minmax(17rem, 1fr); align-items: start; gap: 2.5rem; }
   .x-thread { position: sticky; top: 1.5rem; max-height: calc(100vh - 3rem); overflow: auto; padding-right: 0.25rem; }
 }
-.x-player { aspect-ratio: 16 / 9; border-radius: var(--radius); overflow: hidden; background: var(--surface); display: grid; place-items: center; scroll-margin-top: 1rem; }
+.x-player { aspect-ratio: 16 / 9; border-radius: var(--radius); overflow: hidden; background: var(--surface); position: relative; display: grid; place-items: center; scroll-margin-top: 1rem; }
 .x-player iframe { width: 100%; height: 100%; border: 0; display: block; background: #000; }
 .x-player-empty { color: var(--muted); margin: 0; padding: 1.5rem; text-align: center; max-width: 32rem; }
 .x-player-empty p { margin: 0 0 1rem; }
@@ -2257,6 +2257,14 @@ ol.principles summary:focus-visible { outline: 2px solid var(--accent); outline-
 .x-clip-words { display: grid; gap: 0.15rem; min-width: 0; padding-top: 0.1rem; }
 .x-clip-name { font-weight: 650; }
 .x-clip-when { color: var(--muted); font-size: 0.9rem; }
+.x-clip-reacts { font-size: 0.9rem; letter-spacing: 0.1em; }
+.x-reactions { display: grid; gap: 0.6rem; }
+.x-reactions .react-row { max-width: 30rem; }
+.x-reactions .react-btn[aria-pressed="true"] { border-color: var(--accent); background: color-mix(in srgb, var(--thistle) 35%, var(--card)); }
+.x-reactions .hint { margin: 0; color: var(--muted); font-size: 0.92rem; }
+.x-reacted { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.3rem; color: var(--muted); font-size: 0.92rem; }
+.x-reacted li { display: flex; gap: 0.5rem; align-items: baseline; }
+.x-reacted-emoji { font-size: 1.05rem; color: var(--ink); }
 .x-clip-closed-note { color: var(--muted); font-size: 0.9rem; font-style: italic; }
 .x-clip-note { font-size: 0.92rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .x-empty { color: var(--muted); }

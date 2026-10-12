@@ -75,3 +75,11 @@ test('recordings stop at five minutes; an existing video may run to thirty', () 
   assert.equal(X.MAX_SECONDS, 300);
   assert.equal(X.MAX_UPLOAD_SECONDS, 1800);
 });
+
+test('who reacted reads as people, with an Oxford comma', () => {
+  assert.equal(X.names(['Ana']), 'Ana');
+  assert.equal(X.names(['Ana', 'Ben']), 'Ana and Ben');
+  assert.equal(X.names(['Ana', 'Ben', 'Cy']), 'Ana, Ben, and Cy');
+  assert.equal(X.names(['Ana', 'Ben', 'Cy', 'Di']), 'Ana, Ben, and 2 others');
+  assert.equal(X.names(['Ana', 'Ben', 'Cy', 'Di', 'Ed', 'Flo']), 'Ana, Ben, and 4 others');
+});

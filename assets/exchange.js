@@ -137,9 +137,16 @@
       var reply = p.reply_to && byId(p.reply_to);
       words.appendChild(el('span', 'x-clip-when', (i === 0 ? 'Opened the exchange ' : reply ? 'Answered ' + reply.author.name + ' ' : 'Added a video ') + X.ago(p.created_at)));
       if (p.note) words.appendChild(el('span', 'x-clip-note', p.note));
+      var felt = reactionsOf(p);
+      if (felt.length) {
+        var line = el('span', 'x-clip-reacts', felt.map(function (x) { return x.kind.emoji; }).join(' '));
+        line.setAttribute('aria-hidden', 'true');
+        words.appendChild(line);
+      }
       if (closed) words.appendChild(el('span', 'x-clip-closed-note', 'No longer shared'));
       b.appendChild(thumb); b.appendChild(words);
-      b.setAttribute('aria-label', p.author.name + ', ' + X.ago(p.created_at) + (p.seconds != null ? ', ' + X.lengthWords(p.seconds) : '') + (p.note ? '. ' + p.note : ''));
+      b.setAttribute('aria-label', p.author.name + ', ' + X.ago(p.created_at) + (p.seconds != null ? ', ' + X.lengthWords(p.seconds) : '') + (p.note ? '. ' + p.note : '')
+        + (felt.length ? '. Reactions: ' + felt.map(function (x) { return x.kind.label; }).join(', ') : ''));
       b.addEventListener('click', function () { play(p, true); });
       li.appendChild(b);
       list.appendChild(li);
@@ -203,6 +210,9 @@
       wait.setAttribute('data-preparing', '');
       now.appendChild(wait);
     }
+    var box = el('div', 'x-reactions');
+    now.appendChild(box);
+    drawReactions(p, box);
     var acts = el('div', 'actions');
     var open = el('a', 'go-text', 'Open in Google Drive');
     open.href = links.view; open.target = '_blank'; open.rel = 'noopener';
@@ -226,6 +236,91 @@
       if (window.matchMedia && window.matchMedia('(max-width: 56rem)').matches) stage.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }
+
+  // ---- reactions ----------------------------------------------------
+  // The Meet add-on's eight reactions (react-lib.js), kept with the video
+  // so its maker sees them later (migration 20261012030000).
+  var R = window.ReactLib, reacting = {};
+  function reactionsOf(p) {
+    if (!R) return [];
+    return (p.reactions || []).map(function (x) { return { r: x.r, names: x.names || [], mine: !!x.mine, kind: R.reaction(x.r) }; })
+      .filter(function (x) { return x.kind && x.names.length; });
+  }
+  function drawReactions(p, box) {
+    box = box || $('.x-reactions');
+    if (!box || !R) return;
+    box.replaceChildren();
+    var felt = reactionsOf(p);
+    if (ex.can_react) {
+      var row = el('div', 'react-row');
+      row.setAttribute('role', 'group');
+      row.setAttribute('aria-label', 'React to this video');
+      R.REACTIONS.forEach(function (r) {
+        var b = el('button', 'react-btn');
+        b.type = 'button';
+        var on = felt.some(function (x) { return x.r === r.id && x.mine; });
+        b.setAttribute('aria-pressed', String(on));
+        b.setAttribute('aria-label', r.label + ' (key ' + r.key + ')');
+        b.title = r.label + ' (' + r.key + ')';
+        b.setAttribute('data-r', r.id);
+        b.appendChild(el('span', 'react-emoji', r.emoji)).setAttribute('aria-hidden', 'true');
+        b.appendChild(el('span', 'react-key', r.key)).setAttribute('aria-hidden', 'true');
+        b.addEventListener('click', function () { react(p, r.id); });
+        row.appendChild(b);
+      });
+      box.appendChild(row);
+    }
+    if (felt.length) {
+      var who = el('ul', 'x-reacted');
+      felt.forEach(function (x) {
+        var li = el('li');
+        li.appendChild(el('span', 'x-reacted-emoji', x.kind.emoji)).setAttribute('aria-hidden', 'true');
+        li.appendChild(el('span', null, x.kind.label + ': ' + X.names(x.names)));
+        who.appendChild(li);
+      });
+      box.appendChild(who);
+    }
+  }
+  function float(id) {
+    var stage = $('[data-player]'), kind = R && R.reaction(id);
+    if (!stage || !kind) return;
+    var layer = stage.querySelector('.react-layer');
+    if (!layer) { layer = el('div', 'react-layer'); layer.setAttribute('aria-hidden', 'true'); stage.appendChild(layer); }
+    var f = el('div', 'react-float');
+    f.style.left = (10 + Math.random() * 75) + '%';
+    f.appendChild(el('span', 'react-emoji', kind.emoji));
+    layer.appendChild(f);
+    setTimeout(function () { f.remove(); }, 3400);
+  }
+  // A reaction turns on or off; the button answers at once and the hub's
+  // answer then replaces the video's reactions.
+  function react(p, id) {
+    if (!ex.can_react || reacting[p.id]) return;
+    var on = !reactionsOf(p).some(function (x) { return x.r === id && x.mine; });
+    reacting[p.id] = true;
+    var btn = $('.x-reactions [data-r="' + id + '"]');
+    if (btn) { btn.setAttribute('aria-pressed', String(on)); btn.classList.remove('sent'); void btn.offsetWidth; btn.classList.add('sent'); }
+    if (on) float(id);
+    within(db.rpc('react_to_exchange_post', { post: p.id, reaction: id, turn_on: on })).then(function (r) {
+      if (r.error) throw r.error;
+      p.reactions = r.data || [];
+    }).catch(function (e) {
+      if (btn) btn.setAttribute('aria-pressed', String(!on));
+      var box = $('.x-reactions');
+      if (box) box.appendChild(el('p', 'hint', 'That reaction did not go through: ' + said(e) + '.'));
+      return 'failed';
+    }).then(function (failed) {
+      reacting[p.id] = false;
+      if (failed) return;
+      if (current && current.id === p.id) drawReactions(p);
+      drawThread();
+    });
+  }
+  document.addEventListener('keydown', function (e) {
+    if (!R || !ex || !ex.can_react || !current || !$('[data-compose]').hidden) return;
+    var k = R.keyFor(e);
+    if (k && k.reaction) { e.preventDefault(); react(current, k.reaction); }
+  });
 
   // Shown in place of the player when a video's owner has stopped sharing
   // it in Google Drive, or has deleted it there. The video keeps its place

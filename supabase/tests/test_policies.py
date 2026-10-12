@@ -2756,6 +2756,33 @@ def main():
           attempt(as_user("zed"), "select token, for_members from public.my_exchanges()") and last_rows == [(xm, True)])
     check("a members' exchange stays one",
           not attempt(as_user("zed"), "update public.exchanges set members_only = false where token = %s returning id", (xm,)))
+    # Reactions to exchange videos (migration 20261012030000).
+    react = "select public.react_to_exchange_post(%s, %s, %s)"
+    check("signed out, no one reacts", not attempt(as_user(None), react, (first, "ponder", True)))
+    check("an agent cannot react", not attempt(as_agent("yara"), react, (first, "ponder", True)))
+    check("only the eight reactions", not attempt(as_user("yara"), react, (first, "thumbsup", True)))
+    check("anyone signed in reacts to a video they can see, even after replies close",
+          attempt(as_user("yara"), react, (first, "ponder", True)) and last_rows[0][0] == [{"r": "ponder", "names": ["Yara Quill"], "mine": True}])
+    check("reacting twice the same way counts once",
+          attempt(as_user("yara"), react, (first, "ponder", True)) and last_rows[0][0][0]["names"] == ["Yara Quill"])
+    attempt(as_user("xan"), react, (first, "ponder", True))
+    check("reactions come in the add-on's order, with who sent them, earliest first",
+          attempt(as_user("xan"), react, (first, "love", True))
+          and last_rows[0][0] == [{"r": "love", "names": ["xan"], "mine": True}, {"r": "ponder", "names": ["Yara Quill", "xan"], "mine": True}])
+    check("the exchange shows them to anyone who can watch it",
+          attempt(as_user(None), see, (xo,)) and [x["r"] for x in last_rows[0][0]["posts"][1]["reactions"]] == ["love", "ponder"]
+          and last_rows[0][0]["posts"][1]["reactions"][1]["mine"] is False and last_rows[0][0]["can_react"] is False)
+    check("a person takes their reaction back",
+          attempt(as_user("yara"), react, (first, "ponder", False)) and last_rows[0][0][1]["names"] == ["xan"])
+    sx.execute("reset role")
+    sx.execute("select p.id from public.exchange_posts p join public.exchanges e on e.id = p.exchange_id where e.token = %s limit 1", (xm,))
+    xm_post = sx.fetchone()[0]
+    check("someone who cannot see an exchange cannot react in it", not attempt(as_user("wren"), react, (xm_post, "clap", True)))
+    check("a member can", attempt(as_user("kofi"), react, (xm_post, "clap", True)))
+    check("no one reads reactions from the table directly",
+          not attempt(as_user("yara"), "select * from public.exchange_reactions") or last_rows == [])
+    check("nor writes one there",
+          not attempt(as_user("yara"), "insert into public.exchange_reactions (post_id, user_id, reaction) values (%s, %s, 'clap')", (first, people["yara"])))
     check("its maker deletes it, and its videos go with it",
           attempt(as_user("xan"), "delete from public.exchanges where token = %s returning id", (xo,)) and len(last_rows) == 1
           and attempt(as_user(None), see, (xo,)) and last_rows == [(None,)])

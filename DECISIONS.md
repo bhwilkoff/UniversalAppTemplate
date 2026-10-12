@@ -808,6 +808,17 @@ members without asking GitHub; someone added to the organization by hand,
 outside any cohort, counts only once they teach or join one. Outsiders
 opening a members' exchange learn only that it is for members.
 
+**Exchange videos take the Meet add-on's eight reactions, and these are
+kept** (Ben, October 12, 2026: "so that users can react to the exchange
+videos as they watch them"). This narrows the live rule that reactions
+are never stored: a live reaction is seen in the moment, but the person
+who posted a video watches for reactions later, so each is kept with the
+video and shown with the names of who sent it. Never a tally per person,
+never a ranking. One of each kind per person per video, pressed again to
+take it back; anyone signed in who can see the exchange may react, even
+after replies close. Drive's player does not tell the page where in the
+video someone is, so a reaction belongs to the video, not a moment in it.
+
 **A video's picture is the one Drive makes, and nothing more.** Drive
 uses a video's first frame, so one that fades in from black shows black.
 A picture taken in the browser and a click-to-load player were proposed
@@ -822,7 +833,7 @@ for the video's picture without cookies (an image comes back only while
 anyone with the link may watch), shows "No longer shared" in its place,
 and offers its owner "Share it again".
 
-**How to apply:** migrations 20261011010000, 20261012010000, and 20261012020000 (all reads through `exchange()`,
+**How to apply:** migrations 20261011010000, 20261012010000, 20261012020000, and 20261012030000 (all reads through `exchange()`,
 `my_exchanges()`, and `cohort_exchanges()`), `exchange-lib.js` (tested),
 `exchange-drive.js`, `exchange-recorder.js`, `exchange.js`, and
 `exchange-list.js` on /account/ and /cohort/.
