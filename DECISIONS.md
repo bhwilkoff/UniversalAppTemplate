@@ -814,7 +814,7 @@ makes no picture for that combination (tested October 12, 2026: the same
 clip rotated and fragmented got none; rotated and unfragmented got one).
 The upload sends a frame from about a second in as Drive's
 `contentHints.thumbnail`, which Drive uses only when it cannot make its
-own, so other videos keep Drive's picture and nobody does anything extra.
+own, so other videos keep Drive's picture and nobody does anything extra. Ben confirmed a phone recording got its picture this way the same day.
 This is not the custom picture declined below.
 
 **Exchange videos take the Meet add-on's eight reactions, and these are
