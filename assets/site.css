@@ -2220,7 +2220,7 @@ ol.principles summary:focus-visible { outline: 2px solid var(--accent); outline-
   .x-thread { position: sticky; top: 1.5rem; max-height: calc(100vh - 3rem); overflow: auto; padding-right: 0.25rem; }
 }
 .x-player { aspect-ratio: 16 / 9; border-radius: var(--radius); overflow: hidden; background: var(--surface); position: relative; display: grid; place-items: center; scroll-margin-top: 1rem; }
-.x-player iframe { width: 100%; height: 100%; border: 0; display: block; background: #000; }
+.x-player iframe, .x-player video { width: 100%; height: 100%; border: 0; display: block; background: #000; }
 .x-player-empty { color: var(--muted); margin: 0; padding: 1.5rem; text-align: center; max-width: 32rem; }
 .x-player-empty p { margin: 0 0 1rem; }
 .x-player-empty .hint { margin: 0.75rem 0 0; }

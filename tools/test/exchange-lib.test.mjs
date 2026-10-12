@@ -42,6 +42,9 @@ test('Drive links come only from an id that looks like one', () => {
   assert.equal(d.thumb, 'https://lh3.googleusercontent.com/d/1AbC_def-GHIjkl=w640');
   assert.equal(d.shared, 'https://lh3.googleusercontent.com/d/1AbC_def-GHIjkl=w64');
   assert.equal(X.drive('../../x'), null);
+  assert.equal(X.mediaUrl('1AbC_def-GHIjkl', 'AIza k'), 'https://www.googleapis.com/drive/v3/files/1AbC_def-GHIjkl?alt=media&key=AIza%20k');
+  assert.equal(X.mediaUrl('1AbC_def-GHIjkl', ''), null);
+  assert.equal(X.mediaUrl('../x', 'k'), null);
   assert.equal(X.drive('short'), null);
 });
 

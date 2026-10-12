@@ -194,13 +194,7 @@
     if (reach[p.id] === 'closed') {
       stage.appendChild(closedNotice(p));
     } else {
-      var frame = el('iframe');
-      frame.src = links.preview;
-      frame.title = 'Video by ' + p.author.name;
-      frame.allow = 'autoplay; fullscreen';
-      frame.setAttribute('allowfullscreen', '');
-      frame.loading = 'lazy';
-      stage.appendChild(frame);
+      stage.appendChild(videoFor(p, links));
     }
 
     now.hidden = false;
@@ -222,11 +216,6 @@
       now.appendChild(r);
     }
     if (p.note) now.appendChild(el('p', 'x-now-note', p.note));
-    if (isFresh(p) && reach[p.id] !== 'open') {
-      var wait = el('p', 'hint', 'Drive can take a few minutes to prepare a new video. If it does not play yet, open it in Google Drive or come back shortly.');
-      wait.setAttribute('data-preparing', '');
-      now.appendChild(wait);
-    }
     var box = el('div', 'x-reactions');
     now.appendChild(box);
     drawReactions(p, box);
@@ -343,6 +332,47 @@
     var k = R.keyFor(e);
     if (k && k.reaction) { e.preventDefault(); react(current, k.reaction); }
   });
+
+  // The browser's own player, streaming the file through the Drive API, so
+  // it plays in Safari on a phone and as soon as it is posted. If the
+  // browser cannot play the file (a format it lacks, or Drive refusing a
+  // file downloaded too often), Drive's player takes its place, which needs
+  // Drive to have prepared the video first.
+  function videoFor(p, links) {
+    var url = X.mediaUrl(p.drive_file_id, window.HUB.googleApiKey);
+    if (!url) return driveFrame(p, links);
+    var v = el('video');
+    v.controls = true; v.preload = 'metadata'; v.playsInline = true;
+    v.setAttribute('playsinline', '');
+    v.setAttribute('aria-label', 'Video by ' + p.author.name);
+    if (!isFresh(p) || reach[p.id] === 'open') v.poster = links.thumb;
+    var src = el('source');
+    src.src = url;
+    var fell = false;
+    function fallBack() {
+      if (fell || !v.parentNode) return;
+      fell = true;
+      v.parentNode.replaceChild(driveFrame(p, links), v);
+      var now = $('[data-now]');
+      if (now && isFresh(p) && reach[p.id] !== 'open') {
+        var wait = el('p', 'hint', 'Drive can take a few minutes to prepare a new video. If it does not play yet, open it in Google Drive or come back shortly.');
+        wait.setAttribute('data-preparing', '');
+        now.insertBefore(wait, now.querySelector('.x-reactions'));
+      }
+    }
+    src.addEventListener('error', fallBack);
+    v.addEventListener('error', fallBack);
+    v.appendChild(src);
+    return v;
+  }
+  function driveFrame(p, links) {
+    var frame = el('iframe');
+    frame.src = links.preview;
+    frame.title = 'Video by ' + p.author.name;
+    frame.allow = 'autoplay; fullscreen';
+    frame.setAttribute('allowfullscreen', '');
+    return frame;
+  }
 
   // Shown in place of the player when a video's owner has stopped sharing
   // it in Google Drive, or has deleted it there. The video keeps its place

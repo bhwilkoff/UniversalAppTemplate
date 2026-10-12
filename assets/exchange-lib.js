@@ -77,6 +77,15 @@
     };
   }
 
+  // The video file itself, through the Drive API with the site's browser
+  // key, for the browser's own player. Drive's embedded player fails in
+  // Safari on a phone, which blocks the cookies it needs inside another
+  // site; and Drive's download address refuses other sites' players.
+  function mediaUrl(id, key) {
+    if (!DRIVE_ID.test(String(id || '')) || !key) return null;
+    return 'https://www.googleapis.com/drive/v3/files/' + id + '?alt=media&key=' + encodeURIComponent(key);
+  }
+
   // "Human Shaped exchange, Week 2 check-in, 2026-10-11 14.05.mp4"
   function fileName(title, when, mime) {
     var t = String(title || 'exchange').replace(/[\\/:*?"<>|\u0000-\u001f]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 80);
@@ -124,7 +133,7 @@
 
   var api = {
     MAX_SECONDS: MAX_SECONDS, MAX_UPLOAD_SECONDS: MAX_UPLOAD_SECONDS, FORMATS: FORMATS, pickFormat: pickFormat, baseType: baseType, extFor: extFor,
-    clock: clock, lengthWords: lengthWords, ago: ago, drive: drive, fileName: fileName,
+    clock: clock, lengthWords: lengthWords, ago: ago, drive: drive, mediaUrl: mediaUrl, fileName: fileName,
     CHUNK: CHUNK, chunkEnd: chunkEnd, resumeFrom: resumeFrom, checkExchange: checkExchange, summary: summary, names: names
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;

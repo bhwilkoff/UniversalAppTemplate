@@ -808,6 +808,18 @@ members without asking GitHub; someone added to the organization by hand,
 outside any cohort, counts only once they teach or join one. Outsiders
 opening a members' exchange learn only that it is for members.
 
+**Videos play in the browser's own player, streamed through the Drive
+API** (Ben, October 12, 2026, an iPhone screenshot of Drive's "Unable to
+load video. Try again." inside an exchange). Drive's embedded player needs
+cookies that Safari on a phone blocks inside another site, and Drive's
+download address refuses other sites' players (403 once the browser's
+cross-site headers are present, tested). The Drive API's media address,
+with a browser key limited to the Drive API and to
+https://humanshaped.org/*, sends the file to the page's `<video>` with
+cross-site permission and no cookies. Drive's player stays as the fallback
+when the browser cannot play a file. A bonus: a new video plays at once,
+without Drive's minutes of preparing.
+
 **Every upload carries a fallback picture for Drive.** Safari on a phone
 records portrait video as a fragmented MP4 with a rotation flag, and Drive
 makes no picture for that combination (tested October 12, 2026: the same

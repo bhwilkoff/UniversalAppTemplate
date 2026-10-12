@@ -6,7 +6,12 @@ window.HUB = {
   key: 'sb_publishable_bdJoZ7bc6Lk0Ug2Z37yn2g_A8AjkjKC',
   // The Google sign-in client in the human-shaped Cloud project. Public by
   // design: Google checks the page's origin, and Supabase checks the token.
-  googleClientId: '1086485459450-me3ejointl1dq4kd2qpq4d6tqla696uf.apps.googleusercontent.com'
+  googleClientId: '1086485459450-me3ejointl1dq4kd2qpq4d6tqla696uf.apps.googleusercontent.com',
+  // A browser key in the same project, for playing exchange videos from
+  // Drive. Public by design: Google allows it only the Drive API and only
+  // from https://humanshaped.org/*, and it reaches only files their owners
+  // shared with anyone who has the link.
+  googleApiKey: 'AIzaSyCPOg-sQIrtdytoOUOt3k_ojXSUgp4t9dY'
 };
 
 // One connection per page, shared by every script on it (AGENTS.md: "All

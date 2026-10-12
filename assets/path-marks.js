@@ -56,7 +56,7 @@
     if (!maybeSignedIn()) return Promise.resolve();
     var ready = window.supabase ? Promise.resolve() : loadScript(SUPABASE_JS);
     return ready.then(function () {
-      return window.HUB ? null : loadScript('/assets/hub-config.js?v=20261009a');
+      return window.HUB ? null : loadScript('/assets/hub-config.js?v=20261012j');
     }).then(function () {
       db = (window.HUB.client ? window.HUB.client() : window.supabase.createClient(window.HUB.url, window.HUB.key));
       return db.auth.getSession();
