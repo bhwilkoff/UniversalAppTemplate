@@ -820,6 +820,17 @@ cross-site permission and no cookies. Drive's player stays as the fallback
 when the browser cannot play a file. A bonus: a new video plays at once,
 without Drive's minutes of preparing.
 
+**The Drive key in `hub-config.js` is public by design, not a leaked
+secret.** GitHub's secret scanning flags it (alert 2, closed as "won't
+fix" on October 12, 2026, at Ben's request). It is a browser key: limited
+to the Drive API and to https://humanshaped.org/*, it reads only files
+shared with anyone who has the link, and the Cloud project has no billing
+account, so misuse can at most spend the free daily quota, after which
+videos fall back to Drive's player. Do not move it server-side or rotate
+it out of the page; proxying video through the hub would spend its free
+bandwidth. Alert 1 is Excalidraw's own public Firebase key inside its
+vendored bundle, also closed.
+
 **Every upload carries a fallback picture for Drive.** Safari on a phone
 records portrait video as a fragmented MP4 with a rotation flag, and Drive
 makes no picture for that combination (tested October 12, 2026: the same
