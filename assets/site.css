@@ -2248,6 +2248,12 @@ ol.principles summary:focus-visible { outline: 2px solid var(--accent); outline-
   text-align: left; padding: 0.5rem; border: 1px solid transparent; border-radius: 12px; background: none; color: var(--ink); font: inherit; cursor: pointer;
 }
 .x-clip-btn:hover { border-color: var(--rule); }
+.x-clip { position: relative; }
+.x-clip:has(.x-clip-remove) .x-clip-btn { padding-right: 2.75rem; }
+.x-clip-remove { position: absolute; top: 0.4rem; right: 0.4rem; width: 36px; height: 36px; display: grid; place-items: center; border: 1px solid transparent; border-radius: 10px; background: none; color: var(--muted); cursor: pointer; }
+.x-clip-remove svg { width: 18px; height: 18px; }
+.x-clip-remove:hover { color: var(--ink); border-color: var(--rule); }
+.x-clip-remove:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 .x-clip-btn:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 .x-clip-btn[aria-current="true"] { background: color-mix(in srgb, var(--thistle) 32%, var(--paper)); border-color: transparent; }
 .x-thumb { position: relative; aspect-ratio: 16 / 10; border-radius: 8px; overflow: hidden; background: var(--surface); display: grid; place-items: center; }

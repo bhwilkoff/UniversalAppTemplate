@@ -149,6 +149,20 @@
         + (felt.length ? '. Reactions: ' + felt.map(function (x) { return x.kind.label; }).join(', ') : ''));
       b.addEventListener('click', function () { play(p, true); });
       li.appendChild(b);
+      if (p.mine || ex.can_moderate) {
+        var rm = el('button', 'x-clip-remove');
+        rm.type = 'button';
+        rm.title = 'Remove from the exchange';
+        rm.setAttribute('aria-label', 'Remove ' + (p.mine ? 'your' : p.author.name + '\'s') + ' video from the exchange');
+        var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('aria-hidden', 'true');
+        var use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+        use.setAttribute('href', '/assets/icons.svg#trash');
+        svg.appendChild(use);
+        rm.appendChild(svg);
+        rm.addEventListener('click', function () { removePost(p); });
+        li.appendChild(rm);
+      }
       list.appendChild(li);
     });
     var empty = $('[data-thread-empty]');
