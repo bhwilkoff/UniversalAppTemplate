@@ -25,7 +25,7 @@
         card.appendChild(el('p', 'small', TeachLib.openingLine(c)));
         card.appendChild(el('p', 'small', TeachLib.scheduleText(c, zone)));
         if (c.description) card.appendChild(el('p', null, c.description));
-        var join = el('a', 'btn-github', 'Join with GitHub');
+        var join = el('a', 'btn-primary', 'Join with GitHub');
         join.href = '/account/?join=' + encodeURIComponent(c.slug);
         var actions = el('div', 'actions'); actions.appendChild(join); card.appendChild(actions);
         box.appendChild(card);

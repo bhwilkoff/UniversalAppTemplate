@@ -154,8 +154,8 @@
     box.appendChild(el('h2', null, 'This page could not reach GitHub just now.'));
     box.appendChild(el('p', null, 'Its text lives in the template on GitHub, and the request for it did not come back, which usually means a network hiccup on one side or the other. The same page is always readable on GitHub itself.'));
     var actions = el('div', { 'class': 'actions' });
-    var gh = el('a', { 'class': 'btn-quiet', href: githubUrl }, 'Read it on GitHub');
-    var retry = el('button', { 'class': 'btn-quiet', type: 'button' }, 'Try again');
+    var gh = el('a', { 'class': 'btn-secondary', href: githubUrl }, 'Read it on GitHub');
+    var retry = el('button', { 'class': 'btn-secondary', type: 'button' }, 'Try again');
     retry.addEventListener('click', load);
     actions.appendChild(gh);
     actions.appendChild(retry);
@@ -314,7 +314,7 @@
         fig.appendChild(el('img', { src: a.shot, alt: app + ' on an iPhone.', width: '600', height: '1304', loading: 'lazy' }));
         box.insertBefore(fig, label);
         var more = el('p', { 'class': 'case-more' });
-        more.appendChild(el('a', { 'class': 'go-text', href: a.page }, app + ' on Human Shaped'));
+        more.appendChild(el('a', { 'class': 'btn-secondary', href: a.page }, app + ' on Human Shaped'));
         box.appendChild(more);
       }
     });

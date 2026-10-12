@@ -13,7 +13,7 @@
   var PYODIDE = 'https://cdn.jsdelivr.net/pyodide/v0.26.4/full/';
 
   function el(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
-  function button(label, cls, onClick) { var b = el('button', cls || 'btn-quiet', label); b.type = 'button'; b.addEventListener('click', onClick); return b; }
+  function button(label, cls, onClick) { var b = el('button', cls || 'btn-secondary', label); b.type = 'button'; b.addEventListener('click', onClick); return b; }
 
   // JavaScript: a fresh sandboxed frame per run.
   function runJs(code) {
@@ -94,13 +94,13 @@
       onStage.appendChild(box2); onStage.appendChild(document.createTextNode(' Also show it on the main stage'));
       var line = el('p', 'small');
       var acts = el('div', 'actions');
-      acts.appendChild(button('Send it to everyone', 'btn-github', function () {
+      acts.appendChild(button('Send it to everyone', 'btn-primary', function () {
         var m = C.message(lang.value, area.value, box2.checked);
         if (!m) { line.textContent = 'Write a program first, up to ' + C.MAX + ' characters.'; return; }
         o.onSend(m);
         line.textContent = 'Sent. Everyone has their own copy to change and run.';
       }));
-      acts.appendChild(button('Take it back', 'btn-quiet', function () { o.onSend(null); line.textContent = 'Taken back.'; }));
+      acts.appendChild(button('Take it back', 'btn-secondary', function () { o.onSend(null); line.textContent = 'Taken back.'; }));
       d.appendChild(lang); d.appendChild(area); d.appendChild(onStage); d.appendChild(acts); d.appendChild(line);
       box.appendChild(d);
     }
@@ -127,7 +127,7 @@
       });
       var out = el('pre', 'code-out'); out.hidden = true; out.setAttribute('aria-live', 'polite');
       var acts = el('div', 'actions');
-      var run = button('Run it', 'btn-github', function () {
+      var run = button('Run it', 'btn-primary', function () {
         run.disabled = true; out.hidden = false; out.textContent = current.lang === 'py' ? 'Running (Python takes a moment the first time)…' : 'Running…';
         (current.lang === 'py' ? runPy : runJs)(area.value).then(function (lines) {
           run.disabled = false;
@@ -137,7 +137,7 @@
         });
       });
       acts.appendChild(run);
-      acts.appendChild(button('Start again from the teacher’s', 'btn-quiet', function () { mine = null; draw(); }));
+      acts.appendChild(button('Start again from the teacher’s', 'btn-secondary', function () { mine = null; draw(); }));
       card.appendChild(area); card.appendChild(acts); card.appendChild(out);
       card.appendChild(el('p', 'small', 'It runs only in your browser, and nothing you change is sent anywhere.'));
     }

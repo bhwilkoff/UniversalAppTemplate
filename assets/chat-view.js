@@ -14,7 +14,7 @@
   var EVERY = 15000;
 
   function el(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
-  function button(label, cls, onClick) { var b = el('button', cls || 'btn-quiet', label); b.type = 'button'; b.addEventListener('click', onClick); return b; }
+  function button(label, cls, onClick) { var b = el('button', cls || 'btn-secondary', label); b.type = 'button'; b.addEventListener('click', onClick); return b; }
   function store() { try { return window.sessionStorage; } catch (e) { return null; } }
 
   function start(o) {
@@ -146,7 +146,7 @@
         lab.appendChild(cb); lab.appendChild(document.createTextNode(' This is what my AI agent said'));
         f.appendChild(lab);
       }
-      var send = el('button', 'btn-github', replyTo ? 'Reply' : 'Send'); send.type = 'submit';
+      var send = el('button', 'btn-primary', replyTo ? 'Reply' : 'Send'); send.type = 'submit';
       f.appendChild(send);
       f.addEventListener('submit', function (e) {
         e.preventDefault();
@@ -170,7 +170,7 @@
       var c = el('textarea'); c.rows = 3; c.placeholder = 'One choice on each line'; c.setAttribute('aria-label', 'The choices');
       var status = el('p', 'small');
       d.appendChild(p); d.appendChild(c);
-      d.appendChild(button('Ask everyone', 'btn-quiet', function () {
+      d.appendChild(button('Ask everyone', 'btn-secondary', function () {
         var choices = c.value.split('\n').map(function (x) { return x.trim(); }).filter(Boolean).slice(0, 8);
         if (!p.value.trim() || choices.length < 2) { status.textContent = 'Write a question and at least two choices.'; return; }
         o.onPoll(p.value.trim(), choices).then(function (err) {
@@ -194,15 +194,15 @@
       if (!o.session.chat_number) {
         if (!o.teaching) { box.appendChild(el('p', 'small', 'Your teacher has not opened the class chat for this session yet.')); return; }
         box.appendChild(el('p', 'small', 'Open the chat for this session. It is a discussion in the cohort’s repository on GitHub, so everything said in class stays there, apart from the ongoing conversation.'));
-        if (!token()) { box.appendChild(button('Connect GitHub first', 'btn-github', connect)); return; }
+        if (!token()) { box.appendChild(button('Connect GitHub first', 'btn-primary', connect)); return; }
         var st = el('p', 'small');
-        box.appendChild(button('Open the class chat', 'btn-github', function () { openChat(st); }));
+        box.appendChild(button('Open the class chat', 'btn-primary', function () { openChat(st); }));
         box.appendChild(st);
         return;
       }
       if (!token()) {
         box.appendChild(el('p', 'small', 'The chat lives on GitHub, so you post as yourself. Connect GitHub once for this class.'));
-        box.appendChild(button('Connect GitHub', 'btn-github', connect));
+        box.appendChild(button('Connect GitHub', 'btn-primary', connect));
         return;
       }
       if (!chat) { box.appendChild(el('p', 'small', 'Reading the chat…')); return; }

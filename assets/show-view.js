@@ -73,7 +73,7 @@
         li.appendChild(body);
         var tools = el('div', 'actions show-tools');
         if (teaching && opts.onPick) {
-          var pick = el('button', 'btn-quiet show-pick', 'Make this the current scene');
+          var pick = el('button', 'btn-secondary show-pick', 'Make this the current scene');
           pick.type = 'button';
           pick.addEventListener('click', function () { opts.onPick(s.key); });
           tools.appendChild(pick);
@@ -90,7 +90,7 @@
     // Running the show (R3)
     // ------------------------------------------------------------------
 
-    function btn(label, cls, fn) { var b = el('button', cls || 'btn-quiet', label); b.type = 'button'; b.addEventListener('click', fn); return b; }
+    function btn(label, cls, fn) { var b = el('button', cls || 'btn-secondary', label); b.type = 'button'; b.addEventListener('click', fn); return b; }
 
     // Shown on the current scene: its clock for everyone; for a teacher,
     // back and next, the clock's start and stop, and, when something else
@@ -106,13 +106,13 @@
       box.appendChild(pinned);
       var follow = null, clockBtn = null;
       if (teaching) {
-        follow = btn('Show this scene on the main stage again', 'btn-quiet show-follow', function () { if (run.onFollow) run.onFollow(); });
+        follow = btn('Show this scene on the main stage again', 'btn-secondary show-follow', function () { if (run.onFollow) run.onFollow(); });
         follow.hidden = true;
         box.appendChild(follow);
         var acts = el('div', 'actions show-moves');
-        acts.appendChild(btn('Back', 'btn-quiet show-back', function () { if (run.onStep) run.onStep(-1); }));
-        acts.appendChild(btn('Next scene', 'btn-github show-next', function () { if (run.onStep) run.onStep(1); }));
-        clockBtn = btn('Start the clock', 'btn-quiet show-clock-btn', function () { if (run.onClock) run.onClock(!info.clockOn); });
+        acts.appendChild(btn('Back', 'btn-secondary show-back', function () { if (run.onStep) run.onStep(-1); }));
+        acts.appendChild(btn('Next scene', 'btn-primary show-next', function () { if (run.onStep) run.onStep(1); }));
+        clockBtn = btn('Start the clock', 'btn-secondary show-clock-btn', function () { if (run.onClock) run.onClock(!info.clockOn); });
         acts.appendChild(clockBtn);
         box.appendChild(acts);
       }
@@ -148,7 +148,7 @@
       if (mode === 'parts') {
         d.appendChild(el('p', 'small', 'This week is running on the six parts. To change a scene in the moment, give this week a run of show of its own, starting from the same scenes. Everyone stays where they are.'));
         var msg0 = el('p', 'small'); msg0.setAttribute('role', 'status');
-        var make = btn('Give this week its own run of show', 'btn-quiet', function () {
+        var make = btn('Give this week its own run of show', 'btn-secondary', function () {
           make.disabled = true; msg0.textContent = 'Making it…';
           Promise.resolve(run.onStartOwn()).then(function (err) { make.disabled = false; msg0.textContent = err ? 'Not made: ' + err : ''; });
         });
@@ -177,9 +177,9 @@
       if (have.options) field('options', 'Choices', 'area', 'One to a line, two to eight. Leave empty for an answer in their own words.');
       var msg = el('p', 'small'); msg.setAttribute('role', 'status');
       var acts = el('div', 'actions');
-      var save = el('button', 'btn-github', 'Show it to everyone'); save.type = 'submit';
+      var save = el('button', 'btn-primary', 'Show it to everyone'); save.type = 'submit';
       acts.appendChild(save);
-      acts.appendChild(btn('Put it back as it was', 'btn-quiet', function () {
+      acts.appendChild(btn('Put it back as it was', 'btn-secondary', function () {
         Object.keys(start).forEach(function (k) { if (f.elements[k]) f.elements[k].value = start[k]; });
         if (run.onDraft) run.onDraft(s.key, null);
         msg.textContent = '';

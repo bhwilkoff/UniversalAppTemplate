@@ -54,12 +54,12 @@
     stage.appendChild(live); stage.appendChild(review); stage.appendChild(idle); stage.appendChild(count); stage.appendChild(badge);
 
     var controls = el('div', 'xr-controls');
-    var onBtn = button('btn-quiet', 'Turn on the camera');
+    var onBtn = button('btn-secondary', 'Turn on the camera');
     var recBtn = button('xr-rec', 'Record');
     var stopBtn = button('xr-rec stop', 'Stop');
-    var againBtn = button('btn-quiet', 'Record again');
-    var upBtn = button('btn-quiet', 'Upload a video');
-    var otherBtn = button('btn-quiet', 'Choose a different video');
+    var againBtn = button('btn-secondary', 'Record again');
+    var upBtn = button('btn-secondary', 'Upload a video');
+    var otherBtn = button('btn-secondary', 'Choose a different video');
     recBtn.hidden = stopBtn.hidden = againBtn.hidden = otherBtn.hidden = true;
     if (!canRecord) onBtn.hidden = true;
     controls.appendChild(onBtn); controls.appendChild(upBtn); controls.appendChild(recBtn); controls.appendChild(stopBtn); controls.appendChild(againBtn); controls.appendChild(otherBtn);
@@ -74,7 +74,7 @@
     var shoot = el('input');
     shoot.type = 'file'; shoot.accept = 'video/*'; shoot.setAttribute('capture', 'user'); shoot.hidden = true;
     var altLine = el('p', 'hint');
-    var useApp = button('link-btn', 'record with your phone\'s camera app');
+    var useApp = button('text-button', 'record with your phone\'s camera app');
     altLine.appendChild(document.createTextNode('Or '));
     altLine.appendChild(useApp);
     altLine.appendChild(document.createTextNode(' and come back here to post it.'));

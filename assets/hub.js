@@ -161,7 +161,7 @@
           ? (pv[0] === 'github' && data.user_name ? ', linked as @' + data.user_name : data.email ? ', linked as ' + data.email : ', linked')
           : ', not linked'));
         if (idn && G.canUnlink(ids, pv[0])) {
-          var b = el('button', 'btn-link', 'Unlink');
+          var b = el('button', 'btn-secondary small', 'Unlink');
           b.type = 'button';
           b.addEventListener('click', function () {
             if (!b.hasAttribute('data-armed')) {
@@ -182,7 +182,7 @@
           li.appendChild(b);
         }
         if (!idn && pv[0] === 'github') {
-          var l = el('button', 'btn-link', 'Link GitHub');
+          var l = el('button', 'btn-secondary small', 'Link GitHub');
           l.type = 'button';
           l.addEventListener('click', function () {
             linkGitHub(location.origin + '/account/').catch(function (e) { status.textContent = 'Linking GitHub did not start: ' + said(e) + '.'; });
@@ -275,15 +275,15 @@
     if (mine && c.myRole === 'mentor') card.appendChild(el('p', 'small', 'You are a mentor in this cohort.'));
     var actions = el('div', 'actions');
     if (mine) {
-      var open = el('a', 'btn-github', 'Open your cohort');
+      var open = el('a', 'btn-primary', 'Open your cohort');
       open.href = '/cohort/?c=' + encodeURIComponent(c.slug);
       actions.appendChild(open);
-      var leave = el('button', 'btn-quiet', 'Leave this cohort');
+      var leave = el('button', 'btn-danger', 'Leave this cohort');
       leave.type = 'button';
       leave.addEventListener('click', function () { leavingCohort = c.id; leaveDialog.showModal(); });
       actions.appendChild(leave);
     } else {
-      var join = el('button', 'btn-quiet', 'Join this cohort');
+      var join = el('button', 'btn-primary', 'Join this cohort');
       join.type = 'button';
       join.addEventListener('click', function () {
         join.disabled = true;
@@ -413,7 +413,7 @@
           if (c === chosen) {
             card.classList.add('chosen');
             card.insertBefore(el('p', 'kicker', 'The cohort you chose'), card.firstChild);
-            card.querySelector('button').className = 'btn-github';
+            card.querySelector('button').className = 'btn-primary';
           }
           openBox.appendChild(card);
         });
@@ -509,7 +509,7 @@
           card.appendChild(el('p', 'who-line', C.levelName(C.levelFor(c.platforms)) + from));
           if (state === 'signed') {
             card.appendChild(el('p', 'small', 'Signed on ' + day(c.signed_at) + '.'));
-            var a = el('a', 'btn-quiet', 'Open it, to share, download, or check it');
+            var a = el('a', 'btn-secondary', 'Open it, to share, download, or check it');
             a.href = '/credential/?id=' + encodeURIComponent(c.id);
             var acts = el('div', 'actions'); acts.appendChild(a); card.appendChild(acts);
           } else if (state === 'waiting') {
@@ -606,7 +606,7 @@
     card.appendChild(el('p', 'small', (c.status === 'running' ? 'Running now. ' : 'Open for sign-up. ') + when(c.starts_on) + ', ' + c.weeks + ' weeks.'));
     if (c.description) card.appendChild(el('p', null, c.description));
     var actions = el('div', 'actions');
-    var join = el('button', 'btn-quiet', 'Mentor this cohort');
+    var join = el('button', 'btn-secondary', 'Mentor this cohort');
     join.type = 'button';
     var msg = el('span', 'small'); msg.setAttribute('role', 'status');
     join.addEventListener('click', function () {
@@ -646,7 +646,7 @@
             if (n.edited_at) line += ' (edited)';
             q.appendChild(el('p', 'small', line));
             var msg = el('span', 'small'); msg.setAttribute('role', 'status');
-            var rm = el('button', 'btn-quiet', 'Remove this note');
+            var rm = el('button', 'btn-danger', 'Remove this note');
             rm.type = 'button';
             rm.addEventListener('click', function () {
               rm.disabled = true;
@@ -696,7 +696,7 @@
         line.appendChild(a);
         q.appendChild(line);
         var msg = el('span', 'small'); msg.setAttribute('role', 'status');
-        var rm = el('button', 'btn-quiet', 'Remove this note');
+        var rm = el('button', 'btn-danger', 'Remove this note');
         rm.type = 'button';
         rm.addEventListener('click', function () {
           rm.disabled = true;

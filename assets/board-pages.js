@@ -15,7 +15,7 @@
   var LIB_KEY = 'hs-board-library';
 
   function el(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
-  function button(label, onClick) { var b = el('button', 'btn-quiet', label); b.type = 'button'; b.addEventListener('click', onClick); return b; }
+  function button(label, onClick) { var b = el('button', 'btn-secondary', label); b.type = 'button'; b.addEventListener('click', onClick); return b; }
 
   // pdf.js, loaded the first time a PDF is chosen. Its worker comes from
   // the same address, handed to the browser as this page's own blob,

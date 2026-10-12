@@ -39,7 +39,7 @@
         var card = el('article', 'cohort-card');
         card.appendChild(el('h3', null, p.title));
         card.appendChild(el('p', 'small', (p.open ? 'Taking answers' : 'Closed') + ', ' + n + (n === 1 ? ' answer' : ' answers') + '. ' + daysText(p) + ', ' + windowText(p) + '.'));
-        var open = el('button', 'btn-quiet', 'Open');
+        var open = el('button', 'btn-secondary', 'Open');
         open.type = 'button';
         open.addEventListener('click', function () { openPoll(p.id); });
         var a = el('div', 'actions'); a.appendChild(open); card.appendChild(a);
@@ -160,7 +160,7 @@
       tr.appendChild(td);
       body.appendChild(tr);
       if (a.host) return;
-      var rm = el('button', 'link-btn', 'Remove');
+      var rm = el('button', 'btn-danger small', 'Remove');
       rm.type = 'button';
       rm.setAttribute('aria-label', 'Remove ' + a.name + "'s answer");
       rm.addEventListener('click', function () {

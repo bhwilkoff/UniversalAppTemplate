@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261012c">
+  <link rel="stylesheet" href="/assets/site.css?v=20261012h">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -22,7 +22,7 @@
       if (t) document.documentElement.setAttribute('data-theme', t);
     })();
   </script>
-  <script src="/assets/site.js" defer></script>
+  <script src="/assets/site.js?v=20261012h" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" defer></script>
   <script src="/assets/hub-config.js?v=20261009a" defer></script>
   <script src="/assets/times-lib.js?v=20261009g" defer></script>
@@ -48,7 +48,7 @@
         <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
           <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#moon"/></svg>
         </button>
-        <a class="btn-github small" href="/account/">
+        <a class="btn-primary small" href="/account/">
           <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>
           <span>Sign in<span class="long"> with GitHub</span></span>
         </a>
@@ -69,7 +69,7 @@
         <section class="times-state" data-state="error" hidden>
           <h1>The poll could not be loaded.</h1>
           <p class="lead" data-error-text></p>
-          <p><button class="btn-quiet" type="button" data-retry>Try again</button></p>
+          <p><button class="btn-secondary" type="button" data-retry>Try again</button></p>
         </section>
 
         <section class="times-state" data-state="poll" hidden>
@@ -98,7 +98,7 @@
                 <p class="hint" data-zone-line></p>
               </div>
               <div class="times-calendar" data-calendar hidden>
-                <button class="btn-quiet" type="button" data-cal-check>Check my Google Calendar</button>
+                <button class="btn-secondary" type="button" data-cal-check>Check my Google Calendar</button>
                 <p class="hint">Google tells this page only when you are busy, never what you are doing. Nothing from your calendar is saved or sent to the teacher.</p>
                 <p class="times-status" role="status" aria-live="polite" data-cal-line></p>
                 <p class="times-wake" data-cal-wake hidden>Marking free times between <input type="time" value="08:00" step="900" data-wake-from aria-label="The earliest start time to mark"> and <input type="time" value="20:00" step="900" data-wake-to aria-label="The latest start time to mark">, your time.</p>
@@ -116,15 +116,15 @@
 
             <p class="times-status" role="status" aria-live="polite" data-status></p>
             <div class="actions">
-              <button class="btn-github" type="submit" data-submit>Send my answer</button>
-              <button class="link-btn" type="button" data-withdraw hidden>Take back my answer</button>
+              <button class="btn-primary" type="submit" data-submit>Send my answer</button>
+              <button class="btn-danger" type="button" data-withdraw hidden>Take back my answer</button>
             </div>
           </form>
 
           <div class="times-keep" data-keep hidden>
             <h2>Changing your answer later</h2>
             <p>This browser remembers your answer. To change it from another phone or computer, keep this link, which is yours alone.</p>
-            <p class="times-link"><input readonly data-keep-link aria-label="Your link for changing your answer"> <button class="btn-quiet" type="button" data-copy-keep>Copy</button></p>
+            <p class="times-link"><input readonly data-keep-link aria-label="Your link for changing your answer"> <button class="btn-secondary" type="button" data-copy-keep>Copy</button></p>
           </div>
         </section>
       </div>
@@ -136,7 +136,7 @@
       <div class="footer-brand">
         <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
         <p>The ideas, the method, the tools, and the cohorts are free, and what you build is yours.</p>
-        <p><a class="go-text" href="/about/">About Human Shaped</a></p>
+        <p><a href="/about/">About Human Shaped</a></p>
       </div>
       <nav class="footer-links" aria-label="More of the site">
         <div>

@@ -354,7 +354,7 @@
       var recent = el('div', 'app-threads');
       box.appendChild(recent);
       var a = el('div', 'actions');
-      var go = link(talk.href, talk.kind === 'discussions' ? 'Join the conversation' : 'Open its Issues', 'btn-github');
+      var go = link(talk.href, talk.kind === 'discussions' ? 'Join the conversation' : 'Open its Issues', 'btn-primary');
       a.appendChild(go); box.appendChild(a);
       drawThreads(recent, repo, talk.kind);
     }

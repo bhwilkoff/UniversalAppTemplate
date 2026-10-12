@@ -22,6 +22,14 @@
     if (text != null) n.textContent = text;
     return n;
   }
+  function icon(name) {
+    var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('aria-hidden', 'true');
+    var use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+    use.setAttribute('href', '/assets/icons.svg#' + name);
+    svg.appendChild(use);
+    return svg;
+  }
   function said(e) { return e && e.message ? e.message : String(e || 'no details'); }
   function show(state) {
     root.querySelectorAll('.x-state').forEach(function (s) { s.hidden = s.getAttribute('data-state') !== state; });
@@ -154,12 +162,7 @@
         rm.type = 'button';
         rm.title = 'Remove from the exchange';
         rm.setAttribute('aria-label', 'Remove ' + (p.mine ? 'your' : p.author.name + '\'s') + ' video from the exchange');
-        var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        svg.setAttribute('aria-hidden', 'true');
-        var use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
-        use.setAttribute('href', '/assets/icons.svg#trash');
-        svg.appendChild(use);
-        rm.appendChild(svg);
+        rm.appendChild(icon('trash'));
         rm.addEventListener('click', function () { removePost(p); });
         li.appendChild(rm);
       }
@@ -212,7 +215,7 @@
     if (reply) {
       var r = el('p', 'x-now-reply');
       r.appendChild(document.createTextNode('In answer to '));
-      var rb = el('button', 'link-btn', reply.author.name + '\'s video');
+      var rb = el('button', 'text-button', reply.author.name + '\'s video');
       rb.type = 'button';
       rb.addEventListener('click', function () { play(reply, true); });
       r.appendChild(rb);
@@ -228,17 +231,20 @@
     now.appendChild(box);
     drawReactions(p, box);
     var acts = el('div', 'actions');
-    var open = el('a', 'go-text', 'Open in Google Drive');
-    open.href = links.view; open.target = '_blank'; open.rel = 'noopener';
-    acts.appendChild(open);
     if (ex.can_reply) {
-      var ans = el('button', 'btn-quiet', 'Answer this video');
+      var ans = el('button', 'btn-secondary', 'Answer this video');
       ans.type = 'button';
       ans.addEventListener('click', function () { compose(p); });
       acts.appendChild(ans);
     }
+    // Leaving the site: named in the label, marked with the arrow-out
+    // icon, in the same tab (research/notes/links-and-actions-notes.md).
+    var open = el('a', 'btn-secondary', 'Open in Google Drive');
+    open.href = links.view;
+    open.appendChild(icon('arrow-square-out'));
+    acts.appendChild(open);
     if (p.mine || ex.can_moderate) {
-      var rm = el('button', 'link-btn', 'Remove from the exchange');
+      var rm = el('button', 'btn-danger', 'Remove from the exchange');
       rm.type = 'button';
       rm.addEventListener('click', function () { removePost(p); });
       acts.appendChild(rm);
@@ -347,7 +353,7 @@
       ? 'This video is no longer shared in your Google Drive, so nobody else can watch it here.'
       : 'This video can\'t play here, because ' + p.author.name + ' is no longer sharing it in Google Drive.'));
     if (p.mine) {
-      var again = el('button', 'btn-quiet', 'Share it again');
+      var again = el('button', 'btn-secondary', 'Share it again');
       again.type = 'button';
       var say = el('p', 'hint');
       again.addEventListener('click', function () {
@@ -380,7 +386,7 @@
     line.replaceChildren();
     if (to) {
       line.appendChild(document.createTextNode('Your video will answer ' + to.author.name + '\'s, and join the end of the exchange. '));
-      var whole = el('button', 'link-btn', 'Answer the whole exchange instead');
+      var whole = el('button', 'text-button', 'Answer the whole exchange instead');
       whole.type = 'button';
       whole.addEventListener('click', function () { compose(null); });
       line.appendChild(whole);

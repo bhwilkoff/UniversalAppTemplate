@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261012c">
+  <link rel="stylesheet" href="/assets/site.css?v=20261012h">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -39,8 +39,8 @@
       <h1>Sign in to see this call’s session.</h1>
       <p class="small">Meet keeps this panel apart from the rest of your browser, so it needs your permission to use your humanshaped.org sign-in.</p>
       <div class="addon-signin">
-        <button class="btn-github" type="button" data-use-site hidden>Use my humanshaped.org sign-in</button>
-        <button class="btn-quiet" type="button" data-popup>
+        <button class="btn-primary" type="button" data-use-site hidden>Use my humanshaped.org sign-in</button>
+        <button class="btn-secondary" type="button" data-popup>
           <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Sign in with GitHub in a small window
         </button>
       </div>
@@ -56,7 +56,7 @@
       <h1>Link your GitHub account, once.</h1>
       <p class="small">Your cohort works through GitHub: your app lives there, and so does your cohort’s conversation. Link it in a small window, and this panel will follow.</p>
       <div class="addon-signin">
-        <button class="btn-github" type="button" data-link-github>
+        <button class="btn-primary" type="button" data-link-github>
           <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Link my GitHub account
         </button>
       </div>
@@ -67,12 +67,12 @@
       <p class="addon-mark"><span class="visually-hidden">Human Shaped</span><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></p>
       <h1>This call is not one of your cohort’s rooms yet.</h1>
       <p class="small" data-no-room-text></p>
-      <p><a class="btn-quiet" href="/teach/" target="_blank" rel="noopener">Open your teaching page</a></p>
+      <p><a class="btn-secondary" href="/teach/" target="_blank" rel="noopener">Open your teaching page</a></p>
     </section>
 
     <section class="account-state" data-state="error" hidden>
       <p class="error" data-error-text></p>
-      <p><button class="btn-quiet" type="button" data-reload>Try again</button></p>
+      <p><button class="btn-secondary" type="button" data-reload>Try again</button></p>
     </section>
 
     <section class="account-state" data-state="ready" hidden>
@@ -120,9 +120,9 @@
           <p class="kicker" data-part-kicker></p>
           <p class="addon-clock" data-clock aria-live="off"></p>
           <div class="actions addon-teacher-only" data-part-controls hidden>
-            <button class="btn-github" type="button" data-timer>Start this scene’s clock</button>
-            <button class="btn-quiet" type="button" data-next-part>Next scene</button>
-            <button class="btn-quiet" type="button" data-welcome-toggle>Put the welcome on the main stage</button>
+            <button class="btn-primary" type="button" data-timer>Start this scene’s clock</button>
+            <button class="btn-secondary" type="button" data-next-part>Next scene</button>
+            <button class="btn-secondary" type="button" data-welcome-toggle>Put the welcome on the main stage</button>
           </div>
         </div>
 
@@ -149,7 +149,7 @@
         <!-- Questions (checks for understanding). -->
         <div data-questions>
           <div class="actions addon-closing" data-closing-wrap hidden>
-            <button class="btn-quiet" type="button" data-ask-closing>Ask the two closing questions</button>
+            <button class="btn-secondary" type="button" data-ask-closing>Ask the two closing questions</button>
           </div>
           <div class="live-scene-question" data-scene-question hidden></div>
           <div class="live-checks" data-checks></div>
@@ -158,7 +158,7 @@
             <form class="inline-form" data-ask>
               <div data-ask-fields></div>
               <label class="check"><input type="checkbox" data-ask-tally> Show everyone the results as answers come in</label>
-              <div class="actions"><button class="btn-quiet" type="submit">Ask everyone</button></div>
+              <div class="actions"><button class="btn-secondary" type="submit">Ask everyone</button></div>
             </form>
           </details>
           <p class="small" data-ask-status role="status"></p>
@@ -170,8 +170,8 @@
 
       <footer class="addon-foot">
         <div class="actions">
-          <button class="btn-quiet" type="button" data-open-stage hidden>Open the main stage</button>
-          <a class="btn-quiet" data-full-link target="_blank" rel="noopener">This view in a browser tab</a>
+          <button class="btn-secondary" type="button" data-open-stage hidden>Open the main stage</button>
+          <a class="btn-secondary" data-full-link target="_blank" rel="noopener">This view in a browser tab</a>
         </div>
         <p class="small" data-stage-status role="status"></p>
         <p class="small" data-sync></p>
@@ -192,19 +192,19 @@
   <script src="/assets/addon-config.js" defer></script>
   <script src="/assets/cohort-lib.js" defer></script>
   <script src="/assets/live-lib.js" defer></script>
-  <script src="/assets/question-view.js" defer></script>
+  <script src="/assets/question-view.js?v=20261012h" defer></script>
   <script src="/assets/board-lib.js" defer></script>
   <script src="/assets/addon-lib.js" defer></script>
   <script src="/assets/discussions-lib.js" defer></script>
   <script src="/assets/session-thread-lib.js" defer></script>
   <script src="/assets/rooms-lib.js" defer></script>
-  <script src="/assets/rooms.js" defer></script>
-  <script src="/assets/signals-lib.js" defer></script>
-  <script src="/assets/signals.js" defer></script>
+  <script src="/assets/rooms.js?v=20261012h" defer></script>
+  <script src="/assets/signals-lib.js?v=20261012h" defer></script>
+  <script src="/assets/signals.js?v=20261012h" defer></script>
   <script src="/assets/show-lib.js" defer></script>
   <script src="/assets/show-view-lib.js" defer></script>
   <script src="/assets/curriculum-pages-lib.js" defer></script>
-  <script src="/assets/show-view.js" defer></script>
+  <script src="/assets/show-view.js?v=20261012h" defer></script>
   <script src="/assets/google-signin-lib.js" defer></script>
   <script src="/assets/google-signin.js" defer></script>
   <script src="/assets/show-run.js" defer></script>
@@ -213,10 +213,10 @@
   <script src="/assets/rerun-lib.js" defer></script>
   <script src="/assets/recognition-lib.js" defer></script>
   <script src="/assets/chat-lib.js" defer></script>
-  <script src="/assets/chat-view.js" defer></script>
+  <script src="/assets/chat-view.js?v=20261012h" defer></script>
   <script src="/assets/code-lib.js" defer></script>
-  <script src="/assets/code-runner.js" defer></script>
+  <script src="/assets/code-runner.js?v=20261012h" defer></script>
   <script src="/assets/class-channel.js" defer></script>
-  <script src="/assets/addon.js" defer></script>
+  <script src="/assets/addon.js?v=20261012h" defer></script>
 </body>
 </html>

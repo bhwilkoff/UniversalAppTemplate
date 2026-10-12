@@ -846,3 +846,29 @@ and offers its owner "Share it again".
 `my_exchanges()`, and `cohort_exchanges()`), `exchange-lib.js` (tested),
 `exchange-drive.js`, `exchange-recorder.js`, `exchange.js`, and
 `exchange-list.js` on /account/ and /cohort/.
+
+## Actions and links: one standard (October 12, 2026)
+
+**Anything that stands on its own is a button, in one of three styles;
+underlined text appears only inside a sentence** (Ben: "We need a
+consistent design for links and actions within the site").
+
+**Why:** the site had grown seven looks for things a person presses, and
+its own rule (pattern 7) allowed a bold underlined link beside an outlined
+button, so one row could hold three styles. Design systems agree on links
+for going somewhere and buttons for doing something, one primary action per
+group, red only for what is hard to undo, and underlines for links in
+reading text; they disagree on letting a plain link sit in a row of
+buttons, and this site takes the stricter side because that mix is what
+read as wonky. Sources: research/notes/links-and-actions-notes.md.
+
+**How to apply:** `.btn-primary` (filled, the main next step, at most one
+per group and first), `.btn-secondary` (outlined, everything else,
+including a link that ends a section and Cancel), `.btn-danger` (outlined
+red, last, `.final` filled red on the confirming step), `.small` in dense
+lists; a link or `.text-button` inside a sentence; plain links in
+navigation; leaving the site named in the label with the arrow-out icon.
+The rule is pattern 7 in research/notes/design-patterns.md, and
+tools/test/action-styles.test.mjs fails on a retired style or a row that
+breaks it. The retired names are `.btn-github`, `.btn-quiet`, `.btn-link`,
+`.link-btn`, `a.go`, `a.go-text`, and the hero's `a.text`.

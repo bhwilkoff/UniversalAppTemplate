@@ -19,7 +19,7 @@
     return e;
   }
   function button(text, cls, onClick) {
-    var b = el('button', cls || 'btn-quiet', text);
+    var b = el('button', cls || 'btn-secondary', text);
     b.type = 'button';
     b.addEventListener('click', onClick);
     return b;
@@ -76,15 +76,15 @@
         : 'Week ' + session.number + ' has no run of show yet.';
       if (!scenes.length) {
         var C = window.CurriculumLib, week = C ? C.weekOf(session.number) : null;
-        if (week != null && window.CurriculumSeed) start.appendChild(button(C.startLabel(week), 'btn-github', startPlan));
-        start.appendChild(button('Start from the six parts', 'btn-quiet', startDefault));
+        if (week != null && window.CurriculumSeed) start.appendChild(button(C.startLabel(week), 'btn-primary', startPlan));
+        start.appendChild(button('Start from the six parts', 'btn-secondary', startDefault));
         var from = S.copySource(opts.sessions, session, withScenes);
-        if (from) start.appendChild(button('Copy week ' + from.number + '’s run of show', 'btn-quiet', function () { copyFrom(from); }));
+        if (from) start.appendChild(button('Copy week ' + from.number + '’s run of show', 'btn-secondary', function () { copyFrom(from); }));
       }
       var at = S.startTimes(scenes);
       scenes.forEach(function (s, i) { list.appendChild(item(s, i, at[i])); });
       if (editing === 'new') { var li = el('li', 'scene-item is-editing'); li.appendChild(form(null)); list.appendChild(li); }
-      else add.appendChild(button('Add a scene', 'btn-quiet', function () { editing = 'new'; previewing = null; draw(); focusFirst(); }));
+      else add.appendChild(button('Add a scene', 'btn-secondary', function () { editing = 'new'; previewing = null; draw(); focusFirst(); }));
     }
 
     function focusFirst() {
@@ -107,20 +107,20 @@
       li.appendChild(head);
       if (notes[s.id]) li.appendChild(el('p', 'small scene-note', 'Your note: ' + notes[s.id]));
       var acts = el('div', 'actions scene-actions');
-      var up = button('Up', 'btn-quiet', function () { move(i, -1); });
+      var up = button('Up', 'btn-secondary', function () { move(i, -1); });
       up.setAttribute('aria-label', 'Move ' + s.title + ' up'); up.disabled = i === 0;
-      var down = button('Down', 'btn-quiet', function () { move(i, 1); });
+      var down = button('Down', 'btn-secondary', function () { move(i, 1); });
       down.setAttribute('aria-label', 'Move ' + s.title + ' down'); down.disabled = i === scenes.length - 1;
       acts.appendChild(up); acts.appendChild(down);
-      acts.appendChild(button('Edit', 'btn-quiet', function () { editing = s.id; previewing = null; draw(); focusFirst(); }));
-      var prev = button(previewing === s.id ? 'Hide the preview' : 'Preview the main stage', 'btn-quiet', function () {
+      acts.appendChild(button('Edit', 'btn-secondary', function () { editing = s.id; previewing = null; draw(); focusFirst(); }));
+      var prev = button(previewing === s.id ? 'Hide the preview' : 'Preview the main stage', 'btn-secondary', function () {
         previewing = previewing === s.id ? null : s.id; draw();
         var again = list.querySelector('[data-id="' + s.id + '"] .scene-actions button:nth-child(4)');
         if (again) again.focus();
       });
       prev.setAttribute('aria-expanded', previewing === s.id ? 'true' : 'false');
       acts.appendChild(prev);
-      var rm = button('Remove', 'btn-quiet danger', function () {
+      var rm = button('Remove', 'btn-danger', function () {
         if (!rm.hasAttribute('data-armed')) { rm.setAttribute('data-armed', ''); rm.textContent = 'Remove ' + s.title + '?'; return; }
         remove(s);
       });
@@ -235,9 +235,9 @@
 
       var msg = el('span', 'small'); msg.setAttribute('role', 'status');
       var acts = el('div', 'actions');
-      var save = el('button', 'btn-quiet', s ? 'Save the scene' : 'Add it to the run of show'); save.type = 'submit';
+      var save = el('button', 'btn-secondary', s ? 'Save the scene' : 'Add it to the run of show'); save.type = 'submit';
       acts.appendChild(save);
-      acts.appendChild(button('Cancel', 'btn-quiet', function () { editing = null; draw(); }));
+      acts.appendChild(button('Cancel', 'btn-secondary', function () { editing = null; draw(); }));
       acts.appendChild(msg);
       f.appendChild(acts);
 

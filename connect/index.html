@@ -23,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261012c">
+  <link rel="stylesheet" href="/assets/site.css?v=20261012h">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -32,7 +32,7 @@
       if (t) document.documentElement.setAttribute('data-theme', t);
     })();
   </script>
-  <script src="/assets/site.js" defer></script>
+  <script src="/assets/site.js?v=20261012h" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to the page</a>
@@ -52,7 +52,7 @@
         <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
           <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#moon"/></svg>
         </button>
-        <a class="btn-github small" href="/account/">
+        <a class="btn-primary small" href="/account/">
           <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>
           <span>Sign in<span class="long"> with GitHub</span></span>
         </a>
@@ -77,7 +77,7 @@
             <h2>The address your agent needs.</h2>
             <div class="prose"><p>Every way of connecting starts from this one address. Your agent will open a page on humanshaped.org where you sign in with GitHub and see exactly what it can read before you allow it.</p></div>
             <pre id="mcp-url">https://bifrieqzkihuxfzttgvd.supabase.co/functions/v1/mcp</pre>
-            <p class="actions"><button class="btn-quiet" type="button" data-copy="mcp-url">Copy the address</button></p>
+            <p class="actions"><button class="btn-secondary" type="button" data-copy="mcp-url">Copy the address</button></p>
           </div>
 
           <div class="topic" id="claude">
@@ -95,7 +95,7 @@
             <h2>Claude Code.</h2>
             <div class="prose"><p>Ask Claude Code to do it for you, in your own words or in these:</p></div>
             <pre id="claude-code-ask">Please add the Human Shaped MCP server for my user, not this project, with: claude mcp add --transport http --scope user humanshaped https://bifrieqzkihuxfzttgvd.supabase.co/functions/v1/mcp</pre>
-            <p class="actions"><button class="btn-quiet" type="button" data-copy="claude-code-ask">Copy the request</button></p>
+            <p class="actions"><button class="btn-secondary" type="button" data-copy="claude-code-ask">Copy the request</button></p>
             <ol class="steps">
               <li>Then type <b>/mcp</b>, choose humanshaped, and sign in on the page it opens.</li>
               <li>Try the prompt it brings with it: <b>/humanshaped:review_this_week</b> asks your agent for a human-shaped review, written to a file and left for you to decide about. On your own, outside a cohort, <b>/humanshaped:review_my_own_work</b> does the same from your own app and your marks on the stages.</li>
@@ -106,7 +106,7 @@
             <h2>Gemini CLI.</h2>
             <div class="prose"><p>Ask Gemini to add it for your user. The <b>-s user</b> part matters: without it, Gemini saves the setting inside your app's repository, which is public.</p></div>
             <pre id="gemini-ask">Please add the Human Shaped MCP server for my user, not this project, with: gemini mcp add --transport http -s user humanshaped https://bifrieqzkihuxfzttgvd.supabase.co/functions/v1/mcp</pre>
-            <p class="actions"><button class="btn-quiet" type="button" data-copy="gemini-ask">Copy the request</button></p>
+            <p class="actions"><button class="btn-secondary" type="button" data-copy="gemini-ask">Copy the request</button></p>
             <ol class="steps">
               <li>Then type <b>/mcp auth humanshaped</b> and sign in on the page it opens.</li>
             </ol>
@@ -129,7 +129,7 @@
       <div class="footer-brand">
         <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
         <p>The ideas, the method, the tools, and the cohorts are free, and what you build is yours.</p>
-        <p><a class="go-text" href="/about/">About Human Shaped</a></p>
+        <p><a href="/about/">About Human Shaped</a></p>
       </div>
       <nav class="footer-links" aria-label="More of the site">
         <div>

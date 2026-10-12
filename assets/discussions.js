@@ -12,7 +12,7 @@
 
   function el(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
   function link(href, text, cls) { var a = el('a', cls || null, text); a.href = href; return a; }
-  function button(label, cls, onClick) { var b = el('button', cls || 'btn-quiet', label); b.type = 'button'; b.addEventListener('click', onClick); return b; }
+  function button(label, cls, onClick) { var b = el('button', cls || 'btn-secondary', label); b.type = 'button'; b.addEventListener('click', onClick); return b; }
   function ago(iso) { return root.CohortLib ? root.CohortLib.ago(iso, new Date()) : new Date(iso).toLocaleDateString(); }
   function who(a) { return a ? a.login : 'someone who has left GitHub'; }
   function replies(n) { return n === 0 ? 'no replies yet' : n === 1 ? '1 reply' : n + ' replies'; }
@@ -88,7 +88,7 @@
         : 'GitHub lets this page read the conversation for you for a few hours after you sign in, and that time has passed in this tab, so sign in again to read it here, or open it on GitHub.');
     box.appendChild(p);
     var acts = el('div', 'actions');
-    var b = button('Sign in again to read it here', 'btn-quiet', function () { signInAgain(db, b); });
+    var b = button('Sign in again to read it here', 'btn-secondary', function () { signInAgain(db, b); });
     acts.appendChild(b);
     if (compact) acts.appendChild(link('https://github.com/' + repo + '/discussions', 'Open it on GitHub'));
     box.appendChild(acts);
@@ -122,7 +122,7 @@
       area.replaceChildren();
       if (p.kind === 'expired') { forget(); tok = null; return noToken(area, o.db, o.repo, true, false); }
       area.appendChild(explain(p, o.repo));
-      area.appendChild(el('div', 'actions')).appendChild(button('Try again', 'btn-quiet', function () { load(); }));
+      area.appendChild(el('div', 'actions')).appendChild(button('Try again', 'btn-secondary', function () { load(); }));
     }
 
     function draw() {
@@ -133,7 +133,7 @@
       if (list.discussions.length) area.appendChild(ol);
       var foot = el('p', 'small talk-foot');
       if (list.total > list.discussions.length) foot.appendChild(link(list.url + '/discussions', 'All ' + list.total + ' conversations on GitHub'));
-      foot.appendChild(button('Read it again', 'btn-link', function () { load(openId); }));
+      foot.appendChild(button('Read it again', 'btn-secondary small', function () { load(openId); }));
       area.appendChild(foot);
       area.appendChild(startForm());
     }
@@ -199,7 +199,7 @@
       label.appendChild(ta); f.appendChild(label);
       f.appendChild(el('p', 'small hint', 'It goes to GitHub as yours, marked as sent from Human Shaped, and you can edit or delete it there.'));
       var acts = el('div', 'actions');
-      var b = el('button', 'btn-quiet', 'Post your reply'); b.type = 'submit';
+      var b = el('button', 'btn-secondary', 'Post your reply'); b.type = 'submit';
       var msg = el('span', 'small'); msg.setAttribute('role', 'status');
       acts.appendChild(b); acts.appendChild(msg); f.appendChild(acts);
       f.addEventListener('submit', function (ev) {
@@ -238,7 +238,7 @@
       var l3 = el('label', null, 'What you want to say'); var ta = el('textarea'); ta.rows = 4; ta.required = true; ta.maxLength = 65000; l3.appendChild(ta); f.appendChild(l3);
       f.appendChild(el('p', 'small hint', 'Only the people in this cohort can see it. It goes to GitHub as yours, marked as sent from Human Shaped, and stays there under your name even if you leave the cohort, unless you delete it.'));
       var acts = el('div', 'actions');
-      var b = el('button', 'btn-quiet', 'Post it to GitHub'); b.type = 'submit';
+      var b = el('button', 'btn-secondary', 'Post it to GitHub'); b.type = 'submit';
       var msg = el('span', 'small'); msg.setAttribute('role', 'status');
       acts.appendChild(b); acts.appendChild(msg); f.appendChild(acts);
       f.addEventListener('submit', function (ev) {
@@ -291,13 +291,13 @@
         var a = link(d.url, d.title, 'talk-title'); a.target = '_blank'; a.rel = 'noopener';
         li.appendChild(a);
         li.appendChild(el('p', 'small talk-meta', who(d.author) + ', ' + replies(d.comments) + ', last active ' + ago(d.lastActivity)));
-        if (o.onShow) li.appendChild(button('Add it to the queue', 'btn-link', function () { o.onShow(d.url); }));
+        if (o.onShow) li.appendChild(button('Add it to the queue', 'btn-secondary small', function () { o.onShow(d.url); }));
         ol.appendChild(li);
       });
       if (list.discussions.length) box.appendChild(ol);
       var foot = el('p', 'small talk-foot');
       foot.appendChild(link(list.url + '/discussions', 'Open the conversation on GitHub'));
-      foot.appendChild(button('Read it again', 'btn-link', function () { compact(box, o); }));
+      foot.appendChild(button('Read it again', 'btn-secondary small', function () { compact(box, o); }));
       box.appendChild(foot);
     });
   }
@@ -359,7 +359,7 @@
       box.appendChild(el('p', 'small', note || 'Opening it starts a discussion in the cohort’s repository on GitHub, under your name, where links, questions for later, and what people are stuck on can stay after the call.'));
       var acts = el('div', 'actions');
       var msg = el('span', 'small'); msg.setAttribute('role', 'status');
-      var b = button('Open this session’s thread', 'btn-quiet', function () { open(b, msg, !!note); });
+      var b = button('Open this session’s thread', 'btn-secondary', function () { open(b, msg, !!note); });
       acts.appendChild(b); acts.appendChild(msg); box.appendChild(acts);
     }
 
@@ -368,7 +368,7 @@
       posts = null;
       if (p.kind === 'expired') { forget(); tok = null; return step(); }
       box.replaceChildren(explain(p, o.repo));
-      box.appendChild(el('div', 'actions')).appendChild(button('Try again', 'btn-quiet', function () { step(); }));
+      box.appendChild(el('div', 'actions')).appendChild(button('Try again', 'btn-secondary', function () { step(); }));
     }
 
     // Make the discussion as the teacher, then keep its number on the
@@ -441,7 +441,7 @@
       foot.replaceChildren();
       var a = link(t.url, 'Open it on GitHub'); a.target = '_blank'; a.rel = 'noopener';
       foot.appendChild(a);
-      foot.appendChild(button('Read it again', 'btn-link', function () { clearTimeout(wait); read(); }));
+      foot.appendChild(button('Read it again', 'btn-secondary small', function () { clearTimeout(wait); read(); }));
       if (t.locked) foot.appendChild(el('span', null, 'It is locked, so no one can add to it.'));
     }
 
@@ -452,7 +452,7 @@
       label.appendChild(ta); f.appendChild(label);
       f.appendChild(el('p', 'small hint', 'It goes to GitHub as yours, where only the cohort can see it, and you can edit or delete it there.'));
       var acts = el('div', 'actions');
-      var b = el('button', 'btn-quiet', 'Post it'); b.type = 'submit';
+      var b = el('button', 'btn-secondary', 'Post it'); b.type = 'submit';
       var msg = el('span', 'small'); msg.setAttribute('role', 'status');
       acts.appendChild(b); acts.appendChild(msg); f.appendChild(acts);
       f.addEventListener('submit', function (ev) {

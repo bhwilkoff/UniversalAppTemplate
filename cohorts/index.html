@@ -23,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261012c">
+  <link rel="stylesheet" href="/assets/site.css?v=20261012h">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -32,13 +32,13 @@
       if (t) document.documentElement.setAttribute('data-theme', t);
     })();
   </script>
-  <script src="/assets/site.js" defer></script>
+  <script src="/assets/site.js?v=20261012h" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" defer></script>
   <script src="/assets/hub-config.js?v=20261009a" defer></script>
   <script src="/assets/teach-lib.js?v=20261006g" defer></script>
-  <script src="/assets/cohorts.js?v=20261009a" defer></script>
+  <script src="/assets/cohorts.js?v=20261012h" defer></script>
   <script src="/assets/path-lib.js" defer></script>
-  <script src="/assets/path-marks.js" defer></script>
+  <script src="/assets/path-marks.js?v=20261012h" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to the page</a>
@@ -58,7 +58,7 @@
         <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
           <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#moon"/></svg>
         </button>
-        <a class="btn-github small" href="/account/">
+        <a class="btn-primary small" href="/account/">
           <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>
           <span>Sign in<span class="long"> with GitHub</span></span>
         </a>
@@ -213,8 +213,8 @@
           <div class="open-cohorts" data-open-list hidden></div>
           <p class="small">If you do not have a GitHub account yet, it is free, and it is the first thing you will need either way.</p>
           <div class="actions">
-            <a class="btn-github" href="https://github.com/signup"><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Create a GitHub account</a>
-            <a class="btn-quiet" href="/path/setup/">Start Cohort Prep</a>
+            <a class="btn-primary" href="https://github.com/signup"><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Create a GitHub account</a>
+            <a class="btn-secondary" href="/path/setup/">Start Cohort Prep</a>
           </div>
         </div>
       </div>
@@ -226,7 +226,7 @@
       <div class="footer-brand">
         <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
         <p>The ideas, the method, the tools, and the cohorts are free, and what you build is yours.</p>
-        <p><a class="go-text" href="/about/">About Human Shaped</a></p>
+        <p><a href="/about/">About Human Shaped</a></p>
       </div>
       <nav class="footer-links" aria-label="More of the site">
         <div>

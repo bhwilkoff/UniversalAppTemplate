@@ -14,7 +14,7 @@
   if (!L || !Q) return;
 
   function el(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
-  function btn(text, cls, onClick) { var b = el('button', cls || 'btn-quiet', text); b.type = 'button'; b.addEventListener('click', onClick); return b; }
+  function btn(text, cls, onClick) { var b = el('button', cls || 'btn-secondary', text); b.type = 'button'; b.addEventListener('click', onClick); return b; }
 
   function mount(section, opts) {
     var db = opts.db, cohort = opts.cohort;
@@ -57,13 +57,13 @@
         var parts = L.kindOf(q) === 'scale' ? L.scaleLabels(q) : (q.choices || []);
         if (parts.length) li.appendChild(el('p', 'small', parts.join('; ')));
         var acts = el('div', 'actions scene-actions');
-        acts.appendChild(btn('Edit', 'btn-quiet', function () { editing = q.id; draw(); }));
-        var del = btn('Delete', 'btn-quiet danger', function () { del.hidden = true; sure.hidden = false; });
+        acts.appendChild(btn('Edit', 'btn-secondary', function () { editing = q.id; draw(); }));
+        var del = btn('Delete', 'btn-danger', function () { del.hidden = true; sure.hidden = false; });
         acts.appendChild(del);
         var sure = el('span', 'bank-sure'); sure.hidden = true;
         sure.appendChild(document.createTextNode('Delete it from the bank? Anything already asked from it stays. '));
-        sure.appendChild(btn('Delete', 'btn-quiet danger', function () { remove(q); }));
-        sure.appendChild(btn('Keep it', 'btn-quiet', function () { sure.hidden = true; del.hidden = false; }));
+        sure.appendChild(btn('Keep it', 'btn-secondary', function () { sure.hidden = true; del.hidden = false; }));
+        sure.appendChild(btn('Delete', 'btn-danger final', function () { remove(q); }));
         acts.appendChild(sure);
         li.appendChild(acts);
         ul.appendChild(li);
@@ -72,7 +72,7 @@
       box.appendChild(ul);
       if (editing !== 'new') {
         var add = el('div', 'actions');
-        add.appendChild(btn('Write a question', 'btn-quiet', function () { editing = 'new'; draw(); var t = box.querySelector('.bank-item textarea'); if (t) t.focus(); }));
+        add.appendChild(btn('Write a question', 'btn-secondary', function () { editing = 'new'; draw(); var t = box.querySelector('.bank-item textarea'); if (t) t.focus(); }));
         box.appendChild(add);
       }
       box.appendChild(status);
@@ -98,9 +98,9 @@
       f.appendChild(fs);
       var msg = el('span', 'small'); msg.setAttribute('role', 'status');
       var acts = el('div', 'actions');
-      var save = el('button', 'btn-quiet', q ? 'Save the question' : 'Keep it in the bank'); save.type = 'submit';
+      var save = el('button', 'btn-secondary', q ? 'Save the question' : 'Keep it in the bank'); save.type = 'submit';
       acts.appendChild(save);
-      acts.appendChild(btn('Cancel', 'btn-quiet', function () { editing = null; draw(); }));
+      acts.appendChild(btn('Cancel', 'btn-secondary', function () { editing = null; draw(); }));
       acts.appendChild(msg);
       f.appendChild(acts);
       f.addEventListener('submit', function (ev) {

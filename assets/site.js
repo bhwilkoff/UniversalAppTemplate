@@ -47,7 +47,7 @@
 // goes to their account. Supabase keeps the session in this browser under
 // sb-<project>-auth-token; nothing is fetched to read it.
 (function () {
-  var link = document.querySelector('.site-header .btn-github');
+  var link = document.querySelector('.site-header .btn-primary');
   if (!link) return;
   var meta = null;
   try {

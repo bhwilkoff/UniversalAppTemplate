@@ -57,10 +57,35 @@ The pictures are real: the apps' App Store screens, Ben's desk and
 testing phones, the marks people actually show. No illustrations, no
 stock, no decorative shapes; icons are Phosphor's.
 
-## 7. Quiet controls
+## 7. Actions and links
 
-One filled button per view (forest), everything else a quiet outlined
-button or a bold underlined link (`.section-more`, `a.go`, `a.go-text`).
+Replaced October 12, 2026 (Ben: "The whole site has a pretty wonky way of
+displaying links that are completely unadorned right next to buttons that
+are also links. We need a consistent design for links and actions within
+the site"). Research and sources: `links-and-actions-notes.md`.
+
+- **Anything that stands on its own is a button**, whether it goes
+  somewhere (an `<a>`) or does something (a `<button>`): one shape, one
+  height (44px, or 40px with `.small` in dense lists), one weight, in one
+  of three styles. `.btn-primary` is filled and is the main next step: at
+  most one in a group, and first. `.btn-secondary` is outlined, for
+  everything else, including a link that ends a section. `.btn-danger` is
+  outlined in red for what is hard to undo (removing, deleting, leaving),
+  last in its row, and filled red (`.final`) only on the step that
+  confirms it. Undoable things (taking a card down) stay secondary.
+- **Underlined text appears only inside a sentence**: links, and
+  `.text-button` for a button that sits in a sentence ("Or record with
+  your phone's camera app and come back").
+- **Navigation is plain**: the header, the footer, and lists of pages use
+  ink-colored links that underline on hover.
+- **Leaving the site** is named in the label and marked with the
+  arrow-out icon, in the same tab ("Open in Google Drive").
+- Never put a bare link beside buttons. The check is
+  `tools/test/action-styles.test.mjs`: no retired style, and in every row
+  of actions on a page, one filled button at most and first, red last, and
+  nothing without a button style.
+
+*Where:* "Actions" near the top of `assets/site.css`.
 
 ## 8. Things that are compared look alike
 
@@ -78,7 +103,7 @@ reading text, and one small label or caption style. A second large
 statement in the same section (a pull quote) takes the heading's size
 and the heading-left, words-right layout, with a 1px rule, not a heavier
 one. A link inside reading text looks like every other link and is not
-bolded to stand out; only a link that stands alone uses `a.go-text`.
+bolded to stand out; a link that stands alone is a `.btn-secondary`.
 
 ## 10. Side-by-side text starts at the same height
 

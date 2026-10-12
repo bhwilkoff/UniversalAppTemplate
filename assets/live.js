@@ -33,7 +33,7 @@
 
   function $(s) { return root.querySelector(s); }
   function el(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
-  function button(label, cls, onClick) { var b = el('button', cls || 'btn-quiet', label); b.type = 'button'; b.addEventListener('click', onClick); return b; }
+  function button(label, cls, onClick) { var b = el('button', cls || 'btn-secondary', label); b.type = 'button'; b.addEventListener('click', onClick); return b; }
   function show(state) { root.querySelectorAll('.account-state').forEach(function (s) { s.hidden = s.getAttribute('data-state') !== state; }); }
   function fail(m) { $('[data-error-text]').textContent = m; show('error'); }
   function safe(u) { return /^https:\/\//.test(u || '') ? u : null; }
@@ -69,7 +69,7 @@
     tick();
   }
   function timerButton(seconds, key, onStart) {
-    var b = button(idleLabel(seconds), 'btn-quiet', function () { runTimer(b, seconds, key); if (onStart) onStart(); });
+    var b = button(idleLabel(seconds), 'btn-secondary', function () { runTimer(b, seconds, key); if (onStart) onStart(); });
     if (timer && timer.key === key) { timer.button = b; }
     return b;
   }
@@ -145,10 +145,10 @@
     $('[data-title]').textContent = 'Week ' + session.number + (session.title && session.title !== 'Week ' + session.number ? ': ' + session.title : '');
     $('[data-scope]').textContent = session.scope || 'This week’s challenge will be here once your teacher writes it.';
     var top = $('[data-top-actions]'); top.replaceChildren();
-    if (safe(session.meet_url)) { var j = el('a', 'btn-github', live ? 'Join the session' : 'The Meet link'); j.href = session.meet_url; j.target = '_blank'; j.rel = 'noopener'; top.appendChild(j); }
-    var back = el('a', 'btn-quiet', 'Your cohort page'); back.href = '/cohort/?c=' + encodeURIComponent(cohort.slug); top.appendChild(back);
+    if (safe(session.meet_url)) { var j = el('a', 'btn-primary', live ? 'Join the session' : 'The Meet link'); j.href = session.meet_url; j.target = '_blank'; j.rel = 'noopener'; top.appendChild(j); }
+    var back = el('a', 'btn-secondary', 'Your cohort page'); back.href = '/cohort/?c=' + encodeURIComponent(cohort.slug); top.appendChild(back);
     // The session's drawing board (C4), in its own tab so this page stays open.
-    var board = el('a', 'btn-quiet', 'The board'); board.href = '/board/?c=' + encodeURIComponent(cohort.slug) + '&s=week-' + session.number; board.target = '_blank'; board.rel = 'noopener'; top.appendChild(board);
+    var board = el('a', 'btn-secondary', 'The board'); board.href = '/board/?c=' + encodeURIComponent(cohort.slug) + '&s=week-' + session.number; board.target = '_blank'; board.rel = 'noopener'; top.appendChild(board);
     $('[data-cohort-link]').href = back.href;
 
     S.parts = lib.agenda(cohort.session_minutes);
@@ -312,7 +312,7 @@
     if (S.teaching) show.slot('pushed', $('[data-pushed-section]'));
     var board = el('div');
     board.appendChild(el('p', 'small', 'This week’s design stage for the whole cohort. Everyone draws on it at once, and it is kept with the session.'));
-    var open = el('a', 'btn-github', 'Open the design stage'); open.target = '_blank'; open.rel = 'noopener';
+    var open = el('a', 'btn-primary', 'Open the design stage'); open.target = '_blank'; open.rel = 'noopener';
     S.designLink = open;
     designHref();
     board.appendChild(el('p')).appendChild(open);
@@ -365,11 +365,11 @@
     card.appendChild(el('h3', null, named || S.teaching ? g.name : 'Your group, ' + g.name));
     var acts = el('div', 'actions');
     if (safe(g.meet_url)) {
-      var go = el('a', 'btn-github', S.teaching && !isMine ? 'Visit its room' : 'Join your group’s room');
+      var go = el('a', 'btn-primary', S.teaching && !isMine ? 'Visit its room' : 'Join your group’s room');
       go.href = g.meet_url; go.target = '_blank'; go.rel = 'noopener';
       acts.appendChild(go);
       if (safe(S.session.meet_url)) {
-        var back = el('a', 'btn-quiet', 'Back to the main session'); back.href = S.session.meet_url; back.target = '_blank'; back.rel = 'noopener';
+        var back = el('a', 'btn-secondary', 'Back to the main session'); back.href = S.session.meet_url; back.target = '_blank'; back.rel = 'noopener';
         acts.appendChild(back);
       }
       card.appendChild(acts);
@@ -472,9 +472,9 @@
     if (seen) out.push(el('p', 'small', seen));
     var partners = lib.partnersOf(S.me.id, S.groups);
     if (mineConfirmed) {
-      out.push(button('Take back my confirmation', 'btn-quiet', function () { setConfirmation(s, false); }));
+      out.push(button('Take back my confirmation', 'btn-secondary', function () { setConfirmation(s, false); }));
     } else if (lib.canConfirm(s, S.me.id, partners, S.teaching)) {
-      out.push(button('I saw it working on a device', 'btn-quiet', function () { setConfirmation(s, true); }));
+      out.push(button('I saw it working on a device', 'btn-secondary', function () { setConfirmation(s, true); }));
     }
     return out;
   }
@@ -668,20 +668,20 @@
     li.appendChild(el('p', 'live-what', L.itemLabel(item)));
     if (item.note) li.appendChild(el('p', 'live-note', item.note));
     var acts = el('div', 'actions');
-    var open = el('a', isShown ? 'btn-quiet' : 'btn-github', 'Open it'); open.href = item.url; open.target = '_blank'; open.rel = 'noopener';
+    var open = el('a', isShown ? 'btn-secondary' : 'btn-primary', 'Open it'); open.href = item.url; open.target = '_blank'; open.rel = 'noopener';
     open.setAttribute('aria-label', 'Open ' + L.itemLabel(item) + ' in a new tab');
     acts.appendChild(open);
     if (L.canManage(item, S.me.id, S.teaching)) {
-      if (isShown) acts.appendChild(button('Back in the wings', 'btn-quiet', function () { setItem(item, { state: 'waiting' }); }));
-      else acts.appendChild(button('They have presented', 'btn-quiet', function () { setItem(item, { state: 'shown' }); }));
-      acts.appendChild(button('Take it off', 'btn-quiet', function () { removeItem(item); }));
+      if (isShown) acts.appendChild(button('Back in the wings', 'btn-secondary', function () { setItem(item, { state: 'waiting' }); }));
+      else acts.appendChild(button('They have presented', 'btn-secondary', function () { setItem(item, { state: 'shown' }); }));
+      acts.appendChild(button('Take it off', 'btn-secondary', function () { removeItem(item); }));
     }
     // With the show running (R3), a teacher puts work from the wings on
     // every main stage, and takes it off again (R7).
     if (S.teaching && shared() && !isShown) {
       var pinned = V.pinOf(run.state());
       var on = !!pinned && pinned.kind === 'item' && pinned.id === item.id;
-      var t = button(on ? 'Take it off the main stage' : 'Put it on the main stage', 'btn-quiet', function () { run.pin(on ? null : { kind: 'item', id: item.id }); });
+      var t = button(on ? 'Take it off the main stage' : 'Put it on the main stage', 'btn-secondary', function () { run.pin(on ? null : { kind: 'item', id: item.id }); });
       t.setAttribute('aria-pressed', String(on));
       acts.insertBefore(t, acts.children[1] || null);
     }
@@ -706,11 +706,11 @@
     }
     if (next) {
       var acts = el('div', 'actions');
-      acts.appendChild(button(now ? 'Thank them, and bring up ' + nameOf(next.user_id) : 'Bring up ' + nameOf(next.user_id) + ' from the wings', 'btn-github', function () {
+      acts.appendChild(button(now ? 'Thank them, and bring up ' + nameOf(next.user_id) : 'Bring up ' + nameOf(next.user_id) + ' from the wings', 'btn-primary', function () {
         var done = now ? db.from('live_queue').update({ state: 'shown' }).eq('id', now.id) : Promise.resolve({});
         done.then(function () { run.pin({ kind: 'item', id: next.id }); refreshLive(); });
       }));
-      if (now) acts.appendChild(button('Thank them, and clear the stage', 'btn-quiet', function () {
+      if (now) acts.appendChild(button('Thank them, and clear the stage', 'btn-secondary', function () {
         db.from('live_queue').update({ state: 'shown' }).eq('id', now.id).then(function () { run.pin(null); refreshLive(); });
       }));
       box.appendChild(acts);
@@ -762,17 +762,17 @@
       card.appendChild(ul);
     }
     var acts = el('div', 'actions');
-    if (L.kindOf(check) !== 'short') acts.appendChild(button(check.show_tally ? 'Hide the results from everyone' : 'Show everyone the results', 'btn-quiet', function () { changeCheck(check, { show_tally: !check.show_tally }); }));
-    acts.appendChild(button(check.state === 'open' ? 'Close it' : 'Open it again', 'btn-quiet', function () { changeCheck(check, { state: check.state === 'open' ? 'closed' : 'open' }); }));
-    var del = button('Delete it', 'btn-quiet danger', function () { del.hidden = true; ask.hidden = false; });
+    if (L.kindOf(check) !== 'short') acts.appendChild(button(check.show_tally ? 'Hide the results from everyone' : 'Show everyone the results', 'btn-secondary', function () { changeCheck(check, { show_tally: !check.show_tally }); }));
+    acts.appendChild(button(check.state === 'open' ? 'Close it' : 'Open it again', 'btn-secondary', function () { changeCheck(check, { state: check.state === 'open' ? 'closed' : 'open' }); }));
+    var del = button('Delete it', 'btn-danger', function () { del.hidden = true; ask.hidden = false; });
     acts.appendChild(del);
     var ask = el('div', 'live-confirm'); ask.hidden = true;
     ask.appendChild(el('p', null, 'Delete this question and every answer to it?'));
     var askActs = el('div', 'actions');
-    askActs.appendChild(button('Delete', 'btn-quiet danger', function () {
+    askActs.appendChild(button('Keep it', 'btn-secondary', function () { ask.hidden = true; del.hidden = false; }));
+    askActs.appendChild(button('Delete', 'btn-danger final', function () {
       db.from('live_checks').delete().eq('id', check.id).then(function (r) { if (!r.error) refreshLive(); });
     }));
-    askActs.appendChild(button('Keep it', 'btn-quiet', function () { ask.hidden = true; del.hidden = false; }));
     ask.appendChild(askActs);
     card.appendChild(acts);
     card.appendChild(ask);
@@ -790,7 +790,7 @@
     fl.fill(L.questionFields(check));
     f.appendChild(fl.el);
     var acts = el('div', 'actions');
-    var save = el('button', 'btn-quiet', 'Save the change'); save.type = 'submit';
+    var save = el('button', 'btn-secondary', 'Save the change'); save.type = 'submit';
     var status = el('span', 'small'); status.setAttribute('role', 'status');
     acts.appendChild(save); acts.appendChild(status);
     f.appendChild(acts);
@@ -923,7 +923,7 @@
     var status = el('span', 'small'); status.setAttribute('role', 'status');
     var acts = el('div', 'actions');
     if (asked) status.textContent = 'Asked. The answers are below.';
-    else acts.appendChild(button('Ask it now', 'btn-github', function () {
+    else acts.appendChild(button('Ask it now', 'btn-primary', function () {
       status.textContent = 'Asking…';
       ask(q, $('[data-ask-tally]').checked).then(function (err) { status.textContent = err ? 'Not asked: ' + err : ''; });
     }));

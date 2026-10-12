@@ -46,7 +46,7 @@
         var card = el('article', 'cohort-card');
         card.appendChild(el('h3', null, c.title));
         card.appendChild(el('p', 'small', statusText(c.status) + (c.starts_on ? ', first day ' + c.starts_on : '') + '.'));
-        var open = el('button', 'btn-quiet', 'Open');
+        var open = el('button', 'btn-secondary', 'Open');
         open.type = 'button';
         open.addEventListener('click', function () { openCohort(c.id); });
         var a = el('div', 'actions'); a.appendChild(open); card.appendChild(a);
@@ -103,8 +103,8 @@
       var label = el('label', null, s.kind === 'question' ? 'Your answer' : 'Your feedback');
       var input = el('textarea'); input.rows = 3; input.required = true; input.maxLength = 8000;
       label.appendChild(input); form.appendChild(label);
-      var send = el('button', 'btn-quiet', 'Send'); send.type = 'submit';
-      var open = el('a', 'text', 'Open the cohort page'); open.href = '/cohort/?c=' + encodeURIComponent(c.slug);
+      var send = el('button', 'btn-primary', 'Send'); send.type = 'submit';
+      var open = el('a', 'btn-secondary', 'Open the cohort page'); open.href = '/cohort/?c=' + encodeURIComponent(c.slug);
       var actions = el('div', 'actions'); actions.appendChild(send); actions.appendChild(open); form.appendChild(actions);
       form.addEventListener('submit', function (ev) {
         ev.preventDefault();
@@ -638,15 +638,15 @@
   // students"): only its words change, and the student sees it was edited.
   function correctControl(g) {
     var wrap = el('span', 'followup-correct');
-    var open = el('button', 'btn-link', 'Edit');
+    var open = el('button', 'btn-secondary small', 'Edit');
     open.type = 'button';
     var form = el('form', 'inline-form');
     form.hidden = true;
     var label = el('label', null, 'Your corrected words');
     var input = el('textarea'); input.rows = 3; input.required = true; input.maxLength = 8000; input.value = g.body;
     label.appendChild(input); form.appendChild(label);
-    var save = el('button', 'btn-quiet', 'Save the correction'); save.type = 'submit';
-    var cancel = el('button', 'btn-quiet', 'Cancel'); cancel.type = 'button';
+    var save = el('button', 'btn-secondary', 'Save the correction'); save.type = 'submit';
+    var cancel = el('button', 'btn-secondary', 'Cancel'); cancel.type = 'button';
     var msg = el('span', 'small'); msg.setAttribute('role', 'status');
     var actions = el('div', 'actions'); actions.appendChild(save); actions.appendChild(cancel); actions.appendChild(msg);
     form.appendChild(actions);
@@ -753,7 +753,7 @@
     var input = el('textarea'); input.rows = 4; input.maxLength = 8000;
     input.value = F.loadDraft(store, key);
     label.appendChild(input); form.appendChild(label);
-    var send = el('button', 'btn-quiet', 'Send it to ' + name); send.type = 'submit';
+    var send = el('button', 'btn-secondary', 'Send it to ' + name); send.type = 'submit';
     send.disabled = target.kind === 'note' && !notesReady;
     var msg = el('span', 'small'); msg.setAttribute('role', 'status');
     var acts = el('div', 'actions'); acts.appendChild(send); acts.appendChild(msg); form.appendChild(acts);
@@ -885,7 +885,7 @@
         drawWhere();
         f.appendChild(where);
       }
-      var save = el('button', 'btn-quiet', 'Save week ' + s.number); save.type = 'submit';
+      var save = el('button', 'btn-secondary', 'Save week ' + s.number); save.type = 'submit';
       var msg = el('span', 'small');
       var a = el('div', 'actions'); a.appendChild(save); a.appendChild(msg); f.appendChild(a);
       // The run of show (R2): the class builder, opened under each week.
@@ -955,7 +955,7 @@
         li.appendChild(el('strong', null, t.user_id === me.id ? 'You' : personName(t)));
         if (t.user_id === c.created_by) { li.appendChild(el('span', 'small', ' made this cohort')); box.appendChild(li); return; }
         var msg = el('span', 'small'); msg.setAttribute('role', 'status');
-        var rm = el('button', 'btn-link', t.user_id === me.id ? 'Step away from this cohort' : 'Take them off');
+        var rm = el('button', 'btn-danger small', t.user_id === me.id ? 'Step away from this cohort' : 'Take them off');
         rm.type = 'button';
         rm.addEventListener('click', function () {
           if (!rm.hasAttribute('data-armed')) {
@@ -1032,7 +1032,7 @@
   function roleSwitch(p, people) {
     var wrap = el('span', 'roster-role');
     var next = window.MentorLib.otherRole(p.role);
-    var b = el('button', 'link', next === 'mentor' ? 'Make them a mentor' : 'Make them a student again');
+    var b = el('button', 'btn-secondary small', next === 'mentor' ? 'Make them a mentor' : 'Make them a student again');
     b.type = 'button';
     var msg = el('span', 'small'); msg.setAttribute('role', 'status');
     b.addEventListener('click', function () {
@@ -1127,7 +1127,7 @@
     li.appendChild(actions);
 
     if (row.hide) {
-      var showBtn = el('button', 'btn-quiet', 'Show it again'); showBtn.type = 'button';
+      var showBtn = el('button', 'btn-secondary', 'Show it again'); showBtn.type = 'button';
       actions.appendChild(showBtn);
       li.appendChild(msg);
       showBtn.addEventListener('click', function () {
@@ -1150,15 +1150,15 @@
     }
     if (!submitted) { li.removeChild(actions); return li; }
 
-    var hideBtn = el('button', 'btn-quiet', 'Keep it off /apps/'); hideBtn.type = 'button';
+    var hideBtn = el('button', 'btn-secondary', 'Keep it off /apps/'); hideBtn.type = 'button';
     actions.appendChild(hideBtn);
     var f = el('form', 'inline-form'); f.hidden = true;
     var l = el('label', null, 'Why, in a sentence they will read (you may leave it empty)');
     var input = el('input'); input.maxLength = 500;
     l.appendChild(input); f.appendChild(l);
     f.appendChild(el('p', 'small', 'It stays on the cohort’s own pages for everyone in the cohort, and their own word that it is ready stays as it is.'));
-    var go = el('button', 'btn-quiet', 'Keep it off /apps/ now'); go.type = 'submit';
-    var cancel = el('button', 'btn-quiet', 'Leave it shown'); cancel.type = 'button';
+    var go = el('button', 'btn-secondary', 'Keep it off /apps/ now'); go.type = 'submit';
+    var cancel = el('button', 'btn-secondary', 'Leave it shown'); cancel.type = 'button';
     var fa = el('div', 'actions'); fa.appendChild(go); fa.appendChild(cancel); f.appendChild(fa);
     li.appendChild(f);
     li.appendChild(msg);
@@ -1214,7 +1214,7 @@
     var input = el('input'); input.type = hasSpace ? 'text' : 'url'; input.placeholder = 'https://meet.google.com/…'; input.maxLength = 620;
     input.value = (g.meet_url || '') + (hasSpace && g.meet_space ? ' | ' + g.meet_space : '');
     l.appendChild(input); f.appendChild(l);
-    var save = el('button', 'btn-quiet', 'Save the room'); save.type = 'submit';
+    var save = el('button', 'btn-secondary', 'Save the room'); save.type = 'submit';
     var msg = el('span', 'small'); msg.setAttribute('role', 'status');
     var a = el('div', 'actions'); a.appendChild(save); a.appendChild(msg); f.appendChild(a);
     f.addEventListener('submit', function (ev) {
@@ -1315,9 +1315,9 @@
     if (now.state === 'signed') {
       status.textContent = cred.levelName(cred.levelFor(rec.platforms)) + '. Signed on ' + day(rec.signed_at) + ', and public at its own page, which the holder can share.';
       var actions = el('div', 'actions');
-      var open = el('a', 'btn-quiet', 'Open its page'); open.href = '/credential/?id=' + rec.id;
+      var open = el('a', 'btn-secondary', 'Open its page'); open.href = '/credential/?id=' + rec.id;
       actions.appendChild(open);
-      var revoke = el('button', 'btn-quiet danger', 'Revoke it'); revoke.type = 'button';
+      var revoke = el('button', 'btn-danger', 'Revoke it'); revoke.type = 'button';
       actions.appendChild(revoke);
       card.appendChild(actions);
       var why = el('label', null, 'Why, for the record (only the cohort’s teachers and the holder read it)');
@@ -1347,11 +1347,11 @@
       status.textContent = cred.levelName(cred.levelFor(rec.platforms)) + '. Recorded on ' + day(rec.issued_at) + ', and waiting to be signed.';
       var request = cred.requestFromRecord(rec, p.profiles || { github_login: '' }, current);
       var acts = el('div', 'actions');
-      var copy = el('button', 'btn-quiet', 'Copy what the signing tool needs'); copy.type = 'button';
-      var pick = el('label', 'btn-quiet file-pick', 'Attach the signed file');
+      var copy = el('button', 'btn-secondary', 'Copy what the signing tool needs'); copy.type = 'button';
+      var pick = el('label', 'btn-secondary file-pick', 'Attach the signed file');
       var file = el('input'); file.type = 'file'; file.accept = '.json,application/json,application/ld+json';
       pick.appendChild(file);
-      var remove = el('button', 'btn-quiet danger', 'Remove this record'); remove.type = 'button';
+      var remove = el('button', 'btn-danger', 'Remove this record'); remove.type = 'button';
       acts.appendChild(copy); acts.appendChild(pick); acts.appendChild(remove);
       card.appendChild(acts);
       var shown = el('textarea', 'signing-request'); shown.readOnly = true; shown.rows = 8; shown.hidden = true;
@@ -1408,7 +1408,7 @@
     }
     status.textContent = before + 'Not issued yet.';
     card.appendChild(linkList([['The repository', 'https://github.com/' + p.app_repo], ['On the web', p.app_url]]));
-    var start = el('button', 'btn-quiet', 'Issue the credential'); start.type = 'button';
+    var start = el('button', 'btn-secondary', 'Issue the credential'); start.type = 'button';
     var startRow = el('div', 'actions'); startRow.appendChild(start); card.appendChild(startRow);
 
     var f = el('form', 'inline-form'); f.hidden = true;
@@ -1432,8 +1432,8 @@
     var sureBox = el('input'); sureBox.type = 'checkbox'; sureBox.required = true;
     sure.appendChild(sureBox); sure.appendChild(document.createTextNode(' I opened the repository and every link, and they show this person’s own work.'));
     f.appendChild(sure);
-    var save = el('button', 'btn-quiet', 'Record the credential'); save.type = 'submit';
-    var cancel = el('button', 'btn-quiet', 'Not now'); cancel.type = 'button';
+    var save = el('button', 'btn-secondary', 'Record the credential'); save.type = 'submit';
+    var cancel = el('button', 'btn-secondary', 'Not now'); cancel.type = 'button';
     var fa = el('div', 'actions'); fa.appendChild(save); fa.appendChild(cancel); f.appendChild(fa);
     card.appendChild(f);
     card.appendChild(msg);
@@ -1596,8 +1596,8 @@
     var label = el('label', null, 'Your answer, which they will read');
     var input = el('textarea'); input.rows = 3; input.maxLength = 2000;
     label.appendChild(input); form.appendChild(label);
-    var approve = el('button', 'btn-quiet', 'Approve'); approve.type = 'submit';
-    var decline = el('button', 'btn-quiet danger', 'Decline'); decline.type = 'button';
+    var approve = el('button', 'btn-secondary', 'Approve'); approve.type = 'submit';
+    var decline = el('button', 'btn-danger', 'Decline'); decline.type = 'button';
     var msg = el('p', 'small');
     var actions = el('div', 'actions'); actions.appendChild(approve); actions.appendChild(decline);
     form.appendChild(actions); form.appendChild(msg);
@@ -1655,7 +1655,7 @@
     if (recs) card.appendChild(recs);
     var request = cred.requestFromWaiting(w);
     var msg = el('p', 'small'); msg.setAttribute('role', 'status');
-    var copy = el('button', 'btn-quiet', 'Copy the signing request'); copy.type = 'button';
+    var copy = el('button', 'btn-secondary', 'Copy the signing request'); copy.type = 'button';
     var shown = el('textarea', 'signing-request'); shown.readOnly = true; shown.rows = 8; shown.hidden = true;
     shown.value = JSON.stringify(request, null, 2);
     copy.addEventListener('click', function () {
@@ -1667,10 +1667,10 @@
     var label = el('label', null, 'The signed file');
     var pasted = el('textarea'); pasted.rows = 4; pasted.placeholder = 'Paste the signed credential here';
     label.appendChild(pasted); form.appendChild(label);
-    var pick = el('label', 'btn-quiet file-pick', 'Or choose the file');
+    var pick = el('label', 'btn-secondary file-pick', 'Or choose the file');
     var file = el('input'); file.type = 'file'; file.accept = '.json,application/json,application/ld+json';
     pick.appendChild(file);
-    var save = el('button', 'btn-quiet', 'Check and attach it'); save.type = 'submit';
+    var save = el('button', 'btn-secondary', 'Check and attach it'); save.type = 'submit';
     var acts = el('div', 'actions'); acts.appendChild(copy); acts.appendChild(save); acts.appendChild(pick);
     form.appendChild(acts);
     function attach(text) {

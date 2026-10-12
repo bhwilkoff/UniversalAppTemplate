@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261012c">
+  <link rel="stylesheet" href="/assets/site.css?v=20261012h">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -33,7 +33,7 @@
       if (t) document.documentElement.setAttribute('data-theme', t);
     })();
   </script>
-  <script src="/assets/site.js" defer></script>
+  <script src="/assets/site.js?v=20261012h" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to the page</a>
@@ -53,7 +53,7 @@
         <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
           <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#moon"/></svg>
         </button>
-        <a class="btn-github small" href="/account/">
+        <a class="btn-primary small" href="/account/">
           <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>
           <span>Sign in<span class="long"> with GitHub</span></span>
         </a>
@@ -68,7 +68,7 @@
         <section class="account-state" data-state="signed-out" hidden>
           <h1>Keep this page open beside the session.</h1>
           <p>Sign in with the GitHub account you joined with, and this page will hold the session's agenda, this week's challenge, the queue of work people want to show, your teacher's questions, and what everyone brought back, while Google Meet holds the faces.</p>
-          <p><a class="btn-github" href="/account/"><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Sign in with GitHub</a></p>
+          <p><a class="btn-primary" href="/account/"><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Sign in with GitHub</a></p>
         </section>
         <section class="account-state" data-state="not-member" hidden>
           <h1>This session is for the people in its cohort.</h1>
@@ -77,7 +77,7 @@
         <section class="account-state" data-state="error" hidden>
           <h1 class="visually-hidden">The live session</h1>
           <p class="error" data-error-text role="alert"></p>
-          <p><button class="btn-quiet" type="button" data-reload>Try again</button></p>
+          <p><button class="btn-secondary" type="button" data-reload>Try again</button></p>
         </section>
 
         <section class="account-state" data-state="ready" hidden>
@@ -126,7 +126,7 @@
                Words by Claude, awaiting Ben's review. -->
           <div class="live-pushed" data-pushed-section hidden>
             <ol class="commit-list live-pushed-list" data-pushed></ol>
-            <div class="actions"><button class="btn-quiet" type="button" data-pushed-reload hidden>Read GitHub again</button><span class="small" data-pushed-status role="status"></span></div>
+            <div class="actions"><button class="btn-secondary" type="button" data-pushed-reload hidden>Read GitHub again</button><span class="small" data-pushed-status role="status"></span></div>
           </div>
 
           <!-- The queue and checks for understanding (M3): copy awaiting Ben's review. -->
@@ -148,7 +148,7 @@
               <label>What should people look at, if you want to say
                 <input type="text" maxlength="300" data-add-note>
               </label>
-              <div class="actions"><button class="btn-quiet" type="submit">Ask to present it</button><span class="small" data-add-status role="status"></span></div>
+              <div class="actions"><button class="btn-secondary" type="submit">Ask to present it</button><span class="small" data-add-status role="status"></span></div>
             </form>
           </div>
 
@@ -164,7 +164,7 @@
             <form class="inline-form live-ask" data-ask hidden>
               <div data-ask-fields></div>
               <label class="check"><input type="checkbox" data-ask-tally> Show everyone the results as answers come in</label>
-              <div class="actions"><button class="btn-quiet" type="submit">Ask everyone</button><button class="btn-quiet" type="button" data-ask-closing>Ask the two closing questions</button><span class="small" data-ask-status role="status"></span></div>
+              <div class="actions"><button class="btn-secondary" type="submit">Ask everyone</button><button class="btn-secondary" type="button" data-ask-closing>Ask the two closing questions</button><span class="small" data-ask-status role="status"></span></div>
             </form>
             <div class="live-checks" data-checks></div>
             <details class="live-earlier" data-earlier-wrap hidden>
@@ -190,31 +190,31 @@
   <script src="/assets/hub-config.js?v=20261009a" defer></script>
   <script src="/assets/cohort-lib.js" defer></script>
   <script src="/assets/live-lib.js" defer></script>
-  <script src="/assets/question-view.js" defer></script>
+  <script src="/assets/question-view.js?v=20261012h" defer></script>
   <script src="/assets/board-lib.js" defer></script>
   <script src="/assets/followup-lib.js" defer></script>
   <script src="/assets/live-commits.js" defer></script>
-  <script src="/assets/signals-lib.js" defer></script>
-  <script src="/assets/signals.js" defer></script>
+  <script src="/assets/signals-lib.js?v=20261012h" defer></script>
+  <script src="/assets/signals.js?v=20261012h" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.4.16/purify.min.js" integrity="sha512-flQmhkXNRQ3iUfvtdCobtpMjCb6kE+zLnTiAulAQJ3WykVfy84JvCMOo6vhwWXHTXjR25h9Zj+LyGFRWKjRoag==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
   <script src="/assets/rooms-lib.js" defer></script>
-  <script src="/assets/rooms.js" defer></script>
+  <script src="/assets/rooms.js?v=20261012h" defer></script>
   <script src="/assets/discussions-lib.js" defer></script>
   <script src="/assets/session-thread-lib.js" defer></script>
-  <script src="/assets/discussions.js" defer></script>
+  <script src="/assets/discussions.js?v=20261012h" defer></script>
   <script src="/assets/show-lib.js" defer></script>
   <script src="/assets/show-view-lib.js" defer></script>
   <script src="/assets/curriculum-pages-lib.js" defer></script>
-  <script src="/assets/show-view.js" defer></script>
+  <script src="/assets/show-view.js?v=20261012h" defer></script>
   <script src="/assets/show-run.js" defer></script>
-  <script src="/assets/live.js" defer></script>
+  <script src="/assets/live.js?v=20261012h" defer></script>
 
   <footer class="site-footer">
     <div class="wrap">
       <div class="footer-brand">
         <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
         <p>The ideas, the method, the tools, and the cohorts are free, and what you build is yours.</p>
-        <p><a class="go-text" href="/about/">About Human Shaped</a></p>
+        <p><a href="/about/">About Human Shaped</a></p>
       </div>
       <nav class="footer-links" aria-label="More of the site">
         <div>

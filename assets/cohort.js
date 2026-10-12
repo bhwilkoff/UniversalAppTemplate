@@ -136,7 +136,7 @@
       var label = el('label', null, 'Your feedback');
       var input = el('textarea'); input.rows = 2; input.required = true; input.maxLength = 8000;
       label.appendChild(input); form.appendChild(label);
-      var b = el('button', 'btn-quiet', 'Send'); b.type = 'submit';
+      var b = el('button', 'btn-secondary', 'Send'); b.type = 'submit';
       var a = el('div', 'actions'); a.appendChild(b); form.appendChild(a);
       form.addEventListener('submit', function (ev) {
         ev.preventDefault();
@@ -190,7 +190,7 @@
     return box.children.length ? box : el('span');
   }
 
-  function button(label, fn) { var b = el('button', 'btn-quiet', label); b.type = 'button'; b.addEventListener('click', fn); return b; }
+  function button(label, fn) { var b = el('button', 'btn-secondary', label); b.type = 'button'; b.addEventListener('click', fn); return b; }
 
   // The builder's own mark, changed in place. Changing it clears what
   // partners confirmed, so that they can look again.
@@ -213,7 +213,7 @@
     function sync() { ml.hidden = !radios['not-yet'].checked; missing.required = radios['not-yet'].checked; }
     radios.ready.addEventListener('change', sync); radios['not-yet'].addEventListener('change', sync); sync();
     f.appendChild(fs);
-    var save = el('button', 'btn-quiet', 'Save my mark'); save.type = 'submit';
+    var save = el('button', 'btn-secondary', 'Save my mark'); save.type = 'submit';
     var cancel = button('Leave it as it was', onCancel);
     var msg = el('span', 'small'); msg.setAttribute('role', 'status');
     var a = el('div', 'actions'); a.appendChild(save); a.appendChild(cancel); a.appendChild(msg); f.appendChild(a);
@@ -486,7 +486,7 @@
     var actions = el('div', 'actions');
     if (state === 'member') {
       box.appendChild(el('p', null, 'The conversation is open to you. It happens in GitHub Discussions, in a repository only this cohort can see, and what you write there is yours.'));
-      var go = link('https://github.com/' + repo + '/discussions', 'Open the conversation on GitHub'); go.className = 'btn-github';
+      var go = link('https://github.com/' + repo + '/discussions', 'Open the conversation on GitHub'); go.className = 'btn-primary';
       actions.appendChild(go);
       box.appendChild(actions);
       // The newest conversations, read and posted here as this person.
@@ -494,7 +494,7 @@
       return;
     } else if (state === 'invited') {
       box.appendChild(el('p', null, 'GitHub has emailed you an invitation to the humanshaped organization. Accept it, and the conversation opens.'));
-      var inv = link('https://github.com/orgs/humanshaped/invitation', 'Accept the invitation'); inv.className = 'btn-github';
+      var inv = link('https://github.com/orgs/humanshaped/invitation', 'Accept the invitation'); inv.className = 'btn-primary';
       actions.appendChild(inv);
       actions.appendChild(askButton('I accepted it'));
     } else {
@@ -522,7 +522,7 @@
   }
 
   function askButton(label) {
-    var b = el('button', 'btn-quiet', label);
+    var b = el('button', 'btn-secondary', label);
     b.type = 'button';
     b.addEventListener('click', function () {
       b.disabled = true;
@@ -627,9 +627,9 @@
       $('[data-next-when]').textContent = (t.live ? 'Happening now: ' : '') + when(t.next.starts_at) + ', for ' + cohort.session_minutes + ' minutes.';
       // During the group part, your group's own room comes first.
       var part = t.live ? lib.partNow(lib.agenda(cohort.session_minutes), t.next.starts_at, new Date()) : null;
-      if (room && part && part.key === 'show') { var gr = link(room, 'Join your group’s room'); gr.className = 'btn-github'; na.appendChild(gr); }
-      if (safe(t.next.meet_url)) { var j = link(t.next.meet_url, t.live ? (part && part.key === 'show' && room ? 'The main session' : 'Join the session now') : 'The Meet link'); j.className = room && part && part.key === 'show' ? 'btn-quiet' : 'btn-github'; na.appendChild(j); }
-      var lp = link('/live/?c=' + encodeURIComponent(cohort.slug), 'The session page'); lp.className = 'btn-quiet'; na.appendChild(lp);
+      if (room && part && part.key === 'show') { var gr = link(room, 'Join your group’s room'); gr.className = 'btn-primary'; na.appendChild(gr); }
+      if (safe(t.next.meet_url)) { var j = link(t.next.meet_url, t.live ? (part && part.key === 'show' && room ? 'The main session' : 'Join the session now') : 'The Meet link'); j.className = room && part && part.key === 'show' ? 'btn-secondary' : 'btn-primary'; na.appendChild(j); }
+      var lp = link('/live/?c=' + encodeURIComponent(cohort.slug), 'The session page'); lp.className = 'btn-secondary'; na.appendChild(lp);
     } else {
       $('[data-next-when]').textContent = sessions.length ? 'The last session has happened.' : 'The sessions have not been scheduled yet.';
     }

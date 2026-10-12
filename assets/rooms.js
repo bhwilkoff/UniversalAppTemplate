@@ -20,7 +20,7 @@
   var POLL = 15000;
 
   function el(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
-  function button(label, cls, onClick) { var b = el('button', cls || 'btn-quiet', label); b.type = 'button'; b.addEventListener('click', onClick); return b; }
+  function button(label, cls, onClick) { var b = el('button', cls || 'btn-secondary', label); b.type = 'button'; b.addEventListener('click', onClick); return b; }
   function link(label, cls, href) { var a = el('a', cls, label); a.href = href; a.target = '_blank'; a.rel = 'noopener'; return a; }
 
   // opts: db, cohort, session, meId, teaching, groups (with
@@ -144,28 +144,28 @@
           card.appendChild(asking);
         }
         var acts = el('div', 'actions');
-        if (opts.showLinks !== false && c.url) acts.appendChild(link(opts.teaching && !c.mine ? 'Visit its room' : 'Join your group’s room', c.mine ? 'btn-github' : 'btn-quiet', c.url));
+        if (opts.showLinks !== false && c.url) acts.appendChild(link(opts.teaching && !c.mine ? 'Visit its room' : 'Join your group’s room', c.mine ? 'btn-primary' : 'btn-secondary', c.url));
         var boardHref = opts.boardLink && (opts.teaching || boards[c.id]) ? opts.boardLink(c.id) : null;
-        if (boardHref) acts.appendChild(link(opts.teaching && !boards[c.id] ? 'Make its board' : 'The room’s board', 'btn-quiet', boardHref));
+        if (boardHref) acts.appendChild(link(opts.teaching && !boards[c.id] ? 'Make its board' : 'The room’s board', 'btn-secondary', boardHref));
         var status = el('span', 'small'); status.setAttribute('role', 'status');
         if (canMove(g)) {
           if (!place.done) {
-            acts.appendChild(button(place.started ? 'Next step' : 'Start the first turn', 'btn-quiet', function () {
+            acts.appendChild(button(place.started ? 'Next step' : 'Start the first turn', 'btn-secondary', function () {
               var next = place.started ? R.advance(c.state, order, steps) : R.start(order);
               write(g, { step: next.step, presenter: next.presenter }, status);
             }));
           } else {
-            acts.appendChild(button('Start the turns again', 'btn-quiet', function () {
+            acts.appendChild(button('Start the turns again', 'btn-secondary', function () {
               var first = R.start(order);
               write(g, { step: first.step, presenter: first.presenter }, status);
             }));
           }
           if (opts.teaching && c.helpAt) {
-            acts.appendChild(button('I am here', 'btn-quiet', function () { write(g, { help_at: null }, status); }));
+            acts.appendChild(button('I am here', 'btn-secondary', function () { write(g, { help_at: null }, status); }));
           } else if (!opts.teaching && c.helpAt) {
-            acts.appendChild(button('We are fine now', 'btn-quiet', function () { write(g, { help_at: null }, status); }));
+            acts.appendChild(button('We are fine now', 'btn-secondary', function () { write(g, { help_at: null }, status); }));
           } else if (!opts.teaching) {
-            acts.appendChild(button('We would like the teacher', 'btn-quiet', function () { write(g, { help_at: new Date().toISOString() }, status); }));
+            acts.appendChild(button('We would like the teacher', 'btn-secondary', function () { write(g, { help_at: new Date().toISOString() }, status); }));
           }
         }
         if (acts.children.length) card.appendChild(acts);

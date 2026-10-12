@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261012c">
+  <link rel="stylesheet" href="/assets/site.css?v=20261012h">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -33,7 +33,7 @@
       if (t) document.documentElement.setAttribute('data-theme', t);
     })();
   </script>
-  <script src="/assets/site.js" defer></script>
+  <script src="/assets/site.js?v=20261012h" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to the page</a>
@@ -53,7 +53,7 @@
         <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
           <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#moon"/></svg>
         </button>
-        <a class="btn-github small" href="/account/">
+        <a class="btn-primary small" href="/account/">
           <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>
           <span>Sign in<span class="long"> with GitHub</span></span>
         </a>
@@ -74,7 +74,7 @@
         </section>
 
         <section class="account-state" data-state="signed-out" hidden>
-          <button class="btn-github" type="button" data-sign-in>
+          <button class="btn-primary" type="button" data-sign-in>
             <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Sign in with GitHub
           </button>
           <p class="small">GitHub will ask whether to share your public profile with Human Shaped. That is all we ask for, and you can take it back at any time from your GitHub settings.</p>
@@ -93,7 +93,7 @@
           <p>That GitHub account already has a Human Shaped account of its own.</p>
           <p class="small" data-elsewhere-text></p>
           <div class="actions">
-            <button class="btn-github" type="button" data-use-github-account hidden>Use my GitHub account instead</button>
+            <button class="btn-primary" type="button" data-use-github-account hidden>Use my GitHub account instead</button>
           </div>
           <p class="small" data-elsewhere-status role="status"></p>
         </section>
@@ -105,7 +105,7 @@
 
         <section class="account-state" data-state="error" hidden>
           <p class="error" data-error-text role="alert">Something went wrong while signing in.</p>
-          <p><button class="btn-quiet" type="button" data-retry>Try again</button></p>
+          <p><button class="btn-secondary" type="button" data-retry>Try again</button></p>
         </section>
 
         <section class="account-state" data-state="signed-in" hidden>
@@ -120,7 +120,7 @@
           <!-- Words by Claude, awaiting Ben's review (Google sign-in beside GitHub). -->
           <div class="notice" data-needs-github hidden>
             <p><strong>Link your GitHub account to join a cohort.</strong> Your app lives on GitHub, and your cohort talks there, so a cohort needs your GitHub as well as your Google sign-in.</p>
-            <p><button class="btn-github" type="button" data-link-github>
+            <p><button class="btn-primary" type="button" data-link-github>
               <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Link my GitHub account
             </button></p>
           </div>
@@ -136,7 +136,7 @@
             <h2>Exchanges</h2>
             <p class="small">Short videos back and forth, in a cohort between sessions or with anyone you send the link to. Each video is saved in its maker's own Google Drive.</p>
             <div data-x-list></div>
-            <p><button class="btn-quiet" type="button" data-x-new>Start an exchange</button></p>
+            <p><button class="btn-secondary" type="button" data-x-new>Start an exchange</button></p>
             <form class="cohort-form x-form" data-x-form hidden novalidate>
               <label>What to call it <input name="title" maxlength="120" autocomplete="off" placeholder="Tell us about the problem you want to build for"></label>
               <label>Who can see it <select name="where"><option value="">Anyone with its link (people sign in to add a video)</option></select></label>
@@ -149,7 +149,7 @@
               <p class="hint">Your video is saved in your own Google Drive, in a folder called Human Shaped exchanges, and anyone with its link can watch it.</p>
               <progress class="x-progress" data-x-progress max="100" value="0" hidden></progress>
               <p class="small" role="status" aria-live="polite" data-x-status></p>
-              <div class="actions"><button class="btn-github" type="submit" disabled>Start the exchange</button><button class="link-btn" type="button" data-x-cancel>Cancel</button></div>
+              <div class="actions"><button class="btn-primary" type="submit" disabled>Start the exchange</button><button class="btn-secondary" type="button" data-x-cancel>Cancel</button></div>
             </form>
           </section>
 
@@ -201,9 +201,9 @@
               <label class="check"><input type="checkbox" name="public"> Show it on the apps page</label>
               <p class="small" data-own-app-standing></p>
               <div class="actions">
-                <button class="btn-quiet" type="submit">Save my app</button>
-                <button class="btn-quiet" type="button" data-own-app-remove hidden>Take it off the hub</button>
-                <a class="btn-link" data-own-app-page hidden>See its page</a>
+                <button class="btn-secondary" type="submit">Save my app</button>
+                <a class="btn-secondary" data-own-app-page hidden>See its page</a>
+                <button class="btn-danger" type="button" data-own-app-remove hidden>Take it off the hub</button>
                 <span class="small" role="status" data-own-app-status></span>
               </div>
             </form>
@@ -222,8 +222,8 @@
               <label class="check"><input type="checkbox" name="notices"> Email me, at most once a day, when a teacher writes me a note or someone answers what I shared</label>
               <p class="small">That second email comes from meet@humanshaped.org and says only that something is waiting, never the words themselves.</p>
               <div class="actions">
-                <button class="btn-quiet" type="submit">Save how to reach me</button>
-                <button class="btn-quiet" type="button" data-reach-clear hidden>Forget my address</button>
+                <button class="btn-secondary" type="submit">Save how to reach me</button>
+                <button class="btn-secondary" type="button" data-reach-clear hidden>Forget my address</button>
                 <span class="small" role="status" data-reach-status></span>
               </div>
             </form>
@@ -239,8 +239,8 @@
           <h2>Your data</h2>
           <p>This site keeps your GitHub name and picture, which cohorts you are in, whatever you choose to share with a cohort, your own marks on the stages, your own app if you add one, the notes your teachers send you, and, only if you give it above, the address your teachers may use. Leaving a cohort removes what you shared there but keeps your notes, which you can remove here. Deleting your account removes everything.</p>
           <div class="actions">
-            <button class="btn-quiet" type="button" data-sign-out>Sign out</button>
-            <button class="btn-quiet danger" type="button" data-delete-open>Delete my account</button>
+            <button class="btn-secondary" type="button" data-sign-out>Sign out</button>
+            <button class="btn-danger" type="button" data-delete-open>Delete my account</button>
           </div>
         </section>
       </div>
@@ -251,8 +251,8 @@
         <h2 id="delete-title">Delete your account?</h2>
         <p>This removes your profile, your place in every cohort, and everything you shared on this site. Your GitHub account and your apps are not touched.</p>
         <div class="actions">
-          <button class="btn-quiet" value="cancel">Keep my account</button>
-          <button class="btn-quiet danger" value="delete" data-delete-confirm>Delete it</button>
+          <button class="btn-secondary" value="cancel">Keep my account</button>
+          <button class="btn-danger final" value="delete" data-delete-confirm>Delete it</button>
         </div>
       </form>
     </dialog>
@@ -262,8 +262,8 @@
         <h2 id="leave-title">Leave this cohort?</h2>
         <p>What you shared with this cohort will be removed, and your classmates will no longer see your app here. Your app itself stays yours, on GitHub.</p>
         <div class="actions">
-          <button class="btn-quiet" value="cancel">Stay</button>
-          <button class="btn-quiet danger" value="leave">Leave the cohort</button>
+          <button class="btn-secondary" value="cancel">Stay</button>
+          <button class="btn-danger final" value="leave">Leave the cohort</button>
         </div>
       </form>
     </dialog>
@@ -281,9 +281,9 @@
   <script src="/assets/credential-lib.js?v=20261006c" defer></script>
   <script src="/assets/google-signin-lib.js" defer></script>
   <script src="/assets/google-signin.js" defer></script>
-  <script src="/assets/hub.js" defer></script>
+  <script src="/assets/hub.js?v=20261012h" defer></script>
   <script src="/assets/exchange-lib.js?v=20261012c" defer></script>
-  <script src="/assets/exchange-recorder.js?v=20261011c" defer></script>
+  <script src="/assets/exchange-recorder.js?v=20261012h" defer></script>
   <script src="/assets/exchange-drive.js?v=20261012b" defer></script>
   <script src="/assets/exchange-list.js?v=20261012b" defer></script>
 
@@ -292,7 +292,7 @@
       <div class="footer-brand">
         <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
         <p>The ideas, the method, the tools, and the cohorts are free, and what you build is yours.</p>
-        <p><a class="go-text" href="/about/">About Human Shaped</a></p>
+        <p><a href="/about/">About Human Shaped</a></p>
       </div>
       <nav class="footer-links" aria-label="More of the site">
         <div>

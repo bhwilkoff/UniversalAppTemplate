@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261012c">
+  <link rel="stylesheet" href="/assets/site.css?v=20261012h">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -33,7 +33,7 @@
       if (t) document.documentElement.setAttribute('data-theme', t);
     })();
   </script>
-  <script src="/assets/site.js" defer></script>
+  <script src="/assets/site.js?v=20261012h" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to the page</a>
@@ -53,7 +53,7 @@
         <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
           <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#moon"/></svg>
         </button>
-        <a class="btn-github small" href="/account/">
+        <a class="btn-primary small" href="/account/">
           <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>
           <span>Sign in<span class="long"> with GitHub</span></span>
         </a>
@@ -69,7 +69,7 @@
         <section class="account-state" data-state="signed-out" hidden>
           <h1>Your cohort lives here.</h1>
           <p>Sign in with the GitHub account you joined with, and you will see this week's work, the next session, your group, and the apps everyone is building.</p>
-          <p><a class="btn-github" href="/account/"><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Sign in with GitHub</a></p>
+          <p><a class="btn-primary" href="/account/"><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Sign in with GitHub</a></p>
         </section>
 
         <section class="account-state" data-state="not-member" hidden>
@@ -80,7 +80,7 @@
         <section class="account-state" data-state="error" hidden>
           <h1 class="visually-hidden">Your cohort</h1>
           <p class="error" data-error-text role="alert"></p>
-          <p><button class="btn-quiet" type="button" data-reload>Try again</button></p>
+          <p><button class="btn-secondary" type="button" data-reload>Try again</button></p>
         </section>
 
         <section class="account-state" data-state="ready" hidden>
@@ -118,8 +118,8 @@
               <div data-bg-wrap hidden>
                 <p class="small">A background for Meet with your cohort's name on it, kept out of the middle where Meet puts you.</p>
                 <div class="actions">
-                  <button class="btn-quiet" type="button" data-bg="paper">Save the light one</button>
-                  <button class="btn-quiet" type="button" data-bg="evening">Save the dark one</button>
+                  <button class="btn-secondary" type="button" data-bg="paper">Save the light one</button>
+                  <button class="btn-secondary" type="button" data-bg="evening">Save the dark one</button>
                 </div>
                 <p class="small" role="status" data-bg-status></p>
               </div>
@@ -134,7 +134,7 @@
             </div>
             <div data-lesson-line hidden>
               <p>Together, the cohort chooses one thing it learned that the next builder should not have to learn again, and sends it back to the template. Your teacher usually sends it, and anyone can. Credit people only if each of them says yes, and leave out anything private, because GitHub is public.</p>
-              <p class="actions"><a class="btn-quiet" data-lesson-link href="https://github.com/bhwilkoff/UniversalAppTemplate/issues/new"><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Send a lesson back to the template</a></p>
+              <p class="actions"><a class="btn-secondary" data-lesson-link href="https://github.com/bhwilkoff/UniversalAppTemplate/issues/new"><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Send a lesson back to the template</a></p>
             </div>
           </section>
 
@@ -161,7 +161,7 @@
             <h2 id="exchanges-title">Exchanges</h2>
             <p class="small">Short videos back and forth between sessions, seen only by this cohort. Each video is saved in its maker's own Google Drive.</p>
             <div data-x-list></div>
-            <p><button class="btn-quiet" type="button" data-x-new>Start an exchange</button></p>
+            <p><button class="btn-secondary" type="button" data-x-new>Start an exchange</button></p>
             <form class="cohort-form x-form" data-x-form hidden novalidate>
               <label>What to call it <input name="title" maxlength="120" autocomplete="off" placeholder="What surprised you when someone else used your app?"></label>
               <fieldset>
@@ -173,7 +173,7 @@
               <p class="hint">Your video is saved in your own Google Drive, in a folder called Human Shaped exchanges, and anyone with its link can watch it.</p>
               <progress class="x-progress" data-x-progress max="100" value="0" hidden></progress>
               <p class="small" role="status" aria-live="polite" data-x-status></p>
-              <div class="actions"><button class="btn-github" type="submit" disabled>Start the exchange</button><button class="link-btn" type="button" data-x-cancel>Cancel</button></div>
+              <div class="actions"><button class="btn-primary" type="submit" disabled>Start the exchange</button><button class="btn-secondary" type="button" data-x-cancel>Cancel</button></div>
             </form>
           </section>
 
@@ -201,7 +201,7 @@
                 <p class="hint">Every app in the cohort goes up by the time the cohort ends, and this is where you say yours is ready. It shows the app&rsquo;s name, its repository (which names your GitHub account), and where people can use it, and nothing about you or this cohort. You can turn it off again, and leaving the cohort turns it off.</p>
               </div>
               <label>An email for calendar invitations, if you want them <input name="email" type="email" maxlength="254"><span class="hint">Only you and your teacher can see it, and it is removed when you leave.</span></label>
-              <div class="actions"><button class="btn-quiet" type="submit">Save</button><span class="small" data-my-app-message></span></div>
+              <div class="actions"><button class="btn-secondary" type="submit">Save</button><span class="small" data-my-app-message></span></div>
             </form>
           </section>
 
@@ -235,7 +235,7 @@
                   <p class="hint">Judge it yourself first, and a partner can confirm it once they have seen it working on a device. It is never a score, and changing it later costs nothing.</p>
                 </fieldset>
               </div>
-              <div class="actions"><button class="btn-github" type="submit">Share with the cohort</button><span class="small" data-share-message></span></div>
+              <div class="actions"><button class="btn-primary" type="submit">Share with the cohort</button><span class="small" data-share-message></span></div>
             </form>
             <div data-shares></div>
           </section>
@@ -249,7 +249,7 @@
   <script src="/assets/cohort-lib.js" defer></script>
   <script src="/assets/submit-lib.js" defer></script>
   <script src="/assets/discussions-lib.js" defer></script>
-  <script src="/assets/discussions.js" defer></script>
+  <script src="/assets/discussions.js?v=20261012h" defer></script>
   <script src="/assets/background.js" defer></script>
   <script src="/assets/mentor-lib.js" defer></script>
   <script src="/assets/path-lib.js" defer></script>
@@ -257,9 +257,9 @@
   <script src="/assets/show-lib.js" defer></script>
   <script src="/assets/recognition-lib.js" defer></script>
   <script src="/assets/curriculum-pages-lib.js" defer></script>
-  <script src="/assets/cohort.js" defer></script>
+  <script src="/assets/cohort.js?v=20261012h" defer></script>
   <script src="/assets/exchange-lib.js?v=20261012c" defer></script>
-  <script src="/assets/exchange-recorder.js?v=20261011c" defer></script>
+  <script src="/assets/exchange-recorder.js?v=20261012h" defer></script>
   <script src="/assets/exchange-drive.js?v=20261012b" defer></script>
   <script src="/assets/exchange-list.js?v=20261012b" defer></script>
 
@@ -268,7 +268,7 @@
       <div class="footer-brand">
         <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
         <p>The ideas, the method, the tools, and the cohorts are free, and what you build is yours.</p>
-        <p><a class="go-text" href="/about/">About Human Shaped</a></p>
+        <p><a href="/about/">About Human Shaped</a></p>
       </div>
       <nav class="footer-links" aria-label="More of the site">
         <div>

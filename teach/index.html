@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261012c">
+  <link rel="stylesheet" href="/assets/site.css?v=20261012h">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -33,7 +33,7 @@
       if (t) document.documentElement.setAttribute('data-theme', t);
     })();
   </script>
-  <script src="/assets/site.js" defer></script>
+  <script src="/assets/site.js?v=20261012h" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to the page</a>
@@ -53,7 +53,7 @@
         <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
           <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#moon"/></svg>
         </button>
-        <a class="btn-github small" href="/account/">
+        <a class="btn-primary small" href="/account/">
           <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>
           <span>Sign in<span class="long"> with GitHub</span></span>
         </a>
@@ -73,7 +73,7 @@
 
         <section class="account-state" data-state="signed-out" hidden>
           <p>Teaching starts with signing in, the same way everyone else does, and that is also how you ask to teach. <a href="/teach/guide/">The teaching guide</a> says what leading a cohort asks of you.</p>
-          <p><a class="btn-github" href="/account/"><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Sign in with GitHub</a></p>
+          <p><a class="btn-primary" href="/account/"><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Sign in with GitHub</a></p>
         </section>
 
         <!-- The words in the three request states below were written by
@@ -86,8 +86,8 @@
             <label>What you would bring to it <span class="hint">The people you would teach, where you would find them, and anything you have built this way.</span><textarea name="brings" rows="3" maxlength="2000"></textarea></label>
             <p class="small">Only you and the people who approve teachers can read this, and you can change it or take it back until it has an answer.</p>
             <div class="actions">
-              <button class="btn-github" type="submit" data-ask-submit>Send my request</button>
-              <button class="btn-quiet" type="button" data-ask-cancel hidden>Keep it as it was</button>
+              <button class="btn-primary" type="submit" data-ask-submit>Send my request</button>
+              <button class="btn-secondary" type="button" data-ask-cancel hidden>Keep it as it was</button>
             </div>
             <p class="small" data-ask-message></p>
           </form>
@@ -109,15 +109,15 @@
             <p data-asked-reply></p>
           </div>
           <div class="actions">
-            <button class="btn-quiet" type="button" data-asked-edit>Change the words</button>
-            <button class="btn-quiet danger" type="button" data-asked-withdraw>Take it back</button>
+            <button class="btn-secondary" type="button" data-asked-edit>Change the words</button>
+            <button class="btn-danger" type="button" data-asked-withdraw>Take it back</button>
           </div>
           <p class="small" data-asked-message></p>
         </section>
 
         <section class="account-state" data-state="error" hidden>
           <p class="error" data-error-text role="alert"></p>
-          <p><button class="btn-quiet" type="button" data-reload>Try again</button></p>
+          <p><button class="btn-secondary" type="button" data-reload>Try again</button></p>
         </section>
 
         <section class="account-state" data-state="teacher" hidden>
@@ -142,7 +142,7 @@
 
           <h2>Your cohorts</h2>
           <div data-cohort-list></div>
-          <p class="actions"><button class="btn-quiet" type="button" data-new-cohort>Start a new cohort</button><a class="go-text" href="/teach/times/">Find a weekly time with the people who might join</a></p>
+          <p class="actions"><button class="btn-secondary" type="button" data-new-cohort>Start a new cohort</button><a class="btn-secondary" href="/teach/times/">Find a weekly time with the people who might join</a></p>
 
           <!-- The cohort form (Ben, October 6): every question is one that
                changes how the cohort runs. Words by Claude, awaiting Ben's review. -->
@@ -158,7 +158,7 @@
                   <legend><span class="q-n">1</span>What will people call it?</legend>
                   <p class="hint" id="q-title-hint">Its name on the cohorts page and at the top of its own page.</p>
                   <input id="cohort-title" name="title" maxlength="120" placeholder="Fall 2026, Tuesday evenings" aria-describedby="q-title-hint" aria-label="The cohort's name" autocomplete="off">
-                  <p class="addr" data-slug-line>Its address: <span class="url">humanshaped.org/cohort/?c=<b data-slug-show>&hellip;</b></span> <button class="link-btn" type="button" data-slug-edit>Change it</button></p>
+                  <p class="addr" data-slug-line>Its address: <span class="url">humanshaped.org/cohort/?c=<b data-slug-show>&hellip;</b></span> <button class="text-button" type="button" data-slug-edit>Change it</button></p>
                   <label class="sub" data-slug-field hidden>The short name in its address <input id="cohort-slug" name="slug" maxlength="60" autocomplete="off" spellcheck="false" autocapitalize="off"><span class="hint">Lowercase letters, numbers, and hyphens. It stays the same once the cohort is saved, so links to it keep working.</span></label>
                 </fieldset>
 
@@ -232,14 +232,14 @@
                   <p class="small" data-preview-line></p>
                   <p class="small" data-preview-time></p>
                   <p data-preview-desc></p>
-                  <div class="actions"><span class="btn-github" aria-hidden="true">Join with GitHub</span></div>
+                  <div class="actions"><span class="btn-primary" aria-hidden="true">Join with GitHub</span></div>
                 </article>
                 <p class="small" data-preview-note>People see it here once it is Open.</p>
               </aside>
             </div>
             <div class="builder-actions">
-              <button class="btn-github" type="submit">Save the cohort</button>
-              <button class="btn-quiet" type="button" data-cancel>Cancel</button>
+              <button class="btn-primary" type="submit">Save the cohort</button>
+              <button class="btn-secondary" type="button" data-cancel>Cancel</button>
               <p class="small" data-form-message role="status"></p>
             </div>
           </form>
@@ -248,12 +248,12 @@
             <h2 data-detail-title></h2>
             <p class="small" data-detail-meta></p>
             <div class="actions">
-              <button class="btn-quiet" type="button" data-edit>Edit the details</button>
-              <button class="btn-quiet" type="button" data-make-sessions>Make the weekly sessions</button>
-              <a class="btn-quiet" data-live-link href="/live/">Open the live page</a>
-              <a class="btn-quiet" data-rooms-link href="/live/#rooms">Every rehearsal room now</a>
-              <button class="btn-quiet" type="button" data-copy-meet>Copy the setup for the Meet script</button>
-              <button class="btn-quiet danger" type="button" data-delete-draft hidden>Delete this draft</button>
+              <button class="btn-secondary" type="button" data-edit>Edit the details</button>
+              <button class="btn-secondary" type="button" data-make-sessions>Make the weekly sessions</button>
+              <a class="btn-secondary" data-live-link href="/live/">Open the live page</a>
+              <a class="btn-secondary" data-rooms-link href="/live/#rooms">Every rehearsal room now</a>
+              <button class="btn-secondary" type="button" data-copy-meet>Copy the setup for the Meet script</button>
+              <button class="btn-danger" type="button" data-delete-draft hidden>Delete this draft</button>
             </div>
             <p class="small" data-detail-message></p>
             <!-- Words by Claude, awaiting Ben's review (H4). -->
@@ -278,7 +278,7 @@
                   <span class="hint">Your own words to the whole cohort, which the session page shows while people arrive next time. Say what you noticed across the answers rather than who wrote what.</span>
                   <textarea name="heard" rows="4" maxlength="2000"></textarea>
                 </label>
-                <div class="actions"><button class="btn-quiet" type="submit">Save it</button><span class="small" data-heard-message role="status"></span></div>
+                <div class="actions"><button class="btn-secondary" type="submit">Save it</button><span class="small" data-heard-message role="status"></span></div>
               </form>
 
               <h3 id="not-seen-title" data-not-seen-title></h3>
@@ -307,7 +307,7 @@
             <div class="lesson" data-lesson hidden>
               <h3 id="lesson">The lesson this cohort sends back</h3>
               <p class="small">In the last week, the cohort chooses together one thing it learned that the next builder should not have to learn again: a prompt that worked, a step that broke, or a correction that kept coming up. Send it to the template as an issue, and credit the people who learned it only if each of them said yes. Everything on GitHub is public, so leave out anything private about anyone.</p>
-              <p class="actions"><a class="btn-quiet" data-lesson-link href="https://github.com/bhwilkoff/UniversalAppTemplate/issues/new"><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Send a lesson back to the template</a></p>
+              <p class="actions"><a class="btn-secondary" data-lesson-link href="https://github.com/bhwilkoff/UniversalAppTemplate/issues/new"><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Send a lesson back to the template</a></p>
             </div>
 
             <h3>People</h3>
@@ -322,7 +322,7 @@
                 <select name="user_id" required data-co-teacher-choices></select>
               </label>
               <div class="actions">
-                <button class="btn-quiet" type="submit">Add them</button>
+                <button class="btn-secondary" type="submit">Add them</button>
                 <span class="small" role="status" data-co-teacher-message></span>
               </div>
             </form>
@@ -339,7 +339,7 @@
             <form class="inline-form" data-group-form>
               <label>New group <input name="name" required maxlength="60" placeholder="Group 1"></label>
               <label>What it is for <input name="expectations" maxlength="400" placeholder="Show each other your bring-back before each session"></label>
-              <button class="btn-quiet" type="submit">Add the group</button>
+              <button class="btn-secondary" type="submit">Add the group</button>
             </form>
 
             <!-- The words in the credential section were written by Claude
@@ -368,21 +368,21 @@
   <script src="/assets/showcase-lib.js" defer></script>
   <script src="/assets/cohort-lib.js" defer></script>
   <script src="/assets/live-lib.js" defer></script>
-  <script src="/assets/question-view.js" defer></script>
-  <script src="/assets/question-bank.js" defer></script>
+  <script src="/assets/question-view.js?v=20261012h" defer></script>
+  <script src="/assets/question-bank.js?v=20261012h" defer></script>
   <script src="/assets/board-lib.js" defer></script>
   <script src="/assets/show-lib.js" defer></script>
   <script src="/assets/curriculum-lib.js" defer></script>
   <script src="/assets/curriculum-seed.js" defer></script>
-  <script src="/assets/show-builder.js" defer></script>
-  <script src="/assets/teach.js?v=20261009a" defer></script>
+  <script src="/assets/show-builder.js?v=20261012h" defer></script>
+  <script src="/assets/teach.js?v=20261012h" defer></script>
 
   <footer class="site-footer">
     <div class="wrap">
       <div class="footer-brand">
         <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
         <p>The ideas, the method, the tools, and the cohorts are free, and what you build is yours.</p>
-        <p><a class="go-text" href="/about/">About Human Shaped</a></p>
+        <p><a href="/about/">About Human Shaped</a></p>
       </div>
       <nav class="footer-links" aria-label="More of the site">
         <div>

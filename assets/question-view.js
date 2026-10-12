@@ -22,7 +22,7 @@
   var uid = 0;
 
   function el(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
-  function btn(text, cls, onClick) { var b = el('button', cls || 'btn-quiet', text); b.type = 'button'; b.addEventListener('click', onClick); return b; }
+  function btn(text, cls, onClick) { var b = el('button', cls || 'btn-secondary', text); b.type = 'button'; b.addEventListener('click', onClick); return b; }
   function labelled(text, input, hint) {
     var l = el('label', null, text);
     if (hint) l.appendChild(el('span', 'hint', hint));
@@ -110,8 +110,8 @@
       order.forEach(function (c, i) {
         var li = el('li');
         li.appendChild(el('span', 'label', check.choices[c - 1]));
-        var up = btn('Move up', 'btn-quiet', function () { swap(i, -1); });
-        var down = btn('Move down', 'btn-quiet', function () { swap(i, 1); });
+        var up = btn('Move up', 'btn-secondary', function () { swap(i, -1); });
+        var down = btn('Move down', 'btn-secondary', function () { swap(i, 1); });
         up.setAttribute('aria-label', 'Move ' + check.choices[c - 1] + ' up');
         down.setAttribute('aria-label', 'Move ' + check.choices[c - 1] + ' down');
         up.disabled = i === 0; down.disabled = i === order.length - 1;
@@ -179,7 +179,7 @@
       read = function () { return { body: input.value }; };
     }
     var acts = el('div', 'actions');
-    var send = el('button', 'btn-quiet', given ? 'Change my answer' : 'Send my answer'); send.type = 'submit';
+    var send = el('button', 'btn-secondary', given ? 'Change my answer' : 'Send my answer'); send.type = 'submit';
     var status = el('span', 'small'); status.setAttribute('role', 'status');
     acts.appendChild(send); acts.appendChild(status);
     form.appendChild(acts);

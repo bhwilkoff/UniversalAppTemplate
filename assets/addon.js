@@ -29,7 +29,7 @@
 
   function $(s) { return root.querySelector(s); }
   function el(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
-  function button(label, cls, onClick) { var b = el('button', cls || 'btn-quiet', label); b.type = 'button'; b.addEventListener('click', onClick); return b; }
+  function button(label, cls, onClick) { var b = el('button', cls || 'btn-secondary', label); b.type = 'button'; b.addEventListener('click', onClick); return b; }
   function show(state) { root.querySelectorAll('.account-state').forEach(function (s) { s.hidden = s.getAttribute('data-state') !== state; }); }
   function fail(m) { $('[data-error-text]').textContent = m; show('error'); }
   function safe(u) { return /^https:\/\//.test(u || '') ? u : null; }
@@ -345,7 +345,7 @@
       var moment = el('input'); moment.type = 'text'; moment.maxLength = 300; moment.setAttribute('aria-label', 'The moment');
       d.addEventListener('toggle', function () { if (d.open && !moment.value) { var part = partNow(); moment.value = RL.momentFor(part && part.name, S.session.number); } });
       var status = el('p', 'small'); status.setAttribute('role', 'status');
-      var give = button('Give it', 'btn-github', function () {
+      var give = button('Give it', 'btn-primary', function () {
         var r = RL.row({ cohortId: S.cohort.id, sessionId: S.session.id, userId: who.value, key: what.value === 'own' ? null : what.value, ownWords: own.value, moment: moment.value });
         if (r.why) { status.textContent = r.why; return; }
         give.disabled = true;
@@ -503,8 +503,8 @@
       ? 'Your trio’s own design stage for this week. Everyone in the trio draws on it at once, and it is kept with the session.'
       : 'This week’s design stage for the whole cohort. Everyone draws on it at once, and it is kept with the session.'));
     var acts = el('div', 'actions');
-    var open = newTab(el('a', 'btn-github', 'Open the design stage')); open.href = links.board; acts.appendChild(open);
-    if (S.teaching) { var stage = newTab(el('a', 'btn-quiet', 'Open it to present')); stage.href = links.stage; acts.appendChild(stage); }
+    var open = newTab(el('a', 'btn-primary', 'Open the design stage')); open.href = links.board; acts.appendChild(open);
+    if (S.teaching) { var stage = newTab(el('a', 'btn-secondary', 'Open it to present')); stage.href = links.stage; acts.appendChild(stage); }
     box.appendChild(acts);
     if (S.teaching) box.appendChild(el('p', 'small', 'During a design stage scene, the main stage shows this board to everyone who has it open. On the board you can add a PDF, slides saved as a PDF, or pictures as pages to draw on, from your computer or your library folder on GitHub.'));
   }
@@ -530,7 +530,7 @@
           : 'Your teacher has not opened this session’s thread yet.'));
       } else {
         box.appendChild(el('p', 'small', 'Links, questions for later, and what you are stuck on go here, and they stay on GitHub under your own name.'));
-        var a = el('a', 'btn-github', 'Open the thread on GitHub'); a.href = url; a.target = '_blank'; a.rel = 'noopener';
+        var a = el('a', 'btn-primary', 'Open the thread on GitHub'); a.href = url; a.target = '_blank'; a.rel = 'noopener';
         box.appendChild(el('p')).appendChild(a);
       }
       var live = el('a', null, 'Read and post on the session page'); live.href = '/live/?c=' + encodeURIComponent(S.cohort.slug); live.target = '_blank'; live.rel = 'noopener';
@@ -825,7 +825,7 @@
 
   function stageToggle(kind, id, onLabel, offLabel) {
     var on = S.onStage && S.onStage.kind === kind && S.onStage.id === id;
-    var b = button(on ? offLabel : onLabel, 'btn-quiet', function () { setPin(on ? null : { kind: kind, id: id }); });
+    var b = button(on ? offLabel : onLabel, 'btn-secondary', function () { setPin(on ? null : { kind: kind, id: id }); });
     b.setAttribute('aria-pressed', String(on));
     return b;
   }
@@ -855,11 +855,11 @@
     }
     if (S.teaching && next) {
       var acts = el('div', 'actions');
-      acts.appendChild(button(now ? 'Thank them, and bring up ' + nameOf(next.user_id) : 'Bring up ' + nameOf(next.user_id) + ' from the wings', 'btn-github', function () {
+      acts.appendChild(button(now ? 'Thank them, and bring up ' + nameOf(next.user_id) : 'Bring up ' + nameOf(next.user_id) + ' from the wings', 'btn-primary', function () {
         var done = now ? db.from('live_queue').update({ state: 'shown' }).eq('id', now.id) : Promise.resolve({});
         done.then(function () { setPin({ kind: 'item', id: next.id }); refreshLive(); });
       }));
-      if (now) acts.appendChild(button('Thank them, and clear the stage', 'btn-quiet', function () {
+      if (now) acts.appendChild(button('Thank them, and clear the stage', 'btn-secondary', function () {
         db.from('live_queue').update({ state: 'shown' }).eq('id', now.id).then(function () { setPin(null); refreshLive(); });
       }));
       box.appendChild(acts);
@@ -878,12 +878,12 @@
       li.appendChild(el('p', 'live-what', L.itemLabel(item)));
       if (item.note) li.appendChild(el('p', 'live-note', item.note));
       var acts = el('div', 'actions');
-      var open = newTab(el('a', 'btn-quiet', 'Open it')); open.href = item.url;
+      var open = newTab(el('a', 'btn-secondary', 'Open it')); open.href = item.url;
       open.setAttribute('aria-label', 'Open ' + L.itemLabel(item) + ' in a new tab');
       acts.appendChild(open);
       if (S.teaching) acts.appendChild(stageToggle('item', item.id, 'Put it on the main stage', 'Take it off the main stage'));
       if (L.canManage(item, S.me.id, S.teaching)) {
-        acts.appendChild(button('They have presented', 'btn-quiet', function () {
+        acts.appendChild(button('They have presented', 'btn-secondary', function () {
           if (S.onStage && S.onStage.id === item.id) setPin(null);
           db.from('live_queue').update({ state: 'shown' }).eq('id', item.id).then(function (r) { if (!r.error) refreshLive(); });
         }));
@@ -897,7 +897,7 @@
   function drawChecksChrome() {
     var closingFirst = S.plan && S.plan.closingFirst;
     $('[data-closing-wrap]').hidden = !S.teaching;
-    $('[data-ask-closing]').className = closingFirst ? 'btn-github' : 'btn-quiet';
+    $('[data-ask-closing]').className = closingFirst ? 'btn-primary' : 'btn-secondary';
     // Before the closing part, the button sits below the checks.
     var wrap = $('[data-closing-wrap]'), pane = $('[data-questions]');
     if (closingFirst) pane.insertBefore(wrap, $('[data-checks]')); else pane.insertBefore(wrap, $('[data-ask-status]'));
@@ -948,14 +948,14 @@
     }
     var acts = el('div', 'actions');
     acts.appendChild(stageToggle('check', k.id, 'Put it on the main stage', 'Take it off the main stage'));
-    if (RR && RR.canRerun(L.kindOf(k))) acts.appendChild(button('Ask it again', 'btn-quiet', function () {
+    if (RR && RR.canRerun(L.kindOf(k))) acts.appendChild(button('Ask it again', 'btn-secondary', function () {
       db.from('live_checks').insert(RR.againRow(k, { cohortId: S.cohort.id, sessionId: S.session.id, me: S.me.id })).then(function (r) {
         if (r.error) { window.alert('Not asked again: ' + r.error.message); return; }
         refreshLive();
       });
     }));
-    if (!short) acts.appendChild(button(k.show_tally ? 'Hide the results' : 'Show everyone the results', 'btn-quiet', function () { changeCheck(k, { show_tally: !k.show_tally }); }));
-    acts.appendChild(button('Close it', 'btn-quiet', function () { if (S.onStage && S.onStage.id === k.id) setPin(null); changeCheck(k, { state: 'closed' }); }));
+    if (!short) acts.appendChild(button(k.show_tally ? 'Hide the results' : 'Show everyone the results', 'btn-secondary', function () { changeCheck(k, { show_tally: !k.show_tally }); }));
+    acts.appendChild(button('Close it', 'btn-secondary', function () { if (S.onStage && S.onStage.id === k.id) setPin(null); changeCheck(k, { state: 'closed' }); }));
     card.appendChild(acts);
     if (!mine.length && S.kinds) card.appendChild(editCheck(k));
     return card;
@@ -971,7 +971,7 @@
     fl.fill(L.questionFields(check));
     f.appendChild(fl.el);
     var acts = el('div', 'actions');
-    var save = el('button', 'btn-quiet', 'Save the change'); save.type = 'submit';
+    var save = el('button', 'btn-secondary', 'Save the change'); save.type = 'submit';
     var status = el('span', 'small'); status.setAttribute('role', 'status');
     acts.appendChild(save); acts.appendChild(status);
     f.appendChild(acts);
@@ -1084,7 +1084,7 @@
     var status = el('span', 'small'); status.setAttribute('role', 'status');
     var acts = el('div', 'actions');
     if (asked) status.textContent = 'Asked. The answers are below.';
-    else acts.appendChild(button('Ask it now', 'btn-github', function () {
+    else acts.appendChild(button('Ask it now', 'btn-primary', function () {
       ask([Object.assign({ show_tally: $('[data-ask-tally]').checked }, q)], status);
     }));
     acts.appendChild(status);

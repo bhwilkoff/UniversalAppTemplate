@@ -49,7 +49,7 @@
       box.appendChild(el('p', null, 'The call is on Google Meet, hosted by meet@humanshaped.org. Open the link a few minutes early and choose Ask to join, and someone in the room will let you in.'));
       box.appendChild(el('p', null, 'You do not need a Google account to come from a computer: open the link in your browser, type your name, and choose Ask to join. From a phone, the Meet app may ask you to sign in first, so a computer is the easier way in.'));
       var a = el('p', 'actions');
-      a.appendChild(link(s.guestLink, state === 'now' ? 'Join the showing now' : 'The link to join', 'btn-quiet'));
+      a.appendChild(link(s.guestLink, state === 'now' ? 'Join the showing now' : 'The link to join', 'btn-secondary'));
       box.appendChild(a);
     } else {
       box.appendChild(el('p', null, 'The cohort’s teacher shares the way in with the guests they invite, so if someone asked you to come, the link is in their invitation. If the teacher posts it here, it will appear on this page.'));

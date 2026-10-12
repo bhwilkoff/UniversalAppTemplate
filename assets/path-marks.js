@@ -126,7 +126,7 @@
   }
 
   function copyButton(quote) {
-    var b = el('button', 'btn-quiet copy-prompt', 'Copy these words');
+    var b = el('button', 'btn-secondary copy-prompt', 'Copy these words');
     b.type = 'button';
     var status = el('span', 'small'); status.setAttribute('role', 'status');
     b.addEventListener('click', function () {
@@ -198,7 +198,7 @@
       box.appendChild(label);
       r.addEventListener('change', function () { msg.textContent = ''; change(stage, 'ready', o[0], null, msg); });
     });
-    var clear = el('button', 'btn-link', 'Clear my answer');
+    var clear = el('button', 'btn-danger', 'Clear my answer');
     clear.type = 'button';
     clear.addEventListener('click', function () { msg.textContent = ''; change(stage, 'ready', null, null, msg); });
     var hint = el('p', 'hint');
@@ -234,7 +234,7 @@
           : 'When you have it, bring it to one of your cohorts, with a link and a sentence in your own words.'));
         var row = el('div', 'actions');
         choice.cohorts.forEach(function (c) {
-          var a = el('a', 'btn-github', choice.cohorts.length === 1 ? 'Bring it back' : 'Bring it back to ' + c.title);
+          var a = el('a', choice.cohorts.length === 1 ? 'btn-primary' : 'btn-secondary', choice.cohorts.length === 1 ? 'Bring it back' : 'Bring it back to ' + c.title);
           a.href = c.href;
           row.appendChild(a);
         });
@@ -257,11 +257,11 @@
     t.value = draft || (kept ? kept.note : '');
     label.appendChild(t);
     form.appendChild(label);
-    var save = el('button', 'btn-quiet', kept ? 'Keep the change' : 'Keep it'); save.type = 'submit';
+    var save = el('button', 'btn-secondary', kept ? 'Keep the change' : 'Keep it'); save.type = 'submit';
     var msg = el('span', 'small'); msg.setAttribute('role', 'status');
     var row = el('div', 'actions'); row.appendChild(save);
     if (kept) {
-      var rm = el('button', 'btn-quiet', 'Remove the note'); rm.type = 'button';
+      var rm = el('button', 'btn-danger', 'Remove the note'); rm.type = 'button';
       rm.addEventListener('click', function () {
         change(stage, 'note', null, null, msg).then(function (ok) { if (ok) say(msg, 'Removed.'); });
       });

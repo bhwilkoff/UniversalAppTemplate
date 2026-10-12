@@ -17,7 +17,7 @@
   if (!K) return;
 
   function el(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
-  function button(label, cls, onClick) { var b = el('button', cls || 'btn-quiet', label); b.type = 'button'; b.addEventListener('click', onClick); return b; }
+  function button(label, cls, onClick) { var b = el('button', cls || 'btn-secondary', label); b.type = 'button'; b.addEventListener('click', onClick); return b; }
   function link(label, cls, href) { var a = el('a', cls, label); a.href = href; a.target = '_blank'; a.rel = 'noopener'; return a; }
   function safe(u) { return /^https:\/\//.test(u || '') ? u : null; }
   function reduced() { return !!(root.matchMedia && root.matchMedia('(prefers-reduced-motion: reduce)').matches); }
@@ -127,7 +127,7 @@
         box.appendChild(el('p', 'signal-title', 'Come back to the main room'));
         box.appendChild(el('p', null, w.because === 'time' ? 'The time in the rooms is up.' : 'Your teacher is calling everyone back.'));
         var acts = el('div', 'actions');
-        if (mainUrl) acts.appendChild(link('Back to the main room', 'btn-github', mainUrl));
+        if (mainUrl) acts.appendChild(link('Back to the main room', 'btn-primary', mainUrl));
         else acts.appendChild(el('p', 'small', 'The main room is the session’s own Meet call.'));
         box.appendChild(acts);
         return;
@@ -155,9 +155,9 @@
       var acts2 = el('div', 'actions');
       rooms.forEach(function (r) {
         if (!r.url) return;
-        acts2.appendChild(link(opts.teaching && !r.mine ? 'Visit ' + r.name : 'Join ' + (opts.teaching ? r.name + '’s' : 'your group’s') + ' room', r.mine ? 'btn-github' : 'btn-quiet', r.url));
+        acts2.appendChild(link(opts.teaching && !r.mine ? 'Visit ' + r.name : 'Join ' + (opts.teaching ? r.name + '’s' : 'your group’s') + ' room', r.mine ? 'btn-primary' : 'btn-secondary', r.url));
       });
-      if (mainUrl) acts2.appendChild(link('The main room', 'btn-quiet', mainUrl));
+      if (mainUrl) acts2.appendChild(link('The main room', 'btn-secondary', mainUrl));
       box.appendChild(acts2);
       var none = rooms.filter(function (r) { return !r.url; }).map(function (r) { return r.name; });
       if (opts.teaching && none.length) box.appendChild(el('p', 'small', K.list(none) + (none.length === 1 ? ' has' : ' have') + ' no room yet, so ' + (none.length === 1 ? 'it stays' : 'they stay') + ' in the main room.'));
@@ -361,21 +361,21 @@
         var list = q('[data-sig-presets]'); list.replaceChildren();
         K.presets(saved).forEach(function (p) {
           var li = el('li', 'signal-preset');
-          li.appendChild(button(K.presetLabel(p), 'btn-quiet', function () {
+          li.appendChild(button(K.presetLabel(p), 'btn-secondary', function () {
             words.value = p.body; cardMinutes.value = p.minutes ? String(p.minutes) : '';
             syncSave();
             status.card.textContent = 'Ready to show.';
             q('[data-sig-card-show]').focus();
           }));
           if (p.saved) {
-            var rm = button('Remove', 'btn-quiet danger', function () { rm.hidden = true; confirm.hidden = false; });
+            var rm = button('Remove', 'btn-danger', function () { rm.hidden = true; confirm.hidden = false; });
             rm.setAttribute('aria-label', 'Remove the saved card: ' + p.body);
             var confirm = el('span', 'signal-confirm'); confirm.hidden = true;
             confirm.appendChild(el('span', null, 'Remove it? '));
-            confirm.appendChild(button('Remove', 'btn-quiet danger', function () {
+            confirm.appendChild(button('Keep it', 'btn-secondary', function () { confirm.hidden = true; rm.hidden = false; }));
+            confirm.appendChild(button('Remove', 'btn-danger final', function () {
               db.from('card_presets').delete().eq('id', p.id).then(function () { refresh(); });
             }));
-            confirm.appendChild(button('Keep it', 'btn-quiet', function () { confirm.hidden = true; rm.hidden = false; }));
             li.appendChild(rm); li.appendChild(confirm);
           }
           list.appendChild(li);
