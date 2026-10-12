@@ -86,3 +86,20 @@ test('who reacted reads as people, with an Oxford comma', () => {
   assert.equal(X.names(['Ana', 'Ben', 'Cy', 'Di']), 'Ana, Ben, and 2 others');
   assert.equal(X.names(['Ana', 'Ben', 'Cy', 'Di', 'Ed', 'Flo']), 'Ana, Ben, and 4 others');
 });
+
+test('the thread nests two levels under the prompt, in time order, and deeper answers join their branch', () => {
+  const P = (id, reply_to) => ({ id, reply_to: reply_to || null });
+  const posts = [P('prompt'), P('maya', 'prompt'), P('sam', null), P('jo', 'maya'), P('ana', 'jo'), P('lee', 'sam'), P('kim', 'prompt'), P('ray', 'ana')];
+  const t = X.threadOrder(posts);
+  assert.deepEqual(t.map((x) => x.post.id + ':' + x.depth), ['prompt:0', 'maya:1', 'jo:2', 'ana:2', 'ray:2', 'sam:1', 'lee:2', 'kim:1']);
+  assert.deepEqual(t.filter((x) => x.depth === 2).map((x) => x.post.id + '<' + x.parent.id + '@' + x.branch), ['jo<maya@maya', 'ana<jo@maya', 'ray<ana@maya', 'lee<sam@sam']);
+  assert.equal(t[1].parent.id, 'prompt');
+  assert.equal(t[5].parent, null);
+});
+
+test('an answer to a removed video becomes a response of its own, and an empty thread is empty', () => {
+  const t = X.threadOrder([{ id: 'p' }, { id: 'x', reply_to: 'gone' }, { id: 'y', reply_to: 'x' }]);
+  assert.deepEqual(t.map((x) => x.post.id + ':' + x.depth), ['p:0', 'x:1', 'y:2']);
+  assert.equal(t[1].parent, null);
+  assert.deepEqual(X.threadOrder([]), []);
+});

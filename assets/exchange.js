@@ -116,58 +116,102 @@
     });
   }
 
+  // The thread, nested two levels under the opening video (X.threadOrder;
+  // research/notes/exchange-threads-notes.md): responses, and under each
+  // its answers in time order. A branch with more than three answers shows
+  // the first two and a button for the rest.
+  var opened = {};
+  function clipItem(item) {
+    var p = item.post;
+    var li = el('li', 'x-clip' + (item.depth === 2 ? ' x-clip-answer' : ''));
+    li.id = 'video-' + p.id;
+    var b = el('button', 'x-clip-btn');
+    b.type = 'button';
+    if (current && current.id === p.id) b.setAttribute('aria-current', 'true');
+    var thumb = el('span', 'x-thumb');
+    var links = X.drive(p.drive_file_id);
+    var fresh = isFresh(p);
+    var closed = reach[p.id] === 'closed';
+    if (!closed) checkShared(p);
+    if (closed) li.classList.add('x-clip-closed');
+    if (links && !closed && (!fresh || reach[p.id] === 'open')) {
+      var img = el('img');
+      img.alt = ''; img.loading = 'lazy'; img.referrerPolicy = 'no-referrer'; img.crossOrigin = 'anonymous';
+      img.onerror = function () { img.remove(); };
+      img.src = links.thumb;
+      thumb.appendChild(img);
+    }
+    thumb.appendChild(face(p.author, item.depth === 2 ? 30 : 36));
+    if (p.seconds != null) thumb.appendChild(el('span', 'x-len', X.clock(p.seconds)));
+    var words = el('span', 'x-clip-words');
+    words.appendChild(el('span', 'x-clip-name', p.author.name + (p.mine ? ' (you)' : '')));
+    var said = item.depth === 0 ? 'Opened the exchange '
+      : item.depth === 2 && item.parent ? 'Answered ' + item.parent.author.name + ' '
+      : 'Added a video ';
+    words.appendChild(el('span', 'x-clip-when', said + X.ago(p.created_at)));
+    if (p.note) words.appendChild(el('span', 'x-clip-note', p.note));
+    var felt = reactionsOf(p);
+    if (felt.length) {
+      var line = el('span', 'x-clip-reacts', felt.map(function (x) { return x.kind.emoji; }).join(' '));
+      line.setAttribute('aria-hidden', 'true');
+      words.appendChild(line);
+    }
+    if (closed) words.appendChild(el('span', 'x-clip-closed-note', 'No longer shared'));
+    b.appendChild(thumb); b.appendChild(words);
+    b.setAttribute('aria-label', p.author.name + ', ' + said.trim().toLowerCase() + ' ' + X.ago(p.created_at) + (p.seconds != null ? ', ' + X.lengthWords(p.seconds) : '') + (p.note ? '. ' + p.note : '')
+      + (felt.length ? '. Reactions: ' + felt.map(function (x) { return x.kind.label; }).join(', ') : ''));
+    b.addEventListener('click', function () { playing = false; drawPlayAll(); play(p, true); });
+    li.appendChild(b);
+    if (p.mine || ex.can_moderate) {
+      var rm = el('button', 'x-clip-remove');
+      rm.type = 'button';
+      rm.title = 'Remove from the exchange';
+      rm.setAttribute('aria-label', 'Remove ' + (p.mine ? 'your' : p.author.name + '\'s') + ' video from the exchange');
+      rm.appendChild(icon('trash'));
+      rm.addEventListener('click', function () { removePost(p); });
+      li.appendChild(rm);
+    }
+    return li;
+  }
+
   function drawThread() {
     var list = $('[data-thread]');
     list.replaceChildren();
-    ex.posts.forEach(function (p, i) {
-      var li = el('li', 'x-clip');
-      var b = el('button', 'x-clip-btn');
-      b.type = 'button';
-      if (current && current.id === p.id) b.setAttribute('aria-current', 'true');
-      var thumb = el('span', 'x-thumb');
-      var links = X.drive(p.drive_file_id);
-      var fresh = isFresh(p);
-      var closed = reach[p.id] === 'closed';
-      if (!closed) checkShared(p);
-      if (closed) li.classList.add('x-clip-closed');
-      if (links && !closed && (!fresh || reach[p.id] === 'open')) {
-        var img = el('img');
-        img.alt = ''; img.loading = 'lazy'; img.referrerPolicy = 'no-referrer'; img.crossOrigin = 'anonymous';
-        img.onerror = function () { img.remove(); };
-        img.src = links.thumb;
-        thumb.appendChild(img);
+    var order = X.threadOrder(ex.posts);
+    var branchLi = null, answers = [];
+    function closeBranch() {
+      if (!branchLi || !answers.length) return;
+      var ol = el('ol', 'x-answers');
+      ol.setAttribute('aria-label', 'Answers to ' + answers[0].parent.author.name);
+      var hide = answers.length > 3 && !opened[branchLi.dataset.branch]
+        && !answers.slice(2).some(function (a) { return current && current.id === a.post.id; });
+      answers.forEach(function (a, i) {
+        var item = clipItem(a);
+        if (hide && i >= 2) item.hidden = true;
+        ol.appendChild(item);
+      });
+      if (hide) {
+        var more = el('li', 'x-more');
+        var btn = el('button', 'btn-secondary small', (answers.length - 2) + ' more answers');
+        btn.type = 'button';
+        btn.setAttribute('aria-expanded', 'false');
+        var branch = branchLi.dataset.branch;
+        btn.addEventListener('click', function () { opened[branch] = true; drawThread(); });
+        more.appendChild(btn);
+        ol.appendChild(more);
       }
-      thumb.appendChild(face(p.author, 36));
-      var len = el('span', 'x-len', p.seconds != null ? X.clock(p.seconds) : '');
-      if (p.seconds != null) thumb.appendChild(len);
-      var words = el('span', 'x-clip-words');
-      words.appendChild(el('span', 'x-clip-name', p.author.name + (p.mine ? ' (you)' : '')));
-      var reply = p.reply_to && byId(p.reply_to);
-      words.appendChild(el('span', 'x-clip-when', (i === 0 ? 'Opened the exchange ' : reply ? 'Answered ' + reply.author.name + ' ' : 'Added a video ') + X.ago(p.created_at)));
-      if (p.note) words.appendChild(el('span', 'x-clip-note', p.note));
-      var felt = reactionsOf(p);
-      if (felt.length) {
-        var line = el('span', 'x-clip-reacts', felt.map(function (x) { return x.kind.emoji; }).join(' '));
-        line.setAttribute('aria-hidden', 'true');
-        words.appendChild(line);
-      }
-      if (closed) words.appendChild(el('span', 'x-clip-closed-note', 'No longer shared'));
-      b.appendChild(thumb); b.appendChild(words);
-      b.setAttribute('aria-label', p.author.name + ', ' + X.ago(p.created_at) + (p.seconds != null ? ', ' + X.lengthWords(p.seconds) : '') + (p.note ? '. ' + p.note : '')
-        + (felt.length ? '. Reactions: ' + felt.map(function (x) { return x.kind.label; }).join(', ') : ''));
-      b.addEventListener('click', function () { play(p, true); });
-      li.appendChild(b);
-      if (p.mine || ex.can_moderate) {
-        var rm = el('button', 'x-clip-remove');
-        rm.type = 'button';
-        rm.title = 'Remove from the exchange';
-        rm.setAttribute('aria-label', 'Remove ' + (p.mine ? 'your' : p.author.name + '\'s') + ' video from the exchange');
-        rm.appendChild(icon('trash'));
-        rm.addEventListener('click', function () { removePost(p); });
-        li.appendChild(rm);
-      }
-      list.appendChild(li);
+      branchLi.appendChild(ol);
+    }
+    order.forEach(function (item) {
+      if (item.depth === 2) { answers.push(item); return; }
+      closeBranch();
+      answers = [];
+      branchLi = clipItem(item);
+      if (item.depth === 1) branchLi.dataset.branch = item.post.id;
+      list.appendChild(branchLi);
     });
+    closeBranch();
+    drawPlayAll();
     var empty = $('[data-thread-empty]');
     empty.hidden = ex.posts.length > 0;
     empty.textContent = ex.mine ? 'No videos yet. Record the first one to open the exchange.' : 'No videos yet.';
@@ -178,7 +222,8 @@
     $('[data-signin]').hidden = !!me || !ex.replies_open;
   }
 
-  function play(p, focus) {
+  function play(p, focus, auto) {
+    clearTimeout(nextTimer);
     current = p;
     var stage = $('[data-player]');
     stage.replaceChildren();
@@ -194,7 +239,7 @@
     if (reach[p.id] === 'closed') {
       stage.appendChild(closedNotice(p));
     } else {
-      stage.appendChild(videoFor(p, links));
+      stage.appendChild(videoFor(p, links, auto));
     }
 
     now.hidden = false;
@@ -338,11 +383,12 @@
   // browser cannot play the file (a format it lacks, or Drive refusing a
   // file downloaded too often), Drive's player takes its place, which needs
   // Drive to have prepared the video first.
-  function videoFor(p, links) {
+  function videoFor(p, links, auto) {
     var url = X.mediaUrl(p.drive_file_id, window.HUB.googleApiKey);
     if (!url) return driveFrame(p, links);
     var v = el('video');
-    v.controls = true; v.preload = 'metadata'; v.playsInline = true;
+    v.controls = true; v.preload = 'metadata'; v.playsInline = true; v.autoplay = !!auto;
+    v.addEventListener('ended', function () { if (playing) queueNext(p); });
     v.setAttribute('playsinline', '');
     v.setAttribute('aria-label', 'Video by ' + p.author.name);
     if (!isFresh(p) || reach[p.id] === 'open') v.poster = links.thumb;
@@ -373,6 +419,60 @@
     frame.setAttribute('allowfullscreen', '');
     return frame;
   }
+
+  // Play all: the thread in reading order (X.threadOrder), each video
+  // starting when the last ends, after five seconds that say who is next
+  // and can be stopped. Only the browser's own player says when a video
+  // ends, so a video in Drive's player ends the run.
+  var playing = false, nextTimer = null;
+  function readingOrder() {
+    return X.threadOrder(ex.posts).filter(function (i) { return reach[i.post.id] !== 'closed'; });
+  }
+  function drawPlayAll() {
+    var b = $('[data-play-all]');
+    if (!b) return;
+    b.hidden = ex.posts.length < 2;
+    b.setAttribute('aria-pressed', String(playing));
+    b.textContent = playing ? 'Stop playing all' : 'Play all';
+  }
+  function stopAll() {
+    playing = false;
+    clearTimeout(nextTimer);
+    var card = $('.x-next');
+    if (card) card.remove();
+    drawPlayAll();
+  }
+  function queueNext(p) {
+    var order = readingOrder();
+    var at = order.map(function (i) { return i.post.id; }).indexOf(p.id);
+    var next = order[at + 1];
+    if (!next) { stopAll(); return; }
+    var stage = $('[data-player]');
+    var card = el('div', 'x-next');
+    card.setAttribute('role', 'status');
+    var who = el('p', 'x-next-who', 'Next: ' + next.post.author.name + (next.depth === 2 && next.parent ? ', answering ' + next.parent.author.name : ''));
+    var count = el('p', 'x-next-count');
+    var stop = el('button', 'btn-secondary small', 'Stop');
+    stop.type = 'button';
+    stop.addEventListener('click', stopAll);
+    card.appendChild(who); card.appendChild(count); card.appendChild(stop);
+    stage.appendChild(card);
+    var left = 5;
+    (function tick() {
+      count.textContent = 'In ' + left + (left === 1 ? ' second' : ' seconds');
+      if (left-- <= 0) { play(next.post, false, true); return; }
+      nextTimer = setTimeout(tick, 1000);
+    })();
+    stop.focus();
+  }
+  $('[data-play-all]').addEventListener('click', function () {
+    if (playing) { stopAll(); return; }
+    var order = readingOrder();
+    if (!order.length) return;
+    playing = true;
+    drawPlayAll();
+    play(order[0].post, true, true);
+  });
 
   // Shown in place of the player when a video's owner has stopped sharing
   // it in Google Drive, or has deleted it there. The video keeps its place

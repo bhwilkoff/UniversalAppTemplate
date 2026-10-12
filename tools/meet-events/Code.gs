@@ -828,21 +828,40 @@ function noticesOn(value) {
 function plural_(n, one, many) { return n + ' ' + (n === 1 ? one : many); }
 
 // The email for one person, from the counts the hub sent. Null when there
-// is nothing to say or no sensible address.
+// is nothing to say or no sensible address. Exchanges joined on October
+// 12, 2026 (Ben: "write out the email notification for exchanges"):
+// videos others added to an exchange the person started, and videos that
+// answer one of theirs elsewhere (migration 20261012040000).
+function count_(person, key) { return Math.max(0, Number(person && person[key]) || 0); }
+
+function sayList_(parts) {
+  if (parts.length < 3) return parts.join(', and ');
+  return parts.slice(0, -1).join(', ') + ', and ' + parts[parts.length - 1];
+}
+
 function noticeEmail(person) {
-  var notes = Math.max(0, Number(person && person.notes) || 0);
-  var answers = Math.max(0, Number(person && person.answers) || 0);
+  var notes = count_(person, 'notes'), answers = count_(person, 'answers');
+  var videos = count_(person, 'exchange_videos'), replies = count_(person, 'exchange_answers');
   var to = String((person && person.email) || '').trim();
-  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(to) || (!notes && !answers)) return null;
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(to) || (!notes && !answers && !videos && !replies)) return null;
   var parts = [];
   if (notes) parts.push(notes === 1 ? 'a teacher wrote you a note' : 'your teachers wrote you ' + plural_(notes, 'note', 'notes'));
   if (answers) parts.push(answers === 1 ? 'someone answered what you shared' : plural_(answers, 'answer', 'answers') + ' came in on what you shared');
-  var what = parts.join(', and ');
+  if (videos) parts.push(videos === 1 ? 'a new video came in on an exchange you started' : plural_(videos, 'new video', 'new videos') + ' came in on exchanges you started');
+  if (replies) parts.push(replies === 1 ? 'someone answered your video in an exchange' : plural_(replies, 'video', 'videos') + ' answered yours in exchanges');
+  var onlyExchanges = !notes && !answers;
+  var subject = notes ? 'A note is waiting for you on Human Shaped'
+    : answers ? 'Someone answered what you shared on Human Shaped'
+    : videos ? (videos === 1 ? 'A new video in your exchange on Human Shaped' : 'New videos in your exchanges on Human Shaped')
+    : 'Someone answered your video on Human Shaped';
   return {
     to: to,
-    subject: notes ? 'A note is waiting for you on Human Shaped' : 'Someone answered what you shared on Human Shaped',
-    body: 'Hello,\n\nSince we last wrote, ' + what + '. The words themselves are on the site, so they stay where you and your cohort keep your work:\n\n' +
-      'https://humanshaped.org/account/\n\n' +
+    subject: subject,
+    body: 'Hello,\n\nSince we last wrote, ' + sayList_(parts) + '. ' +
+      (onlyExchanges
+        ? 'The videos are on the site, where you can watch them and answer:\n\n'
+        : 'The words themselves are on the site, so they stay where you and your cohort keep your work:\n\n') +
+      'https://humanshaped.org/account/' + (onlyExchanges ? '#exchanges' : '') + '\n\n' +
       'You asked for these emails on that page, and you can turn them off there at any time.\n\nHuman Shaped\n'
   };
 }

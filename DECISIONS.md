@@ -859,6 +859,17 @@ useful and it creates more friction for the user. I'll edit the video to
 make a new thumbnail."). Fix a dark picture by editing the video, and
 uploading it as a new version in Drive keeps the exchange's link to it.
 
+**Replies nest two levels under the opening video, and the daily email
+counts exchange videos** (Ben, October 12, 2026: "Please research and
+implement nested replies and write out the email notification for
+exchanges"). Responses to the prompt, and under each its answers indented
+once; deeper answers join their branch in time order, each saying whom it
+answers; long branches collapse after two; Play all goes in reading order
+with a stoppable "Next" card (research/notes/exchange-threads-notes.md).
+The once-a-day email (opted into on /account/) now also says when videos
+came in on an exchange someone started, or answered one of their videos
+elsewhere, as counts only (migration 20261012040000).
+
 **A video its owner stops sharing keeps its place, marked.** Later videos
 may answer it, so hiding it would break the thread. The page asks Drive
 for the video's picture without cookies (an image comes back only while

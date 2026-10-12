@@ -121,6 +121,44 @@
     return 'Started by ' + e.maker.name + where + ', with ' + count + '.';
   }
 
+  // The thread in reading order, nested two levels under the opening video
+  // (research/notes/exchange-threads-notes.md): the opening video is the
+  // prompt; a video that answers it, or answers nothing, is a response;
+  // anything that answers a response, or an answer, joins that response's
+  // branch in time order, so nothing is indented twice. Each item says its
+  // depth (0 the prompt, 1 a response, 2 an answer), its branch (the
+  // response it sits under), and parent (the video it answers, if still
+  // here). Posts come oldest first, as exchange() sends them.
+  function threadOrder(posts) {
+    var list = (posts || []).slice();
+    if (!list.length) return [];
+    var byId = {};
+    list.forEach(function (p) { byId[p.id] = p; });
+    var prompt = list[0];
+    function topOf(p) {
+      var seen = {}, cur = p;
+      while (cur.reply_to && byId[cur.reply_to] && cur.reply_to !== prompt.id && !seen[cur.id]) {
+        seen[cur.id] = true;
+        cur = byId[cur.reply_to];
+      }
+      return cur;
+    }
+    var out = [{ post: prompt, depth: 0, branch: null, parent: null }];
+    var responses = [], answers = {};
+    list.slice(1).forEach(function (p) {
+      var top = topOf(p);
+      if (top === p) responses.push(p);
+      else (answers[top.id] = answers[top.id] || []).push(p);
+    });
+    responses.forEach(function (r) {
+      out.push({ post: r, depth: 1, branch: r.id, parent: r.reply_to && byId[r.reply_to] ? byId[r.reply_to] : null });
+      (answers[r.id] || []).forEach(function (a) {
+        out.push({ post: a, depth: 2, branch: r.id, parent: byId[a.reply_to] || null });
+      });
+    });
+    return out;
+  }
+
   // Who sent a reaction, as words: "Ana", "Ana and Ben", "Ana, Ben, and
   // Cy", and past three, "Ana, Ben, and 4 others".
   function names(list) {
@@ -134,7 +172,7 @@
   var api = {
     MAX_SECONDS: MAX_SECONDS, MAX_UPLOAD_SECONDS: MAX_UPLOAD_SECONDS, FORMATS: FORMATS, pickFormat: pickFormat, baseType: baseType, extFor: extFor,
     clock: clock, lengthWords: lengthWords, ago: ago, drive: drive, mediaUrl: mediaUrl, fileName: fileName,
-    CHUNK: CHUNK, chunkEnd: chunkEnd, resumeFrom: resumeFrom, checkExchange: checkExchange, summary: summary, names: names
+    CHUNK: CHUNK, chunkEnd: chunkEnd, resumeFrom: resumeFrom, checkExchange: checkExchange, summary: summary, names: names, threadOrder: threadOrder
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.ExchangeLib = api;

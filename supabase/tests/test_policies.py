@@ -2783,6 +2783,34 @@ def main():
           not attempt(as_user("yara"), "select * from public.exchange_reactions") or last_rows == [])
     check("nor writes one there",
           not attempt(as_user("yara"), "insert into public.exchange_reactions (post_id, user_id, reaction) values (%s, %s, 'clap')", (first, people["yara"])))
+    # Exchanges in the once-a-day email (migration 20261012040000).
+    attempt(as_user("zed"), "insert into public.reach_choices (user_id, email, notices) values (%s, 'zed@example.org', true)", (people["zed"],))
+    attempt(as_user("kofi"), "insert into public.reach_choices (user_id, email, notices) values (%s, 'kofi@example.org', true)", (people["kofi"],))
+    sv = as_server(); sv.execute("reset role")
+    sv.execute("update public.reach_choices set notified_at = now() - interval '2 days' where user_id in (%s, %s)", (people["zed"], people["kofi"]))
+    sv.execute("select p.id from public.exchange_posts p join public.profiles a on a.id = p.author_id where p.drive_file_id = 'kofimembers001'")
+    kofi_post = sv.fetchone()[0]
+    sv.execute("update public.exchange_posts set created_at = now() - interval '3 days' where exchange_id = (select id from public.exchanges where token = %s)", (xm,))
+    check("someone else answers kofi's video in zed's members' exchange",
+          attempt(as_user("yara"), post, (xm, "yaraanswer0001", "video/mp4", "camera", 12, None, kofi_post)))
+    sv = as_server()
+    sv.execute("select user_id, notes, answers, exchange_videos, exchange_answers from public.notice_digest() where user_id in (%s, %s)", (people["zed"], people["kofi"]))
+    got = {str(r[0]): tuple(r[1:]) for r in sv.fetchall()}
+    check("the exchange's maker is told one new video came in, and nothing older",
+          got.get(people["zed"]) == (0, 0, 1, 0))
+    check("the person answered is told someone answered their video, and not twice as a new video",
+          got.get(people["kofi"]) == (0, 0, 0, 1))
+    sv.execute("select public.mark_notified(array[%s, %s]::uuid[])", (people["zed"], people["kofi"]))
+    sv.execute("select count(*) from public.notice_digest() where user_id in (%s, %s)", (people["zed"], people["kofi"]))
+    check("once emailed, the same videos are not counted again", sv.fetchone()[0] == 0)
+    sv.execute("reset role")
+    sv.execute("update public.reach_choices set notified_at = now() - interval '2 days' where user_id = %s", (people["zed"],))
+    sv.execute("update public.exchange_posts set created_at = now() - interval '3 days' where drive_file_id = 'yaraanswer0001'")
+    attempt(as_user("zed"), post, (xm, "zedownvideo001", "video/mp4", "camera", 5, None, None))
+    sv = as_server()
+    sv.execute("select count(*) from public.notice_digest() where user_id = %s", (people["zed"],))
+    check("a person's own new video is never news to them", sv.fetchone()[0] == 0)
+    sv.execute("reset role")
     check("its maker deletes it, and its videos go with it",
           attempt(as_user("xan"), "delete from public.exchanges where token = %s returning id", (xo,)) and len(last_rows) == 1
           and attempt(as_user(None), see, (xo,)) and last_rows == [(None,)])
