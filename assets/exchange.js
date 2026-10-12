@@ -10,8 +10,9 @@
   var db = window.HUB.client ? window.HUB.client() : window.supabase.createClient(window.HUB.url, window.HUB.key);
   var token = null, ex = null, me = null, current = null, replyTo = null, recorder = null, posting = false;
   var RETURN = 'hs-exchange-return';
-  // Whether each video is still shared with anyone who has its link:
-  // post id -> 'open' | 'closed', or 'asking' while the check runs.
+  // Whether each video is ready and shared with anyone who has its link:
+  // post id -> 'open' | 'closed' | 'preparing' (new, not ready yet), or
+  // 'asking' while the check runs.
   var reach = {};
 
   function $(sel) { return root.querySelector(sel); }
@@ -75,17 +76,31 @@
   }
 
   function isFresh(p) { return Date.now() - new Date(p.created_at).getTime() < 10 * 60000; }
-  // A new video has no picture until Drive has prepared it, so it is not
-  // checked until it is ten minutes old.
+  // Drive makes a video's picture once it has prepared the video, so the
+  // picture says both that a new video is ready and that an older one is
+  // still shared. A new video without one is still being prepared and is
+  // asked about again every 30 seconds; after ten minutes, no picture
+  // means its owner stopped sharing it.
   function checkShared(p) {
     var links = X.drive(p.drive_file_id);
-    if (!links || reach[p.id] || isFresh(p) || !window.fetch) return;
+    if (!links || reach[p.id] || !window.fetch) return;
     reach[p.id] = 'asking';
     fetch(links.shared, { credentials: 'omit' }).then(function (r) {
       return r.ok && /^image\//.test(r.headers.get('content-type') || '');
     }, function () { return false; }).then(function (open) {
-      reach[p.id] = open ? 'open' : 'closed';
-      if (open || !ex || !byId(p.id)) return;
+      var fresh = isFresh(p);
+      reach[p.id] = open ? 'open' : fresh ? 'preparing' : 'closed';
+      if (!ex || !byId(p.id)) return;
+      if (reach[p.id] === 'preparing') {
+        setTimeout(function () { if (reach[p.id] === 'preparing') { delete reach[p.id]; checkShared(p); } }, 30000);
+        return;
+      }
+      if (open) {
+        // Ready: drop the "still preparing" line without reloading the player.
+        if (current && current.id === p.id) { var wait = $('[data-preparing]'); if (wait) wait.remove(); }
+        if (fresh) drawThread();
+        return;
+      }
       if (current && current.id === p.id) play(current, false);
       else drawThread();
     });
@@ -105,7 +120,7 @@
       var closed = reach[p.id] === 'closed';
       if (!closed) checkShared(p);
       if (closed) li.classList.add('x-clip-closed');
-      if (links && !fresh && !closed) {
+      if (links && !closed && (!fresh || reach[p.id] === 'open')) {
         var img = el('img');
         img.alt = ''; img.loading = 'lazy'; img.referrerPolicy = 'no-referrer';
         img.onerror = function () { img.remove(); };
@@ -181,8 +196,10 @@
       now.appendChild(r);
     }
     if (p.note) now.appendChild(el('p', 'x-now-note', p.note));
-    if (Date.now() - new Date(p.created_at).getTime() < 10 * 60000) {
-      now.appendChild(el('p', 'hint', 'Drive can take a few minutes to prepare a new video. If it does not play yet, open it in Google Drive or come back shortly.'));
+    if (isFresh(p) && reach[p.id] !== 'open') {
+      var wait = el('p', 'hint', 'Drive can take a few minutes to prepare a new video. If it does not play yet, open it in Google Drive or come back shortly.');
+      wait.setAttribute('data-preparing', '');
+      now.appendChild(wait);
     }
     var acts = el('div', 'actions');
     var open = el('a', 'go-text', 'Open in Google Drive');
