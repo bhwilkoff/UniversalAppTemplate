@@ -66,7 +66,10 @@
     return {
       preview: 'https://drive.google.com/file/d/' + id + '/preview',
       view: 'https://drive.google.com/file/d/' + id + '/view',
-      thumb: 'https://drive.google.com/thumbnail?id=' + id + '&sz=w640',
+      // Drive's /thumbnail address answers a browser signed in to Google
+      // with a dark placeholder; the picture itself, asked for without
+      // cookies, is the video's real frame.
+      thumb: 'https://lh3.googleusercontent.com/d/' + id + '=w640',
       // Asked without cookies, this answers with an image only while anyone
       // with the link may watch; once its owner stops sharing it, Google
       // sends a sign-in page instead.

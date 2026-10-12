@@ -124,7 +124,7 @@
       if (closed) li.classList.add('x-clip-closed');
       if (links && !closed && (!fresh || reach[p.id] === 'open')) {
         var img = el('img');
-        img.alt = ''; img.loading = 'lazy'; img.referrerPolicy = 'no-referrer';
+        img.alt = ''; img.loading = 'lazy'; img.referrerPolicy = 'no-referrer'; img.crossOrigin = 'anonymous';
         img.onerror = function () { img.remove(); };
         img.src = links.thumb;
         thumb.appendChild(img);

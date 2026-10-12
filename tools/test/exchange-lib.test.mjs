@@ -39,7 +39,7 @@ test('times read as how long ago', () => {
 test('Drive links come only from an id that looks like one', () => {
   const d = X.drive('1AbC_def-GHIjkl');
   assert.equal(d.preview, 'https://drive.google.com/file/d/1AbC_def-GHIjkl/preview');
-  assert.match(d.thumb, /thumbnail\?id=1AbC_def-GHIjkl/);
+  assert.equal(d.thumb, 'https://lh3.googleusercontent.com/d/1AbC_def-GHIjkl=w640');
   assert.equal(d.shared, 'https://lh3.googleusercontent.com/d/1AbC_def-GHIjkl=w64');
   assert.equal(X.drive('../../x'), null);
   assert.equal(X.drive('short'), null);
