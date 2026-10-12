@@ -808,6 +808,14 @@ members without asking GitHub; someone added to the organization by hand,
 outside any cohort, counts only once they teach or join one. Outsiders
 opening a members' exchange learn only that it is for members.
 
+**A video's picture is the one Drive makes, and nothing more.** Drive
+uses a video's first frame, so one that fades in from black shows black.
+A picture taken in the browser and a click-to-load player were proposed
+and declined (Ben, October 12, 2026: "I don't think that feature is
+useful and it creates more friction for the user. I'll edit the video to
+make a new thumbnail."). Fix a dark picture by editing the video, and
+uploading it as a new version in Drive keeps the exchange's link to it.
+
 **A video its owner stops sharing keeps its place, marked.** Later videos
 may answer it, so hiding it would break the thread. The page asks Drive
 for the video's picture without cookies (an image comes back only while
