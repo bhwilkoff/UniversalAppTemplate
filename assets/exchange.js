@@ -26,7 +26,7 @@
     var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttribute('aria-hidden', 'true');
     var use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
-    use.setAttribute('href', '/assets/icons.svg?v=20261012i#' + name);
+    use.setAttribute('href', '/assets/icons.svg?v=20261012n#' + name);
     svg.appendChild(use);
     return svg;
   }
@@ -394,11 +394,27 @@
     if (!isFresh(p) || reach[p.id] === 'open') v.poster = links.thumb;
     var src = el('source');
     src.src = url;
+    // A large play button over the opening frame, as Drive's player has,
+    // since the browser's own controls show only on hover in some
+    // browsers. It hides while the video plays and returns when it pauses
+    // or ends.
+    var wrap = el('div', 'x-video');
+    var big = el('button', 'x-play');
+    big.type = 'button';
+    big.setAttribute('aria-label', 'Play the video by ' + p.author.name);
+    big.appendChild(icon('play-fill'));
+    big.addEventListener('click', function () { var go = v.play(); if (go && go.catch) go.catch(function () {}); });
+    v.addEventListener('play', function () { big.hidden = true; });
+    v.addEventListener('pause', function () { if (!v.seeking) big.hidden = false; });
+    v.addEventListener('ended', function () { big.hidden = false; });
+    if (auto) big.hidden = true;
+    wrap.appendChild(v);
+    wrap.appendChild(big);
     var fell = false;
     function fallBack() {
-      if (fell || !v.parentNode) return;
+      if (fell || !wrap.parentNode) return;
       fell = true;
-      v.parentNode.replaceChild(driveFrame(p, links), v);
+      wrap.parentNode.replaceChild(driveFrame(p, links), wrap);
       var now = $('[data-now]');
       if (now && isFresh(p) && reach[p.id] !== 'open') {
         var wait = el('p', 'hint', 'Drive can take a few minutes to prepare a new video. If it does not play yet, open it in Google Drive or come back shortly.');
@@ -409,7 +425,7 @@
     src.addEventListener('error', fallBack);
     v.addEventListener('error', fallBack);
     v.appendChild(src);
-    return v;
+    return wrap;
   }
   function driveFrame(p, links) {
     var frame = el('iframe');
