@@ -5,7 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Exchange | Human Shaped</title>
   <meta name="robots" content="noindex, nofollow">
-  <meta name="referrer" content="no-referrer">
+  <!-- Only "https://humanshaped.org/" goes to other sites: never the path,
+       and the exchange's link lives after the #, which is never sent. The
+       site's Drive key is allowed only from that origin. -->
+  <meta name="referrer" content="strict-origin">
   <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#131916" media="(prefers-color-scheme: dark)">
   <link rel="icon" href="/assets/favicon.svg?v=20261006q" type="image/svg+xml">
