@@ -91,10 +91,10 @@
         'X-Upload-Content-Type': X.baseType(blob.type || meta.mime),
         'X-Upload-Content-Length': String(blob.size)
       },
-      body: JSON.stringify({
+      body: JSON.stringify(Object.assign({
         name: meta.name, parents: [parent], mimeType: X.baseType(blob.type || meta.mime),
         description: meta.description || '', appProperties: { humanshaped: 'exchange-video' }
-      })
+      }, meta.thumbnail ? { contentHints: { thumbnail: { image: meta.thumbnail, mimeType: 'image/jpeg' } } } : {}))
     }).then(function (r) {
       if (!r.ok) return r.text().then(function (t) { throw new Error('Drive would not start the upload (' + r.status + ')' + (t ? ': ' + t.slice(0, 160) : '')); });
       var where = r.headers.get('Location');
@@ -157,10 +157,50 @@
     return step(0);
   }
 
+  // A frame about a second in, as Drive's fallback picture. Drive makes
+  // its own picture when it can and uses this only when it cannot, as with
+  // the fragmented, rotated MP4 that Safari on a phone records. Resolves
+  // to URL-safe base64 JPEG, or null; never holds up the upload more than
+  // four seconds.
+  function frame(blob) {
+    return new Promise(function (resolve) {
+      var url = null, done = false, v = document.createElement('video');
+      function finish(out) {
+        if (done) return;
+        done = true;
+        try { v.removeAttribute('src'); v.load(); } catch (e) { /* gone */ }
+        if (url) URL.revokeObjectURL(url);
+        resolve(out);
+      }
+      setTimeout(function () { finish(null); }, 4000);
+      try {
+        url = URL.createObjectURL(blob);
+        v.muted = true; v.playsInline = true; v.preload = 'auto';
+        v.onloadeddata = function () {
+          var d = isFinite(v.duration) ? v.duration : 2;
+          v.currentTime = Math.min(1, d / 2);
+        };
+        v.onseeked = function () {
+          try {
+            var w = v.videoWidth, h = v.videoHeight, scale = Math.min(1, 640 / Math.max(w, h));
+            if (!w || !h) return finish(null);
+            var c = document.createElement('canvas');
+            c.width = Math.round(w * scale); c.height = Math.round(h * scale);
+            c.getContext('2d').drawImage(v, 0, 0, c.width, c.height);
+            var data = c.toDataURL('image/jpeg', 0.8).split(',')[1] || '';
+            finish(data ? data.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '') : null);
+          } catch (e) { finish(null); }
+        };
+        v.onerror = function () { finish(null); };
+        v.src = url;
+      } catch (e) { finish(null); }
+    });
+  }
+
   function save(token, blob, meta, onProgress) {
     onProgress = onProgress || function () {};
-    return folder(token).then(function (parent) {
-      return begin(token, blob, meta, parent);
+    return Promise.all([folder(token), meta.thumbnail === undefined ? frame(blob) : meta.thumbnail]).then(function (got) {
+      return begin(token, blob, Object.assign({}, meta, { thumbnail: got[1] }), got[0]);
     }).then(function (where) {
       return send(where, blob, onProgress);
     }).then(function (id) {
@@ -176,5 +216,5 @@
     return call(token, 'POST', API + '/files/' + id + '/permissions?fields=id', { role: 'reader', type: 'anyone' }).then(function () { return id; });
   }
 
-  window.ExchangeDrive = { connect: connect, save: save, share: share };
+  window.ExchangeDrive = { connect: connect, save: save, share: share, frame: frame };
 })();

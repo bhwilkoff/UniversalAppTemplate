@@ -808,6 +808,15 @@ members without asking GitHub; someone added to the organization by hand,
 outside any cohort, counts only once they teach or join one. Outsiders
 opening a members' exchange learn only that it is for members.
 
+**Every upload carries a fallback picture for Drive.** Safari on a phone
+records portrait video as a fragmented MP4 with a rotation flag, and Drive
+makes no picture for that combination (tested October 12, 2026: the same
+clip rotated and fragmented got none; rotated and unfragmented got one).
+The upload sends a frame from about a second in as Drive's
+`contentHints.thumbnail`, which Drive uses only when it cannot make its
+own, so other videos keep Drive's picture and nobody does anything extra.
+This is not the custom picture declined below.
+
 **Exchange videos take the Meet add-on's eight reactions, and these are
 kept** (Ben, October 12, 2026: "so that users can react to the exchange
 videos as they watch them"). This narrows the live rule that reactions
