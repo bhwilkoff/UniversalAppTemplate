@@ -2398,3 +2398,11 @@ html[data-member] .public-home { display: none; }
 .account-menu-list a { display: block; padding: 0.65rem 0.8rem; border-radius: 8px; color: var(--ink); text-decoration: none; font-weight: 500; }
 .account-menu-list a:hover, .account-menu-list a:focus-visible { background: var(--surface); color: var(--accent); }
 @media (min-width: 56rem) { .account-button { min-height: 44px; } }
+/* On a phone, the picture alone, so the header keeps to the wordmark's row;
+   the button's label still names the account. */
+.account-button:has(img) .account-name { display: none; }
+.account-button:has(img) { padding: 0.25rem; }
+@media (min-width: 30rem) {
+  .account-button:has(img) .account-name { display: inline; }
+  .account-button:has(img) { padding: 0.25rem 0.85rem 0.25rem 0.3rem; }
+}
