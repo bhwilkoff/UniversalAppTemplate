@@ -1,6 +1,6 @@
 # The skills
 
-There are 146 folders in this directory. 56 of them I wrote, one lesson
+There are 147 folders in this directory. 57 of them I wrote, one lesson
 at a time, while building BOBA Playbook, Bsky Dreams, Tidbits Trivia and
 Archive Watch. The other 90 came from people who wrote good skills
 before I needed them, and they are credited below.
@@ -75,6 +75,7 @@ them. "From" names the app where the lesson was learned.
 | `universal-feature-states` | Every list has loading, empty, error and offline states, and the difference between an empty state, an error banner, a hint and a walkthrough. | BOBA Playbook |
 | `mobile-first-density-design` | Density comes from removing chrome, not adding decoration. Six levels of type, tested at phone width first. | BOBA Playbook |
 | `native-platform-first` | Use the platform's own control before building a custom one. The most expensive mistake across every app. | BOBA Playbook |
+| `learner-experience-design` | What a person sees once they are in: a home that stops pitching, ordered by what needs them now, one page for every role, empty states with one action, teachers' lists of what needs them, account pages for rare jobs, and no scores. It grows a Lessons list each round. | humanshaped.org |
 
 ### Stage 02: The shape of an app
 
