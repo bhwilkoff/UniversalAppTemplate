@@ -413,7 +413,7 @@ h3 { font-size: 1.25rem; letter-spacing: -0.012em; line-height: 1.25; }
    ------------------------------------------------------------------ */
 
 .nav a[aria-current] { color: var(--accent); }
-.nav ul { display: grid; grid-template-columns: repeat(3, max-content); gap: 0 1.75rem; }
+.nav ul { display: flex; flex-wrap: wrap; gap: 0 1.5rem; }
 
 .visually-hidden {
   position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px;
@@ -525,12 +525,12 @@ h3 { font-size: 1.25rem; letter-spacing: -0.012em; line-height: 1.25; }
 
 /* Cohorts, start: plain sections of prose */
 
-.topics { display: grid; gap: 3rem; }
+.topics { display: grid; grid-template-columns: minmax(0, 1fr); gap: 3rem; }
 .topic h2 { font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2rem); max-width: none; margin-bottom: 1rem; }
 .topic .prose p { margin: 0 0 1rem; }
 .topic[id] { scroll-margin-top: 1.5rem; }
 .steps { margin: 0.5rem 0 0; padding-left: 1.3rem; max-width: var(--measure); }
-.steps li { margin: 0 0 0.9rem; }
+.steps li { margin: 0 0 0.9rem; overflow-wrap: anywhere; }
 .steps li::marker { color: var(--accent); font-weight: 600; }
 
 /* The human-shaped mark, on /start/ */
@@ -591,8 +591,8 @@ h3 { font-size: 1.25rem; letter-spacing: -0.012em; line-height: 1.25; }
   .weeks-table thead th { color: var(--muted); font-weight: 600; font-size: 0.95rem; border-top: 0; padding-top: 0; }
   .weeks-table th[scope="row"] { width: 6rem; font-size: 1rem; }
   .weeks-table td::before { display: none; }
-  .topics { grid-template-columns: 1fr 1fr; gap: 4rem 5rem; }
-  .topics.single { grid-template-columns: 1fr; }
+  .topics { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 4rem 5rem; }
+  .topics.single { grid-template-columns: minmax(0, 1fr); }
   .toc-stack { order: 0; grid-column: 2; grid-row: 1; position: sticky; top: 1.5rem; align-self: start; }
   .toc-stack .stage-toc { position: static; }
 }
@@ -1630,6 +1630,9 @@ label.check { min-height: 2.25rem; }
 
 /* Google sign-in beside GitHub: Google draws its own button inside. */
 .google-signin { margin: 0.75rem 0 0.25rem; min-height: 44px; }
+/* Google draws its button in a light page; in a dark one Chrome paints that
+   frame's backdrop white unless the frame is told it is light too. */
+.google-signin iframe { color-scheme: light; }
 .linked-accounts { list-style: none; padding: 0; margin: 0.5rem 0; display: grid; gap: 0.4rem; }
 .linked-accounts .btn-secondary { margin-left: 0.25rem; }
 
@@ -2215,11 +2218,17 @@ ol.principles summary:focus-visible { outline: 2px solid var(--accent); outline-
 .x-summary a { color: inherit; }
 .x-tools { display: flex; flex-wrap: wrap; gap: 0.6rem 1rem; align-items: center; margin-top: 1.25rem; }
 .x-layout { display: grid; gap: 2rem; }
-@media (min-width: 56rem) {
-  .x-layout { grid-template-columns: minmax(0, 1.75fr) minmax(17rem, 1fr); align-items: start; gap: 2.5rem; }
-  .x-thread { position: sticky; top: 1.5rem; max-height: calc(100vh - 3rem); overflow: auto; padding-right: 0.25rem; }
+/* Two columns from 48rem, so narrowing a desktop window keeps the thread
+   beside the video instead of the video ballooning and the thread dropping
+   below it. Neither the player nor the camera is ever taller than the
+   window: each is as wide as its column or as wide as the window's height
+   allows, whichever is less. */
+@media (min-width: 48rem) {
+  .x-layout { grid-template-columns: minmax(0, 1.75fr) minmax(15rem, 1fr); align-items: start; gap: 2rem; }
+  .x-thread { position: sticky; top: 1.5rem; max-height: calc(100vh - 3rem); max-height: calc(100svh - 3rem); overflow: auto; padding-right: 0.25rem; }
 }
-.x-player { aspect-ratio: 16 / 9; border-radius: var(--radius); overflow: hidden; background: var(--surface); position: relative; display: grid; place-items: center; scroll-margin-top: 1rem; }
+@media (min-width: 64rem) { .x-layout { grid-template-columns: minmax(0, 1.75fr) minmax(17rem, 1fr); gap: 2.5rem; } }
+.x-player { width: min(100%, calc((100vh - 8rem) * 16 / 9)); width: min(100%, calc((100svh - 8rem) * 16 / 9)); aspect-ratio: 16 / 9; border-radius: var(--radius); overflow: hidden; background: var(--surface); position: relative; display: grid; place-items: center; scroll-margin-top: 1rem; }
 .x-player iframe, .x-player video { width: 100%; height: 100%; border: 0; display: block; background: #000; }
 .x-video { position: relative; width: 100%; height: 100%; }
 .x-play { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 72px; height: 72px; display: grid; place-items: center; border: 0; border-radius: 16px; background: rgba(0, 0, 0, 0.66); color: #fff; cursor: pointer; transition: background-color 0.15s; }
@@ -2299,7 +2308,11 @@ ol.principles summary:focus-visible { outline: 2px solid var(--accent); outline-
 .xr-source[aria-pressed="true"] { background: color-mix(in srgb, var(--thistle) 45%, var(--paper)); }
 .xr-source:disabled { opacity: 0.55; cursor: default; }
 .xr-stage { position: relative; aspect-ratio: 16 / 9; border-radius: var(--radius); overflow: hidden; background: #000; }
-@media (max-width: 40rem) { .xr-stage { aspect-ratio: 3 / 4; } }
+.xr-stage { width: min(100%, calc((100vh - 12rem) * 16 / 9)); width: min(100%, calc((100svh - 12rem) * 16 / 9)); }
+/* A phone held upright films upright; a narrow desktop window does not. */
+@media (max-width: 40rem) and (pointer: coarse) and (orientation: portrait) {
+  .xr-stage { aspect-ratio: 3 / 4; width: min(100%, calc((100svh - 12rem) * 3 / 4)); }
+}
 .xr-stage video { width: 100%; height: 100%; object-fit: contain; display: block; background: #000; }
 .xr-stage.mirror .xr-live { transform: scaleX(-1); }
 .xr-stage.recording { box-shadow: inset 0 0 0 3px #E5484D; }
@@ -2405,4 +2418,15 @@ html[data-member] .public-home { display: none; }
 @media (min-width: 30rem) {
   .account-button:has(img) .account-name { display: inline; }
   .account-button:has(img) { padding: 0.25rem 0.85rem 0.25rem 0.3rem; }
+}
+/* From 48rem the menu joins the wordmark's row, so a window narrowed on a
+   desktop spends one row on the header, not two. Until 64rem the account
+   button is the picture alone again, to leave the menu room. */
+@media (min-width: 48rem) {
+  .nav { order: 0; width: auto; margin-left: auto; }
+  .nav ul { flex-wrap: nowrap; }
+}
+@media (min-width: 48rem) and (max-width: 63.99rem) {
+  .account-button:has(img) .account-name { display: none; }
+  .account-button:has(img) { padding: 0.25rem; }
 }

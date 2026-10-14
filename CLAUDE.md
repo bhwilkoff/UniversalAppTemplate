@@ -210,6 +210,13 @@ what waits on Ben.
   `hub.js`, `cohorts.js`, `teach.js` with `teach-lib.js`, `cohort.js` and `live.js`
   with `cohort-lib.js` and `live-lib.js`, and `apps.js` with `apps-lib.js`, and `times.js` and `teach-times.js` with `times-lib.js` and `times-grid.js`. Pure logic lives in the `-lib.js` files with
   tests in `tools/test/` (`node --test tools/test/*.mjs`, 436 tests).
+- **Responsiveness:** `node tools/responsive/check.mjs` (add `--base
+  http://127.0.0.1:8765` for a local copy, `--only exchange`, `--shots`)
+  loads every page at five widths and drags one open copy from 1600px to
+  320px and back, failing on sideways scroll, anything past the right
+  edge, or a box that differs after a resize from a fresh load. It sees
+  pages as a visitor; check the signed-in views as Ben in a resized
+  same-origin iframe.
 - **The cohort's conversation:** `discussions.js` with `discussions-lib.js`
   reads and posts the cohort repository's GitHub Discussions on /cohort/
   and /live/ with the student's own GitHub token. That token is kept in

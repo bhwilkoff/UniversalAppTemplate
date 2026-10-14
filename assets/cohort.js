@@ -269,7 +269,7 @@
   }
 
   function load() {
-    if (!slug) return fail('This page needs to know which cohort to show. Open it from your account.');
+    if (!slug) return fail('This page needs to know which cohort to show. Open it from your home page.');
     show('loading');
     db.auth.getSession().then(function (s) {
       session = s.data && s.data.session;

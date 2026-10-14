@@ -287,7 +287,7 @@
     drawThread();
     if (focus) {
       try { history.replaceState(null, '', location.pathname + '#' + token + '/' + p.id); } catch (e) { /* the link still works */ }
-      if (window.matchMedia && window.matchMedia('(max-width: 56rem)').matches) stage.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (window.matchMedia && window.matchMedia('(max-width: 47.99rem)').matches) stage.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }
 
