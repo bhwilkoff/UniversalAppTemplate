@@ -173,6 +173,22 @@ lines, nothing else.
   `color:inherit; text-decoration:none`, affordance on `:hover` /
   `:focus-visible`.
 
+- **A two-column breakpoint set too high makes the main thing grow as
+  the window narrows.** Just below it, the player takes the whole
+  width, gets taller than it was at a wider window, and pushes the side
+  column out of sight (humanshaped.org's exchange at 56rem). Put the
+  breakpoint where the side column still fits at its minimum, and cap
+  media by the window's height too:
+  `width: min(100%, calc((100svh - 8rem) * 16 / 9)); aspect-ratio: 16 / 9`.
+- **A grid with no column template sizes its column to min-content**,
+  so one unbreakable line (a URL in a `<pre>`) widens the whole column
+  past the screen. Write `grid-template-columns: minmax(0, 1fr)`.
+- **A phone-only layout keyed on width alone lands on narrow desktop
+  windows** (an upright 3:4 camera, taller than a 640px-wide window).
+  Add `(pointer: coarse) and (orientation: portrait)`.
+- **A cross-origin iframe on a dark page gets an opaque white
+  backdrop** (Google's sign-in button) when its document is light. Give
+  the iframe `color-scheme: light`.
 - **Two-axis sticky (rail `left:0` + ruler `top:0`) requires rows
   set to `width: max-content`** — otherwise the sticky containing
   block is the visible width and the pinned rail detaches mid-strip.
@@ -235,6 +251,16 @@ verify cross-platform agreement on a fixed seed before shipping.
   `AbortSignal`, and `--timeout` dumps the pre-hydration DOM.
 - Pixel-measure layout from screenshots (PIL/sharp) when a layout
   claim matters.
+- **Drag the window; don't sample two widths.** Load each page at a few
+  widths, then resize one open copy through every width from 1600px to
+  320px and back. Fail on sideways scroll, anything past the right
+  edge, or a box whose size after the resize differs from a fresh load
+  (layout fixed by script at load). Look at the screenshots at the
+  in-between widths (640 to 900px) too, where layouts go wrong without
+  overflowing. Drive headless Chrome over CDP with
+  `Emulation.setDeviceMetricsOverride`, which goes below the 500px
+  window floor. Worked example: humanshaped.org's
+  `tools/responsive/check.mjs`, which has no dependencies.
 - **The Pages CDN caches ~600 s** — verify deploys with cache-busted
   URLs (`?v=...`), or you're testing the previous deploy.
 - Local server: `python3 -m http.server 8080`. If it works locally
