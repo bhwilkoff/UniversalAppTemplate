@@ -718,5 +718,11 @@
     });
   });
 
-  if (linkMode) linkFlow(); else load();
+  // The header's account menu signs out through /account/?sign-out, on any
+  // page, and lands on the public home.
+  if (params.has('sign-out')) {
+    if (window.DiscussionsLib) window.DiscussionsLib.forget(stores.session);
+    show('loading');
+    db.auth.signOut().catch(function () {}).then(function () { location.replace('/'); });
+  } else if (linkMode) linkFlow(); else load();
 })();

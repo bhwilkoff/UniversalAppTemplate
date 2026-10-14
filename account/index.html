@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261012n">
+  <link rel="stylesheet" href="/assets/site.css?v=20261014a">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -32,8 +32,10 @@
       else { try { t = localStorage.getItem('hs-theme'); } catch (e) {} }
       if (t) document.documentElement.setAttribute('data-theme', t);
     })();
+    // Exchanges moved to the signed-in home; older links still land there.
+    if (location.hash === '#exchanges') location.replace('/#exchanges');
   </script>
-  <script src="/assets/site.js?v=20261012h" defer></script>
+  <script src="/assets/site.js?v=20261014a" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to the page</a>
@@ -132,26 +134,6 @@
           <h2>Your cohorts</h2>
           <div data-my-cohorts></div>
 
-          <section id="exchanges" class="x-section" data-exchanges-account hidden>
-            <h2>Exchanges</h2>
-            <p class="small">Short videos back and forth, in a cohort between sessions or with anyone you send the link to. Each video is saved in its maker's own Google Drive.</p>
-            <div data-x-list></div>
-            <p><button class="btn-secondary" type="button" data-x-new>Start an exchange</button></p>
-            <form class="cohort-form x-form" data-x-form hidden novalidate>
-              <label>What to call it <input name="title" maxlength="120" autocomplete="off" placeholder="Tell us about the problem you want to build for"></label>
-              <label>Who can see it <select name="where"><option value="">Anyone with its link (people sign in to add a video)</option></select></label>
-              <fieldset>
-                <legend>The opening video</legend>
-                <p class="small">It is the exchange's prompt, so ask your question or show what you want answered.</p>
-                <div data-x-recorder></div>
-              </fieldset>
-              <label>A few words with it, if you like <span class="hint">Shown beside your video, and read aloud to people who use a screen reader.</span><textarea name="note" rows="2" maxlength="1000"></textarea></label>
-              <p class="hint">Your video is saved in your own Google Drive, in a folder called Human Shaped exchanges, and anyone with its link can watch it.</p>
-              <progress class="x-progress" data-x-progress max="100" value="0" hidden></progress>
-              <p class="small" role="status" aria-live="polite" data-x-status></p>
-              <div class="actions"><button class="btn-primary" type="submit" disabled>Start the exchange</button><button class="btn-secondary" type="button" data-x-cancel>Cancel</button></div>
-            </form>
-          </section>
 
           <h2>Cohorts you can join</h2>
           <div data-open-cohorts></div>
@@ -170,14 +152,14 @@
             <div data-credential-list></div>
           </div>
 
-          <div data-notes-section hidden>
+          <div id="notes" data-notes-section hidden>
             <h2>Notes from your teachers</h2>
             <p class="small">These are yours to keep after a cohort ends or you leave it, and yours to remove. Only you and the cohort's teachers can read them.</p>
             <div data-notes></div>
           </div>
 
           <!-- Words by Claude, awaiting Ben's review (G3). -->
-          <div data-path-section hidden>
+          <div id="stages" data-path-section hidden>
             <h2>Your stages</h2>
             <p class="small">What you marked on the stages. Only you can see it, and nothing here is counted or compared.</p>
             <div data-path-marks></div>
@@ -281,11 +263,7 @@
   <script src="/assets/credential-lib.js?v=20261006c" defer></script>
   <script src="/assets/google-signin-lib.js" defer></script>
   <script src="/assets/google-signin.js" defer></script>
-  <script src="/assets/hub.js?v=20261012h" defer></script>
-  <script src="/assets/exchange-lib.js?v=20261012m" defer></script>
-  <script src="/assets/exchange-recorder.js?v=20261012h" defer></script>
-  <script src="/assets/exchange-drive.js?v=20261012b" defer></script>
-  <script src="/assets/exchange-list.js?v=20261012b" defer></script>
+  <script src="/assets/hub.js?v=20261014a" defer></script>
 
   <footer class="site-footer">
     <div class="wrap">

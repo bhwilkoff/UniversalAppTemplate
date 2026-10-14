@@ -1,5 +1,5 @@
-// Exchanges on /account/ (the ones a person started or added a video to,
-// and starting a new one anywhere they belong) and on /cohort/ (the
+// Exchanges on the signed-in home page (the ones a person started or added
+// a video to, and starting a new one anywhere they belong) and on /cohort/ (the
 // cohort's own). Each lists exchanges and starts new ones with their
 // opening video; the exchange itself is at /exchange/#<link>.
 (function () {
@@ -101,7 +101,7 @@
     if (cancel) cancel.addEventListener('click', function () { form.xClose(); form.hidden = true; button.hidden = false; });
   }
 
-  // ---- /account/ ----------------------------------------------------------
+  // ---- the signed-in home (/) ---------------------------------------------
   function account(box) {
     db.auth.getSession().then(function (s) {
       var me = s.data && s.data.session ? s.data.session.user : null;

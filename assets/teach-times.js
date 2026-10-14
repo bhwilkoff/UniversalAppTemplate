@@ -310,7 +310,11 @@
           if (pr.data) myName = (pr.data.display_name || '').trim() || pr.data.github_login || '';
           if (!form.elements.host_name.value) form.elements.host_name.value = myName;
         });
-        return Promise.all([loadList(), loadCohorts()]);
+        // The home page links to one poll as /teach/times/#<its id>.
+        return Promise.all([loadList(), loadCohorts()]).then(function () {
+          var id = location.hash.slice(1);
+          if (id && (polls || []).some(function (p) { return p.id === id; })) openPoll(id);
+        });
       });
     }).catch(function (err) { fail('Something went wrong: ' + said(err) + '.'); });
   }

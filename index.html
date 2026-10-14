@@ -23,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261012n">
+  <link rel="stylesheet" href="/assets/site.css?v=20261014a">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -31,8 +31,19 @@
       else { try { t = localStorage.getItem('hs-theme'); } catch (e) {} }
       if (t) document.documentElement.setAttribute('data-theme', t);
     })();
+    // Someone signed in sees their own home here, not the pitch
+    // (research/notes/signed-in-experience-notes.md). Decided before the
+    // page draws, from the session this browser keeps, so the pitch never
+    // flashes; ?public shows the pitch to anyone.
+    (function () {
+      if (/[?&]public\b/.test(location.search)) return;
+      try {
+        var s = JSON.parse(localStorage.getItem('sb-bifrieqzkihuxfzttgvd-auth-token') || 'null');
+        if (s && s.user && s.expires_at * 1000 > Date.now() - 7 * 864e5) document.documentElement.setAttribute('data-member', '');
+      } catch (e) {}
+    })();
   </script>
-  <script src="/assets/site.js?v=20261012h" defer></script>
+  <script src="/assets/site.js?v=20261014a" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to the page</a>
@@ -61,6 +72,82 @@
   </header>
 
   <main id="main">
+
+    <!-- The signed-in home (research/notes/signed-in-experience-notes.md):
+         what is on now and what waits for you first, then your cohorts,
+         exchanges, times, app, and stages. assets/home.js fills it. Words
+         by Claude, awaiting Ben's review. -->
+    <div class="member-home" data-member-home>
+      <div class="wrap">
+        <header class="home-head">
+          <img class="avatar" data-home-avatar alt="" width="56" height="56" hidden>
+          <div>
+            <h1>Your Human Shaped.</h1>
+            <p class="small" data-home-who></p>
+          </div>
+        </header>
+        <p class="home-status" data-home-status role="status">Gathering your cohorts, exchanges, and times…</p>
+
+        <section class="home-next" data-home="next" aria-labelledby="home-next-title" hidden>
+          <h2 id="home-next-title">Coming up</h2>
+          <ul class="home-rows" data-home-next></ul>
+        </section>
+
+        <section class="hang-section home-part" data-home="waiting" aria-labelledby="home-waiting-title" hidden>
+          <h2 id="home-waiting-title">Waiting for you</h2>
+          <div><ul class="home-rows" data-home-waiting></ul></div>
+        </section>
+
+        <section class="hang-section home-part" data-home="cohorts" aria-labelledby="home-cohorts-title" hidden>
+          <h2 id="home-cohorts-title">Your cohorts</h2>
+          <div data-home-cohorts></div>
+        </section>
+
+        <section id="exchanges" class="hang-section home-part x-section" data-home="exchanges" data-exchanges-account aria-labelledby="home-exchanges-title" hidden>
+          <h2 id="home-exchanges-title">Exchanges</h2>
+          <div>
+            <div data-x-list></div>
+            <div class="actions"><button class="btn-secondary" type="button" data-x-new>Start an exchange</button></div>
+            <form class="cohort-form x-form" data-x-form hidden novalidate>
+              <label>What to call it <input name="title" maxlength="120" autocomplete="off" placeholder="Tell us about the problem you want to build for"></label>
+              <label>Who can see it <select name="where"><option value="">Anyone with its link (people sign in to add a video)</option></select></label>
+              <fieldset>
+                <legend>The opening video</legend>
+                <p class="small">It is the exchange's prompt, so ask your question or show what you want answered.</p>
+                <div data-x-recorder></div>
+              </fieldset>
+              <label>A few words with it, if you like <span class="hint">Shown beside your video, and read aloud to people who use a screen reader.</span><textarea name="note" rows="2" maxlength="1000"></textarea></label>
+              <p class="hint">Your video is saved in your own Google Drive, in a folder called Human Shaped exchanges, and anyone with its link can watch it.</p>
+              <progress class="x-progress" data-x-progress max="100" value="0" hidden></progress>
+              <p class="small" role="status" aria-live="polite" data-x-status></p>
+              <div class="actions"><button class="btn-primary" type="submit" disabled>Start the exchange</button><button class="btn-secondary" type="button" data-x-cancel>Cancel</button></div>
+            </form>
+          </div>
+        </section>
+
+        <section class="hang-section home-part" data-home="times" aria-labelledby="home-times-title" hidden>
+          <h2 id="home-times-title">Finding a time</h2>
+          <div data-home-times></div>
+        </section>
+
+        <section class="hang-section home-part" data-home="app" aria-labelledby="home-app-title" hidden>
+          <h2 id="home-app-title">Your app</h2>
+          <div data-home-app></div>
+        </section>
+
+        <section class="hang-section home-part" data-home="stages" aria-labelledby="home-stages-title" hidden>
+          <h2 id="home-stages-title">Your stages</h2>
+          <div data-home-stages></div>
+        </section>
+
+        <section class="hang-section home-part" data-home="more" aria-labelledby="home-more-title" hidden>
+          <h2 id="home-more-title">More you can do</h2>
+          <div><ul class="home-more" data-home-more></ul></div>
+        </section>
+      </div>
+    </div>
+
+    <div class="public-home" data-public-home>
 
     <!-- The home page (DECISIONS.md): the claim and the principles, the
          working software, the idea, the method, and the ways in, each
@@ -204,8 +291,10 @@
         </ul>
       </div>
     </section>
+    </div>
 
   </main>
+  <script src="/assets/home.js?v=20261014a" defer></script>
   <script src="/assets/principles-lib.js?v=20261005c" defer></script>
   <script src="/assets/principles.js?v=20261005c" defer></script>
 
