@@ -48,6 +48,10 @@
   // authorized), and hands only the GitHub token to the panel that opened
   // it, which keeps it in its own tab for the class (ChatLib).
   var githubMode = params.get('handoff') === 'github';
+  // A plain sign-in lands on the person's own home (research/notes/
+  // signed-in-experience-notes.md); joining a cohort and Meet's windows
+  // stay here.
+  var welcome = params.has('welcome');
   var handoffNote = root.querySelector('[data-handoff-note]');
   if (handoffNote) handoffNote.hidden = !handoffMode;
 
@@ -72,6 +76,7 @@
       db: db, button: root.querySelector('[data-google-signin]'), prompt: false, theme: theme(),
       onSession: function () {
         if (handoffMode) { try { window.sessionStorage.setItem('hs-handoff', '1'); } catch (e) {} }
+        else if (!joining) welcome = true;
         load();
       },
       onError: function (e) { status.textContent = 'Google sign-in did not finish: ' + said(e) + '.'; }
@@ -214,7 +219,7 @@
     if (handoffMode) { try { window.sessionStorage.setItem('hs-handoff', '1'); } catch (e) {} }
     db.auth.signInWithOAuth({
       provider: 'github',
-      options: { redirectTo: location.origin + '/account/' + (handoffMode ? '?handoff=meet' : joining ? '?join=' + encodeURIComponent(joining) : '') }
+      options: { redirectTo: location.origin + '/account/' + (handoffMode ? '?handoff=meet' : joining ? '?join=' + encodeURIComponent(joining) : '?welcome') }
     }).then(function (r) { if (r.error) fail(r.error.message); });
   });
   root.querySelector('[data-retry]').addEventListener('click', function () {
@@ -361,6 +366,7 @@
         return;
       }
       if (handoffMode) return handOff(session);
+      if (welcome) return location.replace('/');
       var uid = session.user.id;
       keepGitHubToken(session);
       return Promise.all([
@@ -375,6 +381,8 @@
         root.querySelector('[data-name]').textContent = p.display_name || p.github_login || 'You';
         var title = document.querySelector('[data-account-title]');
         if (title) title.textContent = 'Your account.';
+        var lead = document.querySelector('[data-account-lead]');
+        if (lead) lead.textContent = 'How you sign in, how your teachers can reach you, what you keep here, and your data. Your cohorts, exchanges, and times are on your home page.';
         var a = root.querySelector('[data-github-link]');
         if (p.github_login) {
           a.textContent = '@' + p.github_login;
@@ -417,7 +425,7 @@
           }
           openBox.appendChild(card);
         });
-        root.querySelector('[data-teach-link]').hidden = !res[3].data;
+        root.querySelector('[data-open-section]').hidden = !joining;
         drawNotes(uid);
         drawMentoring(uid);
         drawPath(uid);

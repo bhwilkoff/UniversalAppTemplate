@@ -19,13 +19,16 @@
     .eq('status', 'open').order('starts_on')
     .then(function (r) {
       if (r.error || !r.data.length) return;
+      // Someone already signed in joins without being asked to sign in again.
+      var signedIn = false;
+      try { signedIn = !!localStorage.getItem('sb-bifrieqzkihuxfzttgvd-auth-token'); } catch (e) {}
       r.data.forEach(function (c) {
         var card = el('article', 'open-cohort');
         card.appendChild(el('h3', null, c.title));
         card.appendChild(el('p', 'small', TeachLib.openingLine(c)));
         card.appendChild(el('p', 'small', TeachLib.scheduleText(c, zone)));
         if (c.description) card.appendChild(el('p', null, c.description));
-        var join = el('a', 'btn-primary', 'Join with GitHub');
+        var join = el('a', 'btn-primary', signedIn ? 'Join this cohort' : 'Join with GitHub');
         join.href = '/account/?join=' + encodeURIComponent(c.slug);
         var actions = el('div', 'actions'); actions.appendChild(join); card.appendChild(actions);
         box.appendChild(card);

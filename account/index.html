@@ -67,7 +67,7 @@
     <div class="wrap">
       <header class="page-head">
         <h1 data-account-title>Sign in with GitHub.</h1>
-        <p class="lead">Your GitHub account is where your app lives and where your cohort talks, so it is also how you sign in here. This site keeps only what a cohort needs, and everything you build stays in your own account.</p>
+        <p class="lead" data-account-lead>Your GitHub account is where your app lives and where your cohort talks, so it is also how you sign in here. This site keeps only what a cohort needs, and everything you build stays in your own account.</p>
       </header>
 
       <div class="account" data-account>
@@ -127,42 +127,36 @@
             </button></p>
           </div>
 
-          <p class="teach-link" data-teach-link hidden>You teach here. <a href="/teach/">Run your cohorts and answer what is waiting for you</a>.</p>
-          <!-- Written by Claude, awaiting Ben's review (H3). -->
-          <p class="small">Your own Claude or Gemini can read your cohorts, your own app, and your marks on the stages, and only read them. <a href="/connect/">Connect your agent</a>.</p>
-
-          <h2>Your cohorts</h2>
-          <div data-my-cohorts></div>
-
-
-          <h2>Cohorts you can join</h2>
-          <div data-open-cohorts></div>
-
-          <!-- Written by Claude for G7 (mentors), awaiting Ben's review. -->
-          <div data-mentor-section hidden>
-            <h2>Help a new cohort as a mentor</h2>
-            <p>You hold the credential, so you can join a cohort that is open or running as a mentor. You are in it like everyone else, with no app of your own to finish, there to show how you worked, answer what you can, and give feedback when people ask for it. Everyone in the cohort can see that you are a mentor, and its teachers still give the feedback that counts.</p>
-            <div data-mentor-cohorts></div>
+          <div data-open-section hidden>
+            <h2>Cohorts you can join</h2>
+            <div data-open-cohorts></div>
           </div>
 
-          <!-- Written by Claude, awaiting Ben's review (H2). -->
-          <div data-credential-section hidden>
-            <h2>Your credential</h2>
-            <p class="small">What your teachers recorded when your cohort finished. Once it is signed, its page holds the credential itself, which you can share by its link, download for a credential wallet that reads Open Badges 3.0, or have anyone check.</p>
-            <div data-credential-list></div>
-          </div>
+          <!-- Words by Claude, awaiting Ben's review (Google sign-in beside GitHub). -->
+          <h2>Linked accounts</h2>
+          <p class="small">The ways you can sign in to this one account. You can add or take one away, but never the last.</p>
+          <ul class="linked-accounts" data-linked></ul>
+          <div class="google-signin" data-google-link hidden></div>
+          <p class="small" data-linked-status role="status"></p>
 
-          <div id="notes" data-notes-section hidden>
-            <h2>Notes from your teachers</h2>
-            <p class="small">These are yours to keep after a cohort ends or you leave it, and yours to remove. Only you and the cohort's teachers can read them.</p>
-            <div data-notes></div>
-          </div>
-
-          <!-- Words by Claude, awaiting Ben's review (G3). -->
-          <div id="stages" data-path-section hidden>
-            <h2>Your stages</h2>
-            <p class="small">What you marked on the stages. Only you can see it, and nothing here is counted or compared.</p>
-            <div data-path-marks></div>
+          <!-- Written by Claude, awaiting Ben's review (research/notes/reach-notes.md). -->
+          <div data-reach-section hidden>
+            <h2>How your teachers can reach you</h2>
+            <p class="small">A teacher who has not seen you in a while may want to write to you privately. Until you choose otherwise, their words wait for you here and on your cohort page. Both choices below are off until you turn them on, and you can turn them off at any time.</p>
+            <form class="inline-form" data-reach-form>
+              <label>The email address to use
+                <span class="hint">It can be different from the one on your calendar invites. Only the teachers of cohorts you are in see it, and only if you tick the first box.</span>
+                <input type="email" name="email" autocomplete="email" maxlength="254">
+              </label>
+              <label class="check"><input type="checkbox" name="teachers_may_email"> My teachers may email me, from their own email</label>
+              <label class="check"><input type="checkbox" name="notices"> Email me, at most once a day, when a teacher writes me a note, someone answers what I shared, or a video comes in on my exchanges</label>
+              <p class="small">That second email comes from meet@humanshaped.org and says only that something is waiting, never the words themselves.</p>
+              <div class="actions">
+                <button class="btn-secondary" type="submit">Save how to reach me</button>
+                <button class="btn-secondary" type="button" data-reach-clear hidden>Forget my address</button>
+                <span class="small" role="status" data-reach-status></span>
+              </div>
+            </form>
           </div>
 
           <!-- Written by Claude, awaiting Ben's review (G2, hub-privacy-notes.md "Apps outside a cohort"). -->
@@ -191,32 +185,35 @@
             </form>
           </div>
 
-          <!-- Written by Claude, awaiting Ben's review (research/notes/reach-notes.md). -->
-          <div data-reach-section hidden>
-            <h2>How your teachers can reach you</h2>
-            <p class="small">A teacher who has not seen you in a while may want to write to you privately. Until you choose otherwise, their words wait for you here and on your cohort page. Both choices below are off until you turn them on, and you can turn them off at any time.</p>
-            <form class="inline-form" data-reach-form>
-              <label>The email address to use
-                <span class="hint">It can be different from the one on your calendar invites. Only the teachers of cohorts you are in see it, and only if you tick the first box.</span>
-                <input type="email" name="email" autocomplete="email" maxlength="254">
-              </label>
-              <label class="check"><input type="checkbox" name="teachers_may_email"> My teachers may email me, from their own email</label>
-              <label class="check"><input type="checkbox" name="notices"> Email me, at most once a day, when a teacher writes me a note, someone answers what I shared, or a video comes in on my exchanges</label>
-              <p class="small">That second email comes from meet@humanshaped.org and says only that something is waiting, never the words themselves.</p>
-              <div class="actions">
-                <button class="btn-secondary" type="submit">Save how to reach me</button>
-                <button class="btn-secondary" type="button" data-reach-clear hidden>Forget my address</button>
-                <span class="small" role="status" data-reach-status></span>
-              </div>
-            </form>
+          <h2>Cohorts you are in</h2>
+          <div data-my-cohorts></div>
+
+          <div id="notes" data-notes-section hidden>
+            <h2>Notes from your teachers</h2>
+            <p class="small">These are yours to keep after a cohort ends or you leave it, and yours to remove. Only you and the cohort's teachers can read them.</p>
+            <div data-notes></div>
           </div>
 
-          <!-- Words by Claude, awaiting Ben's review (Google sign-in beside GitHub). -->
-          <h2>Linked accounts</h2>
-          <p class="small">The ways you can sign in to this one account. You can add or take one away, but never the last.</p>
-          <ul class="linked-accounts" data-linked></ul>
-          <div class="google-signin" data-google-link hidden></div>
-          <p class="small" data-linked-status role="status"></p>
+          <!-- Words by Claude, awaiting Ben's review (G3). -->
+          <div id="stages" data-path-section hidden>
+            <h2>Your stages</h2>
+            <p class="small">What you marked on the stages. Only you can see it, and nothing here is counted or compared.</p>
+            <div data-path-marks></div>
+          </div>
+
+          <!-- Written by Claude, awaiting Ben's review (H2). -->
+          <div data-credential-section hidden>
+            <h2>Your credential</h2>
+            <p class="small">What your teachers recorded when your cohort finished. Once it is signed, its page holds the credential itself, which you can share by its link, download for a credential wallet that reads Open Badges 3.0, or have anyone check.</p>
+            <div data-credential-list></div>
+          </div>
+
+          <!-- Written by Claude for G7 (mentors), awaiting Ben's review. -->
+          <div data-mentor-section hidden>
+            <h2>Help a new cohort as a mentor</h2>
+            <p>You hold the credential, so you can join a cohort that is open or running as a mentor. You are in it like everyone else, with no app of your own to finish, there to show how you worked, answer what you can, and give feedback when people ask for it. Everyone in the cohort can see that you are a mentor, and its teachers still give the feedback that counts.</p>
+            <div data-mentor-cohorts></div>
+          </div>
 
           <h2>Your data</h2>
           <p>This site keeps your GitHub name and picture, which cohorts you are in, whatever you choose to share with a cohort, your own marks on the stages, your own app if you add one, the notes your teachers send you, and, only if you give it above, the address your teachers may use. Leaving a cohort removes what you shared there but keeps your notes, which you can remove here. Deleting your account removes everything.</p>
@@ -263,7 +260,7 @@
   <script src="/assets/credential-lib.js?v=20261006c" defer></script>
   <script src="/assets/google-signin-lib.js" defer></script>
   <script src="/assets/google-signin.js" defer></script>
-  <script src="/assets/hub.js?v=20261014a" defer></script>
+  <script src="/assets/hub.js?v=20261014b" defer></script>
 
   <footer class="site-footer">
     <div class="wrap">
