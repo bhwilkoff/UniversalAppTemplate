@@ -136,7 +136,7 @@ is the one page to keep open while you work.
 | `docs/path/` | The nine stages, and two companions: talking to your agent, and showing your work. |
 | `COURSE.md`, `docs/teaching/` | The five-week cohort built on the stages, and a one-page guide for each of its live sessions. |
 | `docs/` | The reference docs each stage points to. Map: [`docs/README.md`](docs/README.md). |
-| `.claude/skills/` | 146 skills, 56 of them written from shipped apps. Catalog: [`.claude/skills/README.md`](.claude/skills/README.md). |
+| `.claude/skills/` | 147 skills, 57 of them written from shipped apps. Catalog: [`.claude/skills/README.md`](.claude/skills/README.md). |
 | `tools/` | Device testing, store submission, CI and Pulse tooling. Catalog: [`tools/README.md`](tools/README.md). |
 | `index.html`, `css/`, `js/` | The web app: plain HTML, CSS and JavaScript, no build step. |
 | `apple/` | Swift starter for one universal Xcode target (iPhone, iPad, Mac, Apple TV). See `apple/README.md`. |

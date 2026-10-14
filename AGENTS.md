@@ -54,6 +54,7 @@ Sources: `docs/research/gemini-and-other-agents.md`. Rows follow the
 | Any web UI, routing, data, offline or image work | `web-platform-patterns` |
 | Designing any view (any platform) | `mobile-first-density-design` + `native-platform-first` |
 | Adding a list / grid / sheet / shelf | `universal-feature-states` |
+| A signed-in home, dashboard, account page, or role-based view | `learner-experience-design` |
 | **02 Shape of an app** | |
 | Shipping a feature on ANY platform, auditing a port, mirroring a rule across languages | `cross-platform-parity-discipline` |
 | Shared data the clients consume | `shared-data-plane-contract` (worked example: `web-catalog-data-layer`) |
