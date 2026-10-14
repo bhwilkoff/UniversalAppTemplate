@@ -150,6 +150,12 @@ what waits on Ben.
   and a teacher with `can_approve` decides there through
   `decide_teacher_request`, which adds the `public.teachers` row. Only
   a change by hand gives someone `can_approve`.
+- **The signed-in home** (research/notes/signed-in-experience-notes.md):
+  `/` is the person's own home once signed in (`home.js`, `home-lib.js`;
+  `?public` shows the pitch): coming up, waiting for you, cohorts,
+  exchanges, times, their app, stages. The head marks `<html data-member>`
+  before drawing; `site.js` gives every page's header a Home link and an
+  account menu (`/account/?sign-out` signs out).
 - **Pages:** `/account/` (sign in, cohorts, join, leave, delete),
   `/teach/` (a teacher's cohorts, sessions, groups, roster, and the Meet
   script setup), `/cohort/?c=<slug>` (this week, next session, group,
@@ -180,7 +186,7 @@ what waits on Ben.
   and saves nothing.
 - **Exchanges** (DECISIONS.md, "Exchanges"; migration 20261011010000):
   threads of short videos at `/exchange/#<link>`, listed and started on
-  /account/ (#exchanges) and on each /cohort/ page. Videos are recorded in
+  the signed-in home (/#exchanges) and on each /cohort/ page. Videos are recorded in
   the browser (`exchange-recorder.js`, MP4 first) and saved to the
   poster's own Google Drive with `drive.file` (`exchange-drive.js`,
   resumable uploads, shared by link); the hub keeps only Drive file ids.
@@ -203,7 +209,7 @@ what waits on Ben.
 - **Scripts:** `assets/hub-config.js` (public URL and publishable key),
   `hub.js`, `cohorts.js`, `teach.js` with `teach-lib.js`, `cohort.js` and `live.js`
   with `cohort-lib.js` and `live-lib.js`, and `apps.js` with `apps-lib.js`, and `times.js` and `teach-times.js` with `times-lib.js` and `times-grid.js`. Pure logic lives in the `-lib.js` files with
-  tests in `tools/test/` (`node --test tools/test/*.mjs`, 371 tests).
+  tests in `tools/test/` (`node --test tools/test/*.mjs`, 436 tests).
 - **The cohort's conversation:** `discussions.js` with `discussions-lib.js`
   reads and posts the cohort repository's GitHub Discussions on /cohort/
   and /live/ with the student's own GitHub token. That token is kept in
