@@ -335,7 +335,11 @@ Shipped October 14, 2026 (`index.html`, `assets/home.js`,
 - **Each section is a region named by its heading**, laid out with the
   site's hanging headings from 64rem, one column on a phone
   (recommendations 8 and 9).
-- **Still on /account/**: sign-in and linked accounts, cohorts with
-  joining and leaving, notes, stage marks, your own app's form, the
-  credential, how teachers reach you, and your data. Slimming it to the
-  rare jobs (recommendation 6) is the next step.
+- **/account/ is for the rare jobs** (recommendation 6, same day): how
+  you sign in and linked accounts, how teachers reach you, your own app,
+  cohorts you are in (to leave one), notes, stages, the credential,
+  mentoring, and your data. "Cohorts you can join" shows only when you
+  came to join one. A plain sign-in lands on the home (`?welcome`);
+  joining and Meet's sign-in windows stay on /account/.
+- **The method is a skill now**: `learner-experience-design` in the
+  template's `.claude/skills/`, with a Lessons list each round adds to.
