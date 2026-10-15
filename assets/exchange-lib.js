@@ -169,7 +169,38 @@
     return n[0] + ', ' + n[1] + ', and ' + rest + (rest === 1 ? ' other' : ' others');
   }
 
+  // Which phone's own screen recorder to explain: 'ios' (iPadOS Safari
+  // calls itself a Mac, so a Mac with touch is an iPad), 'android', or null
+  // on a computer, which shares its screen in the page.
+  function phoneKind(ua, touchPoints) {
+    ua = String(ua || '');
+    if (/iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && touchPoints > 1)) return 'ios';
+    if (/Android/.test(ua)) return 'android';
+    return null;
+  }
+
+  // How to record the screen with the recorder the phone already has, ending
+  // back on this page with the recording in Photos or the phone's videos.
+  // Phone browsers (other than Safari from iOS 27) cannot share a screen in
+  // the page, and the phone's recorder can show any app, not only the browser.
+  var SCREEN_STEPS = {
+    ios: [
+      'Swipe down from the top-right corner to open Control Center, then touch and hold Screen Recording and turn the microphone on, so your voice is recorded along with your screen. If Screen Recording isn’t there, touch and hold an empty spot in Control Center to add it.',
+      'Tap Start Recording, and after the countdown show what you want to show, talking it through as you go.',
+      'Tap the red indicator at the top of the screen to stop, and the recording is saved to Photos.',
+      'Come back to this page and choose the recording.'
+    ],
+    android: [
+      'Swipe down twice from the top of the screen and tap Screen record (Screen recorder on some phones). If it isn’t there, tap the pencil to add it.',
+      'Choose to record sound from the microphone, so your voice is recorded along with your screen, then tap Start.',
+      'Show what you want to show, talking it through as you go, and stop from the notification at the top of the screen. The recording is saved with your videos.',
+      'Come back to this page and choose the recording.'
+    ]
+  };
+  function screenSteps(kind) { return SCREEN_STEPS[kind] ? SCREEN_STEPS[kind].slice() : []; }
+
   var api = {
+    phoneKind: phoneKind, screenSteps: screenSteps,
     MAX_SECONDS: MAX_SECONDS, MAX_UPLOAD_SECONDS: MAX_UPLOAD_SECONDS, FORMATS: FORMATS, pickFormat: pickFormat, baseType: baseType, extFor: extFor,
     clock: clock, lengthWords: lengthWords, ago: ago, drive: drive, mediaUrl: mediaUrl, fileName: fileName,
     CHUNK: CHUNK, chunkEnd: chunkEnd, resumeFrom: resumeFrom, checkExchange: checkExchange, summary: summary, names: names, threadOrder: threadOrder

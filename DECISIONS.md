@@ -906,3 +906,32 @@ The rule is pattern 7 in research/notes/design-patterns.md, and
 tools/test/action-styles.test.mjs fails on a retired style or a row that
 breaks it. The retired names are `.btn-github`, `.btn-quiet`, `.btn-link`,
 `.link-btn`, `a.go`, `a.go-text`, and the hero's `a.text`.
+
+## Screen recordings from a phone use the phone's own recorder (October 15, 2026)
+
+**On a phone, Screen walks through the screen recorder the phone already
+has and then takes the recording it saved; the page records the screen
+itself only where the browser offers its own sharing picker** (Ben: "It
+should be possible across both android and iOS/iPadOS via native screen
+sharing rather than custom implementations").
+
+**Why:** a web page can record a screen only through the browser's
+`getDisplayMedia`, which Chrome on Android still does not have and Safari
+on iPhone and iPad gained only in iOS 27 (MDN browser-compat-data, merged
+October 14, 2026). The phone's own recorder (Control Center's Screen
+Recording, Android's Screen record tile) works on every phone people
+have, records any app rather than only the browser, records the voice
+when the microphone is on, and saves to Photos or the phone's videos,
+where the recorder's existing upload already reaches. An installed-app
+share target was left out: iOS does not support it for web apps, and it
+would mean asking people to install the site.
+
+**How to apply:** `exchange-lib.js` `phoneKind()` (iPadOS Safari reports
+a Mac, so a Mac with touch is an iPad) and `screenSteps()`, tested;
+`exchange-recorder.js` shows the steps and "Choose the recording" when
+Screen is selected on a phone, adds "Share from this page" where
+`getDisplayMedia` exists (Safari from iOS 27), and saves a video chosen
+under Screen as kind `screen`, so the thread says "sharing their screen".
+Not yet seen on a real phone: the steps' wording against each phone, and
+Safari's in-page sharing on iOS 27 (whether it keeps recording when the
+person leaves Safari).

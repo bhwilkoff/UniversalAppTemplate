@@ -103,3 +103,18 @@ test('an answer to a removed video becomes a response of its own, and an empty t
   assert.equal(t[1].parent, null);
   assert.deepEqual(X.threadOrder([]), []);
 });
+
+test('a phone gets the steps for its own screen recorder, a computer none', () => {
+  assert.equal(X.phoneKind('Mozilla/5.0 (iPhone; CPU iPhone OS 27_0 like Mac OS X)', 5), 'ios');
+  assert.equal(X.phoneKind('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Safari/605.1.15', 5), 'ios');
+  assert.equal(X.phoneKind('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Safari/605.1.15', 0), null);
+  assert.equal(X.phoneKind('Mozilla/5.0 (Linux; Android 15; Pixel 9) Chrome/141.0 Mobile', 5), 'android');
+  assert.equal(X.phoneKind('Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/141.0', 10), null);
+  assert.equal(X.phoneKind(undefined), null);
+  assert.match(X.screenSteps('ios')[0], /Control Center/);
+  assert.match(X.screenSteps('android')[0], /Screen record/);
+  for (const k of ['ios', 'android']) assert.match(X.screenSteps(k).at(-1), /choose the recording/);
+  assert.deepEqual(X.screenSteps(null), []);
+  X.screenSteps('ios').push('changed');
+  assert.equal(X.screenSteps('ios').length, 4);
+});
