@@ -187,7 +187,8 @@ what waits on Ben.
 - **Exchanges** (DECISIONS.md, "Exchanges"; migration 20261011010000):
   threads of short videos at `/exchange/#<link>`, listed and started on
   the signed-in home (/#exchanges) and on each /cohort/ page. Videos are recorded in
-  the browser (`exchange-recorder.js`, MP4 first) and saved to the
+  the browser (`exchange-recorder.js`, MP4 first; on a phone, Screen
+  explains the phone's own screen recorder and takes what it saved) and saved to the
   poster's own Google Drive with `drive.file` (`exchange-drive.js`,
   resumable uploads, shared by link); the hub keeps only Drive file ids.
   An exchange starts with its maker's opening video (`start_exchange`,

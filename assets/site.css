@@ -2313,6 +2313,8 @@ ol.principles summary:focus-visible { outline: 2px solid var(--accent); outline-
 @media (max-width: 40rem) and (pointer: coarse) and (orientation: portrait) {
   .xr-stage { aspect-ratio: 3 / 4; width: min(100%, calc((100svh - 12rem) * 3 / 4)); }
 }
+.xr-steps { margin: 0; padding: 1.1rem 1.25rem 1.1rem 2.6rem; border-radius: var(--radius); background: var(--surface); max-width: var(--measure); display: grid; gap: 0.6rem; }
+.xr-steps li { padding-left: 0.2rem; }
 .xr-stage video { width: 100%; height: 100%; object-fit: contain; display: block; background: #000; }
 .xr-stage.mirror .xr-live { transform: scaleX(-1); }
 .xr-stage.recording { box-shadow: inset 0 0 0 3px #E5484D; }

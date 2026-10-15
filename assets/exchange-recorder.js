@@ -1,17 +1,22 @@
-// The recorder for exchanges: the camera or (on a computer) the screen,
-// recorded in the browser with a countdown, a five-minute limit, a look
-// back before posting, and as many tries as the person wants. Phones and
-// browsers that cannot record in the page can use their own camera app or
-// a video they already have.
+// The recorder for exchanges: the camera or the screen, recorded in the
+// browser with a countdown, a five-minute limit, a look back before
+// posting, and as many tries as the person wants. Phones and browsers that
+// cannot record in the page can use their own camera app or a video they
+// already have. On a phone, Screen walks through the phone's own screen
+// recorder (Control Center, or Android's Screen record tile) and then takes
+// the recording it saved; Safari from iOS 27 can also share in the page.
 //
 //   var r = ExchangeRecorder.mount(box, { onChange(result | null) })
-//   result = { blob, mime, seconds, kind: 'camera' | 'screen' | 'upload' }
+//   result = { blob, mime, seconds, kind: 'camera' | 'screen' | 'upload', picked }
+//   (picked: chosen from the device rather than recorded here)
 //   r.reset()   r.release()
 (function () {
   var X = window.ExchangeLib;
   var md = navigator.mediaDevices || {};
   var canRecord = !!(window.MediaRecorder && md.getUserMedia);
-  var canScreen = canRecord && !!md.getDisplayMedia && !/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  var canDisplay = canRecord && typeof md.getDisplayMedia === 'function';
+  var phoneOs = X.phoneKind(navigator.userAgent, navigator.maxTouchPoints || 0);
+  var canScreen = canDisplay || !!phoneOs;
   var phone = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
   var MAX_UPLOAD = 1024 * 1024 * 1024;
 
@@ -52,6 +57,9 @@
     var badge = el('div', 'xr-badge');
     badge.hidden = true;
     stage.appendChild(live); stage.appendChild(review); stage.appendChild(idle); stage.appendChild(count); stage.appendChild(badge);
+    var steps = el('ol', 'xr-steps');
+    steps.hidden = true;
+    X.screenSteps(phoneOs).forEach(function (t) { steps.appendChild(el('li', null, t)); });
 
     var controls = el('div', 'xr-controls');
     var onBtn = button('btn-secondary', 'Turn on the camera');
@@ -81,9 +89,9 @@
     altLine.hidden = !phone;
     alt.appendChild(altLine); alt.appendChild(pick); alt.appendChild(shoot);
 
-    wrap.appendChild(sources); wrap.appendChild(stage); wrap.appendChild(controls); wrap.appendChild(status); wrap.appendChild(alt);
+    wrap.appendChild(sources); wrap.appendChild(stage); wrap.appendChild(steps); wrap.appendChild(controls); wrap.appendChild(status); wrap.appendChild(alt);
     box.replaceChildren(wrap);
-    if (!canRecord) sources.hidden = true;
+    if (!canScreen) sources.hidden = true;
 
     function say(t) { status.textContent = t || ''; }
     function set(r) { result = r; if (opts.onChange) opts.onChange(r); }
@@ -93,15 +101,20 @@
       live.srcObject = null;
     }
     function show(what) {
+      var phoneScreen = mode === 'screen' && !!phoneOs;
+      stage.hidden = phoneScreen && what === 'idle';
+      steps.hidden = !(phoneScreen && what === 'idle');
+      upBtn.textContent = phoneScreen ? 'Choose the recording' : 'Upload a video';
+      altLine.hidden = !phone || mode === 'screen';
       idle.hidden = what !== 'idle';
       live.hidden = what !== 'live';
       review.hidden = what !== 'review';
-      onBtn.hidden = !canRecord || what !== 'idle';
+      onBtn.hidden = !canRecord || what !== 'idle' || (mode === 'screen' && !canDisplay);
       upBtn.hidden = what !== 'idle';
       recBtn.hidden = what !== 'live';
       stopBtn.hidden = what !== 'recording';
-      againBtn.hidden = what !== 'review' || !result || result.kind === 'upload';
-      otherBtn.hidden = what !== 'review' || !result || result.kind !== 'upload';
+      againBtn.hidden = what !== 'review' || !result || result.picked;
+      otherBtn.hidden = what !== 'review' || !result || !result.picked;
       sources.querySelectorAll('button').forEach(function (b) { b.disabled = what === 'recording' || what === 'countdown'; });
       alt.hidden = what === 'recording' || what === 'countdown';
       if (what === 'recording' || what === 'countdown') live.hidden = false;
@@ -113,7 +126,7 @@
       mode = m;
       camBtn.setAttribute('aria-pressed', String(m === 'camera'));
       scrBtn.setAttribute('aria-pressed', String(m === 'screen'));
-      onBtn.textContent = m === 'camera' ? 'Turn on the camera' : 'Choose what to share';
+      onBtn.textContent = m === 'camera' ? 'Turn on the camera' : phoneOs ? 'Share from this page' : 'Choose what to share';
       idleText.textContent = m === 'camera'
         ? 'Record a new video, or upload one you already have. Your camera turns on only when you ask it to, and nothing is recorded until you press Record.'
         : 'Choose a window, a tab, or your whole screen to share. Your microphone records your voice with it.';
@@ -151,7 +164,8 @@
         var denied = e && (e.name === 'NotAllowedError' || e.name === 'SecurityError');
         say(denied
           ? (mode === 'camera' ? 'The browser was not allowed to use the camera. You can allow it in the browser\'s settings for this site, or use one of the other ways below.' : 'Sharing was cancelled.')
-          : 'The ' + mode + ' could not start' + (e && e.message ? ': ' + e.message : '') + '.');
+          : 'The ' + mode + ' could not start' + (e && e.message ? ': ' + e.message : '') + '.'
+            + (mode === 'screen' && phoneOs ? ' Your phone’s own screen recorder still works, with the steps above.' : ''));
       });
     }
     onBtn.addEventListener('click', turnOn);
@@ -183,7 +197,7 @@
         var blob = new Blob(chunks, { type: X.baseType(type) });
         stopTracks();
         if (!blob.size) { show('idle'); say('Nothing was recorded. Try again.'); return; }
-        showReview(blob, seconds, mode);
+        showReview(blob, seconds, mode, false);
       };
       recorder.start(1000);
       started = Date.now();
@@ -206,13 +220,13 @@
     recBtn.addEventListener('click', begin);
     stopBtn.addEventListener('click', stop);
 
-    function showReview(blob, seconds, kind) {
+    function showReview(blob, seconds, kind, picked) {
       if (reviewUrl) URL.revokeObjectURL(reviewUrl);
       reviewUrl = URL.createObjectURL(blob);
       review.src = reviewUrl;
-      set({ blob: blob, mime: blob.type || 'video/mp4', seconds: seconds, kind: kind });
+      set({ blob: blob, mime: blob.type || 'video/mp4', seconds: seconds, kind: kind, picked: picked });
       show('review');
-      say(kind === 'upload'
+      say(picked
         ? 'Here is your video' + (seconds != null ? ' (' + X.lengthWords(seconds) + ')' : '') + '. Watch it back, then post it, or choose a different one.'
         : 'Here is your video (' + X.lengthWords(seconds) + '). Watch it back, then post it, or record again.');
     }
@@ -230,22 +244,25 @@
       if (!/^video\//.test(f.type) && !/\.(mp4|mov|webm|m4v|mkv)$/i.test(f.name)) { say('That file is not a video.'); return; }
       if (f.size > MAX_UPLOAD) { say('That video is larger than 1 GB. Try a shorter one.'); return; }
       stopTracks();
+      // A video chosen while Screen is selected is a screen recording, and
+      // the thread says so.
+      var kind = mode === 'screen' ? 'screen' : 'upload';
       var probe = document.createElement('video');
       probe.preload = 'metadata';
       probe.muted = true;
       var url = URL.createObjectURL(f), settled = false;
       // Browsers may hold off reading a video in a background tab; the
       // review should not wait on its length forever.
-      var late = setTimeout(function () { if (settled) return; settled = true; URL.revokeObjectURL(url); showReview(f, null, 'upload'); }, 4000);
+      var late = setTimeout(function () { if (settled) return; settled = true; URL.revokeObjectURL(url); showReview(f, null, kind, true); }, 4000);
       probe.onloadedmetadata = function () {
         if (settled) return;
         settled = true; clearTimeout(late);
         var s = isFinite(probe.duration) ? Math.round(probe.duration) : null;
         URL.revokeObjectURL(url);
         if (s && s > X.MAX_UPLOAD_SECONDS) { say('That video is ' + X.lengthWords(s) + ' long. An exchange takes videos of up to 30 minutes.'); return; }
-        showReview(f, s, 'upload');
+        showReview(f, s, kind, true);
       };
-      probe.onerror = function () { if (settled) return; settled = true; clearTimeout(late); URL.revokeObjectURL(url); showReview(f, null, 'upload'); };
+      probe.onerror = function () { if (settled) return; settled = true; clearTimeout(late); URL.revokeObjectURL(url); showReview(f, null, kind, true); };
       probe.src = url;
     }
     upBtn.addEventListener('click', function () { pick.click(); });

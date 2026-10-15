@@ -14,8 +14,8 @@
     '/assets/teach-lib.js?v=20261006g',
     '/assets/path-lib.js',
     '/assets/home-lib.js?v=20261014a',
-    '/assets/exchange-lib.js?v=20261012m',
-    '/assets/exchange-recorder.js?v=20261012h',
+    '/assets/exchange-lib.js?v=20261015a',
+    '/assets/exchange-recorder.js?v=20261015a',
     '/assets/exchange-drive.js?v=20261012b',
     '/assets/exchange-list.js?v=20261014a'
   ];
