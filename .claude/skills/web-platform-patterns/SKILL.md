@@ -218,6 +218,24 @@ is right-click only; Firefox has neither in the bar. One function
 test it read out of the shipped JS with an engine fixture per row. Do
 not assume the matrix; open each browser's menu.
 
+## Screen recording on a phone: hand it to the phone's recorder
+
+A page records a screen only through `getDisplayMedia`, and on phones that
+is thin: Chrome on Android has never had it, and Safari on iPhone and
+iPad gained it in iOS 27 (MDN browser-compat-data, October 2026). The
+phone's own recorder (iOS Control Center's Screen Recording, Android's
+Screen record tile) works on every phone, records any app rather than
+only the browser, and saves to Photos or the phone's videos, which a
+plain `<input type="file" accept="video/*">` reaches. So on a phone,
+"Screen" shows the steps for that recorder and a button to choose what
+it saved; offer in-page sharing as well only where `getDisplayMedia`
+exists. Detect it with `typeof md.getDisplayMedia === 'function'`, never
+a user-agent ban, and pick the steps by platform remembering that iPadOS
+Safari calls itself a Mac (`/Macintosh/` with `maxTouchPoints > 1` is an
+iPad). Ask for the microphone in the steps: both recorders leave it off
+unless chosen, and a silent screen recording explains nothing.
+(humanshaped.org exchanges, 2026-10-15.)
+
 ## Porting deterministic logic to JS
 
 When the same seeded logic must agree across platforms (schedules,
