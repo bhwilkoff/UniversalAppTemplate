@@ -404,13 +404,13 @@
     v.setAttribute('playsinline', '');
     v.setAttribute('aria-label', 'Video by ' + p.author.name);
     if (!isFresh(p) || reach[p.id] === 'open') v.poster = links.thumb;
-    var src = el('source');
-    src.src = url;
-    // A large play button over the opening frame, as Drive's player has,
-    // since the browser's own controls show only on hover in some
-    // browsers. It hides while the video plays and returns when it pauses
-    // or ends.
+    // A large play button over the opening frame, only where the browser's
+    // own player has none (X.drawsOwnPlay: Chrome on a computer shows its
+    // controls only on hover). It hides while the video plays and returns
+    // when it pauses or ends.
     var wrap = el('div', 'x-video');
+    wrap.appendChild(v);
+    if (X.drawsOwnPlay(navigator.userAgent, window.matchMedia && matchMedia('(pointer: coarse)').matches)) return finishVideo(p, links, v, wrap, url);
     var big = el('button', 'x-play');
     big.type = 'button';
     big.setAttribute('aria-label', 'Play the video by ' + p.author.name);
@@ -420,8 +420,12 @@
     v.addEventListener('pause', function () { if (!v.seeking) big.hidden = false; });
     v.addEventListener('ended', function () { big.hidden = false; });
     if (auto) big.hidden = true;
-    wrap.appendChild(v);
     wrap.appendChild(big);
+    return finishVideo(p, links, v, wrap, url);
+  }
+  function finishVideo(p, links, v, wrap, url) {
+    var src = el('source');
+    src.src = url;
     var fell = false;
     function fallBack() {
       if (fell || !wrap.parentNode) return;

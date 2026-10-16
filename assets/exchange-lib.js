@@ -201,8 +201,21 @@
   };
   function screenSteps(kind) { return SCREEN_STEPS[kind] ? SCREEN_STEPS[kind].slice() : []; }
 
+  // Whether the browser's own player already puts a large play button over
+  // a paused video. Phones and tablets do (Safari on iPhone and iPad,
+  // Chrome on Android), and so do Firefox and Safari on a computer; Chrome
+  // and Edge on a computer show nothing until the pointer moves onto the
+  // video (seen October 16, 2026), so only there does the page add its own.
+  function drawsOwnPlay(ua, coarse) {
+    ua = String(ua || '');
+    if (coarse || /Android|iPhone|iPad|iPod|Mobile/.test(ua)) return true;
+    if (/Firefox\//.test(ua)) return true;
+    if (/Chrome\/|Chromium\/|Edg\//.test(ua)) return false;
+    return /Safari\//.test(ua);
+  }
+
   var api = {
-    phoneKind: phoneKind, screenSteps: screenSteps,
+    drawsOwnPlay: drawsOwnPlay, phoneKind: phoneKind, screenSteps: screenSteps,
     MAX_SECONDS: MAX_SECONDS, MAX_UPLOAD_SECONDS: MAX_UPLOAD_SECONDS, FORMATS: FORMATS, pickFormat: pickFormat, baseType: baseType, extFor: extFor,
     clock: clock, lengthWords: lengthWords, ago: ago, drive: drive, mediaUrl: mediaUrl, fileName: fileName,
     CHUNK: CHUNK, chunkEnd: chunkEnd, resumeFrom: resumeFrom, checkExchange: checkExchange, summary: summary, names: names, threadOrder: threadOrder
