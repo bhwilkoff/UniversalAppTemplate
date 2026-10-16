@@ -383,9 +383,19 @@
   // browser cannot play the file (a format it lacks, or Drive refusing a
   // file downloaded too often), Drive's player takes its place, which needs
   // Drive to have prepared the video first.
+  // Google sometimes answers the Drive API from a whole network with its
+  // "automated queries" page, and only after 6 to 10 seconds (seen October
+  // 16, 2026). A healthy answer starts within a second or two, so a video
+  // that has asked and heard nothing by STALL_MS goes to Drive's player,
+  // and so does every later video for the next hour in this tab.
+  var STALL_MS = 3000, STALLED = 'hs-drive-api-stalled';
+  function driveStalled() {
+    try { return Date.now() - Number(sessionStorage.getItem(STALLED) || 0) < 3600000; } catch (e) { return false; }
+  }
+  function markStalled() { try { sessionStorage.setItem(STALLED, String(Date.now())); } catch (e) { /* this video only */ } }
   function videoFor(p, links, auto) {
     var url = X.mediaUrl(p.drive_file_id, window.HUB.googleApiKey);
-    if (!url) return driveFrame(p, links);
+    if (!url || driveStalled()) return driveFrame(p, links);
     var v = el('video');
     v.controls = true; v.preload = 'metadata'; v.playsInline = true; v.autoplay = !!auto;
     v.addEventListener('ended', function () { if (playing) queueNext(p); });
@@ -424,6 +434,19 @@
     }
     src.addEventListener('error', fallBack);
     v.addEventListener('error', fallBack);
+    // Timed from when the browser starts asking (Safari on a phone waits
+    // for Play), and only while the tab is in front, since a background
+    // tab may not load media at all.
+    var stall = null;
+    v.addEventListener('loadstart', function () {
+      clearTimeout(stall);
+      stall = setTimeout(function () {
+        if (v.readyState > 0 || document.hidden) return;
+        markStalled();
+        fallBack();
+      }, STALL_MS);
+    });
+    v.addEventListener('loadedmetadata', function () { clearTimeout(stall); });
     v.appendChild(src);
     return wrap;
   }
