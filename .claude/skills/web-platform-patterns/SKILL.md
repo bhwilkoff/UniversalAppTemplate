@@ -218,6 +218,14 @@ is right-click only; Firefox has neither in the bar. One function
 test it read out of the shipped JS with an engine fixture per row. Do
 not assume the matrix; open each browser's menu.
 
+The same holds for a big play button over a paused video: iOS and
+iPadOS Safari, Chrome on Android, and Firefox draw their own, while
+desktop Chrome and Edge show nothing until the pointer moves onto the
+video (humanshaped.org, 2026-10-16: an iPhone showed two stacked play
+buttons). Decide it in one tested function from the user agent and
+`(pointer: coarse)`, and add the page's own button only where the
+browser has none.
+
 ## Screen recording on a phone: hand it to the phone's recorder
 
 A page records a screen only through `getDisplayMedia`, and on phones that
