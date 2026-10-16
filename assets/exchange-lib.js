@@ -77,13 +77,15 @@
     };
   }
 
-  // The video file itself, through the Drive API with the site's browser
-  // key, for the browser's own player. Drive's embedded player fails in
-  // Safari on a phone, which blocks the cookies it needs inside another
-  // site; and Drive's download address refuses other sites' players.
-  function mediaUrl(id, key) {
-    if (!DRIVE_ID.test(String(id || '')) || !key) return null;
-    return 'https://www.googleapis.com/drive/v3/files/' + id + '?alt=media&key=' + encodeURIComponent(key);
+  // The video file itself, for the browser's own player, through the
+  // site's relay (tools/video-relay), which fetches it from Drive. Drive's
+  // embedded player fails in Safari on a phone, Drive's download address
+  // refuses other sites' players, and the Drive API with a key now gets
+  // Google's "automated queries" page (October 16, 2026). The type the hub
+  // kept goes along for a file Drive serves without one.
+  function mediaUrl(id, relay, mime) {
+    if (!DRIVE_ID.test(String(id || '')) || !relay) return null;
+    return String(relay).replace(/\/$/, '') + '/v/' + id + (mime ? '?type=' + encodeURIComponent(baseType(mime)) : '');
   }
 
   // "Human Shaped exchange, Week 2 check-in, 2026-10-11 14.05.mp4"

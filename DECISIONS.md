@@ -935,3 +935,26 @@ under Screen as kind `screen`, so the thread says "sharing their screen".
 Not yet seen on a real phone: the steps' wording against each phone, and
 Safari's in-page sharing on iOS 27 (whether it keeps recording when the
 person leaves Safari).
+
+## Exchange videos stream through the site's relay (October 16, 2026)
+
+**The browser's player streams exchange videos from a Cloudflare Worker
+that fetches them from the poster's Drive; the videos stay in the
+poster's Drive** (Ben: "The videos on the exchange pages are taking a VERY
+long time to load", then, after Drive's player failed on his iPhone over
+5G, "You should be able to do the relay on the cloudflare account").
+
+**Why:** the Drive API with the site's key now gets Google's "automated
+queries" page after 6 to 10 seconds from every network tried, and Drive's
+download address refuses requests a browser marks as coming from another
+site, so the only browser path left was Drive's embedded player, which
+fails in Safari on a phone. The same download address answers a server in
+two or three seconds. A copy in our own storage (R2) was the other way,
+and was not taken because it would break "your videos stay in your own
+Drive".
+
+**How to apply:** `tools/video-relay` (README there), `X.mediaUrl(id,
+HUB.videoRelay, mime)`, `exchange_video_known()` (migration
+20261016010000). Drive's player stays the fallback when the browser's own
+player fails. The browser key `googleApiKey` is no longer used by the
+site.

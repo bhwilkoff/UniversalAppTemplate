@@ -191,6 +191,8 @@ what waits on Ben.
   explains the phone's own screen recorder and takes what it saved) and saved to the
   poster's own Google Drive with `drive.file` (`exchange-drive.js`,
   resumable uploads, shared by link); the hub keeps only Drive file ids.
+  They play through the relay in `tools/video-relay` (a Cloudflare Worker
+  that fetches them from Drive and caches them for a day).
   An exchange starts with its maker's opening video (`start_exchange`,
   migration 20261012010000), which is its prompt; a video whose owner
   stops sharing it in Drive is marked so, with "Share it again". An
