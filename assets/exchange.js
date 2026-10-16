@@ -91,6 +91,16 @@
   // still shared. A new video without one is still being prepared and is
   // asked about again every 30 seconds; after ten minutes, no picture
   // means its owner stopped sharing it.
+  // Asks the relay to fetch a shared video from Drive ahead of time, so it
+  // starts quickly when someone presses it (Drive takes seconds to answer
+  // the first time). Once a page.
+  var warmed = {};
+  function warm(p) {
+    var url = X.mediaUrl(p.drive_file_id, window.HUB.videoRelay, p.mime);
+    if (!url || warmed[p.id]) return;
+    warmed[p.id] = true;
+    fetch(url + (url.indexOf('?') < 0 ? '?' : '&') + 'warm=1', { mode: 'no-cors', credentials: 'omit' }).catch(function () { /* it plays from Drive instead */ });
+  }
   function checkShared(p) {
     var links = X.drive(p.drive_file_id);
     if (!links || reach[p.id] || !window.fetch) return;
@@ -106,6 +116,7 @@
         return;
       }
       if (open) {
+        warm(p);
         // Ready: drop the "still preparing" line without reloading the player.
         if (current && current.id === p.id) { var wait = $('[data-preparing]'); if (wait) wait.remove(); }
         if (fresh) drawThread();
@@ -378,24 +389,15 @@
     if (k && k.reaction) { e.preventDefault(); react(current, k.reaction); }
   });
 
-  // The browser's own player, streaming the file through the Drive API, so
-  // it plays in Safari on a phone and as soon as it is posted. If the
+  // The browser's own player, streaming the file from Drive through the
+  // site's relay (X.mediaUrl), so it plays in Safari on a phone and as soon
+  // as it is posted. If the
   // browser cannot play the file (a format it lacks, or Drive refusing a
   // file downloaded too often), Drive's player takes its place, which needs
   // Drive to have prepared the video first.
-  // Google sometimes answers the Drive API from a whole network with its
-  // "automated queries" page, and only after 6 to 10 seconds (seen October
-  // 16, 2026). A healthy answer starts within a second or two, so a video
-  // that has asked and heard nothing by STALL_MS goes to Drive's player,
-  // and so does every later video for the next hour in this tab.
-  var STALL_MS = 3000, STALLED = 'hs-drive-api-stalled';
-  function driveStalled() {
-    try { return Date.now() - Number(sessionStorage.getItem(STALLED) || 0) < 3600000; } catch (e) { return false; }
-  }
-  function markStalled() { try { sessionStorage.setItem(STALLED, String(Date.now())); } catch (e) { /* this video only */ } }
   function videoFor(p, links, auto) {
-    var url = X.mediaUrl(p.drive_file_id, window.HUB.googleApiKey);
-    if (!url || driveStalled()) return driveFrame(p, links);
+    var url = X.mediaUrl(p.drive_file_id, window.HUB.videoRelay, p.mime);
+    if (!url) return driveFrame(p, links);
     var v = el('video');
     v.controls = true; v.preload = 'metadata'; v.playsInline = true; v.autoplay = !!auto;
     v.addEventListener('ended', function () { if (playing) queueNext(p); });
@@ -434,19 +436,6 @@
     }
     src.addEventListener('error', fallBack);
     v.addEventListener('error', fallBack);
-    // Timed from when the browser starts asking (Safari on a phone waits
-    // for Play), and only while the tab is in front, since a background
-    // tab may not load media at all.
-    var stall = null;
-    v.addEventListener('loadstart', function () {
-      clearTimeout(stall);
-      stall = setTimeout(function () {
-        if (v.readyState > 0 || document.hidden) return;
-        markStalled();
-        fallBack();
-      }, STALL_MS);
-    });
-    v.addEventListener('loadedmetadata', function () { clearTimeout(stall); });
     v.appendChild(src);
     return wrap;
   }

@@ -1,0 +1,9 @@
+name = "humanshaped-video"
+main = "worker.js"
+compatibility_date = "2026-10-01"
+workers_dev = true
+
+# Public values (the same ones every page carries in assets/hub-config.js).
+[vars]
+SUPABASE_URL = "https://bifrieqzkihuxfzttgvd.supabase.co"
+SUPABASE_KEY = "sb_publishable_bdJoZ7bc6Lk0Ug2Z37yn2g_A8AjkjKC"
