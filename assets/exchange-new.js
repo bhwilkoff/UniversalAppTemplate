@@ -89,7 +89,7 @@
       db.from('cohort_teachers').select('cohorts(id, slug, title, status)').eq('user_id', me.id)
     ]).then(function (res) {
       if (res[0].data === true) {
-        var m = el('option', null, 'Human Shaped members (people in a cohort, now or before, and teachers)');
+        var m = el('option', null, 'Human Shaped members');
         m.value = 'members';
         sel.appendChild(m);
       }
@@ -100,13 +100,13 @@
           if (!c || seen[c.id] || c.status === 'finished') return;
           seen[c.id] = any = true;
           if (c.id === asked) from = c;
-          var o = el('option', null, 'Only the people in ' + c.title);
+          var o = el('option', null, 'Your cohort: ' + c.title);
           o.value = c.id;
           sel.appendChild(o);
         });
       });
       if (!any) {
-        var none = el('option', null, 'Only the people in one of your cohorts (you are in none yet)');
+        var none = el('option', null, 'Your cohort (you are in none yet)');
         none.disabled = true;
         sel.appendChild(none);
       }

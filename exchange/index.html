@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261021g">
+  <link rel="stylesheet" href="/assets/site.css?v=20261021h">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -34,10 +34,11 @@
   <script src="/assets/google-signin-lib.js" defer></script>
   <script src="/assets/google-signin.js" defer></script>
   <script src="/assets/react-lib.js" defer></script>
+  <script src="/assets/ui.js?v=20261021d" defer></script>
   <script src="/assets/exchange-lib.js?v=20261016b" defer></script>
   <script src="/assets/exchange-recorder.js?v=20261015a" defer></script>
   <script src="/assets/exchange-drive.js?v=20261012b" defer></script>
-  <script src="/assets/exchange.js?v=20261016c" defer></script>
+  <script src="/assets/exchange.js?v=20261021a" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to the page</a>
@@ -91,7 +92,7 @@
           <header class="x-head">
             <h1 data-title></h1>
             <p class="x-prompt" data-prompt hidden></p>
-            <p class="x-summary"><span data-summary></span> <span data-where></span></p>
+            <div data-facts></div>
             <div class="x-tools" data-tools hidden>
               <button class="btn-secondary" type="button" data-copy>Copy the link</button>
               <button class="btn-secondary" type="button" data-toggle-replies></button>
@@ -110,12 +111,13 @@
                 <h2 id="thread-title" class="x-thread-title">The exchange</h2>
                 <button class="btn-secondary small" type="button" data-play-all aria-pressed="false" hidden>Play all</button>
               </div>
+              <p class="ui-inline-status" role="status" data-x-status></p>
               <ol class="x-clips" data-thread></ol>
               <p class="x-empty" data-thread-empty hidden></p>
               <p><button class="btn-primary" type="button" data-add hidden>Add your video</button></p>
-              <p class="hint" data-closed hidden>Its maker has closed this exchange to new videos.</p>
+              <p data-closed hidden><span class="ui-status ui-status-off"><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261021a#circle-dashed"/></svg><span>Closed to new videos</span></span></p>
               <div class="x-signin" data-signin hidden>
-                <p>Sign in to react, or to add a video of your own. Your video is saved in your own Google Drive.</p>
+                <p>Sign in to add a video.</p>
                 <div class="google-signin" data-google></div>
                 <p><button class="btn-secondary" type="button" data-github>Sign in with GitHub instead</button></p>
                 <p class="hint" role="status" data-signin-status></p>
@@ -127,8 +129,8 @@
             <h2 id="compose-title" tabindex="-1" data-compose-title>Add your video</h2>
             <p class="hint" data-replying></p>
             <div data-recorder></div>
-            <label class="x-note">A few words with it, if you like <span class="hint">Shown beside your video, and read aloud to people who use a screen reader.</span><textarea data-note rows="2" maxlength="1000"></textarea></label>
-            <p class="hint">Your video is saved in your own Google Drive, in a folder called Human Shaped exchanges, and anyone with its link can watch it. Taking it out of the exchange later leaves it in your Drive.</p>
+            <label class="x-note">A few words with it <span class="ui-optional">Optional</span><textarea data-note rows="2" maxlength="1000"></textarea></label>
+            <p class="ui-meta-line"><span class="ui-visibility"><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261021a#globe-simple"/></svg><span>Anyone with the link</span></span> Your video is kept in your Google Drive, in a folder called Human Shaped exchanges.</p>
             <progress class="x-progress" data-progress max="100" value="0" hidden></progress>
             <p class="x-post-status" role="status" aria-live="polite" data-post-status></p>
             <div class="actions">

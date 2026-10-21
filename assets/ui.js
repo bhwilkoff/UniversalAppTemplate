@@ -110,6 +110,33 @@
     return a;
   }
 
+  // A hard-to-undo action asks once more, on the page: the first press
+  // turns the button into the consequence ("Delete Kit test") and shows the
+  // warning beside it; the second press runs it. Leaving the button, or
+  // waiting, puts it back.
+  function confirmStep(button, o) {
+    var label = button.textContent, note = o.status || null, timer = null;
+    function reset() {
+      button.removeAttribute('data-armed');
+      button.textContent = label;
+      if (note) note.textContent = '';
+      clearTimeout(timer);
+    }
+    button.addEventListener('click', function () {
+      if (!button.hasAttribute('data-armed')) {
+        button.setAttribute('data-armed', '');
+        button.textContent = o.confirm;
+        if (note && o.warning) note.textContent = o.warning;
+        timer = setTimeout(reset, 8000);
+        return;
+      }
+      reset();
+      o.run();
+    });
+    button.addEventListener('blur', function () { if (button.hasAttribute('data-armed')) setTimeout(function () { if (document.activeElement !== button) reset(); }, 200); });
+    return { reset: reset };
+  }
+
   // A number of things waiting, beside the name of where they are.
   function count(n, label) {
     var s = el('span', 'ui-count', String(n));
@@ -158,5 +185,5 @@
     return { go: function (k) { go(k, true); }, current: function () { return now; }, link: function (k) { return links[k] && links[k].getAttribute('href'); } };
   }
 
-  root.UI = { el: el, icon: icon, status: status, visibility: visibility, facts: facts, row: row, rows: rows, empty: empty, disclosure: disclosure, button: button, link: link, count: count, tabs: tabs, WHO: WHO };
+  root.UI = { el: el, icon: icon, status: status, visibility: visibility, facts: facts, row: row, rows: rows, empty: empty, disclosure: disclosure, button: button, link: link, count: count, tabs: tabs, confirmStep: confirmStep, WHO: WHO };
 })(typeof window !== 'undefined' ? window : this);

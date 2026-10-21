@@ -5,7 +5,7 @@
 // the people to invite, and whether it becomes a cohort.
 (function () {
   var root = document.querySelector('[data-teach-times-poll]');
-  if (!root || !window.supabase || !window.HUB || !window.TimesLib || !window.TimesGrid || !window.TeachTimesPage || !window.TeachLib) return;
+  if (!root || !window.supabase || !window.HUB || !window.TimesLib || !window.TimesGrid || !window.TeachTimesPage || !window.TeachLib || !window.UI) return;
   var T = window.TimesLib, G = window.TimesGrid, P = window.TeachTimesPage, TL = window.TeachLib, el = P.el, said = P.said;
   var id = new URLSearchParams(location.search).get('p');
   var db = null, me = null, myName = '', hostMarks = {}, hostTouched = {}, hostTable = null, current = null, answers = [], zone = G.myZone(), picked = null, table = null;
@@ -86,13 +86,12 @@
       var rm = el('button', 'btn-danger small', 'Remove');
       rm.type = 'button';
       rm.setAttribute('aria-label', 'Remove ' + a.name + "'s answer");
-      rm.addEventListener('click', function () {
-        if (!window.confirm('Remove ' + a.name + "'s answer? This cannot be undone.")) return;
+      window.UI.confirmStep(rm, { confirm: 'Remove ' + a.name + "'s answer", status: $('[data-detail-status]'), warning: 'It cannot be brought back.', run: function () {
         G.within(db.from('time_poll_answers').delete().eq('id', a.id), db).catch(function (e) { return { error: { message: said(e) } }; }).then(function (r) {
-          if (r.error) { $('[data-detail-status]').textContent = 'It was not removed: ' + r.error.message; return; }
+          if (r.error) { $('[data-detail-status]').textContent = 'Not removed: ' + r.error.message; return; }
           openPoll();
         });
-      });
+      } });
       td.appendChild(rm);
     });
   }
@@ -313,11 +312,10 @@
       openPoll();
     });
   });
-  $('[data-delete]').addEventListener('click', function () {
-    if (!window.confirm('Delete "' + current.title + '" and every answer to it? The link will stop working. This cannot be undone.')) return;
+  window.UI.confirmStep($('[data-delete]'), { confirm: 'Delete this poll and its answers', status: $('[data-detail-status]'), warning: 'Its link will stop working.', run: function () {
     G.within(db.from('time_polls').delete().eq('id', id), db).catch(function (e) { return { error: { message: said(e) } }; }).then(function (r) {
-      if (r.error) { $('[data-detail-status]').textContent = 'It was not deleted: ' + r.error.message; return; }
+      if (r.error) { $('[data-detail-status]').textContent = 'Not deleted: ' + r.error.message; return; }
       location.assign('/teach/times/');
     });
-  });
+  } });
 })();

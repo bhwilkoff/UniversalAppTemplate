@@ -67,20 +67,18 @@
     var prompt = $('[data-prompt]');
     prompt.textContent = ex.prompt || '';
     prompt.hidden = !ex.prompt;
-    $('[data-summary]').textContent = X.summary(ex);
-    var where = $('[data-where]');
-    where.replaceChildren();
-    if (ex.cohort) {
-      where.appendChild(document.createTextNode('Only the people in '));
-      var a = el('a', null, ex.cohort.title);
-      a.href = '/cohort/?c=' + encodeURIComponent(ex.cohort.slug);
-      where.appendChild(a);
-      where.appendChild(document.createTextNode(' can see this exchange.'));
-    } else if (ex.members) {
-      where.textContent = 'Only Human Shaped members can see this exchange: people in a cohort, now or before, and teachers.';
-    } else {
-      where.textContent = 'Anyone with this page\'s link can watch, and anyone signed in can add a video' + (ex.replies_open ? '.' : ' once its maker opens replies again.');
-    }
+    // Facts, not a sentence (DESIGN-KIT.md): who started it, how many
+    // videos, who can see it, and whether it takes new ones.
+    var U = window.UI, cohortLink = null;
+    if (ex.cohort) { cohortLink = el('a', null, ex.cohort.title); cohortLink.href = '/cohort/?c=' + encodeURIComponent(ex.cohort.slug); }
+    var n = (ex.posts || []).length;
+    $('[data-facts]').replaceChildren(U.facts([
+      ['Started by', ex.maker.name],
+      ['Cohort', cohortLink],
+      ['Videos', String(n)],
+      ['Who can see it', U.visibility(ex.cohort ? 'cohort' : ex.members ? 'members' : 'link')],
+      ['New videos', U.status(ex.replies_open ? 'done' : 'off', ex.replies_open ? 'Open' : 'Closed to new videos')]
+    ]));
     $('[data-tools]').hidden = !ex.mine;
     $('[data-toggle-replies]').textContent = ex.replies_open ? 'Close replies' : 'Open replies again';
   }
@@ -179,7 +177,8 @@
       rm.title = 'Remove from the exchange';
       rm.setAttribute('aria-label', 'Remove ' + (p.mine ? 'your' : p.author.name + '\'s') + ' video from the exchange');
       rm.appendChild(icon('trash'));
-      rm.addEventListener('click', function () { removePost(p); });
+      // The thread's trash opens the video, whose own Remove asks once more.
+      rm.addEventListener('click', function () { playing = false; drawPlayAll(); play(p, true); var b = $('[data-now] .btn-danger'); if (b) b.focus(); });
       li.appendChild(rm);
     }
     return li;
@@ -291,7 +290,7 @@
     if (p.mine || ex.can_moderate) {
       var rm = el('button', 'btn-danger', 'Remove from the exchange');
       rm.type = 'button';
-      rm.addEventListener('click', function () { removePost(p); });
+      window.UI.confirmStep(rm, { confirm: 'Remove this video', status: $('[data-x-status]'), warning: 'It stays in ' + (p.mine ? 'your' : 'its maker\'s') + ' Google Drive.', run: function () { removePost(p); } });
       acts.appendChild(rm);
     }
     now.appendChild(acts);
@@ -547,13 +546,14 @@
     var line = $('[data-replying]');
     line.replaceChildren();
     if (to) {
-      line.appendChild(document.createTextNode('Your video will answer ' + to.author.name + '\'s, and join the end of the exchange. '));
-      var whole = el('button', 'text-button', 'Answer the whole exchange instead');
+      var chip = el('span', 'ui-chip', 'Replying to ' + to.author.name);
+      var whole = el('button', 'ui-chip-x', '');
       whole.type = 'button';
+      whole.setAttribute('aria-label', 'Answer the whole exchange instead');
+      whole.appendChild(document.createTextNode('\u00d7'));
       whole.addEventListener('click', function () { compose(null); });
-      line.appendChild(whole);
-    } else {
-      line.textContent = ex.posts.length ? 'Your video joins the end of the exchange.' : (ex.prompt ? 'Your video opens the exchange, under its prompt.' : 'Your video opens the exchange.');
+      chip.appendChild(whole);
+      line.appendChild(chip);
     }
     if (!recorder) recorder = window.ExchangeRecorder.mount($('[data-recorder]'), { onChange: function (r) { $('[data-post]').disabled = !r || posting; } });
     $('[data-post]').disabled = !recorder.result();
@@ -609,19 +609,19 @@
   }
 
   function removePost(p) {
-    if (!window.confirm('Take this video out of the exchange? It stays in ' + (p.mine ? 'your' : 'its maker\'s') + ' Google Drive, where it can be deleted.')) return;
     within(db.rpc('remove_exchange_post', { post: p.id })).then(function (r) {
       if (r.error) throw r.error;
       return load();
-    }).catch(function (e) { window.alert('It was not removed: ' + said(e) + '.'); });
+    }).catch(function (e) { $('[data-x-status]').textContent = 'Not removed: ' + said(e); });
   }
 
   // ---- the maker's tools ------------------------------------------------
   function copyLink(btn) {
     var url = location.origin + location.pathname + '#' + token;
     var done = function () { btn.textContent = 'Copied'; setTimeout(function () { btn.textContent = 'Copy the link'; }, 2000); };
-    if (navigator.clipboard) navigator.clipboard.writeText(url).then(done, function () { window.prompt('Copy this link', url); });
-    else window.prompt('Copy this link', url);
+    var shown = function () { $('[data-x-status]').textContent = url; };
+    if (navigator.clipboard) navigator.clipboard.writeText(url).then(done, shown);
+    else shown();
   }
 
   // ---- signing in to reply ----------------------------------------------
@@ -684,15 +684,14 @@
     within(db.from('exchanges').update({ replies_open: !ex.replies_open }).eq('token', token)).then(function (r) {
       if (r.error) throw r.error;
       return load();
-    }).catch(function (e) { window.alert('Nothing changed: ' + said(e) + '.'); });
+    }).catch(function (e) { $('[data-x-status]').textContent = 'Nothing changed: ' + said(e); });
   });
-  $('[data-delete]').addEventListener('click', function () {
-    if (!window.confirm('Delete "' + ex.title + '" for everyone? The videos stay in each person\'s Google Drive. This cannot be undone.')) return;
+  window.UI.confirmStep($('[data-delete]'), { confirm: 'Delete this exchange for everyone', status: $('[data-x-status]'), warning: 'The videos stay in each person\'s Google Drive.', run: function () {
     within(db.from('exchanges').delete().eq('token', token)).then(function (r) {
       if (r.error) throw r.error;
-      location.href = '/account/#exchanges';
-    }).catch(function (e) { window.alert('It was not deleted: ' + said(e) + '.'); });
-  });
+      location.href = '/exchanges/';
+    }).catch(function (e) { $('[data-x-status]').textContent = 'Not deleted: ' + said(e); });
+  } });
   $('[data-retry]').addEventListener('click', function () { load(); });
   window.addEventListener('hashchange', function () { var t = tokenFromHash(); if (!t || t.token !== token) { current = null; load(); } });
   window.addEventListener('pagehide', function () { if (recorder) recorder.release(); });

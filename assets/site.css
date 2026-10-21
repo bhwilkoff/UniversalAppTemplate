@@ -2561,3 +2561,8 @@ html.app-nav-open[data-signed-in] body:not([data-no-app-nav]) .app-nav { display
 .cohort-tabs .area-nav { margin-top: 0.5rem; }
 .cohort-tabs + .page-head { padding-top: 1.75rem; }
 .danger-zone { border-top: 1px solid var(--rule); padding-top: 0.5rem; }
+.ui-optional { display: inline-block; margin-left: 0.4rem; font-size: 0.85rem; font-weight: 500; color: var(--muted); }
+.ui-chip { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.15rem 0.35rem 0.15rem 0.7rem; border: 1px solid var(--rule); border-radius: 1rem; font-size: 0.95rem; font-weight: 500; }
+.ui-chip-x { border: 0; background: none; color: var(--muted); font: inherit; font-size: 1.1rem; line-height: 1; padding: 0.1rem 0.35rem; cursor: pointer; border-radius: 1rem; min-width: 24px; min-height: 24px; }
+.ui-chip-x:hover { color: var(--ink); background: var(--surface); }
+.ui-meta-line { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 0.6rem; color: var(--muted); font-size: 0.95rem; }

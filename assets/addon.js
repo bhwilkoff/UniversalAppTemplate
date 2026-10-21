@@ -948,15 +948,17 @@
     }
     var acts = el('div', 'actions');
     acts.appendChild(stageToggle('check', k.id, 'Put it on the main stage', 'Take it off the main stage'));
+    var againStatus = el('span', 'ui-inline-status'); againStatus.setAttribute('role', 'status');
     if (RR && RR.canRerun(L.kindOf(k))) acts.appendChild(button('Ask it again', 'btn-secondary', function () {
       db.from('live_checks').insert(RR.againRow(k, { cohortId: S.cohort.id, sessionId: S.session.id, me: S.me.id })).then(function (r) {
-        if (r.error) { window.alert('Not asked again: ' + r.error.message); return; }
+        if (r.error) { againStatus.textContent = 'Not asked again: ' + r.error.message; return; }
         refreshLive();
       });
     }));
     if (!short) acts.appendChild(button(k.show_tally ? 'Hide the results' : 'Show everyone the results', 'btn-secondary', function () { changeCheck(k, { show_tally: !k.show_tally }); }));
     acts.appendChild(button('Close it', 'btn-secondary', function () { if (S.onStage && S.onStage.id === k.id) setPin(null); changeCheck(k, { state: 'closed' }); }));
     card.appendChild(acts);
+    card.appendChild(againStatus);
     if (!mine.length && S.kinds) card.appendChild(editCheck(k));
     return card;
   }
