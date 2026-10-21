@@ -114,6 +114,11 @@ as Ben's without his review, $0 to run.
   PRINCIPLES.md through `PrinciplesLib.page`: each statement whole and
   alike, opening to what it means and how you can tell; old
   /principles/#why links land on /about/.
+- **DESIGN-KIT.md is binding**: every page is built from its parts in
+  `assets/ui.js` (statuses, visibility, rows, empty states, confirm
+  dialog, inline status, gates, tabs) and speaks by its writing rules: a
+  sentence only for a refusal, a warning, or an undiscoverable fact.
+  `tools/test/design-kit.test.mjs` holds the checkable rules.
 - **PAGES.md is binding**: every page, who it is for, what it shows, what
   can be done there, and how you find your way (header, area rows, cohort
   header, breadcrumbs). Read it before adding a page, section, or form.

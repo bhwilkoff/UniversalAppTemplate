@@ -2604,3 +2604,4 @@ html.app-nav-open[data-signed-in] body:not([data-no-app-nav]) .app-nav { display
 .ui-tabs-more-list { position: absolute; right: 0; top: 100%; z-index: 20; display: grid !important; gap: 0; min-width: 11rem; padding: 0.35rem; background: var(--card); border: 1px solid var(--rule); border-radius: 8px; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15); }
 .ui-tabs-more-list[hidden] { display: none !important; }
 .ui-tabs-more-list a { display: block; padding: 0.45rem 0.6rem; border-bottom: 0 !important; margin: 0 !important; }
+.ui-tabs a { white-space: nowrap; }

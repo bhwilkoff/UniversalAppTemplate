@@ -1048,3 +1048,31 @@ admin (admin rows are locked while a change runs), and agents cannot call
 any of it. The page asks once more only for admin, and for taking teaching
 from someone who holds more. The overview says when there is only one
 admin. Rights inside one cohort stay with its teachers.
+
+## The design kit: one language for every page, held by a check (October 21, 2026)
+
+**DESIGN-KIT.md is binding: every page is built from its parts (facts,
+status labels from one registry, visibility markers from one audience
+set, rows, empty states, disclosures, toolbars, tabs, a native confirm
+dialog, inline status, page gates, a quiet skeleton), and a sentence
+appears only for a refusal, a warning, or a fact no one could see by
+looking** (Ben: "You are still building a site that is explaining
+everything as text rather than actually building a sustainable platform
+that has design elements and a common language that can continue to be
+built upon," and "I want this to be fully research based").
+
+**Why:** an audit of every surface (research/notes/audit-2026-10-21/)
+found about 35 sentences explaining who can see something, worded five
+ways for teachers alone; about 25 states told as sentences; four kinds of
+confirmation; loading sentences on fourteen pages; and intro paragraphs
+under nearly every heading. Each was a part the site did not yet have.
+The parts and their words come from GOV.UK, Primer, Polaris, Material,
+Apple, NN/g, and WCAG 2.2 (research/notes/design-kit-research.md).
+
+**How to apply:** build with `assets/ui.js`; add a status word or an
+audience to the registry in ui.js and DESIGN-KIT.md together (a test
+checks they match); never write a heading as a sentence or an intro
+paragraph on a hub page. `tools/test/design-kit.test.mjs` fails on the
+rules a test can check; the rest are a page review at 375 and 1280 px.
+The site's metaphors are teaching and performance; names are plain nouns
+(the lexicon in DESIGN-KIT.md).
