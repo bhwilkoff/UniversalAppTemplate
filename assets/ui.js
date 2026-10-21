@@ -81,6 +81,13 @@
     if ('popover' in HTMLElement.prototype) {
       pop.setAttribute('popover', '');
       b.setAttribute('popovertarget', id);
+      // Opened beside its marker, inside the window.
+      pop.addEventListener('toggle', function (e) {
+        if (e.newState !== 'open') return;
+        var r = b.getBoundingClientRect(), w = pop.offsetWidth;
+        pop.style.top = Math.round(r.bottom + 6) + 'px';
+        pop.style.left = Math.round(Math.max(8, Math.min(r.left, window.innerWidth - w - 8))) + 'px';
+      });
     } else {
       pop.hidden = true;
       b.addEventListener('click', function () { pop.hidden = !pop.hidden; });
