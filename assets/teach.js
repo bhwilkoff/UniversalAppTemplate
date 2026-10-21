@@ -1709,7 +1709,9 @@
         if (r.error) return fail('Your teaching access could not be checked: ' + r.error.message);
         if (!r.data) return loadMyRequest();
         show('teacher');
-        var jobs = [loadList(), loadQueue()];
+        // A poll that became a cohort links to it as /teach/?c=<its id>.
+        var asked = new URLSearchParams(location.search).get('c');
+        var jobs = [loadList().then(function () { if (asked) openCohort(asked); }), loadQueue()];
         if (r.data.can_approve) jobs.push(loadRequests());
         if (r.data.can_sign) jobs.push(loadSigning());
         return Promise.all(jobs);

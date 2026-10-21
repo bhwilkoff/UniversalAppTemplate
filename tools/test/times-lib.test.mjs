@@ -140,3 +140,20 @@ test('after a calendar check, free times in waking hours on the person\'s own cl
   assert.deepEqual(T.freeInHours(p, checked, 'America/New_York', 480, 1200).map((s) => s % 1440),
     [480, 600, 660, 1020, 1080]);
 });
+
+test('a cohort from a poll invites, by default, those who said the time works or works if need be, never the teacher', () => {
+  const answers = [
+    { id: 'a', works: [2460], if_need_be: [] },
+    { id: 'b', works: [], if_need_be: [2460] },
+    { id: 'c', works: [5400], if_need_be: [] },
+    { id: 'h', works: [2460], if_need_be: [], host: true }
+  ];
+  assert.deepEqual(T.inviteesAt(answers, 2460), ['a', 'b']);
+  assert.equal(T.answerAt(answers[1], 2460), 'if_need_be');
+  assert.equal(T.answerAt(answers[2], 2460), null);
+});
+
+test('a poll time is a weekday and a clock time in the poll zone', () => {
+  assert.deepEqual(T.sessionOf(2460), { weekday: 1, time: '17:00' });
+  assert.deepEqual(T.sessionOf(6 * 1440 + 9 * 60 + 15), { weekday: 6, time: '09:15' });
+});

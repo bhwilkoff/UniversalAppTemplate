@@ -113,6 +113,9 @@ as Ben's without his review, $0 to run.
   PRINCIPLES.md through `PrinciplesLib.page`: each statement whole and
   alike, opening to what it means and how you can tell; old
   /principles/#why links land on /about/.
+- Each kind of content has its own page (Ben, October 21; DECISIONS.md):
+  a list page lists, and each thing opens at its own address, never
+  unfolded under the list.
 - Each idea has one full page, and the home page only summarizes it
   and links there: the why and what Human Shaped is on /about/, the
   principles on /principles/, the
@@ -181,7 +184,12 @@ what waits on Ben.
   which lives in `private.time_poll_secrets`. A time is
   `weekday * 1440 + minute` in the poll's zone, and everyone sees the
   grid on their own clock, converted on the dates of the cohort's first
-  week (`times-lib.js`). The optional Google Calendar check asks for
+  week (`times-lib.js`). The teacher's pages are the list
+  (`/teach/times/`), a new poll (`/teach/times/new/`), and each poll on
+  its own page (`/teach/times/poll/?p=<id>`), where the teacher can make
+  the poll a cohort at one time and invite the people who answered
+  (`time_poll_to_cohort`, migration 20261021010000); invited people see
+  the cohort and Join with GitHub at the poll's link. The optional Google Calendar check asks for
   `calendar.freebusy` only, reads the first four weeks in the browser,
   and saves nothing.
 - **Exchanges** (DECISIONS.md, "Exchanges"; migration 20261011010000):
@@ -211,7 +219,7 @@ what waits on Ben.
   migration 20261003055000, `public_apps()`; see `research/notes/hub-privacy-notes.md`), which is also their "it is ready": every app is submitted by the cohort's end (`submit-lib.js`, loaded on /cohort/ and /teach/). A teacher can keep an app off /apps/ with `app_hides` (migration 20261003090000), which never touches the student's switch.
 - **Scripts:** `assets/hub-config.js` (public URL and publishable key),
   `hub.js`, `cohorts.js`, `teach.js` with `teach-lib.js`, `cohort.js` and `live.js`
-  with `cohort-lib.js` and `live-lib.js`, and `apps.js` with `apps-lib.js`, and `times.js` and `teach-times.js` with `times-lib.js` and `times-grid.js`. Pure logic lives in the `-lib.js` files with
+  with `cohort-lib.js` and `live-lib.js`, and `apps.js` with `apps-lib.js`, and `times.js` and the `teach-times*.js` pages with `times-lib.js` and `times-grid.js`. Pure logic lives in the `-lib.js` files with
   tests in `tools/test/` (`node --test tools/test/*.mjs`, 436 tests).
 - **Responsiveness:** `node tools/responsive/check.mjs` (add `--base
   http://127.0.0.1:8765` for a local copy, `--only exchange`, `--shots`)

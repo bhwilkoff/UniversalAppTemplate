@@ -9,7 +9,7 @@
   var T = window.TimesLib, G = window.TimesGrid;
   var db = window.supabase.createClient(window.HUB.url, window.HUB.key, { auth: { persistSession: false } });
   var form = root.querySelector('[data-form]');
-  var poll = null, link = null, mine = null, tally = null, table = null, dragTo = null;
+  var poll = null, link = null, mine = null, tally = null, invite = null, table = null, dragTo = null;
   var marks = {};
   // Times the person changed by hand, which a calendar check never changes.
   var touched = {};
@@ -138,13 +138,30 @@
       r.data.works.forEach(function (s) { marks[s] = 'works'; });
       r.data.if_need_be.forEach(function (s) { marks[s] = 'if_need_be'; });
       tally = r.data.tally;
+      invite = r.data.cohort || null;
     });
+  }
+
+  // The teacher made the poll a cohort and invited this person
+  // (migration 20261021010000). They join it themselves, with GitHub.
+  function drawInvite() {
+    var box = $('[data-invite]');
+    box.hidden = !invite;
+    if (!invite) return;
+    $('[data-invite-title]').textContent = 'You are invited to ' + invite.title + '.';
+    var line = window.TeachLib ? window.TeachLib.scheduleText(invite, zone) + '. ' + window.TeachLib.openingLine(invite) : '';
+    if (invite.status !== 'open') line += invite.status === 'draft' ? ' It is not open for joining yet; the way to join will be here when it is.' : ' It is no longer taking new people, so write to ' + poll.teacher + ' about joining.';
+    $('[data-invite-line]').textContent = line;
+    $('[data-invite-join-box]').hidden = invite.status !== 'open';
+    $('[data-invite-join]').href = '/account/?join=' + encodeURIComponent(invite.slug);
+    $('[data-closed]').hidden = true;
   }
 
   function afterAnswer() {
     $('[data-submit]').textContent = mine ? 'Save my changes' : 'Send my answer';
     $('[data-withdraw]').hidden = !mine || !poll.open;
     keepLink();
+    drawInvite();
   }
 
   function load() {
@@ -172,7 +189,7 @@
     });
   }
 
-  $('[data-zone]').addEventListener('change', function (e) { zone = e.target.value; draw(); });
+  $('[data-zone]').addEventListener('change', function (e) { zone = e.target.value; draw(); drawInvite(); });
   $('[data-retry]').addEventListener('click', load);
   $('[data-copy-keep]').addEventListener('click', function (e) {
     var input = $('[data-keep-link]');
@@ -221,7 +238,7 @@
     if (!mine) return;
     G.within(db.rpc('withdraw_time_poll_answer', { t: link.token, answer: mine.id, secret: mine.secret }), db).then(function (r) {
       if (r.error) throw r.error;
-      mine = null; tally = null; marks = {}; touched = {}; cal.reset();
+      mine = null; tally = null; invite = null; marks = {}; touched = {}; cal.reset();
       remember(null);
       form.reset();
       $('[data-zone]').value = zone;

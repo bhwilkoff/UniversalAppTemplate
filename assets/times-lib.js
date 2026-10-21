@@ -194,6 +194,22 @@
     }).slice(0, limit || 5);
   }
 
+  // Making a cohort from a poll: what each person said about one time
+  // ('works', 'if_need_be', or null), and the cohort's weekly session in
+  // the poll's own zone. The teacher's own answer is never an invitation.
+  function answerAt(answer, slot) {
+    if ((answer.works || []).indexOf(slot) >= 0) return 'works';
+    if ((answer.if_need_be || []).indexOf(slot) >= 0) return 'if_need_be';
+    return null;
+  }
+  function inviteesAt(answers, slot) {
+    return answers.filter(function (a) { return !a.host && answerAt(a, slot); }).map(function (a) { return a.id; });
+  }
+  function sessionOf(slot) {
+    var m = minuteOf(slot);
+    return { weekday: dayOf(slot), time: String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0') };
+  }
+
   // A Google Calendar check (free/busy only) looks at the cohort's first
   // weeks, because a weekly time is only free if it stays free. These say
   // which span to ask about and how many of those weeks each time is busy.
@@ -248,6 +264,7 @@
     offsetAt: offsetAt, instantOf: instantOf, placeIn: placeIn, gridFor: gridFor,
     timeText: timeText, slotText: slotText, PARTS: PARTS, partsMinutes: partsMinutes, hoursText: hoursText, minutesOfPoll: minutesOfPoll, zoneName: zoneName, parseHash: parseHash,
     minutesOf: minutesOf, checkPoll: checkPoll, tallyOf: tallyOf, bestTimes: bestTimes,
+    answerAt: answerAt, inviteesAt: inviteesAt, sessionOf: sessionOf,
     CHECK_WEEKS: CHECK_WEEKS, freeInHours: freeInHours, checkSpan: checkSpan, busyWeeks: busyWeeks
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;

@@ -958,3 +958,46 @@ HUB.videoRelay, mime)`, `exchange_video_known()` (migration
 20261016010000). Drive's player stays the fallback when the browser's own
 player fails. The browser key `googleApiKey` is no longer used by the
 site.
+
+## Each kind of content has its own page (October 21, 2026)
+
+**A list page lists, and each thing in it opens on its own page, at its
+own address** (Ben: "I really don't like the way that an individual poll
+will show up on the overall polls page. It should have its own page. All
+content types should only show on their own pages and interfaces so that
+we don't get it muddied what the purpose of each page is supposed to
+be.").
+
+**Why:** a page that is a list until you press Open, and then a list with
+one poll unfolded under it, has no single purpose: what you see depends on
+what you clicked, the address does not name it, and the back button leaves
+the list instead of the poll.
+
+**How to apply:** time polls are now `/teach/times/` (the list),
+`/teach/times/new/` (making one), and `/teach/times/poll/?p=<id>` (one
+poll); old `/teach/times/#<id>` links forward. `/teach/` still shows a
+cohort's detail under the list of cohorts and is the next page to split
+the same way. A new kind of content starts with its own page.
+
+## A poll becomes a cohort; the people invited join it themselves (October 21, 2026)
+
+**On a poll's page, the teacher chooses one weekly time and who to
+invite, and the hub makes the cohort at that time (or sets the time of the
+cohort the poll was for), closes the poll, and marks those answers
+invited** (Ben: "I'm ready to convert a Time Poll into a cohort at a
+particular time with the participants that filled out the poll.").
+
+**Why:** the people who answered have no account, only a name and maybe
+an email, so no one can be enrolled for them, and joining should stay
+their own choice. Each invited person sees the cohort, its time on their
+own clock, and Join with GitHub when they open the poll's link again (the
+answer's secret already in their browser reads it); the teacher also gets
+a mail link and the addresses, to write to them in their own words. The
+site sends no email for this.
+
+**How to apply:** `time_poll_to_cohort` and `time_poll_answers.invited`
+(migration 20261021010000), `TimesLib.inviteesAt` for who is ticked by
+default (said the time works, or works if need be), and the Make it a
+cohort panel in `teach-times-poll.js`. Joining is the ordinary open-cohort
+path, `/account/?join=<slug>`, so a cohort made as a draft takes no one
+until it is open.

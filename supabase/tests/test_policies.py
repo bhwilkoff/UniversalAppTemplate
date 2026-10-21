@@ -2637,6 +2637,57 @@ def main():
           attempt(as_user("cal"), "update public.time_polls set open = false where id = %s returning id", (tp,)) and last_rows == [])
     check("its teacher closes it", attempt(as_user("ben"), "update public.time_polls set open = false where id = %s returning id", (tp,)) and len(last_rows) == 1)
     check("a closed poll takes no new answers", not attempt(anon(), ans, (tok, "Late", "{2460}", "{}", None, None, None)))
+    # A poll becomes a cohort (migration 20261021010000): the teacher
+    # chooses the time and the people; the people join themselves.
+    conv = "select public.time_poll_to_cohort(%s, %s, %s::uuid[], %s, %s, %s, 5, %s, null)"
+    check("someone who is not its teacher cannot make a cohort from it",
+          not attempt(as_user("cal"), conv, (tp, 2460, [jo["id"]], "Mondays (delete me)", "mondays-delete-me", None, "open")))
+    check("nor can the teacher's agent",
+          not attempt(as_agent("ben"), conv, (tp, 2460, [jo["id"]], "Mondays (delete me)", "mondays-delete-me", None, "open")))
+    check("the time must be one the poll offers",
+          not attempt(as_user("ben"), conv, (tp, 3900, [jo["id"]], None, None, None, "open")))
+    check("a poll for a cohort sets that cohort's weekly time",
+          attempt(as_user("ben"), conv, (tp, 2460, [jo["id"], ivy["id"]], None, None, "2027-01-04", "open"))
+          and last_rows[0][0]["id"] == bc
+          and attempt(as_user("ben"), "select session_weekday, session_time::text, time_zone, starts_on::text from public.cohorts where id = %s", (bc,))
+          and last_rows == [(1, "17:00:00", "America/Denver", "2027-01-04")])
+    check("the person invited sees the cohort with their own answer",
+          attempt(anon(), "select public.my_time_poll_answer(%s, %s, %s)", (tok, jo["id"], jo["secret"]))
+          and last_rows[0][0]["cohort"]["session_weekday"] == 1 and last_rows[0][0]["cohort"]["slug"])
+    attempt(as_user("ben"), conv, (tp, 2460, [ivy["id"]], None, None, None, "open"))
+    check("someone not invited sees no cohort",
+          attempt(anon(), "select public.my_time_poll_answer(%s, %s, %s)", (tok, jo["id"], jo["secret"]))
+          and last_rows[0][0]["cohort"] is None)
+    check("the poll closes once it is a cohort",
+          attempt(as_user("ben"), "select open from public.time_polls where id = %s", (tp,)) and last_rows == [(False,)])
+    attempt(as_user("ben"), "insert into public.time_polls (title, time_zone, days, first_minute, last_minute, step_minutes) "
+            "values ('Thursdays (delete me)', 'America/New_York', '{4}', 1080, 1200, 60) returning id, token")
+    np, ntok = last_rows[0]
+    attempt(anon(), ans, (ntok, "Lu", "{6840}", "{}", "lu@example.org", None, None))
+    lu = last_rows[0][0]
+    check("another teacher cannot make a cohort from someone else's poll",
+          not attempt(as_user("kofi"), conv, (np, 6840, [lu["id"]], "Not mine (delete me)", "not-mine-delete-me", None, "open")))
+    check("a poll for no cohort yet makes a new one at the chosen time",
+          attempt(as_user("ben"), conv, (np, 6840, [lu["id"]], "Thursday evenings (delete me)", "thursday-evenings-delete-me", "2027-01-07", "open"))
+          and last_rows[0][0]["slug"] == "thursday-evenings-delete-me")
+    newc = last_rows[0][0]["id"]
+    check("its maker teaches it",
+          attempt(as_user("ben"), "select title, status::text, session_weekday, session_time::text, time_zone from public.cohorts c "
+                  "join public.cohort_teachers t on t.cohort_id = c.id and t.user_id = %s where c.id = %s", (people["ben"], newc))
+          and last_rows == [("Thursday evenings (delete me)", "open", 4, "18:00:00", "America/New_York")])
+    check("and the poll now belongs to it", attempt(as_user("ben"), "select cohort_id::text from public.time_polls where id = %s", (np,)) and last_rows == [(newc,)])
+    check("no one is enrolled for the people invited",
+          attempt(as_user("ben"), "select count(*) from public.enrollments where cohort_id = %s", (newc,)) and last_rows == [(0,)])
+    check("nor can the teacher set the time of a cohort they do not teach",
+          not attempt(as_user("ben"), "select public.time_poll_to_cohort(%s, %s, '{}'::uuid[], null, null, null, 5, 'open', %s)", (np, 6840, kc)))
+    attempt(as_user("ben"), "insert into public.time_polls (title, time_zone, days, first_minute, last_minute, step_minutes) "
+            "values ('Fridays (delete me)', 'America/New_York', '{5}', 1080, 1200, 60) returning id")
+    check("a new cohort cannot start as running",
+          not attempt(as_user("ben"), "select public.time_poll_to_cohort(%s, 8280, '{}'::uuid[], 'X', 'x-delete-me', null, 5, 'running', null)",
+                      (last_rows[0][0],)))
+    attempt(as_user("ben"), "delete from public.time_polls where id = %s returning id", (np,))
+    attempt(as_user("ben"), "delete from public.cohorts where id = %s returning id", (newc,))
+
     check("someone takes back their answer with its secret",
           attempt(anon(), "select public.withdraw_time_poll_answer(%s, %s, %s)", (tok, jo["id"], jo["secret"])) and last_rows == [(True,)])
     check("its teacher removes an answer",
