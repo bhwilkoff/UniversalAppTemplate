@@ -2450,10 +2450,6 @@ html[data-member] .public-home { display: none; }
    queue, never the queue itself (PAGES.md rule 6). */
 .needs { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.6rem; }
 .needs li { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1rem; }
-/* One line naming the reader's role on a page another role also opens
-   (PAGES.md rule 5). */
-.role-line { margin: 0; color: var(--muted); max-width: var(--measure); }
-.page-head .role-line { margin-top: -1.5rem; }
 
 /* How you find your way (PAGES.md; research/notes/navigation-and-wayfinding-notes.md).
    The page you are on is marked by more than color: an underline, in the

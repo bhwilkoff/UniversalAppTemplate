@@ -15,9 +15,7 @@
     '/assets/path-lib.js',
     '/assets/home-lib.js?v=20261021a',
     '/assets/exchange-lib.js?v=20261016b',
-    '/assets/exchange-recorder.js?v=20261015a',
-    '/assets/exchange-drive.js?v=20261012b',
-    '/assets/exchange-list.js?v=20261014a'
+    '/assets/exchange-list.js?v=20261021a'
   ];
   function loadAll(list) {
     return new Promise(function (resolve, reject) {
@@ -304,13 +302,13 @@
     });
     var b = m.builderApp;
     if (b) {
-      var acts = [link('/account/#own-app', 'Change it', 'btn-secondary small')];
+      var acts = [link('/apps/mine/', 'Change it', 'btn-secondary small')];
       if (b.public) acts.unshift(link('/apps/app/?r=' + encodeURIComponent(b.app_repo), 'Its page', 'btn-secondary small'));
       ul.appendChild(row(b.app_name || b.app_repo, b.public ? 'Shown on the apps page.' : 'Yours alone until you choose to show it.', acts));
     }
     if (ul.children.length) { box.appendChild(ul); return; }
     box.appendChild(empty('Building an app on your own, from the template? Add it here, and choose whether the apps page shows it.', [
-      link('/account/#own-app', 'Add your app', 'btn-secondary'),
+      link('/apps/mine/', 'Add your app', 'btn-secondary'),
       link('/path/setup/', 'Start from the template', 'btn-secondary')
     ]));
   }
