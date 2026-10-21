@@ -88,6 +88,7 @@
             <p class="kicker" data-kicker>Your cohort</p>
             <h1 data-title></h1>
             <p class="lead" data-lead></p>
+            <p class="role-line" data-teacher-line hidden>You teach this cohort, and this is the page the people in it see. <a data-teach-link href="/teach/">Open it as its teacher</a></p>
           </header>
 
           <section class="cohort-card setup-card" aria-labelledby="setup-title" data-setup hidden>
@@ -182,7 +183,7 @@
             <div data-group></div>
           </section>
 
-          <section aria-labelledby="mine-title">
+          <section aria-labelledby="mine-title" data-student-only>
             <h2 id="mine-title">Your app</h2>
             <!-- The words about submitting and hiding were written by Claude
                  for milestone M10 and await Ben's review. -->
@@ -210,7 +211,7 @@
             <div class="apps" data-people></div>
           </section>
 
-          <section aria-labelledby="share-title">
+          <section aria-labelledby="share-title" data-student-only>
             <h2 id="share-title">Bring something back</h2>
             <p>Share this week's work with your cohort and your teacher: a link to what you made, and a sentence or two about it in your own words. If your own AI agent gave you a human-shaped review and you want your classmates to see it, you can share that here too.</p>
             <form class="cohort-form" data-share-form>
@@ -257,7 +258,7 @@
   <script src="/assets/show-lib.js" defer></script>
   <script src="/assets/recognition-lib.js" defer></script>
   <script src="/assets/curriculum-pages-lib.js" defer></script>
-  <script src="/assets/cohort.js?v=20261014a" defer></script>
+  <script src="/assets/cohort.js?v=20261021a" defer></script>
   <script src="/assets/exchange-lib.js?v=20261016b" defer></script>
   <script src="/assets/exchange-recorder.js?v=20261015a" defer></script>
   <script src="/assets/exchange-drive.js?v=20261012b" defer></script>

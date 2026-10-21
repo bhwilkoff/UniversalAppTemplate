@@ -313,6 +313,7 @@
           drawNotes(res[5].data);
           drawRecognized(res[5].data);
           drawSetup(mine, res[6].data);
+          drawRole(mine, teaching);
           drawPublicChoice(mine, res[1].data);
           drawShowcase(res[1].data);
           drawCredentialNote();
@@ -609,6 +610,18 @@
       st.appendChild(all); st.appendChild(document.createTextNode('.'));
     }
     st.hidden = false;
+  }
+
+  // A teacher opening the page its people see (PAGES.md rule 5): one line
+  // says so and links to the teaching page, and the student's own forms
+  // and getting-ready steps are left out.
+  function drawRole(mine, teaching) {
+    var only = teaching && !mine;
+    $('[data-teacher-line]').hidden = !only;
+    $('[data-teach-link]').href = '/teach/cohort/?c=' + cohort.id;
+    $('[data-kicker]').textContent = only ? 'A cohort you teach' : 'Your cohort';
+    root.querySelectorAll('[data-student-only]').forEach(function (s) { s.hidden = only; });
+    if (only) $('[data-setup]').hidden = true;
   }
 
   function draw(people, mine, sessions, groups, shares, contact, teachers) {
