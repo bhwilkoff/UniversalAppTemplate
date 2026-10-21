@@ -21,7 +21,9 @@
     return nav;
   }
 
-  // o: { cohort: {id, slug, title}, teaching, member, current: 'home' | 'live' | 'teach' }
+  // o: { cohort: {id, slug, title}, teaching, member, current: 'home' | 'live' | 'teach', noBar }
+  // noBar: the page draws its own row (the teaching page's tabs), so two
+  // rows of links never stack.
   function draw(mount, o) {
     if (!mount) return;
     var c = o.cohort, slug = encodeURIComponent(c.slug);
@@ -37,7 +39,7 @@
       li.appendChild(a); ul.appendChild(li);
     });
     bar.appendChild(ul);
-    mount.replaceChildren(crumbs(trail), bar);
+    if (o.noBar) mount.replaceChildren(crumbs(trail)); else mount.replaceChildren(crumbs(trail), bar);
     mount.hidden = false;
   }
 

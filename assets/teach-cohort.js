@@ -22,6 +22,76 @@
   }
 
   // ---- one cohort ---------------------------------------------------
+  // ---- the page's own parts (DESIGN-KIT.md) --------------------------
+  var U = window.UI, tabsCtl = null;
+  var TABS = [
+    { key: 'overview', label: 'Overview' }, { key: 'sessions', label: 'Sessions' }, { key: 'followup', label: 'Follow-up' },
+    { key: 'people', label: 'People' }, { key: 'groups', label: 'Groups' }, { key: 'apps', label: 'Apps' },
+    { key: 'credentials', label: 'Credentials' }, { key: 'settings', label: 'Settings' }
+  ];
+  function drawTabs() {
+    if (tabsCtl) return;
+    var mount = root.querySelector('[data-cohort-tabs]');
+    if (!mount) {
+      mount = el('div', 'cohort-tabs');
+      mount.setAttribute('data-cohort-tabs', '');
+      $('[data-cohort-nav]').after(mount);
+    }
+    tabsCtl = U.tabs(mount, TABS, $('[data-detail]'), { label: current.title });
+  }
+  var STATUS = { draft: ['off', 'Draft'], open: ['done', 'Open for joining'], running: ['time', 'Running'], finished: ['off', 'Finished'] };
+  function drawFacts(c, sessions, people) {
+    var st = STATUS[c.status] || ['off', c.status];
+    var when = c.session_weekday != null && c.session_time ? lib.scheduleText(c, Intl.DateTimeFormat().resolvedOptions().timeZone).replace(/\.$/, '') : null;
+    var here = people.filter(function (p) { return p.status !== 'left'; }).length;
+    $('[data-detail-facts]').replaceChildren(U.facts([
+      ['Status', U.status(st[0], st[1])],
+      ['Meets', when || 'Not set'],
+      ['Starts', c.starts_on ? new Date(c.starts_on + 'T12:00:00').toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' }) : 'Not set'],
+      ['Weeks', String(c.weeks)],
+      ['People', c.capacity ? here + ' of ' + c.capacity : String(here)]
+    ]));
+  }
+  // The one next step for where the cohort stands, then the other views.
+  function drawOverview(c, sessions) {
+    var bar = $('[data-overview-toolbar]'), slug = encodeURIComponent(c.slug);
+    bar.replaceChildren();
+    var live = U.link('Live session', '/live/?c=' + slug), home = U.link('Cohort home', '/cohort/?c=' + slug);
+    if (c.status === 'draft') {
+      bar.appendChild(U.button('Open for joining', 'btn-primary', function (e) {
+        e.target.disabled = true;
+        db.from('cohorts').update({ status: 'open' }).eq('id', c.id).select('id').then(function (r) {
+          if (r.error) { e.target.disabled = false; return say('[data-detail-message]', 'Not opened: ' + r.error.message); }
+          openCohort(c.id);
+        });
+      }));
+    } else if (c.status === 'finished') {
+      bar.appendChild(U.link('Credentials', tabsCtl ? tabsCtl.link('credentials') : '#', 'btn-primary'));
+    } else live.className = 'btn-primary';
+    bar.appendChild(live);
+    bar.appendChild(home);
+    $('[data-make-sessions]').textContent = sessions.length ? 'Update the weekly sessions' : 'Make the weekly sessions';
+    needs.draw();
+  }
+  // What needs the teacher, each a row with a count and a way there.
+  var needs = (function () {
+    var items = {};
+    function draw() {
+      var box = $('[data-needs]');
+      if (!box) return;
+      box.replaceChildren();
+      var keys = Object.keys(items).filter(function (k) { return items[k]; });
+      if (!keys.length) { box.appendChild(U.empty('Nothing needs you right now.')); return; }
+      keys.forEach(function (k) {
+        var n = items[k];
+        var go = U.link(n.action, tabsCtl ? tabsCtl.link(n.tab) : '#', 'btn-secondary small');
+        go.addEventListener('click', function (e) { if (tabsCtl) { e.preventDefault(); tabsCtl.go(n.tab); } });
+        box.appendChild(U.row({ title: n.text, status: U.count(n.count, n.count + ' to see'), actions: [go] }));
+      });
+    }
+    return { set: function (k, v) { items[k] = v; draw(); }, draw: draw };
+  })();
+
   function openCohort(id) {
     Promise.all([
       db.from('cohorts').select('*').eq('id', id).single(),
@@ -38,15 +108,14 @@
       if (bad) return page.fail('This cohort could not be loaded: ' + bad.error.message);
       current = res[0].data;
       document.title = current.title + ' | Human Shaped';
-      if (window.CohortNav) window.CohortNav.draw($('[data-cohort-nav]'), { cohort: current, teaching: true, member: false, current: 'teach' });
+      if (window.CohortNav) window.CohortNav.draw($('[data-cohort-nav]'), { cohort: current, teaching: true, member: false, current: 'teach', noBar: true });
+      drawTabs();
       $('[data-edit]').href = '/teach/cohort/edit/?c=' + current.id;
       currentGroups = res[3].data;
       var c = current;
       say('[data-detail-title]', c.title);
-      var meta = [statusText(c.status)];
-      if (c.session_weekday != null && c.session_time) meta.push(DAYS[c.session_weekday] + 's at ' + c.session_time.slice(0, 5) + ' ' + c.time_zone + ', ' + c.session_minutes + ' minutes');
-      if (c.starts_on) meta.push(c.weeks + ' weeks from ' + c.starts_on);
-      say('[data-detail-meta]', meta.join('. ') + '.');
+      drawFacts(c, res[1].data, res[2].data);
+      drawOverview(c, res[1].data);
       say('[data-detail-message]', '');
       drawSessions(res[1].data);
       if (window.QuestionBank) window.QuestionBank.mount($('[data-question-bank]'), { db: db, cohort: c });
@@ -66,7 +135,7 @@
       loadSince(res[1].data, res[2].data);
       drawCredentials(res[2].data, res[5]);
       var del = $('[data-delete-draft]');
-      del.hidden = c.status !== 'draft';
+      $('[data-danger]').hidden = c.status !== 'draft';
       del.textContent = 'Delete this draft';
       del.removeAttribute('data-armed');
       $('[data-detail]').hidden = false;
@@ -94,7 +163,7 @@
           if (x.action === 'sessions') $('[data-make-sessions]').click();
           else if (x.action === 'meet') askMeet(target);
           else if (x.action === 'provision') provision(target);
-          else if (x.action === 'groups') { var g = $('#groups'); if (g) g.scrollIntoView({ block: 'start' }); }
+          else if (x.action === 'groups') { if (tabsCtl) tabsCtl.go('groups'); }
           else location.assign('/teach/cohort/edit/?c=' + current.id);
         });
       }
@@ -363,9 +432,8 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
     var byId = {};
     people.forEach(function (p) { byId[p.user_id] = F.contributions(p.user_id, w, data); });
     var order = F.followupOrder(people, byId);
-    say('[data-followups-intro]', order.length
-      ? 'What each person did on purpose around week ' + last.number + '’s session, from what they brought back to the feedback they gave, with a place to write to them. Anyone who said something is still muddy comes first. A draft stays in this browser alone until you send it, and sending puts your words where they will see them: on their bring-back, or, if they brought nothing back, as a note on their cohort page that only they and the cohort’s teachers can read. Every word is yours to write.'
-      : 'Once people join, each of them is listed here after every session, with a place to write to them.');
+    say('[data-followups-intro]', order.length ? '' : 'No one has joined yet.');
+    needs.set('followups', order.length ? { count: order.length, text: 'Follow up on week ' + last.number, tab: 'followup', action: 'Write' } : null);
     // The show as it ran (R8): what everyone did together, above what each
     // person did.
     var show = F.showAsRun(data.scenes);
@@ -551,9 +619,7 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
   function drawCheckAnswers(checks, last) {
     var box = $('[data-check-answers]');
     box.replaceChildren();
-    say('[data-checks-heard-intro]', checks.length
-      ? 'Every answer from week ' + last.number + ', by name, for you alone. Read them before the next session, and then say in a few sentences what you heard and what you will change because of it.'
-      : 'No questions were asked in week ' + last.number + '’s session, so there is nothing to read. You can still tell the cohort what you noticed, and what changes.');
+    say('[data-checks-heard-intro]', checks.length ? '' : 'No questions were asked in week ' + last.number + '.');
     checks.forEach(function (k) {
       var card = el('article', 'cohort-card check-answers');
       card.appendChild(el('h4', null, k.prompt));
@@ -575,9 +641,8 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
   function drawNotSeen(list, last) {
     var ul = $('[data-not-seen]');
     ul.replaceChildren();
-    say('[data-not-seen-intro]', list.length
-      ? 'No one listed here has shared, queued, answered a check, or given feedback since week ' + last.number + ' began, so these are the people to reach out to in the next two days, privately and kindly, with an easy way back in. Only you see this. It is worked out each time you open this page, from what you can already read, and it says nothing about who came to the session.'
-      : 'Everyone in the cohort has shared, queued, answered, or given feedback since week ' + last.number + ' began.');
+    say('[data-not-seen-intro]', list.length ? '' : 'Everyone has taken part since week ' + last.number + ' began.');
+    needs.set('notseen', list.length ? { count: list.length, text: 'Not seen since week ' + last.number + ' began', tab: 'followup', action: 'See who' } : null);
     list.forEach(function (p) {
       var li = el('li');
       li.appendChild(el('strong', null, personName(p)));
@@ -824,12 +889,9 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
     var win = S.submissionWindow(current, sessions, new Date());
     var view = S.teacherView(people, hides || []);
     var opens = win.opensAt ? new Date(win.opensAt).toLocaleDateString(undefined, { timeZone: current.time_zone, month: 'long', day: 'numeric' }) : null;
-    say('[data-submissions-intro]', win.open
-      ? 'An app goes up on humanshaped.org/apps/ when its builder says it is ready, and every app in the cohort is up by the time the cohort ends. Who has not submitted yet is listed here for you alone, so that you can reach out.'
-      : 'An app goes up on humanshaped.org/apps/ when its builder says it is ready, and every app in the cohort is up by the time the cohort ends. ' +
-        (opens ? 'From ' + opens + ', a week before the last session,' : 'A week before the last session,') +
-        ' this also lists who has not submitted yet, for you alone, so that you can reach out.');
-    if (!view.submitted.length && !view.notYet.length) { box.appendChild(el('p', 'small', 'Apps appear here once people join.')); return; }
+    say('[data-submissions-intro]', '');
+    needs.set('apps', win.open && view.notYet.length ? { count: view.notYet.length, text: 'Apps not on the apps page yet', tab: 'apps', action: 'See them' } : null);
+    if (!view.submitted.length && !view.notYet.length) { box.appendChild(window.UI.empty('No apps yet.')); return; }
 
     if (view.submitted.length) {
       box.appendChild(el('p', 'kicker', 'Submitted'));
@@ -1095,44 +1157,13 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
     }
 
     if (now.state === 'waiting') {
-      status.textContent = cred.levelName(cred.levelFor(rec.platforms)) + '. Recorded on ' + day(rec.issued_at) + ', and waiting to be signed.';
-      var request = cred.requestFromRecord(rec, p.profiles || { github_login: '' }, current);
+      status.replaceChildren(U.status('waiting', 'With the signer'), document.createTextNode(' ' + cred.levelName(cred.levelFor(rec.platforms)) + ', recorded ' + day(rec.issued_at) + '.'));
       var acts = el('div', 'actions');
-      var copy = el('button', 'btn-secondary', 'Copy what the signing tool needs'); copy.type = 'button';
-      var pick = el('label', 'btn-secondary file-pick', 'Attach the signed file');
-      var file = el('input'); file.type = 'file'; file.accept = '.json,application/json,application/ld+json';
-      pick.appendChild(file);
+      if (teacherRow && teacherRow.can_sign) acts.appendChild(U.link('Sign it', '/teach/signing/', 'btn-secondary'));
       var remove = el('button', 'btn-danger', 'Remove this record'); remove.type = 'button';
-      acts.appendChild(copy); acts.appendChild(pick); acts.appendChild(remove);
+      acts.appendChild(remove);
       card.appendChild(acts);
-      var shown = el('textarea', 'signing-request'); shown.readOnly = true; shown.rows = 8; shown.hidden = true;
-      shown.value = JSON.stringify(request, null, 2);
-      card.appendChild(shown);
       card.appendChild(msg);
-
-      copy.addEventListener('click', function () {
-        var done = function () { msg.textContent = 'Copied. On the signer’s computer, run: pbpaste | node tools/credential/sign.mjs --key <the key file> > signed.json, then attach signed.json here.'; };
-        var fallback = function () { shown.hidden = false; shown.select(); msg.textContent = 'Copy the text above, then give it to the signing tool.'; };
-        if (navigator.clipboard) navigator.clipboard.writeText(shown.value).then(done, fallback); else fallback();
-      });
-
-      file.addEventListener('change', function () {
-        var f = file.files && file.files[0];
-        if (!f) return;
-        msg.textContent = 'Checking the signed file…';
-        f.text().then(function (text) {
-          var doc;
-          try { doc = JSON.parse(text); } catch (e) { throw new Error('That file is not JSON.'); }
-          if (!cred.matchesRow(doc, request)) throw new Error('That file is not the signed credential for this record. Its words or links differ from what was recorded here.');
-          return window.CredentialCheck.check(doc).then(function (r) {
-            if (!r.ok) throw new Error('Its signature does not check out. ' + r.reason);
-            return db.from('credentials').update({ signed: doc }).eq('id', rec.id).select('id');
-          });
-        }).then(function (r) {
-          if (r.error || !r.data.length) throw new Error('It was not saved: ' + (r.error ? r.error.message : 'the database refused') + '.');
-          openCohort(current.id);
-        }).catch(function (err) { msg.textContent = err.message; file.value = ''; });
-      });
 
       remove.addEventListener('click', function () {
         if (!remove.hasAttribute('data-armed')) {
@@ -1226,8 +1257,9 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
   }
 
 
-  var page = P.start(root, function (client, user) {
-    db = client; me = user;
+  var teacherRow = null;
+  var page = P.start(root, function (client, user, name, teacher) {
+    db = client; me = user; teacherRow = teacher;
     if (!id) return page.show('missing');
     openCohort(id);
   });

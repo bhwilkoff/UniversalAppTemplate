@@ -110,5 +110,53 @@
     return a;
   }
 
-  root.UI = { el: el, icon: icon, status: status, visibility: visibility, facts: facts, row: row, rows: rows, empty: empty, disclosure: disclosure, button: button, link: link, WHO: WHO };
+  // A number of things waiting, beside the name of where they are.
+  function count(n, label) {
+    var s = el('span', 'ui-count', String(n));
+    s.setAttribute('aria-label', label || String(n));
+    return s;
+  }
+
+  // Sections of one page that each have their own address (?t=<key>):
+  // links, so they can be opened in a new tab and shared, with the one
+  // you are on marked, and the panels with data-tab="<key>" shown one at
+  // a time without a reload. Returns { go(key), current() }.
+  function tabs(mount, items, panelsRoot, opts) {
+    opts = opts || {};
+    var nav = el('nav', 'area-nav ui-tabs');
+    nav.setAttribute('aria-label', opts.label || 'Sections');
+    var ul = el('ul'), links = {};
+    items.forEach(function (it) {
+      var li = el('li'), a = el('a', null, it.label);
+      var u = new URL(location.href);
+      if (it.key === items[0].key) u.searchParams.delete('t'); else u.searchParams.set('t', it.key);
+      a.href = u.pathname + u.search;
+      if (it.count) a.appendChild(count(it.count, it.count + ' waiting'));
+      a.addEventListener('click', function (e) {
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.button) return;
+        e.preventDefault();
+        go(it.key, true);
+      });
+      links[it.key] = a;
+      li.appendChild(a); ul.appendChild(li);
+    });
+    nav.appendChild(ul);
+    mount.replaceChildren(nav);
+    var now = null;
+    function go(key, push) {
+      if (!links[key]) key = items[0].key;
+      now = key;
+      Object.keys(links).forEach(function (k) {
+        if (k === key) links[k].setAttribute('aria-current', 'page'); else links[k].removeAttribute('aria-current');
+      });
+      panelsRoot.querySelectorAll('[data-tab]').forEach(function (p) { p.hidden = p.getAttribute('data-tab') !== key; });
+      if (push) history.pushState({ t: key }, '', links[key].getAttribute('href'));
+      if (opts.onChange) opts.onChange(key);
+    }
+    window.addEventListener('popstate', function () { go(new URLSearchParams(location.search).get('t') || items[0].key, false); });
+    go(new URLSearchParams(location.search).get('t') || items[0].key, false);
+    return { go: function (k) { go(k, true); }, current: function () { return now; }, link: function (k) { return links[k] && links[k].getAttribute('href'); } };
+  }
+
+  root.UI = { el: el, icon: icon, status: status, visibility: visibility, facts: facts, row: row, rows: rows, empty: empty, disclosure: disclosure, button: button, link: link, count: count, tabs: tabs, WHO: WHO };
 })(typeof window !== 'undefined' ? window : this);

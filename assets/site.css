@@ -2550,3 +2550,14 @@ html.app-nav-open[data-signed-in] body:not([data-no-app-nav]) .app-nav { display
   html[data-signed-in] body:not([data-no-app-nav]) .app-nav { display: block; position: fixed; top: var(--header-h, 4rem); left: 0; bottom: 0; width: 15rem; border-right: 1px solid var(--rule); box-shadow: none; }
 }
 @media print { .app-nav, .app-menu-button { display: none !important; } html[data-signed-in] body { padding-left: 0 !important; } }
+.ui-count { display: inline-block; margin-left: 0.4rem; min-width: 1.35rem; padding: 0 0.4rem; border-radius: 0.7rem; background: var(--surface); color: var(--ink); font-size: 0.8rem; font-weight: 650; line-height: 1.35rem; text-align: center; }
+.panel-section { margin: 0 0 2rem; }
+.panel-section > h2, [data-tab] > section > h2, [data-tab] h2 { font-size: 1.25rem; margin: 1.5rem 0 0.6rem; }
+[data-tab] > :first-child > h2:first-child { margin-top: 0.5rem; }
+.ui-inline-status { margin: 0.25rem 0; color: var(--muted); font-size: 0.95rem; }
+.ui-inline-status:empty { display: none; }
+.ui-help { margin: 0.5rem 0; font-size: 0.95rem; }
+.ui-meta-line { margin: 0 0 0.75rem; }
+.cohort-tabs .area-nav { margin-top: 0.5rem; }
+.cohort-tabs + .page-head { padding-top: 1.75rem; }
+.danger-zone { border-top: 1px solid var(--rule); padding-top: 0.5rem; }
