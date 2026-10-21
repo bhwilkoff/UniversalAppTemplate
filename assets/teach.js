@@ -270,6 +270,7 @@
   });
 
   // ---- one cohort ---------------------------------------------------
+  var scrollToDetail = false;
   function openCohort(id) {
     Promise.all([
       db.from('cohorts').select('*').eq('id', id).single(),
@@ -316,6 +317,7 @@
       del.textContent = 'Delete this draft';
       del.removeAttribute('data-armed');
       $('[data-detail]').hidden = false;
+      if (scrollToDetail) { scrollToDetail = false; $('[data-detail]').scrollIntoView({ block: 'start' }); }
     });
   }
   $('[data-edit]').addEventListener('click', function () { fillForm(current); });
@@ -1711,7 +1713,7 @@
         show('teacher');
         // A poll that became a cohort links to it as /teach/?c=<its id>.
         var asked = new URLSearchParams(location.search).get('c');
-        var jobs = [loadList().then(function () { if (asked) openCohort(asked); }), loadQueue()];
+        var jobs = [loadList().then(function () { if (asked) { scrollToDetail = true; openCohort(asked); } }), loadQueue()];
         if (r.data.can_approve) jobs.push(loadRequests());
         if (r.data.can_sign) jobs.push(loadSigning());
         return Promise.all(jobs);
