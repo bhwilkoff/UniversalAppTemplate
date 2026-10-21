@@ -84,6 +84,10 @@
   var teachItem = null, adminItem = null;
   function drawRoles(r) {
     var teaching = !!(r && r.teacher), admin = !!(r && r.admin);
+    // An area's row shows at once from the note, so the page does not jump
+    // when the hub answers; the page still checks before drawing anything.
+    if (teaching) document.querySelectorAll('[data-area-nav="teaching"]').forEach(function (n) { n.hidden = false; });
+    if (admin) document.querySelectorAll('[data-area-nav="admin"]').forEach(function (n) { n.hidden = false; });
     if (nav && teaching && !teachItem) {
       teachItem = el('li');
       var a = el('a', null, 'Teaching');

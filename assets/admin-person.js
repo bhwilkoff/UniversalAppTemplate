@@ -26,7 +26,7 @@
       var acts = el('div', 'actions');
       var msg = el('p', 'small'); msg.setAttribute('role', 'status');
       if (self && has && (r.key === 'can_admin' || r.key === 'teacher')) {
-        acts.appendChild(el('p', 'small', 'Another admin can take this away; you cannot take it from yourself.'));
+        text.appendChild(el('p', 'small', 'Only another admin can take this from you.'));
       } else {
         var b = el('button', 'btn-secondary small', has ? r.take : r.give);
         b.type = 'button';
@@ -83,6 +83,7 @@
     var facts = (person.github_login ? '@' + person.github_login + ' on GitHub. ' : 'Signed in with Google, with no GitHub linked. ') +
       'First signed in ' + new Date(person.created_at).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' }) + '.';
     $('[data-person-facts]').textContent = facts;
+    $('[data-may-title]').textContent = person.id === me.id ? 'What you may do' : 'What they may do';
     var req = $('[data-request]');
     req.hidden = !(person.request && person.request.state === 'waiting');
     drawRights();
