@@ -15,18 +15,12 @@
 
   function $(sel) { return root.querySelector(sel); }
   function say(sel, text) { $(sel).textContent = text || ''; }
-  function statusText(s) {
-    return { draft: 'Draft, visible only to you', open: 'Open for people to join', running: 'Running', finished: 'Finished' }[s] || s;
-  }
 
   // ---- what needs you -----------------------------------------------
   // One row per queue that has something in it, each a count and a link.
-  function row(box, text, href, label) {
-    var li = el('li');
-    li.appendChild(el('span', null, text + ' '));
-    var a = el('a', 'btn-secondary small', label); a.href = href;
-    li.appendChild(a);
-    box.appendChild(li);
+  // One row per queue with something in it: its name, a count, one way in.
+  function row(box, n, title, href, noun) {
+    box.appendChild(window.UI.row({ title: title, href: href, status: window.UI.count(n, noun) }));
   }
   function loadNeeds(teacher) {
     var jobs = [
@@ -49,11 +43,11 @@
     return Promise.all(jobs).then(function (n) {
       var box = $('[data-needs]');
       box.replaceChildren();
-      if (n[0]) row(box, n[0] === 1 ? 'One request for feedback or question is waiting for you.' : n[0] + ' requests for feedback and questions are waiting for you.', '/teach/feedback/', 'Answer them');
-      if (n[1]) row(box, n[1] === 1 ? 'One person is asking to teach.' : n[1] + ' people are asking to teach.', '/teach/requests/', 'Read the requests');
-      if (n[2]) row(box, n[2] === 1 ? 'One credential is waiting to be signed.' : n[2] + ' credentials are waiting to be signed.', '/teach/signing/', 'Sign them');
-      if (n[0] == null || n[1] == null || n[2] == null) row(box, 'Some of what waits for you could not be counted just now.', '/teach/feedback/', 'Open your feedback queue');
-      $('[data-needs-none]').hidden = !!box.children.length;
+      if (n[0]) row(box, n[0], 'Feedback', '/teach/feedback/', 'waiting');
+      if (n[1]) row(box, n[1], 'Requests to teach', '/teach/requests/', 'waiting');
+      if (n[2]) row(box, n[2], 'Signing', '/teach/signing/', 'to sign');
+      if (n[0] == null || n[1] == null || n[2] == null) box.appendChild(window.UI.row({ title: 'Some counts could not load', status: window.UI.status('action', 'failed') }));
+      if (!box.children.length) box.appendChild(window.UI.empty('Nothing waiting'));
     });
   }
 
@@ -65,15 +59,16 @@
       box.replaceChildren();
       var cohorts = r.data.map(function (x) { return x.cohorts; }).filter(Boolean)
         .sort(function (a, b) { return (b.starts_on || '').localeCompare(a.starts_on || ''); });
-      if (!cohorts.length) box.appendChild(window.UI.empty('No cohorts yet', window.UI.link('Plan a cohort', '/teach/new/', 'btn-secondary')));
+      if (!cohorts.length) { box.appendChild(window.UI.empty('No cohorts yet', window.UI.link('Plan a cohort', '/teach/new/', 'btn-secondary'))); return; }
+      var list = window.UI.rows();
       cohorts.forEach(function (c) {
-        var card = el('article', 'cohort-card');
-        var h = card.appendChild(el('h3'));
-        var a = h.appendChild(el('a', null, c.title));
-        a.href = '/teach/cohort/?c=' + c.id;
-        card.appendChild(el('p', 'small', statusText(c.status) + (c.starts_on ? ', first day ' + c.starts_on : '') + '.'));
-        box.appendChild(card);
+        list.appendChild(window.UI.row({
+          title: c.title, href: '/teach/cohort/?c=' + c.id,
+          meta: c.starts_on ? 'Starts ' + new Date(c.starts_on + 'T12:00:00').toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' }) : 'Dates not set',
+          status: window.UI.status('cohort', c.status)
+        }));
       });
+      box.appendChild(list);
     });
   }
 
@@ -158,6 +153,7 @@
 
   var page = P.start(root, function (client, user, name, teacher) {
     db = client; me = user;
+    var acts = document.querySelector('[data-desk-actions]'); if (acts) acts.hidden = false;
     return Promise.all([loadNeeds(teacher), loadList()]);
   }, { notTeacher: function (client, user) { db = client; me = user; return loadMyRequest(); } });
 })();
