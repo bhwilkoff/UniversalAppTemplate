@@ -622,6 +622,7 @@
     $('[data-kicker]').textContent = only ? 'A cohort you teach' : 'Your cohort';
     root.querySelectorAll('[data-student-only]').forEach(function (s) { s.hidden = only; });
     if (only) $('[data-setup]').hidden = true;
+    if (window.CohortNav) window.CohortNav.draw($('[data-cohort-nav]'), { cohort: cohort, teaching: teaching, member: !!mine, current: 'home' });
   }
 
   function draw(people, mine, sessions, groups, shares, contact, teachers) {

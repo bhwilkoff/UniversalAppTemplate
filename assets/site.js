@@ -78,6 +78,42 @@
     nav.insertBefore(li, nav.firstChild);
   }
 
+  // Teaching, second, for anyone who teaches; Run the hub in the account
+  // menu for an admin (PAGES.md, "How you find your way"). The roles come
+  // from HS.roles, which pages that read them keep in this browser.
+  var teachItem = null, adminItem = null;
+  function drawRoles(r) {
+    var teaching = !!(r && r.teacher), admin = !!(r && r.admin);
+    if (nav && teaching && !teachItem) {
+      teachItem = el('li');
+      var a = el('a', null, 'Teaching');
+      a.href = '/teach/';
+      if (/^\/teach\//.test(location.pathname)) {
+        nav.querySelectorAll('[aria-current]').forEach(function (x) { x.removeAttribute('aria-current'); });
+        a.setAttribute('aria-current', 'page');
+      }
+      teachItem.appendChild(a);
+      nav.insertBefore(teachItem, nav.children[1] || null);
+    } else if (teachItem && !teaching) { teachItem.remove(); teachItem = null; }
+    if (admin && !adminItem) {
+      adminItem = el('li');
+      var b = el('a', null, 'Run the hub');
+      b.href = '/admin/';
+      adminItem.appendChild(b);
+      list.insertBefore(adminItem, list.children[2] || null);
+    } else if (adminItem && !admin) { adminItem.remove(); adminItem = null; }
+  }
+  window.HS = window.HS || {};
+  window.HS.roles = function (r) {
+    if (r === undefined) {
+      try { var c = JSON.parse(localStorage.getItem('hs-roles') || 'null'); return c && c.uid === user.id ? c : null; } catch (e) { return null; }
+    }
+    var kept = { uid: user.id, teacher: !!r.teacher, admin: !!r.admin, at: Date.now() };
+    try { localStorage.setItem('hs-roles', JSON.stringify(kept)); } catch (e) {}
+    drawRoles(kept);
+    return kept;
+  };
+
   var wrap = el('div', 'account-menu');
   var button = el('button', 'account-button');
   button.type = 'button';
@@ -102,6 +138,19 @@
   wrap.appendChild(button);
   wrap.appendChild(list);
   link.replaceWith(wrap);
+  drawRoles(window.HS.roles());
+
+  // Roles change rarely, so the note is read again only when it is a day
+  // old, on a page that already has the hub's client.
+  window.addEventListener('load', function () {
+    var kept = window.HS.roles();
+    if (kept && Date.now() - kept.at < 864e5) return;
+    if (!window.HUB || !window.supabase) return;
+    var db = window.HUB.client ? window.HUB.client() : window.supabase.createClient(window.HUB.url, window.HUB.key);
+    db.from('teachers').select('*').eq('user_id', user.id).maybeSingle().then(function (r) {
+      if (!r.error) window.HS.roles({ teacher: !!r.data, admin: !!(r.data && r.data.can_admin) });
+    });
+  });
 
   function close(focus) {
     if (list.hidden) return;
@@ -117,4 +166,27 @@
   wrap.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(true); });
   document.addEventListener('click', function (e) { if (!wrap.contains(e.target)) close(false); });
   wrap.addEventListener('focusout', function (e) { if (e.relatedTarget && !wrap.contains(e.relatedTarget)) close(false); });
+})();
+
+// An area's row of links (.area-nav: Teaching, Run the hub, one cohort)
+// marks the page you are on, by its address (PAGES.md).
+(function () {
+  function mark() {
+    document.querySelectorAll('.area-nav').forEach(function (nav) {
+      var best = null, bestLen = -1;
+      nav.querySelectorAll('a[href]').forEach(function (a) {
+        a.removeAttribute('aria-current');
+        var u = new URL(a.href, location.href);
+        var exact = u.pathname === location.pathname && (!u.search || u.search === location.search);
+        var len = exact ? 1e6 : (location.pathname.indexOf(u.pathname) === 0 && u.pathname.length > 1 && a.hasAttribute('data-prefix') ? u.pathname.length : -1);
+        var also = a.getAttribute('data-also');
+        if (also && location.pathname.indexOf(also) === 0) len = Math.max(len, also.length);
+        if (len > bestLen) { best = a; bestLen = len; }
+      });
+      if (best && bestLen >= 0) best.setAttribute('aria-current', 'page');
+    });
+  }
+  window.HS = window.HS || {};
+  window.HS.markAreaNav = mark;
+  mark();
 })();

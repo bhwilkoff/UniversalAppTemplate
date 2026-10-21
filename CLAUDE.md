@@ -114,6 +114,9 @@ as Ben's without his review, $0 to run.
   PRINCIPLES.md through `PrinciplesLib.page`: each statement whole and
   alike, opening to what it means and how you can tell; old
   /principles/#why links land on /about/.
+- **PAGES.md is binding**: every page, who it is for, what it shows, what
+  can be done there, and how you find your way (header, area rows, cohort
+  header, breadcrumbs). Read it before adding a page, section, or form.
 - Each kind of content has its own page (Ben, October 21; DECISIONS.md):
   a list page lists, and each thing opens at its own address, never
   unfolded under the list.

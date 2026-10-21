@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261021b">
+  <link rel="stylesheet" href="/assets/site.css?v=20261021c">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -33,7 +33,7 @@
       if (t) document.documentElement.setAttribute('data-theme', t);
     })();
   </script>
-  <script src="/assets/site.js?v=20261014a" defer></script>
+  <script src="/assets/site.js?v=20261021a" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to the page</a>
@@ -63,7 +63,16 @@
 
   <main id="main">
     <div class="wrap">
-      <p class="crumbs"><a href="/teach/">Teaching</a> &rsaquo; A new cohort</p>
+      <nav class="area-nav" aria-label="Teaching" data-area-nav="teaching" hidden>
+        <ul>
+          <li><a href="/teach/" data-prefix>Desk</a></li>
+          <li><a href="/teach/feedback/">Feedback</a></li>
+          <li><a href="/teach/times/" data-prefix>Polls</a></li>
+          <li data-needs-right="can_approve" hidden><a href="/teach/requests/">Requests to teach</a></li>
+          <li data-needs-right="can_sign" hidden><a href="/teach/signing/">Signing</a></li>
+        </ul>
+      </nav>
+      <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/teach/">Teaching</a></li></ol></nav>
       <header class="page-head">
         <h1 data-form-title>A new cohort.</h1>
       </header>
@@ -187,7 +196,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" defer></script>
   <script src="/assets/hub-config.js?v=20261016a" defer></script>
   <script src="/assets/teach-lib.js?v=20261006g" defer></script>
-  <script src="/assets/teach-page.js?v=20261021b" defer></script>
+  <script src="/assets/teach-page.js?v=20261021c" defer></script>
   <script src="/assets/teach-cohort-form.js?v=20261021c" defer></script>
 
   <footer class="site-footer">

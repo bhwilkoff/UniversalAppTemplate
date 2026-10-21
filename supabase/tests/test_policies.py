@@ -151,6 +151,8 @@ def main():
             cur.execute("select set_config('request.jwt.claim.sub', %s, false)", (people[name],))
         return cur
 
+    last_reason = ['']
+
     def attempt(cur, sql, args=()):
         try:
             cur.execute("savepoint s")
@@ -160,6 +162,7 @@ def main():
             return True
         except psycopg2.Error as err:
             reason = (err.pgerror or str(err)).strip().splitlines()[0]
+            last_reason[0] = reason
             print(f"     refused: {reason}")
             cur.execute("rollback to savepoint s")
             return False
@@ -2865,6 +2868,59 @@ def main():
     check("its maker deletes it, and its videos go with it",
           attempt(as_user("xan"), "delete from public.exchanges where token = %s returning id", (xo,)) and len(last_rows) == 1
           and attempt(as_user(None), see, (xo,)) and last_rows == [(None,)])
+
+    # Running the hub (migration 20261021020000): an admin changes anyone's
+    # hub-wide rights through admin_set_right, every change is logged, no
+    # one removes their own admin right, and the hub keeps one admin.
+    su.execute("reset role")
+    su.execute("update public.teachers set can_admin = (user_id = %s)", (people["ben"],))
+    setr = "select public.admin_set_right(%s, %s, %s, %s)"
+    check("someone who is not an admin cannot see everyone",
+          not attempt(as_user("kofi"), "select * from public.admin_people(null)"))
+    check("nor change a right", not attempt(as_user("kofi"), setr, (people["xan"], "teacher", True, None)))
+    check("nor can an admin's agent", not attempt(as_agent("ben"), setr, (people["xan"], "teacher", True, None)))
+    check("nor can anyone signed out", not attempt(as_user(None), setr, (people["xan"], "teacher", True, None)))
+    check("no one writes to the log directly",
+          not attempt(as_user("ben"), "insert into public.role_changes (subject, \"right\", before, after) values (%s, 'teacher', false, true)", (people["xan"],)))
+    check("an admin finds people by name",
+          attempt(as_user("ben"), "select github_login, teacher from public.admin_people('xa')") and ("xan", False) in last_rows)
+    check("an admin makes someone a teacher",
+          attempt(as_user("ben"), setr, (people["xan"], "teacher", True, "Testing (delete me)"))
+          and last_rows[0][0]["teacher"] is True)
+    check("granting signing to someone who does not teach makes them a teacher too",
+          attempt(as_user("ben"), setr, (people["yara"], "can_sign", True, None))
+          and last_rows[0][0]["teacher"] is True and last_rows[0][0]["can_sign"] is True)
+    check("and both changes are in the log, with who made them",
+          attempt(as_user("ben"), "select \"right\", before, after, actor::text from public.role_changes where subject = %s order by id", (people["yara"],))
+          and last_rows == [("teacher", False, True, people["ben"]), ("can_sign", False, True, people["ben"])])
+    check("a person reads the changes to their own rights",
+          attempt(as_user("yara"), "select count(*) from public.role_changes where subject = %s", (people["yara"],)) and last_rows == [(2,)])
+    check("but not anyone else's",
+          attempt(as_user("yara"), "select count(*) from public.role_changes where subject = %s", (people["xan"],)) and last_rows == [(0,)])
+    check("setting a right it already has changes nothing and logs nothing",
+          attempt(as_user("ben"), setr, (people["yara"], "can_sign", True, None))
+          and attempt(as_user("ben"), "select count(*) from public.role_changes where subject = %s", (people["yara"],)) and last_rows == [(2,)])
+    check("an admin cannot take away their own admin right",
+          not attempt(as_user("ben"), setr, (people["ben"], "can_admin", False, None)) and "your own admin right" in last_reason[0])
+    check("nor their own teaching, which would take it too",
+          not attempt(as_user("ben"), setr, (people["ben"], "teacher", False, None)) and "your own admin right" in last_reason[0])
+    check("an admin makes another admin", attempt(as_user("ben"), setr, (people["xan"], "can_admin", True, None)))
+    check("who can then take the first admin's right away",
+          attempt(as_user("xan"), setr, (people["ben"], "can_admin", False, None)) and last_rows[0][0]["can_admin"] is False)
+    check("and the last admin cannot give theirs up",
+          not attempt(as_user("xan"), "select public.admin_set_right(%s, 'can_admin', false, null)", (people["xan"],))
+          and ("at least one admin" in last_reason[0] or "your own admin right" in last_reason[0]))
+    attempt(as_user("xan"), setr, (people["ben"], "can_admin", True, None))
+    check("taking away teaching takes signing with it, and logs each",
+          attempt(as_user("ben"), setr, (people["yara"], "teacher", False, None))
+          and last_rows[0][0]["teacher"] is False and last_rows[0][0]["can_sign"] is False
+          and attempt(as_user("ben"), "select \"right\", after from public.role_changes where subject = %s order by id desc limit 2", (people["yara"],))
+          and sorted(last_rows) == [("can_sign", False), ("teacher", False)])
+    check("an admin reads the whole log", attempt(as_user("ben"), "select jsonb_array_length(public.admin_changes(50))") and last_rows[0][0] >= 6)
+    check("no one else does", not attempt(as_user("kofi"), "select public.admin_changes(50)"))
+    check("there is no such right as owner", not attempt(as_user("ben"), setr, (people["xan"], "owner", True, None)))
+    attempt(as_user("ben"), setr, (people["xan"], "can_admin", False, None))
+    attempt(as_user("ben"), setr, (people["xan"], "teacher", False, None))
     conn.rollback()
     conn.close()
     failed = [n for n, ok in results if not ok]
