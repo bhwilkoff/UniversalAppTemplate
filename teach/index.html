@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261021a">
+  <link rel="stylesheet" href="/assets/site.css?v=20261021b">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -72,10 +72,18 @@
         <section class="account-state" data-state="loading"><p>Checking whether you are signed in…</p></section>
 
         <section class="account-state" data-state="signed-out" hidden>
-          <p>Teaching starts with signing in, the same way everyone else does, and that is also how you ask to teach. <a href="/teach/guide/">The teaching guide</a> says what leading a cohort asks of you.</p>
+          <p>This page is for teachers, so it starts with signing in.</p>
           <p><a class="btn-primary" href="/account/"><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Sign in with GitHub</a></p>
         </section>
 
+        <section class="account-state" data-state="not-teacher" hidden>
+          <p>This page is for teachers. <a href="/teach/">Ask to teach a cohort</a>, and once you are approved it opens for you.</p>
+        </section>
+
+        <section class="account-state" data-state="error" hidden>
+          <p class="error" data-error-text role="alert"></p>
+          <p><button class="btn-secondary" type="button" data-reload>Try again</button></p>
+        </section>
         <!-- The words in the three request states below were written by
              Claude for milestone M2 and await Ben's review. -->
         <section class="account-state" data-state="ask" hidden>
@@ -115,242 +123,14 @@
           <p class="small" data-asked-message></p>
         </section>
 
-        <section class="account-state" data-state="error" hidden>
-          <p class="error" data-error-text role="alert"></p>
-          <p><button class="btn-secondary" type="button" data-reload>Try again</button></p>
-        </section>
-
         <section class="account-state" data-state="teacher" hidden>
-          <div class="queue" data-requests hidden>
-            <h2 id="requests">Asking to teach</h2>
-            <p class="small">People who would like to lead a cohort, oldest first. Approving one makes them a teacher here, able to make cohorts of their own, and whatever you write in the answer is what they will read.</p>
-            <div data-request-list></div>
-          </div>
-
-          <!-- Written by Claude, awaiting Ben's review (H2). -->
-          <div class="queue" data-signing hidden>
-            <h2>Waiting to be signed</h2>
-            <p class="small">Credentials the teachers of any cohort have recorded, oldest first. Copy one, run <code>node tools/credential/sign-waiting.mjs</code> in the site folder on the computer that holds the key, and paste what it puts back on your clipboard here. The page checks the signature before it saves anything.</p>
-            <div data-signing-list></div>
-          </div>
-
-          <div class="queue" data-queue>
-            <h2 id="waiting">Waiting for your feedback</h2>
-            <p class="small" data-queue-intro>When someone in one of your cohorts asks for feedback or asks a question, it waits here until you answer, oldest first.</p>
-            <div data-queue-list></div>
-          </div>
+          <h2>What needs you</h2>
+          <ul class="needs" data-needs></ul>
+          <p class="small" data-needs-none hidden>Nothing is waiting for you right now.</p>
 
           <h2>Your cohorts</h2>
           <div data-cohort-list></div>
-          <p class="actions"><button class="btn-secondary" type="button" data-new-cohort>Start a new cohort</button><a class="btn-secondary" href="/teach/times/">Find a weekly time with the people who might join</a></p>
-
-          <!-- The cohort form (Ben, October 6): every question is one that
-               changes how the cohort runs. Words by Claude, awaiting Ben's review. -->
-          <form class="cohort-builder" data-cohort-form hidden novalidate>
-            <header class="builder-head">
-              <p class="kicker">Teach a cohort</p>
-              <h2 data-form-title>A new cohort</h2>
-              <p>Each answer shapes how the cohort runs: who it is for, when it meets, how many people can join, and who can see it. You can change any of them later, except its address.</p>
-            </header>
-            <div class="builder-grid">
-              <div class="builder-steps">
-                <fieldset class="q">
-                  <legend><span class="q-n">1</span>What will people call it?</legend>
-                  <p class="hint" id="q-title-hint">Its name on the cohorts page and at the top of its own page.</p>
-                  <input id="cohort-title" name="title" maxlength="120" placeholder="Fall 2026, Tuesday evenings" aria-describedby="q-title-hint" aria-label="The cohort's name" autocomplete="off">
-                  <p class="addr" data-slug-line>Its address: <span class="url">humanshaped.org/cohort/?c=<b data-slug-show>&hellip;</b></span> <button class="text-button" type="button" data-slug-edit>Change it</button></p>
-                  <label class="sub" data-slug-field hidden>The short name in its address <input id="cohort-slug" name="slug" maxlength="60" autocomplete="off" spellcheck="false" autocapitalize="off"><span class="hint">Lowercase letters, numbers, and hyphens. It stays the same once the cohort is saved, so links to it keep working.</span></label>
-                </fieldset>
-
-                <fieldset class="q">
-                  <legend><span class="q-n">2</span>Who is it for, and what will they build?</legend>
-                  <p class="hint" id="q-desc-hint">A sentence or two in your own words, shown under its name. Say who you hope will join and the kind of problem they might bring.</p>
-                  <textarea id="cohort-description" name="description" rows="3" maxlength="2000" aria-describedby="q-desc-hint" aria-label="Who it is for" placeholder="Teachers who want a tool their students would actually use, built in the evenings after school."></textarea>
-                </fieldset>
-
-                <fieldset class="q">
-                  <legend><span class="q-n">3</span>When does week 1 begin?</legend>
-                  <p class="hint" id="q-start-hint">Cohort Prep is the week before it, and the cohort runs for 5 weeks from here.</p>
-                  <input id="cohort-starts" type="date" name="starts_on" aria-describedby="q-start-hint" aria-label="The day week 1 begins">
-                  <input type="hidden" name="weeks" value="5">
-                </fieldset>
-
-                <fieldset class="q">
-                  <legend><span class="q-n">4</span>When does the class meet each week?</legend>
-                  <p class="hint">One live session a week. The first is on the first of these days on or after week 1 begins, and everyone sees the time in their own time zone too.</p>
-                  <div class="row">
-                    <label>Day <select id="cohort-day" name="session_weekday">
-                      <option value="">Not decided yet</option><option value="0">Sunday</option><option value="1">Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5">Friday</option><option value="6">Saturday</option>
-                    </select></label>
-                    <label>Time <input id="cohort-time" type="time" name="session_time"></label>
-                    <label>Time zone <input id="cohort-zone" name="time_zone" list="zones" autocomplete="off"></label>
-                  </div>
-                  <label class="sub">How long <select id="cohort-minutes" name="session_minutes">
-                    <option value="60">An hour</option>
-                    <option value="75">75 minutes, as the weekly guides are written</option>
-                    <option value="90">90 minutes</option>
-                    <option value="120">Two hours</option>
-                  </select><span class="hint">Sessions of an hour or less leave out the break.</span></label>
-                  <datalist id="zones" data-zones></datalist>
-                </fieldset>
-
-                <fieldset class="q">
-                  <legend><span class="q-n">5</span>How many people can join?</legend>
-                  <p class="hint" id="q-cap-hint">Everyone works in a group of three that stays together, so a multiple of three keeps everyone in a group. Leave it empty for no limit.</p>
-                  <input id="cohort-capacity" type="number" name="capacity" min="1" max="500" inputmode="numeric" placeholder="No limit" aria-describedby="q-cap-hint" aria-label="How many people can join">
-                </fieldset>
-
-                <fieldset class="q">
-                  <legend><span class="q-n">6</span>Where does it stand?</legend>
-                  <div class="choices">
-                    <label class="choice"><input type="radio" name="status" value="draft"><span><b>Draft</b> Only its teachers can see it. Start here.</span></label>
-                    <label class="choice"><input type="radio" name="status" value="open"><span><b>Open</b> Listed on the cohorts page, and people can join.</span></label>
-                    <label class="choice"><input type="radio" name="status" value="running"><span><b>Running</b> The weeks have begun, and it leaves the cohorts page.</span></label>
-                    <label class="choice"><input type="radio" name="status" value="finished"><span><b>Finished</b> The weeks are over. Each live session's questions and answers are deleted, and you can issue credentials.</span></label>
-                  </div>
-                </fieldset>
-
-                <fieldset class="q">
-                  <legend><span class="q-n">7</span>Who can read its conversation?</legend>
-                  <p class="hint">The cohort talks in Discussions in its own private repository on GitHub, which the hub makes for you under Before the first session.</p>
-                  <label class="check"><input type="checkbox" name="conversations_open"> People outside the cohort can read it too</label>
-                  <details class="by-hand">
-                    <summary>Using a repository and team you made by hand</summary>
-                    <p class="hint">Fill these in only if you made them yourself in the humanshaped organization on GitHub.</p>
-                    <div class="row">
-                      <label>Repository <input name="github_repo" placeholder="humanshaped/cohort-fall-2026" autocomplete="off" spellcheck="false" autocapitalize="off"></label>
-                      <label>Team <input name="github_team" placeholder="cohort-fall-2026" autocomplete="off" spellcheck="false" autocapitalize="off"></label>
-                    </div>
-                  </details>
-                </fieldset>
-              </div>
-
-              <aside class="builder-preview" aria-label="How it will look on the cohorts page">
-                <p class="kicker">On the cohorts page</p>
-                <article class="open-cohort" data-preview>
-                  <h3 data-preview-title>Your cohort's name</h3>
-                  <p class="small" data-preview-line></p>
-                  <p class="small" data-preview-time></p>
-                  <p data-preview-desc></p>
-                  <div class="actions"><span class="btn-primary" aria-hidden="true">Join with GitHub</span></div>
-                </article>
-                <p class="small" data-preview-note>People see it here once it is Open.</p>
-              </aside>
-            </div>
-            <div class="builder-actions">
-              <button class="btn-primary" type="submit">Save the cohort</button>
-              <button class="btn-secondary" type="button" data-cancel>Cancel</button>
-              <p class="small" data-form-message role="status"></p>
-            </div>
-          </form>
-
-          <div class="cohort-detail" data-detail hidden>
-            <h2 data-detail-title></h2>
-            <p class="small" data-detail-meta></p>
-            <div class="actions">
-              <button class="btn-secondary" type="button" data-edit>Edit the details</button>
-              <button class="btn-secondary" type="button" data-make-sessions>Make the weekly sessions</button>
-              <a class="btn-secondary" data-live-link href="/live/">Open the live page</a>
-              <a class="btn-secondary" data-rooms-link href="/live/#rooms">Every rehearsal room now</a>
-              <button class="btn-secondary" type="button" data-copy-meet>Copy the setup for the Meet script</button>
-              <button class="btn-danger" type="button" data-delete-draft hidden>Delete this draft</button>
-            </div>
-            <p class="small" data-detail-message></p>
-            <!-- Words by Claude, awaiting Ben's review (H4). -->
-            <p class="small">In the call itself, the live page in a tab beside Meet does everything a teacher needs. The Human Shaped add-on puts the same things in Meet’s own side panel, and it works for meet@humanshaped.org only until it is listed: <a href="https://github.com/bhwilkoff/UniversalAppTemplate/blob/site/tools/meet-addon/README.md#who-can-use-it" target="_blank" rel="noopener">who can use it, and how it is installed</a>.</p>
-            <textarea class="signing-request" readonly rows="10" aria-label="The setup for the Meet script" data-meet-text hidden></textarea>
-
-            <section class="cohort-card setup-card" aria-labelledby="cohort-setup-title" data-cohort-setup hidden>
-              <h3 id="cohort-setup-title">Before the first session</h3>
-              <p class="small">What this cohort needs before people arrive. Each step checks itself off when the hub can see it is done, and <a href="/teach/guide/#need">the teaching guide</a> says more about each one.</p>
-              <ol class="setup-steps" data-cohort-setup-steps></ol>
-            </section>
-
-            <!-- The words in the two sections below were written by Claude
-                 for milestone M12 (closing the loop on checks, and not seen
-                 this week) and await Ben's review. -->
-            <section class="since" aria-labelledby="checks-heard-title" data-since hidden>
-              <h3 id="checks-heard-title" data-checks-heard-title></h3>
-              <p class="small" data-checks-heard-intro></p>
-              <div data-check-answers></div>
-              <form class="inline-form" data-heard-form>
-                <label>What I heard, and what changes
-                  <span class="hint">Your own words to the whole cohort, which the session page shows while people arrive next time. Say what you noticed across the answers rather than who wrote what.</span>
-                  <textarea name="heard" rows="4" maxlength="2000"></textarea>
-                </label>
-                <div class="actions"><button class="btn-secondary" type="submit">Save it</button><span class="small" data-heard-message role="status"></span></div>
-              </form>
-
-              <h3 id="not-seen-title" data-not-seen-title></h3>
-              <p class="small" data-not-seen-intro></p>
-              <ul class="roster not-seen" data-not-seen></ul>
-
-              <!-- Follow-ups (C7): words by Claude, awaiting Ben's review. -->
-              <h3 id="followups-title" data-followups-title></h3>
-              <p class="small" data-followups-intro></p>
-              <div class="followups" data-followups></div>
-            </section>
-
-            <h3>Sessions</h3>
-            <!-- The run of show (R2): words by Claude, awaiting Ben's review. -->
-            <p class="small">Each week’s run of show is the plan you will run in Meet: its scenes in order, each with its minutes and what the main stage shows. Open one under its week to start from the six parts, copy last week’s, and change anything.</p>
-            <div data-sessions></div>
-
-            <!-- The question bank (R4): words by Claude, awaiting Ben's review. -->
-            <div class="question-bank" data-question-bank hidden>
-              <h3 id="question-bank">Question bank</h3>
-              <p class="small">The questions you prepare before class: choose one, choose any, a scale, a few words, put in order, or in their own words. Ask any of them in the moment from the Meet add-on or the live page, or plan one into a question scene. Students see a question only when you ask it, and what you ask is a copy, so changing it in class leaves the bank as it was.</p>
-              <div data-bank></div>
-            </div>
-
-            <!-- The lesson sent back (H5): words by Claude, awaiting Ben's review. -->
-            <div class="lesson" data-lesson hidden>
-              <h3 id="lesson">The lesson this cohort sends back</h3>
-              <p class="small">In the last week, the cohort chooses together one thing it learned that the next builder should not have to learn again: a prompt that worked, a step that broke, or a correction that kept coming up. Send it to the template as an issue, and credit the people who learned it only if each of them said yes. Everything on GitHub is public, so leave out anything private about anyone.</p>
-              <p class="actions"><a class="btn-secondary" data-lesson-link href="https://github.com/bhwilkoff/UniversalAppTemplate/issues/new"><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Send a lesson back to the template</a></p>
-            </div>
-
-            <h3>People</h3>
-            <div data-roster></div>
-
-            <!-- Co-teachers (H1): words by Claude, awaiting Ben's review. -->
-            <h3 id="teachers">Teachers</h3>
-            <p class="small">A cohort can have more than one teacher, and a new teacher leads best after co-leading a session of someone else's cohort first. Anyone who teaches here can be added, and a co-teacher sees and does everything you do on this page.</p>
-            <ul class="roster" data-teachers></ul>
-            <form class="inline-form" data-co-teacher-form hidden>
-              <label>Add a co-teacher
-                <select name="user_id" required data-co-teacher-choices></select>
-              </label>
-              <div class="actions">
-                <button class="btn-secondary" type="submit">Add them</button>
-                <span class="small" role="status" data-co-teacher-message></span>
-              </div>
-            </form>
-
-            <!-- The words in the apps section were written by Claude for
-                 milestone M10 and await Ben's review. -->
-            <h3 id="apps">Their apps on humanshaped.org</h3>
-            <p class="small" data-submissions-intro></p>
-            <div data-submissions></div>
-
-            <h3 id="groups">Groups</h3>
-            <p class="small">Trios, because a trio still has two people to show when one is away. Everyone can see their own group and what it is for, and you can change them whenever the cohort needs it. Each group has its own Meet room for the group part of every session, which meet@ makes when you ask it to set up the calls, and its members see it on their cohort page and the live page.</p>
-            <div data-groups></div>
-            <form class="inline-form" data-group-form>
-              <label>New group <input name="name" required maxlength="60" placeholder="Group 1"></label>
-              <label>What it is for <input name="expectations" maxlength="400" placeholder="Show each other your bring-back before each session"></label>
-              <button class="btn-secondary" type="submit">Add the group</button>
-            </form>
-
-            <!-- The words in the credential section were written by Claude
-                 for milestone M4 and await Ben's review. -->
-            <h3 id="credential">The credential</h3>
-            <p class="small" data-credentials-later>Credentials are issued here once the cohort is finished, and <a href="/credential/issuer/">the credential&rsquo;s own page</a> says what each level asks for.</p>
-            <div data-credentials hidden>
-              <p class="small">Open each person&rsquo;s repository and every link before you record their credential. It is then signed on the signer&rsquo;s own computer, never on this page, because the key that signs must stay off the web, and the signed file comes back here to be attached. <a href="/credential/issuer/">What each level asks for</a></p>
-              <div data-credential-list></div>
-            </div>
-          </div>
+          <p class="actions"><a class="btn-primary" href="/teach/new/">Plan a new cohort</a><a class="btn-secondary" href="/teach/times/">Your polls for finding a weekly time</a><a class="btn-secondary" href="/teach/guide/">The teaching guide</a></p>
         </section>
       </div>
     </div>
@@ -358,24 +138,8 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" defer></script>
   <script src="/assets/hub-config.js?v=20261016a" defer></script>
   <script src="/assets/teach-lib.js?v=20261006g" defer></script>
-  <script src="/assets/rooms-lib.js" defer></script>
-  <script src="/assets/followup-lib.js" defer></script>
-  <script src="/assets/submit-lib.js" defer></script>
-  <script src="/assets/credential-lib.js?v=20261006c" defer></script>
-  <script src="/assets/credential-check.js" defer></script>
-  <script src="/assets/mentor-lib.js" defer></script>
-  <script src="/assets/reach-lib.js" defer></script>
-  <script src="/assets/showcase-lib.js" defer></script>
-  <script src="/assets/cohort-lib.js" defer></script>
-  <script src="/assets/live-lib.js" defer></script>
-  <script src="/assets/question-view.js?v=20261012h" defer></script>
-  <script src="/assets/question-bank.js?v=20261012h" defer></script>
-  <script src="/assets/board-lib.js" defer></script>
-  <script src="/assets/show-lib.js" defer></script>
-  <script src="/assets/curriculum-lib.js" defer></script>
-  <script src="/assets/curriculum-seed.js" defer></script>
-  <script src="/assets/show-builder.js?v=20261012h" defer></script>
-  <script src="/assets/teach.js?v=20261021b" defer></script>
+  <script src="/assets/teach-page.js?v=20261021b" defer></script>
+  <script src="/assets/teach.js?v=20261021c" defer></script>
 
   <footer class="site-footer">
     <div class="wrap">

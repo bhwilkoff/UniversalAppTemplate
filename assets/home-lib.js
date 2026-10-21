@@ -79,8 +79,8 @@
   function waiting(w) {
     var out = [];
     function plural(n, one, many) { return n === 1 ? one : n + ' ' + many; }
-    if (w.requests) out.push({ text: plural(w.requests, 'A request to teach is', 'requests to teach are') + ' waiting for your answer.', href: '/teach/#requests', action: 'Answer' });
-    if (w.feedback) out.push({ text: plural(w.feedback, 'Someone is', 'people are') + ' waiting for your feedback.', href: '/teach/#waiting', action: 'Give feedback' });
+    if (w.requests) out.push({ text: plural(w.requests, 'A request to teach is', 'requests to teach are') + ' waiting for your answer.', href: '/teach/requests/', action: 'Answer' });
+    if (w.feedback) out.push({ text: plural(w.feedback, 'Someone is', 'people are') + ' waiting for your feedback.', href: '/teach/feedback/', action: 'Give feedback' });
     if (w.notes) out.push({ text: plural(w.notes, 'A teacher wrote you a note', 'notes from your teachers') + (w.notes === 1 ? '.' : ' are new.'), href: '/account/#notes', action: 'Read' });
     if (w.answers) out.push({ text: plural(w.answers, 'Someone answered what you shared', 'answers to what you shared') + (w.answers === 1 ? '.' : ' are new.'), href: w.answersHref || '/account/', action: 'Read' });
     if (w.videos) out.push({ text: plural(w.videos, 'A new video came in', 'new videos came in') + ' on your exchanges.', href: '#exchanges', action: 'Watch' });

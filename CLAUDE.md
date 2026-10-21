@@ -90,9 +90,10 @@ as Ben's without his review, $0 to run.
   something" became /events/; /start/ redirects, and the marks and how to
   show one live in the brand kit (/start/brand/#marks, #declare). The
   footer is the same short block on every page; credits live on
-  /support/#credits. Links that stand on their own are a quiet outlined
-  button (`.section-more`, `a.go`) or a bold underlined link
-  (`a.go-text`), never an arrow glyph. Before changing how the site
+  /support/#credits. Anything that stands on its own is a button
+  (`.btn-primary`, `.btn-secondary`, `.btn-danger`; DECISIONS.md, "Actions
+  and links: one standard"); underlined links appear only inside a
+  sentence, never an arrow glyph. Before changing how the site
   looks or reads, check research/notes/ai-design-anti-patterns.md: no
   label above a heading unless it carries information, no tracked
   capitals, no colored stripes, no identical icon-card rows.

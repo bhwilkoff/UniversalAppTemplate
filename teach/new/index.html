@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>A new cohort | Human Shaped</title>
+  <meta name="description" content="Create and run a Human Shaped cohort: its dates, its weekly sessions, its groups, and the people in it.">
+  <link rel="canonical" href="https://humanshaped.org/teach/">
+  <meta property="og:url" content="https://humanshaped.org/teach/">
+  <meta property="og:site_name" content="Human Shaped">
+  <meta property="og:title" content="Teach a cohort">
+  <meta property="og:description" content="Create and run a Human Shaped cohort: its dates, its weekly sessions, its groups, and the people in it.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://humanshaped.org/assets/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="The human-shaped wordmark, with its hyphen drawn as an arch, above the line: apps that wear the builder&#x27;s values on their sleeves.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#131916" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="/assets/favicon.svg?v=20261006q" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20261006q">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/site.css?v=20261021b">
+  <script>
+    (function () {
+      var q = location.search, t = null;
+      if (/[?&]dark\b/.test(q)) t = 'dark'; else if (/[?&]light\b/.test(q)) t = 'light';
+      else { try { t = localStorage.getItem('hs-theme'); } catch (e) {} }
+      if (t) document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+  <script src="/assets/site.js?v=20261014a" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to the page</a>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
+      <nav class="nav" aria-label="Main">
+        <ul>
+          <li><a href="/principles/">Principles</a></li>
+          <li><a href="/cohorts/" aria-current="true">Cohorts</a></li>
+          <li><a href="/apps/">Apps</a></li>
+          <li><a href="/events/">Events</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#moon"/></svg>
+        </button>
+        <a class="btn-primary small" href="/account/">
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>
+          <span>Sign in<span class="long"> with GitHub</span></span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <div class="wrap">
+      <p class="crumbs"><a href="/teach/">Teaching</a> &rsaquo; A new cohort</p>
+      <header class="page-head">
+        <h1 data-form-title>A new cohort.</h1>
+      </header>
+
+      <div class="account teach" data-teach-cohort-form>
+        <section class="account-state" data-state="loading"><p>Checking whether you are signed in…</p></section>
+
+        <section class="account-state" data-state="signed-out" hidden>
+          <p>This page is for teachers, so it starts with signing in.</p>
+          <p><a class="btn-primary" href="/account/"><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Sign in with GitHub</a></p>
+        </section>
+
+        <section class="account-state" data-state="not-teacher" hidden>
+          <p>This page is for teachers. <a href="/teach/">Ask to teach a cohort</a>, and once you are approved it opens for you.</p>
+        </section>
+
+        <section class="account-state" data-state="error" hidden>
+          <p class="error" data-error-text role="alert"></p>
+          <p><button class="btn-secondary" type="button" data-reload>Try again</button></p>
+        </section>
+        <section class="account-state" data-state="teacher" hidden>
+          <form class="cohort-builder" data-cohort-form novalidate>
+            <header class="builder-head">
+              <p>Each answer shapes how the cohort runs: who it is for, when it meets, how many people can join, and who can see it. You can change any of them later, except its address.</p>
+            </header>
+            <div class="builder-grid">
+              <div class="builder-steps">
+                <fieldset class="q">
+                  <legend><span class="q-n">1</span>What will people call it?</legend>
+                  <p class="hint" id="q-title-hint">Its name on the cohorts page and at the top of its own page.</p>
+                  <input id="cohort-title" name="title" maxlength="120" placeholder="Fall 2026, Tuesday evenings" aria-describedby="q-title-hint" aria-label="The cohort's name" autocomplete="off">
+                  <p class="addr" data-slug-line>Its address: <span class="url">humanshaped.org/cohort/?c=<b data-slug-show>&hellip;</b></span> <button class="text-button" type="button" data-slug-edit>Change it</button></p>
+                  <label class="sub" data-slug-field hidden>The short name in its address <input id="cohort-slug" name="slug" maxlength="60" autocomplete="off" spellcheck="false" autocapitalize="off"><span class="hint">Lowercase letters, numbers, and hyphens. It stays the same once the cohort is saved, so links to it keep working.</span></label>
+                </fieldset>
+
+                <fieldset class="q">
+                  <legend><span class="q-n">2</span>Who is it for, and what will they build?</legend>
+                  <p class="hint" id="q-desc-hint">A sentence or two in your own words, shown under its name. Say who you hope will join and the kind of problem they might bring.</p>
+                  <textarea id="cohort-description" name="description" rows="3" maxlength="2000" aria-describedby="q-desc-hint" aria-label="Who it is for" placeholder="Teachers who want a tool their students would actually use, built in the evenings after school."></textarea>
+                </fieldset>
+
+                <fieldset class="q">
+                  <legend><span class="q-n">3</span>When does week 1 begin?</legend>
+                  <p class="hint" id="q-start-hint">Cohort Prep is the week before it, and the cohort runs for 5 weeks from here.</p>
+                  <input id="cohort-starts" type="date" name="starts_on" aria-describedby="q-start-hint" aria-label="The day week 1 begins">
+                  <input type="hidden" name="weeks" value="5">
+                </fieldset>
+
+                <fieldset class="q">
+                  <legend><span class="q-n">4</span>When does the class meet each week?</legend>
+                  <p class="hint">One live session a week. The first is on the first of these days on or after week 1 begins, and everyone sees the time in their own time zone too.</p>
+                  <div class="row">
+                    <label>Day <select id="cohort-day" name="session_weekday">
+                      <option value="">Not decided yet</option><option value="0">Sunday</option><option value="1">Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5">Friday</option><option value="6">Saturday</option>
+                    </select></label>
+                    <label>Time <input id="cohort-time" type="time" name="session_time"></label>
+                    <label>Time zone <input id="cohort-zone" name="time_zone" list="zones" autocomplete="off"></label>
+                  </div>
+                  <label class="sub">How long <select id="cohort-minutes" name="session_minutes">
+                    <option value="60">An hour</option>
+                    <option value="75">75 minutes, as the weekly guides are written</option>
+                    <option value="90">90 minutes</option>
+                    <option value="120">Two hours</option>
+                  </select><span class="hint">Sessions of an hour or less leave out the break.</span></label>
+                  <datalist id="zones" data-zones></datalist>
+                </fieldset>
+
+                <fieldset class="q">
+                  <legend><span class="q-n">5</span>How many people can join?</legend>
+                  <p class="hint" id="q-cap-hint">Everyone works in a group of three that stays together, so a multiple of three keeps everyone in a group. Leave it empty for no limit.</p>
+                  <input id="cohort-capacity" type="number" name="capacity" min="1" max="500" inputmode="numeric" placeholder="No limit" aria-describedby="q-cap-hint" aria-label="How many people can join">
+                </fieldset>
+
+                <fieldset class="q">
+                  <legend><span class="q-n">6</span>Where does it stand?</legend>
+                  <div class="choices">
+                    <label class="choice"><input type="radio" name="status" value="draft"><span><b>Draft</b> Only its teachers can see it. Start here.</span></label>
+                    <label class="choice"><input type="radio" name="status" value="open"><span><b>Open</b> Listed on the cohorts page, and people can join.</span></label>
+                    <label class="choice"><input type="radio" name="status" value="running"><span><b>Running</b> The weeks have begun, and it leaves the cohorts page.</span></label>
+                    <label class="choice"><input type="radio" name="status" value="finished"><span><b>Finished</b> The weeks are over. Each live session's questions and answers are deleted, and you can issue credentials.</span></label>
+                  </div>
+                </fieldset>
+
+                <fieldset class="q">
+                  <legend><span class="q-n">7</span>Who can read its conversation?</legend>
+                  <p class="hint">The cohort talks in Discussions in its own private repository on GitHub, which the hub makes for you under Before the first session.</p>
+                  <label class="check"><input type="checkbox" name="conversations_open"> People outside the cohort can read it too</label>
+                  <details class="by-hand">
+                    <summary>Using a repository and team you made by hand</summary>
+                    <p class="hint">Fill these in only if you made them yourself in the humanshaped organization on GitHub.</p>
+                    <div class="row">
+                      <label>Repository <input name="github_repo" placeholder="humanshaped/cohort-fall-2026" autocomplete="off" spellcheck="false" autocapitalize="off"></label>
+                      <label>Team <input name="github_team" placeholder="cohort-fall-2026" autocomplete="off" spellcheck="false" autocapitalize="off"></label>
+                    </div>
+                  </details>
+                </fieldset>
+              </div>
+
+              <aside class="builder-preview" aria-label="How it will look on the cohorts page">
+                <p class="kicker">On the cohorts page</p>
+                <article class="open-cohort" data-preview>
+                  <h3 data-preview-title>Your cohort's name</h3>
+                  <p class="small" data-preview-line></p>
+                  <p class="small" data-preview-time></p>
+                  <p data-preview-desc></p>
+                  <div class="actions"><span class="btn-primary" aria-hidden="true">Join with GitHub</span></div>
+                </article>
+                <p class="small" data-preview-note>People see it here once it is Open.</p>
+              </aside>
+            </div>
+            <div class="builder-actions">
+              <button class="btn-primary" type="submit">Save the cohort</button>
+              <a class="btn-secondary" href="/teach/">Cancel</a>
+              <p class="small" data-form-message role="status"></p>
+            </div>
+          </form>
+        </section>
+      </div>
+    </div>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" defer></script>
+  <script src="/assets/hub-config.js?v=20261016a" defer></script>
+  <script src="/assets/teach-lib.js?v=20261006g" defer></script>
+  <script src="/assets/teach-page.js?v=20261021b" defer></script>
+  <script src="/assets/teach-cohort-form.js?v=20261021c" defer></script>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="footer-brand">
+        <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
+        <p>The ideas, the method, the tools, and the cohorts are free, and what you build is yours.</p>
+        <p><a href="/about/">About Human Shaped</a></p>
+      </div>
+      <nav class="footer-links" aria-label="More of the site">
+        <div>
+          <p class="footer-head">Take part</p>
+          <ul>
+            <li><a href="/account/">Your account</a></li>
+            <li><a href="/teach/">Teach a cohort</a></li>
+            <li><a href="/connect/">Connect your agent</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="footer-head">On GitHub</p>
+          <ul>
+            <li><a href="https://github.com/bhwilkoff/UniversalAppTemplate">The template</a></li>
+            <li><a href="https://github.com/orgs/humanshaped/discussions">Discussions</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="footer-head">The fine print</p>
+          <ul>
+            <li><a href="/support/">Help</a></li>
+            <li><a href="/privacy/">Privacy</a></li>
+            <li><a href="/terms/">Terms</a></li>
+          </ul>
+        </div>
+      </nav>
+      <p class="footer-made">Made by <a href="https://learningischange.com">Ben Wilkoff</a>, with <a href="/support/#credits">help from people and tools</a>.</p>
+    </div>
+  </footer>
+</body>
+</html>
