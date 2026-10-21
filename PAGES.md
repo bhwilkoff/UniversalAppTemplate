@@ -23,10 +23,10 @@ functionality is possible from the page you are on."
    never a second copy of the thing or of its tools.
 4. **The heading names the thing** (the cohort's name, the poll's title),
    and a crumb leads back to the list it belongs to.
-5. **A page says whose view it is when that is not obvious.** Where a
-   teacher and a student could both open the same thing, each page names
-   the reader's role in one line and links to the other view. Tools for a
-   role you do not hold are not shown.
+5. **The interface shows whose view it is, not a sentence.** Where a
+   teacher and a student could both open the same thing, the row of links
+   holds both views and marks the one you are on. Tools for a role you do
+   not hold are not shown.
 6. **Actions sit on the page of the thing they act on.** A queue page
    answers what is in it; the desk only counts it and links there.
 7. **Moved pages keep their old addresses**, which forward to the new ones.
@@ -49,7 +49,8 @@ Moodle, GitHub, GOV.UK, NN/g, WCAG 2.2).
 - **A cohort's header** (`assets/cohort-nav.js`) opens every page that
   belongs to one cohort, the same way: a breadcrumb, the cohort's row of
   links (Cohort home, Live session, and Teaching it for its teachers), the
-  cohort's name, and a line naming your role there when it is not obvious.
+  cohort's name. Your role shows in the interface itself (only its
+  teachers have Teaching it in the row), never as a sentence explaining it.
   A cohort's pages show its header in place of the area's row, so a page
   never stacks two rows of links; the breadcrumb leads back to the area.
 - **Breadcrumbs** say where a page sits, not where you came from. They
@@ -57,8 +58,9 @@ Moodle, GitHub, GOV.UK, NN/g, WCAG 2.2).
   names the page itself; a page that is an item in its area's row has none.
   At phone width only the parent shows. A page never has both a breadcrumb
   and a "back" link.
-- **No role switcher.** Your role is a sentence on the page, never only in
-  a menu. A teacher who wants the students' view opens the cohort home.
+- **No role switcher, and no explaining.** What you can do is the set of
+  links and buttons in front of you; a teacher who wants the students' view
+  opens Cohort home in the cohort's row.
 
 ## Everyone
 

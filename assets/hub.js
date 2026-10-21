@@ -29,6 +29,9 @@
     return 'Begins ' + d.toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' });
   }
 
+  // Your own app has its own page now (PAGES.md).
+  if (location.hash === '#own-app') { location.replace('/apps/mine/'); return; }
+
   // GitHub sends people back here with an error in the address when
   // something goes wrong (for example, if sign-in is not switched on).
   var params = new URLSearchParams(location.search + '&' + location.hash.replace(/^#/, ''));
@@ -427,10 +430,8 @@
         });
         root.querySelector('[data-open-section]').hidden = !joining;
         drawNotes(uid);
-        drawMentoring(uid);
         drawPath(uid);
         drawReach(uid);
-        drawOwnApp(uid);
         drawCredential(uid);
         show('signed-in');
       });
@@ -495,7 +496,6 @@
 
   // A builder's own app, outside any cohort (G2, BuilderLib). Before the
   // hub's database has builder_apps, the section stays away.
-  var ownAppWired = false;
   // The credentials recorded for you (migration 20261003070000; the
   // holder reads their own). Each links to its own page once signed,
   // where the file itself can be downloaded or checked.
@@ -528,106 +528,6 @@
           box.appendChild(card);
         });
       });
-  }
-
-  function drawOwnApp(uid) {
-    var B = window.BuilderLib;
-    var section = root.querySelector('[data-own-app-section]');
-    if (!B || !section) return;
-    var form = root.querySelector('[data-own-app-form]');
-    var status = root.querySelector('[data-own-app-status]');
-    var standing = root.querySelector('[data-own-app-standing]');
-    var remove = root.querySelector('[data-own-app-remove]');
-    var page = root.querySelector('[data-own-app-page]');
-    function show(row, hide) {
-      standing.textContent = B.standing(row, hide);
-      remove.hidden = !row;
-      page.hidden = !(row && row.public && !hide);
-      if (row) page.href = '/apps/app/?r=' + row.app_repo;
-    }
-    Promise.all([
-      db.from('builder_apps').select('app_repo, app_name, app_url, public').eq('user_id', uid).maybeSingle(),
-      db.from('builder_app_hides').select('reason').eq('user_id', uid).maybeSingle()
-    ]).then(function (res) {
-      if (res[0].error) { section.hidden = true; return; }
-      var row = res[0].data, hide = res[1].error ? null : res[1].data;
-      form.elements.repo.value = row ? row.app_repo : '';
-      form.elements.name.value = row && row.app_name || '';
-      form.elements.url.value = row && row.app_url || '';
-      form.elements.public.checked = !!(row && row.public);
-      show(row, hide);
-      section.hidden = false;
-      if (location.hash === '#own-app') section.scrollIntoView();
-      if (ownAppWired) return;
-      ownAppWired = true;
-      form.addEventListener('submit', function (ev) {
-        ev.preventDefault();
-        var checked = B.checkOwnApp({
-          repo: form.elements.repo.value, name: form.elements.name.value,
-          url: form.elements.url.value, public: form.elements.public.checked
-        });
-        if (checked.error) { status.textContent = checked.error; return; }
-        status.textContent = 'Saving…';
-        db.from('builder_apps').upsert(Object.assign({ user_id: uid }, checked.row)).select('app_repo, app_name, app_url, public').single().then(function (s) {
-          if (s.error) { status.textContent = 'Not saved: ' + s.error.message + '.'; return; }
-          form.elements.repo.value = s.data.app_repo;
-          status.textContent = 'Saved.';
-          show(s.data, hide);
-        });
-      });
-      remove.addEventListener('click', function () {
-        status.textContent = 'Taking it off…';
-        db.from('builder_apps').delete().eq('user_id', uid).then(function (d) {
-          if (d.error) { status.textContent = 'Not taken off: ' + d.error.message + '.'; return; }
-          form.reset();
-          hide = null;
-          show(null, null);
-          status.textContent = 'Taken off. The hub no longer has it.';
-        });
-      });
-    });
-  }
-
-  function drawMentoring(uid) {
-    var section = root.querySelector('[data-mentor-section]');
-    var box = root.querySelector('[data-mentor-cohorts]');
-    if (!window.MentorLib) return;
-    db.rpc('can_mentor').then(function (r) {
-      if (r.error || !r.data) { section.hidden = true; return; }
-      return Promise.all([
-        db.from('cohorts').select('id, slug, title, starts_on, weeks, description, status, session_weekday, session_time, session_minutes, time_zone').in('status', ['open', 'running']).order('starts_on'),
-        db.from('enrollments').select('cohort_id, status').eq('user_id', uid),
-        db.from('cohort_teachers').select('cohort_id').eq('user_id', uid)
-      ]).then(function (res) {
-        if (res.some(function (x) { return x.error; })) { section.hidden = true; return; }
-        var choices = window.MentorLib.mentorChoices(res[0].data, res[1].data, res[2].data.map(function (t) { return t.cohort_id; }));
-        section.hidden = !choices.length;
-        box.replaceChildren();
-        choices.forEach(function (c) { box.appendChild(mentorCard(c)); });
-      });
-    });
-  }
-
-  function mentorCard(c) {
-    var card = el('article', 'cohort-card');
-    card.appendChild(el('h3', null, c.title));
-    card.appendChild(el('p', 'small', (c.status === 'running' ? 'Running now. ' : 'Open for sign-up. ') + when(c.starts_on) + ', ' + c.weeks + ' weeks.'));
-    if (c.description) card.appendChild(el('p', null, c.description));
-    var actions = el('div', 'actions');
-    var join = el('button', 'btn-secondary', 'Mentor this cohort');
-    join.type = 'button';
-    var msg = el('span', 'small'); msg.setAttribute('role', 'status');
-    join.addEventListener('click', function () {
-      join.disabled = true;
-      db.rpc('join_as_mentor', { c: c.id }).then(function (r) {
-        if (r.error) { join.disabled = false; msg.textContent = 'Not joined: ' + r.error.message; return; }
-        db.functions.invoke('cohort-access', { body: { action: 'join', cohort_id: c.id } }).catch(function () {});
-        load();
-      });
-    });
-    actions.appendChild(join); actions.appendChild(msg);
-    card.appendChild(actions);
-    return card;
   }
 
   // Every note a teacher sent you, in every cohort, including ones you

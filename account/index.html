@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261021c">
+  <link rel="stylesheet" href="/assets/site.css?v=20261021d">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -159,33 +159,8 @@
             </form>
           </div>
 
-          <!-- Written by Claude, awaiting Ben's review (G2, hub-privacy-notes.md "Apps outside a cohort"). -->
-          <div data-own-app-section id="own-app" hidden>
-            <h2>Your own app</h2>
-            <p class="small">For an app you are building on your own, outside any cohort. It stays yours alone until you choose to show it, and then the apps page shows its name, repository, and address, with a page that follows its work, and never anything about you.</p>
-            <form class="inline-form" data-own-app-form>
-              <label>Its repository on GitHub
-                <span class="hint">As owner/name, or paste its address.</span>
-                <input type="text" name="repo" required maxlength="200" autocomplete="off" spellcheck="false" placeholder="you/your-app">
-              </label>
-              <label>Its name
-                <input type="text" name="name" maxlength="120" autocomplete="off">
-              </label>
-              <label>Where it runs, if it runs somewhere
-                <input type="url" name="url" maxlength="500" placeholder="https://">
-              </label>
-              <label class="check"><input type="checkbox" name="public"> Show it on the apps page</label>
-              <p class="small" data-own-app-standing></p>
-              <div class="actions">
-                <button class="btn-secondary" type="submit">Save my app</button>
-                <a class="btn-secondary" data-own-app-page hidden>See its page</a>
-                <button class="btn-danger" type="button" data-own-app-remove hidden>Take it off the hub</button>
-                <span class="small" role="status" data-own-app-status></span>
-              </div>
-            </form>
-          </div>
 
-          <h2>Cohorts you are in</h2>
+          <h2>Leaving a cohort</h2>
           <div data-my-cohorts></div>
 
           <div id="notes" data-notes-section hidden>
@@ -208,15 +183,8 @@
             <div data-credential-list></div>
           </div>
 
-          <!-- Written by Claude for G7 (mentors), awaiting Ben's review. -->
-          <div data-mentor-section hidden>
-            <h2>Help a new cohort as a mentor</h2>
-            <p>You hold the credential, so you can join a cohort that is open or running as a mentor. You are in it like everyone else, with no app of your own to finish, there to show how you worked, answer what you can, and give feedback when people ask for it. Everyone in the cohort can see that you are a mentor, and its teachers still give the feedback that counts.</p>
-            <div data-mentor-cohorts></div>
-          </div>
-
           <h2>Your data</h2>
-          <p>This site keeps your GitHub name and picture, which cohorts you are in, whatever you choose to share with a cohort, your own marks on the stages, your own app if you add one, the notes your teachers send you, and, only if you give it above, the address your teachers may use. Leaving a cohort removes what you shared there but keeps your notes, which you can remove here. Deleting your account removes everything.</p>
+          <p>This site keeps your GitHub name and picture, which cohorts you are in, whatever you choose to share with a cohort, your own marks on the stages, your own app if you add one (on <a href="/apps/mine/">its own page</a>), the notes your teachers send you, and, only if you give it above, the address your teachers may use. Leaving a cohort removes what you shared there but keeps your notes, which you can remove here. Deleting your account removes everything.</p>
           <div class="actions">
             <button class="btn-secondary" type="button" data-sign-out>Sign out</button>
             <button class="btn-danger" type="button" data-delete-open>Delete my account</button>
@@ -260,7 +228,7 @@
   <script src="/assets/credential-lib.js?v=20261006c" defer></script>
   <script src="/assets/google-signin-lib.js" defer></script>
   <script src="/assets/google-signin.js" defer></script>
-  <script src="/assets/hub.js?v=20261014b" defer></script>
+  <script src="/assets/hub.js?v=20261021a" defer></script>
 
   <footer class="site-footer">
     <div class="wrap">

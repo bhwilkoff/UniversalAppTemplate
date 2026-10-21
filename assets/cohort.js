@@ -617,7 +617,6 @@
   // and getting-ready steps are left out.
   function drawRole(mine, teaching) {
     var only = teaching && !mine;
-    $('[data-teacher-line]').hidden = !only;
     root.querySelectorAll('[data-student-only]').forEach(function (s) { s.hidden = only; });
     if (only) $('[data-setup]').hidden = true;
     if (window.CohortNav) window.CohortNav.draw($('[data-cohort-nav]'), { cohort: cohort, teaching: teaching, member: !!mine, current: 'home' });
