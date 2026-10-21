@@ -81,7 +81,6 @@
     if (role) by.appendChild(el('span', 'role-tag', role));
     card.appendChild(by);
     if (e.role === 'mentor' && !e.app_repo) {
-      card.appendChild(el('p', 'small', 'Here as a mentor, to help.'));
       return card;
     }
     var repo = lib.repoPath(e.app_repo);
@@ -116,7 +115,7 @@
   function drawShares(shares, people) {
     var box = $('[data-shares]');
     box.replaceChildren();
-    if (!shares.length) { box.appendChild(el('p', 'small', 'Nothing has been shared yet this cohort.')); return; }
+    if (!shares.length) { box.appendChild(window.UI.empty('Nothing shared yet.')); return; }
     var byId = {};
     people.forEach(function (p) { byId[p.user_id] = p.profiles; });
     var KIND = { 'bring-back': 'Bring-back', 'for-feedback': 'Asking for feedback', 'ai-review': 'A review from their AI agent', question: 'A question' };
@@ -350,13 +349,14 @@
       .is('revoked_at', null).maybeSingle().then(function (r) {
         if (r.error || !r.data) return;
         p.replaceChildren();
+        var U = window.UI;
+        p.appendChild(el('span', 'ui-label', 'Your credential '));
         if (r.data.signed_at) {
-          p.appendChild(document.createTextNode('Your credential from this cohort is signed. '));
-          var a = document.createElement('a'); a.href = '/credential/?id=' + encodeURIComponent(r.data.id);
-          a.textContent = 'Open it to share, download, or check it'; p.appendChild(a);
-          p.appendChild(document.createTextNode('.'));
+          p.appendChild(U.status('credential', 'signed'));
+          p.appendChild(document.createTextNode(' '));
+          p.appendChild(U.link('Open credential', '/credential/?id=' + encodeURIComponent(r.data.id), 'btn-secondary small'));
         } else {
-          p.textContent = 'Your teacher has recorded your credential from this cohort, and it is waiting to be signed. It will be on your account page once it is.';
+          p.appendChild(U.status('credential', 'waiting'));
         }
         p.hidden = false;
       });
@@ -480,26 +480,26 @@
     box.replaceChildren();
     var repo = cohort.github_repo;
     if (!repo || !cohort.github_team) {
-      box.appendChild(el('p', 'small', 'The cohort talks in its own private space on GitHub, and your teacher is still setting it up.'));
+      box.appendChild(window.UI.empty('Not set up yet.'));
       return;
     }
     var state = access ? access.state : null;
     var actions = el('div', 'actions');
     if (state === 'member') {
-      box.appendChild(el('p', null, 'The conversation is open to you. It happens in GitHub Discussions, in a repository only this cohort can see, and what you write there is yours.'));
-      var go = link('https://github.com/' + repo + '/discussions', 'Open the conversation on GitHub'); go.className = 'btn-primary';
+      var meta = el('p', 'ui-meta-line'); meta.appendChild(window.UI.visibility('cohort')); box.appendChild(meta);
+      var go = link('https://github.com/' + repo + '/discussions', 'Open on GitHub'); go.className = 'btn-secondary';
       actions.appendChild(go);
       box.appendChild(actions);
       // The newest conversations, read and posted here as this person.
       if (window.CohortTalk) window.CohortTalk.full(box, { db: db, session: session, repo: repo });
       return;
     } else if (state === 'invited') {
-      box.appendChild(el('p', null, 'GitHub has emailed you an invitation to the humanshaped organization. Accept it, and the conversation opens.'));
+      var st = el('p'); st.appendChild(window.UI.status('invitation', 'invited')); box.appendChild(st);
       var inv = link('https://github.com/orgs/humanshaped/invitation', 'Accept the invitation'); inv.className = 'btn-primary';
       actions.appendChild(inv);
       actions.appendChild(askButton('I accepted it'));
     } else {
-      box.appendChild(el('p', null, 'The cohort talks in GitHub Discussions, in a repository only this cohort can see. Opening it adds you to the cohort\u2019s team on GitHub, which may send you an invitation to accept.'));
+      var m2 = el('p', 'ui-meta-line'); m2.appendChild(window.UI.visibility('cohort')); m2.appendChild(document.createTextNode(' GitHub may send you an invitation to accept.')); box.appendChild(m2);
       if (state === 'failed' && access.detail) box.appendChild(el('p', 'small error', access.detail));
       actions.appendChild(askButton(state === 'failed' ? 'Try again' : 'Open the conversation'));
     }
@@ -515,8 +515,10 @@
     list.replaceChildren();
     steps.forEach(function (s) {
       var li = el('li', s.done ? 'done' : s.done === null ? 'optional' : null);
-      var a = link(s.href, s.label);
+      var a = link(s.href || ('/cohort/?c=' + encodeURIComponent(cohort.slug) + '&t=' + s.tab), s.label);
+      if (s.tab) a.addEventListener('click', function (e) { if (cohortTabs) { e.preventDefault(); cohortTabs.go(s.tab); } });
       li.appendChild(a);
+      if (s.done === null) { li.appendChild(document.createTextNode(' ')); li.appendChild(window.UI.status('task', 'optional')); }
       if (s.done) li.appendChild(el('span', 'visually-hidden', ' (done)'));
       list.appendChild(li);
     });
@@ -598,28 +600,23 @@
     if (!C || !q || !st) return;
     var w = C.weekOf(n);
     q.hidden = !w;
-    if (w) q.textContent = 'This week leads with ' + w.lead.toLowerCase() + ': ' + w.question;
+    if (w) { q.replaceChildren(window.UI.tag(w.lead), document.createTextNode(' ' + w.question)); }
     var s = C.stuckFor(n);
     st.replaceChildren();
-    st.appendChild(document.createTextNode('Stuck? Ask yourself one question first, then try what '));
-    var a = document.createElement('a'); a.href = s.url; a.textContent = s.label;
+    var a = document.createElement('a'); a.href = s.url; a.textContent = 'Stuck? ' + s.label;
     st.appendChild(a);
-    st.appendChild(document.createTextNode(' suggests' + (s.move ? ', or look through ' : '.')));
-    if (s.move) {
-      var all = document.createElement('a'); all.href = '/stuck/'; all.textContent = 'the whole library';
-      st.appendChild(all); st.appendChild(document.createTextNode('.'));
-    }
     st.hidden = false;
   }
 
   // A teacher opening the page its people see (PAGES.md rule 5): one line
   // says so and links to the teaching page, and the student's own forms
   // and getting-ready steps are left out.
+  var cohortTabs = null;
   function drawRole(mine, teaching) {
     var only = teaching && !mine;
     root.querySelectorAll('[data-student-only]').forEach(function (s) { s.hidden = only; });
     if (only) $('[data-setup]').hidden = true;
-    if (window.CohortNav) window.CohortNav.draw($('[data-cohort-nav]'), { cohort: cohort, teaching: teaching, member: !!mine, current: 'home' });
+    if (window.CohortNav && !cohortTabs) cohortTabs = window.CohortNav.draw($('[data-cohort-nav]'), { cohort: cohort, teaching: teaching, member: !!mine, current: 'home', panels: $('[data-cohort-panels]') });
   }
 
   function draw(people, mine, sessions, groups, shares, contact, teachers) {
@@ -653,13 +650,13 @@
       var gb = $('[data-group]'); gb.replaceChildren();
       gb.appendChild(el('p', null, myGroup.name + (myGroup.expectations ? ': ' + myGroup.expectations : '')));
       var names = people.filter(function (p) { return p.user_id !== me.id && myGroup.group_members.some(function (m) { return m.user_id === p.user_id; }); }).map(function (p) { return nameOf(p.profiles); });
-      gb.appendChild(el('p', 'small', names.length ? 'With ' + names.join(', ') + '.' : 'Your teacher will add the others soon.'));
+      gb.appendChild(el('p', 'small', names.length ? 'With ' + names.join(', ') + '.' : 'No one else yet.'));
       // The group's own Meet room, for the group part of each session
       // (Meet on our Google edition may have no breakout rooms).
       if (room) {
-        var rp = el('p', 'small');
-        rp.appendChild(document.createTextNode('Your group meets in its own room for the group part of each session, and the session page sends you there when it is time: '));
-        rp.appendChild(link(room, room.replace(/^https:\/\//, '')));
+        var rp = el('p', 'actions');
+        var rl = link(room, 'Your group\u2019s room'); rl.className = 'btn-secondary';
+        rp.appendChild(rl);
         gb.appendChild(rp);
       }
     }
@@ -701,6 +698,7 @@
     syncShareForm();
     var go = function () {
       syncShareForm();
+      if (cohortTabs) cohortTabs.go('mine');
       $('#share-title').scrollIntoView();
       f.note.focus({ preventScroll: true });
     };

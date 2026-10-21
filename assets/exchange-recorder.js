@@ -49,7 +49,7 @@
     var review = el('video', 'xr-review');
     review.controls = true; review.playsInline = true; review.setAttribute('playsinline', ''); review.hidden = true;
     var idle = el('div', 'xr-idle');
-    var idleText = el('p', null, canRecord ? 'Record a new video, or upload one you already have. Your camera turns on only when you ask it to, and nothing is recorded until you press Record.' : 'This browser cannot record in the page. Upload a video you already have, or record one with your camera app.');
+    var idleText = el('p', null, canRecord ? '' : 'This browser cannot record here. Upload a video instead.');
     idle.appendChild(idleText);
     var count = el('div', 'xr-count');
     count.setAttribute('aria-hidden', 'true');
@@ -128,7 +128,7 @@
       scrBtn.setAttribute('aria-pressed', String(m === 'screen'));
       onBtn.textContent = m === 'camera' ? 'Turn on the camera' : phoneOs ? 'Share from this page' : 'Choose what to share';
       idleText.textContent = m === 'camera'
-        ? 'Record a new video, or upload one you already have. Your camera turns on only when you ask it to, and nothing is recorded until you press Record.'
+        ? ''
         : 'Choose a window, a tab, or your whole screen to share. Your microphone records your voice with it.';
       stopTracks();
       show('idle');
@@ -163,7 +163,7 @@
         show('idle');
         var denied = e && (e.name === 'NotAllowedError' || e.name === 'SecurityError');
         say(denied
-          ? (mode === 'camera' ? 'The browser was not allowed to use the camera. You can allow it in the browser\'s settings for this site, or use one of the other ways below.' : 'Sharing was cancelled.')
+          ? (mode === 'camera' ? 'The camera is blocked. Allow it in this site\'s browser settings.' : 'Sharing was cancelled.')
           : 'The ' + mode + ' could not start' + (e && e.message ? ': ' + e.message : '') + '.'
             + (mode === 'screen' && phoneOs ? ' Your phone’s own screen recorder still works, with the steps above.' : ''));
       });

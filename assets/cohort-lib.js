@@ -52,11 +52,11 @@
   // with that guide's minutes for 75. Sessions of an hour or less drop
   // the break, as the guide says.
   var PARTS = [
-    { key: 'arrive', name: 'Arrive', minutes: 7, what: 'One line each in the chat: what you shipped this week, or where you are stuck. Then your teacher says what they read in last week\u2019s checks, and what they changed because of it. Cameras are welcome, and never required.' },
-    { key: 'show', name: 'Show what you brought back', minutes: 25, what: 'In your group of three, about eight minutes each: say what you want to know, show it on the real device, and explain one decision with the agent closed. Partners ask one clarifying question, then answer three: where is it going, how is it going, and what is next. End by saying what you will do next, and whether the stage is ready or not yet.' },
+    { key: 'arrive', name: 'Arrive', minutes: 7, what: 'One line each in the chat: what you shipped this week, or where you are stuck. Then your teacher says what they read in last week\u2019s checks, and what they changed because of it. Cameras are welcome, and never required.' }, // kit: content
+    { key: 'show', name: 'Show what you brought back', minutes: 25, what: 'In your group of three, about eight minutes each: say what you want to know, show it on the real device, and explain one decision with the agent closed. Partners ask one clarifying question, then answer three: where is it going, how is it going, and what is next. End by saying what you will do next, and whether the stage is ready or not yet.' }, // kit: content
     { key: 'break', name: 'A short break', minutes: 3, what: 'Stretch, refill, and come back to the main session.' },
-    { key: 'value', name: 'One value at work', minutes: 6, what: 'Back together, one person shares a decision their values changed this week and what it cost them, and your teacher names one thing they heard across the groups.' },
-    { key: 'prompt', name: 'Read one real prompt, trying first', minutes: 22, what: 'Write the prompt you would send for the situation on screen, compare it with a partner, and then see the real one and talk about the difference.' },
+    { key: 'value', name: 'One value at work', minutes: 6, what: 'Back together, one person shares a decision their values changed this week and what it cost them, and your teacher names one thing they heard across the groups.' }, // kit: content
+    { key: 'prompt', name: 'Read one real prompt, trying first', minutes: 22, what: 'Write the prompt you would send for the situation on screen, compare it with a partner, and then see the real one and talk about the difference.' }, // kit: content
     { key: 'start', name: 'Start', minutes: 9, what: 'Send this week\u2019s first prompt to your agent before you leave, with a room open for anyone who is stuck.' },
     { key: 'check', name: 'Check for understanding', minutes: 3, what: 'Answer your teacher\u2019s two questions privately, on this page: this week\u2019s question, and what is still muddy.' }
   ];
@@ -170,14 +170,14 @@
   // the person, not here), so it is offered as a link and never marked.
   function setupSteps(mine, access, cohort) {
     var steps = [
-      { key: 'setup', label: 'Read Getting set up, and make your own copy of the template', href: '/path/setup/', done: !!(mine && mine.app_repo) },
-      { key: 'repo', label: 'Add your app\u2019s repository under Your app, so your classmates can follow it', href: '#mine-title', done: !!(mine && mine.app_repo) },
-      { key: 'address', label: 'Add the address where your app is live, the first win', href: '#mine-title', done: !!(mine && mine.app_url) }
+      { key: 'setup', label: 'Copy the template', href: '/path/setup/', done: !!(mine && mine.app_repo) },
+      { key: 'repo', label: 'Add your repository', tab: 'mine', done: !!(mine && mine.app_repo) },
+      { key: 'address', label: 'Add your live address', tab: 'mine', done: !!(mine && mine.app_url) }
     ];
     if (cohort && cohort.github_team) {
-      steps.push({ key: 'talk', label: 'Open the cohort\u2019s conversation on GitHub', href: '#talk-title', done: !!(access && access.state === 'member') });
+      steps.push({ key: 'talk', label: 'Open the conversation', tab: 'talk', done: !!(access && access.state === 'member') });
     }
-    steps.push({ key: 'agent', label: 'Connect your own AI agent, if you would like it to know what the cohort is doing', href: '/connect/', done: null });
+    steps.push({ key: 'agent', label: 'Connect your agent', href: '/connect/', done: null });
     return steps;
   }
 

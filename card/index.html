@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261021h">
+  <link rel="stylesheet" href="/assets/site.css?v=20261022a">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -34,14 +34,9 @@
   <main class="card-frame" data-card-page aria-live="polite">
     <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
 
-    <section class="account-state screen-body" data-state="loading"><p class="screen-sub">Opening the card…</p></section>
-    <section class="account-state screen-body" data-state="signed-out" hidden>
-      <h1 class="screen-title">Sign in to show this cohort’s cards.</h1>
-      <p class="screen-sub"><a href="/account/">Sign in with GitHub</a>, then come back to this page.</p>
-    </section>
-    <section class="account-state screen-body" data-state="not-member" hidden>
-      <h1 class="screen-title">These cards are for the people in this cohort.</h1>
-    </section>
+    <section class="account-state screen-body" data-state="loading"><span class="visually-hidden" role="status">Loading</span></section>
+    <section class="account-state screen-body" data-state="signed-out" hidden><h1 class="visually-hidden">Human Shaped</h1><div data-gate="signed-out"></div></section>
+    <section class="account-state screen-body" data-state="not-member" hidden><h1 class="visually-hidden">Human Shaped</h1><div data-gate="not-member"></div></section>
     <section class="account-state screen-body" data-state="error" hidden>
       <p class="screen-sub" data-error-text></p>
     </section>
@@ -54,9 +49,9 @@
   </main>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" defer></script>
   <script src="/assets/hub-config.js?v=20261016a" defer></script>
-  <script src="/assets/cohort-lib.js" defer></script>
+  <script src="/assets/cohort-lib.js?v=20261022a" defer></script>
   <script src="/assets/signals-lib.js?v=20261012h" defer></script>
-  <script src="/assets/signals.js?v=20261012h" defer></script>
+  <script src="/assets/signals.js?v=20261022a" defer></script>
   <script src="/assets/card.js" defer></script>
 </body>
 </html>

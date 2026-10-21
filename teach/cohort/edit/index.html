@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261021h">
+  <link rel="stylesheet" href="/assets/site.css?v=20261022a">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -37,6 +37,7 @@
     })();
   </script>
   <script src="/assets/site.js?v=20261021c" defer></script>
+  <script src="/assets/ui.js?v=20261022a" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to the page</a>
@@ -54,10 +55,10 @@
       </nav>
       <div class="header-actions">
         <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#moon"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#moon"/></svg>
         </button>
         <a class="btn-primary small" href="/account/">
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#github"/></svg>
           <span>Sign in<span class="long"> with GitHub</span></span>
         </a>
       </div>
@@ -69,24 +70,16 @@
       <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/teach/">Teaching</a></li><li><a href="/teach/" data-back-to-cohort data-name>The cohort</a></li></ol></nav>
       <header class="page-head">
         <h1 data-form-title>The cohort</h1>
-        <p class="lead">Its details: who it is for, when it meets, how many can join, and where it stands.</p>
       </header>
 
       <div class="account teach" data-teach-cohort-form>
-        <section class="account-state" data-state="loading"><p>Checking whether you are signed in…</p></section>
+        <section class="account-state" data-state="loading"><div class="ui-skeleton" aria-busy="true"><span class="visually-hidden" role="status">Loading</span><i></i><i></i><i></i></div></section>
 
-        <section class="account-state" data-state="signed-out" hidden>
-          <p>This page is for teachers, so it starts with signing in.</p>
-          <p><a class="btn-primary" href="/account/"><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Sign in with GitHub</a></p>
-        </section>
+        <section class="account-state" data-state="signed-out" hidden><div data-gate="signed-out"></div></section>
 
-        <section class="account-state" data-state="not-teacher" hidden>
-          <p>This page is for teachers. <a href="/teach/">Ask to teach a cohort</a>, and once you are approved it opens for you.</p>
-        </section>
+        <section class="account-state" data-state="not-teacher" hidden><div data-gate="not-teacher"></div></section>
 
-        <section class="account-state" data-state="missing" hidden>
-          <p>There is no cohort of yours at this address. <a href="/teach/">Your cohorts</a> are all listed together.</p>
-        </section>
+        <section class="account-state" data-state="missing" hidden><div data-gate="missing"></div></section>
 
         <section class="account-state" data-state="error" hidden>
           <p class="error" data-error-text role="alert"></p>
@@ -95,7 +88,6 @@
         <section class="account-state" data-state="teacher" hidden>
           <form class="cohort-builder" data-cohort-form novalidate>
             <header class="builder-head">
-              <p>Each answer shapes how the cohort runs: who it is for, when it meets, how many people can join, and who can see it. You can change any of them later, except its address.</p>
             </header>
             <div class="builder-grid">
               <div class="builder-steps">
@@ -109,7 +101,7 @@
 
                 <fieldset class="q">
                   <legend><span class="q-n">2</span>Who is it for, and what will they build?</legend>
-                  <p class="hint" id="q-desc-hint">A sentence or two in your own words, shown under its name. Say who you hope will join and the kind of problem they might bring.</p>
+                  <p class="hint" id="q-desc-hint">Who it is for</p>
                   <textarea id="cohort-description" name="description" rows="3" maxlength="2000" aria-describedby="q-desc-hint" aria-label="Who it is for" placeholder="Teachers who want a tool their students would actually use, built in the evenings after school."></textarea>
                 </fieldset>
 
@@ -122,7 +114,7 @@
 
                 <fieldset class="q">
                   <legend><span class="q-n">4</span>When does the class meet each week?</legend>
-                  <p class="hint">One live session a week. The first is on the first of these days on or after week 1 begins, and everyone sees the time in their own time zone too.</p>
+                  <p class="hint">The first session is on this day, on or after week 1 begins</p>
                   <div class="row">
                     <label>Day <select id="cohort-day" name="session_weekday">
                       <option value="">Not decided yet</option><option value="0">Sunday</option><option value="1">Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5">Friday</option><option value="6">Saturday</option>
@@ -141,7 +133,7 @@
 
                 <fieldset class="q">
                   <legend><span class="q-n">5</span>How many people can join?</legend>
-                  <p class="hint" id="q-cap-hint">Everyone works in a group of three that stays together, so a multiple of three keeps everyone in a group. Leave it empty for no limit.</p>
+                  <p class="hint" id="q-cap-hint">Groups are three, so a multiple of three fits. Empty for no limit</p>
                   <input id="cohort-capacity" type="number" name="capacity" min="1" max="500" inputmode="numeric" placeholder="No limit" aria-describedby="q-cap-hint" aria-label="How many people can join">
                 </fieldset>
 
@@ -157,7 +149,7 @@
 
                 <fieldset class="q">
                   <legend><span class="q-n">7</span>Who can read its conversation?</legend>
-                  <p class="hint">The cohort talks in Discussions in its own private repository on GitHub, which the hub makes for you under Before the first session.</p>
+                  <p class="hint">In its own private repository on GitHub</p>
                   <label class="check"><input type="checkbox" name="conversations_open"> People outside the cohort can read it too</label>
                   <details class="by-hand">
                     <summary>Using a repository and team you made by hand</summary>

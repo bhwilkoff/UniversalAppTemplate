@@ -14,7 +14,7 @@
       var keys = (did.verificationMethod || []).length;
       keyStatus.textContent = keys
         ? 'humanshaped.org publishes ' + (keys === 1 ? 'one signing key' : keys + ' signing keys') + ' there now, and every credential it has signed can be checked against ' + (keys === 1 ? 'it' : 'them') + '.'
-        : 'The signing key has not been made yet, so no credential has been signed so far. The first will be signed when the first cohort finishes.';
+        : 'No credential has been signed yet.';
     }, function () {
       keyStatus.textContent = 'The list of signing keys could not be read just now.';
     });
@@ -47,7 +47,7 @@
     if (!row) return show('missing');
     if (row.state === 'waiting') return show('waiting');
     if (row.state === 'revoked') {
-      $('[data-revoked-when]').textContent = row.revoked_at ? 'on ' + day(row.revoked_at) : '';
+      $('[data-revoked-when]').textContent = row.revoked_at ? day(row.revoked_at) : '';
       return show('revoked');
     }
     draw(row.signed);

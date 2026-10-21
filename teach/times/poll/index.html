@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261021h">
+  <link rel="stylesheet" href="/assets/site.css?v=20261022a">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -25,15 +25,15 @@
     })();
   </script>
   <script src="/assets/site.js?v=20261021c" defer></script>
+  <script src="/assets/ui.js?v=20261022a" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" defer></script>
   <script src="/assets/hub-config.js?v=20261016a" defer></script>
   <script src="/assets/times-lib.js?v=20261021a" defer></script>
   <script src="/assets/times-grid.js?v=20261009g" defer></script>
   <script src="/assets/times-calendar.js?v=20261009b" defer></script>
   <script src="/assets/teach-lib.js?v=20261006g" defer></script>
-  <script src="/assets/ui.js?v=20261021d" defer></script>
   <script src="/assets/teach-page.js?v=20261021d" defer></script>
-  <script src="/assets/teach-times-poll.js?v=20261021f" defer></script>
+  <script src="/assets/teach-times-poll.js?v=20261022a" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to the page</a>
@@ -51,10 +51,10 @@
       </nav>
       <div class="header-actions">
         <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#moon"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#moon"/></svg>
         </button>
         <a class="btn-primary small" href="/account/">
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#github"/></svg>
           <span>Sign in<span class="long"> with GitHub</span></span>
         </a>
       </div>
@@ -78,20 +78,13 @@
       </header>
 
       <div class="account teach times-teach" data-teach-times-poll>
-        <section class="account-state" data-state="loading"><p>Checking whether you are signed in…</p></section>
+        <section class="account-state" data-state="loading"><div class="ui-skeleton" aria-busy="true"><span class="visually-hidden" role="status">Loading</span><i></i><i></i><i></i></div></section>
 
-        <section class="account-state" data-state="signed-out" hidden>
-          <p>Polls are made by teachers, so this starts with signing in.</p>
-          <p><a class="btn-primary" href="/account/"><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Sign in with GitHub</a></p>
-        </section>
+        <section class="account-state" data-state="signed-out" hidden><div data-gate="signed-out"></div></section>
 
-        <section class="account-state" data-state="not-teacher" hidden>
-          <p>Polls are made by teachers. <a href="/teach/">Ask to teach a cohort</a>, and once you are approved you can make one here.</p>
-        </section>
+        <section class="account-state" data-state="not-teacher" hidden><div data-gate="not-teacher"></div></section>
 
-        <section class="account-state" data-state="missing" hidden>
-          <p>There is no poll of yours at this address. It may have been deleted. <a href="/teach/times/">Your polls</a> are all listed together.</p>
-        </section>
+        <section class="account-state" data-state="missing" hidden><div data-gate="missing"></div></section>
 
         <section class="account-state" data-state="error" hidden>
           <p class="error" data-error-text></p>
@@ -110,7 +103,7 @@
               <p class="hint" data-host-hint>Mark the times you could make. They count like everyone else's, and the people answering see a dot on each one, so they know which times could really work.</p>
               <div class="times-calendar" data-host-calendar hidden>
                 <button class="btn-secondary" type="button" data-cal-check>Check my Google Calendar</button>
-                <p class="hint">Google tells this page only when you are busy, never what you are doing, and nothing from your calendar is saved.</p>
+                <p class="hint">Google tells this page only when you are busy. Nothing is saved.</p>
                 <p class="times-status" role="status" aria-live="polite" data-cal-line></p>
                 <p class="times-wake" data-cal-wake hidden>Marking free times between <input type="time" value="08:00" step="900" data-wake-from aria-label="The earliest start time to mark"> and <input type="time" value="20:00" step="900" data-wake-to aria-label="The latest start time to mark">, your time.</p>
               </div>
@@ -127,7 +120,7 @@
                 <button class="btn-primary" type="button" data-copy-share>Copy the link</button>
                 <a class="btn-secondary" data-open-share target="_blank" rel="noopener">See it as they will</a>
               </div>
-              <p class="hint">Anyone with this link can answer, so share it with the people you are inviting rather than posting it in public.</p>
+              <p class="hint"><span data-vis="link" data-vis-what="Who can answer"></span></p>
             </div>
 
             <h3>What people said</h3>

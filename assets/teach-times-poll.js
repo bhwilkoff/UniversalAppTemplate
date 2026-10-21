@@ -83,10 +83,10 @@
       tr.appendChild(td);
       body.appendChild(tr);
       if (a.host) return;
-      var rm = el('button', 'btn-danger small', 'Remove');
+      var rm = el('button', 'btn-danger small', 'Delete');
       rm.type = 'button';
-      rm.setAttribute('aria-label', 'Remove ' + a.name + "'s answer");
-      window.UI.confirmStep(rm, { confirm: 'Remove ' + a.name + "'s answer", status: $('[data-detail-status]'), warning: 'It cannot be brought back.', run: function () {
+      rm.setAttribute('aria-label', 'Delete ' + a.name + "'s answer");
+      window.UI.confirmStep(rm, { title: 'Delete ' + a.name + "'s answer?", body: 'It is deleted for good.', action: 'Delete answer', run: function () {
         G.within(db.from('time_poll_answers').delete().eq('id', a.id), db).catch(function (e) { return { error: { message: said(e) } }; }).then(function (r) {
           if (r.error) { $('[data-detail-status]').textContent = 'Not removed: ' + r.error.message; return; }
           openPoll();
@@ -312,7 +312,7 @@
       openPoll();
     });
   });
-  window.UI.confirmStep($('[data-delete]'), { confirm: 'Delete this poll and its answers', status: $('[data-detail-status]'), warning: 'Its link will stop working.', run: function () {
+  window.UI.confirmStep($('[data-delete]'), { title: 'Delete this poll?', body: 'Its answers go too, and its link stops working.', action: 'Delete poll', run: function () {
     G.within(db.from('time_polls').delete().eq('id', id), db).catch(function (e) { return { error: { message: said(e) } }; }).then(function (r) {
       if (r.error) { $('[data-detail-status]').textContent = 'Not deleted: ' + r.error.message; return; }
       location.assign('/teach/times/');

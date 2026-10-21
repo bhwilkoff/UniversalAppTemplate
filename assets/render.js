@@ -152,7 +152,7 @@
     status.innerHTML = '';
     var box = el('div', { 'class': 'doc-error', role: 'alert' });
     box.appendChild(el('h2', null, 'This page could not reach GitHub just now.'));
-    box.appendChild(el('p', null, 'Its text lives in the template on GitHub, and the request for it did not come back, which usually means a network hiccup on one side or the other. The same page is always readable on GitHub itself.'));
+    box.appendChild(el('p', null, 'This could not load.'));
     var actions = el('div', { 'class': 'actions' });
     var gh = el('a', { 'class': 'btn-secondary', href: githubUrl }, 'Read it on GitHub');
     var retry = el('button', { 'class': 'btn-secondary', type: 'button' }, 'Try again');

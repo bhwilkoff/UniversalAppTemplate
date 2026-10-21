@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261021h">
+  <link rel="stylesheet" href="/assets/site.css?v=20261022a">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -29,16 +29,16 @@
     })();
   </script>
   <script src="/assets/site.js?v=20261021c" defer></script>
+  <script src="/assets/ui.js?v=20261022a" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" defer></script>
   <script src="/assets/hub-config.js?v=20261016a" defer></script>
   <script src="/assets/google-signin-lib.js" defer></script>
   <script src="/assets/google-signin.js" defer></script>
   <script src="/assets/react-lib.js" defer></script>
-  <script src="/assets/ui.js?v=20261021d" defer></script>
-  <script src="/assets/exchange-lib.js?v=20261016b" defer></script>
-  <script src="/assets/exchange-recorder.js?v=20261015a" defer></script>
+  <script src="/assets/exchange-lib.js?v=20261022a" defer></script>
+  <script src="/assets/exchange-recorder.js?v=20261022a" defer></script>
   <script src="/assets/exchange-drive.js?v=20261012b" defer></script>
-  <script src="/assets/exchange.js?v=20261021a" defer></script>
+  <script src="/assets/exchange.js?v=20261022a" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to the page</a>
@@ -56,10 +56,10 @@
       </nav>
       <div class="header-actions">
         <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#moon"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#moon"/></svg>
         </button>
         <a class="btn-primary small" href="/account/">
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#github"/></svg>
           <span>Sign in<span class="long"> with GitHub</span></span>
         </a>
       </div>
@@ -69,22 +69,22 @@
   <main id="main">
     <div class="wrap">
       <div class="exchange" data-exchange>
-        <section class="x-state" data-state="loading"><p>Opening the exchange…</p></section>
+        <section class="x-state" data-state="loading"><div class="ui-skeleton" aria-busy="true"><span class="visually-hidden" role="status">Loading</span><i></i><i></i><i></i></div></section>
 
         <section class="x-state" data-state="missing" hidden>
-          <h1>There is no exchange at this link.</h1>
-          <p class="lead">The link may have been cut short when it was copied, or the exchange may have been deleted. Ask whoever sent it for the whole link.</p>
+          <h1>Nothing is at this address</h1>
+          <p>Ask whoever sent it for the whole link.</p>
         </section>
 
         <section class="x-state" data-state="private" hidden>
-          <h1 data-private-title>This exchange is for a cohort.</h1>
-          <p class="lead" data-private-lead>Only the people in the cohort it belongs to can watch it and add to it.</p>
-          <p data-private-signin><a class="btn-primary" href="/account/"><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Sign in</a></p>
+          <h1 data-private-title>Only people in this cohort can open this</h1>
+          <p data-private-lead hidden></p>
+          <p data-private-signin><a class="btn-primary" href="/account/"><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#github"/></svg>Sign in</a></p>
         </section>
 
         <section class="x-state" data-state="error" hidden>
-          <h1>The exchange could not be opened.</h1>
-          <p class="lead" data-error-text></p>
+          <h1>This could not load</h1>
+          <p class="small" data-error-text></p>
           <p><button class="btn-secondary" type="button" data-retry>Try again</button></p>
         </section>
 
@@ -115,7 +115,7 @@
               <ol class="x-clips" data-thread></ol>
               <p class="x-empty" data-thread-empty hidden></p>
               <p><button class="btn-primary" type="button" data-add hidden>Add your video</button></p>
-              <p data-closed hidden><span class="ui-status ui-status-off"><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261021a#circle-dashed"/></svg><span>Closed to new videos</span></span></p>
+              <p data-closed hidden><span data-status="exchange.closed"></span></p>
               <div class="x-signin" data-signin hidden>
                 <p>Sign in to add a video.</p>
                 <div class="google-signin" data-google></div>
@@ -129,8 +129,8 @@
             <h2 id="compose-title" tabindex="-1" data-compose-title>Add your video</h2>
             <p class="hint" data-replying></p>
             <div data-recorder></div>
-            <label class="x-note">A few words with it <span class="ui-optional">Optional</span><textarea data-note rows="2" maxlength="1000"></textarea></label>
-            <p class="ui-meta-line"><span class="ui-visibility"><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261021a#globe-simple"/></svg><span>Anyone with the link</span></span> Your video is kept in your Google Drive, in a folder called Human Shaped exchanges.</p>
+            <label class="x-note">A few words with it (optional)<textarea data-note rows="2" maxlength="1000"></textarea></label>
+            <p class="ui-meta-line"><span data-vis="link" data-vis-what="Video file"></span> Kept in your Google Drive, in a folder called Human Shaped exchanges.</p>
             <progress class="x-progress" data-progress max="100" value="0" hidden></progress>
             <p class="x-post-status" role="status" aria-live="polite" data-post-status></p>
             <div class="actions">

@@ -115,7 +115,7 @@
     return { row: { title: title, cohort: input.cohort || null } };
   }
 
-  // A sentence about an exchange, never an "A · B · C" string.
+  // Kept for older callers; the exchange page shows facts (DESIGN-KIT.md).
   function summary(e) {
     var n = (e.posts || []).length;
     var where = e.cohort ? ' in ' + e.cohort.title : '';
@@ -187,15 +187,15 @@
   // the page, and the phone's recorder can show any app, not only the browser.
   var SCREEN_STEPS = {
     ios: [
-      'Swipe down from the top-right corner to open Control Center, then touch and hold Screen Recording and turn the microphone on, so your voice is recorded along with your screen. If Screen Recording isn’t there, touch and hold an empty spot in Control Center to add it.',
+      'Swipe down from the top-right corner to open Control Center, then touch and hold Screen Recording and turn the microphone on, so your voice is recorded along with your screen. If Screen Recording isn’t there, touch and hold an empty spot in Control Center to add it.', // kit: content
       'Tap Start Recording, and after the countdown show what you want to show, talking it through as you go.',
       'Tap the red indicator at the top of the screen to stop, and the recording is saved to Photos.',
       'Come back to this page and choose the recording.'
     ],
     android: [
-      'Swipe down twice from the top of the screen and tap Screen record (Screen recorder on some phones). If it isn’t there, tap the pencil to add it.',
+      'Swipe down twice from the top of the screen and tap Screen record (Screen recorder on some phones). If it isn’t there, tap the pencil to add it.', // kit: content
       'Choose to record sound from the microphone, so your voice is recorded along with your screen, then tap Start.',
-      'Show what you want to show, talking it through as you go, and stop from the notification at the top of the screen. The recording is saved with your videos.',
+      'Show what you want to show, talking it through as you go, and stop from the notification at the top of the screen. The recording is saved with your videos.', // kit: content
       'Come back to this page and choose the recording.'
     ]
   };

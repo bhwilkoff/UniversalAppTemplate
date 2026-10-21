@@ -23,9 +23,9 @@ test('the form is checked the way the database checks it', () => {
 });
 
 test('where an app stands is said plainly, and a hide never reads as the builder\'s doing', () => {
-  assert.equal(B.standing(null, null), '');
-  assert.match(B.standing({ public: false }, null), /Only you can see it/);
-  assert.match(B.standing({ public: true }, null), /on the apps page/);
-  assert.match(B.standing({ public: true }, { reason: 'It asks for a password first' }), /because: It asks for a password first\. Your switch is still yours/);
-  assert.match(B.standing({ public: true }, { reason: null }), /for now\. Your switch/);
+  assert.equal(B.standing(null, null), null);
+  assert.deepEqual(B.standing({ public: false }, null), { audience: 'me', hidden: false, reason: null });
+  assert.deepEqual(B.standing({ public: true }, null), { audience: 'public', hidden: false, reason: null });
+  assert.deepEqual(B.standing({ public: true }, { reason: 'It asks for a password first' }), { audience: 'me', hidden: true, reason: 'It asks for a password first' });
+  assert.deepEqual(B.standing({ public: true }, { reason: null }), { audience: 'me', hidden: true, reason: null });
 });

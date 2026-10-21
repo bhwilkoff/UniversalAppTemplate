@@ -64,14 +64,14 @@ test('a student sees no note before the window, once submitted, or as a mentor',
 test('the note names what is missing and the last session', () => {
   const n = lib.studentNote({ ...ready, app_public: false }, { open: true, ended: false }, 'Tuesday, November 17');
   assert.deepEqual(n.missing, ['ready']);
-  assert.match(n.text, /with the last session on Tuesday, November 17\./);
-  assert.match(n.text, /Yours still needs your word that it is ready to show, which you can add under Your app below\.$/);
+  assert.match(n.text, /by Tuesday, November 17\./);
+  assert.match(n.text, /Yours needs your word that it is ready to show\.$/);
   assert.doesNotMatch(n.text, /—/);
 });
 test('after the end, the note says so, and lists several things', () => {
   const n = lib.studentNote({ role: 'student', app_repo: 'bea/x' }, { open: true, ended: true }, null);
-  assert.match(n.text, /^The cohort has come to its end/);
-  assert.match(n.text, /the address where people can use it and your word that it is ready to show, all of which/);
+  assert.match(n.text, /^Every app goes on the apps page\. Yours needs/);
+  assert.match(n.text, /the address where people can use it and your word that it is ready to show\.$/);
 });
 
 test('the teacher sees submitted and not yet, by name, students only', () => {

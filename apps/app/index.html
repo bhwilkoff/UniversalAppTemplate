@@ -23,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261021h">
+  <link rel="stylesheet" href="/assets/site.css?v=20261022a">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -36,6 +36,7 @@
     })();
   </script>
   <script src="/assets/site.js?v=20261021c" defer></script>
+  <script src="/assets/ui.js?v=20261022a" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to the page</a>
@@ -53,10 +54,10 @@
       </nav>
       <div class="header-actions">
         <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#moon"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#moon"/></svg>
         </button>
         <a class="btn-primary small" href="/account/">
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#github"/></svg>
           <span>Sign in<span class="long"> with GitHub</span></span>
         </a>
       </div>
@@ -68,15 +69,15 @@
       <p class="crumbs"><a href="/apps/">Apps</a> &rsaquo; <span data-crumb>An app</span></p>
 
       <div data-state="loading">
-        <p class="small">Reading this app from the directory and from GitHub&hellip;</p>
+        <div class="ui-skeleton" aria-busy="true"><span class="visually-hidden" role="status">Loading</span><i></i><i></i><i></i></div>
       </div>
 
       <div data-state="unknown" hidden>
         <header class="page-head">
           <div>
-            <h1>This app is not in the directory yet.</h1>
-            <p class="lead">A page here follows an app from the open directory, or one that its builder chose to show, from a cohort or on their own<span data-unknown-repo-wrap hidden>, and <b data-unknown-repo></b> is not one of them yet</span>.</p>
-            <p class="fine">If it was built by the principles, its builder can <a href="https://github.com/humanshaped/directory/issues/new?template=list-my-app.yml">ask to have it listed</a>, and in the meantime <a href="/apps/">every app in the directory</a> has a page of its own.</p>
+            <h1>Nothing is at this address</h1>
+            <p class="ui-row-meta" data-unknown-repo-wrap hidden><b data-unknown-repo></b></p>
+            <p class="actions"><a class="btn-secondary" href="/apps/">The apps page</a><a class="btn-secondary" href="https://github.com/humanshaped/directory/issues/new?template=list-my-app.yml">Ask to list an app</a></p>
           </div>
         </header>
       </div>
@@ -84,8 +85,8 @@
       <div data-state="error" hidden>
         <header class="page-head">
           <div>
-            <h1>The directory could not be reached.</h1>
-            <p class="lead">This page reads the open directory on GitHub each time it opens, and GitHub did not answer just now, so trying again in a minute is the best next step.</p>
+            <h1>This could not load</h1>
+            <p class="actions"><a class="btn-secondary" href="">Try again</a></p>
           </div>
         </header>
       </div>
@@ -127,10 +128,10 @@
     </div>
   </main>
   <script src="/assets/hub-config.js?v=20261016a" defer></script>
-  <script src="/assets/cohort-lib.js" defer></script>
+  <script src="/assets/cohort-lib.js?v=20261022a" defer></script>
   <script src="/assets/apps-lib.js?v=20261005f" defer></script>
   <script src="/assets/community-lib.js" defer></script>
-  <script src="/assets/apps.js?v=20261012h" defer></script>
+  <script src="/assets/apps.js?v=20261022a" defer></script>
 
   <footer class="site-footer">
     <div class="wrap">

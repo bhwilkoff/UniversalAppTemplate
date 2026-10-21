@@ -39,13 +39,11 @@
     }
     tabsCtl = U.tabs(mount, TABS, $('[data-detail]'), { label: current.title });
   }
-  var STATUS = { draft: ['off', 'Draft'], open: ['done', 'Open for joining'], running: ['time', 'Running'], finished: ['off', 'Finished'] };
   function drawFacts(c, sessions, people) {
-    var st = STATUS[c.status] || ['off', c.status];
     var when = c.session_weekday != null && c.session_time ? lib.scheduleText(c, Intl.DateTimeFormat().resolvedOptions().timeZone).replace(/\.$/, '') : null;
     var here = people.filter(function (p) { return p.status !== 'left'; }).length;
     $('[data-detail-facts]').replaceChildren(U.facts([
-      ['Status', U.status(st[0], st[1])],
+      ['Status', U.status('cohort', c.status)],
       ['Meets', when || 'Not set'],
       ['Starts', c.starts_on ? new Date(c.starts_on + 'T12:00:00').toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' }) : 'Not set'],
       ['Weeks', String(c.weeks)],
@@ -137,7 +135,6 @@
       var del = $('[data-delete-draft]');
       $('[data-danger]').hidden = c.status !== 'draft';
       del.textContent = 'Delete this draft';
-      del.removeAttribute('data-armed');
       $('[data-detail]').hidden = false;
     });
   }
@@ -188,7 +185,7 @@
       button.disabled = false;
       if (r.error && r.error.code === '23505') return say('[data-detail-message]', 'You have asked already, and meet@ has not finished yet.');
       if (r.error) return say('[data-detail-message]', 'The request could not be made: ' + r.error.message);
-      say('[data-detail-message]', 'Asked. meet@humanshaped.org picks it up within the hour, invites everyone who gave an email for invitations, and puts the Meet link on each week here. People who give their email later are added when you ask again.');
+      say('[data-detail-message]', 'Asked. Meet links arrive within the hour.');
       openCohort(current.id);
     });
   }
@@ -219,19 +216,16 @@
   // the button asks once more on the page itself before it does.
   $('[data-delete-draft]').addEventListener('click', function () {
     var b = this;
-    if (!b.hasAttribute('data-armed')) {
-      b.setAttribute('data-armed', '');
-      b.textContent = 'Delete ' + current.title + ', with its sessions and groups';
-      say('[data-detail-message]', 'This cannot be undone. Click again to delete it.');
-      return;
-    }
+    U.confirm({ title: 'Delete ' + current.title + '?', body: 'Its sessions and groups go too.', action: 'Delete draft' }).then(function (ok) { if (ok) deleteDraft(b); });
+  });
+  function deleteDraft(b) {
     b.disabled = true;
     db.from('cohorts').delete().eq('id', current.id).eq('status', 'draft').select('id').then(function (r) {
       b.disabled = false;
       if (r.error || !r.data.length) return say('[data-detail-message]', 'It could not be deleted: ' + (r.error ? r.error.message : 'only drafts can be deleted') + '.');
 if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign('/teach/');
     });
-  });
+  }
 
   $('[data-make-sessions]').addEventListener('click', function () {
     var rows = lib.sessionRows(current);
@@ -304,7 +298,7 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
       ev.preventDefault();
       say('[data-heard-message]', 'Saving…');
       db.from('sessions').update({ heard: heardForm.elements.heard.value.trim() || null }).eq('id', last.id).select('id').then(function (r) {
-        say('[data-heard-message]', r.error || !r.data.length ? 'Not saved: ' + (r.error ? r.error.message : 'the database refused') + '.' : 'Saved. It shows on the session page while people arrive next time.');
+        say('[data-heard-message]', r.error || !r.data.length ? 'Not saved: ' + (r.error ? r.error.message : 'no change was allowed') + '.' : 'Saved. It shows on the session page while people arrive next time.');
       });
     };
     say('[data-heard-message]', '');
@@ -481,7 +475,7 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
         : db.from('feedback').update({ body: body }).eq('id', g.feedback_id).select('id');
       q.then(function (r) {
         save.disabled = false;
-        if (r.error || !r.data.length) { msg.textContent = 'Not saved: ' + (r.error ? r.error.message : 'the database refused') + '.'; return; }
+        if (r.error || !r.data.length) { msg.textContent = 'Not saved: ' + (r.error ? r.error.message : 'no change was allowed') + '.'; return; }
         g.body = body;
         msg.textContent = 'Saved. They will see it was edited.';
         form.hidden = true; open.hidden = false;
@@ -555,7 +549,7 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
       if (g.from === me.id && (g.note_id || g.feedback_id)) li.appendChild(correctControl(g));
       return li;
     }));
-    if (c.empty) body.appendChild(el('p', 'small', 'They did not share, queue, answer, or give feedback around this session, which is worth a kind, private word with an easy way back in.'));
+    if (c.empty) body.appendChild(el('p', 'small', 'Nothing from them around this session.'));
     if (p.app_repo) {
       var repo = el('p', 'small'); var ra = el('a', null, 'Their repository on GitHub'); ra.href = 'https://github.com/' + p.app_repo; ra.rel = 'noopener'; ra.target = '_blank';
       repo.appendChild(ra); body.appendChild(repo);
@@ -771,22 +765,22 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
         li.appendChild(el('strong', null, t.user_id === me.id ? 'You' : personName(t)));
         if (t.user_id === c.created_by) { li.appendChild(el('span', 'small', ' made this cohort')); box.appendChild(li); return; }
         var msg = el('span', 'small'); msg.setAttribute('role', 'status');
-        var rm = el('button', 'btn-danger small', t.user_id === me.id ? 'Step away from this cohort' : 'Take them off');
+        var self = t.user_id === me.id;
+        var rm = el('button', 'btn-danger small', self ? 'Leave' : 'Remove');
         rm.type = 'button';
+        rm.setAttribute('aria-label', self ? 'Leave this cohort as a teacher' : 'Remove ' + personName(t) + ' as teacher');
         rm.addEventListener('click', function () {
-          if (!rm.hasAttribute('data-armed')) {
-            rm.setAttribute('data-armed', '');
-            rm.textContent = t.user_id === me.id ? 'Step away: you will no longer teach it' : 'Take ' + personName(t) + ' off this cohort';
-            return;
-          }
+          U.confirm(self ? { title: 'Stop teaching ' + c.title + '?', body: 'Another teacher can add you back.', action: 'Leave' } : { title: 'Remove ' + personName(t) + ' as teacher?', body: 'You can add them back.', action: 'Remove teacher' }).then(function (ok) { if (ok) takeOff(); });
+        });
+        function takeOff() {
           rm.disabled = true;
           db.from('cohort_teachers').delete().eq('cohort_id', c.id).eq('user_id', t.user_id).select('user_id').then(function (r) {
             rm.disabled = false;
-            if (r.error || !r.data.length) { msg.textContent = ' Not removed: ' + (r.error ? r.error.message : 'the database refused') + '.'; return; }
+            if (r.error || !r.data.length) { msg.textContent = ' Not removed: ' + (r.error ? r.error.message : 'no change was allowed') + '.'; return; }
             if (t.user_id === me.id) { location.assign('/teach/'); return; }
             drawTeachers();
           });
-        });
+        }
         li.appendChild(document.createTextNode(' '));
         li.appendChild(rm); li.appendChild(msg);
         box.appendChild(li);
@@ -855,7 +849,7 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
       b.disabled = true;
       db.from('enrollments').update({ role: next }).eq('cohort_id', current.id).eq('user_id', p.user_id).select('role').then(function (r) {
         b.disabled = false;
-        if (r.error || !r.data.length) { msg.textContent = ' Not changed: ' + (r.error ? r.error.message : 'the database refused') + '.'; return; }
+        if (r.error || !r.data.length) { msg.textContent = ' Not changed: ' + (r.error ? r.error.message : 'no change was allowed') + '.'; return; }
         p.role = r.data[0].role;
         drawRoster(people);
       });
@@ -944,21 +938,16 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
       actions.appendChild(showBtn);
       li.appendChild(msg);
       showBtn.addEventListener('click', function () {
-        if (!showBtn.hasAttribute('data-armed')) {
-          showBtn.setAttribute('data-armed', '');
-          showBtn.textContent = 'Show it again, for anyone to see';
-          msg.textContent = submitted
-            ? 'It goes back on humanshaped.org/apps/ and the feed. Click again to show it.'
-            : 'It goes back on humanshaped.org/apps/ once its builder says it is ready. Click again to lift the hide.';
-          return;
-        }
+        U.confirm({ title: 'Show this app again?', body: submitted ? 'It goes back on the apps page, for everyone.' : 'It goes on the apps page once its builder submits it.', action: 'Show it', danger: false }).then(function (ok) { if (ok) unhide(); });
+      });
+      function unhide() {
         showBtn.disabled = true;
         db.from('app_hides').delete().eq('cohort_id', current.id).eq('user_id', p.user_id).select('user_id').then(function (r) {
           showBtn.disabled = false;
-          if (r.error || !r.data.length) { msg.textContent = 'It was not changed: ' + (r.error ? r.error.message : 'the database refused') + '.'; return; }
+          if (r.error || !r.data.length) { msg.textContent = 'Not changed' + (r.error ? ': ' + r.error.message : ''); return; }
           openCohort(current.id);
         });
-      });
+      }
       return li;
     }
     if (!submitted) { li.removeChild(actions); return li; }
@@ -1040,7 +1029,7 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
       } else if (url && !/^https:\/\//.test(url)) { msg.textContent = 'A Meet link starts with https://.'; return; }
       msg.textContent = 'Saving…';
       db.from('groups').update(patch).eq('id', g.id).select('id').then(function (r) {
-        msg.textContent = r.error || !r.data.length ? 'Not saved: ' + (r.error ? r.error.message : 'the database refused') + '.' : (url ? 'Saved.' : 'Removed.');
+        msg.textContent = r.error || !r.data.length ? 'Not saved: ' + (r.error ? r.error.message : 'no change was allowed') + '.' : (url ? 'Saved.' : 'Removed.');
         if (!r.error && r.data.length) Object.assign(g, patch);
       });
     });
@@ -1133,52 +1122,43 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
       var revoke = el('button', 'btn-danger', 'Revoke it'); revoke.type = 'button';
       actions.appendChild(revoke);
       card.appendChild(actions);
-      var why = el('label', null, 'Why, for the record (only the cohort’s teachers and the holder read it)');
+      var why = el('label', null, 'Reason (optional) ');
+      why.appendChild(U.visibility('teachers', 'Read by'));
       var whyInput = el('input'); whyInput.maxLength = 500; why.appendChild(whyInput);
-      var whyForm = el('div', 'inline-form'); whyForm.appendChild(why); whyForm.hidden = true;
+      var whyForm = el('div', 'inline-form'); whyForm.appendChild(why);
       card.appendChild(whyForm);
       revoke.addEventListener('click', function () {
-        if (!revoke.hasAttribute('data-armed')) {
-          revoke.setAttribute('data-armed', '');
-          revoke.textContent = 'Revoke it for good';
-          whyForm.hidden = false;
-          msg.textContent = 'Its page will say it was revoked, and it will no longer open finished cohorts. Revoking cannot be undone, and a higher level is issued as a new credential afterwards. Click again to revoke.';
-          return;
-        }
+        U.confirm({ title: 'Revoke this credential?', body: 'Its page will say it was revoked. A higher level is issued as a new credential.', action: 'Revoke credential' }).then(function (ok) { if (ok) doRevoke(); });
+      });
+      function doRevoke() {
         revoke.disabled = true;
         db.from('credentials').update({ revoked_at: new Date().toISOString(), revoked_reason: whyInput.value.trim() || null }).eq('id', rec.id).select('id').then(function (r) {
           revoke.disabled = false;
-          if (r.error || !r.data.length) { msg.textContent = 'It was not revoked: ' + (r.error ? r.error.message : 'the database refused') + '.'; return; }
+          if (r.error || !r.data.length) { msg.textContent = 'Not revoked' + (r.error ? ': ' + r.error.message : ''); return; }
           openCohort(current.id);
         });
-      });
+      }
       card.appendChild(msg);
       return card;
     }
 
     if (now.state === 'waiting') {
-      status.replaceChildren(U.status('waiting', 'With the signer'), document.createTextNode(' ' + cred.levelName(cred.levelFor(rec.platforms)) + ', recorded ' + day(rec.issued_at) + '.'));
+      status.replaceChildren(U.status('credential', 'waiting'), document.createTextNode(' ' + cred.levelName(cred.levelFor(rec.platforms)) + ', recorded ' + day(rec.issued_at) + '.'));
       var acts = el('div', 'actions');
       if (teacherRow && teacherRow.can_sign) acts.appendChild(U.link('Sign it', '/teach/signing/', 'btn-secondary'));
-      var remove = el('button', 'btn-danger', 'Remove this record'); remove.type = 'button';
+      var remove = el('button', 'btn-danger', 'Delete this record'); remove.type = 'button';
       acts.appendChild(remove);
       card.appendChild(acts);
       card.appendChild(msg);
 
-      remove.addEventListener('click', function () {
-        if (!remove.hasAttribute('data-armed')) {
-          remove.setAttribute('data-armed', '');
-          remove.textContent = 'Remove it, before it is signed';
-          msg.textContent = 'For a record made by mistake. Click again to remove it.';
-          return;
-        }
+      U.confirmStep(remove, { title: 'Delete this record?', body: 'For a record made by mistake, before it is signed.', action: 'Delete record', run: function () {
         remove.disabled = true;
         db.from('credentials').delete().eq('id', rec.id).select('id').then(function (r) {
           remove.disabled = false;
-          if (r.error || !r.data.length) { msg.textContent = 'It was not removed: ' + (r.error ? r.error.message : 'the database refused') + '.'; return; }
+          if (r.error || !r.data.length) { msg.textContent = 'Not deleted' + (r.error ? ': ' + r.error.message : ''); return; }
           openCohort(current.id);
         });
-      });
+      } });
       return card;
     }
 

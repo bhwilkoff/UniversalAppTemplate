@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261021h">
+  <link rel="stylesheet" href="/assets/site.css?v=20261022a">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -36,6 +36,7 @@
     if (location.hash === '#exchanges') location.replace('/#exchanges');
   </script>
   <script src="/assets/site.js?v=20261021c" defer></script>
+  <script src="/assets/ui.js?v=20261022a" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to the page</a>
@@ -53,10 +54,10 @@
       </nav>
       <div class="header-actions">
         <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#moon"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#moon"/></svg>
         </button>
         <a class="btn-primary small" href="/account/">
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#github"/></svg>
           <span>Sign in<span class="long"> with GitHub</span></span>
         </a>
       </div>
@@ -72,14 +73,14 @@
 
       <div class="account" data-account>
         <section class="account-state" data-state="loading">
-          <p>Checking whether you are signed in…</p>
+          <div class="ui-skeleton" aria-busy="true"><span class="visually-hidden" role="status">Loading</span><i></i><i></i><i></i></div>
         </section>
 
         <section class="account-state" data-state="signed-out" hidden>
           <button class="btn-primary" type="button" data-sign-in>
-            <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Sign in with GitHub
+            <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#github"/></svg>Sign in with GitHub
           </button>
-          <p class="small">GitHub will ask whether to share your public profile with Human Shaped. That is all we ask for, and you can take it back at any time from your GitHub settings.</p>
+          <p class="small">GitHub shares your public profile only.</p>
           <!-- Google sign-in beside GitHub (DECISIONS.md): words by Claude, awaiting Ben's review. -->
           <div class="google-signin" data-google-signin hidden></div>
           <p class="small" data-google-note hidden>You can also sign in with Google. Cohorts work through GitHub, so the first time, you will be asked to link your GitHub account too.</p>
@@ -123,7 +124,7 @@
           <div class="notice" data-needs-github hidden>
             <p><strong>Link your GitHub account to join a cohort.</strong> Your app lives on GitHub, and your cohort talks there, so a cohort needs your GitHub as well as your Google sign-in.</p>
             <p><button class="btn-primary" type="button" data-link-github>
-              <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Link my GitHub account
+              <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#github"/></svg>Link my GitHub account
             </button></p>
           </div>
 
@@ -134,7 +135,6 @@
 
           <!-- Words by Claude, awaiting Ben's review (Google sign-in beside GitHub). -->
           <h2>Linked accounts</h2>
-          <p class="small">The ways you can sign in to this one account. You can add or take one away, but never the last.</p>
           <ul class="linked-accounts" data-linked></ul>
           <div class="google-signin" data-google-link hidden></div>
           <p class="small" data-linked-status role="status"></p>
@@ -142,7 +142,6 @@
           <!-- Written by Claude, awaiting Ben's review (research/notes/reach-notes.md). -->
           <div data-reach-section hidden>
             <h2>How your teachers can reach you</h2>
-            <p class="small">A teacher who has not seen you in a while may want to write to you privately. Until you choose otherwise, their words wait for you here and on your cohort page. Both choices below are off until you turn them on, and you can turn them off at any time.</p>
             <form class="inline-form" data-reach-form>
               <label>The email address to use
                 <span class="hint">It can be different from the one on your calendar invites. Only the teachers of cohorts you are in see it, and only if you tick the first box.</span>
@@ -165,26 +164,25 @@
 
           <div id="notes" data-notes-section hidden>
             <h2>Notes from your teachers</h2>
-            <p class="small">These are yours to keep after a cohort ends or you leave it, and yours to remove. Only you and the cohort's teachers can read them.</p>
+            <p class="ui-meta-line"><span data-vis="teachers"></span></p>
             <div data-notes></div>
           </div>
 
           <!-- Words by Claude, awaiting Ben's review (G3). -->
           <div id="stages" data-path-section hidden>
             <h2>Your stages</h2>
-            <p class="small">What you marked on the stages. Only you can see it, and nothing here is counted or compared.</p>
+            <p class="ui-meta-line"><span data-vis="me"></span></p>
             <div data-path-marks></div>
           </div>
 
           <!-- Written by Claude, awaiting Ben's review (H2). -->
           <div data-credential-section hidden>
             <h2>Your credential</h2>
-            <p class="small">What your teachers recorded when your cohort finished. Once it is signed, its page holds the credential itself, which you can share by its link, download for a credential wallet that reads Open Badges 3.0, or have anyone check.</p>
             <div data-credential-list></div>
           </div>
 
           <h2>Your data</h2>
-          <p>This site keeps your GitHub name and picture, which cohorts you are in, whatever you choose to share with a cohort, your own marks on the stages, your own app if you add one (on <a href="/apps/mine/">its own page</a>), the notes your teachers send you, and, only if you give it above, the address your teachers may use. Leaving a cohort removes what you shared there but keeps your notes, which you can remove here. Deleting your account removes everything.</p>
+          <p class="actions"><a class="btn-secondary" href="/privacy/">What the hub keeps</a></p>
           <div class="actions">
             <button class="btn-secondary" type="button" data-sign-out>Sign out</button>
             <button class="btn-danger" type="button" data-delete-open>Delete my account</button>
@@ -196,7 +194,7 @@
     <dialog class="confirm" data-delete-dialog aria-labelledby="delete-title">
       <form method="dialog">
         <h2 id="delete-title">Delete your account?</h2>
-        <p>This removes your profile, your place in every cohort, and everything you shared on this site. Your GitHub account and your apps are not touched.</p>
+        <p>Your profile, your place in every cohort, and what you shared are deleted.</p>
         <div class="actions">
           <button class="btn-secondary" value="cancel">Keep my account</button>
           <button class="btn-danger final" value="delete" data-delete-confirm>Delete it</button>
@@ -207,7 +205,7 @@
     <dialog class="confirm" data-leave-dialog aria-labelledby="leave-title">
       <form method="dialog">
         <h2 id="leave-title">Leave this cohort?</h2>
-        <p>What you shared with this cohort will be removed, and your classmates will no longer see your app here. Your app itself stays yours, on GitHub.</p>
+        <p>What you shared there is removed. Your notes stay.</p>
         <div class="actions">
           <button class="btn-secondary" value="cancel">Stay</button>
           <button class="btn-danger final" value="leave">Leave the cohort</button>
@@ -220,15 +218,15 @@
   <script src="/assets/teach-lib.js?v=20261006g" defer></script>
   <script src="/assets/discussions-lib.js" defer></script>
   <script src="/assets/addon-lib.js" defer></script>
-  <script src="/assets/chat-lib.js" defer></script>
+  <script src="/assets/chat-lib.js?v=20261022a" defer></script>
   <script src="/assets/mentor-lib.js" defer></script>
   <script src="/assets/path-lib.js" defer></script>
   <script src="/assets/reach-lib.js" defer></script>
-  <script src="/assets/builder-lib.js" defer></script>
+  <script src="/assets/builder-lib.js?v=20261022a" defer></script>
   <script src="/assets/credential-lib.js?v=20261006c" defer></script>
   <script src="/assets/google-signin-lib.js" defer></script>
   <script src="/assets/google-signin.js" defer></script>
-  <script src="/assets/hub.js?v=20261021b" defer></script>
+  <script src="/assets/hub.js?v=20261022a" defer></script>
 
   <footer class="site-footer">
     <div class="wrap">

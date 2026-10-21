@@ -30,10 +30,12 @@
   }
 
   // One sentence about where the app stands in public.
+  // Where the app stands, as parts (DESIGN-KIT.md): who can see it, and a
+  // hide with its reason. null when there is no app yet.
   function standing(row, hide) {
-    if (!row) return '';
-    if (hide) return 'It is kept off the apps page for now' + (hide.reason ? ', because: ' + hide.reason : '.') + (hide.reason && !/[.!?]$/.test(hide.reason) ? '.' : '') + ' Your switch is still yours, and it shows again when the hide is lifted.';
-    return row.public ? 'It is on the apps page, with a page of its own.' : 'Only you can see it. Nobody else knows it is here until you choose to show it.';
+    if (!row) return null;
+    if (hide) return { audience: 'me', hidden: true, reason: hide.reason || null };
+    return { audience: row.public ? 'public' : 'me', hidden: false, reason: null };
   }
 
   var lib = { repoFrom: repoFrom, checkOwnApp: checkOwnApp, standing: standing };

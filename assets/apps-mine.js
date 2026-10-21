@@ -21,7 +21,12 @@
     var remove = root.querySelector('[data-own-app-remove]');
     var page = root.querySelector('[data-own-app-page]');
     function show(row, hide) {
-      standing.textContent = B.standing(row, hide);
+      var st = B.standing(row, hide), U = window.UI;
+      standing.replaceChildren();
+      if (st) {
+        standing.appendChild(U.visibility(st.audience));
+        if (st.hidden) { standing.appendChild(document.createTextNode(' ')); standing.appendChild(U.status('app', 'hidden')); if (st.reason) standing.appendChild(U.el('span', 'ui-row-meta', ' ' + st.reason)); }
+      }
       remove.hidden = !row;
       page.hidden = !(row && row.public && !hide);
       if (row) page.href = '/apps/app/?r=' + row.app_repo;

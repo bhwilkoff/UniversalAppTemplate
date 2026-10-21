@@ -61,7 +61,7 @@
     { key: 'cue-card', name: 'A card for everyone', teacher: true, kinds: ['talk', 'design'],
       line: { teacher: 'A few words, and a clock if you want one, on everyone’s view at once.' } },
     { key: 'questions', name: 'Questions', teacher: false, kinds: ['question', 'reflection'],
-      line: { teacher: 'Ask everyone a question, see the answers come in, and choose whether to show the count.', student: 'Your teacher’s questions. Only you and your teacher see your answer.' } },
+      line: { teacher: 'Ask everyone a question, see the answers come in, and choose whether to show the count.', student: 'Your teacher’s questions.' } },
     { key: 'cue-recording', name: 'Recording', teacher: true, kinds: [],
       line: { teacher: 'Tell everyone the session is being recorded, and when it stops.' } },
     { key: 'cue-talk', name: 'Your own talk', teacher: true, kinds: [],

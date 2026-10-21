@@ -57,15 +57,11 @@
     }
     form.addEventListener('submit', function (ev) {
       ev.preventDefault();
-      if (!approve.hasAttribute('data-armed')) {
-        approve.setAttribute('data-armed', '');
-        approve.textContent = 'Approve, and make @' + login + ' a teacher';
-        msg.textContent = 'They will be able to make and run cohorts of their own. Click again to approve.';
-        return;
-      }
-      decide(true);
+      window.UI.confirm({ title: 'Make @' + login + ' a teacher?', body: 'They can plan and run cohorts of their own.', action: 'Approve', danger: false }).then(function (ok) { if (ok) decide(true); });
     });
-    decline.addEventListener('click', function () { decide(false); });
+    decline.addEventListener('click', function () {
+      window.UI.confirm({ title: 'Decline @' + login + '\u2019s request?', body: 'They read your answer, and can ask again later.', action: 'Decline' }).then(function (ok) { if (ok) decide(false); });
+    });
     card.appendChild(form);
     return card;
   }

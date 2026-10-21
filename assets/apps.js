@@ -303,7 +303,7 @@
       var box = $('[data-declaration]'); box.replaceChildren();
       var file = 'https://github.com/' + repo + '/blob/HEAD/HUMAN-SHAPED.md';
       if (!d || !d.principles.length) {
-        box.appendChild(el('p', null, 'This app has not answered the principles yet. Its builder can do that in a file called HUMAN-SHAPED.md in the app’s own repository, answering each principle in their own words, with evidence anyone can open.'));
+        box.appendChild(window.UI.empty('Not declared yet', window.UI.link('How to declare', 'https://github.com/bhwilkoff/UniversalAppTemplate/blob/main/HUMAN-SHAPED.md', 'btn-secondary')));
         var p = el('p'); p.appendChild(link('/start/brand/#declare', 'How to show that your software is human-shaped')); box.appendChild(p);
         return;
       }
@@ -349,8 +349,8 @@
         return;
       }
       box.appendChild(el('p', null, talk.kind === 'discussions'
-        ? 'Conversation about this app happens in its repository’s Discussions on GitHub, where anyone with a GitHub account can ask a question, share what they noticed, or say what it meant to them.'
-        : 'Conversation about this app happens in its repository’s Issues on GitHub, where anyone with a GitHub account can ask a question or say what they noticed.'));
+        ? 'In its repository’s Discussions on GitHub.'
+        : 'In its repository’s Issues on GitHub.'));
       var recent = el('div', 'app-threads');
       box.appendChild(recent);
       var a = el('div', 'actions');

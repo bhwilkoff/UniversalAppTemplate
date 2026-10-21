@@ -1,9 +1,9 @@
 # The Human Shaped design kit
 
 Binding, like PAGES.md. PAGES.md says which page holds what; this file says
-what every page is built from. Before adding a sentence to a page, find the
-part below that makes it unnecessary. If none fits, add the part here first,
-with its research, then use it.
+what every page is built from and how it speaks. Before adding a sentence,
+a page, or a control, find the part below that does the job. If none fits,
+add the part here first, with its research, then build it in `assets/ui.js`.
 
 Ben, October 21, 2026: "You are still building a site that is explaining
 everything as text rather than actually building a sustainable platform
@@ -11,143 +11,216 @@ that has design elements and a common language that can continue to be
 built upon," and "I want this to be fully research based, just as
 everything else we do (in the cohorts) needs to be."
 
-Sources: research/notes/design-kit-research.md (the systems and studies
-behind each part), research/notes/navigation-and-wayfinding-notes.md,
-research/notes/links-and-actions-notes.md, research/notes/design-patterns.md,
-research/notes/ai-design-anti-patterns.md, and the audit of every surface
-in research/notes/audit-2026-10-21/.
+**Research:** research/notes/design-kit-research.md (GOV.UK Design
+System, GitHub Primer, Shopify Polaris, Material 3, Apple HIG, Nielsen
+Norman Group, WCAG 2.2, the ARIA practices guide, and how Slack, Drive,
+GitHub, Canvas, and Discourse show who can see something), with the audit
+of every surface in research/notes/audit-2026-10-21/ and the navigation
+research in research/notes/navigation-and-wayfinding-notes.md. Each rule
+below names the section of the research note it comes from (R§).
 
-Code: `assets/ui.js` builds each part (`UI.status`, `UI.visibility`, …);
-`assets/site.css` styles them under "The hub's shared pieces".
-`tools/test/design-kit.test.mjs` fails when a page breaks a rule it can
-check.
+**Code:** every part is built by `assets/ui.js` (`UI.status`,
+`UI.visibility`, `UI.confirm`, …) and styled in `assets/site.css` under
+"The hub's shared pieces". No page draws a part by hand.
+**Check:** `tools/test/design-kit.test.mjs` fails on the rules a test can
+check (R§7). The rest are part of every page review, at 375 and 1280 px,
+light and dark.
 
-## The writing rule
+## How the interface speaks (R§5)
 
-A sentence on screen is allowed only when it is one of these, and then it
-is one short sentence:
+1. **A sentence only for a refusal, a warning, or a fact you cannot see by
+   looking**, and then one short sentence. A sentence that explains a
+   control, restates what happened, says who can see something, or names
+   where an action lives is a missing part.
+2. **Sentence case** everywhere; no colon after a label.
+3. **Short**: a field label three words at most; a tab or row-of-links
+   item one or two words; a status one or two; a result three.
+4. **Buttons are verbs naming the thing** ("Make a poll", "Delete this
+   draft"); the noun drops when the page is about that thing; Save,
+   Cancel, Continue, and Close stand alone.
+5. **One verb per kind of action**: **Remove** takes something out and it
+   can come back; **Delete** ends it for good (red, confirmed); **Hide**
+   and **Show** change who sees it; **Leave** ends your own place in
+   something; **Take back** withdraws your own answer. The result reuses
+   the verb ("Removed").
+6. **One name per thing** (the lexicon below).
+7. **Status words are adjectives or past forms**, never verbs.
+8. **Errors say what is wrong in the field's own terms**: "Enter a title",
+   "Title must be 120 characters or fewer". Never "please", "sorry",
+   "oops", "invalid", "something went wrong", or the database's words.
+9. **Never** "easy", "quick", "just", "click here", exclamation marks,
+   ampersands, or emoji in interface text.
+10. **Times on the reader's clock, written out** ("Tue Feb 2, 6:00 PM
+    your time"), never an ISO date or 24-hour time.
 
-1. **A refusal**: what you cannot do here, and why ("Only the people in
-   this cohort can see it.").
-2. **A warning**: what a step will do that cannot be undone or will be
-   seen by others ("Its page will say it was revoked.").
-3. **A fact you cannot see by looking**: where something goes, who sends
-   it, what happens later ("Your video stays in your Google Drive.").
+### The lexicon (one name per thing)
 
-Everything else is a part: who can see something is a visibility marker,
-a state is a status label, a count is a count, an empty list is an empty
-state, rare detail is a disclosure, how a feature works belongs in the
-guide. Labels are a few words; buttons are verbs that name the thing
-("Sign all", "Add the group"); success is "Saved", not a paragraph.
+| Say | Not |
+|---|---|
+| group | trio, room, rehearsal room (a group's Meet link is its room) |
+| the apps page | humanshaped.org/apps/, the app directory |
+| live session | main session, main room, session page |
+| Open (a cohort, a poll, an exchange taking part) | Open for joining, Open for people to join, Taking answers |
+| exchange | thread, video thread |
+| teacher, co-teacher, mentor, student | instructor, facilitator, learner (as a role) |
 
 ## The parts
 
-### Page header
-- **What**: crumbs (PAGES.md), the heading that names the thing, then
-  facts, then the toolbar.
-- **Words**: the heading is the thing's name ("Kit test", "Signing"),
-  never a slogan.
-- **Not**: an intro paragraph under the heading on a hub page.
+### Page header (R§6.1)
+Crumbs → `h1` naming the thing (its real name, never a slogan, and no
+full stop: "Teaching", not "Run a cohort.") → one line with its status and
+visibility → facts → actions → the area row or cohort bar. No intro
+paragraph on a hub page (a page that has sign-in states). The document
+title is most specific first. Ben, October 21, 2026, of the old /teach/
+intro: "It still reads to me as overly explainatory and unpolished."
 
-### Facts (`UI.facts`)
-- **What**: the few facts about one thing a person checks most (status,
-  when, length, how many), as names and values.
-- **When**: a page or row about one thing with more than one fact. Never a
-  run-on sentence or an "A · B · C" string.
-- **Accessibility**: a `<dl>`; names stay visible (not placeholders).
+### Paragraph length
+On a hub page no paragraph runs past 20 words, and no sentence a script
+builds runs past 22, outside a notice or a closed disclosure. Steps in
+someone else's app (Meet, a phone's recorder), a session plan's own words,
+and queries are content, marked `kit: content` on their line.
 
-### Status label (`UI.status(tone, word)`)
-- **What**: a thing's state as an icon and one or two words.
-- **Tones**: `done` (finished, signed, open, verified), `waiting` (to do,
-  with someone else), `time` (happening now, running), `off` (draft,
-  closed, not set), `alert` (failed, revoked, needs attention).
-- **Words, fixed per kind of thing**:
-  - cohort: Draft, Open for joining, Running, Finished
-  - poll: Taking answers, Closed
-  - credential: Not recorded, With the signer, Signed, Revoked
-  - request to teach: Waiting for an answer, Approved, Declined
-  - exchange: Open, Closed to new videos
-  - an app: Not on the apps page, On the apps page, Hidden by a teacher
-  - work: Ready, Not yet, Confirmed
-  - a step: Done, To do, Optional
-  - a signing key: Key ready, No key chosen
-  - an action under way: Signing, Saving
-- **Accessibility**: the word carries the meaning; the icon and color only
-  repeat it (WCAG 1.4.1).
-- **Not**: a pill with a colored fill, or a sentence ("Draft, visible only
-  to you").
+### Facts — `UI.facts([[name, value], …])` (R§6.1, R§2.3)
+The few facts a person checks most about one thing, as a `<dl>`. Names one
+or two words; values short. An empty fact is left out. Never a sentence or
+an "A · B · C" string.
 
-### Visibility marker (`UI.visibility(who)`)
-- **What**: who can see this, as an icon and fixed words, everywhere
-  privacy used to be explained in prose.
-- **Audiences**: Only you · You and your teachers · Only teachers · Your
-  cohort · Human Shaped members · Anyone with the link · Everyone ·
-  Public on GitHub · Stays on this computer.
-- **When**: beside the field, section, or row it describes. Two markers
-  when two things differ (an exchange for "Your cohort" whose video file is
-  "Anyone with the Drive link").
-- **Not**: "Only you and the cohort's teachers can read these" in a
-  paragraph.
+### Status label — `UI.status(thing, state)` (R§6.4)
+A thing's state as an icon and a word, inline, with no box, fill, or pill.
+The word always carries the meaning. Five tones:
 
-### Count (`UI.count`)
-- **What**: how many things wait, beside the name of where they are.
-- **Not**: a sentence ("Someone is waiting for your feedback"), a score,
-  a streak, or a comparison with anyone.
+| Tone | Icon | Means |
+|---|---|---|
+| done | check-circle | finished, nothing left to do |
+| active | circle (filled, thistle) | open, running, live now |
+| waiting | circle-dashed | not started, or waiting on someone |
+| off | minus-circle | draft, closed, hidden, not possible yet |
+| problem | warning-circle | something is wrong and needs fixing |
 
-### Rows (`UI.rows`, `UI.row`)
-- **What**: a list of things of one kind: the title (a link when it has a
-  page), one meta line, a status, and at most two actions on the right.
-- **When**: every list of cohorts, polls, exchanges, people, credentials,
-  queue items.
-- **Not**: a card per item with its own paragraph.
+The registry is the only source of status words (`UI.STATUS` in ui.js
+mirrors it; a test checks they match):
 
-### Empty state (`UI.empty(text, action)`)
-- **What**: one short line saying what is missing, and at most one action
-  that fills it ("No cohorts yet" + "Plan a cohort").
-- **Not**: "When one opens, it will be listed here."
+- cohort: Draft (off), Open (active), Running (active), Finished (done)
+- session: Planned (waiting), Ready (active), Live now (active), Finished (done)
+- poll: Open (active), Closed (off), Answered (done)
+- request to teach: Waiting (waiting), Approved (done), Declined (off)
+- credential: Not earned yet (off), Waiting to be signed (waiting), Signed (done), Revoked (problem)
+- app: Submitted (done), Not submitted (waiting), Hidden (off)
+- invitation: Invited (waiting), Joined (done), Failed (problem)
+- exchange: Open (active), Closed (off)
+- task: Done (done), To do (waiting), Optional (waiting), Cannot start yet (off)
+- connection: Live (active), Checking (waiting), Offline (problem)
+- key: Ready (done), Not chosen (waiting)
+- work: Ready (done), Not yet (waiting), Confirmed (done)
+- showing: Open to guests (active)
+- action: Saving (waiting), Signing (waiting), Failed (problem)
 
-### Disclosure (`UI.disclosure`, `<details class="ui-disclosure">`)
-- **What**: detail most people never need, closed until asked for: a
-  manual fallback, the why behind a rule, outside steps (Meet, a phone's
-  recorder).
-- **Not**: a place to hide what everyone needs.
+### Visibility marker — `UI.visibility(audience)` (R§6.5, R§2.15)
+Who can see this, as an icon and fixed words, narrow to wide. Each word is
+defined once, in a popover on the marker. The narrowest audience that
+works is the default and is always shown. Widening to a link or everyone
+is a confirm step. When a thing and its file differ, show both, each
+labeled ("Exchange" Your cohort, "Video file" Anyone with the link).
 
-### Toolbar (`.ui-toolbar`)
-- **What**: the actions for the thing on the page, in one row: at most one
-  filled button, first; then outlined ones; red only for what is hard to
-  undo, last (DECISIONS.md, "Actions and links").
-- **When**: a page or tab with more than one action.
+| Audience | Words | Icon |
+|---|---|---|
+| device | On this device | device-mobile |
+| me | Only you | lock-simple |
+| teachers | You and your teachers | user |
+| staff | Only teachers | user |
+| approvers | You and approvers | user |
+| cohort | Your cohort | users |
+| members | Human Shaped members | users-three |
+| link | Anyone with the link | link |
+| public | Everyone | globe-simple |
 
-### Tabs (`UI.tabs`)
-- **What**: sections of one thing, each with its own address (`?t=`),
-  shown one at a time, drawn as a row of links with the current one
-  marked.
-- **When**: a page whose jobs a person does at different times (the
-  teaching page). Never stacked under another row of links.
+A public place is a fact, not an audience ("On GitHub").
 
-### Confirm step
-- **What**: a hard-to-undo action asks once more, on the page, with the
-  button naming the consequence ("Delete Kit test, with its sessions").
-- **When**: deleting, revoking, removing someone, giving or taking admin.
-  Not for reversible changes.
-- **Not**: `window.confirm`, or no confirmation at all on a delete.
+### Count — `UI.count(n, noun)` (R§6.6)
+How many things wait, always beside its noun, never zero (absent instead),
+never a score, streak, or comparison. No pill.
 
-### Inline status (`.ui-inline-status`, `role="status"`)
-- **What**: the result of an action, next to the control that caused it,
-  in a word or two ("Saving", "Saved", "Not saved: <reason>").
-- **Not**: a paragraph of what happens next.
+### Rows — `UI.rows()`, `UI.row({…})` (R§6.7)
+One thing per row: its title (the row's only link to its page) → a meta
+line of short facts → status and visibility → at most two secondary
+actions, danger last. No filled buttons in rows.
 
-### Notice
-- **What**: the only place for a sentence that warns or refuses, in an
-  inset panel.
+### Empty state — `UI.empty(text, action)` (R§6.8)
+One line of at most eight words saying what is absent ("No polls yet"),
+and at most one action, a verb naming the thing ("Make a poll"). Never
+while loading, never for errors.
+
+### Checklist (R§6.9)
+Setup tasks in any order, each a short imperative naming the thing, with
+the task registry's status; a count above ("2 of 5 done"); gone when all
+are done. Never for learning progress.
+
+### Field, hint, error (R§6.10)
+Label three words at most; "(optional)" written in the label; a hint only
+when most people need it, one short sentence, no link; who will see the
+answer is a visibility marker beside the label. Errors as in the writing
+rules, beside the field; three or more get a summary at the top. Save is
+never disabled. Toggles save at once; text, checkboxes, and selects save
+with a button; never both in one form.
+
+### Disclosure — `UI.disclosure(summary, content)` (R§6.11)
+Native `<details>`, closed by default, for detail only some people need.
+The summary names what is inside ("Set up Meet by hand"), never "More" or
+"Learn more". Two levels deep at most.
+
+### Toolbar — `.ui-toolbar` (R§6.12)
+The actions on the page's thing, in one row: one filled button first (the
+next step for the thing's state), up to three secondary, danger last; more
+go in "More actions". No border or fill around it.
+
+### Confirm — `UI.confirm({title, body, action})` (R§6.13)
+A native `<dialog>` before something hard to undo: deleting, removing a
+person, leaving, revoking, widening who can see something, giving or
+taking admin. Title a question naming the thing ("Delete this poll?");
+one sentence of consequence; Cancel, then the action repeating the verb
+("Delete poll"), focus starting on Cancel, Esc cancels. Never for what can
+be undone; never `window.confirm`, "Click again", or an arming button.
+
+### Inline status — `UI.say(element, text, tone)` (R§6.14)
+What just happened, beside the control that did it, in three words at
+most ("Saved", "Link copied", "Not saved: <reason>"), in a `role="status"`
+element present from the start, kept until the next action. No toasts. A
+button's label never flips to carry a result.
+
+### Notice — `.ui-notice` (R§6.15)
+The home of the sentences the writing rules allow, one per page: a
+warning (icon, bold first line) or a refusal (lock icon). A tinted inset
+panel with no stripe. Live-session signals are the one exception to one
+per page.
+
+### Page gate — `UI.gate(kind)` (R§6.15)
+The whole page closed or empty, one fixed line and one action each:
+- signed out: "Sign in to open this" + Sign in with GitHub
+- not a member: "Only people in this cohort can open this" + Go to your home
+- not a teacher: "Only teachers can open this" + Ask to teach
+- not an admin: "Only admins can open this" + Go to your home
+- missing: "Nothing is at this address" + Go to your home
+- error: "This could not load" + Try again, the error in "Error details"
+
+### Tabs — `UI.tabs(...)` (R§6.16, R§6.2)
+Sections of one thing as a row of links, each with its own address
+(`?t=`), the current one marked by weight and an underline; switching does
+not reload, and the address always changes, so a section can be shared.
+Items that do not fit fold into "More". Never stacked under another row.
+
+### Segmented control (R§6.16)
+Filters one list in place: two to five noun choices, buttons with
+`aria-pressed`, a status line naming the result ("5 apps").
+
+### Loading — `.ui-skeleton` (R§6.17)
+Nothing for the first second, then rows shaped like the real ones. No
+loading sentences; a hidden status names what loads.
 
 ### Navigation
-- PAGES.md, "How you find your way": the signed-in sidebar, an area's row
-  of links, a cohort's header, breadcrumbs that end at the parent.
+PAGES.md, "How you find your way": the signed-in sidebar, area rows, the
+cohort bar, breadcrumbs that end at the parent.
 
-## What it never uses
-
-From research/notes/ai-design-anti-patterns.md: no tracked capitals, no
-label above a heading unless it carries information, no colored stripes,
-no rows of identical icon cards, color in inset panels only, no emoji as
-interface.
+## What it never uses (R§4)
+Tracked capitals, a label above a heading unless it carries information,
+colored stripes, pills, rows of identical icon cards, color outside inset
+panels, emoji as interface, a toast, a browser dialog.

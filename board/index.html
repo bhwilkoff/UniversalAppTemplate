@@ -25,7 +25,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/assets/vendor/excalidraw-0.18.1/excalidraw.css">
-  <link rel="stylesheet" href="/assets/site.css?v=20261021h">
+  <link rel="stylesheet" href="/assets/site.css?v=20261022a">
   <link rel="modulepreload" href="/assets/vendor/excalidraw-0.18.1/excalidraw.js">
   <script>
     (function () {
@@ -39,6 +39,7 @@
     })();
   </script>
   <script src="/assets/site.js?v=20261021c" defer></script>
+  <script src="/assets/ui.js?v=20261022a" defer></script>
 </head>
 <body class="board-body" data-no-app-nav>
   <a class="skip" href="#main">Skip to the page</a>
@@ -56,10 +57,10 @@
       </nav>
       <div class="header-actions">
         <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#moon"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#moon"/></svg>
         </button>
         <a class="btn-primary small" href="/account/">
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#github"/></svg>
           <span>Sign in<span class="long"> with GitHub</span></span>
         </a>
       </div>
@@ -70,16 +71,9 @@
   <main id="main" class="board-main">
     <div class="board-page" data-board>
       <div class="wrap account board-states">
-        <section class="account-state" data-state="loading"><p>Opening the board…</p></section>
-        <section class="account-state" data-state="signed-out" hidden>
-          <h1>The board is for the people in a cohort.</h1>
-          <p>Sign in with the GitHub account you joined with, and this page will open the board your cohort draws on together during the session.</p>
-          <p><a class="btn-primary" href="/account/"><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Sign in with GitHub</a></p>
-        </section>
-        <section class="account-state" data-state="not-member" hidden>
-          <h1>This board is for the people in its cohort.</h1>
-          <p data-not-member-text>If you are in it, open the board from the session page, which you can reach from <a href="/">your home page</a>.</p>
-        </section>
+        <section class="account-state" data-state="loading"><div class="ui-skeleton" aria-busy="true"><span class="visually-hidden" role="status">Loading</span><i></i><i></i><i></i></div></section>
+        <section class="account-state" data-state="signed-out" hidden><h1 class="visually-hidden">Human Shaped</h1><div data-gate="signed-out"></div></section>
+        <section class="account-state" data-state="not-member" hidden><h1 class="visually-hidden">Human Shaped</h1><div data-gate="not-member"></div></section>
         <section class="account-state" data-state="error" hidden>
           <p class="error" data-error-text></p>
           <p><button class="btn-secondary" type="button" data-reload>Try again</button></p>
@@ -113,7 +107,7 @@
         </div>
         <div class="board-canvas" data-canvas aria-label="The drawing board"></div>
         <div class="wrap board-foot">
-          <p class="small">Everyone in the cohort sees what you draw here as you draw it, and the board is saved every few seconds and when you leave, so it is still here after the session. It is deleted with the rest of the session when the cohort finishes, so download anything you want to keep. You can add a PDF or pictures as pages to draw on, and a teacher can lock the board so only they can add or draw.</p>
+          <p class="ui-meta-line"><span data-vis="cohort"></span> Deleted when the cohort finishes.</p>
           <p class="small">The board is <a href="https://github.com/excalidraw/excalidraw">Excalidraw</a>, which is open source under the MIT License.</p>
         </div>
       </section>
@@ -121,7 +115,7 @@
     <dialog class="confirm" data-clear-dialog>
       <form method="dialog">
         <h2>Clear the board for everyone?</h2>
-        <p>Everything on it disappears from every screen and from what is saved, and it cannot be brought back. If anyone might want it, download it first.</p>
+        <p>It clears for everyone. Download it first if anyone might want it.</p>
         <div class="actions">
           <button class="btn-secondary" value="keep" autofocus>Keep it</button>
           <button class="btn-danger final" value="clear">Clear it</button>
@@ -131,11 +125,11 @@
   </main>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" defer></script>
   <script src="/assets/hub-config.js?v=20261016a" defer></script>
-  <script src="/assets/cohort-lib.js" defer></script>
+  <script src="/assets/cohort-lib.js?v=20261022a" defer></script>
   <script src="/assets/board-lib.js" defer></script>
-  <script src="/assets/board-pages-lib.js" defer></script>
+  <script src="/assets/board-pages-lib.js?v=20261022a" defer></script>
   <script src="/assets/board-pages.js?v=20261012h" defer></script>
-  <script src="/assets/board.js" defer></script>
+  <script src="/assets/board.js?v=20261022a" defer></script>
 
   <footer class="site-footer">
     <div class="wrap">

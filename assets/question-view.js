@@ -174,7 +174,7 @@
       input.required = true;
       input.value = draft && draft.body != null ? draft.body : given ? given.body || '' : '';
       input.addEventListener('input', function () { keep({ body: input.value }); });
-      form.appendChild(labelled(words ? 'A word or a few' : (opts.label || 'Your answer, which only you and your teacher see'), input,
+      form.appendChild(labelled(words ? 'A word or a few' : (opts.label || 'Your answer'), input,
         words ? 'Shown with everyone’s, with no names, if your teacher shows them.' : null));
       read = function () { return { body: input.value }; };
     }

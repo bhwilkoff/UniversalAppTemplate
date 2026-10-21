@@ -146,7 +146,7 @@
       var d = el('details', 'show-edit');
       d.appendChild(el('summary', null, 'Edit this scene'));
       if (mode === 'parts') {
-        d.appendChild(el('p', 'small', 'This week is running on the six parts. To change a scene in the moment, give this week a run of show of its own, starting from the same scenes. Everyone stays where they are.'));
+        d.appendChild(el('p', 'small', 'Running on the six parts.'));
         var msg0 = el('p', 'small'); msg0.setAttribute('role', 'status');
         var make = btn('Give this week its own run of show', 'btn-secondary', function () {
           make.disabled = true; msg0.textContent = 'Making it…';

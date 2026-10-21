@@ -23,7 +23,7 @@
   // What a teacher needs to open the chat: the repository's id and its
   // categories.
   var REPO =
-    'query($owner: String!, $name: String!) { repository(owner: $owner, name: $name) { id discussionCategories(first: 25) { nodes { id name slug } } } }';
+    'query($owner: String!, $name: String!) { repository(owner: $owner, name: $name) { id discussionCategories(first: 25) { nodes { id name slug } } } }'; // kit: content
   var OPEN =
     'mutation($repo: ID!, $cat: ID!, $title: String!, $body: String!) {' +
     ' createDiscussion(input: {repositoryId: $repo, categoryId: $cat, title: $title, body: $body}) { discussion { number url } } }';

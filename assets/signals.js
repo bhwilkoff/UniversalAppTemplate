@@ -109,10 +109,10 @@
       m.recording.hidden = !st.recording && !st.talk && !share;
       if (st.recording) m.recording.appendChild(el('p', null, opts.teaching
         ? 'You are recording now, and everyone in the cohort sees this line until you say it has stopped.'
-        : 'Your teacher is recording now, on their own computer, and only the people in this cohort will see it.'));
+        : 'Your teacher is recording this session for your cohort.'));
       if (st.talk) m.recording.appendChild(el('p', null, opts.teaching
         ? 'You are counting how much you talk, and everyone in the cohort sees this line until you say it has stopped.'
-        : 'Your teacher’s recorder is counting how much they talk compared with everyone else, not who else talks, and it keeps no one’s words for this.'));
+        : 'Your teacher is counting their own talk time. No one’s words are kept.'));
       if (share) m.recording.appendChild(el('p', 'small', share));
     }
 
@@ -180,7 +180,7 @@
       var onIt = stage.people.indexOf(opts.meId) >= 0;
       box.appendChild(el('p', 'small', opts.teaching ? 'Everyone else is watching.' : onIt
         ? 'Everyone else is watching, so take your time.'
-        : 'Everyone else is watching. Your teacher pins them for everyone in Meet, but Meet on a phone does not show pins, so these names are how you know who is talking.'));
+        : 'Meet on a phone does not show pins, so these are the people talking.'));
     }
 
     // The one thing a shared screen shows, large (/card/).

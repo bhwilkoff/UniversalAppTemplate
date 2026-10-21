@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261021h">
+  <link rel="stylesheet" href="/assets/site.css?v=20261022a">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -37,6 +37,7 @@
     })();
   </script>
   <script src="/assets/site.js?v=20261021c" defer></script>
+  <script src="/assets/ui.js?v=20261022a" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to the page</a>
@@ -54,10 +55,10 @@
       </nav>
       <div class="header-actions">
         <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#moon"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#moon"/></svg>
         </button>
         <a class="btn-primary small" href="/account/">
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#github"/></svg>
           <span>Sign in<span class="long"> with GitHub</span></span>
         </a>
       </div>
@@ -67,16 +68,9 @@
   <main id="main">
     <div class="wrap">
       <div class="account cohort-page live-page" data-live>
-        <section class="account-state" data-state="loading"><h1 class="visually-hidden">The live session</h1><p>Opening the session…</p></section>
-        <section class="account-state" data-state="signed-out" hidden>
-          <h1>Keep this page open beside the session.</h1>
-          <p>Sign in with the GitHub account you joined with, and this page will hold the session's agenda, this week's challenge, the queue of work people want to show, your teacher's questions, and what everyone brought back, while Google Meet holds the faces.</p>
-          <p><a class="btn-primary" href="/account/"><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Sign in with GitHub</a></p>
-        </section>
-        <section class="account-state" data-state="not-member" hidden>
-          <h1>This session is for the people in its cohort.</h1>
-          <p>If you are in it, open this page from <a href="/">your home page</a>.</p>
-        </section>
+        <section class="account-state" data-state="loading"><h1 class="visually-hidden">The live session</h1><div class="ui-skeleton" aria-busy="true"><span class="visually-hidden" role="status">Loading</span><i></i><i></i><i></i></div></section>
+        <section class="account-state" data-state="signed-out" hidden><h1 class="visually-hidden">Human Shaped</h1><div data-gate="signed-out"></div></section>
+        <section class="account-state" data-state="not-member" hidden><h1 class="visually-hidden">Human Shaped</h1><div data-gate="not-member"></div></section>
         <section class="account-state" data-state="error" hidden>
           <h1 class="visually-hidden">The live session</h1>
           <p class="error" data-error-text role="alert"></p>
@@ -100,7 +94,7 @@
           <section class="signal-card" aria-label="A card from your teacher" data-sig-card hidden></section>
           <section class="signal-stage" aria-label="Who is on stage" data-sig-stage hidden></section>
 
-          <p class="notice small">Sessions are recorded so that anyone who misses one, or wants to come back to it, can watch it later. The host says so before the recording starts, and only the people in this cohort can see it.</p>
+          <p class="notice small">Sessions are recorded for anyone who misses one. <span data-vis="cohort"></span></p>
 
           <!-- The run of show (R1, research/notes/run-of-show-design.md): the
                session as a timeline of scenes, the current one open with what
@@ -136,7 +130,7 @@
           <!-- The queue and checks for understanding (M3): copy awaiting Ben's review. -->
           <div data-wings>
             <div class="on-stage" data-on-stage hidden></div>
-            <p class="small">When it is your turn, open your work in its own tab and present that tab from Meet, so everyone sees the real thing rather than a description of it.</p>
+            <p class="small">Present your work’s own tab from Meet.</p>
             <ol class="live-queue" data-queue></ol>
             <details class="live-shown" data-shown-wrap hidden>
               <summary data-shown-summary></summary>
@@ -192,27 +186,27 @@
   </main>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" defer></script>
   <script src="/assets/hub-config.js?v=20261016a" defer></script>
-  <script src="/assets/cohort-lib.js" defer></script>
+  <script src="/assets/cohort-lib.js?v=20261022a" defer></script>
   <script src="/assets/live-lib.js" defer></script>
-  <script src="/assets/question-view.js?v=20261012h" defer></script>
+  <script src="/assets/question-view.js?v=20261022a" defer></script>
   <script src="/assets/board-lib.js" defer></script>
   <script src="/assets/followup-lib.js" defer></script>
   <script src="/assets/live-commits.js" defer></script>
   <script src="/assets/signals-lib.js?v=20261012h" defer></script>
-  <script src="/assets/signals.js?v=20261012h" defer></script>
+  <script src="/assets/signals.js?v=20261022a" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.4.16/purify.min.js" integrity="sha512-flQmhkXNRQ3iUfvtdCobtpMjCb6kE+zLnTiAulAQJ3WykVfy84JvCMOo6vhwWXHTXjR25h9Zj+LyGFRWKjRoag==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
   <script src="/assets/rooms-lib.js" defer></script>
   <script src="/assets/rooms.js?v=20261012h" defer></script>
   <script src="/assets/discussions-lib.js" defer></script>
-  <script src="/assets/session-thread-lib.js" defer></script>
-  <script src="/assets/discussions.js?v=20261012h" defer></script>
+  <script src="/assets/session-thread-lib.js?v=20261022a" defer></script>
+  <script src="/assets/discussions.js?v=20261022a" defer></script>
   <script src="/assets/show-lib.js" defer></script>
-  <script src="/assets/show-view-lib.js" defer></script>
+  <script src="/assets/show-view-lib.js?v=20261022a" defer></script>
   <script src="/assets/curriculum-pages-lib.js" defer></script>
-  <script src="/assets/show-view.js?v=20261012h" defer></script>
+  <script src="/assets/show-view.js?v=20261022a" defer></script>
   <script src="/assets/show-run.js" defer></script>
-  <script src="/assets/cohort-nav.js?v=20261021b" defer></script>
-  <script src="/assets/live.js?v=20261021b" defer></script>
+  <script src="/assets/cohort-nav.js?v=20261022a" defer></script>
+  <script src="/assets/live.js?v=20261022a" defer></script>
 
   <footer class="site-footer">
     <div class="wrap">

@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261021h">
+  <link rel="stylesheet" href="/assets/site.css?v=20261022a">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -29,22 +29,22 @@
        (R1): the teacher's view or the student's, from the same parts as
        /live/. Words by Claude, awaiting Ben's review. -->
   <main class="addon-panel live-page" data-addon aria-live="polite">
-    <section class="account-state" data-state="loading"><p class="small">Opening the session…</p></section>
+    <section class="account-state" data-state="loading"><div class="ui-skeleton" aria-busy="true"><span class="visually-hidden" role="status">Loading</span><i></i><i></i><i></i></div></section>
 
     <section class="account-state addon-outside" data-state="outside" hidden>
       <p class="addon-mark"><span class="visually-hidden">Human Shaped</span><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></p>
-      <h1>This page runs inside Google Meet.</h1>
-      <p>In any other browser, the same session is on your cohort’s live page, which you can open from <a href="/" data-outside-link>your home page</a>.</p>
+      <h1>Open this in Google Meet</h1>
+      <p class="actions"><a class="btn-secondary" href="/" data-outside-link>Go to your home</a></p>
     </section>
 
     <section class="account-state" data-state="signed-out" hidden>
       <p class="addon-mark"><span class="visually-hidden">Human Shaped</span><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></p>
-      <h1>Sign in to see this call’s session.</h1>
-      <p class="small">Meet keeps this panel apart from the rest of your browser, so it needs your permission to use your humanshaped.org sign-in.</p>
+      <h1>Sign in</h1>
+      <p class="small">Meet keeps this panel separate from your browser.</p>
       <div class="addon-signin">
         <button class="btn-primary" type="button" data-use-site hidden>Use my humanshaped.org sign-in</button>
         <button class="btn-secondary" type="button" data-popup>
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Sign in with GitHub in a small window
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#github"/></svg>Sign in with GitHub in a small window
         </button>
       </div>
       <p class="small" data-signin-status role="status"></p>
@@ -56,11 +56,11 @@
     <!-- After a Google sign-in, GitHub once (DECISIONS.md, "Google sign-in beside GitHub"). Words by Claude, awaiting Ben's review. -->
     <section class="account-state" data-state="link-github" hidden>
       <p class="addon-mark"><span class="visually-hidden">Human Shaped</span><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></p>
-      <h1>Link your GitHub account, once.</h1>
-      <p class="small">Your cohort works through GitHub: your app lives there, and so does your cohort’s conversation. Link it in a small window, and this panel will follow.</p>
+      <h1>Link your GitHub account</h1>
+      <p class="small">Your app and your cohort’s conversation live on GitHub.</p>
       <div class="addon-signin">
         <button class="btn-primary" type="button" data-link-github>
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Link my GitHub account
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#github"/></svg>Link my GitHub account
         </button>
       </div>
       <p class="small" data-link-status role="status"></p>
@@ -68,7 +68,7 @@
 
     <section class="account-state" data-state="no-room" hidden>
       <p class="addon-mark"><span class="visually-hidden">Human Shaped</span><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></p>
-      <h1>This call is not one of your cohort’s rooms yet.</h1>
+      <h1>Not one of your cohort’s calls</h1>
       <p class="small" data-no-room-text></p>
       <p><a class="btn-secondary" href="/teach/" target="_blank" rel="noopener">Open your teaching page</a></p>
     </section>
@@ -99,7 +99,7 @@
            it; only the student and their teachers see it. -->
       <section class="recognize" aria-label="Recognized in class" data-recognize hidden></section>
 
-      <p class="small addon-agent">Your own AI agent can follow this class with you: where the show is, the open questions, and your own work. <a href="/connect/" target="_blank" rel="noopener">Connect it</a>. What it says reaches the class only if you share it.</p>
+      <p class="small addon-agent"><a href="/connect/" target="_blank" rel="noopener">Connect your agent</a></p>
 
       <!-- Live signals (C1, H4): where everyone should be, the teacher's
            card, who is on stage, and "recording now", the same lines /live/
@@ -193,21 +193,21 @@
   <script src="https://www.gstatic.com/meetjs/addons/1.1.0/meet.addons.js" defer></script>
   <script src="/assets/hub-config.js?v=20261016a" defer></script>
   <script src="/assets/addon-config.js" defer></script>
-  <script src="/assets/cohort-lib.js" defer></script>
+  <script src="/assets/cohort-lib.js?v=20261022a" defer></script>
   <script src="/assets/live-lib.js" defer></script>
-  <script src="/assets/question-view.js?v=20261012h" defer></script>
+  <script src="/assets/question-view.js?v=20261022a" defer></script>
   <script src="/assets/board-lib.js" defer></script>
   <script src="/assets/addon-lib.js" defer></script>
   <script src="/assets/discussions-lib.js" defer></script>
-  <script src="/assets/session-thread-lib.js" defer></script>
+  <script src="/assets/session-thread-lib.js?v=20261022a" defer></script>
   <script src="/assets/rooms-lib.js" defer></script>
   <script src="/assets/rooms.js?v=20261012h" defer></script>
   <script src="/assets/signals-lib.js?v=20261012h" defer></script>
-  <script src="/assets/signals.js?v=20261012h" defer></script>
+  <script src="/assets/signals.js?v=20261022a" defer></script>
   <script src="/assets/show-lib.js" defer></script>
-  <script src="/assets/show-view-lib.js" defer></script>
+  <script src="/assets/show-view-lib.js?v=20261022a" defer></script>
   <script src="/assets/curriculum-pages-lib.js" defer></script>
-  <script src="/assets/show-view.js?v=20261012h" defer></script>
+  <script src="/assets/show-view.js?v=20261022a" defer></script>
   <script src="/assets/google-signin-lib.js" defer></script>
   <script src="/assets/google-signin.js" defer></script>
   <script src="/assets/show-run.js" defer></script>
@@ -215,11 +215,11 @@
   <script src="/assets/roster-lib.js" defer></script>
   <script src="/assets/rerun-lib.js" defer></script>
   <script src="/assets/recognition-lib.js" defer></script>
-  <script src="/assets/chat-lib.js" defer></script>
-  <script src="/assets/chat-view.js?v=20261012h" defer></script>
+  <script src="/assets/chat-lib.js?v=20261022a" defer></script>
+  <script src="/assets/chat-view.js?v=20261022a" defer></script>
   <script src="/assets/code-lib.js" defer></script>
-  <script src="/assets/code-runner.js?v=20261012h" defer></script>
+  <script src="/assets/code-runner.js?v=20261022a" defer></script>
   <script src="/assets/class-channel.js" defer></script>
-  <script src="/assets/addon.js?v=20261021b" defer></script>
+  <script src="/assets/addon.js?v=20261022a" defer></script>
 </body>
 </html>

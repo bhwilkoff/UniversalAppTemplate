@@ -21,7 +21,7 @@
     if (size > MAX_BYTES) return { kind: null, why: 'is larger than 25 MB' };
     if (type === 'application/pdf' || /\.pdf$/.test(name)) return { kind: 'pdf' };
     if (IMAGE_TYPES.indexOf(type) >= 0 || /\.(png|jpe?g|webp|gif)$/.test(name)) return { kind: 'image' };
-    if (/\.(pptx?|key|odp)$/.test(name)) return { kind: null, why: 'is a slide deck; export it as a PDF first (File, then Download, then PDF in Google Slides; File, then Export in PowerPoint or Keynote)' };
+    if (/\.(pptx?|key|odp)$/.test(name)) return { kind: null, why: 'is a slide deck; export it as a PDF first (File, then Download, then PDF in Google Slides; File, then Export in PowerPoint or Keynote)' }; // kit: content
     return { kind: null, why: 'is not a PDF or a picture' };
   }
 

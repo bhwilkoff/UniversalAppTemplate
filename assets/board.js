@@ -67,7 +67,7 @@
           var out = root.querySelector('[data-state="signed-out"]');
           out.replaceChildren();
           var h = document.createElement('h1'); h.textContent = 'The board opens here once you are signed in.';
-          var p = document.createElement('p'); p.textContent = 'Sign in from the Human Shaped panel beside the call, then come back to this scene. The board is also in its own tab from the panel.';
+          var p = document.createElement('p'); p.textContent = 'Sign in from the Human Shaped panel beside the call.';
           out.appendChild(h); out.appendChild(p);
         }
         return show('signed-out');

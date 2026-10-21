@@ -61,7 +61,7 @@
       var timer = setTimeout(function () {
         w.removeEventListener('message', hear);
         w.terminate(); py = null;
-        done([{ kind: 'error', text: 'It ran for more than thirty seconds, so it was stopped. (The first Python run also loads Python itself, which takes a moment.)' }]);
+        done([{ kind: 'error', text: 'Stopped after thirty seconds.' }]);
       }, C.LIMIT_MS.py);
       function hear(e) {
         if (!e.data || e.data.id !== id) return;

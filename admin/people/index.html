@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261021h">
+  <link rel="stylesheet" href="/assets/site.css?v=20261022a">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -37,6 +37,7 @@
     })();
   </script>
   <script src="/assets/site.js?v=20261021c" defer></script>
+  <script src="/assets/ui.js?v=20261022a" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to the page</a>
@@ -54,10 +55,10 @@
       </nav>
       <div class="header-actions">
         <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#moon"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#moon"/></svg>
         </button>
         <a class="btn-primary small" href="/account/">
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#github"/></svg>
           <span>Sign in<span class="long"> with GitHub</span></span>
         </a>
       </div>
@@ -74,21 +75,15 @@
         </ul>
       </nav>
       <header class="page-head">
-        <h1>People.</h1>
-        <p class="lead">Everyone who has signed in. Open someone to change what they may do.</p>
+        <h1>People</h1>
       </header>
 
       <div class="account teach admin" data-admin-people>
-        <section class="account-state" data-state="loading"><p>Checking whether you are signed in…</p></section>
+        <section class="account-state" data-state="loading"><div class="ui-skeleton" aria-busy="true"><span class="visually-hidden" role="status">Loading</span><i></i><i></i><i></i></div></section>
 
-        <section class="account-state" data-state="signed-out" hidden>
-          <p>Running the hub is for its admins, so it starts with signing in.</p>
-          <p><a class="btn-primary" href="/account/"><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Sign in with GitHub</a></p>
-        </section>
+        <section class="account-state" data-state="signed-out" hidden><div data-gate="signed-out"></div></section>
 
-        <section class="account-state" data-state="not-admin" hidden>
-          <p>Running the hub is for its admins. If you think you should be one, ask an admin; the hub keeps a log of who changes whose rights.</p>
-        </section>
+        <section class="account-state" data-state="not-admin" hidden><div data-gate="not-admin"></div></section>
 
         <section class="account-state" data-state="error" hidden>
           <p class="error" data-error-text role="alert"></p>

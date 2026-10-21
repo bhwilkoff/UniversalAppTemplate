@@ -32,12 +32,9 @@
         b.type = 'button';
         b.addEventListener('click', function () {
           var ask = A.confirmFor(r.key, !has, person);
-          if (ask && !b.hasAttribute('data-armed')) {
-            b.setAttribute('data-armed', '');
-            b.textContent = (has ? r.take : r.give) + ', for ' + A.nameOf(person);
-            msg.textContent = ask + ' Click again to go ahead.';
-            return;
-          }
+          (ask ? window.UI.confirm({ title: (has ? r.take : r.give) + ' for ' + A.nameOf(person) + '?', body: ask, action: has ? r.take : r.give, danger: has }) : Promise.resolve(true)).then(function (ok) { if (ok) change(); });
+        });
+        function change() {
           b.disabled = true;
           msg.textContent = 'Saving…';
           db.rpc('admin_set_right', { u: person.id, which: r.key, value: !has, note: $('[data-note]').value.trim() || null }).then(function (res) {
@@ -48,7 +45,7 @@
             $('[data-saved]').textContent = 'Saved.';
             if (person.id === me.id && window.HS && window.HS.roles) window.HS.roles({ teacher: person.teacher, admin: person.can_admin });
           }).catch(function (e) { b.disabled = false; msg.textContent = 'Nothing changed: ' + said(e); });
-        });
+        }
         acts.appendChild(b);
       }
       item.appendChild(acts);

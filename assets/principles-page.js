@@ -46,7 +46,7 @@
       s.appendChild(el('span', 'p-s', p.statement));
       var caret = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
       caret.setAttribute('class', 'icon p-caret'); caret.setAttribute('aria-hidden', 'true'); caret.setAttribute('focusable', 'false');
-      var use = document.createElementNS('http://www.w3.org/2000/svg', 'use'); use.setAttribute('href', '/assets/icons.svg#caret-down');
+      var use = document.createElementNS('http://www.w3.org/2000/svg', 'use'); use.setAttribute('href', '/assets/icons.svg?v=20261022a#caret-down');
       caret.appendChild(use); s.appendChild(caret);
       d.appendChild(s);
       var more = el('div', 'p-more');

@@ -14,7 +14,7 @@
     '/assets/teach-lib.js?v=20261006g',
     '/assets/path-lib.js',
     '/assets/home-lib.js?v=20261021a',
-    '/assets/exchange-lib.js?v=20261016b',
+    '/assets/exchange-lib.js?v=20261022a',
     '/assets/exchange-list.js?v=20261021a'
   ];
   function loadAll(list) {
@@ -50,7 +50,7 @@
     var li = el('li', 'home-row' + (cls ? ' ' + cls : ''));
     var text = el('div', 'home-row-text');
     if (title) text.appendChild(title.nodeType ? title : el('p', 'home-row-title', title));
-    if (line) text.appendChild(el('p', 'home-row-line', line));
+    if (line) text.appendChild(line.nodeType ? line : el('p', 'home-row-line', line));
     li.appendChild(text);
     if (actions && actions.length) {
       var a = el('div', 'actions');
@@ -261,7 +261,7 @@
       if (m.teacher) acts.unshift(link('/teach/new/', 'Plan a cohort', 'btn-secondary'));
       box.appendChild(empty(m.teacher
         ? 'You do not teach a cohort yet. A cohort you plan is listed here from its first draft.'
-        : 'You are not in a cohort yet, and none is open to join right now. When one opens, it is listed here and on the cohorts page.', acts));
+        : 'No cohorts yet', acts));
     }
     function rank(c) { return { live: 0, between: 1, before: 2, draft: 3, unscheduled: 4, over: 5, finished: 6 }[c.now.kind]; }
   }
@@ -297,14 +297,14 @@
     m.cohorts.forEach(function (c) {
       var e = c.enrollment;
       if (!e || !e.app_repo) return;
-      ul.appendChild(row(e.app_name || e.app_repo, 'Built in ' + c.title + '. ' + (e.app_public ? 'Shown on the apps page.' : 'Seen only by your cohort.'),
-        [link('/apps/app/?r=' + encodeURIComponent(e.app_repo), 'Its page', 'btn-secondary small'), link('/cohort/?c=' + encodeURIComponent(c.slug) + '#mine-title', 'Change it', 'btn-secondary small')]));
+      ul.appendChild(row(e.app_name || e.app_repo, (function () { var l = el('p', 'home-row-line ui-meta-line', c.title + ' '); l.appendChild(window.UI.visibility(e.app_public ? 'public' : 'cohort')); return l; })(),
+        [link('/apps/app/?r=' + encodeURIComponent(e.app_repo), 'Its page', 'btn-secondary small'), link('/cohort/?c=' + encodeURIComponent(c.slug) + '&t=mine', 'Change it', 'btn-secondary small')]));
     });
     var b = m.builderApp;
     if (b) {
       var acts = [link('/apps/mine/', 'Change it', 'btn-secondary small')];
       if (b.public) acts.unshift(link('/apps/app/?r=' + encodeURIComponent(b.app_repo), 'Its page', 'btn-secondary small'));
-      ul.appendChild(row(b.app_name || b.app_repo, b.public ? 'Shown on the apps page.' : 'Yours alone until you choose to show it.', acts));
+      ul.appendChild(row(b.app_name || b.app_repo, (function () { var l = el('p', 'home-row-line ui-meta-line'); l.appendChild(window.UI.visibility(b.public ? 'public' : 'me')); return l; })(), acts));
     }
     if (ul.children.length) { box.appendChild(ul); return; }
     box.appendChild(empty('Building an app on your own, from the template? Add it here, and choose whether the apps page shows it.', [

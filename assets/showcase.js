@@ -46,13 +46,13 @@
       return;
     }
     if (s.guestLink) {
-      box.appendChild(el('p', null, 'The call is on Google Meet, hosted by meet@humanshaped.org. Open the link a few minutes early and choose Ask to join, and someone in the room will let you in.'));
-      box.appendChild(el('p', null, 'You do not need a Google account to come from a computer: open the link in your browser, type your name, and choose Ask to join. From a phone, the Meet app may ask you to sign in first, so a computer is the easier way in.'));
+      box.appendChild(el('p', null, 'The call is on Google Meet, hosted by meet@humanshaped.org. Open the link a few minutes early and choose Ask to join, and someone in the room will let you in.')); // kit: content
+      box.appendChild(el('p', null, 'You do not need a Google account to come from a computer: open the link in your browser, type your name, and choose Ask to join. From a phone, the Meet app may ask you to sign in first, so a computer is the easier way in.')); // kit: content
       var a = el('p', 'actions');
       a.appendChild(link(s.guestLink, state === 'now' ? 'Join the showing now' : 'The link to join', 'btn-secondary'));
       box.appendChild(a);
     } else {
-      box.appendChild(el('p', null, 'The cohort’s teacher shares the way in with the guests they invite, so if someone asked you to come, the link is in their invitation. If the teacher posts it here, it will appear on this page.'));
+      box.appendChild(el('p', null, 'The link is in your invitation.'));
     }
   }
 
@@ -76,8 +76,8 @@
     document.querySelector('[data-showcase-title]').textContent = s.cohort;
     document.title = s.cohort + ', the showing | Human Shaped';
     var lead = state === 'over'
-      ? 'The last night of this cohort, where everyone showed the app they built, the feature they wanted from their own use, and one value with the decision it changed.'
-      : 'The last night of this cohort, where everyone shows the app they built, the feature they wanted from their own use, and one value with the decision it changed. Guests are welcome, and you are invited.';
+      ? 'Everyone showed the app they built.'
+      : 'Everyone shows the app they built. Guests are welcome.';
     document.querySelector('[data-showcase-lead]').textContent = lead;
     $('[data-showcase-status]').hidden = true;
     $('[data-when]').textContent = (state === 'now' ? 'On now. ' : '') + whenText(s);
@@ -101,5 +101,5 @@
       if (!s) { status('This cohort has no public showing yet. Its teacher chooses whether the last session is open to guests.', true); return; }
       draw(s);
     })
-    .catch(function () { status('The showing could not be read just now. Reading this page again in a minute usually brings it back.', false); });
+    .catch(function () { status('This could not load.', false); });
 })();

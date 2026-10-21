@@ -357,7 +357,7 @@ h3 { font-size: 1.25rem; letter-spacing: -0.012em; line-height: 1.25; }
 .prose ol.rounds { padding-left: 1.2rem; display: grid; gap: 0.6rem; }
 .wk-move { margin: 0.35rem 0 0; color: var(--muted); font-size: 0.95rem; line-height: 1.4; }
 .wk-lead { color: var(--ink); font-weight: 600; }
-.stage-question { margin: 1.5rem 0 2rem; padding: 1.25rem; background: var(--surface); border-radius: var(--radius); border-left: 3px solid var(--accent); }
+.stage-question { margin: 1.5rem 0 2rem; padding: 1.25rem; background: var(--surface); border-radius: var(--radius); }
 .stage-question p { margin: 0; }
 .stage-question-label { font-size: 0.85rem; font-weight: 650; letter-spacing: 0.04em; text-transform: uppercase; color: var(--accent); }
 .stage-question-text { margin-top: 0.35rem !important; font-size: clamp(1.15rem, 1.05rem + 0.4vw, 1.35rem); line-height: 1.35; font-weight: 600; color: var(--ink); overflow-wrap: anywhere; }
@@ -1429,7 +1429,7 @@ label.check { min-height: 2.25rem; }
 .screen-show .screen-note { font-size: clamp(1.15rem, 3.2vmin, 1.9rem); line-height: 1.35; margin: 1.25rem 0 0; max-width: 46ch; overflow-wrap: anywhere; }
 .screen-card { font-size: clamp(2.1rem, 8.5vmin, 5.6rem); font-weight: 680; line-height: 1.08; letter-spacing: -0.035em; text-wrap: balance; overflow-wrap: anywhere; }
 .screen-show .screen-clock { font-size: clamp(2rem, 9vmin, 6rem); font-weight: 650; color: var(--accent); margin-top: 0.4em; line-height: 1; }
-.screen-show[data-kind="card"], .screen-show[data-kind="rooms"], .screen-show[data-kind="back"] { border-left: clamp(6px, 1vmin, 12px) solid var(--accent); padding-left: clamp(1rem, 3vmin, 2.5rem); }
+.screen-show[data-kind="card"], .screen-show[data-kind="rooms"], .screen-show[data-kind="back"] { padding-left: clamp(1rem, 3vmin, 2.5rem); }
 .screen-foot { margin: 0; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem 1.5rem; color: var(--muted); font-size: clamp(0.95rem, 2.2vmin, 1.3rem); }
 .card-frame:has(.screen-show[data-kind="idle"]) [data-card-cohort] { visibility: hidden; }
 .screen-rec { font-weight: 650; color: var(--ink); padding-left: 1.1em; position: relative; }
@@ -1789,7 +1789,7 @@ label.check { min-height: 2.25rem; }
 .chat h2 { font-size: 1.05rem; margin: 0; }
 .chat-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.6rem; max-height: 22rem; overflow: auto; }
 .chat-msg { display: grid; gap: 0.2rem; }
-.chat-msg.is-ai { border-left: 3px solid var(--edge); padding-left: 0.5rem; }
+.chat-msg.is-ai { border-left: 3px solid var(--rule); padding-left: 0.5rem; }
 .chat-head { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: baseline; font-size: 0.82rem; }
 .chat-who { font-weight: 680; }
 .chat-ai { font-size: 0.72rem; font-weight: 600; border: 1px solid var(--rule); border-radius: 999px; padding: 0 0.45rem; color: var(--muted); }
@@ -1819,7 +1819,7 @@ label.check { min-height: 2.25rem; }
 .recognize-give[open] { display: grid; gap: 0.45rem; }
 .recognize-give select, .recognize-give input { width: 100%; box-sizing: border-box; min-height: 38px; font: inherit; font-size: 0.95rem; border: 1px solid var(--rule); border-radius: 8px; background: var(--paper); color: var(--ink); padding: 0 0.5rem; }
 .recognize-give .btn-primary { justify-self: start; }
-.recognize-card { border: 1px solid var(--rule); border-left: 4px solid #3F7A4F; border-radius: 10px; background: var(--card); padding: 0.6rem 0.8rem; }
+.recognize-card { border: 1px solid var(--rule); border-radius: 10px; background: var(--card); padding: 0.6rem 0.8rem; }
 .recognize-card.is-new { animation: recognize-in 1.2s ease-out; }
 @keyframes recognize-in { 0% { background: var(--surface); transform: scale(0.98); } 100% { background: var(--card); transform: none; } }
 @media (prefers-reduced-motion: reduce) { .recognize-card.is-new { animation: none; } }
@@ -2497,11 +2497,6 @@ nav.crumbs a { color: var(--muted); }
 
 /* ---- The hub's shared pieces (DESIGN-KIT.md; assets/ui.js) ------------ */
 .icon { width: 1.1em; height: 1.1em; flex: none; vertical-align: -0.15em; }
-.ui-status, .ui-visibility { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.95rem; font-weight: 500; white-space: nowrap; }
-.ui-status-done { color: var(--accent); }
-.ui-status-waiting, .ui-status-off, .ui-status-time { color: var(--muted); }
-.ui-status-alert { color: var(--danger); }
-.ui-visibility { color: var(--muted); }
 .ui-facts { display: flex; flex-wrap: wrap; gap: 0.5rem 2rem; margin: 0; }
 .ui-facts div { display: grid; gap: 0.1rem; }
 .ui-facts dt { font-size: 0.85rem; color: var(--muted); }
@@ -2521,8 +2516,6 @@ a.ui-row-title { color: var(--ink); }
 .ui-empty p { margin: 0; }
 .ui-disclosure summary { cursor: pointer; color: var(--muted); font-size: 0.95rem; }
 .ui-disclosure[open] summary { margin-bottom: 0.5rem; }
-.ui-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 1rem; padding: 1rem 1.25rem; background: var(--card); border: 1px solid var(--rule); border-radius: var(--radius); margin: 0 0 1.5rem; }
-.ui-toolbar .ui-toolbar-end { margin-left: auto; display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; }
 
 /* ---- The signed-in workspace (PAGES.md, "How you find your way") -------
    Signed in, the public menu gives way to a sidebar of the person's own
@@ -2550,7 +2543,6 @@ html.app-nav-open[data-signed-in] body:not([data-no-app-nav]) .app-nav { display
   html[data-signed-in] body:not([data-no-app-nav]) .app-nav { display: block; position: fixed; top: var(--header-h, 4rem); left: 0; bottom: 0; width: 15rem; border-right: 1px solid var(--rule); box-shadow: none; }
 }
 @media print { .app-nav, .app-menu-button { display: none !important; } html[data-signed-in] body { padding-left: 0 !important; } }
-.ui-count { display: inline-block; margin-left: 0.4rem; min-width: 1.35rem; padding: 0 0.4rem; border-radius: 0.7rem; background: var(--surface); color: var(--ink); font-size: 0.8rem; font-weight: 650; line-height: 1.35rem; text-align: center; }
 .panel-section { margin: 0 0 2rem; }
 .panel-section > h2, [data-tab] > section > h2, [data-tab] h2 { font-size: 1.25rem; margin: 1.5rem 0 0.6rem; }
 [data-tab] > :first-child > h2:first-child { margin-top: 0.5rem; }
@@ -2561,8 +2553,53 @@ html.app-nav-open[data-signed-in] body:not([data-no-app-nav]) .app-nav { display
 .cohort-tabs .area-nav { margin-top: 0.5rem; }
 .cohort-tabs + .page-head { padding-top: 1.75rem; }
 .danger-zone { border-top: 1px solid var(--rule); padding-top: 0.5rem; }
-.ui-optional { display: inline-block; margin-left: 0.4rem; font-size: 0.85rem; font-weight: 500; color: var(--muted); }
 .ui-chip { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.15rem 0.35rem 0.15rem 0.7rem; border: 1px solid var(--rule); border-radius: 1rem; font-size: 0.95rem; font-weight: 500; }
 .ui-chip-x { border: 0; background: none; color: var(--muted); font: inherit; font-size: 1.1rem; line-height: 1; padding: 0.1rem 0.35rem; cursor: pointer; border-radius: 1rem; min-width: 24px; min-height: 24px; }
 .ui-chip-x:hover { color: var(--ink); background: var(--surface); }
 .ui-meta-line { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 0.6rem; color: var(--muted); font-size: 0.95rem; }
+
+/* Status: an icon and a word, no box, no fill, no pill (DESIGN-KIT.md). */
+.ui-status { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.95rem; font-weight: 500; white-space: nowrap; color: var(--ink); }
+.ui-status-done .icon { color: var(--accent); }
+.ui-status-active .icon { color: var(--thistle); stroke: var(--ink); stroke-width: 14; }
+.ui-status-waiting, .ui-status-off { color: var(--muted); }
+.ui-status-problem { color: var(--danger); }
+/* Visibility: who can see this, its words defined in a popover. */
+.ui-visibility { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.95rem; color: var(--muted); }
+.ui-visibility-what { color: var(--muted); }
+.ui-visibility-what::after { content: ":"; }
+.ui-visibility-button { display: inline-flex; align-items: center; gap: 0.35rem; background: none; border: 0; padding: 0.15rem 0; min-height: 24px; font: inherit; color: var(--muted); cursor: help; text-decoration: underline dotted; text-underline-offset: 0.25em; }
+.ui-visibility-button:hover { color: var(--ink); }
+.ui-popover { margin: 0; padding: 0.6rem 0.8rem; max-width: 18rem; border: 1px solid var(--rule); border-radius: 8px; background: var(--card); color: var(--ink); font-size: 0.9rem; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15); }
+.ui-popover:not([popover]) { display: block; margin-top: 0.35rem; }
+/* Count: a number beside its noun, in tabular figures, no pill. */
+.ui-count { font-variant-numeric: tabular-nums; font-weight: 650; color: var(--ink); }
+.ui-tag { font-size: 0.85rem; font-weight: 600; color: var(--muted); margin-right: 0.35rem; }
+/* Toolbar: one row of actions, no border or fill around it. */
+.ui-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 1rem; margin: 0 0 1.5rem; }
+.ui-toolbar .ui-toolbar-end { margin-left: auto; display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; }
+.ui-label { color: var(--muted); font-size: 0.95rem; margin-right: 0.35rem; }
+.ui-say-problem { color: var(--danger); }
+/* Confirm: a native dialog. */
+.ui-dialog { border: 1px solid var(--rule); border-radius: var(--radius); padding: 1.5rem; max-width: min(28rem, 92vw); background: var(--card); color: var(--ink); }
+.ui-dialog::backdrop { background: rgba(0, 0, 0, 0.45); }
+.ui-dialog h2 { font-size: 1.25rem; margin: 0 0 0.5rem; }
+.ui-dialog p { margin: 0 0 1.25rem; }
+.ui-dialog .actions { justify-content: flex-end; }
+/* Page gates. */
+.ui-gate { display: grid; justify-items: start; gap: 0.75rem; padding: 1rem 0 2rem; }
+.ui-gate-line { margin: 0; font-size: 1.1rem; font-weight: 600; }
+/* Loading: nothing for a second, then rows shaped like the real ones. */
+.ui-skeleton { display: grid; gap: 0.75rem; padding: 0.5rem 0; opacity: 0; animation: ui-appear 0.2s ease 1s forwards; }
+.ui-skeleton i { display: block; height: 3rem; border-radius: 8px; background: var(--surface); }
+.ui-skeleton i:nth-child(3) { width: 85%; }
+.ui-skeleton i:nth-child(4) { width: 70%; }
+@keyframes ui-appear { to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .ui-skeleton { animation: none; opacity: 1; } }
+/* Tabs that do not fit fold into More. */
+.ui-tabs ul { flex-wrap: nowrap; }
+.ui-tabs-more { position: relative; }
+.ui-tabs-more-button { background: none; border: 0; font: inherit; font-weight: 500; color: var(--muted); padding: 0.6rem 0 0.55rem; cursor: pointer; }
+.ui-tabs-more-list { position: absolute; right: 0; top: 100%; z-index: 20; display: grid !important; gap: 0; min-width: 11rem; padding: 0.35rem; background: var(--card); border: 1px solid var(--rule); border-radius: 8px; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15); }
+.ui-tabs-more-list[hidden] { display: none !important; }
+.ui-tabs-more-list a { display: block; padding: 0.45rem 0.6rem; border-bottom: 0 !important; margin: 0 !important; }

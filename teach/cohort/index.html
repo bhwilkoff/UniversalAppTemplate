@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261021h">
+  <link rel="stylesheet" href="/assets/site.css?v=20261022a">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -37,6 +37,7 @@
     })();
   </script>
   <script src="/assets/site.js?v=20261021c" defer></script>
+  <script src="/assets/ui.js?v=20261022a" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to the page</a>
@@ -54,10 +55,10 @@
       </nav>
       <div class="header-actions">
         <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#moon"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#moon"/></svg>
         </button>
         <a class="btn-primary small" href="/account/">
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#github"/></svg>
           <span>Sign in<span class="long"> with GitHub</span></span>
         </a>
       </div>
@@ -67,20 +68,13 @@
   <main id="main">
     <div class="wrap">
       <div class="account teach" data-teach-cohort>
-        <section class="account-state" data-state="loading"><p>Checking whether you are signed in…</p></section>
+        <section class="account-state" data-state="loading"><div class="ui-skeleton" aria-busy="true"><span class="visually-hidden" role="status">Loading</span><i></i><i></i><i></i></div></section>
 
-        <section class="account-state" data-state="signed-out" hidden>
-          <p>This page is for teachers, so it starts with signing in.</p>
-          <p><a class="btn-primary" href="/account/"><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Sign in with GitHub</a></p>
-        </section>
+        <section class="account-state" data-state="signed-out" hidden><div data-gate="signed-out"></div></section>
 
-        <section class="account-state" data-state="not-teacher" hidden>
-          <p>This page is for teachers. <a href="/teach/">Ask to teach a cohort</a>, and once you are approved it opens for you.</p>
-        </section>
+        <section class="account-state" data-state="not-teacher" hidden><div data-gate="not-teacher"></div></section>
 
-        <section class="account-state" data-state="missing" hidden>
-          <p>There is no cohort of yours at this address. <a href="/teach/">Your cohorts</a> are all listed together.</p>
-        </section>
+        <section class="account-state" data-state="missing" hidden><div data-gate="missing"></div></section>
 
         <section class="account-state" data-state="error" hidden>
           <p class="error" data-error-text role="alert"></p>
@@ -117,27 +111,27 @@
               </section>
               <section class="panel-section lesson" data-lesson hidden aria-labelledby="lesson">
                 <h2 id="lesson">The lesson it sends back</h2>
-                <p class="ui-meta-line"><span class="ui-visibility"><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261021a#globe-simple"/></svg><span>Public on GitHub</span></span></p>
-                <p class="actions"><a class="btn-secondary" data-lesson-link href="https://github.com/bhwilkoff/UniversalAppTemplate/issues/new"><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Send a lesson to the template</a></p>
+                <p class="ui-meta-line"><span data-vis="public"></span> On GitHub.</p>
+                <p class="actions"><a class="btn-secondary" data-lesson-link href="https://github.com/bhwilkoff/UniversalAppTemplate/issues/new"><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#github"/></svg>Send a lesson to the template</a></p>
               </section>
             </div>
 
             <div data-tab="followup" hidden>
               <section class="since" aria-labelledby="checks-heard-title" data-since hidden>
                 <h2 id="checks-heard-title" data-checks-heard-title></h2>
-                <p class="ui-meta-line"><span class="ui-visibility"><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261021a#lock-simple"/></svg><span>Only teachers</span></span></p>
+                <p class="ui-meta-line"><span data-vis="staff"></span></p>
                 <p class="ui-inline-status" data-checks-heard-intro></p>
                 <div data-check-answers></div>
                 <form class="inline-form" data-heard-form>
                   <label>What I heard, and what changes
-                    <span class="hint"><span class="ui-visibility"><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261021a#users"/></svg><span>Your cohort</span></span> Shown as people arrive next session.</span>
+                    <span class="hint"><span data-vis="cohort"></span> Shown as people arrive next session.</span>
                     <textarea name="heard" rows="4" maxlength="2000"></textarea>
                   </label>
                   <div class="actions"><button class="btn-secondary" type="submit">Save</button><span class="ui-inline-status" data-heard-message role="status"></span></div>
                 </form>
 
                 <h2 id="not-seen-title" data-not-seen-title></h2>
-                <p class="ui-meta-line"><span class="ui-visibility"><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261021a#lock-simple"/></svg><span>Only teachers</span></span></p>
+                <p class="ui-meta-line"><span data-vis="staff"></span></p>
                 <p class="ui-inline-status" data-not-seen-intro></p>
                 <ul class="roster not-seen" data-not-seen></ul>
 
@@ -225,24 +219,23 @@
   <script src="/assets/teach-page.js?v=20261021d" defer></script>
   <script src="/assets/rooms-lib.js" defer></script>
   <script src="/assets/followup-lib.js" defer></script>
-  <script src="/assets/submit-lib.js" defer></script>
+  <script src="/assets/submit-lib.js?v=20261022a" defer></script>
   <script src="/assets/credential-lib.js?v=20261006c" defer></script>
   <script src="/assets/credential-check.js" defer></script>
   <script src="/assets/mentor-lib.js" defer></script>
   <script src="/assets/reach-lib.js" defer></script>
-  <script src="/assets/showcase-lib.js" defer></script>
-  <script src="/assets/cohort-lib.js" defer></script>
+  <script src="/assets/showcase-lib.js?v=20261022a" defer></script>
+  <script src="/assets/cohort-lib.js?v=20261022a" defer></script>
   <script src="/assets/live-lib.js" defer></script>
-  <script src="/assets/question-view.js?v=20261012h" defer></script>
+  <script src="/assets/question-view.js?v=20261022a" defer></script>
   <script src="/assets/question-bank.js?v=20261012h" defer></script>
   <script src="/assets/board-lib.js" defer></script>
   <script src="/assets/show-lib.js" defer></script>
   <script src="/assets/curriculum-lib.js" defer></script>
   <script src="/assets/curriculum-seed.js" defer></script>
-  <script src="/assets/show-builder.js?v=20261012h" defer></script>
-  <script src="/assets/ui.js?v=20261021d" defer></script>
-  <script src="/assets/cohort-nav.js?v=20261021b" defer></script>
-  <script src="/assets/teach-cohort.js?v=20261021h" defer></script>
+  <script src="/assets/show-builder.js?v=20261022a" defer></script>
+  <script src="/assets/cohort-nav.js?v=20261022a" defer></script>
+  <script src="/assets/teach-cohort.js?v=20261022a" defer></script>
 
   <footer class="site-footer">
     <div class="wrap">

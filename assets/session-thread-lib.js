@@ -71,7 +71,7 @@
   function body(session, liveUrl) {
     return [
       'This is the thread for ' + weekName(session) + '’s live session.',
-      'Links, questions for later, and whatever you are stuck on can go here, and they stay, under your own name, after the call ends. Meet’s chat is for the moment, and this is for what should last.',
+      'For links and questions that should outlast the call.',
       'You can post here on GitHub or from the session page' + (/^https:\/\//.test(liveUrl || '') ? ' (' + liveUrl + ')' : '') + ', and you can edit or delete what you wrote, here, at any time.'
     ].join('\n\n');
   }

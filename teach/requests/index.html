@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Asking to teach | Human Shaped</title>
+  <title>Requests to teach | Human Shaped</title>
   <meta name="description" content="Create and run a Human Shaped cohort: its dates, its weekly sessions, its groups, and the people in it.">
   <link rel="canonical" href="https://humanshaped.org/teach/">
   <meta property="og:url" content="https://humanshaped.org/teach/">
@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261021h">
+  <link rel="stylesheet" href="/assets/site.css?v=20261022a">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -37,6 +37,7 @@
     })();
   </script>
   <script src="/assets/site.js?v=20261021c" defer></script>
+  <script src="/assets/ui.js?v=20261022a" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to the page</a>
@@ -54,10 +55,10 @@
       </nav>
       <div class="header-actions">
         <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#moon"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#moon"/></svg>
         </button>
         <a class="btn-primary small" href="/account/">
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#github"/></svg>
           <span>Sign in<span class="long"> with GitHub</span></span>
         </a>
       </div>
@@ -76,21 +77,15 @@
         </ul>
       </nav>
       <header class="page-head">
-        <h1>Asking to teach.</h1>
-        <p class="lead">People who would like to lead a cohort, oldest first. Approving one makes them a teacher here, able to make cohorts of their own, and whatever you write in the answer is what they will read.</p>
+        <h1>Requests to teach</h1>
       </header>
 
       <div class="account teach" data-teach-requests>
-        <section class="account-state" data-state="loading"><p>Checking whether you are signed in…</p></section>
+        <section class="account-state" data-state="loading"><div class="ui-skeleton" aria-busy="true"><span class="visually-hidden" role="status">Loading</span><i></i><i></i><i></i></div></section>
 
-        <section class="account-state" data-state="signed-out" hidden>
-          <p>This page is for teachers, so it starts with signing in.</p>
-          <p><a class="btn-primary" href="/account/"><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Sign in with GitHub</a></p>
-        </section>
+        <section class="account-state" data-state="signed-out" hidden><div data-gate="signed-out"></div></section>
 
-        <section class="account-state" data-state="not-teacher" hidden>
-          <p>This page is for teachers. <a href="/teach/">Ask to teach a cohort</a>, and once you are approved it opens for you.</p>
-        </section>
+        <section class="account-state" data-state="not-teacher" hidden><div data-gate="not-teacher"></div></section>
 
         <section class="account-state" data-state="not-approver" hidden>
           <p>Only the people who approve teachers read requests to teach.</p>
@@ -110,7 +105,7 @@
   <script src="/assets/hub-config.js?v=20261016a" defer></script>
   <script src="/assets/teach-lib.js?v=20261006g" defer></script>
   <script src="/assets/teach-page.js?v=20261021d" defer></script>
-  <script src="/assets/teach-requests.js?v=20261021c" defer></script>
+  <script src="/assets/teach-requests.js?v=20261022a" defer></script>
 
   <footer class="site-footer">
     <div class="wrap">

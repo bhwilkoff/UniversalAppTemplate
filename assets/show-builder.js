@@ -120,9 +120,8 @@
       });
       prev.setAttribute('aria-expanded', previewing === s.id ? 'true' : 'false');
       acts.appendChild(prev);
-      var rm = button('Remove', 'btn-danger', function () {
-        if (!rm.hasAttribute('data-armed')) { rm.setAttribute('data-armed', ''); rm.textContent = 'Remove ' + s.title + '?'; return; }
-        remove(s);
+      var rm = button('Delete', 'btn-danger', function () {
+        window.UI.confirm({ title: 'Delete ' + s.title + '?', body: 'It comes out of this week\u2019s run of show.', action: 'Delete scene' }).then(function (ok) { if (ok) remove(s); });
       });
       acts.appendChild(rm);
       li.appendChild(acts);

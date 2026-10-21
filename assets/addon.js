@@ -196,7 +196,7 @@
       if (bad) return fail('The panel could not look up this call: ' + bad.error.message);
       var room = A.findRoom(code, { sessions: res[0].data, groups: res[1].data, teaching: res[2].data.map(function (t) { return t.cohort_id; }) });
       if (!room) {
-        $('[data-no-room-text]').textContent = 'This call’s code is ' + code + '. If it is your cohort’s session or one group’s room, a teacher can paste the call’s link into that session or group on the teaching page, and then this panel finds it when it opens.';
+        $('[data-no-room-text]').textContent = 'This call’s code is ' + code + '. A teacher adds its link to a session or group on the teaching page.';
         return show('no-room');
       }
       S.room = room;
@@ -506,7 +506,7 @@
     var open = newTab(el('a', 'btn-primary', 'Open the design stage')); open.href = links.board; acts.appendChild(open);
     if (S.teaching) { var stage = newTab(el('a', 'btn-secondary', 'Open it to present')); stage.href = links.stage; acts.appendChild(stage); }
     box.appendChild(acts);
-    if (S.teaching) box.appendChild(el('p', 'small', 'During a design stage scene, the main stage shows this board to everyone who has it open. On the board you can add a PDF, slides saved as a PDF, or pictures as pages to draw on, from your computer or your library folder on GitHub.'));
+    if (S.teaching) box.appendChild(el('p', 'small', 'Shown on the main stage during a design scene.'));
   }
 
   // ------------------------------------------------------------------
@@ -918,7 +918,7 @@
     var mine = S.answers.filter(function (a) { return a.check_id === k.id; });
     var short = L.kindOf(k) === 'short';
     if (!short) card.appendChild(resultsOf(k));
-    else card.appendChild(el('p', 'small', L.counted(mine.length, 'answer', 'answers') + ', which only you and the other teachers see'));
+    else { var pc = el('p', 'small', L.counted(mine.length, 'answer', 'answers') + ' '); pc.appendChild(window.UI.visibility('staff')); card.appendChild(pc); }
     if (mine.length) {
       var details = el('details', 'addon-answers');
       details.appendChild(el('summary', null, 'Read the answers'));

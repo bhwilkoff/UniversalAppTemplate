@@ -53,7 +53,7 @@
   function drawEvents(split) {
     var up = events.querySelector('[data-upcoming]'), past = events.querySelector('[data-past]');
     up.replaceChildren(); past.replaceChildren();
-    if (!split.upcoming.length) up.appendChild(el('p', 'small', 'Nothing is on the calendar right now. If you are planning something, tell us about it below, and it will be listed here.'));
+    if (!split.upcoming.length) up.appendChild(window.UI.empty('No events coming up'));
     else { var ol = el('ol', 'events'); split.upcoming.forEach(function (e) { ol.appendChild(eventItem(e, false)); }); up.appendChild(ol); }
     events.querySelector('[data-past-section]').hidden = !split.past.length;
     if (split.past.length) { var ol2 = el('ol', 'events'); split.past.forEach(function (e) { ol2.appendChild(eventItem(e, true)); }); past.appendChild(ol2); }
@@ -80,7 +80,7 @@
 
   function trouble() {
     if (events) {
-      events.querySelector('[data-upcoming]').replaceChildren(el('p', 'small', 'The list of events could not be reached just now. It lives in the humanshaped community repository on GitHub, and reading this page again in a minute usually brings it back.'));
+      events.querySelector('[data-upcoming]').replaceChildren(el('p', 'small', 'This could not load.'));
     }
   }
 

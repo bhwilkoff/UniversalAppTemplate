@@ -57,7 +57,7 @@
   function explain(p, repo) {
     var box = el('div', 'talk-problem');
     if (p.kind === 'not-visible') {
-      box.appendChild(el('p', null, 'GitHub will not show this cohort’s repository to your account yet. Usually that means the invitation to the humanshaped organization is still waiting for you, in your email or on GitHub, so accept it and read this page again.'));
+      box.appendChild(el('p', null, 'Accept your invitation to the humanshaped organization on GitHub first.'));
       box.appendChild(el('p')).appendChild(link('https://github.com/orgs/humanshaped/invitation', 'See the invitation on GitHub'));
     } else if (p.kind === 'rate') {
       box.appendChild(el('p', null, 'GitHub has asked this page to slow down for a little while (in its words: “' + (p.message || 'rate limit') + '”). Try again in a few minutes. The conversation on GitHub itself is not affected.'));
@@ -82,10 +82,10 @@
 
   function noToken(box, db, repo, expired, compact) {
     var p = el('p', compact ? 'small' : null, compact
-      ? 'This page can read the conversation for a few hours after you sign in, and that time has passed, so sign in again or open it on GitHub.'
+      ? 'Sign in again to read this here.'
       : expired
-        ? 'GitHub ends this page\u2019s permission to read the conversation for you after eight hours, and that time has passed, so sign in again to read it here, or open it on GitHub.'
-        : 'GitHub lets this page read the conversation for you for a few hours after you sign in, and that time has passed in this tab, so sign in again to read it here, or open it on GitHub.');
+        ? 'Sign in again to read this here.'
+        : 'Sign in again to read this here.');
     box.appendChild(p);
     var acts = el('div', 'actions');
     var b = button('Sign in again to read it here', 'btn-secondary', function () { signInAgain(db, b); });
@@ -236,7 +236,7 @@
       cats.forEach(function (c) { var op = el('option', null, c.name); op.value = c.id; sel.appendChild(op); });
       l2.appendChild(sel); f.appendChild(l2);
       var l3 = el('label', null, 'What you want to say'); var ta = el('textarea'); ta.rows = 4; ta.required = true; ta.maxLength = 65000; l3.appendChild(ta); f.appendChild(l3);
-      f.appendChild(el('p', 'small hint', 'Only the people in this cohort can see it. It goes to GitHub as yours, marked as sent from Human Shaped, and stays there under your name even if you leave the cohort, unless you delete it.'));
+      f.appendChild((function () { var h = el('p', 'small hint'); h.appendChild(window.UI.visibility('cohort')); h.appendChild(document.createTextNode(' Posted to GitHub as you, and kept there if you leave.')); return h; })());
       var acts = el('div', 'actions');
       var b = el('button', 'btn-secondary', 'Post it to GitHub'); b.type = 'submit';
       var msg = el('span', 'small'); msg.setAttribute('role', 'status');
@@ -356,7 +356,7 @@
     function offerToOpen(note) {
       posts = null;
       box.replaceChildren();
-      box.appendChild(el('p', 'small', note || 'Opening it starts a discussion in the cohort’s repository on GitHub, under your name, where links, questions for later, and what people are stuck on can stay after the call.'));
+      box.appendChild(el('p', 'small', note || 'Starts a discussion on GitHub, under your name.'));
       var acts = el('div', 'actions');
       var msg = el('span', 'small'); msg.setAttribute('role', 'status');
       var b = button('Open this session’s thread', 'btn-secondary', function () { open(b, msg, !!note); });

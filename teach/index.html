@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Teach a cohort | Human Shaped</title>
+  <title>Teaching | Human Shaped</title>
   <meta name="description" content="Create and run a Human Shaped cohort: its dates, its weekly sessions, its groups, and the people in it.">
   <link rel="canonical" href="https://humanshaped.org/teach/">
   <meta property="og:url" content="https://humanshaped.org/teach/">
@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261021h">
+  <link rel="stylesheet" href="/assets/site.css?v=20261022a">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -37,6 +37,7 @@
     })();
   </script>
   <script src="/assets/site.js?v=20261021c" defer></script>
+  <script src="/assets/ui.js?v=20261022a" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to the page</a>
@@ -54,10 +55,10 @@
       </nav>
       <div class="header-actions">
         <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#moon"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#moon"/></svg>
         </button>
         <a class="btn-primary small" href="/account/">
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#github"/></svg>
           <span>Sign in<span class="long"> with GitHub</span></span>
         </a>
       </div>
@@ -76,21 +77,15 @@
         </ul>
       </nav>
       <header class="page-head">
-        <h1>Run a cohort.</h1>
-        <p class="lead">A cohort is something you make here rather than something written into the site, so every detail of it (its dates, its weekly sessions, its groups, and what each week asks of people) is yours to set and to change as the cohort goes.</p>
+        <h1>Teaching</h1>
       </header>
 
       <div class="account teach" data-teach>
-        <section class="account-state" data-state="loading"><p>Checking whether you are signed in…</p></section>
+        <section class="account-state" data-state="loading"><div class="ui-skeleton" aria-busy="true"><span class="visually-hidden" role="status">Loading</span><i></i><i></i><i></i></div></section>
 
-        <section class="account-state" data-state="signed-out" hidden>
-          <p>This page is for teachers, so it starts with signing in.</p>
-          <p><a class="btn-primary" href="/account/"><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Sign in with GitHub</a></p>
-        </section>
+        <section class="account-state" data-state="signed-out" hidden><div data-gate="signed-out"></div></section>
 
-        <section class="account-state" data-state="not-teacher" hidden>
-          <p>This page is for teachers. <a href="/teach/">Ask to teach a cohort</a>, and once you are approved it opens for you.</p>
-        </section>
+        <section class="account-state" data-state="not-teacher" hidden><div data-gate="not-teacher"></div></section>
 
         <section class="account-state" data-state="error" hidden>
           <p class="error" data-error-text role="alert"></p>
@@ -100,11 +95,12 @@
              Claude for milestone M2 and await Ben's review. -->
         <section class="account-state" data-state="ask" hidden>
           <h2 id="ask">Ask to teach</h2>
-          <p>Teaching here is by invitation while the first cohorts find their shape, so leading one starts with asking. <a href="/teach/guide/">The teaching guide</a> says what a cohort asks of its teacher and what you need before the first session.</p>
+          <p>Teaching is by invitation for now.</p>
+          <p class="actions"><a class="btn-secondary" href="/teach/guide/">The teaching guide</a></p>
           <form class="cohort-form" data-ask-form>
             <label>Why you would like to teach a cohort <textarea name="why" rows="4" required maxlength="2000"></textarea></label>
             <label>What you would bring to it <span class="hint">The people you would teach, where you would find them, and anything you have built this way.</span><textarea name="brings" rows="3" maxlength="2000"></textarea></label>
-            <p class="small">Only you and the people who approve teachers can read this, and you can change it or take it back until it has an answer.</p>
+            <p class="ui-meta-line"><span data-vis="approvers"></span></p>
             <div class="actions">
               <button class="btn-primary" type="submit" data-ask-submit>Send my request</button>
               <button class="btn-secondary" type="button" data-ask-cancel hidden>Keep it as it was</button>
@@ -151,7 +147,7 @@
   <script src="/assets/hub-config.js?v=20261016a" defer></script>
   <script src="/assets/teach-lib.js?v=20261006g" defer></script>
   <script src="/assets/teach-page.js?v=20261021d" defer></script>
-  <script src="/assets/teach.js?v=20261021c" defer></script>
+  <script src="/assets/teach.js?v=20261022a" defer></script>
 
   <footer class="site-footer">
     <div class="wrap">

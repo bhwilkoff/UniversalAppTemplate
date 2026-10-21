@@ -193,7 +193,7 @@
       if (problem) box.appendChild(el('p', 'small error', problem));
       if (!o.session.chat_number) {
         if (!o.teaching) { box.appendChild(el('p', 'small', 'Your teacher has not opened the class chat for this session yet.')); return; }
-        box.appendChild(el('p', 'small', 'Open the chat for this session. It is a discussion in the cohort’s repository on GitHub, so everything said in class stays there, apart from the ongoing conversation.'));
+        box.appendChild(el('p', 'small', 'Kept in the cohort’s repository on GitHub.'));
         if (!token()) { box.appendChild(button('Connect GitHub first', 'btn-primary', connect)); return; }
         var st = el('p', 'small');
         box.appendChild(button('Open the class chat', 'btn-primary', function () { openChat(st); }));

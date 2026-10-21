@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261021h">
+  <link rel="stylesheet" href="/assets/site.css?v=20261022a">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -39,6 +39,7 @@
     if (location.hash === '#exchanges') location.replace('/#exchanges');
   </script>
   <script src="/assets/site.js?v=20261021c" defer></script>
+  <script src="/assets/ui.js?v=20261022a" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to the page</a>
@@ -56,10 +57,10 @@
       </nav>
       <div class="header-actions">
         <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#moon"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#moon"/></svg>
         </button>
         <a class="btn-primary small" href="/account/">
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#github"/></svg>
           <span>Sign in<span class="long"> with GitHub</span></span>
         </a>
       </div>
@@ -70,16 +71,13 @@
     <div class="wrap">
       <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li></ol></nav>
       <header class="page-head">
-        <h1>Your app.</h1>
+        <h1>Your app</h1>
       </header>
 
       <div class="account" data-apps-mine data-own-app-section>
-        <section class="account-state" data-state="loading"><p>Checking whether you are signed in…</p></section>
+        <section class="account-state" data-state="loading"><div class="ui-skeleton" aria-busy="true"><span class="visually-hidden" role="status">Loading</span><i></i><i></i><i></i></div></section>
 
-        <section class="account-state" data-state="signed-out" hidden>
-          <p>Your app is kept with your account, so this starts with signing in.</p>
-          <p><a class="btn-primary" href="/account/"><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Sign in with GitHub</a></p>
-        </section>
+        <section class="account-state" data-state="signed-out" hidden><div data-gate="signed-out"></div></section>
 
         <section class="account-state" data-state="error" hidden>
           <p class="error" data-error-text role="alert"></p>
@@ -87,7 +85,6 @@
         </section>
 
         <section class="account-state" data-state="ready" hidden>
-            <p>For an app you are building on your own, outside any cohort. It stays yours alone until you choose to show it, and then the apps page shows its name, repository, and address, with a page that follows its work, and never anything about you.</p>
             <form class="inline-form" data-own-app-form>
               <label>Its repository on GitHub
                 <span class="hint">As owner/name, or paste its address.</span>
@@ -99,7 +96,7 @@
               <label>Where it runs, if it runs somewhere
                 <input type="url" name="url" maxlength="500" placeholder="https://">
               </label>
-              <label class="check"><input type="checkbox" name="public"> Show it on the apps page</label>
+              <label class="check"><input type="checkbox" name="public"> Show it on the apps page <span data-vis="public"></span></label>
               <p class="small" data-own-app-standing></p>
               <div class="actions">
                 <button class="btn-secondary" type="submit">Save my app</button>
@@ -114,8 +111,8 @@
   </main>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" defer></script>
   <script src="/assets/hub-config.js?v=20261016a" defer></script>
-  <script src="/assets/builder-lib.js" defer></script>
-  <script src="/assets/apps-mine.js?v=20261021a" defer></script>
+  <script src="/assets/builder-lib.js?v=20261022a" defer></script>
+  <script src="/assets/apps-mine.js?v=20261022a" defer></script>
 
   <footer class="site-footer">
     <div class="wrap">

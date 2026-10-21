@@ -110,8 +110,8 @@
 
   function whereLine() {
     return mode === 'account'
-      ? 'Only you can see your marks, and they are kept with your account.'
-      : 'Only you can see your marks, and they are kept in this browser. Sign in to keep them with your account.';
+      ? ''
+      : 'Sign in to keep them with your account.';
   }
 
   // ------------------------------------------------------------------

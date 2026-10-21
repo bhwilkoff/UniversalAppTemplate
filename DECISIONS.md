@@ -1020,8 +1020,9 @@ and let a role add items to it; GitHub and GOV.UK give every item its own
 address and a breadcrumb to where it sits. Sources:
 research/notes/navigation-and-wayfinding-notes.md.
 
-**How to apply:** before adding a page, section, or form, find its row in
-PAGES.md, or add the row first. New teacher pages go under /teach/ with the
+**How to apply** (the role line this entry first described was retired
+the same day for the interface itself; DESIGN-KIT.md): before adding a
+page, section, or form, find its row in PAGES.md, or add the row first. New teacher pages go under /teach/ with the
 Teaching row (`data-area-nav="teaching"`, revealed by `teach-page.js`); any
 page about one cohort calls `CohortNav.draw`. The header learns your roles
 from `HS.roles` in site.js, which pages that read them keep in the browser.

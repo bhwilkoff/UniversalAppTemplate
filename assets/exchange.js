@@ -26,7 +26,7 @@
     var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttribute('aria-hidden', 'true');
     var use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
-    use.setAttribute('href', '/assets/icons.svg?v=20261012n#' + name);
+    use.setAttribute('href', '/assets/icons.svg?v=20261022a#' + name);
     svg.appendChild(use);
     return svg;
   }
@@ -77,7 +77,7 @@
       ['Cohort', cohortLink],
       ['Videos', String(n)],
       ['Who can see it', U.visibility(ex.cohort ? 'cohort' : ex.members ? 'members' : 'link')],
-      ['New videos', U.status(ex.replies_open ? 'done' : 'off', ex.replies_open ? 'Open' : 'Closed to new videos')]
+      ['New videos', U.status('exchange', ex.replies_open ? 'open' : 'closed')]
     ]));
     $('[data-tools]').hidden = !ex.mine;
     $('[data-toggle-replies]').textContent = ex.replies_open ? 'Close replies' : 'Open replies again';
@@ -290,7 +290,7 @@
     if (p.mine || ex.can_moderate) {
       var rm = el('button', 'btn-danger', 'Remove from the exchange');
       rm.type = 'button';
-      window.UI.confirmStep(rm, { confirm: 'Remove this video', status: $('[data-x-status]'), warning: 'It stays in ' + (p.mine ? 'your' : 'its maker\'s') + ' Google Drive.', run: function () { removePost(p); } });
+      window.UI.confirmStep(rm, { title: 'Remove this video?', body: 'It stays in ' + (p.mine ? 'your' : 'its maker\'s') + ' Google Drive.', action: 'Remove video', run: function () { removePost(p); } });
       acts.appendChild(rm);
     }
     now.appendChild(acts);
@@ -432,7 +432,7 @@
       wrap.parentNode.replaceChild(driveFrame(p, links), wrap);
       var now = $('[data-now]');
       if (now && isFresh(p) && reach[p.id] !== 'open') {
-        var wait = el('p', 'hint', 'Drive can take a few minutes to prepare a new video. If it does not play yet, open it in Google Drive or come back shortly.');
+        var wait = el('p', 'hint', 'Drive is still preparing this video.');
         wait.setAttribute('data-preparing', '');
         now.insertBefore(wait, now.querySelector('.x-reactions'));
       }
@@ -658,10 +658,7 @@
         if (r.error) throw r.error;
         if (!r.data) return show('missing');
         if (r.data.private) {
-          $('[data-private-title]').textContent = r.data.members ? 'This exchange is for Human Shaped members.' : 'This exchange is for a cohort.';
-          $('[data-private-lead]').textContent = r.data.members
-            ? 'Only people who are in a cohort, now or before, and teachers can watch it and add to it.'
-            : 'Only the people in the cohort it belongs to can watch it and add to it.';
+          $('[data-private-title]').textContent = r.data.members ? 'Only Human Shaped members can open this' : 'Only people in this cohort can open this';
           $('[data-private-signin]').hidden = !!me;
           return show('private');
         }
@@ -686,7 +683,7 @@
       return load();
     }).catch(function (e) { $('[data-x-status]').textContent = 'Nothing changed: ' + said(e); });
   });
-  window.UI.confirmStep($('[data-delete]'), { confirm: 'Delete this exchange for everyone', status: $('[data-x-status]'), warning: 'The videos stay in each person\'s Google Drive.', run: function () {
+  window.UI.confirmStep($('[data-delete]'), { title: 'Delete this exchange?', body: 'It is deleted for everyone. ' + 'The videos stay in each person\'s Google Drive.', action: 'Delete exchange', run: function () {
     within(db.from('exchanges').delete().eq('token', token)).then(function (r) {
       if (r.error) throw r.error;
       location.href = '/exchanges/';

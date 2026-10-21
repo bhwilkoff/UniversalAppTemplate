@@ -168,9 +168,9 @@
     if (window.LiveCommits) window.LiveCommits.draw(root, { teaching: S.teaching, people: S.people, since: session.starts_at, token: S.token });
     $('[data-ask]').hidden = !S.teaching;
     if (S.teaching) startAsking();
-    $('[data-checks-intro]').textContent = S.teaching
-      ? 'Ask a short question to see what is landing. Each person sees only their own answer, and the count of answers only if you choose to show it. Nothing here is graded, and the questions and answers are deleted when the cohort finishes.'
-      : 'Your teacher may ask a short question to see what is landing. Only you and your teacher see your answer, nothing here is graded, and the questions and answers are deleted when the cohort finishes.';
+    // Who sees an answer, as a part; the two facts no one could guess.
+    var intro = $('[data-checks-intro]');
+    intro.replaceChildren(window.UI.visibility(S.teaching ? 'staff' : 'teachers', 'Answers'), document.createTextNode(' Not graded. Deleted when the cohort finishes.'));
     show('ready');
   }
 
@@ -356,7 +356,7 @@
         : 'You are not in a group yet, so stay in the main session, and your teacher will say where to go.'));
       return;
     }
-    body.appendChild(el('p', 'small', 'Each builder takes a turn, in the order below, which moves along by one each week. Run the step timers from any one screen in the group.'));
+    body.appendChild(el('p', 'small', 'The order moves along by one each week.'));
     groups.forEach(function (g) { body.appendChild(groupCard(g, groups.length > 1)); });
   }
 

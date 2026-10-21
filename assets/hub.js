@@ -127,13 +127,13 @@
     show('link-elsewhere');
     var text = root.querySelector('[data-elsewhere-text]');
     var useGitHub = root.querySelector('[data-use-github-account]');
-    text.textContent = 'Sign in with your GitHub account instead, then link Google to it from your account page, so Google and GitHub both reach the same account.';
+    text.textContent = 'Sign in with GitHub, then link Google from your account.';
     db.auth.getUser().then(function (u) {
       var user = u.data && u.data.user;
       if (!user) return null;
       return db.from('profiles').select('github_login').eq('id', user.id).maybeSingle().then(function (p) {
         if (!G.emptyGoogleOnly(user.identities, p.data)) return;
-        text.textContent = 'The Google sign-in made a new, empty account a moment ago. Using your GitHub account removes that empty one, signs you in with GitHub, and hands that back to Meet. Then, on your account page, link Google, so the next Google sign-in reaches your GitHub account.';
+        text.textContent = 'Google made a new, empty account. Signing in with GitHub removes it; then link Google from your account.';
         useGitHub.hidden = false;
       });
     });
@@ -172,20 +172,16 @@
           var b = el('button', 'btn-secondary small', 'Unlink');
           b.type = 'button';
           b.addEventListener('click', function () {
-            if (!b.hasAttribute('data-armed')) {
-              b.setAttribute('data-armed', '');
-              b.textContent = pv[0] === 'github'
-                ? 'Without GitHub, your cohorts cannot reach you. Press again to unlink it.'
-                : 'Press again to unlink Google.';
-              return;
-            }
+            window.UI.confirm({ title: 'Unlink ' + pv[1] + '?', body: pv[0] === 'github' ? 'Without GitHub, your cohorts cannot reach you.' : 'You will sign in with GitHub only.', action: 'Unlink ' + pv[1] }).then(function (ok) { if (ok) unlink(); });
+          });
+          function unlink() {
             b.disabled = true;
             db.auth.unlinkIdentity(idn).then(function (u) {
               if (u.error) { b.disabled = false; status.textContent = 'Not unlinked: ' + u.error.message + '.'; return; }
-              status.textContent = pv[1] + ' is unlinked.';
+              status.textContent = pv[1] + ' unlinked';
               load();
             });
-          });
+          }
           li.appendChild(document.createTextNode(' '));
           li.appendChild(b);
         }
@@ -210,7 +206,7 @@
           onSession: function () { status.textContent = 'Google is linked. Signing in with Google now reaches this same account.'; googleLinkShown = false; drawLinked(); },
           onError: function (e) {
             status.textContent = G.alreadyLinkedElsewhere(e)
-              ? 'That Google account already signs in to a different account here. Sign in with Google, delete that account from its account page, then link Google here.'
+              ? 'That Google account belongs to another account here. Delete that account first, then link it.'
               : 'Linking Google did not finish: ' + said(e) + '.';
           }
         });
@@ -329,7 +325,7 @@
     var signedInHere = false;
     try { signedInHere = window.sessionStorage.getItem('hs-handoff') === '1'; window.sessionStorage.removeItem('hs-handoff'); } catch (e) {}
     if (!opener || !msg) {
-      text.textContent = 'You are signed in on humanshaped.org, but this window lost track of Meet along the way. Go back to Meet, and in the panel choose “Use my humanshaped.org sign-in”, which can work now.';
+      text.textContent = 'This window lost track of Meet. In Meet’s panel, choose “Use my humanshaped.org sign-in”.';
       return show('handoff');
     }
     opener.postMessage(msg, location.origin);
@@ -387,7 +383,7 @@
         var title = document.querySelector('[data-account-title]');
         if (title) title.textContent = 'Your account.';
         var lead = document.querySelector('[data-account-lead]');
-        if (lead) lead.textContent = 'How you sign in, how your teachers can reach you, what you keep here, and your data. Your cohorts, exchanges, and times are on your home page.';
+        if (lead) lead.textContent = '';
         var a = root.querySelector('[data-github-link]');
         if (p.github_login) {
           a.textContent = '@' + p.github_login;

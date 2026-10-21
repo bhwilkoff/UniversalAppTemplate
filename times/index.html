@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261021h">
+  <link rel="stylesheet" href="/assets/site.css?v=20261022a">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -26,6 +26,7 @@
     })();
   </script>
   <script src="/assets/site.js?v=20261021c" defer></script>
+  <script src="/assets/ui.js?v=20261022a" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" defer></script>
   <script src="/assets/hub-config.js?v=20261016a" defer></script>
   <script src="/assets/times-lib.js?v=20261021a" defer></script>
@@ -50,10 +51,10 @@
       </nav>
       <div class="header-actions">
         <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#moon"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#moon"/></svg>
         </button>
         <a class="btn-primary small" href="/account/">
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#github"/></svg>
           <span>Sign in<span class="long"> with GitHub</span></span>
         </a>
       </div>
@@ -63,16 +64,16 @@
   <main id="main">
     <div class="wrap">
       <div class="account times" data-times>
-        <section class="times-state" data-state="loading"><p>Finding the poll…</p></section>
+        <section class="times-state" data-state="loading"><div class="ui-skeleton" aria-busy="true"><span class="visually-hidden" role="status">Loading</span><i></i><i></i><i></i></div></section>
 
         <section class="times-state" data-state="missing" hidden>
-          <h1>There is no poll at this link.</h1>
-          <p class="lead">The link may have been cut short when it was copied, or the teacher may have deleted the poll. Ask whoever sent it for the whole link.</p>
+          <h1>Nothing is at this address</h1>
+          <p>Ask whoever sent it for the whole link.</p>
         </section>
 
         <section class="times-state" data-state="error" hidden>
-          <h1>The poll could not be loaded.</h1>
-          <p class="lead" data-error-text></p>
+          <h1>This could not load</h1>
+          <p class="small" data-error-text></p>
           <p><button class="btn-secondary" type="button" data-retry>Try again</button></p>
         </section>
 
@@ -86,7 +87,7 @@
           <section class="times-invite" data-invite hidden aria-labelledby="invite-title">
             <h2 id="invite-title" data-invite-title></h2>
             <p data-invite-line></p>
-            <p data-invite-join-box><a class="btn-primary" data-invite-join><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Join with GitHub</a></p>
+            <p data-invite-join-box><a class="btn-primary" data-invite-join><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#github"/></svg>Join with GitHub</a></p>
           </section>
 
           <p class="notice" data-closed hidden>This poll has closed, so it no longer takes answers. The teacher is choosing a time from the answers they have.</p>
@@ -97,7 +98,7 @@
               <legend class="visually-hidden">About you</legend>
               <label>Your name <input name="name" maxlength="80" autocomplete="name" required></label>
               <label>Your email, if you would like to hear when the cohort forms <input name="contact" type="email" maxlength="254" autocomplete="email" inputmode="email"></label>
-              <p class="hint">Only the teacher sees your name and email.</p>
+              <p class="hint"><span data-vis="staff" data-vis-what="Your name and email"></span></p>
             </fieldset>
 
             <fieldset class="times-pick">
@@ -109,7 +110,7 @@
               </div>
               <div class="times-calendar" data-calendar hidden>
                 <button class="btn-secondary" type="button" data-cal-check>Check my Google Calendar</button>
-                <p class="hint">Google tells this page only when you are busy, never what you are doing. Nothing from your calendar is saved or sent to the teacher.</p>
+                <p class="hint">Google tells this page only when you are busy. Nothing is saved.</p>
                 <p class="times-status" role="status" aria-live="polite" data-cal-line></p>
                 <p class="times-wake" data-cal-wake hidden>Marking free times between <input type="time" value="08:00" step="900" data-wake-from aria-label="The earliest start time to mark"> and <input type="time" value="20:00" step="900" data-wake-to aria-label="The latest start time to mark">, your time.</p>
               </div>
@@ -133,7 +134,7 @@
 
           <div class="times-keep" data-keep hidden>
             <h2>Changing your answer later</h2>
-            <p>This browser remembers your answer. To change it from another phone or computer, keep this link, which is yours alone.</p>
+            <p>Keep this link to change your answer from another device. Anyone with it can change your answer.</p>
             <p class="times-link"><input readonly data-keep-link aria-label="Your link for changing your answer"> <button class="btn-secondary" type="button" data-copy-keep>Copy</button></p>
           </div>
         </section>

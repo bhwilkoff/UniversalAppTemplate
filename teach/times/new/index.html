@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261021h">
+  <link rel="stylesheet" href="/assets/site.css?v=20261022a">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -25,6 +25,7 @@
     })();
   </script>
   <script src="/assets/site.js?v=20261021c" defer></script>
+  <script src="/assets/ui.js?v=20261022a" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" defer></script>
   <script src="/assets/hub-config.js?v=20261016a" defer></script>
   <script src="/assets/times-lib.js?v=20261021a" defer></script>
@@ -48,10 +49,10 @@
       </nav>
       <div class="header-actions">
         <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#moon"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#moon"/></svg>
         </button>
         <a class="btn-primary small" href="/account/">
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#github"/></svg>
           <span>Sign in<span class="long"> with GitHub</span></span>
         </a>
       </div>
@@ -71,20 +72,15 @@
       </nav>
       <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/teach/">Teaching</a></li><li><a href="/teach/times/">Polls</a></li></ol></nav>
       <header class="page-head">
-        <h1>A new poll.</h1>
+        <h1>A new poll</h1>
       </header>
 
       <div class="account teach times-teach" data-teach-times-new>
-        <section class="account-state" data-state="loading"><p>Checking whether you are signed in…</p></section>
+        <section class="account-state" data-state="loading"><div class="ui-skeleton" aria-busy="true"><span class="visually-hidden" role="status">Loading</span><i></i><i></i><i></i></div></section>
 
-        <section class="account-state" data-state="signed-out" hidden>
-          <p>Polls are made by teachers, so this starts with signing in.</p>
-          <p><a class="btn-primary" href="/account/"><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Sign in with GitHub</a></p>
-        </section>
+        <section class="account-state" data-state="signed-out" hidden><div data-gate="signed-out"></div></section>
 
-        <section class="account-state" data-state="not-teacher" hidden>
-          <p>Polls are made by teachers. <a href="/teach/">Ask to teach a cohort</a>, and once you are approved you can make one here.</p>
-        </section>
+        <section class="account-state" data-state="not-teacher" hidden><div data-gate="not-teacher"></div></section>
 
         <section class="account-state" data-state="error" hidden>
           <p class="error" data-error-text></p>
@@ -103,7 +99,7 @@
             </fieldset>
             <fieldset class="times-days">
               <legend>Parts of the day to offer</legend>
-              <p class="hint">Choose as many as you like, in the time zone below. Each offers its start times; a session may run past the end.</p>
+              <p class="hint">A session may run past the end of its part of the day</p>
               <div class="times-day-list times-part-list"><label class="check"><input type="checkbox" name="parts" value="early"> Early morning, 6 to 8 AM</label><label class="check"><input type="checkbox" name="parts" value="morning"> Morning, 8 AM to noon</label><label class="check"><input type="checkbox" name="parts" value="midday"> Midday, noon to 2 PM</label><label class="check"><input type="checkbox" name="parts" value="afternoon"> Afternoon, 2 to 5 PM</label><label class="check"><input type="checkbox" name="parts" value="evening"> Evening, 5 to 9 PM</label><label class="check"><input type="checkbox" name="parts" value="late"> Late evening, 9 to 11 PM</label></div>
             </fieldset>
             <label class="times-step">Start times every <select name="step"><option value="15">15 minutes</option><option value="30" selected>30 minutes</option><option value="60">hour</option></select></label>

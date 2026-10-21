@@ -65,7 +65,7 @@
       box.replaceChildren();
       var cohorts = r.data.map(function (x) { return x.cohorts; }).filter(Boolean)
         .sort(function (a, b) { return (b.starts_on || '').localeCompare(a.starts_on || ''); });
-      if (!cohorts.length) box.appendChild(el('p', 'small', 'You do not teach a cohort yet. Planning one starts it as a draft that only you can see.'));
+      if (!cohorts.length) box.appendChild(window.UI.empty('No cohorts yet', window.UI.link('Plan a cohort', '/teach/new/', 'btn-secondary')));
       cohorts.forEach(function (c) {
         var card = el('article', 'cohort-card');
         var h = card.appendChild(el('h3'));
@@ -102,9 +102,7 @@
       return;
     }
     var waiting = state === 'waiting';
-    say('[data-asked-status]', waiting
-      ? 'Your request is waiting for an answer, which will appear here. Until then, you can change its words or take it back.'
-      : 'Your request has an answer, and it was not a yes this time. Taking the request back clears it, so that you can ask again later.');
+    $('[data-asked-status]').replaceChildren(window.UI.status('request', waiting ? 'waiting' : 'declined'), document.createTextNode(waiting ? '' : ' You can take it back and ask again later.'));
     say('[data-asked-why]', myRequest.why);
     say('[data-asked-brings]', myRequest.brings || '');
     $('[data-asked-brings-box]').hidden = !myRequest.brings;
@@ -113,7 +111,6 @@
     $('[data-asked-edit]').hidden = !waiting;
     var w = $('[data-asked-withdraw]');
     w.textContent = 'Take it back';
-    w.removeAttribute('data-armed');
     say('[data-asked-message]', '');
     page.show('asked');
   }
@@ -147,12 +144,9 @@
   // Taking a request back asks once more on the page itself.
   $('[data-asked-withdraw]').addEventListener('click', function () {
     var b = this;
-    if (!b.hasAttribute('data-armed')) {
-      b.setAttribute('data-armed', '');
-      b.textContent = 'Take my request back';
-      say('[data-asked-message]', 'Its words will be deleted. Click again to take it back.');
-      return;
-    }
+    window.UI.confirm({ title: 'Take back your request?', body: 'Its words are deleted. You can ask again.', action: 'Take back' }).then(function (ok) { if (ok) withdraw(b); });
+  });
+  function withdraw(b) {
     b.disabled = true;
     db.from('teacher_requests').delete().eq('user_id', me.id).select('user_id').then(function (r) {
       b.disabled = false;
@@ -160,7 +154,7 @@
       myRequest = null;
       drawMyRequest();
     });
-  });
+  }
 
   var page = P.start(root, function (client, user, name, teacher) {
     db = client; me = user;

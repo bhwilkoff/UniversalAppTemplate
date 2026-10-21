@@ -25,7 +25,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261021h">
+  <link rel="stylesheet" href="/assets/site.css?v=20261022a">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -38,6 +38,7 @@
     })();
   </script>
   <script src="/assets/site.js?v=20261021c" defer></script>
+  <script src="/assets/ui.js?v=20261022a" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to the page</a>
@@ -55,10 +56,10 @@
       </nav>
       <div class="header-actions">
         <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#moon"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#moon"/></svg>
         </button>
         <a class="btn-primary small" href="/account/">
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#github"/></svg>
           <span>Sign in<span class="long"> with GitHub</span></span>
         </a>
       </div>
@@ -68,8 +69,7 @@
   <main id="main">
     <div class="wrap">
       <header class="page-head">
-        <h1>Connect your AI agent.</h1>
-        <p class="lead">Your own Claude or Gemini can know what your cohort is working on, so that when you ask it for help, it starts from this week's challenge and your own work rather than from nothing. It reads as you, and it can only read.</p>
+        <h1>Connect your agent</h1>
       </header>
 
       <div class="account consent" data-consent>
@@ -78,7 +78,7 @@
         <section class="account-state" data-state="signed-out" hidden>
           <p>Sign in with the same GitHub account you use for your cohort, and then you can decide.</p>
           <button class="btn-primary" type="button" data-sign-in>
-            <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Sign in with GitHub
+            <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#github"/></svg>Sign in with GitHub
           </button>
         </section>
 
@@ -109,7 +109,7 @@
               </ul>
             </div>
           </div>
-          <p class="small">What your agent says to you stays with you. If you want your cohort to see it, you share it yourself, on your cohort page. To disconnect it later, remove the Human Shaped connector in your agent's settings.</p>
+          <p class="small">To disconnect it, remove the Human Shaped connector in your agent's settings.</p>
           <div class="actions">
             <button class="btn-primary" type="button" data-approve>Allow it to read</button>
             <button class="btn-secondary" type="button" data-deny>Not now</button>

@@ -153,7 +153,7 @@
     var body = [
       '## The lesson',
       '',
-      'One thing this cohort learned that the next builder should not have to learn again: a prompt that worked, a step that broke, or a correction that kept coming up.',
+      'One thing this cohort learned that the next builder should not have to learn again: a prompt that worked, a step that broke, or a correction that kept coming up.', // kit: content
       '',
       '## Where it came from',
       '',

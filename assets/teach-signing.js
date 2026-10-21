@@ -22,7 +22,8 @@
     });
   }
   function drawKey(problem) {
-    $('[data-key-state]').replaceChildren(key ? U.status('done', 'Key ready') : problem ? U.status('alert', problem) : U.status('waiting', 'No key chosen'));
+    $('[data-key-state]').replaceChildren(U.el('span', 'ui-label', 'Signing key '), U.status('key', key ? 'ready' : 'none'));
+    U.say($('[data-key-problem]'), problem || '', 'problem');
     $('[data-key-forget]').hidden = !key;
     $('[data-key-pick]').hidden = !!key;
     $('[data-sign-all]').disabled = !key || !waiting.length;
@@ -45,7 +46,7 @@
   function signOne(w) {
     var r = rowsById[w.id];
     r.button.disabled = true;
-    r.side.replaceChildren(U.status('time', 'Signing'));
+    r.side.replaceChildren(U.status('action', 'signing'));
     return Promise.resolve().then(function () {
       var unsigned = cred.buildCredential(cred.requestFromWaiting(w));
       return window.CredentialCheck.sign(unsigned, key);
@@ -56,12 +57,13 @@
       });
     }).then(function (res) {
       if (res.error) throw res.error;
-      r.side.replaceChildren(U.status('done', 'Signed'), U.link('Its page', cred.credentialUrl(w.id), 'btn-secondary small'));
+      r.side.replaceChildren(U.status('credential', 'signed'), U.link('Open credential', cred.credentialUrl(w.id), 'btn-secondary small'));
       waiting = waiting.filter(function (x) { return x.id !== w.id; });
       document.querySelector('[data-count]').replaceChildren(U.facts([['Waiting', String(waiting.length)]]));
       drawKey();
     }).catch(function (e) {
-      r.side.replaceChildren(U.status('alert', 'Not signed: ' + P.said(e)), r.button);
+      r.side.replaceChildren(U.status('action', 'failed'), r.button);
+      U.say(r.say, 'Not signed: ' + P.said(e), 'problem');
       r.button.disabled = !key;
     });
   }
@@ -83,7 +85,9 @@
         detail: U.disclosure('What it says', evidence(w)),
         actions: [b]
       });
-      rowsById[w.id] = { button: b, side: item.querySelector('.ui-row-side') };
+      var line = U.el('p', 'ui-inline-status'); line.setAttribute('role', 'status');
+      item.querySelector('.ui-row-main').appendChild(line);
+      rowsById[w.id] = { button: b, side: item.querySelector('.ui-row-side'), say: line };
       list.appendChild(item);
     });
     box.appendChild(list);
