@@ -33,7 +33,7 @@
   <script src="/assets/times-calendar.js?v=20261009b" defer></script>
   <script src="/assets/teach-lib.js?v=20261022c" defer></script>
   <script src="/assets/teach-page.js?v=20261021d" defer></script>
-  <script src="/assets/teach-times-poll.js?v=20261022a" defer></script>
+  <script src="/assets/teach-times-poll.js?v=20261022e" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to the page</a>
@@ -92,7 +92,7 @@
         </section>
 
         <section class="account-state times-detail" data-state="teacher" hidden>
-            <p class="small" data-detail-facts></p>
+            <div data-detail-facts></div>
             <form class="inline-form times-host-name" data-host-name-form>
               <label>Your name on this poll <input name="host_name" maxlength="80" autocomplete="name"></label>
               <div class="actions"><button class="btn-secondary" type="submit">Save the name</button><span class="small" role="status" data-host-name-status></span></div>
@@ -100,7 +100,7 @@
 
             <section class="times-host" aria-labelledby="host-times-title">
               <h3 id="host-times-title">Your own times</h3>
-              <p class="hint" data-host-hint>Mark the times you could make. They count like everyone else's, and the people answering see a dot on each one, so they know which times could really work.</p>
+              <p class="hint" data-host-hint>People answering see your times as dots</p>
               <div class="times-calendar" data-host-calendar hidden>
                 <button class="btn-secondary" type="button" data-cal-check>Check my Google Calendar</button>
                 <p class="hint">Google tells this page only when you are busy. Nothing is saved.</p>
@@ -142,9 +142,9 @@
             <section class="times-cohort" aria-labelledby="make-title">
               <h3 id="make-title" data-make-title>Make it a cohort</h3>
               <div data-made hidden>
-                <p data-made-line></p>
+                <div data-made-line></div>
                 <p class="small" data-made-who></p>
-                <p class="hint">Each person you invited sees the cohort, with a way to join it, when they open the poll's link again.</p>
+                <p class="hint">Invited people see the cohort at the poll's link.</p>
                 <div class="actions">
                   <a class="btn-primary" data-made-setup>Set up the cohort</a>
                   <a class="btn-secondary" data-made-mail>Write to them</a>
@@ -154,15 +154,15 @@
               </div>
               <form class="cohort-form times-make" data-make-form novalidate>
                 <label>The weekly time <select name="slot" data-make-slot></select></label>
-                <p class="small" data-make-none hidden>Once people answer, their times are here to choose from.</p>
+                <p class="small" data-make-none hidden>No answers yet</p>
                 <fieldset class="times-days">
                   <legend>Who to invite</legend>
                   <div class="times-day-list times-invite-list" data-make-people></div>
                 </fieldset>
                 <div data-make-new>
-                  <label>The cohort's name <input name="title" maxlength="120" autocomplete="off"></label>
-                  <label>Its short name, for its address <input name="slug" maxlength="60" autocomplete="off" spellcheck="false"></label>
-                  <label class="check"><input type="checkbox" name="open" checked> Open for joining now, and listed on the cohorts page</label>
+                  <label>Name <input name="title" maxlength="120" autocomplete="off"></label>
+                  <label>Short name <input name="slug" maxlength="60" autocomplete="off" spellcheck="false"></label>
+                  <label class="check"><input type="checkbox" name="open" checked> Open for joining now <span data-vis="public"></span></label>
                 </div>
                 <div class="row">
                   <label>Week 1 begins <input type="date" name="starts_on"></label>

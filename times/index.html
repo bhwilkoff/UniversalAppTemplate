@@ -33,7 +33,7 @@
   <script src="/assets/teach-lib.js?v=20261022c" defer></script>
   <script src="/assets/times-grid.js?v=20261009g" defer></script>
   <script src="/assets/times-calendar.js?v=20261009b" defer></script>
-  <script src="/assets/times.js?v=20261021b" defer></script>
+  <script src="/assets/times.js?v=20261022e" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to the page</a>
@@ -80,13 +80,13 @@
         <section class="times-state" data-state="poll" hidden>
           <header class="page-head times-head">
             <h1 data-title></h1>
-            <p class="lead" data-from></p>
+            <div data-from></div>
             <p class="times-note" data-note hidden></p>
           </header>
 
           <section class="times-invite" data-invite hidden aria-labelledby="invite-title">
             <h2 id="invite-title" data-invite-title></h2>
-            <p data-invite-line></p>
+            <div data-invite-line></div>
             <p data-invite-join-box><a class="btn-primary" data-invite-join><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#github"/></svg>Join with GitHub</a></p>
           </section>
 
@@ -97,7 +97,7 @@
             <fieldset class="times-who">
               <legend class="visually-hidden">About you</legend>
               <label>Your name <input name="name" maxlength="80" autocomplete="name" required></label>
-              <label>Your email, if you would like to hear when the cohort forms <input name="contact" type="email" maxlength="254" autocomplete="email" inputmode="email"></label>
+              <label>Your email (optional) <input name="contact" type="email" maxlength="254" autocomplete="email" inputmode="email"></label>
               <p class="hint"><span data-vis="staff" data-vis-what="Your name and email"></span></p>
             </fieldset>
 

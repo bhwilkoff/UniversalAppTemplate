@@ -101,18 +101,18 @@
   function fill() {
     $('[data-title]').textContent = poll.title;
     document.title = poll.title + ' | Human Shaped';
-    $('[data-from]').textContent = 'From ' + poll.teacher + ', who would like to find the weekly time that works for the most people.';
+    var U = window.UI;
+    $('[data-from]').replaceChildren(U.facts([
+      ['From', poll.teacher],
+      ['Sessions', poll.session_minutes + ' minutes'],
+      ['First week', poll.starts_on ? new Date(poll.starts_on + 'T12:00:00Z').toLocaleDateString(undefined, { timeZone: 'UTC', month: 'long', day: 'numeric' }) : null],
+      ['Status', U.status('poll', poll.open ? 'open' : 'closed')]
+    ]));
     var note = $('[data-note]');
     note.textContent = poll.note || '';
     note.hidden = !poll.note;
-    var line = 'Each time is when a weekly session of ' + poll.session_minutes + ' minutes would start.';
-    if (poll.starts_on) {
-      var d = new Date(poll.starts_on + 'T12:00:00Z');
-      line += ' The first week begins ' + d.toLocaleDateString(undefined, { timeZone: 'UTC', month: 'long', day: 'numeric' }) + '.';
-    }
-    line += ' Tap a time to mark it, and tap it again to clear it.';
-    $('[data-session-line]').textContent = line;
-    $('[data-closed]').hidden = poll.open;
+    $('[data-session-line]').textContent = 'Each time is when a session starts.';
+    $('[data-closed]').hidden = true;
     form.querySelectorAll('input, textarea, button[type="submit"]').forEach(function (n) {
       if (n.name !== 'zone') n.disabled = !poll.open;
     });
@@ -148,10 +148,16 @@
     var box = $('[data-invite]');
     box.hidden = !invite;
     if (!invite) return;
-    $('[data-invite-title]').textContent = 'You are invited to ' + invite.title + '.';
-    var line = window.TeachLib ? window.TeachLib.scheduleText(invite, zone) + ' ' + window.TeachLib.openingLine(invite) : '';
-    if (invite.status !== 'open') line += invite.status === 'draft' ? ' It is not open for joining yet; the way to join will be here when it is.' : ' It is no longer taking new people, so write to ' + poll.teacher + ' about joining.';
-    $('[data-invite-line]').textContent = line;
+    var U = window.UI, TL = window.TeachLib;
+    $('[data-invite-title]').textContent = 'Invited: ' + invite.title;
+    var facts = U.facts([
+      ['Status', U.status('cohort', invite.status)],
+      ['Meets', TL ? TL.scheduleText(invite, zone).replace(/\.$/, '').replace(/, for \d+ minutes/, '') : null],
+      ['Starts', invite.starts_on ? new Date(invite.starts_on + 'T12:00:00').toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' }) : null],
+      ['Weeks', String(invite.weeks)]
+    ]);
+    $('[data-invite-line]').replaceChildren(facts);
+    if (invite.status === 'running' || invite.status === 'finished') $('[data-invite-line]').appendChild(U.el('p', 'small', 'Write to ' + poll.teacher + ' about joining.'));
     $('[data-invite-join-box]').hidden = invite.status !== 'open';
     $('[data-invite-join]').href = '/account/?join=' + encodeURIComponent(invite.slug);
     $('[data-closed]').hidden = true;

@@ -203,7 +203,7 @@
         googleLinkShown = true;
         window.HSGoogle.mount({
           db: db, button: googleBox, link: true, prompt: false, theme: theme(),
-          onSession: function () { status.textContent = 'Google is linked. Signing in with Google now reaches this same account.'; googleLinkShown = false; drawLinked(); },
+          onSession: function () { status.textContent = 'Google linked'; googleLinkShown = false; drawLinked(); },
           onError: function (e) {
             status.textContent = G.alreadyLinkedElsewhere(e)
               ? 'That Google account belongs to another account here. Delete that account first, then link it.'
@@ -381,7 +381,7 @@
         var p = res[0].data;
         root.querySelector('[data-name]').textContent = p.display_name || p.github_login || 'You';
         var title = document.querySelector('[data-account-title]');
-        if (title) title.textContent = 'Your account.';
+        if (title) title.textContent = 'Your account';
         var lead = document.querySelector('[data-account-lead]');
         if (lead) lead.textContent = '';
         var a = root.querySelector('[data-github-link]');
@@ -476,7 +476,7 @@
         db.from('reach_choices').upsert(Object.assign({ user_id: uid }, checked.row)).select('user_id').then(function (s) {
           if (s.error) { status.textContent = 'Not saved: ' + s.error.message + '.'; return; }
           var row = checked.row;
-          status.textContent = row.teachers_may_email || row.notices ? 'Saved.' : 'Saved. Both are off, so your teachers’ words wait for you here.';
+          status.textContent = 'Saved';
           clear.hidden = false;
         });
       });
@@ -486,7 +486,7 @@
           if (d.error) { status.textContent = 'Not forgotten: ' + d.error.message + '.'; return; }
           form.reset();
           clear.hidden = true;
-          status.textContent = 'Forgotten. The hub no longer has this address.';
+          status.textContent = 'Address removed';
         });
       });
     });
@@ -507,24 +507,19 @@
         section.hidden = !rows.length;
         var box = root.querySelector('[data-credential-list]');
         box.replaceChildren();
+        var U = window.UI, list = U.rows();
         var day = function (iso) { return new Date(iso).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' }); };
         rows.forEach(function (c) {
-          var card = el('article', 'cohort-card');
           var state = C.standing({ signed: c.signed_at, revoked_at: c.revoked_at });
-          var from = c.cohorts && c.cohorts.title ? ', from ' + c.cohorts.title : '';
-          card.appendChild(el('p', 'who-line', C.levelName(C.levelFor(c.platforms)) + from));
-          if (state === 'signed') {
-            card.appendChild(el('p', 'small', 'Signed on ' + day(c.signed_at) + '.'));
-            var a = el('a', 'btn-secondary', 'Open it, to share, download, or check it');
-            a.href = '/credential/?id=' + encodeURIComponent(c.id);
-            var acts = el('div', 'actions'); acts.appendChild(a); card.appendChild(acts);
-          } else if (state === 'waiting') {
-            card.appendChild(el('p', 'small', 'Recorded on ' + day(c.issued_at) + ', and waiting to be signed. It will be here, with its own page, once it is.'));
-          } else {
-            card.appendChild(el('p', 'small', 'Revoked on ' + day(c.revoked_at) + (c.revoked_reason ? ': ' + c.revoked_reason : '.')));
-          }
-          box.appendChild(card);
+          var title = C.levelName(C.levelFor(c.platforms)) + (c.cohorts && c.cohorts.title ? ', ' + c.cohorts.title : '');
+          var signed = state === 'signed', waiting = state === 'waiting';
+          list.appendChild(U.row({
+            title: title, href: signed ? '/credential/?id=' + encodeURIComponent(c.id) : null,
+            meta: signed ? day(c.signed_at) : waiting ? 'Recorded ' + day(c.issued_at) : day(c.revoked_at) + (c.revoked_reason ? ', ' + c.revoked_reason : ''),
+            status: U.status('credential', signed ? 'signed' : waiting ? 'waiting' : 'revoked')
+          }));
         });
+        box.appendChild(list);
       });
   }
 

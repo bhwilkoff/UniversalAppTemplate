@@ -67,7 +67,7 @@
   <main id="main">
     <div class="wrap">
       <header class="page-head">
-        <h1 data-account-title>Sign in with GitHub.</h1>
+        <h1 data-account-title>Sign in</h1>
         <p class="lead" data-account-lead>Your GitHub account is where your app lives and where your cohort talks, so it is also how you sign in here. This site keeps only what a cohort needs, and everything you build stays in your own account.</p>
       </header>
 
@@ -122,7 +122,7 @@
 
           <!-- Words by Claude, awaiting Ben's review (Google sign-in beside GitHub). -->
           <div class="notice" data-needs-github hidden>
-            <p><strong>Link your GitHub account to join a cohort.</strong> Your app lives on GitHub, and your cohort talks there, so a cohort needs your GitHub as well as your Google sign-in.</p>
+            <p><strong>Link your GitHub account to join a cohort.</strong></p>
             <p><button class="btn-primary" type="button" data-link-github>
               <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#github"/></svg>Link my GitHub account
             </button></p>
@@ -142,17 +142,18 @@
           <!-- Written by Claude, awaiting Ben's review (research/notes/reach-notes.md). -->
           <div data-reach-section hidden>
             <h2>How your teachers can reach you</h2>
+            <p class="ui-meta-line"><span data-vis="teachers" data-vis-what="Your address"></span></p>
             <form class="inline-form" data-reach-form>
               <label>The email address to use
                 <span class="hint">It can be different from the one on your calendar invites. Only the teachers of cohorts you are in see it, and only if you tick the first box.</span>
                 <input type="email" name="email" autocomplete="email" maxlength="254">
               </label>
               <label class="check"><input type="checkbox" name="teachers_may_email"> My teachers may email me, from their own email</label>
-              <label class="check"><input type="checkbox" name="notices"> Email me, at most once a day, when a teacher writes me a note, someone answers what I shared, or a video comes in on my exchanges</label>
-              <p class="small">That second email comes from meet@humanshaped.org and says only that something is waiting, never the words themselves.</p>
+              <label class="check"><input type="checkbox" name="notices"> A daily email when something waits</label>
+              <p class="small">From meet@humanshaped.org, without the words themselves.</p>
               <div class="actions">
-                <button class="btn-secondary" type="submit">Save how to reach me</button>
-                <button class="btn-secondary" type="button" data-reach-clear hidden>Forget my address</button>
+                <button class="btn-secondary" type="submit">Save</button>
+                <button class="btn-secondary" type="button" data-reach-clear hidden>Remove address</button>
                 <span class="small" role="status" data-reach-status></span>
               </div>
             </form>
@@ -196,8 +197,8 @@
         <h2 id="delete-title">Delete your account?</h2>
         <p>Your profile, your place in every cohort, and what you shared are deleted.</p>
         <div class="actions">
-          <button class="btn-secondary" value="cancel">Keep my account</button>
-          <button class="btn-danger final" value="delete" data-delete-confirm>Delete it</button>
+          <button class="btn-secondary" value="cancel">Cancel</button>
+          <button class="btn-danger final" value="delete" data-delete-confirm>Delete account</button>
         </div>
       </form>
     </dialog>
@@ -207,8 +208,8 @@
         <h2 id="leave-title">Leave this cohort?</h2>
         <p>What you shared there is removed. Your notes stay.</p>
         <div class="actions">
-          <button class="btn-secondary" value="cancel">Stay</button>
-          <button class="btn-danger final" value="leave">Leave the cohort</button>
+          <button class="btn-secondary" value="cancel">Cancel</button>
+          <button class="btn-danger final" value="leave">Leave cohort</button>
         </div>
       </form>
     </dialog>
@@ -226,7 +227,7 @@
   <script src="/assets/credential-lib.js?v=20261006c" defer></script>
   <script src="/assets/google-signin-lib.js" defer></script>
   <script src="/assets/google-signin.js" defer></script>
-  <script src="/assets/hub.js?v=20261022a" defer></script>
+  <script src="/assets/hub.js?v=20261022e" defer></script>
 
   <footer class="site-footer">
     <div class="wrap">

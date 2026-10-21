@@ -68,9 +68,7 @@
     });
   }
   function drawAnswers() {
-    $('[data-answer-count]').textContent = answers.length
-      ? answers.length + (answers.length === 1 ? ' person has' : ' people have') + ' answered. Choose a time to see who can make it.'
-      : 'No one has answered yet.';
+    $('[data-answer-count]').textContent = answers.length ? '' : 'No answers yet';
     var body = $('[data-answers]');
     body.replaceChildren();
     answers.forEach(function (a) {
@@ -111,7 +109,15 @@
       $('[data-who]').replaceChildren();
       document.title = current.title + ' | Human Shaped';
       document.querySelector('[data-detail-title]').textContent = current.title;
-      $('[data-detail-facts]').textContent = (current.open ? 'Taking answers. ' : 'Closed. ') + daysText(current) + ', starting ' + T.hoursText(current) + ', every ' + current.step_minutes + ' minutes, in ' + T.zoneName(current.time_zone) + '. Sessions of ' + current.session_minutes + ' minutes' + (current.starts_on ? ', beginning the week of ' + current.starts_on : '') + '.';
+      $('[data-detail-facts]').replaceChildren(window.UI.facts([
+        ['Status', window.UI.status('poll', current.open ? 'open' : 'closed')],
+        ['Days', daysText(current)],
+        ['Start times', T.hoursText(current) + ', every ' + current.step_minutes + ' minutes'],
+        ['Time zone', T.zoneName(current.time_zone)],
+        ['Sessions', current.session_minutes + ' minutes'],
+        ['First week', current.starts_on ? new Date(current.starts_on + 'T12:00:00').toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' }) : null],
+        ['Answers', String(answers.filter(function (a) { return !a.host; }).length)]
+      ]));
       $('[data-share-link]').value = shareUrl(current);
       $('[data-open-share]').href = shareUrl(current);
       $('[data-toggle-open]').textContent = current.open ? 'Stop taking answers' : 'Take answers again';
@@ -224,12 +230,17 @@
     $('[data-make-title]').textContent = cohort ? cohort.title : 'Make it a cohort';
     $('[data-made]').hidden = !made;
     if (made) {
-      var state = { draft: 'A draft, so no one can join yet.', open: 'Open for joining.', running: 'Running.', finished: 'Finished.' }[cohort.status] || '';
-      $('[data-made-line]').textContent = TL.scheduleText(cohort, zone) + ' ' + TL.openingLine(cohort) + ' ' + state;
+      var U = window.UI;
       var noMail = people.filter(function (a) { return !a.contact; }).map(function (a) { return a.name; });
-      $('[data-made-who]').textContent = 'Invited: ' + people.map(function (a) { return a.name; }).join(', ') + '.' +
-        (noMail.length ? ' No email address from ' + noMail.join(', ') + '.' : '');
-      $('[data-made-setup]').href = '/teach/?c=' + cohort.id;
+      $('[data-made-line]').replaceChildren(U.facts([
+        ['Status', U.status('cohort', cohort.status)],
+        ['Meets', TL.scheduleText(cohort, zone).replace(/\.$/, '').replace(/, for \d+ minutes/, '')],
+        ['Starts', cohort.starts_on ? new Date(cohort.starts_on + 'T12:00:00').toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' }) : null],
+        ['Invited', people.map(function (a) { return a.name; }).join(', ')],
+        ['No email from', noMail.length ? noMail.join(', ') : null]
+      ]));
+      $('[data-made-who]').textContent = '';
+      $('[data-made-setup]').href = '/teach/cohort/?c=' + cohort.id;
       var mails = people.filter(function (a) { return a.contact; }).map(function (a) { return a.contact; });
       var mail = $('[data-made-mail]'), copy = $('[data-made-copy]');
       mail.hidden = copy.hidden = !mails.length;
