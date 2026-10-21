@@ -111,7 +111,7 @@
       picked = null;
       $('[data-who]').replaceChildren();
       document.title = current.title + ' | Human Shaped';
-      $('[data-detail-title]').textContent = current.title;
+      document.querySelector('[data-detail-title]').textContent = current.title;
       $('[data-detail-facts]').textContent = (current.open ? 'Taking answers. ' : 'Closed. ') + daysText(current) + ', starting ' + T.hoursText(current) + ', every ' + current.step_minutes + ' minutes, in ' + T.zoneName(current.time_zone) + '. Sessions of ' + current.session_minutes + ' minutes' + (current.starts_on ? ', beginning the week of ' + current.starts_on : '') + '.';
       $('[data-share-link]').value = shareUrl(current);
       $('[data-open-share]').href = shareUrl(current);
