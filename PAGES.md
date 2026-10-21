@@ -50,6 +50,8 @@ Moodle, GitHub, GOV.UK, NN/g, WCAG 2.2).
   belongs to one cohort, the same way: a breadcrumb, the cohort's row of
   links (Cohort home, Live session, and Teaching it for its teachers), the
   cohort's name, and a line naming your role there when it is not obvious.
+  A cohort's pages show its header in place of the area's row, so a page
+  never stacks two rows of links; the breadcrumb leads back to the area.
 - **Breadcrumbs** say where a page sits, not where you came from. They
   start at the area's first page and end at the parent, because the heading
   names the page itself; a page that is an item in its area's row has none.
