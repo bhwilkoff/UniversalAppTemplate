@@ -152,3 +152,18 @@ Add a dated entry each time a member experience teaches something new.
   row of its own at 375px. The daily email's link to the old exchanges
   address needed a redirect, not an email change, because the script that
   sends it could not be redeployed that day.
+- **2026-10-21, humanshaped.org's workspace.** Three corrections from the
+  owner in one day. A list page that unfolds one item under itself has no
+  single purpose: each thing gets its own address, and making or changing
+  it is its own page. Public menu items (principles, events, the open
+  cohorts list) do not serve someone signed in to teach or learn: signed
+  in, the site becomes a workspace with a sidebar of the person's own
+  things (home, each cohort by name, exchanges, teaching, admin) and the
+  public pages in a quieter group. And a sentence explaining the interface
+  ("You teach this cohort, and this is the page the people in it see") is
+  a missing component: role, state, privacy, and what is possible should
+  show through shared pieces (a row of views with the current one marked,
+  status labels, visibility markers, empty states with one action,
+  disclosures for rare detail). An audit found about 35 privacy sentences
+  and 25 state sentences that one visibility marker and one status label
+  would replace.
