@@ -1,6 +1,6 @@
-// What every teacher page for time polls shares (/teach/times/, /new/,
-// /poll/): one hub client, the signed-out and not-a-teacher states, and the
-// teacher's own name. Each page draws only its own content.
+// What every teacher page shares (/teach/ and the pages under it; PAGES.md):
+// one hub client, the signed-out and not-a-teacher states, and the
+// teacher's own row and name. Each page draws only its own content.
 (function () {
   function el(tag, cls, text) {
     var n = document.createElement(tag);
@@ -10,8 +10,12 @@
   }
   function said(e) { return e && e.message ? e.message : String(e || 'no details'); }
 
-  // start(root, ready): ready(db, me, myName) runs once a teacher is signed in.
-  function start(root, ready) {
+  // start(root, ready, opts): ready(db, me, myName, teacher) runs once a
+  // teacher is signed in; `teacher` is their row (can_approve, can_sign).
+  // opts.notTeacher(db, me), if given, runs for someone signed in who does
+  // not teach; otherwise the page shows its not-teacher state.
+  function start(root, ready, opts) {
+    opts = opts || {};
     var db = window.HUB.client ? window.HUB.client() : window.supabase.createClient(window.HUB.url, window.HUB.key);
     function show(state) {
       root.querySelectorAll('.account-state').forEach(function (s) { s.hidden = s.getAttribute('data-state') !== state; });
@@ -23,13 +27,15 @@
         var session = s.data && s.data.session;
         if (!session) return show('signed-out');
         var me = session.user;
-        return db.from('teachers').select('user_id').eq('user_id', me.id).maybeSingle().then(function (r) {
+        // Every column, so can_sign comes along once the database has it.
+        return db.from('teachers').select('*').eq('user_id', me.id).maybeSingle().then(function (r) {
           if (r.error) return fail('Your teaching access could not be checked: ' + r.error.message);
-          if (!r.data) return show('not-teacher');
+          if (!r.data) return opts.notTeacher ? opts.notTeacher(db, me) : show('not-teacher');
+          var teacher = r.data;
           return db.from('profiles').select('display_name, github_login').eq('id', me.id).maybeSingle().then(function (pr) {
             var name = pr.data ? ((pr.data.display_name || '').trim() || pr.data.github_login || '') : '';
             show('teacher');
-            return ready(db, me, name);
+            return ready(db, me, name, teacher);
           });
         });
       }).catch(function (err) { fail('Something went wrong: ' + said(err) + '.'); });
@@ -40,5 +46,5 @@
     return { show: show, fail: fail, reload: load };
   }
 
-  window.TeachTimesPage = { start: start, el: el, said: said };
+  window.TeachPage = window.TeachTimesPage = { start: start, el: el, said: said };
 })();

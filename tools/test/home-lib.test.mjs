@@ -67,7 +67,7 @@ test('waiting lines appear only for what is there, with a place to go', () => {
     '3 people are waiting for your feedback.',
     '2 new videos came in on your exchanges.'
   ]);
-  assert.equal(w[1].href, '/teach/#waiting');
+  assert.equal(w[1].href, '/teach/feedback/');
 });
 
 test('sections: everyone sees cohorts, exchanges, and their app; the rest only when there is something', () => {

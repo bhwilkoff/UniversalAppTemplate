@@ -331,7 +331,7 @@
     } else if (S.teaching && S.prev && 'heard' in S.prev) {
       var hint = el('p', 'small');
       hint.appendChild(document.createTextNode('What you heard in week ' + S.prev.number + '’s checks, and what you changed because of it, shows here while people arrive once you write it '));
-      var a = el('a', null, 'on your teaching page'); a.href = '/teach/';
+      var a = el('a', null, 'on your teaching page'); a.href = '/teach/cohort/?c=' + S.cohort.id;
       hint.appendChild(a); hint.appendChild(document.createTextNode('.'));
       body.appendChild(hint);
     }

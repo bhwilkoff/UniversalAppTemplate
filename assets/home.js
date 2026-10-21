@@ -13,7 +13,7 @@
     '/assets/hub-config.js?v=20261016a',
     '/assets/teach-lib.js?v=20261006g',
     '/assets/path-lib.js',
-    '/assets/home-lib.js?v=20261014a',
+    '/assets/home-lib.js?v=20261021a',
     '/assets/exchange-lib.js?v=20261016b',
     '/assets/exchange-recorder.js?v=20261015a',
     '/assets/exchange-drive.js?v=20261012b',
@@ -238,7 +238,7 @@
         var slug = encodeURIComponent(c.slug);
         var acts = [];
         if (c.myRole === 'teacher') {
-          acts.push(link('/teach/', c.status === 'draft' ? 'Finish setting it up' : 'Teach it', 'btn-secondary small'));
+          acts.push(link('/teach/cohort/?c=' + c.id, c.status === 'draft' ? 'Finish setting it up' : 'Teach it', 'btn-secondary small'));
           if (c.status !== 'draft') acts.push(link('/cohort/?c=' + slug, 'Its page', 'btn-secondary small'));
         } else {
           acts.push(link('/cohort/?c=' + slug, 'Open the cohort', 'btn-secondary small'));
@@ -260,7 +260,7 @@
       box.appendChild(open);
     } else if (!m.cohorts.length) {
       var acts = [link('/cohorts/', 'See the cohorts', 'btn-secondary')];
-      if (m.teacher) acts.unshift(link('/teach/', 'Plan a cohort', 'btn-secondary'));
+      if (m.teacher) acts.unshift(link('/teach/new/', 'Plan a cohort', 'btn-secondary'));
       box.appendChild(empty(m.teacher
         ? 'You do not teach a cohort yet. A cohort you plan is listed here from its first draft.'
         : 'You are not in a cohort yet, and none is open to join right now. When one opens, it is listed here and on the cohorts page.', acts));

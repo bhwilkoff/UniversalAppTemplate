@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>A cohort you teach | Human Shaped</title>
+  <meta name="description" content="Create and run a Human Shaped cohort: its dates, its weekly sessions, its groups, and the people in it.">
+  <link rel="canonical" href="https://humanshaped.org/teach/">
+  <meta property="og:url" content="https://humanshaped.org/teach/">
+  <meta property="og:site_name" content="Human Shaped">
+  <meta property="og:title" content="Teach a cohort">
+  <meta property="og:description" content="Create and run a Human Shaped cohort: its dates, its weekly sessions, its groups, and the people in it.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://humanshaped.org/assets/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="The human-shaped wordmark, with its hyphen drawn as an arch, above the line: apps that wear the builder&#x27;s values on their sleeves.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#131916" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="/assets/favicon.svg?v=20261006q" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20261006q">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/site.css?v=20261021b">
+  <script>
+    (function () {
+      var q = location.search, t = null;
+      if (/[?&]dark\b/.test(q)) t = 'dark'; else if (/[?&]light\b/.test(q)) t = 'light';
+      else { try { t = localStorage.getItem('hs-theme'); } catch (e) {} }
+      if (t) document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+  <script src="/assets/site.js?v=20261014a" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to the page</a>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
+      <nav class="nav" aria-label="Main">
+        <ul>
+          <li><a href="/principles/">Principles</a></li>
+          <li><a href="/cohorts/" aria-current="true">Cohorts</a></li>
+          <li><a href="/apps/">Apps</a></li>
+          <li><a href="/events/">Events</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#moon"/></svg>
+        </button>
+        <a class="btn-primary small" href="/account/">
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>
+          <span>Sign in<span class="long"> with GitHub</span></span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <div class="wrap">
+      <p class="crumbs"><a href="/teach/">Teaching</a> &rsaquo; This cohort</p>
+      <div class="account teach" data-teach-cohort>
+        <section class="account-state" data-state="loading"><p>Checking whether you are signed in…</p></section>
+
+        <section class="account-state" data-state="signed-out" hidden>
+          <p>This page is for teachers, so it starts with signing in.</p>
+          <p><a class="btn-primary" href="/account/"><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Sign in with GitHub</a></p>
+        </section>
+
+        <section class="account-state" data-state="not-teacher" hidden>
+          <p>This page is for teachers. <a href="/teach/">Ask to teach a cohort</a>, and once you are approved it opens for you.</p>
+        </section>
+
+        <section class="account-state" data-state="missing" hidden>
+          <p>There is no cohort of yours at this address. <a href="/teach/">Your cohorts</a> are all listed together.</p>
+        </section>
+
+        <section class="account-state" data-state="error" hidden>
+          <p class="error" data-error-text role="alert"></p>
+          <p><button class="btn-secondary" type="button" data-reload>Try again</button></p>
+        </section>
+        <section class="account-state" data-state="teacher" hidden>
+          <header class="page-head">
+            <h1 data-detail-title>Your cohort</h1>
+            <p class="role-line">You teach this cohort. <a data-student-view href="/cohorts/">See its page as the people in it do</a></p>
+          </header>
+          <div class="cohort-detail" data-detail>
+            <p class="small" data-detail-meta></p>
+            <div class="actions">
+              <a class="btn-secondary" data-edit href="/teach/">Edit the details</a>
+              <button class="btn-secondary" type="button" data-make-sessions>Make the weekly sessions</button>
+              <a class="btn-secondary" data-live-link href="/live/">Open the live page</a>
+              <a class="btn-secondary" data-rooms-link href="/live/#rooms">Every rehearsal room now</a>
+              <button class="btn-secondary" type="button" data-copy-meet>Copy the setup for the Meet script</button>
+              <button class="btn-danger" type="button" data-delete-draft hidden>Delete this draft</button>
+            </div>
+            <p class="small" data-detail-message></p>
+            <!-- Words by Claude, awaiting Ben's review (H4). -->
+            <p class="small">In the call itself, the live page in a tab beside Meet does everything a teacher needs. The Human Shaped add-on puts the same things in Meet’s own side panel, and it works for meet@humanshaped.org only until it is listed: <a href="https://github.com/bhwilkoff/UniversalAppTemplate/blob/site/tools/meet-addon/README.md#who-can-use-it" target="_blank" rel="noopener">who can use it, and how it is installed</a>.</p>
+            <textarea class="signing-request" readonly rows="10" aria-label="The setup for the Meet script" data-meet-text hidden></textarea>
+
+            <section class="cohort-card setup-card" aria-labelledby="cohort-setup-title" data-cohort-setup hidden>
+              <h3 id="cohort-setup-title">Before the first session</h3>
+              <p class="small">What this cohort needs before people arrive. Each step checks itself off when the hub can see it is done, and <a href="/teach/guide/#need">the teaching guide</a> says more about each one.</p>
+              <ol class="setup-steps" data-cohort-setup-steps></ol>
+            </section>
+
+            <!-- The words in the two sections below were written by Claude
+                 for milestone M12 (closing the loop on checks, and not seen
+                 this week) and await Ben's review. -->
+            <section class="since" aria-labelledby="checks-heard-title" data-since hidden>
+              <h3 id="checks-heard-title" data-checks-heard-title></h3>
+              <p class="small" data-checks-heard-intro></p>
+              <div data-check-answers></div>
+              <form class="inline-form" data-heard-form>
+                <label>What I heard, and what changes
+                  <span class="hint">Your own words to the whole cohort, which the session page shows while people arrive next time. Say what you noticed across the answers rather than who wrote what.</span>
+                  <textarea name="heard" rows="4" maxlength="2000"></textarea>
+                </label>
+                <div class="actions"><button class="btn-secondary" type="submit">Save it</button><span class="small" data-heard-message role="status"></span></div>
+              </form>
+
+              <h3 id="not-seen-title" data-not-seen-title></h3>
+              <p class="small" data-not-seen-intro></p>
+              <ul class="roster not-seen" data-not-seen></ul>
+
+              <!-- Follow-ups (C7): words by Claude, awaiting Ben's review. -->
+              <h3 id="followups-title" data-followups-title></h3>
+              <p class="small" data-followups-intro></p>
+              <div class="followups" data-followups></div>
+            </section>
+
+            <h3>Sessions</h3>
+            <!-- The run of show (R2): words by Claude, awaiting Ben's review. -->
+            <p class="small">Each week’s run of show is the plan you will run in Meet: its scenes in order, each with its minutes and what the main stage shows. Open one under its week to start from the six parts, copy last week’s, and change anything.</p>
+            <div data-sessions></div>
+
+            <!-- The question bank (R4): words by Claude, awaiting Ben's review. -->
+            <div class="question-bank" data-question-bank hidden>
+              <h3 id="question-bank">Question bank</h3>
+              <p class="small">The questions you prepare before class: choose one, choose any, a scale, a few words, put in order, or in their own words. Ask any of them in the moment from the Meet add-on or the live page, or plan one into a question scene. Students see a question only when you ask it, and what you ask is a copy, so changing it in class leaves the bank as it was.</p>
+              <div data-bank></div>
+            </div>
+
+            <!-- The lesson sent back (H5): words by Claude, awaiting Ben's review. -->
+            <div class="lesson" data-lesson hidden>
+              <h3 id="lesson">The lesson this cohort sends back</h3>
+              <p class="small">In the last week, the cohort chooses together one thing it learned that the next builder should not have to learn again: a prompt that worked, a step that broke, or a correction that kept coming up. Send it to the template as an issue, and credit the people who learned it only if each of them said yes. Everything on GitHub is public, so leave out anything private about anyone.</p>
+              <p class="actions"><a class="btn-secondary" data-lesson-link href="https://github.com/bhwilkoff/UniversalAppTemplate/issues/new"><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg#github"/></svg>Send a lesson back to the template</a></p>
+            </div>
+
+            <h3>People</h3>
+            <div data-roster></div>
+
+            <!-- Co-teachers (H1): words by Claude, awaiting Ben's review. -->
+            <h3 id="teachers">Teachers</h3>
+            <p class="small">A cohort can have more than one teacher, and a new teacher leads best after co-leading a session of someone else's cohort first. Anyone who teaches here can be added, and a co-teacher sees and does everything you do on this page.</p>
+            <ul class="roster" data-teachers></ul>
+            <form class="inline-form" data-co-teacher-form hidden>
+              <label>Add a co-teacher
+                <select name="user_id" required data-co-teacher-choices></select>
+              </label>
+              <div class="actions">
+                <button class="btn-secondary" type="submit">Add them</button>
+                <span class="small" role="status" data-co-teacher-message></span>
+              </div>
+            </form>
+
+            <!-- The words in the apps section were written by Claude for
+                 milestone M10 and await Ben's review. -->
+            <h3 id="apps">Their apps on humanshaped.org</h3>
+            <p class="small" data-submissions-intro></p>
+            <div data-submissions></div>
+
+            <h3 id="groups">Groups</h3>
+            <p class="small">Trios, because a trio still has two people to show when one is away. Everyone can see their own group and what it is for, and you can change them whenever the cohort needs it. Each group has its own Meet room for the group part of every session, which meet@ makes when you ask it to set up the calls, and its members see it on their cohort page and the live page.</p>
+            <div data-groups></div>
+            <form class="inline-form" data-group-form>
+              <label>New group <input name="name" required maxlength="60" placeholder="Group 1"></label>
+              <label>What it is for <input name="expectations" maxlength="400" placeholder="Show each other your bring-back before each session"></label>
+              <button class="btn-secondary" type="submit">Add the group</button>
+            </form>
+
+            <!-- The words in the credential section were written by Claude
+                 for milestone M4 and await Ben's review. -->
+            <h3 id="credential">The credential</h3>
+            <p class="small" data-credentials-later>Credentials are issued here once the cohort is finished, and <a href="/credential/issuer/">the credential&rsquo;s own page</a> says what each level asks for.</p>
+            <div data-credentials hidden>
+              <p class="small">Open each person&rsquo;s repository and every link before you record their credential. It is then signed on the signer&rsquo;s own computer, never on this page, because the key that signs must stay off the web, and the signed file comes back here to be attached. <a href="/credential/issuer/">What each level asks for</a></p>
+              <div data-credential-list></div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" defer></script>
+  <script src="/assets/hub-config.js?v=20261016a" defer></script>
+  <script src="/assets/teach-lib.js?v=20261006g" defer></script>
+  <script src="/assets/teach-page.js?v=20261021b" defer></script>
+  <script src="/assets/rooms-lib.js" defer></script>
+  <script src="/assets/followup-lib.js" defer></script>
+  <script src="/assets/submit-lib.js" defer></script>
+  <script src="/assets/credential-lib.js?v=20261006c" defer></script>
+  <script src="/assets/credential-check.js" defer></script>
+  <script src="/assets/mentor-lib.js" defer></script>
+  <script src="/assets/reach-lib.js" defer></script>
+  <script src="/assets/showcase-lib.js" defer></script>
+  <script src="/assets/cohort-lib.js" defer></script>
+  <script src="/assets/live-lib.js" defer></script>
+  <script src="/assets/question-view.js?v=20261012h" defer></script>
+  <script src="/assets/question-bank.js?v=20261012h" defer></script>
+  <script src="/assets/board-lib.js" defer></script>
+  <script src="/assets/show-lib.js" defer></script>
+  <script src="/assets/curriculum-lib.js" defer></script>
+  <script src="/assets/curriculum-seed.js" defer></script>
+  <script src="/assets/show-builder.js?v=20261012h" defer></script>
+  <script src="/assets/teach-cohort.js?v=20261021c" defer></script>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="footer-brand">
+        <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
+        <p>The ideas, the method, the tools, and the cohorts are free, and what you build is yours.</p>
+        <p><a href="/about/">About Human Shaped</a></p>
+      </div>
+      <nav class="footer-links" aria-label="More of the site">
+        <div>
+          <p class="footer-head">Take part</p>
+          <ul>
+            <li><a href="/account/">Your account</a></li>
+            <li><a href="/teach/">Teach a cohort</a></li>
+            <li><a href="/connect/">Connect your agent</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="footer-head">On GitHub</p>
+          <ul>
+            <li><a href="https://github.com/bhwilkoff/UniversalAppTemplate">The template</a></li>
+            <li><a href="https://github.com/orgs/humanshaped/discussions">Discussions</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="footer-head">The fine print</p>
+          <ul>
+            <li><a href="/support/">Help</a></li>
+            <li><a href="/privacy/">Privacy</a></li>
+            <li><a href="/terms/">Terms</a></li>
+          </ul>
+        </div>
+      </nav>
+      <p class="footer-made">Made by <a href="https://learningischange.com">Ben Wilkoff</a>, with <a href="/support/#credits">help from people and tools</a>.</p>
+    </div>
+  </footer>
+</body>
+</html>

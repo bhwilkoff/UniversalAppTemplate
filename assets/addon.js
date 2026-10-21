@@ -703,7 +703,7 @@
     } else if (S.teaching && S.prev) {
       var hint = el('p', 'small');
       hint.appendChild(document.createTextNode('What you heard in week ' + S.prev.number + '’s checks shows here once you write it '));
-      hint.appendChild(newTab(Object.assign(el('a', null, 'on your teaching page'), { href: '/teach/' })));
+      hint.appendChild(newTab(Object.assign(el('a', null, 'on your teaching page'), { href: '/teach/cohort/?c=' + S.cohort.id })));
       hint.appendChild(document.createTextNode('.'));
       box.appendChild(hint);
     }
