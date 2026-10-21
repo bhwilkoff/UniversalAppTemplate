@@ -20,7 +20,7 @@
       var ids = Object.keys(cohorts);
       if (!ids.length) { box.replaceChildren(el('p', 'small', 'Nothing yet, because you do not have a cohort yet.')); return; }
       return Promise.all([
-        db.from('shares').select('id, cohort_id, user_id, kind, url, note, created_at, profiles(github_login, display_name), feedback(author_id)')
+        db.from('shares').select('id, cohort_id, user_id, kind, url, note, created_at, profiles!shares_user_id_fkey(github_login, display_name), feedback(author_id)')
           .in('cohort_id', ids).in('kind', ['for-feedback', 'question']),
         db.from('cohort_teachers').select('cohort_id, user_id').in('cohort_id', ids)
       ]).then(function (res) {
