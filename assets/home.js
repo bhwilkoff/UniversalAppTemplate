@@ -13,9 +13,9 @@
     '/assets/hub-config.js?v=20261016a',
     '/assets/teach-lib.js?v=20261022c',
     '/assets/path-lib.js',
-    '/assets/home-lib.js?v=20261021a',
+    '/assets/home-lib.js?v=20261022d',
     '/assets/exchange-lib.js?v=20261022a',
-    '/assets/exchange-list.js?v=20261021a'
+    '/assets/exchange-list.js?v=20261022d'
   ];
   function loadAll(list) {
     return new Promise(function (resolve, reject) {
@@ -40,7 +40,10 @@
   }
   function link(href, text, cls) { var a = el('a', cls || null, text); a.href = href; return a; }
   function said(e) { return e && e.message ? e.message : String(e || 'no details'); }
-  function status(text) { $('[data-home-status]').textContent = text || ''; $('[data-home-status]').hidden = !text; }
+  function status(text) {
+    $('[data-home-status]').textContent = text || ''; $('[data-home-status]').hidden = !text;
+    var sk = $('[data-home-skeleton]'); if (sk) sk.hidden = true;
+  }
   function section(key) { return root.querySelector('[data-home="' + key + '"]'); }
   function pub() { html.removeAttribute('data-member'); }
   function safeUrl(u) { return /^https:\/\//.test(u || '') ? u : null; }
@@ -171,19 +174,6 @@
   }
 
   function draw(m, H, P) {
-    var name = (m.profile.display_name || '').trim() || m.profile.github_login || '';
-    var who = $('[data-home-who]');
-    who.replaceChildren();
-    if (m.profile.github_login) {
-      who.append('Signed in as ');
-      who.appendChild(link('https://github.com/' + encodeURIComponent(m.profile.github_login), '@' + m.profile.github_login));
-      who.append('.');
-    } else {
-      who.textContent = name ? 'Signed in as ' + name + '.' : 'Signed in.';
-    }
-    var img = $('[data-home-avatar]');
-    if (safeUrl(m.profile.avatar_url)) { img.src = m.profile.avatar_url; img.hidden = false; }
-
     var shown = H.sections(m);
     root.querySelectorAll('[data-home]').forEach(function (s) { s.hidden = shown.indexOf(s.getAttribute('data-home')) < 0; });
     drawNext(m, H);
@@ -195,35 +185,36 @@
     drawMore(m);
     status('');
   }
+  var U = function () { return window.UI; };
+  function day(iso) { return new Date(iso.length === 10 ? iso + 'T12:00:00' : iso).toLocaleDateString(undefined, { month: 'long', day: 'numeric' }); }
 
   // ---- coming up: a session on now, or one in the next eight days ----
   function drawNext(m, H) {
     var box = $('[data-home-next]');
     box.replaceChildren();
-    m.comingUp.forEach(function (u, i) {
+    var list = U().rows();
+    m.comingUp.forEach(function (u) {
       var c = u.cohort, slug = encodeURIComponent(c.slug);
       var acts = [];
       var meet = safeUrl(u.session.meet_url);
-      if (u.live && meet) acts.push(link(meet, 'Join the session now', 'btn-primary'));
-      acts.push(link('/live/?c=' + slug, 'The session page', u.live && !meet ? 'btn-primary' : 'btn-secondary'));
-      if (!u.live) acts.push(link('/cohort/?c=' + slug, 'The cohort page', 'btn-secondary'));
-      var when = u.live ? 'On now' : H.whenText(u.session.starts_at, m.now, m.zone);
-      var title = el('p', 'home-row-title');
-      title.appendChild(el('span', 'home-when', when));
-      title.append(' ' + c.title + ', week ' + u.session.number);
-      box.appendChild(row(title, null, acts, u.live ? 'live' : null));
+      if (u.live && meet) acts.push(link(meet, 'Join the call', 'btn-primary'));
+      acts.push(link('/live/?c=' + slug, 'Live session', u.live && !meet ? 'btn-primary' : 'btn-secondary small'));
+      list.appendChild(U().row({
+        title: c.title + ', week ' + u.session.number, href: '/cohort/?c=' + slug,
+        meta: u.live ? null : H.whenText(u.session.starts_at, m.now, m.zone),
+        status: u.live ? U().status('session', 'live') : null, actions: acts
+      }));
     });
+    box.appendChild(list);
   }
 
-  // ---- waiting for you ------------------------------------------------
+  // ---- waiting for you: a row per kind, with its count ------------------
   function drawWaiting(m) {
     var box = $('[data-home-waiting]');
     box.replaceChildren();
-    m.waiting.forEach(function (w) {
-      var a = link(w.href, w.action, 'btn-secondary small');
-      a.setAttribute('aria-label', w.action + ': ' + w.text);
-      box.appendChild(row(w.text, null, [a]));
-    });
+    var list = U().rows();
+    m.waiting.forEach(function (w) { list.appendChild(U().row({ title: w.title, href: w.href, status: U().count(w.count, w.noun) })); });
+    box.appendChild(list);
   }
 
   // ---- cohorts ----------------------------------------------------------
@@ -231,37 +222,30 @@
     var box = $('[data-home-cohorts]');
     box.replaceChildren();
     if (m.cohorts.length) {
-      var ul = el('ul', 'home-rows');
+      var list = U().rows();
       m.cohorts.slice().sort(function (a, b) { return rank(a) - rank(b); }).forEach(function (c) {
+        var st = H.cohortState(c, c.now);
         var slug = encodeURIComponent(c.slug);
-        var acts = [];
-        if (c.myRole === 'teacher') {
-          acts.push(link('/teach/cohort/?c=' + c.id, c.status === 'draft' ? 'Finish setting it up' : 'Teach it', 'btn-secondary small'));
-          if (c.status !== 'draft') acts.push(link('/cohort/?c=' + slug, 'Its page', 'btn-secondary small'));
-        } else {
-          acts.push(link('/cohort/?c=' + slug, 'Open the cohort', 'btn-secondary small'));
-        }
-        ul.appendChild(row(c.title, H.cohortLine(c, c.now), acts));
+        var detail = c.myRole === 'teacher' ? U().tag('Teacher') : c.myRole === 'mentor' ? U().tag('Mentor') : null;
+        list.appendChild(U().row({
+          title: c.title, href: c.myRole === 'teacher' ? '/teach/cohort/?c=' + c.id : '/cohort/?c=' + slug,
+          meta: st.meta, detail: detail, status: U().status(st.thing, st.state)
+        }));
       });
-      box.appendChild(ul);
+      box.appendChild(list);
     }
     var students = m.cohorts.filter(function (c) { return c.myRole !== 'teacher' && c.status !== 'finished'; });
     if (!students.length && m.open.length) {
-      var open = el('div', 'home-open');
-      open.appendChild(el('p', 'small', m.open.length === 1 ? 'One cohort is open for people to join.' : m.open.length + ' cohorts are open for people to join.'));
-      var oul = el('ul', 'home-rows');
+      var h = el('h3', 'home-sub', 'Open to join');
+      box.appendChild(h);
+      var open = U().rows();
       m.open.forEach(function (c) {
-        oul.appendChild(row(c.title, c.starts_on ? 'Begins ' + new Date(c.starts_on + 'T12:00:00').toLocaleDateString(undefined, { month: 'long', day: 'numeric' }) + '.' : 'Dates to come.',
-          [link('/account/?join=' + encodeURIComponent(c.slug), 'Join it', 'btn-secondary small')]));
+        open.appendChild(U().row({ title: c.title, meta: c.starts_on ? 'Starts ' + day(c.starts_on) : 'Dates not set', status: U().status('cohort', 'open'),
+          actions: [link('/account/?join=' + encodeURIComponent(c.slug), 'Join', 'btn-secondary small')] }));
       });
-      open.appendChild(oul);
       box.appendChild(open);
     } else if (!m.cohorts.length) {
-      var acts = [link('/cohorts/', 'See the cohorts', 'btn-secondary')];
-      if (m.teacher) acts.unshift(link('/teach/new/', 'Plan a cohort', 'btn-secondary'));
-      box.appendChild(empty(m.teacher
-        ? 'You do not teach a cohort yet. A cohort you plan is listed here from its first draft.'
-        : 'No cohorts yet', acts));
+      box.appendChild(U().empty('No cohorts yet', m.teacher ? link('/teach/new/', 'Plan a cohort', 'btn-secondary') : link('/cohorts/', 'See open cohorts', 'btn-secondary')));
     }
     function rank(c) { return { live: 0, between: 1, before: 2, draft: 3, unscheduled: 4, over: 5, finished: 6 }[c.now.kind]; }
   }
@@ -270,47 +254,32 @@
   function drawTimes(m) {
     var box = $('[data-home-times]');
     box.replaceChildren();
-    var ul = el('ul', 'home-rows');
+    var list = U().rows();
     m.myPolls.forEach(function (p) {
       var n = (p.time_poll_answers && p.time_poll_answers[0] || {}).count || 0;
-      ul.appendChild(row(p.title, (p.open ? 'Taking answers' : 'Closed') + ', with ' + (n === 0 ? 'no answers yet' : n === 1 ? 'one answer' : n + ' answers') + '.',
-        [link('/teach/times/poll/?p=' + p.id, 'Open', 'btn-secondary small')]));
+      list.appendChild(U().row({ title: p.title, href: '/teach/times/poll/?p=' + p.id, meta: n === 1 ? '1 answer' : n + ' answers', status: U().status('poll', p.open ? 'open' : 'closed') }));
     });
     m.answeredPolls.forEach(function (p) {
-      ul.appendChild(row(p.title, 'You answered it' + (p.open ? '' : ', and it is closed now') + '.',
-        [link('/times/#' + p.token, 'Change my answer', 'btn-secondary small')]));
+      list.appendChild(U().row({ title: p.title, href: '/times/#' + p.token, status: U().status('poll', p.open ? 'answered' : 'closed') }));
     });
-    if (ul.children.length) box.appendChild(ul);
-    if (m.teacher) {
-      if (!m.myPolls.length) box.appendChild(el('p', 'small', 'A poll of weekly times lets the people you hope will join say when they can meet, before a cohort has a time.'));
-      var a = el('div', 'actions');
-      a.appendChild(link('/teach/times/', 'Make a poll', 'btn-secondary'));
-      box.appendChild(a);
-    }
+    if (list.children.length) box.appendChild(list);
+    else if (m.teacher) box.appendChild(U().empty('No polls yet', link('/teach/times/new/', 'Make a poll', 'btn-secondary')));
   }
 
   // ---- your app ---------------------------------------------------------
   function drawApp(m) {
     var box = $('[data-home-app]');
     box.replaceChildren();
-    var ul = el('ul', 'home-rows');
+    var list = U().rows();
     m.cohorts.forEach(function (c) {
       var e = c.enrollment;
       if (!e || !e.app_repo) return;
-      ul.appendChild(row(e.app_name || e.app_repo, (function () { var l = el('p', 'home-row-line ui-meta-line', c.title + ' '); l.appendChild(window.UI.visibility(e.app_public ? 'public' : 'cohort')); return l; })(),
-        [link('/apps/app/?r=' + encodeURIComponent(e.app_repo), 'Its page', 'btn-secondary small'), link('/cohort/?c=' + encodeURIComponent(c.slug) + '&t=mine', 'Change it', 'btn-secondary small')]));
+      list.appendChild(U().row({ title: e.app_name || e.app_repo, href: '/cohort/?c=' + encodeURIComponent(c.slug) + '&t=mine', meta: c.title, visibility: U().visibility(e.app_public ? 'public' : 'cohort') }));
     });
     var b = m.builderApp;
-    if (b) {
-      var acts = [link('/apps/mine/', 'Change it', 'btn-secondary small')];
-      if (b.public) acts.unshift(link('/apps/app/?r=' + encodeURIComponent(b.app_repo), 'Its page', 'btn-secondary small'));
-      ul.appendChild(row(b.app_name || b.app_repo, (function () { var l = el('p', 'home-row-line ui-meta-line'); l.appendChild(window.UI.visibility(b.public ? 'public' : 'me')); return l; })(), acts));
-    }
-    if (ul.children.length) { box.appendChild(ul); return; }
-    box.appendChild(empty('Building an app on your own, from the template? Add it here, and choose whether the apps page shows it.', [
-      link('/apps/mine/', 'Add your app', 'btn-secondary'),
-      link('/path/setup/', 'Start from the template', 'btn-secondary')
-    ]));
+    if (b) list.appendChild(U().row({ title: b.app_name || b.app_repo, href: '/apps/mine/', visibility: U().visibility(b.public ? 'public' : 'me') }));
+    if (list.children.length) { box.appendChild(list); return; }
+    box.appendChild(U().empty('No app yet', link('/apps/mine/', 'Add your app', 'btn-secondary')));
   }
 
   // ---- stages -------------------------------------------------------------
@@ -320,31 +289,23 @@
     if (!m.lastMark || !P) return;
     var s = P.stageInfo(m.lastMark.stage);
     if (!s) return;
-    var ul = el('ul', 'home-rows');
-    ul.appendChild(row(s.title, 'The stage you marked most recently.', [link(s.href, 'Go back to it', 'btn-secondary small'), link('/account/#stages', 'All your marks', 'btn-secondary small')]));
-    box.appendChild(ul);
+    var list = U().rows();
+    list.appendChild(U().row({ title: s.title, href: s.href, meta: m.lastMark.at ? 'Marked ' + day(m.lastMark.at) : null }));
+    box.appendChild(list);
   }
 
   // ---- more you can do ----------------------------------------------------
   function drawMore(m) {
     var box = $('[data-home-more]');
     box.replaceChildren();
-    var items = [
-      ['/connect/', 'Connect your agent', 'Let your own Claude or Gemini read your cohorts, your app, and your marks.'],
-      [m.teacher ? '/teach/' : '/teach/#ask', m.teacher ? 'Teach' : 'Teach a cohort', m.teacher ? 'Your cohorts, their sessions, and the feedback queue.' : 'Ask to lead a cohort of your own.'],
-      ['/events/', 'Host an event', 'A meetup or a day of building, or one near you.'],
-      ['/account/', 'Your account', 'How you sign in, how teachers can reach you, and your data.']
-    ];
-    items.forEach(function (x) {
+    [['/connect/', 'Connect your agent'], [m.teacher ? '/teach/' : '/teach/#ask', m.teacher ? 'Teaching' : 'Ask to teach'], ['/events/', 'Host an event'], ['/account/', 'Your account']].forEach(function (x) {
       var li = el('li');
       li.appendChild(link(x[0], x[1]));
-      li.appendChild(el('span', null, x[2]));
       box.appendChild(li);
     });
   }
 
-  status('Gathering your cohorts, exchanges, and times…');
   loadAll(SCRIPTS).then(start).catch(function (e) {
-    status('Your home could not be gathered just now: ' + said(e) + '. Reload the page to try again.');
+    status('This could not load: ' + said(e));
   });
 })();

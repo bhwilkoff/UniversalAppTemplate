@@ -52,19 +52,16 @@
     return new Intl.DateTimeFormat(locale, Object.assign({ weekday: 'long', month: 'long', day: 'numeric' }, opt)).format(at) + ', at ' + clock;
   }
 
-  // One line under a cohort's name.
-  function cohortLine(c, n) {
-    var role = c.myRole === 'teacher' ? 'You teach it. ' : c.myRole === 'mentor' ? 'You are a mentor in it. ' : '';
-    if (n.kind === 'live') return role + 'Week ' + n.live.number + ' is on right now.';
-    if (n.kind === 'between') return role + 'Week ' + n.week + ' of ' + n.weeks + '.';
-    if (n.kind === 'before') {
-      var d = c.starts_on ? new Date(c.starts_on + 'T12:00:00').toLocaleDateString(undefined, { month: 'long', day: 'numeric' }) : null;
-      return role + (d ? 'It begins ' + d + '.' : 'Its dates are still to come.');
-    }
-    if (n.kind === 'draft') return role + 'A draft, not yet open for people to join.';
-    if (n.kind === 'finished') return role + 'Finished.';
-    if (n.kind === 'over') return role + 'Every session has happened.';
-    return role + 'Its sessions are still to be set.';
+  // A cohort's state as parts (DESIGN-KIT.md): a registry status and a
+  // short meta line of facts.
+  function cohortState(c, n) {
+    function d(iso) { return new Date(iso + 'T12:00:00').toLocaleDateString(undefined, { month: 'long', day: 'numeric' }); }
+    if (n.kind === 'live') return { thing: 'session', state: 'live', meta: 'Week ' + n.live.number };
+    if (n.kind === 'between') return { thing: 'cohort', state: 'running', meta: 'Week ' + n.week + ' of ' + n.weeks };
+    if (n.kind === 'before') return { thing: 'cohort', state: 'open', meta: c.starts_on ? 'Starts ' + d(c.starts_on) : 'Dates not set' };
+    if (n.kind === 'draft') return { thing: 'cohort', state: 'draft', meta: null };
+    if (n.kind === 'finished' || n.kind === 'over') return { thing: 'cohort', state: 'finished', meta: null };
+    return { thing: 'cohort', state: c.status === 'draft' ? 'draft' : 'open', meta: 'Sessions not set' };
   }
 
   // The tokens of the time polls this browser has answered (times.js keeps
@@ -78,12 +75,11 @@
   // like the daily email.
   function waiting(w) {
     var out = [];
-    function plural(n, one, many) { return n === 1 ? one : n + ' ' + many; }
-    if (w.requests) out.push({ text: plural(w.requests, 'A request to teach is', 'requests to teach are') + ' waiting for your answer.', href: '/teach/requests/', action: 'Answer' });
-    if (w.feedback) out.push({ text: plural(w.feedback, 'Someone is', 'people are') + ' waiting for your feedback.', href: '/teach/feedback/', action: 'Give feedback' });
-    if (w.notes) out.push({ text: plural(w.notes, 'A teacher wrote you a note', 'notes from your teachers') + (w.notes === 1 ? '.' : ' are new.'), href: '/account/#notes', action: 'Read' });
-    if (w.answers) out.push({ text: plural(w.answers, 'Someone answered what you shared', 'answers to what you shared') + (w.answers === 1 ? '.' : ' are new.'), href: w.answersHref || '/account/', action: 'Read' });
-    if (w.videos) out.push({ text: plural(w.videos, 'A new video came in', 'new videos came in') + ' on your exchanges.', href: '#exchanges', action: 'Watch' });
+    if (w.requests) out.push({ title: 'Requests to teach', count: w.requests, noun: 'waiting', href: '/teach/requests/' });
+    if (w.feedback) out.push({ title: 'Feedback', count: w.feedback, noun: 'waiting', href: '/teach/feedback/' });
+    if (w.notes) out.push({ title: 'Notes from your teachers', count: w.notes, noun: 'new', href: '/account/#notes' });
+    if (w.answers) out.push({ title: 'Answers to what you shared', count: w.answers, noun: 'new', href: w.answersHref || '/account/' });
+    if (w.videos) out.push({ title: 'New videos in your exchanges', count: w.videos, noun: 'new', href: '/exchanges/' });
     return out;
   }
 
@@ -113,7 +109,7 @@
     return (rows || []).filter(function (r) { return r[field] && (!since || r[field] > since); }).length;
   }
 
-  var lib = { cohortNow: cohortNow, comingUp: comingUp, whenText: whenText, cohortLine: cohortLine, answeredPolls: answeredPolls, waiting: waiting, sections: sections, lastStage: lastStage, newerThan: newerThan };
+  var lib = { cohortNow: cohortNow, comingUp: comingUp, whenText: whenText, cohortState: cohortState, answeredPolls: answeredPolls, waiting: waiting, sections: sections, lastStage: lastStage, newerThan: newerThan };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
   else root.HomeLib = lib;
 })(this);

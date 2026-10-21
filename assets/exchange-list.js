@@ -13,19 +13,17 @@
     return n;
   }
   function said(e) { return e && e.message ? e.message : String(e || 'no details'); }
-  function count(n) { return n === 0 ? 'no videos yet' : n === 1 ? 'one video' : n + ' videos'; }
+  function count(n) { return n === 1 ? '1 video' : n + ' videos'; }
 
+  // Each exchange a row: its title, its facts, who can see it.
   function drawList(box, rows, line) {
     box.replaceChildren();
     if (!rows.length) return false;
-    var ul = el('ul', 'x-list');
+    var U = window.UI, ul = U.rows();
     rows.forEach(function (r) {
-      var li = el('li');
-      var a = el('a', 'x-list-title', r.title);
-      a.href = '/exchange/#' + r.token;
-      li.appendChild(a);
-      li.appendChild(el('span', 'x-list-line', line(r)));
-      ul.appendChild(li);
+      var f = line(r);
+      ul.appendChild(U.row({ title: r.title, href: '/exchange/#' + r.token, meta: f.meta, status: f.closed ? U.status('exchange', 'closed') : null,
+        visibility: f.audience ? U.visibility(f.audience) : null }));
     });
     box.appendChild(ul);
     return true;
@@ -41,10 +39,9 @@
       return db.rpc('my_exchanges').then(function (r) {
         if (r.error) throw r.error;
         var any = drawList(list, r.data, function (x) {
-          var who = x.made ? 'You started it' : 'You added ' + (x.mine === 1 ? 'a video' : x.mine + ' videos');
-          return who + (x.cohort_title ? ' in ' + x.cohort_title : x.for_members ? ' for Human Shaped members' : '') + ', and it has ' + count(+x.videos) + '. Last active ' + X.ago(x.active_at) + '.';
+          return { meta: (x.cohort_title ? x.cohort_title + ', ' : '') + count(+x.videos) + ', active ' + X.ago(x.active_at), audience: x.cohort_title ? 'cohort' : x.for_members ? 'members' : 'link' };
         });
-        if (!any) list.appendChild(el('p', 'small', 'Exchanges you start or add a video to will be here.'));
+        if (!any) list.appendChild(window.UI.empty('No exchanges yet'));
         if (location.hash === '#exchanges') box.scrollIntoView();
       });
     }).catch(function (e) {
@@ -66,9 +63,9 @@
           var list = box.querySelector('[data-x-list]');
           box.querySelector('[data-x-new]').href = '/exchange/new/?c=' + c.data.id;
           var any = drawList(list, r.data, function (x) {
-            return 'Started by ' + x.maker + ', with ' + count(+x.videos) + (x.replies_open ? '' : ', closed to new videos') + '. Last active ' + X.ago(x.active_at) + '.';
+            return { meta: x.maker + ', ' + count(+x.videos) + ', active ' + X.ago(x.active_at), closed: !x.replies_open };
           });
-          if (!any) list.appendChild(el('p', 'small', 'No exchanges yet in this cohort.'));
+          if (!any) list.appendChild(window.UI.empty('No exchanges yet'));
         });
       });
     });

@@ -48,10 +48,9 @@ test('times are said as today, tomorrow, a weekday, or a date, on the reader\'s 
   assert.equal(lib.whenText('2026-10-27T23:00:00Z', now, 'America/Denver', 'en-US'), 'Tuesday, October 27, at 5:00 PM');
 });
 
-test('a cohort line names the person\'s role and where the cohort is', () => {
+test('a cohort\'s state is a registry status and a short meta line', () => {
   const now = new Date('2026-10-28T12:00:00Z');
-  assert.equal(lib.cohortLine({ ...C, myRole: 'teacher' }, lib.cohortNow(C, S, now)), 'You teach it. Week 2 of 3.');
-  assert.equal(lib.cohortLine({ ...C, myRole: 'student' }, lib.cohortNow(C, S, now)), 'Week 2 of 3.');
+  assert.deepEqual(lib.cohortState(C, lib.cohortNow(C, S, now)), { thing: 'cohort', state: 'running', meta: 'Week 2 of 3' });
 });
 
 test('answered polls come from this browser\'s hs-times keys only', () => {
@@ -62,11 +61,7 @@ test('answered polls come from this browser\'s hs-times keys only', () => {
 test('waiting lines appear only for what is there, with a place to go', () => {
   assert.deepEqual(lib.waiting({}), []);
   const w = lib.waiting({ requests: 1, feedback: 3, notes: 0, videos: 2 });
-  assert.deepEqual(w.map((x) => x.text), [
-    'A request to teach is waiting for your answer.',
-    '3 people are waiting for your feedback.',
-    '2 new videos came in on your exchanges.'
-  ]);
+  assert.deepEqual(w.map((x) => [x.title, x.count]), [['Requests to teach', 1], ['Feedback', 3], ['New videos in your exchanges', 2]]);
   assert.equal(w[1].href, '/teach/feedback/');
 });
 
