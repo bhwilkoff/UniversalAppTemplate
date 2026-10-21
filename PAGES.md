@@ -31,6 +31,33 @@ functionality is possible from the page you are on."
    answers what is in it; the desk only counts it and links there.
 7. **Moved pages keep their old addresses**, which forward to the new ones.
 
+## How you find your way
+
+From research/notes/navigation-and-wayfinding-notes.md (Canvas, Classroom,
+Moodle, GitHub, GOV.UK, NN/g, WCAG 2.2).
+
+- **The site header** keeps Principles, Cohorts, Apps, and Events for
+  everyone. Signed in, Home comes first; anyone who teaches also gets
+  Teaching, second; an admin's account menu adds Run the hub. Items are only
+  ever added, never reordered (WCAG 3.2.3). The current one is underlined
+  as well as colored.
+- **An area's row of links** (`.area-nav`) sits at the top of every page in
+  that area, in a fixed order, each item its own page, the current one
+  underlined: Teaching (Desk, Feedback, Polls, then Requests to teach and
+  Signing for the people who hold those rights) and Running the hub
+  (Overview, People, Changes).
+- **A cohort's header** (`assets/cohort-nav.js`) opens every page that
+  belongs to one cohort, the same way: a breadcrumb, the cohort's row of
+  links (Cohort home, Live session, and Teaching it for its teachers), the
+  cohort's name, and a line naming your role there when it is not obvious.
+- **Breadcrumbs** say where a page sits, not where you came from. They
+  start at the area's first page and end at the parent, because the heading
+  names the page itself; a page that is an item in its area's row has none.
+  At phone width only the parent shows. A page never has both a breadcrumb
+  and a "back" link.
+- **No role switcher.** Your role is a sentence on the page, never only in
+  a menu. A teacher who wants the students' view opens the cohort home.
+
 ## Everyone
 
 | Page | What it is | What you can do there |
@@ -71,6 +98,18 @@ functionality is possible from the page you are on."
 | `/teach/times/` | Your polls | Open one, make one |
 | `/teach/times/new/` | Making a poll | Fill it in; saving opens the poll |
 | `/teach/times/poll/?p=` | One poll | Share it, mark your times, read the answers, make it a cohort |
+
+## An admin (Running the hub)
+
+| Page | What it is | What you can do there |
+|---|---|---|
+| `/admin/` | The hub at a glance | Counts of people and teachers, the admins, what waits, recent changes |
+| `/admin/people/` | Everyone who has signed in | Find someone by name, narrow by right, open them |
+| `/admin/person/?u=` | One person | Give or take each hub-wide right (teacher, approves teachers, signs credentials, admin), with a note for the log; see their cohorts and the changes to their rights |
+| `/admin/changes/` | The log of every change to a right | Read it; no one can edit it |
+
+Who teaches or belongs to one cohort stays with that cohort's teachers, on
+`/teach/cohort/?c=`.
 
 ## Not yet true
 

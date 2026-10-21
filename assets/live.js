@@ -107,6 +107,7 @@
           if (S.teaching) { try { localStorage.setItem('hs-rehearsed:' + cohort.id, '1'); } catch (e) {} }
           S.mine = people.filter(function (p) { return p.user_id === S.me.id; })[0] || null;
           if (!S.mine && !S.teaching) return show('not-member');
+          if (window.CohortNav) window.CohortNav.draw($('[data-cohort-nav]'), { cohort: cohort, teaching: S.teaching, member: !!S.mine, current: 'live' });
           people.concat(teachers).forEach(function (p) { if (p.profiles) S.names[p.user_id] = p.profiles.display_name || p.profiles.github_login; });
           var t = lib.currentAndNext(ss, new Date(), cohort.session_minutes);
           var session = t.live ? t.next : (t.next || t.current);

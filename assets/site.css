@@ -2454,3 +2454,47 @@ html[data-member] .public-home { display: none; }
    (PAGES.md rule 5). */
 .role-line { margin: 0; color: var(--muted); max-width: var(--measure); }
 .page-head .role-line { margin-top: -1.5rem; }
+
+/* How you find your way (PAGES.md; research/notes/navigation-and-wayfinding-notes.md).
+   The page you are on is marked by more than color: an underline, in the
+   site header and in every area's row of links. */
+.nav a[aria-current] { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 0.4em; }
+
+/* An area's row of links (Teaching, Run the hub, one cohort): each item
+   its own page, the current one underlined. It wraps at phone width
+   rather than scrolling sideways. */
+.area-nav { border-bottom: 1px solid var(--rule); margin: 1.25rem 0 0; }
+.area-nav ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0 1.5rem; }
+.area-nav a { display: inline-block; padding: 0.6rem 0 0.55rem; color: var(--muted); text-decoration: none; font-weight: 500; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.area-nav a:hover { color: var(--ink); }
+.area-nav a[aria-current] { color: var(--ink); font-weight: 650; border-bottom-color: currentColor; }
+
+/* Breadcrumbs say where a page sits, not where you came from. They end at
+   the parent (the heading names this page), and at phone width only the
+   parent shows. */
+nav.crumbs { padding-top: 1.25rem; font-size: 0.95rem; }
+nav.crumbs ol { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.25rem 0.5rem; }
+nav.crumbs li + li::before { content: "\203A"; color: var(--muted); margin-right: 0.5rem; }
+nav.crumbs a { color: var(--muted); }
+@media (max-width: 39.99rem) {
+  nav.crumbs li:not(:last-child) { display: none; }
+  nav.crumbs li:last-child::before { content: "\2039"; margin-right: 0.4rem; }
+}
+.area-nav + .page-head, .area-nav + nav.crumbs + .page-head { padding-top: 1.75rem; }
+.cohort-top .area-nav { margin-top: 0.75rem; }
+.cohort-top + .page-head { padding-top: 1.75rem; }
+
+/* Running the hub (/admin/): each right a row with what it allows and one
+   button; lists of cohorts and changes as plain lists. */
+.rights { list-style: none; margin: 0.5rem 0 0; padding: 0; display: grid; gap: 0.75rem; }
+.right-row { background: var(--card); border: 1px solid var(--rule); border-radius: var(--radius); padding: 1rem 1.25rem; display: grid; gap: 0.5rem; }
+.right-row p { margin: 0; }
+.right-name { font-weight: 600; }
+@media (min-width: 48rem) {
+  .right-row { grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: 1.5rem; }
+  .right-row > [role="status"] { grid-column: 1 / -1; }
+}
+.admin-log { margin: 0.5rem 0 0; padding-left: 1.2rem; }
+.admin-log li { margin: 0.35rem 0; }
+.admin-note, .admin-filter label { display: grid; gap: 0.35rem; font-weight: 600; font-size: 0.95rem; max-width: 30rem; }
+.admin-filter { align-items: end; }

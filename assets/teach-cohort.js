@@ -38,6 +38,7 @@
       if (bad) return page.fail('This cohort could not be loaded: ' + bad.error.message);
       current = res[0].data;
       document.title = current.title + ' | Human Shaped';
+      if (window.CohortNav) window.CohortNav.draw($('[data-cohort-nav]'), { cohort: current, teaching: true, member: false, current: 'teach' });
       $('[data-edit]').href = '/teach/cohort/edit/?c=' + current.id;
       $('[data-student-view]').href = '/cohort/?c=' + encodeURIComponent(current.slug);
       currentGroups = res[3].data;

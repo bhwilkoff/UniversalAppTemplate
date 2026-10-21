@@ -1001,3 +1001,49 @@ default (said the time works, or works if need be), and the Make it a
 cohort panel in `teach-times-poll.js`. Joining is the ordinary open-cohort
 path, `/account/?join=<slug>`, so a cohort made as a draft takes no one
 until it is open.
+
+## Every page says what it is, whose view it is, and what it is for (October 21, 2026)
+
+**PAGES.md is the binding map of every page, and the site finds its way
+in three levels: the header, an area's row of links, and a cohort's
+header, with breadcrumbs that end at the parent and a role line instead of
+a role switcher** (Ben: "You should never question what your role is, what
+the content is that you are looking at, or what functionality is possible
+from the page you are on," and "It should be intuitive from start to
+end.").
+
+**Why:** the hub grew page by page, so one address could be four jobs
+(/teach/ was asking to teach, approving teachers, three queues, and a whole
+cohort unfolded under a list), and the same cohort looked the same to a
+teacher and a student. Canvas, Classroom, and Moodle all keep one layout
+and let a role add items to it; GitHub and GOV.UK give every item its own
+address and a breadcrumb to where it sits. Sources:
+research/notes/navigation-and-wayfinding-notes.md.
+
+**How to apply:** before adding a page, section, or form, find its row in
+PAGES.md, or add the row first. New teacher pages go under /teach/ with the
+Teaching row (`data-area-nav="teaching"`, revealed by `teach-page.js`); any
+page about one cohort calls `CohortNav.draw`. The header learns your roles
+from `HS.roles` in site.js, which pages that read them keep in the browser.
+
+## Running the hub: named rights, changed on the site, every change logged (October 21, 2026)
+
+**An admin gives or takes four named hub-wide rights (teacher, approves
+teachers, signs credentials, admin) on /admin/person/, through
+`admin_set_right`, which logs each change to `role_changes`** (Ben: "a
+robust admin interface that can allow for me (as the administrator) to edit
+permissions without having to go into the database/auth system and
+tools.").
+
+**Why:** before this, a right could only be changed by hand in the
+database, with no record. Fixed named rights, as GitHub, Discourse, and
+Classroom use, are easier to reason about than Canvas or Moodle's grids of
+permissions for a hub this size, and an append-only log answers "who gave
+them that?" later.
+
+**How to apply:** migration 20261021020000. You cannot take away your own
+admin right (or your teaching, which carries it), the hub always keeps one
+admin (admin rows are locked while a change runs), and agents cannot call
+any of it. The page asks once more only for admin, and for taking teaching
+from someone who holds more. The overview says when there is only one
+admin. Rights inside one cohort stay with its teachers.
