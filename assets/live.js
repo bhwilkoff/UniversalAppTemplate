@@ -146,11 +146,10 @@
     $('[data-title]').textContent = 'Week ' + session.number + (session.title && session.title !== 'Week ' + session.number ? ': ' + session.title : '');
     $('[data-scope]').textContent = session.scope || 'This week’s challenge will be here once your teacher writes it.';
     var top = $('[data-top-actions]'); top.replaceChildren();
-    if (safe(session.meet_url)) { var j = el('a', 'btn-primary', live ? 'Join the session' : 'The Meet link'); j.href = session.meet_url; j.target = '_blank'; j.rel = 'noopener'; top.appendChild(j); }
-    var back = el('a', 'btn-secondary', 'Your cohort page'); back.href = '/cohort/?c=' + encodeURIComponent(cohort.slug); top.appendChild(back);
+    if (safe(session.meet_url)) { var j = el('a', 'btn-primary', 'Join the call'); j.href = session.meet_url; j.target = '_blank'; j.rel = 'noopener'; top.appendChild(j); }
     // The session's drawing board (C4), in its own tab so this page stays open.
     var board = el('a', 'btn-secondary', 'The board'); board.href = '/board/?c=' + encodeURIComponent(cohort.slug) + '&s=week-' + session.number; board.target = '_blank'; board.rel = 'noopener'; top.appendChild(board);
-    $('[data-cohort-link]').href = back.href;
+    $('[data-cohort-link]').href = '/cohort/?c=' + encodeURIComponent(cohort.slug) + '&t=mine';
 
     S.parts = lib.agenda(cohort.session_minutes);
     startShow();
@@ -618,7 +617,7 @@
       db.from('live_answers').select('*').eq('cohort_id', S.cohort.id)
     ]).then(function (res) {
       var bad = res.filter(function (r) { return r.error; })[0];
-      if (bad) { $('[data-sync]').textContent = 'The page could not read the latest changes: ' + bad.error.message; return; }
+      if (bad) { $('[data-sync]').replaceChildren(window.UI.status('connection', 'offline')); return; }
       var checks = res[1].data;
       S.checks = checks;
       var visible = checks.filter(function (k) { return L.kindOf(k) !== 'short' && (S.teaching || k.show_tally); });
@@ -940,9 +939,9 @@
   function poll(on) {
     if (on && !poller) poller = setInterval(refreshLive, POLL);
     if (!on && poller) { clearInterval(poller); poller = null; }
-    $('[data-sync]').textContent = on
-      ? 'This page checks for changes every fifteen seconds.'
-      : 'Changes to the queue and the questions appear here as they happen.';
+    // The connection part (DESIGN-KIT.md): Live when changes arrive as they
+    // happen, Checking when the page reads again every fifteen seconds.
+    $('[data-sync]').replaceChildren(window.UI.status('connection', on ? 'checking' : 'live'));
   }
   function listen() {
     if (channel || !db.channel) return poll(true);

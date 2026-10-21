@@ -605,7 +605,7 @@
     if (w) { q.replaceChildren(window.UI.tag(w.lead), document.createTextNode(' ' + w.question)); }
     var s = C.stuckFor(n);
     st.replaceChildren();
-    var a = document.createElement('a'); a.href = s.url; a.textContent = 'Stuck? ' + s.label;
+    var a = document.createElement('a'); a.href = s.url; a.textContent = s.label;
     st.appendChild(a);
     st.hidden = false;
   }
@@ -623,13 +623,15 @@
 
   function draw(people, mine, sessions, groups, shares, contact, teachers) {
     $('[data-title]').textContent = cohort.title;
+    document.title = cohort.title + ' | Human Shaped';
     $('[data-lead]').textContent = cohort.description || '';
+    $('[data-lead]').hidden = !cohort.description;
     var t = lib.currentAndNext(sessions, new Date(), cohort.session_minutes);
     week = t.current ? t.current.number : null;
     var myGroup = groups.filter(function (g) { return g.group_members.some(function (m) { return m.user_id === me.id; }); })[0];
     var room = myGroup ? safe(myGroup.meet_url) : null;
     $('[data-week-title]').textContent = t.current ? 'Week ' + t.current.number + (t.current.title && t.current.title !== 'Week ' + t.current.number ? ': ' + t.current.title : '') : 'This week';
-    $('[data-week-scope]').textContent = t.current && t.current.scope ? t.current.scope : 'Your teacher will put this week’s challenge here.';
+    $('[data-week-scope]').textContent = t.current && t.current.scope ? t.current.scope : 'Not posted yet';
     drawWeekMove(t.current ? t.current.number : null);
     drawBackground();
     var na = $('[data-next-actions]'); na.replaceChildren();
@@ -641,7 +643,7 @@
       if (safe(t.next.meet_url)) { var j = link(t.next.meet_url, t.live ? (part && part.key === 'show' && room ? 'The main session' : 'Join the session now') : 'The Meet link'); j.className = room && part && part.key === 'show' ? 'btn-secondary' : 'btn-primary'; na.appendChild(j); }
       var lp = link('/live/?c=' + encodeURIComponent(cohort.slug), 'The session page'); lp.className = 'btn-secondary'; na.appendChild(lp);
     } else {
-      $('[data-next-when]').textContent = sessions.length ? 'The last session has happened.' : 'The sessions have not been scheduled yet.';
+      $('[data-next-when]').textContent = sessions.length ? 'All sessions done' : 'Not scheduled yet';
     }
     drawRunOfShow(t.next);
     var past = sessions.filter(function (s) { return safe(s.recording_url); });
