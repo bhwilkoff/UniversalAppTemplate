@@ -58,7 +58,7 @@
       if (res.error) throw res.error;
       r.side.replaceChildren(U.status('done', 'Signed'), U.link('Its page', cred.credentialUrl(w.id), 'btn-secondary small'));
       waiting = waiting.filter(function (x) { return x.id !== w.id; });
-      $('[data-count]').replaceChildren(U.facts([['Waiting', String(waiting.length)]]));
+      document.querySelector('[data-count]').replaceChildren(U.facts([['Waiting', String(waiting.length)]]));
       drawKey();
     }).catch(function (e) {
       r.side.replaceChildren(U.status('alert', 'Not signed: ' + P.said(e)), r.button);
@@ -70,7 +70,7 @@
     var box = $('[data-signing-list]');
     box.replaceChildren();
     rowsById = {};
-    $('[data-count]').replaceChildren(U.facts([['Waiting', String(waiting.length)]]));
+    document.querySelector('[data-count]').replaceChildren(U.facts([['Waiting', String(waiting.length)]]));
     if (!waiting.length) { box.appendChild(U.empty('Nothing is waiting to be signed.')); drawKey(); return; }
     var list = U.rows();
     waiting.forEach(function (w) {
