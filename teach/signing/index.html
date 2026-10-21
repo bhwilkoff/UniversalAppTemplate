@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261021d">
+  <link rel="stylesheet" href="/assets/site.css?v=20261021e">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -73,8 +73,8 @@
         </ul>
       </nav>
       <header class="page-head">
-        <h1>Waiting to be signed.</h1>
-        <p class="lead">Credentials the teachers of any cohort have recorded, oldest first. Copy one, run <code>node tools/credential/sign-waiting.mjs</code> in the site folder on the computer that holds the key, and paste what it puts back on your clipboard here. The page checks the signature before it saves anything.</p>
+        <h1>Signing.</h1>
+        <div data-count></div>
       </header>
 
       <div class="account teach" data-teach-signing>
@@ -97,7 +97,16 @@
           <p class="error" data-error-text role="alert"></p>
           <p><button class="btn-secondary" type="button" data-reload>Try again</button></p>
         </section>
-        <section class="account-state queue" data-state="teacher" hidden>
+        <section class="account-state" data-state="teacher" hidden>
+          <div class="ui-toolbar">
+            <span data-key-state></span>
+            <span class="ui-visibility"><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons.svg#lock-simple"/></svg><span>Your key stays on this computer</span></span>
+            <div class="ui-toolbar-end">
+              <label class="btn-secondary file-pick" data-key-pick>Choose your signing key<input type="file" accept=".json,application/json" data-key-file></label>
+              <button class="btn-secondary" type="button" data-key-forget hidden>Forget the key</button>
+              <button class="btn-primary" type="button" data-sign-all disabled>Sign all</button>
+            </div>
+          </div>
           <div data-signing-list></div>
         </section>
       </div>
@@ -108,8 +117,9 @@
   <script src="/assets/teach-lib.js?v=20261006g" defer></script>
   <script src="/assets/teach-page.js?v=20261021c" defer></script>
   <script src="/assets/credential-lib.js?v=20261006c" defer></script>
-  <script src="/assets/credential-check.js" defer></script>
-  <script src="/assets/teach-signing.js?v=20261021c" defer></script>
+  <script src="/assets/credential-check.js?v=20261021a" defer></script>
+  <script src="/assets/ui.js?v=20261021a" defer></script>
+  <script src="/assets/teach-signing.js?v=20261021d" defer></script>
 
   <footer class="site-footer">
     <div class="wrap">

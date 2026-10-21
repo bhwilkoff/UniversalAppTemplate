@@ -67,5 +67,26 @@
     });
   }
 
-  window.CredentialCheck = { check: check, didDocument: didDocument };
+  // Signing in the browser (/teach/signing/): the same canonicalization and
+  // the shared lib.sign, with a key the signer chose from their own
+  // computer. The key is used in this page's memory and never sent.
+  function sign(unsigned, key) {
+    if (!window.crypto || !window.crypto.subtle) return Promise.reject(new Error('This browser cannot sign.'));
+    return Promise.all([loadJsonld(), loadContexts()]).then(function (r) {
+      var jsonld = r[0], map = r[1];
+      function documentLoader(url) {
+        if (map[url]) return Promise.resolve({ contextUrl: null, documentUrl: url, document: map[url] });
+        return Promise.reject(new Error('Only the contexts kept on this site are loaded, not ' + url));
+      }
+      function canonize(d) {
+        return jsonld.canonize(d, { algorithm: 'RDFC-1.0', format: 'application/n-quads', documentLoader: documentLoader, safe: true });
+      }
+      return lib.sign(unsigned, { key: key, subtle: window.crypto.subtle, canonize: canonize });
+    }).catch(function (err) {
+      if (err && err.name === 'NotSupportedError') throw new Error('This browser cannot make Ed25519 signatures. Chrome, Safari, and Firefox can.');
+      throw err;
+    });
+  }
+
+  window.CredentialCheck = { check: check, didDocument: didDocument, sign: sign };
 })();
