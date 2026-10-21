@@ -1,4 +1,4 @@
-// The teaching desk (/teach/; PAGES.md): what needs the teacher, as
+// The teaching overview (/teach/; PAGES.md): what needs the teacher, as
 // counts that link to each queue, and a row for each cohort. Someone who
 // does not teach yet asks to here. The database decides who may do what.
 (function () {

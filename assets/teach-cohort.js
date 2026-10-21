@@ -40,11 +40,12 @@
     tabsCtl = U.tabs(mount, TABS, $('[data-detail]'), { label: current.title });
   }
   function drawFacts(c, sessions, people) {
-    var when = c.session_weekday != null && c.session_time ? lib.scheduleText(c, Intl.DateTimeFormat().resolvedOptions().timeZone).replace(/\.$/, '') : null;
+    var when = c.session_weekday != null && c.session_time ? lib.scheduleText(c, Intl.DateTimeFormat().resolvedOptions().timeZone).replace(/\.$/, '').replace(/, for \d+ minutes/, '') : null;
     var here = people.filter(function (p) { return p.status !== 'left'; }).length;
     $('[data-detail-facts]').replaceChildren(U.facts([
       ['Status', U.status('cohort', c.status)],
       ['Meets', when || 'Not set'],
+      ['Length', c.session_minutes + ' minutes'],
       ['Starts', c.starts_on ? new Date(c.starts_on + 'T12:00:00').toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' }) : 'Not set'],
       ['Weeks', String(c.weeks)],
       ['People', c.capacity ? here + ' of ' + c.capacity : String(here)]
@@ -79,7 +80,7 @@
       if (!box) return;
       box.replaceChildren();
       var keys = Object.keys(items).filter(function (k) { return items[k]; });
-      if (!keys.length) { box.appendChild(U.empty('Nothing needs you right now.')); return; }
+      if (!keys.length) { box.appendChild(U.empty('Nothing waiting')); return; }
       keys.forEach(function (k) {
         var n = items[k];
         var go = U.link(n.action, tabsCtl ? tabsCtl.link(n.tab) : '#', 'btn-secondary small');
@@ -150,6 +151,9 @@
     $('[data-cohort-setup]').hidden = steps.every(function (x) { return x.done || x.optional; });
     var list = $('[data-cohort-setup-steps]');
     list.replaceChildren();
+    var needed = steps.filter(function (x) { return !x.optional; });
+    var count = $('[data-setup-count]');
+    if (count) count.textContent = needed.filter(function (x) { return x.done; }).length + ' of ' + needed.length + ' done';
     steps.forEach(function (x) {
       var li = el('li', x.done ? 'done' : null);
       var target;
@@ -165,7 +169,7 @@
         });
       }
       li.appendChild(target);
-      if (x.optional) li.appendChild(el('span', 'small', ' (if you would like)'));
+      if (x.optional) { li.appendChild(document.createTextNode(' ')); li.appendChild(U.status('task', 'optional')); }
       if (x.note) li.appendChild(el('span', 'small', ' ' + x.note));
       if (x.done) li.appendChild(el('span', 'visually-hidden', ' (done)'));
       list.appendChild(li);

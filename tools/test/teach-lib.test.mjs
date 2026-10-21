@@ -84,7 +84,7 @@ test('the conversation step appears once the repository and team are named, and 
   const invited = lib.cohortSetupSteps(c, [], { state: 'invited' });
   const talk = invited.find((s) => s.key === 'talk');
   assert.equal(talk.done, false);
-  assert.equal(talk.href, '/cohort/?c=spring#talk-title');
+  assert.equal(talk.href, '/cohort/?c=spring&t=talk');
   assert.deepEqual(keysDone(invited), ['repo', 'open']);
   assert.equal(lib.cohortSetupSteps(c, [], { state: 'member' }).find((s) => s.key === 'talk').done, true);
 });
@@ -95,7 +95,7 @@ test('the trios step checks off only when every group has its room', () => {
   assert.equal(step([]).note, null);
   const half = step([{ meet_url: 'https://meet.google.com/aaa-bbbb-ccc' }, { meet_url: null }]);
   assert.equal(half.done, false);
-  assert.match(half.note, /without a room/);
+  assert.match(half.note, /Meet links again/);
   assert.equal(step([{ meet_url: 'https://meet.google.com/aaa-bbbb-ccc' }]).done, true);
 });
 test('rehearsing the live page links there and checks off once this browser has opened it', () => {

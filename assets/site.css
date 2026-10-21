@@ -751,7 +751,7 @@ label.check { display: flex; gap: 0.5rem; align-items: center; font-weight: 400;
   border: 2px solid var(--edge); border-radius: 50%;
 }
 .setup-steps li.done::before { background: var(--accent); border-color: var(--accent); }
-.setup-steps li.done a { color: var(--muted); text-decoration: line-through; text-decoration-thickness: 1px; }
+.setup-steps li.done a { color: var(--muted); }
 .setup-steps li.optional::before { border-style: dashed; }
 
 /* Before the first session, on /teach/: steps that act on the page are
@@ -761,7 +761,7 @@ label.check { display: flex; gap: 0.5rem; align-items: center; font-weight: 400;
   text-align: left; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.2em;
 }
 .setup-steps button.link:hover { text-decoration-thickness: 2px; }
-.setup-steps li.done button.link { color: var(--muted); text-decoration: line-through; }
+.setup-steps li.done button.link { color: var(--muted); }
 .teach .setup-card h3 { margin-top: 0; }
 
 /* The public hub: each app's page (/apps/app/), and the feed of work in

@@ -63,6 +63,7 @@ light and dark.
 | Open (a cohort, a poll, an exchange taking part) | Open for joining, Open for people to join, Taking answers |
 | exchange | thread, video thread |
 | teacher, co-teacher, mentor, student | instructor, facilitator, learner (as a role) |
+| Overview (an area's first page) | desk, dashboard (the site's metaphors are teaching and performance: run of show, scenes, main stage, rehearsal, the showing; Ben, October 21, 2026) |
 
 ## The parts
 

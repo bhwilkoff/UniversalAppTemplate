@@ -183,29 +183,29 @@
     var linked = sessions.filter(function (s) { return !!s.meet_url; }).length;
     var eventDone = sessions.length > 0 && linked === sessions.length;
     var steps = [
-      { key: 'schedule', label: 'Set the first day, the session day, and the time', action: 'edit',
+      { key: 'schedule', label: 'Set the day and time', action: 'edit',
         done: !!(cohort.starts_on && cohort.session_weekday != null && cohort.session_time) },
       { key: 'sessions', label: 'Make the weekly sessions', action: 'sessions', done: sessions.length > 0 },
-      { key: 'host', label: 'Choose the Google account you will host the sessions from', href: '/teach/guide/#host', done: linked > 0 },
-      { key: 'event', label: 'Ask meet@humanshaped.org to make the weekly event, its Meet link, and a room for each group', action: 'meet',
+      { key: 'host', label: 'Choose a host account', href: '/teach/guide/#host', done: linked > 0 },
+      { key: 'event', label: 'Ask for Meet links', action: 'meet',
         done: eventDone, note: eventDone ? null : meetRequestNote(meetRequest) },
-      { key: 'repo', label: 'Make the cohort’s private repository and team on GitHub', action: 'provision',
+      { key: 'repo', label: 'Make the GitHub repository', action: 'provision',
         done: !!(cohort.github_repo && cohort.github_team) }
     ];
     if (cohort.github_repo && cohort.github_team) {
-      steps.push({ key: 'talk', label: 'Open the cohort’s conversation yourself, so you know it works', href: '/cohort/?c=' + slug + '#talk-title',
+      steps.push({ key: 'talk', label: 'Open the conversation', href: '/cohort/?c=' + slug + '&t=talk',
         done: !!(myAccess && myAccess.state === 'member') });
     }
-    steps.push({ key: 'open', label: 'Open the cohort, so people can join', action: 'edit', done: cohort.status !== 'draft' });
+    steps.push({ key: 'open', label: 'Open for joining', action: 'edit', done: cohort.status !== 'draft' });
     // Rooms are made for groups that exist, and groups wait for people,
     // so this comes after opening: make the trios, then ask meet@ again.
     var groups = more.groups || [];
     var roomed = groups.length > 0 && groups.every(function (g) { return !!g.meet_url; });
-    steps.push({ key: 'groups', label: 'Once people have joined, make the trios, then ask meet@ again so each one has its room', action: 'groups',
-      done: roomed, note: groups.length && !roomed ? 'A group without a room still needs one.' : null });
-    steps.push({ key: 'rehearse', label: 'Open the live page once before the first session, and try a timer and a check, so nothing in the session is new to you',
+    steps.push({ key: 'groups', label: 'Make the groups', action: 'groups',
+      done: roomed, note: groups.length && !roomed ? 'Ask for Meet links again for their rooms.' : null });
+    steps.push({ key: 'rehearse', label: 'Rehearse on the live page',
       href: '/live/?c=' + slug, done: !!more.rehearsed });
-    steps.push({ key: 'agent', label: 'Connect your own AI agent, if you would like it to read the cohort with you', href: '/connect/',
+    steps.push({ key: 'agent', label: 'Connect your agent', href: '/connect/',
       done: false, optional: true });
     return steps;
   }

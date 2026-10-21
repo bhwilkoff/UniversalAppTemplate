@@ -11,7 +11,7 @@
   var SCRIPTS = [
     'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js',
     '/assets/hub-config.js?v=20261016a',
-    '/assets/teach-lib.js?v=20261006g',
+    '/assets/teach-lib.js?v=20261022c',
     '/assets/path-lib.js',
     '/assets/home-lib.js?v=20261021a',
     '/assets/exchange-lib.js?v=20261022a',

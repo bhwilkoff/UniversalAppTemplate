@@ -28,7 +28,7 @@ functionality is possible from the page you are on."
    holds both views and marks the one you are on. Tools for a role you do
    not hold are not shown.
 6. **Actions sit on the page of the thing they act on.** A queue page
-   answers what is in it; the desk only counts it and links there.
+   answers what is in it; the overview only counts it and links there.
 7. **Moved pages keep their old addresses**, which forward to the new ones.
 
 ## How you find your way
@@ -49,7 +49,7 @@ Moodle, GitHub, GOV.UK, NN/g, WCAG 2.2).
   a tint, not color alone.
 - **An area's row of links** (`.area-nav`) sits at the top of every page in
   that area, in a fixed order, each item its own page, the current one
-  underlined: Teaching (Desk, Feedback, Polls, then Requests to teach and
+  underlined: Teaching (Overview, Feedback, Polls, then Requests to teach and
   Signing for the people who hold those rights) and Running the hub
   (Overview, People, Changes).
 - **A cohort's header** (`assets/cohort-nav.js`) opens every page that
@@ -100,7 +100,7 @@ Moodle, GitHub, GOV.UK, NN/g, WCAG 2.2).
 
 | Page | What it is | What you can do there |
 |---|---|---|
-| `/teach/` | Your teaching desk; for anyone else, asking to teach | Counts of what needs you, each linking to its queue; a row for each cohort; plan a cohort; your polls |
+| `/teach/` | Your teaching overview; for anyone else, asking to teach | Counts of what needs you, each linking to its queue; a row for each cohort; plan a cohort; your polls |
 | `/teach/new/` | Planning a new cohort | Fill it in; saving opens the cohort |
 | `/teach/cohort/?c=` | One cohort, as its teacher | Sessions, people, groups, follow-ups, apps, credentials, setup |
 | `/teach/cohort/edit/?c=` | That cohort's details | Change them; saving returns to the cohort |

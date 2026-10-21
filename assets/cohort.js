@@ -513,6 +513,8 @@
     box.hidden = !steps.some(function (s) { return s.done === false; });
     var list = $('[data-setup-steps]');
     list.replaceChildren();
+    var needed = steps.filter(function (s) { return s.done !== null; });
+    $('[data-setup-count]').textContent = needed.filter(function (s) { return s.done; }).length + ' of ' + needed.length + ' done';
     steps.forEach(function (s) {
       var li = el('li', s.done ? 'done' : s.done === null ? 'optional' : null);
       var a = link(s.href || ('/cohort/?c=' + encodeURIComponent(cohort.slug) + '&t=' + s.tab), s.label);
