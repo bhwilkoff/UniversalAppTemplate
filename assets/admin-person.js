@@ -20,13 +20,13 @@
       var has = !!person[r.key], self = person.id === me.id;
       var item = el('li', 'right-row');
       var text = el('div');
-      text.appendChild(el('p', 'right-name', r.name + (has ? ': yes' : ': no')));
+      var nm = el('p', 'right-name', r.name + ' '); nm.appendChild(window.UI.status('right', has ? 'held' : 'none')); text.appendChild(nm);
       text.appendChild(el('p', 'small', r.what));
       item.appendChild(text);
       var acts = el('div', 'actions');
       var msg = el('p', 'small'); msg.setAttribute('role', 'status');
       if (self && has && (r.key === 'can_admin' || r.key === 'teacher')) {
-        text.appendChild(el('p', 'small', 'Only another admin can take this from you.'));
+        text.appendChild(el('p', 'small', 'Only another admin can take this from you'));
       } else {
         var b = el('button', 'btn-secondary small', has ? r.take : r.give);
         b.type = 'button';
@@ -42,7 +42,7 @@
             person = res.data;
             $('[data-note]').value = '';
             draw();
-            $('[data-saved]').textContent = 'Saved.';
+            $('[data-saved]').textContent = 'Saved';
             if (person.id === me.id && window.HS && window.HS.roles) window.HS.roles({ teacher: person.teacher, admin: person.can_admin });
           }).catch(function (e) { b.disabled = false; msg.textContent = 'Nothing changed: ' + said(e); });
         }

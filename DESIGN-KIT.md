@@ -114,6 +114,7 @@ mirrors it; a test checks they match):
 - key: Ready (done), Not chosen (waiting)
 - work: Ready (done), Not yet (waiting), Confirmed (done)
 - showing: Open to guests (active)
+- right: Held (done), Not held (off)
 - action: Saving (waiting), Signing (waiting), Failed (problem)
 
 ### Visibility marker — `UI.visibility(audience)` (R§6.5, R§2.15)
@@ -130,6 +131,7 @@ labeled ("Exchange" Your cohort, "Video file" Anyone with the link).
 | teachers | You and your teachers | user |
 | staff | Only teachers | user |
 | approvers | You and approvers | user |
+| them | Them and teachers | user |
 | cohort | Your cohort | users |
 | members | Human Shaped members | users-three |
 | link | Anyone with the link | link |

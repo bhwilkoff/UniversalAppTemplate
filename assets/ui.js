@@ -41,6 +41,7 @@
     key: { ready: ['done', 'Ready'], none: ['waiting', 'Not chosen'] },
     work: { ready: ['done', 'Ready'], notyet: ['waiting', 'Not yet'], confirmed: ['done', 'Confirmed'] },
     showing: { open: ['active', 'Open to guests'] },
+    right: { held: ['done', 'Held'], none: ['off', 'Not held'] },
     action: { saving: ['waiting', 'Saving'], signing: ['waiting', 'Signing'], failed: ['problem', 'Failed'] }
   };
   function status(thing, state) {
@@ -59,6 +60,7 @@
     teachers: ['user', 'You and your teachers', 'You and the teachers of this cohort.'],
     staff: ['user', 'Only teachers', 'The teachers of this cohort, and no one in it.'],
     approvers: ['user', 'You and approvers', 'You and the people who decide requests to teach.'],
+    them: ['user', 'Them and teachers', 'The person it is written to, and this cohort’s teachers.'],
     cohort: ['users', 'Your cohort', 'The people in this cohort and its teachers.'],
     members: ['users-three', 'Human Shaped members', 'People in a cohort, now or before, and teachers.'],
     link: ['link', 'Anyone with the link', 'Anyone you give the address to, signed in or not.'],

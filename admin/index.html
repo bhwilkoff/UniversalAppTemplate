@@ -37,7 +37,7 @@
     })();
   </script>
   <script src="/assets/site.js?v=20261021c" defer></script>
-  <script src="/assets/ui.js?v=20261022a" defer></script>
+  <script src="/assets/ui.js?v=20261022f" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to the page</a>
@@ -76,6 +76,7 @@
       </nav>
       <header class="page-head">
         <h1>Running the hub</h1>
+        <div data-admin-facts></div>
       </header>
 
       <div class="account teach admin" data-admin>
@@ -90,9 +91,11 @@
           <p><button class="btn-secondary" type="button" data-reload>Try again</button></p>
         </section>
         <section class="account-state" data-state="teacher" hidden>
-          <ul class="needs" data-overview></ul>
+          <p class="notice" data-one-admin hidden><strong>You are the only admin.</strong> A second keeps the hub open if an account is lost. <a href="/admin/people/">Choose one</a></p>
+          <h2>Waiting</h2>
+          <ul class="ui-rows" data-overview></ul>
           <h2>Recent changes</h2>
-          <ul class="admin-log" data-recent></ul>
+          <ul class="ui-rows" data-recent></ul>
           <p class="actions"><a class="btn-secondary" href="/admin/changes/">The whole log</a></p>
         </section>
       </div>
@@ -103,7 +106,7 @@
   <script src="/assets/teach-page.js?v=20261021d" defer></script>
   <script src="/assets/admin-lib.js?v=20261021a" defer></script>
   <script src="/assets/admin-page.js?v=20261021a" defer></script>
-  <script src="/assets/admin.js?v=20261021a" defer></script>
+  <script src="/assets/admin.js?v=20261022f" defer></script>
 
   <footer class="site-footer">
     <div class="wrap">

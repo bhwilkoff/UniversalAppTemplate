@@ -206,11 +206,11 @@
         var res = r.error.context;
         return (res && res.json ? res.json() : Promise.resolve({})).catch(function () { return {}; }).then(function (body) {
           button.disabled = false;
-          say('[data-detail-message]', body.message || 'GitHub could not be reached just now. Try again in a minute.');
+          say('[data-detail-message]', body.message || 'GitHub did not answer. Try again in a minute.');
         });
       }
       return db.functions.invoke('cohort-access', { body: { action: 'join', cohort_id: id } }).then(function () {
-        say('[data-detail-message]', 'The repository ' + r.data.github_repo + ' and its team are ready, with Discussions on. Open the cohort’s conversation from its page to check it works.');
+        say('[data-detail-message]', 'The repository ' + r.data.github_repo + ' is ready.');
         openCohort(id);
       });
     });
@@ -233,11 +233,11 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
 
   $('[data-make-sessions]').addEventListener('click', function () {
     var rows = lib.sessionRows(current);
-    if (!rows) return say('[data-detail-message]', 'Set the first day, the session day, and the time first, and the sessions will follow from them.');
+    if (!rows) return say('[data-detail-message]', 'Set the day and time first.');
     var cohort = current;
     db.from('sessions').upsert(rows, { onConflict: 'cohort_id,number' }).select('id, number').then(function (r) {
       if (r.error) return say('[data-detail-message]', 'The sessions could not be made: ' + r.error.message);
-      var made = rows.length + ' weekly sessions are set. Changing the dates later and making them again keeps what you wrote in each.';
+      var made = rows.length + ' sessions made. Making them again keeps what you wrote.';
       say('[data-detail-message]', made);
       // Each week that has no run of show yet starts from the course's
       // plan (curriculum milestone C6). Words by Claude, awaiting Ben's review.
@@ -302,7 +302,7 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
       ev.preventDefault();
       say('[data-heard-message]', 'Saving…');
       db.from('sessions').update({ heard: heardForm.elements.heard.value.trim() || null }).eq('id', last.id).select('id').then(function (r) {
-        say('[data-heard-message]', r.error || !r.data.length ? 'Not saved: ' + (r.error ? r.error.message : 'no change was allowed') + '.' : 'Saved. It shows on the session page while people arrive next time.');
+        say('[data-heard-message]', r.error || !r.data.length ? 'Not saved: ' + (r.error ? r.error.message : 'no change was allowed') + '.' : 'Saved');
       });
     };
     say('[data-heard-message]', '');
@@ -366,7 +366,7 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
     if (!R || !way || !way.mayEmail) return null;
     var href = R.mailtoHref(way.email, R.reachSubject(current.title), draft || '');
     if (!href) return null;
-    var a = el('a', null, 'Write to ' + personName(p) + ' from your own email');
+    var a = el('a', 'btn-secondary small', 'Write from your email');
     a.href = href;
     return a;
   }
@@ -562,11 +562,11 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
     var target = F.followupTarget(c);
     var form = el('form', 'inline-form followup-form');
     var label = el('label', null, 'Your follow-up to ' + name);
-    var where = target.kind === 'feedback'
-      ? 'It goes as your feedback on their bring-back, where they and the cohort will see it.'
-      : notesReady ? 'It goes as a note on their cohort page that only they and the cohort’s teachers can read.'
-        : 'It can go only as feedback on a bring-back until the hub’s database has notes, and they brought nothing back this time.';
-    label.appendChild(el('span', 'hint', where));
+    var where = el('span', 'hint');
+    if (target.kind === 'feedback') where.appendChild(U.visibility('cohort', 'On their bring-back'));
+    else if (notesReady) where.appendChild(U.visibility('them', 'A note'));
+    else where.textContent = 'They shared nothing to answer.';
+    label.appendChild(where);
     var input = el('textarea'); input.rows = 4; input.maxLength = 8000;
     input.value = F.loadDraft(store, key);
     label.appendChild(input); form.appendChild(label);
@@ -579,16 +579,14 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
     var mail = emailLink(p, input.value);
     if (mail) {
       var alt = el('p', 'small');
-      alt.appendChild(document.createTextNode('Or, privately, since they said you may email them: '));
       alt.appendChild(mail);
-      alt.appendChild(document.createTextNode('. It opens your own mail with this draft in it, and nothing is sent until you send it there.'));
       form.appendChild(alt);
     }
     input.addEventListener('input', function () {
       if (mail) mail.href = R.mailtoHref(reachBy[p.user_id].email, R.reachSubject(current.title), input.value);
       var kept = F.saveDraft(store, key, input.value);
       draftFlag.hidden = !input.value.trim();
-      msg.textContent = !input.value.trim() ? '' : kept ? 'Draft kept in this browser only.' : 'This browser will not keep drafts, so send it before you leave the page.';
+      msg.textContent = !input.value.trim() ? '' : kept ? 'Draft kept on this device' : 'Drafts are not kept here. Send before you leave.';
     });
     form.addEventListener('submit', function (ev) {
       ev.preventDefault();
@@ -651,7 +649,7 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
       var mail = emailLink(p, '');
       var how = el('span', 'small followup-line');
       if (mail) { how.appendChild(document.createTextNode('They said you may email them. ')); how.appendChild(mail); }
-      else how.textContent = 'They have not chosen email, so a note to them, in their follow-up below, is how your words reach them.';
+      else how.textContent = 'No email. A note reaches them.';
       li.appendChild(how);
       ul.appendChild(li);
     });
@@ -660,7 +658,7 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
   function drawSessions(sessions) {
     var box = $('[data-sessions]');
     box.replaceChildren();
-    if (!sessions.length) { box.appendChild(el('p', 'small', 'No sessions yet. Set the day and time, then make the weekly sessions.')); return; }
+    if (!sessions.length) { box.appendChild(el('p', 'small', 'No sessions yet')); return; }
     sessions.forEach(function (s) {
       var f = el('form', 'session-row');
       f.appendChild(el('p', 'session-when', 'Week ' + s.number + (s.starts_at ? ', ' + whenText(s.starts_at, current.time_zone) : '')));
@@ -679,11 +677,11 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
       if (showcase) {
         var open = el('label', 'check');
         var openBox = el('input'); openBox.type = 'checkbox'; openBox.name = 'public_showcase'; openBox.checked = !!s.public_showcase;
-        open.appendChild(openBox); open.appendChild(document.createTextNode(' Open this session to guests, as a public showing'));
+        open.appendChild(openBox); open.appendChild(document.createTextNode(' Open to guests'));
         f.appendChild(open);
         var share = el('label', 'check');
         var shareBox = el('input'); shareBox.type = 'checkbox'; shareBox.name = 'showcase_shares_link'; shareBox.checked = !!s.showcase_shares_link;
-        share.appendChild(shareBox); share.appendChild(document.createTextNode(' Show its Meet link on the public page, so anyone can ask to join'));
+        share.appendChild(shareBox); share.appendChild(document.createTextNode(' Show its Meet link to guests'));
         f.appendChild(share);
         var where = el('p', 'small');
         function drawWhere() {
@@ -808,7 +806,7 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
     var btn = f.querySelector('button'); btn.disabled = true;
     db.from('cohort_teachers').insert({ cohort_id: current.id, user_id: uid }).then(function (r) {
       btn.disabled = false;
-      msg.textContent = r.error ? 'Not added: ' + r.error.message + '.' : 'Added. They will find the cohort on their own teaching page.';
+      msg.textContent = r.error ? 'Not added: ' + r.error.message + '.' : 'Added';
       if (!r.error) drawTeachers();
     });
   });
@@ -817,7 +815,7 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
     var box = $('[data-roster]');
     box.replaceChildren();
     var here = people.filter(function (p) { return p.status !== 'left'; });
-    if (!here.length) { box.appendChild(el('p', 'small', current.status === 'open' ? 'No one has joined yet.' : 'No one has joined yet. People can join once the cohort is open.')); return; }
+    if (!here.length) { box.appendChild(el('p', 'small', current.status === 'open' ? 'No one has joined yet.' : 'No one yet')); return; }
     var ul = el('ul', 'roster');
     here.forEach(function (p) {
       var li = el('li');
@@ -959,10 +957,10 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
     var hideBtn = el('button', 'btn-secondary', 'Keep it off /apps/'); hideBtn.type = 'button';
     actions.appendChild(hideBtn);
     var f = el('form', 'inline-form'); f.hidden = true;
-    var l = el('label', null, 'Why, in a sentence they will read (you may leave it empty)');
+    var l = el('label', null, 'Reason (optional)');
     var input = el('input'); input.maxLength = 500;
     l.appendChild(input); f.appendChild(l);
-    f.appendChild(el('p', 'small', 'It stays on the cohort’s own pages for everyone in the cohort, and their own word that it is ready stays as it is.'));
+    f.appendChild(el('p', 'small', 'It stays visible to the cohort.'));
     var go = el('button', 'btn-secondary', 'Keep it off /apps/ now'); go.type = 'submit';
     var cancel = el('button', 'btn-secondary', 'Leave it shown'); cancel.type = 'button';
     var fa = el('div', 'actions'); fa.appendChild(go); fa.appendChild(cancel); f.appendChild(fa);
@@ -1119,7 +1117,7 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
     }
 
     if (now.state === 'signed') {
-      status.textContent = cred.levelName(cred.levelFor(rec.platforms)) + '. Signed on ' + day(rec.signed_at) + ', and public at its own page, which the holder can share.';
+      status.textContent = cred.levelName(cred.levelFor(rec.platforms)) + '. Signed on ' + day(rec.signed_at) + '';
       var actions = el('div', 'actions');
       var open = el('a', 'btn-secondary', 'Open its page'); open.href = '/credential/?id=' + rec.id;
       actions.appendChild(open);
@@ -1169,7 +1167,7 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
     // Nothing live yet (or only a revoked one): offer to record it.
     var before = now.state === 'revoked' ? 'Their last credential was revoked on ' + day(rec.revoked_at) + '. ' : '';
     if (!p.app_repo || !/^https:\/\//.test(p.app_url || '')) {
-      status.textContent = before + 'Waiting for their repository and the live address of their app, which they add on the cohort page.';
+      status.textContent = before + 'Needs a repository and a live address.';
       return card;
     }
     status.textContent = before + 'Not issued yet.';

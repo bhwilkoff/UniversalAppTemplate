@@ -44,7 +44,7 @@ function kitRegistry() {
   }
   return out;
 }
-const KIT_NAME = { cohort: 'cohort', session: 'session', poll: 'poll', request: 'request to teach', credential: 'credential', app: 'app', invitation: 'invitation', exchange: 'exchange', task: 'task', connection: 'connection', key: 'key', work: 'work', showing: 'showing', action: 'action' };
+const KIT_NAME = { cohort: 'cohort', session: 'session', poll: 'poll', request: 'request to teach', credential: 'credential', app: 'app', invitation: 'invitation', exchange: 'exchange', task: 'task', connection: 'connection', key: 'key', work: 'work', showing: 'showing', right: 'right', action: 'action' };
 
 const PRIVACY = [/only you and (the|your)/i, /only the people in/i, /anyone with its link/i, /seen only by/i, /stays yours alone|yours alone until/i, /for you alone/i, /only you can see/i, /only the teacher sees/i];
 const LOADING = [/Checking whether you are signed in/, /Opening the (cohort|session|board|card|exchange)/, /Finding the poll/, /Reading this /];
