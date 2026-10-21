@@ -2523,3 +2523,30 @@ a.ui-row-title { color: var(--ink); }
 .ui-disclosure[open] summary { margin-bottom: 0.5rem; }
 .ui-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 1rem; padding: 1rem 1.25rem; background: var(--card); border: 1px solid var(--rule); border-radius: var(--radius); margin: 0 0 1.5rem; }
 .ui-toolbar .ui-toolbar-end { margin-left: auto; display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; }
+
+/* ---- The signed-in workspace (PAGES.md, "How you find your way") -------
+   Signed in, the public menu gives way to a sidebar of the person's own
+   things; the head marks <html data-signed-in> before the page draws. */
+html[data-signed-in] .site-header .nav { display: none; }
+.app-nav, .app-menu-button { display: none; }
+html[data-signed-in] body:not([data-no-app-nav]) .app-menu-button { display: inline-flex; align-items: center; gap: 0.4rem; margin-right: auto; margin-left: 0.75rem; background: none; border: 1px solid var(--rule); border-radius: 999px; padding: 0.35rem 0.85rem; font: inherit; font-weight: 600; color: var(--ink); cursor: pointer; min-height: 40px; }
+html[data-signed-in] body:not([data-no-app-nav]) .site-header { position: sticky; top: 0; z-index: 30; background: var(--paper); border-bottom: 1px solid var(--rule); }
+.app-nav { padding: 1rem 0.75rem 2rem; overflow-y: auto; background: var(--paper); }
+.app-nav ul { list-style: none; margin: 0; padding: 0; }
+.app-nav-list > li { margin: 0.1rem 0; }
+.app-nav a { display: block; padding: 0.45rem 0.75rem; border-radius: 8px; color: var(--ink); text-decoration: none; font-weight: 500; line-height: 1.3; }
+.app-nav a:hover { background: var(--surface); }
+.app-nav a[aria-current] { background: var(--surface); font-weight: 680; }
+.app-nav-group ul a { padding-left: 1.5rem; font-size: 0.95rem; }
+.app-nav-label { display: block; font-size: 0.85rem; color: var(--muted); padding: 0.9rem 0.75rem 0.3rem; }
+.app-nav-quiet a { color: var(--muted); font-size: 0.95rem; }
+.app-nav-quiet a[aria-current] { color: var(--ink); }
+/* Below 64rem the sidebar is a drawer behind Menu. */
+html.app-nav-open[data-signed-in] body:not([data-no-app-nav]) .app-nav { display: block; position: fixed; z-index: 40; top: var(--header-h, 4rem); left: 0; bottom: 0; width: min(19rem, 86vw); border-right: 1px solid var(--rule); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18); }
+@media (min-width: 64rem) {
+  html[data-signed-in] body:not([data-no-app-nav]) .app-menu-button { display: none; }
+  html[data-signed-in] body:not([data-no-app-nav]) { padding-left: 15rem; }
+  html[data-signed-in] body:not([data-no-app-nav]) .site-header { margin-left: -15rem; padding-left: 0; }
+  html[data-signed-in] body:not([data-no-app-nav]) .app-nav { display: block; position: fixed; top: var(--header-h, 4rem); left: 0; bottom: 0; width: 15rem; border-right: 1px solid var(--rule); box-shadow: none; }
+}
+@media print { .app-nav, .app-menu-button { display: none !important; } html[data-signed-in] body { padding-left: 0 !important; } }

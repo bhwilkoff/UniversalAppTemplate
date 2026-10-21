@@ -431,7 +431,7 @@ words each.
 identical, on every page that belongs to it: the cohort page, the
 teaching page, live, the board, and that cohort's exchanges. It holds the
 crumb, the cohort's name as the `h1` (or as a line above the `h1` on a
-sub-page such as live), the role line, the one primary action, and the
+sub-page such as live), the one primary action, and the
 **cohort bar**:
 
 - This week (`/cohort/?c=`), Live (`/live/?c=`), Board (`/board/?c=`),
@@ -482,20 +482,17 @@ Every page that is about one thing opens the same way, in this order:
 2. **The `h1` names the thing**: the cohort's name, the poll's title,
    "Week 3 live session". Never a slogan ("Your cohort lives here.") on a
    page about one cohort; slogans belong on the signed-out pitch.
-3. **The role line**, one plain sentence, only where two roles could open
-   the same thing (PAGES.md rule 5):
-   - a student: no line (the default reader needs none);
-   - a mentor: "You mentor in this cohort.";
-   - a teacher on the student page: "You teach this cohort. This is the
-     page its people see; your tools are on the teaching page." with the
-     link;
-   - an admin on a cohort they do not teach: "You are seeing this as the
-     hub's admin, not as one of its teachers."
-   It sits in the header on the page itself, never only in the account
-   menu, which is where Moodle's indicator got missed.
-4. **A facts sentence** when facts matter (dates, the next session on the
-   reader's clock), written as a sentence, not an `A · B · C` string
-   (ai-design-anti-patterns.md, template chrome).
+3. **No role line** (superseded October 21, 2026; Ben: "Things like 'You
+   teach this cohort, and this is the page the people in it see' are text
+   where there likely should be buttons and interface elements"). The
+   reader's view shows in the interface itself: the cohort bar holds the
+   views a person may open (Teaching it only for its teachers) and marks
+   the one they are on, and tools for a role they do not hold are not
+   drawn. DESIGN-KIT.md holds the components that carry role, state, and
+   visibility.
+4. **Facts** when facts matter (dates, the next session on the reader's
+   clock), as the facts component (DESIGN-KIT.md), never a run-on
+   sentence or an `A · B · C` string.
 5. **Actions**: at most one filled button, first, then outlined ones
    (design-patterns.md 7). Only actions on this thing (PAGES.md rule 6);
    no actions in the bars (Apple HIG: tabs navigate, toolbars act).
@@ -581,7 +578,7 @@ migrations above.
 | `/admin/people/` | Everyone with an account | Find a person by GitHub login or name; filter to teachers, approvers, signers, admins, or one cohort; open a person |
 | `/admin/person/?u=` | One person, as the admin sees them | Change their hub rights (each a checkbox with one sentence saying what it allows); see each cohort they are in and their role there, with a link to change it on that cohort's teaching page; see their GitHub organization state and request to teach; read the changes about them |
 | `/admin/changes/` | Every change to anyone's rights | Read, filter by person, by who made the change, and by date |
-| `/teach/cohort/?c=` (existing) | One cohort, as its teacher | Its People section stays the one home for co-teachers, mentors, and members (PAGES.md rule 3); an admin can open any cohort's teaching page, with the admin role line |
+| `/teach/cohort/?c=` (existing) | One cohort, as its teacher | Its People section stays the one home for co-teachers, mentors, and members (PAGES.md rule 3) |
 
 The person page answers Moodle's "Check permissions" question in words,
 for that one person: "Ada can plan and run cohorts, teaches Spring

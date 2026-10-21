@@ -43,12 +43,14 @@
   });
 })();
 
-// When someone is signed in, the header is theirs: a labeled Home first in
-// the menu (their own home, not the pitch), and in place of the sign-in
-// button, their picture and name opening a short list: home, account, and
-// sign out (research/notes/signed-in-experience-notes.md). Supabase keeps
-// the session in this browser under sb-<project>-auth-token; nothing is
-// fetched to read it.
+// When someone is signed in, the site is their workspace (PAGES.md, "How
+// you find your way"): a sidebar of their own things (home, each of their
+// cohorts, exchanges, teaching, running the hub) with the public pages in
+// a quieter group below, and in place of the sign-in button their picture
+// opening home, account, and sign out. The head marks <html
+// data-signed-in> before the page draws, from the session Supabase keeps
+// in this browser; what the sidebar lists comes from a note pages keep
+// (HS.roles), read again in the background on pages with the hub's client.
 (function () {
   var link = document.querySelector('.site-header .header-actions .btn-primary');
   if (!link) return;
@@ -68,56 +70,99 @@
     if (text != null) n.textContent = text;
     return n;
   }
+  var here = location.pathname, query = new URLSearchParams(location.search);
 
-  var nav = document.querySelector('.site-header .nav ul');
-  if (nav) {
-    var li = el('li'), home = el('a', null, 'Home');
-    home.href = '/';
-    if (location.pathname === '/' && !/[?&]public\b/.test(location.search)) home.setAttribute('aria-current', 'page');
-    li.appendChild(home);
-    nav.insertBefore(li, nav.firstChild);
-  }
-
-  // Teaching, second, for anyone who teaches; Run the hub in the account
-  // menu for an admin (PAGES.md, "How you find your way"). The roles come
-  // from HS.roles, which pages that read them keep in this browser.
-  var teachItem = null, adminItem = null;
-  function drawRoles(r) {
-    var teaching = !!(r && r.teacher), admin = !!(r && r.admin);
-    // An area's row shows at once from the note, so the page does not jump
-    // when the hub answers; the page still checks before drawing anything.
-    if (teaching) document.querySelectorAll('[data-area-nav="teaching"]').forEach(function (n) { n.hidden = false; });
-    if (admin) document.querySelectorAll('[data-area-nav="admin"]').forEach(function (n) { n.hidden = false; });
-    if (nav && teaching && !teachItem) {
-      teachItem = el('li');
-      var a = el('a', null, 'Teaching');
-      a.href = '/teach/';
-      if (/^\/teach\//.test(location.pathname)) {
-        nav.querySelectorAll('[aria-current]').forEach(function (x) { x.removeAttribute('aria-current'); });
-        a.setAttribute('aria-current', 'page');
-      }
-      teachItem.appendChild(a);
-      nav.insertBefore(teachItem, nav.children[1] || null);
-    } else if (teachItem && !teaching) { teachItem.remove(); teachItem = null; }
-    if (admin && !adminItem) {
-      adminItem = el('li');
-      var b = el('a', null, 'Run the hub');
-      b.href = '/admin/';
-      adminItem.appendChild(b);
-      list.insertBefore(adminItem, list.children[2] || null);
-    } else if (adminItem && !admin) { adminItem.remove(); adminItem = null; }
-  }
+  // ---- the note of what this person holds ------------------------------
   window.HS = window.HS || {};
+  function readNote() {
+    try { var c = JSON.parse(localStorage.getItem('hs-roles') || 'null'); return c && c.uid === user.id ? c : null; } catch (e) { return null; }
+  }
   window.HS.roles = function (r) {
-    if (r === undefined) {
-      try { var c = JSON.parse(localStorage.getItem('hs-roles') || 'null'); return c && c.uid === user.id ? c : null; } catch (e) { return null; }
-    }
-    var kept = { uid: user.id, teacher: !!r.teacher, admin: !!r.admin, at: Date.now() };
+    if (r === undefined) return readNote();
+    var kept = Object.assign({ cohorts: [] }, readNote() || {}, r, { uid: user.id, at: Date.now() });
     try { localStorage.setItem('hs-roles', JSON.stringify(kept)); } catch (e) {}
-    drawRoles(kept);
+    drawNav(kept);
     return kept;
   };
+  window.HS.forgetRoles = function () { try { localStorage.removeItem('hs-roles'); } catch (e) {} };
 
+  // ---- the sidebar ------------------------------------------------------
+  var nav = el('nav', 'app-nav');
+  nav.id = 'app-nav';
+  nav.setAttribute('aria-label', 'Your Human Shaped');
+  function item(list, href, text, current, cls) {
+    var li = el('li', cls || null), a = el('a', null, text);
+    a.href = href;
+    if (current) a.setAttribute('aria-current', 'page');
+    li.appendChild(a); list.appendChild(li);
+    return li;
+  }
+  function cohortHere(c) {
+    var slug = query.get('c');
+    return (slug === c.slug && /^\/(cohort|live|board)\//.test(here)) || (slug === c.id && /^\/teach\/cohort\//.test(here));
+  }
+  function drawNav(r) {
+    r = r || {};
+    nav.replaceChildren();
+    var main = el('ul', 'app-nav-list');
+    item(main, '/', 'Home', here === '/' && !query.has('public'));
+    var cohorts = (r.cohorts || []).filter(function (c) { return c.status !== 'finished'; });
+    if (cohorts.length) {
+      var g = el('li', 'app-nav-group');
+      g.appendChild(el('span', 'app-nav-label', 'Your cohorts'));
+      var sub = el('ul');
+      cohorts.forEach(function (c) {
+        item(sub, c.role === 'teacher' ? '/teach/cohort/?c=' + c.id : '/cohort/?c=' + encodeURIComponent(c.slug), c.title, cohortHere(c));
+      });
+      g.appendChild(sub);
+      main.appendChild(g);
+    }
+    item(main, '/exchanges/', 'Exchanges', /^\/exchange/.test(here));
+    if (r.teacher) item(main, '/teach/', 'Teaching', /^\/teach\//.test(here) && !/^\/teach\/(cohort|guide)\//.test(here));
+    if (r.admin) item(main, '/admin/', 'Running the hub', /^\/admin\//.test(here));
+    nav.appendChild(main);
+    nav.appendChild(el('span', 'app-nav-label', 'Human Shaped'));
+    var quiet = el('ul', 'app-nav-list app-nav-quiet');
+    item(quiet, '/cohorts/', 'Open cohorts', here === '/cohorts/');
+    item(quiet, '/apps/', 'Apps', /^\/apps\//.test(here) && here !== '/apps/mine/');
+    item(quiet, '/events/', 'Events', here === '/events/');
+    item(quiet, '/principles/', 'Principles', here === '/principles/');
+    if (r.teacher) item(quiet, '/teach/guide/', 'Teaching guide', /^\/teach\/guide\//.test(here));
+    nav.appendChild(quiet);
+    // An area's row shows at once from the note, so the page does not jump
+    // when the hub answers; the page still checks before drawing anything.
+    if (r.teacher) document.querySelectorAll('[data-area-nav="teaching"]').forEach(function (n) {
+      n.hidden = false;
+      n.querySelectorAll('[data-needs-right]').forEach(function (li) { li.hidden = !r[li.getAttribute('data-needs-right')]; });
+    });
+    if (r.admin) document.querySelectorAll('[data-area-nav="admin"]').forEach(function (n) { n.hidden = false; });
+  }
+  var header = document.querySelector('.site-header');
+  var withNav = !document.body.hasAttribute('data-no-app-nav');
+  if (withNav) header.after(nav);
+  drawNav(readNote());
+  function headerHeight() { document.documentElement.style.setProperty('--header-h', header.offsetHeight + 'px'); }
+  headerHeight();
+  window.addEventListener('resize', headerHeight);
+
+  // At phone and tablet width the sidebar is a drawer behind Menu.
+  var menu = el('button', 'app-menu-button');
+  menu.type = 'button';
+  menu.setAttribute('aria-controls', 'app-nav');
+  menu.setAttribute('aria-expanded', 'false');
+  menu.appendChild(el('span', null, 'Menu'));
+  function setOpen(open) {
+    document.documentElement.classList.toggle('app-nav-open', open);
+    menu.setAttribute('aria-expanded', String(open));
+    if (open) { var first = nav.querySelector('a'); if (first) first.focus(); }
+  }
+  menu.addEventListener('click', function () { setOpen(!document.documentElement.classList.contains('app-nav-open')); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && document.documentElement.classList.contains('app-nav-open')) { setOpen(false); menu.focus(); } });
+  nav.addEventListener('click', function (e) { if (e.target.closest('a')) setOpen(false); });
+  var wordmark = header.querySelector('.wordmark');
+  if (withNav) { if (wordmark) wordmark.after(menu); else header.querySelector('.wrap').prepend(menu); }
+
+  // ---- the account button -----------------------------------------------
   var wrap = el('div', 'account-menu');
   var button = el('button', 'account-button');
   button.type = 'button';
@@ -134,25 +179,32 @@
   list.id = 'account-menu-list';
   list.hidden = true;
   [['/', 'Your home'], ['/account/', 'Your account'], ['/account/?sign-out', 'Sign out']].forEach(function (x) {
-    var item = el('li'), a = el('a', null, x[1]);
+    var li = el('li'), a = el('a', null, x[1]);
     a.href = x[0];
-    item.appendChild(a);
-    list.appendChild(item);
+    li.appendChild(a);
+    list.appendChild(li);
   });
   wrap.appendChild(button);
   wrap.appendChild(list);
   link.replaceWith(wrap);
-  drawRoles(window.HS.roles());
 
-  // Roles change rarely, so the note is read again only when it is a day
-  // old, on a page that already has the hub's client.
+  // Read again in the background when the note is five minutes old, on a
+  // page that already has the hub's client: rights and cohorts together.
   window.addEventListener('load', function () {
-    var kept = window.HS.roles();
-    if (kept && Date.now() - kept.at < 864e5) return;
+    var kept = readNote();
+    if (kept && kept.cohorts && Date.now() - kept.at < 3e5) return;
     if (!window.HUB || !window.supabase) return;
     var db = window.HUB.client ? window.HUB.client() : window.supabase.createClient(window.HUB.url, window.HUB.key);
-    db.from('teachers').select('*').eq('user_id', user.id).maybeSingle().then(function (r) {
-      if (!r.error) window.HS.roles({ teacher: !!r.data, admin: !!(r.data && r.data.can_admin) });
+    Promise.all([
+      db.from('teachers').select('*').eq('user_id', user.id).maybeSingle(),
+      db.from('enrollments').select('role, status, cohorts(id, slug, title, status)').eq('user_id', user.id).neq('status', 'left'),
+      db.from('cohort_teachers').select('cohorts(id, slug, title, status)').eq('user_id', user.id)
+    ]).then(function (res) {
+      if (res.some(function (x) { return x.error; })) return;
+      var t = res[0].data, seen = {}, cohorts = [];
+      res[2].data.forEach(function (x) { var c = x.cohorts; if (c && !seen[c.id]) { seen[c.id] = 1; cohorts.push({ id: c.id, slug: c.slug, title: c.title, status: c.status, role: 'teacher' }); } });
+      res[1].data.forEach(function (x) { var c = x.cohorts; if (c && !seen[c.id]) { seen[c.id] = 1; cohorts.push({ id: c.id, slug: c.slug, title: c.title, status: c.status, role: x.role }); } });
+      window.HS.roles({ teacher: !!t, admin: !!(t && t.can_admin), can_approve: !!(t && t.can_approve), can_sign: !!(t && t.can_sign), cohorts: cohorts });
     });
   });
 

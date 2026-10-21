@@ -71,6 +71,7 @@
     box.replaceChildren();
     rowsById = {};
     document.querySelector('[data-count]').replaceChildren(U.facts([['Waiting', String(waiting.length)]]));
+    $('.ui-toolbar').hidden = !waiting.length;
     if (!waiting.length) { box.appendChild(U.empty('Nothing is waiting to be signed.')); drawKey(); return; }
     var list = U.rows();
     waiting.forEach(function (w) {

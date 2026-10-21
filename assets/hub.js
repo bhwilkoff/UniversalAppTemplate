@@ -269,6 +269,7 @@
       // Take them off the cohort's GitHub team too, so the conversation
       // closes when membership does.
       db.functions.invoke('cohort-access', { body: { action: 'leave', cohort_id: leaving } }).catch(function () {});
+      if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles();
       load();
     });
   });
@@ -303,6 +304,7 @@
           // team yet, the cohort page offers it again later.
           db.functions.invoke('cohort-access', { body: { action: 'join', cohort_id: c.id } }).catch(function () {});
           joining = null;
+          if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); 
           history.replaceState(null, '', '/account/');
           load();
         });

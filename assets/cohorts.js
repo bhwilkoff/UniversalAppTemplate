@@ -70,7 +70,7 @@
             db.rpc('join_as_mentor', { c: c.id }).then(function (j) {
               if (j.error) { join.disabled = false; msg.textContent = 'Not joined: ' + j.error.message; return; }
               db.functions.invoke('cohort-access', { body: { action: 'join', cohort_id: c.id } }).catch(function () {});
-              location.assign('/cohort/?c=' + encodeURIComponent(c.slug));
+if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign('/cohort/?c=' + encodeURIComponent(c.slug));
             });
           });
           var actions = el('div', 'actions'); actions.appendChild(join); actions.appendChild(msg);

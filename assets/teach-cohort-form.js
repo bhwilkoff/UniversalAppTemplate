@@ -155,7 +155,7 @@
         var dup = /duplicate|unique/i.test(r.error.message);
         return say('[data-form-message]', dup ? 'Another cohort already uses that short name. Try another.' : 'It could not be saved: ' + r.error.message);
       }
-      location.assign('/teach/cohort/?c=' + r.data.id);
+if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign('/teach/cohort/?c=' + r.data.id);
     });
   });
 

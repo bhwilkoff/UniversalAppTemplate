@@ -12,12 +12,15 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261021e">
+  <link rel="stylesheet" href="/assets/site.css?v=20261021f">
   <script>
     (function () {
       var q = location.search, t = null;
       if (/[?&]dark\b/.test(q)) t = 'dark'; else if (/[?&]light\b/.test(q)) t = 'light';
       if (t) document.documentElement.setAttribute('data-theme', t);
+      // Signed in: the page wears the hub's sidebar (PAGES.md), chosen before
+      // it draws, from the session this browser keeps.
+      try { var se = JSON.parse(localStorage.getItem('sb-bifrieqzkihuxfzttgvd-auth-token') || 'null'); if (se && se.user && se.expires_at * 1000 > Date.now() - 7 * 864e5) document.documentElement.setAttribute('data-signed-in', ''); } catch (e) {}
     })();
   </script>
 </head>

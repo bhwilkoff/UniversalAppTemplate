@@ -289,6 +289,7 @@
     }), db).then(function (r) {
       if (r.error) throw r.error;
       err.textContent = '';
+      if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); 
       makeForm.hidden = true;
       return openPoll().then(function () { $('[data-made]').scrollIntoView({ block: 'start' }); });
     }).catch(function (x) {

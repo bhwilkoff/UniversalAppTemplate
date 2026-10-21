@@ -36,11 +36,17 @@ functionality is possible from the page you are on."
 From research/notes/navigation-and-wayfinding-notes.md (Canvas, Classroom,
 Moodle, GitHub, GOV.UK, NN/g, WCAG 2.2).
 
-- **The site header** keeps Principles, Cohorts, Apps, and Events for
-  everyone. Signed in, Home comes first; anyone who teaches also gets
-  Teaching, second; an admin's account menu adds Run the hub. Items are only
-  ever added, never reordered (WCAG 3.2.3). The current one is underlined
-  as well as colored.
+- **Signed out, the site header** holds Principles, Cohorts, Apps, and
+  Events. **Signed in, the site is a workspace** (Ben: the public pages
+  "don't really work as a learning platform for a logged in user who is
+  trying to focus on either teaching or learning"): the header keeps only
+  the wordmark and the account button, and a sidebar (`site.js`) lists the
+  person's own things in a fixed order: Home, each of their cohorts by
+  name, Exchanges, Teaching (teachers), and Running the hub (admins), with
+  the public pages (Open cohorts, Apps, Events, Principles, and the
+  Teaching guide for teachers) in a quieter group below. Below 64rem the
+  sidebar is a drawer behind Menu. The current item is marked by weight and
+  a tint, not color alone.
 - **An area's row of links** (`.area-nav`) sits at the top of every page in
   that area, in a fixed order, each item its own page, the current one
   underlined: Teaching (Desk, Feedback, Polls, then Requests to teach and
@@ -86,7 +92,9 @@ Moodle, GitHub, GOV.UK, NN/g, WCAG 2.2).
 | `/live/?c=` | One cohort's live session | Take part; a teacher runs it |
 | `/board/?c=`, `/card/?c=` | The live session's board; its card for OBS | Draw; show the card |
 | `/exchange/#<link>` | One exchange | Watch, add a video |
+| `/exchanges/` | Your exchanges | Open one, start one |
 | `/exchange/new/` (`?c=` for a cohort) | Starting an exchange | Record the opening video and start it |
+| `/apps/mine/` | Your own app, outside a cohort | Add or change it, show it on the apps page, take it off |
 
 ## A teacher
 
@@ -119,9 +127,12 @@ Who teaches or belongs to one cohort stays with that cohort's teachers, on
 
 Each line is work to do; remove it when the page matches its row.
 
-- `/account/` still shows cohorts you are in, notes from teachers, stages,
-  and mentoring, which belong on `/` and `/cohort/`.
-- `/` and `/cohort/` still open the new-exchange form in place.
+- Most pages still explain themselves in sentences; the audit in
+  research/notes/audit-2026-10-21/ lists each one and the component
+  (DESIGN-KIT.md, `assets/ui.js`) that replaces it.
+- `/teach/cohort/` is one long page; the teacher audit recommends tabs per
+  job (Overview, Sessions, Follow-up, People, Groups, Apps, Credentials,
+  Settings).
 - `/signin-check/` is a temporary diagnostic page and should go once the
   Safari sign-in hang is settled.
 - `/design/…` holds old design explorations at public addresses.
