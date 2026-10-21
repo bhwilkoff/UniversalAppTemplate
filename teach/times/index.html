@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261015a">
+  <link rel="stylesheet" href="/assets/site.css?v=20261021a">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -24,10 +24,9 @@
   <script src="/assets/site.js?v=20261014a" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" defer></script>
   <script src="/assets/hub-config.js?v=20261016a" defer></script>
-  <script src="/assets/times-lib.js?v=20261009g" defer></script>
-  <script src="/assets/times-grid.js?v=20261009g" defer></script>
-  <script src="/assets/times-calendar.js?v=20261009b" defer></script>
-  <script src="/assets/teach-times.js?v=20261014a" defer></script>
+  <script src="/assets/times-lib.js?v=20261021a" defer></script>
+  <script src="/assets/teach-times-page.js?v=20261021a" defer></script>
+  <script src="/assets/teach-times.js?v=20261021a" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to the page</a>
@@ -82,90 +81,7 @@
         <section class="account-state" data-state="teacher" hidden>
           <h2>Your polls</h2>
           <div data-poll-list></div>
-          <p><button class="btn-secondary" type="button" data-new-poll>Make a new poll</button></p>
-
-          <form class="cohort-form times-new" data-poll-form hidden novalidate>
-            <h2>A new poll</h2>
-            <label>Your name, as people will see it <input name="host_name" maxlength="80" autocomplete="name"></label>
-            <label>What people will see at the top <input name="title" maxlength="120" placeholder="A Tuesday or Thursday evening cohort, this winter" autocomplete="off"></label>
-            <label>A note to them, if you would like one <span class="hint">Who the cohort is for, or anything that would help someone decide.</span><textarea name="note" rows="3" maxlength="1500"></textarea></label>
-            <label data-cohort-field hidden>The cohort it is for <span class="hint">Its other teachers will see the answers too.</span><select name="cohort_id"><option value="">Not a cohort yet</option></select></label>
-            <fieldset class="times-days">
-              <legend>Days to offer</legend>
-              <div class="times-day-list"><label class="check"><input type="checkbox" name="days" value="0"> Sunday</label><label class="check"><input type="checkbox" name="days" value="1" checked> Monday</label><label class="check"><input type="checkbox" name="days" value="2" checked> Tuesday</label><label class="check"><input type="checkbox" name="days" value="3" checked> Wednesday</label><label class="check"><input type="checkbox" name="days" value="4" checked> Thursday</label><label class="check"><input type="checkbox" name="days" value="5"> Friday</label><label class="check"><input type="checkbox" name="days" value="6"> Saturday</label></div>
-            </fieldset>
-            <fieldset class="times-days">
-              <legend>Parts of the day to offer</legend>
-              <p class="hint">Choose as many as you like, in the time zone below. Each offers its start times; a session may run past the end.</p>
-              <div class="times-day-list times-part-list"><label class="check"><input type="checkbox" name="parts" value="early"> Early morning, 6 to 8 AM</label><label class="check"><input type="checkbox" name="parts" value="morning"> Morning, 8 AM to noon</label><label class="check"><input type="checkbox" name="parts" value="midday"> Midday, noon to 2 PM</label><label class="check"><input type="checkbox" name="parts" value="afternoon"> Afternoon, 2 to 5 PM</label><label class="check"><input type="checkbox" name="parts" value="evening"> Evening, 5 to 9 PM</label><label class="check"><input type="checkbox" name="parts" value="late"> Late evening, 9 to 11 PM</label></div>
-            </fieldset>
-            <label class="times-step">Start times every <select name="step"><option value="15">15 minutes</option><option value="30" selected>30 minutes</option><option value="60">hour</option></select></label>
-            <div class="row">
-              <label>In the time zone <select name="time_zone" data-zone-pick></select></label>
-              <label>Sessions last <select name="session_minutes"><option value="60">an hour</option><option value="75" selected>75 minutes</option><option value="90">90 minutes</option><option value="120">two hours</option></select></label>
-              <label>Week 1 begins <input type="date" name="starts_on"><span class="hint">Optional. Times are converted for each person using this week's daylight saving.</span></label>
-            </div>
-            <p class="error" role="status" data-form-error></p>
-            <div class="actions">
-              <button class="btn-primary" type="submit">Make the poll</button>
-              <button class="btn-secondary" type="button" data-cancel>Cancel</button>
-            </div>
-          </form>
-
-          <section class="times-detail" data-detail hidden aria-labelledby="detail-title">
-            <h2 id="detail-title" data-detail-title></h2>
-            <p class="small" data-detail-facts></p>
-            <form class="inline-form times-host-name" data-host-name-form>
-              <label>Your name on this poll <input name="host_name" maxlength="80" autocomplete="name"></label>
-              <div class="actions"><button class="btn-secondary" type="submit">Save the name</button><span class="small" role="status" data-host-name-status></span></div>
-            </form>
-
-            <section class="times-host" aria-labelledby="host-times-title">
-              <h3 id="host-times-title">Your own times</h3>
-              <p class="hint" data-host-hint>Mark the times you could make. They count like everyone else's, and the people answering see a dot on each one, so they know which times could really work.</p>
-              <div class="times-calendar" data-host-calendar hidden>
-                <button class="btn-secondary" type="button" data-cal-check>Check my Google Calendar</button>
-                <p class="hint">Google tells this page only when you are busy, never what you are doing, and nothing from your calendar is saved.</p>
-                <p class="times-status" role="status" aria-live="polite" data-cal-line></p>
-                <p class="times-wake" data-cal-wake hidden>Marking free times between <input type="time" value="08:00" step="900" data-wake-from aria-label="The earliest start time to mark"> and <input type="time" value="20:00" step="900" data-wake-to aria-label="The latest start time to mark">, your time.</p>
-              </div>
-              <div class="times-mode" role="radiogroup" aria-label="What tapping a time marks">
-                <label class="times-mode-opt"><input type="radio" name="host_mode" value="works" checked><span class="swatch works" aria-hidden="true"></span>Works for me</label>
-                <label class="times-mode-opt"><input type="radio" name="host_mode" value="if_need_be"><span class="swatch maybe" aria-hidden="true"></span>If need be</label>
-              </div>
-              <div class="times-grid-wrap" data-host-grid></div>
-              <div class="actions"><button class="btn-secondary" type="button" data-host-save>Save my times</button><span class="small" role="status" data-host-status></span></div>
-            </section>
-            <div class="times-share">
-              <label>The link to share <input readonly data-share-link></label>
-              <div class="actions">
-                <button class="btn-primary" type="button" data-copy-share>Copy the link</button>
-                <a class="btn-secondary" data-open-share target="_blank" rel="noopener">See it as they will</a>
-              </div>
-              <p class="hint">Anyone with this link can answer, so share it with the people you are inviting rather than posting it in public.</p>
-            </div>
-
-            <h3>What people said</h3>
-            <p class="small" data-answer-count></p>
-            <div class="times-zone">
-              <label>Shown in <select data-detail-zone></select></label>
-            </div>
-            <div class="times-legend" aria-hidden="true"><span>Fewer people</span><span class="times-ramp"><i class="h1"></i><i class="h2"></i><i class="h3"></i><i class="h4"></i></span><span>More</span></div>
-            <div class="times-grid-wrap" data-detail-grid></div>
-            <div class="times-who-list" data-who aria-live="polite"></div>
-
-            <h3>The times the most people can make</h3>
-            <ol class="times-best" data-best></ol>
-
-            <h3>Everyone who answered</h3>
-            <div class="table-wrap"><table class="times-answers"><thead><tr><th scope="col">Name</th><th scope="col">Email</th><th scope="col">Times</th><th scope="col">Note</th><th scope="col"><span class="visually-hidden">Remove</span></th></tr></thead><tbody data-answers></tbody></table></div>
-
-            <div class="actions">
-              <button class="btn-secondary" type="button" data-toggle-open></button>
-              <button class="btn-danger" type="button" data-delete>Delete this poll</button>
-            </div>
-            <p class="small" role="status" data-detail-status></p>
-          </section>
+          <p><a class="btn-secondary" href="/teach/times/new/">Make a new poll</a></p>
         </section>
       </div>
     </div>

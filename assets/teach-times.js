@@ -1,323 +1,34 @@
-// A teacher's polls for finding a weekly time (/teach/times/; migration
-// 20261009010000). The database decides who may see and change a poll and
-// its answers; this page only asks. The page counts and orders the
-// answers, and the teacher chooses the time.
+// A teacher's polls for finding a weekly time, as a list (/teach/times/;
+// migration 20261009010000). Each poll has its own page, /teach/times/poll/,
+// and a new one is made on /teach/times/new/.
 (function () {
   var root = document.querySelector('[data-teach-times]');
-  if (!root || !window.supabase || !window.HUB || !window.TimesLib || !window.TimesGrid) return;
-  var T = window.TimesLib, G = window.TimesGrid;
-  var db = (window.HUB.client ? window.HUB.client() : window.supabase.createClient(window.HUB.url, window.HUB.key));
-  var me = null, myName = '', hostMarks = {}, hostTouched = {}, lastHostPoll = null, hostTable = null, polls = [], current = null, answers = [], zone = G.myZone(), picked = null, table = null;
-  var form = root.querySelector('[data-poll-form]');
+  if (!root || !window.supabase || !window.HUB || !window.TimesLib || !window.TeachTimesPage) return;
+  var T = window.TimesLib, P = window.TeachTimesPage, el = P.el;
 
-  function $(sel) { return root.querySelector(sel); }
-  function el(tag, cls, text) {
-    var n = document.createElement(tag);
-    if (cls) n.className = cls;
-    if (text != null) n.textContent = text;
-    return n;
+  // Old links named one poll as /teach/times/#<its id>.
+  if (/^#[0-9a-f-]{36}$/.test(location.hash)) {
+    location.replace('/teach/times/poll/?p=' + location.hash.slice(1));
+    return;
   }
-  function show(state) {
-    root.querySelectorAll('.account-state').forEach(function (s) { s.hidden = s.getAttribute('data-state') !== state; });
-  }
-  function fail(message) { $('[data-error-text]').textContent = message; show('error'); }
-  function said(e) { return e && e.message ? e.message : String(e || 'no details'); }
-  function shareUrl(p) { return location.origin + '/times/#' + p.token; }
-  function daysText(p) { return p.days.map(function (d) { return T.DAYS[d]; }).join(', '); }
-  function windowText(p) { return T.hoursText(p); }
 
-  // ---- the list -----------------------------------------------------
-  function loadList() {
-    return db.from('time_polls').select('*, time_poll_answers(count)').order('created_at', { ascending: false }).then(function (r) {
-      if (r.error) return fail('Your polls could not be loaded: ' + r.error.message);
-      polls = r.data;
-      var box = $('[data-poll-list]');
+  var page = P.start(root, function (db) {
+    return db.from('time_polls').select('*, time_poll_answers(count), cohorts(title)').order('created_at', { ascending: false }).then(function (r) {
+      if (r.error) return page.fail('Your polls could not be loaded: ' + r.error.message);
+      var box = root.querySelector('[data-poll-list]');
       box.replaceChildren();
-      if (!polls.length) box.appendChild(el('p', 'small', 'You have not made a poll yet.'));
-      polls.forEach(function (p) {
+      if (!r.data.length) box.appendChild(el('p', 'small', 'You have not made a poll yet.'));
+      r.data.forEach(function (p) {
         var n = (p.time_poll_answers[0] || {}).count || 0;
         var card = el('article', 'cohort-card');
-        card.appendChild(el('h3', null, p.title));
-        card.appendChild(el('p', 'small', (p.open ? 'Taking answers' : 'Closed') + ', ' + n + (n === 1 ? ' answer' : ' answers') + '. ' + daysText(p) + ', ' + windowText(p) + '.'));
-        var open = el('button', 'btn-secondary', 'Open');
-        open.type = 'button';
-        open.addEventListener('click', function () { openPoll(p.id); });
-        var a = el('div', 'actions'); a.appendChild(open); card.appendChild(a);
+        var h = card.appendChild(el('h3'));
+        var a = h.appendChild(el('a', null, p.title));
+        a.href = '/teach/times/poll/?p=' + p.id;
+        var state = (p.open ? 'Taking answers' : 'Closed') + (p.cohorts ? ', for ' + p.cohorts.title : '');
+        card.appendChild(el('p', 'small', state + ', ' + n + (n === 1 ? ' answer' : ' answers') + '. ' +
+          p.days.map(function (d) { return T.DAYS[d]; }).join(', ') + ', ' + T.hoursText(p) + '.'));
         box.appendChild(card);
       });
     });
-  }
-
-  // ---- making one ---------------------------------------------------
-  function loadCohorts() {
-    return db.from('cohort_teachers').select('cohorts(id, title, status, starts_on, time_zone)').eq('user_id', me.id).then(function (r) {
-      if (r.error) return;
-      var list = r.data.map(function (x) { return x.cohorts; }).filter(function (c) { return c && c.status !== 'finished'; });
-      var sel = form.elements.cohort_id;
-      list.forEach(function (c) { var o = el('option', null, c.title); o.value = c.id; o.dataset.starts = c.starts_on || ''; o.dataset.zone = c.time_zone || ''; sel.appendChild(o); });
-      $('[data-cohort-field]').hidden = !list.length;
-    });
-  }
-  form.elements.cohort_id.addEventListener('change', function (e) {
-    var o = e.target.selectedOptions[0];
-    if (o && o.dataset.starts && !form.elements.starts_on.value) form.elements.starts_on.value = o.dataset.starts;
-    if (o && o.dataset.zone) form.elements.time_zone.value = o.dataset.zone;
   });
-  $('[data-new-poll]').addEventListener('click', function () {
-    form.hidden = false;
-    $('[data-detail]').hidden = true;
-    form.elements.title.focus();
-  });
-  $('[data-cancel]').addEventListener('click', function () { form.hidden = true; });
-  form.addEventListener('submit', function (e) {
-    e.preventDefault();
-    var f = form.elements;
-    var checked = T.checkPoll({
-      title: f.title.value, host_name: f.host_name.value, note: f.note.value, cohort_id: f.cohort_id.value,
-      days: Array.prototype.filter.call(form.querySelectorAll('input[name="days"]'), function (c) { return c.checked; }).map(function (c) { return c.value; }),
-      parts: Array.prototype.filter.call(form.querySelectorAll('input[name="parts"]'), function (c) { return c.checked; }).map(function (c) { return c.value; }),
-      step: f.step.value, time_zone: f.time_zone.value,
-      session_minutes: f.session_minutes.value, starts_on: f.starts_on.value
-    });
-    var err = $('[data-form-error]');
-    if (checked.error) { err.textContent = checked.error; return; }
-    err.textContent = 'Saving…';
-    var btn = form.querySelector('button[type="submit"]');
-    btn.disabled = true;
-    G.within(db.from('time_polls').insert(checked.row).select('id').single(), db).then(function (r) {
-      if (r.error) { err.textContent = 'The poll was not made: ' + r.error.message; return; }
-      err.textContent = '';
-      form.reset();
-      form.elements.time_zone.value = zone;
-      form.elements.host_name.value = myName;
-      form.hidden = true;
-      return loadList().then(function () { return openPoll(r.data.id); });
-    }).catch(function (e) {
-      err.textContent = 'The poll may not have been made: ' + said(e) + '. Your answers are still in the form. If it appears in your polls above, it was saved.';
-      loadList();
-    }).then(function () { btn.disabled = false; });
-  });
-
-  // ---- one poll -----------------------------------------------------
-  function level(n, most) {
-    if (!n) return '';
-    return 'h' + Math.max(1, Math.ceil((n / most) * 4));
-  }
-  function cellFor(tally) {
-    var most = 1;
-    Object.keys(tally.works).concat(Object.keys(tally.if_need_be)).forEach(function (s) {
-      most = Math.max(most, (tally.works[s] || 0) + (tally.if_need_be[s] || 0));
-    });
-    return function (slot) {
-      var n = tally.works[slot] || 0, k = tally.if_need_be[slot] || 0;
-      return {
-        cls: level(n + k, most) + (slot === picked ? ' picked' : ''),
-        text: n + k ? String(n + k) : '',
-        label: n + ' can make it' + (k ? ', ' + k + ' if need be' : ''),
-        pressed: slot === picked ? 'true' : 'false'
-      };
-    };
-  }
-  function showWho(slot) {
-    picked = picked === slot ? null : slot;
-    var box = $('[data-who]');
-    box.replaceChildren();
-    G.refresh(table, cellFor(T.tallyOf(answers)));
-    if (picked == null) return;
-    box.appendChild(el('h4', null, T.slotText(current, slot, zone)));
-    var yes = answers.filter(function (a) { return a.works.indexOf(slot) >= 0; }).map(function (a) { return a.name; });
-    var maybe = answers.filter(function (a) { return a.if_need_be.indexOf(slot) >= 0; }).map(function (a) { return a.name; });
-    box.appendChild(el('p', null, yes.length ? 'Can make it: ' + yes.join(', ') + '.' : 'No one has said this time works.'));
-    if (maybe.length) box.appendChild(el('p', null, 'If need be: ' + maybe.join(', ') + '.'));
-  }
-  function drawGrid() {
-    var tally = T.tallyOf(answers);
-    table = G.render($('[data-detail-grid]'), {
-      poll: current, zone: zone, cell: cellFor(tally), onCell: showWho,
-      caption: 'How many people can make each time, in ' + T.zoneName(zone)
-    });
-    var best = $('[data-best]');
-    best.replaceChildren();
-    var top = T.bestTimes(tally, 5);
-    if (!top.length) best.appendChild(el('li', null, 'No answers yet.'));
-    top.forEach(function (b) {
-      best.appendChild(el('li', null, T.slotText(current, b.slot, zone) + ': ' + b.works + ' can make it' + (b.if_need_be ? ', ' + b.if_need_be + ' if need be' : '') + '.'));
-    });
-  }
-  function drawAnswers() {
-    $('[data-answer-count]').textContent = answers.length
-      ? answers.length + (answers.length === 1 ? ' person has' : ' people have') + ' answered. Choose a time to see who can make it.'
-      : 'No one has answered yet.';
-    var body = $('[data-answers]');
-    body.replaceChildren();
-    answers.forEach(function (a) {
-      var tr = el('tr');
-      tr.appendChild(el('td', null, a.host ? a.name + (current.created_by === me.id ? ' (you)' : ' (teacher)') : a.name));
-      tr.appendChild(el('td', null, a.contact || ''));
-      tr.appendChild(el('td', null, a.works.length + (a.if_need_be.length ? ', and ' + a.if_need_be.length + ' if need be' : '')));
-      tr.appendChild(el('td', null, a.comment || ''));
-      var td = el('td');
-      tr.appendChild(td);
-      body.appendChild(tr);
-      if (a.host) return;
-      var rm = el('button', 'btn-danger small', 'Remove');
-      rm.type = 'button';
-      rm.setAttribute('aria-label', 'Remove ' + a.name + "'s answer");
-      rm.addEventListener('click', function () {
-        if (!window.confirm('Remove ' + a.name + "'s answer? This cannot be undone.")) return;
-        G.within(db.from('time_poll_answers').delete().eq('id', a.id), db).catch(function (e) { return { error: { message: said(e) } }; }).then(function (r) {
-          if (r.error) { $('[data-detail-status]').textContent = 'It was not removed: ' + r.error.message; return; }
-          openPoll(current.id);
-          loadList();
-        });
-      });
-      td.appendChild(rm);
-    });
-  }
-  function openPoll(id) {
-    current = polls.filter(function (p) { return p.id === id; })[0];
-    if (!current) return Promise.resolve();
-    picked = null;
-    $('[data-who]').replaceChildren();
-    return db.from('time_poll_answers').select('id, name, contact, comment, works, if_need_be, created_at, host').eq('poll_id', id).order('created_at').then(function (r) {
-      if (r.error) return fail('The answers could not be loaded: ' + r.error.message);
-      answers = r.data;
-      var d = $('[data-detail]');
-      $('[data-detail-title]').textContent = current.title;
-      $('[data-detail-facts]').textContent = (current.open ? 'Taking answers. ' : 'Closed. ') + daysText(current) + ', starting ' + windowText(current) + ', every ' + current.step_minutes + ' minutes, in ' + T.zoneName(current.time_zone) + '. Sessions of ' + current.session_minutes + ' minutes' + (current.starts_on ? ', beginning the week of ' + current.starts_on : '') + '.';
-      $('[data-share-link]').value = shareUrl(current);
-      $('[data-open-share]').href = shareUrl(current);
-      $('[data-toggle-open]').textContent = current.open ? 'Stop taking answers' : 'Take answers again';
-      $('[data-detail-status]').textContent = '';
-      G.fillZones($('[data-detail-zone]'), zone);
-      $('[data-host-name-form]').elements.host_name.value = current.host_name || myName;
-      $('[data-host-name-status]').textContent = '';
-      $('[data-host-status]').textContent = '';
-      if (!current || current.id !== lastHostPoll) { hostCal.reset(); hostTouched = {}; lastHostPoll = current.id; }
-      hostMarks = {};
-      answers.filter(function (a) { return a.host; }).forEach(function (a) {
-        a.works.forEach(function (x) { hostMarks[x] = 'works'; });
-        a.if_need_be.forEach(function (x) { hostMarks[x] = 'if_need_be'; });
-      });
-      drawHost();
-      drawGrid();
-      drawAnswers();
-      d.hidden = false;
-    });
-  }
-  // ---- the teacher's own name and times ---------------------------------
-  function hostMode() { return root.querySelector('input[name="host_mode"]:checked').value; }
-  function hostCell(slot) {
-    var m = hostMarks[slot], busy = hostCal.busy();
-    var c = {
-      cls: m === 'works' ? 'works' : m === 'if_need_be' ? 'maybe' : '',
-      pressed: m === 'works' ? 'true' : m === 'if_need_be' ? 'mixed' : 'false',
-      label: m === 'works' ? 'works for you' : m === 'if_need_be' ? 'if need be' : 'not marked'
-    };
-    if (busy && busy.busy[slot]) {
-      c.cls += ' busy';
-      c.label += ', busy on your calendar ' + (busy.busy[slot] === busy.weeks ? 'every week' : 'in ' + busy.busy[slot] + ' of ' + busy.weeks + ' weeks');
-    }
-    return c;
-  }
-  var hostCal = window.TimesCalendar ? window.TimesCalendar.mount($('[data-host-calendar]'), {
-    poll: function () { return current; },
-    marks: function () { return hostMarks; },
-    touched: function () { return hostTouched; },
-    canMark: function () { return true; },
-    refresh: function () { G.refresh(hostTable, hostCell); },
-    after: 'Look them over, then save your times.'
-  }) : { busy: function () { return null; }, reset: function () {} };
-  var hostDragTo = null;
-  function drawHost() {
-    hostTable = G.render($('[data-host-grid]'), {
-      poll: current, zone: zone, cell: hostCell,
-      onCell: function (slot) {
-        hostTouched[slot] = true;
-        var want = hostMode();
-        if (hostMarks[slot] === want) delete hostMarks[slot]; else hostMarks[slot] = want;
-        G.refresh(hostTable, hostCell);
-      },
-      onDrag: function (slot, first) {
-        hostTouched[slot] = true;
-        if (first) hostDragTo = hostMarks[slot] === hostMode() ? null : hostMode();
-        if (hostDragTo) hostMarks[slot] = hostDragTo; else delete hostMarks[slot];
-        G.refresh(hostTable, hostCell);
-      },
-      caption: 'Your own times, in ' + T.zoneName(zone)
-    });
-  }
-  $('[data-host-save]').addEventListener('click', function (e) {
-    var works = [], maybe = [], btn = e.target, say = $('[data-host-status]');
-    Object.keys(hostMarks).forEach(function (x) { (hostMarks[x] === 'works' ? works : maybe).push(+x); });
-    btn.disabled = true;
-    say.textContent = 'Saving…';
-    var id = current.id;
-    G.within(db.rpc('set_host_times', { poll: id, works: works, if_need_be: maybe }), db).then(function (r) {
-      if (r.error) throw r.error;
-      return loadList().then(function () { return openPoll(id); }).then(function () {
-        $('[data-host-status]').textContent = works.length + maybe.length ? 'Your times are saved.' : 'Your times are cleared.';
-      });
-    }).catch(function (err) { say.textContent = 'Your times were not saved: ' + said(err) + '.'; })
-      .then(function () { btn.disabled = false; });
-  });
-  $('[data-host-name-form]').addEventListener('submit', function (e) {
-    e.preventDefault();
-    var name = e.target.elements.host_name.value.trim(), say = $('[data-host-name-status]'), id = current.id;
-    say.textContent = 'Saving…';
-    G.within(db.from('time_polls').update({ host_name: name || null }).eq('id', id), db).then(function (r) {
-      if (r.error) throw r.error;
-      return loadList().then(function () { return openPoll(id); }).then(function () { $('[data-host-name-status]').textContent = 'Saved.'; });
-    }).catch(function (err) { say.textContent = 'The name was not saved: ' + said(err) + '.'; });
-  });
-
-  $('[data-detail-zone]').addEventListener('change', function (e) { zone = e.target.value; picked = null; $('[data-who]').replaceChildren(); drawHost(); drawGrid(); });
-  $('[data-copy-share]').addEventListener('click', function (e) {
-    var input = $('[data-share-link]');
-    if (navigator.clipboard) navigator.clipboard.writeText(input.value).then(function () { e.target.textContent = 'Copied'; setTimeout(function () { e.target.textContent = 'Copy the link'; }, 2000); }, function () { input.select(); });
-    else input.select();
-  });
-  $('[data-toggle-open]').addEventListener('click', function () {
-    G.within(db.from('time_polls').update({ open: !current.open }).eq('id', current.id), db).catch(function (e) { return { error: { message: said(e) } }; }).then(function (r) {
-      if (r.error) { $('[data-detail-status]').textContent = 'Nothing changed: ' + r.error.message; return; }
-      var id = current.id;
-      loadList().then(function () { openPoll(id); });
-    });
-  });
-  $('[data-delete]').addEventListener('click', function () {
-    if (!window.confirm('Delete "' + current.title + '" and every answer to it? The link will stop working. This cannot be undone.')) return;
-    G.within(db.from('time_polls').delete().eq('id', current.id), db).catch(function (e) { return { error: { message: said(e) } }; }).then(function (r) {
-      if (r.error) { $('[data-detail-status]').textContent = 'It was not deleted: ' + r.error.message; return; }
-      $('[data-detail]').hidden = true;
-      current = null;
-      loadList();
-    });
-  });
-
-  // ---- start --------------------------------------------------------
-  function load() {
-    show('loading');
-    db.auth.getSession().then(function (s) {
-      var session = s.data && s.data.session;
-      if (!session) return show('signed-out');
-      me = session.user;
-      return db.from('teachers').select('user_id').eq('user_id', me.id).maybeSingle().then(function (r) {
-        if (r.error) return fail('Your teaching access could not be checked: ' + r.error.message);
-        if (!r.data) return show('not-teacher');
-        G.fillZones(form.elements.time_zone, zone);
-        show('teacher');
-        db.from('profiles').select('display_name, github_login').eq('id', me.id).maybeSingle().then(function (pr) {
-          if (pr.data) myName = (pr.data.display_name || '').trim() || pr.data.github_login || '';
-          if (!form.elements.host_name.value) form.elements.host_name.value = myName;
-        });
-        // The home page links to one poll as /teach/times/#<its id>.
-        return Promise.all([loadList(), loadCohorts()]).then(function () {
-          var id = location.hash.slice(1);
-          if (id && (polls || []).some(function (p) { return p.id === id; })) openPoll(id);
-        });
-      });
-    }).catch(function (err) { fail('Something went wrong: ' + said(err) + '.'); });
-  }
-  $('[data-reload]').addEventListener('click', load);
-  load();
 })();

@@ -276,7 +276,7 @@
     m.myPolls.forEach(function (p) {
       var n = (p.time_poll_answers && p.time_poll_answers[0] || {}).count || 0;
       ul.appendChild(row(p.title, (p.open ? 'Taking answers' : 'Closed') + ', with ' + (n === 0 ? 'no answers yet' : n === 1 ? 'one answer' : n + ' answers') + '.',
-        [link('/teach/times/#' + p.id, 'Open', 'btn-secondary small')]));
+        [link('/teach/times/poll/?p=' + p.id, 'Open', 'btn-secondary small')]));
     });
     m.answeredPolls.forEach(function (p) {
       ul.appendChild(row(p.title, 'You answered it' + (p.open ? '' : ', and it is closed now') + '.',

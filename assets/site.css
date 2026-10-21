@@ -2171,6 +2171,19 @@ ol.principles summary:focus-visible { outline: 2px solid var(--accent); outline-
 .times-detail { display: grid; gap: 0.9rem; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--rule); }
 .times-detail h3 { margin: 1.25rem 0 0; }
 .times-detail .actions { margin-top: 0.25rem; }
+.times-teach > .times-detail { margin-top: 0; padding-top: 0; border-top: 0; }
+/* Making a poll a cohort (/teach/times/poll/): an inset panel, since it is
+   the one step that changes more than the poll. */
+.times-cohort { display: grid; gap: 0.9rem; background: var(--card); border: 1px solid var(--rule); border-radius: var(--radius); padding: 1.25rem; margin-top: 1.25rem; }
+.times-cohort h3 { margin: 0; }
+.times-cohort [data-made] p { margin: 0 0 0.5rem; }
+.times-make { display: grid; gap: 0.9rem; }
+.times-invite-list { flex-direction: column; gap: 0; }
+.times-invite-list .small { color: var(--muted); }
+.times-invite { background: var(--card); border: 2px solid var(--accent); border-radius: var(--radius); padding: 1.25rem; margin-bottom: 1.25rem; }
+.times-invite h2 { margin: 0 0 0.5rem; font-size: 1.3rem; }
+.times-invite p { margin: 0 0 0.75rem; max-width: var(--measure); }
+.times-invite p:last-child { margin-bottom: 0; }
 .times-who-list h4 { margin: 0 0 0.25rem; font-size: 1rem; }
 .times-who-list p { margin: 0.2rem 0; }
 .times-best { margin: 0; padding-left: 1.4rem; }
