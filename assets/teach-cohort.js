@@ -40,7 +40,6 @@
       document.title = current.title + ' | Human Shaped';
       if (window.CohortNav) window.CohortNav.draw($('[data-cohort-nav]'), { cohort: current, teaching: true, member: false, current: 'teach' });
       $('[data-edit]').href = '/teach/cohort/edit/?c=' + current.id;
-      $('[data-student-view]').href = '/cohort/?c=' + encodeURIComponent(current.slug);
       currentGroups = res[3].data;
       var c = current;
       say('[data-detail-title]', c.title);
