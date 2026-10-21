@@ -214,8 +214,8 @@
       var tick = el('input'); tick.type = 'checkbox'; tick.name = 'invite'; tick.value = a.id;
       tick.checked = chosen.indexOf(a.id) >= 0;
       label.appendChild(tick);
-      label.appendChild(document.createTextNode(a.name + (a.contact ? ' (' + a.contact + ')' : '') + ', '));
-      label.appendChild(el('span', 'small', at === 'works' ? 'can make it' : at === 'if_need_be' ? 'if need be' : 'not this time'));
+      var words = label.appendChild(el('span', null, a.name + (a.contact ? ' (' + a.contact + ')' : '') + ', '));
+      words.appendChild(el('span', 'small', at === 'works' ? 'can make it' : at === 'if_need_be' ? 'if need be' : 'not this time'));
       box.appendChild(label);
     });
     if (!box.children.length) box.appendChild(el('p', 'small', 'No one has answered yet.'));
