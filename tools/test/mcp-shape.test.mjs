@@ -223,7 +223,7 @@ test('someone building on their own hears about their own app and their own mark
 test('a private, hidden, or missing own app is said plainly', () => {
   assert.match(ownAppText({ app_repo: 'a/b', public: false }, null, []), /private to you/);
   assert.match(ownAppText({ app_repo: 'a/b', public: true }, { reason: 'unsafe' }, []), /kept off the apps page.*because: unsafe\. Your own switch is unchanged/);
-  assert.match(ownAppText(null, null, []), /account\/#own-app/);
+  assert.match(ownAppText(null, null, []), /apps\/mine\//);
   assert.match(ownAppText(null, null, [{ stage: 'setup', item: 'ready', state: 'ready' }]), /Setup: ready to move on \(method part "setup"\)/);
 });
 

@@ -160,7 +160,7 @@ export function ownAppText(app, hide, marks) {
     else if (app.public) lines.push(`On the hub: shown, at ${SITE}/apps/app/?r=${app.app_repo}`);
     else lines.push('On the hub: private to you. Only you can choose to show it.');
   } else {
-    lines.push(`No app of your own on the hub yet. You can add one, private until you choose to show it, at ${SITE}/account/#own-app.`);
+    lines.push(`No app of your own on the hub yet. You can add one, private until you choose to show it, at ${SITE}/apps/mine/.`);
   }
   const label = (stage) => (stage === 'setup' ? 'Setup' : 'Stage ' + stage);
   const part = (stage) => (stage === 'setup' ? 'setup' : stagePart(stage));
@@ -188,7 +188,7 @@ export function ownReviewPrompt(stage) {
   const part = stage ? (stage === 'setup' ? 'setup' : stagePart(stage)) : null;
   return [
     `Please give me a human-shaped review of the app I am building on my own${part ? `, at the method part "${part}"` : ''}.`,
-    `First call my_app to see my app and my own marks on the stages. If it has no app yet, ask me which repository to read, and tell me I can keep it on the hub at ${SITE}/account/#own-app if I want to. Then call method with part "review-skill" and follow that skill exactly${part ? `, and call method with part "${part}" for what that stage asks` : ', choosing the stage from my marks (the first one I have not marked ready)'}, reading my repository for evidence.`,
+    `First call my_app to see my app and my own marks on the stages. If it has no app yet, ask me which repository to read, and tell me I can keep it on the hub at ${SITE}/apps/mine/ if I want to. Then call method with part "review-skill" and follow that skill exactly${part ? `, and call method with part "${part}" for what that stage asks` : ', choosing the stage from my marks (the first one I have not marked ready)'}, reading my repository for evidence.`,
     'Open the review with a line that says it is AI feedback, naming yourself, your model, and today\'s date. Give no scores or grades, and do not compare me with anyone. Say plainly what you could not see. Ask the questions the method asks rather than answering them for me.',
     `Write the review to a file in my repository and stop there. Do not share it anywhere. Without a cohort there is no teacher reading this, so if I want people to see the work, I can show the app on the hub or bring it to an event (${SITE}/events/).`,
   ].join('\n\n');
