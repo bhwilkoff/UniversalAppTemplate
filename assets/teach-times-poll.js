@@ -226,7 +226,7 @@
     $('[data-made]').hidden = !made;
     if (made) {
       var state = { draft: 'A draft, so no one can join yet.', open: 'Open for joining.', running: 'Running.', finished: 'Finished.' }[cohort.status] || '';
-      $('[data-made-line]').textContent = TL.scheduleText(cohort, zone) + '. ' + TL.openingLine(cohort) + ' ' + state;
+      $('[data-made-line]').textContent = TL.scheduleText(cohort, zone) + ' ' + TL.openingLine(cohort) + ' ' + state;
       var noMail = people.filter(function (a) { return !a.contact; }).map(function (a) { return a.name; });
       $('[data-made-who]').textContent = 'Invited: ' + people.map(function (a) { return a.name; }).join(', ') + '.' +
         (noMail.length ? ' No email address from ' + noMail.join(', ') + '.' : '');

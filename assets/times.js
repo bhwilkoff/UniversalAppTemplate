@@ -149,7 +149,7 @@
     box.hidden = !invite;
     if (!invite) return;
     $('[data-invite-title]').textContent = 'You are invited to ' + invite.title + '.';
-    var line = window.TeachLib ? window.TeachLib.scheduleText(invite, zone) + '. ' + window.TeachLib.openingLine(invite) : '';
+    var line = window.TeachLib ? window.TeachLib.scheduleText(invite, zone) + ' ' + window.TeachLib.openingLine(invite) : '';
     if (invite.status !== 'open') line += invite.status === 'draft' ? ' It is not open for joining yet; the way to join will be here when it is.' : ' It is no longer taking new people, so write to ' + poll.teacher + ' about joining.';
     $('[data-invite-line]').textContent = line;
     $('[data-invite-join-box]').hidden = invite.status !== 'open';
