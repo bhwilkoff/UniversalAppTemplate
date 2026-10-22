@@ -115,6 +115,7 @@ mirrors it; a test checks they match):
 - invitation: Not joined (off), Invited (waiting), Joined (done), Failed (problem)
 - exchange: Open (active), Closed (off)
 - task: Done (done), To do (waiting), Optional (waiting), Cannot start yet (off)
+- watch: Watching (active)
 - connection: Live (active), Checking (waiting), Offline (problem)
 - key: Ready (done), Not chosen (waiting)
 - work: Ready (done), Not yet (waiting), Confirmed (done)

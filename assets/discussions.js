@@ -101,13 +101,17 @@
     var where = D.splitRepo(o.repo);
     var tok = token(o.db, o.session);
     var list = null, openId = null;
+    // The toolbar the cohort page gives (Open on GitHub, Watch) gets the
+    // one filled button first: starting a conversation, which opens its
+    // form under the toolbar.
+    var bar = o.toolbar || null, startButton = null, starting = null;
     var area = el('div', 'talk');
     box.appendChild(area);
     if (!where) return;
     if (!tok) { noToken(area, o.db, o.repo, false, false); return; }
 
     function load(thenOpen) {
-      area.replaceChildren(el('p', 'small', 'Reading the conversation from GitHub…'));
+      area.replaceChildren(el('div', 'ui-skeleton'));
       D.ask(tok, D.LIST, { owner: where.owner, name: where.name, n: 5 }).then(function (r) {
         area.replaceChildren();
         if (r.problem) return trouble(r.problem);
@@ -127,15 +131,38 @@
 
     function draw() {
       area.replaceChildren();
+      drawStart();
       var ol = el('ol', 'talk-list');
-      if (!list.discussions.length) area.appendChild(el('p', 'small', 'No one has started a conversation yet, so the first one could be yours.'));
+      if (!list.discussions.length) area.appendChild(window.UI.empty('No conversations yet'));
       list.discussions.forEach(function (d) { ol.appendChild(item(d)); });
       if (list.discussions.length) area.appendChild(ol);
-      var foot = el('p', 'small talk-foot');
-      if (list.total > list.discussions.length) foot.appendChild(link(list.url + '/discussions', 'All ' + list.total + ' conversations on GitHub'));
-      foot.appendChild(button('Read it again', 'btn-secondary small', function () { load(openId); }));
-      area.appendChild(foot);
-      area.appendChild(startForm());
+      if (list.total > list.discussions.length) {
+        var foot = el('p', 'small talk-foot');
+        foot.appendChild(link(list.url + '/discussions', 'All ' + list.total + ' conversations on GitHub'));
+        area.appendChild(foot);
+      }
+    }
+
+    // Starting a conversation: a button first in the toolbar, its form
+    // under it, closed again by Cancel or by posting.
+    function drawStart() {
+      var cats = D.postableCategories(list.categories);
+      if (!cats.length) return;
+      if (!starting) {
+        starting = startForm(cats);
+        starting.hidden = true;
+        box.insertBefore(starting, area);
+      }
+      if (startButton) return;
+      startButton = button('Start a conversation', 'btn-primary', function () {
+        starting.hidden = false; startButton.hidden = true; starting.querySelector('input').focus();
+      });
+      if (bar) bar.insertBefore(startButton, bar.firstChild); else box.insertBefore(startButton, starting);
+    }
+    function closeStart() {
+      if (!starting) return;
+      starting.reset(); starting.hidden = true;
+      if (startButton) { startButton.hidden = false; startButton.focus(); }
     }
 
     function item(d) {
@@ -169,7 +196,7 @@
       var box = li.querySelector('.talk-thread');
       li.querySelector('.talk-title').setAttribute('aria-expanded', 'true');
       box.hidden = false;
-      box.replaceChildren(el('p', 'small', 'Reading the thread…'));
+      box.replaceChildren(el('div', 'ui-skeleton'));
       D.ask(tok, D.THREAD, { id: id }).then(function (r) {
         if (r.problem && r.problem.kind === 'expired') return trouble(r.problem);
         box.replaceChildren();
@@ -193,20 +220,21 @@
     }
 
     function replyForm(t) {
-      var f = el('form', 'inline-form talk-form');
+      var f = el('form', 'cohort-form talk-form');
       var label = el('label', null, 'Your reply');
       var ta = el('textarea'); ta.rows = 3; ta.required = true; ta.maxLength = 65000;
-      label.appendChild(ta); f.appendChild(label);
-      f.appendChild(el('p', 'small hint', 'It goes to GitHub as yours, marked as sent from Human Shaped, and you can edit or delete it there.'));
+      label.appendChild(ta);
+      label.appendChild(el('span', 'hint', 'Posted as you; edit or delete it on GitHub.'));
+      f.appendChild(label);
       var acts = el('div', 'actions');
-      var b = el('button', 'btn-secondary', 'Post your reply'); b.type = 'submit';
-      var msg = el('span', 'small'); msg.setAttribute('role', 'status');
+      var b = el('button', 'btn-secondary', 'Post reply'); b.type = 'submit';
+      var msg = el('span', 'ui-inline-status'); msg.setAttribute('role', 'status');
       acts.appendChild(b); acts.appendChild(msg); f.appendChild(acts);
       f.addEventListener('submit', function (ev) {
         ev.preventDefault();
         var text = ta.value.trim();
         if (!text) return;
-        b.disabled = true; msg.textContent = 'Posting to GitHub…';
+        b.disabled = true; msg.textContent = 'Posting';
         var old = f.querySelector('.talk-problem'); if (old) old.remove();
         D.ask(tok, D.COMMENT, { discussionId: t.id, body: text }).then(function (r) {
           b.disabled = false;
@@ -222,29 +250,24 @@
       return f;
     }
 
-    function startForm() {
-      var cats = D.postableCategories(list.categories);
-      var wrap = el('details', 'talk-start');
-      wrap.appendChild(el('summary', null, 'Start a conversation'));
-      if (!cats.length) {
-        wrap.appendChild(el('p', 'small', 'This repository has no category a new conversation can go in yet, so start it on GitHub.'));
-        return wrap;
-      }
-      var f = el('form', 'inline-form talk-form');
-      var l1 = el('label', null, 'What it is about'); var title = el('input'); title.required = true; title.maxLength = 256; l1.appendChild(title); f.appendChild(l1);
-      var l2 = el('label', null, 'Where it belongs'); var sel = el('select');
+    function startForm(cats) {
+      var f = el('form', 'cohort-form talk-form talk-start');
+      var l1 = el('label', null, 'Title'); var title = el('input'); title.required = true; title.maxLength = 256; l1.appendChild(title); f.appendChild(l1);
+      var l2 = el('label', null, 'Category'); var sel = el('select');
       cats.forEach(function (c) { var op = el('option', null, c.name); op.value = c.id; sel.appendChild(op); });
       l2.appendChild(sel); f.appendChild(l2);
-      var l3 = el('label', null, 'What you want to say'); var ta = el('textarea'); ta.rows = 4; ta.required = true; ta.maxLength = 65000; l3.appendChild(ta); f.appendChild(l3);
-      f.appendChild((function () { var h = el('p', 'small hint'); h.appendChild(window.UI.visibility('cohort')); h.appendChild(document.createTextNode(' Posted to GitHub as you, and kept there if you leave.')); return h; })());
+      var l3 = el('label', null, 'Message'); var ta = el('textarea'); ta.rows = 4; ta.required = true; ta.maxLength = 65000; l3.appendChild(ta);
+      l3.appendChild(el('span', 'hint', 'Posted as you on GitHub, and kept there if you leave.'));
+      f.appendChild(l3);
       var acts = el('div', 'actions');
-      var b = el('button', 'btn-secondary', 'Post it to GitHub'); b.type = 'submit';
-      var msg = el('span', 'small'); msg.setAttribute('role', 'status');
-      acts.appendChild(b); acts.appendChild(msg); f.appendChild(acts);
+      var b = el('button', 'btn-primary', 'Post'); b.type = 'submit';
+      var cancel = button('Cancel', 'btn-secondary', function () { closeStart(); });
+      var msg = el('span', 'ui-inline-status'); msg.setAttribute('role', 'status');
+      acts.appendChild(b); acts.appendChild(cancel); acts.appendChild(msg); f.appendChild(acts);
       f.addEventListener('submit', function (ev) {
         ev.preventDefault();
         if (!title.value.trim() || !ta.value.trim()) return;
-        b.disabled = true; msg.textContent = 'Posting to GitHub…';
+        b.disabled = true; msg.textContent = 'Posting';
         var old = f.querySelector('.talk-problem'); if (old) old.remove();
         D.ask(tok, D.CREATE, { repositoryId: list.repositoryId, categoryId: sel.value, title: title.value.trim(), body: ta.value.trim() }).then(function (r) {
           b.disabled = false;
@@ -255,11 +278,12 @@
             return;
           }
           var made = r.data && r.data.createDiscussion && r.data.createDiscussion.discussion;
+          msg.textContent = '';
+          closeStart();
           load(made ? made.id : null);
         });
       });
-      wrap.appendChild(f);
-      return wrap;
+      return f;
     }
 
     load();
@@ -274,7 +298,7 @@
     box.replaceChildren();
     if (!where) return;
     if (!tok) return noToken(box, o.db, o.repo, false, true);
-    box.appendChild(el('p', 'small', 'Reading the conversation from GitHub…'));
+    box.appendChild(el('div', 'ui-skeleton'));
     D.ask(tok, D.LIST, { owner: where.owner, name: where.name, n: 3 }).then(function (r) {
       box.replaceChildren();
       var list = !r.problem && D.shapeList(r.data);
@@ -284,7 +308,7 @@
         box.appendChild(el('div', 'actions')).appendChild(link('https://github.com/' + o.repo + '/discussions', 'Open it on GitHub'));
         return;
       }
-      if (!list.discussions.length) box.appendChild(el('p', 'small', 'No one has started a conversation yet.'));
+      if (!list.discussions.length) box.appendChild(window.UI ? window.UI.empty('No conversations yet') : el('p', 'small', 'No conversations yet'));
       var ol = el('ol', 'talk-list compact');
       list.discussions.forEach(function (d) {
         var li = el('li', 'talk-item');
@@ -297,7 +321,6 @@
       if (list.discussions.length) box.appendChild(ol);
       var foot = el('p', 'small talk-foot');
       foot.appendChild(link(list.url + '/discussions', 'Open the conversation on GitHub'));
-      foot.appendChild(button('Read it again', 'btn-secondary small', function () { compact(box, o); }));
       box.appendChild(foot);
     });
   }

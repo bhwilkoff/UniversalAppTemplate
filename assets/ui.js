@@ -37,6 +37,7 @@
     invitation: { notyet: ['off', 'Not joined'], invited: ['waiting', 'Invited'], joined: ['done', 'Joined'], failed: ['problem', 'Failed'] },
     exchange: { open: ['active', 'Open'], closed: ['off', 'Closed'] },
     task: { done: ['done', 'Done'], todo: ['waiting', 'To do'], optional: ['waiting', 'Optional'], blocked: ['off', 'Cannot start yet'] },
+    watch: { on: ['active', 'Watching'] },
     connection: { live: ['active', 'Live'], checking: ['waiting', 'Checking'], offline: ['problem', 'Offline'] },
     key: { ready: ['done', 'Ready'], none: ['waiting', 'Not chosen'] },
     work: { ready: ['done', 'Ready'], notyet: ['waiting', 'Not yet'], confirmed: ['done', 'Confirmed'] },

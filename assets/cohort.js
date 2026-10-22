@@ -545,12 +545,15 @@
     var actions = el('div', 'actions');
     if (state === 'member') {
       var meta = el('p', 'ui-meta-line'); meta.appendChild(window.UI.visibility('cohort')); box.appendChild(meta);
+      var bar = el('div', 'ui-toolbar');
       var go = link('https://github.com/' + repo + '/discussions', 'Open on GitHub'); go.className = 'btn-secondary';
-      actions.appendChild(go);
-      box.appendChild(actions);
-      if (window.CohortWatch) window.CohortWatch.control({ db: db, session: session, repo: repo }).then(function (w) { if (w) actions.appendChild(w); });
+      bar.appendChild(go);
+      var end = el('div', 'ui-toolbar-end');
+      bar.appendChild(end);
+      box.appendChild(bar);
+      if (window.CohortWatch) window.CohortWatch.control({ db: db, session: session, repo: repo }).then(function (w) { if (w) end.appendChild(w); });
       // The newest conversations, read and posted here as this person.
-      if (window.CohortTalk) window.CohortTalk.full(box, { db: db, session: session, repo: repo });
+      if (window.CohortTalk) window.CohortTalk.full(box, { db: db, session: session, repo: repo, toolbar: bar });
       return;
     } else if (state === 'invited') {
       var st = el('p'); st.appendChild(window.UI.status('invitation', 'invited')); box.appendChild(st);

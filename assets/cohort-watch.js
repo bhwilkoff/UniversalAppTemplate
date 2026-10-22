@@ -1,13 +1,17 @@
 // Watching the cohort's repository on GitHub, from its Conversation
 // section: GitHub then emails the person about new discussions, issues,
 // and files, by their own notification settings, at no cost to anyone
-// (research/notes/cohort-repository-design.md, "Notifications"). Read
-// and changed with the person's own GitHub token. Until the Human Shaped
-// Hub app has the Watching permission, GitHub refuses, and the control
-// stays out of the way.
+// (research/notes/cohort-repository-design.md, "Notifications").
+//
+// GitHub lets an app read which repositories a person watches (the
+// Watching permission, /user/subscriptions) but not change it: the
+// repository's own subscription endpoint refuses every app token
+// (checked October 22, 2026). So this says whether they watch, and the
+// change is made with GitHub's own Watch button, one click away.
 (function (root) {
   var D = root.DiscussionsLib, U = root.UI;
   if (!D || !U) return;
+  var PAGES = 3;
 
   function stores() {
     var s = null, l = null;
@@ -16,50 +20,38 @@
     return { session: s, local: l };
   }
 
-  function ask(token, method, repo, body) {
-    return fetch('https://api.github.com/repos/' + repo + '/subscription', {
-      method: method,
-      headers: { Authorization: 'Bearer ' + token, Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' },
-      body: body ? JSON.stringify(body) : undefined
-    }).then(function (r) {
-      return r.json().catch(function () { return {}; }).then(function (b) { return { status: r.status, body: b }; });
-    }, function () { return { status: 0, body: {} }; });
+  // Whether repo is among the repositories this person watches: true,
+  // false, or null when GitHub will not say.
+  function watches(token, repo) {
+    var want = String(repo).toLowerCase();
+    function page(n) {
+      return fetch('https://api.github.com/user/subscriptions?per_page=100&page=' + n, {
+        headers: { Authorization: 'Bearer ' + token, Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' },
+        cache: 'no-store'
+      }).then(function (r) { return r.ok ? r.json() : null; }, function () { return null; }).then(function (list) {
+        if (!Array.isArray(list)) return null;
+        if (list.some(function (x) { return x && String(x.full_name).toLowerCase() === want; })) return true;
+        return list.length === 100 && n < PAGES ? page(n + 1) : false;
+      });
+    }
+    return page(1);
   }
 
-  // Resolves to a span holding the control, or null when GitHub will not
-  // say whether this person watches.
+  // Resolves to the control: Watching with a link to change it, or the
+  // link to start watching.
   function control(o) {
+    if (!o.repo) return Promise.resolve(null);
+    var url = 'https://github.com/' + o.repo;
+    var start = function () { return U.link('Watch on GitHub', url); };
     var token = D.tokenFrom(o.session, stores(), Date.now(), o.db && o.db.auth && o.db.auth.storageKey);
-    if (!token || !o.repo) return Promise.resolve(null);
-    return ask(token, 'GET', o.repo).then(function (r) {
-      // 404 means not watching. Anything else but 200 means GitHub will
-      // not tell this page, so the person gets the repository's own
-      // Watch button instead.
-      if (r.status !== 200 && r.status !== 404) return U.link('Watch on GitHub', 'https://github.com/' + o.repo);
-      var watching = r.status === 200 && r.body.subscribed === true;
+    if (!token) return Promise.resolve(start());
+    return watches(token, o.repo).then(function (yes) {
+      if (!yes) return start();
       var wrap = U.el('span', 'watch-control');
-      var b = U.button('', 'btn-secondary');
-      var said = U.el('span', 'ui-inline-status');
-      said.setAttribute('role', 'status');
-      function draw() {
-        b.textContent = watching ? 'Stop watching' : 'Watch on GitHub';
-        b.setAttribute('aria-pressed', watching ? 'true' : 'false');
-        U.say(said, watching ? 'Watching' : '');
-      }
-      b.addEventListener('click', function () {
-        b.disabled = true;
-        var q = watching ? ask(token, 'DELETE', o.repo) : ask(token, 'PUT', o.repo, { subscribed: true, ignored: false });
-        q.then(function (x) {
-          b.disabled = false;
-          if (x.status === 200 || x.status === 204) { watching = !watching; draw(); return; }
-          // GitHub would not let this page change it, so send the person
-          // to the repository, where its own Watch button is.
-          wrap.replaceChildren(U.link('Watch on GitHub', 'https://github.com/' + o.repo));
-        });
-      });
-      draw();
-      wrap.appendChild(b);
-      wrap.appendChild(said);
+      wrap.appendChild(U.status('watch', 'on'));
+      var change = U.el('a', null, 'Change on GitHub');
+      change.href = url;
+      wrap.appendChild(change);
       return wrap;
     });
   }

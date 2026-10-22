@@ -990,8 +990,7 @@ button.talk-title[aria-expanded="true"]::before { transform: rotate(90deg); }
 .talk-body blockquote { margin: 0.5rem 0; padding-left: 0.8rem; border-left: 3px solid var(--rule); color: var(--muted); }
 .talk-more { margin: 0; }
 .talk-foot { display: flex; flex-wrap: wrap; gap: 0 1.25rem; align-items: center; margin: 0.5rem 0 0; }
-.talk-start { margin-top: 1rem; }
-.talk-start > summary { cursor: pointer; font-weight: 600; padding: 0.6rem 0; min-height: 44px; }
+.talk-start { max-width: 36rem; margin: 0 0 1.5rem; }
 .talk-form { margin-top: 0.5rem; }
 .talk-form .hint { margin: 0; color: var(--muted); font-weight: 400; }
 .talk-form select {
@@ -2657,3 +2656,4 @@ html.app-nav-open[data-signed-in] body:not([data-no-app-nav]) .app-nav { display
 }
 .files-add, .asks-form { max-width: 36rem; margin: 0 0 1.5rem; }
 .roster-repo select { font: inherit; font-weight: 400; min-height: 36px; padding: 0 0.5rem; border: 1px solid var(--muted); border-radius: 10px; background: var(--card); color: var(--ink); }
+.watch-control { display: inline-flex; align-items: center; gap: 0.75rem; }
