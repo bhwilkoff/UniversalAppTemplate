@@ -2660,3 +2660,4 @@ html.app-nav-open[data-signed-in] body:not([data-no-app-nav]) .app-nav { display
 .ui-row-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 0.4rem; }
 .ui-row-head .role-tag { margin-left: 0; }
 .roster-repo { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; font-weight: 600; }
+.group-form { max-width: 36rem; margin: 0 0 1.5rem; }

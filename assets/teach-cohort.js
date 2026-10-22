@@ -1060,7 +1060,7 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
     var box = $('[data-groups]');
     box.replaceChildren();
     var here = people.filter(function (p) { return p.status !== 'left'; });
-    if (!groups.length) { box.appendChild(el('p', 'small', 'No groups yet.')); return; }
+    if (!groups.length) { box.appendChild(U.empty('No groups yet')); return; }
     groups.forEach(function (g) {
       var card = el('article', 'cohort-card');
       card.appendChild(el('h4', null, g.name));
@@ -1114,12 +1114,21 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
     return f;
   }
 
+  // A new group: a button that opens its short form, closed by Cancel
+  // or by adding the group.
+  function groupForm(open) {
+    var f = $('[data-group-form]'), b = $('[data-group-open]');
+    f.hidden = !open; b.hidden = open;
+    if (open) f.elements.name.focus(); else { f.reset(); b.focus(); }
+  }
+  $('[data-group-open]').addEventListener('click', function () { groupForm(true); });
+  $('[data-group-cancel]').addEventListener('click', function () { groupForm(false); });
   $('[data-group-form]').addEventListener('submit', function (ev) {
     ev.preventDefault();
     var f = ev.target.elements;
     db.from('groups').insert({ cohort_id: current.id, name: f.name.value.trim(), expectations: f.expectations.value.trim() || null }).then(function (r) {
       if (r.error) return say('[data-detail-message]', 'The group could not be added: ' + r.error.message);
-      ev.target.reset();
+      groupForm(false);
       openCohort(current.id);
     });
   });

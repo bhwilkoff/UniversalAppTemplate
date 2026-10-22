@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261022z">
+  <link rel="stylesheet" href="/assets/site.css?v=20261022za">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -234,10 +234,11 @@
                 <h2 id="groups-title">Groups</h2>
                 <p class="ui-meta-line">Three learners each, together for all five weeks, each with its own Meet room.</p>
               <div data-groups></div>
-              <form class="inline-form" data-group-form>
-                <label>New group <input name="name" required maxlength="60" placeholder="Group 1"></label>
+              <div class="ui-toolbar"><button class="btn-secondary" type="button" data-group-open>Add a group</button></div>
+              <form class="cohort-form group-form" data-group-form hidden>
+                <label>Name <input name="name" required maxlength="60" placeholder="Group 1"></label>
                 <label>What it is for <input name="expectations" maxlength="400" placeholder="Show each other your bring-back before each session"></label>
-                <button class="btn-secondary" type="submit">Add the group</button>
+                <div class="actions"><button class="btn-primary" type="submit">Add group</button><button class="btn-secondary" type="button" data-group-cancel>Cancel</button></div>
               </form>
               </section>
               <section class="panel-section" aria-labelledby="teachers">
@@ -261,7 +262,7 @@
               </section>
               <section class="panel-section" aria-labelledby="credentials-title">
                 <h2 id="credentials-title">Credentials</h2>
-              <div data-credentials-later></div>
+              <div data-credentials-later><div class="ui-empty"><p>Recorded once the cohort is finished</p></div></div>
               <div data-credentials hidden>
                 <p class="ui-help"><a href="/credential/issuer/">What each level asks for</a></p>
                 <div data-credential-list></div>
@@ -404,7 +405,7 @@
   <script src="/assets/curriculum-lib.js" defer></script>
   <script src="/assets/curriculum-seed.js" defer></script>
   <script src="/assets/show-builder.js?v=20261022j" defer></script>
-  <script src="/assets/teach-cohort.js?v=20261022z" defer></script>
+  <script src="/assets/teach-cohort.js?v=20261022za" defer></script>
   <script src="/assets/cohort.js?v=20261022y" defer></script>
   <script src="/assets/exchange-lib.js?v=20261022a" defer></script>
   <script src="/assets/exchange-list.js?v=20261022d" defer></script>
