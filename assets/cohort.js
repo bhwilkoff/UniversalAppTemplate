@@ -509,6 +509,7 @@
       var go = link('https://github.com/' + repo + '/discussions', 'Open on GitHub'); go.className = 'btn-secondary';
       actions.appendChild(go);
       box.appendChild(actions);
+      if (window.CohortWatch) window.CohortWatch.control({ db: db, session: session, repo: repo }).then(function (w) { if (w) actions.appendChild(w); });
       // The newest conversations, read and posted here as this person.
       if (window.CohortTalk) window.CohortTalk.full(box, { db: db, session: session, repo: repo });
       return;

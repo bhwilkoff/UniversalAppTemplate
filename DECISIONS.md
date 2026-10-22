@@ -1104,3 +1104,29 @@ up, Waiting for you, Learning, Leading, Your work; Admin is one page,
 Roles. Database names (`teachers`, `cohort_teachers`, `role = 'mentor'`)
 and `/teach/` addresses stay as they are; only words on screen change. A
 mentor is shown as a learner with a Returning tag.
+
+## The cohort repository is the cohort's shared space, and humanshaped.org holds its controls (October 22, 2026)
+
+**Each cohort's private repository holds everything the cohort shares
+(conversation, files, and, once decided, feedback and a board), learners
+write to it, and every control over it is set on humanshaped.org and
+carried to GitHub** (Ben: "Learners should be able to write things to the
+cohort repository," "allow for granular controls within HumanShaped.org
+and have those flow through to github," and "any shared resource or file
+should be stored on github within the cohort repository").
+
+**Why:** GitHub already does history, undo, notifications, and
+permissions well and at no cost, and people learn GitHub by using it. But
+Ben wants the time spent on the platform, "rather than dealing with more
+technical issues in github." So GitHub is where things live, and
+humanshaped.org is where people choose and see them.
+
+**How to apply:** roles are GitHub's own (Read, Triage, Write, Maintain),
+chosen per person in People (`repo_roles`) and set by `cohort-access`.
+A leader maintains; a learner writes unless a leader chooses otherwise;
+admin stays with the organization's owners. Protection on the Free plan
+comes from what Write cannot do, from history, from the workflow that
+keeps replaced history, and from a leader's levers, never from a paid
+feature. Notifications move to GitHub's own (watching and mentions), with
+schedules in Actions in a public repository. Design and what is still
+waiting: research/notes/cohort-repository-design.md.

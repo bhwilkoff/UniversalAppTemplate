@@ -60,9 +60,9 @@ role you hold and the role named on the page, never a switcher.
 - **Home** answers what needs you now: Coming up, Waiting for you, then
   Learning and Leading (everyone sees both, so asking to lead is always in
   view), then Your work. Nothing on it repeats a sidebar place.
-- **One cohort, one page, six sections** (`/cohort/?c=`, `assets/cohort-nav.js`),
+- **One cohort, one page, seven sections** (`/cohort/?c=`, `assets/cohort-nav.js`),
   the same for everyone and in the same order: **This week**, **Sessions**,
-  **Conversation**, **Exchanges**, **People**, then **Your work** for
+  **Conversation**, **Files**, **Exchanges**, **People**, then **Your work** for
   learners or **Settings** for leaders. A leader's tools sit inside the
   shared sections, never in sections of their own (Ben, October 22, 2026:
   "It seems like we can do some simplification on these pages too"):
@@ -71,9 +71,16 @@ role you hold and the role named on the page, never a switcher.
   - Sessions: each week's session, and the live session it becomes while
     it runs (`/live/?c=`); for leaders, making the sessions, each one's run
     of show, the question bank, and each past session's follow-up.
-  - Conversation: for leaders, the button that sets it up, right there.
+  - Conversation: the cohort repository's Discussions, and Watch on
+    GitHub; for leaders, the button that makes the repository, right
+    there.
+  - Files: what the cohort shares, kept in its repository by folder
+    (Resources, then each week), added as the person (Ben, October 22,
+    2026: "any shared resource or file should be stored on github within
+    the cohort repository").
   - People: everyone in their groups of three, each with their app; for
-    leaders, adding leaders, making groups, and recording credentials.
+    leaders, each learner's role on GitHub (Read, Triage, Write, or
+    Maintain), adding leaders, making groups, and recording credentials.
   - Settings: the cohort's details, status, and calls.
   Under the cohort's name a tag says Leader or Learner. Every section works
   before the cohort has sessions, people, or a conversation: it says what
@@ -105,7 +112,7 @@ role you hold and the role named on the page, never a switcher.
 |---|---|---|
 | `/` | Your home | Follow a row to the thing |
 | `/account/` | Your account | How you sign in, linked accounts, how leaders reach you, your data, sign out, delete; confirm joining one cohort (`?join=`) |
-| `/cohort/?c=` | One cohort: This week, Sessions, Conversation, Exchanges, People, and Your work (learners) or Settings (leaders) | Read the week, join a session, bring something back, keep your app; a leader sets it up and runs it from the same sections |
+| `/cohort/?c=` | One cohort: This week, Sessions, Conversation, Files, Exchanges, People, and Your work (learners) or Settings (leaders) | Read the week, join a session, bring something back, keep your app; a leader sets it up and runs it from the same sections |
 | `/live/?c=` | One cohort's live session | Take part; a leader runs it |
 | `/board/?c=`, `/card/?c=` | The live session's board; its card | Draw; show the card |
 | `/exchange/#<link>` | One exchange | Watch, add a video |
