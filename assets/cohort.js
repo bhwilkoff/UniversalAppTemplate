@@ -319,8 +319,9 @@
           partnerIds = lib.partnersOf(me.id, res[2].data);
           draw(people, mine, res[1].data, res[2].data, res[3].data, res[4].data, res[5].data);
           drawTalk(res[6].data);
+          if (window.CohortAsks) window.CohortAsks.mount($('[data-asks]'), { db: db, session: session, cohort: cohort, access: res[6].data, leading: teaching });
           if (window.CohortFiles) window.CohortFiles.mount($('[data-files]'), { db: db, session: session, cohort: cohort, access: res[6].data, leading: teaching });
-          drawNotes(res[5].data);
+          drawFeedback(res[5].data, people, res[3].data, mine);
           drawRecognized(res[5].data);
           drawSetup(mine, res[6].data);
           drawRole(mine, teaching);
@@ -424,34 +425,69 @@
     });
   }
 
-  // Follow-ups a teacher wrote to this person alone (teacher_notes,
-  // migration 20261003130000). Before the table exists, the read fails
-  // quietly and nothing shows. The person can remove any of them.
-  function drawNotes(teachers) {
+  // Feedback, from wherever it lives, as one list (FeedbackLib): notes a
+  // leader wrote to this person alone (teacher_notes), feedback on what
+  // they shared, issues in the cohort's repository that mention them, and
+  // their app's open issues. Each row says where it lives and who can see
+  // it. GitHub's parts need a GitHub token in this tab and quietly drop
+  // out without one; a note can be removed from their page.
+  function drawFeedback(teachers, people, shares, mine) {
+    var F = window.FeedbackLib, U = window.UI;
     var section = $('[data-notes-section]');
-    db.from('teacher_notes').select('id, author_id, body, created_at, edited_at').eq('cohort_id', cohort.id).eq('student_id', me.id).order('created_at', { ascending: false }).then(function (r) {
-      var notes = r.error ? [] : r.data;
-      section.hidden = !notes.length;
+    if (!F || !section) return;
+    var names = {};
+    (people || []).concat(teachers || []).forEach(function (p) { names[p.user_id] = nameOf(p.profiles); });
+    var myLogin = session && session.user && session.user.user_metadata ? session.user.user_metadata.user_name : null;
+    var token = window.DiscussionsLib ? window.DiscussionsLib.read((function () { try { return sessionStorage; } catch (e) { return null; } })(), Date.now()) : null;
+    function gh(url) {
+      if (!url) return Promise.resolve([]);
+      var h = { Accept: 'application/vnd.github+json' };
+      if (token) h.Authorization = 'Bearer ' + token;
+      return fetch(url, { headers: h }).then(function (r) { return r.ok ? r.json() : []; }, function () { return []; })
+        .then(function (j) { return Array.isArray(j) ? j : (j && j.items) || []; });
+    }
+    var repo = cohort.github_repo;
+    Promise.all([
+      db.from('teacher_notes').select('id, author_id, body, created_at, edited_at').eq('cohort_id', cohort.id).eq('student_id', me.id).order('created_at', { ascending: false }),
+      token && repo && myLogin ? gh(F.cohortSearchUrl(repo, myLogin)) : Promise.resolve([]),
+      gh(F.appIssuesUrl(mine && mine.app_repo))
+    ]).then(function (res) {
+      var items = F.merge({
+        me: me.id, myLogin: myLogin, names: names, appRepo: mine && mine.app_repo,
+        notes: res[0].error ? [] : res[0].data,
+        shares: (shares || []).filter(function (x) { return x.user_id === me.id; }),
+        cohortIssues: res[1], appIssues: res[2]
+      });
+      section.hidden = !mine && !items.length;
       var box = $('[data-notes]');
       box.replaceChildren();
-      var names = {};
-      (teachers || []).forEach(function (t) { names[t.user_id] = nameOf(t.profiles); });
-      notes.forEach(function (n) {
-        var q = el('blockquote', 'feedback');
-        n.body.split(/\n{2,}/).forEach(function (para) { q.appendChild(el('p', null, para)); });
-        q.appendChild(el('p', 'small', (names[n.author_id] || 'Your leader') + ', ' + lib.ago(n.created_at, new Date()) + (n.edited_at ? ', edited ' + lib.ago(n.edited_at, new Date()) : '')));
-        var msg = el('span', 'small'); msg.setAttribute('role', 'status');
-        var rm = button('Remove it from my page', function () {
-          rm.disabled = true;
-          db.from('teacher_notes').delete().eq('id', n.id).select('id').then(function (d) {
-            rm.disabled = false;
-            if (d.error || !d.data.length) { msg.textContent = 'Not removed: ' + (d.error ? d.error.message : 'the database refused') + '.'; return; }
-            drawNotes(teachers);
-          });
-        });
-        var a = el('div', 'actions'); a.appendChild(rm); a.appendChild(msg); q.appendChild(a);
-        box.appendChild(q);
+      if (!items.length) { box.appendChild(U.empty('No feedback yet')); return; }
+      var list = U.rows();
+      items.forEach(function (it) {
+        var detail = null, actions = [];
+        if (!it.href) {
+          detail = el('div', 'feedback-body');
+          it.text.split(/\n{2,}/).forEach(function (para) { detail.appendChild(el('p', null, para)); });
+        }
+        if (it.kind === 'note') {
+          actions.push(U.button('Remove', 'btn-secondary small', function (ev) {
+            var b = ev.currentTarget; b.disabled = true;
+            db.from('teacher_notes').delete().eq('id', it.noteId).select('id').then(function (d) {
+              b.disabled = false;
+              if (!d.error && d.data.length) drawFeedback(teachers, people, shares, mine);
+            });
+          }));
+        }
+        list.appendChild(U.row({
+          title: it.href ? it.text : F.where(it),
+          href: it.href,
+          meta: (it.href ? F.where(it) + ', ' : '') + it.who + ', ' + lib.ago(it.at, new Date()),
+          detail: detail,
+          visibility: U.visibility(it.audience),
+          actions: actions
+        }));
       });
+      box.appendChild(list);
     });
   }
 

@@ -2641,3 +2641,11 @@ html.app-nav-open[data-signed-in] body:not([data-no-app-nav]) .app-nav { display
 .roster-repo { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
 .roster-repo label { font-size: 0.875rem; }
 .roster-repo select { margin-left: 0.25rem; }
+.feedback-body p { overflow-wrap: anywhere; margin: 0.35rem 0 0; }
+
+/* The cohort's Asks: three columns side by side when there is room. */
+.asks-form { max-width: 36rem; margin: 1rem 0 1.5rem; }
+.asks-board { display: grid; gap: 1.5rem; }
+@media (min-width: 60rem) { .asks-board { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.asks-column h3 { font-size: 1rem; margin: 0 0 0.5rem; }
+.asks-column .ui-row { grid-template-columns: minmax(0, 1fr); }

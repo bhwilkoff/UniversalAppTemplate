@@ -62,6 +62,8 @@ light and dark.
 | live session | main session, main room, session page |
 | Open (a cohort, a poll, an exchange taking part) | Open for joining, Open for people to join, Taking answers |
 | exchange | thread, video thread |
+| ask (a card on a cohort's Asks board) | request, ticket, task, card |
+| Files (the cohort's shared files, in its repository) | resources page, library, uploads |
 | leader (anyone who leads a cohort), learner (anyone in one, including someone returning) | teacher, co-teacher, student, mentor, instructor, facilitator (Ben, October 22, 2026: "the people inside of the system are either Learners or Leaders") |
 | Leading (the area), Leader's guide | Teaching, the teaching page, the teaching guide |
 | Human Shaped, humanshaped.org | the hub (a metaphor, not a label; Ben, October 22, 2026) |

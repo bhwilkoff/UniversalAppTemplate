@@ -97,7 +97,7 @@ from a leader's levers on humanshaped.org.
   something unkind; a leader hides or deletes it on GitHub, as Maintain
   allows.
 
-## 4. Files — Built, waiting on a permission
+## 4. Files — Built
 
 The cohort page has a seventh section, **Files**, between Conversation
 and Exchanges. It lists the repository's files by folder (`resources/`,
@@ -114,7 +114,7 @@ things go, issues turned on, and the workflow above. Asking the
 function to set up an older repository again adds whatever is missing
 and never replaces a file people have changed.
 
-## 7. Notifications — Watch built; the rest designed
+## 7. Notifications — Built, waiting on the automation repository
 
 **Built: Watch on GitHub**, in Conversation. Watching the cohort
 repository means GitHub emails the person about new discussions,
@@ -124,7 +124,9 @@ a link to the repository's own Watch button. (Not verified: whether
 GitHub lets a GitHub App's user token set a subscription at all. Its
 permissions page lists only reading subscriptions under "Watching".)
 
-**Designed: the reminders the Apps Script sends today, moved to GitHub.**
+**Built: session threads the day before.** `supabase/functions/github-tick` (rules in `tick.js`, tested in `tools/test/github-tick.test.mjs`) opens each session's discussion within the day before it, with the same words and category as `/live/` and the start written out in the cohort's zone, and keeps the session's thread number, never replacing one a leader opened. It accepts only a workflow on the main branch of `humanshaped/automation`, proven by GitHub's OIDC token. The workflow is in `tools/automation/repo/`, waiting for that public repository to exist.
+
+**The plan beyond that: the reminders the Apps Script sends today, moved to GitHub.**
 GitHub can only email someone about something that happens on GitHub,
 so the plan is to make the things people need to hear about happen
 there, and let watching and mentions carry them:
@@ -147,7 +149,7 @@ The Apps Script stays for what only Google can do (calendar invitations
 and Meet rooms), and its email digest stays until each kind of notice it
 sends has moved.
 
-## 5. Feedback in one view — Designed, one decision waiting
+## 5. Feedback in one view — Built
 
 Learners would see one **Feedback** list in Your work, newest first,
 each item saying where it lives:
@@ -159,14 +161,15 @@ each item saying where it lives:
 | Issues on their app | Their app's own repository | GitHub's public API, for a public repository |
 | A leader's private note | humanshaped.org, as today | Supabase |
 
-**The decision for Ben:** everything in the cohort repository is visible
-to the whole cohort. Moving leaders' notes there makes feedback part of
-the cohort's shared learning, which suits bring-backs and sessions, but
-a note meant for one person would need to stay on humanshaped.org. The
-recommendation is both: a leader chooses "Your cohort" or "Only them"
-when writing, and the one view shows both.
+**Built** as Feedback, first in Your work: one list, newest first, each
+row naming where it lives and showing who can see it. The leader's
+choice between the cohort and one person already exists: feedback on a
+bring-back is the cohort's, and a follow-up note is for them and their
+leaders alone (Ben, October 22: "you can just go ahead"). Feedback on
+bring-backs still lives on humanshaped.org; moving it into the cohort
+repository as issues is a later step, and the list would not change.
 
-## 6. The board — Proposed, for Ben to confirm
+## 6. The board — Built, as Asks
 
 What a board does that no other place does is hold **shared work with a
 state and an owner**: something that needs doing, who has taken it, and
@@ -181,12 +184,23 @@ iPhone?", "Who wants to pair on the showing?", and anyone moves it from
 makes helping each other visible and claimable, which is the cohort's
 work that no other space holds, and it never measures anyone: no counts
 per person, and no card tracks a learner's progress. Each card is an
-issue in the cohort repository, made from a short form on humanshaped.org
-or GitHub, and the board is a GitHub Project shared only with the
-cohort's team. It needs the app's Issues and Organization projects
-permissions.
+issue labeled "ask" in the cohort repository, made from a short form in
+the cohort's **Asks** section, and its column is the issue's own state
+(open, assigned, closed), so the board on humanshaped.org and the issues
+on GitHub never disagree. A GitHub Project view can be added later
+without changing anything, since the app has Organization projects.
 
 ## What Ben does
+
+Done October 22: Ben gave the app Contents, Workflows, Issues,
+Organization projects, and Watching, and the organization accepted them.
+
+Still Ben's (the safety check stops Claude from making repositories):
+
+1. **Make Kit test's repository** from its Conversation section.
+2. **Make `humanshaped/automation`** (public) from `tools/automation/repo/`.
+
+Earlier list, kept for the record:
 
 1. **Give the Human Shaped Hub app more permissions**, at
    github.com/organizations/humanshaped/settings/apps/human-shaped-hub/permissions,

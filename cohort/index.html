@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261022s">
+  <link rel="stylesheet" href="/assets/site.css?v=20261022u">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -204,6 +204,12 @@
             <div data-talk></div>
           </section>
           </div>
+          <div data-tab="asks" hidden>
+          <section aria-labelledby="asks-title">
+            <h2 id="asks-title">Asks</h2>
+            <div data-asks></div>
+          </section>
+          </div>
           <div data-tab="files" hidden>
           <section aria-labelledby="files-title">
             <h2 id="files-title">Files</h2>
@@ -272,10 +278,9 @@
           </section>
           </div>
           <div data-tab="mine" hidden>
-          <!-- Notes from a teacher (C7): words by Claude, awaiting Ben's review. -->
-          <section class="cohort-card teacher-notes" aria-labelledby="notes-title" data-notes-section hidden>
-            <h2 id="notes-title">From your leader</h2>
-            <p class="ui-meta-line"><span data-vis="teachers"></span></p>
+          <!-- Feedback from everywhere it lives (FeedbackLib). -->
+          <section aria-labelledby="notes-title" data-notes-section hidden>
+            <h2 id="notes-title">Feedback</h2>
             <div data-notes></div>
           </section>
           <!-- Recognition for a skill shown in class (R16). -->
@@ -374,6 +379,9 @@
   <script src="/assets/cohort-files-lib.js?v=20261022s" defer></script>
   <script src="/assets/cohort-files.js?v=20261022s" defer></script>
   <script src="/assets/cohort-watch.js?v=20261022t" defer></script>
+  <script src="/assets/feedback-lib.js?v=20261022u" defer></script>
+  <script src="/assets/asks-lib.js?v=20261022u" defer></script>
+  <script src="/assets/asks.js?v=20261022u" defer></script>
   <script src="/assets/background.js" defer></script>
   <script src="/assets/mentor-lib.js" defer></script>
   <script src="/assets/path-lib.js" defer></script>
@@ -381,7 +389,7 @@
   <script src="/assets/show-lib.js" defer></script>
   <script src="/assets/recognition-lib.js" defer></script>
   <script src="/assets/curriculum-pages-lib.js" defer></script>
-  <script src="/assets/cohort-nav.js?v=20261022s" defer></script>
+  <script src="/assets/cohort-nav.js?v=20261022u" defer></script>
   <script src="/assets/teach-lib.js?v=20261022c" defer></script>
   <script src="/assets/teach-page.js?v=20261022j" defer></script>
   <script src="/assets/rooms-lib.js" defer></script>
@@ -397,7 +405,7 @@
   <script src="/assets/curriculum-seed.js" defer></script>
   <script src="/assets/show-builder.js?v=20261022j" defer></script>
   <script src="/assets/teach-cohort.js?v=20261022s" defer></script>
-  <script src="/assets/cohort.js?v=20261022t" defer></script>
+  <script src="/assets/cohort.js?v=20261022u" defer></script>
   <script src="/assets/exchange-lib.js?v=20261022a" defer></script>
   <script src="/assets/exchange-list.js?v=20261022d" defer></script>
 

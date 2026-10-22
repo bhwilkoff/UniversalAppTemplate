@@ -30,6 +30,7 @@
       { key: 'week', label: 'This week' },
       { key: 'sessions', label: 'Sessions' },
       { key: 'talk', label: 'Conversation' },
+      { key: 'asks', label: 'Asks' },
       { key: 'files', label: 'Files' },
       { key: 'exchanges', label: 'Exchanges' },
       { key: 'people', label: 'People' }

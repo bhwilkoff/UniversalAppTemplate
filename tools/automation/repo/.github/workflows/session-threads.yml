@@ -1,0 +1,32 @@
+# Each hour, open the discussion for every cohort session that starts
+# within the day, so GitHub emails everyone watching the cohort's
+# repository and the thread is ready when the session begins. The work is
+# done by humanshaped.org's github-tick function, which this workflow
+# proves itself to with GitHub's own OIDC token, so no secret is kept here.
+# This repository is public, so its Actions minutes cost nothing.
+name: Session threads
+on:
+  schedule:
+    - cron: '17 * * * *'
+  workflow_dispatch:
+permissions:
+  id-token: write
+  contents: read
+jobs:
+  open:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const token = await core.getIDToken('https://humanshaped.org');
+            const r = await fetch('https://bifrieqzkihuxfzttgvd.supabase.co/functions/v1/github-tick', {
+              method: 'POST',
+              headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+              body: '{}',
+            });
+            const text = await r.text();
+            core.info(`${r.status} ${text}`);
+            if (r.status >= 300 && r.status !== 207) core.setFailed(`github-tick answered ${r.status}`);
+            if (r.status === 207) core.warning(text);
