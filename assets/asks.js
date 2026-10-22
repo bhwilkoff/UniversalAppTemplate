@@ -17,6 +17,9 @@
   function ask(token, method, url, body) {
     return fetch(url, {
       method: method,
+      // GitHub lets browsers keep its answers for a minute; a list read
+      // right after a change must be the new one.
+      cache: 'no-store',
       headers: { Authorization: 'Bearer ' + token, Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' },
       body: body ? JSON.stringify(body) : undefined
     }).then(function (r) {
