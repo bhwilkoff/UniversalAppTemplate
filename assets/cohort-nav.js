@@ -74,8 +74,12 @@
       role.hidden = false;
     }
     var list = places(o);
-    var holder = el('div');
-    mount.appendChild(holder);
+    // The row sits under the cohort's name and role when the page has a
+    // header beside the crumbs: crumb, name, role, then the sections.
+    var holder = el('div', 'cohort-row');
+    var head = mount.parentNode && mount.parentNode.querySelector(':scope > .page-head');
+    if (head) { mount.parentNode.querySelectorAll(':scope > .cohort-row').forEach(function (n) { n.remove(); }); head.after(holder); }
+    else mount.appendChild(holder);
     if (!window.UI) return null;
     var tabs = window.UI.tabs(holder, list.map(function (p) {
       return p.at === o.current && o.current !== 'live' ? { key: p.key, label: p.label } : { key: p.key, label: p.label, href: href(o, p) };

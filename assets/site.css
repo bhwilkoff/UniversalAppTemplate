@@ -2478,7 +2478,9 @@ nav.crumbs a { color: var(--muted); }
 }
 .area-nav + .page-head, .area-nav + nav.crumbs + .page-head { padding-top: 1.75rem; }
 .cohort-top .area-nav { margin-top: 0.75rem; }
-.cohort-top + .page-head { padding-top: 1.75rem; }
+.cohort-top + .page-head { padding: 1.25rem 0 1rem; gap: 0.6rem; }
+.cohort-top + .page-head .ui-meta-line { margin: 0; }
+.cohort-row { margin-bottom: 2rem; }
 
 /* Running the hub (/admin/): each right a row with what it allows and one
    button; lists of cohorts and changes as plain lists. */
