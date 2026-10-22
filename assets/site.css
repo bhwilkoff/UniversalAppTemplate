@@ -2657,3 +2657,6 @@ html.app-nav-open[data-signed-in] body:not([data-no-app-nav]) .app-nav { display
 .files-add, .asks-form { max-width: 36rem; margin: 0 0 1.5rem; }
 .roster-repo select { font: inherit; font-weight: 400; min-height: 36px; padding: 0 0.5rem; border: 1px solid var(--muted); border-radius: 10px; background: var(--card); color: var(--ink); }
 .watch-control { display: inline-flex; align-items: center; gap: 0.75rem; }
+.ui-row-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 0.4rem; }
+.ui-row-head .role-tag { margin-left: 0; }
+.roster-repo { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; font-weight: 600; }

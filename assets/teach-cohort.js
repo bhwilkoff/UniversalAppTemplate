@@ -13,7 +13,7 @@
   var currentGroups = [];
   // What each person may do in the repository, and what GitHub holds
   // for them now (migration 20261022020000).
-  var accessBy = {}, chosenBy = {};
+  var accessBy = {}, chosenBy = {}, leaderIds = [];
   var DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
   function $(sel) { return root.querySelector(sel); }
@@ -92,7 +92,8 @@
       db.from('github_access').select('state').eq('cohort_id', id).eq('user_id', me.id).maybeSingle(),
       db.from('credentials').select('*').eq('cohort_id', id),
       db.from('github_access').select('*').eq('cohort_id', id),
-      db.from('repo_roles').select('user_id, role').eq('cohort_id', id)
+      db.from('repo_roles').select('user_id, role').eq('cohort_id', id),
+      db.from('cohort_teachers').select('user_id').eq('cohort_id', id)
     ]).then(function (res) {
       var bad = res.slice(0, 5).filter(function (r) { return r.error; })[0];
       if (bad) return failed('Your leader’s tools could not be loaded: ' + bad.error.message);
@@ -103,6 +104,7 @@
       accessBy = {}; chosenBy = {};
       (res[6].data || []).forEach(function (a) { accessBy[a.user_id] = a; });
       (res[7].data || []).forEach(function (r) { chosenBy[r.user_id] = r.role; });
+      leaderIds = (res[8].data || []).map(function (t) { return t.user_id; });
       var c = current;
       drawFacts(c, res[1].data, res[2].data);
       drawOverview(c, res[1].data);
@@ -752,37 +754,37 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
       var box = $('[data-teachers]');
       box.replaceChildren();
       var form = $('[data-co-teacher-form]');
-      if (res[0].error) { box.appendChild(el('li', 'small', 'The leaders could not be read just now.')); form.hidden = true; return; }
+      if (res[0].error) { box.appendChild(el('p', 'small', 'The leaders could not be read just now.')); form.hidden = true; return; }
       var here = res[0].data;
       var ids = here.map(function (t) { return t.user_id; });
+      leaderIds = ids;
+      var list = U.rows();
       here.forEach(function (t) {
-        var li = el('li');
-        li.appendChild(el('strong', null, t.user_id === me.id ? 'You' : personName(t)));
-        li.appendChild(el('span', 'role-tag', 'Leader'));
-        if (c.github_repo) li.appendChild(el('span', 'small', ' Maintain on GitHub'));
-        if (t.user_id === c.created_by) { li.appendChild(el('span', 'small', ' made this cohort')); box.appendChild(li); return; }
-        var msg = el('span', 'small'); msg.setAttribute('role', 'status');
         var self = t.user_id === me.id;
-        var rm = el('button', 'btn-danger small', self ? 'Leave' : 'Remove');
-        rm.type = 'button';
-        rm.setAttribute('aria-label', self ? 'Leave this cohort as a leader' : 'Remove ' + personName(t) + ' as leader');
-        rm.addEventListener('click', function () {
-          U.confirm(self ? { title: 'Stop leading ' + c.title + '?', body: 'Another leader can add you back.', action: 'Leave' } : { title: 'Remove ' + personName(t) + ' as leader?', body: 'You can add them back.', action: 'Remove leader' }).then(function (ok) { if (ok) takeOff(); });
-        });
-        function takeOff() {
-          rm.disabled = true;
-          db.from('cohort_teachers').delete().eq('cohort_id', c.id).eq('user_id', t.user_id).select('user_id').then(function (r) {
-            rm.disabled = false;
-            if (r.error || !r.data.length) { msg.textContent = ' Not removed: ' + (r.error ? r.error.message : 'no change was allowed') + '.'; return; }
-            if (t.user_id === me.id) { location.assign('/teach/'); return; }
-            drawTeachers();
-            if (c.github_repo) syncGitHub();
-          });
+        var facts = [t.user_id === c.created_by ? 'Made this cohort' : null, c.github_repo ? 'Maintain on GitHub' : null].filter(Boolean).join(', ');
+        var actions = [];
+        var msg = el('span', 'ui-inline-status'); msg.setAttribute('role', 'status');
+        if (t.user_id !== c.created_by) {
+          var rm = U.button(self ? 'Leave' : 'Remove', 'btn-danger small');
+          rm.setAttribute('aria-label', self ? 'Leave this cohort as a leader' : 'Remove ' + personName(t) + ' as leader');
+          U.confirmStep(rm, Object.assign(self ? { title: 'Stop leading ' + c.title + '?', body: 'Another leader can add you back.', action: 'Leave' } : { title: 'Remove ' + personName(t) + ' as leader?', body: 'You can add them back.', action: 'Remove leader' }, { run: function () {
+            rm.disabled = true;
+            db.from('cohort_teachers').delete().eq('cohort_id', c.id).eq('user_id', t.user_id).select('user_id').then(function (r) {
+              rm.disabled = false;
+              if (r.error || !r.data.length) { U.say(msg, 'Not removed: ' + (r.error ? r.error.message : 'not allowed'), 'problem'); return; }
+              if (self) { location.assign('/teach/'); return; }
+              drawTeachers();
+              if (c.github_repo) syncGitHub();
+            });
+          } }));
+          actions.push(rm);
         }
-        li.appendChild(document.createTextNode(' '));
-        li.appendChild(rm); li.appendChild(msg);
-        box.appendChild(li);
+        var row = U.row({ title: self ? 'You' : personName(t), meta: facts || null, actions: actions });
+        tagRow(row, ['Leader']);
+        row.querySelector('.ui-row-main').appendChild(msg);
+        list.appendChild(row);
       });
+      box.appendChild(list);
       var choices = (res[1].data || []).filter(function (t) { return ids.indexOf(t.user_id) === -1; });
       var select = $('[data-co-teacher-choices]');
       select.replaceChildren();
@@ -807,31 +809,62 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
     });
   });
 
+  // The learners, one row each: their name (to their GitHub profile),
+  // what they are building, where their GitHub access stands, and the two
+  // things a leader changes here: their role on GitHub and whether they
+  // are returning.
   function drawRoster(people) {
     var box = $('[data-roster]');
     box.replaceChildren();
     var here = people.filter(function (p) { return p.status !== 'left'; });
-    if (!here.length) { box.appendChild(el('p', 'small', current.status === 'open' ? 'No one has joined yet.' : 'No one yet')); return; }
-    var ul = el('ul', 'roster');
+    if (!here.length) { box.appendChild(U.empty(current.status === 'open' ? 'No one has joined yet' : 'No learners yet')); return; }
+    var list = U.rows();
     here.forEach(function (p) {
-      var li = el('li');
-      li.appendChild(el('strong', null, personName(p)));
-      if (p.profiles) {
-        var gh = el('a', null, ' @' + p.profiles.github_login); gh.href = 'https://github.com/' + encodeURIComponent(p.profiles.github_login);
-        li.appendChild(gh);
-      }
-      if (p.role === 'student' || p.role === 'mentor') li.appendChild(el('span', 'role-tag', 'Learner'));
-      if (p.role === 'mentor') li.appendChild(el('span', 'role-tag', 'Returning'));
+      var login = p.profiles ? p.profiles.github_login : null;
+      var detail = el('span', 'ui-row-meta');
+      if (login) detail.appendChild(document.createTextNode('@' + login));
       if (p.app_repo) {
-        li.appendChild(document.createTextNode(', building '));
+        detail.appendChild(document.createTextNode((login ? ', ' : '') + 'building '));
         var r = el('a', null, p.app_name || p.app_repo); r.href = 'https://github.com/' + p.app_repo;
-        li.appendChild(r);
+        detail.appendChild(r);
       }
-      if (window.MentorLib && (p.role === 'student' || p.role === 'mentor')) li.appendChild(roleSwitch(p, people));
-      if (current.github_repo) li.appendChild(repoRole(p, people));
-      ul.appendChild(li);
+      var msg = el('span', 'ui-inline-status'); msg.setAttribute('role', 'status');
+      var actions = [];
+      if (current.github_repo) actions.push(repoRole(p, people, msg));
+      if (window.MentorLib && (p.role === 'student' || p.role === 'mentor')) actions.push(roleSwitch(p, people, msg));
+      var row = U.row({
+        title: personName(p),
+        href: login ? 'https://github.com/' + encodeURIComponent(login) : null,
+        detail: detail,
+        status: current.github_repo ? accessStatus(p) : null,
+        actions: actions
+      });
+      tagRow(row, p.role === 'mentor' ? ['Learner', 'Returning'] : ['Learner']);
+      row.querySelector('.ui-row-main').appendChild(msg);
+      list.appendChild(row);
     });
-    box.appendChild(ul);
+    box.appendChild(list);
+  }
+
+  // A row's role tags sit on the line of its title.
+  function tagRow(row, tags) {
+    var title = row.querySelector('.ui-row-title');
+    var head = el('span', 'ui-row-head');
+    title.replaceWith(head);
+    head.appendChild(title);
+    tags.forEach(function (t) { head.appendChild(el('span', 'role-tag', t)); });
+  }
+
+  // Where their access to the repository stands, shown only when it is
+  // not simply in place: not joined yet, invited, or not what Human
+  // Shaped records.
+  function accessStatus(p) {
+    var a = accessBy[p.user_id];
+    var want = leaderIds.indexOf(p.user_id) !== -1 ? 'maintain' : (chosenBy[p.user_id] || 'write');
+    if (!a || a.state === 'removed') return U.status('invitation', 'notyet');
+    if (a.state === 'invited') return U.status('invitation', 'invited');
+    if (a.state === 'failed' || (a.state === 'member' && a.repo_role !== want)) return U.status('action', 'failed');
+    return null;
   }
 
   // What a learner may do in the cohort's repository, chosen here and
@@ -839,24 +872,18 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
   // for its roles, so they read the same in both places. Someone who has
   // not joined on GitHub yet gets the role when they do.
   var ROLE_NAMES = { read: 'Read', triage: 'Triage', write: 'Write', maintain: 'Maintain' };
-  function repoRole(p, people) {
-    var wrap = el('span', 'roster-repo');
-    var label = el('label', null, 'On GitHub ');
+  function repoRole(p, people, msg) {
+    // Someone who also leads the cohort always maintains it.
+    if (leaderIds.indexOf(p.user_id) !== -1) return el('span', 'ui-row-meta', 'Maintain on GitHub');
+    var label = el('label', 'roster-repo', 'On GitHub');
     var pick = el('select');
     var chosen = chosenBy[p.user_id] || 'write';
     Object.keys(ROLE_NAMES).forEach(function (k) {
       var o = el('option', null, ROLE_NAMES[k]); o.value = k; o.selected = k === chosen; pick.appendChild(o);
     });
     label.appendChild(pick);
-    wrap.appendChild(document.createTextNode(' '));
-    wrap.appendChild(label);
     var a = accessBy[p.user_id];
-    if (!a || a.state === 'removed') wrap.appendChild(U.status('invitation', 'notyet'));
-    else if (a.state === 'invited') wrap.appendChild(U.status('invitation', 'invited'));
-    else if (a.state === 'failed' || (a.state === 'member' && a.repo_role !== chosen)) wrap.appendChild(U.status('action', 'failed'));
-    var msg = el('span', 'ui-inline-status'); msg.setAttribute('role', 'status');
     if (a && a.detail) U.say(msg, a.detail, 'problem');
-    wrap.appendChild(msg);
     pick.addEventListener('change', function () {
       pick.disabled = true;
       U.say(msg, 'Saving');
@@ -870,7 +897,7 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
         });
       });
     });
-    return wrap;
+    return label;
   }
 
   // Bring everyone's access on GitHub up to what Human Shaped records,
@@ -896,24 +923,18 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
   // sees the word beside their name. The database lets only this cohort's
   // teachers change it (migration 20261003200000). Its words were written
   // by Claude for G7 and await Ben's review.
-  function roleSwitch(p, people) {
-    var wrap = el('span', 'roster-role');
+  function roleSwitch(p, people, msg) {
     var next = window.MentorLib.otherRole(p.role);
-    var b = el('button', 'btn-secondary small', next === 'mentor' ? 'Mark them returning' : 'Mark them not returning');
-    b.type = 'button';
-    var msg = el('span', 'small'); msg.setAttribute('role', 'status');
-    b.addEventListener('click', function () {
+    var b = U.button(next === 'mentor' ? 'Mark returning' : 'Mark not returning', 'btn-secondary small', function () {
       b.disabled = true;
       db.from('enrollments').update({ role: next }).eq('cohort_id', current.id).eq('user_id', p.user_id).select('role').then(function (r) {
         b.disabled = false;
-        if (r.error || !r.data.length) { msg.textContent = ' Not changed: ' + (r.error ? r.error.message : 'no change was allowed') + '.'; return; }
+        if (r.error || !r.data.length) { U.say(msg, 'Not changed: ' + (r.error ? r.error.message : 'not allowed'), 'problem'); return; }
         p.role = r.data[0].role;
         drawRoster(people);
       });
     });
-    wrap.appendChild(document.createTextNode(' '));
-    wrap.appendChild(b); wrap.appendChild(msg);
-    return wrap;
+    return b;
   }
 
   // ---- their apps on humanshaped.org --------------------------------
