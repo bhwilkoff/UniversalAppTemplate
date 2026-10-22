@@ -470,13 +470,16 @@
           it.text.split(/\n{2,}/).forEach(function (para) { detail.appendChild(el('p', null, para)); });
         }
         if (it.kind === 'note') {
-          actions.push(U.button('Remove', 'btn-secondary small', function (ev) {
-            var b = ev.currentTarget; b.disabled = true;
+          // Deleting a note ends it for the leader too, so it asks first.
+          var del = U.button('Delete', 'btn-danger small');
+          U.confirmStep(del, { title: 'Delete this note?', body: 'It is gone for you and your leaders.', action: 'Delete note', run: function () {
+            del.disabled = true;
             db.from('teacher_notes').delete().eq('id', it.noteId).select('id').then(function (d) {
-              b.disabled = false;
+              del.disabled = false;
               if (!d.error && d.data.length) drawFeedback(teachers, people, shares, mine);
             });
-          }));
+          } });
+          actions.push(del);
         }
         list.appendChild(U.row({
           title: it.href ? it.text : F.where(it),
