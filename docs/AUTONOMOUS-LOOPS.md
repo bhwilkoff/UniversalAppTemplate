@@ -95,9 +95,14 @@ habits:
   that will tell you when it is done.
 - **One version convention, written down.** Every commit that touches
   app source bumps the PATCH of `MARKETING_VERSION` and the build number
-  in `AppVersion.xcconfig`. Every store release (an Apple build and
-  submit, a Play release, an Amazon or Roku package) first sets MINOR
-  up by one and PATCH to 0, so 1.42.1041 ships as 1.43.0. Both numbers
+  in `AppVersion.xcconfig`. MINOR goes up by one (PATCH to 0) only when
+  a release carries something a person would call new since the last
+  released version: a feature, a new surface. A fix-only release keeps
+  its minor and ships at its patch, and a store upload never bumps the
+  minor by itself. (Archive Watch's owner corrected an over-correction
+  on 2026-09-30: *"we shouldn't be pushing a new minor release for each
+  new version ... I want to make sure that we are doing it in a way that
+  makes sense each time."*) Both numbers
   only ever go up, which is what every store requires. Pipeline, CI,
   and docs-only commits do not bump. Commit messages quote the owner's
   request verbatim. Commit and push each verified unit, because an

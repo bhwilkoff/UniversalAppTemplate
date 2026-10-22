@@ -69,7 +69,7 @@ recipes are in `docs/DEVICE-HARNESSES.md`.
 | Google TV and Fire TV | `gtv_scenario.py` (navigates by reading the focus tree after every press), `verify_tv_focus.sh` (focus lands on real content) |
 | Roku | `roku_run.py` (deploy, keys, screenshots, console), `roku_playback_audit.py` (does it actually play), `roku_sweep.py` (press Select on every screen), `roku_design_lint.py` (the design rules as a lint) |
 | Web | `web_run.py` (every route at 375 and 1440 pixels wide), `webdrive.py` (drives Chrome for interactive flows), `devserve.py` (a no-cache local server) |
-| TV web (LG, Samsung) | `tv_glass.mjs` (a true 1920 by 1080 screen with real key presses), `tv_reachability.mjs` (can every control be reached with a remote), `tv_follow_focus.mjs` (does focus stay on screen), `tv_audit_sizes.mjs` (are targets big enough at ten feet), `tv_browser_tests.js` (in-browser focus checks), `_tv_cdp.mjs` (their shared Chrome driver) |
+| TV web (LG, Samsung) | `tv_glass.mjs` (a true 1920 by 1080 screen with real key presses), `tv_reachability.mjs` (can every control be reached with a remote), `tv_follow_focus.mjs` (does focus stay on screen), `tv_audit_sizes.mjs` (are targets big enough at ten feet), `tv_browser_tests.js` (in-browser focus checks), `_tv_cdp.mjs` (their shared Chrome driver), `test_tv_compat.py` (the TV code stays inside Chromium 85, Samsung's 2022 floor; the package build refuses otherwise). On a retail Samsung set, through the Chii inspector: `tv_inspect.mjs` (read anything in the page), `tv_press.mjs` (press remote keys, report focus), `tv_walk.mjs` (walk every route), `tv_chii.mjs` (their shared connection) |
 | Windows | `win_run.py` (scenario runner), `winbox.py` (drives a Windows machine over SSH) |
 
 ## Stage 05: Shipping
@@ -81,6 +81,7 @@ The runbooks are `docs/CLOUD-SUBMISSION.md` (build, sign, upload) and
 |---|---|
 | `asc_release.py` | Ships every Apple platform: creates or renames the version, waits for the build, and submits for review. Refuses to submit without release notes. |
 | `asc_submit.py` | Uploads App Store screenshot sets and audits a version before review. |
+| `asc_asset_library.py`, `asc_stage_assets.py` | The Asset Library API, the only route for iPhone Duo screenshots and the product page header and search results assets: upload, then place a batch on a new version in order. |
 | `asc.py` | A small App Store Connect API client the other tools share. |
 | `asc_build_exists.py` | Refuses to archive a build number that was already uploaded. |
 | `asc_certs.py`, `asc_profiles.py`, `ci_make_signing_p12.py` | Signing certificates and provisioning profiles through the API, including the one-time CI signing setup. |

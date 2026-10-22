@@ -686,12 +686,37 @@ player block, so an autoplay-blocked tab fails by name instead of hanging.
 
 ### Retail Tizen
 
-A retail Samsung set is deploy-and-launch only: no shell, no log, no
-screenshot, no inspector. The app becomes the instrument. Build a
-diagnostics overlay opened by a key sequence, hosted on the video stage,
-because an open `<dialog>` sits in the top layer above everything else.
-To re-enter Developer Mode, open Apps and type 1 2 3 4 5. Store and SDK
-details are in `docs/TV-PLATFORMS.md`.
+A retail Samsung set closes `sdb shell` entirely: no shell, no log, no
+screenshot. It CAN be inspected, which this section said otherwise until
+Archive Watch proved it on 2026-10-03:
+
+- **See inside the app with Chii.** Run `chii start -p 8080` on the Mac,
+  build with `APP_TV_INSPECT=<mac-ip>:8080 bash tv/build-tv-packages.sh
+  tizen`, install the `-debug.wgt`, launch it, then `node
+  tools/tv_inspect.mjs "<js>"` reads anything in the page,
+  `tools/tv_press.mjs down ok back` dispatches remote keys and prints what
+  is focused and whether it sits inside the 5% overscan band, and
+  `tools/tv_walk.mjs` walks every route by key presses. The debug package
+  must declare its own `<tizen:content-security-policy>` naming the
+  inspector host: a widget without one runs only its own scripts, and the
+  set silently never requested the inspector. Keys dispatched this way
+  prove the APP's handling; the platform's own key delivery is a separate
+  fact a physical remote confirms.
+- **Turn the set on over HDMI-CEC** from another box on the same chain
+  (`atvremote ... --protocol companion turn_on` on an Apple TV). Wake-on-LAN
+  did nothing from standby. Read power state from
+  `http://<tv>:8001/api/v2/` (`"PowerState":"on"`).
+- **The network remote** (ports 8001/8002) never answered on Archive
+  Watch's set, even with IP Remote on. Do not spend time on it; drive keys
+  through the inspector.
+- Without the inspector, the app is the instrument: a diagnostics overlay
+  opened by a key sequence, hosted on the video stage, because an open
+  `<dialog>` sits in the top layer above everything else.
+
+To re-enter Developer Mode, open Apps and type 1 2 3 4 5. The developer
+certificate is tied to the TV's DUID, so a second test set means
+re-issuing it. Store and SDK details are in `docs/TV-PLATFORMS.md` and
+`docs/store/tizen-submission.md`.
 
 ---
 

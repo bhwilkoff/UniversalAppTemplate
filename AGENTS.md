@@ -63,6 +63,8 @@ Sources: `docs/research/gemini-and-other-agents.md`. Rows follow the
 | Sync, sign-in, progress across devices | `per-ecosystem-sync-islands` |
 | Users see EACH OTHER'S data (profiles, roles, moderation) | `zero-cost-hosted-backend` (vs `per-ecosystem-sync-islands`, Decision 047) |
 | Deriving a shipped corpus from a messy source | `content-corpus-derivation` |
+| Deciding what a catalog you did not author may show, hide, recommend, or say (rights, provenance, wrong matches, versions) | `evidence-gated-catalog-curation` |
+| Reading archive.org (enumerating, metadata, picking files, streaming) | `internet-archive-source` |
 | **03 Going native** | |
 | Planning a new platform, or choosing a deployment floor | `multiplatform-expansion-method` |
 | The app still wears the template's placeholder look | `make-it-look-like-itself` |
@@ -95,6 +97,8 @@ Sources: `docs/research/gemini-and-other-agents.md`. Rows follow the
 | **07 Raising the ceiling** | |
 | Video/audio streaming from hosts you don't control | `resilient-media-streaming` |
 | SharePlay / Group Activities | `shareplay-activities` |
+| Capturing camera, mic, or another app's audio, mixing sources, or publishing live (RTMP) | `live-capture-and-broadcast` |
+| Vertical social video (Reels, Shorts, TikTok), burned captions, posting cadence | `social-video-teaser-craft` |
 | Real-time multiplayer, or a $0 watch party | `cross-platform-multiplayer` + `zero-cost-hosted-backend` |
 | A value identical on every platform (daily pick, hash) | `cross-platform-determinism` |
 | Any algorithmic feed / discovery / "for you" surface | `values-based-feed-ranking` |

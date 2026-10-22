@@ -48,6 +48,18 @@ and no run may destroy work — its own or another's.**
    `[skip ci]` fires no `push` workflows at all, including deploys; chain
    those with `workflow_run` and use `paths-ignore` instead.
 
+10. **A push retry rebases and resolves, never `pull --rebase || true`.** A
+   conflict leaves the rebase half-done and every retry fails. Generated
+   file: this run's copy wins. Hand-edited file: main's wins, or stop with an
+   error. Abort a rebase that cannot continue (`docs/CI-FLEET.md` §3).
+11. **Failures are remembered on the item, not the runner.** A failure list on
+   the runner dies with it, and the same poison items lead every run. Cap a
+   download's total time, not only each read. Adopt an artifact already
+   hosted before regenerating it.
+12. **Ingest hands off to the gate, and the gate publishes.** Never let
+   discovery publish new items before the audits that judge them have run.
+   Give each source of a shared queue a fair share.
+
 ## Standing guardians (enable once per repo)
 
 - `.github/workflows/retry-infra-failures.yml` + `tools/retry_infra_failures.py`

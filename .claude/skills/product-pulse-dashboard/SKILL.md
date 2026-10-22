@@ -72,7 +72,10 @@ Follow Few and Cleveland & McGill, in that order:
   survives colour-blindness and spends no colour on a number.
 - **No gauges.** `bullet()` carries measure, scale, bands and target in 22px;
   a gauge carries one number in a quarter of the screen.
-- **Zero is DRAWN; absence is WRITTEN.**
+- **Zero is DRAWN; absence is WRITTEN.** A server tally that writes a row
+  only on an active day (rooms opened, say) must be zero-filled for every
+  day since it began, whenever its source ANSWERED; otherwise a quiet week
+  reads as a stale reader.
 
 `pulse/charts.js` implements exactly this: `bullet`, `bars`, `spark`, `stack`,
 `legend`, `dots`, `ratio`, `cadence`, plus the question-driven forms —

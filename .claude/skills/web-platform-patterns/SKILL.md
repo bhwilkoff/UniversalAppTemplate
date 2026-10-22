@@ -64,6 +64,10 @@ deploy-reality layer** that vanilla web apps live or die on.
   the hash router. **Never change this shape once apps ship** —
   installed apps depend on it. Legacy routes get forwarder entries,
   not breakage.
+- **A merged id's page forwards; it never 404s.** Generate
+  `/item/<old>/` as a zero-second meta refresh with a canonical link to
+  the survivor, outside the sitemap; give same-title pages distinct
+  `<title>`s (see `canonical-entity-identity`).
 - Percent-encode slugs in routes — non-ASCII slugs are real.
 - "Open in app" on Detail: `appname://` scheme on Apple UAs, an
   `intent://` URL **with the current page as fallback** on Android.

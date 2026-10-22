@@ -68,6 +68,22 @@ publishes, every day's work thrown away.
 - On a mid-item abort, either discard that item's partial output or make the
   resume marker transactional. Partial rows without the "done" marker get
   re-inserted in full next run and duplicate.
+- **What a run learns must outlive the runner.** Archive Watch's remux job
+  was killed at its 301-minute wall seven runs in a row, because the same
+  poison items came first every day: its list of failures lived on the
+  runner and died with it. Record a per-item failure ON THE ITEM
+  (`failedAt`, `reason`, retried after N days), so tomorrow's run starts
+  with new work.
+- **Cap each download as a whole, not only per read.** A `requests` timeout
+  is per read, so a server trickling bytes kept one download alive for 3.5
+  hours. Give each transfer a total deadline, and stream large uploads from
+  disk with a per-operation timeout rather than reading them into memory
+  under one.
+- **Adopt work that is already hosted.** Before regenerating an artifact,
+  list the hosting target and re-point to a copy that is already there and
+  probes the same. Then a lost publish (a GitHub 500) costs minutes, not a
+  172-minute recompute. And run the publish step `always()` whenever
+  anything was hosted or marked.
 
 ## 3. Restores never swallow; publishes never shrink (D020/D089)
 
@@ -96,6 +112,38 @@ destroyed by a run that reported success.
   refuses to retry the deterministic 422-too-large), and every fire-and-forget
   dispatch in `tools/gh_dispatch.sh` (warns and exits 0, because a failed dispatch of
   an idempotent, self-scheduled pipeline must not fail a clean run).
+
+### A push that loses the race resolves it
+
+Two runs of one workflow can commit the same generated file seconds apart.
+`git pull --rebase || true` then hits a conflict, leaves the rebase
+half-done, and every later push attempt fails (Archive Watch's Pulse,
+2026-10-07, proven in a two-clone repro). In the retry loop, `git fetch`
+and `git rebase`; on a conflict, a GENERATED file takes this run's copy
+(`git checkout --theirs`, the newer reading), a HAND-EDITED file takes
+main's (`--ours`) or stops the run with an error naming it, and a rebase
+that still cannot continue is aborted. `pulse.yml` and `play-release.yml`
+carry both shapes.
+
+### New items pass the gate before they ship
+
+Discovery that publishes straight away serves each night's new items
+before the audits that judge them have run: Archive Watch's newly
+ingested titles were visible for about a day before the nightly rights
+confirm. Chain it instead: discovery dispatches the audit
+(`then_publish=true`), and the audit dispatches publish. A shelf of "new"
+items takes the strictest evidence bar for the same reason: the newest
+items have had the least time in the audits.
+
+### One source must not starve a shared queue
+
+A work queue with a ceiling, refilled nightly by one prolific source, is
+never drained by the others: one collection refilled a 4,000-item ceiling
+every night, and 29 of 39 collections were never mined. Give each source a
+fair share, and let low-value sources wait until the backlog is through.
+(Archive Watch's owner: *"Council meeting collections are not going to
+yield anything useful ... only look at them once the full backlog has been
+run through."*)
 
 ## 4. Dropped work heals itself (D048/D057/D095)
 

@@ -131,6 +131,17 @@ There is no API. The Console writes monthly CSVs to
   Alarm at **14 days**, not 3. Acquisitions (`store_performance`) run 6–8 days
   behind: lag 8. Prefer the plain `store_performance_*` files over the
   `total_*` rollup, which can stall while the plain one is current.
+- **The acquisitions export can stop while the installs export keeps going.**
+  Measured 2026-10-07: Google last wrote `store_performance` on 09-30 (rows to
+  09-24, against a documented 3-7 days) while the installs export in the same
+  bucket was rewritten that day. Google had moved store-listing reporting to
+  **install clicks**. Dead ends, each measured: the Play Developer Reporting
+  API is vitals only, and the Console's statistics service needs the
+  `play_console` scope, refused to a service account and to OAuth alike.
+  Record the export's own write time and name it in the alert; keep install
+  clicks as their OWN series (clicks are not acquisitions: 37 vs 27 on one
+  day), read by hand into a manual file with a 7-day staleness until an
+  export carries them. Never splice the two.
 - **Staleness comes from the OBJECT's update time, never the newest row.** A
   row cannot tell "stopped being written" from "moved", "renamed" or "behind";
   the object metadata (`updated`) can. List the bucket

@@ -33,7 +33,9 @@ Auth is a **service-account JSON key** (from a GCP project) with the `https://ww
 
 ## Rule 3: versionCode +1 on EVERY upload; versionName is not yours to type
 
-Bump `versionCode` for every AAB you upload. Play permanently rejects any `versionCode` it has seen, **even one uploaded to a draft track and never shipped**. `versionName` is READ from `AppVersion.xcconfig` by the Gradle build (held by `tools/test_version_contract.py`), so it cannot drift from the Apple marketing version; only `versionCode` is bumped. Anything that can refuse the upload must be checked BEFORE the bump: **release notes are capped at 500 characters**, and a refusal after the bump has spent the versionCode. Don't start a new upload while a previous release is still in review; batch trivial releases.
+Bump `versionCode` for every AAB you upload. Play permanently rejects any `versionCode` it has seen, **even one uploaded to a draft track and never shipped**. `versionName` is READ from `AppVersion.xcconfig` by the Gradle build (held by `tools/test_version_contract.py`), so it cannot drift from the Apple marketing version; only `versionCode` is bumped. Anything that can refuse the upload must be checked BEFORE the bump: **release notes are capped at 500 characters**, and a refusal after the bump has spent the versionCode. Don't start a new upload while a previous release is still in review; batch trivial releases. (Archive Watch's owner made it a rule: no new Play version until the one in review is approved; commit fixes freely meanwhile.)
+
+**Play's automatic protection requires `minSdk` 24 or higher.** An upload at 23 was refused in October 2026 ("Play automatic protection requires a minimum SDK version of 24 or higher") although 23 had uploaded two weeks earlier. A store flavor that must reach Android 6 (Fire TV) keeps 23 in its own flavor; the Play flavor's floor is 24 while automatic protection is on (AW Decision 165).
 
 ## Rule 4 — applicationId ≠ namespace
 

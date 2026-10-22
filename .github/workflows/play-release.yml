@@ -186,7 +186,14 @@ jobs:
           git commit -m "Android ${{ steps.ver.outputs.name }} (versionCode ${{ steps.ver.outputs.code }}) [skip ci]"
           for i in 1 2 3 4 5; do
             git push && exit 0
-            git pull --rebase --autostash origin "${GITHUB_REF_NAME}" || true
+            # Never `pull --rebase || true`: a conflict leaves the rebase
+            # half-done and every retry fails. build.gradle.kts is hand-edited,
+            # so a conflict on it needs a person, not a guess.
+            git fetch origin "${GITHUB_REF_NAME}"
+            if ! git rebase "origin/${GITHUB_REF_NAME}"; then
+              git rebase --abort
+              echo "::error::main changed android/app/build.gradle.kts during this run; reconcile the versionCode by hand"; exit 1
+            fi
             sleep $((i * 5))
           done
           echo "::error::could not push the versionCode bump"; exit 1

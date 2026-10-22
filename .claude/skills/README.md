@@ -88,6 +88,8 @@ them. "From" names the app where the lesson was learned.
 | `zero-cost-hosted-backend` | When people need to see one another's data: a hosted database for accounts and user data only, and everything else static. | BOBA Playbook |
 | `image-cdn-discipline` | Two sizes of every image on a CDN, never in git, and never a box that reshapes art you did not make. | BOBA Playbook, Archive Watch |
 | `content-corpus-derivation` | Deriving a shipped set of facts or questions from a messy source, at build time. | Tidbits Trivia |
+| `evidence-gated-catalog-curation` | Deciding what a catalog you did not make may show, hide, recommend, or say: a claim a reader can open, an uploader's word is not evidence, restore by evidence, never recommended but always findable, provenance on every field. | Archive Watch |
+| `internet-archive-source` | Reading archive.org honestly: scrape vs search, throttled is not empty, the connection limit, upload dates, items that hold many works, private files, storage nodes. | Archive Watch |
 | `web-catalog-data-layer` | A worked example: how Archive Watch's web app reads the shared catalog. Read `shared-data-plane-contract` first. | Archive Watch |
 
 ### Stage 03: Going native
@@ -142,6 +144,8 @@ them. "From" names the app where the lesson was learned.
 | Skill | What it is for | From |
 |---|---|---|
 | `resilient-media-streaming` | Video from hosts you do not control, without stalls. | Archive Watch |
+| `live-capture-and-broadcast` | Capturing and mixing several sources, or publishing live, with every sample on one clock and the bitrate steered by what the link carried. | Archive Watch |
+| `social-video-teaser-craft` | Vertical social video: safe areas under platform chrome, burned captions checked against the audio, cadence per platform. | Archive Watch |
 | `cross-platform-multiplayer` | Real-time play across native apps and the web, in the same room or online. | Tidbits Trivia |
 | `cross-platform-determinism` | A value (a daily pick, a shuffle) that must come out identical on every platform. | Tidbits Trivia |
 | `values-based-feed-ranking` | A feed or "for you" surface that passes the four questions as a ranking function. | Bsky Dreams |

@@ -1,6 +1,6 @@
 ---
 name: autonomous-loop-cadence
-description: "Use when running an autonomous /loop on a multi-platform codebase, or picking one up after compaction. Governs what goes IN each tick: platform rotation with an opt tick every fifth, mining real user requests before inventing work, audit-before-ship, one version convention (commits bump PATCH, store releases bump MINOR), verified vs fixed vs shipped, announcing the next tick in the owner's local time BEFORE scheduling it, the owner/agent split (the whole store ship is CLI; accounts, payments, agreements, privacy answers, console-only declarations and demo videos stay human), working-style rules (read the runbook first, audits fix what they find, warnings are defects, commit -F with a quoted heredoc), context hygiene (two scratchpad entries, ship state from Pulse, DECISIONS rolls at ~50 KB), and stop conditions. Triggers on /loop with no interval, 'keep iterating', 'loop all night', AUTONOMOUS_PROGRESS.md, resuming a loop. Depth: docs/AUTONOMOUS-LOOPS.md and docs/ENGINEERING-PROCESS.md."
+description: "Use when running an autonomous /loop on a multi-platform codebase, or picking one up after compaction. Governs what goes IN each tick: platform rotation with an opt tick every fifth, mining real user requests before inventing work, audit-before-ship, one version convention (commits bump PATCH; MINOR only when a release carries something new), verified vs fixed vs shipped, announcing the next tick in the owner's local time BEFORE scheduling it, the owner/agent split (the whole store ship is CLI; accounts, payments, agreements, privacy answers, console-only declarations and demo videos stay human), working-style rules (read the runbook first, audits fix what they find, warnings are defects, commit -F with a quoted heredoc), context hygiene (two scratchpad entries, ship state from Pulse, DECISIONS rolls at ~50 KB), and stop conditions. Triggers on /loop with no interval, 'keep iterating', 'loop all night', AUTONOMOUS_PROGRESS.md, resuming a loop. Depth: docs/AUTONOMOUS-LOOPS.md and docs/ENGINEERING-PROCESS.md."
 ---
 
 # Autonomous loop cadence (multi-platform)
@@ -92,8 +92,11 @@ read as parallel. The last tick's commit says "closes the trio."
 
 - Every commit touching app source: PATCH +1 in `MARKETING_VERSION` and
   build +1, both in `AppVersion.xcconfig`, in the same commit.
-- Every store release (Apple build and submit, Play, Amazon, Roku
-  package): MINOR +1, PATCH 0 first.
+- MINOR +1 (PATCH 0) only when a release carries something a person
+  would call NEW since the last RELEASED version (a feature, a new
+  surface). A fix-only release keeps its minor and ships at its patch,
+  and an upload never bumps the minor by itself. Decide on purpose
+  before each release, against the last released version.
 - Pipeline, CI, and docs-only commits do not bump. Never hand the bump
   to CI.
 

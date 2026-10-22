@@ -213,7 +213,17 @@
    * Key handling
    * ------------------------------------------------------------------ */
 
-  function goBack() {
+  let lastBack = { at: 0, via: '' };
+
+  function goBack(via) {
+    // Tizen firmware can deliver ONE Return press as both a keydown and a
+    // tizenhwkey event; handled twice, it skipped a layer or answered the exit
+    // question it had just asked. Only the OTHER channel's echo is dropped, so
+    // two quick presses on the remote still go back twice.
+    const now = Date.now();
+    if (via && lastBack.via && via !== lastBack.via && now - lastBack.at < 300) return;
+    lastBack = { at: now, via: via || '' };
+
     // §1.7 — Back is layered, and the layers matter.
     //
     // An OPEN OVERLAY IS THE TOP LAYER. Backing out of the player used to run
@@ -232,11 +242,35 @@
     }
 
     // Otherwise navigate back, and exit from the root. Never swallowed.
+    // Samsung's Terminating Applications policy requires the app to ask first.
     if ((location.hash || '#/').replace(/^#\/?/, '') === '') {
-      exitApp();
+      if (PLATFORM === 'tizen') askToExit(); else exitApp();
     } else {
       history.back();
     }
+  }
+
+  function askToExit() {
+    let dlg = document.getElementById('tv-exit');
+    if (!dlg) {
+      dlg = document.createElement('dialog');
+      dlg.id = 'tv-exit';
+      dlg.className = 'tv-exit';
+      const q = document.createElement('p');
+      q.textContent = 'Exit ' + document.title + '?';
+      const exit = document.createElement('button');
+      exit.type = 'button';
+      exit.textContent = 'Exit';
+      exit.addEventListener('click', exitApp);
+      const stay = document.createElement('button');
+      stay.type = 'button';
+      stay.textContent = 'Stay';
+      stay.addEventListener('click', function () { dlg.close(); claimFocus(); });
+      dlg.append(q, exit, stay);
+      document.body.appendChild(dlg);
+    }
+    dlg.showModal();
+    dlg.querySelector('button:last-of-type').focus();
   }
 
   function exitApp() {
@@ -252,7 +286,7 @@
   function onKeyDown(ev) {
     const code = ev.keyCode;
 
-    if (BACK_KEYS.has(code)) { ev.preventDefault(); goBack(); return; }
+    if (BACK_KEYS.has(code)) { ev.preventDefault(); goBack('key'); return; }
 
     // A focused <select> OWNS Up/Down: spatial navigation on every arrow walked
     // off the control, so its value could never change — filters that were
@@ -306,14 +340,25 @@
    * Lifecycle (§7.3) — pause on suspend, resume focus on return
    * ------------------------------------------------------------------ */
 
+  // Samsung CO-MT-01: media the app paused on going to the background resumes
+  // when it returns. Media the person paused stays paused.
+  let pausedByHide = null;
+
   function onHidden() {
     const v = document.querySelector('video');
-    if (v && !v.paused) v.pause();
+    if (v && !v.paused) { v.pause(); pausedByHide = v; }
+  }
+
+  function onShown() {
+    const v = pausedByHide;
+    pausedByHide = null;
+    if (v && v.isConnected) v.play().catch(function () { /* autoplay refused; leave paused */ });
+    claimFocus();
   }
 
   function installLifecycle() {
     document.addEventListener('visibilitychange', function () {
-      if (document.hidden) onHidden(); else claimFocus();
+      if (document.hidden) onHidden(); else onShown();
     });
 
     if (PLATFORM === 'webos') {
@@ -326,7 +371,7 @@
       // The hardware Back/Exit key arrives as its own event on Tizen in
       // addition to keydown, depending on firmware.
       document.addEventListener('tizenhwkey', function (e) {
-        if (e.keyName === 'back') { e.preventDefault(); goBack(); }
+        if (e.keyName === 'back') { e.preventDefault(); goBack('hwkey'); }
       });
     }
   }
