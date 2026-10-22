@@ -2524,7 +2524,7 @@ a.ui-row-title { color: var(--ink); }
    things; the head marks <html data-signed-in> before the page draws. */
 html[data-signed-in] .site-header .nav { display: none; }
 .app-nav, .app-menu-button { display: none; }
-html[data-signed-in] body:not([data-no-app-nav]) .app-menu-button { display: inline-flex; align-items: center; gap: 0.4rem; margin-right: auto; margin-left: 0.75rem; background: none; border: 1px solid var(--rule); border-radius: 999px; padding: 0.35rem 0.85rem; font: inherit; font-weight: 600; color: var(--ink); cursor: pointer; min-height: 40px; }
+html[data-signed-in] body:not([data-no-app-nav]) .app-menu-button { display: inline-flex; align-items: center; gap: 0.4rem; margin-right: auto; margin-left: 0.25rem; background: none; border: 1px solid var(--rule); border-radius: 999px; padding: 0.35rem 0.8rem; font: inherit; font-weight: 600; color: var(--ink); cursor: pointer; min-height: 40px; }
 html[data-signed-in] body:not([data-no-app-nav]) .site-header { position: sticky; top: 0; z-index: 30; background: var(--paper); border-bottom: 1px solid var(--rule); }
 .app-nav { padding: 0.75rem 0.6rem 1rem; overflow-y: auto; background: var(--paper); flex-direction: column; }
 .app-nav ul { list-style: none; margin: 0; padding: 0; }
