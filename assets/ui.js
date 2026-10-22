@@ -34,7 +34,7 @@
     request: { waiting: ['waiting', 'Waiting'], approved: ['done', 'Approved'], declined: ['off', 'Declined'] },
     credential: { none: ['off', 'Not earned yet'], waiting: ['waiting', 'Waiting to be signed'], signed: ['done', 'Signed'], revoked: ['problem', 'Revoked'] },
     app: { submitted: ['done', 'Submitted'], notyet: ['waiting', 'Not submitted'], hidden: ['off', 'Hidden'] },
-    invitation: { invited: ['waiting', 'Invited'], joined: ['done', 'Joined'], failed: ['problem', 'Failed'] },
+    invitation: { notyet: ['off', 'Not joined'], invited: ['waiting', 'Invited'], joined: ['done', 'Joined'], failed: ['problem', 'Failed'] },
     exchange: { open: ['active', 'Open'], closed: ['off', 'Closed'] },
     task: { done: ['done', 'Done'], todo: ['waiting', 'To do'], optional: ['waiting', 'Optional'], blocked: ['off', 'Cannot start yet'] },
     connection: { live: ['active', 'Live'], checking: ['waiting', 'Checking'], offline: ['problem', 'Offline'] },

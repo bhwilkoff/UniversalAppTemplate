@@ -27,14 +27,14 @@ test('the names come from the slug, or from what the cohort already records', ()
 
 test('a new cohort gets every step, in order', () => {
   const r = stepsFor({ cohort, names, repo: null, team: null, teamCanRead: false });
-  assert.deepEqual(r.steps, ['create-repo', 'turn-on-discussions', 'create-team', 'let-team-read', 'record']);
+  assert.deepEqual(r.steps, ['create-repo', 'turn-on-discussions', 'create-team', 'let-team-read', 'record', 'write-files']);
 });
 
 test('asking again finishes only what is missing', () => {
   const half = stepsFor({ cohort, names, repo: mine, team: null, teamCanRead: false });
-  assert.deepEqual(half.steps, ['turn-on-discussions', 'create-team', 'let-team-read', 'record']);
-  const done = stepsFor({ cohort: { ...cohort }, names: { ...names, recorded: true }, repo: { ...mine, has_discussions: true }, team: { description: '' }, teamCanRead: true });
-  assert.deepEqual(done.steps, []);
+  assert.deepEqual(half.steps, ['turn-on-discussions', 'create-team', 'let-team-read', 'record', 'turn-on-issues', 'write-files']);
+  const done = stepsFor({ cohort: { ...cohort }, names: { ...names, recorded: true }, repo: { ...mine, has_discussions: true, has_issues: true }, team: { description: '' }, teamCanRead: true });
+  assert.deepEqual(done.steps, ['write-files']);
 });
 
 test('a name taken by something the cohort did not make is refused, never reused', () => {
@@ -67,4 +67,17 @@ test('an agent’s token is told apart from a person’s by its client_id', () =
   assert.equal(isAgentToken(jwt({ sub: 'u', client_id: 'claude' })), true);
   assert.equal(isAgentToken(jwt({ sub: 'u' })), false);
   assert.equal(isAgentToken('not a token'), false);
+});
+
+import { seedFiles, issuesRequest } from '../../supabase/functions/cohort-access/provision.js';
+test('a cohort repository starts with a README and the workflow that keeps replaced history', () => {
+  const files = seedFiles({ slug: 'kit-test', title: 'Kit test' });
+  assert.deepEqual(files.map((f) => f.path), ['README.md', '.github/workflows/keep-replaced-history.yml']);
+  assert.match(files[0].content, /^# Kit test\n/);
+  assert.match(files[0].content, /cohort\/\?c=kit-test&t=files/);
+  assert.match(files[1].content, /if: github\.event\.forced/);
+  assert.match(files[1].content, /sha: context\.payload\.before/);
+});
+test('an older repository gets its issues turned on', () => {
+  assert.deepEqual(issuesRequest({ repo: 'cohort-test' }), { method: 'PATCH', path: '/repos/humanshaped/cohort-test', body: { has_issues: true } });
 });

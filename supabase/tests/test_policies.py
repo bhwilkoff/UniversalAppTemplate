@@ -2931,6 +2931,32 @@ def main():
     check("there is no such right as owner", not attempt(as_user("ben"), setr, (people["xan"], "owner", True, None)))
     attempt(as_user("ben"), setr, (people["xan"], "can_admin", False, None))
     attempt(as_user("ben"), setr, (people["xan"], "teacher", False, None))
+
+    # Repository roles (migration 20261022020000): a leader of the cohort
+    # chooses what each learner may do in its repository; a leader always
+    # maintains. bea is a learner in Ben's cohort; dee is outside it.
+    attempt(as_user("ben"), "insert into public.cohorts (slug, title, created_by, status) values ('repo-roles', 'Repo roles', %s, 'open') returning id", (people["ben"],))
+    rc = last_rows[0][0]
+    su.execute("reset role")
+    su.execute("insert into public.enrollments (cohort_id, user_id) values (%s, %s)", (rc, people["bea"]))
+    setrole = "select public.set_repo_role(%s, %s, %s)"
+    check("a leader limits a learner to reading the repository",
+          attempt(as_user("ben"), setrole, (rc, people["bea"], "read")) and last_rows == [("read",)])
+    check("and the choice says who made it",
+          attempt(as_user("ben"), "select role::text, set_by::text from public.repo_roles where cohort_id = %s", (rc,)) and last_rows == [("read", people["ben"])])
+    check("choosing again replaces the choice",
+          attempt(as_user("ben"), setrole, (rc, people["bea"], "triage"))
+          and attempt(as_user("ben"), "select count(*) from public.repo_roles where cohort_id = %s", (rc,)) and last_rows == [(1,)])
+    check("the learner reads their own role", attempt(as_user("bea"), "select role::text from public.repo_roles where cohort_id = %s", (rc,)) and last_rows == [("triage",)])
+    check("a learner cannot choose their own role", not attempt(as_user("bea"), setrole, (rc, people["bea"], "maintain")))
+    check("nor write the table directly",
+          not attempt(as_user("bea"), "insert into public.repo_roles (cohort_id, user_id, role, set_by) values (%s, %s, 'maintain', %s)", (rc, people["bea"], people["bea"])))
+    check("someone outside the cohort sees no roles", attempt(as_user("dee"), "select count(*) from public.repo_roles") and last_rows == [(0,)])
+    check("a leader's role is not chosen: they always maintain",
+          not attempt(as_user("ben"), setrole, (rc, people["ben"], "read")) and "always maintains" in last_reason[0])
+    check("only people in the cohort get a role", not attempt(as_user("ben"), setrole, (rc, people["dee"], "write")))
+    check("an agent cannot change a role", not attempt(as_agent("ben"), setrole, (rc, people["bea"], "write")))
+    check("there is no admin role to give", not attempt(as_user("ben"), setrole, (rc, people["bea"], "admin")))
     conn.rollback()
     conn.close()
     failed = [n for n, ok in results if not ok]

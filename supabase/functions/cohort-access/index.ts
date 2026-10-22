@@ -4,10 +4,18 @@
 // plan.js; this file only asks the database, asks GitHub, and records
 // the answer in github_access.
 //
+// Each person also gets their own role on the repository, above the
+// team's read access: a leader maintains, a learner writes unless a
+// leader chose another role on humanshaped.org (repo_roles). "sync",
+// asked by a leader, brings everyone's role on GitHub up to what Human
+// Shaped records, takes off anyone who has left, and finishes any
+// invitation that has since been accepted.
+//
 // "provision", asked by a teacher of the cohort, makes the conversation
 // itself: the private repository with Discussions on and the secret team
 // that reads it (rules in provision.js). It needs the GitHub App to have
-// the repository Administration permission as well as Members.
+// the repository Administration permission as well as Members, and,
+// for the files it starts the repository with, Contents and Workflows.
 //
 // Secrets (set in Supabase, never in this repository):
 //   GITHUB_APP_ID, GITHUB_APP_PRIVATE_KEY, GITHUB_APP_INSTALLATION_ID
@@ -15,10 +23,10 @@
 
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { createAppAuth } from 'npm:@octokit/auth-app@7';
-import { plan, outcome } from './plan.js';
+import { plan, outcome, wantedRole, repoName, collaboratorRequest, roleOutcome, syncStep } from './plan.js';
 import {
   mayProvision, namesFor, stepsFor, repoRequest, teamRequest, teamReadRequest,
-  discussionsMutation, recorded, isAgentToken,
+  discussionsMutation, recorded, isAgentToken, issuesRequest, seedFiles,
 } from './provision.js';
 
 const ALLOWED_ORIGINS = ['https://humanshaped.org', 'https://www.humanshaped.org'];
@@ -55,14 +63,16 @@ Deno.serve(async (req) => {
   try { input = await req.json(); } catch { return reply(400, { message: 'Send JSON.' }); }
   if (!input.cohort_id) return reply(400, { message: 'Which cohort?' });
   if (input.action === 'provision') return provision(db, uid, input.cohort_id, reply);
+  if (input.action === 'sync') return sync(db, uid, input.cohort_id, reply);
 
-  const [profile, cohort, enrollment, teacher] = await Promise.all([
+  const [profile, cohort, enrollment, teacher, chosen] = await Promise.all([
     db.from('profiles').select('github_login').eq('id', uid).maybeSingle(),
-    db.from('cohorts').select('id, github_team').eq('id', input.cohort_id).maybeSingle(),
+    db.from('cohorts').select('id, github_team, github_repo').eq('id', input.cohort_id).maybeSingle(),
     db.from('enrollments').select('status').eq('cohort_id', input.cohort_id).eq('user_id', uid).maybeSingle(),
     db.from('cohort_teachers').select('user_id').eq('cohort_id', input.cohort_id).eq('user_id', uid).maybeSingle(),
+    db.from('repo_roles').select('role').eq('cohort_id', input.cohort_id).eq('user_id', uid).maybeSingle(),
   ]);
-  const failed = [profile, cohort, enrollment, teacher].find((r) => r.error);
+  const failed = [profile, cohort, enrollment, teacher, chosen].find((r) => r.error);
   if (failed) return reply(500, { message: 'The hub could not be read: ' + failed.error!.message });
 
   const p = plan({
@@ -78,13 +88,29 @@ Deno.serve(async (req) => {
   if (!token) return reply(503, { message: 'The cohort\u2019s conversation is not connected to GitHub yet. Try again later, or tell your teacher.' });
 
   const gh = await github(token, p.method, p.path, p.body);
-  const result = outcome(p.method, gh.status, gh.body);
+  const result: { state: string; detail: string | null } = outcome(p.method, gh.status, gh.body);
+
+  // Their own role on the repository: set once they are in the
+  // organization, taken off when they leave.
+  let role: string | null = null;
+  const repo = repoName(cohort.data);
+  if (repo && (result.state === 'member' || result.state === 'removed')) {
+    const want = result.state === 'member'
+      ? wantedRole({ teaches: !!teacher.data, enrolled: !!enrollment.data && enrollment.data.status !== 'left', chosen: chosen.data?.role })
+      : null;
+    const q = collaboratorRequest(repo, profile.data!.github_login, want);
+    const r = await github(token, q.method, q.path, q.body);
+    const o = roleOutcome(q.method, r.status, r.body);
+    if (o.ok) role = want;
+    else result.detail = o.detail;
+  }
 
   const saved = await db.from('github_access').upsert({
     cohort_id: input.cohort_id,
     user_id: uid,
     state: result.state,
     detail: result.detail,
+    repo_role: role,
     updated_at: new Date().toISOString(),
   });
   if (saved.error) return reply(500, { message: 'GitHub answered, but the hub could not record it: ' + saved.error.message, ...result });
@@ -161,6 +187,7 @@ async function provision(db: any, uid: string, cohortId: string, reply: (s: numb
 
   let repo = repoNow.status === 200 ? repoNow.body : null;
   const done: string[] = [];
+  const waiting: string[] = [];
   const fail = (step: string, r: { status: number; body: { message?: string } | null }) =>
     reply(502, {
       message: `GitHub refused at "${step}" (${r.status}: ${String(r.body?.message || 'no details').slice(0, 200)}). ` +
@@ -190,8 +217,105 @@ async function provision(db: any, uid: string, cohortId: string, reply: (s: numb
     } else if (step === 'record') {
       const saved = await db.from('cohorts').update(recorded(names)).eq('id', c.id);
       if (saved.error) return reply(500, { message: 'GitHub is ready, but the hub could not record it: ' + saved.error.message, done });
+    } else if (step === 'turn-on-issues') {
+      const q = issuesRequest(names);
+      const r = await github(token, q.method, q.path, q.body);
+      if (r.status !== 200) return fail(step, r);
+    } else if (step === 'write-files') {
+      // The repository works without these, so a file GitHub refuses
+      // (most often because the app has not been given Contents and
+      // Workflows yet) is reported, never a failure.
+      for (const f of seedFiles(c)) {
+        const at = `/repos/humanshaped/${encodeURIComponent(names.repo)}/contents/${f.path.split('/').map(encodeURIComponent).join('/')}`;
+        const there = await github(token, 'GET', at);
+        if (there.status === 200) continue;
+        const r = there.status === 404
+          ? await github(token, 'PUT', at, { message: f.message, content: base64(f.content) })
+          : there;
+        if (r.status !== 201 && r.status !== 200) waiting.push(`${f.path} (${r.status}: ${String(r.body?.message || 'no details').slice(0, 120)})`);
+      }
     }
     done.push(step);
   }
-  return reply(200, { state: 'ready', ...recorded(names), done });
+  return reply(200, { state: 'ready', ...recorded(names), done, waiting });
+}
+
+function base64(text: string) {
+  const bytes = new TextEncoder().encode(text);
+  let bin = '';
+  for (const b of bytes) bin += String.fromCharCode(b);
+  return btoa(bin);
+}
+
+// A leader brings GitHub up to what Human Shaped records for everyone in
+// the cohort (syncStep in plan.js decides what each person needs).
+// deno-lint-ignore no-explicit-any
+async function sync(db: any, uid: string, cohortId: string, reply: (s: number, b: unknown) => Response) {
+  const [cohort, leaders, members, chosen, access] = await Promise.all([
+    db.from('cohorts').select('id, github_repo, github_team').eq('id', cohortId).maybeSingle(),
+    db.from('cohort_teachers').select('user_id, profiles(github_login)').eq('cohort_id', cohortId),
+    db.from('enrollments').select('user_id, status, profiles(github_login)').eq('cohort_id', cohortId),
+    db.from('repo_roles').select('user_id, role').eq('cohort_id', cohortId),
+    db.from('github_access').select('user_id, state, repo_role').eq('cohort_id', cohortId),
+  ]);
+  const bad = [cohort, leaders, members, chosen, access].find((r) => r.error);
+  if (bad) return reply(500, { message: 'Human Shaped could not be read: ' + bad.error.message });
+  // deno-lint-ignore no-explicit-any
+  if (!leaders.data.some((t: any) => t.user_id === uid)) return reply(403, { message: 'Only a leader of this cohort can do this.' });
+  const c = cohort.data;
+  const repo = repoName(c);
+  if (!repo || !c.github_team) return reply(409, { message: 'This cohort does not have its repository yet.' });
+
+  const token = await appToken();
+  if (!token) return reply(503, { message: 'Human Shaped cannot reach GitHub just now. Try again later.' });
+
+  // deno-lint-ignore no-explicit-any
+  const people = new Map<string, any>();
+  // deno-lint-ignore no-explicit-any
+  for (const m of members.data as any[]) people.set(m.user_id, { id: m.user_id, login: m.profiles?.github_login, enrolled: m.status !== 'left' });
+  // deno-lint-ignore no-explicit-any
+  for (const t of leaders.data as any[]) people.set(t.user_id, { ...(people.get(t.user_id) || { id: t.user_id, login: t.profiles?.github_login }), teaches: true });
+  // deno-lint-ignore no-explicit-any
+  for (const r of chosen.data as any[]) if (people.has(r.user_id)) people.get(r.user_id).chosen = r.role;
+  // deno-lint-ignore no-explicit-any
+  for (const a of access.data as any[]) if (people.has(a.user_id)) people.get(a.user_id).access = a;
+
+  const changed: string[] = [];
+  const problems: { login: string; detail: string }[] = [];
+  const membership = (login: string) => `/orgs/humanshaped/teams/${encodeURIComponent(c.github_team)}/memberships/${encodeURIComponent(login)}`;
+
+  for (const p of people.values()) {
+    const step = syncStep(p);
+    if (!step) continue;
+    let state = p.access.state;
+    let role = p.access.repo_role;
+    let detail: string | null = null;
+    if (step.kind === 'remove') {
+      await github(token, 'DELETE', membership(p.login));
+      const q = collaboratorRequest(repo, p.login, null);
+      const r = await github(token, q.method, q.path);
+      const o = roleOutcome(q.method, r.status, r.body);
+      if (o.ok) { state = 'removed'; role = null; } else detail = o.detail!;
+    } else {
+      if (step.kind === 'check-invitation' || step.kind === 'join') {
+        const r = await github(token, step.kind === 'join' ? 'PUT' : 'GET', membership(p.login), step.kind === 'join' ? { role: p.teaches ? 'maintainer' : 'member' } : undefined);
+        const o = outcome('PUT', r.status === 404 ? 404 : r.status, r.body);
+        state = r.status === 404 ? 'failed' : o.state;
+        detail = r.status === 404 ? 'Their invitation is gone. They can ask again from the cohort\u2019s Conversation.' : o.detail;
+      }
+      if (state === 'member') {
+        const q = collaboratorRequest(repo, p.login, step.role);
+        const r = await github(token, q.method, q.path, q.body);
+        const o = roleOutcome(q.method, r.status, r.body);
+        if (o.ok) role = step.role; else detail = o.detail!;
+      }
+    }
+    if (detail) problems.push({ login: p.login, detail });
+    if (state !== p.access.state || role !== p.access.repo_role || detail) {
+      await db.from('github_access').update({ state, repo_role: role, detail, updated_at: new Date().toISOString() })
+        .eq('cohort_id', cohortId).eq('user_id', p.id);
+      if (!detail) changed.push(p.login);
+    }
+  }
+  return reply(problems.length ? 207 : 200, { changed, problems });
 }

@@ -38,3 +38,43 @@ test('GitHub answers become member, invited, removed, or failed', () => {
   assert.equal(outcome('DELETE', 404, { message: 'Not Found' }).state, 'removed');
   assert.deepEqual(outcome('PUT', 422, { message: 'Validation Failed' }), { state: 'failed', detail: 'GitHub answered 422: Validation Failed' });
 });
+
+// Repository roles (migration 20261022020000).
+import { wantedRole, collaboratorRequest, roleOutcome, syncStep, repoName } from '../../supabase/functions/cohort-access/plan.js';
+
+test('a leader maintains, a learner writes unless a leader chose otherwise, anyone else has no role', () => {
+  assert.equal(wantedRole({ teaches: true, enrolled: false }), 'maintain');
+  assert.equal(wantedRole({ teaches: true, enrolled: true, chosen: 'read' }), 'maintain');
+  assert.equal(wantedRole({ teaches: false, enrolled: true }), 'write');
+  assert.equal(wantedRole({ teaches: false, enrolled: true, chosen: 'read' }), 'read');
+  assert.equal(wantedRole({ teaches: false, enrolled: true, chosen: 'admin' }), 'write');
+  assert.equal(wantedRole({ teaches: false, enrolled: false, chosen: 'write' }), null);
+});
+test('roles become GitHub permissions on the repository; no role takes the person off', () => {
+  assert.deepEqual(collaboratorRequest('cohort-test', 'bea', 'write'),
+    { method: 'PUT', path: '/repos/humanshaped/cohort-test/collaborators/bea', body: { permission: 'push' } });
+  assert.equal(collaboratorRequest('cohort-test', 'bea', 'read').body.permission, 'pull');
+  assert.equal(collaboratorRequest('cohort-test', 'bea', 'maintain').body.permission, 'maintain');
+  assert.deepEqual(collaboratorRequest('cohort-test', 'a/b', null), { method: 'DELETE', path: '/repos/humanshaped/cohort-test/collaborators/a%2Fb' });
+  assert.equal(repoName({ github_repo: 'humanshaped/cohort-test' }), 'cohort-test');
+  assert.equal(repoName({ github_repo: null }), null);
+});
+test('GitHub answers for a role', () => {
+  assert.ok(roleOutcome('PUT', 204, null).ok);
+  assert.ok(roleOutcome('DELETE', 404, null).ok);
+  assert.equal(roleOutcome('PUT', 403, { message: 'Resource not accessible by integration' }).ok, false);
+});
+test('bringing GitHub up to date leaves alone anyone who never asked', () => {
+  assert.equal(syncStep({ login: 'bea', enrolled: true, access: null }), null);
+  assert.equal(syncStep({ login: 'bea', enrolled: true, access: { state: 'removed' } }), null);
+  assert.equal(syncStep({ login: null, enrolled: true, access: { state: 'member' } }), null);
+});
+test('and changes only what differs', () => {
+  assert.equal(syncStep({ login: 'bea', enrolled: true, access: { state: 'member', repo_role: 'write' } }), null);
+  assert.deepEqual(syncStep({ login: 'bea', enrolled: true, chosen: 'read', access: { state: 'member', repo_role: 'write' } }), { kind: 'set-role', role: 'read' });
+  assert.deepEqual(syncStep({ login: 'bea', enrolled: true, access: { state: 'member', repo_role: null } }), { kind: 'set-role', role: 'write' });
+  assert.deepEqual(syncStep({ login: 'bea', enrolled: true, access: { state: 'invited' } }), { kind: 'check-invitation', role: 'write' });
+  assert.deepEqual(syncStep({ login: 'bea', enrolled: true, access: { state: 'failed' } }), { kind: 'join', role: 'write' });
+  assert.deepEqual(syncStep({ login: 'bea', enrolled: false, access: { state: 'member', repo_role: 'write' } }), { kind: 'remove' });
+  assert.deepEqual(syncStep({ login: 'kofi', teaches: true, access: { state: 'member', repo_role: 'maintain' } }), null);
+});

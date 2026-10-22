@@ -110,7 +110,7 @@ mirrors it; a test checks they match):
 - request to teach: Waiting (waiting), Approved (done), Declined (off)
 - credential: Not earned yet (off), Waiting to be signed (waiting), Signed (done), Revoked (problem)
 - app: Submitted (done), Not submitted (waiting), Hidden (off)
-- invitation: Invited (waiting), Joined (done), Failed (problem)
+- invitation: Not joined (off), Invited (waiting), Joined (done), Failed (problem)
 - exchange: Open (active), Closed (off)
 - task: Done (done), To do (waiting), Optional (waiting), Cannot start yet (off)
 - connection: Live (active), Checking (waiting), Offline (problem)

@@ -299,7 +299,7 @@
           db.from('shares').select('*, feedback(id, author_id, body, created_at)').eq('cohort_id', cohort.id).order('created_at', { ascending: false }).limit(40),
           db.from('calendar_contacts').select('email').eq('cohort_id', cohort.id).eq('user_id', me.id).maybeSingle(),
           db.from('cohort_teachers').select('user_id, profiles(github_login, display_name)').eq('cohort_id', cohort.id),
-          db.from('github_access').select('state, detail').eq('cohort_id', cohort.id).eq('user_id', me.id).maybeSingle(),
+          db.from('github_access').select('*').eq('cohort_id', cohort.id).eq('user_id', me.id).maybeSingle(),
           // Read on its own: before the table exists, this fails quietly and
           // the ready marks simply do not show.
           db.from('share_confirmations').select('share_id, user_id').eq('cohort_id', cohort.id),
@@ -319,6 +319,7 @@
           partnerIds = lib.partnersOf(me.id, res[2].data);
           draw(people, mine, res[1].data, res[2].data, res[3].data, res[4].data, res[5].data);
           drawTalk(res[6].data);
+          if (window.CohortFiles) window.CohortFiles.mount($('[data-files]'), { db: db, session: session, cohort: cohort, access: res[6].data, leading: teaching });
           drawNotes(res[5].data);
           drawRecognized(res[5].data);
           drawSetup(mine, res[6].data);

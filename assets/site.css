@@ -2632,3 +2632,12 @@ html.app-nav-open[data-signed-in] body:not([data-no-app-nav]) .app-nav { display
 .guide-step p { margin: 0.3rem 0 0; max-width: 38rem; }
 .guide-step a.ui-row-title:not([href]) { color: var(--ink); text-decoration: none; }
 .guide > p { max-width: 38rem; }
+
+/* The cohort's Files section, and each learner's role on GitHub in People. */
+.files-group { margin-top: 1.5rem; }
+.files-group h3 { font-size: 1rem; margin: 0 0 0.25rem; }
+.files-group h3 a { color: inherit; }
+.files-add { margin: 1rem 0; }
+.roster-repo { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+.roster-repo label { font-size: 0.875rem; }
+.roster-repo select { margin-left: 0.25rem; }

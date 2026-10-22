@@ -11,6 +11,9 @@
   var db = null, me = null;
   var current = null;
   var currentGroups = [];
+  // What each person may do in the repository, and what GitHub holds
+  // for them now (migration 20261022020000).
+  var accessBy = {}, chosenBy = {};
   var DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
   function $(sel) { return root.querySelector(sel); }
@@ -87,7 +90,9 @@
       // the database has it, and the page works the same before then.
       db.from('groups').select('*, group_members(user_id)').eq('cohort_id', id).order('name'),
       db.from('github_access').select('state').eq('cohort_id', id).eq('user_id', me.id).maybeSingle(),
-      db.from('credentials').select('*').eq('cohort_id', id)
+      db.from('credentials').select('*').eq('cohort_id', id),
+      db.from('github_access').select('*').eq('cohort_id', id),
+      db.from('repo_roles').select('user_id, role').eq('cohort_id', id)
     ]).then(function (res) {
       var bad = res.slice(0, 5).filter(function (r) { return r.error; })[0];
       if (bad) return failed('Your leader’s tools could not be loaded: ' + bad.error.message);
@@ -95,6 +100,9 @@
       document.title = current.title + ' | Human Shaped';
       $('[data-edit]').href = '/teach/cohort/edit/?c=' + current.id;
       currentGroups = res[3].data;
+      accessBy = {}; chosenBy = {};
+      (res[6].data || []).forEach(function (a) { accessBy[a.user_id] = a; });
+      (res[7].data || []).forEach(function (r) { chosenBy[r.user_id] = r.role; });
       var c = current;
       drawFacts(c, res[1].data, res[2].data);
       drawOverview(c, res[1].data);
@@ -751,6 +759,7 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
         var li = el('li');
         li.appendChild(el('strong', null, t.user_id === me.id ? 'You' : personName(t)));
         li.appendChild(el('span', 'role-tag', 'Leader'));
+        if (c.github_repo) li.appendChild(el('span', 'small', ' Maintain on GitHub'));
         if (t.user_id === c.created_by) { li.appendChild(el('span', 'small', ' made this cohort')); box.appendChild(li); return; }
         var msg = el('span', 'small'); msg.setAttribute('role', 'status');
         var self = t.user_id === me.id;
@@ -767,6 +776,7 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
             if (r.error || !r.data.length) { msg.textContent = ' Not removed: ' + (r.error ? r.error.message : 'no change was allowed') + '.'; return; }
             if (t.user_id === me.id) { location.assign('/teach/'); return; }
             drawTeachers();
+            if (c.github_repo) syncGitHub();
           });
         }
         li.appendChild(document.createTextNode(' '));
@@ -818,9 +828,67 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
         li.appendChild(r);
       }
       if (window.MentorLib && (p.role === 'student' || p.role === 'mentor')) li.appendChild(roleSwitch(p, people));
+      if (current.github_repo) li.appendChild(repoRole(p, people));
       ul.appendChild(li);
     });
     box.appendChild(ul);
+  }
+
+  // What a learner may do in the cohort's repository, chosen here and
+  // carried to GitHub by the cohort-access function. GitHub's own names
+  // for its roles, so they read the same in both places. Someone who has
+  // not joined on GitHub yet gets the role when they do.
+  var ROLE_NAMES = { read: 'Read', triage: 'Triage', write: 'Write', maintain: 'Maintain' };
+  function repoRole(p, people) {
+    var wrap = el('span', 'roster-repo');
+    var label = el('label', null, 'On GitHub ');
+    var pick = el('select');
+    var chosen = chosenBy[p.user_id] || 'write';
+    Object.keys(ROLE_NAMES).forEach(function (k) {
+      var o = el('option', null, ROLE_NAMES[k]); o.value = k; o.selected = k === chosen; pick.appendChild(o);
+    });
+    label.appendChild(pick);
+    wrap.appendChild(document.createTextNode(' '));
+    wrap.appendChild(label);
+    var a = accessBy[p.user_id];
+    if (!a || a.state === 'removed') wrap.appendChild(U.status('invitation', 'notyet'));
+    else if (a.state === 'invited') wrap.appendChild(U.status('invitation', 'invited'));
+    else if (a.state === 'failed' || (a.state === 'member' && a.repo_role !== chosen)) wrap.appendChild(U.status('action', 'failed'));
+    var msg = el('span', 'ui-inline-status'); msg.setAttribute('role', 'status');
+    if (a && a.detail) U.say(msg, a.detail, 'problem');
+    wrap.appendChild(msg);
+    pick.addEventListener('change', function () {
+      pick.disabled = true;
+      U.say(msg, 'Saving');
+      db.rpc('set_repo_role', { c: current.id, u: p.user_id, r: pick.value }).then(function (r) {
+        if (r.error) { pick.disabled = false; pick.value = chosen; U.say(msg, 'Not saved: ' + r.error.message, 'problem'); return; }
+        chosenBy[p.user_id] = pick.value;
+        return syncGitHub().then(function (said) {
+          pick.disabled = false;
+          drawRoster(people);
+          if (said) say('[data-detail-message]', said);
+        });
+      });
+    });
+    return wrap;
+  }
+
+  // Bring everyone's access on GitHub up to what Human Shaped records,
+  // then read back what GitHub now holds.
+  function syncGitHub() {
+    return db.functions.invoke('cohort-access', { body: { action: 'sync', cohort_id: current.id } }).then(function (r) {
+      var problem = null;
+      if (r.error) {
+        var res = r.error.context;
+        problem = (res && res.json ? res.json() : Promise.resolve({})).catch(function () { return {}; }).then(function (b) { return 'GitHub was not updated: ' + (b.message || 'no answer'); });
+      } else if (r.data && r.data.problems && r.data.problems.length) {
+        problem = Promise.resolve('GitHub was not updated for ' + r.data.problems.map(function (x) { return '@' + x.login; }).join(', ') + '.');
+      }
+      return db.from('github_access').select('*').eq('cohort_id', current.id).then(function (a) {
+        if (!a.error) { accessBy = {}; a.data.forEach(function (x) { accessBy[x.user_id] = x; }); }
+        return problem;
+      });
+    });
   }
 
   // A teacher moves someone between student and mentor (DECISIONS.md,

@@ -42,6 +42,57 @@ export function outcome(method, status, body) {
   return { state: 'failed', detail: `GitHub answered ${status}: ${why}` };
 }
 
+// ---- What each person may do in the repository ----------------------
+// (migration 20261022020000, research/notes/cohort-repository-design.md)
+// The team only lets people read; each person's own role sits above
+// that, as a direct grant on the repository, which GitHub adds at once
+// for someone already in the organization. A leader maintains; a learner
+// writes unless a leader chose another role; anyone else has none.
+
+export const GITHUB_PERMISSION = { read: 'pull', triage: 'triage', write: 'push', maintain: 'maintain' };
+
+export function wantedRole({ teaches, enrolled, chosen }) {
+  if (teaches) return 'maintain';
+  if (!enrolled) return null;
+  return GITHUB_PERMISSION[chosen] ? chosen : 'write';
+}
+
+export function repoName(cohort) {
+  return cohort && cohort.github_repo ? String(cohort.github_repo).replace(/^humanshaped\//, '') : null;
+}
+
+export function collaboratorRequest(repo, login, role) {
+  const path = `/repos/${ORG}/${encodeURIComponent(repo)}/collaborators/${encodeURIComponent(login)}`;
+  return role ? { method: 'PUT', path, body: { permission: GITHUB_PERMISSION[role] } } : { method: 'DELETE', path };
+}
+
+// 204 is GitHub's answer for an organization member; 201 means it sent a
+// repository invitation instead, which only happens to someone outside
+// the organization and is left for them to accept.
+export function roleOutcome(method, status, body) {
+  if (method === 'PUT' && (status === 204 || status === 201)) return { ok: true };
+  if (method === 'DELETE' && (status === 204 || status === 404)) return { ok: true };
+  const why = body && body.message ? String(body.message).slice(0, 200) : 'no details';
+  return { ok: false, detail: `GitHub did not set the repository role (${status}: ${why})` };
+}
+
+// What a leader's "bring GitHub up to date" does for each person, from
+// what Human Shaped records. Someone who never asked for access is left
+// alone (GitHub would email them an invitation they did not ask for);
+// someone whose invitation is waiting is checked; someone who has left
+// is taken off.
+//   person: { login, teaches, enrolled, chosen, access: { state, repo_role } | null }
+export function syncStep(person) {
+  const access = person.access;
+  if (!person.login || !access || access.state === 'removed') return null;
+  const role = wantedRole(person);
+  if (!role) return { kind: 'remove' };
+  if (access.state === 'invited') return { kind: 'check-invitation', role };
+  if (access.state === 'failed') return { kind: 'join', role };
+  if (access.repo_role !== role) return { kind: 'set-role', role };
+  return null;
+}
+
 function refuse(status, message) {
   return { ok: false, status, message };
 }
