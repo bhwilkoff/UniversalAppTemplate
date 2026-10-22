@@ -119,35 +119,43 @@ and never replaces a file people have changed.
 **Built: Watch on GitHub**, in Conversation. Watching the cohort
 repository means GitHub emails the person about new discussions,
 issues, and files, by their own settings, from GitHub's own servers, at
-no cost. If GitHub will not let the page change it, the button becomes
-a link to the repository's own Watch button. (Not verified: whether
-GitHub lets a GitHub App's user token set a subscription at all. Its
-permissions page lists only reading subscriptions under "Watching".)
+no cost. **Checked October 22, 2026:** GitHub lets an app read which
+repositories a person watches (`/user/subscriptions`, with the Watching
+permission) but not change it: `PUT /repos/{owner}/{repo}/subscription`
+answers 403 "Resource not accessible by integration" to an app's user
+token even with Watching granted. So Conversation shows **Watching**
+with a link to change it on GitHub, or **Watch on GitHub**, which opens
+the repository where GitHub's own Watch button is.
 
-**Built: session threads the day before.** `supabase/functions/github-tick` (rules in `tick.js`, tested in `tools/test/github-tick.test.mjs`) opens each session's discussion within the day before it, with the same words and category as `/live/` and the start written out in the cohort's zone, and keeps the session's thread number, never replacing one a leader opened. It accepts only a workflow on the main branch of `humanshaped/automation`, proven by GitHub's OIDC token. The workflow is in `tools/automation/repo/`, waiting for that public repository to exist.
+**Built and running: session threads the day before.**
+`supabase/functions/github-tick` (rules in `tick.js`, tested in
+`tools/test/github-tick.test.mjs`) opens each session's discussion within
+the day before it, with the same words and category as `/live/` and the
+start written out in the cohort's zone, and keeps the session's thread
+number, never replacing one a leader opened. It accepts only a workflow
+on the main branch of the public `humanshaped/automation` repository,
+proven by GitHub's OIDC token, so no secret is kept anywhere. The
+workflow runs every hour at no cost; its first run, by hand on October
+22, was accepted and found nothing due.
 
-**The plan beyond that: the reminders the Apps Script sends today, moved to GitHub.**
-GitHub can only email someone about something that happens on GitHub,
-so the plan is to make the things people need to hear about happen
-there, and let watching and mentions carry them:
+**What GitHub carries, and what stays in email.** GitHub can only notify
+someone about something that happens on GitHub, and it has no private
+messages: anything in the cohort repository is visible to the whole
+cohort. So the split is:
 
-1. **A session's discussion opens the day before**, in the cohort
-   repository, with the time on each reader's clock and the week's
-   challenge. Everyone watching is emailed by GitHub, and the thread is
-   ready for the session (the session thread `/live/` already uses).
-2. **Feedback a leader writes** (section 5) becomes an issue or comment
-   that mentions the learner, so GitHub emails them.
-3. **The schedule runs in GitHub Actions**, in a small public repository
-   in the organization (`humanshaped/automation`), because public
-   repositories' Actions minutes are free and unlimited while private
-   ones share 2,000 a month. Its workflow proves who it is to a Supabase
-   function with GitHub's own OIDC token, so no secret is pasted
-   anywhere (the same idea as the Apps Script's Google ID token today),
-   and that function does the work with the GitHub App.
+| Notice | Carried by |
+|---|---|
+| A new conversation, reply, ask, or file | GitHub, to everyone watching |
+| A session about to start | GitHub, through its thread opening the day before |
+| Someone took your ask, or marked it done | GitHub, since the person who asks is subscribed to their own issue |
+| A mention of you | GitHub, always |
+| A leader's private note to you | The daily email, since it must stay private |
+| Feedback on what you shared, and exchange replies | The daily email, until those move into the cohort repository |
 
 The Apps Script stays for what only Google can do (calendar invitations
-and Meet rooms), and its email digest stays until each kind of notice it
-sends has moved.
+and Meet rooms) and for the private notices above. Moving bring-back
+feedback and exchanges into the repository would move their notices with
+them; that is a later step.
 
 ## 5. Feedback in one view — Built
 
