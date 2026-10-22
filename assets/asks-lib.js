@@ -58,7 +58,7 @@
     return null;
   }
 
-  var MOVE_LABELS = { take: 'I have it', release: 'Let it go', done: 'Done', reopen: 'Open again' };
+  var MOVE_LABELS = { take: 'Take it', release: 'Let it go', done: 'Mark done', reopen: 'Reopen' };
 
   function listUrl(repo) { return API + '/repos/' + repo + '/issues?labels=' + LABEL + '&state=all&per_page=100&sort=created&direction=asc'; }
   function createUrl(repo) { return API + '/repos/' + repo + '/issues'; }

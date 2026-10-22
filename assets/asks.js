@@ -48,7 +48,15 @@
     var meta = el('p', 'ui-meta-line');
     meta.appendChild(U.visibility('cohort'));
     box.appendChild(meta);
-    box.appendChild(form());
+    var bar = el('div', 'ui-toolbar');
+    var asking = form();
+    asking.hidden = true;
+    var start = U.button('Ask the cohort', 'btn-primary', function () { asking.hidden = false; start.hidden = true; asking.querySelector('input').focus(); });
+    bar.appendChild(start);
+    bar.appendChild(U.link('Open on GitHub', 'https://github.com/' + repo + '/issues?q=label%3A' + A.LABEL));
+    box.appendChild(bar);
+    box.appendChild(asking);
+    function closeForm() { asking.reset(); asking.hidden = true; start.hidden = false; start.focus(); }
     var board = el('div', 'asks-board');
     box.appendChild(board);
     load();
@@ -68,7 +76,7 @@
           sec.setAttribute('aria-label', c.label);
           var h = el('h3', null, c.label);
           sec.appendChild(h);
-          if (!cols[c.key].length) sec.appendChild(el('p', 'ui-meta-line', c.key === 'asked' ? 'Nothing asked' : c.key === 'taken' ? 'No one on anything' : 'Nothing done lately'));
+          if (!cols[c.key].length) sec.appendChild(U.empty(c.key === 'asked' ? 'Nothing asked yet' : c.key === 'taken' ? 'No one has one yet' : 'Nothing done lately'));
           var ul = U.rows();
           cols[c.key].forEach(function (card) { ul.appendChild(cardRow(card, c.key)); });
           sec.appendChild(ul);
@@ -98,17 +106,18 @@
 
     function form() {
       var f = el('form', 'cohort-form asks-form');
-      var t = el('label', null, 'Your ask ');
+      var t = el('label', null, 'Your ask');
       var title = el('input'); title.name = 'title'; title.maxLength = 200; title.required = true;
       title.placeholder = 'Can someone test my app on an iPhone?';
       t.appendChild(title);
-      var d = el('label', null, 'More detail (optional) ');
+      var d = el('label', null, 'More detail (optional)');
       var details = el('textarea'); details.name = 'details'; details.rows = 2; details.maxLength = 4000;
       d.appendChild(details);
       var acts = el('div', 'actions');
-      var go = el('button', 'btn-secondary', 'Ask the cohort'); go.type = 'submit';
+      var go = el('button', 'btn-primary', 'Ask'); go.type = 'submit';
+      var cancel = U.button('Cancel', 'btn-secondary', function () { U.say(said, ''); closeForm(); });
       var said = el('span', 'ui-inline-status'); said.setAttribute('role', 'status');
-      acts.appendChild(go); acts.appendChild(said);
+      acts.appendChild(go); acts.appendChild(cancel); acts.appendChild(said);
       f.appendChild(t); f.appendChild(d); f.appendChild(acts);
       f.addEventListener('submit', function (ev) {
         ev.preventDefault();
@@ -118,8 +127,7 @@
         ask(token, 'POST', A.createUrl(repo), n.body).then(function (r) {
           go.disabled = false;
           if (!r.ok) { U.say(said, 'Not asked: ' + (r.body.message || r.status), 'problem'); return; }
-          U.say(said, 'Asked');
-          f.reset();
+          closeForm();
           load();
         });
       });

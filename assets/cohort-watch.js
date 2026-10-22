@@ -32,9 +32,10 @@
     var token = D.tokenFrom(o.session, stores(), Date.now(), o.db && o.db.auth && o.db.auth.storageKey);
     if (!token || !o.repo) return Promise.resolve(null);
     return ask(token, 'GET', o.repo).then(function (r) {
-      // 404 means not watching; anything else but 200 means GitHub will
-      // not tell this page.
-      if (r.status !== 200 && r.status !== 404) return null;
+      // 404 means not watching. Anything else but 200 means GitHub will
+      // not tell this page, so the person gets the repository's own
+      // Watch button instead.
+      if (r.status !== 200 && r.status !== 404) return U.link('Watch on GitHub', 'https://github.com/' + o.repo);
       var watching = r.status === 200 && r.body.subscribed === true;
       var wrap = U.el('span', 'watch-control');
       var b = U.button('', 'btn-secondary');

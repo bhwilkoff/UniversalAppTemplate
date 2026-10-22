@@ -2649,3 +2649,11 @@ html.app-nav-open[data-signed-in] body:not([data-no-app-nav]) .app-nav { display
 @media (min-width: 60rem) { .asks-board { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 .asks-column h3 { font-size: 1rem; margin: 0 0 0.5rem; }
 .asks-column .ui-row { grid-template-columns: minmax(0, 1fr); }
+/* The browser's own file button, drawn as the site's secondary button. */
+.cohort-form input[type="file"] { padding: 0.4rem; }
+.cohort-form input[type="file"]::file-selector-button {
+  font: inherit; font-family: var(--sans); font-weight: 600; margin-right: 0.75rem; padding: 0.45rem 0.9rem; cursor: pointer;
+  border: 1px solid var(--edge); border-radius: 10px; background: transparent; color: var(--ink);
+}
+.files-add, .asks-form { max-width: 36rem; margin: 0 0 1.5rem; }
+.roster-repo select { font: inherit; font-weight: 400; min-height: 36px; padding: 0 0.5rem; border: 1px solid var(--muted); border-radius: 10px; background: var(--card); color: var(--ink); }

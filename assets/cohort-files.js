@@ -69,11 +69,17 @@
     meta.appendChild(U.visibility('cohort'));
     box.appendChild(meta);
 
-    var canAdd = F.canAdd(access.repo_role);
-    var adder = canAdd ? addForm(o, repo, weeks, token, function () { list(); }) : null;
-    var actions = el('div', 'actions');
-    actions.appendChild(U.link('Open on GitHub', F.folderUrl(repo, '')));
-    box.appendChild(actions);
+    // The toolbar: adding a file first, for those who may, then GitHub.
+    var bar = el('div', 'ui-toolbar');
+    var adder = null;
+    if (F.canAdd(access.repo_role)) {
+      var open = U.button('Add a file', 'btn-primary', function () { adder.hidden = false; open.hidden = true; adder.querySelector('select').focus(); });
+      adder = addForm(o, repo, weeks, token, function () { list(); }, function () { adder.hidden = true; open.hidden = false; open.focus(); });
+      adder.hidden = true;
+      bar.appendChild(open);
+    }
+    bar.appendChild(U.link('Open on GitHub', F.folderUrl(repo, '')));
+    box.appendChild(bar);
     if (adder) box.appendChild(adder);
     var listBox = el('div');
     box.appendChild(listBox);
@@ -88,10 +94,7 @@
         if (!groups.length) { listBox.appendChild(U.empty('No files yet')); return; }
         groups.forEach(function (g) {
           var sec = el('section', 'files-group');
-          var h = el('h3');
-          var a = el('a', null, g.label); a.href = F.folderUrl(repo, g.dir); a.rel = 'noopener';
-          h.appendChild(a);
-          sec.appendChild(h);
+          sec.appendChild(el('h3', null, g.label));
           var ul = U.rows();
           g.files.forEach(function (f) {
             ul.appendChild(U.row({ title: f.name, href: F.pageUrl(repo, f.path), meta: F.size(f.size) }));
@@ -106,26 +109,29 @@
   // Adding a file: a folder, the file, and a commit made as the person.
   // A name already in that folder is replaced only after a confirm,
   // and GitHub keeps the earlier version in the file's history.
-  function addForm(o, repo, weeks, token, done) {
-    var form = el('form', 'inline-form files-add');
-    var where = el('label', null, 'Folder ');
+  function addForm(o, repo, weeks, token, done, close) {
+    var form = el('form', 'cohort-form files-add');
+    var where = el('label', null, 'Folder');
     var pick = el('select');
     pick.name = 'folder';
     F.folders(weeks).forEach(function (f) {
       var opt = el('option', null, f.label); opt.value = f.path; pick.appendChild(opt);
     });
     where.appendChild(pick);
-    var which = el('label', null, 'File ');
+    var which = el('label', null, 'File');
     var input = el('input');
     input.type = 'file';
     input.name = 'file';
     input.required = true;
     which.appendChild(input);
-    var submit = el('button', 'btn-secondary', 'Add the file');
+    var acts = el('div', 'actions');
+    var submit = el('button', 'btn-primary', 'Add file');
     submit.type = 'submit';
-    var said = el('p', 'ui-inline-status');
+    var cancel = U.button('Cancel', 'btn-secondary', function () { form.reset(); U.say(said, ''); close(); });
+    var said = el('span', 'ui-inline-status');
     said.setAttribute('role', 'status');
-    form.appendChild(where); form.appendChild(which); form.appendChild(submit); form.appendChild(said);
+    acts.appendChild(submit); acts.appendChild(cancel); acts.appendChild(said);
+    form.appendChild(where); form.appendChild(which); form.appendChild(acts);
 
     form.addEventListener('submit', function (ev) {
       ev.preventDefault();
@@ -146,8 +152,8 @@
         submit.disabled = false;
         if (!r) return;
         if (r.problem) { U.say(said, 'Not added: ' + (r.problem.message || r.problem.kind), 'problem'); return; }
-        U.say(said, 'Added');
         form.reset();
+        close();
         done();
       }, function (err) {
         submit.disabled = false;
