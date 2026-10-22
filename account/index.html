@@ -31,6 +31,10 @@
       if (/[?&]dark\b/.test(q)) t = 'dark'; else if (/[?&]light\b/.test(q)) t = 'light';
       else { try { t = localStorage.getItem('hs-theme'); } catch (e) {} }
       if (t) document.documentElement.setAttribute('data-theme', t);
+      // Signed in: the page wears the sidebar (PAGES.md), chosen before it
+      // draws, from the session this browser keeps.
+      try { var se = JSON.parse(localStorage.getItem('sb-bifrieqzkihuxfzttgvd-auth-token') || 'null'); if (se && se.user && se.expires_at * 1000 > Date.now() - 7 * 864e5) document.documentElement.setAttribute('data-signed-in', ''); } catch (e) {}
+      try { if (localStorage.getItem('hs-nav') === 'collapsed') document.documentElement.setAttribute('data-nav', 'collapsed'); } catch (e) {}
     })();
     // Exchanges moved to the signed-in home; older links still land there.
     if (location.hash === '#exchanges') location.replace('/#exchanges');
