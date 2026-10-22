@@ -135,6 +135,12 @@ until proven otherwise.
   order is `(centroid, zoom, pan, rotation)`** — centroid FIRST;
   the wrong order compiles (positional aliases) and breaks at use.
 
+- **Lazy keys must be UNIQUE, not merely stable.** A key built from a
+  display field (a file name, a title) collides the day two rows share it
+  and crashes with `Key "…" was already used`. Archive Watch's TV copy
+  picker did, read from Play's own stack trace. Key by a stable id, and
+  dedupe the list before it reaches the container.
+
 ## Release engineering: native debug symbols + ML Kit
 
 - **Embed native debug symbols IN the AAB; don't upload a zip.**
@@ -180,9 +186,24 @@ until proven otherwise.
   box. Track a failed state keyed on the URL so a retry with a new
   URL re-attempts. (An empty tile reads as "broken app"; a designed
   fallback reads as "no art yet.")
+- **The Cast chooser needs an AppCompat `colorPrimary`.** mediarouter's
+  dialog crashes on Android 11 and 12 ("background can not be translucent:
+  #0") when the activity theme does not set it. A Material 3-only theme is
+  not enough.
 - **RTL**: use `Icons.AutoMirrored.*` for directional (back/forward)
   arrows when `supportsRtl="true"` — a non-mirrored back arrow points
   the wrong way in RTL locales.
+
+## Crash triage from the store
+
+- Read crash clusters with their full stack traces from Play's Reporting
+  API before guessing (`store-metrics-pipelines`), filtered to the build
+  that is live.
+- A cluster credited as fixed that recurs on the fixing build comes OUT of
+  `ops/fixed-in.json`; and the entry names the versionCode CI actually
+  assigned (a refused upload once shifted 67 to 68).
+- TV ANRs on budget GPUs (Mali): Perfetto-trace the store build on the
+  device before you "fix" one by guesswork.
 
 ## Verification recipes
 

@@ -91,6 +91,18 @@ A formula change is a **deterministic, lockstep migration**:
    migration.
 5. Re-run the zero-collision check.
 
+**A merged or retired id keeps its public URL.** When two records merge
+(duplicate uploads folded into one card), the losing id forwards to the
+survivor everywhere it was stored: favorites, history, deep links, and
+the public web page. Archive Watch stopped generating pages for merged
+ids and Google Search Console reported 128 pages as 404, each one a
+crawled URL or a link someone had shared. The fix: `/item/<old>/` is a
+zero-second meta refresh plus a canonical link to the survivor, kept out
+of the sitemap. An item that is hidden (not merged) still 404s, which is
+correct. And when two distinct records share a title and year, their
+pages must differ (name the source item in `<title>`), or the search
+engine picks its own canonical and drops one.
+
 ## Consumption rules (where identity bugs actually bite)
 
 - **Never reverse-parse a composite ID.** `id.substringBefore('-')`
@@ -133,6 +145,47 @@ The principle: **every invariant the app relies on is enforced where
 it can be measured.** "One asset per entity" lives in binary content,
 so the check runs against binary content.
 
+## Sub-item identity: many works inside one source item
+
+Sources often file many works in one item: a whole TV series in one
+archive.org upload, a season of radio episodes in one folder, an album,
+a box set. Archive Watch first served `FireballXL5.complete` (39 files)
+as ONE episode that played episode 25, and 150 such items on 85 shows
+were hiding about 4,800 episodes (AW Decisions 166, 167). The rules it
+settled on:
+
+- **Each work gets its own id, `<item>@<token>`**, where the token is
+  the work's OWN number or name as the source states it (`e01`,
+  `s2e05`, `x-<slug>` for an unnumbered extra). Never its position in
+  a file list and never its file name: a token that moves loses every
+  person's progress and favorites. Pick a delimiter the source's ids can
+  never contain and that survives URLs, deep links, routers, and
+  storage keys (AW tested `/`, which broke deep links and the 404
+  router, and `~`, which broke the Worker's id regex, before `@`).
+- **Store the parent as a field** (`sourceID`) on every sub-item. Tools
+  read the item from that field; clients that must reach the source
+  split at the FIRST delimiter through one helper (`item_of`) per
+  language. That helper is the one sanctioned exception to "no split
+  parsing" below, and it is grep-able.
+- **Place a file by the evidence it carries** (its own title first,
+  then its number, then the season its item names), not by order.
+  An uploader may number by production order while the authority
+  numbers by broadcast ("08. Space Immigrants" is 1x03). A file far
+  shorter than its slot (under 40% of the episode's runtime, or a few
+  minutes) is a fragment, not the episode.
+- **Demand evidence that a bundle is a series.** Numbered files are
+  lectures, launch coverage, and audiobooks as often as shows, and a
+  film split into reels is one work. AW requires episode words in file
+  names, a TV typing, per-file titles, a run of ten or more, or the
+  item's own metadata saying "series," and keeps a control for each
+  false positive it met.
+- **Judge per work, cache per item** (see
+  `evidence-gated-catalog-curation` §9): the item answers for its
+  license and collections only.
+- **Old clients**: a build made before sub-ids existed will show the
+  works but cannot split the id. Ship the client helper before, or with,
+  the data that needs it, and say so in the decision.
+
 ## Checklist for a new catalog project
 
 - [ ] Composite ID formula written in ONE source per language, with a
@@ -144,5 +197,6 @@ so the check runs against binary content.
 - [ ] md5 byte-collision guard at the end of the asset pipeline, with
       a hard stop on non-empty report
 - [ ] No `split`/`substring` parsing of the ID anywhere (grep for the
-      delimiter)
+      delimiter), except the one `item_of` helper per language for
+      sub-item ids, which reads a stored `sourceID` first
 - [ ] Dedupe and equality checks keyed on ID, never display name

@@ -20,6 +20,11 @@ nobody rediscovers an exclusion.
   `docs/maintaining/ARCHIVE-WATCH-GAP-AUDIT-2026-09-30.md`, and the
   record of the reorganization it drove is
   `docs/maintaining/RESTRUCTURE-PLAN.md`.
+- **2026-10-22**, Archive Watch decisions 159 to 168 and everything since
+  the 09-30 audit, before Ear Drama (an audio app on the same source) was
+  started from this template. It also built three skills the 09-30 audit
+  recommended and never landed. The record is
+  `docs/maintaining/ARCHIVE-WATCH-GAP-AUDIT-2026-10-22.md`.
 
 ## Coverage: domain → home in this template
 
@@ -69,6 +74,14 @@ nobody rediscovers an exclusion.
 | State in the link; the web bridges the sync islands; $0 watch party; one free Worker of adapters | `DEEP_LINKS.md`, `per-ecosystem-sync-islands`, `cross-platform-multiplayer`, `zero-cost-hosted-backend`, `pulse/worker-example/` |
 | Engineering disciplines and loop working style | `docs/ENGINEERING-PROCESS.md`, `docs/AUTONOMOUS-LOOPS.md` |
 | iPad regular-width rules | `docs/templates/IPAD-DESIGN-template.md` |
+| Evidence-gated curation of a catalog you did not author (a claim a reader can open, uploader's word is not evidence, restore by evidence, never recommended always findable, computed date lines, provenance and accuracy, cleared matches scrub, versions never the default, per-work judgment, the reconcile trap) | `evidence-gated-catalog-curation` skill (AW 027, 124, 137, 140, 149-152, 156-159, 163, 168) |
+| Reading archive.org (scrape vs search, throttled is not empty, main-host connection limit, honest UA, upload dates, many-works items, private files, derivatives, storage nodes, CORS) | `internet-archive-source` skill |
+| Many works in one source item (`<item>@<token>` ids, stored `sourceID`, placement by evidence) and merged ids that keep their public URL | `canonical-entity-identity` (AW 166-168, Search Console fix) |
+| On-device capture and live broadcast (own the protocol, prove it locally, capture clocks and per-voice sync, link adaptation, the host in the show) | `live-capture-and-broadcast` skill (AW 127, 129, 132, 138, 160, 161) |
+| Vertical social video | `social-video-teaser-craft` skill (vendored from the global skill) |
+| Samsung 2022 floor (Chromium 85), the exit question, Tizen player traps, retail-set inspection | `js/compat.js`, `tools/test_tv_compat.py`, `tv.js` `askToExit`, `tools/tv_inspect.mjs` + `tv_press.mjs` + `tv_walk.mjs`, `docs/store/tizen-submission.md` §2b, `docs/DEVICE-HARNESSES.md` "Retail Tizen" (AW 162) |
+| iPhone Duo, App Store creative assets, Asset Library API, public-Xcode rule | `ios-production-gotchas`, `store-submission-playbook`, `tools/asc_asset_library.py` + `asc_stage_assets.py` |
+| Push races, durable failure memory, ingest gated before publish, fair queues | `docs/CI-FLEET.md` §2-3, `ci-fleet-engineering`, `pulse.yml` and `play-release.yml` retry loops |
 | Standing rules on words and AI in the product | `learning-orientation-design`, `mobile-first-density-design`, `AGENTS.md` Standing instructions |
 
 ## Deliberate exclusions (do not "rediscover" these)
@@ -82,11 +95,14 @@ nobody rediscovers an exclusion.
   poster pipelines** (about forty workflows): inseparable from
   archive.org. The patterns are in `docs/CI-FLEET.md` and the data-plane
   skill.
-- **A social posting pipeline and the `social-video-teaser-craft` skill**:
-  not ported yet. A candidate for a later audit.
+- **A social posting pipeline**: not ported. The `social-video-teaser-craft`
+  skill was vendored on 2026-10-22; the pipeline itself (AW's
+  `docs/SOCIAL-PROGRAM.md`, Decision 120) stays with Archive Watch.
 - **Archive Watch's catalog pipeline** (~150 tools: discovery, enrichment,
   rights audit, TV spines, covers, subtitles sourcing): inseparable from
-  archive.org and that app's data model. The PATTERNS it proved are here
+  that app's data model. Its archive.org habits and curation rules are now
+  skills (`internet-archive-source`, `evidence-gated-catalog-curation`); an
+  app on the same source copies tools from Archive Watch by name. The PATTERNS it proved are here
   (CI-FLEET, marker rules, additive merges); the tools are not. Worked
   examples: Archive-Watch `tools/` + `docs/decisions/`.
 - **`macos-creation-studio-engine` skill**: a Mac video-editor engine for

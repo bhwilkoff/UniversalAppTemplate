@@ -410,6 +410,17 @@ each one is a step with an assertion, not an intention.
   and put it back. A permission prompt (macOS or tvOS privacy consent,
   TCC) outlives a killed app, so check the authorization status in code
   and never press Allow for someone. Never put a test device to sleep.
+- **Check that a television is ON before any command.** A sleeping box
+  returns black captures that read as "nothing drawn," and a refused
+  launch can look like a crash. Ask before waking a television in a room
+  where someone may be sleeping or watching.
+- **Pointer automation only when the owner is away from the Mac**, and aim
+  from the element's accessibility frame, never a guessed coordinate: a
+  guessed click once landed on a second display.
+- **Close what a door opened.** Bench doors leave debug instances running;
+  seven copies of one app piled up in a day. Close each after its run, and
+  quit a live session only after it has ended (a quit mid-session raises a
+  confirmation that blocks automation).
 - **Say what is under test.** `tools/devreset.py` stops the app on each
   device before a run, and its `label()` sets `APP_QA_LABEL`, which every
   client draws as a small banner. A photograph of the bench then says what

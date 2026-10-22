@@ -29,7 +29,7 @@ APP_DIRS=(assets)
 # From js/ the viewer needs ONLY api.js. app.js and whats-new.js belong to the
 # curator dashboard at /curate/ — dead weight in a TV package, and webOS's
 # packager aborts trying to minify them.
-APP_JS=(js/api.js js/app.js js/cast-sender.js)
+APP_JS=(js/compat.js js/api.js js/app.js js/cast-sender.js)
 APP_CSS=(css/styles.css)
 
 # One source of truth for the version, the same file the Apple targets read
@@ -43,6 +43,10 @@ if [ -z "$VERSION" ]; then
   exit 1
 fi
 echo "Version: $VERSION"
+
+# Samsung 2022 sets run Chromium 85 (Tizen 6.5). Refuse to package code they
+# cannot run: a raised required_version would drop a model year silently.
+python3 "$ROOT/tools/test_tv_compat.py" >&2 || { echo "!! TV code uses a feature 2022 TVs lack" >&2; exit 1; }
 
 stage() {
   local dest="$1"
@@ -104,6 +108,20 @@ build_webos() {
   fi
 }
 
+# DEBUG HOOK for a retail Samsung set, which offers no shell, no screenshot and
+# no log. With APP_TV_INSPECT=<this Mac's ip>:8080 (and `chii start -p 8080`
+# running), the package loads Chii's target script so tools/tv_inspect.mjs,
+# tv_press.mjs and tv_walk.mjs can drive and read the app ON the TV. A widget
+# with no CSP of its own runs only its own scripts, so the debug package names
+# the inspector host; the store package declares none. Never upload a -debug.wgt.
+debug_hooks() {
+  local dest="$1"
+  [ -n "${APP_TV_INSPECT:-}" ] || return 0
+  sed -i '' "s#<head>#<head><script src=\"http://${APP_TV_INSPECT}/target.js\"></script>#" "$dest/index.html"
+  sed -i '' "s#</widget>#  <tizen:content-security-policy>default-src * data: blob: 'unsafe-inline' 'unsafe-eval'; script-src 'self' file: 'unsafe-inline' 'unsafe-eval' http://${APP_TV_INSPECT}; connect-src * ws: wss:</tizen:content-security-policy>\n</widget>#" "$dest/config.xml"
+  echo "    inspector hook -> http://${APP_TV_INSPECT}/target.js"
+}
+
 build_tizen() {
   echo "==> Tizen"
   local app="$ROOT/tv/tizen/app"
@@ -111,11 +129,18 @@ build_tizen() {
   sed "s/version=\"[0-9][^\"]*\"/version=\"$VERSION\"/" \
     "$ROOT/tv/tizen/config.xml" > "$app/config.xml"
   cp "$ROOT/tv/tizen/icon.png" "$app/"
+  debug_hooks "$app"
   mkdir -p "$OUT"
   if command -v tizen >/dev/null 2>&1; then
     tizen build-web -- "$app"
     # tizen build-web emits into <app>/.buildResult
     tizen package -t wgt -o "$OUT" -- "$app/.buildResult"
+    if [ -n "${APP_TV_INSPECT:-}" ]; then
+      for w in "$OUT"/*.wgt; do
+        case "$w" in *-debug.wgt) ;; *) mv "$w" "${w%.wgt}-debug.wgt" ;; esac
+      done
+      echo "    DEBUG package (never upload this)"
+    fi
     echo "    .wgt -> $OUT"
   else
     echo "    tizen CLI not installed — staged only at $app"

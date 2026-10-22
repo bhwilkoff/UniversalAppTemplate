@@ -206,6 +206,16 @@ parity audit closes each phase.
   port forks it. Protocol-decouple first (a `PlaybackSource`
   protocol in Core, conformed by each app store) — it's a day of
   work that saves a fork per platform.
+- **Building a platform before measuring the one thing it cannot
+  carry.** Archive Watch researched Roblox in nine tracks: the theaters,
+  rooms, interface, and tooling all fit, and the films did not (video
+  only as hosted 5-minute assets at 2,000 Robux each; the free route plays
+  at 256x192 and 12 fps). The owner shelved it: *"I don't think that it is
+  worth the time and effort for such a compromised experience"* (AW
+  Decision 164). Measure the core payload first, before any account,
+  spend, or build. A shelved platform gets its research kept, its
+  pathway written down, and named triggers for reopening, so the next
+  person neither rediscovers it nor builds it on a whim.
 - **Deferring store plumbing.** Deep-link verification files,
   signing, store listings have multi-day external latencies
   (domain DNS, Play review of the developer account) — start them

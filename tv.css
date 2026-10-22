@@ -205,3 +205,24 @@ html.tv .smart-banner,
 html.tv .share-menu-trigger {
   display: none !important;
 }
+
+/* The exit question Samsung's Return policy requires at the root (tv.js
+   askToExit). Buttons take the shared focus ring above. */
+html.tv dialog.tv-exit {
+  background: var(--tv-bg);
+  color: var(--tv-text);
+  border: 0;
+  padding: 48px 64px;
+  text-align: center;
+}
+html.tv dialog.tv-exit::backdrop { background: rgba(0, 0, 0, 0.7); }
+html.tv dialog.tv-exit p {
+  font-size: var(--tv-title);
+  margin: 0 0 32px 0;
+}
+html.tv dialog.tv-exit button {
+  font-size: var(--tv-body-lg);
+  min-width: 200px;
+  margin: 0 12px;
+  padding: 16px 32px;
+}

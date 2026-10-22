@@ -100,7 +100,7 @@ Bump `sw.js` `SHELL` on every web-TV change, or installs serve stale assets.
 ## Bugs a real browser found that the shim could not
 
 The Node shim does no layout, has no `<dialog>` semantics and no media element.
-These four shipped past it and were caught in Chrome — check them on any new
+These shipped past it and were caught in Chrome. Check them on any new
 TV surface:
 
 1. **The rem trap.** `font-size` on `html.tv` rescales EVERY rem dimension in
@@ -117,6 +117,15 @@ TV surface:
    exit at the root.
 4. **Initial focus on the logo.** Technically focused, practically useless.
    Prefer content over chrome (`.brand`, footer links).
+
+5. **Focus rings clip** inside a row with no padding for the focus lift.
+   Pad rows by the lift, or the focused card's ring is cut off.
+6. **A view rendered while hidden has no layout.** Its scroll-to-now (a guide's
+   current hour) ran at width 0 and did nothing. Wait for a non-zero width.
+7. **Re-claim focus after a route change, once the old view is hidden**, and
+   restore remembered focus only on a Back return, never on a forward visit.
+8. **`prompt()` and `confirm()` are unusable on TV.** Draw your own dialog or
+   use a list (rooms joined from a keypad, not a text prompt).
 
 Also: make Enter activation **explicit** (preventDefault + click). Chrome
 activates a focused `<a>` on a real Enter, but TV browsers are inconsistent and

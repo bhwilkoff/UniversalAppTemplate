@@ -252,6 +252,40 @@ safe.
   `GeometryReader` (unreliable inside a `NavigationStack`).
 - Streaming from flaky hosts: `resilient-media-streaming`.
 
+- **A background download held for Wi-Fi fails silently.** With cellular
+  off for the app (or `allowsCellularAccess = false`), the system holds the
+  task with no error and no callback, and the progress bar sits at 0 KB.
+  Archive Watch's owner: *"it never moved past 0 KB"* ... *"It works when I
+  turn on download over cellular."* Say "Waiting for Wi-Fi" and offer
+  "Download over cellular", which restarts THAT task with a new request. A
+  task keeps the policy of the request it was made with, so turning the
+  setting on must also restart the tasks already waiting.
+
+## iPhone Duo (iOS 27.1 SDK)
+
+- Two displays: the outer is compact width, wider and shorter than any
+  iPhone; the inner is regular width. Apple's guidance is not to design
+  per pose: compact outside and regular inside cover closed, open, partly
+  folded, tabletop, and standing.
+- Built with the 27.1 SDK, the status bar, toolbars, back button, and tab
+  bar move to a vertical strip down the right edge (outer display, and
+  inner in landscape). Standard `TabView`, `NavigationStack`, and
+  `.toolbar` get this for free; custom bars do not. Give toolbar items
+  titles, since a vertical strip shows them differently.
+- Keep content out of reserved regions (the cameras, and the fold while
+  partly folded) with `GeometryProxy.reservedRegions(kind:)`; system
+  sheets and menus already avoid them. `onHingeChange` is for effects,
+  never layout.
+- `UIArrangementViewController` arranges a primary and secondary view
+  (split, or overlay across the fold); Apple's own example is a player
+  with an Up Next list. Tabletop: media on top, the same controls below.
+- The inner display supports Split View and multiple scenes of one app
+  on an iPhone for the first time, so declare scene support for iPhone.
+- An app built with an earlier SDK runs boxed. Store screenshots and
+  any claim of Duo support wait for a store build made with 27.1 (see
+  `store-submission-playbook`), and only the real device proves the open
+  and folded poses.
+
 ## Camera + capture
 
 - **`UIImagePickerController` is broken on multi-camera iPhones**

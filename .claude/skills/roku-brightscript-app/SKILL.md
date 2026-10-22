@@ -44,6 +44,16 @@ and then failed on the device; treat this as a lint you run in your head.
 - **`Str()` takes a Float**, so `Str(aString)` is a runtime Type Mismatch that
   halts the component. Route everything printable through one `fmt(v)` helper
   that switches on `type(v)`.
+- **A field `init()` has not set yet is `invalid`, and `not invalid` is a Type
+  Mismatch.** Write `not (m.flag = true)`, never `not m.flag`, for any flag that
+  an observer can read before `init()` runs.
+- **`itemContent` (and other observed fields) can arrive before `init()` has
+  found its child nodes.** Guard the handler on the nodes existing, and replay the
+  stored content at the end of `init()`.
+- **Size an array from its definitions list, never a literal count.** A reset
+  loop that hard-coded 4 after a fifth filter chip was added caused about 90% of
+  Archive Watch 1.0.77's crashes (3.1% crash rate, read from the dashboard's crash
+  logs). Read crash logs per version before guessing.
 - Keep a project `tools/test_*_includes.py` that parses every `.xml` and asserts
   each referenced `.brs` exists and each `sub`/`function` a component calls is
   defined — the compiler will not.

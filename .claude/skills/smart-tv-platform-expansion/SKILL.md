@@ -119,6 +119,22 @@ overflowing nav bars and blowing out heroes. Set ten-foot type **per element**;
   platforms. No DRM, no transcode.
 - Side-load subtitles (`SubtitleConfiguration` on Media3, `<track>` on web —
   convert SRT→VTT client-side). If captions exist they must be selectable.
+- **Tizen's player has its own failure modes** (Archive Watch, Samsung
+  certification, 2026-10-03):
+  - Changing `playbackRate` breaks it (readyState 0, nothing plays). Offer no
+    Speed control on Tizen.
+  - The end of a file can arrive as `PIPELINE_ERROR_NETWORK` with no `ended`
+    event. Treat an error within a few seconds of the duration as the end.
+  - `waiting` fires spuriously: give it a grace period before any recovery (10 s
+    near a seek), plus a ~12 s watchdog for an element that fires nothing at all.
+  - Its subtitle renderer draws huge text in a narrow box and cannot be sized.
+    Keep the track `hidden` and draw the active cues yourself at ten-foot size.
+  - Pause on going to the background, and resume what YOU paused on return
+    (CO-MT-01); turn the screensaver off during playback with
+    `webapis.appcommon.setScreenSaver`, and back on at pause and end.
+- **The 2022 Samsung floor is Chromium 85.** Fill the gaps in one compat file
+  loaded first and gate the CSS in the package build (`js/compat.js`,
+  `tools/test_tv_compat.py`, `docs/store/tizen-submission.md` §2b).
 
 ### ⚠️ Two silent subtitle/second-screen traps
 

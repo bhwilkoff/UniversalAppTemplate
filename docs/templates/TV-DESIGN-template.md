@@ -73,8 +73,11 @@ guardrail 3.)*
 
 **1.7 Back is sacred.** Back never gets swallowed. On Android TV, Back from the
 root returns to the launcher (TV-DB). On webOS, Back is keyCode **461**; on
-Tizen it is the `tizenhwkey` event. Both must navigate back, and exit from the
-root. Intercepting Back is a certification failure on all three.
+Tizen it is the `tizenhwkey` event (and, on some firmware, a keydown 10009 for
+the SAME press: handle it once). Both must navigate back. At the root, webOS and
+Android TV exit; Samsung's Terminating Applications policy requires the app to
+ask first ("Exit <app>?" with Exit and Stay, drawn by the app, `tv.js`
+`askToExit`). Intercepting Back is a certification failure on all three.
 
 **1.8 Faithful presentation.** [FILL IN: the media format and why it plays
 natively everywhere.] In Archive Watch, progressive H.264 MP4 over HTTPS played

@@ -73,6 +73,66 @@ them as an explicit OWNER list.
   Domains capability (`applinks:domain`). Adding the entitlement
   re-signs — don't flip it while a build is in review.
 - Xcode Cloud: `.xcodeproj` at repo root, no spaces in product name.
+- **Build with the current PUBLIC Xcode, locally and in CI, never a
+  beta.** Archive Watch's owner, 2026-10-08: *"You should always build for
+  the current version of Xcode that is publicly available (never the
+  betas)."* Move the Mac and `appstore-build.yml` together when a new one
+  ships. Whether a Release Candidate counts as public is the owner's call;
+  AW's own notes recorded it both ways, so ask once and write the answer
+  in the decision log. GitHub's macOS images can lag a public Xcode by
+  weeks (actions/runner-images), so check what the runner offers before
+  promising a store build that needs the newest SDK.
+- **A local build passing says little about the store build** when the
+  two use different Xcodes. Result-builder arity is one trap: Xcode 26's
+  `CommandsBuilder` takes at most 10 children and a beta took 12, so the
+  Mac archive failed only in CI. Run the cloud workflow without submitting
+  first whenever anything in the build is new.
+
+### iPhone Duo and the new product page assets (App Store Connect, 2026-10)
+
+- **iPhone Duo screenshots are a third device set** on the iOS version
+  page, required from April 2027 for apps built with the iOS 27.1 SDK.
+  Outer display 1398 × 2034 (or landscape), inner 2007 × 2853; no alpha.
+  Until then the Duo slot falls back to scaled phone screenshots.
+- **The SDK decides how the app looks on a Duo**: built with the iOS 26
+  SDK it runs boxed; 27 fills most of the inner display; 27.1 is edge to
+  edge with the toolbar, tab bar, and status bar moved to a strip down the
+  right edge. Screenshots of a boxed app are accurate and poor, so shoot
+  Duo screenshots from the first store build made with 27.1.
+- **Product page header** (21:9, 3840 × 1646) and **search results
+  asset** (3:2, 1920 × 1280 to 3840 × 2560) are new, optional creative
+  assets, shown on iOS 27 and later. Without a search asset, search shows
+  In-App Events, previews, then the first three screenshots, so order
+  those three on purpose. Videos loop muted.
+- **The legacy screenshot API has no Duo type.** Duo screenshots and the
+  creative assets go through the Asset Library API (reserve, upload,
+  commit, place, order): `tools/asc_asset_library.py` uploads and places,
+  and `tools/asc_stage_assets.py` puts a batch on a new, editable version
+  in order. An asset can be approved on its own once the app has an
+  approved version. Use Device Preview in App Store Connect to see the
+  page on every device before submitting.
+- **The Duo simulator** lives in Device Hub (Xcode 27.1), which replaces
+  Simulator.app; the 27.1 runtime runs only the Duo. Poses (closed,
+  partially open, open) are Device Hub's own buttons and ignore
+  accessibility presses, so click each button's frame. "Data Migration
+  Failed" on every boot meant a corrupt runtime (downloaded with little
+  disk free): delete and re-download. On an 8 GB Mac, run one simulator
+  at a time.
+- **Show the catalog at its best by rule, not by hand.** A DEBUG showcase
+  door that ranks the strongest items by a stated rule (professional art,
+  clear rights, most voted) makes store screenshots repeatable without
+  hand-picking. Archive Watch's first rule-ranked set surfaced a promo
+  clip posing as a famous film, which is a data bug worth finding before
+  a reviewer does.
+- **App Review contact phone must be in international format** (`+1…`).
+- **If the app uses the YouTube API**, its API Services terms are audited
+  after approval. Archive Watch's ToS Violations Report (2026-10-01) asked
+  that the privacy policy name the operator, list each piece of YouTube
+  API data with its purpose, place, and retention, describe cookies and
+  device storage, and be linked at sign-in; and that stored API data be
+  refreshed or deleted (AW refreshes records older than 7 days, deletes
+  them after 30 without a refresh, and deletes on sign-out and on
+  `invalid_grant`).
 
 ## App Store (tvOS) — the extra mile
 
@@ -237,10 +297,19 @@ convenience:
 ### Certification findings are a design conversation, not a checklist
 
 Roku static analysis went 12 findings (one Error) → 3 warnings. Two
-of the three survive DELIBERATELY: adopting `rsg_version=1.3` would
-silence them and force a minimum firmware of 15.1, locking out every
-older device — including the owner's own. Record the refusal and its
+of the three survived DELIBERATELY for a while: adopting
+`rsg_version=1.3` would silence them and force a minimum firmware of
+15.1, locking out older devices. Record a refusal like that and its
 reason in the manifest itself, or the next person "fixes" it.
+
+And then re-check it, because a store can take the choice away. **From
+2026-10-01 Roku refuses a package without `rsg_version=1.3`** (an
+ERROR in static analysis) and offers no minimum firmware below v15.1.0.
+Each device runs the highest package it can, so a Roku below 15.1 keeps
+the last package built without it and stops getting updates. Note that
+last floor-friendly version in the decision log, and test the 1.3
+package on a current device before upload (Archive Watch 1.0.78,
+2026-10-19).
 
 ### Roku store lessons (certification and the dashboard)
 
@@ -248,6 +317,7 @@ reason in the manifest itself, or the next person "fixes" it.
 - **Keep the beta channel's package in sync with the store package.** Deep-link certification runs against what is submitted; a stale beta package fails it.
 - **The package upload is automatable.** The dashboard's dropzone is an `input.dzu-input`; upload to it by ref like any other file input.
 - **App Behavior Analysis must be started by hand.** It does not run on upload; start it, wait, read it.
+- **A failed first App Behavior Analysis can be the lab, not the package.** Archive Watch 1.0.79 failed 3 of 4 because the lab's player never started, then passed 4 of 4 on a re-run of the same `.pkg`. Before changing code, replay the failing deep link cold on a real Roku with the console open on port 8085; if it plays, re-run the analysis.
 - **Ask the device what it installs.** Query the device for its supported package formats before building for it, rather than assuming.
 - **Never automate `genkey`.** The signing key is created once, by a person, and its credentials live where the packaging tool looks (`~/.config/roku/signing.env`). A regenerated key orphans the published channel.
 
