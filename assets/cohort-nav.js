@@ -1,12 +1,10 @@
-// The top of every page that belongs to one cohort (PAGES.md, "The
-// signed-in platform"; DESIGN-KIT.md, Tabs): a breadcrumb, the person's
-// role in the cohort, and one row of the cohort's sections, the same for
-// everyone, with the leader's sections added at the end (Google
-// Classroom's pattern: one structure, items added for the role you hold).
-// The sections live on three pages (the cohort's home, its live session,
-// and the leader's tools); on each page its own sections switch in place
-// (?t=) and the others are links, so the row never changes as you move.
-// Used by cohort.js, live.js, teach-cohort.js.
+// The top of every page that belongs to one cohort (PAGES.md, "One
+// cohort, one page, six sections"; DESIGN-KIT.md, Tabs): a breadcrumb, the
+// person's role in the cohort, and one row of the cohort's six sections,
+// the same for everyone: Google Classroom's pattern, one structure, with
+// a leader's tools inside the shared sections. The sections are on the
+// cohort's page (?t=); the live session (/live/) is a session while it
+// runs, so its row marks Sessions. Used by cohort.js and live.js.
 (function () {
   function el(tag, cls, text) {
     var n = document.createElement(tag);
@@ -26,41 +24,27 @@
     return nav;
   }
 
-  // The cohort's sections, in their fixed order. at: the page that holds it.
+  // The cohort's sections, in their fixed order.
   function places(o) {
-    var c = o.cohort;
     var list = [
-      { key: 'week', label: 'This week', at: 'home' },
-      { key: 'talk', label: 'Conversation', at: 'home' },
-      { key: 'exchanges', label: 'Exchanges', at: 'home' },
-      { key: 'people', label: 'People', at: o.teaching ? 'teach' : 'home' }
+      { key: 'week', label: 'This week' },
+      { key: 'sessions', label: 'Sessions' },
+      { key: 'talk', label: 'Conversation' },
+      { key: 'exchanges', label: 'Exchanges' },
+      { key: 'people', label: 'People' }
     ];
-    if (o.member) list.push({ key: 'mine', label: 'Your work', at: 'home' });
-    list.push({ key: 'live', label: 'Live session', at: 'live' });
-    if (o.teaching) {
-      if (c.status === 'draft' || c.status === 'open') list.push({ key: 'setup', label: 'Setup', at: 'teach' });
-      list.push(
-        { key: 'sessions', label: 'Sessions', at: 'teach' },
-        { key: 'followup', label: 'Follow-up', at: 'teach' },
-        { key: 'groups', label: 'Groups', at: 'teach' },
-        { key: 'apps', label: 'Apps', at: 'teach' },
-        { key: 'credentials', label: 'Credentials', at: 'teach' },
-        { key: 'settings', label: 'Settings', at: 'teach' }
-      );
-    }
+    if (o.member) list.push({ key: 'mine', label: 'Your work' });
+    if (o.teaching) list.push({ key: 'settings', label: 'Settings' });
     return list;
   }
   function href(o, p) {
-    var c = o.cohort, slug = encodeURIComponent(c.slug);
-    if (p.at === 'live') return '/live/?c=' + slug;
-    if (p.at === 'teach') return '/teach/cohort/?c=' + c.id + '&t=' + p.key;
-    return '/cohort/?c=' + slug + (p.key === 'week' ? '' : '&t=' + p.key);
+    return '/cohort/?c=' + encodeURIComponent(o.cohort.slug) + (p.key === 'week' ? '' : '&t=' + p.key);
   }
 
   // o: { cohort: {id, slug, title, status}, teaching, member,
-  //      current: 'home' | 'live' | 'teach', panels (the element holding this
-  //      page's [data-tab] panels), onChange }
-  // Returns the tabs control on the home and leader pages.
+  //      current: 'home' | 'live', panels (the cohort page's [data-tab]
+  //      panels), onChange }
+  // Returns the tabs control on the cohort's page.
   function draw(mount, o) {
     if (!mount) return null;
     var c = o.cohort, slug = encodeURIComponent(c.slug);
@@ -82,10 +66,10 @@
     else mount.appendChild(holder);
     if (!window.UI) return null;
     var tabs = window.UI.tabs(holder, list.map(function (p) {
-      return p.at === o.current && o.current !== 'live' ? { key: p.key, label: p.label } : { key: p.key, label: p.label, href: href(o, p) };
+      return o.current === 'live' ? { key: p.key, label: p.label, href: href(o, p) } : { key: p.key, label: p.label };
     }), o.current === 'live' ? null : o.panels, { label: c.title, onChange: o.onChange });
     if (o.current === 'live') {
-      var here = holder.querySelector('a[href^="/live/"]');
+      var here = holder.querySelector('a[href$="&t=sessions"]');
       if (here) { here.setAttribute('aria-current', 'page'); window.dispatchEvent(new Event('resize')); }
       return null;
     }

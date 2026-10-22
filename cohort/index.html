@@ -88,8 +88,23 @@
             <p class="ui-meta-line" data-cohort-role hidden></p>
             <p class="lead" data-lead></p>
           </header>
+          <p class="ui-inline-status" role="status" data-detail-message data-leader-only hidden></p>
           <div class="cohort-panels" data-cohort-panels>
           <div data-tab="week">
+          <div data-leader-only hidden>
+              <div class="ui-toolbar" data-overview-toolbar></div>
+              <section class="panel-section setup-card" aria-labelledby="cohort-setup-title" data-cohort-setup hidden>
+                <h2 id="cohort-setup-title">Before the first session</h2>
+                <p class="ui-inline-status" data-cohort-setup-count></p>
+                <ol class="setup-steps" data-cohort-setup-steps></ol>
+                <p class="ui-help"><a href="/teach/guide/#need">What each step is for</a></p>
+              </section>
+              <div data-setup-done></div>
+              <section class="panel-section" aria-labelledby="needs-title">
+                <h2 id="needs-title">Waiting for you</h2>
+                <ul class="ui-rows" data-needs></ul>
+              </section>
+</div>
           <section class="cohort-card setup-card" aria-labelledby="setup-title" data-setup hidden>
             <h2 id="setup-title">Getting ready</h2>
             <p class="ui-inline-status" data-setup-count></p>
@@ -142,6 +157,47 @@
             <div data-shares></div>
           </section>
           </div>
+          <div data-tab="sessions" hidden>
+          <section aria-labelledby="sessions-title" data-learner-view>
+            <h2 id="sessions-title">Sessions</h2>
+            <div data-session-list></div>
+          </section>
+          <div data-leader-only hidden>
+              <div class="ui-toolbar"><button class="btn-primary" type="button" data-make-sessions>Make the weekly sessions</button><a class="btn-secondary" data-live-link href="/live/">Open the live session</a></div>
+              <div data-sessions></div>
+              <section class="panel-section question-bank" data-question-bank hidden aria-labelledby="question-bank">
+                <h2 id="question-bank">Question bank</h2>
+                <div data-bank></div>
+              </section>
+              <section class="panel-section lesson" data-lesson hidden aria-labelledby="lesson">
+                <h2 id="lesson">The lesson it sends back</h2>
+                <p class="ui-meta-line"><span data-vis="public"></span> On GitHub.</p>
+                <p class="actions"><a class="btn-secondary" data-teach-lesson-link href="https://github.com/bhwilkoff/UniversalAppTemplate/issues/new"><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022j#github"/></svg>Send a lesson to the template</a></p>
+              </section>
+              <section class="since" aria-labelledby="checks-heard-title" data-since hidden>
+                <h2 id="checks-heard-title" data-checks-heard-title></h2>
+                <p class="ui-meta-line"><span data-vis="staff"></span></p>
+                <p class="ui-inline-status" data-checks-heard-intro></p>
+                <div data-check-answers></div>
+                <form class="inline-form" data-heard-form>
+                  <label>What I heard, and what changes
+                    <span class="hint"><span data-vis="cohort"></span> Shown as people arrive next session.</span>
+                    <textarea name="heard" rows="4" maxlength="2000"></textarea>
+                  </label>
+                  <div class="actions"><button class="btn-secondary" type="submit">Save</button><span class="ui-inline-status" data-heard-message role="status"></span></div>
+                </form>
+
+                <h2 id="not-seen-title" data-not-seen-title></h2>
+                <p class="ui-meta-line"><span data-vis="staff"></span></p>
+                <p class="ui-inline-status" data-not-seen-intro></p>
+                <ul class="roster not-seen" data-not-seen></ul>
+
+                <h2 id="followups-title" data-followups-title></h2>
+                <p class="ui-inline-status" data-followups-intro></p>
+                <div class="followups" data-followups></div>
+              </section>
+</div>
+          </div>
           <div data-tab="talk" hidden>
           <section aria-labelledby="talk-title">
             <h2 id="talk-title">Conversation</h2>
@@ -157,11 +213,53 @@
           </section>
           </div>
           <div data-tab="people" hidden>
+          <div data-leader-only hidden>
+              <section class="panel-section" aria-labelledby="groups-title">
+                <h2 id="groups-title">Groups</h2>
+              <div data-groups></div>
+              <form class="inline-form" data-group-form>
+                <label>New group <input name="name" required maxlength="60" placeholder="Group 1"></label>
+                <label>What it is for <input name="expectations" maxlength="400" placeholder="Show each other your bring-back before each session"></label>
+                <button class="btn-secondary" type="submit">Add the group</button>
+              </form>
+              </section>
+              <section class="panel-section" aria-labelledby="roster-title">
+                <h2 id="roster-title">Learners</h2>
+                <div data-roster></div>
+              </section>
+              <section class="panel-section" aria-labelledby="teachers">
+                <h2 id="teachers">Leaders</h2>
+                <ul class="roster" data-teachers></ul>
+                <form class="inline-form" data-co-teacher-form hidden>
+                  <label>Add a leader
+                    <span class="hint">Another leader can do everything you can here.</span>
+                    <select name="user_id" required data-co-teacher-choices></select>
+                  </label>
+                  <div class="actions">
+                    <button class="btn-secondary" type="submit">Add</button>
+                    <span class="ui-inline-status" role="status" data-co-teacher-message></span>
+                  </div>
+                </form>
+              </section>
+              <section class="panel-section" aria-labelledby="apps-title">
+                <h2 id="apps-title">Apps</h2>
+              <p class="ui-inline-status" data-submissions-intro></p>
+              <div data-submissions></div>
+              </section>
+              <section class="panel-section" aria-labelledby="credentials-title">
+                <h2 id="credentials-title">Credentials</h2>
+              <div data-credentials-later></div>
+              <div data-credentials hidden>
+                <p class="ui-help"><a href="/credential/issuer/">What each level asks for</a></p>
+                <div data-credential-list></div>
+              </div>
+              </section>
+</div>
           <section aria-labelledby="group-title" data-group-section hidden>
             <h2 id="group-title">Your group</h2>
             <div data-group></div>
           </section>
-          <section aria-labelledby="people-title">
+          <section aria-labelledby="people-title" data-learner-view>
             <h2 id="people-title">What everyone is building</h2>
             <div class="apps" data-people></div>
           </section>
@@ -230,6 +328,30 @@
             </form>
           </section>
           </div>
+          <div data-tab="settings" hidden>
+              <section class="panel-section" aria-labelledby="details-title">
+                <h2 id="details-title">Details</h2>
+                <div data-detail-facts></div>
+                <p class="actions"><a class="btn-secondary" data-edit href="/teach/">Edit the details</a></p>
+              </section>
+              <section class="panel-section" aria-labelledby="calls-title">
+                <h2 id="calls-title">Calls</h2>
+                <p class="actions"><a class="btn-secondary" data-rooms-link href="/live/#rooms">Every group room now</a></p>
+                <details class="ui-disclosure">
+                  <summary>Set up Meet by hand</summary>
+                  <p class="actions"><button class="btn-secondary" type="button" data-copy-meet>Copy the setup for the Meet script</button></p>
+                  <textarea class="signing-request" readonly rows="10" aria-label="The setup for the Meet script" data-meet-text hidden></textarea>
+                </details>
+                <details class="ui-disclosure">
+                  <summary>The Human Shaped add-on for Meet</summary>
+                  <p>It puts the live page in Meet&rsquo;s own side panel. Until it is listed, it works for meet@humanshaped.org only: <a href="https://github.com/bhwilkoff/UniversalAppTemplate/blob/site/tools/meet-addon/README.md#who-can-use-it" target="_blank" rel="noopener">who can use it, and how it is installed</a>.</p>
+                </details>
+              </section>
+              <section class="panel-section danger-zone" data-danger hidden aria-labelledby="danger-title">
+                <h2 id="danger-title">Delete this draft</h2>
+                <p class="actions"><button class="btn-danger" type="button" data-delete-draft>Delete this draft</button></p>
+              </section>
+          </div>
           </div>
         </section>
       </div>
@@ -249,8 +371,23 @@
   <script src="/assets/show-lib.js" defer></script>
   <script src="/assets/recognition-lib.js" defer></script>
   <script src="/assets/curriculum-pages-lib.js" defer></script>
-  <script src="/assets/cohort-nav.js?v=20261022l" defer></script>
-  <script src="/assets/cohort.js?v=20261022j" defer></script>
+  <script src="/assets/cohort-nav.js?v=20261022q" defer></script>
+  <script src="/assets/teach-lib.js?v=20261022c" defer></script>
+  <script src="/assets/teach-page.js?v=20261022j" defer></script>
+  <script src="/assets/rooms-lib.js" defer></script>
+  <script src="/assets/followup-lib.js" defer></script>
+  <script src="/assets/credential-lib.js?v=20261022j" defer></script>
+  <script src="/assets/credential-check.js" defer></script>
+  <script src="/assets/reach-lib.js" defer></script>
+  <script src="/assets/live-lib.js" defer></script>
+  <script src="/assets/question-view.js?v=20261022j" defer></script>
+  <script src="/assets/question-bank.js?v=20261022j" defer></script>
+  <script src="/assets/board-lib.js" defer></script>
+  <script src="/assets/curriculum-lib.js" defer></script>
+  <script src="/assets/curriculum-seed.js" defer></script>
+  <script src="/assets/show-builder.js?v=20261022j" defer></script>
+  <script src="/assets/teach-cohort.js?v=20261022q" defer></script>
+  <script src="/assets/cohort.js?v=20261022q" defer></script>
   <script src="/assets/exchange-lib.js?v=20261022a" defer></script>
   <script src="/assets/exchange-list.js?v=20261022d" defer></script>
 

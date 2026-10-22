@@ -222,9 +222,8 @@
     var rows = U().rows();
     list.slice().sort(function (a, b) { return rank(a) - rank(b); }).forEach(function (c) {
       var st = H.cohortState(c, c.now), slug = encodeURIComponent(c.slug);
-      var setup = leading && (c.status === 'draft' || c.status === 'open');
       rows.appendChild(U().row({
-        title: c.title, href: setup ? '/teach/cohort/?c=' + c.id + '&t=setup' : '/cohort/?c=' + slug,
+        title: c.title, href: '/cohort/?c=' + slug,
         meta: st.meta, detail: c.myRole === 'mentor' ? U().tag('Returning') : null, status: U().status(st.thing, st.state)
       }));
     });

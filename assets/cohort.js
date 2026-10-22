@@ -1,4 +1,6 @@
-// The cohort page (/cohort/?c=<slug>). Human Shaped's database says who is in
+// The cohort page (/cohort/?c=<slug>, or the cohort's id from an older
+// link), for its learners and its leaders alike (PAGES.md, "One cohort,
+// one page, six sections"). Human Shaped's database says who is in
 // the cohort and what they chose to share; everyone's work is read live
 // from GitHub, never copied, because it belongs to them.
 (function () {
@@ -277,10 +279,16 @@
       me = session.user;
       // The GitHub token lives in this tab only (DiscussionsLib).
       token = window.CohortTalk ? window.CohortTalk.token(db, session) : null;
-      return db.from('cohorts').select('*').eq('slug', slug).maybeSingle().then(function (c) {
+      var byId = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug);
+      return db.from('cohorts').select('*').eq(byId ? 'id' : 'slug', slug).maybeSingle().then(function (c) {
         if (c.error) return fail('This cohort could not be opened: ' + c.error.message);
         if (!c.data) return show('not-member');
         cohort = c.data;
+        if (byId) {
+          var u = new URL(location.href); u.searchParams.set('c', cohort.slug);
+          history.replaceState(history.state, '', u.pathname + u.search);
+          slug = cohort.slug;
+        }
         return Promise.all([
           db.from('enrollments').select('user_id, role, status, app_name, app_repo, app_url, profiles(github_login, display_name)').eq('cohort_id', cohort.id).neq('status', 'left'),
           db.from('sessions').select('*').eq('cohort_id', cohort.id).order('number'),
@@ -294,7 +302,8 @@
           db.from('github_access').select('state, detail').eq('cohort_id', cohort.id).eq('user_id', me.id).maybeSingle(),
           // Read on its own: before the table exists, this fails quietly and
           // the ready marks simply do not show.
-          db.from('share_confirmations').select('share_id, user_id').eq('cohort_id', cohort.id)
+          db.from('share_confirmations').select('share_id, user_id').eq('cohort_id', cohort.id),
+          db.from('teachers').select('*').eq('user_id', me.id).maybeSingle()
         ]).then(function (res) {
           var bad = res.slice(0, 7).filter(function (r) { return r.error; })[0];
           if (bad) return fail('This cohort could not be loaded: ' + bad.error.message);
@@ -314,9 +323,11 @@
           drawRecognized(res[5].data);
           drawSetup(mine, res[6].data);
           drawRole(mine, teaching);
+          drawSessionList(res[1].data);
           drawPublicChoice(mine, res[1].data);
           drawShowcase(res[1].data);
           drawCredentialNote();
+          if (teaching && window.TeachCohort) window.TeachCohort.open({ db: db, me: me, cohort: cohort, teacher: res[8].data, tabs: cohortTabs, reload: load, fail: function (m) { var n = $('[data-detail-message]'); if (n) n.textContent = m; } });
         });
       });
     }).catch(function (err) { fail('Something went wrong: ' + (err && err.message ? err.message : 'no details') + '.'); });
@@ -481,7 +492,13 @@
     box.replaceChildren();
     var repo = cohort.github_repo;
     if (!repo || !cohort.github_team) {
-      box.appendChild(window.UI.empty('Not set up yet.'));
+      // A leader makes it from here; a learner waits for them.
+      if (amTeaching && window.TeachCohort) {
+        var make = window.UI.button('Make the GitHub repository', 'btn-secondary', function () { window.TeachCohort.provision(make); });
+        box.appendChild(window.UI.empty('No conversation yet', make));
+        var where = el('p', 'ui-meta-line'); where.appendChild(window.UI.visibility('cohort')); where.appendChild(document.createTextNode(' A private repository on GitHub.'));
+        box.appendChild(where);
+      } else box.appendChild(window.UI.empty('No conversation yet'));
       return;
     }
     var state = access ? access.state : null;
@@ -611,6 +628,33 @@
     st.hidden = false;
   }
 
+  // Sessions, for learners: each week's session on their own clock, with
+  // its call and its live session while it runs or is next.
+  function drawSessionList(sessions) {
+    var box = $('[data-session-list]');
+    if (!box) return;
+    box.replaceChildren();
+    if (!sessions.length) { box.appendChild(window.UI.empty('No sessions yet')); return; }
+    var t = lib.currentAndNext(sessions, new Date(), cohort.session_minutes);
+    var nextNo = t.next ? t.next.number : null;
+    var list = window.UI.rows();
+    sessions.forEach(function (s) {
+      var acts = [];
+      var live = t.live && s.number === nextNo;
+      if (s.number === nextNo) acts.push(window.UI.link('Live session', '/live/?c=' + encodeURIComponent(cohort.slug), live ? 'btn-primary small' : 'btn-secondary small'));
+      if (s.number === nextNo && safe(s.meet_url)) { var j = window.UI.link('Join the call', s.meet_url, 'btn-secondary small'); j.target = '_blank'; j.rel = 'noopener'; acts.push(j); }
+      if (safe(s.recording_url)) acts.push(window.UI.link('Recording', s.recording_url, 'btn-secondary small'));
+      var past = s.starts_at && new Date(s.starts_at) < new Date() && !live;
+      list.appendChild(window.UI.row({
+        title: 'Week ' + s.number + (s.title && s.title !== 'Week ' + s.number ? ': ' + s.title : ''),
+        meta: s.starts_at ? when(s.starts_at) : 'Not scheduled yet',
+        status: window.UI.status('session', live ? 'live' : past ? 'finished' : s.meet_url ? 'ready' : 'planned'),
+        actions: acts
+      }));
+    });
+    box.appendChild(list);
+  }
+
   // A teacher opening the page its people see (PAGES.md rule 5): one line
   // says so and links to the teaching page, and the student's own forms
   // and getting-ready steps are left out.
@@ -618,6 +662,8 @@
   function drawRole(mine, teaching) {
     var only = teaching && !mine;
     root.querySelectorAll('[data-student-only]').forEach(function (s) { s.hidden = only; });
+    root.querySelectorAll('[data-leader-only]').forEach(function (s) { s.hidden = !teaching; });
+    root.querySelectorAll('[data-learner-view]').forEach(function (s) { s.hidden = teaching; });
     if (only) $('[data-setup]').hidden = true;
     if (window.CohortNav && !cohortTabs) cohortTabs = window.CohortNav.draw($('[data-cohort-nav]'), { cohort: cohort, teaching: teaching, member: !!mine, current: 'home', panels: $('[data-cohort-panels]') });
   }

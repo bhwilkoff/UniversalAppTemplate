@@ -4,12 +4,13 @@
 (function () {
   var root = document.querySelector('[data-guide]');
   if (!root || !window.CohortNav) return;
-  var AT = { setup: 'teach', sessions: 'teach', followup: 'teach', people: 'teach', groups: 'teach', apps: 'teach', credentials: 'teach', settings: 'teach', talk: 'home', week: 'home', live: 'live' };
+  var SECTION = { setup: 'week', followup: 'sessions', groups: 'people', apps: 'people', credentials: 'people' };
   var note = window.HS && window.HS.roles ? window.HS.roles() : null;
   var mine = ((note && note.cohorts) || []).filter(function (c) { return c.role === 'teacher' && c.status !== 'finished'; });
   function place(c, key) {
     if (key === 'edit') return '/teach/cohort/edit/?c=' + c.id;
-    return window.CohortNav.href({ cohort: c }, { key: key, at: AT[key] });
+    if (key === 'live') return '/live/?c=' + encodeURIComponent(c.slug);
+    return window.CohortNav.href({ cohort: c }, { key: SECTION[key] || key });
   }
   function apply(c) {
     root.querySelectorAll('[data-place]').forEach(function (a) {

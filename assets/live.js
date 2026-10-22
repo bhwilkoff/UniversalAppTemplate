@@ -99,9 +99,14 @@
           var ss = res[0].data, people = res[1].data, teachers = res[2].data;
           S.groups = res[3].data;
           S.people = people;
-          if (!ss.length) return show('not-member');
           S.cohort = cohort;
           S.teaching = teachers.some(function (t) { return t.user_id === S.me.id; });
+          if (!ss.length) {
+            if (!S.teaching && !people.some(function (p) { return p.user_id === S.me.id; })) return show('not-member');
+            var none = $('[data-no-sessions]');
+            none.replaceChildren(window.UI.empty('No sessions yet', S.teaching ? window.UI.link('Make the weekly sessions', '/cohort/?c=' + encodeURIComponent(cohort.slug) + '&t=sessions', 'btn-secondary') : null));
+            return show('no-sessions');
+          }
           // /teach/'s "Before the first session" checks off rehearsing
           // once this browser has opened the live page as its teacher.
           if (S.teaching) { try { localStorage.setItem('hs-rehearsed:' + cohort.id, '1'); } catch (e) {} }
@@ -210,7 +215,7 @@
     if (lead === 'arrive') drawArrive(body);
     else if (lead === 'show') drawGroups(body);
     body.hidden = !body.children.length;
-    if (show) show.update(key, runInfo());
+    if (showView) showView.update(key, runInfo());
     if (S.checks) drawSceneQuestion();
     designHref();
     if (rooms && rooms.setPlan) rooms.setPlan({ turn: L.roomTurn(roomsScene(), 3), prompt: roomsPrompt() });
@@ -242,16 +247,16 @@
   }
 
   function showChanged() {
-    if (!show || !run) return;
+    if (!showView || !run) return;
     var list = V.scenes(run.list());
     var changed = JSON.stringify(list) !== JSON.stringify(S.list);
     S.list = list;
-    if (changed) { S.drawnPart = undefined; show.setScenes(S.list); }
+    if (changed) { S.drawnPart = undefined; showView.setScenes(S.list); }
     drawNow(true);
     // A pin moved the main stage (R7): the wings and their card follow.
     if (S.items) render('[data-queue]', function () { drawQueue(S.items); });
   }
-  setInterval(function () { if (show && show.tick && shared()) show.tick(runInfo()); }, 1000);
+  setInterval(function () { if (showView && showView.tick && shared()) showView.tick(runInfo()); }, 1000);
 
   // ------------------------------------------------------------------
   // The run of show (R1): the same component as the Meet add-on's panel
@@ -259,11 +264,11 @@
   // this page is drawn by its own code and handed to it to place.
   // ------------------------------------------------------------------
 
-  var show = null, clockLine = null;
+  var showView = null, clockLine = null;
   function startShow() {
-    if (show || !window.ShowView) return;
+    if (showView || !window.ShowView) return;
     S.list = S.parts;
-    show = window.ShowView.mount({
+    showView = window.ShowView.mount({
       mount: $('[data-show]'), parts: S.list, teaching: S.teaching,
       stuck: window.CurriculumPagesLib && S.session ? window.CurriculumPagesLib.stuckFor(S.session.number) : null,
       onPick: function (key) {
@@ -300,23 +305,23 @@
     var clock = el('div', 'addon-part');
     clockLine = el('p', 'kicker');
     clock.appendChild(clockLine);
-    show.slot('clock', clock);
-    show.slot('lead', $('[data-now-body]'));
-    show.slot('wings', $('[data-wings]'));
-    show.slot('questions', $('[data-questions]'));
-    show.slot('rooms', $('[data-rooms]'));
-    show.slot('brought', $('[data-brought-section]'));
-    show.slot('path', $('[data-stages-section]'));
-    show.slot('thread', $('[data-thread-section]'));
-    show.slot('conversation', $('[data-talk-section]'));
-    if (S.teaching) show.slot('pushed', $('[data-pushed-section]'));
+    showView.slot('clock', clock);
+    showView.slot('lead', $('[data-now-body]'));
+    showView.slot('wings', $('[data-wings]'));
+    showView.slot('questions', $('[data-questions]'));
+    showView.slot('rooms', $('[data-rooms]'));
+    showView.slot('brought', $('[data-brought-section]'));
+    showView.slot('path', $('[data-stages-section]'));
+    showView.slot('thread', $('[data-thread-section]'));
+    showView.slot('conversation', $('[data-talk-section]'));
+    if (S.teaching) showView.slot('pushed', $('[data-pushed-section]'));
     var board = el('div');
     board.appendChild(el('p', 'small', 'This week’s design stage for the whole cohort. Everyone draws on it at once, and it is kept with the session.'));
     var open = el('a', 'btn-primary', 'Open the design stage'); open.target = '_blank'; open.rel = 'noopener';
     S.designLink = open;
     designHref();
     board.appendChild(el('p')).appendChild(open);
-    show.slot('design', board);
+    showView.slot('design', board);
   }
 
   // While people arrive: what the teacher heard in last week's checks,
@@ -331,7 +336,7 @@
     } else if (S.teaching && S.prev && 'heard' in S.prev) {
       var hint = el('p', 'small');
       hint.appendChild(document.createTextNode('What you heard in week ' + S.prev.number + '’s checks, and what you changed because of it, shows here while people arrive once you write it '));
-      var a = el('a', null, 'in Follow-up'); a.href = '/teach/cohort/?c=' + S.cohort.id + '&t=followup';
+      var a = el('a', null, 'in Sessions'); a.href = '/cohort/?c=' + encodeURIComponent(S.cohort.slug) + '&t=sessions';
       hint.appendChild(a); hint.appendChild(document.createTextNode('.'));
       body.appendChild(hint);
     }
@@ -351,7 +356,7 @@
     var groups = S.teaching ? S.groups : mine;
     if (!groups.length) {
       body.appendChild(el('p', null, S.teaching
-        ? 'This cohort has no groups yet, so everyone stays in the main session. You can make them in Groups.'
+        ? 'This cohort has no groups yet, so everyone stays in the main session. You can make them in People.'
         : 'You are not in a group yet, so stay in the main session, and your leader will say where to go.'));
       return;
     }
@@ -374,7 +379,7 @@
       }
       card.appendChild(acts);
     } else {
-      card.appendChild(el('p', 'small', S.teaching ? 'This group has no room of its own yet, so it stays in the main session until you add one in Groups.' : 'Your group has no room of its own yet, so stay in the main session.'));
+      card.appendChild(el('p', 'small', S.teaching ? 'This group has no room of its own yet, so it stays in the main session until you add one in People.' : 'Your group has no room of its own yet, so stay in the main session.'));
     }
 
     var order = L.presentingOrder(peopleIn(g), S.session.number);
@@ -436,7 +441,7 @@
       boardLink: window.BoardLib ? function (gid) { return window.BoardLib.link(S.cohort.slug, S.session, gid, false); } : null,
       onChange: function (byGroup) {
         roomPlaces = byGroup;
-        if (show) show.count('rooms', S.teaching ? Object.keys(byGroup).filter(function (k) { return byGroup[k].asking; }).length : 0);
+        if (showView) showView.count('rooms', S.teaching ? Object.keys(byGroup).filter(function (k) { return byGroup[k].asking; }).length : 0);
         root.querySelectorAll('[data-steps-of]').forEach(function (list) { markSteps(list, byGroup[list.getAttribute('data-steps-of')]); });
       }
     });
@@ -517,7 +522,7 @@
       }
     });
     // Each cue group sits in the scene it belongs to (ShowViewLib.SLOTS).
-    if (S.teaching && show) show.cues($('[data-sig-controls-body]'), { cardHref: '/card/?c=' + encodeURIComponent(S.cohort.slug) });
+    if (S.teaching && showView) showView.cues($('[data-sig-controls-body]'), { cardHref: '/card/?c=' + encodeURIComponent(S.cohort.slug) });
   }
 
   // ------------------------------------------------------------------
@@ -726,7 +731,7 @@
     q.waiting.forEach(function (item, i) { list.appendChild(queueItem(item, i, false)); });
     $('[data-shown-wrap]').hidden = !q.shown.length;
     $('[data-shown-summary]').textContent = 'Presented so far (' + q.shown.length + ')';
-    if (show) show.count('wings', q.waiting.length);
+    if (showView) showView.count('wings', q.waiting.length);
     var shown = $('[data-shown]'); shown.replaceChildren();
     q.shown.forEach(function (item, i) { shown.appendChild(queueItem(item, i, true)); });
   }
@@ -842,7 +847,7 @@
   function drawChecks(checks, answers, tallies) {
     var open = checks.filter(function (k) { return k.state === 'open'; });
     var closed = checks.filter(function (k) { return k.state !== 'open'; });
-    if (show) show.count('questions', open.length);
+    if (showView) showView.count('questions', open.length);
     function card(k) {
       if (S.teaching) return teacherCard(k, answers, tallies[k.id]);
       return studentCard(k, answers.filter(function (a) { return a.check_id === k.id && a.user_id === S.me.id; })[0], tallies[k.id]);

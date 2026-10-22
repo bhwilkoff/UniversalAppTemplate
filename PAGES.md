@@ -60,13 +60,24 @@ role you hold and the role named on the page, never a switcher.
 - **Home** answers what needs you now: Coming up, Waiting for you, then
   Learning and Leading (everyone sees both, so asking to lead is always in
   view), then Your work. Nothing on it repeats a sidebar place.
-- **One cohort, one row of sections** (`assets/cohort-nav.js`), the same for
-  everyone and in the same order: This week, Conversation, Exchanges,
-  People, Your work (learners), Live session, then for its leaders Setup
-  (while it is a draft or open), Sessions, Follow-up, Groups, Apps,
-  Credentials, Settings. Under the cohort's name a tag says Leader or
-  Learner. The sections live on three pages (`/cohort/`, `/live/`,
-  `/teach/cohort/`), but the row never changes as you move between them.
+- **One cohort, one page, six sections** (`/cohort/?c=`, `assets/cohort-nav.js`),
+  the same for everyone and in the same order: **This week**, **Sessions**,
+  **Conversation**, **Exchanges**, **People**, then **Your work** for
+  learners or **Settings** for leaders. A leader's tools sit inside the
+  shared sections, never in sections of their own (Ben, October 22, 2026:
+  "It seems like we can do some simplification on these pages too"):
+  - This week: while the cohort is being set up, its setup steps; what is
+    waiting for the leader.
+  - Sessions: each week's session, and the live session it becomes while
+    it runs (`/live/?c=`); for leaders, making the sessions, each one's run
+    of show, the question bank, and each past session's follow-up.
+  - Conversation: for leaders, the button that sets it up, right there.
+  - People: everyone in their groups of three, each with their app; for
+    leaders, adding leaders, making groups, and recording credentials.
+  - Settings: the cohort's details, status, and calls.
+  Under the cohort's name a tag says Leader or Learner. Every section works
+  before the cohort has sessions, people, or a conversation: it says what
+  is missing and, for a leader, offers the step that fills it.
 - **Breadcrumbs** say where a page sits and end at the parent; a page the
   sidebar names has none. A page never has both a breadcrumb and a back
   link. Nothing stacks two rows of links.
@@ -94,7 +105,7 @@ role you hold and the role named on the page, never a switcher.
 |---|---|---|
 | `/` | Your home | Follow a row to the thing |
 | `/account/` | Your account | How you sign in, linked accounts, how leaders reach you, your data, sign out, delete; confirm joining one cohort (`?join=`) |
-| `/cohort/?c=` | One cohort: This week, Conversation, Exchanges, People, Your work | Read the week, bring something back, keep your app |
+| `/cohort/?c=` | One cohort: This week, Sessions, Conversation, Exchanges, People, and Your work (learners) or Settings (leaders) | Read the week, join a session, bring something back, keep your app; a leader sets it up and runs it from the same sections |
 | `/live/?c=` | One cohort's live session | Take part; a leader runs it |
 | `/board/?c=`, `/card/?c=` | The live session's board; its card | Draw; show the card |
 | `/exchange/#<link>` | One exchange | Watch, add a video |
@@ -108,7 +119,7 @@ role you hold and the role named on the page, never a switcher.
 |---|---|---|
 | `/teach/` | Leading: what waits for you and every cohort you lead; for anyone else, asking to lead | Follow a row; plan a cohort |
 | `/teach/new/` | Planning a new cohort | Fill it in; saving opens its Setup |
-| `/teach/cohort/?c=&t=` | The leader's sections of one cohort (Setup, Sessions, Follow-up, People, Groups, Apps, Credentials, Settings), in the cohort's one row | Set it up and run it; without `t`, Setup while it is a draft or open, otherwise the cohort's home |
+| `/teach/cohort/?c=` | Forwards to the cohort's page, `/cohort/?c=` | |
 | `/teach/cohort/edit/?c=` | That cohort's details | Change them; saving returns to the cohort |
 | `/teach/feedback/` | What your cohorts are waiting on you for | Answer each |
 | `/teach/requests/` | Requests to lead (approvers only) | Approve or decline |
@@ -134,8 +145,6 @@ Each line is work to do; remove it when the page matches its row.
 - Most pages still explain themselves in sentences; the audit in
   research/notes/audit-2026-10-21/ lists each one and the component
   (DESIGN-KIT.md, `assets/ui.js`) that replaces it.
-- The cohort's sections still live on three pages; one page that loads
-  the leader's sections in place would remove the reload between them.
 - The MCP server's words still say teacher and student in places.
 - `/signin-check/` is a temporary diagnostic page and should go once the
   Safari sign-in hang is settled.

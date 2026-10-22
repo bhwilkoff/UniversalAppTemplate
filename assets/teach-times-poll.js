@@ -240,7 +240,7 @@
         ['No email from', noMail.length ? noMail.join(', ') : null]
       ]));
       $('[data-made-who]').textContent = '';
-      $('[data-made-setup]').href = '/teach/cohort/?c=' + cohort.id;
+      $('[data-made-setup]').href = '/cohort/?c=' + cohort.id;
       var mails = people.filter(function (a) { return a.contact; }).map(function (a) { return a.contact; });
       var mail = $('[data-made-mail]'), copy = $('[data-made-copy]');
       mail.hidden = copy.hidden = !mails.length;

@@ -155,7 +155,7 @@
         var dup = /duplicate|unique/i.test(r.error.message);
         return say('[data-form-message]', dup ? 'Another cohort already uses that short name. Try another.' : 'It could not be saved: ' + r.error.message);
       }
-if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign('/teach/cohort/?c=' + r.data.id);
+if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign('/cohort/?c=' + r.data.id);
     });
   });
 
@@ -169,7 +169,7 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
       document.title = 'Edit ' + r.data.title + ' | Human Shaped';
       document.querySelector('[data-form-title]').textContent = r.data.title;
       var back = document.querySelectorAll('[data-back-to-cohort]');
-      back.forEach(function (a) { a.href = '/teach/cohort/?c=' + r.data.id; if (a.hasAttribute('data-name')) a.textContent = r.data.title; });
+      back.forEach(function (a) { a.href = '/cohort/?c=' + r.data.id; if (a.hasAttribute('data-name')) a.textContent = r.data.title; });
       fillForm(r.data);
     });
   });

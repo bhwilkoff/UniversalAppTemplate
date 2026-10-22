@@ -1,19 +1,20 @@
-// One cohort, as its teacher sees it (/teach/cohort/?c=<id>; PAGES.md).
+// A leader's tools for one cohort, inside the cohort's own page
+// (/cohort/?c=; PAGES.md, "One cohort, one page, six sections"). cohort.js
+// opens them through TeachCohort.open when the person leads the cohort.
 // Every rule about who may do what is enforced by the database; this page
 // only asks for it.
 (function () {
-  var root = document.querySelector('[data-teach-cohort]');
+  var root = document.querySelector('[data-cohort-page]');
   if (!root || !window.supabase || !window.HUB || !window.TeachLib || !window.TeachPage) return;
   var P = window.TeachPage, el = P.el;
   var lib = window.TeachLib;
-  var id = new URLSearchParams(location.search).get('c');
   var db = null, me = null;
   var current = null;
   var currentGroups = [];
   var DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
   function $(sel) { return root.querySelector(sel); }
-  function say(sel, text) { $(sel).textContent = text || ''; }
+  function say(sel, text) { var n = $(sel); if (n) n.textContent = text || ''; }
   function whenText(iso, tz) {
     return new Date(iso).toLocaleString(undefined, { timeZone: tz, weekday: 'long', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short' });
   }
@@ -23,20 +24,12 @@
 
   // ---- one cohort ---------------------------------------------------
   // ---- the page's own parts (DESIGN-KIT.md) --------------------------
-  var U = window.UI, tabsCtl = null, amMember = false;
-  // The cohort's one row of sections (CohortNav), with this page holding
-  // the leader's. Without a section named, the page opens Setup while the
-  // cohort is being set up, and otherwise the cohort's home.
-  function drawTabs() {
-    if (tabsCtl) return true;
-    var setup = current.status === 'draft' || current.status === 'open';
-    if (!new URLSearchParams(location.search).get('t')) {
-      if (!setup) { location.replace('/cohort/?c=' + encodeURIComponent(current.slug)); return false; }
-      var u = new URL(location.href); u.searchParams.set('t', 'setup'); history.replaceState(null, '', u.pathname + u.search);
-    }
-    tabsCtl = window.CohortNav.draw($('[data-cohort-nav]'), { cohort: current, teaching: true, member: amMember, current: 'teach', panels: $('[data-detail]') });
-    return true;
-  }
+  var U = window.UI, tabsCtl = null;
+  // The leader's old section names, now sections of the cohort's page.
+  var MOVED = { setup: 'week', followup: 'sessions', groups: 'people', apps: 'people', credentials: 'people' };
+  function tab(k) { return MOVED[k] || k; }
+  var failed = function () {};
+  var reloadPage = function () { openCohort(current.id); };
   function drawFacts(c, sessions, people) {
     var when = c.session_weekday != null && c.session_time ? lib.scheduleText(c, Intl.DateTimeFormat().resolvedOptions().timeZone).replace(/\.$/, '').replace(/, for \d+ minutes/, '') : null;
     var here = people.filter(function (p) { return p.status !== 'left'; }).length;
@@ -77,8 +70,8 @@
       if (!keys.length) { box.appendChild(U.empty('Nothing waiting')); return; }
       keys.forEach(function (k) {
         var n = items[k];
-        var go = U.link(n.action, tabsCtl ? tabsCtl.link(n.tab) : '#', 'btn-secondary small');
-        go.addEventListener('click', function (e) { if (tabsCtl) { e.preventDefault(); tabsCtl.go(n.tab); } });
+        var go = U.link(n.action, tabsCtl ? tabsCtl.link(tab(n.tab)) : '#', 'btn-secondary small');
+        go.addEventListener('click', function (e) { if (tabsCtl) { e.preventDefault(); tabsCtl.go(tab(n.tab)); } });
         box.appendChild(U.row({ title: n.text, status: U.count(n.count, n.count + ' to see'), actions: [go] }));
       });
     }
@@ -97,16 +90,12 @@
       db.from('credentials').select('*').eq('cohort_id', id)
     ]).then(function (res) {
       var bad = res.slice(0, 5).filter(function (r) { return r.error; })[0];
-      if (res[0].error && res[0].error.code === 'PGRST116') return page.show('missing');
-      if (bad) return page.fail('This cohort could not be loaded: ' + bad.error.message);
+      if (bad) return failed('Your leader’s tools could not be loaded: ' + bad.error.message);
       current = res[0].data;
       document.title = current.title + ' | Human Shaped';
-      amMember = res[2].data.some(function (p) { return p.user_id === me.id && p.status !== 'left'; });
-      if (!drawTabs()) return;
       $('[data-edit]').href = '/teach/cohort/edit/?c=' + current.id;
       currentGroups = res[3].data;
       var c = current;
-      say('[data-detail-title]', c.title);
       drawFacts(c, res[1].data, res[2].data);
       drawOverview(c, res[1].data);
       say('[data-detail-message]', '');
@@ -116,6 +105,7 @@
       drawRoster(res[2].data, res[3].data);
       drawTeachers();
       $('[data-rooms-link]').href = '/live/?c=' + encodeURIComponent(c.slug) + '#rooms';
+      $('[data-live-link]').href = '/live/?c=' + encodeURIComponent(c.slug);
       loadSubmissions(res[2].data, res[1].data);
       drawGroups(res[3].data, res[2].data);
       drawCohortSetup(res[1].data, res[4].data, null);
@@ -130,7 +120,6 @@
       var del = $('[data-delete-draft]');
       $('[data-danger]').hidden = c.status !== 'draft';
       del.textContent = 'Delete this draft';
-      $('[data-detail]').hidden = false;
     });
   }
 
@@ -148,7 +137,7 @@
     var list = $('[data-cohort-setup-steps]');
     list.replaceChildren();
     var needed = steps.filter(function (x) { return !x.optional; });
-    var count = $('[data-setup-count]');
+    var count = $('[data-cohort-setup-count]');
     if (count) count.textContent = needed.filter(function (x) { return x.done; }).length + ' of ' + needed.length + ' done';
     steps.forEach(function (x) {
       var li = el('li', x.done ? 'done' : null);
@@ -160,7 +149,7 @@
           if (x.action === 'sessions') $('[data-make-sessions]').click();
           else if (x.action === 'meet') askMeet(target);
           else if (x.action === 'provision') provision(target);
-          else if (x.action === 'groups') { if (tabsCtl) tabsCtl.go('groups'); }
+          else if (x.action === 'groups') { if (tabsCtl) tabsCtl.go('people'); }
           else location.assign('/teach/cohort/edit/?c=' + current.id);
         });
       }
@@ -207,7 +196,7 @@
       }
       return db.functions.invoke('cohort-access', { body: { action: 'join', cohort_id: id } }).then(function () {
         say('[data-detail-message]', 'The repository ' + r.data.github_repo + ' is ready.');
-        openCohort(id);
+        reloadPage();
       });
     });
   }
@@ -736,7 +725,7 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
     var box = $('[data-lesson]');
     if (!box || !window.ShowcaseLib) return;
     box.hidden = !window.ShowcaseLib.lessonTime(c, sessions, new Date());
-    $('[data-lesson-link]').href = window.ShowcaseLib.lessonIssueUrl(c.title);
+    $('[data-teach-lesson-link]').href = window.ShowcaseLib.lessonIssueUrl(c.title);
   }
 
   function personName(e) { return e.profiles ? (e.profiles.display_name || e.profiles.github_login) : 'Someone'; }
@@ -1238,9 +1227,14 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
 
 
   var teacherRow = null;
-  var page = P.start(root, function (client, user, name, teacher) {
-    db = client; me = user; teacherRow = teacher;
-    if (!id) return page.show('missing');
-    openCohort(id);
-  });
+  // o: { db, me, cohort, teacher (their teachers row), tabs (the page's
+  //      tabs control), fail(message) }
+  window.TeachCohort = {
+    open: function (o) {
+      db = o.db; me = o.me; teacherRow = o.teacher; tabsCtl = o.tabs; failed = o.fail || failed;
+      if (o.reload) reloadPage = o.reload;
+      openCohort(o.cohort.id);
+    },
+    provision: function (button) { return provision(button); }
+  };
 })();

@@ -54,7 +54,7 @@
       var input = el('textarea'); input.rows = 3; input.required = true; input.maxLength = 8000;
       label.appendChild(input); form.appendChild(label);
       var send = el('button', 'btn-primary', 'Send'); send.type = 'submit';
-      var open = el('a', 'btn-secondary', 'Open the cohort'); open.href = '/teach/cohort/?c=' + c.id;
+      var open = el('a', 'btn-secondary', 'Open the cohort'); open.href = '/cohort/?c=' + c.id;
       var actions = el('div', 'actions'); actions.appendChild(send); actions.appendChild(open); form.appendChild(actions);
       form.addEventListener('submit', function (ev) {
         ev.preventDefault();

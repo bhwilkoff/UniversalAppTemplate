@@ -196,7 +196,7 @@
       if (bad) return fail('The panel could not look up this call: ' + bad.error.message);
       var room = A.findRoom(code, { sessions: res[0].data, groups: res[1].data, teaching: res[2].data.map(function (t) { return t.cohort_id; }) });
       if (!room) {
-        $('[data-no-room-text]').textContent = 'This call’s code is ' + code + '. A leader adds its link to a session or group in the cohort’s Sessions or Groups.';
+        $('[data-no-room-text]').textContent = 'This call’s code is ' + code + '. A leader adds its link to a session or group in the cohort’s Sessions or People.';
         return show('no-room');
       }
       S.room = room;
@@ -703,7 +703,7 @@
     } else if (S.teaching && S.prev) {
       var hint = el('p', 'small');
       hint.appendChild(document.createTextNode('What you heard in week ' + S.prev.number + '’s checks shows here once you write it '));
-      hint.appendChild(newTab(Object.assign(el('a', null, 'in Follow-up'), { href: '/teach/cohort/?c=' + S.cohort.id + '&t=followup' })));
+      hint.appendChild(newTab(Object.assign(el('a', null, 'in Sessions'), { href: '/cohort/?c=' + encodeURIComponent(S.cohort.slug) + '&t=sessions' })));
       hint.appendChild(document.createTextNode('.'));
       box.appendChild(hint);
     }

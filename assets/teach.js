@@ -9,7 +9,7 @@
 
   // Old links opened one cohort here as /teach/?c=<id>.
   var old = new URLSearchParams(location.search).get('c');
-  if (old) { location.replace('/teach/cohort/?c=' + encodeURIComponent(old)); return; }
+  if (old) { location.replace('/cohort/?c=' + encodeURIComponent(old)); return; }
   var anchors = { '#waiting': '/teach/feedback/', '#requests': '/teach/requests/' };
   if (anchors[location.hash]) { location.replace(anchors[location.hash]); return; }
 
@@ -63,7 +63,7 @@
       var list = window.UI.rows();
       cohorts.forEach(function (c) {
         list.appendChild(window.UI.row({
-          title: c.title, href: c.status === 'draft' || c.status === 'open' ? '/teach/cohort/?c=' + c.id + '&t=setup' : '/cohort/?c=' + encodeURIComponent(c.slug),
+          title: c.title, href: '/cohort/?c=' + encodeURIComponent(c.slug),
           meta: c.starts_on ? 'Starts ' + new Date(c.starts_on + 'T12:00:00').toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' }) : 'Dates not set',
           status: window.UI.status('cohort', c.status)
         }));
