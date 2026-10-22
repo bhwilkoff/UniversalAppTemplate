@@ -104,7 +104,10 @@
           if (!ss.length) {
             if (!S.teaching && !people.some(function (p) { return p.user_id === S.me.id; })) return show('not-member');
             var none = $('[data-no-sessions]');
-            none.replaceChildren(window.UI.empty('No sessions yet', S.teaching ? window.UI.link('Make the weekly sessions', '/cohort/?c=' + encodeURIComponent(cohort.slug) + '&t=sessions', 'btn-secondary') : null));
+            var crumb = el('nav', 'crumbs'), ol = el('ol'), li = el('li'), back = el('a', null, cohort.title);
+            crumb.setAttribute('aria-label', 'Breadcrumb'); back.href = '/cohort/?c=' + encodeURIComponent(cohort.slug);
+            li.appendChild(back); ol.appendChild(li); crumb.appendChild(ol);
+            none.replaceChildren(crumb, window.UI.empty('No sessions yet', S.teaching ? window.UI.link('Make the weekly sessions', '/cohort/?c=' + encodeURIComponent(cohort.slug) + '&t=sessions', 'btn-secondary') : null));
             return show('no-sessions');
           }
           // /teach/'s "Before the first session" checks off rehearsing
