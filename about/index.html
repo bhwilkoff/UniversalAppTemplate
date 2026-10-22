@@ -23,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261022i">
+  <link rel="stylesheet" href="/assets/site.css?v=20261022j">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -33,13 +33,14 @@
       // Signed in: the page wears the hub's sidebar (PAGES.md), chosen before
       // it draws, from the session this browser keeps.
       try { var se = JSON.parse(localStorage.getItem('sb-bifrieqzkihuxfzttgvd-auth-token') || 'null'); if (se && se.user && se.expires_at * 1000 > Date.now() - 7 * 864e5) document.documentElement.setAttribute('data-signed-in', ''); } catch (e) {}
+      try { if (localStorage.getItem('hs-nav') === 'collapsed') document.documentElement.setAttribute('data-nav', 'collapsed'); } catch (e) {}
     })();
   </script>
-  <script src="/assets/site.js?v=20261021c" defer></script>
-  <script src="/assets/ui.js?v=20261022h" defer></script>
+  <script src="/assets/site.js?v=20261022j" defer></script>
+  <script src="/assets/ui.js?v=20261022j" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/18.0.14/lib/marked.umd.min.js" integrity="sha512-trN9mtGYvoySPVI909KTnwbJI9AkKPydRCV/qAsUG1+q39hhpKltEag9b5JpdjeIZn5i8IH62hHRFdbKwMFh9w==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.4.16/purify.min.js" integrity="sha512-flQmhkXNRQ3iUfvtdCobtpMjCb6kE+zLnTiAulAQJ3WykVfy84JvCMOo6vhwWXHTXjR25h9Zj+LyGFRWKjRoag==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
-  <script src="/assets/render.js?v=20261022a" defer></script>
+  <script src="/assets/render.js?v=20261022j" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to the page</a>
@@ -57,10 +58,10 @@
       </nav>
       <div class="header-actions">
         <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#moon"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022j#moon"/></svg>
         </button>
         <a class="btn-primary small" href="/account/">
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#github"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022j#github"/></svg>
           <span>Sign in<span class="long"> with GitHub</span></span>
         </a>
       </div>
@@ -77,7 +78,7 @@
       <header class="page-head about-head">
         <div>
           <h1>Human Shaped exists so that the future continues to be shaped by humans.</h1>
-          <p class="lead">It started as a place to learn by building, in free 5-week <a href="/cohorts/">cohorts</a> where each person makes one real app of their own, and anyone can teach one. It is also where <a href="/apps/">the apps built this way</a> show their work as it happens, and where anyone can find what they need to <a href="/events/">gather people</a> around the idea. Every app here is measured against the same <a href="/principles/">fifteen principles</a>.</p>
+          <p class="lead">It started as a place to learn by building, in free 5-week <a href="/cohorts/">cohorts</a> where each person makes one real app of their own, and anyone can lead one. It is also where <a href="/apps/">the apps built this way</a> show their work as it happens, and where anyone can find what they need to <a href="/events/">gather people</a> around the idea. Every app here is measured against the same <a href="/principles/">fifteen principles</a>.</p>
         </div>
       </header>
 
@@ -119,7 +120,7 @@
           <p class="footer-head">Take part</p>
           <ul>
             <li><a href="/account/">Your account</a></li>
-            <li><a href="/teach/">Teach a cohort</a></li>
+            <li><a href="/teach/">Lead a cohort</a></li>
             <li><a href="/connect/">Connect your agent</a></li>
           </ul>
         </div>

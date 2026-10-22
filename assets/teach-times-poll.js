@@ -73,7 +73,7 @@
     body.replaceChildren();
     answers.forEach(function (a) {
       var tr = el('tr');
-      tr.appendChild(el('td', null, a.host ? a.name + (current.created_by === me.id ? ' (you)' : ' (teacher)') : a.name));
+      tr.appendChild(el('td', null, a.host ? a.name + (current.created_by === me.id ? ' (you)' : ' (leader)') : a.name));
       tr.appendChild(el('td', null, a.contact || ''));
       tr.appendChild(el('td', null, a.works.length + (a.if_need_be.length ? ', and ' + a.if_need_be.length + ' if need be' : '')));
       tr.appendChild(el('td', null, a.comment || ''));

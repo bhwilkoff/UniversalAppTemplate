@@ -179,7 +179,7 @@ test('each recognition is named in the evidence, with who gave it and the moment
   assert.deepEqual(recs[0], { type: ['Evidence'], name: 'Recognized in class: Tested it the way people will actually use it',
     genre: 'Recognized in class', narrative: 'Recognized by Ben Wilkoff. During “Show your work”, week 2.' });
   assert.equal(recs[1].narrative, 'Recognized by Ben Wilkoff, in class.');
-  assert.equal(recs[2].narrative, 'Recognized by a teacher, in week 3.');
+  assert.equal(recs[2].narrative, 'Recognized by a leader, in week 3.');
   assert.ok(recs.every(e => !('id' in e)));
   // The work comes first, then what was recognized, in the order given.
   assert.equal(c.evidence[0].genre, 'Repository');

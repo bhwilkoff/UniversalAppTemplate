@@ -23,21 +23,19 @@
 
   // ---- one cohort ---------------------------------------------------
   // ---- the page's own parts (DESIGN-KIT.md) --------------------------
-  var U = window.UI, tabsCtl = null;
-  var TABS = [
-    { key: 'overview', label: 'Overview' }, { key: 'sessions', label: 'Sessions' }, { key: 'followup', label: 'Follow-up' },
-    { key: 'people', label: 'People' }, { key: 'groups', label: 'Groups' }, { key: 'apps', label: 'Apps' },
-    { key: 'credentials', label: 'Credentials' }, { key: 'settings', label: 'Settings' }
-  ];
+  var U = window.UI, tabsCtl = null, amMember = false;
+  // The cohort's one row of sections (CohortNav), with this page holding
+  // the leader's. Without a section named, the page opens Setup while the
+  // cohort is being set up, and otherwise the cohort's home.
   function drawTabs() {
-    if (tabsCtl) return;
-    var mount = root.querySelector('[data-cohort-tabs]');
-    if (!mount) {
-      mount = el('div', 'cohort-tabs');
-      mount.setAttribute('data-cohort-tabs', '');
-      $('[data-cohort-nav]').after(mount);
+    if (tabsCtl) return true;
+    var setup = current.status === 'draft' || current.status === 'open';
+    if (!new URLSearchParams(location.search).get('t')) {
+      if (!setup) { location.replace('/cohort/?c=' + encodeURIComponent(current.slug)); return false; }
+      var u = new URL(location.href); u.searchParams.set('t', 'setup'); history.replaceState(null, '', u.pathname + u.search);
     }
-    tabsCtl = U.tabs(mount, TABS, $('[data-detail]'), { label: current.title });
+    tabsCtl = window.CohortNav.draw($('[data-cohort-nav]'), { cohort: current, teaching: true, member: amMember, current: 'teach', panels: $('[data-detail]') });
+    return true;
   }
   function drawFacts(c, sessions, people) {
     var when = c.session_weekday != null && c.session_time ? lib.scheduleText(c, Intl.DateTimeFormat().resolvedOptions().timeZone).replace(/\.$/, '').replace(/, for \d+ minutes/, '') : null;
@@ -53,9 +51,8 @@
   }
   // The one next step for where the cohort stands, then the other views.
   function drawOverview(c, sessions) {
-    var bar = $('[data-overview-toolbar]'), slug = encodeURIComponent(c.slug);
+    var bar = $('[data-overview-toolbar]');
     bar.replaceChildren();
-    var live = U.link('Live session', '/live/?c=' + slug), home = U.link('Cohort home', '/cohort/?c=' + slug);
     if (c.status === 'draft') {
       bar.appendChild(U.button('Open for joining', 'btn-primary', function (e) {
         e.target.disabled = true;
@@ -64,11 +61,8 @@
           openCohort(c.id);
         });
       }));
-    } else if (c.status === 'finished') {
-      bar.appendChild(U.link('Credentials', tabsCtl ? tabsCtl.link('credentials') : '#', 'btn-primary'));
-    } else live.className = 'btn-primary';
-    bar.appendChild(live);
-    bar.appendChild(home);
+    }
+    bar.hidden = !bar.children.length;
     $('[data-make-sessions]').textContent = sessions.length ? 'Update the weekly sessions' : 'Make the weekly sessions';
     needs.draw();
   }
@@ -107,8 +101,8 @@
       if (bad) return page.fail('This cohort could not be loaded: ' + bad.error.message);
       current = res[0].data;
       document.title = current.title + ' | Human Shaped';
-      if (window.CohortNav) window.CohortNav.draw($('[data-cohort-nav]'), { cohort: current, teaching: true, member: false, current: 'teach', noBar: true });
-      drawTabs();
+      amMember = res[2].data.some(function (p) { return p.user_id === me.id && p.status !== 'left'; });
+      if (!drawTabs()) return;
       $('[data-edit]').href = '/teach/cohort/edit/?c=' + current.id;
       currentGroups = res[3].data;
       var c = current;
@@ -148,7 +142,9 @@
     var rehearsed = false;
     try { rehearsed = !!localStorage.getItem('hs-rehearsed:' + current.id); } catch (e) {}
     var steps = lib.cohortSetupSteps(current, sessions, access, meetRequest, { groups: currentGroups, rehearsed: rehearsed });
-    $('[data-cohort-setup]').hidden = steps.every(function (x) { return x.done || x.optional; });
+    var allDone = steps.every(function (x) { return x.done || x.optional; });
+    $('[data-cohort-setup]').hidden = allDone;
+    $('[data-setup-done]').replaceChildren(allDone ? U.empty('Setup done') : '');
     var list = $('[data-cohort-setup-steps]');
     list.replaceChildren();
     var needed = steps.filter(function (x) { return !x.optional; });
@@ -548,7 +544,7 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
     block('What else they shared', c.otherShares.map(function (s) { return line((KIND[s.kind] || s.kind) + (s.note ? ': ' + s.note : ''), s.url); }));
     block('Feedback they gave', c.given.map(function (g) { return line('To ' + who(g.to) + ': ' + g.body); }));
     block('Feedback they received', c.received.map(function (g) { return line('From ' + who(g.from) + ': ' + g.body); }));
-    block('Already sent by a teacher', c.fromTeachers.map(function (g) {
+    block('Already sent by a leader', c.fromTeachers.map(function (g) {
       var li = line(who(g.from) + ': ' + g.body);
       if (g.from === me.id && (g.note_id || g.feedback_id)) li.appendChild(correctControl(g));
       return li;
@@ -688,7 +684,7 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
           share.hidden = !openBox.checked;
           where.replaceChildren();
           if (!openBox.checked) return;
-          where.appendChild(document.createTextNode('Guests read only when it is, the way in if you share it, and the apps your students chose to show. '));
+          where.appendChild(document.createTextNode('Guests read only when it is, the way in if you share it, and the apps your learners chose to show. '));
           var page = el('a', null, 'Its public page'); page.href = '/showcase/?c=' + encodeURIComponent(current.slug);
           where.appendChild(page);
           where.appendChild(document.createTextNode(' appears on Events once the cohort is open or running.'));
@@ -759,20 +755,21 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
       var box = $('[data-teachers]');
       box.replaceChildren();
       var form = $('[data-co-teacher-form]');
-      if (res[0].error) { box.appendChild(el('li', 'small', 'The teachers could not be read just now.')); form.hidden = true; return; }
+      if (res[0].error) { box.appendChild(el('li', 'small', 'The leaders could not be read just now.')); form.hidden = true; return; }
       var here = res[0].data;
       var ids = here.map(function (t) { return t.user_id; });
       here.forEach(function (t) {
         var li = el('li');
         li.appendChild(el('strong', null, t.user_id === me.id ? 'You' : personName(t)));
+        li.appendChild(el('span', 'role-tag', 'Leader'));
         if (t.user_id === c.created_by) { li.appendChild(el('span', 'small', ' made this cohort')); box.appendChild(li); return; }
         var msg = el('span', 'small'); msg.setAttribute('role', 'status');
         var self = t.user_id === me.id;
         var rm = el('button', 'btn-danger small', self ? 'Leave' : 'Remove');
         rm.type = 'button';
-        rm.setAttribute('aria-label', self ? 'Leave this cohort as a teacher' : 'Remove ' + personName(t) + ' as teacher');
+        rm.setAttribute('aria-label', self ? 'Leave this cohort as a leader' : 'Remove ' + personName(t) + ' as leader');
         rm.addEventListener('click', function () {
-          U.confirm(self ? { title: 'Stop teaching ' + c.title + '?', body: 'Another teacher can add you back.', action: 'Leave' } : { title: 'Remove ' + personName(t) + ' as teacher?', body: 'You can add them back.', action: 'Remove teacher' }).then(function (ok) { if (ok) takeOff(); });
+          U.confirm(self ? { title: 'Stop leading ' + c.title + '?', body: 'Another leader can add you back.', action: 'Leave' } : { title: 'Remove ' + personName(t) + ' as leader?', body: 'You can add them back.', action: 'Remove leader' }).then(function (ok) { if (ok) takeOff(); });
         });
         function takeOff() {
           rm.disabled = true;
@@ -824,7 +821,8 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
         var gh = el('a', null, ' @' + p.profiles.github_login); gh.href = 'https://github.com/' + encodeURIComponent(p.profiles.github_login);
         li.appendChild(gh);
       }
-      if (p.role === 'mentor') li.appendChild(el('span', 'role-tag', 'Mentor'));
+      if (p.role === 'student' || p.role === 'mentor') li.appendChild(el('span', 'role-tag', 'Learner'));
+      if (p.role === 'mentor') li.appendChild(el('span', 'role-tag', 'Returning'));
       if (p.app_repo) {
         li.appendChild(document.createTextNode(', building '));
         var r = el('a', null, p.app_name || p.app_repo); r.href = 'https://github.com/' + p.app_repo;
@@ -844,7 +842,7 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
   function roleSwitch(p, people) {
     var wrap = el('span', 'roster-role');
     var next = window.MentorLib.otherRole(p.role);
-    var b = el('button', 'btn-secondary small', next === 'mentor' ? 'Make them a mentor' : 'Make them a student again');
+    var b = el('button', 'btn-secondary small', next === 'mentor' ? 'Mark them returning' : 'Mark them not returning');
     b.type = 'button';
     var msg = el('span', 'small'); msg.setAttribute('role', 'status');
     b.addEventListener('click', function () {

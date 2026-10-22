@@ -87,15 +87,44 @@
   window.HS.forgetRoles = function () { try { localStorage.removeItem('hs-roles'); } catch (e) {} };
 
   // ---- the sidebar ------------------------------------------------------
+  // One structure for everyone (PAGES.md, "The signed-in platform"): Home,
+  // the cohorts you learn in, the cohorts you lead with the leader's own
+  // places, exchanges, and Admin for admins, then the public pages. Each
+  // item has an icon so the collapsed sidebar still reads.
+  var ICONS = '/assets/icons.svg?v=20261022j#';
+  function svgIcon(name) {
+    var ns = 'http://www.w3.org/2000/svg';
+    var svg = document.createElementNS(ns, 'svg');
+    svg.setAttribute('class', 'icon');
+    svg.setAttribute('aria-hidden', 'true');
+    svg.setAttribute('focusable', 'false');
+    var use = document.createElementNS(ns, 'use');
+    use.setAttribute('href', ICONS + name);
+    svg.appendChild(use);
+    return svg;
+  }
   var nav = el('nav', 'app-nav');
   nav.id = 'app-nav';
-  nav.setAttribute('aria-label', 'Your Human Shaped');
-  function item(list, href, text, current, cls) {
-    var li = el('li', cls || null), a = el('a', null, text);
+  nav.setAttribute('aria-label', 'Human Shaped');
+  function item(list, href, text, icon, current, note) {
+    var li = el('li'), a = el('a');
     a.href = href;
+    a.appendChild(svgIcon(icon));
+    a.appendChild(el('span', 'app-nav-text', text));
+    if (note) a.appendChild(el('span', 'app-nav-note', note));
+    a.setAttribute('data-tip', note ? text + ', ' + note : text);
     if (current) a.setAttribute('aria-current', 'page');
     li.appendChild(a); list.appendChild(li);
     return li;
+  }
+  function section(label, href, current) {
+    var g = el('li', 'app-nav-group');
+    var head = href ? el('a', 'app-nav-label', label) : el('span', 'app-nav-label', label);
+    if (href) { head.href = href; if (current) head.setAttribute('aria-current', 'page'); }
+    if (label) g.appendChild(head);
+    var sub = el('ul');
+    g.appendChild(sub);
+    return { li: g, list: sub };
   }
   function cohortHere(c) {
     var slug = query.get('c');
@@ -105,38 +134,65 @@
     r = r || {};
     nav.replaceChildren();
     var main = el('ul', 'app-nav-list');
-    item(main, '/', 'Home', here === '/' && !query.has('public'));
+    item(main, '/', 'Home', 'house', here === '/' && !query.has('public'));
     var cohorts = (r.cohorts || []).filter(function (c) { return c.status !== 'finished'; });
-    if (cohorts.length) {
-      var g = el('li', 'app-nav-group');
-      g.appendChild(el('span', 'app-nav-label', 'Your cohorts'));
-      var sub = el('ul');
-      cohorts.forEach(function (c) {
-        item(sub, c.role === 'teacher' ? '/teach/cohort/?c=' + c.id : '/cohort/?c=' + encodeURIComponent(c.slug), c.title, cohortHere(c));
-      });
-      g.appendChild(sub);
-      main.appendChild(g);
+    var learning = cohorts.filter(function (c) { return c.role !== 'teacher'; });
+    var leading = cohorts.filter(function (c) { return c.role === 'teacher'; });
+    if (learning.length) {
+      var l = section('Learning');
+      learning.forEach(function (c) { item(l.list, '/cohort/?c=' + encodeURIComponent(c.slug), c.title, 'student', cohortHere(c)); });
+      main.appendChild(l.li);
     }
-    item(main, '/exchanges/', 'Exchanges', /^\/exchange/.test(here));
-    if (r.teacher) item(main, '/teach/', 'Teaching', /^\/teach\//.test(here) && !/^\/teach\/(cohort|guide)\//.test(here));
-    if (r.admin) item(main, '/admin/', 'Running the hub', /^\/admin\//.test(here));
+    if (r.teacher) {
+      var t = section('Leading');
+      leading.forEach(function (c) { item(t.list, '/cohort/?c=' + encodeURIComponent(c.slug), c.title, 'chalkboard-teacher', cohortHere(c), c.status === 'draft' ? 'Draft' : null); });
+      item(t.list, '/teach/feedback/', 'Feedback', 'chat-circle-text', here === '/teach/feedback/');
+      item(t.list, '/teach/times/', 'Polls', 'calendar-check', /^\/teach\/times\//.test(here));
+      if (r.can_approve) item(t.list, '/teach/requests/', 'Requests to lead', 'user-plus', here === '/teach/requests/');
+      if (r.can_sign) item(t.list, '/teach/signing/', 'Signing', 'seal-check', here === '/teach/signing/');
+      item(t.list, '/teach/guide/', "Leader's guide", 'book-open-text', /^\/teach\/guide\//.test(here));
+      main.appendChild(t.li);
+    }
+    var o = section('');
+    o.li.classList.add('app-nav-plain');
+    item(o.list, '/exchanges/', 'Exchanges', 'video-camera', /^\/exchange/.test(here));
+    if (r.admin) item(o.list, '/admin/', 'Admin', 'shield-check', /^\/admin\//.test(here));
+    main.appendChild(o.li);
     nav.appendChild(main);
-    nav.appendChild(el('span', 'app-nav-label', 'Human Shaped'));
-    var quiet = el('ul', 'app-nav-list app-nav-quiet');
-    item(quiet, '/cohorts/', 'Open cohorts', here === '/cohorts/');
-    item(quiet, '/apps/', 'Apps', /^\/apps\//.test(here) && here !== '/apps/mine/');
-    item(quiet, '/events/', 'Events', here === '/events/');
-    item(quiet, '/principles/', 'Principles', here === '/principles/');
-    if (r.teacher) item(quiet, '/teach/guide/', 'Teaching guide', /^\/teach\/guide\//.test(here));
-    nav.appendChild(quiet);
-    // An area's row shows at once from the note, so the page does not jump
-    // when the hub answers; the page still checks before drawing anything.
-    if (r.teacher) document.querySelectorAll('[data-area-nav="teaching"]').forEach(function (n) {
-      n.hidden = false;
-      n.querySelectorAll('[data-needs-right]').forEach(function (li) { li.hidden = !r[li.getAttribute('data-needs-right')]; });
-    });
-    if (r.admin) document.querySelectorAll('[data-area-nav="admin"]').forEach(function (n) { n.hidden = false; });
+    var pub = el('ul', 'app-nav-list app-nav-quiet');
+    var p = section('Human Shaped');
+    item(p.list, '/cohorts/', 'Open cohorts', 'door-open', here === '/cohorts/');
+    item(p.list, '/apps/', 'Apps', 'app-window', /^\/apps\//.test(here) && here !== '/apps/mine/');
+    item(p.list, '/events/', 'Events', 'calendar-blank', here === '/events/');
+    item(p.list, '/principles/', 'Principles', 'compass', here === '/principles/');
+    pub.appendChild(p.li);
+    nav.appendChild(pub);
+    nav.appendChild(collapse);
   }
+
+  // From 64rem the sidebar collapses to its icons; the choice is this
+  // browser's own (the head script applies it before the page draws).
+  var collapse = el('button', 'app-nav-collapse');
+  collapse.type = 'button';
+  collapse.appendChild(svgIcon('sidebar-simple'));
+  var collapseText = el('span', 'app-nav-text');
+  collapse.appendChild(collapseText);
+  function collapsed() { return document.documentElement.getAttribute('data-nav') === 'collapsed'; }
+  function drawCollapse() {
+    var c = collapsed();
+    collapseText.textContent = c ? 'Expand sidebar' : 'Collapse sidebar';
+    collapse.setAttribute('aria-label', c ? 'Expand sidebar' : 'Collapse sidebar');
+    collapse.setAttribute('aria-expanded', String(!c));
+    collapse.setAttribute('data-tip', c ? 'Expand sidebar' : 'Collapse sidebar');
+  }
+  collapse.addEventListener('click', function () {
+    var c = !collapsed();
+    if (c) document.documentElement.setAttribute('data-nav', 'collapsed'); else document.documentElement.removeAttribute('data-nav');
+    try { if (c) localStorage.setItem('hs-nav', 'collapsed'); else localStorage.removeItem('hs-nav'); } catch (e) {}
+    drawCollapse();
+  });
+  try { if (localStorage.getItem('hs-nav') === 'collapsed') document.documentElement.setAttribute('data-nav', 'collapsed'); } catch (e) {}
+  drawCollapse();
   var header = document.querySelector('.site-header');
   var withNav = !document.body.hasAttribute('data-no-app-nav');
   if (withNav) header.after(nav);

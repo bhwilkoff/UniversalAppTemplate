@@ -1076,3 +1076,31 @@ paragraph on a hub page. `tools/test/design-kit.test.mjs` fails on the
 rules a test can check; the rest are a page review at 375 and 1280 px.
 The site's metaphors are teaching and performance; names are plain nouns
 (the lexicon in DESIGN-KIT.md).
+
+## Learners and leaders, one structure for both (October 22, 2026)
+
+**Everyone on the platform is a learner, a leader, or both, and the
+interface names them only that way; the signed-in platform has one
+structure for everyone, with the leader's places added to it, never a
+second version of anything** (Ben: "the people inside of the system are
+either Learners or Leaders. They can be both … those are the roles and how
+I'd like to make sure that folks are labeled as they use the platform,"
+and "Start with the user who is logged in. What do they need to see? How
+should it be organized? … you have only done half measures for actually
+building toward that cohesive platform").
+
+**Why:** the navigation research had already recommended Google
+Classroom's pattern (one row of pages in one order, one more item for the
+teacher, the role named on the page), but a leader still met each cohort
+as two pages with two rows of tabs, the sidebar and area rows listed the
+same places twice, the home repeated the sidebar, and the admin area was
+named after a metaphor ("the hub") with three tabs no one could tell
+apart.
+
+**How to apply:** the sidebar has Learning and Leading sections and an
+icon on every item, and collapses to its icons; a cohort has one row of
+sections (`cohort-nav.js`) whatever page holds them; the home is Coming
+up, Waiting for you, Learning, Leading, Your work; Admin is one page,
+Roles. Database names (`teachers`, `cohort_teachers`, `role = 'mentor'`)
+and `/teach/` addresses stay as they are; only words on screen change. A
+mentor is shown as a learner with a Returning tag.

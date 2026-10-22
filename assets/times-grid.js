@@ -112,9 +112,9 @@
   }
 
   // A save that never answers must not leave "Saving..." on screen forever
-  // (Ben, October 9: a new poll stuck there, and the hub never received
+  // (Ben, October 9: a new poll stuck there, and Human Shaped never received
   // it). After 20 seconds this gives up and says which layer was silent:
-  // the browser's sign-in, or the hub itself.
+  // the browser's sign-in, or Human Shaped itself.
   var LIMIT = 20000;
   function within(promise, db) {
     var timer;
@@ -134,7 +134,7 @@
           } catch (e) { /* the message still says what happened */ }
           reject(new Error(auth === 'silent' || auth === 'failed'
             ? 'your sign-in in this browser stopped answering, so nothing was sent. Try once more, and if it happens again, reload the page'
-            : (navigator.onLine === false ? 'this browser is offline' : 'the hub did not answer within ' + LIMIT / 1000 + ' seconds. Try again')));
+            : (navigator.onLine === false ? 'this browser is offline' : 'Human Shaped did not answer within ' + LIMIT / 1000 + ' seconds. Try again')));
         });
       }, LIMIT);
     });

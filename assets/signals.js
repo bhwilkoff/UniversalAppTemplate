@@ -109,10 +109,10 @@
       m.recording.hidden = !st.recording && !st.talk && !share;
       if (st.recording) m.recording.appendChild(el('p', null, opts.teaching
         ? 'You are recording now, and everyone in the cohort sees this line until you say it has stopped.'
-        : 'Your teacher is recording this session for your cohort.'));
+        : 'Your leader is recording this session for your cohort.'));
       if (st.talk) m.recording.appendChild(el('p', null, opts.teaching
         ? 'You are counting how much you talk, and everyone in the cohort sees this line until you say it has stopped.'
-        : 'Your teacher is counting their own talk time. No one’s words are kept.'));
+        : 'Your leader is counting their own talk time. No one’s words are kept.'));
       if (share) m.recording.appendChild(el('p', 'small', share));
     }
 
@@ -125,7 +125,7 @@
       var now = Date.now(), coarse = reduced();
       if (w.kind === 'back') {
         box.appendChild(el('p', 'signal-title', 'Come back to the main room'));
-        box.appendChild(el('p', null, w.because === 'time' ? 'The time in the rooms is up.' : 'Your teacher is calling everyone back.'));
+        box.appendChild(el('p', null, w.because === 'time' ? 'The time in the rooms is up.' : 'Your leader is calling everyone back.'));
         var acts = el('div', 'actions');
         if (mainUrl) acts.appendChild(link('Back to the main room', 'btn-primary', mainUrl));
         else acts.appendChild(el('p', 'small', 'The main room is the session’s own Meet call.'));
@@ -144,7 +144,7 @@
       }
       if (!opts.teaching && !mine) {
         title.textContent = 'Everyone is going to their groups’ rooms';
-        box.appendChild(el('p', null, 'You are not in a group yet, so stay in the main room, and your teacher will say where to go.'));
+        box.appendChild(el('p', null, 'You are not in a group yet, so stay in the main room, and your leader will say where to go.'));
         return;
       }
       if (!opts.teaching && !mine.url) {
@@ -206,7 +206,7 @@
         if (sc.signal.ends_at) box.appendChild(el('p', 'screen-clock')).appendChild(clockFor(sc.signal.ends_at, now, coarse, ''));
       } else if (sc.kind === 'back') {
         box.appendChild(el('p', 'screen-title', 'Come back to the main room'));
-        box.appendChild(el('p', 'screen-sub', sc.because === 'time' ? 'The time in the rooms is up.' : 'Your teacher is calling everyone back.'));
+        box.appendChild(el('p', 'screen-sub', sc.because === 'time' ? 'The time in the rooms is up.' : 'Your leader is calling everyone back.'));
       } else if (sc.kind === 'stage') {
         box.appendChild(el('p', 'screen-sub', 'On stage'));
         box.appendChild(el('p', 'screen-title', K.stageText(sc.signal, opts.nameOf)));

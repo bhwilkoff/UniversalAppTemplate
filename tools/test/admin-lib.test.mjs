@@ -5,12 +5,12 @@ const require = createRequire(import.meta.url);
 const A = require('../../assets/admin-lib.js');
 
 test('rights read as their names, or None', () => {
-  assert.equal(A.rightsText({ teacher: true, can_admin: true }), 'Teacher, Admin');
+  assert.equal(A.rightsText({ teacher: true, can_admin: true }), 'Leader, Admin');
   assert.equal(A.rightsText({}), 'None');
 });
 
 test('a change reads as what was done to whom', () => {
-  assert.equal(A.changeText({ right: 'teacher', before: false, after: true }, 'Ivy'), 'made Ivy a teacher');
+  assert.equal(A.changeText({ right: 'teacher', before: false, after: true }, 'Ivy'), 'made Ivy a leader');
   assert.equal(A.changeText({ right: 'can_sign', before: true, after: false }, 'Jo'), 'took away Jo’s signing');
 });
 

@@ -23,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261022i">
+  <link rel="stylesheet" href="/assets/site.css?v=20261022j">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -33,10 +33,11 @@
       // Signed in: the page wears the hub's sidebar (PAGES.md), chosen before
       // it draws, from the session this browser keeps.
       try { var se = JSON.parse(localStorage.getItem('sb-bifrieqzkihuxfzttgvd-auth-token') || 'null'); if (se && se.user && se.expires_at * 1000 > Date.now() - 7 * 864e5) document.documentElement.setAttribute('data-signed-in', ''); } catch (e) {}
+      try { if (localStorage.getItem('hs-nav') === 'collapsed') document.documentElement.setAttribute('data-nav', 'collapsed'); } catch (e) {}
     })();
   </script>
-  <script src="/assets/site.js?v=20261021c" defer></script>
-  <script src="/assets/ui.js?v=20261022h" defer></script>
+  <script src="/assets/site.js?v=20261022j" defer></script>
+  <script src="/assets/ui.js?v=20261022j" defer></script>
 </head>
 <body>
   <!-- Support (C0, for the Meet add-on listing and the consent screen): words by Claude, awaiting Ben's review. -->
@@ -55,10 +56,10 @@
       </nav>
       <div class="header-actions">
         <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#moon"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022j#moon"/></svg>
         </button>
         <a class="btn-primary small" href="/account/">
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#github"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022j#github"/></svg>
           <span>Sign in<span class="long"> with GitHub</span></span>
         </a>
       </div>
@@ -81,14 +82,14 @@
             <h2>Where to ask.</h2>
             <div class="prose">
               <p>Help here comes from people who know the course, so the best place to ask is wherever your question will help the next person too.</p>
-              <ul><li><strong>If you are in a cohort,</strong> ask your teacher, or post in your cohort's conversation, which is linked from your cohort page.</li><li><strong>For anything about the site, the add-on, or the method,</strong> ask in the <a href="https://github.com/orgs/humanshaped/discussions">discussions on GitHub</a>.</li><li><strong>For something private,</strong> such as removing information about you, write to <a href="mailto:meet@humanshaped.org">meet@humanshaped.org</a>.</li><li><strong>If you found a bug in the template,</strong> open an issue on <a href="https://github.com/bhwilkoff/UniversalAppTemplate/issues">its repository</a>.</li></ul>
+              <ul><li><strong>If you are in a cohort,</strong> ask your leader, or post in your cohort's conversation, which is linked from your cohort page.</li><li><strong>For anything about the site, the add-on, or the method,</strong> ask in the <a href="https://github.com/orgs/humanshaped/discussions">discussions on GitHub</a>.</li><li><strong>For something private,</strong> such as removing information about you, write to <a href="mailto:meet@humanshaped.org">meet@humanshaped.org</a>.</li><li><strong>If you found a bug in the template,</strong> open an issue on <a href="https://github.com/bhwilkoff/UniversalAppTemplate/issues">its repository</a>.</li></ul>
             </div>
           </div>
 
           <div class="topic" id="addon">
             <h2>The add-on for Google Meet.</h2>
             <div class="prose">
-              <p>Open Human Shaped from Meet's Activities button. The side panel finds the cohort from the call's link, so the call's link has to be the one on the session's page (a teacher sets it on the teaching page). If the panel cannot sign you in, it offers a small window to sign in with GitHub, and if neither works, a link to the session page in a new tab, which has everything the panel has.</p>
+              <p>Open Human Shaped from Meet's Activities button. The side panel finds the cohort from the call's link, so the call's link has to be the one on the session's page (a leader sets it on the leading page). If the panel cannot sign you in, it offers a small window to sign in with GitHub, and if neither works, a link to the session page in a new tab, which has everything the panel has.</p>
               <p>The panel asks Google for no permissions and reads only the meeting code, which the <a href="/privacy/#meet">privacy page</a> explains.</p>
             </div>
           </div>
@@ -103,7 +104,7 @@
           <div class="topic" id="self">
             <h2>What you can do yourself.</h2>
             <div class="prose">
-              <p>From your <a href="/account/">account page</a> you can sign out, leave a cohort, remove notes from your teachers, and delete your account. From your cohort page you can take your app off the public apps page.</p>
+              <p>From your <a href="/account/">account page</a> you can sign out, leave a cohort, remove notes from your leaders, and delete your account. From your cohort page you can take your app off the public apps page.</p>
               <p>humanshaped.org is offered by Learning is Change, Inc.</p>
               <p class="small">Last changed October 4, 2026.</p>
             </div>
@@ -127,7 +128,7 @@
           <p class="footer-head">Take part</p>
           <ul>
             <li><a href="/account/">Your account</a></li>
-            <li><a href="/teach/">Teach a cohort</a></li>
+            <li><a href="/teach/">Lead a cohort</a></li>
             <li><a href="/connect/">Connect your agent</a></li>
           </ul>
         </div>

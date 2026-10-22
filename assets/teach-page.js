@@ -29,7 +29,7 @@
         var me = session.user;
         // Every column, so can_sign comes along once the database has it.
         return db.from('teachers').select('*').eq('user_id', me.id).maybeSingle().then(function (r) {
-          if (r.error) return fail('Your teaching access could not be checked: ' + r.error.message);
+          if (r.error) return fail('Your leader access could not be checked: ' + r.error.message);
           if (window.HS && window.HS.roles) window.HS.roles({ teacher: !!r.data, admin: !!(r.data && r.data.can_admin), can_approve: !!(r.data && r.data.can_approve), can_sign: !!(r.data && r.data.can_sign) });
           if (!r.data) return opts.notTeacher ? opts.notTeacher(db, me) : show('not-teacher');
           var teacher = r.data;

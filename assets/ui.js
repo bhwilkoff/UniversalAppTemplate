@@ -4,7 +4,7 @@
 // starts from parts people already know instead of a sentence explaining
 // itself. Research: research/notes/design-kit-research.md.
 (function (root) {
-  var ICONS = '/assets/icons.svg?v=20261022a#';
+  var ICONS = '/assets/icons.svg?v=20261022j#';
   function el(tag, cls, text) {
     var n = document.createElement(tag);
     if (cls) n.className = cls;
@@ -56,13 +56,13 @@
   // ---- visibility: who can see this, the same words everywhere ---------
   var AUDIENCES = {
     device: ['device-mobile', 'On this device', 'It is kept in this browser and never sent anywhere.'],
-    me: ['lock-simple', 'Only you', 'No one else, including your teachers.'],
-    teachers: ['user', 'You and your teachers', 'You and the teachers of this cohort.'],
-    staff: ['user', 'Only teachers', 'The teachers of this cohort, and no one in it.'],
-    approvers: ['user', 'You and approvers', 'You and the people who decide requests to teach.'],
-    them: ['user', 'Them and teachers', 'The person it is written to, and this cohort’s teachers.'],
-    cohort: ['users', 'Your cohort', 'The people in this cohort and its teachers.'],
-    members: ['users-three', 'Human Shaped members', 'People in a cohort, now or before, and teachers.'],
+    me: ['lock-simple', 'Only you', 'No one else, including your leaders.'],
+    teachers: ['user', 'You and your leaders', 'You and the leaders of this cohort.'],
+    staff: ['user', 'Only leaders', 'The leaders of this cohort, and no one in it.'],
+    approvers: ['user', 'You and approvers', 'You and the people who decide requests to lead.'],
+    them: ['user', 'Them and leaders', 'The person it is written to, and this cohort’s leaders.'],
+    cohort: ['users', 'Your cohort', 'The people in this cohort and its leaders.'],
+    members: ['users-three', 'Human Shaped members', 'People in a cohort, now or before, and leaders.'],
     link: ['link', 'Anyone with the link', 'Anyone you give the address to, signed in or not.'],
     public: ['globe-simple', 'Everyone', 'Anyone on the web.']
   };
@@ -222,7 +222,7 @@
   var GATES = {
     'signed-out': ['Sign in to open this', ['Sign in with GitHub', '/account/', 'btn-primary']],
     'not-member': ['Only people in this cohort can open this', ['Go to your home', '/', 'btn-secondary']],
-    'not-teacher': ['Only teachers can open this', ['Ask to teach', '/teach/', 'btn-secondary']],
+    'not-teacher': ['Only leaders can open this', ['Ask to lead', '/teach/', 'btn-secondary']],
     'not-admin': ['Only admins can open this', ['Go to your home', '/', 'btn-secondary']],
     missing: ['Nothing is at this address', ['Go to your home', '/', 'btn-secondary']],
     error: ['This could not load', null]
@@ -263,6 +263,9 @@
     var nav = el('nav', 'area-nav ui-tabs');
     nav.setAttribute('aria-label', opts.label || 'Sections');
     var ul = el('ul'), links = {}, lis = [];
+    // The first of this page's own sections is its default; items with an
+    // href are sections of the same thing on another page.
+    var first = (items.filter(function (it) { return !it.href; })[0] || items[0]).key;
     items.forEach(function (it) {
       var li = el('li'), a = el('a', null, it.label);
       if (it.href) {
@@ -270,7 +273,7 @@
       } else {
         var u = new URL(location.href);
         u.searchParams.delete('t');
-        if (it.key !== items[0].key) u.searchParams.set('t', it.key);
+        if (it.key !== first) u.searchParams.set('t', it.key);
         a.href = u.pathname + u.search;
         if (it.count) { a.appendChild(document.createTextNode(' ')); a.appendChild(count(it.count, 'waiting')); }
         a.addEventListener('click', function (e) {
@@ -310,7 +313,7 @@
     }
     var now = null;
     function go(key, push) {
-      if (!links[key]) key = items[0].key;
+      if (!links[key]) key = first;
       now = key;
       Object.keys(links).forEach(function (k) {
         if (k === key) links[k].setAttribute('aria-current', 'page'); else links[k].removeAttribute('aria-current');
@@ -321,9 +324,9 @@
       fit();
       if (opts.onChange) opts.onChange(key);
     }
-    window.addEventListener('popstate', function () { go(new URLSearchParams(location.search).get('t') || items[0].key, false); });
+    window.addEventListener('popstate', function () { go(new URLSearchParams(location.search).get('t') || first, false); });
     window.addEventListener('resize', fit);
-    go(new URLSearchParams(location.search).get('t') || items[0].key, false);
+    go(new URLSearchParams(location.search).get('t') || first, false);
     return { go: function (k) { go(k, true); }, current: function () { return now; }, link: function (k) { return links[k] && links[k].getAttribute('href'); } };
   }
 

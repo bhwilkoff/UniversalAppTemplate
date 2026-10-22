@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Card | Human Shaped</title>
-  <meta name="description" content="The page a teacher presents in Google Meet during a Human Shaped session: the card they are showing, where everyone should be, and who is on stage, large enough to read from a shared screen.">
+  <meta name="description" content="The page a leader presents in Google Meet during a Human Shaped session: the card they are showing, where everyone should be, and who is on stage, large enough to read from a shared screen.">
   <link rel="canonical" href="https://humanshaped.org/card/">
   <meta name="robots" content="noindex">
   <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261022i">
+  <link rel="stylesheet" href="/assets/site.css?v=20261022j">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -24,6 +24,7 @@
       // Signed in: the page wears the hub's sidebar (PAGES.md), chosen before
       // it draws, from the session this browser keeps.
       try { var se = JSON.parse(localStorage.getItem('sb-bifrieqzkihuxfzttgvd-auth-token') || 'null'); if (se && se.user && se.expires_at * 1000 > Date.now() - 7 * 864e5) document.documentElement.setAttribute('data-signed-in', ''); } catch (e) {}
+      try { if (localStorage.getItem('hs-nav') === 'collapsed') document.documentElement.setAttribute('data-nav', 'collapsed'); } catch (e) {}
     })();
   </script>
 </head>
@@ -49,9 +50,9 @@
   </main>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" defer></script>
   <script src="/assets/hub-config.js?v=20261016a" defer></script>
-  <script src="/assets/cohort-lib.js?v=20261022a" defer></script>
-  <script src="/assets/signals-lib.js?v=20261012h" defer></script>
-  <script src="/assets/signals.js?v=20261022a" defer></script>
+  <script src="/assets/cohort-lib.js?v=20261022j" defer></script>
+  <script src="/assets/signals-lib.js?v=20261022j" defer></script>
+  <script src="/assets/signals.js?v=20261022j" defer></script>
   <script src="/assets/card.js" defer></script>
 </body>
 </html>

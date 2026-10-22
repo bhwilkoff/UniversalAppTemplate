@@ -95,7 +95,7 @@
     function askingText(at, now) {
       return opts.teaching
         ? 'They would like you here, asked ' + R.agoText(at, now) + '.'
-        : 'You asked for your teacher ' + R.agoText(at, now) + '. They will say so when they arrive.';
+        : 'You asked for your leader ' + R.agoText(at, now) + '. They will say so when they arrive.';
     }
 
     function draw() {
@@ -165,7 +165,7 @@
           } else if (!opts.teaching && c.helpAt) {
             acts.appendChild(button('We are fine now', 'btn-secondary', function () { write(g, { help_at: null }, status); }));
           } else if (!opts.teaching) {
-            acts.appendChild(button('We would like the teacher', 'btn-secondary', function () { write(g, { help_at: new Date().toISOString() }, status); }));
+            acts.appendChild(button('We would like the leader', 'btn-secondary', function () { write(g, { help_at: new Date().toISOString() }, status); }));
           }
         }
         if (acts.children.length) card.appendChild(acts);

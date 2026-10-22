@@ -209,7 +209,7 @@ test('the teacher types the percent the recorder showed, and the database keeps 
 test('the saved share reads as a whole percent, about the teacher only', () => {
   assert.equal(lib.percent('0.380'), 38);
   assert.equal(lib.percent(null), null);
-  assert.match(lib.shareText(0.41, false), /^Your teacher talked 41 percent/);
+  assert.match(lib.shareText(0.41, false), /^Your leader talked 41 percent/);
   assert.match(lib.shareText(0.41, true), /^You talked 41 percent/);
   assert.doesNotMatch(lib.shareText(0.41, false), /—/);
   assert.equal(lib.shareText(null, false), '');

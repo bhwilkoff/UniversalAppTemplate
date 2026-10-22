@@ -98,7 +98,7 @@
     .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
     .then(function (rows) {
       var s = S.showcaseFor(rows, slug, new Date());
-      if (!s) { status('This cohort has no public showing yet. Its teacher chooses whether the last session is open to guests.', true); return; }
+      if (!s) { status('This cohort has no public showing yet. Its leader chooses whether the last session is open to guests.', true); return; }
       draw(s);
     })
     .catch(function () { status('This could not load.', false); });

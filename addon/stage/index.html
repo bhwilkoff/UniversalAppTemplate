@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261022i">
+  <link rel="stylesheet" href="/assets/site.css?v=20261022j">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -19,6 +19,7 @@
       // Signed in: the page wears the hub's sidebar (PAGES.md), chosen before
       // it draws, from the session this browser keeps.
       try { var se = JSON.parse(localStorage.getItem('sb-bifrieqzkihuxfzttgvd-auth-token') || 'null'); if (se && se.user && se.expires_at * 1000 > Date.now() - 7 * 864e5) document.documentElement.setAttribute('data-signed-in', ''); } catch (e) {}
+      try { if (localStorage.getItem('hs-nav') === 'collapsed') document.documentElement.setAttribute('data-nav', 'collapsed'); } catch (e) {}
     })();
   </script>
 </head>
@@ -67,7 +68,7 @@
         <p class="stage-quiet" data-count-note hidden></p>
         <p class="stage-quiet" data-count-total hidden></p>
         <p class="stage-quiet" data-rerun-key hidden>The grey line under each bar is how people answered the first time.</p>
-        <p class="stage-quiet">Answer on your cohort’s live page, where only you and your teacher see what you said.</p>
+        <p class="stage-quiet">Answer on your cohort’s live page, where only you and your leader see what you said.</p>
       </div>
 
       <!-- The current scene of the run of show, as the teacher wrote it (R3). -->

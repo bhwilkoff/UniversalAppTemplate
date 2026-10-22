@@ -61,15 +61,13 @@ test('answered polls come from this browser\'s hs-times keys only', () => {
 test('waiting lines appear only for what is there, with a place to go', () => {
   assert.deepEqual(lib.waiting({}), []);
   const w = lib.waiting({ requests: 1, feedback: 3, notes: 0, videos: 2 });
-  assert.deepEqual(w.map((x) => [x.title, x.count]), [['Requests to teach', 1], ['Feedback', 3], ['New videos in your exchanges', 2]]);
+  assert.deepEqual(w.map((x) => [x.title, x.count]), [['Requests to lead', 1], ['Feedback', 3], ['New videos in your exchanges', 2]]);
   assert.equal(w[1].href, '/teach/feedback/');
 });
 
-test('sections: everyone sees cohorts, exchanges, and their app; the rest only when there is something', () => {
-  assert.deepEqual(lib.sections({}), ['cohorts', 'exchanges', 'app', 'more']);
-  assert.deepEqual(lib.sections({ comingUp: [1], waiting: [1], teacher: true, lastMark: {} }),
-    ['next', 'waiting', 'cohorts', 'exchanges', 'times', 'app', 'stages', 'more']);
-  assert.deepEqual(lib.sections({ polls: [1] }), ['cohorts', 'exchanges', 'times', 'app', 'more']);
+test('sections: everyone sees learning, leading, and their work; next and waiting only when there is something', () => {
+  assert.deepEqual(lib.sections({}), ['learning', 'leading', 'work']);
+  assert.deepEqual(lib.sections({ comingUp: [1], waiting: [1], teacher: true, lastMark: {} }), ['next', 'waiting', 'learning', 'leading', 'work']);
 });
 
 test('the last stage marked is the newest mark', () => {

@@ -13,7 +13,7 @@
   var WORDS = [
     { key: 'show', name: 'Run of show', line: 'The session’s scenes in order. The open one is happening now.' },
     { key: 'scene', name: 'Scene', line: 'One step of the run of show, with its minutes. There is one current scene at a time.' },
-    { key: 'cue', name: 'Cue', line: 'Something the teacher does in the moment that everyone sees at once, like sending people to their rooms.' },
+    { key: 'cue', name: 'Cue', line: 'Something the leader does in the moment that everyone sees at once, like sending people to their rooms.' },
     { key: 'stage', name: 'Main stage', line: 'The middle of the call, where the current scene or a presenter’s work is shown to everyone.' },
     { key: 'presenter', name: 'Presenter', line: 'The person whose work everyone is looking at.' },
     { key: 'audience', name: 'Audience', line: 'Everyone else in that moment, with one thing to do.' },
@@ -30,7 +30,7 @@
     presenter: { name: 'Presenter', line: 'One person shows their work on the main stage, and the audience responds.' },
     design: { name: 'Design stage', line: 'Everyone works on the same prompt together, drawing and writing in one shared space.' },
     reflection: { name: 'Reflection', line: 'Everyone starts this week’s work before leaving, with help close by.' },
-    question: { name: 'Question', line: 'Everyone answers privately, and the teacher may show the count.' }
+    question: { name: 'Question', line: 'Everyone answers privately, and the leader may show the count.' }
   };
 
   // COURSE.md's six parts (and the break), as scenes.
@@ -49,7 +49,7 @@
     { key: 'cue-rooms', name: 'Send everyone to their rooms', teacher: true, kinds: ['rooms'],
       line: { teacher: 'One cue sends every trio to its room with a clock, and one calls them back.' } },
     { key: 'rooms', name: 'The rehearsal rooms', teacher: false, kinds: ['rooms'],
-      line: { teacher: 'Each room’s turn and step, and which room would like you to visit.', student: 'Whose turn it is in your room, the step you are on, and how to ask for your teacher.' } },
+      line: { teacher: 'Each room’s turn and step, and which room would like you to visit.', student: 'Whose turn it is in your room, the step you are on, and how to ask for your leader.' } },
     { key: 'brought', name: 'What people brought back', teacher: false, kinds: ['rooms'],
       line: { teacher: 'Everyone’s bring-back since last session, with what each person wants to know.', student: 'Everyone’s bring-back since last session, so you know what your partners will show.' } },
     { key: 'cue-stage', name: 'Presenter and audience', teacher: true, kinds: ['presenter'],
@@ -61,7 +61,7 @@
     { key: 'cue-card', name: 'A card for everyone', teacher: true, kinds: ['talk', 'design'],
       line: { teacher: 'A few words, and a clock if you want one, on everyone’s view at once.' } },
     { key: 'questions', name: 'Questions', teacher: false, kinds: ['question', 'reflection'],
-      line: { teacher: 'Ask everyone a question, see the answers come in, and choose whether to show the count.', student: 'Your teacher’s questions.' } },
+      line: { teacher: 'Ask everyone a question, see the answers come in, and choose whether to show the count.', student: 'Your leader’s questions.' } },
     { key: 'cue-recording', name: 'Recording', teacher: true, kinds: [],
       line: { teacher: 'Tell everyone the session is being recorded, and when it stops.' } },
     { key: 'cue-talk', name: 'Your own talk', teacher: true, kinds: [],

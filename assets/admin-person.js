@@ -56,9 +56,9 @@
   function drawCohorts() {
     var box = $('[data-cohorts]');
     box.replaceChildren();
-    if (!person.cohorts.length) { box.appendChild(el('li', 'small', 'Not in a cohort, and not teaching one.')); return; }
+    if (!person.cohorts.length) { box.appendChild(el('li', 'small', 'Not in a cohort, and not leading one.')); return; }
     person.cohorts.forEach(function (c) {
-      var role = c.role === 'teacher' ? 'Teaches it' : c.role === 'mentor' ? 'Mentors in it' : 'A student in it';
+      var role = c.role === 'teacher' ? 'Leader' : c.role === 'mentor' ? 'Learner, returning' : 'Learner';
       if (c.member_status === 'left') role += ', and has left';
       else if (c.member_status === 'finished') role += ', and finished';
       box.appendChild(el('li', null, c.title + ': ' + role + '. It is ' + (STATUS[c.status] || c.status) + '.'));

@@ -25,7 +25,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261022i">
+  <link rel="stylesheet" href="/assets/site.css?v=20261022j">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -35,10 +35,11 @@
       // Signed in: the page wears the hub's sidebar (PAGES.md), chosen before
       // it draws, from the session this browser keeps.
       try { var se = JSON.parse(localStorage.getItem('sb-bifrieqzkihuxfzttgvd-auth-token') || 'null'); if (se && se.user && se.expires_at * 1000 > Date.now() - 7 * 864e5) document.documentElement.setAttribute('data-signed-in', ''); } catch (e) {}
+      try { if (localStorage.getItem('hs-nav') === 'collapsed') document.documentElement.setAttribute('data-nav', 'collapsed'); } catch (e) {}
     })();
   </script>
-  <script src="/assets/site.js?v=20261021c" defer></script>
-  <script src="/assets/ui.js?v=20261022h" defer></script>
+  <script src="/assets/site.js?v=20261022j" defer></script>
+  <script src="/assets/ui.js?v=20261022j" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to the page</a>
@@ -56,10 +57,10 @@
       </nav>
       <div class="header-actions">
         <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#moon"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022j#moon"/></svg>
         </button>
         <a class="btn-primary small" href="/account/">
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#github"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022j#github"/></svg>
           <span>Sign in<span class="long"> with GitHub</span></span>
         </a>
       </div>
@@ -78,7 +79,7 @@
         <section class="account-state" data-state="signed-out" hidden>
           <p>Sign in with the same GitHub account you use for your cohort, and then you can decide.</p>
           <button class="btn-primary" type="button" data-sign-in>
-            <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#github"/></svg>Sign in with GitHub
+            <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022j#github"/></svg>Sign in with GitHub
           </button>
         </section>
 
@@ -89,10 +90,10 @@
             <div>
               <h3>What it can read</h3>
               <ul>
-                <li>The cohorts you are in or teach</li>
+                <li>The cohorts you are in or lead</li>
                 <li>This week's challenge and the stages it covers</li>
                 <li>The next session's time, agenda, and Meet link</li>
-                <li>During a session, your place in the queue to show your work, your teacher's open questions, and your own answers</li>
+                <li>During a session, your place in the queue to show your work, your leader's open questions, and your own answers</li>
                 <li>Your group, with each partner's GitHub name, app, and repository</li>
                 <li>Your own app, what you have shared, and the feedback on it</li>
                 <li>The method itself, from the Universal App Template</li>
@@ -102,7 +103,7 @@
               <h3>What it can never do</h3>
               <ul>
                 <li>Share anything with your cohort, or give feedback</li>
-                <li>Answer your teacher's questions, or add to the queue, for you</li>
+                <li>Answer your leader's questions, or add to the queue, for you</li>
                 <li>Change, join, leave, or delete anything</li>
                 <li>See anyone's email address, including yours</li>
                 <li>Read what your classmates shared outside your group</li>
@@ -140,7 +141,7 @@
           <p class="footer-head">Take part</p>
           <ul>
             <li><a href="/account/">Your account</a></li>
-            <li><a href="/teach/">Teach a cohort</a></li>
+            <li><a href="/teach/">Lead a cohort</a></li>
             <li><a href="/connect/">Connect your agent</a></li>
           </ul>
         </div>

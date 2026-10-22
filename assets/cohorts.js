@@ -62,7 +62,7 @@
           card.appendChild(el('h4', null, c.title));
           card.appendChild(el('p', 'small', (c.status === 'running' ? 'Running now. ' : 'Open for sign-up. ') + TeachLib.openingLine(c)));
           if (c.description) card.appendChild(el('p', null, c.description));
-          var join = el('button', 'btn-secondary', 'Mentor this cohort');
+          var join = el('button', 'btn-secondary', 'Rejoin as a learner');
           join.type = 'button';
           var msg = el('span', 'small'); msg.setAttribute('role', 'status');
           join.addEventListener('click', function () {

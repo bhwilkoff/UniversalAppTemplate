@@ -98,7 +98,7 @@
       if (e.problem) return Promise.resolve(e.problem);
       return db.from('scenes').update(e.change).eq('id', scene.id).select('*').then(function (r) {
         if (r.error) return r.error.message;
-        if (!r.data || !r.data.length) return 'The change was not saved. Only the cohort’s teachers can change its run of show.';
+        if (!r.data || !r.data.length) return 'The change was not saved. Only the cohort’s leaders can change its run of show.';
         rows = rows.map(function (x) { return x.id === r.data[0].id ? r.data[0] : x; });
         if (o.onChange) o.onChange();
         return null;

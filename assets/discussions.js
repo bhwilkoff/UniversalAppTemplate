@@ -62,7 +62,7 @@
     } else if (p.kind === 'rate') {
       box.appendChild(el('p', null, 'GitHub has asked this page to slow down for a little while (in its words: “' + (p.message || 'rate limit') + '”). Try again in a few minutes. The conversation on GitHub itself is not affected.'));
     } else if (p.kind === 'forbidden') {
-      box.appendChild(el('p', null, 'GitHub did not allow that, and said: “' + (p.message || 'forbidden') + '”. If it keeps happening, tell your teacher, because the cohort’s repository may need a setting changed.'));
+      box.appendChild(el('p', null, 'GitHub did not allow that, and said: “' + (p.message || 'forbidden') + '”. If it keeps happening, tell your leader, because the cohort’s repository may need a setting changed.'));
     } else if (p.kind === 'offline') {
       box.appendChild(el('p', null, 'GitHub could not be reached just now. Check your connection and try again.'));
     } else {
@@ -332,11 +332,11 @@
       if (st === 'show') return tok ? read() : linkOnly();
       if (st === 'open') return offerToOpen();
       if (st === 'signin') { box.replaceChildren(); noToken(box, o.db, o.repo, false, true); return; }
-      box.replaceChildren(el('p', 'small', 'Your teacher has not opened this session’s thread yet. It will be here when they do.'));
+      box.replaceChildren(el('p', 'small', 'Your leader has not opened this session’s thread yet. It will be here when they do.'));
       lookForNumber();
     }
 
-    // Until a teacher opens it, ask the hub now and then whether they have.
+    // Until a teacher opens it, ask Human Shaped now and then whether they have.
     function lookForNumber() {
       later(function () {
         o.db.from('sessions').select('discussion_number').eq('id', o.row.id).maybeSingle().then(function (r) {
@@ -388,13 +388,13 @@
           var q = o.db.from('sessions').update({ discussion_number: made.number }).eq('id', o.row.id);
           if (!replacing) q = q.is('discussion_number', null);
           return q.select('discussion_number').then(function (u) {
-            if (u.error) { b.disabled = false; msg.textContent = 'GitHub made it, but the hub did not keep it: ' + u.error.message + '. It is at ' + made.url + '.'; return; }
+            if (u.error) { b.disabled = false; msg.textContent = 'GitHub made it, but Human Shaped did not keep it: ' + u.error.message + '. It is at ' + made.url + '.'; return; }
             if (u.data.length) { number = made.number; return step(); }
             return o.db.from('sessions').select('discussion_number').eq('id', o.row.id).maybeSingle().then(function (s) {
               var kept = T.settle(s.data && s.data.discussion_number, made.number);
               number = kept.keep;
               step();
-              if (kept.extra) box.prepend(el('p', 'small', 'Another teacher opened the thread at the same moment, so this page shows theirs. Yours is still on GitHub as number ' + kept.extra + ', and you can delete it there.'));
+              if (kept.extra) box.prepend(el('p', 'small', 'Another leader opened the thread at the same moment, so this page shows theirs. Yours is still on GitHub as number ' + kept.extra + ', and you can delete it there.'));
             });
           });
         });
@@ -410,7 +410,7 @@
         if (!got.thread) {
           if (o.teaching) return offerToOpen('This session’s thread is no longer on GitHub (someone may have deleted it), so you can open a new one.');
           posts = null;
-          box.replaceChildren(el('p', 'small', 'This session’s thread is no longer on GitHub. Your teacher can open a new one.'));
+          box.replaceChildren(el('p', 'small', 'This session’s thread is no longer on GitHub. Your leader can open a new one.'));
           return;
         }
         drawThread(got.thread);

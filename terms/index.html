@@ -4,12 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Terms | Human Shaped</title>
-  <meta name="description" content="The terms for using humanshaped.org, its hub, and the Human Shaped add-on for Google Meet.">
+  <meta name="description" content="The terms for using humanshaped.org and the Human Shaped add-on for Google Meet.">
   <link rel="canonical" href="https://humanshaped.org/terms/">
   <meta property="og:url" content="https://humanshaped.org/terms/">
   <meta property="og:site_name" content="Human Shaped">
   <meta property="og:title" content="Terms">
-  <meta property="og:description" content="The terms for using humanshaped.org, its hub, and the Human Shaped add-on for Google Meet.">
+  <meta property="og:description" content="The terms for using humanshaped.org and the Human Shaped add-on for Google Meet.">
   <meta property="og:type" content="website">
   <meta property="og:image" content="https://humanshaped.org/assets/og.png">
   <meta property="og:image:width" content="1200">
@@ -23,20 +23,21 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261022i">
+  <link rel="stylesheet" href="/assets/site.css?v=20261022j">
   <script>
     (function () {
       var q = location.search, t = null;
       if (/[?&]dark\b/.test(q)) t = 'dark'; else if (/[?&]light\b/.test(q)) t = 'light';
       else { try { t = localStorage.getItem('hs-theme'); } catch (e) {} }
       if (t) document.documentElement.setAttribute('data-theme', t);
-      // Signed in: the page wears the hub's sidebar (PAGES.md), chosen before
+      // Signed in: the page wears Human Shaped's sidebar (PAGES.md), chosen before
       // it draws, from the session this browser keeps.
       try { var se = JSON.parse(localStorage.getItem('sb-bifrieqzkihuxfzttgvd-auth-token') || 'null'); if (se && se.user && se.expires_at * 1000 > Date.now() - 7 * 864e5) document.documentElement.setAttribute('data-signed-in', ''); } catch (e) {}
+      try { if (localStorage.getItem('hs-nav') === 'collapsed') document.documentElement.setAttribute('data-nav', 'collapsed'); } catch (e) {}
     })();
   </script>
-  <script src="/assets/site.js?v=20261021c" defer></script>
-  <script src="/assets/ui.js?v=20261022h" defer></script>
+  <script src="/assets/site.js?v=20261022j" defer></script>
+  <script src="/assets/ui.js?v=20261022j" defer></script>
 </head>
 <body>
   <!-- Terms (C0, for the Meet add-on listing and the consent screen): words by Claude, awaiting Ben's review. -->
@@ -55,10 +56,10 @@
       </nav>
       <div class="header-actions">
         <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#moon"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022j#moon"/></svg>
         </button>
         <a class="btn-primary small" href="/account/">
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#github"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022j#github"/></svg>
           <span>Sign in<span class="long"> with GitHub</span></span>
         </a>
       </div>
@@ -70,7 +71,7 @@
       <header class="page-head">
         <div>
           <h1>Free to use, and yours to keep.</h1>
-          <p class="lead">These are the terms for humanshaped.org, its hub, and the Human Shaped add-on for Google Meet, kept short so that you can read all of them.</p>
+          <p class="lead">These are the terms for humanshaped.org and the Human Shaped add-on for Google Meet, kept short so that you can read all of them.</p>
           <!-- Written by Claude, awaiting Ben's review. -->
         </div>
       </header>
@@ -80,7 +81,7 @@
           <div class="topic" id="free">
             <h2>It is free, and it is offered as it is.</h2>
             <div class="prose">
-              <p>Anyone can learn and teach here, so humanshaped.org, its hub, its cohorts, and the Human Shaped add-on for Google Meet are free, with no paid tier and nothing to buy. The cost of that choice is that it is run by a few people rather than a company with a support desk, so it is offered as it is, without a promise that it will always be available or free of mistakes, and, as far as the law allows, we are not responsible for losses that come from using it.</p>
+              <p>Anyone can learn and lead here, so humanshaped.org, its cohorts, and the Human Shaped add-on for Google Meet are free, with no paid tier and nothing to buy. The cost of that choice is that it is run by a few people rather than a company with a support desk, so it is offered as it is, without a promise that it will always be available or free of mistakes, and, as far as the law allows, we are not responsible for losses that come from using it.</p>
             </div>
           </div>
 
@@ -101,9 +102,9 @@
           </div>
 
           <div class="topic" id="teachers">
-            <h2>If you teach here.</h2>
+            <h2>If you lead here.</h2>
             <div class="prose">
-              <p>Anyone may ask to teach, and a teacher agrees to look after what their students share, to say so before a session is recorded and give people a way to stay out of frame, and never to use what they see here for anything but the cohort.</p>
+              <p>Anyone may ask to lead, and a leader agrees to look after what their learners share, to say so before a session is recorded and give people a way to stay out of frame, and never to use what they see here for anything but the cohort.</p>
             </div>
           </div>
 
@@ -141,7 +142,7 @@
           <p class="footer-head">Take part</p>
           <ul>
             <li><a href="/account/">Your account</a></li>
-            <li><a href="/teach/">Teach a cohort</a></li>
+            <li><a href="/teach/">Lead a cohort</a></li>
             <li><a href="/connect/">Connect your agent</a></li>
           </ul>
         </div>

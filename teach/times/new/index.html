@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261022i">
+  <link rel="stylesheet" href="/assets/site.css?v=20261022j">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -22,15 +22,16 @@
       // Signed in: the page wears the hub's sidebar (PAGES.md), chosen before
       // it draws, from the session this browser keeps.
       try { var se = JSON.parse(localStorage.getItem('sb-bifrieqzkihuxfzttgvd-auth-token') || 'null'); if (se && se.user && se.expires_at * 1000 > Date.now() - 7 * 864e5) document.documentElement.setAttribute('data-signed-in', ''); } catch (e) {}
+      try { if (localStorage.getItem('hs-nav') === 'collapsed') document.documentElement.setAttribute('data-nav', 'collapsed'); } catch (e) {}
     })();
   </script>
-  <script src="/assets/site.js?v=20261021c" defer></script>
-  <script src="/assets/ui.js?v=20261022h" defer></script>
+  <script src="/assets/site.js?v=20261022j" defer></script>
+  <script src="/assets/ui.js?v=20261022j" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" defer></script>
   <script src="/assets/hub-config.js?v=20261016a" defer></script>
   <script src="/assets/times-lib.js?v=20261021a" defer></script>
-  <script src="/assets/times-grid.js?v=20261009g" defer></script>
-  <script src="/assets/teach-page.js?v=20261021d" defer></script>
+  <script src="/assets/times-grid.js?v=20261022j" defer></script>
+  <script src="/assets/teach-page.js?v=20261022j" defer></script>
   <script src="/assets/teach-times-new.js?v=20261021a" defer></script>
 </head>
 <body>
@@ -49,10 +50,10 @@
       </nav>
       <div class="header-actions">
         <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#moon"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022j#moon"/></svg>
         </button>
         <a class="btn-primary small" href="/account/">
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#github"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022j#github"/></svg>
           <span>Sign in<span class="long"> with GitHub</span></span>
         </a>
       </div>
@@ -61,16 +62,7 @@
 
   <main id="main">
     <div class="wrap">
-      <nav class="area-nav" aria-label="Teaching" data-area-nav="teaching" hidden>
-        <ul>
-          <li><a href="/teach/" data-prefix>Overview</a></li>
-          <li><a href="/teach/feedback/">Feedback</a></li>
-          <li><a href="/teach/times/" data-prefix>Polls</a></li>
-          <li data-needs-right="can_approve" hidden><a href="/teach/requests/">Requests to teach</a></li>
-          <li data-needs-right="can_sign" hidden><a href="/teach/signing/">Signing</a></li>
-        </ul>
-      </nav>
-      <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/teach/">Teaching</a></li><li><a href="/teach/times/">Polls</a></li></ol></nav>
+      <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/teach/">Leading</a></li><li><a href="/teach/times/">Polls</a></li></ol></nav>
       <header class="page-head">
         <h1>A new poll</h1>
       </header>
@@ -92,7 +84,7 @@
             <label>Your name, as people will see it <input name="host_name" maxlength="80" autocomplete="name"></label>
             <label>What people will see at the top <input name="title" maxlength="120" placeholder="A Tuesday or Thursday evening cohort, this winter" autocomplete="off"></label>
             <label>A note to them, if you would like one <span class="hint">Who the cohort is for, or anything that would help someone decide.</span><textarea name="note" rows="3" maxlength="1500"></textarea></label>
-            <label data-cohort-field hidden>The cohort it is for <span class="hint">Its other teachers will see the answers too.</span><select name="cohort_id"><option value="">Not a cohort yet</option></select></label>
+            <label data-cohort-field hidden>The cohort it is for <span class="hint">Its other leaders will see the answers too.</span><select name="cohort_id"><option value="">Not a cohort yet</option></select></label>
             <fieldset class="times-days">
               <legend>Days to offer</legend>
               <div class="times-day-list"><label class="check"><input type="checkbox" name="days" value="0"> Sunday</label><label class="check"><input type="checkbox" name="days" value="1" checked> Monday</label><label class="check"><input type="checkbox" name="days" value="2" checked> Tuesday</label><label class="check"><input type="checkbox" name="days" value="3" checked> Wednesday</label><label class="check"><input type="checkbox" name="days" value="4" checked> Thursday</label><label class="check"><input type="checkbox" name="days" value="5"> Friday</label><label class="check"><input type="checkbox" name="days" value="6"> Saturday</label></div>
@@ -131,7 +123,7 @@
           <p class="footer-head">Take part</p>
           <ul>
             <li><a href="/account/">Your account</a></li>
-            <li><a href="/teach/">Teach a cohort</a></li>
+            <li><a href="/teach/">Lead a cohort</a></li>
             <li><a href="/connect/">Connect your agent</a></li>
           </ul>
         </div>

@@ -1,38 +1,48 @@
-// Running the hub, its overview (/admin/; PAGES.md): how many people and
-// teachers there are, who the admins are, and what waits, each a count
-// that links to its page.
+// Roles (/admin/; PAGES.md): everyone who has signed in, with the roles
+// and rights they hold, found by name and narrowed by role, each opening
+// their own page to change them; and the latest changes, newest first.
 (function () {
   var root = document.querySelector('[data-admin]');
   if (!root || !window.AdminPage || !window.AdminLib) return;
-  var el = window.TeachPage.el, A = window.AdminLib;
-  var page = window.AdminPage.start(root, function (db, me) {
-    return Promise.all([
-      db.rpc('admin_people', { q: null }),
-      db.from('teacher_requests').select('user_id', { count: 'exact', head: true }).eq('state', 'waiting'),
-      db.rpc('credentials_to_sign'),
-      db.rpc('admin_changes', { lim: 5 })
-    ]).then(function (res) {
-      if (res[0].error) return page.fail('The hub could not be read: ' + res[0].error.message);
-      var people = res[0].data, teachers = people.filter(function (p) { return p.teacher; }), admins = people.filter(function (p) { return p.can_admin; });
-      var U = window.UI;
-      document.querySelector('[data-admin-facts]').replaceChildren(U.facts([
-        ['People', String(people.length)], ['Teachers', String(teachers.length)], ['Admins', admins.map(A.nameOf).join(', ')]
-      ]));
-      var warn = root.querySelector('[data-one-admin]');
-      warn.hidden = admins.length > 1;
-      var box = root.querySelector('[data-overview]');
-      box.replaceChildren();
-      var waiting = res[1].count || 0, toSign = res[2].error ? 0 : res[2].data.length;
-      if (waiting) box.appendChild(U.row({ title: 'Requests to teach', href: '/teach/requests/', status: U.count(waiting, 'waiting') }));
-      if (toSign) box.appendChild(U.row({ title: 'Signing', href: '/teach/signing/', status: U.count(toSign, 'to sign') }));
-      if (!box.children.length) box.appendChild(U.empty('Nothing waiting'));
-      var log = root.querySelector('[data-recent]');
+  var A = window.AdminLib, U = window.UI;
+  var db = null, timer = null, last = [];
+  function $(sel) { return root.querySelector(sel); }
+  function draw() {
+    var only = $('[data-only]').value;
+    var list = last.filter(function (p) { return !only || (only === 'learner' ? p.enrolled > 0 : p[only]); });
+    var box = $('[data-people]');
+    box.replaceChildren();
+    $('[data-count]').textContent = list.length + (list.length === 1 ? ' person' : ' people') + (list.length === 200 ? ', the first 200' : '');
+    if (!list.length) { box.appendChild(U.empty('No one matches')); return; }
+    list.forEach(function (p) {
+      var tags = U.el('span', 'ui-tags');
+      A.rolesOf(p).forEach(function (t) { tags.appendChild(U.tag(t)); });
+      box.appendChild(U.row({ title: A.nameOf(p), href: '/admin/person/?u=' + p.id, meta: p.github_login && p.display_name ? '@' + p.github_login : null, status: tags }));
+    });
+  }
+  function load() {
+    return db.rpc('admin_people', { q: $('[data-q]').value.trim() || null }).then(function (r) {
+      if (r.error) return page.fail('Everyone could not be read: ' + r.error.message);
+      last = r.data;
+      if (!$('[data-q]').value.trim()) $('[data-one-admin]').hidden = last.filter(function (p) { return p.can_admin; }).length > 1;
+      draw();
+    });
+  }
+  function loadChanges() {
+    return db.rpc('admin_changes', { lim: 20 }).then(function (r) {
+      var log = $('[data-recent]');
       log.replaceChildren();
-      var changes = res[3].error ? [] : res[3].data;
+      var changes = r.error ? [] : r.data;
       if (!changes.length) log.appendChild(U.empty('No changes yet'));
       changes.forEach(function (c) {
-        log.appendChild(U.row({ title: (c.actor_name || 'Someone') + ' ' + A.changeText(c, c.subject_name || 'someone'), href: '/admin/person/?u=' + c.subject, meta: new Date(c.at).toLocaleDateString(undefined, { month: 'long', day: 'numeric' }) }));
+        log.appendChild(U.row({ title: (c.actor_name || 'Someone') + ' ' + A.changeText(c, c.subject_name || 'someone'), href: '/admin/person/?u=' + c.subject, meta: new Date(c.at).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' }) + (c.note ? ', ' + c.note : '') }));
       });
     });
+  }
+  $('[data-q]').addEventListener('input', function () { clearTimeout(timer); timer = setTimeout(load, 250); });
+  $('[data-only]').addEventListener('change', draw);
+  var page = window.AdminPage.start(root, function (client) {
+    db = client;
+    return Promise.all([load(), loadChanges()]);
   });
 })();

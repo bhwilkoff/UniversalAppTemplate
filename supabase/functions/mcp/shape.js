@@ -1,7 +1,7 @@
-// How the hub's MCP server answers a student's agent, decided without
+// How Human Shaped's MCP server answers a student's agent, decided without
 // touching the database, so every answer is tested on its own
 // (tools/test/mcp-shape.test.mjs). Answers are short plain text that a
-// model reads well, and each one links back to the hub page it came from.
+// model reads well, and each one links back to Human Shaped page it came from.
 
 export const SITE = 'https://humanshaped.org';
 const RAW = 'https://raw.githubusercontent.com/bhwilkoff/UniversalAppTemplate/main/';
@@ -146,7 +146,7 @@ export function workText(cohort, mine, shares, teacherIds, myId, notes) {
 }
 
 // A person working on their own, outside any cohort (G2): their own app
-// from builder_apps, whether it shows on the hub (and why not, if it was
+// from builder_apps, whether it shows on Human Shaped (and why not, if it was
 // kept off), and which stages they have reached, from their own marks
 // (stage_marks: ready, not yet, and notes of what they would bring back).
 // Nothing here compares them with anyone.
@@ -156,11 +156,11 @@ export function ownAppText(app, hide, marks) {
     lines.push(`App: ${app.app_name || '(no name yet)'}`);
     lines.push(`Repository: https://github.com/${app.app_repo}`);
     if (app.app_url) lines.push(`Live at: ${app.app_url}`);
-    if (hide) lines.push(`On the hub: kept off the apps page by the people who approve teachers${hide.reason ? ', because: ' + hide.reason : ''}. Your own switch is unchanged.`);
-    else if (app.public) lines.push(`On the hub: shown, at ${SITE}/apps/app/?r=${app.app_repo}`);
-    else lines.push('On the hub: private to you. Only you can choose to show it.');
+    if (hide) lines.push(`On Human Shaped: kept off the apps page by the people who approve teachers${hide.reason ? ', because: ' + hide.reason : ''}. Your own switch is unchanged.`);
+    else if (app.public) lines.push(`On Human Shaped: shown, at ${SITE}/apps/app/?r=${app.app_repo}`);
+    else lines.push('On Human Shaped: private to you. Only you can choose to show it.');
   } else {
-    lines.push(`No app of your own on the hub yet. You can add one, private until you choose to show it, at ${SITE}/apps/mine/.`);
+    lines.push(`No app of your own on Human Shaped yet. You can add one, private until you choose to show it, at ${SITE}/apps/mine/.`);
   }
   const label = (stage) => (stage === 'setup' ? 'Setup' : 'Stage ' + stage);
   const part = (stage) => (stage === 'setup' ? 'setup' : stagePart(stage));
@@ -188,9 +188,9 @@ export function ownReviewPrompt(stage) {
   const part = stage ? (stage === 'setup' ? 'setup' : stagePart(stage)) : null;
   return [
     `Please give me a human-shaped review of the app I am building on my own${part ? `, at the method part "${part}"` : ''}.`,
-    `First call my_app to see my app and my own marks on the stages. If it has no app yet, ask me which repository to read, and tell me I can keep it on the hub at ${SITE}/apps/mine/ if I want to. Then call method with part "review-skill" and follow that skill exactly${part ? `, and call method with part "${part}" for what that stage asks` : ', choosing the stage from my marks (the first one I have not marked ready)'}, reading my repository for evidence.`,
+    `First call my_app to see my app and my own marks on the stages. If it has no app yet, ask me which repository to read, and tell me I can keep it on Human Shaped at ${SITE}/apps/mine/ if I want to. Then call method with part "review-skill" and follow that skill exactly${part ? `, and call method with part "${part}" for what that stage asks` : ', choosing the stage from my marks (the first one I have not marked ready)'}, reading my repository for evidence.`,
     'Open the review with a line that says it is AI feedback, naming yourself, your model, and today\'s date. Give no scores or grades, and do not compare me with anyone. Say plainly what you could not see. Ask the questions the method asks rather than answering them for me.',
-    `Write the review to a file in my repository and stop there. Do not share it anywhere. Without a cohort there is no teacher reading this, so if I want people to see the work, I can show the app on the hub or bring it to an event (${SITE}/events/).`,
+    `Write the review to a file in my repository and stop there. Do not share it anywhere. Without a cohort there is no teacher reading this, so if I want people to see the work, I can show the app on Human Shaped or bring it to an event (${SITE}/events/).`,
   ].join('\n\n');
 }
 
@@ -312,7 +312,7 @@ export function thisSessionText(cohort, session, live, queue, checks, myAnswers,
 // student: the teacher's, never the agent's.
 // ---------------------------------------------------------------------
 
-export const TEACHER_ASIDE = 'This is read-only, and for the teacher alone. Anything you make of it is the teacher\'s to give or not: the hub never sends what an agent wrote, and a follow-up is written and sent by the teacher on ' + SITE + '/teach/. If you help the teacher think about someone\'s work, say that it comes from an AI, ask the method\'s questions rather than grading, and do not post anywhere.';
+export const TEACHER_ASIDE = 'This is read-only, and for the teacher alone. Anything you make of it is the teacher\'s to give or not: Human Shaped never sends what an agent wrote, and a follow-up is written and sent by the teacher on ' + SITE + '/teach/. If you help the teacher think about someone\'s work, say that it comes from an AI, ask the method\'s questions rather than grading, and do not post anywhere.';
 
 // Which cohort a teacher's question is about, among the cohorts they
 // teach. Anyone who does not teach it gets a plain refusal, so a

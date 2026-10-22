@@ -62,7 +62,10 @@ light and dark.
 | live session | main session, main room, session page |
 | Open (a cohort, a poll, an exchange taking part) | Open for joining, Open for people to join, Taking answers |
 | exchange | thread, video thread |
-| teacher, co-teacher, mentor, student | instructor, facilitator, learner (as a role) |
+| leader (anyone who leads a cohort), learner (anyone in one, including someone returning) | teacher, co-teacher, student, mentor, instructor, facilitator (Ben, October 22, 2026: "the people inside of the system are either Learners or Leaders") |
+| Leading (the area), Leader's guide | Teaching, the teaching page, the teaching guide |
+| Human Shaped, humanshaped.org | the hub (a metaphor, not a label; Ben, October 22, 2026) |
+| Admin, Roles | Running the hub |
 | Overview (an area's first page) | desk, dashboard (the site's metaphors are teaching and performance: run of show, scenes, main stage, rehearsal, the showing; Ben, October 21, 2026) |
 
 ## The parts
@@ -128,10 +131,10 @@ labeled ("Exchange" Your cohort, "Video file" Anyone with the link).
 |---|---|---|
 | device | On this device | device-mobile |
 | me | Only you | lock-simple |
-| teachers | You and your teachers | user |
-| staff | Only teachers | user |
+| teachers | You and your leaders | user |
+| staff | Only leaders | user |
 | approvers | You and approvers | user |
-| them | Them and teachers | user |
+| them | Them and leaders | user |
 | cohort | Your cohort | users |
 | members | Human Shaped members | users-three |
 | link | Anyone with the link | link |
@@ -200,7 +203,7 @@ per page.
 The whole page closed or empty, one fixed line and one action each:
 - signed out: "Sign in to open this" + Sign in with GitHub
 - not a member: "Only people in this cohort can open this" + Go to your home
-- not a teacher: "Only teachers can open this" + Ask to teach
+- not a leader: "Only leaders can open this" + Ask to lead
 - not an admin: "Only admins can open this" + Go to your home
 - missing: "Nothing is at this address" + Go to your home
 - error: "This could not load" + Try again, the error in "Error details"
@@ -219,9 +222,18 @@ Filters one list in place: two to five noun choices, buttons with
 Nothing for the first second, then rows shaped like the real ones. No
 loading sentences; a hidden status names what loads.
 
+### Role tag — `UI.tag('Leader' | 'Learner')`
+A person's role in one cohort, as a plain tag beside their name or the
+cohort's name: Leader or Learner, and Returning for a learner who has come
+back. Never a sentence saying what the role allows; the sections and
+buttons in front of them are what it allows.
+
 ### Navigation
-PAGES.md, "How you find your way": the signed-in sidebar, area rows, the
-cohort bar, breadcrumbs that end at the parent.
+PAGES.md, "How you find your way": the signed-in sidebar (each item an
+icon and a name; it collapses to its icons from 64rem, each icon naming
+itself in a tip on hover and focus), the cohort's one row of sections,
+breadcrumbs that end at the parent. Sidebar icons are Phosphor's regular
+weight, from `assets/icons.svg`; never emoji.
 
 ## What it never uses (R§4)
 Tracked capitals, a label above a heading unless it carries information,

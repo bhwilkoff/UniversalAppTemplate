@@ -85,7 +85,7 @@
         li.appendChild(el('h2', null, r.name));
         li.appendChild(el('p', 'stage-room-place', r.text));
         var c = el('p', 'stage-room-clock'); c.setAttribute('data-ends', r.endsAt == null ? '' : String(r.endsAt)); li.appendChild(c);
-        if (r.asking) li.appendChild(el('p', 'stage-room-asking', 'Would like the teacher'));
+        if (r.asking) li.appendChild(el('p', 'stage-room-asking', 'Would like the leader'));
         grid.appendChild(li);
       });
     }

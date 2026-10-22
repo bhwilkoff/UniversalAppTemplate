@@ -23,7 +23,7 @@ test('not a cohort they are in, or teach, but one they left is offered again', (
 });
 
 test('a role reads as a word only for mentors, and the switch moves between the two', () => {
-  assert.equal(M.roleLabel('mentor'), 'Mentor');
+  assert.equal(M.roleLabel('mentor'), 'Returning');
   assert.equal(M.roleLabel('student'), '');
   assert.equal(M.otherRole('student'), 'mentor');
   assert.equal(M.otherRole('mentor'), 'student');

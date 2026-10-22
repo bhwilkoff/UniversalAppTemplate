@@ -200,7 +200,7 @@
     function canAdd() {
       var ok = o.canDraw();
       addBtn.disabled = !ok;
-      addBtn.title = ok ? '' : 'The board is locked, so only a teacher can add pages.';
+      addBtn.title = ok ? '' : 'The board is locked, so only a leader can add pages.';
     }
     canAdd();
     return { sync: sync, refresh: canAdd };

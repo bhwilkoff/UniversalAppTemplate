@@ -88,7 +88,7 @@
     { key: 'scale', name: 'A scale', line: 'Everyone picks a point on a scale, from three to ten points long.', points: true },
     { key: 'words', name: 'A few words', line: 'Everyone gives a word or a few, and the words show together, largest where most people agree.' },
     { key: 'rank', name: 'Put in order', line: 'Everyone puts the choices in their own order, first to last.', choices: true },
-    { key: 'short', name: 'In their own words', line: 'Everyone answers in a sentence or a few. Only the teachers read the answers.' }
+    { key: 'short', name: 'In their own words', line: 'Everyone answers in a sentence or a few. Only the leaders read the answers.' }
   ];
   var KIND_BY = {};
   QUESTION_KINDS.forEach(function (k) { KIND_BY[k.key] = k; });

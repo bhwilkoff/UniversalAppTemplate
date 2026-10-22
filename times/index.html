@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261022i">
+  <link rel="stylesheet" href="/assets/site.css?v=20261022j">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -23,17 +23,18 @@
       // Signed in: the page wears the hub's sidebar (PAGES.md), chosen before
       // it draws, from the session this browser keeps.
       try { var se = JSON.parse(localStorage.getItem('sb-bifrieqzkihuxfzttgvd-auth-token') || 'null'); if (se && se.user && se.expires_at * 1000 > Date.now() - 7 * 864e5) document.documentElement.setAttribute('data-signed-in', ''); } catch (e) {}
+      try { if (localStorage.getItem('hs-nav') === 'collapsed') document.documentElement.setAttribute('data-nav', 'collapsed'); } catch (e) {}
     })();
   </script>
-  <script src="/assets/site.js?v=20261021c" defer></script>
-  <script src="/assets/ui.js?v=20261022h" defer></script>
+  <script src="/assets/site.js?v=20261022j" defer></script>
+  <script src="/assets/ui.js?v=20261022j" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" defer></script>
   <script src="/assets/hub-config.js?v=20261016a" defer></script>
   <script src="/assets/times-lib.js?v=20261021a" defer></script>
   <script src="/assets/teach-lib.js?v=20261022c" defer></script>
-  <script src="/assets/times-grid.js?v=20261009g" defer></script>
+  <script src="/assets/times-grid.js?v=20261022j" defer></script>
   <script src="/assets/times-calendar.js?v=20261009b" defer></script>
-  <script src="/assets/times.js?v=20261022e" defer></script>
+  <script src="/assets/times.js?v=20261022j" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to the page</a>
@@ -51,10 +52,10 @@
       </nav>
       <div class="header-actions">
         <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#moon"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022j#moon"/></svg>
         </button>
         <a class="btn-primary small" href="/account/">
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#github"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022j#github"/></svg>
           <span>Sign in<span class="long"> with GitHub</span></span>
         </a>
       </div>
@@ -87,10 +88,10 @@
           <section class="times-invite" data-invite hidden aria-labelledby="invite-title">
             <h2 id="invite-title" data-invite-title></h2>
             <div data-invite-line></div>
-            <p data-invite-join-box><a class="btn-primary" data-invite-join><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#github"/></svg>Join with GitHub</a></p>
+            <p data-invite-join-box><a class="btn-primary" data-invite-join><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022j#github"/></svg>Join with GitHub</a></p>
           </section>
 
-          <p class="notice" data-closed hidden>This poll has closed, so it no longer takes answers. The teacher is choosing a time from the answers they have.</p>
+          <p class="notice" data-closed hidden>This poll has closed, so it no longer takes answers. The leader is choosing a time from the answers they have.</p>
           <p class="notice" data-saved hidden tabindex="-1"></p>
 
           <form class="cohort-form times-form" data-form novalidate>
@@ -123,7 +124,7 @@
               <p class="hint" data-count-line hidden>The number in each time is how many people can make it, counting those who said if need be.</p>
             </fieldset>
 
-            <label class="times-comment">Anything the teacher should know <span class="hint">For example, a week you know you will miss.</span><textarea name="comment" rows="3" maxlength="1000"></textarea></label>
+            <label class="times-comment">Anything the leader should know <span class="hint">For example, a week you know you will miss.</span><textarea name="comment" rows="3" maxlength="1000"></textarea></label>
 
             <p class="times-status" role="status" aria-live="polite" data-status></p>
             <div class="actions">
@@ -154,7 +155,7 @@
           <p class="footer-head">Take part</p>
           <ul>
             <li><a href="/account/">Your account</a></li>
-            <li><a href="/teach/">Teach a cohort</a></li>
+            <li><a href="/teach/">Lead a cohort</a></li>
             <li><a href="/connect/">Connect your agent</a></li>
           </ul>
         </div>

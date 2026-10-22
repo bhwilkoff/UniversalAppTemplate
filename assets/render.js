@@ -33,7 +33,7 @@
     'docs/teaching/': '/teach/guide/weeks/',
     'docs/path/talking-to-your-agent.md': '/path/talking-to-your-agent/',
     'docs/path/showing-your-work.md': '/path/showing-your-work/',
-    'COURSE.md': '/teach/guide/',
+    'COURSE.md': '/teach/guide/course/',
     'docs/path/README.md': '/cohorts/#weeks',
     'docs/path/': '/cohorts/#weeks',
     'docs/human-shaped/PRINCIPLES.md': '/principles/',

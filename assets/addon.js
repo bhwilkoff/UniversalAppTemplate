@@ -196,7 +196,7 @@
       if (bad) return fail('The panel could not look up this call: ' + bad.error.message);
       var room = A.findRoom(code, { sessions: res[0].data, groups: res[1].data, teaching: res[2].data.map(function (t) { return t.cohort_id; }) });
       if (!room) {
-        $('[data-no-room-text]').textContent = 'This call’s code is ' + code + '. A teacher adds its link to a session or group on the teaching page.';
+        $('[data-no-room-text]').textContent = 'This call’s code is ' + code + '. A leader adds its link to a session or group in the cohort’s Sessions or Groups.';
         return show('no-room');
       }
       S.room = room;
@@ -329,7 +329,7 @@
     if (S.teaching) {
       var d = el('details', 'recognize-give');
       d.appendChild(el('summary', null, 'Recognize someone'));
-      d.appendChild(el('p', 'small', 'Name a skill someone just showed, and when. Only they and the cohort’s teachers see it.'));
+      d.appendChild(el('p', 'small', 'Name a skill someone just showed, and when. Only they and the cohort’s leaders see it.'));
       var who = el('select'); who.setAttribute('aria-label', 'Who showed it');
       who.appendChild(new Option('Who showed it?', ''));
       S.people.map(function (p) { return { id: p.user_id, name: S.names[p.user_id] || 'Someone' }; })
@@ -352,7 +352,7 @@
         db.from('recognitions').insert(r.row).then(function (res) {
           give.disabled = false;
           if (res.error) { status.textContent = 'Not given: ' + res.error.message + '.'; return; }
-          status.textContent = 'Given to ' + (S.names[who.value] || 'them') + '. Only they and the cohort’s teachers see it.';
+          status.textContent = 'Given to ' + (S.names[who.value] || 'them') + '. Only they and the cohort’s leaders see it.';
           if (S.classChannel) S.classChannel.nudge('recognition');
           who.value = ''; what.value = ''; own.value = ''; own.hidden = true; moment.value = '';
         });
@@ -367,7 +367,7 @@
       db.from('recognitions').select('id, skill, skill_key, moment, given_by, given_at, session_id').eq('cohort_id', S.cohort.id).eq('user_id', S.me.id).then(function (r) {
         if (r.error) return;
         var today = (r.data || []).filter(function (x) { return x.session_id === S.session.id; });
-        var lines = RL.lines(today, function (id) { return S.names[id] || 'Your teacher'; });
+        var lines = RL.lines(today, function (id) { return S.names[id] || 'Your leader'; });
         mineBox.replaceChildren();
         box.hidden = !lines.length;
         if (!lines.length) return;
@@ -527,7 +527,7 @@
       if (!url) {
         box.appendChild(el('p', 'small', S.teaching
           ? 'This session has no thread yet. Open it on the session page, and it will be linked here for everyone.'
-          : 'Your teacher has not opened this session’s thread yet.'));
+          : 'Your leader has not opened this session’s thread yet.'));
       } else {
         box.appendChild(el('p', 'small', 'Links, questions for later, and what you are stuck on go here, and they stay on GitHub under your own name.'));
         var a = el('a', 'btn-primary', 'Open the thread on GitHub'); a.href = url; a.target = '_blank'; a.rel = 'noopener';
@@ -541,7 +541,7 @@
   function drawFrame() {
     $('[data-cohort-title]').textContent = S.cohort.title;
     var group = S.room.groupId ? S.groups.filter(function (g) { return g.id === S.room.groupId; })[0] : null;
-    $('[data-where]').textContent = 'Week ' + S.session.number + ', ' + (group ? group.name + '’s room' : 'the main room') + (S.teaching ? '. You are teaching.' : '.') + (S.room.ambiguous ? ' Another cohort uses this call too.' : '');
+    $('[data-where]').textContent = 'Week ' + S.session.number + ', ' + (group ? group.name + '’s room' : 'the main room') + (S.teaching ? '. You are leading.' : '.') + (S.room.ambiguous ? ' Another cohort uses this call too.' : '');
     var full = $('[data-full-link]'); full.href = '/live/?c=' + encodeURIComponent(S.cohort.slug);
     $('[data-fallback-link]').href = full.href;
     $('[data-open-stage]').hidden = !S.teaching;
@@ -697,13 +697,13 @@
     var heard = S.prev && S.prev.heard;
     if (heard) {
       var wrap = el('div', 'live-heard addon-card');
-      wrap.appendChild(el('p', 'kicker', 'What ' + (S.teaching ? 'you' : 'your teacher') + ' heard in week ' + S.prev.number + '’s checks'));
+      wrap.appendChild(el('p', 'kicker', 'What ' + (S.teaching ? 'you' : 'your leader') + ' heard in week ' + S.prev.number + '’s checks'));
       heard.split(/\n{2,}/).forEach(function (para) { wrap.appendChild(el('p', null, para)); });
       box.appendChild(wrap);
     } else if (S.teaching && S.prev) {
       var hint = el('p', 'small');
       hint.appendChild(document.createTextNode('What you heard in week ' + S.prev.number + '’s checks shows here once you write it '));
-      hint.appendChild(newTab(Object.assign(el('a', null, 'on your teaching page'), { href: '/teach/cohort/?c=' + S.cohort.id })));
+      hint.appendChild(newTab(Object.assign(el('a', null, 'in Follow-up'), { href: '/teach/cohort/?c=' + S.cohort.id + '&t=followup' })));
       hint.appendChild(document.createTextNode('.'));
       box.appendChild(hint);
     }
@@ -1018,7 +1018,7 @@
   function drawChecks() {
     var open = S.checks.filter(function (k) { return k.state === 'open'; });
     var box = $('[data-checks]'); box.replaceChildren();
-    if (!open.length) box.appendChild(el('p', 'small live-empty', S.teaching ? 'No question is open right now.' : 'No question is open right now. When your teacher asks one, it appears here.'));
+    if (!open.length) box.appendChild(el('p', 'small live-empty', S.teaching ? 'No question is open right now.' : 'No question is open right now. When your leader asks one, it appears here.'));
     open.forEach(function (k) { box.appendChild(S.teaching ? teacherCheck(k) : studentCheck(k)); });
   }
 

@@ -72,7 +72,7 @@
       start.replaceChildren();
       add.replaceChildren();
       fit.textContent = scenes.length
-        ? S.fitText(scenes, cohort.session_minutes) + ' Students see the scenes’ titles and minutes on their cohort page; your notes stay with the teachers.'
+        ? S.fitText(scenes, cohort.session_minutes) + ' Learners see the scenes’ titles and minutes on their cohort page; your notes stay with the leaders.'
         : 'Week ' + session.number + ' has no run of show yet.';
       if (!scenes.length) {
         var C = window.CurriculumLib, week = C ? C.weekOf(session.number) : null;
@@ -213,7 +213,7 @@
       var rooms = el('textarea'); rooms.name = 'room_scenes'; rooms.rows = 5; rooms.value = S.roomScenesToText(c.room_scenes);
       var roomsL = field('The room’s own scenes', rooms, 'One per line, a title and its minutes, such as “Their question, 2”.');
       var note = el('textarea'); note.name = 'note'; note.rows = 2; note.maxLength = 4000; note.value = (s && notes[s.id]) || '';
-      field('Your note for this scene', note, 'Only the cohort’s teachers see it.');
+      field('Your note for this scene', note, 'Only the cohort’s leaders see it.');
       var promptLabel = promptL.firstChild;
 
       function fitKind() {

@@ -63,7 +63,7 @@
     'is the app’s repository, which holds the app and the record of how it was made, and ' +
     'an app live on the web at a real address is enough for the first level. Each further ' +
     'platform the app is published on, where other people can get it for themselves, adds a ' +
-    'level. A teacher of the cohort opened the repository and every link before this ' +
+    'level. A leader of the cohort opened the repository and every link before this ' +
     'credential was issued.';
 
   function levelName(level) {
@@ -122,7 +122,7 @@
   function problems(row) {
     var out = [];
     if (!row || typeof row !== 'object') return ['There is no credential to read.'];
-    if (!UUID.test(row.credential || '')) out.push('The credential has no id from the hub.');
+    if (!UUID.test(row.credential || '')) out.push('The credential has no id from Human Shaped.');
     if (!row.issued_at || isNaN(Date.parse(row.issued_at))) out.push('The credential has no date it was issued.');
     var p = row.person || {};
     if (!LOGIN.test(p.github_login || '')) out.push('The person has no GitHub username.');
@@ -163,7 +163,7 @@
   var RECOGNIZED_PREFIX = RECOGNIZED + ': ';
   function oneLine(t) { return String(t == null ? '' : t).replace(/\s+/g, ' ').trim(); }
   function recognitionEvidence(r) {
-    var by = oneLine(r.by) || 'a teacher';
+    var by = oneLine(r.by) || 'a leader';
     var moment = oneLine(r.moment).replace(/[.!?]+$/, '');
     var when = moment ? '. ' + moment : (r.week ? ', in week ' + r.week : ', in class');
     return {
@@ -229,7 +229,7 @@
     return c;
   }
 
-  // ---- the hub's records ----------------------------------------------
+  // ---- Human Shaped's records ----------------------------------------------
   // A public.credentials row, with the person's profile and the cohort,
   // in the shape the signing tool reads (the "signing request").
   function requestFromRecord(rec, profile, cohort) {

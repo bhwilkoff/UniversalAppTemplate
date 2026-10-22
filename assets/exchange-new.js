@@ -122,7 +122,7 @@
       form.xOpen();
     });
   }).catch(function (e) {
-    root.querySelector('[data-error-text]').textContent = 'The page could not reach the hub: ' + said(e) + '.';
+    root.querySelector('[data-error-text]').textContent = 'The page could not reach Human Shaped: ' + said(e) + '.';
     show('error');
   });
 })();

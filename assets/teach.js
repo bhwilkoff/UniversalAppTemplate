@@ -44,7 +44,7 @@
       var box = $('[data-needs]');
       box.replaceChildren();
       if (n[0]) row(box, n[0], 'Feedback', '/teach/feedback/', 'waiting');
-      if (n[1]) row(box, n[1], 'Requests to teach', '/teach/requests/', 'waiting');
+      if (n[1]) row(box, n[1], 'Requests to lead', '/teach/requests/', 'waiting');
       if (n[2]) row(box, n[2], 'Signing', '/teach/signing/', 'to sign');
       if (n[0] == null || n[1] == null || n[2] == null) box.appendChild(window.UI.row({ title: 'Some counts could not load', status: window.UI.status('action', 'failed') }));
       if (!box.children.length) box.appendChild(window.UI.empty('Nothing waiting'));
@@ -63,7 +63,7 @@
       var list = window.UI.rows();
       cohorts.forEach(function (c) {
         list.appendChild(window.UI.row({
-          title: c.title, href: '/teach/cohort/?c=' + c.id,
+          title: c.title, href: c.status === 'draft' || c.status === 'open' ? '/teach/cohort/?c=' + c.id + '&t=setup' : '/cohort/?c=' + encodeURIComponent(c.slug),
           meta: c.starts_on ? 'Starts ' + new Date(c.starts_on + 'T12:00:00').toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' }) : 'Dates not set',
           status: window.UI.status('cohort', c.status)
         }));
@@ -80,7 +80,7 @@
   var askForm = $('[data-ask-form]');
   function loadMyRequest() {
     return db.from('teacher_requests').select('*').eq('user_id', me.id).maybeSingle().then(function (r) {
-      if (r.error) return page.fail('Your request to teach could not be loaded: ' + r.error.message);
+      if (r.error) return page.fail('Your request to lead could not be loaded: ' + r.error.message);
       myRequest = r.data;
       drawMyRequest();
     });
@@ -113,7 +113,7 @@
     ev.preventDefault();
     var f = askForm.elements;
     var row = { why: f.why.value.trim(), brings: f.brings.value.trim() || null };
-    if (!row.why) return say('[data-ask-message]', 'Say a little about why you would like to teach, and then send it.');
+    if (!row.why) return say('[data-ask-message]', 'Say a little about why you would like to lead, and then send it.');
     var editing = !!myRequest;
     var q = editing
       ? db.from('teacher_requests').update(Object.assign({ updated_at: new Date().toISOString() }, row)).eq('user_id', me.id).select().single()

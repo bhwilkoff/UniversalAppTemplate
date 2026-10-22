@@ -67,7 +67,7 @@
           form.reset();
           hide = null;
           show(null, null);
-          status.textContent = 'Taken off. The hub no longer has it.';
+          status.textContent = 'Taken off. Human Shaped no longer has it.';
         });
       });
     });

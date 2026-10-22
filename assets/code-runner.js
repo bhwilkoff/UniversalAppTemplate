@@ -114,7 +114,7 @@
       card.replaceChildren();
       card.hidden = !current;
       if (!current) return;
-      card.appendChild(el('p', 'kicker', C.LANGS[current.lang] + ' from your teacher'));
+      card.appendChild(el('p', 'kicker', C.LANGS[current.lang] + ' from your leader'));
       var area = el('textarea', 'code-text'); area.rows = Math.min(14, current.text.split('\n').length + 1); area.spellcheck = false;
       area.value = mine != null ? mine : current.text;
       area.setAttribute('aria-label', 'Your copy of the program');
@@ -137,7 +137,7 @@
         });
       });
       acts.appendChild(run);
-      acts.appendChild(button('Start again from the teacher’s', 'btn-secondary', function () { mine = null; draw(); }));
+      acts.appendChild(button('Start again from the leader’s', 'btn-secondary', function () { mine = null; draw(); }));
       card.appendChild(area); card.appendChild(acts); card.appendChild(out);
       card.appendChild(el('p', 'small', 'It runs only in your browser, and nothing you change is sent anywhere.'));
     }

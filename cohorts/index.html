@@ -23,25 +23,26 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261022i">
+  <link rel="stylesheet" href="/assets/site.css?v=20261022j">
   <script>
     (function () {
       var q = location.search, t = null;
       if (/[?&]dark\b/.test(q)) t = 'dark'; else if (/[?&]light\b/.test(q)) t = 'light';
       else { try { t = localStorage.getItem('hs-theme'); } catch (e) {} }
       if (t) document.documentElement.setAttribute('data-theme', t);
-      // Signed in: the page wears the hub's sidebar (PAGES.md), chosen before
+      // Signed in: the page wears Human Shaped's sidebar (PAGES.md), chosen before
       // it draws, from the session this browser keeps.
       try { var se = JSON.parse(localStorage.getItem('sb-bifrieqzkihuxfzttgvd-auth-token') || 'null'); if (se && se.user && se.expires_at * 1000 > Date.now() - 7 * 864e5) document.documentElement.setAttribute('data-signed-in', ''); } catch (e) {}
+      try { if (localStorage.getItem('hs-nav') === 'collapsed') document.documentElement.setAttribute('data-nav', 'collapsed'); } catch (e) {}
     })();
   </script>
-  <script src="/assets/site.js?v=20261021c" defer></script>
-  <script src="/assets/ui.js?v=20261022h" defer></script>
+  <script src="/assets/site.js?v=20261022j" defer></script>
+  <script src="/assets/ui.js?v=20261022j" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" defer></script>
   <script src="/assets/hub-config.js?v=20261016a" defer></script>
   <script src="/assets/teach-lib.js?v=20261022c" defer></script>
   <script src="/assets/mentor-lib.js" defer></script>
-  <script src="/assets/cohorts.js?v=20261021b" defer></script>
+  <script src="/assets/cohorts.js?v=20261022j" defer></script>
   <script src="/assets/path-lib.js" defer></script>
   <script src="/assets/path-marks.js?v=20261022a" defer></script>
 </head>
@@ -61,10 +62,10 @@
       </nav>
       <div class="header-actions">
         <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#moon"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022j#moon"/></svg>
         </button>
         <a class="btn-primary small" href="/account/">
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#github"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022j#github"/></svg>
           <span>Sign in<span class="long"> with GitHub</span></span>
         </a>
       </div>
@@ -131,7 +132,7 @@
           <div class="topic" id="data">
             <h2>Your work stays yours.</h2>
             <div class="prose">
-              <p>Your app lives in your own GitHub account. The hub reads your progress from GitHub rather than copying it, your classmates see your work only inside the cohort, and your app appears on the public <a href="/apps/">apps page</a> only if you choose to show it there. <a href="/privacy/">The privacy page</a> lists everything the site keeps, who can see each part, and when it goes away.</p>
+              <p>Your app lives in your own GitHub account. Human Shaped reads your progress from GitHub rather than copying it, your classmates see your work only inside the cohort, and your app appears on the public <a href="/apps/">apps page</a> only if you choose to show it there. <a href="/privacy/">The privacy page</a> lists everything the site keeps, who can see each part, and when it goes away.</p>
             </div>
           </div>
 
@@ -218,13 +219,13 @@
           <div class="open-cohorts" data-open-list hidden></div>
           <!-- Written by Claude for G7 (mentors), awaiting Ben's review. -->
           <div data-mentor-section hidden>
-            <h3>Mentoring a cohort</h3>
-            <p>You hold the credential, so you can join a cohort that is open or running as a mentor. You are in it like everyone else, with no app of your own to finish, there to show how you worked, answer what you can, and give feedback when people ask for it. Everyone in the cohort can see that you are a mentor, and its teachers still give the feedback that counts.</p>
+            <h3>Rejoining a cohort</h3>
+            <p>You hold the credential, so you can rejoin a cohort that is open or running as a learner. You are in it like everyone else, with no app of your own to finish, there to show how you worked, answer what you can, and give feedback when people ask for it. Everyone in the cohort can see that you are returning, and its leaders still give the feedback that counts.</p>
             <div class="open-cohorts" data-mentor-cohorts></div>
           </div>
           <p class="small">If you do not have a GitHub account yet, it is free, and it is the first thing you will need either way.</p>
           <div class="actions">
-            <a class="btn-primary" href="https://github.com/signup"><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#github"/></svg>Create a GitHub account</a>
+            <a class="btn-primary" href="https://github.com/signup"><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022j#github"/></svg>Create a GitHub account</a>
             <a class="btn-secondary" href="/path/setup/">Start Cohort Prep</a>
           </div>
         </div>
@@ -244,7 +245,7 @@
           <p class="footer-head">Take part</p>
           <ul>
             <li><a href="/account/">Your account</a></li>
-            <li><a href="/teach/">Teach a cohort</a></li>
+            <li><a href="/teach/">Lead a cohort</a></li>
             <li><a href="/connect/">Connect your agent</a></li>
           </ul>
         </div>

@@ -2524,23 +2524,41 @@ html[data-signed-in] .site-header .nav { display: none; }
 .app-nav, .app-menu-button { display: none; }
 html[data-signed-in] body:not([data-no-app-nav]) .app-menu-button { display: inline-flex; align-items: center; gap: 0.4rem; margin-right: auto; margin-left: 0.75rem; background: none; border: 1px solid var(--rule); border-radius: 999px; padding: 0.35rem 0.85rem; font: inherit; font-weight: 600; color: var(--ink); cursor: pointer; min-height: 40px; }
 html[data-signed-in] body:not([data-no-app-nav]) .site-header { position: sticky; top: 0; z-index: 30; background: var(--paper); border-bottom: 1px solid var(--rule); }
-.app-nav { padding: 1rem 0.75rem 2rem; overflow-y: auto; background: var(--paper); }
+.app-nav { padding: 0.75rem 0.6rem 1rem; overflow-y: auto; background: var(--paper); flex-direction: column; }
 .app-nav ul { list-style: none; margin: 0; padding: 0; }
 .app-nav-list > li { margin: 0.1rem 0; }
-.app-nav a { display: block; padding: 0.45rem 0.75rem; border-radius: 8px; color: var(--ink); text-decoration: none; font-weight: 500; line-height: 1.3; }
-.app-nav a:hover { background: var(--surface); }
+.app-nav a, .app-nav-collapse { display: flex; align-items: center; gap: 0.7rem; padding: 0.45rem 0.65rem; border-radius: 8px; color: var(--ink); text-decoration: none; font-weight: 500; line-height: 1.3; min-height: 40px; }
+.app-nav a .icon, .app-nav-collapse .icon { width: 1.25rem; height: 1.25rem; flex: none; color: var(--muted); }
+.app-nav a[aria-current] .icon { color: var(--ink); }
+.app-nav-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.app-nav-note { margin-left: auto; font-size: 0.85rem; color: var(--muted); font-weight: 400; }
+.app-nav a:hover, .app-nav-collapse:hover { background: var(--surface); }
 .app-nav a[aria-current] { background: var(--surface); font-weight: 680; }
-.app-nav-group ul a { padding-left: 1.5rem; font-size: 0.95rem; }
-.app-nav-label { display: block; font-size: 0.85rem; color: var(--muted); padding: 0.9rem 0.75rem 0.3rem; }
+.app-nav-group { margin-top: 0.6rem !important; }
+.app-nav-label { display: block; font-size: 0.85rem; color: var(--muted); padding: 0.4rem 0.65rem 0.2rem; min-height: 0 !important; font-weight: 600 !important; }
+a.app-nav-label { display: block; }
+.app-nav-quiet { margin-top: 0.4rem; padding-top: 0.2rem; border-top: 1px solid var(--rule); }
 .app-nav-quiet a { color: var(--muted); font-size: 0.95rem; }
 .app-nav-quiet a[aria-current] { color: var(--ink); }
+.app-nav-collapse { display: none; margin-top: auto; width: 100%; background: none; border: 0; font: inherit; font-size: 0.95rem; color: var(--muted); cursor: pointer; text-align: left; }
 /* Below 64rem the sidebar is a drawer behind Menu. */
-html.app-nav-open[data-signed-in] body:not([data-no-app-nav]) .app-nav { display: block; position: fixed; z-index: 40; top: var(--header-h, 4rem); left: 0; bottom: 0; width: min(19rem, 86vw); border-right: 1px solid var(--rule); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18); }
+html.app-nav-open[data-signed-in] body:not([data-no-app-nav]) .app-nav { display: flex; position: fixed; z-index: 40; top: var(--header-h, 4rem); left: 0; bottom: 0; width: min(19rem, 86vw); border-right: 1px solid var(--rule); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18); }
 @media (min-width: 64rem) {
   html[data-signed-in] body:not([data-no-app-nav]) .app-menu-button { display: none; }
   html[data-signed-in] body:not([data-no-app-nav]) { padding-left: 15rem; }
   html[data-signed-in] body:not([data-no-app-nav]) .site-header { margin-left: -15rem; padding-left: 0; }
-  html[data-signed-in] body:not([data-no-app-nav]) .app-nav { display: block; position: fixed; top: var(--header-h, 4rem); left: 0; bottom: 0; width: 15rem; border-right: 1px solid var(--rule); box-shadow: none; }
+  html[data-signed-in] body:not([data-no-app-nav]) .app-nav { display: flex; position: fixed; top: var(--header-h, 4rem); left: 0; bottom: 0; width: 15rem; border-right: 1px solid var(--rule); box-shadow: none; }
+  html[data-signed-in] body:not([data-no-app-nav]) .app-nav-collapse { display: flex; }
+  /* Collapsed: the icons alone, each naming itself in a tip on hover and focus. */
+  html[data-signed-in][data-nav="collapsed"] body:not([data-no-app-nav]) { padding-left: 4rem; }
+  html[data-signed-in][data-nav="collapsed"] body:not([data-no-app-nav]) .site-header { margin-left: -4rem; }
+  html[data-signed-in][data-nav="collapsed"] body:not([data-no-app-nav]) .app-nav { width: 4rem; overflow: visible; }
+  html[data-nav="collapsed"] .app-nav .app-nav-text, html[data-nav="collapsed"] .app-nav .app-nav-note { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  html[data-nav="collapsed"] .app-nav .app-nav-label { height: 0; padding: 0; overflow: hidden; border-top: 1px solid var(--rule); margin: 0.3rem 0.4rem; }
+  html[data-nav="collapsed"] .app-nav-quiet { border-top: 0; }
+  html[data-nav="collapsed"] .app-nav a, html[data-nav="collapsed"] .app-nav-collapse { justify-content: center; padding: 0.45rem; position: relative; }
+  html[data-nav="collapsed"] .app-nav [data-tip]:hover::after, html[data-nav="collapsed"] .app-nav [data-tip]:focus-visible::after { content: attr(data-tip); position: absolute; left: calc(100% + 0.5rem); top: 50%; transform: translateY(-50%); background: var(--ink); color: var(--paper); font-size: 0.85rem; font-weight: 500; padding: 0.3rem 0.55rem; border-radius: 6px; white-space: nowrap; z-index: 50; pointer-events: none; }
+  html[data-nav="collapsed"] .app-nav-collapse .icon { transform: scaleX(-1); }
 }
 @media print { .app-nav, .app-menu-button { display: none !important; } html[data-signed-in] body { padding-left: 0 !important; } }
 .panel-section { margin: 0 0 2rem; }

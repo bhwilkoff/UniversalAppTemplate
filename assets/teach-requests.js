@@ -15,10 +15,10 @@
       .select('user_id, why, brings, state, created_at, profiles!teacher_requests_user_id_fkey(github_login, display_name)')
       .eq('state', 'waiting').then(function (r) {
         var box = $('[data-request-list]');
-        if (r.error) { box.replaceChildren(el('p', 'small error', 'The requests to teach could not be loaded: ' + r.error.message)); return; }
+        if (r.error) { box.replaceChildren(el('p', 'small error', 'The requests to lead could not be loaded: ' + r.error.message)); return; }
         var waiting = lib.waitingRequests(r.data);
         box.replaceChildren();
-        if (!waiting.length) { box.appendChild(el('p', 'small', 'No one is waiting to hear about teaching right now.')); return; }
+        if (!waiting.length) { box.appendChild(el('p', 'small', 'No one is waiting to hear about leading right now.')); return; }
         waiting.forEach(function (q) { box.appendChild(requestCard(q)); });
       });
   }
@@ -30,7 +30,7 @@
     var gh = el('a', null, p.display_name ? p.display_name + ' (@' + login + ')' : '@' + login);
     gh.href = 'https://github.com/' + encodeURIComponent(login);
     who.appendChild(gh);
-    who.appendChild(document.createTextNode(' asks to teach'));
+    who.appendChild(document.createTextNode(' asks to lead'));
     card.appendChild(who);
     card.appendChild(el('p', 'small', 'Asked ' + new Date(q.created_at).toLocaleDateString(undefined, { month: 'long', day: 'numeric' }) + '.'));
     card.appendChild(el('p', null, q.why));
@@ -57,7 +57,7 @@
     }
     form.addEventListener('submit', function (ev) {
       ev.preventDefault();
-      window.UI.confirm({ title: 'Make @' + login + ' a teacher?', body: 'They can plan and run cohorts of their own.', action: 'Approve', danger: false }).then(function (ok) { if (ok) decide(true); });
+      window.UI.confirm({ title: 'Make @' + login + ' a leader?', body: 'They can plan and run cohorts of their own.', action: 'Approve', danger: false }).then(function (ok) { if (ok) decide(true); });
     });
     decline.addEventListener('click', function () {
       window.UI.confirm({ title: 'Decline @' + login + '\u2019s request?', body: 'They read your answer, and can ask again later.', action: 'Decline' }).then(function (ok) { if (ok) decide(false); });

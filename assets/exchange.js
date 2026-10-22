@@ -26,7 +26,7 @@
     var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttribute('aria-hidden', 'true');
     var use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
-    use.setAttribute('href', '/assets/icons.svg?v=20261022a#' + name);
+    use.setAttribute('href', '/assets/icons.svg?v=20261022j#' + name);
     svg.appendChild(use);
     return svg;
   }

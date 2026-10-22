@@ -277,7 +277,7 @@
     card.appendChild(el('p', 'small', when(c.starts_on) + ', ' + weeks + '.'));
     if (window.TeachLib) card.appendChild(el('p', 'small', window.TeachLib.scheduleText(c, Intl.DateTimeFormat().resolvedOptions().timeZone)));
     if (c.description) card.appendChild(el('p', null, c.description));
-    if (mine && c.myRole === 'mentor') card.appendChild(el('p', 'small', 'You are a mentor in this cohort.'));
+    if (mine && c.myRole === 'mentor') card.appendChild(el('p', 'small', 'You are a returning learner in this cohort.'));
     var actions = el('div', 'actions');
     if (mine) {
       var open = el('a', 'btn-primary', 'Open your cohort');
@@ -542,7 +542,7 @@
           notes.forEach(function (n) {
             var q = el('blockquote', 'feedback');
             n.body.split(/\n{2,}/).forEach(function (para) { q.appendChild(el('p', null, para)); });
-            var line = (names[n.author_id] || 'Your teacher') + ', ' + new Date(n.created_at).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' });
+            var line = (names[n.author_id] || 'Your leader') + ', ' + new Date(n.created_at).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' });
             if (n.cohorts && n.cohorts.title) line += ', in ' + n.cohorts.title;
             if (n.edited_at) line += ' (edited)';
             q.appendChild(el('p', 'small', line));

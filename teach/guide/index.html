@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>The teaching guide | Human Shaped</title>
-  <meta name="description" content="What leading a free Human Shaped cohort asks of you, what you need before the first session, and how to ask to teach.">
+  <title>Leader's guide | Human Shaped</title>
+  <meta name="description" content="Leading a Human Shaped cohort: the steps before the first session, each session, between sessions, and at the finish.">
   <link rel="canonical" href="https://humanshaped.org/teach/guide/">
   <meta property="og:url" content="https://humanshaped.org/teach/guide/">
   <meta property="og:site_name" content="Human Shaped">
-  <meta property="og:title" content="The teaching guide">
-  <meta property="og:description" content="What leading a free Human Shaped cohort asks of you, what you need before the first session, and how to ask to teach.">
+  <meta property="og:title" content="Leader's guide">
+  <meta property="og:description" content="Leading a Human Shaped cohort: the steps before the first session, each session, between sessions, and at the finish.">
   <meta property="og:type" content="website">
   <meta property="og:image" content="https://humanshaped.org/assets/og.png">
   <meta property="og:image:width" content="1200">
@@ -23,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261022i">
+  <link rel="stylesheet" href="/assets/site.css?v=20261022j">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -33,13 +33,11 @@
       // Signed in: the page wears the hub's sidebar (PAGES.md), chosen before
       // it draws, from the session this browser keeps.
       try { var se = JSON.parse(localStorage.getItem('sb-bifrieqzkihuxfzttgvd-auth-token') || 'null'); if (se && se.user && se.expires_at * 1000 > Date.now() - 7 * 864e5) document.documentElement.setAttribute('data-signed-in', ''); } catch (e) {}
+      try { if (localStorage.getItem('hs-nav') === 'collapsed') document.documentElement.setAttribute('data-nav', 'collapsed'); } catch (e) {}
     })();
   </script>
-  <script src="/assets/site.js?v=20261021c" defer></script>
-  <script src="/assets/ui.js?v=20261022h" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/18.0.14/lib/marked.umd.min.js" integrity="sha512-trN9mtGYvoySPVI909KTnwbJI9AkKPydRCV/qAsUG1+q39hhpKltEag9b5JpdjeIZn5i8IH62hHRFdbKwMFh9w==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.4.16/purify.min.js" integrity="sha512-flQmhkXNRQ3iUfvtdCobtpMjCb6kE+zLnTiAulAQJ3WykVfy84JvCMOo6vhwWXHTXjR25h9Zj+LyGFRWKjRoag==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
-  <script src="/assets/render.js?v=20261022a" defer></script>
+  <script src="/assets/site.js?v=20261022j" defer></script>
+  <script src="/assets/ui.js?v=20261022j" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to the page</a>
@@ -57,171 +55,105 @@
       </nav>
       <div class="header-actions">
         <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#moon"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022j#moon"/></svg>
         </button>
         <a class="btn-primary small" href="/account/">
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#github"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022j#github"/></svg>
           <span>Sign in<span class="long"> with GitHub</span></span>
         </a>
       </div>
     </div>
   </header>
 
-  <!-- The words on this page outside the rendered course were written by
-       Claude for milestone M2 (October 3, 2026), rewritten for H1 (October
-       4) to match the hub as it is now, and await Ben's review. -->
+  <!-- Rewritten October 22, 2026, at Ben's request ("That page in
+       particular seems to be made up of a huge amount of words that need
+       to be in alignment with the actual work of the cohorts"). Each row
+       names a step the platform really has, in the words the cohort's
+       checklist and tabs use; the course's own text is on /teach/guide/course/. -->
   <main id="main">
     <div class="wrap">
-      <p class="crumbs"><a href="/teach/">Teach</a> &rsaquo; The teaching guide</p>
+      <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/teach/">Leading</a></li></ol></nav>
       <header class="page-head">
-        <div>
-          <h1>Leading a cohort of your own.</h1>
-          <p class="lead">Cohorts reach more people than one teacher ever could when anyone who wants to lead one can ask to, and because the cohorts are free, what a teacher gives is time and attention rather than a fee. This page says what leading a cohort asks of you, what you need before the first session, and how to ask.</p>
-        </div>
+        <h1>Leader's guide</h1>
       </header>
 
-      <section class="section first" aria-label="What teaching asks">
-        <div class="topics single">
-          <!-- Rewritten by Claude for H1 (October 4, 2026) so that every
-               line matches what the hub does now; awaiting Ben's review. -->
-          <!-- Written by Claude, awaiting Ben's review. -->
-          <div class="topic" id="asks">
-            <h2>What it asks of you.</h2>
-            <div class="prose">
-              <p>A cohort runs for five weeks, with a week of setup before them and one live session every week on Google Meet, at a day and time you choose. Every session has the same six parts in the same order, so nobody spends the first ten minutes wondering what happens next: people arrive with one line in the chat, show what they brought back to their trio, hear one value at work, read one real prompt together after trying it first, start the coming week before they leave, and answer a check for understanding in the last three minutes. The course below gives each part its reasons, and the weekly guides give each one its minutes.</p>
-              <p>The cohort works in trios, because a trio still has two people to show when one is away, and you make them once people have joined and change them whenever the cohort needs it. Between sessions, people ask you for feedback on what they built and ask you questions, and each one waits on your teaching page until you answer it, oldest first, so nobody's request sinks under a newer one. You also write each week's challenge in your own words, and you read the checks for understanding before the next session, because the first thing you say when people arrive is what you read in them and what you changed because of it.</p>
-              <p>Nobody needs to be an expert in building apps to teach, since the work is running the session, reading the checks, and noticing who needs a word. A new teacher's first session goes best when it feels familiar, so the course asks you to co-lead one session of someone else's cohort first, taking the parts you are most comfortable with. A cohort's teacher can add you as a co-teacher on their teaching page, and you can step away again afterwards.</p>
-            </div>
-          </div>
-
-          <!-- Curriculum C7, from the template's
-               docs/research/curriculum/00-curriculum-design.md ("The arc",
-               "Tasks that leave evidence", "When someone is stuck") and
-               docs/path/setup.md. Written by Claude, awaiting Ben's review. -->
-          <div class="topic" id="rounds">
-            <h2>Five weeks, as rounds of write, play, and publish.</h2>
-            <div class="prose">
-              <p>The cohort has one method and no other loop: write gets it out of your head, play makes your thinking tangible, and publish puts it in front of the people it is for. Each week is a larger round of the same three moves. It leads with one of them, asks one question about each person's own app, and has one task whose result is the evidence, so nobody makes something just to hand it in.</p>
-              <ol class="rounds">
-                <!-- The weeks follow COURSE.md's week table (October 7, 2026): each session shows the stages the week before started, and starts the next ones. Written by Claude, awaiting Ben's review. -->
-                <li><strong>Cohort Prep, leads with publish.</strong> What do I need in order to build at all? Getting set up, ending with their app's address open on their own phone, shown to their trio, and the start of a five-day noticing log. The repository becomes the credential's first evidence.</li>
-                <li><strong>Week 1, leads with write.</strong> What problem in my own life is worth building something for, and who else has it? The session starts stages 00 and 01. Each person holds five candidate problems from their noticing log to Ben's tests, studies his published problems as models of a strong problem statement, rewrites theirs in his form, talks with two people who might share it, and writes the why and one line the app will not cross. By the next session the smallest real version is live at a real address with real data, in the hands of one of those people. A live web address is the credential's first level.</li>
-                <li><strong>Week 2, leads with play.</strong> What has to be the same on every device, and what should feel as if it was born there? The session shows stages 00 and 01: the problem statement and the version before it, what the conversations showed, and the app on a phone with what that person did with it. It starts stages 02 and 03: the parity matrix read and trimmed, a second platform on their own device, and a look that comes from the app's why.</li>
-                <li><strong>Week 3, leads with play, then publish.</strong> How do I know it works, and what happens when someone I did not build it with holds it? The session shows stages 02 and 03: one verb on both platforms, each in its own idiom, one cell their own eyes proved wrong, and the app's own look. It starts stages 04 and 05: proof of a fix on their own devices, and the app installed on a device they did not build it on. Each further platform adds a level.</li>
-                <li><strong>Week 4, leads with publish, then write.</strong> What is happening to it when I am not holding it, and what do I want now that I live with it? The session shows stages 04 and 05: a screenshot that proved a fix, and what the other person did and said. It starts stages 06 and 07: one honest number taken back to the app's people, and one feature wanted from their own use.</li>
-                <li><strong>Week 5, leads with publish.</strong> Is this version enough for its people, and what should the next builder not have to learn? The session is the showing, guests welcome: the number with what its people said, and the feature with the reason it exists. Stage 08, the skills and memories that carry the app's lessons into the next one, is written in the days after.</li>
-              </ol>
-              <p>When a cohort is created, each week's run of show starts from this plan, with the week's prepared questions in your question bank, and you change any of it on your teaching page. <a href="/teach/guide/weeks/">The weekly guides</a> say what to watch for in each session.</p>
-            </div>
-          </div>
-
-          <div class="topic" id="paths">
-            <h2>Three ways to bring an agent.</h2>
-            <div class="prose">
-              <p>Students bring their own agent, and <a href="/path/setup/">Getting set up</a> walks through three: Claude Code, Google Antigravity, and an open path for anyone who will not use an AI company, with open models running on their own computer through Ollama and Aider. With either company's agent, the first step is changing its privacy settings, and on the first night they approve the agent's changes by hand; on the open path nothing leaves their computer at all. The method and the evidence are the same on all three, so nobody is behind for choosing the open path, though a smaller model asks for smaller steps.</p>
-            </div>
-          </div>
-
-          <div class="topic" id="stuck">
-            <h2>When someone is stuck.</h2>
-            <div class="prose">
-              <p>Being stuck is the normal shape of this work, and <a href="/stuck/">When you are stuck</a> is the library everyone shares, organized by move: <a href="/stuck/writing/">stuck writing</a>, <a href="/stuck/playing/">stuck playing</a>, and <a href="/stuck/publishing/">stuck publishing</a>. Each page asks one question to answer before opening the agent, then what to try, then who to ask, and the default is about twenty minutes of trying before bringing it to the trio, then to you. Students see the page for the week's move on their cohort page and in the run of show. When you help, ask what they have already tried before you suggest anything, and when a new kind of stuck turns up, it belongs in the library for the next cohort.</p>
-            </div>
-          </div>
-
-          <div class="topic" id="need">
-            <h2>What you need before the first session.</h2>
-            <div class="prose">
-              <p><strong>Time,</strong> first of all: five weekly sessions, plus the hours between them to read what people share and answer it.</p>
-              <p><strong>A GitHub account,</strong> because it is how you sign in here, where your students' apps live, and where your cohort talks. Each cohort's conversation is a private repository in the humanshaped organization, reached through a secret team of the cohort's people, and the "Before the first session" list on your teaching page makes both with one button, then adds you to the team.</p>
-              <p>The same list walks you through the rest in order: the schedule, the weekly sessions, the calls, opening the cohort, making the trios once people have joined, and opening the live page once to try a timer and a check before anyone else is there. Each step checks itself off when the hub can see it is done.</p>
-            </div>
-          </div>
-
-          <div class="topic" id="host">
-            <h2>The calls, and who hosts them.</h2>
-            <div class="prose">
-              <p>Every cohort's calls are hosted from meet@humanshaped.org, an account set aside for sessions so that nothing depends on anyone's personal login, and your students join from whatever Google account they already have. You do not need a Google account of your own to host. From your teaching page you ask meet@ to set up the calls, and within the hour it makes the weekly event with its Meet link, puts that link on every week, and makes a room for each trio, which its members find on their cohort page and the live page. If you make the trios after asking, ask again and the rooms follow.</p>
-              <p>Sessions are recorded so that missing a week never means falling behind. The <a href="https://github.com/bhwilkoff/UniversalAppTemplate/blob/site/tools/session-recorder/README.md">session recorder</a> is a free Chrome extension that only the host installs, and it will not start until the host has read its notice aloud and pasted it into the chat. It saves the recording to the host's own computer and, if they choose, uploads it to the cohort's own folder, which only the cohort can open. It can also count your own share of the talking, from your microphone alone and only if you turn that on, and it never measures anyone else.</p>
-            </div>
-          </div>
-
-          <div class="topic" id="event">
-            <h2>During a session.</h2>
-            <div class="prose">
-              <p>Keep your cohort's <strong>live page</strong> open beside Meet. It has the agenda with a timer for each part, the queue of work people want to show, the checks for understanding with an anonymous count you may choose to show, and what people brought back. From it you send everyone to their trios' rooms with a countdown and call them back, put a card in front of everyone, say who is on stage, and say when the session is being recorded, and every student's live page shows the same thing at the same moment.</p>
-              <p>The rooms board on the live page shows where each trio is in its turns and whose turn it is, and a trio that would like you lights up, so you join its room, say that you are there, and press "I am here". The session's thread is a discussion in the cohort's repository, opened from the live page, where links and questions for later stay after the call under each person's own name. The <a href="/board/">board</a> is a drawing space the whole cohort, or one trio, can draw on at once.</p>
-              <p>The <strong>Human Shaped add-on for Meet</strong> puts the same agenda, queue, checks, thread, and rooms in Meet's own side panel, with a welcome and a calm main stage you can present. It is still being tested on our own accounts and is not yet listed for everyone, so until it is, the live page in a second tab does all of the same work.</p>
-            </div>
-          </div>
-
-          <div class="topic" id="after">
-            <h2>After a session.</h2>
-            <div class="prose">
-              <p>Your teaching page gathers what each person did on purpose during the session (what they showed, asked, answered, and said to their partners) with a place to write each of them a follow-up. A follow-up stays in your own browser until you send it, and it reaches the student as feedback on what they brought back, or as a note to them alone. Students keep their notes after the cohort ends or they leave it, they can remove any of them, and you can correct the words of anything you sent, which shows them it was edited.</p>
-              <p>The course asks you to write privately, within two days, to anyone who missed a session or brought nothing back, with an easy way back in and an easy way out. People choose on their account page whether their teachers may email them, and for those who do, your teaching page opens your own email with your words already in it. For everyone else, a note on their cohort page is how to reach them.</p>
-              <p>When a cohort finishes, the people who stayed are marked finished and can still read it, you record the credential for each person whose work earned it, and anyone holding a credential can come back to a later cohort as a mentor.</p>
-            </div>
-          </div>
-
-          <div class="topic" id="agent">
-            <h2>Your own agent, if you would like one.</h2>
-            <div class="prose">
-              <p>Your students connect their own Claude or Gemini to the hub, and so can you, on the <a href="/connect/">connect page</a>. For a teacher it adds a few things a student's agent cannot see: the cohort's roster and apps, one student's work across the weeks, and the class as it stands right now, with prompts for preparing a session and for checking a piece of code with you during class. It only reads, it is labeled as AI wherever it speaks, and it never stands in for what you say to your students yourself.</p>
-            </div>
-          </div>
-          <!-- Written by Claude for C9 (October 3, 2026), awaiting Ben's
-               review. The OBS names were checked against obsproject.com's
-               own guides; what they did not say is marked below. -->
-          <div class="topic" id="obs">
-            <h2>A card beside you, with OBS.</h2>
-            <div class="prose">
-              <!-- Written by Claude, awaiting Ben's review. -->
-              <p>The simplest way to put a card in front of everyone is to open the card page from your cohort's live page and present that tab in Meet, which needs nothing installed. Presenting takes your face off the main view, though, so when you want people to see you and the card at once, you can make your camera into a scene with <a href="https://obsproject.com">OBS Studio</a>, which is free, and send that scene to Meet as if it were your camera.</p>
-              <ol>
-                <li>Open your cohort's card page in its own Chrome window, and make the window narrow and tall, about a third of your screen, since the card page arranges itself for whatever width it has.</li>
-                <li>In OBS, press the <strong>+</strong> under Sources, add a <strong>Video Capture Device</strong> for your camera, and drag its red handles so that you fill the left two thirds of the canvas.</li>
-                <li>Press <strong>+</strong> again and add the card's window: on Windows, Linux, and older Macs it is <strong>Window Capture</strong>, and on macOS 13 or later it is <strong>macOS Screen Capture</strong> with that one window chosen. Place it in the right third, and hold Alt (Option on a Mac) while dragging an edge to crop away the window's frame.</li>
-                <li>Press <strong>Start Virtual Camera</strong> in the Controls dock.</li>
-                <li>In Meet, open Video settings and choose the OBS camera instead of your own. Leave Meet's own backgrounds and effects off, because they would treat the card as part of the room behind you.</li>
-              </ol>
-              <p>The card page follows what you send from the live page, so you change the card there and the scene changes with it. The OBS camera's name in Meet's list can vary, so look for the one with OBS in it. On a Mac, OBS will also ask for permission to record the screen the first time.</p>
-            </div>
-          </div>
-        </div>
+      <section class="section first guide" aria-labelledby="g-cohort">
+        <h2 id="g-cohort">A cohort</h2>
+        <dl class="ui-facts">
+          <div><dt>Length</dt><dd>Five weeks, after a prep week</dd></div>
+          <div><dt>Meets</dt><dd>Weekly on Google Meet, about 75 minutes</dd></div>
+          <div><dt>Groups</dt><dd>Three learners, kept together</dd></div>
+          <div id="host"><dt>Calls hosted by</dt><dd>meet@humanshaped.org</dd></div>
+          <div><dt>Leaders</dt><dd>One or more per cohort</dd></div>
+        </dl>
       </section>
 
-      <section class="section first" aria-labelledby="course-title">
-        <div class="topics single">
-          <div class="topic" id="the-course">
-            <h2 id="course-title">The course itself.</h2>
-            
-            <p class="actions"><a class="btn-secondary" href="/teach/guide/weeks/">The guide for each week, from Cohort Prep to week 5</a></p>
-          </div>
-        </div>
-        <article class="article hang" data-doc="COURSE.md">
-          <div class="doc-status" data-doc-status aria-live="polite"></div>
-          <noscript>
-            <div class="doc-error">
-              <h2>This part of the page reads its text from GitHub.</h2>
-              <p>The course lives in the template on GitHub, and this page needs JavaScript to bring it here. You can read exactly the same text <a href="https://github.com/bhwilkoff/UniversalAppTemplate/blob/main/COURSE.md">on GitHub</a>.</p>
-            </div>
-          </noscript>
-          <div class="doc-body" data-doc-body></div>
-        </article>
-        <p class="source"><a href="https://github.com/bhwilkoff/UniversalAppTemplate/blob/main/COURSE.md">Read it on GitHub</a></p>
+      <section class="section guide" aria-labelledby="need">
+        <h2 id="need">Before the first session</h2>
+        <ol class="ui-rows guide-steps">
+          <li class="ui-row"><div class="ui-row-main"><span class="ui-row-title">Co-lead one session first</span><span class="ui-row-meta">Another cohort's leader adds you under People</span></div></li>
+          <li class="ui-row"><div class="ui-row-main"><span class="ui-row-title">Set the day and time</span><span class="ui-row-meta">Settings</span></div></li>
+          <li class="ui-row"><div class="ui-row-main"><span class="ui-row-title">Make the weekly sessions</span><span class="ui-row-meta">Sessions</span></div></li>
+          <li class="ui-row"><div class="ui-row-main"><span class="ui-row-title">Ask for Meet links</span><span class="ui-row-meta">Overview. meet@humanshaped.org makes the weekly call, so no personal account is needed.</span></div></li>
+          <li class="ui-row"><div class="ui-row-main"><span class="ui-row-title">Make the GitHub repository</span><span class="ui-row-meta">Overview. It holds the cohort's conversation.</span></div></li>
+          <li class="ui-row"><div class="ui-row-main"><span class="ui-row-title">Open for joining</span><span class="ui-row-meta">Settings</span></div></li>
+          <li class="ui-row"><div class="ui-row-main"><span class="ui-row-title">Make the groups</span><span class="ui-row-meta">Groups, once people have joined. Ask for Meet links again for their rooms.</span></div></li>
+          <li class="ui-row"><div class="ui-row-main"><span class="ui-row-title">Rehearse on the live session</span><span class="ui-row-meta">Live session</span></div></li>
+          <li class="ui-row"><div class="ui-row-main"><span class="ui-row-title">Connect your agent (optional)</span><span class="ui-row-meta"><a href="/connect/">Connect</a></span></div></li>
+        </ol>
       </section>
 
-      <section class="section first" aria-labelledby="ask-title">
-        <div class="topics single">
-          <div class="topic" id="ask">
-            <h2 id="ask-title">Asking to teach.</h2>
-            <div class="prose">
-              <p>Teaching here is by invitation while the first cohorts find their shape, so leading one starts with a short request: why you would like to teach, and what you would bring. A person reads every request, and the answer appears on the same page where you asked.</p>
-            </div>
-            <p class="actions"><a class="btn-primary" href="/teach/#ask"><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#github"/></svg>Ask to teach</a></p>
-          </div>
-        </div>
+      <section class="section guide" aria-labelledby="event">
+        <h2 id="event">Each session</h2>
+        <dl class="ui-facts">
+          <div><dt>Run it from</dt><dd>The Human Shaped add-on in Meet, or the live session beside Meet</dd></div>
+          <div><dt>Main stage</dt><dd>Present it from the add-on to show the welcome or a card</dd></div>
+        </dl>
+        <div class="ui-notice"><p><strong>The add-on is still in testing.</strong> Until it is listed, keep the live session open beside Meet.</p></div>
+        <h3>The six parts</h3>
+        <ol class="ui-rows guide-steps">
+          <li class="ui-row"><div class="ui-row-main"><span class="ui-row-title">Arrive</span><span class="ui-row-meta">One line each in the chat, then what you read in last week's checks</span></div></li>
+          <li class="ui-row"><div class="ui-row-main"><span class="ui-row-title">Show what you brought back</span><span class="ui-row-meta">In groups, about eight minutes each</span></div></li>
+          <li class="ui-row"><div class="ui-row-main"><span class="ui-row-title">One value at work</span><span class="ui-row-meta">Back together, one decision shared</span></div></li>
+          <li class="ui-row"><div class="ui-row-main"><span class="ui-row-title">Read one real prompt together</span><span class="ui-row-meta">Everyone tries it first</span></div></li>
+          <li class="ui-row"><div class="ui-row-main"><span class="ui-row-title">Start</span><span class="ui-row-meta">The coming week's first prompt, written before leaving</span></div></li>
+          <li class="ui-row"><div class="ui-row-main"><span class="ui-row-title">Check for understanding</span><span class="ui-row-meta">The last three minutes</span></div></li>
+        </ol>
+      </section>
+
+      <section class="section guide" aria-labelledby="after">
+        <h2 id="after">Between sessions</h2>
+        <ul class="ui-rows">
+          <li class="ui-row"><div class="ui-row-main"><span class="ui-row-title">Read the checks and say what changes</span><span class="ui-row-meta">Follow-up. Learners see it as they arrive next session.</span></div></li>
+          <li class="ui-row"><div class="ui-row-main"><span class="ui-row-title">Answer feedback and questions</span><span class="ui-row-meta"><a href="/teach/feedback/">Feedback</a>, oldest first</span></div></li>
+          <li class="ui-row"><div class="ui-row-main"><span class="ui-row-title">Write each learner a follow-up</span><span class="ui-row-meta">Follow-up</span></div></li>
+          <li class="ui-row"><div class="ui-row-main"><span class="ui-row-title">Write to anyone who missed the session</span><span class="ui-row-meta">Follow-up, within two days</span></div></li>
+          <li class="ui-row"><div class="ui-row-main"><span class="ui-row-title">Change next week's run of show</span><span class="ui-row-meta">Sessions</span></div></li>
+        </ul>
+      </section>
+
+      <section class="section guide" aria-labelledby="g-finish">
+        <h2 id="g-finish">When the cohort finishes</h2>
+        <ul class="ui-rows">
+          <li class="ui-row"><div class="ui-row-main"><span class="ui-row-title">Mark the cohort finished</span><span class="ui-row-meta">Settings</span></div></li>
+          <li class="ui-row"><div class="ui-row-main"><span class="ui-row-title">Record each credential that was earned</span><span class="ui-row-meta">Credentials. A signer then signs it.</span></div></li>
+        </ul>
+      </section>
+
+      <section class="section guide" aria-labelledby="g-course">
+        <h2 id="g-course">The course</h2>
+        <ul class="ui-rows">
+          <li class="ui-row"><div class="ui-row-main"><a class="ui-row-title" href="/teach/guide/course/">The course in full</a></div></li>
+          <li class="ui-row"><div class="ui-row-main"><a class="ui-row-title" href="/teach/guide/weeks/">The weekly guides</a><span class="ui-row-meta">Each session's minutes and words</span></div></li>
+          <li class="ui-row"><div class="ui-row-main"><a class="ui-row-title" href="/stuck/">When you are stuck</a></div></li>
+          <li class="ui-row"><div class="ui-row-main"><a class="ui-row-title" href="/path/setup/">Getting set up</a><span class="ui-row-meta">Cohort Prep, for learners</span></div></li>
+        </ul>
+      </section>
+
+      <section class="section guide" aria-labelledby="ask">
+        <h2 id="ask">Asking to lead</h2>
+        <p>Leading is by invitation while the first cohorts find their shape.</p>
+        <p class="actions"><a class="btn-primary" href="/teach/#ask">Ask to lead</a></p>
       </section>
     </div>
   </main>

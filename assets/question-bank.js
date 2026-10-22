@@ -40,7 +40,7 @@
         });
     }
 
-    function whose(q) { return q.cohort_id ? 'For this cohort’s teachers' : 'Yours, in every cohort you teach'; }
+    function whose(q) { return q.cohort_id ? 'For this cohort’s leaders' : 'Yours, in every cohort you lead'; }
 
     function draw() {
       box.replaceChildren();
@@ -88,7 +88,7 @@
       var fs = el('fieldset', 'live-mode');
       fs.appendChild(el('legend', null, 'Who keeps it'));
       var name = 'bank-for-' + (q ? q.id : 'new');
-      [['mine', 'Just you, in every cohort you teach'], ['cohort', 'This cohort’s teachers, for ' + cohort.title]].forEach(function (x) {
+      [['mine', 'Just you, in every cohort you lead'], ['cohort', 'This cohort’s leaders, for ' + cohort.title]].forEach(function (x) {
         var lab = el('label', 'check');
         var r = el('input'); r.type = 'radio'; r.name = name; r.value = x[0];
         r.checked = q ? (x[0] === 'cohort') === !!q.cohort_id : x[0] === 'mine';
@@ -113,7 +113,7 @@
         var write = q ? db.from('questions').update(row).eq('id', q.id).select('id') : db.from('questions').insert(row).select('id');
         write.then(function (r) {
           save.disabled = false;
-          if (r.error || !r.data || !r.data.length) { msg.textContent = 'Not saved: ' + (r.error ? r.error.message : 'only the teacher who wrote it can keep it just for themselves') + '.'; return; }
+          if (r.error || !r.data || !r.data.length) { msg.textContent = 'Not saved: ' + (r.error ? r.error.message : 'only the leader who wrote it can keep it just for themselves') + '.'; return; }
           editing = null;
           say(q ? 'Saved.' : 'It is in the bank.');
           load();

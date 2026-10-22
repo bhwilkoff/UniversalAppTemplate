@@ -244,7 +244,7 @@
   function shareText(share, teaching) {
     var p = percent(share);
     if (p == null) return '';
-    return (teaching ? 'You' : 'Your teacher') + ' talked ' + p + ' percent of the time anyone was talking in this session, counted on '
+    return (teaching ? 'You' : 'Your leader') + ' talked ' + p + ' percent of the time anyone was talking in this session, counted on '
       + (teaching ? 'your' : 'their') + ' own computer from the sound alone, without anyone’s words and without who else spoke.';
   }
 

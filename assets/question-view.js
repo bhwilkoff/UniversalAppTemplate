@@ -175,7 +175,7 @@
       input.value = draft && draft.body != null ? draft.body : given ? given.body || '' : '';
       input.addEventListener('input', function () { keep({ body: input.value }); });
       form.appendChild(labelled(words ? 'A word or a few' : (opts.label || 'Your answer'), input,
-        words ? 'Shown with everyone’s, with no names, if your teacher shows them.' : null));
+        words ? 'Shown with everyone’s, with no names, if your leader shows them.' : null));
       read = function () { return { body: input.value }; };
     }
     var acts = el('div', 'actions');

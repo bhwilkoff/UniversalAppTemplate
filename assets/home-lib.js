@@ -75,9 +75,9 @@
   // like the daily email.
   function waiting(w) {
     var out = [];
-    if (w.requests) out.push({ title: 'Requests to teach', count: w.requests, noun: 'waiting', href: '/teach/requests/' });
+    if (w.requests) out.push({ title: 'Requests to lead', count: w.requests, noun: 'waiting', href: '/teach/requests/' });
     if (w.feedback) out.push({ title: 'Feedback', count: w.feedback, noun: 'waiting', href: '/teach/feedback/' });
-    if (w.notes) out.push({ title: 'Notes from your teachers', count: w.notes, noun: 'new', href: '/account/#notes' });
+    if (w.notes) out.push({ title: 'Notes from your leaders', count: w.notes, noun: 'new', href: '/account/#notes' });
     if (w.answers) out.push({ title: 'Answers to what you shared', count: w.answers, noun: 'new', href: w.answersHref || '/account/' });
     if (w.videos) out.push({ title: 'New videos in your exchanges', count: w.videos, noun: 'new', href: '/exchanges/' });
     return out;
@@ -86,15 +86,13 @@
   // Which of the page's sections a person sees, in order. Everyone sees
   // their cohorts (or how to join one), their exchanges, and their own app;
   // the rest appear when there is something in them or something to do.
+  // Now and next, what waits, then the person's two roles (everyone sees
+  // both, so the way to lead is always in view), then their own work.
   function sections(m) {
     var out = [];
     if (m.comingUp && m.comingUp.length) out.push('next');
     if (m.waiting && m.waiting.length) out.push('waiting');
-    out.push('cohorts', 'exchanges');
-    if (m.teacher || (m.polls && m.polls.length)) out.push('times');
-    out.push('app');
-    if (m.lastMark) out.push('stages');
-    out.push('more');
+    out.push('learning', 'leading', 'work');
     return out;
   }
 

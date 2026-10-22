@@ -23,16 +23,17 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261022i">
+  <link rel="stylesheet" href="/assets/site.css?v=20261022j">
   <script>
     (function () {
       var q = location.search, t = null;
       if (/[?&]dark\b/.test(q)) t = 'dark'; else if (/[?&]light\b/.test(q)) t = 'light';
       else { try { t = localStorage.getItem('hs-theme'); } catch (e) {} }
       if (t) document.documentElement.setAttribute('data-theme', t);
-      // Signed in: the page wears the hub's sidebar (PAGES.md), chosen before
+      // Signed in: the page wears Human Shaped's sidebar (PAGES.md), chosen before
       // it draws, from the session this browser keeps.
       try { var se = JSON.parse(localStorage.getItem('sb-bifrieqzkihuxfzttgvd-auth-token') || 'null'); if (se && se.user && se.expires_at * 1000 > Date.now() - 7 * 864e5) document.documentElement.setAttribute('data-signed-in', ''); } catch (e) {}
+      try { if (localStorage.getItem('hs-nav') === 'collapsed') document.documentElement.setAttribute('data-nav', 'collapsed'); } catch (e) {}
     })();
     // Someone signed in sees their own home here, not the pitch
     // (research/notes/signed-in-experience-notes.md). Decided before the
@@ -46,8 +47,8 @@
       } catch (e) {}
     })();
   </script>
-  <script src="/assets/site.js?v=20261021c" defer></script>
-  <script src="/assets/ui.js?v=20261022h" defer></script>
+  <script src="/assets/site.js?v=20261022j" defer></script>
+  <script src="/assets/ui.js?v=20261022j" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to the page</a>
@@ -65,10 +66,10 @@
       </nav>
       <div class="header-actions">
         <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#moon"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022j#moon"/></svg>
         </button>
         <a class="btn-primary small" href="/account/">
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#github"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022j#github"/></svg>
           <span>Sign in<span class="long"> with GitHub</span></span>
         </a>
       </div>
@@ -99,37 +100,19 @@
           <div><ul class="home-rows" data-home-waiting></ul></div>
         </section>
 
-        <section class="hang-section home-part" data-home="cohorts" aria-labelledby="home-cohorts-title" hidden>
-          <h2 id="home-cohorts-title">Your cohorts</h2>
-          <div data-home-cohorts></div>
+        <section class="hang-section home-part" data-home="learning" aria-labelledby="home-learning-title" hidden>
+          <h2 id="home-learning-title">Learning</h2>
+          <div data-home-learning></div>
         </section>
 
-        <section id="exchanges" class="hang-section home-part" data-home="exchanges" data-exchanges-account aria-labelledby="home-exchanges-title" hidden>
-          <h2 id="home-exchanges-title">Exchanges</h2>
-          <div>
-            <div data-x-list></div>
-            <div class="actions"><a class="btn-secondary" href="/exchange/new/">Start an exchange</a></div>
-          </div>
+        <section class="hang-section home-part" data-home="leading" aria-labelledby="home-leading-title" hidden>
+          <h2 id="home-leading-title">Leading</h2>
+          <div data-home-leading></div>
         </section>
 
-        <section class="hang-section home-part" data-home="times" aria-labelledby="home-times-title" hidden>
-          <h2 id="home-times-title">Finding a time</h2>
-          <div data-home-times></div>
-        </section>
-
-        <section class="hang-section home-part" data-home="app" aria-labelledby="home-app-title" hidden>
-          <h2 id="home-app-title">Your app</h2>
-          <div data-home-app></div>
-        </section>
-
-        <section class="hang-section home-part" data-home="stages" aria-labelledby="home-stages-title" hidden>
-          <h2 id="home-stages-title">Your stages</h2>
-          <div data-home-stages></div>
-        </section>
-
-        <section class="hang-section home-part" data-home="more" aria-labelledby="home-more-title" hidden>
-          <h2 id="home-more-title">More you can do</h2>
-          <div><ul class="home-more" data-home-more></ul></div>
+        <section class="hang-section home-part" data-home="work" aria-labelledby="home-work-title" hidden>
+          <h2 id="home-work-title">Your work</h2>
+          <div data-home-work></div>
         </section>
       </div>
     </div>
@@ -274,14 +257,14 @@
         <ul class="band-ways">
           <li><a href="/path/setup/">Build on your own</a><span>Copy the Universal App Template on GitHub, and work through its stages at your own pace.</span></li>
           <li><a href="/events/">Host an event</a><span>Host a meetup or a day of building, or find one near you.</span></li>
-          <li><a href="/account/">Sign in with GitHub</a><span>To see your cohort, or to keep your own app on the hub.</span></li>
+          <li><a href="/account/">Sign in with GitHub</a><span>To see your cohort, or to keep your own app on Human Shaped.</span></li>
         </ul>
       </div>
     </section>
     </div>
 
   </main>
-  <script src="/assets/home.js?v=20261022d" defer></script>
+  <script src="/assets/home.js?v=20261022j" defer></script>
   <script src="/assets/principles-lib.js?v=20261005c" defer></script>
   <script src="/assets/principles.js?v=20261005c" defer></script>
 
@@ -297,7 +280,7 @@
           <p class="footer-head">Take part</p>
           <ul>
             <li><a href="/account/">Your account</a></li>
-            <li><a href="/teach/">Teach a cohort</a></li>
+            <li><a href="/teach/">Lead a cohort</a></li>
             <li><a href="/connect/">Connect your agent</a></li>
           </ul>
         </div>

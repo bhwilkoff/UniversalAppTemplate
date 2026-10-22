@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Running the hub | Human Shaped</title>
+  <title>Roles | Human Shaped</title>
   <meta name="description" content="Create and run a Human Shaped cohort: its dates, its weekly sessions, its groups, and the people in it.">
   <link rel="canonical" href="https://humanshaped.org/teach/">
   <meta property="og:url" content="https://humanshaped.org/teach/">
   <meta property="og:site_name" content="Human Shaped">
-  <meta property="og:title" content="Teach a cohort">
+  <meta property="og:title" content="Lead a cohort">
   <meta property="og:description" content="Create and run a Human Shaped cohort: its dates, its weekly sessions, its groups, and the people in it.">
   <meta property="og:type" content="website">
   <meta property="og:image" content="https://humanshaped.org/assets/og.png">
@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261022i">
+  <link rel="stylesheet" href="/assets/site.css?v=20261022j">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -34,10 +34,11 @@
       // Signed in: the page wears the hub's sidebar (PAGES.md), chosen before
       // it draws, from the session this browser keeps.
       try { var se = JSON.parse(localStorage.getItem('sb-bifrieqzkihuxfzttgvd-auth-token') || 'null'); if (se && se.user && se.expires_at * 1000 > Date.now() - 7 * 864e5) document.documentElement.setAttribute('data-signed-in', ''); } catch (e) {}
+      try { if (localStorage.getItem('hs-nav') === 'collapsed') document.documentElement.setAttribute('data-nav', 'collapsed'); } catch (e) {}
     })();
   </script>
-  <script src="/assets/site.js?v=20261021c" defer></script>
-  <script src="/assets/ui.js?v=20261022h" defer></script>
+  <script src="/assets/site.js?v=20261022j" defer></script>
+  <script src="/assets/ui.js?v=20261022j" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to the page</a>
@@ -55,10 +56,10 @@
       </nav>
       <div class="header-actions">
         <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#moon"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022j#moon"/></svg>
         </button>
         <a class="btn-primary small" href="/account/">
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#github"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022j#github"/></svg>
           <span>Sign in<span class="long"> with GitHub</span></span>
         </a>
       </div>
@@ -67,15 +68,8 @@
 
   <main id="main">
     <div class="wrap">
-      <nav class="area-nav" aria-label="Running the hub" data-area-nav="admin" hidden>
-        <ul>
-          <li><a href="/admin/">Overview</a></li>
-          <li><a href="/admin/people/" data-also="/admin/person/">People</a></li>
-          <li><a href="/admin/changes/">Changes</a></li>
-        </ul>
-      </nav>
       <header class="page-head">
-        <h1>Running the hub</h1>
+        <h1>Roles</h1>
         <div data-admin-facts></div>
       </header>
 
@@ -91,21 +85,27 @@
           <p><button class="btn-secondary" type="button" data-reload>Try again</button></p>
         </section>
         <section class="account-state" data-state="teacher" hidden>
-          <p class="notice" data-one-admin hidden><strong>You are the only admin.</strong> A second keeps the hub open if an account is lost. <a href="/admin/people/">Choose one</a></p>
-          <h2>Waiting</h2>
-          <ul class="ui-rows" data-overview></ul>
-          <h2>Recent changes</h2>
-          <ul class="ui-rows" data-recent></ul>
+          <div class="ui-notice" data-one-admin hidden><p><strong>You are the only admin.</strong> A second keeps Human Shaped running if an account is lost.</p></div>
+          <div class="row admin-filter cohort-form">
+            <label>Find someone <input type="search" data-q placeholder="A name or GitHub login" autocomplete="off" spellcheck="false"></label>
+            <label>Show <select data-only><option value="">Everyone</option><option value="teacher">Leaders</option><option value="learner">Learners</option><option value="can_approve">Approvers</option><option value="can_sign">Signers</option><option value="can_admin">Admins</option></select></label>
+          </div>
+          <p class="ui-inline-status" role="status" data-count></p>
+          <ul class="ui-rows" data-people></ul>
+          <section class="panel-section" aria-labelledby="changes-title">
+            <h2 id="changes-title">Recent changes</h2>
+            <ul class="ui-rows" data-recent></ul>
+          </section>
         </section>
       </div>
     </div>
   </main>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" defer></script>
   <script src="/assets/hub-config.js?v=20261016a" defer></script>
-  <script src="/assets/teach-page.js?v=20261021d" defer></script>
-  <script src="/assets/admin-lib.js?v=20261021a" defer></script>
-  <script src="/assets/admin-page.js?v=20261021a" defer></script>
-  <script src="/assets/admin.js?v=20261022f" defer></script>
+  <script src="/assets/teach-page.js?v=20261022j" defer></script>
+  <script src="/assets/admin-lib.js?v=20261022j" defer></script>
+  <script src="/assets/admin-page.js?v=20261022j" defer></script>
+  <script src="/assets/admin.js?v=20261022j" defer></script>
 
   <footer class="site-footer">
     <div class="wrap">
@@ -119,7 +119,7 @@
           <p class="footer-head">Take part</p>
           <ul>
             <li><a href="/account/">Your account</a></li>
-            <li><a href="/teach/">Teach a cohort</a></li>
+            <li><a href="/teach/">Lead a cohort</a></li>
             <li><a href="/connect/">Connect your agent</a></li>
           </ul>
         </div>

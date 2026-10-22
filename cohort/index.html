@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261022i">
+  <link rel="stylesheet" href="/assets/site.css?v=20261022j">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -34,10 +34,11 @@
       // Signed in: the page wears the hub's sidebar (PAGES.md), chosen before
       // it draws, from the session this browser keeps.
       try { var se = JSON.parse(localStorage.getItem('sb-bifrieqzkihuxfzttgvd-auth-token') || 'null'); if (se && se.user && se.expires_at * 1000 > Date.now() - 7 * 864e5) document.documentElement.setAttribute('data-signed-in', ''); } catch (e) {}
+      try { if (localStorage.getItem('hs-nav') === 'collapsed') document.documentElement.setAttribute('data-nav', 'collapsed'); } catch (e) {}
     })();
   </script>
-  <script src="/assets/site.js?v=20261021c" defer></script>
-  <script src="/assets/ui.js?v=20261022h" defer></script>
+  <script src="/assets/site.js?v=20261022j" defer></script>
+  <script src="/assets/ui.js?v=20261022j" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to the page</a>
@@ -55,10 +56,10 @@
       </nav>
       <div class="header-actions">
         <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#moon"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022j#moon"/></svg>
         </button>
         <a class="btn-primary small" href="/account/">
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#github"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022j#github"/></svg>
           <span>Sign in<span class="long"> with GitHub</span></span>
         </a>
       </div>
@@ -84,6 +85,7 @@
           <div class="cohort-top" data-cohort-nav hidden></div>
           <header class="page-head">
             <h1 data-title></h1>
+            <p class="ui-meta-line" data-cohort-role hidden></p>
             <p class="lead" data-lead></p>
           </header>
           <div class="cohort-panels" data-cohort-panels>
@@ -132,7 +134,7 @@
             </div>
             <div data-lesson-line hidden>
               <p class="ui-meta-line"><span data-vis="public"></span> On GitHub. Credit people only if each of them says yes.</p>
-              <p class="actions"><a class="btn-secondary" data-lesson-link href="https://github.com/bhwilkoff/UniversalAppTemplate/issues/new"><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#github"/></svg>Send a lesson to the template</a></p>
+              <p class="actions"><a class="btn-secondary" data-lesson-link href="https://github.com/bhwilkoff/UniversalAppTemplate/issues/new"><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022j#github"/></svg>Send a lesson to the template</a></p>
             </div>
           </section>
           <section aria-labelledby="shared-title">
@@ -167,7 +169,7 @@
           <div data-tab="mine" hidden>
           <!-- Notes from a teacher (C7): words by Claude, awaiting Ben's review. -->
           <section class="cohort-card teacher-notes" aria-labelledby="notes-title" data-notes-section hidden>
-            <h2 id="notes-title">From your teacher</h2>
+            <h2 id="notes-title">From your leader</h2>
             <p class="ui-meta-line"><span data-vis="teachers"></span></p>
             <div data-notes></div>
           </section>
@@ -236,10 +238,10 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" defer></script>
   <script src="/assets/hub-config.js?v=20261016a" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.4.16/purify.min.js" integrity="sha512-flQmhkXNRQ3iUfvtdCobtpMjCb6kE+zLnTiAulAQJ3WykVfy84JvCMOo6vhwWXHTXjR25h9Zj+LyGFRWKjRoag==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
-  <script src="/assets/cohort-lib.js?v=20261022a" defer></script>
+  <script src="/assets/cohort-lib.js?v=20261022j" defer></script>
   <script src="/assets/submit-lib.js?v=20261022a" defer></script>
   <script src="/assets/discussions-lib.js" defer></script>
-  <script src="/assets/discussions.js?v=20261022a" defer></script>
+  <script src="/assets/discussions.js?v=20261022j" defer></script>
   <script src="/assets/background.js" defer></script>
   <script src="/assets/mentor-lib.js" defer></script>
   <script src="/assets/path-lib.js" defer></script>
@@ -247,8 +249,8 @@
   <script src="/assets/show-lib.js" defer></script>
   <script src="/assets/recognition-lib.js" defer></script>
   <script src="/assets/curriculum-pages-lib.js" defer></script>
-  <script src="/assets/cohort-nav.js?v=20261022a" defer></script>
-  <script src="/assets/cohort.js?v=20261022g" defer></script>
+  <script src="/assets/cohort-nav.js?v=20261022j" defer></script>
+  <script src="/assets/cohort.js?v=20261022j" defer></script>
   <script src="/assets/exchange-lib.js?v=20261022a" defer></script>
   <script src="/assets/exchange-list.js?v=20261022d" defer></script>
 
@@ -264,7 +266,7 @@
           <p class="footer-head">Take part</p>
           <ul>
             <li><a href="/account/">Your account</a></li>
-            <li><a href="/teach/">Teach a cohort</a></li>
+            <li><a href="/teach/">Lead a cohort</a></li>
             <li><a href="/connect/">Connect your agent</a></li>
           </ul>
         </div>

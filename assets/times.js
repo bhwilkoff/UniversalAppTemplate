@@ -79,7 +79,7 @@
     });
     var theirs = zone !== poll.time_zone;
     $('[data-zone-line]').textContent = theirs
-      ? 'The teacher set these times in ' + T.zoneName(poll.time_zone) + '.'
+      ? 'The leader set these times in ' + T.zoneName(poll.time_zone) + '.'
       : '';
     $('[data-count-line]').hidden = !tally;
     var key = $('[data-host-key]'), hasHost = (poll.host_works || []).length + (poll.host_if_need_be || []).length > 0;
@@ -190,7 +190,7 @@
         show('poll');
       });
     }).catch(function (e) {
-      $('[data-error-text]').textContent = 'The page could not reach the hub: ' + said(e) + '.';
+      $('[data-error-text]').textContent = 'The page could not reach Human Shaped: ' + said(e) + '.';
       show('error');
     });
   }
@@ -207,7 +207,7 @@
   form.addEventListener('submit', function (e) {
     e.preventDefault();
     var name = form.elements.name.value.trim();
-    if (!name) { status('Add your name, so the teacher knows who can come.'); form.elements.name.focus(); return; }
+    if (!name) { status('Add your name, so the leader knows who can come.'); form.elements.name.focus(); return; }
     var works = [], maybe = [];
     Object.keys(marks).forEach(function (s) { (marks[s] === 'works' ? works : maybe).push(+s); });
     if (!works.length && !maybe.length) { status('Mark at least one time you could make.'); return; }
@@ -251,7 +251,7 @@
       draw();
       afterAnswer();
       var saved = $('[data-saved]');
-      saved.textContent = 'Your answer has been taken back, and the teacher no longer sees it.';
+      saved.textContent = 'Your answer has been taken back, and the leader no longer sees it.';
       saved.hidden = false;
       saved.focus();
     }).catch(function (err) { status('Your answer was not taken back: ' + said(err) + '.'); });

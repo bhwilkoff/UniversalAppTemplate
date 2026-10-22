@@ -24,7 +24,7 @@
   }
 
   // The word shown beside a person's name, or nothing for a student.
-  function roleLabel(role) { return role === 'mentor' ? 'Mentor' : ''; }
+  function roleLabel(role) { return role === 'mentor' ? 'Returning' : ''; }
 
   // The role a teacher's switch moves someone to.
   function otherRole(role) { return role === 'mentor' ? 'student' : 'mentor'; }

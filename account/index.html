@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261022i">
+  <link rel="stylesheet" href="/assets/site.css?v=20261022j">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -35,8 +35,8 @@
     // Exchanges moved to the signed-in home; older links still land there.
     if (location.hash === '#exchanges') location.replace('/#exchanges');
   </script>
-  <script src="/assets/site.js?v=20261021c" defer></script>
-  <script src="/assets/ui.js?v=20261022h" defer></script>
+  <script src="/assets/site.js?v=20261022j" defer></script>
+  <script src="/assets/ui.js?v=20261022j" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to the page</a>
@@ -54,10 +54,10 @@
       </nav>
       <div class="header-actions">
         <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#moon"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022j#moon"/></svg>
         </button>
         <a class="btn-primary small" href="/account/">
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#github"/></svg>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022j#github"/></svg>
           <span>Sign in<span class="long"> with GitHub</span></span>
         </a>
       </div>
@@ -78,7 +78,7 @@
 
         <section class="account-state" data-state="signed-out" hidden>
           <button class="btn-primary" type="button" data-sign-in>
-            <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#github"/></svg>Sign in with GitHub
+            <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022j#github"/></svg>Sign in with GitHub
           </button>
           <p class="small">GitHub shares your public profile only.</p>
           <!-- Google sign-in beside GitHub (DECISIONS.md): words by Claude, awaiting Ben's review. -->
@@ -124,7 +124,7 @@
           <div class="notice" data-needs-github hidden>
             <p><strong>Link your GitHub account to join a cohort.</strong></p>
             <p><button class="btn-primary" type="button" data-link-github>
-              <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#github"/></svg>Link my GitHub account
+              <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022j#github"/></svg>Link my GitHub account
             </button></p>
           </div>
 
@@ -141,14 +141,14 @@
 
           <!-- Written by Claude, awaiting Ben's review (research/notes/reach-notes.md). -->
           <div data-reach-section hidden>
-            <h2>How your teachers can reach you</h2>
+            <h2>How your leaders can reach you</h2>
             <p class="ui-meta-line"><span data-vis="teachers" data-vis-what="Your address"></span></p>
             <form class="inline-form" data-reach-form>
               <label>The email address to use
-                <span class="hint">It can be different from the one on your calendar invites. Only the teachers of cohorts you are in see it, and only if you tick the first box.</span>
+                <span class="hint">It can be different from the one on your calendar invites. Only the leaders of cohorts you are in see it, and only if you tick the first box.</span>
                 <input type="email" name="email" autocomplete="email" maxlength="254">
               </label>
-              <label class="check"><input type="checkbox" name="teachers_may_email"> My teachers may email me, from their own email</label>
+              <label class="check"><input type="checkbox" name="teachers_may_email"> My leaders may email me, from their own email</label>
               <label class="check"><input type="checkbox" name="notices"> A daily email when something waits</label>
               <p class="small">From meet@humanshaped.org, without the words themselves.</p>
               <div class="actions">
@@ -164,7 +164,7 @@
           <div data-my-cohorts></div>
 
           <div id="notes" data-notes-section hidden>
-            <h2>Notes from your teachers</h2>
+            <h2>Notes from your leaders</h2>
             <p class="ui-meta-line"><span data-vis="teachers"></span></p>
             <div data-notes></div>
           </div>
@@ -183,7 +183,7 @@
           </div>
 
           <h2>Your data</h2>
-          <p class="actions"><a class="btn-secondary" href="/privacy/">What the hub keeps</a></p>
+          <p class="actions"><a class="btn-secondary" href="/privacy/">What Human Shaped keeps</a></p>
           <div class="actions">
             <button class="btn-secondary" type="button" data-sign-out>Sign out</button>
             <button class="btn-danger" type="button" data-delete-open>Delete my account</button>
@@ -224,10 +224,10 @@
   <script src="/assets/path-lib.js" defer></script>
   <script src="/assets/reach-lib.js" defer></script>
   <script src="/assets/builder-lib.js?v=20261022a" defer></script>
-  <script src="/assets/credential-lib.js?v=20261006c" defer></script>
+  <script src="/assets/credential-lib.js?v=20261022j" defer></script>
   <script src="/assets/google-signin-lib.js" defer></script>
   <script src="/assets/google-signin.js" defer></script>
-  <script src="/assets/hub.js?v=20261022e" defer></script>
+  <script src="/assets/hub.js?v=20261022j" defer></script>
 
   <footer class="site-footer">
     <div class="wrap">
@@ -241,7 +241,7 @@
           <p class="footer-head">Take part</p>
           <ul>
             <li><a href="/account/">Your account</a></li>
-            <li><a href="/teach/">Teach a cohort</a></li>
+            <li><a href="/teach/">Lead a cohort</a></li>
             <li><a href="/connect/">Connect your agent</a></li>
           </ul>
         </div>

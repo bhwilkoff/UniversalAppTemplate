@@ -1,4 +1,4 @@
-// The cohort page (/cohort/?c=<slug>). The hub's database says who is in
+// The cohort page (/cohort/?c=<slug>). Human Shaped's database says who is in
 // the cohort and what they chose to share; everyone's work is read live
 // from GitHub, never copied, because it belongs to them.
 (function () {
@@ -55,7 +55,7 @@
       });
   }
 
-  // Which repositories have a page on the hub (/apps/app/), read once:
+  // Which repositories have a page on Human Shaped (/apps/app/), read once:
   // only apps their builders chose to show and nobody kept off
   // (public_apps). A classmate's private app gets no link to a page
   // that would not draw it. It fails quietly to no links.
@@ -78,6 +78,7 @@
     by.appendChild(document.createTextNode((e.app_name ? 'Built by ' + nameOf(e.profiles) + ', ' : '')));
     if (e.profiles) by.appendChild(link('https://github.com/' + encodeURIComponent(e.profiles.github_login), '@' + e.profiles.github_login));
     var role = window.MentorLib ? window.MentorLib.roleLabel(e.role) : '';
+    by.appendChild(el('span', 'role-tag', 'Learner'));
     if (role) by.appendChild(el('span', 'role-tag', role));
     card.appendChild(by);
     if (e.role === 'mentor' && !e.app_repo) {
@@ -88,7 +89,7 @@
     if (safe(e.app_url)) links.appendChild(el('li')).appendChild(link(e.app_url, 'Use it'));
     if (repo) links.appendChild(el('li')).appendChild(link('https://github.com/' + repo, 'Its repository'));
     if (repo) hubPageSet().then(function (set) {
-      if (set[repo.toLowerCase()]) links.appendChild(el('li')).appendChild(link('/apps/app/?r=' + encodeURIComponent(repo), 'Its page on the hub'));
+      if (set[repo.toLowerCase()]) links.appendChild(el('li')).appendChild(link('/apps/app/?r=' + encodeURIComponent(repo), 'Its page on Human Shaped'));
     });
     card.appendChild(links);
     var log = el('div', 'commits');
@@ -364,7 +365,7 @@
 
   // Showing your app in public is your own choice (hub-privacy-notes.md).
   // The choice is read on its own, so the rest of the page works before
-  // the hub's database has the app_public column.
+  // Human Shaped's database has the app_public column.
   var canShow = false;
   function drawPublicChoice(mine, sessions) {
     var wrap = $('[data-app-public-wrap]');
@@ -426,7 +427,7 @@
       notes.forEach(function (n) {
         var q = el('blockquote', 'feedback');
         n.body.split(/\n{2,}/).forEach(function (para) { q.appendChild(el('p', null, para)); });
-        q.appendChild(el('p', 'small', (names[n.author_id] || 'Your teacher') + ', ' + lib.ago(n.created_at, new Date()) + (n.edited_at ? ', edited ' + lib.ago(n.edited_at, new Date()) : '')));
+        q.appendChild(el('p', 'small', (names[n.author_id] || 'Your leader') + ', ' + lib.ago(n.created_at, new Date()) + (n.edited_at ? ', edited ' + lib.ago(n.edited_at, new Date()) : '')));
         var msg = el('span', 'small'); msg.setAttribute('role', 'status');
         var rm = button('Remove it from my page', function () {
           rm.disabled = true;
@@ -450,7 +451,7 @@
     db.from('recognitions').select('id, skill, skill_key, moment, given_by, given_at').eq('cohort_id', cohort.id).eq('user_id', me.id).then(function (r) {
       var names = {};
       (teachers || []).forEach(function (t) { names[t.user_id] = nameOf(t.profiles); });
-      var lines = r.error ? [] : RL.lines(r.data, function (id) { return names[id] || 'Your teacher'; });
+      var lines = r.error ? [] : RL.lines(r.data, function (id) { return names[id] || 'Your leader'; });
       section.hidden = !lines.length;
       var ul = $('[data-recognized]');
       ul.replaceChildren();
@@ -506,7 +507,7 @@
     box.appendChild(actions);
   }
   // Getting ready: only for people in the cohort, and only while a step
-  // the hub can see is still undone (CohortLib.setupSteps).
+  // Human Shaped can see is still undone (CohortLib.setupSteps).
   function drawSetup(mine, access) {
     var box = $('[data-setup]');
     var steps = mine ? lib.setupSteps(mine, access, cohort) : [];
@@ -534,7 +535,7 @@
       b.textContent = 'Asking GitHub…';
       db.functions.invoke('cohort-access', { body: { action: 'join', cohort_id: cohort.id } }).then(function (r) {
         if (!r.error) return load();
-        // GitHub or the hub said no: keep the reason on screen, and let them try again.
+        // GitHub or Human Shaped said no: keep the reason on screen, and let them try again.
         var res = r.error.context;
         return (res && res.json ? res.json() : Promise.resolve({})).catch(function () { return {}; }).then(function (body) {
           b.disabled = false;

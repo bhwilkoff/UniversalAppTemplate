@@ -109,7 +109,7 @@
       var row = (r.data || [])[0];
       if (!row) {
         if (S.group) {
-          $('[data-not-member-text]').textContent = 'Your teacher has not made a board for ' + S.group.name + ' yet. The session’s board is open to everyone in the cohort.';
+          $('[data-not-member-text]').textContent = 'Your leader has not made a board for ' + S.group.name + ' yet. The session’s board is open to everyone in the cohort.';
         }
         return show('not-member');
       }
@@ -134,7 +134,7 @@
 
   function drawHead() {
     var c = S.cohort, s = S.session;
-    $('[data-kicker]').textContent = c.title + ', week ' + s.number + (S.teaching ? '. You are teaching it.' : '');
+    $('[data-kicker]').textContent = c.title + ', week ' + s.number + (S.teaching ? '. You are leading it.' : '');
     $('[data-title]').textContent = S.group ? 'The board for ' + S.group.name : 'The board';
     var back = $('[data-back]');
     back.href = '/live/?c=' + encodeURIComponent(c.slug);
@@ -156,7 +156,7 @@
   function syncLine() {
     if (!S.board) return;
     var parts = [];
-    if (S.board.locked) parts.push(S.teaching ? 'The board is locked, so only teachers can draw on it.' : 'Your teacher has locked the board, so it is here to look at and download.');
+    if (S.board.locked) parts.push(S.teaching ? 'The board is locked, so only leaders can draw on it.' : 'Your leader has locked the board, so it is here to look at and download.');
     if (S.X) parts.push(S.live ? 'Live with everyone on the board.' : 'Not live right now, so the board checks for changes every ten seconds.');
     if (S.here.length > 1) parts.push('Here now: ' + S.here.join(', ') + '.');
     if (S.savedAt) parts.push('Saved at ' + S.savedAt.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) + '.');

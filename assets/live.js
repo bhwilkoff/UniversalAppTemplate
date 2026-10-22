@@ -142,9 +142,9 @@
 
   function draw(live, shares) {
     var cohort = S.cohort, session = S.session;
-    $('[data-kicker]').textContent = cohort.title + (live ? ', live now' : '') + (S.teaching ? '. You are teaching it.' : '');
+    $('[data-kicker]').textContent = cohort.title + (live ? ', live now' : '') + (S.teaching ? '. You are leading it.' : '');
     $('[data-title]').textContent = 'Week ' + session.number + (session.title && session.title !== 'Week ' + session.number ? ': ' + session.title : '');
-    $('[data-scope]').textContent = session.scope || 'This week’s challenge will be here once your teacher writes it.';
+    $('[data-scope]').textContent = session.scope || 'This week’s challenge will be here once your leader writes it.';
     var top = $('[data-top-actions]'); top.replaceChildren();
     if (safe(session.meet_url)) { var j = el('a', 'btn-primary', 'Join the call'); j.href = session.meet_url; j.target = '_blank'; j.rel = 'noopener'; top.appendChild(j); }
     // The session's drawing board (C4), in its own tab so this page stays open.
@@ -325,13 +325,13 @@
     var heard = S.prev && S.prev.heard;
     if (heard) {
       var box = el('div', 'live-heard');
-      box.appendChild(el('p', 'kicker', 'What your teacher heard in week ' + S.prev.number + '’s checks, and what changes'));
+      box.appendChild(el('p', 'kicker', 'What your leader heard in week ' + S.prev.number + '’s checks, and what changes'));
       heard.split(/\n{2,}/).forEach(function (para) { box.appendChild(el('p', null, para)); });
       body.appendChild(box);
     } else if (S.teaching && S.prev && 'heard' in S.prev) {
       var hint = el('p', 'small');
       hint.appendChild(document.createTextNode('What you heard in week ' + S.prev.number + '’s checks, and what you changed because of it, shows here while people arrive once you write it '));
-      var a = el('a', null, 'on your teaching page'); a.href = '/teach/cohort/?c=' + S.cohort.id;
+      var a = el('a', null, 'in Follow-up'); a.href = '/teach/cohort/?c=' + S.cohort.id + '&t=followup';
       hint.appendChild(a); hint.appendChild(document.createTextNode('.'));
       body.appendChild(hint);
     }
@@ -351,8 +351,8 @@
     var groups = S.teaching ? S.groups : mine;
     if (!groups.length) {
       body.appendChild(el('p', null, S.teaching
-        ? 'This cohort has no groups yet, so everyone stays in the main session. You can make groups on your teaching page.'
-        : 'You are not in a group yet, so stay in the main session, and your teacher will say where to go.'));
+        ? 'This cohort has no groups yet, so everyone stays in the main session. You can make them in Groups.'
+        : 'You are not in a group yet, so stay in the main session, and your leader will say where to go.'));
       return;
     }
     body.appendChild(el('p', 'small', 'The order moves along by one each week.'));
@@ -374,7 +374,7 @@
       }
       card.appendChild(acts);
     } else {
-      card.appendChild(el('p', 'small', S.teaching ? 'This group has no room of its own yet, so it stays in the main session until you add one on your teaching page.' : 'Your group has no room of its own yet, so stay in the main session.'));
+      card.appendChild(el('p', 'small', S.teaching ? 'This group has no room of its own yet, so it stays in the main session until you add one in Groups.' : 'Your group has no room of its own yet, so stay in the main session.'));
     }
 
     var order = L.presentingOrder(peopleIn(g), S.session.number);
@@ -810,7 +810,7 @@
 
   function studentCard(check, answer, summary) {
     var card = el('article', 'cohort-card live-check');
-    card.appendChild(el('p', 'kicker', check.state === 'open' ? 'Your teacher asks' : 'Closed'));
+    card.appendChild(el('p', 'kicker', check.state === 'open' ? 'Your leader asks' : 'Closed'));
     card.appendChild(el('h3', null, check.prompt));
     var said = L.answerText(check, answer);
     if (check.state === 'open') {
@@ -848,7 +848,7 @@
       return studentCard(k, answers.filter(function (a) { return a.check_id === k.id && a.user_id === S.me.id; })[0], tallies[k.id]);
     }
     var box = $('[data-checks]'); box.replaceChildren();
-    if (!open.length) box.appendChild(el('p', 'small live-empty', S.teaching ? 'No question is open right now.' : 'No question is open right now. When your teacher asks one, it appears here.'));
+    if (!open.length) box.appendChild(el('p', 'small live-empty', S.teaching ? 'No question is open right now.' : 'No question is open right now. When your leader asks one, it appears here.'));
     open.forEach(function (k) { box.appendChild(card(k)); });
     $('[data-earlier-wrap]').hidden = !closed.length;
     var earlier = $('[data-earlier]'); earlier.replaceChildren();

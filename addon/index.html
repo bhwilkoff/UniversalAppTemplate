@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261022i">
+  <link rel="stylesheet" href="/assets/site.css?v=20261022j">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -21,6 +21,7 @@
       // Signed in: the page wears the hub's sidebar (PAGES.md), chosen before
       // it draws, from the session this browser keeps.
       try { var se = JSON.parse(localStorage.getItem('sb-bifrieqzkihuxfzttgvd-auth-token') || 'null'); if (se && se.user && se.expires_at * 1000 > Date.now() - 7 * 864e5) document.documentElement.setAttribute('data-signed-in', ''); } catch (e) {}
+      try { if (localStorage.getItem('hs-nav') === 'collapsed') document.documentElement.setAttribute('data-nav', 'collapsed'); } catch (e) {}
     })();
   </script>
 </head>
@@ -44,7 +45,7 @@
       <div class="addon-signin">
         <button class="btn-primary" type="button" data-use-site hidden>Use my humanshaped.org sign-in</button>
         <button class="btn-secondary" type="button" data-popup>
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#github"/></svg>Sign in with GitHub in a small window
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022j#github"/></svg>Sign in with GitHub in a small window
         </button>
       </div>
       <p class="small" data-signin-status role="status"></p>
@@ -60,7 +61,7 @@
       <p class="small">Your app and your cohort’s conversation live on GitHub.</p>
       <div class="addon-signin">
         <button class="btn-primary" type="button" data-link-github>
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022a#github"/></svg>Link my GitHub account
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022j#github"/></svg>Link my GitHub account
         </button>
       </div>
       <p class="small" data-link-status role="status"></p>
@@ -70,7 +71,7 @@
       <p class="addon-mark"><span class="visually-hidden">Human Shaped</span><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></p>
       <h1>Not one of your cohort’s calls</h1>
       <p class="small" data-no-room-text></p>
-      <p><a class="btn-secondary" href="/teach/" target="_blank" rel="noopener">Open your teaching page</a></p>
+      <p><a class="btn-secondary" href="/teach/" target="_blank" rel="noopener">Open Leading</a></p>
     </section>
 
     <section class="account-state" data-state="error" hidden>
@@ -106,7 +107,7 @@
            shows. Words by Claude, awaiting Ben's review. -->
       <div class="signal-recording" data-sig-recording hidden></div>
       <section class="signal-where" aria-label="Where everyone should be" data-sig-where hidden></section>
-      <section class="signal-card" aria-label="A card from your teacher" data-sig-card hidden></section>
+      <section class="signal-card" aria-label="A card from your leader" data-sig-card hidden></section>
       <section class="signal-stage" aria-label="Who is on stage" data-sig-stage hidden></section>
 
       <!-- The run of show (R1, research/notes/run-of-show-design.md): the
@@ -193,19 +194,19 @@
   <script src="https://www.gstatic.com/meetjs/addons/1.1.0/meet.addons.js" defer></script>
   <script src="/assets/hub-config.js?v=20261016a" defer></script>
   <script src="/assets/addon-config.js" defer></script>
-  <script src="/assets/cohort-lib.js?v=20261022a" defer></script>
+  <script src="/assets/cohort-lib.js?v=20261022j" defer></script>
   <script src="/assets/live-lib.js" defer></script>
-  <script src="/assets/question-view.js?v=20261022a" defer></script>
+  <script src="/assets/question-view.js?v=20261022j" defer></script>
   <script src="/assets/board-lib.js" defer></script>
   <script src="/assets/addon-lib.js" defer></script>
   <script src="/assets/discussions-lib.js" defer></script>
   <script src="/assets/session-thread-lib.js?v=20261022a" defer></script>
   <script src="/assets/rooms-lib.js" defer></script>
-  <script src="/assets/rooms.js?v=20261012h" defer></script>
-  <script src="/assets/signals-lib.js?v=20261012h" defer></script>
-  <script src="/assets/signals.js?v=20261022a" defer></script>
+  <script src="/assets/rooms.js?v=20261022j" defer></script>
+  <script src="/assets/signals-lib.js?v=20261022j" defer></script>
+  <script src="/assets/signals.js?v=20261022j" defer></script>
   <script src="/assets/show-lib.js" defer></script>
-  <script src="/assets/show-view-lib.js?v=20261022a" defer></script>
+  <script src="/assets/show-view-lib.js?v=20261022j" defer></script>
   <script src="/assets/curriculum-pages-lib.js" defer></script>
   <script src="/assets/show-view.js?v=20261022a" defer></script>
   <script src="/assets/google-signin-lib.js" defer></script>
@@ -216,10 +217,10 @@
   <script src="/assets/rerun-lib.js" defer></script>
   <script src="/assets/recognition-lib.js" defer></script>
   <script src="/assets/chat-lib.js?v=20261022a" defer></script>
-  <script src="/assets/chat-view.js?v=20261022a" defer></script>
+  <script src="/assets/chat-view.js?v=20261022j" defer></script>
   <script src="/assets/code-lib.js" defer></script>
-  <script src="/assets/code-runner.js?v=20261022a" defer></script>
+  <script src="/assets/code-runner.js?v=20261022j" defer></script>
   <script src="/assets/class-channel.js" defer></script>
-  <script src="/assets/addon.js?v=20261022a" defer></script>
+  <script src="/assets/addon.js?v=20261022j" defer></script>
 </body>
 </html>
