@@ -13,7 +13,7 @@
     '/assets/hub-config.js?v=20261016a',
     '/assets/teach-lib.js?v=20261022c',
     '/assets/path-lib.js',
-    '/assets/home-lib.js?v=20261022o',
+    '/assets/home-lib.js?v=20261022p',
     '/assets/exchange-lib.js?v=20261022a'
   ];
   function loadAll(list) {

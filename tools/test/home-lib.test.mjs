@@ -81,14 +81,17 @@ test('newerThan counts rows after a moment, or all of them with no moment', () =
   assert.equal(lib.newerThan(rows, 'created_at', null), 2);
 });
 
-test('appsBuiltBy: directory apps under the person’s GitHub account, active ones only', () => {
+test('appsBuiltBy: directory apps under the person’s GitHub account, whatever their status', () => {
   const apps = [
     { name: 'Archive Watch', repository: 'https://github.com/bhwilkoff/Archive-Watch', active: true, website: 'https://archivewatch.org' },
     { name: 'Old', repository: 'https://github.com/BHWilkoff/Old', active: false },
     { name: 'Someone else', repository: 'https://github.com/ada/tides', active: true },
     { name: 'No repo' }
   ];
-  assert.deepEqual(lib.appsBuiltBy(apps, 'bhwilkoff'), [{ name: 'Archive Watch', repo: 'bhwilkoff/Archive-Watch', website: 'https://archivewatch.org' }]);
+  assert.deepEqual(lib.appsBuiltBy(apps, 'bhwilkoff'), [
+    { name: 'Archive Watch', repo: 'bhwilkoff/Archive-Watch', website: 'https://archivewatch.org' },
+    { name: 'Old', repo: 'BHWilkoff/Old', website: null }
+  ]);
   assert.deepEqual(lib.appsBuiltBy(apps, 'ada').map((a) => a.name), ['Someone else']);
   assert.deepEqual(lib.appsBuiltBy(apps, null), []);
 });

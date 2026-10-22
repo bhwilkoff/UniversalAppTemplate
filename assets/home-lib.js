@@ -109,13 +109,13 @@
 
   // The directory's apps whose repository lives under this person's GitHub
   // account: their work, wherever it was listed from. Same order as the
-  // directory; an app no longer active is left out.
+  // directory, all of which the apps page shows.
   function appsBuiltBy(apps, login) {
     if (!login) return [];
     var who = String(login).toLowerCase();
     return (apps || []).filter(function (a) {
       var m = /^https:\/\/github\.com\/([^/]+)\/([^/#?]+)/.exec(a.repository || '');
-      return m && m[1].toLowerCase() === who && a.active !== false;
+      return m && m[1].toLowerCase() === who;
     }).map(function (a) {
       var m = /^https:\/\/github\.com\/([^/]+)\/([^/#?]+)/.exec(a.repository);
       return { name: a.name, repo: m[1] + '/' + m[2].replace(/\.git$/, ''), website: a.website || null };
