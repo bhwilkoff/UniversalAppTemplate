@@ -97,7 +97,10 @@
           });
         });
       });
-      var bits = [card.by ? 'Asked by @' + card.by : null, card.holders.length ? card.holders.map(function (x) { return '@' + x; }).join(', ') + (card.holders.length > 1 ? ' have it' : ' has it') : null];
+      var name = function (x) { return x === me ? 'you' : '@' + x; };
+      var holding = card.holders.length === 1 && card.holders[0] === me ? 'you have it'
+        : card.holders.length ? card.holders.map(name).join(', ') + (card.holders.length > 1 ? ' have it' : ' has it') : null;
+      var bits = [card.by ? 'Asked by ' + name(card.by) : null, holding];
       if (card.comments) bits.push(card.comments === 1 ? '1 reply' : card.comments + ' replies');
       var row = U.row({ title: card.title, href: card.url, meta: bits.filter(Boolean).join(', '), actions: actions });
       row.querySelector('.ui-row-main').appendChild(said);
