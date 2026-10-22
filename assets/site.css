@@ -2564,6 +2564,9 @@ html.app-nav-open[data-signed-in] body:not([data-no-app-nav]) .app-nav { display
 }
 @media print { .app-nav, .app-menu-button { display: none !important; } html[data-signed-in] body { padding-left: 0 !important; } }
 .panel-section { margin: 0 0 2rem; }
+.panel-section.guide { max-width: 44rem; }
+.panel-section.guide h3 { font-size: 1rem; margin: 1.25rem 0 0.4rem; }
+.panel-section.guide .ui-notice { margin: 0.75rem 0; }
 .panel-section > h2, [data-tab] > section > h2, [data-tab] h2 { font-size: 1.25rem; margin: 1.5rem 0 0.6rem; }
 [data-tab] > :first-child > h2:first-child { margin-top: 0.5rem; }
 .ui-inline-status { margin: 0.25rem 0; color: var(--muted); font-size: 0.95rem; }
