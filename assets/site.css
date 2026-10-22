@@ -2628,3 +2628,7 @@ html.app-nav-open[data-signed-in] body:not([data-no-app-nav]) .app-nav { display
 .ui-tabs-more-list[hidden] { display: none !important; }
 .ui-tabs-more-list a { display: block; padding: 0.45rem 0.6rem; border-bottom: 0 !important; margin: 0 !important; }
 .ui-tabs a { white-space: nowrap; }
+/* The leader's guide: each step a row whose title opens the step itself. */
+.guide-step p { margin: 0.3rem 0 0; max-width: 38rem; }
+.guide-step a.ui-row-title:not([href]) { color: var(--ink); text-decoration: none; }
+.guide > p { max-width: 38rem; }

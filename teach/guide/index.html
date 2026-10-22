@@ -23,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261022n">
+  <link rel="stylesheet" href="/assets/site.css?v=20261022o">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -36,7 +36,9 @@
       try { if (localStorage.getItem('hs-nav') === 'collapsed') document.documentElement.setAttribute('data-nav', 'collapsed'); } catch (e) {}
     })();
   </script>
-  <script src="/assets/site.js?v=20261022j" defer></script>
+  <script src="/assets/site.js?v=20261022o" defer></script>
+  <script src="/assets/cohort-nav.js?v=20261022o" defer></script>
+  <script src="/assets/guide.js?v=20261022o" defer></script>
   <script src="/assets/ui.js?v=20261022j" defer></script>
 </head>
 <body>
@@ -65,17 +67,24 @@
     </div>
   </header>
 
-  <!-- Rewritten October 22, 2026, at Ben's request ("That page in
-       particular seems to be made up of a huge amount of words that need
-       to be in alignment with the actual work of the cohorts"). Each row
-       names a step the platform really has, in the words the cohort's
-       checklist and tabs use; the course's own text is on /teach/guide/course/. -->
+  <!-- Rewritten October 22, 2026, at Ben's request: "The Leader's guide
+       should actually be helpful for leading, but without links to the
+       actual things they are referencing, it is hard to know what is
+       happening on that page." Each step says what it is for, in the
+       course's own terms (COURSE.md), and links to that step in the
+       cohort you lead (assets/guide.js). -->
   <main id="main">
     <div class="wrap">
       <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/teach/">Leading</a></li></ol></nav>
       <header class="page-head">
         <h1>Leader's guide</h1>
       </header>
+
+      <div class="guide-root" data-guide>
+      <div class="panel-section guide guide-for" data-guide-for hidden>
+        <label>Links open <select data-guide-cohort></select></label>
+      </div>
+      <div class="ui-notice" data-guide-none hidden><p><strong>The steps link to your cohort once you lead one.</strong> <a href="/teach/new/">Plan a cohort</a></p></div>
 
       <section class="panel-section guide" aria-labelledby="g-cohort">
         <h2 id="g-cohort">A cohort</h2>
@@ -86,68 +95,65 @@
           <div id="host"><dt>Calls hosted by</dt><dd>meet@humanshaped.org</dd></div>
           <div><dt>Leaders</dt><dd>One or more per cohort</dd></div>
         </dl>
+        <p>Your work is running the sessions, reading the checks, and noticing who needs a word. Nobody needs to be an expert in building apps to lead.</p>
+        <p class="actions"><a class="btn-secondary" href="/teach/guide/course/">The course in full</a></p>
       </section>
 
       <section class="panel-section guide" aria-labelledby="need">
         <h2 id="need">Before the first session</h2>
-        <ol class="ui-rows guide-steps">
-          <li class="ui-row"><div class="ui-row-main"><span class="ui-row-title">Co-lead one session first</span><span class="ui-row-meta">Another cohort's leader adds you under People</span></div></li>
-          <li class="ui-row"><div class="ui-row-main"><span class="ui-row-title">Set the day and time</span><span class="ui-row-meta">Settings</span></div></li>
-          <li class="ui-row"><div class="ui-row-main"><span class="ui-row-title">Make the weekly sessions</span><span class="ui-row-meta">Sessions</span></div></li>
-          <li class="ui-row"><div class="ui-row-main"><span class="ui-row-title">Ask for Meet links</span><span class="ui-row-meta">Setup. meet@humanshaped.org makes the weekly call, so no personal account is needed.</span></div></li>
-          <li class="ui-row"><div class="ui-row-main"><span class="ui-row-title">Make the GitHub repository</span><span class="ui-row-meta">Setup. It holds the cohort's conversation.</span></div></li>
-          <li class="ui-row"><div class="ui-row-main"><span class="ui-row-title">Open for joining</span><span class="ui-row-meta">Settings</span></div></li>
-          <li class="ui-row"><div class="ui-row-main"><span class="ui-row-title">Make the groups</span><span class="ui-row-meta">Groups, once people have joined. Ask for Meet links again for their rooms.</span></div></li>
-          <li class="ui-row"><div class="ui-row-main"><span class="ui-row-title">Rehearse on the live session</span><span class="ui-row-meta">Live session</span></div></li>
-          <li class="ui-row"><div class="ui-row-main"><span class="ui-row-title">Connect your agent (optional)</span><span class="ui-row-meta"><a href="/connect/">Connect</a></span></div></li>
+        <ol class="ui-rows">
+          <li class="ui-row guide-step"><div class="ui-row-main"><span class="ui-row-title">Co-lead one session first</span><span class="ui-row-meta">People, in their cohort</span><p>A first session goes best when it already feels familiar. Ask a leader to add you to their cohort, and take the parts of one session you are most comfortable with.</p></div></li>
+          <li class="ui-row guide-step"><div class="ui-row-main"><a class="ui-row-title" data-place="edit">Set the day and time</a><span class="ui-row-meta">Settings</span><p>The day, time, start date, and length that every session is built from. People see them on Open cohorts before they join, each on their own clock.</p></div></li>
+          <li class="ui-row guide-step"><div class="ui-row-main"><a class="ui-row-title" data-place="sessions">Make the weekly sessions</a><span class="ui-row-meta">Sessions</span><p>One session for each week of the schedule, each starting from the course’s plan for that week and its questions, which you can change.</p></div></li>
+          <li class="ui-row guide-step"><div class="ui-row-main"><a class="ui-row-title" data-place="setup">Ask for Meet links</a><span class="ui-row-meta">Setup</span><p>meet@humanshaped.org makes the weekly Google Calendar event and puts its Meet link on every session, usually within the hour. You need no Google account of your own to host, and learners join from whatever account they have.</p></div></li>
+          <li class="ui-row guide-step"><div class="ui-row-main"><a class="ui-row-title" data-place="setup">Make the GitHub repository</a><span class="ui-row-meta">Setup</span><p>The cohort’s conversation is a private repository in the humanshaped organization, reached through a team of the cohort’s people. One button makes both and adds you to the team; learners are added as they join.</p></div></li>
+          <li class="ui-row guide-step"><div class="ui-row-main"><a class="ui-row-title" data-place="talk">Open the conversation</a><span class="ui-row-meta">Conversation</span><p>Join the cohort’s conversation on GitHub, so you can read and post in it before anyone else arrives.</p></div></li>
+          <li class="ui-row guide-step"><div class="ui-row-main"><a class="ui-row-title" data-place="setup">Open for joining</a><span class="ui-row-meta">Setup</span><p>The cohort appears on Open cohorts and people can join. Until then, only its leaders can see it.</p></div></li>
+          <li class="ui-row guide-step"><div class="ui-row-main"><a class="ui-row-title" data-place="groups">Make the groups</a><span class="ui-row-meta">Groups</span><p>Groups of three stay together all five weeks, so someone is there to show to when one person is away. Make them once people have joined, then ask for Meet links again and each group gets its own room.</p></div></li>
+          <li class="ui-row guide-step"><div class="ui-row-main"><a class="ui-row-title" data-place="live">Rehearse on the live session</a><span class="ui-row-meta">Live session</span><p>Open it once before anyone arrives and try a clock and a check, so the first time you press them is not in front of everyone.</p></div></li>
+          <li class="ui-row guide-step"><div class="ui-row-main"><a class="ui-row-title" href="/connect/">Connect your agent (optional)</a><span class="ui-row-meta">Connect</span><p>Your own Claude or Gemini can read the cohort with you: the roster, each learner’s work across the weeks, and the class as it stands right now. It only reads, and it never speaks for you.</p></div></li>
         </ol>
       </section>
 
       <section class="panel-section guide" aria-labelledby="event">
         <h2 id="event">Each session</h2>
-        <dl class="ui-facts">
-          <div><dt>Run it from</dt><dd>The Human Shaped add-on in Meet, or the live session beside Meet</dd></div>
-          <div><dt>Main stage</dt><dd>Present it from the add-on to show the welcome or a card</dd></div>
-        </dl>
+        <p>Keep the live session open beside Meet, or open the Human Shaped add-on inside Meet. Either holds the run of show with a clock for each part, the queue of work to show, and the checks, and sends everyone to their groups’ rooms and back. To show the welcome or a card, present the add-on’s main stage.</p>
         <div class="ui-notice"><p><strong>The add-on is still in testing.</strong> Until it is listed, keep the live session open beside Meet.</p></div>
+        <p class="actions"><a class="btn-secondary" data-place="live">Open the live session</a> <a class="btn-secondary" href="/teach/guide/weeks/">Each week’s minutes and words</a></p>
         <h3>The six parts</h3>
-        <ol class="ui-rows guide-steps">
-          <li class="ui-row"><div class="ui-row-main"><span class="ui-row-title">Arrive</span><span class="ui-row-meta">One line each in the chat, then what you read in last week's checks</span></div></li>
-          <li class="ui-row"><div class="ui-row-main"><span class="ui-row-title">Show what you brought back</span><span class="ui-row-meta">In groups, about eight minutes each</span></div></li>
-          <li class="ui-row"><div class="ui-row-main"><span class="ui-row-title">One value at work</span><span class="ui-row-meta">Back together, one decision shared</span></div></li>
-          <li class="ui-row"><div class="ui-row-main"><span class="ui-row-title">Read one real prompt together</span><span class="ui-row-meta">Everyone tries it first</span></div></li>
-          <li class="ui-row"><div class="ui-row-main"><span class="ui-row-title">Start</span><span class="ui-row-meta">The coming week's first prompt, written before leaving</span></div></li>
-          <li class="ui-row"><div class="ui-row-main"><span class="ui-row-title">Check for understanding</span><span class="ui-row-meta">The last three minutes</span></div></li>
+        <ol class="ui-rows">
+          <li class="ui-row guide-step"><div class="ui-row-main"><span class="ui-row-title">Arrive</span><span class="ui-row-meta">In the chat</span><p>Everyone writes one line in the chat: what they shipped, or where they are stuck. Then you say what you read in last week’s checks and what you changed because of it, which is what makes the check worth answering.</p></div></li>
+          <li class="ui-row guide-step"><div class="ui-row-main"><span class="ui-row-title">Show what you brought back</span><span class="ui-row-meta">In groups, about 8 minutes each</span><p>Each person shows their work on the device it runs on and explains one decision with the agent closed. Partners ask one question before saying anything about it. Visit the groups, say so as you arrive, and listen for one thing that comes up in more than one.</p></div></li>
+          <li class="ui-row guide-step"><div class="ui-row-main"><span class="ui-row-title">One value at work</span><span class="ui-row-meta">Back together</span><p>One person shares a decision their values changed that week, and what it cost them. Then you name the one thing you heard across the groups.</p></div></li>
+          <li class="ui-row guide-step"><div class="ui-row-main"><span class="ui-row-title">Read one real prompt together</span><span class="ui-row-meta">Together</span><p>Put up a real situation without the prompt that answered it. Everyone writes the prompt they would send and compares it with a partner before the real one goes up, so the conversation is about the difference.</p></div></li>
+          <li class="ui-row guide-step"><div class="ui-row-main"><span class="ui-row-title">Start</span><span class="ui-row-meta">Before leaving</span><p>Everyone writes the first prompt of the coming week and sends it to their agent, so they leave with the week already begun.</p></div></li>
+          <li class="ui-row guide-step"><div class="ui-row-main"><span class="ui-row-title">Check for understanding</span><span class="ui-row-meta">The last 3 minutes</span><p>Each learner answers two questions privately: the week’s question, and “What is still muddy?” Never in the shared chat, where the first answer shapes the rest.</p></div></li>
         </ol>
       </section>
 
       <section class="panel-section guide" aria-labelledby="after">
         <h2 id="after">Between sessions</h2>
-        <ul class="ui-rows">
-          <li class="ui-row"><div class="ui-row-main"><span class="ui-row-title">Read the checks and say what changes</span><span class="ui-row-meta">Follow-up. Learners see it as they arrive next session.</span></div></li>
-          <li class="ui-row"><div class="ui-row-main"><span class="ui-row-title">Answer feedback and questions</span><span class="ui-row-meta"><a href="/teach/feedback/">Feedback</a>, oldest first</span></div></li>
-          <li class="ui-row"><div class="ui-row-main"><span class="ui-row-title">Write each learner a follow-up</span><span class="ui-row-meta">Follow-up</span></div></li>
-          <li class="ui-row"><div class="ui-row-main"><span class="ui-row-title">Write to anyone who missed the session</span><span class="ui-row-meta">Follow-up, within two days</span></div></li>
-          <li class="ui-row"><div class="ui-row-main"><span class="ui-row-title">Change next week's run of show</span><span class="ui-row-meta">Sessions</span></div></li>
-        </ul>
+        <ol class="ui-rows">
+          <li class="ui-row guide-step"><div class="ui-row-main"><a class="ui-row-title" data-place="followup">Read the checks and say what changes</a><span class="ui-row-meta">Follow-up</span><p>Read every answer before the next session, since they show who understood the week and who needs a word. What you write here shows as people arrive next time.</p></div></li>
+          <li class="ui-row guide-step"><div class="ui-row-main"><a class="ui-row-title" href="/teach/feedback/">Answer feedback and questions</a><span class="ui-row-meta">Feedback</span><p>Learners ask for feedback on what they built, or ask a question. Each waits here, oldest first, until a leader answers it.</p></div></li>
+          <li class="ui-row guide-step"><div class="ui-row-main"><a class="ui-row-title" data-place="followup">Write each learner a follow-up</a><span class="ui-row-meta">Follow-up</span><p>Follow-up gathers what each person did in the session (what they showed, asked, and answered) with a place to write them a note. A note stays in your browser until you send it.</p></div></li>
+          <li class="ui-row guide-step"><div class="ui-row-main"><a class="ui-row-title" data-place="followup">Write to anyone who missed the session</a><span class="ui-row-meta">Follow-up</span><p>The course asks for a private note within two days, with an easy way back in and an easy way out. Follow-up lists who has not been seen since the week began, and opens your own email for anyone who allows it.</p></div></li>
+          <li class="ui-row guide-step"><div class="ui-row-main"><a class="ui-row-title" data-place="sessions">Change next week’s run of show</a><span class="ui-row-meta">Sessions</span><p>Adjust next week’s parts, prompt, and check to what you heard.</p></div></li>
+        </ol>
       </section>
 
       <section class="panel-section guide" aria-labelledby="g-finish">
         <h2 id="g-finish">When the cohort finishes</h2>
-        <ul class="ui-rows">
-          <li class="ui-row"><div class="ui-row-main"><span class="ui-row-title">Mark the cohort finished</span><span class="ui-row-meta">Settings</span></div></li>
-          <li class="ui-row"><div class="ui-row-main"><span class="ui-row-title">Record each credential that was earned</span><span class="ui-row-meta">Credentials. A signer then signs it.</span></div></li>
-        </ul>
+        <ol class="ui-rows">
+          <li class="ui-row guide-step"><div class="ui-row-main"><a class="ui-row-title" data-place="edit">Mark the cohort finished</a><span class="ui-row-meta">Settings</span><p>The people who stayed can still read the cohort. Each live session’s questions and answers are deleted, and credentials can be recorded.</p></div></li>
+          <li class="ui-row guide-step"><div class="ui-row-main"><a class="ui-row-title" data-place="credentials">Record each credential that was earned</a><span class="ui-row-meta">Credentials</span><p>Open each person’s repository and every link first. A signer then signs the credential, and anyone can check it at its own address.</p></div></li>
+        </ol>
       </section>
 
-      <section class="panel-section guide" aria-labelledby="g-course">
-        <h2 id="g-course">The course</h2>
-        <ul class="ui-rows">
-          <li class="ui-row"><div class="ui-row-main"><a class="ui-row-title" href="/teach/guide/course/">The course in full</a></div></li>
-          <li class="ui-row"><div class="ui-row-main"><a class="ui-row-title" href="/teach/guide/weeks/">The weekly guides</a><span class="ui-row-meta">Each session's minutes and words</span></div></li>
-          <li class="ui-row"><div class="ui-row-main"><a class="ui-row-title" href="/stuck/">When you are stuck</a></div></li>
-          <li class="ui-row"><div class="ui-row-main"><a class="ui-row-title" href="/path/setup/">Getting set up</a><span class="ui-row-meta">Cohort Prep, for learners</span></div></li>
-        </ul>
+      <section class="panel-section guide" aria-labelledby="g-more">
+        <h2 id="g-more">When someone is stuck</h2>
+        <p>About twenty minutes of trying, then their group, then you. When you help, ask what they have already tried before suggesting anything.</p>
+        <p class="actions"><a class="btn-secondary" href="/stuck/">When you are stuck</a> <a class="btn-secondary" href="/path/setup/">Getting set up</a></p>
       </section>
 
       <section class="panel-section guide" aria-labelledby="ask">
@@ -155,6 +161,7 @@
         <p>Leading is by invitation while the first cohorts find their shape.</p>
         <p class="actions"><a class="btn-primary" href="/teach/#ask">Ask to lead</a></p>
       </section>
+      </div>
     </div>
   </main>
 

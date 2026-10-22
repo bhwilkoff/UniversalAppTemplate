@@ -82,6 +82,7 @@
     var kept = Object.assign({ cohorts: [] }, readNote() || {}, r, { uid: user.id, at: Date.now() });
     try { localStorage.setItem('hs-roles', JSON.stringify(kept)); } catch (e) {}
     drawNav(kept);
+    drawName(kept);
     return kept;
   };
   window.HS.forgetRoles = function () { try { localStorage.removeItem('hs-roles'); } catch (e) {} };
@@ -229,8 +230,15 @@
     img.src = meta.avatar_url; img.alt = ''; img.width = 28; img.height = 28;
     button.appendChild(img);
   }
-  button.appendChild(el('span', 'account-name', label));
-  button.setAttribute('aria-label', 'Your account, signed in as ' + label);
+  var nameEl = el('span', 'account-name', label);
+  button.appendChild(nameEl);
+  // The name the person chose on their account page, once the note has it.
+  function drawName(r) {
+    var shown = (r && r.name) || label;
+    nameEl.textContent = shown;
+    button.setAttribute('aria-label', 'Your account, signed in as ' + shown);
+  }
+  drawName(readNote());
   var list = el('ul', 'account-menu-list');
   list.id = 'account-menu-list';
   list.hidden = true;
@@ -254,13 +262,14 @@
     Promise.all([
       db.from('teachers').select('*').eq('user_id', user.id).maybeSingle(),
       db.from('enrollments').select('role, status, cohorts(id, slug, title, status)').eq('user_id', user.id).neq('status', 'left'),
-      db.from('cohort_teachers').select('cohorts(id, slug, title, status)').eq('user_id', user.id)
+      db.from('cohort_teachers').select('cohorts(id, slug, title, status)').eq('user_id', user.id),
+      db.from('profiles').select('display_name').eq('id', user.id).maybeSingle()
     ]).then(function (res) {
       if (res.some(function (x) { return x.error; })) return;
       var t = res[0].data, seen = {}, cohorts = [];
       res[2].data.forEach(function (x) { var c = x.cohorts; if (c && !seen[c.id]) { seen[c.id] = 1; cohorts.push({ id: c.id, slug: c.slug, title: c.title, status: c.status, role: 'teacher' }); } });
       res[1].data.forEach(function (x) { var c = x.cohorts; if (c && !seen[c.id]) { seen[c.id] = 1; cohorts.push({ id: c.id, slug: c.slug, title: c.title, status: c.status, role: x.role }); } });
-      window.HS.roles({ teacher: !!t, admin: !!(t && t.can_admin), can_approve: !!(t && t.can_approve), can_sign: !!(t && t.can_sign), cohorts: cohorts });
+      window.HS.roles({ teacher: !!t, admin: !!(t && t.can_admin), can_approve: !!(t && t.can_approve), can_sign: !!(t && t.can_sign), cohorts: cohorts, name: (res[3].data && res[3].data.display_name) || null });
     });
   });
 

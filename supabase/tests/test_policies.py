@@ -2179,6 +2179,16 @@ def main():
           not attempt(as_user("bea"), "update public.profiles set github_login = 'someone-else' where id = %s returning id", (people["bea"],)))
     check("but they can still change their display name",
           attempt(as_user("bea"), "update public.profiles set display_name = 'Bea B' where id = %s returning id", (people["bea"],)) and len(last_rows) == 1)
+    # A display name stays a name (migration 20261022010000).
+    check("a display name with spaces around it is refused",
+          not attempt(as_user("bea"), "update public.profiles set display_name = ' Bea ' where id = %s returning id", (people["bea"],)) and "profiles_display_name_shape" in last_reason[0])
+    check("so is an empty one, or one past 80 characters",
+          not attempt(as_user("bea"), "update public.profiles set display_name = '' where id = %s returning id", (people["bea"],))
+          and not attempt(as_user("bea"), "update public.profiles set display_name = repeat('a', 81) where id = %s returning id", (people["bea"],)))
+    check("and clearing it falls back to the GitHub name",
+          attempt(as_user("bea"), "update public.profiles set display_name = null where id = %s returning id", (people["bea"],)) and len(last_rows) == 1)
+    check("nobody can change someone else's display name",
+          attempt(as_user("bea"), "update public.profiles set display_name = 'Not Ben' where id = %s returning id", (people["ben"],)) and len(last_rows) == 0)
     as_system()
 
 

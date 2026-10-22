@@ -13,7 +13,7 @@
     '/assets/hub-config.js?v=20261016a',
     '/assets/teach-lib.js?v=20261022c',
     '/assets/path-lib.js',
-    '/assets/home-lib.js?v=20261022j',
+    '/assets/home-lib.js?v=20261022o',
     '/assets/exchange-lib.js?v=20261022a'
   ];
   function loadAll(list) {
@@ -139,6 +139,7 @@
           taught.length ? db.from('shares').select('cohort_id, kind, created_at, feedback(author_id)').in('cohort_id', taught).in('kind', ['for-feedback', 'question']) : { data: [] },
           taught.length ? db.from('cohort_teachers').select('cohort_id, user_id').in('cohort_id', taught) : { data: [] },
           teacher && teacher.can_approve ? db.from('teacher_requests').select('state, created_at').eq('state', 'waiting') : { data: [] },
+          fetch('https://raw.githubusercontent.com/humanshaped/directory/main/directory.json', { cache: 'no-cache' }).then(function (r) { return r.ok ? r.json() : { apps: [] }; }).catch(function () { return { apps: [] }; }),
           Promise.all(answered.map(function (t) {
             return db.rpc('time_poll', { t: t }).then(function (r) { return r.data ? { token: t, title: r.data.title, open: r.data.open } : null; }, function () { return null; });
           }))
@@ -154,7 +155,8 @@
             builderApp: res[4].data,
             lastMark: H.lastStage(res[5].data),
             myPolls: more[1].data || [],
-            answeredPolls: more[5].filter(Boolean)
+            answeredPolls: more[6].filter(Boolean),
+            listedApps: H.appsBuiltBy(more[5].apps, profile.github_login)
           };
           var feedbackCohortSlug = feedbackCohort && byId[feedbackCohort] ? byId[feedbackCohort].slug : null;
           model.waiting = H.waiting({
@@ -267,10 +269,14 @@
     });
     var b = m.builderApp;
     if (b) list.appendChild(U().row({ title: b.app_name || b.app_repo, href: '/apps/mine/', visibility: U().visibility(b.public ? 'public' : 'me') }));
+    (m.listedApps || []).forEach(function (a) {
+      if (b && b.app_repo.toLowerCase() === a.repo.toLowerCase()) return;
+      list.appendChild(U().row({ title: a.name, href: '/apps/app/?r=' + encodeURIComponent(a.repo), meta: 'On the apps page', visibility: U().visibility('public') }));
+    });
     var s = m.lastMark && P ? P.stageInfo(m.lastMark.stage) : null;
     if (s) list.appendChild(U().row({ title: s.title, href: s.href, meta: m.lastMark.at ? 'Stage marked ' + day(m.lastMark.at) : null }));
     if (list.children.length) box.appendChild(list);
-    if (!list.querySelector('a[href="/apps/mine/"]') && !m.cohorts.some(function (c) { return c.enrollment && c.enrollment.app_repo; })) box.appendChild(U().empty('No app yet', link('/apps/mine/', 'Add your app', 'btn-secondary')));
+    if (!list.querySelector('a[href="/apps/mine/"]') && !(m.listedApps || []).length && !m.cohorts.some(function (c) { return c.enrollment && c.enrollment.app_repo; })) box.appendChild(U().empty('No app yet', link('/apps/mine/', 'Add your app', 'btn-secondary')));
   }
 
   loadAll(SCRIPTS).then(start).catch(function (e) {

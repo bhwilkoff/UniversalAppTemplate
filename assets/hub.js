@@ -232,6 +232,29 @@
   // (DiscussionsLib; research/notes/cohort-conversation-notes.md, part 7).
   var stores = {};
   try { stores.session = window.sessionStorage; stores.local = window.localStorage; } catch (e) {}
+  // The name others see (migration 20261022010000): typed here, saved on
+  // Save, and empty falls back to the GitHub name.
+  function drawNameForm(p, uid) {
+    var form = root.querySelector('[data-name-form]');
+    if (!form) return;
+    var input = form.querySelector('[data-name-input]');
+    input.value = p.display_name || '';
+    input.placeholder = p.github_login || '';
+    if (form.dataset.ready) return;
+    form.dataset.ready = '1';
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var name = input.value.replace(/\s+/g, ' ').trim() || null;
+      var msg = form.querySelector('[data-name-message]');
+      db.from('profiles').update({ display_name: name }).eq('id', uid).select('display_name').single().then(function (r) {
+        if (r.error) return window.UI.say(msg, 'Not saved: ' + r.error.message, 'problem');
+        input.value = r.data.display_name || '';
+        root.querySelector('[data-name]').textContent = r.data.display_name || p.github_login || 'You';
+        if (window.HS && window.HS.roles) window.HS.roles({ name: r.data.display_name });
+        window.UI.say(msg, 'Saved');
+      });
+    });
+  }
   function keepGitHubToken(session) {
     if (window.DiscussionsLib) window.DiscussionsLib.tokenFrom(session, stores, Date.now(), db.auth.storageKey);
   }
@@ -380,6 +403,7 @@
         if (bad) return fail('Your account could not be loaded just now: ' + bad.error.message);
         var p = res[0].data;
         root.querySelector('[data-name]').textContent = p.display_name || p.github_login || 'You';
+        drawNameForm(p, uid);
         var title = document.querySelector('[data-account-title]');
         if (title) title.textContent = 'Your account';
         var lead = document.querySelector('[data-account-lead]');
