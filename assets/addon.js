@@ -924,7 +924,7 @@
       box.appendChild(el('p', 'kicker', 'On the main stage'));
       box.appendChild(el('p', 'on-stage-line', now.line));
       box.appendChild(el('p', 'live-what', now.what));
-      if (now.audience) box.appendChild(el('p', 'on-stage-audience', 'Your part: ' + now.audience));
+      if (now.audience) box.appendChild(el('p', 'on-stage-audience', 'What to show: ' + now.audience));
     }
     if (S.teaching && next) {
       var acts = el('div', 'actions');
@@ -978,8 +978,8 @@
     if (S.teaching) return;
     var mine = q.waiting.filter(function (x) { return x.user_id === S.me.id; })[0];
     if (mine) {
-      box.appendChild(el('p', 'small', 'You are waiting to show your work.'));
-      box.appendChild(button('Take it off', 'btn-secondary small', function () {
+      // Their own card above already says they are waiting.
+      box.appendChild(button('Take my name off the list', 'btn-secondary small', function () {
         db.from('live_queue').delete().eq('id', mine.id).then(function () { refreshLive(); });
       }));
       return;

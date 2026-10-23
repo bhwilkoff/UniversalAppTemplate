@@ -237,7 +237,7 @@
         if (qf) qf.el.hidden = !asQuestion;
         templateL.hidden = uses.indexOf('template') === -1;
         roomsL.hidden = uses.indexOf('room_scenes') === -1;
-        promptLabel.textContent = { presenter: 'What the audience does', question: 'The question', rooms: 'What the rooms are for', reflection: 'The closing question' }[kindSel.value] || 'Prompt';
+        promptLabel.textContent = { presenter: 'What each person shows', question: 'The question', rooms: 'What the rooms are for', reflection: 'The closing question' }[kindSel.value] || 'Prompt';
         bodyL.hidden = kindSel.value === 'question';
       }
       kindSel.addEventListener('change', fitKind);

@@ -11,7 +11,7 @@
   // kind may carry in its configuration; anything else is dropped.
   var KINDS = [
     { key: 'talk', name: 'Talk', what: 'You explain. The main stage shows a title and a few lines.', keys: [] },
-    { key: 'presenter', name: 'Showing work', what: 'Each person in turn shows their work, and everyone else gets one thing to look for.', keys: ['prompt'] },
+    { key: 'presenter', name: 'Showing work', what: 'Each person in turn shows their work, as the prompt asks.', keys: ['prompt'] },
     { key: 'question', name: 'Question', what: 'Everyone answers, and the answers go on the main stage when you show them.', keys: ['prompt', 'options', 'kind', 'points', 'question_id'] },
     { key: 'design', name: 'On the board', what: 'The shared board on the main stage, where everyone draws together, blank or from a template.', keys: ['template'] },
     { key: 'rooms', name: 'In groups', what: 'Everyone goes to their group’s room for a set time, and the room runs its own parts.', keys: ['prompt', 'room_scenes'] },

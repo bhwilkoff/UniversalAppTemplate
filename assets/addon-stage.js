@@ -117,7 +117,7 @@
       $('[data-note]').hidden = !view.note;
       $('[data-note]').textContent = view.note || '';
       $('[data-audience]').hidden = !view.audience;
-      $('[data-audience]').textContent = view.audience ? 'Everyone else: ' + view.audience : '';
+      $('[data-audience]').textContent = view.audience ? 'What to show: ' + view.audience : '';
     }
     tick();
   }
@@ -176,9 +176,15 @@
       p.classList.toggle('is-over', left === 0);
     });
     var t = clockText(view.part);
-    $('[data-clock]').textContent = t ? ', ' + t : '';
+    // A scene's words can fill the stage, so its clock sits small at the
+    // top (found in the live Meet test: a long part pushed it out of the
+    // frame); a break, which is only its clock, keeps it large.
+    var scene = view.mode === 'scene', big = scene && view.scene && view.scene.eyebrow === 'Break';
+    $('[data-part-name]').hidden = scene;
+    $('[data-clock]').textContent = t ? (scene ? t : ', ' + t) : '';
+    if (scene) $('[data-part]').hidden = big || !t;
     $('[data-clock-big]').textContent = t;
-    $('[data-s-clock]').hidden = !(view.mode === 'scene' && t);
+    $('[data-s-clock]').hidden = !(big && t);
     $('[data-s-clock]').textContent = t;
   }
   setInterval(tick, 1000);
