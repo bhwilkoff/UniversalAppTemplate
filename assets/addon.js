@@ -504,7 +504,7 @@
 
   function drawCounts() {
     if (!S.show) return;
-    S.show.count('wings', L.queue(S.items).waiting.length);
+    S.show.count('wings', L.queue(S.items).waiting.filter(function (x) { return !(S.onStage && S.onStage.kind === 'item' && S.onStage.id === x.id); }).length);
     S.show.count('questions', S.checks.filter(function (k) { return k.state === 'open'; }).length);
     S.show.count('rooms', S.teaching ? Object.keys(S.roomPlaces).filter(function (k) { return S.roomPlaces[k].asking; }).length : 0);
   }
@@ -926,13 +926,15 @@
       box.appendChild(el('p', 'live-what', now.what));
       if (now.audience) box.appendChild(el('p', 'on-stage-audience', 'What to show: ' + now.audience));
     }
-    if (S.teaching && next) {
+    // With no one else waiting, the person on stage still needs thanking
+    // (found in the live Meet test: the box offered nothing).
+    if (S.teaching && (next || now)) {
       var acts = el('div', 'actions');
-      acts.appendChild(button(now ? 'Thank them, and bring up ' + nameOf(next.user_id) : 'Bring up ' + nameOf(next.user_id) + '', 'btn-primary', function () {
+      if (next) acts.appendChild(button(now ? 'Thank them, and bring up ' + nameOf(next.user_id) : 'Bring up ' + nameOf(next.user_id) + '', 'btn-primary', function () {
         var done = now ? db.from('live_queue').update({ state: 'shown' }).eq('id', now.id) : Promise.resolve({});
         done.then(function () { setPin({ kind: 'item', id: next.id }); refreshLive(); });
       }));
-      if (now) acts.appendChild(button('Thank them, and clear the stage', 'btn-secondary', function () {
+      if (now) acts.appendChild(button('Thank them, and clear the stage', next ? 'btn-secondary' : 'btn-primary', function () {
         db.from('live_queue').update({ state: 'shown' }).eq('id', now.id).then(function () { setPin(null); refreshLive(); });
       }));
       box.appendChild(acts);
@@ -942,9 +944,12 @@
   function drawQueue() {
     drawOnStage();
     var q = L.queue(S.items);
+    // Whoever is on the main stage is in the box above, not twice.
+    var staged = S.onStage && S.onStage.kind === 'item' ? S.onStage.id : null;
+    var waiting = q.waiting.filter(function (x) { return x.id !== staged; });
     var list = $('[data-queue]'); list.replaceChildren();
-    if (!q.waiting.length) list.appendChild(el('li', 'live-empty small', q.shown.length ? 'Everyone waiting has shown their work.' : 'No one is waiting yet.'));
-    q.waiting.forEach(function (item, i) {
+    if (!waiting.length && !staged) list.appendChild(el('li', 'live-empty small', q.shown.length ? 'Everyone waiting has shown their work.' : 'No one is waiting yet.'));
+    waiting.forEach(function (item, i) {
       var li = el('li', 'live-item' + (i === 0 ? ' next' : ''));
       if (i === 0) li.appendChild(el('p', 'kicker', 'Next to present'));
       li.appendChild(el('p', 'live-who', nameOf(item.user_id)));
@@ -977,6 +982,7 @@
     box.replaceChildren();
     if (S.teaching) return;
     var mine = q.waiting.filter(function (x) { return x.user_id === S.me.id; })[0];
+    if (mine && S.onStage && S.onStage.kind === 'item' && S.onStage.id === mine.id) return;
     if (mine) {
       // Their own card above already says they are waiting.
       box.appendChild(button('Take my name off the list', 'btn-secondary small', function () {
