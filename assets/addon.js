@@ -16,7 +16,7 @@
 // already has; a small window to /account/?handoff=meet that signs in and
 // hands the session back with postMessage (this origin only, from the
 // window it opened, and only the two Supabase tokens); and, if none of
-// those work, a link to open the live page in a new tab.
+// those work, a link to open the panel in a new tab.
 //
 // What it never does: record, measure, or join the call as a
 // participant. It reads the meeting code and nothing else from Meet.
@@ -592,7 +592,7 @@
     // Outside Meet, this page already is the browser tab.
     full.hidden = standalone;
     if (standalone) document.title = (window.CohortLib ? window.CohortLib.sessionName(S.session.number) : 'Week ' + S.session.number) + ', ' + S.cohort.title + ' | Human Shaped';
-    $('[data-fallback-link]').href = full.href;
+    $('[data-fallback-link]').href = '/addon/?c=' + encodeURIComponent(S.cohort.slug) + '&s=' + S.session.number;
     $('[data-open-stage]').hidden = !S.teaching || standalone;
     // The main stage is a leader's first move in a call, so its button sits
     // at the top of the panel, not below every part.
