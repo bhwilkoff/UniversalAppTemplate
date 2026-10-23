@@ -2678,7 +2678,7 @@ html.app-nav-open[data-signed-in] body:not([data-no-app-nav]) .app-nav { display
 .scene-detail { margin: 0.4rem 0 0 3.25rem; max-width: 40rem; }
 .scene-detail .scene-body { margin: 0 0 0.5rem; }
 .scene-detail .scene-prompt { margin: 0 0 0.5rem; font-weight: 600; }
-.scene-detail .scene-note { margin: 0.5rem 0 0; padding: 0.5rem 0.75rem; border-left: 3px solid var(--accent); background: var(--tint, transparent); color: var(--muted); }
+.scene-detail .scene-note { margin: 0.5rem 0 0; color: var(--muted); }
 .show-list.is-read-only .scene-item { background: transparent; }
 .session-bring, .session-plan { margin: 2rem 0; }
 .session-bring h2, .session-plan h2 { margin: 0 0 0.75rem; }
