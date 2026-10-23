@@ -734,6 +734,25 @@ each target file before the shot. It takes no lease: the browser is a
 private headless instance. `tools/webdrive.py` is a stdlib-only CDP
 driver for typing and clicking when a flow needs input.
 
+- **It waits for the page, not a clock.** Chrome is driven over CDP: a
+  fresh profile, `--remote-debugging-port=0`, the viewport set with
+  `Emulation.setDeviceMetricsOverride` (headless Chrome floors its window
+  near 500 px, so `--window-size=375` was never 375), then a poll of
+  `document.body.innerText` until the route's `ready` regex matches, then
+  `Page.captureScreenshot`. The old `--virtual-time-budget --screenshot`
+  shot when virtual time ran out, sometimes before the data fetch finished
+  (Ear Drama, 2026-10-23: three of five loads of one route rendered).
+- **`ready` is text only the rendered route has.** A tab label is on every
+  page, so waiting for one shoots the empty shell.
+- **Blind is red, not silent.** A route that never shows its `ready` text
+  is shot anyway at 20 s and graded `<route>.ready` FAIL, "timed out
+  waiting". `report.json` records `ready_ms` per route and viewport.
+- **A server that drops requests is graded too.** `<route>.loads_complete`
+  fails when a same-origin request dies in the network layer:
+  `python3 -m http.server` (listen backlog 5) resets connections when a page
+  opens many scripts at once, and the app boots half-loaded.
+  `tools/devserve.py` uses a backlog of 128.
+
 ---
 
 ## Windows
