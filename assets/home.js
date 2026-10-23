@@ -197,9 +197,9 @@
       var acts = [];
       var meet = safeUrl(u.session.meet_url);
       if (u.live && meet) acts.push(link(meet, 'Join the call', 'btn-primary'));
-      acts.push(link('/live/?c=' + slug, 'Live session', u.live && !meet ? 'btn-primary' : 'btn-secondary small'));
+      acts.push(link('/session/?c=' + slug + '&s=' + Number(u.session.number), 'Open the session', u.live && !meet ? 'btn-primary' : 'btn-secondary small'));
       list.appendChild(U().row({
-        title: c.title + ', week ' + u.session.number, href: '/cohort/?c=' + slug,
+        title: c.title + ', ' + (Number(u.session.number) === 0 ? 'prep session' : 'week ' + u.session.number), href: '/cohort/?c=' + slug,
         meta: u.live ? null : H.whenText(u.session.starts_at, m.now, m.zone),
         status: u.live ? U().status('session', 'live') : null, actions: acts
       }));

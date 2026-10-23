@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Session | Human Shaped</title>
+  <meta name="description" content="One session of a Human Shaped cohort: when it is, its Google Meet link, what to bring, and the plan for the hour, and while it runs, the parts, checks, and work being shown.">
+  <link rel="canonical" href="https://humanshaped.org/session/">
+  <meta property="og:url" content="https://humanshaped.org/session/">
+  <meta property="og:site_name" content="Human Shaped">
+  <meta property="og:title" content="Session">
+  <meta property="og:description" content="One session of a Human Shaped cohort: when it is, its Google Meet link, what to bring, and the plan for the hour, and while it runs, the parts, checks, and work being shown.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://humanshaped.org/assets/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="The human-shaped wordmark, with its hyphen drawn as an arch, above the line: apps that wear the builder&#x27;s values on their sleeves.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#131916" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="/assets/favicon.svg?v=20261006q" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20261006q">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/site.css?v=20261023b">
+  <script>
+    (function () {
+      var q = location.search, t = null;
+      if (/[?&]dark\b/.test(q)) t = 'dark'; else if (/[?&]light\b/.test(q)) t = 'light';
+      else { try { t = localStorage.getItem('hs-theme'); } catch (e) {} }
+      if (t) document.documentElement.setAttribute('data-theme', t);
+      // Signed in: the page wears the hub's sidebar (PAGES.md), chosen before
+      // it draws, from the session this browser keeps.
+      try { var se = JSON.parse(localStorage.getItem('sb-bifrieqzkihuxfzttgvd-auth-token') || 'null'); if (se && se.user && se.expires_at * 1000 > Date.now() - 7 * 864e5) document.documentElement.setAttribute('data-signed-in', ''); } catch (e) {}
+      try { if (localStorage.getItem('hs-nav') === 'collapsed') document.documentElement.setAttribute('data-nav', 'collapsed'); } catch (e) {}
+    })();
+  </script>
+  <script src="/assets/site.js?v=20261022o" defer></script>
+  <script src="/assets/ui.js?v=20261022y" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to the page</a>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
+      <nav class="nav" aria-label="Main">
+        <ul>
+          <li><a href="/principles/">Principles</a></li>
+          <li><a href="/cohorts/">Cohorts</a></li>
+          <li><a href="/apps/">Apps</a></li>
+          <li><a href="/events/">Events</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022j#moon"/></svg>
+        </button>
+        <a class="btn-primary small" href="/account/">
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022j#github"/></svg>
+          <span>Sign in<span class="long"> with GitHub</span></span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <div class="wrap">
+      <div class="account cohort-page live-page session-page" data-live>
+        <section class="account-state" data-state="loading"><h1 class="visually-hidden">The session</h1><div class="ui-skeleton" aria-busy="true"><span class="visually-hidden" role="status">Loading</span><i></i><i></i><i></i></div></section>
+        <section class="account-state" data-state="signed-out" hidden><h1 class="visually-hidden">Human Shaped</h1><div data-gate="signed-out"></div></section>
+        <section class="account-state" data-state="not-member" hidden><h1 class="visually-hidden">Human Shaped</h1><div data-gate="not-member"></div></section>
+        <section class="account-state" data-state="no-sessions" hidden><h1 class="visually-hidden">The session</h1><div data-no-sessions></div></section>
+        <section class="account-state" data-state="error" hidden>
+          <h1 class="visually-hidden">The session</h1>
+          <p class="error" data-error-text role="alert"></p>
+          <p><button class="btn-secondary" type="button" data-reload>Try again</button></p>
+        </section>
+
+        <section class="account-state" data-state="ready" hidden>
+          <div class="cohort-top" data-cohort-nav hidden></div>
+          <header class="page-head">
+            <p class="kicker" data-kicker></p>
+            <h1 data-title></h1>
+            <p class="session-meta" data-when></p>
+            <p class="lead" data-scope></p>
+            <div class="actions" data-top-actions></div>
+          </header>
+
+          <!-- Before and after a session, its leaders change it here: its
+               title, its challenge, its recording, and its plan (JOURNEYS.md,
+               S1 and L5). While it runs, the plan changes from the add-on
+               in Meet, or from "Run it here" below. -->
+          <section class="session-edit" aria-labelledby="session-edit-head" data-session-edit hidden>
+            <h2 id="session-edit-head">The plan</h2>
+            <div class="show-box" data-session-builder></div>
+            <details class="session-details">
+              <summary>Title, challenge, and recording</summary>
+              <form class="cohort-form" data-session-form>
+                <label>Title <input type="text" name="title" maxlength="200"></label>
+                <label>The challenge, in your words <textarea name="scope" rows="2" maxlength="2000"></textarea></label>
+                <label>Recording link <input type="url" name="recording_url" placeholder="https://"></label>
+                <label class="check" data-showcase-only hidden><input type="checkbox" name="public_showcase"> Open to guests</label>
+                <label class="check" data-showcase-only hidden><input type="checkbox" name="showcase_shares_link"> Show its Meet link to guests</label>
+                <div class="actions"><button class="btn-primary" type="submit">Save the session</button><span class="ui-inline-status" role="status" data-session-form-status></span></div>
+              </form>
+            </details>
+          </section>
+
+          <!-- Live signals (C1): where everyone should be, the teacher's card,
+               who is on stage, and "recording now", sent from the teacher's
+               controls below. Words by Claude, awaiting Ben's review. -->
+          <div class="signal-recording" data-sig-recording hidden></div>
+          <section class="signal-where" aria-label="Where everyone should be" data-sig-where hidden></section>
+          <section class="signal-card" aria-label="A card from your leader" data-sig-card hidden></section>
+          <section class="signal-stage" aria-label="Who is on stage" data-sig-stage hidden></section>
+
+          <p class="notice small">Sessions are recorded for anyone who misses one. <span data-vis="cohort"></span></p>
+
+          <!-- The run of show (R1, research/notes/run-of-show-design.md): the
+               session as a timeline of scenes, the current one open with what
+               it needs, and everything else under "Any time in the show". The
+               same component draws the Meet add-on's panel (assets/show-view.js),
+               and the parts below are moved into it by scene. Words by Claude,
+               awaiting Ben's review. -->
+          <div data-show></div>
+
+          <div class="show-parts">
+          <!-- The teacher's cues, from SignalsLib.controlsHtml() (H4), split by scene. -->
+          <div class="signal-controls" data-sig-controls hidden><div data-sig-controls-body></div></div>
+
+          <!-- What this part of the session needs (M12): the teacher's
+               "what I heard" while people arrive, and each group's room and
+               turns during "Show what you brought back". Words by Claude,
+               awaiting Ben's review. -->
+          <div data-now-body></div>
+
+          <!-- The rooms (C2, assets/rooms.js): each group's room, where it is
+               in its turns, and "We would like the teacher". A teacher sees
+               every group; anyone else, their own. Words by Claude, awaiting
+               Ben's review. -->
+          <div class="room-board" id="rooms" data-rooms hidden></div>
+
+          <!-- During class (C6), for the cohort's teachers alone (assets/live-commits.js).
+               Words by Claude, awaiting Ben's review. -->
+          <div class="live-pushed" data-pushed-section hidden>
+            <ol class="commit-list live-pushed-list" data-pushed></ol>
+            <div class="actions"><button class="btn-secondary" type="button" data-pushed-reload hidden>Read GitHub again</button><span class="small" data-pushed-status role="status"></span></div>
+          </div>
+
+          <!-- The queue and checks for understanding (M3): copy awaiting Ben's review. -->
+          <div data-wings>
+            <div class="on-stage" data-on-stage hidden></div>
+            <p class="small">Present your work’s own tab from Meet.</p>
+            <ol class="live-queue" data-queue></ol>
+            <details class="live-shown" data-shown-wrap hidden>
+              <summary data-shown-summary></summary>
+              <ol class="live-queue shown" data-shown></ol>
+            </details>
+            <form class="inline-form live-add" data-add>
+              <label>What you want to show
+                <select data-add-what></select>
+              </label>
+              <label data-add-link-wrap hidden>Link
+                <input type="url" inputmode="url" placeholder="https://" data-add-link>
+              </label>
+              <label>What to look at (optional)
+                <input type="text" maxlength="300" data-add-note>
+              </label>
+              <div class="actions"><button class="btn-secondary" type="submit">Ask to present it</button><span class="small" data-add-status role="status"></span></div>
+            </form>
+          </div>
+
+          <!-- This session's thread (C5): copy awaiting Ben's review. -->
+          <div data-thread-section hidden><div data-thread></div></div>
+
+          <!-- From the conversation (M9): copy awaiting Ben's review. -->
+          <div data-talk-section hidden><div data-talk></div></div>
+
+          <div data-questions>
+            <p class="small" data-checks-intro></p>
+            <div class="live-scene-question" data-scene-question hidden></div>
+            <form class="inline-form live-ask" data-ask hidden>
+              <div data-ask-fields></div>
+              <label class="check"><input type="checkbox" data-ask-tally> Show everyone the results as answers come in</label>
+              <div class="actions"><button class="btn-secondary" type="submit">Ask everyone</button><button class="btn-secondary" type="button" data-ask-closing>Ask the two closing questions</button><span class="small" data-ask-status role="status"></span></div>
+            </form>
+            <div class="live-checks" data-checks></div>
+            <details class="live-earlier" data-earlier-wrap hidden>
+              <summary>Earlier questions</summary>
+              <div class="live-checks" data-earlier></div>
+            </details>
+          </div>
+          <p class="small live-sync" data-sync></p>
+
+
+          <div data-stages-section hidden><ul class="links" data-stages></ul></div>
+
+          <div data-brought-section>
+            <p class="actions"><a class="btn-secondary small" data-cohort-link>Share yours</a></p>
+            <div data-brought></div>
+          </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" defer></script>
+  <script src="/assets/hub-config.js?v=20261016a" defer></script>
+  <script src="/assets/cohort-lib.js?v=20261023b" defer></script>
+  <script src="/assets/live-lib.js" defer></script>
+  <script src="/assets/question-view.js?v=20261022j" defer></script>
+  <script src="/assets/board-lib.js" defer></script>
+  <script src="/assets/followup-lib.js" defer></script>
+  <script src="/assets/live-commits.js" defer></script>
+  <script src="/assets/signals-lib.js?v=20261022j" defer></script>
+  <script src="/assets/signals.js?v=20261023b" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.4.16/purify.min.js" integrity="sha512-flQmhkXNRQ3iUfvtdCobtpMjCb6kE+zLnTiAulAQJ3WykVfy84JvCMOo6vhwWXHTXjR25h9Zj+LyGFRWKjRoag==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
+  <script src="/assets/rooms-lib.js" defer></script>
+  <script src="/assets/rooms.js?v=20261022j" defer></script>
+  <script src="/assets/discussions-lib.js" defer></script>
+  <script src="/assets/session-thread-lib.js?v=20261023b" defer></script>
+  <script src="/assets/discussions.js?v=20261022y" defer></script>
+  <script src="/assets/show-lib.js" defer></script>
+  <script src="/assets/show-view-lib.js?v=20261022j" defer></script>
+  <script src="/assets/curriculum-pages-lib.js" defer></script>
+  <script src="/assets/show-view.js?v=20261022a" defer></script>
+  <script src="/assets/show-run.js" defer></script>
+  <script src="/assets/teach-lib.js?v=20261023b" defer></script>
+  <script src="/assets/curriculum-lib.js?v=20261023b" defer></script>
+  <script src="/assets/curriculum-seed.js?v=20261023b" defer></script>
+  <script src="/assets/show-builder.js?v=20261023b" defer></script>
+  <script src="/assets/cohort-nav.js?v=20261023a" defer></script>
+  <script src="/assets/live.js?v=20261023b" defer></script>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="footer-brand">
+        <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
+        <p>The ideas, the method, the tools, and the cohorts are free, and what you build is yours.</p>
+        <p><a href="/about/">About Human Shaped</a></p>
+      </div>
+      <nav class="footer-links" aria-label="More of the site">
+        <div>
+          <p class="footer-head">Take part</p>
+          <ul>
+            <li><a href="/account/">Your account</a></li>
+            <li><a href="/teach/">Lead a cohort</a></li>
+            <li><a href="/connect/">Connect your agent</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="footer-head">On GitHub</p>
+          <ul>
+            <li><a href="https://github.com/bhwilkoff/UniversalAppTemplate">The template</a></li>
+            <li><a href="https://github.com/orgs/humanshaped/discussions">Discussions</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="footer-head">The fine print</p>
+          <ul>
+            <li><a href="/support/">Help</a></li>
+            <li><a href="/privacy/">Privacy</a></li>
+            <li><a href="/terms/">Terms</a></li>
+          </ul>
+        </div>
+      </nav>
+      <p class="footer-made">Made by <a href="https://learningischange.com">Ben Wilkoff</a>, with <a href="/support/#credits">help from people and tools</a>.</p>
+    </div>
+  </footer>
+</body>
+</html>

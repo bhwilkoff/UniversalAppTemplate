@@ -672,8 +672,8 @@
     st.hidden = false;
   }
 
-  // Sessions, for learners: each week's session on their own clock, with
-  // its call and its live session while it runs or is next.
+  // Sessions, for everyone: each session on their own clock, opening its
+  // own page (JOURNEYS.md, S1), with the call for the one on now or next.
   function drawSessionList(sessions) {
     var box = $('[data-session-list]');
     if (!box) return;
@@ -685,12 +685,10 @@
     sessions.forEach(function (s) {
       var acts = [];
       var live = t.live && s.number === nextNo;
-      if (s.number === nextNo) acts.push(window.UI.link('Live session', '/live/?c=' + encodeURIComponent(cohort.slug), live ? 'btn-primary small' : 'btn-secondary small'));
-      if (s.number === nextNo && safe(s.meet_url)) { var j = window.UI.link('Join the call', s.meet_url, 'btn-secondary small'); j.target = '_blank'; j.rel = 'noopener'; acts.push(j); }
-      if (safe(s.recording_url)) acts.push(window.UI.link('Recording', s.recording_url, 'btn-secondary small'));
+      if (s.number === nextNo && safe(s.meet_url)) { var j = window.UI.link('Join the call', s.meet_url, live ? 'btn-primary small' : 'btn-secondary small'); j.target = '_blank'; j.rel = 'noopener'; acts.push(j); }
       var past = s.starts_at && new Date(s.starts_at) < new Date() && !live;
       list.appendChild(window.UI.row({
-        title: 'Week ' + s.number + (s.title && s.title !== 'Week ' + s.number ? ': ' + s.title : ''),
+        title: lib.sessionTitle(s), href: lib.sessionUrl(cohort.slug, s.number),
         meta: s.starts_at ? when(s.starts_at) : 'Not scheduled yet',
         status: window.UI.status('session', live ? 'live' : past ? 'finished' : s.meet_url ? 'ready' : 'planned'),
         actions: acts
@@ -721,7 +719,7 @@
     week = t.current ? t.current.number : null;
     var myGroup = groups.filter(function (g) { return g.group_members.some(function (m) { return m.user_id === me.id; }); })[0];
     var room = myGroup ? safe(myGroup.meet_url) : null;
-    $('[data-week-title]').textContent = t.current ? 'Week ' + t.current.number + (t.current.title && t.current.title !== 'Week ' + t.current.number ? ': ' + t.current.title : '') : 'This week';
+    $('[data-week-title]').textContent = t.current ? lib.sessionTitle(t.current) : 'This week';
     $('[data-week-scope]').textContent = t.current && t.current.scope ? t.current.scope : 'Not posted yet';
     drawWeekMove(t.current ? t.current.number : null);
     drawBackground();
@@ -731,14 +729,16 @@
       // During the group part, your group's own room comes first.
       var part = t.live ? lib.partNow(lib.agenda(cohort.session_minutes), t.next.starts_at, new Date()) : null;
       if (room && part && part.key === 'show') { var gr = link(room, 'Join your group’s room'); gr.className = 'btn-primary'; na.appendChild(gr); }
-      if (safe(t.next.meet_url)) { var j = link(t.next.meet_url, t.live ? (part && part.key === 'show' && room ? 'The main session' : 'Join the session now') : 'The Meet link'); j.className = room && part && part.key === 'show' ? 'btn-secondary' : 'btn-primary'; na.appendChild(j); }
-      var lp = link('/live/?c=' + encodeURIComponent(cohort.slug), 'The session page'); lp.className = 'btn-secondary'; na.appendChild(lp);
+      // One session, one name for its call and one for its page
+      // (JOURNEYS.md, S1).
+      if (safe(t.next.meet_url)) { var j = link(t.next.meet_url, 'Join the call'); j.className = room && part && part.key === 'show' ? 'btn-secondary' : 'btn-primary'; na.appendChild(j); }
+      var lp = link(lib.sessionUrl(cohort.slug, t.next.number), 'Open the session'); lp.className = 'btn-secondary'; lp.removeAttribute('target'); lp.removeAttribute('rel'); na.appendChild(lp);
     } else {
       $('[data-next-when]').textContent = sessions.length ? 'All sessions done' : 'Not scheduled yet';
     }
     drawRunOfShow(t.next);
     var past = sessions.filter(function (s) { return safe(s.recording_url); });
-    past.forEach(function (s) { na.appendChild(link(s.recording_url, 'Week ' + s.number + ' recording')); });
+    past.forEach(function (s) { na.appendChild(link(s.recording_url, lib.sessionName(s.number) + ' recording')); });
 
     $('[data-group-section]').hidden = !myGroup;
     if (myGroup) {
@@ -762,7 +762,7 @@
       form.elements.app_name.value = mine.app_name || '';
       form.elements.app_repo.value = mine.app_repo || '';
       form.elements.app_url.value = mine.app_url || '';
-      form.elements.email.value = contact && contact.email ? contact.email : '';
+      drawInviteLine();
     }
     var box = $('[data-people]'); box.replaceChildren();
     people.filter(function (p) { return p.role === 'student' || p.role === 'mentor'; }).forEach(function (p) { box.appendChild(personCard(p)); });
@@ -805,18 +805,28 @@
     });
   }
 
+  // Where this cohort's calendar invitations go, set once on /account/
+  // for every cohort (migration 20261023010000).
+  function drawInviteLine() {
+    var line = $('[data-invite-line]');
+    if (!line) return;
+    db.rpc('my_invite_address', { c: cohort.id }).then(function (r) {
+      line.replaceChildren();
+      if (r.error || !r.data) return;
+      var change = link('/account/#calendar', 'Change');
+      line.appendChild(document.createTextNode(r.data.email ? 'Each session’s invitation goes to ' + r.data.email + '. ' : 'Your sessions are not on your calendar. '));
+      line.appendChild(change);
+    });
+  }
+
   $('[data-my-app]').addEventListener('submit', function (ev) {
     ev.preventDefault();
     var f = ev.target.elements, msg = $('[data-my-app-message]');
     var repo = f.app_repo.value.trim() ? lib.repoPath(f.app_repo.value) : null;
     if (f.app_repo.value.trim() && !repo) { msg.textContent = 'Give the repository as owner/name, for example bea/garden-swap, or paste its GitHub link.'; return; }
     msg.textContent = 'Saving…';
-    var email = f.email.value.trim();
     Promise.all([
       db.from('enrollments').update({ app_name: f.app_name.value.trim() || null, app_repo: repo, app_url: f.app_url.value.trim() || null }).eq('cohort_id', cohort.id).eq('user_id', me.id),
-      email
-        ? db.from('calendar_contacts').upsert({ cohort_id: cohort.id, user_id: me.id, email: email })
-        : db.from('calendar_contacts').delete().eq('cohort_id', cohort.id).eq('user_id', me.id),
       canShow
         ? db.from('enrollments').update({ app_public: f.app_public.checked }).eq('cohort_id', cohort.id).eq('user_id', me.id)
         : Promise.resolve({})

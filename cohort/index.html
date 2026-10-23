@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261022za">
+  <link rel="stylesheet" href="/assets/site.css?v=20261023b">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -158,13 +158,12 @@
           </section>
           </div>
           <div data-tab="sessions" hidden>
-          <section aria-labelledby="sessions-title" data-learner-view>
+          <section aria-labelledby="sessions-title">
             <h2 id="sessions-title">Sessions</h2>
+            <div class="ui-toolbar" data-leader-only hidden><button class="btn-primary" type="button" data-make-sessions>Make the sessions</button></div>
             <div data-session-list></div>
           </section>
           <div data-leader-only hidden>
-              <div class="ui-toolbar"><button class="btn-primary" type="button" data-make-sessions>Make the weekly sessions</button><a class="btn-secondary" data-live-link href="/live/">Open the live session</a></div>
-              <div data-sessions></div>
               <section class="panel-section question-bank" data-question-bank hidden aria-labelledby="question-bank">
                 <h2 id="question-bank">Question bank</h2>
                 <div data-bank></div>
@@ -308,7 +307,7 @@
                 <label class="check"><input type="checkbox" name="app_public"> Show it on the apps page</label>
                 <p class="hint"><span data-vis="public"></span> Its name, repository, and address, which name your GitHub account.</p>
               </div>
-              <label>Email for calendar invitations (optional)<input name="email" type="email" maxlength="254"><span class="hint"><span data-vis="teachers"></span></span></label>
+              <p class="small" data-invite-line></p>
               <div class="actions"><button class="btn-secondary" type="submit">Save</button><span class="small" data-my-app-message></span></div>
             </form>
           </section>
@@ -349,7 +348,7 @@
               </section>
               <section class="panel-section" aria-labelledby="calls-title">
                 <h2 id="calls-title">Calls</h2>
-                <p class="actions"><a class="btn-secondary" data-rooms-link href="/live/#rooms">Every group room now</a></p>
+                <p class="actions"><a class="btn-secondary" data-rooms-link href="/session/#rooms">Every group room now</a></p>
                 <details class="ui-disclosure">
                   <summary>Set up Meet by hand</summary>
                   <p class="actions"><button class="btn-secondary" type="button" data-copy-meet>Copy the setup for the Meet script</button></p>
@@ -373,7 +372,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" defer></script>
   <script src="/assets/hub-config.js?v=20261016a" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.4.16/purify.min.js" integrity="sha512-flQmhkXNRQ3iUfvtdCobtpMjCb6kE+zLnTiAulAQJ3WykVfy84JvCMOo6vhwWXHTXjR25h9Zj+LyGFRWKjRoag==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
-  <script src="/assets/cohort-lib.js?v=20261022j" defer></script>
+  <script src="/assets/cohort-lib.js?v=20261023b" defer></script>
   <script src="/assets/submit-lib.js?v=20261022a" defer></script>
   <script src="/assets/discussions-lib.js" defer></script>
   <script src="/assets/discussions.js?v=20261022y" defer></script>
@@ -391,7 +390,7 @@
   <script src="/assets/recognition-lib.js" defer></script>
   <script src="/assets/curriculum-pages-lib.js" defer></script>
   <script src="/assets/cohort-nav.js?v=20261022u" defer></script>
-  <script src="/assets/teach-lib.js?v=20261022c" defer></script>
+  <script src="/assets/teach-lib.js?v=20261023b" defer></script>
   <script src="/assets/teach-page.js?v=20261022j" defer></script>
   <script src="/assets/rooms-lib.js" defer></script>
   <script src="/assets/followup-lib.js" defer></script>
@@ -402,11 +401,11 @@
   <script src="/assets/question-view.js?v=20261022j" defer></script>
   <script src="/assets/question-bank.js?v=20261022j" defer></script>
   <script src="/assets/board-lib.js" defer></script>
-  <script src="/assets/curriculum-lib.js" defer></script>
-  <script src="/assets/curriculum-seed.js" defer></script>
-  <script src="/assets/show-builder.js?v=20261022j" defer></script>
-  <script src="/assets/teach-cohort.js?v=20261022za" defer></script>
-  <script src="/assets/cohort.js?v=20261022y" defer></script>
+  <script src="/assets/curriculum-lib.js?v=20261023b" defer></script>
+  <script src="/assets/curriculum-seed.js?v=20261023b" defer></script>
+  <script src="/assets/show-builder.js?v=20261023b" defer></script>
+  <script src="/assets/teach-cohort.js?v=20261023b" defer></script>
+  <script src="/assets/cohort.js?v=20261023b" defer></script>
   <script src="/assets/exchange-lib.js?v=20261022a" defer></script>
   <script src="/assets/exchange-list.js?v=20261022d" defer></script>
 

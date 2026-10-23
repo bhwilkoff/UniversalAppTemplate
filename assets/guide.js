@@ -9,7 +9,7 @@
   var mine = ((note && note.cohorts) || []).filter(function (c) { return c.role === 'teacher' && c.status !== 'finished'; });
   function place(c, key) {
     if (key === 'edit') return '/teach/cohort/edit/?c=' + c.id;
-    if (key === 'live') return '/live/?c=' + encodeURIComponent(c.slug);
+    if (key === 'live') return '/session/?c=' + encodeURIComponent(c.slug);
     return window.CohortNav.href({ cohort: c }, { key: SECTION[key] || key });
   }
   function apply(c) {

@@ -21,16 +21,17 @@ test('a first day that is already the session weekday counts', () => {
   assert.deepEqual(lib.sessionDates('2026-10-20', 2, 1), ['2026-10-20']);
 });
 test('session rows cross the daylight saving change at the same local time', () => {
-  const rows = lib.sessionRows({ id: 'x', starts_on: '2026-10-19', session_weekday: 2, session_time: '17:00:00', time_zone: 'America/Denver', weeks: 3 });
+  const rows = lib.sessionRows({ id: 'x', starts_on: '2026-10-19', session_weekday: 2, session_time: '17:00:00', time_zone: 'America/Denver', weeks: 2 });
   assert.deepEqual(rows.map(r => r.starts_at), ['2026-10-20T23:00:00.000Z', '2026-10-27T23:00:00.000Z', '2026-11-04T00:00:00.000Z']);
-  assert.deepEqual(rows.map(r => r.number), [1, 2, 3]);
+  assert.deepEqual(rows.map(r => r.number), [0, 1, 2]);
+  assert.deepEqual(rows.map(r => r.title), ['Prep', 'Week 1', 'Week 2']);
 });
 test('no session rows until the day, time, and first day are set', () => {
   assert.equal(lib.sessionRows({ starts_on: '2026-10-19', session_weekday: null, session_time: '17:00', time_zone: 'UTC', weeks: 5 }), null);
 });
 test('the Meet setup matches what tools/meet-events reads', () => {
   const out = lib.meetSetup({ slug: 'fall-2026', title: 'Fall 2026', starts_on: '2026-10-19', session_weekday: 2, session_time: '17:00:00', time_zone: 'America/Denver', session_minutes: 75, weeks: 5 }, ['a@example.org', 'b@example.org'], ['t@example.org']);
-  assert.deepEqual(out, { id: 'fall-2026', title: 'Fall 2026', startDate: '2026-10-20', weekday: 'TU', startTime: '17:00', timeZone: 'America/Denver', minutes: 75, sessions: 5, members: 'a@example.org, b@example.org', teachers: 't@example.org', sessionUrl: 'https://humanshaped.org/live/?c=fall-2026' });
+  assert.deepEqual(out, { id: 'fall-2026', title: 'Fall 2026', startDate: '2026-10-20', weekday: 'TU', startTime: '17:00', timeZone: 'America/Denver', minutes: 75, sessions: 5, members: 'a@example.org, b@example.org', teachers: 't@example.org', sessionUrl: 'https://humanshaped.org/session/?c=fall-2026' });
 });
 
 test('the feedback queue holds unanswered requests and questions, oldest first', () => {
@@ -67,17 +68,11 @@ test('a schedule without a day or time says so', () => {
 
 const draft = { slug: 'spring', status: 'draft', starts_on: null, session_weekday: null, session_time: null, github_repo: null, github_team: null };
 const keysDone = (steps) => steps.filter((s) => s.done).map((s) => s.key);
-test('a new draft cohort has every setup step still to do', () => {
+test('a new draft cohort has every setup step still to do, and only what a leader decides', () => {
   const steps = lib.cohortSetupSteps(draft, [], null);
-  assert.deepEqual(steps.map((s) => s.key), ['schedule', 'sessions', 'host', 'event', 'repo', 'open', 'groups', 'rehearse', 'agent']);
+  assert.deepEqual(steps.map((s) => s.key), ['schedule', 'sessions', 'repo', 'open', 'agent']);
   assert.deepEqual(keysDone(steps), []);
-});
-test('a Meet link on one week checks off the host, and on every week the event', () => {
-  const c = { ...draft, starts_on: '2026-10-19', session_weekday: 2, session_time: '17:00:00' };
-  const some = [{ meet_url: 'https://meet.google.com/abc-defg-hij' }, { meet_url: null }];
-  assert.deepEqual(keysDone(lib.cohortSetupSteps(c, some, null)), ['schedule', 'sessions', 'host']);
-  const all = [{ meet_url: 'https://meet.google.com/abc-defg-hij' }, { meet_url: 'https://meet.google.com/abc-defg-hij' }];
-  assert.deepEqual(keysDone(lib.cohortSetupSteps(c, all, null)), ['schedule', 'sessions', 'host', 'event']);
+  assert.equal(steps.some((s) => /host|Meet links|Rehearse/i.test(s.label)), false);
 });
 test('the conversation step appears once the repository and team are named, and checks off for a member', () => {
   const c = { ...draft, status: 'open', github_repo: 'humanshaped/cohort-spring', github_team: 'cohort-spring' };
@@ -88,21 +83,21 @@ test('the conversation step appears once the repository and team are named, and 
   assert.deepEqual(keysDone(invited), ['repo', 'open']);
   assert.equal(lib.cohortSetupSteps(c, [], { state: 'member' }).find((s) => s.key === 'talk').done, true);
 });
-test('the trios step checks off only when every group has its room', () => {
+test('once there are sessions, reading the first one is offered, and never keeps the card open', () => {
   const c = { ...draft, status: 'open' };
-  const step = (groups) => lib.cohortSetupSteps(c, [], null, null, { groups }).find((s) => s.key === 'groups');
-  assert.equal(step([]).done, false);
-  assert.equal(step([]).note, null);
-  const half = step([{ meet_url: 'https://meet.google.com/aaa-bbbb-ccc' }, { meet_url: null }]);
-  assert.equal(half.done, false);
-  assert.match(half.note, /Meet links again/);
-  assert.equal(step([{ meet_url: 'https://meet.google.com/aaa-bbbb-ccc' }]).done, true);
+  const plan = lib.cohortSetupSteps(c, [{ number: 1 }, { number: 0 }], null).find((s) => s.key === 'plan');
+  assert.equal(plan.label, 'Read the prep session’s plan');
+  assert.equal(plan.href, '/session/?c=spring&s=0');
+  assert.equal(plan.optional, true);
 });
-test('rehearsing the live page links there and checks off once this browser has opened it', () => {
-  const r = lib.cohortSetupSteps(draft, [], null, null, { rehearsed: true }).find((s) => s.key === 'rehearse');
-  assert.equal(r.href, '/live/?c=spring');
-  assert.equal(r.done, true);
-  assert.equal(lib.cohortSetupSteps(draft, [], null).find((s) => s.key === 'rehearse').done, false);
+test('the calendar is a note beside the sessions, never a step', () => {
+  const now = new Date('2026-10-23T12:00:00Z');
+  const ahead = (extra) => [{ starts_at: '2026-10-28T19:00:00Z', ...extra }, { starts_at: '2026-10-01T19:00:00Z' }];
+  assert.match(lib.calendarNote({ status: 'draft' }, ahead({}), now), /once the cohort is open/);
+  assert.match(lib.calendarNote({ status: 'open' }, ahead({}), now), /within the hour/);
+  assert.match(lib.calendarNote({ status: 'open' }, ahead({ calendar_event_id: 'e1' }), now), /^On everyone’s calendar/);
+  assert.equal(lib.calendarNote({ status: 'open' }, ahead({ calendar_error: 'Quota.' }), now), 'The calendar said: Quota.');
+  assert.equal(lib.calendarNote({ status: 'open' }, [{ starts_at: '2026-10-01T19:00:00Z' }], now), null);
 });
 test('connecting an agent is optional, so it never keeps the card open', () => {
   const a = lib.cohortSetupSteps(draft, [], null).find((s) => s.key === 'agent');
@@ -156,18 +151,8 @@ test("a session's checks come back with each answer in the person's words", () =
   assert.equal(out[1].answers[0].text, 'Pipelines');
 });
 
-// G1: a teacher asks meet@ for the calls, and the hub makes the repository.
-test('the event step asks meet@, and says where the request stands', () => {
-  const c = { ...draft, starts_on: '2026-10-19', session_weekday: 2, session_time: '17:00:00' };
-  const ev = (r) => lib.cohortSetupSteps(c, [{ meet_url: null }], null, r).find((s) => s.key === 'event');
-  assert.equal(ev(null).action, 'meet');
-  assert.equal(ev(null).note, null);
-  assert.match(ev({ state: 'waiting' }).note, /within the hour/);
-  assert.match(ev({ state: 'failed', detail: 'No start date.' }).note, /No start date\./);
-  const linked = lib.cohortSetupSteps(c, [{ meet_url: 'https://meet.google.com/abc-defg-hij' }], null, { state: 'done' }).find((s) => s.key === 'event');
-  assert.equal(linked.done, true);
-  assert.equal(linked.note, null);
-  assert.equal(lib.cohortSetupSteps(c, [], null).find((s) => s.key === 'repo').action, 'provision');
+test('the repository step asks the hub to make it', () => {
+  assert.equal(lib.cohortSetupSteps(draft, [], null).find((s) => s.key === 'repo').action, 'provision');
 });
 
 test('a short name for the address comes from the title, the way the database allows', () => {

@@ -59,7 +59,7 @@
       }));
     }
     bar.hidden = !bar.children.length;
-    $('[data-make-sessions]').textContent = sessions.length ? 'Update the weekly sessions' : 'Make the weekly sessions';
+    $('[data-make-sessions]').textContent = sessions.length ? 'Update the sessions' : 'Make the sessions';
     needs.draw();
   }
   // What needs the teacher, each a row with a count and a way there.
@@ -109,13 +109,11 @@
       drawFacts(c, res[1].data, res[2].data);
       drawOverview(c, res[1].data);
       say('[data-detail-message]', '');
-      drawSessions(res[1].data);
       if (window.QuestionBank) window.QuestionBank.mount($('[data-question-bank]'), { db: db, cohort: c });
       drawLesson(c, res[1].data);
       drawRoster(res[2].data, res[3].data);
       drawTeachers();
-      $('[data-rooms-link]').href = '/live/?c=' + encodeURIComponent(c.slug) + '#rooms';
-      $('[data-live-link]').href = '/live/?c=' + encodeURIComponent(c.slug);
+      $('[data-rooms-link]').href = '/session/?c=' + encodeURIComponent(c.slug) + '#rooms';
       loadSubmissions(res[2].data, res[1].data);
       drawGroups(res[3].data, res[2].data);
       drawCohortSetup(res[1].data, res[4].data, null);
@@ -137,10 +135,7 @@
   // checked off by what the hub can see (TeachLib.cohortSetupSteps). The
   // card goes away once every step is done.
   function drawCohortSetup(sessions, access, meetRequest) {
-    // /live/ remembers, in this browser only, that its teacher opened it.
-    var rehearsed = false;
-    try { rehearsed = !!localStorage.getItem('hs-rehearsed:' + current.id); } catch (e) {}
-    var steps = lib.cohortSetupSteps(current, sessions, access, meetRequest, { groups: currentGroups, rehearsed: rehearsed });
+    var steps = lib.cohortSetupSteps(current, sessions, access, meetRequest);
     var allDone = steps.every(function (x) { return x.done || x.optional; });
     $('[data-cohort-setup]').hidden = allDone;
     $('[data-setup-done]').replaceChildren(allDone ? U.empty('Setup done') : '');
@@ -157,7 +152,6 @@
         target = el('button', 'link', x.label); target.type = 'button';
         target.addEventListener('click', function () {
           if (x.action === 'sessions') $('[data-make-sessions]').click();
-          else if (x.action === 'meet') askMeet(target);
           else if (x.action === 'provision') provision(target);
           else if (x.action === 'groups') { if (tabsCtl) tabsCtl.go('people'); }
           else location.assign('/teach/cohort/edit/?c=' + current.id);
@@ -647,82 +641,6 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
       else how.textContent = 'No email. A note reaches them.';
       li.appendChild(how);
       ul.appendChild(li);
-    });
-  }
-
-  function drawSessions(sessions) {
-    var box = $('[data-sessions]');
-    box.replaceChildren();
-    if (!sessions.length) { box.appendChild(el('p', 'small', 'No sessions yet')); return; }
-    sessions.forEach(function (s) {
-      var f = el('form', 'session-row');
-      f.appendChild(el('p', 'session-when', 'Week ' + s.number + (s.starts_at ? ', ' + whenText(s.starts_at, current.time_zone) : '')));
-      [['title', 'Title', s.title], ['scope', 'This week’s challenge, in your words', s.scope], ['meet_url', 'Meet link', s.meet_url], ['recording_url', 'Recording link', s.recording_url]].forEach(function (x) {
-        var l = el('label', null, x[1]);
-        var input = x[0] === 'scope' ? el('textarea') : el('input');
-        input.name = x[0]; input.value = x[2] || '';
-        if (x[0] === 'scope') input.rows = 2;
-        if (/url/.test(x[0])) { input.type = 'url'; input.placeholder = 'https://'; }
-        l.appendChild(input); f.appendChild(l);
-      });
-      // The showing, open to guests (H5; migration 20261004030000): only
-      // once the database has the columns, so the page works before then.
-      // Words by Claude, awaiting Ben's review.
-      var showcase = 'public_showcase' in s;
-      if (showcase) {
-        var open = el('label', 'check');
-        var openBox = el('input'); openBox.type = 'checkbox'; openBox.name = 'public_showcase'; openBox.checked = !!s.public_showcase;
-        open.appendChild(openBox); open.appendChild(document.createTextNode(' Open to guests'));
-        f.appendChild(open);
-        var share = el('label', 'check');
-        var shareBox = el('input'); shareBox.type = 'checkbox'; shareBox.name = 'showcase_shares_link'; shareBox.checked = !!s.showcase_shares_link;
-        share.appendChild(shareBox); share.appendChild(document.createTextNode(' Show its Meet link to guests'));
-        f.appendChild(share);
-        var where = el('p', 'small');
-        function drawWhere() {
-          share.hidden = !openBox.checked;
-          where.replaceChildren();
-          if (!openBox.checked) return;
-          where.appendChild(document.createTextNode('Guests read only when it is, the way in if you share it, and the apps your learners chose to show. '));
-          var page = el('a', null, 'Its public page'); page.href = '/showcase/?c=' + encodeURIComponent(current.slug);
-          where.appendChild(page);
-          where.appendChild(document.createTextNode(' appears on Events once the cohort is open or running.'));
-        }
-        openBox.addEventListener('change', drawWhere);
-        drawWhere();
-        f.appendChild(where);
-      }
-      var save = el('button', 'btn-secondary', 'Save week ' + s.number); save.type = 'submit';
-      var msg = el('span', 'small');
-      var a = el('div', 'actions'); a.appendChild(save); a.appendChild(msg); f.appendChild(a);
-      // The run of show (R2): the class builder, opened under each week.
-      // Words by Claude, awaiting Ben's review.
-      if (window.ShowBuilder && window.ShowLib) {
-        var show = el('details', 'show-builder');
-        show.appendChild(el('summary', null, 'Run of show for week ' + s.number));
-        var showBox = el('div', 'show-box');
-        show.appendChild(showBox);
-        var mounted = false;
-        show.addEventListener('toggle', function () {
-          if (!show.open || mounted) return;
-          mounted = true;
-          window.ShowBuilder.mount(showBox, {
-            db: db, cohort: current, session: s, sessions: sessions,
-            agenda: window.CohortLib ? window.CohortLib.agenda(current.session_minutes) : [],
-            turn: window.LiveLib ? window.LiveLib.TURN : []
-          });
-        });
-        f.appendChild(show);
-      }
-      f.addEventListener('submit', function (ev) {
-        ev.preventDefault();
-        var e = f.elements;
-        var patch = { title: e.title.value.trim() || null, scope: e.scope.value.trim() || null, meet_url: e.meet_url.value.trim() || null, recording_url: e.recording_url.value.trim() || null };
-        if (showcase) { patch.public_showcase = e.public_showcase.checked; patch.showcase_shares_link = e.public_showcase.checked && e.showcase_shares_link.checked; }
-        msg.textContent = 'Saving…';
-        db.from('sessions').update(patch).eq('id', s.id).then(function (r) { msg.textContent = r.error ? 'Not saved: ' + r.error.message : 'Saved.'; });
-      });
-      box.appendChild(f);
     });
   }
 

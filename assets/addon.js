@@ -533,7 +533,7 @@
         var a = el('a', 'btn-primary', 'Open the thread on GitHub'); a.href = url; a.target = '_blank'; a.rel = 'noopener';
         box.appendChild(el('p')).appendChild(a);
       }
-      var live = el('a', null, 'Read and post on the session page'); live.href = '/live/?c=' + encodeURIComponent(S.cohort.slug); live.target = '_blank'; live.rel = 'noopener';
+      var live = el('a', null, 'Read and post on the session page'); live.href = '/session/?c=' + encodeURIComponent(S.cohort.slug) + '&s=' + S.session.number; live.target = '_blank'; live.rel = 'noopener';
       box.appendChild(el('p', 'small')).appendChild(live);
     });
   }
@@ -541,8 +541,8 @@
   function drawFrame() {
     $('[data-cohort-title]').textContent = S.cohort.title;
     var group = S.room.groupId ? S.groups.filter(function (g) { return g.id === S.room.groupId; })[0] : null;
-    $('[data-where]').textContent = 'Week ' + S.session.number + ', ' + (group ? group.name + '’s room' : 'the main room') + (S.teaching ? '. You are leading.' : '.') + (S.room.ambiguous ? ' Another cohort uses this call too.' : '');
-    var full = $('[data-full-link]'); full.href = '/live/?c=' + encodeURIComponent(S.cohort.slug);
+    $('[data-where]').textContent = (window.CohortLib ? window.CohortLib.sessionName(S.session.number) : 'Week ' + S.session.number) + ', ' + (group ? group.name + '’s room' : 'the main room') + (S.teaching ? '. You are leading.' : '.') + (S.room.ambiguous ? ' Another cohort uses this call too.' : '');
+    var full = $('[data-full-link]'); full.href = '/session/?c=' + encodeURIComponent(S.cohort.slug) + '&s=' + S.session.number;
     $('[data-fallback-link]').href = full.href;
     $('[data-open-stage]').hidden = !S.teaching;
     $('[data-part-controls]').hidden = !S.teaching;

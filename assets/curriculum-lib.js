@@ -147,9 +147,12 @@
 
   // The published file, read for one week: { weeks: [{ week, scenes,
   // questions }] } or { weeks: { "1": { scenes, questions } } }, or a
-  // week given as a bare list of scenes. Returns { scenes, questions } only
+  // week given as a bare list of scenes. A week may also carry its scenes
+  // for other session lengths, { lengths: { "60": [scenes] } }, and the
+  // one matching the cohort's minutes is used, so an hour-long cohort is
+  // never handed a 75-minute plan. Returns { scenes, questions } only
   // when every scene fits ShowLib.problem, or null so the defaults win.
-  function fromPublished(data, week, SL) {
+  function fromPublished(data, week, SL, minutes) {
     if (!data || !SL) return null;
     var weeks = data.weeks || data, entry = null;
     if (Array.isArray(weeks)) {
@@ -158,7 +161,8 @@
       entry = weeks[String(week)] || null;
     }
     if (!entry) return null;
-    var scenes = Array.isArray(entry) ? entry : entry.scenes;
+    var sized = !Array.isArray(entry) && entry.lengths && minutes ? entry.lengths[String(minutes)] : null;
+    var scenes = Array.isArray(sized) ? sized : Array.isArray(entry) ? entry : entry.scenes;
     if (!Array.isArray(scenes) || !scenes.length || scenes.length > 30) return null;
     var out = [];
     for (var i = 0; i < scenes.length; i++) {
@@ -175,8 +179,8 @@
   // What to seed for one week: the published plan if it fits, else the
   // defaults written here, else null (the six parts are then the
   // builder's own fallback).
-  function plan(week, agendaParts, turn, SL, published) {
-    var got = published ? fromPublished(published, week, SL) : null;
+  function plan(week, agendaParts, turn, SL, published, minutes) {
+    var got = published ? fromPublished(published, week, SL, minutes) : null;
     if (got) return { from: 'published', scenes: got.scenes, questions: got.questions.length ? got.questions : defaultQuestions(week) };
     var scenes = weekShow(week, agendaParts, turn, SL);
     if (!scenes) return null;

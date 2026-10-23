@@ -190,7 +190,7 @@
     function cut(x, n) { x = String(x == null ? '' : x).trim(); return x.length > n ? x.slice(0, n - 1) + '\u2026' : x; }
     if (!cohort || !session) return null;
     var n = session.number, first = (parts || [])[0] || null;
-    var title = session.title && session.title !== 'Week ' + n ? cut(session.title, 120) : null;
+    var title = session.title && session.title !== 'Week ' + n && session.title !== sessionName(n) ? cut(session.title, 120) : null;
     return {
       cohort: cut(cohort.title, 120), week: n, title: title,
       challenge: session.scope ? cut(session.scope, 400) : null,
@@ -198,8 +198,19 @@
     };
   }
 
+  // A session's one name everywhere (JOURNEYS.md, S1): the prep session
+  // is number 0, then Week 1 onward. A leader's own title follows it.
+  function sessionName(n) { return Number(n) === 0 ? 'Prep' : 'Week ' + Number(n); }
+  function sessionTitle(session) {
+    if (!session) return '';
+    var name = sessionName(session.number), t = session.title ? String(session.title).trim() : '';
+    return t && t !== name && t !== 'Week ' + session.number ? name + ': ' + t : name;
+  }
+  // The session's own page, before, during, and after it.
+  function sessionUrl(slug, n) { return '/session/?c=' + encodeURIComponent(slug) + '&s=' + Number(n); }
+
   var lib = {
-    welcome: welcome,
+    welcome: welcome, sessionName: sessionName, sessionTitle: sessionTitle, sessionUrl: sessionUrl,
     setupSteps: setupSteps, agenda: agenda, partNow: partNow, stagesForWeek: stagesForWeek, stagesShownAt: stagesShownAt, stageFile: stageFile,
     readyBar: readyBar, readinessText: readinessText, seenText: seenText, canConfirm: canConfirm, partnersOf: partnersOf,
     currentAndNext: currentAndNext, commitLine: commitLine, ago: ago, repoPath: repoPath, PARTS: PARTS

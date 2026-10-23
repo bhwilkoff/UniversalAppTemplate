@@ -105,7 +105,7 @@
     if (view.mode === 'welcome') {
       var w = view.welcome;
       $('[data-w-cohort]').textContent = w.cohort;
-      $('[data-w-week]').textContent = (w.week ? 'Week ' + w.week : '') + (w.title ? (w.week ? ': ' : '') + w.title : '');
+      $('[data-w-week]').textContent = (w.week ? 'Week ' + w.week : w.week === 0 ? 'Prep' : '') + (w.title ? (w.week ? ': ' : '') + w.title : '');
       $('[data-w-challenge]').hidden = !w.challenge;
       $('[data-w-challenge]').textContent = w.challenge || '';
       $('[data-w-first]').hidden = !w.first;

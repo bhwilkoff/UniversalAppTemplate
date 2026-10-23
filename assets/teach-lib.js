@@ -45,14 +45,17 @@
     return out;
   }
 
+  // The prep session comes first, on the first meeting day, and the
+  // weeks follow it (COURSE.md: Cohort Prep, then weeks 1 to 5), so a
+  // five-week cohort has six sessions, numbered 0 to 5.
   function sessionRows(cohort) {
     if (!cohort.starts_on || cohort.session_weekday == null || !cohort.session_time) return null;
-    return sessionDates(cohort.starts_on, cohort.session_weekday, cohort.weeks).map(function (date, i) {
+    return sessionDates(cohort.starts_on, cohort.session_weekday, cohort.weeks + 1).map(function (date, i) {
       return {
         cohort_id: cohort.id,
-        number: i + 1,
+        number: i,
         starts_at: zonedToUtc(date, cohort.session_time.slice(0, 5), cohort.time_zone).toISOString(),
-        title: 'Week ' + (i + 1)
+        title: i === 0 ? 'Prep' : 'Week ' + i
       };
     });
   }
@@ -76,7 +79,7 @@
       sessions: cohort.weeks,
       members: emails.join(', '),
       teachers: (teacherEmails || []).join(', '),
-      sessionUrl: 'https://humanshaped.org/live/?c=' + encodeURIComponent(cohort.slug)
+      sessionUrl: 'https://humanshaped.org/session/?c=' + encodeURIComponent(cohort.slug)
     };
     if (groups && groups.length) {
       out.groups = groups.map(function (g) {
@@ -163,32 +166,21 @@
     return text + '.';
   }
 
-  // A teacher's setup before a cohort's first session, each step checked
-  // off by what the hub can see: the cohort's own fields, its sessions,
-  // and the teacher's own access to the cohort's conversation. A Meet
-  // link on a week is the hub's only sign that a host exists, so the
-  // host step is done when one week has a link, and the event step when
-  // every week has one.
-  // meetRequest is the cohort's newest request to meet@ (setup_requests,
-  // migration 20261004000000), or null. Words by Claude, awaiting Ben's
-  // review.
-  // `more` carries what the page knows besides the database rows above:
-  // groups (the cohort's groups, each with meet_url) and rehearsed (this
-  // browser has opened the cohort's live page as its teacher). A step
-  // marked optional never keeps the card open.
+  // A leader's setup before a cohort's first session (JOURNEYS.md, L4):
+  // only what a leader decides or presses. What the site does on its own
+  // (each session's calendar event and Meet link, the invitations) is a
+  // note beside the step it follows, never a step of its own, because
+  // nobody should have to ask for mechanical work. Groups wait until a
+  // cohort has eight learners or more (Ben's decision 8), so they are not
+  // a step. `meetRequest` and `more` are kept for older callers.
   function cohortSetupSteps(cohort, sessions, myAccess, meetRequest, more) {
     sessions = sessions || [];
-    more = more || {};
     var slug = encodeURIComponent(cohort.slug || '');
-    var linked = sessions.filter(function (s) { return !!s.meet_url; }).length;
-    var eventDone = sessions.length > 0 && linked === sessions.length;
     var steps = [
       { key: 'schedule', label: 'Set the day and time', action: 'edit',
         done: !!(cohort.starts_on && cohort.session_weekday != null && cohort.session_time) },
-      { key: 'sessions', label: 'Make the weekly sessions', action: 'sessions', done: sessions.length > 0 },
-      { key: 'host', label: 'Choose a host account', href: '/teach/guide/#host', done: linked > 0 },
-      { key: 'event', label: 'Ask for Meet links', action: 'meet',
-        done: eventDone, note: eventDone ? null : meetRequestNote(meetRequest) },
+      { key: 'sessions', label: 'Make the sessions', action: 'sessions', done: sessions.length > 0,
+        note: calendarNote(cohort, sessions) },
       { key: 'repo', label: 'Make the GitHub repository', action: 'provision',
         done: !!(cohort.github_repo && cohort.github_team) }
     ];
@@ -197,17 +189,27 @@
         done: !!(myAccess && myAccess.state === 'member') });
     }
     steps.push({ key: 'open', label: 'Open for joining', action: 'edit', done: cohort.status !== 'draft' });
-    // Rooms are made for groups that exist, and groups wait for people,
-    // so this comes after opening: make the trios, then ask meet@ again.
-    var groups = more.groups || [];
-    var roomed = groups.length > 0 && groups.every(function (g) { return !!g.meet_url; });
-    steps.push({ key: 'groups', label: 'Make the groups', action: 'groups',
-      done: roomed, note: groups.length && !roomed ? 'Ask for Meet links again for their rooms.' : null });
-    steps.push({ key: 'rehearse', label: 'Rehearse on the live page',
-      href: '/live/?c=' + slug, done: !!more.rehearsed });
+    var first = sessions.slice().sort(function (a, b) { return a.number - b.number; })[0];
+    if (first) {
+      steps.push({ key: 'plan', label: 'Read the ' + (first.number === 0 ? 'prep session' : 'first session') + '’s plan',
+        href: '/session/?c=' + slug + '&s=' + first.number, done: false, optional: true });
+    }
     steps.push({ key: 'agent', label: 'Connect your agent', href: '/connect/',
       done: false, optional: true });
     return steps;
+  }
+
+  // Whether the sessions to come are on everyone's calendar yet, from
+  // what meet@'s script last said about each (migration 20261023010000).
+  function calendarNote(cohort, sessions, now) {
+    var t = (now || new Date()).getTime();
+    var ahead = (sessions || []).filter(function (s) { return s.starts_at && Date.parse(s.starts_at) > t; });
+    if (!ahead.length) return null;
+    var failed = ahead.filter(function (s) { return s.calendar_error; })[0];
+    if (failed) return 'The calendar said: ' + failed.calendar_error;
+    if (cohort.status === 'draft') return 'They go on everyone’s calendar once the cohort is open.';
+    if (ahead.every(function (s) { return !!s.calendar_event_id; })) return 'On everyone’s calendar, each with its own Meet link.';
+    return 'Going on everyone’s calendar within the hour, each with its own Meet link.';
   }
 
   // Where a request to meet@ stands, in a line beside its step.
@@ -255,7 +257,7 @@
     return first + ', for ' + c.weeks + ' weeks' + (c.capacity ? ', with room for ' + c.capacity + ' people' : '') + '.';
   }
 
-  var lib = { zonedToUtc: zonedToUtc, sessionDates: sessionDates, sessionRows: sessionRows, meetSetup: meetSetup, lastStarted: lastStarted, notSeen: notSeen, checkAnswers: checkAnswers, waitingForFeedback: waitingForFeedback, scheduleText: scheduleText, slugFrom: slugFrom, slugProblem: slugProblem, openingLine: openingLine, cohortSetupSteps: cohortSetupSteps, meetRequestNote: meetRequestNote, requestState: requestState, waitingRequests: waitingRequests, WEEKDAYS: WEEKDAYS };
+  var lib = { zonedToUtc: zonedToUtc, sessionDates: sessionDates, sessionRows: sessionRows, meetSetup: meetSetup, lastStarted: lastStarted, notSeen: notSeen, checkAnswers: checkAnswers, waitingForFeedback: waitingForFeedback, scheduleText: scheduleText, slugFrom: slugFrom, slugProblem: slugProblem, openingLine: openingLine, cohortSetupSteps: cohortSetupSteps, calendarNote: calendarNote, meetRequestNote: meetRequestNote, requestState: requestState, waitingRequests: waitingRequests, WEEKDAYS: WEEKDAYS };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
   else root.TeachLib = lib;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

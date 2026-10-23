@@ -930,7 +930,7 @@ function askSetupQueue_(action, extra) {
   return hubCall_('SETUP_QUEUE', action, extra);
 }
 
-function processSetupRequests() {
+function takeSetupRequests_() {
   if (!setupQueueOn(props_().getProperty('SETUP_QUEUE_ON'))) {
     console.log('The setup queue is off. Set SETUP_QUEUE_ON to true in Script Properties to take requests.');
     return 'off';
@@ -949,6 +949,196 @@ function processSetupRequests() {
     }
   });
   var msg = requests.length ? lines.join('\n') : 'No requests are waiting.';
+  console.log(msg);
+  return msg;
+}
+
+// ---------------------------------------------------------------------
+// Each session on everyone's calendar (JOURNEYS.md, Ben's decisions of
+// October 23, 2026). Ben: "Each session should be its own calendar event
+// that has the meet link attached," and "That is how humans work with
+// calendars." So every session is one event of its own, on this account's
+// calendar, with its own Meet link, that session's name, its page, and
+// every learner and leader of the cohort as a guest at the address the
+// hub says. The hub keeps the to-do list (migration 20261023010000): a
+// session is on it until its event matches what it should hold, so a
+// late joiner, a changed time, or a renamed session is put right on the
+// next run. Run from processSetupRequests every hour, or by hand.
+
+var SITE = 'https://humanshaped.org';
+
+function sessionLabel(number) {
+  return Number(number) === 0 ? 'Prep' : 'Week ' + Number(number);
+}
+
+// "Prep", "Week 2", or "Week 2: A leader's own title".
+function sessionName(s) {
+  var label = sessionLabel(s.number);
+  var t = String(s.title || '').trim();
+  return t && t !== label && t !== 'Week ' + s.number ? label + ': ' + t : label;
+}
+
+function sessionPage(s) {
+  return SITE + '/session/?c=' + encodeURIComponent(s.slug) + '&s=' + Number(s.number);
+}
+
+function sessionDescription(s, folderUrl) {
+  var lines = [
+    'What to bring, and the plan for the hour: ' + sessionPage(s),
+    '',
+    'Join with the Google Meet link on this event. Each session has its own link.',
+  ];
+  if (folderUrl) lines.push('', 'Recordings for this cohort: ' + folderUrl);
+  lines.push('', 'Sessions are recorded, and the host says so at the start of each one. Recordings are shared only with this cohort. If you would rather not appear, keep your camera off and use the chat.');
+  return lines.join('\n');
+}
+
+// The event for one session from the hub's to-do list. A new event also
+// asks Calendar for its own Meet link (createRequest), keyed to the
+// session so a retry never makes a second one.
+function sessionEventResource(s, folderUrl, isNew) {
+  var start = new Date(s.starts_at);
+  var end = new Date(start.getTime() + Number(s.minutes) * 60000);
+  var r = {
+    summary: s.cohort_title + ': ' + sessionName(s),
+    description: sessionDescription(s, folderUrl),
+    start: { dateTime: start.toISOString(), timeZone: s.time_zone },
+    end: { dateTime: end.toISOString(), timeZone: s.time_zone },
+    attendees: (s.guests || []).map(function (email) { return { email: email }; }),
+    // Each person gave their address to the host, not to the cohort.
+    guestsCanSeeOtherGuests: false,
+    guestsCanInviteOthers: false,
+    guestsCanModify: false,
+    extendedProperties: { private: { hsSessionId: s.session_id, hsCohortId: s.slug } },
+  };
+  if (isNew) r.conferenceData = { createRequest: { requestId: 'hs-' + s.session_id, conferenceSolutionKey: { type: 'hangoutsMeet' } } };
+  return r;
+}
+
+// Whom Google should email about a change: everyone when the time or
+// name moved or someone was added (the new guest needs their
+// invitation), and no one when the only change is a guest leaving.
+function sessionUpdateNotice(before, after) {
+  var had = ((before && before.attendees) || []).map(function (a) { return String(a.email || '').toLowerCase(); });
+  var want = (after.attendees || []).map(function (a) { return a.email; });
+  var moved = !before || !before.start || before.summary !== after.summary
+    || new Date(before.start.dateTime).getTime() !== new Date(after.start.dateTime).getTime()
+    || new Date(before.end.dateTime).getTime() !== new Date(after.end.dateTime).getTime();
+  var added = want.some(function (e) { return had.indexOf(e) < 0; });
+  return moved || added ? 'all' : 'none';
+}
+
+// Every cohort's guests, from the sessions on the list, for its folder.
+function guestsByCohort(sessions) {
+  var out = {};
+  (sessions || []).forEach(function (s) {
+    var c = out[s.slug] || (out[s.slug] = { id: s.slug, title: s.cohort_title, members: [], teachers: [] });
+    (s.guests || []).forEach(function (e) { if (c.members.indexOf(e) < 0) c.members.push(e); });
+  });
+  return out;
+}
+
+function syncCalendars() {
+  var me = me_();
+  if (me !== hostEmail_()) throw new Error('This is running as ' + me + '. Run it as ' + hostEmail_() + '.');
+  var sessions = askSetupQueue_('calendar').sessions || [];
+  if (!sessions.length) { console.log('Every session is on the calendar as it should be.'); return 'none'; }
+  var cohorts = guestsByCohort(sessions);
+  var folders = {};
+  Object.keys(cohorts).forEach(function (slug) {
+    var c = cohorts[slug];
+    // The one weekly event the older setup made goes, once its sessions
+    // each have their own.
+    var old = saved_(slug).eventId;
+    if (old) {
+      try { Calendar.Events.remove('primary', old, { sendUpdates: 'all' }); } catch (e) { /* already gone */ }
+      save_(slug, { eventId: null, retiredEventId: old });
+    }
+    try {
+      var folder = ensureFolder_(c);
+      syncFolderSharing_(c, folder.getId());
+      folders[slug] = folder.getUrl();
+    } catch (e) { console.log('The recordings folder for ' + slug + ' could not be shared: ' + e.message); }
+  });
+  var done = [];
+  sessions.forEach(function (s) {
+    try {
+      var event = null;
+      if (s.event_id) {
+        var before = null;
+        try { before = Calendar.Events.get('primary', s.event_id); } catch (e) { before = null; }
+        if (before && before.status !== 'cancelled') {
+          var patch = sessionEventResource(s, folders[s.slug], false);
+          event = Calendar.Events.patch(patch, 'primary', s.event_id, { sendUpdates: sessionUpdateNotice(before, patch) });
+        }
+      }
+      if (!event) {
+        event = Calendar.Events.insert(sessionEventResource(s, folders[s.slug], true), 'primary', { conferenceDataVersion: 1, sendUpdates: 'all' });
+        event = waitForMeet_(event.id);
+      }
+      done.push({ session_id: s.session_id, event_id: event.id, meet_url: meetLinkOf(event), want: s.want });
+    } catch (e) {
+      done.push({ session_id: s.session_id, problem: String(e.message || e).slice(0, 900) });
+    }
+  });
+  askSetupQueue_('calendar-done', { done: done });
+  var bad = done.filter(function (d) { return d.problem; });
+  var msg = 'Calendar: ' + plural_(done.length - bad.length, 'session', 'sessions') + ' brought up to date' + (bad.length ? '; ' + bad.length + ' failed: ' + bad.map(function (d) { return d.problem; }).join(' | ') : '') + '.';
+  console.log(msg);
+  return msg;
+}
+
+// ---------------------------------------------------------------------
+// Invitations from a poll (decision 2). When a leader makes a cohort
+// from a time poll, each person they invited who left an email hears
+// about it once, from this account, with a link that signs them in with
+// GitHub and joins them in one pass. The hub says who is waiting
+// (invitation_work) and remembers who was written to.
+
+function invitationEmail(inv, when) {
+  var to = String((inv && inv.email) || '').trim();
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(to) || !inv.slug || !inv.token) return null;
+  var first = String(inv.name || '').trim().split(/\s+/)[0];
+  var link = SITE + '/account/?join=' + encodeURIComponent(inv.slug) + '&invite=' + encodeURIComponent(inv.token);
+  var hour = Number(inv.minutes) === 60 ? 'an hour' : Number(inv.minutes) + ' minutes';
+  return {
+    to: to,
+    subject: 'You are invited to ' + inv.cohort_title,
+    body: 'Hello' + (first ? ' ' + first : '') + ',\n\n' +
+      inv.leader + ' has made the cohort you answered the time poll for, ' + inv.cohort_title + ', and invited you to join it. ' +
+      'It meets for ' + hour + ' each week' + (when ? ', and the first session is ' + when + '. Once you join, your calendar shows every session on your own clock.' : '.') + '\n\n' +
+      'The cohort keeps its conversation and its shared files on GitHub, so joining takes a GitHub account; if you do not have one yet, GitHub will help you make one along the way. This link signs you in and joins you in one step:\n\n' +
+      link + '\n\n' +
+      'Once you have joined, each session arrives as its own calendar invitation, with its Google Meet link and a page that says what to bring.\n\n' +
+      'Human Shaped\n',
+  };
+}
+
+function sendInvitations() {
+  var list = askSetupQueue_('invitations').invitations || [];
+  var sent = [];
+  list.forEach(function (inv) {
+    var when = inv.first_session ? Utilities.formatDate(new Date(inv.first_session), inv.time_zone, "EEEE, MMMM d 'at' h:mm a") + ' (' + inv.time_zone.replace(/_/g, ' ') + ' time)' : null;
+    var mail = invitationEmail(inv, when);
+    if (!mail) return;
+    MailApp.sendEmail({ to: mail.to, subject: mail.subject, body: mail.body, name: 'Human Shaped' });
+    sent.push(inv.answer_id);
+  });
+  if (sent.length) askSetupQueue_('invitations-sent', { ids: sent });
+  var msg = 'Invitations: sent ' + sent.length + '.';
+  console.log(msg);
+  return msg;
+}
+
+// The hourly trigger runs processSetupRequests (see the README), so it
+// is the one entry point: the setup queue, then the calendar, then the
+// invitations, each on its own so one failing never stops the others.
+function processSetupRequests() {
+  var out = [];
+  try { out.push(takeSetupRequests_()); } catch (e) { out.push('Setup requests failed: ' + e.message); }
+  try { out.push(syncCalendars()); } catch (e) { out.push('Calendar failed: ' + e.message); }
+  try { out.push(sendInvitations()); } catch (e) { out.push('Invitations failed: ' + e.message); }
+  var msg = out.join('\n');
   console.log(msg);
   return msg;
 }

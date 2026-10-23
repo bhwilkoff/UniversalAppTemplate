@@ -2661,3 +2661,13 @@ html.app-nav-open[data-signed-in] body:not([data-no-app-nav]) .app-nav { display
 .ui-row-head .role-tag { margin-left: 0; }
 .roster-repo { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; font-weight: 600; }
 .group-form { max-width: 36rem; margin: 0 0 1.5rem; }
+
+/* A session's own page (JOURNEYS.md, S1): when it is, the sessions on
+   either side, and the plan its leaders change before it runs. */
+.session-meta { margin: 0.25rem 0 0; color: var(--muted); font-size: 0.975rem; display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+.session-pager { display: flex; flex-wrap: wrap; gap: 0.25rem 1.25rem; margin: 0.75rem 0 0; font-size: 0.95rem; }
+.session-edit { margin: 2rem 0; }
+.session-edit h2 { margin: 0 0 0.75rem; }
+.session-details { margin-top: 1rem; }
+.session-details > summary { cursor: pointer; font-weight: 600; }
+.session-details .cohort-form { margin-top: 0.75rem; }

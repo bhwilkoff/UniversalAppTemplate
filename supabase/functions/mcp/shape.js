@@ -85,7 +85,7 @@ export function nextSessionText(cohort, t, parts, when, broughtBack) {
   const lines = [
     `${cohort.title}, week ${s.number}${t.live ? ' (happening now)' : ''}: ${when}`,
     s.meet_url ? `Join on Google Meet: ${s.meet_url}` : 'The Meet link is not posted yet.',
-    `Session page: ${SITE}/live/?c=${encodeURIComponent(cohort.slug)}`,
+    `Session page: ${SITE}/session/?c=${encodeURIComponent(cohort.slug)}`,
     '',
     'Agenda:',
     ...parts.map((p) => `- Minute ${p.start}, ${p.minutes} min, ${p.name}: ${p.what}`),
@@ -265,7 +265,7 @@ export function thisSessionText(cohort, session, live, queue, checks, myAnswers,
   if (!session) return `${cohort.title}: no sessions are scheduled yet, so there is nothing happening live.`;
   const lines = [
     `${cohort.title}, week ${session.number}${live ? ' (happening now)' : ' (the next session; it is not live yet)'}`,
-    `Session page: ${SITE}/live/?c=${encodeURIComponent(cohort.slug)}`,
+    `Session page: ${SITE}/session/?c=${encodeURIComponent(cohort.slug)}`,
     '',
   ];
   const sl = showLine(show);
@@ -432,7 +432,7 @@ export function classNowText(cohort, now) {
   if (!s) return `${cohort.title}: no sessions are scheduled yet, so there is no class to describe.`;
   const lines = [
     `${cohort.title}, week ${s.number}${now.live ? ' (happening now)' : now.started ? ' (the most recent session, which is over)' : ' (it has not begun yet)'}`,
-    `Session page: ${SITE}/live/?c=${encodeURIComponent(cohort.slug)}`,
+    `Session page: ${SITE}/session/?c=${encodeURIComponent(cohort.slug)}`,
   ];
   const sl = showLine(now.show);
   if (sl) lines.push(sl);

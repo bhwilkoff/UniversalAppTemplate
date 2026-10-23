@@ -36,8 +36,13 @@
   // something goes wrong (for example, if sign-in is not switched on).
   var params = new URLSearchParams(location.search + '&' + location.hash.replace(/^#/, ''));
   // The cohorts page sends people here with ?join=<slug> for the cohort
-  // they chose; they still click Join themselves.
+  // they chose; they still click Join themselves. An invitation emailed
+  // from a time poll adds &invite=<token> (migration 20261023010000): the
+  // person asked to join by following it, so once signed in they join at
+  // once, and the address they gave on the poll goes with them.
   var joining = params.get('join');
+  var invite = /^[0-9a-f-]{36}$/i.test(params.get('invite') || '') ? params.get('invite') : null;
+  function joinQuery() { return joining ? '?join=' + encodeURIComponent(joining) + (invite ? '&invite=' + invite : '') : ''; }
   var arrivalError = params.get('error_description')
     ? 'GitHub sign-in did not finish: ' + params.get('error_description') + '. Nothing was saved.'
     : null;
@@ -218,11 +223,11 @@
     if (handoffMode) { try { window.sessionStorage.setItem('hs-handoff', '1'); } catch (e) {} }
     db.auth.signInWithOAuth({
       provider: 'github',
-      options: { redirectTo: location.origin + '/account/' + (handoffMode ? '?handoff=meet' : joining ? '?join=' + encodeURIComponent(joining) : '?welcome') }
+      options: { redirectTo: location.origin + '/account/' + (handoffMode ? '?handoff=meet' : joining ? joinQuery() : '?welcome') }
     }).then(function (r) { if (r.error) fail(r.error.message); });
   });
   root.querySelector('[data-retry]').addEventListener('click', function () {
-    history.replaceState(null, '', '/account/' + (joining ? '?join=' + encodeURIComponent(joining) : ''));
+    history.replaceState(null, '', '/account/' + joinQuery());
     arrivalError = null;
     load();
   });
@@ -319,13 +324,13 @@
           return db.from('enrollments').insert({ cohort_id: c.id, user_id: u.data.user.id });
         }).then(function (r) {
           if (r.error) { join.disabled = false; return fail('You could not join just now: ' + r.error.message); }
-          // Open the cohort's conversation on GitHub. If the cohort has no
-          // team yet, the cohort page offers it again later.
-          db.functions.invoke('cohort-access', { body: { action: 'join', cohort_id: c.id } }).catch(function () {});
-          joining = null;
-          if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); 
-          history.replaceState(null, '', '/account/');
-          load();
+          // Open the cohort's conversation on GitHub (if the cohort has no
+          // team yet, the cohort page offers it again later), claim the
+          // invitation they followed, and land on the cohort they joined.
+          var claimed = invite && c.slug === joining ? db.rpc('claim_invitation', { t: invite }).then(function () {}, function () {}) : Promise.resolve();
+          var access = db.functions.invoke('cohort-access', { body: { action: 'join', cohort_id: c.id } }).then(function () {}, function () {});
+          if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles();
+          Promise.all([claimed, access]).then(function () { location.assign('/cohort/?c=' + encodeURIComponent(c.slug)); });
         });
       });
       actions.appendChild(join);
@@ -437,6 +442,12 @@
         if (chosen) {
           open = [chosen].concat(open.filter(function (c) { return c !== chosen; }));
         } else if (joining && mine.some(function (c) { return c.slug === joining; })) {
+          // Already in: an invitation they follow again still brings its
+          // address along, and they go straight to the cohort.
+          if (invite) {
+            db.rpc('claim_invitation', { t: invite }).then(function () {}, function () {}).then(function () { location.assign('/cohort/?c=' + encodeURIComponent(joining)); });
+            return;
+          }
           myBox.prepend(el('p', 'small', 'You are already in this cohort.'));
         } else if (joining) {
           openBox.appendChild(el('p', 'small', 'The cohort you chose is not open for sign-up any more.'));
@@ -451,9 +462,11 @@
           openBox.appendChild(card);
         });
         root.querySelector('[data-open-section]').hidden = !joining;
+        if (chosen && invite) { var go = openBox.querySelector('.chosen button'); if (go) go.click(); }
         drawNotes(uid);
         drawPath(uid);
         drawReach(uid);
+        drawCalendar(uid);
         drawCredential(uid);
         show('signed-in');
       });
@@ -471,6 +484,39 @@
   // (research/notes/reach-notes.md). Read on its own, so the page works
   // before the hub's database has reach_choices.
   var reachWired = false;
+  // Where each session's calendar invitation goes (migration
+  // 20261023010000): blank means the sign-in email, shown as the
+  // placeholder, and unticking takes the sessions off the calendar.
+  var calendarWired = false;
+  function drawCalendar(uid) {
+    var section = root.querySelector('[data-calendar-section]');
+    if (!section) return;
+    var form = root.querySelector('[data-calendar-form]'), status = root.querySelector('[data-calendar-status]');
+    Promise.all([
+      db.from('calendar_preferences').select('email, invites').eq('user_id', uid).maybeSingle(),
+      db.rpc('my_sign_in_email')
+    ]).then(function (res) {
+      if (res[0].error) { section.hidden = true; return; }
+      var row = res[0].data || {};
+      form.elements.email.value = row.email || '';
+      form.elements.email.placeholder = res[1].data || 'you@example.org';
+      form.elements.invites.checked = row.invites !== false;
+      section.hidden = false;
+      if (location.hash === '#calendar') section.scrollIntoView();
+      if (calendarWired) return;
+      calendarWired = true;
+      form.addEventListener('submit', function (ev) {
+        ev.preventDefault();
+        var email = form.elements.email.value.trim().toLowerCase();
+        if (email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { status.textContent = 'That does not look like an email address.'; return; }
+        status.textContent = 'Saving';
+        db.from('calendar_preferences').upsert({ user_id: uid, email: email || null, invites: form.elements.invites.checked, updated_at: new Date().toISOString() }).select('user_id').then(function (s) {
+          status.textContent = s.error ? 'Not saved: ' + s.error.message : 'Saved. Your calendar catches up within the hour.';
+        });
+      });
+    });
+  }
+
   function drawReach(uid) {
     var R = window.ReachLib;
     var section = root.querySelector('[data-reach-section]');

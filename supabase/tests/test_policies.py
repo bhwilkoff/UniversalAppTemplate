@@ -2957,6 +2957,71 @@ def main():
     check("only people in the cohort get a role", not attempt(as_user("ben"), setrole, (rc, people["dee"], "write")))
     check("an agent cannot change a role", not attempt(as_agent("ben"), setrole, (rc, people["bea"], "write")))
     check("there is no admin role to give", not attempt(as_user("ben"), setrole, (rc, people["bea"], "admin")))
+
+    # Session calendars and invitations (migration 20261023010000). Lu
+    # answers a poll with an address and is invited to the cohort made
+    # from it; dee follows Lu's link and joins.
+    attempt(as_user("ben"), "insert into public.time_polls (title, time_zone, days, first_minute, last_minute, step_minutes) "
+            "values ('Saturdays (delete me)', 'America/New_York', '{6}', 600, 720, 60) returning id, token")
+    sp, stok = last_rows[0]
+    attempt(anon(), ans, (stok, "Lu", "{9240}", "{}", " Lu@Example.org ", None, None))
+    slu = last_rows[0][0]
+    attempt(as_user("ben"), conv, (sp, 9240, [slu["id"]], "Saturday mornings (delete me)", "saturday-mornings-delete-me", "2027-01-09", "open"))
+    newc = last_rows[0][0]["id"]
+    su.execute("reset role")
+    su.execute("update auth.users set email = 'ben@example.org' where id = %s", (people["ben"],))
+    su.execute("update auth.users set email = 'dee-signin@example.org' where id = %s", (people["dee"],))
+    check("no one signed in can read the invitations to send", not attempt(as_user("ben"), "select * from public.invitation_work()"))
+    sv = as_server()
+    sv.execute("select answer_id::text, email, cohort_title, token::text from public.invitation_work() where slug = 'saturday-mornings-delete-me'")
+    inv = sv.fetchall()
+    check("the server lists an invitation for the person invited, at the address they gave",
+          len(inv) == 1 and inv[0][1] == "lu@example.org" and inv[0][2] == "Saturday mornings (delete me)")
+    lu_token = inv[0][3] if inv else None
+    check("no one signed in can mark invitations sent", not attempt(as_user("ben"), "select public.invitation_sent(array[%s]::uuid[])", (inv[0][0],)))
+    sv = as_server(); sv.execute("select public.invitation_sent(array[%s]::uuid[])", (inv[0][0],))
+    check("marking it sent counts it once", sv.fetchall() == [(1,)])
+    sv = as_server(); sv.execute("select count(*) from public.invitation_work() where slug = 'saturday-mornings-delete-me'")
+    check("and it is not sent again", sv.fetchall() == [(0,)])
+    claim = "select public.claim_invitation(%s::uuid)"
+    check("following the link before joining claims nothing", attempt(as_user("dee"), claim, (lu_token,)) and last_rows == [("not joined",)])
+    su.execute("reset role")
+    su.execute("insert into public.enrollments (cohort_id, user_id) values (%s, %s)", (newc, people["dee"]))
+    check("once joined, the invitation is claimed", attempt(as_user("dee"), claim, (lu_token,)) and last_rows == [("claimed",)])
+    check("and the poll's address becomes their calendar address for this cohort",
+          attempt(as_user("dee"), "select public.my_invite_address(%s)", (newc,))
+          and last_rows[0][0] == {"email": "lu@example.org", "invites": True, "from": "cohort"})
+    check("someone else cannot claim the same invitation", attempt(as_user("bea"), claim, (lu_token,)) and last_rows == [("taken",)])
+    check("signed out, nothing is claimed", not attempt(as_user(None), claim, (lu_token,)))
+    check("an address chosen on the account page wins",
+          attempt(as_user("dee"), "insert into public.calendar_preferences (email) values ('dee@example.org') returning user_id::text") and last_rows == [(people["dee"],)]
+          and attempt(as_user("dee"), "select public.my_invite_address(%s) ->> 'email'", (newc,)) and last_rows == [("dee@example.org",)])
+    check("no one else reads it", attempt(as_user("cal"), "select count(*) from public.calendar_preferences") and last_rows == [(0,)])
+    check("no one sets it for someone else",
+          not attempt(as_user("cal"), "insert into public.calendar_preferences (user_id, email) values (%s, 'x@example.org')", (people["dee"],)))
+    check("a person reads their own sign-in email", attempt(as_user("dee"), "select public.my_sign_in_email()") and last_rows == [("dee-signin@example.org",)])
+    attempt(as_user("ben"), "insert into public.sessions (cohort_id, number, title, starts_at) values (%s, 0, 'Prep', now() + interval '3 days') returning id", (newc,))
+    cal_s = last_rows[0][0]
+    check("no one signed in can read the calendar's to-do list", not attempt(as_user("ben"), "select * from public.calendar_work()"))
+    work = "select session_id::text, guests, want, event_id from public.calendar_work() where cohort_id = %s"
+    sv = as_server(); sv.execute(work, (newc,)); got = sv.fetchall()
+    check("a session still to come is on the calendar's list, with every learner and leader as a guest",
+          len(got) == 1 and got[0][0] == cal_s and got[0][1] == ["ben@example.org", "dee@example.org"] and got[0][3] is None)
+    sv = as_server(); sv.execute("select public.calendar_done(%s, 'evt1', 'https://meet.google.com/abc-defg-hij', %s)", (cal_s, got[0][2]))
+    sv = as_server(); sv.execute(work, (newc,))
+    check("once its event matches, it leaves the list", sv.fetchall() == [])
+    check("and the session carries the event's own Meet link",
+          attempt(as_user("dee"), "select meet_url from public.sessions where id = %s", (cal_s,)) and last_rows == [("https://meet.google.com/abc-defg-hij",)])
+    attempt(as_user("dee"), "update public.calendar_preferences set invites = false returning 1")
+    sv = as_server(); sv.execute(work, (newc,)); got = sv.fetchall()
+    check("someone who turns invitations off comes off the guest list, and the event is changed",
+          len(got) == 1 and got[0][1] == ["ben@example.org"] and got[0][3] == "evt1")
+    check("their own address reads as none", attempt(as_user("dee"), "select public.my_invite_address(%s) -> 'email'", (newc,)) and last_rows == [(None,)])
+    sv = as_server(); sv.execute("select public.calendar_done(%s, null, null, 'x', 'Calendar said no')", (cal_s,))
+    sv = as_server(); sv.execute(work, (newc,))
+    check("a problem leaves the session on the list", len(sv.fetchall()) == 1)
+    check("no one signed in can say what the calendar did",
+          not attempt(as_user("ben"), "select public.calendar_done(%s, 'evt2', null, 'x')", (cal_s,)))
     conn.rollback()
     conn.close()
     failed = [n for n, ok in results if not ok]

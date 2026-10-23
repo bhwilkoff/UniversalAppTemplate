@@ -62,7 +62,7 @@
         if (r.problem) throw new Error(r.problem.message);
         var cat = C.category(r.data.repository.discussionCategories.nodes);
         if (!cat) throw new Error('the repository has no discussion categories');
-        return D.ask(t, C.OPEN, { repo: r.data.repository.id, cat: cat.id, title: C.weekTitle(o.session), body: C.opening(o.session, location.origin + '/live/?c=' + encodeURIComponent(o.cohort.slug)) });
+        return D.ask(t, C.OPEN, { repo: r.data.repository.id, cat: cat.id, title: C.weekTitle(o.session), body: C.opening(o.session, location.origin + '/session/?c=' + encodeURIComponent(o.cohort.slug) + '&s=' + Number(o.session.number)) });
       }).then(function (r) {
         if (r.problem) throw new Error(r.problem.message);
         var n = r.data.createDiscussion.discussion.number;

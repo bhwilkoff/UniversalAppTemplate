@@ -127,3 +127,12 @@ test('only a partner or a teacher confirms, and only what its builder marked rea
   assert.equal(lib.canConfirm(s, 'bea', ['eve'], true), false);
   assert.equal(lib.canConfirm({ ...s, readiness: 'not-yet' }, 'eve', ['bea'], false), false);
 });
+
+test('a session has one name: Prep for number 0, then Week N, with the leader title after', () => {
+  assert.equal(lib.sessionName(0), 'Prep');
+  assert.equal(lib.sessionName(3), 'Week 3');
+  assert.equal(lib.sessionTitle({ number: 0, title: 'Prep' }), 'Prep');
+  assert.equal(lib.sessionTitle({ number: 2, title: 'Week 2' }), 'Week 2');
+  assert.equal(lib.sessionTitle({ number: 1, title: 'Finding a problem' }), 'Week 1: Finding a problem');
+  assert.equal(lib.sessionUrl('my cohort', 0), '/session/?c=my%20cohort&s=0');
+});

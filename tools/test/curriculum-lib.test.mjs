@@ -141,3 +141,13 @@ test('the fallback is the published plan: same board, rooms, note, and questions
     assert.ok(got && got.scenes.length, 'week ' + key + ' passes the hub’s own scene rules');
   }
 });
+
+test('a week carries a plan for each session length, and an hour-long cohort gets the hour', () => {
+  const published = JSON.parse(readFileSync(new URL('../../../UniversalAppTemplate/docs/teaching/runs-of-show.json', import.meta.url), 'utf8'));
+  const hour = K.fromPublished(published, 0, S, 60);
+  assert.ok(hour, 'the prep session has a 60-minute plan that passes the hub’s own scene rules');
+  assert.equal(hour.scenes.reduce((n, s) => n + s.minutes, 0), 60);
+  assert.equal(hour.scenes.some(s => s.kind === 'rooms'), false, 'no groups below eight learners');
+  const full = K.fromPublished(published, 0, S, 75);
+  assert.equal(full.scenes.reduce((n, s) => n + s.minutes, 0), 75, 'a length with no plan of its own keeps the main one');
+});

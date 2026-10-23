@@ -137,7 +137,7 @@
     $('[data-kicker]').textContent = c.title + ', week ' + s.number + (S.teaching ? '. You are leading it.' : '');
     $('[data-title]').textContent = S.group ? 'The board for ' + S.group.name : 'The board';
     var back = $('[data-back]');
-    back.href = '/live/?c=' + encodeURIComponent(c.slug);
+    back.href = '/session/?c=' + encodeURIComponent(c.slug);
     $('[data-teach]').hidden = !S.teaching;
     $('[data-lock]').textContent = S.board.locked ? 'Unlock the board' : 'Lock the board';
     if (S.pages) S.pages.refresh();

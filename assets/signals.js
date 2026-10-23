@@ -195,7 +195,7 @@
         var w = opts.welcome;
         if (w) box.appendChild(el('p', 'screen-sub', 'Welcome'));
         box.appendChild(el('p', 'screen-title', opts.cohort.title));
-        box.appendChild(el('p', 'screen-sub', 'Week ' + opts.session.number + (opts.session.title && opts.session.title !== 'Week ' + opts.session.number ? ': ' + opts.session.title : '')));
+        box.appendChild(el('p', 'screen-sub', (opts.session.number === 0 ? 'Prep' : 'Week ' + opts.session.number) + (opts.session.title && opts.session.title !== 'Week ' + opts.session.number && opts.session.title !== 'Prep' ? ': ' + opts.session.title : '')));
         if (w && w.challenge) box.appendChild(el('p', 'screen-note', w.challenge));
         if (w && w.first) box.appendChild(el('p', 'screen-sub', 'First: ' + w.first.name + '.'));
       } else if (sc.kind === 'card') {

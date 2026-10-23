@@ -62,7 +62,7 @@ Deno.serve(async (req) => {
     const where = found.data ? S.shape(found.data) : null;
     const category = where ? S.category(where.categories) : null;
     if (!where || !category) { problems.push(`${repo} week ${s.number}: ${found.problem || 'no category to post in'}`); continue; }
-    const live = 'https://humanshaped.org/live/?c=' + encodeURIComponent(s.cohorts.slug);
+    const live = 'https://humanshaped.org/session/?c=' + encodeURIComponent(s.cohorts.slug) + '&s=' + Number(s.number);
     const body = S.body(s, live) + '\n\n' + whenLine(s.starts_at, s.cohorts.time_zone);
     const made = await graphql(token, D.CREATE, { repositoryId: where.repositoryId, categoryId: category.id, title: S.title(s), body });
     const number = made.data?.createDiscussion?.discussion?.number;

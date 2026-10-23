@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261022za">
+  <link rel="stylesheet" href="/assets/site.css?v=20261023b">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -150,6 +150,23 @@
           <div class="google-signin" data-google-link hidden></div>
           <p class="small" data-linked-status role="status"></p>
 
+          <!-- Every session arrives as its own calendar invitation, here by
+               default at the email you signed in with (JOURNEYS.md, Ben's
+               decision 1). One choice for every cohort. -->
+          <div data-calendar-section id="calendar" hidden>
+            <h2>Calendar invitations</h2>
+            <form class="inline-form" data-calendar-form>
+              <label>Send each session's invitation to
+                <input type="email" name="email" autocomplete="email" maxlength="254" data-calendar-email>
+              </label>
+              <label class="check"><input type="checkbox" name="invites"> Put my cohorts' sessions on my calendar</label>
+              <div class="actions">
+                <button class="btn-secondary" type="submit">Save</button>
+                <span class="small" role="status" data-calendar-status></span>
+              </div>
+            </form>
+          </div>
+
           <!-- Written by Claude, awaiting Ben's review (research/notes/reach-notes.md). -->
           <div data-reach-section hidden>
             <h2>How your leaders can reach you</h2>
@@ -171,7 +188,7 @@
           </div>
 
 
-          <h2>Leaving a cohort</h2>
+          <h2>Your cohorts</h2>
           <div data-my-cohorts></div>
 
           <div id="notes" data-notes-section hidden>
@@ -227,10 +244,10 @@
   </main>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" defer></script>
   <script src="/assets/hub-config.js?v=20261016a" defer></script>
-  <script src="/assets/teach-lib.js?v=20261022c" defer></script>
+  <script src="/assets/teach-lib.js?v=20261023b" defer></script>
   <script src="/assets/discussions-lib.js" defer></script>
   <script src="/assets/addon-lib.js" defer></script>
-  <script src="/assets/chat-lib.js?v=20261022a" defer></script>
+  <script src="/assets/chat-lib.js?v=20261023b" defer></script>
   <script src="/assets/mentor-lib.js" defer></script>
   <script src="/assets/path-lib.js" defer></script>
   <script src="/assets/reach-lib.js" defer></script>
@@ -238,7 +255,7 @@
   <script src="/assets/credential-lib.js?v=20261022j" defer></script>
   <script src="/assets/google-signin-lib.js" defer></script>
   <script src="/assets/google-signin.js" defer></script>
-  <script src="/assets/hub.js?v=20261022o" defer></script>
+  <script src="/assets/hub.js?v=20261023b" defer></script>
 
   <footer class="site-footer">
     <div class="wrap">

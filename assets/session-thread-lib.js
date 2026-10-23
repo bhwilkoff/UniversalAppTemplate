@@ -61,8 +61,8 @@
   }
 
   function weekName(session) {
-    var n = 'Week ' + session.number;
-    return session.title && session.title !== n ? n + ': ' + session.title : n;
+    var n = Number(session.number) === 0 ? 'Prep' : 'Week ' + session.number;
+    return session.title && session.title !== n && session.title !== 'Week ' + session.number ? n + ': ' + session.title : n;
   }
 
   // The thread's title and opening words, the same for every teacher.

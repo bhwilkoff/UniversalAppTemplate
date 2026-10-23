@@ -68,9 +68,10 @@ role you hold and the role named on the page, never a switcher.
   "It seems like we can do some simplification on these pages too"):
   - This week: while the cohort is being set up, its setup steps; what is
     waiting for the leader.
-  - Sessions: each week's session, and the live session it becomes while
-    it runs (`/live/?c=`); for leaders, making the sessions, each one's run
-    of show, the question bank, and each past session's follow-up.
+  - Sessions: the prep session and each week's, each row opening that
+    session's own page (`/session/?c=&s=`), where its plan is read and,
+    by its leaders, changed; for leaders, making the sessions, the
+    question bank, and each past session's follow-up.
   - Conversation: the cohort repository's Discussions, and Watch on
     GitHub; for leaders, the button that makes the repository, right
     there.
@@ -121,8 +122,8 @@ role you hold and the role named on the page, never a switcher.
 | `/` | Your home | Follow a row to the thing |
 | `/account/` | Your account | How you sign in, linked accounts, how leaders reach you, your data, sign out, delete; confirm joining one cohort (`?join=`) |
 | `/cohort/?c=` | One cohort: This week, Sessions, Conversation, Asks, Files, Exchanges, People, and Your work (learners) or Settings (leaders) | Read the week, join a session, bring something back, keep your app; a leader sets it up and runs it from the same sections |
-| `/live/?c=` | One cohort's live session | Take part; a leader runs it |
-| `/board/?c=`, `/card/?c=` | The live session's board; its card | Draw; show the card |
+| `/session/?c=&s=` | One session, before, during, and after it (JOURNEYS.md, S1); `/live/` forwards here | Join the call, read the plan, take part; a leader changes the plan and runs it |
+| `/board/?c=`, `/card/?c=` | A session's board; its card | Draw; show the card |
 | `/exchange/#<link>` | One exchange | Watch, add a video |
 | `/exchanges/` | Your exchanges | Open one, start one |
 | `/exchange/new/` (`?c=` for a cohort) | Starting an exchange | Record the opening video and start it |

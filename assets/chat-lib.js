@@ -93,9 +93,9 @@
   // The discussion's title and opening, and the category it goes in:
   // one named for sessions or class if the repository has it, else
   // General.
-  function weekTitle(session) { return 'Week ' + Number(session && session.number) + ', in class'; }
+  function weekTitle(session) { var n = Number(session && session.number); return (n === 0 ? 'Prep' : 'Week ' + n) + ', in class'; }
   function opening(session, liveUrl) {
-    return 'The in-class chat for week ' + Number(session && session.number) + '. Everything said in the Meet panel’s chat during class is here, posted by the person who said it.' +
+    return 'The in-class chat for ' + (Number(session && session.number) === 0 ? 'the prep session' : 'week ' + Number(session && session.number)) + '. Everything said in the Meet panel’s chat during class is here, posted by the person who said it.' +
       (liveUrl ? '\n\nThe session page: ' + liveUrl : '');
   }
   function category(cats) {

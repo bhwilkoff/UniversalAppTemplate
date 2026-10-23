@@ -56,7 +56,7 @@
   // short meta line of facts.
   function cohortState(c, n) {
     function d(iso) { return new Date(iso + 'T12:00:00').toLocaleDateString(undefined, { month: 'long', day: 'numeric' }); }
-    if (n.kind === 'live') return { thing: 'session', state: 'live', meta: 'Week ' + n.live.number };
+    if (n.kind === 'live') return { thing: 'session', state: 'live', meta: n.live.number === 0 ? 'Prep' : 'Week ' + n.live.number };
     if (n.kind === 'between') return { thing: 'cohort', state: 'running', meta: 'Week ' + n.week + ' of ' + n.weeks };
     if (n.kind === 'before') return { thing: 'cohort', state: 'open', meta: c.starts_on ? 'Starts ' + d(c.starts_on) : 'Dates not set' };
     if (n.kind === 'draft') return { thing: 'cohort', state: 'draft', meta: null };

@@ -1,8 +1,12 @@
-// The live session page (/live/?c=<slug>), kept open beside Google Meet.
-// Meet cannot be embedded in another page, so this page holds what Meet
-// does not: the agenda with a timer for each part, this week's challenge
-// and stages, a "show your work" queue, checks for understanding, and
-// what people brought back.
+// A session's own page (/session/?c=<slug>&s=<number>), the one home of
+// a session before, during, and after it (JOURNEYS.md, S1). Before, it
+// says when, what to bring, and the plan, which its leaders change here.
+// While it runs, it is kept open beside Google Meet (or replaced by the
+// add-on's panel inside Meet) and holds what Meet does not: the parts
+// with their clock, a "show your work" queue, checks for understanding,
+// and what people brought back. After, it keeps the recording and the
+// checks. With no session named (old /live/ links), it opens the one on
+// now, or the next.
 //
 // Live updates: Supabase Realtime tells the page that something in this
 // cohort's queue, questions, or answers changed, and the page reads them
@@ -15,7 +19,9 @@
   var db = (window.HUB.client ? window.HUB.client() : window.supabase.createClient(window.HUB.url, window.HUB.key));
   var lib = window.CohortLib;
   var L = window.LiveLib;
-  var slug = new URLSearchParams(location.search).get('c') || '';
+  var query = new URLSearchParams(location.search);
+  var slug = query.get('c') || '';
+  var wanted = /^\d{1,2}$/.test(query.get('s') || '') ? Number(query.get('s')) : null;
   var timer = null;
   var POLL = 15000;
 
@@ -110,16 +116,18 @@
             none.replaceChildren(crumb, window.UI.empty('No sessions yet', S.teaching ? window.UI.link('Make the weekly sessions', '/cohort/?c=' + encodeURIComponent(cohort.slug) + '&t=sessions', 'btn-secondary') : null));
             return show('no-sessions');
           }
-          // /teach/'s "Before the first session" checks off rehearsing
-          // once this browser has opened the live page as its teacher.
-          if (S.teaching) { try { localStorage.setItem('hs-rehearsed:' + cohort.id, '1'); } catch (e) {} }
           S.mine = people.filter(function (p) { return p.user_id === S.me.id; })[0] || null;
           if (!S.mine && !S.teaching) return show('not-member');
           if (window.CohortNav) window.CohortNav.draw($('[data-cohort-nav]'), { cohort: cohort, teaching: S.teaching, member: !!S.mine, current: 'live' });
           people.concat(teachers).forEach(function (p) { if (p.profiles) S.names[p.user_id] = p.profiles.display_name || p.profiles.github_login; });
           var t = lib.currentAndNext(ss, new Date(), cohort.session_minutes);
-          var session = t.live ? t.next : (t.next || t.current);
+          var named = wanted == null ? null : ss.filter(function (x) { return x.number === wanted; })[0];
+          var session = named || (t.live ? t.next : (t.next || t.current));
           S.session = session;
+          S.sessions = ss;
+          var live = !!(t.live && t.next && t.next.id === session.id);
+          // The address names the session, so it can be kept and shared.
+          if (!named) history.replaceState(null, '', lib.sessionUrl(cohort.slug, session.number) + location.hash);
           var prev = ss.filter(function (x) { return x.number === session.number - 1; })[0];
           S.prev = prev || null;
           var since = prev && prev.starts_at ? prev.starts_at : new Date(Date.now() - 8 * 86400000).toISOString();
@@ -134,7 +142,7 @@
             S.brought = sh[0].data || [];
             S.tools = !sh[2].error;
             S.confirmations = S.tools ? sh[2].data : [];
-            draw(t.live, S.brought);
+            draw(live, S.brought);
             startSignals(teachers);
             startRooms();
             return refreshLive().then(listen);
@@ -150,13 +158,21 @@
 
   function draw(live, shares) {
     var cohort = S.cohort, session = S.session;
-    $('[data-kicker]').textContent = cohort.title + (live ? ', live now' : '') + (S.teaching ? '. You are leading it.' : '');
-    $('[data-title]').textContent = 'Week ' + session.number + (session.title && session.title !== 'Week ' + session.number ? ': ' + session.title : '');
-    $('[data-scope]').textContent = session.scope || 'This week’s challenge will be here once your leader writes it.';
+    var ends = session.starts_at ? Date.parse(session.starts_at) + cohort.session_minutes * 60000 : null;
+    var finished = !live && ends != null && ends < Date.now();
+    S.finished = finished;
+    document.title = lib.sessionTitle(session) + ', ' + cohort.title + ' | Human Shaped';
+    $('[data-kicker]').textContent = cohort.title;
+    $('[data-title]').textContent = lib.sessionTitle(session);
+    drawWhen(live, finished);
+    $('[data-scope]').textContent = session.scope || '';
+    $('[data-scope]').hidden = !session.scope;
     var top = $('[data-top-actions]'); top.replaceChildren();
-    if (safe(session.meet_url)) { var j = el('a', 'btn-primary', 'Join the call'); j.href = session.meet_url; j.target = '_blank'; j.rel = 'noopener'; top.appendChild(j); }
+    if (!finished && safe(session.meet_url)) { var j = el('a', 'btn-primary', 'Join the call'); j.href = session.meet_url; j.target = '_blank'; j.rel = 'noopener'; top.appendChild(j); }
+    if (safe(session.recording_url)) { var rec = el('a', finished ? 'btn-primary' : 'btn-secondary', 'Watch the recording'); rec.href = session.recording_url; rec.target = '_blank'; rec.rel = 'noopener'; top.appendChild(rec); }
+    drawEdit(live);
     // The session's drawing board (C4), in its own tab so this page stays open.
-    var board = el('a', 'btn-secondary', 'The board'); board.href = '/board/?c=' + encodeURIComponent(cohort.slug) + '&s=week-' + session.number; board.target = '_blank'; board.rel = 'noopener'; top.appendChild(board);
+    if (!finished) { var board = el('a', 'btn-secondary', 'The board'); board.href = '/board/?c=' + encodeURIComponent(cohort.slug) + '&s=week-' + session.number; board.target = '_blank'; board.rel = 'noopener'; top.appendChild(board); }
     $('[data-cohort-link]').href = '/cohort/?c=' + encodeURIComponent(cohort.slug) + '&t=mine';
 
     S.parts = lib.agenda(cohort.session_minutes);
@@ -179,6 +195,72 @@
     var intro = $('[data-checks-intro]');
     intro.replaceChildren(window.UI.visibility(S.teaching ? 'staff' : 'teachers', 'Answers'), document.createTextNode(' Not graded. Deleted when the cohort finishes.'));
     show('ready');
+  }
+
+  // When the session is, on the reader's own clock, its state, and the
+  // sessions on either side of it.
+  function drawWhen(live, finished) {
+    var box = $('[data-when]'); box.replaceChildren();
+    var s = S.session, U = window.UI;
+    if (U) box.appendChild(U.status('session', live ? 'live' : finished ? 'finished' : safe(s.meet_url) ? 'ready' : 'planned'));
+    if (s.starts_at) {
+      var start = new Date(s.starts_at), end = new Date(start.getTime() + S.cohort.session_minutes * 60000);
+      var day = start.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
+      var t = function (d) { return d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }); };
+      box.appendChild(document.createTextNode(' ' + day + ', ' + t(start) + ' to ' + t(end) + ', your time'));
+    }
+    var i = S.sessions.indexOf(s), prev = S.sessions[i - 1], next = S.sessions[i + 1];
+    var nav = root.querySelector('[data-session-pager]');
+    if (!nav) { nav = el('nav', 'session-pager'); nav.setAttribute('data-session-pager', ''); nav.setAttribute('aria-label', 'Other sessions'); $('[data-top-actions]').after(nav); }
+    nav.replaceChildren();
+    [[prev, 'Before: '], [next, 'Next: ']].forEach(function (x) {
+      if (!x[0]) return;
+      var a = el('a', null, x[1] + lib.sessionTitle(x[0])); a.href = lib.sessionUrl(S.cohort.slug, x[0].number);
+      nav.appendChild(a);
+    });
+    nav.hidden = !nav.children.length;
+  }
+
+  // Its leaders change the session here, before and after it runs: the
+  // plan (the same builder the Sessions section used to hold) and its
+  // title, challenge, and recording.
+  var built = false;
+  function drawEdit(live) {
+    var box = $('[data-session-edit]');
+    if (!box) return;
+    box.hidden = !S.teaching || live;
+    if (box.hidden || built) return;
+    built = true;
+    var s = S.session;
+    if (window.ShowBuilder && window.ShowLib) {
+      window.ShowBuilder.mount($('[data-session-builder]'), {
+        db: db, cohort: S.cohort, session: s, sessions: S.sessions,
+        agenda: lib.agenda(S.cohort.session_minutes), turn: L.TURN || []
+      });
+    }
+    var f = $('[data-session-form]'), said = $('[data-session-form-status]');
+    f.elements.title.value = s.title && s.title !== lib.sessionName(s.number) ? s.title : '';
+    f.elements.scope.value = s.scope || '';
+    f.elements.recording_url.value = s.recording_url || '';
+    // The showing, open to guests (H5), once the database has the columns.
+    var showcase = 'public_showcase' in s;
+    f.querySelectorAll('[data-showcase-only]').forEach(function (n) { n.hidden = !showcase; });
+    if (showcase) { f.elements.public_showcase.checked = !!s.public_showcase; f.elements.showcase_shares_link.checked = !!s.showcase_shares_link; }
+    f.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      var e = f.elements, rec = e.recording_url.value.trim();
+      if (rec && !safe(rec)) { said.textContent = 'A recording link starts with https://'; return; }
+      var patch = { title: e.title.value.trim() || lib.sessionName(s.number), scope: e.scope.value.trim() || null, recording_url: rec || null };
+      if (showcase) { patch.public_showcase = e.public_showcase.checked; patch.showcase_shares_link = e.public_showcase.checked && e.showcase_shares_link.checked; }
+      said.textContent = 'Saving';
+      db.from('sessions').update(patch).eq('id', s.id).then(function (r) {
+        if (r.error) { said.textContent = 'Not saved: ' + r.error.message; return; }
+        Object.assign(s, patch);
+        said.textContent = 'Saved';
+        $('[data-title]').textContent = lib.sessionTitle(s);
+        $('[data-scope]').textContent = s.scope || ''; $('[data-scope]').hidden = !s.scope;
+      });
+    });
   }
 
   // What people brought back since the last session, with each one's
@@ -208,7 +290,7 @@
   function drawNow(force) {
     var part = partNow();
     var key = part ? part.key : null;
-    if (clockLine) clockLine.textContent = part ? 'Minute ' + part.start + ' of ' + S.cohort.session_minutes + ', for ' + part.minutes + ' minutes' : 'Before the session, week ' + S.session.number;
+    if (clockLine) clockLine.textContent = part ? 'Minute ' + part.start + ' of ' + S.cohort.session_minutes + ', for ' + part.minutes + ' minutes' : 'Before the session';
     if (!force && key === S.drawnPart) return;
     S.drawnPart = key;
     var list = S.list || S.parts;
@@ -551,7 +633,7 @@
     $('[data-thread-section]').hidden = !on;
     if (!on) return;
     window.CohortTalk.sessionThread($('[data-thread]'), { db: db, session: S.auth, repo: repo, row: S.session, teaching: S.teaching,
-      liveUrl: location.origin + '/live/?c=' + encodeURIComponent(S.cohort.slug) });
+      liveUrl: location.origin + lib.sessionUrl(S.cohort.slug, S.session.number) });
   }
 
   // From the conversation: the newest threads in the cohort's GitHub

@@ -37,7 +37,7 @@
     var status = el('p', 'small'); status.setAttribute('role', 'status');
     var fit = el('p', 'small show-fit');
     var list = el('ol', 'show-list');
-    list.setAttribute('aria-label', 'Run of show for week ' + session.number);
+    list.setAttribute('aria-label', 'Plan for ' + (window.CohortLib ? window.CohortLib.sessionName(session.number) : 'Week ' + session.number));
     var start = el('div', 'actions');
     var add = el('div', 'actions');
     box.replaceChildren(fit, list, start, add, status);
@@ -73,7 +73,7 @@
       add.replaceChildren();
       fit.textContent = scenes.length
         ? S.fitText(scenes, cohort.session_minutes) + ' Learners see the scenes’ titles and minutes on their cohort page; your notes stay with the leaders.'
-        : 'Week ' + session.number + ' has no run of show yet.';
+        : (window.CohortLib ? window.CohortLib.sessionName(session.number) : 'Week ' + session.number) + ' has no plan yet.';
       if (!scenes.length) {
         var C = window.CurriculumLib, week = C ? C.weekOf(session.number) : null;
         if (week != null && window.CurriculumSeed) start.appendChild(button(C.startLabel(week), 'btn-primary', startPlan));
@@ -316,7 +316,7 @@
       say('Adding the six parts…');
       db.from('scenes').insert(rows).then(function (r) {
         if (r.error) { say('Not added: ' + r.error.message); return; }
-        say('Week ' + session.number + ' starts from the six parts. Change anything.');
+        say((window.CohortLib ? window.CohortLib.sessionName(session.number) : 'Week ' + session.number) + ' starts from the six parts. Change anything.');
         load();
       });
     }

@@ -72,5 +72,43 @@ Deno.serve(async (req) => {
     if (error) return reply(500, { message: error.message });
     return reply(200, { state: data });
   }
-  return reply(400, { message: 'Ask to claim or finish.' });
+  // Each session's own calendar event (migration 20261023010000): the
+  // sessions whose event is missing or out of date, and what the script did.
+  if (input.action === 'calendar') {
+    const { data, error } = await db.rpc('calendar_work', { n: 30 });
+    if (error) return reply(500, { message: error.message });
+    return reply(200, { sessions: data || [] });
+  }
+  if (input.action === 'calendar-done') {
+    // deno-lint-ignore no-explicit-any
+    const done = Array.isArray((input as any).done) ? (input as any).done.slice(0, 100) : [];
+    let saved = 0;
+    for (const d of done) {
+      if (!d || !UUID.test(String(d.session_id || ''))) continue;
+      const { error } = await db.rpc('calendar_done', {
+        s: d.session_id,
+        event_id: typeof d.event_id === 'string' ? d.event_id.slice(0, 1024) : null,
+        meet_url: typeof d.meet_url === 'string' ? d.meet_url : null,
+        synced: typeof d.want === 'string' ? d.want.slice(0, 64) : null,
+        problem: typeof d.problem === 'string' && d.problem ? d.problem.slice(0, 1000) : null,
+      });
+      if (!error) saved++;
+    }
+    return reply(200, { saved });
+  }
+  // The invitations from a poll still to send, and which went.
+  if (input.action === 'invitations') {
+    const { data, error } = await db.rpc('invitation_work', { n: 50 });
+    if (error) return reply(500, { message: error.message });
+    return reply(200, { invitations: data || [] });
+  }
+  if (input.action === 'invitations-sent') {
+    // deno-lint-ignore no-explicit-any
+    const ids = Array.isArray((input as any).ids) ? (input as any).ids.filter((x: unknown) => UUID.test(String(x))).slice(0, 200) : [];
+    if (!ids.length) return reply(200, { sent: 0 });
+    const { data, error } = await db.rpc('invitation_sent', { ids });
+    if (error) return reply(500, { message: error.message });
+    return reply(200, { sent: data });
+  }
+  return reply(400, { message: 'Ask to claim or finish, or for the calendar or the invitations.' });
 });

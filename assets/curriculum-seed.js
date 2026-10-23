@@ -40,7 +40,7 @@
       if ((have.data || []).length) return { skipped: true };
       return loadPublished().then(function (data) {
         var ctx = context(cohort);
-        var plan = C.plan(week, ctx.agenda, ctx.turn, SL, data);
+        var plan = C.plan(week, ctx.agenda, ctx.turn, SL, data, cohort.session_minutes);
         if (!plan) return { skipped: true };
         var rows = plan.scenes.map(function (s, i) {
           return { cohort_id: cohort.id, session_id: session.id, position: i, kind: s.kind, title: s.title, minutes: s.minutes, body: s.body || null, config: s.config };
