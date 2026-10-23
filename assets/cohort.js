@@ -562,8 +562,13 @@
     } else if (state === 'invited') {
       var st = el('p'); st.appendChild(window.UI.status('invitation', 'invited')); box.appendChild(st);
       var inv = link('https://github.com/orgs/humanshaped/invitation', 'Accept the invitation'); inv.className = 'btn-primary';
+      inv.target = '_blank'; inv.rel = 'noopener';
       actions.appendChild(inv);
-      actions.appendChild(askButton('I accepted it'));
+      actions.appendChild(askButton('Check again'));
+      // Once they accept on GitHub, the page notices on its own: it asks
+      // now, and again whenever they come back to this tab (found running
+      // a test cohort: "I accepted it" was a step the site could take).
+      watchInvitation();
     } else {
       var m2 = el('p', 'ui-meta-line'); m2.appendChild(window.UI.visibility('cohort')); m2.appendChild(document.createTextNode(' GitHub may send you an invitation to accept.')); box.appendChild(m2);
       if (state === 'failed' && access.detail) box.appendChild(el('p', 'small error', access.detail));
@@ -590,6 +595,28 @@
       if (s.done) li.appendChild(el('span', 'visually-hidden', ' (done)'));
       list.appendChild(li);
     });
+  }
+
+  var invitationWatch = null;
+  function watchInvitation() {
+    if (invitationWatch) return;
+    var asking = false;
+    invitationWatch = function () {
+      if (asking || document.visibilityState === 'hidden') return;
+      asking = true;
+      db.functions.invoke('cohort-access', { body: { action: 'join', cohort_id: cohort.id } }).then(function (r) {
+        asking = false;
+        if (r.data && r.data.state === 'member') {
+          window.removeEventListener('focus', invitationWatch);
+          document.removeEventListener('visibilitychange', invitationWatch);
+          invitationWatch = null;
+          load();
+        }
+      }, function () { asking = false; });
+    };
+    window.addEventListener('focus', invitationWatch);
+    document.addEventListener('visibilitychange', invitationWatch);
+    invitationWatch();
   }
 
   function askButton(label) {
