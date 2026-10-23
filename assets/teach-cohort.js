@@ -656,7 +656,7 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
       var list = U.rows();
       here.forEach(function (t) {
         var self = t.user_id === me.id;
-        var facts = [t.user_id === c.created_by ? 'Made this cohort' : null, c.github_repo ? 'Maintain on GitHub' : null].filter(Boolean).join(', ');
+        var facts = [t.user_id === c.created_by ? 'Made this cohort' : null, c.github_repo ? 'Manages the repository' : null].filter(Boolean).join(', ');
         var actions = [];
         var msg = el('span', 'ui-inline-status'); msg.setAttribute('role', 'status');
         if (t.user_id !== c.created_by) {
@@ -766,11 +766,13 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
   // carried to GitHub by the cohort-access function. GitHub's own names
   // for its roles, so they read the same in both places. Someone who has
   // not joined on GitHub yet gets the role when they do.
-  var ROLE_NAMES = { read: 'Read', triage: 'Triage', write: 'Write', maintain: 'Maintain' };
+  // GitHub's roles in plain words: what each lets a learner do in the
+  // cohort's repository.
+  var ROLE_NAMES = { read: 'Read only', triage: 'Read, and sort asks', write: 'Add files and post (usual)', maintain: 'Also manage the repository' };
   function repoRole(p, people, msg) {
     // Someone who also leads the cohort always maintains it.
-    if (leaderIds.indexOf(p.user_id) !== -1) return el('span', 'ui-row-meta', 'Maintain on GitHub');
-    var label = el('label', 'roster-repo', 'On GitHub');
+    if (leaderIds.indexOf(p.user_id) !== -1) return el('span', 'ui-row-meta', 'Manages the repository');
+    var label = el('label', 'roster-repo', 'In the repository');
     var pick = el('select');
     var chosen = chosenBy[p.user_id] || 'write';
     Object.keys(ROLE_NAMES).forEach(function (k) {
@@ -820,7 +822,7 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
   // by Claude for G7 and await Ben's review.
   function roleSwitch(p, people, msg) {
     var next = window.MentorLib.otherRole(p.role);
-    var b = U.button(next === 'mentor' ? 'Mark returning' : 'Mark not returning', 'btn-secondary small', function () {
+    var b = U.button(next === 'mentor' ? 'Make a returning learner' : 'Make a first-time learner', 'btn-secondary small', function () {
       b.disabled = true;
       db.from('enrollments').update({ role: next }).eq('cohort_id', current.id).eq('user_id', p.user_id).select('role').then(function (r) {
         b.disabled = false;
