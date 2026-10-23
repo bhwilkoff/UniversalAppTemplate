@@ -156,7 +156,7 @@
     if (!data || !SL) return null;
     var weeks = data.weeks || data, entry = null;
     if (Array.isArray(weeks)) {
-      entry = weeks.filter(function (w) { return w && (String(w.week) === String(week) || String(w.number) === String(week)); })[0] || null;
+      entry = weeks.filter(function (w) { return w && (String(w.week) === String(week) || String(w.number) === String(week) || (w.key != null && String(w.key) === String(week))); })[0] || null;
     } else if (weeks && typeof weeks === 'object') {
       entry = weeks[String(week)] || null;
     }

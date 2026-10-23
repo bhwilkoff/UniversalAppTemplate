@@ -144,7 +144,8 @@ test('the fallback is the published plan: same board, rooms, note, and questions
 
 test('a week carries a plan for each session length, and an hour-long cohort gets the hour', () => {
   const published = JSON.parse(readFileSync(new URL('../../../UniversalAppTemplate/docs/teaching/runs-of-show.json', import.meta.url), 'utf8'));
-  const hour = K.fromPublished(published, 0, S, 60);
+  const hour = K.fromPublished(published, K.weekOf(0), S, 60);
+  assert.ok(K.fromPublished(published, 'prep', S), 'the prep session is found by the key the seed asks with');
   assert.ok(hour, 'the prep session has a 60-minute plan that passes the hub’s own scene rules');
   assert.equal(hour.scenes.reduce((n, s) => n + s.minutes, 0), 60);
   assert.equal(hour.scenes.some(s => s.kind === 'rooms'), false, 'no groups below eight learners');
