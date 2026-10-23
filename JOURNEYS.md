@@ -391,6 +391,32 @@ not; nothing here is "improved".
 meet@ in a Meet call). It draws the same run-of-show view as the session
 page, so it carries the session page's problems.
 
+## The first end-to-end test run, October 23, 2026
+
+Ben: "You should be able to run a cohort from end to end via chrome and
+the systems we set up." Claude ran "Claude test cohort (delete me)" on the
+live site as Ben and two test learners (benhstest1, benhstest2, each in
+their own signed-in Chrome profile): poll, answers, cohort, sessions,
+repository, invitations, joining, GitHub's invitation, calendar events,
+preparing, running the session in the panel, Try my app, Files,
+Conversation, after the session, and finishing. Found and fixed on the
+way, each live and tested:
+
+- The time poll, the board, and app pages had not loaded since October
+  21: a bare data-status hook crashed ui.js. A test now refuses it.
+- Invitations went out before any session existed; they now wait for one.
+- "I accepted it" after GitHub's invitation: the page now notices itself.
+- Try my app hid a new request until a reload; tried cards said "you have it".
+- Files had no Prep folder; making sessions did not refresh This week.
+- The add-on page did not load ui.js, so a leader never saw a question's
+  answers; a test now refuses any page that uses the kit without it.
+- Learners had no way to ask to show their work in the panel.
+- A running session showed two clocks and an open card form; jargon
+  (wings, scene, week 0, the main room) remained in places.
+- Finishing: the archive question (decision 9) was built, its first
+  version asked GitHub for the wrong address and swallowed the error,
+  and a finished cohort still offered to join, post, and add.
+
 ## Order of work
 
 1. **Done, October 23.** Each session has its own page
