@@ -307,7 +307,20 @@ Chosen from multiple-choice options:
    session touches only its event. The Meet add-on finds the session from
    the meeting's own code, so each link opens the exact session. A group's
    room stays one link for the whole cohort, reached from the session
-   page, because it belongs to the group, not to a session.
+   page, because it belongs to the group, not to a session (see 8).
+8. **Groups and rooms wait until cohorts are bigger.** Meet's breakout
+   rooms are not on Ben's Workspace edition, so they would have to be
+   built in the add-on. Ben: "Breakouts only would be relevant for groups
+   of 8 learners or more, so we don't have to build this out just yet."
+   Below eight learners, the bring-back happens with everyone in the one
+   call, and the content says so. Research on building them in the add-on
+   is in research/notes/meet-breakout-rooms-notes.md. Launch without them.
+9. **Finishing asks.** Marking a cohort finished asks the leader whether
+   to archive its repository now or leave it open; sessions not yet held
+   come off the calendar either way.
+10. **Late joiners get the remaining sessions.** Someone who joins after
+    the events exist is added as a guest to every session still to come,
+    within the hour.
 
 ## Order of work, once decided
 
