@@ -23,7 +23,7 @@
 
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { createAppAuth } from 'npm:@octokit/auth-app@7';
-import { plan, outcome, wantedRole, repoName, collaboratorRequest, roleOutcome, syncStep } from './plan.js';
+import { ORG, plan, outcome, wantedRole, repoName, collaboratorRequest, roleOutcome, syncStep } from './plan.js';
 import {
   mayProvision, namesFor, stepsFor, repoRequest, teamRequest, teamReadRequest,
   discussionsMutation, recorded, isAgentToken, issuesRequest, seedFiles,
@@ -266,7 +266,7 @@ async function archive(db: any, uid: string, cohortId: string, reply: (s: number
   if (!repo) return reply(409, { message: 'This cohort has no repository.' });
   const token = await appToken();
   if (!token) return reply(503, { message: 'Human Shaped cannot reach GitHub just now. Try again later.' });
-  const r = await github(token, 'PATCH', '/repos/' + repo, { archived: true });
+  const r = await github(token, 'PATCH', `/repos/${ORG}/${encodeURIComponent(repo)}`, { archived: true });
   if (r.status !== 200) return reply(502, { message: 'GitHub did not archive it: ' + (r.body?.message || r.status) });
   return reply(200, { archived: repo });
 }

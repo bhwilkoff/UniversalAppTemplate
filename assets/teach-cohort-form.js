@@ -166,9 +166,16 @@
         var dup = /duplicate|unique/i.test(r.error.message);
         return say('[data-form-message]', dup ? 'Another cohort already uses that short name. Try another.' : 'It could not be saved: ' + r.error.message);
       }
-      var archived = archiveIt ? db.functions.invoke('cohort-access', { body: { action: 'archive', cohort_id: r.data.id } }).then(function () {}, function () {}) : Promise.resolve();
-      archived.then(function () {
-        if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign('/cohort/?c=' + r.data.id);
+      var go = function () { if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign('/cohort/?c=' + r.data.id); };
+      if (!archiveIt) return go();
+      say('[data-form-message]', 'Archiving the repository…');
+      // If GitHub says no, the leader hears why instead of the page moving on.
+      db.functions.invoke('cohort-access', { body: { action: 'archive', cohort_id: r.data.id } }).then(function (a) {
+        if (!a.error) return go();
+        var res = a.error.context;
+        return (res && res.json ? res.json() : Promise.resolve({})).catch(function () { return {}; }).then(function (b) {
+          say('[data-form-message]', 'Saved as finished, but the repository was not archived: ' + (b.message || 'GitHub did not answer') + '. You can archive it on GitHub.');
+        });
       });
     });
   });
