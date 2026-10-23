@@ -36,7 +36,8 @@ def js(value):
 
 def week_block(week):
     key = "prep" if week["week"] == 0 else str(week["week"])
-    design = [s for s in week["scenes"] if s["kind"] == "design"][0]
+    # A week may have no board (week 5's showing takes its place).
+    design = ([s for s in week["scenes"] if s["kind"] == "design"] or [{}])[0]
     room = [s for s in week["scenes"] if s["kind"] == "rooms"][0]
     questions = []
     for q in week.get("questions", []):
@@ -48,7 +49,7 @@ def week_block(week):
         questions.append("        " + js(item))
     return (
         f"    {key}: {{\n"
-        f"      template: {js(design.get('config', {}).get('template'))},\n"
+        f"      template: {js(design.get('config', {}).get('template') or 'questions')},\n"
         f"      room: {js(room['config']['prompt'])},\n"
         f"      watch: {js(room.get('note') or '')},\n"
         "      questions: [\n" + ",\n".join(questions) + "\n      ]\n    }"

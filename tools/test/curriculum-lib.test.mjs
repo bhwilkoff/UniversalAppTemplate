@@ -133,7 +133,7 @@ test('the fallback is the published plan: same board, rooms, note, and questions
     assert.ok(mine, 'week ' + key);
     const design = w.scenes.find(s => s.kind === 'design');
     const rooms = w.scenes.find(s => s.kind === 'rooms');
-    assert.equal(mine.template, design.config.template, 'week ' + key + ' board');
+    assert.equal(mine.template, design ? design.config.template : 'questions', 'week ' + key + ' board');
     assert.equal(mine.room, rooms.config.prompt, 'week ' + key + ' room');
     assert.equal(mine.watch, rooms.note || '', 'week ' + key + ' note');
     assert.deepEqual(mine.questions.map(q => q.prompt), (w.questions || []).map(q => q.prompt), 'week ' + key + ' questions');

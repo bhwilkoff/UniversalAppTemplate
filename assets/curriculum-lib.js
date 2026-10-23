@@ -24,10 +24,10 @@
   var WEEKS = {
     prep: {
       template: "questions",
-      room: "Show your app's address on your phone, and say one thing in your life you wish worked differently.",
-      watch: "Watch for anyone whose setup is still stuck, and anyone who has not met their trio yet.",
+      room: "Show your app's address on your phone, or where setup stopped, and say one thing in your life you wish worked differently.",
+      watch: "Watch for anyone whose setup is still stuck, and fix one in front of everyone: it teaches the room how to ask their agent for help.",
       questions: [
-        {"kind": "short", "prompt": "What do you hope this app will do for someone?"},
+        {"kind": "short", "prompt": "What do you hope your app will do for someone?"},
         {"kind": "scale", "prompt": "How ready do you feel to build?", "choices": ["Not ready yet", "Ready to build"], "points": 5},
         {"kind": "short", "prompt": "What did your agent do for you during setup that you expected to have to do yourself?"},
         {"kind": "choice", "prompt": "Where will you keep your noticing log this week?", "choices": ["A notes app on my phone", "Paper", "My app's note", "Somewhere else"]}
@@ -35,11 +35,9 @@
     },
     1: {
       template: "problem-tests",
-      room: "Read your problem statement aloud. Then listen to the questions, and write down the one you want to answer.",
-      watch: "Critique rules from Ron Berger. Watch for a statement that names a technology instead of a situation, and for a room where nobody asks a question.",
+      room: "Read three lines from your noticing log, say which one you keep coming back to, and why. Questions are about what happened, never about an app.",
+      watch: "Watch for log lines that are already app ideas (\"an app that...\"), and steer back to what happened.",
       questions: [
-        {"kind": "short", "prompt": "Which would you rather read, and what would be lost if the app only had the first kind?"},
-        {"kind": "words", "prompt": "In a few words, what do these four problem statements do well?"},
         {"kind": "scale", "prompt": "How sure are you, right now, that someone besides you has this problem?", "choices": ["Not sure at all", "I could name them"], "points": 5},
         {"kind": "short", "prompt": "What is still muddy?"},
         {"kind": "multi", "prompt": "Which of these does your problem statement do?", "choices": ["Starts from something that happens in my life", "Says what a better life would look like", "Names who else has it", "Never names a technology"]},
@@ -48,18 +46,17 @@
     },
     2: {
       template: "blank",
-      room: "Read your problem statement, show the app on your phone, and say what the person you talked to did first.",
-      watch: "Watch for a problem statement that has not changed since week 1, \"my friend liked it\" with nothing about what the person did, and a first version that grew past the smallest thing.",
+      room: "Read your problem statement and the version before it, then show the app on your phone: what the real data taught you, and what the person you talked to did with it.",
+      watch: "Watch for a problem statement unchanged since week 1, for \"my friend liked it\" in place of what they did, and for a first version that grew past the smallest thing.",
       questions: [
-        {"kind": "short", "prompt": "Which device will the people you talked to reach for, and why that one second?"},
         {"kind": "multi", "prompt": "Which of these belong in the data, so every platform gets them the same way? Choose every one.", "choices": ["A film's title and year", "Whether a film is saved", "A trivia question's correct answer", "Swipe to go back", "The size of the play button"]},
         {"kind": "short", "prompt": "What is still muddy?"}
       ]
     },
     3: {
       template: "prompt",
-      room: "Show one verb on both platforms, the cell your eyes proved wrong, and your app's look beside the template's.",
-      watch: "Watch for a second platform that only runs in a simulator, a look with no line back to the people it is for, and anyone who has not named a person outside the cohort whose device the app could reach.",
+      room: "Show your matrix and the cell your eyes proved wrong, then your app on the oldest device it supports: the newest feature that device will not show, and why the new look fits your people.",
+      watch: "Watch for a second platform that only runs in a simulator, and for a look that is still the template's.",
       questions: [
         {"kind": "short", "prompt": "When your agent says something is fixed, what do you ask to see, and why is its word not enough?"},
         {"kind": "short", "prompt": "How do you know your last fix is real?"},
@@ -68,8 +65,8 @@
     },
     4: {
       template: "blank",
-      room: "Show what the person did first, beside the guess you wrote before they held it.",
-      watch: "Critique rules from Ron Berger: be kind, be specific, be helpful, and offer suggestions as questions. Visit every group tonight. Watch for anyone who has not handed the app to another person yet, and ask them privately what is in the way.",
+      room: "Show the screenshot that proved a fix, and what it would have looked like if the fix had failed. Then show your app on the other person's device beside the guess you wrote before they held it: what did they do first?",
+      watch: "Watch for \"it works on mine\", and for anyone who has not handed it over yet: help them find the free way today.",
       questions: [
         {"kind": "short", "prompt": "What is the difference between a fix that is verified and a fix that is shipped?"},
         {"kind": "rank", "prompt": "Rank what the other person noticed first.", "choices": ["What it is for", "How it looks", "What it does first", "Something that broke", "How fast it is"]},
@@ -80,8 +77,8 @@
     },
     5: {
       template: "questions",
-      room: "Explain every part of your app, even the parts the agent wrote, and the number and the feature you will show.",
-      watch: "Critique rules from Ron Berger: be kind, be specific, be helpful, and offer suggestions as questions. Watch for a part of the app its builder cannot explain, and for a value that never changed a decision.",
+      room: "Show the feature and your number once, and explain one part the agent wrote and how you know it works.",
+      watch: "",
       questions: [
         {"kind": "short", "prompt": "What is enough about this version, for now, and for whom?"},
         {"kind": "short", "prompt": "What waits for the next version?"},
