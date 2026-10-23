@@ -417,6 +417,24 @@ way, each live and tested:
   version asked GitHub for the wrong address and swallowed the error,
   and a finished cohort still offered to join, post, and add.
 
+## The add-on in a real Meet call, October 23, 2026
+
+meet@ led a test cohort's session from inside Meet, with a test learner
+in the panel outside Meet. What it found, each fixed the same evening:
+
+- The hourly calendar run gave the session a new call and wrote its link
+  over the leader's, so the add-on in the call people were in no longer
+  knew its session. A session now keeps the link it has.
+- Start the clock did nothing before the session had begun, and before a
+  leader started it the panel took the part the schedule named as
+  current, showing parts never run as done.
+- The main stage called a part Presenter and prefixed its prompt with
+  "The audience:"; the kinds now carry the plain names in one place.
+- Open the main stage sat at the bottom and stayed after it was used.
+- Outside Meet, the learner's panel took the site's sidebar padding and
+  ran off the right edge of a desktop window.
+- The call-not-found message pointed to session forms that are gone.
+
 ## Order of work
 
 1. **Done, October 23.** Each session has its own page
