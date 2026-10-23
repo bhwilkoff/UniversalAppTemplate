@@ -230,7 +230,7 @@
       var cohort = c.data;
       return Promise.all([
         db.from('sessions').select('*').eq('cohort_id', id).order('number'),
-        db.from('enrollments').select('user_id, profiles(github_login, display_name)').eq('cohort_id', id).neq('status', 'left'),
+        db.from('enrollments').select('user_id, app_url, profiles(github_login, display_name)').eq('cohort_id', id).neq('status', 'left'),
         db.from('cohort_teachers').select('user_id, profiles(github_login, display_name)').eq('cohort_id', id),
         db.from('groups').select('*, group_members(user_id)').eq('cohort_id', id).order('name')
       ]).then(function (res) {
@@ -240,6 +240,7 @@
         if (!ss.length) return fail('This cohort has no sessions yet.');
         S.cohort = cohort;
         S.people = res[1].data;
+        S.myApp = (S.people.filter(function (p) { return p.user_id === S.me.id; })[0] || {}).app_url || null;
         S.groups = res[3].data;
         S.teaching = res[2].data.some(function (t) { return t.user_id === S.me.id; });
         S.teacherIds = res[2].data.map(function (t) { return t.user_id; });
@@ -916,7 +917,7 @@
     drawOnStage();
     var q = L.queue(S.items);
     var list = $('[data-queue]'); list.replaceChildren();
-    if (!q.waiting.length) list.appendChild(el('li', 'live-empty small', q.shown.length ? 'Everyone in the wings has presented.' : 'No one is in the wings yet. People ask to present from their own view.'));
+    if (!q.waiting.length) list.appendChild(el('li', 'live-empty small', q.shown.length ? 'Everyone waiting has shown their work.' : 'No one is waiting yet.'));
     q.waiting.forEach(function (item, i) {
       var li = el('li', 'live-item' + (i === 0 ? ' next' : ''));
       if (i === 0) li.appendChild(el('p', 'kicker', 'Next to present'));
@@ -938,6 +939,47 @@
       list.appendChild(li);
     });
     $('[data-shown-count]').textContent = q.shown.length ? L.counted(q.shown.length, 'presentation', 'presentations') + ' so far.' : '';
+    drawAskToShow(q);
+  }
+
+  // A learner's own way into the queue (found in the test cohort: the
+  // panel showed who was waiting but gave a learner no way to ask). One
+  // link, their app's address to start with, and what to look at.
+  function drawAskToShow(q) {
+    var box = $('[data-ask-show]');
+    if (!box) { box = el('div', 'live-ask-show'); box.setAttribute('data-ask-show', ''); $('[data-wings]').appendChild(box); }
+    box.replaceChildren();
+    if (S.teaching) return;
+    var mine = q.waiting.filter(function (x) { return x.user_id === S.me.id; })[0];
+    if (mine) {
+      box.appendChild(el('p', 'small', 'You are waiting to show your work.'));
+      box.appendChild(button('Take it off', 'btn-secondary small', function () {
+        db.from('live_queue').delete().eq('id', mine.id).then(function () { refreshLive(); });
+      }));
+      return;
+    }
+    var f = el('form', 'cohort-form');
+    var l = el('label', null, 'What you will show');
+    var url = el('input'); url.type = 'url'; url.placeholder = 'https://'; url.required = true; url.value = S.myApp || '';
+    l.appendChild(url); f.appendChild(l);
+    var n = el('label', null, 'What to look at (optional)');
+    var note = el('input'); note.maxLength = 300; n.appendChild(note); f.appendChild(n);
+    var acts = el('div', 'actions');
+    var go = el('button', 'btn-primary', 'Ask to show my work'); go.type = 'submit';
+    var said = el('span', 'ui-inline-status'); said.setAttribute('role', 'status');
+    acts.appendChild(go); acts.appendChild(said); f.appendChild(acts);
+    f.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      var c = L.classifyLink(url.value);
+      if (!c) { said.textContent = 'A full link that starts with https://'; return; }
+      go.disabled = true;
+      db.from('live_queue').insert({ cohort_id: S.cohort.id, session_id: S.session.id, user_id: S.me.id, kind: c.kind, url: c.url, note: note.value.trim() || null }).then(function (r) {
+        go.disabled = false;
+        if (r.error) { said.textContent = 'Not added: ' + r.error.message; return; }
+        refreshLive();
+      });
+    });
+    box.appendChild(f);
   }
 
   function drawChecksChrome() {
