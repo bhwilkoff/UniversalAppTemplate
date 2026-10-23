@@ -743,6 +743,8 @@
   function drawWelcomeToggle() {
     var welcoming = S.onStage && S.onStage.kind === 'welcome';
     $('[data-welcome-toggle]').textContent = welcoming ? 'Take the welcome off the main stage' : 'Put the welcome on the main stage';
+    // Before the session starts, the welcome is already all the stage shows.
+    $('[data-welcome-toggle]').hidden = !partNow();
   }
   $('[data-welcome-toggle]').addEventListener('click', function () {
     var welcoming = S.onStage && S.onStage.kind === 'welcome';
@@ -1230,7 +1232,7 @@
     return A.stageView({
       part: part ? { key: part.key, name: part.name, endsAt: endsNow() } : null,
       onStage: S.onStage, checks: S.checks, results: S.results, items: S.items, names: S.names, audience: V ? V.audienceOf(part) : null,
-      welcome: lib.welcome(S.cohort, S.session, S.parts), scene: scene,
+      welcome: lib.welcome(S.cohort, S.session, S.list && S.list.length ? S.list : S.parts), scene: scene,
       path: window.RosterLib && S.onStage && S.onStage.kind === 'path' ? window.RosterLib.pathView(rosterNow()) : null,
       rooms: S.onStage && S.onStage.kind === 'rooms' ? Object.keys(S.roomPlaces).map(function (k) { return S.roomPlaces[k]; }) : null
     });
