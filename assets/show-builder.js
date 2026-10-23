@@ -24,6 +24,14 @@
     b.addEventListener('click', onClick);
     return b;
   }
+  // Each kind of part in plain words, for the plan people read (JOURNEYS.md,
+  // the walk-through audit: the builder's own names were jargon).
+  var PLAIN = { talk: 'Talk', presenter: 'Showing work', question: 'Question', design: 'On the board', rooms: 'In groups', 'break': 'Break', reflection: 'Writing' };
+  function plain(k) { return PLAIN[k] || ((S.kind(k) || {}).name) || k; }
+  function paragraphs(text) {
+    return String(text || '').split(/\n{2,}/).map(function (x) { return x.trim(); }).filter(Boolean).map(function (x) { return el('p', 'scene-body', x); });
+  }
+
   function clock(minutes) {
     var h = Math.floor(minutes / 60), m = minutes % 60;
     return h + ':' + (m < 10 ? '0' : '') + m;
@@ -32,11 +40,12 @@
   // opts: { db, cohort, session, sessions, agenda, turn }
   // `agenda` is CohortLib.agenda(cohort.session_minutes), `turn` LiveLib.TURN.
   function mount(box, opts) {
-    var db = opts.db, cohort = opts.cohort, session = opts.session;
+    var db = opts.db, cohort = opts.cohort, session = opts.session, readOnly = !!opts.readOnly;
     var scenes = [], notes = {}, withScenes = [], editing = null, previewing = null, busy = false, dragId = null, bank = [], kinds = false;
     var status = el('p', 'small'); status.setAttribute('role', 'status');
     var fit = el('p', 'small show-fit');
     var list = el('ol', 'show-list');
+ list.classList.toggle('is-read-only', readOnly);
     list.setAttribute('aria-label', 'Plan for ' + (window.CohortLib ? window.CohortLib.sessionName(session.number) : 'Week ' + session.number));
     var start = el('div', 'actions');
     var add = el('div', 'actions');
@@ -72,9 +81,9 @@
       start.replaceChildren();
       add.replaceChildren();
       fit.textContent = scenes.length
-        ? S.fitText(scenes, cohort.session_minutes) + ' Learners see the scenes’ titles and minutes on their cohort page; your notes stay with the leaders.'
+        ? (readOnly ? scenes.reduce(function (n, x) { return n + x.minutes; }, 0) + ' minutes' : S.fitText(scenes, cohort.session_minutes))
         : (window.CohortLib ? window.CohortLib.sessionName(session.number) : 'Week ' + session.number) + ' has no plan yet.';
-      if (!scenes.length) {
+      if (!scenes.length && !readOnly) {
         var C = window.CurriculumLib, week = C ? C.weekOf(session.number) : null;
         if (week != null && window.CurriculumSeed) start.appendChild(button(C.startLabel(week), 'btn-primary', startPlan));
         start.appendChild(button('Start from the six parts', 'btn-secondary', startDefault));
@@ -84,7 +93,7 @@
       var at = S.startTimes(scenes);
       scenes.forEach(function (s, i) { list.appendChild(item(s, i, at[i])); });
       if (editing === 'new') { var li = el('li', 'scene-item is-editing'); li.appendChild(form(null)); list.appendChild(li); }
-      else add.appendChild(button('Add a scene', 'btn-secondary', function () { editing = 'new'; previewing = null; draw(); focusFirst(); }));
+      else if (!readOnly) add.appendChild(button('Add a part', 'btn-secondary', function () { editing = 'new'; previewing = null; draw(); focusFirst(); }));
     }
 
     function focusFirst() {
@@ -92,47 +101,49 @@
       if (f) f.focus();
     }
 
+    // One part of the plan, as people read it: when it starts, what kind
+    // it is, its title and minutes, its words, and what it asks of people.
+    // A leader also sees their note, and one button to change it; moving
+    // and deleting are in the form, so a row never carries a row of tools.
     function item(s, i, at) {
       var li = el('li', 'scene-item');
       li.dataset.id = s.id;
-      if (editing === s.id) { li.classList.add('is-editing'); li.appendChild(form(s)); return li; }
-      var k = S.kind(s.kind) || { name: s.kind };
+      if (editing === s.id) { li.classList.add('is-editing'); li.appendChild(form(s, i)); return li; }
+      var c = s.config || {};
       var head = el('div', 'scene-head');
       head.appendChild(el('span', 'scene-at', clock(at)));
       var words = el('div', 'scene-words');
-      words.appendChild(el('span', 'scene-kind', k.name));
+      words.appendChild(el('span', 'scene-kind', plain(s.kind)));
       words.appendChild(el('strong', 'scene-title', s.title));
       words.appendChild(el('span', 'scene-minutes small', s.minutes + ' min'));
       head.appendChild(words);
+      if (!readOnly) {
+        var edit = button('Edit', 'btn-secondary small', function () { editing = s.id; previewing = null; draw(); focusFirst(); });
+        edit.setAttribute('aria-label', 'Edit ' + s.title);
+        head.appendChild(edit);
+      }
       li.appendChild(head);
-      if (notes[s.id]) li.appendChild(el('p', 'small scene-note', 'Your note: ' + notes[s.id]));
-      var acts = el('div', 'actions scene-actions');
-      var up = button('Up', 'btn-secondary', function () { move(i, -1); });
-      up.setAttribute('aria-label', 'Move ' + s.title + ' up'); up.disabled = i === 0;
-      var down = button('Down', 'btn-secondary', function () { move(i, 1); });
-      down.setAttribute('aria-label', 'Move ' + s.title + ' down'); down.disabled = i === scenes.length - 1;
-      acts.appendChild(up); acts.appendChild(down);
-      acts.appendChild(button('Edit', 'btn-secondary', function () { editing = s.id; previewing = null; draw(); focusFirst(); }));
-      var prev = button(previewing === s.id ? 'Hide the preview' : 'Preview the main stage', 'btn-secondary', function () {
-        previewing = previewing === s.id ? null : s.id; draw();
-        var again = list.querySelector('[data-id="' + s.id + '"] .scene-actions button:nth-child(4)');
-        if (again) again.focus();
-      });
-      prev.setAttribute('aria-expanded', previewing === s.id ? 'true' : 'false');
-      acts.appendChild(prev);
-      var rm = button('Delete', 'btn-danger', function () {
-        window.UI.confirm({ title: 'Delete ' + s.title + '?', body: 'It comes out of this week\u2019s run of show.', action: 'Delete scene' }).then(function (ok) { if (ok) remove(s); });
-      });
-      acts.appendChild(rm);
-      li.appendChild(acts);
-      if (previewing === s.id) li.appendChild(preview(s));
-      // Keyboard: Alt with the up or down arrow moves the scene you are on.
+      var detail = el('div', 'scene-detail');
+      paragraphs(s.body).forEach(function (p) { detail.appendChild(p); });
+      if (c.prompt) detail.appendChild(el('p', 'scene-prompt', (s.kind === 'question' || s.kind === 'reflection' ? '' : 'The prompt: ') + c.prompt));
+      if (c.options && c.options.length && s.kind === 'question') detail.appendChild(el('p', 'small', c.options.join(' · ')));
+      if (c.room_scenes && c.room_scenes.length) {
+        detail.appendChild(el('p', 'small', 'Each turn: ' + c.room_scenes.map(function (r) { return r.title + ' (' + r.minutes + ')'; }).join(', ') + '.'));
+      }
+      if (!readOnly && notes[s.id]) {
+        var note = el('p', 'scene-note');
+        if (window.UI && window.UI.visibility) { note.appendChild(window.UI.visibility('staff', 'Your note')); note.appendChild(document.createTextNode(' ')); }
+        note.appendChild(document.createTextNode(notes[s.id]));
+        detail.appendChild(note);
+      }
+      if (detail.children.length) li.appendChild(detail);
+      if (readOnly) return li;
+      // Keyboard: Alt with the up or down arrow moves the part you are on.
       li.addEventListener('keydown', function (ev) {
         if (!ev.altKey || (ev.key !== 'ArrowUp' && ev.key !== 'ArrowDown')) return;
         ev.preventDefault();
         move(i, ev.key === 'ArrowUp' ? -1 : 1, true);
       });
-      // Dragging, for those who like it; the buttons do the same.
       li.draggable = true;
       li.addEventListener('dragstart', function (ev) { dragId = s.id; li.classList.add('is-dragging'); if (ev.dataTransfer) ev.dataTransfer.effectAllowed = 'move'; });
       li.addEventListener('dragend', function () { dragId = null; li.classList.remove('is-dragging'); });
@@ -165,7 +176,7 @@
 
     // One form for a new scene and for editing one: the fields each kind
     // uses, and the teacher's own note.
-    function form(s) {
+    function form(s, index) {
       var f = el('form', 'inline-form scene-form');
       var c = (s && s.config) || {};
       function field(label, input, hint) {
@@ -176,16 +187,16 @@
         return l;
       }
       var kindSel = el('select'); kindSel.name = 'kind';
-      S.KINDS.forEach(function (k) { var o = el('option', null, k.name); o.value = k.key; kindSel.appendChild(o); });
+      S.KINDS.forEach(function (k) { var o = el('option', null, plain(k.key)); o.value = k.key; kindSel.appendChild(o); });
       kindSel.value = s ? s.kind : 'talk';
       var kindHint = el('span', 'hint');
-      var kl = field('Kind of scene', kindSel); kl.insertBefore(kindHint, kindSel);
+      var kl = field('Kind of part', kindSel); kl.insertBefore(kindHint, kindSel);
       var title = el('input'); title.name = 'title'; title.maxLength = 120; title.required = true; title.value = s ? s.title : '';
       field('Title', title);
       var minutes = el('input'); minutes.name = 'minutes'; minutes.type = 'number'; minutes.min = 1; minutes.max = 240; minutes.required = true; minutes.value = s ? s.minutes : 5;
       field('Minutes', minutes);
       var body = el('textarea'); body.name = 'body'; body.rows = 3; body.maxLength = 2000; body.value = (s && s.body) || '';
-      var bodyL = field('What the main stage shows', body, 'A few lines. A blank line starts a new one.');
+      var bodyL = field('What happens', body, 'What people read on this session’s page and see in Meet. A blank line starts a new paragraph.');
       var prompt = el('textarea'); prompt.name = 'prompt'; prompt.rows = 2; prompt.maxLength = 500; prompt.value = c.prompt || '';
       var promptL = field('Prompt', prompt);
       var options = el('textarea'); options.name = 'options'; options.rows = 3; options.value = (c.options || []).join('\n');
@@ -213,7 +224,7 @@
       var rooms = el('textarea'); rooms.name = 'room_scenes'; rooms.rows = 5; rooms.value = S.roomScenesToText(c.room_scenes);
       var roomsL = field('The room’s own scenes', rooms, 'One per line, a title and its minutes, such as “Their question, 2”.');
       var note = el('textarea'); note.name = 'note'; note.rows = 2; note.maxLength = 4000; note.value = (s && notes[s.id]) || '';
-      field('Your note for this scene', note, 'Only the cohort’s leaders see it.');
+      field('Your note', note, 'Only the cohort’s leaders see it.');
       var promptLabel = promptL.firstChild;
 
       function fitKind() {
@@ -234,9 +245,19 @@
 
       var msg = el('span', 'small'); msg.setAttribute('role', 'status');
       var acts = el('div', 'actions');
-      var save = el('button', 'btn-secondary', s ? 'Save the scene' : 'Add it to the run of show'); save.type = 'submit';
+      var save = el('button', 'btn-primary', s ? 'Save the part' : 'Add the part'); save.type = 'submit';
       acts.appendChild(save);
       acts.appendChild(button('Cancel', 'btn-secondary', function () { editing = null; draw(); }));
+      if (s) {
+        var up = button('Move up', 'btn-secondary', function () { editing = null; move(index, -1); });
+        up.disabled = index === 0;
+        var down = button('Move down', 'btn-secondary', function () { editing = null; move(index, 1); });
+        down.disabled = index === scenes.length - 1;
+        acts.appendChild(up); acts.appendChild(down);
+        acts.appendChild(button('Delete', 'btn-danger', function () {
+          window.UI.confirm({ title: 'Delete ' + s.title + '?', body: 'It comes out of this session’s plan.', action: 'Delete part' }).then(function (ok) { if (ok) { editing = null; remove(s); } });
+        }));
+      }
       acts.appendChild(msg);
       f.appendChild(acts);
 

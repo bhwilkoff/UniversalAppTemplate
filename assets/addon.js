@@ -20,6 +20,12 @@
 //
 // What it never does: record, measure, or join the call as a
 // participant. It reads the meeting code and nothing else from Meet.
+//
+// Outside Meet, opened as /addon/?c=<slug>&s=<number>, it draws the same
+// panel for that session, for learners until Google approves the add-on
+// for everyone (Ben, October 23, 2026: "a button for learners ... that
+// opens up a page with the features that will be available in the add-on
+// once it [is] approved"). Leaders run sessions from the add-on in Meet.
 (function () {
   var root = document.querySelector('[data-addon]');
   if (!root) return;
@@ -44,7 +50,12 @@
   var framed = false;
   try { framed = window.self !== window.top; } catch (e) { framed = true; }
   var side = null;          // Meet's side panel client
-  if (!framed || !window.meet || !window.meet.addon) { show('outside'); return; }
+  var query = new URLSearchParams(location.search);
+  var standalone = !framed && !!query.get('c');
+  var standaloneSlug = query.get('c') || '';
+  var standaloneNumber = /^\d{1,2}$/.test(query.get('s') || '') ? Number(query.get('s')) : null;
+  if (!standalone && (!framed || !window.meet || !window.meet.addon)) { show('outside'); return; }
+  if (standalone) root.classList.add('addon-standalone');
 
   function withTimeout(p, ms) {
     return Promise.race([p, new Promise(function (_, no) { setTimeout(function () { no(new Error('timeout')); }, ms); })]);
@@ -174,6 +185,13 @@
   function start(session) {
     S.me = session.user;
     show('loading');
+    if (standalone) {
+      return db.from('cohorts').select('id').eq('slug', standaloneSlug).maybeSingle().then(function (c) {
+        if (c.error || !c.data) return fail('This session could not be opened. Open it again from your cohort’s session page.');
+        S.room = { cohortId: c.data.id, groupId: null };
+        return loadCohort(c.data.id);
+      });
+    }
     var info;
     try { info = side.getMeetingInfo(); } catch (e) { info = null; }
     Promise.resolve(info).then(function (m) {
@@ -225,7 +243,8 @@
         S.teacherIds = res[2].data.map(function (t) { return t.user_id; });
         S.people.concat(res[2].data).forEach(function (p) { if (p.profiles) S.names[p.user_id] = p.profiles.display_name || p.profiles.github_login; });
         var t = lib.currentAndNext(ss, new Date(), cohort.session_minutes);
-        S.session = t.live ? t.next : (t.next || t.current);
+        var named = standalone && standaloneNumber != null ? ss.filter(function (x) { return x.number === standaloneNumber; })[0] : null;
+        S.session = named || (t.live ? t.next : (t.next || t.current));
         S.prev = ss.filter(function (x) { return x.number === S.session.number - 1; })[0] || null;
         S.parts = lib.agenda(cohort.session_minutes);
         var since = S.prev && S.prev.starts_at ? S.prev.starts_at : new Date(Date.now() - 8 * 86400000).toISOString();
@@ -544,7 +563,7 @@
     $('[data-where]').textContent = (window.CohortLib ? window.CohortLib.sessionName(S.session.number) : 'Week ' + S.session.number) + ', ' + (group ? group.name + '’s room' : 'the main room') + (S.teaching ? '. You are leading.' : '.') + (S.room.ambiguous ? ' Another cohort uses this call too.' : '');
     var full = $('[data-full-link]'); full.href = '/session/?c=' + encodeURIComponent(S.cohort.slug) + '&s=' + S.session.number;
     $('[data-fallback-link]').href = full.href;
-    $('[data-open-stage]').hidden = !S.teaching;
+    $('[data-open-stage]').hidden = !S.teaching || standalone;
     $('[data-part-controls]').hidden = !S.teaching;
     $('[data-ask-wrap]').hidden = !S.teaching;
     if (S.teaching) startAsking();
@@ -1181,6 +1200,12 @@
       show('outside');
     });
   }
-  $('[data-reload]').addEventListener('click', function () { if (S.me) start({ user: S.me }); else open(); });
-  open();
+  $('[data-reload]').addEventListener('click', function () { if (S.me) start({ user: S.me }); else if (standalone) openStandalone(); else open(); });
+  // Outside Meet there is no main stage to open, and the sign-in is this
+  // site's own.
+  function openStandalone() {
+    show('loading');
+    return sessionOf(db).then(function (s) { if (s) proceed(s); else signedOut(); });
+  }
+  if (standalone) openStandalone(); else open();
 })();
