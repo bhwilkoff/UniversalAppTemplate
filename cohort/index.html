@@ -123,20 +123,6 @@
               <h2 id="next-title">The next session</h2>
               <p data-next-when></p>
               <div class="actions" data-next-actions></div>
-              <!-- The run of show (R2): words by Claude, awaiting Ben's review. -->
-              <div class="run-of-show" data-run-of-show hidden>
-                <h3>How it will go</h3>
-                <ol class="show-glance" data-run-of-show-list></ol>
-              </div>
-              <!-- A background for calls (C9): words by Claude, awaiting Ben's review. -->
-              <div data-bg-wrap hidden>
-                <p class="ui-label">A background for Meet</p>
-                <div class="actions">
-                  <button class="btn-secondary" type="button" data-bg="paper">Light</button>
-                  <button class="btn-secondary" type="button" data-bg="evening">Dark</button>
-                </div>
-                <p class="small" role="status" data-bg-status></p>
-              </div>
             </section>
           </div>
 
@@ -229,9 +215,9 @@
                 <h2 id="roster-title">Learners</h2>
                 <div data-roster></div>
               </section>
-              <section class="panel-section" aria-labelledby="groups-title">
+              <section class="panel-section" aria-labelledby="groups-title" data-groups-section hidden>
                 <h2 id="groups-title">Groups</h2>
-                <p class="ui-meta-line">Three learners each, together for all five weeks, each with its own Meet room.</p>
+                <p class="ui-meta-line">Groups of three that stay together for the whole cohort.</p>
               <div data-groups></div>
               <div class="ui-toolbar"><button class="btn-secondary" type="button" data-group-open>Add a group</button></div>
               <form class="cohort-form group-form" data-group-form hidden>
@@ -348,16 +334,8 @@
               </section>
               <section class="panel-section" aria-labelledby="calls-title">
                 <h2 id="calls-title">Calls</h2>
-                <p class="actions"><a class="btn-secondary" data-rooms-link href="/session/#rooms">Every group room now</a></p>
-                <details class="ui-disclosure">
-                  <summary>Set up Meet by hand</summary>
-                  <p class="actions"><button class="btn-secondary" type="button" data-copy-meet>Copy the setup for the Meet script</button></p>
-                  <textarea class="signing-request" readonly rows="10" aria-label="The setup for the Meet script" data-meet-text hidden></textarea>
-                </details>
-                <details class="ui-disclosure">
-                  <summary>The Human Shaped add-on for Meet</summary>
-                  <p>It puts the live page in Meet&rsquo;s own side panel. Until it is listed, it works for meet@humanshaped.org only: <a href="https://github.com/bhwilkoff/UniversalAppTemplate/blob/site/tools/meet-addon/README.md#who-can-use-it" target="_blank" rel="noopener">who can use it, and how it is installed</a>.</p>
-                </details>
+                <p>Each session is its own calendar event with its own Meet link, sent to everyone in the cohort. Run each session from the Human Shaped add-on inside the call, joined as meet@humanshaped.org until the add-on is listed for everyone.</p>
+                <p class="ui-help"><a href="https://github.com/bhwilkoff/UniversalAppTemplate/blob/site/tools/meet-addon/README.md#who-can-use-it" target="_blank" rel="noopener">How the add-on is installed</a></p>
               </section>
               <section class="panel-section danger-zone" data-danger hidden aria-labelledby="danger-title">
                 <h2 id="danger-title">Delete this draft</h2>
@@ -404,8 +382,8 @@
   <script src="/assets/curriculum-lib.js?v=20261023d" defer></script>
   <script src="/assets/curriculum-seed.js?v=20261023b" defer></script>
   <script src="/assets/show-builder.js?v=20261023f" defer></script>
-  <script src="/assets/teach-cohort.js?v=20261023b" defer></script>
-  <script src="/assets/cohort.js?v=20261023b" defer></script>
+  <script src="/assets/teach-cohort.js?v=20261023h" defer></script>
+  <script src="/assets/cohort.js?v=20261023h" defer></script>
   <script src="/assets/exchange-lib.js?v=20261022a" defer></script>
   <script src="/assets/exchange-list.js?v=20261022d" defer></script>
 

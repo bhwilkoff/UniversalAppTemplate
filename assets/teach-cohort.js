@@ -40,7 +40,7 @@
       ['Status', U.status('cohort', c.status)],
       ['Meets', when || 'Not set'],
       ['Length', c.session_minutes + ' minutes'],
-      ['Starts', c.starts_on ? new Date(c.starts_on + 'T12:00:00').toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' }) : 'Not set'],
+      ['First session', sessions && sessions.length && sessions[0].starts_at ? new Date(sessions[0].starts_at).toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) : 'Not set'],
       ['Weeks', String(c.weeks)],
       ['People', c.capacity ? here + ' of ' + c.capacity : String(here)]
     ]));
@@ -59,7 +59,11 @@
       }));
     }
     bar.hidden = !bar.children.length;
-    $('[data-make-sessions]').textContent = sessions.length ? 'Update the sessions' : 'Make the sessions';
+    // Once made, the button matches the dates to a changed schedule and
+    // fills in any plan still missing; it never overwrites a plan.
+    var make = $('[data-make-sessions]');
+    make.textContent = sessions.length ? 'Match the dates to the schedule' : 'Make the sessions';
+    make.className = sessions.length ? 'btn-secondary' : 'btn-primary';
     needs.draw();
   }
   // What needs the teacher, each a row with a count and a way there.
@@ -113,7 +117,6 @@
       drawLesson(c, res[1].data);
       drawRoster(res[2].data, res[3].data);
       drawTeachers();
-      $('[data-rooms-link]').href = '/session/?c=' + encodeURIComponent(c.slug) + '#rooms';
       loadSubmissions(res[2].data, res[1].data);
       drawGroups(res[3].data, res[2].data);
       drawCohortSetup(res[1].data, res[4].data, null);
@@ -138,7 +141,7 @@
     var steps = lib.cohortSetupSteps(current, sessions, access, meetRequest);
     var allDone = steps.every(function (x) { return x.done || x.optional; });
     $('[data-cohort-setup]').hidden = allDone;
-    $('[data-setup-done]').replaceChildren(allDone ? U.empty('Setup done') : '');
+    $('[data-setup-done]').replaceChildren();
     var list = $('[data-cohort-setup-steps]');
     list.replaceChildren();
     var needed = steps.filter(function (x) { return !x.optional; });
@@ -237,32 +240,6 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
           }).catch(function () {})
         : Promise.resolve();
       seeding.then(function () { openCohort(cohort.id); });
-    });
-  });
-
-  // The setup the Meet script reads, with one room asked for per group
-  // (each group's members by the emails they gave for invitations). If
-  // the clipboard is not available, the text appears on the page to copy.
-  $('[data-copy-meet]').addEventListener('click', function () {
-    var shown = $('[data-meet-text]');
-    shown.hidden = true;
-    db.from('calendar_contacts').select('user_id, email').eq('cohort_id', current.id).then(function (r) {
-      if (r.error) return say('[data-detail-message]', 'The emails could not be read: ' + r.error.message);
-      var byUser = {};
-      r.data.forEach(function (x) { byUser[x.user_id] = x.email; });
-      var groups = currentGroups.map(function (g) {
-        return { id: g.id, name: g.name, emails: g.group_members.map(function (m) { return byUser[m.user_id]; }).filter(Boolean) };
-      });
-      var setup = lib.meetSetup(current, r.data.map(function (x) { return x.email; }), [], groups);
-      var text = JSON.stringify(setup, null, 2);
-      var rooms = groups.length ? ', and the script will make a room for each of the ' + groups.length + (groups.length === 1 ? ' group' : ' groups') : '';
-      var told = r.data.length + (r.data.length === 1 ? ' person has' : ' people have') + ' given an email for invitations' + rooms + '.';
-      var done = function () { say('[data-detail-message]', 'Copied. Paste it into the Meet events script as this cohort’s setup, and add your own email under "teachers". ' + told); };
-      var fallback = function () {
-        shown.value = text; shown.hidden = false; shown.select();
-        say('[data-detail-message]', 'Copy the setup below, paste it into the Meet events script, and add your own email under "teachers". ' + told);
-      };
-      if (navigator.clipboard) navigator.clipboard.writeText(text).then(done, fallback); else fallback();
     });
   });
 
@@ -978,6 +955,10 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
     var box = $('[data-groups]');
     box.replaceChildren();
     var here = people.filter(function (p) { return p.status !== 'left'; });
+    // Groups wait until a cohort has eight learners or more (Ben's
+    // decision 8 in JOURNEYS.md); below that, everyone is one group.
+    var section = $('[data-groups-section]');
+    if (section) section.hidden = !groups.length && here.length < 8;
     if (!groups.length) { box.appendChild(U.empty('No groups yet')); return; }
     groups.forEach(function (g) {
       var card = el('article', 'cohort-card');

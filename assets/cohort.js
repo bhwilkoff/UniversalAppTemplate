@@ -664,10 +664,10 @@
     if (!C || !q || !st) return;
     var w = C.weekOf(n);
     q.hidden = !w;
-    if (w) { q.replaceChildren(window.UI.tag(w.lead), document.createTextNode(' ' + w.question)); }
+    if (w) q.textContent = 'This week’s question: ' + w.question;
     var s = C.stuckFor(n);
     st.replaceChildren();
-    var a = document.createElement('a'); a.href = s.url; a.textContent = s.label;
+    var a = document.createElement('a'); a.href = s.url; a.textContent = 'If you get stuck';
     st.appendChild(a);
     st.hidden = false;
   }
@@ -720,9 +720,11 @@
     var myGroup = groups.filter(function (g) { return g.group_members.some(function (m) { return m.user_id === me.id; }); })[0];
     var room = myGroup ? safe(myGroup.meet_url) : null;
     $('[data-week-title]').textContent = t.current ? lib.sessionTitle(t.current) : 'This week';
-    $('[data-week-scope]').textContent = t.current && t.current.scope ? t.current.scope : 'Not posted yet';
+    $('[data-week-scope]').textContent = t.current && t.current.scope ? t.current.scope : '';
+    $('[data-week-scope]').hidden = !(t.current && t.current.scope);
     drawWeekMove(t.current ? t.current.number : null);
-    drawBackground();
+    // The plan now lives on the session's own page (JOURNEYS.md, the
+    // walk-through audit), so This week links there instead of repeating it.
     var na = $('[data-next-actions]'); na.replaceChildren();
     if (t.next) {
       $('[data-next-when]').textContent = (t.live ? 'Happening now: ' : '') + when(t.next.starts_at) + ', for ' + cohort.session_minutes + ' minutes.';
@@ -736,7 +738,6 @@
     } else {
       $('[data-next-when]').textContent = sessions.length ? 'All sessions done' : 'Not scheduled yet';
     }
-    drawRunOfShow(t.next);
     var past = sessions.filter(function (s) { return safe(s.recording_url); });
     past.forEach(function (s) { na.appendChild(link(s.recording_url, lib.sessionName(s.number) + ' recording')); });
 
