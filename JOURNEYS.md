@@ -322,6 +322,21 @@ Chosen from multiple-choice options:
     the events exist is added as a guest to every session still to come,
     within the hour.
 
+## The session page prepares; the add-on runs (Ben, October 23, 2026)
+
+Ben: "The session page should functionally only be to prep the session.
+All of the other work that a Leader should be doing in the session
+should be done via the Google Meet add-on. There shouldn't have to be two
+different pages open just to run the session (the google meet video call
+and the humanshaped.org session page). The session page should show
+content to the learners and should be prep for the leader, but once the
+session is going, the session page on humanshaped.org should serve no
+further purpose for the leader (other than as reference)."
+
+This replaces decision 4's "Run it here" fallback and S1's "During": the
+session page never carries live controls. Leaders prepare there; they run
+the session only in the add-on, inside the Meet call.
+
 ## The walk-through audit, October 23, 2026
 
 Ben: "I still see lots of things that either don't make sense or don't
