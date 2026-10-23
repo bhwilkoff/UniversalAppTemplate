@@ -1118,7 +1118,7 @@ function sendInvitations() {
   var list = askSetupQueue_('invitations').invitations || [];
   var sent = [];
   list.forEach(function (inv) {
-    var when = inv.first_session ? Utilities.formatDate(new Date(inv.first_session), inv.time_zone, "EEEE, MMMM d 'at' h:mm a") + ' (' + inv.time_zone.replace(/_/g, ' ') + ' time)' : null;
+    var when = inv.first_session ? Utilities.formatDate(new Date(inv.first_session), inv.time_zone, "EEEE, MMMM d 'at' h:mm a, zzzz") : null;
     var mail = invitationEmail(inv, when);
     if (!mail) return;
     MailApp.sendEmail({ to: mail.to, subject: mail.subject, body: mail.body, name: 'Human Shaped' });
