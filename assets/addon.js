@@ -685,6 +685,14 @@
     var lead = $('[data-now-lead]'); lead.replaceChildren();
     if (S.plan && S.plan.lead === 'heard') drawHeard(lead);
     if (S.plan && S.plan.lead === 'groups') drawGroups(lead);
+    // An empty section is no section (found in the test cohort).
+    lead.hidden = !lead.children.length;
+    // Once the show runs, the current part carries its own clock, so this
+    // box keeps only what a leader can do here (the welcome), and a learner
+    // has no box at all.
+    var running = shared() && !!part;
+    $('[data-part-kicker]').hidden = running;
+    $('[data-part-clock]').hidden = running && !S.teaching;
   }
 
   function tick() {

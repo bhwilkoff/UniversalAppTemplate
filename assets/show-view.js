@@ -282,7 +282,9 @@
       var target = current && items[current] ? items[current].body : before;
       l.now.forEach(function (key) {
         var w = wraps[key].box;
-        if (w.parentNode !== target) { target.appendChild(w); w.open = true; }
+        // A leader's cue (a card, rooms, the presenter) waits closed until
+        // it is wanted; what the part itself needs opens.
+        if (w.parentNode !== target) { target.appendChild(w); w.open = key.indexOf('cue-') !== 0; }
         else target.appendChild(w);
       });
       l.anytime.forEach(function (key) {
