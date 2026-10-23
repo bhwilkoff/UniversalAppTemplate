@@ -3018,7 +3018,13 @@ def main():
     check("once its event matches, it leaves the list", sv.fetchall() == [])
     check("and the session carries the event's own Meet link",
           attempt(as_user("dee"), "select meet_url from public.sessions where id = %s", (cal_s,)) and last_rows == [("https://meet.google.com/abc-defg-hij",)])
+    sv = as_server(); sv.execute("select public.calendar_done(%s, 'evt1', 'https://meet.google.com/zzz-zzzz-zzz', %s)", (cal_s, got[0][2]))
+    check("a session keeps the Meet link it has; the calendar's never writes over it",
+          attempt(as_user("dee"), "select meet_url from public.sessions where id = %s", (cal_s,)) and last_rows == [("https://meet.google.com/abc-defg-hij",)])
+    sv = as_server(); sv.execute("select meet_url from public.calendar_work() where session_id = %s", (cal_s,))
     attempt(as_user("dee"), "update public.calendar_preferences set invites = false returning 1")
+    sv = as_server(); sv.execute("select meet_url from public.calendar_work() where session_id = %s", (cal_s,))
+    check("the calendar's list hands the script the session's own link", sv.fetchall() == [("https://meet.google.com/abc-defg-hij",)])
     sv = as_server(); sv.execute(work, (newc,)); got = sv.fetchall()
     check("someone who turns invitations off comes off the guest list, and the event is changed",
           len(got) == 1 and got[0][1] == ["ben@example.org"] and got[0][3] == "evt1")

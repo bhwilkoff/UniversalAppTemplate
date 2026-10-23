@@ -993,9 +993,16 @@ function sessionDescription(s, folderUrl) {
   return lines.join('\n');
 }
 
-// The event for one session from the hub's to-do list. A new event also
-// asks Calendar for its own Meet link (createRequest), keyed to the
-// session so a retry never makes a second one.
+// The event for one session from the hub's to-do list. A new event
+// carries the session's Meet link when it already has one (a leader set
+// it, or people already have it), and otherwise asks Calendar for its
+// own (createRequest), keyed to the session so a retry never makes a
+// second one.
+function meetCodeOf(url) {
+  var m = /^https:\/\/meet\.google\.com\/([a-z]{3}-[a-z]{4}-[a-z]{3})$/.exec(String(url || ''));
+  return m ? m[1] : null;
+}
+
 function sessionEventResource(s, folderUrl, isNew) {
   var start = new Date(s.starts_at);
   var end = new Date(start.getTime() + Number(s.minutes) * 60000);
@@ -1011,7 +1018,16 @@ function sessionEventResource(s, folderUrl, isNew) {
     guestsCanModify: false,
     extendedProperties: { private: { hsSessionId: s.session_id, hsCohortId: s.slug } },
   };
-  if (isNew) r.conferenceData = { createRequest: { requestId: 'hs-' + s.session_id, conferenceSolutionKey: { type: 'hangoutsMeet' } } };
+  var code = meetCodeOf(s.meet_url);
+  if (isNew && code) {
+    r.conferenceData = {
+      conferenceId: code,
+      conferenceSolution: { key: { type: 'hangoutsMeet' } },
+      entryPoints: [{ entryPointType: 'video', uri: 'https://meet.google.com/' + code, label: 'meet.google.com/' + code }],
+    };
+  } else if (isNew) {
+    r.conferenceData = { createRequest: { requestId: 'hs-' + s.session_id, conferenceSolutionKey: { type: 'hangoutsMeet' } } };
+  }
   return r;
 }
 
@@ -1080,7 +1096,17 @@ function syncCalendars() {
         }
       }
       if (!event) {
-        event = Calendar.Events.insert(sessionEventResource(s, folders[s.slug], true), 'primary', { conferenceDataVersion: 1, sendUpdates: 'all' });
+        var fresh = sessionEventResource(s, folders[s.slug], true);
+        try {
+          event = Calendar.Events.insert(fresh, 'primary', { conferenceDataVersion: 1, sendUpdates: 'all' });
+        } catch (e) {
+          // Calendar would not attach the existing call: the event names
+          // it instead, and the session keeps its link either way.
+          if (!meetCodeOf(s.meet_url)) throw e;
+          delete fresh.conferenceData;
+          fresh.location = s.meet_url;
+          event = Calendar.Events.insert(fresh, 'primary', { sendUpdates: 'all' });
+        }
         event = waitForMeet_(event.id);
       }
       done.push({ session_id: s.session_id, event_id: event.id, meet_url: meetLinkOf(event), want: s.want });

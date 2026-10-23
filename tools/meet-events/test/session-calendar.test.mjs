@@ -36,6 +36,14 @@ test('each session is its own event, with its own Meet link asked for, its page,
   assert.match(r.description, /drive\.google\.com\/x/);
 });
 
+test('a session that already has a Meet link keeps it on its new event', () => {
+  const r = plain(gs.sessionEventResource(Object.assign({}, prep, { meet_url: 'https://meet.google.com/irt-ynum-rnw' }), null, true));
+  assert.equal(r.conferenceData.createRequest, undefined);
+  assert.equal(r.conferenceData.conferenceId, 'irt-ynum-rnw');
+  assert.equal(r.conferenceData.entryPoints[0].uri, 'https://meet.google.com/irt-ynum-rnw');
+  assert.equal(gs.meetCodeOf('https://meet.google.com/irt-ynum-rnw?x=1'), null);
+});
+
 test('changing an event keeps its Meet link', () => {
   assert.equal(plain(gs.sessionEventResource(prep, null, false)).conferenceData, undefined);
 });
