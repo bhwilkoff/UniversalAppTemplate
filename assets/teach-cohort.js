@@ -239,7 +239,7 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
             if (line) say('[data-detail-message]', made + ' ' + line);
           }).catch(function () {})
         : Promise.resolve();
-      seeding.then(function () { openCohort(cohort.id); });
+      seeding.then(function () { reloadPage(); });
     });
   });
 
