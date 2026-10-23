@@ -128,7 +128,68 @@
             "Somewhere else"
           ]
         }
-      ]
+      ],
+      "lengths": {
+        "60": [
+          {
+            "kind": "talk",
+            "title": "Arrive",
+            "minutes": 5,
+            "body": "Your name, where you are joining from, and one thing in your life you wish worked differently. That last line is the first entry in the log you start tonight."
+          },
+          {
+            "kind": "talk",
+            "title": "How we talk to one another",
+            "minutes": 5,
+            "body": "The four rules, said aloud: no correcting what does not matter, no acting surprised, no taking over, and no small digs at who someone is. When one is broken, someone says so plainly, the person says thanks, and we move on."
+          },
+          {
+            "kind": "presenter",
+            "title": "Show what you set up",
+            "minutes": 20,
+            "body": "Each person in turn opens their app's address on their phone and holds it up. If setup stopped somewhere, show where it stopped, and we work through it together, where everyone can see. Being stuck tonight is the most useful thing anyone can bring.",
+            "note": "Watch for anyone whose setup is still stuck, and fix one in front of everyone: it teaches the room how to ask their agent for help."
+          },
+          {
+            "kind": "design",
+            "title": "What a bring-back looks like",
+            "minutes": 12,
+            "body": "Every session from week 1 opens with each person showing the week's work on a device. Here is a strong bring-back and a weak one, side by side. Then everyone practices the three questions on the weak one: where is it going, how is it going, and what is next.",
+            "config": {
+              "template": "questions"
+            }
+          },
+          {
+            "kind": "reflection",
+            "title": "Start your noticing log",
+            "minutes": 10,
+            "body": "For five days, write one line whenever one of these happens:\n\nI wished something worked differently.\nI gave up on something I care about.\nI did something the long way because nothing helped.\nSomeone I know struggled with the same thing.\n\nNo app ideas yet. Just what happened. Write today's line now, before you leave: this log is where week 1's problem comes from.",
+            "config": {
+              "prompt": "What is one thing that happened today that could go in your log?"
+            }
+          },
+          {
+            "kind": "question",
+            "title": "Check for understanding",
+            "minutes": 4,
+            "body": "In your own words. Only your leaders read it.",
+            "config": {
+              "prompt": "What do you hope your app will do for someone?",
+              "kind": "short"
+            }
+          },
+          {
+            "kind": "question",
+            "title": "What is still muddy?",
+            "minutes": 4,
+            "body": "Anything from tonight that is not clear yet. Your leaders read every answer before week 1.",
+            "config": {
+              "prompt": "What is still muddy for you?",
+              "kind": "short"
+            }
+          }
+        ]
+      }
     },
     {
       "key": "week-1",
