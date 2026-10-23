@@ -1250,6 +1250,9 @@ body.addon-body { min-height: 100vh; }
 .addon-mark span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 .addon-panel { padding: 0.9rem 0.9rem 2rem; display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.75rem; font-size: 1rem; }
+/* Outside Meet (learners, until Google approves the add-on): the same
+   panel as one readable column, not stretched across a desktop window. */
+.addon-panel.addon-standalone { max-width: 40rem; margin: 0 auto; }
 .addon-panel > *, .addon-panel .account-state > * { min-width: 0; }
 .addon-panel .account-state:not([hidden]) { display: grid; gap: 0.75rem; min-width: 0; }
 .addon-panel h1 { font-size: 1.3rem; line-height: 1.2; letter-spacing: -0.015em; }
