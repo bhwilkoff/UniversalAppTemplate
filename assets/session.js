@@ -98,7 +98,7 @@
 
     // What to bring: the stage's "Be ready to...", which the plan's
     // bring-back part asks for, and the stages this session starts.
-    drawPlan(cohort, sessions, session, leading);
+    drawPlan(cohort, sessions, session, leading, finished);
     var stages = lib.stagesForWeek(session.number);
     var stageBox = $('[data-stages]'); stageBox.replaceChildren();
     stages.forEach(function (n) { var li = el('li'); li.appendChild(link('Stage ' + n, '/path/' + n + '/')); stageBox.appendChild(li); });
@@ -109,7 +109,7 @@
     show('ready');
   }
 
-  function drawPlan(cohort, sessions, session, leading) {
+  function drawPlan(cohort, sessions, session, leading, finished) {
     var box = $('[data-plan]');
     if (!window.ShowBuilder || !window.ShowLib) { box.replaceChildren(U.empty('The plan could not load')); return; }
     window.ShowBuilder.mount(box, {
@@ -120,7 +120,8 @@
     db.from('scenes').select('kind, title, config, position').eq('session_id', session.id).order('position').then(function (r) {
       var bring = (r.data || []).filter(function (x) { return (x.kind === 'rooms' || x.kind === 'presenter') && x.config && x.config.prompt; })[0];
       var sec = $('[data-bring-section]');
-      sec.hidden = !bring;
+      // What to bring matters only before the session.
+      sec.hidden = !bring || !!finished;
       if (bring) $('[data-bring]').textContent = bring.config.prompt;
     });
   }
