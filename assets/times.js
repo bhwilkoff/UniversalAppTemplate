@@ -112,7 +112,8 @@
     note.textContent = poll.note || '';
     note.hidden = !poll.note;
     $('[data-session-line]').textContent = 'Each time is when a session starts.';
-    $('[data-closed]').hidden = true;
+    // A closed poll says so, unless an invitation below says more.
+    $('[data-closed]').hidden = !!poll.open;
     form.querySelectorAll('input, textarea, button[type="submit"]').forEach(function (n) {
       if (n.name !== 'zone') n.disabled = !poll.open;
     });
