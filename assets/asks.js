@@ -59,6 +59,20 @@
     function closeForm() { asking.reset(); asking.hidden = true; start.hidden = false; start.focus(); }
     var board = el('div', 'asks-board');
     box.appendChild(board);
+    // GitHub's list filtered by label trails a new or changed issue by a
+    // few seconds, so what GitHub just answered is kept and shown first
+    // (found in the test cohort: a new request vanished until a reload).
+    var fresh = {};
+    function remember(issue) { if (issue && typeof issue.number === 'number') fresh[issue.number] = issue; }
+    function merged(list) {
+      var byNumber = {};
+      (list || []).forEach(function (i) { byNumber[i.number] = i; });
+      Object.keys(fresh).forEach(function (n) {
+        var f = fresh[n], have = byNumber[n];
+        if (!have || String(have.updated_at) < String(f.updated_at)) byNumber[n] = f; else delete fresh[n];
+      });
+      return Object.keys(byNumber).map(function (n) { return byNumber[n]; });
+    }
     load();
 
     function load() {
@@ -70,7 +84,7 @@
           board.appendChild(n);
           return;
         }
-        var cols = A.columns(r.body, new Date());
+        var cols = A.columns(merged(r.body), new Date());
         A.COLUMNS.forEach(function (c) {
           var sec = el('section', 'asks-column');
           sec.setAttribute('aria-label', c.label);
@@ -97,7 +111,7 @@
           var q = A.request(repo, card, m, me);
           ask(token, q.method, q.url, q.body).then(function (r) {
             btn.disabled = false;
-            if (r.ok) load(); else U.say(said, 'Not moved: ' + (r.body.message || r.status), 'problem');
+            if (r.ok) { remember(r.body); load(); } else U.say(said, 'Not moved: ' + (r.body.message || r.status), 'problem');
           });
         });
       });
@@ -135,7 +149,7 @@
           var q = A.request(repo, card, 'done', me);
           return ask(token, q.method, q.url, q.body).then(function (r2) {
             go.disabled = false;
-            if (r2.ok) load(); else U.say(said, 'Sent, but not marked tried: ' + (r2.body.message || r2.status), 'problem');
+            if (r2.ok) { remember(r2.body); load(); } else U.say(said, 'Sent, but not marked tried: ' + (r2.body.message || r2.status), 'problem');
           });
         });
       });
@@ -173,6 +187,7 @@
         ask(token, 'POST', A.createUrl(repo), n.body).then(function (r) {
           go.disabled = false;
           if (!r.ok) { U.say(said, 'Not asked: ' + (r.body.message || r.status), 'problem'); return; }
+          remember(r.body);
           closeForm();
           load();
         });
