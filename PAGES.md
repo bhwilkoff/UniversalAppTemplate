@@ -62,7 +62,7 @@ role you hold and the role named on the page, never a switcher.
   view), then Your work. Nothing on it repeats a sidebar place.
 - **One cohort, one page, eight sections** (`/cohort/?c=`, `assets/cohort-nav.js`),
   the same for everyone and in the same order: **This week**, **Sessions**,
-  **Conversation**, **Asks**, **Files**, **Exchanges**, **People**, then **Your work** for
+  **Conversation**, **Try my app**, **Files**, **Exchanges**, **People**, then **Your work** for
   learners or **Settings** for leaders. A leader's tools sit inside the
   shared sections, never in sections of their own (Ben, October 22, 2026:
   "It seems like we can do some simplification on these pages too"):
@@ -75,10 +75,9 @@ role you hold and the role named on the page, never a switcher.
   - Conversation: the cohort repository's Discussions, and Watch on
     GitHub; for leaders, the button that makes the repository, right
     there.
-  - Asks: the cohort's board. Anyone asks the cohort for something, and
-    anyone moves it from Asked to Someone has it to Done; each ask is an
-    issue labeled "ask" in the cohort's repository. Nothing on it counts
-    or compares people.
+  - Try my app: the cohort's one board (JOURNEYS.md, decision 3). A learner asks
+    for their app to be tried on a device they do not have; someone takes
+    it and marks it tried with what they saw.
   - Files: what the cohort shares, kept in its repository by folder
     (Resources, then each week), added as the person (Ben, October 22,
     2026: "any shared resource or file should be stored on github within
@@ -121,7 +120,7 @@ role you hold and the role named on the page, never a switcher.
 |---|---|---|
 | `/` | Your home | Follow a row to the thing |
 | `/account/` | Your account | How you sign in, linked accounts, how leaders reach you, your data, sign out, delete; confirm joining one cohort (`?join=`) |
-| `/cohort/?c=` | One cohort: This week, Sessions, Conversation, Asks, Files, Exchanges, People, and Your work (learners) or Settings (leaders) | Read the week, join a session, bring something back, keep your app; a leader sets it up and runs it from the same sections |
+| `/cohort/?c=` | One cohort: This week, Sessions, Conversation, Try my app, Files, Exchanges, People, and Your work (learners) or Settings (leaders) | Read the week, join a session, bring something back, keep your app; a leader sets it up and runs it from the same sections |
 | `/session/?c=&s=` | One session, before, during, and after it (JOURNEYS.md, S1); `/live/` forwards here | Join the call, read the plan, take part; a leader changes the plan and runs it |
 | `/board/?c=`, `/card/?c=` | A session's board; its card | Draw; show the card |
 | `/exchange/#<link>` | One exchange | Watch, add a video |

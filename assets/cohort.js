@@ -322,7 +322,7 @@
           partnerIds = lib.partnersOf(me.id, res[2].data);
           draw(people, mine, res[1].data, res[2].data, res[3].data, res[4].data, res[5].data);
           drawTalk(res[6].data);
-          if (window.CohortAsks) window.CohortAsks.mount($('[data-asks]'), { db: db, session: session, cohort: cohort, access: res[6].data, leading: teaching });
+          if (window.CohortAsks) window.CohortAsks.mount($('[data-asks]'), { db: db, session: session, cohort: cohort, access: res[6].data, leading: teaching, app: mine && mine.app_url });
           if (window.CohortFiles) window.CohortFiles.mount($('[data-files]'), { db: db, session: session, cohort: cohort, access: res[6].data, leading: teaching });
           drawFeedback(res[5].data, people, res[3].data, mine);
           drawRecognized(res[5].data);
