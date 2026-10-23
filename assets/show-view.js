@@ -139,7 +139,7 @@
       var mode = run.canEdit(s.key);
       if (!mode) return null;
       var d = el('details', 'show-edit');
-      d.appendChild(el('summary', null, 'Edit this scene'));
+      d.appendChild(el('summary', null, 'Edit this part'));
       if (mode === 'parts') {
         d.appendChild(el('p', 'small', 'Running on the six parts.'));
         var msg0 = el('p', 'small'); msg0.setAttribute('role', 'status');
@@ -238,7 +238,6 @@
       var badge = el('span', 'show-count'); badge.hidden = true;
       sum.appendChild(badge);
       d.appendChild(sum);
-      if (t.line) d.appendChild(el('p', 'small show-slot-line', t.line));
       wraps[key] = { box: d, badge: badge, name: t.name };
       return wraps[key];
     }

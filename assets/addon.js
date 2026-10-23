@@ -285,6 +285,7 @@
       // without groups, a board without a board part (JOURNEYS.md).
       unavailable: function () {
         var off = [];
+        off.push('cue-talk');
         if (!S.groups.length) off.push('rooms', 'cue-rooms', 'brought');
         var list = S.list || S.parts || [];
         if (!list.some(function (x) { return x.kind === 'design' || x.key === 'prompt'; })) off.push('design');
@@ -672,7 +673,9 @@
 
   function drawNowActivity() {
     var part = partNow();
-    $('[data-part-kicker]').textContent = part ? 'Minute ' + part.start + ' of ' + S.cohort.session_minutes : 'Before the session, week ' + S.session.number;
+    $('[data-part-kicker]').textContent = part ? 'Minute ' + part.start + ' of ' + S.cohort.session_minutes : 'Not started yet';
+    // Before anything has begun, a leader's one clear move: start.
+    $('[data-start-session]').hidden = !(S.teaching && !part);
     tick();
     // The welcome: on the main stage by itself before any scene begins,
     // and the teacher's to put back up at any time (C9).
@@ -1160,6 +1163,13 @@
     if (!S.stageOn || !side || !S.session) return;
     try { Promise.resolve(side.notifyMainStage(A.stageMessage(currentView()))).catch(function () {}); } catch (e) {}
   }
+  // Start the session: the first part, with its clock running.
+  $('[data-start-session]').addEventListener('click', function () {
+    var first = (S.list || S.parts || [])[0];
+    if (!first) return;
+    if (shared()) S.run.go(first.key).then(function () { return S.run.clock(true); });
+    else { S.chosenPart = first.key; drawPart(true); }
+  });
   $('[data-open-stage]').addEventListener('click', function () {
     var status = $('[data-stage-status]');
     status.textContent = 'Opening the main stage…';
