@@ -299,7 +299,18 @@
       },
       run: S.teaching ? {
         onStep: function (d) { if (shared()) S.run.step(d); else stepLocal(d); },
-        onClock: function (on) { if (shared()) S.run.clock(on); else $('[data-timer]').click(); },
+        // The database runs a clock only on a current part, so a clock
+        // started before the show has begun begins it on the part shown
+        // (found in a real Meet call: Start the clock did nothing).
+        onClock: function (on) {
+          if (!shared()) { $('[data-timer]').click(); return; }
+          if (on && !S.run.current()) {
+            var p = partNow() || (S.list || S.parts || [])[0];
+            if (p) S.run.go(p.key).then(function () { return S.run.clock(true); });
+            return;
+          }
+          S.run.clock(on);
+        },
         onFollow: function () { setPin(null); },
         canEdit: function (key) {
           if (!S.run) return null;
@@ -582,6 +593,13 @@
     full.hidden = standalone;
     $('[data-fallback-link]').href = full.href;
     $('[data-open-stage]').hidden = !S.teaching || standalone;
+    // The main stage is a leader's first move in a call, so its button sits
+    // at the top of the panel, not below every part.
+    if (S.teaching && !standalone) {
+      var head = root.querySelector('.addon-head');
+      head.appendChild($('[data-open-stage]'));
+      head.appendChild($('[data-stage-status]'));
+    }
     $('[data-part-controls]').hidden = !S.teaching;
     $('[data-ask-wrap]').hidden = !S.teaching;
     if (S.teaching) startAsking();
@@ -678,7 +696,9 @@
     var part = partNow();
     $('[data-part-kicker]').textContent = part ? 'Minute ' + part.start + ' of ' + S.cohort.session_minutes : 'Not started yet';
     // Before anything has begun, a leader's one clear move: start.
-    $('[data-start-session]').hidden = !(S.teaching && !part);
+    // Until a leader starts it, the show has not begun, whatever the
+    // schedule says.
+    $('[data-start-session]').hidden = !(S.teaching && (shared() ? !S.run.current() : !part));
     tick();
     // The welcome: on the main stage by itself before any scene begins,
     // and the teacher's to put back up at any time (C9).

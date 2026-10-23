@@ -107,8 +107,12 @@
         var acts = el('div', 'actions show-moves');
         acts.appendChild(btn('Back', 'btn-secondary show-back', function () { if (run.onStep) run.onStep(-1); }));
         acts.appendChild(btn('Next part', 'btn-primary show-next', function () { if (run.onStep) run.onStep(1); }));
-        clockBtn = btn('Start the clock', 'btn-secondary show-clock-btn', function () { if (run.onClock) run.onClock(!info.clockOn); });
-        acts.appendChild(clockBtn);
+        // The clock's own switch sits beside it, small, so Back and Next
+        // keep one row in Meet's narrow panel.
+        clockBtn = btn('Start', 'btn-secondary small show-clock-btn', function () { if (run.onClock) run.onClock(!info.clockOn); });
+        var row = el('div', 'show-clock-row');
+        box.insertBefore(row, clock);
+        row.appendChild(clock); row.appendChild(clockBtn);
         box.appendChild(acts);
       }
       return { box: box, clock: clock, pinned: pinned, follow: follow, clockBtn: clockBtn, key: s.key };
@@ -121,12 +125,13 @@
         var here = key === current;
         b.box.hidden = !here;
         if (!here) return;
-        b.clock.textContent = info.left || (info.clockOn ? '' : (teaching ? 'The clock is stopped.' : ''));
+        b.clock.textContent = info.left || (info.clockOn ? '' : (teaching ? 'Clock stopped' : ''));
+        b.clock.classList.toggle('is-stopped', !info.left);
         b.clock.hidden = !b.clock.textContent;
         b.pinned.hidden = !info.pinned;
         b.pinned.textContent = info.pinned ? 'The main stage shows ' + info.pinned + ' instead of this scene.' : '';
         if (b.follow) b.follow.hidden = !info.pinned;
-        if (b.clockBtn) b.clockBtn.textContent = info.clockOn ? 'Stop the clock' : 'Start the clock';
+        if (b.clockBtn) b.clockBtn.textContent = info.clockOn ? 'Stop' : 'Start';
       });
     }
 

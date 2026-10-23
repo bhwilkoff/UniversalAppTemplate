@@ -2683,3 +2683,11 @@ html.app-nav-open[data-signed-in] body:not([data-no-app-nav]) .app-nav { display
 .session-bring, .session-plan { margin: 2rem 0; }
 .session-bring h2, .session-plan h2 { margin: 0 0 0.75rem; }
 @media (max-width: 560px) { .scene-detail { margin-left: 0; } }
+
+/* The current part's clock in the add-on's narrow panel: the time, and its
+   small switch beside it; stopped, it is quiet (found in a real Meet call). */
+.show-clock-row { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+.show-clock.is-stopped { font-size: 0.95rem; font-weight: 500; color: var(--muted); }
+.show-moves { flex-wrap: nowrap; }
+/* The part's words, read across a call on the main stage. */
+.stage-lines .stage-what { font-size: clamp(1.35rem, 4.4vmin, 3rem); }
