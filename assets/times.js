@@ -20,7 +20,7 @@
     root.querySelectorAll('.times-state').forEach(function (s) { s.hidden = s.getAttribute('data-state') !== state; });
   }
   function said(e) { return e && e.message ? e.message : String(e || 'no details'); }
-  function status(text) { $('[data-status]').textContent = text || ''; }
+  function status(text) { $('[data-say]').textContent = text || ''; }
 
   var KEY = function () { return 'hs-times-' + link.token; };
   function remembered() {

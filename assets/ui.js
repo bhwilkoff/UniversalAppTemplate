@@ -343,14 +343,14 @@
       gate(n, n.getAttribute('data-gate'));
       n.removeAttribute('data-gate');
     });
+    // A marker the kit does not know is left alone, so one bad attribute
+    // never stops a page (October 23, 2026: the poll page's own
+    // data-status hook threw here and took the page down with it).
     (scope || document).querySelectorAll('[data-status]').forEach(function (n) {
-      var k = n.getAttribute('data-status').split('.');
+      var k = String(n.getAttribute('data-status') || '').split('.');
+      if (!STATUS[k[0]] || !STATUS[k[0]][k[1]]) { if (window.console) console.warn('Unknown status marker', k.join('.')); return; }
       n.replaceWith(status(k[0], k[1]));
     });
-  }
-  if (typeof document !== 'undefined') {
-    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { hydrate(); });
-    else hydrate();
   }
 
   root.UI = {
@@ -359,4 +359,10 @@
     say: say, confirm: confirm, confirmStep: confirmStep, gate: gate, skeleton: skeleton, tabs: tabs, hydrate: hydrate,
     STATUS: STATUS, AUDIENCES: AUDIENCES, GATES: GATES
   };
+  // Defined before the page is filled in, so the kit is there for every
+  // script even if filling in fails.
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { hydrate(); });
+    else hydrate();
+  }
 })(typeof window !== 'undefined' ? window : this);

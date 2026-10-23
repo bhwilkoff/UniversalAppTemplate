@@ -44,7 +44,7 @@
     root.querySelector('.board-states').hidden = state === 'ready';
   }
   function fail(m) { $('[data-error-text]').textContent = m; show('error'); }
-  function status(m) { $('[data-status]').textContent = m; }
+  function status(m) { $('[data-say]').textContent = m; }
 
   function theme() {
     var t = document.documentElement.getAttribute('data-theme');

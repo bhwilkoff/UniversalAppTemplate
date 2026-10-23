@@ -251,7 +251,7 @@
 
     show('ready');
     drawCover($('[data-app-cover]'), app, apps.indexOf(app));
-    $('[data-status]').textContent = lib.statusText(app, null);
+    $('[data-say]').textContent = lib.statusText(app, null);
     drawWhere(app, null);
     drawCommits(repo);
     var report = lib.reportHref(app);
@@ -259,7 +259,7 @@
 
     Promise.all([declaration, info]).then(function (res) {
       var d = res[0], meta = res[1].data || null;
-      $('[data-status]').textContent = lib.statusText(app, d);
+      $('[data-say]').textContent = lib.statusText(app, d);
       var words = lib.ownWords(app, d, meta);
       var own = $('[data-own]');
       own.hidden = !words;
