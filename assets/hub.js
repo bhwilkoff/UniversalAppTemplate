@@ -260,12 +260,16 @@
       });
     });
   }
+  // Right after a GitHub sign-in or link, the refresh token goes to the
+  // server (GitHubToken.keep) before the long-lived copy is scrubbed.
   function keepGitHubToken(session) {
+    if (window.GitHubToken && session && session.provider_refresh_token) window.GitHubToken.keep(db, session);
     if (window.DiscussionsLib) window.DiscussionsLib.tokenFrom(session, stores, Date.now(), db.auth.storageKey);
   }
   root.querySelector('[data-sign-out]').addEventListener('click', function () {
     if (window.DiscussionsLib) window.DiscussionsLib.forget(stores.session);
-    db.auth.signOut().then(load);
+    var gone = window.GitHubToken ? window.GitHubToken.forget(db) : Promise.resolve();
+    gone.then(function () { return db.auth.signOut(); }).then(load);
   });
 
   var deleteDialog = document.querySelector('[data-delete-dialog]');
@@ -694,6 +698,6 @@
   if (params.has('sign-out')) {
     if (window.DiscussionsLib) window.DiscussionsLib.forget(stores.session);
     show('loading');
-    db.auth.signOut().catch(function () {}).then(function () { location.replace('/'); });
+    (window.GitHubToken ? window.GitHubToken.forget(db) : Promise.resolve()).then(function () { return db.auth.signOut(); }).catch(function () {}).then(function () { location.replace('/'); });
   } else if (linkMode) linkFlow(); else load();
 })();

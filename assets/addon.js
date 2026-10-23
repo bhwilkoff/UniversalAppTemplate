@@ -117,6 +117,8 @@
   }
   function proceed(session) {
     current = session;
+    // A tab without a GitHub token gets a fresh one first (GitHubToken).
+    if (window.GitHubToken) window.GitHubToken.ensure(db, session);
     if (!GL) return start(session);
     return db.from('profiles').select('github_login').eq('id', session.user.id).maybeSingle().then(function (p) {
       if (!p.error && GL.needsGitHub(p.data)) return show('link-github');

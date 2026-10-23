@@ -277,7 +277,10 @@
       session = s.data && s.data.session;
       if (!session) return show('signed-out');
       me = session.user;
-      // The GitHub token lives in this tab only (DiscussionsLib).
+      // The GitHub token lives in this tab only (DiscussionsLib); a tab
+      // without one gets a fresh one from the server first, so nothing
+      // below asks the person to sign in again (GitHubToken).
+      return (window.GitHubToken ? window.GitHubToken.ensure(db, session) : Promise.resolve(null)).then(function () {
       token = window.CohortTalk ? window.CohortTalk.token(db, session) : null;
       var byId = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug);
       return db.from('cohorts').select('*').eq(byId ? 'id' : 'slug', slug).maybeSingle().then(function (c) {
@@ -331,6 +334,7 @@
           drawCredentialNote();
           if (teaching && window.TeachCohort) window.TeachCohort.open({ db: db, me: me, cohort: cohort, teacher: res[8].data, tabs: cohortTabs, reload: load, fail: function (m) { var n = $('[data-detail-message]'); if (n) n.textContent = m; } });
         });
+      });
       });
     }).catch(function (err) { fail('Something went wrong: ' + (err && err.message ? err.message : 'no details') + '.'); });
   }

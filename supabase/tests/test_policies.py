@@ -3022,6 +3022,18 @@ def main():
     check("a problem leaves the session on the list", len(sv.fetchall()) == 1)
     check("no one signed in can say what the calendar did",
           not attempt(as_user("ben"), "select public.calendar_done(%s, 'evt2', null, 'x')", (cal_s,)))
+
+    # GitHub refresh tokens (migration 20261023020000): kept where no one
+    # signed in can reach them, only the server.
+    check("no one signed in reads the kept GitHub tokens", not attempt(as_user("ben"), "select * from private.github_tokens"))
+    check("no one signed in reads them through the server's function", not attempt(as_user("ben"), "select * from public.github_token_get(%s)", (people["ben"],)))
+    check("no one signed in keeps a token for someone", not attempt(as_user("dee"), "select public.github_token_put(%s, 1, 'r', null, null, null)", (people["ben"],)))
+    sv = as_server(); sv.execute("select public.github_token_put(%s, 42, 'refresh-1', now() + interval '180 days', 'access-1', now() + interval '8 hours')", (people["ben"],))
+    sv = as_server(); sv.execute("select github_id, refresh_token, access_token from public.github_token_get(%s)", (people["ben"],))
+    check("the server keeps and reads a person's tokens", sv.fetchall() == [(42, "refresh-1", "access-1")])
+    sv = as_server(); sv.execute("select public.github_token_drop(%s)", (people["ben"],))
+    sv = as_server(); sv.execute("select count(*) from public.github_token_get(%s)", (people["ben"],))
+    check("and forgets them", sv.fetchall() == [(0,)])
     conn.rollback()
     conn.close()
     failed = [n for n, ok in results if not ok]
