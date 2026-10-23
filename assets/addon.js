@@ -902,7 +902,7 @@
     }
     if (S.teaching && next) {
       var acts = el('div', 'actions');
-      acts.appendChild(button(now ? 'Thank them, and bring up ' + nameOf(next.user_id) : 'Bring up ' + nameOf(next.user_id) + ' from the wings', 'btn-primary', function () {
+      acts.appendChild(button(now ? 'Thank them, and bring up ' + nameOf(next.user_id) : 'Bring up ' + nameOf(next.user_id) + '', 'btn-primary', function () {
         var done = now ? db.from('live_queue').update({ state: 'shown' }).eq('id', now.id) : Promise.resolve({});
         done.then(function () { setPin({ kind: 'item', id: next.id }); refreshLive(); });
       }));
@@ -930,7 +930,7 @@
       acts.appendChild(open);
       if (S.teaching) acts.appendChild(stageToggle('item', item.id, 'Put it on the main stage', 'Take it off the main stage'));
       if (L.canManage(item, S.me.id, S.teaching)) {
-        acts.appendChild(button('They have presented', 'btn-secondary', function () {
+        acts.appendChild(button(item.user_id === S.me.id ? 'I have shown it' : 'They have shown it', 'btn-secondary', function () {
           if (S.onStage && S.onStage.id === item.id) setPin(null);
           db.from('live_queue').update({ state: 'shown' }).eq('id', item.id).then(function (r) { if (!r.error) refreshLive(); });
         }));
