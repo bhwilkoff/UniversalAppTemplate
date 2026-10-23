@@ -42,28 +42,34 @@ verb each person names. The play starts before they leave.
 
 ## The run of show
 
+*Written by Claude, awaiting Ben's review (the rewrite of October 23, 2026, in four parts: bring back the stage's work, one thing that unblocks the next stage, start it, and the check).* Generated from [`runs-of-show.json`](runs-of-show.json) by `tools/teaching_tables.py`; change the JSON, then run it.
+
 | Minutes (75) | Scene | Kind | What happens |
 |---|---|---|---|
-| 0-5 | Arrive | Talk | One line in the chat: what the person you talked to did first with your app. Then what I heard in last week's answers, and what I changed because of it. |
-| 5-35 | Show what you brought back | Rehearsal rooms | Groups of three. The room's prompt: "Read your problem statement, show the app on your phone, and say what the person you talked to did first." |
+| 0-5 | Arrive | Talk | One line in the chat: what the person you talked to did first with your app, or what is in the way. Then what I read in your answers last week, and what I changed. |
+| 5-35 | Show what you brought back | Rehearsal rooms | In your group's room. Each person in turn: say what you want to know, show it on the device, and explain one decision with your agent closed (a decision, never the code). The others ask one question to understand it, then answer the three questions: where is it going, how is it going, and what is next. The builder ends by saying what they will do next, and ready or not yet. The prompt: "Read your problem statement and the version before it, then show the app on your phone: what the real data taught you, and what the person you talked to did with it." |
 | 35-38 | Break | Break |  |
-| 38-43 | What surprised us | Presenter | One or two people say what a real person did with their app that they did not expect. The audience: "Listen for what the person did that the builder did not plan for." |
-| 43-47 | Where Archive Watch went next | Talk | The order Archive Watch reached its platforms, from stage 03, as a model of choosing the second one by where its people are. |
-| 47-50 | Your second device | Question | "Which device will the people you talked to reach for, and why that one second?" (in their own words) |
-| 50-62 | One verb, twice | Design stage | The one thing your app must do everywhere, drawn twice: once the way it works on your first platform, once the way it should feel on the second. On the board: *Blank*. |
-| 62-70 | Start | Reflection | Write the one verb that must be the same everywhere, and one rule about your data. Then send the first prompt of stage 02. "What is the first prompt you will send this week?" |
-| 70-73 | Data, or idiom? | Question | "Which of these belong in the data, so every platform gets them the same way? Choose every one." (any that fit) |
-| 73-75 | What is still muddy? | Question | "What is still muddy?" (in their own words) |
+| 38-45 | Two layers | Talk | Every app built from the template has two layers. The data plane holds what is the same everywhere (what exists, what is allowed, and what it is called), and it is built once. The native layer holds what should feel born on each device: its controls, its gestures, and its look. Archive Watch's contract says it in one line: no client re-implements or re-hosts any part of the pipeline. Tonight you sort your own app into those two layers. |
+| 45-58 | One verb, twice | Design stage | Write the one thing your app must do on every device. Then draw it twice: once on the device you started with, and once on the device your people reach for next, each with that device's own controls. Mark what lives in the data and what lives in the device. On the board: *Blank*. |
+| 58-68 | Start | Reflection | Write the one rule about your data that every platform must follow. Then, before you leave, send the first prompt of stage 02: ask your agent to read your parity matrix with you and trim what your app does not need. Stage 03, a second platform that feels born there, follows once the matrix is honest. The prompt: "What is the first prompt of stage 02 you sent tonight?" |
+| 68-72 | Data, or idiom? | Question | The prompt: "Which of these belong in the data, so every platform gets them the same way? Choose every one." |
+| 72-75 | What is still muddy? | Question | Anything from tonight that is not clear yet. Your leaders read every answer before the next session. The prompt: "What is still muddy for you?" |
 
-**In the rehearsal rooms,** each builder's turn runs these scenes, 10
-minutes in all: their question (1), show it, and one decision (4), one
-clarifying question (1), the three questions (3), what comes next (1).
-The room's prompt is on screen the whole time.
+**In the rehearsal rooms,** each builder's turn runs these scenes, 8 minutes in all: say what you want to know, then show it on the device (3), explain one decision, agent closed (2), one question, then the three answers (2), what is next, and ready or not yet (1). The room's prompt is on screen the whole time.
 
-These are the scenes a new cohort is made with on humanshaped.org, from
-[`runs-of-show.json`](runs-of-show.json), and every one of them can be
-changed in the class builder, before the session and during it. To fit
-60 or 90 minutes, use the table in the [guides' index](README.md).
+**At 60 minutes,** for a cohort of fewer than eight learners, everyone stays in the one call:
+
+| Minutes (60) | Scene | Kind | What happens |
+|---|---|---|---|
+| 0-4 | Arrive | Talk | One line in the chat: what the person you talked to did first with your app, or what is in the way. Then what I read in your answers last week, and what I changed. |
+| 4-26 | Show what you brought back | Presenter | With everyone in the call, about five minutes each. Each person in turn: say what you want to know, show it on the device, and explain one decision with your agent closed (a decision, never the code). The others ask one question to understand it, then answer the three questions: where is it going, how is it going, and what is next. The builder ends by saying what they will do next, and ready or not yet. The prompt: "Read your problem statement and the version before it, then show the app on your phone: what the real data taught you, and what the person you talked to did with it." |
+| 26-32 | Two layers | Talk | Every app built from the template has two layers. The data plane holds what is the same everywhere (what exists, what is allowed, and what it is called), and it is built once. The native layer holds what should feel born on each device: its controls, its gestures, and its look. Archive Watch's contract says it in one line: no client re-implements or re-hosts any part of the pipeline. Tonight you sort your own app into those two layers. |
+| 32-43 | One verb, twice | Design stage | Write the one thing your app must do on every device. Then draw it twice: once on the device you started with, and once on the device your people reach for next, each with that device's own controls. Mark what lives in the data and what lives in the device. On the board: *Blank*. |
+| 43-52 | Start | Reflection | Write the one rule about your data that every platform must follow. Then, before you leave, send the first prompt of stage 02: ask your agent to read your parity matrix with you and trim what your app does not need. Stage 03, a second platform that feels born there, follows once the matrix is honest. The prompt: "What is the first prompt of stage 02 you sent tonight?" |
+| 52-56 | Data, or idiom? | Question | The prompt: "Which of these belong in the data, so every platform gets them the same way? Choose every one." |
+| 56-60 | What is still muddy? | Question | Anything from tonight that is not clear yet. Your leaders read every answer before the next session. The prompt: "What is still muddy for you?" |
+
+Every scene can be changed on the session's page before it runs, and in the Meet add-on while it runs.
 
 **What to watch for tonight.**
 
@@ -73,6 +79,13 @@ changed in the class builder, before the session and during it. To fit
   they did first is the evidence; what they said about it comes second.
 - A first version that grew past the smallest thing. It is not wrong,
   but ask what the person used, and what nobody touched.
+- A second-device drawing that is the first screen squeezed smaller or
+  stretched wider, rather than something that device's own people would
+  recognize.
+- A rule about the data that is really about the look ("the button is
+  blue"), which belongs to each device, not to the data.
+- A first prompt of stage 02 that is written in the note but not yet
+  sent to the agent.
 
 ## The opening
 
@@ -125,63 +138,121 @@ one of the people they talked to has used it.
 instead of a problem. Conversations that were really pitches. An app
 that only exists on the builder's computer. Typed-in sample data.
 
-## Where Archive Watch went next
+## Show what you brought back
 
-Put the order on screen, from [stage 03](../path/03-going-native.md):
+*Written by Claude, awaiting Ben's review (the rewrite of October 23, 2026).*
 
-> 1. **Apple TV, April 17.** The platform where its people were.
-> 2. **iPhone and iPad, the web, and Android, all on June 9.**
-> 3. **Mac, June 22.**
-> 4. **Roku, September 3.**
+Each group goes to its room with the prompt on screen, and each person
+takes about eight minutes, with someone in the group keeping time. They
+say in one line what they want to know, read their problem statement and
+the version before it, and then show the app on their phone, naming what
+the real data taught them and what the person they talked to did with
+it. The decision they explain with the agent closed is one the stages
+ask for: why they drew their one rule where they did, or why they
+started on the platform they chose. Their partners ask one question
+before saying anything, then answer where it is going, how it is going,
+and what is next, and the builder ends with what they will do next and
+whether stages 00 and 01 are ready or not yet. A partner who saw the app
+in their own hand can confirm "ready," because the app on a device is
+evidence and "it works" is only a claim.
 
-**What to talk about.** The first platform was chosen by where the
-people were: an app for watching old films on a couch began on the TV.
-Ask everyone to use the order as a model, not as an answer: where do the
-two people you talked to already reach, and what would make your second
-platform the one they would actually open? Then the question scene.
+You visit the rooms, say so as you arrive so that nobody stops to
+perform, and listen for one thing that comes up in more than one group,
+which you can name when everyone is back together. At 60 minutes there
+are no rooms: everyone stays in the call and presents in turn, about
+five minutes each, so you keep the time yourself and the whole call
+answers the three questions, which means keeping each answer to a line.
 
-## On the design stage: one verb, twice
+## Two layers
 
-Put the board on the main stage from the *Blank* template. Each person
-takes one corner and draws the one thing their app must do everywhere
-(search, save, play, answer) twice: the way it works now on their first
-platform, and the way it should feel on the second, with that device's
-own controls. Partners write one question beside it.
+*Written by Claude, awaiting Ben's review (the rewrite of October 23, 2026).*
 
-**What to talk about.** Stage 02's line is "Same verb, native idiom."
-The result is the same everywhere; the way you reach it is the
-device's own. Point at any drawing that is the first screen squeezed
-smaller, and ask what the second device's people already know how to
-do. Then remind everyone of stage 02's Roku story: the web quietly
-coped with a broken record and hid it, and the platform that trusted
-the data is the one that crashed. That is why the rule about the data
-gets written down first.
+This is the one thing that unblocks stage 02, and it is a short talk
+(seven minutes, or six at 60), drawn from stage 02's "Two layers." Every
+app built from the template has a data plane, built once, that decides
+what exists, what is allowed, and what it is called, and a native layer
+on each device that carries its controls, its gestures, and its look.
+Put Archive Watch's line on screen, "No client re-implements or
+re-hosts any part of the pipeline," and tell the Roku story from the top
+of stage 02 in a sentence or two: the web quietly coped with a broken
+record and hid it, and the platform that trusted the data was the one
+that crashed. That is why the rule about the data is written down before
+a second platform exists.
+
+End the talk by turning it toward their own apps, which is what the
+next scene does: everyone already has one platform with real data in it,
+so ask them to think, as you finish, which of their app's answers would
+be wrong if a second device worked them out for itself. Listen
+afterward for anyone who hears "two layers" as front end and back end;
+the point is which decisions are made once, not where the code runs.
+
+## One verb, twice
+
+*Written by Claude, awaiting Ben's review (the rewrite of October 23, 2026).*
+
+Put the board on the main stage from the *Blank* template, with everyone
+in the one call in both versions of the session. Each person writes the
+one thing their app must do on every device (search, save, play,
+answer), then draws it twice: on the device they started with, and on
+the device their people reach for next, each with that device's own
+controls. Then they mark which parts live in the data and which live in
+the device.
+
+Choosing the second device belongs here. Stage 03's order is a model,
+not an answer: Archive Watch began on the Apple TV because an app for
+watching old films on a couch belonged where its people were, and the
+others followed once the data was clean. Ask each person where the two
+people they talked to already reach, and draw that one. Stage 02's line
+is "Same verb, native idiom," so point at any drawing that is the first
+screen squeezed smaller, and ask what that device's people already know
+how to do. Expect a few minutes fewer at 60 (eleven instead of
+thirteen), which is enough for the verb and two small drawings.
 
 ## Start
 
-Everyone begins [stage 02](../path/02-shape-of-an-app.md): writing the
-verb that must be the same everywhere and one rule about their data,
-then asking the agent for the parity matrix across every platform they
-plan to reach. They send it before they leave, and name, to themselves,
-the second platform and the reason for it.
+*Written by Claude, awaiting Ben's review (the rewrite of October 23, 2026).*
+
+Everyone writes, from the marks on their drawing, the one rule about
+their data that every platform must follow, and then sends the first
+prompt of [stage 02](../path/02-shape-of-an-app.md) before they leave:
+telling the agent every platform they plan to reach, including the
+device they just drew, and asking it to write the parity matrix for
+everything the app already does, so they can read it together and trim
+what the app does not need. My own prompt from June 10 is a fair
+model to put on screen: "continue working on our parity matrix across
+all platforms to make sure we can launch on all platforms with the same
+features across the board." In Claude Code, plan mode lets them read the
+promises before anything is built, and in Antigravity, `/plan` does the
+same. [Stage 03](../path/03-going-native.md), the second platform that
+feels born there, follows once the matrix is honest.
+
+Keep a room open for anyone who gets stuck sending it, and read the
+reflection's answers ("What is the first prompt of stage 02 you sent
+tonight?") as they arrive. A prompt that asks the agent to build the
+second platform tonight has skipped the matrix, and a rule about how
+something looks has put an idiom in the data; either is worth a word
+before the week starts. At 60 minutes this scene runs nine minutes
+instead of ten.
 
 ## The check
 
-The question scenes, answered privately, and shown on the main stage
+*Written by Claude, awaiting Ben's review (the rewrite of October 23, 2026).*
+
+The two question scenes, answered privately, and shown on the main stage
 without names only if you choose:
 
-1. **Which device will the people you talked to reach for, and why that
-   one second?** (in their own words).
-2. **Which of these belong in the data, so every platform gets them the
-   same way? Choose every one.** (any that fit). Choices: a film's title
-   and year; whether a film is saved; a trivia question's correct
-   answer; swipe to go back; the size of the play button.
-3. **What is still muddy?** (in their own words).
+1. **Data, or idiom? Which of these belong in the data, so every
+   platform gets them the same way? Choose every one.** (any that fit).
+   Choices: a film's title and year; whether a film is saved; a trivia
+   question's correct answer; swipe to go back; the size of the play
+   button.
+2. **What is still muddy?** (in their own words).
 
-The answer you hope for to the second puts the title, the saved state,
+The answer you hope for to the first puts the title, the saved state,
 and the correct answer in the data, and leaves the gesture and the
 button size to each platform. Anyone who chose the gesture is worth a
-word before stage 02's matrix.
+word before stage 02's matrix, and so is anyone whose Start answer
+named a rule about the look.
 
 ## The task, and its evidence
 
@@ -224,8 +295,10 @@ twenty minutes before the trio is a default each person can move.
 
 > Answer the questions on the live page before you go. This week your
 > app gets a second home, in its own idiom, and a look that comes from
-> its why. Next week, bring one verb on both platforms, one cell your
-> eyes proved wrong, and your app's new look beside the template's.
+> its why. Next week, bring your matrix with one cell your eyes proved
+> wrong, the rule about your data and why you drew it there, and the
+> second platform on your device, with its new look beside the
+> template's.
 
 ## After the session
 

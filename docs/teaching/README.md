@@ -21,12 +21,12 @@ that is what every guide is built around.
 
 | Session | Leads with | What gets brought back | Guide |
 |---|---|---|---|
-| The week before | Publish | The app's address, open on a phone | [The week before](before.md) |
-| Week 1 | Write | The noticing log, which the session turns into one problem statement, held to the tests and critiqued in the trio | [Week 1](week-1.md) |
+| Prep | Publish | Setup: the app's address, open on a phone | [Prep](before.md) |
+| Week 1 | Write | The noticing log, which the session turns into one problem held to the tests | [Week 1](week-1.md) |
 | Week 2 | Play | 00 and 01: the problem statement, the two conversations, and the first app in the hands of a person they talked to | [Week 2](week-2.md) |
-| Week 3 | Play, then publish | 02 and 03: one verb on both platforms, one cell proved wrong, and the app's own look | [Week 3](week-3.md) |
+| Week 3 | Play, then publish | 02 and 03: the matrix and one cell proved wrong, the oldest device and what it will not show, and the app's own look | [Week 3](week-3.md) |
 | Week 4 | Publish, then write | 04 and 05: a screenshot that proved a fix, and the app on someone else's device | [Week 4](week-4.md) |
-| Week 5 | Publish | 06 and 07: one honest number and one feature from their own use, shown to everyone; 08 follows the showing | [Week 5](week-5.md) |
+| Week 5 | Publish | 06 and 07: one honest number and one feature from their own use, shown to everyone and to guests; 08 starts after the showing | [Week 5](week-5.md) |
 
 Each session opens its week. It is where the week before's work gets
 shown, and where the week ahead's work gets started, so every guide
@@ -44,37 +44,49 @@ is the center of every session.
 
 ## The shape of every session
 
-*Written by Claude, awaiting Ben's review (curriculum milestone C5, October 7, 2026).*
+*Written by Claude, awaiting Ben's review (the rewrite of October 23, 2026, after Ben found the earlier scenes "a non-sequitur for the learners and unconnected to the actual work of building apps").*
 
 Every session is one round of Write, Play, Publish, the same three moves
-as stage 00, at the size of a week, and each guide names the move its
-session leads with and the one question it turns on. The session itself
-is a run of show of scenes, in the words the hub uses: a talk, the
-rehearsal rooms, a break, a presenter, the design stage, a reflection,
-and the question scenes. Prep, week 1, and week 5 change the middle
-(meeting the group, finding a problem, and the showing), and the rest
-keep this shape. These are the
-minutes for 75, and how they change for 60 and 90.
+as stage 00, at the size of a week, and every part of it points at the
+learner's own app. It has four parts, in this order:
 
-| Scene | Kind | 75 minutes | 60 minutes | 90 minutes |
-|---|---|---|---|---|
-| Arrive | Talk | 0-7 | 0-5 | 0-8 |
-| Show what you brought back | Rehearsal rooms | 7-37 | 5-29 | 8-41 |
-| Break | Break | 37-40 | none | 41-46 |
-| One value at work | Presenter | 40-47 | 29-35 | 46-54 |
-| Read one real prompt, or the week's board | Design stage | 47-62 | 35-47 | 54-74 |
-| Start | Reflection | 62-70 | 47-55 | 74-84 |
-| Check for understanding, and what is still muddy | Question | 70-75 | 55-60 | 84-90 |
+1. **Bring back.** Each person shows the "Be ready to..." of the stage
+   they just finished, on a device, explains one decision with the agent
+   closed, and hears the three questions. It is the largest part, because
+   it is the only time anyone sees the app in someone else's hands.
+2. **One thing that unblocks the next stage.** A short talk from the
+   stage's own text, then everyone tries it on their own app, often on
+   the board.
+3. **Start.** Everyone sends the first prompt of the next stage before
+   they leave, so the week begins in the room.
+4. **The check.** The week's question, and what is still muddy, read by
+   the leader before the next session.
+
+Prep and week 5 bend the shape: prep's bring-back is the setup itself,
+and week 5's is the showing, open to guests. A cohort of eight learners
+or more brings back in groups of three, in rehearsal rooms; a smaller
+cohort stays in the one call, and each person shows to everyone.
+
+| Part | 75 minutes, in groups | 60 minutes, one call |
+|---|---|---|
+| Arrive | 5 | 4 |
+| Bring back | 30 (rehearsal rooms) | 22 (each person to everyone) |
+| Break | 3 | none |
+| The one thing, then trying it | 7 and 13 | 6 and 11 |
+| Start | 10 | 9 |
+| The week's question, and what is still muddy | 4 and 3 | 4 and 4 |
 
 The same scenes are in [`runs-of-show.json`](runs-of-show.json), and the
-hub makes every new cohort's sessions from that file, so a teacher opens
-the class builder to a plan that matches this page and can change any
-scene, before the session or during it. Each guide also says what to
+hub makes every new cohort's sessions from that file, choosing the
+version that matches the cohort's session length, so a leader opens each
+session's page to a plan that matches its guide and can change any
+scene, before the session or during it. Each guide's tables are written
+from the file by `tools/teaching_tables.py`. Each guide also says what to
 watch for, the week's task and the evidence it leaves for the
 credential, and which pages of the [stuck library](../stuck/README.md)
 to point people to.
 
-When time is short, the design stage gives up minutes first. The
+When time is short, trying the one thing gives up minutes first. The
 bring-back and the check never do, because the bring-back is the only
 time anyone sees the app in someone's hands, and the check is how you
 find out what the session actually taught.

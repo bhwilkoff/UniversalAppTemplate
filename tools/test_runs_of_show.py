@@ -74,7 +74,19 @@ for s in sessions:
             check(0 < inner * 3 <= sc["minutes"], f"{name}: three turns fit inside {sc.get('title')}",
                   f"{inner} x 3 > {sc['minutes']}")
     check(any(sc["kind"] == "question" for sc in scenes), f"{name}: has a question scene")
-    check(any(sc["kind"] == "design" for sc in scenes), f"{name}: has a design stage scene")
+    # Every session tries the week's one thing on the board, except week 5,
+    # whose showing takes the board's place (the rewrite of October 23, 2026).
+    if name != "week-5":
+        check(any(sc["kind"] == "design" for sc in scenes), f"{name}: has a design stage scene")
+    for minutes, other in (s.get("lengths") or {}).items():
+        total = sum(sc.get("minutes", 0) for sc in other)
+        check(total == int(minutes), f"{name}: its {minutes}-minute plan fills {minutes} minutes", f"{total}")
+        for sc in other:
+            extra = set(sc.get("config", {})) - KEYS.get(sc.get("kind"), set())
+            check(sc.get("kind") in KEYS and not extra and set(sc) <= {"kind", "title", "minutes", "body", "config", "note"},
+                  f"{name} ({minutes}): {sc.get('title')} is a {sc.get('kind')} scene with only its own settings", ", ".join(sorted(extra)))
+        check(not any(sc["kind"] == "rooms" for sc in other) if int(minutes) <= 60 else True,
+              f"{name}: its {minutes}-minute plan keeps everyone in one call")
     for q in s.get("questions", []):
         check(set(q) <= {"kind", "prompt", "choices", "points"} and q.get("prompt"),
               f"{name}: bank question has the bank's shape", q.get("prompt", "?"))
@@ -107,7 +119,8 @@ else:
             "const d = require(process.argv[2]);"
             "const out = [];"
             "for (const s of d.weeks) {"
-            "  for (const sc of s.scenes) { const p = L.problem(sc); if (p) out.push(s.key + ': ' + sc.title + ': ' + p); }"
+            "  const all = [s.scenes].concat(Object.values(s.lengths || {}));"
+            "  for (const list of all) for (const sc of list) { const p = L.problem(sc); if (p) out.push(s.key + ': ' + sc.title + ': ' + p); }"
             "  for (const q of (s.questions || [])) {"
             "    const c = { prompt: q.prompt, kind: q.kind }; if (q.choices) c.options = q.choices; if (q.points) c.points = q.points;"
             "    const p = L.problem({ kind: 'question', title: 'bank', minutes: 1, config: c }); if (p) out.push(s.key + ': bank: ' + q.prompt + ': ' + p); } }"
@@ -116,6 +129,10 @@ else:
         r = subprocess.run([node, "-e", script, str(lib), str(FILE)], capture_output=True, text=True)
         problems = json.loads(r.stdout or "[\"node failed: " + r.stderr.strip().replace('"', "'") + "\"]")
         check(not problems, "every scene and bank question passes the hub's ShowLib.problem", "; ".join(problems))
+
+# Each guide's tables are written from this file (tools/teaching_tables.py).
+r = subprocess.run([sys.executable, str(ROOT / "tools/teaching_tables.py"), "--check"], capture_output=True, text=True)
+check(r.returncode == 0, "every guide's run-of-show tables match the file", (r.stderr or r.stdout).strip())
 
 print()
 if fails:

@@ -19,8 +19,11 @@ value that never changed a decision is decoration.
 Tonight is the final showing, open to everyone, guests welcome. It is
 also the second week the teacher looks closely at every bring-back,
 and the night the cohort chooses the one lesson it sends back to the
-template. The session keeps its usual parts, but "one value at work"
-grows into a showing for the whole room.
+template. The session keeps its four parts: the showing itself is the
+bring-back of stages 06 and 07, a short talk on how values climb from
+reason to rule to check is the one thing that unblocks stage 08, Start
+is the cohort's lesson and everyone's first prompt of stage 08, and the
+check closes the night.
 
 **Everyone's work, shown to everyone.**
 
@@ -59,40 +62,41 @@ written, played with, and published.
 
 ## The run of show
 
+*Written by Claude, awaiting Ben's review (the rewrite of October 23, 2026, in four parts: bring back the stage's work, one thing that unblocks the next stage, start it, and the check).* Generated from [`runs-of-show.json`](runs-of-show.json) by `tools/teaching_tables.py`; change the JSON, then run it.
+
 | Minutes (75) | Scene | Kind | What happens |
 |---|---|---|---|
-| 0-5 | Arrive | Talk | Guests, welcome. The four rules, said once more, for everyone. Then what I heard in last week's answers. |
-| 5-8 | A value that changed a decision | Talk | Archive Watch, September 20: the paid voice server refused, and why. The model for stage 08, which starts tonight. |
-| 8-25 | Last look in your trio | Rehearsal rooms | Groups of three. The room's prompt: "Explain every part of your app, even the parts the agent wrote, and the number and the feature you will show." |
-| 25-28 | Break | Break |  |
-| 28-53 | The showing | Presenter | Everyone, about two minutes each: the feature you wanted from your own use, and your one honest number with what its people said. The audience: "Guests may ask one question each. Listen for what is enough, for now." |
-| 53-61 | The three questions, on the showing | Design stage | Where is it going, how is it going, and what is next, for the apps you just saw. On the board: *The three questions*. |
-| 61-66 | Enough, for now | Reflection | With the agent closed, two sentences: what is enough, for now, for the people you talked to in week 1, and what waits. |
-| 66-70 | Start | Reflection | The cohort chooses its one lesson to send back to the template. Then everyone sends the first prompt of stage 08. |
-| 70-73 | What waits | Question | "What waits for the next version?" (in their own words) |
-| 73-75 | What is still muddy? | Question | "What is still muddy?" (in their own words) |
+| 0-5 | Arrive | Talk | Guests, welcome. The four rules once more, for everyone here tonight. Then one line in the chat from each builder: the feature you will show. |
+| 5-17 | Last look in your group | Rehearsal rooms | In your group's room, each person shows the feature and the number once, the way they will show them to everyone, and explains one part the agent wrote and how they know it works. The prompt: "Show the feature and your number once, and explain one part the agent wrote and how you know it works." |
+| 17-20 | Break | Break |  |
+| 20-48 | The showing | Presenter | Each builder, about three minutes: the feature you wanted from living with your app, shown on your newest device; the sentence an older device shows instead; and your one honest number, with what its people said. Guests may ask one question each. The prompt: "Show the feature, the sentence an older device shows, and your number." |
+| 48-54 | From reason to rule to check | Talk | Values climb. A reason is the "Why we build" paragraph your agent weighs like advice. A rule is a standing instruction in your own words, dated the day the agent crossed a line. A check is a test that fails when the line is crossed, so the agent cannot cross it without being told. Stage 08 is where your app's lessons climb, so the next app starts knowing them. |
+| 54-67 | Start | Reflection | The cohort chooses one lesson to send back to the template, so the next builder does not have to learn it. Then, before you leave, send the first prompt of stage 08: ask your agent which of your app's lessons belong in a skill or a memory. The prompt: "What is one lesson the next builder should not have to learn?" |
+| 67-71 | Enough, for now | Question | In your own words. Only your leaders read it. The prompt: "What is enough about this version, for now, and for whom?" |
+| 71-75 | What is still muddy? | Question | Anything from tonight that is not clear yet. Your leaders read every answer before the next session. The prompt: "What is still muddy for you?" |
 
-**In the rehearsal rooms,** each builder's turn runs these scenes, 5
-minutes in all: show it, and one decision (2), what is strong in it (1),
-"Have you considered...?" (2). The critique follows Ron Berger's rules:
-be kind, be specific, be helpful, and offer suggestions as questions
-([Berger, "Fostering an Ethic of Excellence"](https://jaymctighe.com/wp-content/uploads/2011/04/Ron-Berger-Article.pdf)).
-Each builder leaves the room with one thing to say differently in the
-showing.
+**In the rehearsal rooms,** each builder's turn runs these scenes, 4 minutes in all: show it once, as you will tonight (3), one part the agent wrote, and how you know it works (1). The room's prompt is on screen the whole time.
 
-These are the scenes a new cohort is made with on humanshaped.org, from
-[`runs-of-show.json`](runs-of-show.json), and every one of them can be
-changed in the class builder, before the session and during it. If the
-teacher opened this session to guests, the cohort's public page on
-humanshaped.org (/showcase/) is where guests learned when and how to
-come. Two minutes each in the showing fits about twelve people. With
-more, use 90 minutes, or hold the showing in two rooms.
+**At 60 minutes,** for a cohort of fewer than eight learners, everyone stays in the one call:
+
+| Minutes (60) | Scene | Kind | What happens |
+|---|---|---|---|
+| 0-4 | Arrive | Talk | Guests, welcome. The four rules once more, for everyone here tonight. Then one line in the chat from each builder: the feature you will show. |
+| 4-30 | The showing | Presenter | Each builder, about three minutes: the feature you wanted from living with your app, shown on your newest device; the sentence an older device shows instead; and your one honest number, with what its people said. Guests may ask one question each. The prompt: "Show the feature, the sentence an older device shows, and your number." |
+| 30-36 | From reason to rule to check | Talk | Values climb. A reason is the "Why we build" paragraph your agent weighs like advice. A rule is a standing instruction in your own words, dated the day the agent crossed a line. A check is a test that fails when the line is crossed, so the agent cannot cross it without being told. Stage 08 is where your app's lessons climb, so the next app starts knowing them. |
+| 36-51 | Start | Reflection | The cohort chooses one lesson to send back to the template, so the next builder does not have to learn it. Then, before you leave, send the first prompt of stage 08: ask your agent which of your app's lessons belong in a skill or a memory. The prompt: "What is one lesson the next builder should not have to learn?" |
+| 51-56 | Enough, for now | Question | In your own words. Only your leaders read it. The prompt: "What is enough about this version, for now, and for whom?" |
+| 56-60 | What is still muddy? | Question | Anything from tonight that is not clear yet. Your leaders read every answer before the next session. The prompt: "What is still muddy for you?" |
+
+Every scene can be changed on the session's page before it runs, and in the Meet add-on while it runs.
 
 **What to watch for tonight.**
 
 - A part of the app its builder cannot explain, even one the agent
   wrote.
 - A number nobody questioned, especially a zero.
+- Anyone reading their agent's words at the showing instead of their
+  own. Ask them what they decided.
 - Whether each student can name what is enough, for now, for the people
   they talked to in week 1.
 
@@ -105,6 +109,10 @@ more, use 90 minutes, or hold the showing in two rooms.
 > no taking over, and no small digs at who someone is. From last week's
 > answers, I heard [what you heard]. Groups first, one last time, and
 > then everyone shows everyone.
+
+In the 60-minute session, where everyone stays in one call, leave out
+"Groups first, one last time," because the showing follows Arrive
+directly.
 
 ## What they bring back
 
@@ -141,72 +149,119 @@ A feature nobody but the builder has touched. Many apps will be "not yet"
 on some part of these stages tonight, and that is ordinary. The stages are
 built to be lapped more than once, and the app's page stays open.
 
-## On the design stage: the three questions, on the showing
+## Last look in your group
 
-*Written by Claude, awaiting Ben's review (note 06, October 7, 2026).*
+*Written by Claude, awaiting Ben's review (the rewrite of October 23, 2026).*
 
-Put the board on the main stage from the *The three questions*
-template, right after the showing. Everyone, guests included, writes
-for the apps they just saw: where is it going, how is it going, and what
-is next. The builders read the board, and nobody talks over it.
+Send everyone to their group's room for one last look before the
+showing. Each builder gets about four minutes: three to show the feature
+and the number once, on the device, the way they will show them to
+everyone, and one to explain a part of the app the agent wrote and how
+they know it works. That last minute is stage 08's honesty in the log at
+the size of one feature, because "the agent said it works" is fixed,
+and something outside the agent seeing it work is verified. Visit the
+rooms, say so on arriving so that nobody stops to perform, and listen
+for a part its builder cannot explain. That is not a failure tonight,
+only the next prompt, and [Showing your work](../path/showing-your-work.md)
+has one: "Before we change anything else, explain why we decided to do
+it this way, in plain words, and tell me what we gave up."
 
-**What to talk about.** Read one "what is next" aloud for each app, and
-ask its builder whether that is enough, for now, or what waits.
+In the 60-minute session there are no rooms, and the rehearsal happens
+in the showing itself.
 
-## The volunteer's prompt, in a 90-minute session
+## The showing
 
-In a 90-minute session, the volunteer leads this after the board.
+*Written by Claude, awaiting Ben's review (the rewrite of October 23, 2026).*
 
-**The situation** comes from whoever volunteered last week, from a
-moment of their own: what they saw and what the agent said, then
-everyone's prompt, then the one they sent. Help them prepare, and let
-them lead.
+This is the bring-back of stages 06 and 07, shown to the whole room,
+guests included. Each builder has about three minutes to show the
+feature they wanted from living with their app on their newest device,
+the sentence an older device shows instead, and their one honest number
+with what its people said. Keep time gently, and after each builder let
+the guests ask one question each, nudging them toward the kind
+[Showing your work](../path/showing-your-work.md) recommends, a question
+about something the agent could not have decided, such as "What did you
+give up?" or "Who is this for?" This is one of the two nights the
+teacher looks closely at every bring-back, so note against the stage
+bars above who is ready and who is "not yet," without saying it out
+loud.
 
-**If nobody volunteered,** that is fine, and the session works without
-it. Use a moment of your own if you have one, or this one, from
-[Talking to your agent](../path/talking-to-your-agent.md). On August 31,
-the agent concluded that Amazon's reporting API needed special
-permission before anyone could use it. Ask what they would send. Then
-show the real prompt:
+Watch for anyone reading their agent's words instead of their own, and
+ask them what they decided. Watch, too, for a zero nobody questioned,
+and for an older device that fails silently rather than saying what it
+cannot do. In the 60-minute session the showing follows Arrive
+directly.
 
-> That cannot be the way in which you have to get API access enabled.
-> Amazon is a huge company and there is no way that they require every
-> developer to ask for API access. You need to keep looking for ways to
-> do this
+## From reason to rule to check
 
-**What to talk about.** Agents give up too early, and they say so with
-confidence. Ask what limit their own agent has told them is real, and
-whether they believe it.
+*Written by Claude, awaiting Ben's review (the rewrite of October 23, 2026).*
+
+A six-minute talk, and the one thing that unblocks stage 08. Walk the
+ladder from [stage 08](../path/08-working-with-ai.md): a reason is the
+"Why we build" paragraph the agent weighs like advice; a rule is a
+standing instruction in the builder's own words, dated the day the agent
+crossed a line, which the agent reads every session but can still miss;
+and a check is a test or a hook that fails when the line is crossed, so
+the agent cannot cross it without being told. Not every value can climb
+all the way, and "only essential words on screen" will probably always
+need a person's judgment, but "one spelling locale" climbed from a word
+Ben noticed on a label to a test that reads every string in the app.
+
+For a value tied to a decision, use the September section of the
+[Archive Watch case study](../human-shaped/case-study-archive-watch.md):
+on September 20 the agent designed Watch Together around a paid voice
+server, and Ben refused, because "the goal of this app (and all of my
+apps) is for them to cost $0 to run." In the same week, three standing
+instructions went into the app's `CLAUDE.md`. It is a model of what
+a value that changed a decision looks like, not an answer to copy. Then
+point each builder at their own app: they have just shown a feature,
+and somewhere in building it a value of theirs either changed a
+decision or did not, and stage 08 is where they find out which, and
+where the lessons that did climb get written down so the next app starts
+knowing them.
 
 ## Start
 
-Before Start, give everyone five quiet minutes, agent closed, for two
-sentences: what is enough about this version, for now, for the people
-they talked to in week 1, and what waits, written down rather than
-built. Principle 15 is the measure: an app that "brings joy to at least
-one person in the form it ships today" is enough, for now.
+*Written by Claude, awaiting Ben's review (the rewrite of October 23, 2026).*
 
-Then the cohort chooses its one lesson to send back to the template:
-a prompt that worked, a step that broke, or a correction that kept
-coming up. Offer two or three candidates you saw in the weeks' checks,
-let the cohort choose, and ask who would like to be credited. Then
-everyone sends the first prompt of [stage 08](../path/08-working-with-ai.md),
-which they write in the days after the showing. Whatever comes next for
-the app (the next round, a store listing, or the first stage of a second
-lap) waits until stage 08 has kept what this one taught.
+First, the cohort chooses its one lesson to send back to the template,
+as [`COURSE.md`](../../COURSE.md) describes in "What a cohort gives
+back": a prompt that worked, a step that broke, or a correction that
+kept coming up, drawn from the apps just shown. Offer two or three
+candidates you saw in the weeks' checks, let the cohort choose, and ask
+who would like to be credited. It is one lesson from the whole cohort,
+never a requirement for any one person.
+
+Then everyone sends the first prompt of
+[stage 08](../path/08-working-with-ai.md) before they leave. The stage
+asks for a first answer before any prompt, so give a minute for each
+builder to write in their note the one lesson from their own app they
+would most want carried forward, and then to ask their agent which of
+their app's lessons belong in a skill or a memory. Keep a room open for
+anyone who gets stuck. The rest of stage 08 is written in the days after
+the showing, and whatever comes next for the app (the next round, a
+store listing, or the first stage of a second lap) waits until stage 08
+has kept what this one taught. In the 60-minute session, Start has two
+more minutes, which is enough for the cohort to choose without rushing.
 
 ## The check
 
-The question scenes at the end of the run of show, answered privately,
-and shown on the main stage without names only if you choose:
+*Written by Claude, awaiting Ben's review (the rewrite of October 23, 2026).*
 
-1. **What waits for the next version?** (in their own words).
+The two question scenes at the end of the run of show, answered
+privately, and shown on the main stage without names only if you
+choose:
+
+1. **Enough, for now:** "What is enough about this version, for now,
+   and for whom?" Principle 15 is the measure: an app that "brings joy
+   to at least one person in the form it ships today" is enough, for
+   now. Read for whether the "whom" is the people the builder talked to
+   in week 1.
 2. **What is still muddy?** (in their own words).
 
-**Also prepared,** in the cohort's question bank: "What is enough about
-this version, for now, and for whom?" and "What will your agent know at
-the start of your next app that it did not know in week 1, and where
-does that knowledge live?"
+**Also prepared,** in the cohort's question bank: "What waits for the
+next version?" and "What will your agent know at the start of your next
+app that it did not know in week 1, and where does that knowledge live?"
 
 There is no next session to open with what you heard, so this week the
 teacher writes it to the cohort's conversation instead.
