@@ -33,6 +33,9 @@
   function tab(k) { return MOVED[k] || k; }
   var failed = function () {};
   var reloadPage = function () { openCohort(current.id); };
+  // A session named inside a sentence: "the prep session", or "week 2".
+  function sessionPhrase(n) { return Number(n) === 0 ? 'the prep session' : 'week ' + n; }
+
   function drawFacts(c, sessions, people) {
     var when = c.session_weekday != null && c.session_time ? lib.scheduleText(c, Intl.DateTimeFormat().resolvedOptions().timeZone).replace(/\.$/, '').replace(/, for \d+ minutes/, '') : null;
     var here = people.filter(function (p) { return p.status !== 'left'; }).length;
@@ -259,8 +262,8 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
     var names = {};
     people.forEach(function (p) { names[p.user_id] = personName(p); });
     var nameOf = function (id) { return id === me.id ? 'You' : (names[id] || 'Someone'); };
-    say('[data-checks-heard-title]', 'What week ' + last.number + '’s checks said');
-    say('[data-not-seen-title]', 'Not seen since week ' + last.number + ' began');
+    say('[data-checks-heard-title]', 'What ' + sessionPhrase(last.number) + '’s checks said');
+    say('[data-not-seen-title]', 'Not seen since ' + sessionPhrase(last.number) + ' began');
     var heardForm = $('[data-heard-form]');
     heardForm.hidden = !('heard' in last);   // until the database has the column
     heardForm.elements.heard.value = last.heard || '';
@@ -353,7 +356,7 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
   function loadFollowups(last, sessions, people, nameOf) {
     var box = $('[data-followups]');
     if (!F || !box) return;
-    say('[data-followups-title]', 'Following up on week ' + last.number);
+    say('[data-followups-title]', 'Following up on ' + sessionPhrase(last.number));
     say('[data-followups-intro]', '');
     box.replaceChildren(el('p', 'small', 'Gathering what each person did around the session…'));
     var w = F.sessionWindow(sessions, last);
@@ -397,13 +400,13 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
     people.forEach(function (p) { byId[p.user_id] = F.contributions(p.user_id, w, data); });
     var order = F.followupOrder(people, byId);
     say('[data-followups-intro]', order.length ? '' : 'No one has joined yet.');
-    needs.set('followups', order.length ? { count: order.length, text: 'Follow up on week ' + last.number, tab: 'followup', action: 'Write' } : null);
+    needs.set('followups', order.length ? { count: order.length, text: 'Follow up on ' + sessionPhrase(last.number), tab: 'followup', action: 'Write' } : null);
     // The show as it ran (R8): what everyone did together, above what each
     // person did.
     var show = F.showAsRun(data.scenes);
     if (show.length) {
       var ran = el('details', 'followup-show');
-      ran.appendChild(el('summary', null, 'Week ' + last.number + '’s run of show'));
+      ran.appendChild(el('summary', null, (last.number === 0 ? 'The prep session' : 'Week ' + last.number) + '’s plan'));
       var ol = el('ol', 'show-glance');
       show.forEach(function (s) {
         var li = el('li');
@@ -581,7 +584,7 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
   function drawCheckAnswers(checks, last) {
     var box = $('[data-check-answers]');
     box.replaceChildren();
-    say('[data-checks-heard-intro]', checks.length ? '' : 'No questions were asked in week ' + last.number + '.');
+    say('[data-checks-heard-intro]', checks.length ? '' : 'No questions were asked in ' + sessionPhrase(last.number) + '.');
     checks.forEach(function (k) {
       var card = el('article', 'cohort-card check-answers');
       card.appendChild(el('h4', null, k.prompt));
@@ -603,8 +606,8 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
   function drawNotSeen(list, last) {
     var ul = $('[data-not-seen]');
     ul.replaceChildren();
-    say('[data-not-seen-intro]', list.length ? '' : 'Everyone has taken part since week ' + last.number + ' began.');
-    needs.set('notseen', list.length ? { count: list.length, text: 'Not seen since week ' + last.number + ' began', tab: 'followup', action: 'See who' } : null);
+    say('[data-not-seen-intro]', list.length ? '' : 'Everyone has taken part since ' + sessionPhrase(last.number) + ' began.');
+    needs.set('notseen', list.length ? { count: list.length, text: 'Not seen since ' + sessionPhrase(last.number) + ' began', tab: 'followup', action: 'See who' } : null);
     list.forEach(function (p) {
       var li = el('li');
       li.appendChild(el('strong', null, personName(p)));
