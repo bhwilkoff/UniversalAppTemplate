@@ -168,15 +168,16 @@
   // from what the hub already knows, so nobody ticks a box by hand.
   // "unknown" means the hub cannot see it (a connected agent lives with
   // the person, not here), so it is offered as a link and never marked.
+  // In the order a learner meets them (JOURNEYS.md, J2 to J4): GitHub's
+  // invitation, which arrives as they join; getting set up, which ends
+  // with the app live at an address; and telling the cohort where it is.
   function setupSteps(mine, access, cohort) {
-    var steps = [
-      { key: 'setup', label: 'Copy the template', href: '/path/setup/', done: !!(mine && mine.app_repo) },
-      { key: 'repo', label: 'Add your repository', tab: 'mine', done: !!(mine && mine.app_repo) },
-      { key: 'address', label: 'Add your live address', tab: 'mine', done: !!(mine && mine.app_url) }
-    ];
+    var steps = [];
     if (cohort && cohort.github_team) {
-      steps.push({ key: 'talk', label: 'Open the conversation', tab: 'talk', done: !!(access && access.state === 'member') });
+      steps.push({ key: 'talk', label: 'Accept the GitHub invitation', tab: 'talk', done: !!(access && access.state === 'member') });
     }
+    steps.push({ key: 'setup', label: 'Get set up', href: '/path/setup/', done: !!(mine && mine.app_url) });
+    steps.push({ key: 'app', label: 'Add your app', tab: 'mine', done: !!(mine && mine.app_repo && mine.app_url) });
     steps.push({ key: 'agent', label: 'Connect your agent', href: '/connect/', done: null });
     return steps;
   }
