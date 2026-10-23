@@ -117,7 +117,8 @@
       });
       if (A.moves(card, column, me).indexOf('done') !== -1) saw = sawForm(card, said);
       var name = function (x) { return x === me ? 'you' : '@' + x; };
-      var holding = card.holders.length === 1 && card.holders[0] === me ? 'you have it'
+      var holding = column === 'done' ? (card.holders.length ? 'tried by ' + card.holders.map(name).join(', ') : null)
+        : card.holders.length === 1 && card.holders[0] === me ? 'you have it'
         : card.holders.length ? card.holders.map(name).join(', ') + (card.holders.length > 1 ? ' have it' : ' has it') : null;
       var bits = [card.device, card.by ? 'asked by ' + name(card.by) : null, holding];
       if (card.comments) bits.push(card.comments === 1 ? '1 reply' : card.comments + ' replies');
