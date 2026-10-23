@@ -94,7 +94,26 @@ nothing depends on your own login.
    the choice between private and public "can't" be changed once it is
    saved. Testing needs only step 6, so leave this until we list it.
 
-## Who can use it
+## Who can use it, as of October 23, 2026
+
+Ben: "The session page should functionally only be to prep the session.
+All of the other work that a Leader should be doing in the session should
+be done via the Google Meet add-on." So:
+
+- **Leaders** run each session from the add-on inside the call. Until it
+  is listed, that means joining the call signed in as
+  meet@humanshaped.org, where the test deployment is installed.
+- **Learners** open the same panel outside Meet, from "Open the session
+  panel" on the session's page (`/addon/?c=<slug>&s=<number>`), until
+  the add-on is listed for everyone. The session page itself carries no
+  live controls.
+- Listing it publicly is in LISTING.md. Its open question for Ben is
+  sign-in: Google's review asks for One Tap (Google) sign-in inside the
+  add-on, and Human Shaped signs in with GitHub.
+
+The notes below are from October 4 and kept for their research.
+
+### Who could use it, October 4
 
 *Written by Claude, awaiting Ben's review. Read on October 4, 2026.*
 
