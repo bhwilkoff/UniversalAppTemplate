@@ -1251,7 +1251,8 @@
     status.textContent = 'Opening the main stage…';
     Promise.resolve(side.startActivity({ mainStageUrl: location.origin + '/addon/stage/' })).then(function () {
       S.stageOn = true;
-      status.textContent = 'The main stage is open. Present it from Meet when you want everyone to see it.';
+      $('[data-open-stage]').hidden = true;
+      status.textContent = 'The main stage is open. Meet asks everyone in the call to join it.';
     }, function (err) {
       status.textContent = 'The main stage did not open: ' + (err && err.message ? err.message : 'Meet gave no reason') + '.';
     });

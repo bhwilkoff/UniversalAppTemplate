@@ -187,7 +187,7 @@
   // The follow-up built from the show (R8)
   // ------------------------------------------------------------------
 
-  var KIND_NAMES = { talk: 'Talk', presenter: 'Presenter', question: 'Question', design: 'Design stage', rooms: 'Rehearsal rooms', 'break': 'Break', reflection: 'Reflection' };
+  var KIND_NAMES = { talk: 'Talk', presenter: 'Showing work', question: 'Question', design: 'On the board', rooms: 'In groups', 'break': 'Break', reflection: 'Writing' };
 
   // The session's run of show as it was planned, in order, for the top
   // of the follow-ups: each scene's kind, title, and minutes.

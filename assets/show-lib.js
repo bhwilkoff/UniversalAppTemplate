@@ -11,12 +11,12 @@
   // kind may carry in its configuration; anything else is dropped.
   var KINDS = [
     { key: 'talk', name: 'Talk', what: 'You explain. The main stage shows a title and a few lines.', keys: [] },
-    { key: 'presenter', name: 'Presenter', what: 'Someone from the wings shows their work, and the audience gets one thing to do.', keys: ['prompt'] },
+    { key: 'presenter', name: 'Showing work', what: 'Each person in turn shows their work, and everyone else gets one thing to look for.', keys: ['prompt'] },
     { key: 'question', name: 'Question', what: 'Everyone answers, and the answers go on the main stage when you show them.', keys: ['prompt', 'options', 'kind', 'points', 'question_id'] },
-    { key: 'design', name: 'Design stage', what: 'The shared board on the main stage, where everyone draws together, blank or from a template.', keys: ['template'] },
-    { key: 'rooms', name: 'Rehearsal rooms', what: 'Everyone goes to their trio’s room for a set time, and the room runs its own scenes.', keys: ['prompt', 'room_scenes'] },
+    { key: 'design', name: 'On the board', what: 'The shared board on the main stage, where everyone draws together, blank or from a template.', keys: ['template'] },
+    { key: 'rooms', name: 'In groups', what: 'Everyone goes to their group’s room for a set time, and the room runs its own parts.', keys: ['prompt', 'room_scenes'] },
     { key: 'break', name: 'Break', what: 'A pause, with the clock on the main stage.', keys: [] },
-    { key: 'reflection', name: 'Reflection', what: 'One closing question, often what is still muddy.', keys: ['prompt'] }
+    { key: 'reflection', name: 'Writing', what: 'One closing question, often what is still muddy.', keys: ['prompt'] }
   ];
   var BY_KEY = {};
   KINDS.forEach(function (k) { BY_KEY[k.key] = k; });
@@ -199,7 +199,7 @@
         short: 'Answers in their own words, read by you, shown only if you choose.'
       }[qk];
     } else if (k.key === 'presenter') {
-      p.note = c.prompt ? 'The audience: ' + c.prompt : 'The presenter’s work fills the stage.';
+      p.note = c.prompt || 'The work being shown fills the stage.';
     } else if (k.key === 'design') {
       var BL = root.BoardLib, t = c.template && BL ? BL.template(c.template) : null;
       p.note = c.template ? 'The board, from the ' + (t ? t.name : c.template) + ' template, live on the main stage.' : 'The board, blank, live on the main stage.';

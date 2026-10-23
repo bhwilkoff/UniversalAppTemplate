@@ -175,7 +175,7 @@ test('drafts fail quietly when the browser refuses storage', () => {
 test('the follow-up is built from the show: its scenes, each student’s room, and what they presented (R8)', () => {
   const F = createRequire(import.meta.url)('../../assets/followup-lib.js');
   assert.deepEqual(F.showAsRun([{ position: 1, kind: 'rooms', title: 'Show what you brought back', minutes: 25 }, { position: 0, kind: 'talk', title: 'Arrive', minutes: 5 }]),
-    [{ kind: 'Talk', title: 'Arrive', minutes: 5 }, { kind: 'Rehearsal rooms', title: 'Show what you brought back', minutes: 25 }]);
+    [{ kind: 'Talk', title: 'Arrive', minutes: 5 }, { kind: 'In groups', title: 'Show what you brought back', minutes: 25 }]);
   const groups = [{ name: 'Trio A', group_members: [{ user_id: 'bea' }, { user_id: 'cal' }, { user_id: 'dee' }] }];
   const nameOf = (id) => ({ cal: 'Cal', dee: 'Dee' })[id];
   assert.deepEqual(F.roomOf('bea', groups, nameOf), { name: 'Trio A', partners: ['Cal', 'Dee'] });

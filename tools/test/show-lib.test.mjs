@@ -72,7 +72,7 @@ test('the preview shows what the main stage will', () => {
 });
 
 test('the shared board is the design stage', () => {
-  assert.equal(S.kind('design').name, 'Design stage');
+  assert.equal(S.kind('design').name, 'On the board');
   assert.equal(S.kind('board'), null);
   assert.equal(S.problem({ kind: 'design', title: 'Sketch the screen', minutes: 10, config: { template: 'Phone screen' } }), null);
   assert.match(S.stagePreview({ kind: 'design', title: 'Sketch', minutes: 10, config: {} }).note, /blank/);
