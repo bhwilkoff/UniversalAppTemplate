@@ -200,6 +200,8 @@
     body.hidden = !o.body;
     var go = dlg.querySelector('button[value="go"]');
     go.textContent = o.action;
+    // The other choice can be named when it is not simply going back.
+    dlg.querySelector('button[value="cancel"]').textContent = o.cancel || 'Cancel';
     go.className = o.danger === false ? 'btn-primary' : 'btn-danger final';
     dlg.returnValue = '';
     return new Promise(function (resolve) {

@@ -85,6 +85,11 @@ Deno.serve(async (req) => {
     let saved = 0;
     for (const d of done) {
       if (!d || !UUID.test(String(d.session_id || ''))) continue;
+      if (d.cancelled === true) {
+        const { error: ce } = await db.rpc('calendar_cancelled', { s: d.session_id });
+        if (!ce) saved++;
+        continue;
+      }
       const { error } = await db.rpc('calendar_done', {
         s: d.session_id,
         event_id: typeof d.event_id === 'string' ? d.event_id.slice(0, 1024) : null,

@@ -71,6 +71,7 @@
     f.time_zone.value = c ? c.time_zone : Intl.DateTimeFormat().resolvedOptions().timeZone;
     f.capacity.value = c && c.capacity ? c.capacity : '';
     f.status.value = c ? c.status : 'draft';
+    startedAs = c ? c.status : null;
     f.conversations_open.checked = c ? c.conversations_open : false;
     f.github_repo.value = c && c.github_repo ? c.github_repo : '';
     f.github_team.value = c && c.github_team ? c.github_team : '';
@@ -122,6 +123,7 @@
     }).catch(function () {});
   }
 
+  var startedAs = null, archiveIt = false;
   form.addEventListener('submit', function (ev) {
     ev.preventDefault();
     var f = form.elements;
@@ -146,6 +148,15 @@
     // the pages placed on them go first (R13): a file in storage cannot be
     // removed from SQL.
     var before = editing && row.status === 'finished' ? removeBoardFiles(editing) : Promise.resolve();
+    // Finishing asks about the repository (JOURNEYS.md, Ben's decision 9):
+    // archive it now, or leave it open for the cohort to keep talking.
+    var finishing = editing && row.status === 'finished' && startedAs !== 'finished' && !!row.github_repo;
+    var archive = finishing && window.UI ? window.UI.confirm({
+      title: 'Archive the repository now?',
+      body: 'Everyone in the cohort can still read it. Nothing new can be added.',
+      action: 'Archive it', cancel: 'Leave it open', danger: false
+    }) : Promise.resolve(false);
+    before = Promise.all([before, archive]).then(function (r) { archiveIt = !!r[1]; });
     var q = editing
       ? before.then(function () { return db.from('cohorts').update(row).eq('id', editing).select().single(); })
       : db.from('cohorts').insert(Object.assign({ slug: f.slug.value.trim(), created_by: me.id }, row)).select().single();
@@ -155,7 +166,10 @@
         var dup = /duplicate|unique/i.test(r.error.message);
         return say('[data-form-message]', dup ? 'Another cohort already uses that short name. Try another.' : 'It could not be saved: ' + r.error.message);
       }
-if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign('/cohort/?c=' + r.data.id);
+      var archived = archiveIt ? db.functions.invoke('cohort-access', { body: { action: 'archive', cohort_id: r.data.id } }).then(function () {}, function () {}) : Promise.resolve();
+      archived.then(function () {
+        if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign('/cohort/?c=' + r.data.id);
+      });
     });
   });
 

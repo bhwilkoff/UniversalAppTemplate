@@ -64,6 +64,7 @@ Deno.serve(async (req) => {
   if (!input.cohort_id) return reply(400, { message: 'Which cohort?' });
   if (input.action === 'provision') return provision(db, uid, input.cohort_id, reply);
   if (input.action === 'sync') return sync(db, uid, input.cohort_id, reply);
+  if (input.action === 'archive') return archive(db, uid, input.cohort_id, reply);
 
   const [profile, cohort, enrollment, teacher, chosen] = await Promise.all([
     db.from('profiles').select('github_login').eq('id', uid).maybeSingle(),
@@ -249,6 +250,27 @@ function base64(text: string) {
 
 // A leader brings GitHub up to what Human Shaped records for everyone in
 // the cohort (syncStep in plan.js decides what each person needs).
+// deno-lint-ignore no-explicit-any
+// A finished cohort's repository, archived when its leader says so
+// (JOURNEYS.md, Ben's decision 9): everyone keeps reading it, and nothing
+// new can be added. Only a leader of a finished cohort may.
+// deno-lint-ignore no-explicit-any
+async function archive(db: any, uid: string, cohortId: string, reply: (s: number, b: unknown) => Response) {
+  const [cohort, leader] = await Promise.all([
+    db.from('cohorts').select('id, status, github_repo, github_team').eq('id', cohortId).maybeSingle(),
+    db.from('cohort_teachers').select('user_id').eq('cohort_id', cohortId).eq('user_id', uid).maybeSingle(),
+  ]);
+  if (!leader.data) return reply(403, { message: 'Only a leader of this cohort can do this.' });
+  if (!cohort.data || cohort.data.status !== 'finished') return reply(409, { message: 'Mark the cohort finished first.' });
+  const repo = repoName(cohort.data);
+  if (!repo) return reply(409, { message: 'This cohort has no repository.' });
+  const token = await appToken();
+  if (!token) return reply(503, { message: 'Human Shaped cannot reach GitHub just now. Try again later.' });
+  const r = await github(token, 'PATCH', '/repos/' + repo, { archived: true });
+  if (r.status !== 200) return reply(502, { message: 'GitHub did not archive it: ' + (r.body?.message || r.status) });
+  return reply(200, { archived: repo });
+}
+
 // deno-lint-ignore no-explicit-any
 async function sync(db: any, uid: string, cohortId: string, reply: (s: number, b: unknown) => Response) {
   const [cohort, leaders, members, chosen, access] = await Promise.all([

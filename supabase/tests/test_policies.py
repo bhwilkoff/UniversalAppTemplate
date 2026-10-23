@@ -3028,6 +3028,17 @@ def main():
     check("a problem leaves the session on the list", len(sv.fetchall()) == 1)
     check("no one signed in can say what the calendar did",
           not attempt(as_user("ben"), "select public.calendar_done(%s, 'evt2', null, 'x')", (cal_s,)))
+    # A finished cohort's sessions to come leave the calendar (migration
+    # 20261023040000).
+    su.execute("reset role")
+    su.execute("update public.sessions set calendar_event_id = 'evt1' where id = %s", (cal_s,))
+    su.execute("update public.cohorts set status = 'finished' where id = %s", (newc,))
+    sv = as_server(); sv.execute("select want, guests from public.calendar_work() where session_id = %s", (cal_s,))
+    check("a finished cohort's session to come is on the list to cancel, with no guests", sv.fetchall() == [("cancel", [])])
+    check("no one signed in can say an event was cancelled", not attempt(as_user("ben"), "select public.calendar_cancelled(%s)", (cal_s,)))
+    sv = as_server(); sv.execute("select public.calendar_cancelled(%s)", (cal_s,))
+    sv = as_server(); sv.execute("select count(*) from public.calendar_work() where session_id = %s", (cal_s,))
+    check("once cancelled, it leaves the list and forgets its event", sv.fetchall() == [(0,)])
 
     # GitHub refresh tokens (migration 20261023020000): kept where no one
     # signed in can reach them, only the server.

@@ -1043,7 +1043,7 @@ function syncCalendars() {
   if (me !== hostEmail_()) throw new Error('This is running as ' + me + '. Run it as ' + hostEmail_() + '.');
   var sessions = askSetupQueue_('calendar').sessions || [];
   if (!sessions.length) { console.log('Every session is on the calendar as it should be.'); return 'none'; }
-  var cohorts = guestsByCohort(sessions);
+  var cohorts = guestsByCohort(sessions.filter(function (s) { return s.want !== 'cancel'; }));
   var folders = {};
   Object.keys(cohorts).forEach(function (slug) {
     var c = cohorts[slug];
@@ -1062,6 +1062,13 @@ function syncCalendars() {
   });
   var done = [];
   sessions.forEach(function (s) {
+    // A finished cohort's session to come leaves the calendar (Ben's
+    // decision 9): its event is deleted, and its guests are told.
+    if (s.want === 'cancel') {
+      try { Calendar.Events.remove('primary', s.event_id, { sendUpdates: 'all' }); } catch (e) { /* already gone */ }
+      done.push({ session_id: s.session_id, cancelled: true });
+      return;
+    }
     try {
       var event = null;
       if (s.event_id) {
