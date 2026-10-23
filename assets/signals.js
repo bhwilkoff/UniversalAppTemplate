@@ -244,7 +244,7 @@
 
     function controls() {
       var box = m.controls;
-      function q(s) { return box.querySelector(s); }
+      function q(s) { return box.querySelector(s) || document.createElement('span'); }  // a control this view leaves out (rooms without groups) is skipped
       var status = {
         rooms: q('[data-sig-rooms-status]'), card: q('[data-sig-card-status]'),
         stage: q('[data-sig-stage-status]'), rec: q('[data-sig-rec-status]'), talk: q('[data-sig-talk-status]')

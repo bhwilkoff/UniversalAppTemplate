@@ -984,7 +984,8 @@
 
   function drawChecksChrome() {
     var closingFirst = S.plan && S.plan.closingFirst;
-    $('[data-closing-wrap]').hidden = !S.teaching;
+    // The plan now has its own closing parts, so the two-at-once button is gone.
+    $('[data-closing-wrap]').hidden = true;
     $('[data-ask-closing]').className = closingFirst ? 'btn-primary' : 'btn-secondary';
     // Before the closing part, the button sits below the checks.
     var wrap = $('[data-closing-wrap]'), pane = $('[data-questions]');
@@ -1169,7 +1170,7 @@
     box.replaceChildren();
     if (!q) return;
     var asked = (S.checks || []).some(function (k) { return k.prompt === q.prompt && k.state === 'open'; });
-    box.appendChild(el('p', 'kicker', 'Planned for this scene, ' + L.questionKind(q.kind).name.toLowerCase()));
+    box.appendChild(el('p', 'kicker', 'Planned for this part, ' + L.questionKind(q.kind).name.toLowerCase()));
     box.appendChild(el('p', 'live-what', q.prompt));
     var status = el('span', 'small'); status.setAttribute('role', 'status');
     var acts = el('div', 'actions');
