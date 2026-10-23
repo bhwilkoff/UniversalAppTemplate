@@ -177,7 +177,7 @@
   // ------------------------------------------------------------------
 
   var S = { me: null, room: null, cohort: null, session: null, prev: null, teaching: false, names: {}, people: [], groups: [], brought: [],
-    parts: [], chosenPart: null, timerEnds: null, drawnPart: undefined, show: null,
+    parts: [], autoAsked: {}, chosenPart: null, timerEnds: null, drawnPart: undefined, show: null,
     items: [], checks: [], answers: [], results: {}, onStage: null, stageOn: false, rooms: null, roomPlaces: {}, signals: null };
   var channel = null, poller = null, nudgeTimer = null, deferred = {}, drafts = {};
   var Q = window.QuestionView, askFields = null;  // the question bank (R4)
@@ -294,11 +294,11 @@
       },
       stuck: window.CurriculumPagesLib && S.session ? window.CurriculumPagesLib.stuckFor(S.session.number) : null,
       onPick: function (key) {
-        if (shared()) { S.run.go(key); return; }
+        if (shared()) { S.run.go(key).then(askPlanned); return; }
         S.chosenPart = key; S.timerEnds = null; drawPart(true);
       },
       run: S.teaching ? {
-        onStep: function (d) { if (shared()) S.run.step(d); else stepLocal(d); },
+        onStep: function (d) { if (shared()) S.run.step(d).then(askPlanned); else stepLocal(d); },
         // The database runs a clock only on a current part, so a clock
         // started before the show has begun begins it on the part shown
         // (found in a real Meet call: Start the clock did nothing).
@@ -1202,16 +1202,32 @@
     box.replaceChildren();
     if (!q) return;
     var asked = (S.checks || []).some(function (k) { return k.prompt === q.prompt && k.state === 'open'; });
+    // Once asked, the question's own card below is the one place for it.
+    box.hidden = asked;
+    if (asked) return;
     box.appendChild(el('p', 'kicker', 'Planned for this part, ' + L.questionKind(q.kind).name.toLowerCase()));
     box.appendChild(el('p', 'live-what', q.prompt));
     var status = el('span', 'small'); status.setAttribute('role', 'status');
     var acts = el('div', 'actions');
-    if (asked) status.textContent = 'Asked. The answers are below.';
-    else acts.appendChild(button('Ask it now', 'btn-primary', function () {
+    acts.appendChild(button('Ask it now', 'btn-primary', function () {
       ask([Object.assign({ show_tally: $('[data-ask-tally]').checked }, q)], status);
     }));
     acts.appendChild(status);
     box.appendChild(acts);
+  }
+
+  // Moving to a question part asks its planned question, once: the main
+  // stage already shows it, and learners' panels said no question was
+  // open (found in the live Meet test). Only the leader who moved asks,
+  // so two leaders never ask it twice; closed, it stays closed.
+  function askPlanned() {
+    var part = partNow();
+    if (!S.teaching || !part || !part.own || part.kind !== 'question' || S.autoAsked[part.key]) return;
+    var q = L.fromScene(part.config);
+    if (!q) return;
+    S.autoAsked[part.key] = true;
+    if ((S.checks || []).some(function (k) { return k.prompt === q.prompt; })) return;
+    ask([Object.assign({ show_tally: $('[data-ask-tally]').checked }, q)], $('[data-ask-status]'));
   }
 
   // ------------------------------------------------------------------

@@ -190,13 +190,14 @@
         var n = Number(c.points) || 0, ends = c.options || [];
         for (var i = 1; i <= n && i <= 10; i++) p.items.push(i === 1 && ends[0] ? '1 (' + ends[0] + ')' : i === n && ends[1] ? i + ' (' + ends[1] + ')' : String(i));
       } else if (qk !== 'words' && qk !== 'short') p.items = (c.options || []).slice(0, 8);
+      // The room reads this on the main stage, so it speaks to learners.
       p.note = {
-        choice: 'Everyone chooses one. The count shows here, without names, when you show it.',
-        multi: 'Everyone chooses any that fit. The count shows here, without names, when you show it.',
-        scale: 'Everyone picks a point. The count shows here, without names, when you show it.',
-        rank: 'Everyone puts these in order. The average order shows here, without names, when you show it.',
-        words: 'Everyone gives a word or a few. The words show here together, without names, when you show them.',
-        short: 'Answers in their own words, read by you, shown only if you choose.'
+        choice: 'Choose one in your panel; the count shows here, without names, once your leader shows it.',
+        multi: 'Choose any that fit in your panel; the count shows here, without names, once your leader shows it.',
+        scale: 'Pick a point in your panel; the count shows here, without names, once your leader shows it.',
+        rank: 'Put these in order in your panel; the average order shows here, without names, once your leader shows it.',
+        words: 'Give a word or a few in your panel; the words show here together, without names, once your leader shows them.',
+        short: 'Answer in your own words in your panel; your leader reads the answers and shows them here only if they choose.'
       }[qk];
     } else if (k.key === 'presenter') {
       p.note = c.prompt || 'The work being shown fills the stage.';
