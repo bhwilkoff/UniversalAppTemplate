@@ -24,7 +24,7 @@ test('a session’s own run of show becomes the scenes, in order, each starting 
   assert.ok(list.every((s) => s.own));
   const sc = S.scenes(list);
   assert.deepEqual(sc.map((s) => s.kind), ['talk', 'rooms', 'question'], 'a scene keeps its own kind');
-  assert.equal(sc[1].kindName, 'Rehearsal rooms');
+  assert.equal(sc[1].kindName, 'In groups');
   assert.ok(S.layout(list, 'b').now.includes('rooms'), 'a scene of its own holds what its kind needs');
   assert.deepEqual(S.scenes(parts).map((s) => s.kind), ['talk', 'rooms', 'break', 'presenter', 'design', 'reflection', 'question'], 'the six parts are unchanged');
 });

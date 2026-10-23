@@ -29,11 +29,8 @@
     box.classList.add('show');
 
     var head = el('div', 'show-head');
-    var h = el('h2', null, K.WORDS[0].name);
+    var h = el('h2', null, 'The plan');
     head.appendChild(h);
-    head.appendChild(el('p', 'small', teaching
-      ? 'Today’s scenes in order. The open one is happening now; choose another to move everyone there.'
-      : 'Today’s scenes in order. The open one is happening now.'));
     box.appendChild(head);
 
     var ol = el('ol', 'show-timeline');
@@ -58,14 +55,12 @@
         top.appendChild(kind);
         top.appendChild(el('h3', 'show-name', s.name));
         li.appendChild(top);
-        var line = el('p', 'small show-line', s.kindLine);
-        li.appendChild(line);
-        if (s.what) {
-          var what = el('details', 'show-what');
-          what.appendChild(el('summary', null, 'What happens in this scene'));
-          what.appendChild(el('p', 'small', s.what));
-          li.appendChild(what);
-        }
+        // The part's own words, in plain view (JOURNEYS.md, the
+        // walk-through audit); the kind's general line only when it has none.
+        var words = String(s.what || '').split(/\n{2,}/).map(function (x) { return x.trim(); }).filter(Boolean);
+        if (words.length) words.forEach(function (w) { li.appendChild(el('p', 'show-line', w)); });
+        else li.appendChild(el('p', 'small show-line', s.kindLine));
+        if (s.config && s.config.prompt) li.appendChild(el('p', 'show-prompt', s.config.prompt));
         // The current scene's clock, and the teacher's moves through the show.
         var bar = run ? runBar(s) : null;
         if (bar) li.appendChild(bar.box);
@@ -73,7 +68,7 @@
         li.appendChild(body);
         var tools = el('div', 'actions show-tools');
         if (teaching && opts.onPick) {
-          var pick = el('button', 'btn-secondary show-pick', 'Make this the current scene');
+          var pick = el('button', 'btn-secondary small show-pick', 'Go to this part');
           pick.type = 'button';
           pick.addEventListener('click', function () { opts.onPick(s.key); });
           tools.appendChild(pick);
@@ -111,7 +106,7 @@
         box.appendChild(follow);
         var acts = el('div', 'actions show-moves');
         acts.appendChild(btn('Back', 'btn-secondary show-back', function () { if (run.onStep) run.onStep(-1); }));
-        acts.appendChild(btn('Next scene', 'btn-primary show-next', function () { if (run.onStep) run.onStep(1); }));
+        acts.appendChild(btn('Next part', 'btn-primary show-next', function () { if (run.onStep) run.onStep(1); }));
         clockBtn = btn('Start the clock', 'btn-secondary show-clock-btn', function () { if (run.onClock) run.onClock(!info.clockOn); });
         acts.appendChild(clockBtn);
         box.appendChild(acts);
@@ -211,8 +206,7 @@
     box.insertBefore(before, ol);
 
     var any = el('section', 'show-anytime');
-    any.appendChild(el('h2', null, 'Any time in the show'));
-    any.appendChild(el('p', 'small', 'Everything that is not part of the current scene, kept here so it is always in reach.'));
+    any.appendChild(el('h2', null, 'Also in this session'));
     var anyList = el('div', 'show-anytime-list');
     any.appendChild(anyList);
     box.appendChild(any);
@@ -227,16 +221,10 @@
       sa.target = '_blank';
       sa.rel = 'noopener';
       stuck.appendChild(sa);
-      stuck.appendChild(document.createTextNode(' suggests, and bring it to your trio if it is still stuck after twenty minutes.'));
+      stuck.appendChild(document.createTextNode(' suggests, and bring it to your group if it is still stuck after twenty minutes.'));
       box.appendChild(stuck);
     }
 
-    var words = el('details', 'show-words');
-    words.appendChild(el('summary', null, 'What the words mean'));
-    var dl = el('dl');
-    K.WORDS.forEach(function (w) { dl.appendChild(el('dt', null, w.name)); dl.appendChild(el('dd', null, w.line)); });
-    words.appendChild(dl);
-    box.appendChild(words);
 
     // Each part of the view is wrapped once, in a details whose summary is
     // its name (and count) and whose first line says what it is for.
@@ -288,7 +276,10 @@
     build(parts);
 
     function place() {
-      var l = K.layout(parts, current || null, { teaching: teaching, available: Object.keys(slots) });
+      // A page can say a part does not apply (no groups, so no rooms).
+      var off = opts.unavailable ? opts.unavailable() : [];
+      var l = K.layout(parts, current || null, { teaching: teaching, available: Object.keys(slots).filter(function (k) { return off.indexOf(k) < 0; }) });
+      off.forEach(function (k) { if (wraps[k]) wraps[k].box.hidden = true; });
       var target = current && items[current] ? items[current].body : before;
       l.now.forEach(function (key) {
         var w = wraps[key].box;

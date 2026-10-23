@@ -25,11 +25,11 @@
   // The kinds of scene, each with the one line that says what happens in it.
   var KINDS = {
     talk: { name: 'Talk', line: 'Someone explains, and everyone listens and reads along.' },
-    rooms: { name: 'Rehearsal rooms', line: 'Everyone goes to their trio’s room, takes a turn presenting, and comes back when the clock runs out.' },
+    rooms: { name: 'In groups', line: 'Everyone goes to their trio’s room, takes a turn presenting, and comes back when the clock runs out.' },
     'break': { name: 'Break', line: 'A few minutes away, and then back to the main room.' },
-    presenter: { name: 'Presenter', line: 'One person shows their work on the main stage, and the audience responds.' },
-    design: { name: 'Design stage', line: 'Everyone works on the same prompt together, drawing and writing in one shared space.' },
-    reflection: { name: 'Reflection', line: 'Everyone starts this week’s work before leaving, with help close by.' },
+    presenter: { name: 'Showing work', line: 'One person shows their work on the main stage, and the audience responds.' },
+    design: { name: 'On the board', line: 'Everyone works on the same prompt together, drawing and writing in one shared space.' },
+    reflection: { name: 'Writing', line: 'Everyone starts this week’s work before leaving, with help close by.' },
     question: { name: 'Question', line: 'Everyone answers privately, and the leader may show the count.' }
   };
 

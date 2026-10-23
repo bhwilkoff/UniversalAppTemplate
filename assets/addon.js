@@ -257,6 +257,9 @@
           startRooms();
           startSignals(res[2].data);
           startClass();
+          // Reactions and stance are for the people in the session, not
+          // the leader running it.
+          if (S.teaching) $('[data-react]').hidden = true;
           drawCode();
           startChat();
           startRecognition();
@@ -278,6 +281,15 @@
     S.list = S.parts;
     S.show = window.ShowView.mount({
       mount: $('[data-show]'), parts: S.list, teaching: S.teaching,
+      // What does not apply to this cohort stays out of sight: rooms
+      // without groups, a board without a board part (JOURNEYS.md).
+      unavailable: function () {
+        var off = [];
+        if (!S.groups.length) off.push('rooms', 'cue-rooms', 'brought');
+        var list = S.list || S.parts || [];
+        if (!list.some(function (x) { return x.kind === 'design' || x.key === 'prompt'; })) off.push('design');
+        return off;
+      },
       stuck: window.CurriculumPagesLib && S.session ? window.CurriculumPagesLib.stuckFor(S.session.number) : null,
       onPick: function (key) {
         if (shared()) { S.run.go(key); return; }

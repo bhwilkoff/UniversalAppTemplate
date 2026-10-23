@@ -79,8 +79,8 @@ test('the next scene follows the current one, and the first comes before any', (
   assert.equal(S.minutesText(0), '');
 });
 
-test('the shared drawing scene is the design stage, and the main stage keeps its name', () => {
-  assert.equal(S.KINDS.design.name, 'Design stage');
+test('the shared drawing scene is named in plain words (On the board), and the main stage keeps its name', () => {
+  assert.equal(S.KINDS.design.name, 'On the board');
   assert.equal(S.PART_KIND.prompt, 'design');
   assert.ok(!S.KINDS.board);
   assert.ok(S.layout(parts, 'prompt', { teaching: false }).now.includes('design'));
