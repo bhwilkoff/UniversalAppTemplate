@@ -216,12 +216,12 @@
     if (!teaching && opts.stuck && opts.stuck.url) {
       var stuck = el('p', 'small show-stuck');
       stuck.appendChild(document.createTextNode('Stuck? Ask yourself one question first, then try what '));
-      var sa = el('a', null, opts.stuck.label);
+      var sa = el('a', null, 'the stuck pages');
       sa.href = opts.stuck.url;
       sa.target = '_blank';
       sa.rel = 'noopener';
       stuck.appendChild(sa);
-      stuck.appendChild(document.createTextNode(' suggests, and bring it to your group if it is still stuck after twenty minutes.'));
+      stuck.appendChild(document.createTextNode(' suggest, and bring it to your group if it is still stuck after twenty minutes.'));
       box.appendChild(stuck);
     }
 

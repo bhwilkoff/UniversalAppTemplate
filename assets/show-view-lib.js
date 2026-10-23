@@ -54,7 +54,7 @@
       line: { teacher: 'Everyone’s bring-back since last session, with what each person wants to know.', student: 'Everyone’s bring-back since last session, so you know what your partners will show.' } },
     { key: 'cue-stage', name: 'Who is presenting', teacher: true, kinds: ['presenter'],
       line: { teacher: 'Name who presents and who responds, so everyone knows whom to watch.' } },
-    { key: 'wings', name: 'The wings', teacher: false, kinds: ['presenter'],
+    { key: 'wings', name: 'Waiting to show work', teacher: false, kinds: ['presenter'],
       line: { teacher: 'Who is ready to present, in the order they asked. Put one on the main stage when it is their turn.', student: 'Ask to present here, and see whose turn is next.' } },
     { key: 'design', name: 'The board', teacher: false, kinds: ['design'],
       line: { teacher: 'The shared space for this scene, where everyone draws and writes at once.', student: 'The shared space where everyone draws and writes on the same prompt.' } },

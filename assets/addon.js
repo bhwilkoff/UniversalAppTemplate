@@ -575,8 +575,10 @@
   function drawFrame() {
     $('[data-cohort-title]').textContent = S.cohort.title;
     var group = S.room.groupId ? S.groups.filter(function (g) { return g.id === S.room.groupId; })[0] : null;
-    $('[data-where]').textContent = (window.CohortLib ? window.CohortLib.sessionName(S.session.number) : 'Week ' + S.session.number) + ', ' + (group ? group.name + '’s room' : 'the main room') + (S.teaching ? '. You are leading.' : '.') + (S.room.ambiguous ? ' Another cohort uses this call too.' : '');
+    $('[data-where]').textContent = (window.CohortLib ? window.CohortLib.sessionName(S.session.number) : 'Week ' + S.session.number) + (group ? ', ' + group.name + '’s room' : S.groups.length ? ', the main room' : '') + (S.teaching ? '. You are leading.' : '.') + (S.room.ambiguous ? ' Another cohort uses this call too.' : '');
     var full = $('[data-full-link]'); full.href = '/session/?c=' + encodeURIComponent(S.cohort.slug) + '&s=' + S.session.number;
+    // Outside Meet, this page already is the browser tab.
+    full.hidden = standalone;
     $('[data-fallback-link]').href = full.href;
     $('[data-open-stage]').hidden = !S.teaching || standalone;
     $('[data-part-controls]').hidden = !S.teaching;
