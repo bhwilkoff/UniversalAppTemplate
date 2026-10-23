@@ -216,7 +216,7 @@
       if (bad) return fail('The panel could not look up this call: ' + bad.error.message);
       var room = A.findRoom(code, { sessions: res[0].data, groups: res[1].data, teaching: res[2].data.map(function (t) { return t.cohort_id; }) });
       if (!room) {
-        $('[data-no-room-text]').textContent = 'This call’s code is ' + code + '. A leader adds its link to a session or group in the cohort’s Sessions or People.';
+        $('[data-no-room-text]').textContent = 'This call’s code is ' + code + '. Each session’s call is the Meet link on its calendar invitation and its session page; open the panel from that call.';
         return show('no-room');
       }
       S.room = room;
@@ -617,10 +617,13 @@
   function shared() { return !!(S.run && S.run.shared); }
   function sceneOf(key) { return (S.list || []).filter(function (s) { return s.key === key; })[0] || null; }
 
-  // The scene happening now: where the teacher moved the show, or, before
-  // anyone has, the one the clock says (as before R3).
+  // The scene happening now: where the teacher moved the show, or, without
+  // the shared show, the one the clock says (as before R3).
   function partNow() {
-    if (shared() && S.run.state() && S.run.current()) return sceneOf(S.run.current());
+    // With the shared show, nothing is on until a leader starts it, even
+    // when the schedule says a later part (found in the live Meet test:
+    // parts never run showed as done).
+    if (shared()) return S.run.current() ? sceneOf(S.run.current()) : null;
     return lib.partNow(S.list || S.parts, S.session.starts_at, new Date(), S.chosenPart);
   }
 
