@@ -600,6 +600,10 @@
       var head = root.querySelector('.addon-head');
       head.appendChild($('[data-open-stage]'));
       head.appendChild($('[data-stage-status]'));
+      // The welcome is a stage control too, not a part of the plan (found
+      // in the live Meet test: it sat alone in an empty box under each part).
+      var wt = $('[data-welcome-toggle]'); wt.classList.add('small');
+      head.appendChild(wt);
     }
     $('[data-part-controls]').hidden = !S.teaching;
     $('[data-ask-wrap]').hidden = !S.teaching;
@@ -717,7 +721,7 @@
     // has no box at all.
     var running = shared() && !!part;
     $('[data-part-kicker]').hidden = running;
-    $('[data-part-clock]').hidden = running && !S.teaching;
+    $('[data-part-clock]').hidden = running;
   }
 
   function tick() {
