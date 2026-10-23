@@ -146,6 +146,8 @@
     // Starting a conversation: a button first in the toolbar, its form
     // under it, closed again by Cancel or by posting.
     function drawStart() {
+      // A finished cohort's conversation stays readable, and nothing new is added.
+      if (o.readOnly) return;
       var cats = D.postableCategories(list.categories);
       if (!cats.length) return;
       if (!starting) {
@@ -216,6 +218,7 @@
       });
       if (t.more) box.appendChild(el('p', 'small talk-more')).appendChild(link(t.url, t.more + ' more comments on GitHub'));
       if (t.locked) { box.appendChild(el('p', 'small', 'This conversation is locked, so no one can add to it.')); return; }
+      if (o.readOnly) return;
       box.appendChild(replyForm(t));
     }
 

@@ -322,8 +322,8 @@
           partnerIds = lib.partnersOf(me.id, res[2].data);
           draw(people, mine, res[1].data, res[2].data, res[3].data, res[4].data, res[5].data);
           drawTalk(res[6].data);
-          if (window.CohortAsks) window.CohortAsks.mount($('[data-asks]'), { db: db, session: session, cohort: cohort, access: res[6].data, leading: teaching, app: mine && mine.app_url });
-          if (window.CohortFiles) window.CohortFiles.mount($('[data-files]'), { db: db, session: session, cohort: cohort, access: res[6].data, leading: teaching });
+          if (window.CohortAsks) window.CohortAsks.mount($('[data-asks]'), { db: db, session: session, cohort: cohort, access: res[6].data, leading: teaching, app: mine && mine.app_url, readOnly: cohort.status === 'finished' });
+          if (window.CohortFiles) window.CohortFiles.mount($('[data-files]'), { db: db, session: session, cohort: cohort, access: res[6].data, leading: teaching, readOnly: cohort.status === 'finished' });
           drawFeedback(res[5].data, people, res[3].data, mine);
           drawRecognized(res[5].data);
           drawSetup(mine, res[6].data);
@@ -557,7 +557,7 @@
       box.appendChild(bar);
       if (window.CohortWatch) window.CohortWatch.control({ db: db, session: session, repo: repo }).then(function (w) { if (w) end.appendChild(w); });
       // The newest conversations, read and posted here as this person.
-      if (window.CohortTalk) window.CohortTalk.full(box, { db: db, session: session, repo: repo, toolbar: bar });
+      if (window.CohortTalk) window.CohortTalk.full(box, { db: db, session: session, repo: repo, toolbar: bar, readOnly: cohort.status === 'finished' });
       return;
     } else if (state === 'invited') {
       var st = el('p'); st.appendChild(window.UI.status('invitation', 'invited')); box.appendChild(st);
@@ -581,7 +581,7 @@
   function drawSetup(mine, access) {
     var box = $('[data-setup]');
     var steps = mine ? lib.setupSteps(mine, access, cohort) : [];
-    box.hidden = !steps.some(function (s) { return s.done === false; });
+    box.hidden = cohort.status === 'finished' || !steps.some(function (s) { return s.done === false; });
     var list = $('[data-setup-steps]');
     list.replaceChildren();
     var needed = steps.filter(function (s) { return s.done !== null; });
@@ -757,7 +757,10 @@
     // The plan now lives on the session's own page (JOURNEYS.md, the
     // walk-through audit), so This week links there instead of repeating it.
     var na = $('[data-next-actions]'); na.replaceChildren();
-    if (t.next) {
+    // A finished cohort has no next session; its recordings stay below.
+    if (cohort.status === 'finished') {
+      $('[data-next-when]').textContent = 'This cohort has finished.';
+    } else if (t.next) {
       $('[data-next-when]').textContent = (t.live ? 'Happening now: ' : '') + when(t.next.starts_at) + ', for ' + cohort.session_minutes + ' minutes.';
       // During the group part, your group's own room comes first.
       var part = t.live ? lib.partNow(lib.agenda(cohort.session_minutes), t.next.starts_at, new Date()) : null;

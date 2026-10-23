@@ -52,7 +52,7 @@
     var asking = form();
     asking.hidden = true;
     var start = U.button('Ask someone to try my app', 'btn-primary', function () { asking.hidden = false; start.hidden = true; asking.querySelector('input').focus(); });
-    bar.appendChild(start);
+    if (!o.readOnly) bar.appendChild(start);
     bar.appendChild(U.link('Open on GitHub', 'https://github.com/' + repo + '/issues?q=label%3A' + A.LABEL));
     box.appendChild(bar);
     box.appendChild(asking);

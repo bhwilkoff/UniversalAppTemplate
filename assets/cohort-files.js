@@ -72,7 +72,7 @@
     // The toolbar: adding a file first, for those who may, then GitHub.
     var bar = el('div', 'ui-toolbar');
     var adder = null;
-    if (F.canAdd(access.repo_role)) {
+    if (F.canAdd(access.repo_role) && !o.readOnly) {
       var open = U.button('Add a file', 'btn-primary', function () { adder.hidden = false; open.hidden = true; adder.querySelector('select').focus(); });
       adder = addForm(o, repo, weeks, token, function () { list(); }, function () { adder.hidden = true; open.hidden = false; open.focus(); });
       adder.hidden = true;
