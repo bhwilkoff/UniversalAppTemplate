@@ -322,6 +322,60 @@ Chosen from multiple-choice options:
     the events exist is added as a guest to every session still to come,
     within the hour.
 
+## The walk-through audit, October 23, 2026
+
+Ben: "I still see lots of things that either don't make sense or don't
+work on the session pages, the add-on, or within the platform itself. It
+needs to be cohesive, substantive, and intuitive." These are what a walk
+through the Minerva cohort, signed in as Ben, found. Each is fixed or
+not; nothing here is "improved".
+
+**The session page (S1) does not hold together.**
+- [ ] Before a session, it shows the plan twice: the builder ("The plan",
+  five buttons on every part) and the live controls ("Run of show", with
+  a running clock, "Make this the current scene", "Stop the clock", and
+  "Any time in the show" tools such as sending everyone to rooms in a
+  cohort with no rooms).
+- [ ] The words of each part, which are what a leader prepares and a
+  learner reads, are nowhere in plain view; they hide behind Edit or a
+  fold, and the live view shows a kind's generic line ("Someone explains,
+  and everyone listens and reads along") instead.
+- [ ] Icon buttons with no names.
+- [ ] Kinds are the builder's jargon (Talk, Presenter, Design stage,
+  Reflection) on pages learners read.
+- [ ] "What to bring" (the stage's "Be ready to...") is not on the page.
+
+**This week.**
+- [ ] A stray "Setup done" line.
+- [ ] The week card says "Not posted yet", with a bare "Publish" tag and
+  "Stuck publishing" link nobody can read; a large empty card beside the
+  next session.
+- [ ] "A background for Meet" with no reason to be here.
+
+**Sessions.**
+- [ ] "Update the sessions" is the primary button and does not say what
+  it does.
+- [ ] The question bank is every week's questions in one list under the
+  sessions; each belongs with its session.
+
+**GitHub, everywhere.**
+- [ ] Conversation, Asks, and Files ask to "Sign in again" in every new
+  tab, because the GitHub token lives only in the tab that signed in.
+- [x] The Human Shaped Hub app was private, so nobody outside the
+  organization could sign in with GitHub (fixed by Ben, October 23).
+
+**People and Settings.**
+- [ ] Groups still say "Three learners each... each with its own Meet
+  room", against decision 8.
+- [ ] "Mark returning" and the role buttons say nothing about what they do.
+- [ ] Settings still offers "Set up Meet by hand" and "Every group room
+  now" from before each session had its own event; "Starts October 25"
+  does not match the first session on October 28.
+
+**The add-on.** Not yet seen inside Meet by Claude (it runs only for
+meet@ in a Meet call). It draws the same run-of-show view as the session
+page, so it carries the session page's problems.
+
 ## Order of work
 
 1. **Done, October 23.** Each session has its own page
