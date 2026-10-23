@@ -12,7 +12,8 @@
 
   // Resources for everything shared, then one folder for each week.
   function folders(weeks) {
-    var list = [{ path: 'resources', label: 'Resources' }];
+    // Prep is its own session (number 0), so it has its own folder too.
+    var list = [{ path: 'resources', label: 'Resources' }, { path: 'sessions/prep', label: 'Prep' }];
     for (var i = 1; i <= (weeks || 5); i++) list.push({ path: 'sessions/week-' + i, label: 'Week ' + i });
     return list;
   }
@@ -40,6 +41,7 @@
     // loose files last.
     function rank(d) {
       if (d === 'resources') return 0;
+      if (d === 'sessions/prep') return 0.5;
       if (weekOf(d)) return weekOf(d);
       return d === '' ? 100000 : 10000;
     }

@@ -5,14 +5,15 @@ import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 const F = require('../../assets/cohort-files-lib.js');
 
-test('the folders are Resources, then one for each week', () => {
+test('the folders are Resources, Prep, then one for each week', () => {
   assert.deepEqual(F.folders(3), [
     { path: 'resources', label: 'Resources' },
+    { path: 'sessions/prep', label: 'Prep' },
     { path: 'sessions/week-1', label: 'Week 1' },
     { path: 'sessions/week-2', label: 'Week 2' },
     { path: 'sessions/week-3', label: 'Week 3' },
   ]);
-  assert.equal(F.folders().length, 6);
+  assert.equal(F.folders().length, 7);
 });
 
 test('the list leaves out the repository’s own machinery and groups by folder in order', () => {
