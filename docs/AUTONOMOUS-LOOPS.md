@@ -289,6 +289,22 @@ time before it was written down.
     Gradle's and is unbounded by default, and caps parallel workers
     (`org.gradle.workers.max=4`).
   - Release builds run in CI, not on the laptop.
+- **Parallel agents share the owner's machine, and its rules bind them.**
+  Ear Drama's first build night (2026-10-22) ran the core platforms as
+  background agents in their own worktrees, and three things went wrong
+  that each brief now forbids. An agent booted an iOS simulator for a
+  screenshot and stalled with it running; the load average reached 852,
+  every other agent stalled behind it, a scheduled tick ran three hours
+  late, and the owner had to quit the simulator by hand. So an agent boots
+  no simulator unless it shuts it down in the same step, runs builds in
+  the background with short foreground commands, and proves `pgrep
+  launchd_sim` and its build daemons are empty before it reports. Four
+  times a crashed background run read as success because the command
+  ended in `echo` or `gradlew --stop`, so a run is judged by its log or its
+  test reports, never by a trailing command's exit code. And twice a
+  client's tests pinned a series the catalog later hid or stopped serving,
+  so query tests run on a fixture in the served schema, and a test against
+  the real catalog checks only shape and picks its series from the data.
 
 ## 9. Context hygiene: what loads every session stays small
 
