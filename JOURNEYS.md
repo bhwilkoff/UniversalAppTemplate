@@ -322,12 +322,17 @@ Chosen from multiple-choice options:
     the events exist is added as a guest to every session still to come,
     within the hour.
 
-## Order of work, once decided
+## Order of work
 
-1. The session page (S1), with Sessions, This week, and /live/ pointing at
-   it, and the checklist cut to what a leader decides.
-2. Per-session calendar events with guests, kept up to date as people
-   join, and the invitation email.
-3. The course content, week by week, starting with prep and week 1.
-4. The board's purpose, and the small breaks in the audit.
-5. The add-on, by whichever path Ben chooses.
+1. **Done, October 23.** Each session has its own page
+   (`/session/?c=&s=`), and Sessions, This week, and `/live/` point at it.
+   The checklist keeps only what a leader decides.
+2. **Done, October 23, and seen working.** Each session is its own
+   calendar event with its own Meet link and every learner and leader as
+   a guest. Minerva's six events reached Ben's calendar, and meet@ sent
+   the four invitations from the poll.
+3. **Done, October 23, awaiting Ben's review.** The course is rewritten
+   in four parts, prep through week 5, at 75 minutes in groups and 60 in
+   one call. Minerva's sessions hold the 60-minute plans.
+4. **Next.** The "Try my app" board, and the poll page's closed notice.
+5. **Then.** The Meet add-on's Workspace Marketplace listing.
