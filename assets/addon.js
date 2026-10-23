@@ -591,6 +591,7 @@
     var full = $('[data-full-link]'); full.href = '/session/?c=' + encodeURIComponent(S.cohort.slug) + '&s=' + S.session.number;
     // Outside Meet, this page already is the browser tab.
     full.hidden = standalone;
+    if (standalone) document.title = (window.CohortLib ? window.CohortLib.sessionName(S.session.number) : 'Week ' + S.session.number) + ', ' + S.cohort.title + ' | Human Shaped';
     $('[data-fallback-link]').href = full.href;
     $('[data-open-stage]').hidden = !S.teaching || standalone;
     // The main stage is a leader's first move in a call, so its button sits
