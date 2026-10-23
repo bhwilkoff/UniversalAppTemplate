@@ -299,6 +299,15 @@ Chosen from multiple-choice options:
    app-building course, cut to 60 minutes, with groups that fit four.
 6. **The course content: rewritten all at once, then reviewed.** Prep
    through week 5 in one pass, so Ben can see the whole arc.
+7. **Each session is its own calendar event with its own Meet link.** Not
+   one recurring event with one link for every week. Ben: "That is how
+   humans work with calendars." Each event carries that session's title
+   (prep, then each week's question), the time on the guest's own clock,
+   and a link to that session's page. Moving, cancelling, or changing one
+   session touches only its event. The Meet add-on finds the session from
+   the meeting's own code, so each link opens the exact session. A group's
+   room stays one link for the whole cohort, reached from the session
+   page, because it belongs to the group, not to a session.
 
 ## Order of work, once decided
 
