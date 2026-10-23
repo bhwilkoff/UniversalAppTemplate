@@ -1,7 +1,7 @@
 # The journeys through a cohort
 
-**Status: a proposal, waiting on Ben's decisions at the end.** Once those
-are made, this becomes binding beside PAGES.md: every page, button, email,
+**Status: binding beside PAGES.md**, with Ben's decisions of October 23
+recorded at the end: every page, button, email,
 and calendar invitation exists because a step here needs it, and a step
 that has no home on the site is a gap to fill before anything else moves.
 
@@ -278,27 +278,27 @@ before the next:
   Watch story with what it shows about the learner's app;
 - let groups be two, three, or four, so four people in two cities work.
 
-## Decisions for Ben
+## Ben's decisions, October 23, 2026
 
-1. **Calendar address.** Invite each person at the email they signed in
-   with (or gave on the poll), changeable in Your work, rather than only
-   when they fill in a field. *Recommended.*
-2. **Invitation email.** meet@humanshaped.org emails the people invited
-   from a poll when the cohort is made. *Recommended.*
-3. **The board.** Either fold Asks into Conversation, so there is one place
-   to talk, or give the board the one purpose the course already needs: a
-   "Try my app" board, where someone asks for their app to be held on a
-   device they do not have, and someone takes it. That is week 3's work
-   and week 4's, and it is the clearest thing a board can do that a
-   conversation cannot. *Recommended: "Try my app".*
-4. **The add-on.** For any leader to run a session inside Meet, the add-on
-   has to be published in the Google Workspace Marketplace, which needs
-   Ben's Google Cloud console and a review by Google. Until then, leaders
-   can run sessions from Meet only while signed in as meet@. Publish it, or
-   keep "Run it here" on the session page as the way leaders run sessions?
-5. **Minerva.** It is a research team of four, in San Francisco and Berlin,
-   meeting for an hour. Is it taking the app-building course as written,
-   one app each, or does it need its own sessions?
+Chosen from multiple-choice options:
+
+1. **Calendar address: the sign-in email.** Each person is invited at the
+   email they gave on the poll or that GitHub shares at sign-in. They can
+   change it, or turn invitations off, in Your work.
+2. **Invitation: an email from meet@.** Making a cohort from a poll emails
+   each invited person who left an address, with one "Join the cohort"
+   button. People shows who has joined.
+3. **The board: "Try my app".** Asks becomes a board with one purpose:
+   asking for your app to be held on a device you do not have, someone
+   taking it, and marking it done with what they saw.
+4. **The add-on: publish it, with a fallback.** Claude prepares the Google
+   Workspace Marketplace listing and Ben does the steps in Google Cloud.
+   Until Google approves it, the session page has a "Run it here" panel.
+5. **Minerva: the course, starting a week later.** October 28 becomes the
+   prep session and week 1 moves to November 4, using the standard
+   app-building course, cut to 60 minutes, with groups that fit four.
+6. **The course content: rewritten all at once, then reviewed.** Prep
+   through week 5 in one pass, so Ben can see the whole arc.
 
 ## Order of work, once decided
 
