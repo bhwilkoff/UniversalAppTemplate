@@ -2711,3 +2711,7 @@ html.app-nav-open[data-signed-in] body:not([data-no-app-nav]) .app-nav { display
 .stage-choices.counted .label { grid-column: auto; }
 .stage-choices.many { font-size: clamp(1rem, 2.5vmin, 1.7rem); gap: 0.9vmin; }
 .stage-choices.many li { padding: 0.8vmin 1.6vmin; }
+/* A scale, and any long uncounted list, flows across in columns so it
+   stays in the frame (found in the loop's live Meet test: a five-point
+   scale ran off the stage). */
+.stage-choices.many:not(.counted), .stage-choices.scale { grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr)); }

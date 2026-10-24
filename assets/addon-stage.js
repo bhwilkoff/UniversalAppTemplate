@@ -41,6 +41,7 @@
       sc.lines.forEach(function (t) { lines.appendChild(el('p', 'stage-what' + (t.length > 240 ? ' is-long' : ''), t)); });
       var items = $('[data-s-items]'); items.replaceChildren();
       items.hidden = !sc.items.length;
+      items.classList.toggle('many', sc.items.length > 4);
       sc.items.forEach(function (t) { var li = el('li'); li.appendChild(el('span', 'label', t)); items.appendChild(li); });
       $('[data-s-note]').hidden = !sc.note;
       $('[data-s-note]').textContent = sc.note || '';
@@ -58,6 +59,8 @@
       var ul = $('[data-choices]'); ul.replaceChildren();
       ul.hidden = !rows.length;
       ul.classList.toggle('many', rows.length > 4);
+      // A scale reads as one row of points, not a tall list.
+      ul.classList.toggle('scale', view.kind === 'scale' && !(count && count.rows.length));
       rows.forEach(function (row) {
         var li = el('li');
         li.appendChild(el('span', 'label', row.label));
