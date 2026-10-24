@@ -475,7 +475,12 @@ with what it found.
       on the bare choices (a question part's stage now shows its question
       and count); the counts pushed their total out of the frame; a scale
       ran off the stage; a finished break said Back in 3 minutes.
-- [ ] Edit this part, live: the leader's stage previews, then everyone's
+- [x] Edit this part, live: the leader's stage previews, then everyone's.
+      Previewing and Show it to everyone held, and a learner's plan took
+      the edit at once. Fixed: editing an asked question's words changed
+      the stage but not the question learners were answering; Back to an
+      earlier question part showed a question no one could answer; saving
+      threw the panel away from the part.
 - [ ] Back a part, stop and restart the clock, time running out
 - [ ] Who is here and the roster; reactions; Agree, Not sure, Disagree
 - [ ] The stage I am on; A card for everyone; recording
