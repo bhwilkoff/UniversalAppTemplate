@@ -677,7 +677,16 @@
     if (on.kind === 'welcome') return 'the welcome';
     if (on.kind === 'blank') return 'nothing';
     if (on.kind === 'check') return 'a question';
-    if (on.kind === 'item') { var i = S.items.filter(function (x) { return x.id === on.id; })[0]; return i ? nameOf(i.user_id) + '’s work' : 'someone’s work'; }
+    if (on.kind === 'item') {
+      // In a Showing work part, someone's work on the stage is the part
+      // itself, and the box below says whose (found in the live Meet test:
+      // "shows You's work instead of this part").
+      var part = partNow();
+      if (part && part.kind === 'presenter') return null;
+      var i = S.items.filter(function (x) { return x.id === on.id; })[0];
+      if (!i) return 'someone’s work';
+      return i.user_id === S.me.id ? 'your work' : nameOf(i.user_id) + '’s work';
+    }
     return null;
   }
 
@@ -963,7 +972,9 @@
       var open = newTab(el('a', 'btn-secondary', 'Open it')); open.href = item.url;
       open.setAttribute('aria-label', 'Open ' + L.itemLabel(item) + ' in a new tab');
       acts.appendChild(open);
-      if (S.teaching) acts.appendChild(stageToggle('item', item.id, 'Put it on the main stage', 'Take it off the main stage'));
+      // The first in line is brought up from the box above, so only those
+      // further down need their own way onto the stage.
+      if (S.teaching && i > 0) acts.appendChild(stageToggle('item', item.id, 'Put it on the main stage', 'Take it off the main stage'));
       if (L.canManage(item, S.me.id, S.teaching)) {
         acts.appendChild(button(item.user_id === S.me.id ? 'I have shown it' : 'They have shown it', 'btn-secondary', function () {
           if (S.onStage && S.onStage.id === item.id) setPin(null);
