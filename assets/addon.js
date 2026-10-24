@@ -545,14 +545,12 @@
     var links = A.boardLinks(S.cohort, S.session, S.room.groupId, part && part.kind === 'design' ? (part.config || {}).template : null);
     if (!box || !links) return;
     box.replaceChildren();
-    box.appendChild(el('p', 'small', links.group
-      ? 'Your trio’s own design stage for this week. Everyone in the trio draws on it at once, and it is kept with the session.'
-      : 'This week’s design stage for the whole cohort. Everyone draws on it at once, and it is kept with the session.'));
+    // The main stage already shows the board during its part, so the panel
+    // offers one way in, in the words the plan uses.
+    box.appendChild(el('p', 'small', links.group ? 'Your group’s own board, kept with the session.' : 'The cohort’s board for this session, kept with it.'));
     var acts = el('div', 'actions');
-    var open = newTab(el('a', 'btn-primary', 'Open the design stage')); open.href = links.board; acts.appendChild(open);
-    if (S.teaching) { var stage = newTab(el('a', 'btn-secondary', 'Open it to present')); stage.href = links.stage; acts.appendChild(stage); }
+    var open = newTab(el('a', 'btn-primary', 'Open the board')); open.href = links.board; acts.appendChild(open);
     box.appendChild(acts);
-    if (S.teaching) box.appendChild(el('p', 'small', 'Shown on the main stage during an On the board part.'));
   }
 
   // ------------------------------------------------------------------

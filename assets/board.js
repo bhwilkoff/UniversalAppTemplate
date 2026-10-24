@@ -150,7 +150,7 @@
 
   function drawHead() {
     var c = S.cohort, s = S.session;
-    $('[data-kicker]').textContent = c.title + ', week ' + s.number + (S.teaching ? '. You are leading it.' : '');
+    $('[data-kicker]').textContent = c.title + ', ' + (window.CohortLib ? window.CohortLib.sessionName(s.number) : 'week ' + s.number) + (S.teaching ? '. You are leading it.' : '');
     $('[data-title]').textContent = S.group ? 'The board for ' + S.group.name : 'The board';
     var back = $('[data-back]');
     back.href = '/session/?c=' + encodeURIComponent(c.slug);

@@ -2694,3 +2694,10 @@ html.app-nav-open[data-signed-in] body:not([data-no-app-nav]) .app-nav { display
 .show-moves { flex-wrap: nowrap; }
 /* The part's words, read across a call on the main stage. */
 .stage-lines .stage-what { font-size: clamp(1.35rem, 4.4vmin, 3rem); }
+
+/* The board's three downloads under one button (found in the loop's live
+   test: six buttons crowded the board's head). */
+.board-download { display: inline-block; }
+.board-download > summary { list-style: none; cursor: pointer; }
+.board-download > summary::-webkit-details-marker { display: none; }
+.board-download[open] > .actions { margin-top: 0.5rem; }
