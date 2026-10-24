@@ -49,6 +49,9 @@
 
   var framed = false;
   try { framed = window.self !== window.top; } catch (e) { framed = true; }
+  // Meet always frames the panel from another site; a frame from this
+  // site's own pages (a narrow preview) is the page outside Meet.
+  if (framed) { try { if (window.top.location.origin === location.origin) framed = false; } catch (e) { /* another site: Meet */ } }
   var side = null;          // Meet's side panel client
   var query = new URLSearchParams(location.search);
   var standalone = !framed && !!query.get('c');
