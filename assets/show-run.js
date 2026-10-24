@@ -85,7 +85,8 @@
       return key ? go(key) : Promise.resolve(null);
     }
     // The database starts the clock from its own time; any value restarts it.
-    function clock(on) { return write({ scene_started_at: on ? new Date().toISOString() : null }); }
+    // A start time in the past resumes a stopped clock where it was.
+    function clock(on, startedAt) { return write({ scene_started_at: on ? (startedAt || new Date()).toISOString() : null }); }
     function pin(onStage) { return write(K.stageChange(onStage)); }
 
     // A scene's words, changed in the moment: checked as the class

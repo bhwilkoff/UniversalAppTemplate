@@ -2227,6 +2227,12 @@ def main():
           attempt(ben, "update public.show_state set scene_started_at = null where session_id = %s returning scene_started_at", (r1,)) and last_rows == [(None,)])
     check("and restarts it from the database's own time, not the one the page sends",
           attempt(ben, "update public.show_state set scene_started_at = '2000-01-01' where session_id = %s returning scene_started_at > '2001-01-01'", (r1,)) and last_rows == [(True,)])
+    attempt(ben, "update public.show_state set scene_started_at = null where session_id = %s returning 1", (r1,))
+    check("a stopped clock resumes from a start the page sends in the recent past",
+          attempt(ben, "update public.show_state set scene_started_at = now() - interval '90 seconds' where session_id = %s returning abs(extract(epoch from (now() - scene_started_at)) - 90) < 2", (r1,)) and last_rows == [(True,)])
+    attempt(ben, "update public.show_state set scene_started_at = null where session_id = %s returning 1", (r1,))
+    check("but never starts later than the database's own now",
+          attempt(ben, "update public.show_state set scene_started_at = now() + interval '1 hour' where session_id = %s returning scene_started_at <= now()", (r1,)) and last_rows == [(True,)])
     check("a teacher pins a question of this session on the main stage",
           attempt(ben, "update public.show_state set stage = 'answers', stage_ref = %s where session_id = %s returning stage", (rk, r1)) and last_rows == [("answers",)])
     check("a question from another session cannot go on this main stage",

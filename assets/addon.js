@@ -177,7 +177,7 @@
   // ------------------------------------------------------------------
 
   var S = { me: null, room: null, cohort: null, session: null, prev: null, teaching: false, names: {}, people: [], groups: [], brought: [],
-    parts: [], autoAsked: {}, chosenPart: null, timerEnds: null, drawnPart: undefined, show: null,
+    parts: [], autoAsked: {}, paused: {}, chosenPart: null, timerEnds: null, drawnPart: undefined, show: null,
     items: [], checks: [], answers: [], results: {}, onStage: null, stageOn: false, rooms: null, roomPlaces: {}, signals: null };
   var channel = null, poller = null, nudgeTimer = null, deferred = {}, drafts = {};
   var Q = window.QuestionView, askFields = null;  // the question bank (R4)
@@ -309,7 +309,18 @@
             if (p) S.run.go(p.key).then(function () { return S.run.clock(true); });
             return;
           }
-          S.run.clock(on);
+          // Stop, then Start, carries on from where it stopped (found in
+          // the live Meet test: Start went back to the full time).
+          var part = partNow();
+          if (!on) {
+            var left = A.timeLeft(endsNow(), Date.now());
+            if (part && left) S.paused[part.key] = left;
+            S.run.clock(false);
+            return;
+          }
+          var kept = part && S.paused[part.key];
+          if (part) delete S.paused[part.key];
+          S.run.clock(true, kept ? new Date(Date.now() - (part.minutes * 60 - kept) * 1000) : null);
         },
         onFollow: function () { setPin(null); },
         canEdit: function (key) {
