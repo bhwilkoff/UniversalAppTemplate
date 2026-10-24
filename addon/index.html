@@ -17,6 +17,9 @@
     (function () {
       var q = location.search, t = null;
       if (/[?&]dark\b/.test(q)) t = 'dark'; else if (/[?&]light\b/.test(q)) t = 'light';
+      // Outside Meet, the theme a person chose on the site (found in the
+      // loop's live test: the panel took the system's instead).
+      if (!t && window.top === window) { try { var saved = localStorage.getItem('hs-theme'); if (saved === 'light' || saved === 'dark') t = saved; } catch (e) {} }
       if (t) document.documentElement.setAttribute('data-theme', t);
       // Signed in: the page wears the hub's sidebar (PAGES.md), chosen before
       // it draws, from the session this browser keeps.
