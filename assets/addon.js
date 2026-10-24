@@ -674,7 +674,7 @@
     if (!on) return null;
     if (on.kind === 'welcome') return 'the welcome';
     if (on.kind === 'blank') return 'nothing';
-    if (on.kind === 'check') return 'a question';
+    if (on.kind === 'check') { var own = partCheck(); return own && own.id === on.id ? null : 'a question'; }
     if (on.kind === 'item') {
       // In a Showing work part, someone's work on the stage is the part
       // itself, and the box below says whose (found in the live Meet test:
