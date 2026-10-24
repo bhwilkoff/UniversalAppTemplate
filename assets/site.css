@@ -2729,6 +2729,6 @@ html.app-nav-open[data-signed-in] body:not([data-no-app-nav]) .app-nav { display
    the connection dropped (found in the loop's phone-width check). */
 @media (pointer: coarse) { .react-line:not(.is-warning) { display: none; } }
 
-.stage-choices.long { grid-template-columns: repeat(2, minmax(0, 1fr)); font-size: clamp(0.95rem, 2.3vmin, 1.5rem); gap: 0.8vmin; }
+.stage-choices.long, .stage-choices.long.many { grid-template-columns: repeat(2, minmax(0, 1fr)); font-size: clamp(0.95rem, 2.3vmin, 1.5rem); gap: 0.8vmin; }
 .stage-choices.long li { padding: 0.8vmin 1.4vmin; }
 [data-view="check"].has-long .stage-title { font-size: clamp(1.3rem, 4vmin, 2.8rem); max-width: 40ch; }
