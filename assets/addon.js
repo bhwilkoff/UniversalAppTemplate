@@ -294,11 +294,11 @@
       },
       stuck: window.CurriculumPagesLib && S.session ? window.CurriculumPagesLib.stuckFor(S.session.number) : null,
       onPick: function (key) {
-        if (shared()) { S.run.go(key).then(askPlanned); return; }
+        if (shared()) { S.run.go(key).then(afterMove); return; }
         S.chosenPart = key; S.timerEnds = null; drawPart(true);
       },
       run: S.teaching ? {
-        onStep: function (d) { if (shared()) S.run.step(d).then(askPlanned); else stepLocal(d); },
+        onStep: function (d) { if (shared()) S.run.step(d).then(afterMove); else stepLocal(d); },
         // The database runs a clock only on a current part, so a clock
         // started before the show has begun begins it on the part shown
         // (found in a real Meet call: Start the clock did nothing).
@@ -1242,7 +1242,20 @@
     if (!q) return;
     S.autoAsked[part.key] = true;
     if ((S.checks || []).some(function (k) { return k.prompt === q.prompt; })) return;
-    ask([Object.assign({ show_tally: $('[data-ask-tally]').checked }, q)], $('[data-ask-status]'));
+    // Its own card says it is open, so only a problem leaves a line.
+    var said = el('span');
+    Promise.resolve(ask([Object.assign({ show_tally: $('[data-ask-tally]').checked }, q)], said)).then(function () {
+      if (/^Not asked/.test(said.textContent)) $('[data-ask-status]').textContent = said.textContent;
+    });
+  }
+
+  // After a leader moves the show: the new part in view (found in the
+  // live Meet test: the panel stayed where the button was, parts away),
+  // and its planned question asked.
+  function afterMove() {
+    var now = root.querySelector('[data-show] [aria-current="step"]');
+    if (now && now.scrollIntoView) now.scrollIntoView({ block: 'start', behavior: 'smooth' });
+    askPlanned();
   }
 
   // ------------------------------------------------------------------
