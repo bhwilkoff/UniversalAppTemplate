@@ -1239,6 +1239,17 @@
     var q = L.fromScene(part.config);
     if (!q) return;
     S.autoAsked[part.key] = true;
+    // The question an earlier part asked closes, so learners face one at a
+    // time (found in the live Meet test: two were open at once). Answers
+    // stay, and a question the leader asked by hand stays open.
+    var planned = (S.list || []).filter(function (x) { return x.own && x.kind === 'question' && x.key !== part.key; })
+      .map(function (x) { var p = L.fromScene(x.config); return p ? p.prompt : null; });
+    (S.checks || []).forEach(function (k) {
+      if (k.state === 'open' && k.prompt !== q.prompt && planned.indexOf(k.prompt) >= 0) {
+        if (S.onStage && S.onStage.id === k.id) setPin(null);
+        changeCheck(k, { state: 'closed' });
+      }
+    });
     if ((S.checks || []).some(function (k) { return k.prompt === q.prompt; })) return;
     // Its own card says it is open, so only a problem leaves a line.
     var said = el('span');
