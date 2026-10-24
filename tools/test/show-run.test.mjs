@@ -128,9 +128,9 @@ test('the main stage shows the current scene, and reads only a scene it can chec
   const pinned = A.stageView({ part, onStage: { kind: 'check', id: 'k' }, checks: [{ id: 'k', state: 'open', prompt: 'Q?', choices: null }], scene: preview });
   assert.equal(pinned.mode, 'check', 'a pinned question wins over the scene');
   assert.equal(A.readStageMessage(A.stageMessage({ mode: 'scene', part: null, scene: { title: '' } })), null, 'a scene with no title is not shown');
-  const long = A.sceneOf({ title: 'T', lines: Array(9).fill('x'.repeat(400)), items: Array(12).fill('i'), note: 5 });
+  const long = A.sceneOf({ title: 'T', lines: Array(9).fill('x'.repeat(900)), items: Array(12).fill('i'), note: 5 });
   assert.equal(long.lines.length, 4);
-  assert.equal(long.lines[0].length, 300);
+  assert.equal(long.lines[0].length, 700);
   assert.equal(long.items.length, 8);
   assert.equal(long.note, null);
   assert.equal(A.stageView({ part: null, onStage: null, scene: preview, welcome: { cohort: 'C' } }).mode, 'welcome', 'before the show begins, the welcome');

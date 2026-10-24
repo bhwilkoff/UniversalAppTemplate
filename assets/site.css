@@ -2701,3 +2701,5 @@ html.app-nav-open[data-signed-in] body:not([data-no-app-nav]) .app-nav { display
 .board-download > summary { list-style: none; cursor: pointer; }
 .board-download > summary::-webkit-details-marker { display: none; }
 .board-download[open] > .actions { margin-top: 0.5rem; }
+
+.stage-lines .stage-what.is-long { font-size: clamp(1.1rem, 3.2vmin, 2.1rem); }

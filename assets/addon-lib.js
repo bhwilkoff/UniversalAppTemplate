@@ -168,7 +168,7 @@
     function lines(a, n, len) { return Array.isArray(a) ? a.filter(function (x) { return typeof x === 'string' && x; }).slice(0, n).map(function (x) { return cut(x, len); }) : []; }
     var out = {
       eyebrow: typeof p.eyebrow === 'string' ? cut(p.eyebrow, 40) : '', title: cut(p.title, 120),
-      lines: lines(p.lines, 4, 300), items: lines(p.items, 8, 120), note: typeof p.note === 'string' && p.note ? cut(p.note, 200) : null
+      lines: lines(p.lines, 4, 700), items: lines(p.items, 8, 120), note: typeof p.note === 'string' && p.note ? cut(p.note, 200) : null
     };
     // The design stage (R5): the board itself, on the main stage.
     if (typeof p.board === 'string' && STAGE_BOARD.test(p.board)) out.board = p.board;

@@ -36,7 +36,9 @@
       $('[data-s-eyebrow]').textContent = sc.eyebrow;
       $('[data-s-title]').textContent = sc.title;
       var lines = $('[data-s-lines]'); lines.replaceChildren();
-      sc.lines.forEach(function (t) { lines.appendChild(el('p', 'stage-what', t)); });
+      // Long words get a smaller size rather than a cut (found in the live
+      // Meet test: a Writing part's instructions ended mid-word).
+      sc.lines.forEach(function (t) { lines.appendChild(el('p', 'stage-what' + (t.length > 240 ? ' is-long' : ''), t)); });
       var items = $('[data-s-items]'); items.replaceChildren();
       items.hidden = !sc.items.length;
       sc.items.forEach(function (t) { var li = el('li'); li.appendChild(el('span', 'label', t)); items.appendChild(li); });
