@@ -1251,10 +1251,9 @@
   // so two leaders never ask it twice; closed, it stays closed.
   function askPlanned() {
     var part = partNow();
-    if (!S.teaching || !part || !part.own || part.kind !== 'question' || S.autoAsked[part.key]) return;
+    if (!S.teaching || !part || !part.own || part.kind !== 'question') return;
     var q = L.fromScene(part.config);
     if (!q) return;
-    S.autoAsked[part.key] = true;
     // The question an earlier part asked closes, so learners face one at a
     // time (found in the live Meet test: two were open at once). Answers
     // stay, and a question the leader asked by hand stays open.
@@ -1266,7 +1265,13 @@
         changeCheck(k, { state: 'closed' });
       }
     });
-    if ((S.checks || []).some(function (k) { return k.prompt === q.prompt; })) return;
+    // Coming back to a part opens its question again, with its answers
+    // (found in the live Meet test: Back showed a question no one could
+    // answer); a first arrival asks it, once.
+    var mine = (S.checks || []).filter(function (k) { return k.prompt === q.prompt; })[0];
+    if (mine) { if (mine.state !== 'open') changeCheck(mine, { state: 'open' }); return; }
+    if (S.autoAsked[part.key]) return;
+    S.autoAsked[part.key] = true;
     // Its own card says it is open, so only a problem leaves a line.
     var said = el('span');
     Promise.resolve(ask([Object.assign({ show_tally: $('[data-ask-tally]').checked }, q)], said)).then(function () {
