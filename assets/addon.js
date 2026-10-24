@@ -552,7 +552,7 @@
     var open = newTab(el('a', 'btn-primary', 'Open the design stage')); open.href = links.board; acts.appendChild(open);
     if (S.teaching) { var stage = newTab(el('a', 'btn-secondary', 'Open it to present')); stage.href = links.stage; acts.appendChild(stage); }
     box.appendChild(acts);
-    if (S.teaching) box.appendChild(el('p', 'small', 'Shown on the main stage during a design scene.'));
+    if (S.teaching) box.appendChild(el('p', 'small', 'Shown on the main stage during an On the board part.'));
   }
 
   // ------------------------------------------------------------------
@@ -734,11 +734,11 @@
     var clock = $('[data-clock]'), btn = $('[data-timer]');
     if (left != null) {
       clock.textContent = left ? L.clock(left) : 'Time is up';
-      btn.textContent = left ? 'Stop the clock' : 'Start this scene’s clock';
+      btn.textContent = left ? 'Stop the clock' : 'Start this part’s clock';
       if (!left) S.timerEnds = null;
     } else {
       clock.textContent = part ? part.minutes + ' minutes' : '';
-      btn.textContent = 'Start this scene’s clock';
+      btn.textContent = 'Start this part’s clock';
     }
   }
   setInterval(function () { if (S.session) { tick(); } }, 1000);

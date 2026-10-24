@@ -101,7 +101,7 @@
       box.appendChild(pinned);
       var follow = null, clockBtn = null;
       if (teaching) {
-        follow = btn('Show this scene on the main stage again', 'btn-secondary show-follow', function () { if (run.onFollow) run.onFollow(); });
+        follow = btn('Show this part on the main stage again', 'btn-secondary show-follow', function () { if (run.onFollow) run.onFollow(); });
         follow.hidden = true;
         box.appendChild(follow);
         var acts = el('div', 'actions show-moves');
@@ -129,7 +129,7 @@
         b.clock.classList.toggle('is-stopped', !info.left);
         b.clock.hidden = !b.clock.textContent;
         b.pinned.hidden = !info.pinned;
-        b.pinned.textContent = info.pinned ? 'The main stage shows ' + info.pinned + ' instead of this scene.' : '';
+        b.pinned.textContent = info.pinned ? 'The main stage shows ' + info.pinned + ' instead of this part.' : '';
         if (b.follow) b.follow.hidden = !info.pinned;
         if (b.clockBtn) b.clockBtn.textContent = info.clockOn ? 'Stop' : 'Start';
       });

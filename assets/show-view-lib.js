@@ -14,12 +14,12 @@
     { key: 'show', name: 'Run of show', line: 'The session’s scenes in order. The open one is happening now.' },
     { key: 'scene', name: 'Scene', line: 'One step of the run of show, with its minutes. There is one current scene at a time.' },
     { key: 'cue', name: 'Cue', line: 'Something the leader does in the moment that everyone sees at once, like sending people to their rooms.' },
-    { key: 'stage', name: 'Main stage', line: 'The middle of the call, where the current scene or a presenter’s work is shown to everyone.' },
+    { key: 'stage', name: 'Main stage', line: 'The middle of the call, where the current part or a presenter’s work is shown to everyone.' },
     { key: 'presenter', name: 'Presenter', line: 'The person whose work everyone is looking at.' },
     { key: 'audience', name: 'Audience', line: 'Everyone else in that moment, with one thing to do.' },
     { key: 'wings', name: 'Waiting to show work', line: 'Who is ready to present, waiting their turn in the order they asked.' },
     { key: 'rooms', name: 'Rehearsal rooms', line: 'Each trio’s own call, where people present to two partners before anything is shown to the whole class.' },
-    { key: 'design', name: 'Design stage', line: 'The scene where everyone draws and writes together in one shared space, shown on the main stage.' }
+    { key: 'design', name: 'Design stage', line: 'The part where everyone draws and writes together in one shared space, shown on the main stage.' }
   ];
 
   // The kinds of scene, each with the one line that says what happens in it.
@@ -43,9 +43,9 @@
   // show", so nothing is ever out of reach.
   var SLOTS = [
     { key: 'clock', name: 'Now', teacher: false, kinds: '*',
-      line: { teacher: 'Its clock, and the cues to start it or move to the next scene.', student: 'Where the session is, and how long this scene runs.' } },
+      line: { teacher: 'Its clock, and the cues to start it or move to the next part.', student: 'Where the session is, and how long this part runs.' } },
     { key: 'lead', name: 'Notes for this part', teacher: false, kinds: ['talk', 'rooms'],
-      line: { teacher: 'What this scene needs from you: last week’s notes while people arrive, and each trio’s order in the rooms.', student: 'What this scene asks of you, like your trio’s order and each person’s question.' } },
+      line: { teacher: 'What this part needs from you: last week’s notes while people arrive, and each trio’s order in the rooms.', student: 'What this part asks of you, like your trio’s order and each person’s question.' } },
     { key: 'cue-rooms', name: 'Send everyone to their rooms', teacher: true, kinds: ['rooms'],
       line: { teacher: 'One cue sends every trio to its room with a clock, and one calls them back.' } },
     { key: 'rooms', name: 'The group rooms', teacher: false, kinds: ['rooms'],
@@ -57,7 +57,7 @@
     { key: 'wings', name: 'Waiting to show work', teacher: false, kinds: ['presenter'],
       line: { teacher: 'Who is ready to present, in the order they asked. Put one on the main stage when it is their turn.', student: 'Ask to present here, and see whose turn is next.' } },
     { key: 'design', name: 'The board', teacher: false, kinds: ['design'],
-      line: { teacher: 'The shared space for this scene, where everyone draws and writes at once.', student: 'The shared space where everyone draws and writes on the same prompt.' } },
+      line: { teacher: 'The shared space for this part, where everyone draws and writes at once.', student: 'The shared space where everyone draws and writes on the same prompt.' } },
     { key: 'cue-card', name: 'A card for everyone', teacher: true, kinds: ['talk', 'design'],
       line: { teacher: 'A few words, and a clock if you want one, on everyone’s view at once.' } },
     { key: 'questions', name: 'Questions', teacher: false, kinds: ['question', 'reflection'],

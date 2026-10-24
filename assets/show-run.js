@@ -93,7 +93,7 @@
     // and every main stage following the scene shows them at once.
     function save(key, fields) {
       var scene = list().filter(function (s) { return s.key === key; })[0];
-      if (!scene || !scene.own) return Promise.resolve('Only a scene of this session’s own run of show can be changed here.');
+      if (!scene || !scene.own) return Promise.resolve('Only a part of this session’s own plan can be changed here.');
       var e = K.edited(scene, fields, SL);
       if (e.problem) return Promise.resolve(e.problem);
       return db.from('scenes').update(e.change).eq('id', scene.id).select('*').then(function (r) {
