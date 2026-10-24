@@ -486,7 +486,12 @@ with what it found.
       clock; time up reads Time is up and the leader moves on. Fixed:
       Start after Stop went back to the full time (now carries on, with a
       database change); a panel opened mid-session started at the top.
-- [ ] Who is here and the roster; reactions; Agree, Not sure, Disagree
+- [x] Who is here and the roster; reactions; Agree, Not sure, Disagree.
+      Reactions float onto the stage with their sender's name, and the
+      stance bar counts Agree, Not sure, and Disagree. Fixed: a panel left
+      behind the Meet tab lost its live channel for good once its sign-in
+      key aged out, dropping its reactions and its place in Who is here
+      (it now reconnects with a fresh key, to confirm next tick).
 - [ ] The stage I am on; A card for everyone; recording
 - [ ] The welcome button while the session runs
 - [ ] A second leader in the same call
