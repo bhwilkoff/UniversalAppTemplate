@@ -509,7 +509,11 @@ with what it found.
       also ends Meet's main stage, so the leader opens it again from the
       top. Fixed: a card never reached the stage on a question part.
 - [ ] Past the session's end, and what learners see afterward
-- [ ] The panel outside Meet at phone width and in light mode
+- [ ] The panel outside Meet at phone width and in light mode. Light mode
+      seen and fine; fixed: the panel ignored the theme a person chose on
+      the site. Phone width not yet seen: this browser will not size a
+      window down, and a framed copy turns into the in-Meet panel. The
+      layout is the in-Meet one, built for Meet's 330px side panel.
 - [ ] The stage with long titles and many choices
 
 ## Order of work
