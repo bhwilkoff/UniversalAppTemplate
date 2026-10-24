@@ -58,7 +58,16 @@
           // The address names the session, so it can be kept and shared.
           if (!named) history.replaceState(null, '', lib.sessionUrl(cohort.slug, session.number));
           var live = !!(t.live && t.next && t.next.id === session.id);
-          draw(cohort, sessions, session, live, leading);
+          // A session its leader is still running counts as on, even past
+          // its hour (found in the loop's live test: running over, the page
+          // said Finished and took away the learners' panel).
+          var ends = session.starts_at ? Date.parse(session.starts_at) + cohort.session_minutes * 60000 : null;
+          if (live || ends == null || ends > Date.now() || ends < Date.now() - 3 * 3600000) return draw(cohort, sessions, session, live, leading);
+          return db.from('show_state').select('current_scene, updated_at').eq('session_id', session.id).maybeSingle().then(function (st) {
+            var row = st && st.data;
+            var running = !!(row && row.current_scene && Date.parse(row.updated_at) > Date.now() - 45 * 60000);
+            draw(cohort, sessions, session, running, leading);
+          }, function () { draw(cohort, sessions, session, false, leading); });
         });
       });
     }).catch(function (err) { fail('Something went wrong: ' + (err && err.message ? err.message : 'no details') + '.'); });
