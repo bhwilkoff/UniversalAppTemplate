@@ -492,7 +492,13 @@ with what it found.
       behind the Meet tab lost its live channel for good once its sign-in
       key aged out, dropping its reactions and its place in Who is here
       (it now reconnects with a fresh key, to confirm next tick).
-- [ ] The stage I am on; A card for everyone; recording
+- [x] The stage I am on; A card for everyone; recording. All three
+      reached learners' panels, and the path view counted without names.
+      Fixed, to confirm in Meet next tick: the path choices were
+      abbreviations under a label that clashed with the main stage; the
+      path view repeated itself and ran under the Agree bar; a card and
+      the recording notice reached panels but never the main stage, and
+      the panel still said to present a separate card page.
 - [ ] The welcome button while the session runs
 - [ ] A second leader in the same call
 - [ ] Closing and reopening the panel mid-session
