@@ -732,6 +732,12 @@
     drawNowActivity();
     drawChecksChrome();
     sendStage();
+    // Opened mid-session, the panel starts at the part that is on (found
+    // in the live Meet test: it opened at the top of the plan).
+    if (key && !S.shownNow) {
+      S.shownNow = true;
+      setTimeout(function () { var it = root.querySelector('[data-show] [aria-current="step"]'); if (it && it.scrollIntoView) it.scrollIntoView({ block: 'start' }); }, 300);
+    }
   }
 
   function drawNowActivity() {
