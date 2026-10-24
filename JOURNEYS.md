@@ -523,9 +523,13 @@ with what it found.
       site; on a touch screen its keyboard line is gone. Also fixed: a
       timed card stayed up beside Time is up (it goes a minute after), and
       a card on a question part now takes the stage, confirmed in Meet.
-- [ ] The stage with long titles and many choices. Eight long choices
-      under a three-line question ran off the stage; fixed with two wide
-      columns and a smaller question, to confirm in Meet next tick.
+- [x] The stage with long titles and many choices. Confirmed in Meet:
+      eight long choices under a long question fit in two wide columns,
+      and a long part name ends in an ellipsis on the stage's top line.
+
+The loop stopped on October 24, 2026, with every item but the first
+checked; that one waits on the add-on in the test profiles. Its test
+cohort was deleted, and it never reached anyone's calendar.
 
 ## Order of work
 
