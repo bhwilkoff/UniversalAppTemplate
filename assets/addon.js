@@ -1081,7 +1081,9 @@
       card.appendChild(dm);
     }
     var acts = el('div', 'actions');
-    acts.appendChild(stageToggle('check', k.id, 'Put it on the main stage', 'Take it off the main stage'));
+    // The current part's own question is on the stage already.
+    var own = partCheck();
+    if (!own || own.id !== k.id) acts.appendChild(stageToggle('check', k.id, 'Put it on the main stage', 'Take it off the main stage'));
     var againStatus = el('span', 'ui-inline-status'); againStatus.setAttribute('role', 'status');
     if (RR && RR.canRerun(L.kindOf(k))) acts.appendChild(button('Ask it again', 'btn-secondary', function () {
       db.from('live_checks').insert(RR.againRow(k, { cohortId: S.cohort.id, sessionId: S.session.id, me: S.me.id })).then(function (r) {
@@ -1290,12 +1292,22 @@
     }
     return A.stageView({
       part: part ? { key: part.key, name: part.name, endsAt: endsNow() } : null,
-      onStage: S.onStage, checks: S.checks, results: S.results, items: S.items, names: S.names, audience: V ? V.audienceOf(part) : null,
+      onStage: S.onStage || partCheckPin(), checks: S.checks, results: S.results, items: S.items, names: S.names, audience: V ? V.audienceOf(part) : null,
       welcome: lib.welcome(S.cohort, S.session, S.list && S.list.length ? S.list : S.parts), scene: scene,
       path: window.RosterLib && S.onStage && S.onStage.kind === 'path' ? window.RosterLib.pathView(rosterNow()) : null,
       rooms: S.onStage && S.onStage.kind === 'rooms' ? Object.keys(S.roomPlaces).map(function (k) { return S.roomPlaces[k]; }) : null
     });
   }
+  // A question part's own question is what its stage shows, with the
+  // count once the leader shows results (found in the live Meet test:
+  // Show everyone the results left the stage on the bare choices).
+  function partCheck() {
+    var part = partNow();
+    if (!part || !part.own || part.kind !== 'question') return null;
+    var q = L.fromScene(part.config);
+    return q ? (S.checks || []).filter(function (k) { return k.state === 'open' && k.prompt === q.prompt; })[0] || null : null;
+  }
+  function partCheckPin() { var k = partCheck(); return k ? { kind: 'check', id: k.id } : null; }
   function sendStage() {
     drawWelcomeToggle();
     if (!S.stageOn || !side || !S.session) return;

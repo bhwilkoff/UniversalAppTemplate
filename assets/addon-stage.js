@@ -188,6 +188,8 @@
     $('[data-clock-big]').textContent = t;
     $('[data-s-clock]').hidden = !(big && t);
     $('[data-s-clock]').textContent = t;
+    // "Back in 3 minutes" and "Time is up" never show together.
+    if (big) $('[data-s-note]').hidden = !view.scene.note || t === 'Time is up';
   }
   setInterval(tick, 1000);
 
