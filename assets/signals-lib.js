@@ -30,8 +30,10 @@
   //   together   for ten minutes, unless the teacher sends people to
   //              their rooms again or takes it down
   //   card, stage, recording, talk   until the teacher clears them or sends a
-  //              newer one of the same kind
+  //              newer one of the same kind; a timed card also goes a
+  //              minute after its time runs out
   // Nothing older than four hours shows.
+  var CARD_AFTER_MS = 60 * 1000;
   function state(rows, now) {
     var t = at(now);
     var fresh = (rows || []).filter(function (r) {
@@ -51,6 +53,10 @@
       if (end == null || t - end < BACK_FOR_MS) out.rooms = lastRooms;
     }
     if (!roomsNewer && lastBack && !lastBack.cleared_at && t - ms(lastBack.created_at) < BACK_FOR_MS) out.together = lastBack;
+    // A timed card goes a minute after its time runs out, so its words
+    // ("5 minutes left") never sit beside Time is up for long (found in
+    // the loop's live Meet test).
+    if (out.card && ms(out.card.ends_at) != null && t - ms(out.card.ends_at) > CARD_AFTER_MS) out.card = null;
     return out;
   }
 

@@ -227,3 +227,11 @@ test('the teacher’s controls are one piece of markup with every hook signals.j
   assert.doesNotMatch(html, /\$\{|<script/i);
   assert.doesNotMatch(html, /—/);
 });
+
+test('a timed card goes a minute after its time runs out; an untimed one stays', () => {
+  const timed = { id: 'c1', kind: 'card', body: '5 minutes left', created_at: iso(T0), ends_at: iso(T0 + min(5)), cleared_at: null };
+  assert.equal(lib.state([timed], T0 + min(5) + 30000).card.id, 'c1');
+  assert.equal(lib.state([timed], T0 + min(6) + 1000).card, null);
+  const plain = { id: 'c2', kind: 'card', body: 'Stretch', created_at: iso(T0), ends_at: null, cleared_at: null };
+  assert.equal(lib.state([plain], T0 + min(30)).card.id, 'c2');
+});
