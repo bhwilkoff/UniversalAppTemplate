@@ -481,7 +481,11 @@ with what it found.
       the stage but not the question learners were answering; Back to an
       earlier question part showed a question no one could answer; saving
       threw the panel away from the part.
-- [ ] Back a part, stop and restart the clock, time running out
+- [x] Back a part, stop and restart the clock, time running out. Back
+      reopened its question with its counts; Stop cleared the stage's
+      clock; time up reads Time is up and the leader moves on. Fixed:
+      Start after Stop went back to the full time (now carries on, with a
+      database change); a panel opened mid-session started at the top.
 - [ ] Who is here and the roster; reactions; Agree, Not sure, Disagree
 - [ ] The stage I am on; A card for everyone; recording
 - [ ] The welcome button while the session runs
