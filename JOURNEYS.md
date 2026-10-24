@@ -499,9 +499,15 @@ with what it found.
       path view repeated itself and ran under the Agree bar; a card and
       the recording notice reached panels but never the main stage, and
       the panel still said to present a separate card page.
-- [ ] The welcome button while the session runs
+- [x] The welcome button while the session runs. It sits at the top with
+      the stage button, puts the welcome up over any part, and turns into
+      Take the welcome off the main stage. Also confirmed: the Recording
+      mark on the stage.
 - [ ] A second leader in the same call
-- [ ] Closing and reopening the panel mid-session
+- [x] Closing and reopening the panel mid-session. The panel comes back
+      at the part that is on, with its question and counts; closing it
+      also ends Meet's main stage, so the leader opens it again from the
+      top. Fixed: a card never reached the stage on a question part.
 - [ ] Past the session's end, and what learners see afterward
 - [ ] The panel outside Meet at phone width and in light mode
 - [ ] The stage with long titles and many choices
