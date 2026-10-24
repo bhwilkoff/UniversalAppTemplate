@@ -460,7 +460,11 @@ with what it found.
       presenter read "shows You's work instead of this part"; the first in
       line repeated Bring up; the panel stayed parts away after a move; a
       stray "Asked." line.
-- [ ] On the board part, and the board on the stage
+- [ ] On the board part, and the board on the stage. The learner's board
+      works. Fixed, to confirm in Meet: the stage's board asked a
+      signed-in leader to sign in; Open the design stage became Open the
+      board; the board's head said week 0 and carried three downloads.
+      Also fixed: a Writing part's stage dropped its words.
 - [ ] Writing part, Break part (large clock), the closing question
 - [ ] Choice and scale questions: counts on the stage, without names
 - [ ] Edit this part, live: the leader's stage previews, then everyone's
