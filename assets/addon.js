@@ -319,7 +319,21 @@
           return S.run.canOwn() ? 'parts' : null;
         },
         onDraft: function (key, fields) { S.draft = fields ? { key: key, fields: fields } : null; sendStage(); },
-        onSave: function (key, fields) { return S.run.save(key, fields); },
+        // A question part's words, changed while its question is open,
+        // change the question everyone is answering too (found in the live
+        // Meet test: the stage took the new wording, learners kept the old).
+        onSave: function (key, fields) {
+          var before = sceneOf(key), asked = null;
+          if (before && before.own && before.kind === 'question') {
+            var q = L.fromScene(before.config);
+            asked = q ? (S.checks || []).filter(function (k) { return k.state === 'open' && k.prompt === q.prompt; })[0] : null;
+          }
+          return S.run.save(key, fields).then(function (problem) {
+            var p = fields && typeof fields.prompt === 'string' ? fields.prompt.trim() : '';
+            if (!problem && asked && p && p !== asked.prompt) changeCheck(asked, { prompt: p });
+            return problem;
+          });
+        },
         onStartOwn: function () { return S.run.startOwn(); }
       } : {}
     });
