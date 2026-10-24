@@ -503,12 +503,20 @@ with what it found.
       the stage button, puts the welcome up over any part, and turns into
       Take the welcome off the main stage. Also confirmed: the Recording
       mark on the stage.
-- [ ] A second leader in the same call
+- [x] A second leader in the same call. A co-leader's Back moved meet@'s
+      panel and stage at once, and only one question was ever open, with
+      no duplicates.
 - [x] Closing and reopening the panel mid-session. The panel comes back
       at the part that is on, with its question and counts; closing it
       also ends Meet's main stage, so the leader opens it again from the
       top. Fixed: a card never reached the stage on a question part.
-- [ ] Past the session's end, and what learners see afterward
+- [x] Past the session's end, and what learners see afterward. The panel
+      keeps running past the hour, and afterward the session page reads
+      Finished with its plan. Fixed: running over, the session page said
+      Finished and took away the learners' panel while the leader was
+      still moving through the plan (it now stays on while the show moved
+      in the last 45 minutes). Open: there is no End the session button;
+      the page turns Finished 45 minutes after the last move.
 - [x] The panel outside Meet at phone width and in light mode. Seen at
       375px (a same-site frame, which now counts as outside Meet) and in
       light mode. Fixed: the panel ignored the theme a person chose on the
