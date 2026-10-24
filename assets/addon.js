@@ -331,6 +331,8 @@
           return S.run.save(key, fields).then(function (problem) {
             var p = fields && typeof fields.prompt === 'string' ? fields.prompt.trim() : '';
             if (!problem && asked && p && p !== asked.prompt) changeCheck(asked, { prompt: p });
+            // The plan redraws on save; keep the part just edited in view.
+            if (!problem) setTimeout(function () { var it = root.querySelector('[data-show] [aria-current="step"]'); if (it && it.scrollIntoView) it.scrollIntoView({ block: 'start' }); }, 50);
             return problem;
           });
         },
