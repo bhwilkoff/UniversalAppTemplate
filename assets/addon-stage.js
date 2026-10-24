@@ -105,7 +105,7 @@
         pr.appendChild(li);
       });
       $('[data-path-note]').textContent = view.path.sharing
-        ? L.counted(view.path.sharing, 'person', 'people') + ' chose to say where they are. Anyone can, from the panel.'
+        ? L.counted(view.path.sharing, 'person', 'people') + ' shared their stage on the path. Anyone can, from the panel.'
         : 'Nobody has said where they are yet. Anyone can, from the panel.';
     }
     if (view.mode === 'welcome') {
@@ -165,6 +165,8 @@
     });
     var bar = $('[data-stance]'), sh = R.shares(m.stance);
     bar.hidden = !sh;
+    // The stage keeps room at its foot for the bar, so nothing runs under it.
+    root.classList.toggle('has-stance', !!sh);
     if (sh) {
       ['agree', 'unsure', 'disagree'].forEach(function (k) {
         bar.querySelector('[data-st="' + k + '"]').style.flexGrow = String(sh[k]);

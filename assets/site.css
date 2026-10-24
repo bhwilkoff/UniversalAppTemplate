@@ -2715,3 +2715,7 @@ html.app-nav-open[data-signed-in] body:not([data-no-app-nav]) .app-nav { display
    stays in the frame (found in the loop's live Meet test: a five-point
    scale ran off the stage). */
 .stage-choices.many:not(.counted), .stage-choices.scale { grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr)); }
+
+/* Room at the stage's foot while the stance bar shows (found in the
+   loop's live Meet test: the path view's last line ran under it). */
+.has-stance .stage-ready:not([hidden]) { padding-bottom: calc(5vmin + 2.6rem); }

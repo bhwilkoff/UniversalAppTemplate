@@ -56,10 +56,10 @@
     var RL = window.RosterLib, memKey = o.cohort ? 'hs-path-stage:' + o.cohort.id : null;
     if (RL) {
       var where = el('label', 'path-pick');
-      where.appendChild(el('span', null, 'The stage I am on'));
+      where.appendChild(el('span', null, 'My stage on the path'));
       var sel = el('select');
       sel.appendChild(new Option('Not sharing', ''));
-      RL.STAGE_IDS.forEach(function (id) { sel.appendChild(new Option(RL.STAGE_SHORT[id], id)); });
+      RL.STAGE_IDS.forEach(function (id) { sel.appendChild(new Option((RL.STAGE_NAMES || RL.STAGE_SHORT)[id], id)); });
       try { var saved = memKey && localStorage.getItem(memKey); if (saved && RL.isStage(saved)) { sel.value = saved; extra.stage = saved; } } catch (e) {}
       sel.addEventListener('change', function () {
         extra.stage = sel.value || null;

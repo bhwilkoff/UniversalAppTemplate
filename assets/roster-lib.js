@@ -7,6 +7,8 @@
 (function (root) {
   var STAGE_IDS = ['setup', '00', '01', '02', '03', '04', '05', '06', '07', '08'];
   var STAGE_SHORT = { setup: 'Set up', '00': '00 Why', '01': '01 Prototype', '02': '02 Shape', '03': '03 Native', '04': '04 Seeing', '05': '05 Shipping', '06': '06 Running', '07': '07 Ceiling', '08': '08 AI' };
+  // The full names, as each stage's own page has them, where there is room.
+  var STAGE_NAMES = { setup: 'Getting set up', '00': '00 Why we build', '01': '01 The first prototype', '02': '02 The shape of an app', '03': '03 Going native', '04': '04 Seeing it work', '05': '05 Shipping', '06': '06 Keeping it running', '07': '07 Raising the ceiling', '08': '08 Working with AI' };
   function isStage(id) { return STAGE_IDS.indexOf(id) >= 0; }
 
   // people: [{ user_id, name }] (the cohort's students); presence: the
@@ -48,7 +50,7 @@
     var c = r.counts;
     var line = c.here + ' of ' + c.total + ' here';
     if (asking) line += ', ' + c.answered + ' answered';
-    if (c.sharing) line += ', ' + c.sharing + ' sharing where they are';
+    if (c.sharing) line += ', ' + c.sharing + ' sharing their stage on the path';
     return line + '.';
   }
 
@@ -61,7 +63,7 @@
     return { rows: rows, sharing: r.counts.sharing };
   }
 
-  var lib = { STAGE_IDS: STAGE_IDS, STAGE_SHORT: STAGE_SHORT, isStage: isStage, roster: roster, askingNow: askingNow, summary: summary, pathView: pathView };
+  var lib = { STAGE_IDS: STAGE_IDS, STAGE_SHORT: STAGE_SHORT, STAGE_NAMES: STAGE_NAMES, isStage: isStage, roster: roster, askingNow: askingNow, summary: summary, pathView: pathView };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
   else root.RosterLib = lib;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

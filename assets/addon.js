@@ -524,7 +524,7 @@
     list('Here now', r.here, false);
     list('Not here yet', r.missing, true);
     var acts = el('div', 'actions');
-    acts.appendChild(stageToggle('path', undefined, 'Put where everyone is on the main stage', 'Take it off the main stage'));
+    acts.appendChild(stageToggle('path', undefined, 'Put the path on the main stage', 'Take it off the main stage'));
     d.appendChild(acts);
     box.appendChild(d);
   }

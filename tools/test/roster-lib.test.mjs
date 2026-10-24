@@ -14,7 +14,7 @@ test('who is here, who is not yet, and who answered the question being asked', (
   assert.equal(r.here[0].answered, true);
   assert.equal(r.here[1].answered, false);
   assert.deepEqual(r.counts, { here: 3, total: 4, answered: 2, answeredHere: 1, sharing: 1 });
-  assert.equal(R.summary(r, 'k1'), '3 of 4 here, 2 answered, 1 sharing where they are.');
+  assert.equal(R.summary(r, 'k1'), '3 of 4 here, 2 answered, 1 sharing their stage on the path.');
   assert.equal(R.summary(R.roster(people, {}, [], null), null), '0 of 4 here.');
 });
 
