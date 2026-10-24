@@ -469,7 +469,12 @@ with what it found.
       (long words now shrink); arriving at the closing question left the
       earlier question open, so two were open at once; a break said back
       to the main room in a cohort without rooms.
-- [ ] Choice and scale questions: counts on the stage, without names
+- [x] Choice and scale questions: counts on the stage, without names.
+      Asking, answering, and counts without names all held. Fixed, to
+      confirm in Meet next tick: Show everyone the results left the stage
+      on the bare choices (a question part's stage now shows its question
+      and count); the counts pushed their total out of the frame; a scale
+      ran off the stage; a finished break said Back in 3 minutes.
 - [ ] Edit this part, live: the leader's stage previews, then everyone's
 - [ ] Back a part, stop and restart the clock, time running out
 - [ ] Who is here and the roster; reactions; Agree, Not sure, Disagree
