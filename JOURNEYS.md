@@ -509,12 +509,15 @@ with what it found.
       also ends Meet's main stage, so the leader opens it again from the
       top. Fixed: a card never reached the stage on a question part.
 - [ ] Past the session's end, and what learners see afterward
-- [ ] The panel outside Meet at phone width and in light mode. Light mode
-      seen and fine; fixed: the panel ignored the theme a person chose on
-      the site. Phone width not yet seen: this browser will not size a
-      window down, and a framed copy turns into the in-Meet panel. The
-      layout is the in-Meet one, built for Meet's 330px side panel.
-- [ ] The stage with long titles and many choices
+- [x] The panel outside Meet at phone width and in light mode. Seen at
+      375px (a same-site frame, which now counts as outside Meet) and in
+      light mode. Fixed: the panel ignored the theme a person chose on the
+      site; on a touch screen its keyboard line is gone. Also fixed: a
+      timed card stayed up beside Time is up (it goes a minute after), and
+      a card on a question part now takes the stage, confirmed in Meet.
+- [ ] The stage with long titles and many choices. Eight long choices
+      under a three-line question ran off the stage; fixed with two wide
+      columns and a smaller question, to confirm in Meet next tick.
 
 ## Order of work
 
