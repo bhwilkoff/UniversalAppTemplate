@@ -434,6 +434,16 @@ in the panel outside Meet. What it found, each fixed the same evening:
 - Outside Meet, the learner's panel took the site's sidebar padding and
   ran off the right edge of a desktop window.
 - The call-not-found message pointed to session forms that are gone.
+- The welcome read the generic agenda's arrival line, not the plan's.
+- Every Showing work prompt tells the presenter what to show, but the stage
+  labeled it for the audience; it now reads "What to show".
+- A long part pushed the stage's clock out of the frame.
+- The presenter showed twice in the leader's panel, and with no one else
+  waiting there was no way to thank them.
+- A question part showed its question on the stage while learners' panels
+  said none was open; arriving at the part now asks it, once.
+- Notes on the stage spoke to the leader ("read by you") and pointed to a
+  live page that no longer exists; the panel still said scene for part.
 
 ## Order of work
 
