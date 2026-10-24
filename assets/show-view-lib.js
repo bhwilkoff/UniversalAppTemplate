@@ -26,7 +26,7 @@
   var KINDS = {
     talk: { name: 'Talk', line: 'Someone explains, and everyone listens and reads along.' },
     rooms: { name: 'In groups', line: 'Everyone goes to their trio’s room, takes a turn presenting, and comes back when the clock runs out.' },
-    'break': { name: 'Break', line: 'A few minutes away, and then back to the main room.' },
+    'break': { name: 'Break', line: 'A few minutes away from the screen, and then back to the call.' },
     presenter: { name: 'Showing work', line: 'One person shows their work on the main stage, and the audience responds.' },
     design: { name: 'On the board', line: 'Everyone works on the same prompt together, drawing and writing in one shared space.' },
     reflection: { name: 'Writing', line: 'Everyone starts this week’s work before leaving, with help close by.' },
