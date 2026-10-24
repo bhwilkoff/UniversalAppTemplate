@@ -69,7 +69,8 @@
       where.appendChild(sel);
       mount.appendChild(where);
     }
-    var line = el('p', 'react-line small', 'Keys 1 to 8 react, and A, U, and D say where you stand, while this panel has focus.');
+    var HINT = 'Keys 1 to 8 react, and A, U, and D say where you stand, while this panel has focus.';
+    var line = el('p', 'react-line small', HINT);
     mount.appendChild(line);
 
     function flash(b) {
@@ -125,27 +126,47 @@
       else hold(k.stance);
     });
 
+    // The channel comes back on its own (found in the loop's live test: a
+    // panel left behind the Meet tab lost it for good once its sign-in
+    // key aged out). Each try takes the newest key and a fresh channel,
+    // backing off, and again whenever the tab is looked at.
+    var retry = null, tries = 0;
+    function connect() {
+      clearTimeout(retry); retry = null;
+      if (channel) { try { o.db.removeChannel(channel); } catch (e) {} channel = null; }
+      var keyed = o.db.auth && o.db.auth.getSession ? o.db.auth.getSession().then(function (r) { return r && r.data && r.data.session; }, function () { return null; }) : Promise.resolve(o.auth);
+      keyed.then(function (session) {
+        var token = (session && session.access_token) || (o.auth && o.auth.access_token);
+        if (o.db.realtime && o.db.realtime.setAuth && token) o.db.realtime.setAuth(token);
+        channel = o.db.channel('class:' + o.cohort.id, { config: { private: true, broadcast: { self: true }, presence: { key: me.id } } });
+        var mine = channel;
+        channel
+          .on('broadcast', { event: 'react' }, heard)
+          // A nudge that something changed elsewhere (the chat, R15), so
+          // every panel reads it again at once; the nudge itself carries
+          // nothing but its name.
+          .on('broadcast', { event: 'nudge' }, function (m) {
+            var what = m && m.payload && typeof m.payload.what === 'string' ? m.payload.what : null;
+            (nudged[what] || []).forEach(function (fn) { try { fn(); } catch (e) {} });
+          })
+          .on('presence', { event: 'sync' }, function () {
+            if (!flushTimer) flushTimer = setTimeout(flush, 400);
+            if (o.onPresence) o.onPresence(channel.presenceState());
+          })
+          .subscribe(function (state) {
+            if (mine !== channel) return;
+            live = state === 'SUBSCRIBED';
+            if (live) { tries = 0; line.textContent = HINT; track(); return; }
+            if (state === 'CHANNEL_ERROR' || state === 'TIMED_OUT' || state === 'CLOSED') {
+              line.textContent = 'Reactions are not reaching the class just now. They will come back when the connection does.';
+              if (!retry) retry = setTimeout(connect, Math.min(60000, 2000 * Math.pow(2, tries++)));
+            }
+          });
+      });
+    }
     if (o.db && o.db.channel && o.cohort) {
-      if (o.db.realtime && o.db.realtime.setAuth && o.auth && o.auth.access_token) o.db.realtime.setAuth(o.auth.access_token);
-      channel = o.db.channel('class:' + o.cohort.id, { config: { private: true, broadcast: { self: true }, presence: { key: me.id } } });
-      channel
-        .on('broadcast', { event: 'react' }, heard)
-        // A nudge that something changed elsewhere (the chat, R15), so
-        // every panel reads it again at once; the nudge itself carries
-        // nothing but its name.
-        .on('broadcast', { event: 'nudge' }, function (m) {
-          var what = m && m.payload && typeof m.payload.what === 'string' ? m.payload.what : null;
-          (nudged[what] || []).forEach(function (fn) { try { fn(); } catch (e) {} });
-        })
-        .on('presence', { event: 'sync' }, function () {
-          if (!flushTimer) flushTimer = setTimeout(flush, 400);
-          if (o.onPresence) o.onPresence(channel.presenceState());
-        })
-        .subscribe(function (state) {
-          live = state === 'SUBSCRIBED';
-          if (live) track();
-          if (state === 'CHANNEL_ERROR' || state === 'TIMED_OUT') line.textContent = 'Reactions are not reaching the class just now. They will come back when the connection does.';
-        });
+      connect();
+      document.addEventListener('visibilitychange', function () { if (!document.hidden && !live) connect(); });
     }
 
     return {
@@ -154,7 +175,7 @@
       nudge: function (what) { if (live && channel) channel.send({ type: 'broadcast', event: 'nudge', payload: { what: String(what) } }); },
       onNudge: function (what, fn) { (nudged[what] = nudged[what] || []).push(fn); },
       presence: function () { return channel ? channel.presenceState() : {}; },
-      stop: function () { if (channel) { o.db.removeChannel(channel); channel = null; } }
+      stop: function () { clearTimeout(retry); retry = null; if (channel) { var c = channel; channel = null; o.db.removeChannel(c); } }
     };
   }
 
