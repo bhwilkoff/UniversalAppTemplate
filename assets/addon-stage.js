@@ -57,6 +57,7 @@
       var rows = count && count.rows.length ? count.rows : (view.choices || []).map(function (c) { return { label: c }; });
       var ul = $('[data-choices]'); ul.replaceChildren();
       ul.hidden = !rows.length;
+      ul.classList.toggle('many', rows.length > 4);
       rows.forEach(function (row) {
         var li = el('li');
         li.appendChild(el('span', 'label', row.label));

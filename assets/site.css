@@ -2703,3 +2703,11 @@ html.app-nav-open[data-signed-in] body:not([data-no-app-nav]) .app-nav { display
 .board-download[open] > .actions { margin-top: 0.5rem; }
 
 .stage-lines .stage-what.is-long { font-size: clamp(1.1rem, 3.2vmin, 2.1rem); }
+
+/* Counted choices sit on one line each, label, bar, and count, so the
+   total under them stays in the frame (found in the loop's live Meet
+   test: three choices pushed it out); many choices take a smaller size. */
+.stage-choices.counted li { grid-template-columns: minmax(6ch, 1fr) minmax(0, 2fr) auto; padding: 1vmin 2vmin; }
+.stage-choices.counted .label { grid-column: auto; }
+.stage-choices.many { font-size: clamp(1rem, 2.5vmin, 1.7rem); gap: 0.9vmin; }
+.stage-choices.many li { padding: 0.8vmin 1.6vmin; }
