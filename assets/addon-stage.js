@@ -27,6 +27,7 @@
 
   function draw() {
     root.querySelectorAll('[data-view]').forEach(function (v) { v.hidden = v.getAttribute('data-view') !== view.mode; });
+    $('[data-stage-rec]').hidden = !view.recording;
     var part = view.part;
     // The part sits small at the top when something else has the stage.
     $('[data-part]').hidden = view.mode === 'part' || view.mode === 'welcome' || view.mode === 'scene' || view.mode === 'blank' || !part;

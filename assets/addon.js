@@ -555,8 +555,9 @@
       // reached learners' panels and nowhere else).
       onChange: function (st) {
         var c = st && st.card ? { id: st.card.id, body: st.card.body, endsAt: st.card.ends_at ? Date.parse(st.card.ends_at) : null } : null;
-        if (JSON.stringify(c) === JSON.stringify(S.card || null)) return;
-        S.card = c; sendStage();
+        var rec = !!(st && st.recording);
+        if (JSON.stringify(c) === JSON.stringify(S.card || null) && rec === !!S.recording) return;
+        S.card = c; S.recording = rec; sendStage();
       },
       nameOf: nameOf, people: people, roomMinutes: function () { var r = roomsScene(); return r && r.minutes ? r.minutes : (show ? show.minutes : 25); },
       mounts: {
@@ -1359,7 +1360,7 @@
   function sendStage() {
     drawWelcomeToggle();
     if (!S.stageOn || !side || !S.session) return;
-    try { Promise.resolve(side.notifyMainStage(A.stageMessage(currentView()))).catch(function () {}); } catch (e) {}
+    try { Promise.resolve(side.notifyMainStage(A.stageMessage(currentView(), !!S.recording))).catch(function () {}); } catch (e) {}
   }
   // Start the session: the first part, with its clock running.
   $('[data-start-session]').addEventListener('click', function () {

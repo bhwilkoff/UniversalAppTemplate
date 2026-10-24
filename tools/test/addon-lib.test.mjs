@@ -254,3 +254,9 @@ test('a leader card goes on the main stage over the part, and gives way to a pin
   assert.notEqual(lib.stageView({ part, card: { body: 'x' }, onStage: { kind: 'blank' } }).mode, 'card');
   assert.notEqual(lib.stageView({ part, card: { body: '' } }).mode, 'card');
 });
+
+test('recording rides with every stage message, and only when on', () => {
+  const v = lib.stageView({ part: { key: 'p', name: 'Arrive', endsAt: null }, scene: { eyebrow: 'Talk', title: 'Arrive', lines: [], items: [] } });
+  assert.equal(lib.readStageMessage(lib.stageMessage(v, true)).recording, true);
+  assert.equal(lib.readStageMessage(lib.stageMessage(v)).recording, undefined);
+});

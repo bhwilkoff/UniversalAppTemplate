@@ -193,8 +193,18 @@
   // notifyMainStage (a string). The stage trusts nothing it cannot read
   // back into one of the views above.
   var STAGE = 'hs-stage';
-  function stageMessage(view) { return JSON.stringify({ type: STAGE, v: 1, view: view }); }
+  // `recording` rides with every view: the stage marks it, because people
+  // without the panel open see only the stage.
+  function stageMessage(view, recording) { return JSON.stringify({ type: STAGE, v: 1, view: view, recording: recording === true }); }
   function readStageMessage(payload) {
+    var v = readStageView(payload);
+    if (!v) return null;
+    var m;
+    try { m = typeof payload === 'string' ? JSON.parse(payload) : payload; } catch (e) { m = null; }
+    if (m && m.recording === true) v.recording = true;
+    return v;
+  }
+  function readStageView(payload) {
     var m;
     try { m = typeof payload === 'string' ? JSON.parse(payload) : payload; } catch (e) { return null; }
     if (!m || m.type !== STAGE || m.v !== 1 || !m.view) return null;

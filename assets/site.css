@@ -2719,3 +2719,8 @@ html.app-nav-open[data-signed-in] body:not([data-no-app-nav]) .app-nav { display
 /* Room at the stage's foot while the stance bar shows (found in the
    loop's live Meet test: the path view's last line ran under it). */
 .has-stance .stage-ready:not([hidden]) { padding-bottom: calc(5vmin + 2.6rem); }
+
+/* Recording, marked on the main stage for everyone in the call. */
+.stage-rec { margin: 0 0 0 auto; display: inline-flex; align-items: center; gap: 0.45em; font-size: clamp(0.9rem, 2vmin, 1.3rem); font-weight: 650; color: var(--ink); }
+.stage-rec::before { content: ""; width: 0.6em; height: 0.6em; border-radius: 50%; background: var(--danger); }
+.stage-rec[hidden] { display: none; }
