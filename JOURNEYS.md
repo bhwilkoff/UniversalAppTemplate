@@ -445,6 +445,31 @@ in the panel outside Meet. What it found, each fixed the same evening:
 - Notes on the stage spoke to the leader ("read by you") and pointed to a
   live page that no longer exists; the panel still said scene for part.
 
+## The add-on checklist (the testing loop, from October 23, 2026)
+
+Each tick takes the next unchecked item, tests it live (meet@ leading in
+a real call, benhstest1 and benhstest2 as learners, a labeled test cohort
+cleaned up afterward), fixes what is broken or hard to use, checks the
+last tick's fixes once Meet has the new page, and marks the item here
+with what it found.
+
+- [ ] Learners inside Meet as participants (needs the add-on installed in
+      the test profiles; until then, the panel outside Meet)
+- [ ] Two learners at once: the queue order, answers, who is here
+- [ ] On the board part, and the board on the stage
+- [ ] Writing part, Break part (large clock), the closing question
+- [ ] Choice and scale questions: counts on the stage, without names
+- [ ] Edit this part, live: the leader's stage previews, then everyone's
+- [ ] Back a part, stop and restart the clock, time running out
+- [ ] Who is here and the roster; reactions; Agree, Not sure, Disagree
+- [ ] The stage I am on; A card for everyone; recording
+- [ ] The welcome button while the session runs
+- [ ] A second leader in the same call
+- [ ] Closing and reopening the panel mid-session
+- [ ] Past the session's end, and what learners see afterward
+- [ ] The panel outside Meet at phone width and in light mode
+- [ ] The stage with long titles and many choices
+
 ## Order of work
 
 1. **Done, October 23.** Each session has its own page
