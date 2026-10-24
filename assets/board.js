@@ -56,10 +56,26 @@
   // Opening the board
   // ------------------------------------------------------------------
 
+  // On the main stage, Meet frames the board, so its own storage is apart
+  // from humanshaped.org's. The panel signs in with the browser's storage
+  // access, which this frame may then use too without asking again (found
+  // in the live Meet test: the board said to sign in while the leader was).
+  function stageSignIn() {
+    if (!document.requestStorageAccess) return Promise.resolve(false);
+    return document.requestStorageAccess({ localStorage: true }).then(function (handle) {
+      if (!handle || !handle.localStorage) return false;
+      db = window.supabase.createClient(window.HUB.url, window.HUB.key, { auth: { storage: handle.localStorage } });
+      return true;
+    }, function () { return false; });
+  }
+
   function load() {
     if (!P.slug) return fail('This page needs to know which cohort’s board to open. Open it from the session page.');
     show('loading');
     db.auth.getSession().then(function (s) {
+      if ((!s.data || !s.data.session) && P.stage) return stageSignIn().then(function (got) { return got ? db.auth.getSession() : s; });
+      return s;
+    }).then(function (s) {
       if (!s.data || !s.data.session) {
         // On the Meet add-on's main stage (R5), the board reads the sign-in
         // the panel made; there is nowhere to sign in inside the stage.

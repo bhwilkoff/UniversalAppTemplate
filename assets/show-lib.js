@@ -210,7 +210,10 @@
       p.items = (c.room_scenes || []).map(function (r) { return r.title + ', ' + r.minutes + ' min'; });
       if (c.prompt) p.lines = [c.prompt];
     } else if (k.key === 'reflection') {
-      if (c.prompt) p.lines = [c.prompt];
+      // A writing part's words say what to write; its prompt follows them
+      // (found in the live Meet test: the stage dropped the words).
+      if (c.prompt && p.lines.length) p.note = c.prompt;
+      else if (c.prompt) p.lines = [c.prompt];
     } else if (k.key === 'break') {
       p.note = 'Back in ' + p.minutes + ' minutes.';
     }

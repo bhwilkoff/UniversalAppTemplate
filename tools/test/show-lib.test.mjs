@@ -92,3 +92,10 @@ test('a question scene carries its kind, and the stage preview says how it is an
   assert.match(words.note, /words show here together/);
   assert.deepEqual(S.cleanConfig('question', { prompt: 'x', kind: 'multi', options: ['a', 'b'], question_id: 'q', template: 't' }), { prompt: 'x', kind: 'multi', options: ['a', 'b'], question_id: 'q' });
 });
+
+test('a writing part keeps its words on the stage, with its prompt after them', () => {
+  const p = S.stagePreview({ kind: 'reflection', title: 'Start your log', body: 'Write one line a day.', config: { prompt: 'What happened today?' } });
+  assert.deepEqual(p.lines, ['Write one line a day.']);
+  assert.equal(p.note, 'What happened today?');
+  assert.deepEqual(S.stagePreview({ kind: 'reflection', title: 'X', config: { prompt: 'Only this?' } }).lines, ['Only this?']);
+});
