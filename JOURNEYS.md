@@ -454,8 +454,12 @@ last tick's fixes once Meet has the new page, and marks the item here
 with what it found.
 
 - [ ] Learners inside Meet as participants (needs the add-on installed in
-      the test profiles; until then, the panel outside Meet)
-- [ ] Two learners at once: the queue order, answers, who is here
+      the test profiles; until then, the panel outside Meet). Waits on Ben.
+- [x] Two learners at once: the queue order, answers, who is here.
+      Order, handoff, both answers, and 2 of 2 here all held. Fixed: a
+      presenter read "shows You's work instead of this part"; the first in
+      line repeated Bring up; the panel stayed parts away after a move; a
+      stray "Asked." line.
 - [ ] On the board part, and the board on the stage
 - [ ] Writing part, Break part (large clock), the closing question
 - [ ] Choice and scale questions: counts on the stage, without names
