@@ -61,6 +61,12 @@
       var ul = $('[data-choices]'); ul.replaceChildren();
       ul.hidden = !rows.length;
       ul.classList.toggle('many', rows.length > 4);
+      // Long choices take two wide columns, and the question a smaller
+      // size, so all of them stay in the frame (found in the loop's live
+      // Meet test: eight long choices ran off the stage).
+      var long = rows.some(function (r) { return String(r.label || '').length > 40; });
+      ul.classList.toggle('long', long);
+      root.querySelector('[data-view="check"]').classList.toggle('has-long', long || String(view.prompt || '').length > 90);
       // A scale reads as one row of points, not a tall list.
       ul.classList.toggle('scale', view.kind === 'scale' && !(count && count.rows.length));
       rows.forEach(function (row) {
