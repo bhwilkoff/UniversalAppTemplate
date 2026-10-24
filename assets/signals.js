@@ -80,6 +80,7 @@
         if (m.stage) drawStage(st.stage);
         if (m.screen) drawScreen(sc);
         if (C) C.sync();
+        if (opts.onChange) { try { opts.onChange(st); } catch (e) {} }
       } else {
         updateClocks(now, coarse);
       }

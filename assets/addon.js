@@ -550,6 +550,14 @@
     var show = S.parts.filter(function (p) { return p.key === 'show'; })[0];
     S.signals = window.LiveSignals.start({
       db: db, cohort: S.cohort, session: S.session, meId: S.me.id, teaching: S.teaching, groups: S.groups,
+      // A card a leader shows goes on the main stage too, the one place
+      // the whole call is looking (found in the loop's live Meet test: it
+      // reached learners' panels and nowhere else).
+      onChange: function (st) {
+        var c = st && st.card ? { id: st.card.id, body: st.card.body, endsAt: st.card.ends_at ? Date.parse(st.card.ends_at) : null } : null;
+        if (JSON.stringify(c) === JSON.stringify(S.card || null)) return;
+        S.card = c; sendStage();
+      },
       nameOf: nameOf, people: people, roomMinutes: function () { var r = roomsScene(); return r && r.minutes ? r.minutes : (show ? show.minutes : 25); },
       mounts: {
         recording: $('[data-sig-recording]'), where: $('[data-sig-where]'), card: $('[data-sig-card]'), stage: $('[data-sig-stage]'),
@@ -557,7 +565,8 @@
       }
     });
     // Each cue group sits in the scene it belongs to (ShowViewLib.SLOTS).
-    if (S.teaching) S.show.cues($('[data-sig-controls-body]'), { cardHref: '/card/?c=' + encodeURIComponent(S.cohort.slug) });
+    // Inside Meet the card goes on the main stage itself, so no card page.
+    if (S.teaching) S.show.cues($('[data-sig-controls-body]'), { cardHref: standalone ? '/card/?c=' + encodeURIComponent(S.cohort.slug) : null });
   }
 
   // ------------------------------------------------------------------
@@ -1330,6 +1339,7 @@
     }
     return A.stageView({
       part: part ? { key: part.key, name: part.name, endsAt: endsNow() } : null,
+      card: S.onStage ? null : S.card || null,
       onStage: S.onStage || partCheckPin(), checks: S.checks, results: S.results, items: S.items, names: S.names, audience: V ? V.audienceOf(part) : null,
       welcome: lib.welcome(S.cohort, S.session, S.list && S.list.length ? S.list : S.parts), scene: scene,
       path: window.RosterLib && S.onStage && S.onStage.kind === 'path' ? window.RosterLib.pathView(rosterNow()) : null,

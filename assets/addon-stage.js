@@ -49,6 +49,7 @@
     $('[data-part-name]').textContent = part ? part.name : '';
     $('[data-part-kicker]').textContent = part ? 'Now' : 'Welcome';
     $('[data-part-big]').textContent = part ? part.name : 'The session begins soon.';
+    if (view.mode === 'card') $('[data-card-body]').textContent = view.card.body;
     if (view.mode === 'check') {
       $('[data-prompt]').textContent = view.prompt;
       $('[data-check-kicker]').textContent = view.rerun ? 'Asked again: how have the answers moved?' : 'A question for everyone';
@@ -183,6 +184,10 @@
       p.textContent = left == null ? '' : left ? L.clock(left) + ' left in this step' : 'Time to move on';
       p.classList.toggle('is-over', left === 0);
     });
+    if (view.mode === 'card') {
+      var cl = view.card.endsAt ? A.timeLeft(view.card.endsAt, Date.now()) : null;
+      $('[data-card-clock]').textContent = cl == null ? '' : cl ? L.clock(cl) : 'Time is up';
+    }
     var t = clockText(view.part);
     // A scene's words can fill the stage, so its clock sits small at the
     // top (found in the live Meet test: a long part pushed it out of the

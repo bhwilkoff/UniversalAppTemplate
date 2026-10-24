@@ -101,6 +101,10 @@
     var on = state.onStage || null;
     var w = welcomeOf(state.welcome);
     if (w && ((on && on.kind === 'welcome') || (!on && !part))) return { mode: 'welcome', part: part, welcome: w };
+    // A leader's card, over the current part until it is cleared or done.
+    if (!on && state.card && typeof state.card.body === 'string' && state.card.body) {
+      return { mode: 'card', part: part, card: { body: cut(state.card.body, 400), endsAt: num(state.card.endsAt) } };
+    }
     if (on && on.kind === 'check') {
       var k = (state.checks || []).filter(function (x) { return x.id === on.id; })[0];
       if (k && k.state === 'open') {
@@ -224,6 +228,7 @@
       return iv;
     }
     if (v.mode === 'welcome') { var w = welcomeOf(v.welcome); return w ? { mode: 'welcome', part: part, welcome: w } : null; }
+    if (v.mode === 'card' && v.card && typeof v.card.body === 'string' && v.card.body) return { mode: 'card', part: part, card: { body: cut(v.card.body, 400), endsAt: num(v.card.endsAt) } };
     if (v.mode === 'part') return { mode: 'part', part: part };
     if (v.mode === 'blank') return { mode: 'blank', part: part };
     if (v.mode === 'path') return { mode: 'path', part: part, path: pathOf(v.path) };

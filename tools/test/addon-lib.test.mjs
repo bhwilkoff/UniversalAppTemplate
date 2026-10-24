@@ -244,3 +244,13 @@ test('a question asked again shows the first time beside each bar, by label', ()
   assert.equal(back.rerun, true);
   assert.deepEqual(back.count.rows.map(r => r.before), [75, 25]);
 });
+
+test('a leader card goes on the main stage over the part, and gives way to a pin', () => {
+  const part = { key: 'p', name: 'Arrive', endsAt: null };
+  const v = lib.stageView({ part, card: { body: 'Write one line.', endsAt: 1000 } });
+  assert.equal(v.mode, 'card');
+  assert.equal(v.card.body, 'Write one line.');
+  assert.deepEqual(lib.readStageMessage(lib.stageMessage(v)).card, { body: 'Write one line.', endsAt: 1000 });
+  assert.notEqual(lib.stageView({ part, card: { body: 'x' }, onStage: { kind: 'blank' } }).mode, 'card');
+  assert.notEqual(lib.stageView({ part, card: { body: '' } }).mode, 'card');
+});
