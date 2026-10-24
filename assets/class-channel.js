@@ -156,9 +156,10 @@
           .subscribe(function (state) {
             if (mine !== channel) return;
             live = state === 'SUBSCRIBED';
-            if (live) { tries = 0; line.textContent = HINT; track(); return; }
+            if (live) { tries = 0; line.textContent = HINT; line.classList.remove('is-warning'); track(); return; }
             if (state === 'CHANNEL_ERROR' || state === 'TIMED_OUT' || state === 'CLOSED') {
               line.textContent = 'Reactions are not reaching the class just now. They will come back when the connection does.';
+              line.classList.add('is-warning');
               if (!retry) retry = setTimeout(connect, Math.min(60000, 2000 * Math.pow(2, tries++)));
             }
           });

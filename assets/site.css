@@ -2724,3 +2724,7 @@ html.app-nav-open[data-signed-in] body:not([data-no-app-nav]) .app-nav { display
 .stage-rec { margin: 0 0 0 auto; display: inline-flex; align-items: center; gap: 0.45em; font-size: clamp(0.9rem, 2vmin, 1.3rem); font-weight: 650; color: var(--ink); }
 .stage-rec::before { content: ""; width: 0.6em; height: 0.6em; border-radius: 50%; background: var(--danger); }
 .stage-rec[hidden] { display: none; }
+
+/* The keyboard line means nothing on a touch screen, unless it is saying
+   the connection dropped (found in the loop's phone-width check). */
+@media (pointer: coarse) { .react-line:not(.is-warning) { display: none; } }
