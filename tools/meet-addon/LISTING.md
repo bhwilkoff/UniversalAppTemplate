@@ -123,7 +123,7 @@ Each step names the screen and what goes in each field.
    - **Installation settings:** Individual + Admin Install, so a
      student or a teacher can install it themselves and a school's admin
      can install it for everyone.
-   - **App integration:** Google Meet add-on, deployment `human-shaped`.
+   - **App integration:** **Google Workspace add-on** (there is no Meet-only option; the deployment's `meet` section makes it a Meet add-on), then **Deploy using cloud deployment resource** and choose `human-shaped`, not an Apps Script deployment ID ([Deploy a Meet add-on](https://developers.google.com/workspace/meet/add-ons/guides/deploy-add-on)).
    - **OAuth scopes:** none beyond what Meet add-ons need by default.
    - **Developer information:** developer name (your legal name or the
      organization's), developer website `https://humanshaped.org`,
