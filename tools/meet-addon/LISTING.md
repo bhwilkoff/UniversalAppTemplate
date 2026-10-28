@@ -124,17 +124,17 @@ Each step names the screen and what goes in each field.
      student or a teacher can install it themselves and a school's admin
      can install it for everyone.
    - **App integration:** **Google Workspace add-on** (there is no Meet-only option; the deployment's `meet` section makes it a Meet add-on), then **Deploy using cloud deployment resource** and choose `human-shaped`, not an Apps Script deployment ID ([Deploy a Meet add-on](https://developers.google.com/workspace/meet/add-ons/guides/deploy-add-on)).
-   - **OAuth scopes:** none beyond what Meet add-ons need by default.
+   - **OAuth scopes:** only userinfo.email and userinfo.profile. The site's own Drive and Calendar permissions are asked for separately on its pages, so the add-on does not list them (Ben, October 28).
    - **Developer information:** developer name (your legal name or the
      organization's), developer website `https://humanshaped.org`,
-     developer email (the one someone reads), trader status.
+     developer email (the one someone reads), trader status. As filed October 28: Non-trader, developer name Ben Wilkoff, developer email benwilkoff@gmail.com, website and application website https://humanshaped.org.
    - **Links:** terms `https://humanshaped.org/terms/`, privacy
      `https://humanshaped.org/privacy/`, support
      `https://humanshaped.org/support/`.
 5. **Store listing:**
    - **Application name:** `Human Shaped`
    - **Short description** and **detailed description:** below.
-   - **Category:** Education.
+   - **Category:** Teacher and Admin Tools (there is no plain Education category).
    - **Application icons:** the four `listing/icon-*.png` files.
    - **Application card banner:** `listing/banner-220x140.png`.
    - **Screenshots:** the three `listing/screenshot-*.png` files.
