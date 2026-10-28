@@ -773,7 +773,13 @@
       $('[data-next-when]').textContent = sessions.length ? 'All sessions done' : 'Not scheduled yet';
     }
     var past = sessions.filter(function (s) { return safe(s.recording_url); });
-    past.forEach(function (s) { na.appendChild(link(s.recording_url, lib.sessionName(s.number) + ' recording')); });
+    // A recording the recorder put in Drive plays on its session page.
+    past.forEach(function (s) {
+      var here = window.RecordLib && window.RecordLib.driveId(s.recording_url);
+      var a = link(here ? lib.sessionUrl(cohort.slug, s.number) + '#recording' : s.recording_url, lib.sessionName(s.number) + ' recording');
+      if (here) { a.removeAttribute('target'); a.removeAttribute('rel'); }
+      na.appendChild(a);
+    });
 
     $('[data-group-section]').hidden = !myGroup;
     if (myGroup) {

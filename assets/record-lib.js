@@ -57,6 +57,19 @@
   }
 
   function driveUrl(fileId) { return 'https://drive.google.com/file/d/' + encodeURIComponent(fileId) + '/view'; }
+  // The file id in a recording link the recorder wrote, or null for any
+  // other link a leader pasted (which the page still links to as is).
+  function driveId(url) {
+    var m = /^https:\/\/drive\.google\.com\/file\/d\/([A-Za-z0-9_-]{10,200})(?:[/?#]|$)/.exec(String(url || ''));
+    return m ? m[1] : null;
+  }
+  // Where the session page's player reads a Drive recording: the site's
+  // video relay (tools/video-relay), because Drive's own player refused a
+  // viewer who was not signed in (meet@ test, October 28, 2026).
+  function playUrl(url, relay) {
+    var id = driveId(url);
+    return id && relay ? String(relay).replace(/\/$/, '') + '/v/' + id : null;
+  }
 
   // What the picker gave back, in the words a leader needs: a tab with
   // its sound is right; anything else says what to choose instead.
@@ -69,7 +82,7 @@
   var lib = {
     recordUrl: recordUrl, notice: notice, stopNotice: stopNotice, pickMime: pickMime, extension: extension,
     fileName: fileName, pieceName: pieceName, isPiece: isPiece, duration: duration, size: size,
-    driveUrl: driveUrl, checkCapture: checkCapture, MIMES: MIMES
+    driveUrl: driveUrl, driveId: driveId, playUrl: playUrl, checkCapture: checkCapture, MIMES: MIMES
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
   else root.RecordLib = lib;

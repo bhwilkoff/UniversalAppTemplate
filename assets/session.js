@@ -95,7 +95,12 @@
     var acts = $('[data-actions]'); acts.replaceChildren();
     if (!finished && safe(session.meet_url)) acts.appendChild(link('Join the call', session.meet_url, 'btn-primary', true));
     if (live && !leading) acts.appendChild(link('Open the session panel', '/addon/?c=' + encodeURIComponent(cohort.slug) + '&s=' + session.number, 'btn-secondary', true));
-    if (safe(session.recording_url)) acts.appendChild(link('Watch the recording', session.recording_url, finished ? 'btn-primary' : 'btn-secondary', true));
+    // A recording the recorder put in Drive plays here, through the relay,
+    // for anyone who can read this session (the cohort and its leaders).
+    var play = window.RecordLib && safe(session.recording_url) ? window.RecordLib.playUrl(session.recording_url, window.HUB.videoRelay) : null;
+    if (play) { var w = link('Watch the recording', '#recording', finished ? 'btn-primary' : 'btn-secondary', false); w.removeAttribute('target'); w.removeAttribute('rel'); acts.appendChild(w); }
+    else if (safe(session.recording_url)) acts.appendChild(link('Watch the recording', session.recording_url, finished ? 'btn-primary' : 'btn-secondary', true));
+    drawRecording(session.recording_url, play);
     acts.hidden = !acts.children.length;
 
     // The sessions on either side.
@@ -116,6 +121,16 @@
     if (leading) drawDetails(session);
     $('[data-details]').hidden = !leading;
     show('ready');
+  }
+
+  function drawRecording(url, play) {
+    var sec = $('[data-recording-section]'), v = $('[data-recording-video]');
+    sec.hidden = !play;
+    if (!play) { v.removeAttribute('src'); return; }
+    $('[data-recording-link]').href = url;
+    $('[data-recording-note]').hidden = true;
+    v.onerror = function () { $('[data-recording-note]').hidden = false; };
+    if (v.getAttribute('src') !== play) v.src = play;
   }
 
   function drawPlan(cohort, sessions, session, leading, finished) {

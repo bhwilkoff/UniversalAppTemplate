@@ -89,6 +89,12 @@
             <nav class="session-pager" aria-label="Other sessions" data-pager></nav>
           </header>
 
+          <section class="session-recording" id="recording" aria-labelledby="recording-head" data-recording-section hidden>
+            <h2 id="recording-head">The recording</h2>
+            <video controls playsinline preload="metadata" data-recording-video style="width:100%;border-radius:.75rem;background:#000"></video>
+            <p class="small" data-recording-note hidden>It did not play here. <a data-recording-link target="_blank" rel="noopener">Open it in Drive</a>.</p>
+          </section>
+
           <section class="session-bring" aria-labelledby="bring-head" data-bring-section hidden>
             <h2 id="bring-head">What to bring</h2>
             <p data-bring></p>
@@ -129,7 +135,8 @@
   <script src="/assets/curriculum-seed.js?v=20261023b" defer></script>
   <script src="/assets/show-builder.js?v=20261023zg" defer></script>
   <script src="/assets/cohort-nav.js?v=20261023m" defer></script>
-  <script src="/assets/session.js?v=20261024aa" defer></script>
+  <script src="/assets/record-lib.js?v=20261028d" defer></script>
+  <script src="/assets/session.js?v=20261028a" defer></script>
 
   <footer class="site-footer">
     <div class="wrap">

@@ -54,3 +54,13 @@ test('a wrong choice in the picker says what to choose instead', () => {
 test('the session page links the Drive file', () => {
   assert.equal(lib.driveUrl('abc_123'), 'https://drive.google.com/file/d/abc_123/view');
 });
+
+test('a recorder link plays through the relay; any other link does not', () => {
+  const link = lib.driveUrl('1mgOsEufkb9NlIDv9Ft5ZUywydLbTYuep');
+  assert.equal(lib.driveId(link), '1mgOsEufkb9NlIDv9Ft5ZUywydLbTYuep');
+  assert.equal(lib.playUrl(link, 'https://relay.example/'), 'https://relay.example/v/1mgOsEufkb9NlIDv9Ft5ZUywydLbTYuep');
+  assert.equal(lib.driveId('https://drive.google.com/file/d/abc'), null);
+  assert.equal(lib.driveId('https://evil.example/file/d/1mgOsEufkb9NlIDv9Ft5ZUywydLbTYuep/view'), null);
+  assert.equal(lib.playUrl('https://youtu.be/xyz', 'https://relay.example'), null);
+  assert.equal(lib.playUrl(link, ''), null);
+});
