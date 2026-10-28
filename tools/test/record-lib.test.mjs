@@ -16,6 +16,7 @@ test('the notice names the cohort and where the recording goes', () => {
 });
 
 test('the best format this browser records is chosen', () => {
+  assert.equal(lib.pickMime(() => true), 'video/mp4;codecs=avc1.42E01E,mp4a.40.2');
   assert.equal(lib.pickMime((m) => m.startsWith('video/webm')), 'video/webm;codecs=vp9,opus');
   assert.equal(lib.pickMime((m) => m === 'video/mp4'), 'video/mp4');
   assert.equal(lib.pickMime(() => false), '');

@@ -19,9 +19,11 @@
   }
   function stopNotice() { return 'I have stopped recording. Anything from here on is not recorded.'; }
 
-  // The first format this browser records, best first. VP9 keeps a
-  // shared screen sharp at a low rate; Opus carries the voices.
-  var MIMES = ['video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm', 'video/mp4'];
+  // The first format this browser records, best first, in the order
+  // exchanges use (exchange-lib.js): MP4 is what Drive's player plays. A
+  // WebM recording uploaded in the meet@ test of October 28, 2026 showed
+  // "Unable to load video" in Drive. WebM is the fallback.
+  var MIMES = ['video/mp4;codecs=avc1.42E01E,mp4a.40.2', 'video/mp4;codecs=avc1,mp4a', 'video/mp4', 'video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm'];
   function pickMime(isSupported) {
     for (var i = 0; i < MIMES.length; i++) { try { if (isSupported(MIMES[i])) return MIMES[i]; } catch (e) { /* try the next */ } }
     return '';

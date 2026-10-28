@@ -155,7 +155,7 @@
     var screen = null, mic = null;
     status.textContent = 'Choose the Meet tab in the window that opens.';
     var options = {
-      video: { displaySurface: 'browser', frameRate: 30 },
+      video: { displaySurface: 'browser', frameRate: 30, width: { max: 1920 }, height: { max: 1080 } },
       audio: { suppressLocalAudioPlayback: false },
       preferCurrentTab: false, selfBrowserSurface: 'exclude', surfaceSwitching: 'include', systemAudio: 'exclude', monitorTypeSurfaces: 'exclude'
     };
@@ -238,7 +238,7 @@
     r.queue.then(function () { return r.dir ? saveMeta(r.dir, r.meta) : null; }).then(function () {
       if (r.dir) return list();
       // Without a place on disk, the one recording stays in memory until saved.
-      drawItem({ meta: r.meta, blob: function () { return Promise.resolve(new Blob(r.memory, { type: 'video/webm' })); } }, true);
+      drawItem({ meta: r.meta, blob: function () { return Promise.resolve(new Blob(r.memory, { type: R.extension(r.meta.mime) === 'mp4' ? 'video/mp4' : 'video/webm' })); } }, true);
     });
   }
 
