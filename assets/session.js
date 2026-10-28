@@ -142,11 +142,17 @@
   // every answer. One plain question per box (Ben, October 28, 2026).
   function drawPrep(cohort, session, leading) {
     var sec = $('[data-prep-section]'), form = $('[data-prep-form]'), list = $('[data-prep-answers]');
-    var qs = Array.isArray(session.prep_questions) ? session.prep_questions.filter(function (q) { return q && q.id && q.prompt; }) : [];
+    var items = Array.isArray(session.prep_questions) ? session.prep_questions.filter(function (q) { return q && q.id && q.prompt; }) : [];
+    // An exchange to reply to is an item too: { kind: 'exchange', token }.
+    var exItems = items.filter(function (q) { return q.kind === 'exchange' && /^[0-9a-f]{32}$/.test(q.token || ''); });
+    var qs = items.filter(function (q) { return q.kind !== 'exchange'; });
     form.replaceChildren(); list.replaceChildren();
-    sec.hidden = !qs.length;
-    if (!qs.length) return;
+    var exBox = $('[data-prep-exchanges]'); exBox.replaceChildren();
+    sec.hidden = !items.length;
+    if (!items.length) return;
+    drawPrepExchanges(exItems, exBox, cohort, leading);
     if (leading) {
+      if (!qs.length) return;
       $('[data-prep-note]').replaceChildren(U.visibility('staff', 'Everyone’s answers'));
       return Promise.all([
         db.from('prep_answers').select('user_id, question_id, body, updated_at').eq('session_id', session.id),
@@ -170,6 +176,7 @@
       });
     }
     if (!K.member || !K.me) { sec.hidden = true; return; }
+    if (!qs.length) return;
     $('[data-prep-note]').replaceChildren(U.visibility('teachers', 'Your answers'));
     return db.from('prep_answers').select('question_id, body').eq('session_id', session.id).eq('user_id', K.me.id).then(function (r) {
       var had = {};
@@ -202,6 +209,33 @@
           U.say(said, 'Saved. You can change these until the session.');
         });
       };
+    });
+  }
+
+  // Each exchange to reply to before the session: a link, and whether this
+  // learner has posted in it; for a leader, how many have.
+  function drawPrepExchanges(exItems, box, cohort, leading) {
+    exItems.forEach(function (q) {
+      var row = el('div', 'session-prep-exchange');
+      row.appendChild(el('h3', null, q.prompt));
+      box.appendChild(row);
+      db.from('exchanges').select('id, title').eq('token', q.token).maybeSingle().then(function (r) {
+        if (r.error || !r.data) { row.appendChild(el('p', 'small', 'This exchange could not be found.')); return; }
+        var a = el('a', 'btn-secondary', r.data.title); a.href = '/exchange/#' + q.token;
+        var acts = el('div', 'actions'); acts.appendChild(a); row.appendChild(acts);
+        var posts = db.from('exchange_posts').select('author_id').eq('exchange_id', r.data.id);
+        if (leading) {
+          return Promise.all([posts, db.from('enrollments').select('user_id').eq('cohort_id', cohort.id).neq('status', 'left')]).then(function (res) {
+            var by = {}; (res[0].data || []).forEach(function (p) { by[p.author_id] = true; });
+            var people = (res[1].data || []).map(function (e) { return e.user_id; });
+            row.appendChild(el('p', 'ui-meta-line', people.filter(function (id) { return by[id]; }).length + ' of ' + people.length + ' have replied.'));
+          });
+        }
+        if (!K.me) return;
+        return posts.eq('author_id', K.me.id).limit(1).then(function (p) {
+          acts.appendChild(U.status('task', p.data && p.data.length ? 'done' : 'todo'));
+        });
+      });
     });
   }
 
