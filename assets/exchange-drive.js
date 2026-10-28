@@ -71,13 +71,16 @@
 
   // The folder this site made before, or a new one. drive.file can see
   // only what this site made, so the search never reads anything else.
-  function folder(token) {
-    var q = "mimeType = 'application/vnd.google-apps.folder' and trashed = false and appProperties has { key='humanshaped' and value='exchanges' }";
+  // The session recorder (/record/) passes its own folder in meta.folder.
+  var EXCHANGES = { key: 'exchanges', name: FOLDER, description: 'Videos you recorded for exchanges on humanshaped.org. Anyone with a video\'s link can watch it.' };
+  function folder(token, spec) {
+    spec = spec || EXCHANGES;
+    var q = "mimeType = 'application/vnd.google-apps.folder' and trashed = false and appProperties has { key='humanshaped' and value='" + spec.key + "' }";
     return call(token, 'GET', API + '/files?fields=files(id)&pageSize=1&q=' + encodeURIComponent(q)).then(function (r) {
       if (r && r.files && r.files.length) return r.files[0].id;
       return call(token, 'POST', API + '/files?fields=id', {
-        name: FOLDER, mimeType: 'application/vnd.google-apps.folder', appProperties: { humanshaped: 'exchanges' },
-        description: 'Videos you recorded for exchanges on humanshaped.org. Anyone with a video\'s link can watch it.'
+        name: spec.name, mimeType: 'application/vnd.google-apps.folder', appProperties: { humanshaped: spec.key },
+        description: spec.description
       }).then(function (f) { return f.id; });
     });
   }
@@ -93,7 +96,7 @@
       },
       body: JSON.stringify(Object.assign({
         name: meta.name, parents: [parent], mimeType: X.baseType(blob.type || meta.mime),
-        description: meta.description || '', appProperties: { humanshaped: 'exchange-video' }
+        description: meta.description || '', appProperties: { humanshaped: meta.kind || 'exchange-video' }
       }, meta.thumbnail ? { contentHints: { thumbnail: { image: meta.thumbnail, mimeType: 'image/jpeg' } } } : {}))
     }).then(function (r) {
       if (!r.ok) return r.text().then(function (t) { throw new Error('Drive would not start the upload (' + r.status + ')' + (t ? ': ' + t.slice(0, 160) : '')); });
@@ -199,7 +202,7 @@
 
   function save(token, blob, meta, onProgress) {
     onProgress = onProgress || function () {};
-    return Promise.all([folder(token), meta.thumbnail === undefined ? frame(blob) : meta.thumbnail]).then(function (got) {
+    return Promise.all([folder(token, meta.folder), meta.thumbnail === undefined ? frame(blob) : meta.thumbnail]).then(function (got) {
       return begin(token, blob, Object.assign({}, meta, { thumbnail: got[1] }), got[0]);
     }).then(function (where) {
       return send(where, blob, onProgress);

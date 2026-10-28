@@ -330,9 +330,22 @@
       });
       q('[data-sig-stage-clear]').addEventListener('click', function () { if (st.stage) clear(st.stage, status.stage); });
 
-      // Recording: a notice only; the recorder itself runs on the
-      // teacher's computer and is started and stopped there.
-      q('[data-sig-rec-on]').addEventListener('click', function () { send('recording', {}, status.rec); });
+      // Recording: the recorder (/record/) opens in its own window, since
+      // Meet frames the panel without capture, and sends the notice for
+      // everyone itself. It asks this page for its sign-in, which the
+      // panel needs to hand over because Meet keeps its storage apart.
+      var recWin = null;
+      q('[data-sig-rec-open]').addEventListener('click', function () {
+        recWin = window.open(window.RecordLib ? window.RecordLib.recordUrl(location.origin, opts.cohort.slug, opts.session.number) : '/record/?c=' + encodeURIComponent(opts.cohort.slug) + '&s=' + opts.session.number, 'hs-record', 'popup,width=480,height=760');
+        status.rec.textContent = recWin ? 'The recorder is open in its own window.' : 'Your browser blocked the recorder’s window.';
+      });
+      window.addEventListener('message', function (event) {
+        if (!recWin || !window.GoogleSignInLib || !window.GoogleSignInLib.isWant(event, location.origin, recWin)) return;
+        db.auth.getSession().then(function (s) {
+          var se = s.data && s.data.session;
+          if (se && window.AddonLib) recWin.postMessage(window.AddonLib.handoff(se), location.origin);
+        });
+      });
       q('[data-sig-rec-off]').addEventListener('click', function () { if (st.recording) clear(st.recording, status.rec); });
 
       // Measuring the teacher's own talk: a notice while the recorder
@@ -401,7 +414,7 @@
         q('[data-sig-card-now]').textContent = st.card ? 'Showing now: “' + st.card.body + '”' : '';
         q('[data-sig-stage-live]').hidden = !st.stage;
         q('[data-sig-stage-now]').textContent = st.stage ? K.stageText(st.stage, opts.nameOf) : '';
-        q('[data-sig-rec-on]').hidden = !!st.recording;
+        q('[data-sig-rec-open]').hidden = !!st.recording;
         q('[data-sig-rec-live]').hidden = !st.recording;
         q('[data-sig-talk-on]').hidden = !!st.talk;
         q('[data-sig-talk-live]').hidden = !st.talk;

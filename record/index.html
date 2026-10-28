@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Record the session | Human Shaped</title>
+  <meta name="description" content="The Human Shaped session recorder: a leader records their cohort's Meet call, after saying so, and puts it on the session page.">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#131916" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="/assets/favicon.svg?v=20261006q" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/site.css?v=20261024ab">
+  <script>
+    (function () {
+      try { var saved = localStorage.getItem('hs-theme'); if (saved === 'light' || saved === 'dark') document.documentElement.setAttribute('data-theme', saved); } catch (e) {}
+    })();
+  </script>
+  <style>
+    .record-page { max-width: 30rem; margin: 0 auto; padding: 1.25rem 1rem 2rem; }
+    .record-page h1 { margin-top: .25rem; }
+    .record-notice { padding: .75rem 1rem; border: 1px solid var(--border, currentColor); border-radius: .75rem; }
+    .record-live { display: flex; align-items: center; gap: .5rem; font-variant-numeric: tabular-nums; }
+    .record-dot { width: .75rem; height: .75rem; border-radius: 50%; background: var(--error, #c0392b); flex: none; }
+    .record-list { list-style: none; padding: 0; margin: 0; display: grid; gap: .75rem; }
+    .record-item { padding: .75rem 1rem; border: 1px solid var(--border, currentColor); border-radius: .75rem; }
+    .record-item .actions { margin-top: .5rem; }
+    .record-page progress { width: 100%; }
+  </style>
+</head>
+<body data-no-app-nav>
+  <!-- The session recorder (October 28, 2026). Meet frames the add-on
+       without screen or microphone capture, so the add-on opens this page
+       in its own window. Words by Claude, awaiting Ben's review. -->
+  <main class="record-page" data-record aria-live="polite">
+    <p class="ui-label" data-where>Record the session</p>
+
+    <section data-state="loading"><p>Loading</p></section>
+
+    <section data-state="ready" hidden>
+      <h1>Record this session</h1>
+      <p class="small" data-signin-note hidden></p>
+      <ol>
+        <li>Read this aloud, then copy it into the Meet chat.</li>
+      </ol>
+      <p class="record-notice" data-notice></p>
+      <div class="actions"><button class="btn-secondary" type="button" data-copy>Copy the notice</button></div>
+      <p class="small" role="status" data-copy-status></p>
+      <label><input type="checkbox" data-told> I have said it aloud and posted it in the chat</label>
+      <p>Then choose the Meet tab, with “Also share tab audio” on.</p>
+      <div class="actions"><button class="btn-primary" type="button" data-start disabled>Choose the Meet tab and start</button></div>
+      <p class="small" role="status" data-start-status></p>
+    </section>
+
+    <section data-state="recording" hidden>
+      <h1>Recording</h1>
+      <p class="record-live"><span class="record-dot" aria-hidden="true"></span><span data-clock>0:00</span><span data-bytes></span></p>
+      <p class="small" data-mic-note></p>
+      <p class="small">Keep this window open. It saves every ten seconds, so a crash keeps everything up to that moment.</p>
+      <div class="actions"><button class="btn-primary" type="button" data-stop>Stop recording</button></div>
+    </section>
+
+    <section data-state="done" hidden>
+      <h1>Recording stopped</h1>
+      <p class="record-notice" data-stop-notice></p>
+    </section>
+
+    <section data-saved hidden>
+      <h2>On this computer</h2>
+      <ul class="record-list" data-list></ul>
+    </section>
+  </main>
+
+  <script src="https://accounts.google.com/gsi/client" async></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" defer></script>
+  <script src="/assets/hub-config.js?v=20261016a" defer></script>
+  <script src="/assets/google-signin-lib.js" defer></script>
+  <script src="/assets/addon-lib.js?v=20261024t" defer></script>
+  <script src="/assets/exchange-lib.js" defer></script>
+  <script src="/assets/exchange-drive.js?v=20261028a" defer></script>
+  <script src="/assets/record-lib.js?v=20261028a" defer></script>
+  <script src="/assets/record.js?v=20261028a" defer></script>
+</body>
+</html>
