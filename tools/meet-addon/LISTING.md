@@ -167,11 +167,13 @@ Each step names the screen and what goes in each field.
 > count of answers when the teacher chooses to show it, or someone's
 > work while they talk about it.
 >
-> What it does not do matters as much. It never records, transcribes,
-> or measures who talks. It never joins the call as a participant. It
+> What it does not do matters as much. It never transcribes or
+> measures who talks, and it never joins the call as a participant. It
 > asks Google for no permissions, and the only thing it reads from Meet
-> is the call's meeting code. Answers to questions are counted without
-> names on the stage.
+> is the call's meeting code. A leader can record a session with Human
+> Shaped's recorder, which opens in its own window, only after saying so
+> out loud and in the chat, and everyone sees that it is recording.
+> Answers to questions are counted without names on the stage.
 >
 > Signing in uses your humanshaped.org account. Everything is free, and
 > what you build in a cohort is yours.
@@ -180,7 +182,8 @@ Each step names the screen and what goes in each field.
 
 > Human Shaped reads only the call's meeting code from Google Meet, to
 > find the cohort the call belongs to. It asks for no Google
-> permissions, reads no Google account data, and records nothing. What
+> permissions and reads no Google account data. A session is recorded
+> only when its leader starts the recorder, after telling everyone. What
 > the hub keeps, who can read it, and how to delete it are on
 > https://humanshaped.org/privacy/.
 
