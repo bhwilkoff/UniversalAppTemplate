@@ -211,7 +211,7 @@
     $('[data-mic-note]').textContent = r.mic ? 'Your microphone and the call are both in the recording.' : 'Your microphone is not in the recording, so your voice will be missing. Stop, allow the microphone, and start again.';
     r.tick = setInterval(function () {
       $('[data-clock]').textContent = R.duration((Date.now() - r.meta.started) / 1000);
-      $('[data-bytes]').textContent = r.meta.bytes ? ', ' + R.size(r.meta.bytes) : '';
+      $('[data-bytes]').textContent = r.meta.bytes ? R.size(r.meta.bytes) : '';
     }, 1000);
     if (r.dir) saveMeta(r.dir, r.meta);
     signal(true);
@@ -300,7 +300,9 @@
       up.disabled = true; status.textContent = 'Connecting Drive…';
       // Google's window must open from this click, before anything else waits.
       var token = null;
-      D.connect(K.email).then(function (t) {
+      // No account hint: Drive is the Google account this browser uses
+      // (meet@ for a host), not the email on the Human Shaped account.
+      D.connect().then(function (t) {
         token = t; status.textContent = 'Putting the pieces together…';
         return it.blob();
       }).then(function (blob) {
