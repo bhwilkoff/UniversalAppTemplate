@@ -28,6 +28,8 @@
     return a;
   }
 
+  var K = { me: null, member: false };
+
   function load() {
     if (!slug) return fail('This page needs to know which session to show. Open it from your cohort’s Sessions.');
     show('loading');
@@ -46,6 +48,7 @@
           var bad = res.filter(function (r) { return r.error; })[0];
           if (bad) return fail('This session could not be loaded: ' + bad.error.message);
           var sessions = res[0].data, member = res[1].data.length > 0, leading = res[2].data.length > 0;
+          K.me = me; K.member = member;
           if (!member && !leading) return show('not-member');
           if (window.CohortNav) window.CohortNav.draw($('[data-cohort-nav]'), { cohort: cohort, teaching: leading, member: member, current: 'live' });
           if (!sessions.length) {
@@ -113,6 +116,7 @@
     // What to bring: the stage's "Be ready to...", which the plan's
     // bring-back part asks for, and the stages this session starts.
     drawPlan(cohort, sessions, session, leading, finished);
+    drawPrep(cohort, session, leading);
     var stages = lib.stagesForWeek(session.number);
     var stageBox = $('[data-stages]'); stageBox.replaceChildren();
     stages.forEach(function (n) { var li = el('li'); li.appendChild(link('Stage ' + n, '/path/' + n + '/')); stageBox.appendChild(li); });
@@ -131,6 +135,74 @@
     $('[data-recording-note]').hidden = true;
     v.onerror = function () { $('[data-recording-note]').hidden = false; };
     if (v.getAttribute('src') !== play) v.src = play;
+  }
+
+  // Work handed in before the session (prep_questions on the session):
+  // a learner answers each question privately here, and its leaders read
+  // every answer. One plain question per box (Ben, October 28, 2026).
+  function drawPrep(cohort, session, leading) {
+    var sec = $('[data-prep-section]'), form = $('[data-prep-form]'), list = $('[data-prep-answers]');
+    var qs = Array.isArray(session.prep_questions) ? session.prep_questions.filter(function (q) { return q && q.id && q.prompt; }) : [];
+    form.replaceChildren(); list.replaceChildren();
+    sec.hidden = !qs.length;
+    if (!qs.length) return;
+    if (leading) {
+      $('[data-prep-note]').replaceChildren(U.visibility('staff', 'Everyone’s answers'));
+      return Promise.all([
+        db.from('prep_answers').select('user_id, question_id, body, updated_at').eq('session_id', session.id),
+        db.from('enrollments').select('user_id, profiles(github_login, display_name)').eq('cohort_id', cohort.id).neq('status', 'left')
+      ]).then(function (res) {
+        if (res[0].error) { list.appendChild(el('p', 'small', 'The answers could not load: ' + res[0].error.message)); return; }
+        var names = {}, rows = res[0].data || [];
+        (res[1].data || []).forEach(function (e) { names[e.user_id] = e.profiles ? (e.profiles.display_name || e.profiles.github_login) : 'Someone'; });
+        var people = Object.keys(names), done = people.filter(function (id) { return rows.some(function (r) { return r.user_id === id; }); });
+        list.appendChild(el('p', 'ui-meta-line', done.length + ' of ' + people.length + ' have answered.'));
+        qs.forEach(function (q) {
+          var mine = rows.filter(function (r) { return r.question_id === q.id; });
+          var box = el('div', 'session-prep-q');
+          box.appendChild(el('h3', null, q.prompt));
+          if (!mine.length) box.appendChild(el('p', 'small', 'No answers yet.'));
+          mine.forEach(function (r) {
+            var p = el('p'); p.appendChild(el('strong', null, (names[r.user_id] || 'Someone') + ': ')); p.appendChild(document.createTextNode(r.body)); box.appendChild(p);
+          });
+          list.appendChild(box);
+        });
+      });
+    }
+    if (!K.member || !K.me) { sec.hidden = true; return; }
+    $('[data-prep-note]').replaceChildren(U.visibility('teachers', 'Your answers'));
+    return db.from('prep_answers').select('question_id, body').eq('session_id', session.id).eq('user_id', K.me.id).then(function (r) {
+      var had = {};
+      (r.data || []).forEach(function (a) { had[a.question_id] = a.body; });
+      qs.forEach(function (q) {
+        var label = el('label', null, q.prompt);
+        var box = el('textarea'); box.name = q.id; box.rows = 3; box.maxLength = 4000; box.value = had[q.id] || '';
+        label.appendChild(box); form.appendChild(label);
+      });
+      var actions = el('div', 'actions'), save = el('button', 'btn-primary', 'Save my answers'), said = el('p', 'small');
+      save.type = 'submit'; said.setAttribute('role', 'status');
+      actions.appendChild(save); form.appendChild(actions); form.appendChild(said);
+      form.onsubmit = function (ev) {
+        ev.preventDefault();
+        var rows = [], gone = [];
+        qs.forEach(function (q) {
+          var v = form.elements[q.id].value.trim();
+          if (v) rows.push({ session_id: session.id, cohort_id: cohort.id, user_id: K.me.id, question_id: q.id, body: v });
+          else if (had[q.id]) gone.push(q.id);
+        });
+        U.say(said, 'Saving');
+        var work = [];
+        if (rows.length) work.push(db.from('prep_answers').upsert(rows, { onConflict: 'session_id,user_id,question_id' }));
+        if (gone.length) work.push(db.from('prep_answers').delete().eq('session_id', session.id).eq('user_id', K.me.id).in('question_id', gone));
+        Promise.all(work).then(function (res) {
+          var bad = res.filter(function (x) { return x.error; })[0];
+          if (bad) return U.say(said, 'Not saved: ' + bad.error.message, 'problem');
+          rows.forEach(function (x) { had[x.question_id] = x.body; });
+          gone.forEach(function (id) { delete had[id]; });
+          U.say(said, 'Saved. You can change these until the session.');
+        });
+      };
+    });
   }
 
   function drawPlan(cohort, sessions, session, leading, finished) {
