@@ -632,11 +632,14 @@
     if (standalone) document.title = (window.CohortLib ? window.CohortLib.sessionName(S.session.number) : 'Week ' + S.session.number) + ', ' + S.cohort.title + ' | Human Shaped';
     $('[data-fallback-link]').href = '/addon/?c=' + encodeURIComponent(S.cohort.slug) + '&s=' + S.session.number;
     $('[data-open-stage]').hidden = !S.teaching || standalone;
+    $('[data-close-stage]').hidden = true;
+    stageButtons(S.stageOn);
     // The main stage is a leader's first move in a call, so its button sits
     // at the top of the panel, not below every part.
     if (S.teaching && !standalone) {
       var head = root.querySelector('.addon-head');
       head.appendChild($('[data-open-stage]'));
+      head.appendChild($('[data-close-stage]'));
       head.appendChild($('[data-stage-status]'));
       // The welcome is a stage control too, not a part of the plan (found
       // in the live Meet test: it sat alone in an empty box under each part).
@@ -1379,10 +1382,29 @@
     status.textContent = 'Opening the main stage…';
     Promise.resolve(side.startActivity({ mainStageUrl: location.origin + '/addon/stage/' })).then(function () {
       S.stageOn = true;
-      $('[data-open-stage]').hidden = true;
+      stageButtons(true);
       status.textContent = 'The main stage is open. Meet asks everyone in the call to join it.';
     }, function (err) {
       status.textContent = 'The main stage did not open: ' + (err && err.message ? err.message : 'Meet gave no reason') + '.';
+    });
+  });
+
+  // Closing the stage ends Meet's activity, which only the leader who
+  // opened it can do (found in Prep's recording, October 28: "can I turn
+  // off the main stage? ... If I press Stop, what happens? Nope.").
+  function stageButtons(open) {
+    if (!S.teaching || standalone) return;
+    $('[data-open-stage]').hidden = !!open;
+    $('[data-close-stage]').hidden = !open;
+  }
+  $('[data-close-stage]').addEventListener('click', function () {
+    var status = $('[data-stage-status]');
+    Promise.resolve(side && side.endActivity ? side.endActivity() : Promise.reject(new Error('Meet cannot close it from here'))).then(function () {
+      S.stageOn = false;
+      stageButtons(false);
+      status.textContent = 'The main stage is closed.';
+    }, function (err) {
+      status.textContent = 'The main stage did not close: ' + (err && err.message ? err.message : 'only the leader who opened it can close it') + '. Use End activity in Meet.';
     });
   });
 
@@ -1422,7 +1444,7 @@
     }).then(function (client) {
       side = client;
       side.on('frameToFrameMessage', function (m) {
-        if (m && A.isHello(m.payload)) { S.stageOn = true; sendStage(); S.codeStageSent = null; drawCode(); }
+        if (m && A.isHello(m.payload)) { S.stageOn = true; stageButtons(true); sendStage(); S.codeStageSent = null; drawCode(); }
       });
       return signIn().then(function (s) { if (s) proceed(s); else signedOut(); });
     }, function () {

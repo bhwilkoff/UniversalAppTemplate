@@ -97,7 +97,19 @@
     // learner's panel until the add-on is approved; afterward, the recording.
     var acts = $('[data-actions]'); acts.replaceChildren();
     if (!finished && safe(session.meet_url)) acts.appendChild(link('Join the call', session.meet_url, 'btn-primary', true));
-    if (live && !leading) acts.appendChild(link('Open the session panel', '/addon/?c=' + encodeURIComponent(cohort.slug) + '&s=' + session.number, 'btn-secondary', true));
+    // One press for a learner while it runs: the call opens in its own
+    // tab and this tab becomes their panel (Prep's recording, October 28:
+    // learners could not find "Open the session" beside "Join the call").
+    var panelUrl = '/addon/?c=' + encodeURIComponent(cohort.slug) + '&s=' + session.number;
+    var soon = !finished && session.starts_at && Date.parse(session.starts_at) - 15 * 60000 <= Date.now();
+    if ((live || soon) && !leading) {
+      var join = acts.querySelector('a.btn-primary');
+      if (join) {
+        join.textContent = 'Join the call and open your panel';
+        join.addEventListener('click', function () { setTimeout(function () { location.href = panelUrl; }, 300); });
+      }
+      acts.appendChild(link('Open the session panel', panelUrl, 'btn-secondary', true));
+    }
     // A recording the recorder put in Drive plays here, through the relay,
     // for anyone who can read this session (the cohort and its leaders).
     var play = window.RecordLib && safe(session.recording_url) ? window.RecordLib.playUrl(session.recording_url, window.HUB.videoRelay) : null;
