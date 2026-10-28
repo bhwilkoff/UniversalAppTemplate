@@ -25,6 +25,7 @@
         meet_url: 'https://meet.google.com/abc-defg-hij', discussion_number: null }
     ],
     enrollments: people,
+    profiles: [{ id: ME, github_login: 'teacher-sample', display_name: 'Your teacher' }],
     cohort_teachers: [{ cohort_id: 'sample-cohort', user_id: ME, profiles: { github_login: 'teacher-sample', display_name: 'Your teacher' } }],
     groups: [
       { id: 'sample-g1', cohort_id: 'sample-cohort', name: 'Trio A', meet_url: null, group_members: [{ user_id: 'sample-1' }, { user_id: 'sample-2' }, { user_id: 'sample-3' }] },
@@ -56,7 +57,7 @@
         return Promise.resolve({ data: data, error: null }).then(ok, no);
       }
     };
-    ['select', 'eq', 'neq', 'ilike', 'gte', 'lte', 'order', 'in', 'is', 'not', 'limit', 'update', 'insert', 'upsert', 'delete'].forEach(function (m) {
+    ['select', 'eq', 'neq', 'ilike', 'like', 'gt', 'lt', 'gte', 'lte', 'order', 'in', 'is', 'not', 'or', 'filter', 'match', 'contains', 'range', 'limit', 'update', 'insert', 'upsert', 'delete'].forEach(function (m) {
       q[m] = function () { return q; };
     });
     q.maybeSingle = q.single = function () { one = true; return q; };
@@ -70,6 +71,16 @@
       onAuthStateChange: function () { return { data: { subscription: { unsubscribe: function () {} } } }; }
     },
     from: builder,
+    // Live updates, presence, and server functions: quiet stand-ins.
+    channel: function () {
+      var ch = { on: function () { return ch; }, subscribe: function (cb) { if (cb) setTimeout(function () { cb('SUBSCRIBED'); }, 0); return ch; },
+        send: function () { return Promise.resolve('ok'); }, track: function () { return Promise.resolve('ok'); }, untrack: function () { return Promise.resolve('ok'); },
+        presenceState: function () { return {}; }, unsubscribe: function () { return Promise.resolve('ok'); } };
+      return ch;
+    },
+    removeChannel: function () { return Promise.resolve('ok'); },
+    realtime: { setAuth: function () {} },
+    functions: { invoke: function () { return Promise.resolve({ data: null, error: null }); } },
     rpc: function (name) { return Promise.resolve({ data: RPC[name] || [], error: null }); }
   };
   window.supabase = { createClient: function () { return client; } };

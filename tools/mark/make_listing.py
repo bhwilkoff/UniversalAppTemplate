@@ -146,7 +146,7 @@ def main():
     try:
         for name, scene, tab in SCREENS:
             url = f"http://127.0.0.1:{port}{FIXTURE}frame.html?stage={scene}&panel={tab}"
-            shoot(browser, url, OUT / f"screenshot-{name}.png", 1280, 800, wait_ms=6000)
+            shoot(browser, url, OUT / f"screenshot-{name}.png", 1280, 800, wait_ms=12000)
     finally:
         server.shutdown()
     print("Wrote", ", ".join(sorted(p.name for p in OUT.glob("*.png"))))

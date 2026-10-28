@@ -24,7 +24,9 @@
 <script>
   var p = new URLSearchParams(location.search);
   document.getElementById('stage').src = '/addon/stage/?scene=' + encodeURIComponent(p.get('stage') || 'welcome');
-  document.getElementById('panel').src = '/addon/?tab=' + encodeURIComponent(p.get('panel') || 'Now');
+  // The panel as a leader sees it, by its own address: the same panel Meet
+  // shows, drawn from the sample data without Meet's frame around it.
+  document.getElementById('panel').src = '/addon/?c=sample&s=2&tab=' + encodeURIComponent(p.get('panel') || 'Now');
 </script>
 </body>
 </html>
