@@ -19,11 +19,11 @@
   }
   function stopNotice() { return 'I have stopped recording. Anything from here on is not recorded.'; }
 
-  // The first format this browser records, best first, in the order
-  // exchanges use (exchange-lib.js): MP4 is what Drive's player plays. A
-  // WebM recording uploaded in the meet@ test of October 28, 2026 showed
-  // "Unable to load video" in Drive. WebM is the fallback.
-  var MIMES = ['video/mp4;codecs=avc1.42E01E,mp4a.40.2', 'video/mp4;codecs=avc1,mp4a', 'video/mp4', 'video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm'];
+  // The first format this browser records, best first. WebM, because the
+  // session page's player could not seek past half a minute into the MP4
+  // Chrome recorded (October 28, 2026), and could anywhere in the WebM once
+  // it has a duration (fixDuration). MP4 is the fallback.
+  var MIMES = ['video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm', 'video/mp4'];
   function pickMime(isSupported) {
     for (var i = 0; i < MIMES.length; i++) { try { if (isSupported(MIMES[i])) return MIMES[i]; } catch (e) { /* try the next */ } }
     return '';
@@ -56,6 +56,65 @@
     return Math.max(1, Math.round(b / 1024)) + ' KB';
   }
 
+  // Chrome writes a WebM recording without its length, so a player shows
+  // no duration and its scrub bar does nothing. This adds the Duration
+  // element to the header's Info, in the first piece the recorder wrote.
+  // bytes: that piece (a Uint8Array); ms: the recording's length. Returns
+  // the new piece, or null when it is not a WebM header this understands.
+  function fixDuration(bytes, ms) {
+    var b = bytes, n = b.length;
+    function vint(i, keepMarker) {
+      if (i >= n) return null;
+      var first = b[i], len = 1, mask = 0x80;
+      while (len <= 8 && !(first & mask)) { mask >>= 1; len++; }
+      if (len > 8 || i + len > n) return null;
+      var v = keepMarker ? first : (first & (mask - 1)), all = !keepMarker && v === mask - 1;
+      for (var k = 1; k < len; k++) { v = v * 256 + b[i + k]; if (b[i + k] !== 0xff) all = false; }
+      return { len: len, value: v, unknown: all };
+    }
+    function el(i) {
+      var id = vint(i, true); if (!id) return null;
+      var size = vint(i + id.len, false); if (!size) return null;
+      return { id: id.value, start: i, data: i + id.len + size.len, size: size.unknown ? null : size.value };
+    }
+    var head = el(0);
+    if (!head || head.id !== 0x1A45DFA3 || head.size == null) return null;
+    var seg = el(head.data + head.size);
+    if (!seg || seg.id !== 0x18538067) return null;
+    var i = seg.data;
+    while (i < n) {
+      var e = el(i);
+      if (!e || e.id === 0x1F43B675 || e.size == null) return null;
+      if (e.id === 0x1549A966) {
+        var end = e.data + e.size, scale = 1000000, j = e.data, kept = [];
+        if (end > n) return null;
+        while (j < end) {
+          var c = el(j);
+          if (!c || c.size == null) return null;
+          if (c.id === 0x2AD7B1) { var t = 0; for (var k = 0; k < c.size; k++) t = t * 256 + b[c.data + k]; if (t) scale = t; }
+          if (c.id !== 0x4489) kept.push(b.subarray(c.start, c.data + c.size));
+          j = c.data + c.size;
+        }
+        var dur = new Uint8Array(11), dv = new DataView(dur.buffer);
+        dur[0] = 0x44; dur[1] = 0x89; dur[2] = 0x88;
+        dv.setFloat64(3, ms * 1000000 / scale);
+        kept.push(dur);
+        var body = kept.reduce(function (s, x) { return s + x.length; }, 0);
+        var info = new Uint8Array(4 + 8), iv = new DataView(info.buffer);
+        info.set([0x15, 0x49, 0xA9, 0x66, 0x01], 0);
+        iv.setUint32(8, body); iv.setUint16(6, Math.floor(body / 4294967296) & 0xffff); info[5] = 0;
+        var out = new Uint8Array(e.start + info.length + body + (n - end)), o = 0;
+        out.set(b.subarray(0, e.start), o); o += e.start;
+        out.set(info, o); o += info.length;
+        kept.forEach(function (x) { out.set(x, o); o += x.length; });
+        out.set(b.subarray(end), o);
+        return out;
+      }
+      i = e.data + e.size;
+    }
+    return null;
+  }
+
   function driveUrl(fileId) { return 'https://drive.google.com/file/d/' + encodeURIComponent(fileId) + '/view'; }
   // The file id in a recording link the recorder wrote, or null for any
   // other link a leader pasted (which the page still links to as is).
@@ -82,7 +141,7 @@
   var lib = {
     recordUrl: recordUrl, notice: notice, stopNotice: stopNotice, pickMime: pickMime, extension: extension,
     fileName: fileName, pieceName: pieceName, isPiece: isPiece, duration: duration, size: size,
-    driveUrl: driveUrl, driveId: driveId, playUrl: playUrl, checkCapture: checkCapture, MIMES: MIMES
+    driveUrl: driveUrl, fixDuration: fixDuration, driveId: driveId, playUrl: playUrl, checkCapture: checkCapture, MIMES: MIMES
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
   else root.RecordLib = lib;

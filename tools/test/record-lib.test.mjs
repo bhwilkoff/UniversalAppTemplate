@@ -16,8 +16,7 @@ test('the notice names the cohort and where the recording goes', () => {
 });
 
 test('the best format this browser records is chosen', () => {
-  assert.equal(lib.pickMime(() => true), 'video/mp4;codecs=avc1.42E01E,mp4a.40.2');
-  assert.equal(lib.pickMime((m) => m.startsWith('video/webm')), 'video/webm;codecs=vp9,opus');
+  assert.equal(lib.pickMime(() => true), 'video/webm;codecs=vp9,opus');
   assert.equal(lib.pickMime((m) => m === 'video/mp4'), 'video/mp4');
   assert.equal(lib.pickMime(() => false), '');
   assert.equal(lib.pickMime(() => { throw new Error('no'); }), '');
@@ -63,4 +62,32 @@ test('a recorder link plays through the relay; any other link does not', () => {
   assert.equal(lib.driveId('https://evil.example/file/d/1mgOsEufkb9NlIDv9Ft5ZUywydLbTYuep/view'), null);
   assert.equal(lib.playUrl('https://youtu.be/xyz', 'https://relay.example'), null);
   assert.equal(lib.playUrl(link, ''), null);
+});
+
+// The header of a real WebM that Chrome recorded in the meet@ test, up to
+// its first Cluster: no Duration in its Info.
+const HEADER = Buffer.from('GkXfo59ChoEBQveBAULygQRC84EIQoKEd2VibUKHgQRChYECGFOAZwH/////////FUmpZpkq17GDD0JATYCGQ2hyb21lV0GGQ2hyb21lFlSua/2uvNeBAXPFhys7R+aFJmCDgQFV7oEBhoVWX1ZQOeCfsIIL0LqCBQRTwIEBVbCQVbGBAVW5gQFVuoEBVbuBAa6914ECc8WHva+HAU1rs4OBAoaGQV9PUFVTY6KTT3B1c0hlYWQBAgAAgLsAAAAAAOGNtYRHO4AAn4ECYmSBIA==', 'base64');
+
+function durationOf(bytes) {
+  const i = Buffer.from(bytes).indexOf(Buffer.from([0x44, 0x89, 0x88]));
+  return i < 0 ? null : new DataView(bytes.buffer, bytes.byteOffset + i + 3, 8).getFloat64(0);
+}
+
+test('a WebM gets its length written into the header', () => {
+  assert.equal(durationOf(new Uint8Array(HEADER)), null);
+  const fixed = lib.fixDuration(new Uint8Array(HEADER), 62345);
+  assert.ok(fixed);
+  assert.equal(durationOf(fixed), 62345);
+  assert.equal(fixed.length, HEADER.length + 11 + 7);
+  // The rest of the file follows unchanged, and doing it twice keeps one Duration.
+  const withCluster = new Uint8Array([...HEADER, 0x1F, 0x43, 0xB6, 0x75, 0x81, 0x00]);
+  const twice = lib.fixDuration(lib.fixDuration(withCluster, 1000), 2000);
+  assert.equal(durationOf(twice), 2000);
+  assert.equal(Buffer.from(twice).indexOf(Buffer.from([0x44, 0x89])), Buffer.from(twice).lastIndexOf(Buffer.from([0x44, 0x89])));
+  assert.deepEqual([...twice.slice(-6)], [0x1F, 0x43, 0xB6, 0x75, 0x81, 0x00]);
+});
+
+test('anything that is not a WebM header is left alone', () => {
+  assert.equal(lib.fixDuration(new Uint8Array([0, 0, 0, 0x20, 0x66, 0x74, 0x79, 0x70]), 1000), null);
+  assert.equal(lib.fixDuration(new Uint8Array(HEADER.subarray(0, 40)), 1000), null);
 });

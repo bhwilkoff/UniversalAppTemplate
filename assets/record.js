@@ -235,11 +235,33 @@
     signal(false);
     $('[data-stop-notice]').textContent = R.stopNotice() + ' (Say this aloud.)';
     show('done');
-    r.queue.then(function () { return r.dir ? saveMeta(r.dir, r.meta) : null; }).then(function () {
+    r.queue.then(function () { return withDuration(r); }).then(function () { return r.dir ? saveMeta(r.dir, r.meta) : null; }).then(function () {
       if (r.dir) return list();
       // Without a place on disk, the one recording stays in memory until saved.
       drawItem({ meta: r.meta, blob: function () { return Promise.resolve(new Blob(r.memory, { type: R.extension(r.meta.mime) === 'mp4' ? 'video/mp4' : 'video/webm' })); } }, true);
     });
+  }
+
+  // The length goes into the WebM's header (RecordLib.fixDuration), so the
+  // session page's player can show it and seek. Only the first piece holds
+  // the header; a recording it cannot read stays as it was.
+  function withDuration(r) {
+    if (R.extension(r.meta.mime) !== 'webm') return Promise.resolve();
+    var ms = r.meta.seconds * 1000;
+    if (!r.dir) {
+      if (!r.memory.length) return Promise.resolve();
+      return r.memory[0].arrayBuffer().then(function (buf) {
+        var fixed = R.fixDuration(new Uint8Array(buf), ms);
+        if (fixed) { r.meta.bytes += fixed.length - buf.byteLength; r.memory[0] = new Blob([fixed]); }
+      });
+    }
+    var name = R.pieceName(1);
+    return r.dir.getFileHandle(name).then(function (h) { return h.getFile(); }).then(function (f) { return f.arrayBuffer(); }).then(function (buf) {
+      var fixed = R.fixDuration(new Uint8Array(buf), ms);
+      if (!fixed) return null;
+      r.meta.bytes += fixed.length - buf.byteLength;
+      return writeFile(r.dir, name, fixed);
+    }).catch(function () { return null; });
   }
 
   window.addEventListener('beforeunload', function (e) {
