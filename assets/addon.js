@@ -129,6 +129,9 @@
     }, function () { start(session); });
   }
 
+  // Without GitHub the panel still runs a session; what lives on GitHub
+  // (the cohort's conversation) waits until it is linked.
+  $('[data-github-later]').addEventListener('click', function () { if (current) start(current); });
   $('[data-link-github]').addEventListener('click', function () {
     var status = $('[data-link-status]');
     popup = window.open(GL.linkWindowUrl(location.origin), 'hs-link', 'popup,width=480,height=720');
@@ -213,11 +216,13 @@
     return Promise.all([
       db.from('sessions').select('id, cohort_id, meet_url').ilike('meet_url', like),
       db.from('groups').select('id, cohort_id, name, meet_url').ilike('meet_url', like),
-      db.from('cohort_teachers').select('cohort_id').eq('user_id', S.me.id)
+      db.from('cohort_teachers').select('cohort_id').eq('user_id', S.me.id),
+      db.from('cohorts').select('id').eq('details->>any_call', 'true')
     ]).then(function (res) {
       var bad = res.filter(function (r) { return r.error; })[0];
       if (bad) return fail('The panel could not look up this call: ' + bad.error.message);
-      var room = A.findRoom(code, { sessions: res[0].data, groups: res[1].data, teaching: res[2].data.map(function (t) { return t.cohort_id; }) });
+      var room = A.findRoom(code, { sessions: res[0].data, groups: res[1].data, teaching: res[2].data.map(function (t) { return t.cohort_id; }),
+        anyCall: res[3].data.map(function (c) { return c.id; }) });
       if (!room) {
         $('[data-no-room-text]').textContent = 'This call’s code is ' + code + '. Each session’s call is the Meet link on its calendar invitation and its session page; open the panel from that call.';
         return show('no-room');

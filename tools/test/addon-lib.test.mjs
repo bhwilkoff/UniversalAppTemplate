@@ -53,6 +53,13 @@ test('a code nobody has, or no code at all, finds nothing', () => {
   assert.equal(lib.findRoom('aaa-bbbb-ccc', {}), null);
 });
 
+test("a sample cohort opens in any call, only for the people who lead it", () => {
+  const sample = { sessions: [], groups: [], teaching: ['s1'], anyCall: ['s1', 'notmine'] };
+  assert.deepEqual(lib.findRoom('qqq-wwww-eee', sample), { code: 'qqq-wwww-eee', cohortId: 's1', groupId: null, room: 'main', ambiguous: false, sample: true });
+  assert.equal(lib.findRoom('qqq-wwww-eee', { ...sample, teaching: [] }), null);
+  assert.equal(lib.findRoom('aaa-bbbb-ccc', { ...rows, teaching: ['s1'], anyCall: ['s1'] }).cohortId, 'c1');
+});
+
 test('when two cohorts share a code, the one this person teaches wins, and it says so', () => {
   const shared = {
     sessions: [

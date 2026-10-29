@@ -40,7 +40,13 @@
     var cohorts = [];
     groups.forEach(function (g) { if (cohorts.indexOf(g.cohort_id) < 0) cohorts.push(g.cohort_id); });
     sessions.forEach(function (s) { if (cohorts.indexOf(s.cohort_id) < 0) cohorts.push(s.cohort_id); });
-    if (!cohorts.length) return null;
+    if (!cohorts.length) {
+      // A sample cohort (details.any_call) opens in any call for the
+      // people who lead it, so Google's reviewer can try the panel in a
+      // call of their own (tools/meet-addon/SCREENCAST.md).
+      var sample = (rows.anyCall || []).filter(function (id) { return teaching.indexOf(id) >= 0; })[0];
+      return sample ? { code: c, cohortId: sample, groupId: null, room: 'main', ambiguous: false, sample: true } : null;
+    }
     var chosen = cohorts.filter(function (id) { return teaching.indexOf(id) >= 0; })[0] || cohorts[0];
     var group = groups.filter(function (g) { return g.cohort_id === chosen; })[0] || null;
     return { code: c, cohortId: chosen, groupId: group ? group.id : null, room: group ? 'group' : 'main', ambiguous: cohorts.length > 1 };
