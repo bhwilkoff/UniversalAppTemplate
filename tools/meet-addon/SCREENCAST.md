@@ -113,3 +113,13 @@ and the detailed description ends with "Google Meet™ is a trademark of
 Google LLC." The app name has no Google product in it. The listing was
 still marked in review, so the review was cancelled, the draft saved,
 reloaded to check, and submitted for review again.
+
+## Approved, October 29
+
+Google approved the listing the same day. The sample cohort
+(`sample-for-google-review`), its five sessions, and its two leader rows
+were deleted that evening; it had no calendar events, repository, or
+learners. The `sample_leaders` rule in `handle_new_user` stays but no
+cohort carries it. Google's reviewer account
+(gsmtestuser@marketplacetest.net) still has a Human Shaped account,
+leading nothing.

@@ -978,6 +978,8 @@ function sessionName(s) {
   return t && t !== label && t !== 'Week ' + s.number ? label + ': ' + t : label;
 }
 
+var ADDON_LISTING = 'https://workspace.google.com/marketplace/app/human_shaped/1086485459450';
+
 function sessionPage(s) {
   return SITE + '/session/?c=' + encodeURIComponent(s.slug) + '&s=' + Number(s.number);
 }
@@ -987,6 +989,8 @@ function sessionDescription(s, folderUrl) {
     'What to bring, and the plan for the hour: ' + sessionPage(s),
     '',
     'Join with the Google Meet link on this event. Each session has its own link.',
+    '',
+    'In the call, open Human Shaped from Activities to follow the plan, answer the questions, and use the class chat. Add it to Google Meet once, from a computer: ' + ADDON_LISTING,
   ];
   if (folderUrl) lines.push('', 'Recordings for this cohort: ' + folderUrl);
   lines.push('', 'Sessions are recorded, and the host says so at the start of each one. Recordings are shared only with this cohort. If you would rather not appear, keep your camera off and use the chat.');

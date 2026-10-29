@@ -34,6 +34,14 @@ test('each session is its own event, with its own Meet link asked for, its page,
   assert.deepEqual(r.conferenceData, { createRequest: { requestId: 'hs-' + prep.session_id, conferenceSolutionKey: { type: 'hangoutsMeet' } } });
   assert.match(r.description, /https:\/\/humanshaped\.org\/session\/\?c=minerva&s=0/);
   assert.match(r.description, /drive\.google\.com\/x/);
+  assert.match(r.description, /open Human Shaped from Activities/);
+  assert.match(r.description, /https:\/\/workspace\.google\.com\/marketplace\/app\/human_shaped\/1086485459450/);
+});
+
+test('a change to the description alone tells no one', () => {
+  const after = plain(gs.sessionEventResource(prep, null, false));
+  const before = JSON.parse(JSON.stringify(after)); before.description = 'The older words.';
+  assert.equal(gs.sessionUpdateNotice(before, after), 'none');
 });
 
 test('a session that already has a Meet link keeps it on its new event', () => {
