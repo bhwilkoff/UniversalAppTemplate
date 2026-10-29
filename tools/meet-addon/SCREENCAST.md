@@ -94,3 +94,10 @@ consent shows. meet@'s own "Human Shaped" grant was left alone: it also
 holds Calendar and Sheets for the Apps Script that sends invitations.
 The Not now step is on a card rather than filmed, since that account
 already has GitHub linked.
+
+## Uploaded, October 29
+
+<https://youtu.be/sNsgBpluizU>, unlisted, on Ben's "Ben Wilkoff" channel
+(benwilkoff@gmail.com). The reply to gwm-review@google.com is a draft in
+ben@learningischange.com's Gmail, on Google's thread, for Ben to review
+and send himself.
