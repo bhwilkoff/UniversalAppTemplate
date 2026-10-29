@@ -189,6 +189,8 @@
         done: !!(myAccess && myAccess.state === 'member') });
     }
     steps.push({ key: 'open', label: 'Open for joining', action: 'edit', done: cohort.status !== 'draft' });
+    steps.push({ key: 'meet', label: 'Add Human Shaped to Google Meet', href: '/meet/#add',
+      done: false, optional: true });
     var first = sessions.slice().sort(function (a, b) { return a.number - b.number; })[0];
     if (first) {
       steps.push({ key: 'plan', label: 'Read the ' + (first.number === 0 ? 'prep session' : 'first session') + '’s plan',

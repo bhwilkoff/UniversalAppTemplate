@@ -170,7 +170,9 @@
   // the person, not here), so it is offered as a link and never marked.
   // In the order a learner meets them (JOURNEYS.md, J2 to J4): GitHub's
   // invitation, which arrives as they join; getting set up, which ends
-  // with the app live at an address; and telling the cohort where it is.
+  // with the app live at an address; telling the cohort where it is; and
+  // the Meet add-on, which the hub cannot see either (the session page's
+  // panel stands in for it).
   function setupSteps(mine, access, cohort) {
     var steps = [];
     if (cohort && cohort.github_team) {
@@ -178,6 +180,7 @@
     }
     steps.push({ key: 'setup', label: 'Get set up', href: '/path/setup/', done: !!(mine && mine.app_url) });
     steps.push({ key: 'app', label: 'Add your app', tab: 'mine', done: !!(mine && mine.app_repo && mine.app_url) });
+    steps.push({ key: 'meet', label: 'Add Human Shaped to Google Meet', href: '/meet/#add', done: null });
     steps.push({ key: 'agent', label: 'Connect your agent', href: '/connect/', done: null });
     return steps;
   }

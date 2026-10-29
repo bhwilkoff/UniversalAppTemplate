@@ -6,8 +6,9 @@
 // leader (other than as reference)." So it holds no live controls: when
 // the session is, its call, what to bring, and the plan with each part's
 // words, which its leaders change here. While a session runs, learners get
-// one button to the add-on's panel outside Meet, until Google approves the
-// add-on for everyone; leaders run it from the add-on inside Meet.
+// one button to the add-on's panel outside Meet, for anyone whose phone or
+// school account cannot run Meet add-ons; leaders run it from the add-on
+// inside Meet (/meet/).
 (function () {
   var root = document.querySelector('[data-session]');
   if (!root || !window.supabase || !window.HUB || !window.CohortLib) return;
@@ -94,7 +95,7 @@
     $('[data-scope]').hidden = !session.scope;
 
     // What a person does from here: join the call, and, while it runs, a
-    // learner's panel until the add-on is approved; afterward, the recording.
+    // learner's panel outside Meet; afterward, the recording.
     var acts = $('[data-actions]'); acts.replaceChildren();
     if (!finished && safe(session.meet_url)) acts.appendChild(link('Join the call', session.meet_url, 'btn-primary', true));
     // One press for a learner while it runs: the call opens in its own

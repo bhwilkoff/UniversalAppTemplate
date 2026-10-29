@@ -106,6 +106,7 @@ role you hold and the role named on the page, never a switcher.
 | `/` (signed out) | What Human Shaped is | Read, go to cohorts, apps, events |
 | `/about/`, `/principles/`, `/path/…`, `/stuck/…` | Reading | Read |
 | `/cohorts/` | Open cohorts, and what a week asks | Choose one to join |
+| `/meet/` | The Meet add-on: what it does in a session, adding it, what it never does | Add it to Google Meet |
 | `/apps/`, `/apps/app/?…` | Apps built this way; one app | Read, open the app |
 | `/events/`, `/start/…` | Events; kits for running one | Read, add an event |
 | `/showcase/?c=` | One cohort's public showing | Read, come to it |

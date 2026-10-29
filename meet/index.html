@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>In Google Meet | Human Shaped</title>
+  <meta name="description" content="How a Human Shaped session runs inside Google Meet, what the add-on does and never does, and how to add it.">
+  <link rel="canonical" href="https://humanshaped.org/meet/">
+  <meta property="og:url" content="https://humanshaped.org/meet/">
+  <meta property="og:site_name" content="Human Shaped">
+  <meta property="og:title" content="In Google Meet">
+  <meta property="og:description" content="How a Human Shaped session runs inside Google Meet, what the add-on does and never does, and how to add it.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://humanshaped.org/assets/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="The human-shaped wordmark, with its hyphen drawn as an arch, above the line: apps that wear the builder&#x27;s values on their sleeves.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#131916" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="/assets/favicon.svg?v=20261006q" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20261006q">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/site.css?v=20261024ab">
+  <script>
+    (function () {
+      var q = location.search, t = null;
+      if (/[?&]dark\b/.test(q)) t = 'dark'; else if (/[?&]light\b/.test(q)) t = 'light';
+      else { try { t = localStorage.getItem('hs-theme'); } catch (e) {} }
+      if (t) document.documentElement.setAttribute('data-theme', t);
+      // Signed in: the page wears the hub's sidebar (PAGES.md), chosen before
+      // it draws, from the session this browser keeps.
+      try { var se = JSON.parse(localStorage.getItem('sb-bifrieqzkihuxfzttgvd-auth-token') || 'null'); if (se && se.user && se.expires_at * 1000 > Date.now() - 7 * 864e5) document.documentElement.setAttribute('data-signed-in', ''); } catch (e) {}
+      try { if (localStorage.getItem('hs-nav') === 'collapsed') document.documentElement.setAttribute('data-nav', 'collapsed'); } catch (e) {}
+    })();
+  </script>
+  <script src="/assets/site.js?v=20261022o" defer></script>
+  <script src="/assets/ui.js?v=20261023h" defer></script>
+</head>
+<body>
+    <a class="skip" href="#main">Skip to the page</a>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
+      <nav class="nav" aria-label="Main">
+        <ul>
+          <li><a href="/principles/">Principles</a></li>
+          <li><a href="/cohorts/">Cohorts</a></li>
+          <li><a href="/apps/">Apps</a></li>
+          <li><a href="/events/">Events</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022j#moon"/></svg>
+        </button>
+        <a class="btn-primary small" href="/account/">
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022j#github"/></svg>
+          <span>Sign in<span class="long"> with GitHub</span></span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- The add-on's own page (PAGES.md): words by Claude, awaiting Ben's review. -->
+    <div class="wrap">
+      <header class="page-head">
+        <div>
+          <h1>Each session happens inside Google Meet.</h1>
+          <p class="lead">A cohort meets once a week on a Google Meet&trade; call, and the Human Shaped add-on puts that session's plan, its clock, and its questions in Meet's own side panel, so the people in the call stay the thing everyone is looking at and nobody has to keep a second page open beside it.</p>
+          <p class="actions"><a class="btn-primary" href="https://workspace.google.com/marketplace/app/human_shaped/1086485459450" target="_blank" rel="noopener">Add it to Google Meet</a></p>
+          <p class="fine">Free, from the Google Workspace Marketplace&trade;. You add it once, with the Google account you use for Meet.</p>
+        </div>
+      </header>
+
+      <section class="section first" aria-label="The add-on in a session">
+        <figure class="photo">
+          <img src="/assets/meet/2-question-1280.webp" srcset="/assets/meet/2-question-700.webp 700w, /assets/meet/2-question-1280.webp 1280w" sizes="(min-width: 64rem) 48rem, 100vw" width="1280" height="800" alt="A Meet call's main stage showing a question for everyone, How sure are you that your first screen does what you wrote down, with four answers counted and no names, and beside it the leader's side panel with the session's plan.">
+          <figcaption>A question for everyone on the main stage, answered privately in each person's panel and counted without names.</figcaption>
+        </figure>
+        <div class="topics single">
+          <div class="topic" id="session">
+            <h2>What it does while you meet.</h2>
+            <div class="prose">
+              <p>The panel knows which cohort and which week the call belongs to from the call's own link, so nobody picks anything by hand. A leader sees the part of the session that is happening now and its clock, who is ready to show their work and in what order, and the questions they prepared, and can put one thing at a time on the main stage for everyone: a welcome as people arrive, a question with its count of answers, or someone's app while they talk about it.</p>
+              <p>A learner's panel follows the same session. It shows where the call is in the plan, it is where you answer a question, with your name kept off the main stage's count, and it holds the class chat, which is your cohort's conversation on GitHub.</p>
+            </div>
+          </div>
+
+          <div class="topic" id="why">
+            <h2>Why the session lives in the call.</h2>
+            <div class="prose">
+              <p>The heart of every session is people showing what they built that week and talking through the decisions they made, so the tools should stay out of the way of that conversation. Everything a session needs is prepared beforehand on its page on humanshaped.org, and once the call starts, the add-on carries that preparation into Meet, which means a leader runs the hour without leaving it and a learner never has to wonder which window matters.</p>
+            </div>
+          </div>
+        </div>
+        <figure class="photo">
+          <img src="/assets/meet/3-showing-work-1280.webp" srcset="/assets/meet/3-showing-work-700.webp 700w, /assets/meet/3-showing-work-1280.webp 1280w" sizes="(min-width: 64rem) 48rem, 100vw" width="1280" height="800" loading="lazy" alt="The main stage showing a learner named Rosa, her app running at example.org/bird-log, and her note, The first screen, running on my phone, with the leader's side panel beside it.">
+          <figcaption>Someone's work on the main stage while they talk about it. The names here are sample data.</figcaption>
+        </figure>
+        <div class="topics single">
+          <div class="topic" id="add">
+            <h2>Adding it, and opening it in a call.</h2>
+            <div class="prose">
+              <ol>
+                <li>Press <a href="https://workspace.google.com/marketplace/app/human_shaped/1086485459450" target="_blank" rel="noopener">Add it to Google Meet</a> and install Human Shaped with the Google account you join calls with.</li>
+                <li>Join your session from its calendar event or from the session's page on humanshaped.org.</li>
+                <li>In the call, open Activities, choose Human Shaped, and sign in with Google or with GitHub.</li>
+              </ol>
+              <p>When your leader opens the main stage, Meet asks everyone in the call to join it, and offers the add-on to anyone who has not installed it yet.</p>
+              <p>Meet runs add-ons only in a computer's browser, and some schools and workplaces turn them off for their accounts. In either case, the session's page has Open the session panel, which is the same panel in a browser tab, so nobody misses anything.</p>
+            </div>
+          </div>
+
+          <div class="topic" id="never">
+            <h2>What it never does.</h2>
+            <div class="prose">
+              <p>It never transcribes the call, never measures who talks, and never joins as a participant. From Google it asks only to sign you in, which shares your name, email address, and profile picture, and the only thing it reads from Meet is the call's meeting code. A leader can record a session with Human Shaped's recorder, which opens in its own window, only after saying so out loud and in the chat, and everyone sees that it is recording. <a href="/privacy/#google">The privacy page</a> says what is kept and for how long.</p>
+              <p class="small">Google Meet&trade; and Google Workspace Marketplace&trade; are trademarks of Google LLC.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="footer-brand">
+        <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
+        <p>The ideas, the method, the tools, and the cohorts are free, and what you build is yours.</p>
+        <p><a href="/about/">About Human Shaped</a></p>
+      </div>
+      <nav class="footer-links" aria-label="More of the site">
+        <div>
+          <p class="footer-head">Take part</p>
+          <ul>
+            <li><a href="/account/">Your account</a></li>
+            <li><a href="/teach/">Lead a cohort</a></li>
+            <li><a href="/connect/">Connect your agent</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="footer-head">On GitHub</p>
+          <ul>
+            <li><a href="https://github.com/bhwilkoff/UniversalAppTemplate">The template</a></li>
+            <li><a href="https://github.com/orgs/humanshaped/discussions">Discussions</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="footer-head">The fine print</p>
+          <ul>
+            <li><a href="/support/">Help</a></li>
+            <li><a href="/privacy/">Privacy</a></li>
+            <li><a href="/terms/">Terms</a></li>
+          </ul>
+        </div>
+      </nav>
+      <p class="footer-made">Made by <a href="https://learningischange.com">Ben Wilkoff</a>, with <a href="/support/#credits">help from people and tools</a>.</p>
+    </div>
+  </footer>
+</body>
+</html>

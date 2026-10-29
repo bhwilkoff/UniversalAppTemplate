@@ -70,7 +70,7 @@ const draft = { slug: 'spring', status: 'draft', starts_on: null, session_weekda
 const keysDone = (steps) => steps.filter((s) => s.done).map((s) => s.key);
 test('a new draft cohort has every setup step still to do, and only what a leader decides', () => {
   const steps = lib.cohortSetupSteps(draft, [], null);
-  assert.deepEqual(steps.map((s) => s.key), ['schedule', 'sessions', 'repo', 'open', 'agent']);
+  assert.deepEqual(steps.map((s) => s.key), ['schedule', 'sessions', 'repo', 'open', 'meet', 'agent']);
   assert.deepEqual(keysDone(steps), []);
   assert.equal(steps.some((s) => /host|Meet links|Rehearse/i.test(s.label)), false);
 });

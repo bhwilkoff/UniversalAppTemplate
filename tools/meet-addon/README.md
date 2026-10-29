@@ -94,7 +94,21 @@ nothing depends on your own login.
    the choice between private and public "can't" be changed once it is
    saved. Testing needs only step 6, so leave this until we list it.
 
-## Who can use it, as of October 23, 2026
+## Who can use it, as of October 29, 2026
+
+Google approved the listing on October 29:
+https://workspace.google.com/marketplace/app/human_shaped/1086485459450.
+Anyone can add it to their own Google account, so leaders no longer join
+as meet@humanshaped.org. /meet/ is its public page (what it does, adding
+it, what it never does), /cohorts/#meet summarizes it, and both setup
+lists (a learner's Getting ready, a leader's Before the first session)
+carry "Add Human Shaped to Google Meet", linking /meet/#add. The hub
+cannot see whether someone installed it, so neither step is ever marked
+done. The session page's "Open the session panel" stays, for phones
+(Meet runs add-ons only in a computer's browser) and for school accounts
+whose admins turn add-ons off.
+
+## Who could use it, October 23, 2026
 
 Ben: "The session page should functionally only be to prep the session.
 All of the other work that a Leader should be doing in the session should
