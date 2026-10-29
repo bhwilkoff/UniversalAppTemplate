@@ -78,3 +78,19 @@ Archive Watch's tools: `demo_window_record.swift` (build with
 sits on another Space) and `ax_press.swift` to dismiss Chrome bubbles.
 Crop the "started debugging this browser" banner, which comes and goes
 as the browser tools attach.
+
+## Made, October 29
+
+6:24, 1920x1080, ten cards and seven clips. The title cards and the
+cut are in `screencast/` (`cards.json`, `make.py` renders the cards in
+headless Chrome, `build.sh` crops, blurs, and joins). The account list
+in One Tap is blurred wherever it shows, and so is the sidebar on the
+account page (it names a real cohort). The video itself is not in the
+repository.
+
+Filmed as meet@'s call with ben@learningischange.com signing in with
+Google, after removing that account's Human Shaped sign-in grant so
+consent shows. meet@'s own "Human Shaped" grant was left alone: it also
+holds Calendar and Sheets for the Apps Script that sends invitations.
+The Not now step is on a card rather than filmed, since that account
+already has GitHub linked.

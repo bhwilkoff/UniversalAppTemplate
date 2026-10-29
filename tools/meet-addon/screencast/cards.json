@@ -1,0 +1,78 @@
+[
+ {
+  "kicker": "Google Workspace Marketplace review, project 1086485459450",
+  "title": "Human Shaped, the add-on for Google Meet",
+  "body": [
+   "Human Shaped is a free, five-week course for people who build software with AI, and this add-on is how a cohort's session runs inside Google Meet.",
+   "It asks Google for two scopes, userinfo.email and userinfo.profile, and uses them for one thing: signing a person in with Google inside Meet's side panel. This recording shows the whole workflow, and where each scope is used."
+  ]
+ },
+ {
+  "kicker": "Step 1",
+  "title": "The scopes the add-on declares",
+  "body": [
+   "In the Marketplace SDK's App Configuration, the OAuth scopes are userinfo.email and userinfo.profile, and nothing else. The add-on is an HTTP deployment whose side panel is served from humanshaped.org/addon/."
+  ]
+ },
+ {
+  "kicker": "Step 2",
+  "title": "Opening Human Shaped in a call",
+  "body": [
+   "A cohort's leader starts the session's Google Meet call and opens Human Shaped from Meet's Activities panel. Meet loads the side panel, and the panel asks the person to sign in."
+  ]
+ },
+ {
+  "kicker": "Step 3, where the scopes are used",
+  "title": "Signing in with Google",
+  "body": [
+   "The panel offers two ways in, Google's sign-in (with its One Tap prompt) and GitHub. The person picks their Google account in One Tap (the list of accounts is blurred here), and Google's own window then shows what Human Shaped asks for, which is their name, email address, and profile picture."
+  ]
+ },
+ {
+  "kicker": "Step 3, continued",
+  "title": "What each scope is used for",
+  "list": [
+   "userinfo.email: the verified address finds or makes the person's Human Shaped account, and decides which cohorts they take part in or lead.",
+   "userinfo.profile: the name and picture show who is signed in, to the person and to the people in their cohort.",
+   "Nothing else is read from the Google account, and none of it is sold, used for advertising, or used to train AI."
+  ]
+ },
+ {
+  "kicker": "Step 4",
+  "title": "Linking GitHub, or not yet",
+  "body": [
+   "A cohort's conversation lives on GitHub, so a new account is asked to link GitHub once. The account in this recording already has GitHub linked, so the panel goes straight on. A new Google-only account, like Google's reviewer's, sees \"Link your GitHub account\" with a Not now button, which goes straight on without it."
+  ]
+ },
+ {
+  "kicker": "Step 5",
+  "title": "Finding the cohort from the call",
+  "body": [
+   "Meet's add-on SDK tells the panel the call's meeting code (not a Google scope), and the panel matches it to a session's Meet link to find the cohort and week. This sample cohort has no learners, and it opens in any call for the people who lead it."
+  ]
+ },
+ {
+  "kicker": "Step 6",
+  "title": "Running the session",
+  "body": [
+   "The leader starts the part's clock, opens the main stage for everyone in the call, puts the welcome on it, and asks everyone a question, whose answers are counted without names. None of this uses Google user data."
+  ]
+ },
+ {
+  "kicker": "Step 7",
+  "title": "Seeing and removing what Google shared",
+  "body": [
+   "On humanshaped.org/account/, the person sees the Google account linked by its email address, can unlink it, and can delete their account, which deletes everything Human Shaped holds about them. Then they sign out."
+  ]
+ },
+ {
+  "kicker": "In short",
+  "title": "Two scopes, and one use",
+  "list": [
+   "userinfo.email and userinfo.profile, used only to sign a person in with Google and show who they are.",
+   "From Meet, only the call's meeting code, through the add-on SDK.",
+   "The add-on never reads Drive, Calendar, Gmail, contacts, or the call's audio and video.",
+   "Privacy: humanshaped.org/privacy/. Support: humanshaped.org/support/."
+  ]
+ }
+]
