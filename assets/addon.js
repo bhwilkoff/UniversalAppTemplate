@@ -98,8 +98,12 @@
     });
   }
 
+  // After Sign out, the panel stays signed out until the person signs in
+  // again, rather than quietly borrowing the site's sign-in.
+  var OUT = 'hs-addon-signed-out';
+  function signedOutOnPurpose() { try { return localStorage.getItem(OUT) === '1'; } catch (e) { return false; } }
   function signIn() {
-    return sessionOf(db).then(function (s) { return s || useSiteSignIn(true); });
+    return sessionOf(db).then(function (s) { return s || (signedOutOnPurpose() ? null : useSiteSignIn(true)); });
   }
 
   // Google sign-in beside GitHub (DECISIONS.md): signed out, the panel
@@ -120,6 +124,7 @@
   }
   function proceed(session) {
     current = session;
+    try { localStorage.removeItem(OUT); } catch (e) {}
     // A tab without a GitHub token gets a fresh one first (GitHubToken).
     if (window.GitHubToken) window.GitHubToken.ensure(db, session);
     if (!GL) return start(session);
@@ -128,6 +133,16 @@
       start(session);
     }, function () { start(session); });
   }
+
+  root.querySelectorAll('[data-sign-out]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      try { localStorage.setItem(OUT, '1'); } catch (e) {}
+      if (window.google && window.google.accounts && window.google.accounts.id) window.google.accounts.id.disableAutoSelect();
+      (window.GitHubToken ? window.GitHubToken.forget(db) : Promise.resolve()).catch(function () {})
+        .then(function () { return db.auth.signOut({ scope: 'local' }); }).catch(function () {})
+        .then(function () { location.reload(); });
+    });
+  });
 
   // Without GitHub the panel still runs a session; what lives on GitHub
   // (the cohort's conversation) waits until it is linked.
