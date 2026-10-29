@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261024ab">
+  <link rel="stylesheet" href="/assets/site.css?v=20261029a">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -44,16 +44,14 @@
     <section class="account-state" data-state="signed-out" hidden>
       <p class="addon-mark"><span class="visually-hidden">Human Shaped</span><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></p>
       <h1>Sign in</h1>
-      <p class="small">Meet keeps this panel separate from your browser.</p>
+      <!-- Google first, GitHub beside it, nothing else (Ben, October 29: "extremely busy with at least four different sign in buttons"). -->
       <div class="addon-signin">
-        <button class="btn-primary" type="button" data-use-site hidden>Use my humanshaped.org sign-in</button>
+        <div class="google-signin" data-google-signin hidden></div>
         <button class="btn-secondary" type="button" data-popup>
-          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022j#github"/></svg>Sign in with GitHub in a small window
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022j#github"/></svg>Sign in with GitHub
         </button>
       </div>
       <p class="small" data-signin-status role="status"></p>
-      <!-- Google sign-in beside GitHub (DECISIONS.md): words by Claude, awaiting Ben's review. -->
-      <div class="google-signin" data-google-signin hidden></div>
       <p class="small" data-fallback hidden>If neither works here, <a data-fallback-link href="/account/" target="_blank" rel="noopener">open the session panel in a new tab</a> and keep it beside Meet.</p>
     </section>
 
@@ -237,6 +235,6 @@
   <script src="/assets/code-lib.js" defer></script>
   <script src="/assets/code-runner.js?v=20261022j" defer></script>
   <script src="/assets/class-channel.js?v=20261024w" defer></script>
-  <script src="/assets/addon.js?v=20261029b" defer></script>
+  <script src="/assets/addon.js?v=20261029c" defer></script>
 </body>
 </html>

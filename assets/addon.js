@@ -160,12 +160,6 @@
     if (msg) popup.postMessage(msg, location.origin);
   });
 
-  $('[data-use-site]').hidden = !document.requestStorageAccess;
-  $('[data-use-site]').addEventListener('click', function () {
-    $('[data-signin-status]').textContent = 'Asking your browser…';
-    useSiteSignIn(false).then(function (s) { if (s) proceed(s); });
-  });
-
   $('[data-popup]').addEventListener('click', function () {
     var status = $('[data-signin-status]');
     popup = window.open('/account/?handoff=meet', 'hs-signin', 'popup,width=480,height=720');
