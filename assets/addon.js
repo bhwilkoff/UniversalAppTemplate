@@ -71,7 +71,7 @@
   // The panel's own storage first. A second client is made only when the
   // browser lends the panel humanshaped.org's own storage.
   var db = (window.HUB.client ? window.HUB.client() : window.supabase.createClient(window.HUB.url, window.HUB.key));
-  var popup = null, popupWatch = null;
+  var popup = null, popupWatch = null, borrowed = false;
 
   function siteStorage() {
     if (!document.requestStorageAccess) return Promise.resolve(null);
@@ -91,7 +91,7 @@
       }
       var client = window.supabase.createClient(window.HUB.url, window.HUB.key, { auth: { storage: store } });
       return sessionOf(client).then(function (s) {
-        if (s) { db = client; return s; }
+        if (s) { db = client; borrowed = true; return s; }
         if (!quiet) status.textContent = 'You are not signed in on humanshaped.org in this browser yet, so sign in with GitHub in a small window instead.';
         return null;
       });
@@ -138,6 +138,10 @@
     b.addEventListener('click', function () {
       try { localStorage.setItem(OUT, '1'); } catch (e) {}
       if (window.google && window.google.accounts && window.google.accounts.id) window.google.accounts.id.disableAutoSelect();
+      // A sign-in borrowed from humanshaped.org is the site's own: the
+      // panel lets go of it, and the site's tabs stay signed in (found
+      // making the review screencast: the panel signed the site out).
+      if (borrowed) { location.reload(); return; }
       (window.GitHubToken ? window.GitHubToken.forget(db) : Promise.resolve()).catch(function () {})
         .then(function () { return db.auth.signOut({ scope: 'local' }); }).catch(function () {})
         .then(function () { location.reload(); });
