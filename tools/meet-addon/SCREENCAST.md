@@ -33,12 +33,12 @@ unlisted, and the link goes in a reply on Google's thread.
 | 3 | A leader's Google Meet call (the sample cohort's session link). Activities, Add-ons, Human Shaped. | — |
 | 4 | The side panel, signed out: Google's sign-in button and One Tap, beside GitHub. | — |
 | 5 | Google's consent window for Human Shaped: name, email address, and profile picture. Continue. | both, granted |
-| 6 | The panel, signed in: the person's name and picture. Card: the email finds their Human Shaped account; the name and picture show who is signed in; nothing is stored beyond the account. | both, in use |
+| 6 | Card: what each scope is used for. Then "Link your GitHub account", and Not now (the reviewer's way in). | both, in use |
 | 7 | The panel names the cohort and week from the call's meeting code: "Sample cohort for Google review", main room. | none (Meet SDK) |
 | 8 | Running the session: start the part's clock, open the main stage, put the welcome on it, ask everyone a question, see the anonymous count, next part. | none |
 | 9 | Close the main stage. | none |
 | 10 | humanshaped.org/account/: the linked Google account shown by its email, how to unlink it, and how to delete the account. | email, shown |
-| 11 | Sign out in the panel. | — |
+| 11 | Sign out in the panel; it comes back signed out. | — |
 | 12 | End card: the two scopes and their one use; no Drive, Calendar, Gmail, or call media is touched by the add-on; privacy at humanshaped.org/privacy/. | — |
 
 **Not filmed:** the Google account chooser, notifications, any other
@@ -50,5 +50,31 @@ window, real learners' names (the sample cohort has none).
   to verify on October 29).
 - A sample cohort, labeled, with Ben as leader and a session whose Meet
   link is the call filmed in shot 3. Deleted after.
-- Human Shaped's Google grant removed from the account that signs in, so
-  shot 5 shows the consent screen rather than skipping it.
+- The account that signs in on camera is meet@humanshaped.org with
+  Google, a new Google-only account, which is exactly the reviewer's
+  path: consent, Not now on GitHub, then the sample cohort (meet@ is in
+  its `sample_leaders`). If meet@ already granted Human Shaped, that
+  grant is removed first so the consent screen shows.
+
+## What changed on the site for the review (October 29)
+
+- `/addon/`: Not now on the GitHub step, and Sign out (review checks
+  that sign-out works; the panel had none).
+- A draft cohort with `details.any_call` opens in any call for its
+  leaders; the Google addresses in `details.sample_leaders` become
+  leaders on their first Google sign-in (migration 20261029010000).
+  The sample is slug `sample-for-google-review`; delete it after review.
+- `/privacy/` now has a section on Google sign-in: the scopes, their
+  use, how long they are kept, and Limited Use. It used to say the
+  add-on "asks Google for no permissions."
+- Still wrong: the Marketplace store listing's detailed description says
+  the add-on "asks Google for no permissions". Editing it may restart
+  review, so it is Ben's call.
+
+## Recording
+
+Archive Watch's tools: `demo_window_record.swift` (build with
+`-parse-as-library`, list with `onScreenWindowsOnly: false` when Chrome
+sits on another Space) and `ax_press.swift` to dismiss Chrome bubbles.
+Crop the "started debugging this browser" banner, which comes and goes
+as the browser tools attach.
