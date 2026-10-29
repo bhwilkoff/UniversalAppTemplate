@@ -81,7 +81,7 @@ as the browser tools attach.
 
 ## Made, October 29
 
-6:24, 1920x1080, ten cards and seven clips. The title cards and the
+3:22 after tightening (6:24 as first cut), 1920x1080, ten cards and seven clips. `tighten.py` cuts every still stretch to a 2.5 s hold (6 to 7 s on the scopes and the consent screen), and `cards2.sh` sets the card lengths and joins the cut. The title cards and the
 cut are in `screencast/` (`cards.json`, `make.py` renders the cards in
 headless Chrome, `build.sh` crops, blurs, and joins). The account list
 in One Tap is blurred wherever it shows, and so is the sidebar on the
