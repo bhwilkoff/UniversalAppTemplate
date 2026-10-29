@@ -101,3 +101,15 @@ already has GitHub linked.
 (benwilkoff@gmail.com). The reply to gwm-review@google.com is a draft in
 ben@learningischange.com's Gmail, on Google's thread, for Ben to review
 and send himself.
+
+## Rejected for trademarks, resubmitted, October 29
+
+Google rejected the listing the same day ("Human Shaped (1086485459450) -
+Google Workspace Add-on - Rejected"): every Google product name in the
+title and the short and detailed descriptions needs ™, and a footnote may
+name the owner. The short description and the detailed description now
+say Google Meet™ (the detailed one's bare "Meet" became "Google Meet™"),
+and the detailed description ends with "Google Meet™ is a trademark of
+Google LLC." The app name has no Google product in it. The listing was
+still marked in review, so the review was cancelled, the draft saved,
+reloaded to check, and submitted for review again.
