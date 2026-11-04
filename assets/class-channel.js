@@ -56,7 +56,7 @@
     // Folded, because this bar stays on screen and the part above it needs
     // the room (found in a real call: it took half the panel).
     var more = el('details', 'react-more');
-    more.appendChild(el('summary', null, 'More'));
+    more.appendChild(el('summary', null, 'More ways to respond'));
     var RL = window.RosterLib, memKey = o.cohort ? 'hs-path-stage:' + o.cohort.id : null;
     if (RL) {
       var where = el('label', 'path-pick');

@@ -432,8 +432,9 @@
       },
       onPresence: function (state) {
         S.presence = state;
-        var known = (S.guests || []).map(function (g) { return g.user_id; }).concat(S.teacherIds || [], S.people.map(function (p) { return p.user_id; }));
-        if (S.teaching && Object.keys(state || {}).some(function (id) { return known.indexOf(id) < 0; })) loadGuests();
+        var members = (S.teacherIds || []).concat(S.people.map(function (p) { return p.user_id; }));
+        // A guest arriving, or a guest saying their name.
+        if (S.teaching && Object.keys(state || {}).some(function (id) { return members.indexOf(id) < 0; })) loadGuests();
         drawRoster();
         drawCode();
         if (S.onStage && S.onStage.kind === 'path') sendStage();
@@ -609,13 +610,15 @@
     $('[data-guest-form]').hidden = !!mine.member_id;
     var line = $('[data-guest-line]');
     line.hidden = !mine.member_id;
-    line.textContent = mine.member_id ? 'Your answers count as ' + (S.names[mine.member_id] || 'yours') + '.' : '';
+    line.textContent = mine.member_id ? 'Your answers count as ' + (S.names[mine.member_id] || 'a member’s') + '.' : '';
+    if (mine.member_id) $('[data-guest-status]').textContent = '';
   }
   $('[data-guest-form]').addEventListener('submit', function (ev) {
     ev.preventDefault();
     var status = $('[data-guest-status]');
     db.rpc('join_call', { code: S.room.code, guest_name: $('[data-guest-name]').value }).then(function (r) {
       status.textContent = r.error ? 'Not saved: ' + r.error.message : 'Saved.';
+      if (!r.error && S.classChannel) S.classChannel.setPresence({ guest_name: $('[data-guest-name]').value });
       loadGuests();
     });
   });
