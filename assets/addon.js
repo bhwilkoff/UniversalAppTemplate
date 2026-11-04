@@ -602,9 +602,14 @@
   }
   function drawGuest() {
     var box = $('[data-guest]');
-    box.hidden = !S.isGuest;
-    if (!S.isGuest) return;
     var mine = (S.guests || []).filter(function (g) { return g.user_id === S.me.id; })[0] || {};
+    // It rides in the bar that stays on screen, because the panel follows the
+    // session and a name field at the top scrolls away (found in a real
+    // call). A guest who has given a name has no more need of it.
+    box.hidden = !S.isGuest || (!!mine.name && !mine.member_id);
+    if (box.hidden) return;
+    var bar = $('[data-react]');
+    if (box.parentNode !== bar) bar.insertBefore(box, bar.firstChild);
     var name = $('[data-guest-name]');
     if (document.activeElement !== name) name.value = mine.name || '';
     $('[data-guest-form]').hidden = !!mine.member_id;
