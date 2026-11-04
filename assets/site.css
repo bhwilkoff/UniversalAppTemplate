@@ -1712,6 +1712,10 @@ label.check { min-height: 2.25rem; }
 .stance-btn { min-height: 40px; border: 1px solid var(--rule); border-radius: 999px; background: var(--card); color: var(--ink); font: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer; }
 .stance-btn[aria-pressed="true"] { background: var(--ink); color: var(--on-ink); border-color: var(--ink); }
 .react-line { font-size: 0.8rem !important; }
+.show-notes { display: grid; gap: 0.5rem; margin-top: 0.6rem; padding: 0.6rem 0.7rem; border-left: 2px solid var(--rule); font-size: 0.95rem; }
+.show-notes > summary { cursor: pointer; font-weight: 600; }
+.show-notes[open] > summary { margin-bottom: 0.4rem; }
+.show-notes p + p { margin-top: 0.5rem; }
 .react-line:empty { display: none; }
 .react-bar { gap: 0.35rem; }
 .react-more { display: grid; gap: 0.5rem; font-size: 0.9rem; }

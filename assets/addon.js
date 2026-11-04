@@ -272,7 +272,19 @@
         S.prev = ss.filter(function (x) { return x.number === S.session.number - 1; })[0] || null;
         S.parts = lib.agenda(cohort.session_minutes);
         var since = S.prev && S.prev.starts_at ? S.prev.starts_at : new Date(Date.now() - 8 * 86400000).toISOString();
-        return db.from('shares').select('*').eq('cohort_id', id).eq('kind', 'bring-back').gte('created_at', since).order('created_at', { ascending: false }).then(function (sh) {
+        // Leaders' notes for each part, which only leaders can read (found
+        // in Week 1: they were written on the session page and never reached
+        // the panel, so a stage cut to its main points left the leader
+        // without the rest).
+        var notes = S.teaching ? db.from('scene_notes').select('scene_id, body').eq('cohort_id', id) : Promise.resolve({ data: [] });
+        return Promise.all([
+          db.from('shares').select('*').eq('cohort_id', id).eq('kind', 'bring-back').gte('created_at', since).order('created_at', { ascending: false }),
+          notes
+        ]).then(function (got) {
+          var sh = got[0];
+          if (got[1].error) console.log('[addon] leader notes did not load: ' + got[1].error.message);
+          S.notes = {};
+          (got[1].data || []).forEach(function (n) { S.notes[n.scene_id] = n.body; });
           S.brought = sh.data || [];
           drawFrame();
           startShow();
@@ -303,6 +315,7 @@
     S.list = S.parts;
     S.show = window.ShowView.mount({
       mount: $('[data-show]'), parts: S.list, teaching: S.teaching,
+      notes: function (key) { return (S.notes || {})[key] || null; },
       // What does not apply to this cohort stays out of sight: rooms
       // without groups, a board without a board part (JOURNEYS.md).
       unavailable: function () {

@@ -64,6 +64,15 @@
         // The current scene's clock, and the teacher's moves through the show.
         var bar = run ? runBar(s) : null;
         if (bar) li.appendChild(bar.box);
+        // The leader's own notes for the part, which the stage leaves out:
+        // open on the part that is on, and folded on the rest.
+        var note = teaching && opts.notes ? opts.notes(s.key) : null, notes = null;
+        if (note) {
+          notes = el('details', 'show-notes');
+          notes.appendChild(el('summary', null, 'Your notes'));
+          String(note).split(/\n{2,}/).map(function (x) { return x.trim(); }).filter(Boolean).forEach(function (w) { notes.appendChild(el('p', null, w)); });
+          li.appendChild(notes);
+        }
         var body = el('div', 'show-body');
         li.appendChild(body);
         var tools = el('div', 'actions show-tools');
@@ -76,7 +85,7 @@
         if (teaching && opts.tools) { var extra = opts.tools(s.key); if (extra) tools.appendChild(extra); }
         if (tools.children.length) li.appendChild(tools);
         if (teaching && run && run.canEdit) { var ed = editor(s); if (ed) li.appendChild(ed); }
-        items[s.key] = { li: li, body: body, bar: bar };
+        items[s.key] = { li: li, body: body, bar: bar, notes: notes };
         ol.appendChild(li);
       });
     }
@@ -118,7 +127,12 @@
       return { box: box, clock: clock, pinned: pinned, follow: follow, clockBtn: clockBtn, key: s.key };
     }
 
+    var notesOpenFor;
     function drawRun() {
+      if (notesOpenFor !== current) {
+        notesOpenFor = current;
+        Object.keys(items).forEach(function (key) { if (items[key].notes) items[key].notes.open = key === current; });
+      }
       Object.keys(items).forEach(function (key) {
         var b = items[key].bar;
         if (!b) return;
