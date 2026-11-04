@@ -9,7 +9,7 @@
   if (!root) return;
   var A = window.AddonLib, L = window.LiveLib;
   var cfg = window.MEET_ADDON || {};
-  var view = null, last = '';
+  var view = null, last = '', heard = false;
 
   function $(s) { return root.querySelector(s); }
   function el(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
@@ -231,14 +231,24 @@
         if (!m || m.payload === last) return;
         var v = A.readStageMessage(m.payload);
         if (!v) return;
-        last = m.payload; view = v;
+        last = m.payload; view = v; heard = true;
+        $('[data-stage-waiting]').hidden = true;
         show('ready'); draw();
       });
       view = { mode: 'part', part: null };
       show('ready'); draw();
       // Ask the panel for what to show, since a message only reaches a
-      // stage that is already listening.
-      try { Promise.resolve(stage.notifySidePanel(A.HELLO)).catch(function () {}); } catch (e) {}
+      // frame that is already listening. A learner's panel can open or
+      // sign in long after the stage, or close and come back, so the stage
+      // keeps asking: often until it hears, then now and then.
+      var asked = 0;
+      function ask() {
+        asked += 1;
+        try { Promise.resolve(stage.notifySidePanel(A.HELLO)).catch(function () {}); } catch (e) {}
+        if (!heard && asked === 3) { console.log('[stage] no word from the side panel yet'); $('[data-stage-waiting]').hidden = false; }
+        setTimeout(ask, heard ? 15000 : 3000);
+      }
+      ask();
     }, function () { show('outside'); });
   }
   open();

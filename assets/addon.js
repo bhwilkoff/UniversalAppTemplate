@@ -1398,7 +1398,11 @@
   $('[data-open-stage]').addEventListener('click', function () {
     var status = $('[data-stage-status]');
     status.textContent = 'Opening the main stage…';
-    Promise.resolve(side.startActivity({ mainStageUrl: location.origin + '/addon/stage/' })).then(function () {
+    // Both addresses: Meet opens for someone joining only the frames named
+    // here, and a stage with no panel beside it has nothing to show (found
+    // in Week 1: learners got a stage that never left its welcome line, and
+    // had to open the panel by hand).
+    Promise.resolve(side.startActivity({ mainStageUrl: location.origin + '/addon/stage/', sidePanelUrl: location.origin + '/addon/' })).then(function () {
       S.stageOn = true;
       stageButtons(true);
       status.textContent = 'The main stage is open. Meet asks everyone in the call to join it.';
