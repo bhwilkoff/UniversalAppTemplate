@@ -1170,3 +1170,21 @@ anything by GitHub's schedule, which ran about every six hours when set to
 hourly; the clock is Supabase Cron. Never put another learner in a learner's
 message. Never add someone to a repository before they join the organization.
 
+## A session belongs to its leader's calendar, and every session is an hour (November 4, 2026)
+
+**New cohorts' events live on the leader's own Google Calendar, made by a
+button in their browser, and every session is 60 minutes** (Ben: "we aren't
+dependent upon a single account for very much within the system," and "Let's
+just make everything 60 minutes. There is no reason to worry about this or
+over explain it.").
+
+**Why:** one lost or flagged account should touch one cohort, not all of them,
+and the leader is then the call's real host. A free Google account stops calls
+of three or more at 60 minutes, so an hour works for everyone.
+
+**How to apply:** keep no Google refresh tokens; a short-lived token in the
+leader's browser is the design, and a change that needs a leader goes in their
+reminders. Never move a running cohort's events, because that changes Meet
+links people already have, so Minerva stays on meet@ (`calendar_by = 'meet'`).
+Offer no session length choice. Details: research/notes/calendar-ownership-notes.md.
+

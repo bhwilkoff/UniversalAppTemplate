@@ -51,7 +51,7 @@ Deno.serve(async (req) => {
   const ids = cohorts.map((c) => c.id);
   if (!ids.length) return reply(200, { sent: [], note: 'No cohorts.' });
 
-  const [members, leaders, threads, stops, sessions, access, roles, feedback] = await Promise.all([
+  const [members, leaders, threads, stops, sessions, access, roles, feedback, calendars] = await Promise.all([
     db.from('enrollments').select('cohort_id, user_id, status, profiles(github_login, display_name)').in('cohort_id', ids).neq('status', 'left'),
     db.from('cohort_teachers').select('cohort_id, user_id, profiles(github_login, display_name)').in('cohort_id', ids),
     db.from('reminder_threads').select('*').in('cohort_id', ids),
@@ -60,8 +60,9 @@ Deno.serve(async (req) => {
     db.from('github_access').select('cohort_id, user_id').in('cohort_id', ids).eq('state', 'invited'),
     db.from('repo_roles').select('cohort_id, user_id, role').in('cohort_id', ids),
     db.rpc('reminder_leader_items'),
+    db.rpc('reminder_calendar_due'),
   ]);
-  const bad = [members, leaders, threads, stops, sessions, access, roles, feedback].find((r) => r.error);
+  const bad = [members, leaders, threads, stops, sessions, access, roles, feedback, calendars].find((r) => r.error);
   if (bad) return reply(500, { message: bad.error!.message });
 
   const problems: string[] = [], repaired: string[] = [], sent: unknown[] = [];
@@ -135,9 +136,10 @@ Deno.serve(async (req) => {
       const who = login(l.profiles);
       if (!who) continue;
       const news = fresh(l.user_id), t = thread(l.user_id);
-      const due = R.digestDue({ now, zone: c.time_zone, lastOn: t?.last_digest_on || null, nextStart: common.nextStart, hasItems: people.length > 0 || issues.length > 0 || waiting > 0 });
+      const cal = calendars.data.find((x: { cohort_id: string; owner: string | null; due: number }) => x.cohort_id === c.id && x.due > 0 && (!x.owner || x.owner === l.user_id));
+      const due = R.digestDue({ now, zone: c.time_zone, lastOn: t?.last_digest_on || null, nextStart: common.nextStart, hasItems: people.length > 0 || issues.length > 0 || waiting > 0 || !!cal });
       if (!due && !news.length) continue;
-      await send(l.user_id, who, due, R.leaderMessage({ ...common, login: who, events: news, people: due ? people : [], issues: due ? issues : [], feedback: due ? waiting : 0 }));
+      await send(l.user_id, who, due, R.leaderMessage({ ...common, login: who, events: news, people: due ? people : [], issues: due ? issues : [], feedback: due ? waiting : 0, calendar: due && !!cal }));
     }
   }
   return reply(problems.length ? 207 : 200, { dry, repaired, sent, problems });

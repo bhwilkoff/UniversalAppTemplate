@@ -189,6 +189,10 @@
         done: !!(myAccess && myAccess.state === 'member') });
     }
     steps.push({ key: 'open', label: 'Open for joining', action: 'edit', done: cohort.status !== 'draft' });
+    if (cohort.calendar_by === 'leader' && sessions.length) {
+      steps.push({ key: 'calendar', label: 'Send calendar invitations', action: 'calendar',
+        done: sessions.every(function (s) { return !!s.calendar_event_id || (s.starts_at && Date.parse(s.starts_at) < Date.now()); }) });
+    }
     steps.push({ key: 'meet', label: 'Add Human Shaped to Google Meet', href: '/meet/#add',
       done: false, optional: true });
     var first = sessions.slice().sort(function (a, b) { return a.number - b.number; })[0];
@@ -210,6 +214,7 @@
     var failed = ahead.filter(function (s) { return s.calendar_error; })[0];
     if (failed) return 'The calendar said: ' + failed.calendar_error;
     if (cohort.status === 'draft') return 'They go on everyone’s calendar once the cohort is open.';
+    if (cohort.calendar_by === 'leader') return null;
     if (ahead.every(function (s) { return !!s.calendar_event_id; })) return 'On everyone’s calendar, each with its own Meet link.';
     return 'Going on everyone’s calendar within the hour, each with its own Meet link.';
   }

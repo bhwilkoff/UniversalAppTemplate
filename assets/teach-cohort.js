@@ -142,6 +142,8 @@
   // card goes away once every step is done.
   function drawCohortSetup(sessions, access, meetRequest) {
     var steps = lib.cohortSetupSteps(current, sessions, access, meetRequest);
+    var calBox = $('[data-leader-calendar]');
+    if (calBox && window.LeaderCalendar) window.LeaderCalendar.mount(calBox, { db: db, cohort: current, me: me && me.id, after: function () { openCohort(current.id); } });
     var allDone = steps.every(function (x) { return x.done || x.optional; });
     $('[data-cohort-setup]').hidden = allDone;
     $('[data-setup-done]').replaceChildren();
@@ -159,6 +161,7 @@
         target.addEventListener('click', function () {
           if (x.action === 'sessions') $('[data-make-sessions]').click();
           else if (x.action === 'provision') provision(target);
+          else if (x.action === 'calendar') { var go = root.querySelector('[data-calendar-go]'); if (go) go.click(); }
           else if (x.action === 'groups') { if (tabsCtl) tabsCtl.go('people'); }
           else location.assign('/teach/cohort/edit/?c=' + current.id);
         });

@@ -34,7 +34,7 @@
       title: f.title.value.trim(), description: f.description.value.trim(), starts_on: f.starts_on.value || null,
       weeks: Number(f.weeks.value) || 5, capacity: f.capacity.value ? Number(f.capacity.value) : null,
       session_weekday: f.session_weekday.value === '' ? null : Number(f.session_weekday.value),
-      session_time: f.session_time.value || null, session_minutes: Number(f.session_minutes.value) || 75, time_zone: f.time_zone.value
+      session_time: f.session_time.value || null, session_minutes: Number(f.session_minutes.value) || 60, time_zone: f.time_zone.value
     };
     $('[data-preview-title]').textContent = c.title || 'Your cohort’s name';
     $('[data-preview-line]').textContent = TL.openingLine(c);
@@ -63,11 +63,7 @@
     f.weeks.value = c ? c.weeks : 5;
     f.session_weekday.value = c && c.session_weekday != null ? String(c.session_weekday) : '';
     f.session_time.value = c && c.session_time ? c.session_time.slice(0, 5) : '';
-    var minutes = String(c ? c.session_minutes : 75);
-    if (!Array.prototype.some.call(f.session_minutes.options, function (o) { return o.value === minutes; })) {
-      f.session_minutes.appendChild(new Option(minutes + ' minutes', minutes));
-    }
-    f.session_minutes.value = minutes;
+    f.session_minutes.value = String(c ? c.session_minutes : 60);
     f.time_zone.value = c ? c.time_zone : Intl.DateTimeFormat().resolvedOptions().timeZone;
     f.capacity.value = c && c.capacity ? c.capacity : '';
     f.status.value = c ? c.status : 'draft';
@@ -136,7 +132,7 @@
       weeks: Number(f.weeks.value) || 5,
       session_weekday: f.session_weekday.value === '' ? null : Number(f.session_weekday.value),
       session_time: f.session_time.value || null,
-      session_minutes: Number(f.session_minutes.value) || 75,
+      session_minutes: Number(f.session_minutes.value) || 60,
       time_zone: f.time_zone.value.trim(),
       capacity: f.capacity.value ? Number(f.capacity.value) : null,
       status: f.status.value,

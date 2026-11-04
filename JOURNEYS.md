@@ -334,6 +334,13 @@ This replaces decision 4's "Run it here" fallback and S1's "During": the
 session page never carries live controls. Leaders prepare there; they run
 the session only in the add-on, inside the Meet call.
 
+## The leader's calendar (Ben, November 4, 2026)
+
+This changes who holds decision 7's events: each new cohort's sessions are
+on its leader's own calendar, sent by a button on the cohort's page, and
+people invited from a time poll get those invitations rather than a separate
+email. The rest of decision 7 stands. See DECISIONS.md.
+
 ## One way in: Join the call (Ben, November 4, 2026)
 
 Ben: "With the Google Meet add-on approved, we should be able to simplify

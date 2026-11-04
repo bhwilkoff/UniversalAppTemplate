@@ -121,12 +121,7 @@
                     <label>Time <input id="cohort-time" type="time" name="session_time"></label>
                     <label>Time zone <input id="cohort-zone" name="time_zone" list="zones" autocomplete="off"></label>
                   </div>
-                  <label class="sub">How long <select id="cohort-minutes" name="session_minutes">
-                    <option value="60">An hour</option>
-                    <option value="75">75 minutes, as the weekly guides are written</option>
-                    <option value="90">90 minutes</option>
-                    <option value="120">Two hours</option>
-                  </select><span class="hint">Sessions of an hour or less leave out the break.</span></label>
+                  <input type="hidden" name="session_minutes" value="60">
                   <datalist id="zones" data-zones></datalist>
                 </fieldset>
 

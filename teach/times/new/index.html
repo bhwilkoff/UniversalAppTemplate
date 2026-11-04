@@ -97,7 +97,7 @@
             <label class="times-step">Start times every <select name="step"><option value="15">15 minutes</option><option value="30" selected>30 minutes</option><option value="60">hour</option></select></label>
             <div class="row">
               <label>In the time zone <select name="time_zone" data-zone-pick></select></label>
-              <label>Sessions last <select name="session_minutes"><option value="60">an hour</option><option value="75" selected>75 minutes</option><option value="90">90 minutes</option><option value="120">two hours</option></select></label>
+              <input type="hidden" name="session_minutes" value="60">
               <label>Week 1 begins <input type="date" name="starts_on"><span class="hint">Optional. Times are converted for each person using this week's daylight saving.</span></label>
             </div>
             <p class="error" role="status" data-form-error></p>

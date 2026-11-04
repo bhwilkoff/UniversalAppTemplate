@@ -9,7 +9,7 @@
   // cohort's rows; `minutes` its session length.
   function cohortNow(c, sessions, now) {
     var t = now.getTime();
-    var length = (c.session_minutes || 75) * 60000;
+    var length = (c.session_minutes || 60) * 60000;
     var dated = (sessions || []).filter(function (s) { return s.starts_at; })
       .slice().sort(function (a, b) { return a.starts_at.localeCompare(b.starts_at); });
     var live = dated.filter(function (s) { var at = Date.parse(s.starts_at); return at <= t && at + length > t; })[0] || null;

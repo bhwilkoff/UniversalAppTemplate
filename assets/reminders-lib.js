@@ -18,6 +18,7 @@
     if (i.kind === 'prep') return { text: 'Answer ' + (i.amount === 1 ? '1 question' : i.amount + ' questions') + by, href: sessionUrl(i.slug, i.session_number) };
     if (i.kind === 'exchange') return { text: 'Reply to the exchange' + by + (i.label ? ': ' + i.label : ''), href: '/exchange/#' + i.token };
     if (i.kind === 'repo') return { text: 'Add your repository and address', href: cohortUrl(i.slug, 'mine') };
+    if (i.kind === 'calendar') return { text: 'Update your calendar invitations', href: cohortUrl(i.slug) };
     if (i.kind === 'invite') return { text: 'Accept your GitHub invitation', href: 'https://github.com/orgs/humanshaped/invitation' };
     return null;
   }
@@ -84,13 +85,14 @@
     var out = ['@' + o.login];
     var people = o.people || [], issues = o.issues || [];
     var fresh = (o.events || []).map(function (e) { return eventLine(e, o.slug); }).filter(Boolean);
-    if (!people.length && !issues.length && !o.feedback && !fresh.length) return null;
+    if (!people.length && !issues.length && !o.feedback && !o.calendar && !fresh.length) return null;
     if (o.nextStart) out.push(sessionName(o.nextNumber) + ' is ' + when(o.nextStart, o.zone) + '.');
     if (people.length) {
       out.push('**Still open**\n\n' + people.map(function (p) {
         return '- ' + p.name + ': ' + sorted(p.items).map(function (i) { return line(Object.assign({}, i, { label: null })); }).filter(Boolean).map(function (l) { return l.text.charAt(0).toLowerCase() + l.text.slice(1); }).join('; ');
       }).join('\n'));
     }
+    if (o.calendar) out.push(md(line({ kind: 'calendar', slug: o.slug })));
     if (o.feedback) out.push('[Give feedback on ' + (o.feedback === 1 ? '1 piece of shared work' : o.feedback + ' pieces of shared work') + '](' + SITE + '/teach/feedback/)');
     if (issues.length) out.push('**Open issues in your cohort repository**\n\n' + issues.map(function (i) { return '- [' + String(i.title).replace(/[\[\]]/g, '') + '](' + i.html_url + ')'; }).join('\n'));
     if (fresh.length) out.push(fresh.map(function (l) { return '- ' + md(l); }).join('\n'));

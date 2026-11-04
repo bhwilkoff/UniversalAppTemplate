@@ -6,7 +6,7 @@
   function currentAndNext(sessions, now, minutes) {
     var sorted = sessions.filter(function (s) { return s.starts_at; })
       .slice().sort(function (a, b) { return a.starts_at.localeCompare(b.starts_at); });
-    var length = (minutes || 75) * 60000;
+    var length = (minutes || 60) * 60000;
     var t = now.getTime();
     var started = sorted.filter(function (s) { return Date.parse(s.starts_at) <= t; });
     var upcoming = sorted.filter(function (s) { return Date.parse(s.starts_at) + length > t; });
