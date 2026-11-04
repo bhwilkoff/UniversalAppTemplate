@@ -335,6 +335,10 @@
           folder: { key: 'recordings', name: 'Human Shaped recordings', description: 'Session recordings from humanshaped.org. Each is linked from its cohort’s session page, and anyone with a recording’s link can watch it.' }
         }, function (p) { bar.value = p; });
       }).then(function (fileId) {
+        // Already there when the recorder is meet@ itself; a leader's copy
+        // stays theirs and on the session page either way.
+        return D.shareWith(token, fileId, 'meet@humanshaped.org').catch(function (e) { console.log('[record] meet@ not added:', e && e.message); }).then(function () { return fileId; });
+      }).then(function (fileId) {
         m.driveId = fileId;
         var link = R.driveUrl(fileId);
         if (it.dir) saveMeta(it.dir, m);

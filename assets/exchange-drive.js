@@ -219,5 +219,12 @@
     return call(token, 'POST', API + '/files/' + id + '/permissions?fields=id', { role: 'reader', type: 'anyone' }).then(function () { return id; });
   }
 
-  window.ExchangeDrive = { connect: connect, save: save, share: share, frame: frame };
+  // One person can also edit it, without an email about it: Human Shaped's
+  // own account, so a recording outlives a leader's leaving (Ben, November 4,
+  // 2026: "shared with meet@ so that permissions still work cleanly").
+  function shareWith(token, id, email) {
+    return call(token, 'POST', API + '/files/' + id + '/permissions?fields=id&sendNotificationEmail=false', { role: 'writer', type: 'user', emailAddress: email }).then(function () { return id; });
+  }
+
+  window.ExchangeDrive = { connect: connect, save: save, share: share, shareWith: shareWith, frame: frame };
 })();
