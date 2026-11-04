@@ -102,7 +102,8 @@
         db.from('stage_marks').select('stage, updated_at').eq('user_id', me.id),
         db.from('teacher_notes').select('created_at').eq('student_id', me.id),
         db.from('shares').select('cohort_id, feedback(author_id, created_at)').eq('user_id', me.id),
-        db.from('cohorts').select(COHORT).eq('status', 'open').order('starts_on')
+        db.from('cohorts').select(COHORT).eq('status', 'open').order('starts_on'),
+        db.rpc('my_open_items')
       ]).then(function (res) {
         var bad = res.filter(function (r) { return r.error; })[0];
         if (bad) throw bad.error;
@@ -166,6 +167,9 @@
             answers: feedbackNew,
             answersHref: feedbackCohortSlug ? '/cohort/?c=' + encodeURIComponent(feedbackCohortSlug) : '/account/'
           });
+          // What is open for this person, in the words their reminders use.
+          var L = window.ReminderLib, open = res[res.length - 1].data || [];
+          if (L) model.waiting = L.sorted(open).map(L.line).filter(Boolean).map(function (l) { return { title: l.text, href: l.href }; }).concat(model.waiting);
           model.polls = model.myPolls.concat(model.answeredPolls);
           draw(model, H, P);
           markSeen();

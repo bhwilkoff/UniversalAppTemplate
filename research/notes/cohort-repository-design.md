@@ -143,6 +143,10 @@ someone about something that happens on GitHub, and it has no private
 messages: anything in the cohort repository is visible to the whole
 cohort. So the split is:
 
+*November 4, 2026: reminders and the notices marked as the daily email now
+go through GitHub, in each person's private repository
+(research/notes/notifications-notes.md). The table below is the earlier plan.*
+
 | Notice | Carried by |
 |---|---|
 | A new conversation, reply, ask, or file | GitHub, to everyone watching |

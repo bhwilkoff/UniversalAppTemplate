@@ -528,12 +528,25 @@
     var form = root.querySelector('[data-reach-form]');
     var status = root.querySelector('[data-reach-status]');
     var clear = root.querySelector('[data-reach-clear]');
-    db.from('reach_choices').select('email, teachers_may_email, notices').eq('user_id', uid).maybeSingle().then(function (r) {
+    // Reminders are on until someone stops them (migration 20261104010000).
+    var remind = root.querySelector('[data-reminders]'), remindSaid = root.querySelector('[data-reminders-status]');
+    if (remind) {
+      db.from('reminder_choices').select('stopped').eq('user_id', uid).maybeSingle().then(function (r) { remind.checked = !(r.data && r.data.stopped); });
+      if (!remind.dataset.wired) {
+        remind.dataset.wired = '1';
+        remind.addEventListener('change', function () {
+          remindSaid.textContent = 'Saving…';
+          db.from('reminder_choices').upsert({ user_id: uid, stopped: !remind.checked, updated_at: new Date().toISOString() }).then(function (s) {
+            remindSaid.textContent = s.error ? 'Not saved: ' + s.error.message + '.' : 'Saved';
+          });
+        });
+      }
+    }
+    db.from('reach_choices').select('email, teachers_may_email').eq('user_id', uid).maybeSingle().then(function (r) {
       if (r.error) { section.hidden = true; return; }
       var row = r.data || {};
       form.elements.email.value = row.email || '';
       form.elements.teachers_may_email.checked = !!row.teachers_may_email;
-      form.elements.notices.checked = !!row.notices;
       clear.hidden = !r.data;
       section.hidden = false;
       if (reachWired) return;
@@ -543,7 +556,7 @@
         var checked = R.checkChoice({
           email: form.elements.email.value,
           teachers_may_email: form.elements.teachers_may_email.checked,
-          notices: form.elements.notices.checked
+          notices: false
         });
         if (checked.error) { status.textContent = checked.error; return; }
         status.textContent = 'Saving…';

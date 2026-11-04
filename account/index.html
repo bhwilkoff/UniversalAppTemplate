@@ -169,6 +169,11 @@
 
           <!-- Written by Claude, awaiting Ben's review (research/notes/reach-notes.md). -->
           <div data-reach-section hidden>
+            <div id="reminders">
+              <h2>Reminders</h2>
+              <label class="check"><input type="checkbox" data-reminders checked> Remind me when something is open for me</label>
+              <p class="small">GitHub emails these to the address on your GitHub account, from a private repository only you can open. <span role="status" data-reminders-status></span></p>
+            </div>
             <h2>How your leaders can reach you</h2>
             <p class="ui-meta-line"><span data-vis="teachers" data-vis-what="Your address"></span></p>
             <form class="inline-form" data-reach-form>
@@ -177,8 +182,6 @@
                 <input type="email" name="email" autocomplete="email" maxlength="254">
               </label>
               <label class="check"><input type="checkbox" name="teachers_may_email"> My leaders may email me, from their own email</label>
-              <label class="check"><input type="checkbox" name="notices"> A daily email when something waits</label>
-              <p class="small">From meet@humanshaped.org, without the words themselves.</p>
               <div class="actions">
                 <button class="btn-secondary" type="submit">Save</button>
                 <button class="btn-secondary" type="button" data-reach-clear hidden>Remove address</button>
@@ -256,7 +259,7 @@
   <script src="/assets/credential-lib.js?v=20261022j" defer></script>
   <script src="/assets/google-signin-lib.js" defer></script>
   <script src="/assets/google-signin.js" defer></script>
-  <script src="/assets/hub.js?v=20261023i" defer></script>
+  <script src="/assets/hub.js?v=20261104a" defer></script>
 
   <footer class="site-footer">
     <div class="wrap">

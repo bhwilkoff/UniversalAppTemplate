@@ -1147,3 +1147,26 @@ Someone on a phone is in the call without the panel, and someone whose
 school turns add-ons off joins with a personal Google account; /meet/ and
 /support/ say both. `/addon/?c=&s=` stays working, because the add-on's
 sign-in failure link needs it.
+
+## GitHub carries reminders, through a private repository for each person (November 4, 2026)
+
+**Reminders are on by default, are sent by GitHub, and go to a private
+repository of each person's own** (Ben: "Ideally the notifications come from
+Github and therefore it is Github who is sending them. This gets around
+having to use a single account that can easily be flagged as spam. We want
+sustainable solutions."). This replaces the Apps Script daily email.
+
+**Why:** an email from one Google account does not scale and needs the
+script changed each time, while GitHub already sends mail well and at no
+cost. GitHub has no private messages, and a learner's open items in the
+cohort repository would show their peers who is behind, so each person has
+their own. A test showed the app's comments reach a person's inbox in
+seconds (research/notes/notifications-notes.md).
+
+**How to apply:** change words and timing in `assets/reminders-lib.js`, and
+what counts as open in `private.open_items`, so the home page and the
+message stay the same. Deploy with `tools/deploy-reminders.sh`. Never time
+anything by GitHub's schedule, which ran about every six hours when set to
+hourly; the clock is Supabase Cron. Never put another learner in a learner's
+message. Never add someone to a repository before they join the organization.
+
