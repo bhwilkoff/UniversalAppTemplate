@@ -115,6 +115,11 @@ blocks add-ons. `/addon/?c=<slug>&s=<number>` still opens the panel
 outside Meet: the add-on's sign-in failure link uses it, and a leader can
 send it to someone who is stuck.
 
+Since November 4, 2026, nobody needs a Human Shaped sign-in in a call
+(DECISIONS.md, "Whoever has the call's link is part of the cohort"). The
+add-on must still be installed on each Google account, and each person must
+press Join activity each time the leader opens the stage.
+
 ## Who could use it, October 23, 2026 (history)
 
 Ben: "The session page should functionally only be to prep the session.

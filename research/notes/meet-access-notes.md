@@ -1,6 +1,6 @@
 # Who can reach the add-on, and with which account
 
-*Written by Claude, November 4, 2026, for Ben's decision.*
+*Written by Claude, November 4, 2026. Ben chose guests by link the same day, with leaders tying a guest to a member; DECISIONS.md has what was built.*
 
 Ben: "Is there a way that we can allow anyone who has access to the link for
 the call to be able to access the Human Shaped add-on and its content?"
