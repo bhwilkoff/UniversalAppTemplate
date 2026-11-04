@@ -1317,22 +1317,30 @@
   // stage already shows it, and learners' panels said no question was
   // open (found in the live Meet test). Only the leader who moved asks,
   // so two leaders never ask it twice; closed, it stays closed.
+  // A Writing part asks in words too: its stage says to write, and the
+  // panel has to give the place to do it (found in a real call: it gave none).
+  function plannedAsk(part) {
+    if (part.kind === 'question') return L.fromScene(part.config);
+    if (part.kind === 'reflection') return L.fromScene(Object.assign({}, part.config, { kind: 'short' }));
+    return null;
+  }
   function askPlanned() {
     var part = partNow();
-    if (!S.teaching || !part || !part.own || part.kind !== 'question') return;
-    var q = L.fromScene(part.config);
-    if (!q) return;
-    // The question an earlier part asked closes, so learners face one at a
-    // time (found in the live Meet test: two were open at once). Answers
-    // stay, and a question the leader asked by hand stays open.
-    var planned = (S.list || []).filter(function (x) { return x.own && x.kind === 'question' && x.key !== part.key; })
-      .map(function (x) { var p = L.fromScene(x.config); return p ? p.prompt : null; });
+    if (!S.teaching || !part || !part.own) return;
+    var q = plannedAsk(part);
+    // The question another part asked closes, so learners only ever face
+    // what this part asks, on every kind of part (found in a real call: a
+    // Writing part's panel still showed the question from a part left
+    // behind). Answers stay, and a question asked by hand stays open.
+    var planned = (S.list || []).filter(function (x) { return x.own && x.key !== part.key; })
+      .map(function (x) { var p = plannedAsk(x); return p ? p.prompt : null; });
     (S.checks || []).forEach(function (k) {
-      if (k.state === 'open' && k.prompt !== q.prompt && planned.indexOf(k.prompt) >= 0) {
+      if (k.state === 'open' && !(q && k.prompt === q.prompt) && planned.indexOf(k.prompt) >= 0) {
         if (S.onStage && S.onStage.id === k.id) setPin(null);
         changeCheck(k, { state: 'closed' });
       }
     });
+    if (!q) return;
     // Coming back to a part opens its question again, with its answers
     // (found in the live Meet test: Back showed a question no one could
     // answer); a first arrival asks it, once.
