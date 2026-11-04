@@ -1201,3 +1201,19 @@ Meet had been the one unchecked item on the add-on list.
 in a real call. Leaders tell learners to press Join activity, each time
 the stage opens. If signing in on the panel keeps stopping learners, the
 next step is a stage fed by the leader, which needs no learner sign-in.
+
+## Whoever has the call's link is part of the cohort
+
+**The panel never stops someone at a sign-in. A person in the call with no
+member's sign-in comes in as a guest, and a leader can tie them to a member.**
+Ben, November 4, 2026: "If you have access to the google meet link, you are a
+part of the cohort. As a leader, I should be able to tie a google meet user to
+a cohort member and have their responses work for that user."
+**Why:** a sign-in wall left learners with a blank stage in Week 1, and the
+Google account in Meet tells us nothing about who someone is here.
+**How to apply:** `join_call` turns the call's code into a place in
+`call_guests`, which `private.in_cohort` counts, so a guest reads what a member
+reads: the roster, the plan, the stage. Leader notes and other people's answers
+stay closed, and guests cannot add shares, apps, or requests to lead. Leaders tie
+someone under Guests in Who is here (`tie_call_guest`), and can change it; the
+answers move with the match. Meet still needs the add-on on each Google account.

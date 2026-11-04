@@ -120,7 +120,8 @@ def main():
     su.execute(REALTIME_STUB)
     su.execute(STORAGE_STUB)
     for path in sorted((ROOT / "migrations").glob("*.sql")):
-        su.execute(path.read_text())
+        # The scheduler's extensions exist on Supabase, not in this Postgres.
+        su.execute(path.read_text().replace("create extension if not exists pg_cron;", "").replace("create extension if not exists pg_net;", ""))
     su.execute(GRANTS)
 
     people = {}
@@ -2975,6 +2976,8 @@ def main():
     attempt(as_user("ben"), conv, (sp, 9240, [slu["id"]], "Saturday mornings (delete me)", "saturday-mornings-delete-me", "2027-01-09", "open"))
     newc = last_rows[0][0]["id"]
     su.execute("reset role")
+    # New cohorts default to the leader's calendar; these tests are of meet@'s.
+    su.execute("update public.cohorts set calendar_by = 'meet' where id = %s", (newc,))
     su.execute("update auth.users set email = 'ben@example.org' where id = %s", (people["ben"],))
     su.execute("update auth.users set email = 'dee-signin@example.org' where id = %s", (people["dee"],))
     check("no one signed in can read the invitations to send", not attempt(as_user("ben"), "select * from public.invitation_work()"))
@@ -3063,6 +3066,46 @@ def main():
     sv = as_server(); sv.execute("select public.github_token_drop(%s)", (people["ben"],))
     sv = as_server(); sv.execute("select count(*) from public.github_token_get(%s)", (people["ben"],))
     check("and forgets them", sv.fetchall() == [(0,)])
+    # Guests by the call's link (migration 20261104030000).
+    gid, cc, ss, kk = str(uuid.uuid4()), str(uuid.uuid4()), str(uuid.uuid4()), str(uuid.uuid4())
+    su.execute("reset role")
+    su.execute("insert into auth.users (id, raw_app_meta_data) values (%s, '{}')", (gid,))
+    people["gus"] = gid
+    su.execute("reset role")
+    su.execute("insert into public.cohorts (id, slug, title, status, created_by) values (%s, 'guest-test', 'Guest test', 'running', %s)", (cc, people["ben"]))
+    su.execute("insert into public.sessions (id, cohort_id, number, meet_url) values (%s, %s, 1, 'https://meet.google.com/gst-gstg-gst')", (ss, cc))
+    su.execute("insert into public.enrollments (cohort_id, user_id) values (%s, %s)", (cc, people["bea"]))
+    su.execute("insert into public.live_checks (id, cohort_id, session_id, created_by, prompt, kind, state) values (%s, %s, %s, %s, 'Why?', 'short', 'open')", (kk, cc, ss, people["ben"]))
+    g = as_user("gus"); g.execute("select count(*) from public.sessions where id = %s", (ss,))
+    check("before the link, a guest reads nothing of the cohort", g.fetchall() == [(0,)])
+    g = as_user("gus"); g.execute("select public.join_call('qqq-qwqw-qqq')")
+    check("a code that is no session's call joins nothing", g.fetchall() == [(None,)])
+    g = as_user("gus"); g.execute("select public.join_call('gst-gstg-gst', 'Gus')")
+    check("the call's code joins its cohort", str(g.fetchall()[0][0]) == cc)
+    g = as_user("gus"); g.execute("select count(*) from public.sessions where id = %s", (ss,))
+    check("after the link, a guest reads the session", g.fetchall() == [(1,)])
+    g = as_user("gus"); g.execute("select count(*) from public.scene_notes where cohort_id = %s", (cc,))
+    check("a guest still cannot read leader notes", g.fetchall() == [(0,)])
+    check("a guest can answer", attempt(as_user("gus"), "insert into public.live_answers (check_id, cohort_id, user_id, body) values (%s, %s, %s, 'mine')", (kk, cc, gid)))
+    check("a guest cannot tie themselves to a member", not attempt(as_user("gus"), "select public.tie_call_guest(%s, %s, %s)", (cc, gid, people["bea"])))
+    check("a leader cannot tie a guest to someone outside the cohort", not attempt(as_user("ben"), "select public.tie_call_guest(%s, %s, %s)", (cc, gid, people["dee"])))
+    check("a leader ties a guest to a member", attempt(as_user("ben"), "select public.tie_call_guest(%s, %s, %s)", (cc, gid, people["bea"])))
+    b = as_user("bea"); b.execute("select body from public.live_answers where check_id = %s and user_id = %s", (kk, people["bea"]))
+    check("the guest's answer is now the member's", b.fetchall() == [("mine",)])
+    g = as_user("gus"); g.execute("select count(*) from public.live_answers where check_id = %s", (kk,))
+    check("and the guest still sees it", g.fetchall() == [(1,)])
+    k2 = str(uuid.uuid4())
+    su.execute("reset role")
+    su.execute("insert into public.live_checks (id, cohort_id, session_id, created_by, prompt, kind, state) values (%s, %s, %s, %s, 'And?', 'short', 'open')", (k2, cc, ss, people["ben"]))
+    check("a tied guest's next answer goes through", attempt(as_user("gus"), "insert into public.live_answers (check_id, cohort_id, user_id, body) values (%s, %s, %s, 'next')", (k2, cc, gid)))
+    su.execute("reset role")
+    su.execute("select user_id::text from public.live_answers where check_id = %s", (k2,))
+    check("and lands on the member", su.fetchall() == [(people["bea"],)])
+    check("a leader can undo a match", attempt(as_user("ben"), "select public.tie_call_guest(%s, %s, null)", (cc, gid)))
+    su.execute("reset role")
+    su.execute("select count(*) from public.live_answers where cohort_id = %s and user_id = %s", (cc, gid))
+    check("and the answers go back to the guest", su.fetchall() == [(2,)])
+
     conn.rollback()
     conn.close()
     failed = [n for n, ok in results if not ok]

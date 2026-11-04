@@ -1716,6 +1716,12 @@ label.check { min-height: 2.25rem; }
 .show-notes > summary { cursor: pointer; font-weight: 600; }
 .show-notes[open] > summary { margin-bottom: 0.4rem; }
 .show-notes p + p { margin-top: 0.5rem; }
+.addon-guest { display: grid; gap: 0.35rem; }
+.addon-guest-form { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.35rem 0.5rem; align-items: center; }
+.addon-guest-form label { grid-column: 1 / -1; font-weight: 600; }
+.addon-guest-form input { min-height: 36px; font: inherit; border: 1px solid var(--rule); border-radius: 8px; background: var(--card); color: var(--ink); padding: 0 0.5rem; min-width: 0; }
+.addon-guest .small:empty { display: none; }
+.roster-guest select { min-height: 32px; max-width: 60%; font: inherit; border: 1px solid var(--rule); border-radius: 8px; background: var(--card); color: var(--ink); }
 .react-line:empty { display: none; }
 .react-bar { gap: 0.35rem; }
 .react-more { display: grid; gap: 0.5rem; font-size: 0.9rem; }

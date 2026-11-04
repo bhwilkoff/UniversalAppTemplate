@@ -114,6 +114,7 @@
   var current = null;      // the session to lend the link window
   function signedOut() {
     show('signed-out');
+    $('[data-as-guest]').hidden = standalone;
     if (!window.HSGoogle || !GL) return;
     window.HSGoogle.mount({
       db: db, button: $('[data-google-signin]'), prompt: true,
@@ -123,11 +124,14 @@
     });
   }
   function proceed(session) {
+    // Signing in after coming in as a guest: start over as that person.
+    if (S.me && S.me.id !== session.user.id) { location.reload(); return; }
     current = session;
     try { localStorage.removeItem(OUT); } catch (e) {}
     // A tab without a GitHub token gets a fresh one first (GitHubToken).
     if (window.GitHubToken) window.GitHubToken.ensure(db, session);
-    if (!GL) return start(session);
+    // In a call nothing stands between a person and the session.
+    if (!GL || framed) return start(session);
     return db.from('profiles').select('github_login').eq('id', session.user.id).maybeSingle().then(function (p) {
       if (!p.error && GL.needsGitHub(p.data)) return show('link-github');
       start(session);
@@ -224,7 +228,7 @@
 
   // Only rows this person may read come back (the database's own rules),
   // so a teacher finds the cohorts they teach and a student their own.
-  function findCohort(code) {
+  function findCohort(code, joined) {
     var like = '%' + code + '%';
     return Promise.all([
       db.from('sessions').select('id, cohort_id, meet_url').ilike('meet_url', like),
@@ -236,6 +240,14 @@
       if (bad) return fail('The panel could not look up this call: ' + bad.error.message);
       var room = A.findRoom(code, { sessions: res[0].data, groups: res[1].data, teaching: res[2].data.map(function (t) { return t.cohort_id; }),
         anyCall: res[3].data.map(function (c) { return c.id; }) });
+      if (!room && !joined) {
+        // The link is the way in (Ben, November 4, 2026: "If you have access
+        // to the google meet link, you are a part of the cohort.").
+        return db.rpc('join_call', { code: code }).then(function (j) {
+          if (j.error) console.log('[addon] joining the call: ' + j.error.message);
+          return findCohort(code, true);
+        });
+      }
       if (!room) {
         $('[data-no-room-text]').textContent = 'This call’s code is ' + code + '. Each session’s call is the Meet link on its calendar invitation and its session page; open the panel from that call.';
         return show('no-room');
@@ -253,7 +265,8 @@
         db.from('sessions').select('*').eq('cohort_id', id).order('number'),
         db.from('enrollments').select('user_id, app_url, profiles(github_login, display_name)').eq('cohort_id', id).neq('status', 'left'),
         db.from('cohort_teachers').select('user_id, profiles(github_login, display_name)').eq('cohort_id', id),
-        db.from('groups').select('*, group_members(user_id)').eq('cohort_id', id).order('name')
+        db.from('groups').select('*, group_members(user_id)').eq('cohort_id', id).order('name'),
+        db.from('call_guests').select('*').eq('cohort_id', id).order('joined_at', { ascending: false })
       ]).then(function (res) {
         var bad = res.filter(function (r) { return r.error; })[0];
         if (bad) return fail('The session could not be loaded: ' + bad.error.message);
@@ -266,6 +279,7 @@
         S.teaching = res[2].data.some(function (t) { return t.user_id === S.me.id; });
         S.teacherIds = res[2].data.map(function (t) { return t.user_id; });
         S.people.concat(res[2].data).forEach(function (p) { if (p.profiles) S.names[p.user_id] = p.profiles.display_name || p.profiles.github_login; });
+        useGuests(res[4].data);
         var t = lib.currentAndNext(ss, new Date(), cohort.session_minutes);
         var named = standalone && standaloneNumber != null ? ss.filter(function (x) { return x.number === standaloneNumber; })[0] : null;
         S.session = named || (t.live ? t.next : (t.next || t.current));
@@ -297,6 +311,7 @@
           drawCode();
           startChat();
           startRecognition();
+          drawGuest();
           drawPart(true);
           show('ready');
           return refreshLive().then(listen);
@@ -417,6 +432,8 @@
       },
       onPresence: function (state) {
         S.presence = state;
+        var known = (S.guests || []).map(function (g) { return g.user_id; }).concat(S.teacherIds || [], S.people.map(function (p) { return p.user_id; }));
+        if (S.teaching && Object.keys(state || {}).some(function (id) { return known.indexOf(id) < 0; })) loadGuests();
         drawRoster();
         drawCode();
         if (S.onStage && S.onStage.kind === 'path') sendStage();
@@ -528,8 +545,81 @@
     var RL = window.RosterLib;
     if (!RL) return null;
     var people = S.people.map(function (p) { return { user_id: p.user_id, name: S.names[p.user_id] || 'Someone' }; });
-    return RL.roster(people, S.presence || {}, S.answers, RL.askingNow(S.checks, S.onStage));
+    // A guest tied to a member is that member, here.
+    var here = Object.assign({}, S.presence || {});
+    (S.guests || []).forEach(function (g) { if (g.member_id && here[g.user_id]) here[g.member_id] = here[g.user_id]; });
+    return RL.roster(people, here, S.answers, RL.askingNow(S.checks, S.onStage));
   }
+
+  // ------------------------------------------------------------------
+  // Guests: someone in the call who is not signed in as a member. They are
+  // in the session like anyone else; a leader can say which member they
+  // are, and their answers become that member's.
+  // ------------------------------------------------------------------
+
+  function useGuests(rows) {
+    S.guests = rows || [];
+    S.guests.forEach(function (g) { S.names[g.user_id] = g.name || 'A guest'; });
+    S.isGuest = !S.teaching && !S.people.some(function (p) { return p.user_id === S.me.id; });
+  }
+  function loadGuests() {
+    return db.from('call_guests').select('*').eq('cohort_id', S.cohort.id).order('joined_at', { ascending: false }).then(function (r) {
+      if (r.error) return;
+      useGuests(r.data);
+      drawRoster();
+      drawGuest();
+    });
+  }
+  function tieGuest(guest, member, status) {
+    status.textContent = 'Saving…';
+    return db.rpc('tie_call_guest', { c: S.cohort.id, guest: guest, member: member }).then(function (r) {
+      status.textContent = r.error ? 'Not saved: ' + r.error.message : '';
+      return Promise.all([loadGuests(), refreshLive()]);
+    });
+  }
+  function drawGuestRows(d) {
+    var present = S.presence || {};
+    var rows = (S.guests || []).filter(function (g) { return !g.member_id || present[g.user_id]; });
+    if (!rows.length) return;
+    d.appendChild(el('p', 'kicker', 'Guests'));
+    var ul = el('ul', 'roster-list');
+    rows.forEach(function (g) {
+      var li = el('li', 'roster-guest');
+      li.appendChild(el('span', 'roster-name', g.name || 'A guest'));
+      var sel = el('select');
+      sel.setAttribute('aria-label', 'Which member is ' + (g.name || 'this guest'));
+      sel.appendChild(new Option('Who is this?', ''));
+      S.people.forEach(function (p) { sel.appendChild(new Option(S.names[p.user_id] || 'Someone', p.user_id)); });
+      sel.value = g.member_id || '';
+      var status = el('span', 'small'); status.setAttribute('role', 'status');
+      sel.addEventListener('change', function () { tieGuest(g.user_id, sel.value || null, status); });
+      li.appendChild(sel);
+      li.appendChild(status);
+      ul.appendChild(li);
+    });
+    d.appendChild(ul);
+  }
+  function drawGuest() {
+    var box = $('[data-guest]');
+    box.hidden = !S.isGuest;
+    if (!S.isGuest) return;
+    var mine = (S.guests || []).filter(function (g) { return g.user_id === S.me.id; })[0] || {};
+    var name = $('[data-guest-name]');
+    if (document.activeElement !== name) name.value = mine.name || '';
+    $('[data-guest-form]').hidden = !!mine.member_id;
+    var line = $('[data-guest-line]');
+    line.hidden = !mine.member_id;
+    line.textContent = mine.member_id ? 'Your answers count as ' + (S.names[mine.member_id] || 'yours') + '.' : '';
+  }
+  $('[data-guest-form]').addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var status = $('[data-guest-status]');
+    db.rpc('join_call', { code: S.room.code, guest_name: $('[data-guest-name]').value }).then(function (r) {
+      status.textContent = r.error ? 'Not saved: ' + r.error.message : 'Saved.';
+      loadGuests();
+    });
+  });
+  $('[data-guest-signin]').addEventListener('click', function () { signedOut(); });
 
   // The teacher's roster: one line, opened for names. It is drawn from
   // presence while the call runs, and it never writes anything down.
@@ -557,6 +647,7 @@
     }
     list('Here now', r.here, false);
     list('Not here yet', r.missing, true);
+    drawGuestRows(d);
     var acts = el('div', 'actions');
     acts.appendChild(stageToggle('path', undefined, 'Put the path on the main stage', 'Take it off the main stage'));
     d.appendChild(acts);
@@ -972,6 +1063,7 @@
       var bad = res.filter(function (r) { return r.error; })[0];
       if (bad) { $('[data-sync]').textContent = 'The panel could not read the latest changes: ' + bad.error.message; return; }
       S.items = res[0].data; S.checks = res[1].data; S.answers = res[2].data;
+      if (S.isGuest) loadGuests();
       var visible = S.checks.filter(function (k) { return L.kindOf(k) !== 'short' && (S.teaching || k.show_tally); });
       // A question asked again (R17) needs its first results too, even closed.
       S.checks.forEach(function (k) {
@@ -1223,7 +1315,7 @@
   }
 
   function studentCheck(k) {
-    var answer = S.answers.filter(function (a) { return a.check_id === k.id && a.user_id === S.me.id; })[0];
+    var answer = S.answers.filter(function (a) { return a.check_id === k.id && (a.user_id === S.me.id || a.via_guest === S.me.id); })[0];
     var card = el('article', 'cohort-card live-check');
     card.appendChild(el('h3', null, k.prompt));
     var said = L.answerText(k, answer);
@@ -1494,6 +1586,18 @@
   // Opening
   // ------------------------------------------------------------------
 
+  function asGuest() {
+    return db.auth.signInAnonymously().then(function (r) {
+      if (r.error || !r.data || !r.data.session) { console.log('[addon] guest: ' + (r.error ? r.error.message : 'no session')); return signedOut(); }
+      proceed(r.data.session);
+    }, function () { signedOut(); });
+  }
+  $('[data-as-guest]').addEventListener('click', function () {
+    if (S.me) return show('ready');
+    try { localStorage.removeItem(OUT); } catch (e) {}
+    show('loading');
+    asGuest();
+  });
   function open() {
     show('loading');
     if (!cfg.cloudProjectNumber) return fail('This add-on is not set up yet: it needs its Google Cloud project number in assets/addon-config.js.');
@@ -1504,7 +1608,12 @@
       side.on('frameToFrameMessage', function (m) {
         if (m && A.isHello(m.payload)) { S.stageOn = true; stageButtons(true); sendStage(); S.codeStageSent = null; drawCode(); }
       });
-      return signIn().then(function (s) { if (s) proceed(s); else signedOut(); });
+      return signIn().then(function (s) {
+        if (s) return proceed(s);
+        if (signedOutOnPurpose()) return signedOut();
+        // No sign-in here: come in as a guest, with no screen in the way.
+        return asGuest();
+      });
     }, function () {
       show('outside');
     });
