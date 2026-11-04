@@ -216,22 +216,21 @@
       var row = el('div', 'session-prep-exchange');
       row.appendChild(el('h3', null, q.prompt));
       box.appendChild(row);
-      db.from('exchanges').select('id, title').eq('token', q.token).maybeSingle().then(function (r) {
-        if (r.error || !r.data) { row.appendChild(el('p', 'small', 'This exchange could not be found.')); return; }
+      // Through the exchange function: posts and other people's exchanges
+      // cannot be read directly, so a direct read always came back empty.
+      db.rpc('exchange', { t: q.token }).then(function (r) {
+        if (r.error || !r.data || r.data.private) { row.appendChild(el('p', 'small', 'This exchange could not be found.')); return; }
         var a = el('a', 'btn-secondary', r.data.title); a.href = '/exchange/#' + q.token;
         var acts = el('div', 'actions'); acts.appendChild(a); row.appendChild(acts);
-        var posts = db.from('exchange_posts').select('author_id').eq('exchange_id', r.data.id);
+        var posts = r.data.posts || [], maker = r.data.maker && r.data.maker.name;
         if (leading) {
-          return Promise.all([posts, db.from('enrollments').select('user_id').eq('cohort_id', cohort.id).neq('status', 'left')]).then(function (res) {
-            var by = {}; (res[0].data || []).forEach(function (p) { by[p.author_id] = true; });
-            var people = (res[1].data || []).map(function (e) { return e.user_id; });
-            row.appendChild(el('p', 'ui-meta-line', people.filter(function (id) { return by[id]; }).length + ' of ' + people.length + ' have replied.'));
+          return db.from('enrollments').select('user_id').eq('cohort_id', cohort.id).neq('status', 'left').then(function (e) {
+            var names = [];
+            posts.forEach(function (p) { var n = p.author && p.author.name; if (n && n !== maker && names.indexOf(n) < 0) names.push(n); });
+            row.appendChild(el('p', 'ui-meta-line', names.length + ' of ' + (e.data || []).length + ' have replied' + (names.length ? ': ' + names.join(', ') : '') + '.'));
           });
         }
-        if (!K.me) return;
-        return posts.eq('author_id', K.me.id).limit(1).then(function (p) {
-          acts.appendChild(U.status('task', p.data && p.data.length ? 'done' : 'todo'));
-        });
+        if (K.me) acts.appendChild(U.status('task', posts.some(function (p) { return p.mine; }) ? 'done' : 'todo'));
       });
     });
   }
