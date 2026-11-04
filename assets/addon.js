@@ -766,13 +766,28 @@
     drawNowActivity();
     drawChecksChrome();
     sendStage();
-    // Opened mid-session, the panel starts at the part that is on (found
-    // in the live Meet test: it opened at the top of the plan).
-    if (key && !S.shownNow) {
-      S.shownNow = true;
-      setTimeout(function () { var it = root.querySelector('[data-show] [aria-current="step"]'); if (it && it.scrollIntoView) it.scrollIntoView({ block: 'start' }); }, 300);
+    // The panel goes where the session goes, every time, and a learner
+    // lands on what is being asked (found in a real call: the stage said to
+    // answer in the panel, and the box was three screens below the plan's
+    // top). A question draws a moment after its part, so it looks twice.
+    if (key && key !== S.shownKey) {
+      S.shownKey = key;
+      setTimeout(showNow, 300);
+      setTimeout(showNow, 1500);
     }
   }
+  function showNow() {
+    var active = document.activeElement;
+    if (active && /^(TEXTAREA|INPUT|SELECT)$/.test(active.tagName)) return;
+    var it = root.querySelector('[data-show] [aria-current="step"]');
+    if (!it) return;
+    var ask = S.teaching ? null : it.querySelector('[data-questions]');
+    var to = ask && ask.querySelector('textarea, input, button') ? ask : it;
+    if (to.scrollIntoView) to.scrollIntoView({ block: 'start' });
+  }
+  // Closing the panel only hides it, and a hidden page cannot scroll, so
+  // it finds its place again when it comes back.
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) setTimeout(showNow, 100); });
 
   function drawNowActivity() {
     var part = partNow();

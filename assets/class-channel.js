@@ -53,6 +53,10 @@
     mount.appendChild(stances);
     // The stage I am on (R11), shared only if the person picks it,
     // and remembered in this browser for the next call.
+    // Folded, because this bar stays on screen and the part above it needs
+    // the room (found in a real call: it took half the panel).
+    var more = el('details', 'react-more');
+    more.appendChild(el('summary', null, 'More'));
     var RL = window.RosterLib, memKey = o.cohort ? 'hs-path-stage:' + o.cohort.id : null;
     if (RL) {
       var where = el('label', 'path-pick');
@@ -67,10 +71,11 @@
         track();
       });
       where.appendChild(sel);
-      mount.appendChild(where);
+      more.appendChild(where);
     }
-    var HINT = 'Keys 1 to 8 react, and A, U, and D say where you stand, while this panel has focus.';
-    var line = el('p', 'react-line small', HINT);
+    more.appendChild(el('p', 'small', 'Keys 1 to 8 react, and A, U, and D say where you stand, while this panel has focus.'));
+    mount.appendChild(more);
+    var line = el('p', 'react-line small');
     mount.appendChild(line);
 
     function flash(b) {
@@ -156,7 +161,7 @@
           .subscribe(function (state) {
             if (mine !== channel) return;
             live = state === 'SUBSCRIBED';
-            if (live) { tries = 0; line.textContent = HINT; line.classList.remove('is-warning'); track(); return; }
+            if (live) { tries = 0; line.textContent = ''; line.classList.remove('is-warning'); track(); return; }
             if (state === 'CHANNEL_ERROR' || state === 'TIMED_OUT' || state === 'CLOSED') {
               line.textContent = 'Reactions are not reaching the class just now. They will come back when the connection does.';
               line.classList.add('is-warning');
