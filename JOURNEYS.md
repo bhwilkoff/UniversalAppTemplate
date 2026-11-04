@@ -471,8 +471,18 @@ cleaned up afterward), fixes what is broken or hard to use, checks the
 last tick's fixes once Meet has the new page, and marks the item here
 with what it found.
 
-- [ ] Learners inside Meet as participants. The add-on is public now, so
-      the test profiles can install it from the listing.
+- [x] Learners inside Meet as participants (November 4, after Week 1,
+      where no learner could see the stage). Leader meet@, learners on
+      their own Google accounts in a real call. Joining now opens both
+      the stage and the panel; a learner must press Join activity each
+      time the stage opens, because Meet never joins for them. Fixed: the
+      activity named no side panel, so the stage had nothing to show; the
+      stage now keeps asking its panel and says what to do when none
+      answers; the panel follows the session to what is being asked; a
+      Writing part gives a place to write; other parts' questions close.
+      Still untested: installing from the join notice, a learner whose
+      Google account has no Human Shaped account yet, and Screen share
+      your view (Meet refused it from an automated click).
 - [x] Two learners at once: the queue order, answers, who is here.
       Order, handoff, both answers, and 2 of 2 here all held. Fixed: a
       presenter read "shows You's work instead of this part"; the first in

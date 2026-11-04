@@ -1428,7 +1428,7 @@
     Promise.resolve(side.startActivity({ mainStageUrl: location.origin + '/addon/stage/', sidePanelUrl: location.origin + '/addon/' })).then(function () {
       S.stageOn = true;
       stageButtons(true);
-      status.textContent = 'The main stage is open. Meet asks everyone in the call to join it.';
+      status.textContent = 'The main stage is open. Ask everyone to press Join activity at the top of Meet.';
     }, function (err) {
       status.textContent = 'The main stage did not open: ' + (err && err.message ? err.message : 'Meet gave no reason') + '.';
     });

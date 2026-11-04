@@ -1188,3 +1188,16 @@ reminders. Never move a running cohort's events, because that changes Meet
 links people already have, so Minerva stays on meet@ (`calendar_by = 'meet'`).
 Offer no session length choice. Details: research/notes/calendar-ownership-notes.md.
 
+## Learners join the main stage through their own panel
+
+**Every activity names both frames, and a learner's stage depends on that
+learner's own signed-in panel.** A Writing part asks its prompt in words,
+private to leaders, like a question part.
+**Why:** in Week 1 (November 4, 2026) no learner saw the stage or the
+panel, because `startActivity` named only the main stage: Meet opened
+nothing beside it, and the stage stayed on its welcome line. Learners in
+Meet had been the one unchecked item on the add-on list.
+**How to apply:** test any change to the stage with a second participant
+in a real call. Leaders tell learners to press Join activity, each time
+the stage opens. If signing in on the panel keeps stopping learners, the
+next step is a stage fed by the leader, which needs no learner sign-in.
