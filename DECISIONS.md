@@ -1130,3 +1130,20 @@ keeps replaced history, and from a leader's levers, never from a paid
 feature. Notifications move to GitHub's own (watching and mentions), with
 schedules in Actions in a public repository. Design and what is still
 waiting: research/notes/cohort-repository-design.md.
+
+## The session page has one way in (November 4, 2026)
+
+**Everyone joins with "Join the call", and the add-on is installed
+beforehand; the session page offers no panel of its own** (Ben: "With the
+Google Meet add-on approved, we should be able to simplify the session
+page to allow for simply joining the session with the add-on installed").
+
+**Why:** the panel buttons existed only until Google approved the listing,
+and two ways in made learners choose between them before a session they
+had not seen yet.
+
+**How to apply:** put no panel, live control, or second join on /session/.
+Someone on a phone is in the call without the panel, and someone whose
+school turns add-ons off joins with a personal Google account; /meet/ and
+/support/ say both. `/addon/?c=&s=` stays working, because the add-on's
+sign-in failure link needs it.

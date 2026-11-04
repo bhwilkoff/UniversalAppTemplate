@@ -7,9 +7,8 @@ Google Meet, with the part of the session, its timer, the queue of work
 to show, and the checks for understanding in Meet's own side panel, and
 a calm main stage they can present to everyone. On October 3, 2026, I
 decided the add-on has to be open and free for anyone teaching or taking
-a cohort (DECISIONS.md, "The classroom on Meet"), so we test it on our
-own accounts first and then list it publicly on the Google Workspace
-Marketplace.
+a cohort (DECISIONS.md, "The classroom on Meet"), and it is listed
+publicly on the Google Workspace Marketplace.
 
 **The add-on is two pages on humanshaped.org, and Google only frames them.**
 
@@ -21,9 +20,11 @@ Marketplace.
   check's question (with the anonymous count only when the teacher
   shows it), or someone's work from the queue.
 
-It never records, measures, or joins the call as a participant. It asks
-Google for no permissions at all, and it reads nothing from Meet except
-the meeting code.
+It never measures anyone or joins the call as a participant. From Google
+it asks only to sign you in (name, email address, and profile picture),
+and it reads nothing from Meet except the meeting code. Recording happens
+in `/record/`, a window the panel opens, because Meet's frame cannot
+capture.
 
 ## What it costs
 
@@ -104,11 +105,17 @@ it, what it never does), /cohorts/#meet summarizes it, and both setup
 lists (a learner's Getting ready, a leader's Before the first session)
 carry "Add Human Shaped to Google Meet", linking /meet/#add. The hub
 cannot see whether someone installed it, so neither step is ever marked
-done. The session page's "Open the session panel" stays, for phones
-(Meet runs add-ons only in a computer's browser) and for school accounts
-whose admins turn add-ons off.
+done.
 
-## Who could use it, October 23, 2026
+The session page has one button, "Join the call" (Ben, November 4, 2026;
+JOURNEYS.md, "One way in"). Meet runs add-ons only in a computer's
+browser, and school admins can turn them off, so /meet/ and /support/ say
+to join from a computer, with a personal Google account where a school
+blocks add-ons. `/addon/?c=<slug>&s=<number>` still opens the panel
+outside Meet: the add-on's sign-in failure link uses it, and a leader can
+send it to someone who is stuck.
+
+## Who could use it, October 23, 2026 (history)
 
 Ben: "The session page should functionally only be to prep the session.
 All of the other work that a Leader should be doing in the session should

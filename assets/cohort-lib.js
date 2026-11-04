@@ -58,7 +58,7 @@
     { key: 'value', name: 'One value at work', minutes: 6, what: 'Back together, one person shares a decision their values changed this week and what it cost them, and your leader names one thing they heard across the groups.' }, // kit: content
     { key: 'prompt', name: 'Read one real prompt, trying first', minutes: 22, what: 'Write the prompt you would send for the situation on screen, compare it with a partner, and then see the real one and talk about the difference.' }, // kit: content
     { key: 'start', name: 'Start', minutes: 9, what: 'Send this week\u2019s first prompt to your agent before you leave, with a room open for anyone who is stuck.' },
-    { key: 'check', name: 'Check for understanding', minutes: 3, what: 'Answer your leader\u2019s two questions privately, on this page: this week\u2019s question, and what is still muddy.' }
+    { key: 'check', name: 'Check for understanding', minutes: 3, what: 'Answer your leader\u2019s two questions privately, in your panel: this week\u2019s question, and what is still muddy.' }
   ];
   function agenda(minutes, parts) {
     parts = parts || PARTS;
@@ -171,8 +171,7 @@
   // In the order a learner meets them (JOURNEYS.md, J2 to J4): GitHub's
   // invitation, which arrives as they join; getting set up, which ends
   // with the app live at an address; telling the cohort where it is; and
-  // the Meet add-on, which the hub cannot see either (the session page's
-  // panel stands in for it).
+  // the Meet add-on, which the hub cannot see either.
   function setupSteps(mine, access, cohort) {
     var steps = [];
     if (cohort && cohort.github_team) {

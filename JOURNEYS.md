@@ -158,11 +158,8 @@ Open the call from the calendar event or the session page, then open the
 Human Shaped add-on in Meet's side panel. The add-on shows the same
 session: where we are, the clock, the checks, the rooms, and the queue of
 work to show. Changes made on the fly are made there, in Meet, and they
-are what the session page shows afterward. **Change:** the add-on becomes
-the one place a session is run, and the session page says so with a
-"Runs in Google Meet" status rather than offering a second copy. Until the
-add-on can be installed by any leader (Decision 4), the session page keeps
-a "Run it here" fallback that opens the same controls.
+are what the session page shows afterward. The add-on is the one place a
+session is run, and the session page offers no second copy.
 
 ### L7. After the session
 
@@ -242,8 +239,8 @@ history, which stays readable.
 
 - **Before:** the title, the time on your clock, "Join the call" (the Meet
   link), what to bring, and the plan. Leaders edit the plan here.
-- **During:** the same page, now marked live, follows the add-on: the part
-  we are on, the checks to answer, your group's room.
+- **During:** the same page, now marked live, is for reference. Everything
+  the session does happens in the add-on, inside the call.
 - **After:** the recording, the checks, and what is next.
 
 The Sessions section lists the sessions, and each row opens its page.
@@ -336,6 +333,20 @@ further purpose for the leader (other than as reference)."
 This replaces decision 4's "Run it here" fallback and S1's "During": the
 session page never carries live controls. Leaders prepare there; they run
 the session only in the add-on, inside the Meet call.
+
+## One way in: Join the call (Ben, November 4, 2026)
+
+Ben: "With the Google Meet add-on approved, we should be able to simplify
+the session page to allow for simply joining the session with the add-on
+installed."
+
+Google approved the listing on October 29, so the session page's learner
+buttons ("Join the call and open your panel", "Open the session panel")
+are gone, and everyone has the one "Join the call". The add-on goes on in
+setup, and /meet/ says to join from a computer, with a personal Google
+account where a school turns add-ons off. The panel still opens outside
+Meet at `/addon/?c=<slug>&s=<number>`, which is how the add-on's own
+sign-in failure link works, but the session page no longer offers it.
 
 ## The walk-through audit, October 23, 2026
 
@@ -453,8 +464,8 @@ cleaned up afterward), fixes what is broken or hard to use, checks the
 last tick's fixes once Meet has the new page, and marks the item here
 with what it found.
 
-- [ ] Learners inside Meet as participants (needs the add-on installed in
-      the test profiles; until then, the panel outside Meet). Waits on Ben.
+- [ ] Learners inside Meet as participants. The add-on is public now, so
+      the test profiles can install it from the listing.
 - [x] Two learners at once: the queue order, answers, who is here.
       Order, handoff, both answers, and 2 of 2 here all held. Fixed: a
       presenter read "shows You's work instead of this part"; the first in

@@ -5,10 +5,8 @@
 // session page on humanshaped.org should serve no further purpose for the
 // leader (other than as reference)." So it holds no live controls: when
 // the session is, its call, what to bring, and the plan with each part's
-// words, which its leaders change here. While a session runs, learners get
-// one button to the add-on's panel outside Meet, for anyone whose phone or
-// school account cannot run Meet add-ons; leaders run it from the add-on
-// inside Meet (/meet/).
+// words, which its leaders change here. Everyone joins with one button,
+// and the session itself happens in the add-on inside Meet (/meet/).
 (function () {
   var root = document.querySelector('[data-session]');
   if (!root || !window.supabase || !window.HUB || !window.CohortLib) return;
@@ -64,7 +62,7 @@
           var live = !!(t.live && t.next && t.next.id === session.id);
           // A session its leader is still running counts as on, even past
           // its hour (found in the loop's live test: running over, the page
-          // said Finished and took away the learners' panel).
+          // said Finished and took away Join the call).
           var ends = session.starts_at ? Date.parse(session.starts_at) + cohort.session_minutes * 60000 : null;
           if (live || ends == null || ends > Date.now() || ends < Date.now() - 3 * 3600000) return draw(cohort, sessions, session, live, leading);
           return db.from('show_state').select('current_scene, updated_at').eq('session_id', session.id).maybeSingle().then(function (st) {
@@ -94,23 +92,9 @@
     $('[data-scope]').textContent = session.scope || '';
     $('[data-scope]').hidden = !session.scope;
 
-    // What a person does from here: join the call, and, while it runs, a
-    // learner's panel outside Meet; afterward, the recording.
+    // What a person does from here: join the call; afterward, the recording.
     var acts = $('[data-actions]'); acts.replaceChildren();
     if (!finished && safe(session.meet_url)) acts.appendChild(link('Join the call', session.meet_url, 'btn-primary', true));
-    // One press for a learner while it runs: the call opens in its own
-    // tab and this tab becomes their panel (Prep's recording, October 28:
-    // learners could not find "Open the session" beside "Join the call").
-    var panelUrl = '/addon/?c=' + encodeURIComponent(cohort.slug) + '&s=' + session.number;
-    var soon = !finished && session.starts_at && Date.parse(session.starts_at) - 15 * 60000 <= Date.now();
-    if ((live || soon) && !leading) {
-      var join = acts.querySelector('a.btn-primary');
-      if (join) {
-        join.textContent = 'Join the call and open your panel';
-        join.addEventListener('click', function () { setTimeout(function () { location.href = panelUrl; }, 300); });
-      }
-      acts.appendChild(link('Open the session panel', panelUrl, 'btn-secondary', true));
-    }
     // A recording the recorder put in Drive plays here, through the relay,
     // for anyone who can read this session (the cohort and its leaders).
     var play = window.RecordLib && safe(session.recording_url) ? window.RecordLib.playUrl(session.recording_url, window.HUB.videoRelay) : null;

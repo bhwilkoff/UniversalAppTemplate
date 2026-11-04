@@ -122,7 +122,7 @@ role you hold and the role named on the page, never a switcher.
 | `/` | Your home | Follow a row to the thing |
 | `/account/` | Your account | How you sign in, linked accounts, how leaders reach you, your data, sign out, delete; confirm joining one cohort (`?join=`) |
 | `/cohort/?c=` | One cohort: This week, Sessions, Conversation, Try my app, Files, Exchanges, People, and Your work (learners) or Settings (leaders) | Read the week, join a session, bring something back, keep your app; a leader sets it up and runs it from the same sections |
-| `/session/?c=&s=` | One session, before, during, and after it (JOURNEYS.md, S1); `/live/` forwards here | Join the call, read the plan, take part; a leader changes the plan and runs it |
+| `/session/?c=&s=` | One session: its time, its call, what to bring, the plan, and afterward the recording (JOURNEYS.md, S1); `/live/` forwards here | Join the call and read the plan; a leader changes the plan, and runs it in the add-on inside Meet |
 | `/board/?c=`, `/card/?c=` | A session's board; its card | Draw; show the card |
 | `/exchange/#<link>` | One exchange | Watch, add a video |
 | `/exchanges/` | Your exchanges | Open one, start one |
