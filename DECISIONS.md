@@ -1236,3 +1236,21 @@ break parts stay live. Next slide walks a part's deck, then the plan
 `scenes` and must never receive notes: the source is in `scene_decks`, for
 leaders. A part without slides shows its words as before. Change the renderer
 only through `tools/deck-kit/build.sh`.
+
+## Breakouts run through the add-on, from start to finish
+
+**A leader launches, watches, and calls back from their panel, and a learner's
+panel does the rest. Each room is its own Meet call.** Ben, November 4, 2026: "If
+we can leverage the add-on from start to finish, we can make this all work."
+**Why:** no Google API or add-on call can make Meet's own breakouts or move a
+person, and those rooms need a paid plan. A panel can do everything else.
+**How to apply:** rooms come from `breakout_rooms`, one pool of Meet links shared
+by every cohort and lent for four hours, so Launch needs nothing set up. A breakout
+is a `groups` row with `breakout` true, so a panel knows its room by the call's
+code, and `live_signals` carry go and come back. Each panel puts its room in the
+class channel's presence, which is how a leader sees who arrived. A group with its
+own room launches the same way, with no pool. Pool links are made from
+meet.google.com/new as meet@: an empty room took a personal Gmail account with no
+host and no knocking (November 4, 2026). Add more before a cohort needs more rooms
+than the pool holds. The learner leaves the main call by hand, because a panel
+cannot end a call; a Chrome extension could do that, and is not built.

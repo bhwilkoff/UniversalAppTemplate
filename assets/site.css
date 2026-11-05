@@ -1757,6 +1757,7 @@ div.slide-pick { cursor: default; }
 .breakouts-room-name { font-weight: 600; }
 .breakouts-names { grid-column: 1; }
 .breakouts-rooms .btn-secondary { grid-column: 2; grid-row: 1 / span 2; }
+[data-questions] { scroll-margin-top: 8rem; }
 .show-slide-place { margin: 0; }
 .show-slide-note { font-weight: 600; white-space: pre-line; }
 .react-line:empty { display: none; }

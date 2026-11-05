@@ -651,7 +651,8 @@
     var open = box.querySelector('details') && box.querySelector('details').open;
     box.replaceChildren();
     var d = el('details'); d.open = !!open;
-    d.appendChild(el('summary', null, RL.summary(r, asking)));
+    var guests = (S.guests || []).filter(function (g) { return !g.member_id && (S.presence || {})[g.user_id]; }).length;
+    d.appendChild(el('summary', null, RL.summary(r, asking).replace(/\.$/, '') + (guests ? ', ' + guests + (guests === 1 ? ' guest' : ' guests') : '') + '.'));
     function list(title, rows, missing) {
       if (!rows.length) return;
       d.appendChild(el('p', 'kicker', title));
@@ -770,7 +771,7 @@
   function drawFrame() {
     $('[data-cohort-title]').textContent = S.cohort.title;
     var group = S.room.groupId ? S.groups.filter(function (g) { return g.id === S.room.groupId; })[0] : null;
-    $('[data-where]').textContent = (window.CohortLib ? window.CohortLib.sessionName(S.session.number) : 'Week ' + S.session.number) + (group ? ', ' + group.name + '’s room' : S.groups.length ? ', the main room' : '') + (S.teaching ? '. You are leading.' : '.') + (S.room.ambiguous ? ' Another cohort uses this call too.' : '');
+    $('[data-where]').textContent = (window.CohortLib ? window.CohortLib.sessionName(S.session.number) : 'Week ' + S.session.number) + (group ? ', ' + (group.breakout ? group.name : group.name + '’s room') : S.groups.length ? ', the main room' : '') + (S.teaching ? '. You are leading.' : '.') + (S.room.ambiguous ? ' Another cohort uses this call too.' : '');
     var full = $('[data-full-link]'); full.href = '/session/?c=' + encodeURIComponent(S.cohort.slug) + '&s=' + S.session.number;
     // Outside Meet, this page already is the browser tab.
     full.hidden = standalone;

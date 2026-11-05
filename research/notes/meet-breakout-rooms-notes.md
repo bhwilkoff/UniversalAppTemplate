@@ -189,4 +189,4 @@ a privacy policy page. Keep space creation on meet@.
 2. Leaders cannot see who reached which room: nothing is read from Meet.
 3. Ben, after using them on October 4: "overly conveluted".
 
-**Proposed.** One press for the learner. Go to my room opens the room, and a small Human Shaped window beside it that outlives the call: the group's time left, whose turn it is, and, when the leader calls everyone back, a sound and one button. That window is also how the leader sees who has arrived, through the class channel. The recorder already proves a window opened from the panel can carry its sign-in. No new Google permission, no cost.
+**Proposed, and not taken.** Ben chose to run everything through the add-on instead (DECISIONS.md). One press for the learner. Go to my room opens the room, and a small Human Shaped window beside it that outlives the call: the group's time left, whose turn it is, and, when the leader calls everyone back, a sound and one button. That window is also how the leader sees who has arrived, through the class channel. The recorder already proves a window opened from the panel can carry its sign-in. No new Google permission, no cost.

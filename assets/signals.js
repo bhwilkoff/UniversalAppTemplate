@@ -131,6 +131,7 @@
         if (mainUrl) acts.appendChild(link('Back to the main room', 'btn-primary', mainUrl));
         else acts.appendChild(el('p', 'small', 'The main room is the session’s own Meet call.'));
         box.appendChild(acts);
+        if (opts.inRoom && opts.inRoom()) box.appendChild(el('p', 'small', 'Then leave this room.'));
         return;
       }
       // In a room's own call there is nowhere to go: its time is what matters.

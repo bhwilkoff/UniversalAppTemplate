@@ -473,6 +473,19 @@ it to everyone. Found on the way: no part but a question could be saved on the
 session page, because a hidden required box stopped the form with nothing on
 screen.
 
+## Breakouts from the add-on (November 4, 2026)
+
+Tested end to end in a real call, leader and a guest: Breakouts in the leader's
+panel, rooms lent from the pool, Launch bringing Go to your room to the learner's
+panel, the learner's add-on knowing its room by the call's code, the leader seeing
+1 of 2 there, a question reaching the room and its answer reaching the leader in
+the main call, Call everyone back reaching the room's add-on, and End breakouts
+returning the rooms. Found on the way: a guest who arrived after the panel opened
+was left out of the rooms.
+
+Not tried: two rooms at once, a learner returning to the main call through the
+button, or more than one person in a room.
+
 ## The add-on checklist (the testing loop, from October 23, 2026)
 
 Each tick takes the next unchecked item, tests it live (meet@ leading in
