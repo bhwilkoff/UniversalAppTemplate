@@ -188,6 +188,10 @@
     // uses, and the teacher's own note.
     function form(s, index) {
       var f = el('form', 'inline-form scene-form');
+      // ShowLib.problem checks a part. The browser's own check would stop on
+      // the hidden question form's required box, with nothing on screen (found
+      // saving slides: no part but a question could be saved here).
+      f.noValidate = true;
       var c = (s && s.config) || {};
       function field(label, input, hint) {
         var l = el('label', null, label);
