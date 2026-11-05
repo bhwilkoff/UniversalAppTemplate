@@ -82,7 +82,7 @@
     function go(key, slide) { return write({ current_scene: key, stage: 'scene', stage_ref: null, slide: slide || 0 }); }
     function slidesIn(key) {
       var s = list().filter(function (x) { return x.key === key; })[0];
-      return s && SD ? SD.count(s.slides) : 0;
+      return s && SD ? SD.frames(s.slides).length : 0;
     }
     // Back and next walk a part's slides first, then the parts.
     function step(delta) {

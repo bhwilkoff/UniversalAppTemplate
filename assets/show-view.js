@@ -159,7 +159,7 @@
         var sl = info.slide;
         b.place.hidden = !sl;
         b.place.textContent = sl ? 'Slide ' + (sl.at + 1) + ' of ' + sl.count : '';
-        if (b.next) b.next.textContent = sl && sl.at < sl.count - 1 ? 'Next slide' : 'Next part';
+        if (b.next) b.next.textContent = sl ? sl.next : 'Next part';
         var it = items[key];
         if (it.slideNote) {
           var said = sl && sl.note ? sl.note : '';

@@ -46,3 +46,14 @@ test('a note goes under the line the caret is on', () => {
   const r = lib.insertNote('## A\n\n---\n\n## B\n', 2);
   assert.deepEqual(lib.notes(r.text).map((n) => !!n), [true, false]);
 });
+test('a slide marked to build stops at each line, and the mark never reaches the renderer', () => {
+  const t = '## Plain\n\n- a\n- b\n\n---\n\n## Step {.build}\n\n- one\n- two\n\n> a note\n\n---\n\n## Both {.two .build}\n\n- l\n\n|\n\n- r\n';
+  assert.deepEqual(lib.frames(t), [
+    { slide: 0, shown: Infinity }, { slide: 1, shown: 1 }, { slide: 1, shown: Infinity }, { slide: 2, shown: 1 }, { slide: 2, shown: Infinity }
+  ]);
+  assert.equal(/build/.test(lib.deck(t)), false);
+  assert.match(lib.deck(t), /## Both \{\.two\}/);
+  assert.match(lib.deck(t), /## Step\n/);
+  assert.equal(lib.frameOf(t, 1), 2);
+  assert.equal(lib.frameOf(t, 0), 0);
+});

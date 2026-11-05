@@ -19,6 +19,45 @@
   }
   function count(text) { return split(text).length; }
 
+  // A slide marked {.build} shows its lines one at a time. The renderer does
+  // not know the mark, so it comes out of what the renderer reads.
+  var BUILD = /^##.*\{[^}]*\.build\b/;
+  function clean(text) {
+    return String(text || '').split('\n').map(function (l) {
+      if (!BUILD.test(l)) return l;
+      return l.replace(/\s*\.build\b/, '').replace(/\s*\{\s*\}\s*$/, '').replace(/\{\s+/, '{');
+    }).join('\n');
+  }
+  // The lines a slide can reveal: everything under its headline, outside a
+  // fence, but for notes and the column mark.
+  function lines(slide) {
+    var fence = false, n = 0;
+    slide.forEach(function (l) {
+      if (/^```/.test(l)) { fence = !fence; return; }
+      if (fence || !l.trim() || /^##/.test(l) || /^>/.test(l) || /^\|\s*$/.test(l)) return;
+      n += 1;
+    });
+    return n;
+  }
+  // Every stop in a deck, in order: { slide, shown }, where shown is how many
+  // of its lines are drawn (Infinity for all of them).
+  function frames(text) {
+    var out = [];
+    split(text).forEach(function (s, i) {
+      var build = s.some(function (l) { return BUILD.test(l); });
+      var n = build ? lines(s) : 0;
+      if (n < 2) { out.push({ slide: i, shown: Infinity }); return; }
+      for (var k = 1; k <= n; k++) out.push({ slide: i, shown: k === n ? Infinity : k });
+    });
+    return out;
+  }
+  // The stop that shows a slide whole, for the leader's stage while editing.
+  function frameOf(text, slide) {
+    var f = frames(text), at = 0;
+    f.forEach(function (x, i) { if (x.slide <= slide) at = i; });
+    return at;
+  }
+
   function withoutNotes(text) {
     return String(text || '').split('\n').filter(function (l) { return !/^>/.test(l); }).join('\n').trim();
   }
@@ -30,7 +69,7 @@
   }
 
   // What the renderer reads: the site's look, and no closing QR code.
-  function deck(text) { return text ? HEAD + String(text) : ''; }
+  function deck(text) { return text ? HEAD + clean(text) : ''; }
 
   // A step inside a part's deck, or null when the step leaves the part.
   function step(total, at, delta) {
@@ -45,12 +84,13 @@
   // example to write over rather than a blank to fill in.
   var ADD = [
     { key: 'slide', label: 'Slide', text: '## One idea, in a few words\n\n- What you will say about it\n' },
+    { key: 'build', label: 'Point by point', text: '## One idea, a point at a time {.build}\n\n- The first point\n- The next point\n- The last point\n' },
     { key: 'title', label: 'Title', text: '## A title {.title}\n\nA line under it\n' },
     { key: 'two', label: 'Two columns', text: '## Two sides {.two}\n\n- On the left\n\n|\n\n- On the right\n' },
     { key: 'icon', label: 'Big icon', text: '## :lightbulb: One idea {.icon}\n\n- Beside a big icon\n' },
-    { key: 'table', label: 'Table', text: '## A table\n\n```sheet\nName | Count:number\n--- | ---\nFirst | 3\nSecond | 5\n```\n' },
+    { key: 'table', label: 'Table', text: '## A table\n\n```sheet\nName | Count\n--- | ---\nFirst | 3\nSecond | 5\n```\n' },
     { key: 'chart', label: 'Chart', text: '## A chart\n\n```sheet\n---\nchart: bar\n---\nName | Count:number\n--- | ---\nFirst | 3\nSecond | 5\n```\n' },
-    { key: 'diagram', label: 'Diagram', text: '## A diagram\n\n```diagram\n---\nkind: flow\n---\n- First\n- Then\n- Last\n```\n' }
+    { key: 'diagram', label: 'Diagram', text: '## A diagram\n\n```diagram\n---\nkind: mind\n---\n- The center\n  - One branch\n  - Another branch\n```\n' }
   ];
   var NOTE = '> What you want to remember to say\n';
 
@@ -87,7 +127,7 @@
   }
   function slideAt(text, caret) { return Math.max(0, count(String(text || '').slice(0, caret)) - 1); }
 
-  var lib = { HEAD: HEAD, split: split, count: count, withoutNotes: withoutNotes, notes: notes, deck: deck, step: step, arrive: arrive, ADD: ADD, NOTE: NOTE, insert: insert, insertNote: insertNote, offset: offset, slideAt: slideAt };
+  var lib = { HEAD: HEAD, split: split, count: count, withoutNotes: withoutNotes, notes: notes, deck: deck, clean: clean, frames: frames, frameOf: frameOf, step: step, arrive: arrive, ADD: ADD, NOTE: NOTE, insert: insert, insertNote: insertNote, offset: offset, slideAt: slideAt };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
   else root.SlidesLib = lib;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

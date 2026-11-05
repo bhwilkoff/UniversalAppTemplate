@@ -851,11 +851,13 @@
   function slideNow() { return shared() && S.run.slide ? S.run.slide() : 0; }
   function slideInfo() {
     var part = partNow(), SD = window.SlidesLib;
-    var total = part && SD ? SD.count(part.slides) : 0;
-    if (!total) return null;
-    var at = Math.min(slideNow(), total - 1);
+    var stops = part && SD ? SD.frames(part.slides) : [];
+    if (!stops.length) return null;
+    var here = Math.min(slideNow(), stops.length - 1), stop = stops[here];
+    var next = stops[here + 1];
     var source = S.teaching ? (S.decks || {})[part.key] : null;
-    return { at: at, count: total, note: source ? SD.notes(source)[at] || '' : '' };
+    return { at: stop.slide, count: SD.count(part.slides), note: source ? SD.notes(source)[stop.slide] || '' : '',
+      next: !next ? 'Next part' : next.slide === stop.slide ? 'Next point' : 'Next slide' };
   }
   function slidesView(part) {
     var SD = window.SlidesLib;
@@ -863,7 +865,10 @@
     var drafting = S.draft && S.draft.key === part.key && S.draft.fields.slides != null;
     var text = drafting ? SD.withoutNotes(S.draft.fields.slides) : part.slides;
     if (!text) return null;
-    return { text: SD.deck(text), at: drafting ? S.draft.fields.slide_at || 0 : slideNow() };
+    var stops = SD.frames(text);
+    var at = drafting ? SD.frameOf(text, S.draft.fields.slide_at || 0) : Math.min(slideNow(), stops.length - 1);
+    var stop = stops[at] || { slide: 0, shown: Infinity };
+    return { text: SD.deck(text), at: stop.slide, shown: stop.shown === Infinity ? 0 : stop.shown };
   }
   function pinnedText() {
     var on = S.onStage;

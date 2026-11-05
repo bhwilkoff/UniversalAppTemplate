@@ -27,9 +27,13 @@ fetches it when opened.
   only through the deck kit.
 - Learners can read `scenes`, so speaker notes cannot live there.
 
-## Not done yet
+## Added after the first test
 
-- Charts and diagrams sit on a white card, in the renderer's blue.
-- Bullets do not appear one at a time.
-- Clicking on a slide to change its words: the words are changed in the text.
-- A deck in the plan on the session page is shown to learners only as the part's words.
+- Tables, charts, and diagrams now take the site's palette, in `tools/deck-kit/entry.ts`: each of the renderer's colors maps to one of ours, and a table with no chart is drawn as a plain table, not a spreadsheet.
+- `{.build}` on a headline shows a slide's lines one at a time. `show_state.slide` counts stops, not slides (`SlidesLib.frames`).
+- A click on words in a session page preview selects them in the text.
+- Everyone can read a part's slides in the plan.
+
+## Not done
+
+- Pictures on a slide. The format has icons but no images.

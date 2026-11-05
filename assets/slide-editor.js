@@ -7,7 +7,7 @@
 (function () {
   var L = window.SlidesLib;
   if (!L) return;
-  var SRC = '/assets/vendor/deck-kit.js?v=20261104b';
+  var SRC = '/assets/vendor/deck-kit.js?v=20261104c';
   var loading = null;
 
   function el(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
@@ -28,6 +28,21 @@
       var svg = K.render(L.deck(text))[0];
       if (svg) { box.innerHTML = svg; box.classList.add('slide-thumb'); }
     }, function () {});
+  }
+
+  // Every slide of a deck, for reading, drawn the first time it is opened.
+  function strip(text) {
+    var d = el('details', 'slide-strip');
+    d.appendChild(el('summary', null, L.count(text) === 1 ? '1 slide' : L.count(text) + ' slides'));
+    var box = el('div', 'slide-preview');
+    d.appendChild(box);
+    d.addEventListener('toggle', function () {
+      if (!d.open || box.childElementCount) return;
+      load().then(function (K) {
+        K.render(L.deck(text)).forEach(function (svg) { var s = el('div', 'slide-pick'); s.innerHTML = svg; box.appendChild(s); });
+      }, function () {});
+    });
+    return d;
   }
 
   function attach(o) {
@@ -78,9 +93,16 @@
           var b = el('button', 'slide-pick'); b.type = 'button';
           b.setAttribute('aria-label', 'Go to slide ' + (i + 1));
           b.innerHTML = svg;
-          b.addEventListener('click', function () {
-            var at = L.offset(input.value, i);
-            input.focus(); input.setSelectionRange(at, at);
+          // A click on words finds those words in the text; anywhere else,
+          // the start of the slide.
+          b.addEventListener('click', function (ev) {
+            var word = ev.target.closest ? ev.target.closest('text') : null;
+            var from = L.offset(input.value, i);
+            var said = word ? word.textContent.trim() : '';
+            var found = said ? input.value.indexOf(said, from) : -1;
+            input.focus();
+            if (found >= 0) input.setSelectionRange(found, found + said.length);
+            else input.setSelectionRange(from, from);
           });
           shown.appendChild(b);
         });
@@ -91,5 +113,5 @@
     return { check: check };
   }
 
-  window.SlideEditor = { attach: attach, load: load, thumb: thumb };
+  window.SlideEditor = { attach: attach, load: load, thumb: thumb, strip: strip };
 })();

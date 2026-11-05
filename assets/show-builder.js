@@ -133,6 +133,7 @@
       if (c.room_scenes && c.room_scenes.length) {
         detail.appendChild(el('p', 'small', 'Each turn: ' + c.room_scenes.map(function (r) { return r.title + ' (' + r.minutes + ')'; }).join(', ') + '.'));
       }
+      if (s.slides && window.SlideEditor) detail.appendChild(window.SlideEditor.strip(s.slides));
       if (!readOnly && notes[s.id]) {
         var note = el('p', 'scene-note');
         if (window.UI && window.UI.visibility) { note.appendChild(window.UI.visibility('staff', 'Your note')); note.appendChild(document.createTextNode(' ')); }

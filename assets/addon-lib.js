@@ -191,7 +191,7 @@
   // A deck and the slide it is on, read back with both checked.
   function slidesOf(d) {
     if (!d || typeof d.text !== 'string' || !d.text) return null;
-    return { text: cut(d.text, 42000), at: Math.max(0, Math.floor(num(d.at) || 0)) };
+    return { text: cut(d.text, 42000), at: Math.max(0, Math.floor(num(d.at) || 0)), shown: Math.max(0, Math.floor(num(d.shown) || 0)) };
   }
 
   // A welcome, read back with every field checked and cut to size.

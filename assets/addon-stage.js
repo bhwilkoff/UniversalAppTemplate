@@ -140,19 +140,25 @@
   // A slide, drawn from the deck's text by the deck kit (tools/deck-kit). The
   // deck is drawn once and each slide kept, so moving through it is instant,
   // and the words are read out for anyone who cannot see the picture.
-  var deckText = null, deckSlides = [], deckWords = [], shownSlide = null;
+  var deckText = null, deckSlides = [], deckWords = [], shownKey = null, shownAt = null;
   function drawSlide(d) {
     var box = $('[data-slide]');
     if (d.text !== deckText) {
-      deckText = d.text; shownSlide = null;
+      deckText = d.text; shownKey = null;
       try { deckSlides = window.DeckKit.render(d.text); deckWords = window.DeckKit.words(d.text); }
       catch (e) { console.log('[stage] the slides did not draw: ' + (e && e.message)); deckSlides = []; deckWords = []; }
     }
     var at = Math.min(d.at, Math.max(0, deckSlides.length - 1));
-    if (at === shownSlide) return;
-    shownSlide = at;
-    box.innerHTML = deckSlides[at] || '';
+    var key = at + ':' + d.shown;
+    if (key === shownKey) return;
+    shownKey = key;
+    var svg = deckSlides[at] || '';
+    if (d.shown) { try { svg = window.DeckKit.frame(d.text, at, d.shown); } catch (e) {} }
+    box.innerHTML = svg;
     box.setAttribute('aria-label', (deckWords[at] || []).join('. '));
+    // A new slide fades in; a point arriving on the same slide does not.
+    box.classList.toggle('is-new', at !== shownAt);
+    shownAt = at;
   }
 
   // The board in its own frame, made once per board so a new message (a
