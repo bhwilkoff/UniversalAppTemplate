@@ -580,6 +580,7 @@
       useGuests(r.data);
       drawRoster();
       drawGuest();
+      if (S.breakouts) S.breakouts.draw();
     });
   }
   function tieGuest(guest, member, status) {
