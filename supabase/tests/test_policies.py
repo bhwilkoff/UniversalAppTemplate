@@ -3131,6 +3131,28 @@ def main():
     su.execute("select slides from public.scenes where id = %s", (sc,))
     check("and leaves no slides behind", su.fetchall() == [(None,)])
 
+    # Breakouts (migration 20261104060000): rooms lent from one pool.
+    su.execute("reset role")
+    su.execute("insert into public.breakout_rooms (url) values ('https://meet.google.com/aaa-aaaa-aaa'), ('https://meet.google.com/bbb-bbbb-bbb')")
+    two = json.dumps([[people["bea"]], [gid]])
+    check("a learner cannot launch breakouts", not attempt(as_user("bea"), "select public.launch_breakouts(%s, %s::jsonb)", (ss, two)))
+    b = as_user("bea"); b.execute("select count(*) from public.breakout_rooms")
+    check("no one reads the pool directly", b.fetchall() == [(0,)])
+    check("a leader launches breakouts", attempt(as_user("ben"), "select public.launch_breakouts(%s, %s::jsonb)", (ss, two)))
+    su.execute("reset role")
+    su.execute("select g.name, count(m.user_id) from public.groups g left join public.group_members m on m.group_id = g.id where g.cohort_id = %s and g.breakout group by 1 order by 1", (cc,))
+    check("each room gets its people, guests too", su.fetchall() == [("Room 1", 1), ("Room 2", 1)])
+    check("asking for more rooms than are free says so", not attempt(as_user("ben"), "select public.launch_breakouts(%s, %s::jsonb)", (ss, json.dumps([[], [], []]))))
+    check("someone outside the cohort is left out", attempt(as_user("ben"), "select public.launch_breakouts(%s, %s::jsonb)", (ss, json.dumps([[people["dee"]]]))))
+    su.execute("reset role")
+    su.execute("select count(m.user_id) from public.groups g left join public.group_members m on m.group_id = g.id where g.cohort_id = %s and g.breakout", (cc,))
+    check("and never placed in a room", su.fetchall() == [(0,)])
+    check("a learner cannot end breakouts", not attempt(as_user("bea"), "select public.end_breakouts(%s)", (cc,)))
+    check("a leader ends them", attempt(as_user("ben"), "select public.end_breakouts(%s)", (cc,)))
+    su.execute("reset role")
+    su.execute("select (select count(*) from public.groups where cohort_id = %s and breakout), (select count(*) from public.breakout_rooms where cohort_id is not null)", (cc,))
+    check("ending gives the rooms back", su.fetchall() == [(0, 0)])
+
     conn.rollback()
     conn.close()
     failed = [n for n, ok in results if not ok]

@@ -1741,6 +1741,22 @@ label.check { min-height: 2.25rem; }
 .slide-strip { margin-top: 0.5rem; }
 .slide-strip > summary { cursor: pointer; font-weight: 600; }
 div.slide-pick { cursor: default; }
+.breakouts { display: grid; gap: 0.5rem; }
+.breakouts:not([hidden]) { border: 1px solid var(--rule); border-radius: var(--radius); padding: 0.6rem 0.8rem; }
+.breakouts h3 { margin: 0; }
+.breakouts-setup { display: grid; gap: 0.6rem; }
+.addon-panel .breakouts-setup > summary { padding: 0; }
+.breakouts-setup[open] > summary { margin-bottom: 0.5rem; }
+.breakouts-fields { display: flex; gap: 0.75rem; }
+.breakouts-fields label { display: grid; gap: 0.2rem; font-size: 0.9rem; font-weight: 600; }
+.breakouts-fields input { width: 5rem; min-height: 36px; font: inherit; border: 1px solid var(--rule); border-radius: 8px; background: var(--card); color: var(--ink); padding: 0 0.4rem; }
+.breakouts-people, .breakouts-rooms { list-style: none; margin: 0.4rem 0; padding: 0; display: grid; gap: 0.35rem; }
+.breakouts-people li { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; }
+.breakouts-people select { min-height: 32px; font: inherit; border: 1px solid var(--rule); border-radius: 8px; background: var(--card); color: var(--ink); }
+.breakouts-rooms li { display: grid; grid-template-columns: 1fr auto; gap: 0.1rem 0.5rem; align-items: center; }
+.breakouts-room-name { font-weight: 600; }
+.breakouts-names { grid-column: 1; }
+.breakouts-rooms .btn-secondary { grid-column: 2; grid-row: 1 / span 2; }
 .show-slide-place { margin: 0; }
 .show-slide-note { font-weight: 600; white-space: pre-line; }
 .react-line:empty { display: none; }

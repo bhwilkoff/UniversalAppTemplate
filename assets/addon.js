@@ -308,6 +308,9 @@
           startRooms();
           startSignals(res[2].data);
           startClass();
+          // Where this panel is, so the leader sees who reached their room.
+          if (S.classChannel) S.classChannel.setPresence({ room: S.room.groupId || null });
+          startBreakouts();
           // Reactions and stance are for the people in the session, not
           // the leader running it.
           if (S.teaching) $('[data-react]').hidden = true;
@@ -339,7 +342,7 @@
       // without groups, a board without a board part (JOURNEYS.md).
       unavailable: function () {
         var off = [];
-        off.push('cue-talk');
+        off.push('cue-talk', 'cue-rooms');
         if (!S.groups.length) off.push('rooms', 'cue-rooms', 'brought');
         var list = S.list || S.parts || [];
         if (!list.some(function (x) { return x.kind === 'design' || x.key === 'prompt'; })) off.push('design');
@@ -441,6 +444,7 @@
         // A guest arriving, or a guest saying their name.
         if (S.teaching && Object.keys(state || {}).some(function (id) { return members.indexOf(id) < 0; })) loadGuests();
         drawRoster();
+        if (S.breakouts) S.breakouts.draw();
         drawCode();
         if (S.onStage && S.onStage.kind === 'path') sendStage();
       }
@@ -567,6 +571,8 @@
     S.guests = rows || [];
     S.guests.forEach(function (g) { S.names[g.user_id] = g.name || 'A guest'; });
     S.isGuest = !S.teaching && !S.people.some(function (p) { return p.user_id === S.me.id; });
+    var tied = S.guests.filter(function (g) { return g.user_id === S.me.id && g.member_id; })[0];
+    S.asMember = tied ? tied.member_id : null;
   }
   function loadGuests() {
     return db.from('call_guests').select('*').eq('cohort_id', S.cohort.id).order('joined_at', { ascending: false }).then(function (r) {
@@ -688,10 +694,13 @@
     var show = S.parts.filter(function (p) { return p.key === 'show'; })[0];
     S.signals = window.LiveSignals.start({
       db: db, cohort: S.cohort, session: S.session, meId: S.me.id, teaching: S.teaching, groups: S.groups,
+      inRoom: function () { return !!S.room.groupId; },
+      memberId: function () { return S.asMember || S.me.id; },
       // A card a leader shows goes on the main stage too, the one place
       // the whole call is looking (found in the loop's live Meet test: it
       // reached learners' panels and nowhere else).
       onChange: function (st) {
+        breakoutsChanged(st);
         var c = st && st.card ? { id: st.card.id, body: st.card.body, endsAt: st.card.ends_at ? Date.parse(st.card.ends_at) : null } : null;
         var rec = !!(st && st.recording);
         if (JSON.stringify(c) === JSON.stringify(S.card || null) && rec === !!S.recording) return;
@@ -699,7 +708,7 @@
       },
       nameOf: nameOf, people: people, roomMinutes: function () { var r = roomsScene(); return r && r.minutes ? r.minutes : (show ? show.minutes : 25); },
       mounts: {
-        recording: $('[data-sig-recording]'), where: $('[data-sig-where]'), card: $('[data-sig-card]'), stage: $('[data-sig-stage]'),
+        recording: $('[data-sig-recording]'), where: S.teaching && !S.room.groupId && !standalone ? null : $('[data-sig-where]'), card: $('[data-sig-card]'), stage: $('[data-sig-stage]'),
         controls: S.teaching ? root.querySelector('[data-state="ready"]') : null
       }
     });
@@ -1017,6 +1026,47 @@
 
   // The room board (C2): every group for a teacher in the main room, the
   // group alone in a group's own room, and your own group otherwise.
+  // ------------------------------------------------------------------
+  // Breakouts (assets/breakouts.js): the leader launches and calls back from
+  // here, and every panel follows through the same signals.
+  // ------------------------------------------------------------------
+
+  function reloadGroups() {
+    return db.from('groups').select('*, group_members(user_id)').eq('cohort_id', S.cohort.id).order('name').then(function (r) {
+      if (r.error) return;
+      S.groups.splice.apply(S.groups, [0, S.groups.length].concat(r.data));
+      if (S.signals) S.signals.redraw();
+      if (S.breakouts) S.breakouts.draw();
+    });
+  }
+  // A launch reaches a learner as a signal, with rooms this panel has never
+  // read, so it reads them, and brings the way to the room into view.
+  function breakoutsChanged(st) {
+    var now = st ? (st.rooms ? 'rooms:' + st.rooms.id : st.together ? 'back:' + st.together.id : '') : '';
+    if (now === S.breakoutSeen) return;
+    var first = S.breakoutSeen === undefined;
+    S.breakoutSeen = now;
+    if (S.breakouts) S.breakouts.draw();
+    if (first || !now) return;
+    reloadGroups().then(function () {
+      var box = $('[data-sig-where]');
+      if (!S.teaching && box && box.scrollIntoView) box.scrollIntoView({ block: 'start' });
+    });
+  }
+  function startBreakouts() {
+    if (S.breakouts || !window.Breakouts || !S.teaching || standalone || S.room.groupId || !S.signals) return;
+    $('[data-breakouts]').hidden = false;
+    S.breakouts = window.Breakouts.start({
+      db: db, mount: $('[data-breakouts]'), cohort: S.cohort, session: S.session, signals: S.signals, nameOf: nameOf,
+      groups: function () { return S.groups; }, presence: function () { return S.presence || {}; }, reload: reloadGroups,
+      people: function () {
+        var list = S.people.map(function (p) { return { id: p.user_id, name: S.names[p.user_id] || 'Someone' }; });
+        (S.guests || []).forEach(function (g) { if (!g.member_id) list.push({ id: g.user_id, name: g.name || 'A guest' }); });
+        return list;
+      }
+    });
+  }
+
   function startRooms() {
     if (S.rooms || !window.RoomBoard) return;
     var mine = S.groups.some(function (g) { return g.group_members.some(function (m) { return m.user_id === S.me.id; }); });

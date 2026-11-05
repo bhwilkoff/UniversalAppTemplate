@@ -133,9 +133,16 @@
         box.appendChild(acts);
         return;
       }
-      var rooms = K.roomsFor(opts.groups, opts.meId, opts.teaching);
+      // In a room's own call there is nowhere to go: its time is what matters.
+      if (opts.inRoom && opts.inRoom()) {
+        box.appendChild(el('p', 'signal-title', 'You are in your room'));
+        if (w.signal.ends_at) box.appendChild(el('p', 'signal-time')).appendChild(clockFor(w.signal.ends_at, now, coarse, ''));
+        return;
+      }
+      var who = opts.memberId ? opts.memberId() : opts.meId;
+      var rooms = K.roomsFor(opts.groups, who, opts.teaching);
       var mine = rooms.filter(function (r) { return r.mine; })[0];
-      var title = el('p', 'signal-title', opts.teaching ? 'Everyone is in their rooms' : 'Go to your group’s room');
+      var title = el('p', 'signal-title', opts.teaching ? 'Everyone is in their rooms' : 'Go to your room');
       box.appendChild(title);
       if (w.signal.ends_at) {
         var line = el('p', 'signal-time');
@@ -158,8 +165,10 @@
         if (!r.url) return;
         acts2.appendChild(link(opts.teaching && !r.mine ? 'Visit ' + r.name : 'Join ' + (opts.teaching ? r.name + '’s' : 'your group’s') + ' room', r.mine ? 'btn-primary' : 'btn-secondary', r.url));
       });
-      if (mainUrl) acts2.appendChild(link('The main room', 'btn-secondary', mainUrl));
+      if (mainUrl && opts.teaching) acts2.appendChild(link('The main room', 'btn-secondary', mainUrl));
       box.appendChild(acts2);
+      // Meet cannot leave a call for anyone, and two calls at once echo.
+      if (!opts.teaching) box.appendChild(el('p', 'small', 'Then leave this call, and open Human Shaped in your room.'));
       var none = rooms.filter(function (r) { return !r.url; }).map(function (r) { return r.name; });
       if (opts.teaching && none.length) box.appendChild(el('p', 'small', K.list(none) + (none.length === 1 ? ' has' : ' have') + ' no room yet, so ' + (none.length === 1 ? 'it stays' : 'they stay') + ' in the main room.'));
     }
@@ -455,7 +464,7 @@
     }
 
     refresh().then(listen);
-    return { refresh: refresh, state: function () { return st; } };
+    return { refresh: refresh, state: function () { return st; }, send: send, redraw: function () { draw(true); } };
   }
 
   root.LiveSignals = { start: start };
