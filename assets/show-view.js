@@ -41,7 +41,9 @@
     // The scenes, drawn again whenever the run of show changes (a scene
     // edited, added, or moved). Each part of the view is moved out first
     // and put back by place(), so nothing a person was typing is lost.
+    var notesOpenFor;
     function build(list) {
+      notesOpenFor = undefined;
       Object.keys(wraps).forEach(function (k) { var w = wraps[k].box; if (w.parentNode) w.parentNode.removeChild(w); });
       ol.replaceChildren();
       items = {};
@@ -136,7 +138,6 @@
       return { box: box, clock: clock, pinned: pinned, place: place, next: nextBtn, follow: follow, clockBtn: clockBtn, key: s.key };
     }
 
-    var notesOpenFor;
     function drawRun() {
       if (notesOpenFor !== current) {
         notesOpenFor = current;
@@ -206,7 +207,8 @@
       }
       field('title', 'Title', 'text');
       field('minutes', 'Minutes', 'number');
-      field('body', 'What the main stage says', 'area', 'A few lines, with a blank line between them.');
+      if (have.slides) field('body', 'What the plan says', 'area', 'The main stage shows the slides, once there are any.');
+      else field('body', 'What the main stage says', 'area', 'A few lines, with a blank line between them.');
       if (have.slides) {
         start.slides = (opts.deck && opts.deck(s.key)) || s.slides || '';
         field('slides', 'Slides', 'area');

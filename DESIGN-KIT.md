@@ -238,6 +238,15 @@ itself in a tip on hover and focus), the cohort's one row of sections,
 breadcrumbs that end at the parent. Sidebar icons are Phosphor's regular
 weight, from `assets/icons.svg`; never emoji.
 
+### Slides — `SlideEditor.attach({ input, preview })`
+
+A part's main stage is a deck, written as text in Tiny Little Office's format
+and drawn by `assets/vendor/deck-kit.js`. A slide says one thing: a headline of
+a few words, and the words a leader will speak go in a `>` note, never on the
+slide (Ben, November 4, 2026; research/notes/stage-slides-notes.md). The editor
+adds a real example to write over, and says what will not fit. A slide is drawn
+only by the deck kit, in the site's own colors.
+
 ## What it never uses (R§4)
 Tracked capitals, a label above a heading unless it carries information,
 colored stripes, pills, rows of identical icon cards, color outside inset

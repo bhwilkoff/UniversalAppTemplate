@@ -463,6 +463,16 @@ in the panel outside Meet. What it found, each fixed the same evening:
 - Notes on the stage spoke to the leader ("read by you") and pointed to a
   live page that no longer exists; the panel still said scene for part.
 
+## Slides on the main stage (November 4, 2026)
+
+Tested in a real call, leader and guest: writing a deck on the session page,
+Next slide and Back through a part and on to the next, a slide's note opening
+for the leader and never reaching a learner, and changing a slide from Edit this
+part while it is on the stage, seen by the leader first and by everyone on Show
+it to everyone. Found on the way: no part but a question could be saved on the
+session page, because a hidden required box stopped the form with nothing on
+screen.
+
 ## The add-on checklist (the testing loop, from October 23, 2026)
 
 Each tick takes the next unchecked item, tests it live (meet@ leading in

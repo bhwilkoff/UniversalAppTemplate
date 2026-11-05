@@ -1217,3 +1217,22 @@ reads: the roster, the plan, the stage. Leader notes and other people's answers
 stay closed, and guests cannot add shares, apps, or requests to lead. Leaders tie
 someone under Guests in Who is here (`tie_call_guest`), and can change it; the
 answers move with the match. Meet still needs the add-on on each Google account.
+
+## The main stage is built from slides
+
+**A part can hold a deck, written as text in Tiny Little Office's format, and
+parts stay the session's structure.** Ben, November 4, 2026: "allow for far more
+sophisticated ideas to be shared on the main stage and allow for editing those
+ideas/slides directly from within the add-on or the session page."
+**Why:** the format is plain text, so a leader or their agent can write it, and
+its renderer brings layouts, tables, charts, diagrams, icons, and a check that
+words fit. Only the renderer is taken (MIT, `tools/deck-kit`): its editor needs a
+build step and a framework this site does not have, and a link to its own site
+would sit outside the session's clock, questions, and stage.
+**How to apply:** Talk and Writing parts take slides; question, rooms, board, and
+break parts stay live. Next slide walks a part's deck, then the plan
+(`show_state.slide`). A line starting with `>` is a speaker note, and
+`save_scene_deck` splits it out in the database, because learners can read
+`scenes` and must never receive notes: the source is in `scene_decks`, for
+leaders. A part without slides shows its words as before. Change the renderer
+only through `tools/deck-kit/build.sh`.
