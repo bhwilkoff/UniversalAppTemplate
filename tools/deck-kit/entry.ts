@@ -19,9 +19,12 @@ function tablePage(text: string) {
   const cells = lines.map((l) => l.split('|').map((c) => c.trim().replace(/:(number|money|text|name|date|percent)$/, '')));
   const cols = Math.max(1, ...cells.map((r) => r.length));
   const W = 840, rowH = 78, cw = W / cols;
+  // The longest cell sets the size, so no column runs into the next.
+  const longest = Math.max(1, ...cells.flat().map((c) => c.length));
+  const px = Math.max(16, Math.min(31, Math.floor((cw - 28) / (longest * 0.54))));
   const svg = cells.map((row, i) => {
     const y = i * rowH;
-    const words = row.map((c, j) => `<text x="${j * cw + 16}" y="${y + 50}" font-size="31" font-weight="${i ? 400 : 600}" fill="${i ? '#18181b' : '#52525b'}">${esc(c)}</text>`).join('');
+    const words = row.map((c, j) => `<text x="${j * cw + 16}" y="${y + 50}" font-size="${px}" font-weight="${i ? 400 : 600}" fill="${i ? '#18181b' : '#52525b'}">${esc(c)}</text>`).join('');
     return words + `<line x1="0" y1="${y + rowH}" x2="${W}" y2="${y + rowH}" stroke="#d4d4d8" stroke-width="1"/>`;
   }).join('');
   return { w: W, h: cells.length * rowH + 2, svg, alt: cells.map((r) => r.join(', ')).join('. ') };
