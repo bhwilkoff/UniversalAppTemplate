@@ -20,7 +20,7 @@
 // onChange() is called whenever the list or the show changes.
 // Words by Claude, awaiting Ben's review.
 (function () {
-  var K = window.ShowViewLib, SL = window.ShowLib;
+  var K = window.ShowViewLib, SL = window.ShowLib, SD = window.SlidesLib;
   if (!K) return;
   var POLL = 15000;
 
@@ -79,11 +79,20 @@
     function current() { return K.currentKey(show, list()); }
 
     // Going to a scene returns the main stage to following it.
-    function go(key) { return write({ current_scene: key, stage: 'scene', stage_ref: null }); }
-    function step(delta) {
-      var key = K.step(list(), current(), delta);
-      return key ? go(key) : Promise.resolve(null);
+    function go(key, slide) { return write({ current_scene: key, stage: 'scene', stage_ref: null, slide: slide || 0 }); }
+    function slidesIn(key) {
+      var s = list().filter(function (x) { return x.key === key; })[0];
+      return s && SD ? SD.count(s.slides) : 0;
     }
+    // Back and next walk a part's slides first, then the parts.
+    function step(delta) {
+      var here = current();
+      var inside = SD ? SD.step(slidesIn(here), slide(), delta) : null;
+      if (here && inside != null) return write({ slide: inside });
+      var key = K.step(list(), here, delta);
+      return key ? go(key, SD ? SD.arrive(slidesIn(key), delta) : 0) : Promise.resolve(null);
+    }
+    function slide() { return (show && show.slide) || 0; }
     // The database starts the clock from its own time; any value restarts it.
     // A start time in the past resumes a stopped clock where it was.
     function clock(on, startedAt) { return write({ scene_started_at: on ? (startedAt || new Date()).toISOString() : null }); }
@@ -101,8 +110,11 @@
         if (r.error) return r.error.message;
         if (!r.data || !r.data.length) return 'The change was not saved. Only the cohort’s leaders can change its run of show.';
         rows = rows.map(function (x) { return x.id === r.data[0].id ? r.data[0] : x; });
-        if (o.onChange) o.onChange();
-        return null;
+        if (fields.slides == null) { if (o.onChange) o.onChange(); return null; }
+        return db.rpc('save_scene_deck', { scene: scene.id, source: fields.slides }).then(function (d) {
+          if (d.error) return d.error.message;
+          return load().then(function () { return null; });
+        });
       });
     }
 
@@ -128,6 +140,7 @@
     api.list = list;
     api.state = function () { return show; };
     api.current = current;
+    api.slide = slide;
     api.own = function () { return rows.length > 0; };
     api.canOwn = function () { return o.teaching && ownTable && !rows.length && !!SL; };
     api.go = go; api.step = step; api.clock = clock; api.pin = pin; api.save = save; api.startOwn = startOwn;

@@ -97,7 +97,7 @@ test('a scene’s words are edited in the moment, and checked as the class build
   const kept = S.edited(rooms, S.editFields(rooms), SL);
   assert.equal(kept.problem, null);
   assert.deepEqual(kept.change.config.room_scenes, [{ title: 'Their question', minutes: 2 }], 'a room’s own scenes are kept');
-  assert.deepEqual(S.editable('talk'), { prompt: false, options: false });
+  assert.deepEqual(S.editable('talk'), { prompt: false, slides: true, options: false });
   const talk = S.edited(talkScene, { title: 'Hello', minutes: '5', body: 'Hi.', prompt: 'ignored', options: 'x\ny' }, SL);
   assert.deepEqual(talk.change.config, {}, 'a talk scene carries no prompt or choices');
   assert.equal(talk.problem, null);

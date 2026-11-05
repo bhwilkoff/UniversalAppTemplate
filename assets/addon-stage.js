@@ -30,7 +30,8 @@
     $('[data-stage-rec]').hidden = !view.recording;
     var part = view.part;
     // The part sits small at the top when something else has the stage.
-    $('[data-part]').hidden = view.mode === 'part' || view.mode === 'welcome' || view.mode === 'scene' || view.mode === 'blank' || !part;
+    $('[data-part]').hidden = view.mode === 'part' || view.mode === 'welcome' || view.mode === 'scene' || view.mode === 'slides' || view.mode === 'blank' || !part;
+    if (view.mode === 'slides') drawSlide(view.slides);
     if (view.mode === 'scene') {
       var sc = view.scene;
       drawBoard(sc.board || null);
@@ -136,6 +137,24 @@
     tick();
   }
 
+  // A slide, drawn from the deck's text by the deck kit (tools/deck-kit). The
+  // deck is drawn once and each slide kept, so moving through it is instant,
+  // and the words are read out for anyone who cannot see the picture.
+  var deckText = null, deckSlides = [], deckWords = [], shownSlide = null;
+  function drawSlide(d) {
+    var box = $('[data-slide]');
+    if (d.text !== deckText) {
+      deckText = d.text; shownSlide = null;
+      try { deckSlides = window.DeckKit.render(d.text); deckWords = window.DeckKit.words(d.text); }
+      catch (e) { console.log('[stage] the slides did not draw: ' + (e && e.message)); deckSlides = []; deckWords = []; }
+    }
+    var at = Math.min(d.at, Math.max(0, deckSlides.length - 1));
+    if (at === shownSlide) return;
+    shownSlide = at;
+    box.innerHTML = deckSlides[at] || '';
+    box.setAttribute('aria-label', (deckWords[at] || []).join('. '));
+  }
+
   // The board in its own frame, made once per board so a new message (a
   // clock tick, a title edit) never reloads it while people draw.
   var boardSrc = null;
@@ -199,7 +218,7 @@
     // A scene's words can fill the stage, so its clock sits small at the
     // top (found in the live Meet test: a long part pushed it out of the
     // frame); a break, which is only its clock, keeps it large.
-    var scene = view.mode === 'scene', big = scene && view.scene && view.scene.eyebrow === 'Break';
+    var scene = view.mode === 'scene' || view.mode === 'slides', big = view.mode === 'scene' && view.scene && view.scene.eyebrow === 'Break';
     $('[data-part-name]').hidden = scene;
     $('[data-clock]').textContent = t ? (scene ? t : ', ' + t) : '';
     if (scene) $('[data-part]').hidden = big || !t;

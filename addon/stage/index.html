@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261024ab">
+  <link rel="stylesheet" href="/assets/site.css?v=20261104g">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -85,6 +85,9 @@
         <div class="stage-board" data-s-board hidden></div>
       </div>
 
+      <!-- A part's own slides, drawn by the deck kit. -->
+      <div class="stage-slide" data-view="slides" hidden><div class="stage-slide-frame" data-slide role="img"></div></div>
+
       <!-- A card the leader shows, over the current part. -->
       <div class="stage-body" data-view="card" hidden>
         <h1 class="stage-title" data-card-body></h1>
@@ -131,11 +134,12 @@
     </section>
   </main>
   <script src="https://www.gstatic.com/meetjs/addons/1.1.0/meet.addons.js" defer></script>
+  <script src="/assets/vendor/deck-kit.js?v=20261104a" defer></script>
   <script src="/assets/addon-config.js" defer></script>
   <script src="/assets/live-lib.js" defer></script>
-  <script src="/assets/addon-lib.js?v=20261024t" defer></script>
+  <script src="/assets/addon-lib.js?v=20261104a" defer></script>
   <script src="/assets/react-lib.js" defer></script>
   <script src="/assets/code-lib.js" defer></script>
-  <script src="/assets/addon-stage.js?v=20261104a" defer></script>
+  <script src="/assets/addon-stage.js?v=20261104b" defer></script>
 </body>
 </html>

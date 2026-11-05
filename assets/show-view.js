@@ -66,11 +66,16 @@
         if (bar) li.appendChild(bar.box);
         // The leader's own notes for the part, which the stage leaves out:
         // open on the part that is on, and folded on the rest.
-        var note = teaching && opts.notes ? opts.notes(s.key) : null, notes = null;
-        if (note) {
+        var note = teaching && opts.notes ? opts.notes(s.key) : null, notes = null, slideNote = null;
+        var deckNotes = teaching && s.slides;
+        if (note || deckNotes) {
           notes = el('details', 'show-notes');
           notes.appendChild(el('summary', null, 'Your notes'));
-          String(note).split(/\n{2,}/).map(function (x) { return x.trim(); }).filter(Boolean).forEach(function (w) { notes.appendChild(el('p', null, w)); });
+          slideNote = el('p', 'show-slide-note');
+          slideNote.hidden = true;
+          notes.appendChild(slideNote);
+          String(note || '').split(/\n{2,}/).map(function (x) { return x.trim(); }).filter(Boolean).forEach(function (w) { notes.appendChild(el('p', null, w)); });
+          notes.hidden = !note;
           li.appendChild(notes);
         }
         var body = el('div', 'show-body');
@@ -85,7 +90,7 @@
         if (teaching && opts.tools) { var extra = opts.tools(s.key); if (extra) tools.appendChild(extra); }
         if (tools.children.length) li.appendChild(tools);
         if (teaching && run && run.canEdit) { var ed = editor(s); if (ed) li.appendChild(ed); }
-        items[s.key] = { li: li, body: body, bar: bar, notes: notes };
+        items[s.key] = { li: li, body: body, bar: bar, notes: notes, slideNote: slideNote, hasNote: !!note };
         ol.appendChild(li);
       });
     }
@@ -105,17 +110,21 @@
       var clock = el('p', 'show-clock');
       clock.setAttribute('aria-live', 'off');
       box.appendChild(clock);
+      var place = el('p', 'small show-slide-place');
+      place.hidden = true;
+      box.appendChild(place);
       var pinned = el('p', 'small show-pinned');
       pinned.hidden = true;
       box.appendChild(pinned);
-      var follow = null, clockBtn = null;
+      var follow = null, clockBtn = null, nextBtn = null;
       if (teaching) {
         follow = btn('Show this part on the main stage again', 'btn-secondary show-follow', function () { if (run.onFollow) run.onFollow(); });
         follow.hidden = true;
         box.appendChild(follow);
         var acts = el('div', 'actions show-moves');
         acts.appendChild(btn('Back', 'btn-secondary show-back', function () { if (run.onStep) run.onStep(-1); }));
-        acts.appendChild(btn('Next part', 'btn-primary show-next', function () { if (run.onStep) run.onStep(1); }));
+        nextBtn = btn('Next part', 'btn-primary show-next', function () { if (run.onStep) run.onStep(1); });
+        acts.appendChild(nextBtn);
         // The clock's own switch sits beside it, small, so Back and Next
         // keep one row in Meet's narrow panel.
         clockBtn = btn('Start', 'btn-secondary small show-clock-btn', function () { if (run.onClock) run.onClock(!info.clockOn); });
@@ -124,7 +133,7 @@
         row.appendChild(clock); row.appendChild(clockBtn);
         box.appendChild(acts);
       }
-      return { box: box, clock: clock, pinned: pinned, follow: follow, clockBtn: clockBtn, key: s.key };
+      return { box: box, clock: clock, pinned: pinned, place: place, next: nextBtn, follow: follow, clockBtn: clockBtn, key: s.key };
     }
 
     var notesOpenFor;
@@ -146,6 +155,17 @@
         b.pinned.textContent = info.pinned ? 'The main stage shows ' + info.pinned + ' instead of this part.' : '';
         if (b.follow) b.follow.hidden = !info.pinned;
         if (b.clockBtn) b.clockBtn.textContent = info.clockOn ? 'Stop' : 'Start';
+        var sl = info.slide;
+        b.place.hidden = !sl;
+        b.place.textContent = sl ? 'Slide ' + (sl.at + 1) + ' of ' + sl.count : '';
+        if (b.next) b.next.textContent = sl && sl.at < sl.count - 1 ? 'Next slide' : 'Next part';
+        var it = items[key];
+        if (it.slideNote) {
+          var said = sl && sl.note ? sl.note : '';
+          it.slideNote.textContent = said;
+          it.slideNote.hidden = !said;
+          it.notes.hidden = !said && !it.hasNote;
+        }
       });
     }
 
@@ -187,6 +207,12 @@
       field('title', 'Title', 'text');
       field('minutes', 'Minutes', 'number');
       field('body', 'What the main stage says', 'area', 'A few lines, with a blank line between them.');
+      if (have.slides) {
+        start.slides = (opts.deck && opts.deck(s.key)) || s.slides || '';
+        field('slides', 'Slides', 'area');
+        f.elements.slides.rows = 10;
+        if (window.SlideEditor) window.SlideEditor.attach({ input: f.elements.slides });
+      }
       if (have.prompt) field('prompt', s.kind === 'question' ? 'The question' : 'The prompt', 'area');
       if (have.options) field('options', 'Choices', 'area', 'One to a line, two to eight. Leave empty for an answer in their own words.');
       var msg = el('p', 'small'); msg.setAttribute('role', 'status');
@@ -203,6 +229,8 @@
       function values() {
         var v = {};
         Object.keys(start).forEach(function (k) { v[k] = f.elements[k] ? f.elements[k].value : start[k]; });
+        // The leader's own stage shows the slide being written.
+        if (f.elements.slides && window.SlidesLib) v.slide_at = window.SlidesLib.slideAt(f.elements.slides.value, f.elements.slides.selectionStart);
         return v;
       }
       f.addEventListener('input', function () { if (run.onDraft) run.onDraft(s.key, values()); msg.textContent = 'Your own main stage shows this as you type. Everyone else sees it when you choose Show it to everyone.'; });

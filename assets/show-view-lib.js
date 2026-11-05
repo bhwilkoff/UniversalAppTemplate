@@ -99,7 +99,7 @@
     var at = 0;
     return (rows || []).slice().sort(function (a, b) { return a.position - b.position; }).map(function (r) {
       var m = Number(r.minutes) || 0;
-      var s = { key: r.id, id: r.id, name: r.title, kind: r.kind, minutes: m, start: at, what: r.body || '', config: r.config || {}, own: true };
+      var s = { key: r.id, id: r.id, name: r.title, kind: r.kind, minutes: m, start: at, what: r.body || '', slides: r.slides || '', config: r.config || {}, own: true };
       at += m;
       return s;
     });
@@ -238,6 +238,7 @@
     var qk = config && config.kind;
     return {
       prompt: ['presenter', 'question', 'rooms', 'reflection'].indexOf(kind) >= 0,
+      slides: ['talk', 'reflection'].indexOf(kind) >= 0,
       options: kind === 'question' && (!qk || qk === 'choice' || qk === 'multi' || qk === 'rank')
     };
   }

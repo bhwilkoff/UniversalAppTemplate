@@ -41,7 +41,7 @@
   // `agenda` is CohortLib.agenda(cohort.session_minutes), `turn` LiveLib.TURN.
   function mount(box, opts) {
     var db = opts.db, cohort = opts.cohort, session = opts.session, readOnly = !!opts.readOnly;
-    var scenes = [], notes = {}, withScenes = [], editing = null, previewing = null, busy = false, dragId = null, bank = [], kinds = false;
+    var scenes = [], notes = {}, decks = {}, withScenes = [], editing = null, previewing = null, busy = false, dragId = null, bank = [], kinds = false;
     var status = el('p', 'small'); status.setAttribute('role', 'status');
     var fit = el('p', 'small show-fit');
     var list = el('ol', 'show-list');
@@ -57,6 +57,7 @@
       return Promise.all([
         db.from('scenes').select('*').eq('session_id', session.id).order('position'),
         db.from('scene_notes').select('scene_id, body').eq('cohort_id', cohort.id),
+        db.from('scene_decks').select('scene_id, body').eq('cohort_id', cohort.id),
         db.from('scenes').select('session_id').eq('cohort_id', cohort.id),
         // The teacher's own questions and this cohort's (R4); before the
         // database has the bank, a question is written here as before.
@@ -69,9 +70,11 @@
         scenes = res[0].data;
         notes = {};
         (res[1].data || []).forEach(function (n) { notes[n.scene_id] = n.body; });
-        withScenes = (res[2].data || []).map(function (r) { return r.session_id; });
-        bank = res[3].error ? [] : (res[3].data || []).filter(function (q) { return !q.cohort_id || q.cohort_id === cohort.id; });
-        kinds = res[4];
+        decks = {};
+        (res[2].data || []).forEach(function (n) { decks[n.scene_id] = n.body; });
+        withScenes = (res[3].data || []).map(function (r) { return r.session_id; });
+        bank = res[4].error ? [] : (res[4].data || []).filter(function (q) { return !q.cohort_id || q.cohort_id === cohort.id; });
+        kinds = res[5];
         draw();
       });
     }
@@ -158,6 +161,13 @@
     }
 
     function preview(s) {
+      if (s.slides && window.SlideEditor) {
+        var deckBox = el('div', 'stage-preview');
+        deckBox.setAttribute('role', 'img');
+        deckBox.setAttribute('aria-label', 'The first slide of ' + s.title);
+        window.SlideEditor.thumb(deckBox, s.slides);
+        return deckBox;
+      }
       var p = S.stagePreview(s);
       var stage = el('div', 'stage-preview');
       stage.setAttribute('role', 'img');
@@ -223,6 +233,9 @@
       });
       var rooms = el('textarea'); rooms.name = 'room_scenes'; rooms.rows = 5; rooms.value = S.roomScenesToText(c.room_scenes);
       var roomsL = field('The room’s own scenes', rooms, 'One per line, a title and its minutes, such as “Their question, 2”.');
+      var slides = el('textarea'); slides.name = 'slides'; slides.rows = 14; slides.maxLength = 60000; slides.value = (s && (decks[s.id] || s.slides)) || '';
+      var slidesL = field('Slides', slides);
+      if (window.SlideEditor) window.SlideEditor.attach({ input: slides, preview: true });
       var note = el('textarea'); note.name = 'note'; note.rows = 2; note.maxLength = 4000; note.value = (s && notes[s.id]) || '';
       field('Your note', note, 'Only the cohort’s leaders see it.');
       var promptLabel = promptL.firstChild;
@@ -239,6 +252,7 @@
         roomsL.hidden = uses.indexOf('room_scenes') === -1;
         promptLabel.textContent = { presenter: 'What each person shows', question: 'The question', rooms: 'What the rooms are for', reflection: 'The closing question' }[kindSel.value] || 'Prompt';
         bodyL.hidden = kindSel.value === 'question';
+        slidesL.hidden = ['talk', 'reflection'].indexOf(kindSel.value) < 0;
       }
       kindSel.addEventListener('change', fitKind);
       fitKind();
@@ -282,8 +296,12 @@
           : db.from('scenes').insert(Object.assign({ cohort_id: cohort.id, session_id: session.id, position: nextPosition() }, row)).select('id').single();
         q.then(function (r) {
           if (r.error) { save.disabled = false; msg.textContent = 'Not saved: ' + r.error.message; return; }
-          return saveNote(r.data.id, note.value.trim()).then(function (nr) {
-            if (nr && nr.error) say('The scene is saved, but not your note: ' + nr.error.message);
+          var deckBefore = (s && (decks[s.id] || s.slides)) || '';
+          var deckSaved = slides.value === deckBefore || slidesL.hidden ? Promise.resolve({}) : db.rpc('save_scene_deck', { scene: r.data.id, source: slides.value });
+          return Promise.all([saveNote(r.data.id, note.value.trim()), deckSaved]).then(function (both) {
+            var nr = both[0], dr = both[1];
+            if (dr && dr.error) say('The part is saved, but not its slides: ' + dr.error.message);
+            else if (nr && nr.error) say('The scene is saved, but not your note: ' + nr.error.message);
             else say(s ? 'Saved.' : 'Added.');
             editing = null;
             return load();

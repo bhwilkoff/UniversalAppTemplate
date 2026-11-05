@@ -166,6 +166,9 @@
     // Every rehearsal room at a glance (R12): its name, where its turns
     // are, its step's clock, and whether it asked for the teacher.
     if (on && on.kind === 'rooms') return { mode: 'rooms', part: part, rooms: roomsOf(state.rooms) };
+    // A part's own slides fill the stage (DECISIONS.md, "The main stage is
+    // built from slides").
+    if (!on && state.slides) { var sl = slidesOf(state.slides); if (sl) return { mode: 'slides', part: part, slides: sl }; }
     if (!on && state.scene) { var sc = sceneOf(state.scene); if (sc) return { mode: 'scene', part: part, scene: sc }; }
     return { mode: 'part', part: part };
   }
@@ -183,6 +186,12 @@
     // The design stage (R5): the board itself, on the main stage.
     if (typeof p.board === 'string' && STAGE_BOARD.test(p.board)) out.board = p.board;
     return out;
+  }
+
+  // A deck and the slide it is on, read back with both checked.
+  function slidesOf(d) {
+    if (!d || typeof d.text !== 'string' || !d.text) return null;
+    return { text: cut(d.text, 42000), at: Math.max(0, Math.floor(num(d.at) || 0)) };
   }
 
   // A welcome, read back with every field checked and cut to size.
@@ -249,6 +258,7 @@
     if (v.mode === 'blank') return { mode: 'blank', part: part };
     if (v.mode === 'path') return { mode: 'path', part: part, path: pathOf(v.path) };
     if (v.mode === 'rooms') return { mode: 'rooms', part: part, rooms: roomsOf(v.rooms) };
+    if (v.mode === 'slides') { var sl = slidesOf(v.slides); return sl ? { mode: 'slides', part: part, slides: sl } : null; }
     if (v.mode === 'scene') { var sc = sceneOf(v.scene); return sc ? { mode: 'scene', part: part, scene: sc } : null; }
     return null;
   }

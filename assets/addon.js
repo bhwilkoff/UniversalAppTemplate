@@ -291,11 +291,14 @@
         // the panel, so a stage cut to its main points left the leader
         // without the rest).
         var notes = S.teaching ? db.from('scene_notes').select('scene_id, body').eq('cohort_id', id) : Promise.resolve({ data: [] });
+        var decks = S.teaching ? db.from('scene_decks').select('scene_id, body').eq('cohort_id', id) : Promise.resolve({ data: [] });
         return Promise.all([
           db.from('shares').select('*').eq('cohort_id', id).eq('kind', 'bring-back').gte('created_at', since).order('created_at', { ascending: false }),
-          notes
+          notes, decks
         ]).then(function (got) {
           var sh = got[0];
+          S.decks = {};
+          (got[2].data || []).forEach(function (n) { S.decks[n.scene_id] = n.body; });
           if (got[1].error) console.log('[addon] leader notes did not load: ' + got[1].error.message);
           S.notes = {};
           (got[1].data || []).forEach(function (n) { S.notes[n.scene_id] = n.body; });
@@ -331,6 +334,7 @@
     S.show = window.ShowView.mount({
       mount: $('[data-show]'), parts: S.list, teaching: S.teaching,
       notes: function (key) { return (S.notes || {})[key] || null; },
+      deck: function (key) { return (S.decks || {})[key] || null; },
       // What does not apply to this cohort stays out of sight: rooms
       // without groups, a board without a board part (JOURNEYS.md).
       unavailable: function () {
@@ -389,6 +393,7 @@
             asked = q ? (S.checks || []).filter(function (k) { return k.state === 'open' && k.prompt === q.prompt; })[0] : null;
           }
           return S.run.save(key, fields).then(function (problem) {
+            if (!problem && fields && fields.slides != null) S.decks[key] = fields.slides;
             var p = fields && typeof fields.prompt === 'string' ? fields.prompt.trim() : '';
             if (!problem && asked && p && p !== asked.prompt) changeCheck(asked, { prompt: p });
             // The plan redraws on save; keep the part just edited in view.
@@ -840,7 +845,25 @@
   function drawRunInfo() {
     if (!S.show || !S.show.tick) return;
     var left = A.timeLeft(endsNow(), Date.now());
-    S.show.tick({ left: V.leftText(left), clockOn: left != null, pinned: pinnedText() });
+    S.show.tick({ left: V.leftText(left), clockOn: left != null, pinned: pinnedText(), slide: slideInfo() });
+  }
+  // Where the show is in this part's slides, for the plan and the stage.
+  function slideNow() { return shared() && S.run.slide ? S.run.slide() : 0; }
+  function slideInfo() {
+    var part = partNow(), SD = window.SlidesLib;
+    var total = part && SD ? SD.count(part.slides) : 0;
+    if (!total) return null;
+    var at = Math.min(slideNow(), total - 1);
+    var source = S.teaching ? (S.decks || {})[part.key] : null;
+    return { at: at, count: total, note: source ? SD.notes(source)[at] || '' : '' };
+  }
+  function slidesView(part) {
+    var SD = window.SlidesLib;
+    if (!part || !SD) return null;
+    var drafting = S.draft && S.draft.key === part.key && S.draft.fields.slides != null;
+    var text = drafting ? SD.withoutNotes(S.draft.fields.slides) : part.slides;
+    if (!text) return null;
+    return { text: SD.deck(text), at: drafting ? S.draft.fields.slide_at || 0 : slideNow() };
   }
   function pinnedText() {
     var on = S.onStage;
@@ -1504,7 +1527,7 @@
       // outranks the card.
       card: S.onStage ? null : S.card || null,
       onStage: S.onStage || (S.card ? null : partCheckPin()), checks: S.checks, results: S.results, items: S.items, names: S.names, audience: V ? V.audienceOf(part) : null,
-      welcome: lib.welcome(S.cohort, S.session, S.list && S.list.length ? S.list : S.parts), scene: scene,
+      welcome: lib.welcome(S.cohort, S.session, S.list && S.list.length ? S.list : S.parts), scene: scene, slides: slidesView(part),
       path: window.RosterLib && S.onStage && S.onStage.kind === 'path' ? window.RosterLib.pathView(rosterNow()) : null,
       rooms: S.onStage && S.onStage.kind === 'rooms' ? Object.keys(S.roomPlaces).map(function (k) { return S.roomPlaces[k]; }) : null
     });

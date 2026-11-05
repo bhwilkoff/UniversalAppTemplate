@@ -3110,6 +3110,27 @@ def main():
     su.execute("select count(*) from public.live_answers where cohort_id = %s and user_id = %s", (cc, gid))
     check("and the answers go back to the guest", su.fetchall() == [(2,)])
 
+    # A part's slides (migration 20261104050000): notes stay with leaders.
+    sc = str(uuid.uuid4())
+    su.execute("reset role")
+    su.execute("insert into public.scenes (id, cohort_id, session_id, position, kind, title, minutes) values (%s, %s, %s, 0, 'talk', 'Talk', 5)", (sc, cc, ss))
+    deck_src = "## One\n\n- shown\n\n> secret note\n\n---\n\n## Two\n"
+    check("a learner cannot save slides", not attempt(as_user("bea"), "select public.save_scene_deck(%s, %s)", (sc, deck_src)))
+    check("an agent cannot save slides", not attempt(as_agent("ben"), "select public.save_scene_deck(%s, %s)", (sc, deck_src)))
+    check("a leader saves slides", attempt(as_user("ben"), "select public.save_scene_deck(%s, %s)", (sc, deck_src)))
+    b = as_user("bea"); b.execute("select slides from public.scenes where id = %s", (sc,))
+    shown = b.fetchall()[0][0] or ""
+    check("a learner reads the slides", "## Two" in shown and "shown" in shown)
+    check("and never the speaker notes", "secret" not in shown)
+    b = as_user("bea"); b.execute("select count(*) from public.scene_decks where scene_id = %s", (sc,))
+    check("a learner cannot read the source", b.fetchall() == [(0,)])
+    x = as_user("ben"); x.execute("select body from public.scene_decks where scene_id = %s", (sc,))
+    check("a leader reads the source with its notes", "secret note" in x.fetchall()[0][0])
+    check("clearing the text clears the slides", attempt(as_user("ben"), "select public.save_scene_deck(%s, '')", (sc,)))
+    su.execute("reset role")
+    su.execute("select slides from public.scenes where id = %s", (sc,))
+    check("and leaves no slides behind", su.fetchall() == [(None,)])
+
     conn.rollback()
     conn.close()
     failed = [n for n, ok in results if not ok]

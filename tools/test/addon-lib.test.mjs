@@ -267,3 +267,12 @@ test('recording rides with every stage message, and only when on', () => {
   assert.equal(lib.readStageMessage(lib.stageMessage(v, true)).recording, true);
   assert.equal(lib.readStageMessage(lib.stageMessage(v)).recording, undefined);
 });
+
+test('a part with slides fills the stage, and a pin still outranks it', () => {
+  const slides = { text: '## One', at: 1 };
+  const v = lib.stageView({ part, slides, scene: { title: 'Words', eyebrow: 'Talk', lines: [], items: [] } });
+  assert.equal(v.mode, 'slides');
+  assert.deepEqual(lib.readStageMessage(lib.stageMessage(v)).slides, slides);
+  assert.equal(lib.stageView({ part, slides, onStage: { kind: 'blank' } }).mode, 'blank');
+  assert.equal(lib.stageView({ part, slides, card: { body: 'A card' } }).mode, 'card');
+});
