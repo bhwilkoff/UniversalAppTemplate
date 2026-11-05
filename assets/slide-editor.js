@@ -7,7 +7,7 @@
 (function () {
   var L = window.SlidesLib;
   if (!L) return;
-  var SRC = '/assets/vendor/deck-kit.js?v=20261104a';
+  var SRC = '/assets/vendor/deck-kit.js?v=20261104b';
   var loading = null;
 
   function el(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }

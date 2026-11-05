@@ -16,7 +16,9 @@ lookup.appOf = (id: string) => INSIDE[id];
 
 // The site's dark palette (assets/site.css), and its typeface.
 THEMES.humanshaped = { name: () => 'Human Shaped', dark: true, paper: '#131916', ink: '#E8EDEA', muted: '#C1CAC5', accent: '#DCC4F0' };
-const type = (svg: string) => svg.replace(/'IBM Plex Sans'/g, 'Commissioner');
+// The renderer lays white under every page, which bleeds through at a dark
+// slide's edges when the stage scales it.
+const type = (svg: string) => svg.replace(/'IBM Plex Sans'/g, 'Commissioner').replace('<rect width="960" height="600" fill="#ffffff"/>', '');
 
 export const render = (text: string): string[] => deckPages(text).map((p: any) => type(pageSvg(p, 'class="deck-slide" preserveAspectRatio="xMidYMid meet"')));
 export const lint = (text: string) => lintDeck(text);
