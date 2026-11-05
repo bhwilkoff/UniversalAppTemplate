@@ -172,3 +172,21 @@ a privacy policy page. Keep space creation on meet@.
 - Co-Doing closed to new signups: https://developers.google.com/workspace/meet/add-ons/guides/use-CoDoingAPI (via earlier notes)
 - Breakout rooms history, 2020: https://workspaceupdates.googleblog.com/2020/11/bringing-breakout-rooms-in-google-meet.html
 - Repo: `tools/meet-events/README.md`, `assets/rooms.js`, `assets/addon.js`
+
+## November 4, 2026: where this stands before building
+
+*Written by Claude, for Ben's decision. Ben asked to start on breakout rooms for larger cohorts and demonstrations.*
+
+**What Google allows.** Neither the Meet REST API nor the add-ons SDK lists breakout rooms or a way to move someone between calls, so no add-on can run Meet's own. Those rooms come only with paid editions, and Human Shaped pays for nothing. `spaces.create` needs a sensitive scope, and Google's quickstart asks for a Workspace account, so a leader's Gmail cannot be counted on to make rooms.
+
+**So a room is its own Meet call,** as this site already builds it: `groups.meet_url`, made ahead of time as meet@.
+
+**Measured in a real call, November 4.** A room made by meet@ and left empty: a personal Gmail account saw "No one else is here" and Join now, and went in with no host and no knocking. The room was made from meet.google.com/new; a room made by Calendar or the API has not been tried.
+
+**What is still wrong with the rooms already built.**
+
+1. A call back reaches only an open panel or page, and Meet does not carry the panel into another call. A learner in a room would likely never see it. Not yet tried in a real call.
+2. Leaders cannot see who reached which room: nothing is read from Meet.
+3. Ben, after using them on October 4: "overly conveluted".
+
+**Proposed.** One press for the learner. Go to my room opens the room, and a small Human Shaped window beside it that outlives the call: the group's time left, whose turn it is, and, when the leader calls everyone back, a sound and one button. That window is also how the leader sees who has arrived, through the class channel. The recorder already proves a window opened from the panel can carry its sign-in. No new Google permission, no cost.
