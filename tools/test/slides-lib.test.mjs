@@ -67,3 +67,10 @@ test('what a slide shows from GitHub becomes the deck\'s own words', () => {
   lib.ghHold('a/b|issues', { error: 'Not found' });
   assert.match(lib.deck(t), /- Not found/);
 });
+
+test('a GitHub read that failed can be tried again', () => {
+  lib.ghHold('x/y|issues', { error: 'no' });
+  assert.equal(lib.ghHas('x/y|issues'), true);
+  lib.ghDrop('x/y|issues');
+  assert.equal(lib.ghHas('x/y|issues'), false);
+});
