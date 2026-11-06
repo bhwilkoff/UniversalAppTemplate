@@ -932,7 +932,10 @@
       S.toolBack.appendChild(el('span', 'p2-toolname'));
       F.pane('tools').insertBefore(S.toolBack, F.pane('tools').firstChild);
       F.pane('tools').insertBefore(S.tiles, F.pane('tools').firstChild);
-      new MutationObserver(drawTiles).observe(F.pane('tools'), { childList: true, subtree: true, attributes: true, attributeFilter: ['hidden'] });
+      // Only the list of tools is watched, never the tiles themselves: drawing
+      // them would wake this again, for ever (it froze the panel, November 6, 2026).
+      var tilesSoon = null;
+      new MutationObserver(function () { clearTimeout(tilesSoon); tilesSoon = setTimeout(drawTiles, 50); }).observe(S.frameTools, { childList: true, attributes: true, attributeFilter: ['hidden'], subtree: true });
       setTimeout(function () { drawTiles(); drawBoardPin(); }, 0);
       F.put('people', $('[data-roster]'));
       F.put('people', $('[data-recognize]'));
@@ -1421,6 +1424,7 @@
     drawMyApp();
     drawAsks();
     drawMyRequests();
+    drawTiles();
   }
 
   // A learner's own way into the queue (found in the test cohort: the
