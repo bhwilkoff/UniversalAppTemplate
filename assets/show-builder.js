@@ -331,6 +331,12 @@
       top.appendChild(titleL); top.appendChild(kl); top.appendChild(minutesL);
       f.insertBefore(top, f.firstChild);
       f.insertBefore(deckBox, top.nextSibling);
+      var stageBox = el('div', 'part-stage');
+      f.insertBefore(stageBox, deckBox);
+      function drawStage() {
+        stageBox.hidden = !deckBox.hidden;
+        if (!stageBox.hidden) stageBox.replaceChildren(preview(s));
+      }
       if (window.SlideStudio) studio = window.SlideStudio.mount(deckBox, { text: decks[s.id] || s.slides || '', onChange: saveDeck });
       function saved(text) { msg.textContent = text; }
 
@@ -353,6 +359,7 @@
         more.hidden = !deck;
         [bodyL, noteL].forEach(function (x) { (deck ? more : f).appendChild(x); });
         f.appendChild(acts);
+        drawStage();
       }
       var acts = el('div', 'actions');
       acts.appendChild(button('Delete this part', 'btn-danger', function () {
@@ -382,6 +389,7 @@
           if (r.error) { saved('Not saved: ' + r.error.message); return; }
           if (nr && nr.error) { saved('Your note is not saved: ' + nr.error.message); return; }
           Object.assign(s, row);
+          drawStage();
           if (note.value.trim()) notes[s.id] = note.value.trim(); else delete notes[s.id];
           saved('Saved');
         });
