@@ -178,7 +178,8 @@
 
   $('[data-popup]').addEventListener('click', function () {
     var status = $('[data-signin-status]');
-    popup = window.open('/account/?handoff=meet', 'hs-signin', 'popup,width=480,height=720');
+    // A name of its own each time: a window left open would only come to the front.
+    popup = window.open('/account/?handoff=meet', 'hs-signin-' + Date.now(), 'popup,width=480,height=720');
     if (!popup) { status.textContent = 'Your browser blocked the small window.'; $('[data-fallback]').hidden = false; return; }
     status.textContent = 'Finish signing in in the small window, and this panel will follow.';
     clearInterval(popupWatch);
