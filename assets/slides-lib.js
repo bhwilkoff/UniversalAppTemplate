@@ -103,6 +103,16 @@
     if (spec.show === 'commits') return rows.map(function (r) { return '- ' + cell(r.title) + ', ' + cell(r.by); }).join('\n');
     return '```sheet\nNumber | Title | By\n--- | --- | ---\n' + rows.map(function (r) { return '#' + r.n + ' | ' + cell(r.title) + ' | ' + cell(r.by); }).join('\n') + '\n```';
   }
+  // What a slide's GitHub rows open, for the stage to offer.
+  function ghLinks(text, slide) {
+    var one = split(text)[slide];
+    if (!one) return [];
+    var out = [];
+    ghSpecs(one.join('\n')).forEach(function (s) {
+      ((github[s.key] || {}).rows || []).forEach(function (r) { if (r.url) out.push({ label: (r.n ? '#' + r.n + ' ' : '') + cell(r.title).slice(0, 48), url: r.url }); });
+    });
+    return out.slice(0, 6);
+  }
   function ghExpand(text) {
     return String(text || '').replace(new RegExp(GH_FENCE.source, 'g'), function (all, body) {
       var spec = ghSpec(body);
@@ -170,7 +180,7 @@
   }
   function slideAt(text, caret) { return Math.max(0, count(String(text || '').slice(0, caret)) - 1); }
 
-  var lib = { ghSpecs: ghSpecs, ghHold: ghHold, ghHas: ghHas, ghExpand: ghExpand, HEAD: HEAD, split: split, count: count, withoutNotes: withoutNotes, notes: notes, deck: deck, clean: clean, frames: frames, frameOf: frameOf, step: step, arrive: arrive, ADD: ADD, NOTE: NOTE, insert: insert, insertNote: insertNote, offset: offset, slideAt: slideAt };
+  var lib = { ghLinks: ghLinks, ghSpecs: ghSpecs, ghHold: ghHold, ghHas: ghHas, ghExpand: ghExpand, HEAD: HEAD, split: split, count: count, withoutNotes: withoutNotes, notes: notes, deck: deck, clean: clean, frames: frames, frameOf: frameOf, step: step, arrive: arrive, ADD: ADD, NOTE: NOTE, insert: insert, insertNote: insertNote, offset: offset, slideAt: slideAt };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
   else root.SlidesLib = lib;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

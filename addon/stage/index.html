@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261106v">
+  <link rel="stylesheet" href="/assets/site.css?v=20261106w">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -137,15 +137,21 @@
         <p class="stage-audience" data-audience hidden></p>
       </div>
       <div class="stage-reacts" data-stage-reacts></div>
+      <form class="stage-ask" data-stage-ask hidden>
+        <select aria-label="What to ask for"><option value="question">A question for everyone</option><option value="card">A message on the stage</option><option value="board">The board</option><option value="breakouts">Breakouts</option><option value="other">Something else</option></select>
+        <input maxlength="500" aria-label="In your words" placeholder="In your words" autocomplete="off">
+        <button class="stage-send" type="submit">Ask</button>
+      </form>
+      <div class="stage-chips" data-slide-links hidden></div>
     </section>
   </main>
   <script src="https://www.gstatic.com/meetjs/addons/1.2.0/meet.addons.js" defer></script>
   <script src="/assets/vendor/deck-kit.js?v=20261104e" defer></script>
   <script src="/assets/addon-config.js" defer></script>
   <script src="/assets/live-lib.js" defer></script>
-  <script src="/assets/addon-lib.js?v=20261106q" defer></script>
+  <script src="/assets/addon-lib.js?v=20261106r" defer></script>
   <script src="/assets/react-lib.js?v=20261106j" defer></script>
   <script src="/assets/code-lib.js" defer></script>
-  <script src="/assets/addon-stage.js?v=20261106q" defer></script>
+  <script src="/assets/addon-stage.js?v=20261106r" defer></script>
 </body>
 </html>

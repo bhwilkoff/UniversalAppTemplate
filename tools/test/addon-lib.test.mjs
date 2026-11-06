@@ -309,3 +309,15 @@ test('a stage asks its panel to act, in one shape only', () => {
   assert.equal(lib.readAct('{"type":"other"}'), null);
   assert.equal(lib.readAct('not json'), null);
 });
+
+test('a stage only offers GitHub links, and a learner flag rides the message', () => {
+  const v = lib.readStageMessage(lib.stageMessage({ mode: 'slides', part: null, slides: { text: 'x', at: 0, shown: 0, links: [{ label: 'One', url: 'https://github.com/a/b/issues/1' }, { label: 'Bad', url: 'https://evil.example/' }] } }, false, true));
+  assert.deepEqual(v.slides.links, [{ label: 'One', url: 'https://github.com/a/b/issues/1' }]);
+  assert.equal(v.learner, true);
+});
+
+test('the board can be called up whatever the part', () => {
+  const v = lib.stageView({ onStage: { kind: 'board' }, boardStage: '/board/?c=a&s=week-1&view=stage' });
+  assert.equal(v.mode, 'scene');
+  assert.equal(v.scene.board, '/board/?c=a&s=week-1&view=stage');
+});

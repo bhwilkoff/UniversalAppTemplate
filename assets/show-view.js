@@ -192,6 +192,12 @@
         d.appendChild(msg0);
         return d;
       }
+      // Slides are edited on the slide, in a window wide enough for it.
+      if (opts.editUrl && ['talk', 'reflection'].indexOf(s.kind) >= 0) {
+        d.appendChild(el('div', 'actions')).appendChild(btn('Edit the slides', 'btn-secondary', function () {
+          window.open(opts.editUrl(s.key), 'hs-slides', 'popup,width=1280,height=820');
+        }));
+      }
       var f = el('form', 'show-edit-form');
       var start = K.editFields(s), have = K.editable(s.kind, s.config);
       function field(name, label, kind, hint) {

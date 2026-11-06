@@ -84,11 +84,11 @@ Deno.serve(async (req) => {
   if (show === 'issues' || show === 'pulls') {
     const r = await gh(token, show === 'issues' ? `/repos/${repo}/issues?state=open&per_page=20` : `/repos/${repo}/pulls?state=open&per_page=8`);
     const rows = (Array.isArray(r.body) ? r.body : []).filter((x: { pull_request?: unknown }) => show === 'pulls' || !x.pull_request).slice(0, 6);
-    body = { rows: rows.map((x: { number: number; title: string; user?: { login?: string } }) => ({ n: x.number, title: x.title.slice(0, 90), by: by(x) })) };
+    body = { rows: rows.map((x: { number: number; title: string; html_url: string; user?: { login?: string } }) => ({ n: x.number, title: x.title.slice(0, 90), by: by(x), url: x.html_url })) };
   } else if (show === 'commits') {
     const r = await gh(token, `/repos/${repo}/commits?per_page=6`);
-    body = { rows: (Array.isArray(r.body) ? r.body : []).map((x: { commit: { message: string; author?: { name?: string } }; author?: { login?: string } }) => ({
-      title: x.commit.message.split('\n')[0].slice(0, 90), by: x.author?.login || x.commit.author?.name || 'someone',
+    body = { rows: (Array.isArray(r.body) ? r.body : []).map((x: { html_url: string; commit: { message: string; author?: { name?: string } }; author?: { login?: string } }) => ({
+      title: x.commit.message.split('\n')[0].slice(0, 90), by: x.author?.login || x.commit.author?.name || 'someone', url: x.html_url,
     })) };
   } else if (show === 'readme') {
     const r = await gh(token, `/repos/${repo}/readme`, 'application/vnd.github.raw+json');

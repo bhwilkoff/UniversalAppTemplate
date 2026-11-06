@@ -193,6 +193,8 @@
     // The run of show (R3): a stage the teacher cleared, or the current
     // scene as the class builder previews it (ShowLib.stagePreview).
     if (on && on.kind === 'blank') return { mode: 'blank', part: part };
+    // The board, called up by a leader whatever the part.
+    if (on && on.kind === 'board' && typeof state.boardStage === 'string') return { mode: 'scene', part: part, scene: { eyebrow: 'The board', title: 'The board', lines: [], items: [], note: null, board: state.boardStage } };
     // Where everyone said they are on the path (R11): counts, never names.
     if (on && on.kind === 'path') return { mode: 'path', part: part, path: pathOf(state.path) };
     // Every rehearsal room at a glance (R12): its name, where its turns
@@ -231,7 +233,11 @@
   // A deck and the slide it is on, read back with both checked.
   function slidesOf(d) {
     if (!d || typeof d.text !== 'string' || !d.text) return null;
-    return { text: cut(d.text, 42000), at: Math.max(0, Math.floor(num(d.at) || 0)), shown: Math.max(0, Math.floor(num(d.shown) || 0)) };
+    var out = { text: cut(d.text, 42000), at: Math.max(0, Math.floor(num(d.at) || 0)), shown: Math.max(0, Math.floor(num(d.shown) || 0)) };
+    var links = (Array.isArray(d.links) ? d.links : []).filter(function (l) { return l && typeof l.label === 'string' && /^https:\/\/github\.com\//.test(l.url || ''); })
+      .slice(0, 6).map(function (l) { return { label: cut(l.label, 60), url: cut(l.url, 300) }; });
+    if (links.length) out.links = links;
+    return out;
   }
 
   // A welcome, read back with every field checked and cut to size.
@@ -250,13 +256,14 @@
   var STAGE = 'hs-stage';
   // `recording` rides with every view: the stage marks it, because people
   // without the panel open see only the stage.
-  function stageMessage(view, recording) { return JSON.stringify({ type: STAGE, v: 1, view: view, recording: recording === true }); }
+  function stageMessage(view, recording, learner) { return JSON.stringify({ type: STAGE, v: 1, view: view, learner: learner === true, recording: recording === true }); }
   function readStageMessage(payload) {
     var v = readStageView(payload);
     if (!v) return null;
     var m;
     try { m = typeof payload === 'string' ? JSON.parse(payload) : payload; } catch (e) { m = null; }
     if (m && m.recording === true) v.recording = true;
+    if (m && m.learner === true) v.learner = true;
     return v;
   }
   function readStageView(payload) {

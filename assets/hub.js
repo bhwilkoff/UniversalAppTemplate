@@ -264,9 +264,10 @@
   // server (GitHubToken.keep) before the long-lived copy is scrubbed.
   function keepGitHubToken(session) {
     var trading = window.GitHubToken && session && session.provider_refresh_token;
-    if (trading) window.GitHubToken.keep(db, session);
+    var kept = trading ? window.GitHubToken.keep(db, session) : Promise.resolve();
     // While the trade runs the session's own token is about to die, so it is not held.
     if (window.DiscussionsLib) window.DiscussionsLib.tokenFrom(trading ? Object.assign({}, session, { provider_token: null }) : session, stores, Date.now(), db.auth.storageKey);
+    return kept;
   }
   root.querySelector('[data-sign-out]').addEventListener('click', function () {
     if (window.DiscussionsLib) window.DiscussionsLib.forget(stores.session);
@@ -404,7 +405,9 @@
         return;
       }
       if (handoffMode) return handOff(session);
-      if (welcome) return location.replace('/');
+      // The token goes to the server before the page moves on, or the move cancels
+      // the trade and this sign-in is never kept (found November 6, 2026).
+      if (welcome) return Promise.race([keepGitHubToken(session), new Promise(function (ok) { setTimeout(ok, 4000); })]).then(function () { location.replace('/'); }, function () { location.replace('/'); });
       var uid = session.user.id;
       keepGitHubToken(session);
       return Promise.all([

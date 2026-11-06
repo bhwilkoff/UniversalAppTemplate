@@ -3094,3 +3094,35 @@ select:not([multiple]):not(.p2-panel select) {
 .stage-ready:has(.stage-app:not([hidden])) .stage-reacts { display: none; }
 
 .ui-status .icon { margin: 0; }
+
+/* Tools as tiles, one tool at a time, and asking from the panel or the stage. */
+.p2-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+.p2-tile { position: relative; display: grid; justify-items: start; gap: 6px; min-height: 76px; padding: 10px 12px; border: 1px solid rgb(255 255 255 / 0.12); border-radius: 12px; background: rgb(255 255 255 / 0.05); color: inherit; font: inherit; font-size: 0.85rem; font-weight: 500; text-align: left; line-height: 1.2; cursor: pointer; }
+.p2-tile:hover { background: rgb(255 255 255 / 0.1); }
+.p2-tile svg { width: 20px; height: 20px; fill: currentColor; color: #A8C7FA; }
+.p2-tile-n { position: absolute; top: 8px; right: 10px; min-width: 18px; padding: 0 5px; border-radius: 999px; background: #A8C7FA; color: #062E6F; font-size: 0.72rem; font-weight: 700; text-align: center; }
+.p2-toolback { display: none; align-items: center; gap: 8px; margin-bottom: 10px; }
+.p2-toolname { font-weight: 600; font-size: 0.9rem; }
+[data-pane="tools"]:not([data-tool]) > :not(.p2-tiles) { display: none; }
+[data-pane="tools"][data-tool] > .p2-tiles { display: none; }
+[data-pane="tools"][data-tool] > .p2-toolback { display: flex; }
+[data-pane="tools"][data-tool] > :not(.p2-toolback):not(.is-tool):not(.p2-group) { display: none; }
+[data-pane="tools"][data-tool] > .p2-group > :not(.is-tool) { display: none; }
+[data-pane="tools"][data-tool] > .is-tool > summary { display: none; }
+.p2-ask.is-request { display: grid; gap: 6px; }
+.p2-ask-acts { display: flex; gap: 6px; }
+.p2-label { margin: 0 0 6px; font-size: 0.85rem; font-weight: 600; }
+.p2-asks-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.p2-ask-form { display: flex; gap: 6px; margin-bottom: 8px; }
+.p2-ask-form[hidden] { display: none; }
+.p2-ask-form input { flex: 1; min-width: 0; padding: 6px 10px; border: 1px solid rgb(255 255 255 / 0.3); border-radius: 8px; background: transparent; color: inherit; font: inherit; font-size: 0.85rem; }
+.p2-mine-ask { margin-bottom: 12px; }
+.stage-ask-open { padding: 0.1rem 0.7rem; border: 0; border-radius: 999px; background: var(--thistle); color: var(--on-thistle); font: inherit; font-size: clamp(0.8rem, 1.8vmin, 1rem); font-weight: 600; cursor: pointer; }
+.stage-ask:not([hidden]) { position: fixed; left: 0.75rem; bottom: 3rem; z-index: 6; display: grid; grid-template-columns: auto minmax(10rem, 22rem) auto; gap: 0.4rem; padding: 0.5rem; border-radius: 12px; background: var(--card); box-shadow: 0 2px 12px rgb(0 0 0 / 0.35); }
+.stage-ask select, .stage-ask input { padding: 0.35rem 0.5rem; border: 1px solid var(--muted); border-radius: 8px; background: var(--card); color: var(--ink); font: inherit; font-size: 0.9rem; }
+.stage-chips:not([hidden]) { position: fixed; right: 0.75rem; bottom: 0.6rem; left: 40%; z-index: 5; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.3rem; }
+.stage-chip { padding: 0.15rem 0.6rem; border: 1px solid var(--rule); border-radius: 999px; background: var(--card); color: var(--ink); font-size: clamp(0.72rem, 1.6vmin, 0.9rem); text-decoration: none; }
+.stage-chip:hover { border-color: var(--thistle); }
+.stage-ready:has(.has-board:not([hidden])) .stage-reacts { display: flex; }
+.stage-ready:has(.has-board:not([hidden])) .stage-react { display: none; }
+

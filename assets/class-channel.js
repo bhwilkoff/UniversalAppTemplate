@@ -187,6 +187,7 @@
 
     return {
       // Other parts of the panel (R11) add to what this person shares.
+      rename: function (n) { o.name = n; track(); },
       press: function (e) { var k = R.keyFor(e); if (k) pressed(k); },
       setPresence: function (fields) { extra = Object.assign({}, extra, fields || {}); track(); },
       nudge: function (what) { if (live && channel) channel.send({ type: 'broadcast', event: 'nudge', payload: { what: String(what) } }); },

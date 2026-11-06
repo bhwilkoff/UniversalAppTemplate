@@ -32,6 +32,8 @@
     // The part sits small at the top when something else has the stage.
     $('[data-part]').hidden = view.mode === 'part' || view.mode === 'welcome' || view.mode === 'scene' || view.mode === 'app' || view.mode === 'slides' || view.mode === 'blank' || !part;
     if (view.mode === 'slides') drawSlide(view.slides);
+    drawLinks(view.mode === 'slides' ? view.slides.links : null);
+    drawAsk();
     if (view.mode === 'scene') {
       var sc = view.scene;
       drawBoard(sc.board || null);
@@ -222,6 +224,35 @@
   var stageClient = null;
   function act(a) { if (stageClient) try { Promise.resolve(stageClient.notifySidePanel(A.actMessage(a))).catch(function () {}); } catch (e) {} }
 
+  // What a slide shows from GitHub, ready to open.
+  function drawLinks(links) {
+    var box = $('[data-slide-links]');
+    box.replaceChildren();
+    box.hidden = !links || !links.length;
+    (links || []).forEach(function (l) {
+      var a = el('a', 'stage-chip', l.label); a.href = l.url; a.target = '_blank'; a.rel = 'noopener';
+      box.appendChild(a);
+    });
+  }
+  // A learner asks from the stage itself, and their panel sends it.
+  function drawAsk() {
+    var open = $('[data-stage-ask-open]');
+    if (open) open.hidden = !view.learner;
+  }
+  function wireAsk() {
+    var bar = $('[data-stage-reacts]'), box = $('[data-stage-ask]');
+    var b = el('button', 'stage-ask-open', 'Ask'); b.type = 'button'; b.setAttribute('data-stage-ask-open', ''); b.hidden = true;
+    b.addEventListener('click', function () { box.hidden = !box.hidden; if (!box.hidden) box.querySelector('input').focus(); });
+    bar.appendChild(b);
+    box.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      var kind = box.querySelector('select').value, input = box.querySelector('input');
+      if (!input.value.trim() && ['board', 'breakouts'].indexOf(kind) < 0) return;
+      act({ a: 'request', kind: kind, body: input.value.trim() });
+      input.value = ''; box.hidden = true;
+    });
+  }
+
   // Reactions, within reach on the stage itself.
   function drawReactBar() {
     var bar = $('[data-stage-reacts]');
@@ -316,6 +347,7 @@
     }).then(function (stage) {
       stageClient = stage;
       drawReactBar();
+      wireAsk();
       stage.on('frameToFrameMessage', function (m) {
         var react = m && window.ReactLib ? window.ReactLib.readStage(m.payload) : null;
         if (react) return drawReactions(react);

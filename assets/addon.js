@@ -214,7 +214,7 @@
   var channel = null, poller = null, nudgeTimer = null, deferred = {}, drafts = {};
   var Q = window.QuestionView, askFields = null;  // the question bank (R4)
 
-  function nameOf(id) { return S.me && id === S.me.id ? 'You' : (S.names[id] || 'Someone'); }
+  function nameOf(id) { return S.me && (id === S.me.id || id === S.asMember) ? 'You' : (S.names[id] || 'Someone'); }
 
   function start(session) {
     S.me = session.user;
@@ -355,6 +355,7 @@
       anyBox: S.newPanel ? S.frameTools : null,
       notes: function (key) { return S.newPanel ? null : (S.notes || {})[key] || null; },
       deck: function (key) { return (S.decks || {})[key] || null; },
+      editUrl: function (key) { return '/session/?c=' + encodeURIComponent(S.cohort.slug) + '&s=' + S.session.number + '&t=plan&part=' + encodeURIComponent(key); },
       // What does not apply to this cohort stays out of sight: rooms
       // without groups, a board without a board part (JOURNEYS.md).
       unavailable: function () {
@@ -591,7 +592,13 @@
     S.isGuest = !S.teaching && !S.people.some(function (p) { return p.user_id === S.me.id; });
     var tied = S.guests.filter(function (g) { return g.user_id === S.me.id && g.member_id; })[0];
     S.asMember = tied ? tied.member_id : null;
+    // Someone tied to a member is that member here: their name, their app,
+    // their place in the queue (Ben, November 6, 2026).
+    var self = S.people.filter(function (p) { return p.user_id === who(); })[0];
+    if (self) S.myApp = self.app_url || null;
+    if (tied && S.classChannel && S.names[tied.member_id]) S.classChannel.rename(S.names[tied.member_id]);
   }
+  function who() { return S.asMember || S.me.id; }
   function loadGuests() {
     return db.from('call_guests').select('*').eq('cohort_id', S.cohort.id).order('joined_at', { ascending: false }).then(function (r) {
       if (r.error) return;
@@ -637,7 +644,7 @@
     // It rides in the bar that stays on screen, because the panel follows the
     // session and a name field at the top scrolls away (found in a real
     // call). A guest who has given a name has no more need of it.
-    $('[data-guest-signin]').parentNode.hidden = !S.isGuest;
+    $('[data-guest-signin]').parentNode.hidden = !S.isGuest || !!S.asMember;
     box.hidden = !S.isGuest || (!!mine.name && !mine.member_id);
     if (box.hidden) return;
     var bar = $('[data-react]');
@@ -647,7 +654,7 @@
     $('[data-guest-form]').hidden = !!mine.member_id;
     var line = $('[data-guest-line]');
     line.hidden = !mine.member_id;
-    line.textContent = mine.member_id ? 'Your answers count as ' + (S.names[mine.member_id] || 'a member’s') + '.' : '';
+    line.textContent = mine.member_id ? 'You are here as ' + (S.names[mine.member_id] || 'a member') + '.' : '';
     if (mine.member_id) $('[data-guest-status]').textContent = '';
   }
   $('[data-guest-form]').addEventListener('submit', function (ev) {
@@ -915,12 +922,23 @@
       F.put('tools', $('[data-ask-wrap]'));
       F.put('tools', $('[data-breakouts]'));
       S.appsBox = el('div', 'p2-apps'); F.put('tools', S.appsBox);
+      S.boardPin = el('div', 'actions'); stage.appendChild(S.boardPin);
       S.nowAsks = el('div', 'p2-asks'); S.nowAsks.hidden = true; F.pane('now').insertBefore(S.nowAsks, F.pane('now').firstChild);
       F.put('tools', S.frameTools);
+      S.stageTools = stage; S.askTool = $('[data-ask-wrap]'); S.breakTool = $('[data-breakouts]');
+      S.tiles = el('div', 'p2-tiles');
+      S.toolBack = el('div', 'p2-toolback');
+      S.toolBack.appendChild(button('All tools', 'btn-secondary small', closeTool));
+      S.toolBack.appendChild(el('span', 'p2-toolname'));
+      F.pane('tools').insertBefore(S.toolBack, F.pane('tools').firstChild);
+      F.pane('tools').insertBefore(S.tiles, F.pane('tools').firstChild);
+      new MutationObserver(drawTiles).observe(F.pane('tools'), { childList: true, subtree: true, attributes: true, attributeFilter: ['hidden'] });
+      setTimeout(function () { drawTiles(); drawBoardPin(); }, 0);
       F.put('people', $('[data-roster]'));
       F.put('people', $('[data-recognize]'));
     } else {
       S.mineApp = el('div', 'p2-myapp'); F.put('mine', S.mineApp);
+      S.mineAsk = el('div', 'p2-mine-ask'); F.put('mine', S.mineAsk);
       F.put('mine', S.frameTools);
       F.put('mine', $('[data-guest-signin]').parentNode);
       F.put('mine', $('[data-recognize]'));
@@ -1010,7 +1028,7 @@
     var stop = stops[at] || { slide: 0, shown: Infinity };
     // What this deck shows from GitHub, fetched here because the panel is signed in.
     if (window.GitHubBlock) window.GitHubBlock.preload(db, S.cohort.id, text).then(function (got) { if (got) sendStage(); });
-    return { text: SD.deck(text), at: stop.slide, shown: stop.shown === Infinity ? 0 : stop.shown };
+    return { text: SD.deck(text), at: stop.slide, shown: stop.shown === Infinity ? 0 : stop.shown, links: SD.ghLinks(text, stop.slide) };
   }
   function pinnedText() {
     var on = S.onStage;
@@ -1283,11 +1301,13 @@
     return Promise.all([
       db.from('live_queue').select('*').eq('session_id', sid),
       db.from('live_checks').select('*').eq('session_id', sid).order('created_at', { ascending: false }),
-      db.from('live_answers').select('*').eq('cohort_id', S.cohort.id)
+      db.from('live_answers').select('*').eq('cohort_id', S.cohort.id),
+      db.from('live_requests').select('*').eq('session_id', sid).order('created_at')
     ]).then(function (res) {
       var bad = res.filter(function (r) { return r.error; })[0];
       if (bad) { $('[data-sync]').textContent = 'The panel could not read the latest changes: ' + bad.error.message; return; }
       S.items = res[0].data; S.checks = res[1].data; S.answers = res[2].data;
+      S.requests = res[3].data || [];
       if (S.isGuest) loadGuests();
       var visible = S.checks.filter(function (k) { return L.kindOf(k) !== 'short' && (S.teaching || k.show_tally); });
       // A question asked again (R17) needs its first results too, even closed.
@@ -1333,6 +1353,7 @@
     S.onStage = v;
     if (S.run && S.run.shared && S.teaching) S.run.pin(v);
     drawQueue(); drawChecks(); drawRoster(); drawRoomsToggle(); sendStage(); drawRunInfo(); drawApps();
+    drawBoardPin();
   }
 
   // Whose work is on the main stage, for everyone, and, for a teacher,
@@ -1386,7 +1407,7 @@
       // further down need their own way onto the stage.
       if (S.teaching && i > 0) acts.appendChild(stageToggle('item', item.id, 'Put it on the main stage', 'Take it off the main stage'));
       if (L.canManage(item, S.me.id, S.teaching)) {
-        acts.appendChild(button(item.user_id === S.me.id ? 'I have shown it' : 'They have shown it', 'btn-secondary', function () {
+        acts.appendChild(button(item.user_id === who() ? 'I have shown it' : 'They have shown it', 'btn-secondary', function () {
           if (S.onStage && S.onStage.id === item.id) setPin(null);
           db.from('live_queue').update({ state: 'shown' }).eq('id', item.id).then(function (r) { if (!r.error) refreshLive(); });
         }));
@@ -1399,6 +1420,7 @@
     drawApps();
     drawMyApp();
     drawAsks();
+    drawMyRequests();
   }
 
   // A learner's own way into the queue (found in the test cohort: the
@@ -1409,7 +1431,7 @@
     if (!box) { box = el('div', 'live-ask-show'); box.setAttribute('data-ask-show', ''); $('[data-wings]').appendChild(box); }
     box.replaceChildren();
     if (S.teaching) return;
-    var mine = q.waiting.filter(function (x) { return x.user_id === S.me.id; })[0];
+    var mine = q.waiting.filter(function (x) { return x.user_id === who(); })[0];
     if (mine && S.onStage && S.onStage.kind === 'item' && S.onStage.id === mine.id) return;
     if (mine) {
       // Their own card above already says they are waiting.
@@ -1433,13 +1455,81 @@
       var c = L.classifyLink(url.value);
       if (!c) { said.textContent = 'A full link that starts with https://'; return; }
       go.disabled = true;
-      db.from('live_queue').insert({ cohort_id: S.cohort.id, session_id: S.session.id, user_id: S.me.id, kind: c.kind, url: c.url, note: note.value.trim() || null }).then(function (r) {
+      db.from('live_queue').insert({ cohort_id: S.cohort.id, session_id: S.session.id, user_id: who(), kind: c.kind, url: c.url, note: note.value.trim() || null }).then(function (r) {
         go.disabled = false;
         if (r.error) { said.textContent = 'Not added: ' + r.error.message; return; }
         refreshLive();
       });
     });
     box.appendChild(f);
+  }
+
+  // Anything a leader can do, a learner can ask for, and a leader decides.
+  var ASKS = { question: 'a question for everyone', card: 'a message on the stage', board: 'the board', breakouts: 'breakouts', other: 'something else' };
+  function decide(r, state) {
+    return db.from('live_requests').update({ state: state }).eq('id', r.id).then(function () { refreshLive(); });
+  }
+  function doRequest(r) {
+    if (r.kind === 'question') {
+      var q = L.parseQuestion({ kind: 'short', prompt: r.body });
+      if (q.error) return;
+      return ask([q], el('span')).then(function (ok) { if (ok) decide(r, 'done'); });
+    }
+    if (r.kind === 'card' && S.signals) {
+      S.signals.send('card', { body: String(r.body || '').slice(0, 400), ends_at: new Date(Date.now() + 300000).toISOString() }, el('span'));
+      return decide(r, 'done');
+    }
+    if (r.kind === 'board') { setPin({ kind: 'board' }); return decide(r, 'done'); }
+    if (r.kind === 'breakouts') { openTool('Breakouts'); return decide(r, 'done'); }
+    return decide(r, 'done');
+  }
+  function sendRequest(kind, body) {
+    return db.from('live_requests').insert({ cohort_id: S.cohort.id, session_id: S.session.id, user_id: who(), kind: kind, body: body ? String(body).slice(0, 500) : null }).then(function (r) {
+      if (!r.error) refreshLive();
+      return r.error ? r.error.message : null;
+    });
+  }
+  function drawMyRequests() {
+    var box = S.mineAsk;
+    if (!box) return;
+    var typing = box.contains(document.activeElement) && document.activeElement.tagName === 'INPUT';
+    if (typing) return;
+    box.replaceChildren();
+    box.appendChild(el('p', 'p2-label', 'Ask your leader for'));
+    var row = el('div', 'p2-asks-row'), form = el('form', 'p2-ask-form'); form.hidden = true;
+    var input = el('input'); input.maxLength = 500; input.setAttribute('aria-label', 'What you want');
+    var go = el('button', 'btn-primary small', 'Ask'); go.type = 'submit';
+    var said = el('span', 'small'); said.setAttribute('role', 'status');
+    form.appendChild(input); form.appendChild(go);
+    var chosen = null;
+    [['question', 'A question', 'What should everyone answer?'], ['card', 'A message', 'What should the stage say?'], ['link', 'A link', 'https://'],
+     ['board', 'The board'], ['breakouts', 'Breakouts'], ['other', 'Something else', 'What would you like?']].forEach(function (x) {
+      row.appendChild(button(x[1], 'btn-secondary small', function () {
+        if (!x[2]) return sendRequest(x[0]);
+        chosen = x[0]; form.hidden = false; input.placeholder = x[2]; input.focus();
+      }));
+    });
+    form.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      var text = input.value.trim();
+      if (!text) return;
+      if (chosen === 'link') {
+        var c = L.classifyLink(text);
+        if (!c) { said.textContent = 'A full link that starts with https://'; return; }
+        db.from('live_queue').insert({ cohort_id: S.cohort.id, session_id: S.session.id, user_id: who(), kind: c.kind, url: c.url }).then(function (r) { said.textContent = r.error ? 'Not sent: ' + r.error.message : ''; if (!r.error) { input.value = ''; input.blur(); refreshLive(); } });
+        return;
+      }
+      sendRequest(chosen, text).then(function (err) { said.textContent = err ? 'Not sent: ' + err : ''; if (!err) { input.value = ''; input.blur(); drawMyRequests(); } });
+    });
+    box.appendChild(row); box.appendChild(form); box.appendChild(said);
+    var mine = (S.requests || []).filter(function (r) { return r.user_id === who(); }).slice(-3).reverse();
+    mine.forEach(function (r) {
+      var line = el('div', 'p2-ask');
+      line.appendChild(el('span', null, ASKS[r.kind].charAt(0).toUpperCase() + ASKS[r.kind].slice(1) + (r.body ? ': ' + r.body : '')));
+      if (r.state === 'waiting') line.appendChild(button('Take it back', 'btn-secondary small', function () { db.from('live_requests').delete().eq('id', r.id).then(function () { refreshLive(); }); }));
+      else line.appendChild(el('span', 'p2-state', r.state === 'done' ? 'Done' : 'Not now'));
+      box.appendChild(line);
+    });
   }
 
   // The first thing in Mine: a learner's own app, and where it stands.
@@ -1450,7 +1540,7 @@
     var app = S.myApp ? L.classifyLink(S.myApp) : null;
     box.hidden = !app;
     if (!app) return;
-    var mine = L.queue(S.items).waiting.filter(function (x) { return x.user_id === S.me.id; })[0];
+    var mine = L.queue(S.items).waiting.filter(function (x) { return x.user_id === who(); })[0];
     if (mine && S.onStage && S.onStage.kind === 'item' && S.onStage.id === mine.id) { box.appendChild(el('p', 'p2-state', 'Your app is on the main stage.')); return; }
     if (mine) {
       box.appendChild(el('p', 'p2-state', 'Your leader sees you are ready.'));
@@ -1458,7 +1548,7 @@
       return;
     }
     box.appendChild(button('Show my app on the main stage', 'btn-primary', function () {
-      db.from('live_queue').insert({ cohort_id: S.cohort.id, session_id: S.session.id, user_id: S.me.id, kind: app.kind, url: app.url }).then(function (r) { if (!r.error) refreshLive(); });
+      db.from('live_queue').insert({ cohort_id: S.cohort.id, session_id: S.session.id, user_id: who(), kind: app.kind, url: app.url }).then(function (r) { if (!r.error) refreshLive(); });
     }));
   }
   // A learner asking to show comes to the leader where the leader is looking.
@@ -1473,6 +1563,18 @@
       row.appendChild(button('Show it', 'btn-secondary small', function () { setPin({ kind: 'item', id: item.id }); }));
       box.appendChild(row);
     });
+    (S.requests || []).filter(function (r) { return r.state === 'waiting'; }).forEach(function (r) {
+      var row = el('div', 'p2-ask is-request');
+      var words = el('span');
+      words.appendChild(el('strong', null, nameOf(r.user_id)));
+      words.appendChild(document.createTextNode(' asks: ' + ASKS[r.kind] + (r.body ? ': ' + r.body : '')));
+      row.appendChild(words);
+      var acts = el('span', 'p2-ask-acts');
+      acts.appendChild(button('Do it', 'btn-secondary small', function () { doRequest(r); }));
+      acts.appendChild(button('Not now', 'btn-secondary small', function () { decide(r, 'declined'); }));
+      row.appendChild(acts);
+      box.appendChild(row);
+    });
     if (staged) {
       var on = el('div', 'p2-ask');
       on.appendChild(el('span', null, 'On the main stage'));
@@ -1484,6 +1586,54 @@
     box.hidden = !box.children.length;
   }
 
+  function drawBoardPin() {
+    if (S.boardPin) S.boardPin.replaceChildren(stageToggle('board', undefined, 'Put the board on the main stage', 'Take the board down'));
+  }
+  // Tools as tiles: one tool at a time, and the way back to all of them.
+  var TOOL_ICONS = { 'Main stage': 'app-window', 'Ask a question': 'chats-circle', 'Breakouts': 'users-three', 'Apps': 'laptop', 'A card for everyone': 'megaphone-simple',
+    'Who is presenting': 'chalkboard-teacher', 'Waiting to show work': 'hand-tap', 'The board': 'palette', 'Questions': 'chat-circle-text', 'Recording': 'video-camera' };
+  function toolList() {
+    var pane = S.frame.pane('tools'), out = [];
+    function add(name, node) { if (node && !node.hidden && name) out.push({ name: name, node: node }); }
+    add('Main stage', S.stageTools); add('Ask a question', S.askTool); add('Breakouts', S.breakTool);
+    if (S.appsBox && S.appsBox.childElementCount) add('Apps', S.appsBox);
+    Array.prototype.forEach.call(S.frameTools.children, function (d) {
+      var head = d.querySelector('summary');
+      if (head && !d.hidden) add(head.firstChild ? head.firstChild.textContent.trim() : '', d);
+    });
+    return { pane: pane, list: out };
+  }
+  function drawTiles() {
+    if (!S.teaching || !S.tiles) return;
+    var t = toolList(), grid = S.tiles, open = t.pane.getAttribute('data-tool');
+    grid.replaceChildren();
+    t.list.forEach(function (x) {
+      var b = el('button', 'p2-tile'); b.type = 'button';
+      if (TOOL_ICONS[x.name]) b.innerHTML = '<svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022j#' + TOOL_ICONS[x.name] + '"/></svg>';
+      b.appendChild(el('span', null, x.name));
+      var n = x.node.querySelector && x.node.querySelector('summary .ui-count, summary [class*="badge"]');
+      if (n && !n.hidden && n.textContent) b.appendChild(el('span', 'p2-tile-n', n.textContent));
+      b.addEventListener('click', function () { openTool(x.name); });
+      grid.appendChild(b);
+    });
+    if (open && !t.list.some(function (x) { return x.name === open; })) closeTool();
+  }
+  function openTool(name) {
+    if (!S.tiles) return;
+    S.frame.show('tools');
+    var t = toolList(), one = t.list.filter(function (x) { return x.name === name; })[0];
+    if (!one) return;
+    t.list.forEach(function (x) { x.node.classList.toggle('is-tool', x === one); });
+    if (one.node.tagName === 'DETAILS') one.node.open = true;
+    t.pane.setAttribute('data-tool', name);
+    S.toolBack.querySelector('span').textContent = name;
+  }
+  function closeTool() {
+    var pane = S.frame.pane('tools');
+    pane.removeAttribute('data-tool');
+    pane.querySelectorAll('.is-tool').forEach(function (n) { n.classList.remove('is-tool'); });
+  }
+  // A leader puts anyone's app on every stage in one press.
   // A leader puts anyone's app on every stage in one press.
   function drawApps() {
     var box = S.appsBox;
@@ -1627,6 +1777,7 @@
   // What a person did on their own main stage, done here, where they are signed in.
   function stageAct(a) {
     if (a.a === 'react' && S.classChannel) return S.classChannel.press({ key: String(a.key), target: {} });
+    if (a.a === 'request' && !S.teaching && ASKS[a.kind]) return sendRequest(a.kind, a.body);
     if (a.a !== 'answer' || S.teaching) return;
     var k = S.checks.filter(function (x) { return x.id === a.id && x.state === 'open'; })[0];
     if (!k) return;
@@ -1810,6 +1961,7 @@
       // outranks the card.
       card: S.onStage ? null : S.card || null,
       answerable: !S.teaching,
+      boardStage: (A.boardLinks(S.cohort, S.session, null, null) || {}).stage,
       mineOf: function (k) { var x = myAnswer(k); return x ? { choice: x.choice, picks: Array.isArray(x.value) ? x.value : undefined, body: x.body } : null; },
       onStage: S.onStage || (S.card ? null : partCheckPin()), checks: S.checks, results: S.results, items: S.items, names: S.names, audience: V ? V.audienceOf(part) : null,
       welcome: lib.welcome(S.cohort, S.session, S.list && S.list.length ? S.list : S.parts), scene: scene, slides: slidesView(part),
@@ -1830,7 +1982,7 @@
   function sendStage() {
     drawWelcomeToggle();
     if (!S.stageOn || !side || !S.session) return;
-    try { Promise.resolve(side.notifyMainStage(A.stageMessage(currentView(), !!S.recording))).catch(function () {}); } catch (e) {}
+    try { Promise.resolve(side.notifyMainStage(A.stageMessage(currentView(), !!S.recording, !S.teaching))).catch(function () {}); } catch (e) {}
   }
   // Start the session: the first part, with its clock running.
   $('[data-start-session]').addEventListener('click', function () {
@@ -1888,7 +2040,7 @@
     if (channel || !db.channel) return poll(true);
     var f = 'cohort_id=eq.' + S.cohort.id;
     channel = db.channel('addon:' + S.cohort.id);
-    ['live_queue', 'live_checks', 'live_answers'].forEach(function (t) {
+    ['live_queue', 'live_checks', 'live_answers', 'live_requests'].forEach(function (t) {
       channel.on('postgres_changes', { event: '*', schema: 'public', table: t, filter: f }, nudge);
     });
     poll(true);

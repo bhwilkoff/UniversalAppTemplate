@@ -260,6 +260,13 @@
     var bar = $('[data-notes]');
     if (!bar || !canDraw()) return;
     bar.hidden = false;
+    // Someone tied to a member writes as that member.
+    db.from('call_guests').select('member_id').eq('cohort_id', S.cohort.id).eq('user_id', S.me.id).maybeSingle().then(function (g) {
+      var id = g.data && g.data.member_id;
+      if (!id) return;
+      S.asMember = id;
+      db.from('profiles').select('display_name, github_login').eq('id', id).maybeSingle().then(function (p) { if (p.data) S.asName = p.data.display_name || p.data.github_login; });
+    });
     var form = bar.querySelector('form'), vote = bar.querySelector('[data-vote]'), input = form.querySelector('input');
     form.addEventListener('submit', function (ev) {
       ev.preventDefault();
@@ -268,7 +275,7 @@
       var st = S.api.getAppState(), z = st.zoom.value, now = Date.now();
       var n = S.api.getSceneElements().filter(function (e) { return e.customData && e.customData.by === S.me.id && e.type === 'rectangle'; }).length;
       var x = st.width / 2 / z - st.scrollX - 120 + (n % 5) * 28, y = st.height / 2 / z - st.scrollY - 80 + (n % 5) * 28;
-      var made = B.noteElements({ id: 'n' + now.toString(36) + Math.random().toString(36).slice(2, 6), by: S.me.id, name: myName(), text: text, x: x, y: y, now: now });
+      var made = B.noteElements({ id: 'n' + now.toString(36) + Math.random().toString(36).slice(2, 6), by: S.asMember || S.me.id, name: myName(), text: text, x: x, y: y, now: now });
       S.api.updateScene({ elements: S.api.getSceneElementsIncludingDeleted().concat(S.X.restoreElements(made, null)), captureUpdate: S.X.CaptureUpdateAction.IMMEDIATELY });
       input.value = '';
       // Everything stays in view, at no more than life size.
@@ -389,6 +396,7 @@
     sendPointer({ id: S.me.id, name: myName(), x: e.pointer.x, y: e.pointer.y, tool: e.pointer.tool, button: e.button });
   }
   function myName() {
+    if (S.asName) return S.asName;
     var m = (S.me && S.me.user_metadata) || {};
     return m.full_name || m.name || m.user_name || m.preferred_username || 'Someone';
   }

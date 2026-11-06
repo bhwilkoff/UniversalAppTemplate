@@ -3112,6 +3112,14 @@ def main():
     first_app = last_rows[0][0]
     attempt(as_user("ben"), "select public.queue_member_app(%s, %s)", (ss, people["bea"]))
     check("asking twice makes one item", last_rows[0][0] == first_app)
+    tied_session = ss
+    check("a tied guest asks as the member", attempt(as_user("gus"), "insert into public.live_requests (cohort_id, session_id, user_id, kind, body) values (%s, %s, %s, 'other', 'please') returning id", (cc, tied_session, people["bea"])))
+    req = last_rows[0][0]
+    check("a learner cannot ask as someone else", not attempt(as_user("gus"), "insert into public.live_requests (cohort_id, session_id, user_id, kind) values (%s, %s, %s, 'board')", (cc, tied_session, people["ben"])))
+    attempt(as_user("gus"), "update public.live_requests set state = 'done' where id = %s returning id", (req,))
+    check("a learner cannot answer their own request", last_rows == [])
+    check("a leader decides a request", attempt(as_user("ben"), "update public.live_requests set state = 'done' where id = %s returning id", (req,)))
+    check("a tied guest shows work as the member", attempt(as_user("gus"), "insert into public.live_queue (cohort_id, session_id, user_id, kind, url) values (%s, %s, %s, 'app', 'https://bea.example/other/') returning id", (cc, tied_session, people["bea"])))
     check("a leader can undo a match", attempt(as_user("ben"), "select public.tie_call_guest(%s, %s, null)", (cc, gid)))
     su.execute("reset role")
     su.execute("select count(*) from public.live_answers where cohort_id = %s and user_id = %s", (cc, gid))
