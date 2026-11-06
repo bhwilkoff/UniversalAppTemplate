@@ -1477,7 +1477,14 @@
     if (r.kind === 'question') {
       var q = L.parseQuestion({ kind: 'short', prompt: r.body });
       if (q.error) return;
-      return ask([q], el('span')).then(function (ok) { if (ok) decide(r, 'done'); });
+      return ask([q], el('span')).then(function (ok) {
+        if (!ok) return;
+        decide(r, 'done');
+        // What was asked goes straight to the stage, or no one would see it.
+        var made = S.checks.filter(function (k) { return k.prompt === q.prompt && k.state === 'open'; })[0];
+        if (made) setPin({ kind: 'check', id: made.id });
+        else refreshLive().then(function () { var k = S.checks.filter(function (x) { return x.prompt === q.prompt && x.state === 'open'; })[0]; if (k) setPin({ kind: 'check', id: k.id }); });
+      });
     }
     if (r.kind === 'card' && S.signals) {
       S.signals.send('card', { body: String(r.body || '').slice(0, 400), ends_at: new Date(Date.now() + 300000).toISOString() }, el('span'));

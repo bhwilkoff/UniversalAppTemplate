@@ -321,3 +321,9 @@ test('the board can be called up whatever the part', () => {
   assert.equal(v.mode, 'scene');
   assert.equal(v.scene.board, '/board/?c=a&s=week-1&view=stage');
 });
+
+test('typing on the stage is never read as a shortcut', () => {
+  assert.equal(lib.keyMessage({ key: 'a', code: 'KeyA', target: { tagName: 'INPUT' } }), null);
+  assert.equal(lib.keyMessage({ key: 'k', code: 'KeyK', target: { tagName: 'TEXTAREA' } }), null);
+  assert.ok(lib.keyMessage({ key: 'a', code: 'KeyA', target: { tagName: 'DIV' } }));
+});

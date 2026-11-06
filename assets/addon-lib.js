@@ -343,6 +343,9 @@
   // reactions live. Only the keys that mean something leave the stage.
   function keyMessage(e) {
     if (e.ctrlKey || e.metaKey || e.altKey || e.repeat) return null;
+    // Words typed on the stage are words, not shortcuts.
+    var t = e.target;
+    if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName || ''))) return null;
     if (!/^[1-8aukdr]$/i.test(e.key || '') && !(e.shiftKey && /^Digit[1-8]$/.test(e.code || ''))) return null;
     return JSON.stringify({ type: STAGE + '-key', key: e.key, code: e.code, shiftKey: !!e.shiftKey });
   }

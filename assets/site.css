@@ -3066,7 +3066,7 @@ select:not([multiple]):not(.p2-panel select) {
 .stage-write:not([hidden]) { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 1vmin; }
 .stage-write input, .stage-write textarea { width: 100%; padding: 1vmin 1.4vmin; border: 2px solid var(--rule); border-radius: 12px; background: var(--card); color: var(--ink); font: inherit; font-size: clamp(1rem, 2.6vmin, 1.6rem); }
 .stage-send { padding: 0 2vmin; border: 0; border-radius: 12px; background: var(--thistle); color: var(--on-thistle); font: inherit; font-weight: 600; cursor: pointer; }
-.stage-reacts { position: fixed; left: 0.75rem; bottom: 0.6rem; z-index: 5; display: flex; gap: 0.15rem; padding: 0.2rem 0.3rem; border-radius: 999px; background: rgb(19 25 22 / 0.7); opacity: 0.35; transition: opacity 0.15s; }
+.stage-reacts { position: fixed; left: 0.75rem; bottom: 2.4rem; z-index: 5; display: flex; gap: 0.15rem; padding: 0.2rem 0.3rem; border-radius: 999px; background: rgb(19 25 22 / 0.7); opacity: 0.35; transition: opacity 0.15s; }
 .stage-reacts:hover, .stage-reacts:focus-within { opacity: 1; }
 .stage-react { padding: 0.15rem 0.3rem; border: 0; background: none; font-size: clamp(1rem, 2.4vmin, 1.5rem); line-height: 1; cursor: pointer; }
 
@@ -3118,7 +3118,7 @@ select:not([multiple]):not(.p2-panel select) {
 .p2-ask-form input { flex: 1; min-width: 0; padding: 6px 10px; border: 1px solid rgb(255 255 255 / 0.3); border-radius: 8px; background: transparent; color: inherit; font: inherit; font-size: 0.85rem; }
 .p2-mine-ask { margin-bottom: 12px; }
 .stage-ask-open { padding: 0.1rem 0.7rem; border: 0; border-radius: 999px; background: var(--thistle); color: var(--on-thistle); font: inherit; font-size: clamp(0.8rem, 1.8vmin, 1rem); font-weight: 600; cursor: pointer; }
-.stage-ask:not([hidden]) { position: fixed; left: 0.75rem; bottom: 3rem; z-index: 6; display: grid; grid-template-columns: auto minmax(10rem, 22rem) auto; gap: 0.4rem; padding: 0.5rem; border-radius: 12px; background: var(--card); box-shadow: 0 2px 12px rgb(0 0 0 / 0.35); }
+.stage-ask:not([hidden]) { position: fixed; left: 0.75rem; bottom: 4.6rem; z-index: 6; display: grid; grid-template-columns: auto minmax(10rem, 22rem) auto; gap: 0.4rem; padding: 0.5rem; border-radius: 12px; background: var(--card); box-shadow: 0 2px 12px rgb(0 0 0 / 0.35); }
 .stage-ask select, .stage-ask input { padding: 0.35rem 0.5rem; border: 1px solid var(--muted); border-radius: 8px; background: var(--card); color: var(--ink); font: inherit; font-size: 0.9rem; }
 .stage-chips:not([hidden]) { position: fixed; right: 0.75rem; bottom: 0.6rem; left: 40%; z-index: 5; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.3rem; }
 .stage-chip { padding: 0.15rem 0.6rem; border: 1px solid var(--rule); border-radius: 999px; background: var(--card); color: var(--ink); font-size: clamp(0.72rem, 1.6vmin, 0.9rem); text-decoration: none; }
