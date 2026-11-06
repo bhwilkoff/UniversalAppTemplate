@@ -84,7 +84,8 @@
         li.appendChild(body);
         var tools = el('div', 'actions show-tools');
         if (teaching && opts.onPick) {
-          var pick = el('button', 'btn-secondary small show-pick', 'Go to this part');
+          var pick = el('button', 'btn-secondary small show-pick', opts.nowBox ? 'Go' : 'Go to this part');
+          if (opts.nowBox) pick.setAttribute('aria-label', 'Go to ' + s.name);
           pick.type = 'button';
           pick.addEventListener('click', function () { opts.onPick(s.key); });
           tools.appendChild(pick);

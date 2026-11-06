@@ -316,6 +316,8 @@
           startClass();
           // Where this panel is, so the leader sees who reached their room.
           if (S.classChannel) S.classChannel.setPresence({ room: S.room.groupId || null });
+          // Agree, Not sure, and Disagree wait a press away, so the bar stays small.
+          if (S.newPanel) { var more = root.querySelector('.react-more'), st = root.querySelector('.stance-row'); if (more && st) more.insertBefore(st, more.children[1] || null); }
           startBreakouts();
           // Reactions and stance are for the people in the session, not
           // the leader running it.
@@ -909,6 +911,7 @@
       F.put('people', $('[data-recognize]'));
     } else {
       F.put('mine', S.frameTools);
+      F.put('mine', $('[data-guest-signin]').parentNode);
       F.put('mine', $('[data-recognize]'));
     }
     root.querySelector('.addon-more').hidden = true;
@@ -957,7 +960,7 @@
     S.nowWhat.hidden = !what;
     if (S.teaching) {
       var noteOf = part || first;
-      var slideNote = info ? info.note : first && window.SlidesLib && (S.decks || {})[first.key] ? window.SlidesLib.notes(S.decks[first.key])[0] : '';
+      var slideNote = part ? (info ? info.note : '') : first && window.SlidesLib && (S.decks || {})[first.key] ? window.SlidesLib.notes(S.decks[first.key])[0] : '';
       var said = [slideNote, noteOf && (S.notes || {})[noteOf.key]].filter(Boolean).join('\n\n');
       if (S.nowNotes.getAttribute('data-said') !== said) {
         S.nowNotes.setAttribute('data-said', said);
@@ -1671,6 +1674,7 @@
   // live Meet test: the panel stayed where the button was, parts away),
   // and its planned question asked.
   function afterMove() {
+    if (S.newPanel) S.frame.show('now');
     var now = root.querySelector('[data-show] [aria-current="step"]');
     if (now && now.scrollIntoView) now.scrollIntoView({ block: 'start', behavior: 'smooth' });
     askPlanned();
