@@ -41,15 +41,17 @@
   // `agenda` is CohortLib.agenda(cohort.session_minutes), `turn` LiveLib.TURN.
   function mount(box, opts) {
     var db = opts.db, cohort = opts.cohort, session = opts.session, readOnly = !!opts.readOnly;
-    var scenes = [], notes = {}, decks = {}, withScenes = [], editing = null, previewing = null, busy = false, dragId = null, bank = [], kinds = false;
+    var scenes = [], notes = {}, decks = {}, withScenes = [], busy = false, dragId = null, bank = [], kinds = false;
+    var part = opts.part || null, studio = null;
     var status = el('p', 'small'); status.setAttribute('role', 'status');
-    var fit = el('p', 'small show-fit');
-    var list = el('ol', 'show-list');
- list.classList.toggle('is-read-only', readOnly);
+    var fit = el('p', 'plan-fit');
+    var hour = el('div', 'plan-hour');
+    var list = el('ol', 'plan-board');
+    list.classList.toggle('is-read-only', readOnly);
     list.setAttribute('aria-label', 'Plan for ' + (window.CohortLib ? window.CohortLib.sessionName(session.number) : 'Week ' + session.number));
     var start = el('div', 'actions');
-    var add = el('div', 'actions');
-    box.replaceChildren(fit, list, start, add, status);
+    var page = el('div', 'part-page');
+    box.replaceChildren(fit, hour, list, start, page, status);
 
     function say(text) { status.textContent = text || ''; }
 
@@ -80,9 +82,19 @@
     }
 
     function draw() {
+      var here = part ? scenes.filter(function (x) { return x.id === part; })[0] : null;
+      [fit, hour, list, start].forEach(function (n) { n.hidden = !!here; });
+      page.hidden = !here;
+      if (here) return drawPart(here, scenes.indexOf(here));
+      page.replaceChildren();
+      studio = null;
+      drawBoard();
+    }
+
+    function drawBoard() {
       list.replaceChildren();
       start.replaceChildren();
-      add.replaceChildren();
+      hour.replaceChildren();
       fit.textContent = scenes.length
         ? (readOnly ? scenes.reduce(function (n, x) { return n + x.minutes; }, 0) + ' minutes' : S.fitText(scenes, cohort.session_minutes))
         : (window.CohortLib ? window.CohortLib.sessionName(session.number) : 'Week ' + session.number) + ' has no plan yet.';
@@ -94,59 +106,47 @@
         if (from) start.appendChild(button('Copy week ' + from.number + '’s run of show', 'btn-secondary', function () { copyFrom(from); }));
       }
       var at = S.startTimes(scenes);
-      scenes.forEach(function (s, i) { list.appendChild(item(s, i, at[i])); });
-      if (editing === 'new') { var li = el('li', 'scene-item is-editing'); li.appendChild(form(null)); list.appendChild(li); }
-      else if (!readOnly) add.appendChild(button('Add a part', 'btn-secondary', function () { editing = 'new'; previewing = null; draw(); focusFirst(); }));
+      scenes.forEach(function (s, i) {
+        var seg = el('a', 'plan-seg fam-' + family(s.kind));
+        seg.href = opts.href(s.id);
+        seg.style.flexGrow = s.minutes;
+        seg.title = s.title + ', ' + s.minutes + ' min';
+        seg.setAttribute('aria-label', s.title + ', ' + s.minutes + ' minutes');
+        seg.addEventListener('click', function (ev) { if (plainClick(ev)) { ev.preventDefault(); opts.go(s.id); } });
+        hour.appendChild(seg);
+        list.appendChild(card(s, i, at[i]));
+      });
+      if (!readOnly && scenes.length) list.appendChild(adder());
+    }
+    function plainClick(ev) { return !(ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.button); }
+    // Three families of what a part asks of people, so the hour reads at a glance.
+    function family(k) {
+      return { question: 'ask', presenter: 'do', design: 'do', rooms: 'do', 'break': 'rest' }[k] || 'say';
     }
 
-    function focusFirst() {
-      var f = list.querySelector('.is-editing select, .is-editing input');
-      if (f) f.focus();
-    }
-
-    // One part of the plan, as people read it: when it starts, what kind
-    // it is, its title and minutes, its words, and what it asks of people.
-    // A leader also sees their note, and one button to change it; moving
-    // and deleting are in the form, so a row never carries a row of tools.
-    function item(s, i, at) {
-      var li = el('li', 'scene-item');
+    // One part, as a picture of its main stage. It opens on its own page.
+    function card(s, i, at) {
+      var li = el('li', 'part-card');
       li.dataset.id = s.id;
-      if (editing === s.id) { li.classList.add('is-editing'); li.appendChild(form(s, i)); return li; }
-      var c = s.config || {};
-      var head = el('div', 'scene-head');
-      head.appendChild(el('span', 'scene-at', clock(at)));
-      var words = el('div', 'scene-words');
-      words.appendChild(el('span', 'scene-kind', plain(s.kind)));
-      words.appendChild(el('strong', 'scene-title', s.title));
-      words.appendChild(el('span', 'scene-minutes small', s.minutes + ' min'));
-      head.appendChild(words);
-      if (!readOnly) {
-        var edit = button('Edit', 'btn-secondary small', function () { editing = s.id; previewing = null; draw(); focusFirst(); });
-        edit.setAttribute('aria-label', 'Edit ' + s.title);
-        head.appendChild(edit);
-      }
-      li.appendChild(head);
-      var detail = el('div', 'scene-detail');
-      paragraphs(s.body).forEach(function (p) { detail.appendChild(p); });
-      if (c.prompt) detail.appendChild(el('p', 'scene-prompt', (s.kind === 'question' || s.kind === 'reflection' ? '' : 'The prompt: ') + c.prompt));
-      if (c.options && c.options.length && s.kind === 'question') detail.appendChild(el('p', 'small', c.options.join(' · ')));
-      if (c.room_scenes && c.room_scenes.length) {
-        detail.appendChild(el('p', 'small', 'Each turn: ' + c.room_scenes.map(function (r) { return r.title + ' (' + r.minutes + ')'; }).join(', ') + '.'));
-      }
-      if (s.slides && window.SlideEditor) detail.appendChild(window.SlideEditor.strip(s.slides));
-      if (!readOnly && notes[s.id]) {
-        var note = el('p', 'scene-note');
-        if (window.UI && window.UI.visibility) { note.appendChild(window.UI.visibility('staff', 'Your note')); note.appendChild(document.createTextNode(' ')); }
-        note.appendChild(document.createTextNode(notes[s.id]));
-        detail.appendChild(note);
-      }
-      if (detail.children.length) li.appendChild(detail);
+      var a = el('a', 'part-link');
+      a.href = opts.href(s.id);
+      a.addEventListener('click', function (ev) { if (plainClick(ev)) { ev.preventDefault(); opts.go(s.id); } });
+      a.appendChild(preview(s));
+      var words = el('span', 'part-words');
+      var line = el('span', 'part-line fam-' + family(s.kind));
+      line.appendChild(el('span', 'part-at', clock(at)));
+      line.appendChild(el('span', 'part-kind', plain(s.kind)));
+      line.appendChild(el('span', 'part-min', s.minutes + ' min'));
+      words.appendChild(line);
+      words.appendChild(el('strong', 'part-title', s.title));
+      a.appendChild(words);
+      li.appendChild(a);
       if (readOnly) return li;
-      // Keyboard: Alt with the up or down arrow moves the part you are on.
+      // Keyboard: Alt with an arrow moves the part you are on.
       li.addEventListener('keydown', function (ev) {
-        if (!ev.altKey || (ev.key !== 'ArrowUp' && ev.key !== 'ArrowDown')) return;
+        if (!ev.altKey || ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].indexOf(ev.key) < 0) return;
         ev.preventDefault();
-        move(i, ev.key === 'ArrowUp' ? -1 : 1, true);
+        move(i, ev.key === 'ArrowUp' || ev.key === 'ArrowLeft' ? -1 : 1, true);
       });
       li.draggable = true;
       li.addEventListener('dragstart', function (ev) { dragId = s.id; li.classList.add('is-dragging'); if (ev.dataTransfer) ev.dataTransfer.effectAllowed = 'move'; });
@@ -161,16 +161,79 @@
       return li;
     }
 
+    function adder() {
+      var li = el('li', 'part-card part-new');
+      var open = button('Add a part', 'part-new-open', function () { open.hidden = true; menu.hidden = false; menu.querySelector('button').focus(); });
+      var menu = el('div', 'part-new-menu');
+      menu.hidden = true;
+      S.KINDS.forEach(function (k) { menu.appendChild(button(plain(k.key), 'btn-secondary small', function () { addPart(k.key); })); });
+      li.appendChild(open); li.appendChild(menu);
+      return li;
+    }
+    function addPart(k) {
+      var raw = k === 'question' ? { prompt: 'Your question' } : k === 'rooms' ? { prompt: 'What the rooms are for', room_scenes: [{ title: 'Talk it over', minutes: 5 }] } : k === 'presenter' ? { prompt: 'What each person shows' } : k === 'reflection' ? { prompt: 'Your question' } : {};
+      var row = { cohort_id: cohort.id, session_id: session.id, position: nextPosition(), kind: k, title: plain(k), minutes: 5, body: null, config: S.cleanConfig(k, raw) };
+      say('Adding…');
+      db.from('scenes').insert(row).select('id').single().then(function (r) {
+        if (r.error) { say('Not added: ' + r.error.message); return; }
+        say('');
+        return load().then(function () { opts.go(r.data.id); });
+      });
+    }
+
+    // A part on its own page: its stage, big, and the few things it needs.
+    function drawPart(s, i) {
+      page.replaceChildren();
+      var nav = el('div', 'part-nav');
+      var back = el('a', 'btn-secondary small', 'The plan');
+      back.href = opts.href(null);
+      back.addEventListener('click', function (ev) { if (plainClick(ev)) { ev.preventDefault(); leave(null); } });
+      nav.appendChild(back);
+      nav.appendChild(el('span', 'part-of', 'Part ' + (i + 1) + ' of ' + scenes.length));
+      var turn = el('span', 'part-turn');
+      [[scenes[i - 1], 'Previous part'], [scenes[i + 1], 'Next part']].forEach(function (x) {
+        var b = button(x[1], 'btn-secondary small', function () { leave(x[0].id); });
+        b.disabled = !x[0];
+        turn.appendChild(b);
+      });
+      nav.appendChild(turn);
+      page.appendChild(nav);
+      if (!readOnly) { page.appendChild(form(s, i)); return; }
+      var head = el('div', 'part-read');
+      head.appendChild(el('p', 'part-line fam-' + family(s.kind), plain(s.kind) + ', ' + s.minutes + ' min'));
+      head.appendChild(el('h2', 'part-heading', s.title));
+      page.appendChild(head);
+      if (s.slides && window.SlideStudio) {
+        var deck = el('div');
+        page.appendChild(deck);
+        window.SlideStudio.mount(deck, { text: s.slides, readOnly: true });
+      } else page.appendChild(preview(s));
+      var c = s.config || {}, detail = el('div', 'scene-detail');
+      paragraphs(s.body).forEach(function (p) { detail.appendChild(p); });
+      if (c.prompt) detail.appendChild(el('p', 'scene-prompt', c.prompt));
+      if (c.options && c.options.length && s.kind === 'question') detail.appendChild(el('p', 'small', c.options.join(' · ')));
+      if (detail.children.length) page.appendChild(detail);
+    }
+    function leave(id) { opts.go(id); }
+    // Everything waiting to save lands before the page changes.
+    function setPart(id) {
+      if (id === part) return Promise.resolve();
+      var pending = studio ? studio.flush() : null;
+      studio = null;
+      part = id;
+      return Promise.resolve(pending).then(load);
+    }
+
     function preview(s) {
       if (s.slides && window.SlideEditor) {
-        var deckBox = el('div', 'stage-preview');
+        var deckBox = el('div', 'stage-preview part-pic');
         deckBox.setAttribute('role', 'img');
         deckBox.setAttribute('aria-label', 'The first slide of ' + s.title);
         window.SlideEditor.thumb(deckBox, s.slides);
         return deckBox;
       }
       var p = S.stagePreview(s);
-      var stage = el('div', 'stage-preview');
+      var stage = el('div', 'stage-preview part-pic');
       stage.setAttribute('role', 'img');
       stage.setAttribute('aria-label', 'The main stage during ' + s.title);
       stage.appendChild(el('p', 'stage-eyebrow', p.eyebrow + ', ' + p.minutes + ' min'));
@@ -189,6 +252,7 @@
     // uses, and the teacher's own note.
     function form(s, index) {
       var f = el('form', 'inline-form scene-form');
+      var deckBox = el('div', 'part-deck');
       // ShowLib.problem checks a part. The browser's own check would stop on
       // the hidden question form's required box, with nothing on screen (found
       // saving slides: no part but a question could be saved here).
@@ -204,14 +268,13 @@
       var kindSel = el('select'); kindSel.name = 'kind';
       S.KINDS.forEach(function (k) { var o = el('option', null, plain(k.key)); o.value = k.key; kindSel.appendChild(o); });
       kindSel.value = s ? s.kind : 'talk';
-      var kindHint = el('span', 'hint');
-      var kl = field('Kind of part', kindSel); kl.insertBefore(kindHint, kindSel);
+      var kl = field('Kind of part', kindSel);
       var title = el('input'); title.name = 'title'; title.maxLength = 120; title.required = true; title.value = s ? s.title : '';
-      field('Title', title);
+      var titleL = field('Title', title);
       var minutes = el('input'); minutes.name = 'minutes'; minutes.type = 'number'; minutes.min = 1; minutes.max = 240; minutes.required = true; minutes.value = s ? s.minutes : 5;
-      field('Minutes', minutes);
+      var minutesL = field('Minutes', minutes);
       var body = el('textarea'); body.name = 'body'; body.rows = 3; body.maxLength = 2000; body.value = (s && s.body) || '';
-      var bodyL = field('What happens', body, 'What people read on this session’s page and see in Meet. A blank line starts a new paragraph.');
+      var bodyL = field('What happens', body);
       var prompt = el('textarea'); prompt.name = 'prompt'; prompt.rows = 2; prompt.maxLength = 500; prompt.value = c.prompt || '';
       var promptL = field('Prompt', prompt);
       var options = el('textarea'); options.name = 'options'; options.rows = 3; options.value = (c.options || []).join('\n');
@@ -238,16 +301,12 @@
       });
       var rooms = el('textarea'); rooms.name = 'room_scenes'; rooms.rows = 5; rooms.value = S.roomScenesToText(c.room_scenes);
       var roomsL = field('The room’s own scenes', rooms, 'One per line, a title and its minutes, such as “Their question, 2”.');
-      var slides = el('textarea'); slides.name = 'slides'; slides.rows = 14; slides.maxLength = 60000; slides.value = (s && (decks[s.id] || s.slides)) || '';
-      var slidesL = field('Slides', slides);
-      if (window.SlideEditor) window.SlideEditor.attach({ input: slides, preview: true });
       var note = el('textarea'); note.name = 'note'; note.rows = 2; note.maxLength = 4000; note.value = (s && notes[s.id]) || '';
       field('Your note', note, 'Only the cohort’s leaders see it.');
       var promptLabel = promptL.firstChild;
 
       function fitKind() {
         var k = S.kind(kindSel.value);
-        kindHint.textContent = k ? k.what : '';
         var uses = k ? k.keys : [];
         var asQuestion = !!qf && kindSel.value === 'question';
         promptL.hidden = uses.indexOf('prompt') === -1 || asQuestion;
@@ -257,36 +316,42 @@
         roomsL.hidden = uses.indexOf('room_scenes') === -1;
         promptLabel.textContent = { presenter: 'What each person shows', question: 'The question', rooms: 'What the rooms are for', reflection: 'The closing question' }[kindSel.value] || 'Prompt';
         bodyL.hidden = kindSel.value === 'question';
-        slidesL.hidden = ['talk', 'reflection'].indexOf(kindSel.value) < 0;
+        deckBox.hidden = ['talk', 'reflection'].indexOf(kindSel.value) < 0;
       }
       kindSel.addEventListener('change', fitKind);
       fitKind();
 
-      var msg = el('span', 'small'); msg.setAttribute('role', 'status');
-      var acts = el('div', 'actions');
-      var save = el('button', 'btn-primary', s ? 'Save the part' : 'Add the part'); save.type = 'submit';
-      acts.appendChild(save);
-      acts.appendChild(button('Cancel', 'btn-secondary', function () { editing = null; draw(); }));
-      if (s) {
-        var up = button('Move up', 'btn-secondary', function () { editing = null; move(index, -1); });
-        up.disabled = index === 0;
-        var down = button('Move down', 'btn-secondary', function () { editing = null; move(index, 1); });
-        down.disabled = index === scenes.length - 1;
-        acts.appendChild(up); acts.appendChild(down);
-        acts.appendChild(button('Delete', 'btn-danger', function () {
-          window.UI.confirm({ title: 'Delete ' + s.title + '?', body: 'It comes out of this session’s plan.', action: 'Delete part' }).then(function (ok) { if (ok) { editing = null; remove(s); } });
-        }));
+      var msg = el('span', 'part-saved'); msg.setAttribute('role', 'status');
+      var top = el('div', 'part-top');
+      top.appendChild(titleL); top.appendChild(kl); top.appendChild(minutesL); top.appendChild(msg);
+      f.insertBefore(top, f.firstChild);
+      f.insertBefore(deckBox, top.nextSibling);
+      if (window.SlideStudio) studio = window.SlideStudio.mount(deckBox, { text: decks[s.id] || s.slides || '', onChange: saveDeck });
+      function saved(text) { msg.textContent = text; }
+
+      function saveDeck(text) {
+        if (text === (decks[s.id] || s.slides || '')) return null;
+        saved('Saving…');
+        return db.rpc('save_scene_deck', { scene: s.id, source: text }).then(function (r) {
+          if (r.error) { saved('Not saved: ' + r.error.message); return; }
+          decks[s.id] = text;
+          saved('Saved');
+        });
       }
-      acts.appendChild(msg);
+
+      var acts = el('div', 'actions');
+      acts.appendChild(button('Delete this part', 'btn-danger', function () {
+        window.UI.confirm({ title: 'Delete ' + s.title + '?', body: 'It comes out of this session’s plan.', action: 'Delete part' }).then(function (yes) { if (yes) remove(s); });
+      }));
       f.appendChild(acts);
 
-      f.addEventListener('submit', function (ev) {
-        ev.preventDefault();
+      var waiting = null;
+      function persist() {
         var k = kindSel.value;
         var raw = { prompt: prompt.value, options: S.optionsFromText(options.value), template: template.value, room_scenes: S.roomScenesFromText(rooms.value) };
         if (k === 'question' && qf) {
           var qr = qf.read(), parsed = LL.parseQuestion(qr);
-          if (parsed.error) { msg.textContent = parsed.error; return; }
+          if (parsed.error) { saved(parsed.error); return; }
           raw = LL.sceneQuestion(parsed, qr.question_id);
         }
         var row = {
@@ -294,25 +359,21 @@
           body: k === 'question' ? null : (body.value.trim() || null), config: S.cleanConfig(k, raw)
         };
         var p = S.problem(row);
-        if (p) { msg.textContent = p; return; }
-        save.disabled = true; msg.textContent = 'Saving…';
-        var q = s
-          ? db.from('scenes').update(row).eq('id', s.id).select('id').single()
-          : db.from('scenes').insert(Object.assign({ cohort_id: cohort.id, session_id: session.id, position: nextPosition() }, row)).select('id').single();
-        q.then(function (r) {
-          if (r.error) { save.disabled = false; msg.textContent = 'Not saved: ' + r.error.message; return; }
-          var deckBefore = (s && (decks[s.id] || s.slides)) || '';
-          var deckSaved = slides.value === deckBefore || slidesL.hidden ? Promise.resolve({}) : db.rpc('save_scene_deck', { scene: r.data.id, source: slides.value });
-          return Promise.all([saveNote(r.data.id, note.value.trim()), deckSaved]).then(function (both) {
-            var nr = both[0], dr = both[1];
-            if (dr && dr.error) say('The part is saved, but not its slides: ' + dr.error.message);
-            else if (nr && nr.error) say('The scene is saved, but not your note: ' + nr.error.message);
-            else say(s ? 'Saved.' : 'Added.');
-            editing = null;
-            return load();
-          });
+        if (p) { saved(p); return; }
+        saved('Saving…');
+        return Promise.all([db.from('scenes').update(row).eq('id', s.id).select('id').single(), saveNote(s.id, note.value.trim())]).then(function (both) {
+          var r = both[0], nr = both[1];
+          if (r.error) { saved('Not saved: ' + r.error.message); return; }
+          if (nr && nr.error) { saved('Your note is not saved: ' + nr.error.message); return; }
+          Object.assign(s, row);
+          if (note.value.trim()) notes[s.id] = note.value.trim(); else delete notes[s.id];
+          saved('Saved');
         });
-      });
+      }
+      function soon() { clearTimeout(waiting); waiting = setTimeout(persist, 700); }
+      f.addEventListener('input', function (ev) { if (!deckBox.contains(ev.target)) soon(); });
+      f.addEventListener('change', function (ev) { if (!deckBox.contains(ev.target)) soon(); });
+      f.addEventListener('submit', function (ev) { ev.preventDefault(); persist(); });
       return f;
     }
 
@@ -349,7 +410,8 @@
       db.from('scenes').delete().eq('id', s.id).select('id').then(function (r) {
         if (r.error || !r.data.length) { say('Not removed: ' + (r.error ? r.error.message : 'the database refused') + '.'); return; }
         say(s.title + ' is removed.');
-        load();
+        studio = null;
+        opts.go(null);
       });
     }
 
@@ -387,7 +449,7 @@
     }
 
     load();
-    return { reload: load };
+    return { reload: load, part: setPart };
   }
 
   window.ShowBuilder = { mount: mount };

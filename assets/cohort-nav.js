@@ -51,6 +51,13 @@
     if (!mount) return null;
     var c = o.cohort, slug = encodeURIComponent(c.slug);
     var root = o.teaching ? ['/teach/', 'Leading'] : ['/', 'Home'];
+    if (o.within) {
+      // A page inside a cohort has its own row of views, and the kit never
+      // stacks two, so the way back is the crumbs.
+      mount.replaceChildren(crumbs([root, ['/cohort/?c=' + slug, c.title], ['/cohort/?c=' + slug + '&t=sessions', 'Sessions']]));
+      mount.hidden = false;
+      return null;
+    }
     mount.replaceChildren(crumbs(o.current === 'live' ? [root, ['/cohort/?c=' + slug, c.title]] : [root]));
     mount.hidden = false;
     var role = mount.parentNode && mount.parentNode.querySelector('[data-cohort-role]');
