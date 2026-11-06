@@ -328,18 +328,18 @@
       var off = opts.unavailable ? opts.unavailable() : [];
       var l = K.layout(parts, current || null, { teaching: teaching, available: Object.keys(slots).filter(function (k) { return off.indexOf(k) < 0; }) });
       off.forEach(function (k) { if (wraps[k]) wraps[k].box.hidden = true; });
-      var target = current && items[current] ? items[current].body : before;
+      var target = opts.nowBox || (current && items[current] ? items[current].body : before);
       l.now.forEach(function (key) {
         var w = wraps[key].box;
         // A leader's cue (a card, rooms, the presenter) waits closed until
         // it is wanted; what the part itself needs opens.
-        if (w.parentNode !== target) { target.appendChild(w); w.open = key.indexOf('cue-') !== 0; }
+        if (w.parentNode !== target) { target.appendChild(w); w.open = !!opts.nowBox || key.indexOf('cue-') !== 0; }
         else target.appendChild(w);
       });
       l.anytime.forEach(function (key) {
-        var w = wraps[key].box;
-        if (w.parentNode !== anyList) { anyList.appendChild(w); w.open = false; }
-        else anyList.appendChild(w);
+        var w = wraps[key].box, side = opts.anyBox || anyList;
+        if (w.parentNode !== side) { side.appendChild(w); w.open = false; }
+        else side.appendChild(w);
       });
       sync();
     }

@@ -334,15 +334,22 @@
 
   function startShow() {
     S.list = S.parts;
+    // The redesigned panel (ADDON-DESIGN.md), a cohort at a time until it is
+    // proven. Everything below it is the same parts in a new frame.
+    S.newPanel = !!window.PanelFrame && ((S.cohort.details || {}).panel === 'new' || query.get('panel') === 'new');
+    if (S.newPanel) startFrame();
     S.show = window.ShowView.mount({
       mount: $('[data-show]'), parts: S.list, teaching: S.teaching,
-      notes: function (key) { return (S.notes || {})[key] || null; },
+      nowBox: S.newPanel ? S.frame.pane('now') : null,
+      anyBox: S.newPanel ? S.frame.pane(S.teaching ? 'tools' : 'mine') : null,
+      notes: function (key) { return S.newPanel ? null : (S.notes || {})[key] || null; },
       deck: function (key) { return (S.decks || {})[key] || null; },
       // What does not apply to this cohort stays out of sight: rooms
       // without groups, a board without a board part (JOURNEYS.md).
       unavailable: function () {
         var off = [];
         off.push('cue-talk', 'cue-rooms');
+        if (S.newPanel) off.push('clock', 'thread', 'conversation', 'path', 'pushed');
         if (!S.groups.length) off.push('rooms', 'cue-rooms', 'brought');
         var list = S.list || S.parts || [];
         if (!list.some(function (x) { return x.kind === 'design' || x.key === 'prompt'; })) off.push('design');
@@ -857,7 +864,95 @@
     if (!S.show || !S.show.tick) return;
     var left = A.timeLeft(endsNow(), Date.now());
     S.show.tick({ left: V.leftText(left), clockOn: left != null, pinned: pinnedText(), slide: slideInfo() });
+    if (S.newPanel) drawFrameNow(left);
   }
+  // ------------------------------------------------------------------
+  // The redesigned panel's frame (ADDON-DESIGN.md).
+  // ------------------------------------------------------------------
+
+  function startFrame() {
+    S.frame = window.PanelFrame.mount({ root: root, teaching: S.teaching });
+    var F = S.frame, mine = S.teaching ? 'tools' : 'mine';
+    root.querySelector('.addon-head').hidden = true;
+    // Now: where to go and what is said to everyone, then the part's own needs.
+    S.nowNotes = el('section', 'p2-notes');
+    S.nowNotes.setAttribute('aria-label', 'Your notes');
+    S.nowWhat = el('p', 'p2-what');
+    var now = F.pane('now');
+    ['[data-sig-recording]', '[data-sig-where]', '[data-sig-card]', '[data-sig-stage]'].forEach(function (s) { now.appendChild($(s)); });
+    now.appendChild(S.nowWhat);
+    if (S.teaching) now.appendChild(S.nowNotes);
+    // Plan: the parts, one line each.
+    if (S.teaching) F.put('plan', $('[data-show]')); else $('[data-show]').hidden = true;
+    // Tools and People, for a leader; Mine, for a learner.
+    if (S.teaching) {
+      var stage = el('section', 'p2-group');
+      stage.appendChild(el('h2', null, 'Main stage'));
+      var acts = el('div', 'actions');
+      ['[data-open-stage]', '[data-close-stage]', '[data-welcome-toggle]'].forEach(function (s) { acts.appendChild($(s)); });
+      stage.appendChild(acts);
+      stage.appendChild($('[data-stage-status]'));
+      F.put('tools', stage);
+      F.put('tools', $('[data-ask-wrap]'));
+      F.put('tools', $('[data-breakouts]'));
+      F.put('people', $('[data-roster]'));
+      F.put('people', $('[data-recognize]'));
+    } else {
+      F.put('mine', $('[data-recognize]'));
+    }
+    root.querySelector('.addon-more').hidden = true;
+    F.put(mine, root.querySelector('.addon-foot'));
+    // The bar that stays: reactions and a guest's name stay with a learner.
+    F.low.appendChild($('[data-react]'));
+    F.on(function () { nextMove(); }, function () { if (S.run) S.run.step(-1).then(afterMove); });
+  }
+  function nextStep() {
+    var part = partNow(), info = slideInfo();
+    if (!S.teaching) return null;
+    if (!part) return !S.stageOn && !standalone ? { label: 'Open the main stage', go: 'stage' } : { label: 'Start the session', go: 'start' };
+    if (info && info.next !== 'Next part') return { label: info.next, go: 'step' };
+    var list = S.list || [], at = list.indexOf(part), after = list[at + 1];
+    return after ? { label: 'Next: ' + after.name, go: 'step' } : { label: 'Last part', disabled: true };
+  }
+  function nextMove() {
+    var n = nextStep();
+    if (!n || n.disabled) return;
+    if (n.go === 'stage') return $('[data-open-stage]').click();
+    if (n.go === 'start') return $('[data-start-session]').click();
+    if (S.run) S.run.step(1).then(afterMove);
+  }
+  function drawFrameNow(left) {
+    var part = partNow(), st = S.signals && S.signals.state ? S.signals.state() || {} : {};
+    var chips = [];
+    if (S.teaching) {
+      chips.push({ text: S.stageOn ? 'Stage on' : 'Stage off', on: !!S.stageOn });
+      if (S.recording) chips.push({ text: 'Recording', on: true });
+      if (st.rooms) chips.push({ text: 'In breakouts', on: true });
+      if (st.together) chips.push({ text: 'Coming back', on: true });
+    }
+    var info = slideInfo();
+    S.frame.draw({
+      title: part ? part.name : S.cohort.title,
+      time: left != null ? window.LiveLib.clock(left) : '', over: left === 0,
+      chips: chips, next: nextStep() || undefined, canBack: !!part
+    });
+    var what = !S.teaching && part && !part.slides ? String(part.what || '').split(/\n{2,}/)[0] : '';
+    if (S.nowWhat.textContent !== what) S.nowWhat.textContent = what;
+    S.nowWhat.hidden = !what;
+    if (S.teaching) {
+      var said = [info && info.note, part && (S.notes || {})[part.key]].filter(Boolean).join('\n\n');
+      if (S.nowNotes.getAttribute('data-said') !== said) {
+        S.nowNotes.setAttribute('data-said', said);
+        S.nowNotes.replaceChildren();
+        said.split(/\n{2,}/).forEach(function (t) { if (t.trim()) S.nowNotes.appendChild(el('p', null, t.trim())); });
+      }
+      S.nowNotes.hidden = !said;
+    }
+    // Breakouts belong to Now while they run.
+    var b = $('[data-breakouts]');
+    if (b) S.frame.put(st.rooms || st.together ? 'now' : 'tools', b);
+  }
+
   // Where the show is in this part's slides, for the plan and the stage.
   function slideNow() { return shared() && S.run.slide ? S.run.slide() : 0; }
   function slideInfo() {
@@ -930,6 +1025,12 @@
   function showNow() {
     var active = document.activeElement;
     if (active && /^(TEXTAREA|INPUT|SELECT)$/.test(active.tagName)) return;
+    if (S.newPanel) {
+      if (!S.teaching) S.frame.show('now');
+      var q = $('[data-questions]');
+      if (!S.teaching && q && q.scrollIntoView && q.querySelector('textarea, input, button')) q.scrollIntoView({ block: 'start' });
+      return;
+    }
     var it = root.querySelector('[data-show] [aria-current="step"]');
     if (!it) return;
     var ask = S.teaching ? null : it.querySelector('[data-questions]');

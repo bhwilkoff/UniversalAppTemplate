@@ -1,0 +1,91 @@
+// The add-on's frame (ADDON-DESIGN.md): what never scrolls away, a few tabs,
+// and the panes the panel's parts live in. The parts stay as they are and are
+// moved into a pane, so what each one does does not change.
+// PanelFrame.mount({ root, teaching }) returns the frame.
+(function () {
+  function el(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
+
+  function mount(o) {
+    var ready = o.root.querySelector('[data-state="ready"]');
+    var tabs = o.teaching ? [['now', 'Now'], ['plan', 'Plan'], ['tools', 'Tools'], ['people', 'People']] : [['now', 'Now'], ['mine', 'Mine']];
+    var shell = el('div', 'p2');
+    var top = el('header', 'p2-top');
+    var row = el('div', 'p2-top-row');
+    var title = el('h1', 'p2-title');
+    var time = el('p', 'p2-time');
+    time.setAttribute('aria-live', 'off');
+    row.appendChild(title); row.appendChild(time);
+    top.appendChild(row);
+    var chips = el('ul', 'p2-chips');
+    top.appendChild(chips);
+    var nav = el('div', 'p2-tabs');
+    nav.setAttribute('role', 'tablist');
+    top.appendChild(nav);
+    shell.appendChild(top);
+    var panes = {}, buttons = {}, current = null;
+    var body = el('div', 'p2-body');
+    tabs.forEach(function (t) {
+      var b = el('button', 'p2-tab', t[1]);
+      b.type = 'button'; b.setAttribute('role', 'tab');
+      b.appendChild(el('span', 'p2-dot')).hidden = true;
+      b.addEventListener('click', function () { show(t[0]); });
+      nav.appendChild(b); buttons[t[0]] = b;
+      var p = el('section', 'p2-pane');
+      p.setAttribute('role', 'tabpanel'); p.setAttribute('aria-label', t[1]); p.setAttribute('data-pane', t[0]);
+      body.appendChild(p); panes[t[0]] = p;
+    });
+    shell.appendChild(body);
+    var bar = el('footer', 'p2-bar');
+    var back = el('button', 'btn-secondary p2-back', 'Back'); back.type = 'button';
+    var next = el('button', 'btn-primary p2-next'); next.type = 'button';
+    var low = el('div', 'p2-low');
+    if (o.teaching) { bar.appendChild(back); bar.appendChild(next); }
+    shell.appendChild(low);
+    shell.appendChild(bar);
+    ready.insertBefore(shell, ready.firstChild);
+    o.root.classList.add('p2-panel');
+
+    var onNext = null, onBack = null;
+    next.addEventListener('click', function () { if (onNext) onNext(); });
+    back.addEventListener('click', function () { if (onBack) onBack(); });
+
+    function show(key) {
+      if (!panes[key]) return;
+      current = key;
+      Object.keys(panes).forEach(function (k) {
+        panes[k].hidden = k !== key;
+        buttons[k].setAttribute('aria-selected', String(k === key));
+        buttons[k].classList.toggle('is-on', k === key);
+      });
+      buttons[key].querySelector('.p2-dot').hidden = true;
+      body.scrollTop = 0;
+    }
+    show('now');
+
+    var drawn = '';
+    return {
+      el: shell, low: low,
+      pane: function (key) { return panes[key]; },
+      show: show,
+      current: function () { return current; },
+      put: function (key, node) { if (node && panes[key] && node.parentNode !== panes[key]) panes[key].appendChild(node); },
+      dot: function (key) { if (buttons[key] && key !== current) buttons[key].querySelector('.p2-dot').hidden = false; },
+      // title, time, chips [{ text, on }], next { label, disabled }, canBack
+      draw: function (s) {
+        var key = JSON.stringify([s.title, s.chips, s.next && s.next.label, s.next && s.next.disabled, s.canBack]);
+        time.textContent = s.time || '';
+        time.classList.toggle('is-over', !!s.over);
+        if (key === drawn) return;
+        drawn = key;
+        title.textContent = s.title || '';
+        chips.replaceChildren();
+        (s.chips || []).forEach(function (c) { chips.appendChild(el('li', 'p2-chip' + (c.on ? ' is-on' : ''), c.text)); });
+        chips.hidden = !(s.chips || []).length;
+        if (s.next) { next.textContent = s.next.label; next.disabled = !!s.next.disabled; }
+        back.hidden = !s.canBack;
+      },
+      on: function (n, b) { onNext = n; onBack = b; }
+    };
+  }
+  window.PanelFrame = { mount: mount };
+})();
