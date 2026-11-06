@@ -33,7 +33,21 @@
     return ask(db, { action: 'get' }).then(hold);
   }
 
+  // Joining a cohort is the person's yes, so the waiting organization
+  // invitation is accepted with their own token. A refusal changes nothing:
+  // GitHub's own page still works.
+  function acceptOrg(db, session) {
+    return ensure(db, session).then(function (t) {
+      if (!t) return false;
+      return fetch('https://api.github.com/user/memberships/orgs/humanshaped', {
+        method: 'PATCH',
+        headers: { Authorization: 'Bearer ' + t, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ state: 'active' })
+      }).then(function (r) { console.log('[invite] accept', r.status); return r.ok; });
+    }).catch(function () { return false; });
+  }
+
   function forget(db) { return db ? ask(db, { action: 'forget' }) : Promise.resolve(null); }
 
-  window.GitHubToken = { keep: keep, ensure: ensure, forget: forget };
+  window.GitHubToken = { keep: keep, ensure: ensure, acceptOrg: acceptOrg, forget: forget };
 })();

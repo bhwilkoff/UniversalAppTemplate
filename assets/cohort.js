@@ -616,7 +616,8 @@
     };
     window.addEventListener('focus', invitationWatch);
     document.addEventListener('visibilitychange', invitationWatch);
-    invitationWatch();
+    var accepted = window.GitHubToken && window.GitHubToken.acceptOrg ? window.GitHubToken.acceptOrg(db, session) : Promise.resolve(false);
+    accepted.then(function () { if (invitationWatch) invitationWatch(); });
   }
 
   function askButton(label) {
