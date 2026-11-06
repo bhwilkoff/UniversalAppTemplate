@@ -3156,4 +3156,15 @@ select:not([multiple]) {
 .stage-studio .btn-primary.small { color: var(--on-ink); }
 .stage-studio .btn-secondary.small { color: var(--ink); }
 .stage-ready:has(.stage-studio:not([hidden])) .stage-reacts, .stage-ready:has(.stage-studio:not([hidden])) .stance-bar { display: none; }
+.stage-studio .studio { grid-template-columns: 5.5rem minmax(0, 1fr) 10.5rem; }
+.stage-studio .studio-film { display: grid; overflow-x: hidden; overflow-y: auto; padding: 3px; }
+.stage-studio .studio-film li { flex: none; }
+.stage-studio .studio-side { display: grid; grid-template-columns: minmax(0, 1fr); min-width: 0; }
+.stage-studio .studio-layouts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.stage-studio .studio-layout { min-width: 0; font-size: 0.7rem; }
+.stage-studio .studio-layout svg { width: 2.2rem; }
+.stage-chips:not([hidden]) { right: auto; left: 0.75rem; bottom: 4.6rem; }
+.stage-links[open] { justify-items: start; }
 
+.p2-panel .btn-primary.small { color: var(--on-ink); }
+.p2-panel .btn-secondary.small { color: var(--ink); }
