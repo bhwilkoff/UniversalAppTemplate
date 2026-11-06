@@ -14,7 +14,7 @@ This week  Sessions  Conversation  People  Files  Settings
 
 +---------------------------------------------------+
 | Next                                [Join the call]|
-| Week 2, Wednesday at 1:00 PM        [The session]  |
+| Week 2, Wednesday at 1:00 PM (links to its page)  |
 | [=====|==|=========|====|===|=======|==]           |
 | What to do before it                               |
 +---------------------------------------------------+

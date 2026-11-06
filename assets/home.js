@@ -200,8 +200,9 @@
       var c = u.cohort, slug = encodeURIComponent(c.slug);
       var acts = [];
       var meet = safeUrl(u.session.meet_url);
+      // One button: the call while it is on, the session's page until then.
       if (u.live && meet) acts.push(link(meet, 'Join the call', 'btn-primary'));
-      acts.push(link('/session/?c=' + slug + '&s=' + Number(u.session.number), 'Open the session', u.live && !meet ? 'btn-primary' : 'btn-secondary small'));
+      else acts.push(link('/session/?c=' + slug + '&s=' + Number(u.session.number), 'Open the session', u.live ? 'btn-primary' : 'btn-secondary small'));
       list.appendChild(U().row({
         title: c.title + ', ' + (Number(u.session.number) === 0 ? 'prep session' : 'week ' + u.session.number), href: '/cohort/?c=' + slug,
         meta: u.live ? null : H.whenText(u.session.starts_at, m.now, m.zone),

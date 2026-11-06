@@ -806,14 +806,14 @@
     if (cohort.status === 'finished') {
       $('[data-next-when]').textContent = 'This cohort has finished.';
     } else if (t.next) {
-      $('[data-next-when]').textContent = (t.live ? 'Happening now: ' : '') + when(t.next.starts_at) + ', for ' + cohort.session_minutes + ' minutes.';
+      // One button: the call. The date is the way to the session's page.
+      var page = link(lib.sessionUrl(cohort.slug, t.next.number), (t.live ? 'Happening now: ' : '') + when(t.next.starts_at) + ', for ' + cohort.session_minutes + ' minutes.');
+      page.removeAttribute('target'); page.removeAttribute('rel');
+      $('[data-next-when]').replaceChildren(page);
       // During the group part, your group's own room comes first.
       var part = t.live ? lib.partNow(lib.agenda(cohort.session_minutes), t.next.starts_at, new Date()) : null;
       if (room && part && part.key === 'show') { var gr = link(room, 'Join your group’s room'); gr.className = 'btn-primary'; na.appendChild(gr); }
-      // One session, one name for its call and one for its page
-      // (JOURNEYS.md, S1).
       if (safe(t.next.meet_url)) { var j = link(t.next.meet_url, 'Join the call'); j.className = room && part && part.key === 'show' ? 'btn-secondary' : 'btn-primary'; na.appendChild(j); }
-      var lp = link(lib.sessionUrl(cohort.slug, t.next.number), 'Open the session'); lp.className = 'btn-secondary'; lp.removeAttribute('target'); lp.removeAttribute('rel'); na.appendChild(lp);
     } else {
       $('[data-next-when]').textContent = sessions.length ? 'All sessions done' : 'Not scheduled yet';
     }

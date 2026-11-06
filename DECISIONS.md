@@ -1148,6 +1148,14 @@ school turns add-ons off joins with a personal Google account; /meet/ and
 /support/ say both. `/addon/?c=&s=` stays working, because the add-on's
 sign-in failure link needs it.
 
+**The same holds on every page that shows a session: one button, never Join
+the call beside Open the session.** Ben, November 6, 2026: "I now see 'Join
+the call' and a separate 'Open the session' again. I thought we had simplified
+that to a single button." The November 4 change reached only /session/, so the
+home and cohort pages kept both. **How to apply:** the cohort page's button is
+Join the call and the session's date links to its page; the home page shows
+Join the call during a session and Open the session otherwise.
+
 ## GitHub carries reminders, through a private repository for each person (November 4, 2026)
 
 **Reminders are on by default, are sent by GitHub, and go to a private
