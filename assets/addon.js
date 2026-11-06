@@ -154,8 +154,8 @@
       if (borrowed) { location.reload(); return; }
       // The session came from the site, so ending it would sign the site out
       // too (found testing): the panel only forgets its own copy.
-      (window.GitHubToken ? window.GitHubToken.forget(db) : Promise.resolve()).catch(function () {})
-        .then(function () { db.auth.stopAutoRefresh(); localStorage.removeItem(db.auth.storageKey); }).catch(function () {})
+      // The site's kept GitHub token stays: this is only the panel letting go.
+      Promise.resolve().then(function () { db.auth.stopAutoRefresh(); localStorage.removeItem(db.auth.storageKey); }).catch(function () {})
         .then(function () { location.reload(); });
     });
   });

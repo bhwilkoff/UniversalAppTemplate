@@ -263,8 +263,10 @@
   // Right after a GitHub sign-in or link, the refresh token goes to the
   // server (GitHubToken.keep) before the long-lived copy is scrubbed.
   function keepGitHubToken(session) {
-    if (window.GitHubToken && session && session.provider_refresh_token) window.GitHubToken.keep(db, session);
-    if (window.DiscussionsLib) window.DiscussionsLib.tokenFrom(session, stores, Date.now(), db.auth.storageKey);
+    var trading = window.GitHubToken && session && session.provider_refresh_token;
+    if (trading) window.GitHubToken.keep(db, session);
+    // While the trade runs the session's own token is about to die, so it is not held.
+    if (window.DiscussionsLib) window.DiscussionsLib.tokenFrom(trading ? Object.assign({}, session, { provider_token: null }) : session, stores, Date.now(), db.auth.storageKey);
   }
   root.querySelector('[data-sign-out]').addEventListener('click', function () {
     if (window.DiscussionsLib) window.DiscussionsLib.forget(stores.session);
