@@ -172,6 +172,57 @@
     return out;
   }
 
+  // A note on the board: a colored card, its words, and who wrote it, moved as
+  // one. A vote is a dot of its own, so a class voting at once never overwrites
+  // one another (a shared count would: a board settles element by element).
+  var NOTE_W = 240, NOTE_H = 160;
+  var NOTE_COLORS = ['#FFE08A', '#B7E4C7', '#DCC4F0', '#A9D6F5', '#F9C5B5', '#E6E6A8'];
+  function noteColor(id) {
+    var h = 0;
+    String(id).split('').forEach(function (c) { h = (h * 31 + c.charCodeAt(0)) >>> 0; });
+    return NOTE_COLORS[h % NOTE_COLORS.length];
+  }
+  function shape(type, id, group, x, y, w, h, now, extra) {
+    return Object.assign({
+      id: id, type: type, x: x, y: y, width: w, height: h, angle: 0, strokeColor: '#1e1e1e', backgroundColor: 'transparent', fillStyle: 'solid',
+      strokeWidth: 1, strokeStyle: 'solid', roughness: 0, opacity: 100, groupIds: [group], frameId: null, roundness: type === 'rectangle' ? { type: 3 } : null,
+      seed: 1, version: 1, versionNonce: 1, isDeleted: false, boundElements: null, updated: now, link: null, locked: false
+    }, extra || {});
+  }
+  function words(id, group, x, y, value, size, color, now, data) {
+    var lines = wrap(value, Math.floor((NOTE_W - 24) / (size * 0.55)));
+    return shape('text', id, group, x, y, NOTE_W - 24, lines.length * size * 1.25, now, {
+      strokeColor: color, text: lines.join('\n'), originalText: lines.join('\n'), fontSize: size, fontFamily: 5, textAlign: 'left', verticalAlign: 'top',
+      containerId: null, autoResize: true, lineHeight: 1.25, customData: data
+    });
+  }
+  function noteElements(o) {
+    var id = o.id, group = 'note-' + id, data = { note: id, by: o.by };
+    return [
+      shape('rectangle', id, group, o.x, o.y, NOTE_W, NOTE_H, o.now, { backgroundColor: o.color || noteColor(o.by), strokeColor: 'transparent', customData: data }),
+      words(id + '-t', group, o.x + 12, o.y + 32, String(o.text).slice(0, 200), 20, '#1e1e1e', o.now, data),
+      words(id + '-n', group, o.x + 12, o.y + NOTE_H - 26, String(o.name || '').slice(0, 40), 14, '#4e5b55', o.now, data)
+    ];
+  }
+  function noteAt(elements, ids) {
+    for (var i = 0; i < elements.length; i++) {
+      var e = elements[i];
+      if (!e.isDeleted && ids[e.id] && e.customData && e.customData.note) return e.customData.note;
+    }
+    return null;
+  }
+  function votesOn(elements, note) {
+    return elements.filter(function (e) { return !e.isDeleted && e.customData && e.customData.vote === note; });
+  }
+  function voteDot(o) {
+    var card = o.elements.filter(function (e) { return e.id === o.note; })[0];
+    if (!card) return null;
+    var n = votesOn(o.elements, o.note).length;
+    return shape('ellipse', 'vote-' + o.note + '-' + o.by, card.groupIds[0], card.x + 12 + (n % 9) * 24, card.y + 8 + Math.floor(n / 9) * 24, 18, 18, o.now, {
+      backgroundColor: '#1F4D3A', strokeColor: '#1F4D3A', customData: { vote: o.note, by: o.by }
+    });
+  }
+
   // Words broken into lines of at most `width` characters.
   // Wraps each line the words already have (a hint may list things, one
   // to a line) to the frame's width.
@@ -345,7 +396,7 @@
   var lib = {
     DAY: DAY, MAX_MESSAGE_BYTES: MAX_MESSAGE_BYTES, SAVE_EVERY: SAVE_EVERY, CATCH_UP_AFTER: CATCH_UP_AFTER, CATCH_UP_EVERY: CATCH_UP_EVERY, MESSAGES_PER_SECOND: MESSAGES_PER_SECOND,
     params: params, pickSession: pickSession, topic: topic, link: link,
-    TEMPLATES: TEMPLATES, template: template, templateElements: templateElements, needsTemplate: needsTemplate,
+    TEMPLATES: TEMPLATES, template: template, templateElements: templateElements, noteColor: noteColor, noteElements: noteElements, noteAt: noteAt, votesOn: votesOn, voteDot: voteDot, needsTemplate: needsTemplate,
     unsent: unsent, markSeen: markSeen, syncable: syncable, keepLocal: keepLocal, merge: merge,
     bytes: bytes, batches: batches, sendInterval: sendInterval, pointerInterval: pointerInterval, throttle: throttle,
     sameGeneration: sameGeneration, canDraw: canDraw, colorFor: colorFor, fileName: fileName

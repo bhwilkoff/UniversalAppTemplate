@@ -3066,6 +3066,23 @@ select:not([multiple]):not(.p2-panel select) {
 .stage-write:not([hidden]) { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 1vmin; }
 .stage-write input, .stage-write textarea { width: 100%; padding: 1vmin 1.4vmin; border: 2px solid var(--rule); border-radius: 12px; background: var(--card); color: var(--ink); font: inherit; font-size: clamp(1rem, 2.6vmin, 1.6rem); }
 .stage-send { padding: 0 2vmin; border: 0; border-radius: 12px; background: var(--thistle); color: var(--on-thistle); font: inherit; font-weight: 600; cursor: pointer; }
-.stage-reacts { position: fixed; right: 0.75rem; bottom: 0.6rem; z-index: 5; display: flex; gap: 0.15rem; padding: 0.2rem 0.3rem; border-radius: 999px; background: rgb(19 25 22 / 0.7); opacity: 0.35; transition: opacity 0.15s; }
+.stage-reacts { position: fixed; left: 0.75rem; bottom: 0.6rem; z-index: 5; display: flex; gap: 0.15rem; padding: 0.2rem 0.3rem; border-radius: 999px; background: rgb(19 25 22 / 0.7); opacity: 0.35; transition: opacity 0.15s; }
 .stage-reacts:hover, .stage-reacts:focus-within { opacity: 1; }
 .stage-react { padding: 0.15rem 0.3rem; border: 0; background: none; font-size: clamp(1rem, 2.4vmin, 1.5rem); line-height: 1; cursor: pointer; }
+
+/* The board fills the stage, and a class works on it together. */
+[data-view="scene"].has-board:not([hidden]) { position: fixed; inset: 0; z-index: 1; display: block; max-width: none; padding: 0; background: var(--paper); }
+[data-view="scene"].has-board > :not(.stage-board) { display: none; }
+[data-view="scene"].has-board .stage-board:not([hidden]) { height: 100%; min-height: 0; border: 0; border-radius: 0; }
+[data-view="scene"].has-board .stage-board iframe { height: 100%; min-height: 0; }
+.stage-ready:has(.has-board:not([hidden])) .stage-reacts { display: none; }
+.board-notes:not([hidden]) { position: absolute; z-index: 6; left: 50%; bottom: 0.6rem; transform: translateX(-50%); display: flex; gap: 0.4rem; align-items: center; padding: 0.3rem; border-radius: 12px; background: var(--card); box-shadow: 0 2px 10px rgb(0 0 0 / 0.25); }
+.board-notes form { display: flex; gap: 0.3rem; margin: 0; }
+.board-notes input { width: min(16rem, 40vw); min-height: 40px; padding: 0.3rem 0.6rem; border: 1px solid var(--muted); border-radius: 10px; background: var(--card); color: var(--ink); font: inherit; font-size: 0.95rem; }
+.board-notes .btn-primary.small { color: var(--on-ink); }
+.board-notes .btn-secondary.small { color: var(--ink); white-space: nowrap; }
+.p2-ask { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.5rem 0.6rem; margin-bottom: 0.5rem; border-radius: 8px; background: rgb(168 199 250 / 0.14); font-size: 0.9rem; }
+.p2-state { margin: 0 0 0.4rem; font-size: 0.9rem; }
+.p2-myapp { margin-bottom: 0.75rem; }
+.p2-myapp[hidden], .p2-asks[hidden] { display: none; }
+

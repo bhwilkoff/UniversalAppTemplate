@@ -637,6 +637,7 @@
     // It rides in the bar that stays on screen, because the panel follows the
     // session and a name field at the top scrolls away (found in a real
     // call). A guest who has given a name has no more need of it.
+    $('[data-guest-signin]').parentNode.hidden = !S.isGuest;
     box.hidden = !S.isGuest || (!!mine.name && !mine.member_id);
     if (box.hidden) return;
     var bar = $('[data-react]');
@@ -914,10 +915,12 @@
       F.put('tools', $('[data-ask-wrap]'));
       F.put('tools', $('[data-breakouts]'));
       S.appsBox = el('div', 'p2-apps'); F.put('tools', S.appsBox);
+      S.nowAsks = el('div', 'p2-asks'); S.nowAsks.hidden = true; F.pane('now').insertBefore(S.nowAsks, F.pane('now').firstChild);
       F.put('tools', S.frameTools);
       F.put('people', $('[data-roster]'));
       F.put('people', $('[data-recognize]'));
     } else {
+      S.mineApp = el('div', 'p2-myapp'); F.put('mine', S.mineApp);
       F.put('mine', S.frameTools);
       F.put('mine', $('[data-guest-signin]').parentNode);
       F.put('mine', $('[data-recognize]'));
@@ -1391,6 +1394,8 @@
     $('[data-shown-count]').textContent = q.shown.length ? L.counted(q.shown.length, 'presentation', 'presentations') + ' so far.' : '';
     drawAskToShow(q);
     drawApps();
+    drawMyApp();
+    drawAsks();
   }
 
   // A learner's own way into the queue (found in the test cohort: the
@@ -1409,12 +1414,6 @@
         db.from('live_queue').delete().eq('id', mine.id).then(function () { refreshLive(); });
       }));
       return;
-    }
-    if (S.myApp) {
-      var app = L.classifyLink(S.myApp);
-      if (app) box.appendChild(button('Show my app on the main stage', 'btn-primary', function () {
-        db.from('live_queue').insert({ cohort_id: S.cohort.id, session_id: S.session.id, user_id: S.me.id, kind: app.kind, url: app.url }).then(function (r) { if (!r.error) refreshLive(); });
-      }));
     }
     var f = el('form', 'cohort-form');
     var l = el('label', null, 'What you will show');
@@ -1438,6 +1437,48 @@
       });
     });
     box.appendChild(f);
+  }
+
+  // The first thing in Mine: a learner's own app, and where it stands.
+  function drawMyApp() {
+    var box = S.mineApp;
+    if (!box) return;
+    box.replaceChildren();
+    var app = S.myApp ? L.classifyLink(S.myApp) : null;
+    box.hidden = !app;
+    if (!app) return;
+    var mine = L.queue(S.items).waiting.filter(function (x) { return x.user_id === S.me.id; })[0];
+    if (mine && S.onStage && S.onStage.kind === 'item' && S.onStage.id === mine.id) { box.appendChild(el('p', 'p2-state', 'Your app is on the main stage.')); return; }
+    if (mine) {
+      box.appendChild(el('p', 'p2-state', 'Your leader sees you are ready.'));
+      box.appendChild(button('Take it back', 'btn-secondary small', function () { db.from('live_queue').delete().eq('id', mine.id).then(function () { refreshLive(); }); }));
+      return;
+    }
+    box.appendChild(button('Show my app on the main stage', 'btn-primary', function () {
+      db.from('live_queue').insert({ cohort_id: S.cohort.id, session_id: S.session.id, user_id: S.me.id, kind: app.kind, url: app.url }).then(function (r) { if (!r.error) refreshLive(); });
+    }));
+  }
+  // A learner asking to show comes to the leader where the leader is looking.
+  function drawAsks() {
+    var box = S.nowAsks;
+    if (!box) return;
+    box.replaceChildren();
+    var staged = S.onStage && S.onStage.kind === 'item' ? S.onStage.id : null;
+    L.queue(S.items).waiting.filter(function (x) { return x.id !== staged; }).forEach(function (item) {
+      var row = el('div', 'p2-ask');
+      row.appendChild(el('span', null, nameOf(item.user_id) + ' is ready to show'));
+      row.appendChild(button('Show it', 'btn-secondary small', function () { setPin({ kind: 'item', id: item.id }); }));
+      box.appendChild(row);
+    });
+    if (staged) {
+      var on = el('div', 'p2-ask');
+      on.appendChild(el('span', null, 'On the main stage'));
+      on.appendChild(button('Take it down', 'btn-secondary small', function () {
+        db.from('live_queue').update({ state: 'shown' }).eq('id', staged).then(function () { setPin(null); refreshLive(); });
+      }));
+      box.appendChild(on);
+    }
+    box.hidden = !box.children.length;
   }
 
   // A leader puts anyone's app on every stage in one press.

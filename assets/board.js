@@ -232,6 +232,7 @@
           // the board fits the screen when it opens (once, so no one's view
           // jumps while they draw).
           S.fitPending = !!(S.seeded || P.stage);
+          drawNotes();
         }
       },
       initialData: S.initial,
@@ -252,6 +253,49 @@
         }
       }
     };
+  }
+
+  // Notes and dot votes: what a class does on a board, in two presses.
+  function drawNotes() {
+    var bar = $('[data-notes]');
+    if (!bar || !canDraw()) return;
+    bar.hidden = false;
+    var form = bar.querySelector('form'), vote = bar.querySelector('[data-vote]'), input = form.querySelector('input');
+    form.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      var text = input.value.trim();
+      if (!text || !S.api) return;
+      var st = S.api.getAppState(), z = st.zoom.value, now = Date.now();
+      var n = S.api.getSceneElements().filter(function (e) { return e.customData && e.customData.by === S.me.id && e.type === 'rectangle'; }).length;
+      var x = st.width / 2 / z - st.scrollX - 120 + (n % 5) * 28, y = st.height / 2 / z - st.scrollY - 80 + (n % 5) * 28;
+      var made = B.noteElements({ id: 'n' + now.toString(36) + Math.random().toString(36).slice(2, 6), by: S.me.id, name: myName(), text: text, x: x, y: y, now: now });
+      S.api.updateScene({ elements: S.api.getSceneElementsIncludingDeleted().concat(S.X.restoreElements(made, null)), captureUpdate: S.X.CaptureUpdateAction.IMMEDIATELY });
+      input.value = '';
+    });
+    vote.addEventListener('click', function () {
+      if (!S.api) return;
+      var all = S.api.getSceneElementsIncludingDeleted(), note = B.noteAt(all, S.api.getAppState().selectedElementIds);
+      if (!note) return;
+      var mine = B.votesOn(all, note).filter(function (e) { return e.customData.by === S.me.id; })[0], next;
+      function bump(e, fields) { return Object.assign({}, e, fields, { version: e.version + 1, versionNonce: Math.floor(Math.random() * 1e9), updated: Date.now() }); }
+      if (mine) next = all.map(function (e) { return e.id === mine.id ? bump(e, { isDeleted: true }) : e; });
+      else {
+        var gone = all.filter(function (e) { return e.id === 'vote-' + note + '-' + S.me.id; })[0];
+        var dot = B.voteDot({ note: note, by: S.me.id, elements: all, now: Date.now() });
+        next = gone ? all.map(function (e) { return e === gone ? bump(e, { x: dot.x, y: dot.y, isDeleted: false }) : e; }) : all.concat(S.X.restoreElements([dot], null));
+      }
+      S.api.updateScene({ elements: next, captureUpdate: S.X.CaptureUpdateAction.IMMEDIATELY });
+      syncVote();
+    });
+  }
+  function syncVote() {
+    var vote = $('[data-vote]');
+    if (!vote || !S.api) return;
+    var all = S.api.getSceneElements(), note = B.noteAt(all, S.api.getAppState().selectedElementIds);
+    vote.hidden = !note;
+    if (!note) return;
+    var mine = B.votesOn(all, note).some(function (e) { return e.customData.by === S.me.id; });
+    vote.textContent = mine ? 'Take my vote back' : 'Vote for this';
   }
 
   function mount() {
@@ -276,6 +320,7 @@
   function onChange(elements) {
     if (!S.api) return;
     if (S.pages) S.pages.sync(elements);
+    syncVote();
     if (S.fitPending && S.api.scrollToContent && elements.some(function (e) { return !e.isDeleted; })) {
       S.fitPending = false;
       setTimeout(function () { S.api.scrollToContent(S.api.getSceneElements(), { fitToViewport: true, viewportZoomFactor: 0.8 }); }, 50);

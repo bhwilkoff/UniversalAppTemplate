@@ -166,3 +166,23 @@ test('a design stage template is the course’s words, laid once, with ids that 
   assert.deepEqual(frames.map((f) => [f.x, f.y]), [[0, 0], [460, 0], [0, 360], [460, 360]]);
   assert.ok(prompt.filter((e) => e.type === 'text').every((t) => t.width <= 380));
 });
+
+test('a note is one card with its words and its writer', () => {
+  const made = lib.noteElements({ id: 'n1', by: 'u1', name: 'Bea', text: 'An idea', x: 10, y: 20, now: 1 });
+  assert.equal(made.length, 3);
+  assert.equal(new Set(made.map((e) => e.groupIds[0])).size, 1);
+  assert.equal(made[0].type, 'rectangle');
+  assert.equal(made[1].text, 'An idea');
+  assert.equal(lib.noteAt(made, { 'n1-t': true }), 'n1');
+  assert.equal(lib.noteAt(made, { other: true }), null);
+});
+
+test('each person has their own dot, so votes never overwrite', () => {
+  const card = lib.noteElements({ id: 'n1', by: 'u1', text: 'x', x: 0, y: 0, now: 1 });
+  const a = lib.voteDot({ note: 'n1', by: 'a', elements: card, now: 2 });
+  const b = lib.voteDot({ note: 'n1', by: 'b', elements: card.concat([a]), now: 2 });
+  assert.notEqual(a.id, b.id);
+  assert.notEqual(a.x, b.x);
+  assert.equal(lib.votesOn(card.concat([a, b]), 'n1').length, 2);
+  assert.equal(lib.voteDot({ note: 'gone', by: 'a', elements: card, now: 2 }), null);
+});
