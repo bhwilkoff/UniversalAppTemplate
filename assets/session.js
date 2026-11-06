@@ -429,7 +429,8 @@
             drawStory(cohort, session, leading);
           });
         });
-        card.appendChild(pick);
+        var field = el('div', 'cohort-form session-who'); field.appendChild(pick);
+        card.appendChild(field);
         box.appendChild(card);
       });
     });
