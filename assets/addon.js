@@ -973,8 +973,9 @@
       S.nowNotes.hidden = !said;
     }
     // Breakouts belong to Now while they run.
-    var b = $('[data-breakouts]');
-    if (b) S.frame.put(st.rooms || st.together ? 'now' : 'tools', b);
+    var b = $('[data-breakouts]'), running = !!(st.rooms || st.together), pane = S.frame.pane('now');
+    if (b && running && b.parentNode !== pane) { pane.insertBefore(b, pane.firstChild); S.frame.show('now'); }
+    if (b && !running && b.parentNode === pane) S.frame.pane('tools').insertBefore(b, S.frameTools);
   }
 
   // Where the show is in this part's slides, for the plan and the stage.
@@ -1188,7 +1189,7 @@
       groups: function () { return S.groups; }, presence: function () { return S.presence || {}; }, reload: reloadGroups,
       people: function () {
         var list = S.people.map(function (p) { return { id: p.user_id, name: S.names[p.user_id] || 'Someone' }; });
-        (S.guests || []).forEach(function (g) { if (!g.member_id) list.push({ id: g.user_id, name: g.name || 'A guest' }); });
+        (S.guests || []).forEach(function (g) { if (!g.member_id && (S.presence || {})[g.user_id]) list.push({ id: g.user_id, name: g.name || 'A guest' }); });
         return list;
       }
     });

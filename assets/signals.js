@@ -164,7 +164,7 @@
       var acts2 = el('div', 'actions');
       rooms.forEach(function (r) {
         if (!r.url) return;
-        acts2.appendChild(link(opts.teaching && !r.mine ? 'Visit ' + r.name : 'Join ' + (opts.teaching ? r.name + '’s' : 'your group’s') + ' room', r.mine ? 'btn-primary' : 'btn-secondary', r.url));
+        acts2.appendChild(link(opts.teaching && !r.mine ? 'Visit ' + r.name : 'Join ' + (opts.teaching ? r.name + '’s' : 'your') + ' room', r.mine ? 'btn-primary' : 'btn-secondary', r.url));
       });
       if (mainUrl && opts.teaching) acts2.appendChild(link('The main room', 'btn-secondary', mainUrl));
       box.appendChild(acts2);
