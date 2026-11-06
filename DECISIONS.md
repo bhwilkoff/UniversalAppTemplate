@@ -1278,3 +1278,20 @@ truly pending invitation has not been tried: the first new member is that test, 
 the console logs `[invite] accept` with GitHub's answer. **How to apply:**
 `GitHubToken.acceptOrg` runs once when the page sees an invitation waiting. If GitHub
 refuses, the Accept button still leads to GitHub's own page.
+
+## The main stage is a place people work, and it has no sign-in
+
+**A stage takes each person's own clicks and sends them to that person's panel, which is signed in.** Ben, November 6, 2026: "I'd also like to make it so that the main stage is fully interactive." **Why:** measured in a real call, the stage shares no storage with the panel, so giving it a sign-in would mean a second handoff that can fail. Every stage already has a panel beside it. **How to apply:** add a stage action as an `actMessage`, handled in `stageAct` in the panel. The stage never reads the database.
+
+## A learner's live app opens on everyone's stage, in a frame
+
+**A page opens in a sandboxed frame on each person's stage, and everyone uses their own copy.** Ben, November 6, 2026: "learners being able to display their web apps directly into the Google Meet interface for testing, presentation, and demonstration." **Why:** a screen share shows one person's app to everyone; this lets a whole class try it at once, which is the point of the session. **How to apply:** `frameable` allows https pages and refuses github.com, which cannot be framed. Google's add-on guide says every origin an add-on uses belongs in `addOnOrigins`, and a learner's host is not listed: Meet allowed it in a real call on November 6, 2026, but that could change, so Open in a new tab stays on the stage. A leader decides what goes up; a learner asks.
+
+## GitHub on a slide becomes the slide's own words
+
+**A ```github fence names a repository and what to show, and the deck draws it as a table or a list.** Ben, November 6, 2026: "include elements from Github on the slides and within the Google Meet experience." **Why:** github.com refuses framing, and one renderer means the stage, thumbnails, and Play all agree. **How to apply:** `github-read` reads with the app's token, for anyone in the cohort including guests, so nobody approves anything, and it only ever reads: the cohort's own repository or a public one. `SlidesLib.deck` swaps the fence for what `GitHubBlock.preload` fetched.
+
+## The whiteboard stays Excalidraw
+
+**Keep the board we have and add what a class needs.** Ben, November 6, 2026: "Build upon what we already have." **Why:** Excalidraw is MIT and already syncs and saves; tldraw needs a license key in production, which breaks zero ongoing cost. What was missing was the classroom layer. **How to apply:** a vote is its own element, one per person per note, because the board settles element by element: a shared count would lose votes when a class votes at once.
+

@@ -44,6 +44,20 @@ Leader                         Learner
 10. The panel wears Meet's colors, type, and shapes, light and dark. Brand color appears only on the main stage.
 11. A feature earns the panel only if it is used during a live session. Preparation stays on the session page.
 
+## The main stage is shared
+
+Ben, November 6, 2026: "Build upon what we already have and emphasize full collaboration between leaders and learners on the main stage."
+
+Measured in a real call: each person's stage takes their own clicks and keys, Meet lets it frame a learner's `github.io` app, and it can reach GitHub's API. It does not share the panel's sign-in, so **a stage has no sign-in, and what a person does on it, their own panel does for them** (`AddonLib.actMessage`).
+
+| On the stage | Who | How |
+|---|---|---|
+| A live app | A learner asks from the top of Mine; the leader presses Show it in Now, or shows anyone's from Tools | Everyone gets their own working copy, so a class can use it at once. A page that refuses framing keeps Open in a new tab |
+| A question | Learners, on the stage | Choices are buttons, and words are typed there. The panel saves them |
+| Reactions | Everyone | A quiet row on the stage, and the keys |
+| The board | Everyone | It fills the stage. Add a note, select it, Vote for this. Each vote is its own dot |
+| GitHub | A leader adds it to a slide | Issues, pull requests, commits, a README, or the repository, drawn on the slide |
+
 ## Sign-in in Meet
 
 Meet's frame refuses the Storage Access request, so the panel cannot borrow the site's sign-in. Sign in opens the small window, which hands back at once for anyone signed in on the site.
