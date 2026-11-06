@@ -30,7 +30,7 @@
     $('[data-stage-rec]').hidden = !view.recording;
     var part = view.part;
     // The part sits small at the top when something else has the stage.
-    $('[data-part]').hidden = view.mode === 'part' || view.mode === 'welcome' || view.mode === 'scene' || view.mode === 'app' || view.mode === 'slides' || view.mode === 'blank' || !part;
+    $('[data-part]').hidden = view.mode === 'part' || view.mode === 'welcome' || view.mode === 'scene' || view.mode === 'app' || view.mode === 'studio' || view.mode === 'slides' || view.mode === 'blank' || !part;
     if (view.mode === 'slides') drawSlide(view.slides);
     drawLinks(view.mode === 'slides' ? view.slides.links : null);
     drawAsk();
@@ -146,6 +146,7 @@
       $('[data-w-first]').textContent = w.first ? 'First: ' + w.first.name + '. ' + (w.first.what || '') : '';
     }
     drawApp(view.mode === 'app' ? view : null);
+    drawStudio(view.mode === 'studio' ? view.studio : null);
     if (view.mode === 'item') {
       $('[data-who]').textContent = view.who;
       $('[data-what]').textContent = view.what;
@@ -201,6 +202,18 @@
     f.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-modals allow-downloads');
     f.setAttribute('allow', 'clipboard-read; clipboard-write');
     box.replaceChildren(f);
+  }
+
+  // The slide editor, on the leader's own stage: the same slide, the same
+  // editor, and the panel saves, because the stage has no sign-in.
+  var studioKey = null;
+  function drawStudio(d) {
+    var box = $('[data-studio]');
+    if (!d) { if (studioKey) { studioKey = null; box.replaceChildren(); } return; }
+    if (d.key === studioKey || !window.SlideStudio) return;
+    studioKey = d.key;
+    Object.keys(d.gh || {}).forEach(function (k) { window.SlidesLib.ghHold(k, d.gh[k]); });
+    window.SlideStudio.mount(box, { text: d.text, onChange: function (t) { act({ a: 'deck', key: d.key, text: t }); } });
   }
 
   // A question in their own words, typed on the stage.

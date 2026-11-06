@@ -3023,7 +3023,7 @@ html:has(.p2-panel), body:has(.p2-panel) { background: #fff; overflow: hidden; }
 .part-saved { color: var(--muted); font-size: 0.9rem; }
 /* One dropdown across the site: the same arrow, with room around it, in both
    themes. Meet's panel keeps Meet's own. */
-select:not([multiple]):not(.p2-panel select) {
+select:not([multiple]) {
   appearance: none; -webkit-appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%238B9891' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
   background-repeat: no-repeat !important; background-position: right 0.75rem center !important; background-size: 0.75rem !important;
@@ -3097,10 +3097,10 @@ select:not([multiple]):not(.p2-panel select) {
 
 /* Tools as tiles, one tool at a time, and asking from the panel or the stage. */
 .p2-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
-.p2-tile { position: relative; display: grid; justify-items: start; gap: 6px; min-height: 76px; padding: 10px 12px; border: 1px solid rgb(255 255 255 / 0.12); border-radius: 12px; background: rgb(255 255 255 / 0.05); color: inherit; font: inherit; font-size: 0.85rem; font-weight: 500; text-align: left; line-height: 1.2; cursor: pointer; }
-.p2-tile:hover { background: rgb(255 255 255 / 0.1); }
-.p2-tile svg { width: 20px; height: 20px; fill: currentColor; color: #A8C7FA; }
-.p2-tile-n { position: absolute; top: 8px; right: 10px; min-width: 18px; padding: 0 5px; border-radius: 999px; background: #A8C7FA; color: #062E6F; font-size: 0.72rem; font-weight: 700; text-align: center; }
+.p2-tile { position: relative; display: grid; justify-items: start; gap: 6px; min-height: 76px; padding: 10px 12px; border: 1px solid var(--rule); border-radius: 12px; background: var(--card); color: var(--ink); font: inherit; font-size: 0.85rem; font-weight: 500; text-align: left; line-height: 1.2; cursor: pointer; }
+.p2-tile:hover { border-color: var(--edge); }
+.p2-tile svg { width: 20px; height: 20px; fill: currentColor; color: var(--accent); }
+.p2-tile-n { position: absolute; top: 8px; right: 10px; min-width: 18px; padding: 0 5px; border-radius: 999px; background: var(--accent); color: var(--on-ink); font-size: 0.72rem; font-weight: 700; text-align: center; }
 .p2-toolback { display: none; align-items: center; gap: 8px; margin-bottom: 10px; }
 .p2-toolname { font-weight: 600; font-size: 0.9rem; }
 [data-pane="tools"]:not([data-tool]) > :not(.p2-tiles) { display: none; }
@@ -3115,7 +3115,6 @@ select:not([multiple]):not(.p2-panel select) {
 .p2-asks-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
 .p2-ask-form { display: flex; gap: 6px; margin-bottom: 8px; }
 .p2-ask-form[hidden] { display: none; }
-.p2-ask-form input { flex: 1; min-width: 0; padding: 6px 10px; border: 1px solid rgb(255 255 255 / 0.3); border-radius: 8px; background: transparent; color: inherit; font: inherit; font-size: 0.85rem; }
 .p2-mine-ask { margin-bottom: 12px; }
 .stage-ask-open { padding: 0.1rem 0.7rem; border: 0; border-radius: 999px; background: var(--thistle); color: var(--on-thistle); font: inherit; font-size: clamp(0.8rem, 1.8vmin, 1rem); font-weight: 600; cursor: pointer; }
 .stage-ask:not([hidden]) { position: fixed; left: 0.75rem; bottom: 4.6rem; z-index: 6; display: grid; grid-template-columns: auto minmax(10rem, 22rem) auto; gap: 0.4rem; padding: 0.5rem; border-radius: 12px; background: var(--card); box-shadow: 0 2px 12px rgb(0 0 0 / 0.35); }
@@ -3130,4 +3129,31 @@ select:not([multiple]):not(.p2-panel select) {
 .stage-ready:has(.has-board:not([hidden])) .stage-reacts { display: flex; }
 .stage-ready:has(.has-board:not([hidden])) .stage-react { display: none; }
 .stage-ready:has(.has-board:not([hidden])) .stance-bar { display: none; }
+
+/* Every field in the panel wears Meet's, and the slide editor on the stage. */
+.p2-panel input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), .p2-panel select, .p2-panel textarea {
+  width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box; min-height: 40px; padding: 8px 12px;
+  border: 1px solid var(--edge); border-radius: 8px; background: var(--card); color: var(--ink);
+  font: inherit; font-size: 0.9rem; font-weight: 400; line-height: 1.35;
+}
+.p2-panel textarea { resize: vertical; }
+.p2-panel input:focus, .p2-panel select:focus, .p2-panel textarea:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: transparent; }
+.p2-panel input::placeholder, .p2-panel textarea::placeholder { color: var(--muted); opacity: 0.8; }
+.p2-panel select option { background: var(--card); color: var(--ink); }
+.p2-panel label { display: grid; gap: 4px; margin: 0 0 10px; font-size: 0.82rem; font-weight: 500; }
+.p2-panel label.check { display: flex; align-items: center; gap: 8px; }
+.p2-panel .hint { font-size: 0.78rem; font-weight: 400; opacity: 0.75; }
+.p2-panel .show-edit-form, .p2-panel form.cohort-form { display: grid; gap: 2px; }
+.stage-studio:not([hidden]) { position: fixed; inset: 0; z-index: 3; overflow: auto; padding: 0.5rem; background: var(--paper); }
+.stage-studio .studio { grid-template-columns: 6.5rem minmax(0, 1fr) 11.5rem; gap: 0.6rem; }
+.stage-studio .studio-film { max-height: calc(100vh - 1.2rem); }
+.stage-studio .studio-pick { grid-template-columns: 0.8rem minmax(0, 1fr); }
+.stage-studio .studio .studio-canvas { width: min(100%, calc((100vh - 8.5rem) * 1.6)); min-width: 0; }
+.stage-studio .studio-notes textarea { width: 100%; padding: 0.3rem 0.5rem; border: 1px solid var(--muted); border-radius: 8px; background: var(--card); color: var(--ink); font: inherit; font-size: 0.85rem; }
+.stage-studio .studio-side { gap: 0.6rem; max-height: calc(100vh - 1.2rem); overflow-y: auto; font-size: 0.85rem; }
+.stage-studio .studio-side select, .stage-studio .studio-side input:not([type="checkbox"]), .stage-studio .studio-side textarea { width: 100%; padding: 0.3rem 0.5rem; border: 1px solid var(--muted); border-radius: 8px; background: var(--card); color: var(--ink); font: inherit; font-size: 0.85rem; }
+.stage-studio .btn-secondary.small, .stage-studio .btn-primary.small { min-height: 32px; padding: 0.25rem 0.6rem; font-size: 0.82rem; }
+.stage-studio .btn-primary.small { color: var(--on-ink); }
+.stage-studio .btn-secondary.small { color: var(--ink); }
+.stage-ready:has(.stage-studio:not([hidden])) .stage-reacts, .stage-ready:has(.stage-studio:not([hidden])) .stance-bar { display: none; }
 

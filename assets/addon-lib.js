@@ -101,6 +101,9 @@
   //   state.items    live_queue rows;  state.names { [userId]: name }
   //   state.welcome  CohortLib.welcome(), shown when the teacher puts it
   //                  on the stage, and before any part has begun
+  function studioOf(d) {
+    return { key: cut(d.key, 60), text: cut(d.text, 60000), gh: d.gh && typeof d.gh === 'object' ? d.gh : {} };
+  }
   function frameable(url) {
     var u;
     try { u = new URL(String(url || '')); } catch (e) { return null; }
@@ -128,6 +131,8 @@
   function stageView(state) {
     state = state || {};
     var part = state.part ? { key: cut(state.part.key, 20), name: cut(state.part.name, 80), endsAt: num(state.part.endsAt) } : null;
+    // The leader's own stage, turned into the slide editor. Only their panel sends this.
+    if (state.studio && typeof state.studio.text === 'string') return { mode: 'studio', part: part, studio: studioOf(state.studio) };
     var on = state.onStage || null;
     var w = welcomeOf(state.welcome);
     if (w && ((on && on.kind === 'welcome') || (!on && !part))) return { mode: 'welcome', part: part, welcome: w };
@@ -294,6 +299,7 @@
       if (v.rerun === true) cv.rerun = true;
       return cv;
     }
+    if (v.mode === 'studio' && v.studio && typeof v.studio.text === 'string') return { mode: 'studio', part: part, studio: studioOf(v.studio) };
     if (v.mode === 'app') {
       var live = frameable(v.url);
       if (!live) return null;

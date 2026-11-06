@@ -355,7 +355,12 @@
       anyBox: S.newPanel ? S.frameTools : null,
       notes: function (key) { return S.newPanel ? null : (S.notes || {})[key] || null; },
       deck: function (key) { return (S.decks || {})[key] || null; },
-      editUrl: function (key) { return '/session/?c=' + encodeURIComponent(S.cohort.slug) + '&s=' + S.session.number + '&t=plan&part=' + encodeURIComponent(key); },
+      editSlides: function (key) {
+        // The real editor, on the leader's own stage; a window if the stage is closed.
+        if (!S.stageOn) return window.open('/session/?c=' + encodeURIComponent(S.cohort.slug) + '&s=' + S.session.number + '&t=plan&part=' + encodeURIComponent(key), 'hs-slides', 'popup,width=1280,height=820');
+        S.studioKey = key; S.studioHeld = null;
+        drawAsks(); sendStage();
+      },
       // What does not apply to this cohort stays out of sight: rooms
       // without groups, a board without a board part (JOURNEYS.md).
       unavailable: function () {
@@ -1585,6 +1590,12 @@
       row.appendChild(acts);
       box.appendChild(row);
     });
+    if (S.studioKey) {
+      var ed = el('div', 'p2-ask');
+      ed.appendChild(el('span', null, 'Editing slides on your stage'));
+      ed.appendChild(button('Done', 'btn-primary small', studioDone));
+      box.appendChild(ed);
+    }
     if (staged) {
       var on = el('div', 'p2-ask');
       on.appendChild(el('span', null, 'On the main stage'));
@@ -1786,9 +1797,24 @@
     });
   }
   // What a person did on their own main stage, done here, where they are signed in.
+  function saveDeck(key, text) {
+    S.decks = S.decks || {}; S.decks[key] = text;
+    return db.rpc('save_scene_deck', { scene: key, source: text }).then(function (r) { if (r.error) console.log('[addon] slides not saved: ' + r.error.message); });
+  }
+  function studioDone() {
+    var key = S.studioKey, held = S.studioHeld;
+    S.studioKey = null; S.studioHeld = null;
+    (held != null ? saveDeck(key, held) : Promise.resolve()).then(function () { drawAsks(); sendStage(); });
+  }
   function stageAct(a) {
     if (a.a === 'react' && S.classChannel) return S.classChannel.press({ key: String(a.key), target: {} });
     if (a.a === 'request' && !S.teaching && ASKS[a.kind]) return sendRequest(a.kind, a.body);
+    if (a.a === 'deck' && S.teaching && a.key === S.studioKey) {
+      // Half-typed words never reach a room that is watching this part.
+      var watching = (partNow() || {}).key === a.key;
+      if (watching) { S.studioHeld = String(a.text); return; }
+      return saveDeck(a.key, String(a.text));
+    }
     if (a.a !== 'answer' || S.teaching) return;
     var k = S.checks.filter(function (x) { return x.id === a.id && x.state === 'open'; })[0];
     if (!k) return;
@@ -1972,6 +1998,7 @@
       // outranks the card.
       card: S.onStage ? null : S.card || null,
       answerable: !S.teaching,
+      studio: S.studioKey ? { key: S.studioKey, text: S.studioHeld != null ? S.studioHeld : (S.decks || {})[S.studioKey] || (sceneOf(S.studioKey) || {}).slides || '', gh: window.SlidesLib ? window.SlidesLib.ghAll() : {} } : null,
       boardStage: (A.boardLinks(S.cohort, S.session, null, null) || {}).stage,
       mineOf: function (k) { var x = myAnswer(k); return x ? { choice: x.choice, picks: Array.isArray(x.value) ? x.value : undefined, body: x.body } : null; },
       onStage: S.onStage || (S.card ? null : partCheckPin()), checks: S.checks, results: S.results, items: S.items, names: S.names, audience: V ? V.audienceOf(part) : null,

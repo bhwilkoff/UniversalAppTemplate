@@ -327,3 +327,10 @@ test('typing on the stage is never read as a shortcut', () => {
   assert.equal(lib.keyMessage({ key: 'k', code: 'KeyK', target: { tagName: 'TEXTAREA' } }), null);
   assert.ok(lib.keyMessage({ key: 'a', code: 'KeyA', target: { tagName: 'DIV' } }));
 });
+
+test('the slide editor goes only to the stage of the panel that asked', () => {
+  const v = lib.stageView({ studio: { key: 'k', text: '## A', gh: {} } });
+  assert.equal(v.mode, 'studio');
+  assert.deepEqual(lib.readStageMessage(lib.stageMessage(v)).studio, { key: 'k', text: '## A', gh: {} });
+  assert.notEqual(lib.stageView({}).mode, 'studio');
+});
