@@ -38,7 +38,7 @@ None of those six were on my list before the call.
 between people.
 
 **Go deeper.** Read [showing your work](../../path/showing-your-work.md)
-and pick the form of bring-back that feels least like a performance to
+and pick the form of build that feels least like a performance to
 you.
 
 **Who to ask.** Your trio first, then the people your app is for once

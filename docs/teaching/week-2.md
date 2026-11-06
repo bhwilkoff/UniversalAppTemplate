@@ -15,7 +15,7 @@ into `AGENTS.md`, posted the problem where other people can read it, and
 then put the smallest real version of the app, with real data, in the
 hands of one of the people they talked to.
 
-So tonight is the first bring-back of the cohort, and it is the one that
+So tonight is the first build of the cohort, and it is the one that
 answers the question week 1 asked: is this problem worth building for,
 and did one real person find the first version useful? Then the session
 starts the week ahead, which is [stage 02](../path/02-shape-of-an-app.md)
@@ -37,17 +37,17 @@ Every session is one round of Write, Play, Publish at a larger size,
 the same three moves as stage 00, and the principles decide what gets
 written, played with, and published
 ([`00-curriculum-design.md`](../research/curriculum/00-curriculum-design.md)).
-Tonight's publish is the bring-back. The write is the data rule and the
+Tonight's publish is the build. The write is the data rule and the
 verb each person names. The play starts before they leave.
 
 ## The run of show
 
-*Written by Claude, awaiting Ben's review (the rewrite of October 23, 2026, in four parts: bring back the stage's work, one thing that unblocks the next stage, start it, and the check).* Generated from [`runs-of-show.json`](runs-of-show.json) by `tools/teaching_tables.py`; change the JSON, then run it.
+*Written by Claude, awaiting Ben's review (the rewrite of October 23, 2026, in four parts: show the stage's work, one thing that unblocks the next stage, start it, and the check).* Generated from [`runs-of-show.json`](runs-of-show.json) by `tools/teaching_tables.py`; change the JSON, then run it.
 
 | Minutes (75) | Scene | Kind | What happens |
 |---|---|---|---|
 | 0-5 | Arrive | Talk | One line in the chat: what the person you talked to did first with your app, or what is in the way. Then what I read in your answers last week, and what I changed. |
-| 5-35 | Show what you brought back | Rehearsal rooms | In your group's room. Each person in turn: say what you want to know, show it on the device, and explain one decision with your agent closed (a decision, never the code). The others ask one question to understand it, then answer the three questions: where is it going, how is it going, and what is next. The builder ends by saying what they will do next, and ready or not yet. The prompt: "Read your problem statement and the version before it, then show the app on your phone: what the real data taught you, and what the person you talked to did with it." |
+| 5-35 | Show what you built | Rehearsal rooms | In your group's room. Each person in turn: say what you want to know, show it on the device, and explain one decision with your agent closed (a decision, never the code). The others ask one question to understand it, then answer the three questions: where is it going, how is it going, and what is next. The builder ends by saying what they will do next, and ready or not yet. The prompt: "Read your problem statement and the version before it, then show the app on your phone: what the real data taught you, and what the person you talked to did with it." |
 | 35-38 | Break | Break |  |
 | 38-45 | Two layers | Talk | Every app built from the template has two layers. The data plane holds what is the same everywhere (what exists, what is allowed, and what it is called), and it is built once. The native layer holds what should feel born on each device: its controls, its gestures, and its look. Archive Watch's contract says it in one line: no client re-implements or re-hosts any part of the pipeline. Tonight you sort your own app into those two layers. |
 | 45-58 | One verb, twice | Design stage | Write the one thing your app must do on every device. Then draw it twice: once on the device you started with, and once on the device your people reach for next, each with that device's own controls. Mark what lives in the data and what lives in the device. On the board: *Blank*. |
@@ -62,7 +62,7 @@ verb each person names. The play starts before they leave.
 | Minutes (60) | Scene | Kind | What happens |
 |---|---|---|---|
 | 0-4 | Arrive | Talk | One line in the chat: what the person you talked to did first with your app, or what is in the way. Then what I read in your answers last week, and what I changed. |
-| 4-26 | Show what you brought back | Presenter | With everyone in the call, about five minutes each. Each person in turn: say what you want to know, show it on the device, and explain one decision with your agent closed (a decision, never the code). The others ask one question to understand it, then answer the three questions: where is it going, how is it going, and what is next. The builder ends by saying what they will do next, and ready or not yet. The prompt: "Read your problem statement and the version before it, then show the app on your phone: what the real data taught you, and what the person you talked to did with it." |
+| 4-26 | Show what you built | Presenter | With everyone in the call, about five minutes each. Each person in turn: say what you want to know, show it on the device, and explain one decision with your agent closed (a decision, never the code). The others ask one question to understand it, then answer the three questions: where is it going, how is it going, and what is next. The builder ends by saying what they will do next, and ready or not yet. The prompt: "Read your problem statement and the version before it, then show the app on your phone: what the real data taught you, and what the person you talked to did with it." |
 | 26-32 | Two layers | Talk | Every app built from the template has two layers. The data plane holds what is the same everywhere (what exists, what is allowed, and what it is called), and it is built once. The native layer holds what should feel born on each device: its controls, its gestures, and its look. Archive Watch's contract says it in one line: no client re-implements or re-hosts any part of the pipeline. Tonight you sort your own app into those two layers. |
 | 32-43 | One verb, twice | Design stage | Write the one thing your app must do on every device. Then draw it twice: once on the device you started with, and once on the device your people reach for next, each with that device's own controls. Mark what lives in the data and what lives in the device. On the board: *Blank*. |
 | 43-52 | Start | Reflection | Write the one rule about your data that every platform must follow. Then, before you leave, send the first prompt of stage 02: ask your agent to read your parity matrix with you and trim what your app does not need. Stage 03, a second platform that feels born there, follows once the matrix is honest. The prompt: "What is the first prompt of stage 02 you sent tonight?" |
@@ -93,13 +93,13 @@ Every scene can be changed on the session's page before it runs, and in the Meet
 > to say what problem they were building for, out loud, to people they
 > had just met, and then go and ask strangers about it. That is harder
 > than anything the agent did this week. Tonight is the first
-> bring-back. Before you show, say in one line what you want your
+> build. Before you show, say in one line what you want your
 > partners to tell you. "Does my problem statement say who has it?"
 > gets you a better answer than "What do you think?"
 
-## What they bring back
+## What they show
 
-The cohort's bring-back, from `COURSE.md`: the problem statement and the
+The cohort's build, from `COURSE.md`: the problem statement and the
 version before it, what they heard in their two conversations, the why,
 the one rule, and the app on their phone, with what the real data
 taught them and what the person they talked to did with it. The stages'
@@ -138,7 +138,7 @@ one of the people they talked to has used it.
 instead of a problem. Conversations that were really pitches. An app
 that only exists on the builder's computer. Typed-in sample data.
 
-## Show what you brought back
+## Show what you built
 
 *Written by Claude, awaiting Ben's review (the rewrite of October 23, 2026).*
 
@@ -266,7 +266,7 @@ proved wrong; the rule in the data contract; the second platform on your
 device; the look beside the template's.
 
 **On the credential.** Recognitions: "Took another round instead of
-shipping a first draft," and, from tonight's bring-back, "Asked for
+shipping a first draft," and, from tonight's build, "Asked for
 feedback and used it" and "Wrote down what they value." Students do the thing itself, and what they make is
 the evidence; nobody writes a report about it
 ([`05-inquiry-and-evidence.md`](../research/curriculum/05-inquiry-and-evidence.md)).

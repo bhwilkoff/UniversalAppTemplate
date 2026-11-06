@@ -37,7 +37,7 @@ ways of making one of the moves well, and the stages credit them where
 they are used.
 
 The course is the stages in `docs/path/`. Each stage already ends with a
-"Be ready to..." line, and that line is the challenge to bring back.
+"Be ready to..." line, and that line is the challenge to show.
 What follows is how the stages map onto a cohort of about five weeks,
 with one live session each week, and what each week asks a person to
 make.
@@ -117,8 +117,8 @@ feedback pass" to "UI feedback round 7", each round a list of what was
 still wrong, and I want everyone to know from the start that a long list
 of what is wrong is what the method looks like when it is working.
 
-The third is what a bring-back looks like before anyone has to make
-one. The teacher shows a strong bring-back and a weak one, side by side,
+The third is what a build looks like before anyone has to make
+one. The teacher shows a strong build and a weak one, side by side,
 and everyone practices the three questions from [Showing your
 work](docs/path/showing-your-work.md) on the weak one, once, so that the
 first time anyone answers them about a classmate's app, they have
@@ -153,7 +153,7 @@ have seen last week's version too. I want three rather than two because
 a group's job here is to see one another's apps and say something
 useful about them, and a pair has nobody to show when one person is
 away. When the numbers do not divide by three, a pair joins another
-pair for the bring-back rather than anyone showing alone.
+pair for the build rather than anyone showing alone.
 
 Groups are visible, so every student knows who their partners are and
 what the partnership expects of them:
@@ -191,7 +191,7 @@ part its minutes, and say how to fit the session into 60 or 90.
    that they are stuck gets asked, in the chat, whether they would like
    theirs to be the stuck moment the group works on, or to stay a few
    minutes after. Nobody is named out loud for being stuck.
-2. **Show what you brought back.** In their groups of three, about eight
+2. **Show what you built.** In their groups of three, about eight
    minutes each, someone keeping time. Each student says in one line
    what they want to know from their partners, shows their "Be ready
    to..." work on the device it runs on, and explains one decision
@@ -270,13 +270,13 @@ conversation is worth more than another round alone.
 
 The cost is that people who are new to building are judging work in a
 field they are new to. Seeing the app on a device does most of that
-work, and the strong and weak bring-backs from the week before do some
+work, and the strong and weak builds from the week before do some
 of the rest.
 
 ## When someone goes quiet
 
 A partner who notices first reaches out first, kindly. The teacher does
-too: within two days of a missed session, or a week with no bring-back,
+too: within two days of a missed session, or a week with no build,
 the teacher writes to that person privately, with an easy way back in
 and an easy way out. Life happens in five weeks, and leaving a cohort
 should never feel like failing it. The recording and the stages are both
@@ -338,7 +338,7 @@ else's cohort first, taking the parts they are most comfortable with,
 and then run their own from the [weekly guides](docs/teaching/README.md).
 Each guide is a session on a page: the minutes, the words for the
 opening and the close, the check question, what to look for in the
-bring-backs, the prompt situation, and what to do afterward.
+builds, the prompt situation, and what to do afterward.
 
 ## What a cohort gives back
 

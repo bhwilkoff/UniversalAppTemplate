@@ -78,7 +78,7 @@ Learning is the frame for everything in this template, and it runs in
 three directions at once.
 
 - **As a student,** you are learning a way of building, one stage at a
-  time. Every stage ends with something to bring back and show another
+  time. Every stage ends with something to show another
   person, because a method is learned by showing it, not by reading it.
 - **As a builder,** you are learning what your app is. The agent writes
   the code. Deciding what to build, judging what came back, and using it

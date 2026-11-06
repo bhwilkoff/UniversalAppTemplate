@@ -17,10 +17,10 @@ the builder names one value with the decision it changed, because a
 value that never changed a decision is decoration.
 
 Tonight is the final showing, open to everyone, guests welcome. It is
-also the second week the teacher looks closely at every bring-back,
+also the second week the teacher looks closely at every build,
 and the night the cohort chooses the one lesson it sends back to the
 template. The session keeps its four parts: the showing itself is the
-bring-back of stages 06 and 07, a short talk on how values climb from
+build of stages 06 and 07, a short talk on how values climb from
 reason to rule to check is the one thing that unblocks stage 08, Start
 is the cohort's lesson and everyone's first prompt of stage 08, and the
 check closes the night.
@@ -42,7 +42,7 @@ have to learn?**
 
 The session is designed backward
 ([note 06](../research/curriculum/06-instructional-design.md), section 4)
-from the showing's bring-back (the honest number with what its people
+from the showing's build (the honest number with what its people
 said, the feature from the student's own use, and two sentences on what
 is enough, for now, and for whom) and from what stage 08 asks for in
 the days after (one value with the decision it changed, and
@@ -62,7 +62,7 @@ written, played with, and published.
 
 ## The run of show
 
-*Written by Claude, awaiting Ben's review (the rewrite of October 23, 2026, in four parts: bring back the stage's work, one thing that unblocks the next stage, start it, and the check).* Generated from [`runs-of-show.json`](runs-of-show.json) by `tools/teaching_tables.py`; change the JSON, then run it.
+*Written by Claude, awaiting Ben's review (the rewrite of October 23, 2026, in four parts: show the stage's work, one thing that unblocks the next stage, start it, and the check).* Generated from [`runs-of-show.json`](runs-of-show.json) by `tools/teaching_tables.py`; change the JSON, then run it.
 
 | Minutes (75) | Scene | Kind | What happens |
 |---|---|---|---|
@@ -114,9 +114,9 @@ In the 60-minute session, where everyone stays in one call, leave out
 "Groups first, one last time," because the showing follows Arrive
 directly.
 
-## What they bring back
+## What they show
 
-The cohort's bring-back: the honest number with what its people said,
+The cohort's build: the honest number with what its people said,
 and the feature. The stages' own lines:
 
 > Be ready to show one number Pulse read correctly, one reader that told
@@ -173,7 +173,7 @@ in the showing itself.
 
 *Written by Claude, awaiting Ben's review (the rewrite of October 23, 2026).*
 
-This is the bring-back of stages 06 and 07, shown to the whole room,
+This is the build of stages 06 and 07, shown to the whole room,
 guests included. Each builder has about three minutes to show the
 feature they wanted from living with their app on their newest device,
 the sentence an older device shows instead, and their one honest number
@@ -182,7 +182,7 @@ the guests ask one question each, nudging them toward the kind
 [Showing your work](../path/showing-your-work.md) recommends, a question
 about something the agent could not have decided, such as "What did you
 give up?" or "Who is this for?" This is one of the two nights the
-teacher looks closely at every bring-back, so note against the stage
+teacher looks closely at every build, so note against the stage
 bars above who is ready and who is "not yet," without saying it out
 loud.
 

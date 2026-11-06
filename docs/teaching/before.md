@@ -12,7 +12,7 @@ stage's work yet, and nobody is asked what they think of anyone else's
 app, because people need to know who is in the room before they will
 show it something unfinished. So, this session is for getting everyone
 unstuck, meeting their group, hearing how we talk to one another, and
-seeing what a good bring-back looks like before anyone has to make one.
+seeing what a good build looks like before anyone has to make one.
 
 **Know who is in the room first.**
 
@@ -31,7 +31,7 @@ written, played with, and published
 
 ## The run of show
 
-*Written by Claude, awaiting Ben's review (the rewrite of October 23, 2026, in four parts: bring back the stage's work, one thing that unblocks the next stage, start it, and the check).* Generated from [`runs-of-show.json`](runs-of-show.json) by `tools/teaching_tables.py`; change the JSON, then run it.
+*Written by Claude, awaiting Ben's review (the rewrite of October 23, 2026, in four parts: show the stage's work, one thing that unblocks the next stage, start it, and the check).* Generated from [`runs-of-show.json`](runs-of-show.json) by `tools/teaching_tables.py`; change the JSON, then run it.
 
 | Minutes (75) | Scene | Kind | What happens |
 |---|---|---|---|
@@ -39,7 +39,7 @@ written, played with, and published
 | 8-15 | How we talk to one another | Talk | The four rules, said aloud: no correcting what does not matter, no acting surprised, no taking over, and no small digs at who someone is. When one is broken, someone says so plainly, the person says thanks, and we move on. |
 | 15-35 | Show what you set up | Rehearsal rooms | In your group's room, each person opens their app's address on their phone and holds it up. If setup stopped somewhere, show where it stopped, and the group works through it together. Being stuck tonight is the most useful thing anyone can bring. The prompt: "Show your app's address on your phone, or where setup stopped, and say one thing in your life you wish worked differently." |
 | 35-38 | Break | Break |  |
-| 38-53 | What a bring-back looks like | Design stage | Every session from week 1 opens with each person showing the week's work on a device. Here is a strong bring-back and a weak one, side by side. Then everyone practices the three questions on the weak one: where is it going, how is it going, and what is next. On the board: *The three questions*. |
+| 38-53 | What a build looks like | Design stage | Every session from week 1 opens with each person showing the week's work on a device. Here is a strong build and a weak one, side by side. Then everyone practices the three questions on the weak one: where is it going, how is it going, and what is next. On the board: *The three questions*. |
 | 53-65 | Start your noticing log | Reflection | For five days, write one line whenever one of these happens: I wished something worked differently. I gave up on something I care about. I did something the long way because nothing helped. Someone I know struggled with the same thing. No app ideas yet, just what happened. Write today's line now, before you leave: this log is where week 1's problem comes from. The prompt: "What is one thing that happened today that could go in your log?" |
 | 65-70 | Check for understanding | Question | In your own words. Only your leaders read it. The prompt: "What do you hope your app will do for someone?" |
 | 70-75 | What is still muddy? | Question | Anything from tonight that is not clear yet. Your leaders read every answer before the next session. The prompt: "What is still muddy for you?" |
@@ -53,7 +53,7 @@ written, played with, and published
 | 0-5 | Arrive | Talk | Your name, where you are joining from, and one thing in your life you wish worked differently. That last line is the first entry in the log you start tonight. |
 | 5-10 | How we talk to one another | Talk | The four rules, said aloud: no correcting what does not matter, no acting surprised, no taking over, and no small digs at who someone is. When one is broken, someone says so plainly, the person says thanks, and we move on. |
 | 10-30 | Show what you set up | Presenter | Each person in turn opens their app's address on their phone and holds it up. If setup stopped somewhere, show where it stopped, and we work through it together, where everyone can see. Being stuck tonight is the most useful thing anyone can bring. The prompt: "Show your app's address on your phone, or where setup stopped." |
-| 30-42 | What a bring-back looks like | Design stage | Every session from week 1 opens with each person showing the week's work on a device. Here is a strong bring-back and a weak one, side by side. Then everyone practices the three questions on the weak one: where is it going, how is it going, and what is next. On the board: *The three questions*. |
+| 30-42 | What a build looks like | Design stage | Every session from week 1 opens with each person showing the week's work on a device. Here is a strong build and a weak one, side by side. Then everyone practices the three questions on the weak one: where is it going, how is it going, and what is next. On the board: *The three questions*. |
 | 42-52 | Start your noticing log | Reflection | For five days, write one line whenever one of these happens: I wished something worked differently. I gave up on something I care about. I did something the long way because nothing helped. Someone I know struggled with the same thing. No app ideas yet, just what happened. Write today's line now, before you leave: this log is where week 1's problem comes from. The prompt: "What is one thing that happened today that could go in your log?" |
 | 52-56 | Check for understanding | Question | In your own words. Only your leaders read it. The prompt: "What do you hope your app will do for someone?" |
 | 56-60 | What is still muddy? | Question | Anything from tonight that is not clear yet. Your leaders read every answer before the next session. The prompt: "What is still muddy for you?" |
@@ -72,7 +72,7 @@ Every scene can be changed on the session's page before it runs, and in the Meet
 > shown each week to two other people who are building theirs. Tonight
 > nobody shows a stage, and nobody gives anyone feedback. We are here to
 > get everyone set up, to meet your group, and to see what a good
-> bring-back looks like before you have to make one. Cameras are
+> build looks like before you have to make one. Cameras are
 > welcome and never required, and the chat counts as being here. Let's
 > start with names, and one sentence each: what do you want your app to
 > do for someone you know?
@@ -94,9 +94,9 @@ from "UI feedback pass" to "UI feedback round 7", each round a list of
 what was still wrong. The point to land is that a long list of what is
 wrong is what the method looks like when it is working.
 
-## What they bring back
+## What they show
 
-The bring-back for this week is the last line of Getting set up:
+The build for this week is the last line of Getting set up:
 
 > Be ready to open your app's address on your phone, and to say in one
 > sentence what you want it to do for someone you know.
@@ -111,7 +111,7 @@ listing features. A student whose address only works on the computer,
 or whose sentence is about "users," is not yet there, and the main room
 is where that gets fixed tonight.
 
-## A strong bring-back and a weak one
+## A strong build and a weak one
 
 This is the design stage scene. Put the board on the main stage from the
 *The three questions* template, so everyone writes their three answers

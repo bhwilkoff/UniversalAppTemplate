@@ -21,7 +21,7 @@ kept while living with the app that ends in one feature the builder
 wants.
 
 This is the first of the two weeks when the teacher looks closely at
-every bring-back, because it is the first time the app has been in the
+every build, because it is the first time the app has been in the
 hands of someone who did not build it, and what that person said is
 worth more than anything the builder could say about it.
 
@@ -43,13 +43,13 @@ live with it?**
 
 The session is designed backward
 ([note 06](../research/curriculum/06-instructional-design.md), section 4)
-from two things: tonight's bring-back (the screenshot that proved a fix,
+from two things: tonight's build (the screenshot that proved a fix,
 the app in someone else's hands, what they did first beside the guess
 the student wrote, and one change made because of it) and next week's
 (one honest number taken back to a person, and one feature from the
 student's own use). Ben's own material is what students reason with
 tonight: the forty-one versions Archive Watch had verified and shipped to
-nobody (stage 05), which sits behind the bring-back, and the rules Pulse
+nobody (stage 05), which sits behind the build, and the rules Pulse
 follows for an honest number (stage 06), which the talk after the break
 turns into each person's choice of number. Neither is an answer to
 repeat. Each is a test the student holds their own app to.
@@ -60,12 +60,12 @@ written, played with, and published.
 
 ## The run of show
 
-*Written by Claude, awaiting Ben's review (the rewrite of October 23, 2026, in four parts: bring back the stage's work, one thing that unblocks the next stage, start it, and the check).* Generated from [`runs-of-show.json`](runs-of-show.json) by `tools/teaching_tables.py`; change the JSON, then run it.
+*Written by Claude, awaiting Ben's review (the rewrite of October 23, 2026, in four parts: show the stage's work, one thing that unblocks the next stage, start it, and the check).* Generated from [`runs-of-show.json`](runs-of-show.json) by `tools/teaching_tables.py`; change the JSON, then run it.
 
 | Minutes (75) | Scene | Kind | What happens |
 |---|---|---|---|
 | 0-5 | Arrive | Talk | One line in the chat: who held your app this week, or what is in the way. Then what I read in your answers last week, and what I changed. |
-| 5-35 | Show what you brought back | Rehearsal rooms | In your group's room. Each person in turn: say what you want to know, show it on the device, and explain one decision with your agent closed (a decision, never the code). The others ask one question to understand it, then answer the three questions: where is it going, how is it going, and what is next. The builder ends by saying what they will do next, and ready or not yet. The prompt: "Show the screenshot that proved a fix, and what it would have looked like if the fix had failed. Then show your app on the other person's device beside the guess you wrote before they held it: what did they do first?" |
+| 5-35 | Show what you built | Rehearsal rooms | In your group's room. Each person in turn: say what you want to know, show it on the device, and explain one decision with your agent closed (a decision, never the code). The others ask one question to understand it, then answer the three questions: where is it going, how is it going, and what is next. The builder ends by saying what they will do next, and ready or not yet. The prompt: "Show the screenshot that proved a fix, and what it would have looked like if the fix had failed. Then show your app on the other person's device beside the guess you wrote before they held it: what did they do first?" |
 | 35-38 | Break | Break |  |
 | 38-45 | Numbers that tell the truth | Talk | Once other people hold your app, you can no longer see it by using it yourself, so you read numbers about it. Stage 06's rules keep those numbers honest. A reader that cannot read says so, and a missing number is empty, never zero. Count only what servers and stores already see, with no tracking added to the app. And a number you aim at stops telling you the truth, so you read it, you do not chase it. |
 | 45-58 | Choose your number | Design stage | Write the one number about your app you will read this week, where it comes from, and what it would look like if its reader could not read. Hold it to the rules on the board, then name the person you will show it to. On the board: *Blank*. |
@@ -80,7 +80,7 @@ written, played with, and published.
 | Minutes (60) | Scene | Kind | What happens |
 |---|---|---|---|
 | 0-4 | Arrive | Talk | One line in the chat: who held your app this week, or what is in the way. Then what I read in your answers last week, and what I changed. |
-| 4-26 | Show what you brought back | Presenter | With everyone in the call, about five minutes each. Each person in turn: say what you want to know, show it on the device, and explain one decision with your agent closed (a decision, never the code). The others ask one question to understand it, then answer the three questions: where is it going, how is it going, and what is next. The builder ends by saying what they will do next, and ready or not yet. The prompt: "Show the screenshot that proved a fix, and what it would have looked like if the fix had failed. Then show your app on the other person's device beside the guess you wrote before they held it: what did they do first?" |
+| 4-26 | Show what you built | Presenter | With everyone in the call, about five minutes each. Each person in turn: say what you want to know, show it on the device, and explain one decision with your agent closed (a decision, never the code). The others ask one question to understand it, then answer the three questions: where is it going, how is it going, and what is next. The builder ends by saying what they will do next, and ready or not yet. The prompt: "Show the screenshot that proved a fix, and what it would have looked like if the fix had failed. Then show your app on the other person's device beside the guess you wrote before they held it: what did they do first?" |
 | 26-32 | Numbers that tell the truth | Talk | Once other people hold your app, you can no longer see it by using it yourself, so you read numbers about it. Stage 06's rules keep those numbers honest. A reader that cannot read says so, and a missing number is empty, never zero. Count only what servers and stores already see, with no tracking added to the app. And a number you aim at stops telling you the truth, so you read it, you do not chase it. |
 | 32-43 | Choose your number | Design stage | Write the one number about your app you will read this week, where it comes from, and what it would look like if its reader could not read. Hold it to the rules on the board, then name the person you will show it to. On the board: *Blank*. |
 | 43-52 | Start | Reflection | Before you leave, send the first prompt of stage 06, with the number you chose tonight. Then start the log for stage 07: each time you use your own app this week and want it to do something it does not, write one line. Next week's feature comes from that log, not from a list. The prompt: "What is one thing you have already wanted your app to do while using it yourself?" |
@@ -112,9 +112,9 @@ In a 60-minute session, with everyone in one call, say instead that you
 will be listening to each person's turn a little more closely than
 usual.
 
-## What they bring back
+## What they show
 
-The cohort's bring-back: the proof that a fix worked, the app on
+The cohort's build: the proof that a fix worked, the app on
 someone else's device, and what that person said. The stages' own lines:
 
 > Be ready to show the screenshot that proved a fix, to say what it would
@@ -149,7 +149,7 @@ Saying "not yet" to those tonight is ordinary and costs nothing.
 fix the agent called done with no screenshot behind it. A store listing the agent
 wrote that the student has not read aloud.
 
-## Show what you brought back
+## Show what you built
 
 *Written by Claude, awaiting Ben's review (the rewrite of October 23, 2026).*
 
@@ -163,7 +163,7 @@ closed is one of their own: why this fix, why this way of sharing it, or
 what they changed after watching someone else hold it. Visit every room,
 say so as you arrive, and stay a little longer than usual this week.
 
-The bring-back carries the difference between a fix that is verified
+The build carries the difference between a fix that is verified
 and one that is shipped, which no longer needs a scene of its own. If a
 builder shows a screenshot that proved a fix but the fix is not yet on
 the other person's device, that is stage 05's opening story in small: on
@@ -272,7 +272,7 @@ word.
 
 **Evidence a person can open.** The number, its source, and what the person said it misses; the log, with the moment each want came from; the first sketch of the feature and the want it traces to.
 
-**On the credential.** Recognitions: "Asked for feedback and used it." Tonight's bring-back (the proof, the install link, what the person did first, and the change it led to) is already evidence for "Got it onto someone else's device" and "Tested it the way people will actually use it." Students do the thing itself, and what they
+**On the credential.** Recognitions: "Asked for feedback and used it." Tonight's build (the proof, the install link, what the person did first, and the change it led to) is already evidence for "Got it onto someone else's device" and "Tested it the way people will actually use it." Students do the thing itself, and what they
 make is the evidence; nobody writes a report about it
 ([`05-inquiry-and-evidence.md`](../research/curriculum/05-inquiry-and-evidence.md)).
 

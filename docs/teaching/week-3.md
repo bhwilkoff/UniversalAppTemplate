@@ -43,12 +43,12 @@ written, played with, and published
 
 ## The run of show
 
-*Written by Claude, awaiting Ben's review (the rewrite of October 23, 2026, in four parts: bring back the stage's work, one thing that unblocks the next stage, start it, and the check).* Generated from [`runs-of-show.json`](runs-of-show.json) by `tools/teaching_tables.py`; change the JSON, then run it.
+*Written by Claude, awaiting Ben's review (the rewrite of October 23, 2026, in four parts: show the stage's work, one thing that unblocks the next stage, start it, and the check).* Generated from [`runs-of-show.json`](runs-of-show.json) by `tools/teaching_tables.py`; change the JSON, then run it.
 
 | Minutes (75) | Scene | Kind | What happens |
 |---|---|---|---|
 | 0-5 | Arrive | Talk | One line in the chat: the cell in your parity matrix that your own eyes proved wrong. Then what I read in your answers last week, and what I changed. |
-| 5-35 | Show what you brought back | Rehearsal rooms | In your group's room. Each person in turn: say what you want to know, show it on the device, and explain one decision with your agent closed (a decision, never the code). The others ask one question to understand it, then answer the three questions: where is it going, how is it going, and what is next. The builder ends by saying what they will do next, and ready or not yet. The prompt: "Show your matrix and the cell your eyes proved wrong, then your app on the oldest device it supports: the newest feature that device will not show, and why the new look fits your people." |
+| 5-35 | Show what you built | Rehearsal rooms | In your group's room. Each person in turn: say what you want to know, show it on the device, and explain one decision with your agent closed (a decision, never the code). The others ask one question to understand it, then answer the three questions: where is it going, how is it going, and what is next. The builder ends by saying what they will do next, and ready or not yet. The prompt: "Show your matrix and the cell your eyes proved wrong, then your app on the oldest device it supports: the newest feature that device will not show, and why the new look fits your people." |
 | 35-38 | Break | Break |  |
 | 38-45 | Why the agent cannot grade itself | Talk | An agent reports what it intended. "I fixed it" is true about the code and says nothing about the app, and everything short of the real device lies a little: the simulator allows what a real device forbids, and a log line that says "shown" does not mean a person could read it. So the agent does the testing, and the evidence comes from outside it: a picture of the actual screen, a number read from the device, or a person holding it. The agent is never the tester. |
 | 45-58 | What would you ask to see? | Design stage | Take one thing your agent said it fixed this week. On the board, write the prompt you would send asking it to prove the fix, and what the screen would look like if the fix had not worked. Then read a partner's, and change yours if theirs asks for better evidence. On the board: *Read one real prompt*. |
@@ -63,7 +63,7 @@ written, played with, and published
 | Minutes (60) | Scene | Kind | What happens |
 |---|---|---|---|
 | 0-4 | Arrive | Talk | One line in the chat: the cell in your parity matrix that your own eyes proved wrong. Then what I read in your answers last week, and what I changed. |
-| 4-26 | Show what you brought back | Presenter | With everyone in the call, about five minutes each. Each person in turn: say what you want to know, show it on the device, and explain one decision with your agent closed (a decision, never the code). The others ask one question to understand it, then answer the three questions: where is it going, how is it going, and what is next. The builder ends by saying what they will do next, and ready or not yet. The prompt: "Show your matrix and the cell your eyes proved wrong, then your app on the oldest device it supports: the newest feature that device will not show, and why the new look fits your people." |
+| 4-26 | Show what you built | Presenter | With everyone in the call, about five minutes each. Each person in turn: say what you want to know, show it on the device, and explain one decision with your agent closed (a decision, never the code). The others ask one question to understand it, then answer the three questions: where is it going, how is it going, and what is next. The builder ends by saying what they will do next, and ready or not yet. The prompt: "Show your matrix and the cell your eyes proved wrong, then your app on the oldest device it supports: the newest feature that device will not show, and why the new look fits your people." |
 | 26-32 | Why the agent cannot grade itself | Talk | An agent reports what it intended. "I fixed it" is true about the code and says nothing about the app, and everything short of the real device lies a little: the simulator allows what a real device forbids, and a log line that says "shown" does not mean a person could read it. So the agent does the testing, and the evidence comes from outside it: a picture of the actual screen, a number read from the device, or a person holding it. The agent is never the tester. |
 | 32-43 | What would you ask to see? | Design stage | Take one thing your agent said it fixed this week. On the board, write the prompt you would send asking it to prove the fix, and what the screen would look like if the fix had not worked. Then read a partner's, and change yours if theirs asks for better evidence. On the board: *Read one real prompt*. |
 | 43-52 | Start | Reflection | Before you leave, send the first prompt of stage 04: ask your agent to prove its next fix on your own device, with a screenshot. Then plan stage 05: the person who will hold your app this week, the device they will hold it on, and the free way it gets there, a link, a test track, or the web. The prompt: "Who will hold your app this week, on which device, and how will it get there for free?" |
@@ -94,9 +94,9 @@ Every scene can be changed on the session's page before it runs, and in the Meet
 > this week, and work out what you would ask to see before you believed
 > it.
 
-## What they bring back
+## What they show
 
-The cohort's bring-back, from `COURSE.md`: one verb on both platforms,
+The cohort's build, from `COURSE.md`: one verb on both platforms,
 each in its own idiom, one cell their own eyes proved wrong, and the
 app's own look beside the template's. The stages' own lines:
 
@@ -130,7 +130,7 @@ measurement, and looks like the student's app rather than the template.
 **Signs of "not yet."** A matrix nobody has read. "The agent picked the
 floor." An app that still wears the template's colors and type.
 
-## Show what you brought back
+## Show what you built
 
 *Written by Claude, awaiting Ben's review (the rewrite of October 23, 2026).*
 
@@ -282,7 +282,7 @@ twenty minutes before the trio is a default each person can move.
 
 Read the checks, write your two sentences, and reach out within two
 days to anyone who missed the session or brought nothing back. Week 4 is also the first of the
-sessions where you look closely at every bring-back, so set aside time
+sessions where you look closely at every build, so set aside time
 the day after it.
 
 Next week, the app in someone else's hands.

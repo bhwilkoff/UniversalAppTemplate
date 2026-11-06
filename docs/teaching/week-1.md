@@ -61,12 +61,12 @@ written, played with, and published
 
 ## The run of show
 
-*Written by Claude, awaiting Ben's review (the rewrite of October 23, 2026, in four parts: bring back the stage's work, one thing that unblocks the next stage, start it, and the check).* Generated from [`runs-of-show.json`](runs-of-show.json) by `tools/teaching_tables.py`; change the JSON, then run it.
+*Written by Claude, awaiting Ben's review (the rewrite of October 23, 2026, in four parts: show the stage's work, one thing that unblocks the next stage, start it, and the check).* Generated from [`runs-of-show.json`](runs-of-show.json) by `tools/teaching_tables.py`; change the JSON, then run it.
 
 | Minutes (75) | Scene | Kind | What happens |
 |---|---|---|---|
 | 0-5 | Arrive | Talk | One line in the chat from your noticing log: the one you keep thinking about. Then what I read in your answers last session, and what I changed because of them. |
-| 5-29 | Show what you brought back | Rehearsal rooms | In your group's room, each person reads from the log they kept for five days. The prompt: "Read three lines from your noticing log, say which one you keep coming back to, and why. Questions are about what happened, never about an app." |
+| 5-29 | Show what you built | Rehearsal rooms | In your group's room, each person reads from the log they kept for five days. The prompt: "Read three lines from your noticing log, say which one you keep coming back to, and why. Questions are about what happened, never about an app." |
 | 29-32 | Break | Break |  |
 | 32-39 | Computer-shaped and human-shaped | Talk | A computer-shaped problem is one a database and some code can take control of: counting, sorting, reminding. A human-shaped problem is something in your life that has gone unsolved for months or years, that you wonder about often, and that you cannot do yourself with the tools you have. It is about people's stories more than data points. This week you choose one, and your agent stays closed until you have, because the problem has to be yours before anyone helps. |
 | 39-53 | Hold one to the tests | Design stage | With your agent closed, take the log line you keep coming back to and write it as a problem: what happens in your life, then "I need something that..." Put it on the board and hold it to the ten tests in stage 00, marking each yes, not yet, or I don't know. A "not yet" is the next thing to find out, not a failure. On the board: *Problem tests*. |
@@ -81,7 +81,7 @@ written, played with, and published
 | Minutes (60) | Scene | Kind | What happens |
 |---|---|---|---|
 | 0-4 | Arrive | Talk | One line in the chat from your noticing log: the one you keep thinking about. Then what I read in your answers last session, and what I changed because of them. |
-| 4-24 | Show what you brought back | Presenter | With everyone in the call, about five minutes each: read three lines from the log you kept for five days, say which one you keep coming back to and why, and hear one question about what happened. The prompt: "Read three lines from your noticing log, say which one you keep coming back to, and why. Questions are about what happened, never about an app." |
+| 4-24 | Show what you built | Presenter | With everyone in the call, about five minutes each: read three lines from the log you kept for five days, say which one you keep coming back to and why, and hear one question about what happened. The prompt: "Read three lines from your noticing log, say which one you keep coming back to, and why. Questions are about what happened, never about an app." |
 | 24-30 | Computer-shaped and human-shaped | Talk | A computer-shaped problem is one a database and some code can take control of: counting, sorting, reminding. A human-shaped problem is something in your life that has gone unsolved for months or years, that you wonder about often, and that you cannot do yourself with the tools you have. It is about people's stories more than data points. This week you choose one, and your agent stays closed until you have, because the problem has to be yours before anyone helps. |
 | 30-42 | Hold one to the tests | Design stage | With your agent closed, take the log line you keep coming back to and write it as a problem: what happens in your life, then "I need something that..." Put it on the board and hold it to the ten tests in stage 00, marking each yes, not yet, or I don't know. A "not yet" is the next thing to find out, not a failure. On the board: *Problem tests*. |
 | 42-52 | Start | Reflection | Before you leave, name two people who might have this problem, and write three questions for them that each start "Tell me about the last time you..." Do not describe an app. This week is stage 00, then stage 01 once your problem holds: the smallest real version, live with real data, in the hands of one of those two people. The prompt: "Who are the two people you will talk to this week, and what is your first "Tell me about the last time you..." question?" |
@@ -119,7 +119,7 @@ Every scene can be changed on the session's page before it runs, and in the Meet
 > talk to about it. Let's start with one line from your log, in the chat,
 > one you don't mind sharing.
 
-## What they bring back
+## What they show
 
 The noticing log, five days of it, started at the end of the
 [week before](before.md). Nobody shows the whole log, and nobody is
@@ -138,16 +138,16 @@ nothing in it but "nothing happened." Neither is a problem tonight. The
 first is the habit the log is meant to break, and the second is what
 the prompts on screen are for.
 
-## Show what you brought back
+## Show what you built
 
 *Written by Claude, awaiting Ben's review (the rewrite of October 23, 2026).*
 
-This is the cohort's first bring-back, and what comes back is the log
+This is the cohort's first build, and what comes back is the log
 rather than anything on a device, because there is nothing to build
 yet. Send everyone to their group's room with the prompt on screen. In
 turn, each person reads three lines from their log, says which one they
 keep coming back to and why, and then hears one question from the other
-two about what happened. The other parts of a bring-back, from
+two about what happened. The other parts of a build, from
 [Showing your work](../path/showing-your-work.md), wait until there is
 an app to show; tonight the one question is the whole of the feedback,
 and it is about the person's life, never about an app. Say that before

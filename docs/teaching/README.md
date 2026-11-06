@@ -19,7 +19,7 @@ about Xcode or Google Play, because the job is to keep the session's
 shape, to read what people write, and to notice who needs a word, and
 that is what every guide is built around.
 
-| Session | Leads with | What gets brought back | Guide |
+| Session | Leads with | What gets shown | Guide |
 |---|---|---|---|
 | Prep | Publish | Setup: the app's address, open on a phone | [Prep](before.md) |
 | Week 1 | Write | The noticing log, which the session turns into one problem held to the tests | [Week 1](week-1.md) |
@@ -39,7 +39,7 @@ are most comfortable with (the opening and the close are a good start)
 and watch how the other teacher handles the groups and the prompt
 reading. Then read [`COURSE.md`](../../COURSE.md) once, the stages your
 cohort will reach, and [Showing your
-work](../path/showing-your-work.md), because the bring-back it describes
+work](../path/showing-your-work.md), because the build it describes
 is the center of every session.
 
 ## The shape of every session
@@ -50,7 +50,7 @@ Every session is one round of Write, Play, Publish, the same three moves
 as stage 00, at the size of a week, and every part of it points at the
 learner's own app. It has four parts, in this order:
 
-1. **Bring back.** Each person shows the "Be ready to..." of the stage
+1. **Build.** Each person shows the "Be ready to..." of the stage
    they just finished, on a device, explains one decision with the agent
    closed, and hears the three questions. It is the largest part, because
    it is the only time anyone sees the app in someone else's hands.
@@ -62,7 +62,7 @@ learner's own app. It has four parts, in this order:
 4. **The check.** The week's question, and what is still muddy, read by
    the leader before the next session.
 
-Prep and week 5 bend the shape: prep's bring-back is the setup itself,
+Prep and week 5 bend the shape: prep's build is the setup itself,
 and week 5's is the showing, open to guests. A cohort of eight learners
 or more brings back in groups of three, in rehearsal rooms; a smaller
 cohort stays in the one call, and each person shows to everyone.
@@ -70,7 +70,7 @@ cohort stays in the one call, and each person shows to everyone.
 | Part | 75 minutes, in groups | 60 minutes, one call |
 |---|---|---|
 | Arrive | 5 | 4 |
-| Bring back | 30 (rehearsal rooms) | 22 (each person to everyone) |
+| Build | 30 (rehearsal rooms) | 22 (each person to everyone) |
 | Break | 3 | none |
 | The one thing, then trying it | 7 and 13 | 6 and 11 |
 | Start | 10 | 9 |
@@ -87,13 +87,13 @@ credential, and which pages of the [stuck library](../stuck/README.md)
 to point people to.
 
 When time is short, trying the one thing gives up minutes first. The
-bring-back and the check never do, because the bring-back is the only
+build and the check never do, because the build is the only
 time anyone sees the app in someone's hands, and the check is how you
 find out what the session actually taught.
 
 ## While the groups work
 
-Put the steps of the bring-back on screen in every group's room as well
+Put the steps of the build on screen in every group's room as well
 as the main one, and ask one person in each group to keep time. When you
 visit a group, say so as you arrive and tell them to carry on, so
 nobody stops to perform for you. You are listening for one thing that
@@ -130,7 +130,7 @@ permission, so that it can become the next entry.
 ## What a teacher never does
 
 The course is ungraded on purpose, so a teacher never scores a
-bring-back, counts cameras or attendance, ranks one app above another,
+build, counts cameras or attendance, ranks one app above another,
 or asks an AI to summarize the students for them. Nor does a teacher
 tell anyone to use their agent less. The course asks people to keep the
 deciding and the judging, and the agent can do everything else.

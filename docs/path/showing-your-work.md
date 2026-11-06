@@ -31,7 +31,7 @@ than the work. The same research found that giving feedback teaches the
 giver as much as getting it teaches the receiver, which is why the method
 asks you to show your work to people rather than hand it in.
 
-A bring-back has six steps, and in a cohort they fit in about eight
+A build has six steps, and in a cohort they fit in about eight
 minutes: say what you want to know, show it, explain one decision, hear
 one question, hear three answers, and say what is next and whether the
 stage is ready.
@@ -83,7 +83,7 @@ the agent could not have decided for you: "What did you give up?" or
 which follow are about the app you meant to build, not the one your
 partner guessed at.
 
-## Three questions for every bring-back
+## Three questions for every build
 
 Then the people watching answer three questions, out loud or in a line
 each, while you listen:
