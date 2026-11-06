@@ -13,7 +13,7 @@ was read. Nothing about any person is printed, because the job that runs this
 keeps a log that everyone with access to the repository can read.
 """
 import difflib, glob, json, os, re, subprocess, sys, tempfile
-from collections import Counter, defaultdict
+from collections import Counter
 
 import numpy as np
 from PIL import Image, ImageOps
@@ -65,8 +65,10 @@ def name_in(path, box):
     from a dark room to a bright window, so one treatment cannot read them all."""
     x0, y0, x1, y1 = box
     w, h = x1 - x0, y1 - y0
-    im = Image.open(path).convert('L').crop((x0 + 2, int(y1 - max(h * 0.2, 26)), int(x0 + w * 0.8), y1 - 2))
-    im = im.resize((im.width * 4, im.height * 4), Image.LANCZOS)
+    full = Image.open(path).convert('L')
+    k = full.width / WIDTH
+    im = full.crop((int((x0 + 2) * k), int((y1 - max(h * 0.2, 26)) * k), int((x0 + w * 0.8) * k), int((y1 - 2) * k)))
+    im = im.resize((im.width * 3, im.height * 3), Image.LANCZOS)
     tries = [im, ImageOps.autocontrast(im), ImageOps.invert(im)]
     tries += [im.point(lambda v, c=c: 0 if v > c else 255) for c in (150, 185, 215, 235)]
     found = []
@@ -80,23 +82,31 @@ def name_in(path, box):
     return found
 
 
+def looks_like_a_name(text):
+    """The words of a label worth asking a leader about, or nothing."""
+    words = [w for w in text.split() if len(w) >= 3 and w[0].isupper() and w[1:].replace("'", '').replace('-', '').islower()]
+    return ' '.join(words[:3]) if words and sum(map(len, words)) >= 7 else None
+
+
 def closest(text, names):
     best, score = None, 0
     for n in names:
         s = difflib.SequenceMatcher(None, text.lower(), n['name'].lower()).ratio()
         if s > score:
             best, score = n, s
-    return (best, score) if score >= 0.6 else (None, score)
+    return (best, score) if score >= 0.72 else (None, score)
 
 
 def read(video, names):
     with tempfile.TemporaryDirectory() as d:
         subprocess.run(['ffmpeg', '-nostdin', '-loglevel', 'error', '-y', '-i', video, '-vf',
-                        f'fps=1,scale={WIDTH}:-1', '-q:v', '3', os.path.join(d, '%06d.jpg')], check=True)
+                        'fps=1', '-q:v', '2', os.path.join(d, '%06d.jpg')], check=True)
         frames = sorted(glob.glob(os.path.join(d, '*.jpg')))
         seen = []
         for p in frames:
-            seen.append(border(lit(np.asarray(Image.open(p).convert('RGB')))))
+            im = Image.open(p).convert('RGB')
+            small = im.resize((WIDTH, round(im.height * WIDTH / im.width)), Image.BILINEAR)
+            seen.append(border(lit(np.asarray(small))))
         # Turns: runs of frames on the same tile, with gaps under two seconds closed.
         key = lambda b: tuple(round(v / 12) for v in b)
         turns = []
@@ -107,36 +117,37 @@ def read(video, names):
                 turns[-1]['end'] = i + 1
             else:
                 turns.append({'key': key(b), 'box': b, 'start': i, 'end': i + 1})
-        # A tile keeps its person while the layout holds, so names vote per tile.
-        votes = defaultdict(Counter)
-        raw = {}
-        spots = defaultdict(list)
-        for t in turns:
-            spots[t['key']] += [(t['box'], i) for i in (t['start'], (t['start'] + t['end'] - 1) // 2, t['end'] - 1)]
-        for k, seen_at in spots.items():
-            step = max(1, len(seen_at) // 6)
-            for box, i in seen_at[::step][:6]:
-                for text in name_in(frames[i], box):
-                    who, score = closest(text, names)
-                    if who:
-                        votes[k][who['id']] += score
-                    else:
-                        raw.setdefault(k, Counter())[text] += 1
-        # Misreads of one name become one label, so a leader is asked once.
+        # Each turn is named from its own frames. A tile does not keep its
+        # person: with more people than tiles, Meet moves them between tiles
+        # (found on the Week 0 recording, where this wrongly gave one person
+        # everyone's turns). A turn that cannot be read says so, and is never
+        # given to whoever sat there before.
         labels = []
 
         def one_label(text):
             for known in labels:
-                if difflib.SequenceMatcher(None, text.lower(), known.lower()).ratio() >= 0.6:
+                near = difflib.SequenceMatcher(None, text.lower(), known.lower()).ratio()
+                first = difflib.SequenceMatcher(None, text.split()[0].lower(), known.split()[0].lower()).ratio()
+                if near >= 0.6 or first >= 0.8:
                     return known
             labels.append(text)
             return text
 
         out = []
         for t in turns:
-            v = votes.get(t['key'])
-            person = v.most_common(1)[0][0] if v else None
-            label = None if person else (one_label(raw[t['key']].most_common(1)[0][0]) if t['key'] in raw else None)
+            votes, raw = Counter(), Counter()
+            at = sorted({t['start'], (t['start'] + t['end'] - 1) // 2, t['end'] - 1})
+            for i in at:
+                for text in name_in(frames[i], t['box']):
+                    who, score = closest(text, names)
+                    if who:
+                        votes[who['id']] += score
+                    elif looks_like_a_name(text):
+                        raw[looks_like_a_name(text)] += 1
+                if votes and votes.most_common(1)[0][1] >= 1.6:
+                    break
+            person = votes.most_common(1)[0][0] if votes else None
+            label = None if person or not raw else one_label(raw.most_common(1)[0][0])
             out.append({'user_id': person, 'name': label, 'start': t['start'], 'end': t['end']})
         return {'read_seconds': len(frames), 'tiles': len({t['key'] for t in turns}), 'turns': out}
 
