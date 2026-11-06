@@ -898,7 +898,7 @@
   function startFrame() {
     S.frame = window.PanelFrame.mount({ root: root, teaching: S.teaching });
     var F = S.frame, mine = S.teaching ? 'tools' : 'mine';
-    S.frameTools = el('div', 'p2-group');
+    S.frameTools = el('div', 'p2-group p2-toolset');
     root.querySelector('.addon-head').hidden = true;
     // Now: where to go and what is said to everyone, then the part's own needs.
     S.nowNotes = el('section', 'p2-notes');
@@ -1603,7 +1603,8 @@
     if (S.appsBox && S.appsBox.childElementCount) add('Apps', S.appsBox);
     Array.prototype.forEach.call(S.frameTools.children, function (d) {
       var head = d.querySelector('summary');
-      if (head && !d.hidden) add(head.firstChild ? head.firstChild.textContent.trim() : '', d);
+      var name = head && head.firstChild ? head.firstChild.textContent.trim() : '';
+      if (head && !d.hidden && name !== 'The thread') add(name, d);
     });
     return { pane: pane, list: out };
   }

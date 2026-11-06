@@ -3106,8 +3106,8 @@ select:not([multiple]):not(.p2-panel select) {
 [data-pane="tools"]:not([data-tool]) > :not(.p2-tiles) { display: none; }
 [data-pane="tools"][data-tool] > .p2-tiles { display: none; }
 [data-pane="tools"][data-tool] > .p2-toolback { display: flex; }
-[data-pane="tools"][data-tool] > :not(.p2-toolback):not(.is-tool):not(.p2-group) { display: none; }
-[data-pane="tools"][data-tool] > .p2-group > :not(.is-tool) { display: none; }
+[data-pane="tools"][data-tool] > :not(.p2-toolback):not(.is-tool):not(.p2-toolset) { display: none; }
+[data-pane="tools"][data-tool] > .p2-toolset > :not(.is-tool) { display: none; }
 [data-pane="tools"][data-tool] > .is-tool > summary { display: none; }
 .p2-ask.is-request { display: grid; gap: 6px; }
 .p2-ask-acts { display: flex; gap: 6px; }
