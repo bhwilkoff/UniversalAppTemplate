@@ -20,7 +20,7 @@ publicly on the Google Workspace Marketplace.
   check's question (with the anonymous count only when the teacher
   shows it), or someone's work from the queue.
 
-It never measures anyone or joins the call as a participant. From Google
+It never scores or compares anyone, and never joins the call as a participant. It keeps what people do in the add-on so a session can be understood afterward. From Google
 it asks only to sign you in (name, email address, and profile picture),
 and it reads nothing from Meet except the meeting code. Recording happens
 in `/record/`, a window the panel opens, because Meet's frame cannot

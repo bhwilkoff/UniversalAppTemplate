@@ -314,6 +314,11 @@
     if (window.TeachLib) card.appendChild(el('p', 'small', window.TeachLib.scheduleText(c, Intl.DateTimeFormat().resolvedOptions().timeZone)));
     if (c.description) card.appendChild(el('p', null, c.description));
     if (mine && c.myRole === 'mentor') card.appendChild(el('p', 'small', 'You are a returning learner in this cohort.'));
+    if (!mine) {
+      var kept = el('p', 'small', 'Sessions are recorded, and what happens in them is kept. ');
+      var why = el('a', null, 'What is kept'); why.href = '/privacy/#google';
+      kept.appendChild(why); card.appendChild(kept);
+    }
     var actions = el('div', 'actions');
     if (mine) {
       var open = el('a', 'btn-primary', 'Open your cohort');

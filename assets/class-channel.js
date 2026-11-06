@@ -1,14 +1,15 @@
 // The class channel in the Meet panel (R10, R11): the reaction row, the
 // stance a person holds, and who has the class open, all on the cohort's
 // private Realtime channel 'class:<cohort id>' (migration
-// 20261005010000_class_channel.sql). Nothing here is written to a table;
-// when the call ends, it is gone. Logic in ReactLib (react-lib.js).
+// 20261005010000_class_channel.sql). What this person sends also goes to
+// o.log, which keeps it in session_events. Logic in ReactLib (react-lib.js).
 //
 //   ClassChannel.start({
 //     db, auth,           the supabase client, and the session (its token)
 //     cohort, me, name,   the cohort, the signed-in user, their name
 //     mount,              the element the reaction row is drawn in
 //     onStage(payload),   sends a ReactLib.stageMessage to this person's stage
+//     log(kind, detail),  keeps what this person sent (optional)
 //     onPresence(state)   the channel's presence state, whenever it changes
 //   }) -> { setPresence(fields), presence(), stop() }
 (function () {
@@ -96,6 +97,7 @@
       if (!a.ok) { line.textContent = 'That is a lot of reactions at once. Give it a moment.'; return; }
       flash(button || row.querySelector('[data-r="' + id + '"]'));
       var msg = R.message(id, o.name);
+      if (o.log) o.log('reaction', id);
       if (live && channel) channel.send({ type: 'broadcast', event: 'react', payload: msg });
       else heard({ payload: msg, self: true });
     }
@@ -103,6 +105,7 @@
     // A stance is held until it is changed, and pressing it again lets go.
     function hold(id) {
       held = held === id ? null : id;
+      if (o.log) o.log('stance', held);
       stances.querySelectorAll('[data-s]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-s') === held)); });
       track();
     }

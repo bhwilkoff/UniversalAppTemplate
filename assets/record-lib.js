@@ -14,6 +14,8 @@
     var where = cohortTitle ? ' for ' + cohortTitle : '';
     return 'I am recording this session' + where + ' now, so that anyone who misses it can watch it later. ' +
       'The recording is kept in my Google Drive, shared with Human Shaped, and linked only from this cohort’s session page. ' +
+      'Human Shaped also keeps what happens in the add-on and uses this recording to show how the session went. ' +
+      'That includes who spoke and for how long, and it is never a grade. ' +
       'If you would rather not appear, turn your camera off and use the chat, or tell me and I will trim your part. ' +
       'Breakout rooms are not recorded, and I will stop the recording before we split up.';
   }

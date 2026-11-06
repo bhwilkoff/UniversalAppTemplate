@@ -452,10 +452,36 @@
   // What it hears goes to this person's own main stage when it is open.
   // ------------------------------------------------------------------
 
+  // What this person did in the session, kept in session_events: the
+  // reactions and stances they sent, and a row a minute while the add-on is
+  // open. Sent in small batches, and a failed write never touches the call.
+  function startKeeping() {
+    if (S.keeping || !S.session) return;
+    var waiting = [];
+    function row(kind, detail) {
+      waiting.push({ cohort_id: S.cohort.id, session_id: S.session.id, user_id: S.me.id, kind: kind, detail: detail || null });
+    }
+    function send() {
+      if (!waiting.length) return;
+      var rows = waiting; waiting = [];
+      db.from('session_events').insert(rows).then(function (r) {
+        if (r.error) console.log('[addon] session events not kept: ' + r.error.message);
+      });
+    }
+    S.keeping = row;
+    row('here');
+    send();
+    setInterval(function () { row('here'); send(); }, 60000);
+    setInterval(send, 10000);
+    window.addEventListener('pagehide', send);
+  }
+
   function startClass() {
     if (!window.ClassChannel || S.classChannel) return;
+    startKeeping();
     S.classChannel = window.ClassChannel.start({
       db: db, auth: current, cohort: S.cohort, me: S.me, name: S.names[S.me.id] || null,
+      log: function (kind, detail) { if (S.keeping) S.keeping(kind, detail); },
       mount: $('[data-react]'),
       onStage: function (payload) {
         if (!S.stageOn || !side) return;

@@ -3,8 +3,9 @@
 // person chooses to send while someone presents ("see everybody and their
 // reactions to what's being talked about"); a stance is where they stand
 // on what is being said, held until they change it. Both travel on the
-// cohort's private class channel and are never stored or counted against
-// anyone. Tested in tools/test/react-lib.test.mjs.
+// cohort's private class channel and are kept in session_events, which a
+// leader and the person who sent them can read; they never become a score.
+// Tested in tools/test/react-lib.test.mjs.
 (function (root) {
   // Each reaction has a number key, so it is one press away while the
   // panel has focus.
