@@ -84,6 +84,11 @@
           <header class="page-head session-head">
             <div class="session-head-words">
               <h1 data-title></h1>
+              <form class="session-rename" data-title-form hidden>
+                <label>Title <input type="text" name="title" maxlength="200"></label>
+                <p class="hint">Saving a new title emails everyone invited to this session.</p>
+                <div class="actions"><button class="btn-primary small" type="submit">Save</button><button class="btn-secondary small" type="button" data-title-cancel>Cancel</button><span class="ui-inline-status" role="status" data-title-status></span></div>
+              </form>
               <p class="session-meta" data-when></p>
               <p class="lead" data-scope></p>
             </div>
@@ -114,10 +119,20 @@
             <section class="session-plan" aria-label="The plan">
               <div class="show-box" data-plan></div>
             </section>
+            <form class="cohort-form session-before-next" data-next-form hidden>
+              <label>Before the next session
+                <span class="hint"><span data-vis="cohort"></span></span>
+                <textarea name="scope" rows="2" maxlength="2000"></textarea>
+              </label>
+              <div class="actions"><button class="btn-secondary" type="submit">Save</button><span class="ui-inline-status" role="status" data-next-status></span></div>
+            </form>
           </div>
 
           <div data-tab="after" hidden>
-            <section class="session-after" aria-label="What came of it">
+            <section class="session-after" aria-label="What happened">
+              <div data-story></div>
+            </section>
+            <section class="session-after" aria-label="What came of it" data-after-leading>
               <p class="ui-meta-line"><span data-vis="staff"></span></p>
               <div data-after-answers></div>
               <form class="cohort-form" data-heard-form>
@@ -127,6 +142,13 @@
                 </label>
                 <div class="actions"><button class="btn-secondary" type="submit">Save</button><span class="ui-inline-status" role="status" data-heard-message></span></div>
               </form>
+              <details class="session-recording-link">
+                <summary>Recording link</summary>
+                <form class="cohort-form" data-recording-form>
+                  <label>Link <input type="url" name="recording_url" placeholder="https://"></label>
+                  <div class="actions"><button class="btn-secondary" type="submit">Save</button><span class="ui-inline-status" role="status" data-recording-status></span></div>
+                </form>
+              </details>
             </section>
           </div>
 
@@ -134,17 +156,6 @@
             <section class="session-recording" id="recording" aria-label="The recording" data-recording-section hidden>
               <video controls playsinline preload="metadata" data-recording-video style="width:100%;border-radius:.75rem;background:#000"></video>
               <p class="small" data-recording-note hidden>It did not play here. <a data-recording-link target="_blank" rel="noopener">Open it in Drive</a>.</p>
-            </section>
-          </div>
-
-          <div data-tab="details" hidden>
-            <section class="session-edit" aria-label="Title, challenge, and recording" data-details hidden>
-              <form class="cohort-form" data-session-form>
-                <label>Title <input type="text" name="title" maxlength="200"></label>
-                <label>The challenge, in your words <textarea name="scope" rows="2" maxlength="2000"></textarea></label>
-                <label>Recording link <input type="url" name="recording_url" placeholder="https://"></label>
-                <div class="actions"><button class="btn-primary" type="submit">Save</button><span class="ui-inline-status" role="status" data-session-form-status></span></div>
-              </form>
             </section>
           </div>
         </section>
@@ -170,7 +181,9 @@
   <script src="/assets/show-builder.js?v=20261106g" defer></script>
   <script src="/assets/cohort-nav.js?v=20261106a" defer></script>
   <script src="/assets/record-lib.js?v=20261104a" defer></script>
-  <script src="/assets/session.js?v=20261107a" defer></script>
+  <script src="/assets/react-lib.js?v=20261107a" defer></script>
+  <script src="/assets/session-story-lib.js?v=20261107a" defer></script>
+  <script src="/assets/session.js?v=20261107c" defer></script>
 
   <footer class="site-footer">
     <div class="wrap">

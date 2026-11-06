@@ -13,7 +13,7 @@ Week 2                                  [Join the call]
 Wed, Nov 11, 1:00 to 2:00 PM   Ready
 (0) (1) [2] (3) (4) (5)
 
-Before 0 of 4   Plan   Recording   Details
+Before 0 of 4   Plan   Recording   After
 
 [====|==|========|=====|===|=======|==]  60 of 60 minutes
 +-------+ +-------+ +-------+ +-------+
@@ -28,7 +28,9 @@ Before 0 of 4   Plan   Recording   Details
 | Plan | The hour as a bar, then every part as a picture of its main stage, in order. |
 | A part | Its own address. Slides fill the page; any other kind shows its stage and its few fields. |
 | Recording | The recording. Appears once there is one. |
-| Details | A leader's title, challenge, and recording link. |
+| After | What happened: how the session moved and who took part (a learner sees only what was kept about them). A leader also finds answers, what they heard, and the recording's link. |
+
+There is no Details view (Ben, November 6, 2026: "It seems like all of that is left over from previous iterations"). A leader renames a session on its title, and writes what comes before the next session under the plan.
 
 The page opens where the person is needed: a leader on Plan, a learner on Before, and anyone on Recording once it exists.
 

@@ -127,8 +127,9 @@
 
     K.started = !!(session.starts_at && Date.parse(session.starts_at) < Date.now());
     if (leading && K.started) drawAfter(cohort, session);
-    if (leading) drawDetails(session);
-    $('[data-details]').hidden = !leading;
+    $('[data-after-leading]').hidden = !leading;
+    if (K.started) drawStory(cohort, session, leading);
+    if (leading) drawEdits(session);
     return bringReady.then(function (bring) { drawViews(session, leading, finished, !!play, bring, stages.length > 0); show('ready'); });
   }
 
@@ -143,8 +144,7 @@
     if (before) add('before', 'Before');
     if (!leading) add('plan', 'Plan');
     if (played && !finished) add('recording', 'Recording');
-    if (leading && K.started) add('after', 'After');
-    if (leading) add('details', 'Details');
+    if (K.started) add('after', 'After');
     // A part's address names the view too, and the row's links never carry a part.
     var url = new URL(location.href), opened = url.searchParams.get('part');
     if (opened) { url.searchParams.delete('part'); url.searchParams.set('t', 'plan'); history.replaceState(null, '', url.pathname + url.search); }
@@ -373,6 +373,55 @@
 
   // What came of a session, for its leaders: what was answered, and what they
   // heard. Nothing is scored, because a question here has no right answer.
+  // What happened, from what was kept. A leader reads everyone; a learner's
+  // reads return only their own rows, so they see what is kept about them.
+  function drawStory(cohort, session, leading) {
+    var box = $('[data-story]'), L = window.SessionStoryLib, R = window.ReactLib;
+    box.replaceChildren();
+    Promise.all([
+      db.from('session_events').select('user_id, kind, detail, at').eq('session_id', session.id).order('at').limit(5000),
+      db.from('live_checks').select('id').eq('session_id', session.id),
+      db.from('live_answers').select('user_id, check_id').eq('cohort_id', cohort.id),
+      db.from('live_requests').select('user_id').eq('session_id', session.id),
+      db.from('live_queue').select('user_id, shown_at').eq('session_id', session.id),
+      db.from('enrollments').select('user_id, profiles(github_login, display_name)').eq('cohort_id', cohort.id)
+    ]).then(function (res) {
+      if (res.some(function (r) { return r.error; })) { box.appendChild(el('p', 'small', 'What happened could not be read.')); return; }
+      var ids = res[1].data.map(function (k) { return k.id; }), names = {};
+      res[5].data.forEach(function (e) {
+        if (leading || e.user_id === K.me.id) names[e.user_id] = e.profiles ? (e.profiles.display_name || e.profiles.github_login) : 'Someone';
+      });
+      if (K.me && !names[K.me.id] && !leading) names[K.me.id] = 'You';
+      var who = L.people({ names: names, events: res[0].data, requests: res[3].data, queue: res[4].data,
+        answers: res[2].data.filter(function (a) { return ids.indexOf(a.check_id) >= 0; }) });
+      var stops = leading ? L.stops(res[0].data) : [];
+      if (!who.length && !stops.length) { box.appendChild(U.empty('Nothing was kept from this session')); return; }
+      if (stops.length) {
+        box.appendChild(el('h3', null, 'How it moved'));
+        var ol = el('ol', 'session-story-stops');
+        stops.forEach(function (x) {
+          var li = el('li'); li.appendChild(el('span', null, x.scene || x.stage));
+          li.appendChild(el('span', 'small', x.minutes + ' min'));
+          ol.appendChild(li);
+        });
+        box.appendChild(ol);
+      }
+      box.appendChild(el('h3', null, leading ? 'Who took part' : 'What was kept about you'));
+      who.forEach(function (p) {
+        var card = el('div', 'session-prep-q');
+        if (leading) card.appendChild(el('h4', null, p.name));
+        var facts = [];
+        if (p.minutes) facts.push(['Add-on open', p.minutes + ' min']);
+        if (p.reactions.length) facts.push(['Reactions', p.reactions.map(function (r) { var d = R && R.reaction(r[0]); return (d ? d.label : r[0]) + ' ' + r[1]; }).join(', ')]);
+        if (p.answers) facts.push(['Answers', String(p.answers)]);
+        if (p.requests) facts.push(['Requests', String(p.requests)]);
+        if (p.shown) facts.push(['Work shown', String(p.shown)]);
+        card.appendChild(U.facts(facts));
+        box.appendChild(card);
+      });
+    });
+  }
+
   function drawAfter(cohort, session) {
     var box = $('[data-after-answers]'), f = $('[data-heard-form]'), said = $('[data-heard-message]');
     box.replaceChildren();
@@ -412,28 +461,55 @@
 
   // A leader's own fields for the session: its title, the challenge in
   // their words, and the recording once there is one.
-  var wired = false;
-  function drawDetails(s) {
-    var f = $('[data-session-form]'), said = $('[data-session-form-status]');
-    f.elements.title.value = s.title && s.title !== lib.sessionName(s.number) ? s.title : '';
-    f.elements.scope.value = s.scope || '';
-    f.elements.recording_url.value = s.recording_url || '';
-    if (wired) return;
-    wired = true;
-    f.addEventListener('submit', function (ev) {
-      ev.preventDefault();
-      var e = f.elements, rec = e.recording_url.value.trim();
-      if (rec && !safe(rec)) { U.say(said, 'A recording link starts with https://', 'problem'); return; }
-      var patch = { title: e.title.value.trim() || lib.sessionName(s.number), scope: e.scope.value.trim() || null, recording_url: rec || null };
-      U.say(said, 'Saving');
-      db.from('sessions').update(patch).eq('id', s.id).then(function (r) {
-        if (r.error) { U.say(said, 'Not saved: ' + r.error.message, 'problem'); return; }
-        Object.assign(s, patch);
-        U.say(said, 'Saved');
-        $('[data-title]').textContent = lib.sessionTitle(s);
-        $('[data-scope]').textContent = s.scope || ''; $('[data-scope]').hidden = !s.scope;
-      });
+  // Each thing a leader can change sits where it shows: the title on the
+  // title, what comes before the next session under the plan, and the
+  // recording's link, which the recorder fills in, with what came of it.
+  function drawEdits(s) {
+    K.editing = s;
+    var title = $('[data-title-form]'), next = $('[data-next-form]'), rec = $('[data-recording-form]');
+    next.hidden = false;
+    next.elements.scope.value = s.scope || '';
+    rec.elements.recording_url.value = s.recording_url || '';
+    var head = $('[data-title]');
+    var rename = el('button', 'btn-secondary small session-rename-open', 'Rename');
+    rename.type = 'button';
+    var old = $('.session-rename-open'); if (old) old.remove();
+    head.after(rename);
+    function open(on) { title.hidden = !on; head.hidden = on; rename.hidden = on; }
+    rename.addEventListener('click', function () {
+      var now = K.editing;
+      title.elements.title.value = now.title && now.title !== lib.sessionName(now.number) ? now.title : '';
+      open(true); title.elements.title.focus();
     });
+    $('[data-title-cancel]').onclick = function () { open(false); };
+    function save(patch, said, done) {
+      U.say(said, 'Saving');
+      db.from('sessions').update(patch).eq('id', K.editing.id).then(function (r) {
+        if (r.error) { U.say(said, 'Not saved: ' + r.error.message, 'problem'); return; }
+        Object.assign(K.editing, patch);
+        U.say(said, 'Saved');
+        if (done) done();
+      });
+    }
+    title.onsubmit = function (ev) {
+      ev.preventDefault();
+      save({ title: title.elements.title.value.trim() || lib.sessionName(K.editing.number) }, $('[data-title-status]'), function () {
+        head.textContent = lib.sessionTitle(K.editing);
+        open(false);
+      });
+    };
+    next.onsubmit = function (ev) {
+      ev.preventDefault();
+      save({ scope: next.elements.scope.value.trim() || null }, $('[data-next-status]'), function () {
+        $('[data-scope]').textContent = K.editing.scope || ''; $('[data-scope]').hidden = !K.editing.scope;
+      });
+    };
+    rec.onsubmit = function (ev) {
+      ev.preventDefault();
+      var link = rec.elements.recording_url.value.trim(), said = $('[data-recording-status]');
+      if (link && !safe(link)) { U.say(said, 'A recording link starts with https://', 'problem'); return; }
+      save({ recording_url: link || null }, said);
+    };
   }
 
   $('[data-reload]').addEventListener('click', load);

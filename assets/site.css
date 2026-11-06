@@ -2731,8 +2731,6 @@ html.app-nav-open[data-signed-in] body:not([data-no-app-nav]) .app-nav { display
    either side, and the plan its leaders change before it runs. */
 .session-meta { margin: 0.25rem 0 0; color: var(--muted); font-size: 0.975rem; display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
 .session-pager { display: flex; flex-wrap: wrap; gap: 0.25rem 1.25rem; margin: 0.75rem 0 0; font-size: 0.95rem; }
-.session-edit { margin: 2rem 0; }
-.session-edit h2 { margin: 0 0 0.75rem; }
 .session-details { margin-top: 1rem; }
 .session-details > summary { cursor: pointer; font-weight: 600; }
 .session-details .cohort-form { margin-top: 0.75rem; }
@@ -2980,6 +2978,14 @@ html:has(.p2-panel), body:has(.p2-panel) { background: #fff; overflow: hidden; }
 .prep-people li.is-done { background: var(--thistle); border-color: var(--thistle); color: var(--on-thistle); }
 .session-prep-q, .session-prep-exchange { padding: 1rem 1.1rem; margin-bottom: 0.75rem; border: 1px solid var(--rule); border-radius: 12px; background: var(--card); }
 .session-prep-q p { margin: 0.35rem 0 0; }
+.session-rename-open { margin-top: 0.4rem; }
+.session-rename { max-width: 32rem; }
+.session-rename .hint { margin: 0; }
+.session-before-next { margin-top: 2rem; }
+.is-part .session-before-next { display: none; }
+.session-recording-link { margin-top: 1.5rem; }
+.session-story-stops { list-style: none; margin: 0 0 1.5rem; padding: 0; }
+.session-story-stops li { display: flex; justify-content: space-between; gap: 1rem; padding: 0.4rem 0; border-bottom: 1px solid var(--rule); }
 .prep-q-head { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 0.5rem; align-items: center; }
 .prep-ask { width: 100%; min-height: 0; padding: 0.15rem 0.3rem; margin-left: -0.3rem; border: 1px solid transparent; border-radius: 6px; background: none; font: inherit; font-weight: 700; font-size: 1.05rem; color: var(--ink); resize: none; field-sizing: content; }
 .prep-ask:hover, .prep-ask:focus { border-color: var(--edge); }
