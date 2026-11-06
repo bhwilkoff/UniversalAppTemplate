@@ -5,7 +5,7 @@ import { WORKFLOW, WORKFLOW_PATH } from '../../supabase/functions/_shared/sessio
 
 const repo = 'cohort-a';
 const good = {
-  iss: ISSUER, aud: AUDIENCE, repository: 'humanshaped/cohort-a', ref: 'refs/heads/main', event_name: 'workflow_dispatch',
+  iss: ISSUER, aud: AUDIENCE, repository: 'humanshaped/cohort-a', ref: 'refs/heads/main', event_name: 'repository_dispatch',
   workflow_ref: `humanshaped/cohort-a/${WORKFLOW_PATH}@refs/heads/main`, workflow_sha: 'a'.repeat(40),
 };
 

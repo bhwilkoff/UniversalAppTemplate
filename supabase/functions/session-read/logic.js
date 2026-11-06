@@ -22,7 +22,7 @@ export function callerOk(claims, repo) {
   const full = fullName(repo);
   if (!repo || claims.repository !== full) return { ok: false, reason: 'repository' };
   if (claims.ref !== 'refs/heads/main') return { ok: false, reason: 'ref' };
-  if (claims.event_name !== 'workflow_dispatch') return { ok: false, reason: 'event' };
+  if (claims.event_name !== 'repository_dispatch') return { ok: false, reason: 'event' };
   if (claims.workflow_ref !== `${full}/${WORKFLOW_PATH}@refs/heads/main`) return { ok: false, reason: 'workflow' };
   if (!/^[0-9a-f]{40}$/.test(String(claims.workflow_sha || ''))) return { ok: false, reason: 'sha' };
   return { ok: true };

@@ -6,4 +6,4 @@
 set -e
 cd "$(dirname "$0")/.."
 SUPABASE_ACCESS_TOKEN="$(tr -d '\n\r ' < "$HOME/.humanshaped/supabase-token")" \
-  npx -y supabase@latest functions deploy cohort-access --project-ref bifrieqzkihuxfzttgvd --use-api
+  npx -y supabase@latest functions deploy cohort-access --project-ref bifrieqzkihuxfzttgvd --use-api --yes

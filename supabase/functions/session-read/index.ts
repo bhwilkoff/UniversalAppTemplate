@@ -77,7 +77,7 @@ async function tick(db: any) {
     }
     const prior = byId.get(s.id) as { tries?: number; recording_url?: string } | undefined;
     const tries = prior && prior.recording_url === s.recording_url ? (prior.tries || 0) + 1 : 1;
-    const go = await github(token, 'POST', `/repos/${repo}/actions/workflows/session-read.yml/dispatches`, { ref: 'main', inputs: { session: s.id } });
+    const go = await github(token, 'POST', `/repos/${repo}/dispatches`, { event_type: 'read-session', client_payload: { session: s.id } });
     if (go.status !== 204) { problems.push(`${s.id}: start ${go.status}`); continue; }
     await db.from('session_reads').upsert({ session_id: s.id, cohort_id: s.cohort_id, recording_url: s.recording_url, state: 'running', tries, started_at: now.toISOString(), problem: null });
     started.push(s.id);
