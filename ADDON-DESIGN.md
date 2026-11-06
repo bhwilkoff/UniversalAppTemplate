@@ -56,12 +56,10 @@ The panel's chat and code runner (Meet has chat; code belongs on the stage or a 
 
 Every cohort gets this panel. `details.panel = 'old'` on a cohort, or `?panel=old` on the address, brings back the previous one. Chat, the code runner, and the class thread do not appear in this panel.
 
-## Decisions waiting on Ben
+## Decisions Ben made, November 6, 2026
 
-Each has a default the work proceeds on, and can change.
-
-1. **Reactions and stance.** Meet has its own reactions. Default: keep ours as one quiet row for learners, because they reach the main stage.
-2. **Posts as the app.** Moving GitHub actions to the server removes approvals, but a post then reads as the app, not the person. Default: a person with GitHub connected posts as themselves; the panel needs GitHub for nothing.
-3. **GitHub for learners.** Default: not needed to take part, only to build and publish, asked once at setup.
-4. **Reminders without GitHub.** They ride on GitHub, so a Google-only person gets none. Default: a plain line on their home page until Ben chooses.
-5. **Guests and Google's rule.** The listing says signed-out users must see the One Tap prompt, and a guest walks in without one. Default: guests stay, with Sign in on screen.
+1. **Reactions stay, and get easier.** Ben: "Our reactions are far better than the ones built into Google Meet. They should be easily accessible within our add-on and have keyboard shortcuts for triggering them akin to the ones that are used in the Minerva Active Learning Forum."
+2. **Posts.** A person with GitHub connected posts as themselves. Anyone else posts through the app, with their name in the text.
+3. **GitHub is required to join a cohort.** A person connects it as they join. A guest by call link still needs nothing.
+4. **Reminders stay native.** Ben: "we are trying to leverage Github and Google Calendar's native notification systems rather than creating ones that we have to build and maintain." Requiring GitHub to join is what closes the gap, so nothing new gets built.
+5. **Guests stay, with One Tap.** A signed-out person sees the One Tap prompt, can dismiss it, and carries on as a guest.
