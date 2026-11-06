@@ -152,8 +152,10 @@
       // panel lets go of it, and the site's tabs stay signed in (found
       // making the review screencast: the panel signed the site out).
       if (borrowed) { location.reload(); return; }
+      // The session came from the site, so ending it would sign the site out
+      // too (found testing): the panel only forgets its own copy.
       (window.GitHubToken ? window.GitHubToken.forget(db) : Promise.resolve()).catch(function () {})
-        .then(function () { return db.auth.signOut({ scope: 'local' }); }).catch(function () {})
+        .then(function () { db.auth.stopAutoRefresh(); localStorage.removeItem(db.auth.storageKey); }).catch(function () {})
         .then(function () { location.reload(); });
     });
   });
