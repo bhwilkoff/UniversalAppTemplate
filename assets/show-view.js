@@ -329,6 +329,12 @@
       var l = K.layout(parts, current || null, { teaching: teaching, available: Object.keys(slots).filter(function (k) { return off.indexOf(k) < 0; }) });
       off.forEach(function (k) { if (wraps[k]) wraps[k].box.hidden = true; });
       var target = opts.nowBox || (current && items[current] ? items[current].body : before);
+      // In the new frame a leader's cues are tools, not part of the moment.
+      if (opts.nowBox) {
+        var cues = l.now.filter(function (k) { return k.indexOf('cue-') === 0 && k !== 'cue-stage'; });
+        l.now = l.now.filter(function (k) { return cues.indexOf(k) < 0; });
+        l.anytime = cues.concat(l.anytime);
+      }
       l.now.forEach(function (key) {
         var w = wraps[key].box;
         // A leader's cue (a card, rooms, the presenter) waits closed until
