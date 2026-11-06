@@ -229,10 +229,14 @@
     var box = $('[data-slide-links]');
     box.replaceChildren();
     box.hidden = !links || !links.length;
+    if (box.hidden) return;
+    var d = el('details', 'stage-links');
+    d.appendChild(el('summary', null, 'Open on GitHub'));
     (links || []).forEach(function (l) {
       var a = el('a', 'stage-chip', l.label); a.href = l.url; a.target = '_blank'; a.rel = 'noopener';
-      box.appendChild(a);
+      d.appendChild(a);
     });
+    box.appendChild(d);
   }
   // A learner asks from the stage itself, and their panel sends it.
   function drawAsk() {

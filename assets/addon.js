@@ -913,7 +913,6 @@
     // Tools and People, for a leader; Mine, for a learner.
     if (S.teaching) {
       var stage = el('section', 'p2-group');
-      stage.appendChild(el('h2', null, 'Main stage'));
       var acts = el('div', 'actions');
       ['[data-open-stage]', '[data-close-stage]', '[data-welcome-toggle]'].forEach(function (s) { acts.appendChild($(s)); });
       stage.appendChild(acts);

@@ -3120,9 +3120,14 @@ select:not([multiple]):not(.p2-panel select) {
 .stage-ask-open { padding: 0.1rem 0.7rem; border: 0; border-radius: 999px; background: var(--thistle); color: var(--on-thistle); font: inherit; font-size: clamp(0.8rem, 1.8vmin, 1rem); font-weight: 600; cursor: pointer; }
 .stage-ask:not([hidden]) { position: fixed; left: 0.75rem; bottom: 4.6rem; z-index: 6; display: grid; grid-template-columns: auto minmax(10rem, 22rem) auto; gap: 0.4rem; padding: 0.5rem; border-radius: 12px; background: var(--card); box-shadow: 0 2px 12px rgb(0 0 0 / 0.35); }
 .stage-ask select, .stage-ask input { padding: 0.35rem 0.5rem; border: 1px solid var(--muted); border-radius: 8px; background: var(--card); color: var(--ink); font: inherit; font-size: 0.9rem; }
-.stage-chips:not([hidden]) { position: fixed; right: 0.75rem; bottom: 0.6rem; left: 40%; z-index: 5; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.3rem; }
+.stage-chips:not([hidden]) { position: fixed; right: 0.75rem; bottom: 2.4rem; z-index: 5; }
+.stage-links { position: relative; }
+.stage-links > summary { padding: 0.15rem 0.7rem; border: 1px solid var(--rule); border-radius: 999px; background: var(--card); color: var(--ink); font-size: clamp(0.75rem, 1.7vmin, 0.95rem); cursor: pointer; list-style: none; }
+.stage-links[open] { display: grid; gap: 0.3rem; justify-items: end; }
+.stage-links[open] > summary { order: 2; }
 .stage-chip { padding: 0.15rem 0.6rem; border: 1px solid var(--rule); border-radius: 999px; background: var(--card); color: var(--ink); font-size: clamp(0.72rem, 1.6vmin, 0.9rem); text-decoration: none; }
 .stage-chip:hover { border-color: var(--thistle); }
 .stage-ready:has(.has-board:not([hidden])) .stage-reacts { display: flex; }
 .stage-ready:has(.has-board:not([hidden])) .stage-react { display: none; }
+.stage-ready:has(.has-board:not([hidden])) .stance-bar { display: none; }
 
