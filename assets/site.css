@@ -3033,7 +3033,7 @@ select:not([multiple]):not(.p2-panel select) {
 .studio-film { padding: 3px 5px 3px 3px; }
 
 /* The slide and its notes fit on one screen. */
-@media (min-width: 60rem) { .studio:not(.is-reading) .studio-canvas { width: min(100%, calc((100vh - 21rem) * 1.6)); min-width: 28rem; } .studio-notes { width: 100%; } }
+@media (min-width: 60rem) { .studio .studio-canvas { width: min(100%, calc((100vh - 21rem) * 1.6)); min-width: 28rem; } .studio-notes { width: 100%; } }
 .session-head .session-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 0.6rem; }
 .part-link .part-pic .stage-note { display: none; }
 .part-stage { max-width: 36rem; }
@@ -3087,3 +3087,10 @@ select:not([multiple]):not(.p2-panel select) {
 .p2-myapp[hidden], .p2-asks[hidden] { display: none; }
 
 .board-stage .board-head { bottom: 3.4rem; }
+.prep-form { display: grid; gap: 1rem; margin-bottom: 1.25rem; }
+.prep-form label { padding: 1rem 1.1rem; border: 1px solid var(--rule); border-radius: 12px; background: var(--card); font-size: 1.05rem; font-weight: 700; }
+.prep-form textarea { width: 100%; }
+.session-head .session-meta > * { margin: 0; }
+.stage-ready:has(.stage-app:not([hidden])) .stage-reacts { display: none; }
+
+.ui-status .icon { margin: 0; }

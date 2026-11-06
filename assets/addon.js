@@ -1499,7 +1499,7 @@
       li.appendChild(el('span', 'roster-name', S.names[p.user_id] || 'Someone'));
       var live = S.onStage && S.onStage.kind === 'item' && (S.items.filter(function (x) { return x.id === S.onStage.id; })[0] || {}).user_id === p.user_id;
       li.appendChild(button(live ? 'Take it down' : 'Show it', 'btn-secondary small', function () {
-        if (live) return setPin(null);
+        if (live) return db.from('live_queue').update({ state: 'shown' }).eq('id', S.onStage.id).then(function () { setPin(null); refreshLive(); });
         db.rpc('queue_member_app', { s: S.session.id, member: p.user_id }).then(function (r) {
           if (r.error) return;
           refreshLive().then(function () { setPin({ kind: 'item', id: r.data }); drawApps(); });
