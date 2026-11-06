@@ -1835,6 +1835,7 @@
       side = client;
       side.on('frameToFrameMessage', function (m) {
         if (m && A.isHello(m.payload)) { S.stageOn = true; stageButtons(true); sendStage(); S.codeStageSent = null; drawCode(); }
+        if (m && A.isHello(m.payload) && S.cohort && (S.cohort.details || {}).probe) { try { side.notifyMainStage(JSON.stringify({ type: 'hs-probe', url: S.cohort.details.probe })); } catch (e) {} }
         var key = m && A.readKey(m.payload);
         if (key && S.classChannel) S.classChannel.press(key);
       });

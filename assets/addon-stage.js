@@ -19,6 +19,26 @@
   try { framed = window.self !== window.top; } catch (e) { framed = true; }
   if (!A || !L || !framed || !window.meet || !window.meet.addon) { show('outside'); return; }
 
+  // A measurement, for a test cohort only: what this frame is allowed to do.
+  function probe(url) {
+    if (document.getElementById('hs-probe')) return;
+    var box = el('div'); box.id = 'hs-probe';
+    box.style.cssText = 'position:fixed;inset:0;z-index:99;display:grid;grid-template-rows:auto 1fr;background:#131916;color:#fff;font:15px/1.4 sans-serif';
+    var out = el('pre'); out.style.cssText = 'margin:0;padding:8px;white-space:pre-wrap';
+    var f = document.createElement('iframe'); f.src = url; f.style.cssText = 'width:100%;height:100%;border:0;background:#fff';
+    box.appendChild(out); box.appendChild(f); document.body.appendChild(box);
+    function say(t) { out.textContent += t + '  '; }
+    var keys = []; try { keys = Object.keys(localStorage); } catch (e) { say('storage ERR ' + e.name); }
+    say('auth-in-storage ' + keys.some(function (k) { return /auth-token/.test(k); }));
+    f.addEventListener('load', function () { say('iframe load'); });
+    f.addEventListener('error', function () { say('iframe error'); });
+    document.addEventListener('securitypolicyviolation', function (e) { say('CSP ' + e.violatedDirective + ' ' + e.blockedURI); });
+    fetch('https://api.github.com/repos/humanshaped/.github').then(function (r) { say('github ' + r.status); }, function (e) { say('github ERR ' + e.message); });
+    say('sandbox? ' + (window.frameElement ? 'same' : 'cross'));
+    say('featurePolicy ' + (document.featurePolicy ? document.featurePolicy.allowedFeatures().slice(0, 40).join(',') : 'n/a'));
+    window.addEventListener('click', function () { say('click'); });
+  }
+
   function clockText(part) {
     var left = part ? A.timeLeft(part.endsAt, Date.now()) : null;
     if (left == null) return '';
@@ -245,6 +265,7 @@
       return session.createMainStageClient();
     }).then(function (stage) {
       stage.on('frameToFrameMessage', function (m) {
+        if (m && typeof m.payload === 'string' && m.payload.indexOf('hs-probe') > 0) return probe(JSON.parse(m.payload).url);
         var react = m && window.ReactLib ? window.ReactLib.readStage(m.payload) : null;
         if (react) return drawReactions(react);
         var code = m && window.CodeLib ? window.CodeLib.readStage(m.payload) : null;
