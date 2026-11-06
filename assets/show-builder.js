@@ -272,7 +272,7 @@
       var kindSel = el('select'); kindSel.name = 'kind';
       S.KINDS.forEach(function (k) { var o = el('option', null, plain(k.key)); o.value = k.key; kindSel.appendChild(o); });
       kindSel.value = s ? s.kind : 'talk';
-      var kl = field('Kind of part', kindSel);
+      var kl = field('Activity', kindSel);
       var title = el('input'); title.name = 'title'; title.maxLength = 120; title.required = true; title.value = s ? s.title : '';
       var titleL = field('Title', title);
       var minutes = el('input'); minutes.name = 'minutes'; minutes.type = 'number'; minutes.min = 1; minutes.max = 240; minutes.required = true; minutes.value = s ? s.minutes : 5;

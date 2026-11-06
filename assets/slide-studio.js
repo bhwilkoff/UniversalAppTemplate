@@ -343,7 +343,7 @@
       var pick = el('select');
       pick.appendChild(new Option('None', ''));
       var has = M.iconOf(lines);
-      ICONS.concat(has && ICONS.indexOf(has) < 0 ? [has] : []).forEach(function (n) { pick.appendChild(new Option(n.replace(/-/g, ' '), n)); });
+      ICONS.concat(has && ICONS.indexOf(has) < 0 ? [has] : []).forEach(function (n) { var words = n.replace(/-/g, ' '); pick.appendChild(new Option(words.charAt(0).toUpperCase() + words.slice(1), n)); });
       pick.value = has;
       pick.addEventListener('change', function () { edit(function (a) { return M.setIcon(a, pick.value); }); });
       ic.appendChild(pick);

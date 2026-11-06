@@ -3041,4 +3041,6 @@ select:not([multiple]):not(.p2-panel select) {
 .part-stage .part-pic.stage-preview { padding: 1.5rem; }
 .part-stage .part-pic .stage-title { font-size: 1.4rem; }
 .part-stage .part-pic .stage-line, .part-stage .part-pic .stage-items, .part-stage .part-pic .stage-note { font-size: 0.95rem; }
+.part-form input[type="number"] { appearance: textfield; -moz-appearance: textfield; }
+.part-form input[type="number"]::-webkit-inner-spin-button, .part-form input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 
