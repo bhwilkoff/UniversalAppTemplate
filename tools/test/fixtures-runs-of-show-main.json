@@ -201,7 +201,7 @@
         },
         {
           "kind": "rooms",
-          "title": "Show what you brought back",
+          "title": "Show what you built",
           "minutes": 24,
           "body": "In your group's room, each person reads from the log they kept for five days.",
           "config": {
@@ -324,7 +324,7 @@
           },
           {
             "kind": "presenter",
-            "title": "Show what you brought back",
+            "title": "Show what you built",
             "minutes": 20,
             "body": "With everyone in the call, about five minutes each: read three lines from the log you kept for five days, say which one you keep coming back to and why, and hear one question about what happened.",
             "config": {
@@ -401,7 +401,7 @@
         },
         {
           "kind": "rooms",
-          "title": "Show what you brought back",
+          "title": "Show what you built",
           "minutes": 30,
           "body": "In your group's room. Each person in turn: say what you want to know, show it on the device, and explain one decision with your agent closed (a decision, never the code). The others ask one question to understand it, then answer the three questions: where is it going, how is it going, and what is next. The builder ends by saying what they will do next, and ready or not yet.",
           "config": {
@@ -510,7 +510,7 @@
           },
           {
             "kind": "presenter",
-            "title": "Show what you brought back",
+            "title": "Show what you built",
             "minutes": 22,
             "body": "With everyone in the call, about five minutes each. Each person in turn: say what you want to know, show it on the device, and explain one decision with your agent closed (a decision, never the code). The others ask one question to understand it, then answer the three questions: where is it going, how is it going, and what is next. The builder ends by saying what they will do next, and ready or not yet.",
             "config": {
@@ -587,7 +587,7 @@
         },
         {
           "kind": "rooms",
-          "title": "Show what you brought back",
+          "title": "Show what you built",
           "minutes": 30,
           "body": "In your group's room. Each person in turn: say what you want to know, show it on the device, and explain one decision with your agent closed (a decision, never the code). The others ask one question to understand it, then answer the three questions: where is it going, how is it going, and what is next. The builder ends by saying what they will do next, and ready or not yet.",
           "config": {
@@ -687,7 +687,7 @@
           },
           {
             "kind": "presenter",
-            "title": "Show what you brought back",
+            "title": "Show what you built",
             "minutes": 22,
             "body": "With everyone in the call, about five minutes each. Each person in turn: say what you want to know, show it on the device, and explain one decision with your agent closed (a decision, never the code). The others ask one question to understand it, then answer the three questions: where is it going, how is it going, and what is next. The builder ends by saying what they will do next, and ready or not yet.",
             "config": {
@@ -758,7 +758,7 @@
         },
         {
           "kind": "rooms",
-          "title": "Show what you brought back",
+          "title": "Show what you built",
           "minutes": 30,
           "body": "In your group's room. Each person in turn: say what you want to know, show it on the device, and explain one decision with your agent closed (a decision, never the code). The others ask one question to understand it, then answer the three questions: where is it going, how is it going, and what is next. The builder ends by saying what they will do next, and ready or not yet.",
           "config": {
@@ -880,7 +880,7 @@
           },
           {
             "kind": "presenter",
-            "title": "Show what you brought back",
+            "title": "Show what you built",
             "minutes": 22,
             "body": "With everyone in the call, about five minutes each. Each person in turn: say what you want to know, show it on the device, and explain one decision with your agent closed (a decision, never the code). The others ask one question to understand it, then answer the three questions: where is it going, how is it going, and what is next. The builder ends by saying what they will do next, and ready or not yet.",
             "config": {

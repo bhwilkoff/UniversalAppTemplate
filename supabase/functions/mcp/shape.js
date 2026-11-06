@@ -172,7 +172,7 @@ export function ownAppText(app, hide, marks) {
       lines.push(`- ${label(m.stage)}: ${m.state === 'ready' ? 'ready to move on' : 'not yet'} (method part "${part(m.stage)}")`));
   }
   if (notes.length) {
-    lines.push('', 'What you noted you would bring back:');
+    lines.push('', 'What you noted you would show:');
     [...notes].sort((a, b) => a.stage.localeCompare(b.stage)).forEach((m) => lines.push(`- ${label(m.stage)}: ${m.note}`));
   }
   lines.push('', `Without a cohort there is no teacher here, so an agent asks the method's questions (method part "review-skill") and says plainly that its feedback is an AI's. Open cohorts are at ${SITE}/cohorts/.`);

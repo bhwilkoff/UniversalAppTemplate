@@ -47,7 +47,7 @@
       var k = PART_KIND[p.key] || 'talk';
       var config = {};
       if (k === 'rooms') {
-        config.prompt = 'Show what you brought back on the real device, and explain one decision with the agent closed.';
+        config.prompt = 'Show what you built on the real device, and explain one decision with the agent closed.';
         var rs = roomScenes(turn, p.minutes, 3);
         if (rs.length) config.room_scenes = rs;
       }

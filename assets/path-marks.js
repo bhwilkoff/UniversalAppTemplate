@@ -251,8 +251,8 @@
     var kept = P.get(marks, stage, 'note');
     var form = el('form', 'cohort-form path-note');
     var label = el('label', null, mode === 'account'
-      ? 'Not in a cohort just now? Keep a note of what you would bring back'
-      : 'Keep a note of what you would bring back');
+      ? 'Not in a cohort just now? Keep a note of what you would show'
+      : 'Keep a note of what you would show');
     var t = el('textarea'); t.rows = 3; t.maxLength = 4000;
     t.value = draft || (kept ? kept.note : '');
     label.appendChild(t);

@@ -121,7 +121,7 @@
     if (!shares.length) { box.appendChild(window.UI.empty('Nothing shared yet.')); return; }
     var byId = {};
     people.forEach(function (p) { byId[p.user_id] = p.profiles; });
-    var KIND = { 'bring-back': 'Bring-back', 'for-feedback': 'Asking for feedback', 'ai-review': 'A review from their AI agent', question: 'A question' };
+    var KIND = { 'bring-back': 'Build', 'for-feedback': 'Asking for feedback', 'ai-review': 'A review from their AI agent', question: 'A question' };
     shares.forEach(function (s) {
       var card = el('article', 'cohort-card share');
       card.appendChild(el('p', 'kicker', KIND[s.kind] + ' from ' + nameOf(byId[s.user_id]) + ', ' + lib.ago(s.created_at, new Date())));
@@ -867,7 +867,7 @@
     var form = $('[data-share-form]'), f = form.elements;
     f.kind.value = 'bring-back';
     var info = P.stageInfo(stage);
-    f.note.placeholder = 'What you are bringing back from ' + (stage === 'setup' ? 'getting set up' : 'stage ' + stage + ', ' + info.title) + ', in your own words';
+    f.note.placeholder = 'What you built in ' + (stage === 'setup' ? 'getting set up' : 'stage ' + stage + ', ' + info.title) + ', in your own words';
     syncShareForm();
     var go = function () {
       syncShareForm();

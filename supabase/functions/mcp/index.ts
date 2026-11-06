@@ -478,7 +478,7 @@ Deno.serve(
 
         server.registerPrompt('prepare_for_session', {
           title: 'Prepare for the next session',
-          description: 'Your agent helps you choose one thing to bring back to the next live session, and you say it in your own words.',
+          description: 'Your agent helps you choose one thing to show at the next live session, and you say it in your own words.',
           argsSchema: cohortArg,
         }, ({ cohort }) => ({
           messages: [{

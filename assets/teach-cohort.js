@@ -470,7 +470,7 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
       } else li.textContent = text;
       return li;
     }
-    block('What they brought back', c.bringBacks.map(function (s) {
+    block('What they built', c.bringBacks.map(function (s) {
       var li = line(s.note || '', s.url);
       if (s.want_to_know) li.appendChild(el('span', 'followup-line want', 'Their question: ' + s.want_to_know));
       if (s.readiness === 'ready') li.appendChild(el('span', 'followup-line small', 'They marked it ready to move on.'));
@@ -509,7 +509,7 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
     var form = el('form', 'inline-form followup-form');
     var label = el('label', null, 'Your follow-up to ' + name);
     var where = el('span', 'hint');
-    if (target.kind === 'feedback') where.appendChild(U.visibility('cohort', 'On their bring-back'));
+    if (target.kind === 'feedback') where.appendChild(U.visibility('cohort', 'On their build'));
     else if (notesReady) where.appendChild(U.visibility('them', 'A note'));
     else where.textContent = 'They shared nothing to answer.';
     label.appendChild(where);
@@ -549,7 +549,7 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
         F.clearDraft(store, key);
         input.value = '';
         draftFlag.hidden = true;
-        msg.textContent = target.kind === 'feedback' ? 'Sent, as feedback on their bring-back.' : 'Sent, as a note on their cohort page.';
+        msg.textContent = target.kind === 'feedback' ? 'Sent, as feedback on their build.' : 'Sent, as a note on their cohort page.';
         body.insertBefore(el('p', 'small followup-sent', 'You sent: ' + checked.body), form);
       });
     });

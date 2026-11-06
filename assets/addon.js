@@ -1295,7 +1295,7 @@
   }
   function roomsPrompt() { var r = roomsScene(); return r && r.config && r.config.prompt ? r.config.prompt : null; }
 
-  // During "Show what you brought back", and always in a group's room:
+  // During "Show what you built", and always in a group's room:
   // each group's order this week, and each builder's question.
   function drawGroups(box) {
     var groups = S.room.groupId ? S.groups.filter(function (g) { return g.id === S.room.groupId; })
