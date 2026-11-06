@@ -28,7 +28,7 @@ Before 0 of 4   Plan   Recording   After
 | Plan | The hour as a bar, then every part as a picture of its main stage, in order. |
 | A part | Its own address. Slides fill the page; any other kind shows its stage and its few fields. |
 | Recording | The recording. Appears once there is one. |
-| After | What happened: how the session moved and who took part (a learner sees only what was kept about them). A leader also finds answers, what they heard, and the recording's link. |
+| After | What happened: how the session moved and what was kept, by person, which is never a list of who attended (a learner sees only what was kept about them). A leader also finds answers, what they heard, and the recording's link. |
 
 There is no Details view (Ben, November 6, 2026: "It seems like all of that is left over from previous iterations"). A leader renames a session on its title, and writes what comes before the next session under the plan.
 

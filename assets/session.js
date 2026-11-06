@@ -406,7 +406,7 @@
         });
         box.appendChild(ol);
       }
-      box.appendChild(el('h3', null, leading ? 'Who took part' : 'What was kept about you'));
+      box.appendChild(el('h3', null, leading ? 'What was kept, by person' : 'What was kept about you'));
       who.forEach(function (p) {
         var card = el('div', 'session-prep-q');
         if (leading) card.appendChild(el('h4', null, p.name));
