@@ -934,7 +934,8 @@
   function nextStep() {
     var part = partNow(), info = slideInfo();
     if (!S.teaching) return null;
-    if (!part) return !S.stageOn && !standalone ? { label: 'Open the main stage', go: 'stage' } : { label: 'Start the session', go: 'start' };
+    if (!S.stageOn && !standalone) return { label: 'Open the main stage', go: 'stage' };
+    if (!part) return { label: 'Start the session', go: 'start' };
     if (info && info.next !== 'Next part') return { label: info.next, go: 'step' };
     var list = S.list || [], at = list.indexOf(part), after = list[at + 1];
     return after ? { label: 'Next: ' + after.name, go: 'step' } : { label: 'Last part', disabled: true };

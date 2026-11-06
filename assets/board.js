@@ -271,6 +271,8 @@
       var made = B.noteElements({ id: 'n' + now.toString(36) + Math.random().toString(36).slice(2, 6), by: S.me.id, name: myName(), text: text, x: x, y: y, now: now });
       S.api.updateScene({ elements: S.api.getSceneElementsIncludingDeleted().concat(S.X.restoreElements(made, null)), captureUpdate: S.X.CaptureUpdateAction.IMMEDIATELY });
       input.value = '';
+      // Everything stays in view, at no more than life size.
+      setTimeout(function () { S.api.scrollToContent(S.api.getSceneElements(), { fitToViewport: true, maxZoom: 1, viewportZoomFactor: 0.8, animate: true }); }, 0);
     });
     vote.addEventListener('click', function () {
       if (!S.api) return;
@@ -323,7 +325,7 @@
     syncVote();
     if (S.fitPending && S.api.scrollToContent && elements.some(function (e) { return !e.isDeleted; })) {
       S.fitPending = false;
-      setTimeout(function () { S.api.scrollToContent(S.api.getSceneElements(), { fitToViewport: true, viewportZoomFactor: 0.8 }); }, 50);
+      setTimeout(function () { S.api.scrollToContent(S.api.getSceneElements(), { fitToViewport: true, maxZoom: 1, viewportZoomFactor: 0.8 }); }, 50);
     }
     var v = S.X.getSceneVersion(elements);
     var same = v === S.lastVersion;

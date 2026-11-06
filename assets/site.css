@@ -3086,3 +3086,4 @@ select:not([multiple]):not(.p2-panel select) {
 .p2-myapp { margin-bottom: 0.75rem; }
 .p2-myapp[hidden], .p2-asks[hidden] { display: none; }
 
+.board-stage .board-head { bottom: 3.4rem; }
