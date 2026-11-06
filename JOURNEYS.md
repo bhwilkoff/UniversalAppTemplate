@@ -199,6 +199,8 @@ so the cohort's home shows that as the one thing waiting, with a button
 that opens it.
 **November 6, 2026:** the cohort page now accepts it with the person's own
 token, and the button stays for when GitHub refuses.
+Tested the same day with a real pending invitation: one press took a person outside
+the organization to a member of the team, reading the private conversation.
 
 ### J3. The sessions appear on their calendar
 

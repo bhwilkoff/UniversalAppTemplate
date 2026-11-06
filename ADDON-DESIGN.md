@@ -23,12 +23,12 @@ Leader                         Learner
 
 | Tab | Holds |
 |---|---|
-| Now | Leader: this moment. Before the session, open the stage and start. In a part, your notes and what the part needs: the question's answers, who shows next, rooms and their clock. |
+| Now | Leader: this moment. Before the session, open the stage and start. In a part, what people are asking for, your notes, and what the part needs: the question's answers, who shows next, rooms and their clock. |
 | Plan | Every part, one line each. Go to one; change one. |
-| Tools | What you do to the room: main stage, ask a question, a card, breakouts, recording. |
+| Tools | Tiles for what you do to the room: main stage, a question, apps, breakouts, a card, the board, recording. |
 | People | Who is here, who answered, guests and who they are, recognition. |
 | Now (learner) | Where to go, then what is being asked. |
-| Mine (learner) | Your answers, your work to show, your app. |
+| Mine (learner) | Your app first, then what you can ask for, then your answers and work. |
 
 ## Rules
 
@@ -56,7 +56,21 @@ Measured in a real call: each person's stage takes their own clicks and keys, Me
 | A question | Learners, on the stage | Choices are buttons, and words are typed there. The panel saves them |
 | Reactions | Everyone | A quiet row on the stage, and the keys |
 | The board | Everyone | It fills the stage. Add a note, select it, Vote for this. Each vote is its own dot |
-| GitHub | A leader adds it to a slide | Issues, pull requests, commits, a README, or the repository, drawn on the slide |
+| GitHub | A leader adds it to a slide | Issues, pull requests, commits, a README, or the repository, drawn on the slide; rows open on GitHub from the stage |
+
+## Asking
+
+Ben, November 6, 2026: "a learner should be able to request to do any of the things a leader can do right from the add-on or the main stage itself."
+
+A learner asks from Mine, or with Ask on the stage: a question for everyone, a message on the stage, a link, the board, breakouts, or something else in their own words. It arrives in the leader's Now with Do it and Not now. Do it runs the leader's own action. A learner never changes the room directly.
+
+## A tied guest is that member
+
+Ben, November 6, 2026: "If I have tied that new google account to their account within Human Shaped, it should registar as that user." Once tied, someone is that member here: their name, their app, their place in the queue, their answers, their reactions, and their board notes (`who()` in the panel, `private.claimed_member` in the database).
+
+## Tools
+
+Tools is a grid of tiles, and a tile opens one tool, with All tools to go back. Rule 4's two levels, and nothing to scan.
 
 ## Sign-in in Meet
 

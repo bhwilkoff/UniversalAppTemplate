@@ -1295,3 +1295,11 @@ refuses, the Accept button still leads to GitHub's own page.
 
 **Keep the board we have and add what a class needs.** Ben, November 6, 2026: "Build upon what we already have." **Why:** Excalidraw is MIT and already syncs and saves; tldraw needs a license key in production, which breaks zero ongoing cost. What was missing was the classroom layer. **How to apply:** a vote is its own element, one per person per note, because the board settles element by element: a shared count would lose votes when a class votes at once.
 
+## A learner asks, and a leader decides
+
+**Anything a leader can do on the stage, a learner can request, and nothing reaches the room until a leader says Do it.** Ben, November 6, 2026: "a learner should be able to request to do any of the things a leader can do right from the add-on or the main stage itself." **Why:** the stage belongs to everyone, but a talk should not be interrupted by surprise. **How to apply:** requests live in `live_requests`, which only a leader can decide. Adding a kind means a label in `ASKS` and a branch in `doRequest`.
+
+## GitHub tokens: the trade comes first
+
+**After a sign-in, the page hands GitHub's refresh token to the server before it does anything else, and a tab never holds the token that came with it.** **Why:** found November 6, 2026 with a real pending invitation. Trading the refresh token retires the access token from the sign-in, so tabs held a dead token and GitHub answered 401; and the account page redirected before the trade, so some sign-ins were never kept at all. **How to apply:** `keepGitHubToken` resolves before the redirect, and a 401 asks the server for a fresh token. Signing out of the panel leaves the server's token alone.
+
