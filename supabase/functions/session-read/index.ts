@@ -103,17 +103,20 @@ async function job(db: any, req: Request, jwt: string) {
   const file = await github(token, 'GET', `/repos/${fullName(repo)}/contents/${WORKFLOW_PATH}?ref=${claims.workflow_sha}`);
   if (file.status !== 200 || decoded(file.body.content) !== WORKFLOW) return reply(403, { message: 'No.', reason: 'edited' });
 
-  const [learners, leaders] = await Promise.all([
+  const [learners, leaders, known] = await Promise.all([
     db.from('enrollments').select('user_id, profiles(display_name, github_login)').eq('cohort_id', s.data.cohort_id),
     db.from('cohort_teachers').select('user_id, profiles(display_name, github_login)').eq('cohort_id', s.data.cohort_id),
+    db.from('talk_names').select('label, user_id').eq('cohort_id', s.data.cohort_id),
   ]);
-  if (learners.error || leaders.error) return reply(500, { message: 'The people could not be read.' });
+  if (learners.error || leaders.error || known.error) return reply(500, { message: 'The people could not be read.' });
   // deno-lint-ignore no-explicit-any
   const people = [...learners.data, ...leaders.data].map((p: any) => ({ id: p.user_id, name: p.profiles?.display_name || p.profiles?.github_login || '' }));
 
   if (body.action === 'start') {
     const id = driveId(s.data.recording_url);
-    return id ? reply(200, { file: id, names: people }) : reply(404, { message: 'No recording.' });
+    // deno-lint-ignore no-explicit-any
+    const names = [...people, ...known.data.map((k: any) => ({ id: k.user_id, name: k.label }))];
+    return id ? reply(200, { file: id, names }) : reply(404, { message: 'No recording.' });
   }
   if (body.action === 'fail') {
     await db.from('session_reads').update({ state: 'failed', problem: String(body.problem || 'no details').slice(0, 200), finished_at: new Date().toISOString() }).eq('session_id', s.data.id);

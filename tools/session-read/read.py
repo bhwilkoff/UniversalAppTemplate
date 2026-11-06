@@ -122,11 +122,21 @@ def read(video, names):
                         votes[k][who['id']] += score
                     else:
                         raw.setdefault(k, Counter())[text] += 1
+        # Misreads of one name become one label, so a leader is asked once.
+        labels = []
+
+        def one_label(text):
+            for known in labels:
+                if difflib.SequenceMatcher(None, text.lower(), known.lower()).ratio() >= 0.6:
+                    return known
+            labels.append(text)
+            return text
+
         out = []
         for t in turns:
             v = votes.get(t['key'])
             person = v.most_common(1)[0][0] if v else None
-            label = None if person else (raw[t['key']].most_common(1)[0][0] if t['key'] in raw else None)
+            label = None if person else (one_label(raw[t['key']].most_common(1)[0][0]) if t['key'] in raw else None)
             out.append({'user_id': person, 'name': label, 'start': t['start'], 'end': t['end']})
         return {'read_seconds': len(frames), 'tiles': len({t['key'] for t in turns}), 'turns': out}
 

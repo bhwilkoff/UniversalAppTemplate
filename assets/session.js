@@ -418,10 +418,23 @@
         card.appendChild(U.facts(facts));
         box.appendChild(card);
       });
+      // A name on a tile the site cannot connect to anyone: asked once.
       if (leading) L.others(talk).forEach(function (o) {
         var card = el('div', 'session-prep-q');
         card.appendChild(el('h4', null, o.name));
         card.appendChild(U.facts([['Speaking', L.spoken(o.spoke)]]));
+        if (o.name === L.UNMATCHED) { box.appendChild(card); return; }
+        var pick = el('select'); pick.setAttribute('aria-label', 'Who is ' + o.name + '?');
+        pick.appendChild(new Option('Who is this?', ''));
+        Object.keys(names).sort(function (a, b) { return names[a].localeCompare(names[b]); }).forEach(function (id) { pick.appendChild(new Option(names[id], id)); });
+        pick.addEventListener('change', function () {
+          if (!pick.value) return;
+          db.rpc('name_speaker', { s: session.id, label: o.name, member: pick.value }).then(function (r) {
+            if (r.error) { card.appendChild(el('p', 'small', 'Not saved: ' + r.error.message)); return; }
+            drawStory(cohort, session, leading);
+          });
+        });
+        card.appendChild(pick);
         box.appendChild(card);
       });
     });

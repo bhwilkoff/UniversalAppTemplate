@@ -21,12 +21,14 @@
     return seconds < 60 ? seconds + ' sec' : Math.round(seconds / 60) + ' min';
   }
 
+  var UNMATCHED = 'A name that could not be read';
+
   // A name on a tile that was no one in the cohort, with its seconds.
   function others(talk) {
     var by = {};
     (talk || []).forEach(function (t) {
       if (t.user_id) return;
-      var n = t.name || 'Someone not matched';
+      var n = t.name || UNMATCHED;
       by[n] = (by[n] || 0) + t.ended_s - t.started_s;
     });
     return Object.keys(by).sort().map(function (n) { return { name: n, spoke: by[n] }; });
@@ -76,7 +78,7 @@
     });
   }
 
-  var api = { secondsSpoken: secondsSpoken, spoken: spoken, others: others, minutesHere: minutesHere, reactionsOf: reactionsOf, people: people, stops: stops };
+  var api = { UNMATCHED: UNMATCHED, secondsSpoken: secondsSpoken, spoken: spoken, others: others, minutesHere: minutesHere, reactionsOf: reactionsOf, people: people, stops: stops };
   root.SessionStoryLib = api;
   if (typeof module !== 'undefined') module.exports = api;
 })(typeof window !== 'undefined' ? window : globalThis);
