@@ -78,6 +78,8 @@
         bank = res[4].error ? [] : (res[4].data || []).filter(function (q) { return !q.cohort_id || q.cohort_id === cohort.id; });
         kinds = res[5];
         draw();
+        // The board's pictures wait for what their slides show from GitHub.
+        if (window.GitHubBlock) window.GitHubBlock.preload(db, cohort.id, scenes.map(function (x) { return x.slides || ''; }).join('\n')).then(function (got) { if (got && !part) draw(); });
       });
     }
 
@@ -210,7 +212,7 @@
       if (s.slides && window.SlideStudio) {
         var deck = el('div');
         page.appendChild(deck);
-        window.SlideStudio.mount(deck, { text: s.slides, readOnly: true });
+        window.SlideStudio.mount(deck, { text: s.slides, readOnly: true, github: githubOpts() });
       } else page.appendChild(preview(s));
       var c = s.config || {}, detail = el('div', 'scene-detail');
       paragraphs(s.body).forEach(function (p) { detail.appendChild(p); });
@@ -219,6 +221,7 @@
       if (detail.children.length) page.appendChild(detail);
     }
     function leave(id) { opts.go(id); }
+    function githubOpts() { return { db: db, cohortId: cohort.id, repo: cohort.github_repo || '', repos: opts.repos || [] }; }
     // Everything waiting to save lands before the page changes.
     function setPart(id) {
       if (id === part) return Promise.resolve();
@@ -337,7 +340,7 @@
         stageBox.hidden = !deckBox.hidden;
         if (!stageBox.hidden) stageBox.replaceChildren(preview(s));
       }
-      if (window.SlideStudio) studio = window.SlideStudio.mount(deckBox, { text: decks[s.id] || s.slides || '', onChange: saveDeck });
+      if (window.SlideStudio) studio = window.SlideStudio.mount(deckBox, { text: decks[s.id] || s.slides || '', onChange: saveDeck, github: githubOpts() });
       function saved(text) { msg.textContent = text; }
 
       function saveDeck(text) {

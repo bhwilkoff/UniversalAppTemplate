@@ -68,8 +68,50 @@
     });
   }
 
+  // A part of a slide that comes from GitHub: a fence naming a repository and
+  // what to show. github.com cannot be framed, so what it holds becomes the
+  // deck's own words, and every place a slide is drawn needs nothing more.
+  var GH_FENCE = /```github\n([\s\S]*?)```/g;
+  var github = {};
+  function ghSpec(body) {
+    var repo = (/^repo:\s*(\S+)/m.exec(body) || [])[1] || '', show = (/^show:\s*(\S+)/m.exec(body) || [])[1] || 'issues';
+    return { repo: repo, show: show, key: repo.toLowerCase() + '|' + show };
+  }
+  function ghSpecs(text) {
+    var out = [], m, re = new RegExp(GH_FENCE.source, 'g');
+    while ((m = re.exec(String(text || '')))) out.push(ghSpec(m[1]));
+    return out;
+  }
+  function ghHold(key, data) { github[key] = data; }
+  function ghHas(key) { return Object.prototype.hasOwnProperty.call(github, key); }
+  function cell(s) { return String(s == null ? '' : s).replace(/\|/g, '/').replace(/\s+/g, ' ').trim(); }
+  function ghWords(spec, d) {
+    if (!spec.repo) return '- Name a repository';
+    if (!d) return '- Reading ' + spec.repo + ' on GitHub';
+    if (d.error) return '- ' + cell(d.error);
+    if (spec.show === 'readme') {
+      var lines = String(d.text || '').split('\n').map(function (l) { return l.replace(/^#+\s*/, '').replace(/[*_`]/g, '').trim(); })
+        .filter(function (l) { return l && !/^[!<\[]/.test(l); }).slice(0, 5);
+      return lines.length ? lines.map(function (l) { return '- ' + cell(l).slice(0, 90); }).join('\n') : '- This repository has no README yet';
+    }
+    if (spec.show === 'repo') {
+      var a = d.about || {};
+      return ['- ' + (cell(a.description) || cell(a.name)), '- ' + (a.issues || 0) + ' open, ' + (a.stars || 0) + ' stars'].join('\n');
+    }
+    var rows = d.rows || [];
+    if (!rows.length) return spec.show === 'commits' ? '- No commits yet' : '- Nothing open right now';
+    if (spec.show === 'commits') return rows.map(function (r) { return '- ' + cell(r.title) + ', ' + cell(r.by); }).join('\n');
+    return '```sheet\nNumber | Title | By\n--- | --- | ---\n' + rows.map(function (r) { return '#' + r.n + ' | ' + cell(r.title) + ' | ' + cell(r.by); }).join('\n') + '\n```';
+  }
+  function ghExpand(text) {
+    return String(text || '').replace(new RegExp(GH_FENCE.source, 'g'), function (all, body) {
+      var spec = ghSpec(body);
+      return ghWords(spec, github[spec.key]);
+    });
+  }
+
   // What the renderer reads: the site's look, and no closing QR code.
-  function deck(text) { return text ? HEAD + clean(text) : ''; }
+  function deck(text) { return text ? HEAD + ghExpand(clean(text)) : ''; }
 
   // A step inside a part's deck, or null when the step leaves the part.
   function step(total, at, delta) {
@@ -90,6 +132,7 @@
     { key: 'icon', label: 'Big icon', text: '## :lightbulb: One idea {.icon}\n\n- Beside a big icon\n' },
     { key: 'table', label: 'Table', text: '## A table\n\n```sheet\nName | Count\n--- | ---\nFirst | 3\nSecond | 5\n```\n' },
     { key: 'chart', label: 'Chart', text: '## A chart\n\n```sheet\n---\nchart: bar\n---\nName | Count:number\n--- | ---\nFirst | 3\nSecond | 5\n```\n' },
+    { key: 'github', label: 'GitHub', text: '## From GitHub\n\n```github\nrepo: \nshow: issues\n```\n' },
     { key: 'diagram', label: 'Diagram', text: '## A diagram\n\n```diagram\n---\nkind: mind\n---\n- The center\n  - One branch\n  - Another branch\n```\n' }
   ];
   var NOTE = '> What you want to remember to say\n';
@@ -127,7 +170,7 @@
   }
   function slideAt(text, caret) { return Math.max(0, count(String(text || '').slice(0, caret)) - 1); }
 
-  var lib = { HEAD: HEAD, split: split, count: count, withoutNotes: withoutNotes, notes: notes, deck: deck, clean: clean, frames: frames, frameOf: frameOf, step: step, arrive: arrive, ADD: ADD, NOTE: NOTE, insert: insert, insertNote: insertNote, offset: offset, slideAt: slideAt };
+  var lib = { ghSpecs: ghSpecs, ghHold: ghHold, ghHas: ghHas, ghExpand: ghExpand, HEAD: HEAD, split: split, count: count, withoutNotes: withoutNotes, notes: notes, deck: deck, clean: clean, frames: frames, frameOf: frameOf, step: step, arrive: arrive, ADD: ADD, NOTE: NOTE, insert: insert, insertNote: insertNote, offset: offset, slideAt: slideAt };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
   else root.SlidesLib = lib;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

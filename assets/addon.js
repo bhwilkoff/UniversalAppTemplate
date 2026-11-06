@@ -1007,6 +1007,8 @@
     var stops = SD.frames(text);
     var at = drafting ? SD.frameOf(text, S.draft.fields.slide_at || 0) : Math.min(slideNow(), stops.length - 1);
     var stop = stops[at] || { slide: 0, shown: Infinity };
+    // What this deck shows from GitHub, fetched here because the panel is signed in.
+    if (window.GitHubBlock) window.GitHubBlock.preload(db, S.cohort.id, text).then(function (got) { if (got) sendStage(); });
     return { text: SD.deck(text), at: stop.slide, shown: stop.shown === Infinity ? 0 : stop.shown };
   }
   function pinnedText() {

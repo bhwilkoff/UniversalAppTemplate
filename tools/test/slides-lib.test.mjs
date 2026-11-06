@@ -57,3 +57,13 @@ test('a slide marked to build stops at each line, and the mark never reaches the
   assert.equal(lib.frameOf(t, 1), 2);
   assert.equal(lib.frameOf(t, 0), 0);
 });
+
+test('what a slide shows from GitHub becomes the deck\'s own words', () => {
+  const t = '## Issues\n\n```github\nrepo: a/b\nshow: issues\n```\n';
+  assert.deepEqual(lib.ghSpecs(t).map((x) => x.key), ['a/b|issues']);
+  assert.match(lib.deck(t), /Reading a\/b on GitHub/);
+  lib.ghHold('a/b|issues', { rows: [{ n: 7, title: 'A | pipe', by: 'bea' }] });
+  assert.match(lib.deck(t), /#7 \| A \/ pipe \| bea/);
+  lib.ghHold('a/b|issues', { error: 'Not found' });
+  assert.match(lib.deck(t), /- Not found/);
+});

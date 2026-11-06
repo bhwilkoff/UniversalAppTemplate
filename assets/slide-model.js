@@ -147,7 +147,7 @@
 
   // A table, chart, or diagram on a slide: where it sits, and its text.
   function block(lines) {
-    var from = lines.findIndex(function (l) { return /^```\s*(sheet|diagram)\b/.test(l); });
+    var from = lines.findIndex(function (l) { return /^```\s*(sheet|diagram|github)\b/.test(l); });
     if (from < 0) return null;
     var to = from + 1;
     while (to < lines.length && !/^```/.test(lines[to])) to += 1;

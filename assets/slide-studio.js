@@ -53,7 +53,7 @@
 
     function text() { return list.length ? M.join(list) : ''; }
     function drawnText() { return L.deck(L.withoutNotes(text())); }
-    function changed() { clearTimeout(timer); timer = setTimeout(function () { if (o.onChange) o.onChange(text()); }, 500); }
+    function changed() { needGitHub(); clearTimeout(timer); timer = setTimeout(function () { if (o.onChange) o.onChange(text()); }, 500); }
     function remember() { past.push(JSON.stringify([list, at])); if (past.length > 200) past.shift(); ahead = []; }
     function restore(from, to) {
       if (!from.length) return;
@@ -63,6 +63,11 @@
       changed(); redraw();
     }
 
+    // What a slide shows from GitHub, fetched once, then drawn like anything else.
+    function needGitHub() {
+      if (!o.github || !window.GitHubBlock) return;
+      window.GitHubBlock.preload(o.github.db, o.github.cohortId, text()).then(function (got) { if (got && K) paint(); });
+    }
     function paint() {
       svgs = list.length ? K.render(drawnText()) : [];
       Array.prototype.forEach.call(film.querySelectorAll('.studio-thumb'), function (t, i) { t.innerHTML = svgs[i] || ''; });
@@ -239,6 +244,7 @@
         var left = m.e + m.a * Number(n.getAttribute('x')) - c.left, base = m.f + m.d * Number(n.getAttribute('y')) - c.top;
         return { node: n, left: left, top: base - px * 0.95, width: width * m.a, height: px * 1.3, px: px, scale: scale };
       }
+      if (b.app === 'github') return [];
       if (b.app === 'sheet') {
         var g = M.grid(b.body);
         if (g.chart) return [];
@@ -465,10 +471,10 @@
         var more = el('div', 'studio-group');
         more.appendChild(el('p', 'ui-label', 'Add to this slide'));
         var row = el('div', 'studio-adds');
-        ['table', 'chart', 'diagram'].forEach(function (k) {
+        ['table', 'chart', 'diagram', 'github'].forEach(function (k) {
           var a = L.ADD.filter(function (x) { return x.key === k; })[0];
           row.appendChild(button(a.label, null, function () {
-            var fence = /```[\s\S]*```/.exec(a.text)[0].split('\n');
+            var fence = /```[\s\S]*```/.exec(a.text)[0].replace('repo: ', 'repo: ' + ((o.github && o.github.repo) || '')).split('\n');
             edit(function (x) { return x.concat([''], fence); });
           }));
         });
@@ -491,7 +497,21 @@
         changed(); paint();
         if (!quiet) drawHits();
       }
-      if (b.app === 'diagram') {
+      if (b.app === 'github') {
+        wrap.appendChild(el('p', 'ui-label', 'From GitHub'));
+        var spec = L.ghSpecs('```github\n' + b.body + '\n```')[0] || { repo: '', show: 'issues' };
+        var repo = el('input'); repo.value = spec.repo; repo.placeholder = 'owner/name'; repo.setAttribute('aria-label', 'Repository');
+        repo.setAttribute('list', 'studio-repos');
+        var known = el('datalist'); known.id = 'studio-repos';
+        ((o.github && o.github.repos) || []).forEach(function (r) { known.appendChild(new Option(r, r)); });
+        var what = el('select'); what.setAttribute('aria-label', 'What to show');
+        [['issues', 'Open issues'], ['pulls', 'Open pull requests'], ['commits', 'Latest commits'], ['readme', 'The README'], ['repo', 'About the repository']].forEach(function (x) { what.appendChild(new Option(x[1], x[0])); });
+        what.value = spec.show;
+        var put = function () { write('repo: ' + repo.value.trim() + '\nshow: ' + what.value); };
+        repo.addEventListener('focus', remember); repo.addEventListener('change', put);
+        what.addEventListener('change', function () { remember(); put(); });
+        wrap.appendChild(repo); wrap.appendChild(known); wrap.appendChild(what);
+      } else if (b.app === 'diagram') {
         wrap.appendChild(el('p', 'ui-label', 'Branches'));
         var d = el('textarea'); d.rows = 8; d.value = b.body; d.setAttribute('aria-label', 'The diagram as an outline');
         d.addEventListener('focus', remember);
@@ -616,7 +636,7 @@
 
     if (window.ResizeObserver) new ResizeObserver(function () { if (K && !typing) drawHits(); }).observe(canvas);
 
-    E.load().then(function (kit) { K = kit; drawAdder(); redraw(); }, function () { box.replaceChildren(el('p', 'small', 'The slides cannot be drawn here.')); });
+    E.load().then(function (kit) { K = kit; drawAdder(); redraw(); needGitHub(); }, function () { box.replaceChildren(el('p', 'small', 'The slides cannot be drawn here.')); });
 
     return { text: text, flush: function () { finish(); clearTimeout(timer); return o.onChange ? o.onChange(text()) : null; } };
   }

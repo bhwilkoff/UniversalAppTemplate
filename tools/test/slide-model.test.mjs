@@ -116,3 +116,9 @@ test('a diagram label changes in place and keeps its depth', () => {
 test('every row of a table comes out the same width', () => {
   assert.deepEqual(M.even([['a', 'b'], ['c']]), [['a', 'b'], ['c', '']]);
 });
+
+test('a GitHub fence is a block a leader can point at a repository', () => {
+  const lines = ['## H', '', '```github', 'repo: a/b', 'show: issues', '```'];
+  assert.equal(M.block(lines).app, 'github');
+  assert.deepEqual(M.editable(lines).map((x) => x.words), ['H']);
+});
