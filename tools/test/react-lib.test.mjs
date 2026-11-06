@@ -20,6 +20,14 @@ test('a key press means a reaction or a stance, but never while typing or with a
   assert.equal(R.keyFor({ key: 'x', target: {} }), null);
 });
 
+test('Shift and a number reacts, as in Forum; R and K move around', () => {
+  assert.deepEqual(R.keyFor({ key: '$', code: 'Digit4', shiftKey: true, target: {} }), { reaction: 'clap' });
+  assert.equal(R.keyFor({ key: '(', code: 'Digit9', shiftKey: true, target: {} }), null);
+  assert.equal(R.keyFor({ key: '$', code: 'Digit4', shiftKey: true, target: { tagName: 'INPUT' } }), null);
+  assert.deepEqual(R.keyFor({ key: 'r', target: {} }), { go: 'reactions' });
+  assert.deepEqual(R.keyFor({ key: 'k', target: {} }), { go: 'keys' });
+});
+
 test('a reaction carries only which one and a first name', () => {
   assert.deepEqual(R.message('love', 'Bea Example'), { r: 'love', n: 'Bea' });
   assert.equal(R.message('shout', 'Bea'), null);

@@ -33,7 +33,13 @@
     if (!e || e.ctrlKey || e.metaKey || e.altKey || e.repeat) return null;
     var t = e.target;
     if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName || ''))) return null;
+    // Shift and a number is Forum's habit (help.minervaproject.com), and the
+    // code, because Shift turns the 1 key's value into "!".
+    var held = e.shiftKey && /^Digit([1-8])$/.exec(e.code || '');
+    if (held) return { reaction: REACTIONS[Number(held[1]) - 1].id };
     var k = String(e.key || '').toLowerCase();
+    if (k === 'r') return { go: 'reactions' };
+    if (k === 'k') return { go: 'keys' };
     for (var i = 0; i < REACTIONS.length; i++) if (REACTIONS[i].key === k) return { reaction: REACTIONS[i].id };
     for (var j = 0; j < STANCES.length; j++) if (STANCES[j].key === k) return { stance: STANCES[j].id };
     return null;

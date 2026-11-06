@@ -29,8 +29,8 @@
     R.REACTIONS.forEach(function (r) {
       var b = el('button', 'react-btn');
       b.type = 'button';
-      b.setAttribute('aria-label', r.label + ' (key ' + r.key + ')');
-      b.title = r.label + ' (' + r.key + ')';
+      b.setAttribute('aria-label', r.label + ' (Shift ' + r.key + ')');
+      b.title = r.label + ' (Shift ' + r.key + ')';
       b.appendChild(el('span', 'react-emoji', r.emoji)).setAttribute('aria-hidden', 'true');
       b.appendChild(el('span', 'react-key', r.key)).setAttribute('aria-hidden', 'true');
       b.addEventListener('click', function () { react(r.id, b); });
@@ -57,6 +57,12 @@
     // the room (found in a real call: it took half the panel).
     var more = el('details', 'react-more');
     more.appendChild(el('summary', null, 'More ways to respond'));
+    var keys = el('dl', 'react-keys');
+    [['Shift 1 to 8', 'React'], ['A, U, D', 'Agree, not sure, disagree'], ['R', 'Go to reactions'], ['K', 'These keys']].forEach(function (x) {
+      keys.appendChild(el('dt', null, x[0]));
+      keys.appendChild(el('dd', null, x[1]));
+    });
+    more.appendChild(keys);
     var RL = window.RosterLib, memKey = o.cohort ? 'hs-path-stage:' + o.cohort.id : null;
     if (RL) {
       var where = el('label', 'path-pick');
@@ -123,12 +129,17 @@
       pending = [];
     }
 
+    function pressed(k) {
+      if (k.reaction) react(k.reaction, row.querySelector('[data-r="' + k.reaction + '"]'));
+      else if (k.stance) hold(k.stance);
+      else if (k.go === 'keys') more.open = !more.open;
+      else if (k.go === 'reactions') row.querySelector('button').focus();
+    }
     document.addEventListener('keydown', function (e) {
       var k = R.keyFor(e);
       if (!k) return;
       e.preventDefault();
-      if (k.reaction) react(k.reaction);
-      else hold(k.stance);
+      pressed(k);
     });
 
     // The channel comes back on its own (found in the loop's live test: a
@@ -177,6 +188,7 @@
 
     return {
       // Other parts of the panel (R11) add to what this person shares.
+      press: function (e) { var k = R.keyFor(e); if (k) pressed(k); },
       setPresence: function (fields) { extra = Object.assign({}, extra, fields || {}); track(); },
       nudge: function (what) { if (live && channel) channel.send({ type: 'broadcast', event: 'nudge', payload: { what: String(what) } }); },
       onNudge: function (what, fn) { (nudged[what] = nudged[what] || []).push(fn); },

@@ -282,3 +282,12 @@ test('a stage that will not open says why, in words a leader can act on', () => 
   assert.equal(lib.stageError({ errorType: 'UserCancelled' }), 'The main stage did not open.');
   assert.match(lib.stageError(new Error('boom')), /boom/);
 });
+
+test('only keys that mean something leave the stage, and they arrive whole', () => {
+  assert.equal(lib.keyMessage({ key: 'x', code: 'KeyX' }), null);
+  assert.equal(lib.keyMessage({ key: '1', metaKey: true }), null);
+  const m = lib.keyMessage({ key: '!', code: 'Digit1', shiftKey: true });
+  assert.deepEqual(lib.readKey(m), { key: '!', code: 'Digit1', shiftKey: true, target: {} });
+  assert.equal(lib.readKey('{"type":"other"}'), null);
+  assert.equal(lib.readKey('not json'), null);
+});

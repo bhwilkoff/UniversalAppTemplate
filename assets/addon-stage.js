@@ -262,6 +262,12 @@
       });
       view = { mode: 'part', part: null };
       show('ready'); draw();
+      document.addEventListener('keydown', function (e) {
+        var msg = A.keyMessage(e);
+        if (!msg) return;
+        e.preventDefault();
+        try { Promise.resolve(stage.notifySidePanel(msg)).catch(function () {}); } catch (x) {}
+      });
       // Ask the panel for what to show, since a message only reaches a
       // frame that is already listening. A learner's panel can open or
       // sign in long after the stage, or close and come back, so the stage

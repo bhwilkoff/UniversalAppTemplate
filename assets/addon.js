@@ -1805,10 +1805,19 @@
   // Opening
   // ------------------------------------------------------------------
 
+  function offerOneTap() {
+    if (!window.HSGoogle || !GL) return;
+    window.HSGoogle.mount({
+      db: db, prompt: true,
+      onSession: function (s) { if (s) proceed(s); },
+      onError: function (e) { console.log('[addon] one tap: ' + (e && e.message ? e.message : e)); }
+    });
+  }
   function asGuest() {
     return db.auth.signInAnonymously().then(function (r) {
       if (r.error || !r.data || !r.data.session) { console.log('[addon] guest: ' + (r.error ? r.error.message : 'no session')); return signedOut(); }
       proceed(r.data.session);
+      return true;
     }, function () { signedOut(); });
   }
   $('[data-as-guest]').addEventListener('click', function () {
@@ -1826,12 +1835,15 @@
       side = client;
       side.on('frameToFrameMessage', function (m) {
         if (m && A.isHello(m.payload)) { S.stageOn = true; stageButtons(true); sendStage(); S.codeStageSent = null; drawCode(); }
+        var key = m && A.readKey(m.payload);
+        if (key && S.classChannel) S.classChannel.press(key);
       });
       return signIn().then(function (s) {
         if (s) return proceed(s);
         if (signedOutOnPurpose()) return signedOut();
         // No sign-in here: come in as a guest, with no screen in the way.
-        return asGuest();
+        // One Tap rides on top, as Google's listing rule asks, and closes.
+        return asGuest().then(function (came) { if (came) offerOneTap(); });
       });
     }, function () {
       show('outside');

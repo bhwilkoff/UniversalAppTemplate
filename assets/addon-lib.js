@@ -293,6 +293,20 @@
     try { var m = JSON.parse(payload); return !!m && m.type === STAGE + '-hello'; } catch (e) { return false; }
   }
 
+  // A key pressed while the stage has focus belongs to the panel, where
+  // reactions live. Only the keys that mean something leave the stage.
+  function keyMessage(e) {
+    if (e.ctrlKey || e.metaKey || e.altKey || e.repeat) return null;
+    if (!/^[1-8aukdr]$/i.test(e.key || '') && !(e.shiftKey && /^Digit[1-8]$/.test(e.code || ''))) return null;
+    return JSON.stringify({ type: STAGE + '-key', key: e.key, code: e.code, shiftKey: !!e.shiftKey });
+  }
+  function readKey(payload) {
+    try {
+      var m = JSON.parse(payload);
+      return m && m.type === STAGE + '-key' ? { key: String(m.key), code: String(m.code || ''), shiftKey: !!m.shiftKey, target: {} } : null;
+    } catch (e) { return null; }
+  }
+
   // The sign-in window hands the session back with postMessage. The panel
   // takes it only from the window it opened, only from this site's own
   // origin, and only in this exact shape: the two tokens Supabase needs to
@@ -335,7 +349,7 @@
 
   var lib = {
     meetingCode: meetingCode, findRoom: findRoom, panelPlan: panelPlan, timeLeft: timeLeft,
-    stageView: stageView, sceneOf: sceneOf, stageError: stageError, stageMessage: stageMessage, readStageMessage: readStageMessage, HELLO: HELLO, isHello: isHello,
+    stageView: stageView, sceneOf: sceneOf, stageError: stageError, stageMessage: stageMessage, keyMessage: keyMessage, readKey: readKey, readStageMessage: readStageMessage, HELLO: HELLO, isHello: isHello,
     handoff: handoff, acceptHandoff: acceptHandoff, boardLinks: boardLinks
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
