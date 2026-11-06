@@ -220,8 +220,9 @@ co-leading first) and the five tools in order (one Meet link per group,
 closing the loop on checks, the trio protocol on /live/, ready or not yet
 on bring-backs, a teachers-only "not seen this week" list). **How to
 apply:** drafts for Ben's copy audit; never build points, streaks,
-leaderboards, attendance or camera tracking, scored quizzes, AI grading,
-automatic partner rotation, or a second chat space.
+leaderboards, camera tracking, scored quizzes, AI grading, automatic
+partner rotation, or a second chat space. (Attendance tracking was on this
+list until November 6, 2026; see "A session keeps what happened".)
 
 **AGENTS.md stays under 24,000 bytes.** Antigravity cuts off longer rule
 files. **How to apply:** rules and values stay in AGENTS.md; platform
@@ -1315,3 +1316,10 @@ refuses, the Accept button still leads to GitHub's own page.
 
 **A row in Waiting for you is something only the leader can act on, and a learner is described only by what they did, never by what the site failed to record.** Ben, November 6, 2026, of a row reading "Not seen since week 1 began": "What are these?" **Why:** that row named three people who were in the call, because the add-on had failed for them and the site cannot see a call. A count of everyone is no count at all. **How to apply:** COHORT-DESIGN.md is binding. Meet's API can list who attended, but it needs a new Google permission and the meeting owner's sign-in, and guests come back as bare display names; add that as a decision, not by default.
 
+## A session keeps what happened (November 6, 2026)
+
+**A session keeps what people did in it, a leader reads everyone, and each person reads their own.** Ben: "I'd like to save everything from reactions that were sent to the amount of time that someone talked, if possible. The goal is to understand from an analytics and data-analysis perspective what happened during a session, who participated, and what was asked/answered or build during the session." This replaces the earlier refusal of attendance tracking, and keeps his October rule that anything measuring is visible and that learners can see what is kept about them.
+
+**Why:** his October wish list asked for this, and a session cannot be improved from memory alone. Agreeing to the recording aloud is consent ("If folks have agreed to the recording ... they have given this permission"), and the joining card says so too.
+
+**How to apply:** rows are facts, never a score, ranking, or comparison. People list by name. What was kept is never presented as who attended, because a closed add-on leaves no row. Change the public promise in the same commit as the practice. Keep no voiceprints. Talk time must come from the Drive recording with no manual step, and per-learner seconds do not appear until they are proven: on Week 1, two voice models each put the learners in one cluster.
