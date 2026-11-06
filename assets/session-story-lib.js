@@ -11,6 +11,27 @@
     return (events || []).filter(function (e) { return e.kind === 'here' && e.user_id === userId; }).length;
   }
 
+  // Seconds a person was marked as speaking in the recording.
+  function secondsSpoken(talk, userId) {
+    return (talk || []).reduce(function (n, t) { return t.user_id === userId ? n + t.ended_s - t.started_s : n; }, 0);
+  }
+
+  // Seconds as a person says them: "5 min", or "40 sec" when under a minute.
+  function spoken(seconds) {
+    return seconds < 60 ? seconds + ' sec' : Math.round(seconds / 60) + ' min';
+  }
+
+  // A name on a tile that was no one in the cohort, with its seconds.
+  function others(talk) {
+    var by = {};
+    (talk || []).forEach(function (t) {
+      if (t.user_id) return;
+      var n = t.name || 'Someone not matched';
+      by[n] = (by[n] || 0) + t.ended_s - t.started_s;
+    });
+    return Object.keys(by).sort().map(function (n) { return { name: n, spoke: by[n] }; });
+  }
+
   // Each reaction a person sent, as [id, count], in the order first sent.
   function reactionsOf(events, userId) {
     var seen = {}, order = [];
@@ -31,13 +52,14 @@
       return {
         id: id, name: names[id],
         minutes: minutesHere(input.events, id),
+        spoke: secondsSpoken(input.talk, id),
         reactions: reactionsOf(input.events, id),
         answers: (input.answers || []).filter(function (a) { return a.user_id === id; }).length,
         requests: (input.requests || []).filter(function (r) { return r.user_id === id; }).length,
         shown: (input.queue || []).filter(function (q) { return q.user_id === id && q.shown_at; }).length
       };
     }).filter(function (p) {
-      return p.minutes || p.reactions.length || p.answers || p.requests || p.shown;
+      return p.minutes || p.spoke || p.reactions.length || p.answers || p.requests || p.shown;
     }).sort(function (a, b) { return a.name.localeCompare(b.name); });
   }
 
@@ -54,7 +76,7 @@
     });
   }
 
-  var api = { minutesHere: minutesHere, reactionsOf: reactionsOf, people: people, stops: stops };
+  var api = { secondsSpoken: secondsSpoken, spoken: spoken, others: others, minutesHere: minutesHere, reactionsOf: reactionsOf, people: people, stops: stops };
   root.SessionStoryLib = api;
   if (typeof module !== 'undefined') module.exports = api;
 })(typeof window !== 'undefined' ? window : globalThis);

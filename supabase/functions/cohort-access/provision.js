@@ -1,3 +1,4 @@
+import { WORKFLOW, WORKFLOW_PATH } from '../_shared/session-read-workflow.js';
 // Making a cohort's conversation, decided without touching GitHub or the
 // database, so each rule is tested on its own
 // (tools/test/cohort-access-provision.test.mjs).
@@ -166,6 +167,7 @@ export function seedFiles(cohort) {
         '',
       ].join('\n'),
     },
+    { path: WORKFLOW_PATH, message: 'Read who was speaking in session recordings', content: WORKFLOW },
   ];
 }
 

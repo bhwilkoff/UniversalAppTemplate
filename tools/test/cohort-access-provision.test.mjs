@@ -72,7 +72,7 @@ test('an agent’s token is told apart from a person’s by its client_id', () =
 import { seedFiles, issuesRequest } from '../../supabase/functions/cohort-access/provision.js';
 test('a cohort repository starts with a README and the workflow that keeps replaced history', () => {
   const files = seedFiles({ slug: 'kit-test', title: 'Kit test' });
-  assert.deepEqual(files.map((f) => f.path), ['README.md', '.github/workflows/keep-replaced-history.yml']);
+  assert.deepEqual(files.map((f) => f.path), ['README.md', '.github/workflows/keep-replaced-history.yml', '.github/workflows/session-read.yml']);
   assert.match(files[0].content, /^# Kit test\n/);
   assert.match(files[0].content, /cohort\/\?c=kit-test&t=files/);
   assert.match(files[1].content, /if: github\.event\.forced/);

@@ -131,3 +131,10 @@ test('the page adds its own play button only where the browser has none', () => 
   assert.equal(X.drawsOwnPlay('Mozilla/5.0 (Linux; Android 15; Pixel 9) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Mobile Safari/537.36', false), true);
   assert.equal(X.drawsOwnPlay(chromeMac, true), true);
 });
+
+test('a new exchange joins a session’s before-items once', () => {
+  const a = X.withExchange([{ id: 'q1', prompt: 'A question' }], 'abc', 36);
+  assert.deepEqual(a[1], { id: 'x10', kind: 'exchange', token: 'abc', prompt: 'Reply to this exchange' });
+  assert.equal(X.withExchange(a, 'abc', 37).length, 2);
+  assert.equal(X.withExchange(null, 'abc', 36).length, 1);
+});

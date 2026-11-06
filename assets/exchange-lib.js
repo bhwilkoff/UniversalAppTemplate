@@ -214,8 +214,15 @@
     return /Safari\//.test(ua);
   }
 
+  // A session's before-items with a new exchange added, once only.
+  function withExchange(items, token, now) {
+    var list = Array.isArray(items) ? items : [];
+    if (list.some(function (q) { return q && q.kind === 'exchange' && q.token === token; })) return list;
+    return list.concat([{ id: 'x' + Number(now).toString(36), kind: 'exchange', token: token, prompt: 'Reply to this exchange' }]);
+  }
+
   var api = {
-    drawsOwnPlay: drawsOwnPlay, phoneKind: phoneKind, screenSteps: screenSteps,
+    withExchange: withExchange, drawsOwnPlay: drawsOwnPlay, phoneKind: phoneKind, screenSteps: screenSteps,
     MAX_SECONDS: MAX_SECONDS, MAX_UPLOAD_SECONDS: MAX_UPLOAD_SECONDS, FORMATS: FORMATS, pickFormat: pickFormat, baseType: baseType, extFor: extFor,
     clock: clock, lengthWords: lengthWords, ago: ago, drive: drive, mediaUrl: mediaUrl, fileName: fileName,
     CHUNK: CHUNK, chunkEnd: chunkEnd, resumeFrom: resumeFrom, checkExchange: checkExchange, summary: summary, names: names, threadOrder: threadOrder

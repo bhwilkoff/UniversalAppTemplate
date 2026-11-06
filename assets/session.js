@@ -274,8 +274,8 @@
   function removeButton(fn) { var b = el('button', 'btn-secondary small', 'Remove'); b.type = 'button'; b.addEventListener('click', fn); return b; }
   function savePrep(session, items) { return db.from('sessions').update({ prep_questions: items }).eq('id', session.id); }
 
-  // A leader adds what people do before the session: a question, or an
-  // exchange to reply to, from its link.
+  // A leader adds what people do before the session: a question, or a new
+  // exchange to reply to.
   function drawPrepAdd(cohort, session, leading, box) {
     var items = Array.isArray(session.prep_questions) ? session.prep_questions : [];
     function put(item) {
@@ -289,21 +289,13 @@
     var row = el('div', 'actions');
     var q = el('button', 'btn-secondary', 'Add a question'); q.type = 'button';
     q.addEventListener('click', function () { put({ id: 'q' + Date.now().toString(36), prompt: 'A question for everyone' }); });
-    var x = el('button', 'btn-secondary', 'Add an exchange'); x.type = 'button';
-    var form = el('form', 'prep-exchange-add'); form.hidden = true;
-    var paste = el('input'); paste.type = 'url'; paste.required = true; paste.placeholder = 'The exchange’s link'; paste.setAttribute('aria-label', 'The exchange’s link');
-    var ask = el('input'); ask.required = true; ask.maxLength = 500; ask.value = 'Reply to this exchange'; ask.setAttribute('aria-label', 'What to do with it');
-    var go = el('button', 'btn-primary', 'Add it');
-    form.appendChild(paste); form.appendChild(ask); form.appendChild(go);
-    x.addEventListener('click', function () { form.hidden = false; paste.focus(); });
-    form.addEventListener('submit', function (ev) {
-      ev.preventDefault();
-      var m = /([0-9a-f]{32})/.exec(paste.value);
-      if (!m) { U.say(said, 'That is not an exchange’s link.', 'problem'); return; }
-      put({ id: 'x' + Date.now().toString(36), kind: 'exchange', token: m[1], prompt: ask.value.trim() });
-    });
+    // The real new-exchange page, which brings the leader back here with the
+    // exchange added (Ben, November 6, 2026: "it should present me with the
+    // new exchange interface and not ask me for a link").
+    var x = el('a', 'btn-secondary', 'Add an exchange');
+    x.href = '/exchange/new/?c=' + encodeURIComponent(cohort.id) + '&s=' + Number(session.number);
     row.appendChild(q); row.appendChild(x); row.appendChild(said);
-    box.appendChild(row); box.appendChild(form);
+    box.appendChild(row);
   }
 
   // Each exchange to reply to before the session: a link, and whether this
@@ -384,15 +376,19 @@
       db.from('live_answers').select('user_id, check_id').eq('cohort_id', cohort.id),
       db.from('live_requests').select('user_id').eq('session_id', session.id),
       db.from('live_queue').select('user_id, shown_at').eq('session_id', session.id),
-      db.from('enrollments').select('user_id, profiles(github_login, display_name)').eq('cohort_id', cohort.id)
+      db.from('enrollments').select('user_id, profiles(github_login, display_name)').eq('cohort_id', cohort.id),
+      db.from('session_talk').select('user_id, name, started_s, ended_s').eq('session_id', session.id).limit(5000),
+      db.from('session_reads').select('state, read_seconds').eq('session_id', session.id).maybeSingle(),
+      db.from('cohort_teachers').select('user_id, profiles(github_login, display_name)').eq('cohort_id', cohort.id)
     ]).then(function (res) {
       if (res.some(function (r) { return r.error; })) { box.appendChild(el('p', 'small', 'What happened could not be read.')); return; }
       var ids = res[1].data.map(function (k) { return k.id; }), names = {};
-      res[5].data.forEach(function (e) {
+      res[5].data.concat(res[8].data).forEach(function (e) {
         if (leading || e.user_id === K.me.id) names[e.user_id] = e.profiles ? (e.profiles.display_name || e.profiles.github_login) : 'Someone';
       });
       if (K.me && !names[K.me.id] && !leading) names[K.me.id] = 'You';
-      var who = L.people({ names: names, events: res[0].data, requests: res[3].data, queue: res[4].data,
+      var talk = res[6].data, read = res[7].data;
+      var who = L.people({ names: names, events: res[0].data, talk: talk, requests: res[3].data, queue: res[4].data,
         answers: res[2].data.filter(function (a) { return ids.indexOf(a.check_id) >= 0; }) });
       var stops = leading ? L.stops(res[0].data) : [];
       if (!who.length && !stops.length) { box.appendChild(U.empty('Nothing was kept from this session')); return; }
@@ -407,16 +403,25 @@
         box.appendChild(ol);
       }
       box.appendChild(el('h3', null, leading ? 'What was kept, by person' : 'What was kept about you'));
+      // Talk covers only what was recorded, and rooms never are.
+      if (read && read.state === 'done') box.appendChild(el('p', 'small', 'Speaking is from ' + L.spoken(read.read_seconds) + ' of recording. Breakout rooms are not recorded.'));
       who.forEach(function (p) {
         var card = el('div', 'session-prep-q');
         if (leading) card.appendChild(el('h4', null, p.name));
         var facts = [];
+        if (p.spoke) facts.push(['Speaking', L.spoken(p.spoke)]);
         if (p.minutes) facts.push(['Add-on open', p.minutes + ' min']);
         if (p.reactions.length) facts.push(['Reactions', p.reactions.map(function (r) { var d = R && R.reaction(r[0]); return (d ? d.label : r[0]) + ' ' + r[1]; }).join(', ')]);
         if (p.answers) facts.push(['Answers', String(p.answers)]);
         if (p.requests) facts.push(['Requests', String(p.requests)]);
         if (p.shown) facts.push(['Work shown', String(p.shown)]);
         card.appendChild(U.facts(facts));
+        box.appendChild(card);
+      });
+      if (leading) L.others(talk).forEach(function (o) {
+        var card = el('div', 'session-prep-q');
+        card.appendChild(el('h4', null, o.name));
+        card.appendChild(U.facts([['Speaking', L.spoken(o.spoke)]]));
         box.appendChild(card);
       });
     });

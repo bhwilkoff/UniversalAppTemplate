@@ -2984,6 +2984,7 @@ html:has(.p2-panel), body:has(.p2-panel) { background: #fff; overflow: hidden; }
 .session-before-next { margin-top: 2rem; }
 .is-part .session-before-next { display: none; }
 .session-recording-link { margin-top: 1.5rem; }
+.session-after h4 { margin: 0 0 0.25rem; }
 .session-story-stops { list-style: none; margin: 0 0 1.5rem; padding: 0; }
 .session-story-stops li { display: flex; justify-content: space-between; gap: 1rem; padding: 0.4rem 0; border-bottom: 1px solid var(--rule); }
 .prep-q-head { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 0.5rem; align-items: center; }

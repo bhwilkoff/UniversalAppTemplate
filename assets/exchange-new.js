@@ -7,6 +7,25 @@
   if (!root || !X || !window.supabase || !window.HUB || !window.ExchangeRecorder || !window.ExchangeDrive) return;
   var db = window.HUB.client ? window.HUB.client() : window.supabase.createClient(window.HUB.url, window.HUB.key);
   var asked = new URLSearchParams(location.search).get('c');
+  var forSession = new URLSearchParams(location.search).get('s');
+  var fromCohort = null;
+
+  // Opened from a session's page: the new exchange joins what people do
+  // before that session, and the leader goes back to it. If that cannot be
+  // saved, the exchange itself still stands and opens as usual.
+  function backToSession(token) {
+    var open = '/exchange/#' + token;
+    if (forSession == null || !/^\d+$/.test(forSession) || !fromCohort) return Promise.resolve(open);
+    var number = Number(forSession);
+    return db.from('sessions').select('id, prep_questions').eq('cohort_id', fromCohort.id).eq('number', number).maybeSingle().then(function (r) {
+      if (r.error || !r.data) return open;
+      var items = X.withExchange(r.data.prep_questions, token, Date.now());
+      return db.from('sessions').update({ prep_questions: items }).eq('id', r.data.id).select('id').then(function (u) {
+        if (u.error || !u.data || !u.data.length) return open;
+        return '/session/?c=' + encodeURIComponent(fromCohort.slug) + '&s=' + number + '&t=before';
+      });
+    }).catch(function () { return open; });
+  }
 
   function el(tag, cls, text) {
     var n = document.createElement(tag);
@@ -69,7 +88,8 @@
         });
       }).then(function (res) {
         if (res.error) throw new Error('your video is in your Drive, but the exchange did not start: ' + res.error.message);
-        location.href = '/exchange/#' + res.data;
+        status.textContent = 'Adding it to the session…';
+        return backToSession(res.data).then(function (where) { location.href = where; });
       }).catch(function (err) {
         busy = false; ready();
         bar.hidden = true;
@@ -99,7 +119,7 @@
           var c = x.cohorts;
           if (!c || seen[c.id] || c.status === 'finished') return;
           seen[c.id] = any = true;
-          if (c.id === asked) from = c;
+          if (c.id === asked) { from = c; fromCohort = c; }
           var o = el('option', null, 'Your cohort: ' + c.title);
           o.value = c.id;
           sel.appendChild(o);

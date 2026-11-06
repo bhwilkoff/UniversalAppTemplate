@@ -40,6 +40,15 @@ test('stops run to the next move, and the last to the last thing kept', () => {
   assert.deepEqual(s.map((x) => [x.stage, x.scene, x.minutes]), [['scene', 'open', 5], ['presenter', null, 4]]);
 });
 
+test('talk comes from the turns, and an unmatched name stays apart', () => {
+  const talk = [{ user_id: 'a', started_s: 0, ended_s: 90 }, { user_id: 'a', started_s: 100, ended_s: 130 }, { user_id: null, name: 'Guest', started_s: 200, ended_s: 240 }];
+  assert.equal(L.secondsSpoken(talk, 'a'), 120);
+  assert.deepEqual(L.others(talk), [{ name: 'Guest', spoke: 40 }]);
+  assert.equal(L.people({ names: { a: 'Amy' }, talk })[0].spoke, 120);
+  assert.equal(L.spoken(40), '40 sec');
+  assert.equal(L.spoken(120), '2 min');
+});
+
 test('nothing kept gives nothing', () => {
   assert.deepEqual(L.stops([]), []);
   assert.deepEqual(L.people({ names: {} }), []);
