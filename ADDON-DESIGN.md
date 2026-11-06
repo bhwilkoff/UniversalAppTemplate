@@ -63,3 +63,11 @@ Every cohort gets this panel. `details.panel = 'old'` on a cohort, or `?panel=ol
 3. **GitHub is required to join a cohort.** A person connects it as they join. A guest by call link still needs nothing.
 4. **Reminders stay native.** Ben: "we are trying to leverage Github and Google Calendar's native notification systems rather than creating ones that we have to build and maintain." Requiring GitHub to join is what closes the gap, so nothing new gets built.
 5. **Guests stay, with One Tap.** A signed-out person sees the One Tap prompt, can dismiss it, and carries on as a guest.
+
+Where these stand:
+
+- **Keys:** built and tested in a real call. Shift and a number reacts, R goes to reactions, K lists the keys, and A, U, and D say where you stand. They work with focus in the panel or on the main stage. They cannot work with focus on Meet's own page, because Meet's page does not share key presses with an add-on; a Chrome extension is the only way past that.
+- **Posts:** not built. With GitHub required to join, the app's fallback would reach only guests, so it waits on whether guests should post at all.
+- **GitHub to join:** the database already refused it; the Join button now waits too.
+- **Reminders:** nothing to build.
+- **One Tap:** it shows inside Meet's panel on the sign-in screen. Over a first-time guest it is built, and not yet seen, because a test profile's panel cannot be returned to a first visit.

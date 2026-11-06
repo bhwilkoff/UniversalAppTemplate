@@ -302,6 +302,7 @@
     });
   });
 
+  var needsLink = false;
   function cohortCard(c, mine) {
     var card = el('article', 'cohort-card');
     card.appendChild(el('h3', null, c.title));
@@ -322,6 +323,8 @@
     } else {
       var join = el('button', 'btn-primary', 'Join this cohort');
       join.type = 'button';
+      join.disabled = needsLink;
+      if (needsLink) join.title = 'Link your GitHub account first';
       join.addEventListener('click', function () {
         join.disabled = true;
         db.auth.getUser().then(function (u) {
@@ -424,7 +427,8 @@
         } else {
           root.querySelector('[data-signed-in-as]').textContent = 'Signed in with Google.';
         }
-        root.querySelector('[data-needs-github]').hidden = !(G && G.needsGitHub(p));
+        needsLink = !!(G && G.needsGitHub(p));
+        root.querySelector('[data-needs-github]').hidden = !needsLink;
         drawLinked();
         var img = root.querySelector('[data-avatar]');
         if (p.avatar_url && /^https:\/\//.test(p.avatar_url)) img.src = p.avatar_url; else img.hidden = true;
