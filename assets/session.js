@@ -116,27 +116,22 @@
     pager.appendChild(weeks);
     pager.hidden = sessions.length < 2;
 
-    // What to bring: the stage's "Be ready to...", which the plan's
-    // bring-back part asks for, and the stages this session starts.
+    // What to bring, which the plan's build part asks for.
     drawPlan(cohort, sessions, session, leading, finished);
     drawPrep(cohort, session, leading);
-    var stages = lib.stagesForWeek(session.number);
-    var stageBox = $('[data-stages]'); stageBox.replaceChildren();
-    stages.forEach(function (n) { var li = el('li'); li.appendChild(link('Stage ' + n, '/path/' + n + '/')); stageBox.appendChild(li); });
-    $('[data-stages-section]').hidden = !stages.length;
 
     K.started = !!(session.starts_at && Date.parse(session.starts_at) < Date.now());
     if (leading && K.started) drawAfter(cohort, session);
     $('[data-after-leading]').hidden = !leading;
     if (K.started) drawStory(cohort, session, leading);
     if (leading) drawEdits(session);
-    return bringReady.then(function (bring) { drawViews(session, leading, finished, !!play, bring, stages.length > 0); show('ready'); });
+    return bringReady.then(function (bring) { drawViews(session, leading, finished, !!play, bring); show('ready'); });
   }
 
   // One view at a time (SESSION-DESIGN.md), opening where this person is needed.
-  function drawViews(session, leading, finished, played, bring, stages) {
+  function drawViews(session, leading, finished, played, bring) {
     var items = Array.isArray(session.prep_questions) ? session.prep_questions : [];
-    var before = leading || items.length > 0 || (!!bring && !finished) || stages;
+    var before = leading || items.length > 0 || (!!bring && !finished);
     var list = [];
     function add(key, label) { list.push({ key: key, label: label }); }
     if (played && finished) add('recording', 'Recording');

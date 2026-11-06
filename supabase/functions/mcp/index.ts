@@ -185,8 +185,7 @@ Deno.serve(
           if (!p.cohort) return text(p.text);
           const c = p.cohort;
           const t = CohortLib.currentAndNext(await sessionsOf(c.id), new Date(), c.session_minutes);
-          const stages = t.current ? CohortLib.stagesForWeek(t.current.number) : [];
-          return text(thisWeekText(c, t, stages, TeachLib.scheduleText(c, c.time_zone, 'en-US')));
+          return text(thisWeekText(c, t, [], TeachLib.scheduleText(c, c.time_zone, 'en-US')));
         });
 
         server.registerTool('next_session', {

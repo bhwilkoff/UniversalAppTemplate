@@ -227,7 +227,9 @@
       var t = box.querySelector('textarea');
       if (t) draft = t.value;
       box.replaceChildren();
-      var choice = mode === 'account' ? P.bringChoices(enrollments, stage) : { kind: 'note' };
+      // Stages stand apart from cohorts until they are revised (Ben, November
+      // 6, 2026), so a stage no longer sends anyone to a cohort's form.
+      var choice = { kind: 'note' };
       if (choice.kind === 'cohorts') {
         box.appendChild(el('p', 'small', choice.cohorts.length === 1
           ? 'When you have it, bring it to your cohort, with a link and a sentence in your own words.'

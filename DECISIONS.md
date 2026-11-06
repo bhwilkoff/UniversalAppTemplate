@@ -1329,3 +1329,12 @@ refuses, the Accept button still leads to GitHub's own page.
 **Why:** `humanshaped/automation` is public, so its logs are, and the reminders repositories belong to one person each. A cohort's repository already exists per cohort, but learners can write to it, and rooms are not recorded, so any talk number there would be invented.
 
 **How to apply:** the repository holds only `session-read.yml`, and the work lives on humanshaped.org. The job commits nothing, logs no name or number, and sends results straight to the database. session-read compares the workflow file at the run's own commit with `_shared/session-read-workflow.js` and refuses any difference, so a learner's edit cannot post or fetch anything. Start it with a repository dispatch, since the GitHub App has Contents but not Actions. Never estimate talk for a room: the minute rows name the room, and the After tab says rooms are not recorded.
+
+## Stages stand apart from cohorts for now (November 6, 2026)
+
+**No cohort page, session, plan, or agent answer mentions a stage until the first full cohort is finished and the stages are revised to match.** Ben: "The Stages seem almost entirely disconnected from the cohorts at this point. Can we remove their inclusion until we have gone through the full cohort and can fully revise the stages to better match how they actually function in a cohort?"
+
+**Why:** the cohort moved on from the stages as it ran, so links to them sent people to work that did not match their week.
+
+**How to apply:** /path/ keeps working on its own. Nothing was deleted: `stagesForWeek`, `stage_marks`, `path-lib`, and the hidden ready mark in the share form stay for the revision. Do not bring a stage back into a cohort surface before then. The template's `runs-of-show.json` and course docs still name stages, and they change with that revision.
+

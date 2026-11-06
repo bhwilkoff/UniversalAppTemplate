@@ -62,6 +62,7 @@ light and dark.
 | live session | main session, main room, session page |
 | Open (a cohort, a poll, an exchange taking part) | Open for joining, Open for people to join, Taking answers |
 | exchange | thread, video thread |
+| (no stage on any cohort surface until they are revised; Ben, November 6, 2026) | stage, path, Stage 04 |
 | build (what a person shows the cohort that week) | bring-back, submission, demo |
 | feedback (from anyone, shown with who gave it) | notes, critique, peer review |
 | ask (a card on a cohort's Asks board) | request, ticket, task, card |

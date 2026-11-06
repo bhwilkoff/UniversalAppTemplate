@@ -277,8 +277,6 @@
       if (b && b.app_repo.toLowerCase() === a.repo.toLowerCase()) return;
       list.appendChild(U().row({ title: a.name, href: '/apps/app/?r=' + encodeURIComponent(a.repo), meta: 'On the apps page', visibility: U().visibility('public') }));
     });
-    var s = m.lastMark && P ? P.stageInfo(m.lastMark.stage) : null;
-    if (s) list.appendChild(U().row({ title: s.title, href: s.href, meta: m.lastMark.at ? 'Stage marked ' + day(m.lastMark.at) : null }));
     if (list.children.length) box.appendChild(list);
     if (!list.querySelector('a[href="/apps/mine/"]') && !(m.listedApps || []).length && !m.cohorts.some(function (c) { return c.enrollment && c.enrollment.app_repo; })) box.appendChild(U().empty('No app yet', link('/apps/mine/', 'Add your app', 'btn-secondary')));
   }
