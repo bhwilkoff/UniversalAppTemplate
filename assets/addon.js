@@ -102,8 +102,14 @@
   // again, rather than quietly borrowing the site's sign-in.
   var OUT = 'hs-addon-signed-out';
   function signedOutOnPurpose() { try { return localStorage.getItem(OUT) === '1'; } catch (e) { return false; } }
+  // A guest's own session gives way to a real sign-in once the browser has
+  // lent the panel humanshaped.org's: a member should never stay a guest.
   function signIn() {
-    return sessionOf(db).then(function (s) { return s || (signedOutOnPurpose() ? null : useSiteSignIn(true)); });
+    return sessionOf(db).then(function (s) {
+      if (s && !s.user.is_anonymous) return s;
+      if (signedOutOnPurpose()) return s;
+      return useSiteSignIn(true).then(function (site) { return site || s; });
+    });
   }
 
   // Google sign-in beside GitHub (DECISIONS.md): signed out, the panel
@@ -341,7 +347,7 @@
     S.show = window.ShowView.mount({
       mount: $('[data-show]'), parts: S.list, teaching: S.teaching,
       nowBox: S.newPanel ? S.frame.pane('now') : null,
-      anyBox: S.newPanel ? S.frame.pane(S.teaching ? 'tools' : 'mine') : null,
+      anyBox: S.newPanel ? S.frameTools : null,
       notes: function (key) { return S.newPanel ? null : (S.notes || {})[key] || null; },
       deck: function (key) { return (S.decks || {})[key] || null; },
       // What does not apply to this cohort stays out of sight: rooms
@@ -645,7 +651,11 @@
       loadGuests();
     });
   });
-  $('[data-guest-signin]').addEventListener('click', function () { signedOut(); });
+  // A press is what the browser needs to lend the site's sign-in; if there is
+  // none to lend, the sign-in choices follow.
+  $('[data-guest-signin]').addEventListener('click', function () {
+    useSiteSignIn(true).then(function (s) { if (s && !s.user.is_anonymous) location.reload(); else signedOut(); });
+  });
 
   // The teacher's roster: one line, opened for names. It is drawn from
   // presence while the call runs, and it never writes anything down.
@@ -656,7 +666,7 @@
     box.hidden = false;
     var open = box.querySelector('details') && box.querySelector('details').open;
     box.replaceChildren();
-    var d = el('details'); d.open = !!open;
+    var d = el('details'); d.open = !!open || !!S.newPanel;
     var guests = (S.guests || []).filter(function (g) { return !g.member_id && (S.presence || {})[g.user_id]; }).length;
     d.appendChild(el('summary', null, RL.summary(r, asking).replace(/\.$/, '') + (guests ? ', ' + guests + (guests === 1 ? ' guest' : ' guests') : '') + '.'));
     function list(title, rows, missing) {
@@ -872,6 +882,7 @@
   function startFrame() {
     S.frame = window.PanelFrame.mount({ root: root, teaching: S.teaching });
     var F = S.frame, mine = S.teaching ? 'tools' : 'mine';
+    S.frameTools = el('div', 'p2-group');
     root.querySelector('.addon-head').hidden = true;
     // Now: where to go and what is said to everyone, then the part's own needs.
     S.nowNotes = el('section', 'p2-notes');
@@ -894,9 +905,11 @@
       F.put('tools', stage);
       F.put('tools', $('[data-ask-wrap]'));
       F.put('tools', $('[data-breakouts]'));
+      F.put('tools', S.frameTools);
       F.put('people', $('[data-roster]'));
       F.put('people', $('[data-recognize]'));
     } else {
+      F.put('mine', S.frameTools);
       F.put('mine', $('[data-recognize]'));
     }
     root.querySelector('.addon-more').hidden = true;
@@ -925,6 +938,8 @@
     var chips = [];
     if (S.teaching) {
       chips.push({ text: S.stageOn ? 'Stage on' : 'Stage off', on: !!S.stageOn });
+      var place = slideInfo();
+      if (place) chips.push({ text: 'Slide ' + (place.at + 1) + ' of ' + place.count });
       if (S.recording) chips.push({ text: 'Recording', on: true });
       if (st.rooms) chips.push({ text: 'In breakouts', on: true });
       if (st.together) chips.push({ text: 'Coming back', on: true });
@@ -935,11 +950,14 @@
       time: left != null ? window.LiveLib.clock(left) : '', over: left === 0,
       chips: chips, next: nextStep() || undefined, canBack: !!part
     });
-    var what = !S.teaching && part && !part.slides ? String(part.what || '').split(/\n{2,}/)[0] : '';
+    var first = (S.list || [])[0];
+    var what = !part && first ? 'First: ' + first.name : !S.teaching && part && !part.slides ? String(part.what || '').split(/\n{2,}/)[0] : '';
     if (S.nowWhat.textContent !== what) S.nowWhat.textContent = what;
     S.nowWhat.hidden = !what;
     if (S.teaching) {
-      var said = [info && info.note, part && (S.notes || {})[part.key]].filter(Boolean).join('\n\n');
+      var noteOf = part || first;
+      var slideNote = info ? info.note : first && window.SlidesLib && (S.decks || {})[first.key] ? window.SlidesLib.notes(S.decks[first.key])[0] : '';
+      var said = [slideNote, noteOf && (S.notes || {})[noteOf.key]].filter(Boolean).join('\n\n');
       if (S.nowNotes.getAttribute('data-said') !== said) {
         S.nowNotes.setAttribute('data-said', said);
         S.nowNotes.replaceChildren();
@@ -1723,7 +1741,7 @@
       stageButtons(true);
       status.textContent = 'The main stage is open. Ask everyone to press Join activity at the top of Meet.';
     }, function (err) {
-      status.textContent = 'The main stage did not open: ' + (err && err.message ? err.message : 'Meet gave no reason') + '.';
+      status.textContent = A.stageError(err);
     });
   });
 

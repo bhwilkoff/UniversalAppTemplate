@@ -188,6 +188,14 @@
     return out;
   }
 
+  // Why the main stage did not open, in words a leader can act on.
+  function stageError(err) {
+    var kind = err && (err.errorType || err.name);
+    if (kind === 'MeetingPolicyPreventsStartingActivity') return 'This call’s settings stop add-ons here. Turn on Let contributors share add-on activities in host controls.';
+    if (kind === 'UserCancelled') return 'The main stage did not open.';
+    return 'The main stage did not open: ' + (err && err.message ? err.message : 'Meet gave no reason') + '.';
+  }
+
   // A deck and the slide it is on, read back with both checked.
   function slidesOf(d) {
     if (!d || typeof d.text !== 'string' || !d.text) return null;
@@ -327,7 +335,7 @@
 
   var lib = {
     meetingCode: meetingCode, findRoom: findRoom, panelPlan: panelPlan, timeLeft: timeLeft,
-    stageView: stageView, sceneOf: sceneOf, stageMessage: stageMessage, readStageMessage: readStageMessage, HELLO: HELLO, isHello: isHello,
+    stageView: stageView, sceneOf: sceneOf, stageError: stageError, stageMessage: stageMessage, readStageMessage: readStageMessage, HELLO: HELLO, isHello: isHello,
     handoff: handoff, acceptHandoff: acceptHandoff, boardLinks: boardLinks
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;

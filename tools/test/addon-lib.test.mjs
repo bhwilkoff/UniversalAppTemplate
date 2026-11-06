@@ -276,3 +276,9 @@ test('a part with slides fills the stage, and a pin still outranks it', () => {
   assert.equal(lib.stageView({ part, slides, onStage: { kind: 'blank' } }).mode, 'blank');
   assert.equal(lib.stageView({ part, slides, card: { body: 'A card' } }).mode, 'card');
 });
+
+test('a stage that will not open says why, in words a leader can act on', () => {
+  assert.match(lib.stageError({ errorType: 'MeetingPolicyPreventsStartingActivity' }), /host controls/);
+  assert.equal(lib.stageError({ errorType: 'UserCancelled' }), 'The main stage did not open.');
+  assert.match(lib.stageError(new Error('boom')), /boom/);
+});
