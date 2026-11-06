@@ -82,10 +82,10 @@
         },
         {
           "kind": "question",
-          "title": "What is still muddy?",
+          "title": "What is still unclear?",
           "body": "Anything from tonight that is not clear yet. Your leaders read every answer before the next session.",
           "config": {
-            "prompt": "What is still muddy for you?",
+            "prompt": "What is still unclear for you?",
             "kind": "short"
           },
           "minutes": 5
@@ -174,10 +174,10 @@
           },
           {
             "kind": "question",
-            "title": "What is still muddy?",
+            "title": "What is still unclear?",
             "body": "Anything from tonight that is not clear yet. Your leaders read every answer before the next session.",
             "config": {
-              "prompt": "What is still muddy for you?",
+              "prompt": "What is still unclear for you?",
               "kind": "short"
             },
             "minutes": 4
@@ -270,10 +270,10 @@
         },
         {
           "kind": "question",
-          "title": "What is still muddy?",
+          "title": "What is still unclear?",
           "body": "Anything from tonight that is not clear yet. Your leaders read every answer before the next session.",
           "config": {
-            "prompt": "What is still muddy for you?",
+            "prompt": "What is still unclear for you?",
             "kind": "short"
           },
           "minutes": 5
@@ -291,7 +291,7 @@
         },
         {
           "kind": "short",
-          "prompt": "What is still muddy?"
+          "prompt": "What is still unclear?"
         },
         {
           "kind": "multi",
@@ -374,10 +374,10 @@
           },
           {
             "kind": "question",
-            "title": "What is still muddy?",
+            "title": "What is still unclear?",
             "body": "Anything from tonight that is not clear yet. Your leaders read every answer before the next session.",
             "config": {
-              "prompt": "What is still muddy for you?",
+              "prompt": "What is still unclear for you?",
               "kind": "short"
             },
             "minutes": 4
@@ -474,10 +474,10 @@
         },
         {
           "kind": "question",
-          "title": "What is still muddy?",
+          "title": "What is still unclear?",
           "body": "Anything from tonight that is not clear yet. Your leaders read every answer before the next session.",
           "config": {
-            "prompt": "What is still muddy for you?",
+            "prompt": "What is still unclear for you?",
             "kind": "short"
           },
           "minutes": 3
@@ -497,7 +497,7 @@
         },
         {
           "kind": "short",
-          "prompt": "What is still muddy?"
+          "prompt": "What is still unclear?"
         }
       ],
       "lengths": {
@@ -560,10 +560,10 @@
           },
           {
             "kind": "question",
-            "title": "What is still muddy?",
+            "title": "What is still unclear?",
             "body": "Anything from tonight that is not clear yet. Your leaders read every answer before the next session.",
             "config": {
-              "prompt": "What is still muddy for you?",
+              "prompt": "What is still unclear for you?",
               "kind": "short"
             },
             "minutes": 4
@@ -654,10 +654,10 @@
         },
         {
           "kind": "question",
-          "title": "What is still muddy?",
+          "title": "What is still unclear?",
           "body": "Anything from tonight that is not clear yet. Your leaders read every answer before the next session.",
           "config": {
-            "prompt": "What is still muddy for you?",
+            "prompt": "What is still unclear for you?",
             "kind": "short"
           },
           "minutes": 3
@@ -674,7 +674,7 @@
         },
         {
           "kind": "short",
-          "prompt": "What is still muddy?"
+          "prompt": "What is still unclear?"
         }
       ],
       "lengths": {
@@ -731,10 +731,10 @@
           },
           {
             "kind": "question",
-            "title": "What is still muddy?",
+            "title": "What is still unclear?",
             "body": "Anything from tonight that is not clear yet. Your leaders read every answer before the next session.",
             "config": {
-              "prompt": "What is still muddy for you?",
+              "prompt": "What is still unclear for you?",
               "kind": "short"
             },
             "minutes": 4
@@ -832,10 +832,10 @@
         },
         {
           "kind": "question",
-          "title": "What is still muddy?",
+          "title": "What is still unclear?",
           "body": "Anything from tonight that is not clear yet. Your leaders read every answer before the next session.",
           "config": {
-            "prompt": "What is still muddy for you?",
+            "prompt": "What is still unclear for you?",
             "kind": "short"
           },
           "minutes": 3
@@ -867,7 +867,7 @@
         },
         {
           "kind": "short",
-          "prompt": "What is still muddy?"
+          "prompt": "What is still unclear?"
         }
       ],
       "lengths": {
@@ -931,10 +931,10 @@
           },
           {
             "kind": "question",
-            "title": "What is still muddy?",
+            "title": "What is still unclear?",
             "body": "Anything from tonight that is not clear yet. Your leaders read every answer before the next session.",
             "config": {
-              "prompt": "What is still muddy for you?",
+              "prompt": "What is still unclear for you?",
               "kind": "short"
             },
             "minutes": 4
@@ -1017,10 +1017,10 @@
         },
         {
           "kind": "question",
-          "title": "What is still muddy?",
+          "title": "What is still unclear?",
           "body": "Anything from tonight that is not clear yet. Your leaders read every answer before the next session.",
           "config": {
-            "prompt": "What is still muddy for you?",
+            "prompt": "What is still unclear for you?",
             "kind": "short"
           },
           "minutes": 4
@@ -1041,7 +1041,7 @@
         },
         {
           "kind": "short",
-          "prompt": "What is still muddy?"
+          "prompt": "What is still unclear?"
         }
       ],
       "lengths": {
@@ -1089,10 +1089,10 @@
           },
           {
             "kind": "question",
-            "title": "What is still muddy?",
+            "title": "What is still unclear?",
             "body": "Anything from tonight that is not clear yet. Your leaders read every answer before the next session.",
             "config": {
-              "prompt": "What is still muddy for you?",
+              "prompt": "What is still unclear for you?",
               "kind": "short"
             },
             "minutes": 4

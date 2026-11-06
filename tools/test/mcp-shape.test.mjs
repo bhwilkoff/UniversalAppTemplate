@@ -147,7 +147,7 @@ test('a student\'s work shows their marks, answers, queue, feedback both ways, a
     shares: [{ id: 'bb', kind: 'bring-back', note: 'Round three', url: 'https://bea.github.io/garden-swap', created_at: '2026-10-12T00:00:00Z', want_to_know: 'Does the list read?', readiness: 'not-yet', missing: 'offline', feedback: [
       { author_id: 't', body: 'Try it on the train.', created_at: '2026-10-14T00:00:00Z' }, { author_id: 'c', body: 'Nice.', created_at: '2026-10-13T00:00:00Z' }, { author_id: 'b', body: 'Thanks', created_at: '2026-10-15T00:00:00Z' }] }],
     confirmations: [{ share_id: 'bb', user_id: 'c' }],
-    answers: [{ week: 2, prompt: 'What is still muddy?', text: 'Sync' }],
+    answers: [{ week: 2, prompt: 'What is still unclear?', text: 'Sync' }],
     queue: [{ week: 2, label: 'The app, live at bea.github.io/garden-swap', url: 'https://bea.github.io/garden-swap', state: 'shown' }],
     given: [{ to: 'c', body: 'The colors help.', created_at: '2026-10-13T00:00:00Z' }],
     notes: [{ author_id: 't', body: 'Glad you came.', created_at: '2026-10-15T00:00:00Z' }],
@@ -158,7 +158,7 @@ test('a student\'s work shows their marks, answers, queue, feedback both ways, a
   assert.match(t, /Their own mark: not yet, because offline\./);
   assert.match(t, /Seen working on a device by Cal\./);
   assert.match(t, /Feedback from Cal \(a classmate\): Nice\.\n    Feedback from you \(a teacher\): Try it on the train\.\n    Feedback from Bea \(themselves\): Thanks/);
-  assert.match(t, /Week 2, "What is still muddy\?": Sync/);
+  assert.match(t, /Week 2, "What is still unclear\?": Sync/);
   assert.match(t, /Week 2, The app, live at bea\.github\.io\/garden-swap .*, shown/);
   assert.match(t, /to Cal: The colors help\./);
   assert.match(t, /from you: Glad you came\./);
@@ -177,14 +177,14 @@ test('class now gives the part, the queue by name, answers by name, and commits 
       { name: 'Bea', label: 'The app', url: 'https://bea.github.io/garden-swap', note: 'the list', state: 'waiting', created_at: '2026-10-13T23:10:00Z' },
       { name: 'Fay', label: 'A link', url: 'https://x.org', state: 'shown', created_at: '2026-10-13T23:00:00Z' },
     ],
-    checks: [{ prompt: 'What is still muddy?', choices: null, state: 'open', answers: [{ name: 'Bea', text: 'Sync' }] }, { prompt: 'Closed', state: 'closed', answers: [] }],
+    checks: [{ prompt: 'What is still unclear?', choices: null, state: 'open', answers: [{ name: 'Bea', text: 'Sync' }] }, { prompt: 'Closed', state: 'closed', answers: [] }],
     commits: [{ date: '2026-10-13T23:40:00Z', name: 'Bea', repo: 'bea/garden-swap', line: 'Sort the list', agent: 'Claude', url: 'https://github.com/bea/garden-swap/commit/abc' }],
     unread: 'cal/x is private or moved, so its commits are not shown.',
   });
   assert.match(t, /week 2 \(happening now\)/);
   assert.match(t, /the part now is "Start" \(minute 57, for 9 minutes\)/);
   assert.match(t, /2 waiting, 1 shown\.\n1\. Bea: The app .*"the list"\n2\. Cal: /);
-  assert.match(t, /Open check: "What is still muddy\?" 1 answered\.\n- Bea: Sync/);
+  assert.match(t, /Open check: "What is still unclear\?" 1 answered\.\n- Bea: Sync/);
   assert.doesNotMatch(t, /Closed/);
   assert.match(t, /- 23:40 UTC, Bea in bea\/garden-swap: Sort the list \(with Claude\) https:\/\/github\.com\/bea\/garden-swap\/commit\/abc/);
   assert.match(t, /cal\/x is private or moved/);

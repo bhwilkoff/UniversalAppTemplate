@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261104i">
+  <link rel="stylesheet" href="/assets/site.css?v=20261107c">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -101,7 +101,7 @@
                 <p class="ui-help"><a href="/teach/guide/#need">What each step is for</a></p>
               </section>
               <div data-setup-done></div>
-              <section class="panel-section" aria-labelledby="needs-title">
+              <section class="panel-section" aria-labelledby="needs-title" data-needs-section hidden>
                 <h2 id="needs-title">Waiting for you</h2>
                 <ul class="ui-rows" data-needs></ul>
               </section>
@@ -111,21 +111,23 @@
             <p class="ui-inline-status" data-setup-count></p>
             <ol class="setup-steps" data-setup-steps></ol>
           </section>
-          <div class="cohort-grid">
-            <section class="cohort-card" aria-labelledby="week-title">
-              <h2 id="week-title" data-week-title>This week</h2>
-              <p data-week-scope></p>
-              <!-- Curriculum C7: the week's move and question, and the
-                   stuck library. Written by Claude, awaiting Ben's review. -->
-              <p class="small" data-week-question hidden></p>
-              <p class="small stuck-line" data-stuck-line hidden></p>
-            </section>
-            <section class="cohort-card" aria-labelledby="next-title">
-              <h2 id="next-title">The next session</h2>
-              <p data-next-when></p>
+          <section class="week-hero" aria-labelledby="week-title">
+            <div class="week-hero-head">
+              <div>
+                <p class="kicker" data-week-kicker>Next</p>
+                <h2 id="week-title" data-week-title>This week</h2>
+                <p class="week-when" data-next-when></p>
+              </div>
               <div class="actions" data-next-actions></div>
-            </section>
-          </div>
+            </div>
+            <div class="plan-hour" data-week-hour></div>
+            <p data-week-scope></p>
+            <!-- Curriculum C7: the week's move and question, and the
+                 stuck library. Written by Claude, awaiting Ben's review. -->
+            <p class="small" data-week-question hidden></p>
+            <p class="small stuck-line" data-stuck-line hidden></p>
+            <div class="week-due" data-week-due hidden></div>
+          </section>
 
           <!-- The last week (H5): words by Claude, awaiting Ben's review. -->
           <section class="cohort-card" aria-labelledby="last-week-title" data-last-week hidden>
@@ -156,28 +158,6 @@
                 <p class="ui-meta-line"><span data-vis="public"></span> On GitHub.</p>
                 <p class="actions"><a class="btn-secondary" data-teach-lesson-link href="https://github.com/bhwilkoff/UniversalAppTemplate/issues/new"><svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022j#github"/></svg>Send a lesson to the template</a></p>
               </section>
-              <section class="since" aria-labelledby="checks-heard-title" data-since hidden>
-                <h2 id="checks-heard-title" data-checks-heard-title></h2>
-                <p class="ui-meta-line"><span data-vis="staff"></span></p>
-                <p class="ui-inline-status" data-checks-heard-intro></p>
-                <div data-check-answers></div>
-                <form class="inline-form" data-heard-form>
-                  <label>What I heard, and what changes
-                    <span class="hint"><span data-vis="cohort"></span> Shown as people arrive next session.</span>
-                    <textarea name="heard" rows="4" maxlength="2000"></textarea>
-                  </label>
-                  <div class="actions"><button class="btn-secondary" type="submit">Save</button><span class="ui-inline-status" data-heard-message role="status"></span></div>
-                </form>
-
-                <h2 id="not-seen-title" data-not-seen-title></h2>
-                <p class="ui-meta-line"><span data-vis="staff"></span></p>
-                <p class="ui-inline-status" data-not-seen-intro></p>
-                <ul class="roster not-seen" data-not-seen></ul>
-
-                <h2 id="followups-title" data-followups-title></h2>
-                <p class="ui-inline-status" data-followups-intro></p>
-                <div class="followups" data-followups></div>
-              </section>
 </div>
           </div>
           <div data-tab="talk" hidden>
@@ -186,10 +166,12 @@
             <div data-talk></div>
           </section>
           </div>
-          <div data-tab="asks" hidden>
-          <section aria-labelledby="asks-title">
-            <h2 id="asks-title">Try my app</h2>
-            <div data-asks></div>
+          <div data-tab="talk" hidden>
+          <section aria-labelledby="exchanges-title" class="x-section" data-exchanges-cohort>
+            <h2 id="exchanges-title">Exchanges</h2>
+            <p class="ui-meta-line"><span data-vis="cohort"></span></p>
+            <div data-x-list></div>
+            <p class="actions"><a class="btn-secondary" data-x-new href="/exchange/new/">Start an exchange</a></p>
           </section>
           </div>
           <div data-tab="files" hidden>
@@ -198,19 +180,13 @@
             <div data-files></div>
           </section>
           </div>
-          <div data-tab="exchanges" hidden>
-          <section aria-labelledby="exchanges-title" class="x-section" data-exchanges-cohort>
-            <h2 id="exchanges-title">Exchanges</h2>
-            <p class="ui-meta-line"><span data-vis="cohort"></span></p>
-            <div data-x-list></div>
-            <p class="actions"><a class="btn-secondary" data-x-new href="/exchange/new/">Start an exchange</a></p>
-          </section>
-          </div>
           <div data-tab="people" hidden>
           <div data-leader-only hidden>
               <section class="panel-section" aria-labelledby="roster-title">
                 <h2 id="roster-title">Learners</h2>
                 <div data-roster></div>
+                <div class="followups" data-followups></div>
+                <p class="ui-inline-status" data-followups-intro></p>
               </section>
               <section class="panel-section" aria-labelledby="groups-title" data-groups-section hidden>
                 <h2 id="groups-title">Groups</h2>
@@ -258,6 +234,12 @@
           <section aria-labelledby="people-title" data-learner-view>
             <h2 id="people-title">What everyone is building</h2>
             <div class="apps" data-people></div>
+          </section>
+          </div>
+          <div data-tab="people" hidden>
+          <section aria-labelledby="asks-title">
+            <h2 id="asks-title">Try my app</h2>
+            <div data-asks></div>
           </section>
           </div>
           <div data-tab="mine" hidden>
@@ -352,7 +334,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" defer></script>
   <script src="/assets/hub-config.js?v=20261016a" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.4.16/purify.min.js" integrity="sha512-flQmhkXNRQ3iUfvtdCobtpMjCb6kE+zLnTiAulAQJ3WykVfy84JvCMOo6vhwWXHTXjR25h9Zj+LyGFRWKjRoag==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
-  <script src="/assets/cohort-lib.js?v=20261104a" defer></script>
+  <script src="/assets/cohort-lib.js?v=20261107a" defer></script>
   <script src="/assets/submit-lib.js?v=20261022a" defer></script>
   <script src="/assets/discussions-lib.js" defer></script>
   <script src="/assets/github-token.js?v=20261106b" defer></script>
@@ -369,14 +351,14 @@
   <script src="/assets/showcase-lib.js?v=20261022a" defer></script>
   <script src="/assets/slides-lib.js?v=20261104b" defer></script>
   <script src="/assets/slide-editor.js?v=20261104e" defer></script>
-  <script src="/assets/show-lib.js?v=20261024c" defer></script>
+  <script src="/assets/show-lib.js?v=20261107a" defer></script>
   <script src="/assets/recognition-lib.js" defer></script>
   <script src="/assets/curriculum-pages-lib.js" defer></script>
-  <script src="/assets/cohort-nav.js?v=20261023m" defer></script>
+  <script src="/assets/cohort-nav.js?v=20261107a" defer></script>
   <script src="/assets/teach-lib.js?v=20261104a" defer></script>
   <script src="/assets/teach-page.js?v=20261022j" defer></script>
   <script src="/assets/rooms-lib.js" defer></script>
-  <script src="/assets/followup-lib.js?v=20261023zc" defer></script>
+  <script src="/assets/followup-lib.js?v=20261107a" defer></script>
   <script src="/assets/credential-lib.js?v=20261022j" defer></script>
   <script src="/assets/credential-check.js" defer></script>
   <script src="/assets/reach-lib.js" defer></script>
@@ -384,14 +366,14 @@
   <script src="/assets/question-view.js?v=20261022j" defer></script>
   <script src="/assets/question-bank.js?v=20261022j" defer></script>
   <script src="/assets/board-lib.js" defer></script>
-  <script src="/assets/curriculum-lib.js?v=20261023d" defer></script>
-  <script src="/assets/curriculum-seed.js?v=20261023b" defer></script>
+  <script src="/assets/curriculum-lib.js?v=20261107a" defer></script>
+  <script src="/assets/curriculum-seed.js?v=20261107a" defer></script>
   <script src="/assets/show-builder.js?v=20261104c" defer></script>
   <script src="/assets/calendar-lib.js?v=20261104a" defer></script>
   <script src="/assets/leader-calendar.js?v=20261104a" defer></script>
-  <script src="/assets/teach-cohort.js?v=20261107a" defer></script>
+  <script src="/assets/teach-cohort.js?v=20261107b" defer></script>
   <script src="/assets/record-lib.js?v=20261104a" defer></script>
-  <script src="/assets/cohort.js?v=20261106a" defer></script>
+  <script src="/assets/cohort.js?v=20261107a" defer></script>
   <script src="/assets/exchange-lib.js?v=20261022a" defer></script>
   <script src="/assets/exchange-list.js?v=20261022d" defer></script>
 

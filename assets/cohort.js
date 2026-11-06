@@ -742,6 +742,44 @@
     if (window.CohortNav && !cohortTabs) cohortTabs = window.CohortNav.draw($('[data-cohort-nav]'), { cohort: cohort, teaching: teaching, member: !!mine, current: 'home', panels: $('[data-cohort-panels]') });
   }
 
+  // The hour of the session that leads, as the session page draws it.
+  function drawHour(s) {
+    var bar = $('[data-week-hour]');
+    bar.replaceChildren();
+    if (!s) return;
+    db.from('scenes').select('kind, title, minutes').eq('session_id', s.id).order('position').then(function (r) {
+      var fam = { question: 'ask', presenter: 'do', design: 'do', rooms: 'do', 'break': 'rest' };
+      (r.data || []).forEach(function (x) {
+        var seg = el('a', 'plan-seg fam-' + (fam[x.kind] || 'say'));
+        seg.href = lib.sessionUrl(cohort.slug, s.number) + '&t=plan';
+        seg.style.flexGrow = x.minutes;
+        seg.title = x.title + ', ' + x.minutes + ' min';
+        seg.setAttribute('aria-label', x.title + ', ' + x.minutes + ' minutes');
+        bar.appendChild(seg);
+      });
+    });
+  }
+  // What the next session asks of this learner before it starts.
+  function drawDue(next, mine) {
+    var box = $('[data-week-due]');
+    box.replaceChildren();
+    box.hidden = true;
+    var items = next && Array.isArray(next.prep_questions) ? next.prep_questions.filter(function (q) { return q && q.kind !== 'exchange' && q.prompt; }) : [];
+    var ex = next && Array.isArray(next.prep_questions) ? next.prep_questions.filter(function (q) { return q && q.kind === 'exchange'; }) : [];
+    if (!mine || (!items.length && !ex.length)) return;
+    db.from('prep_answers').select('question_id').eq('session_id', next.id).eq('user_id', me.id).then(function (r) {
+      var done = (r.data || []).length;
+      var row = el('div', 'week-due-row');
+      var left = items.length - done;
+      row.appendChild(el('span', null, left > 0 ? left + (left === 1 ? ' question' : ' questions') + ' to answer before this session' + (ex.length ? ', and an exchange' : '') : ex.length ? 'An exchange to reply to before this session' : 'Your answers are in. You can change them until the session.'));
+      var go = link(lib.sessionUrl(cohort.slug, next.number) + '&t=before', left > 0 ? 'Answer them' : 'See them');
+      go.className = left > 0 ? 'btn-primary small' : 'btn-secondary small'; go.removeAttribute('target'); go.removeAttribute('rel');
+      row.appendChild(go);
+      box.appendChild(row);
+      box.hidden = false;
+    });
+  }
+
   function draw(people, mine, sessions, groups, shares, contact, teachers) {
     $('[data-title]').textContent = cohort.title;
     document.title = cohort.title + ' | Human Shaped';
@@ -751,9 +789,15 @@
     week = t.current ? t.current.number : null;
     var myGroup = groups.filter(function (g) { return g.group_members.some(function (m) { return m.user_id === me.id; }); })[0];
     var room = myGroup ? safe(myGroup.meet_url) : null;
-    $('[data-week-title]').textContent = t.current ? lib.sessionTitle(t.current) : 'This week';
-    $('[data-week-scope]').textContent = t.current && t.current.scope ? t.current.scope : '';
-    $('[data-week-scope]').hidden = !(t.current && t.current.scope);
+    // The next session leads, whatever week it is (COHORT-DESIGN.md).
+    var lead = t.next || t.current;
+    $('[data-week-kicker]').textContent = t.live ? 'Happening now' : t.next ? 'Next' : 'This week';
+    $('[data-week-title]').textContent = lead ? lib.sessionTitle(lead) : 'This week';
+    var scope = (t.next && t.next.scope) || (t.current && t.current.scope) || '';
+    $('[data-week-scope]').textContent = scope;
+    $('[data-week-scope]').hidden = !scope;
+    drawHour(lead);
+    drawDue(t.next, mine);
     drawWeekMove(t.current ? t.current.number : null);
     // The plan now lives on the session's own page (JOURNEYS.md, the
     // walk-through audit), so This week links there instead of repeating it.
@@ -773,14 +817,6 @@
     } else {
       $('[data-next-when]').textContent = sessions.length ? 'All sessions done' : 'Not scheduled yet';
     }
-    var past = sessions.filter(function (s) { return safe(s.recording_url); });
-    // A recording the recorder put in Drive plays on its session page.
-    past.forEach(function (s) {
-      var here = window.RecordLib && window.RecordLib.driveId(s.recording_url);
-      var a = link(here ? lib.sessionUrl(cohort.slug, s.number) + '#recording' : s.recording_url, lib.sessionName(s.number) + ' recording');
-      if (here) { a.removeAttribute('target'); a.removeAttribute('rel'); }
-      na.appendChild(a);
-    });
 
     $('[data-group-section]').hidden = !myGroup;
     if (myGroup) {

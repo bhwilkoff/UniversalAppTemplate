@@ -90,7 +90,7 @@ test('a timer counts down to zero, and no timer is null', () => {
 });
 
 const check = { id: 'k1', state: 'open', prompt: 'Which stage are you on?', choices: ['One', 'Two'], show_tally: false };
-const words = { id: 'k2', state: 'open', prompt: 'What is still muddy?', choices: null, show_tally: false };
+const words = { id: 'k2', state: 'open', prompt: 'What is still unclear?', choices: null, show_tally: false };
 const closed = { id: 'k3', state: 'closed', prompt: 'Old', choices: null, show_tally: false };
 const tallies = { k1: [{ choice: 1, answers: 3 }, { choice: 2, answers: 1 }] };
 const part = { key: 'value', name: 'One value at work', endsAt: 1000 };

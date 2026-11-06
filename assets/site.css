@@ -3168,3 +3168,33 @@ select:not([multiple]) {
 
 .p2-panel .btn-primary.small { color: var(--on-ink); }
 .p2-panel .btn-secondary.small { color: var(--ink); }
+
+/* The cohort's home (COHORT-DESIGN.md). */
+.cohort-page { --fam-say: var(--thistle); --fam-ask: #8FD6B4; --fam-do: #F2C879; --fam-rest: var(--edge); }
+.cohort-page .page-head { padding-bottom: 1rem; gap: 0.5rem; }
+.cohort-page .page-head h1 { font-size: clamp(1.6rem, 1.3rem + 1.2vw, 2.2rem); line-height: 1.15; letter-spacing: -0.02em; }
+.cohort-page .page-head .lead { margin-top: 0.4rem; font-size: 1rem; }
+.week-hero { display: grid; gap: 0.9rem; margin: 0.5rem 0 1.5rem; padding: 1.4rem 1.5rem; border: 1px solid var(--rule); border-radius: 16px; background: var(--card); }
+.week-hero-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.75rem 1.5rem; align-items: start; }
+.week-hero .kicker { margin: 0; }
+.cohort-page .week-hero h2 { margin: 0.1rem 0 0.2rem; font-size: 1.5rem; }
+.week-hero .actions { margin: 0; justify-content: flex-end; }
+.week-when { margin: 0; color: var(--muted); }
+.week-hero > p { margin: 0; max-width: 44rem; }
+.week-hero .plan-hour { margin: 0; }
+.week-due-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding-top: 0.8rem; border-top: 1px solid var(--rule); font-weight: 600; }
+.person-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr)); gap: 0.9rem; margin-top: 0.75rem; }
+.person-card { display: grid; gap: 0.5rem; align-content: start; padding: 1rem 1.1rem; border: 1px solid var(--rule); border-radius: 12px; background: var(--card); min-width: 0; }
+.person-head { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 0.6rem; }
+.person-name { font-weight: 700; color: var(--ink); text-decoration: none; }
+a.person-name:hover { text-decoration: underline; }
+.person-work { margin: 0; font-size: 0.95rem; color: var(--muted); overflow-wrap: anywhere; }
+.person-facts { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+.person-facts:empty { display: none; }
+.person-fact { padding: 0.1rem 0.55rem; border: 1px solid var(--rule); border-radius: 999px; font-size: 0.8rem; color: var(--muted); }
+.person-fact.is-yes { background: var(--thistle); border-color: var(--thistle); color: var(--on-thistle); }
+.person-follow .cohort-card.followup { margin: 0; padding: 0; border: 0; background: none; }
+.person-follow .followup > summary { padding: 0.2rem 0; }
+.person-more { font-size: 0.9rem; }
+@media (max-width: 40rem) { .week-hero-head { grid-template-columns: minmax(0, 1fr); } .week-hero .actions { justify-content: flex-start; } .week-due-row { flex-wrap: wrap; } }
+

@@ -30,10 +30,8 @@
       { key: 'week', label: 'This week' },
       { key: 'sessions', label: 'Sessions' },
       { key: 'talk', label: 'Conversation' },
-      { key: 'asks', label: 'Try my app' },
-      { key: 'files', label: 'Files' },
-      { key: 'exchanges', label: 'Exchanges' },
-      { key: 'people', label: 'People' }
+      { key: 'people', label: 'People' },
+      { key: 'files', label: 'Files' }
     ];
     if (o.member) list.push({ key: 'mine', label: 'Your work' });
     if (o.teaching) list.push({ key: 'settings', label: 'Settings' });
@@ -66,6 +64,9 @@
       if (o.teaching && o.member) role.appendChild(window.UI.tag('Learner'));
       role.hidden = false;
     }
+    // Sections that moved keep their old addresses.
+    var old = new URLSearchParams(location.search).get('t'), now = { asks: 'people', exchanges: 'talk' }[old];
+    if (now) { var u = new URL(location.href); u.searchParams.set('t', now); history.replaceState(null, '', u.pathname + u.search + u.hash); }
     var list = places(o);
     // The row sits under the cohort's name and role when the page has a
     // header beside the crumbs: crumb, name, role, then the sections.

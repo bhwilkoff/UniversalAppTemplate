@@ -16,7 +16,7 @@
     { key: 'design', name: 'On the board', what: 'The shared board on the main stage, where everyone draws together, blank or from a template.', keys: ['template'] },
     { key: 'rooms', name: 'In groups', what: 'Everyone goes to their group’s room for a set time, and the room runs its own parts.', keys: ['prompt', 'room_scenes'] },
     { key: 'break', name: 'Break', what: 'A pause, with the clock on the main stage.', keys: [] },
-    { key: 'reflection', name: 'Writing', what: 'One closing question, often what is still muddy.', keys: ['prompt'] }
+    { key: 'reflection', name: 'Writing', what: 'One closing question, often what is still unclear.', keys: ['prompt'] }
   ];
   var BY_KEY = {};
   KINDS.forEach(function (k) { BY_KEY[k.key] = k; });
@@ -53,7 +53,7 @@
       }
       if (k === 'presenter') config.prompt = 'Listen for the value at work, and what it cost.';
       if (k === 'reflection') config.prompt = 'What is the first prompt you will send this week?';
-      if (k === 'question') config.prompt = 'What is still muddy for you?';
+      if (k === 'question') config.prompt = 'What is still unclear for you?';
       return { kind: k, title: p.name, minutes: p.minutes, body: p.what || null, config: config };
     });
   }

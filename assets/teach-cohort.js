@@ -29,7 +29,7 @@
   // ---- the page's own parts (DESIGN-KIT.md) --------------------------
   var U = window.UI, tabsCtl = null;
   // The leader's old section names, now sections of the cohort's page.
-  var MOVED = { setup: 'week', followup: 'sessions', groups: 'people', apps: 'people', credentials: 'people' };
+  var MOVED = { setup: 'week', followup: 'people', groups: 'people', apps: 'people', credentials: 'people' };
   function tab(k) { return MOVED[k] || k; }
   var failed = function () {};
   var reloadPage = function () { openCohort(current.id); };
@@ -77,11 +77,14 @@
       if (!box) return;
       box.replaceChildren();
       var keys = Object.keys(items).filter(function (k) { return items[k]; });
-      if (!keys.length) { box.appendChild(U.empty('Nothing waiting')); return; }
+      // Nothing waiting is no section at all (COHORT-DESIGN.md, rule 1).
+      var section = $('[data-needs-section]');
+      if (section) section.hidden = !keys.length;
       keys.forEach(function (k) {
         var n = items[k];
-        var go = U.link(n.action, tabsCtl ? tabsCtl.link(tab(n.tab)) : '#', 'btn-secondary small');
-        go.addEventListener('click', function (e) { if (tabsCtl) { e.preventDefault(); tabsCtl.go(tab(n.tab)); } });
+        var go = U.link(n.action, n.href || (tabsCtl ? tabsCtl.link(tab(n.tab)) : '#'), 'btn-secondary small');
+        if (n.href) { go.removeAttribute('target'); go.removeAttribute('rel'); }
+        else go.addEventListener('click', function (e) { if (tabsCtl) { e.preventDefault(); tabsCtl.go(tab(n.tab)); } });
         box.appendChild(U.row({ title: n.text, status: U.count(n.count, n.count + ' to see'), actions: [go] }));
       });
     }
@@ -249,72 +252,42 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
     });
   });
 
-  // ---- since the last session ---------------------------------------
-  // Two things for the days after a session, for the cohort's teachers
-  // alone: that session's check answers with one field to say what you
-  // heard and what changes (shown on /live/ while people arrive next
-  // time), and who has not been seen since it began, worked out here from
-  // what this page can already read and never stored (TeachLib.notSeen).
+  // What a person did around the last session, for following up.
   function loadSince(sessions, people) {
-    var box = $('[data-since]');
     var last = lib.lastStarted(sessions, new Date());
-    box.hidden = !last;
-    if (!last) return;
-    var since = last.starts_at;
-    var reachLoaded = loadReach();
     var names = {};
     people.forEach(function (p) { names[p.user_id] = personName(p); });
     var nameOf = function (id) { return id === me.id ? 'You' : (names[id] || 'Someone'); };
-    say('[data-checks-heard-title]', 'What ' + sessionPhrase(last.number) + '’s checks said');
-    say('[data-not-seen-title]', 'Not seen since ' + sessionPhrase(last.number) + ' began');
-    var heardForm = $('[data-heard-form]');
-    heardForm.hidden = !('heard' in last);   // until the database has the column
-    heardForm.elements.heard.value = last.heard || '';
-    heardForm.onsubmit = function (ev) {
-      ev.preventDefault();
-      say('[data-heard-message]', 'Saving…');
-      db.from('sessions').update({ heard: heardForm.elements.heard.value.trim() || null }).eq('id', last.id).select('id').then(function (r) {
-        say('[data-heard-message]', r.error || !r.data.length ? 'Not saved: ' + (r.error ? r.error.message : 'no change was allowed') + '.' : 'Saved');
-      });
-    };
-    say('[data-heard-message]', '');
+    loadFacts(sessions, people);
+    if (last) loadReach().then(function () { loadFollowups(last, sessions, people, nameOf); });
+  }
 
-    var answersBox = $('[data-check-answers]');
-    answersBox.replaceChildren(el('p', 'small', 'Reading the answers…'));
-    var notSeenList = $('[data-not-seen]');
-    notSeenList.replaceChildren();
-    say('[data-not-seen-intro]', '');
-    db.from('live_checks').select('*').eq('session_id', last.id).then(function (k) {
-      if (k.error) { answersBox.replaceChildren(el('p', 'small error', 'The checks could not be read: ' + k.error.message)); return; }
-      var ids = k.data.map(function (x) { return x.id; });
-      var answers = ids.length
-        ? db.from('live_answers').select('*').in('check_id', ids)
-        : Promise.resolve({ data: [] });
-      return answers.then(function (a) {
-        if (a.error) { answersBox.replaceChildren(el('p', 'small error', 'The answers could not be read: ' + a.error.message)); return; }
-        drawCheckAnswers(lib.checkAnswers(k.data, a.data, nameOf), last);
-      });
-    });
-
-    // Anything a person did since the session began: a share, an item in
-    // the queue, an answer, or feedback on someone's work.
+  // What the site really knows about each learner, and what really waits for
+  // the leader. It cannot see who was in a call, so it never says who was not.
+  function loadFacts(sessions, people) {
+    var t = lib.currentAndNext(sessions, new Date(), current.session_minutes), next = t.next;
+    var learners = people.filter(function (p) { return p.status !== 'left' && (p.role === 'student' || p.role === 'mentor'); });
     Promise.all([
-      db.from('shares').select('user_id, created_at').eq('cohort_id', current.id).gte('created_at', since),
-      db.from('live_queue').select('user_id, created_at').eq('cohort_id', current.id).gte('created_at', since),
-      db.from('live_answers').select('user_id, updated_at').eq('cohort_id', current.id).gte('updated_at', since),
-      db.from('feedback').select('author_id, created_at, shares!inner(cohort_id)').eq('shares.cohort_id', current.id).gte('created_at', since)
+      next ? db.from('prep_answers').select('user_id').eq('session_id', next.id) : Promise.resolve({ data: [] }),
+      db.from('live_queue').select('user_id').eq('cohort_id', current.id).eq('state', 'shown'),
+      db.from('shares').select('id, feedback(id)').eq('cohort_id', current.id)
     ]).then(function (res) {
-      var bad = res.filter(function (r) { return r.error; })[0];
-      if (bad) { say('[data-not-seen-intro]', 'This list could not be worked out just now: ' + bad.error.message); return; }
-      var activity = [].concat(
-        res[0].data.map(function (x) { return { user_id: x.user_id, at: x.created_at }; }),
-        res[1].data.map(function (x) { return { user_id: x.user_id, at: x.created_at }; }),
-        res[2].data.map(function (x) { return { user_id: x.user_id, at: x.updated_at }; }),
-        res[3].data.map(function (x) { return { user_id: x.author_id, at: x.created_at }; }));
-      reachLoaded.then(function () { drawNotSeen(lib.notSeen(people, since, activity), last); });
+      var answered = {}, shown = {};
+      (res[0].data || []).forEach(function (r) { answered[r.user_id] = true; });
+      (res[1].data || []).forEach(function (r) { shown[r.user_id] = true; });
+      var hasPrep = next && Array.isArray(next.prep_questions) && next.prep_questions.some(function (q) { return q && q.kind !== 'exchange'; });
+      learners.forEach(function (p) {
+        var box = $('[data-facts-for="' + p.user_id + '"]');
+        if (!box) return;
+        box.replaceChildren();
+        if (hasPrep) box.appendChild(el('span', 'person-fact' + (answered[p.user_id] ? ' is-yes' : ''), (answered[p.user_id] ? 'Answered ' : 'Not yet: ') + sessionPhrase(next.number) + ' pre-work'));
+        if (shown[p.user_id]) box.appendChild(el('span', 'person-fact is-yes', 'Has shown their work'));
+      });
+      var count = Object.keys(answered).length;
+      needs.set('prep', hasPrep && count ? { count: count, text: count + ' of ' + learners.length + ' answered the ' + sessionPhrase(next.number) + ' pre-work', href: lib.sessionUrl(current.slug, next.number) + '&t=before', action: 'Read them' } : null);
+      var quiet = (res[2].data || []).filter(function (x) { return !(x.feedback || []).length; }).length;
+      needs.set('shares', quiet ? { count: quiet, text: quiet === 1 ? 'A share with no feedback yet' : quiet + ' shares with no feedback yet', tab: 'week', action: 'See them' } : null);
     });
-
-    reachLoaded.then(function () { loadFollowups(last, sessions, people, nameOf); });
   }
 
   // How each person chose to be reached when they are not on the site
@@ -359,7 +332,6 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
   function loadFollowups(last, sessions, people, nameOf) {
     var box = $('[data-followups]');
     if (!F || !box) return;
-    say('[data-followups-title]', 'Following up on ' + sessionPhrase(last.number));
     say('[data-followups-intro]', '');
     box.replaceChildren(el('p', 'small', 'Gathering what each person did around the session…'));
     var w = F.sessionWindow(sessions, last);
@@ -419,7 +391,11 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
       ran.appendChild(ol);
       box.appendChild(ran);
     }
-    order.forEach(function (p) { box.appendChild(followupCard(p, byId[p.user_id], last, notesReady, who)); });
+    order.forEach(function (p) {
+      var slot = $('[data-follow-for="' + p.user_id + '"]');
+      if (slot) { slot.replaceChildren(followupCard(p, byId[p.user_id], last, notesReady, who)); return; }
+      box.appendChild(followupCard(p, byId[p.user_id], last, notesReady, who));
+    });
   }
 
   // Correcting a note or feedback you sent (DECISIONS.md, "Notes to
@@ -466,8 +442,8 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
     var key = F.draftKey(current.id, last.id, p.user_id);
     var card = el('details', 'cohort-card followup');
     var sum = el('summary');
-    sum.appendChild(el('strong', null, name));
-    var gist = c.muddy ? 'Still muddy: ' + c.muddy.text
+    sum.appendChild(el('strong', null, 'Write about ' + sessionPhrase(last.number)));
+    var gist = c.muddy ? 'Still unclear: ' + c.muddy.text
       : c.bringBacks.length ? (c.bringBacks[0].readiness === 'ready' ? 'Brought something back, marked ready' : c.bringBacks[0].readiness === 'not-yet' ? 'Brought something back, marked not yet' : 'Brought something back')
       : c.empty ? 'Nothing from them around this session' : 'Took part without a bring-back';
     var gistEl = el('span', 'small followup-gist', gist);
@@ -583,47 +559,7 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
     return card;
   }
 
-  function drawCheckAnswers(checks, last) {
-    var box = $('[data-check-answers]');
-    box.replaceChildren();
-    say('[data-checks-heard-intro]', checks.length ? '' : 'No questions were asked in ' + sessionPhrase(last.number) + '.');
-    checks.forEach(function (k) {
-      var card = el('article', 'cohort-card check-answers');
-      card.appendChild(el('h4', null, k.prompt));
-      if (!k.answers.length) card.appendChild(el('p', 'small', 'No one answered this one.'));
-      else {
-        var ul = el('ul', 'answer-list');
-        k.answers.forEach(function (a) {
-          var li = el('li');
-          li.appendChild(el('strong', null, a.name + ': '));
-          li.appendChild(document.createTextNode(a.text));
-          ul.appendChild(li);
-        });
-        card.appendChild(ul);
-      }
-      box.appendChild(card);
-    });
-  }
 
-  function drawNotSeen(list, last) {
-    var ul = $('[data-not-seen]');
-    ul.replaceChildren();
-    say('[data-not-seen-intro]', list.length ? '' : 'Everyone has taken part since ' + sessionPhrase(last.number) + ' began.');
-    list.forEach(function (p) {
-      var li = el('li');
-      li.appendChild(el('strong', null, personName(p)));
-      if (p.profiles) {
-        var gh = el('a', null, ' @' + p.profiles.github_login); gh.href = 'https://github.com/' + encodeURIComponent(p.profiles.github_login);
-        li.appendChild(gh);
-      }
-      var mail = emailLink(p, '');
-      var how = el('span', 'small followup-line');
-      if (mail) { how.appendChild(document.createTextNode('They said you may email them. ')); how.appendChild(mail); }
-      else how.textContent = 'No email. A note reaches them.';
-      li.appendChild(how);
-      ul.appendChild(li);
-    });
-  }
 
   // The lesson the cohort sends back to the template (COURSE.md, "What
   // a cohort gives back"), offered once the last session has begun or
@@ -717,32 +653,41 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
     box.replaceChildren();
     var here = people.filter(function (p) { return p.status !== 'left'; });
     if (!here.length) { box.appendChild(U.empty(current.status === 'open' ? 'No one has joined yet' : 'No learners yet')); return; }
-    var list = U.rows();
+    var grid = el('div', 'person-grid');
     here.forEach(function (p) {
       var login = p.profiles ? p.profiles.github_login : null;
-      var detail = el('span', 'ui-row-meta');
-      if (login) detail.appendChild(document.createTextNode('@' + login));
-      if (p.app_repo) {
-        detail.appendChild(document.createTextNode((login ? ', ' : '') + 'building '));
-        var r = el('a', null, p.app_name || p.app_repo); r.href = 'https://github.com/' + p.app_repo;
-        detail.appendChild(r);
-      }
+      var card = el('article', 'person-card');
+      var head = el('div', 'person-head');
+      var who = login ? el('a', 'person-name', personName(p)) : el('span', 'person-name', personName(p));
+      if (login) { who.href = 'https://github.com/' + encodeURIComponent(login); who.target = '_blank'; who.rel = 'noopener'; }
+      head.appendChild(who);
+      if (p.role === 'mentor') head.appendChild(el('span', 'role-tag', 'Returning'));
+      var st = current.github_repo ? accessStatus(p) : null;
+      if (st) head.appendChild(st);
+      card.appendChild(head);
+      var work = el('p', 'person-work');
+      if (p.app_url) { var a = el('a', null, p.app_name || p.app_url.replace(/^https:\/\//, '')); a.href = p.app_url; a.target = '_blank'; a.rel = 'noopener'; work.appendChild(a); }
+      else work.textContent = p.app_name || 'No app added yet';
+      if (p.app_repo) { work.appendChild(document.createTextNode(' · ')); var r = el('a', null, 'Repository'); r.href = 'https://github.com/' + p.app_repo; r.target = '_blank'; r.rel = 'noopener'; work.appendChild(r); }
+      card.appendChild(work);
+      var facts = el('div', 'person-facts'); facts.setAttribute('data-facts-for', p.user_id);
+      card.appendChild(facts);
+      var slot = el('div', 'person-follow'); slot.setAttribute('data-follow-for', p.user_id);
+      card.appendChild(slot);
       var msg = el('span', 'ui-inline-status'); msg.setAttribute('role', 'status');
-      var actions = [];
-      if (current.github_repo) actions.push(repoRole(p, people, msg));
-      if (window.MentorLib && (p.role === 'student' || p.role === 'mentor')) actions.push(roleSwitch(p, people, msg));
-      var row = U.row({
-        title: personName(p),
-        href: login ? 'https://github.com/' + encodeURIComponent(login) : null,
-        detail: detail,
-        status: current.github_repo ? accessStatus(p) : null,
-        actions: actions
-      });
-      tagRow(row, p.role === 'mentor' ? ['Learner', 'Returning'] : ['Learner']);
-      row.querySelector('.ui-row-main').appendChild(msg);
-      list.appendChild(row);
+      var more = [];
+      if (current.github_repo) more.push(repoRole(p, people, msg));
+      if (window.MentorLib && (p.role === 'student' || p.role === 'mentor')) more.push(roleSwitch(p, people, msg));
+      if (more.length) {
+        var d = el('details', 'ui-disclosure person-more');
+        d.appendChild(el('summary', null, 'Roles'));
+        more.forEach(function (m) { d.appendChild(m); });
+        d.appendChild(msg);
+        card.appendChild(d);
+      }
+      grid.appendChild(card);
     });
-    box.appendChild(list);
+    box.appendChild(grid);
   }
 
   // A row's role tags sit on the line of its title.

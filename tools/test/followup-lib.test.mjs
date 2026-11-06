@@ -90,7 +90,7 @@ const data = {
   queue: [{ user_id: 'b', url: 'https://bea.github.io/garden-swap', kind: 'app', state: 'shown', created_at: '2026-10-13T23:10:00Z' }, { user_id: 'c', url: 'https://x.org', kind: 'link', state: 'waiting', created_at: '2026-10-13T23:11:00Z' }],
   checks: [
     { id: 'k1', prompt: 'What can you decide now?', choices: null, created_at: '2026-10-14T00:10:00Z' },
-    { id: 'k2', prompt: 'What is still muddy?', choices: null, created_at: '2026-10-14T00:11:00Z' },
+    { id: 'k2', prompt: 'What is still unclear?', choices: null, created_at: '2026-10-14T00:11:00Z' },
     { id: 'k3', prompt: 'Which?', choices: ['Planning', 'Testing'], created_at: '2026-10-14T00:05:00Z' },
   ],
   answers: [
@@ -128,7 +128,7 @@ test('a follow-up goes on the newest bring-back, or as a note when there is none
   assert.deepEqual(lib.followupTarget(lib.contributions('z', w, data)), { kind: 'note' });
 });
 
-test('the list puts anyone still muddy first, then everyone by name, and leaves out teachers and leavers', () => {
+test('the list puts anyone still unclear first, then everyone by name, and leaves out teachers and leavers', () => {
   const byId = { c: { muddy: { text: 'All of it' } }, b: { muddy: null } };
   const order = lib.followupOrder(people.concat([{ user_id: 't', status: 'enrolled', role: 'teacher', profiles: { github_login: 'ben' } }]), byId);
   assert.deepEqual(order.map((p) => p.user_id), ['c', 'b', 'e', 'f']);

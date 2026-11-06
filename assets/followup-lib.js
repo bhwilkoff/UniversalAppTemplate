@@ -135,7 +135,7 @@
     return t >= Date.parse(w.from) && (!w.to || t < Date.parse(w.to));
   }
 
-  function isMuddy(prompt) { return /muddy/i.test(String(prompt || '')); }
+  function isMuddy(prompt) { return /muddy|unclear/i.test(String(prompt || '')); }
 
   // What one student contributed to a session, on purpose, from what the
   // teacher can already read. data: shares (the cohort's, each with its

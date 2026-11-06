@@ -125,6 +125,8 @@
     stages.forEach(function (n) { var li = el('li'); li.appendChild(link('Stage ' + n, '/path/' + n + '/')); stageBox.appendChild(li); });
     $('[data-stages-section]').hidden = !stages.length;
 
+    K.started = !!(session.starts_at && Date.parse(session.starts_at) < Date.now());
+    if (leading && K.started) drawAfter(cohort, session);
     if (leading) drawDetails(session);
     $('[data-details]').hidden = !leading;
     return bringReady.then(function (bring) { drawViews(session, leading, finished, !!play, bring, stages.length > 0); show('ready'); });
@@ -141,6 +143,7 @@
     if (before) add('before', 'Before');
     if (!leading) add('plan', 'Plan');
     if (played && !finished) add('recording', 'Recording');
+    if (leading && K.started) add('after', 'After');
     if (leading) add('details', 'Details');
     // A part's address names the view too, and the row's links never carry a part.
     var url = new URL(location.href), opened = url.searchParams.get('part');
@@ -365,6 +368,45 @@
       sec.hidden = !bring || !!finished;
       if (bring) $('[data-bring]').textContent = bring.config.prompt;
       return bring || null;
+    });
+  }
+
+  // What came of a session, for its leaders: what was answered, and what they
+  // heard. Nothing is scored, because a question here has no right answer.
+  function drawAfter(cohort, session) {
+    var box = $('[data-after-answers]'), f = $('[data-heard-form]'), said = $('[data-heard-message]');
+    box.replaceChildren();
+    f.hidden = !('heard' in session);
+    f.elements.heard.value = session.heard || '';
+    f.onsubmit = function (ev) {
+      ev.preventDefault();
+      U.say(said, 'Saving');
+      db.from('sessions').update({ heard: f.elements.heard.value.trim() || null }).eq('id', session.id).then(function (r) {
+        U.say(said, r.error ? 'Not saved: ' + r.error.message : 'Saved', r.error ? 'problem' : undefined);
+      });
+    };
+    Promise.all([
+      db.from('live_checks').select('*').eq('session_id', session.id),
+      db.from('live_answers').select('*').eq('cohort_id', cohort.id),
+      db.from('enrollments').select('user_id, profiles(github_login, display_name)').eq('cohort_id', cohort.id)
+    ]).then(function (res) {
+      if (res[0].error || res[1].error) { box.appendChild(el('p', 'small', 'The answers could not be read.')); return; }
+      var names = {};
+      (res[2].data || []).forEach(function (e) { names[e.user_id] = e.profiles ? (e.profiles.display_name || e.profiles.github_login) : 'Someone'; });
+      var ids = res[0].data.map(function (k) { return k.id; });
+      var rows = (res[1].data || []).filter(function (a) { return ids.indexOf(a.check_id) >= 0; });
+      var checks = window.TeachLib.checkAnswers(res[0].data, rows, function (id) { return names[id] || 'Someone'; });
+      if (!checks.length) box.appendChild(U.empty('No questions were asked in this session'));
+      checks.forEach(function (k) {
+        var card = el('div', 'session-prep-q');
+        card.appendChild(el('h3', null, k.prompt));
+        if (!k.answers.length) card.appendChild(el('p', 'small', 'No answers.'));
+        k.answers.forEach(function (a) {
+          var p = el('p'); p.appendChild(el('strong', null, a.name + ': ')); p.appendChild(document.createTextNode(a.text));
+          card.appendChild(p);
+        });
+        box.appendChild(card);
+      });
     });
   }
 

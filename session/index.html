@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261107b">
+  <link rel="stylesheet" href="/assets/site.css?v=20261107c">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -116,6 +116,20 @@
             </section>
           </div>
 
+          <div data-tab="after" hidden>
+            <section class="session-after" aria-label="What came of it">
+              <p class="ui-meta-line"><span data-vis="staff"></span></p>
+              <div data-after-answers></div>
+              <form class="cohort-form" data-heard-form>
+                <label>What I heard, and what changes
+                  <span class="hint"><span data-vis="cohort"></span> Shown as people arrive next session.</span>
+                  <textarea name="heard" rows="4" maxlength="2000"></textarea>
+                </label>
+                <div class="actions"><button class="btn-secondary" type="submit">Save</button><span class="ui-inline-status" role="status" data-heard-message></span></div>
+              </form>
+            </section>
+          </div>
+
           <div data-tab="recording" hidden>
             <section class="session-recording" id="recording" aria-label="The recording" data-recording-section hidden>
               <video controls playsinline preload="metadata" data-recording-video style="width:100%;border-radius:.75rem;background:#000"></video>
@@ -139,7 +153,7 @@
   </main>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" defer></script>
   <script src="/assets/hub-config.js?v=20261016a" defer></script>
-  <script src="/assets/cohort-lib.js?v=20261104a" defer></script>
+  <script src="/assets/cohort-lib.js?v=20261107a" defer></script>
   <script src="/assets/live-lib.js" defer></script>
   <script src="/assets/question-view.js?v=20261106a" defer></script>
   <script src="/assets/board-lib.js" defer></script>
@@ -148,15 +162,15 @@
   <script src="/assets/slide-model.js?v=20261106c" defer></script>
   <script src="/assets/github-block.js?v=20261107a" defer></script>
   <script src="/assets/slide-studio.js?v=20261106e" defer></script>
-  <script src="/assets/show-lib.js?v=20261024c" defer></script>
+  <script src="/assets/show-lib.js?v=20261107a" defer></script>
   <script src="/assets/curriculum-pages-lib.js" defer></script>
   <script src="/assets/teach-lib.js?v=20261029x" defer></script>
-  <script src="/assets/curriculum-lib.js?v=20261023d" defer></script>
-  <script src="/assets/curriculum-seed.js?v=20261023b" defer></script>
+  <script src="/assets/curriculum-lib.js?v=20261107a" defer></script>
+  <script src="/assets/curriculum-seed.js?v=20261107a" defer></script>
   <script src="/assets/show-builder.js?v=20261106g" defer></script>
   <script src="/assets/cohort-nav.js?v=20261106a" defer></script>
   <script src="/assets/record-lib.js?v=20261104a" defer></script>
-  <script src="/assets/session.js?v=20261106a" defer></script>
+  <script src="/assets/session.js?v=20261107a" defer></script>
 
   <footer class="site-footer">
     <div class="wrap">

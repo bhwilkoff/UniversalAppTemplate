@@ -1303,3 +1303,7 @@ refuses, the Accept button still leads to GitHub's own page.
 
 **After a sign-in, the page hands GitHub's refresh token to the server before it does anything else, and a tab never holds the token that came with it.** **Why:** found November 6, 2026 with a real pending invitation. Trading the refresh token retires the access token from the sign-in, so tabs held a dead token and GitHub answered 401; and the account page redirected before the trade, so some sign-ins were never kept at all. **How to apply:** `keepGitHubToken` resolves before the redirect, and a 401 asks the server for a fresh token. Signing out of the panel leaves the server's token alone.
 
+## The cohort page says only what the site knows
+
+**A row in Waiting for you is something only the leader can act on, and a learner is described only by what they did, never by what the site failed to record.** Ben, November 6, 2026, of a row reading "Not seen since week 1 began": "What are these?" **Why:** that row named three people who were in the call, because the add-on had failed for them and the site cannot see a call. A count of everyone is no count at all. **How to apply:** COHORT-DESIGN.md is binding. Meet's API can list who attended, but it needs a new Google permission and the meeting owner's sign-in, and guests come back as bare display names; add that as a decision, not by default.
+

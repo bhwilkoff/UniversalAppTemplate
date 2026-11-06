@@ -280,7 +280,7 @@
   // review). The teacher reads both before the next session.
   var CLOSING_CHECKS = [
     'What can you decide or judge about your app now that you could not last week?',
-    'What is still muddy?'
+    'What is still unclear?'
   ];
 
   // The trio protocol (the notes' 3.3 and 6.1: the Tuning protocol and
