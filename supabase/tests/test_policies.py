@@ -3105,6 +3105,13 @@ def main():
     check("a guest can read the names of the people in the cohort", g.fetchall() == [(1,)])
     g = as_user("gus"); g.execute("select count(*) from public.profiles where id = %s", (people["dee"],))
     check("and no one else's", g.fetchall() == [(0,)])
+    as_system()
+    su.execute("update public.enrollments set app_url = 'https://bea.example/app/' where cohort_id = %s and user_id = %s", (cc, people["bea"]))
+    check("a guest cannot put a member's app on the stage", not attempt(as_user("gus"), "select public.queue_member_app(%s, %s)", (ss, people["bea"])))
+    check("a leader puts a member's app on the stage", attempt(as_user("ben"), "select public.queue_member_app(%s, %s)", (ss, people["bea"])))
+    first_app = last_rows[0][0]
+    attempt(as_user("ben"), "select public.queue_member_app(%s, %s)", (ss, people["bea"]))
+    check("asking twice makes one item", last_rows[0][0] == first_app)
     check("a leader can undo a match", attempt(as_user("ben"), "select public.tie_call_guest(%s, %s, null)", (cc, gid)))
     su.execute("reset role")
     su.execute("select count(*) from public.live_answers where cohort_id = %s and user_id = %s", (cc, gid))

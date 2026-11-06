@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261106k">
+  <link rel="stylesheet" href="/assets/site.css?v=20261106s">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -70,7 +70,8 @@
         <p class="stage-quiet" data-count-note hidden></p>
         <p class="stage-quiet" data-count-total hidden></p>
         <p class="stage-quiet" data-rerun-key hidden>The grey line under each bar is how people answered the first time.</p>
-        <p class="stage-quiet">Answer in your Human Shaped panel, where only you and your leader see what you said.</p>
+        <form class="stage-write" data-stage-write hidden></form>
+        <p class="stage-quiet" data-answer-panel>Answer in your Human Shaped panel, where only you and your leader see what you said.</p>
       </div>
 
       <!-- The current scene of the run of show, as the teacher wrote it (R3). -->
@@ -124,6 +125,10 @@
         <p class="stance-key"><span data-stk="agree"></span><span data-stk="unsure"></span><span data-stk="disagree"></span></p>
       </div>
 
+      <div class="stage-app" data-view="app" hidden>
+        <div class="stage-app-bar"><strong><span data-app-who></span>’s app</strong><span class="stage-app-note" data-app-note></span><a class="stage-app-open" data-app-open target="_blank" rel="noopener">Open in a new tab</a></div>
+        <div class="stage-app-frame" data-app-frame></div>
+      </div>
       <div class="stage-body" data-view="item" hidden>
         <p class="kicker">Showing their work</p>
         <h1 class="stage-title" data-who></h1>
@@ -131,15 +136,16 @@
         <p class="stage-note" data-note hidden></p>
         <p class="stage-audience" data-audience hidden></p>
       </div>
+      <div class="stage-reacts" data-stage-reacts></div>
     </section>
   </main>
   <script src="https://www.gstatic.com/meetjs/addons/1.2.0/meet.addons.js" defer></script>
   <script src="/assets/vendor/deck-kit.js?v=20261104e" defer></script>
   <script src="/assets/addon-config.js" defer></script>
   <script src="/assets/live-lib.js" defer></script>
-  <script src="/assets/addon-lib.js?v=20261106j" defer></script>
+  <script src="/assets/addon-lib.js?v=20261106q" defer></script>
   <script src="/assets/react-lib.js?v=20261106j" defer></script>
   <script src="/assets/code-lib.js" defer></script>
-  <script src="/assets/addon-stage.js?v=20261106p" defer></script>
+  <script src="/assets/addon-stage.js?v=20261106q" defer></script>
 </body>
 </html>

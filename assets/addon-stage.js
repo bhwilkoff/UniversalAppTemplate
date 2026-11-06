@@ -19,26 +19,6 @@
   try { framed = window.self !== window.top; } catch (e) { framed = true; }
   if (!A || !L || !framed || !window.meet || !window.meet.addon) { show('outside'); return; }
 
-  // A measurement, for a test cohort only: what this frame is allowed to do.
-  function probe(url) {
-    if (document.getElementById('hs-probe')) return;
-    var box = el('div'); box.id = 'hs-probe';
-    box.style.cssText = 'position:fixed;inset:0;z-index:99;display:grid;grid-template-rows:auto 1fr;background:#131916;color:#fff;font:15px/1.4 sans-serif';
-    var out = el('pre'); out.style.cssText = 'margin:0;padding:8px;white-space:pre-wrap';
-    var f = document.createElement('iframe'); f.src = url; f.style.cssText = 'width:100%;height:100%;border:0;background:#fff';
-    box.appendChild(out); box.appendChild(f); document.body.appendChild(box);
-    function say(t) { out.textContent += t + '  '; }
-    var keys = []; try { keys = Object.keys(localStorage); } catch (e) { say('storage ERR ' + e.name); }
-    say('auth-in-storage ' + keys.some(function (k) { return /auth-token/.test(k); }));
-    f.addEventListener('load', function () { say('iframe load'); });
-    f.addEventListener('error', function () { say('iframe error'); });
-    document.addEventListener('securitypolicyviolation', function (e) { say('CSP ' + e.violatedDirective + ' ' + e.blockedURI); });
-    fetch('https://api.github.com/repos/humanshaped/.github').then(function (r) { say('github ' + r.status); }, function (e) { say('github ERR ' + e.message); });
-    say('sandbox? ' + (window.frameElement ? 'same' : 'cross'));
-    say('featurePolicy ' + (document.featurePolicy ? document.featurePolicy.allowedFeatures().slice(0, 40).join(',') : 'n/a'));
-    window.addEventListener('click', function () { say('click'); });
-  }
-
   function clockText(part) {
     var left = part ? A.timeLeft(part.endsAt, Date.now()) : null;
     if (left == null) return '';
@@ -50,7 +30,7 @@
     $('[data-stage-rec]').hidden = !view.recording;
     var part = view.part;
     // The part sits small at the top when something else has the stage.
-    $('[data-part]').hidden = view.mode === 'part' || view.mode === 'welcome' || view.mode === 'scene' || view.mode === 'slides' || view.mode === 'blank' || !part;
+    $('[data-part]').hidden = view.mode === 'part' || view.mode === 'welcome' || view.mode === 'scene' || view.mode === 'app' || view.mode === 'slides' || view.mode === 'blank' || !part;
     if (view.mode === 'slides') drawSlide(view.slides);
     if (view.mode === 'scene') {
       var sc = view.scene;
@@ -90,8 +70,23 @@
       root.querySelector('[data-view="check"]').classList.toggle('has-long', long || String(view.prompt || '').length > 90);
       // A scale reads as one row of points, not a tall list.
       ul.classList.toggle('scale', view.kind === 'scale' && !(count && count.rows.length));
-      rows.forEach(function (row) {
+      var mine = view.mine || {}, picks = mine.picks || (mine.choice ? [mine.choice] : []);
+      var pickable = view.answerable && !(count && count.rows.length) && ['choice', 'scale', 'multi'].indexOf(view.kind) >= 0;
+      ul.classList.toggle('is-pickable', !!pickable);
+      rows.forEach(function (row, n) {
         var li = el('li');
+        if (pickable) {
+          var pick = el('button', 'stage-pick'); pick.type = 'button';
+          pick.setAttribute('aria-pressed', String(picks.indexOf(n + 1) >= 0));
+          pick.appendChild(el('span', 'label', row.label));
+          pick.addEventListener('click', function () {
+            var on = picks.indexOf(n + 1) >= 0, next = view.kind === 'multi' ? (on ? picks.filter(function (x) { return x !== n + 1; }) : picks.concat([n + 1])) : null;
+            act(view.kind === 'multi' ? { a: 'answer', id: view.id, picks: next } : { a: 'answer', id: view.id, choice: n + 1 });
+          });
+          li.appendChild(pick);
+          ul.appendChild(li);
+          return;
+        }
         li.appendChild(el('span', 'label', row.label));
         if (count && row.text != null) {
           var bar = el('span', 'bar'); bar.style.setProperty('--share', row.share + '%');
@@ -103,6 +98,8 @@
         ul.appendChild(li);
       });
       ul.classList.toggle('counted', !!(count && count.rows.length));
+      drawWriting();
+      $('[data-answer-panel]').hidden = !!view.answerable && view.kind !== 'rank';
       var words = $('[data-words]'); words.replaceChildren();
       words.hidden = !(count && count.words.length);
       if (count) count.words.forEach(function (w) { words.appendChild(el('li', 'size-' + w.size, w.word)); });
@@ -146,6 +143,7 @@
       $('[data-w-first]').hidden = !w.first;
       $('[data-w-first]').textContent = w.first ? 'First: ' + w.first.name + '. ' + (w.first.what || '') : '';
     }
+    drawApp(view.mode === 'app' ? view : null);
     if (view.mode === 'item') {
       $('[data-who]').textContent = view.who;
       $('[data-what]').textContent = view.what;
@@ -184,6 +182,58 @@
   // The board in its own frame, made once per board so a new message (a
   // clock tick, a title edit) never reloads it while people draw.
   var boardSrc = null;
+  // Everyone's own working copy of a person's app. The frame stays put through
+  // every later message, or a person's place in the app would be lost.
+  var appUrl = null;
+  function drawApp(v) {
+    var box = $('[data-app-frame]');
+    if (!v) { if (appUrl) { appUrl = null; box.replaceChildren(); } return; }
+    $('[data-app-who]').textContent = v.who;
+    $('[data-app-open]').href = v.url;
+    $('[data-app-note]').textContent = v.audience || v.note || '';
+    if (v.url === appUrl) return;
+    appUrl = v.url;
+    var f = document.createElement('iframe');
+    f.src = v.url;
+    f.title = v.who + '’s app';
+    f.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-modals allow-downloads');
+    f.setAttribute('allow', 'clipboard-read; clipboard-write');
+    box.replaceChildren(f);
+  }
+
+  // A question in their own words, typed on the stage.
+  function drawWriting() {
+    var box = $('[data-stage-write]');
+    var on = view.answerable && (view.kind === 'short' || view.kind === 'words') && !(view.count && view.count.rows.length);
+    box.hidden = !on;
+    if (!on) { box.replaceChildren(); box.dataset.id = ''; return; }
+    if (box.dataset.id === view.id && box.contains(document.activeElement)) return;
+    box.dataset.id = view.id;
+    box.replaceChildren();
+    var input = el(view.kind === 'words' ? 'input' : 'textarea');
+    input.setAttribute('aria-label', 'Your answer');
+    if (view.kind === 'words') input.maxLength = 60; else { input.rows = 2; input.maxLength = 1000; }
+    input.value = (view.mine && view.mine.body) || '';
+    var send = el('button', 'stage-send', view.mine && view.mine.body ? 'Change my answer' : 'Send my answer');
+    box.appendChild(input); box.appendChild(send);
+    box.onsubmit = function (ev) { ev.preventDefault(); if (input.value.trim()) { act({ a: 'answer', id: view.id, body: input.value }); send.textContent = 'Sent'; } };
+  }
+
+  var stageClient = null;
+  function act(a) { if (stageClient) try { Promise.resolve(stageClient.notifySidePanel(A.actMessage(a))).catch(function () {}); } catch (e) {} }
+
+  // Reactions, within reach on the stage itself.
+  function drawReactBar() {
+    var bar = $('[data-stage-reacts]');
+    if (!bar || !window.ReactLib || bar.childElementCount) return;
+    window.ReactLib.REACTIONS.forEach(function (r) {
+      var b = el('button', 'stage-react'); b.type = 'button';
+      b.textContent = r.emoji; b.title = r.label; b.setAttribute('aria-label', r.label);
+      b.addEventListener('click', function () { act({ a: 'react', key: r.key }); });
+      bar.appendChild(b);
+    });
+  }
+
   function drawBoard(src) {
     var box = $('[data-s-board]');
     root.querySelector('[data-view="scene"]').classList.toggle('has-board', !!src);
@@ -264,8 +314,9 @@
     ]).then(function (session) {
       return session.createMainStageClient();
     }).then(function (stage) {
+      stageClient = stage;
+      drawReactBar();
       stage.on('frameToFrameMessage', function (m) {
-        if (m && typeof m.payload === 'string' && m.payload.indexOf('hs-probe') > 0) return probe(JSON.parse(m.payload).url);
         var react = m && window.ReactLib ? window.ReactLib.readStage(m.payload) : null;
         if (react) return drawReactions(react);
         var code = m && window.CodeLib ? window.CodeLib.readStage(m.payload) : null;

@@ -101,6 +101,30 @@
   //   state.items    live_queue rows;  state.names { [userId]: name }
   //   state.welcome  CohortLib.welcome(), shown when the teacher puts it
   //                  on the stage, and before any part has begun
+  function frameable(url) {
+    var u;
+    try { u = new URL(String(url || '')); } catch (e) { return null; }
+    if (u.protocol !== 'https:' || /(^|\.)github\.com$/.test(u.hostname)) return null;
+    return u.href.length > 500 ? null : u.href;
+  }
+  // What this person answered, for their own stage only.
+  function mineOf(m) {
+    if (!m || typeof m !== 'object') return null;
+    var out = {};
+    if (typeof m.choice === 'number') out.choice = m.choice;
+    if (Array.isArray(m.picks)) out.picks = m.picks.filter(function (x) { return typeof x === 'number'; }).slice(0, 12);
+    if (typeof m.body === 'string') out.body = cut(m.body, 1000);
+    return out;
+  }
+  // A stage asks its own panel to act: the stage has no sign-in, and the panel does.
+  function actMessage(act) { return JSON.stringify({ type: STAGE + '-act', act: act }); }
+  function readAct(payload) {
+    try {
+      var m = JSON.parse(payload);
+      return m && m.type === STAGE + '-act' && m.act && typeof m.act === 'object' ? m.act : null;
+    } catch (e) { return null; }
+  }
+
   function stageView(state) {
     state = state || {};
     var part = state.part ? { key: cut(state.part.key, 20), name: cut(state.part.name, 80), endsAt: num(state.part.endsAt) } : null;
@@ -117,7 +141,7 @@
         var L = live();
         var kind = L ? L.kindOf(k) : (k.choices ? 'choice' : 'short');
         var labels = kind === 'scale' && L ? L.scaleLabels(k) : kind === 'short' || kind === 'words' ? null : k.choices;
-        var view = { mode: 'check', part: part, kind: kind, prompt: cut(k.prompt, 500), choices: labels ? labels.map(function (c) { return cut(c, 120); }) : null, count: null };
+        var view = { mode: 'check', id: k.id, answerable: !!state.answerable, mine: state.mineOf ? state.mineOf(k) : null, part: part, kind: kind, prompt: cut(k.prompt, 500), choices: labels ? labels.map(function (c) { return cut(c, 120); }) : null, count: null };
         if (k.show_tally && kind !== 'short' && L) {
           var summary = (state.results || {})[k.id];
           if (!summary && state.tallies) {
@@ -152,6 +176,14 @@
       var i = (state.items || []).filter(function (x) { return x.id === on.id; })[0];
       if (i) {
         var label = live() ? live().itemLabel(i) : i.url;
+        // A live page opens on the stage, and everyone uses their own copy.
+        // GitHub refuses to be framed, so its links stay as words.
+        var frame = frameable(i.url);
+        if (frame) {
+          var appView = { mode: 'app', part: part, who: cut((state.names || {})[i.user_id] || 'Someone', 80), url: frame, note: i.note ? cut(i.note, 300) : null };
+          if (typeof state.audience === 'string' && state.audience) appView.audience = cut(state.audience, 300);
+          return appView;
+        }
         var itemView = { mode: 'item', part: part, who: cut((state.names || {})[i.user_id] || 'Someone', 80), what: cut(label, 200), note: i.note ? cut(i.note, 300) : null };
         // The audience's part, from the current presenter scene (R7).
         if (typeof state.audience === 'string' && state.audience) itemView.audience = cut(state.audience, 300);
@@ -251,9 +283,16 @@
           note: typeof v.count.note === 'string' && v.count.note ? cut(v.count.note, 200) : null
         };
       }
-      var cv = { mode: 'check', part: part, kind: kinds.indexOf(v.kind) >= 0 ? v.kind : 'choice', prompt: cut(v.prompt, 500), choices: choices, count: count };
+      var cv = { mode: 'check', id: typeof v.id === 'string' ? cut(v.id, 40) : null, answerable: v.answerable === true, mine: mineOf(v.mine), part: part, kind: kinds.indexOf(v.kind) >= 0 ? v.kind : 'choice', prompt: cut(v.prompt, 500), choices: choices, count: count };
       if (v.rerun === true) cv.rerun = true;
       return cv;
+    }
+    if (v.mode === 'app') {
+      var live = frameable(v.url);
+      if (!live) return null;
+      var av = { mode: 'app', part: part, who: cut(v.who || 'Someone', 80), url: live, note: v.note ? cut(v.note, 300) : null };
+      if (typeof v.audience === 'string' && v.audience) av.audience = cut(v.audience, 300);
+      return av;
     }
     if (v.mode === 'item' && typeof v.what === 'string') {
       var iv = { mode: 'item', part: part, who: cut(v.who || 'Someone', 80), what: cut(v.what, 200), note: v.note ? cut(v.note, 300) : null };
@@ -349,7 +388,7 @@
 
   var lib = {
     meetingCode: meetingCode, findRoom: findRoom, panelPlan: panelPlan, timeLeft: timeLeft,
-    stageView: stageView, sceneOf: sceneOf, stageError: stageError, stageMessage: stageMessage, keyMessage: keyMessage, readKey: readKey, readStageMessage: readStageMessage, HELLO: HELLO, isHello: isHello,
+    stageView: stageView, sceneOf: sceneOf, stageError: stageError, stageMessage: stageMessage, actMessage: actMessage, readAct: readAct, frameable: frameable, keyMessage: keyMessage, readKey: readKey, readStageMessage: readStageMessage, HELLO: HELLO, isHello: isHello,
     handoff: handoff, acceptHandoff: acceptHandoff, boardLinks: boardLinks
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;

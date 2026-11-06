@@ -291,3 +291,21 @@ test('only keys that mean something leave the stage, and they arrive whole', () 
   assert.equal(lib.readKey('{"type":"other"}'), null);
   assert.equal(lib.readKey('not json'), null);
 });
+
+test('a live page opens on the stage, and GitHub stays as words', () => {
+  assert.equal(lib.frameable('https://bea.github.io/app/'), 'https://bea.github.io/app/');
+  assert.equal(lib.frameable('https://github.com/bea/app'), null);
+  assert.equal(lib.frameable('http://bea.example/'), null);
+  assert.equal(lib.frameable('javascript:alert(1)'), null);
+  const v = lib.stageView({ onStage: { kind: 'item', id: 'i' }, items: [{ id: 'i', user_id: 'u', url: 'https://bea.github.io/app/' }], names: { u: 'Bea' } });
+  assert.equal(v.mode, 'app');
+  const back = lib.readStageMessage(lib.stageMessage(v));
+  assert.equal(back.url, 'https://bea.github.io/app/');
+  assert.equal(lib.readStageMessage(JSON.stringify({ type: JSON.parse(lib.stageMessage(v)).type, v: 1, view: { mode: 'app', url: 'http://x.test/' } })), null);
+});
+
+test('a stage asks its panel to act, in one shape only', () => {
+  assert.deepEqual(lib.readAct(lib.actMessage({ a: 'answer', id: 'k', choice: 2 })), { a: 'answer', id: 'k', choice: 2 });
+  assert.equal(lib.readAct('{"type":"other"}'), null);
+  assert.equal(lib.readAct('not json'), null);
+});

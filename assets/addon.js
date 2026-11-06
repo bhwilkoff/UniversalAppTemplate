@@ -913,6 +913,7 @@
       F.put('tools', stage);
       F.put('tools', $('[data-ask-wrap]'));
       F.put('tools', $('[data-breakouts]'));
+      S.appsBox = el('div', 'p2-apps'); F.put('tools', S.appsBox);
       F.put('tools', S.frameTools);
       F.put('people', $('[data-roster]'));
       F.put('people', $('[data-recognize]'));
@@ -1325,7 +1326,7 @@
   function setPin(v) {
     S.onStage = v;
     if (S.run && S.run.shared && S.teaching) S.run.pin(v);
-    drawQueue(); drawChecks(); drawRoster(); drawRoomsToggle(); sendStage(); drawRunInfo();
+    drawQueue(); drawChecks(); drawRoster(); drawRoomsToggle(); sendStage(); drawRunInfo(); drawApps();
   }
 
   // Whose work is on the main stage, for everyone, and, for a teacher,
@@ -1389,6 +1390,7 @@
     });
     $('[data-shown-count]').textContent = q.shown.length ? L.counted(q.shown.length, 'presentation', 'presentations') + ' so far.' : '';
     drawAskToShow(q);
+    drawApps();
   }
 
   // A learner's own way into the queue (found in the test cohort: the
@@ -1407,6 +1409,12 @@
         db.from('live_queue').delete().eq('id', mine.id).then(function () { refreshLive(); });
       }));
       return;
+    }
+    if (S.myApp) {
+      var app = L.classifyLink(S.myApp);
+      if (app) box.appendChild(button('Show my app on the main stage', 'btn-primary', function () {
+        db.from('live_queue').insert({ cohort_id: S.cohort.id, session_id: S.session.id, user_id: S.me.id, kind: app.kind, url: app.url }).then(function (r) { if (!r.error) refreshLive(); });
+      }));
     }
     var f = el('form', 'cohort-form');
     var l = el('label', null, 'What you will show');
@@ -1430,6 +1438,32 @@
       });
     });
     box.appendChild(f);
+  }
+
+  // A leader puts anyone's app on every stage in one press.
+  function drawApps() {
+    var box = S.appsBox;
+    if (!box) return;
+    box.replaceChildren();
+    var rows = S.people.filter(function (p) { return p.app_url && L.classifyLink(p.app_url); });
+    box.hidden = !rows.length;
+    if (!rows.length) return;
+    box.appendChild(el('p', 'kicker', 'Apps'));
+    var ul = el('ul', 'roster-list');
+    rows.forEach(function (p) {
+      var li = el('li', 'roster-guest');
+      li.appendChild(el('span', 'roster-name', S.names[p.user_id] || 'Someone'));
+      var live = S.onStage && S.onStage.kind === 'item' && (S.items.filter(function (x) { return x.id === S.onStage.id; })[0] || {}).user_id === p.user_id;
+      li.appendChild(button(live ? 'Take it down' : 'Show it', 'btn-secondary small', function () {
+        if (live) return setPin(null);
+        db.rpc('queue_member_app', { s: S.session.id, member: p.user_id }).then(function (r) {
+          if (r.error) return;
+          refreshLive().then(function () { setPin({ kind: 'item', id: r.data }); drawApps(); });
+        });
+      }));
+      ul.appendChild(li);
+    });
+    box.appendChild(ul);
   }
 
   function drawChecksChrome() {
@@ -1532,6 +1566,32 @@
     return d;
   }
 
+  function myAnswer(k) {
+    return S.answers.filter(function (a) { return a.check_id === k.id && (a.user_id === S.me.id || a.via_guest === S.me.id); })[0];
+  }
+  function sendAnswer(k, row) {
+    var answer = myAnswer(k);
+    var write = answer
+      ? db.from('live_answers').update(row).eq('id', answer.id)
+      : db.from('live_answers').insert(Object.assign({ check_id: k.id, cohort_id: S.cohort.id, user_id: S.me.id }, row));
+    return write.then(function (r) {
+      if (r.error) return r.error.message;
+      delete drafts[k.id]; refreshLive();
+      return null;
+    });
+  }
+  // What a person did on their own main stage, done here, where they are signed in.
+  function stageAct(a) {
+    if (a.a === 'react' && S.classChannel) return S.classChannel.press({ key: String(a.key), target: {} });
+    if (a.a !== 'answer' || S.teaching) return;
+    var k = S.checks.filter(function (x) { return x.id === a.id && x.state === 'open'; })[0];
+    if (!k) return;
+    var row = L.answerRow(k, a.body != null ? { body: String(a.body) } : a.picks ? { picks: a.picks } : { choice: a.choice });
+    if (row.error) return;
+    if (row.value == null) delete row.value;
+    sendAnswer(k, row);
+  }
+
   function studentCheck(k) {
     var answer = S.answers.filter(function (a) { return a.check_id === k.id && (a.user_id === S.me.id || a.via_guest === S.me.id); })[0];
     var card = el('article', 'cohort-card live-check');
@@ -1541,16 +1601,7 @@
     card.appendChild(Q.answer(k, answer, {
       draft: drafts[k.id],
       onDraft: function (input) { drafts[k.id] = input; },
-      onSend: function (row) {
-        var write = answer
-          ? db.from('live_answers').update(row).eq('id', answer.id)
-          : db.from('live_answers').insert(Object.assign({ check_id: k.id, cohort_id: S.cohort.id, user_id: S.me.id }, row));
-        return write.then(function (r) {
-          if (r.error) return r.error.message;
-          delete drafts[k.id]; refreshLive();
-          return null;
-        });
-      }
+      onSend: function (row) { return sendAnswer(k, row); }
     }));
     if (k.show_tally && L.kindOf(k) !== 'short') card.appendChild(resultsOf(k));
     return card;
@@ -1714,6 +1765,8 @@
       // A card outranks the part's own question; only a leader's own pin
       // outranks the card.
       card: S.onStage ? null : S.card || null,
+      answerable: !S.teaching,
+      mineOf: function (k) { var x = myAnswer(k); return x ? { choice: x.choice, picks: Array.isArray(x.value) ? x.value : undefined, body: x.body } : null; },
       onStage: S.onStage || (S.card ? null : partCheckPin()), checks: S.checks, results: S.results, items: S.items, names: S.names, audience: V ? V.audienceOf(part) : null,
       welcome: lib.welcome(S.cohort, S.session, S.list && S.list.length ? S.list : S.parts), scene: scene, slides: slidesView(part),
       path: window.RosterLib && S.onStage && S.onStage.kind === 'path' ? window.RosterLib.pathView(rosterNow()) : null,
@@ -1835,7 +1888,8 @@
       side = client;
       side.on('frameToFrameMessage', function (m) {
         if (m && A.isHello(m.payload)) { S.stageOn = true; stageButtons(true); sendStage(); S.codeStageSent = null; drawCode(); }
-        if (m && A.isHello(m.payload) && S.cohort && (S.cohort.details || {}).probe) { try { side.notifyMainStage(JSON.stringify({ type: 'hs-probe', url: S.cohort.details.probe })); } catch (e) {} }
+        var did = m && A.readAct(m.payload);
+        if (did) stageAct(did);
         var key = m && A.readKey(m.payload);
         if (key && S.classChannel) S.classChannel.press(key);
       });
