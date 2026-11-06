@@ -403,7 +403,6 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
     people.forEach(function (p) { byId[p.user_id] = F.contributions(p.user_id, w, data); });
     var order = F.followupOrder(people, byId);
     say('[data-followups-intro]', order.length ? '' : 'No one has joined yet.');
-    needs.set('followups', order.length ? { count: order.length, text: 'Follow up on ' + sessionPhrase(last.number), tab: 'followup', action: 'Write' } : null);
     // The show as it ran (R8): what everyone did together, above what each
     // person did.
     var show = F.showAsRun(data.scenes);
@@ -610,7 +609,6 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
     var ul = $('[data-not-seen]');
     ul.replaceChildren();
     say('[data-not-seen-intro]', list.length ? '' : 'Everyone has taken part since ' + sessionPhrase(last.number) + ' began.');
-    needs.set('notseen', list.length ? { count: list.length, text: 'Not seen since ' + sessionPhrase(last.number) + ' began', tab: 'followup', action: 'See who' } : null);
     list.forEach(function (p) {
       var li = el('li');
       li.appendChild(el('strong', null, personName(p)));
