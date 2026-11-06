@@ -64,4 +64,6 @@ A part's slides are edited on the slide itself.
 6. No live controls, ever.
 7. Designed at 375px first. The film strip lies across the top, and the side panel follows the slide.
 8. Nothing here counts a learner's progress or compares people. A leader sees who answered, as names.
-9. Slides are always drawn in the stage's dark colors; the page around them follows light and dark.
+9. Every field, select, and button is the site's own (DESIGN-KIT.md), with nothing restyled here. Size comes from the kit's `.small`, color from its button classes.
+10. A part saves itself, on purpose: this inverts the kit's rule that text saves with a button, because a slide edited in place has no moment to press Save.
+11. Slides are always drawn in the stage's dark colors; the page around them follows light and dark.

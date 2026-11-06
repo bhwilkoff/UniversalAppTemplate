@@ -198,7 +198,11 @@
       });
       nav.appendChild(turn);
       page.appendChild(nav);
-      if (!readOnly) { page.appendChild(form(s, i)); return; }
+      if (!readOnly) {
+        page.appendChild(form(s, i));
+        nav.insertBefore(page.querySelector('.part-saved'), turn);
+        return;
+      }
       var head = el('div', 'part-read');
       head.appendChild(el('p', 'part-line fam-' + family(s.kind), plain(s.kind) + ', ' + s.minutes + ' min'));
       head.appendChild(el('h2', 'part-heading', s.title));
@@ -251,7 +255,7 @@
     // One form for a new scene and for editing one: the fields each kind
     // uses, and the teacher's own note.
     function form(s, index) {
-      var f = el('form', 'inline-form scene-form');
+      var f = el('form', 'part-form');
       var deckBox = el('div', 'part-deck');
       // ShowLib.problem checks a part. The browser's own check would stop on
       // the hidden question form's required box, with nothing on screen (found
@@ -322,8 +326,9 @@
       fitKind();
 
       var msg = el('span', 'part-saved'); msg.setAttribute('role', 'status');
+      f.appendChild(msg);
       var top = el('div', 'part-top');
-      top.appendChild(titleL); top.appendChild(kl); top.appendChild(minutesL); top.appendChild(msg);
+      top.appendChild(titleL); top.appendChild(kl); top.appendChild(minutesL);
       f.insertBefore(top, f.firstChild);
       f.insertBefore(deckBox, top.nextSibling);
       if (window.SlideStudio) studio = window.SlideStudio.mount(deckBox, { text: decks[s.id] || s.slides || '', onChange: saveDeck });
@@ -340,7 +345,7 @@
       }
 
       // On a part with slides, the slide is the part: the rest stays folded.
-      var more = el('details', 'part-more');
+      var more = el('details', 'ui-disclosure part-more');
       more.appendChild(el('summary', null, 'More about this part'));
       f.appendChild(more);
       function tuck() {
