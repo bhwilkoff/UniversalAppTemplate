@@ -79,7 +79,6 @@
       where.appendChild(sel);
       more.appendChild(where);
     }
-    more.appendChild(el('p', 'small', 'Keys 1 to 8 react, and A, U, and D say where you stand, while this panel has focus.'));
     mount.appendChild(more);
     var line = el('p', 'react-line small');
     mount.appendChild(line);
