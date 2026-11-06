@@ -106,3 +106,13 @@ test('a chart keeps its head', () => {
 test('slides move', () => {
   assert.deepEqual(M.move(['a', 'b', 'c'], 0, 2), ['b', 'c', 'a']);
 });
+
+test('a diagram label changes in place and keeps its depth', () => {
+  const body = '---\nkind: mind\n---\n- The center\n  - One branch';
+  assert.deepEqual(M.outline(body).map((x) => x.words), ['The center', 'One branch']);
+  assert.equal(M.setOutline(body, 4, 'New'), '---\nkind: mind\n---\n- The center\n  - New');
+});
+
+test('every row of a table comes out the same width', () => {
+  assert.deepEqual(M.even([['a', 'b'], ['c']]), [['a', 'b'], ['c', '']]);
+});

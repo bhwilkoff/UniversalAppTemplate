@@ -176,6 +176,26 @@
     return (g.head ? '---\n' + g.head + '\n---\n' : '') + out.join('\n');
   }
 
+  // A diagram's lines, each a label on the slide.
+  function outline(body) {
+    var out = [];
+    String(body).split('\n').forEach(function (l, i) {
+      var m = /^(\s*[-*]\s+)(.*)$/.exec(l);
+      if (m) out.push({ line: i, words: m[2] });
+    });
+    return out;
+  }
+  function setOutline(body, i, words) {
+    var a = String(body).split('\n'), m = /^(\s*[-*]\s+)/.exec(a[i]);
+    a[i] = (m ? m[1] : '') + String(words).replace(/\s*\n\s*/g, ' ').trim();
+    return a.join('\n');
+  }
+  // The rows of a table, all one width, so each drawn cell has its place.
+  function even(rows) {
+    var cols = Math.max.apply(null, rows.map(function (r) { return r.length; }).concat(1));
+    return rows.map(function (r) { var c = r.slice(); while (c.length < cols) c.push(''); return c; });
+  }
+
   function move(list, from, to) {
     var a = list.slice(), x = a.splice(from, 1)[0];
     a.splice(to, 0, x);
@@ -185,7 +205,7 @@
   var lib = { slides: slides, join: join, pieces: pieces, editable: editable, setWords: setWords, addAfter: addAfter, remove: remove,
     plain: plain, match: match, LAYOUTS: LAYOUTS, layoutOf: layoutOf, setLayout: setLayout, revealed: revealed,
     setRevealed: setRevealed, iconOf: iconOf, setIcon: setIcon, noteOf: noteOf, setNote: setNote, block: block, setBlock: setBlock,
-    grid: grid, ungrid: ungrid, move: move };
+    grid: grid, ungrid: ungrid, outline: outline, setOutline: setOutline, even: even, move: move };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
   else root.SlideModel = lib;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

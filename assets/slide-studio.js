@@ -183,11 +183,22 @@
       });
       var b = M.block(lines), inner = svg.querySelector('svg');
       if (b && inner) {
-        var area = el('button', 'studio-hit is-block'); area.type = 'button';
-        area.setAttribute('aria-label', b.app === 'sheet' ? 'Change the numbers' : 'Change the diagram');
-        pin(area, place([inner]));
-        area.addEventListener('click', function () { var f = side.querySelector('[data-block] input, [data-block] textarea'); if (f) f.focus(); });
-        hits.appendChild(area);
+        var spots = spotsOf(b, inner);
+        spots.forEach(function (c, n) {
+          var hit = el('button', 'studio-hit'); hit.type = 'button';
+          hit.setAttribute('aria-label', 'Change: ' + (c.text || 'an empty cell'));
+          pin(hit, { left: c.left, top: c.top, width: c.width, height: c.height, scale: c.scale });
+          hit.addEventListener('pointerdown', function (ev) { ev.preventDefault(); finish(); openSpot(n); });
+          hit.addEventListener('click', function (ev) { if (ev.detail === 0) { finish(); openSpot(n); } });
+          hits.appendChild(hit);
+        });
+        if (!spots.length) {
+          var area = el('button', 'studio-hit is-block'); area.type = 'button';
+          area.setAttribute('aria-label', 'Change the numbers');
+          pin(area, place([inner]));
+          area.addEventListener('click', function () { var f = side.querySelector('[data-block] input, [data-block] textarea'); if (f) f.focus(); });
+          hits.appendChild(area);
+        }
       }
       if (M.layoutOf(lines) !== 'title' && !b) [0, 1].forEach(function (col) {
         var mine = items.filter(function (x, i) { return x.column === col && groups[i].length; });
@@ -215,6 +226,97 @@
         f.addEventListener('focus', remember);
         f.addEventListener('input', function () { list[at] = M.setWords(list[at], it.line, f.value); changed(); paint(); });
         lostBox.appendChild(f);
+      });
+    }
+
+    // The places on a table or diagram a person can type, where they are drawn.
+    // Each cell is drawn even when empty, so a table's text is its grid, in order.
+    function spotsOf(b, inner) {
+      var c = canvas.getBoundingClientRect(), scale = c.width / W;
+      var nodes = Array.prototype.slice.call(inner.querySelectorAll('text'));
+      function at(n, width) {
+        var m = n.getScreenCTM(), size = Number(n.getAttribute('font-size')) || 20, px = size * m.a;
+        var left = m.e + m.a * Number(n.getAttribute('x')) - c.left, base = m.f + m.d * Number(n.getAttribute('y')) - c.top;
+        return { node: n, left: left, top: base - px * 0.95, width: width * m.a, height: px * 1.3, px: px, scale: scale };
+      }
+      if (b.app === 'sheet') {
+        var g = M.grid(b.body);
+        if (g.chart) return [];
+        var rows = M.even(g.rows), cols = rows[0] ? rows[0].length : 0;
+        if (!cols || nodes.length !== rows.length * cols) return [];
+        var pitch = cols > 1 ? Number(nodes[1].getAttribute('x')) - Number(nodes[0].getAttribute('x')) : 800;
+        return nodes.map(function (n, i) {
+          var y = Math.floor(i / cols), x = i % cols;
+          return Object.assign(at(n, pitch - 12), { text: rows[y][x].replace(TYPE, ''), y: y, x: x, rows: rows.length, cols: cols });
+        });
+      }
+      var items = M.outline(b.body), found = M.match(items, nodes.map(function (n) { return n.textContent; })), out = [];
+      items.forEach(function (it, i) {
+        if (!found[i].length) return;
+        var n = nodes[found[i][0]], r = n.getBoundingClientRect();
+        var spot = at(n, r.width / n.getScreenCTM().a + 8);
+        out.push(Object.assign(spot, { left: r.left - c.left, text: it.words, line: it.line, center: true }));
+      });
+      return out;
+    }
+    var TYPE = /:(number|money|text|name|date|percent)$/;
+    var cell = null;
+    function openSpot(n) {
+      var lines = list[at], b = M.block(lines), inner = art.querySelector('svg svg');
+      if (!b || !inner) return;
+      var spots = spotsOf(b, inner), c = spots[n];
+      if (!c) return;
+      if (c.y != null) { cell = { y: c.y, x: c.x }; drawSide(); }
+      remember();
+      var box2 = el('div', 'studio-type');
+      box2.contentEditable = 'plaintext-only';
+      if (box2.contentEditable !== 'plaintext-only') box2.contentEditable = 'true';
+      box2.setAttribute('role', 'textbox');
+      box2.setAttribute('aria-label', c.y != null ? 'Row ' + (c.y + 1) + ', column ' + (c.x + 1) : 'A label');
+      box2.textContent = c.text;
+      var st = box2.style;
+      st.fontSize = c.px + 'px'; st.lineHeight = c.height + 'px';
+      st.fontWeight = c.node.getAttribute('font-weight') || '400';
+      st.color = c.node.getAttribute('fill') || '#E8EDEA';
+      st.background = '#1B2320';
+      st.left = c.left + 'px'; st.top = c.top + 'px'; st.minWidth = Math.max(c.width, 40) + 'px'; st.minHeight = c.height + 'px';
+      if (c.y != null) st.width = c.width + 'px';
+      canvas.appendChild(box2);
+      function write(words) {
+        var fresh = M.block(list[at]);
+        if (c.y == null) { list[at] = M.setBlock(list[at], M.setOutline(fresh.body, c.line, words)); return; }
+        var g = M.grid(fresh.body); g.rows = M.even(g.rows);
+        var type = TYPE.exec(g.rows[c.y][c.x]);
+        g.rows[c.y][c.x] = String(words).replace(/\s*\n\s*/g, ' ').replace(/\|/g, '/').trim() + (type ? type[0] : '');
+        list[at] = M.setBlock(list[at], M.ungrid(g));
+      }
+      typing = { node: box2, spot: true, write: write, before: c.text, cancelled: false };
+      box2.focus();
+      var range = document.createRange(); range.selectNodeContents(box2);
+      var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
+      var live = null;
+      box2.addEventListener('input', function () {
+        write(box2.textContent);
+        clearTimeout(live);
+        live = setTimeout(function () { if (typing && typing.node === box2) { paint(); changed(); } }, 250);
+      });
+      box2.addEventListener('blur', function () { if (typing && typing.node === box2) finish(); });
+      box2.addEventListener('keydown', function (ev) {
+        if (ev.key === 'Escape') { ev.preventDefault(); typing.cancelled = true; finish(); return; }
+        if (ev.key !== 'Tab' && ev.key !== 'Enter') return;
+        ev.preventDefault();
+        var step = ev.key === 'Enter' ? (c.y != null ? c.cols : 1) : (ev.shiftKey ? -1 : 1);
+        finish();
+        var next = n + step;
+        if (c.y != null && next >= c.rows * c.cols) {
+          remember();
+          var g = M.grid(M.block(list[at]).body); g.rows = M.even(g.rows);
+          g.rows.push(new Array(c.cols).fill(''));
+          list[at] = M.setBlock(list[at], M.ungrid(g));
+          changed(); paint(); drawHits();
+          next = g.rows.length * c.cols - c.cols + (ev.key === 'Enter' ? c.x : 0);
+        }
+        if (next >= 0) openSpot(next);
       });
     }
 
@@ -299,6 +401,14 @@
     function finish() {
       if (!typing) return;
       var t = typing; typing = null;
+      if (t.spot) {
+        var said2 = t.node.textContent;
+        t.node.remove();
+        t.write(t.cancelled ? t.before : said2);
+        if (t.cancelled || said2.trim() === t.before) past.pop();
+        changed(); drawBar(); paint(); drawHits(); drawSide();
+        return;
+      }
       if (t.node) {
         var words = t.node.textContent.trim();
         t.node.remove();
@@ -382,7 +492,7 @@
         if (!quiet) drawHits();
       }
       if (b.app === 'diagram') {
-        wrap.appendChild(el('p', 'ui-label', 'Diagram'));
+        wrap.appendChild(el('p', 'ui-label', 'Branches'));
         var d = el('textarea'); d.rows = 8; d.value = b.body; d.setAttribute('aria-label', 'The diagram as an outline');
         d.addEventListener('focus', remember);
         d.addEventListener('input', function () { write(d.value); });
@@ -397,26 +507,43 @@
           kind.addEventListener('change', function () { remember(); g.head = g.head.replace(/chart:\s*\S+/, 'chart: ' + kind.value); write(M.ungrid(g)); });
           wrap.appendChild(kind);
         }
-        var table = el('div', 'studio-grid');
-        function cells() {
-          table.replaceChildren();
-          table.style.setProperty('--cols', g.rows[0] ? g.rows[0].length : 1);
-          g.rows.forEach(function (r, y) {
-            r.forEach(function (c, x) {
-              var f = el('input'); f.value = c.replace(/:(number|money|text|name|date|percent)$/, '');
-              var type = /:(number|money|text|name|date|percent)$/.exec(c);
-              f.setAttribute('aria-label', 'Row ' + (y + 1) + ', column ' + (x + 1));
-              f.addEventListener('focus', remember);
-              f.addEventListener('input', function () { g.rows[y][x] = f.value + (type ? type[0] : ''); write(M.ungrid(g), true); });
-              table.appendChild(f);
-            });
-          });
+        function structure(fn) {
+          remember();
+          g.rows = M.even(g.rows);
+          fn();
+          write(M.ungrid(g));
+          drawSide();
         }
-        cells();
-        wrap.appendChild(table);
         var row = el('div', 'studio-adds');
-        row.appendChild(button('Add a row', null, function () { remember(); g.rows.push(new Array(g.rows[0].length).fill('')); cells(); write(M.ungrid(g)); }));
-        if (!g.chart) row.appendChild(button('Add a column', null, function () { remember(); g.rows.forEach(function (r) { r.push(''); }); cells(); write(M.ungrid(g)); }));
+        row.appendChild(button('Add a row', null, function () { structure(function () { g.rows.push(new Array(g.rows[0].length).fill('')); }); if (g.chart) drawSide(); }));
+        if (!g.chart) {
+          var here = { y: Math.min(cell ? cell.y : 1e9, g.rows.length - 1), x: Math.min(cell ? cell.x : 1e9, (g.rows[0] || []).length - 1) };
+          row.appendChild(button('Add a column', null, function () { structure(function () { g.rows.forEach(function (r) { r.push(''); }); }); }));
+          var dropRow = button('Delete row', null, function () { structure(function () { g.rows.splice(here.y, 1); }); cell = null; drawSide(); });
+          dropRow.disabled = g.rows.length < 2;
+          var dropCol = button('Delete column', null, function () { structure(function () { g.rows.forEach(function (r) { r.splice(here.x, 1); }); }); cell = null; drawSide(); });
+          dropCol.disabled = (g.rows[0] || []).length < 2;
+          row.appendChild(dropRow); row.appendChild(dropCol);
+        }
+        if (g.chart) {
+          var table = el('div', 'studio-grid');
+          var cells = function () {
+            table.replaceChildren();
+            table.style.setProperty('--cols', g.rows[0] ? g.rows[0].length : 1);
+            g.rows.forEach(function (r, y) {
+              r.forEach(function (c, x) {
+                var type = TYPE.exec(c);
+                var f = el('input'); f.value = c.replace(TYPE, '');
+                f.setAttribute('aria-label', 'Row ' + (y + 1) + ', column ' + (x + 1));
+                f.addEventListener('focus', remember);
+                f.addEventListener('input', function () { g.rows[y][x] = f.value + (type ? type[0] : ''); write(M.ungrid(g), true); });
+                table.appendChild(f);
+              });
+            });
+          };
+          cells();
+          wrap.appendChild(table);
+        }
         wrap.appendChild(row);
       }
       wrap.appendChild(button('Remove it', 'btn-secondary small', function () {

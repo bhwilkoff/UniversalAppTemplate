@@ -50,7 +50,7 @@ A part's slides are edited on the slide itself.
 - Click any words and type over them, in place, at their real size. Enter adds the next point; Backspace on an empty line removes it.
 - The renderer always draws the slide. The editor only ever sits on top of it, so what a leader sees is what the stage shows.
 - The deck stays text underneath, in the same format. "Edit as text" is always one press away, and nothing a leader can write there is lost here.
-- Tables, charts, and diagrams are edited as a grid or an outline in the side panel, and draw on the slide as they change.
+- A table's cells and a diagram's labels are typed on the slide too: Tab and Enter move between cells, and Tab past the last cell adds a row. The side panel holds only structure (rows, columns, a diagram's branches). A chart's numbers keep a grid there, because a bar has no words to type over.
 - Everything saves itself and says so. Undo walks back every change.
 - A learner sees the same slides and film strip, with no tools and no notes.
 
