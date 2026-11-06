@@ -44,6 +44,10 @@ Leader                         Learner
 10. The panel wears Meet's colors, type, and shapes, light and dark. Brand color appears only on the main stage.
 11. A feature earns the panel only if it is used during a live session. Preparation stays on the session page.
 
+## Sign-in in Meet
+
+Meet's frame refuses the Storage Access request, so the panel cannot borrow the site's sign-in. Sign in opens the small window, which hands back at once for anyone signed in on the site.
+
 ## What leaves the panel
 
 The panel's chat and code runner (Meet has chat; code belongs on the stage or a page). The path picker, Pushed during class, From the conversation, and the stages list move to the session page.

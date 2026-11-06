@@ -651,11 +651,10 @@
       loadGuests();
     });
   });
-  // A press is what the browser needs to lend the site's sign-in; if there is
-  // none to lend, the sign-in choices follow.
-  $('[data-guest-signin]').addEventListener('click', function () {
-    useSiteSignIn(true).then(function (s) { if (s && !s.user.is_anonymous) location.reload(); else signedOut(); });
-  });
+  // Meet's frame cannot borrow the site's sign-in (measured in a real call:
+  // the Storage Access request is refused), so the small window does it: a
+  // person already signed in on the site comes back at once, with one press.
+  $('[data-guest-signin]').addEventListener('click', function () { $('[data-popup]').click(); });
 
   // The teacher's roster: one line, opened for names. It is drawn from
   // presence while the call runs, and it never writes anything down.
@@ -952,6 +951,8 @@
     });
     var first = (S.list || [])[0];
     var what = !part && first ? 'First: ' + first.name : !S.teaching && part && !part.slides ? String(part.what || '').split(/\n{2,}/)[0] : '';
+    // A learner with nothing to do is told so, so an empty panel never reads as broken.
+    if (!what && !S.teaching && !$('[data-pane="now"] textarea, [data-pane="now"] input, [data-pane="now"] .signal-where:not([hidden]), [data-pane="now"] .signal-card:not([hidden])')) what = 'Nothing to answer right now.';
     if (S.nowWhat.textContent !== what) S.nowWhat.textContent = what;
     S.nowWhat.hidden = !what;
     if (S.teaching) {
