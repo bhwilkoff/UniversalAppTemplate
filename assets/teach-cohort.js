@@ -445,7 +445,7 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
     sum.appendChild(el('strong', null, 'Write about ' + sessionPhrase(last.number)));
     var gist = c.muddy ? 'Still unclear: ' + c.muddy.text
       : c.bringBacks.length ? (c.bringBacks[0].readiness === 'ready' ? 'Brought something back, marked ready' : c.bringBacks[0].readiness === 'not-yet' ? 'Brought something back, marked not yet' : 'Brought something back')
-      : c.empty ? 'Nothing from them around this session' : 'Took part without a bring-back';
+      : '';
     var gistEl = el('span', 'small followup-gist', gist);
     sum.appendChild(gistEl);
     var draftFlag = el('span', 'small followup-draft', 'Draft');
@@ -500,7 +500,6 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
       if (g.from === me.id && (g.note_id || g.feedback_id)) li.appendChild(correctControl(g));
       return li;
     }));
-    if (c.empty) body.appendChild(el('p', 'small', 'Nothing from them around this session.'));
     if (p.app_repo) {
       var repo = el('p', 'small'); var ra = el('a', null, 'Their repository on GitHub'); ra.href = 'https://github.com/' + p.app_repo; ra.rel = 'noopener'; ra.target = '_blank';
       repo.appendChild(ra); body.appendChild(repo);

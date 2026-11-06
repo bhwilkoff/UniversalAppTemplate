@@ -3198,4 +3198,6 @@ a.person-name:hover { text-decoration: underline; }
 .person-more { font-size: 0.9rem; }
 @media (max-width: 40rem) { .week-hero-head { grid-template-columns: minmax(0, 1fr); } .week-hero .actions { justify-content: flex-start; } .week-due-row { flex-wrap: wrap; } }
 .cohort-page .page-head h1 { max-width: none; }
+.person-follow .followup-gist { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+.person-follow .followup[open] .followup-gist { display: none; }
 
