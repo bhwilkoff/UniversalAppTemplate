@@ -265,7 +265,7 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
   // What the site really knows about each learner, and what really waits for
   // the leader. It cannot see who was in a call, so it never says who was not.
   function loadFacts(sessions, people) {
-    var t = lib.currentAndNext(sessions, new Date(), current.session_minutes), next = t.next;
+    var C = window.CohortLib, t = C.currentAndNext(sessions, new Date(), current.session_minutes), next = t.next;
     var learners = people.filter(function (p) { return p.status !== 'left' && (p.role === 'student' || p.role === 'mentor'); });
     Promise.all([
       next ? db.from('prep_answers').select('user_id').eq('session_id', next.id) : Promise.resolve({ data: [] }),
@@ -284,7 +284,7 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
         if (shown[p.user_id]) box.appendChild(el('span', 'person-fact is-yes', 'Has shown their work'));
       });
       var count = Object.keys(answered).length;
-      needs.set('prep', hasPrep && count ? { count: count, text: count + ' of ' + learners.length + ' answered the ' + sessionPhrase(next.number) + ' pre-work', href: lib.sessionUrl(current.slug, next.number) + '&t=before', action: 'Read them' } : null);
+      needs.set('prep', hasPrep && count ? { count: count, text: count + ' of ' + learners.length + ' answered the ' + sessionPhrase(next.number) + ' pre-work', href: C.sessionUrl(current.slug, next.number) + '&t=before', action: 'Read them' } : null);
       var quiet = (res[2].data || []).filter(function (x) { return !(x.feedback || []).length; }).length;
       needs.set('shares', quiet ? { count: quiet, text: quiet === 1 ? 'A share with no feedback yet' : quiet + ' shares with no feedback yet', tab: 'week', action: 'See them' } : null);
     });
