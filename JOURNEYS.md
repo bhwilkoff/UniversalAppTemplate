@@ -484,6 +484,17 @@ only when a question changed; the leader's panel now tells the room, and the lin
 arrives within seconds. Not tried: two rooms at once, a phone, and a session with
 real learners.
 
+## The shared main stage in real calls (November 6, 2026)
+
+Passed in a real call, leader and learner on this Mac: a learner's live app on both
+stages, typed into; a learner asking from Mine and the leader's Show it in Now; a
+leader showing anyone's app from Tools; answering and reacting on the stage; the board
+filling the stage, with a note, names, and two people's votes; and commits from GitHub
+on a slide on the stage. Not tried: a GitHub slide on a learner's stage, a page that
+refuses framing, a private repository, more than two people, a phone, or a whole class
+at once. Meet itself was tested only in Chrome; the session page was also drawn in
+WebKit for Safari.
+
 ## Breakouts from the add-on (November 4, 2026)
 
 Tested end to end in a real call, leader and a guest: Breakouts in the leader's
