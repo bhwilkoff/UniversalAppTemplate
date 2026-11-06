@@ -2906,7 +2906,6 @@ html:has(.p2-panel), body:has(.p2-panel) { background: #fff; overflow: hidden; }
 .part-line::before { content: ""; width: 0.6rem; height: 0.6rem; border-radius: 50%; background: var(--fam, var(--fam-say)); flex: none; }
 .part-at { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--ink); }
 .part-min { margin-left: auto; }
-.part-title { line-height: 1.3; }
 .part-new-open { width: 100%; aspect-ratio: 8 / 5; border: 1px dashed var(--edge); border-radius: 12px; background: none; color: var(--ink); font: inherit; font-weight: 600; cursor: pointer; }
 .part-new-open:hover { border-color: var(--thistle); }
 .part-new-menu { display: flex; flex-wrap: wrap; gap: 0.4rem; align-content: flex-start; }
@@ -3006,3 +3005,12 @@ html:has(.p2-panel), body:has(.p2-panel) { background: #fff; overflow: hidden; }
 @media (prefers-reduced-motion: reduce) { .plan-seg, .part-pic.stage-preview { transition: none; } .part-link:hover .part-pic { transform: none; } }
 .session-page.account { max-width: var(--wide); }
 .session-page.account.is-part { max-width: none; }
+.part-name { line-height: 1.3; font-size: 1.02rem; }
+.wrap:has(> .session-page.is-part) { max-width: none; }
+.session-page select { width: 100%; min-height: 2.6rem; padding: 0.45rem 0.6rem; border: 1px solid var(--edge); border-radius: 10px; background: var(--card); color: var(--ink); font: inherit; font-size: 0.95rem; }
+.part-top label { display: grid; gap: 0.25rem; }
+.part-top input { min-height: 2.6rem; }
+.part-top label:first-child input { padding: 0.3rem 0.7rem; font-size: 1.35rem; }
+.studio-bar .btn-primary.small { color: var(--on-ink); }
+.studio-switch input[type="checkbox"] { width: 1.1rem; height: 1.1rem; min-width: 0; min-height: 0; padding: 0; }
+.part-page .scene-form > label { font-size: 0.9rem; }

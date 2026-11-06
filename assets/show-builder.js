@@ -138,7 +138,7 @@
       line.appendChild(el('span', 'part-kind', plain(s.kind)));
       line.appendChild(el('span', 'part-min', s.minutes + ' min'));
       words.appendChild(line);
-      words.appendChild(el('strong', 'part-title', s.title));
+      words.appendChild(el('strong', 'part-name', s.title));
       a.appendChild(words);
       li.appendChild(a);
       if (readOnly) return li;
