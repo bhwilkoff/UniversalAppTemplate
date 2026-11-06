@@ -274,7 +274,7 @@
         typing.fresh = false;
         list[at] = M.setWords(list[at], line, box2.textContent);
         clearTimeout(live);
-        live = setTimeout(function () { if (typing && typing.node === box2) { paint(); changed(); } }, 250);
+        live = setTimeout(function () { if (typing && typing.node === box2) { paint(); drawHits(); changed(); } }, 250);
       });
       box2.addEventListener('blur', function () { if (typing && typing.node === box2) finish(); });
       box2.addEventListener('keydown', function (ev) {
