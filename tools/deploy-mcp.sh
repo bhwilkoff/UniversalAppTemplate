@@ -9,4 +9,4 @@ F=supabase/functions/mcp
 cp assets/cohort-lib.js assets/teach-lib.js assets/live-lib.js assets/followup-lib.js "$F/"
 trap 'rm -f "$F/cohort-lib.js" "$F/teach-lib.js" "$F/live-lib.js" "$F/followup-lib.js"' EXIT
 SUPABASE_ACCESS_TOKEN="$(tr -d '\n\r ' < "$HOME/.humanshaped/supabase-token")" \
-  npx -y supabase@latest functions deploy mcp --project-ref bifrieqzkihuxfzttgvd --no-verify-jwt --use-api
+  npx -y supabase@latest functions deploy mcp --project-ref bifrieqzkihuxfzttgvd --no-verify-jwt --use-api --yes
