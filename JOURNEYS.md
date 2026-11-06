@@ -197,6 +197,8 @@ acceptance on GitHub. **Change:** one email and one pass. The GitHub
 invitation still has to be accepted on GitHub, because GitHub requires it,
 so the cohort's home shows that as the one thing waiting, with a button
 that opens it.
+**November 6, 2026:** the cohort page now accepts it with the person's own
+token, and the button stays for when GitHub refuses.
 
 ### J3. The sessions appear on their calendar
 
@@ -472,6 +474,15 @@ part while it is on the stage, seen by the leader first and by everyone on Show
 it to everyone. Found on the way: no part but a question could be saved on the
 session page, because a hidden required box stopped the form with nothing on
 screen.
+
+## The new panel in real calls (November 6, 2026)
+
+Passed in real Meet calls on this Mac: leader, co-leader, member, guest, tied guest,
+and room learner. A cohort with no flag gets the new panel. Found on the way: a tie
+made in a quiet moment never reached the guest's panel, because it re-read guests
+only when a question changed; the leader's panel now tells the room, and the line
+arrives within seconds. Not tried: two rooms at once, a phone, and a session with
+real learners.
 
 ## Breakouts from the add-on (November 4, 2026)
 

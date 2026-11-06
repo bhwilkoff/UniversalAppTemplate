@@ -52,6 +52,10 @@ Meet's frame refuses the Storage Access request, so the panel cannot borrow the 
 
 The panel's chat and code runner (Meet has chat; code belongs on the stage or a page). The path picker, Pushed during class, From the conversation, and the stages list move to the session page.
 
+## The way back
+
+Every cohort gets this panel. `details.panel = 'old'` on a cohort, or `?panel=old` on the address, brings back the previous one. Chat, the code runner, and the class thread do not appear in this panel.
+
 ## Decisions waiting on Ben
 
 Each has a default the work proceeds on, and can change.

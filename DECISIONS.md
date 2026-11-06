@@ -1254,3 +1254,27 @@ meet.google.com/new as meet@: an empty room took a personal Gmail account with n
 host and no knocking (November 4, 2026). Add more before a cohort needs more rooms
 than the pool holds. The learner leaves the main call by hand, because a panel
 cannot end a call; a Chrome extension could do that, and is not built.
+
+## One panel, shaped like Meet, for every cohort
+
+**The add-on is a frame that never scrolls away and four tabs, and every cohort
+gets it.** Ben, November 6, 2026: "We need a better way to ensure that everything
+is at the leader's fingertips." **Why:** the old panel listed every feature in one
+column, so a leader hunted during class and a learner saw things that were not for
+them. Research on panels at this width found that a short row of labeled tabs beats
+vertical icon tabs, and that one button naming the next step does more than a menu.
+**How to apply:** ADDON-DESIGN.md is binding. `details.panel = 'old'` on a cohort,
+or `?panel=old`, brings the previous panel back if a live session needs it; remove
+both once two real sessions have run on the new one.
+
+## Joining a cohort accepts the GitHub organization invitation
+
+**A person's yes to the cohort is their yes to the organization, so the cohort page
+accepts the invitation with their own token.** Ben, November 6, 2026: "not require
+people to do multiple approvals." **Why:** `PATCH /user/memberships/orgs/humanshaped`
+took a GitHub App user token on an active membership (200 for benhstest2, November
+6, 2026), and the acceptance on GitHub was a step with nothing to decide in it. A
+truly pending invitation has not been tried: the first new member is that test, and
+the console logs `[invite] accept` with GitHub's answer. **How to apply:**
+`GitHubToken.acceptOrg` runs once when the page sees an invitation waiting. If GitHub
+refuses, the Accept button still leads to GitHub's own page.
