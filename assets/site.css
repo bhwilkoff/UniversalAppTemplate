@@ -2841,3 +2841,4 @@ html.app-nav-open[data-signed-in] body:not([data-no-app-nav]) .app-nav { display
 .p2-panel .p2-pane[data-pane="tools"] .show-slot > summary, .p2-panel .addon-ask > summary, .p2-panel .breakouts-setup > summary { min-height: 40px; display: flex; align-items: center; font-weight: 500; }
 .p2-panel .breakouts { border: 0; padding: 0; }
 .p2-panel .addon-foot { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--rule); }
+.p2-panel .show-slot[data-slot="clock"], .p2-panel .show-slot[data-slot="thread"], .p2-panel .show-slot[data-slot="conversation"], .p2-panel .show-slot[data-slot="path"], .p2-panel .show-slot[data-slot="pushed"] { display: none; }

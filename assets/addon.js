@@ -349,7 +349,6 @@
       unavailable: function () {
         var off = [];
         off.push('cue-talk', 'cue-rooms');
-        if (S.newPanel) off.push('clock', 'thread', 'conversation', 'path', 'pushed');
         if (!S.groups.length) off.push('rooms', 'cue-rooms', 'brought');
         var list = S.list || S.parts || [];
         if (!list.some(function (x) { return x.kind === 'design' || x.key === 'prompt'; })) off.push('design');
