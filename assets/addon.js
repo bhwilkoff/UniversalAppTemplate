@@ -347,7 +347,7 @@
     S.list = S.parts;
     // The redesigned panel (ADDON-DESIGN.md), a cohort at a time until it is
     // proven. Everything below it is the same parts in a new frame.
-    S.newPanel = !!window.PanelFrame && ((S.cohort.details || {}).panel === 'new' || query.get('panel') === 'new');
+    S.newPanel = !!window.PanelFrame && (S.cohort.details || {}).panel !== 'old' && query.get('panel') !== 'old';
     if (S.newPanel) startFrame();
     S.show = window.ShowView.mount({
       mount: $('[data-show]'), parts: S.list, teaching: S.teaching,
@@ -466,6 +466,7 @@
         if (S.onStage && S.onStage.kind === 'path') sendStage();
       }
     });
+    S.classChannel.onNudge('guests', function () { if (S.isGuest) { loadGuests(); refreshLive(); } });
   }
 
   // Recognition for a skill shown in class (R16). A teacher names the
@@ -604,6 +605,7 @@
     status.textContent = 'Saving…';
     return db.rpc('tie_call_guest', { c: S.cohort.id, guest: guest, member: member }).then(function (r) {
       status.textContent = r.error ? 'Not saved: ' + r.error.message : '';
+      if (!r.error && S.classChannel) S.classChannel.nudge('guests');
       return Promise.all([loadGuests(), refreshLive()]);
     });
   }
@@ -689,9 +691,11 @@
     list('Here now', r.here, false);
     list('Not here yet', r.missing, true);
     drawGuestRows(d);
-    var acts = el('div', 'actions');
-    acts.appendChild(stageToggle('path', undefined, 'Put the path on the main stage', 'Take it off the main stage'));
-    d.appendChild(acts);
+    if (!S.newPanel) {
+      var acts = el('div', 'actions');
+      acts.appendChild(stageToggle('path', undefined, 'Put the path on the main stage', 'Take it off the main stage'));
+      d.appendChild(acts);
+    }
     box.appendChild(d);
   }
 
