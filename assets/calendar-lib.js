@@ -114,7 +114,11 @@
       }
       var made = s.event_id
         ? call('GET', API + '/' + encodeURIComponent(s.event_id)).then(function (g) {
-            if (!g.ok || !g.body || g.body.status === 'cancelled') return insert(s);
+            // Only an event that is truly gone is made again: any other failed
+            // read would leave a second event, with its own Meet link, on the
+            // calendar (found November 6, 2026: five orphans from November 3).
+            if (g.status === 404 || g.status === 410 || (g.ok && g.body && g.body.status === 'cancelled')) return insert(s);
+            if (!g.ok || !g.body) fail(g);
             var patch = resource(s, false);
             return call('PATCH', API + '/' + encodeURIComponent(s.event_id) + '?sendUpdates=' + notice(g.body, patch), patch)
               .then(function (r) { if (!r.ok) fail(r); return r.body; });

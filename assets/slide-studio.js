@@ -308,7 +308,18 @@
       });
       box2.addEventListener('blur', function () { if (typing && typing.node === box2) finish(); });
       box2.addEventListener('keydown', function (ev) {
-        if (ev.key === 'Escape') { ev.preventDefault(); typing.cancelled = true; finish(); return; }
+        if (ev.key === 'Escape') {
+          ev.preventDefault(); typing.cancelled = true; finish();
+          // Leaving a row Enter just added takes the empty row away again.
+          if (c.y != null) {
+            var left = M.grid(M.block(list[at]).body); left.rows = M.even(left.rows);
+            var last = left.rows[left.rows.length - 1];
+            if (left.rows.length > 1 && last.every(function (x) { return !String(x).trim(); })) {
+              left.rows.pop(); list[at] = M.setBlock(list[at], M.ungrid(left)); changed(); paint(); drawHits();
+            }
+          }
+          return;
+        }
         if (ev.key !== 'Tab' && ev.key !== 'Enter') return;
         ev.preventDefault();
         var step = ev.key === 'Enter' ? (c.y != null ? c.cols : 1) : (ev.shiftKey ? -1 : 1);

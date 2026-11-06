@@ -96,23 +96,6 @@
       .sort(function (a, b) { return b.starts_at.localeCompare(a.starts_at); })[0] || null;
   }
 
-  // Not seen this week, for a cohort's teachers alone: the students and
-  // mentors still in the cohort with nothing shared, queued, answered, or
-  // said in feedback since the last session began, so that the teacher can
-  // reach out within two days. It is worked out on the teacher's page from
-  // what the teacher can already read, and it is never stored. It does
-  // not count attendance or cameras (the hub knows neither), and it is in
-  // name order, which ranks no one. Each activity is { user_id, at }.
-  function notSeen(people, since, activity) {
-    if (!since) return [];
-    var t = Date.parse(since), seen = {};
-    (activity || []).forEach(function (a) { if (a && a.user_id && Date.parse(a.at) >= t) seen[a.user_id] = true; });
-    function name(p) { return p.profiles ? (p.profiles.display_name || p.profiles.github_login || '') : ''; }
-    return (people || []).filter(function (p) {
-      return p.status !== 'left' && (p.role === 'student' || p.role === 'mentor') && !seen[p.user_id];
-    }).sort(function (a, b) { return name(a).toLowerCase().localeCompare(name(b).toLowerCase()); });
-  }
-
   // A session's checks with their answers, for the teacher: each question
   // in the order it was asked, and each answer in the person's words (or
   // the choice they picked), in the order they answered. Nothing is
@@ -264,7 +247,7 @@
     return first + ', for ' + c.weeks + ' weeks' + (c.capacity ? ', with room for ' + c.capacity + ' people' : '') + '.';
   }
 
-  var lib = { zonedToUtc: zonedToUtc, sessionDates: sessionDates, sessionRows: sessionRows, meetSetup: meetSetup, lastStarted: lastStarted, notSeen: notSeen, checkAnswers: checkAnswers, waitingForFeedback: waitingForFeedback, scheduleText: scheduleText, slugFrom: slugFrom, slugProblem: slugProblem, openingLine: openingLine, cohortSetupSteps: cohortSetupSteps, calendarNote: calendarNote, meetRequestNote: meetRequestNote, requestState: requestState, waitingRequests: waitingRequests, WEEKDAYS: WEEKDAYS };
+  var lib = { zonedToUtc: zonedToUtc, sessionDates: sessionDates, sessionRows: sessionRows, meetSetup: meetSetup, lastStarted: lastStarted, checkAnswers: checkAnswers, waitingForFeedback: waitingForFeedback, scheduleText: scheduleText, slugFrom: slugFrom, slugProblem: slugProblem, openingLine: openingLine, cohortSetupSteps: cohortSetupSteps, calendarNote: calendarNote, meetRequestNote: meetRequestNote, requestState: requestState, waitingRequests: waitingRequests, WEEKDAYS: WEEKDAYS };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
   else root.TeachLib = lib;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

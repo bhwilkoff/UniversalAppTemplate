@@ -130,18 +130,7 @@ test('the last session is the one that started most recently', () => {
   assert.equal(lib.lastStarted(s, new Date('2026-10-28T00:00:00Z')).number, 2);
   assert.equal(lib.lastStarted(s, new Date('2026-10-01T00:00:00Z')), null);
 });
-test('not seen this week: no share, queue item, answer, or feedback since the last session, in name order', () => {
-  const p = (id, name, extra) => ({ user_id: id, role: 'student', status: 'enrolled', profiles: { github_login: name }, ...extra });
-  const people = [p('z', 'zed'), p('a', 'amy'), p('b', 'bo'), p('l', 'lee', { status: 'left' }), p('m', 'mo', { role: 'mentor' }), p('c', 'cy')];
-  const since = '2026-10-20T23:00:00Z';
-  const activity = [
-    { user_id: 'b', at: '2026-10-21T10:00:00Z' },
-    { user_id: 'c', at: '2026-10-19T10:00:00Z' },
-    { user_id: 'm', at: '2026-10-20T23:30:00Z' }
-  ];
-  assert.deepEqual(lib.notSeen(people, since, activity).map(x => x.user_id), ['a', 'c', 'z']);
-  assert.deepEqual(lib.notSeen(people, null, []), []);
-});
+
 test("a session's checks come back with each answer in the person's words", () => {
   const checks = [{ id: 'k2', prompt: 'Muddy?', choices: null, created_at: '2' }, { id: 'k1', prompt: 'Which?', choices: ['A', 'B'], created_at: '1' }];
   const answers = [{ check_id: 'k1', user_id: 'u', choice: 2, updated_at: '1' }, { check_id: 'k2', user_id: 'u', body: 'Pipelines', updated_at: '1' }];

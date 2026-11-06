@@ -167,8 +167,8 @@ Each step names the screen and what goes in each field.
 > count of answers when the teacher chooses to show it, or someone's
 > work while they talk about it.
 >
-> What it does not do matters as much. It never transcribes or
-> measures who talks, and it never joins the call as a participant. It
+> What it does not do matters as much. It never joins the call as a
+> participant, and it never gives anyone a score or compares people. It
 > asks Google for no permissions, and the only thing it reads from Meet
 > is the call's meeting code. A leader can record a session with Human
 > Shaped's recorder, which opens in its own window, only after saying so

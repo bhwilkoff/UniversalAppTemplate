@@ -469,9 +469,11 @@
       });
     }
     S.keeping = row;
-    row('here');
-    send();
-    setInterval(function () { row('here'); send(); }, 60000);
+    // A row names the room, so time in a breakout is kept even though
+    // rooms are not recorded and so have no talk time.
+    function here() { row('here', S.room && S.room.groupId ? 'room:' + S.room.groupId : null); send(); }
+    here();
+    setInterval(here, 60000);
     setInterval(send, 10000);
     window.addEventListener('pagehide', send);
   }
