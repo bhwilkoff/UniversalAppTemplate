@@ -58,7 +58,7 @@
     L.QUESTION_KINDS.filter(function (k) { return !opts.basic || k.key === 'choice' || k.key === 'short'; })
       .forEach(function (k) { var o = el('option', null, k.name); o.value = k.key; kind.appendChild(o); });
     var kindLine = el('span', 'hint');
-    var kindL = labelled('Kind of question', kind); kindL.insertBefore(kindLine, kind);
+    var kindL = labelled('How people answer', kind); kindL.insertBefore(kindLine, kind);
     var prompt = el('textarea'); prompt.name = 'prompt'; prompt.rows = 2; prompt.maxLength = 500; prompt.required = true;
     var choices = el('textarea'); choices.name = 'choices'; choices.rows = 4;
     var choicesL = labelled('Choices', choices, 'One on each line, two to eight.');
