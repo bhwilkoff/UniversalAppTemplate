@@ -372,6 +372,8 @@
     var mine = roomMine && roomState.question && roomMine.id === roomState.question.id ? roomMine.answer : null;
     view = roomEnded ? { mode: 'roomend', part: null } : RL.toView(roomState, { addon: A, you: room.you(), talk: roomTalk, html: roomHtml, mine: mine });
     show('ready'); draw();
+    // A room's answers carry no names, so the cohort's line about leaders does not apply.
+    $('[data-answer-panel]').hidden = true;
     var st = roomState.stance;
     drawReactions({ floats: [], stance: st && st.total ? st : null });
   }
