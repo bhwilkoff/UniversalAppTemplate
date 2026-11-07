@@ -2141,13 +2141,39 @@
     show('loading');
     asGuest();
   });
+  // TEMPORARY probe, test call only: does Meet carry shared state by itself?
+  function probeCoDoing() {
+    Promise.resolve(side.getMeetingInfo()).then(function (m) {
+      if (A.meetingCode(m && m.meetingCode) !== 'usapvcttxk' && String(m && m.meetingCode).replace(/-/g, '') !== 'usapvcttxk') return;
+      var box = document.createElement('pre'), me = Math.random().toString(36).slice(2, 6), n = 0, t0 = Date.now();
+      box.style.cssText = 'position:fixed;left:0;right:0;bottom:0;z-index:99999;max-height:45%;overflow:auto;background:#000;color:#0f0;font:11px monospace;margin:0;padding:4px;white-space:pre-wrap';
+      document.body.appendChild(box);
+      var say = function (x) { console.log('[codo] ' + x); box.textContent = ((Date.now() - t0) / 1000).toFixed(1) + ' ' + x + '\n' + box.textContent; };
+      say('me ' + me + ' has ' + typeof window.__probeSession.createCoDoingClient);
+      window.__probeSession.createCoDoingClient({ activityTitle: 'Human Shaped', onCoDoingStateChanged: function (st) {
+        var txt = new TextDecoder().decode(st.bytes);
+        say('GOT ' + st.bytes.length + 'b ' + txt.slice(0, 40));
+      } }).then(function (c) {
+        say('client ok');
+        var enc = new TextEncoder(), sizes = [10, 1000, 10000, 60000, 200000];
+        var tick = setInterval(function () {
+          n++;
+          var size = sizes[Math.min(Math.floor(n / 3), sizes.length - 1)], body = me + ':' + n + ':' + 'x'.repeat(size);
+          try { c.broadcastStateUpdate({ bytes: enc.encode(body) }); say('sent ' + n + ' size ' + size); } catch (e) { say('send failed ' + e.message); }
+          if (n > 40) clearInterval(tick);
+        }, 4000);
+      }, function (e) { say('client refused: ' + (e && e.message || e)); });
+    }).catch(function (e) { console.log('[codo] ' + e); });
+  }
   function open() {
     show('loading');
     if (!cfg.cloudProjectNumber) return fail('This add-on is not set up yet: it needs its Google Cloud project number in assets/addon-config.js.');
     withTimeout(window.meet.addon.createAddonSession({ cloudProjectNumber: String(cfg.cloudProjectNumber) }), 10000).then(function (session) {
+      window.__probeSession = session;
       return session.createSidePanelClient();
     }).then(function (client) {
       side = client;
+      probeCoDoing();
       side.on('frameToFrameMessage', function (m) {
         if (m && A.isHello(m.payload)) { S.stageOn = true; stageButtons(true); sendStage(); S.codeStageSent = null; drawCode(); }
         var did = m && A.readAct(m.payload);
