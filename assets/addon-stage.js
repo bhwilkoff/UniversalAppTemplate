@@ -404,9 +404,8 @@
       if (k.stance) room.send({ t: 'stance', stance: k.stance });
     });
     var name = $('[data-rw-name]');
-    name.hidden = !roomPage;
-    name.querySelector('input').value = window.RoomClient.savedName();
-    name.addEventListener('submit', function (e) { e.preventDefault(); room.setName(name.querySelector('input').value); name.querySelector('button').textContent = 'Saved'; });
+    name.hidden = !roomPage || !!window.RoomClient.savedName();
+    name.addEventListener('submit', function (e) { e.preventDefault(); room.setName(name.querySelector('input').value); name.hidden = true; });
     $('[data-rb-form]').addEventListener('submit', function (e) {
       e.preventDefault();
       var input = e.target.querySelector('input');

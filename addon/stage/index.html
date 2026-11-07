@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261107d">
+  <link rel="stylesheet" href="/assets/site.css?v=20261107e">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -79,10 +79,6 @@
         <p class="kicker" data-rw-kicker></p>
         <h1 class="stage-title" data-rw-title></h1>
         <p class="stage-what" data-rw-host></p>
-        <form class="stage-write stage-name" data-rw-name hidden>
-          <input aria-label="Your name" placeholder="Your name" maxlength="60" autocomplete="name">
-          <button class="stage-send" type="submit">Save</button>
-        </form>
       </div>
       <div class="room-board" data-view="roomboard" hidden>
         <ul class="room-notes" data-rb-notes></ul>
@@ -169,6 +165,10 @@
         <button class="stage-send" type="submit">Ask</button>
       </form>
       <div class="stage-chips" data-slide-links hidden></div>
+      <form class="stage-write stage-name" data-rw-name hidden>
+        <input aria-label="Your name" placeholder="Your name" maxlength="60" autocomplete="name">
+        <button class="stage-send" type="submit">Save</button>
+      </form>
       <p class="room-off" data-room-off role="status" hidden>Reconnecting</p>
     </section>
   </main>
@@ -186,6 +186,6 @@
   <script src="/assets/slide-studio.js?v=20261107a" defer></script>
   <script src="/assets/room-lib.js?v=20261107a" defer></script>
   <script src="/assets/room-client.js?v=20261107a" defer></script>
-  <script src="/assets/addon-stage.js?v=20261107c" defer></script>
+  <script src="/assets/addon-stage.js?v=20261107d" defer></script>
 </body>
 </html>

@@ -3246,7 +3246,8 @@ a.person-name:hover { text-decoration: underline; }
 .open-stances .btn-secondary { min-height: 32px; padding: 0 2px; font-size: 13px; }
 
 .stage-stance { padding: 0.1rem 0.5rem; border: 0; background: none; color: #fff; font: inherit; font-size: clamp(0.75rem, 1.6vmin, 1rem); cursor: pointer; }
-.stage-name { max-width: 28rem; margin-top: 2vmin; }
+.stage-name:not([hidden]) { position: fixed; top: 0.75rem; right: 0.75rem; z-index: 6; width: min(20rem, calc(100vw - 1.5rem)); }
+.stage-name input { padding: 0.3rem 0.6rem; font-size: 1rem; }
 .room-board:not([hidden]) { display: grid; grid-template-rows: minmax(0, 1fr) auto; gap: 1.5vmin; position: fixed; inset: 0; z-index: 1; padding: 6vmin 2vmin 7vmin; background: var(--paper); }
 .room-notes { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr)); gap: 1.2vmin; align-content: start; overflow-y: auto; }
 .room-notes.is-empty { display: block; }
