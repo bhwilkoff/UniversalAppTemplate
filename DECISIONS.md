@@ -1344,3 +1344,11 @@ refuses, the Accept button still leads to GitHub's own page.
 
 **How to apply:** /path/ keeps working on its own. Nothing was deleted: `stagesForWeek`, `stage_marks`, `path-lib`, and the hidden ready mark in the share form stay for the revision. Do not bring a stage back into a cohort surface before then. The template's `runs-of-show.json` and course docs still name stages, and they change with that revision.
 
+## Open rooms stand apart from cohorts (November 7, 2026)
+
+**Any Meet call that is not a cohort's is an open room: slides, a question, a board, a clock, reactions, and a page, with no account, on a Cloudflare Worker, and erased when it ends.** Ben: "I'd like for the add-on to be usable by anyone as a set of presentation tools." ADDON-DESIGN.md, "Open rooms", holds the shape.
+
+**Why:** a pipeline that asks for GitHub, or for anything, before a person has seen what the tools do loses most people. Supabase's free Realtime is 200 connections and going over restricts the whole organization, so strangers' rooms must never share the cohorts' project. Measured the same day: the account is on Cloudflare's Free plan (it refused a paid-only setting), so reaching a limit stops rooms for the day and cannot cost anything; a room held 1,000 sockets; a real stage reached it in 17 ms; and Meet's own co-doing API is refused to us.
+
+**How to apply:** the only database call a stranger makes is `is_cohort_call`, which answers yes or no. Keep rooms out of Supabase. A room's words stay in the room, so a person keeps a talk by keeping it in their own repository, made with GitHub's template page rather than an app of ours, because the Hub App cannot generate a repository for someone who has not installed it. Pages run in a frame with scripts and forms only. To take a page down, add its repository to `BLOCKED_REPOS` in `tools/rooms/wrangler.toml`.
+

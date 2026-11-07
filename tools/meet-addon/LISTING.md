@@ -203,3 +203,7 @@ Each step names the screen and what goes in each field.
   address someone reads, if meet@ is not read.
 - **The home page** links the privacy page, which brand verification
   asks for.
+
+## Next edit, after the current review
+
+The listing still describes cohorts only. Once Google has approved the current text, add that the tools work in any call with no account (ADDON-DESIGN.md, "Open rooms"), keeping the ™ rule and the trademark footnote.
