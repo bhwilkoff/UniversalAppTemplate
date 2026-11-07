@@ -34,6 +34,20 @@
     return Object.keys(by).sort().map(function (n) { return { name: n, spoke: by[n] }; });
   }
 
+  // A moment in the recording: "12:05", or "1:02:05" past the hour.
+  function clock(seconds) {
+    var two = function (n) { return (n < 10 ? '0' : '') + n; };
+    var h = Math.floor(seconds / 3600), m = Math.floor(seconds / 60) % 60, s = seconds % 60;
+    return h ? h + ':' + two(m) + ':' + two(s) : m + ':' + two(s);
+  }
+
+  // What was said, in order, each stretch with its speaker's name.
+  function said(words, names) {
+    return (words || []).slice().sort(function (a, b) { return a.started_s - b.started_s; }).map(function (w) {
+      return { who: (w.user_id && names[w.user_id]) || w.name || 'Name not read', at: clock(w.started_s), text: w.body };
+    });
+  }
+
   // Each reaction a person sent, as [id, count], in the order first sent.
   function reactionsOf(events, userId) {
     var seen = {}, order = [];
@@ -78,7 +92,7 @@
     });
   }
 
-  var api = { UNMATCHED: UNMATCHED, secondsSpoken: secondsSpoken, spoken: spoken, others: others, minutesHere: minutesHere, reactionsOf: reactionsOf, people: people, stops: stops };
+  var api = { UNMATCHED: UNMATCHED, clock: clock, said: said, secondsSpoken: secondsSpoken, spoken: spoken, others: others, minutesHere: minutesHere, reactionsOf: reactionsOf, people: people, stops: stops };
   root.SessionStoryLib = api;
   if (typeof module !== 'undefined') module.exports = api;
 })(typeof window !== 'undefined' ? window : globalThis);

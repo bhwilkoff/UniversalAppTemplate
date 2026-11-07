@@ -4,8 +4,9 @@
 // Every ten minutes Supabase Cron calls this with the x-reminders-key header.
 // Any session whose recording is unread gets the job started in its cohort's
 // private repository. That job then calls here with GitHub's OIDC token: once
-// to ask for the recording and the names, and once with what it read. Only
-// turns are kept; nothing is committed to the repository.
+// to ask for the recording and the names, then with the turns, then with the
+// words. Those are kept here and nothing is committed to the repository,
+// because every learner can read it.
 //
 // Secrets: REMINDERS_KEY, GITHUB_APP_ID, GITHUB_APP_PRIVATE_KEY,
 // GITHUB_APP_INSTALLATION_ID.
@@ -13,7 +14,7 @@ import { createClient } from 'npm:@supabase/supabase-js@2';
 import { createAppAuth } from 'npm:@octokit/auth-app@7';
 import { createRemoteJWKSet, jwtVerify } from 'npm:jose@5';
 import { WORKFLOW, WORKFLOW_PATH } from '../_shared/session-read-workflow.js';
-import { ISSUER, AUDIENCE, callerOk, clean, driveId, due, fullName } from './logic.js';
+import { ISSUER, AUDIENCE, callerOk, clean, cleanWords, driveId, due, fullName } from './logic.js';
 
 const reply = (status: number, body: unknown) =>
   new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
@@ -122,7 +123,7 @@ async function job(db: any, req: Request, jwt: string) {
     await db.from('session_reads').update({ state: 'failed', problem: String(body.problem || 'no details').slice(0, 200), finished_at: new Date().toISOString() }).eq('session_id', s.data.id);
     return reply(200, { kept: false });
   }
-  if (body.action === 'finish') {
+  if (body.action === 'turns') {
     const read = clean(body, people.map((p) => p.id));
     if (!read) return reply(422, { message: 'That is not a reading.' });
     const gone = await db.from('session_talk').delete().eq('session_id', s.data.id);
@@ -130,10 +131,21 @@ async function job(db: any, req: Request, jwt: string) {
     const rows = read.turns.map((t) => ({ ...t, session_id: s.data.id, cohort_id: s.data.cohort_id }));
     const put = rows.length ? await db.from('session_talk').insert(rows) : { error: null };
     if (put.error) return reply(500, { message: put.error.message });
-    await db.from('session_reads').update({ state: 'done', read_seconds: read.seconds, problem: null, finished_at: new Date().toISOString() }).eq('session_id', s.data.id);
+    await db.from('session_reads').update({ read_seconds: read.seconds }).eq('session_id', s.data.id);
     return reply(200, { kept: rows.length });
   }
-  return reply(400, { message: 'Say start, finish, or fail.' });
+  if (body.action === 'finish') {
+    const said = cleanWords(body, people.map((p) => p.id));
+    if (!said) return reply(422, { message: 'Those are not words.' });
+    const gone = await db.from('session_words').delete().eq('session_id', s.data.id);
+    if (gone.error) return reply(500, { message: gone.error.message });
+    const rows = said.map((w) => ({ ...w, session_id: s.data.id, cohort_id: s.data.cohort_id }));
+    const put = rows.length ? await db.from('session_words').insert(rows) : { error: null };
+    if (put.error) return reply(500, { message: put.error.message });
+    await db.from('session_reads').update({ state: 'done', problem: null, finished_at: new Date().toISOString() }).eq('session_id', s.data.id);
+    return reply(200, { kept: rows.length });
+  }
+  return reply(400, { message: 'Say start, turns, finish, or fail.' });
 }
 
 Deno.serve(async (req) => {

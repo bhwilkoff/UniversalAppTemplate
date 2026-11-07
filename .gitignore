@@ -7,3 +7,4 @@ supabase/functions/mcp/teach-lib.js
 supabase/functions/mcp/live-lib.js
 supabase/.temp/
 supabase/functions/setup-queue/teach-lib.js
+__pycache__/

@@ -129,9 +129,11 @@
   // and in the reader's when that is a different clock time:
   // "Tuesdays at 5:00 PM MDT, for 75 minutes (7:00 PM EDT where you are)."
   var DAY_NAMES = ['Sundays', 'Mondays', 'Tuesdays', 'Wednesdays', 'Thursdays', 'Fridays', 'Saturdays'];
-  function scheduleText(c, viewerZone, locale) {
+  function scheduleText(c, viewerZone, locale, now) {
     if (c.session_weekday == null || !c.session_time) return 'The weekly session time is still to come.';
-    var day = c.starts_on || new Date().toISOString().slice(0, 10);
+    // Today once it has begun: a time zone's name changes in the middle of a cohort.
+    var today = (now || new Date()).toISOString().slice(0, 10);
+    var day = c.starts_on && c.starts_on > today ? c.starts_on : today;
     var at = zonedToUtc(day, c.session_time.slice(0, 5), c.time_zone);
     function clock(zone) {
       return new Intl.DateTimeFormat(locale, { timeZone: zone, hour: 'numeric', minute: '2-digit', timeZoneName: 'short' }).format(at);

@@ -374,7 +374,8 @@
       db.from('enrollments').select('user_id, profiles(github_login, display_name)').eq('cohort_id', cohort.id),
       db.from('session_talk').select('user_id, name, started_s, ended_s').eq('session_id', session.id).limit(5000),
       db.from('session_reads').select('state, read_seconds').eq('session_id', session.id).maybeSingle(),
-      db.from('cohort_teachers').select('user_id, profiles(github_login, display_name)').eq('cohort_id', cohort.id)
+      db.from('cohort_teachers').select('user_id, profiles(github_login, display_name)').eq('cohort_id', cohort.id),
+      db.from('session_words').select('user_id, name, started_s, body').eq('session_id', session.id).order('started_s').limit(5000)
     ]).then(function (res) {
       if (res.some(function (r) { return r.error; })) { box.appendChild(el('p', 'small', 'What happened could not be read.')); return; }
       var ids = res[1].data.map(function (k) { return k.id; }), names = {};
@@ -386,7 +387,8 @@
       var who = L.people({ names: names, events: res[0].data, talk: talk, requests: res[3].data, queue: res[4].data,
         answers: res[2].data.filter(function (a) { return ids.indexOf(a.check_id) >= 0; }) });
       var stops = leading ? L.stops(res[0].data) : [];
-      if (!who.length && !stops.length) { box.appendChild(U.empty('Nothing was kept from this session')); return; }
+      var words = L.said(res[9].data, names);
+      if (!who.length && !stops.length && !words.length) { box.appendChild(U.empty('Nothing was kept from this session')); return; }
       if (stops.length) {
         box.appendChild(el('h3', null, 'How it moved'));
         var ol = el('ol', 'session-story-stops');
@@ -399,7 +401,7 @@
       }
       box.appendChild(el('h3', null, leading ? 'What was kept, by person' : 'What was kept about you'));
       // Talk covers only what was recorded, and rooms never are.
-      if (read && read.state === 'done') box.appendChild(el('p', 'small', 'Speaking is from ' + L.spoken(read.read_seconds) + ' of recording. Breakout rooms are not recorded.'));
+      if (read && read.read_seconds) box.appendChild(el('p', 'small', 'Speaking is from ' + L.spoken(read.read_seconds) + ' of recording. Breakout rooms are not recorded.'));
       who.forEach(function (p) {
         var card = el('div', 'session-prep-q');
         if (leading) card.appendChild(el('h4', null, p.name));
@@ -433,7 +435,30 @@
         card.appendChild(field);
         box.appendChild(card);
       });
+      if (words.length) drawSaid(box, words, leading);
     });
+  }
+
+  // Closed until asked for: it is the longest thing here, and the most personal.
+  function drawSaid(box, words, leading) {
+    var fold = el('details', 'session-said');
+    fold.appendChild(el('summary', null, leading ? 'What was said' : 'What you said'));
+    var note = el('p', 'ui-meta-line');
+    note.appendChild(leading ? U.visibility('staff', 'Everyone’s words') : U.visibility('teachers', 'Your words'));
+    fold.appendChild(note);
+    fold.appendChild(el('p', 'small', 'Software wrote this from the recording, so a word or a name can be wrong.'));
+    var list = el('ol');
+    words.forEach(function (w) {
+      var li = el('li');
+      var head = el('p', 'session-said-who');
+      if (leading) head.appendChild(el('strong', null, w.who));
+      head.appendChild(el('span', 'small', w.at));
+      li.appendChild(head);
+      li.appendChild(el('p', null, w.text));
+      list.appendChild(li);
+    });
+    fold.appendChild(list);
+    box.appendChild(fold);
   }
 
   function drawAfter(cohort, session) {

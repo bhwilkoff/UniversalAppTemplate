@@ -53,3 +53,16 @@ test('nothing kept gives nothing', () => {
   assert.deepEqual(L.stops([]), []);
   assert.deepEqual(L.people({ names: {} }), []);
 });
+
+test('what was said reads in order, with a name for each stretch', () => {
+  const rows = L.said([
+    { user_id: null, name: null, started_s: 3725, body: 'c' },
+    { user_id: 'b', name: null, started_s: 65, body: 'a' },
+    { user_id: null, name: 'Guest', started_s: 70, body: 'b' },
+  ], { b: 'Bea' });
+  assert.deepEqual(rows, [
+    { who: 'Bea', at: '1:05', text: 'a' },
+    { who: 'Guest', at: '1:10', text: 'b' },
+    { who: 'Name not read', at: '1:02:05', text: 'c' },
+  ]);
+});

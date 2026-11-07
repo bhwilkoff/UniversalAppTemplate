@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """The job in a cohort's private repository: prove who it is, read one
-recording, send back the turns. It prints no names and no numbers about anyone,
-because everyone with access to the repository can read this job's log."""
+recording, send back the turns and then the words. It prints no names, no
+words, and no numbers about anyone, because everyone with access to the
+repository can read this job's log."""
 import json, os, sys, tempfile, urllib.parse, urllib.request
 
 import read
+import words
 
 API = 'https://bifrieqzkihuxfzttgvd.supabase.co/functions/v1/session-read'
 
@@ -29,9 +31,12 @@ def main(session):
         video = os.path.join(d, 'recording')
         urllib.request.urlretrieve(url, video)
         result = read.read(video, got['names'])
-    if not result['turns']:
-        raise RuntimeError('no speaking border found')
-    call(session, action='finish', read_seconds=result['read_seconds'], turns=result['turns'])
+        if not result['turns']:
+            raise RuntimeError('no speaking border found')
+        # Turns go first, so a failure with the words cannot cost the talk time.
+        call(session, action='turns', read_seconds=result['read_seconds'], turns=result['turns'])
+        said = words.place(words.speech(video, got['names']), result['turns'])
+    call(session, action='finish', said=said)
     print('Done.')
 
 

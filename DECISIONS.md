@@ -1330,6 +1330,12 @@ refuses, the Accept button still leads to GitHub's own page.
 
 **How to apply:** the repository holds only `session-read.yml`, and the work lives on humanshaped.org. The job commits nothing, logs no name or number, and sends results straight to the database. session-read compares the workflow file at the run's own commit with `_shared/session-read-workflow.js` and refuses any difference, so a learner's edit cannot post or fetch anything. Start it with a repository dispatch, since the GitHub App has Contents but not Actions. Never estimate talk for a room: the minute rows name the room, and the After tab says rooms are not recorded.
 
+**A session keeps its words, in the database and never in the repository.** Ben, November 7, 2026: "If you can save transcripts confidentially to the cohort, that's fine to keep the words."
+
+**Why:** words are what show what was asked and answered, and they are the most personal thing kept. Every learner can read the cohort's repository, so it cannot hold them. Drive's own transcript has no API and no speaker labels, and sending audio to a service would put it outside the cohort.
+
+**How to apply:** the same job writes the words on its own computer with an open speech model (`small.en`), so no outside service hears them, and places each word on the turn marked at that moment, shifted two seconds because Meet's mark runs late, then moved to a sentence's end when a handoff lands within three words of one. Turns are sent first, so a failure with the words cannot cost the talk time. session_words follows session_talk: a leader reads everyone, each person reads their own, only the function writes. The After tab keeps them folded and says software wrote them.
+
 ## Stages stand apart from cohorts for now (November 6, 2026)
 
 **No cohort page, session, plan, or agent answer mentions a stage until the first full cohort is finished and the stages are revised to match.** Ben: "The Stages seem almost entirely disconnected from the cohorts at this point. Can we remove their inclusion until we have gone through the full cohort and can fully revise the stages to better match how they actually function in a cohort?"

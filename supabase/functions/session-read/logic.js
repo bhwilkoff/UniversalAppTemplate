@@ -4,7 +4,8 @@ import { WORKFLOW_PATH } from '../_shared/session-read-workflow.js';
 
 export const ISSUER = 'https://token.actions.githubusercontent.com';
 export const AUDIENCE = 'https://humanshaped.org';
-const STALE_MS = 60 * 60000;
+// Longer than the job's own time limit, so a slow run is never started twice.
+const STALE_MS = 150 * 60000;
 export const MOST_TRIES = 3;
 
 // Only the workflow on the main branch of this session's own repository, run
@@ -60,4 +61,22 @@ export function clean(body, people) {
     turns.push({ user_id: user, name, started_s: start, ended_s: end });
   }
   return { seconds, turns };
+}
+
+// What was said, made safe to keep, on the same terms as a turn. Null when it
+// is not a reading at all.
+export function cleanWords(body, people) {
+  if (!Array.isArray(body?.said) || body.said.length > 5000) return null;
+  const known = new Set(people);
+  const said = [];
+  for (const w of body.said) {
+    const start = Number(w?.start), end = Number(w?.end);
+    if (!Number.isInteger(start) || !Number.isInteger(end) || start < 0 || end <= start || end > 6 * 3600) return null;
+    const text = typeof w.text === 'string' ? w.text.trim().slice(0, 8000) : '';
+    if (!text) return null;
+    const user = w.user_id && known.has(w.user_id) ? w.user_id : null;
+    const name = user ? null : (typeof w.name === 'string' ? w.name.slice(0, 80) : null);
+    said.push({ user_id: user, name, started_s: start, ended_s: end, body: text });
+  }
+  return said;
 }
