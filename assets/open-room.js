@@ -26,8 +26,9 @@
       welcome: function (m) { you = m.you; mine = m.mine; },
       room: function (r) { room = r; if (r.on) ended = false; draw(); },
       words: function (w) { words = w; drawNow(); },
+      talk: function (t) { roomDeck = t; drawNow(); drawTop(); },
       mine: function (m) { mine = m; drawNow(); },
-      ended: function () { ended = true; mine = null; words = null; tool = null; },
+      ended: function () { ended = true; roomDeck = null; mine = null; words = null; tool = null; },
       error: function (t) { say(t); },
       status: function (s) {
         online = s === 'on'; drawTop();
@@ -38,7 +39,12 @@
     function say(t) { status.textContent = t || ''; }
     function isHost() { return !!room && room.on && room.host === you; }
 
-    function stops() { return R.stops(SL.frames(talk)); }
+    // The room's own slides decide where Next goes, so a host who took over
+    // moves through the slides everyone sees; notes show only for one's own.
+    var roomDeck = null;
+    function shown() { return roomDeck != null ? R.deckBody(roomDeck) : talk; }
+    function stops() { return R.stops(SL.frames(shown())); }
+    function mineOnStage() { return roomDeck == null || roomDeck === deck(); }
     // This person's own stage is open, or Meet has just said it is opening.
     function stageUp() { return stageOn || (!!room && (room.stages || []).indexOf(you) >= 0); }
     function deck() { return SL.deck(SL.withoutNotes(talk)); }
@@ -151,7 +157,7 @@
     function drawNow() {
       if (!F || !room || !room.on) return;
       var host = isHost();
-      var key = JSON.stringify([host, room.show, room.at, room.shown, room.question, room.summary, room.notes, room.page, room.card, room.clock && room.clock.endsAt, room.canTakeOver, mine, words, newSha, talk.length, stageUp()]);
+      var key = JSON.stringify([host, room.show, room.at, room.shown, room.question, room.summary, room.notes, room.page, room.card, room.clock && room.clock.endsAt, room.canTakeOver, mine, words, newSha, talk.length, roomDeck && roomDeck.length, stageUp()]);
       if (key === nowKey) return;
       var pane = F.pane('now');
       // A half-written note or answer stays while the room changes around it.
@@ -178,8 +184,8 @@
     function hostNow(pane) {
       var list = stops();
       if (room.show === 'slides') {
-        var notes = SL.notes(talk);
-        pane.appendChild(el('p', 'small', 'Slide ' + (room.at + 1) + ' of ' + SL.count(SL.withoutNotes(talk))));
+        var notes = mineOnStage() ? SL.notes(talk) : [];
+        pane.appendChild(el('p', 'small', 'Slide ' + (room.at + 1) + ' of ' + SL.count(shown())));
         if (notes[room.at]) pane.appendChild(el('div', 'p2-notes', notes[room.at]));
       } else if (room.show === 'question' && room.question) {
         var q = room.question;
@@ -281,8 +287,8 @@
       area.addEventListener('input', function () { talk = area.value; put(TALK, talk); });
       var line = el('p', 'small'); line.setAttribute('role', 'status');
       pane.appendChild(area);
-      pane.appendChild(el('p', 'small', '--- starts a new slide. A line starting with > is your own note.'));
-      pane.appendChild(btn('Use these slides', 'btn-primary', function () {
+      pane.appendChild(el('p', 'small', 'A line of three dashes starts a new slide. A line starting with > is your own note.'));
+      pane.appendChild(btn('Use these slides', 'btn-secondary', function () {
         if (!SL.count(SL.withoutNotes(talk))) return (line.textContent = 'Write a slide first.');
         sendTalk(true); line.textContent = 'On the stage.'; F.show('now');
       }));
@@ -372,7 +378,7 @@
       }
       sel.addEventListener('change', fit); fit();
       [sel, prompt, choices, ends, lab].forEach(function (n) { pane.appendChild(n); });
-      pane.appendChild(btn('Ask everyone', 'btn-primary', function () {
+      pane.appendChild(btn('Ask everyone', 'btn-secondary', function () {
         var q = L.parseQuestion({ kind: sel.value, prompt: prompt.value, choices: choices.value, points: 5, low: low.value, high: high.value });
         if (q.error) return (line.textContent = q.error);
         send({ t: 'ask', kind: q.kind, prompt: q.prompt, choices: q.choices, points: q.points, reveal: reveal.checked });
@@ -383,7 +389,7 @@
       var r = field('input', 'yourname/repository', repo ? repo.name : '');
       pane.appendChild(el('h2', null, 'From a repository'));
       pane.appendChild(r);
-      pane.appendChild(btn('Show its index.html', 'btn-primary', function () {
+      pane.appendChild(btn('Show its index.html', 'btn-secondary', function () {
         var x = R.repoOf(r.value);
         if (!x) return (line.textContent = 'Write it as yourname/repository.');
         line.textContent = 'Looking…';
@@ -410,7 +416,7 @@
     function messageTool(pane, line) {
       var m = field('textarea', 'What everyone should see'); m.rows = 3; m.maxLength = 400;
       pane.appendChild(m);
-      pane.appendChild(btn('Put it on the stage', 'btn-primary', function () {
+      pane.appendChild(btn('Put it on the stage', 'btn-secondary', function () {
         if (!m.value.trim()) return (line.textContent = 'Write it first.');
         send({ t: 'card', body: m.value }); done();
       }));

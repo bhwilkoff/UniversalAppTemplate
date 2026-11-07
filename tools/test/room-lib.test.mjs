@@ -80,5 +80,13 @@ test('each thing a host shows becomes its own view', () => {
   assert.equal(R.toView(room({ show: 'blank' }), {}).mode, 'blank');
   const c = R.toView(room({ show: 'card', card: 'Talk', clock: { endsAt: 9, label: '' } }), {});
   assert.deepEqual(c.card, { body: 'Talk', endsAt: 9 });
-  assert.equal(c.part.name, 'Clock');
+  assert.equal(c.part, null, 'the card carries the clock, so it shows once');
+});
+
+test('a deck the room holds reads back as the talk, so a new host moves through the same slides', () => {
+  const SL = require('../../assets/slides-lib.js');
+  const talk = '# One\n\n> mine\n\n---\n\n# Two';
+  const deck = SL.deck(SL.withoutNotes(talk));
+  assert.equal(SL.count(R.deckBody(deck)), 2);
+  assert.equal(R.deckBody('# no head'), '# no head');
 });

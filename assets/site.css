@@ -3248,7 +3248,7 @@ a.person-name:hover { text-decoration: underline; }
 .stage-stance { padding: 0.1rem 0.5rem; border: 0; background: none; color: #fff; font: inherit; font-size: clamp(0.75rem, 1.6vmin, 1rem); cursor: pointer; }
 .stage-name:not([hidden]) { position: fixed; top: 0.75rem; right: 0.75rem; z-index: 6; width: min(20rem, calc(100vw - 1.5rem)); }
 .stage-name input { padding: 0.3rem 0.6rem; font-size: 1rem; }
-.open-board:not([hidden]) { display: grid; grid-template-rows: minmax(0, 1fr) auto; gap: 1.5vmin; position: fixed; inset: 0; z-index: 1; padding: 6vmin 2vmin 7vmin; background: var(--paper); }
+.open-board:not([hidden]) { display: grid; grid-template-rows: minmax(0, 1fr) auto; gap: 1.5vmin; position: fixed; inset: 0; z-index: 1; padding: 6vmin 2vmin 5.5rem; background: var(--paper); }
 .room-notes { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr)); gap: 1.2vmin; align-content: start; overflow-y: auto; }
 .room-notes.is-empty { display: block; }
 .room-note { display: grid; gap: 0.6vmin; padding: 1.4vmin; border-radius: 12px; background: var(--card); color: var(--ink); align-content: space-between; }
@@ -3262,3 +3262,4 @@ a.person-name:hover { text-decoration: underline; }
 .room-links a { color: var(--ink); }
 .room-off { position: fixed; right: 0.75rem; bottom: 0.75rem; z-index: 6; margin: 0; padding: 0.2rem 0.6rem; border-radius: 999px; background: rgb(19 25 22 / 0.8); color: #fff; font-size: 0.85rem; }
 .stage-app[data-view="page"]:not([hidden]) { grid-template-rows: minmax(0, 1fr); }
+.stage-ready:has([data-view="page"]:not([hidden])) .stance-bar, .stage-ready:has([data-view="page"]:not([hidden])) .stage-reacts { display: none; }

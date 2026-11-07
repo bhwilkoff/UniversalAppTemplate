@@ -35,6 +35,9 @@
     return tag + s;
   }
 
+  // A deck as the room holds it, without the theme lines the stage adds.
+  function deckBody(d) { return String(d || '').replace(/^---\n[\s\S]*?\n---\n/, ''); }
+
   // The first heading of a talk, for its title.
   function titleOf(text) {
     var m = /^#{1,3}\s+(.+?)\s*(\{.*\})?\s*$/m.exec(String(text || ''));
@@ -91,12 +94,12 @@
     }
     if (room.show === 'board') return { mode: 'roomboard', part: part, notes: room.notes || [], you: c.you, host: room.host === c.you };
     if (room.show === 'page' && room.page) return { mode: 'page', part: null, page: room.page, html: room.page.owner ? null : (c.html || '') };
-    if (room.show === 'card' && room.card) return { mode: 'card', part: part, card: { body: room.card, endsAt: part ? part.endsAt : null } };
+    if (room.show === 'card' && room.card) return { mode: 'card', part: null, card: { body: room.card, endsAt: part ? part.endsAt : null } };
     if (room.show === 'blank') return { mode: 'blank', part: part };
     return { mode: 'roomwelcome', part: part, title: room.title, host: room.hostName };
   }
 
-  var lib = { CODE: CODE, TEMPLATE: TEMPLATE, STARTER: STARTER, code: code, codeOfSearch: codeOfSearch, link: link, socket: socket, repoOf: repoOf, commitUrl: commitUrl, rawUrl: rawUrl, editUrl: editUrl, assetBase: assetBase, withBase: withBase, titleOf: titleOf, stops: stops, stopAt: stopAt, nextStep: nextStep, people: people, here: here, toView: toView };
+  var lib = { CODE: CODE, TEMPLATE: TEMPLATE, STARTER: STARTER, code: code, codeOfSearch: codeOfSearch, link: link, socket: socket, repoOf: repoOf, commitUrl: commitUrl, rawUrl: rawUrl, editUrl: editUrl, assetBase: assetBase, withBase: withBase, titleOf: titleOf, deckBody: deckBody, stops: stops, stopAt: stopAt, nextStep: nextStep, people: people, here: here, toView: toView };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
   else root.RoomLib = lib;
 })(typeof globalThis !== 'undefined' ? globalThis : this);
