@@ -2156,7 +2156,7 @@
       } }); };
       go().catch(function (e) {
         say('first try refused; starting activity');
-        return Promise.resolve(side.startActivity({ mainStageUrl: 'https://humanshaped.org/addon/stage/' })).then(function () {
+        return Promise.resolve(side.startActivity({ mainStageUrl: 'https://humanshaped.org/addon/stage/probe/' })).then(function () {
           say('activity started');
           return new Promise(function (r) { setTimeout(r, 4000); });
         }).then(go);
