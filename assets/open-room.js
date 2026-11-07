@@ -78,7 +78,7 @@
       box.replaceChildren();
       tool = null;
       if (role === 'lobby') return buildLobby();
-      F = window.PanelFrame.mount({ root: o.root, into: box, teaching: role === 'host', tabs: role === 'host' ? [['now', 'Now'], ['talk', 'Talk'], ['tools', 'Tools'], ['people', 'People']] : [['now', 'Now'], ['yours', 'Yours']] });
+      F = window.PanelFrame.mount({ root: o.root, into: box, teaching: role === 'host', tabs: role === 'host' ? [['now', 'Now'], ['talk', 'Talk'], ['kit', 'Tools'], ['people', 'People']] : [['now', 'Now'], ['yours', 'Yours']] });
       F.on(next, back);
       if (role === 'host') { buildTalk(); drawTools(); peopleTab(); }
       else { buildYours(); buildReactions(); }
@@ -151,7 +151,7 @@
     function drawNow() {
       if (!F || !room || !room.on) return;
       var host = isHost();
-      var key = JSON.stringify([host, room.show, room.at, room.shown, room.question, room.summary, room.notes, room.page, room.card, room.clock && room.clock.endsAt, room.canTakeOver, mine, words, newSha, talk.length]);
+      var key = JSON.stringify([host, room.show, room.at, room.shown, room.question, room.summary, room.notes, room.page, room.card, room.clock && room.clock.endsAt, room.canTakeOver, mine, words, newSha, talk.length, stageUp()]);
       if (key === nowKey) return;
       var pane = F.pane('now');
       // A half-written note or answer stays while the room changes around it.
@@ -205,7 +205,7 @@
       } else if (room.show === 'blank') {
         pane.appendChild(el('p', 'small', 'The stage is clear.'));
       } else {
-        pane.appendChild(el('p', 'small', list.length ? 'The welcome is on the stage.' : 'The welcome is on the stage. Your slides go in Talk.'));
+        pane.appendChild(el('p', 'small', !stageUp() ? 'The main stage is closed.' : list.length ? 'The welcome is on the stage.' : 'The welcome is on the stage. Your slides go in Talk.'));
       }
       if (room.clock) pane.appendChild(btn('Stop the clock', 'btn-secondary', function () { send({ t: 'clock', seconds: 0 }); }));
     }
@@ -331,7 +331,7 @@
 
     var TOOLS = [['question', 'Question'], ['board', 'Board'], ['page', 'Page'], ['clock', 'Clock'], ['message', 'Message'], ['clear', 'Clear stage']];
     function drawTools() {
-      var pane = F && F.pane('tools');
+      var pane = F && F.pane('kit');
       if (!pane) return;
       pane.replaceChildren();
       if (!tool) {
