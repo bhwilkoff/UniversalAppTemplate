@@ -2150,10 +2150,17 @@
       document.body.appendChild(box);
       var say = function (x) { console.log('[codo] ' + x); box.textContent = ((Date.now() - t0) / 1000).toFixed(1) + ' ' + x + '\n' + box.textContent; };
       say('me ' + me + ' has ' + typeof window.__probeSession.createCoDoingClient);
-      window.__probeSession.createCoDoingClient({ activityTitle: 'Human Shaped', onCoDoingStateChanged: function (st) {
+      var go = function () { return window.__probeSession.createCoDoingClient({ activityTitle: 'Human Shaped', onCoDoingStateChanged: function (st) {
         var txt = new TextDecoder().decode(st.bytes);
         say('GOT ' + st.bytes.length + 'b ' + txt.slice(0, 40));
-      } }).then(function (c) {
+      } }); };
+      go().catch(function (e) {
+        say('first try refused; starting activity');
+        return Promise.resolve(side.startActivity({ mainStageUrl: 'https://humanshaped.org/addon/stage/' })).then(function () {
+          say('activity started');
+          return new Promise(function (r) { setTimeout(r, 4000); });
+        }).then(go);
+      }).then(function (c) {
         say('client ok');
         var enc = new TextEncoder(), sizes = [10, 1000, 10000, 60000, 200000];
         var tick = setInterval(function () {
