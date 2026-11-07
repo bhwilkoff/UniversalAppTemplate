@@ -17,6 +17,8 @@ LAG = 2.0
 NEAR = 2
 SNAP = 3
 LONGEST = 45
+# Words every session uses that it otherwise mishears ("Cloud Code").
+TERMS = ['Claude', 'Claude Code', 'GitHub', 'Human Shaped']
 
 
 def audio(video):
@@ -30,9 +32,9 @@ def speech(video, names):
     """Each word as (start, end, text). Names help it spell the people here."""
     from faster_whisper import WhisperModel
     model = WhisperModel(MODEL, device='cpu', compute_type='int8')
-    hint = ', '.join(sorted({p['name'] for p in names if p.get('name')}))
+    hint = ', '.join(TERMS + sorted({p['name'] for p in names if p.get('name')}))
     parts, _ = model.transcribe(audio(video), language='en', vad_filter=True, word_timestamps=True,
-                                hotwords=hint or None, condition_on_previous_text=False)
+                                hotwords=hint, condition_on_previous_text=False)
     return [(w.start, w.end, w.word) for s in parts for w in s.words]
 
 

@@ -173,6 +173,9 @@ Each step names the screen and what goes in each field.
 > is the call's meeting code. A leader can record a session with Human
 > Shaped's recorder, which opens in its own window, only after saying so
 > out loud and in the chat, and everyone sees that it is recording.
+> Software then works out from that recording who spoke, for how long,
+> and what was said, and a leader can read it all while each person
+> reads their own words.
 > Answers to questions are counted without names on the stage.
 >
 > Signing in uses your humanshaped.org account. Everything is free, and
