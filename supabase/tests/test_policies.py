@@ -3078,6 +3078,9 @@ def main():
     su.execute("insert into public.live_checks (id, cohort_id, session_id, created_by, prompt, kind, state) values (%s, %s, %s, %s, 'Why?', 'short', 'open')", (kk, cc, ss, people["ben"]))
     g = as_user("gus"); g.execute("select count(*) from public.sessions where id = %s", (ss,))
     check("before the link, a guest reads nothing of the cohort", g.fetchall() == [(0,)])
+    # Open rooms: anyone can ask whether a call is a cohort's, and learn only that.
+    a = as_user(None); a.execute("select public.is_cohort_call('gst-gstg-gst'), public.is_cohort_call('qqq-qwqw-qqq'), public.is_cohort_call('%')")
+    check("anyone can tell a cohort's call from any other, and a wildcard is no call", a.fetchall() == [(True, False, False)])
     g = as_user("gus"); g.execute("select public.join_call('qqq-qwqw-qqq')")
     check("a code that is no session's call joins nothing", g.fetchall() == [(None,)])
     g = as_user("gus"); g.execute("select public.join_call('gst-gstg-gst', 'Gus')")

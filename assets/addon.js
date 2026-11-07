@@ -257,13 +257,23 @@
           return findCohort(code, true);
         });
       }
-      if (!room) {
-        $('[data-no-room-text]').textContent = 'This call’s code is ' + code + '. Each session’s call is the Meet link on its calendar invitation and its session page; open the panel from that call.';
-        return show('no-room');
-      }
+      if (!room) return openRoom(code);
       S.room = room;
       return loadCohort(room.cohortId);
     });
+  }
+
+  // Any other call is an open room (ADDON-DESIGN.md). Nobody needs an account
+  // for it, and signing in only gives the room their name.
+  var opened = null, openCode = null;
+  function openRoom(code) {
+    openCode = code;
+    show('open');
+    var meta = S.me && !S.me.is_anonymous ? S.me.user_metadata || {} : null;
+    var who = { name: meta ? meta.full_name || meta.name || meta.user_name || '' : '', member: !!meta };
+    if (opened) { opened.person(who); return; }
+    root.classList.add('p2-panel');
+    opened = window.OpenRoom.mount({ root: root, code: code, side: side, name: who.name, member: who.member, signIn: signedOut });
   }
 
   function loadCohort(id) {
@@ -2136,6 +2146,7 @@
     }, function () { signedOut(); });
   }
   $('[data-as-guest]').addEventListener('click', function () {
+    if (openCode) return show('open');
     if (S.me) return show('ready');
     try { localStorage.removeItem(OUT); } catch (e) {}
     show('loading');
@@ -2157,14 +2168,29 @@
       });
       return signIn().then(function (s) {
         if (s) return proceed(s);
-        if (signedOutOnPurpose()) return signedOut();
-        // No sign-in here: come in as a guest, with no screen in the way.
-        // One Tap rides on top, as Google's listing rule asks, and closes.
-        return asGuest().then(function (came) { if (came) offerOneTap(); });
+        return strangerCall().then(function (code) {
+          if (code) { openRoom(code); offerOneTap(); return; }
+          return cohortGuest();
+        });
       });
     }, function () {
       show('outside');
     });
+  }
+  // Before anyone signs in or becomes a guest: is this a cohort's call? If the
+  // answer does not come, the panel carries on as it would for a cohort.
+  function strangerCall() {
+    return Promise.resolve().then(function () { return side.getMeetingInfo(); }).then(function (m) {
+      var code = A.meetingCode(m && m.meetingCode);
+      if (!code) return null;
+      return db.rpc('is_cohort_call', { code: code }).then(function (r) { return !r.error && r.data === false ? code : null; });
+    }).catch(function () { return null; });
+  }
+  function cohortGuest() {
+        if (signedOutOnPurpose()) return signedOut();
+        // No sign-in here: come in as a guest, with no screen in the way.
+        // One Tap rides on top, as Google's listing rule asks, and closes.
+        return asGuest().then(function (came) { if (came) offerOneTap(); });
   }
   $('[data-reload]').addEventListener('click', function () { if (S.me) start({ user: S.me }); else if (standalone) openStandalone(); else open(); });
   // Outside Meet there is no main stage to open, and the sign-in is this

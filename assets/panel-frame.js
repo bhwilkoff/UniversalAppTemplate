@@ -6,8 +6,8 @@
   function el(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
 
   function mount(o) {
-    var ready = o.root.querySelector('[data-state="ready"]');
-    var tabs = o.teaching ? [['now', 'Now'], ['plan', 'Plan'], ['tools', 'Tools'], ['people', 'People']] : [['now', 'Now'], ['mine', 'Mine']];
+    var ready = o.into || o.root.querySelector('[data-state="ready"]');
+    var tabs = o.tabs ? o.tabs : o.teaching ? [['now', 'Now'], ['plan', 'Plan'], ['tools', 'Tools'], ['people', 'People']] : [['now', 'Now'], ['mine', 'Mine']];
     var shell = el('div', 'p2');
     var top = el('header', 'p2-top');
     var row = el('div', 'p2-top-row');

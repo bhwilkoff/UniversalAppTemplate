@@ -8,3 +8,4 @@ supabase/functions/mcp/live-lib.js
 supabase/.temp/
 supabase/functions/setup-queue/teach-lib.js
 __pycache__/
+.wrangler/

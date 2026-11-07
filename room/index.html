@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Human Shaped room</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="/assets/favicon.svg?v=20261006q" type="image/svg+xml">
+  <script>
+    // A room's own address, /room/?abc-defg-hij: the main stage, for people
+    // without the add-on (ADDON-DESIGN.md, "Open rooms").
+    var c = /^\?([a-z]{3}-[a-z]{4}-[a-z]{3})$/.exec(location.search);
+    location.replace(c ? '/addon/stage/?room=' + c[1] : '/meet/');
+  </script>
+</head>
+<body></body>
+</html>

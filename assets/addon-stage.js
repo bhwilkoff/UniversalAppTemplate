@@ -17,7 +17,11 @@
 
   var framed = false;
   try { framed = window.self !== window.top; } catch (e) { framed = true; }
-  if (!A || !L || !framed || !window.meet || !window.meet.addon) { show('outside'); return; }
+  // An open room (ADDON-DESIGN.md): this stage takes what it shows from the
+  // room itself, inside Meet or on the room's own page.
+  var RL = window.RoomLib, roomCode = RL ? RL.codeOfSearch(location.search) : null;
+  var roomPage = !!roomCode && !framed;
+  if (!A || !L || (!roomPage && (!framed || !window.meet || !window.meet.addon))) { show('outside'); return; }
 
   function clockText(part) {
     var left = part ? A.timeLeft(part.endsAt, Date.now()) : null;
@@ -30,7 +34,7 @@
     $('[data-stage-rec]').hidden = !view.recording;
     var part = view.part;
     // The part sits small at the top when something else has the stage.
-    $('[data-part]').hidden = view.mode === 'part' || view.mode === 'welcome' || view.mode === 'scene' || view.mode === 'app' || view.mode === 'studio' || view.mode === 'slides' || view.mode === 'blank' || !part;
+    $('[data-part]').hidden = view.mode === 'part' || view.mode === 'welcome' || view.mode === 'scene' || view.mode === 'app' || view.mode === 'studio' || view.mode === 'slides' || view.mode === 'blank' || view.mode === 'roomwelcome' || view.mode === 'roomboard' || view.mode === 'roomend' || view.mode === 'page' || !part;
     if (view.mode === 'slides') drawSlide(view.slides);
     drawLinks(view.mode === 'slides' ? view.slides.links : null);
     drawAsk();
@@ -146,6 +150,9 @@
       $('[data-w-first]').textContent = w.first ? 'First: ' + w.first.name + '. ' + (w.first.what || '') : '';
     }
     drawApp(view.mode === 'app' ? view : null);
+    drawPage(view.mode === 'page' ? view : null);
+    if (view.mode === 'roomboard') drawRoomBoard();
+    if (view.mode === 'roomwelcome') drawRoomWelcome();
     drawStudio(view.mode === 'studio' ? view.studio : null);
     if (view.mode === 'item') {
       $('[data-who]').textContent = view.who;
@@ -235,7 +242,7 @@
   }
 
   var stageClient = null;
-  function act(a) { if (stageClient) try { Promise.resolve(stageClient.notifySidePanel(A.actMessage(a))).catch(function () {}); } catch (e) {} }
+  function act(a) { if (room) return roomAct(a); if (stageClient) try { Promise.resolve(stageClient.notifySidePanel(A.actMessage(a))).catch(function () {}); } catch (e) {} }
 
   // What a slide shows from GitHub, ready to open.
   function drawLinks(links) {
@@ -342,7 +349,7 @@
     // A scene's words can fill the stage, so its clock sits small at the
     // top (found in the live Meet test: a long part pushed it out of the
     // frame); a break, which is only its clock, keeps it large.
-    var scene = view.mode === 'scene' || view.mode === 'slides', big = view.mode === 'scene' && view.scene && view.scene.eyebrow === 'Break';
+    var scene = view.mode === 'scene' || view.mode === 'slides' || view.mode === 'roomboard' || view.mode === 'roomwelcome', big = view.mode === 'scene' && view.scene && view.scene.eyebrow === 'Break';
     $('[data-part-name]').hidden = scene;
     $('[data-clock]').textContent = t ? (scene ? t : ', ' + t) : '';
     if (scene) $('[data-part]').hidden = big || !t;
@@ -354,7 +361,110 @@
   }
   setInterval(tick, 1000);
 
+  // ------------------------------------------------------------------
+  // An open room
+  // ------------------------------------------------------------------
+
+  var room = null, roomState = null, roomEnded = false, roomTalk = '', roomHtml = '', roomMine = null, pageKey = null;
+
+  function roomDraw() {
+    if (!roomState) return;
+    var mine = roomMine && roomState.question && roomMine.id === roomState.question.id ? roomMine.answer : null;
+    view = roomEnded ? { mode: 'roomend', part: null } : RL.toView(roomState, { addon: A, you: room.you(), talk: roomTalk, html: roomHtml, mine: mine });
+    show('ready'); draw();
+    var st = roomState.stance;
+    drawReactions({ floats: [], stance: st && st.total ? st : null });
+  }
+  function roomAct(a) {
+    if (a.a === 'answer') room.send({ t: 'answer', id: a.id, choice: a.choice, picks: a.picks, body: a.body });
+    else if (a.a === 'react') { var r = R.REACTIONS.filter(function (x) { return x.key === a.key; })[0]; if (r) room.send({ t: 'react', r: r.id }); }
+  }
+  function useRoom() {
+    drawReactBar();
+    var bar = $('[data-stage-reacts]');
+    R.STANCES.forEach(function (s) {
+      var b = el('button', 'stage-stance', s.label); b.type = 'button';
+      b.addEventListener('click', function () { room.send({ t: 'stance', stance: s.id }); });
+      bar.appendChild(b);
+    });
+    room = window.RoomClient.connect({ code: roomCode, role: 'stage', on: {
+      room: function (r) { if (r.on) roomEnded = false; roomState = r; roomDraw(); },
+      talk: function (t) { roomTalk = t; roomDraw(); },
+      html: function (h) { roomHtml = h; roomDraw(); },
+      welcome: function (m) { roomMine = m.mine; },
+      mine: function (m) { roomMine = m; roomDraw(); },
+      floats: function (f) { var st = roomState && roomState.stance; drawReactions({ floats: f, stance: st && st.total ? st : null }); },
+      ended: function () { roomEnded = true; roomMine = null; roomTalk = ''; roomHtml = ''; roomDraw(); },
+      status: function (s) { $('[data-room-off]').hidden = s !== 'off'; }
+    } });
+    document.addEventListener('keydown', function (e) {
+      var k = R.keyFor(e);
+      if (!k) return;
+      if (k.reaction) room.send({ t: 'react', r: k.reaction });
+      if (k.stance) room.send({ t: 'stance', stance: k.stance });
+    });
+    var name = $('[data-rw-name]');
+    name.hidden = !roomPage;
+    name.querySelector('input').value = window.RoomClient.savedName();
+    name.addEventListener('submit', function (e) { e.preventDefault(); room.setName(name.querySelector('input').value); name.querySelector('button').textContent = 'Saved'; });
+    $('[data-rb-form]').addEventListener('submit', function (e) {
+      e.preventDefault();
+      var input = e.target.querySelector('input');
+      if (input.value.trim()) room.send({ t: 'note', text: input.value });
+      input.value = '';
+    });
+  }
+  function drawRoomWelcome() {
+    $('[data-rw-kicker]').textContent = 'Welcome';
+    $('[data-rw-title]').textContent = view.waiting ? 'This session has not started yet.' : (view.title || 'The session is about to begin.');
+    $('[data-rw-host]').textContent = view.host ? 'With ' + view.host : '';
+  }
+  function drawRoomBoard() {
+    var list = $('[data-rb-notes]'); list.replaceChildren();
+    list.classList.toggle('is-empty', !view.notes.length);
+    if (!view.notes.length) list.appendChild(el('li', 'stage-quiet', 'Nothing here yet. Add the first note.'));
+    view.notes.forEach(function (n) {
+      var li = el('li', 'room-note');
+      li.appendChild(el('p', 'room-note-text', n.text));
+      var foot = el('p', 'room-note-foot');
+      foot.appendChild(el('span', 'room-note-who', n.name || ''));
+      var v = el('button', 'room-vote', n.votes.length ? String(n.votes.length) : 'Vote'); v.type = 'button';
+      v.setAttribute('aria-label', 'Vote for this. ' + n.votes.length + ' so far.');
+      v.setAttribute('aria-pressed', String(n.votes.indexOf(view.you) >= 0));
+      v.addEventListener('click', function () { room.send({ t: 'vote', id: n.id }); });
+      foot.appendChild(v);
+      if (n.by === view.you || view.host) {
+        var x = el('button', 'room-unnote', 'Remove'); x.type = 'button';
+        x.addEventListener('click', function () { room.send({ t: 'unnote', id: n.id }); });
+        foot.appendChild(x);
+      }
+      li.appendChild(foot);
+      list.appendChild(li);
+    });
+  }
+  // A page runs sealed off: scripts and forms, nothing else. Everyone gets
+  // their own working copy, and it stays put until the page itself changes.
+  function drawPage(v) {
+    var box = $('[data-page-frame]');
+    if (!v) { if (pageKey) { pageKey = null; box.replaceChildren(); } return; }
+    var p = v.page, key = p.owner ? p.owner + '/' + p.repo + '@' + p.sha : 'pasted:' + p.htmlV;
+    if (key === pageKey) return;
+    pageKey = key;
+    var f = document.createElement('iframe');
+    f.title = p.name || 'A page from the host';
+    f.setAttribute('sandbox', 'allow-scripts allow-forms');
+    box.replaceChildren(f);
+    if (!p.owner) { f.srcdoc = v.html || ''; return; }
+    fetch(RL.rawUrl(p, p.sha, 'index.html')).then(function (r) {
+      if (!r.ok) throw new Error(String(r.status));
+      return r.text();
+    }).then(function (h) { f.srcdoc = RL.withBase(h, RL.assetBase(p, p.sha)); }, function () {
+      box.replaceChildren(el('p', 'stage-quiet', 'This page could not be loaded. It needs an index.html in a public repository.'));
+    });
+  }
+
   function open() {
+    if (roomPage) { useRoom(); return; }
     if (!cfg.cloudProjectNumber) { $('[data-error-text]').textContent = 'This add-on is not set up yet.'; return show('error'); }
     Promise.race([
       window.meet.addon.createAddonSession({ cloudProjectNumber: String(cfg.cloudProjectNumber) }),
@@ -363,6 +473,7 @@
       return session.createMainStageClient();
     }).then(function (stage) {
       stageClient = stage;
+      if (roomCode) { useRoom(); return; }
       drawReactBar();
       wireAsk();
       stage.on('frameToFrameMessage', function (m) {

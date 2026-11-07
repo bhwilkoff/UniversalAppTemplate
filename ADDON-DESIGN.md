@@ -68,6 +68,46 @@ A learner asks from Mine, or with Ask on the stage: a question for everyone, a m
 
 Ben, November 6, 2026: "If I have tied that new google account to their account within Human Shaped, it should registar as that user." Once tied, someone is that member here: their name, their app, their place in the queue, their answers, their reactions, and their board notes (`who()` in the panel, `private.claimed_member` in the database).
 
+## Open rooms
+
+Ben, November 7, 2026: "I'd like for the add-on to be usable by anyone as a set of presentation tools." And: "I want to make it as easy of a pipeline as possible."
+
+Any Meet call that is not a cohort's is an open room. The panel looks up the call before it asks anything of anyone, so a stranger's first screen is Start a session, with no account made and nothing to sign in to.
+
+```
+Host                           Everyone else
++------------------------+     +------------------------+
+| Title            4:32  |     | Title                  |
+| Stage on · 12 here     |     | 12 here                |
+| Now  Talk  Tools People|     | Now  Yours             |
+|                        |     |                        |
+| this slide's notes     |     | the one thing asked    |
+|                        |     |                        |
+| [Back] [Next slide   ] |     | reactions, one row     |
++------------------------+     +------------------------+
+```
+
+The rules above hold here too. What differs:
+
+1. **A room is the call.** Its address is the Meet code. Whoever presses Start is the host; if the host is gone for a minute, anyone can take over. The host can hand it to anyone in the room.
+2. **Nothing is kept.** A room lives on Cloudflare, apart from the cohorts' database, and is erased when the host ends it or a day after its last change. The talk stays in the host's own browser until they keep it in a repository.
+3. **Notes never leave the panel.** Only the slides go to the room.
+4. **Each stage connects for itself.** Unlike a cohort's stage, an open room's stage needs no panel: it takes what it shows from the room, and what a person does on it goes straight to the room.
+5. **Answers carry no names.** The stage counts them. The host reads the words, without names.
+6. **A page runs in a sealed frame.** The host shows a repository's `index.html` at one commit, or a page they pasted. It runs with scripts and forms and nothing else, and everyone gets their own working copy. The room says when a repository has a new version, and the host decides when it reaches the stage.
+7. **Not everyone installs.** People can use the room's link, `/room/?<code>`, on any device, with no add-on.
+
+The ladder, in order, none of it required by the step before:
+
+| Step | What a person does | Needs |
+|---|---|---|
+| Use it | Slides, a question, the board, a clock, reactions | Nothing |
+| Keep it | Makes their own copy of `humanshaped/stage-template` with GitHub's own page, and names it in Talk. `talk.md` is their slides | A GitHub account |
+| Build in the room | Shows `index.html` from their repository, changes it, and shows the new version | The same |
+| Join a cohort | Follows Learn to build this way from Yours or the closing card | Sign-in |
+
+Signing in is offered and never required. One Tap rides on top as it does for a guest.
+
 ## Tools
 
 Tools is a grid of tiles, and a tile opens one tool, with All tools to go back. Rule 4's two levels, and nothing to scan.

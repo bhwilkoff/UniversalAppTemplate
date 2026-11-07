@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261107b">
+  <link rel="stylesheet" href="/assets/site.css?v=20261107d">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -72,6 +72,31 @@
         <p class="stage-quiet" data-rerun-key hidden>The grey line under each bar is how people answered the first time.</p>
         <form class="stage-write" data-stage-write hidden></form>
         <p class="stage-quiet" data-answer-panel>Answer in your Human Shaped panel, where only you and your leader see what you said.</p>
+      </div>
+
+      <!-- An open room (ADDON-DESIGN.md). Words by Claude, awaiting Ben's review. -->
+      <div class="stage-body stage-welcome" data-view="roomwelcome" hidden>
+        <p class="kicker" data-rw-kicker></p>
+        <h1 class="stage-title" data-rw-title></h1>
+        <p class="stage-what" data-rw-host></p>
+        <form class="stage-write stage-name" data-rw-name hidden>
+          <input aria-label="Your name" placeholder="Your name" maxlength="60" autocomplete="name">
+          <button class="stage-send" type="submit">Save</button>
+        </form>
+      </div>
+      <div class="room-board" data-view="roomboard" hidden>
+        <ul class="room-notes" data-rb-notes></ul>
+        <form class="stage-write room-add" data-rb-form>
+          <input aria-label="Add a note" placeholder="Add a note" maxlength="280" autocomplete="off">
+          <button class="stage-send" type="submit">Add</button>
+        </form>
+      </div>
+      <div class="stage-app" data-view="page" hidden><div class="stage-app-frame" data-page-frame></div></div>
+      <div class="stage-body stage-welcome" data-view="roomend" hidden>
+        <p class="kicker">Made with Human Shaped</p>
+        <h1 class="stage-title">Thank you for being here.</h1>
+        <p class="stage-what">These tools are free in any Google Meet&trade; call, and our free cohorts teach people to build their own app.</p>
+        <p class="room-links"><a href="/meet/" target="_blank" rel="noopener">Use it in your own call</a> <a href="/cohorts/" target="_blank" rel="noopener">Learn to build this way</a></p>
       </div>
 
       <!-- The current scene of the run of show, as the teacher wrote it (R3). -->
@@ -144,6 +169,7 @@
         <button class="stage-send" type="submit">Ask</button>
       </form>
       <div class="stage-chips" data-slide-links hidden></div>
+      <p class="room-off" data-room-off role="status" hidden>Reconnecting</p>
     </section>
   </main>
   <script src="https://www.gstatic.com/meetjs/addons/1.2.0/meet.addons.js" defer></script>
@@ -158,6 +184,8 @@
   <script src="/assets/slide-editor.js?v=20261104e" defer></script>
   <script src="/assets/slide-model.js?v=20261106c" defer></script>
   <script src="/assets/slide-studio.js?v=20261107a" defer></script>
-  <script src="/assets/addon-stage.js?v=20261107b" defer></script>
+  <script src="/assets/room-lib.js?v=20261107a" defer></script>
+  <script src="/assets/room-client.js?v=20261107a" defer></script>
+  <script src="/assets/addon-stage.js?v=20261107c" defer></script>
 </body>
 </html>

@@ -1,0 +1,17 @@
+name = "humanshaped-rooms"
+main = "worker.js"
+compatibility_date = "2026-10-01"
+workers_dev = true
+
+[vars]
+ORIGINS = "https://humanshaped.org"
+# Repositories that may not be shown, lowercase owner/name, separated by spaces.
+BLOCKED_REPOS = ""
+
+[[durable_objects.bindings]]
+name = "ROOM"
+class_name = "Room"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Room"]
