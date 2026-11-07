@@ -169,8 +169,8 @@ Each step names the screen and what goes in each field.
 >
 > What it does not do matters as much. It never joins the call as a
 > participant, and it never gives anyone a score or compares people. It
-> asks Google for no permissions, and the only thing it reads from Meet
-> is the call's meeting code. A leader can record a session with Human
+> asks Google for nothing beyond signing you in, and the only thing it
+> reads from Google Meet™ is the call's meeting code. A leader can record a session with Human
 > Shaped's recorder, which opens in its own window, only after saying so
 > out loud and in the chat, and everyone sees that it is recording.
 > Software then works out from that recording who spoke, for how long,
