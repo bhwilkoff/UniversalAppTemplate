@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { apply, blank, publicRoom, summary, hostWords, repoOk, stanceCounts, TAKE_OVER_MS, LIMITS } from '../rooms/room-logic.js';
+import { apply, blank, publicRoom, summary, hostWords, repoOk, siteOk, stanceCounts, TAKE_OVER_MS, LIMITS } from '../rooms/room-logic.js';
 
 const A = { pid: 'a', name: 'Ana', isHere: () => true }, B = { pid: 'b', name: 'Bo', isHere: () => true };
 function started() { const r = blank(); apply(r, A, { t: 'start', title: 'Hello' }, 1); return r; }
@@ -14,7 +14,7 @@ test('the first to start is the host, and nobody else can start over them', () =
 
 test('only the host runs the room', () => {
   const r = started();
-  ['talk', 'go', 'show', 'ask', 'reveal', 'close', 'clear', 'page', 'pasted', 'card', 'clock', 'hand', 'title'].forEach((t) => {
+  ['talk', 'go', 'show', 'ask', 'reveal', 'close', 'clear', 'page', 'site', 'board', 'pasted', 'card', 'clock', 'hand', 'title'].forEach((t) => {
     assert.match(apply(r, B, { t }, 2).error, /Only the host/, t);
   });
 });
@@ -166,4 +166,28 @@ test('nothing unknown changes a room', () => {
   assert.ok(apply(r, A, { t: 'hello' }, 2).error);
   assert.ok(apply(r, A, null, 2).error);
   assert.equal(JSON.stringify(r), before);
+});
+
+test('a board opens with what everyone should add, and a new prompt starts it clean', () => {
+  const r = started();
+  assert.match(apply(r, A, { t: 'show', show: 'board' }, 2).error, /add first/);
+  assert.match(apply(r, A, { t: 'board', prompt: '  ' }, 2).error, /add first/);
+  apply(r, A, { t: 'board', prompt: 'What should we build?' }, 2);
+  assert.equal(r.show, 'board');
+  apply(r, B, { t: 'note', text: 'A map' }, 3);
+  apply(r, A, { t: 'board', prompt: 'What should we build?' }, 4);
+  assert.equal(r.notes.length, 1, 'the same prompt keeps its notes');
+  apply(r, A, { t: 'board', prompt: 'What worries you?' }, 5);
+  assert.equal(r.notes.length, 0);
+  assert.equal(publicRoom(r).board, 'What worries you?');
+});
+
+test('a website is shown by an https address that is not this site', () => {
+  assert.equal(siteOk('https://ana.github.io/app/'), 'https://ana.github.io/app/');
+  ['http://ana.github.io/', 'javascript:alert(1)', 'https://humanshaped.org/x', 'https://www.humanshaped.org/', 'https://humanshaped-rooms.benwilkoff.workers.dev/', 'https://u:p@example.com/', 'not a url', 'https://example.com/' + 'a'.repeat(LIMITS.url)].forEach((u) => assert.equal(siteOk(u), null, u));
+  const r = started();
+  assert.match(apply(r, A, { t: 'site', url: 'https://humanshaped.org/' }, 2).error, /cannot be shown/);
+  apply(r, A, { t: 'site', url: 'https://ana.github.io/app/' }, 2);
+  assert.equal(r.show, 'page');
+  assert.deepEqual(publicRoom(r).page, { owner: null, repo: null, sha: null, htmlV: 0, url: 'https://ana.github.io/app/', name: 'ana.github.io' });
 });

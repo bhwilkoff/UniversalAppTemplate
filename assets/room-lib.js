@@ -77,7 +77,7 @@
   // until they have, so nobody answers with the crowd; the host always sees it.
   function toView(room, c) {
     c = c || {};
-    var A = c.addon, part = room.clock ? { key: 'clock', name: room.clock.label || 'Clock', endsAt: room.clock.endsAt } : null;
+    var A = c.addon, part = room.clock ? { key: 'clock', name: room.clock.label || '', endsAt: room.clock.endsAt } : null;
     if (!room.on) return { mode: 'roomwelcome', part: null, waiting: true, title: '', host: '' };
     if (room.show === 'slides' && c.talk) return { mode: 'slides', part: part, slides: { text: c.talk, at: room.at, shown: room.shown } };
     if (room.show === 'question' && room.question && room.question.open && A) {
@@ -92,10 +92,11 @@
       v.host = isHost;
       return v;
     }
-    if (room.show === 'board') return { mode: 'roomboard', part: part, notes: room.notes || [], you: c.you, host: room.host === c.you };
-    if (room.show === 'page' && room.page) return { mode: 'page', part: null, page: room.page, html: room.page.owner ? null : (c.html || '') };
+    if (room.show === 'board') return { mode: 'roomboard', part: part, prompt: room.board || '', notes: room.notes || [], you: c.you, host: room.host === c.you };
+    if (room.show === 'page' && room.page) return { mode: 'page', part: part, page: room.page, html: room.page.owner || room.page.url ? null : (c.html || '') };
     if (room.show === 'card' && room.card) return { mode: 'card', part: null, card: { body: room.card, endsAt: part ? part.endsAt : null } };
-    if (room.show === 'blank') return { mode: 'blank', part: part };
+    // A clock on a clear stage is the stage: large, with what it is for.
+    if (room.show === 'blank') return part ? { mode: 'part', part: part, roomClock: true } : { mode: 'blank', part: null };
     return { mode: 'roomwelcome', part: part, title: room.title, host: room.hostName };
   }
 

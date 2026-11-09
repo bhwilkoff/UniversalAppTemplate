@@ -90,3 +90,13 @@ test('a deck the room holds reads back as the talk, so a new host moves through 
   assert.equal(SL.count(R.deckBody(deck)), 2);
   assert.equal(R.deckBody('# no head'), '# no head');
 });
+
+test('a clock on a clear stage is the whole stage, and rides along with a page or a board', () => {
+  const base = { on: true, host: 'a', at: 0, shown: 0, notes: [], board: 'Ideas?', clock: { endsAt: 9e12, label: 'Pair up' } };
+  const alone = R.toView({ ...base, show: 'blank' }, { you: 'b' });
+  assert.equal(alone.mode, 'part'); assert.equal(alone.roomClock, true); assert.equal(alone.part.name, 'Pair up');
+  assert.equal(R.toView({ ...base, show: 'blank', clock: null }, {}).mode, 'blank');
+  assert.equal(R.toView({ ...base, show: 'page', page: { url: 'https://a.github.io/' } }, {}).part.endsAt, 9e12);
+  const board = R.toView({ ...base, show: 'board' }, { you: 'b' });
+  assert.equal(board.prompt, 'Ideas?'); assert.equal(board.part.endsAt, 9e12);
+});

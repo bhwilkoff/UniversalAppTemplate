@@ -79,7 +79,7 @@ Host                           Everyone else
 +------------------------+     +------------------------+
 | Title            4:32  |     | Title                  |
 | Stage on · 12 here     |     | 12 here                |
-| Now  Talk  Tools People|     | Now  Yours             |
+| Now Slides Tools People|     | Now  Yours             |
 |                        |     |                        |
 | this slide's notes     |     | the one thing asked    |
 |                        |     |                        |
@@ -96,14 +96,17 @@ The rules above hold here too. What differs:
 5. **Answers carry no names.** The stage counts them. The host reads the words, without names.
 6. **A page runs in a sealed frame.** The host shows a repository's `index.html` at one commit, or a page they pasted. It runs with scripts and forms and nothing else, and everyone gets their own working copy. The room says when a repository has a new version, and the host decides when it reaches the stage.
 7. **Not everyone installs.** People can use the room's link, `/room/?<code>`, on any device, with no add-on.
+8. **Slides are edited on the slide.** Ben, November 9, 2026: "I don't understand why we are back to the plain text slide editor instead of allowing for editing on the stage." The Slides tab shows the deck as pictures (press one to show it) and Edit on your stage, which opens the cohort's slide studio on the host's own stage only. Everyone else keeps seeing what was there until the host presses Done. Text is one press away inside the studio, never the first thing.
+9. **Every tool says what it is for.** Ben, November 9: "Each link/feature needs to have a purpose and make sense." The board opens only with the host's prompt (what everyone should add), and voting is how the group chooses among the ideas. A website goes up by its address or a repository's name in one field; the room checks first that the site allows itself to be shown, and says so plainly when it does not. Pasting HTML is a disclosure, not a second form.
+10. **Nothing covers what is shown.** The reactions and stances sit in their own strip at the foot of every stage, and the stage's views end above it. A running clock is the whole stage when the stage is clear, and a small pill at the top right over anything else, a page and the board included.
 
 The ladder, in order, none of it required by the step before:
 
 | Step | What a person does | Needs |
 |---|---|---|
-| Use it | Slides, a question, the board, a clock, reactions | Nothing |
-| Keep it | Makes their own copy of `humanshaped/stage-template` with GitHub's own page, and names it in Talk. `talk.md` is their slides | A GitHub account |
-| Build in the room | Shows `index.html` from their repository, changes it, and shows the new version | The same |
+| Use it | Slides, a question, an ideas board, a website, a clock, reactions | Nothing |
+| Keep it | Makes their own copy of `humanshaped/stage-template` with GitHub's own page, and names it in Slides. `talk.md` is their slides | A GitHub account |
+| Build in the room | Shows their site by its address, or `index.html` from their repository, changes it, and shows the new version | The same |
 | Join a cohort | Follows Learn to build this way from Yours or the closing card | Sign-in |
 
 Signing in is offered and never required. One Tap rides on top as it does for a guest.

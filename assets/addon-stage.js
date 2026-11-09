@@ -34,7 +34,7 @@
     $('[data-stage-rec]').hidden = !view.recording;
     var part = view.part;
     // The part sits small at the top when something else has the stage.
-    $('[data-part]').hidden = view.mode === 'part' || view.mode === 'welcome' || view.mode === 'scene' || view.mode === 'app' || view.mode === 'studio' || view.mode === 'slides' || view.mode === 'blank' || view.mode === 'roomwelcome' || view.mode === 'roomboard' || view.mode === 'roomend' || view.mode === 'page' || !part;
+    $('[data-part]').hidden = view.mode === 'part' || view.mode === 'welcome' || view.mode === 'scene' || view.mode === 'app' || view.mode === 'studio' || view.mode === 'slides' || view.mode === 'blank' || view.mode === 'roomwelcome' || view.mode === 'roomboard' || view.mode === 'roomend' || !part;
     if (view.mode === 'slides') drawSlide(view.slides);
     drawLinks(view.mode === 'slides' ? view.slides.links : null);
     drawAsk();
@@ -55,8 +55,9 @@
       $('[data-s-note]').textContent = sc.note || '';
     }
     $('[data-part-name]').textContent = part ? part.name : '';
-    $('[data-part-kicker]').textContent = part ? 'Now' : 'Welcome';
-    $('[data-part-big]').textContent = part ? part.name : 'The session begins soon.';
+    $('[data-part-kicker]').textContent = view.roomClock ? '' : part ? 'Now' : 'Welcome';
+    $('[data-part-kicker]').hidden = !!view.roomClock;
+    $('[data-part-big]').textContent = view.roomClock ? (part.name || 'Time left') : part ? part.name : 'The session begins soon.';
     if (view.mode === 'card') $('[data-card-body]').textContent = view.card.body;
     if (view.mode === 'check') {
       $('[data-prompt]').textContent = view.prompt;
@@ -221,6 +222,7 @@
     studioKey = d.key;
     Object.keys(d.gh || {}).forEach(function (k) { window.SlidesLib.ghHold(k, d.gh[k]); });
     window.SlideStudio.mount(box, { text: d.text, onChange: function (t) { act({ a: 'deck', key: d.key, text: t }); } });
+    if (room) { var done = el('button', 'btn-primary studio-done', 'Done'); done.type = 'button'; done.addEventListener('click', function () { act({ a: 'studioDone' }); }); box.prepend(done); }
   }
 
   // A question in their own words, typed on the stage.
@@ -349,7 +351,7 @@
     // A scene's words can fill the stage, so its clock sits small at the
     // top (found in the live Meet test: a long part pushed it out of the
     // frame); a break, which is only its clock, keeps it large.
-    var scene = view.mode === 'scene' || view.mode === 'slides' || view.mode === 'roomboard' || view.mode === 'roomwelcome', big = view.mode === 'scene' && view.scene && view.scene.eyebrow === 'Break';
+    var scene = view.mode === 'scene' || view.mode === 'slides' || view.mode === 'roomboard' || view.mode === 'roomwelcome' || view.mode === 'page' || view.mode === 'check', big = view.mode === 'scene' && view.scene && view.scene.eyebrow === 'Break';
     $('[data-part-name]').hidden = scene;
     $('[data-clock]').textContent = t ? (scene ? t : ', ' + t) : '';
     if (scene) $('[data-part]').hidden = big || !t;
@@ -366,11 +368,16 @@
   // ------------------------------------------------------------------
 
   var room = null, roomState = null, roomEnded = false, roomTalk = '', roomHtml = '', roomMine = null, pageKey = null;
+  // The host edits their slides on their own stage, which shares the panel's
+  // storage: the panel says when, and the slides are saved there as they change.
+  var TALK = 'hs-room-talk', EDIT = 'hs-room-edit';
+  function store(k, v) { try { if (v == null) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
+  function roomEditing() { return !!roomState && roomState.on && roomState.host === room.you() && store(EDIT) === roomCode; }
 
   function roomDraw() {
     if (!roomState) return;
     var mine = roomMine && roomState.question && roomMine.id === roomState.question.id ? roomMine.answer : null;
-    view = roomEnded ? { mode: 'roomend', part: null } : RL.toView(roomState, { addon: A, you: room.you(), talk: roomTalk, html: roomHtml, mine: mine });
+    view = roomEnded ? { mode: 'roomend', part: null } : roomEditing() ? { mode: 'studio', part: null, studio: { key: 'room', text: store(TALK) || RL.STARTER } } : RL.toView(roomState, { addon: A, you: room.you(), talk: roomTalk, html: roomHtml, mine: mine });
     show('ready'); draw();
     // A room's answers carry no names, so the cohort's line about leaders does not apply.
     $('[data-answer-panel]').hidden = true;
@@ -379,9 +386,13 @@
   }
   function roomAct(a) {
     if (a.a === 'answer') room.send({ t: 'answer', id: a.id, choice: a.choice, picks: a.picks, body: a.body });
+    else if (a.a === 'deck') store(TALK, String(a.text || ''));
+    else if (a.a === 'studioDone') { store(EDIT, ''); roomDraw(); }
     else if (a.a === 'react') { var r = R.REACTIONS.filter(function (x) { return x.key === a.key; })[0]; if (r) room.send({ t: 'react', r: r.id }); }
   }
   function useRoom() {
+    root.classList.add('is-room');
+    window.addEventListener('storage', function (e) { if (e.key === EDIT) roomDraw(); });
     drawReactBar();
     var bar = $('[data-stage-reacts]');
     R.STANCES.forEach(function (s) {
@@ -421,9 +432,10 @@
     $('[data-rw-host]').textContent = view.host ? 'With ' + view.host : '';
   }
   function drawRoomBoard() {
+    $('[data-rb-prompt]').textContent = view.prompt;
     var list = $('[data-rb-notes]'); list.replaceChildren();
     list.classList.toggle('is-empty', !view.notes.length);
-    if (!view.notes.length) list.appendChild(el('li', 'stage-quiet', 'Nothing here yet. Add the first note.'));
+    if (!view.notes.length) list.appendChild(el('li', 'stage-quiet', 'Nothing here yet. Add the first idea.'));
     view.notes.forEach(function (n) {
       var li = el('li', 'room-note');
       li.appendChild(el('p', 'room-note-text', n.text));
@@ -448,13 +460,21 @@
   function drawPage(v) {
     var box = $('[data-page-frame]');
     if (!v) { if (pageKey) { pageKey = null; box.replaceChildren(); } return; }
-    var p = v.page, key = p.owner ? p.owner + '/' + p.repo + '@' + p.sha : 'pasted:' + p.htmlV;
+    var p = v.page, key = p.url ? 'url:' + p.url : p.owner ? p.owner + '/' + p.repo + '@' + p.sha : 'pasted:' + p.htmlV;
     if (key === pageKey) return;
     pageKey = key;
     var f = document.createElement('iframe');
     f.title = p.name || 'A page from the host';
-    f.setAttribute('sandbox', 'allow-scripts allow-forms');
     box.replaceChildren(f);
+    // A website at its own address keeps its own origin, so it can keep what a
+    // person does in it; it is never this site (RoomLib and the room refuse it).
+    if (p.url) {
+      f.setAttribute('sandbox', 'allow-scripts allow-forms allow-same-origin allow-popups allow-popups-to-escape-sandbox');
+      f.setAttribute('allow', 'clipboard-write');
+      f.src = p.url;
+      return;
+    }
+    f.setAttribute('sandbox', 'allow-scripts allow-forms');
     if (!p.owner) { f.srcdoc = v.html || ''; return; }
     fetch(RL.rawUrl(p, p.sha, 'index.html')).then(function (r) {
       if (!r.ok) throw new Error(String(r.status));

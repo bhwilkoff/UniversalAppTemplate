@@ -3,7 +3,7 @@
 // messages. A room is one Meet call's slides, question, board, and page, and
 // it is erased when it ends.
 
-export const LIMITS = { talk: 42000, html: 100000, title: 120, name: 60, prompt: 500, choice: 120, choices: 8, note: 280, notes: 200, notesEach: 20, answer: 1000, card: 400, people: 300, clock: 7200 };
+export const LIMITS = { talk: 42000, html: 100000, title: 120, name: 60, prompt: 500, choice: 120, choices: 8, note: 280, notes: 200, notesEach: 20, answer: 1000, card: 400, people: 300, clock: 7200, url: 2000 };
 
 export const REACTIONS = ['smile', 'laugh', 'love', 'clap', 'snaps', 'ponder', 'mind', 'frown'];
 export const STANCES = ['agree', 'unsure', 'disagree'];
@@ -16,7 +16,17 @@ function line(v, n) { return text(v, n * 2).replace(/\s+/g, ' ').trim().slice(0,
 function int(v, lo, hi) { const n = Math.floor(Number(v)); return Number.isFinite(n) ? Math.max(lo, Math.min(hi, n)) : lo; }
 
 export function blank() {
-  return { on: false, host: null, hostName: '', hostLeft: null, title: '', talk: '', talkV: 0, at: 0, shown: 0, show: 'welcome', question: null, answers: {}, notes: [], page: null, html: '', htmlV: 0, card: '', clock: null, stances: {}, seq: 0 };
+  return { on: false, host: null, hostName: '', hostLeft: null, title: '', talk: '', talkV: 0, at: 0, shown: 0, show: 'welcome', question: null, answers: {}, notes: [], board: '', page: null, html: '', htmlV: 0, card: '', clock: null, stances: {}, seq: 0 };
+}
+
+// A website a host shows by its address: https only, and never this site or the
+// room service, whose pages would run with this site's own rights.
+const OURS = /(^|\.)humanshaped\.org$|(^|\.)benwilkoff\.workers\.dev$/i;
+export function siteOk(u) {
+  let x;
+  try { x = new URL(String(u || '')); } catch (e) { return null; }
+  if (x.protocol !== 'https:' || x.username || x.password || OURS.test(x.hostname) || x.href.length > LIMITS.url) return null;
+  return x.href;
 }
 
 export function repoOk(owner, repo) { return /^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})$/.test(owner || '') && /^[A-Za-z0-9._-]{1,100}$/.test(repo || '') && !/^\.+$/.test(repo); }
@@ -50,12 +60,12 @@ export function stanceCounts(room) {
 export function publicRoom(room, here) {
   here = here || { people: [], count: 0, hostHere: false, stages: [] };
   const q = room.question;
-  const page = room.page ? { owner: room.page.owner || null, repo: room.page.repo || null, sha: room.page.sha || null, htmlV: room.page.owner ? 0 : room.htmlV, name: room.page.name || null } : null;
+  const page = room.page ? { owner: room.page.owner || null, repo: room.page.repo || null, sha: room.page.sha || null, htmlV: room.page.owner || room.page.url ? 0 : room.htmlV, url: room.page.url || null, name: room.page.name || null } : null;
   return {
     on: room.on, host: room.host, hostName: room.hostName, title: room.title, talkV: room.talkV, at: room.at, shown: room.shown, show: room.show,
     question: q ? { id: q.id, kind: q.kind, prompt: q.prompt, choices: q.choices, points: q.points || null, reveal: q.reveal, open: q.open } : null,
     summary: summary(room),
-    notes: room.notes, page, card: room.card, clock: room.clock, stance: stanceCounts(room),
+    notes: room.notes, board: room.board, page, card: room.card, clock: room.clock, stance: stanceCounts(room),
     people: here.people.slice(0, LIMITS.people), here: here.count, hostHere: here.hostHere, stages: here.stages,
     canTakeOver: room.on && !here.hostHere && room.hostLeft != null
   };
@@ -83,7 +93,7 @@ function cleanAnswer(q, m) {
   return body ? { body } : null;
 }
 
-const HOST_ONLY = new Set(['talk', 'go', 'show', 'ask', 'reveal', 'close', 'clear', 'unnoteAny', 'page', 'pasted', 'card', 'clock', 'hand', 'title']);
+const HOST_ONLY = new Set(['talk', 'go', 'show', 'ask', 'reveal', 'close', 'clear', 'unnoteAny', 'page', 'site', 'board', 'pasted', 'card', 'clock', 'hand', 'title']);
 
 // who: { pid, name, here(pid) }. Returns what changed: { room?, talk?, html?,
 // to?, error?, ended? }; no result means nothing did.
@@ -128,6 +138,7 @@ export function apply(room, who, m, now, opts) {
       if (!SHOWS.includes(m.show)) return { error: 'There is nothing like that to show.' };
       if (m.show === 'question' && !room.question) return { error: 'Ask a question first.' };
       if (m.show === 'page' && !room.page) return { error: 'Choose a page first.' };
+      if (m.show === 'board' && !room.board) return { error: 'Say what everyone should add first.' };
       room.show = m.show;
       return { room: true };
     }
@@ -183,6 +194,20 @@ export function apply(room, who, m, now, opts) {
       return { room: true };
     }
     case 'clear': room.notes = []; return { room: true };
+    case 'board': {
+      const prompt = line(m.prompt, LIMITS.prompt);
+      if (!prompt) return { error: 'Say what everyone should add first.' };
+      if (prompt !== room.board) room.notes = [];
+      room.board = prompt; room.show = 'board';
+      return { room: true };
+    }
+    case 'site': {
+      const href = siteOk(m.url);
+      if (!href) return { error: 'That address cannot be shown here.' };
+      room.page = { url: href, name: line(m.name, 80) || new URL(href).hostname };
+      room.html = ''; room.show = 'page';
+      return { room: true };
+    }
     case 'page': {
       if (!repoOk(m.owner, m.repo) || !/^[0-9a-f]{40}$/.test(m.sha || '')) return { error: 'That repository could not be read.' };
       if ((opts.blocked || []).includes((m.owner + '/' + m.repo).toLowerCase())) return { error: 'That repository cannot be shown here.' };

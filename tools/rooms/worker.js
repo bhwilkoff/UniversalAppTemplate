@@ -3,7 +3,7 @@
 // It keeps no accounts, and a room is erased when its host ends it or a day
 // after its last change. Sockets hibernate, so an idle room costs nothing.
 import { DurableObject } from 'cloudflare:workers';
-import { apply, blank, publicRoom, hostWords, REACTIONS, LIMITS } from './room-logic.js';
+import { apply, blank, publicRoom, hostWords, siteOk, REACTIONS, LIMITS } from './room-logic.js';
 
 const CODE = /^[a-z]{3}-[a-z]{4}-[a-z]{3}$/;
 const DAY = 86400000, MAX_SOCKETS = 600;
@@ -12,6 +12,7 @@ export default {
   async fetch(req, env) {
     const url = new URL(req.url);
     if (url.pathname === '/') return new Response('Human Shaped rooms', { headers: { 'content-type': 'text/plain' } });
+    if (url.pathname === '/frame') return frameCheck(req, env, url);
     const m = /^\/room\/([a-z-]+)$/.exec(url.pathname);
     if (!m || !CODE.test(m[1])) return new Response('Not found', { status: 404 });
     if (req.headers.get('upgrade') !== 'websocket') return new Response('A room is a WebSocket', { status: 426 });
@@ -20,6 +21,28 @@ export default {
     return env.ROOM.get(env.ROOM.idFromName(m[1])).fetch(req);
   }
 };
+
+// Whether a website lets itself be shown inside another page, asked before the
+// host puts it on everyone's stage. A browser cannot read these headers across
+// sites, so the room asks for it. Anything unclear is a no.
+async function frameCheck(req, env, url) {
+  const origin = req.headers.get('origin') || '';
+  const ok = String(env.ORIGINS || '').split(' ').includes(origin);
+  const head = { 'content-type': 'application/json', 'access-control-allow-origin': ok ? origin : 'null', vary: 'origin' };
+  if (!ok) return new Response('{"ok":false}', { status: 403, headers: head });
+  const href = siteOk(url.searchParams.get('url'));
+  if (!href) return new Response('{"ok":false,"why":"address"}', { headers: head });
+  let res;
+  try { res = await fetch(href, { redirect: 'follow', headers: { 'user-agent': 'HumanShapedRooms/1 (frame check)' }, signal: AbortSignal.timeout(6000) }); }
+  catch (e) { return new Response('{"ok":false,"why":"unreachable"}', { headers: head }); }
+  try { res.body && res.body.cancel(); } catch (e) {}
+  if (!res.ok) return new Response('{"ok":false,"why":"unreachable"}', { headers: head });
+  const xfo = (res.headers.get('x-frame-options') || '').trim();
+  const fa = /(?:^|;)\s*frame-ancestors\s+([^;]*)/i.exec(res.headers.get('content-security-policy') || '');
+  const anywhere = !fa || /(^|\s)(\*|https:)(\s|$)/.test(fa[1]);
+  const framed = (!xfo || !!fa) && anywhere;
+  return new Response(JSON.stringify({ ok: framed, why: framed ? null : 'refuses', url: siteOk(res.url) || href }), { headers: head });
+}
 
 async function pidOf(secret) {
   const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(secret));
