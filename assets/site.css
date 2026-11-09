@@ -3324,3 +3324,4 @@ a.person-name:hover { text-decoration: underline; }
 .open-site:hover { border-color: var(--edge); }
 .open-site-name { font-weight: 500; }
 .open-site-url { font-size: 12px; line-height: 16px; color: var(--muted); overflow-wrap: anywhere; }
+.p2-pane .p2-group > .link-button { justify-self: start; }
