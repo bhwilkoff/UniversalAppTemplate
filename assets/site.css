@@ -3266,18 +3266,26 @@ a.person-name:hover { text-decoration: underline; }
 
 /* Open rooms, after the November 9 audit: the reactions and stances have their
    own strip at the foot of the stage, so nothing they do covers what is shown. */
-.is-room { --strip: 3.25rem; }
-.is-room .stage-ready:not([hidden]) { padding-bottom: calc(var(--strip) + 2vmin); }
-.is-room.has-stance .stage-ready:not([hidden]) { padding-bottom: calc(var(--strip) + 2.6rem + 2vmin); }
-.is-room .stage-reacts, .is-room .stage-ready:has([data-view="page"]:not([hidden])) .stage-reacts { position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; display: flex; align-items: center; justify-content: center; gap: 0.25rem; height: var(--strip); padding: 0 0.75rem; border-radius: 0; border-top: 1px solid var(--rule); background: var(--paper); opacity: 1; }
+.is-room { --strip: 3.25rem; --lane: 2.75rem; --foot: calc(var(--strip) + var(--lane)); }
+.is-room .stage-ready:not([hidden]) { padding-bottom: calc(var(--foot) + 2vmin); }
+.is-room.has-stance .stage-ready:not([hidden]) { padding-bottom: calc(var(--foot) + 2.6rem + 2vmin); }
+.is-room .stage-reacts, .is-room .stage-ready:has([data-view="page"]:not([hidden])) .stage-reacts { position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; display: flex; align-items: center; justify-content: center; gap: 0.25rem; height: var(--strip); padding: 0 0.75rem; border-radius: 0; background: var(--paper); opacity: 1; }
 .is-room .stage-react { padding: 0.25rem 0.35rem; font-size: 1.35rem; border-radius: 8px; }
 .is-room .stage-react:hover { background: var(--card); }
 .is-room .stage-stance { margin-left: 0.25rem; padding: 0.35rem 0.85rem; border: 1px solid var(--rule); border-radius: 999px; color: var(--ink); font-size: 0.95rem; line-height: 1.2; }
 .is-room .stage-stance:first-of-type { margin-left: 1rem; }
 .is-room .stage-stance:hover { border-color: var(--muted); }
-.is-room .stance-bar, .is-room .stage-ready:has([data-view="page"]:not([hidden])) .stance-bar { bottom: calc(var(--strip) + 0.75vmin); }
+.is-room .stance-bar, .is-room .stage-ready:has([data-view="page"]:not([hidden])) .stance-bar { bottom: calc(var(--foot) + 0.75vmin); }
 .is-room .stage-ready:has([data-view="page"]:not([hidden])) .stance-bar:not([hidden]) { display: block; z-index: 4; }
-.is-room .open-board:not([hidden]), .is-room .stage-app:not([hidden]) { bottom: var(--strip); }
+.is-room .open-board:not([hidden]), .is-room .stage-app:not([hidden]) { bottom: var(--foot); }
+/* Reactions float up through their own lane, under what is shown and above
+   the buttons that send them (Ben, November 9: "below the content"). */
+.is-room .react-layer { position: fixed; inset: auto 0 var(--strip) 0; height: var(--lane); overflow: hidden; z-index: 5; border-top: 1px solid var(--rule); background: var(--paper); }
+.is-room .react-float { bottom: 0.35rem; display: flex; align-items: center; gap: 0.35em; animation: react-lane 3.2s ease-out forwards; }
+.is-room .react-float .react-emoji { font-size: 1.6rem; }
+.is-room .react-float .react-name { font-size: 0.8rem; }
+@keyframes react-lane { 0% { transform: translateY(0.8rem); opacity: 0; } 15% { transform: none; opacity: 1; } 75% { opacity: 1; } 100% { transform: translateY(-0.5rem); opacity: 0; } }
+.is-room .stage-ready:has(.stage-studio:not([hidden])) .react-layer { display: none; }
 .is-room .open-board:not([hidden]) { grid-template-rows: auto minmax(0, 1fr) auto; padding: 3vmin 4vmin 2vmin; }
 .is-room .open-board .stage-title { margin: 0; font-size: clamp(1.4rem, 5vmin, 3.2rem); }
 .is-room .stage-studio:not([hidden]) { z-index: 7; }
@@ -3311,3 +3319,8 @@ a.person-name:hover { text-decoration: underline; }
 .open-people li { align-items: center; min-height: 36px; padding: 0 0 0 12px; border-radius: 8px; background: var(--card); }
 .open-people .link-button { padding: 0 12px; min-height: 36px; }
 .open-end { padding-top: 12px; border-top: 1px solid var(--rule); }
+.open-sites { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.open-site { display: grid; width: 100%; gap: 2px; padding: 8px 12px; border: 1px solid var(--rule); border-radius: 8px; background: var(--card); color: var(--ink); font: inherit; text-align: left; cursor: pointer; }
+.open-site:hover { border-color: var(--edge); }
+.open-site-name { font-weight: 500; }
+.open-site-url { font-size: 12px; line-height: 16px; color: var(--muted); overflow-wrap: anywhere; }

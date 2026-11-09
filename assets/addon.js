@@ -270,10 +270,11 @@
     openCode = code;
     show('open');
     var meta = S.me && !S.me.is_anonymous ? S.me.user_metadata || {} : null;
-    var who = { name: meta ? meta.full_name || meta.name || meta.user_name || '' : '', member: !!meta };
+    var gh = meta && S.me.app_metadata && S.me.app_metadata.provider === 'github' ? meta.user_name || '' : '';
+    var who = { name: meta ? meta.full_name || meta.name || meta.user_name || '' : '', member: !!meta, github: gh };
     if (opened) { opened.person(who); return; }
     root.classList.add('p2-panel');
-    opened = window.OpenRoom.mount({ root: root, code: code, side: side, name: who.name, member: who.member, signIn: signedOut });
+    opened = window.OpenRoom.mount({ root: root, code: code, side: side, name: who.name, member: who.member, github: who.github, signIn: signedOut });
   }
 
   function loadCohort(id) {

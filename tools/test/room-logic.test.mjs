@@ -189,5 +189,18 @@ test('a website is shown by an https address that is not this site', () => {
   assert.match(apply(r, A, { t: 'site', url: 'https://humanshaped.org/' }, 2).error, /cannot be shown/);
   apply(r, A, { t: 'site', url: 'https://ana.github.io/app/' }, 2);
   assert.equal(r.show, 'page');
-  assert.deepEqual(publicRoom(r).page, { owner: null, repo: null, sha: null, htmlV: 0, url: 'https://ana.github.io/app/', name: 'ana.github.io' });
+  assert.deepEqual(publicRoom(r).page, { owner: null, repo: null, sha: null, htmlV: 0, url: 'https://ana.github.io/app/', path: null, v: 0, name: 'ana.github.io' });
+});
+
+test('showing the same site again reloads it, and a page in a repository is a file that stays inside it', () => {
+  const r = started();
+  apply(r, A, { t: 'site', url: 'https://ana.github.io/app/' }, 2);
+  apply(r, A, { t: 'site', url: 'https://ana.github.io/app/' }, 3);
+  assert.equal(publicRoom(r).page.v, 1);
+  const sha = 'a'.repeat(40);
+  apply(r, A, { t: 'page', owner: 'ana', repo: 'app', sha, path: 'game/play.html' }, 4);
+  assert.equal(publicRoom(r).page.path, 'game/play.html');
+  apply(r, A, { t: 'page', owner: 'ana', repo: 'app', sha }, 5);
+  assert.equal(publicRoom(r).page.path, 'index.html');
+  ['../x.html', 'game/../../x.html', 'a//b.html', 'x.js', '/abs.html'].forEach((path) => assert.match(apply(r, A, { t: 'page', owner: 'ana', repo: 'app', sha, path }, 6).error, /could not be read/, path));
 });

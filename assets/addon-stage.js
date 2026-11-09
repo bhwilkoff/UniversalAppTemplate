@@ -440,7 +440,7 @@
     $('[data-rb-prompt]').textContent = view.prompt;
     var list = $('[data-rb-notes]'); list.replaceChildren();
     list.classList.toggle('is-empty', !view.notes.length);
-    if (!view.notes.length) list.appendChild(el('li', 'stage-quiet', 'Nothing here yet. Add the first idea.'));
+    if (!view.notes.length) list.appendChild(el('li', 'stage-quiet', 'No ideas yet. Propose the first one.'));
     view.notes.forEach(function (n) {
       var li = el('li', 'room-note');
       li.appendChild(el('p', 'room-note-text', n.text));
@@ -465,7 +465,7 @@
   function drawPage(v) {
     var box = $('[data-page-frame]');
     if (!v) { if (pageKey) { pageKey = null; box.replaceChildren(); } return; }
-    var p = v.page, key = p.url ? 'url:' + p.url : p.owner ? p.owner + '/' + p.repo + '@' + p.sha : 'pasted:' + p.htmlV;
+    var p = v.page, key = p.url ? 'url:' + p.url + '#' + (p.v || 0) : p.owner ? p.owner + '/' + p.repo + '@' + p.sha + '/' + (p.path || '') : 'pasted:' + p.htmlV;
     if (key === pageKey) return;
     pageKey = key;
     var f = document.createElement('iframe');
@@ -481,11 +481,12 @@
     }
     f.setAttribute('sandbox', 'allow-scripts allow-forms');
     if (!p.owner) { f.srcdoc = v.html || ''; return; }
-    fetch(RL.rawUrl(p, p.sha, 'index.html')).then(function (r) {
+    var file = p.path || 'index.html';
+    fetch(RL.rawUrl(p, p.sha, file)).then(function (r) {
       if (!r.ok) throw new Error(String(r.status));
       return r.text();
-    }).then(function (h) { f.srcdoc = RL.withBase(h, RL.assetBase(p, p.sha)); }, function () {
-      box.replaceChildren(el('p', 'stage-quiet', 'This page could not be loaded. It needs an index.html in a public repository.'));
+    }).then(function (h) { f.srcdoc = RL.withBase(h, RL.assetBase(p, p.sha, file)); }, function () {
+      box.replaceChildren(el('p', 'stage-quiet', 'This page could not be loaded from its repository.'));
     });
   }
 

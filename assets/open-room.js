@@ -4,7 +4,7 @@
 // stays here is the host's own talk, notes, and repository, in this browser.
 (function () {
   var R = window.RoomLib, SL = window.SlidesLib, L = window.LiveLib, RX = window.ReactLib, A = window.AddonLib;
-  var TALK = 'hs-room-talk', REPO = 'hs-room-repo', EDIT = 'hs-room-edit';
+  var TALK = 'hs-room-talk', REPO = 'hs-room-repo', EDIT = 'hs-room-edit', GH = 'hs-room-github';
   function el(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
   function btn(label, cls, fn) { var b = el('button', cls || 'btn-secondary', label); b.type = 'button'; b.addEventListener('click', fn); return b; }
   function out(label, href, cls) { var a = el('a', cls || '', label); a.href = href; a.target = '_blank'; a.rel = 'noopener'; return a; }
@@ -17,7 +17,7 @@
     var box = o.root.querySelector('[data-state="open"]');
     var room = null, you = null, F = null, frameRole = null, online = true, ended = false, stageOn = false;
     var words = null, mine = null, tool = null, newSha = null, confirmEnd = false, watching = false;
-    var talk = get(TALK) || R.STARTER, repo = R.repoOf(get(REPO) || ''), lobby = null, person = { name: o.name, member: o.member };
+    var talk = get(TALK) || R.STARTER, repo = R.repoOf(get(REPO) || ''), lobby = null, person = { name: o.name, member: o.member, github: o.github || '' };
     var status = el('p', 'small'); status.setAttribute('role', 'status');
     var name = o.name || window.RoomClient.savedName();
 
@@ -132,7 +132,7 @@
       var s = el('div', 'open-lobby');
       s.innerHTML = '<p class="addon-mark"><span class="visually-hidden">Human Shaped</span><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></p>';
       s.appendChild(el('h1', null, ended ? 'That session has ended.' : 'Teach this call together.'));
-      s.appendChild(el('p', 'small', 'Slides, questions, a board for ideas, and websites you build, for everyone here.'));
+      s.appendChild(el('p', 'small', 'Slides, questions, a vote on ideas, and websites you build, for everyone here.'));
       var input = field('input', 'Your name', client.name());
       input.maxLength = 60; input.autocomplete = 'name';
       s.appendChild(input);
@@ -204,11 +204,14 @@
         pane.appendChild(el('h2', null, room.board));
         pane.appendChild(el('p', 'small', L.counted(room.notes.length, 'idea', 'ideas')));
         noteList(pane, true);
-        if (room.notes.length) pane.appendChild(btn('Clear the board', 'btn-secondary', function () { send({ t: 'clear' }); }));
+        if (room.notes.length) pane.appendChild(btn('Remove every idea', 'btn-secondary', function () { send({ t: 'clear' }); }));
       } else if (room.show === 'page' && room.page) {
         pane.appendChild(el('h2', null, room.page.name || 'A page you pasted'));
-        if (room.page.url) pane.appendChild(out('Open it in a new tab', room.page.url));
-        if (newSha) pane.appendChild(btn('Show the new version', 'btn-secondary', function () { var r = room.page; send({ t: 'page', owner: r.owner, repo: r.repo, sha: newSha }); newSha = null; }));
+        if (room.page.url) {
+          pane.appendChild(btn('Reload it for everyone', 'btn-secondary', function () { send({ t: 'site', url: room.page.url, name: room.page.name }); }));
+          pane.appendChild(out('Open it in a new tab', room.page.url));
+        }
+        if (newSha) pane.appendChild(btn('Show the new version', 'btn-secondary', function () { var r = room.page; send({ t: 'page', owner: r.owner, repo: r.repo, sha: newSha, path: r.path }); newSha = null; }));
       } else if (room.show === 'card') {
         pane.appendChild(el('div', 'p2-notes', room.card));
         pane.appendChild(btn('Take it down', 'btn-secondary', function () { send({ t: 'card', body: '' }); }));
@@ -230,8 +233,8 @@
       if (room.show === 'question' && room.question && room.question.open) return answer(pane);
       if (room.show === 'board') {
         pane.appendChild(el('h2', null, room.board));
-        var f = el('form', 'open-add'), i = field('input', 'Add an idea'); i.maxLength = 280;
-        f.appendChild(i); f.appendChild(btn('Add', 'btn-secondary', function () { f.requestSubmit(); }));
+        var f = el('form', 'open-add'), i = field('input', 'Propose an idea'); i.maxLength = 280;
+        f.appendChild(i); f.appendChild(btn('Propose', 'btn-secondary', function () { f.requestSubmit(); }));
         f.lastChild.type = 'submit';
         f.addEventListener('submit', function (e) { e.preventDefault(); if (i.value.trim()) send({ t: 'note', text: i.value }); i.value = ''; });
         pane.appendChild(f);
@@ -384,7 +387,7 @@
     // Tools
     // --------------------------------------------------------------
 
-    var TOOLS = [['question', 'Question', 'chats-circle'], ['board', 'Ideas board', 'palette'], ['site', 'Website', 'globe-simple'], ['clock', 'Clock', 'clock'], ['message', 'Message', 'megaphone-simple'], ['clear', 'Clear stage', 'eye-slash']];
+    var TOOLS = [['question', 'Question', 'chats-circle'], ['board', 'Propose and vote', 'check-circle'], ['site', 'Show a website', 'globe-simple'], ['clock', 'Clock', 'clock'], ['message', 'Message', 'megaphone-simple'], ['clear', 'Clear stage', 'eye-slash']];
     function drawTools() {
       var pane = F && F.pane('kit');
       if (!pane) return;
@@ -451,47 +454,108 @@
         done();
       }));
     }
-    // A board needs a reason: the host says what everyone adds, and everyone
-    // votes for the ideas they would choose.
+    // Propose and vote: the host asks for ideas, everyone proposes them, and
+    // everyone votes for the ones they would choose. (Not a board: nothing on
+    // it is placed or moved.)
     function boardTool(pane, line) {
-      var p = field('input', 'What should everyone add?', room.board || ''); p.maxLength = 500;
+      var p = field('input', 'What should everyone propose?', room.board || ''); p.maxLength = 500;
       pane.appendChild(p);
-      pane.appendChild(el('p', 'small', 'Everyone adds ideas on the stage or in their panel, and votes for the ones they would choose.'));
-      pane.appendChild(btn(room.board && p.value === room.board ? 'Put the board back on the stage' : 'Open the board', 'btn-secondary', function () {
-        if (!p.value.trim()) return (line.textContent = 'Say what everyone should add first.');
+      pane.appendChild(btn(room.board && p.value === room.board ? 'Put it back on the stage' : 'Ask for ideas', 'btn-secondary', function () {
+        if (!p.value.trim()) return (line.textContent = 'Say what everyone should propose first.');
         send({ t: 'board', prompt: p.value }); done();
       }));
     }
-    // A website by its address, or a repository's own index.html at its latest
-    // commit. Either way everyone gets their own working copy of it.
+    // Show a website: the host's own sites to choose from, or any link pasted
+    // whole. A link is read the way it was meant (RoomLib.siteOf): a GitHub
+    // account lists its sites, a repository shows its GitHub Pages site or
+    // else its page, and any other address is checked and shown.
+    var sites = { owner: null, list: null, error: '' };
+    function api(path) {
+      return fetch('https://api.github.com/' + path, { headers: { Accept: 'application/vnd.github+json' } }).then(function (res) {
+        if (res.status === 404) throw new Error('GitHub cannot find that. It needs to be public.');
+        if (!res.ok) throw new Error('GitHub did not answer. Try again in a minute.');
+        return res.json();
+      });
+    }
+    function githubName() { return get(GH) || person.github || (repo && repo.owner) || ''; }
+    function loadSites(owner, then) {
+      sites = { owner: owner, list: null, error: '' };
+      api('users/' + encodeURIComponent(owner) + '/repos?per_page=100&sort=pushed').then(function (list) {
+        sites.list = list.filter(function (x) { return x.has_pages && !x.private; }).map(function (x) {
+          return { name: x.name, url: R.pagesUrl({ owner: x.owner.login, repo: x.name, homepage: x.homepage }) };
+        });
+        put(GH, owner); then();
+      }, function (e) { sites.error = e.message; then(); });
+    }
+    function showUrl(href, name, line) {
+      line.textContent = 'Checking that it can be shown…';
+      return fetch(window.MEET_ADDON.rooms + '/frame?url=' + encodeURIComponent(href)).then(function (r) { return r.json(); }).then(function (c) {
+        if (c.ok) { send({ t: 'site', url: c.url || href, name: name }); return done(); }
+        line.textContent = c.why === 'address' ? 'That address cannot be shown here.'
+          : c.why === 'refuses' ? 'That site does not allow itself to be shown inside another page. Share your screen to show it instead.'
+          : 'That site did not answer. Check the link and try again.';
+      }, function () { line.textContent = 'The check did not answer. Try again in a minute.'; });
+    }
+    function showRepo(x, line) {
+      line.textContent = 'Looking…';
+      api('repos/' + x.owner + '/' + x.repo).then(function (info) {
+        if (info.has_pages) return showUrl(R.pagesUrl({ owner: info.owner.login, repo: info.name, homepage: info.homepage }, x.path), info.name, line);
+        var file = R.pageFile(x.path);
+        return latest(x).then(function (sha) {
+          return fetch(R.rawUrl(x, sha, file), { method: 'HEAD' }).then(function (h) {
+            if (!h.ok) throw new Error(x.path ? 'That repository has no ' + file + '.' : 'That repository has no website yet: no GitHub Pages site and no index.html.');
+            newSha = null; send({ t: 'page', owner: x.owner, repo: x.repo, sha: sha, path: file }); done();
+          });
+        });
+      }).catch(function (e) { line.textContent = e.message; });
+    }
     function siteTool(pane, line) {
-      var u = field('input', 'Its address, or yourname/repository', repo ? repo.name : ''); u.inputMode = 'url'; u.autocomplete = 'off';
-      pane.appendChild(u);
-      pane.appendChild(btn('Show it to everyone', 'btn-secondary', function () {
-        var v = u.value.trim(), gh = R.repoOf(v);
-        if (!v) return (line.textContent = 'Give an address first.');
-        if (gh && !/\.github\.io/i.test(v)) {
-          line.textContent = 'Looking…';
-          return latest(gh).then(function (sha) { newSha = null; send({ t: 'page', owner: gh.owner, repo: gh.repo, sha: sha }); done(); }, function (e) { line.textContent = e.message; });
-        }
-        var href = /^[a-z]+:/i.test(v) ? v : 'https://' + v;
-        line.textContent = 'Checking that it can be shown…';
-        fetch(window.MEET_ADDON.rooms + '/frame?url=' + encodeURIComponent(href)).then(function (r) { return r.json(); }).then(function (c) {
-          if (c.ok) { send({ t: 'site', url: c.url || href }); return done(); }
-          line.textContent = c.why === 'address' ? 'That address cannot be shown here. It needs to start with https.'
-            : c.why === 'refuses' ? 'That site does not allow itself to be shown inside another page. Share your screen to show it instead.'
-            : 'That site did not answer. Check the address and try again.';
-        }, function () { line.textContent = 'The check did not answer. Try again in a minute.'; });
-      }));
-      var d = el('details', 'open-more');
-      d.appendChild(el('summary', null, 'Paste HTML instead'));
-      var h = field('textarea', 'A whole HTML page'); h.rows = 6;
-      d.appendChild(h);
-      d.appendChild(btn('Show this page', 'btn-secondary', function () {
-        if (!h.value.trim()) return (line.textContent = 'Paste a page first.');
-        send({ t: 'pasted', html: h.value }); done();
-      }));
-      pane.appendChild(d);
+      var f = el('form', 'open-add'), u = field('input', 'Paste a link'); u.inputMode = 'url'; u.autocomplete = 'off';
+      var go = el('button', 'btn-secondary', 'Show'); go.type = 'submit';
+      f.appendChild(u); f.appendChild(go);
+      f.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var x = R.siteOf(u.value);
+        if (!x) return (line.textContent = 'That link could not be read. Paste the whole address.');
+        if (x.kind === 'user') return loadSites(x.owner, function () { drawTools(); });
+        if (x.kind === 'repo') return showRepo(x, line);
+        showUrl(x.url, '', line);
+      });
+      pane.appendChild(f);
+      var g = el('div', 'p2-group');
+      var owner = githubName();
+      if (owner && sites.owner !== owner && !sites.error) { loadSites(owner, function () { if (tool === 'site') drawTools(); }); }
+      g.appendChild(el('h2', null, owner ? 'Sites by ' + owner : 'Your sites'));
+      if (owner && sites.owner === owner && sites.list) {
+        if (!sites.list.length) g.appendChild(el('p', 'small', 'No GitHub Pages sites yet.'));
+        var ul = el('ul', 'open-sites');
+        sites.list.forEach(function (x) {
+          var li = el('li'), b = el('button', 'open-site'); b.type = 'button';
+          b.appendChild(el('span', 'open-site-name', x.name));
+          b.appendChild(el('span', 'open-site-url', x.url.replace(/^https:\/\//, '').replace(/\/$/, '')));
+          b.addEventListener('click', function () { showUrl(x.url, x.name, line); });
+          li.appendChild(b); ul.appendChild(li);
+        });
+        g.appendChild(ul);
+      } else if (owner && !sites.error) {
+        g.appendChild(el('p', 'small', 'Looking on GitHub…'));
+      }
+      if (sites.error) g.appendChild(el('p', 'small', sites.error));
+      var who = el('form', 'open-add'), n = field('input', 'Your GitHub username'); n.autocomplete = 'off';
+      var find = el('button', 'btn-secondary', owner ? 'Change' : 'Find'); find.type = 'submit';
+      who.appendChild(n); who.appendChild(find);
+      who.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var v = n.value.trim().replace(/^@/, '');
+        if (!/^[A-Za-z0-9][A-Za-z0-9-]{0,38}$/.test(v)) return (line.textContent = 'Write just the username.');
+        loadSites(v, function () { drawTools(); });
+      });
+      if (!owner || sites.error) g.appendChild(who);
+      else {
+        var change = btn('Someone else’s sites', 'link-button', function () { g.replaceChildren(el('h2', null, 'Your sites')); g.appendChild(who); n.focus(); });
+        g.appendChild(change);
+      }
+      pane.appendChild(g);
     }
     function clockTool(pane) {
       var label = field('input', 'What it is for, optional'); label.maxLength = 80;

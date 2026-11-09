@@ -66,6 +66,9 @@ light and dark.
 | build (what a person shows the cohort that week) | bring-back, submission, demo |
 | feedback (from anyone, shown with who gave it) | notes, critique, peer review |
 | ask (a card on a cohort's Asks board) | request, ticket, task, card |
+| board (only something people post to and move things around on: a cohort's board, the Asks board) | anything where nothing is placed or moved |
+| Propose and vote (an open room's tool: the host asks for ideas, everyone proposes them and votes; each one is an idea) | ideas board, board, poll (a poll is a cohort's weekly-time poll), suggestion box |
+| Show a website (an open room's tool; a website is any site shown on the main stage) | page, Page tool, embed |
 | Files (the cohort's shared files, in its repository) | resources page, library, uploads |
 | leader (anyone who leads a cohort), learner (anyone in one, including someone returning) | teacher, co-teacher, student, mentor, instructor, facilitator (Ben, October 22, 2026: "the people inside of the system are either Learners or Leaders") |
 | Leading (the area), Leader's guide | Teaching, the teaching page, the teaching guide |

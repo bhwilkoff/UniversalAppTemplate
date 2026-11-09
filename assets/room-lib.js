@@ -22,12 +22,54 @@
     var m = /^([A-Za-z0-9][A-Za-z0-9-]{0,38})\/([A-Za-z0-9._-]{1,100})(?:\/.*)?$/.exec(t);
     return m && !/^\.+$/.test(m[2]) ? { owner: m[1], repo: m[2], name: m[1] + '/' + m[2] } : null;
   }
+  // What a person pasted to show on the stage, read the way they meant it: a
+  // GitHub account (its sites), a repository or a file in one, or any website.
+  function siteOf(text) {
+    var t = String(text || '').trim();
+    if (!t) return null;
+    if (!/[.:]/.test(t.split('/')[0])) {
+      var bare = repoOf(t);
+      if (bare && t.split('/').length === 2) return { kind: 'repo', owner: bare.owner, repo: bare.repo, path: '' };
+      if (/^@?[A-Za-z0-9][A-Za-z0-9-]{0,38}$/.test(t)) return { kind: 'user', owner: t.replace(/^@/, '') };
+      return null;
+    }
+    var u;
+    try { u = new URL(/^[a-z][a-z0-9+.-]*:/i.test(t) ? t : 'https://' + t); } catch (e) { return null; }
+    if (!/^https?:$/.test(u.protocol)) return null;
+    var host = u.hostname.toLowerCase(), parts = u.pathname.split('/').filter(Boolean).map(decodeURIComponent);
+    if (host === 'github.com' || host === 'www.github.com') {
+      if (parts.length === 1) return { kind: 'user', owner: parts[0] };
+      var r = parts.length >= 2 ? repoOf(parts[0] + '/' + parts[1]) : null;
+      if (!r) return null;
+      var rest = parts.slice(2);
+      return { kind: 'repo', owner: r.owner, repo: r.repo, path: (rest[0] === 'blob' || rest[0] === 'tree') ? rest.slice(2).join('/') : '' };
+    }
+    if (host === 'raw.githubusercontent.com' && parts.length >= 3) {
+      var rr = repoOf(parts[0] + '/' + parts[1]);
+      return rr ? { kind: 'repo', owner: rr.owner, repo: rr.repo, path: parts.slice(3).join('/') } : null;
+    }
+    u.protocol = 'https:';
+    return { kind: 'url', url: u.href };
+  }
+  // A repository's GitHub Pages address, from what GitHub says of it.
+  function pagesUrl(r, path) {
+    var own = r.repo.toLowerCase() === r.owner.toLowerCase() + '.github.io';
+    var base = r.homepage && /^https:\/\//.test(r.homepage) ? r.homepage.replace(/\/?$/, '/') : 'https://' + r.owner.toLowerCase() + '.github.io/' + (own ? '' : r.repo + '/');
+    return base + String(path || '').replace(/^\/+/, '').replace(/(^|\/)index\.html$/, '$1');
+  }
+  // The file to show from a repository with no site: a page named, or the
+  // index.html of the folder named, or the repository's own.
+  function pageFile(path) {
+    var p = String(path || '').replace(/^\/+|\/+$/g, '');
+    return !p ? 'index.html' : /\.html?$/i.test(p) ? p : p + '/index.html';
+  }
+
   function commitUrl(r) { return 'https://api.github.com/repos/' + r.owner + '/' + r.repo + '/commits/HEAD'; }
   function rawUrl(r, sha, file) { return 'https://raw.githubusercontent.com/' + r.owner + '/' + r.repo + '/' + sha + '/' + file; }
   function editUrl(r, file) { return 'https://github.com/' + r.owner + '/' + r.repo + '/edit/HEAD/' + file; }
   // raw.githubusercontent.com will not serve a script or a style as one, and
   // jsDelivr will, so a page's own files load from there at the same commit.
-  function assetBase(r, sha) { return 'https://cdn.jsdelivr.net/gh/' + r.owner + '/' + r.repo + '@' + sha + '/'; }
+  function assetBase(r, sha, file) { var dir = String(file || '').replace(/[^/]*$/, ''); return 'https://cdn.jsdelivr.net/gh/' + r.owner + '/' + r.repo + '@' + sha + '/' + dir; }
   function withBase(html, base) {
     var tag = '<base href="' + base + '">';
     var s = String(html || '');
@@ -100,7 +142,7 @@
     return { mode: 'roomwelcome', part: part, title: room.title, host: room.hostName };
   }
 
-  var lib = { CODE: CODE, TEMPLATE: TEMPLATE, STARTER: STARTER, code: code, codeOfSearch: codeOfSearch, link: link, socket: socket, repoOf: repoOf, commitUrl: commitUrl, rawUrl: rawUrl, editUrl: editUrl, assetBase: assetBase, withBase: withBase, titleOf: titleOf, deckBody: deckBody, stops: stops, stopAt: stopAt, nextStep: nextStep, people: people, here: here, toView: toView };
+  var lib = { CODE: CODE, TEMPLATE: TEMPLATE, STARTER: STARTER, code: code, codeOfSearch: codeOfSearch, link: link, socket: socket, repoOf: repoOf, siteOf: siteOf, pagesUrl: pagesUrl, pageFile: pageFile, commitUrl: commitUrl, rawUrl: rawUrl, editUrl: editUrl, assetBase: assetBase, withBase: withBase, titleOf: titleOf, deckBody: deckBody, stops: stops, stopAt: stopAt, nextStep: nextStep, people: people, here: here, toView: toView };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
   else root.RoomLib = lib;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

@@ -60,7 +60,7 @@ export function stanceCounts(room) {
 export function publicRoom(room, here) {
   here = here || { people: [], count: 0, hostHere: false, stages: [] };
   const q = room.question;
-  const page = room.page ? { owner: room.page.owner || null, repo: room.page.repo || null, sha: room.page.sha || null, htmlV: room.page.owner || room.page.url ? 0 : room.htmlV, url: room.page.url || null, name: room.page.name || null } : null;
+  const page = room.page ? { owner: room.page.owner || null, repo: room.page.repo || null, sha: room.page.sha || null, htmlV: room.page.owner || room.page.url ? 0 : room.htmlV, url: room.page.url || null, path: room.page.path || null, v: room.page.v || 0, name: room.page.name || null } : null;
   return {
     on: room.on, host: room.host, hostName: room.hostName, title: room.title, talkV: room.talkV, at: room.at, shown: room.shown, show: room.show,
     question: q ? { id: q.id, kind: q.kind, prompt: q.prompt, choices: q.choices, points: q.points || null, reveal: q.reveal, open: q.open } : null,
@@ -204,14 +204,17 @@ export function apply(room, who, m, now, opts) {
     case 'site': {
       const href = siteOk(m.url);
       if (!href) return { error: 'That address cannot be shown here.' };
-      room.page = { url: href, name: line(m.name, 80) || new URL(href).hostname };
+      const again = room.page && room.page.url === href ? (room.page.v || 0) + 1 : 0;
+      room.page = { url: href, v: again, name: line(m.name, 80) || new URL(href).hostname };
       room.html = ''; room.show = 'page';
       return { room: true };
     }
     case 'page': {
       if (!repoOk(m.owner, m.repo) || !/^[0-9a-f]{40}$/.test(m.sha || '')) return { error: 'That repository could not be read.' };
       if ((opts.blocked || []).includes((m.owner + '/' + m.repo).toLowerCase())) return { error: 'That repository cannot be shown here.' };
-      room.page = { owner: m.owner, repo: m.repo, sha: m.sha, name: m.owner + '/' + m.repo };
+      const path = m.path == null || m.path === '' ? 'index.html' : String(m.path);
+      if (path.length > 200 || !/^[A-Za-z0-9._/-]+\.html?$/.test(path) || path.split('/').some((x) => x === '..' || x === '')) return { error: 'That page could not be read.' };
+      room.page = { owner: m.owner, repo: m.repo, sha: m.sha, path, name: m.owner + '/' + m.repo };
       room.html = ''; room.show = 'page';
       return { room: true };
     }

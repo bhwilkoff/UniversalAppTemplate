@@ -100,3 +100,26 @@ test('a clock on a clear stage is the whole stage, and rides along with a page o
   const board = R.toView({ ...base, show: 'board' }, { you: 'b' });
   assert.equal(board.prompt, 'Ideas?'); assert.equal(board.part.endsAt, 9e12);
 });
+
+test('whatever is pasted to show is read the way it was meant', () => {
+  assert.deepEqual(R.siteOf('ana/app'), { kind: 'repo', owner: 'ana', repo: 'app', path: '' });
+  assert.deepEqual(R.siteOf('ana'), { kind: 'user', owner: 'ana' });
+  assert.deepEqual(R.siteOf('https://github.com/ana'), { kind: 'user', owner: 'ana' });
+  assert.deepEqual(R.siteOf('github.com/ana/app'), { kind: 'repo', owner: 'ana', repo: 'app', path: '' });
+  assert.deepEqual(R.siteOf('https://github.com/ana/app/blob/main/game/index.html'), { kind: 'repo', owner: 'ana', repo: 'app', path: 'game/index.html' });
+  assert.deepEqual(R.siteOf('https://github.com/ana/app/tree/main/game'), { kind: 'repo', owner: 'ana', repo: 'app', path: 'game' });
+  assert.deepEqual(R.siteOf('https://raw.githubusercontent.com/ana/app/main/a.html'), { kind: 'repo', owner: 'ana', repo: 'app', path: 'a.html' });
+  assert.deepEqual(R.siteOf('ana.github.io/app'), { kind: 'url', url: 'https://ana.github.io/app' });
+  assert.deepEqual(R.siteOf('http://example.com/x?y=1'), { kind: 'url', url: 'https://example.com/x?y=1' });
+  [' ', 'javascript:alert(1)', 'ana/app/extra', 'not a thing'].forEach((t) => assert.equal(R.siteOf(t), null, t));
+});
+
+test('a repository with a site is shown at its site, and one without at its page', () => {
+  assert.equal(R.pagesUrl({ owner: 'Ana', repo: 'app' }), 'https://ana.github.io/app/');
+  assert.equal(R.pagesUrl({ owner: 'Ana', repo: 'ana.github.io' }), 'https://ana.github.io/');
+  assert.equal(R.pagesUrl({ owner: 'ana', repo: 'app', homepage: 'https://app.example' }, 'game/index.html'), 'https://app.example/game/');
+  assert.equal(R.pageFile(''), 'index.html');
+  assert.equal(R.pageFile('game'), 'game/index.html');
+  assert.equal(R.pageFile('game/play.html'), 'game/play.html');
+  assert.equal(R.assetBase({ owner: 'a', repo: 'b' }, 'f'.repeat(40), 'game/play.html'), 'https://cdn.jsdelivr.net/gh/a/b@' + 'f'.repeat(40) + '/game/');
+});
