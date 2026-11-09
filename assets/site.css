@@ -3282,8 +3282,8 @@ a.person-name:hover { text-decoration: underline; }
 .is-room .open-board .stage-title { margin: 0; font-size: clamp(1.4rem, 5vmin, 3.2rem); }
 .is-room .stage-studio:not([hidden]) { z-index: 7; }
 .is-room .stage-ready:has(.stage-studio:not([hidden])) .stage-reacts, .is-room .stage-ready:has(.stage-studio:not([hidden])) .stage-name { display: none; }
-.studio-done { position: fixed; top: 0.5rem; right: 0.75rem; z-index: 8; }
 /* A running clock stays in sight over whatever else is on the stage. */
+.is-room .stage-head { z-index: auto; }
 .is-room .stage-part:not([hidden]) { position: fixed; top: 0.75rem; right: 0.75rem; z-index: 6; padding: 0.2rem 0.8rem; border-radius: 999px; background: var(--card); color: var(--ink); font-variant-numeric: tabular-nums; }
 .is-room .stage-ready:has(.stage-name:not([hidden])) .stage-part:not([hidden]) { top: 3.5rem; }
 .is-room [data-view="part"] [data-part-big] { font-size: clamp(1.5rem, 6vmin, 3.5rem); }
@@ -3297,7 +3297,10 @@ a.person-name:hover { text-decoration: underline; }
 .open-check input { width: 18px; height: 18px; accent-color: var(--accent); }
 .open-acts { display: flex; flex-wrap: wrap; gap: 8px; }
 .open-more { border-top: 1px solid var(--rule); padding-top: 8px; }
-.open-more > summary { min-height: 36px; display: flex; align-items: center; color: var(--muted); font-weight: 500; cursor: pointer; }
+.open-more > summary { min-height: 36px; display: flex; align-items: center; gap: 10px; color: var(--muted); font-weight: 500; cursor: pointer; list-style: none; }
+.open-more > summary::-webkit-details-marker { display: none; }
+.open-more > summary::before { content: ''; width: 6px; height: 6px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(-45deg); transition: transform 0.15s; }
+.open-more[open] > summary::before { transform: rotate(45deg); }
 .open-more[open] { display: grid; gap: 8px; }
 .open-film { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .open-film li { position: relative; }
@@ -3307,3 +3310,4 @@ a.person-name:hover { text-decoration: underline; }
 .open-thumb-n { position: absolute; left: 6px; bottom: 6px; padding: 0 6px; border-radius: 6px; background: rgb(0 0 0 / 0.6); color: #fff; font-size: 11px; line-height: 16px; }
 .open-people li { align-items: center; min-height: 36px; padding: 0 0 0 12px; border-radius: 8px; background: var(--card); }
 .open-people .link-button { padding: 0 12px; min-height: 36px; }
+.open-end { padding-top: 12px; border-top: 1px solid var(--rule); }

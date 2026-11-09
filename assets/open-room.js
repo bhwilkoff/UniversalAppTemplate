@@ -528,7 +528,12 @@
       var active = document.activeElement;
       if (active && pane.contains(active) && active.tagName === 'INPUT') return;
       pane.replaceChildren();
-      nameField(pane);
+      var me = el('div', 'p2-group');
+      me.appendChild(el('h2', null, 'Your name'));
+      nameField(me);
+      pane.appendChild(me);
+      var inRoom = el('div', 'p2-group');
+      inRoom.appendChild(el('h2', null, 'In the room'));
       var ul = el('ul', 'open-people');
       room.people.forEach(function (p) {
         var li = el('li');
@@ -536,9 +541,10 @@
         if (p.id !== you) li.appendChild(btn('Make host', 'link-button', function () { send({ t: 'hand', to: p.id, name: p.name }); }));
         ul.appendChild(li);
       });
-      pane.appendChild(ul);
+      inRoom.appendChild(ul);
+      pane.appendChild(inRoom);
       var g = el('div', 'p2-group');
-      g.appendChild(el('h2', null, 'Without the add-on'));
+      g.appendChild(el('h2', null, 'Join without the add-on'));
       var url = R.link(location.origin, o.code);
       g.appendChild(el('p', 'small open-link', url));
       var copy = btn('Copy the link', 'btn-secondary', function () {
@@ -546,7 +552,9 @@
       });
       g.appendChild(copy);
       pane.appendChild(g);
-      pane.appendChild(btn(confirmEnd ? 'Yes, end it and erase the room' : 'End the session', 'btn-secondary', function () {
+      var end = el('div', 'p2-group open-end');
+      pane.appendChild(end);
+      end.appendChild(btn(confirmEnd ? 'Yes, end it and erase the room' : 'End the session', 'btn-secondary', function () {
         if (!confirmEnd) { confirmEnd = true; return drawPeople(); }
         confirmEnd = false; send({ t: 'end' });
       }));

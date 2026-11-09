@@ -1,7 +1,8 @@
 // The slide studio (SESSION-DESIGN.md): a part's slides, edited on the slide.
 // The deck kit always draws the slide; words are typed in a box laid exactly
 // over the line being changed, and every change is a change to the deck's text
-// (SlideModel). SlideStudio.mount(box, { text, readOnly, onChange }).
+// (SlideModel). SlideStudio.mount(box, { text, readOnly, onChange, done }); done is a button
+// kept at the end of the studio's own bar.
 (function () {
   var L = window.SlidesLib, M = window.SlideModel, E = window.SlideEditor;
   if (!L || !M || !E) return;
@@ -131,6 +132,7 @@
       if (list.length) end.appendChild(button('Play', null, play));
       var raw = button(asText ? 'Back to the slide' : 'Edit as text', null, toggleText);
       end.appendChild(raw);
+      if (o.done) end.appendChild(o.done);
       bar.appendChild(end);
     }
 

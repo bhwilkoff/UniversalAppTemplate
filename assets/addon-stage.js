@@ -214,15 +214,20 @@
 
   // The slide editor, on the leader's own stage: the same slide, the same
   // editor, and the panel saves, because the stage has no sign-in.
-  var studioKey = null;
+  var studioKey = null, studioApi = null;
   function drawStudio(d) {
     var box = $('[data-studio]');
     if (!d) { if (studioKey) { studioKey = null; box.replaceChildren(); } return; }
     if (d.key === studioKey || !window.SlideStudio) return;
     studioKey = d.key;
     Object.keys(d.gh || {}).forEach(function (k) { window.SlidesLib.ghHold(k, d.gh[k]); });
-    window.SlideStudio.mount(box, { text: d.text, onChange: function (t) { act({ a: 'deck', key: d.key, text: t }); } });
-    if (room) { var done = el('button', 'btn-primary studio-done', 'Done'); done.type = 'button'; done.addEventListener('click', function () { act({ a: 'studioDone' }); }); box.prepend(done); }
+    // In a room, Done sits with the studio's own buttons, and the notes never
+    // leave this browser.
+    var done = null;
+    if (room) { done = el('button', 'btn-secondary small', 'Done'); done.type = 'button'; done.addEventListener('click', function () { act({ a: 'studioDone' }); }); }
+    studioApi = window.SlideStudio.mount(box, { text: d.text, done: done, onChange: function (t) { act({ a: 'deck', key: d.key, text: t }); } });
+    var head = room && box.querySelector('.studio-notes-head');
+    if (head && window.UI) head.replaceChildren(window.UI.visibility('device', 'Your notes'));
   }
 
   // A question in their own words, typed on the stage.
@@ -387,7 +392,7 @@
   function roomAct(a) {
     if (a.a === 'answer') room.send({ t: 'answer', id: a.id, choice: a.choice, picks: a.picks, body: a.body });
     else if (a.a === 'deck') store(TALK, String(a.text || ''));
-    else if (a.a === 'studioDone') { store(EDIT, ''); roomDraw(); }
+    else if (a.a === 'studioDone') { if (studioApi) studioApi.flush(); store(EDIT, ''); roomDraw(); }
     else if (a.a === 'react') { var r = R.REACTIONS.filter(function (x) { return x.key === a.key; })[0]; if (r) room.send({ t: 'react', r: r.id }); }
   }
   function useRoom() {
