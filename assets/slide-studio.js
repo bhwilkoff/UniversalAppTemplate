@@ -647,6 +647,17 @@
       if (ev.key === 'ArrowUp' || ev.key === 'ArrowLeft') { if (at > 0) { ev.preventDefault(); at -= 1; redraw(); } }
     });
 
+    // Pressing a button while typing would blur the box, and closing it redraws
+    // the bar and the side, so the press would land on a button that is gone.
+    // The button keeps the focus where it is, and the box closes first.
+    root.addEventListener('mousedown', function (ev) {
+      var b = ev.target.closest && ev.target.closest('button');
+      if (typing && b && !b.classList.contains('studio-hit')) ev.preventDefault();
+    });
+    root.addEventListener('click', function (ev) {
+      var b = ev.target.closest && ev.target.closest('button');
+      if (typing && b && !b.classList.contains('studio-hit')) finish();
+    }, true);
     if (window.ResizeObserver) new ResizeObserver(function () { if (K && !typing) drawHits(); }).observe(canvas);
 
     E.load().then(function (kit) { K = kit; drawAdder(); redraw(); needGitHub(); }, function () { box.replaceChildren(el('p', 'small', 'The slides cannot be drawn here.')); });
