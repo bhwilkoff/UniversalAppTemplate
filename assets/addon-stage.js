@@ -373,16 +373,34 @@
   // ------------------------------------------------------------------
 
   var room = null, roomState = null, roomEnded = false, roomTalk = '', roomHtml = '', roomMine = null, pageKey = null;
-  // The host edits their slides on their own stage, which shares the panel's
-  // storage: the panel says when, and the slides are saved there as they change.
+  // The host edits their slides on their own stage. Inside Meet the stage and
+  // the panel do not share storage, so the panel says when through Meet's
+  // frame messages and the stage sends each change back. Outside Meet (a test
+  // with two tabs) they share storage, and that path still works.
   var TALK = 'hs-room-talk', EDIT = 'hs-room-edit';
+  var editOn = false, editText = null, heardPanel = false, deckTimer = null;
   function store(k, v) { try { if (v == null) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
-  function roomEditing() { return !!roomState && roomState.on && roomState.host === room.you() && store(EDIT) === roomCode; }
+  function toPanel(k, data) { if (stageClient) try { Promise.resolve(stageClient.notifySidePanel(RL.frameMessage(k, data))).catch(function () {}); } catch (e) {} }
+  function roomEditing() { return !!roomState && roomState.on && roomState.host === room.you() && (editOn || store(EDIT) === roomCode); }
+  function heardFrame(m) {
+    if (m.k === 'you') {
+      heardPanel = true;
+      room.adopt(m.secret);
+      setEdit(!!m.edit, m.text);
+    } else if (m.k === 'edit') setEdit(!!m.on, m.text);
+  }
+  function setEdit(on, text) {
+    if (on === editOn) return;
+    if (on && text != null) editText = text;
+    if (!on && studioApi) studioApi.flush();
+    editOn = on;
+    roomDraw();
+  }
 
   function roomDraw() {
     if (!roomState) return;
     var mine = roomMine && roomState.question && roomMine.id === roomState.question.id ? roomMine.answer : null;
-    view = roomEnded ? { mode: 'roomend', part: null } : roomEditing() ? { mode: 'studio', part: null, studio: { key: 'room', text: store(TALK) || RL.STARTER } } : RL.toView(roomState, { addon: A, you: room.you(), talk: roomTalk, html: roomHtml, mine: mine });
+    view = roomEnded ? { mode: 'roomend', part: null } : roomEditing() ? { mode: 'studio', part: null, studio: { key: 'room', text: (editOn && editText) || store(TALK) || RL.STARTER } } : RL.toView(roomState, { addon: A, you: room.you(), talk: roomTalk, html: roomHtml, mine: mine });
     show('ready'); draw();
     // A room's answers carry no names, so the cohort's line about leaders does not apply.
     $('[data-answer-panel]').hidden = true;
@@ -391,8 +409,17 @@
   }
   function roomAct(a) {
     if (a.a === 'answer') room.send({ t: 'answer', id: a.id, choice: a.choice, picks: a.picks, body: a.body });
-    else if (a.a === 'deck') store(TALK, String(a.text || ''));
-    else if (a.a === 'studioDone') { if (studioApi) studioApi.flush(); store(EDIT, ''); roomDraw(); }
+    else if (a.a === 'deck') {
+      editText = String(a.text || ''); store(TALK, editText);
+      clearTimeout(deckTimer);
+      deckTimer = setTimeout(function () { toPanel('deck', { text: editText }); }, 300);
+    }
+    else if (a.a === 'studioDone') {
+      if (studioApi) studioApi.flush();
+      clearTimeout(deckTimer);
+      toPanel('done', { text: editText != null ? editText : store(TALK) || '' });
+      editOn = false; store(EDIT, ''); roomDraw();
+    }
     else if (a.a === 'react') { var r = R.REACTIONS.filter(function (x) { return x.key === a.key; })[0]; if (r) room.send({ t: 'react', r: r.id }); }
   }
   function useRoom() {
@@ -500,7 +527,14 @@
       return session.createMainStageClient();
     }).then(function (stage) {
       stageClient = stage;
-      if (roomCode) { useRoom(); return; }
+      if (roomCode) {
+        stage.on('frameToFrameMessage', function (m) { var f = m && RL.readFrame(m.payload); if (f && room) heardFrame(f); });
+        useRoom();
+        // A message reaches only a frame that is listening, so the stage asks
+        // its panel who it is until it hears, then now and then.
+        (function hello() { toPanel('hello'); setTimeout(hello, heardPanel ? 15000 : 2000); })();
+        return;
+      }
       drawReactBar();
       wireAsk();
       stage.on('frameToFrameMessage', function (m) {

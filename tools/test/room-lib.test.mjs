@@ -123,3 +123,14 @@ test('a repository with a site is shown at its site, and one without at its page
   assert.equal(R.pageFile('game/play.html'), 'game/play.html');
   assert.equal(R.assetBase({ owner: 'a', repo: 'b' }, 'f'.repeat(40), 'game/play.html'), 'https://cdn.jsdelivr.net/gh/a/b@' + 'f'.repeat(40) + '/game/');
 });
+
+test('a panel and its own stage talk only in their own messages', () => {
+  const s = 'a'.repeat(32);
+  assert.deepEqual(R.readFrame(R.frameMessage('you', { secret: s, edit: true, text: '# Hi' })), { type: 'hs-room-frame', k: 'you', secret: s, edit: true, text: '# Hi' });
+  assert.equal(R.readFrame(R.frameMessage('you', { secret: 'short' })), null);
+  assert.equal(R.readFrame(R.frameMessage('deck', { text: 3 })), null);
+  assert.equal(R.readFrame(R.frameMessage('nope')), null);
+  assert.equal(R.readFrame(JSON.stringify({ type: 'hs-stage-hello' })), null);
+  assert.equal(R.readFrame('not json'), null);
+  assert.equal(R.readFrame(R.frameMessage('hello')).k, 'hello');
+});

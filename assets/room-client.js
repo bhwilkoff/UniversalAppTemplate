@@ -18,7 +18,7 @@
   function saveName(n) { try { localStorage.setItem(NAME, n); } catch (e) {} }
 
   function connect(o) {
-    var on = o.on || {}, ws = null, closed = false, tries = 0, ping = null, queue = [], you = null, name = o.name || savedName();
+    var on = o.on || {}, ws = null, closed = false, swapping = false, tries = 0, ping = null, queue = [], you = null, name = o.name || savedName();
     var mySecret = secret();
     function status(s) { if (on.status) on.status(s); }
     function send(m) {
@@ -49,6 +49,7 @@
       ws.onclose = function () {
         you = null;
         if (closed) return;
+        if (swapping) { swapping = false; return open(); }
         status('off');
         tries += 1;
         setTimeout(open, Math.min(10000, 400 * Math.pow(1.7, tries)) + Math.random() * 300);
@@ -62,6 +63,16 @@
       you: function () { return you; },
       name: function () { return name; },
       setName: function (n) { name = String(n || '').trim().slice(0, 60); saveName(name); send({ t: 'name', name: name }); },
+      secret: function () { return mySecret; },
+      // A stage takes on its own panel's identity, so the room sees one person.
+      adopt: function (s) {
+        if (!/^[0-9a-f]{32}$/.test(s) || s === mySecret) return false;
+        mySecret = s;
+        try { localStorage.setItem(KEY, s); } catch (e) {}
+        you = null; tries = 0;
+        if (ws && ws.readyState < 2) { swapping = true; ws.close(); }
+        return true;
+      },
       close: function () { closed = true; clearInterval(ping); if (ws) ws.close(); }
     };
   }

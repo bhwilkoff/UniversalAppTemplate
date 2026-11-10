@@ -142,7 +142,22 @@
     return { mode: 'roomwelcome', part: part, title: room.title, host: room.hostName };
   }
 
-  var lib = { CODE: CODE, TEMPLATE: TEMPLATE, STARTER: STARTER, code: code, codeOfSearch: codeOfSearch, link: link, socket: socket, repoOf: repoOf, siteOf: siteOf, pagesUrl: pagesUrl, pageFile: pageFile, commitUrl: commitUrl, rawUrl: rawUrl, editUrl: editUrl, assetBase: assetBase, withBase: withBase, titleOf: titleOf, deckBody: deckBody, stops: stops, stopAt: stopAt, nextStep: nextStep, people: people, here: here, toView: toView };
+  // Between a person's own panel and their own stage, through Meet's frame
+  // messages: the two do not share this browser's storage inside Meet
+  // (measured November 6, 2026). Kinds: hello (stage asks), you (the panel's
+  // room identity, and whether the slides are being edited), edit, deck, done.
+  var FRAME = 'hs-room-frame', KINDS = ['hello', 'you', 'edit', 'deck', 'done'];
+  function frameMessage(k, data) { return JSON.stringify(Object.assign({}, data || {}, { type: FRAME, k: k })); }
+  function readFrame(payload) {
+    var m;
+    try { m = JSON.parse(payload); } catch (e) { return null; }
+    if (!m || m.type !== FRAME || KINDS.indexOf(m.k) < 0) return null;
+    if (m.k === 'you' && !(typeof m.secret === 'string' && /^[0-9a-f]{32}$/.test(m.secret))) return null;
+    if (m.text != null && typeof m.text !== 'string') return null;
+    return m;
+  }
+
+  var lib = { CODE: CODE, TEMPLATE: TEMPLATE, STARTER: STARTER, code: code, codeOfSearch: codeOfSearch, link: link, socket: socket, repoOf: repoOf, siteOf: siteOf, pagesUrl: pagesUrl, pageFile: pageFile, commitUrl: commitUrl, rawUrl: rawUrl, editUrl: editUrl, assetBase: assetBase, withBase: withBase, titleOf: titleOf, deckBody: deckBody, stops: stops, stopAt: stopAt, nextStep: nextStep, people: people, here: here, toView: toView, frameMessage: frameMessage, readFrame: readFrame };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
   else root.RoomLib = lib;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

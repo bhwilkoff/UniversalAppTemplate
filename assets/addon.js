@@ -2161,6 +2161,7 @@
     }).then(function (client) {
       side = client;
       side.on('frameToFrameMessage', function (m) {
+        if (m && opened && opened.frame(m.payload)) return;
         if (m && A.isHello(m.payload)) { S.stageOn = true; stageButtons(true); sendStage(); S.codeStageSent = null; drawCode(); }
         var did = m && A.readAct(m.payload);
         if (did) stageAct(did);

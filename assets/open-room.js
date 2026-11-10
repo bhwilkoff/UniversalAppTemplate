@@ -295,15 +295,31 @@
         return res.json();
       }).then(function (c) { return c.sha; });
     }
-    // The slides are edited where they are seen: on the host's own stage,
-    // which shares this browser's storage, so neither needs the room for it.
+    // The slides are edited where they are seen: on the host's own stage.
+    // Inside Meet the two frames do not share storage, so they talk through
+    // Meet's frame messages (RoomLib.frameMessage); two plain tabs share
+    // storage, and the storage events below cover them.
     function editing() { return get(EDIT) === o.code; }
+    function toStage(k, data) { if (o.side) try { Promise.resolve(o.side.notifyMainStage(R.frameMessage(k, data))).catch(function () {}); } catch (e) {} }
+    function fromStage(payload) {
+      var f = R.readFrame(payload);
+      if (!f) return false;
+      if (f.k === 'hello') toStage('you', { secret: client.secret(), edit: editing() && isHost(), text: talk });
+      if ((f.k === 'deck' || f.k === 'done') && f.text != null) {
+        talk = f.text; put(TALK, talk);
+        if (f.k === 'done' && editing()) return stopEditing(), true;
+        // A last change can arrive after Done.
+        if (!editing() && SL.count(SL.withoutNotes(talk)) && deck() !== roomDeck) sendTalk(room && room.show === 'slides');
+        drawSlides();
+      }
+      return true;
+    }
     function startEditing() {
       if (!stageUp()) return openStage();
-      put(EDIT, o.code); drawSlides(); drawNow();
+      put(EDIT, o.code); toStage('edit', { on: true, text: talk }); drawSlides(); drawNow();
     }
     function stopEditing() {
-      put(EDIT, ''); talk = get(TALK) || talk;
+      put(EDIT, ''); toStage('edit', { on: false }); talk = get(TALK) || talk;
       if (SL.count(SL.withoutNotes(talk))) sendTalk(room && room.show === 'slides');
       drawSlides(); drawNow();
     }
@@ -670,6 +686,7 @@
     }
 
     return {
+      frame: fromStage,
       person: function (p) {
         person = p;
         if (p.name && !client.name()) client.setName(p.name);
