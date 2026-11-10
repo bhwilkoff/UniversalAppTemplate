@@ -174,7 +174,9 @@
     // A custom cohort has no weekly time: its sessions are its schedule.
     var steps = cohort.schedule === 'custom' ? [
       { key: 'sessions', label: 'Add the sessions', action: 'sessions', done: sessions.length > 0 && sessions.every(function (s) { return !!s.starts_at; }),
-        note: calendarNote(cohort, sessions) }
+        note: calendarNote(cohort, sessions) },
+      { key: 'repo', label: 'Make the GitHub repository', action: 'provision',
+        done: !!(cohort.github_repo && cohort.github_team) }
     ] : [
       { key: 'schedule', label: 'Set the day and time', action: 'edit',
         done: !!(cohort.starts_on && cohort.session_weekday != null && cohort.session_time) },

@@ -174,6 +174,7 @@ test('a custom cohort has no weekly rows, time, or length in weeks', () => {
   assert.equal(steps[0].done, true);
   assert.equal(lib.cohortSetupSteps(c, [{ number: 1, starts_at: null }])[0].done, false);
   assert.ok(!steps.some((s) => s.key === 'schedule'));
+  assert.ok(steps.some((s) => s.key === 'repo'));
 });
 
 test('a stored moment fills a form in the cohort\'s own zone', () => {

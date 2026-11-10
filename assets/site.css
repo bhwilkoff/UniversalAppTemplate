@@ -2981,6 +2981,11 @@ html:has(.p2-panel), body:has(.p2-panel) { background: #fff; overflow: hidden; }
 .session-rename-open { margin-top: 0.4rem; }
 .session-rename { max-width: 32rem; }
 .session-rename .hint { margin: 0; }
+.session-rename { display: grid; gap: 0.6rem; }
+.session-rename label { display: grid; gap: 0.25rem; font-weight: 500; }
+.session-rename input[type="text"] { width: 100%; }
+.session-rename .row { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+.session-rename .link-button { justify-self: start; }
 .session-before-next { margin-top: 2rem; }
 .is-part .session-before-next { display: none; }
 .session-recording-link { margin-top: 1.5rem; }
