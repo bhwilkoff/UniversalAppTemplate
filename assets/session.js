@@ -77,6 +77,7 @@
   }
 
   function draw(cohort, sessions, session, live, leading) {
+    K.cohort = cohort;
     var ends = session.starts_at ? Date.parse(session.starts_at) + cohort.session_minutes * 60000 : null;
     var finished = !live && ends != null && ends < Date.now();
     document.title = lib.sessionTitle(session, cohort) + ', ' + cohort.title + ' | Human Shaped';
@@ -143,7 +144,7 @@
     // A part's address names the view too, and the row's links never carry a part.
     var url = new URL(location.href), opened = url.searchParams.get('part');
     if (opened) { url.searchParams.delete('part'); url.searchParams.set('t', 'plan'); history.replaceState(null, '', url.pathname + url.search); }
-    K.tabs = U.tabs($('[data-views]'), list, root, { label: lib.sessionTitle(session, cohort), onChange: function () { if (K.plan) K.plan.part(partNow()); studying(); } });
+    K.tabs = U.tabs($('[data-views]'), list, root, { label: lib.sessionTitle(session, K.cohort), onChange: function () { if (K.plan) K.plan.part(partNow()); studying(); } });
     if (opened) { url.searchParams.set('part', opened); history.replaceState(null, '', url.pathname + url.search); K.plan.part(opened); }
     studying();
   }
