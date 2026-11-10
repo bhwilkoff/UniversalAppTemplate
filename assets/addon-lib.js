@@ -34,6 +34,9 @@
     if (!c) return null;
     rows = rows || {};
     var teaching = rows.teaching || [];
+    // A leader chose a session for this call (call_runs): that wins, in any call.
+    var run = rows.run;
+    if (run && run.cohort_id && run.session_id) return { code: c, cohortId: run.cohort_id, sessionId: run.session_id, groupId: null, room: 'main', ambiguous: false, run: true };
     function same(url) { return meetingCode(url) === c; }
     var groups = (rows.groups || []).filter(function (g) { return same(g.meet_url); });
     var sessions = (rows.sessions || []).filter(function (s) { return same(s.meet_url); });

@@ -334,3 +334,12 @@ test('the slide editor goes only to the stage of the panel that asked', () => {
   assert.deepEqual(lib.readStageMessage(lib.stageMessage(v)).studio, { key: 'k', text: '## A', gh: {} });
   assert.notEqual(lib.stageView({}).mode, 'studio');
 });
+
+test('a session a leader chose for a call wins over the call\'s own links', () => {
+  const rows = { sessions: [{ id: 's1', cohort_id: 'c1', meet_url: 'https://meet.google.com/aaa-bbbb-ccc' }], groups: [], teaching: [] };
+  assert.deepEqual(lib.findRoom('aaa-bbbb-ccc', Object.assign({ run: { cohort_id: 'c1', session_id: 's0' } }, rows)),
+    { code: 'aaa-bbbb-ccc', cohortId: 'c1', sessionId: 's0', groupId: null, room: 'main', ambiguous: false, run: true });
+  assert.equal(lib.findRoom('qqq-wwww-eee', { run: { cohort_id: 'c9', session_id: 's9' } }).cohortId, 'c9');
+  assert.equal(lib.findRoom('qqq-wwww-eee', { run: null }), null);
+  assert.equal(lib.findRoom('qqq-wwww-eee', Object.assign({ run: null }, rows)), null);
+});

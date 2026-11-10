@@ -3325,3 +3325,14 @@ a.person-name:hover { text-decoration: underline; }
 .open-site-name { font-weight: 500; }
 .open-site-url { font-size: 12px; line-height: 16px; color: var(--muted); overflow-wrap: anywhere; }
 .p2-pane .p2-group > .link-button { justify-self: start; }
+
+/* Running another session in a call (call_runs): the leader's list of sessions. */
+.p2-run { gap: 6px; }
+.p2-run-name { margin: 0; font-weight: 500; }
+.p2-run-list, .open-run-sessions { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.p2-run-row { display: block; width: 100%; padding: 8px 12px; border: 1px solid var(--rule); border-radius: 8px; background: var(--card); color: var(--ink); font: inherit; text-align: left; cursor: pointer; }
+.p2-run-row:hover { border-color: var(--edge); }
+.open-runs { display: grid; gap: 8px; margin-top: 16px; }
+.open-runs > .btn-secondary { justify-self: stretch; }
+.open-run-list { display: grid; gap: 12px; }
+.open-run-cohort { display: grid; gap: 6px; }

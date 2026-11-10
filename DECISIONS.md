@@ -1352,3 +1352,11 @@ refuses, the Accept button still leads to GitHub's own page.
 
 **How to apply:** the only database call a stranger makes is `is_cohort_call`, which answers yes or no. Keep rooms out of Supabase. A room's words stay in the room, so a person keeps a talk by keeping it in their own repository, made with GitHub's template page rather than an app of ours, because the Hub App cannot generate a repository for someone who has not installed it. Pages run in a frame with scripts and forms only. To take a page down, add its repository to `BLOCKED_REPOS` in `tools/rooms/wrangler.toml`.
 
+
+## A session can run again (November 10, 2026)
+
+**A leader can run any session of their cohort again, in any call they are signed in to, and the work people do is saved with that session.** Ben: "I'd love to be able to load up any previously built session if I am logged in correctly to the add-on." He chose any call over the cohort's own link, and that session over a separate run. ADDON-DESIGN.md, "Running a session again", holds the shape.
+
+**Why:** a learner who missed a session gets more from doing it than from watching it. The add-on knew a call only by the cohort's links and a session only by the clock, so neither could follow a leader's choice. A recording's reading replaces the session's words and talk, so a makeup's recording on the first run's session would erase the first run.
+
+**How to apply:** `call_runs` (migration 20261110010000) holds one row per call: the cohort, the session, and an end three hours on. `private.call_cohort` decides a call's cohort, a run first, and both `is_cohort_call` and `join_call` use it, so a run's call takes members and guests like the cohort's own link. Only `run_in_call` and `stop_call_run` write, and only a leader of that cohort; a call that is another cohort's is refused. Panels read the row, open that session, and reload when it changes, guarded by sessionStorage so a refusal cannot loop. An open room still makes no database call but `is_cohort_call`, now asked every fifteen seconds so its panels follow a leader's choice. Never attach a makeup's recording to the session's `recording_url`.

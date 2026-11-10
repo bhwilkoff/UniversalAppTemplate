@@ -139,9 +139,37 @@
       s.appendChild(btn('Start a session', 'btn-primary', startRoom));
       s.appendChild(el('p', 'small', 'Free, with no account. Nothing is kept after the call.'));
       s.appendChild(status);
+      if (leads.length && o.runSession) s.appendChild(runPick());
       s.appendChild(links());
       box.appendChild(s);
       lobby = { input: input };
+    }
+    // A leader of a cohort makes this call that cohort's, running any of its
+    // sessions again for someone who missed it (call_runs).
+    var leads = [];
+    function runPick() {
+      var wrap = el('div', 'open-runs');
+      var list = el('div', 'open-run-list'); list.hidden = true;
+      var said = el('p', 'small'); said.setAttribute('role', 'status');
+      var open = btn('Run a cohort session', 'btn-secondary', function () { list.hidden = !list.hidden; open.setAttribute('aria-expanded', String(!list.hidden)); });
+      open.setAttribute('aria-expanded', 'false');
+      leads.forEach(function (c) {
+        var g = el('div', 'open-run-cohort');
+        if (leads.length > 1) g.appendChild(el('p', 'open-label', c.title));
+        var ul = el('ul', 'open-run-sessions');
+        c.sessions.forEach(function (x) {
+          var li = el('li');
+          li.appendChild(btn(x.label, 'p2-run-row', function () {
+            said.textContent = 'Opening ' + x.label + '…';
+            o.runSession(x.id, function (m) { said.textContent = m; });
+          }));
+          ul.appendChild(li);
+        });
+        g.appendChild(ul);
+        list.appendChild(g);
+      });
+      wrap.appendChild(open); wrap.appendChild(list); wrap.appendChild(said);
+      return wrap;
     }
     function links() {
       var p = el('p', 'open-links small');
@@ -687,6 +715,10 @@
 
     return {
       frame: fromStage,
+      cohorts: function (l) {
+        leads = l || [];
+        if (frameRole === 'lobby') { var typed = lobby && lobby.input.value; build('lobby'); if (typed != null) lobby.input.value = typed; }
+      },
       person: function (p) {
         person = p;
         if (p.name && !client.name()) client.setName(p.name);

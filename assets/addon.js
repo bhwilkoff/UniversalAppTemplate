@@ -243,12 +243,13 @@
       db.from('sessions').select('id, cohort_id, meet_url').ilike('meet_url', like),
       db.from('groups').select('id, cohort_id, name, meet_url').ilike('meet_url', like),
       db.from('cohort_teachers').select('cohort_id').eq('user_id', S.me.id),
-      db.from('cohorts').select('id').eq('details->>any_call', 'true')
+      db.from('cohorts').select('id').eq('details->>any_call', 'true'),
+      db.from('call_runs').select('cohort_id, session_id').eq('code', code).gt('ends_at', new Date().toISOString()).maybeSingle()
     ]).then(function (res) {
-      var bad = res.filter(function (r) { return r.error; })[0];
+      var bad = res.slice(0, 4).filter(function (r) { return r.error; })[0];
       if (bad) return fail('The panel could not look up this call: ' + bad.error.message);
       var room = A.findRoom(code, { sessions: res[0].data, groups: res[1].data, teaching: res[2].data.map(function (t) { return t.cohort_id; }),
-        anyCall: res[3].data.map(function (c) { return c.id; }) });
+        anyCall: res[3].data.map(function (c) { return c.id; }), run: res[4].error ? null : res[4].data });
       if (!room && !joined) {
         // The link is the way in (Ben, November 4, 2026: "If you have access
         // to the google meet link, you are a part of the cohort.").
@@ -263,18 +264,77 @@
     });
   }
 
+  // A leader can run any session of their cohort in a call (call_runs). Every
+  // panel in the call watches which session that is and opens again when it
+  // changes, once per change, so a refusal never becomes a loop.
+  function reopenFor(code, key) {
+    var mark = 'hs-call-run:' + code, seen = null;
+    try { seen = JSON.parse(sessionStorage.getItem(mark) || 'null'); } catch (e) {}
+    if (seen && seen.k === key) return;
+    try { sessionStorage.setItem(mark, JSON.stringify({ k: key, t: Date.now() })); } catch (e) {}
+    console.log('[addon] this call now runs ' + (key || 'its schedule') + '; opening again');
+    location.reload();
+  }
+  function watchCallRun() {
+    var code = S.room && S.room.code;
+    if (standalone || !code || S.watchingRun) return;
+    S.watchingRun = true;
+    setInterval(function () {
+      db.from('call_runs').select('session_id').eq('code', code).gt('ends_at', new Date().toISOString()).maybeSingle().then(function (r) {
+        if (r.error) return;
+        var key = (r.data && r.data.session_id) || '';
+        if (key !== (S.callRun || '')) reopenFor(code, key);
+      });
+    }, 15000);
+  }
+  function runInCall(sessionId, said) {
+    var code = (S.room && S.room.code) || openCode;
+    return db.rpc('run_in_call', { code: code, session: sessionId }).then(function (r) {
+      if (r.error) { if (said) said(r.error.message); return; }
+      try { sessionStorage.removeItem('hs-call-run:' + code); } catch (e) {}
+      location.reload();
+    });
+  }
+  function stopCallRun(said) {
+    var code = S.room && S.room.code;
+    return db.rpc('stop_call_run', { code: code }).then(function (r) {
+      if (r.error) { if (said) said(r.error.message); return; }
+      try { sessionStorage.removeItem('hs-call-run:' + code); } catch (e) {}
+      location.reload();
+    });
+  }
+  // The sessions a signed-in leader could run here, from their open or running cohorts.
+  function myCohortSessions() {
+    if (!S.me || S.me.is_anonymous) return Promise.resolve([]);
+    return db.from('cohort_teachers').select('cohort_id, cohorts(id, title, status)').eq('user_id', S.me.id).then(function (t) {
+      var cohorts = (t.data || []).map(function (x) { return x.cohorts; }).filter(function (c) { return c && (c.status === 'open' || c.status === 'running'); });
+      if (!cohorts.length) return [];
+      return db.from('sessions').select('id, cohort_id, number, title, starts_at').in('cohort_id', cohorts.map(function (c) { return c.id; })).order('number').then(function (s) {
+        return cohorts.map(function (c) {
+          return { id: c.id, title: c.title, sessions: (s.data || []).filter(function (x) { return x.cohort_id === c.id; }).map(function (x) { return { id: x.id, label: lib.sessionTitle(x) }; }) };
+        }).filter(function (c) { return c.sessions.length; });
+      });
+    }, function () { return []; });
+  }
+
   // Any other call is an open room (ADDON-DESIGN.md). Nobody needs an account
   // for it, and signing in only gives the room their name.
-  var opened = null, openCode = null;
+  var opened = null, openCode = null, openWatch = null;
   function openRoom(code) {
     openCode = code;
+    // When a leader makes this call a cohort's, everyone here opens again into it.
+    if (!openWatch && !standalone) openWatch = setInterval(function () {
+      db.rpc('is_cohort_call', { code: code }).then(function (r) { if (!r.error && r.data === true) reopenFor(code, 'cohort'); });
+    }, 15000);
     show('open');
     var meta = S.me && !S.me.is_anonymous ? S.me.user_metadata || {} : null;
     var gh = meta && S.me.app_metadata && S.me.app_metadata.provider === 'github' ? meta.user_name || '' : '';
     var who = { name: meta ? meta.full_name || meta.name || meta.user_name || '' : '', member: !!meta, github: gh };
-    if (opened) { opened.person(who); return; }
+    if (opened) { opened.person(who); myCohortSessions().then(function (l) { opened.cohorts(l); }); return; }
     root.classList.add('p2-panel');
-    opened = window.OpenRoom.mount({ root: root, code: code, side: side, name: who.name, member: who.member, github: who.github, signIn: signedOut });
+    opened = window.OpenRoom.mount({ root: root, code: code, side: side, name: who.name, member: who.member, github: who.github, signIn: signedOut,
+      runSession: function (id, said) { return runInCall(id, said); } });
+    myCohortSessions().then(function (l) { opened.cohorts(l); });
   }
 
   function loadCohort(id) {
@@ -302,7 +362,11 @@
         useGuests(res[4].data);
         var t = lib.currentAndNext(ss, new Date(), cohort.session_minutes);
         var named = standalone && standaloneNumber != null ? ss.filter(function (x) { return x.number === standaloneNumber; })[0] : null;
-        S.session = named || (t.live ? t.next : (t.next || t.current));
+        // A session a leader chose for this call runs instead of the schedule's.
+        var chosen = S.room && S.room.sessionId ? ss.filter(function (x) { return x.id === S.room.sessionId; })[0] : null;
+        S.sessions = ss;
+        S.callRun = chosen ? chosen.id : null;
+        S.session = named || chosen || (t.live ? t.next : (t.next || t.current));
         S.prev = ss.filter(function (x) { return x.number === S.session.number - 1; })[0] || null;
         S.parts = lib.agenda(cohort.session_minutes);
         var since = S.prev && S.prev.starts_at ? S.prev.starts_at : new Date(Date.now() - 8 * 86400000).toISOString();
@@ -324,6 +388,7 @@
           (got[1].data || []).forEach(function (n) { S.notes[n.scene_id] = n.body; });
           S.brought = sh.data || [];
           drawFrame();
+          watchCallRun();
           startShow();
           startRooms();
           startSignals(res[2].data);
@@ -954,6 +1019,7 @@
     if (S.teaching) now.appendChild(S.nowNotes);
     // Plan: the parts, one line each.
     if (S.teaching) F.put('plan', $('[data-show]')); else $('[data-show]').hidden = true;
+    if (S.teaching && !standalone && S.room && S.room.code) F.pane('plan').insertBefore(runPick(), F.pane('plan').firstChild);
     // Tools and People, for a leader; Mine, for a learner.
     if (S.teaching) {
       var stage = el('section', 'p2-group');
@@ -1011,6 +1077,35 @@
     if (n.go === 'start') return $('[data-start-session]').click();
     if (S.run) S.run.step(1).then(afterMove);
   }
+  // Which session this call runs: the schedule's, or any other the leader picks
+  // (call_runs), for someone who missed it.
+  function runPick() {
+    var box = el('section', 'p2-group p2-run');
+    var head = el('p', 'p2-run-name', lib.sessionTitle(S.session));
+    box.appendChild(head);
+    var said = el('p', 'small'); said.setAttribute('role', 'status');
+    var acts = el('div', 'actions');
+    var list = el('ul', 'p2-run-list'); list.hidden = true;
+    var pick = button('Run another session', 'link-button', function () {
+      list.hidden = !list.hidden; pick.setAttribute('aria-expanded', String(!list.hidden));
+    });
+    pick.setAttribute('aria-expanded', 'false');
+    acts.appendChild(pick);
+    if (S.callRun) acts.appendChild(button('Back to the schedule', 'link-button', function () { said.textContent = 'Going back…'; stopCallRun(function (m) { said.textContent = m; }); }));
+    (S.sessions || []).forEach(function (x) {
+      if (x.id === S.session.id) return;
+      var li = el('li');
+      li.appendChild(button(lib.sessionTitle(x), 'p2-run-row', function () {
+        said.textContent = 'Opening ' + lib.sessionName(x.number) + '…';
+        runInCall(x.id, function (m) { said.textContent = m; });
+      }));
+      list.appendChild(li);
+    });
+    box.appendChild(acts);
+    box.appendChild(list);
+    box.appendChild(said);
+    return box;
+  }
   function drawFrameNow(left) {
     var part = partNow(), st = S.signals && S.signals.state ? S.signals.state() || {} : {};
     var chips = [];
@@ -1019,6 +1114,7 @@
       var place = slideInfo();
       if (place) chips.push({ text: 'Slide ' + (place.at + 1) + ' of ' + place.count });
       if (S.recording) chips.push({ text: 'Recording', on: true });
+      if (S.callRun) chips.push({ text: lib.sessionName(S.session.number) + ' again', on: true });
       if (st.rooms) chips.push({ text: 'In breakouts', on: true });
       if (st.together) chips.push({ text: 'Coming back', on: true });
     }

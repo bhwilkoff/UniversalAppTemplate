@@ -68,6 +68,15 @@ A learner asks from Mine, or with Ask on the stage: a question for everyone, a m
 
 Ben, November 6, 2026: "If I have tied that new google account to their account within Human Shaped, it should registar as that user." Once tied, someone is that member here: their name, their app, their place in the queue, their answers, their reactions, and their board notes (`who()` in the panel, `private.claimed_member` in the database).
 
+## Running a session again
+
+Ben, November 10, 2026: "sometimes a cohort member has to miss a session. They could watch the recording, but they obviously won't get as much out of the experience as if I was running the session again for them. I'd love to be able to load up any previously built session if I am logged in correctly to the add-on." Asked where, he chose any call he is signed in to; asked where the work goes, he chose that session.
+
+1. **A leader picks the session, in any call.** In a cohort's call, Plan starts with the session's name and Run another session, a list of the cohort's sessions. In any other call, a signed-in leader's open room offers Run a cohort session before anyone starts. Choosing one makes the call that cohort's, running that session, for three hours or until Back to the schedule.
+2. **Everyone in the call follows.** Every panel watches which session its call runs and opens again when it changes, once per change. Members come in as themselves, and anyone else as a guest the leader can tie to a member. A call that is another cohort's own, or is running another cohort's session, is refused.
+3. **The work goes to that session, beside the first run.** Answers, posts, and what people do are saved with that session, and nothing of the first run changes. A makeup's recording is never put in place of the first run's.
+4. **The leader sees it is a rerun.** The top of the panel says "Week N again" while it lasts.
+
 ## Open rooms
 
 Ben, November 7, 2026: "I'd like for the add-on to be usable by anyone as a set of presentation tools." And: "I want to make it as easy of a pipeline as possible."
