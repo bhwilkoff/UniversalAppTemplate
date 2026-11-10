@@ -16,7 +16,9 @@
   }
 
   // A line in three pieces: what marks it, its words, and what follows them.
-  var HEAD = /^(##\s+(?::[a-z0-9-]+:\s+)?)(.*?)(\s*\{[^}]*\})?\s*$/;
+  // A slide's headline is # or ##: the deck kit draws both, and a room's
+  // slides and many talk.md files use #.
+  var HEAD = /^(#{1,2}\s+(?::[a-z0-9-]+:\s+)?)(.*?)(\s*\{[^}]*\})?\s*$/;
   var POINT = /^(\s*[-*]\s+)(.*)$/;
   function pieces(line) {
     var m = HEAD.exec(line);
@@ -87,7 +89,7 @@
     { key: 'two', label: 'Two columns' }, { key: 'icon', label: 'Big icon' }
   ];
   function headIndex(lines) {
-    for (var i = 0; i < lines.length; i++) if (/^##\s/.test(lines[i])) return i;
+    for (var i = 0; i < lines.length; i++) if (/^#{1,2}\s/.test(lines[i])) return i;
     return -1;
   }
   function marks(line) {
@@ -124,14 +126,15 @@
     return a;
   }
   function iconOf(lines) {
-    var m = /^##\s+:([a-z0-9-]+):/.exec(lines[headIndex(lines)] || '');
+    var m = /^#{1,2}\s+:([a-z0-9-]+):/.exec(lines[headIndex(lines)] || '');
     return m ? m[1] : '';
   }
   function setIcon(lines, name) {
     var a = lines.slice(), h = headIndex(a);
     if (h < 0) return a;
-    var bare = a[h].replace(/^##\s+(?::[a-z0-9-]+:\s+)?/, '');
-    a[h] = '## ' + (name ? ':' + name + ': ' : '') + bare;
+    var hashes = /^#+/.exec(a[h])[0];
+    var bare = a[h].replace(/^#{1,2}\s+(?::[a-z0-9-]+:\s+)?/, '');
+    a[h] = hashes + ' ' + (name ? ':' + name + ': ' : '') + bare;
     return a;
   }
 

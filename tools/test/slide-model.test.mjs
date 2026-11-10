@@ -122,3 +122,13 @@ test('a GitHub fence is a block a leader can point at a repository', () => {
   assert.equal(M.block(lines).app, 'github');
   assert.deepEqual(M.editable(lines).map((x) => x.words), ['H']);
 });
+
+test('a headline with one # can be typed on and keeps its one #', () => {
+  const s = ['# What are we building today?', '', '> A note'];
+  assert.deepEqual(M.editable(s), [{ line: 0, kind: 'head', words: 'What are we building today?', column: 0 }]);
+  assert.equal(M.setWords(s, 0, 'A reading app')[0], '# A reading app');
+  assert.equal(M.setLayout(s, 'title')[0], '# What are we building today? {.title}');
+  assert.equal(M.setLayout(s, 'title').filter((l) => /^#/.test(l)).length, 1);
+  assert.equal(M.setIcon(s, 'lightbulb')[0], '# :lightbulb: What are we building today?');
+  assert.equal(M.iconOf(M.setIcon(s, 'lightbulb')), 'lightbulb');
+});
