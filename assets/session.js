@@ -79,8 +79,8 @@
   function draw(cohort, sessions, session, live, leading) {
     var ends = session.starts_at ? Date.parse(session.starts_at) + cohort.session_minutes * 60000 : null;
     var finished = !live && ends != null && ends < Date.now();
-    document.title = lib.sessionTitle(session) + ', ' + cohort.title + ' | Human Shaped';
-    $('[data-title]').textContent = lib.sessionTitle(session);
+    document.title = lib.sessionTitle(session, cohort) + ', ' + cohort.title + ' | Human Shaped';
+    $('[data-title]').textContent = lib.sessionTitle(session, cohort);
 
     // When, on the reader's own clock, and its state.
     var when = $('[data-when]'); when.replaceChildren();
@@ -108,8 +108,8 @@
     var weeks = el('ol');
     sessions.forEach(function (x) {
       var li = el('li'), a = link(String(x.number), lib.sessionUrl(cohort.slug, x.number));
-      a.title = lib.sessionTitle(x);
-      a.setAttribute('aria-label', lib.sessionTitle(x));
+      a.title = lib.sessionTitle(x, cohort);
+      a.setAttribute('aria-label', lib.sessionTitle(x, cohort));
       if (x === session) a.setAttribute('aria-current', 'page');
       li.appendChild(a); weeks.appendChild(li);
     });
@@ -124,7 +124,7 @@
     if (leading && K.started) drawAfter(cohort, session);
     $('[data-after-leading]').hidden = !leading;
     if (K.started) drawStory(cohort, session, leading);
-    if (leading) drawEdits(session);
+    if (leading) drawEdits(session, cohort);
     return bringReady.then(function (bring) { drawViews(session, leading, finished, !!play, bring); show('ready'); });
   }
 
@@ -143,7 +143,7 @@
     // A part's address names the view too, and the row's links never carry a part.
     var url = new URL(location.href), opened = url.searchParams.get('part');
     if (opened) { url.searchParams.delete('part'); url.searchParams.set('t', 'plan'); history.replaceState(null, '', url.pathname + url.search); }
-    K.tabs = U.tabs($('[data-views]'), list, root, { label: lib.sessionTitle(session), onChange: function () { if (K.plan) K.plan.part(partNow()); studying(); } });
+    K.tabs = U.tabs($('[data-views]'), list, root, { label: lib.sessionTitle(session, cohort), onChange: function () { if (K.plan) K.plan.part(partNow()); studying(); } });
     if (opened) { url.searchParams.set('part', opened); history.replaceState(null, '', url.pathname + url.search); K.plan.part(opened); }
     studying();
   }
@@ -503,23 +503,43 @@
   // Each thing a leader can change sits where it shows: the title on the
   // title, what comes before the next session under the plan, and the
   // recording's link, which the recorder fills in, with what came of it.
-  function drawEdits(s) {
+  function drawEdits(s, cohort) {
     K.editing = s;
     var title = $('[data-title-form]'), next = $('[data-next-form]'), rec = $('[data-recording-form]');
     next.hidden = false;
     next.elements.scope.value = s.scope || '';
     rec.elements.recording_url.value = s.recording_url || '';
     var head = $('[data-title]');
-    var rename = el('button', 'btn-secondary small session-rename-open', 'Rename');
+    // A custom cohort's session also has its own date and time, and can go
+    // while nothing of anyone's is in it (the database refuses otherwise).
+    var custom = cohort.schedule === 'custom', TL = window.TeachLib;
+    var rename = el('button', 'btn-secondary small session-rename-open', custom ? 'Change' : 'Rename');
+    $('[data-when-fields]').hidden = !custom;
+    $('[data-remove-session]').hidden = !custom;
     rename.type = 'button';
     var old = $('.session-rename-open'); if (old) old.remove();
     head.after(rename);
     function open(on) { title.hidden = !on; head.hidden = on; rename.hidden = on; }
     rename.addEventListener('click', function () {
       var now = K.editing;
-      title.elements.title.value = now.title && now.title !== lib.sessionName(now.number) ? now.title : '';
+      title.elements.title.value = now.title && now.title !== lib.sessionName(now.number, cohort) ? now.title : '';
+      if (custom) {
+        var at = now.starts_at && TL ? TL.zonedParts(now.starts_at, cohort.time_zone) : { date: '', time: '' };
+        title.elements.date.value = at.date; title.elements.time.value = at.time;
+      }
       open(true); title.elements.title.focus();
     });
+    if (custom && /[?&]edit=1/.test(location.search)) { rename.click(); history.replaceState(null, '', lib.sessionUrl(cohort.slug, s.number)); }
+    $('[data-remove-session]').onclick = function () {
+      var go = window.UI && window.UI.confirm ? window.UI.confirm({ title: 'Remove ' + lib.sessionTitle(K.editing, cohort) + '?', body: 'Its plan goes with it. A session with anyone’s answers, posts, or recording stays.', action: 'Remove it', cancel: 'Keep it', danger: true }) : Promise.resolve(true);
+      go.then(function (yes) {
+        if (!yes) return;
+        db.from('sessions').delete().eq('id', K.editing.id).select('id').then(function (r) {
+          if (r.error) return U.say($('[data-title-status]'), r.error.message, 'problem');
+          location.assign('/cohort/?c=' + encodeURIComponent(cohort.slug) + '&t=sessions');
+        });
+      });
+    };
     $('[data-title-cancel]').onclick = function () { open(false); };
     function save(patch, said, done) {
       U.say(said, 'Saving');
@@ -532,8 +552,15 @@
     }
     title.onsubmit = function (ev) {
       ev.preventDefault();
-      save({ title: title.elements.title.value.trim() || lib.sessionName(K.editing.number) }, $('[data-title-status]'), function () {
-        head.textContent = lib.sessionTitle(K.editing);
+      var patch = { title: title.elements.title.value.trim() || lib.sessionName(K.editing.number, cohort) };
+      if (custom) {
+        var d = title.elements.date.value, t = title.elements.time.value;
+        if (d && !t) return U.say($('[data-title-status]'), 'Choose a time as well as a date.', 'problem');
+        patch.starts_at = d && t && TL ? TL.zonedToUtc(d, t, cohort.time_zone).toISOString() : null;
+      }
+      save(patch, $('[data-title-status]'), function () {
+        if (custom) return location.reload();
+        head.textContent = lib.sessionTitle(K.editing, cohort);
         open(false);
       });
     };

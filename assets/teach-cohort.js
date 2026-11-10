@@ -65,8 +65,13 @@
     // Once made, the button matches the dates to a changed schedule and
     // fills in any plan still missing; it never overwrites a plan.
     var make = $('[data-make-sessions]');
-    make.textContent = sessions.length ? 'Match the dates to the schedule' : 'Make the sessions';
-    make.className = sessions.length ? 'btn-secondary' : 'btn-primary';
+    if (c.schedule === 'custom') {
+      make.textContent = 'Add a session';
+      make.className = sessions.length ? 'btn-secondary' : 'btn-primary';
+    } else {
+      make.textContent = sessions.length ? 'Match the dates to the schedule' : 'Make the sessions';
+      make.className = sessions.length ? 'btn-secondary' : 'btn-primary';
+    }
     needs.draw();
   }
   // What needs the teacher, each a row with a count and a way there.
@@ -232,7 +237,22 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
     });
   }
 
+  // A custom cohort's sessions are added one at a time: the next number, and
+  // its own page opens to set the title, date, and time.
+  function addSession() {
+    var b = $('[data-make-sessions]');
+    b.disabled = true;
+    db.from('sessions').select('number').eq('cohort_id', current.id).order('number', { ascending: false }).limit(1).then(function (r) {
+      var n = r.data && r.data.length ? r.data[0].number + 1 : 1;
+      return db.from('sessions').insert({ cohort_id: current.id, number: n, title: 'Session ' + n }).select('number').single();
+    }).then(function (r) {
+      b.disabled = false;
+      if (r.error) return say('[data-detail-message]', 'The session could not be added: ' + r.error.message);
+      location.assign('/session/?c=' + encodeURIComponent(current.slug) + '&s=' + r.data.number + '&edit=1');
+    });
+  }
   $('[data-make-sessions]').addEventListener('click', function () {
+    if (current.schedule === 'custom') return addSession();
     var rows = lib.sessionRows(current);
     if (!rows) return say('[data-detail-message]', 'Set the day and time first.');
     var cohort = current;

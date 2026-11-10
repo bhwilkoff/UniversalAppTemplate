@@ -193,21 +193,26 @@
     function cut(x, n) { x = String(x == null ? '' : x).trim(); return x.length > n ? x.slice(0, n - 1) + '\u2026' : x; }
     if (!cohort || !session) return null;
     var n = session.number, first = (parts || [])[0] || null;
-    var title = session.title && session.title !== 'Week ' + n && session.title !== sessionName(n) ? cut(session.title, 120) : null;
+    var title = session.title && session.title !== 'Week ' + n && session.title !== sessionName(n, cohort) ? cut(session.title, 120) : null;
     return {
-      cohort: cut(cohort.title, 120), week: n, title: title,
+      cohort: cut(cohort.title, 120), week: n, name: sessionName(n, cohort), title: title,
       challenge: session.scope ? cut(session.scope, 400) : null,
       first: first ? { name: cut(first.name, 80), what: cut(first.what, 300) } : null
     };
   }
 
-  // A session's one name everywhere (JOURNEYS.md, S1): the prep session
-  // is number 0, then Week 1 onward. A leader's own title follows it.
-  function sessionName(n) { return Number(n) === 0 ? 'Prep' : 'Week ' + Number(n); }
-  function sessionTitle(session) {
+  // A session's one name everywhere (JOURNEYS.md, S1). A weekly cohort's
+  // prep session is number 0, then Week 1 onward; a custom cohort's sessions
+  // are Session 1 onward (cohorts.schedule). A leader's own title follows it.
+  function custom(cohort) { return !!cohort && cohort.schedule === 'custom'; }
+  function sessionName(n, cohort) {
+    if (custom(cohort)) return 'Session ' + Number(n);
+    return Number(n) === 0 ? 'Prep' : 'Week ' + Number(n);
+  }
+  function sessionTitle(session, cohort) {
     if (!session) return '';
-    var name = sessionName(session.number), t = session.title ? String(session.title).trim() : '';
-    return t && t !== name && t !== 'Week ' + session.number ? name + ': ' + t : name;
+    var name = sessionName(session.number, cohort), t = session.title ? String(session.title).trim() : '';
+    return t && t !== name && t !== 'Week ' + session.number && t !== 'Session ' + session.number ? name + ': ' + t : name;
   }
   // The session's own page, before, during, and after it.
   function sessionUrl(slug, n) { return '/session/?c=' + encodeURIComponent(slug) + '&s=' + Number(n); }

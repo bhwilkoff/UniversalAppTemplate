@@ -694,11 +694,12 @@
     var C = window.CurriculumPagesLib;
     var q = $('[data-week-question]'), st = $('[data-stuck-line]');
     if (!C || !q || !st) return;
-    var w = C.weekOf(n);
+    var w = cohort && cohort.schedule === 'custom' ? null : C.weekOf(n);
     q.hidden = !w;
     if (w) q.textContent = 'This week’s question: ' + w.question;
-    var s = C.stuckFor(n);
+    var s = cohort && cohort.schedule === 'custom' ? null : C.stuckFor(n);
     st.replaceChildren();
+    if (!s) { st.hidden = true; return; }
     var a = document.createElement('a'); a.href = s.url; a.textContent = 'If you get stuck';
     st.appendChild(a);
     st.hidden = false;
@@ -720,7 +721,7 @@
       if (s.number === nextNo && safe(s.meet_url)) { var j = window.UI.link('Join the call', s.meet_url, live ? 'btn-primary small' : 'btn-secondary small'); j.target = '_blank'; j.rel = 'noopener'; acts.push(j); }
       var past = s.starts_at && new Date(s.starts_at) < new Date() && !live;
       list.appendChild(window.UI.row({
-        title: lib.sessionTitle(s), href: lib.sessionUrl(cohort.slug, s.number),
+        title: lib.sessionTitle(s, cohort), href: lib.sessionUrl(cohort.slug, s.number),
         meta: s.starts_at ? when(s.starts_at) : 'Not scheduled yet',
         status: window.UI.status('session', live ? 'live' : past ? 'finished' : s.meet_url ? 'ready' : 'planned'),
         actions: acts
@@ -792,7 +793,7 @@
     // The next session leads, whatever week it is (COHORT-DESIGN.md).
     var lead = t.next || t.current;
     $('[data-week-kicker]').textContent = t.live ? 'Happening now' : t.next ? 'Next' : 'This week';
-    $('[data-week-title]').textContent = lead ? lib.sessionTitle(lead) : 'This week';
+    $('[data-week-title]').textContent = lead ? lib.sessionTitle(lead, cohort) : 'This week';
     var scope = (t.next && t.next.scope) || (t.current && t.current.scope) || '';
     $('[data-week-scope]').textContent = scope;
     $('[data-week-scope]').hidden = !scope;

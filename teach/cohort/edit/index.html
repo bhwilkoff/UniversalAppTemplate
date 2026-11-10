@@ -107,23 +107,28 @@
                 </fieldset>
 
                 <fieldset class="q">
-                  <legend><span class="q-n">3</span>When does week 1 begin?</legend>
-                  <p class="hint" id="q-start-hint">Cohort Prep is the week before it, and the cohort runs for 5 weeks from here.</p>
-                  <input id="cohort-starts" type="date" name="starts_on" aria-describedby="q-start-hint" aria-label="The day week 1 begins">
+                  <legend><span class="q-n">3</span>How does it meet?</legend>
+                  <div class="choices">
+                    <label class="choice"><input type="radio" name="schedule" value="weekly" checked><span><b>Every week</b> A prep session, then 5 weeks, with the course's plan for each.</span></label>
+                    <label class="choice"><input type="radio" name="schedule" value="custom"><span><b>Sessions you set</b> As many as it needs, each on its own date, with your own plan.</span></label>
+                  </div>
+                  <p class="hint" id="q-start-hint" data-when="weekly">The day week 1 begins. Cohort Prep is the week before it.</p>
+                  <p class="hint" data-when="custom" hidden>Its first day. You add each session, with its own date and time, after saving.</p>
+                  <input id="cohort-starts" type="date" name="starts_on" aria-describedby="q-start-hint" aria-label="The first day">
                   <input type="hidden" name="weeks" value="5">
                 </fieldset>
 
                 <fieldset class="q">
-                  <legend><span class="q-n">4</span>When does the class meet each week?</legend>
-                  <p class="hint">The first session is on this day, on or after week 1 begins</p>
+                  <legend><span class="q-n">4</span>When does the class meet?</legend>
+                  <p class="hint" data-when="weekly">The first session is on this day, on or after week 1 begins</p>
                   <div class="row">
-                    <label>Day <select id="cohort-day" name="session_weekday">
+                    <label data-when="weekly">Day <select id="cohort-day" name="session_weekday">
                       <option value="">Not decided yet</option><option value="0">Sunday</option><option value="1">Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5">Friday</option><option value="6">Saturday</option>
                     </select></label>
-                    <label>Time <input id="cohort-time" type="time" name="session_time"></label>
+                    <label data-when="weekly">Time <input id="cohort-time" type="time" name="session_time"></label>
+                    <label data-when="custom" hidden>Minutes each <input id="cohort-minutes" type="number" name="session_minutes" value="60" min="15" max="240" step="5"></label>
                     <label>Time zone <input id="cohort-zone" name="time_zone" list="zones" autocomplete="off"></label>
                   </div>
-                  <input type="hidden" name="session_minutes" value="60">
                   <datalist id="zones" data-zones></datalist>
                 </fieldset>
 
@@ -182,9 +187,9 @@
   </main>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" defer></script>
   <script src="/assets/hub-config.js?v=20261016a" defer></script>
-  <script src="/assets/teach-lib.js?v=20261029x" defer></script>
+  <script src="/assets/teach-lib.js?v=20261111a" defer></script>
   <script src="/assets/teach-page.js?v=20261022j" defer></script>
-  <script src="/assets/teach-cohort-form.js?v=20261023i" defer></script>
+  <script src="/assets/teach-cohort-form.js?v=20261111a" defer></script>
 
   <footer class="site-footer">
     <div class="wrap">

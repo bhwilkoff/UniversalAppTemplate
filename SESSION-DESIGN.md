@@ -30,7 +30,7 @@ Before 0 of 4   Plan   Recording   After
 | Recording | The recording. Appears once there is one. |
 | After | What happened: how the session moved and what was kept, by person, which is never a list of who attended (a learner sees only what was kept about them). A leader also finds answers, what they heard, and the recording's link. |
 
-There is no Details view (Ben, November 6, 2026: "It seems like all of that is left over from previous iterations"). A leader renames a session on its title, and writes what comes before the next session under the plan.
+There is no Details view (Ben, November 6, 2026: "It seems like all of that is left over from previous iterations"). A leader renames a session on its title, and writes what comes before the next session under the plan. In a cohort with sessions you set (cohorts.schedule = custom), the title's Change also sets the session's date and time, in the cohort's time zone, and holds Remove this session, which the database refuses once anyone's answers, posts, or recording are in it.
 
 The page opens where the person is needed: a leader on Plan, a learner on Before, and anyone on Recording once it exists.
 

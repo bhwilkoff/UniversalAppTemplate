@@ -25,7 +25,7 @@ Shared with the cohort
 | Tab | Holds |
 |---|---|
 | This week | The next session and what it asks, what waits for you, and what people have shared. |
-| Sessions | The sessions, and nothing else. What came of one is on its own page. |
+| Sessions | The sessions, and nothing else. What came of one is on its own page. A weekly cohort's leader makes them from the schedule; a cohort with sessions you set adds them one at a time with Add a session, which opens the new session's page to name and date it. |
 | Conversation | The cohort's conversation, then its exchanges. |
 | People | Each learner as a card, with their app, what they have done, and a place to write to them; then Try my app, groups, leaders, apps, and credentials. |
 | Files, Your work, Settings | As they were. |

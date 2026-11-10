@@ -138,3 +138,14 @@ test('a session has one name: Prep for number 0, then Week N, with the leader ti
   assert.equal(lib.sessionTitle({ number: 1, title: 'Finding a problem' }), 'Week 1: Finding a problem');
   assert.equal(lib.sessionUrl('my cohort', 0), '/session/?c=my%20cohort&s=0');
 });
+
+test('a custom cohort names its sessions Session N, a weekly one as before', () => {
+  const custom = { schedule: 'custom' }, weekly = { schedule: 'weekly' };
+  assert.equal(lib.sessionName(0), 'Prep');
+  assert.equal(lib.sessionName(2, weekly), 'Week 2');
+  assert.equal(lib.sessionName(2, custom), 'Session 2');
+  assert.equal(lib.sessionTitle({ number: 3, title: 'Creativity' }, custom), 'Session 3: Creativity');
+  assert.equal(lib.sessionTitle({ number: 3, title: 'Session 3' }, custom), 'Session 3');
+  assert.equal(lib.sessionTitle({ number: 3, title: 'Week 3' }), 'Week 3');
+  assert.equal(lib.welcome({ title: 'C', schedule: 'custom' }, { number: 4, title: 'Session 4' }, []).name, 'Session 4');
+});

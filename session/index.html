@@ -86,8 +86,13 @@
               <h1 data-title></h1>
               <form class="session-rename" data-title-form hidden>
                 <label>Title <input type="text" name="title" maxlength="200"></label>
+                <div class="row" data-when-fields hidden>
+                  <label>Date <input type="date" name="date"></label>
+                  <label>Time <input type="time" name="time"></label>
+                </div>
                 <p class="hint">Saving a new title emails everyone invited to this session.</p>
                 <div class="actions"><button class="btn-primary small" type="submit">Save</button><button class="btn-secondary small" type="button" data-title-cancel>Cancel</button><span class="ui-inline-status" role="status" data-title-status></span></div>
+                <button class="link-button" type="button" data-remove-session hidden>Remove this session</button>
               </form>
               <p class="session-meta" data-when></p>
               <p class="lead" data-scope></p>
@@ -160,7 +165,7 @@
   </main>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" defer></script>
   <script src="/assets/hub-config.js?v=20261016a" defer></script>
-  <script src="/assets/cohort-lib.js?v=20261107m" defer></script>
+  <script src="/assets/cohort-lib.js?v=20261111a" defer></script>
   <script src="/assets/live-lib.js" defer></script>
   <script src="/assets/question-view.js?v=20261106a" defer></script>
   <script src="/assets/board-lib.js" defer></script>
@@ -171,15 +176,15 @@
   <script src="/assets/slide-studio.js?v=20261110a" defer></script>
   <script src="/assets/show-lib.js?v=20261107m" defer></script>
   <script src="/assets/curriculum-pages-lib.js" defer></script>
-  <script src="/assets/teach-lib.js?v=20261029x" defer></script>
+  <script src="/assets/teach-lib.js?v=20261111a" defer></script>
   <script src="/assets/curriculum-lib.js?v=20261107a" defer></script>
   <script src="/assets/curriculum-seed.js?v=20261107a" defer></script>
-  <script src="/assets/show-builder.js?v=20261106g" defer></script>
+  <script src="/assets/show-builder.js?v=20261111a" defer></script>
   <script src="/assets/cohort-nav.js?v=20261106a" defer></script>
   <script src="/assets/record-lib.js?v=20261107a" defer></script>
   <script src="/assets/react-lib.js?v=20261107a" defer></script>
   <script src="/assets/session-story-lib.js?v=20261107c" defer></script>
-  <script src="/assets/session.js?v=20261107i" defer></script>
+  <script src="/assets/session.js?v=20261111a" defer></script>
 
   <footer class="site-footer">
     <div class="wrap">

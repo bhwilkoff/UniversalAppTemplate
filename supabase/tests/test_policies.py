@@ -3274,6 +3274,19 @@ def main():
     a = as_user(None); a.execute("select public.is_cohort_call('old-oldd-old')")
     check("a run past its three hours is over", a.fetchall() == [(False,)])
 
+    # A cohort of any shape (migration 20261111010000).
+    check("a leader makes a custom cohort's session on any date, with what comes before it",
+          attempt(as_user("ben"), "insert into public.sessions (cohort_id, number, title, starts_at, before, readings) values (%s, 7, 'Creativity', now() + interval '2 days', 'Read this first.', '[{\"title\": \"A reading\", \"url\": \"https://example.com\"}]'::jsonb) returning id", (cc,)))
+    new_s = last_rows[0][0]
+    check("a leader sets the cohort's schedule to custom", attempt(as_user("ben"), "update public.cohorts set schedule = 'custom' where id = %s", (cc,)))
+    check("a schedule that is neither is refused", not attempt(as_user("ben"), "update public.cohorts set schedule = 'monthly' where id = %s", (cc,)))
+    check("a learner cannot add a session", not attempt(as_user("bea"), "insert into public.sessions (cohort_id, number) values (%s, 8)", (cc,)))
+    check("an empty session can be removed", attempt(as_user("ben"), "delete from public.sessions where id = %s", (new_s,)))
+    check("a session with people's answers stays", not attempt(as_user("ben"), "delete from public.sessions where id = %s", (ss,)))
+    su.execute("reset role")
+    su.execute("select count(*) from public.sessions where id = %s", (ss,))
+    check("and it is still there", su.fetchall() == [(1,)])
+
     conn.rollback()
     conn.close()
     failed = [n for n, ok in results if not ok]

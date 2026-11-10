@@ -32,7 +32,7 @@
     var f = form.elements;
     var c = {
       title: f.title.value.trim(), description: f.description.value.trim(), starts_on: f.starts_on.value || null,
-      weeks: Number(f.weeks.value) || 5, capacity: f.capacity.value ? Number(f.capacity.value) : null,
+      weeks: Number(f.weeks.value) || 5, schedule: f.schedule.value, capacity: f.capacity.value ? Number(f.capacity.value) : null,
       session_weekday: f.session_weekday.value === '' ? null : Number(f.session_weekday.value),
       session_time: f.session_time.value || null, session_minutes: Number(f.session_minutes.value) || 60, time_zone: f.time_zone.value
     };
@@ -53,6 +53,8 @@
     slugTouched = !!c;
     say('[data-form-message]', '');
     var f = form.elements;
+    f.schedule.value = c && c.schedule === 'custom' ? 'custom' : 'weekly';
+    drawSchedule();
     f.title.value = c ? c.title : '';
     f.slug.value = c ? c.slug : '';
     f.slug.readOnly = !!c;
@@ -87,8 +89,13 @@
     $('[data-slug-field]').hidden = false;
     form.elements.slug.focus();
   });
+  // A weekly cohort asks for its weekday and time; a custom one for its length.
+  function drawSchedule() {
+    var custom = form.elements.schedule.value === 'custom';
+    form.querySelectorAll('[data-when]').forEach(function (n) { n.hidden = n.getAttribute('data-when') !== (custom ? 'custom' : 'weekly'); });
+  }
   form.addEventListener('input', drawPreview);
-  form.addEventListener('change', drawPreview);
+  form.addEventListener('change', function () { drawSchedule(); drawPreview(); });
 
   // What is wrong with the answers, in plain words, or null.
   function formProblem(f) {
@@ -100,6 +107,7 @@
     if (!f.time_zone.value.trim()) return { field: f.time_zone, text: 'Choose the time zone the class meets in, such as America/Denver.' };
     try { new Intl.DateTimeFormat('en-US', { timeZone: f.time_zone.value.trim() }); }
     catch (e) { return { field: f.time_zone, text: 'That time zone is not one the calendar knows. Choose one from the list, such as America/Denver.' }; }
+    if (f.schedule.value === 'custom' && !(Number(f.session_minutes.value) >= 15 && Number(f.session_minutes.value) <= 240)) return { field: f.session_minutes, text: 'A session runs between 15 and 240 minutes.' };
     if (f.capacity.value && !(Number(f.capacity.value) >= 1)) return { field: f.capacity, text: 'The number of places should be 1 or more, or empty for no limit.' };
     var repo = f.github_repo.value.trim(), team = f.github_team.value.trim();
     if (repo && !/^humanshaped\/[A-Za-z0-9._-]+$/.test(repo)) return { field: f.github_repo, text: 'The repository should be written as humanshaped/its-name.' };
@@ -127,6 +135,7 @@
     if (wrong) { say('[data-form-message]', wrong.text); wrong.field.focus(); return; }
     var row = {
       title: f.title.value.trim(),
+      schedule: f.schedule.value === 'custom' ? 'custom' : 'weekly',
       description: f.description.value.trim() || null,
       starts_on: f.starts_on.value || null,
       weeks: Number(f.weeks.value) || 5,

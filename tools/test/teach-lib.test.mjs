@@ -162,3 +162,22 @@ test('the line under a cohort on /cohorts/ says when it begins, how long, and ho
   assert.equal(lib.openingLine({ starts_on: '2026-11-02', weeks: 5, capacity: 12 }, 'en-US'), 'Begins November 2, 2026, for 5 weeks, with room for 12 people.');
   assert.equal(lib.openingLine({ starts_on: null, weeks: 5, capacity: null }, 'en-US'), 'Dates to come, for 5 weeks.');
 });
+
+test('a custom cohort has no weekly rows, time, or length in weeks', () => {
+  const c = { id: 'c', slug: 's', schedule: 'custom', starts_on: '2026-12-01', session_weekday: 2, session_time: '17:00', time_zone: 'America/Denver', weeks: 5, session_minutes: 90, status: 'draft' };
+  assert.equal(lib.sessionRows(c), null);
+  assert.equal(lib.scheduleText(c), 'Each session on its own date, for 90 minutes.');
+  assert.equal(lib.openingLine(Object.assign({ session_count: 7 }, c), 'en-US'), 'Begins December 1, 2026, 7 sessions.');
+  const steps = lib.cohortSetupSteps(c, [{ number: 1, starts_at: '2026-12-02T00:00:00Z' }]);
+  assert.equal(steps[0].key, 'sessions');
+  assert.equal(steps[0].label, 'Add the sessions');
+  assert.equal(steps[0].done, true);
+  assert.equal(lib.cohortSetupSteps(c, [{ number: 1, starts_at: null }])[0].done, false);
+  assert.ok(!steps.some((s) => s.key === 'schedule'));
+});
+
+test('a stored moment fills a form in the cohort\'s own zone', () => {
+  assert.deepEqual(lib.zonedParts('2026-12-02T00:00:00Z', 'America/Denver'), { date: '2026-12-01', time: '17:00' });
+  const back = lib.zonedToUtc('2026-12-01', '17:00', 'America/Denver').toISOString();
+  assert.equal(back, '2026-12-02T00:00:00.000Z');
+});

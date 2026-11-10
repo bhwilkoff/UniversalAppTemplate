@@ -306,12 +306,12 @@
   // The sessions a signed-in leader could run here, from their open or running cohorts.
   function myCohortSessions() {
     if (!S.me || S.me.is_anonymous) return Promise.resolve([]);
-    return db.from('cohort_teachers').select('cohort_id, cohorts(id, title, status)').eq('user_id', S.me.id).then(function (t) {
+    return db.from('cohort_teachers').select('cohort_id, cohorts(id, title, status, schedule)').eq('user_id', S.me.id).then(function (t) {
       var cohorts = (t.data || []).map(function (x) { return x.cohorts; }).filter(function (c) { return c && (c.status === 'open' || c.status === 'running'); });
       if (!cohorts.length) return [];
       return db.from('sessions').select('id, cohort_id, number, title, starts_at').in('cohort_id', cohorts.map(function (c) { return c.id; })).order('number').then(function (s) {
         return cohorts.map(function (c) {
-          return { id: c.id, title: c.title, sessions: (s.data || []).filter(function (x) { return x.cohort_id === c.id; }).map(function (x) { return { id: x.id, label: lib.sessionTitle(x) }; }) };
+          return { id: c.id, title: c.title, sessions: (s.data || []).filter(function (x) { return x.cohort_id === c.id; }).map(function (x) { return { id: x.id, label: lib.sessionTitle(x, c) }; }) };
         }).filter(function (c) { return c.sessions.length; });
       });
     }, function () { return []; });
@@ -447,7 +447,7 @@
         if (!list.some(function (x) { return x.kind === 'design' || x.key === 'prompt'; })) off.push('design');
         return off;
       },
-      stuck: window.CurriculumPagesLib && S.session ? window.CurriculumPagesLib.stuckFor(S.session.number) : null,
+      stuck: window.CurriculumPagesLib && S.session && S.cohort.schedule !== 'custom' ? window.CurriculumPagesLib.stuckFor(S.session.number) : null,
       onPick: function (key) {
         if (shared()) { S.run.go(key).then(afterMove); return; }
         S.chosenPart = key; S.timerEnds = null; drawPart(true);
@@ -912,11 +912,11 @@
   function drawFrame() {
     $('[data-cohort-title]').textContent = S.cohort.title;
     var group = S.room.groupId ? S.groups.filter(function (g) { return g.id === S.room.groupId; })[0] : null;
-    $('[data-where]').textContent = (window.CohortLib ? window.CohortLib.sessionName(S.session.number) : 'Week ' + S.session.number) + (group ? ', ' + (group.breakout ? group.name : group.name + '’s room') : S.groups.length ? ', the main room' : '') + (S.teaching ? '. You are leading.' : '.') + (S.room.ambiguous ? ' Another cohort uses this call too.' : '');
+    $('[data-where]').textContent = (window.CohortLib ? window.CohortLib.sessionName(S.session.number, S.cohort) : 'Week ' + S.session.number) + (group ? ', ' + (group.breakout ? group.name : group.name + '’s room') : S.groups.length ? ', the main room' : '') + (S.teaching ? '. You are leading.' : '.') + (S.room.ambiguous ? ' Another cohort uses this call too.' : '');
     var full = $('[data-full-link]'); full.href = '/session/?c=' + encodeURIComponent(S.cohort.slug) + '&s=' + S.session.number;
     // Outside Meet, this page already is the browser tab.
     full.hidden = standalone;
-    if (standalone) document.title = (window.CohortLib ? window.CohortLib.sessionName(S.session.number) : 'Week ' + S.session.number) + ', ' + S.cohort.title + ' | Human Shaped';
+    if (standalone) document.title = (window.CohortLib ? window.CohortLib.sessionName(S.session.number, S.cohort) : 'Week ' + S.session.number) + ', ' + S.cohort.title + ' | Human Shaped';
     $('[data-fallback-link]').href = '/addon/?c=' + encodeURIComponent(S.cohort.slug) + '&s=' + S.session.number;
     $('[data-open-stage]').hidden = !S.teaching || standalone;
     $('[data-close-stage]').hidden = true;
@@ -1081,7 +1081,7 @@
   // (call_runs), for someone who missed it.
   function runPick() {
     var box = el('section', 'p2-group p2-run');
-    var head = el('p', 'p2-run-name', lib.sessionTitle(S.session));
+    var head = el('p', 'p2-run-name', lib.sessionTitle(S.session, S.cohort));
     box.appendChild(head);
     var said = el('p', 'small'); said.setAttribute('role', 'status');
     var acts = el('div', 'actions');
@@ -1095,8 +1095,8 @@
     (S.sessions || []).forEach(function (x) {
       if (x.id === S.session.id) return;
       var li = el('li');
-      li.appendChild(button(lib.sessionTitle(x), 'p2-run-row', function () {
-        said.textContent = 'Opening ' + lib.sessionName(x.number) + '…';
+      li.appendChild(button(lib.sessionTitle(x, S.cohort), 'p2-run-row', function () {
+        said.textContent = 'Opening ' + lib.sessionName(x.number, S.cohort) + '…';
         runInCall(x.id, function (m) { said.textContent = m; });
       }));
       list.appendChild(li);
@@ -1114,7 +1114,7 @@
       var place = slideInfo();
       if (place) chips.push({ text: 'Slide ' + (place.at + 1) + ' of ' + place.count });
       if (S.recording) chips.push({ text: 'Recording', on: true });
-      if (S.callRun) chips.push({ text: lib.sessionName(S.session.number) + ' again', on: true });
+      if (S.callRun) chips.push({ text: lib.sessionName(S.session.number, S.cohort) + ' again', on: true });
       if (st.rooms) chips.push({ text: 'In breakouts', on: true });
       if (st.together) chips.push({ text: 'Coming back', on: true });
     }

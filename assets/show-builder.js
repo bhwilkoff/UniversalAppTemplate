@@ -48,7 +48,7 @@
     var hour = el('div', 'plan-hour');
     var list = el('ol', 'plan-board');
     list.classList.toggle('is-read-only', readOnly);
-    list.setAttribute('aria-label', 'Plan for ' + (window.CohortLib ? window.CohortLib.sessionName(session.number) : 'Week ' + session.number));
+    list.setAttribute('aria-label', 'Plan for ' + (window.CohortLib ? window.CohortLib.sessionName(session.number, cohort) : 'Week ' + session.number));
     var start = el('div', 'actions');
     var page = el('div', 'part-page');
     box.replaceChildren(fit, hour, list, start, page, status);
@@ -99,9 +99,9 @@
       hour.replaceChildren();
       fit.textContent = scenes.length
         ? (readOnly ? scenes.reduce(function (n, x) { return n + x.minutes; }, 0) + ' minutes' : S.fitText(scenes, cohort.session_minutes))
-        : (window.CohortLib ? window.CohortLib.sessionName(session.number) : 'Week ' + session.number) + ' has no plan yet.';
+        : (window.CohortLib ? window.CohortLib.sessionName(session.number, cohort) : 'Week ' + session.number) + ' has no plan yet.';
       if (!scenes.length && !readOnly) {
-        var C = window.CurriculumLib, week = C ? C.weekOf(session.number) : null;
+        var C = window.CurriculumLib, week = C && cohort.schedule !== 'custom' ? C.weekOf(session.number) : null;
         if (week != null && window.CurriculumSeed) start.appendChild(button(C.startLabel(week), 'btn-primary', startPlan));
         start.appendChild(button('Start from the six parts', 'btn-secondary', startDefault));
         var from = S.copySource(opts.sessions, session, withScenes);
@@ -449,7 +449,7 @@
       say('Adding the six parts…');
       db.from('scenes').insert(rows).then(function (r) {
         if (r.error) { say('Not added: ' + r.error.message); return; }
-        say((window.CohortLib ? window.CohortLib.sessionName(session.number) : 'Week ' + session.number) + ' starts from the six parts. Change anything.');
+        say((window.CohortLib ? window.CohortLib.sessionName(session.number, cohort) : 'Week ' + session.number) + ' starts from the six parts. Change anything.');
         load();
       });
     }

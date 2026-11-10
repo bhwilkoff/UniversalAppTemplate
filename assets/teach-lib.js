@@ -31,6 +31,14 @@
     return new Date(wall - offsetAt(guess));
   }
 
+  // A moment as a date and a wall time in a zone, for filling a form.
+  function zonedParts(iso, zone) {
+    var f = new Intl.DateTimeFormat('en-CA', { timeZone: zone, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
+    var p = {};
+    f.formatToParts(new Date(iso)).forEach(function (x) { p[x.type] = x.value; });
+    return { date: p.year + '-' + p.month + '-' + p.day, time: p.hour + ':' + p.minute };
+  }
+
   // The first session falls on the first chosen weekday on or after the
   // cohort's first day, then one a week.
   function sessionDates(startsOn, weekday, weeks) {
@@ -49,6 +57,7 @@
   // weeks follow it (COURSE.md: Cohort Prep, then weeks 1 to 5), so a
   // five-week cohort has six sessions, numbered 0 to 5.
   function sessionRows(cohort) {
+    if (cohort.schedule === 'custom') return null;
     if (!cohort.starts_on || cohort.session_weekday == null || !cohort.session_time) return null;
     return sessionDates(cohort.starts_on, cohort.session_weekday, cohort.weeks + 1).map(function (date, i) {
       return {
@@ -130,6 +139,7 @@
   // "Tuesdays at 5:00 PM MDT, for 75 minutes (7:00 PM EDT where you are)."
   var DAY_NAMES = ['Sundays', 'Mondays', 'Tuesdays', 'Wednesdays', 'Thursdays', 'Fridays', 'Saturdays'];
   function scheduleText(c, viewerZone, locale, now) {
+    if (c.schedule === 'custom') return 'Each session on its own date, for ' + c.session_minutes + ' minutes.';
     if (c.session_weekday == null || !c.session_time) return 'The weekly session time is still to come.';
     // Today once it has begun: a time zone's name changes in the middle of a cohort.
     var today = (now || new Date()).toISOString().slice(0, 10);
@@ -161,7 +171,11 @@
   function cohortSetupSteps(cohort, sessions, myAccess, meetRequest, more) {
     sessions = sessions || [];
     var slug = encodeURIComponent(cohort.slug || '');
-    var steps = [
+    // A custom cohort has no weekly time: its sessions are its schedule.
+    var steps = cohort.schedule === 'custom' ? [
+      { key: 'sessions', label: 'Add the sessions', action: 'sessions', done: sessions.length > 0 && sessions.every(function (s) { return !!s.starts_at; }),
+        note: calendarNote(cohort, sessions) }
+    ] : [
       { key: 'schedule', label: 'Set the day and time', action: 'edit',
         done: !!(cohort.starts_on && cohort.session_weekday != null && cohort.session_time) },
       { key: 'sessions', label: 'Make the sessions', action: 'sessions', done: sessions.length > 0,
@@ -182,7 +196,7 @@
       done: false, optional: true });
     var first = sessions.slice().sort(function (a, b) { return a.number - b.number; })[0];
     if (first) {
-      steps.push({ key: 'plan', label: 'Read the ' + (first.number === 0 ? 'prep session' : 'first session') + '’s plan',
+      steps.push({ key: 'plan', label: 'Read the ' + (first.number === 0 && cohort.schedule !== 'custom' ? 'prep session' : 'first session') + '’s plan',
         href: '/session/?c=' + slug + '&s=' + first.number, done: false, optional: true });
     }
     steps.push({ key: 'agent', label: 'Connect your agent', href: '/connect/',
@@ -246,10 +260,11 @@
     var first = c.starts_on
       ? 'Begins ' + new Date(c.starts_on + 'T12:00:00').toLocaleDateString(locale, { month: 'long', day: 'numeric', year: 'numeric' })
       : 'Dates to come';
-    return first + ', for ' + c.weeks + ' weeks' + (c.capacity ? ', with room for ' + c.capacity + ' people' : '') + '.';
+    var length = c.schedule === 'custom' ? (c.session_count ? ', ' + c.session_count + ' sessions' : '') : ', for ' + c.weeks + ' weeks';
+    return first + length + (c.capacity ? ', with room for ' + c.capacity + ' people' : '') + '.';
   }
 
-  var lib = { zonedToUtc: zonedToUtc, sessionDates: sessionDates, sessionRows: sessionRows, meetSetup: meetSetup, lastStarted: lastStarted, checkAnswers: checkAnswers, waitingForFeedback: waitingForFeedback, scheduleText: scheduleText, slugFrom: slugFrom, slugProblem: slugProblem, openingLine: openingLine, cohortSetupSteps: cohortSetupSteps, calendarNote: calendarNote, meetRequestNote: meetRequestNote, requestState: requestState, waitingRequests: waitingRequests, WEEKDAYS: WEEKDAYS };
+  var lib = { zonedToUtc: zonedToUtc, zonedParts: zonedParts, sessionDates: sessionDates, sessionRows: sessionRows, meetSetup: meetSetup, lastStarted: lastStarted, checkAnswers: checkAnswers, waitingForFeedback: waitingForFeedback, scheduleText: scheduleText, slugFrom: slugFrom, slugProblem: slugProblem, openingLine: openingLine, cohortSetupSteps: cohortSetupSteps, calendarNote: calendarNote, meetRequestNote: meetRequestNote, requestState: requestState, waitingRequests: waitingRequests, WEEKDAYS: WEEKDAYS };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
   else root.TeachLib = lib;
 })(typeof globalThis !== 'undefined' ? globalThis : this);
