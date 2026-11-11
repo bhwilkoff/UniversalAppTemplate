@@ -806,8 +806,9 @@
       });
       d.appendChild(ul);
     }
-    list('Here now', r.here, false);
-    list('Not here yet', r.missing, true);
+    list('Human Shaped open', r.here, false);
+    list('Not open yet', r.missing, true);
+    if (r.missing.length) d.appendChild(el('p', 'small', 'Someone in the call without it open needs Join activity at the top of Meet, or Human Shaped under Activities.'));
     drawGuestRows(d);
     if (!S.newPanel) {
       var acts = el('div', 'actions');

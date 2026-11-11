@@ -14,8 +14,8 @@ test('who is here, who is not yet, and who answered the question being asked', (
   assert.equal(r.here[0].answered, true);
   assert.equal(r.here[1].answered, false);
   assert.deepEqual(r.counts, { here: 3, total: 4, answered: 2, answeredHere: 1, sharing: 1 });
-  assert.equal(R.summary(r, 'k1'), '3 of 4 here, 2 answered, 1 sharing their stage on the path.');
-  assert.equal(R.summary(R.roster(people, {}, [], null), null), '0 of 4 here.');
+  assert.equal(R.summary(r, 'k1'), '3 of 4 have Human Shaped open, 2 answered, 1 sharing their stage on the path.');
+  assert.equal(R.summary(R.roster(people, {}, [], null), null), '0 of 4 have Human Shaped open.');
 });
 
 test('only a real stage counts, and only for people who chose to share it', () => {

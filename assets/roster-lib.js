@@ -48,7 +48,9 @@
   // The one-line summary at the top of the teacher's roster.
   function summary(r, asking) {
     var c = r.counts;
-    var line = c.here + ' of ' + c.total + ' here';
+    // It knows open panels, not who is in the call (Week 2: people in the
+    // call read as not here), so it says what it knows.
+    var line = c.here + ' of ' + c.total + ' have Human Shaped open';
     if (asking) line += ', ' + c.answered + ' answered';
     if (c.sharing) line += ', ' + c.sharing + ' sharing their stage on the path';
     return line + '.';
