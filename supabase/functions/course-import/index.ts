@@ -9,6 +9,11 @@
 // account, so it is taken only with the secret of an import still waiting.
 // The leader's page reads course_imports to see how it went.
 //
+// Everything the export carried is kept with the cohort (course_sources),
+// so outcomes, grading weights, and what no page uses yet are never lost.
+// An import can also refresh a course already here: it keeps the new export
+// and the course's outcomes, and leaves the parts as they are.
+//
 // Supabase provides SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY itself.
 
 import { createClient } from 'npm:@supabase/supabase-js@2';
@@ -44,7 +49,7 @@ function hex(n: number) {
 }
 
 // deno-lint-ignore no-explicit-any
-async function build(db: any, leader: string, course: any) {
+async function build(db: any, leader: string, course: any, courseRef: string | null) {
   const plan = convert(course);
   // An address no other cohort uses.
   const base = slugFrom(plan.cohort.title);
@@ -60,10 +65,12 @@ async function build(db: any, leader: string, course: any) {
   })).select('id').single();
   if (c.error) throw new Error('The cohort could not be made: ' + c.error.message);
   const cohortId = c.data.id;
+  const kept = await db.from('course_sources').insert({ cohort_id: cohortId, course_ref: courseRef, export: course });
+  if (kept.error) throw new Error('The course export could not be kept: ' + kept.error.message);
   const refs: Record<string, string> = {};
   const later: { id: string; ref: string; config: Record<string, unknown>; key: string }[] = [];
   for (const s of plan.sessions) {
-    const row = await db.from('sessions').insert({ cohort_id: cohortId, number: s.number, title: s.title, before: s.before, readings: s.readings }).select('id').single();
+    const row = await db.from('sessions').insert({ cohort_id: cohortId, number: s.number, title: s.title, before: s.before, readings: s.readings, after: s.after || null, outcomes: s.outcomes || [] }).select('id').single();
     if (row.error) throw new Error('Session ' + s.number + ' could not be made: ' + row.error.message);
     const sid = row.data.id;
     // Workbooks first, so a breakout part can name its rooms' workbooks.
@@ -111,6 +118,30 @@ async function build(db: any, leader: string, course: any) {
   return { cohortId, counts: plan.counts, warnings: plan.warnings };
 }
 
+// A new export for a course already here: keep it, and bring in the course's
+// outcomes, each session's outcomes, and what comes after where a leader has
+// not written their own. The parts stay as they are.
+// deno-lint-ignore no-explicit-any
+async function refresh(db: any, cohortId: string, course: any, courseRef: string | null) {
+  const plan = convert(course);
+  const kept = await db.from('course_sources').upsert({ cohort_id: cohortId, course_ref: courseRef, export: course, received_at: new Date().toISOString() });
+  if (kept.error) throw new Error('The course export could not be kept: ' + kept.error.message);
+  const c = await db.from('cohorts').update({ outcomes: plan.cohort.outcomes || [] }).eq('id', cohortId);
+  if (c.error) throw new Error('The outcomes could not be saved: ' + c.error.message);
+  const have = await db.from('sessions').select('id, number, after').eq('cohort_id', cohortId);
+  let matched = 0;
+  for (const s of plan.sessions) {
+    const row = (have.data || []).filter((x: { number: number }) => x.number === s.number)[0];
+    if (!row) continue;
+    const change: Record<string, unknown> = { outcomes: s.outcomes || [] };
+    if (!row.after && s.after) change.after = s.after;
+    const u = await db.from('sessions').update(change).eq('id', row.id);
+    if (u.error) throw new Error('Session ' + s.number + ' could not be updated: ' + u.error.message);
+    matched += 1;
+  }
+  return { cohortId, counts: Object.assign({}, plan.counts, { refreshed: matched }), warnings: plan.warnings };
+}
+
 Deno.serve(async (req) => {
   const h = headers(req.headers.get('origin'));
   if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: h });
@@ -131,7 +162,9 @@ Deno.serve(async (req) => {
     try {
       const form = await req.formData();
       const course = JSON.parse(String(form.get('exported_course') || ''));
-      const done = await build(db, row.data.created_by, course);
+      const done = row.data.refresh_of
+        ? await refresh(db, row.data.refresh_of, course, row.data.course_ref)
+        : await build(db, row.data.created_by, course, row.data.course_ref);
       await db.from('course_imports').update({ state: 'done', cohort_id: done.cohortId, counts: done.counts, warnings: done.warnings.slice(0, 200), updated_at: new Date().toISOString() }).eq('id', receive);
       return reply(200, { ok: true });
     } catch (e) {
@@ -149,13 +182,18 @@ Deno.serve(async (req) => {
   if (isAgentToken(jwt)) return reply(403, { message: 'An AI agent cannot bring a course in.' });
   const teacher = await db.from('teachers').select('user_id').eq('user_id', who.user.id).maybeSingle();
   if (!teacher.data) return reply(403, { message: 'Only leaders can bring a course in.' });
-  let body: { export_url?: string } = {};
+  let body: { export_url?: string; refresh_of?: string } = {};
   try { body = await req.json(); } catch (_) { /* empty */ }
   const link = String(body.export_url || '').trim().replace(/\?.*$/, '');
   const m = EXPORT.exec(link);
   if (!m) return reply(400, { message: 'That is not a Course Builder export link. It looks like https://coursebuilder.minerva.edu/api/v2/export/courseexport/1234/…/' });
+  const refreshOf = body.refresh_of ? String(body.refresh_of) : null;
+  if (refreshOf) {
+    const leads = await db.from('cohort_teachers').select('cohort_id').eq('cohort_id', refreshOf).eq('user_id', who.user.id).maybeSingle();
+    if (!leads.data) return reply(403, { message: 'Only a leader of that cohort can bring its course in again.' });
+  }
   const nonce = hex(16);
-  const made = await db.from('course_imports').insert({ created_by: who.user.id, course_ref: m[1], nonce }).select('id').single();
+  const made = await db.from('course_imports').insert({ created_by: who.user.id, course_ref: m[1], nonce, refresh_of: refreshOf }).select('id').single();
   if (made.error) return reply(500, { message: 'The import could not start: ' + made.error.message });
   const id = made.data.id;
   const target = SELF + '?receive=' + id + '&n=' + nonce;

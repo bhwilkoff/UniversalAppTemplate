@@ -85,6 +85,11 @@
             <label for="export-url">Course Builder export link</label>
             <p class="hint" id="export-hint">Make an export in Course Builder and paste its link here without opening it. A link works once.</p>
             <input id="export-url" name="export_url" type="url" inputmode="url" autocomplete="off" aria-describedby="export-hint" placeholder="https://coursebuilder.minerva.edu/api/v2/export/courseexport/…">
+            <div class="import-into" data-import-into hidden>
+              <label for="import-into">Bring it into</label>
+              <select id="import-into" name="refresh_of"><option value="">A new draft cohort</option></select>
+              <p class="hint" id="into-hint">A course already here keeps its parts and takes the new export.</p>
+            </div>
             <p class="actions"><button class="btn-primary" type="submit">Bring it in</button></p>
           </form>
           <section class="import-result" data-import-result aria-live="polite" hidden></section>
@@ -103,7 +108,7 @@
   <script src="/assets/hub-config.js?v=20261016a" defer></script>
   <script src="/assets/teach-page.js?v=20261022j" defer></script>
   <script src="/assets/workbook-lib.js?v=20261111c" defer></script>
-  <script src="/assets/teach-import.js?v=20261111c" defer></script>
+  <script src="/assets/teach-import.js?v=20261111d" defer></script>
   <footer class="site-footer">
     <div class="wrap">
       <div class="footer-brand">

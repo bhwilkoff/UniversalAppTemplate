@@ -336,7 +336,7 @@ export function convert(exported) {
     }
     scenes.forEach((s, p) => { s.position = p; });
     counts.sessions += 1;
-    return { number, title: cut(title, LIMIT.title), before: before ? cut(before, LIMIT.before) : null, readings: reads.length ? reads.slice(0, 60) : null, scenes, workbooks };
+    return { number, title: cut(title, LIMIT.title), before: before ? cut(before, LIMIT.before) : null, readings: reads.length ? reads.slice(0, 60) : null, scenes, workbooks, after: null, outcomes: [] };
   });
 
   const minutes = Math.max(30, Math.min(240, Math.round(Math.max(...sessions.map((s) => s.scenes.reduce((n, x) => n + x.minutes, 0)), 60) / 15) * 15));
@@ -345,6 +345,7 @@ export function convert(exported) {
       title: cut(oneLine(course.course_title) || 'An imported course', LIMIT.cohortTitle),
       description: clean(course.course_description) ? cut(clean(course.course_description).replace(/^#{1,6}\s+/gm, ''), LIMIT.description) : null,
       schedule: 'custom',
+      outcomes: [],
       session_minutes: minutes,
       details: { source: { system: 'coursebuilder', course_id: exported.headers.source_course_id, code: oneLine(course.course_code) || null, environment: exported.headers.source_environment } }
     },

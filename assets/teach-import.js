@@ -17,8 +17,17 @@
   function done(row) {
     out.hidden = false;
     out.replaceChildren();
-    out.appendChild(el('h2', null, 'It arrived as a draft'));
     var c = row.counts || {};
+    if (row.refresh_of) {
+      out.appendChild(el('h2', null, 'It came in again'));
+      out.appendChild(el('p', null, 'The whole export is kept with the cohort, with the course’s outcomes and each session’s, for ' + (c.refreshed || 0) + ' of ' + (c.sessions || 0) + ' sessions. Its parts are as they were.'));
+      var o = el('a', 'btn-primary', 'Open the cohort');
+      o.href = '/cohort/?c=' + encodeURIComponent(row.cohort_id) + '&t=sessions';
+      var q = el('p', 'actions'); q.appendChild(o); out.appendChild(q);
+      form.hidden = true;
+      return;
+    }
+    out.appendChild(el('h2', null, 'It arrived as a draft'));
     var bits = Object.keys(LABELS).filter(function (k) { return c[k]; }).map(function (k) { return c[k] + ' ' + LABELS[k]; });
     if (bits.length) out.appendChild(el('p', null, bits.join(', ') + '.'));
     var skipped = Object.keys(c.skipped || {});
@@ -114,6 +123,13 @@
   window.TeachPage.start(root, function (db) {
     S.refreshWorkbooks = function () { workbooksIn(db); };
     workbooksIn(db);
+    // Courses already brought in that this leader leads, to bring in again.
+    db.from('cohorts').select('id, title, details').order('created_at', { ascending: false }).then(function (r) {
+      var mine = (r.data || []).filter(function (c) { return c.details && c.details.source && c.details.source.system === 'coursebuilder'; });
+      var sel = form.elements.refresh_of;
+      mine.forEach(function (c) { var o = document.createElement('option'); o.value = c.id; o.textContent = c.title + ', again'; sel.appendChild(o); });
+      root.querySelector('[data-import-into]').hidden = !mine.length;
+    });
     form.addEventListener('submit', function (ev) {
       ev.preventDefault();
       var link = form.elements.export_url.value.trim();
@@ -124,7 +140,8 @@
       }
       var b = form.querySelector('button'); b.disabled = true;
       say('Asking Course Builder for the course…');
-      db.functions.invoke('course-import', { body: { export_url: link } }).then(function (r) {
+      var into = form.elements.refresh_of ? form.elements.refresh_of.value : '';
+      db.functions.invoke('course-import', { body: into ? { export_url: link, refresh_of: into } : { export_url: link } }).then(function (r) {
         var id = r.data && r.data.import_id;
         if (r.error || !id) {
           b.disabled = false;

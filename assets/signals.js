@@ -138,6 +138,7 @@
       if (opts.inRoom && opts.inRoom()) {
         box.appendChild(el('p', 'signal-title', 'You are in your room'));
         if (w.signal.ends_at) box.appendChild(el('p', 'signal-time')).appendChild(clockFor(w.signal.ends_at, now, coarse, ''));
+        if (w.warn) box.appendChild(el('p', null, 'Two minutes left: finish the thought you are on, and save what your room made.'));
         return;
       }
       var who = opts.memberId ? opts.memberId() : opts.meId;
@@ -206,7 +207,8 @@
         var w = opts.welcome;
         if (w) box.appendChild(el('p', 'screen-sub', 'Welcome'));
         box.appendChild(el('p', 'screen-title', opts.cohort.title));
-        box.appendChild(el('p', 'screen-sub', (opts.session.number === 0 ? 'Prep' : 'Week ' + opts.session.number) + (opts.session.title && opts.session.title !== 'Week ' + opts.session.number && opts.session.title !== 'Prep' ? ': ' + opts.session.title : '')));
+        var C = window.CohortLib;
+        box.appendChild(el('p', 'screen-sub', C && C.sessionTitle ? C.sessionTitle(opts.session, opts.cohort) : (opts.session.number === 0 ? 'Prep' : 'Week ' + opts.session.number) + (opts.session.title && opts.session.title !== 'Week ' + opts.session.number && opts.session.title !== 'Prep' ? ': ' + opts.session.title : '')));
         if (w && w.challenge) box.appendChild(el('p', 'screen-note', w.challenge));
         if (w && w.first) box.appendChild(el('p', 'screen-sub', 'First: ' + w.first.name + '.'));
       } else if (sc.kind === 'card') {
