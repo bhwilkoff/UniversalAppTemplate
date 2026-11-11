@@ -66,10 +66,20 @@ async function build(db: any, leader: string, course: any) {
     const row = await db.from('sessions').insert({ cohort_id: cohortId, number: s.number, title: s.title, before: s.before, readings: s.readings }).select('id').single();
     if (row.error) throw new Error('Session ' + s.number + ' could not be made: ' + row.error.message);
     const sid = row.data.id;
+    // Workbooks first, so a breakout part can name its rooms' workbooks.
+    const wbIds: Record<string, string> = {};
+    for (const w of (s.workbooks || [])) {
+      const made = await db.from('workbooks').insert({ cohort_id: cohortId, session_id: sid, kind: w.kind, position: w.position, title: w.title, source: w.source }).select('id').single();
+      if (made.error) throw new Error('A workbook of session ' + s.number + ' ("' + w.title + '") could not be made: ' + made.error.message);
+      wbIds[w.ref] = made.data.id;
+    }
     for (const sc of s.scenes) {
       const config = Object.assign({}, sc.config);
       const pending = config.results_of_ref as string | undefined;
       delete config.results_of_ref;
+      const wbRefs = config.workbooks_refs as string[] | undefined;
+      delete config.workbooks_refs;
+      if (wbRefs && wbRefs.length) config.workbooks = wbRefs.map((r) => wbIds[r]).filter(Boolean);
       const slides = sc.deck ? sc.deck.split('\n').filter((l: string) => !/^>/.test(l)).join('\n') : null;
       const ins = await db.from('scenes').insert({
         cohort_id: cohortId, session_id: sid, position: sc.position, kind: sc.kind, title: sc.title,

@@ -7,6 +7,7 @@
   if (!root || !window.TeachPage) return;
   var el = window.TeachPage.el;
   var form = root.querySelector('[data-import-form]'), out = root.querySelector('[data-import-result]');
+  var S = {};
   var LABELS = { sessions: 'sessions', parts: 'parts', slides: 'slides', questions: 'questions', breakouts: 'breakouts', featured: 'people featured', documents: 'documents to show', readings: 'readings and materials', workbooks: 'Minerva workbooks' };
 
   function say(text, cls) {
@@ -35,9 +36,58 @@
     a.href = '/cohort/?c=' + encodeURIComponent(row.cohort_id) + '&t=sessions';
     var p = el('p', 'actions'); p.appendChild(a); out.appendChild(p);
     form.hidden = true;
+    if (S.refreshWorkbooks) S.refreshWorkbooks();
+  }
+
+  // Workbooks waiting for what is in them (workbooks.source.uuid, blocks
+  // empty), filled from the workbooks file: the plain export ([{ id, title,
+  // blocks }]) or Minerva's own data ({ uuid: { title, blocks } }).
+  function workbooksIn(db) {
+    var sec = root.querySelector('[data-workbooks-in]'), said = root.querySelector('[data-workbooks-status]');
+    var input = root.querySelector('[data-workbooks-file]');
+    function waiting() {
+      return db.from('workbooks').select('id, title, source, blocks, cohort_id').then(function (r) {
+        return (r.data || []).filter(function (w) { return w.source && w.source.uuid && !(w.blocks || []).length; });
+      });
+    }
+    function show() {
+      return waiting().then(function (list) {
+        sec.hidden = !list.length;
+        root.querySelector('[data-workbooks-waiting]').textContent = list.length + (list.length === 1 ? ' workbook is' : ' workbooks are') + ' waiting.';
+        return list;
+      });
+    }
+    if (input.getAttribute('data-wired')) return show();
+    input.setAttribute('data-wired', '1');
+    input.addEventListener('change', function () {
+      var f = input.files && input.files[0];
+      if (!f) return;
+      said.textContent = 'Reading the file…';
+      f.text().then(function (text) {
+        var data = JSON.parse(text), byUuid = {};
+        if (Array.isArray(data)) data.forEach(function (w) { if (w && w.id) byUuid[w.id] = w; });
+        else Object.keys(data || {}).forEach(function (k) { byUuid[k] = data[k]; });
+        return waiting().then(function (list) {
+          var filled = 0, missing = 0;
+          return list.reduce(function (p, w) {
+            return p.then(function () {
+              var src = byUuid[w.source.uuid], n = src ? window.WorkbookLib.normalize(src) : null;
+              if (!n || !n.blocks.length) { missing += 1; return null; }
+              return db.from('workbooks').update({ blocks: n.blocks }).eq('id', w.id).then(function (u) { if (!u.error) filled += 1; else missing += 1; });
+            });
+          }, Promise.resolve()).then(function () {
+            said.textContent = filled + (filled === 1 ? ' workbook' : ' workbooks') + ' filled in.' + (missing ? ' ' + missing + ' were not in the file.' : '');
+            return show();
+          });
+        });
+      }).catch(function (e) { said.textContent = 'That file could not be read: ' + (e && e.message ? e.message : 'not a workbooks file') + '.'; });
+    });
+    return show();
   }
 
   window.TeachPage.start(root, function (db) {
+    S.refreshWorkbooks = function () { workbooksIn(db); };
+    workbooksIn(db);
     form.addEventListener('submit', function (ev) {
       ev.preventDefault();
       var link = form.elements.export_url.value.trim();

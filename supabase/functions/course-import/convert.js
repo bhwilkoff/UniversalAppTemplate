@@ -101,10 +101,11 @@ function resourceLink(r, templates) {
     const t = templates[r.sle_document_template_id];
     if (!url && t && t.uuid) url = 'https://sle-collaboration.minervaproject.com/worksheettemplates/' + t.uuid + '/';
     kind = 'minerva';
+    var uuid = t && t.uuid ? t.uuid : null;
   } else if (/course-resources\.minerva\.edu/.test(url)) kind = 'file';
   else if (/docs\.google\.com|drive\.google\.com/.test(url)) kind = 'google';
   url = url.replace(/\?au.*$/, '');
-  return { name: oneLine(r.name || 'A document'), url: /^https:\/\//.test(url) ? url : null, kind };
+  return { name: oneLine(r.name || 'A document'), url: /^https:\/\//.test(url) ? url : null, kind, uuid: typeof uuid === 'undefined' ? null : uuid };
 }
 
 function pollQuestion(a) {
@@ -173,6 +174,15 @@ export function convert(exported) {
       clean(plan.purpose) && 'Purpose of the session:\n' + clean(plan.purpose),
       clean(plan.faculty_readings) && 'Background readings for you:\n' + clean(plan.faculty_readings)
     ].filter(Boolean);
+    const workbooks = [];
+    function workbook(link, kind) {
+      const ref = 'wb:' + (link.uuid || link.name);
+      if (!workbooks.some((w) => w.ref === ref)) {
+        workbooks.push({ ref, kind, title: cut(link.name, 200), position: workbooks.length, source: { system: 'minerva-workbook', uuid: link.uuid || null, name: link.name } });
+        counts.workbooks += 1;
+      }
+      return ref;
+    }
     const reads = readings.filter((r) => r.plan_id === plan.id).sort(byOrder).map((r) => ({
       title: cut(oneLine(r.citation) || r.url || 'A reading', 300),
       url: /^https?:\/\//.test(r.url || '') ? r.url : null,
@@ -181,8 +191,8 @@ export function convert(exported) {
     Object.values(resources).filter((r) => r.plan_id === plan.id && !used.has(r.id)).sort((a, b) => a.id - b.id).forEach((r) => {
       const link = resourceLink(r, templates);
       if (!link || !link.url) return;
-      if (link.kind === 'minerva') { counts.workbooks += 1; warnings.push(title + ': "' + link.name + '" is a Minerva workbook only Minerva accounts can open.'); }
-      reads.push({ title: cut(link.name, 300), url: link.url, note: link.kind === 'minerva' ? 'A Minerva workbook' : 'Class material' });
+      if (link.kind === 'minerva') { workbook(link, 'individual'); return; }
+      reads.push({ title: cut(link.name, 300), url: link.url, note: 'Class material' });
     });
     counts.readings += reads.length;
 
@@ -217,7 +227,8 @@ export function convert(exported) {
             else {
               const m = /resource_id:(\d+)/.exec(String(a.value || ''));
               const link = m ? resourceLink(resources[Number(m[1])], templates) : null;
-              if (link && link.url) { shows.push(link); counts.documents += 1; if (link.kind === 'minerva') counts.workbooks += 1; }
+              if (link && link.kind === 'minerva') workbook(link, 'individual');
+              else if (link && link.url) { shows.push(link); counts.documents += 1; }
               if (clean(a.content)) docText.push(clean(a.content));
             }
           } else skip('element: ' + e.type);
@@ -243,8 +254,10 @@ export function convert(exported) {
           const a = e.attributes || {};
           const g = /groups:(\d+)(?::(\d+))?/.exec(String(a.grouping || ''));
           const names = a.groupNames || {};
+          const wbRefs = [];
           const docs = Object.keys(a.groupResources || {}).sort((x, y) => Number(x) - Number(y)).map((k) => {
             const link = resourceLink(resources[(a.groupResources[k] || {}).resource_id], templates);
+            if (link && link.kind === 'minerva') { wbRefs.push(workbook(link, 'group')); return null; }
             return link && link.url ? { name: cut(names[k] || ('Group ' + (Number(k) + 1)), 120), url: link.url } : null;
           }).filter(Boolean).slice(0, 40);
           const s = scene('rooms', oneLine(a.title) || (breakout.length > 1 ? stepTitle + ' (' + (bi + 1) + ')' : stepTitle), { ref: 'el:' + e.id });
@@ -255,6 +268,7 @@ export function convert(exported) {
           if (g) s.config.groups = Math.max(1, Math.min(40, Number(g[1])));
           if (g && g[2]) s.config.group_size = Math.max(1, Math.min(40, Number(g[2])));
           if (docs.length) s.config.group_docs = docs;
+          if (wbRefs.length) s.config.workbooks_refs = wbRefs;
           // The breakout's notes overview is for instructors only.
           if (clean(a.content)) notes.push('In the breakout:\n' + clean(a.content));
           counts.breakouts += 1;
@@ -295,7 +309,7 @@ export function convert(exported) {
     }
     scenes.forEach((s, p) => { s.position = p; });
     counts.sessions += 1;
-    return { number, title: cut(title, LIMIT.title), before: before ? cut(before, LIMIT.before) : null, readings: reads.length ? reads.slice(0, 60) : null, scenes };
+    return { number, title: cut(title, LIMIT.title), before: before ? cut(before, LIMIT.before) : null, readings: reads.length ? reads.slice(0, 60) : null, scenes, workbooks };
   });
 
   const minutes = Math.max(30, Math.min(240, Math.round(Math.max(...sessions.map((s) => s.scenes.reduce((n, x) => n + x.minutes, 0)), 60) / 15) * 15));

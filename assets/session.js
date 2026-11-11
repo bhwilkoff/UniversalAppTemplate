@@ -121,19 +121,23 @@
     drawPlan(cohort, sessions, session, leading, finished);
     drawPrep(cohort, session, leading);
     drawBefore(session);
+    drawWorkbooks(cohort, session, leading);
 
     K.started = !!(session.starts_at && Date.parse(session.starts_at) < Date.now());
     if (leading && K.started) drawAfter(cohort, session);
     $('[data-after-leading]').hidden = !leading;
     if (K.started) drawStory(cohort, session, leading);
     if (leading) drawEdits(session, cohort);
-    return bringReady.then(function (bring) { drawViews(session, leading, finished, !!play, bring); show('ready'); });
+    var wbReady = db.from('workbooks').select('id, kind').eq('session_id', session.id).then(function (r) {
+      K.hasWorkbooks = (r.data || []).some(function (w) { return leading || w.kind === 'individual'; });
+    }, function () {});
+    return Promise.all([bringReady, wbReady]).then(function (got) { drawViews(session, leading, finished, !!play, got[0]); show('ready'); });
   }
 
   // One view at a time (SESSION-DESIGN.md), opening where this person is needed.
   function drawViews(session, leading, finished, played, bring) {
     var items = Array.isArray(session.prep_questions) ? session.prep_questions : [];
-    var own = !!(session.before || (Array.isArray(session.readings) && session.readings.length));
+    var own = !!(session.before || (Array.isArray(session.readings) && session.readings.length) || K.hasWorkbooks);
     var before = leading || own || items.length > 0 || (!!bring && !finished);
     var list = [];
     function add(key, label) { list.push({ key: key, label: label }); }
@@ -162,6 +166,51 @@
     $('[data-recording-note]').hidden = true;
     v.onerror = function () { $('[data-recording-note]').hidden = false; };
     if (v.getAttribute('src') !== play) v.src = play;
+  }
+
+  // The session's individual workbooks (workbooks, migration 20261111050000):
+  // each person answers their own here, saved as they go; a leader reads
+  // everyone's answers. Group workbooks are answered in breakout rooms.
+  function drawWorkbooks(cohort, session, leading) {
+    var box = $('[data-workbooks]');
+    if (!box || !window.WorkbookView) return;
+    box.replaceChildren();
+    db.from('workbooks').select('*').eq('session_id', session.id).order('position').then(function (r) {
+      var list = (r.data || []).filter(function (w) { return leading || w.kind === 'individual'; });
+      box.hidden = !list.length;
+      if (!list.length) return;
+      var ids = list.map(function (w) { return w.id; });
+      var answersQ = db.from('workbook_answers').select('*').in('workbook_id', ids);
+      if (!leading) answersQ = answersQ.eq('user_id', K.me.id);
+      var namesQ = leading ? db.from('enrollments').select('user_id, profiles(github_login, display_name)').eq('cohort_id', cohort.id) : Promise.resolve({ data: [] });
+      var groupsQ = leading ? db.from('groups').select('id, name').eq('cohort_id', cohort.id) : Promise.resolve({ data: [] });
+      return Promise.all([answersQ, namesQ, groupsQ]).then(function (res) {
+        var rows = res[0].data || [], names = {}, rooms = {};
+        (res[1].data || []).forEach(function (e) { names[e.user_id] = e.profiles ? (e.profiles.display_name || e.profiles.github_login) : 'Someone'; });
+        (res[2].data || []).forEach(function (g) { rooms[g.id] = g.name; });
+        list.forEach(function (w) {
+          var sec = el('section', 'session-workbook');
+          var head = el('h2', null, w.title);
+          sec.appendChild(head);
+          if (leading) sec.appendChild(el('p', 'small', w.kind === 'group' ? 'Each breakout room answers it together.' : 'Each person answers their own.'));
+          else if (U.visibility) sec.appendChild(U.visibility('teachers', 'Your answers'));
+          var body = el('div');
+          sec.appendChild(body);
+          var mine = rows.filter(function (a) { return a.workbook_id === w.id; });
+          if (!(w.blocks || []).length) { body.appendChild(el('p', 'small', 'This workbook’s questions have not come in yet.')); box.appendChild(sec); return; }
+          if (leading) {
+            window.WorkbookView.summary(body, { workbook: w, answers: mine, nameOf: function (a) { return a.group_id ? (rooms[a.group_id] || 'A room') : (names[a.user_id] || 'Someone'); } });
+          } else {
+            var given = {};
+            mine.forEach(function (a) { given[a.block] = a.value; });
+            window.WorkbookView.form(body, { workbook: w, answers: given, onSave: function (key, value) {
+              return db.from('workbook_answers').upsert({ workbook_id: w.id, cohort_id: cohort.id, user_id: K.me.id, block: key, value: value }, { onConflict: 'workbook_id,user_id,block' }).then(function (q) { return q.error ? q.error.message : null; });
+            } });
+          }
+          box.appendChild(sec);
+        });
+      });
+    });
   }
 
   // The session's own words before it, and its readings (sessions.before and

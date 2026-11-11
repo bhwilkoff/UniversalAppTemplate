@@ -3295,6 +3295,38 @@ def main():
     rooms = json.dumps({"groups": 6, "sorting": "random", "group_docs": [{"name": "Group 1", "url": "https://docs.google.com/document/d/x/"}]})
     check("a breakout part keeps its groups, sorting, and a document per group",
           attempt(as_user("ben"), "insert into public.scenes (cohort_id, session_id, position, kind, title, minutes, config) values (%s, %s, 51, 'rooms', 'Rooms', 10, %s::jsonb)", (cc, ss, rooms)))
+    # Workbooks (migration 20261111050000).
+    wb_blocks = json.dumps([{"key": "b1", "type": "free", "text": "Why?"}, {"key": "b2", "type": "choice", "text": "Pick", "choices": ["A", "B"]}])
+    check("a leader adds an individual workbook to a session",
+          attempt(as_user("ben"), "insert into public.workbooks (cohort_id, session_id, title, blocks) values (%s, %s, 'Pre-class', %s::jsonb) returning id", (cc, ss, wb_blocks)))
+    wbi = last_rows[0][0]
+    check("a learner cannot add a workbook", not attempt(as_user("bea"), "insert into public.workbooks (cohort_id, session_id, title) values (%s, %s, 'Mine')", (cc, ss)))
+    b = as_user("bea"); b.execute("select count(*) from public.workbooks where id = %s", (wbi,))
+    check("a learner reads the workbook", b.fetchall() == [(1,)])
+    check("a learner answers their own", attempt(as_user("bea"), "insert into public.workbook_answers (workbook_id, cohort_id, user_id, block, value) values (%s, %s, %s, 'b1', '{\"text\": \"Because\"}')", (wbi, cc, people["bea"])))
+    check("and changes it, saving the way the page does", attempt(as_user("bea"), "insert into public.workbook_answers (workbook_id, cohort_id, user_id, block, value) values (%s, %s, %s, 'b1', '{\"text\": \"Because it matters\"}') on conflict (workbook_id, user_id, block) do update set value = excluded.value", (wbi, cc, people["bea"])))
+    check("a learner cannot answer for someone else", not attempt(as_user("bea"), "insert into public.workbook_answers (workbook_id, cohort_id, user_id, block, value) values (%s, %s, %s, 'b1', '{}')", (wbi, cc, people["ben"])))
+    check("an individual workbook is not answered by a room", not attempt(as_user("ben"), "insert into public.workbook_answers (workbook_id, cohort_id, group_id, block, value) values (%s, %s, (select id from public.groups where cohort_id = %s limit 1), 'b1', '{}')", (wbi, cc, cc)))
+    l = as_user("ben"); l.execute("select value->>'text' from public.workbook_answers where workbook_id = %s", (wbi,))
+    check("a leader reads everyone's answers", l.fetchall() == [("Because it matters",)])
+    d = as_user("dee"); d.execute("select count(*) from public.workbook_answers where workbook_id = %s", (wbi,))
+    check("someone outside the cohort reads none", d.fetchall() == [(0,)])
+    check("a session with workbook answers stays", not attempt(as_user("ben"), "delete from public.sessions where id = %s", (ss,)))
+    gid2 = str(uuid.uuid4())
+    su.execute("reset role")
+    su.execute("insert into public.groups (id, cohort_id, name) values (%s, %s, 'Room 1')", (gid2, cc))
+    su.execute("insert into public.group_members (group_id, user_id) values (%s, %s)", (gid2, people["bea"]))
+    check("a leader adds a group workbook", attempt(as_user("ben"), "insert into public.workbooks (cohort_id, session_id, kind, title) values (%s, %s, 'group', 'Group task') returning id", (cc, ss)))
+    wbg = last_rows[0][0]
+    check("a room's member answers for the room", attempt(as_user("bea"), "insert into public.workbook_answers (workbook_id, cohort_id, group_id, block, value) values (%s, %s, %s, 'b1', '{\"text\": \"Ours\"}')", (wbg, cc, gid2)))
+    check("and a room's answer saves the way the page does", attempt(as_user("bea"), "insert into public.workbook_answers (workbook_id, cohort_id, group_id, block, value) values (%s, %s, %s, 'b1', '{\"text\": \"Ours, better\"}') on conflict (workbook_id, group_id, block) do update set value = excluded.value", (wbg, cc, gid2)))
+    check("someone not in the room cannot", not attempt(as_user("gus"), "insert into public.workbook_answers (workbook_id, cohort_id, group_id, block, value) values (%s, %s, %s, 'b2', '{}')", (wbg, cc, gid2)))
+    g = as_user("gus"); g.execute("select count(*) from public.workbook_answers where workbook_id = %s", (wbg,))
+    check("and does not read the room's answers", g.fetchall() == [(0,)])
+    check("a breakout part names its group workbooks",
+          attempt(as_user("ben"), "insert into public.scenes (cohort_id, session_id, position, kind, title, minutes, config) values (%s, %s, 56, 'rooms', 'With workbooks', 10, jsonb_build_object('workbooks', jsonb_build_array(%s::text)))", (cc, ss, wbg)))
+    check("refused: workbooks on a part that is not a breakout",
+          not attempt(as_user("ben"), "insert into public.scenes (cohort_id, session_id, position, kind, title, minutes, config) values (%s, %s, 57, 'talk', 'No', 3, jsonb_build_object('workbooks', jsonb_build_array(%s::text)))", (cc, ss, wbg)))
     check("a breakout part keeps how many each group holds",
           attempt(as_user("ben"), "insert into public.scenes (cohort_id, session_id, position, kind, title, minutes, config) values (%s, %s, 54, 'rooms', 'Sized', 10, '{\"groups\": 6, \"group_size\": 8}'::jsonb)", (cc, ss)))
     check("refused: a group of more than 40", not attempt(as_user("ben"), "insert into public.scenes (cohort_id, session_id, position, kind, title, minutes, config) values (%s, %s, 55, 'rooms', 'Too big', 10, '{\"group_size\": 41}'::jsonb)", (cc, ss)))

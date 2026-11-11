@@ -72,16 +72,21 @@ test('every element type lands somewhere, and nothing is silently dropped', () =
   assert.equal(s[3].minutes, 7);
   assert.equal(s[3].config.groups, 3);
   assert.equal(s[3].config.sorting, 'random');
-  assert.deepEqual(s[3].config.group_docs.map((d) => d.name), ['Group 1', 'Group 2']);
-  assert.equal(s[3].config.group_docs[1].url, 'https://sle-collaboration.minervaproject.com/worksheettemplates/11111111-2222-3333-4444-555555555555/');
+  // A Minerva workbook in a breakout becomes the rooms' group workbook.
+  assert.deepEqual(s[3].config.group_docs.map((d) => d.name), ['Group 1']);
+  assert.deepEqual(s[3].config.workbooks_refs, ['wb:11111111-2222-3333-4444-555555555555']);
   // Someone quiet is featured.
   assert.deepEqual(s[4].config, { feature: 'quiet' });
   // A class material no step uses becomes a reading; a Minerva workbook says so.
   const reads = r.sessions[0].readings;
   assert.equal(reads[0].title, 'A reading');
-  assert.equal(reads[1].note, 'A Minerva workbook');
-  assert.equal(r.counts.workbooks, 1);
-  assert.ok(r.warnings.some((w) => /Pre-class workbook/.test(w)));
+  assert.equal(reads.length, 1);
+  // A class's own Minerva workbook is an individual workbook on the session.
+  assert.deepEqual(r.sessions[0].workbooks.map((w) => [w.kind, w.title, w.source.uuid]), [
+    ['individual', 'Pre-class workbook', '66666666-2222-3333-4444-555555555555'],
+    ['group', 'G2 workbook', '11111111-2222-3333-4444-555555555555']
+  ]);
+  assert.equal(r.counts.workbooks, 2);
   // Grading and learning outcomes are counted as left out, never scored.
   assert.deepEqual(r.counts.skipped, { 'grading weight': 1, 'learning outcome': 1 });
   // A class with no steps still arrives as one part.

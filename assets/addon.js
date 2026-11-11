@@ -1550,7 +1550,58 @@
         box.appendChild(ul);
       }
     }
+    if (part && part.kind === 'rooms' && Array.isArray(c.workbooks) && c.workbooks.length) drawRoomWorkbook(box, c.workbooks);
     box.hidden = !box.children.length;
+  }
+  // A breakout part's group workbooks, dealt out to the rooms in turn: a
+  // learner in a room answers their room's together; a leader sees the list.
+  function roomNumber() {
+    if (!S.room || !S.room.groupId) return null;
+    var g = (S.groups || []).filter(function (x) { return x.id === S.room.groupId; })[0];
+    var n = g ? /(\d+)\s*$/.exec(g.name || '') : null;
+    return n ? Number(n[1]) : null;
+  }
+  function drawRoomWorkbook(box, ids) {
+    S.workbooks = S.workbooks || {};
+    var missing = ids.filter(function (id) { return !S.workbooks[id]; });
+    if (missing.length && !S.workbooksLoading) {
+      S.workbooksLoading = true;
+      db.from('workbooks').select('*').in('id', missing).then(function (r) {
+        S.workbooksLoading = false;
+        (r.data || []).forEach(function (w) { S.workbooks[w.id] = w; });
+        drawPartTools();
+      });
+      return;
+    }
+    if (S.teaching) {
+      box.appendChild(el('p', 'small', ids.length > 1 ? 'The rooms’ workbooks, dealt out in turn' : 'The rooms’ workbook'));
+      var ul = el('ul', 'p2-run-list');
+      ids.forEach(function (id) {
+        var w = S.workbooks[id];
+        if (!w) return;
+        var li = el('li'), a = el('a', 'p2-run-row', w.title);
+        a.href = '/session/?c=' + encodeURIComponent(S.cohort.slug) + '&s=' + S.session.number + '&t=before'; a.target = '_blank'; a.rel = 'noopener';
+        li.appendChild(a); ul.appendChild(li);
+      });
+      box.appendChild(ul);
+      return;
+    }
+    var n = roomNumber();
+    var w = n ? S.workbooks[ids[(n - 1) % ids.length]] : null;
+    if (!w || !window.WorkbookView) return;
+    var sec = el('section', 'p2-workbook');
+    sec.appendChild(el('h2', 'p2-run-name', w.title));
+    var body = el('div'); sec.appendChild(body);
+    box.appendChild(sec);
+    if (S.workbookShown === w.id + ':' + S.room.groupId && S.workbookBody) { sec.replaceChild(S.workbookBody, body); return; }
+    db.from('workbook_answers').select('*').eq('workbook_id', w.id).eq('group_id', S.room.groupId).then(function (r) {
+      var given = {};
+      (r.data || []).forEach(function (a) { given[a.block] = a.value; });
+      window.WorkbookView.form(body, { workbook: w, answers: given, onSave: function (key, value) {
+        return db.from('workbook_answers').upsert({ workbook_id: w.id, cohort_id: S.cohort.id, group_id: S.room.groupId, block: key, value: value }, { onConflict: 'workbook_id,group_id,block' }).then(function (q) { return q.error ? q.error.message : null; });
+      } });
+      S.workbookShown = w.id + ':' + S.room.groupId; S.workbookBody = body;
+    });
   }
   function drawFeature(box, part, mode) {
     var wrap = el('div', 'p2-feature');

@@ -3367,3 +3367,26 @@ a.person-name:hover { text-decoration: underline; }
 .session-before-text ul, .session-before-text ol { margin: 0 0 0.75rem; padding-left: 1.25rem; }
 .session-readings { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.6rem; }
 .session-readings .small { margin: 0.15rem 0 0; color: var(--muted); }
+
+/* Workbooks (session Before, and a breakout room's panel). */
+.session-workbooks { display: grid; gap: 1.5rem; max-width: 44rem; margin-bottom: 1.5rem; }
+.session-workbook { display: grid; gap: 0.75rem; }
+.session-workbook h2 { margin: 0; }
+.wb-block { display: grid; gap: 0.5rem; padding: 0.75rem 0; border-top: 1px solid var(--rule); }
+.wb-block.wb-text { border-top: 0; }
+.wb-n { margin: 0; font-size: 0.8rem; font-weight: 600; color: var(--muted); }
+.wb-words p { margin: 0 0 0.5rem; }
+.wb-words ul, .wb-words ol { margin: 0 0 0.5rem; padding-left: 1.25rem; }
+.wb-block textarea, .wb-block input[type="url"], .wb-table input {
+  width: 100%; font: inherit; color: var(--ink); background: var(--paper);
+  border: 1px solid var(--rule); border-radius: 10px; padding: 0.55rem 0.7rem;
+}
+.wb-choices { display: grid; gap: 0.35rem; }
+.wb-table { width: 100%; border-collapse: collapse; }
+.wb-table th, .wb-table td { border: 1px solid var(--rule); padding: 0.35rem; text-align: left; vertical-align: top; }
+.wb-table td input { border: 0; padding: 0.2rem; background: transparent; }
+.wb-counts, .wb-answers { margin: 0; padding-left: 1.25rem; display: grid; gap: 0.25rem; }
+.import-workbooks { display: grid; gap: 0.5rem; max-width: 40rem; margin-top: 2rem; }
+.import-workbooks h2 { margin: 0; }
+.import-workbooks .hint { margin: 0; }
+.p2-workbook { display: grid; gap: 0.5rem; }

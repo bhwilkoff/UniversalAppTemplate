@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261111d">
+  <link rel="stylesheet" href="/assets/site.css?v=20261111e">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -88,6 +88,13 @@
             <p class="actions"><button class="btn-primary" type="submit">Bring it in</button></p>
           </form>
           <section class="import-result" data-import-result aria-live="polite" hidden></section>
+          <section class="import-workbooks" data-workbooks-in hidden>
+            <h2>Bring in the workbooks</h2>
+            <p class="hint" id="wb-hint">Choose the workbooks file made from Course Builder. Each waiting workbook fills in.</p>
+            <p class="small" data-workbooks-waiting></p>
+            <input type="file" accept="application/json,.json" aria-describedby="wb-hint" data-workbooks-file>
+            <p class="small" role="status" data-workbooks-status></p>
+          </section>
         </section>
       </div>
     </div>
@@ -95,7 +102,8 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" defer></script>
   <script src="/assets/hub-config.js?v=20261016a" defer></script>
   <script src="/assets/teach-page.js?v=20261022j" defer></script>
-  <script src="/assets/teach-import.js?v=20261111a" defer></script>
+  <script src="/assets/workbook-lib.js?v=20261111a" defer></script>
+  <script src="/assets/teach-import.js?v=20261111b" defer></script>
   <footer class="site-footer">
     <div class="wrap">
       <div class="footer-brand">
