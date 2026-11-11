@@ -180,3 +180,35 @@ Where these stand:
 - **GitHub to join:** the database already refused it; the Join button now waits too.
 - **Reminders:** nothing to build.
 - **One Tap:** it shows inside Meet's panel on the sign-in screen. Over a first-time guest it is built, and not yet seen, because a test profile's panel cannot be returned to a first visit.
+
+## What Week 2 showed, November 11, 2026
+
+Read from the session's recording (Ben's own panel and stage, every 10 seconds), its transcript, and the panel's event log. Ben, at the end of the recording: "It is clear that nobody knows where to click to answer questions ... It should feel like a natural extension of the meeting itself. It should never feel like, oh, I've got to open this back up ... I absolutely have to be able to open and close each one of the tools easily ... I should never have to ask the learners what is on their screen."
+
+What the class managed through the add-on in 53 minutes: two of four learners answered the first question, nobody wrote a next prompt in eleven minutes, two answered the last question, nobody asked the leader for anything, and nobody showed an app from Mine; both demos used Meet's screen sharing, and feedback went into Meet's chat.
+
+Priority 1 stopped people from taking part, priority 2 cost the leader time and confidence, and priority 3 is finish.
+
+### Priority 1
+
+1. **Close the main stage ended the activity, twice** (5:40 and 25:30 into the recording). Each time every learner's panel closed. Their panels came back 7 to 12 minutes later, and one learner's after 25. The leader pressed it to make room for a screen share and to take a card down. **Fix:** nothing in the panel ends the activity except End activity on the last part, which asks in place first. Clearing the stage puts the part's own slide back.
+2. **Learners could not tell where to answer.** "For some reason, I can't even reply." A learner pressed Agree believing it answered the question (the log has that stance at the same second). **Fix:** an open question leads the learner's Now with its own answer controls, as well as the stage, and says "Your answer is in" once saved. Stances are hidden while a question is open.
+3. **Putting one answer on the stage took the question away from everyone else.** "Once [she] submitted I can no longer type." The stage's answer view replaces the question view. **Fix:** a shown answer sits beside the open question, and the question keeps taking answers until the leader closes it.
+4. **Your next prompt** was open eleven minutes with no answers, and **What did you ask your agent to change?** was closed after seven seconds. Same cause as 2: the place to write was not where learners looked.
+5. **One learner could not answer the first question at all, and Ask again made a second copy of it,** splitting four answers across two questions. The first cause is not found yet. It needs a learner-side test in a real call. **Fix for the second:** Ask again reopens the same question.
+6. **Show my app was not found.** Leader: "Did you just share your screen or did you use the tools inside of the add-on?" "The screen." **Fix:** on a part that asks people to show their app, each learner's Now leads with Show my app, or the address field if they have none yet, and the leader's Now lists who is ready with Show it.
+
+### Priority 2
+
+7. **The leader could not tell what was on the stage.** "If I take that down, does it show?" A card went up over an open question's results. **Fix:** the top frame says what is on the stage in words, with one way to clear it. Every tile says on its face whether it is on, and turns off where it turned on.
+8. **Which tab, when.** "It is not intuitive for me as a leader when I'm supposed to be on the Now tab, on the Plan tab, on the Tools tab, on the People tab." **Fix:** Now holds everything the current part plans, its question and its showing apps included. Tools is only for what the plan did not expect.
+9. **Stances stuck and overlapped.** "Agree 1" stayed on the stage from the fourth minute to the end, the leader could not clear it ("the Agree, Disagree, Not Sure bar, I cannot get to"), and on a question's results it was drawn through the reactions strip. **Fix:** stances start each part at zero, are a tool the leader turns on and off, and keep their own row above the strip.
+10. **People said learners were not here while they sat in the call.** It counts open panels, not people, and after each forced end it showed nearly everyone as not here. **Fix:** it says what it knows: Human Shaped open, or not yet, with how to open it.
+11. **The leader cannot see what learners see.** "I should never have to ask the learners what is on their screen." **Fix:** See it as a learner shows the learner's Now for this moment, inside the leader's panel.
+12. **Part clocks on the stage.** "Time is up" sat on the stage through most parts, and the leader told a learner to "disregard the two minutes and 30 seconds." **Fix:** a part's clock is the leader's, in the panel. The stage shows a clock only when the leader starts one.
+13. **Recording said "The recording has stopped"** while the recording ran.
+
+### Priority 3
+
+14. Last part looks disabled.
+15. Feedback in Meet's chat is fine. The add-on builds on Meet, and does not compete with what Meet already does well.
