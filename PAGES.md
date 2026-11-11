@@ -136,6 +136,7 @@ role you hold and the role named on the page, never a switcher.
 |---|---|---|
 | `/teach/` | Leading: what waits for you and every cohort you lead; for anyone else, asking to lead | Follow a row; plan a cohort |
 | `/teach/new/` | Planning a new cohort | Fill it in; saving opens its Setup |
+| `/teach/import/` | Bringing in a course from Course Builder | Paste an export link; when the course arrives, open the draft cohort it made |
 | `/teach/cohort/?c=` | Forwards to the cohort's page, `/cohort/?c=` | |
 | `/teach/cohort/edit/?c=` | That cohort's details | Change them; saving returns to the cohort |
 | `/teach/feedback/` | What your cohorts are waiting on you for | Answer each |

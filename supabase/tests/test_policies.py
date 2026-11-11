@@ -3287,6 +3287,31 @@ def main():
     su.execute("select count(*) from public.sessions where id = %s", (ss,))
     check("and it is still there", su.fetchall() == [(1,)])
 
+    # Courses from Course Builder (migration 20261111020000).
+    good = json.dumps({"feature": "quiet", "show": {"url": "https://example.com/a.pdf", "name": "A file"}})
+    check("a presenter part can feature someone quiet and show a document",
+          attempt(as_user("ben"), "insert into public.scenes (cohort_id, session_id, position, kind, title, minutes, config) values (%s, %s, 50, 'presenter', 'Feature', 5, %s::jsonb) returning id", (cc, ss, good)))
+    pres = last_rows[0][0]
+    rooms = json.dumps({"groups": 6, "sorting": "random", "group_docs": [{"name": "Group 1", "url": "https://docs.google.com/document/d/x/"}]})
+    check("a breakout part keeps its groups, sorting, and a document per group",
+          attempt(as_user("ben"), "insert into public.scenes (cohort_id, session_id, position, kind, title, minutes, config) values (%s, %s, 51, 'rooms', 'Rooms', 10, %s::jsonb)", (cc, ss, rooms)))
+    check("a question part says whether people see the counts",
+          attempt(as_user("ben"), "insert into public.scenes (cohort_id, session_id, position, kind, title, minutes, config) values (%s, %s, 52, 'question', 'Q', 3, '{\"prompt\": \"Why?\", \"kind\": \"short\", \"show_tally\": false}'::jsonb)", (cc, ss)))
+    check("a part can point at an earlier part's answers",
+          attempt(as_user("ben"), "insert into public.scenes (cohort_id, session_id, position, kind, title, minutes, config) values (%s, %s, 53, 'talk', 'Results', 3, jsonb_build_object('results_of', %s::text))", (cc, ss, pres)))
+    for bad, why in [('{"feature": "loudest"}', "a feature that is not one of the four"), ('{"show": {"url": "http://x.com"}}', "a document that is not https"),
+                     ('{"show": {"url": "https://x.com", "extra": 1}}', "a document with anything else in it"), ('{"groups": 41}', "more than 40 groups")]:
+        kind = 'rooms' if 'groups' in bad else 'presenter'
+        check("refused: " + why, not attempt(as_user("ben"), "insert into public.scenes (cohort_id, session_id, position, kind, title, minutes, config) values (%s, %s, 60, %s, 'Bad', 3, %s::jsonb)", (cc, ss, kind, bad)))
+    su.execute("reset role")
+    su.execute("insert into public.course_imports (created_by, nonce) values (%s, %s) returning id", (people["ben"], "a" * 32))
+    imp = su.fetchall()[0][0]
+    b = as_user("ben"); b.execute("select count(*) from public.course_imports where id = %s", (imp,))
+    check("a leader reads their own import", b.fetchall() == [(1,)])
+    d = as_user("dee"); d.execute("select count(*) from public.course_imports where id = %s", (imp,))
+    check("no one else does", d.fetchall() == [(0,)])
+    check("no one signed in writes an import", not attempt(as_user("ben"), "insert into public.course_imports (created_by, nonce) values (%s, %s)", (people["ben"], "b" * 32)))
+
     conn.rollback()
     conn.close()
     failed = [n for n, ok in results if not ok]
