@@ -6,6 +6,9 @@
 // this page shows is always the presenting teacher's choice.
 (function () {
   var root = document.querySelector('[data-stage]');
+  // Every stage keeps its reactions in a strip at the foot, centered, and
+  // ends above it, so nothing they do covers what is shown (Ben, November 11, 2026).
+  if (root) root.classList.add('has-strip');
   if (!root) return;
   var A = window.AddonLib, L = window.LiveLib;
   var cfg = window.MEET_ADDON || {};

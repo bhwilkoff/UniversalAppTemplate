@@ -1036,10 +1036,14 @@
       F.put('tools', $('[data-ask-wrap]'));
       F.put('tools', $('[data-breakouts]'));
       S.appsBox = el('div', 'p2-apps'); F.put('tools', S.appsBox);
-      S.boardPin = el('div', 'actions'); stage.appendChild(S.boardPin);
+      // The board is its own tool, one press from the tiles (Ben, November 11, 2026).
+      S.boardTool = el('section', 'p2-group');
+      S.boardPin = el('div', 'actions'); S.boardTool.appendChild(S.boardPin);
+      F.put('tools', S.boardTool);
       S.nowAsks = el('div', 'p2-asks'); S.nowAsks.hidden = true; F.pane('now').insertBefore(S.nowAsks, F.pane('now').firstChild);
       F.put('tools', S.frameTools);
       S.stageTools = stage; S.askTool = $('[data-ask-wrap]'); S.breakTool = $('[data-breakouts]');
+      S.breakTool.hidden = !!(standalone || S.room.groupId);
       S.tiles = el('div', 'p2-tiles');
       S.toolBack = el('div', 'p2-toolback');
       S.toolBack.appendChild(button('All tools', 'btn-secondary small', closeTool));
@@ -1054,8 +1058,12 @@
       F.put('people', $('[data-roster]'));
       F.put('people', $('[data-recognize]'));
     } else {
+      // What a learner does in the call stays in Now: back to the class's
+      // stage when trying an app, and asking their leader (Ben, November 11, 2026).
+      S.backBox = el('div', 'actions p2-back'); S.backBox.hidden = true; now.insertBefore(S.backBox, now.firstChild);
+      S.mineAsk = el('div', 'p2-mine-ask'); now.appendChild(S.mineAsk);
       S.mineApp = el('div', 'p2-myapp'); F.put('mine', S.mineApp);
-      S.mineAsk = el('div', 'p2-mine-ask'); F.put('mine', S.mineAsk);
+      S.classApps = el('div', 'p2-class-apps'); F.put('mine', S.classApps);
       F.put('mine', S.frameTools);
       F.put('mine', $('[data-guest-signin]').parentNode);
       F.put('mine', $('[data-recognize]'));
@@ -1358,8 +1366,15 @@
     });
   }
   function startBreakouts() {
-    if (S.breakouts || !window.Breakouts || !S.teaching || standalone || S.room.groupId || !S.signals) return;
+    if (S.breakouts || !window.Breakouts || !S.teaching || standalone || S.room.groupId) return;
     $('[data-breakouts]').hidden = false;
+    // The tool is there from the start; it fills in once the call is connected.
+    if (!S.signals) {
+      if (!$('[data-breakouts]').childElementCount) $('[data-breakouts]').appendChild(el('p', 'small', 'Connecting to the call…'));
+      clearTimeout(S.breakRetry); S.breakRetry = setTimeout(startBreakouts, 2000);
+      return;
+    }
+    $('[data-breakouts]').replaceChildren();
     S.breakouts = window.Breakouts.start({
       db: db, mount: $('[data-breakouts]'), cohort: S.cohort, session: S.session, signals: S.signals, nameOf: nameOf,
       groups: function () { return S.groups; }, presence: function () { return S.presence || {}; }, reload: reloadGroups,
@@ -1997,10 +2012,33 @@
   function drawMyApp() {
     var box = S.mineApp;
     if (!box) return;
+    if (box.contains(document.activeElement) && document.activeElement.tagName === 'INPUT') return;
     box.replaceChildren();
+    drawClassApps(); drawBack();
     var app = S.myApp ? L.classifyLink(S.myApp) : null;
-    box.hidden = !app;
-    if (!app) return;
+    box.hidden = false;
+    if (!app) {
+      // No address yet: add it here, without leaving the call.
+      var f = el('form', 'p2-ask-form'), input = el('input'), said = el('span', 'small');
+      input.type = 'url'; input.placeholder = 'https://'; input.setAttribute('aria-label', 'Your app’s address');
+      var go = el('button', 'btn-primary small', 'Save'); go.type = 'submit';
+      said.setAttribute('role', 'status');
+      f.appendChild(input); f.appendChild(go);
+      box.appendChild(el('p', 'p2-label', 'Your app’s address'));
+      box.appendChild(f); box.appendChild(said);
+      f.addEventListener('submit', function (ev) {
+        ev.preventDefault();
+        var c = L.classifyLink(input.value.trim());
+        if (!c) { said.textContent = 'A full address that starts with https://'; return; }
+        db.from('enrollments').update({ app_url: c.url }).eq('cohort_id', S.cohort.id).eq('user_id', who()).select('user_id').then(function (r) {
+          if (r.error || !r.data || !r.data.length) { said.textContent = 'Not saved' + (r.error ? ': ' + r.error.message : '.'); return; }
+          S.myApp = c.url;
+          S.people.forEach(function (p) { if (p.user_id === who()) p.app_url = c.url; });
+          input.blur(); drawMyApp();
+        });
+      });
+      return;
+    }
     var mine = L.queue(S.items).waiting.filter(function (x) { return x.user_id === who(); })[0];
     if (mine && S.onStage && S.onStage.kind === 'item' && S.onStage.id === mine.id) { box.appendChild(el('p', 'p2-state', 'Your app is on the main stage.')); return; }
     if (mine) {
@@ -2011,6 +2049,37 @@
     box.appendChild(button('Show my app on the main stage', 'btn-primary', function () {
       db.from('live_queue').insert({ cohort_id: S.cohort.id, session_id: S.session.id, user_id: who(), kind: app.kind, url: app.url }).then(function (r) { if (!r.error) refreshLive(); });
     }));
+  }
+  // Classmates' apps, each tried on this learner's own stage, never everyone's.
+  function drawClassApps() {
+    var box = S.classApps;
+    if (!box) return;
+    box.replaceChildren();
+    var rows = (S.people || []).filter(function (p) { return p.user_id !== who() && p.app_url && L.classifyLink(p.app_url); });
+    box.hidden = !rows.length;
+    if (!rows.length) return;
+    box.appendChild(el('p', 'p2-label', 'Your classmates’ apps'));
+    var ul = el('ul', 'p2-run-list');
+    rows.forEach(function (p) {
+      var li = el('li'), name = S.names[p.user_id] || 'Someone';
+      var on = S.myStage && S.myStage.url === p.app_url;
+      li.appendChild(el('span', null, name + (p.app_name ? ': ' + p.app_name : '')));
+      if (A.frameable(p.app_url)) li.appendChild(button(on ? 'On your stage' : 'Try it on my stage', 'link-button', function () { tryOnMyStage(p.app_url, name); }));
+      var a = newTab(el('a', 'link-button', 'Open in a new tab')); a.href = p.app_url; li.appendChild(a);
+      ul.appendChild(li);
+    });
+    box.appendChild(ul);
+  }
+  function tryOnMyStage(url, name) {
+    S.myStage = url ? { url: url, who: name } : null;
+    drawClassApps(); drawBack(); sendStage();
+  }
+  function drawBack() {
+    var box = S.backBox;
+    if (!box) return;
+    box.replaceChildren();
+    box.hidden = !S.myStage;
+    if (S.myStage) box.appendChild(button('Back to the class stage', 'btn-primary small', function () { tryOnMyStage(null); }));
   }
   // A learner asking to show comes to the leader where the leader is looking.
   function drawAsks() {
@@ -2054,7 +2123,23 @@
   }
 
   function drawBoardPin() {
-    if (S.boardPin) S.boardPin.replaceChildren(stageToggle('board', undefined, 'Put the board on the main stage', 'Take the board down'));
+    if (!S.boardPin) return;
+    var on = S.onStage && S.onStage.kind === 'board';
+    var b = button(on ? 'Take the board down' : 'Put the board on the main stage', 'btn-primary', function () {
+      if (on) return setPin(null);
+      withStage(function () { setPin({ kind: 'board' }); });
+    });
+    b.setAttribute('aria-pressed', String(!!on));
+    S.boardPin.replaceChildren(b);
+    var links = A.boardLinks(S.cohort, S.session, null, null);
+    if (links && links.board) { var a = newTab(el('a', 'btn-secondary', 'Open the board')); a.href = links.board; S.boardPin.appendChild(a); }
+  }
+  // Something that shows on the main stage opens the stage first, if it is not open.
+  function withStage(then) {
+    if (S.stageOn || standalone) return then();
+    $('[data-open-stage]').click();
+    var tries = 0;
+    (function wait() { if (S.stageOn) return then(); if (++tries < 40) setTimeout(wait, 250); })();
   }
   // Tools as tiles: one tool at a time, and the way back to all of them.
   var TOOL_ICONS = { 'Main stage': 'app-window', 'Ask a question': 'chats-circle', 'Breakouts': 'users-three', 'Apps': 'laptop', 'A card for everyone': 'megaphone-simple',
@@ -2062,7 +2147,7 @@
   function toolList() {
     var pane = S.frame.pane('tools'), out = [];
     function add(name, node) { if (node && !node.hidden && name) out.push({ name: name, node: node }); }
-    add('Main stage', S.stageTools); add('Ask a question', S.askTool); add('Breakouts', S.breakTool);
+    add('Main stage', S.stageTools); add('Ask a question', S.askTool); add('Breakouts', S.breakTool); add('The board', S.boardTool);
     if (S.appsBox && S.appsBox.childElementCount) add('Apps', S.appsBox);
     Array.prototype.forEach.call(S.frameTools.children, function (d) {
       var head = d.querySelector('summary');
@@ -2306,18 +2391,21 @@
   function ask(questions, statusBox) {
     var status = statusBox || $('[data-ask-status]');
     status.textContent = 'Asking…';
+    var firstId = null;
     return questions.reduce(function (p, q) {
       return p.then(function (r) {
         if (r && r.error) return r;
         return db.from('live_checks').insert(Q.askRow({
           cohort_id: S.cohort.id, session_id: S.session.id, created_by: S.me.id, show_tally: !!q.show_tally,
           rerun_of: q.rerun_of || null
-        }, q, S.kinds));
+        }, q, S.kinds)).select('id').single().then(function (x) { if (!x.error && x.data && !firstId) firstId = x.data.id; return x; });
       });
     }, Promise.resolve(null)).then(function (r) {
-      status.textContent = r && r.error ? 'Not asked: ' + r.error.message : questions.length > 1 ? 'Asked both.' : 'Asked.';
-      if (!(r && r.error)) refreshLive();
-      return !(r && r.error);
+      status.textContent = r && r.error ? 'Not asked: ' + r.error.message : questions.length > 1 ? 'Asked both.' : 'Asked, and on the main stage.';
+      if (r && r.error) return false;
+      // A question asked from the panel goes on everyone's stage at once,
+      // whatever the stage was showing (Ben, November 11, 2026).
+      return Promise.resolve(refreshLive()).then(function () { if (firstId) setPin({ kind: 'check', id: firstId }); return true; });
     });
   }
   $('[data-ask]').addEventListener('submit', function (ev) {
@@ -2461,6 +2549,11 @@
   // the words as they type, before anyone else sees them.
   function currentView() {
     var part = partNow();
+    // A learner trying a classmate's app sees it on their own stage only.
+    if (!S.teaching && S.myStage) {
+      var mp = part ? { key: part.key, name: part.name, endsAt: endsNow() } : null, fu = A.frameable(S.myStage.url);
+      return fu ? { mode: 'app', part: mp, who: S.myStage.who, url: fu, note: null } : { mode: 'item', part: mp, who: S.myStage.who, what: S.myStage.url, note: null };
+    }
     var scene = null;
     if (part && SL && V && (shared() || part.own)) {
       var s = S.draft && S.draft.key === part.key ? V.draft(part, S.draft.fields) : part;

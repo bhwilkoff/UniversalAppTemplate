@@ -3411,3 +3411,19 @@ a.person-name:hover { text-decoration: underline; }
 .p2-feature .actions input[type="number"] { width: 4.5rem; }
 .p2-picks { margin: 0; padding-left: 1.25rem; display: grid; gap: 0.2rem; }
 .p2-room-row { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; }
+
+/* Every stage, cohort sessions included: reactions sit in a centered strip at
+   the very foot, sent reactions float in a lane above it, and every view
+   ends above both (Ben, November 11, 2026: "never covering content"). */
+.has-strip { --strip: 3.25rem; --lane: 2.75rem; --foot: calc(var(--strip) + var(--lane)); }
+.has-strip .stage-ready:not([hidden]) { padding-bottom: calc(var(--foot) + 2vmin); }
+.has-strip .stage-reacts, .has-strip .stage-ready:has(.has-board:not([hidden])) .stage-reacts, .has-strip .stage-ready:has(.stage-app:not([hidden])) .stage-reacts, .has-strip .stage-ready:has([data-view="page"]:not([hidden])) .stage-reacts { position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; display: flex; align-items: center; justify-content: center; gap: 0.25rem; height: var(--strip); padding: 0 0.75rem; border-radius: 0; background: var(--paper); opacity: 1; }
+.has-strip .stage-react { padding: 0.25rem 0.35rem; font-size: 1.35rem; border-radius: 8px; }
+.has-strip .stage-react:hover { background: var(--card); }
+.has-strip .react-layer { position: fixed; inset: auto 0 var(--strip) 0; height: var(--lane); overflow: hidden; z-index: 5; border-top: 1px solid var(--rule); background: var(--paper); }
+.has-strip .react-float { bottom: 0.35rem; display: flex; align-items: center; gap: 0.35em; animation: react-lane 3.2s ease-out forwards; }
+.has-strip .react-float .react-emoji { font-size: 1.6rem; }
+.has-strip .react-float .react-name { font-size: 0.8rem; }
+.has-strip .stance-bar { bottom: calc(var(--foot) + 0.75vmin); }
+.has-strip .stage-app:not([hidden]), .has-strip [data-view="scene"].has-board:not([hidden]), .has-strip .open-board:not([hidden]) { bottom: var(--foot); }
+.has-strip .stage-ready:has(.stage-studio:not([hidden])) .react-layer, .has-strip .stage-ready:has(.stage-studio:not([hidden])) .stage-reacts { display: none; }

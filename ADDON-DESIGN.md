@@ -54,7 +54,8 @@ Measured in a real call: each person's stage takes their own clicks and keys, Me
 |---|---|---|
 | A live app | A learner asks from the top of Mine; the leader presses Show it in Now, or shows anyone's from Tools | Everyone gets their own working copy, so a class can use it at once. A page that refuses framing keeps Open in a new tab |
 | A question | Learners, on the stage | Choices are buttons, and words are typed there. The panel saves them |
-| Reactions | Everyone | A quiet row on the stage, and the keys |
+| Reactions | Everyone | A centered strip at the very foot of the stage, with a lane above it where sent reactions float; every view ends above both, so they never cover what is shown (Ben, November 11, 2026) |
+| A classmate's app, for one person | A learner, from Mine's Your classmates' apps | Try it on my stage shows it on that learner's own stage only, never everyone's, until Back to the class stage in Now; nothing is written to the shared show |
 | The board | Everyone | It fills the stage. Add a note, select it, Vote for this. Each vote is its own dot |
 | GitHub | A leader adds it to a slide | Issues, pull requests, commits, a README, or the repository, drawn on the slide; rows open on GitHub from the stage |
 
@@ -62,7 +63,9 @@ Measured in a real call: each person's stage takes their own clicks and keys, Me
 
 Ben, November 6, 2026: "a learner should be able to request to do any of the things a leader can do right from the add-on or the main stage itself."
 
-A learner asks from Mine, or with Ask on the stage: a question for everyone, a message on the stage, a link, the board, breakouts, or something else in their own words. It arrives in the leader's Now with Do it and Not now. Do it runs the leader's own action. A learner never changes the room directly.
+Ben, November 11, 2026: "Any question that I'm asking of the cohort members needs to be done on the main stage or within the add-on sidebar. Any action that I need the cohort members to take, should be able to be completed within the Google Meet." A question a leader asks from Tools goes on everyone's main stage at once, whatever it was showing. A learner without an app address adds it in Mine.
+
+A learner asks from Now, where Ask your leader for always sits, or with Ask on the stage: a question for everyone, a message on the stage, a link, the board, breakouts, or something else in their own words. It arrives in the leader's Now with Do it and Not now. Do it runs the leader's own action. A learner never changes the room directly.
 
 ## A tied guest is that member
 
@@ -137,7 +140,7 @@ Signing in is offered and never required. One Tap rides on top as it does for a 
 
 ## Tools
 
-Tools is a grid of tiles, and a tile opens one tool, with All tools to go back. Rule 4's two levels, and nothing to scan.
+Tools is a grid of tiles, and a tile opens one tool, with All tools to go back. Rule 4's two levels, and nothing to scan. The board and Breakouts are tiles of their own from the start of the call: putting the board up opens the main stage first if it is closed, and Breakouts says it is connecting until the call's signals arrive.
 
 ## Sign-in in Meet
 
