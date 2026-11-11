@@ -477,9 +477,38 @@
   // view of a board on this site, in exactly the shape boardLinks makes.
   var STAGE_BOARD = /^\/board\/\?c=[A-Za-z0-9%._~-]{1,120}&s=week-\d{1,2}(&g=[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})?&view=stage(&t=[a-z][a-z-]{0,39})?$/;
 
+
+  // What a stage view shows, in a few words, for the leader's top frame.
+  function stageSays(v) {
+    if (!v) return 'Nothing yet';
+    function q(t) { t = String(t || ''); return '\u201c' + (t.length > 60 ? t.slice(0, 59) + '\u2026' : t) + '\u201d'; }
+    switch (v.mode) {
+      case 'studio': return 'Your slide editor, on your stage only';
+      case 'welcome': return 'The welcome';
+      case 'card': return 'A card: ' + q(v.card && v.card.body);
+      case 'check': return (v.count ? 'Answers to ' : 'The question ') + q(v.prompt);
+      case 'app': return (v.who || 'Someone') + '\u2019s app';
+      case 'item': return (v.who || 'Someone') + '\u2019s link';
+      case 'blank': return 'Nothing';
+      case 'scene': return v.scene && v.scene.board ? 'The board' : 'This part\u2019s slide';
+      case 'slides': return 'This part\u2019s slides';
+      case 'doc': return 'This part\u2019s document';
+      case 'path': return 'Where everyone is on the path';
+      case 'rooms': return 'Every room';
+      case 'people': return (v.who || []).join(', ') || 'People';
+      case 'person': return v.who || 'Someone';
+      case 'room': return 'A room\u2019s work';
+      case 'answer': return 'One answer';
+      case 'page': return 'A website';
+      case 'roomboard': return 'Propose and vote';
+      case 'roomwelcome': return 'The welcome';
+      default: return v.part && v.part.name ? 'This part\u2019s title' : 'Nothing yet';
+    }
+  }
+
   var lib = {
     meetingCode: meetingCode, findRoom: findRoom, panelPlan: panelPlan, timeLeft: timeLeft,
-    stageView: stageView, sceneOf: sceneOf, stageError: stageError, stageMessage: stageMessage, actMessage: actMessage, readAct: readAct, frameable: frameable, docUrl: docUrl, keyMessage: keyMessage, readKey: readKey, readStageMessage: readStageMessage, HELLO: HELLO, isHello: isHello,
+    stageView: stageView, stageSays: stageSays, sceneOf: sceneOf, stageError: stageError, stageMessage: stageMessage, actMessage: actMessage, readAct: readAct, frameable: frameable, docUrl: docUrl, keyMessage: keyMessage, readKey: readKey, readStageMessage: readStageMessage, HELLO: HELLO, isHello: isHello,
     handoff: handoff, acceptHandoff: acceptHandoff, boardLinks: boardLinks
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;

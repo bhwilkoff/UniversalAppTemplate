@@ -18,6 +18,16 @@
     top.appendChild(row);
     var chips = el('ul', 'p2-chips');
     top.appendChild(chips);
+    // What everyone's main stage shows, in words, with the one way to change
+    // it (Week 2: "if I take that down, does it show?").
+    var stage = el('p', 'p2-stage'); stage.hidden = true;
+    var stageLabel = el('span', 'p2-stage-label', 'On the stage');
+    var stageWhat = el('span', 'p2-stage-what');
+    var stageBtn = el('button', 'btn-secondary small p2-stage-btn'); stageBtn.type = 'button';
+    stage.appendChild(stageLabel); stage.appendChild(stageWhat); stage.appendChild(stageBtn);
+    top.appendChild(stage);
+    var onStageBtn = null;
+    stageBtn.addEventListener('click', function () { if (onStageBtn) onStageBtn(); });
     var nav = el('div', 'p2-tabs');
     nav.setAttribute('role', 'tablist');
     top.appendChild(nav);
@@ -83,6 +93,14 @@
         chips.hidden = !(s.chips || []).length;
         if (s.next) { next.textContent = s.next.label; next.disabled = !!s.next.disabled; }
         back.hidden = !s.canBack;
+      },
+      // { what, action: { label, go } | null }, or null to hide.
+      stage: function (v) {
+        stage.hidden = !v;
+        if (!v) return;
+        if (stageWhat.textContent !== v.what) stageWhat.textContent = v.what;
+        stageBtn.hidden = !v.action;
+        if (v.action) { stageBtn.textContent = v.action.label; onStageBtn = v.action.go; }
       },
       on: function (n, b) { onNext = n; onBack = b; }
     };

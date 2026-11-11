@@ -919,14 +919,12 @@
     if (standalone) document.title = (window.CohortLib ? window.CohortLib.sessionName(S.session.number, S.cohort) : 'Week ' + S.session.number) + ', ' + S.cohort.title + ' | Human Shaped';
     $('[data-fallback-link]').href = '/addon/?c=' + encodeURIComponent(S.cohort.slug) + '&s=' + S.session.number;
     $('[data-open-stage]').hidden = !S.teaching || standalone;
-    $('[data-close-stage]').hidden = true;
     stageButtons(S.stageOn);
     // The main stage is a leader's first move in a call, so its button sits
     // at the top of the panel, not below every part.
     if (S.teaching && !standalone) {
       var head = root.querySelector('.addon-head');
       head.appendChild($('[data-open-stage]'));
-      head.appendChild($('[data-close-stage]'));
       head.appendChild($('[data-stage-status]'));
       // The welcome is a stage control too, not a part of the plan (found
       // in the live Meet test: it sat alone in an empty box under each part).
@@ -1029,7 +1027,7 @@
     if (S.teaching) {
       var stage = el('section', 'p2-group');
       var acts = el('div', 'actions');
-      ['[data-open-stage]', '[data-close-stage]', '[data-welcome-toggle]'].forEach(function (s) { acts.appendChild($(s)); });
+      ['[data-open-stage]', '[data-welcome-toggle]'].forEach(function (s) { acts.appendChild($(s)); });
       stage.appendChild(acts);
       stage.appendChild($('[data-stage-status]'));
       F.put('tools', stage);
@@ -1154,7 +1152,6 @@
     var part = partNow(), st = S.signals && S.signals.state ? S.signals.state() || {} : {};
     var chips = [];
     if (S.teaching) {
-      chips.push({ text: S.stageOn ? 'Stage on' : 'Stage off', on: !!S.stageOn });
       var place = slideInfo();
       if (place) chips.push({ text: 'Slide ' + (place.at + 1) + ' of ' + place.count });
       if (S.recording) chips.push({ text: 'Recording', on: true });
@@ -2658,8 +2655,27 @@
   }
   function sendStage() {
     drawWelcomeToggle();
+    var view = S.session ? currentView() : null;
+    drawStageLine(view);
     if (!S.stageOn || !side || !S.session) return;
-    try { Promise.resolve(side.notifyMainStage(A.stageMessage(currentView(), !!S.recording, !S.teaching, S.svc ? S.svc.stance() : null))).catch(function () {}); } catch (e) {}
+    try { Promise.resolve(side.notifyMainStage(A.stageMessage(view, !!S.recording, !S.teaching, S.svc ? S.svc.stance() : null))).catch(function () {}); } catch (e) {}
+  }
+  // Something a leader put up over the part's own plan: a pin, a card, a
+  // website or Propose and vote. Clear takes it down; the part's own slide
+  // or question comes back. Nothing here ends Meet's activity (Week 2: Close
+  // the main stage ended it twice and closed every learner's panel).
+  function stageExtra() {
+    return !!(S.onStage || S.card || (S.svc && S.svc.showing && S.svc.showing()));
+  }
+  function clearStage() {
+    if (S.card && S.signals && S.signals.clearKind) S.signals.clearKind('card');
+    setPin(null);
+  }
+  function drawStageLine(view) {
+    if (!S.frame || !S.frame.stage) return;
+    if (!S.teaching || standalone) return S.frame.stage(null);
+    if (!S.stageOn) return S.frame.stage({ what: 'Closed', action: { label: 'Open it', go: function () { $('[data-open-stage]').click(); } } });
+    S.frame.stage({ what: A.stageSays(view), action: stageExtra() ? { label: 'Clear', go: clearStage } : null });
   }
   // Start the session: the first part, with its clock running.
   $('[data-start-session]').addEventListener('click', function () {
@@ -2684,25 +2700,13 @@
     });
   });
 
-  // Closing the stage ends Meet's activity, which only the leader who
-  // opened it can do (found in Prep's recording, October 28: "can I turn
-  // off the main stage? ... If I press Stop, what happens? Nope.").
+  // The panel never ends Meet's activity: that closes every learner's panel
+  // (Week 2, November 11). Meet's own End activity does it, at the end.
   function stageButtons(open) {
     if (!S.teaching || standalone) return;
     $('[data-open-stage]').hidden = !!open;
-    $('[data-close-stage]').hidden = !open;
+    sendStage();
   }
-  $('[data-close-stage]').addEventListener('click', function () {
-    var status = $('[data-stage-status]');
-    Promise.resolve(side && side.endActivity ? side.endActivity() : Promise.reject(new Error('Meet cannot close it from here'))).then(function () {
-      S.stageOn = false;
-      stageButtons(false);
-      status.textContent = 'The main stage is closed.';
-    }, function (err) {
-      status.textContent = 'The main stage did not close: ' + (err && err.message ? err.message : 'only the leader who opened it can close it') + '. Use End activity in Meet.';
-    });
-  });
-
   // ------------------------------------------------------------------
   // Hearing about changes (as on /live/)
   // ------------------------------------------------------------------

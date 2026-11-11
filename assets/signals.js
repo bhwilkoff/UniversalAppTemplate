@@ -467,7 +467,8 @@
     }
 
     refresh().then(listen);
-    return { refresh: refresh, state: function () { return st; }, send: send, redraw: function () { draw(true); } };
+    return { refresh: refresh, state: function () { return st; }, send: send, redraw: function () { draw(true); },
+      clearKind: function (kind) { return st[kind] ? clear(st[kind], { textContent: '' }) : Promise.resolve(); } };
   }
 
   root.LiveSignals = { start: start };

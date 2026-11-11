@@ -402,3 +402,13 @@ test('a cohort panel can send its stage a website and Propose and vote, and the 
   assert.deepEqual(board.notes[0], { id: 'n1', text: 'An idea', name: 'Bea', votes: 3, mine: true, by: false });
   assert.equal(lib.readStageMessage(lib.stageMessage({ mode: 'part', part: null }, false, false, { total: 0 })).stance, undefined);
 });
+
+test('the leader reads what the stage shows in a few words', () => {
+  assert.equal(lib.stageSays({ mode: 'card', card: { body: 'Five minutes left' } }), 'A card: “Five minutes left”');
+  assert.equal(lib.stageSays({ mode: 'check', prompt: 'Where is your app?' }), 'The question “Where is your app?”');
+  assert.equal(lib.stageSays({ mode: 'check', prompt: 'Where is your app?', count: { total: 2 } }), 'Answers to “Where is your app?”');
+  assert.equal(lib.stageSays({ mode: 'app', who: 'Ada' }), 'Ada’s app');
+  assert.equal(lib.stageSays({ mode: 'scene', scene: { board: 'x' } }), 'The board');
+  assert.equal(lib.stageSays({ mode: 'part', part: { name: 'Arrive' } }), 'This part’s title');
+  assert.ok(lib.stageSays({ mode: 'check', prompt: 'x'.repeat(100) }).length < 80);
+});
