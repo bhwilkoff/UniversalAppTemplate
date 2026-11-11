@@ -1114,10 +1114,12 @@
     var now = S.frame.pane('now');
     if (!S.nowHead) { S.nowHead = el('h2', 'p2-now-head'); now.insertBefore(S.nowHead, now.firstChild); }
     var showing = !!(part && part.kind === 'presenter');
-    var head = questionWaiting() ? 'Answer the question' : showing ? 'Show your app' : '';
+    var room = S.svc && S.svc.showing ? S.svc.showing() : null;
+    var head = questionWaiting() ? 'Answer the question' : room === 'board' ? 'Propose an idea, and vote' : room === 'page' ? 'Try the website on your stage' : showing ? 'Show your app' : '';
     if (S.nowHead.textContent !== head) S.nowHead.textContent = head;
     S.nowHead.hidden = !head;
     if (now.firstChild !== S.nowHead) now.insertBefore(S.nowHead, now.firstChild);
+    if (room === 'board' && S.svcNow && S.svcNow.previousSibling !== S.nowHead) now.insertBefore(S.svcNow, S.nowHead.nextSibling);
     // On a part where people show their app, its button leads Now.
     if (S.mineApp) {
       var want = showing ? now : S.frame.pane('mine');
