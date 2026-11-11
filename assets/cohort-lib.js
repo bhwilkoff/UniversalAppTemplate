@@ -251,7 +251,30 @@
     return out;
   }
 
+  // A cohort's learning outcomes (cohorts.outcomes): what its sessions
+  // practice, never scored. Course Builder's export names each only by
+  // number; names come from its catalog file ([{ id, name, description }]).
+  // An outcome's text drops the catalog's trailing area code, "(H) MC".
+  function outcomeText(d) { return String(d == null ? '' : d).replace(/\s*\([A-Z]\)\s*[A-Z]{2,3}\s*$/, '').trim().slice(0, 600); }
+  function nameOutcomes(outcomes, catalog) {
+    var by = {}, named = 0;
+    (Array.isArray(catalog) ? catalog : []).forEach(function (x) { if (x && Number.isInteger(x.id) && typeof x.name === 'string') by[x.id] = x; });
+    var out = (outcomes || []).map(function (o) {
+      var c = by[o.ref];
+      if (!c || o.name) return o;
+      named += 1;
+      return Object.assign({}, o, { name: c.name.trim().slice(0, 120), text: outcomeText(c.description) || null });
+    });
+    return { outcomes: out, named: named };
+  }
+  // The named outcomes a session practices, in its own order.
+  function sessionOutcomes(session, cohort) {
+    var all = (cohort && Array.isArray(cohort.outcomes)) ? cohort.outcomes : [];
+    return ((session && session.outcomes) || []).map(function (id) { return all.filter(function (o) { return o.id === id && o.name; })[0]; }).filter(Boolean);
+  }
+
   var lib = {
+    outcomeText: outcomeText, nameOutcomes: nameOutcomes, sessionOutcomes: sessionOutcomes,
     welcome: welcome, blocks: blocks, sessionName: sessionName, sessionTitle: sessionTitle, sessionUrl: sessionUrl,
     setupSteps: setupSteps, agenda: agenda, partNow: partNow, stagesForWeek: stagesForWeek, stagesShownAt: stagesShownAt, stageFile: stageFile,
     readyBar: readyBar, readinessText: readinessText, seenText: seenText, canConfirm: canConfirm, partnersOf: partnersOf,

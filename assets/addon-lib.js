@@ -247,7 +247,7 @@
     // One room's people and workbook answers, for its debrief, and one written
     // answer: both read through on_stage(), which only gives what a leader put up.
     if (on && on.kind === 'room' && state.onStageDetail && state.onStageDetail.kind === 'room') return { mode: 'room', part: part, room: roomOf(state.onStageDetail) };
-    if (on && on.kind === 'answer' && state.onStageDetail && state.onStageDetail.kind === 'answer') return { mode: 'answer', part: part, answer: answerOf(state.onStageDetail) };
+    if (on && (on.kind === 'answer' || on.kind === 'work') && state.onStageDetail && state.onStageDetail.kind === on.kind) return { mode: 'answer', part: part, answer: answerOf(state.onStageDetail) };
     // Someone featured by name (a presenter part's config.feature).
     if (on && on.kind === 'person') {
       var pv = { mode: 'person', part: part, who: cut((state.names || {})[on.id] || 'Someone', 80) };

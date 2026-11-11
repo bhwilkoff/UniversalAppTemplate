@@ -125,6 +125,17 @@
     return out;
   }
 
+  // What a part keeps that its form does not edit, for the kind it is now:
+  // any part's document, featuring, and earlier question; a breakout's
+  // groups and workbooks; a question's count setting and rerun.
+  var CARRIED = { any: ['show', 'results_of', 'feature', 'feature_count'], rooms: ['groups', 'group_size', 'sorting', 'group_docs', 'workbooks'], question: ['show_tally', 'rerun_of'] };
+  function carriedConfig(k, config) {
+    var out = {};
+    config = config || {};
+    CARRIED.any.concat(CARRIED[k] || []).forEach(function (key) { if (config[key] != null) out[key] = config[key]; });
+    return out;
+  }
+
   // The first problem with a scene as a sentence, or null when it fits.
   function problem(scene) {
     var k = kind(scene && scene.kind);
@@ -223,7 +234,7 @@
   var lib = {
     KINDS: KINDS, PART_KIND: PART_KIND, kind: kind, roomScenes: roomScenes, defaultShow: defaultShow, total: total,
     fitText: fitText, startTimes: startTimes, moved: moved, optionsFromText: optionsFromText,
-    roomScenesFromText: roomScenesFromText, roomScenesToText: roomScenesToText, cleanConfig: cleanConfig,
+    roomScenesFromText: roomScenesFromText, roomScenesToText: roomScenesToText, cleanConfig: cleanConfig, carriedConfig: carriedConfig,
     problem: problem, copySource: copySource, stagePreview: stagePreview
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;

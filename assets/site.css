@@ -3367,6 +3367,12 @@ a.person-name:hover { text-decoration: underline; }
 .session-before-text ul, .session-before-text ol { margin: 0 0 0.75rem; padding-left: 1.25rem; }
 .session-readings { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.6rem; }
 .session-readings .small { margin: 0.15rem 0 0; color: var(--muted); }
+.session-outcomes-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
+.session-outcomes-list strong { font-weight: 600; }
+.session-outcomes-list span { color: var(--muted); }
+.session-outcomes, .session-after-work { margin-bottom: 1.5rem; }
+.part-goal { margin: 0.25rem 0 0; color: var(--muted); max-width: 60ch; }
+.p2-goal { margin: 0 0 0.5rem; color: var(--muted); font-size: 0.875rem; }
 
 /* Workbooks (session Before, and a breakout room's panel). */
 .session-workbooks { display: grid; gap: 1.5rem; max-width: 44rem; margin-bottom: 1.5rem; }

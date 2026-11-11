@@ -10,7 +10,7 @@ const course = {
     R('Course', { id: 99, course_title: 'Thinking Tools', course_code: 'TT01', course_description: '# Welcome\n\nA short course.' }),
     R('Plan', { id: 2, week_number: 1, class_number: 2, topics: 'Second', study_guide: '', purpose: 'Why two.', pre_class_work: '' }),
     R('Plan', { id: 1, week_number: 1, class_number: 1, topics: 'First', session_overview: 'What today is about.', study_guide: 'Read the guide.', purpose: 'Only for you.', faculty_readings: 'A paper for you.', pre_class_work: '[Join](https://example.com)' }),
-    R('Activity', { id: 10, plan_id: 1, order: 1, title: 'Opening', faculty_instructions: { value: 'Set the tone.' } }),
+    R('Activity', { id: 10, plan_id: 1, order: 1, title: 'Opening', faculty_instructions: { value: 'Set the tone.' }, activity_learning_goals: { value: '- Say what *you* expect.', display: true } }),
     R('ActivityStep', { id: 100, activity_id: 10, order: 1, title: 'Welcome', time: 3, faculty_instructions: { value: '' }, engagement_prompt: { value: 'Ask who has been here before.' }, focus_questions: { values: { q0: { question: 'Are they ready?', answer: 'Most are' } } } }),
     R('ActivityStep', { id: 101, activity_id: 10, order: 2, title: 'Poll', time: 2, faculty_instructions: { value: '' }, engagement_prompt: { value: '' }, focus_questions: { values: {} } }),
     R('ActivityStep', { id: 102, activity_id: 10, order: 3, title: 'Debrief', time: 4, faculty_instructions: { value: '' }, engagement_prompt: { value: '' }, focus_questions: { values: {} } }),
@@ -87,8 +87,12 @@ test('every element type lands somewhere, and nothing is silently dropped', () =
     ['group', 'G2 workbook', '11111111-2222-3333-4444-555555555555']
   ]);
   assert.equal(r.counts.workbooks, 2);
-  // Grading and learning outcomes are counted as left out, never scored.
-  assert.deepEqual(r.counts.skipped, { 'grading weight': 1, 'learning outcome': 1 });
+  // Grading weights are kept in the whole export, never used; outcomes come
+  // with their sessions, by Course Builder's number, waiting for names.
+  assert.deepEqual(r.counts.skipped, {});
+  assert.equal(r.counts.gradingKept, 1);
+  assert.deepEqual(r.cohort.outcomes, [{ id: 'glo:8', ref: 8, name: null, text: null }]);
+  assert.deepEqual(r.sessions[0].outcomes, ['glo:8']);
   // A class with no steps still arrives as one part.
   assert.equal(r.sessions[1].scenes.length, 1);
 });
@@ -149,4 +153,14 @@ test('a step features several beside its poll, and a repoll asks the poll again'
   assert.equal(again.kind, 'question');
   assert.equal(again.config.rerun_of_ref, 'el:1003');
   assert.deepEqual(again.config.options, ['A', 'B']);
+});
+
+test('a part carries its activity\'s goal, never Course Builder\'s placeholder or N/a', () => {
+  const r = convert(course);
+  assert.equal(r.sessions[0].scenes[0].goal, '- Say what you expect.');
+  const c = JSON.parse(JSON.stringify(course));
+  c.records.filter((x) => x.type === 'Activity')[0].data.activity_learning_goals = { value: 'Provide a concise and concrete goal that can be evaluated at the end of the activity.', display: true };
+  assert.equal(convert(c).sessions[0].scenes[0].goal, null);
+  c.records.filter((x) => x.type === 'Activity')[0].data.activity_learning_goals = { value: '\\[N/a for this step\\]', display: false };
+  assert.equal(convert(c).sessions[0].scenes[0].goal, null);
 });

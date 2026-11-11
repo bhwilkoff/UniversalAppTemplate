@@ -121,6 +121,8 @@
     drawPlan(cohort, sessions, session, leading, finished);
     drawPrep(cohort, session, leading);
     drawBefore(session);
+    K.outcomes = drawOutcomes(session, cohort);
+    drawAfterWork(session, leading);
     drawWorkbooks(cohort, session, leading);
 
     K.started = !!(session.starts_at && Date.parse(session.starts_at) < Date.now());
@@ -137,7 +139,7 @@
   // One view at a time (SESSION-DESIGN.md), opening where this person is needed.
   function drawViews(session, leading, finished, played, bring) {
     var items = Array.isArray(session.prep_questions) ? session.prep_questions : [];
-    var own = !!(session.before || (Array.isArray(session.readings) && session.readings.length) || K.hasWorkbooks);
+    var own = !!(session.before || (Array.isArray(session.readings) && session.readings.length) || K.hasWorkbooks || K.outcomes);
     var before = leading || own || items.length > 0 || (!!bring && !finished);
     var list = [];
     function add(key, label) { list.push({ key: key, label: label }); }
@@ -146,7 +148,7 @@
     if (before) add('before', 'Before');
     if (!leading) add('plan', 'Plan');
     if (played && !finished) add('recording', 'Recording');
-    if (K.started) add('after', 'After');
+    if (K.started || session.after || leading) add('after', 'After');
     // A part's address names the view too, and the row's links never carry a part.
     var url = new URL(location.href), opened = url.searchParams.get('part');
     if (opened) { url.searchParams.delete('part'); url.searchParams.set('t', 'plan'); history.replaceState(null, '', url.pathname + url.search); }
@@ -215,6 +217,64 @@
 
   // The session's own words before it, and its readings (sessions.before and
   // sessions.readings, often brought from Course Builder), for everyone.
+  // Words a leader or Course Builder wrote, as paragraphs and lists.
+  function drawWords(box, text) {
+    box.replaceChildren();
+    function fill(node, parts) {
+      parts.forEach(function (r) {
+        var n;
+        if (r.href) { n = el('a', null, r.text); n.href = r.href; n.target = '_blank'; n.rel = 'noopener'; }
+        else if (r.bold) n = el('strong', null, r.text);
+        else if (r.italic) n = el('em', null, r.text);
+        else n = document.createTextNode(r.text);
+        node.appendChild(n);
+      });
+      return node;
+    }
+    lib.blocks(text || '').forEach(function (b) {
+      if (b.type === 'p') return box.appendChild(fill(el('p'), b.items[0]));
+      var list = el(b.type);
+      b.items.forEach(function (it) { list.appendChild(fill(el('li'), it)); });
+      box.appendChild(list);
+    });
+  }
+
+  // What the session practices (sessions.outcomes, named in cohorts.outcomes):
+  // a purpose to read before, never a score.
+  function drawOutcomes(session, cohort) {
+    var list = lib.sessionOutcomes ? lib.sessionOutcomes(session, cohort) : [];
+    var ul = $('[data-outcomes]'); ul.replaceChildren();
+    $('[data-outcomes-section]').hidden = !list.length;
+    list.forEach(function (o) {
+      var li = el('li');
+      li.appendChild(el('strong', null, '#' + o.name));
+      if (o.text) li.appendChild(el('span', null, ' ' + o.text));
+      ul.appendChild(li);
+    });
+    return list.length;
+  }
+
+  // What a session asks of people afterward (sessions.after): everyone reads
+  // it in After; its leaders write it there.
+  function drawAfterWork(session, leading) {
+    var sec = $('[data-afterwork-section]'), f = $('[data-afterwork-form]');
+    drawWords($('[data-afterwork-text]'), session.after);
+    sec.hidden = !session.after || leading;
+    f.hidden = !leading;
+    if (!leading) return;
+    f.elements.after.value = session.after || '';
+    f.onsubmit = function (ev) {
+      ev.preventDefault();
+      var said = $('[data-afterwork-status]'), v = f.elements.after.value.trim() || null;
+      U.say(said, 'Saving');
+      db.from('sessions').update({ after: v }).eq('id', session.id).then(function (r) {
+        if (r.error) return U.say(said, 'Not saved: ' + r.error.message, 'problem');
+        session.after = v;
+        U.say(said, 'Saved');
+      });
+    };
+  }
+
   function drawBefore(session) {
     var sec = $('[data-before-section]'), box = $('[data-before-text]'), ul = $('[data-readings]');
     var reads = Array.isArray(session.readings) ? session.readings.filter(function (r) { return r && r.title; }) : [];

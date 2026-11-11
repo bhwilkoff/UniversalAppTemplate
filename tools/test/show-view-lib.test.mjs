@@ -126,4 +126,5 @@ test('several people, a room, and one answer go on the stage and come back', () 
   assert.deepEqual(S.pinOf({ stage: 'people', featured: ['a', 'b'] }), { kind: 'people', ids: ['a', 'b'] });
   assert.deepEqual(S.pinOf(S.stageChange({ kind: 'room', id: 'g' })), { kind: 'room', id: 'g' });
   assert.deepEqual(S.pinOf(S.stageChange({ kind: 'answer', id: 'x', named: true })), { kind: 'answer', id: 'x', named: true });
+  assert.deepEqual(S.pinOf(S.stageChange({ kind: 'work', id: 'w', named: false })), { kind: 'work', id: 'w', named: false });
 });

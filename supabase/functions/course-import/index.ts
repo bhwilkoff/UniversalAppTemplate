@@ -92,7 +92,7 @@ async function build(db: any, leader: string, course: any, courseRef: string | n
       const slides = sc.deck ? sc.deck.split('\n').filter((l: string) => !/^>/.test(l)).join('\n') : null;
       const ins = await db.from('scenes').insert({
         cohort_id: cohortId, session_id: sid, position: sc.position, kind: sc.kind, title: sc.title,
-        minutes: sc.minutes, body: sc.body || null, config, slides, created_by: leader,
+        minutes: sc.minutes, body: sc.body || null, config, slides, goal: sc.goal || null, created_by: leader,
       }).select('id').single();
       if (ins.error) throw new Error('A part of session ' + s.number + ' ("' + sc.title + '") could not be made: ' + ins.error.message);
       const id = ins.data.id;
@@ -126,7 +126,12 @@ async function refresh(db: any, cohortId: string, course: any, courseRef: string
   const plan = convert(course);
   const kept = await db.from('course_sources').upsert({ cohort_id: cohortId, course_ref: courseRef, export: course, received_at: new Date().toISOString() });
   if (kept.error) throw new Error('The course export could not be kept: ' + kept.error.message);
-  const c = await db.from('cohorts').update({ outcomes: plan.cohort.outcomes || [] }).eq('id', cohortId);
+  // Names a leader already brought in for an outcome stay with it.
+  const was = await db.from('cohorts').select('outcomes').eq('id', cohortId).single();
+  const named: Record<string, { name: string | null; text: string | null }> = {};
+  for (const o of ((was.data && was.data.outcomes) || [])) named[o.id] = o;
+  const outcomes = (plan.cohort.outcomes || []).map((o: { id: string }) => Object.assign({}, o, named[o.id] && named[o.id].name ? { name: named[o.id].name, text: named[o.id].text } : {}));
+  const c = await db.from('cohorts').update({ outcomes }).eq('id', cohortId);
   if (c.error) throw new Error('The outcomes could not be saved: ' + c.error.message);
   const have = await db.from('sessions').select('id, number, after').eq('cohort_id', cohortId);
   let matched = 0;
@@ -138,6 +143,14 @@ async function refresh(db: any, cohortId: string, course: any, courseRef: string
     const u = await db.from('sessions').update(change).eq('id', row.id);
     if (u.error) throw new Error('Session ' + s.number + ' could not be updated: ' + u.error.message);
     matched += 1;
+    // A part still where the course put it, with its title, takes its goal
+    // when it has none of its own.
+    const parts = await db.from('scenes').select('id, position, title, goal').eq('session_id', row.id);
+    for (const sc of s.scenes) {
+      if (!sc.goal) continue;
+      const p = (parts.data || []).filter((x: { position: number; title: string; goal: string | null }) => x.position === sc.position && x.title === sc.title && !x.goal)[0];
+      if (p) await db.from('scenes').update({ goal: sc.goal }).eq('id', p.id);
+    }
   }
   return { cohortId, counts: Object.assign({}, plan.counts, { refreshed: matched }), warnings: plan.warnings };
 }

@@ -208,6 +208,7 @@
       var head = el('div', 'part-read');
       head.appendChild(el('p', 'part-line fam-' + family(s.kind), plain(s.kind) + ', ' + s.minutes + ' min'));
       head.appendChild(el('h2', 'part-heading', s.title));
+      if (s.goal) head.appendChild(el('p', 'part-goal', s.goal));
       page.appendChild(head);
       if (s.slides && window.SlideStudio) {
         var deck = el('div');
@@ -278,6 +279,8 @@
       var kl = field('Activity', kindSel);
       var title = el('input'); title.name = 'title'; title.maxLength = 120; title.required = true; title.value = s ? s.title : '';
       var titleL = field('Title', title);
+      var goal = el('textarea'); goal.name = 'goal'; goal.rows = 2; goal.maxLength = 600; goal.value = (s && s.goal) || '';
+      field('Purpose', goal, 'What this part is for, shown with it.');
       var minutes = el('input'); minutes.name = 'minutes'; minutes.type = 'number'; minutes.min = 1; minutes.max = 240; minutes.required = true; minutes.value = s ? s.minutes : 5;
       var minutesL = field('Minutes', minutes);
       var body = el('textarea'); body.name = 'body'; body.rows = 3; body.maxLength = 2000; body.value = (s && s.body) || '';
@@ -386,6 +389,11 @@
         };
         var p = S.problem(row);
         if (p) { saved(p); return; }
+        // What this form does not show stays: a part's document, whom to
+        // feature, its breakout groups and workbooks, and its question's
+        // settings, all brought from Course Builder or set elsewhere.
+        row.config = Object.assign(S.carriedConfig(k, c), row.config);
+        row.goal = goal.value.trim() || null;
         saved('Saving…');
         return Promise.all([db.from('scenes').update(row).eq('id', s.id).select('id').single(), saveNote(s.id, note.value.trim())]).then(function (both) {
           var r = both[0], nr = both[1];

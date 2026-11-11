@@ -1508,7 +1508,7 @@
   // written answer, through on_stage().
   function loadStageDetail() {
     var on = S.onStage;
-    if (!on || (on.kind !== 'room' && on.kind !== 'answer')) { if (S.onStageDetail) { S.onStageDetail = null; sendStage(); } return; }
+    if (!on || (on.kind !== 'room' && on.kind !== 'answer' && on.kind !== 'work')) { if (S.onStageDetail) { S.onStageDetail = null; sendStage(); } return; }
     var want = on.kind + ':' + on.id + ':' + !!on.named;
     db.rpc('on_stage', { s: S.session.id }).then(function (r) {
       var d = r && r.data;
@@ -1530,6 +1530,9 @@
           S.onStageDetail = d; sendStage();
         });
       }
+      // Pre-class work shows as one answer: its question, the words, and the
+      // name only when shown.
+      if (d.kind === 'work') d = { kind: 'work', prompt: workQuestion(d.block) || d.title || '', text: workText(d.block, d.value), who: d.who || null };
       S.onStageDetail = d; sendStage();
     });
   }
@@ -1551,6 +1554,8 @@
     if (!box) return;
     box.replaceChildren();
     var part = partNow(), c = part && part.own ? part.config || {} : {};
+    // What the part is for (scenes.goal), for everyone in the call.
+    if (part && part.goal) box.appendChild(el('p', 'p2-goal', part.goal));
     if (S.teaching && c.show && c.show.url) {
       var row = el('div', 'actions');
       var up = S.onStage && S.onStage.kind === 'doc';
@@ -1561,6 +1566,7 @@
     }
     if (S.teaching && part && ((c.feature && c.feature !== 'teacher') || part.kind === 'presenter')) drawFeature(box, part, c.feature);
     if (S.teaching) drawRoomsWork(box);
+    if (S.teaching) drawPrework(box);
     var docs = part && part.kind === 'rooms' && Array.isArray(c.group_docs) ? c.group_docs : [];
     if (docs.length) {
       var mine = null;
@@ -1585,6 +1591,79 @@
     if (part && part.kind === 'rooms' && Array.isArray(c.workbooks) && c.workbooks.length) drawRoomWorkbook(box, c.workbooks);
     box.hidden = !box.children.length;
   }
+  // Pre-class work (Course Builder's "Feature pre-class work"): for a leader,
+  // how many answered each of the session's own workbooks, and any written
+  // answer to put on every stage, without its author's name until shown
+  // (show_state stage 'work', read through on_stage()).
+  function workText(block, v) {
+    v = v || {};
+    if (v.text) return String(v.text);
+    if (v.picks && block) return v.picks.map(function (i) { return (block.choices || [])[i]; }).filter(Boolean).join(', ');
+    if (v.cells) return v.cells.map(function (row) { return row.filter(Boolean).join(' / '); }).filter(Boolean).join('; ');
+    return '';
+  }
+  function workQuestion(block) {
+    var said = block && window.WorkbookLib ? window.WorkbookLib.parts(block.text).filter(function (p) { return p.text; })[0] : null;
+    return said ? said.text.replace(/[*_#]/g, '').split('\n')[0] : '';
+  }
+  function loadPrework() {
+    if (S.preworkLoading || !S.session) return;
+    var sid = S.session.id;
+    S.preworkLoading = true;
+    db.from('workbooks').select('*').eq('session_id', sid).eq('kind', 'individual').order('position').then(function (w) {
+      var list = w.data || [];
+      var answers = list.length ? db.from('workbook_answers').select('id, workbook_id, user_id, block, value').in('workbook_id', list.map(function (x) { return x.id; })).not('user_id', 'is', null) : Promise.resolve({ data: [] });
+      return answers.then(function (a) {
+        S.preworkLoading = false;
+        if (!S.session || S.session.id !== sid) return;
+        S.prework = { session: sid, at: Date.now(), workbooks: list, answers: a.data || [] };
+        drawPartTools();
+      });
+    }, function () { S.preworkLoading = false; });
+  }
+  function drawPrework(box) {
+    if (!S.prework || S.prework.session !== S.session.id || Date.now() - S.prework.at > 120000) loadPrework();
+    var P = S.prework;
+    if (!P || P.session !== S.session.id || !P.workbooks.length) return;
+    var everyone = (S.people || []).length;
+    var det = el('details', 'p2-prework');
+    det.open = !!S.preworkOpen;
+    det.addEventListener('toggle', function () { S.preworkOpen = det.open; if (det.open) loadPrework(); });
+    var sum = el('summary', null, 'Pre-class work');
+    det.appendChild(sum);
+    P.workbooks.forEach(function (w) {
+      var mine = P.answers.filter(function (a) { return a.workbook_id === w.id; });
+      var who = mine.map(function (a) { return a.user_id; }).filter(function (x, i, l) { return l.indexOf(x) === i; });
+      det.appendChild(el('p', 'p2-run-name', w.title));
+      det.appendChild(el('p', 'small', who.length + (everyone ? ' of ' + everyone : '') + ' answered'));
+      (w.blocks || []).filter(function (b) { return b.type !== 'text'; }).forEach(function (b) {
+        var rows = mine.filter(function (a) { return a.block === b.key && workText(b, a.value); });
+        if (!rows.length) return;
+        var q = el('div', 'p2-prework-q');
+        q.appendChild(el('p', 'small', workQuestion(b)));
+        if (b.type === 'choice') {
+          var counts = (b.choices || []).map(function (label, i) { return label + ': ' + rows.filter(function (a) { return ((a.value || {}).picks || []).indexOf(i) >= 0; }).length; });
+          q.appendChild(el('p', 'small', counts.join(' · ')));
+          det.appendChild(q);
+          return;
+        }
+        var ul = el('ul', 'p2-answers');
+        rows.forEach(function (a) {
+          var li = el('li');
+          var text = workText(b, a.value);
+          li.appendChild(el('span', null, (S.names[a.user_id] || 'Someone') + ': ' + (text.length > 140 ? text.slice(0, 139) + '…' : text)));
+          var up = S.onStage && S.onStage.kind === 'work' && S.onStage.id === a.id;
+          li.appendChild(button(up ? 'Take it down' : 'Put on stage', 'link-button', function () { setPin(up ? null : { kind: 'work', id: a.id, named: false }); }));
+          if (up) li.appendChild(button(S.onStage.named ? 'Hide the name' : 'Show the name', 'link-button', function () { setPin({ kind: 'work', id: a.id, named: !S.onStage.named }); }));
+          ul.appendChild(li);
+        });
+        q.appendChild(ul);
+        det.appendChild(q);
+      });
+    });
+    box.appendChild(det);
+  }
+
   // A breakout part's group workbooks, dealt out to the rooms in turn: a
   // learner in a room answers their room's together; a leader sees the list.
   function roomNumber() {

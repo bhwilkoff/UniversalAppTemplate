@@ -133,6 +133,16 @@ function pollQuestion(a) {
   return out;
 }
 
+// An activity's learning goal, when its author wrote one to show: never
+// Course Builder's own placeholder, and never "N/a".
+const GOAL_PLACEHOLDER = /^provide a concise and concrete goal/i;
+function activityGoal(act) {
+  const g = act && act.activity_learning_goals;
+  const v = clean(g && typeof g === 'object' ? g.value : g).replace(/\\([\[\]])/g, '$1');
+  if (!v || (g && g.display === false) || GOAL_PLACEHOLDER.test(v) || /^\[?n\/?a\b/i.test(v)) return null;
+  return cut(plain(v), 600);
+}
+
 // The whole course. Returns { cohort, sessions, warnings, counts }.
 export function convert(exported) {
   if (!exported || !exported.headers || exported.headers.version !== 1 || !Array.isArray(exported.records)) {
@@ -163,8 +173,20 @@ export function convert(exported) {
   const warnings = [];
   const counts = { sessions: 0, parts: 0, slides: 0, questions: 0, breakouts: 0, featured: 0, documents: 0, readings: 0, workbooks: 0, skipped: {} };
   function skip(what) { counts.skipped[what] = (counts.skipped[what] || 0) + 1; }
-  pick(rec, 'CourseGradingWeight').forEach(() => skip('grading weight'));
-  pick(rec, 'PlanGeneralLearningOutcome').forEach(() => skip('learning outcome'));
+  // Grading weights are kept only in the whole export (course_sources): this
+  // site never scores. Outcomes come with each session, by Course Builder's
+  // number; their names come from Course Builder's catalog, not the export.
+  counts.gradingKept = pick(rec, 'CourseGradingWeight').length;
+  const planOutcomes = {};
+  const outcomes = [];
+  pick(rec, 'PlanGeneralLearningOutcome').sort((a, b) => Number(a.id) - Number(b.id)).forEach((o) => {
+    const n = Number(o.general_learning_outcome_id);
+    if (!Number.isInteger(n) || n <= 0) return;
+    const id = 'glo:' + n;
+    (planOutcomes[o.plan_id] = planOutcomes[o.plan_id] || []).indexOf(id) < 0 && planOutcomes[o.plan_id].push(id);
+    if (!outcomes.some((x) => x.id === id)) outcomes.push({ id, ref: n, name: null, text: null });
+  });
+  counts.outcomes = outcomes.length;
 
   const sessions = plans.map((plan, i) => {
     const number = i + 1;
@@ -206,6 +228,7 @@ export function convert(exported) {
 
     const scenes = [];
     activities.filter((a) => a.plan_id === plan.id).sort(byOrder).forEach((act) => {
+      const goal = activityGoal(act);
       const mine = steps.filter((s) => s.activity_id === act.id).sort(byOrder);
       mine.forEach((step, si) => {
         const els = elements.filter((e) => e.activity_step_id === step.id).sort(byOrder);
@@ -248,7 +271,7 @@ export function convert(exported) {
         });
 
         function scene(kind, title, extra) {
-          const s = Object.assign({ kind, title: cut(title, LIMIT.title), minutes: Math.max(1, Math.min(240, Number(step.time) || 1)), body: '', config: {}, notes: '', deck: '', ref: null }, extra || {});
+          const s = Object.assign({ kind, title: cut(title, LIMIT.title), minutes: Math.max(1, Math.min(240, Number(step.time) || 1)), body: '', config: {}, notes: '', deck: '', ref: null, goal }, extra || {});
           scenes.push(s);
           counts.parts += 1;
           return s;
@@ -317,7 +340,6 @@ export function convert(exported) {
           lead.config.show = { url: shows[0].url, name: cut(shows[0].name, 200) };
           shows.slice(1).forEach((x) => extras.push('- ' + x.name + ': ' + x.url));
         }
-        shows.filter((x) => x.kind === 'minerva').forEach((x) => warnings.push(title + ', ' + stepTitle + ': "' + x.name + '" is a Minerva workbook only Minerva accounts can open.'));
         if (docText.length) {
           const text = docText.join('\n\n');
           if (!lead.body) lead.body = cut(plain(text), LIMIT.body);
@@ -336,7 +358,7 @@ export function convert(exported) {
     }
     scenes.forEach((s, p) => { s.position = p; });
     counts.sessions += 1;
-    return { number, title: cut(title, LIMIT.title), before: before ? cut(before, LIMIT.before) : null, readings: reads.length ? reads.slice(0, 60) : null, scenes, workbooks, after: null, outcomes: [] };
+    return { number, title: cut(title, LIMIT.title), before: before ? cut(before, LIMIT.before) : null, readings: reads.length ? reads.slice(0, 60) : null, scenes, workbooks, after: null, outcomes: (planOutcomes[plan.id] || []).slice(0, 60) };
   });
 
   const minutes = Math.max(30, Math.min(240, Math.round(Math.max(...sessions.map((s) => s.scenes.reduce((n, x) => n + x.minutes, 0)), 60) / 15) * 15));
@@ -345,7 +367,7 @@ export function convert(exported) {
       title: cut(oneLine(course.course_title) || 'An imported course', LIMIT.cohortTitle),
       description: clean(course.course_description) ? cut(clean(course.course_description).replace(/^#{1,6}\s+/gm, ''), LIMIT.description) : null,
       schedule: 'custom',
-      outcomes: [],
+      outcomes: outcomes.slice(0, 300),
       session_minutes: minutes,
       details: { source: { system: 'coursebuilder', course_id: exported.headers.source_course_id, code: oneLine(course.course_code) || null, environment: exported.headers.source_environment } }
     },

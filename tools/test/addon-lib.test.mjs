@@ -384,4 +384,7 @@ test('several featured, a room\'s work, and one answer reach the stage as sent',
   assert.deepEqual(lib.readStageMessage(lib.stageMessage(ans)).answer, { prompt: 'Why?', text: 'Because', who: null });
   // Without what on_stage gave, a room or an answer shows nothing of anyone's.
   assert.notEqual(lib.stageView({ part: null, onStage: { kind: 'answer', id: 'x' } }).mode, 'answer');
+  const work = lib.stageView({ part: null, onStage: { kind: 'work', id: 'w' }, onStageDetail: { kind: 'work', prompt: 'Before class: why?', text: 'Mine', who: 'Bea' } });
+  assert.deepEqual([work.mode, work.answer.text, work.answer.who], ['answer', 'Mine', 'Bea']);
+  assert.notEqual(lib.stageView({ part: null, onStage: { kind: 'work', id: 'w' }, onStageDetail: { kind: 'answer', text: 'x' } }).mode, 'answer');
 });

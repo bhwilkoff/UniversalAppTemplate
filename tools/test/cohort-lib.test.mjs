@@ -158,3 +158,15 @@ test('a session\'s words before it become paragraphs, lists, and safe links', ()
   assert.equal(b[3].type, 'ol');
   assert.deepEqual(b[4].items[0], [{ text: '[bad](javascript:alert(1))' }]);
 });
+
+test('outcomes take their names from the catalog, keep names given, and a session lists its named ones', () => {
+  const outcomes = [{ id: 'glo:8', ref: 8, name: null, text: null }, { id: 'glo:9', ref: 9, name: 'Kept', text: 'Mine' }, { id: 'glo:7', ref: 7, name: null, text: null }];
+  const catalog = [{ id: 8, name: 'professionalism', description: 'Follow established guidelines. (H) MC' }, { id: 9, name: 'other', description: 'x' }, { id: '7', name: 'string id' }];
+  const C = lib;
+  const r = C.nameOutcomes(outcomes, catalog);
+  assert.equal(r.named, 1);
+  assert.deepEqual(r.outcomes[0], { id: 'glo:8', ref: 8, name: 'professionalism', text: 'Follow established guidelines.' });
+  assert.equal(r.outcomes[1].name, 'Kept');
+  assert.equal(r.outcomes[2].name, null);
+  assert.deepEqual(C.sessionOutcomes({ outcomes: ['glo:7', 'glo:8'] }, { outcomes: r.outcomes }).map((o) => o.name), ['professionalism']);
+});

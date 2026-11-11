@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261111g">
+  <link rel="stylesheet" href="/assets/site.css?v=20261111h">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -108,6 +108,10 @@
               <h2 data-readings-head hidden>Readings and materials</h2>
               <ul class="session-readings" data-readings hidden></ul>
             </section>
+            <section class="session-outcomes" aria-labelledby="outcomes-head" data-outcomes-section hidden>
+              <h2 id="outcomes-head">What it practices</h2>
+              <ul class="session-outcomes-list" data-outcomes></ul>
+            </section>
             <section class="session-workbooks" aria-label="Workbooks" data-workbooks hidden></section>
             <section class="session-prep" aria-label="Before this session" data-prep-section hidden>
               <p class="small" data-prep-note></p>
@@ -136,6 +140,17 @@
           </div>
 
           <div data-tab="after" hidden>
+            <section class="session-after-work" aria-labelledby="afterwork-head" data-afterwork-section hidden>
+              <h2 id="afterwork-head">After this session</h2>
+              <div class="session-before-text" data-afterwork-text></div>
+            </section>
+            <form class="cohort-form" data-afterwork-form hidden>
+              <label>After this session
+                <span class="hint"><span data-vis="cohort"></span></span>
+                <textarea name="after" rows="4" maxlength="20000"></textarea>
+              </label>
+              <div class="actions"><button class="btn-secondary" type="submit">Save</button><span class="ui-inline-status" role="status" data-afterwork-status></span></div>
+            </form>
             <section class="session-after" aria-label="What happened">
               <div data-story></div>
             </section>
@@ -171,7 +186,7 @@
   </main>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" defer></script>
   <script src="/assets/hub-config.js?v=20261016a" defer></script>
-  <script src="/assets/cohort-lib.js?v=20261111b" defer></script>
+  <script src="/assets/cohort-lib.js?v=20261111h" defer></script>
   <script src="/assets/live-lib.js" defer></script>
   <script src="/assets/question-view.js?v=20261106a" defer></script>
   <script src="/assets/board-lib.js" defer></script>
@@ -180,19 +195,19 @@
   <script src="/assets/slide-model.js?v=20261110a" defer></script>
   <script src="/assets/github-block.js?v=20261107a" defer></script>
   <script src="/assets/slide-studio.js?v=20261110a" defer></script>
-  <script src="/assets/show-lib.js?v=20261107m" defer></script>
+  <script src="/assets/show-lib.js?v=20261111h" defer></script>
   <script src="/assets/curriculum-pages-lib.js" defer></script>
   <script src="/assets/teach-lib.js?v=20261111b" defer></script>
   <script src="/assets/curriculum-lib.js?v=20261107a" defer></script>
   <script src="/assets/curriculum-seed.js?v=20261107a" defer></script>
-  <script src="/assets/show-builder.js?v=20261111a" defer></script>
+  <script src="/assets/show-builder.js?v=20261111h" defer></script>
   <script src="/assets/cohort-nav.js?v=20261106a" defer></script>
   <script src="/assets/record-lib.js?v=20261107a" defer></script>
   <script src="/assets/react-lib.js?v=20261107a" defer></script>
   <script src="/assets/session-story-lib.js?v=20261107c" defer></script>
   <script src="/assets/workbook-lib.js?v=20261111c" defer></script>
   <script src="/assets/workbook-view.js?v=20261111b" defer></script>
-  <script src="/assets/session.js?v=20261111e" defer></script>
+  <script src="/assets/session.js?v=20261111h" defer></script>
 
   <footer class="site-footer">
     <div class="wrap">

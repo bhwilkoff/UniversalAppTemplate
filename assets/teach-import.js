@@ -8,7 +8,7 @@
   var el = window.TeachPage.el;
   var form = root.querySelector('[data-import-form]'), out = root.querySelector('[data-import-result]');
   var S = {};
-  var LABELS = { sessions: 'sessions', parts: 'parts', slides: 'slides', questions: 'questions', breakouts: 'breakouts', featured: 'people featured', documents: 'documents to show', readings: 'readings and materials', workbooks: 'Minerva workbooks' };
+  var LABELS = { sessions: 'sessions', parts: 'parts', slides: 'slides', questions: 'questions', breakouts: 'breakouts', featured: 'people featured', documents: 'documents to show', readings: 'readings and materials', workbooks: 'Minerva workbooks', outcomes: 'learning outcomes' };
 
   function say(text, cls) {
     out.hidden = false;
@@ -30,6 +30,7 @@
     out.appendChild(el('h2', null, 'It arrived as a draft'));
     var bits = Object.keys(LABELS).filter(function (k) { return c[k]; }).map(function (k) { return c[k] + ' ' + LABELS[k]; });
     if (bits.length) out.appendChild(el('p', null, bits.join(', ') + '.'));
+    if (c.gradingKept) out.appendChild(el('p', 'small', 'Kept with the course, never used to score: ' + c.gradingKept + ' grading weight' + (c.gradingKept === 1 ? '' : 's') + '.'));
     var skipped = Object.keys(c.skipped || {});
     if (skipped.length) out.appendChild(el('p', 'small', 'Left out on purpose: ' + skipped.map(function (k) { return c.skipped[k] + ' ' + k + (c.skipped[k] === 1 ? '' : 's'); }).join(', ') + '.'));
     var warn = row.warnings || [];
@@ -120,7 +121,52 @@
     return show();
   }
 
+  // Outcomes that came in by number only (cohorts.outcomes, name null), named
+  // from Course Builder's catalog file: its /api/v2/core/general_learning_outcomes/
+  // list, read from a page signed in to Course Builder. Names given stay.
+  function outcomesIn(db) {
+    var sec = root.querySelector('[data-outcomes-in]'), said = root.querySelector('[data-outcomes-status]');
+    var input = root.querySelector('[data-outcomes-file]'), C = window.CohortLib;
+    function waiting() {
+      return db.from('cohorts').select('id, title, outcomes').then(function (r) {
+        return (r.data || []).filter(function (c) { return (c.outcomes || []).some(function (o) { return !o.name; }); });
+      });
+    }
+    function show() {
+      return waiting().then(function (list) {
+        var n = list.reduce(function (t, c) { return t + c.outcomes.filter(function (o) { return !o.name; }).length; }, 0);
+        sec.hidden = !n && !said.textContent;
+        root.querySelector('[data-outcomes-waiting]').textContent = n + (n === 1 ? ' outcome is' : ' outcomes are') + ' waiting for a name.';
+      });
+    }
+    if (!C || input.getAttribute('data-wired')) return show();
+    input.setAttribute('data-wired', '1');
+    input.addEventListener('change', function () {
+      var f = input.files && input.files[0];
+      if (!f) return;
+      said.textContent = 'Reading the file…';
+      f.text().then(function (text) {
+        var data = JSON.parse(text), list = Array.isArray(data) ? data : (data && (data.results || data.data)) || [];
+        return waiting().then(function (cohorts) {
+          var named = 0;
+          return cohorts.reduce(function (p, c) {
+            return p.then(function () {
+              var r = C.nameOutcomes(c.outcomes, list);
+              if (!r.named) return null;
+              return db.from('cohorts').update({ outcomes: r.outcomes }).eq('id', c.id).then(function (u) { if (u.error) throw new Error(u.error.message); named += r.named; });
+            });
+          }, Promise.resolve()).then(function () {
+            said.textContent = named + (named === 1 ? ' outcome' : ' outcomes') + ' named.';
+            return show();
+          });
+        });
+      }).catch(function (e) { said.textContent = 'That file could not be read: ' + (e && e.message ? e.message : 'not an outcomes file') + '.'; });
+    });
+    return show();
+  }
+
   window.TeachPage.start(root, function (db) {
+    outcomesIn(db);
     S.refreshWorkbooks = function () { workbooksIn(db); };
     workbooksIn(db);
     // Courses already brought in that this leader leads, to bring in again.

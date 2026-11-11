@@ -99,3 +99,10 @@ test('a writing part keeps its words on the stage, with its prompt after them', 
   assert.equal(p.note, 'What happened today?');
   assert.deepEqual(S.stagePreview({ kind: 'reflection', title: 'X', config: { prompt: 'Only this?' } }).lines, ['Only this?']);
 });
+
+test('a part keeps what its form does not edit, for the kind it is now', () => {
+  const c = { prompt: 'x', show: { url: 'https://a.example' }, feature: 'random', feature_count: 3, groups: 4, workbooks: ['w'], show_tally: false, rerun_of: 'q' };
+  assert.deepEqual(S.carriedConfig('rooms', c), { show: { url: 'https://a.example' }, feature: 'random', feature_count: 3, groups: 4, workbooks: ['w'] });
+  assert.deepEqual(S.carriedConfig('question', c), { show: { url: 'https://a.example' }, feature: 'random', feature_count: 3, show_tally: false, rerun_of: 'q' });
+  assert.deepEqual(S.carriedConfig('talk', {}), {});
+});
