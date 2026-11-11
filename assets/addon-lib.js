@@ -316,7 +316,11 @@
   var STAGE = 'hs-stage';
   // `recording` rides with every view: the stage marks it, because people
   // without the panel open see only the stage.
-  function stageMessage(view, recording, learner) { return JSON.stringify({ type: STAGE, v: 1, view: view, learner: learner === true, recording: recording === true }); }
+  function stageMessage(view, recording, learner, stance) {
+    var m = { type: STAGE, v: 1, view: view, learner: learner === true, recording: recording === true };
+    if (stance && num(stance.total)) m.stance = { agree: Number(stance.agree) || 0, unsure: Number(stance.unsure) || 0, disagree: Number(stance.disagree) || 0, total: Number(stance.total) || 0 };
+    return JSON.stringify(m);
+  }
   function readStageMessage(payload) {
     var v = readStageView(payload);
     if (!v) return null;
@@ -324,6 +328,7 @@
     try { m = typeof payload === 'string' ? JSON.parse(payload) : payload; } catch (e) { m = null; }
     if (m && m.recording === true) v.recording = true;
     if (m && m.learner === true) v.learner = true;
+    if (m && m.stance && num(m.stance.total)) v.stance = { agree: Number(m.stance.agree) || 0, unsure: Number(m.stance.unsure) || 0, disagree: Number(m.stance.disagree) || 0, total: Number(m.stance.total) || 0 };
     return v;
   }
   function readStageView(payload) {
@@ -374,6 +379,16 @@
     if (v.mode === 'answer' && v.answer && typeof v.answer.text === 'string') return { mode: 'answer', part: part, answer: answerOf(v.answer) };
     if (v.mode === 'person') { var pr = { mode: 'person', part: part, who: cut(v.who || 'Someone', 80) }; if (typeof v.audience === 'string' && v.audience) pr.audience = cut(v.audience, 300); return pr; }
     if (v.mode === 'doc') { var dd = docOf(v.doc); return dd ? { mode: 'doc', part: part, doc: dd } : null; }
+    // Open rooms' tools in a cohort's call (CohortRoom): a website by its own
+    // address, and Propose and vote's ideas with their counts.
+    if (v.mode === 'page' && v.page && typeof v.page.url === 'string') {
+      var pu = frameable(v.page.url);
+      return pu ? { mode: 'page', part: part, page: { url: pu, v: Math.max(0, Math.floor(num(v.page.v) || 0)), name: cut(v.page.name || '', 80) }, html: null } : null;
+    }
+    if (v.mode === 'roomboard' && Array.isArray(v.notes)) {
+      return { mode: 'roomboard', part: part, prompt: cut(v.prompt || '', 500), host: v.host === true, cohort: true,
+        notes: v.notes.slice(0, 200).map(function (n) { return { id: cut(n.id || '', 20), text: cut(n.text || '', 280), name: cut(n.name || '', 60), votes: Math.max(0, Math.floor(num(n.votes) || 0)), mine: n.mine === true, by: n.by === true }; }) };
+    }
     if (v.mode === 'part') return { mode: 'part', part: part };
     if (v.mode === 'blank') return { mode: 'blank', part: part };
     if (v.mode === 'path') return { mode: 'path', part: part, path: pathOf(v.path) };

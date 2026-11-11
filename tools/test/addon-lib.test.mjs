@@ -388,3 +388,17 @@ test('several featured, a room\'s work, and one answer reach the stage as sent',
   assert.deepEqual([work.mode, work.answer.text, work.answer.who], ['answer', 'Mine', 'Bea']);
   assert.notEqual(lib.stageView({ part: null, onStage: { kind: 'work', id: 'w' }, onStageDetail: { kind: 'answer', text: 'x' } }).mode, 'answer');
 });
+
+test('a cohort panel can send its stage a website and Propose and vote, and the stance counts', () => {
+  const page = lib.readStageMessage(lib.stageMessage({ mode: 'page', part: null, page: { url: 'https://example.com/app/', v: 2, name: 'App' } }, false, true, { agree: 2, unsure: 1, disagree: 0, total: 3 }));
+  assert.equal(page.mode, 'page');
+  assert.equal(page.page.url, 'https://example.com/app/');
+  assert.deepEqual(page.stance, { agree: 2, unsure: 1, disagree: 0, total: 3 });
+  assert.equal(lib.readStageMessage(lib.stageMessage({ mode: 'page', part: null, page: { url: 'javascript:alert(1)' } })), null);
+  assert.equal(lib.readStageMessage(lib.stageMessage({ mode: 'page', part: null, page: { url: 'https://github.com/x/y' } })), null);
+  const board = lib.readStageMessage(lib.stageMessage({ mode: 'roomboard', part: null, prompt: 'What next?', host: false, notes: [{ id: 'n1', text: 'An idea', name: 'Bea', votes: 3, mine: true, by: false }] }));
+  assert.equal(board.mode, 'roomboard');
+  assert.equal(board.cohort, true);
+  assert.deepEqual(board.notes[0], { id: 'n1', text: 'An idea', name: 'Bea', votes: 3, mine: true, by: false });
+  assert.equal(lib.readStageMessage(lib.stageMessage({ mode: 'part', part: null }, false, false, { total: 0 })).stance, undefined);
+});

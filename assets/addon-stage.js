@@ -518,19 +518,24 @@
     var list = $('[data-rb-notes]'); list.replaceChildren();
     list.classList.toggle('is-empty', !view.notes.length);
     if (!view.notes.length) list.appendChild(el('li', 'stage-quiet', 'No ideas yet. Propose the first one.'));
+    // A cohort's call sends its votes through each person's own panel
+    // (CohortRoom), which already counts each person once.
+    var viaPanel = !!view.cohort;
+    function say(m) { if (viaPanel) act({ a: 'room', m: m }); else room.send(m); }
     view.notes.forEach(function (n) {
+      var count = viaPanel ? n.votes : n.votes.length, mine = viaPanel ? n.mine : n.votes.indexOf(view.you) >= 0;
       var li = el('li', 'room-note');
       li.appendChild(el('p', 'room-note-text', n.text));
       var foot = el('p', 'room-note-foot');
       foot.appendChild(el('span', 'room-note-who', n.name || ''));
-      var v = el('button', 'room-vote', n.votes.length ? String(n.votes.length) : 'Vote'); v.type = 'button';
-      v.setAttribute('aria-label', 'Vote for this. ' + n.votes.length + ' so far.');
-      v.setAttribute('aria-pressed', String(n.votes.indexOf(view.you) >= 0));
-      v.addEventListener('click', function () { room.send({ t: 'vote', id: n.id }); });
+      var v = el('button', 'room-vote', count ? String(count) : 'Vote'); v.type = 'button';
+      v.setAttribute('aria-label', 'Vote for this. ' + count + ' so far.');
+      v.setAttribute('aria-pressed', String(mine));
+      v.addEventListener('click', function () { say({ t: 'vote', id: n.id }); });
       foot.appendChild(v);
-      if (n.by === view.you || view.host) {
+      if ((viaPanel ? n.by : n.by === view.you) || view.host) {
         var x = el('button', 'room-unnote', 'Remove'); x.type = 'button';
-        x.addEventListener('click', function () { room.send({ t: 'unnote', id: n.id }); });
+        x.addEventListener('click', function () { say({ t: 'unnote', id: n.id }); });
         foot.appendChild(x);
       }
       li.appendChild(foot);
@@ -567,6 +572,7 @@
     });
   }
 
+  var lastStance = null;
   function open() {
     if (roomPage) { useRoom(); return; }
     if (!cfg.cloudProjectNumber) { $('[data-error-text]').textContent = 'This add-on is not set up yet.'; return show('error'); }
@@ -587,9 +593,25 @@
       }
       drawReactBar();
       wireAsk();
+      // Open rooms' stances and Propose and vote, in a cohort's call: the
+      // stage asks its own panel, which speaks for this person in the room.
+      if (window.ReactLib && window.ReactLib.STANCES) {
+        var sbar = $('[data-stage-reacts]');
+        window.ReactLib.STANCES.forEach(function (st) {
+          var sb = el('button', 'stage-stance', st.label); sb.type = 'button';
+          sb.addEventListener('click', function () { act({ a: 'room', m: { t: 'stance', stance: st.id } }); });
+          sbar.appendChild(sb);
+        });
+      }
+      $('[data-rb-form]').addEventListener('submit', function (e) {
+        e.preventDefault();
+        var input = e.target.querySelector('input');
+        if (input.value.trim()) act({ a: 'room', m: { t: 'note', text: input.value } });
+        input.value = '';
+      });
       stage.on('frameToFrameMessage', function (m) {
         var react = m && window.ReactLib ? window.ReactLib.readStage(m.payload) : null;
-        if (react) return drawReactions(react);
+        if (react) return drawReactions({ floats: react.floats || [], stance: react.stance || lastStance });
         var code = m && window.CodeLib ? window.CodeLib.readStage(m.payload) : null;
         if (code) {
           $('[data-code-view]').hidden = !code.code;
@@ -602,6 +624,8 @@
         last = m.payload; view = v; heard = true;
         $('[data-stage-waiting]').hidden = true;
         show('ready'); draw();
+        lastStance = v.stance || null;
+        drawReactions({ floats: [], stance: lastStance });
       });
       view = { mode: 'part', part: null };
       show('ready'); draw();

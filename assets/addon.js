@@ -424,7 +424,7 @@
     // The redesigned panel (ADDON-DESIGN.md), a cohort at a time until it is
     // proven. Everything below it is the same parts in a new frame.
     S.newPanel = !!window.PanelFrame && (S.cohort.details || {}).panel !== 'old' && query.get('panel') !== 'old';
-    if (S.newPanel) startFrame();
+    if (S.newPanel) { startFrame(); startCohortRoom(); }
     S.show = window.ShowView.mount({
       mount: $('[data-show]'), parts: S.list, teaching: S.teaching,
       nowBox: S.newPanel ? S.frame.pane('now') : null,
@@ -1040,6 +1040,9 @@
       S.boardTool = el('section', 'p2-group');
       S.boardPin = el('div', 'actions'); S.boardTool.appendChild(S.boardPin);
       F.put('tools', S.boardTool);
+      // Open rooms' tools, through the call's own room (CohortRoom).
+      S.svcSite = el('section', 'p2-group'); S.svcClock = el('section', 'p2-group'); S.svcVote = el('section', 'p2-group');
+      [S.svcSite, S.svcClock, S.svcVote].forEach(function (n) { n.hidden = true; F.put('tools', n); });
       S.nowAsks = el('div', 'p2-asks'); S.nowAsks.hidden = true; F.pane('now').insertBefore(S.nowAsks, F.pane('now').firstChild);
       F.put('tools', S.frameTools);
       S.stageTools = stage; S.askTool = $('[data-ask-wrap]'); S.breakTool = $('[data-breakouts]');
@@ -1073,6 +1076,34 @@
     // The bar that stays: reactions and a guest's name stay with a learner.
     F.low.appendChild($('[data-react]'));
     F.on(function () { nextMove(); }, function () { if (S.run) S.run.step(-1).then(afterMove); });
+  }
+  // Open rooms' tools in this cohort's call: the call's own room carries a
+  // website, a clock, Propose and vote, and stances (ADDON-DESIGN.md).
+  function startCohortRoom() {
+    if (S.svc || standalone || !window.CohortRoom || !window.RoomClient || !S.room || !S.room.code || S.room.groupId) return;
+    S.svc = window.CohortRoom.start({ code: S.room.code, teaching: S.teaching, name: S.names[S.me && S.me.id] || '', title: S.cohort ? S.cohort.title : '', onChange: drawCohortRoom });
+    if (!S.teaching && S.frame) {
+      S.svcNow = el('section', 'p2-group'); S.svcNow.hidden = true;
+      var now = S.frame.pane('now'); now.insertBefore(S.svcNow, now.firstChild);
+      S.svcStances = el('div', 'p2-stance-row'); S.frame.low.appendChild(S.svcStances); S.svc.stanceRow(S.svcStances);
+    }
+    drawCohortRoom();
+  }
+  function drawCohortRoom() {
+    if (!S.svc) return;
+    var typing = document.activeElement && document.activeElement.tagName === 'INPUT';
+    if (S.teaching && S.svcSite) {
+      [[S.svcSite, 'siteTool'], [S.svcClock, 'clockTool'], [S.svcVote, 'voteTool']].forEach(function (x) {
+        if (typing && x[0].contains(document.activeElement)) return;
+        x[0].replaceChildren(); x[0].hidden = false; S.svc[x[1]](x[0]);
+      });
+      drawTiles();
+    }
+    if (S.svcNow && !(typing && S.svcNow.contains(document.activeElement))) {
+      S.svcNow.replaceChildren();
+      S.svcNow.hidden = !S.svc.learnerNow(S.svcNow);
+    }
+    sendStage();
   }
   function nextStep() {
     var part = partNow(), info = slideInfo();
@@ -1553,6 +1584,7 @@
   }
   function setPin(v) {
     S.onStage = v;
+    if (S.svc && S.teaching && S.svc.showing()) S.svc.takeDown();
     // What only on_stage() can give is read once the pin is saved, or it
     // would read the stage as it was a moment ago.
     var saving = S.run && S.run.shared && S.teaching ? S.run.pin(v) : null;
@@ -2143,12 +2175,14 @@
   }
   // Tools as tiles: one tool at a time, and the way back to all of them.
   var TOOL_ICONS = { 'Main stage': 'app-window', 'Ask a question': 'chats-circle', 'Breakouts': 'users-three', 'Apps': 'laptop', 'A card for everyone': 'megaphone-simple',
-    'Who is presenting': 'chalkboard-teacher', 'Waiting to show work': 'hand-tap', 'The board': 'palette', 'Questions': 'chat-circle-text', 'Recording': 'video-camera' };
+    'Who is presenting': 'chalkboard-teacher', 'Waiting to show work': 'hand-tap', 'The board': 'palette', 'Questions': 'chat-circle-text', 'Recording': 'video-camera',
+    'Show a website': 'globe-simple', 'A clock': 'clock', 'Propose and vote': 'check-circle' };
   function toolList() {
     var pane = S.frame.pane('tools'), out = [];
     function add(name, node) { if (node && !node.hidden && name) out.push({ name: name, node: node }); }
     add('Main stage', S.stageTools); add('Ask a question', S.askTool); add('Breakouts', S.breakTool); add('The board', S.boardTool);
     if (S.appsBox && S.appsBox.childElementCount) add('Apps', S.appsBox);
+    add('Show a website', S.svcSite); add('A clock', S.svcClock); add('Propose and vote', S.svcVote);
     Array.prototype.forEach.call(S.frameTools.children, function (d) {
       var head = d.querySelector('summary');
       var name = head && head.firstChild ? head.firstChild.textContent.trim() : '';
@@ -2349,6 +2383,7 @@
     (held != null ? saveDeck(key, held) : Promise.resolve()).then(function () { drawAsks(); sendStage(); });
   }
   function stageAct(a) {
+    if (a.a === 'room' && S.svc && a.m && ['vote', 'note', 'unnote', 'stance'].indexOf(a.m.t) >= 0) return S.svc.send(a.m);
     if (a.a === 'react' && S.classChannel) return S.classChannel.press({ key: String(a.key), target: {} });
     if (a.a === 'request' && !S.teaching && ASKS[a.kind]) return sendRequest(a.kind, a.body);
     if (a.a === 'deck' && S.teaching && a.key === S.studioKey) {
@@ -2550,6 +2585,16 @@
   // previews it; while the teacher edits a scene, their own stage shows
   // the words as they type, before anyone else sees them.
   function currentView() {
+    var v = cohortView();
+    if (v && S.svc && !(S.teaching && S.studioKey)) {
+      var rv = S.svc.view(v.part);
+      if (rv) return rv;
+      var cp = S.svc.clockPart();
+      if (cp && v.mode !== 'studio') v.part = cp;
+    }
+    return v;
+  }
+  function cohortView() {
     var part = partNow();
     // A learner trying a classmate's app sees it on their own stage only.
     if (!S.teaching && S.myStage) {
@@ -2614,7 +2659,7 @@
   function sendStage() {
     drawWelcomeToggle();
     if (!S.stageOn || !side || !S.session) return;
-    try { Promise.resolve(side.notifyMainStage(A.stageMessage(currentView(), !!S.recording, !S.teaching))).catch(function () {}); } catch (e) {}
+    try { Promise.resolve(side.notifyMainStage(A.stageMessage(currentView(), !!S.recording, !S.teaching, S.svc ? S.svc.stance() : null))).catch(function () {}); } catch (e) {}
   }
   // Start the session: the first part, with its clock running.
   $('[data-start-session]').addEventListener('click', function () {

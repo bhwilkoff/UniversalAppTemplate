@@ -95,6 +95,17 @@ Ben, November 10, 2026: "Quiet student should function based upon any data that 
 8. **The same rooms can meet again.** The breakout tool keeps the rooms last launched in this session, in the leader's browser, and offers Same rooms as last time (Course Builder's Re-run Breakout); only people still in the call go back.
 9. **What a part is for shows with it.** A part's purpose (Course Builder's activity learning goal, or a leader's own) shows at the top of Now for everyone in the call.
 10. **Pre-class work starts the debrief.** A leader's Now holds Pre-class work: how many answered each of the session's own workbooks, the counts for each choice, and each written answer with Put on stage, which goes up without its author's name until Show the name (show_state stage `work`).
+## Open rooms' tools in cohort sessions
+
+Ben, November 11, 2026: "I want you to bring everything in from our work on open rooms. There is no reason to wait until after the session, as I want to test the items we worked on for open rooms within the session."
+
+1. **The call's own room carries them.** A cohort panel also joins the room keyed to the call's Meet code (CohortRoom, over RoomClient), only for these tools; the session itself stays with the cohort. A leader opens the room the first time they use one. Nothing in the room is kept after the call, as in an open room.
+2. **Show a website.** A leader's tile takes any link pasted whole and works it out as open rooms do (a GitHub account's or repository's Pages site, or any address checked first and refused plainly if it will not be shown inside another page). Everyone gets their own working copy on their stage.
+3. **A clock.** A leader starts one to ten minutes with what it is for; it sits as the part's clock at the top of every stage until it runs out or is stopped.
+4. **Propose and vote.** A leader opens it with a prompt. Everyone proposes ideas and votes, in their panel or on their own stage, and the stage shows the ideas with their counts. A leader takes it off the stage or clears it.
+5. **Stances.** Agree, Not sure, and Disagree sit beside the reactions on each stage's strip and in a learner's panel, and the stage shows the counts above the strip.
+6. **A cohort pin wins.** When a leader puts anything of the cohort's on the stage, the room's website or ideas come down.
+
 ## Open rooms
 
 Ben, November 7, 2026: "I'd like for the add-on to be usable by anyone as a set of presentation tools." And: "I want to make it as easy of a pipeline as possible."
