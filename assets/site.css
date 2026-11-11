@@ -3468,3 +3468,7 @@ a.person-name:hover { text-decoration: underline; }
    Edit this part under every part made the plan hard to read). */
 .p2-panel [data-pane="plan"] .show-edit { display: none; }
 .p2-panel [data-pane="plan"] [aria-current="step"] .show-edit { display: block; }
+
+/* A clock the leader started, over whatever the stage shows. */
+.stage-leader-clock { position: fixed; top: 1.5vmin; right: 2vmin; z-index: 20; margin: 0; padding: 0.4rem 0.9rem; border-radius: 999px; background: var(--ink); color: var(--paper); font-weight: 700; font-size: clamp(1rem, 2.6vmin, 1.8rem); font-variant-numeric: tabular-nums; box-shadow: 0 2px 8px rgba(0,0,0,0.35); }
+.stage-leader-clock[hidden] { display: none; }

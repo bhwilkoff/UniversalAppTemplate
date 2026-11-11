@@ -39,8 +39,11 @@
     // The part sits small at the top when something else has the stage.
     // A clock the leader started shows over whatever the stage shows (found
     // after Week 2: a started clock never appeared on a cohort's stage).
+    // A clock the leader started has its own place over every view, since a
+    // live app or website covers the part line (found after Week 2).
     var leaderClock = !!(part && part.key === 'clock' && part.endsAt) && view.mode !== 'studio' && view.mode !== 'part';
-    $('[data-part]').hidden = !leaderClock && (view.mode === 'part' || view.mode === 'welcome' || view.mode === 'scene' || view.mode === 'app' || view.mode === 'doc' || view.mode === 'studio' || view.mode === 'slides' || view.mode === 'blank' || view.mode === 'roomwelcome' || view.mode === 'roomboard' || view.mode === 'roomend' || !part);
+    $('[data-leader-clock]').hidden = !leaderClock;
+    $('[data-part]').hidden = leaderClock || (view.mode === 'part' || view.mode === 'welcome' || view.mode === 'scene' || view.mode === 'app' || view.mode === 'doc' || view.mode === 'studio' || view.mode === 'slides' || view.mode === 'blank' || view.mode === 'roomwelcome' || view.mode === 'roomboard' || view.mode === 'roomend' || !part);
     if (view.mode === 'slides') drawSlide(view.slides);
     drawLinks(view.mode === 'slides' ? view.slides.links : null);
     drawAsk();
@@ -432,13 +435,15 @@
       $('[data-card-clock]').textContent = cl == null ? '' : cl ? L.clock(cl) : 'Time is up';
     }
     var t = clockText(view.part);
+    var lc = $('[data-leader-clock]');
+    if (lc && !lc.hidden) lc.textContent = (view.part.name ? view.part.name + ' ' : '') + t;
     // A scene's words can fill the stage, so its clock sits small at the
     // top (found in the live Meet test: a long part pushed it out of the
     // frame); a break, which is only its clock, keeps it large.
     var scene = view.mode === 'scene' || view.mode === 'slides' || view.mode === 'roomboard' || view.mode === 'roomwelcome' || view.mode === 'page' || view.mode === 'check', big = view.mode === 'scene' && view.scene && view.scene.eyebrow === 'Break';
     $('[data-part-name]').hidden = scene;
     $('[data-clock]').textContent = t ? (scene ? t : ', ' + t) : '';
-    if (scene) $('[data-part]').hidden = big || !t;
+    if (scene) $('[data-part]').hidden = big || !t || !!(lc && !lc.hidden);
     $('[data-clock-big]').textContent = t;
     $('[data-s-clock]').hidden = !(big && t);
     $('[data-s-clock]').textContent = t;
