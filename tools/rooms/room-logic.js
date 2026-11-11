@@ -65,7 +65,7 @@ export function publicRoom(room, here) {
     on: room.on, host: room.host, hostName: room.hostName, title: room.title, talkV: room.talkV, at: room.at, shown: room.shown, show: room.show,
     question: q ? { id: q.id, kind: q.kind, prompt: q.prompt, choices: q.choices, points: q.points || null, reveal: q.reveal, open: q.open } : null,
     summary: summary(room),
-    notes: room.notes, board: room.board, page, card: room.card, clock: room.clock, stance: stanceCounts(room),
+    notes: room.notes, board: room.board, page, card: room.card, clock: room.clock, stance: stanceCounts(room), stancesOpen: room.stancesOpen === true,
     people: here.people.slice(0, LIMITS.people), here: here.count, hostHere: here.hostHere, stages: here.stages,
     canTakeOver: room.on && !here.hostHere && room.hostLeft != null
   };
@@ -93,7 +93,7 @@ function cleanAnswer(q, m) {
   return body ? { body } : null;
 }
 
-const HOST_ONLY = new Set(['talk', 'go', 'show', 'ask', 'reveal', 'close', 'clear', 'unnoteAny', 'page', 'site', 'board', 'pasted', 'card', 'clock', 'hand', 'title']);
+const HOST_ONLY = new Set(['stances', 'talk', 'go', 'show', 'ask', 'reveal', 'close', 'clear', 'unnoteAny', 'page', 'site', 'board', 'pasted', 'card', 'clock', 'hand', 'title']);
 
 // who: { pid, name, here(pid) }. Returns what changed: { room?, talk?, html?,
 // to?, error?, ended? }; no result means nothing did.
@@ -236,6 +236,10 @@ export function apply(room, who, m, now, opts) {
     case 'stance':
       if (m.stance == null) delete room.stances[who.pid];
       else if (STANCES.includes(m.stance)) { if (room.stances[who.pid] === m.stance) delete room.stances[who.pid]; else room.stances[who.pid] = m.stance; }
+      return { room: true };
+    // A cohort's leader opens and closes stances, and each opening starts at zero.
+    case 'stances':
+      room.stances = {}; room.stancesOpen = m.open === true;
       return { room: true };
     default:
       return { error: 'That message was not understood.' };

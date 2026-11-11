@@ -247,7 +247,15 @@
     // One room's people and workbook answers, for its debrief, and one written
     // answer: both read through on_stage(), which only gives what a leader put up.
     if (on && on.kind === 'room' && state.onStageDetail && state.onStageDetail.kind === 'room') return { mode: 'room', part: part, room: roomOf(state.onStageDetail) };
-    if (on && (on.kind === 'answer' || on.kind === 'work') && state.onStageDetail && state.onStageDetail.kind === on.kind) return { mode: 'answer', part: part, answer: answerOf(state.onStageDetail) };
+    if (on && (on.kind === 'answer' || on.kind === 'work') && state.onStageDetail && state.onStageDetail.kind === on.kind) {
+      // Beside a question still open, so everyone else can keep answering
+      // (Week 2: one answer on the stage took the question away).
+      if (state.beside && state.beside.kind === 'check') {
+        var withQ = stageView(Object.assign({}, state, { onStage: state.beside, card: null, beside: null }));
+        if (withQ.mode === 'check') { withQ.shown = answerOf(state.onStageDetail); return withQ; }
+      }
+      return { mode: 'answer', part: part, answer: answerOf(state.onStageDetail) };
+    }
     // Someone featured by name (a presenter part's config.feature).
     if (on && on.kind === 'person') {
       var pv = { mode: 'person', part: part, who: cut((state.names || {})[on.id] || 'Someone', 80) };
@@ -318,6 +326,7 @@
   // without the panel open see only the stage.
   function stageMessage(view, recording, learner, stance) {
     var m = { type: STAGE, v: 1, view: view, learner: learner === true, recording: recording === true };
+    if (stance && stance.open === true) m.stances = true;
     if (stance && num(stance.total)) m.stance = { agree: Number(stance.agree) || 0, unsure: Number(stance.unsure) || 0, disagree: Number(stance.disagree) || 0, total: Number(stance.total) || 0 };
     return JSON.stringify(m);
   }
@@ -328,6 +337,7 @@
     try { m = typeof payload === 'string' ? JSON.parse(payload) : payload; } catch (e) { m = null; }
     if (m && m.recording === true) v.recording = true;
     if (m && m.learner === true) v.learner = true;
+    if (m && m.stances === true) v.stances = true;
     if (m && m.stance && num(m.stance.total)) v.stance = { agree: Number(m.stance.agree) || 0, unsure: Number(m.stance.unsure) || 0, disagree: Number(m.stance.disagree) || 0, total: Number(m.stance.total) || 0 };
     return v;
   }
@@ -357,6 +367,7 @@
       }
       var cv = { mode: 'check', id: typeof v.id === 'string' ? cut(v.id, 40) : null, answerable: v.answerable === true, mine: mineOf(v.mine), part: part, kind: kinds.indexOf(v.kind) >= 0 ? v.kind : 'choice', prompt: cut(v.prompt, 500), choices: choices, count: count };
       if (v.rerun === true) cv.rerun = true;
+      if (v.shown && typeof v.shown.text === 'string') cv.shown = answerOf(v.shown);
       return cv;
     }
     if (v.mode === 'studio' && v.studio && typeof v.studio.text === 'string') return { mode: 'studio', part: part, studio: studioOf(v.studio) };

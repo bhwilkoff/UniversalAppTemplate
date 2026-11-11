@@ -396,7 +396,8 @@
           // Where this panel is, so the leader sees who reached their room.
           if (S.classChannel) S.classChannel.setPresence({ room: S.room.groupId || null });
           // Agree, Not sure, and Disagree wait a press away, so the bar stays small.
-          if (S.newPanel) { var more = root.querySelector('.react-more'), st = root.querySelector('.stance-row'); if (more && st) more.insertBefore(st, more.children[1] || null); }
+          // One set of stances, the call room's, which the leader opens (Week 2).
+          if (S.newPanel) { var st = root.querySelector('.stance-row'); if (st) st.hidden = true; }
           startBreakouts();
           // Reactions and stance are for the people in the session, not
           // the leader running it.
@@ -1101,7 +1102,14 @@
       S.svcNow.replaceChildren();
       S.svcNow.hidden = !S.svc.learnerNow(S.svcNow);
     }
+    drawStanceRow();
     sendStage();
+  }
+  function questionWaiting() {
+    return (S.checks || []).some(function (k) { return k.state === 'open' && !myAnswer(k); });
+  }
+  function drawStanceRow() {
+    if (S.svcStances) S.svcStances.hidden = !(S.svc && S.svc.stancesOpen()) || questionWaiting();
   }
   function nextStep() {
     var part = partNow(), info = slideInfo();
@@ -1110,7 +1118,7 @@
     if (!part) return { label: 'Start the session', go: 'start' };
     if (info && info.next !== 'Next part') return { label: info.next, go: 'step' };
     var list = S.list || [], at = list.indexOf(part), after = list[at + 1];
-    return after ? { label: 'Next: ' + after.name, go: 'step' } : { label: 'Last part', disabled: true };
+    return after ? { label: 'Next: ' + after.name, go: 'step' } : { label: 'This is the last part', disabled: true };
   }
   function nextMove() {
     var n = nextStep();
@@ -1254,6 +1262,8 @@
     // answer in the panel, and the box was three screens below the plan's
     // top). A question draws a moment after its part, so it looks twice.
     if (key && key !== S.shownKey) {
+      // A new part starts with stances closed and at zero.
+      if (S.teaching && S.shownKey && S.svc && S.svc.stancesOpen && S.svc.stancesOpen()) S.svc.setStances(false);
       S.shownKey = key;
       setTimeout(showNow, 300);
       setTimeout(showNow, 1500);
@@ -2173,31 +2183,50 @@
   // Tools as tiles: one tool at a time, and the way back to all of them.
   var TOOL_ICONS = { 'Main stage': 'app-window', 'Ask a question': 'chats-circle', 'Breakouts': 'users-three', 'Apps': 'laptop', 'A card for everyone': 'megaphone-simple',
     'Who is presenting': 'chalkboard-teacher', 'Waiting to show work': 'hand-tap', 'The board': 'palette', 'Questions': 'chat-circle-text', 'Recording': 'video-camera',
-    'Show a website': 'globe-simple', 'A clock': 'clock', 'Propose and vote': 'check-circle' };
+    'Show a website': 'globe-simple', 'A clock': 'clock', 'Propose and vote': 'check-circle', 'Stances': 'hand-tap' };
   function toolList() {
     var pane = S.frame.pane('tools'), out = [];
-    function add(name, node) { if (node && !node.hidden && name) out.push({ name: name, node: node }); }
-    add('Main stage', S.stageTools); add('Ask a question', S.askTool); add('Breakouts', S.breakTool); add('The board', S.boardTool);
-    if (S.appsBox && S.appsBox.childElementCount) add('Apps', S.appsBox);
-    add('Show a website', S.svcSite); add('A clock', S.svcClock); add('Propose and vote', S.svcVote);
+    function add(name, node, more) { if (node && !node.hidden && name) out.push(Object.assign({ name: name, node: node }, more || {})); }
+    var room = S.svc && S.svc.state ? S.svc.state() || {} : {}, showing = S.svc && S.svc.showing ? S.svc.showing() : null;
+    var asked = (S.checks || []).some(function (k) { return k.state === 'open'; });
+    add('Main stage', S.stageTools, { on: !!S.stageOn }); add('Ask a question', S.askTool, { on: asked }); add('Breakouts', S.breakTool); add('The board', S.boardTool, { on: !!(S.onStage && S.onStage.kind === 'board') });
+    if (S.appsBox && S.appsBox.childElementCount) add('Apps', S.appsBox, { on: !!(S.onStage && S.onStage.kind === 'item') });
+    add('Show a website', S.svcSite, { on: showing === 'page' }); add('A clock', S.svcClock, { on: !!(room.on && room.clock) }); add('Propose and vote', S.svcVote, { on: showing === 'board' });
+    // Stances turn on and off from their tile, with nothing to open.
+    if (S.svc && S.svc.stancesOpen) {
+      S.stanceTile = S.stanceTile || el('div');
+      add('Stances', S.stanceTile, { on: S.svc.stancesOpen(), toggle: function () { S.svc.setStances(!S.svc.stancesOpen()); } });
+    }
+    var st = S.signals && S.signals.state ? S.signals.state() || {} : {};
     Array.prototype.forEach.call(S.frameTools.children, function (d) {
       var head = d.querySelector('summary');
       var name = head && head.firstChild ? head.firstChild.textContent.trim() : '';
-      if (head && !d.hidden && name !== 'The thread') add(name, d);
+      var on = name === 'A card for everyone' ? !!st.card : name === 'Recording' ? !!S.recording : false;
+      if (head && !d.hidden && name !== 'The thread') add(name, d, { on: on });
     });
     return { pane: pane, list: out };
   }
   function drawTiles() {
     if (!S.teaching || !S.tiles) return;
     var t = toolList(), grid = S.tiles, open = t.pane.getAttribute('data-tool');
+    var key = JSON.stringify(t.list.map(function (x) {
+      var n = x.node.querySelector && x.node.querySelector('summary .ui-count, summary [class*="badge"]');
+      return [x.name, !!x.on, !!x.toggle, n && !n.hidden ? n.textContent : ''];
+    }));
+    if (key === S.tilesKey && grid.childElementCount) { if (open && !t.list.some(function (x) { return x.name === open; })) closeTool(); return; }
+    S.tilesKey = key;
     grid.replaceChildren();
     t.list.forEach(function (x) {
-      var b = el('button', 'p2-tile'); b.type = 'button';
+      var b = el('button', 'p2-tile' + (x.on ? ' is-on' : '')); b.type = 'button';
       if (TOOL_ICONS[x.name]) b.innerHTML = '<svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022j#' + TOOL_ICONS[x.name] + '"/></svg>';
       b.appendChild(el('span', null, x.name));
+      // Whether it is on, said on its face (Week 2: "I absolutely have to be
+      // able to open and close each one of the tools easily").
+      if (x.on || x.toggle) b.appendChild(el('span', 'p2-tile-state', x.on ? 'On' : 'Off'));
+      if (x.toggle) b.setAttribute('aria-pressed', String(!!x.on));
       var n = x.node.querySelector && x.node.querySelector('summary .ui-count, summary [class*="badge"]');
       if (n && !n.hidden && n.textContent) b.appendChild(el('span', 'p2-tile-n', n.textContent));
-      b.addEventListener('click', function () { openTool(x.name); });
+      b.addEventListener('click', function () { if (x.toggle) x.toggle(); else openTool(x.name); });
       grid.appendChild(b);
     });
     if (open && !t.list.some(function (x) { return x.name === open; })) closeTool();
@@ -2418,6 +2447,7 @@
     var box = $('[data-checks]'); box.replaceChildren();
     if (!open.length) box.appendChild(el('p', 'small live-empty', S.teaching ? 'No question is open right now.' : 'No question is open right now. When your leader asks one, it appears here.'));
     open.forEach(function (k) { box.appendChild(S.teaching ? teacherCheck(k) : studentCheck(k)); });
+    drawStanceRow();
   }
 
   // Asking questions, in order: a copy of each goes to everyone, so
@@ -2490,7 +2520,18 @@
     box.appendChild(el('p', 'live-what', q.prompt));
     var status = el('span', 'small'); status.setAttribute('role', 'status');
     var acts = el('div', 'actions');
-    acts.appendChild(button('Ask it now', 'btn-primary', function () {
+    // Asked and closed already: it opens again with its answers, rather than
+    // a second copy that splits them (Week 2: four answers across two copies).
+    var before = (S.checks || []).filter(function (k) { return k.prompt === q.prompt && !k.rerun_of; }).pop();
+    if (before) acts.appendChild(button('Open it again', 'btn-primary', function () {
+      status.textContent = 'Opening…';
+      db.from('live_checks').update({ state: 'open' }).eq('id', before.id).then(function (r) {
+        if (r.error) { status.textContent = 'Not opened: ' + r.error.message; return; }
+        status.textContent = '';
+        Promise.resolve(refreshLive()).then(function () { setPin({ kind: 'check', id: before.id }); });
+      });
+    }));
+    else acts.appendChild(button('Ask it now', 'btn-primary', function () {
       ask([Object.assign({ show_tally: $('[data-ask-tally]').checked }, q)], status);
     }));
     acts.appendChild(status);
@@ -2595,7 +2636,7 @@
     var part = partNow();
     // A learner trying a classmate's app sees it on their own stage only.
     if (!S.teaching && S.myStage) {
-      var mp = part ? { key: part.key, name: part.name, endsAt: endsNow() } : null, fu = A.frameable(S.myStage.url);
+      var mp = part ? { key: part.key, name: part.name, endsAt: null } : null, fu = A.frameable(S.myStage.url);
       return fu ? { mode: 'app', part: mp, who: S.myStage.who, url: fu, note: null } : { mode: 'item', part: mp, who: S.myStage.who, what: S.myStage.url, note: null };
     }
     var scene = null;
@@ -2610,7 +2651,10 @@
       }
     }
     return A.stageView({
-      part: part ? { key: part.key, name: part.name, endsAt: endsNow() } : null,
+      // A part's clock is the leader's, in the panel; the stage shows a clock
+      // only when the leader starts one (Week 2: "Time is up" sat on the stage
+      // through most parts, and the leader told a learner to disregard it).
+      part: part ? { key: part.key, name: part.name, endsAt: null } : null,
       // A card outranks the part's own question; only a leader's own pin
       // outranks the card.
       card: S.onStage ? null : S.card || null,
@@ -2618,7 +2662,7 @@
       studio: S.studioKey ? { key: S.studioKey, text: S.studioHeld != null ? S.studioHeld : (S.decks || {})[S.studioKey] || (sceneOf(S.studioKey) || {}).slides || '', gh: window.SlidesLib ? window.SlidesLib.ghAll() : {} } : null,
       boardStage: (A.boardLinks(S.cohort, S.session, null, null) || {}).stage,
       mineOf: function (k) { var x = myAnswer(k); return x ? { choice: x.choice, picks: Array.isArray(x.value) ? x.value : undefined, body: x.body } : null; },
-      onStage: S.onStage || (S.card ? null : partCheckPin()), checks: S.checks, results: S.results, items: S.items, names: S.names, audience: V ? V.audienceOf(part) : null,
+      onStage: S.onStage || (S.card ? null : partCheckPin()), beside: S.onStage && (S.onStage.kind === 'answer' || S.onStage.kind === 'work') ? partCheckPin() || latestCheckPin() : null, checks: S.checks, results: S.results, items: S.items, names: S.names, audience: V ? V.audienceOf(part) : null,
       welcome: lib.welcome(S.cohort, S.session, S.list && S.list.length ? S.list : S.parts), scene: scene, slides: slidesView(part),
       doc: part && part.own && part.config && part.config.show ? part.config.show : null,
       onStageDetail: S.onStageDetail || null,
@@ -2648,6 +2692,10 @@
     var q = target ? plannedAsk(target) : null;
     return q ? (S.checks || []).filter(function (k) { return k.prompt === q.prompt; })[0] || null : null;
   }
+  function latestCheckPin() {
+    var open = (S.checks || []).filter(function (k) { return k.state === 'open'; });
+    return open.length ? { kind: 'check', id: open[0].id } : null;  // newest first, as read
+  }
   function partCheckPin() {
     var part = partNow(), k = partCheck();
     if (!k) return null;
@@ -2672,6 +2720,7 @@
     setPin(null);
   }
   function drawStageLine(view) {
+    if (S.teaching && S.tiles) drawTiles();
     if (!S.frame || !S.frame.stage) return;
     if (!S.teaching || standalone) return S.frame.stage(null);
     if (!S.stageOn) return S.frame.stage({ what: 'Closed', action: { label: 'Open it', go: function () { $('[data-open-stage]').click(); } } });

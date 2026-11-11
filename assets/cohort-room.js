@@ -148,6 +148,10 @@
       });
       box.appendChild(row);
     }
+    // Stances are the leader's to open, and each opening starts at zero
+    // (Week 2: "Agree 1" stayed on the stage for the whole session).
+    function stancesOpen() { return !!(room && room.on && room.stancesOpen); }
+    function setStances(open) { send({ t: 'stances', open: !!open }); }
 
     // What this person's stage shows from the room, or null to show the cohort's own view.
     function view(part) {
@@ -158,10 +162,10 @@
       return null;
     }
     function clockPart() { return room && room.on && room.clock ? { key: 'clock', name: room.clock.label || '', endsAt: room.clock.endsAt } : null; }
-    function stance() { var st = room && room.on && room.stance; return st && st.total ? st : null; }
+    function stance() { return stancesOpen() ? Object.assign({ open: true }, room.stance || {}) : null; }
 
     return { state: function () { return room; }, you: function () { return you; }, send: send, showing: showing, takeDown: takeDown,
-      siteTool: siteTool, clockTool: clockTool, voteTool: voteTool, learnerNow: learnerNow, stanceRow: stanceRow,
+      siteTool: siteTool, clockTool: clockTool, voteTool: voteTool, learnerNow: learnerNow, stanceRow: stanceRow, stancesOpen: stancesOpen, setStances: setStances,
       view: view, clockPart: clockPart, stance: stance, close: function () { client.close(); } };
   }
   window.CohortRoom = { start: start };

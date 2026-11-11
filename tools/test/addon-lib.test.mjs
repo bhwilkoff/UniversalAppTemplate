@@ -412,3 +412,15 @@ test('the leader reads what the stage shows in a few words', () => {
   assert.equal(lib.stageSays({ mode: 'part', part: { name: 'Arrive' } }), 'This part’s title');
   assert.ok(lib.stageSays({ mode: 'check', prompt: 'x'.repeat(100) }).length < 80);
 });
+
+test('one answer on the stage sits beside its open question, which still takes answers', () => {
+  const checks = [{ id: 'k1', state: 'open', kind: 'short', prompt: 'What questions do you still have?' }];
+  const v = lib.stageView({ part: { key: 'p', name: 'Q' }, answerable: true, onStage: { kind: 'answer', id: 'a1' }, beside: { kind: 'check', id: 'k1' }, checks, onStageDetail: { kind: 'answer', prompt: 'What questions do you still have?', text: 'Should I build one aspect at a time?' } });
+  assert.equal(v.mode, 'check');
+  assert.equal(v.answerable, true);
+  assert.equal(v.shown.text, 'Should I build one aspect at a time?');
+  const sent = lib.readStageMessage(lib.stageMessage(v, false, true, null));
+  assert.equal(sent.shown.text, 'Should I build one aspect at a time?');
+  const closed = lib.stageView({ part: { key: 'p', name: 'Q' }, onStage: { kind: 'answer', id: 'a1' }, beside: { kind: 'check', id: 'k1' }, checks: [Object.assign({}, checks[0], { state: 'closed' })], onStageDetail: { kind: 'answer', prompt: 'x', text: 'y' } });
+  assert.equal(closed.mode, 'answer');
+});

@@ -327,7 +327,7 @@
     "  <div class=\"actions\"><button class=\"btn-secondary\" type=\"button\" data-sig-rec-open>Open the recorder</button></div>",
     "  <div data-sig-rec-live hidden>",
     "    <p class=\"signal-now\">Everyone sees that you are recording.</p>",
-    "    <div class=\"actions\"><button class=\"btn-secondary\" type=\"button\" data-sig-rec-off>The recording has stopped</button></div>",
+    "    <div class=\"actions\"><button class=\"btn-secondary\" type=\"button\" data-sig-rec-off>Take the recording notice down</button></div>",
     "  </div>",
     "  <p class=\"small\" role=\"status\" data-sig-rec-status></p>",
     "</div>",

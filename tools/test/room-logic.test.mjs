@@ -204,3 +204,16 @@ test('showing the same site again reloads it, and a page in a repository is a fi
   assert.equal(publicRoom(r).page.path, 'index.html');
   ['../x.html', 'game/../../x.html', 'a//b.html', 'x.js', '/abs.html'].forEach((path) => assert.match(apply(r, A, { t: 'page', owner: 'ana', repo: 'app', sha, path }, 6).error, /could not be read/, path));
 });
+
+test('a leader opens and closes stances, and each opening starts at zero', () => {
+  const r = started();
+  assert.equal(publicRoom(r).stancesOpen, false);
+  assert.match(apply(r, B, { t: 'stances', open: true }, 2).error, /Only the host/);
+  apply(r, B, { t: 'stance', stance: 'agree' }, 3);
+  assert.equal(stanceCounts(r).agree, 1);
+  apply(r, A, { t: 'stances', open: true }, 4);
+  assert.equal(publicRoom(r).stancesOpen, true);
+  assert.equal(stanceCounts(r).total, 0);
+  apply(r, A, { t: 'stances', open: false }, 5);
+  assert.equal(publicRoom(r).stancesOpen, false);
+});

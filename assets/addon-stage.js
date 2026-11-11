@@ -64,11 +64,23 @@
     if (view.mode === 'card') $('[data-card-body]').textContent = view.card.body;
     if (view.mode === 'check') {
       $('[data-prompt]').textContent = view.prompt;
+      $('[data-shown]').hidden = !view.shown;
+      $('[data-shown-text]').textContent = view.shown ? view.shown.text : '';
+      $('[data-shown-who]').hidden = !(view.shown && view.shown.who);
+      $('[data-shown-who]').textContent = view.shown && view.shown.who ? '\u2014 ' + view.shown.who : '';
       $('[data-check-kicker]').textContent = view.rerun ? 'Asked again: how have the answers moved?' : 'A question for everyone';
       // With the results shown, the bars come from them (an order is
       // sorted, first place at the top); before, the choices alone.
       var count = view.count;
-      var rows = count && count.rows.length ? count.rows : (view.choices || []).map(function (c) { return { label: c }; });
+      var mine = view.mine || {}, picks = mine.picks || (mine.choice ? [mine.choice] : []);
+      // Anyone who can still answer gets the choices as buttons, in their own
+      // order, with the counts beside them once shown (Week 2: a question
+      // planned with its results showing drew only bars, and nobody could answer).
+      var pickable = view.answerable && ['choice', 'scale', 'multi'].indexOf(view.kind) >= 0 && (view.choices || []).length;
+      var byLabel = {};
+      if (count) count.rows.forEach(function (r) { byLabel[r.label] = r; });
+      var rows = pickable ? view.choices.map(function (c) { return Object.assign({}, byLabel[c] || {}, { label: c }); })
+        : count && count.rows.length ? count.rows : (view.choices || []).map(function (c) { return { label: c }; });
       var ul = $('[data-choices]'); ul.replaceChildren();
       ul.hidden = !rows.length;
       ul.classList.toggle('many', rows.length > 4);
@@ -80,8 +92,6 @@
       root.querySelector('[data-view="check"]').classList.toggle('has-long', long || String(view.prompt || '').length > 90);
       // A scale reads as one row of points, not a tall list.
       ul.classList.toggle('scale', view.kind === 'scale' && !(count && count.rows.length));
-      var mine = view.mine || {}, picks = mine.picks || (mine.choice ? [mine.choice] : []);
-      var pickable = view.answerable && !(count && count.rows.length) && ['choice', 'scale', 'multi'].indexOf(view.kind) >= 0;
       ul.classList.toggle('is-pickable', !!pickable);
       rows.forEach(function (row, n) {
         var li = el('li');
@@ -94,6 +104,10 @@
             act(view.kind === 'multi' ? { a: 'answer', id: view.id, picks: next } : { a: 'answer', id: view.id, choice: n + 1 });
           });
           li.appendChild(pick);
+          if (count && row.text != null) {
+            var pbar = el('span', 'bar'); pbar.style.setProperty('--share', row.share + '%');
+            li.appendChild(pbar); li.appendChild(el('span', 'count', row.text));
+          }
           ul.appendChild(li);
           return;
         }
@@ -109,7 +123,13 @@
       });
       ul.classList.toggle('counted', !!(count && count.rows.length));
       drawWriting();
-      $('[data-answer-panel]').hidden = !!view.answerable && view.kind !== 'rank';
+      // Once a learner's answer is saved, their stage says so (Week 2: nobody
+      // could tell whether pressing had answered).
+      var ap = $('[data-answer-panel]'), saved = view.mine && (view.mine.choice || (view.mine.picks || []).length || view.mine.body);
+      if (!ap.dataset.base) ap.dataset.base = ap.textContent;
+      ap.textContent = view.answerable && saved ? 'Your answer is in. You can change it until the question closes.' : ap.dataset.base;
+      ap.classList.toggle('is-in', !!(view.answerable && saved));
+      ap.hidden = !!view.answerable && view.kind !== 'rank' && !saved;
       var words = $('[data-words]'); words.replaceChildren();
       words.hidden = !(count && count.words.length);
       if (count) count.words.forEach(function (w) { words.appendChild(el('li', 'size-' + w.size, w.word)); });
@@ -283,7 +303,7 @@
   // A question in their own words, typed on the stage.
   function drawWriting() {
     var box = $('[data-stage-write]');
-    var on = view.answerable && (view.kind === 'short' || view.kind === 'words') && !(view.count && view.count.rows.length);
+    var on = view.answerable && (view.kind === 'short' || view.kind === 'words');
     box.hidden = !on;
     if (!on) { box.replaceChildren(); box.dataset.id = ''; return; }
     if (box.dataset.id === view.id && box.contains(document.activeElement)) return;
@@ -598,7 +618,7 @@
       if (window.ReactLib && window.ReactLib.STANCES) {
         var sbar = $('[data-stage-reacts]');
         window.ReactLib.STANCES.forEach(function (st) {
-          var sb = el('button', 'stage-stance', st.label); sb.type = 'button';
+          var sb = el('button', 'stage-stance', st.label); sb.type = 'button'; sb.hidden = true;
           sb.addEventListener('click', function () { act({ a: 'room', m: { t: 'stance', stance: st.id } }); });
           sbar.appendChild(sb);
         });
@@ -625,6 +645,11 @@
         $('[data-stage-waiting]').hidden = true;
         show('ready'); draw();
         lastStance = v.stance || null;
+        // Stances only while the leader has them open, and never while a
+        // question waits for this person's answer (Week 2: a learner pressed
+        // Agree believing it answered).
+        var stanceOn = !!v.stances && !(v.mode === 'check' && v.answerable);
+        root.querySelectorAll('.stage-stance').forEach(function (b) { b.hidden = !stanceOn; });
         drawReactions({ floats: [], stance: lastStance });
       });
       view = { mode: 'part', part: null };
