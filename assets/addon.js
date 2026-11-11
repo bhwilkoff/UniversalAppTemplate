@@ -1345,6 +1345,9 @@
     if (key && key !== S.shownKey) {
       // A new part starts with stances closed and at zero.
       if (S.teaching && S.shownKey && S.svc && S.svc.stancesOpen && S.svc.stancesOpen()) S.svc.setStances(false);
+      // A website or Propose and vote from the part before comes down, so the
+      // new part shows its own plan (seen in a test call after Week 2).
+      if (S.teaching && S.shownKey && S.svc && S.svc.showing && S.svc.showing()) S.svc.takeDown();
       S.shownKey = key;
       setTimeout(showNow, 300);
       setTimeout(showNow, 1500);
