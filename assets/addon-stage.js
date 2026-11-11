@@ -598,7 +598,7 @@
     });
   }
 
-  var lastStance = null;
+  var lastStance = null; var stageStance = null;
   function open() {
     if (roomPage) { useRoom(); return; }
     if (!cfg.cloudProjectNumber) { $('[data-error-text]').textContent = 'This add-on is not set up yet.'; return show('error'); }
@@ -625,7 +625,12 @@
         var sbar = $('[data-stage-reacts]');
         window.ReactLib.STANCES.forEach(function (st) {
           var sb = el('button', 'stage-stance', st.label); sb.type = 'button'; sb.hidden = true;
-          sb.addEventListener('click', function () { act({ a: 'room', m: { t: 'stance', stance: st.id } }); });
+          sb.setAttribute('data-stance-id', st.id);
+          sb.addEventListener('click', function () {
+            stageStance = stageStance === st.id ? null : st.id;
+            root.querySelectorAll('.stage-stance').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-stance-id') === stageStance)); });
+            act({ a: 'room', m: { t: 'stance', stance: st.id } });
+          });
           sbar.appendChild(sb);
         });
       }
@@ -655,7 +660,8 @@
         // question waits for this person's answer (Week 2: a learner pressed
         // Agree believing it answered).
         var stanceOn = !!v.stances && !(v.mode === 'check' && v.answerable);
-        root.querySelectorAll('.stage-stance').forEach(function (b) { b.hidden = !stanceOn; });
+        if (!v.stances) stageStance = null;
+        root.querySelectorAll('.stage-stance').forEach(function (b) { b.hidden = !stanceOn; b.setAttribute('aria-pressed', String(!!stageStance && b.getAttribute('data-stance-id') === stageStance)); });
         drawReactions({ floats: [], stance: lastStance });
       });
       view = { mode: 'part', part: null };

@@ -19,6 +19,7 @@
         // count from the start, and takes it back if no host is here.
         if (o.teaching && !r.on && !started) { started = true; client.send({ t: 'start', title: o.title || '' }); }
         if (o.teaching && r.canTakeOver) client.send({ t: 'claim' });
+        if (typeof pressStances === 'function') pressStances();
         if (o.onChange) o.onChange();
       }
     } });
@@ -144,13 +145,25 @@
       if (!R2 || !R2.STANCES) return;
       var row = el('div', 'p2-stances');
       R2.STANCES.forEach(function (st) {
-        row.appendChild(btn(st.label, 'btn-secondary small', function () { send({ t: 'stance', stance: st.id }); }));
+        var b = btn(st.label, 'btn-secondary small', function () { mineStance = mineStance === st.id ? null : st.id; send({ t: 'stance', stance: st.id }); pressStances(); });
+        b.setAttribute('data-stance-id', st.id);
+        row.appendChild(b);
       });
+      stanceRows.push(row);
       box.appendChild(row);
+      pressStances();
     }
     // Stances are the leader's to open, and each opening starts at zero
     // (Week 2: "Agree 1" stayed on the stage for the whole session).
     function stancesOpen() { return !!(room && room.on && room.stancesOpen); }
+    // Which stance this person chose, so their button stays pressed; a new
+    // opening starts everyone at none.
+    var mineStance = null, stanceRows = [], wasOpen = false;
+    function pressStances() {
+      var open = stancesOpen();
+      if (open !== wasOpen) { mineStance = null; wasOpen = open; }
+      stanceRows.forEach(function (r) { r.querySelectorAll('[data-stance-id]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-stance-id') === mineStance)); }); });
+    }
     function setStances(open) { send({ t: 'stances', open: !!open }); }
 
     // What this person's stage shows from the room, or null to show the cohort's own view.
@@ -165,7 +178,7 @@
     function stance() { return stancesOpen() ? Object.assign({ open: true }, room.stance || {}) : null; }
 
     return { state: function () { return room; }, you: function () { return you; }, send: send, showing: showing, takeDown: takeDown,
-      siteTool: siteTool, clockTool: clockTool, voteTool: voteTool, learnerNow: learnerNow, stanceRow: stanceRow, stancesOpen: stancesOpen, setStances: setStances,
+      siteTool: siteTool, clockTool: clockTool, voteTool: voteTool, learnerNow: learnerNow, stanceRow: stanceRow, stancesOpen: stancesOpen, setStances: setStances, mineStance: function () { return mineStance; },
       view: view, clockPart: clockPart, stance: stance, close: function () { client.close(); } };
   }
   window.CohortRoom = { start: start };
