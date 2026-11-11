@@ -307,7 +307,7 @@
   function myCohortSessions() {
     if (!S.me || S.me.is_anonymous) return Promise.resolve([]);
     return db.from('cohort_teachers').select('cohort_id, cohorts(id, title, status, schedule)').eq('user_id', S.me.id).then(function (t) {
-      var cohorts = (t.data || []).map(function (x) { return x.cohorts; }).filter(function (c) { return c && (c.status === 'open' || c.status === 'running'); });
+      var cohorts = (t.data || []).map(function (x) { return x.cohorts; }).filter(Boolean);
       if (!cohorts.length) return [];
       return db.from('sessions').select('id, cohort_id, number, title, starts_at').in('cohort_id', cohorts.map(function (c) { return c.id; })).order('number').then(function (s) {
         return cohorts.map(function (c) {

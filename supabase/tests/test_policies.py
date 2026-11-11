@@ -3274,6 +3274,24 @@ def main():
     a = as_user(None); a.execute("select public.is_cohort_call('old-oldd-old')")
     check("a run past its three hours is over", a.fetchall() == [(False,)])
 
+    # A draft cohort's session runs in a call its leader chooses (migration 20261111080000).
+    c3, s3 = str(uuid.uuid4()), str(uuid.uuid4())
+    su.execute("reset role")
+    su.execute("insert into public.cohorts (id, slug, title, status, created_by) values (%s, 'draft-run', 'Draft', 'draft', %s)", (c3, people["ben"]))
+    su.execute("insert into public.cohort_teachers (cohort_id, user_id) values (%s, %s) on conflict do nothing", (c3, people["ben"]))
+    su.execute("insert into public.sessions (id, cohort_id, number, meet_url) values (%s, %s, 1, 'https://meet.google.com/dft-sked-dft')", (s3, c3))
+    a = as_user(None); a.execute("select public.is_cohort_call('dft-sked-dft')")
+    check("a draft cohort's own link does not make a call its", a.fetchall() == [(False,)])
+    check("a leader runs a draft cohort's session in a call", attempt(as_user("ben"), "select public.run_in_call('drf-draf-drf', %s)", (s3,)))
+    a = as_user(None); a.execute("select public.is_cohort_call('drf-draf-drf')")
+    check("and the call follows it", a.fetchall() == [(True,)])
+    check("another cohort's leader cannot take that call", not attempt(as_user("dee"), "select public.run_in_call('drf-draf-drf', %s)", (s2,)))
+    check("the same leader switches the call to another cohort they lead", attempt(as_user("ben"), "select public.run_in_call('drf-draf-drf', %s)", (ss,)))
+    su.execute("reset role")
+    su.execute("select cohort_id::text from public.call_runs where code = 'drf-draf-drf'")
+    check("and the call has one run, the new one", su.fetchall() == [(cc,)])
+    su.execute("delete from public.call_runs where code = 'drf-draf-drf'")
+
     # A cohort of any shape (migration 20261111010000).
     check("a leader makes a custom cohort's session on any date, with what comes before it",
           attempt(as_user("ben"), "insert into public.sessions (cohort_id, number, title, starts_at, before, readings) values (%s, 7, 'Creativity', now() + interval '2 days', 'Read this first.', '[{\"title\": \"A reading\", \"url\": \"https://example.com\"}]'::jsonb) returning id", (cc,)))
