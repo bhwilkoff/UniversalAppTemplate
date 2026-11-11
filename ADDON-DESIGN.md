@@ -151,7 +151,7 @@ Signing in is offered and never required. One Tap rides on top as it does for a 
 
 ## Tools
 
-Tools is a grid of tiles, and a tile opens one tool, with All tools to go back. Rule 4's two levels, and nothing to scan. The board and Breakouts are tiles of their own from the start of the call: putting the board up opens the main stage first if it is closed, and Breakouts says it is connecting until the call's signals arrive.
+Tools is a grid of tiles, and a tile opens one tool, with All tools to go back. Each tile is named for what it does to the room, and says On or Off on its face; Ask where people stand turns on and off from its tile. The top of the panel names the part and where it falls (Part 3 of 7), and says what is on the stage, with Clear. A learner's Now is headed by what to do now, Answer the question or Show your app, with the control under it (Ben, November 11, 2026). Rule 4's two levels, and nothing to scan. The board and Breakouts are tiles of their own from the start of the call: putting the board up opens the main stage first if it is closed, and Breakouts says it is connecting until the call's signals arrive.
 
 ## Sign-in in Meet
 

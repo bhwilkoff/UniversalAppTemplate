@@ -69,6 +69,8 @@ light and dark.
 | board (only something people post to and move things around on: a cohort's board, the Asks board) | anything where nothing is placed or moved |
 | Propose and vote (an open room's tool: the host asks for ideas, everyone proposes them and votes; each one is an idea) | ideas board, board, poll (a poll is a cohort's weekly-time poll), suggestion box |
 | Show a website (an open room's tool; a website is any site shown on the main stage) | page, Page tool, embed |
+| Ask where people stand (the leader's tool for stances: Agree, Not sure, Disagree) | poll, vote, reactions |
+| A leader's tools say what they do to the room: Send to breakouts, Put up a card, Put up the board, Start a clock, Feature someone, Record the session, Read the answers | Breakouts, A card for everyone, A clock, Who is presenting, Recording, Questions (as tile names) |
 | Files (the cohort's shared files, in its repository) | resources page, library, uploads |
 | leader (anyone who leads a cohort), learner (anyone in one, including someone returning) | teacher, co-teacher, student, mentor, instructor, facilitator (Ben, October 22, 2026: "the people inside of the system are either Learners or Leaders") |
 | Leading (the area), Leader's guide | Teaching, the teaching page, the teaching guide |

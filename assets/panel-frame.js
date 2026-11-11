@@ -16,6 +16,9 @@
     time.setAttribute('aria-live', 'off');
     row.appendChild(title); row.appendChild(time);
     top.appendChild(row);
+    // Where the session is: Part 3 of 7, or that it has not started.
+    var step = el('p', 'p2-step'); step.hidden = true;
+    top.appendChild(step);
     var chips = el('ul', 'p2-chips');
     top.appendChild(chips);
     // What everyone's main stage shows, in words, with the one way to change
@@ -82,12 +85,13 @@
       dot: function (key) { if (buttons[key] && key !== current) buttons[key].querySelector('.p2-dot').hidden = false; },
       // title, time, chips [{ text, on }], next { label, disabled }, canBack
       draw: function (s) {
-        var key = JSON.stringify([s.title, s.chips, s.next && s.next.label, s.next && s.next.disabled, s.canBack]);
+        var key = JSON.stringify([s.title, s.step, s.chips, s.next && s.next.label, s.next && s.next.disabled, s.canBack]);
         time.textContent = s.time || '';
         time.classList.toggle('is-over', !!s.over);
         if (key === drawn) return;
         drawn = key;
         title.textContent = s.title || '';
+        step.textContent = s.step || ''; step.hidden = !s.step;
         chips.replaceChildren();
         (s.chips || []).forEach(function (c) { chips.appendChild(el('li', 'p2-chip' + (c.on ? ' is-on' : ''), c.text)); });
         chips.hidden = !(s.chips || []).length;

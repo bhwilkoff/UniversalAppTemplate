@@ -68,7 +68,10 @@
       $('[data-shown-text]').textContent = view.shown ? view.shown.text : '';
       $('[data-shown-who]').hidden = !(view.shown && view.shown.who);
       $('[data-shown-who]').textContent = view.shown && view.shown.who ? '\u2014 ' + view.shown.who : '';
-      $('[data-check-kicker]').textContent = view.rerun ? 'Asked again: how have the answers moved?' : 'A question for everyone';
+      // A learner who can answer reads what to do; everyone else, what it is.
+      var canPick = view.answerable && ['choice', 'scale', 'multi'].indexOf(view.kind) >= 0, canWrite = view.answerable && (view.kind === 'short' || view.kind === 'words');
+      $('[data-check-kicker]').textContent = view.rerun ? 'Asked again: how have the answers moved?'
+        : canPick ? (view.kind === 'multi' ? 'Choose any that fit' : 'Choose your answer') : canWrite ? 'Write your answer' : 'A question for everyone';
       // With the results shown, the bars come from them (an order is
       // sorted, first place at the top); before, the choices alone.
       var count = view.count;
@@ -127,9 +130,12 @@
       // could tell whether pressing had answered).
       var ap = $('[data-answer-panel]'), saved = view.mine && (view.mine.choice || (view.mine.picks || []).length || view.mine.body);
       if (!ap.dataset.base) ap.dataset.base = ap.textContent;
+      // Only a learner who can answer reads a line here: that their answer is
+      // in, or, for an order (answered in the panel), where to answer.
+      var inPanel = view.answerable && view.kind === 'rank' && !saved;
       ap.textContent = view.answerable && saved ? 'Your answer is in. You can change it until the question closes.' : ap.dataset.base;
       ap.classList.toggle('is-in', !!(view.answerable && saved));
-      ap.hidden = !!view.answerable && view.kind !== 'rank' && !saved;
+      ap.hidden = !((view.answerable && saved) || inPanel);
       var words = $('[data-words]'); words.replaceChildren();
       words.hidden = !(count && count.words.length);
       if (count) count.words.forEach(function (w) { words.appendChild(el('li', 'size-' + w.size, w.word)); });

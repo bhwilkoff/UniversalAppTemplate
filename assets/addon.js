@@ -1106,6 +1106,25 @@
     drawStanceRow();
     sendStage();
   }
+  // What a learner does now, said as the heading of Now, with the thing to
+  // do right under it (Ben, November 11, 2026: headings that "better represent
+  // progress being made in the session and what actions people should take").
+  function drawLearnerHead(part) {
+    if (!S.frame) return;
+    var now = S.frame.pane('now');
+    if (!S.nowHead) { S.nowHead = el('h2', 'p2-now-head'); now.insertBefore(S.nowHead, now.firstChild); }
+    var showing = !!(part && part.kind === 'presenter');
+    var head = questionWaiting() ? 'Answer the question' : showing ? 'Show your app' : '';
+    if (S.nowHead.textContent !== head) S.nowHead.textContent = head;
+    S.nowHead.hidden = !head;
+    if (now.firstChild !== S.nowHead) now.insertBefore(S.nowHead, now.firstChild);
+    // On a part where people show their app, its button leads Now.
+    if (S.mineApp) {
+      var want = showing ? now : S.frame.pane('mine');
+      if (showing && S.mineApp.previousSibling !== S.nowHead) now.insertBefore(S.mineApp, S.nowHead.nextSibling);
+      else if (!showing && S.mineApp.parentNode !== want) want.insertBefore(S.mineApp, want.firstChild);
+    }
+  }
   function questionWaiting() {
     return (S.checks || []).some(function (k) { return k.state === 'open' && !myAnswer(k); });
   }
@@ -1169,8 +1188,10 @@
       if (st.together) chips.push({ text: 'Coming back', on: true });
     }
     var info = slideInfo();
+    var list = S.list || [], at = part ? list.indexOf(part) : -1;
     S.frame.draw({
-      title: part ? part.name : S.cohort.title,
+      title: part ? part.name : lib.sessionTitle(S.session, S.cohort),
+      step: part && at >= 0 ? 'Part ' + (at + 1) + ' of ' + list.length : list.length ? 'Not started yet, ' + list.length + ' parts' : '',
       time: left != null ? window.LiveLib.clock(left) : '', over: left === 0,
       chips: chips, next: nextStep() || undefined, canBack: !!part
     });
@@ -1180,6 +1201,7 @@
     if (!what && !S.teaching && !$('[data-pane="now"] textarea, [data-pane="now"] input, [data-pane="now"] .signal-where:not([hidden]), [data-pane="now"] .signal-card:not([hidden])')) what = 'Nothing to answer right now.';
     if (S.nowWhat.textContent !== what) S.nowWhat.textContent = what;
     S.nowWhat.hidden = !what;
+    if (!S.teaching) drawLearnerHead(part);
     if (S.teaching) {
       var noteOf = part || first;
       var slideNote = part ? (info ? info.note : '') : first && window.SlidesLib && (S.decks || {})[first.key] ? window.SlidesLib.notes(S.decks[first.key])[0] : '';
@@ -2182,6 +2204,12 @@
     (function wait() { if (S.stageOn) return then(); if (++tries < 40) setTimeout(wait, 250); })();
   }
   // Tools as tiles: one tool at a time, and the way back to all of them.
+  // Each tile says what it does to the room (Ben, November 11, 2026). Names
+  // from the lexicon stay as they are: Propose and vote, Show a website.
+  var TOOL_LABELS = { 'Breakouts': 'Send to breakouts', 'The board': 'Put up the board', 'Apps': 'Show someone’s app', 'A clock': 'Start a clock',
+    'A card for everyone': 'Put up a card', 'Who is presenting': 'Feature someone', 'Waiting to show work': 'Who is ready to show',
+    'Questions': 'Read the answers', 'Recording': 'Record the session', 'Stances': 'Ask where people stand' };
+  function toolLabel(name) { return TOOL_LABELS[name] || name; }
   var TOOL_ICONS = { 'Main stage': 'app-window', 'Ask a question': 'chats-circle', 'Breakouts': 'users-three', 'Apps': 'laptop', 'A card for everyone': 'megaphone-simple',
     'Who is presenting': 'chalkboard-teacher', 'Waiting to show work': 'hand-tap', 'The board': 'palette', 'Questions': 'chat-circle-text', 'Recording': 'video-camera',
     'Show a website': 'globe-simple', 'A clock': 'clock', 'Propose and vote': 'check-circle', 'Stances': 'hand-tap' };
@@ -2220,7 +2248,7 @@
     t.list.forEach(function (x) {
       var b = el('button', 'p2-tile' + (x.on ? ' is-on' : '')); b.type = 'button';
       if (TOOL_ICONS[x.name]) b.innerHTML = '<svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022j#' + TOOL_ICONS[x.name] + '"/></svg>';
-      b.appendChild(el('span', null, x.name));
+      b.appendChild(el('span', null, toolLabel(x.name)));
       // Whether it is on, said on its face (Week 2: "I absolutely have to be
       // able to open and close each one of the tools easily").
       if (x.on || x.toggle) b.appendChild(el('span', 'p2-tile-state', x.on ? 'On' : 'Off'));
@@ -2242,7 +2270,7 @@
     // A tool opens ready to use, never as one more closed heading.
     var inner = one.node.querySelector('details'); if (inner) inner.open = true;
     t.pane.setAttribute('data-tool', name);
-    S.toolBack.querySelector('span').textContent = name;
+    S.toolBack.querySelector('span').textContent = toolLabel(name);
   }
   function closeTool() {
     var pane = S.frame.pane('tools');
