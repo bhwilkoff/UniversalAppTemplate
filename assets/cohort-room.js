@@ -15,9 +15,9 @@
       welcome: function (m) { you = m.you; },
       room: function (r) {
         room = r;
-        // A leader opens the call's room the first time a tool is wanted, and
-        // takes it back if no host is here.
-        if (o.teaching && !r.on && started) client.send({ t: 'start', title: o.title || '' });
+        // A leader's panel opens the call's room as it arrives, so stances
+        // count from the start, and takes it back if no host is here.
+        if (o.teaching && !r.on && !started) { started = true; client.send({ t: 'start', title: o.title || '' }); }
         if (o.teaching && r.canTakeOver) client.send({ t: 'claim' });
         if (o.onChange) o.onChange();
       }
