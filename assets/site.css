@@ -2842,7 +2842,7 @@ html.app-nav-open[data-signed-in] body:not([data-no-app-nav]) .app-nav { display
 .p2-bar { flex: none; display: flex; gap: 8px; padding: 8px 16px 12px; border-top: 1px solid var(--rule); }
 .p2-bar:empty { display: none; }
 .p2-panel .btn-primary, .p2-panel .btn-secondary { border-radius: 20px; font-family: inherit; font-weight: 500; letter-spacing: 0; min-height: 36px; padding: 0 16px; }
-.p2-next { flex: 1 1 auto; min-width: 0; min-height: 48px !important; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.p2-next { display: block; flex: 1 1 auto; min-width: 0; min-height: 48px !important; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .p2-back { flex: none; min-height: 48px !important; }
 .p2-next:disabled { opacity: 1; background: none; border-color: transparent; color: var(--muted); box-shadow: none; cursor: default; }
 .p2-panel .show-run, .p2-panel .show-anytime, .p2-panel .show-before, .p2-panel .show-kind .show-mins ~ * { display: none; }

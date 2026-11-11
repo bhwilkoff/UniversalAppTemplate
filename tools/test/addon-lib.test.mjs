@@ -424,3 +424,7 @@ test('one answer on the stage sits beside its open question, which still takes a
   const closed = lib.stageView({ part: { key: 'p', name: 'Q' }, onStage: { kind: 'answer', id: 'a1' }, beside: { kind: 'check', id: 'k1' }, checks: [Object.assign({}, checks[0], { state: 'closed' })], onStageDetail: { kind: 'answer', prompt: 'x', text: 'y' } });
   assert.equal(closed.mode, 'answer');
 });
+
+test('the leader reads that one answer sits under the open question', () => {
+  assert.equal(lib.stageSays({ mode: 'check', prompt: 'Q', shown: { text: 'A' } }), 'One answer, under the open question');
+});

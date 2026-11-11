@@ -1142,7 +1142,8 @@
     else if (part && part.kind === 'presenter') lines.push('Their panel: Show your app, at the top of Now');
     else lines.push('Their panel: reactions, and Ask your leader');
     var v = S.session ? currentView() : null;
-    if (v && v.mode === 'check' && S.stageOn) lines.push('Their stage: ' + A.stageSays(v) + ', with ' + (v.count ? 'the counts and ' : '') + 'buttons to answer');
+    var writes = v && (v.kind === 'short' || v.kind === 'words');
+    if (v && v.mode === 'check' && S.stageOn) lines.push('Their stage: ' + A.stageSays(v) + ', with ' + (v.count ? 'the counts and ' : '') + (writes ? 'a box to write in' : 'buttons to answer'));
     else lines.push('Their stage: ' + (S.stageOn ? A.stageSays(v) : 'none until you open the main stage, and then only after they press Join activity'));
     if (S.svc && S.svc.stancesOpen && S.svc.stancesOpen()) lines.push('Agree, Not sure, and Disagree' + (open.length ? ', once they have answered' : ''));
     var key = lines.join('|');
@@ -1836,6 +1837,8 @@
       box.appendChild(wrap);
       return;
     }
+    // A heading that says what this does (Week 2: unlabeled controls).
+    wrap.appendChild(el('p', 'p2-label', 'Pick who shows next'));
     var row = el('div', 'actions');
     var how = el('select'); how.setAttribute('aria-label', 'Whom to feature');
     [{ key: 'random', label: 'At random' }, { key: 'quiet', label: 'Someone quiet so far' }].concat(voteChoices()).forEach(function (o) {
@@ -1845,10 +1848,10 @@
     how.addEventListener('change', function () { S.featureHow = how.value; });
     var count = el('input'); count.type = 'number'; count.min = '1'; count.max = '8';
     count.value = String(S.featureCount || (part.config && part.config.feature_count) || 1);
-    count.setAttribute('aria-label', 'How many');
+    count.setAttribute('aria-label', 'How many people'); count.style.width = '4.5em';
     count.addEventListener('change', function () { S.featureCount = Math.max(1, Math.min(8, Number(count.value) || 1)); });
     row.appendChild(how); row.appendChild(count);
-    row.appendChild(button(pk ? 'Pick again' : 'Choose', 'btn-secondary small', function () { S.featureHow = how.value; S.featureCount = Math.max(1, Math.min(8, Number(count.value) || 1)); choose(part); }));
+    row.appendChild(button(pk ? 'Pick again' : 'Pick', 'btn-secondary small', function () { S.featureHow = how.value; S.featureCount = Math.max(1, Math.min(8, Number(count.value) || 1)); choose(part); }));
     wrap.appendChild(row);
     if (pk) {
       var ul = el('ul', 'p2-picks');
