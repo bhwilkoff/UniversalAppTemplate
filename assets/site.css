@@ -3299,6 +3299,8 @@ a.person-name:hover { text-decoration: underline; }
 .is-room .stage-head { z-index: auto; }
 .is-room .stage-part:not([hidden]) { position: fixed; top: 0.75rem; right: 0.75rem; z-index: 6; padding: 0.2rem 0.8rem; border-radius: 999px; background: var(--card); color: var(--ink); font-variant-numeric: tabular-nums; }
 .is-room .stage-ready:has(.stage-name:not([hidden])) .stage-part:not([hidden]) { top: 3.5rem; }
+/* A cohort's stage: the clock rides above the room's website and ideas too. */
+.has-strip .stage-part:not([hidden]) { position: relative; z-index: 6; }
 .is-room [data-view="part"] [data-part-big] { font-size: clamp(1.5rem, 6vmin, 3.5rem); }
 
 /* The open room's panel, built from the same pieces as a cohort's. */
