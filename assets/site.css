@@ -3093,7 +3093,8 @@ select:not([multiple]) {
 .stage-pick { width: 100%; padding: 1.4vmin 2vmin; border: 2px solid var(--rule); border-radius: 12px; background: var(--card); color: var(--ink); font: inherit; text-align: left; cursor: pointer; }
 .stage-shown { margin: 0 0 2vmin; }
 .stage-shown .stage-answer { margin: 0; font-size: clamp(1rem, 2.6vmin, 1.8rem); }
-.stage-stance[aria-pressed="true"], .p2-stances .btn-secondary[aria-pressed="true"] { background: var(--ink); color: var(--on-ink); border-color: var(--ink); }
+.stage-stance[aria-pressed="true"] { background: var(--ink); color: var(--on-ink); border-color: var(--ink); }
+.p2-panel .p2-stances .btn-secondary[aria-pressed="true"] { background: var(--accent); color: var(--on-ink); border-color: var(--accent); }
 .stage-quiet.is-in { color: var(--ink); font-weight: 600; }
 .stage-pick:hover { border-color: var(--thistle); }
 .stage-pick[aria-pressed="true"] { background: var(--thistle); border-color: var(--thistle); color: var(--on-thistle); }
