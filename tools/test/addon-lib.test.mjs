@@ -374,3 +374,14 @@ test('an earlier question\'s answers show closed, with counts, and cannot be ans
   assert.equal(v.count.total, 2);
   assert.notEqual(lib.stageView({ part: { key: 'p', name: 'P' }, onStage: { kind: 'check', id: 'k1' }, checks: [k], results }).mode, 'check');
 });
+
+test('several featured, a room\'s work, and one answer reach the stage as sent', () => {
+  const people = lib.stageView({ part: { key: 'p', name: 'P' }, onStage: { kind: 'people', ids: ['a', 'b'] }, names: { a: 'Ana', b: 'Bo' } });
+  assert.deepEqual(lib.readStageMessage(lib.stageMessage(people)).who, ['Ana', 'Bo']);
+  const room = lib.stageView({ part: null, onStage: { kind: 'room', id: 'g' }, onStageDetail: { kind: 'room', name: 'Room 2', people: ['Ana'], items: [{ q: 'Why?', a: 'Because' }, { q: 'Empty', a: '' }] } });
+  assert.deepEqual(lib.readStageMessage(lib.stageMessage(room)).room, { name: 'Room 2', people: ['Ana'], items: [{ q: 'Why?', a: 'Because' }] });
+  const ans = lib.stageView({ part: null, onStage: { kind: 'answer', id: 'x' }, onStageDetail: { kind: 'answer', prompt: 'Why?', text: 'Because', who: null } });
+  assert.deepEqual(lib.readStageMessage(lib.stageMessage(ans)).answer, { prompt: 'Why?', text: 'Because', who: null });
+  // Without what on_stage gave, a room or an answer shows nothing of anyone's.
+  assert.notEqual(lib.stageView({ part: null, onStage: { kind: 'answer', id: 'x' } }).mode, 'answer');
+});

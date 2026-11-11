@@ -42,10 +42,26 @@
 
     function status(text) { said = text || ''; var s = box.querySelector('[data-breakout-status]'); if (s) s.textContent = said; }
 
-    function launch() {
+    // The rooms last launched in this session, kept in this browser, so the
+    // same groups can meet again (Course Builder's Re-run Breakout). Only
+    // people still in the call go back; anyone new waits to be placed.
+    var LAST = 'hs-breakout-last:' + o.session.id;
+    function lastRooms() {
+      var kept = null;
+      try { kept = JSON.parse(localStorage.getItem(LAST) || 'null'); } catch (e) {}
+      if (!Array.isArray(kept) || !kept.length) return null;
+      var here = {};
+      everyone().forEach(function (p) { here[p.id] = true; });
+      var rooms = kept.map(function (r) { return (Array.isArray(r) ? r : []).filter(function (id) { return here[id]; }); }).filter(function (r) { return r.length; });
+      return rooms.length ? rooms : null;
+    }
+    function launch(again) {
       var mins = Number(minutesSet ? minutes : preset().minutes || minutes);
+      var rooms = again === true ? lastRooms() : plan();
+      if (!rooms) { status('No rooms from earlier in this session.'); return; }
       status('Launching…');
-      var ready = stable().length ? Promise.resolve({}) : o.db.rpc('launch_breakouts', { session: o.session.id, rooms: plan() });
+      if (!stable().length) { try { localStorage.setItem(LAST, JSON.stringify(rooms)); } catch (e) {} }
+      var ready = stable().length ? Promise.resolve({}) : o.db.rpc('launch_breakouts', { session: o.session.id, rooms: rooms });
       Promise.resolve(ready).then(function (r) {
         if (r.error) { status('Not launched: ' + r.error.message); return null; }
         return o.reload().then(function () {
@@ -108,7 +124,8 @@
         d.appendChild(list);
       }
       var acts = el('div', 'actions');
-      acts.appendChild(button('Launch breakouts', 'btn-primary', launch));
+      acts.appendChild(button('Launch breakouts', 'btn-primary', function () { launch(false); }));
+      if (!stable().length && lastRooms()) acts.appendChild(button('Same rooms as last time', 'btn-secondary', function () { launch(true); }));
       d.appendChild(acts);
       d.appendChild(statusLine());
       return d;

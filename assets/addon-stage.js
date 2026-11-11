@@ -153,6 +153,25 @@
     }
     drawApp(view.mode === 'app' ? view : null);
     drawDoc(view.mode === 'doc' ? view : null);
+    if (view.mode === 'people') {
+      var pl = $('[data-people-list]'); pl.replaceChildren();
+      pl.classList.toggle('many', view.who.length > 3);
+      view.who.forEach(function (n) { pl.appendChild(el('li', null, n)); });
+      $('[data-people-audience]').hidden = !view.audience;
+      $('[data-people-audience]').textContent = view.audience || '';
+    }
+    if (view.mode === 'room') {
+      $('[data-room-name]').textContent = view.room.name;
+      $('[data-room-people]').textContent = view.room.people.join(', ');
+      var dl = $('[data-room-answers]'); dl.replaceChildren();
+      view.room.items.forEach(function (x) { if (x.q) dl.appendChild(el('dt', null, x.q)); dl.appendChild(el('dd', null, x.a)); });
+    }
+    if (view.mode === 'answer') {
+      $('[data-answer-prompt]').textContent = view.answer.prompt;
+      $('[data-answer-text]').textContent = view.answer.text;
+      $('[data-answer-who]').hidden = !view.answer.who;
+      $('[data-answer-who]').textContent = view.answer.who ? '— ' + view.answer.who : '';
+    }
     if (view.mode === 'person') {
       $('[data-person-who]').textContent = view.who;
       $('[data-person-audience]').hidden = !view.audience;

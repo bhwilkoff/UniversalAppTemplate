@@ -113,6 +113,16 @@
     if (u.protocol !== 'https:' || /(^|\.)github\.com$/.test(u.hostname)) return null;
     return u.href.length > 500 ? null : u.href;
   }
+  function roomOf(d) {
+    return {
+      name: cut(d.name || 'A room', 60),
+      people: (Array.isArray(d.people) ? d.people : []).slice(0, 12).map(function (x) { return cut(x, 60); }),
+      items: (Array.isArray(d.items) ? d.items : []).slice(0, 12).filter(function (x) { return x && typeof x.a === 'string' && x.a; }).map(function (x) { return { q: cut(x.q || '', 200), a: cut(x.a, 400) }; })
+    };
+  }
+  function answerOf(d) {
+    return { prompt: cut(d.prompt || '', 300), text: cut(d.text || '', 1000), who: typeof d.who === 'string' && d.who ? cut(d.who, 80) : null };
+  }
   // A part's document as the stage frames it: a Google file opens in its
   // preview, which allows being framed; anything else framable as it is.
   function docUrl(url) {
@@ -227,6 +237,17 @@
     // Every rehearsal room at a glance (R12): its name, where its turns
     // are, its step's clock, and whether it asked for the teacher.
     if (on && on.kind === 'rooms') return { mode: 'rooms', part: part, rooms: roomsOf(state.rooms) };
+    // Several featured at once, by name.
+    if (on && on.kind === 'people') {
+      var names = (on.ids || []).slice(0, 8).map(function (id) { return cut((state.names || {})[id] || 'Someone', 80); });
+      var gv = { mode: 'people', part: part, who: names };
+      if (typeof state.audience === 'string' && state.audience) gv.audience = cut(state.audience, 300);
+      return gv;
+    }
+    // One room's people and workbook answers, for its debrief, and one written
+    // answer: both read through on_stage(), which only gives what a leader put up.
+    if (on && on.kind === 'room' && state.onStageDetail && state.onStageDetail.kind === 'room') return { mode: 'room', part: part, room: roomOf(state.onStageDetail) };
+    if (on && on.kind === 'answer' && state.onStageDetail && state.onStageDetail.kind === 'answer') return { mode: 'answer', part: part, answer: answerOf(state.onStageDetail) };
     // Someone featured by name (a presenter part's config.feature).
     if (on && on.kind === 'person') {
       var pv = { mode: 'person', part: part, who: cut((state.names || {})[on.id] || 'Someone', 80) };
@@ -348,6 +369,9 @@
     }
     if (v.mode === 'welcome') { var w = welcomeOf(v.welcome); return w ? { mode: 'welcome', part: part, welcome: w } : null; }
     if (v.mode === 'card' && v.card && typeof v.card.body === 'string' && v.card.body) return { mode: 'card', part: part, card: { body: cut(v.card.body, 400), endsAt: num(v.card.endsAt) } };
+    if (v.mode === 'people' && Array.isArray(v.who)) { var gp = { mode: 'people', part: part, who: v.who.slice(0, 8).map(function (x) { return cut(x, 80); }) }; if (typeof v.audience === 'string' && v.audience) gp.audience = cut(v.audience, 300); return gp; }
+    if (v.mode === 'room' && v.room) return { mode: 'room', part: part, room: roomOf(v.room) };
+    if (v.mode === 'answer' && v.answer && typeof v.answer.text === 'string') return { mode: 'answer', part: part, answer: answerOf(v.answer) };
     if (v.mode === 'person') { var pr = { mode: 'person', part: part, who: cut(v.who || 'Someone', 80) }; if (typeof v.audience === 'string' && v.audience) pr.audience = cut(v.audience, 300); return pr; }
     if (v.mode === 'doc') { var dd = docOf(v.doc); return dd ? { mode: 'doc', part: part, doc: dd } : null; }
     if (v.mode === 'part') return { mode: 'part', part: part };

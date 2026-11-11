@@ -91,7 +91,23 @@
     return { id: chosen.id, name: chosen.name, why: SIGNALS.filter(function (s) { return !n(s[0], chosen.id); }).map(function (s) { return s[1]; }) };
   }
 
-  var lib = { STAGE_IDS: STAGE_IDS, STAGE_SHORT: STAGE_SHORT, STAGE_NAMES: STAGE_NAMES, isStage: isStage, roster: roster, askingNow: askingNow, summary: summary, pathView: pathView, toFeature: toFeature };
+  // Several at once (a step that features four people beside its poll): each
+  // pick leaves the rest of the pool for the next. `picks` gives the chance for
+  // each pick in turn, so tests can fix them.
+  function toFeatureMany(people, signals, mode, count, picks) {
+    var pool = (people || []).slice(), out = [];
+    var n = Math.max(1, Math.min(8, Number(count) || 1));
+    for (var i = 0; i < n && pool.length; i++) {
+      var r = picks && picks[i] != null ? picks[i] : null;
+      var one = toFeature(pool, signals, mode, r);
+      if (!one) break;
+      out.push(one);
+      pool = pool.filter(function (p) { return p.id !== one.id; });
+    }
+    return out;
+  }
+
+  var lib = { STAGE_IDS: STAGE_IDS, STAGE_SHORT: STAGE_SHORT, STAGE_NAMES: STAGE_NAMES, isStage: isStage, roster: roster, askingNow: askingNow, summary: summary, pathView: pathView, toFeature: toFeature, toFeatureMany: toFeatureMany };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
   else root.RosterLib = lib;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

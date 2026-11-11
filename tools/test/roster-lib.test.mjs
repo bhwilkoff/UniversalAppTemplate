@@ -55,3 +55,11 @@ test('a random pick is anyone not featured yet, and everyone once all have been'
   assert.equal(R.toFeature(people, { featured: { a: 1, b: 1 } }, 'random', 0.99).id, 'b');
   assert.equal(R.toFeature([], {}, 'random', 0), null);
 });
+
+test('several picks never repeat, and stop when the pool runs out', () => {
+  const people = [{ id: 'a', name: 'Ana' }, { id: 'b', name: 'Bo' }, { id: 'c', name: 'Cy' }];
+  const signals = { reactions: { a: 5, b: 1, c: 0 } };
+  assert.deepEqual(R.toFeatureMany(people, signals, 'quiet', 2, [0, 0]).map((x) => x.id), ['c', 'b']);
+  assert.equal(R.toFeatureMany(people, {}, 'random', 8, [0, 0, 0]).length, 3);
+  assert.equal(new Set(R.toFeatureMany(people, {}, 'random', 3).map((x) => x.id)).size, 3);
+});

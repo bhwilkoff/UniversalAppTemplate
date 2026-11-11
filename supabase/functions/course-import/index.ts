@@ -61,7 +61,7 @@ async function build(db: any, leader: string, course: any) {
   if (c.error) throw new Error('The cohort could not be made: ' + c.error.message);
   const cohortId = c.data.id;
   const refs: Record<string, string> = {};
-  const later: { id: string; ref: string; config: Record<string, unknown> }[] = [];
+  const later: { id: string; ref: string; config: Record<string, unknown>; key: string }[] = [];
   for (const s of plan.sessions) {
     const row = await db.from('sessions').insert({ cohort_id: cohortId, number: s.number, title: s.title, before: s.before, readings: s.readings }).select('id').single();
     if (row.error) throw new Error('Session ' + s.number + ' could not be made: ' + row.error.message);
@@ -77,6 +77,8 @@ async function build(db: any, leader: string, course: any) {
       const config = Object.assign({}, sc.config);
       const pending = config.results_of_ref as string | undefined;
       delete config.results_of_ref;
+      const pendingRerun = config.rerun_of_ref as string | undefined;
+      delete config.rerun_of_ref;
       const wbRefs = config.workbooks_refs as string[] | undefined;
       delete config.workbooks_refs;
       if (wbRefs && wbRefs.length) config.workbooks = wbRefs.map((r) => wbIds[r]).filter(Boolean);
@@ -88,7 +90,8 @@ async function build(db: any, leader: string, course: any) {
       if (ins.error) throw new Error('A part of session ' + s.number + ' ("' + sc.title + '") could not be made: ' + ins.error.message);
       const id = ins.data.id;
       if (sc.ref) refs[sc.ref] = id;
-      if (pending) later.push({ id, ref: pending, config });
+      if (pending) later.push({ id, ref: pending, config, key: 'results_of' });
+      if (pendingRerun) later.push({ id, ref: pendingRerun, config, key: 'rerun_of' });
       if (sc.notes) {
         const note = await db.from('scene_notes').insert({ scene_id: id, cohort_id: cohortId, body: sc.notes });
         if (note.error) throw new Error('Notes for "' + sc.title + '" could not be saved: ' + note.error.message);
@@ -102,7 +105,8 @@ async function build(db: any, leader: string, course: any) {
   // A part that shows an earlier question's answers points at that part.
   for (const l of later) {
     if (!refs[l.ref]) continue;
-    await db.from('scenes').update({ config: Object.assign({}, l.config, { results_of: refs[l.ref] }) }).eq('id', l.id);
+    l.config[l.key] = refs[l.ref];
+    await db.from('scenes').update({ config: l.config }).eq('id', l.id);
   }
   return { cohortId, counts: plan.counts, warnings: plan.warnings };
 }

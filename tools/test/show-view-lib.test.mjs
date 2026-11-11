@@ -120,3 +120,10 @@ test('the document and a featured person go on the stage and come back', () => {
   assert.deepEqual(S.stageChange({ kind: 'person', id: 'u1' }), { stage: 'person', stage_ref: 'u1' });
   assert.deepEqual(S.pinOf({ stage: 'person', stage_ref: 'u1' }), { kind: 'person', id: 'u1' });
 });
+
+test('several people, a room, and one answer go on the stage and come back', () => {
+  assert.deepEqual(S.stageChange({ kind: 'people', ids: ['a', 'b'] }), { stage: 'people', stage_ref: null, featured: ['a', 'b'] });
+  assert.deepEqual(S.pinOf({ stage: 'people', featured: ['a', 'b'] }), { kind: 'people', ids: ['a', 'b'] });
+  assert.deepEqual(S.pinOf(S.stageChange({ kind: 'room', id: 'g' })), { kind: 'room', id: 'g' });
+  assert.deepEqual(S.pinOf(S.stageChange({ kind: 'answer', id: 'x', named: true })), { kind: 'answer', id: 'x', named: true });
+});

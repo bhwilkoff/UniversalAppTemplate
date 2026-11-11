@@ -972,7 +972,7 @@
     var list = V.scenes(S.run.list());
     var changed = JSON.stringify(list) !== JSON.stringify(S.list);
     S.list = list;
-    if (shared()) S.onStage = V.pinOf(S.run.state());
+    if (shared()) { var was = JSON.stringify(S.onStage); S.onStage = V.pinOf(S.run.state()); if (JSON.stringify(S.onStage) !== was) loadStageDetail(); }
     $('[data-timer]').hidden = shared();
     $('[data-next-part]').hidden = shared();
     if (changed) { S.drawnPart = undefined; S.show.setScenes(S.list); }
@@ -1478,6 +1478,7 @@
         drawCounts();
         drawRoster();
         drawPartTools();
+        loadStageDetail();
         sendStage();
       });
     });
@@ -1503,8 +1504,37 @@
   // What the main stage shows instead of the current scene, if anything.
   // With the show running (R3) this is the show everyone follows, so
   // every main stage changes with the teacher's.
+  // What only the leader could read, for every stage: a room's work or one
+  // written answer, through on_stage().
+  function loadStageDetail() {
+    var on = S.onStage;
+    if (!on || (on.kind !== 'room' && on.kind !== 'answer')) { if (S.onStageDetail) { S.onStageDetail = null; sendStage(); } return; }
+    var want = on.kind + ':' + on.id + ':' + !!on.named;
+    db.rpc('on_stage', { s: S.session.id }).then(function (r) {
+      var d = r && r.data;
+      if (!d || !S.onStage || S.onStage.kind + ':' + S.onStage.id + ':' + !!S.onStage.named !== want) return;
+      if (d.kind === 'room') {
+        var ids = (d.answers || []).map(function (x) { return x.workbook; }).filter(function (x, i, a) { return a.indexOf(x) === i; });
+        S.workbooks = S.workbooks || {};
+        var need = ids.filter(function (id) { return !S.workbooks[id]; });
+        var ready = need.length ? db.from('workbooks').select('*').in('id', need).then(function (w) { (w.data || []).forEach(function (x) { S.workbooks[x.id] = x; }); }) : Promise.resolve();
+        return ready.then(function () {
+          d.items = (d.answers || []).map(function (x) {
+            var wb = S.workbooks[x.workbook], b = wb ? (wb.blocks || []).filter(function (y) { return y.key === x.block; })[0] : null;
+            var v = x.value || {}, a = v.text || '';
+            if (b && b.type === 'choice') a = (v.picks || []).map(function (i) { return (b.choices || [])[i]; }).filter(Boolean).join(', ');
+            if (v.cells) a = v.cells.map(function (row) { return row.filter(Boolean).join(' / '); }).filter(Boolean).join('; ');
+            return { q: b ? String(b.text || '').replace(/[*_#]/g, '').split('\n')[0] : '', a: a };
+          });
+          S.onStageDetail = d; sendStage();
+        });
+      }
+      S.onStageDetail = d; sendStage();
+    });
+  }
   function setPin(v) {
     S.onStage = v;
+    loadStageDetail();
     if (S.run && S.run.shared && S.teaching) S.run.pin(v);
     drawQueue(); drawChecks(); drawRoster(); drawRoomsToggle(); sendStage(); drawRunInfo(); drawApps();
     drawBoardPin(); drawPartTools();
@@ -1528,7 +1558,8 @@
       row.appendChild(a);
       box.appendChild(row);
     }
-    if (S.teaching && part && part.kind === 'presenter' && c.feature && c.feature !== 'teacher') drawFeature(box, part, c.feature);
+    if (S.teaching && part && ((c.feature && c.feature !== 'teacher') || part.kind === 'presenter')) drawFeature(box, part, c.feature);
+    if (S.teaching) drawRoomsWork(box);
     var docs = part && part.kind === 'rooms' && Array.isArray(c.group_docs) ? c.group_docs : [];
     if (docs.length) {
       var mine = null;
@@ -1603,28 +1634,59 @@
       S.workbookShown = w.id + ':' + S.room.groupId; S.workbookBody = body;
     });
   }
+  // Featuring: how many (a step featured up to eight beside its poll), and
+  // whom: at random, someone quiet so far, or someone who chose an answer to
+  // the newest choice question (Course Builder's Voting filter).
+  function voteChoices() {
+    var k = (S.checks || []).filter(function (x) { var kd = L.kindOf(x); return (kd === 'choice' || kd === 'multi') && (x.choices || []).length; })[0];
+    return k ? (k.choices || []).map(function (c, i) { return { key: 'vote:' + k.id + ':' + i, label: 'Who chose “' + c + '”', check: k.id, index: i }; }) : [];
+  }
   function drawFeature(box, part, mode) {
     var wrap = el('div', 'p2-feature');
-    var featured = S.onStage && S.onStage.kind === 'person' ? S.onStage.id : null;
+    var on = S.onStage && (S.onStage.kind === 'people' || S.onStage.kind === 'person') ? (S.onStage.ids || [S.onStage.id]) : null;
     var pk = S.featurePick && S.featurePick.part === part.key ? S.featurePick : null;
-    if (featured) {
-      wrap.appendChild(el('p', null, 'Featuring ' + (S.names[featured] || 'someone')));
+    if (on) {
+      wrap.appendChild(el('p', null, 'Featuring ' + on.map(function (id) { return S.names[id] || 'someone'; }).join(', ')));
       wrap.appendChild(button('Done', 'btn-secondary small', function () { setPin(null); }));
-    } else if (pk) {
-      wrap.appendChild(el('p', null, pk.name + (pk.why.length ? ': ' + pk.why.join(', ') : '')));
-      var acts = el('div', 'actions');
-      acts.appendChild(button('Feature them', 'btn-secondary small', function () { S.featurePick = null; setPin({ kind: 'person', id: pk.id }); }));
-      acts.appendChild(button('Someone else', 'link-button', function () { choose(part, mode, pk.id); }));
-      wrap.appendChild(acts);
-    } else {
-      wrap.appendChild(button(mode === 'quiet' ? 'Choose someone quiet' : 'Choose someone at random', 'btn-secondary small', function () { choose(part, mode); }));
+      box.appendChild(wrap);
+      return;
+    }
+    var row = el('div', 'actions');
+    var how = el('select'); how.setAttribute('aria-label', 'Whom to feature');
+    [{ key: 'random', label: 'At random' }, { key: 'quiet', label: 'Someone quiet so far' }].concat(voteChoices()).forEach(function (o) {
+      var op = el('option', null, o.label); op.value = o.key; how.appendChild(op);
+    });
+    how.value = S.featureHow && how.querySelector('option[value="' + S.featureHow + '"]') ? S.featureHow : (mode === 'quiet' ? 'quiet' : 'random');
+    how.addEventListener('change', function () { S.featureHow = how.value; });
+    var count = el('input'); count.type = 'number'; count.min = '1'; count.max = '8';
+    count.value = String(S.featureCount || (part.config && part.config.feature_count) || 1);
+    count.setAttribute('aria-label', 'How many');
+    count.addEventListener('change', function () { S.featureCount = Math.max(1, Math.min(8, Number(count.value) || 1)); });
+    row.appendChild(how); row.appendChild(count);
+    row.appendChild(button(pk ? 'Pick again' : 'Choose', 'btn-secondary small', function () { S.featureHow = how.value; S.featureCount = Math.max(1, Math.min(8, Number(count.value) || 1)); choose(part); }));
+    wrap.appendChild(row);
+    if (pk) {
+      var ul = el('ul', 'p2-picks');
+      pk.list.forEach(function (x) { ul.appendChild(el('li', null, x.name + (x.why.length ? ': ' + x.why.join(', ') : ''))); });
+      wrap.appendChild(ul);
+      wrap.appendChild(button('Feature them', 'btn-secondary small', function () { var ids = pk.list.map(function (x) { return x.id; }); S.featurePick = null; setPin({ kind: 'people', ids: ids }); }));
     }
     if (S.featureSaid) wrap.appendChild(el('p', 'small', S.featureSaid));
     box.appendChild(wrap);
   }
-  function choose(part, mode, skip) {
-    var r = rosterNow();
-    var pool = (r ? (r.here.length ? r.here : r.missing) : []).filter(function (p) { return (S.teacherIds || []).indexOf(p.id) < 0 && p.id !== skip; });
+  function choose(part) {
+    var r = rosterNow(), how = S.featureHow || 'random';
+    var pool = (r ? (r.here.length ? r.here : r.missing) : []).filter(function (p) { return (S.teacherIds || []).indexOf(p.id) < 0; });
+    var vote = /^vote:([^:]+):(\d+)$/.exec(how);
+    if (vote) {
+      var chose = {};
+      (S.answers || []).forEach(function (a) {
+        if (a.check_id !== vote[1]) return;
+        var picks = Array.isArray(a.value) ? a.value : a.choice != null ? [a.choice] : [];
+        if (picks.indexOf(Number(vote[2])) >= 0) chose[a.user_id] = true;
+      });
+      pool = pool.filter(function (p) { return chose[p.id]; });
+    }
     S.featureSaid = null;
     return Promise.all([
       db.from('session_events').select('user_id, kind, detail').eq('session_id', S.session.id).in('kind', ['reaction', 'stance', 'stage']),
@@ -1632,19 +1694,37 @@
     ]).then(function (res) {
       var sig = { reactions: {}, answers: {}, shares: {}, queue: {}, requests: {}, featured: {} };
       ((res[0] && res[0].data) || []).forEach(function (e) {
-        if (e.kind === 'stage') { var m = /^person:(.+)$/.exec(e.detail || ''); if (m) inc(sig.featured, m[1]); }
-        else inc(sig.reactions, e.user_id);
+        if (e.kind === 'stage') {
+          var m = /^(person|people):(.+)$/.exec(e.detail || '');
+          if (m) m[2].split(',').forEach(function (id) { inc(sig.featured, id); });
+        } else inc(sig.reactions, e.user_id);
       });
       ((res[1] && res[1].data) || []).forEach(function (x) { inc(sig.shares, x.user_id); });
       var asked = (S.checks || []).map(function (k) { return k.id; });
       (S.answers || []).forEach(function (a) { if (asked.indexOf(a.check_id) >= 0) inc(sig.answers, a.user_id); });
       (S.items || []).forEach(function (i) { inc(sig.queue, i.user_id); });
       (S.requests || []).forEach(function (q) { inc(sig.requests, q.user_id); });
-      var pick = window.RosterLib ? window.RosterLib.toFeature(pool.map(function (p) { return { id: p.id, name: p.name }; }), sig, mode === 'quiet' ? 'quiet' : 'random') : null;
-      S.featurePick = pick ? Object.assign({ part: part.key }, pick) : null;
-      if (!pick) S.featureSaid = 'There is no one to choose yet.';
+      var list = window.RosterLib ? window.RosterLib.toFeatureMany(pool.map(function (p) { return { id: p.id, name: p.name }; }), sig, how === 'quiet' ? 'quiet' : 'random', S.featureCount || 1) : [];
+      S.featurePick = list.length ? { part: part.key, list: list } : null;
+      if (!list.length) S.featureSaid = vote ? 'No one here chose that yet.' : 'There is no one to choose yet.';
       drawPartTools();
     });
+  }
+  // Each breakout room's work, for its debrief (Course Builder's Feature
+  // Breakout Groups): its people and workbook answers on every stage.
+  function drawRoomsWork(box) {
+    var rooms = (S.groups || []).filter(function (g) { return g.breakout; });
+    if (!rooms.length || !S.run || !S.run.shared) return;
+    box.appendChild(el('p', 'small', 'Each room’s work'));
+    var ul = el('ul', 'p2-run-list');
+    rooms.forEach(function (g) {
+      var up = S.onStage && S.onStage.kind === 'room' && S.onStage.id === g.id;
+      var li = el('li', 'p2-room-row');
+      li.appendChild(el('span', null, g.name + ' (' + (g.group_members || []).length + ')'));
+      li.appendChild(button(up ? 'Take it down' : 'Put on stage', 'link-button', function () { setPin(up ? null : { kind: 'room', id: g.id }); }));
+      ul.appendChild(li);
+    });
+    box.appendChild(ul);
   }
 
   // Whose work is on the main stage, for everyone, and, for a teacher,
@@ -1997,7 +2077,16 @@
       details.appendChild(el('summary', null, 'Read the answers'));
       var ul = el('ul', 'live-answers');
       mine.sort(function (a, b) { return a.updated_at.localeCompare(b.updated_at); }).forEach(function (a) {
-        var li = el('li'); li.appendChild(el('strong', null, nameOf(a.user_id) + ': ')); li.appendChild(document.createTextNode(L.answerText(k, a) || '')); ul.appendChild(li);
+        var li = el('li'); li.appendChild(el('strong', null, nameOf(a.user_id) + ': ')); li.appendChild(document.createTextNode(L.answerText(k, a) || ''));
+        // A written answer can go on every stage, without its author's name
+        // until the leader shows it (on_stage, migration 20261111070000).
+        if (a.body && S.run && S.run.shared) {
+          var up = S.onStage && S.onStage.kind === 'answer' && S.onStage.id === a.id;
+          li.appendChild(document.createTextNode(' '));
+          li.appendChild(button(up ? 'Take it down' : 'Put on stage', 'link-button', function () { setPin(up ? null : { kind: 'answer', id: a.id, named: false }); }));
+          if (up) li.appendChild(button(S.onStage.named ? 'Hide the name' : 'Show the name', 'link-button', function () { setPin({ kind: 'answer', id: a.id, named: !S.onStage.named }); }));
+        }
+        ul.appendChild(li);
       });
       details.appendChild(ul);
       card.appendChild(details);
@@ -2139,7 +2228,8 @@
       return p.then(function (r) {
         if (r && r.error) return r;
         return db.from('live_checks').insert(Q.askRow({
-          cohort_id: S.cohort.id, session_id: S.session.id, created_by: S.me.id, show_tally: !!q.show_tally
+          cohort_id: S.cohort.id, session_id: S.session.id, created_by: S.me.id, show_tally: !!q.show_tally,
+          rerun_of: q.rerun_of || null
         }, q, S.kinds));
       });
     }, Promise.resolve(null)).then(function (r) {
@@ -2214,6 +2304,16 @@
     if (part.kind === 'reflection') return L.fromScene(Object.assign({}, part.config, { kind: 'short' }));
     return null;
   }
+  // A part that asks an earlier part's question again (scenes.config.rerun_of,
+  // Course Builder's Repoll): the first time's question, and this time's copy.
+  function rerunPair(part) {
+    var ref = part && part.config && part.config.rerun_of;
+    var earlier = ref ? (S.list || []).filter(function (x) { return x.key === ref; })[0] : null;
+    var q = earlier ? plannedAsk(earlier) : null;
+    var first = q ? (S.checks || []).filter(function (k) { return k.prompt === q.prompt && !k.rerun_of; })[0] || null : null;
+    var again = first ? (S.checks || []).filter(function (k) { return k.rerun_of === first.id; })[0] || null : null;
+    return ref ? { first: first, again: again } : null;
+  }
   function askPlanned() {
     var part = partNow();
     if (!S.teaching || !part || !part.own) return;
@@ -2234,6 +2334,16 @@
     var shown = resultsCheck(part);
     if (shown && !shown.show_tally) changeCheck(shown, { show_tally: true });
     if (!q) return;
+    var pair = rerunPair(part);
+    if (pair) {
+      if (pair.first && pair.first.state === 'open') changeCheck(pair.first, { state: 'closed' });
+      if (pair.again) { if (pair.again.state !== 'open') changeCheck(pair.again, { state: 'open' }); return; }
+      if (!pair.first || S.autoAsked[part.key]) return;
+      S.autoAsked[part.key] = true;
+      var tallyAgain = part.config && typeof part.config.show_tally === 'boolean' ? part.config.show_tally : $('[data-ask-tally]').checked;
+      ask([Object.assign({ show_tally: tallyAgain, rerun_of: pair.first.id }, q)]);
+      return;
+    }
     // Coming back to a part opens its question again, with its answers
     // (found in the live Meet test: Back showed a question no one could
     // answer); a first arrival asks it, once.
@@ -2292,6 +2402,7 @@
       onStage: S.onStage || (S.card ? null : partCheckPin()), checks: S.checks, results: S.results, items: S.items, names: S.names, audience: V ? V.audienceOf(part) : null,
       welcome: lib.welcome(S.cohort, S.session, S.list && S.list.length ? S.list : S.parts), scene: scene, slides: slidesView(part),
       doc: part && part.own && part.config && part.config.show ? part.config.show : null,
+      onStageDetail: S.onStageDetail || null,
       path: window.RosterLib && S.onStage && S.onStage.kind === 'path' ? window.RosterLib.pathView(rosterNow()) : null,
       rooms: S.onStage && S.onStage.kind === 'rooms' ? Object.keys(S.roomPlaces).map(function (k) { return S.roomPlaces[k]; }) : null
     });
@@ -2303,8 +2414,10 @@
     var part = partNow();
     if (!part || !part.own) return null;
     if (part.kind === 'question') {
+      var pair = rerunPair(part);
+      if (pair) return pair.again && pair.again.state === 'open' ? pair.again : null;
       var q = L.fromScene(part.config);
-      return q ? (S.checks || []).filter(function (k) { return k.state === 'open' && k.prompt === q.prompt; })[0] || null : null;
+      return q ? (S.checks || []).filter(function (k) { return k.state === 'open' && k.prompt === q.prompt && !k.rerun_of; })[0] || null : null;
     }
     return resultsCheck(part);
   }

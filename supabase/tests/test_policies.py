@@ -3327,6 +3327,31 @@ def main():
           attempt(as_user("ben"), "insert into public.scenes (cohort_id, session_id, position, kind, title, minutes, config) values (%s, %s, 56, 'rooms', 'With workbooks', 10, jsonb_build_object('workbooks', jsonb_build_array(%s::text)))", (cc, ss, wbg)))
     check("refused: workbooks on a part that is not a breakout",
           not attempt(as_user("ben"), "insert into public.scenes (cohort_id, session_id, position, kind, title, minutes, config) values (%s, %s, 57, 'talk', 'No', 3, jsonb_build_object('workbooks', jsonb_build_array(%s::text)))", (cc, ss, wbg)))
+    # Featuring several, a room, and one answer on the stage (migration 20261111070000).
+    check("a leader features two people at once",
+          attempt(as_user("ben"), "update public.show_state set stage = 'people', stage_ref = null, featured = array[%s, %s]::uuid[] where session_id = %s", (people["bea"], gid, ss)))
+    su.execute("reset role")
+    su.execute("select detail from public.session_events where session_id = %s and kind = 'stage' order by id desc limit 1", (ss,))
+    check("and both are kept for the next pick", su.fetchall() == [("people:" + people["bea"] + "," + gid,)])
+    check("someone outside the cohort cannot be among them",
+          not attempt(as_user("ben"), "update public.show_state set stage = 'people', featured = array[%s]::uuid[] where session_id = %s", (people["dee"], ss)))
+    check("a leader puts a room on the stage", attempt(as_user("ben"), "update public.show_state set stage = 'room', stage_ref = %s, featured = null where session_id = %s", (gid2, ss)))
+    b = as_user("bea"); b.execute("select public.on_stage(%s) -> 'name', jsonb_array_length(public.on_stage(%s) -> 'answers')", (ss, ss))
+    check("everyone in the cohort sees the room and its workbook answers", b.fetchall() == [("Room 1", 1)])
+    d = as_user("dee"); d.execute("select public.on_stage(%s)", (ss,))
+    check("someone outside the cohort sees nothing", d.fetchall() == [(None,)])
+    su.execute("reset role")
+    su.execute("select id from public.live_answers where check_id = %s limit 1", (kk,))
+    ans = su.fetchall()[0][0]
+    check("a leader puts one written answer on the stage", attempt(as_user("ben"), "update public.show_state set stage = 'answer', stage_ref = %s, named = false where session_id = %s", (ans, ss)))
+    g = as_user("gus"); g.execute("select public.on_stage(%s) ->> 'text', public.on_stage(%s) ->> 'who'", (ss, ss))
+    check("everyone sees its words without a name", g.fetchall() == [("mine", None)])
+    attempt(as_user("ben"), "update public.show_state set named = true where session_id = %s", (ss,))
+    g = as_user("gus"); g.execute("select public.on_stage(%s) ->> 'who' is not null", (ss,))
+    check("and the name once the leader shows it", g.fetchall() == [(True,)])
+    check("a part of any kind can say whom and how many to feature",
+          attempt(as_user("ben"), "insert into public.scenes (cohort_id, session_id, position, kind, title, minutes, config) values (%s, %s, 58, 'question', 'Q4', 3, '{\"prompt\": \"Why?\", \"kind\": \"short\", \"feature\": \"random\", \"feature_count\": 4}'::jsonb)", (cc, ss)))
+    check("refused: featuring more than 8", not attempt(as_user("ben"), "insert into public.scenes (cohort_id, session_id, position, kind, title, minutes, config) values (%s, %s, 59, 'talk', 'T', 3, '{\"feature\": \"random\", \"feature_count\": 9}'::jsonb)", (cc, ss)))
     check("a breakout part keeps how many each group holds",
           attempt(as_user("ben"), "insert into public.scenes (cohort_id, session_id, position, kind, title, minutes, config) values (%s, %s, 54, 'rooms', 'Sized', 10, '{\"groups\": 6, \"group_size\": 8}'::jsonb)", (cc, ss)))
     check("refused: a group of more than 40", not attempt(as_user("ben"), "insert into public.scenes (cohort_id, session_id, position, kind, title, minutes, config) values (%s, %s, 55, 'rooms', 'Too big', 10, '{\"group_size\": 41}'::jsonb)", (cc, ss)))

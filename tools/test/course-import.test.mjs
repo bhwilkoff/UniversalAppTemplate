@@ -135,3 +135,18 @@ test('what Course Builder marks for instructors only stays in the leader notes',
   assert.equal(rooms.config.group_size, 3);
   assert.match(r.sessions[1].scenes[0].notes, /Purpose of the session:\nWhy two\./);
 });
+
+test('a step features several beside its poll, and a repoll asks the poll again', () => {
+  const c = JSON.parse(JSON.stringify(course));
+  ['a', 'b', 'c', 'd'].forEach((x, i) => c.records.push(R('ActivityElement', { id: 2000 + i, activity_step_id: 101, order: 5 + i, type: 'feature-user', attributes: { value: 'random-student' } })));
+  c.records.push(R('ActivityStep', { id: 105, activity_id: 10, order: 6, title: 'Again', time: 2, faculty_instructions: { value: '' }, engagement_prompt: { value: '' }, focus_questions: { values: {} } }));
+  c.records.push(R('ActivityElement', { id: 2100, activity_step_id: 105, order: 1, type: 'repoll', attributes: { poll: 1003 } }));
+  const s = convert(c).sessions[0].scenes;
+  const poll = s.find((x) => x.ref === 'el:1003');
+  assert.equal(poll.config.feature, 'random');
+  assert.equal(poll.config.feature_count, 4);
+  const again = s.find((x) => x.ref === 'el:2100');
+  assert.equal(again.kind, 'question');
+  assert.equal(again.config.rerun_of_ref, 'el:1003');
+  assert.deepEqual(again.config.options, ['A', 'B']);
+});

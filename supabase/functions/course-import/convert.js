@@ -108,6 +108,14 @@ function resourceLink(r, templates) {
   return { name: oneLine(r.name || 'A document'), url: /^https:\/\//.test(url) ? url : null, kind, uuid: typeof uuid === 'undefined' ? null : uuid };
 }
 
+function pollRef(a) {
+  for (const k of Object.keys(a || {})) {
+    const v = a[k];
+    if ((typeof v === 'string' || typeof v === 'number') && /^\d{3,12}$/.test(String(v))) return String(v);
+    if (v && typeof v === 'object' && /^\d{3,12}$/.test(String(v.id || v.poll_id || v.element_id || ''))) return String(v.id || v.poll_id || v.element_id);
+  }
+  return null;
+}
 function pollQuestion(a) {
   const prompt = clean(a.question);
   const choices = Object.values(a.choices || {}).sort((x, y) => (x.index || 0) - (y.index || 0)).map((c) => oneLine(c.choice)).filter(Boolean);
@@ -211,7 +219,7 @@ export function convert(exported) {
         if (fq.length) notes.push('Focus questions:\n' + fq.map((q) => '- ' + oneLine(q.question) + (clean(q.answer) ? ' (' + oneLine(q.answer) + ')' : '')).join('\n'));
 
         const slides = [], shows = [], extras = [];
-        let poll = [], breakout = [], results = null, feature = null, board = false, docText = [];
+        let poll = [], breakout = [], results = null, feature = null, board = false, docText = [], featureCount = 0, repoll = [], compare = null;
         els.forEach((e) => {
           const a = e.attributes || {};
           if (e.type === 'poll') poll.push({ el: e, q: pollQuestion(a) });
@@ -219,8 +227,13 @@ export function convert(exported) {
           else if (e.type === 'poll-results') results = String(a.value || '');
           else if (e.type === 'feature-user') {
             const who = a.value === 'random-student' ? 'random' : a.value === 'quiet-student' ? 'quiet' : 'teacher';
-            if (who !== 'teacher') feature = feature || who;
-          } else if (e.type === 'feature-breakout-people-and-notes') feature = feature || 'group';
+            if (who !== 'teacher') { feature = feature || who; featureCount += 1; }
+          } else if (e.type === 'feature-breakout-people-and-notes' || e.type === 'feature-breakout-groups') feature = feature || 'group';
+          // Asking a poll again, and showing the two side by side: the export's
+          // shape for these was not seen in Ben's course, so any attribute that
+          // names an earlier poll element is the one they point at.
+          else if (e.type === 'repoll') repoll.push({ el: e, ref: pollRef(a) });
+          else if (e.type === 'poll-comparison') compare = pollRef(a) || compare;
           else if (e.type === 'resource') {
             if (a.type === 'slide') { slidesOf(a).forEach((s) => slides.push(s)); }
             else if (a.type === 'whiteboard') { board = true; }
@@ -241,6 +254,16 @@ export function convert(exported) {
           return s;
         }
         const first = [];
+        repoll.forEach((rp) => {
+          const earlier = rp.ref ? elements.filter((x) => String(x.id) === rp.ref && x.type === 'poll')[0] : null;
+          if (!earlier) { skip('repoll without its poll'); return; }
+          const q = pollQuestion(earlier.attributes || {});
+          const s = scene('question', stepTitle + ' (again)', { ref: 'el:' + rp.el.id });
+          s.config = { prompt: cut(oneLine(plain(q.prompt)), LIMIT.prompt) || 'What do you think?', kind: q.kind, show_tally: q.showTally, rerun_of_ref: 'el:' + earlier.id };
+          if (q.options) s.config.options = q.options;
+          counts.questions += 1;
+          first.push(s);
+        });
         poll.forEach((p, pi) => {
           const s = scene('question', poll.length > 1 ? stepTitle + ' (' + (pi + 1) + ')' : stepTitle, { ref: 'el:' + p.el.id });
           s.config = { prompt: cut(oneLine(plain(p.q.prompt)), LIMIT.prompt) || 'What do you think?', kind: p.q.kind, show_tally: p.q.showTally };
@@ -277,13 +300,17 @@ export function convert(exported) {
         if (!first.length) {
           const kind = feature && feature !== 'teacher' ? 'presenter' : board ? 'design' : 'talk';
           const s = scene(kind, stepTitle);
-          if (kind === 'presenter') { s.config = { feature }; counts.featured += 1; }
+          if (kind === 'presenter') { s.config = {}; counts.featured += 1; }
           if (kind === 'design') s.config = { template: 'blank' };
-          if (results) s.config.results_of_ref = 'el:' + results;
+          if (results || compare) s.config.results_of_ref = 'el:' + (compare || results);
           first.push(s);
-        } else if (feature) {
-          warnings.push(title + ', ' + stepTitle + ': featuring a person sits with a question or breakout here, so the leader picks them.');
         }
+        // Whom to feature and how many, beside whatever else the step does
+        // (a "5-up with poll" step features four people beside its poll).
+        if (feature && feature !== 'group') {
+          first[0].config.feature = feature;
+          if (featureCount > 1) first[0].config.feature_count = Math.min(8, featureCount);
+        } else if (feature === 'group' && first[0].kind === 'presenter') first[0].config.feature = 'group';
         const lead = first[0];
         if (slides.length) { lead.deck = slides.join('\n\n---\n\n'); counts.slides += slides.length; }
         if (shows.length) {

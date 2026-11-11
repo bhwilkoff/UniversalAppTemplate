@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261111e">
+  <link rel="stylesheet" href="/assets/site.css?v=20261111f">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -161,6 +161,21 @@
         <h1 class="stage-title" data-person-who></h1>
         <p class="stage-audience" data-person-audience hidden></p>
       </div>
+      <div class="stage-body" data-view="people" hidden>
+        <p class="kicker">Featured</p>
+        <ul class="stage-people" data-people-list></ul>
+        <p class="stage-audience" data-people-audience hidden></p>
+      </div>
+      <div class="stage-body" data-view="room" hidden>
+        <p class="kicker" data-room-people></p>
+        <h1 class="stage-title" data-room-name></h1>
+        <dl class="stage-room-answers" data-room-answers></dl>
+      </div>
+      <div class="stage-body" data-view="answer" hidden>
+        <p class="kicker" data-answer-prompt></p>
+        <blockquote class="stage-answer" data-answer-text></blockquote>
+        <p class="stage-note" data-answer-who hidden></p>
+      </div>
       <div class="stage-body" data-view="item" hidden>
         <p class="kicker">Showing their work</p>
         <h1 class="stage-title" data-who></h1>
@@ -186,7 +201,7 @@
   <script src="/assets/vendor/deck-kit.js?v=20261104e" defer></script>
   <script src="/assets/addon-config.js" defer></script>
   <script src="/assets/live-lib.js" defer></script>
-  <script src="/assets/addon-lib.js?v=20261111a" defer></script>
+  <script src="/assets/addon-lib.js?v=20261111b" defer></script>
   <script src="/assets/react-lib.js?v=20261106j" defer></script>
   <script src="/assets/code-lib.js" defer></script>
   <script src="/assets/ui.js?v=20261023h" defer></script>
@@ -196,6 +211,6 @@
   <script src="/assets/slide-studio.js?v=20261110a" defer></script>
   <script src="/assets/room-lib.js?v=20261110a" defer></script>
   <script src="/assets/room-client.js?v=20261110a" defer></script>
-  <script src="/assets/addon-stage.js?v=20261111b" defer></script>
+  <script src="/assets/addon-stage.js?v=20261111c" defer></script>
 </body>
 </html>
