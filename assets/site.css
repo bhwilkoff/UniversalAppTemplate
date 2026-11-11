@@ -3346,6 +3346,11 @@ a.person-name:hover { text-decoration: underline; }
 .import-form { display: grid; gap: 0.5rem; max-width: 40rem; }
 .import-form label { font-weight: 500; }
 .import-form .hint { margin: 0; }
-.import-form input { width: 100%; }
+.import-form input, .session-rename input:not([type="checkbox"]):not([type="radio"]) {
+  width: 100%; max-width: 36rem; font: inherit; font-weight: 400; color: var(--ink); background: var(--paper);
+  border: 1px solid var(--rule); border-radius: 10px; padding: 0.7rem 0.85rem; min-height: 48px;
+}
+.import-form input:focus-visible, .session-rename input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
+.session-rename .row input { width: auto; }
 .import-result { max-width: 40rem; margin-top: 1rem; }
 .import-warnings ul { margin: 0.5rem 0 0; padding-left: 1.25rem; }
