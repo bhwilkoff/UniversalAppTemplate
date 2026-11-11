@@ -9,7 +9,7 @@ const course = {
   records: [
     R('Course', { id: 99, course_title: 'Thinking Tools', course_code: 'TT01', course_description: '# Welcome\n\nA short course.' }),
     R('Plan', { id: 2, week_number: 1, class_number: 2, topics: 'Second', study_guide: '', purpose: 'Why two.', pre_class_work: '' }),
-    R('Plan', { id: 1, week_number: 1, class_number: 1, topics: 'First', study_guide: 'Read the guide.', purpose: '', pre_class_work: '[Join](https://example.com)' }),
+    R('Plan', { id: 1, week_number: 1, class_number: 1, topics: 'First', session_overview: 'What today is about.', study_guide: 'Read the guide.', purpose: 'Only for you.', faculty_readings: 'A paper for you.', pre_class_work: '[Join](https://example.com)' }),
     R('Activity', { id: 10, plan_id: 1, order: 1, title: 'Opening', faculty_instructions: { value: 'Set the tone.' } }),
     R('ActivityStep', { id: 100, activity_id: 10, order: 1, title: 'Welcome', time: 3, faculty_instructions: { value: '' }, engagement_prompt: { value: 'Ask who has been here before.' }, focus_questions: { values: { q0: { question: 'Are they ready?', answer: 'Most are' } } } }),
     R('ActivityStep', { id: 101, activity_id: 10, order: 2, title: 'Poll', time: 2, faculty_instructions: { value: '' }, engagement_prompt: { value: '' }, focus_questions: { values: {} } }),
@@ -111,5 +111,22 @@ test('leader notes keep their lines and lists, without Markdown marks', () => {
   const c = JSON.parse(JSON.stringify(course));
   c.records.find((r) => r.type === 'Activity').data.faculty_instructions.value = '**General guidelines**\n\n* Ask about key terms\n* Avoid telling the answers';
   const notes = convert(c).sessions[0].scenes[0].notes;
-  assert.match(notes, /^General guidelines\n\n- Ask about key terms\n- Avoid telling the answers/);
+  assert.match(notes, /\n\nGeneral guidelines\n\n- Ask about key terms\n- Avoid telling the answers/);
+});
+
+test('what Course Builder marks for instructors only stays in the leader notes', () => {
+  const r = convert(course);
+  const first = r.sessions[0];
+  assert.match(first.before, /^What today is about\./);
+  assert.doesNotMatch(first.before, /Only for you/);
+  assert.match(first.scenes[0].notes, /^Purpose of the session:\nOnly for you\.\n\nBackground readings for you:\nA paper for you\./);
+  // The breakout's notes overview never reaches the stage.
+  const rooms = first.scenes.find((x) => x.kind === 'rooms');
+  assert.equal(rooms.body, '');
+  assert.equal(rooms.config.prompt, undefined);
+  assert.match(rooms.notes, /In the breakout:\nTalk it over\./);
+  // groups:<flavors>:<most per group>
+  assert.equal(rooms.config.groups, 3);
+  assert.equal(rooms.config.group_size, 3);
+  assert.match(r.sessions[1].scenes[0].notes, /Purpose of the session:\nWhy two\./);
 });

@@ -25,7 +25,10 @@
       var ids = everyone().map(function (p) { return p.id; });
       if (pre.random) ids = L.shuffle(ids, pre.key || o.session.id);
       // A part's room count never makes empty rooms.
-      var n = count || (pre.groups ? Math.min(pre.groups, Math.max(1, ids.length)) : L.roomCount(ids.length));
+      // A part sets the rooms: as many as its group size needs, or its count,
+      // and never an empty room.
+      var wanted = pre.size ? Math.ceil(ids.length / pre.size) : pre.groups;
+      var n = count || (wanted ? Math.max(1, Math.min(wanted, ids.length || 1)) : L.roomCount(ids.length));
       var dealt = L.split(ids, n);
       var rooms = dealt.map(function () { return []; });
       dealt.forEach(function (room, i) {

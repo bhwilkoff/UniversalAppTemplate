@@ -3295,6 +3295,9 @@ def main():
     rooms = json.dumps({"groups": 6, "sorting": "random", "group_docs": [{"name": "Group 1", "url": "https://docs.google.com/document/d/x/"}]})
     check("a breakout part keeps its groups, sorting, and a document per group",
           attempt(as_user("ben"), "insert into public.scenes (cohort_id, session_id, position, kind, title, minutes, config) values (%s, %s, 51, 'rooms', 'Rooms', 10, %s::jsonb)", (cc, ss, rooms)))
+    check("a breakout part keeps how many each group holds",
+          attempt(as_user("ben"), "insert into public.scenes (cohort_id, session_id, position, kind, title, minutes, config) values (%s, %s, 54, 'rooms', 'Sized', 10, '{\"groups\": 6, \"group_size\": 8}'::jsonb)", (cc, ss)))
+    check("refused: a group of more than 40", not attempt(as_user("ben"), "insert into public.scenes (cohort_id, session_id, position, kind, title, minutes, config) values (%s, %s, 55, 'rooms', 'Too big', 10, '{\"group_size\": 41}'::jsonb)", (cc, ss)))
     check("a question part says whether people see the counts",
           attempt(as_user("ben"), "insert into public.scenes (cohort_id, session_id, position, kind, title, minutes, config) values (%s, %s, 52, 'question', 'Q', 3, '{\"prompt\": \"Why?\", \"kind\": \"short\", \"show_tally\": false}'::jsonb)", (cc, ss)))
     check("a part can point at an earlier part's answers",

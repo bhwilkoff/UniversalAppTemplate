@@ -85,7 +85,7 @@ Ben, November 10, 2026: "Quiet student should function based upon any data that 
 2. **Someone is featured by name.** A presenter part set to feature someone at random or someone quiet offers Choose someone at random or Choose someone quiet in Now. The pick shows with why (no reactions, no answers, nothing shared, not in the queue, no requests), then Feature them or Someone else. Quiet is counted from this session's reactions and stances, answers, posts, the queue, and requests, among the people in the call; anyone featured already goes to the back (RosterLib.toFeature; show_state stage `person`, logged as person:<id>).
 3. **A debrief shows the earlier question's answers.** A part pointing at an earlier question part pins that question's answers, closed or open, with counts for everyone, and nobody answers there. Written answers stay with the leader.
 4. **A question asks as it was written.** A part's own setting decides whether people see the counts.
-5. **Breakouts start as the part says.** Its number of rooms (never more than there are people), its minutes, and random sorting fill the breakout tool, fixed so the rooms previewed are the rooms launched. Each group's document is listed for the leader, and each learner in a breakout room sees their own group's.
+5. **Breakouts start as the part says.** As many rooms as its group size needs (Course Builder's "groups:<flavors>:<most per group>"), never an empty one, with its minutes and random sorting, fill the breakout tool, fixed so the rooms previewed are the rooms launched. Each flavor's document is dealt out to the rooms in turn: the leader sees the list, and each learner in a breakout room sees their own room's.
 
 ## Open rooms
 

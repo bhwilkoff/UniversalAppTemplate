@@ -1367,7 +1367,7 @@
         var part = partNow();
         if (!part || !part.own || part.kind !== 'rooms') return null;
         var c = part.config || {};
-        return { groups: c.groups || null, minutes: part.minutes || null, random: c.sorting === 'random', key: part.key };
+        return { groups: c.groups || null, size: c.group_size || null, minutes: part.minutes || null, random: c.sorting === 'random', key: part.key };
       },
       people: function () {
         var list = S.people.map(function (p) { return { id: p.user_id, name: S.names[p.user_id] || 'Someone' }; });
@@ -1535,14 +1535,15 @@
       if (!S.teaching && S.room && S.room.groupId) {
         var g = (S.groups || []).filter(function (x) { return x.id === S.room.groupId; })[0];
         var n = g ? /(\d+)\s*$/.exec(g.name || '') : null;
-        mine = n ? docs[Number(n[1]) - 1] || null : null;
+        // Flavors are dealt out in turn: room 7 of six flavors has the first.
+        mine = n ? docs[(Number(n[1]) - 1) % docs.length] || null : null;
       }
       var list = S.teaching ? docs : mine ? [mine] : [];
       if (list.length) {
-        box.appendChild(el('p', 'small', S.teaching ? 'Each group’s document' : 'Your group’s document'));
+        box.appendChild(el('p', 'small', S.teaching ? (docs.length > 1 ? 'The groups’ documents, dealt out in turn' : 'The groups’ document') : 'Your group’s document'));
         var ul = el('ul', 'p2-run-list');
         list.forEach(function (d, i) {
-          var li = el('li'), l = el('a', 'p2-run-row', (S.teaching ? 'Room ' + (i + 1) + ': ' : '') + d.name);
+          var li = el('li'), l = el('a', 'p2-run-row', d.name);
           l.href = d.url; l.target = '_blank'; l.rel = 'noopener';
           li.appendChild(l); ul.appendChild(li);
         });

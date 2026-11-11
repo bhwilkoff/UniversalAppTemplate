@@ -160,12 +160,19 @@ export function convert(exported) {
   const sessions = plans.map((plan, i) => {
     const number = i + 1;
     const title = oneLine(plan.topics) || ('Class ' + (plan.class_number || number));
+    // Course Builder marks each field: the overview, study guide, pre-class
+    // work, and big question are for students; the purpose and background
+    // readings are for instructors only, so they go to the leader's notes.
     const before = [
+      clean(plan.session_overview) && clean(plan.session_overview),
       clean(plan.study_guide) && '**Study guide**\n\n' + clean(plan.study_guide),
-      clean(plan.purpose) && '**Purpose**\n\n' + clean(plan.purpose),
       clean(plan.pre_class_work) && '**Before class**\n\n' + clean(plan.pre_class_work),
       clean(plan.big_question) && '**The big question**\n\n' + clean(plan.big_question)
     ].filter(Boolean).join('\n\n');
+    const forLeader = [
+      clean(plan.purpose) && 'Purpose of the session:\n' + clean(plan.purpose),
+      clean(plan.faculty_readings) && 'Background readings for you:\n' + clean(plan.faculty_readings)
+    ].filter(Boolean);
     const reads = readings.filter((r) => r.plan_id === plan.id).sort(byOrder).map((r) => ({
       title: cut(oneLine(r.citation) || r.url || 'A reading', 300),
       url: /^https?:\/\//.test(r.url || '') ? r.url : null,
@@ -234,7 +241,7 @@ export function convert(exported) {
         });
         breakout.forEach((e, bi) => {
           const a = e.attributes || {};
-          const g = /groups:(\d+)/.exec(String(a.grouping || ''));
+          const g = /groups:(\d+)(?::(\d+))?/.exec(String(a.grouping || ''));
           const names = a.groupNames || {};
           const docs = Object.keys(a.groupResources || {}).sort((x, y) => Number(x) - Number(y)).map((k) => {
             const link = resourceLink(resources[(a.groupResources[k] || {}).resource_id], templates);
@@ -243,9 +250,13 @@ export function convert(exported) {
           const s = scene('rooms', oneLine(a.title) || (breakout.length > 1 ? stepTitle + ' (' + (bi + 1) + ')' : stepTitle), { ref: 'el:' + e.id });
           s.minutes = Math.max(1, Math.min(240, Math.round((Number(a.duration_in_seconds) || 60 * s.minutes) / 60)));
           s.config = { sorting: a.sorting === 'random' ? 'random' : 'roster' };
+          // groups:<flavors>:<most per group>. Forum makes as many groups as
+          // the class needs at that size and deals the flavors out in turn.
           if (g) s.config.groups = Math.max(1, Math.min(40, Number(g[1])));
+          if (g && g[2]) s.config.group_size = Math.max(1, Math.min(40, Number(g[2])));
           if (docs.length) s.config.group_docs = docs;
-          if (clean(a.content)) { s.config.prompt = cut(oneLine(plain(a.content)), LIMIT.prompt); s.body = cut(plain(a.content), LIMIT.body); }
+          // The breakout's notes overview is for instructors only.
+          if (clean(a.content)) notes.push('In the breakout:\n' + clean(a.content));
           counts.breakouts += 1;
           first.push(s);
         });
@@ -279,6 +290,9 @@ export function convert(exported) {
     });
     // A class with no steps still arrives, as one part with its overview.
     if (!scenes.length) scenes.push({ kind: 'talk', title: cut(title, LIMIT.title), minutes: 10, body: cut(plan.session_overview || '', LIMIT.body), config: {}, notes: '', deck: '', ref: null });
+    if (forLeader.length && scenes.length) {
+      scenes[0].notes = cut(forLeader.map((n) => plain(n).replace(/^[ \t]*\*[ \t]+/gm, '- ')).concat(scenes[0].notes ? [scenes[0].notes] : []).join('\n\n'), LIMIT.notes);
+    }
     scenes.forEach((s, p) => { s.position = p; });
     counts.sessions += 1;
     return { number, title: cut(title, LIMIT.title), before: before ? cut(before, LIMIT.before) : null, readings: reads.length ? reads.slice(0, 60) : null, scenes };
