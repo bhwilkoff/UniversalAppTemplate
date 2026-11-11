@@ -66,7 +66,7 @@
     function show() {
       return waiting().then(function (list) {
         sec.hidden = !list.length && !said.textContent;
-        root.querySelector('[data-workbooks-waiting]').textContent = list.length + (list.length === 1 ? ' workbook is' : ' workbooks are') + ' waiting.';
+        root.querySelector('[data-workbooks-waiting]').textContent = list.length ? list.length + (list.length === 1 ? ' workbook is' : ' workbooks are') + ' waiting.' : '';
         return list;
       });
     }
@@ -136,7 +136,7 @@
       return waiting().then(function (list) {
         var n = list.reduce(function (t, c) { return t + c.outcomes.filter(function (o) { return !o.name; }).length; }, 0);
         sec.hidden = !n && !said.textContent;
-        root.querySelector('[data-outcomes-waiting]').textContent = n + (n === 1 ? ' outcome is' : ' outcomes are') + ' waiting for a name.';
+        root.querySelector('[data-outcomes-waiting]').textContent = n ? n + (n === 1 ? ' outcome is' : ' outcomes are') + ' waiting for a name.' : '';
       });
     }
     if (!C || input.getAttribute('data-wired')) return show();
