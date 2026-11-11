@@ -212,3 +212,25 @@ Priority 1 stopped people from taking part, priority 2 cost the leader time and 
 
 14. Last part looks disabled.
 15. Feedback in Meet's chat is fine. The add-on builds on Meet, and does not compete with what Meet already does well.
+
+### Where the fixes stand (November 11, 2026, evening)
+
+Tested in a real Meet call with a leader and a learner profile, running Week 3 so Week 2's data stayed untouched.
+
+| # | Fix | State |
+|---|---|---|
+| 1 | Close the main stage is gone; the top line says what is on the stage, with Clear | Seen in the call. Meet's own End activity asks first. Meet gives learners no prompt to rejoin a restarted activity, only the small icon at the top right, which is why Week 2's learners took minutes to come back |
+| 2 | An open question leads the learner's Now, headed Answer the question; the stage says Choose your answer or Write your answer | Seen in the call |
+| 2 | Choices stay buttons while counts show; the stage says Your answer is in | Seen in the call for a choice. Not yet seen for a written answer |
+| 2 | The panel's choices were drawn as empty boxes with squeezed words | Reproduced offline and fixed; not yet seen in the call |
+| 3 | A shown answer sits under the open question, which keeps taking answers | Seen in the call, both sides |
+| 5 | Open it again reopens a closed planned question | Built; not yet seen in the call |
+| 6 | On a showing part, Show your app leads the learner's Now | Seen in the call |
+| 7 | Tiles say On or Off and are named for what they do | Seen in the call |
+| 8 | An open question's answers stay in the leader's Now | Seen in the call |
+| 9 | Stances: a tile, closed on each new part, hidden while a question waits, bar above the strip, chosen stance pressed | Seen in the call except the pressed state |
+| 10 | People says who has Human Shaped open | Built; not yet seen in the call |
+| 11 | What learners see now, in the leader's Now | Seen in the call |
+| 12 | No part clock on the stage | Seen in the call |
+| 13 | The recording control says Take the recording notice down | Built |
+| 14 | The last part reads as a fact | Built |
