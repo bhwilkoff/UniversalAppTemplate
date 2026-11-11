@@ -1934,7 +1934,7 @@
   }
 
   // Anything a leader can do, a learner can ask for, and a leader decides.
-  var ASKS = { question: 'a question for everyone', card: 'a message on the stage', board: 'the board', breakouts: 'breakouts', other: 'something else' };
+  var ASKS = { question: 'a question for everyone', card: 'a message on the stage', board: 'the board', breakouts: 'breakouts', other: 'their own question' };
   function decide(r, state) {
     return db.from('live_requests').update({ state: state }).eq('id', r.id).then(function () { refreshLive(); });
   }
@@ -1978,8 +1978,8 @@
     var said = el('span', 'small'); said.setAttribute('role', 'status');
     form.appendChild(input); form.appendChild(go);
     var chosen = null;
-    [['question', 'A question', 'What should everyone answer?'], ['card', 'A message', 'What should the stage say?'], ['link', 'A link', 'https://'],
-     ['board', 'The board'], ['breakouts', 'Breakouts'], ['other', 'Something else', 'What would you like?']].forEach(function (x) {
+    [['other', 'My own question', 'What do you want to ask?'], ['question', 'A question for everyone', 'What should everyone answer?'], ['card', 'A message', 'What should the stage say?'], ['link', 'A link', 'https://'],
+     ['board', 'The board'], ['breakouts', 'Breakouts']].forEach(function (x) {
       row.appendChild(button(x[1], 'btn-secondary small', function () {
         if (!x[2]) return sendRequest(x[0]);
         chosen = x[0]; form.hidden = false; input.placeholder = x[2]; input.focus();
@@ -2001,7 +2001,7 @@
     var mine = (S.requests || []).filter(function (r) { return r.user_id === who(); }).slice(-3).reverse();
     mine.forEach(function (r) {
       var line = el('div', 'p2-ask');
-      line.appendChild(el('span', null, ASKS[r.kind].charAt(0).toUpperCase() + ASKS[r.kind].slice(1) + (r.body ? ': ' + r.body : '')));
+      line.appendChild(el('span', null, r.kind === 'other' ? 'Your question' + (r.body ? ': ' + r.body : '') : ASKS[r.kind].charAt(0).toUpperCase() + ASKS[r.kind].slice(1) + (r.body ? ': ' + r.body : '')));
       if (r.state === 'waiting') line.appendChild(button('Take it back', 'btn-secondary small', function () { db.from('live_requests').delete().eq('id', r.id).then(function () { refreshLive(); }); }));
       else line.appendChild(el('span', 'p2-state', r.state === 'done' ? 'Done' : 'Not now'));
       box.appendChild(line);
@@ -2061,7 +2061,7 @@
     box.appendChild(el('p', 'p2-label', 'Your classmates’ apps'));
     var ul = el('ul', 'p2-run-list');
     rows.forEach(function (p) {
-      var li = el('li'), name = S.names[p.user_id] || 'Someone';
+      var li = el('li', 'p2-class-app'), name = S.names[p.user_id] || 'Someone';
       var on = S.myStage && S.myStage.url === p.app_url;
       li.appendChild(el('span', null, name + (p.app_name ? ': ' + p.app_name : '')));
       if (A.frameable(p.app_url)) li.appendChild(button(on ? 'On your stage' : 'Try it on my stage', 'link-button', function () { tryOnMyStage(p.app_url, name); }));
@@ -2097,7 +2097,7 @@
       var row = el('div', 'p2-ask is-request');
       var words = el('span');
       words.appendChild(el('strong', null, nameOf(r.user_id)));
-      words.appendChild(document.createTextNode(' asks: ' + ASKS[r.kind] + (r.body ? ': ' + r.body : '')));
+      words.appendChild(document.createTextNode(r.kind === 'other' && r.body ? ' asks: ' + r.body : ' asks: ' + ASKS[r.kind] + (r.body ? ': ' + r.body : '')));
       row.appendChild(words);
       var acts = el('span', 'p2-ask-acts');
       acts.appendChild(button('Do it', 'btn-secondary small', function () { doRequest(r); }));
@@ -2415,7 +2415,7 @@
     var parsed = L.parseQuestion(f);
     if (parsed.error) { $('[data-ask-status]').textContent = parsed.error; return; }
     ask([Object.assign({ question_id: f.question_id, show_tally: $('[data-ask-tally]').checked }, parsed)]).then(function (ok) {
-      if (ok) { askFields.reset(); $('[data-ask-wrap]').open = false; }
+      if (ok) askFields.reset();
     });
   });
   $('[data-ask-closing]').addEventListener('click', function () {
