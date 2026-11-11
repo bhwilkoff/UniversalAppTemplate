@@ -2178,6 +2178,8 @@
     if (!one) return;
     t.list.forEach(function (x) { x.node.classList.toggle('is-tool', x === one); });
     if (one.node.tagName === 'DETAILS') one.node.open = true;
+    // A tool opens ready to use, never as one more closed heading.
+    var inner = one.node.querySelector('details'); if (inner) inner.open = true;
     t.pane.setAttribute('data-tool', name);
     S.toolBack.querySelector('span').textContent = name;
   }
