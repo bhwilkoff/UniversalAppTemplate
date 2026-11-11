@@ -106,3 +106,10 @@ test('words for the stage carry no Markdown marks, and links keep their address'
   c.records.find((r) => r.type === 'ActivityElement' && r.data.id === 1002).data.attributes.content = '**Bold** and *soft* with [a link](https://example.com/x) and \\[brackets\\]';
   assert.equal(convert(c).sessions[0].scenes[0].body, 'Bold and soft with a link (https://example.com/x) and [brackets]');
 });
+
+test('leader notes keep their lines and lists, without Markdown marks', () => {
+  const c = JSON.parse(JSON.stringify(course));
+  c.records.find((r) => r.type === 'Activity').data.faculty_instructions.value = '**General guidelines**\n\n* Ask about key terms\n* Avoid telling the answers';
+  const notes = convert(c).sessions[0].scenes[0].notes;
+  assert.match(notes, /^General guidelines\n\n- Ask about key terms\n- Avoid telling the answers/);
+});

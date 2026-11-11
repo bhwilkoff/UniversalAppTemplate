@@ -273,7 +273,7 @@ export function convert(exported) {
         }
         if (extras.length) notes.push('More to show:\n' + extras.join('\n'));
         if (feature === 'quiet') notes.push('Feature someone who has been quiet so far.');
-        lead.notes = cut(notes.join('\n\n'), LIMIT.notes);
+        lead.notes = cut(notes.map((n) => plain(n).replace(/^[ \t]*\*[ \t]+/gm, '- ')).join('\n\n'), LIMIT.notes);
         first.slice(1).forEach((s) => { if (!s.notes) s.notes = ''; });
       });
     });
