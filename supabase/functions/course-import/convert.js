@@ -238,7 +238,8 @@ export function convert(exported) {
         if (clean(act.faculty_instructions && act.faculty_instructions.value) && si === 0) notes.push(clean(act.faculty_instructions.value));
         if (clean(step.faculty_instructions && step.faculty_instructions.value)) notes.push(clean(step.faculty_instructions.value));
         if (clean(step.engagement_prompt && step.engagement_prompt.value)) notes.push('Engagement: ' + clean(step.engagement_prompt.value));
-        const fq = Object.values((step.focus_questions && step.focus_questions.values) || {}).filter((q) => clean(q.question));
+        // Course Builder fills an empty step with "Question 1?" and "Answer 1".
+        const fq = Object.values((step.focus_questions && step.focus_questions.values) || {}).filter((q) => clean(q.question) && !(/^question \d+\??$/i.test(oneLine(q.question)) && (!clean(q.answer) || /^answer \d+$/i.test(oneLine(q.answer)))));
         if (fq.length) notes.push('Focus questions:\n' + fq.map((q) => '- ' + oneLine(q.question) + (clean(q.answer) ? ' (' + oneLine(q.answer) + ')' : '')).join('\n'));
 
         const slides = [], shows = [], extras = [];
@@ -347,7 +348,7 @@ export function convert(exported) {
         }
         if (extras.length) notes.push('More to show:\n' + extras.join('\n'));
         if (feature === 'quiet') notes.push('Feature someone who has been quiet so far.');
-        lead.notes = cut(notes.map((n) => plain(n).replace(/^[ \t]*\*[ \t]+/gm, '- ')).join('\n\n'), LIMIT.notes);
+        lead.notes = cut(notes.map((n) => plain(n).replace(/^[ \t]*\*[ \t]+/gm, '- ')).filter((n, i, all) => all.indexOf(n) === i).join('\n\n'), LIMIT.notes);
         first.slice(1).forEach((s) => { if (!s.notes) s.notes = ''; });
       });
     });

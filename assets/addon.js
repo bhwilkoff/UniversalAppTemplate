@@ -1538,8 +1538,10 @@
   }
   function setPin(v) {
     S.onStage = v;
-    loadStageDetail();
-    if (S.run && S.run.shared && S.teaching) S.run.pin(v);
+    // What only on_stage() can give is read once the pin is saved, or it
+    // would read the stage as it was a moment ago.
+    var saving = S.run && S.run.shared && S.teaching ? S.run.pin(v) : null;
+    Promise.resolve(saving).then(loadStageDetail, loadStageDetail);
     drawQueue(); drawChecks(); drawRoster(); drawRoomsToggle(); sendStage(); drawRunInfo(); drawApps();
     drawBoardPin(); drawPartTools();
   }

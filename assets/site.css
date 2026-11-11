@@ -3372,6 +3372,7 @@ a.person-name:hover { text-decoration: underline; }
 .session-outcomes-list span { color: var(--muted); }
 .session-outcomes, .session-after-work { margin-bottom: 1.5rem; }
 .part-goal { margin: 0.25rem 0 0; color: var(--muted); max-width: 60ch; white-space: pre-line; }
+.p2-answers li > .link-button + .link-button, .live-answers li > .link-button + .link-button { margin-left: 0.75rem; }
 .p2-goal { margin: 0 0 0.5rem; color: var(--muted); font-size: 0.875rem; white-space: pre-line; }
 
 /* Workbooks (session Before, and a breakout room's panel). */

@@ -164,3 +164,14 @@ test('a part carries its activity\'s goal, never Course Builder\'s placeholder o
   c.records.filter((x) => x.type === 'Activity')[0].data.activity_learning_goals = { value: '\\[N/a for this step\\]', display: false };
   assert.equal(convert(c).sessions[0].scenes[0].goal, null);
 });
+
+test('Course Builder\'s placeholder focus questions and repeated instructions stay out of the notes', () => {
+  const c = JSON.parse(JSON.stringify(course));
+  const steps = c.records.filter((x) => x.type === 'ActivityStep');
+  steps[0].data.focus_questions = { values: { q0: { question: 'Question 1?', answer: 'Answer 1' }, q1: { question: 'Are they ready?', answer: '' } } };
+  steps[0].data.faculty_instructions = { value: 'Set the tone.' };
+  const notes = convert(c).sessions[0].scenes[0].notes;
+  assert.ok(!/Question 1\?/.test(notes));
+  assert.ok(/Are they ready\?/.test(notes));
+  assert.equal(notes.split('Set the tone.').length, 2);
+});
