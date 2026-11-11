@@ -66,3 +66,9 @@ test('one failure is reported and the rest still go', async () => {
   assert.deepEqual(tally, { done: 1, failed: 1 });
   assert.equal(seen[0].problem, 'Nope');
 });
+
+test('a cohort on its own schedule names each event as a session', () => {
+  assert.equal(L.resource({ ...S, schedule: 'custom', number: 3, title: 'Listening' }, true).summary, 'Fall: Session 3: Listening');
+  assert.equal(L.resource({ ...S, schedule: 'custom', number: 2, title: 'Session 2' }, true).summary, 'Fall: Session 2');
+  assert.equal(L.resource({ ...S, number: 0, title: '' }, true).summary, 'Fall: Prep');
+});

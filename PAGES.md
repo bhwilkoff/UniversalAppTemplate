@@ -68,7 +68,8 @@ role you hold and the role named on the page, never a switcher.
   "It seems like we can do some simplification on these pages too"):
   - This week: while the cohort is being set up, its setup steps; what is
     waiting for the leader.
-  - Sessions: the prep session and each week's, each row opening that
+  - Sessions: every session, the prep session and each week's in a weekly
+    cohort or Session 1 onward in one with sessions you set, each row opening that
     session's own page (`/session/?c=&s=`), where its plan is read and,
     by its leaders, changed; for leaders, making the sessions, the
     question bank, and each past session's follow-up.
@@ -79,7 +80,7 @@ role you hold and the role named on the page, never a switcher.
     for their app to be tried on a device they do not have; someone takes
     it and marks it tried with what they saw.
   - Files: what the cohort shares, kept in its repository by folder
-    (Resources, then each week), added as the person (Ben, October 22,
+    (Resources, then each week, or each session in a cohort with sessions you set), added as the person (Ben, October 22,
     2026: "any shared resource or file should be stored on github within
     the cohort repository").
   - People: everyone in their groups of three, each with their app; for
@@ -123,7 +124,7 @@ role you hold and the role named on the page, never a switcher.
 | `/` | Your home | Follow a row to the thing |
 | `/account/` | Your account | How you sign in, linked accounts, how leaders reach you, your data, sign out, delete; confirm joining one cohort (`?join=`) |
 | `/cohort/?c=` | One cohort: This week, Sessions, Conversation, Try my app, Files, Exchanges, People, and Your work (learners) or Settings (leaders) | Read the week, join a session, bring something back, keep your app; a leader sets it up and runs it from the same sections |
-| `/session/?c=&s=` | One session: its time, its call, what to bring, the plan, and afterward the recording (JOURNEYS.md, S1); `/live/` forwards here | Join the call and read the plan; a leader changes the plan, and runs it in the add-on inside Meet |
+| `/session/?c=&s=` | One session: its time, its call, what to bring, its workbooks, readings, words before it, and what it practices, the plan, what comes after, and afterward the recording (JOURNEYS.md, S1); `/live/` forwards here | Join the call and read the plan; a leader changes the plan, and runs it in the add-on inside Meet |
 | `/board/?c=`, `/card/?c=` | A session's board; its card | Draw; show the card |
 | `/exchange/#<link>` | One exchange | Watch, add a video |
 | `/exchanges/` | Your exchanges | Open one, start one |

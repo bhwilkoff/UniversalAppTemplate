@@ -33,8 +33,12 @@
   function tab(k) { return MOVED[k] || k; }
   var failed = function () {};
   var reloadPage = function () { openCohort(current.id); };
-  // A session named inside a sentence: "the prep session", or "week 2".
-  function sessionPhrase(n) { return Number(n) === 0 ? 'the prep session' : 'week ' + n; }
+  // A session named inside a sentence: "the prep session", "week 2", or
+  // "session 3" in a cohort on its own schedule.
+  function sessionPhrase(n) {
+    if (current && current.schedule === 'custom') return 'session ' + Number(n);
+    return Number(n) === 0 ? 'the prep session' : 'week ' + n;
+  }
 
   function drawFacts(c, sessions, people) {
     var when = c.session_weekday != null && c.session_time ? lib.scheduleText(c, Intl.DateTimeFormat().resolvedOptions().timeZone).replace(/\.$/, '').replace(/, for \d+ minutes/, '') : null;
@@ -44,7 +48,7 @@
       ['Meets', when || 'Not set'],
       ['Length', c.session_minutes + ' minutes'],
       ['First session', sessions && sessions.length && sessions[0].starts_at ? new Date(sessions[0].starts_at).toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) : 'Not set'],
-      ['Weeks', String(c.weeks)],
+      c.schedule === 'custom' ? ['Sessions', String(sessions ? sessions.length : 0)] : ['Weeks', String(c.weeks)],
       ['People', c.capacity ? here + ' of ' + c.capacity : String(here)]
     ]));
   }
@@ -400,7 +404,7 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
     var show = F.showAsRun(data.scenes);
     if (show.length) {
       var ran = el('details', 'followup-show');
-      ran.appendChild(el('summary', null, (last.number === 0 ? 'The prep session' : 'Week ' + last.number) + '’s plan'));
+      ran.appendChild(el('summary', null, (current && current.schedule === 'custom' ? 'Session ' + last.number : last.number === 0 ? 'The prep session' : 'Week ' + last.number) + '’s plan'));
       var ol = el('ol', 'show-glance');
       show.forEach(function (s) {
         var li = el('li');

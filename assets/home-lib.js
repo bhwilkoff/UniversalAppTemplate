@@ -21,7 +21,7 @@
       : c.status === 'draft' ? 'draft'
       : next ? (week ? 'between' : 'before')
       : dated.length ? 'over' : 'unscheduled';
-    return { kind: kind, live: live, next: next, week: week, weeks: c.weeks || dated.length };
+    return { kind: kind, live: live, next: next, week: week, weeks: c.schedule === 'custom' ? (sessions || []).length : c.weeks || dated.length };
   }
 
   // The sessions worth naming at the top of the page: any on now, and any
@@ -56,8 +56,9 @@
   // short meta line of facts.
   function cohortState(c, n) {
     function d(iso) { return new Date(iso + 'T12:00:00').toLocaleDateString(undefined, { month: 'long', day: 'numeric' }); }
-    if (n.kind === 'live') return { thing: 'session', state: 'live', meta: n.live.number === 0 ? 'Prep' : 'Week ' + n.live.number };
-    if (n.kind === 'between') return { thing: 'cohort', state: 'running', meta: 'Week ' + n.week + ' of ' + n.weeks };
+    var custom = c.schedule === 'custom';
+    if (n.kind === 'live') return { thing: 'session', state: 'live', meta: custom ? 'Session ' + n.live.number : n.live.number === 0 ? 'Prep' : 'Week ' + n.live.number };
+    if (n.kind === 'between') return { thing: 'cohort', state: 'running', meta: (custom ? 'Session ' : 'Week ') + n.week + ' of ' + n.weeks };
     if (n.kind === 'before') return { thing: 'cohort', state: 'open', meta: c.starts_on ? 'Starts ' + d(c.starts_on) : 'Dates not set' };
     if (n.kind === 'draft') return { thing: 'cohort', state: 'draft', meta: null };
     if (n.kind === 'finished' || n.kind === 'over') return { thing: 'cohort', state: 'finished', meta: null };

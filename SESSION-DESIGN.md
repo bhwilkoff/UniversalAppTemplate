@@ -24,11 +24,11 @@ Before 0 of 4   Plan   Recording   After
 
 | View | Holds |
 |---|---|
-| Before | A learner: the questions to answer, the exchange to reply to, what to bring. A leader: who has answered, each answer, and the questions themselves, which they add, change, and remove here. |
+| Before | A learner: what the session practices, the questions to answer, the session's workbooks, its words and readings, the exchange to reply to, and what to bring. A leader: who has answered, each answer, and the questions themselves, which they add, change, and remove here. |
 | Plan | The hour as a bar, then every part as a picture of its main stage, in order. |
 | A part | Its own address. Slides fill the page; any other kind shows its stage and its few fields. |
 | Recording | The recording. Appears once there is one. |
-| After | What happened: how the session moved and what was kept, by person, which is never a list of who attended (a learner sees only what was kept about them). A leader also finds answers, what they heard, and the recording's link. |
+| After | What the session asks of people afterward (sessions.after), which its leaders write here and everyone reads. What happened: how the session moved and what was kept, by person, which is never a list of who attended (a learner sees only what was kept about them). A leader also finds answers, what they heard, and the recording's link. |
 
 There is no Details view (Ben, November 6, 2026: "It seems like all of that is left over from previous iterations"). A leader renames a session on its title, and writes what comes before the next session under the plan. Before also shows the session's individual workbooks, each person answering their own as they go and a leader reading everyone's (group workbooks are answered by each breakout room in the add-on), and the session's own words before it and its readings and materials, for everyone, when it has them (sessions.before and sessions.readings, which a course brought from Course Builder fills). In a cohort with sessions you set (cohorts.schedule = custom), the title's Change also sets the session's date and time, in the cohort's time zone, and holds Remove this session, which the database refuses once anyone's answers, posts, or recording are in it.
 

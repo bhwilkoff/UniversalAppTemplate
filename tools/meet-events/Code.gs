@@ -967,15 +967,17 @@ function takeSetupRequests_() {
 
 var SITE = 'https://humanshaped.org';
 
-function sessionLabel(number) {
+function sessionLabel(number, schedule) {
+  if (schedule === 'custom') return 'Session ' + Number(number);
   return Number(number) === 0 ? 'Prep' : 'Week ' + Number(number);
 }
 
-// "Prep", "Week 2", or "Week 2: A leader's own title".
+// "Prep", "Week 2", or "Week 2: A leader's own title", and "Session 3" or
+// "Session 3: Its own title" in a cohort on its own schedule.
 function sessionName(s) {
-  var label = sessionLabel(s.number);
+  var label = sessionLabel(s.number, s.schedule);
   var t = String(s.title || '').trim();
-  return t && t !== label && t !== 'Week ' + s.number ? label + ': ' + t : label;
+  return t && t !== label && t !== 'Week ' + s.number && t !== 'Session ' + s.number ? label + ': ' + t : label;
 }
 
 var ADDON_LISTING = 'https://workspace.google.com/marketplace/app/human_shaped/1086485459450';

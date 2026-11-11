@@ -13,7 +13,7 @@
     '/assets/hub-config.js?v=20261016a',
     '/assets/teach-lib.js?v=20261022c',
     '/assets/path-lib.js',
-    '/assets/home-lib.js?v=20261022p',
+    '/assets/home-lib.js?v=20261111i',
     '/assets/exchange-lib.js?v=20261022a'
   ];
   function loadAll(list) {
@@ -80,7 +80,7 @@
     try { localStorage.setItem(SEEN_KEY, new Date().toISOString()); } catch (e) {}
   }
 
-  var COHORT = 'id, slug, title, starts_on, weeks, status, session_weekday, session_time, session_minutes, time_zone';
+  var COHORT = 'id, slug, title, starts_on, weeks, schedule, status, session_weekday, session_time, session_minutes, time_zone';
 
   function start() {
     var H = window.HomeLib, T = window.TeachLib, P = window.PathLib;
@@ -169,7 +169,9 @@
           });
           // What is open for this person, in the words their reminders use.
           var L = window.ReminderLib, open = res[res.length - 1].data || [];
-          if (L) model.waiting = L.sorted(open).map(L.line).filter(Boolean).map(function (l) { return { title: l.text, href: l.href }; }).concat(model.waiting);
+          var scheduleOf = {};
+          cohorts.forEach(function (c) { scheduleOf[c.slug] = c.schedule; });
+          if (L) model.waiting = L.sorted(open).map(function (i) { return L.line(Object.assign({ schedule: scheduleOf[i.slug] }, i)); }).filter(Boolean).map(function (l) { return { title: l.text, href: l.href }; }).concat(model.waiting);
           model.polls = model.myPolls.concat(model.answeredPolls);
           draw(model, H, P);
           markSeen();
@@ -204,7 +206,7 @@
       if (u.live && meet) acts.push(link(meet, 'Join the call', 'btn-primary'));
       else acts.push(link('/session/?c=' + slug + '&s=' + Number(u.session.number), 'Open the session', u.live ? 'btn-primary' : 'btn-secondary small'));
       list.appendChild(U().row({
-        title: c.title + ', ' + (Number(u.session.number) === 0 ? 'prep session' : 'week ' + u.session.number), href: '/cohort/?c=' + slug,
+        title: c.title + ', ' + (c.schedule === 'custom' ? 'session ' + u.session.number : Number(u.session.number) === 0 ? 'prep session' : 'week ' + u.session.number), href: '/cohort/?c=' + slug,
         meta: u.live ? null : H.whenText(u.session.starts_at, m.now, m.zone),
         status: u.live ? U().status('session', 'live') : null, actions: acts
       }));

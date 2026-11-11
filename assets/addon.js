@@ -1316,12 +1316,12 @@
     var heard = S.prev && S.prev.heard;
     if (heard) {
       var wrap = el('div', 'live-heard addon-card');
-      wrap.appendChild(el('p', 'kicker', 'What ' + (S.teaching ? 'you' : 'your leader') + ' heard in week ' + S.prev.number + '’s checks'));
+      wrap.appendChild(el('p', 'kicker', 'What ' + (S.teaching ? 'you' : 'your leader') + ' heard in ' + (S.cohort && S.cohort.schedule === 'custom' ? 'session ' : 'week ') + S.prev.number + '’s checks'));
       heard.split(/\n{2,}/).forEach(function (para) { wrap.appendChild(el('p', null, para)); });
       box.appendChild(wrap);
     } else if (S.teaching && S.prev) {
       var hint = el('p', 'small');
-      hint.appendChild(document.createTextNode('What you heard in week ' + S.prev.number + '’s checks shows here once you write it '));
+      hint.appendChild(document.createTextNode('What you heard in ' + (S.cohort && S.cohort.schedule === 'custom' ? 'session ' : 'week ') + S.prev.number + '’s checks shows here once you write it '));
       hint.appendChild(newTab(Object.assign(el('a', null, 'in Sessions'), { href: '/cohort/?c=' + encodeURIComponent(S.cohort.slug) + '&t=sessions' })));
       hint.appendChild(document.createTextNode('.'));
       box.appendChild(hint);

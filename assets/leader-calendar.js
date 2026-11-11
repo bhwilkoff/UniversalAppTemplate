@@ -39,7 +39,7 @@
     if (c.calendar_by !== 'leader' || c.status === 'draft') return;
     if (c.calendar_owner && c.calendar_owner !== o.me) return;
     o.db.rpc('my_calendar_work', { c: c.id }).then(function (r) {
-      var rows = r.data || [];
+      var rows = (r.data || []).map(function (s) { return Object.assign({ schedule: c.schedule }, s); });
       var head = document.createElement('h2'); head.textContent = 'Calendar';
       var said = document.createElement('p'); said.className = 'small'; said.setAttribute('role', 'status');
       box.append(head);

@@ -129,8 +129,11 @@ these on its own, and the checklist keeps only the things a leader decides.
 
 Done by the site, shown as a status, never as a step:
 
-- the sessions, a prep session and the weekly ones, each with the course
-  content for its week, cut to the cohort's session length;
+- the sessions: for a weekly cohort a prep session and the weekly ones,
+  each with the course content for its week, cut to the cohort's session
+  length; for one with sessions you set, the ones the leader adds or brings
+  in from Course Builder as a draft, which the leader can try in a Meet call
+  before anyone else can see it;
 - one Google Calendar event per session on meet@'s calendar, each with its
   own Meet link, that week's title, and a link to that session's page,
   with every leader and learner as a guest;

@@ -3341,6 +3341,20 @@ def main():
     check("a leader adds them, only by the image names, and only in the workbook's cohort", l.fetchall() == [(True, False, False)])
     d = as_user("dee"); d.execute("select private.can_read_workbook_file(%s)", (img,))
     check("someone outside the cohort cannot read them", d.fetchall() == [(False,)])
+    # Leaving takes a person's own workbook answers (migration 20261111120000).
+    wil = str(uuid.uuid4())
+    su.execute("reset role")
+    su.execute("insert into auth.users (id, raw_app_meta_data) values (%s, '{}')", (wil,))
+    people["wil"] = wil
+    as_system()
+    su.execute("insert into auth.identities (user_id, provider, provider_id, identity_data) values (%s, 'github', '778', %s)",
+               (wil, json.dumps({"user_name": "wil-gh", "provider_id": "778"})))
+    su.execute("insert into public.enrollments (cohort_id, user_id) values (%s, %s)", (cc, wil))
+    attempt(as_user("wil"), "insert into public.workbook_answers (workbook_id, cohort_id, user_id, block, value) values (%s, %s, %s, 'b1', '{\"text\": \"Mine\"}')", (wbi, cc, wil))
+    w = as_user("wil"); w.execute("select public.leave_cohort(%s)", (cc,))
+    su.execute("reset role")
+    su.execute("select count(*) from public.workbook_answers where user_id = %s", (wil,))
+    check("leaving a cohort takes your own workbook answers", su.fetchall() == [(0,)])
     check("a session with workbook answers stays", not attempt(as_user("ben"), "delete from public.sessions where id = %s", (ss,)))
     gid2 = str(uuid.uuid4())
     su.execute("reset role")

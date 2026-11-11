@@ -323,7 +323,7 @@
           draw(people, mine, res[1].data, res[2].data, res[3].data, res[4].data, res[5].data);
           drawTalk(res[6].data);
           if (window.CohortAsks) window.CohortAsks.mount($('[data-asks]'), { db: db, session: session, cohort: cohort, access: res[6].data, leading: teaching, app: mine && mine.app_url, readOnly: cohort.status === 'finished' });
-          if (window.CohortFiles) window.CohortFiles.mount($('[data-files]'), { db: db, session: session, cohort: cohort, access: res[6].data, leading: teaching, readOnly: cohort.status === 'finished' });
+          if (window.CohortFiles) window.CohortFiles.mount($('[data-files]'), { db: db, session: session, cohort: cohort, sessions: res[1].data.length, access: res[6].data, leading: teaching, readOnly: cohort.status === 'finished' });
           drawFeedback(res[5].data, people, res[3].data, mine);
           drawRecognized(res[5].data);
           drawSetup(mine, res[6].data);

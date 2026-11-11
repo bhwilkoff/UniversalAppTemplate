@@ -10,25 +10,34 @@
   // GitHub's own limit for a file added on the web.
   var MAX_BYTES = 25 * 1024 * 1024;
 
-  // Resources for everything shared, then one folder for each week.
-  function folders(weeks) {
+  // Resources for everything shared, then one folder for each week, or
+  // for each session in a cohort on its own schedule (`weeks` is then the
+  // number of sessions).
+  function folders(weeks, schedule) {
+    var list = [{ path: 'resources', label: 'Resources' }];
+    if (schedule === 'custom') {
+      for (var n = 1; n <= (weeks || 0); n++) list.push({ path: 'sessions/session-' + n, label: 'Session ' + n });
+      return list;
+    }
     // Prep is its own session (number 0), so it has its own folder too.
-    var list = [{ path: 'resources', label: 'Resources' }, { path: 'sessions/prep', label: 'Prep' }];
+    list.push({ path: 'sessions/prep', label: 'Prep' });
     for (var i = 1; i <= (weeks || 5); i++) list.push({ path: 'sessions/week-' + i, label: 'Week ' + i });
     return list;
   }
 
-  function labelFor(dir, weeks) {
-    var f = folders(Math.max(weeks || 5, weekOf(dir) || 0)).filter(function (x) { return x.path === dir; })[0];
+  function labelFor(dir, weeks, schedule) {
+    var most = schedule === 'custom' ? Math.max(weeks || 0, sessionOf(dir) || 0) : Math.max(weeks || 5, weekOf(dir) || 0);
+    var f = folders(most, schedule).filter(function (x) { return x.path === dir; })[0];
     return f ? f.label : dir;
   }
   function weekOf(dir) { var m = /^sessions\/week-(\d+)$/.exec(dir); return m ? Number(m[1]) : null; }
+  function sessionOf(dir) { var m = /^sessions\/session-(\d+)$/.exec(dir); return m ? Number(m[1]) : null; }
 
   // What the files list shows: every file but the repository's own
   // machinery (the README, anything under .github, placeholder files),
   // grouped by folder in the order folders() gives, then any other folder
   // people made on GitHub, by name.
-  function groups(tree, weeks) {
+  function groups(tree, weeks, schedule) {
     var byDir = {};
     (tree || []).forEach(function (t) {
       if (!t || t.type !== 'blob' || typeof t.path !== 'string') return;
@@ -43,13 +52,14 @@
       if (d === 'resources') return 0;
       if (d === 'sessions/prep') return 0.5;
       if (weekOf(d)) return weekOf(d);
+      if (sessionOf(d)) return sessionOf(d);
       return d === '' ? 100000 : 10000;
     }
     var dirs = Object.keys(byDir).sort(function (a, b) { return rank(a) - rank(b) || a.localeCompare(b); });
     return dirs.map(function (d) {
       return {
         dir: d,
-        label: d === '' ? 'Other files' : labelFor(d, weeks),
+        label: d === '' ? 'Other files' : labelFor(d, weeks, schedule),
         files: byDir[d].sort(function (a, b) { return a.name.localeCompare(b.name, undefined, { numeric: true }); })
       };
     });

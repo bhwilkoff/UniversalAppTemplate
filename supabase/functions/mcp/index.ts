@@ -45,7 +45,7 @@ const LiveLib = (globalThis as any).LiveLib;
 // deno-lint-ignore no-explicit-any
 const FollowupLib = (globalThis as any).FollowupLib;
 
-const COHORT_COLUMNS = 'id, slug, title, status, starts_on, weeks, time_zone, session_weekday, session_time, session_minutes';
+const COHORT_COLUMNS = 'id, slug, title, status, starts_on, weeks, schedule, time_zone, session_weekday, session_time, session_minutes';
 const cohortArg = z.object({
   cohort: z.string().optional().describe('The cohort\'s short name (its slug). Leave it out when you are in one cohort.'),
 });

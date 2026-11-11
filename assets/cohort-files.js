@@ -49,7 +49,7 @@
     if (!box) return;
     var repo = o.cohort.github_repo;
     var access = o.access || null;
-    var weeks = o.cohort.weeks || 5;
+    var weeks = o.cohort.schedule === 'custom' ? (o.sessions || 0) : (o.cohort.weeks || 5);
     box.replaceChildren();
 
     if (!repo) {
@@ -90,7 +90,7 @@
       ask(token, 'GET', F.treeUrl(repo)).then(function (r) {
         listBox.replaceChildren();
         if (r.problem && r.problem.kind !== 'empty') { listBox.appendChild(explain(r.problem, o)); return; }
-        var groups = r.problem ? [] : F.groups(r.body.tree, weeks);
+        var groups = r.problem ? [] : F.groups(r.body.tree, weeks, o.cohort.schedule);
         if (!groups.length) { listBox.appendChild(U.empty('No files yet')); return; }
         groups.forEach(function (g) {
           var sec = el('section', 'files-group');
@@ -114,7 +114,7 @@
     var where = el('label', null, 'Folder');
     var pick = el('select');
     pick.name = 'folder';
-    F.folders(weeks).forEach(function (f) {
+    F.folders(weeks, o.cohort.schedule).forEach(function (f) {
       var opt = el('option', null, f.label); opt.value = f.path; pick.appendChild(opt);
     });
     where.appendChild(pick);

@@ -7,10 +7,13 @@
   var API = 'https://www.googleapis.com/calendar/v3/calendars/primary/events';
   var LISTING = 'https://workspace.google.com/marketplace/app/human_shaped/1086485459450';
 
-  function label(n) { return Number(n) === 0 ? 'Prep' : 'Week ' + n; }
+  function label(s) {
+    if (s.schedule === 'custom') return 'Session ' + Number(s.number);
+    return Number(s.number) === 0 ? 'Prep' : 'Week ' + s.number;
+  }
   function sessionName(s) {
-    var l = label(s.number), t = String(s.title || '').trim();
-    return t && t !== l && t !== 'Week ' + s.number ? l + ': ' + t : l;
+    var l = label(s), t = String(s.title || '').trim();
+    return t && t !== l && t !== 'Week ' + s.number && t !== 'Session ' + s.number ? l + ': ' + t : l;
   }
   function sessionPage(s) { return SITE + '/session/?c=' + encodeURIComponent(s.slug) + '&s=' + Number(s.number); }
 

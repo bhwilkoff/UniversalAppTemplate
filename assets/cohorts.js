@@ -15,7 +15,7 @@
   }
 
   db.from('cohorts')
-    .select('slug, title, description, starts_on, weeks, capacity, session_weekday, session_time, session_minutes, time_zone')
+    .select('slug, title, description, starts_on, weeks, schedule, capacity, session_weekday, session_time, session_minutes, time_zone')
     .eq('status', 'open').order('starts_on')
     .then(function (r) {
       if (r.error || !r.data.length) return;
@@ -49,7 +49,7 @@
     return db.rpc('can_mentor').then(function (r) {
       if (r.error || !r.data) return;
       return Promise.all([
-        db.from('cohorts').select('id, slug, title, starts_on, weeks, description, status, session_weekday, session_time, session_minutes, time_zone').in('status', ['open', 'running']).order('starts_on'),
+        db.from('cohorts').select('id, slug, title, starts_on, weeks, schedule, description, status, session_weekday, session_time, session_minutes, time_zone').in('status', ['open', 'running']).order('starts_on'),
         db.from('enrollments').select('cohort_id, status').eq('user_id', uid),
         db.from('cohort_teachers').select('cohort_id').eq('user_id', uid)
       ]).then(function (res) {

@@ -95,3 +95,12 @@ test('appsBuiltBy: directory apps under the person’s GitHub account, whatever 
   assert.deepEqual(lib.appsBuiltBy(apps, 'ada').map((a) => a.name), ['Someone else']);
   assert.deepEqual(lib.appsBuiltBy(apps, null), []);
 });
+
+test('a cohort on its own schedule counts sessions, not weeks', () => {
+  const now = new Date('2026-10-28T12:00:00Z');
+  const K = { ...C, schedule: 'custom', weeks: 5 };
+  assert.deepEqual(lib.cohortState(K, lib.cohortNow(K, S, now)), { thing: 'cohort', state: 'running', meta: 'Session 2 of 3' });
+  const live = lib.cohortNow(K, S, new Date('2026-10-27T23:30:00Z'));
+  assert.equal(lib.cohortState(K, live).meta, 'Session 2');
+  assert.equal(lib.cohortState(C, lib.cohortNow(C, S, new Date('2026-10-27T23:30:00Z'))).meta, 'Week 2');
+});

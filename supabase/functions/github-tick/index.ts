@@ -45,7 +45,7 @@ Deno.serve(async (req) => {
   const now = new Date();
   const until = new Date(now.getTime() + 24 * 3600000).toISOString();
   const rows = await db.from('sessions')
-    .select('id, cohort_id, number, title, starts_at, discussion_number, cohorts(slug, status, github_repo, time_zone)')
+    .select('id, cohort_id, number, title, starts_at, discussion_number, cohorts(slug, status, schedule, github_repo, time_zone)')
     .is('discussion_number', null).gt('starts_at', now.toISOString()).lte('starts_at', until);
   if (rows.error) return reply(500, { message: rows.error.message });
   const sessions = due(rows.data, now);

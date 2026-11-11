@@ -8,13 +8,18 @@
   var HOUR = 8;      // the digest goes out from this hour, on the cohort's clock
   var WINDOW = 3;    // days before a session that the digest starts
 
-  function sessionName(n) { return Number(n) === 0 ? 'Prep' : 'Week ' + n; }
+  function sessionName(n, schedule) {
+    if (schedule === 'custom') return 'Session ' + Number(n);
+    return Number(n) === 0 ? 'Prep' : 'Week ' + n;
+  }
   function sessionUrl(slug, n) { return '/session/?c=' + encodeURIComponent(slug) + '&s=' + Number(n); }
   function cohortUrl(slug, tab) { return '/cohort/?c=' + encodeURIComponent(slug) + (tab ? '&t=' + tab : ''); }
 
+  function withSchedule(i, schedule) { return schedule && !i.schedule ? Object.assign({}, i, { schedule: schedule }) : i; }
+
   // One open item as a sentence that starts with what to do, and where.
   function line(i) {
-    var by = i.session_number == null ? '' : ' before ' + sessionName(i.session_number);
+    var by = i.session_number == null ? '' : ' before ' + sessionName(i.session_number, i.schedule);
     if (i.kind === 'prep') return { text: 'Answer ' + (i.amount === 1 ? '1 question' : i.amount + ' questions') + by, href: sessionUrl(i.slug, i.session_number) };
     if (i.kind === 'exchange') return { text: 'Reply to the exchange' + by + (i.label ? ': ' + i.label : ''), href: '/exchange/#' + i.token };
     if (i.kind === 'repo') return { text: 'Add your repository and address', href: cohortUrl(i.slug, 'mine') };
@@ -67,12 +72,12 @@
 
   // What a learner reads. Null when there is nothing to do.
   function learnerMessage(o) {
-    var todo = sorted(o.items).map(line).filter(Boolean);
+    var todo = sorted(o.items).map(function (i) { return line(withSchedule(i, o.schedule)); }).filter(Boolean);
     var fresh = (o.events || []).map(function (e) { return eventLine(e, o.slug); }).filter(Boolean);
     if (!todo.length && !fresh.length) return null;
     var out = ['@' + o.login];
     if (todo.length) {
-      if (o.nextStart) out.push(sessionName(o.nextNumber) + ' is ' + when(o.nextStart, o.zone) + '.');
+      if (o.nextStart) out.push(sessionName(o.nextNumber, o.schedule) + ' is ' + when(o.nextStart, o.zone) + '.');
       out.push(todo.map(function (l, i) { return (i + 1) + '. ' + md(l); }).join('\n'));
     }
     if (fresh.length) out.push(fresh.map(function (l) { return '- ' + md(l); }).join('\n'));
@@ -86,10 +91,10 @@
     var people = o.people || [], issues = o.issues || [];
     var fresh = (o.events || []).map(function (e) { return eventLine(e, o.slug); }).filter(Boolean);
     if (!people.length && !issues.length && !o.feedback && !o.calendar && !fresh.length) return null;
-    if (o.nextStart) out.push(sessionName(o.nextNumber) + ' is ' + when(o.nextStart, o.zone) + '.');
+    if (o.nextStart) out.push(sessionName(o.nextNumber, o.schedule) + ' is ' + when(o.nextStart, o.zone) + '.');
     if (people.length) {
       out.push('**Still open**\n\n' + people.map(function (p) {
-        return '- ' + p.name + ': ' + sorted(p.items).map(function (i) { return line(Object.assign({}, i, { label: null })); }).filter(Boolean).map(function (l) { return l.text.charAt(0).toLowerCase() + l.text.slice(1); }).join('; ');
+        return '- ' + p.name + ': ' + sorted(p.items).map(function (i) { return line(Object.assign({}, withSchedule(i, o.schedule), { label: null })); }).filter(Boolean).map(function (l) { return l.text.charAt(0).toLowerCase() + l.text.slice(1); }).join('; ');
       }).join('\n'));
     }
     if (o.calendar) out.push(md(line({ kind: 'calendar', slug: o.slug })));

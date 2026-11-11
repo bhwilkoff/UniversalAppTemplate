@@ -309,8 +309,7 @@
   function cohortCard(c, mine) {
     var card = el('article', 'cohort-card');
     card.appendChild(el('h3', null, c.title));
-    var weeks = c.weeks + ' weeks';
-    card.appendChild(el('p', 'small', when(c.starts_on) + ', ' + weeks + '.'));
+    card.appendChild(el('p', 'small', when(c.starts_on) + (c.schedule === 'custom' ? '' : ', ' + c.weeks + ' weeks') + '.'));
     if (window.TeachLib) card.appendChild(el('p', 'small', window.TeachLib.scheduleText(c, Intl.DateTimeFormat().resolvedOptions().timeZone)));
     if (c.description) card.appendChild(el('p', null, c.description));
     if (mine && c.myRole === 'mentor') card.appendChild(el('p', 'small', 'You are a returning learner in this cohort.'));
@@ -417,8 +416,8 @@
       keepGitHubToken(session);
       return Promise.all([
         db.from('profiles').select('github_login, display_name, avatar_url').eq('id', uid).single(),
-        db.from('enrollments').select('status, role, cohorts(id, slug, title, starts_on, weeks, description, status, session_weekday, session_time, session_minutes, time_zone)').eq('user_id', uid).neq('status', 'left'),
-        db.from('cohorts').select('id, slug, title, starts_on, weeks, description, status, session_weekday, session_time, session_minutes, time_zone').eq('status', 'open').order('starts_on'),
+        db.from('enrollments').select('status, role, cohorts(id, slug, title, starts_on, weeks, schedule, description, status, session_weekday, session_time, session_minutes, time_zone)').eq('user_id', uid).neq('status', 'left'),
+        db.from('cohorts').select('id, slug, title, starts_on, weeks, schedule, description, status, session_weekday, session_time, session_minutes, time_zone').eq('status', 'open').order('starts_on'),
         db.from('teachers').select('user_id').eq('user_id', uid).maybeSingle()
       ]).then(function (res) {
         var bad = res.filter(function (r) { return r.error; })[0];

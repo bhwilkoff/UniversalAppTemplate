@@ -333,7 +333,7 @@
   // teacher, read every twenty seconds while the page is seen, and
   // posted to by anyone in the cohort as themselves.
   //   o.db, o.session (the sign-in), o.repo, o.row (the session's row),
-  //   o.teaching, o.liveUrl
+  //   o.teaching, o.liveUrl, o.cohort
   // ------------------------------------------------------------------
   function sessionThread(box, o) {
     var T = root.SessionThreadLib;
@@ -407,7 +407,7 @@
         if (!repo) return trouble({ kind: 'not-visible' });
         var cat = T.category(repo.categories);
         if (!cat) { b.disabled = false; msg.textContent = 'The cohort’s repository has no category a discussion can go in, so add one on GitHub first.'; return; }
-        return D.ask(tok, D.CREATE, { repositoryId: repo.repositoryId, categoryId: cat.id, title: T.title(o.row), body: T.body(o.row, o.liveUrl) }).then(function (c) {
+        return D.ask(tok, D.CREATE, { repositoryId: repo.repositoryId, categoryId: cat.id, title: T.title(o.row, o.cohort), body: T.body(o.row, o.liveUrl, o.cohort) }).then(function (c) {
           if (c.problem) return trouble(c.problem);
           var made = c.data && c.data.createDiscussion && c.data.createDiscussion.discussion;
           if (!made) return trouble({ kind: 'github', message: 'GitHub did not say which discussion it made.' });

@@ -81,3 +81,10 @@ test('when two teachers open a thread at once, the stored one stays', () => {
   assert.deepEqual(lib.settle(12, 12), { keep: 12, extra: null });
   assert.deepEqual(lib.settle(11, 12), { keep: 11, extra: 12 });
 });
+
+test('a cohort on its own schedule names the session, given or embedded', () => {
+  assert.equal(lib.title({ number: 2, title: 'Listening' }, { schedule: 'custom' }), 'Session 2: Listening, the session thread');
+  assert.equal(lib.title({ number: 2, title: 'Session 2', cohorts: { schedule: 'custom' } }), 'Session 2, the session thread');
+  assert.match(lib.body({ number: 4, cohorts: { schedule: 'custom' } }, null), /Session 4’s live session/);
+  assert.equal(lib.title({ number: 0, title: null, cohorts: { schedule: 'weekly' } }), 'Prep, the session thread');
+});

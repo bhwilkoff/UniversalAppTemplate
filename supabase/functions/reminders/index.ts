@@ -45,7 +45,7 @@ Deno.serve(async (req) => {
   if (!token) return reply(503, { message: 'The GitHub App is not set up.' });
   const gh = github(token);
 
-  let cq = db.from('cohorts').select('id, slug, title, time_zone, github_repo, details').in('status', ['open', 'running']).not('github_repo', 'is', null);
+  let cq = db.from('cohorts').select('id, slug, title, schedule, time_zone, github_repo, details').in('status', ['open', 'running']).not('github_repo', 'is', null);
   if (input.only) cq = cq.eq('slug', input.only);
   const cohorts = (await cq).data || [];
   const ids = cohorts.map((c) => c.id);
@@ -97,7 +97,7 @@ Deno.serve(async (req) => {
   for (const c of cohorts) {
     if (c.details?.reminders === 'off') continue;
     const next = sessions.data!.find((s) => s.cohort_id === c.id) || null;
-    const common = { slug: c.slug, zone: c.time_zone, nextStart: next?.starts_at || null, nextNumber: next?.number ?? null };
+    const common = { slug: c.slug, schedule: c.schedule, zone: c.time_zone, nextStart: next?.starts_at || null, nextNumber: next?.number ?? null };
     const itemsOf = (uid: string) => open.data.filter((o: { user_id: string; cohort_id: string }) => o.user_id === uid && o.cohort_id === c.id);
     const thread = (uid: string) => threads.data!.find((t) => t.user_id === uid && t.cohort_id === c.id) || null;
     const fresh = (uid: string) => {

@@ -105,7 +105,7 @@
         if (week != null && window.CurriculumSeed) start.appendChild(button(C.startLabel(week), 'btn-primary', startPlan));
         start.appendChild(button('Start from the six parts', 'btn-secondary', startDefault));
         var from = S.copySource(opts.sessions, session, withScenes);
-        if (from) start.appendChild(button('Copy week ' + from.number + '’s run of show', 'btn-secondary', function () { copyFrom(from); }));
+        if (from) start.appendChild(button('Copy ' + (cohort.schedule === 'custom' ? 'session ' : 'week ') + from.number + '’s run of show', 'btn-secondary', function () { copyFrom(from); }));
       }
       var at = S.startTimes(scenes);
       scenes.forEach(function (s, i) {
@@ -475,10 +475,10 @@
     }
 
     function copyFrom(from) {
-      say('Copying week ' + from.number + '…');
+      say('Copying ' + (cohort.schedule === 'custom' ? 'session ' : 'week ') + from.number + '…');
       db.rpc('copy_scenes', { from_session: from.id, to_session: session.id }).then(function (r) {
         if (r.error) { say('Not copied: ' + r.error.message); return; }
-        say('Copied ' + r.data + ' scenes from week ' + from.number + ', with your notes.');
+        say('Copied ' + r.data + ' scenes from ' + (cohort.schedule === 'custom' ? 'session ' : 'week ') + from.number + ', with your notes.');
         load();
       });
     }

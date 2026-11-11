@@ -44,6 +44,10 @@ export function chooseCohort(cohorts, slug) {
   return { text: 'You are in more than one cohort, so say which one. ' + listText(cohorts) };
 }
 
+// "Week 2", or "Session 2" in a cohort on its own schedule.
+function sessionLabel(n, cohort) { return (cohort && cohort.schedule === 'custom' ? 'Session ' : 'Week ') + n; }
+function inSentence(n, cohort) { return (cohort && cohort.schedule === 'custom' ? 'session ' : 'week ') + n; }
+
 function noCohorts() {
   return `You are not in a cohort yet. Open cohorts are listed at ${SITE}/cohorts/, and joining happens on ${SITE}/account/. Working on your own, my_app reads your own app and your marks on the stages, and the review_my_own_work prompt reviews it the way the method does.`;
 }
@@ -56,7 +60,9 @@ export function cohortsText(cohorts) {
   return cohorts.map((c) => [
     `${c.title} (slug: ${c.slug})`,
     `  Status: ${c.status}. You are ${c.role === 'teacher' ? 'its teacher' : 'a ' + c.role}.`,
-    c.starts_on ? `  ${c.weeks} weeks from ${c.starts_on}.` : `  ${c.weeks} weeks; dates to come.`,
+    c.schedule === 'custom'
+      ? (c.starts_on ? `  Sessions from ${c.starts_on}, each on its own date.` : '  Sessions on their own dates, to come.')
+      : c.starts_on ? `  ${c.weeks} weeks from ${c.starts_on}.` : `  ${c.weeks} weeks; dates to come.`,
     `  Cohort page: ${SITE}/cohort/?c=${encodeURIComponent(c.slug)}`,
   ].join('\n')).join('\n\n');
 }
@@ -69,12 +75,14 @@ export function thisWeekText(cohort, t, stages, schedule) {
     return lines.join('\n');
   }
   const s = t.current;
-  lines.push(`Week ${s.number}${s.title && s.title !== 'Week ' + s.number ? ': ' + s.title : ''}`);
-  lines.push(s.scope ? `This week's challenge, in the teacher's words: ${s.scope}` : 'The teacher has not written this week\'s challenge yet.');
+  const label = sessionLabel(s.number, cohort), custom = cohort.schedule === 'custom';
+  lines.push(`${label}${s.title && s.title !== label && s.title !== 'Week ' + s.number ? ': ' + s.title : ''}`);
+  const span = custom ? 'session' : 'week';
+  lines.push(s.scope ? `This ${span}'s challenge, in the teacher's words: ${s.scope}` : `The teacher has not written this ${span}'s challenge yet.`);
   if (stages.length) {
     lines.push('Stages this week: ' + stages.map((n) => `${n} (method part "${stagePart(n)}", ${SITE}/path/${n}/)`).join(', ') + '.');
   }
-  lines.push('Weekly session: ' + schedule);
+  lines.push((custom ? 'Sessions: ' : 'Weekly session: ') + schedule);
   lines.push(`Cohort page: ${SITE}/cohort/?c=${encodeURIComponent(cohort.slug)}`);
   return lines.join('\n');
 }
@@ -83,7 +91,7 @@ export function nextSessionText(cohort, t, parts, when, broughtBack) {
   if (!t.next) return `${cohort.title}: there is no session still to come.`;
   const s = t.next;
   const lines = [
-    `${cohort.title}, week ${s.number}${t.live ? ' (happening now)' : ''}: ${when}`,
+    `${cohort.title}, ${inSentence(s.number, cohort)}${t.live ? ' (happening now)' : ''}: ${when}`,
     s.meet_url ? `Join on Google Meet: ${s.meet_url}` : 'The Meet link is not posted yet.',
     `Session page: ${SITE}/session/?c=${encodeURIComponent(cohort.slug)}`,
     '',
@@ -264,7 +272,7 @@ export function showLine(show) {
 export function thisSessionText(cohort, session, live, queue, checks, myAnswers, tallies, myId, show) {
   if (!session) return `${cohort.title}: no sessions are scheduled yet, so there is nothing happening live.`;
   const lines = [
-    `${cohort.title}, week ${session.number}${live ? ' (happening now)' : ' (the next session; it is not live yet)'}`,
+    `${cohort.title}, ${inSentence(session.number, cohort)}${live ? ' (happening now)' : ' (the next session; it is not live yet)'}`,
     `Session page: ${SITE}/session/?c=${encodeURIComponent(cohort.slug)}`,
     '',
   ];
@@ -404,11 +412,11 @@ export function studentWorkText(cohort, person, work, names, teacherIds, meId) {
   lines.push('', answers.length
     ? 'Their answers to checks for understanding (only they and the cohort\'s teachers see these):'
     : 'They have not answered a check for understanding.');
-  answers.forEach((x) => lines.push(`- ${x.week ? 'Week ' + x.week + ', ' : ''}"${x.prompt}": ${x.text || '(no answer)'}`));
+  answers.forEach((x) => lines.push(`- ${x.week ? sessionLabel(x.week, cohort) + ', ' : ''}"${x.prompt}": ${x.text || '(no answer)'}`));
   const queue = work.queue || [];
   if (queue.length) {
     lines.push('', 'What they asked to show in a session:');
-    queue.forEach((q) => lines.push(`- ${q.week ? 'Week ' + q.week + ', ' : ''}${q.label} (${q.url})${q.note ? `, "${q.note}"` : ''}, ${q.state === 'shown' ? 'shown' : 'not shown'}`));
+    queue.forEach((q) => lines.push(`- ${q.week ? sessionLabel(q.week, cohort) + ', ' : ''}${q.label} (${q.url})${q.note ? `, "${q.note}"` : ''}, ${q.state === 'shown' ? 'shown' : 'not shown'}`));
   }
   const given = work.given || [];
   if (given.length) {
@@ -431,7 +439,7 @@ export function classNowText(cohort, now) {
   const s = now.session;
   if (!s) return `${cohort.title}: no sessions are scheduled yet, so there is no class to describe.`;
   const lines = [
-    `${cohort.title}, week ${s.number}${now.live ? ' (happening now)' : now.started ? ' (the most recent session, which is over)' : ' (it has not begun yet)'}`,
+    `${cohort.title}, ${inSentence(s.number, cohort)}${now.live ? ' (happening now)' : now.started ? ' (the most recent session, which is over)' : ' (it has not begun yet)'}`,
     `Session page: ${SITE}/session/?c=${encodeURIComponent(cohort.slug)}`,
   ];
   const sl = showLine(now.show);

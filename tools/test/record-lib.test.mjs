@@ -91,3 +91,9 @@ test('anything that is not a WebM header is left alone', () => {
   assert.equal(lib.fixDuration(new Uint8Array([0, 0, 0, 0x20, 0x66, 0x74, 0x79, 0x70]), 1000), null);
   assert.equal(lib.fixDuration(new Uint8Array(HEADER.subarray(0, 40)), 1000), null);
 });
+
+test('a cohort on its own schedule names the file for its session', () => {
+  const at = new Date(2026, 9, 28, 13, 0).getTime();
+  assert.equal(lib.fileName('Team', 1, at, 'video/webm', 'custom'), 'Session 1, Team, 2026-10-28.webm');
+  assert.equal(lib.fileName('Team', 0, at, 'video/webm', 'weekly'), 'Prep, Team, 2026-10-28.webm');
+});

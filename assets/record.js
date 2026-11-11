@@ -69,7 +69,7 @@
       if (!s) return null;
       K.me = s.user; K.email = s.user && s.user.email;
       if (!slug) return null;
-      return db.from('cohorts').select('id, slug, title').eq('slug', slug).maybeSingle().then(function (c) {
+      return db.from('cohorts').select('id, slug, title, schedule').eq('slug', slug).maybeSingle().then(function (c) {
         if (c.error || !c.data) return null;
         K.cohort = c.data;
         return Promise.all([
@@ -85,7 +85,7 @@
 
   function drawReady() {
     var title = K.cohort ? K.cohort.title : '';
-    $('[data-where]').textContent = K.cohort ? (number === 0 ? 'Prep' : 'Week ' + number) + ', ' + title : 'Record the session';
+    $('[data-where]').textContent = K.cohort ? (K.cohort.schedule === 'custom' ? 'Session ' + number : number === 0 ? 'Prep' : 'Week ' + number) + ', ' + title : 'Record the session';
     $('[data-notice]').textContent = R.notice(title);
     var note = $('[data-signin-note]');
     if (!K.me) { note.hidden = false; note.textContent = 'Not signed in: this records and saves, but cannot show everyone the recording notice or link it from the session page.'; }
@@ -178,7 +178,7 @@
       var mixed = new MediaStream([screen.getVideoTracks()[0], out.stream.getAudioTracks()[0]]);
       return store().then(function (top) {
         var started = Date.now(), id = String(started);
-        var meta = { id: id, slug: slug, number: number, cohortTitle: K.cohort ? K.cohort.title : '', sessionId: K.session ? K.session.id : null, started: started, mime: mime, seconds: 0, bytes: 0, stopped: false, mic: !!mic };
+        var meta = { id: id, slug: slug, number: number, cohortTitle: K.cohort ? K.cohort.title : '', schedule: K.cohort ? K.cohort.schedule : null, sessionId: K.session ? K.session.id : null, started: started, mime: mime, seconds: 0, bytes: 0, stopped: false, mic: !!mic };
         return (top ? top.getDirectoryHandle(id, { create: true }) : Promise.resolve(null)).then(function (dir) {
           begin({ dir: dir, meta: meta, screen: screen, mic: mic, audio: audio, mixed: mixed });
         });
@@ -298,7 +298,7 @@
 
   function drawItem(it, memoryOnly) {
     var m = it.meta, li = el('li', 'record-item');
-    var title = R.fileName(m.cohortTitle, m.number, m.started, m.mime);
+    var title = R.fileName(m.cohortTitle, m.number, m.started, m.mime, m.schedule);
     li.appendChild(el('p', null, title));
     li.appendChild(el('p', 'small', R.duration(m.seconds) + ', ' + R.size(m.bytes) + (m.stopped ? '' : ', stopped early when the window closed') + (m.driveId ? ', in Drive' : '')));
     var acts = el('div', 'actions'), status = el('p', 'small'), bar = el('progress');

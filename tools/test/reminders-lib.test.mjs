@@ -77,3 +77,15 @@ test('a leader sees who has what open, feedback, and open issues', () => {
 test('a repository name is one person\'s, and safe for GitHub', () => {
   assert.equal(R.repoFor('SattikBhaumik'), 'reminders-sattikbhaumik');
 });
+
+test('a cohort on its own schedule names sessions, not weeks', () => {
+  assert.equal(R.line({ kind: 'prep', slug: 'c', session_number: 1, amount: 2, schedule: 'custom' }).text, 'Answer 2 questions before Session 1');
+  const m = R.learnerMessage({ login: 'amy', slug: 'c', schedule: 'custom', zone: Z, nextStart: '2026-11-11T20:00:00Z', nextNumber: 3, items: [
+    { kind: 'prep', slug: 'c', session_number: 3, amount: 1, starts_at: '2026-11-11T20:00:00Z' }] });
+  assert.match(m, /Session 3 is Wednesday, November 11 at 1:00 PM MST\./);
+  assert.match(m, /Answer 1 question before Session 3/);
+  const l = R.leaderMessage({ login: 'ben', slug: 'c', schedule: 'custom', zone: Z, nextStart: '2026-11-11T20:00:00Z', nextNumber: 3,
+    people: [{ name: 'Rosa', items: [{ kind: 'prep', slug: 'c', session_number: 3, amount: 3 }] }] });
+  assert.match(l, /Session 3 is/);
+  assert.match(l, /- Rosa: answer 3 questions before Session 3/);
+});

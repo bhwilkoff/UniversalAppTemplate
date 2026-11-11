@@ -60,17 +60,24 @@
     return sessions || list[0] || null;
   }
 
-  function weekName(session) {
+  // A cohort on its own schedule (the cohort given, or the session's
+  // embedded cohorts row) names sessions; every other keeps its weeks.
+  function weekName(session, cohort) {
+    var c = cohort || session.cohorts;
+    if (c && c.schedule === 'custom') {
+      var name = 'Session ' + Number(session.number);
+      return session.title && session.title !== name ? name + ': ' + session.title : name;
+    }
     var n = Number(session.number) === 0 ? 'Prep' : 'Week ' + session.number;
     return session.title && session.title !== n && session.title !== 'Week ' + session.number ? n + ': ' + session.title : n;
   }
 
   // The thread's title and opening words, the same for every teacher.
-  function title(session) { return weekName(session) + ', the session thread'; }
+  function title(session, cohort) { return weekName(session, cohort) + ', the session thread'; }
 
-  function body(session, liveUrl) {
+  function body(session, liveUrl, cohort) {
     return [
-      'This is the thread for ' + weekName(session) + '’s live session.',
+      'This is the thread for ' + weekName(session, cohort) + '’s live session.',
       'For links and questions that should outlast the call.',
       'You can post here on GitHub or from the session page' + (/^https:\/\//.test(liveUrl || '') ? ' (' + liveUrl + ')' : '') + ', and you can edit or delete what you wrote, here, at any time.'
     ].join('\n\n');

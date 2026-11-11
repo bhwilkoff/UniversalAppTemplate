@@ -45,3 +45,10 @@ test('the panel takes a GitHub token only from the window it opened, on this sit
   assert.equal(C.acceptToken(ev({ data: { type: 'hs-github', token: 'bad token!' } }), origin, opened), null);
   assert.equal(C.tokenMessage('short'), null);
 });
+
+test('a cohort on its own schedule titles its chat by session, and weekly titles stay', () => {
+  assert.equal(C.weekTitle({ number: 3 }, { schedule: 'custom' }), 'Session 3, in class');
+  assert.equal(C.weekTitle({ number: 0 }, { schedule: 'weekly' }), 'Prep, in class');
+  assert.match(C.opening({ number: 3 }, null, { schedule: 'custom' }), /^The in-class chat for session 3\./);
+  assert.match(C.opening({ number: 0 }, null), /^The in-class chat for the prep session\./);
+});

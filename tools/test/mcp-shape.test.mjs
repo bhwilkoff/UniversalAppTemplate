@@ -272,3 +272,19 @@ test('an agent hears where the run of show is and what the main stage shows', ()
   const text = S.thisSessionText({ title: 'Fall', slug: 'fall' }, { number: 2 }, true, [], [], [], {}, 'me', { scene: { title: 'Arrive', kind: 'talk', minutes: 5 }, stage: 'path' });
   assert.match(text, /run of show is on "Arrive".*main stage shows which stage everyone said they are on/);
 });
+
+test('a cohort on its own schedule reads as sessions, not weeks', () => {
+  const k = { ...a, schedule: 'custom' };
+  const list = cohortsText([k]);
+  assert.match(list, /Sessions from 2026-10-06, each on its own date\./);
+  assert.doesNotMatch(list, /weeks/);
+  const t = thisWeekText(k, { current: { number: 3, title: 'Listening', scope: null } }, [], 'Each session on its own date, for 60 minutes.');
+  assert.match(t, /^Session 3: Listening$/m);
+  assert.match(t, /not written this session's challenge yet/);
+  assert.match(t, /^Sessions: Each session on its own date/m);
+  assert.doesNotMatch(t, /Week|week/);
+  const w = studentWorkText({ ...t1, schedule: 'custom' }, people[0], { answers: [{ week: 2, prompt: 'Why?', text: 'Because' }], queue: [{ week: 2, label: 'App', url: 'https://x.org', state: 'shown' }] }, {}, ['t'], 't');
+  assert.match(w, /- Session 2, "Why\?": Because/);
+  assert.match(w, /- Session 2, App/);
+  assert.match(classNowText(k, { session: { number: 4 }, live: true }), /Fall 2026, session 4 \(happening now\)/);
+});

@@ -35,9 +35,9 @@
   function pad(n) { return (n < 10 ? '0' : '') + n; }
   // "Prep, Minerva University Admissions ... 2026-10-28.webm", from the
   // local date the recording started.
-  function fileName(cohortTitle, sessionNumber, started, mime) {
+  function fileName(cohortTitle, sessionNumber, started, mime, schedule) {
     var d = new Date(started), day = d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
-    var n = Number(sessionNumber), name = isNaN(n) ? 'Session' : n === 0 ? 'Prep' : 'Week ' + n;
+    var n = Number(sessionNumber), name = isNaN(n) ? 'Session' : schedule === 'custom' ? 'Session ' + n : n === 0 ? 'Prep' : 'Week ' + n;
     var title = String(cohortTitle || '').replace(/[\\/:*?"<>|]+/g, ' ').replace(/\s+/g, ' ').trim();
     return name + ', ' + (title ? title + ', ' : '') + day + '.' + extension(mime);
   }

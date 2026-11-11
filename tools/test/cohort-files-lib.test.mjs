@@ -84,3 +84,18 @@ test('only writers and maintainers add files', () => {
   assert.equal(F.canAdd('read'), false);
   assert.equal(F.canAdd(null), false);
 });
+
+test('a cohort on its own schedule has Resources, then one folder for each session', () => {
+  assert.deepEqual(F.folders(2, 'custom'), [
+    { path: 'resources', label: 'Resources' },
+    { path: 'sessions/session-1', label: 'Session 1' },
+    { path: 'sessions/session-2', label: 'Session 2' }
+  ]);
+  assert.deepEqual(F.folders(0, 'custom'), [{ path: 'resources', label: 'Resources' }]);
+  const g = F.groups([
+    { type: 'blob', path: 'sessions/session-10/b.pdf', size: 1 },
+    { type: 'blob', path: 'sessions/session-2/a.pdf', size: 1 },
+    { type: 'blob', path: 'resources/r.md', size: 1 }
+  ], 3, 'custom');
+  assert.deepEqual(g.map((x) => x.label), ['Resources', 'Session 2', 'Session 10']);
+});
