@@ -113,6 +113,22 @@
     if (u.protocol !== 'https:' || /(^|\.)github\.com$/.test(u.hostname)) return null;
     return u.href.length > 500 ? null : u.href;
   }
+  // A part's document as the stage frames it: a Google file opens in its
+  // preview, which allows being framed; anything else framable as it is.
+  function docUrl(url) {
+    var f = frameable(url);
+    if (!f) return null;
+    var g = /^https:\/\/docs\.google\.com\/(document|presentation|spreadsheets)\/d\/([A-Za-z0-9_-]{10,200})/.exec(f);
+    if (g) return 'https://docs.google.com/' + g[1] + '/d/' + g[2] + '/preview';
+    var d = /^https:\/\/drive\.google\.com\/file\/d\/([A-Za-z0-9_-]{10,200})/.exec(f);
+    if (d) return 'https://drive.google.com/file/d/' + d[1] + '/preview';
+    return f;
+  }
+  function docOf(d) {
+    if (!d || typeof d.url !== 'string') return null;
+    var url = docUrl(d.url);
+    return url ? { url: url, name: typeof d.name === 'string' && d.name ? cut(d.name, 200) : 'A document' } : null;
+  }
   // What this person answered, for their own stage only.
   function mineOf(m) {
     if (!m || typeof m !== 'object') return null;
@@ -145,12 +161,15 @@
     }
     if (on && on.kind === 'check') {
       var k = (state.checks || []).filter(function (x) { return x.id === on.id; })[0];
-      if (k && k.state === 'open') {
+      // A part that shows an earlier question's answers (scenes.config.results_of)
+      // shows them closed or open, and nobody answers it there.
+      var showing = !!on.results;
+      if (k && (k.state === 'open' || showing)) {
         var L = live();
         var kind = L ? L.kindOf(k) : (k.choices ? 'choice' : 'short');
         var labels = kind === 'scale' && L ? L.scaleLabels(k) : kind === 'short' || kind === 'words' ? null : k.choices;
-        var view = { mode: 'check', id: k.id, answerable: !!state.answerable, mine: state.mineOf ? state.mineOf(k) : null, part: part, kind: kind, prompt: cut(k.prompt, 500), choices: labels ? labels.map(function (c) { return cut(c, 120); }) : null, count: null };
-        if (k.show_tally && kind !== 'short' && L) {
+        var view = { mode: 'check', id: k.id, answerable: !!state.answerable && !showing && k.state === 'open', mine: state.mineOf ? state.mineOf(k) : null, part: part, kind: kind, prompt: cut(k.prompt, 500), choices: labels ? labels.map(function (c) { return cut(c, 120); }) : null, count: null };
+        if ((k.show_tally || showing) && kind !== 'short' && L) {
           var summary = (state.results || {})[k.id];
           if (!summary && state.tallies) {
             var t = L.tally(k, state.tallies[k.id] || []);
@@ -208,6 +227,18 @@
     // Every rehearsal room at a glance (R12): its name, where its turns
     // are, its step's clock, and whether it asked for the teacher.
     if (on && on.kind === 'rooms') return { mode: 'rooms', part: part, rooms: roomsOf(state.rooms) };
+    // Someone featured by name (a presenter part's config.feature).
+    if (on && on.kind === 'person') {
+      var pv = { mode: 'person', part: part, who: cut((state.names || {})[on.id] || 'Someone', 80) };
+      if (typeof state.audience === 'string' && state.audience) pv.audience = cut(state.audience, 300);
+      return pv;
+    }
+    // The part's document: when a leader puts it up, or when the part has
+    // no slides of its own.
+    if (state.doc && ((on && on.kind === 'doc') || (!on && !state.slides))) {
+      var dv = docOf(state.doc);
+      if (dv) return { mode: 'doc', part: part, doc: dv };
+    }
     // A part's own slides fill the stage (DECISIONS.md, "The main stage is
     // built from slides").
     if (!on && state.slides) { var sl = slidesOf(state.slides); if (sl) return { mode: 'slides', part: part, slides: sl }; }
@@ -253,7 +284,7 @@
     if (!w || typeof w.cohort !== 'string' || !w.cohort) return null;
     var first = w.first && typeof w.first.name === 'string' ? { name: cut(w.first.name, 80), what: w.first.what ? cut(w.first.what, 300) : null } : null;
     return {
-      cohort: cut(w.cohort, 120), week: num(w.week), title: w.title ? cut(w.title, 120) : null,
+      cohort: cut(w.cohort, 120), week: num(w.week), name: typeof w.name === 'string' && w.name ? cut(w.name, 40) : null, title: w.title ? cut(w.title, 120) : null,
       challenge: w.challenge ? cut(w.challenge, 400) : null, first: first
     };
   }
@@ -317,6 +348,8 @@
     }
     if (v.mode === 'welcome') { var w = welcomeOf(v.welcome); return w ? { mode: 'welcome', part: part, welcome: w } : null; }
     if (v.mode === 'card' && v.card && typeof v.card.body === 'string' && v.card.body) return { mode: 'card', part: part, card: { body: cut(v.card.body, 400), endsAt: num(v.card.endsAt) } };
+    if (v.mode === 'person') { var pr = { mode: 'person', part: part, who: cut(v.who || 'Someone', 80) }; if (typeof v.audience === 'string' && v.audience) pr.audience = cut(v.audience, 300); return pr; }
+    if (v.mode === 'doc') { var dd = docOf(v.doc); return dd ? { mode: 'doc', part: part, doc: dd } : null; }
     if (v.mode === 'part') return { mode: 'part', part: part };
     if (v.mode === 'blank') return { mode: 'blank', part: part };
     if (v.mode === 'path') return { mode: 'path', part: part, path: pathOf(v.path) };
@@ -407,7 +440,7 @@
 
   var lib = {
     meetingCode: meetingCode, findRoom: findRoom, panelPlan: panelPlan, timeLeft: timeLeft,
-    stageView: stageView, sceneOf: sceneOf, stageError: stageError, stageMessage: stageMessage, actMessage: actMessage, readAct: readAct, frameable: frameable, keyMessage: keyMessage, readKey: readKey, readStageMessage: readStageMessage, HELLO: HELLO, isHello: isHello,
+    stageView: stageView, sceneOf: sceneOf, stageError: stageError, stageMessage: stageMessage, actMessage: actMessage, readAct: readAct, frameable: frameable, docUrl: docUrl, keyMessage: keyMessage, readKey: readKey, readStageMessage: readStageMessage, HELLO: HELLO, isHello: isHello,
     handoff: handoff, acceptHandoff: acceptHandoff, boardLinks: boardLinks
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;

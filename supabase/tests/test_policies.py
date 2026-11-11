@@ -3312,6 +3312,20 @@ def main():
     check("no one else does", d.fetchall() == [(0,)])
     check("no one signed in writes an import", not attempt(as_user("ben"), "insert into public.course_imports (created_by, nonce) values (%s, %s)", (people["ben"], "b" * 32)))
 
+    # The main stage can show a part's document or feature someone (migration 20261111030000).
+    check("a leader puts the part's document on the stage",
+          attempt(as_user("ben"), "insert into public.show_state (session_id, cohort_id, stage) values (%s, %s, 'doc') on conflict (session_id) do update set stage = 'doc', stage_ref = null", (ss, cc)))
+    check("a leader features someone in the cohort",
+          attempt(as_user("ben"), "update public.show_state set stage = 'person', stage_ref = %s where session_id = %s", (people["bea"], ss)))
+    su.execute("reset role")
+    su.execute("select detail from public.session_events where session_id = %s and kind = 'stage' order by id desc limit 1", (ss,))
+    check("and who was featured is kept for the next pick", su.fetchall() == [("person:" + people["bea"],)])
+    check("someone outside the cohort cannot be featured",
+          not attempt(as_user("ben"), "update public.show_state set stage = 'person', stage_ref = %s where session_id = %s", (people["dee"], ss)))
+    check("featuring needs someone", not attempt(as_user("ben"), "update public.show_state set stage = 'person', stage_ref = null where session_id = %s", (ss,)))
+    attempt(as_user("bea"), "update public.show_state set stage = 'doc', stage_ref = null where session_id = %s returning stage", (ss,))
+    check("a learner cannot change the stage", last_rows == [])
+
     conn.rollback()
     conn.close()
     failed = [n for n, ok in results if not ok]

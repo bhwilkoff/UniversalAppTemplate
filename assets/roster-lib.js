@@ -63,7 +63,35 @@
     return { rows: rows, sharing: r.counts.sharing };
   }
 
-  var lib = { STAGE_IDS: STAGE_IDS, STAGE_SHORT: STAGE_SHORT, STAGE_NAMES: STAGE_NAMES, isStage: isStage, roster: roster, askingNow: askingNow, summary: summary, pathView: pathView };
+  // Whom to feature next (a presenter part's config.feature, from courses
+  // brought in from Course Builder). Random: anyone not featured yet this
+  // session. Quiet: whoever has done least this session, by what the site
+  // records (Ben, November 10, 2026: "someone who hasn't done any reactions
+  // is an indicator, someone who hasn't shared anything yet is another"):
+  // reactions and stances, answers, posts, the queue, and requests. Someone
+  // already featured goes to the back. Ties go to chance. `pick` is a number
+  // in [0, 1) for the chance, so tests can fix it.
+  var SIGNALS = [['reactions', 'no reactions'], ['answers', 'no answers'], ['shares', 'nothing shared'], ['queue', 'not in the queue'], ['requests', 'no requests']];
+  function toFeature(people, signals, mode, pick) {
+    signals = signals || {};
+    var r = pick == null ? Math.random() : pick;
+    var list = (people || []).filter(function (p) { return p && p.id; });
+    if (!list.length) return null;
+    function n(kind, id) { return Number((signals[kind] || {})[id]) || 0; }
+    var fresh = list.filter(function (p) { return !n('featured', p.id); });
+    var pool = fresh.length ? fresh : list;
+    if (mode !== 'quiet') { var who = pool[Math.floor(r * pool.length)]; return { id: who.id, name: who.name, why: [] }; }
+    var scored = pool.map(function (p) {
+      var total = SIGNALS.reduce(function (t, s) { return t + n(s[0], p.id); }, 0);
+      return { p: p, total: total };
+    });
+    var least = Math.min.apply(null, scored.map(function (x) { return x.total; }));
+    var quiet = scored.filter(function (x) { return x.total === least; });
+    var chosen = quiet[Math.floor(r * quiet.length)].p;
+    return { id: chosen.id, name: chosen.name, why: SIGNALS.filter(function (s) { return !n(s[0], chosen.id); }).map(function (s) { return s[1]; }) };
+  }
+
+  var lib = { STAGE_IDS: STAGE_IDS, STAGE_SHORT: STAGE_SHORT, STAGE_NAMES: STAGE_NAMES, isStage: isStage, roster: roster, askingNow: askingNow, summary: summary, pathView: pathView, toFeature: toFeature };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
   else root.RosterLib = lib;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

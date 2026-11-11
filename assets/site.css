@@ -3354,3 +3354,9 @@ a.person-name:hover { text-decoration: underline; }
 .session-rename .row input { width: auto; }
 .import-result { max-width: 40rem; margin-top: 1rem; }
 .import-warnings ul { margin: 0.5rem 0 0; padding-left: 1.25rem; }
+
+/* A part's own tools in the panel's Now (courses from Course Builder). */
+.p2-part-tools { gap: 0.5rem; }
+.p2-part-tools .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.75rem; }
+.p2-feature { display: grid; gap: 0.4rem; }
+.p2-feature p { margin: 0; }

@@ -11,15 +11,21 @@
   function button(label, cls, fn) { var b = el('button', cls, label); b.type = 'button'; b.addEventListener('click', fn); return b; }
 
   function start(o) {
-    var box = o.mount, count = null, minutes = 10, placed = {}, said = '';
+    var box = o.mount, count = null, minutes = 10, minutesSet = false, placed = {}, said = '';
 
     function everyone() { return o.people(); }
     function stable() { return o.groups().filter(function (g) { return !g.breakout && /^https:/.test(g.meet_url || ''); }); }
     function roomsNow() { return o.groups().filter(function (g) { return g.breakout; }).concat(stable()); }
 
+    // A breakout part can set the number of rooms, the minutes, and random
+    // sorting (o.preset, from the current part). The leader can still change each.
+    function preset() { return (o.preset && o.preset()) || {}; }
     function plan() {
+      var pre = preset();
       var ids = everyone().map(function (p) { return p.id; });
-      var n = count || L.roomCount(ids.length);
+      if (pre.random) ids = L.shuffle(ids, pre.key || o.session.id);
+      // A part's room count never makes empty rooms.
+      var n = count || (pre.groups ? Math.min(pre.groups, Math.max(1, ids.length)) : L.roomCount(ids.length));
       var dealt = L.split(ids, n);
       var rooms = dealt.map(function () { return []; });
       dealt.forEach(function (room, i) {
@@ -34,7 +40,7 @@
     function status(text) { said = text || ''; var s = box.querySelector('[data-breakout-status]'); if (s) s.textContent = said; }
 
     function launch() {
-      var mins = Number(minutes);
+      var mins = Number(minutesSet ? minutes : preset().minutes || minutes);
       status('Launching…');
       var ready = stable().length ? Promise.resolve({}) : o.db.rpc('launch_breakouts', { session: o.session.id, rooms: plan() });
       Promise.resolve(ready).then(function (r) {
@@ -72,8 +78,8 @@
         nl.appendChild(n); row.appendChild(nl);
       }
       var ml = el('label', null, 'Minutes');
-      var m = el('input'); m.type = 'number'; m.min = '1'; m.max = '120'; m.value = String(minutes);
-      m.addEventListener('change', function () { minutes = Math.max(1, Math.min(120, Number(m.value) || 10)); });
+      var m = el('input'); m.type = 'number'; m.min = '1'; m.max = '120'; m.value = String(minutesSet ? minutes : preset().minutes || minutes);
+      m.addEventListener('change', function () { minutesSet = true; minutes = Math.max(1, Math.min(120, Number(m.value) || 10)); });
       ml.appendChild(m); row.appendChild(ml);
       d.appendChild(row);
       if (fixed.length) {

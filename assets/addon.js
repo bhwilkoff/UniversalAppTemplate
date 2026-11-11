@@ -981,6 +981,8 @@
     if (S.checks) drawSceneQuestion();
     drawBoardActivity();
     if (S.rooms && S.rooms.setPlan) S.rooms.setPlan({ turn: L.roomTurn(roomsScene(), 3), prompt: roomsPrompt() });
+    drawPartTools();
+    if (S.breakouts) S.breakouts.draw();
   }
 
   // Back and next without the show (before R3): the panel's own place.
@@ -1017,6 +1019,9 @@
     ['[data-sig-recording]', '[data-sig-where]', '[data-sig-card]', '[data-sig-stage]'].forEach(function (s) { now.appendChild($(s)); });
     now.appendChild(S.nowWhat);
     if (S.teaching) now.appendChild(S.nowNotes);
+    S.partTools = el('section', 'p2-group p2-part-tools'); S.partTools.hidden = true;
+    S.partTools.setAttribute('aria-label', 'For this part');
+    now.appendChild(S.partTools);
     // Plan: the parts, one line each.
     if (S.teaching) F.put('plan', $('[data-show]')); else $('[data-show]').hidden = true;
     if (S.teaching && !standalone && S.room && S.room.code) F.pane('plan').insertBefore(runPick(), F.pane('plan').firstChild);
@@ -1358,6 +1363,12 @@
     S.breakouts = window.Breakouts.start({
       db: db, mount: $('[data-breakouts]'), cohort: S.cohort, session: S.session, signals: S.signals, nameOf: nameOf,
       groups: function () { return S.groups; }, presence: function () { return S.presence || {}; }, reload: reloadGroups,
+      preset: function () {
+        var part = partNow();
+        if (!part || !part.own || part.kind !== 'rooms') return null;
+        var c = part.config || {};
+        return { groups: c.groups || null, minutes: part.minutes || null, random: c.sorting === 'random', key: part.key };
+      },
       people: function () {
         var list = S.people.map(function (p) { return { id: p.user_id, name: S.names[p.user_id] || 'Someone' }; });
         (S.guests || []).forEach(function (g) { if (!g.member_id && (S.presence || {})[g.user_id]) list.push({ id: g.user_id, name: g.name || 'A guest' }); });
@@ -1466,6 +1477,7 @@
         drawSceneQuestion();
         drawCounts();
         drawRoster();
+        drawPartTools();
         sendStage();
       });
     });
@@ -1495,7 +1507,92 @@
     S.onStage = v;
     if (S.run && S.run.shared && S.teaching) S.run.pin(v);
     drawQueue(); drawChecks(); drawRoster(); drawRoomsToggle(); sendStage(); drawRunInfo(); drawApps();
-    drawBoardPin();
+    drawBoardPin(); drawPartTools();
+  }
+
+  // What a part brought from Course Builder asks of the leader: its document
+  // to put up, someone to feature (at random, or someone quiet so far), and
+  // each breakout group's document. A learner in a breakout room sees their
+  // own group's document.
+  function inc(m, id) { if (id) m[id] = (m[id] || 0) + 1; }
+  function drawPartTools() {
+    var box = S.partTools;
+    if (!box) return;
+    box.replaceChildren();
+    var part = partNow(), c = part && part.own ? part.config || {} : {};
+    if (S.teaching && c.show && c.show.url) {
+      var row = el('div', 'actions');
+      var up = S.onStage && S.onStage.kind === 'doc';
+      if (part.slides) row.appendChild(button(up ? 'Back to the slides' : 'Show the document', 'btn-secondary small', function () { setPin(up ? null : { kind: 'doc' }); }));
+      var a = el('a', 'link-button', c.show.name || 'The document'); a.href = c.show.url; a.target = '_blank'; a.rel = 'noopener';
+      row.appendChild(a);
+      box.appendChild(row);
+    }
+    if (S.teaching && part && part.kind === 'presenter' && c.feature && c.feature !== 'teacher') drawFeature(box, part, c.feature);
+    var docs = part && part.kind === 'rooms' && Array.isArray(c.group_docs) ? c.group_docs : [];
+    if (docs.length) {
+      var mine = null;
+      if (!S.teaching && S.room && S.room.groupId) {
+        var g = (S.groups || []).filter(function (x) { return x.id === S.room.groupId; })[0];
+        var n = g ? /(\d+)\s*$/.exec(g.name || '') : null;
+        mine = n ? docs[Number(n[1]) - 1] || null : null;
+      }
+      var list = S.teaching ? docs : mine ? [mine] : [];
+      if (list.length) {
+        box.appendChild(el('p', 'small', S.teaching ? 'Each group’s document' : 'Your group’s document'));
+        var ul = el('ul', 'p2-run-list');
+        list.forEach(function (d, i) {
+          var li = el('li'), l = el('a', 'p2-run-row', (S.teaching ? 'Room ' + (i + 1) + ': ' : '') + d.name);
+          l.href = d.url; l.target = '_blank'; l.rel = 'noopener';
+          li.appendChild(l); ul.appendChild(li);
+        });
+        box.appendChild(ul);
+      }
+    }
+    box.hidden = !box.children.length;
+  }
+  function drawFeature(box, part, mode) {
+    var wrap = el('div', 'p2-feature');
+    var featured = S.onStage && S.onStage.kind === 'person' ? S.onStage.id : null;
+    var pk = S.featurePick && S.featurePick.part === part.key ? S.featurePick : null;
+    if (featured) {
+      wrap.appendChild(el('p', null, 'Featuring ' + (S.names[featured] || 'someone')));
+      wrap.appendChild(button('Done', 'btn-secondary small', function () { setPin(null); }));
+    } else if (pk) {
+      wrap.appendChild(el('p', null, pk.name + (pk.why.length ? ': ' + pk.why.join(', ') : '')));
+      var acts = el('div', 'actions');
+      acts.appendChild(button('Feature them', 'btn-secondary small', function () { S.featurePick = null; setPin({ kind: 'person', id: pk.id }); }));
+      acts.appendChild(button('Someone else', 'link-button', function () { choose(part, mode, pk.id); }));
+      wrap.appendChild(acts);
+    } else {
+      wrap.appendChild(button(mode === 'quiet' ? 'Choose someone quiet' : 'Choose someone at random', 'btn-secondary small', function () { choose(part, mode); }));
+    }
+    if (S.featureSaid) wrap.appendChild(el('p', 'small', S.featureSaid));
+    box.appendChild(wrap);
+  }
+  function choose(part, mode, skip) {
+    var r = rosterNow();
+    var pool = (r ? (r.here.length ? r.here : r.missing) : []).filter(function (p) { return (S.teacherIds || []).indexOf(p.id) < 0 && p.id !== skip; });
+    S.featureSaid = null;
+    return Promise.all([
+      db.from('session_events').select('user_id, kind, detail').eq('session_id', S.session.id).in('kind', ['reaction', 'stance', 'stage']),
+      db.from('shares').select('user_id').eq('session_id', S.session.id)
+    ]).then(function (res) {
+      var sig = { reactions: {}, answers: {}, shares: {}, queue: {}, requests: {}, featured: {} };
+      ((res[0] && res[0].data) || []).forEach(function (e) {
+        if (e.kind === 'stage') { var m = /^person:(.+)$/.exec(e.detail || ''); if (m) inc(sig.featured, m[1]); }
+        else inc(sig.reactions, e.user_id);
+      });
+      ((res[1] && res[1].data) || []).forEach(function (x) { inc(sig.shares, x.user_id); });
+      var asked = (S.checks || []).map(function (k) { return k.id; });
+      (S.answers || []).forEach(function (a) { if (asked.indexOf(a.check_id) >= 0) inc(sig.answers, a.user_id); });
+      (S.items || []).forEach(function (i) { inc(sig.queue, i.user_id); });
+      (S.requests || []).forEach(function (q) { inc(sig.requests, q.user_id); });
+      var pick = window.RosterLib ? window.RosterLib.toFeature(pool.map(function (p) { return { id: p.id, name: p.name }; }), sig, mode === 'quiet' ? 'quiet' : 'random') : null;
+      S.featurePick = pick ? Object.assign({ part: part.key }, pick) : null;
+      if (!pick) S.featureSaid = 'There is no one to choose yet.';
+      drawPartTools();
+    });
   }
 
   // Whose work is on the main stage, for everyone, and, for a teacher,
@@ -2081,6 +2178,9 @@
         changeCheck(k, { state: 'closed' });
       }
     });
+    // A part showing an earlier question's answers lets everyone see the counts.
+    var shown = resultsCheck(part);
+    if (shown && !shown.show_tally) changeCheck(shown, { show_tally: true });
     if (!q) return;
     // Coming back to a part opens its question again, with its answers
     // (found in the live Meet test: Back showed a question no one could
@@ -2091,7 +2191,8 @@
     S.autoAsked[part.key] = true;
     // Its own card says it is open, so only a problem leaves a line.
     var said = el('span');
-    Promise.resolve(ask([Object.assign({ show_tally: $('[data-ask-tally]').checked }, q)], said)).then(function () {
+    var tally = part.config && typeof part.config.show_tally === 'boolean' ? part.config.show_tally : $('[data-ask-tally]').checked;
+    Promise.resolve(ask([Object.assign({ show_tally: tally }, q)], said)).then(function () {
       if (/^Not asked/.test(said.textContent)) $('[data-ask-status]').textContent = said.textContent;
     });
   }
@@ -2138,6 +2239,7 @@
       mineOf: function (k) { var x = myAnswer(k); return x ? { choice: x.choice, picks: Array.isArray(x.value) ? x.value : undefined, body: x.body } : null; },
       onStage: S.onStage || (S.card ? null : partCheckPin()), checks: S.checks, results: S.results, items: S.items, names: S.names, audience: V ? V.audienceOf(part) : null,
       welcome: lib.welcome(S.cohort, S.session, S.list && S.list.length ? S.list : S.parts), scene: scene, slides: slidesView(part),
+      doc: part && part.own && part.config && part.config.show ? part.config.show : null,
       path: window.RosterLib && S.onStage && S.onStage.kind === 'path' ? window.RosterLib.pathView(rosterNow()) : null,
       rooms: S.onStage && S.onStage.kind === 'rooms' ? Object.keys(S.roomPlaces).map(function (k) { return S.roomPlaces[k]; }) : null
     });
@@ -2147,11 +2249,26 @@
   // Show everyone the results left the stage on the bare choices).
   function partCheck() {
     var part = partNow();
-    if (!part || !part.own || part.kind !== 'question') return null;
-    var q = L.fromScene(part.config);
-    return q ? (S.checks || []).filter(function (k) { return k.state === 'open' && k.prompt === q.prompt; })[0] || null : null;
+    if (!part || !part.own) return null;
+    if (part.kind === 'question') {
+      var q = L.fromScene(part.config);
+      return q ? (S.checks || []).filter(function (k) { return k.state === 'open' && k.prompt === q.prompt; })[0] || null : null;
+    }
+    return resultsCheck(part);
   }
-  function partCheckPin() { var k = partCheck(); return k ? { kind: 'check', id: k.id } : null; }
+  // The question an earlier part asked, for a part that shows its answers
+  // (scenes.config.results_of, from Course Builder's poll results).
+  function resultsCheck(part) {
+    var ref = part && part.config && part.config.results_of;
+    var target = ref ? (S.list || []).filter(function (x) { return x.key === ref; })[0] : null;
+    var q = target ? plannedAsk(target) : null;
+    return q ? (S.checks || []).filter(function (k) { return k.prompt === q.prompt; })[0] || null : null;
+  }
+  function partCheckPin() {
+    var part = partNow(), k = partCheck();
+    if (!k) return null;
+    return part.kind === 'question' ? { kind: 'check', id: k.id } : { kind: 'check', id: k.id, results: true };
+  }
   function sendStage() {
     drawWelcomeToggle();
     if (!S.stageOn || !side || !S.session) return;

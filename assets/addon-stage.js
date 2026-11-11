@@ -34,7 +34,7 @@
     $('[data-stage-rec]').hidden = !view.recording;
     var part = view.part;
     // The part sits small at the top when something else has the stage.
-    $('[data-part]').hidden = view.mode === 'part' || view.mode === 'welcome' || view.mode === 'scene' || view.mode === 'app' || view.mode === 'studio' || view.mode === 'slides' || view.mode === 'blank' || view.mode === 'roomwelcome' || view.mode === 'roomboard' || view.mode === 'roomend' || !part;
+    $('[data-part]').hidden = view.mode === 'part' || view.mode === 'welcome' || view.mode === 'scene' || view.mode === 'app' || view.mode === 'doc' || view.mode === 'studio' || view.mode === 'slides' || view.mode === 'blank' || view.mode === 'roomwelcome' || view.mode === 'roomboard' || view.mode === 'roomend' || !part;
     if (view.mode === 'slides') drawSlide(view.slides);
     drawLinks(view.mode === 'slides' ? view.slides.links : null);
     drawAsk();
@@ -144,13 +144,20 @@
     if (view.mode === 'welcome') {
       var w = view.welcome;
       $('[data-w-cohort]').textContent = w.cohort;
-      $('[data-w-week]').textContent = (w.week ? 'Week ' + w.week : w.week === 0 ? 'Prep' : '') + (w.title ? (w.week != null ? ': ' : '') + w.title : '');
+      var wname = w.name || (w.week ? 'Week ' + w.week : w.week === 0 ? 'Prep' : '');
+      $('[data-w-week]').textContent = wname + (w.title ? (wname ? ': ' : '') + w.title : '');
       $('[data-w-challenge]').hidden = !w.challenge;
       $('[data-w-challenge]').textContent = w.challenge || '';
       $('[data-w-first]').hidden = !w.first;
       $('[data-w-first]').textContent = w.first ? 'First: ' + w.first.name + '. ' + (w.first.what || '') : '';
     }
     drawApp(view.mode === 'app' ? view : null);
+    drawDoc(view.mode === 'doc' ? view : null);
+    if (view.mode === 'person') {
+      $('[data-person-who]').textContent = view.who;
+      $('[data-person-audience]').hidden = !view.audience;
+      $('[data-person-audience]').textContent = view.audience || '';
+    }
     drawPage(view.mode === 'page' ? view : null);
     if (view.mode === 'roomboard') drawRoomBoard();
     if (view.mode === 'roomwelcome') drawRoomWelcome();
@@ -209,6 +216,23 @@
     f.title = v.who + '’s app';
     f.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-modals allow-downloads');
     f.setAttribute('allow', 'clipboard-read; clipboard-write');
+    box.replaceChildren(f);
+  }
+
+  // A part's document, framed for everyone; the frame stays through later
+  // messages so a person's place in it is kept.
+  var docSrc = null;
+  function drawDoc(v) {
+    var box = $('[data-doc-frame]');
+    if (!v) { if (docSrc) { docSrc = null; box.replaceChildren(); } return; }
+    $('[data-doc-name]').textContent = v.doc.name;
+    $('[data-doc-open]').href = v.doc.url;
+    if (v.doc.url === docSrc) return;
+    docSrc = v.doc.url;
+    var f = document.createElement('iframe');
+    f.src = v.doc.url;
+    f.title = v.doc.name;
+    f.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-downloads');
     box.replaceChildren(f);
   }
 

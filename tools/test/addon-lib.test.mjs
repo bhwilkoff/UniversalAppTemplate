@@ -343,3 +343,34 @@ test('a session a leader chose for a call wins over the call\'s own links', () =
   assert.equal(lib.findRoom('qqq-wwww-eee', { run: null }), null);
   assert.equal(lib.findRoom('qqq-wwww-eee', Object.assign({ run: null }, rows)), null);
 });
+
+test('a part\'s document fills the stage when it has no slides, or when a leader puts it up', () => {
+  const doc = { url: 'https://docs.google.com/document/d/1ape0dejHzHuU7WVcmrgkFfS/edit', name: 'Group notes' };
+  const v = lib.stageView({ part: { key: 'p', name: 'P' }, doc });
+  assert.equal(v.mode, 'doc');
+  assert.equal(v.doc.url, 'https://docs.google.com/document/d/1ape0dejHzHuU7WVcmrgkFfS/preview');
+  const slides = { text: '## A', at: 0 };
+  assert.notEqual(lib.stageView({ part: { key: 'p', name: 'P' }, doc, slides }).mode, 'doc');
+  assert.equal(lib.stageView({ part: { key: 'p', name: 'P' }, doc, slides, onStage: { kind: 'doc' } }).mode, 'doc');
+  assert.equal(lib.docUrl('https://github.com/a/b'), null);
+  assert.equal(lib.docUrl('https://course-resources.minerva.edu/x.pdf'), 'https://course-resources.minerva.edu/x.pdf');
+  const back = lib.readStageMessage(lib.stageMessage(v));
+  assert.equal(back.mode, 'doc');
+  assert.equal(back.doc.name, 'Group notes');
+});
+
+test('someone featured by name, with what the audience is asked', () => {
+  const v = lib.stageView({ part: { key: 'p', name: 'P' }, onStage: { kind: 'person', id: 'u1' }, names: { u1: 'Ana' }, audience: 'Ask one question.' });
+  assert.deepEqual(v, { mode: 'person', part: { key: 'p', name: 'P', endsAt: null }, who: 'Ana', audience: 'Ask one question.' });
+  assert.equal(lib.readStageMessage(lib.stageMessage(v)).who, 'Ana');
+});
+
+test('an earlier question\'s answers show closed, with counts, and cannot be answered there', () => {
+  const k = { id: 'k1', state: 'closed', show_tally: false, prompt: 'Pick', choices: ['A', 'B'], kind: 'choice' };
+  const results = { k1: { total: 2, counts: [1, 1] } };
+  const v = lib.stageView({ part: { key: 'p', name: 'P' }, onStage: { kind: 'check', id: 'k1', results: true }, checks: [k], results, answerable: true });
+  assert.equal(v.mode, 'check');
+  assert.equal(v.answerable, false);
+  assert.equal(v.count.total, 2);
+  assert.notEqual(lib.stageView({ part: { key: 'p', name: 'P' }, onStage: { kind: 'check', id: 'k1' }, checks: [k], results }).mode, 'check');
+});

@@ -23,7 +23,15 @@
     return { here: ids.filter(function (id) { return isIn(presence, id, group.id); }), total: ids.length };
   }
 
-  var lib = { roomCount: roomCount, split: split, isIn: isIn, arrived: arrived };
+  // People in an order set by chance but fixed by a seed, so the rooms a
+  // leader sees before launching are the rooms that launch (a part's
+  // random sorting, from Course Builder).
+  function shuffle(ids, seed) {
+    function h(t) { var x = 2166136261; for (var i = 0; i < t.length; i++) { x ^= t.charCodeAt(i); x = Math.imul(x, 16777619) >>> 0; } return x; }
+    return (ids || []).slice().sort(function (a, b) { return h(seed + ':' + a) - h(seed + ':' + b) || (a < b ? -1 : 1); });
+  }
+
+  var lib = { roomCount: roomCount, split: split, shuffle: shuffle, isIn: isIn, arrived: arrived };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
   else root.BreakoutsLib = lib;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

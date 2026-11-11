@@ -34,3 +34,24 @@ test('the question counted is the one on the stage, or the newest open one', () 
   assert.equal(R.askingNow(checks, { kind: 'item', id: 'x' }), 'k1');
   assert.equal(R.askingNow([], null), null);
 });
+
+test('a quiet pick is whoever has done least, by what the site records', () => {
+  const people = [{ id: 'a', name: 'Ana' }, { id: 'b', name: 'Bo' }, { id: 'c', name: 'Cy' }];
+  const signals = { reactions: { a: 3, b: 0, c: 1 }, answers: { a: 1, b: 0, c: 0 }, shares: { c: 1 }, queue: {}, requests: {} };
+  const q = R.toFeature(people, signals, 'quiet', 0.5);
+  assert.equal(q.id, 'b');
+  assert.deepEqual(q.why, ['no reactions', 'no answers', 'nothing shared', 'not in the queue', 'no requests']);
+  // Someone featured already goes to the back.
+  assert.equal(R.toFeature(people, Object.assign({ featured: { b: 1 } }, signals), 'quiet', 0.5).id, 'c');
+  // Ties go to chance.
+  const tie = [{ id: 'x', name: 'X' }, { id: 'y', name: 'Y' }];
+  assert.equal(R.toFeature(tie, {}, 'quiet', 0).id, 'x');
+  assert.equal(R.toFeature(tie, {}, 'quiet', 0.99).id, 'y');
+});
+
+test('a random pick is anyone not featured yet, and everyone once all have been', () => {
+  const people = [{ id: 'a', name: 'Ana' }, { id: 'b', name: 'Bo' }];
+  assert.equal(R.toFeature(people, { featured: { a: 1 } }, 'random', 0).id, 'b');
+  assert.equal(R.toFeature(people, { featured: { a: 1, b: 1 } }, 'random', 0.99).id, 'b');
+  assert.equal(R.toFeature([], {}, 'random', 0), null);
+});

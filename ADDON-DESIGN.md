@@ -77,6 +77,16 @@ Ben, November 10, 2026: "sometimes a cohort member has to miss a session. They c
 3. **The work goes to that session, beside the first run.** Answers, posts, and what people do are saved with that session, and nothing of the first run changes. A makeup's recording is never put in place of the first run's.
 4. **The leader sees it is a rerun.** The top of the panel says "Week N again" while it lasts.
 
+## Parts brought from Course Builder
+
+Ben, November 10, 2026: "Quiet student should function based upon any data that we can actually use (someone who hasn't done any reactions is an indicator, someone who hasn't shared anything yet is another indicator)."
+
+1. **A part's document goes on the stage.** A part with a document and no slides shows the document, framed (a Google file in its preview). A part with both shows its slides, and Now offers Show the document and Back to the slides, which every stage follows (show_state stage `doc`).
+2. **Someone is featured by name.** A presenter part set to feature someone at random or someone quiet offers Choose someone at random or Choose someone quiet in Now. The pick shows with why (no reactions, no answers, nothing shared, not in the queue, no requests), then Feature them or Someone else. Quiet is counted from this session's reactions and stances, answers, posts, the queue, and requests, among the people in the call; anyone featured already goes to the back (RosterLib.toFeature; show_state stage `person`, logged as person:<id>).
+3. **A debrief shows the earlier question's answers.** A part pointing at an earlier question part pins that question's answers, closed or open, with counts for everyone, and nobody answers there. Written answers stay with the leader.
+4. **A question asks as it was written.** A part's own setting decides whether people see the counts.
+5. **Breakouts start as the part says.** Its number of rooms (never more than there are people), its minutes, and random sorting fill the breakout tool, fixed so the rooms previewed are the rooms launched. Each group's document is listed for the leader, and each learner in a breakout room sees their own group's.
+
 ## Open rooms
 
 Ben, November 7, 2026: "I'd like for the add-on to be usable by anyone as a set of presentation tools." And: "I want to make it as easy of a pipeline as possible."

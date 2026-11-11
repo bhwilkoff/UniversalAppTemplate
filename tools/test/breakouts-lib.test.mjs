@@ -16,3 +16,11 @@ test('a person has arrived once their add-on says it is in the room', () => {
   assert.deepEqual(lib.arrived(g, { a: [{ room: 'r1' }], b: [{ room: null }] }), { here: ['a'], total: 2 });
   assert.deepEqual(lib.arrived(g, {}), { here: [], total: 2 });
 });
+
+test('a random order is the same for the same seed, and different for another', () => {
+  const ids = ['a', 'b', 'c', 'd', 'e', 'f'];
+  const one = lib.shuffle(ids, 'part-1');
+  assert.deepEqual(lib.shuffle(ids, 'part-1'), one);
+  assert.deepEqual(one.slice().sort(), ids);
+  assert.notDeepEqual(lib.shuffle(ids, 'part-2'), one);
+});

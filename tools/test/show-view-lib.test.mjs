@@ -113,3 +113,10 @@ test('the main stage says whose work is on it, and the audience their part (R7)'
   assert.equal(V.audienceOf(scene), scene.config.prompt);
   assert.equal(V.audienceOf({ kind: 'talk', config: { prompt: 'x' } }), null);
 });
+
+test('the document and a featured person go on the stage and come back', () => {
+  assert.deepEqual(S.stageChange({ kind: 'doc' }), { stage: 'doc', stage_ref: null });
+  assert.deepEqual(S.pinOf({ stage: 'doc' }), { kind: 'doc' });
+  assert.deepEqual(S.stageChange({ kind: 'person', id: 'u1' }), { stage: 'person', stage_ref: 'u1' });
+  assert.deepEqual(S.pinOf({ stage: 'person', stage_ref: 'u1' }), { kind: 'person', id: 'u1' });
+});
