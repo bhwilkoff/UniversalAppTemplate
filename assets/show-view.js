@@ -320,7 +320,7 @@
     function count(key, n) {
       var had = counts[key] || 0;
       counts[key] = n || 0;
-      if (key === 'questions' && !teaching && !had !== !counts[key]) place();
+      if (key === 'questions' && !had !== !counts[key]) place();
       var w = wraps[key];
       if (!w) return;
       w.badge.hidden = !counts[key];
@@ -344,7 +344,8 @@
       }
       // A learner's open question leads Now whatever the part, never a closed
       // heading under Mine (Week 2: nobody could find where to answer).
-      if (opts.nowBox && !teaching && counts.questions > 0 && slots.questions && off.indexOf('questions') < 0) {
+      // A leader's too: the answers coming in belong to this moment, not Tools.
+      if (opts.nowBox && counts.questions > 0 && slots.questions && off.indexOf('questions') < 0) {
         l.anytime = l.anytime.filter(function (k) { return k !== 'questions'; });
         l.now = ['questions'].concat(l.now.filter(function (k) { return k !== 'questions'; }));
       }

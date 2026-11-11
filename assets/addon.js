@@ -1125,6 +1125,32 @@
       else if (!showing && S.mineApp.parentNode !== want) want.insertBefore(S.mineApp, want.firstChild);
     }
   }
+  // For a leader: what a learner's panel and stage show at this moment, so
+  // nobody has to ask what is on their screen (Week 2).
+  function drawLearnerPeek(part) {
+    if (!S.frame || standalone) return;
+    var now = S.frame.pane('now');
+    if (!S.peek) {
+      S.peek = el('details', 'p2-peek');
+      S.peek.appendChild(el('summary', null, 'What learners see now'));
+      S.peekList = el('ul', 'p2-peek-list'); S.peek.appendChild(S.peekList);
+      now.appendChild(S.peek);
+    }
+    var open = (S.checks || []).filter(function (k) { return k.state === 'open'; });
+    var lines = [];
+    if (open.length) lines.push('Their panel: Answer the question, \u201c' + open[0].prompt + '\u201d, at the top of Now');
+    else if (part && part.kind === 'presenter') lines.push('Their panel: Show your app, at the top of Now');
+    else lines.push('Their panel: reactions, and Ask your leader');
+    var v = S.session ? currentView() : null;
+    if (v && v.mode === 'check' && S.stageOn) lines.push('Their stage: ' + A.stageSays(v) + ', with ' + (v.count ? 'the counts and ' : '') + 'buttons to answer');
+    else lines.push('Their stage: ' + (S.stageOn ? A.stageSays(v) : 'none until you open the main stage, and then only after they press Join activity'));
+    if (S.svc && S.svc.stancesOpen && S.svc.stancesOpen()) lines.push('Agree, Not sure, and Disagree' + (open.length ? ', once they have answered' : ''));
+    var key = lines.join('|');
+    if (S.peekKey === key) return;
+    S.peekKey = key;
+    S.peekList.replaceChildren();
+    lines.forEach(function (t) { S.peekList.appendChild(el('li', null, t)); });
+  }
   function questionWaiting() {
     return (S.checks || []).some(function (k) { return k.state === 'open' && !myAnswer(k); });
   }
@@ -1201,7 +1227,7 @@
     if (!what && !S.teaching && !$('[data-pane="now"] textarea, [data-pane="now"] input, [data-pane="now"] .signal-where:not([hidden]), [data-pane="now"] .signal-card:not([hidden])')) what = 'Nothing to answer right now.';
     if (S.nowWhat.textContent !== what) S.nowWhat.textContent = what;
     S.nowWhat.hidden = !what;
-    if (!S.teaching) drawLearnerHead(part);
+    if (!S.teaching) drawLearnerHead(part); else drawLearnerPeek(part);
     if (S.teaching) {
       var noteOf = part || first;
       var slideNote = part ? (info ? info.note : '') : first && window.SlidesLib && (S.decks || {})[first.key] ? window.SlidesLib.notes(S.decks[first.key])[0] : '';

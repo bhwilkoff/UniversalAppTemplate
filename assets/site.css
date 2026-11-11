@@ -2813,6 +2813,10 @@ html.app-nav-open[data-signed-in] body:not([data-no-app-nav]) .app-nav { display
 .p2-chips { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px; }
 .p2-chip { font-size: 12px; line-height: 16px; color: var(--muted); padding: 2px 8px; border: 1px solid var(--rule); border-radius: 8px; }
 .p2-step { margin: 2px 0 0; font-size: 12px; line-height: 16px; color: var(--muted); }
+.p2-peek { margin-top: 12px; font-size: 13px; }
+.p2-peek summary { cursor: pointer; color: var(--muted); }
+.p2-peek-list { margin: 6px 0 0; padding-left: 18px; }
+.p2-peek-list li { margin: 2px 0; }
 .p2-now-head { margin: 0 0 8px; font-size: 14px; font-weight: 600; }
 .p2-stage { margin: 6px 0 0; display: flex; align-items: center; gap: 6px; font-size: 12px; line-height: 16px; min-width: 0; }
 .p2-stage-label { color: var(--muted); flex: none; }
