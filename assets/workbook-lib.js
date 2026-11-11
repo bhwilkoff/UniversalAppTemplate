@@ -146,7 +146,7 @@
   }
   // Waiting for what is in it: no blocks yet, or images that never came in.
   function waiting(w) {
-    return !(w.blocks || []).length || w.blocks.some(function (b) { return String(b.text || '').indexOf('[An image]') >= 0; });
+    return !(w.blocks || []).length || w.blocks.some(function (b) { return /\[(An )?image\]/i.test(String(b.text || '')); });
   }
 
   var lib = { normalize: normalize, parts: parts, sameShape: sameShape, waiting: waiting, deltaText: deltaText, answerOf: answerOf, summary: summary };

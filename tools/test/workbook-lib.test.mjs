@@ -76,5 +76,6 @@ test('blocks replace others only in the same shape, and a workbook waits for its
   assert.equal(W.sameShape(a, a.slice(1)), false);
   assert.equal(W.waiting({ blocks: [] }), true);
   assert.equal(W.waiting({ blocks: [{ text: 'See\n[An image]' }] }), true);
+  assert.equal(W.waiting({ blocks: [{ text: 'See [image][image]' }] }), true);
   assert.equal(W.waiting({ blocks: a }), false);
 });
