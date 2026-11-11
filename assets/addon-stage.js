@@ -37,7 +37,10 @@
     $('[data-stage-rec]').hidden = !view.recording;
     var part = view.part;
     // The part sits small at the top when something else has the stage.
-    $('[data-part]').hidden = view.mode === 'part' || view.mode === 'welcome' || view.mode === 'scene' || view.mode === 'app' || view.mode === 'doc' || view.mode === 'studio' || view.mode === 'slides' || view.mode === 'blank' || view.mode === 'roomwelcome' || view.mode === 'roomboard' || view.mode === 'roomend' || !part;
+    // A clock the leader started shows over whatever the stage shows (found
+    // after Week 2: a started clock never appeared on a cohort's stage).
+    var leaderClock = !!(part && part.key === 'clock' && part.endsAt) && view.mode !== 'studio' && view.mode !== 'part';
+    $('[data-part]').hidden = !leaderClock && (view.mode === 'part' || view.mode === 'welcome' || view.mode === 'scene' || view.mode === 'app' || view.mode === 'doc' || view.mode === 'studio' || view.mode === 'slides' || view.mode === 'blank' || view.mode === 'roomwelcome' || view.mode === 'roomboard' || view.mode === 'roomend' || !part);
     if (view.mode === 'slides') drawSlide(view.slides);
     drawLinks(view.mode === 'slides' ? view.slides.links : null);
     drawAsk();

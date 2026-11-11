@@ -1254,7 +1254,7 @@
       chips: chips, next: nextStep() || undefined, canBack: !!part
     });
     var first = (S.list || [])[0];
-    var what = !part && first ? 'First: ' + first.name : !S.teaching && part && !part.slides ? String(part.what || '').split(/\n{2,}/)[0] : '';
+    var what = !part && first && !S.teaching ? 'First: ' + first.name : !S.teaching && part && !part.slides ? String(part.what || '').split(/\n{2,}/)[0] : '';
     // A learner with nothing to do is told so, so an empty panel never reads as broken.
     if (!what && !S.teaching && !$('[data-pane="now"] textarea, [data-pane="now"] input, [data-pane="now"] .signal-where:not([hidden]), [data-pane="now"] .signal-card:not([hidden])')) what = 'Nothing to answer right now.';
     if (S.nowWhat.textContent !== what) S.nowWhat.textContent = what;
