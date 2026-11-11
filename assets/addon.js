@@ -1125,6 +1125,35 @@
       else if (!showing && S.mineApp.parentNode !== want) want.insertBefore(S.mineApp, want.firstChild);
     }
   }
+  // For a leader: what the next part will need, before pressing Next (Ben,
+  // end of Week 2: "What I can do to prep for the next step").
+  function drawNextPreview(part) {
+    if (!S.frame || !S.list) return;
+    var now = S.frame.pane('now');
+    if (!S.nextBox) { S.nextBox = el('section', 'p2-next-preview'); S.nextBox.setAttribute('aria-label', 'Coming next'); }
+    if (S.nextBox.parentNode !== now || now.lastChild !== S.nextBox) now.appendChild(S.nextBox);
+    var list = S.list, at = part ? list.indexOf(part) : -1, nx = list[at + 1];
+    var lines = [];
+    if (nx) {
+      lines.push((nx.kindName || 'Part') + (nx.minutes ? ', ' + nx.minutes + ' min' : ''));
+      var q = nx.own ? plannedAsk(nx) : null;
+      if (q) lines.push('Asks everyone \u201c' + q.prompt + '\u201d when you get there');
+      if (nx.kind === 'presenter') lines.push('Each learner gets Show your app at the top of their panel');
+      if (nx.kind === 'design') lines.push('Puts the board on the stage');
+      else if (!q) lines.push(nx.slides ? 'Puts its slides on the stage' : 'Puts its title and words on the stage');
+      if (nx.goal) lines.push(nx.goal);
+    }
+    var key = nx ? nx.key + '|' + lines.join('|') : '';
+    if (S.nextKey === key) return;
+    S.nextKey = key;
+    S.nextBox.replaceChildren();
+    S.nextBox.hidden = !nx;
+    if (!nx) return;
+    S.nextBox.appendChild(el('p', 'p2-label', 'Coming next: ' + nx.name));
+    var ul = el('ul', 'p2-peek-list');
+    lines.forEach(function (t) { ul.appendChild(el('li', null, t)); });
+    S.nextBox.appendChild(ul);
+  }
   // For a leader: what a learner's panel and stage show at this moment, so
   // nobody has to ask what is on their screen (Week 2).
   function drawLearnerPeek(part) {
@@ -1228,7 +1257,7 @@
     if (!what && !S.teaching && !$('[data-pane="now"] textarea, [data-pane="now"] input, [data-pane="now"] .signal-where:not([hidden]), [data-pane="now"] .signal-card:not([hidden])')) what = 'Nothing to answer right now.';
     if (S.nowWhat.textContent !== what) S.nowWhat.textContent = what;
     S.nowWhat.hidden = !what;
-    if (!S.teaching) drawLearnerHead(part); else drawLearnerPeek(part);
+    if (!S.teaching) drawLearnerHead(part); else { drawLearnerPeek(part); drawNextPreview(part); }
     if (S.teaching) {
       var noteOf = part || first;
       var slideNote = part ? (info ? info.note : '') : first && window.SlidesLib && (S.decks || {})[first.key] ? window.SlidesLib.notes(S.decks[first.key])[0] : '';
@@ -2247,9 +2276,16 @@
     function add(name, node, more) { if (node && !node.hidden && name) out.push(Object.assign({ name: name, node: node }, more || {})); }
     var room = S.svc && S.svc.state ? S.svc.state() || {} : {}, showing = S.svc && S.svc.showing ? S.svc.showing() : null;
     var asked = (S.checks || []).some(function (k) { return k.state === 'open'; });
-    add('Main stage', S.stageTools, { on: !!S.stageOn }); add('Ask a question', S.askTool, { on: asked }); add('Breakouts', S.breakTool); add('The board', S.boardTool, { on: !!(S.onStage && S.onStage.kind === 'board') });
-    if (S.appsBox && S.appsBox.childElementCount) add('Apps', S.appsBox, { on: !!(S.onStage && S.onStage.kind === 'item') });
-    add('Show a website', S.svcSite, { on: showing === 'page' }); add('A clock', S.svcClock, { on: !!(room.on && room.clock) }); add('Propose and vote', S.svcVote, { on: showing === 'board' });
+    // Whatever is on turns off from its own tile, without opening it (Ben,
+    // end of Week 2: "open and close each one of the tools easily").
+    var newest = (S.checks || []).filter(function (k) { return k.state === 'open'; })[0];
+    function unpin() { setPin(null); }
+    add('Main stage', S.stageTools, { on: !!S.stageOn }); add('Ask a question', S.askTool, { on: asked, off: newest ? function () { if (S.onStage && S.onStage.id === newest.id) setPin(null); changeCheck(newest, { state: 'closed' }); } : null, offLabel: 'Close it' });
+    add('Breakouts', S.breakTool); add('The board', S.boardTool, { on: !!(S.onStage && S.onStage.kind === 'board'), off: unpin, offLabel: 'Take down' });
+    if (S.appsBox && S.appsBox.childElementCount) add('Apps', S.appsBox, { on: !!(S.onStage && S.onStage.kind === 'item'), off: unpin, offLabel: 'Take down' });
+    add('Show a website', S.svcSite, { on: showing === 'page', off: function () { S.svc.takeDown(); }, offLabel: 'Take down' });
+    add('A clock', S.svcClock, { on: !!(room.on && room.clock), off: function () { S.svc.send({ t: 'clock', seconds: 0 }); }, offLabel: 'Stop' });
+    add('Propose and vote', S.svcVote, { on: showing === 'board', off: function () { S.svc.takeDown(); }, offLabel: 'Take down' });
     // Stances turn on and off from their tile, with nothing to open.
     if (S.svc && S.svc.stancesOpen) {
       S.stanceTile = S.stanceTile || el('div');
@@ -2260,7 +2296,8 @@
       var head = d.querySelector('summary');
       var name = head && head.firstChild ? head.firstChild.textContent.trim() : '';
       var on = name === 'A card for everyone' ? !!st.card : name === 'Recording' ? !!S.recording : false;
-      if (head && !d.hidden && name !== 'The thread') add(name, d, { on: on });
+      var off = name === 'A card for everyone' && st.card && S.signals.clearKind ? function () { S.signals.clearKind('card'); } : null;
+      if (head && !d.hidden && name !== 'The thread') add(name, d, { on: on, off: off, offLabel: 'Take down' });
     });
     return { pane: pane, list: out };
   }
@@ -2269,7 +2306,7 @@
     var t = toolList(), grid = S.tiles, open = t.pane.getAttribute('data-tool');
     var key = JSON.stringify(t.list.map(function (x) {
       var n = x.node.querySelector && x.node.querySelector('summary .ui-count, summary [class*="badge"]');
-      return [x.name, !!x.on, !!x.toggle, n && !n.hidden ? n.textContent : ''];
+      return [x.name, !!x.on, !!x.toggle, !!x.off, n && !n.hidden ? n.textContent : ''];
     }));
     if (key === S.tilesKey && grid.childElementCount) { if (open && !t.list.some(function (x) { return x.name === open; })) closeTool(); return; }
     S.tilesKey = key;
@@ -2285,6 +2322,15 @@
       var n = x.node.querySelector && x.node.querySelector('summary .ui-count, summary [class*="badge"]');
       if (n && !n.hidden && n.textContent) b.appendChild(el('span', 'p2-tile-n', n.textContent));
       b.addEventListener('click', function () { if (x.toggle) x.toggle(); else openTool(x.name); });
+      if (x.on && x.off) {
+        var cell = el('div', 'p2-tile-cell');
+        cell.appendChild(b);
+        var stop = button(x.offLabel || 'Turn off', 'btn-secondary small p2-tile-off', function () { x.off(); });
+        stop.setAttribute('aria-label', (x.offLabel || 'Turn off') + ': ' + toolLabel(x.name));
+        cell.appendChild(stop);
+        grid.appendChild(cell);
+        return;
+      }
       grid.appendChild(b);
     });
     if (open && !t.list.some(function (x) { return x.name === open; })) closeTool();

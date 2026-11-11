@@ -2813,6 +2813,7 @@ html.app-nav-open[data-signed-in] body:not([data-no-app-nav]) .app-nav { display
 .p2-chips { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px; }
 .p2-chip { font-size: 12px; line-height: 16px; color: var(--muted); padding: 2px 8px; border: 1px solid var(--rule); border-radius: 8px; }
 .p2-step { margin: 2px 0 0; font-size: 12px; line-height: 16px; color: var(--muted); }
+.p2-next-preview { margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--rule); font-size: 13px; }
 .p2-peek { margin-top: 12px; font-size: 13px; }
 .p2-peek summary { cursor: pointer; color: var(--muted); }
 .p2-peek-list { margin: 6px 0 0; padding-left: 18px; }
@@ -3135,6 +3136,9 @@ select:not([multiple]) {
 .p2-tile { position: relative; display: grid; justify-items: start; gap: 6px; min-height: 76px; padding: 10px 12px; border: 1px solid var(--rule); border-radius: 12px; background: var(--card); color: var(--ink); font: inherit; font-size: 0.85rem; font-weight: 500; text-align: left; line-height: 1.2; cursor: pointer; }
 .p2-tile:hover { border-color: var(--edge); }
 .p2-tile.is-on { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.p2-tile-cell { position: relative; display: grid; }
+.p2-tile-cell > .p2-tile { min-height: 76px; }
+.p2-tile-off { position: absolute; right: 8px; bottom: 8px; min-height: 28px; padding: 0 10px; font-size: 0.75rem; }
 .p2-tile-state { font-size: 0.72rem; font-weight: 600; color: var(--muted); }
 .p2-tile.is-on .p2-tile-state { color: var(--accent); }
 .p2-tile svg { width: 20px; height: 20px; fill: currentColor; color: var(--accent); }
@@ -3460,3 +3464,7 @@ a.person-name:hover { text-decoration: underline; }
 .p2-stance-row { display: flex; flex-wrap: wrap; gap: 0.35rem; justify-content: center; margin-top: 0.35rem; }
 .has-strip .stage-app:not([hidden]), .has-strip [data-view="scene"].has-board:not([hidden]), .has-strip .open-board:not([hidden]) { bottom: var(--foot); }
 .has-strip .stage-ready:has(.stage-studio:not([hidden])) .react-layer, .has-strip .stage-ready:has(.stage-studio:not([hidden])) .stage-reacts { display: none; }
+/* Plan lists the parts; only the current one offers editing (end of Week 2:
+   Edit this part under every part made the plan hard to read). */
+.p2-panel [data-pane="plan"] .show-edit { display: none; }
+.p2-panel [data-pane="plan"] [aria-current="step"] .show-edit { display: block; }
