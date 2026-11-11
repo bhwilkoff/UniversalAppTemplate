@@ -3360,3 +3360,10 @@ a.person-name:hover { text-decoration: underline; }
 .p2-part-tools .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.75rem; }
 .p2-feature { display: grid; gap: 0.4rem; }
 .p2-feature p { margin: 0; }
+
+/* A session's own words before it, and its readings (sessions.before, sessions.readings). */
+.session-before { display: grid; gap: 0.75rem; max-width: 44rem; margin-bottom: 1.5rem; }
+.session-before-text p { margin: 0 0 0.75rem; }
+.session-before-text ul, .session-before-text ol { margin: 0 0 0.75rem; padding-left: 1.25rem; }
+.session-readings { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.6rem; }
+.session-readings .small { margin: 0.15rem 0 0; color: var(--muted); }

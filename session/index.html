@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261111c">
+  <link rel="stylesheet" href="/assets/site.css?v=20261111d">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -103,6 +103,11 @@
           <div class="session-views" data-views></div>
 
           <div data-tab="before" hidden>
+            <section class="session-before" aria-label="What comes before it" data-before-section hidden>
+              <div class="session-before-text" data-before-text></div>
+              <h2 data-readings-head hidden>Readings and materials</h2>
+              <ul class="session-readings" data-readings hidden></ul>
+            </section>
             <section class="session-prep" aria-label="Before this session" data-prep-section hidden>
               <p class="small" data-prep-note></p>
               <div data-prep-exchanges></div>
@@ -165,7 +170,7 @@
   </main>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" defer></script>
   <script src="/assets/hub-config.js?v=20261016a" defer></script>
-  <script src="/assets/cohort-lib.js?v=20261111a" defer></script>
+  <script src="/assets/cohort-lib.js?v=20261111b" defer></script>
   <script src="/assets/live-lib.js" defer></script>
   <script src="/assets/question-view.js?v=20261106a" defer></script>
   <script src="/assets/board-lib.js" defer></script>
@@ -184,7 +189,7 @@
   <script src="/assets/record-lib.js?v=20261107a" defer></script>
   <script src="/assets/react-lib.js?v=20261107a" defer></script>
   <script src="/assets/session-story-lib.js?v=20261107c" defer></script>
-  <script src="/assets/session.js?v=20261111b" defer></script>
+  <script src="/assets/session.js?v=20261111c" defer></script>
 
   <footer class="site-footer">
     <div class="wrap">

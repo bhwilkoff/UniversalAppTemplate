@@ -120,6 +120,7 @@
     // What to bring, which the plan's build part asks for.
     drawPlan(cohort, sessions, session, leading, finished);
     drawPrep(cohort, session, leading);
+    drawBefore(session);
 
     K.started = !!(session.starts_at && Date.parse(session.starts_at) < Date.now());
     if (leading && K.started) drawAfter(cohort, session);
@@ -132,7 +133,8 @@
   // One view at a time (SESSION-DESIGN.md), opening where this person is needed.
   function drawViews(session, leading, finished, played, bring) {
     var items = Array.isArray(session.prep_questions) ? session.prep_questions : [];
-    var before = leading || items.length > 0 || (!!bring && !finished);
+    var own = !!(session.before || (Array.isArray(session.readings) && session.readings.length));
+    var before = leading || own || items.length > 0 || (!!bring && !finished);
     var list = [];
     function add(key, label) { list.push({ key: key, label: label }); }
     if (played && finished) add('recording', 'Recording');
@@ -160,6 +162,41 @@
     $('[data-recording-note]').hidden = true;
     v.onerror = function () { $('[data-recording-note]').hidden = false; };
     if (v.getAttribute('src') !== play) v.src = play;
+  }
+
+  // The session's own words before it, and its readings (sessions.before and
+  // sessions.readings, often brought from Course Builder), for everyone.
+  function drawBefore(session) {
+    var sec = $('[data-before-section]'), box = $('[data-before-text]'), ul = $('[data-readings]');
+    var reads = Array.isArray(session.readings) ? session.readings.filter(function (r) { return r && r.title; }) : [];
+    box.replaceChildren(); ul.replaceChildren();
+    sec.hidden = !session.before && !reads.length;
+    function fill(node, parts) {
+      parts.forEach(function (r) {
+        var n;
+        if (r.href) { n = el('a', null, r.text); n.href = r.href; n.target = '_blank'; n.rel = 'noopener'; }
+        else if (r.bold) n = el('strong', null, r.text);
+        else if (r.italic) n = el('em', null, r.text);
+        else n = document.createTextNode(r.text);
+        node.appendChild(n);
+      });
+      return node;
+    }
+    lib.blocks(session.before || '').forEach(function (b) {
+      if (b.type === 'p') return box.appendChild(fill(el('p'), b.items[0]));
+      var list = el(b.type);
+      b.items.forEach(function (it) { list.appendChild(fill(el('li'), it)); });
+      box.appendChild(list);
+    });
+    $('[data-readings-head]').hidden = !reads.length;
+    ul.hidden = !reads.length;
+    reads.forEach(function (r) {
+      var li = el('li');
+      if (r.url && safe(r.url)) { var a = el('a', null, r.title); a.href = r.url; a.target = '_blank'; a.rel = 'noopener'; li.appendChild(a); }
+      else li.appendChild(el('span', null, r.title));
+      if (r.note) li.appendChild(el('p', 'small', r.note));
+      ul.appendChild(li);
+    });
   }
 
   // Work handed in before the session (prep_questions on the session):

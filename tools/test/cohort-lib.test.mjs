@@ -149,3 +149,12 @@ test('a custom cohort names its sessions Session N, a weekly one as before', () 
   assert.equal(lib.sessionTitle({ number: 3, title: 'Week 3' }), 'Week 3');
   assert.equal(lib.welcome({ title: 'C', schedule: 'custom' }, { number: 4, title: 'Session 4' }, []).name, 'Session 4');
 });
+
+test('a session\'s words before it become paragraphs, lists, and safe links', () => {
+  const b = lib.blocks('**Study guide**\n\nRead *this* first.\nThen [join](https://t.me/x).\n\n- One\n- Two\n\n1. First\n[bad](javascript:alert(1))');
+  assert.deepEqual(b[0], { type: 'p', items: [[{ text: 'Study guide', bold: true }]] });
+  assert.deepEqual(b[1].items[0], [{ text: 'Read ' }, { text: 'this', italic: true }, { text: ' first.' }, { text: ' ' }, { text: 'Then ' }, { text: 'join', href: 'https://t.me/x' }, { text: '.' }]);
+  assert.equal(b[2].type, 'ul'); assert.equal(b[2].items.length, 2);
+  assert.equal(b[3].type, 'ol');
+  assert.deepEqual(b[4].items[0], [{ text: '[bad](javascript:alert(1))' }]);
+});

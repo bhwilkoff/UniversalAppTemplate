@@ -217,8 +217,42 @@
   // The session's own page, before, during, and after it.
   function sessionUrl(slug, n) { return '/session/?c=' + encodeURIComponent(slug) + '&s=' + Number(n); }
 
+  // A session's own words before it (sessions.before, often brought from
+  // Course Builder) as blocks the page builds with text nodes, never HTML:
+  // paragraphs, lists, bold, italic, and https links.
+  function runs(line) {
+    var out = [], re = /\*\*([^*]+)\*\*|\*([^*]+)\*|\[([^\]]+)\]\((https:\/\/[^)\s]+)\)/g, at = 0, m;
+    while ((m = re.exec(line))) {
+      if (m.index > at) out.push({ text: line.slice(at, m.index) });
+      if (m[1]) out.push({ text: m[1], bold: true });
+      else if (m[2]) out.push({ text: m[2], italic: true });
+      else out.push({ text: m[3], href: m[4] });
+      at = re.lastIndex;
+    }
+    if (at < line.length) out.push({ text: line.slice(at) });
+    return out;
+  }
+  function blocks(text) {
+    var out = [], cur = null;
+    String(text || '').replace(/\u200b/g, '').split('\n').forEach(function (raw) {
+      var line = raw.trim();
+      var item = /^([-*]|\d+\.)\s+(.*)$/.exec(line);
+      if (!line) { cur = null; return; }
+      line = line.replace(/^#{1,6}\s+/, '');
+      if (item) {
+        var type = /\d/.test(item[1]) ? 'ol' : 'ul';
+        if (!cur || cur.type !== type) { cur = { type: type, items: [] }; out.push(cur); }
+        cur.items.push(runs(item[2]));
+        return;
+      }
+      if (cur && cur.type === 'p') { cur.items[0] = cur.items[0].concat([{ text: ' ' }], runs(line)); return; }
+      cur = { type: 'p', items: [runs(line)] }; out.push(cur);
+    });
+    return out;
+  }
+
   var lib = {
-    welcome: welcome, sessionName: sessionName, sessionTitle: sessionTitle, sessionUrl: sessionUrl,
+    welcome: welcome, blocks: blocks, sessionName: sessionName, sessionTitle: sessionTitle, sessionUrl: sessionUrl,
     setupSteps: setupSteps, agenda: agenda, partNow: partNow, stagesForWeek: stagesForWeek, stagesShownAt: stagesShownAt, stageFile: stageFile,
     readyBar: readyBar, readinessText: readinessText, seenText: seenText, canConfirm: canConfirm, partnersOf: partnersOf,
     currentAndNext: currentAndNext, commitLine: commitLine, ago: ago, repoPath: repoPath, PARTS: PARTS
