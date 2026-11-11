@@ -39,23 +39,41 @@
     if (S.refreshWorkbooks) S.refreshWorkbooks();
   }
 
-  // Workbooks waiting for what is in them (workbooks.source.uuid, blocks
-  // empty), filled from the workbooks file: the plain export ([{ id, title,
-  // blocks }]) or Minerva's own data ({ uuid: { title, blocks } }).
+  // Workbooks waiting for what is in them (workbooks.source.uuid, with no
+  // blocks yet or images that never came in), filled from the workbooks file:
+  // the plain export ([{ id, title, blocks, images }]) or Minerva's own data
+  // ({ uuid: { title, blocks } }). Images go to the private bucket
+  // workbook-files first; blocks that would move anyone's answers are refused.
   function workbooksIn(db) {
     var sec = root.querySelector('[data-workbooks-in]'), said = root.querySelector('[data-workbooks-status]');
     var input = root.querySelector('[data-workbooks-file]');
+    var W = window.WorkbookLib;
     function waiting() {
       return db.from('workbooks').select('id, title, source, blocks, cohort_id').then(function (r) {
-        return (r.data || []).filter(function (w) { return w.source && w.source.uuid && !(w.blocks || []).length; });
+        return (r.data || []).filter(function (w) { return w.source && w.source.uuid && W.waiting(w); });
       });
     }
     function show() {
       return waiting().then(function (list) {
-        sec.hidden = !list.length;
+        sec.hidden = !list.length && !said.textContent;
         root.querySelector('[data-workbooks-waiting]').textContent = list.length + (list.length === 1 ? ' workbook is' : ' workbooks are') + ' waiting.';
         return list;
       });
+    }
+    function blob(dataUrl) {
+      var m = /^data:([^;]+);base64,(.*)$/.exec(dataUrl), bin = atob(m[2]), bytes = new Uint8Array(bin.length);
+      for (var i = 0; i < bin.length; i += 1) bytes[i] = bin.charCodeAt(i);
+      return new Blob([bytes], { type: m[1] });
+    }
+    function upload(w, images) {
+      var store = db.storage.from('workbook-files');
+      return (images || []).reduce(function (p, im) {
+        return p.then(function () {
+          return store.upload(w.cohort_id + '/' + w.id + '/' + im.name, blob(im.data), { upsert: true, contentType: blob(im.data).type }).then(function (u) {
+            if (u.error) throw new Error(u.error.message);
+          });
+        });
+      }, Promise.resolve());
     }
     if (input.getAttribute('data-wired')) return show();
     input.setAttribute('data-wired', '1');
@@ -68,15 +86,23 @@
         if (Array.isArray(data)) data.forEach(function (w) { if (w && w.id) byUuid[w.id] = w; });
         else Object.keys(data || {}).forEach(function (k) { byUuid[k] = data[k]; });
         return waiting().then(function (list) {
-          var filled = 0, missing = 0;
+          var filled = 0, missing = 0, changed = 0, failed = [];
           return list.reduce(function (p, w) {
             return p.then(function () {
-              var src = byUuid[w.source.uuid], n = src ? window.WorkbookLib.normalize(src) : null;
+              var src = byUuid[w.source.uuid], n = src ? W.normalize(src) : null;
               if (!n || !n.blocks.length) { missing += 1; return null; }
-              return db.from('workbooks').update({ blocks: n.blocks }).eq('id', w.id).then(function (u) { if (!u.error) filled += 1; else missing += 1; });
+              if ((w.blocks || []).length && !W.sameShape(w.blocks, n.blocks)) { changed += 1; return null; }
+              said.textContent = 'Filling in ' + w.title + '…';
+              return upload(w, n.images).then(function () {
+                return db.from('workbooks').update({ blocks: n.blocks }).eq('id', w.id).then(function (u) { if (u.error) throw new Error(u.error.message); filled += 1; });
+              }).catch(function (e) { failed.push(w.title + ': ' + e.message); });
             });
           }, Promise.resolve()).then(function () {
-            said.textContent = filled + (filled === 1 ? ' workbook' : ' workbooks') + ' filled in.' + (missing ? ' ' + missing + ' were not in the file.' : '');
+            var out = [filled + (filled === 1 ? ' workbook' : ' workbooks') + ' filled in.'];
+            if (missing) out.push(missing + ' were not in the file.');
+            if (changed) out.push(changed + ' changed shape in Course Builder, so they were left as they are.');
+            if (failed.length) out.push('Not filled: ' + failed.join('; ') + '.');
+            said.textContent = out.join(' ');
             return show();
           });
         });

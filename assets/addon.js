@@ -1524,7 +1524,8 @@
             var v = x.value || {}, a = v.text || '';
             if (b && b.type === 'choice') a = (v.picks || []).map(function (i) { return (b.choices || [])[i]; }).filter(Boolean).join(', ');
             if (v.cells) a = v.cells.map(function (row) { return row.filter(Boolean).join(' / '); }).filter(Boolean).join('; ');
-            return { q: b ? String(b.text || '').replace(/[*_#]/g, '').split('\n')[0] : '', a: a };
+            var said = b ? window.WorkbookLib.parts(b.text).filter(function (p) { return p.text; })[0] : null;
+            return { q: said ? said.text.replace(/[*_#]/g, '').split('\n')[0] : '', a: a };
           });
           S.onStageDetail = d; sendStage();
         });
@@ -1628,7 +1629,7 @@
     db.from('workbook_answers').select('*').eq('workbook_id', w.id).eq('group_id', S.room.groupId).then(function (r) {
       var given = {};
       (r.data || []).forEach(function (a) { given[a.block] = a.value; });
-      window.WorkbookView.form(body, { workbook: w, answers: given, onSave: function (key, value) {
+      window.WorkbookView.form(body, { workbook: w, answers: given, image: window.WorkbookView.images(db, w), onSave: function (key, value) {
         return db.from('workbook_answers').upsert({ workbook_id: w.id, cohort_id: S.cohort.id, group_id: S.room.groupId, block: key, value: value }, { onConflict: 'workbook_id,group_id,block' }).then(function (q) { return q.error ? q.error.message : null; });
       } });
       S.workbookShown = w.id + ':' + S.room.groupId; S.workbookBody = body;

@@ -199,11 +199,11 @@
           var mine = rows.filter(function (a) { return a.workbook_id === w.id; });
           if (!(w.blocks || []).length) { body.appendChild(el('p', 'small', 'This workbook’s questions have not come in yet.')); box.appendChild(sec); return; }
           if (leading) {
-            window.WorkbookView.summary(body, { workbook: w, answers: mine, nameOf: function (a) { return a.group_id ? (rooms[a.group_id] || 'A room') : (names[a.user_id] || 'Someone'); } });
+            window.WorkbookView.summary(body, { workbook: w, answers: mine, image: window.WorkbookView.images(db, w), nameOf: function (a) { return a.group_id ? (rooms[a.group_id] || 'A room') : (names[a.user_id] || 'Someone'); } });
           } else {
             var given = {};
             mine.forEach(function (a) { given[a.block] = a.value; });
-            window.WorkbookView.form(body, { workbook: w, answers: given, onSave: function (key, value) {
+            window.WorkbookView.form(body, { workbook: w, answers: given, image: window.WorkbookView.images(db, w), onSave: function (key, value) {
               return db.from('workbook_answers').upsert({ workbook_id: w.id, cohort_id: cohort.id, user_id: K.me.id, block: key, value: value }, { onConflict: 'workbook_id,user_id,block' }).then(function (q) { return q.error ? q.error.message : null; });
             } });
           }

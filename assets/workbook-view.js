@@ -1,15 +1,44 @@
 // A workbook on a page (DECISIONS.md, "Workbooks"): its blocks with places to
 // answer, saved as a person goes, and for a leader each block's answers across
 // everyone. Shared by the session page and the add-on.
-// WorkbookView.form(box, { workbook, answers: { key: value }, onSave(key, value) -> Promise, readOnly })
-// WorkbookView.summary(box, { workbook, answers: [rows], nameOf(row) })
+// WorkbookView.form(box, { workbook, answers: { key: value }, onSave(key, value) -> Promise, readOnly, image })
+// WorkbookView.summary(box, { workbook, answers: [rows], nameOf(row), image })
+// image(name) -> Promise of a URL, from WorkbookView.images(db, workbook).
 (function () {
   var W = window.WorkbookLib;
   function el(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
 
-  // Words with bold, italic, lists, and https links, built from text nodes.
-  function words(text) {
-    var box = el('div', 'wb-words');
+  // The workbook's images, each a short-lived link to the private bucket.
+  function images(db, workbook) {
+    var cache = {};
+    return function (name) {
+      if (!cache[name]) cache[name] = db.storage.from('workbook-files').createSignedUrl(workbook.cohort_id + '/' + workbook.id + '/' + name, 3600)
+        .then(function (r) { return r.data && r.data.signedUrl ? r.data.signedUrl : null; }, function () { return null; });
+      return cache[name];
+    };
+  }
+
+  // Words with bold, italic, lists, and https links, built from text nodes,
+  // and the workbook's images between them.
+  function words(text, image) {
+    var box = el('div', 'wb-words'), n = 0;
+    W.parts(text).forEach(function (part) {
+      if (part.text != null) return box.appendChild(prose(part.text));
+      n += 1;
+      var fig = el('figure', 'wb-image');
+      if (!image) { fig.appendChild(el('p', 'small', 'An image')); return box.appendChild(fig); }
+      var img = el('img'); img.alt = 'Image ' + n; img.loading = 'lazy'; img.decoding = 'async';
+      fig.appendChild(img); box.appendChild(fig);
+      image(part.image).then(function (url) {
+        if (url) { img.src = url; var a = el('a'); a.href = url; a.target = '_blank'; a.rel = 'noopener'; a.setAttribute('aria-label', 'Open image ' + n + ' full size'); fig.replaceChild(a, img); a.appendChild(img); }
+        else fig.replaceChild(el('p', 'small', 'This image could not be opened.'), img);
+      });
+    });
+    return box;
+  }
+
+  function prose(text) {
+    var box = el('div');
     var C = window.CohortLib;
     if (!C || !C.blocks) { box.textContent = text || ''; return box; }
     C.blocks(text || '').forEach(function (b) {
@@ -38,7 +67,7 @@
     (wb.blocks || []).forEach(function (b) {
       var sec = el('section', 'wb-block wb-' + b.type);
       if (b.type !== 'text') { n += 1; sec.appendChild(el('p', 'wb-n', String(n))); }
-      sec.appendChild(words(b.text));
+      sec.appendChild(words(b.text, o.image));
       var said = el('span', 'ui-inline-status'); said.setAttribute('role', 'status');
       var timer = null;
       function save(value) {
@@ -103,10 +132,15 @@
 
   function summary(box, o) {
     box.replaceChildren();
-    W.summary(o.workbook, o.answers, o.nameOf).forEach(function (s, i) {
+    var byKey = {}, i = 0;
+    W.summary(o.workbook, o.answers, o.nameOf).forEach(function (s) { byKey[s.key] = s; });
+    (o.workbook.blocks || []).forEach(function (b) {
+      var s = byKey[b.key];
+      if (!s) { var t = el('section', 'wb-block wb-text'); t.appendChild(words(b.text, o.image)); box.appendChild(t); return; }
+      i += 1;
       var sec = el('section', 'wb-block');
-      sec.appendChild(el('p', 'wb-n', String(i + 1)));
-      sec.appendChild(words(s.text));
+      sec.appendChild(el('p', 'wb-n', String(i)));
+      sec.appendChild(words(s.text, o.image));
       if (s.counts) {
         var ul = el('ul', 'wb-counts');
         s.counts.forEach(function (c) { ul.appendChild(el('li', null, c.label + ': ' + c.count)); });
@@ -128,5 +162,5 @@
     });
   }
 
-  window.WorkbookView = { form: form, summary: summary, words: words };
+  window.WorkbookView = { form: form, summary: summary, words: words, images: images };
 })();

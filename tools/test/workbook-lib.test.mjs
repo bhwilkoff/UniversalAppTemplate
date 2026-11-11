@@ -23,11 +23,12 @@ test('Minerva\'s workbook data becomes blocks, keyed by place', () => {
   assert.equal(w.blocks[1].height, 'long');
   assert.deepEqual(w.blocks[2], { key: 'b3', type: 'choice', text: 'Pick', multiple: true, choices: ['A', 'B'] });
   assert.deepEqual(w.blocks[3].rows, [[{ text: 'Word', fill: false }, { text: '', fill: true }]]);
-  assert.equal(w.blocks[4].text, 'Hand in\n[An image]');
+  assert.equal(w.blocks[4].text, 'Hand in\n![](i1.png)');
+  assert.deepEqual(w.images, [{ name: 'i1.png', data: 'data:image/png;base64,AAA' }]);
 });
 
 test('the plain export gives the same blocks', () => {
-  const plain = { title: 'Pre-Class Work', blocks: [{ type: 'Instructions', text: '**Read this**' }, { type: 'FreeResponse', text: 'Why?', height: 'long' }, { type: 'MultipleChoice', text: 'Pick', multiple: true, choices: ['A', 'B'] }, { type: 'Table', text: 'Fill in', rows: [[{ text: 'Word', fill: false }, { text: '', fill: true }]] }, { type: 'File', text: 'Hand in\n[An image]' }] };
+  const plain = { title: 'Pre-Class Work', blocks: [{ type: 'Instructions', text: '**Read this**' }, { type: 'FreeResponse', text: 'Why?', height: 'long' }, { type: 'MultipleChoice', text: 'Pick', multiple: true, choices: ['A', 'B'] }, { type: 'Table', text: 'Fill in', rows: [[{ text: 'Word', fill: false }, { text: '', fill: true }]] }, { type: 'File', text: 'Hand in\n![](i1.png)' }], images: { 'i1.png': 'data:image/png;base64,AAA' } };
   assert.deepEqual(W.normalize(plain), W.normalize(minerva));
 });
 
@@ -54,4 +55,26 @@ test('a leader sees counts for choices and the words for the rest', () => {
   assert.deepEqual(s[0].answers, [{ who: 'A', value: { text: 'One' } }]);
   assert.deepEqual(s[1].counts, [{ label: 'A', count: 2 }, { label: 'B', count: 1 }]);
   assert.equal(s[2].answered, 0);
+});
+
+test('an image that is not a picture, or is missing, stays a note', () => {
+  const w = W.normalize({ title: 'x', blocks: [{ type: 'Instructions', text: '![](i1.png)\n![](i2.png)' }], images: { 'i1.png': 'javascript:alert(1)' } });
+  assert.equal(w.blocks[0].text, '[An image]\n[An image]');
+  assert.equal(w.images, undefined);
+  const m = W.normalize({ blocks: [{ type: 'Instructions', block_components: [{ type: 'Text', value: '{"ops":[{"insert":{"image":"https://example.com/a.png"}}]}' }] }] });
+  assert.equal(m.blocks[0].text, '[An image]');
+});
+
+test('a block reads as words and images in order', () => {
+  assert.deepEqual(W.parts('Look\n![](i1.png)\n![](i2.jpg)\nafter'), [{ text: 'Look' }, { image: 'i1.png' }, { image: 'i2.jpg' }, { text: 'after' }]);
+  assert.deepEqual(W.parts('![](../x.png)'), [{ text: '![](../x.png)' }]);
+});
+
+test('blocks replace others only in the same shape, and a workbook waits for its images', () => {
+  const a = W.normalize(minerva).blocks;
+  assert.equal(W.sameShape(a, a.map((b) => Object.assign({}, b, { text: 'new' }))), true);
+  assert.equal(W.sameShape(a, a.slice(1)), false);
+  assert.equal(W.waiting({ blocks: [] }), true);
+  assert.equal(W.waiting({ blocks: [{ text: 'See\n[An image]' }] }), true);
+  assert.equal(W.waiting({ blocks: a }), false);
 });

@@ -8,13 +8,17 @@
   function cut(s, n) { s = String(s == null ? '' : s); return s.length > n ? s.slice(0, n - 1) + '…' : s; }
 
   // A Quill delta (or its JSON) as plain lines: lists keep their marks, an
-  // image is a short note, colors do not travel.
-  function deltaText(v) {
+  // image is its own line (img(src) gives it, "[An image]" without), colors do
+  // not travel.
+  function deltaText(v, img) {
     var d = v;
-    if (typeof v === 'string') { try { d = JSON.parse(v); } catch (e) { return v.replace(/​/g, '').trim(); } }
+    if (typeof v === 'string') { try { d = JSON.parse(v); } catch (e) { return v.replace(/\u200b/g, '').trim(); } }
     var ops = (d && d.ops) || [], line = '', out = [];
     ops.forEach(function (o) {
-      if (typeof o.insert !== 'string') { if (o.insert && o.insert.image) line += '[An image]'; return; }
+      if (typeof o.insert !== 'string') {
+        if (o.insert && o.insert.image) { if (line) out.push(line); out.push(img ? img(String(o.insert.image)) : '[An image]'); line = ''; }
+        return;
+      }
       var a = o.attributes || {};
       var parts = o.insert.split('\n');
       parts.forEach(function (p, i) {
@@ -24,12 +28,31 @@
         line += t;
         if (i < parts.length - 1) {
           var pre = a.list === 'bullet' ? '- ' : a.list === 'ordered' ? '1. ' : '';
-          out.push(pre + line); line = '';
+          if (line || !out.length || !IMAGE_LINE.test(out[out.length - 1])) out.push(pre + line);
+          line = '';
         }
       });
     });
     if (line) out.push(line);
-    return out.join('\n').replace(/​/g, '').replace(/\n{3,}/g, '\n\n').trim();
+    return out.join('\n').replace(/\u200b/g, '').replace(/\n{3,}/g, '\n\n').trim();
+  }
+
+  // An image kept with a workbook is a line "![](i3.png)": the file i3.png in
+  // the workbook's folder of the private bucket workbook-files.
+  var IMAGE_LINE = /^!\[\]\((i\d{1,3}\.(?:png|jpg|webp|gif))\)$/;
+  var DATA_URL = /^data:image\/(png|jpeg|webp|gif);base64,[A-Za-z0-9+\/=]+$/;
+  function imageName(n, type) { return 'i' + n + '.' + (type === 'jpeg' ? 'jpg' : type); }
+
+  // A block's text in order: words, and the images between them.
+  function parts(text) {
+    var out = [], words = [];
+    function flush() { var t = words.join('\n').trim(); if (t) out.push({ text: t }); words = []; }
+    String(text || '').split('\n').forEach(function (l) {
+      var m = IMAGE_LINE.exec(l.trim());
+      if (m) { flush(); out.push({ image: m[1] }); } else words.push(l);
+    });
+    flush();
+    return out;
   }
 
   // One workbook's blocks, from Minerva's own data ({ title, blocks: [{ type,
@@ -37,19 +60,32 @@
   // choices, rows }] }). Keys are b1, b2, … by position.
   function normalize(w) {
     if (!w || !Array.isArray(w.blocks)) return null;
+    var images = [], given = w.images && typeof w.images === 'object' ? w.images : {};
+    function img(src) {
+      var m = DATA_URL.exec(src);
+      if (!m || images.length >= 60) return '[An image]';
+      var name = imageName(images.length + 1, m[1]);
+      images.push({ name: name, data: src });
+      return '![](' + name + ')';
+    }
     var blocks = w.blocks.slice(0, 120).map(function (b, i) {
       var type = TYPES[b.type] || null;
       if (!type) return null;
       var out = { key: 'b' + (i + 1), type: type, text: '' };
       var comps = Array.isArray(b.block_components) ? b.block_components : null;
       if (comps) {
-        out.text = comps.filter(function (c) { return c.type === 'Text'; }).map(function (c) { return deltaText(c.value); }).filter(Boolean).join('\n\n');
+        out.text = comps.filter(function (c) { return c.type === 'Text'; }).map(function (c) { return deltaText(c.value, img); }).filter(Boolean).join('\n\n');
         var f = comps.filter(function (c) { return c.type !== 'Text'; })[0] || {};
         if (type === 'free') out.height = f.height || 'short';
         if (type === 'choice') { out.multiple = f.multiple === true || f.multiple === 'true'; out.choices = (f.choices || []).map(function (c) { return cut(c.label, 300); }); }
         if (type === 'table') out.rows = (f.value || []).slice(0, 40).map(function (r) { return r.slice(0, 12).map(function (c) { return { text: cut(deltaText(c.value), 500), fill: !c.readOnly }; }); });
       } else {
-        out.text = String(b.text || '');
+        out.text = String(b.text || '').split('\n').map(function (l) {
+          var m = IMAGE_LINE.exec(l.trim());
+          if (!m) return l;
+          var src = typeof given[m[1]] === 'string' ? given[m[1]] : '', t = DATA_URL.exec(src);
+          return t ? img(src) : '[An image]';
+        }).join('\n');
         if (type === 'free') out.height = b.height || 'short';
         if (type === 'choice') { out.multiple = !!b.multiple; out.choices = (b.choices || []).map(function (c) { return cut(c, 300); }); }
         if (type === 'table') out.rows = (b.rows || []).slice(0, 40).map(function (r) { return r.slice(0, 12).map(function (c) { return { text: cut(c.text, 500), fill: !!c.fill }; }); });
@@ -57,7 +93,9 @@
       out.text = cut(out.text, 6000);
       return out;
     }).filter(Boolean);
-    return { title: cut(String(w.title || '').trim() || 'A workbook', 200), blocks: blocks };
+    var res = { title: cut(String(w.title || '').trim() || 'A workbook', 200), blocks: blocks };
+    if (images.length) res.images = images;
+    return res;
   }
 
   // What can be kept for a block: words, the picked choices, or a table's
@@ -100,7 +138,18 @@
     });
   }
 
-  var lib = { normalize: normalize, deltaText: deltaText, answerOf: answerOf, summary: summary };
+  // Whether new blocks can replace a workbook's blocks without moving anyone's
+  // answers: the same keys and types, in the same places.
+  function sameShape(a, b) {
+    a = a || []; b = b || [];
+    return a.length === b.length && a.every(function (x, i) { return x.key === b[i].key && x.type === b[i].type; });
+  }
+  // Waiting for what is in it: no blocks yet, or images that never came in.
+  function waiting(w) {
+    return !(w.blocks || []).length || w.blocks.some(function (b) { return String(b.text || '').indexOf('[An image]') >= 0; });
+  }
+
+  var lib = { normalize: normalize, parts: parts, sameShape: sameShape, waiting: waiting, deltaText: deltaText, answerOf: answerOf, summary: summary };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
   else root.WorkbookLib = lib;
 })(typeof globalThis !== 'undefined' ? globalThis : this);
