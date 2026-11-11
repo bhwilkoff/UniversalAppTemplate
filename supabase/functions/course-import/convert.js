@@ -17,6 +17,15 @@ function cut(s, n) {
   return s.slice(0, at > n * 0.6 ? at : n - 1).trimEnd() + '…';
 }
 function oneLine(s) { return clean(s).replace(/\s*\n\s*/g, ' '); }
+// Words a stage shows as they are: no Markdown marks, a link as its words
+// and its address.
+function plain(s) {
+  return clean(s)
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, '$1 ($2)')
+    .replace(/\*\*([^*]+)\*\*/g, '$1').replace(/__([^_]+)__/g, '$1')
+    .replace(/(^|[\s(])\*([^*\n]+)\*(?=[\s).,!?:;]|$)/g, '$1$2')
+    .replace(/^#{1,6}\s+/gm, '').replace(/\\([\[\]*_#])/g, '$1');
+}
 
 // A Quill delta (the slide editor's own format) as deck lines: the first
 // heading is the slide's headline, later ones bold lines; lists keep their
@@ -216,9 +225,9 @@ export function convert(exported) {
         const first = [];
         poll.forEach((p, pi) => {
           const s = scene('question', poll.length > 1 ? stepTitle + ' (' + (pi + 1) + ')' : stepTitle, { ref: 'el:' + p.el.id });
-          s.config = { prompt: cut(oneLine(p.q.prompt), LIMIT.prompt) || 'What do you think?', kind: p.q.kind, show_tally: p.q.showTally };
+          s.config = { prompt: cut(oneLine(plain(p.q.prompt)), LIMIT.prompt) || 'What do you think?', kind: p.q.kind, show_tally: p.q.showTally };
           if (p.q.options) s.config.options = p.q.options;
-          if (clean(p.q.prompt).length > LIMIT.prompt || /\n/.test(clean(p.q.prompt))) s.body = cut(p.q.prompt, LIMIT.body);
+          if (clean(p.q.prompt).length > LIMIT.prompt || /\n/.test(clean(p.q.prompt))) s.body = cut(plain(p.q.prompt), LIMIT.body);
           if (p.q.warn) { warnings.push(title + ', ' + s.title + ': ' + p.q.warn); notes.push(p.q.warn); }
           counts.questions += 1;
           first.push(s);
@@ -236,7 +245,7 @@ export function convert(exported) {
           s.config = { sorting: a.sorting === 'random' ? 'random' : 'roster' };
           if (g) s.config.groups = Math.max(1, Math.min(40, Number(g[1])));
           if (docs.length) s.config.group_docs = docs;
-          if (clean(a.content)) { s.config.prompt = cut(oneLine(a.content), LIMIT.prompt); s.body = cut(a.content, LIMIT.body); }
+          if (clean(a.content)) { s.config.prompt = cut(oneLine(plain(a.content)), LIMIT.prompt); s.body = cut(plain(a.content), LIMIT.body); }
           counts.breakouts += 1;
           first.push(s);
         });
@@ -259,7 +268,7 @@ export function convert(exported) {
         shows.filter((x) => x.kind === 'minerva').forEach((x) => warnings.push(title + ', ' + stepTitle + ': "' + x.name + '" is a Minerva workbook only Minerva accounts can open.'));
         if (docText.length) {
           const text = docText.join('\n\n');
-          if (!lead.body) lead.body = cut(text, LIMIT.body);
+          if (!lead.body) lead.body = cut(plain(text), LIMIT.body);
           else notes.push(text);
         }
         if (extras.length) notes.push('More to show:\n' + extras.join('\n'));

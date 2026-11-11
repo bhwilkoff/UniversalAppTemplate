@@ -232,7 +232,11 @@
     var f = document.createElement('iframe');
     f.src = v.doc.url;
     f.title = v.doc.name;
-    f.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-downloads');
+    // A PDF opens only unsandboxed: Chrome will not run its viewer in a
+    // sandboxed frame (found in a real call: a broken-page icon). It is still
+    // another site's frame, apart from this page.
+    if (!/\.pdf($|[?#])/i.test(v.doc.url)) f.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-downloads');
+    f.setAttribute('referrerpolicy', 'no-referrer');
     box.replaceChildren(f);
   }
 

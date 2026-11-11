@@ -59,7 +59,7 @@ test('every element type lands somewhere, and nothing is silently dropped', () =
   // Slides, a document to show, and leader notes from instructions, engagement, and focus questions.
   assert.equal(s[0].deck, '## Hello\n\n- One\n- **Two**');
   assert.deepEqual(s[0].config.show, { url: 'https://course-resources.minerva.edu/uploaded_files/x/goals.pdf', name: 'Goals sheet' });
-  assert.equal(s[0].body, '**Goals**');
+  assert.equal(s[0].body, 'Goals');
   assert.match(s[0].notes, /Set the tone\./);
   assert.match(s[0].notes, /Engagement: Ask who has been here before\./);
   assert.match(s[0].notes, /Are they ready\? \(Most are\)/);
@@ -99,4 +99,10 @@ test('long words are cut at a word, within the database limits', () => {
   const r = convert(big);
   assert.ok(r.sessions[0].scenes[0].title.length <= 120);
   assert.ok(r.sessions[0].scenes[0].title.endsWith('…'));
+});
+
+test('words for the stage carry no Markdown marks, and links keep their address', () => {
+  const c = JSON.parse(JSON.stringify(course));
+  c.records.find((r) => r.type === 'ActivityElement' && r.data.id === 1002).data.attributes.content = '**Bold** and *soft* with [a link](https://example.com/x) and \\[brackets\\]';
+  assert.equal(convert(c).sessions[0].scenes[0].body, 'Bold and soft with a link (https://example.com/x) and [brackets]');
 });
