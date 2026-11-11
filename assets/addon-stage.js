@@ -659,7 +659,8 @@
         // Stances only while the leader has them open, and never while a
         // question waits for this person's answer (Week 2: a learner pressed
         // Agree believing it answered).
-        var stanceOn = !!v.stances && !(v.mode === 'check' && v.answerable);
+        var mineIn = v.mine && (v.mine.choice || (v.mine.picks || []).length || v.mine.body);
+        var stanceOn = !!v.stances && !(v.mode === 'check' && v.answerable && !mineIn);
         if (!v.stances) stageStance = null;
         root.querySelectorAll('.stage-stance').forEach(function (b) { b.hidden = !stanceOn; b.setAttribute('aria-pressed', String(!!stageStance && b.getAttribute('data-stance-id') === stageStance)); });
         drawReactions({ floats: [], stance: lastStance });

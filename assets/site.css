@@ -2793,7 +2793,7 @@ html.app-nav-open[data-signed-in] body:not([data-no-app-nav]) .app-nav { display
 .stage-choices.long li { padding: 0.8vmin 1.4vmin; }
 [data-view="check"].has-long .stage-title { font-size: clamp(1.3rem, 4vmin, 2.8rem); max-width: 40ch; }
 /* With long choices, the choices keep the room the answer line would take. */
-[data-view="check"].has-long .stage-choices:not(.counted) ~ .stage-quiet { display: none; }
+[data-view="check"].has-long .stage-choices:not(.counted) ~ .stage-quiet:not(.is-in) { display: none; }
 
 /* The add-on's frame (ADDON-DESIGN.md): Meet's own colors, type, and shapes. */
 .p2-panel {
