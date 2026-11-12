@@ -2452,7 +2452,7 @@
     d.addEventListener('toggle', function () { S.compareOpen = d.open; });
     d.appendChild(el('summary', null, 'Side by side'));
     S.comparePick = S.comparePick || {};
-    var ul = el('ul', 'roster-list');
+    var ul = el('ul');
     framed.forEach(function (p) {
       var li = el('li'), lab = el('label', 'ui-switch-row');
       var c = el('input'); c.type = 'checkbox'; c.checked = !!S.comparePick[p.user_id];

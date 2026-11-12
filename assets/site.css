@@ -3527,3 +3527,7 @@ a.person-name:hover { text-decoration: underline; }
 .p2-clock { display: inline-flex; align-items: baseline; gap: 6px; flex: none; }
 .p2-nudge { font: inherit; font-size: 12px; font-variant-numeric: tabular-nums; padding: 1px 6px; border: 1px solid var(--rule); border-radius: 999px; background: none; color: var(--muted); cursor: pointer; }
 .p2-nudge:hover { color: var(--ink); border-color: var(--ink); }
+.p2-panel label.ui-switch-row { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; font-size: 0.9rem; }
+.p2-panel label.ui-switch-row input { width: auto; margin: 0; flex: none; }
+.p2-compare ul { list-style: none; padding: 0; margin: 8px 0; }
+.p2-compare > summary { cursor: pointer; font-weight: 600; }
