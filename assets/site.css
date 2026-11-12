@@ -3463,6 +3463,11 @@ a.person-name:hover { text-decoration: underline; }
 .has-strip .stage-stance:hover { border-color: var(--muted); }
 .p2-stance-row { display: flex; flex-wrap: wrap; gap: 0.35rem; justify-content: center; margin-top: 0.35rem; }
 .has-strip .stage-app:not([hidden]), .has-strip [data-view="scene"].has-board:not([hidden]), .has-strip .open-board:not([hidden]) { bottom: var(--foot); }
+/* A part's slides end above the strip too: drawn at the full stage, the strip
+   and its lane covered a slide's last row, a chart's labels, and a diagram's
+   last branch (found running the demo session on a laptop-sized window). */
+.has-strip .stage-slide:not([hidden]) { bottom: var(--foot); }
+.has-strip .stage-slide-frame svg { width: 100%; height: 100%; }
 .has-strip .stage-ready:has(.stage-studio:not([hidden])) .react-layer, .has-strip .stage-ready:has(.stage-studio:not([hidden])) .stage-reacts { display: none; }
 /* Plan lists the parts; only the current one offers editing (end of Week 2:
    Edit this part under every part made the plan hard to read). */
