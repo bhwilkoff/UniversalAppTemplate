@@ -2384,7 +2384,15 @@
       words.appendChild(document.createTextNode(r.kind === 'other' && r.body ? ' asks: \u201c' + r.body + '\u201d' : ' asks for ' + ASKS[r.kind] + (r.body ? ': \u201c' + r.body + '\u201d' : '')));
       row.appendChild(words);
       var acts = el('span', 'p2-ask-acts');
-      acts.appendChild(button('Do it', 'btn-secondary small', function () { doRequest(r); }));
+      // A learner's question is answered aloud, or put to everyone; "Do it"
+      // meant nothing for a question (Ben, November 12, 2026).
+      if (r.kind === 'other') {
+        acts.appendChild(button('I answered it', 'btn-secondary small', function () { decide(r, 'done'); }));
+        if (S.signals && r.body) acts.appendChild(button('Show it to everyone', 'btn-secondary small', function () {
+          S.signals.send('card', { body: String(r.body).slice(0, 400), ends_at: new Date(Date.now() + 300000).toISOString() }, el('span'));
+          decide(r, 'done');
+        }));
+      } else acts.appendChild(button('Do it', 'btn-secondary small', function () { doRequest(r); }));
       acts.appendChild(button('Not now', 'btn-secondary small', function () { decide(r, 'declined'); }));
       row.appendChild(acts);
       box.appendChild(row);
