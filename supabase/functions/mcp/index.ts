@@ -269,7 +269,7 @@ Deno.serve(
           const p = await pick(cohort);
           if (!p.cohort) return text(p.text);
           const c = p.cohort;
-          const g = await supabase.from('groups').select('id, name, expectations, group_members(user_id)').eq('cohort_id', c.id);
+          const g = await supabase.from('groups').select('id, name, expectations, group_members(user_id)').is('ended_at', null).eq('cohort_id', c.id);
           if (g.error) throw new Error(g.error.message);
           // deno-lint-ignore no-explicit-any
           const mine = g.data.find((x: any) => x.group_members.some((m: any) => m.user_id === uid));
@@ -327,7 +327,7 @@ Deno.serve(
           const c = p.cohort;
           const [who, groups] = await Promise.all([
             peopleOf(c.id),
-            supabase.from('groups').select('name, expectations, group_members(user_id)').eq('cohort_id', c.id).order('name'),
+            supabase.from('groups').select('name, expectations, group_members(user_id)').is('ended_at', null).eq('cohort_id', c.id).order('name'),
           ]);
           if (groups.error) throw new Error(groups.error.message);
           return text(rosterText(c, who.people, groups.data));

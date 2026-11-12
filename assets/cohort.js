@@ -298,7 +298,7 @@
           // Every column of groups and shares, so a group's Meet room and a
           // bring-back's question and mark come along once the database has
           // them (migration 20261003100000), and the page works before then.
-          db.from('groups').select('*, group_members(user_id)').eq('cohort_id', cohort.id),
+          db.from('groups').select('*, group_members(user_id)').is('ended_at', null).eq('cohort_id', cohort.id),
           db.from('shares').select('*, feedback(id, author_id, body, created_at)').eq('cohort_id', cohort.id).order('created_at', { ascending: false }).limit(40),
           db.from('calendar_contacts').select('email').eq('cohort_id', cohort.id).eq('user_id', me.id).maybeSingle(),
           db.from('cohort_teachers').select('user_id, profiles(github_login, display_name)').eq('cohort_id', cohort.id),

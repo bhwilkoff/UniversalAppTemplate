@@ -107,7 +107,7 @@
       db.from('enrollments').select('user_id, role, status, app_name, app_repo, app_url, app_public, profiles(github_login, display_name)').eq('cohort_id', id),
       // Every column, so a group's Meet link (meet_url) comes along once
       // the database has it, and the page works the same before then.
-      db.from('groups').select('*, group_members(user_id)').eq('cohort_id', id).order('name'),
+      db.from('groups').select('*, group_members(user_id)').is('ended_at', null).eq('cohort_id', id).order('name'),
       db.from('github_access').select('state').eq('cohort_id', id).eq('user_id', me.id).maybeSingle(),
       db.from('credentials').select('*').eq('cohort_id', id),
       db.from('github_access').select('*').eq('cohort_id', id),

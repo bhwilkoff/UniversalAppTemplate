@@ -363,7 +363,9 @@
         S.cohort = cohort;
         S.people = res[1].data;
         S.myApp = (S.people.filter(function (p) { return p.user_id === S.me.id; })[0] || {}).app_url || null;
-        S.groups = res[3].data;
+        // Rooms that have ended keep their work, and stay out of the call's rooms.
+        S.allGroups = res[3].data;
+        S.groups = S.allGroups.filter(function (g) { return !g.ended_at; });
         S.teaching = res[2].data.some(function (t) { return t.user_id === S.me.id; });
         S.teacherIds = res[2].data.map(function (t) { return t.user_id; });
         S.sayLike = {};
@@ -1564,7 +1566,8 @@
   function reloadGroups() {
     return db.from('groups').select('*, group_members(user_id)').eq('cohort_id', S.cohort.id).order('name').then(function (r) {
       if (r.error) return;
-      S.groups.splice.apply(S.groups, [0, S.groups.length].concat(r.data));
+      S.allGroups = r.data;
+      S.groups.splice.apply(S.groups, [0, S.groups.length].concat(r.data.filter(function (g) { return !g.ended_at; })));
       if (S.signals) S.signals.redraw();
       if (S.breakouts) S.breakouts.draw();
     });
@@ -2038,7 +2041,9 @@
   // Each breakout room's work, for its debrief (Course Builder's Feature
   // Breakout Groups): its people and workbook answers on every stage.
   function drawRoomsWork(box) {
-    var rooms = (S.groups || []).filter(function (g) { return g.breakout; });
+    // This session's rooms, the ones still open and the ones that have ended,
+    // whose work stays for the debrief.
+    var rooms = (S.allGroups || S.groups || []).filter(function (g) { return g.breakout && (!g.ended_at || g.session_id === S.session.id); });
     if (!rooms.length || !S.run || !S.run.shared) return;
     box.appendChild(el('p', 'small', 'Each room’s work'));
     var ul = el('ul', 'p2-run-list');

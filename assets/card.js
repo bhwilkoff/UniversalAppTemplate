@@ -25,7 +25,7 @@
         db.from('sessions').select('*').eq('cohort_id', cohort.id).order('number'),
         db.from('enrollments').select('user_id, profiles(github_login, display_name)').eq('cohort_id', cohort.id).neq('status', 'left'),
         db.from('cohort_teachers').select('user_id, profiles(github_login, display_name)').eq('cohort_id', cohort.id),
-        db.from('groups').select('*, group_members(user_id)').eq('cohort_id', cohort.id).order('name')
+        db.from('groups').select('*, group_members(user_id)').is('ended_at', null).eq('cohort_id', cohort.id).order('name')
       ]).then(function (res) {
         var bad = res.filter(function (r) { return r.error; })[0];
         if (bad) return fail('The cards could not be loaded: ' + bad.error.message);

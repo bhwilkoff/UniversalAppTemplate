@@ -97,7 +97,7 @@
         return Promise.all([
           db.from('sessions').select('*').eq('cohort_id', S.cohort.id).order('number'),
           db.from('cohort_teachers').select('user_id').eq('cohort_id', S.cohort.id),
-          db.from('groups').select('id, name, group_members(user_id)').eq('cohort_id', S.cohort.id).order('name')
+          db.from('groups').select('id, name, group_members(user_id)').is('ended_at', null).eq('cohort_id', S.cohort.id).order('name')
         ]).then(function (res) {
           var bad = res.filter(function (r) { return r.error; })[0];
           if (bad) return fail('The board could not be opened: ' + bad.error.message);

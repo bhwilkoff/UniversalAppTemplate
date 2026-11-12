@@ -3238,13 +3238,27 @@ def main():
     check("asking for more rooms than are free says so", not attempt(as_user("ben"), "select public.launch_breakouts(%s, %s::jsonb)", (ss, json.dumps([[], [], []]))))
     check("someone outside the cohort is left out", attempt(as_user("ben"), "select public.launch_breakouts(%s, %s::jsonb)", (ss, json.dumps([[people["dee"]]]))))
     su.execute("reset role")
-    su.execute("select count(m.user_id) from public.groups g left join public.group_members m on m.group_id = g.id where g.cohort_id = %s and g.breakout", (cc,))
+    su.execute("select count(m.user_id) from public.groups g left join public.group_members m on m.group_id = g.id where g.cohort_id = %s and g.breakout and g.ended_at is null", (cc,))
     check("and never placed in a room", su.fetchall() == [(0,)])
     check("a learner cannot end breakouts", not attempt(as_user("bea"), "select public.end_breakouts(%s)", (cc,)))
     check("a leader ends them", attempt(as_user("ben"), "select public.end_breakouts(%s)", (cc,)))
     su.execute("reset role")
-    su.execute("select (select count(*) from public.groups where cohort_id = %s and breakout), (select count(*) from public.breakout_rooms where cohort_id is not null)", (cc,))
+    su.execute("select (select count(*) from public.groups where cohort_id = %s and breakout and ended_at is null), (select count(*) from public.breakout_rooms where cohort_id is not null)", (cc,))
     check("ending gives the rooms back", su.fetchall() == [(0, 0)])
+    # A room's work outlives the room (migration 20261112050000).
+    su.execute("insert into public.workbooks (cohort_id, session_id, kind, title, blocks) values (%s, %s, 'group', 'Room work', '[]'::jsonb) returning id", (cc, ss))
+    gwb = su.fetchone()[0]
+    attempt(as_user("ben"), "select public.launch_breakouts(%s, %s::jsonb)", (ss, json.dumps([[people["bea"]]])))
+    su.execute("reset role")
+    su.execute("select id from public.groups where cohort_id = %s and breakout and ended_at is null", (cc,))
+    room = su.fetchone()[0]
+    su.execute("insert into public.workbook_answers (workbook_id, cohort_id, group_id, block, value) values (%s, %s, %s, 'b1', '{\"text\": \"Ours\"}')", (gwb, cc, room))
+    attempt(as_user("ben"), "select public.end_breakouts(%s)", (cc,))
+    su.execute("reset role")
+    su.execute("select value->>'text' from public.workbook_answers where group_id = %s", (room,))
+    check("a room's workbook answers stay after breakouts end", su.fetchall() == [("Ours",)])
+    su.execute("select g.meet_url is null, g.ended_at is not null, g.session_id = %s, (select count(*) from public.group_members m where m.group_id = g.id) from public.groups g where g.id = %s", (ss, room))
+    check("an ended room keeps its people and its session, and loses its link", su.fetchall() == [(True, True, True, 1)])
 
     # A session runs again in any call (migration 20261110010000).
     c2, s2, rid = str(uuid.uuid4()), str(uuid.uuid4()), str(uuid.uuid4())
