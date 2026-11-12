@@ -609,6 +609,12 @@
         row.appendChild(btn(m + ' min', 'btn-secondary', function () { send({ t: 'clock', seconds: m * 60, label: label.value }); done(); }));
       });
       pane.appendChild(row);
+      if (room && room.clock) {
+        var run = el('div', 'open-picks is-row');
+        run.appendChild(btn('−30 sec', 'btn-secondary small', function () { send({ t: 'clockAdd', seconds: -30 }); }));
+        run.appendChild(btn('+30 sec', 'btn-secondary small', function () { send({ t: 'clockAdd', seconds: 30 }); }));
+        pane.appendChild(run);
+      }
     }
     function messageTool(pane, line) {
       var m = field('textarea', 'What everyone should see'); m.rows = 3; m.maxLength = 400;

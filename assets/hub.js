@@ -242,8 +242,9 @@
   function drawNameForm(p, uid) {
     var form = root.querySelector('[data-name-form]');
     if (!form) return;
-    var input = form.querySelector('[data-name-input]');
+    var input = form.querySelector('[data-name-input]'), say = form.querySelector('[data-say-input]');
     input.value = p.display_name || '';
+    if (say) say.value = p.say_like || '';
     input.placeholder = p.github_login || '';
     if (form.dataset.ready) return;
     form.dataset.ready = '1';
@@ -251,9 +252,12 @@
       e.preventDefault();
       var name = input.value.replace(/\s+/g, ' ').trim() || null;
       var msg = form.querySelector('[data-name-message]');
-      db.from('profiles').update({ display_name: name }).eq('id', uid).select('display_name').single().then(function (r) {
+      var patch = { display_name: name };
+      if (say) patch.say_like = say.value.replace(/\s+/g, ' ').trim() || null;
+      db.from('profiles').update(patch).eq('id', uid).select('display_name, say_like').single().then(function (r) {
         if (r.error) return window.UI.say(msg, 'Not saved: ' + r.error.message, 'problem');
         input.value = r.data.display_name || '';
+        if (say) say.value = r.data.say_like || '';
         root.querySelector('[data-name]').textContent = r.data.display_name || p.github_login || 'You';
         if (window.HS && window.HS.roles) window.HS.roles({ name: r.data.display_name });
         window.UI.say(msg, 'Saved');
@@ -415,7 +419,7 @@
       var uid = session.user.id;
       keepGitHubToken(session);
       return Promise.all([
-        db.from('profiles').select('github_login, display_name, avatar_url').eq('id', uid).single(),
+        db.from('profiles').select('github_login, display_name, avatar_url, say_like').eq('id', uid).single(),
         db.from('enrollments').select('status, role, cohorts(id, slug, title, starts_on, weeks, schedule, description, status, session_weekday, session_time, session_minutes, time_zone)').eq('user_id', uid).neq('status', 'left'),
         db.from('cohorts').select('id, slug, title, starts_on, weeks, schedule, description, status, session_weekday, session_time, session_minutes, time_zone').eq('status', 'open').order('starts_on'),
         db.from('teachers').select('user_id').eq('user_id', uid).maybeSingle()

@@ -93,7 +93,7 @@ function cleanAnswer(q, m) {
   return body ? { body } : null;
 }
 
-const HOST_ONLY = new Set(['stances', 'talk', 'go', 'show', 'ask', 'reveal', 'close', 'clear', 'unnoteAny', 'page', 'site', 'board', 'pasted', 'card', 'clock', 'hand', 'title']);
+const HOST_ONLY = new Set(['stances', 'talk', 'go', 'show', 'ask', 'reveal', 'close', 'clear', 'unnoteAny', 'page', 'site', 'board', 'pasted', 'card', 'clock', 'clockAdd', 'hand', 'title']);
 
 // who: { pid, name, here(pid) }. Returns what changed: { room?, talk?, html?,
 // to?, error?, ended? }; no result means nothing did.
@@ -231,6 +231,13 @@ export function apply(room, who, m, now, opts) {
     case 'clock': {
       const s = int(m.seconds, 0, LIMITS.clock);
       room.clock = s ? { endsAt: now + s * 1000, label: line(m.label, 80) } : null;
+      return { room: true };
+    }
+    // A running clock moves by up to five minutes either way, never into the past.
+    case 'clockAdd': {
+      if (!room.clock) return { error: 'There is no clock running.' };
+      const d = Number.isFinite(Number(m.seconds)) ? int(m.seconds, -300, 300) : 0;
+      room.clock = { ...room.clock, endsAt: Math.max(now, room.clock.endsAt + d * 1000) };
       return { room: true };
     }
     case 'stance':

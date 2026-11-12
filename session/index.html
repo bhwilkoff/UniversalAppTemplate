@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261111zk">
+  <link rel="stylesheet" href="/assets/site.css?v=20261112b">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -38,7 +38,7 @@
     })();
   </script>
   <script src="/assets/site.js?v=20261022o" defer></script>
-  <script src="/assets/ui.js?v=20261023h" defer></script>
+  <script src="/assets/ui.js?v=20261112b" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to the page</a>
@@ -90,6 +90,7 @@
                   <label>Date <input type="date" name="date"></label>
                   <label>Time <input type="time" name="time"></label>
                 </div>
+                <label class="ui-switch-row"><input type="checkbox" name="own"> No call: everyone works on their own with this page</label>
                 <p class="hint">Saving a new title emails everyone invited to this session.</p>
                 <div class="actions"><button class="btn-primary small" type="submit">Save</button><button class="btn-secondary small" type="button" data-title-cancel>Cancel</button><span class="ui-inline-status" role="status" data-title-status></span></div>
                 <button class="link-button" type="button" data-remove-session hidden>Remove this session</button>
@@ -178,6 +179,7 @@
             <section class="session-recording" id="recording" aria-label="The recording" data-recording-section hidden>
               <video controls playsinline preload="metadata" data-recording-video style="width:100%;border-radius:.75rem;background:#000"></video>
               <p class="small" data-recording-note hidden>It did not play here. <a data-recording-link target="_blank" rel="noopener">Open it in Drive</a>.</p>
+              <div class="session-replay" data-replay></div>
             </section>
           </div>
         </section>
@@ -205,9 +207,11 @@
   <script src="/assets/record-lib.js?v=20261111i" defer></script>
   <script src="/assets/react-lib.js?v=20261107a" defer></script>
   <script src="/assets/session-story-lib.js?v=20261107c" defer></script>
+  <script src="/assets/replay-lib.js?v=20261112b" defer></script>
+  <script src="/assets/session-replay.js?v=20261112b" defer></script>
   <script src="/assets/workbook-lib.js?v=20261111c" defer></script>
   <script src="/assets/workbook-view.js?v=20261111b" defer></script>
-  <script src="/assets/session.js?v=20261111h" defer></script>
+  <script src="/assets/session.js?v=20261112b" defer></script>
 
   <footer class="site-footer">
     <div class="wrap">

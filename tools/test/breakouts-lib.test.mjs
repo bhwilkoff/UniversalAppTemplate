@@ -24,3 +24,15 @@ test('a random order is the same for the same seed, and different for another', 
   assert.deepEqual(one.slice().sort(), ids);
   assert.notDeepEqual(lib.shuffle(ids, 'part-2'), one);
 });
+
+test('the cohort’s groups become rooms for the people here, and newcomers join the smallest', () => {
+  const groups = [{ name: 'Builders', members: ['a', 'b', 'c'] }, { name: 'Makers', members: ['d', 'e'] }, { name: 'Away', members: ['z'] }];
+  const r = lib.fromGroups(groups, ['a', 'b', 'd', 'n']);
+  assert.deepEqual(r.names, ['Builders', 'Makers']);
+  assert.deepEqual(r.rooms, [['a', 'b'], ['d', 'n']]);
+  assert.deepEqual(lib.fromGroups([], ['a']).rooms, [['a']]);
+});
+
+test('rooms kept as groups carry names, and an empty room is not kept', () => {
+  assert.deepEqual(lib.toGroups([['a'], [], ['b', 'c']], ['  Front  row ', 'x', '']), [{ name: 'Front row', members: ['a'] }, { name: 'Group 3', members: ['b', 'c'] }]);
+});

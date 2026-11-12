@@ -28,6 +28,17 @@
   }
 
   var K = { me: null, member: false, plan: null, tabs: null };
+  // Reading answers without names, so the idea comes before the person;
+  // kept in this browser, the same switch as the add-on's.
+  var HIDE = 'hs-hide-names';
+  function hidingNames() { try { return localStorage.getItem(HIDE) === '1'; } catch (e) { return false; } }
+  function hideNamesSwitch(onChange) {
+    var lab = el('label', 'ui-switch-row');
+    var box = el('input'); box.type = 'checkbox'; box.checked = hidingNames();
+    box.addEventListener('change', function () { try { localStorage.setItem(HIDE, box.checked ? '1' : '0'); } catch (e) {} onChange(); });
+    lab.appendChild(box); lab.appendChild(document.createTextNode(' Hide names'));
+    return lab;
+  }
   var bringReady = Promise.resolve(null);
 
   function load() {
@@ -85,7 +96,8 @@
 
     // When, on the reader's own clock, and its state.
     var when = $('[data-when]'); when.replaceChildren();
-    when.appendChild(U.status('session', live ? 'live' : finished ? 'finished' : safe(session.meet_url) ? 'ready' : 'planned'));
+    var own = session.mode === 'own';
+    when.appendChild(U.status('session', own && !finished ? 'own' : live ? 'live' : finished ? 'finished' : safe(session.meet_url) ? 'ready' : 'planned'));
     if (session.starts_at) {
       var start = new Date(session.starts_at), end = new Date(start.getTime() + cohort.session_minutes * 60000);
       var time = function (d) { return d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }); };
@@ -96,7 +108,9 @@
 
     // What a person does from here: join the call; afterward, the recording.
     var acts = $('[data-actions]'); acts.replaceChildren();
-    if (!finished && safe(session.meet_url)) acts.appendChild(link('Join the call', session.meet_url, 'btn-primary', true));
+    // A session on your own has no call to join (Ben, November 11, 2026:
+    // "a session without a call should be possible").
+    if (!finished && !own && safe(session.meet_url)) acts.appendChild(link('Join the call', session.meet_url, 'btn-primary', true));
     // A recording the recorder put in Drive plays here, through the relay,
     // for anyone who can read this session (the cohort and its leaders).
     var play = window.RecordLib && safe(session.recording_url) ? window.RecordLib.playUrl(session.recording_url, window.HUB.videoRelay) : null;
@@ -130,6 +144,8 @@
     $('[data-after-leading]').hidden = !leading;
     if (K.started) drawStory(cohort, session, leading);
     if (leading) drawEdits(session, cohort);
+    if (play && window.SessionReplay) window.SessionReplay.draw({ db: db, mount: $('[data-replay]'), video: $('[data-recording-video]'), cohort: cohort, session: session, me: K.me, leading: leading,
+      outcomes: lib.sessionOutcomes ? lib.sessionOutcomes(session, cohort) : [], hideNames: hidingNames });
     var wbReady = db.from('workbooks').select('id, kind').eq('session_id', session.id).then(function (r) {
       K.hasWorkbooks = (r.data || []).some(function (w) { return leading || w.kind === 'individual'; });
     }, function () {});
@@ -549,6 +565,13 @@
       box.appendChild(el('h3', null, leading ? 'What was kept, by person' : 'What was kept about you'));
       // Talk covers only what was recorded, and rooms never are.
       if (read && read.read_seconds) box.appendChild(el('p', 'small', 'Speaking is from ' + L.spoken(read.read_seconds) + ' of recording. Breakout rooms are not recorded.'));
+      // A leader's own share of the talking, as a mirror for them alone.
+      var mine = leading && window.ReplayLib ? window.ReplayLib.share(talk, K.me.id) : null;
+      if (mine != null) {
+        var mirror = el('p', 'session-talk-mirror');
+        mirror.appendChild(el('strong', null, 'You did ' + mine + ' percent of the talking.'));
+        box.appendChild(mirror);
+      }
       who.forEach(function (p) {
         var card = el('div', 'session-prep-q');
         if (leading) card.appendChild(el('h4', null, p.name));
@@ -630,14 +653,15 @@
       (res[2].data || []).forEach(function (e) { names[e.user_id] = e.profiles ? (e.profiles.display_name || e.profiles.github_login) : 'Someone'; });
       var ids = res[0].data.map(function (k) { return k.id; });
       var rows = (res[1].data || []).filter(function (a) { return ids.indexOf(a.check_id) >= 0; });
-      var checks = window.TeachLib.checkAnswers(res[0].data, rows, function (id) { return names[id] || 'Someone'; });
+      var checks = window.TeachLib.checkAnswers(res[0].data, rows, function (id) { return hidingNames() ? null : (names[id] || 'Someone'); });
       if (!checks.length) box.appendChild(U.empty('No questions were asked in this session'));
+      else box.appendChild(hideNamesSwitch(function () { drawAfter(cohort, session); }));
       checks.forEach(function (k) {
         var card = el('div', 'session-prep-q');
         card.appendChild(el('h3', null, k.prompt));
         if (!k.answers.length) card.appendChild(el('p', 'small', 'No answers.'));
         k.answers.forEach(function (a) {
-          var p = el('p'); p.appendChild(el('strong', null, a.name + ': ')); p.appendChild(document.createTextNode(a.text));
+          var p = el('p'); if (a.name) p.appendChild(el('strong', null, a.name + ': ')); p.appendChild(document.createTextNode(a.text));
           card.appendChild(p);
         });
         box.appendChild(card);
@@ -660,7 +684,7 @@
     // A custom cohort's session also has its own date and time, and can go
     // while nothing of anyone's is in it (the database refuses otherwise).
     var custom = cohort.schedule === 'custom', TL = window.TeachLib;
-    var rename = el('button', 'btn-secondary small session-rename-open', custom ? 'Change' : 'Rename');
+    var rename = el('button', 'btn-secondary small session-rename-open', 'Change');
     $('[data-when-fields]').hidden = !custom;
     $('[data-remove-session]').hidden = !custom;
     rename.type = 'button';
@@ -670,6 +694,7 @@
     rename.addEventListener('click', function () {
       var now = K.editing;
       title.elements.title.value = now.title && now.title !== lib.sessionName(now.number, cohort) ? now.title : '';
+      title.elements.own.checked = now.mode === 'own';
       if (custom) {
         var at = now.starts_at && TL ? TL.zonedParts(now.starts_at, cohort.time_zone) : { date: '', time: '' };
         title.elements.date.value = at.date; title.elements.time.value = at.time;
@@ -699,14 +724,15 @@
     }
     title.onsubmit = function (ev) {
       ev.preventDefault();
-      var patch = { title: title.elements.title.value.trim() || lib.sessionName(K.editing.number, cohort) };
+      var patch = { title: title.elements.title.value.trim() || lib.sessionName(K.editing.number, cohort), mode: title.elements.own.checked ? 'own' : 'call' };
+      var modeMoved = patch.mode !== (K.editing.mode || 'call');
       if (custom) {
         var d = title.elements.date.value, t = title.elements.time.value;
         if (d && !t) return U.say($('[data-title-status]'), 'Choose a time as well as a date.', 'problem');
         patch.starts_at = d && t && TL ? TL.zonedToUtc(d, t, cohort.time_zone).toISOString() : null;
       }
       save(patch, $('[data-title-status]'), function () {
-        if (custom) return location.reload();
+        if (custom || modeMoved) return location.reload();
         head.textContent = lib.sessionTitle(K.editing, cohort);
         open(false);
       });
@@ -721,7 +747,10 @@
       ev.preventDefault();
       var link = rec.elements.recording_url.value.trim(), said = $('[data-recording-status]');
       if (link && !safe(link)) { U.say(said, 'A recording link starts with https://', 'problem'); return; }
-      save({ recording_url: link || null }, said);
+      // Another recording starts at another time, so its moments line up again.
+      var patch = { recording_url: link || null };
+      if ((link || null) !== (K.editing.recording_url || null)) patch.recording_started_at = null;
+      save(patch, said);
     };
   }
 

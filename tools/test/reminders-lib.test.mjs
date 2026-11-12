@@ -89,3 +89,15 @@ test('a cohort on its own schedule names sessions, not weeks', () => {
   assert.match(l, /Session 3 is/);
   assert.match(l, /- Rosa: answer 3 questions before Session 3/);
 });
+
+test('feedback goes in whole, with the moment to watch', () => {
+  const m = R.feedbackMessage({ author: 'Ana', number: 2, schedule: 'weekly', at: 725, body: 'You asked the room first.\nThat worked.', outcome: 'questions', slug: 'c1' });
+  assert.match(m, /^\*\*Feedback from Ana on .*, at 12:05\*\*/);
+  assert.match(m, /> You asked the room first\.\n> That worked\./);
+  assert.match(m, /#questions/);
+  assert.match(m, /\[Watch that moment\]\(https:\/\/humanshaped\.org\/session\/\?c=c1&s=2&t=recording&at=725\)/);
+});
+
+test('an announcement says who wrote it and where', () => {
+  assert.match(R.announcementBody({ body: ' No session Friday. ', author: 'Ana', cohort: 'Spring', slug: 'c1' }), /^No session Friday\.\n\n_From Ana, for Spring, on \[humanshaped\.org\]/);
+});

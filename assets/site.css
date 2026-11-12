@@ -3472,3 +3472,55 @@ a.person-name:hover { text-decoration: underline; }
 /* A clock the leader started, over whatever the stage shows. */
 .stage-leader-clock { position: fixed; top: 1.5vmin; right: 2vmin; z-index: 20; margin: 0; padding: 0.4rem 0.9rem; border-radius: 999px; background: var(--ink); color: var(--paper); font-weight: 700; font-size: clamp(1rem, 2.6vmin, 1.8rem); font-variant-numeric: tabular-nums; box-shadow: 0 2px 8px rgba(0,0,0,0.35); }
 .stage-leader-clock[hidden] { display: none; }
+
+/* The recording's moments (session-replay.js): each row opens the video at
+   its second, and the row the video is at is marked as it plays. */
+.session-replay { margin-top: 1.5rem; }
+.session-replay h2 { margin-bottom: 0.25rem; }
+.ui-switch-row { display: inline-flex; align-items: center; gap: 0.4rem; margin: 0 0 0.75rem; font-size: 0.9rem; }
+.ui-switch-row input { width: auto; margin: 0; }
+.replay-bar { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.75rem 0; }
+.replay-bar select { width: auto; }
+.replay-here { margin: 0 0 0.75rem; }
+.replay-rows { list-style: none; margin: 0; padding: 0; }
+.replay-row { display: flex; align-items: baseline; gap: 0.75rem; padding: 0.45rem 0.5rem; border-bottom: 1px solid var(--rule); border-radius: 6px; }
+.replay-row[aria-current] { background: var(--surface); }
+.replay-row .link-button { margin-left: auto; white-space: nowrap; font-size: 0.85rem; }
+.replay-text { margin: 0; flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.replay-kind { font-weight: 600; }
+.replay-part .replay-text { font-size: 1.05rem; }
+.replay-at { font: inherit; font-variant-numeric: tabular-nums; background: none; border: 0; padding: 0; color: var(--accent); cursor: pointer; text-decoration: underline; text-underline-offset: 0.2em; min-width: 3.2rem; text-align: left; }
+.replay-talk .replay-text, .replay-reaction .replay-text { color: var(--muted); }
+.replay-feedback-form, .replay-line-up { margin: 0.75rem 0; padding: 0.75rem; border: 1px solid var(--rule); border-radius: 0.75rem; }
+.replay-line-up h3 { margin-top: 0; }
+.replay-drafts { margin-top: 1.5rem; }
+.replay-draft-list { list-style: none; margin: 0 0 1rem; padding: 0; }
+.replay-draft-list li { padding: 0.6rem 0; border-bottom: 1px solid var(--rule); }
+.replay-draft-list p { margin: 0.2rem 0; }
+/* Mark this moment, under the reactions (addon.js drawMark). */
+.p2-mark { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; padding: 6px 16px 8px; background: var(--paper); }
+.p2-mark-said { font-size: 13px; color: var(--muted); }
+.p2-mark-said:empty { display: none; }
+.p2-mark-word { display: flex; gap: 6px; flex-basis: 100%; }
+.p2-mark-word input { flex: 1; min-width: 0; margin: 0; }
+.p2-talk-mirror { margin: 8px 0 0; font-size: 13px; color: var(--muted); }
+.roster-say { font-size: 12px; color: var(--muted); font-style: italic; }
+.stage-say { margin: 0.25rem 0 0; font-size: clamp(1rem, 2.4vw, 1.6rem); color: var(--muted); font-style: italic; }
+
+/* Apps side by side (stage 'apps'), and a part's document beside its open
+   question: the question keeps the left half, the document the right. */
+.stage-apps:not([hidden]) { position: fixed; inset: 0; z-index: 1; padding: 0.5rem; background: var(--paper); }
+.has-strip .stage-apps:not([hidden]) { bottom: var(--strip); }
+.stage-apps-grid { display: grid; grid-template-columns: repeat(var(--apps, 2), minmax(0, 1fr)); gap: 0.5rem; height: 100%; }
+.stage-apps-cell { display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 0.35rem; min-width: 0; }
+.stage-ready:has(.stage-apps:not([hidden])) .addon-mark { visibility: hidden; }
+.stage-beside:not([hidden]) { position: fixed; top: 0; right: 0; bottom: 0; width: 50vw; z-index: 1; display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 0.5rem; padding: 0.5rem; background: var(--paper); border-left: 1px solid var(--rule); }
+.has-strip .stage-beside:not([hidden]) { bottom: var(--strip); }
+.has-beside .stage-body[data-view="check"]:not([hidden]) { width: calc(50vw - 8vmin); max-width: none; margin: 0; }
+.has-beside .stage-body[data-view="check"] .stage-title { font-size: clamp(1.25rem, 3.4vmin, 2.4rem); }
+.announcement-list { list-style: none; padding: 0; }
+.announcement { padding: 0.75rem 0; border-bottom: 1px solid var(--rule); }
+.announcement p { margin: 0.2rem 0; }
+.announcement-body { white-space: pre-wrap; }
+.announcement-new { margin: 0 0 1rem; }
+.announcement-new > summary { cursor: pointer; font-weight: 600; }

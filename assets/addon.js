@@ -210,7 +210,7 @@
 
   var S = { me: null, room: null, cohort: null, session: null, prev: null, teaching: false, names: {}, people: [], groups: [], brought: [],
     parts: [], autoAsked: {}, paused: {}, chosenPart: null, timerEnds: null, drawnPart: undefined, show: null,
-    items: [], checks: [], answers: [], results: {}, onStage: null, stageOn: false, rooms: null, roomPlaces: {}, signals: null };
+    items: [], checks: [], answers: [], results: {}, answersOpen: {}, onStage: null, stageOn: false, rooms: null, roomPlaces: {}, signals: null };
   var channel = null, poller = null, nudgeTimer = null, deferred = {}, drafts = {};
   var Q = window.QuestionView, askFields = null;  // the question bank (R4)
 
@@ -343,8 +343,8 @@
       var cohort = c.data;
       return Promise.all([
         db.from('sessions').select('*').eq('cohort_id', id).order('number'),
-        db.from('enrollments').select('user_id, app_url, profiles(github_login, display_name)').eq('cohort_id', id).neq('status', 'left'),
-        db.from('cohort_teachers').select('user_id, profiles(github_login, display_name)').eq('cohort_id', id),
+        db.from('enrollments').select('user_id, app_url, profiles(github_login, display_name, say_like)').eq('cohort_id', id).neq('status', 'left'),
+        db.from('cohort_teachers').select('user_id, profiles(github_login, display_name, say_like)').eq('cohort_id', id),
         db.from('groups').select('*, group_members(user_id)').eq('cohort_id', id).order('name'),
         db.from('call_guests').select('*').eq('cohort_id', id).order('joined_at', { ascending: false })
       ]).then(function (res) {
@@ -358,7 +358,8 @@
         S.groups = res[3].data;
         S.teaching = res[2].data.some(function (t) { return t.user_id === S.me.id; });
         S.teacherIds = res[2].data.map(function (t) { return t.user_id; });
-        S.people.concat(res[2].data).forEach(function (p) { if (p.profiles) S.names[p.user_id] = p.profiles.display_name || p.profiles.github_login; });
+        S.sayLike = {};
+        S.people.concat(res[2].data).forEach(function (p) { if (p.profiles) { S.names[p.user_id] = p.profiles.display_name || p.profiles.github_login; if (p.profiles.say_like) S.sayLike[p.user_id] = p.profiles.say_like; } });
         useGuests(res[4].data);
         var t = lib.currentAndNext(ss, new Date(), cohort.session_minutes);
         var named = standalone && standaloneNumber != null ? ss.filter(function (x) { return x.number === standaloneNumber; })[0] : null;
@@ -477,6 +478,13 @@
           var kept = part && S.paused[part.key];
           if (part) delete S.paused[part.key];
           S.run.clock(true, kept ? new Date(Date.now() - (part.minutes * 60 - kept) * 1000) : null);
+        },
+        onNudge: function (delta) {
+          var part = partNow(), end = endsNow() ? new Date(endsNow()).getTime() : null;
+          if (!part || !end) return;
+          if (!shared()) { S.timerEnds = Math.max(Date.now(), end + delta * 1000); tick(); return; }
+          var to = Math.max(Date.now(), end + delta * 1000);
+          S.run.clock(true, new Date(to - part.minutes * 60000));
         },
         onFollow: function () { setPin(null); },
         canEdit: function (key) {
@@ -800,6 +808,7 @@
       rows.forEach(function (x) {
         var li = el('li', missing ? 'is-missing' : null);
         li.appendChild(el('span', 'roster-name', x.name));
+        if (S.sayLike && S.sayLike[x.id]) li.appendChild(el('span', 'roster-say', 'say it like ' + S.sayLike[x.id]));
         if (x.stage) li.appendChild(el('span', 'roster-stage', RL.STAGE_SHORT[x.stage]));
         if (asking) li.appendChild(el('span', x.answered ? 'roster-answered' : 'roster-waiting', x.answered ? 'Answered' : 'Not yet'));
         ul.appendChild(li);
@@ -1019,6 +1028,7 @@
     ['[data-sig-recording]', '[data-sig-where]', '[data-sig-card]', '[data-sig-stage]'].forEach(function (s) { now.appendChild($(s)); });
     now.appendChild(S.nowWhat);
     if (S.teaching) now.appendChild(S.nowNotes);
+    if (S.teaching) drawTalkMirror(now);
     S.partTools = el('section', 'p2-group p2-part-tools'); S.partTools.hidden = true;
     S.partTools.setAttribute('aria-label', 'For this part');
     now.appendChild(S.partTools);
@@ -1075,8 +1085,72 @@
     F.put(mine, root.querySelector('.addon-foot'));
     // The bar that stays: reactions and a guest's name stay with a learner.
     F.low.appendChild($('[data-react]'));
+    drawMark(F.low);
     F.on(function () { nextMove(); }, function () { if (S.run) S.run.step(-1).then(afterMove); });
   }
+  // A leader's own share of the talking in the last recorded session, for
+  // the leader alone (Ben, November 11, 2026: "if the leader is aware of
+  // their own talk time, they are more likely to ask questions rather than
+  // continue to talk"). Never anyone else's, never compared.
+  function drawTalkMirror(mount) {
+    if (!S.me || !S.cohort || !S.session || !window.ReplayLib) return;
+    var line = el('p', 'p2-talk-mirror'); line.hidden = true;
+    mount.appendChild(line);
+    Promise.all([
+      db.from('sessions').select('id, number, title').eq('cohort_id', S.cohort.id).neq('id', S.session.id),
+      db.from('session_talk').select('session_id, user_id, started_s, ended_s').eq('cohort_id', S.cohort.id).neq('session_id', S.session.id).limit(20000)
+    ]).then(function (res) {
+      if (res[0].error || res[1].error) return;
+      var by = {};
+      res[1].data.forEach(function (t) { (by[t.session_id] = by[t.session_id] || []).push(t); });
+      var last = res[0].data.filter(function (x) { return by[x.id]; }).sort(function (a, b) { return b.number - a.number; })[0];
+      if (!last) return;
+      var p = window.ReplayLib.share(by[last.id], S.me.id);
+      if (p == null) return;
+      line.textContent = 'In ' + (lib.sessionTitle ? lib.sessionTitle(last, S.cohort) : 'the last session') + ', you did ' + p + ' percent of the talking.';
+      line.title = 'From its recording.';
+      line.hidden = false;
+    });
+  }
+
+  // Mark this moment: one press keeps the time, for leaders and learners, to
+  // find later beside the recording. Only the person who marks sees it
+  // (session_marks, migration 20261112010000).
+  function drawMark(mount) {
+    if (!S.me || !S.session || !S.cohort || standalone) return;
+    var row = el('div', 'p2-mark');
+    var said = el('span', 'p2-mark-said'); said.setAttribute('role', 'status');
+    var word = null, last = null, quiet = null;
+    var press = button('Mark this moment', 'btn-secondary small p2-mark-btn', function () {
+      press.disabled = true;
+      db.from('session_marks').insert({ cohort_id: S.cohort.id, session_id: S.session.id }).select('id').single().then(function (r) {
+        press.disabled = false;
+        if (r.error) { said.textContent = 'Not marked: ' + r.error.message; return; }
+        last = r.data.id;
+        said.textContent = 'Marked ' + new Date().toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }) + '.';
+        if (!word) {
+          word = el('form', 'p2-mark-word');
+          var i = el('input'); i.type = 'text'; i.maxLength = 80; i.placeholder = 'A word to find it by'; i.setAttribute('aria-label', 'A word to find this mark by');
+          var ok = el('button', 'btn-secondary small', 'Save'); ok.type = 'submit';
+          word.appendChild(i); word.appendChild(ok);
+          word.addEventListener('submit', function (ev) {
+            ev.preventDefault();
+            var w = i.value.trim();
+            if (!w || !last) return;
+            db.from('session_marks').update({ word: w }).eq('id', last).then(function (u) { said.textContent = u.error ? 'Not saved: ' + u.error.message : 'Marked: ' + w + '.'; i.value = ''; word.hidden = true; });
+          });
+          row.appendChild(word);
+        }
+        word.hidden = false;
+        clearTimeout(quiet);
+        quiet = setTimeout(function () { if (word && !word.contains(document.activeElement)) word.hidden = true; }, 20000);
+      });
+    });
+    press.title = 'Find it later beside the recording, on the session page. Only you see your marks.';
+    row.appendChild(press); row.appendChild(said);
+    mount.appendChild(row);
+  }
+
   // Open rooms' tools in this cohort's call: the call's own room carries a
   // website, a clock, Propose and vote, and stances (ADDON-DESIGN.md).
   function startCohortRoom() {
@@ -2359,9 +2433,49 @@
   }
   // A leader puts anyone's app on every stage in one press.
   // A leader puts anyone's app on every stage in one press.
+  function appUrls() {
+    var m = {};
+    (S.people || []).forEach(function (p) { if (p.app_url) m[p.user_id] = p.app_url; });
+    return m;
+  }
+  // Two or three apps side by side, to compare builds (stage 'apps').
+  function drawCompare(box, rows) {
+    var framed = rows.filter(function (p) { return A.frameable(p.app_url); });
+    if (framed.length < 2) return;
+    var up = S.onStage && S.onStage.kind === 'apps';
+    var d = el('details', 'p2-compare');
+    d.open = !!S.compareOpen || up;
+    d.addEventListener('toggle', function () { S.compareOpen = d.open; });
+    d.appendChild(el('summary', null, 'Side by side'));
+    S.comparePick = S.comparePick || {};
+    var ul = el('ul', 'roster-list');
+    framed.forEach(function (p) {
+      var li = el('li'), lab = el('label', 'ui-switch-row');
+      var c = el('input'); c.type = 'checkbox'; c.checked = !!S.comparePick[p.user_id];
+      c.addEventListener('change', function () {
+        if (c.checked && Object.keys(S.comparePick).filter(function (k) { return S.comparePick[k]; }).length >= 3) { c.checked = false; said.textContent = 'Three at most.'; return; }
+        S.comparePick[p.user_id] = c.checked; said.textContent = '';
+      });
+      lab.appendChild(c); lab.appendChild(document.createTextNode(' ' + (S.names[p.user_id] || 'Someone')));
+      li.appendChild(lab); ul.appendChild(li);
+    });
+    d.appendChild(ul);
+    var said = el('span', 'ui-inline-status'); said.setAttribute('role', 'status');
+    var acts = el('div', 'actions');
+    acts.appendChild(button('Show them side by side', 'btn-secondary small', function () {
+      var ids = Object.keys(S.comparePick).filter(function (k) { return S.comparePick[k]; });
+      if (ids.length < 2) { said.textContent = 'Choose two or three.'; return; }
+      setPin({ kind: 'apps', ids: ids.slice(0, 3) });
+    }));
+    if (up) acts.appendChild(button('Take them down', 'btn-secondary small', function () { setPin(null); }));
+    acts.appendChild(said);
+    d.appendChild(acts);
+    box.appendChild(d);
+  }
   function drawApps() {
     var box = S.appsBox;
     if (!box) return;
+    if (box.contains(document.activeElement) && document.activeElement.type === 'checkbox') return;
     box.replaceChildren();
     var rows = S.people.filter(function (p) { return p.app_url && L.classifyLink(p.app_url); });
     box.hidden = !rows.length;
@@ -2382,6 +2496,7 @@
       ul.appendChild(li);
     });
     box.appendChild(ul);
+    drawCompare(box, rows);
   }
 
   function drawChecksChrome() {
@@ -2402,6 +2517,7 @@
     return db.from('live_checks').update(change).eq('id', check.id).then(function (r) { if (!r.error) refreshLive(); });
   }
 
+  function hidingNames() { try { return localStorage.getItem('hs-hide-names') === '1'; } catch (e) { return false; } }
   function teacherCheck(k) {
     var card = el('article', 'cohort-card live-check');
     card.appendChild(el('p', 'kicker', L.questionKind(L.kindOf(k)).name));
@@ -2413,9 +2529,17 @@
     if (mine.length) {
       var details = el('details', 'addon-answers');
       details.appendChild(el('summary', null, 'Read the answers'));
+      details.open = !!S.answersOpen[k.id];
+      details.addEventListener('toggle', function () { S.answersOpen[k.id] = details.open; });
+      // Read the idea before the person: names hidden, kept in this browser.
+      var hide = el('label', 'ui-switch-row');
+      var hb = el('input'); hb.type = 'checkbox'; hb.checked = hidingNames();
+      hb.addEventListener('change', function () { try { localStorage.setItem('hs-hide-names', hb.checked ? '1' : '0'); } catch (e) {} drawChecks(); });
+      hide.appendChild(hb); hide.appendChild(document.createTextNode(' Hide names'));
+      details.appendChild(hide);
       var ul = el('ul', 'live-answers');
       mine.sort(function (a, b) { return a.updated_at.localeCompare(b.updated_at); }).forEach(function (a) {
-        var li = el('li'); li.appendChild(el('strong', null, nameOf(a.user_id) + ': ')); li.appendChild(document.createTextNode(L.answerText(k, a) || ''));
+        var li = el('li'); if (!hidingNames()) li.appendChild(el('strong', null, nameOf(a.user_id) + ': ')); li.appendChild(document.createTextNode(L.answerText(k, a) || ''));
         // A written answer can go on every stage, without its author's name
         // until the leader shows it (on_stage, migration 20261111070000).
         if (a.body && S.run && S.run.shared) {
@@ -2771,7 +2895,7 @@
       studio: S.studioKey ? { key: S.studioKey, text: S.studioHeld != null ? S.studioHeld : (S.decks || {})[S.studioKey] || (sceneOf(S.studioKey) || {}).slides || '', gh: window.SlidesLib ? window.SlidesLib.ghAll() : {} } : null,
       boardStage: (A.boardLinks(S.cohort, S.session, null, null) || {}).stage,
       mineOf: function (k) { var x = myAnswer(k); return x ? { choice: x.choice, picks: Array.isArray(x.value) ? x.value : undefined, body: x.body } : null; },
-      onStage: S.onStage || (S.card ? null : partCheckPin()), beside: S.onStage && (S.onStage.kind === 'answer' || S.onStage.kind === 'work') ? partCheckPin() || latestCheckPin() : null, checks: S.checks, results: S.results, items: S.items, names: S.names, audience: V ? V.audienceOf(part) : null,
+      onStage: S.onStage || (S.card ? null : partCheckPin()), beside: S.onStage && (S.onStage.kind === 'answer' || S.onStage.kind === 'work') ? partCheckPin() || latestCheckPin() : null, checks: S.checks, results: S.results, items: S.items, names: S.names, sayLike: S.sayLike || {}, appUrls: appUrls(), audience: V ? V.audienceOf(part) : null,
       welcome: lib.welcome(S.cohort, S.session, S.list && S.list.length ? S.list : S.parts), scene: scene, slides: slidesView(part),
       doc: part && part.own && part.config && part.config.show ? part.config.show : null,
       onStageDetail: S.onStageDetail || null,

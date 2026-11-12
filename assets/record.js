@@ -345,7 +345,7 @@
         status.replaceChildren(document.createTextNode('In Drive: '));
         var a = el('a', null, 'open it'); a.href = link; a.target = '_blank'; a.rel = 'noopener'; status.appendChild(a);
         if (!(K.me && K.leading && K.cohort)) { status.appendChild(document.createTextNode('. Sign in as a leader to put it on the session page, or paste the link there.')); return; }
-        return db.from('sessions').update({ recording_url: link }).eq('cohort_id', K.cohort.id).eq('number', m.number).select('id').then(function (r) {
+        return db.from('sessions').update({ recording_url: link, recording_started_at: m.started ? new Date(m.started).toISOString() : null }).eq('cohort_id', K.cohort.id).eq('number', m.number).select('id').then(function (r) {
           status.appendChild(document.createTextNode(r.error || !r.data || !r.data.length ? '. It is not on the session page yet; paste the link there.' : ', and it is on the session page.'));
         });
       }).catch(function (e) {

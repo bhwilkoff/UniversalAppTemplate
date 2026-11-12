@@ -72,3 +72,9 @@ test('a cohort on its own schedule names each event as a session', () => {
   assert.equal(L.resource({ ...S, schedule: 'custom', number: 2, title: 'Session 2' }, true).summary, 'Fall: Session 2');
   assert.equal(L.resource({ ...S, number: 0, title: '' }, true).summary, 'Fall: Prep');
 });
+
+test('a session on your own goes on the calendar with no call', () => {
+  const r = L.resource({ ...S, mode: 'own' }, true);
+  assert.equal(r.conferenceData, undefined);
+  assert.match(r.description, /^This session has no call\./);
+});

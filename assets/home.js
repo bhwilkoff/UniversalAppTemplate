@@ -135,7 +135,7 @@
         var answered = H.answeredPolls(polls);
 
         return Promise.all([
-          ids.length ? db.from('sessions').select('cohort_id, number, starts_at, meet_url').in('cohort_id', ids) : { data: [] },
+          ids.length ? db.from('sessions').select('cohort_id, number, starts_at, meet_url, mode').in('cohort_id', ids) : { data: [] },
           teacher ? db.from('time_polls').select('id, title, open, created_at, time_poll_answers(count)').order('created_at', { ascending: false }) : { data: [] },
           taught.length ? db.from('shares').select('cohort_id, kind, created_at, feedback(author_id)').in('cohort_id', taught).in('kind', ['for-feedback', 'question']) : { data: [] },
           taught.length ? db.from('cohort_teachers').select('cohort_id, user_id').in('cohort_id', taught) : { data: [] },
@@ -201,7 +201,7 @@
     m.comingUp.forEach(function (u) {
       var c = u.cohort, slug = encodeURIComponent(c.slug);
       var acts = [];
-      var meet = safeUrl(u.session.meet_url);
+      var meet = u.session.mode === 'own' ? null : safeUrl(u.session.meet_url);
       // One button: the call while it is on, the session's page until then.
       if (u.live && meet) acts.push(link(meet, 'Join the call', 'btn-primary'));
       else acts.push(link('/session/?c=' + slug + '&s=' + Number(u.session.number), 'Open the session', u.live ? 'btn-primary' : 'btn-secondary small'));

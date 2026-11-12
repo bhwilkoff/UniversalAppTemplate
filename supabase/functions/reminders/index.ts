@@ -142,7 +142,65 @@ Deno.serve(async (req) => {
       await send(l.user_id, who, due, R.leaderMessage({ ...common, login: who, events: news, people: due ? people : [], issues: due ? issues : [], feedback: due ? waiting : 0, calendar: due && !!cal }));
     }
   }
-  return reply(problems.length ? 207 : 200, { dry, repaired, sent, problems });
+  // The people named below: profiles hang off auth.users, so they are read apart.
+  const names = new Map<string, { display_name?: string; github_login?: string }>();
+  const nameOf = async (list: string[]) => {
+    const want = [...new Set(list)].filter((x) => x && !names.has(x));
+    if (!want.length) return;
+    const got = await db.from('profiles').select('id, display_name, github_login').in('id', want);
+    for (const p of got.data || []) names.set(p.id, p);
+  };
+
+  // Announcements whose time has come, as issues in the cohort repository,
+  // so GitHub carries them to everyone watching it.
+  const posted: unknown[] = [];
+  const due = await db.from('cohort_announcements').select('*').in('cohort_id', ids).is('sent_at', null).lte('send_at', now.toISOString()).order('send_at').limit(10);
+  await nameOf((due.data || []).map((a) => a.author_id));
+  for (const a of (due.data || [])) {
+    const c = cohorts.find((x) => x.id === a.cohort_id)!;
+    const ap = names.get(a.author_id);
+    const author = ap?.display_name || ap?.github_login || 'A leader';
+    const body = R.announcementBody({ body: a.body, author, cohort: c.title, slug: c.slug });
+    if (dry) { posted.push({ cohort: c.slug, title: a.title }); continue; }
+    const made = await gh('POST', `/repos/${c.github_repo}/issues`, { title: a.title, body });
+    if (made.status >= 300) {
+      await db.from('cohort_announcements').update({ problem: `GitHub said ${made.status}` }).eq('id', a.id);
+      problems.push(`announcement ${a.id}: ${made.status}`);
+      continue;
+    }
+    // Pinned when GitHub allows it; an unpinned issue still reaches everyone.
+    await gh('POST', '/graphql', { query: 'mutation($id:ID!){pinIssue(input:{issueId:$id}){issue{id}}}', variables: { id: made.body.node_id } });
+    await db.from('cohort_announcements').update({ sent_at: now.toISOString(), issue_url: made.body.html_url, problem: null }).eq('id', a.id);
+    posted.push({ cohort: c.slug, title: a.title });
+    await pause();
+  }
+
+  // Feedback a leader shared, into each learner's own thread. Someone who
+  // stopped reminders still reads it on the session page.
+  const given: unknown[] = [];
+  const fb = await db.from('moment_feedback').select('*, sessions(number)').in('cohort_id', ids).not('shared_at', 'is', null).is('delivered_at', null).limit(50);
+  const freshThreads = (await db.from('reminder_threads').select('*').in('cohort_id', ids)).data || [];
+  await nameOf((fb.data || []).flatMap((f) => [f.author_id, f.learner_id]));
+  for (const f of (fb.data || [])) {
+    const c = cohorts.find((x) => x.id === f.cohort_id)!;
+    const who = names.get(f.learner_id)?.github_login || '';
+    const au = names.get(f.author_id);
+    if (stopped.has(f.learner_id) || !who) {
+      if (!dry && !f.problem) await db.from('moment_feedback').update({ problem: who ? 'Reminders are off, so it is on the session page only.' : 'No GitHub account yet.' }).eq('id', f.id);
+      continue;
+    }
+    const body = R.feedbackMessage({ author: au?.display_name || au?.github_login, number: f.sessions?.number, schedule: c.schedule, at: f.at_s, body: f.body, outcome: f.outcome, slug: c.slug });
+    if (dry) { given.push({ to: who, cohort: c.slug }); continue; }
+    const t = freshThreads.find((x) => x.user_id === f.learner_id && x.cohort_id === c.id) || null;
+    const ok = await deliver(db, gh, f.learner_id, who, c, t, body, false, now, problems);
+    if (ok) {
+      await db.from('moment_feedback').update({ delivered_at: now.toISOString(), problem: null }).eq('id', f.id);
+      given.push({ to: who, cohort: c.slug });
+      if (!t) freshThreads.push(...((await db.from('reminder_threads').select('*').eq('user_id', f.learner_id).eq('cohort_id', c.id)).data || []));
+    }
+    await pause();
+  }
+  return reply(problems.length ? 207 : 200, { dry, repaired, sent, posted, given, problems });
 });
 
 // deno-lint-ignore no-explicit-any

@@ -134,9 +134,14 @@
         var row = el('div', 'show-clock-row');
         box.insertBefore(row, clock);
         row.appendChild(clock); row.appendChild(clockBtn);
+        // A running clock moves by half a minute either way.
+        var less = btn('−30 sec', 'btn-secondary small show-clock-nudge', function () { if (run.onNudge) run.onNudge(-30); });
+        var more = btn('+30 sec', 'btn-secondary small show-clock-nudge', function () { if (run.onNudge) run.onNudge(30); });
+        less.setAttribute('aria-label', 'Take 30 seconds off the clock'); more.setAttribute('aria-label', 'Add 30 seconds to the clock');
+        row.appendChild(less); row.appendChild(more);
         box.appendChild(acts);
       }
-      return { box: box, clock: clock, pinned: pinned, place: place, next: nextBtn, follow: follow, clockBtn: clockBtn, key: s.key };
+      return { box: box, clock: clock, pinned: pinned, place: place, next: nextBtn, follow: follow, clockBtn: clockBtn, nudges: clockBtn ? [less, more] : [], key: s.key };
     }
 
     function drawRun() {
@@ -157,6 +162,7 @@
         b.pinned.textContent = info.pinned ? 'The main stage shows ' + info.pinned + ' instead of this part.' : '';
         if (b.follow) b.follow.hidden = !info.pinned;
         if (b.clockBtn) b.clockBtn.textContent = info.clockOn ? 'Stop' : 'Start';
+        (b.nudges || []).forEach(function (n) { n.hidden = !info.clockOn || !run.onNudge; });
         var sl = info.slide;
         b.place.hidden = !sl;
         b.place.textContent = sl ? 'Slide ' + (sl.at + 1) + ' of ' + sl.count : '';

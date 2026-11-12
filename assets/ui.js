@@ -29,7 +29,7 @@
   var TONES = { done: 'check-circle', active: 'circle-fill', waiting: 'circle-dashed', off: 'minus-circle', problem: 'warning-circle' };
   var STATUS = {
     cohort: { draft: ['off', 'Draft'], open: ['active', 'Open'], running: ['active', 'Running'], finished: ['done', 'Finished'] },
-    session: { planned: ['waiting', 'Planned'], ready: ['active', 'Ready'], live: ['active', 'Live now'], finished: ['done', 'Finished'] },
+    session: { planned: ['waiting', 'Planned'], ready: ['active', 'Ready'], live: ['active', 'Live now'], finished: ['done', 'Finished'], own: ['active', 'On your own'] },
     poll: { open: ['active', 'Open'], closed: ['off', 'Closed'], answered: ['done', 'Answered'] },
     request: { waiting: ['waiting', 'Waiting'], approved: ['done', 'Approved'], declined: ['off', 'Declined'] },
     credential: { none: ['off', 'Not earned yet'], waiting: ['waiting', 'Waiting to be signed'], signed: ['done', 'Signed'], revoked: ['problem', 'Revoked'] },
@@ -43,7 +43,9 @@
     work: { ready: ['done', 'Ready'], notyet: ['waiting', 'Not yet'], confirmed: ['done', 'Confirmed'] },
     showing: { open: ['active', 'Open to guests'] },
     right: { held: ['done', 'Held'], none: ['off', 'Not held'] },
-    action: { saving: ['waiting', 'Saving'], signing: ['waiting', 'Signing'], failed: ['problem', 'Failed'] }
+    action: { saving: ['waiting', 'Saving'], signing: ['waiting', 'Signing'], failed: ['problem', 'Failed'] },
+    feedback: { draft: ['waiting', 'Draft'], shared: ['done', 'Shared'], sent: ['done', 'In their repository'] },
+    announcement: { scheduled: ['waiting', 'Scheduled'], sending: ['waiting', 'Posting'], posted: ['done', 'Posted'], failed: ['problem', 'Not posted'] }
   };
   function status(thing, state) {
     var s = STATUS[thing] && STATUS[thing][state];

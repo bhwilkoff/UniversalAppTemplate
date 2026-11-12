@@ -108,6 +108,7 @@ role you hold and the role named on the page, never a switcher.
 | `/about/`, `/principles/`, `/path/…`, `/stuck/…` | Reading | Read |
 | `/cohorts/` | Open cohorts, and what a week asks | Choose one to join |
 | `/meet/` | The Meet add-on: what it does in a session, in any other call, adding it, what it never does | Add it to Google Meet |
+| `/meet/before/` | Trying the add-on in a call of your own before a first session, and the move that brings the stage back | Start a call of your own |
 | `/room/?<code>` | An open room's main stage, for people without the add-on | Answer, add to the board, react |
 | `/apps/`, `/apps/app/?…` | Apps built this way; one app | Read, open the app |
 | `/events/`, `/start/…` | Events; kits for running one | Read, add an event |

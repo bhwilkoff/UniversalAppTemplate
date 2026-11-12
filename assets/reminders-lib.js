@@ -106,10 +106,31 @@
     return out.join('\n\n');
   }
 
+  // A leader's feedback on one moment, into the learner's own thread. It is
+  // their repository, so the words go in whole (Ben, November 11, 2026:
+  // "Feedback that is given directly to the learner should be private to them").
+  function clock(seconds) {
+    var s = Math.max(0, Math.floor(Number(seconds) || 0)), two = function (n) { return (n < 10 ? '0' : '') + n; };
+    var h = Math.floor(s / 3600), m = Math.floor(s / 60) % 60;
+    return h ? h + ':' + two(m) + ':' + two(s % 60) : m + ':' + two(s % 60);
+  }
+  function feedbackMessage(o) {
+    var head = '**Feedback from ' + (o.author || 'your leader') + ' on ' + sessionName(o.number, o.schedule) + (o.at != null ? ', at ' + clock(o.at) : '') + '**';
+    var out = [head, String(o.body || '').split('\n').map(function (l) { return '> ' + l; }).join('\n')];
+    if (o.outcome) out.push('#' + o.outcome);
+    var href = sessionUrl(o.slug, o.number) + '&t=recording' + (o.at != null ? '&at=' + Math.floor(o.at) : '');
+    out.push('[' + (o.at != null ? 'Watch that moment' : 'Open the session') + '](' + SITE + href + ')');
+    return out.join('\n\n');
+  }
+  // A leader's announcement, as an issue in the cohort repository.
+  function announcementBody(o) {
+    return String(o.body || '').trim() + '\n\n' + '_From ' + (o.author || 'a leader') + ', for ' + (o.cohort || 'this cohort') + ', on [humanshaped.org](' + SITE + cohortUrl(o.slug) + ')._';
+  }
+
   function issueTitle(cohortTitle) { return 'What is open for you: ' + cohortTitle; }
   function repoFor(login) { return 'reminders-' + String(login).toLowerCase(); }
 
-  var lib = { line: line, eventLine: eventLine, sorted: sorted, digestDue: digestDue, localDay: localDay, learnerMessage: learnerMessage, leaderMessage: leaderMessage, issueTitle: issueTitle, repoFor: repoFor, HOUR: HOUR, WINDOW: WINDOW };
+  var lib = { line: line, eventLine: eventLine, sorted: sorted, digestDue: digestDue, localDay: localDay, learnerMessage: learnerMessage, leaderMessage: leaderMessage, issueTitle: issueTitle, repoFor: repoFor, feedbackMessage: feedbackMessage, announcementBody: announcementBody, clock: clock, HOUR: HOUR, WINDOW: WINDOW };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
   else if (typeof globalThis !== 'undefined') globalThis.ReminderLib = lib;
   if (root && root !== globalThis) root.ReminderLib = lib;

@@ -115,7 +115,7 @@ The registry is the only source of status words (`UI.STATUS` in ui.js
 mirrors it; a test checks they match):
 
 - cohort: Draft (off), Open (active), Running (active), Finished (done)
-- session: Planned (waiting), Ready (active), Live now (active), Finished (done)
+- session: Planned (waiting), Ready (active), Live now (active), Finished (done), On your own (active)
 - poll: Open (active), Closed (off), Answered (done)
 - request to teach: Waiting (waiting), Approved (done), Declined (off)
 - credential: Not earned yet (off), Waiting to be signed (waiting), Signed (done), Revoked (problem)
@@ -130,6 +130,8 @@ mirrors it; a test checks they match):
 - showing: Open to guests (active)
 - right: Held (done), Not held (off)
 - action: Saving (waiting), Signing (waiting), Failed (problem)
+- feedback: Draft (waiting), Shared (done), In their repository (done)
+- announcement: Scheduled (waiting), Posting (waiting), Posted (done), Not posted (problem)
 
 ### Visibility marker — `UI.visibility(audience)` (R§6.5, R§2.15)
 Who can see this, as an icon and fixed words, narrow to wide. Each word is

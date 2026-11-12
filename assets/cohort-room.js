@@ -86,7 +86,13 @@
         row.appendChild(btn(m + ' min', 'btn-secondary', function () { send({ t: 'clock', seconds: m * 60, label: label.value }); }));
       });
       box.appendChild(row);
-      if (room && room.clock) box.appendChild(btn('Stop the clock', 'btn-secondary small', function () { send({ t: 'clock', seconds: 0 }); }));
+      if (room && room.clock) {
+        var run = el('div', 'open-picks is-row');
+        run.appendChild(btn('−30 sec', 'btn-secondary small', function () { send({ t: 'clockAdd', seconds: -30 }); }));
+        run.appendChild(btn('+30 sec', 'btn-secondary small', function () { send({ t: 'clockAdd', seconds: 30 }); }));
+        run.appendChild(btn('Stop the clock', 'btn-secondary small', function () { send({ t: 'clock', seconds: 0 }); }));
+        box.appendChild(run);
+      }
     }
 
     function noteList(box, host) {

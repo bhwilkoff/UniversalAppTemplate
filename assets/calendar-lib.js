@@ -18,6 +18,12 @@
   function sessionPage(s) { return SITE + '/session/?c=' + encodeURIComponent(s.slug) + '&s=' + Number(s.number); }
 
   function description(s) {
+    // A session on your own has no call: its page holds the work.
+    if (s.mode === 'own') return [
+      'This session has no call. Work on your own with what is on its page: ' + sessionPage(s),
+      '',
+      'Not in the cohort yet? Join here first: ' + SITE + '/account/?join=' + encodeURIComponent(s.slug)
+    ].join('\n');
     return [
       'What to bring, and the plan for the hour: ' + sessionPage(s),
       '',
@@ -27,6 +33,7 @@
       '',
       'In the call, open Human Shaped from Activities.',
       'Add it to Google Meet once, from a computer: ' + LISTING,
+      'Before your first session, try it in a call of your own: ' + SITE + '/meet/before/',
       '',
       'Sessions are recorded, and the host says so at the start.',
       'Recordings are shared only with this cohort.',
@@ -59,6 +66,7 @@
       extendedProperties: { private: { hsSessionId: s.session_id, hsCohortId: s.slug } }
     };
     var code = meetCodeOf(s.meet_url);
+    if (s.mode === 'own') return r;
     if (isNew && code) {
       r.conferenceData = { conferenceId: code, conferenceSolution: { key: { type: 'hangoutsMeet' } },
         entryPoints: [{ entryPointType: 'video', uri: 'https://meet.google.com/' + code, label: 'meet.google.com/' + code }] };
@@ -101,7 +109,7 @@
     function insert(s) {
       var fresh = resource(s, true);
       return call('POST', API + '?conferenceDataVersion=1&sendUpdates=all', fresh).then(function (r) {
-        if (r.ok) return untilMeet(r.body, 8);
+        if (r.ok) return s.mode === 'own' ? r.body : untilMeet(r.body, 8);
         if (!meetCodeOf(s.meet_url)) fail(r);
         delete fresh.conferenceData;
         fresh.location = s.meet_url;

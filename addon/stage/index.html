@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261111zk">
+  <link rel="stylesheet" href="/assets/site.css?v=20261112b">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -154,6 +154,11 @@
         <div class="stage-app-bar"><strong><span data-app-who></span>’s app</strong><span class="stage-app-note" data-app-note></span><a class="stage-app-open" data-app-open target="_blank" rel="noopener">Open in a new tab</a></div>
         <div class="stage-app-frame" data-app-frame></div>
       </div>
+      <div class="stage-apps" data-view="apps" hidden><div class="stage-apps-grid" data-apps-grid></div></div>
+      <aside class="stage-beside" data-beside hidden>
+        <div class="stage-app-bar"><strong data-beside-name></strong><a class="stage-app-open" data-beside-open target="_blank" rel="noopener">Open in a new tab</a></div>
+        <div class="stage-app-frame" data-beside-frame></div>
+      </aside>
       <div class="stage-app" data-view="doc" hidden>
         <div class="stage-app-bar"><strong data-doc-name></strong><a class="stage-app-open" data-doc-open target="_blank" rel="noopener">Open in a new tab</a></div>
         <div class="stage-app-frame" data-doc-frame></div>
@@ -161,6 +166,7 @@
       <div class="stage-body" data-view="person" hidden>
         <p class="kicker">Featured</p>
         <h1 class="stage-title" data-person-who></h1>
+        <p class="stage-say" data-person-say hidden></p>
         <p class="stage-audience" data-person-audience hidden></p>
       </div>
       <div class="stage-body" data-view="people" hidden>
@@ -203,16 +209,16 @@
   <script src="/assets/vendor/deck-kit.js?v=20261104e" defer></script>
   <script src="/assets/addon-config.js" defer></script>
   <script src="/assets/live-lib.js?v=20261111i" defer></script>
-  <script src="/assets/addon-lib.js?v=20261111zc" defer></script>
+  <script src="/assets/addon-lib.js?v=20261112b" defer></script>
   <script src="/assets/react-lib.js?v=20261106j" defer></script>
   <script src="/assets/code-lib.js" defer></script>
-  <script src="/assets/ui.js?v=20261023h" defer></script>
+  <script src="/assets/ui.js?v=20261112b" defer></script>
   <script src="/assets/slides-lib.js?v=20261107b" defer></script>
   <script src="/assets/slide-editor.js?v=20261104e" defer></script>
   <script src="/assets/slide-model.js?v=20261110a" defer></script>
   <script src="/assets/slide-studio.js?v=20261110a" defer></script>
   <script src="/assets/room-lib.js?v=20261110a" defer></script>
   <script src="/assets/room-client.js?v=20261110a" defer></script>
-  <script src="/assets/addon-stage.js?v=20261111zk" defer></script>
+  <script src="/assets/addon-stage.js?v=20261112b" defer></script>
 </body>
 </html>

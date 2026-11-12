@@ -40,6 +40,15 @@
     if (c.calendar_owner && c.calendar_owner !== o.me) return;
     o.db.rpc('my_calendar_work', { c: c.id }).then(function (r) {
       var rows = (r.data || []).map(function (s) { return Object.assign({ schedule: c.schedule }, s); });
+      // A session on your own goes on the calendar without a call.
+      return o.db.from('sessions').select('id, mode').eq('cohort_id', c.id).then(function (m) {
+        var own = {};
+        (m.data || []).forEach(function (x) { if (x.mode === 'own') own[x.id] = true; });
+        rows.forEach(function (s) { if (own[s.session_id]) s.mode = 'own'; });
+        return { rows: rows, error: r.error };
+      });
+    }).then(function (got) {
+      var r = { error: got.error }, rows = got.rows;
       var head = document.createElement('h2'); head.textContent = 'Calendar';
       var said = document.createElement('p'); said.className = 'small'; said.setAttribute('role', 'status');
       box.append(head);

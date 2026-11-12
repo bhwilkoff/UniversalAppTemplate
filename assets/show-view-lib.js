@@ -163,6 +163,7 @@
     if (stage === 'presenter') return { kind: 'item', id: state.stage_ref };
     if (stage === 'person') return { kind: 'person', id: state.stage_ref };
     if (stage === 'people') return { kind: 'people', ids: (state.featured || []).slice(0, 8) };
+    if (stage === 'apps') return { kind: 'apps', ids: (state.featured || []).slice(0, 3) };
     if (stage === 'room') return { kind: 'room', id: state.stage_ref };
     if (stage === 'answer') return { kind: 'answer', id: state.stage_ref, named: !!state.named };
     if (stage === 'work') return { kind: 'work', id: state.stage_ref, named: !!state.named };
@@ -178,6 +179,7 @@
     if (onStage.kind === 'item') return { stage: 'presenter', stage_ref: onStage.id };
     if (onStage.kind === 'person') return { stage: 'person', stage_ref: onStage.id };
     if (onStage.kind === 'people') return { stage: 'people', stage_ref: null, featured: (onStage.ids || []).slice(0, 8) };
+    if (onStage.kind === 'apps') return { stage: 'apps', stage_ref: null, featured: (onStage.ids || []).slice(0, 3) };
     if (onStage.kind === 'room') return { stage: 'room', stage_ref: onStage.id };
     if (onStage.kind === 'answer') return { stage: 'answer', stage_ref: onStage.id, named: !!onStage.named };
     if (onStage.kind === 'work') return { stage: 'work', stage_ref: onStage.id, named: !!onStage.named };

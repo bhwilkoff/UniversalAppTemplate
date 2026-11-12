@@ -31,7 +31,38 @@
     return (ids || []).slice().sort(function (a, b) { return h(seed + ':' + a) - h(seed + ':' + b) || (a < b ? -1 : 1); });
   }
 
-  var lib = { roomCount: roomCount, split: split, shuffle: shuffle, isIn: isIn, arrived: arrived };
+  // The cohort's own groups (cohorts.groups), as rooms for the people here:
+  // each group keeps its name and whoever of it is here, an empty group
+  // stays closed, and anyone in no group joins the smallest room.
+  function fromGroups(groups, hereIds) {
+    var here = {}, placed = {};
+    (hereIds || []).forEach(function (id) { here[id] = true; });
+    var rooms = [], names = [];
+    (groups || []).forEach(function (g, i) {
+      var ids = (g && Array.isArray(g.members) ? g.members : []).filter(function (id) { return here[id] && !placed[id]; });
+      ids.forEach(function (id) { placed[id] = true; });
+      if (!ids.length) return;
+      rooms.push(ids); names.push(String((g && g.name) || ('Group ' + (i + 1))).slice(0, 60));
+    });
+    (hereIds || []).forEach(function (id) {
+      if (placed[id]) return;
+      if (!rooms.length) { rooms.push([]); names.push('Group 1'); }
+      var small = 0;
+      rooms.forEach(function (r, k) { if (r.length < rooms[small].length) small = k; });
+      rooms[small].push(id); placed[id] = true;
+    });
+    return { rooms: rooms, names: names };
+  }
+
+  // Rooms as the cohort's groups, ready to keep: named, at most 40.
+  function toGroups(rooms, names) {
+    return (rooms || []).slice(0, 40).map(function (ids, i) {
+      var n = String((names && names[i]) || '').replace(/\s+/g, ' ').trim().slice(0, 60);
+      return { name: n || ('Group ' + (i + 1)), members: (ids || []).slice() };
+    }).filter(function (g) { return g.members.length; });
+  }
+
+  var lib = { roomCount: roomCount, split: split, shuffle: shuffle, isIn: isIn, arrived: arrived, fromGroups: fromGroups, toGroups: toGroups };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
   else root.BreakoutsLib = lib;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

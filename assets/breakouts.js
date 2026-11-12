@@ -55,13 +55,17 @@
       var rooms = kept.map(function (r) { return (Array.isArray(r) ? r : []).filter(function (id) { return here[id]; }); }).filter(function (r) { return r.length; });
       return rooms.length ? rooms : null;
     }
-    function launch(again) {
+    // The cohort's own groups, named once and kept on the cohort.
+    function saved() { return Array.isArray(o.cohort.groups) ? o.cohort.groups.filter(function (g) { return g && Array.isArray(g.members) && g.members.length; }) : []; }
+    function launch(again, given) {
       var mins = Number(minutesSet ? minutes : preset().minutes || minutes);
-      var rooms = again === true ? lastRooms() : plan();
-      if (!rooms) { status('No rooms from earlier in this session.'); return; }
+      var rooms = given ? given.rooms : again === true ? lastRooms() : plan();
+      if (!rooms || !rooms.length) { status('No rooms from earlier in this session.'); return; }
       status('Launching…');
       if (!stable().length) { try { localStorage.setItem(LAST, JSON.stringify(rooms)); } catch (e) {} }
-      var ready = stable().length ? Promise.resolve({}) : o.db.rpc('launch_breakouts', { session: o.session.id, rooms: rooms });
+      var args = { session: o.session.id, rooms: rooms };
+      if (given && given.names) args.names = given.names;
+      var ready = stable().length ? Promise.resolve({}) : o.db.rpc('launch_breakouts', args);
       Promise.resolve(ready).then(function (r) {
         if (r.error) { status('Not launched: ' + r.error.message); return null; }
         return o.reload().then(function () {
@@ -125,11 +129,46 @@
       }
       var acts = el('div', 'actions');
       acts.appendChild(button('Launch breakouts', 'btn-primary', function () { launch(false); }));
+      if (!fixed.length && saved().length) acts.appendChild(button('Launch the cohort’s groups', 'btn-secondary', function () {
+        launch(false, L.fromGroups(saved(), everyone().map(function (p) { return p.id; })));
+      }));
       if (!stable().length && lastRooms()) acts.appendChild(button('Same rooms as last time', 'btn-secondary', function () { launch(true); }));
       d.appendChild(acts);
+      if (!fixed.length) d.appendChild(keepForm(rooms, d));
       d.appendChild(statusLine());
       return d;
     }
+    // These rooms, kept as the cohort's groups, each with a name, so the
+    // same people can build together week to week.
+    function keepForm(rooms, d) {
+      var wrap = el('details', 'breakouts-keep');
+      wrap.appendChild(el('summary', null, saved().length ? 'Change the cohort’s groups' : 'Keep these rooms as the cohort’s groups'));
+      var f = el('form', 'cohort-form');
+      var inputs = rooms.map(function (room, i) {
+        var lab = el('label', null, 'Room ' + (i + 1) + ': ' + room.map(function (id) { var w = everyone().filter(function (p) { return p.id === id; })[0]; return w ? w.name : 'Someone'; }).join(', '));
+        var inp = el('input'); inp.type = 'text'; inp.maxLength = 60;
+        var old = saved()[i]; inp.value = old && old.name ? old.name : 'Group ' + (i + 1);
+        lab.appendChild(inp); f.appendChild(lab);
+        return inp;
+      });
+      var said = el('span', 'ui-inline-status'); said.setAttribute('role', 'status');
+      var acts = el('div', 'actions');
+      var ok = el('button', 'btn-secondary small', 'Keep these groups'); ok.type = 'submit';
+      acts.appendChild(ok); acts.appendChild(said); f.appendChild(acts);
+      f.addEventListener('submit', function (ev) {
+        ev.preventDefault();
+        var groups = L.toGroups(rooms, inputs.map(function (i) { return i.value; }));
+        said.textContent = 'Saving…';
+        o.db.from('cohorts').update({ groups: groups }).eq('id', o.cohort.id).select('groups').single().then(function (r) {
+          if (r.error) { said.textContent = 'Not kept: ' + r.error.message; return; }
+          o.cohort.groups = r.data.groups;
+          d.open = true; draw(true);
+        });
+      });
+      wrap.appendChild(f);
+      return wrap;
+    }
+
     function statusLine() { var s = el('p', 'small', said); s.setAttribute('data-breakout-status', ''); s.setAttribute('role', 'status'); return s; }
 
     function list(presence) {

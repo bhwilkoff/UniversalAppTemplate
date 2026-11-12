@@ -43,7 +43,7 @@
     // live app or website covers the part line (found after Week 2).
     var leaderClock = !!(part && part.key === 'clock' && part.endsAt) && view.mode !== 'studio' && view.mode !== 'part';
     $('[data-leader-clock]').hidden = !leaderClock;
-    $('[data-part]').hidden = leaderClock || (view.mode === 'part' || view.mode === 'welcome' || view.mode === 'scene' || view.mode === 'app' || view.mode === 'doc' || view.mode === 'studio' || view.mode === 'slides' || view.mode === 'blank' || view.mode === 'roomwelcome' || view.mode === 'roomboard' || view.mode === 'roomend' || !part);
+    $('[data-part]').hidden = leaderClock || (view.mode === 'part' || view.mode === 'welcome' || view.mode === 'scene' || view.mode === 'app' || view.mode === 'apps' || view.mode === 'doc' || view.mode === 'studio' || view.mode === 'slides' || view.mode === 'blank' || view.mode === 'roomwelcome' || view.mode === 'roomboard' || view.mode === 'roomend' || !part);
     if (view.mode === 'slides') drawSlide(view.slides);
     drawLinks(view.mode === 'slides' ? view.slides.links : null);
     drawAsk();
@@ -188,6 +188,8 @@
     }
     drawApp(view.mode === 'app' ? view : null);
     drawDoc(view.mode === 'doc' ? view : null);
+    drawApps(view.mode === 'apps' ? view : null);
+    drawBeside(view.mode === 'check' && view.doc ? view.doc : null);
     if (view.mode === 'people') {
       var pl = $('[data-people-list]'); pl.replaceChildren();
       pl.classList.toggle('many', view.who.length > 3);
@@ -209,6 +211,8 @@
     }
     if (view.mode === 'person') {
       $('[data-person-who]').textContent = view.who;
+      $('[data-person-say]').hidden = !view.say;
+      $('[data-person-say]').textContent = view.say ? 'say it like ' + view.say : '';
       $('[data-person-audience]').hidden = !view.audience;
       $('[data-person-audience]').textContent = view.audience || '';
     }
@@ -270,6 +274,50 @@
     f.title = v.who + '’s app';
     f.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-modals allow-downloads');
     f.setAttribute('allow', 'clipboard-read; clipboard-write');
+    box.replaceChildren(f);
+  }
+
+  // Two or three apps side by side; each frame stays while its app does.
+  var appsKey = null;
+  function drawApps(v) {
+    var grid = $('[data-apps-grid]');
+    var key = v ? v.apps.map(function (a) { return a.url; }).join(' ') : null;
+    if (key === appsKey) return;
+    appsKey = key;
+    grid.replaceChildren();
+    if (!v) return;
+    grid.style.setProperty('--apps', String(v.apps.length));
+    v.apps.forEach(function (a) {
+      var cell = el('div', 'stage-apps-cell');
+      var bar = el('div', 'stage-app-bar');
+      bar.appendChild(el('strong', null, a.who + '’s app'));
+      var open = el('a', 'stage-app-open', 'Open'); open.href = a.url; open.target = '_blank'; open.rel = 'noopener';
+      bar.appendChild(open);
+      var box = el('div', 'stage-app-frame');
+      var f = document.createElement('iframe');
+      f.src = a.url; f.title = a.who + '’s app';
+      f.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-modals allow-downloads');
+      box.appendChild(f);
+      cell.appendChild(bar); cell.appendChild(box);
+      grid.appendChild(cell);
+    });
+  }
+
+  // A part's material beside its open question, so people answer with it in view.
+  var besideSrc = null;
+  function drawBeside(doc) {
+    var side = $('[data-beside]'), box = $('[data-beside-frame]');
+    side.hidden = !doc;
+    root.classList.toggle('has-beside', !!doc);
+    if (!doc) { if (besideSrc) { besideSrc = null; box.replaceChildren(); } return; }
+    $('[data-beside-name]').textContent = doc.name;
+    $('[data-beside-open]').href = doc.url;
+    if (doc.url === besideSrc) return;
+    besideSrc = doc.url;
+    var f = document.createElement('iframe');
+    f.src = doc.url; f.title = doc.name;
+    if (!/\.pdf($|[?#])/i.test(doc.url)) f.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-downloads');
+    f.setAttribute('referrerpolicy', 'no-referrer');
     box.replaceChildren(f);
   }
 

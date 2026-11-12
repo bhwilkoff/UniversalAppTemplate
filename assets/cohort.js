@@ -322,6 +322,7 @@
           partnerIds = lib.partnersOf(me.id, res[2].data);
           draw(people, mine, res[1].data, res[2].data, res[3].data, res[4].data, res[5].data);
           drawTalk(res[6].data);
+          if (window.Announcements) window.Announcements.draw({ db: db, mount: $('[data-announcements]'), cohort: cohort, me: me, leading: teaching });
           if (window.CohortAsks) window.CohortAsks.mount($('[data-asks]'), { db: db, session: session, cohort: cohort, access: res[6].data, leading: teaching, app: mine && mine.app_url, readOnly: cohort.status === 'finished' });
           if (window.CohortFiles) window.CohortFiles.mount($('[data-files]'), { db: db, session: session, cohort: cohort, sessions: res[1].data.length, access: res[6].data, leading: teaching, readOnly: cohort.status === 'finished' });
           drawFeedback(res[5].data, people, res[3].data, mine);
@@ -718,12 +719,12 @@
     sessions.forEach(function (s) {
       var acts = [];
       var live = t.live && s.number === nextNo;
-      if (s.number === nextNo && safe(s.meet_url)) { var j = window.UI.link('Join the call', s.meet_url, live ? 'btn-primary small' : 'btn-secondary small'); j.target = '_blank'; j.rel = 'noopener'; acts.push(j); }
+      if (s.number === nextNo && s.mode !== 'own' && safe(s.meet_url)) { var j = window.UI.link('Join the call', s.meet_url, live ? 'btn-primary small' : 'btn-secondary small'); j.target = '_blank'; j.rel = 'noopener'; acts.push(j); }
       var past = s.starts_at && new Date(s.starts_at) < new Date() && !live;
       list.appendChild(window.UI.row({
         title: lib.sessionTitle(s, cohort), href: lib.sessionUrl(cohort.slug, s.number),
         meta: s.starts_at ? when(s.starts_at) : 'Not scheduled yet',
-        status: window.UI.status('session', live ? 'live' : past ? 'finished' : s.meet_url ? 'ready' : 'planned'),
+        status: window.UI.status('session', s.mode === 'own' && !past ? 'own' : live ? 'live' : past ? 'finished' : s.meet_url ? 'ready' : 'planned'),
         actions: acts
       }));
     });
@@ -814,7 +815,7 @@
       // During the group part, your group's own room comes first.
       var part = t.live ? lib.partNow(lib.agenda(cohort.session_minutes), t.next.starts_at, new Date()) : null;
       if (room && part && part.key === 'show') { var gr = link(room, 'Join your group’s room'); gr.className = 'btn-primary'; na.appendChild(gr); }
-      if (safe(t.next.meet_url)) { var j = link(t.next.meet_url, 'Join the call'); j.className = room && part && part.key === 'show' ? 'btn-secondary' : 'btn-primary'; na.appendChild(j); }
+      if (t.next.mode !== 'own' && safe(t.next.meet_url)) { var j = link(t.next.meet_url, 'Join the call'); j.className = room && part && part.key === 'show' ? 'btn-secondary' : 'btn-primary'; na.appendChild(j); }
     } else {
       $('[data-next-when]').textContent = sessions.length ? 'All sessions done' : 'Not scheduled yet';
     }

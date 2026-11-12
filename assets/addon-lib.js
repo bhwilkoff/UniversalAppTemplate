@@ -206,6 +206,9 @@
             note: r.note ? cut(r.note, 200) : null
           };
         }
+        // The part's own material goes up beside its question.
+        var beside = state.doc ? docOf(state.doc) : null;
+        if (beside) view.doc = beside;
         return view;
       }
     }
@@ -256,9 +259,19 @@
       }
       return { mode: 'answer', part: part, answer: answerOf(state.onStageDetail) };
     }
+    // Two or three people's apps side by side, to compare builds.
+    if (on && on.kind === 'apps') {
+      var apps = (on.ids || []).slice(0, 3).map(function (id) {
+        var u = frameable((state.appUrls || {})[id] || '');
+        return u ? { who: cut((state.names || {})[id] || 'Someone', 80), url: u } : null;
+      }).filter(Boolean);
+      if (apps.length) return { mode: 'apps', part: part, apps: apps };
+    }
     // Someone featured by name (a presenter part's config.feature).
     if (on && on.kind === 'person') {
       var pv = { mode: 'person', part: part, who: cut((state.names || {})[on.id] || 'Someone', 80) };
+      var say = (state.sayLike || {})[on.id];
+      if (typeof say === 'string' && say) pv.say = cut(say, 80);
       if (typeof state.audience === 'string' && state.audience) pv.audience = cut(state.audience, 300);
       return pv;
     }
@@ -368,6 +381,7 @@
       var cv = { mode: 'check', id: typeof v.id === 'string' ? cut(v.id, 40) : null, answerable: v.answerable === true, mine: mineOf(v.mine), part: part, kind: kinds.indexOf(v.kind) >= 0 ? v.kind : 'choice', prompt: cut(v.prompt, 500), choices: choices, count: count };
       if (v.rerun === true) cv.rerun = true;
       if (v.shown && typeof v.shown.text === 'string') cv.shown = answerOf(v.shown);
+      if (v.doc) { var cd = docOf(v.doc); if (cd) cv.doc = cd; }
       return cv;
     }
     if (v.mode === 'studio' && v.studio && typeof v.studio.text === 'string') return { mode: 'studio', part: part, studio: studioOf(v.studio) };
@@ -388,8 +402,12 @@
     if (v.mode === 'people' && Array.isArray(v.who)) { var gp = { mode: 'people', part: part, who: v.who.slice(0, 8).map(function (x) { return cut(x, 80); }) }; if (typeof v.audience === 'string' && v.audience) gp.audience = cut(v.audience, 300); return gp; }
     if (v.mode === 'room' && v.room) return { mode: 'room', part: part, room: roomOf(v.room) };
     if (v.mode === 'answer' && v.answer && typeof v.answer.text === 'string') return { mode: 'answer', part: part, answer: answerOf(v.answer) };
-    if (v.mode === 'person') { var pr = { mode: 'person', part: part, who: cut(v.who || 'Someone', 80) }; if (typeof v.audience === 'string' && v.audience) pr.audience = cut(v.audience, 300); return pr; }
+    if (v.mode === 'person') { var pr = { mode: 'person', part: part, who: cut(v.who || 'Someone', 80) }; if (typeof v.audience === 'string' && v.audience) pr.audience = cut(v.audience, 300); if (typeof v.say === 'string' && v.say) pr.say = cut(v.say, 80); return pr; }
     if (v.mode === 'doc') { var dd = docOf(v.doc); return dd ? { mode: 'doc', part: part, doc: dd } : null; }
+    if (v.mode === 'apps' && Array.isArray(v.apps)) {
+      var ap = v.apps.slice(0, 3).map(function (x) { var u = x && frameable(x.url); return u ? { who: cut(x.who || 'Someone', 80), url: u } : null; }).filter(Boolean);
+      return ap.length ? { mode: 'apps', part: part, apps: ap } : null;
+    }
     // Open rooms' tools in a cohort's call (CohortRoom): a website by its own
     // address, and Propose and vote's ideas with their counts.
     if (v.mode === 'page' && v.page && typeof v.page.url === 'string') {
@@ -497,8 +515,9 @@
       case 'studio': return 'Your slide editor, on your stage only';
       case 'welcome': return 'The welcome';
       case 'card': return 'A card: ' + q(v.card && v.card.body);
-      case 'check': return v.shown ? 'One answer, under the open question' : (v.count ? 'Answers to ' : 'The question ') + q(v.prompt);
+      case 'check': return v.shown ? 'One answer, under the open question' : (v.count ? 'Answers to ' : 'The question ') + q(v.prompt) + (v.doc ? ', beside its document' : '');
       case 'app': return (v.who || 'Someone') + '\u2019s app';
+      case 'apps': return 'Apps side by side: ' + (v.apps || []).map(function (a) { return a.who; }).join(', ');
       case 'item': return (v.who || 'Someone') + '\u2019s link';
       case 'blank': return 'Nothing';
       case 'scene': return v.scene && v.scene.board ? 'The board' : 'This part\u2019s slide';

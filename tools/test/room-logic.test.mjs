@@ -14,7 +14,7 @@ test('the first to start is the host, and nobody else can start over them', () =
 
 test('only the host runs the room', () => {
   const r = started();
-  ['talk', 'go', 'show', 'ask', 'reveal', 'close', 'clear', 'page', 'site', 'board', 'pasted', 'card', 'clock', 'hand', 'title'].forEach((t) => {
+  ['talk', 'go', 'show', 'ask', 'reveal', 'close', 'clear', 'page', 'site', 'board', 'pasted', 'card', 'clock', 'clockAdd', 'hand', 'title'].forEach((t) => {
     assert.match(apply(r, B, { t }, 2).error, /Only the host/, t);
   });
 });
@@ -216,4 +216,15 @@ test('a leader opens and closes stances, and each opening starts at zero', () =>
   assert.equal(stanceCounts(r).total, 0);
   apply(r, A, { t: 'stances', open: false }, 5);
   assert.equal(publicRoom(r).stancesOpen, false);
+});
+
+test('a running clock moves by half a minute, and never into the past', () => {
+  const r = started();
+  apply(r, A, { t: 'clock', seconds: 60, label: '' }, 1000);
+  apply(r, A, { t: 'clockAdd', seconds: 30 }, 2000);
+  assert.equal(r.clock.endsAt, 91000);
+  apply(r, A, { t: 'clockAdd', seconds: -300 }, 3000);
+  assert.equal(r.clock.endsAt, 3000);
+  apply(r, A, { t: 'clock', seconds: 0 }, 4000);
+  assert.ok(apply(r, A, { t: 'clockAdd', seconds: 30 }, 5000).error);
 });

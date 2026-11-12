@@ -2763,6 +2763,9 @@ def main():
           not attempt(as_user("ben"), post, (xc, "benvideo000001", "video/mp4", "camera", 10, None, first)))
     check("someone outside the cohort cannot post in its exchange",
           not attempt(as_user("xan"), post, (xc, "calvideo000001", "video/mp4", "camera", 10, None, None)))
+    # Posted in one transaction, the three share a time; real posts never do.
+    su.execute("reset role")
+    su.execute("update public.exchange_posts set created_at = created_at + make_interval(secs => case drive_file_id when 'xanopening0001' then 0 when 'calfirstvideo01' then 1 else 2 end) where drive_file_id in ('xanopening0001', 'calfirstvideo01', 'deereplyvideo01')")
     check("the exchange reads back its videos in order, with names, never emails",
           attempt(as_user(None), see, (xo,)) and [p["drive_file_id"] for p in last_rows[0][0]["posts"]] == ["xanopening0001", "calfirstvideo01", "deereplyvideo01"]
           and last_rows[0][0]["posts"][0]["note"] == "Say hello" and last_rows[0][0]["posts"][2]["reply_to"] == str(first) and "@" not in json.dumps(last_rows[0][0]))
@@ -2841,8 +2844,8 @@ def main():
           attempt(as_user("xan"), react, (first, "love", True))
           and last_rows[0][0] == [{"r": "love", "names": ["xan"], "mine": True}, {"r": "ponder", "names": ["Yara Quill", "xan"], "mine": True}])
     check("the exchange shows them to anyone who can watch it",
-          attempt(as_user(None), see, (xo,)) and [x["r"] for x in last_rows[0][0]["posts"][1]["reactions"]] == ["love", "ponder"]
-          and last_rows[0][0]["posts"][1]["reactions"][1]["mine"] is False and last_rows[0][0]["can_react"] is False)
+          attempt(as_user(None), see, (xo,)) and [x["r"] for x in [p for p in last_rows[0][0]["posts"] if p["id"] == str(first)][0]["reactions"]] == ["love", "ponder"]
+          and [p for p in last_rows[0][0]["posts"] if p["id"] == str(first)][0]["reactions"][1]["mine"] is False and last_rows[0][0]["can_react"] is False)
     check("a person takes their reaction back",
           attempt(as_user("yara"), react, (first, "ponder", False)) and last_rows[0][0][1]["names"] == ["xan"])
     sx.execute("reset role")
@@ -3457,6 +3460,38 @@ def main():
     check("featuring needs someone", not attempt(as_user("ben"), "update public.show_state set stage = 'person', stage_ref = null where session_id = %s", (ss,)))
     attempt(as_user("bea"), "update public.show_state set stage = 'doc', stage_ref = null where session_id = %s returning stage", (ss,))
     check("a learner cannot change the stage", last_rows == [])
+
+    # From the Forum study (migrations 20261112010000 and 20261112020000).
+    check("a learner marks a moment", attempt(as_user("bea"), "insert into public.session_marks (cohort_id, session_id) values (%s, %s) returning id", (cc, ss)))
+    mark = last_rows[0][0]
+    b = as_user("ben"); b.execute("select count(*) from public.session_marks where id = %s", (mark,))
+    check("a leader does not see a learner's marks", b.fetchall() == [(0,)])
+    check("someone outside the cohort cannot mark it", not attempt(as_user("dee"), "insert into public.session_marks (cohort_id, session_id) values (%s, %s)", (cc, ss)))
+    check("a leader writes feedback for a learner", attempt(as_user("ben"), "insert into public.moment_feedback (cohort_id, session_id, learner_id, at_s, body) values (%s, %s, %s, 30, 'You asked first.') returning id", (cc, ss, people["bea"])))
+    fb = last_rows[0][0]
+    g = as_user("bea"); g.execute("select count(*) from public.moment_feedback where id = %s", (fb,))
+    check("a learner does not read a draft", g.fetchall() == [(0,)])
+    check("a learner cannot write feedback", not attempt(as_user("bea"), "insert into public.moment_feedback (cohort_id, session_id, learner_id, body) values (%s, %s, %s, 'x')", (cc, ss, people["bea"])))
+    check("feedback is only for someone in the cohort", not attempt(as_user("ben"), "insert into public.moment_feedback (cohort_id, session_id, learner_id, body) values (%s, %s, %s, 'x')", (cc, ss, people["dee"])))
+    attempt(as_user("ben"), "update public.moment_feedback set shared_at = now(), delivered_at = now() where id = %s returning delivered_at", (fb,))
+    check("a leader shares it, but cannot mark it delivered", last_rows == [(None,)])
+    g = as_user("bea"); g.execute("select body from public.moment_feedback where id = %s", (fb,))
+    check("the learner reads it once shared", g.fetchall() == [("You asked first.",)])
+    d = as_user("dee"); d.execute("select count(*) from public.moment_feedback where id = %s", (fb,))
+    check("no one else does", d.fetchall() == [(0,)])
+    check("shared feedback stays shared", not attempt(as_user("ben"), "update public.moment_feedback set shared_at = null where id = %s", (fb,)))
+    check("shared feedback cannot be removed", attempt(as_user("ben"), "delete from public.moment_feedback where id = %s returning id", (fb,)) and last_rows == [])
+    check("a leader schedules an announcement", attempt(as_user("ben"), "insert into public.cohort_announcements (cohort_id, title, body, send_at, sent_at) values (%s, 'No call Friday', 'Work on your own.', now() + interval '1 day', now()) returning id, sent_at", (cc,)))
+    check("and cannot say it was already posted", last_rows[0][1] is None)
+    an = last_rows[0][0]
+    g = as_user("bea"); g.execute("select count(*) from public.cohort_announcements where id = %s", (an,))
+    check("a learner does not see it before it is posted", g.fetchall() == [(0,)])
+    check("a learner cannot announce", not attempt(as_user("bea"), "insert into public.cohort_announcements (cohort_id, title, body) values (%s, 'x', 'y')", (cc,)))
+    check("a leader puts two apps side by side",
+          attempt(as_user("ben"), "update public.show_state set stage = 'apps', stage_ref = null, featured = array[%s, %s]::uuid[] where session_id = %s", (people["bea"], people["ben"], ss)))
+    check("only people in the cohort", not attempt(as_user("ben"), "update public.show_state set stage = 'apps', featured = array[%s]::uuid[] where session_id = %s", (people["dee"], ss)))
+    check("a session can have no call", attempt(as_user("ben"), "update public.sessions set mode = 'own' where id = %s", (ss,)))
+    check("and nothing else", not attempt(as_user("ben"), "update public.sessions set mode = 'maybe' where id = %s", (ss,)))
 
     conn.rollback()
     conn.close()

@@ -246,3 +246,15 @@ Tested in a real Meet call with a leader and a learner profile, running Week 3 s
 | "Supposed to be on the plan tab" | Plan offers Edit this part only on the current part | Built |
 | "I've got to open this back up" | A closed side panel only hides; the stage keeps working | Seen in the call. Reopening is three presses in Meet's own menus |
 | Found in the call | A started clock now has its own corner over every stage view; a website or Propose and vote comes down on a new part | Seen in the call |
+
+## From the class platform study, November 11, 2026
+
+What the add-on gained (DECISIONS.md, "What another class platform taught"):
+
+- **Mark this moment**, under the reactions for leaders and learners: one press keeps the time, with a word if wanted, and the mark appears beside the recording on the session page for that person alone.
+- **Hide names** on Read the answers, so a leader reads the idea before the person; the same switch on the session page's answers.
+- **−30 sec and +30 sec** beside a running part clock and a running stage clock.
+- **Your share of the talking** in the leader's Now, from the last recorded session, for the leader alone.
+- **Say it like** beside names in People and under a featured name on the stage, from each person's account page.
+- **The cohort's groups**: breakouts can be kept as named groups and launched again in one press.
+- **Side by side**: two or three people's apps on the stage at once (stage `apps`), and a part's document beside its open question.
