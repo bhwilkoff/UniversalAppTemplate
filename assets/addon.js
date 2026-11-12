@@ -3087,6 +3087,10 @@
     toStage(null);
     CO.show({ target: coachTarget(step.target), text: step.text, n: n, of: of, label: label, onNext: coachNext, onClose: coachClose });
   }
+  // Escape in the panel closes a step even when the stage is drawing it.
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && (C.steps || C.hint) && !(CO && CO.showing())) coachClose();
+  });
   function coachBegin(force) {
     if (!CL || !CO || !S.frame || standalone) return;
     C.role = S.teaching ? 'leader' : 'learner';
