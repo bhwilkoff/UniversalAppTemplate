@@ -35,6 +35,9 @@ test('a hint is due the first time its thing appears, one at a time, and never a
   // A leader is told to open the stage, then cued when learners get a hint.
   const l = store();
   assert.equal(C.due({ teaching: true, stageOn: false, openStage: true, view: {} }, l), 'openstage');
+  // Once the stage is open, the leader is given the words to say first.
+  assert.equal(C.due({ teaching: true, stageOn: true, view: q }, l), 'tell');
+  C.mark(l, 'hint:tell');
   assert.equal(C.due({ teaching: true, stageOn: true, view: q }, l), 'cue');
   C.forget(l);
   assert.equal(C.seen(l, 'hint:cue'), false);

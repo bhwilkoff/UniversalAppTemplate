@@ -33,6 +33,9 @@
     room: { where: 'panel', target: 'room', text: 'Your room is its own Meet call. Join it here, and Human Shaped opens there with you.' },
     show: { where: 'panel', target: 'show', text: 'This puts your app on everyone’s stage while you talk about it.' },
     openstage: { where: 'panel', target: 'openstage', text: 'Open the main stage, and everyone who joins the activity sees the class.' },
+    // Meet tells nobody an activity started beyond a banner that shrinks to
+    // an icon in seconds (measured, November 12, 2026), so the leader says it.
+    tell: { where: 'panel', target: 'stageline', text: 'Tell everyone: the Human Shaped icon at the top right of Meet, then Join activity (or Install and join, the first time).' },
     cue: { where: 'panel', target: 'stageline', text: 'People new to Human Shaped now see a one-line hint on their own stage. Say it aloud too, the first time.' }
   };
 
@@ -63,6 +66,7 @@
     var want = [];
     if (s.teaching) {
       if (s.openStage && !s.stageOn) want.push('openstage');
+      if (s.stageOn) want.push('tell');
       if (s.stageOn && (v.mode === 'check' || v.mode === 'apps' || v.mode === 'app')) want.push('cue');
     } else {
       if (s.roomJoin) want.push('room');
