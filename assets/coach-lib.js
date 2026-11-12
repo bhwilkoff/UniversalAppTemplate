@@ -14,8 +14,8 @@
     learner: [
       { key: 'stage', where: 'stage', target: 'stage', text: 'A live class, not only a call: your leader moves this screen for everyone, and you can click what is on it.' },
       { key: 'reacts', where: 'stage', target: 'reacts', text: 'React, or ask your leader something, here at any time, without unmuting.' },
-      { key: 'asks', where: 'panel', target: 'asks', text: 'Your own panel, which follows the session. Ask your leader here for a question, a message, a link, the board, or rooms.' },
-      { key: 'mine', where: 'panel', target: 'tab:mine', text: 'Mine holds your own place in this class: your app, and the questions you have answered.' }
+      { key: 'asks', where: 'panel', target: 'asks', text: 'Ask your leader a question here at any time. Only your leader sees it.' },
+      { key: 'app', where: 'panel', target: 'yourapp', text: 'When it is your turn, show your app to everyone here, or open a classmate’s app on your own screen.' }
     ],
     leader: [
       { key: 'now', where: 'panel', target: 'tab:now', text: 'Now is the part that is happening, with your notes for it. Learners never see your notes.' },
@@ -31,7 +31,7 @@
     write: { where: 'stage', target: 'write', text: 'Type your answer right here, or in your panel.' },
     app: { where: 'stage', target: 'app', text: 'This is a working app. Click inside it to try it: only you see what you click.' },
     room: { where: 'panel', target: 'room', text: 'Your room is its own Meet call. Join it here, and Human Shaped opens there with you.' },
-    show: { where: 'panel', target: 'show', text: 'This puts your app on everyone’s stage while you talk about it.' },
+    show: { where: 'panel', target: 'show', text: 'This shows your app to everyone while you talk about it.' },
     openstage: { where: 'panel', target: 'openstage', text: 'Open the main stage, and everyone who joins the activity sees the class.' },
     // Meet tells nobody an activity started beyond a banner that shrinks to
     // an icon in seconds (measured, November 12, 2026), so the leader says it.
@@ -39,7 +39,7 @@
     cue: { where: 'panel', target: 'stageline', text: 'People new to Human Shaped now see a one-line hint on their own stage. Say it aloud too, the first time.' }
   };
 
-  var STORE = 'hs-coach-2';
+  var STORE = 'hs-coach-3';
   function read(store) {
     try { var v = JSON.parse(store.getItem(STORE) || '[]'); return Array.isArray(v) ? v : []; } catch (e) { return []; }
   }

@@ -41,7 +41,7 @@ to over explain it, but we do need to orient folks."
 
 A four-stop tour the first time a panel opens (a learner's starts on the
 stage: a live class the leader moves, which they can click; then reactions and
-Ask; then their panel; then Mine), and one-line hints the first time a question,
+Ask; then Ask your leader; then their app, when the cohort has apps), and one-line hints the first time a question,
 a classmate's app, a room, or their turn to show appears. A leader gets their
 own tour (Now, Next, Plan, Tools) and a cue when learners are being shown a
 hint. The ? in the panel's header replays the tour. assets/coach-lib.js decides,

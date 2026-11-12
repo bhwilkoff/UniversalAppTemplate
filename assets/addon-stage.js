@@ -520,9 +520,10 @@
     bar.appendChild(b);
     box.addEventListener('submit', function (ev) {
       ev.preventDefault();
-      var kind = box.querySelector('select').value, input = box.querySelector('input');
-      if (!input.value.trim() && ['board', 'breakouts'].indexOf(kind) < 0) return;
-      act({ a: 'request', kind: kind, body: input.value.trim() });
+      // A learner asks their leader one thing: a question, seen only by the leader.
+      var input = box.querySelector('input');
+      if (!input.value.trim()) return;
+      act({ a: 'request', kind: 'other', body: input.value.trim() });
       input.value = ''; box.hidden = true;
     });
   }

@@ -11,7 +11,7 @@ Leader                         Learner
 +------------------------+     +------------------------+
 | Part title      4:32   |     | Part title             |
 | Stage on · Recording   |     |                        |
-| Now  Plan  Tools People|     | Now  Mine              |
+| Now  Plan  Tools People|     | (one view, no tabs)    |
 |                        |     |                        |
 | what this moment needs |     | the one thing asked    |
 |                        |     |                        |
@@ -28,7 +28,7 @@ Leader                         Learner
 | Tools | Tiles for what you do to the room: main stage, a question, apps, breakouts, a card, the board, recording. |
 | People | Who is here, who answered, guests and who they are, recognition. |
 | Now (learner) | Where to go, then what is being asked. |
-| Mine (learner) | Your app first, then what you can ask for, then your answers and work. |
+| The class (learner, one view) | What the class is doing and the question to answer, your room when there is one, your app (show it to everyone, open a classmate's on your screen), then Ask your leader: one question, seen only by the leader. |
 
 ## Rules
 
@@ -52,10 +52,10 @@ Measured in a real call: each person's stage takes their own clicks and keys, Me
 
 | On the stage | Who | How |
 |---|---|---|
-| A live app | A learner asks from the top of Mine; the leader presses Show it in Now, or shows anyone's from Tools | Everyone gets their own working copy, so a class can use it at once. A page that refuses framing keeps Open in a new tab |
+| A live app | A learner sees Show my app to everyone in their app section; the leader presses Show it in Now, or shows anyone's from Tools | Everyone gets their own working copy, so a class can use it at once. A page that refuses framing keeps Open in a new tab |
 | A question | Learners, on the stage | Choices are buttons, and words are typed there. The panel saves them |
 | Reactions | Everyone | A centered strip at the very foot of the stage, with a lane above it where sent reactions float; every view ends above both, so they never cover what is shown (Ben, November 11, 2026) |
-| A classmate's app, for one person | A learner, from Mine's Your classmates' apps | Try it on my stage shows it on that learner's own stage only, never everyone's, until Back to the class stage in Now; nothing is written to the shared show |
+| A classmate's app, for one person | A learner, from their classmates' apps | Open it on my screen shows it on that learner's own stage only, never everyone's, until Back to the class; nothing is written to the shared show |
 | The board | Everyone | It fills the stage. Add a note, select it, Vote for this. Each vote is its own dot |
 | GitHub | A leader adds it to a slide | Issues, pull requests, commits, a README, or the repository, drawn on the slide; rows open on GitHub from the stage |
 
@@ -63,7 +63,7 @@ Measured in a real call: each person's stage takes their own clicks and keys, Me
 
 Ben, November 6, 2026: "a learner should be able to request to do any of the things a leader can do right from the add-on or the main stage itself."
 
-Ben, November 11, 2026: "Any question that I'm asking of the cohort members needs to be done on the main stage or within the add-on sidebar. Any action that I need the cohort members to take, should be able to be completed within the Google Meet." A question a leader asks from Tools goes on everyone's main stage at once, whatever it was showing. A learner without an app address adds it in Mine.
+Ben, November 11, 2026: "Any question that I'm asking of the cohort members needs to be done on the main stage or within the add-on sidebar. Any action that I need the cohort members to take, should be able to be completed within the Google Meet." A question a leader asks from Tools goes on everyone's main stage at once, whatever it was showing. A learner without an app address adds it in their app section.
 
 A learner asks from Now, where Ask your leader for always sits, or with Ask on the stage: a question for everyone, a message on the stage, a link, the board, breakouts, or something else in their own words. It arrives in the leader's Now with Do it and Not now. Do it runs the leader's own action. A learner never changes the room directly.
 
@@ -302,3 +302,25 @@ tools." Research and the call that prompted it: research/notes/addon-onboarding-
    closed with Escape, and never taking focus or blocking the stage.
 4. **A stage that has not heard from its panel never says the session has not
    begun.** It says it is joining, then how to bring its panel back.
+
+## The learner's panel says what a learner does (November 12, 2026)
+
+Ben: "What does 'mine' mean to a learner (nothing). What does it matter if it
+is happening 'now'? ... the buttons you can press for asking something of your
+leader don't make sense either." Every learner-facing word passes only if a
+learner can tell which of these it serves without trying it: follow the class,
+answer a question, show their app or try a classmate's, ask the leader
+something, react, go to a room and back, bookmark a moment.
+
+1. **One view, no tabs,** in the order a class happens: what the class is
+   doing and the question, the room, their app, Ask your leader, then Bookmark
+   this moment and the footer. No part clock for learners.
+2. **A learner asks their leader one thing: a question,** seen only by the
+   leader, who answers aloud or puts it to everyone. Polls, stage messages, the
+   board, rooms, and links are the leader's to run, so learners are not offered
+   them. The stage's Ask sends the same question.
+3. **Reactions live on the stage,** where everyone sees them; the panel does
+   not repeat them.
+4. **Plain words for what happens:** Show my app to everyone; Open it on my
+   screen; Back to the class; Bookmark this moment (not "mark", which names
+   marking a path stage ready).

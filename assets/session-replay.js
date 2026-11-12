@@ -259,7 +259,7 @@
       }
       var bar = el('div', 'replay-bar cohort-form');
       var which = el('select'); which.setAttribute('aria-label', 'Which moments');
-      [['all', 'Every moment'], ['parts', 'Parts and questions'], ['talk', 'Who spoke'], ['mine', o.leading ? 'Your marks and feedback' : 'Your marks and feedback']].forEach(function (x) { which.appendChild(new Option(x[1], x[0])); });
+      [['all', 'Every moment'], ['parts', 'Parts and questions'], ['talk', 'Who spoke'], ['mine', 'Your bookmarks and feedback']].forEach(function (x) { which.appendChild(new Option(x[1], x[0])); });
       which.value = K.view;
       which.addEventListener('change', function () { K.view = which.value; drawRows(); });
       bar.appendChild(which);
@@ -276,7 +276,7 @@
       var here = el('div', 'actions replay-here');
       function drawHere() {
         here.replaceChildren();
-        if (session.recording_started_at) here.appendChild(button('Mark this moment', 'btn-secondary small', markHere));
+        if (session.recording_started_at) here.appendChild(button('Bookmark this moment', 'btn-secondary small', markHere));
         if (o.leading && K.person) here.appendChild(button('Feedback for ' + K.names[K.person] + ' here', 'btn-secondary small', function () { openFeedback(K.person, v ? v.currentTime : 0, here); }));
         here.hidden = !here.children.length;
       }

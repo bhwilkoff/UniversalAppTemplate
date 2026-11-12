@@ -7,7 +7,8 @@
 
   function mount(o) {
     var ready = o.into || o.root.querySelector('[data-state="ready"]');
-    var tabs = o.tabs ? o.tabs : o.teaching ? [['now', 'Now'], ['plan', 'Plan'], ['tools', 'Tools'], ['people', 'People']] : [['now', 'Now'], ['mine', 'Mine']];
+    // A learner's panel is one view, with no tabs (Ben, November 12, 2026).
+    var tabs = o.tabs ? o.tabs : o.teaching ? [['now', 'Now'], ['plan', 'Plan'], ['tools', 'Tools'], ['people', 'People']] : [['now', 'The class']];
     var shell = el('div', 'p2');
     var top = el('header', 'p2-top');
     var row = el('div', 'p2-top-row');
@@ -51,6 +52,7 @@
     stageBtn.addEventListener('click', function () { if (onStageBtn) onStageBtn(); });
     var nav = el('div', 'p2-tabs');
     nav.setAttribute('role', 'tablist');
+    nav.hidden = tabs.length < 2;
     top.appendChild(nav);
     shell.appendChild(top);
     var panes = {}, buttons = {}, current = null;

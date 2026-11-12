@@ -1120,18 +1120,25 @@
     } else {
       // What a learner does in the call stays in Now: back to the class's
       // stage when trying an app, and asking their leader (Ben, November 11, 2026).
+      // One view for a learner, in the order a class happens (Ben, November
+      // 12, 2026: "What does 'mine' mean to a learner (nothing). What does it
+      // matter if it is happening 'now'?"): what the class is doing and the
+      // question, then their app, then asking their leader.
       S.backBox = el('div', 'actions p2-back'); S.backBox.hidden = true; now.insertBefore(S.backBox, now.firstChild);
-      S.mineAsk = el('div', 'p2-mine-ask'); now.appendChild(S.mineAsk);
-      S.mineApp = el('div', 'p2-myapp'); F.put('mine', S.mineApp);
-      S.classApps = el('div', 'p2-class-apps'); F.put('mine', S.classApps);
-      F.put('mine', S.frameTools);
-      F.put('mine', $('[data-guest-signin]').parentNode);
-      F.put('mine', $('[data-recognize]'));
+      S.appSection = el('section', 'p2-group p2-learn-app'); S.appSection.setAttribute('aria-label', 'Your app');
+      S.mineApp = el('div', 'p2-myapp'); S.appSection.appendChild(S.mineApp);
+      S.classApps = el('div', 'p2-class-apps'); S.appSection.appendChild(S.classApps);
+      now.appendChild(S.appSection);
+      S.mineAsk = el('section', 'p2-group p2-mine-ask'); S.mineAsk.setAttribute('aria-label', 'Ask your leader'); now.appendChild(S.mineAsk);
+      now.appendChild(S.frameTools);
+      now.appendChild($('[data-guest-signin]').parentNode);
+      now.appendChild($('[data-recognize]'));
     }
     root.querySelector('.addon-more').hidden = true;
-    F.put(mine, root.querySelector('.addon-foot'));
-    // The bar that stays: reactions and a guest's name stay with a learner.
-    F.low.appendChild($('[data-react]'));
+    F.put(S.teaching ? mine : 'now', root.querySelector('.addon-foot'));
+    // A leader keeps reactions in the bar that stays; a learner reacts on the
+    // stage, where everyone sees it, so their panel does not repeat them.
+    if (S.teaching) F.low.appendChild($('[data-react]')); else $('[data-react]').hidden = true;
     drawMark(F.low);
     F.on(function () { nextMove(); }, function () { if (S.run) S.run.step(-1).then(afterMove); });
     if (S.teaching && F.onNudge) F.onNudge(nudgeClock);
@@ -1178,13 +1185,13 @@
     var row = el('div', 'p2-mark');
     var said = el('span', 'p2-mark-said'); said.setAttribute('role', 'status');
     var word = null, last = null, quiet = null;
-    var press = button('Mark this moment', 'btn-secondary small p2-mark-btn', function () {
+    var press = button('Bookmark this moment', 'btn-secondary small p2-mark-btn', function () {
       press.disabled = true;
       db.from('session_marks').insert({ cohort_id: S.cohort.id, session_id: S.session.id }).select('id').single().then(function (r) {
         press.disabled = false;
         if (r.error) { said.textContent = 'Not marked: ' + r.error.message; return; }
         last = r.data.id;
-        said.textContent = 'Marked ' + new Date().toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }) + '.';
+        said.textContent = 'Bookmarked ' + new Date().toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }) + '.';
         if (!word) {
           word = el('form', 'p2-mark-word');
           var i = el('input'); i.type = 'text'; i.maxLength = 80; i.placeholder = 'A word to find it by'; i.setAttribute('aria-label', 'A word to find this mark by');
@@ -1194,7 +1201,7 @@
             ev.preventDefault();
             var w = i.value.trim();
             if (!w || !last) return;
-            db.from('session_marks').update({ word: w }).eq('id', last).then(function (u) { said.textContent = u.error ? 'Not saved: ' + u.error.message : 'Marked: ' + w + '.'; i.value = ''; word.hidden = true; });
+            db.from('session_marks').update({ word: w }).eq('id', last).then(function (u) { said.textContent = u.error ? 'Not saved: ' + u.error.message : 'Bookmarked: ' + w + '.'; i.value = ''; word.hidden = true; });
           });
           row.appendChild(word);
         }
@@ -1203,7 +1210,7 @@
         quiet = setTimeout(function () { if (word && !word.contains(document.activeElement)) word.hidden = true; }, 20000);
       });
     });
-    press.title = 'Find it later beside the recording, on the session page. Only you see your marks.';
+    press.title = 'Find it later beside the recording, on the session page. Only you see your bookmarks.';
     row.appendChild(press); row.appendChild(said);
     mount.appendChild(row);
   }
@@ -1246,16 +1253,15 @@
     if (!S.nowHead) { S.nowHead = el('h2', 'p2-now-head'); now.insertBefore(S.nowHead, now.firstChild); }
     var showing = !!(part && part.kind === 'presenter');
     var room = S.svc && S.svc.showing ? S.svc.showing() : null;
-    var head = questionWaiting() ? 'Answer the question' : room === 'board' ? 'Propose an idea, and vote' : room === 'page' ? 'Try the website on your stage' : showing ? 'Show your app' : '';
+    var head = questionWaiting() ? 'Answer the question' : room === 'board' ? 'Propose an idea, and vote' : room === 'page' ? 'Try the website on your screen' : showing ? 'Show your app' : '';
     if (S.nowHead.textContent !== head) S.nowHead.textContent = head;
     S.nowHead.hidden = !head;
     if (now.firstChild !== S.nowHead) now.insertBefore(S.nowHead, now.firstChild);
     if (room === 'board' && S.svcNow && S.svcNow.previousSibling !== S.nowHead) now.insertBefore(S.svcNow, S.nowHead.nextSibling);
     // On a part where people show their app, its button leads Now.
     if (S.mineApp) {
-      var want = showing ? now : S.frame.pane('mine');
       if (showing && S.mineApp.previousSibling !== S.nowHead) now.insertBefore(S.mineApp, S.nowHead.nextSibling);
-      else if (!showing && S.mineApp.parentNode !== want) want.insertBefore(S.mineApp, want.firstChild);
+      else if (!showing && S.appSection && S.mineApp.parentNode !== S.appSection) S.appSection.insertBefore(S.mineApp, S.appSection.firstChild);
     }
   }
   // For a leader: what the next part will need, before pressing Next (Ben,
@@ -1381,13 +1387,11 @@
     S.frame.draw({
       title: part ? part.name : lib.sessionTitle(S.session, S.cohort),
       step: part && at >= 0 ? 'Part ' + (at + 1) + ' of ' + list.length : list.length ? 'Not started yet, ' + list.length + ' parts' : '',
-      time: left != null ? window.LiveLib.clock(left) : '', over: left === 0,
+      time: S.teaching && left != null ? window.LiveLib.clock(left) : '', over: S.teaching && left === 0,
       nudge: !!(S.teaching && left), chips: chips, next: nextStep() || undefined, canBack: !!part
     });
     var first = (S.list || [])[0];
     var what = !part && first && !S.teaching ? 'First: ' + first.name : !S.teaching && part && !part.slides ? String(part.what || '').split(/\n{2,}/)[0] : '';
-    // A learner with nothing to do is told so, so an empty panel never reads as broken.
-    if (!what && !S.teaching && !$('[data-pane="now"] textarea, [data-pane="now"] input, [data-pane="now"] .signal-where:not([hidden]), [data-pane="now"] .signal-card:not([hidden])')) what = 'Nothing to answer right now.';
     if (S.nowWhat.textContent !== what) S.nowWhat.textContent = what;
     S.nowWhat.hidden = !what;
     if (!S.teaching) drawLearnerHead(part); else { drawLearnerPeek(part); drawNextPreview(part); }
@@ -2243,39 +2247,29 @@
     var typing = box.contains(document.activeElement) && document.activeElement.tagName === 'INPUT';
     if (typing) return;
     box.replaceChildren();
-    box.appendChild(el('p', 'p2-label', 'Ask your leader for'));
-    var row = el('div', 'p2-asks-row'), form = el('form', 'p2-ask-form'); form.hidden = true;
-    var input = el('input'); input.maxLength = 500; input.setAttribute('aria-label', 'What you want');
-    var go = el('button', 'btn-primary small', 'Ask'); go.type = 'submit';
+    // One thing a learner asks their leader: a question, seen only by the
+    // leader, who answers it aloud or puts it to everyone. Running the room
+    // (polls, the stage, the board, rooms) stays the leader's.
+    box.appendChild(el('h3', 'p2-label', 'Ask your leader'));
+    var row = el('div', 'p2-asks-row'), form = el('form', 'p2-ask-form');
+    var input = el('input'); input.maxLength = 500; input.setAttribute('aria-label', 'Your question for your leader'); input.placeholder = 'Your question';
+    var go = el('button', 'btn-primary small', 'Send'); go.type = 'submit';
     var said = el('span', 'small'); said.setAttribute('role', 'status');
     form.appendChild(input); form.appendChild(go);
-    var chosen = null;
-    [['other', 'My own question', 'What do you want to ask?'], ['question', 'A question for everyone', 'What should everyone answer?'], ['card', 'A message', 'What should the stage say?'], ['link', 'A link', 'https://'],
-     ['board', 'The board'], ['breakouts', 'Breakouts']].forEach(function (x) {
-      row.appendChild(button(x[1], 'btn-secondary small', function () {
-        if (!x[2]) return sendRequest(x[0]);
-        chosen = x[0]; form.hidden = false; input.placeholder = x[2]; input.focus();
-      }));
-    });
+    var chosen = 'other';
     form.addEventListener('submit', function (ev) {
       ev.preventDefault();
       var text = input.value.trim();
       if (!text) return;
-      if (chosen === 'link') {
-        var c = L.classifyLink(text);
-        if (!c) { said.textContent = 'A full link that starts with https://'; return; }
-        db.from('live_queue').insert({ cohort_id: S.cohort.id, session_id: S.session.id, user_id: who(), kind: c.kind, url: c.url }).then(function (r) { said.textContent = r.error ? 'Not sent: ' + r.error.message : ''; if (!r.error) { input.value = ''; input.blur(); refreshLive(); } });
-        return;
-      }
       sendRequest(chosen, text).then(function (err) { said.textContent = err ? 'Not sent: ' + err : ''; if (!err) { input.value = ''; input.blur(); drawMyRequests(); } });
     });
     box.appendChild(row); box.appendChild(form); box.appendChild(said);
     var mine = (S.requests || []).filter(function (r) { return r.user_id === who(); }).slice(-3).reverse();
     mine.forEach(function (r) {
       var line = el('div', 'p2-ask');
-      line.appendChild(el('span', null, r.kind === 'other' ? 'Your question' + (r.body ? ': ' + r.body : '') : ASKS[r.kind].charAt(0).toUpperCase() + ASKS[r.kind].slice(1) + (r.body ? ': ' + r.body : '')));
+      line.appendChild(el('span', null, r.body || (ASKS[r.kind] || '')));
       if (r.state === 'waiting') line.appendChild(button('Take it back', 'btn-secondary small', function () { db.from('live_requests').delete().eq('id', r.id).then(function () { refreshLive(); }); }));
-      else line.appendChild(el('span', 'p2-state', r.state === 'done' ? 'Done' : 'Not now'));
+      else line.appendChild(el('span', 'p2-state', r.state === 'done' ? 'Answered' : 'Not now'));
       box.appendChild(line);
     });
   }
@@ -2323,13 +2317,13 @@
       return;
     }
     var mine = L.queue(S.items).waiting.filter(function (x) { return x.user_id === who(); })[0];
-    if (mine && S.onStage && S.onStage.kind === 'item' && S.onStage.id === mine.id) { box.appendChild(el('p', 'p2-state', 'Your app is on the main stage.')); return; }
+    if (mine && S.onStage && S.onStage.kind === 'item' && S.onStage.id === mine.id) { box.appendChild(el('p', 'p2-state', 'Everyone is seeing your app.')); return; }
     if (mine) {
       box.appendChild(el('p', 'p2-state', 'Your leader sees you are ready.'));
       box.appendChild(button('Take it back', 'btn-secondary small', function () { db.from('live_queue').delete().eq('id', mine.id).then(function () { refreshLive(); }); }));
       return;
     }
-    box.appendChild(button('Show my app on the main stage', 'btn-primary', function () {
+    box.appendChild(button('Show my app to everyone', 'btn-primary', function () {
       db.from('live_queue').insert({ cohort_id: S.cohort.id, session_id: S.session.id, user_id: who(), kind: app.kind, url: app.url }).then(function (r) { if (!r.error) refreshLive(); });
     }));
   }
@@ -2354,7 +2348,7 @@
       var li = el('li', 'p2-class-app'), name = S.names[p.user_id] || 'Someone';
       var on = S.myStage && S.myStage.url === p.app_url;
       li.appendChild(el('span', null, name + (p.app_name ? ': ' + p.app_name : '')));
-      if (A.frameable(p.app_url)) li.appendChild(button(on ? 'On your stage' : 'Try it on my stage', 'link-button', function () { tryOnMyStage(p.app_url, name); }));
+      if (A.frameable(p.app_url)) li.appendChild(button(on ? 'On your screen' : 'Open it on my screen', 'link-button', function () { tryOnMyStage(p.app_url, name); }));
       var a = newTab(el('a', 'link-button', 'Open in a new tab')); a.href = p.app_url; li.appendChild(a);
       ul.appendChild(li);
     });
@@ -2369,7 +2363,7 @@
     if (!box) return;
     box.replaceChildren();
     box.hidden = !S.myStage;
-    if (S.myStage) box.appendChild(button('Back to the class stage', 'btn-primary small', function () { tryOnMyStage(null); }));
+    if (S.myStage) box.appendChild(button('Back to the class', 'btn-primary small', function () { tryOnMyStage(null); }));
   }
   // A learner asking to show comes to the leader where the leader is looking.
   function drawAsks() {
@@ -2777,7 +2771,7 @@
   function drawChecks() {
     var open = S.checks.filter(function (k) { return k.state === 'open'; });
     var box = $('[data-checks]'); box.replaceChildren();
-    if (!open.length) box.appendChild(el('p', 'small live-empty', S.teaching ? 'No question is open right now.' : 'No question is open right now. When your leader asks one, it appears here.'));
+    if (!open.length && S.teaching) box.appendChild(el('p', 'small live-empty', 'No question is open right now.'));
     open.forEach(function (k) { box.appendChild(S.teaching ? teacherCheck(k) : studentCheck(k)); });
     drawStanceRow();
   }
@@ -3063,7 +3057,8 @@
     if (name.indexOf('tab:') === 0) n = F.tab(name.slice(4));
     else if (name === 'next' || name === 'openstage') n = F.nextButton();
     else if (name === 'stageline') n = F.stageLine();
-    else if (name === 'asks') n = S.mineAsk && S.mineAsk.children.length ? S.mineAsk : F.tab('now');
+    else if (name === 'asks') n = S.mineAsk || null;
+    else if (name === 'yourapp') n = S.mineApp && S.mineApp.children.length ? S.appSection : null;
     else if (name === 'room') n = root.querySelector('[data-sig-where] .btn-primary');
     else if (name === 'show') n = showMineButton();
     // Something in a tab that is not open: point at its tab instead.
@@ -3107,7 +3102,8 @@
     if (!CL || (!force && coachStore && CL.seen(coachStore, 'tour:' + C.role))) return;
     coachEndHint(false);
     var t = CL.tour(C.role, S.stageOn);
-    C.steps = t.now; C.later = force ? null : (t.later.length ? t.later : null); C.i = 0; C.tourKey = 'tour:' + C.role;
+    // A panel step whose place is not on this panel (no app in this cohort) is left out.
+    C.steps = t.now.filter(function (st) { return st.where !== 'panel' || !!coachTarget(st.target); }); C.later = force ? null : (t.later.length ? t.later : null); C.i = 0; C.tourKey = 'tour:' + C.role;
     if (!C.steps.length) return coachFinish();
     coachStep();
   }

@@ -10,10 +10,10 @@ function store() {
 
 test("a learner's tour starts on the stage, and waits for it when it is not open", () => {
   const open = C.tour('learner', true);
-  assert.deepEqual(open.now.map((s) => s.key), ['stage', 'reacts', 'asks', 'mine']);
+  assert.deepEqual(open.now.map((s) => s.key), ['stage', 'reacts', 'asks', 'app']);
   assert.deepEqual(open.later, []);
   const closed = C.tour('learner', false);
-  assert.deepEqual(closed.now.map((s) => s.key), ['asks', 'mine']);
+  assert.deepEqual(closed.now.map((s) => s.key), ['asks', 'app']);
   assert.deepEqual(closed.later.map((s) => s.key), ['stage', 'reacts']);
   assert.deepEqual(C.tour('leader', false).now.map((s) => s.key), ['now', 'next', 'plan', 'tools']);
 });
