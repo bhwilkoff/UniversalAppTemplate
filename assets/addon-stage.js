@@ -53,7 +53,9 @@
     if (!ready) return;
     ready.querySelectorAll('.stage-body').forEach(function (b) { b.style.zoom = ''; });
     var body = ready.querySelector('.stage-body:not([hidden])');
-    if (!body) return;
+    // A view that fills the stage on purpose (the board) is never scaled
+    // (found in a learner's real call: the board drew at a third of its size).
+    if (!body || body.classList.contains('has-board') || body.querySelector('iframe')) return;
     var cs = getComputedStyle(ready), box = ready.getBoundingClientRect(), head = ready.querySelector('.stage-head');
     var top = head && head.getBoundingClientRect().height ? head.getBoundingClientRect().bottom + (parseFloat(cs.rowGap) || 0) : box.top + (parseFloat(cs.paddingTop) || 0);
     // The stage's own box grows with what is in it, so the window is the limit.
