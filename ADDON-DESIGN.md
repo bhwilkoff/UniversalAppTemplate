@@ -280,3 +280,25 @@ Ben: "You should definitely do a learner panel test," then "Can we solve for the
 - **A learner's Mine** keeps each closed section's disclosure marker, and leaves out who is waiting to show, which Show my app at the top already covers. A guest's link says Sign in as a member of this cohort.
 - **Joining late** is the activity icon at the top right of Meet, then Join activity, wherever the panel tells people how.
 - **Words on the stage** keep one fact each: where to answer, and that counts show without names. An answer put on the stage is set as a quote. A learner's request reads "asks for a message on the stage: “…”".
+
+## Showing people around (November 12, 2026)
+
+Ben: "we do need to orient folks so that they can get the most out of the
+tools." Research and the call that prompted it: research/notes/addon-onboarding-research.md.
+
+1. **The first time a panel opens, it shows its person around, one place at a
+   time.** A learner's tour names the stage first (a live class the leader
+   moves, which they can click), then reactions and Ask, then their panel, then
+   Mine; stage stops wait until their stage is open. A leader's names Now, Next,
+   Plan, and Tools. Four stops at most, Next on each, and ? in the header
+   replays it.
+2. **Each new thing is taught the first time it appears, in one line:** a
+   question (answer on the stage or in the panel), a classmate's app (click
+   inside), a room (join it here), a turn to show (Show my app), and for a
+   leader, Open the main stage and a cue when learners are seeing a hint. Once
+   seen on a device, never again.
+3. **One callout at a time across panel and stage,** pointing at the real
+   control, never over it, unlike the controls in look, announced politely,
+   closed with Escape, and never taking focus or blocking the stage.
+4. **A stage that has not heard from its panel never says the session has not
+   begun.** It says it is joining, then how to bring its panel back.

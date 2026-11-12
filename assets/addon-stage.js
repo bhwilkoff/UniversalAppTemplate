@@ -474,6 +474,24 @@
   }
 
   var stageClient = null;
+  // The panel's tour and hints, drawn on this stage at the thing they name.
+  var coachMsg = null, coachEl = null;
+  function coachTarget(name) {
+    if (name === 'stage') return root.querySelector('[data-state="ready"]');
+    if (name === 'reacts') return $('[data-stage-reacts]');
+    if (name === 'choices') return $('[data-choices]');
+    if (name === 'write') return $('[data-stage-write]');
+    if (name === 'app') return root.querySelector('[data-view="app"]:not([hidden]), [data-view="apps"]:not([hidden])');
+    return null;
+  }
+  function drawCoach() {
+    if (!window.Coach) return;
+    if (!coachMsg) return window.Coach.hide();
+    var c = coachMsg;
+    coachEl = coachTarget(c.target);
+    window.Coach.show({ target: coachEl, text: c.text, n: c.n, of: c.of, label: c.label,
+      onNext: function () { act({ a: 'coach', do: 'next' }); }, onClose: function () { coachMsg = null; window.Coach.hide(); act({ a: 'coach', do: 'close' }); } });
+  }
   function act(a) { if (room) return roomAct(a); if (stageClient) try { Promise.resolve(stageClient.notifySidePanel(A.actMessage(a))).catch(function () {}); } catch (e) {} }
 
   // What a slide shows from GitHub, ready to open.
@@ -792,6 +810,8 @@
         input.value = '';
       });
       stage.on('frameToFrameMessage', function (m) {
+        var coach = m && window.CoachLib ? window.CoachLib.readMessage(m.payload) : null;
+        if (coach) { coachMsg = coach.hide ? null : coach.show; drawCoach(); return; }
         var react = m && window.ReactLib ? window.ReactLib.readStage(m.payload) : null;
         if (react) return drawReactions({ floats: react.floats || [], stance: react.stance || lastStance });
         var code = m && window.CodeLib ? window.CodeLib.readStage(m.payload) : null;
@@ -806,6 +826,8 @@
         last = m.payload; view = v; heard = true;
         $('[data-stage-waiting]').hidden = true;
         show('ready'); draw();
+        // Only when the view rebuilt what the callout points at.
+        if (coachMsg && !(window.Coach && window.Coach.showing() && coachEl && coachEl.isConnected)) drawCoach();
         lastStance = v.stance || null;
         // Stances only while the leader has them open, and never while a
         // question waits for this person's answer (Week 2: a learner pressed

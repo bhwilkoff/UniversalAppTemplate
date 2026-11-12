@@ -472,7 +472,7 @@
     // The redesigned panel (ADDON-DESIGN.md), a cohort at a time until it is
     // proven. Everything below it is the same parts in a new frame.
     S.newPanel = !!window.PanelFrame && (S.cohort.details || {}).panel !== 'old' && query.get('panel') !== 'old';
-    if (S.newPanel) { startFrame(); startCohortRoom(); }
+    if (S.newPanel) { startFrame(); startCohortRoom(); coachBegin(); }
     S.show = window.ShowView.mount({
       mount: $('[data-show]'), parts: S.list, teaching: S.teaching,
       nowBox: S.newPanel ? S.frame.pane('now') : null,
@@ -2740,6 +2740,7 @@
     (held != null ? saveDeck(key, held) : Promise.resolve()).then(function () { drawAsks(); sendStage(); });
   }
   function stageAct(a) {
+    if (a.a === 'coach') return a.do === 'next' ? coachNext() : coachClose();
     if (a.a === 'room' && S.svc && a.m && ['vote', 'note', 'unnote', 'stance'].indexOf(a.m.t) >= 0) return S.svc.send(a.m);
     if (a.a === 'react' && S.classChannel) return S.classChannel.press({ key: String(a.key), target: {} });
     if (a.a === 'request' && !S.teaching && ASKS[a.kind]) return sendRequest(a.kind, a.body);
@@ -3047,10 +3048,115 @@
     if (!k) return null;
     return part.kind === 'question' ? { kind: 'check', id: k.id } : { kind: 'check', id: k.id, results: true };
   }
+  // ------------------------------------------------------------------
+  // Showing people around (CoachLib, coach.js): a short tour the first time
+  // this panel opens, then a one-line hint the first time something new
+  // appears. The panel decides; its stage draws only what it is told.
+  // ------------------------------------------------------------------
+  var CL = window.CoachLib, CO = window.Coach;
+  var C = { steps: null, i: 0, later: null, hint: null, role: null, tourKey: null };
+  var coachStore = (function () { try { return window.localStorage; } catch (e) { return null; } })();
+  function coachTarget(name) {
+    var F = S.frame;
+    if (!F) return null;
+    var n = null;
+    if (name.indexOf('tab:') === 0) n = F.tab(name.slice(4));
+    else if (name === 'next' || name === 'openstage') n = F.nextButton();
+    else if (name === 'stageline') n = F.stageLine();
+    else if (name === 'asks') n = S.mineAsk && S.mineAsk.children.length ? S.mineAsk : F.tab('now');
+    else if (name === 'room') n = root.querySelector('[data-sig-where] .btn-primary');
+    else if (name === 'show') n = showMineButton();
+    // Something in a tab that is not open: point at its tab instead.
+    if (n && CO && !CO.visible(n)) {
+      var pane = n.closest && n.closest('[data-pane]');
+      n = pane ? F.tab(pane.getAttribute('data-pane')) : null;
+    }
+    return n;
+  }
+  function showMineButton() {
+    return S.mineApp ? Array.prototype.filter.call(S.mineApp.querySelectorAll('button'), function (b) { return /^Show my app/.test(b.textContent || ''); })[0] || null : null;
+  }
+  function toStage(step) {
+    if (!side || !S.stageOn || !CL) return;
+    try { Promise.resolve(side.notifyMainStage(CL.message(step))).catch(function () {}); } catch (e) {}
+  }
+  function coachDraw(step, n, of, label) {
+    if (!CO) return;
+    var info = { target: step.target, text: step.text, n: n, of: of, label: label };
+    if (step.where === 'stage' && S.stageOn) { CO.hide(); toStage(info); return; }
+    toStage(null);
+    CO.show({ target: coachTarget(step.target), text: step.text, n: n, of: of, label: label, onNext: coachNext, onClose: coachClose });
+  }
+  function coachBegin(force) {
+    if (!CL || !CO || !S.frame || standalone) return;
+    C.role = S.teaching ? 'leader' : 'learner';
+    S.frame.onHelp(function () { coachTour(true); });
+    if (!force && coachStore && CL.seen(coachStore, 'tour:' + C.role)) return;
+    // A learner's tour starts with the stage, so it waits a little for one.
+    var waited = 0;
+    (function go() {
+      if (!S.teaching && !S.stageOn && waited < 8) { waited += 1; return setTimeout(go, 1000); }
+      coachTour(false);
+    })();
+  }
+  function coachTour(force) {
+    if (!CL || (!force && coachStore && CL.seen(coachStore, 'tour:' + C.role))) return;
+    coachEndHint(false);
+    var t = CL.tour(C.role, S.stageOn);
+    C.steps = t.now; C.later = force ? null : (t.later.length ? t.later : null); C.i = 0; C.tourKey = 'tour:' + C.role;
+    if (!C.steps.length) return coachFinish();
+    coachStep();
+  }
+  function coachStep() {
+    var st = C.steps[C.i];
+    if (st.where === 'panel' && st.target.indexOf('tab:') === 0 && S.frame) S.frame.show(st.target.slice(4));
+    coachDraw(st, C.i + 1, C.steps.length, C.i + 1 < C.steps.length ? 'Next' : 'Got it');
+  }
+  function coachNext() {
+    if (C.steps) { C.i += 1; if (C.i < C.steps.length) return coachStep(); return coachFinish(); }
+    coachEndHint(true);
+  }
+  function coachClose() { if (C.steps) return coachFinish(); coachEndHint(true); }
+  function coachFinish() {
+    if (coachStore && C.tourKey) CL.mark(coachStore, C.tourKey);
+    C.steps = null; C.tourKey = null;
+    if (CO) CO.hide();
+    toStage(null);
+    if (S.frame) S.frame.show('now');
+    coachCheck(S.session ? currentView() : null);
+  }
+  function coachEndHint(seenIt) {
+    if (!C.hint) return;
+    if (seenIt && coachStore) CL.mark(coachStore, 'hint:' + C.hint);
+    C.hint = null;
+    if (CO) CO.hide();
+    toStage(null);
+  }
+  function coachCheck(view) {
+    if (!CL || !CO || !S.frame || C.steps || standalone) return;
+    // The stage's half of a learner's tour, once their stage opens.
+    if (C.later && S.stageOn) {
+      var later = C.later; C.later = null;
+      C.steps = later; C.i = 0; C.tourKey = 'tour:' + C.role + ':stage';
+      return coachStep();
+    }
+    var next = S.frame.nextButton();
+    var key = CL.due({
+      teaching: S.teaching, view: view, stageOn: S.stageOn,
+      openStage: !!(next && /main stage/i.test(next.textContent || '')),
+      roomJoin: !!(CO.visible(root.querySelector('[data-sig-where] .btn-primary'))),
+      showMine: !!showMineButton()
+    }, coachStore);
+    // What a hint pointed at is gone: it has done its work.
+    if (C.hint && key !== C.hint) coachEndHint(true);
+    if (key && key !== C.hint) { C.hint = key; coachDraw(Object.assign({ key: key }, CL.HINTS[key]), 0, 0, 'Got it'); }
+  }
+
   function sendStage() {
     drawWelcomeToggle();
     var view = S.session ? currentView() : null;
     drawStageLine(view);
+    coachCheck(view);
     if (!S.stageOn || !side || !S.session) return;
     try { Promise.resolve(side.notifyMainStage(A.stageMessage(view, !!S.recording, !S.teaching, S.svc ? S.svc.stance() : null))).catch(function () {}); } catch (e) {}
   }

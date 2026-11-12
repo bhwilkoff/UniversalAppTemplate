@@ -26,6 +26,13 @@
     more.addEventListener('click', function () { if (onNudge) onNudge(30); });
     clockBox.appendChild(less); clockBox.appendChild(time); clockBox.appendChild(more);
     row.appendChild(clockBox);
+    // Show me around: the panel's tour again, whenever this person asks.
+    var help = el('button', 'p2-help', '?');
+    help.type = 'button'; help.hidden = true;
+    help.setAttribute('aria-label', 'Show me around');
+    var onHelp = null;
+    help.addEventListener('click', function () { if (onHelp) onHelp(); });
+    row.appendChild(help);
     top.appendChild(row);
     // Where the session is: Part 3 of 7, or that it has not started.
     var step = el('p', 'p2-step'); step.hidden = true;
@@ -89,6 +96,11 @@
     var drawn = '';
     return {
       el: shell, low: low,
+      // What the tour points at, and its own button.
+      tab: function (key) { return buttons[key] || null; },
+      nextButton: function () { return next; },
+      stageLine: function () { return stage; },
+      onHelp: function (fn) { onHelp = fn; help.hidden = !fn; },
       pane: function (key) { return panes[key]; },
       show: show,
       current: function () { return current; },

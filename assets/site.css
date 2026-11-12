@@ -3587,3 +3587,21 @@ a.person-name:hover { text-decoration: underline; }
 .studio-picture { display: block; max-width: 100%; max-height: 9rem; object-fit: contain; border-radius: 6px; background: var(--rule); }
 .studio-picture-add { display: grid; gap: 0.5rem; margin-top: 0.5rem; }
 .studio-file { justify-self: start; cursor: pointer; }
+
+/* Showing people around (coach.js): a light note on the dark add-on, with an
+   arrow to what it names, never over it. The ring marks the real control. */
+.coach { position: fixed; z-index: 60; box-sizing: border-box; padding: 0.75rem 0.85rem 0.7rem; border-radius: 12px; background: #F3EEF9; color: #131916; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45); font-size: clamp(0.85rem, 1.9vmin, 1rem); line-height: 1.4; }
+.coach::before { content: ""; position: absolute; left: calc(var(--coach-arrow, 50%) - 7px); width: 14px; height: 14px; background: #F3EEF9; transform: rotate(45deg); display: none; }
+.coach[data-side="below"]::before { display: block; top: -7px; }
+.coach[data-side="above"]::before { display: block; bottom: -7px; }
+.coach-text { margin: 0 1.4rem 0.6rem 0; }
+.coach-row { display: flex; align-items: center; justify-content: flex-end; gap: 0.75rem; }
+.coach-count { margin-right: auto; color: #4A524E; font-size: 0.85em; }
+.coach-go { border: 0; border-radius: 999px; padding: 0.35rem 0.9rem; background: #131916; color: #F3EEF9; font: inherit; font-weight: 600; cursor: pointer; }
+.coach-x { position: absolute; top: 0.3rem; right: 0.35rem; border: 0; background: none; color: #4A524E; font-size: 1.2rem; line-height: 1; width: 1.8rem; height: 1.8rem; border-radius: 50%; cursor: pointer; }
+.coach-go:focus-visible, .coach-x:focus-visible { outline: 2px solid #131916; outline-offset: 2px; }
+.coach-target { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 8px; }
+[data-state].coach-target, .stage-ready.coach-target { outline-offset: -4px; }
+.p2-help { margin-left: 0.5rem; flex: none; width: 1.7rem; height: 1.7rem; border-radius: 50%; border: 1px solid var(--rule); background: none; color: var(--ink); font: inherit; font-weight: 600; line-height: 1; cursor: pointer; }
+.p2-help:hover { border-color: var(--accent); }
+
