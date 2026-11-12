@@ -1479,3 +1479,11 @@ own tab. A part's picture or video fits the stage, and anything beside a
 question can be enlarged on each person's own stage. Imported steps that
 feature people are talk parts, never Showing work, and a long imported poll
 splits into its passage, as a slide, and its question.
+
+**Amended November 12, 2026.** Ben: "Private docs should be copied so that they
+can be used in humanshaped.org more easily ... you can fix content so that it
+makes sense." A breakout's group documents become Human Shaped group workbooks,
+copied from the documents (a wide table becomes a list a panel can show, and a
+blank page becomes a place to write), so nobody needs access to another
+organization's Drive. Course Builder's template lines ("[Useful for: ...]",
+"[do a subsequent task]", "n/a") leave leaders' notes on import.

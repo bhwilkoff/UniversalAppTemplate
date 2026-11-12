@@ -119,6 +119,16 @@ function pollRef(a) {
 // A poll longer than a readable question splits into its passage and the
 // question at its end: the trailing sentences that ask something, up to 300
 // characters. With no question at the end, the poll's own title asks it.
+// Course Builder's template lines a leader never wrote ("[Useful for: ...]",
+// "[Overview description of activity.]", "Tell students to pay attention to
+// ... [do a subsequent task]", "- [Optional]", "n/a"): left in, they read as
+// instructions on the leader's panel.
+const FILLER = [/^\[Useful for:[^\]]*\]$/, /^\[Overview description of activity\.\]$/, /^(Engagement:\s*)?Tell students to pay attention to … because .*\[do a subsequent task\]$/,
+  /^\[Ask students a question that they can answer only if .*\]$/, /^- \[Optional\]$/, /^n\/a$/i, /^Engagement:\s*$/];
+export function withoutFiller(text) {
+  return String(text || '').split('\n').filter((l) => !FILLER.some((p) => p.test(l.trim()))).join('\n').replace(/\n{3,}/g, '\n\n').trim();
+}
+
 export function splitQuestion(text, title) {
   const t = String(text || '').trim();
   if (t.length <= 300) return { prompt: t, passage: '' };
@@ -370,7 +380,7 @@ export function convert(exported) {
         }
         if (extras.length) notes.push('More to show:\n' + extras.join('\n'));
         if (feature === 'quiet') notes.push('Feature someone who has been quiet so far.');
-        lead.notes = cut(notes.map((n) => plain(n).replace(/^[ \t]*\*[ \t]+/gm, '- ')).filter((n, i, all) => all.indexOf(n) === i).join('\n\n'), LIMIT.notes);
+        lead.notes = cut(notes.map((n) => withoutFiller(plain(n).replace(/^[ \t]*\*[ \t]+/gm, '- '))).filter((n, i, all) => n && all.indexOf(n) === i).join('\n\n'), LIMIT.notes);
         first.slice(1).forEach((s) => { if (!s.notes) s.notes = ''; });
       });
     });

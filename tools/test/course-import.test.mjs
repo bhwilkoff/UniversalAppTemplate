@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { convert, deltaToSlide, splitQuestion } from '../../supabase/functions/course-import/convert.js';
+import { convert, deltaToSlide, splitQuestion, withoutFiller } from '../../supabase/functions/course-import/convert.js';
 
 // A made-up course in the shape of Course Builder's export (format version 1).
 const R = (type, data) => ({ type, data });
@@ -186,4 +186,10 @@ test('a long poll splits into its passage and the question at its end, so nothin
   assert.deepEqual(splitQuestion(plain, 'Confidentiality Agreement'), { prompt: 'Confidentiality Agreement', passage: plain, heading: 'Confidentiality Agreement' });
   // A short poll stays as it is.
   assert.deepEqual(splitQuestion('What did you notice?', 'Poll'), { prompt: 'What did you notice?', passage: '' });
+});
+
+test("Course Builder's template lines leave a leader's notes", () => {
+  const note = '[Useful for: share-outs, role-play]\n\n[Overview description of activity.]\n\nExplain the breakouts\n\nEngagement: Tell students to pay attention to … because they will need this information in order to … [do a subsequent task]\n- [Optional]\nn/a\nFeature someone quiet.';
+  assert.equal(withoutFiller(note), 'Explain the breakouts\n\nFeature someone quiet.');
+  assert.equal(withoutFiller('[PAINTING VS. TELLING]'), '[PAINTING VS. TELLING]');
 });
