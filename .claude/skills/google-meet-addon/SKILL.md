@@ -22,6 +22,7 @@ paid for by a feature that passed a test and then failed in Meet.
 | The stage takes each person's own clicks and keys, can `fetch` public APIs, and can frame a learner's `github.io` app (each person gets their own working copy). | A shared stage can be interactive: answer on the stage, try a classmate's app. github.com itself sends `X-Frame-Options: deny`; check XFO/frame-ancestors server-side before framing any URL, and always offer Open in a new tab. |
 | A stage page that never calls `createMainStageClient` leaves Meet on "Loading", then "The add-on couldn't start". | The stage must create its client at once, even when it has nothing to show yet. |
 | `createCoDoingClient` exists in the SDK but is undocumented and refused, with or without an activity. | Do not build on it. Use your own realtime channel. |
+| Chrome draws **no PDF** inside Meet's frames, sandboxed or not (a broken-page icon). A picture or video in a plain iframe draws at its natural size and spills off the stage. | Render a PDF deck's pages to images and show them as slides the leader moves for everyone; give any other PDF an "Open the PDF" card. Show pictures in `<img>` and videos in `<video controls>` with `object-fit: contain`, and let each person enlarge what sits beside a question. |
 
 ## Activities: the lifecycle nobody tells you
 
