@@ -82,3 +82,16 @@ test('a blank to fill in stays a blank, two to a line included, and code is left
   assert.equal(lib.blanks('```\nx = a___b\n```'), '```\nx = a___b\n```');
   assert.ok(lib.deck('## A\n\n- helps ___ to ___').includes('helps \\_\\_\\_ to \\_\\_\\_'));
 });
+
+test('a slide that is only a picture draws the picture, fitted to the slide', () => {
+  const text = lib.deck('![Page one](https://example.org/p1.jpg)\n\n---\n\n## Heading\n\n![Page two](https://example.org/p2.jpg)\n\n---\n\n> a note\n![Page three](https://example.org/p3.jpg)\n\n---\n\n![Not https](http://example.org/p4.jpg)');
+  const pics = lib.pictures(text);
+  assert.deepEqual(pics.map((p) => p && p.url), ['https://example.org/p1.jpg', null, 'https://example.org/p3.jpg', null]);
+  const kit = { render: (t) => lib.split(t.slice(lib.HEAD.length)).map(() => '<svg viewBox="0 0 1600 900"><text>words</text></svg>') };
+  const out = lib.render(kit, text);
+  assert.equal(out.length, 4);
+  assert.match(out[0], /<image href="https:\/\/example\.org\/p1\.jpg" x="0" y="0" width="1600" height="900" preserveAspectRatio="xMidYMid meet"\/>/);
+  assert.match(out[0], /aria-label="Page one"/);
+  assert.match(out[1], /<text>words<\/text>/);
+  assert.match(out[3], /<text>words<\/text>/);
+});

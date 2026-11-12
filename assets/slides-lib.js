@@ -135,6 +135,34 @@
   }
   function deck(text) { return text ? HEAD + ghExpand(blanks(clean(text))) : ''; }
 
+  // A slide that is only a picture (![words](https://...)) draws the picture,
+  // fitted to the slide, because the renderer draws no images (found running
+  // an imported course whose slides were a PDF's pages). The words are read
+  // out for anyone who cannot see it.
+  var PICTURE = /^!\[([^\]]*)\]\((https:\/\/[^\s)]+)\)$/;
+  function pictureOf(lines) {
+    var body = (lines || []).map(function (l) { return String(l).trim(); }).filter(function (l) { return l && l.charAt(0) !== '>'; });
+    var m = body.length === 1 ? PICTURE.exec(body[0]) : null;
+    return m ? { alt: m[1], url: m[2] } : null;
+  }
+  function pictures(text) {
+    var t = String(text || '');
+    if (t.indexOf(HEAD) === 0) t = t.slice(HEAD.length);
+    return split(t).map(pictureOf);
+  }
+  function attr(v) { return String(v).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;'); }
+  function pictureSvg(svg, pic) {
+    var vb = /viewBox="([^"]+)"/.exec(svg || '');
+    var box = vb ? vb[1] : '0 0 1600 900', p = box.split(/[\s,]+/);
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="' + attr(box) + '" role="img" aria-label="' + attr(pic.alt || 'A picture') + '">' +
+      '<image href="' + attr(pic.url) + '" x="' + attr(p[0]) + '" y="' + attr(p[1]) + '" width="' + attr(p[2]) + '" height="' + attr(p[3]) + '" preserveAspectRatio="xMidYMid meet"/></svg>';
+  }
+  // The renderer's slides, with each picture slide drawn as its picture.
+  function render(kit, text) {
+    var out = kit.render(text), pics = pictures(text);
+    return out.map(function (svg, i) { return pics[i] ? pictureSvg(svg, pics[i]) : svg; });
+  }
+
   // A step inside a part's deck, or null when the step leaves the part.
   function step(total, at, delta) {
     var next = (Number(at) || 0) + delta;
@@ -192,7 +220,7 @@
   }
   function slideAt(text, caret) { return Math.max(0, count(String(text || '').slice(0, caret)) - 1); }
 
-  var lib = { ghAll: ghAll, ghDrop: ghDrop, ghLinks: ghLinks, ghSpecs: ghSpecs, ghHold: ghHold, ghHas: ghHas, ghExpand: ghExpand, HEAD: HEAD, split: split, count: count, withoutNotes: withoutNotes, notes: notes, deck: deck, blanks: blanks, clean: clean, frames: frames, frameOf: frameOf, step: step, arrive: arrive, ADD: ADD, NOTE: NOTE, insert: insert, insertNote: insertNote, offset: offset, slideAt: slideAt };
+  var lib = { ghAll: ghAll, ghDrop: ghDrop, ghLinks: ghLinks, ghSpecs: ghSpecs, ghHold: ghHold, ghHas: ghHas, ghExpand: ghExpand, HEAD: HEAD, split: split, count: count, withoutNotes: withoutNotes, notes: notes, deck: deck, render: render, pictures: pictures, blanks: blanks, clean: clean, frames: frames, frameOf: frameOf, step: step, arrive: arrive, ADD: ADD, NOTE: NOTE, insert: insert, insertNote: insertNote, offset: offset, slideAt: slideAt };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
   else root.SlidesLib = lib;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

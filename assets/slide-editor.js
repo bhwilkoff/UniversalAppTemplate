@@ -25,7 +25,7 @@
   // The first slide of a deck as a picture, for a list of parts.
   function thumb(box, text) {
     load().then(function (K) {
-      var svg = K.render(L.deck(text))[0];
+      var svg = L.render(K, L.deck(text))[0];
       if (svg) { box.innerHTML = svg; box.classList.add('slide-thumb'); }
     }, function () {});
   }
@@ -39,7 +39,7 @@
     d.addEventListener('toggle', function () {
       if (!d.open || box.childElementCount) return;
       load().then(function (K) {
-        K.render(L.deck(text)).forEach(function (svg) { var s = el('div', 'slide-pick'); s.innerHTML = svg; box.appendChild(s); });
+        L.render(K, L.deck(text)).forEach(function (svg) { var s = el('div', 'slide-pick'); s.innerHTML = svg; box.appendChild(s); });
       }, function () {});
     });
     return d;
@@ -89,7 +89,7 @@
         if (!shown) return;
         shown.replaceChildren();
         if (!text) return;
-        K.render(full).forEach(function (svg, i) {
+        L.render(K, full).forEach(function (svg, i) {
           var b = el('button', 'slide-pick'); b.type = 'button';
           b.setAttribute('aria-label', 'Go to slide ' + (i + 1));
           b.innerHTML = svg;

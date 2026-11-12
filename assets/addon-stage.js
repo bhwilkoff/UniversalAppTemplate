@@ -280,7 +280,7 @@
     var box = $('[data-slide]');
     if (d.text !== deckText) {
       deckText = d.text; shownKey = null;
-      try { deckSlides = window.DeckKit.render(d.text); deckWords = window.DeckKit.words(d.text); }
+      try { deckSlides = window.SlidesLib.render(window.DeckKit, d.text); deckWords = window.DeckKit.words(d.text); window.SlidesLib.pictures(d.text).forEach(function (pic, i) { if (pic) deckWords[i] = [pic.alt || 'A picture']; }); }
       catch (e) { console.log('[stage] the slides did not draw: ' + (e && e.message)); deckSlides = []; deckWords = []; }
     }
     var at = Math.min(d.at, Math.max(0, deckSlides.length - 1));
@@ -357,7 +357,7 @@
       if (key === besideSrc) return;
       besideSrc = key;
       var svg = '';
-      try { svg = slide.shown ? window.DeckKit.frame(slide.text, slide.at, slide.shown) : (window.DeckKit.render(slide.text)[slide.at] || ''); } catch (e) {}
+      try { svg = slide.shown ? window.DeckKit.frame(slide.text, slide.at, slide.shown) : (window.SlidesLib.render(window.DeckKit, slide.text)[slide.at] || ''); } catch (e) {}
       box.innerHTML = svg;
       return;
     }
@@ -366,11 +366,37 @@
     $('[data-beside-open]').href = doc.url;
     if (doc.url === besideSrc) return;
     besideSrc = doc.url;
+    box.replaceChildren(docElement(doc));
+  }
+
+  // What a document is decides how it is shown: a picture or a video fits the
+  // space it has, and anything else is framed (found running an imported
+  // course: a picture in a frame drew at full size and spilled off the stage).
+  var PICTURE_FILE = /\.(png|jpe?g|gif|webp|svg|avif)($|[?#])/i, VIDEO_FILE = /\.(mp4|webm|mov|m4v)($|[?#])/i, PDF_FILE = /\.pdf($|[?#])/i;
+  function docElement(doc) {
+    var url = doc.url;
+    if (PICTURE_FILE.test(url)) {
+      var img = document.createElement('img');
+      img.src = url; img.alt = doc.name; img.className = 'stage-doc-fit';
+      img.setAttribute('referrerpolicy', 'no-referrer');
+      return img;
+    }
+    if (VIDEO_FILE.test(url)) {
+      // Each person presses play: Meet gives the stage no autoplay.
+      var v = document.createElement('video');
+      v.src = url; v.controls = true; v.playsInline = true; v.preload = 'metadata'; v.className = 'stage-doc-fit';
+      v.setAttribute('aria-label', doc.name);
+      return v;
+    }
     var f = document.createElement('iframe');
-    f.src = doc.url; f.title = doc.name;
-    if (!/\.pdf($|[?#])/i.test(doc.url)) f.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-downloads');
+    // A PDF opens at its page, fitted to the frame (a #page in the address
+    // is kept). It opens only unsandboxed: Chrome will not run its viewer in
+    // a sandboxed frame (found in a real call: a broken-page icon).
+    f.src = PDF_FILE.test(url) && url.indexOf('#') === -1 ? url + '#view=Fit' : url;
+    f.title = doc.name;
+    if (!PDF_FILE.test(url)) f.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-downloads');
     f.setAttribute('referrerpolicy', 'no-referrer');
-    box.replaceChildren(f);
+    return f;
   }
 
   // A part's document, framed for everyone; the frame stays through later
@@ -383,15 +409,7 @@
     $('[data-doc-open]').href = v.doc.url;
     if (v.doc.url === docSrc) return;
     docSrc = v.doc.url;
-    var f = document.createElement('iframe');
-    f.src = v.doc.url;
-    f.title = v.doc.name;
-    // A PDF opens only unsandboxed: Chrome will not run its viewer in a
-    // sandboxed frame (found in a real call: a broken-page icon). It is still
-    // another site's frame, apart from this page.
-    if (!/\.pdf($|[?#])/i.test(v.doc.url)) f.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-downloads');
-    f.setAttribute('referrerpolicy', 'no-referrer');
-    box.replaceChildren(f);
+    box.replaceChildren(docElement(v.doc));
   }
 
   // The slide editor, on the leader's own stage: the same slide, the same

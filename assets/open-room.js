@@ -372,7 +372,7 @@
       if (editing()) pane.appendChild(editRow());
       else pane.appendChild(btn(stageUp() ? 'Edit on your stage' : 'Open the stage to edit', 'btn-secondary', startEditing));
       var pics = [];
-      try { pics = window.DeckKit ? window.DeckKit.render(text) : []; } catch (e) { pics = []; }
+      try { pics = window.DeckKit ? window.SlidesLib.render(window.DeckKit, text) : []; } catch (e) { pics = []; }
       var grid = el('ol', 'open-film');
       grid.setAttribute('aria-label', 'Your slides');
       pics.forEach(function (svg, n) {
