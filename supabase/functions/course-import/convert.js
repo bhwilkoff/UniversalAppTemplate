@@ -116,6 +116,19 @@ function pollRef(a) {
   }
   return null;
 }
+// A poll longer than a readable question splits into its passage and the
+// question at its end: the trailing sentences that ask something, up to 300
+// characters. With no question at the end, the poll's own title asks it.
+export function splitQuestion(text, title) {
+  const t = String(text || '').trim();
+  if (t.length <= 300) return { prompt: t, passage: '' };
+  const parts = t.split(/(?<=[?.!])\s+(?=[A-Z\u2018\u201c'"])/);
+  let k = parts.length, q = '';
+  while (k > 0 && /\?["\u201d\u2019']?$/.test(parts[k - 1]) && (parts.slice(k - 1).join(' ').length <= 300)) { k -= 1; q = parts.slice(k).join(' '); }
+  if (q && k > 0) return { prompt: q, passage: parts.slice(0, k).join(' '), heading: title || '' };
+  return { prompt: title || q || t.slice(0, 300), passage: t, heading: title || '' };
+}
+
 function pollQuestion(a) {
   const prompt = clean(a.question);
   const choices = Object.values(a.choices || {}).sort((x, y) => (x.index || 0) - (y.index || 0)).map((c) => oneLine(c.choice)).filter(Boolean);
@@ -290,7 +303,13 @@ export function convert(exported) {
         });
         poll.forEach((p, pi) => {
           const s = scene('question', poll.length > 1 ? stepTitle + ' (' + (pi + 1) + ')' : stepTitle, { ref: 'el:' + p.el.id });
-          s.config = { prompt: cut(oneLine(plain(p.q.prompt)), LIMIT.prompt) || 'What do you think?', kind: p.q.kind, show_tally: p.q.showTally };
+          // A long poll (a passage, then its question) becomes a slide beside a
+          // short question, so nothing is cut and the question stays readable
+          // (found running an imported course: a 776-character poll was cut at
+          // 500, mid-sentence, on every stage).
+          const split = splitQuestion(oneLine(plain(p.q.prompt)), oneLine((p.el.attributes || {}).title || ''));
+          s.config = { prompt: cut(split.prompt, LIMIT.prompt) || 'What do you think?', kind: p.q.kind, show_tally: p.q.showTally };
+          if (split.passage) s.deck = '## ' + (split.heading || s.title) + '\n\n' + split.passage;
           if (p.q.options) s.config.options = p.q.options;
           if (clean(p.q.prompt).length > LIMIT.prompt || /\n/.test(clean(p.q.prompt))) s.body = cut(plain(p.q.prompt), LIMIT.body);
           if (p.q.warn) { warnings.push(title + ', ' + s.title + ': ' + p.q.warn); notes.push(p.q.warn); }
@@ -339,7 +358,7 @@ export function convert(exported) {
           if (featureCount > 1) first[0].config.feature_count = Math.min(8, featureCount);
         } else if (feature === 'group' && first[0].kind === 'talk') first[0].config.feature = 'group';
         const lead = first[0];
-        if (slides.length) { lead.deck = slides.join('\n\n---\n\n'); counts.slides += slides.length; }
+        if (slides.length) { lead.deck = [lead.deck].concat(slides).filter(Boolean).join('\n\n---\n\n'); counts.slides += slides.length; }
         if (shows.length) {
           lead.config.show = { url: shows[0].url, name: cut(shows[0].name, 200) };
           shows.slice(1).forEach((x) => extras.push('- ' + x.name + ': ' + x.url));

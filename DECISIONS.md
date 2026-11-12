@@ -1454,3 +1454,28 @@ the empty account only if nothing else belongs to it. "Not now" goes on and
 is remembered for that account. /account/ lists every Google account and adds
 more. Holding both sign-ins at once is the proof of ownership; never move an
 identity on one sign-in alone.
+
+## Pictures on slides, and what an imported course shows in Meet (November 12, 2026)
+
+Ben, running an imported course in Meet: "a huge number of the resources were
+poorly rendering (too big for the window) or just didn't load at all", then:
+"add images to slides as well, as that is definitely something we would want
+as a capability."
+
+**Why:** measured in a real call, Chrome draws no PDF inside Meet's frames, and
+a picture or video framed like a web page draws at its own size. The slide
+renderer drew no images at all, so a course built on slide decks and
+screenshots had nothing that worked on the stage.
+
+**How to apply:** a picture is markdown, `![what it shows](https://...)`. Alone
+on a slide it fills the slide; under a headline it sits beneath it; with other
+words the slide becomes two columns with the picture on the right
+(`tools/deck-kit/entry.ts` places it in the renderer's own column). Leaders
+upload pictures from the session page's slide editor into the public
+`slide-pictures` bucket under the cohort's id; only its leaders may add one. A
+PDF deck becomes picture slides (its pages rendered and stored the same way),
+so the leader moves everyone through it; a PDF left as a document opens in its
+own tab. A part's picture or video fits the stage, and anything beside a
+question can be enlarged on each person's own stage. Imported steps that
+feature people are talk parts, never Showing work, and a long imported poll
+splits into its passage, as a slide, and its question.

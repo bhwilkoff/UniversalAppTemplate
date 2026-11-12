@@ -3522,6 +3522,16 @@ def main():
     check("a guest cannot change the rest of their row",
           attempt(as_user("dee"), "update public.call_guests set member_id = %s where user_id = %s returning 1", (people["bea"], people["dee"])) and last_rows == [])
 
+    # Pictures for slides (migration 20261112070000): a cohort's leaders add
+    # them under the cohort's id; nobody else writes there.
+    def add_pic(name, path):
+        return attempt(as_user(name), "insert into storage.objects (bucket_id, name, owner) values ('slide-pictures', %s, auth.uid())", (path,))
+    check("a leader adds a picture to their cohort's slides", add_pic("ben", "%s/p1.jpg" % cc))
+    check("a learner in that cohort cannot", not add_pic("bea", "%s/p2.jpg" % cc))
+    check("nor can someone outside it", not add_pic("dee", "%s/p3.jpg" % cc))
+    check("nor can a leader write outside a cohort's folder", not add_pic("ben", "loose/p4.jpg"))
+    check("nor can a leader's agent", not attempt(as_agent("ben"), "insert into storage.objects (bucket_id, name, owner) values ('slide-pictures', %s, auth.uid())", ("%s/p5.jpg" % cc,)))
+
     # Another Google account joins a GitHub account (migration 20261112060000).
     def google_account(name, sub):
         as_system()

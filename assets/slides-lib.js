@@ -180,6 +180,7 @@
     { key: 'title', label: 'Title', text: '## A title {.title}\n\nA line under it\n' },
     { key: 'two', label: 'Two columns', text: '## Two sides {.two}\n\n- On the left\n\n|\n\n- On the right\n' },
     { key: 'icon', label: 'Big icon', text: '## :lightbulb: One idea {.icon}\n\n- Beside a big icon\n' },
+    { key: 'picture', label: 'Picture', text: '## One idea, with a picture\n\n- What you will say about it\n\n![What the picture shows](https://example.com/picture.jpg)\n' },
     { key: 'table', label: 'Table', text: '## A table\n\n```sheet\nName | Count\n--- | ---\nFirst | 3\nSecond | 5\n```\n' },
     { key: 'chart', label: 'Chart', text: '## A chart\n\n```sheet\n---\nchart: bar\n---\nName | Count:number\n--- | ---\nFirst | 3\nSecond | 5\n```\n' },
     { key: 'github', label: 'GitHub', text: '## From GitHub\n\n```github\nrepo: \nshow: issues\n```\n' },

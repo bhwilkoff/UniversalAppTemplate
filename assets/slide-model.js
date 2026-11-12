@@ -33,7 +33,7 @@
     var out = [], fence = false, column = 0;
     lines.forEach(function (l, i) {
       if (/^```/.test(l)) { fence = !fence; return; }
-      if (fence || !l.trim() || /^>/.test(l)) return;
+      if (fence || !l.trim() || /^>/.test(l) || PICTURE.test(l.trim())) return;
       if (/^\|\s*$/.test(l)) { column = 1; return; }
       var p = pieces(l);
       out.push({ line: i, kind: p.kind, words: p.words, column: column });
@@ -148,6 +148,34 @@
     return a;
   }
 
+  // A picture on a slide, written ![words](https://...): where it sits, its
+  // address, and the words read out in its place. One to a slide.
+  var PICTURE = /^!\[([^\]]*)\]\((https:\/\/[^\s)]+)\)$/;
+  function picture(lines) {
+    for (var i = 0; i < lines.length; i++) {
+      var m = PICTURE.exec(String(lines[i]).trim());
+      if (m) return { line: i, alt: m[1], url: m[2] };
+    }
+    return null;
+  }
+  function setPicture(lines, url, alt) {
+    var words = String(alt || '').replace(/[\[\]\n]/g, ' ').replace(/\s+/g, ' ').trim();
+    var line = '![' + words + '](' + url + ')';
+    var a = lines.slice(), p = picture(a);
+    if (p) { a[p.line] = line; return a; }
+    var notes = a.findIndex(function (l) { return /^>/.test(l); });
+    if (notes < 0) return a.concat(['', line]);
+    a.splice(notes, 0, line, '');
+    return a;
+  }
+  function removePicture(lines) {
+    var p = picture(lines);
+    if (!p) return lines;
+    var a = lines.slice();
+    a.splice(p.line, 1);
+    return trim(a);
+  }
+
   // A table, chart, or diagram on a slide: where it sits, and its text.
   function block(lines) {
     var from = lines.findIndex(function (l) { return /^```\s*(sheet|diagram|github)\b/.test(l); });
@@ -208,7 +236,8 @@
   var lib = { slides: slides, join: join, pieces: pieces, editable: editable, setWords: setWords, addAfter: addAfter, remove: remove,
     plain: plain, match: match, LAYOUTS: LAYOUTS, layoutOf: layoutOf, setLayout: setLayout, revealed: revealed,
     setRevealed: setRevealed, iconOf: iconOf, setIcon: setIcon, noteOf: noteOf, setNote: setNote, block: block, setBlock: setBlock,
-    grid: grid, ungrid: ungrid, outline: outline, setOutline: setOutline, even: even, move: move };
+    grid: grid, ungrid: ungrid, outline: outline, setOutline: setOutline, even: even, move: move,
+    picture: picture, setPicture: setPicture, removePicture: removePicture };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
   else root.SlideModel = lib;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

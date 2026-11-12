@@ -223,6 +223,21 @@
     }
     function leave(id) { opts.go(id); }
     function githubOpts() { return { db: db, cohortId: cohort.id, repo: cohort.github_repo || '', repos: opts.repos || [] }; }
+    // A picture for a slide, stored under the cohort's id in the public
+    // slide-pictures bucket, where only the cohort's leaders may add one.
+    function uploadPicture(file) {
+      if (!/^image\/(png|jpeg|webp)$/.test(file.type)) return Promise.reject(new Error('choose a PNG, JPEG, or WebP picture'));
+      if (file.size > 5 * 1024 * 1024) return Promise.reject(new Error('choose a picture under 5 MB'));
+      var ext = file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg';
+      var path = cohort.id + '/' + window.crypto.randomUUID() + '.' + ext;
+      var store = db.storage.from('slide-pictures');
+      return db.auth.getSession().then(function () {
+        return store.upload(path, file, { contentType: file.type, cacheControl: '31536000' });
+      }).then(function (r) {
+        if (r.error) throw r.error;
+        return store.getPublicUrl(path).data.publicUrl;
+      });
+    }
     // Everything waiting to save lands before the page changes.
     function setPart(id) {
       if (id === part) return Promise.resolve();
@@ -343,7 +358,7 @@
         stageBox.hidden = !deckBox.hidden;
         if (!stageBox.hidden) stageBox.replaceChildren(preview(s));
       }
-      if (window.SlideStudio) studio = window.SlideStudio.mount(deckBox, { text: decks[s.id] || s.slides || '', onChange: saveDeck, github: githubOpts() });
+      if (window.SlideStudio) studio = window.SlideStudio.mount(deckBox, { text: decks[s.id] || s.slides || '', onChange: saveDeck, github: githubOpts(), upload: uploadPicture });
       function saved(text) { msg.textContent = text; }
 
       function saveDeck(text) {

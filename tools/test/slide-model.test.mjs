@@ -132,3 +132,16 @@ test('a headline with one # can be typed on and keeps its one #', () => {
   assert.equal(M.setIcon(s, 'lightbulb')[0], '# :lightbulb: What are we building today?');
   assert.equal(M.iconOf(M.setIcon(s, 'lightbulb')), 'lightbulb');
 });
+
+test('a slide holds one picture: added before the notes, kept out of the words, replaced, and removed', () => {
+  const lines = ['## Hi', '', '- a', '', '> say this'];
+  const withPic = M.setPicture(lines, 'https://x.org/p.jpg', 'A [form]\nwith words');
+  assert.deepEqual(withPic, ['## Hi', '', '- a', '', '![A form with words](https://x.org/p.jpg)', '', '> say this']);
+  assert.deepEqual(M.editable(withPic).map((x) => x.words), ['Hi', 'a']);
+  assert.deepEqual(M.picture(withPic), { line: 4, alt: 'A form with words', url: 'https://x.org/p.jpg' });
+  const again = M.setPicture(withPic, 'https://x.org/q.jpg', 'Another');
+  assert.equal(again.filter((l) => l.startsWith('![')).length, 1);
+  assert.equal(M.picture(M.removePicture(again)), null);
+  // Only an https picture counts.
+  assert.equal(M.picture(['![x](http://x.org/p.jpg)']), null);
+});

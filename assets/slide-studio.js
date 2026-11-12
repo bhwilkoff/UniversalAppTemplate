@@ -479,11 +479,14 @@
       side.appendChild(ic);
 
       var b = M.block(lines);
+      var pic = M.picture(lines);
+      if (pic) side.appendChild(pictureEditor(pic));
       if (b) side.appendChild(blockEditor(b));
       else {
         var more = el('div', 'studio-group');
         more.appendChild(el('p', 'ui-label', 'Add to this slide'));
         var row = el('div', 'studio-adds');
+        if (!pic) row.appendChild(button('Picture', null, function () { addPicture(more); }));
         ['table', 'chart', 'diagram', 'github'].forEach(function (k) {
           var a = L.ADD.filter(function (x) { return x.key === k; })[0];
           row.appendChild(button(a.label, null, function () {
@@ -495,6 +498,50 @@
         side.appendChild(more);
       }
       side.appendChild(lostBox);
+    }
+    // A picture: a file the leader chooses (where the page can store one) or
+    // an address, then the words read out in its place.
+    function addPicture(group) {
+      if (group.querySelector('[data-add-picture]')) return;
+      var form = el('div', 'studio-picture-add');
+      form.setAttribute('data-add-picture', '');
+      var said = el('p', 'small');
+      said.setAttribute('role', 'status');
+      if (o.upload) {
+        var lab = el('label', 'btn-secondary small studio-file', 'Choose a picture');
+        var file = el('input'); file.type = 'file'; file.accept = 'image/png,image/jpeg,image/webp'; file.className = 'visually-hidden';
+        lab.appendChild(file);
+        file.addEventListener('change', function () {
+          var f = file.files && file.files[0];
+          if (!f) return;
+          said.textContent = 'Adding the picture…';
+          o.upload(f).then(function (url) {
+            edit(function (x) { return M.setPicture(x, url, f.name.replace(/\.[a-z0-9]+$/i, '').replace(/[-_]+/g, ' ')); });
+          }, function (e) { said.textContent = 'The picture was not added: ' + (e && e.message ? e.message : e) + '.'; });
+        });
+        form.appendChild(lab);
+      }
+      var addr = el('input'); addr.type = 'url'; addr.placeholder = 'https://'; addr.setAttribute('aria-label', 'The picture’s address');
+      var go = button('Add', null, function () {
+        var u = addr.value.trim();
+        if (!/^https:\/\/\S+$/.test(u)) { said.textContent = 'A full address that starts with https://'; return; }
+        edit(function (x) { return M.setPicture(x, u, ''); });
+      });
+      form.appendChild(addr); form.appendChild(go); form.appendChild(said);
+      group.appendChild(form);
+      (o.upload ? form.querySelector('label') : addr).focus();
+    }
+    function pictureEditor(pic) {
+      var wrap = el('div', 'studio-group');
+      wrap.appendChild(el('p', 'ui-label', 'Picture'));
+      var img = el('img', 'studio-picture'); img.src = pic.url; img.alt = '';
+      wrap.appendChild(img);
+      var words = el('input'); words.value = pic.alt; words.placeholder = 'What it shows'; words.setAttribute('aria-label', 'What the picture shows, read out in its place');
+      words.addEventListener('focus', remember);
+      words.addEventListener('change', function () { list[at] = M.setPicture(list[at], pic.url, words.value); changed(); paint(); });
+      wrap.appendChild(words);
+      wrap.appendChild(button('Remove the picture', null, function () { edit(function (x) { return M.removePicture(x); }); }));
+      return wrap;
     }
     function edit(fn) {
       finish(); remember();

@@ -3584,3 +3584,6 @@ a.person-name:hover { text-decoration: underline; }
    the panel still draws into it (found in a real call: leaving it out of the
    page stopped a learner's panel). */
 .p2-panel .p2-pane[data-pane="mine"] .show-slot[data-slot="wings"] { display: none; }
+.studio-picture { display: block; max-width: 100%; max-height: 9rem; object-fit: contain; border-radius: 6px; background: var(--rule); }
+.studio-picture-add { display: grid; gap: 0.5rem; margin-top: 0.5rem; }
+.studio-file { justify-self: start; cursor: pointer; }

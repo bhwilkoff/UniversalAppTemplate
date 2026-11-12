@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { convert, deltaToSlide } from '../../supabase/functions/course-import/convert.js';
+import { convert, deltaToSlide, splitQuestion } from '../../supabase/functions/course-import/convert.js';
 
 // A made-up course in the shape of Course Builder's export (format version 1).
 const R = (type, data) => ({ type, data });
@@ -174,4 +174,16 @@ test('Course Builder\'s placeholder focus questions and repeated instructions st
   assert.ok(!/Question 1\?/.test(notes));
   assert.ok(/Are they ready\?/.test(notes));
   assert.equal(notes.split('Set the tone.').length, 2);
+});
+
+test('a long poll splits into its passage and the question at its end, so nothing is cut', () => {
+  const passage = 'The applicant wrote a long account of their work. '.repeat(10).trim();
+  const r = splitQuestion(passage + ' Does this count as leadership? Why or why not?', 'Poll B');
+  assert.equal(r.prompt, 'Does this count as leadership? Why or why not?');
+  assert.equal(r.passage, passage);
+  // No question at the end: the poll's title asks it, and the whole text is the passage.
+  const plain = 'Read this agreement carefully before you answer. '.repeat(10).trim();
+  assert.deepEqual(splitQuestion(plain, 'Confidentiality Agreement'), { prompt: 'Confidentiality Agreement', passage: plain, heading: 'Confidentiality Agreement' });
+  // A short poll stays as it is.
+  assert.deepEqual(splitQuestion('What did you notice?', 'Poll'), { prompt: 'What did you notice?', passage: '' });
 });

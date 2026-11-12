@@ -13,3 +13,21 @@ begin
   end if;
 end;
 $$;
+
+-- Leaders add pictures to their own cohorts' slides (Ben, November 12, 2026:
+-- "add images to slides as well ... we can certainly build that feature"):
+-- each file goes under its cohort's id, and only that cohort's leaders may add
+-- one. Nobody else writes here.
+do $$
+begin
+  if exists (select 1 from information_schema.tables where table_schema = 'storage' and table_name = 'objects') then
+    execute $p$
+      create policy slide_pictures_add on storage.objects for insert to authenticated
+        with check (bucket_id = 'slide-pictures'
+          and (storage.foldername(name))[1] ~ '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+          and private.teaches(((storage.foldername(name))[1])::uuid)
+          and private.not_an_agent())
+    $p$;
+  end if;
+end;
+$$;
