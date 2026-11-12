@@ -2872,6 +2872,10 @@
     if (shown && !shown.show_tally) changeCheck(shown, { show_tally: true });
     if (!q) return;
     var pair = rerunPair(part);
+    // A question asked again whose first time never happened (its part was
+    // skipped) is simply asked (found in a real call: skipping the first left
+    // the later part with nothing to answer).
+    if (pair && !pair.first) pair = null;
     if (pair) {
       if (pair.first && pair.first.state === 'open') changeCheck(pair.first, { state: 'closed' });
       if (pair.again) { if (pair.again.state !== 'open') changeCheck(pair.again, { state: 'open' }); return; }
@@ -2971,7 +2975,7 @@
     if (!part || !part.own) return null;
     if (part.kind === 'question') {
       var pair = rerunPair(part);
-      if (pair) return pair.again && pair.again.state === 'open' ? pair.again : null;
+      if (pair && pair.first) return pair.again && pair.again.state === 'open' ? pair.again : null;
       var q = L.fromScene(part.config);
       return q ? (S.checks || []).filter(function (k) { return k.state === 'open' && k.prompt === q.prompt && !k.rerun_of; })[0] || null : null;
     }
