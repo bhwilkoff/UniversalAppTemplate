@@ -457,9 +457,6 @@
       unavailable: function () {
         var off = [];
         off.push('cue-talk', 'cue-rooms');
-        // A learner's Mine shows their app and Show my app at the top, so the
-        // list of who is waiting to show would only repeat it.
-        if (S.newPanel && !S.teaching) off.push('wings');
         if (!S.groups.length) off.push('rooms', 'cue-rooms', 'brought');
         var list = S.list || S.parts || [];
         if (!list.some(function (x) { return x.kind === 'design' || x.key === 'prompt'; })) off.push('design');
@@ -1730,7 +1727,8 @@
   // Redraw part of the panel, unless someone is typing an answer in it.
   function render(sel, fn) {
     var a = document.activeElement;
-    if (a && $(sel).contains(a) && (/^(TEXTAREA|INPUT|SELECT)$/.test(a.tagName) || a.closest('.question-answer, .question-edit'))) { deferred[sel] = fn; return; }
+    var at = $(sel);
+    if (a && at && at.contains(a) && (/^(TEXTAREA|INPUT|SELECT)$/.test(a.tagName) || a.closest('.question-answer, .question-edit'))) { deferred[sel] = fn; return; }
     fn();
   }
   root.addEventListener('focusout', function () {

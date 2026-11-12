@@ -3570,3 +3570,8 @@ a.person-name:hover { text-decoration: underline; }
 .stage-shown .stage-answer { padding: 0; font-size: clamp(1.25rem, 4vmin, 2.6rem); font-weight: 600; line-height: 1.25; quotes: "\201C" "\201D"; }
 .stage-shown .stage-answer::before { content: open-quote; }
 .stage-shown .stage-answer::after { content: close-quote; }
+/* A learner's Mine shows their app and Show my app at the top, so the list of
+   who is waiting to show would only repeat it. It stays in the page, hidden:
+   the panel still draws into it (found in a real call: leaving it out of the
+   page stopped a learner's panel). */
+.p2-panel .p2-pane[data-pane="mine"] .show-slot[data-slot="wings"] { display: none; }
