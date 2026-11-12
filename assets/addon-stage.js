@@ -105,9 +105,13 @@
       $('[data-s-note]').textContent = sc.note || '';
     }
     $('[data-part-name]').textContent = part ? part.name : '';
-    $('[data-part-kicker]').textContent = view.roomClock ? '' : part ? 'Now' : 'Welcome';
-    $('[data-part-kicker]').hidden = !!view.roomClock;
-    $('[data-part-big]').textContent = view.roomClock ? (part.name || 'Time left') : part ? part.name : 'The session begins soon.';
+    // Until its own panel speaks, this stage cannot know where the session is
+    // (each person's stage shows only what their panel sends), so it never
+    // claims the session has not begun (Ben, November 12, 2026: it "continues
+    // to show even though the leader has started the class").
+    $('[data-part-kicker]').textContent = view.roomClock ? '' : part ? 'Now' : heard ? 'Welcome' : '';
+    $('[data-part-kicker]').hidden = !!view.roomClock || (!part && !heard);
+    $('[data-part-big]').textContent = view.roomClock ? (part.name || 'Time left') : part ? part.name : heard ? 'The session begins soon.' : 'Joining the session…';
     if (view.mode === 'card') $('[data-card-body]').textContent = view.card.body;
     if (view.mode === 'check') {
       $('[data-prompt]').textContent = view.prompt;
