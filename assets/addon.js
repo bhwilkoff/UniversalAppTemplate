@@ -579,7 +579,7 @@
         if (S.onStage && S.onStage.kind === 'path') sendStage();
       }
     });
-    S.classChannel.onNudge('guests', function () { if (S.isGuest) { loadGuests(); refreshLive(); } });
+    S.classChannel.onNudge('guests', function () { if (S.isGuest || S.teaching) { loadGuests(); refreshLive(); } });
   }
 
   // Recognition for a skill shown in class (R16). A teacher names the
@@ -708,6 +708,7 @@
     // their place in the queue (Ben, November 6, 2026).
     var self = S.people.filter(function (p) { return p.user_id === who(); })[0];
     if (self) S.myApp = self.app_url || null;
+    else { var mine = S.guests.filter(function (g) { return g.user_id === S.me.id; })[0]; if (mine) S.myApp = mine.app_url || null; }
     if (tied && S.classChannel && S.names[tied.member_id]) S.classChannel.rename(S.names[tied.member_id]);
   }
   function who() { return S.asMember || S.me.id; }
@@ -717,6 +718,8 @@
       useGuests(r.data);
       drawRoster();
       drawGuest();
+      if (S.appsBox) drawApps();
+      if (S.mineApp) drawMyApp();
       if (S.breakouts) S.breakouts.draw();
     });
   }
@@ -2234,7 +2237,18 @@
         var c = L.classifyLink(input.value.trim());
         if (!c) { said.textContent = 'A full address that starts with https://'; return; }
         db.from('enrollments').update({ app_url: c.url }).eq('cohort_id', S.cohort.id).eq('user_id', who()).select('user_id').then(function (r) {
+          // A guest keeps theirs with the call (found in a learner's real call:
+          // a guest has no enrollment, so Save changed nothing).
+          if (!r.error && (!r.data || !r.data.length) && who() === S.me.id) {
+            return db.rpc('set_call_guest_app', { c: S.cohort.id, url: c.url }).then(function (g) {
+              return { error: g.error, data: g.data ? [{ user_id: S.me.id }] : [] };
+            });
+          }
+          return r;
+        }).then(function (r) {
           if (r.error || !r.data || !r.data.length) { said.textContent = 'Not saved' + (r.error ? ': ' + r.error.message : '.'); return; }
+          (S.guests || []).forEach(function (g) { if (g.user_id === S.me.id) g.app_url = c.url; });
+          if (S.classChannel) S.classChannel.nudge('guests');
           S.myApp = c.url;
           S.people.forEach(function (p) { if (p.user_id === who()) p.app_url = c.url; });
           input.blur(); drawMyApp();
@@ -2253,12 +2267,19 @@
       db.from('live_queue').insert({ cohort_id: S.cohort.id, session_id: S.session.id, user_id: who(), kind: app.kind, url: app.url }).then(function (r) { if (!r.error) refreshLive(); });
     }));
   }
+  // Everyone in the call with an app: members, and guests who are not tied
+  // to a member (a tied guest's app is that member's).
+  function withApps() {
+    var guests = (S.guests || []).filter(function (g) { return g.app_url && !g.member_id && !S.people.some(function (p) { return p.user_id === g.user_id; }); })
+      .map(function (g) { return { user_id: g.user_id, app_url: g.app_url }; });
+    return (S.people || []).concat(guests);
+  }
   // Classmates' apps, each tried on this learner's own stage, never everyone's.
   function drawClassApps() {
     var box = S.classApps;
     if (!box) return;
     box.replaceChildren();
-    var rows = (S.people || []).filter(function (p) { return p.user_id !== who() && p.app_url && L.classifyLink(p.app_url); });
+    var rows = withApps().filter(function (p) { return p.user_id !== who() && p.app_url && L.classifyLink(p.app_url); });
     box.hidden = !rows.length;
     if (!rows.length) return;
     box.appendChild(el('p', 'p2-label', 'Your classmates’ apps'));
@@ -2446,7 +2467,7 @@
   // A leader puts anyone's app on every stage in one press.
   function appUrls() {
     var m = {};
-    (S.people || []).forEach(function (p) { if (p.app_url) m[p.user_id] = p.app_url; });
+    withApps().forEach(function (p) { if (p.app_url) m[p.user_id] = p.app_url; });
     return m;
   }
   // Two or three apps side by side, to compare builds (stage 'apps').
@@ -2488,7 +2509,7 @@
     if (!box) return;
     if (box.contains(document.activeElement) && document.activeElement.type === 'checkbox') return;
     box.replaceChildren();
-    var rows = S.people.filter(function (p) { return p.app_url && L.classifyLink(p.app_url); });
+    var rows = withApps().filter(function (p) { return p.app_url && L.classifyLink(p.app_url); });
     box.hidden = !rows.length;
     if (!rows.length) return;
     box.appendChild(el('p', 'kicker', 'Apps'));

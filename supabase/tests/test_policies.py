@@ -2232,8 +2232,10 @@ def main():
     check("a stopped clock resumes from a start the page sends in the recent past",
           attempt(ben, "update public.show_state set scene_started_at = now() - interval '90 seconds' where session_id = %s returning abs(extract(epoch from (now() - scene_started_at)) - 90) < 2", (r1,)) and last_rows == [(True,)])
     attempt(ben, "update public.show_state set scene_started_at = null where session_id = %s returning 1", (r1,))
-    check("but never starts later than the database's own now",
-          attempt(ben, "update public.show_state set scene_started_at = now() + interval '1 hour' where session_id = %s returning scene_started_at <= now()", (r1,)) and last_rows == [(True,)])
+    check("a start a little ahead is kept, so +30 sec can give a part more than its minutes",
+          attempt(ben, "update public.show_state set scene_started_at = now() + interval '30 seconds' where session_id = %s returning abs(extract(epoch from (scene_started_at - now())) - 30) < 2", (r1,)) and last_rows == [(True,)])
+    check("but never more than an hour ahead of the database's own now",
+          attempt(ben, "update public.show_state set scene_started_at = now() + interval '3 hours' where session_id = %s returning scene_started_at <= now() + interval '1 hour'", (r1,)) and last_rows == [(True,)])
     check("a teacher pins a question of this session on the main stage",
           attempt(ben, "update public.show_state set stage = 'answers', stage_ref = %s where session_id = %s returning stage", (rk, r1)) and last_rows == [("answers",)])
     check("a question from another session cannot go on this main stage",
@@ -3492,6 +3494,19 @@ def main():
     check("only people in the cohort", not attempt(as_user("ben"), "update public.show_state set stage = 'apps', featured = array[%s]::uuid[] where session_id = %s", (people["dee"], ss)))
     check("a session can have no call", attempt(as_user("ben"), "update public.sessions set mode = 'own' where id = %s", (ss,)))
     check("and nothing else", not attempt(as_user("ben"), "update public.sessions set mode = 'maybe' where id = %s", (ss,)))
+
+    # A guest's own app (migration 20261112040000).
+    su.execute("reset role")
+    su.execute("insert into public.call_guests (cohort_id, user_id, name) values (%s, %s, 'dee') on conflict do nothing", (cc, people["dee"]))
+    check("a guest keeps their app's address for the call",
+          attempt(as_user("dee"), "select public.set_call_guest_app(%s, 'https://dee.github.io/app/')", (cc,)) and last_rows == [(True,)])
+    lead = as_user("ben"); lead.execute("select app_url from public.call_guests where cohort_id = %s and user_id = %s", (cc, people["dee"]))
+    check("and a leader reads it", lead.fetchall() == [("https://dee.github.io/app/",)])
+    check("someone who is not a guest of that cohort changes nothing",
+          attempt(as_user("cal"), "select public.set_call_guest_app(%s, 'https://cal.example/')", (cc,)) and last_rows == [(False,)])
+    check("only a full https address", not attempt(as_user("dee"), "select public.set_call_guest_app(%s, 'javascript:alert(1)')", (cc,)))
+    check("a guest cannot change the rest of their row",
+          attempt(as_user("dee"), "update public.call_guests set member_id = %s where user_id = %s returning 1", (people["bea"], people["dee"])) and last_rows == [])
 
     conn.rollback()
     conn.close()
