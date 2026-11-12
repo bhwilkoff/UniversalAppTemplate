@@ -14,7 +14,18 @@
     var title = el('h1', 'p2-title');
     var time = el('p', 'p2-time');
     time.setAttribute('aria-live', 'off');
-    row.appendChild(title); row.appendChild(time);
+    row.appendChild(title);
+    // A leader's running clock moves by half a minute either way.
+    var clockBox = el('span', 'p2-clock');
+    var less = el('button', 'p2-nudge', '−30'), more = el('button', 'p2-nudge', '+30');
+    less.type = more.type = 'button';
+    less.setAttribute('aria-label', 'Take 30 seconds off the clock'); more.setAttribute('aria-label', 'Add 30 seconds to the clock');
+    less.hidden = more.hidden = true;
+    var onNudge = null;
+    less.addEventListener('click', function () { if (onNudge) onNudge(-30); });
+    more.addEventListener('click', function () { if (onNudge) onNudge(30); });
+    clockBox.appendChild(less); clockBox.appendChild(time); clockBox.appendChild(more);
+    row.appendChild(clockBox);
     top.appendChild(row);
     // Where the session is: Part 3 of 7, or that it has not started.
     var step = el('p', 'p2-step'); step.hidden = true;
@@ -88,6 +99,7 @@
         var key = JSON.stringify([s.title, s.step, s.chips, s.next && s.next.label, s.next && s.next.disabled, s.canBack]);
         time.textContent = s.time || '';
         time.classList.toggle('is-over', !!s.over);
+        less.hidden = more.hidden = !(s.nudge && onNudge);
         if (key === drawn) return;
         drawn = key;
         title.textContent = s.title || '';
@@ -106,7 +118,8 @@
         stageBtn.hidden = !v.action;
         if (v.action) { stageBtn.textContent = v.action.label; onStageBtn = v.action.go; }
       },
-      on: function (n, b) { onNext = n; onBack = b; }
+      on: function (n, b) { onNext = n; onBack = b; },
+      onNudge: function (fn) { onNudge = fn; }
     };
   }
   window.PanelFrame = { mount: mount };

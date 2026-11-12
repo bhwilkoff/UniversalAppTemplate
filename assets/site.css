@@ -3524,3 +3524,6 @@ a.person-name:hover { text-decoration: underline; }
 .announcement-body { white-space: pre-wrap; }
 .announcement-new { margin: 0 0 1rem; }
 .announcement-new > summary { cursor: pointer; font-weight: 600; }
+.p2-clock { display: inline-flex; align-items: baseline; gap: 6px; flex: none; }
+.p2-nudge { font: inherit; font-size: 12px; font-variant-numeric: tabular-nums; padding: 1px 6px; border: 1px solid var(--rule); border-radius: 999px; background: none; color: var(--muted); cursor: pointer; }
+.p2-nudge:hover { color: var(--ink); border-color: var(--ink); }

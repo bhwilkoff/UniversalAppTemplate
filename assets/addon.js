@@ -479,13 +479,7 @@
           if (part) delete S.paused[part.key];
           S.run.clock(true, kept ? new Date(Date.now() - (part.minutes * 60 - kept) * 1000) : null);
         },
-        onNudge: function (delta) {
-          var part = partNow(), end = endsNow() ? new Date(endsNow()).getTime() : null;
-          if (!part || !end) return;
-          if (!shared()) { S.timerEnds = Math.max(Date.now(), end + delta * 1000); tick(); return; }
-          var to = Math.max(Date.now(), end + delta * 1000);
-          S.run.clock(true, new Date(to - part.minutes * 60000));
-        },
+        onNudge: nudgeClock,
         onFollow: function () { setPin(null); },
         canEdit: function (key) {
           if (!S.run) return null;
@@ -1087,7 +1081,17 @@
     F.low.appendChild($('[data-react]'));
     drawMark(F.low);
     F.on(function () { nextMove(); }, function () { if (S.run) S.run.step(-1).then(afterMove); });
+    if (S.teaching && F.onNudge) F.onNudge(nudgeClock);
   }
+  // A running part clock moves by half a minute either way.
+  function nudgeClock(delta) {
+    var part = partNow(), end = endsNow() ? new Date(endsNow()).getTime() : null;
+    if (!part || !end) return;
+    var to = Math.max(Date.now(), end + delta * 1000);
+    if (!shared()) { S.timerEnds = to; tick(); return; }
+    S.run.clock(true, new Date(to - part.minutes * 60000));
+  }
+
   // A leader's own share of the talking in the last recorded session, for
   // the leader alone (Ben, November 11, 2026: "if the leader is aware of
   // their own talk time, they are more likely to ask questions rather than
@@ -1325,7 +1329,7 @@
       title: part ? part.name : lib.sessionTitle(S.session, S.cohort),
       step: part && at >= 0 ? 'Part ' + (at + 1) + ' of ' + list.length : list.length ? 'Not started yet, ' + list.length + ' parts' : '',
       time: left != null ? window.LiveLib.clock(left) : '', over: left === 0,
-      chips: chips, next: nextStep() || undefined, canBack: !!part
+      nudge: !!(S.teaching && left), chips: chips, next: nextStep() || undefined, canBack: !!part
     });
     var first = (S.list || [])[0];
     var what = !part && first && !S.teaching ? 'First: ' + first.name : !S.teaching && part && !part.slides ? String(part.what || '').split(/\n{2,}/)[0] : '';
