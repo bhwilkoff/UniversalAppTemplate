@@ -42,7 +42,7 @@ written, played with, and published
 | 38-53 | What a build looks like | Design stage | Every session from week 1 opens with each person showing the week's work on a device. Here is a strong build and a weak one, side by side. Then everyone practices the three questions on the weak one: where is it going, how is it going, and what is next. On the board: *The three questions*. |
 | 53-65 | Start your noticing log | Reflection | For five days, write one line whenever one of these happens: I wished something worked differently. I gave up on something I care about. I did something the long way because nothing helped. Someone I know struggled with the same thing. No app ideas yet, just what happened. Write today's line now, before you leave: this log is where week 1's problem comes from. The prompt: "What is one thing that happened today that could go in your log?" |
 | 65-70 | Check for understanding | Question | In your own words. Only your leaders read it. The prompt: "What do you hope your app will do for someone?" |
-| 70-75 | What is still muddy? | Question | Anything from tonight that is not clear yet. Your leaders read every answer before the next session. The prompt: "What is still muddy for you?" |
+| 70-75 | Your questions | Question | Anything from this session you are still wondering about. Your leaders read every answer before the next session. The prompt: "What questions do you still have?" |
 
 **In the rehearsal rooms,** each builder's turn runs these scenes, 6 minutes in all: show the address, or where it stopped (3), one thing you wish worked differently (2), one question to understand it (1). The room's prompt is on screen the whole time.
 
@@ -56,7 +56,7 @@ written, played with, and published
 | 30-42 | What a build looks like | Design stage | Every session from week 1 opens with each person showing the week's work on a device. Here is a strong build and a weak one, side by side. Then everyone practices the three questions on the weak one: where is it going, how is it going, and what is next. On the board: *The three questions*. |
 | 42-52 | Start your noticing log | Reflection | For five days, write one line whenever one of these happens: I wished something worked differently. I gave up on something I care about. I did something the long way because nothing helped. Someone I know struggled with the same thing. No app ideas yet, just what happened. Write today's line now, before you leave: this log is where week 1's problem comes from. The prompt: "What is one thing that happened today that could go in your log?" |
 | 52-56 | Check for understanding | Question | In your own words. Only your leaders read it. The prompt: "What do you hope your app will do for someone?" |
-| 56-60 | What is still muddy? | Question | Anything from tonight that is not clear yet. Your leaders read every answer before the next session. The prompt: "What is still muddy for you?" |
+| 56-60 | Your questions | Question | Anything from this session you are still wondering about. Your leaders read every answer before the next session. The prompt: "What questions do you still have?" |
 
 Every scene can be changed on the session's page before it runs, and in the Meet add-on while it runs.
 

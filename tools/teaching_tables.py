@@ -54,7 +54,7 @@ def rooms_line(scenes):
 
 def section(week):
     out = [START, "", "*Written by Claude, awaiting Ben's review (the rewrite of October 23, 2026, in four parts: "
-           "bring back the stage's work, one thing that unblocks the next stage, start it, and the check).* "
+           "show the stage's work, one thing that unblocks the next stage, start it, and the check).* "
            "Generated from [`runs-of-show.json`](runs-of-show.json) by `tools/teaching_tables.py`; change the JSON, then run it.", "",
            table(week["scenes"], sum(s["minutes"] for s in week["scenes"])), "", rooms_line(week["scenes"]).rstrip()]
     for minutes, scenes in sorted((week.get("lengths") or {}).items()):

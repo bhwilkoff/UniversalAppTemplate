@@ -53,7 +53,7 @@ verb each person names. The play starts before they leave.
 | 45-58 | One verb, twice | Design stage | Write the one thing your app must do on every device. Then draw it twice: once on the device you started with, and once on the device your people reach for next, each with that device's own controls. Mark what lives in the data and what lives in the device. On the board: *Blank*. |
 | 58-68 | Start | Reflection | Write the one rule about your data that every platform must follow. Then, before you leave, send the first prompt of stage 02: ask your agent to read your parity matrix with you and trim what your app does not need. Stage 03, a second platform that feels born there, follows once the matrix is honest. The prompt: "What is the first prompt of stage 02 you sent tonight?" |
 | 68-72 | Data, or idiom? | Question | The prompt: "Which of these belong in the data, so every platform gets them the same way? Choose every one." |
-| 72-75 | What is still muddy? | Question | Anything from tonight that is not clear yet. Your leaders read every answer before the next session. The prompt: "What is still muddy for you?" |
+| 72-75 | Your questions | Question | Anything from this session you are still wondering about. Your leaders read every answer before the next session. The prompt: "What questions do you still have?" |
 
 **In the rehearsal rooms,** each builder's turn runs these scenes, 8 minutes in all: say what you want to know, then show it on the device (3), explain one decision, agent closed (2), one question, then the three answers (2), what is next, and ready or not yet (1). The room's prompt is on screen the whole time.
 
@@ -62,12 +62,12 @@ verb each person names. The play starts before they leave.
 | Minutes (60) | Scene | Kind | What happens |
 |---|---|---|---|
 | 0-4 | Arrive | Talk | One line in the chat: what the person you talked to did first with your app, or what is in the way. Then what I read in your answers last week, and what I changed. |
-| 4-26 | Show what you built | Presenter | With everyone in the call, about five minutes each. Each person in turn: say what you want to know, show it on the device, and explain one decision with your agent closed (a decision, never the code). The others ask one question to understand it, then answer the three questions: where is it going, how is it going, and what is next. The builder ends by saying what they will do next, and ready or not yet. The prompt: "Read your problem statement and the version before it, then show your app: what the real data taught you, and what the person you talked to did with it." |
+| 4-26 | Show what you built | Presenter | With everyone in the call, about five minutes each. Each person in turn: say what you want to know, put it on the main stage with Show my app, and explain one decision with your agent closed (a decision, never the code). The others ask one question to understand it, then answer the three questions: where is it going, how is it going, and what is next. The builder ends by saying what they will do next, and ready or not yet. The prompt: "Read your problem statement and the version before it, then show your app: what the real data taught you, and what the person you talked to did with it." |
 | 26-32 | Two layers | Talk | Every app built from the template has two layers. The data plane holds what is the same everywhere (what exists, what is allowed, and what it is called), and it is built once. The native layer holds what should feel born on each device: its controls, its gestures, and its look. Archive Watch's contract says it in one line: no client re-implements or re-hosts any part of the pipeline. Tonight you sort your own app into those two layers. |
 | 32-43 | One verb, twice | Design stage | Write the one thing your app must do on every device. Then draw it twice: once on the device you started with, and once on the device your people reach for next, each with that device's own controls. Mark what lives in the data and what lives in the device. On the board: *Blank*. |
 | 43-52 | Start | Reflection | Write the one rule about your data that every platform must follow. Then, before you leave, send the first prompt of stage 02: ask your agent to read your parity matrix with you and trim what your app does not need. Stage 03, a second platform that feels born there, follows once the matrix is honest. The prompt: "What is the first prompt of stage 02 you sent tonight?" |
 | 52-56 | Data, or idiom? | Question | The prompt: "Which of these belong in the data, so every platform gets them the same way? Choose every one." |
-| 56-60 | What is still muddy? | Question | Anything from tonight that is not clear yet. Your leaders read every answer before the next session. The prompt: "What is still muddy for you?" |
+| 56-60 | Your questions | Question | Anything from this session you are still wondering about. Your leaders read every answer before the next session. The prompt: "What questions do you still have?" |
 
 Every scene can be changed on the session's page before it runs, and in the Meet add-on while it runs.
 
@@ -246,7 +246,7 @@ without names only if you choose:
    Choices: a film's title and year; whether a film is saved; a trivia
    question's correct answer; swipe to go back; the size of the play
    button.
-2. **What is still muddy?** (in their own words).
+2. **What questions do you still have?** (in their own words).
 
 The answer you hope for to the first puts the title, the saved state,
 and the correct answer in the data, and leaves the gesture and the

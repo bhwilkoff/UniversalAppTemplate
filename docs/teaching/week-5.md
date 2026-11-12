@@ -73,7 +73,7 @@ written, played with, and published.
 | 48-54 | From reason to rule to check | Talk | Values climb. A reason is the "Why we build" paragraph your agent weighs like advice. A rule is a standing instruction in your own words, dated the day the agent crossed a line. A check is a test that fails when the line is crossed, so the agent cannot cross it without being told. Stage 08 is where your app's lessons climb, so the next app starts knowing them. |
 | 54-67 | Start | Reflection | The cohort chooses one lesson to send back to the template, so the next builder does not have to learn it. Then, before you leave, send the first prompt of stage 08: ask your agent which of your app's lessons belong in a skill or a memory. The prompt: "What is one lesson the next builder should not have to learn?" |
 | 67-71 | Enough, for now | Question | In your own words. Only your leaders read it. The prompt: "What is enough about this version, for now, and for whom?" |
-| 71-75 | What is still muddy? | Question | Anything from tonight that is not clear yet. Your leaders read every answer before the next session. The prompt: "What is still muddy for you?" |
+| 71-75 | Your questions | Question | Anything from this session you are still wondering about. Your leaders read every answer before the next session. The prompt: "What questions do you still have?" |
 
 **In the rehearsal rooms,** each builder's turn runs these scenes, 4 minutes in all: show it once, as you will tonight (3), one part the agent wrote, and how you know it works (1). The room's prompt is on screen the whole time.
 
@@ -86,7 +86,7 @@ written, played with, and published.
 | 30-36 | From reason to rule to check | Talk | Values climb. A reason is the "Why we build" paragraph your agent weighs like advice. A rule is a standing instruction in your own words, dated the day the agent crossed a line. A check is a test that fails when the line is crossed, so the agent cannot cross it without being told. Stage 08 is where your app's lessons climb, so the next app starts knowing them. |
 | 36-51 | Start | Reflection | The cohort chooses one lesson to send back to the template, so the next builder does not have to learn it. Then, before you leave, send the first prompt of stage 08: ask your agent which of your app's lessons belong in a skill or a memory. The prompt: "What is one lesson the next builder should not have to learn?" |
 | 51-56 | Enough, for now | Question | In your own words. Only your leaders read it. The prompt: "What is enough about this version, for now, and for whom?" |
-| 56-60 | What is still muddy? | Question | Anything from tonight that is not clear yet. Your leaders read every answer before the next session. The prompt: "What is still muddy for you?" |
+| 56-60 | Your questions | Question | Anything from this session you are still wondering about. Your leaders read every answer before the next session. The prompt: "What questions do you still have?" |
 
 Every scene can be changed on the session's page before it runs, and in the Meet add-on while it runs.
 
@@ -257,7 +257,7 @@ choose:
    to at least one person in the form it ships today" is enough, for
    now. Read for whether the "whom" is the people the builder talked to
    in week 1.
-2. **What is still muddy?** (in their own words).
+2. **What questions do you still have?** (in their own words).
 
 **Also prepared,** in the cohort's question bank: "What waits for the
 next version?" and "What will your agent know at the start of your next

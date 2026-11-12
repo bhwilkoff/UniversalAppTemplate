@@ -1,5 +1,5 @@
 {
-  "about": "Each session's default run of show, for a 75-minute session. Each entry in `weeks` is one session (week 0 is Prep), and the site seeds a new cohort's sessions from this file, and every scene stays editable in the class builder. Scenes use the site's shape (assets/show-lib.js on the site branch): kind, title, minutes, body (what the main stage shows), and config. Written by Claude from docs/research/curriculum/00-curriculum-design.md, October 7, 2026, awaiting Ben's review. A scene's optional `note` is for the teacher only, and a week's `questions` go into the cohort's question bank (kind, prompt, choices, points).",
+  "about": "Each session's run of show: `scenes` for a 75-minute session in groups of three (a cohort of eight or more), and `lengths.60` for the 60-minute session in one call that most cohorts run, which is what a new cohort gets by default. Each entry in `weeks` is one session (week 0 is Prep), and the site seeds a new cohort's sessions from this file, and every scene stays editable in the class builder. Scenes use the site's shape (assets/show-lib.js on the site branch): kind, title, minutes, body (what the main stage shows), and config. Written by Claude from docs/research/curriculum/00-curriculum-design.md, October 7, 2026, awaiting Ben's review. A scene's optional `note` is for the teacher only, and a week's `questions` go into the cohort's question bank (kind, prompt, choices, points).",
   "source": "docs/research/curriculum/00-curriculum-design.md",
   "minutes": 75,
   "weeks": [
@@ -82,10 +82,10 @@
         },
         {
           "kind": "question",
-          "title": "What is still muddy?",
-          "body": "Anything from tonight that is not clear yet. Your leaders read every answer before the next session.",
+          "title": "Your questions",
+          "body": "Anything from this session you are still wondering about. Your leaders read every answer before the next session.",
           "config": {
-            "prompt": "What is still muddy for you?",
+            "prompt": "What questions do you still have?",
             "kind": "short"
           },
           "minutes": 5
@@ -174,10 +174,10 @@
           },
           {
             "kind": "question",
-            "title": "What is still muddy?",
-            "body": "Anything from tonight that is not clear yet. Your leaders read every answer before the next session.",
+            "title": "Your questions",
+            "body": "Anything from this session you are still wondering about. Your leaders read every answer before the next session.",
             "config": {
-              "prompt": "What is still muddy for you?",
+              "prompt": "What questions do you still have?",
               "kind": "short"
             },
             "minutes": 4
@@ -270,10 +270,10 @@
         },
         {
           "kind": "question",
-          "title": "What is still muddy?",
-          "body": "Anything from tonight that is not clear yet. Your leaders read every answer before the next session.",
+          "title": "Your questions",
+          "body": "Anything from this session you are still wondering about. Your leaders read every answer before the next session.",
           "config": {
-            "prompt": "What is still muddy for you?",
+            "prompt": "What questions do you still have?",
             "kind": "short"
           },
           "minutes": 5
@@ -291,7 +291,7 @@
         },
         {
           "kind": "short",
-          "prompt": "What is still muddy?"
+          "prompt": "What questions do you still have?"
         },
         {
           "kind": "multi",
@@ -374,10 +374,10 @@
           },
           {
             "kind": "question",
-            "title": "What is still muddy?",
-            "body": "Anything from tonight that is not clear yet. Your leaders read every answer before the next session.",
+            "title": "Your questions",
+            "body": "Anything from this session you are still wondering about. Your leaders read every answer before the next session.",
             "config": {
-              "prompt": "What is still muddy for you?",
+              "prompt": "What questions do you still have?",
               "kind": "short"
             },
             "minutes": 4
@@ -474,10 +474,10 @@
         },
         {
           "kind": "question",
-          "title": "What is still muddy?",
-          "body": "Anything from tonight that is not clear yet. Your leaders read every answer before the next session.",
+          "title": "Your questions",
+          "body": "Anything from this session you are still wondering about. Your leaders read every answer before the next session.",
           "config": {
-            "prompt": "What is still muddy for you?",
+            "prompt": "What questions do you still have?",
             "kind": "short"
           },
           "minutes": 3
@@ -497,7 +497,7 @@
         },
         {
           "kind": "short",
-          "prompt": "What is still muddy?"
+          "prompt": "What questions do you still have?"
         }
       ],
       "lengths": {
@@ -512,7 +512,7 @@
             "kind": "presenter",
             "title": "Show what you built",
             "minutes": 22,
-            "body": "With everyone in the call, about five minutes each. Each person in turn: say what you want to know, show it on the device, and explain one decision with your agent closed (a decision, never the code). The others ask one question to understand it, then answer the three questions: where is it going, how is it going, and what is next. The builder ends by saying what they will do next, and ready or not yet.",
+            "body": "With everyone in the call, about five minutes each. Each person in turn: say what you want to know, put it on the main stage with Show my app, and explain one decision with your agent closed (a decision, never the code). The others ask one question to understand it, then answer the three questions: where is it going, how is it going, and what is next. The builder ends by saying what they will do next, and ready or not yet.",
             "config": {
               "prompt": "Read your problem statement and the version before it, then show your app: what the real data taught you, and what the person you talked to did with it."
             },
@@ -560,10 +560,10 @@
           },
           {
             "kind": "question",
-            "title": "What is still muddy?",
-            "body": "Anything from tonight that is not clear yet. Your leaders read every answer before the next session.",
+            "title": "Your questions",
+            "body": "Anything from this session you are still wondering about. Your leaders read every answer before the next session.",
             "config": {
-              "prompt": "What is still muddy for you?",
+              "prompt": "What questions do you still have?",
               "kind": "short"
             },
             "minutes": 4
@@ -654,10 +654,10 @@
         },
         {
           "kind": "question",
-          "title": "What is still muddy?",
-          "body": "Anything from tonight that is not clear yet. Your leaders read every answer before the next session.",
+          "title": "Your questions",
+          "body": "Anything from this session you are still wondering about. Your leaders read every answer before the next session.",
           "config": {
-            "prompt": "What is still muddy for you?",
+            "prompt": "What questions do you still have?",
             "kind": "short"
           },
           "minutes": 3
@@ -674,7 +674,7 @@
         },
         {
           "kind": "short",
-          "prompt": "What is still muddy?"
+          "prompt": "What questions do you still have?"
         }
       ],
       "lengths": {
@@ -689,7 +689,7 @@
             "kind": "presenter",
             "title": "Show what you built",
             "minutes": 22,
-            "body": "With everyone in the call, about five minutes each. Each person in turn: say what you want to know, show it on the device, and explain one decision with your agent closed (a decision, never the code). The others ask one question to understand it, then answer the three questions: where is it going, how is it going, and what is next. The builder ends by saying what they will do next, and ready or not yet.",
+            "body": "With everyone in the call, about five minutes each. Each person in turn: say what you want to know, put it on the main stage with Show my app, and explain one decision with your agent closed (a decision, never the code). The others ask one question to understand it, then answer the three questions: where is it going, how is it going, and what is next. The builder ends by saying what they will do next, and ready or not yet.",
             "config": {
               "prompt": "Show your matrix and the cell your eyes proved wrong, then your app on the oldest device it supports: the newest feature that device will not show, and why the new look fits your people."
             },
@@ -731,10 +731,10 @@
           },
           {
             "kind": "question",
-            "title": "What is still muddy?",
-            "body": "Anything from tonight that is not clear yet. Your leaders read every answer before the next session.",
+            "title": "Your questions",
+            "body": "Anything from this session you are still wondering about. Your leaders read every answer before the next session.",
             "config": {
-              "prompt": "What is still muddy for you?",
+              "prompt": "What questions do you still have?",
               "kind": "short"
             },
             "minutes": 4
@@ -832,10 +832,10 @@
         },
         {
           "kind": "question",
-          "title": "What is still muddy?",
-          "body": "Anything from tonight that is not clear yet. Your leaders read every answer before the next session.",
+          "title": "Your questions",
+          "body": "Anything from this session you are still wondering about. Your leaders read every answer before the next session.",
           "config": {
-            "prompt": "What is still muddy for you?",
+            "prompt": "What questions do you still have?",
             "kind": "short"
           },
           "minutes": 3
@@ -867,7 +867,7 @@
         },
         {
           "kind": "short",
-          "prompt": "What is still muddy?"
+          "prompt": "What questions do you still have?"
         }
       ],
       "lengths": {
@@ -882,7 +882,7 @@
             "kind": "presenter",
             "title": "Show what you built",
             "minutes": 22,
-            "body": "With everyone in the call, about five minutes each. Each person in turn: say what you want to know, show it on the device, and explain one decision with your agent closed (a decision, never the code). The others ask one question to understand it, then answer the three questions: where is it going, how is it going, and what is next. The builder ends by saying what they will do next, and ready or not yet.",
+            "body": "With everyone in the call, about five minutes each. Each person in turn: say what you want to know, put it on the main stage with Show my app, and explain one decision with your agent closed (a decision, never the code). The others ask one question to understand it, then answer the three questions: where is it going, how is it going, and what is next. The builder ends by saying what they will do next, and ready or not yet.",
             "config": {
               "prompt": "Show the screenshot that proved a fix, and what it would have looked like if the fix had failed. Then show your app on the other person's device beside the guess you wrote before they held it: what did they do first?"
             },
@@ -931,10 +931,10 @@
           },
           {
             "kind": "question",
-            "title": "What is still muddy?",
-            "body": "Anything from tonight that is not clear yet. Your leaders read every answer before the next session.",
+            "title": "Your questions",
+            "body": "Anything from this session you are still wondering about. Your leaders read every answer before the next session.",
             "config": {
-              "prompt": "What is still muddy for you?",
+              "prompt": "What questions do you still have?",
               "kind": "short"
             },
             "minutes": 4
@@ -1017,10 +1017,10 @@
         },
         {
           "kind": "question",
-          "title": "What is still muddy?",
-          "body": "Anything from tonight that is not clear yet. Your leaders read every answer before the next session.",
+          "title": "Your questions",
+          "body": "Anything from this session you are still wondering about. Your leaders read every answer before the next session.",
           "config": {
-            "prompt": "What is still muddy for you?",
+            "prompt": "What questions do you still have?",
             "kind": "short"
           },
           "minutes": 4
@@ -1041,7 +1041,7 @@
         },
         {
           "kind": "short",
-          "prompt": "What is still muddy?"
+          "prompt": "What questions do you still have?"
         }
       ],
       "lengths": {
@@ -1089,10 +1089,10 @@
           },
           {
             "kind": "question",
-            "title": "What is still muddy?",
-            "body": "Anything from tonight that is not clear yet. Your leaders read every answer before the next session.",
+            "title": "Your questions",
+            "body": "Anything from this session you are still wondering about. Your leaders read every answer before the next session.",
             "config": {
-              "prompt": "What is still muddy for you?",
+              "prompt": "What questions do you still have?",
               "kind": "short"
             },
             "minutes": 4

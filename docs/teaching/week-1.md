@@ -72,7 +72,7 @@ written, played with, and published
 | 39-53 | Hold one to the tests | Design stage | With your agent closed, take the log line you keep coming back to and write it as a problem: what happens in your life, then "I need something that..." Put it on the board and hold it to the ten tests in stage 00, marking each yes, not yet, or I don't know. A "not yet" is the next thing to find out, not a failure. On the board: *Problem tests*. |
 | 53-65 | Start | Reflection | Before you leave, name two people who might have this problem, and write three questions for them that each start "Tell me about the last time you..." Do not describe an app. This week is stage 00, then stage 01 once your problem holds: the smallest real version, live with real data, in the hands of one of those two people. The prompt: "Who are the two people you will talk to this week, and what is your first "Tell me about the last time you..." question?" |
 | 65-70 | Who else has it? | Question | Only your leaders see your answer. The prompt: "How sure are you, right now, that someone besides you has this problem?" |
-| 70-75 | What is still muddy? | Question | Anything from tonight that is not clear yet. Your leaders read every answer before the next session. The prompt: "What is still muddy for you?" |
+| 70-75 | Your questions | Question | Anything from this session you are still wondering about. Your leaders read every answer before the next session. The prompt: "What questions do you still have?" |
 
 **In the rehearsal rooms,** each builder's turn runs these scenes, 7 minutes in all: read three lines from your log (3), the one you keep coming back to, and why (2), one question about what happened (2). The room's prompt is on screen the whole time.
 
@@ -86,7 +86,7 @@ written, played with, and published
 | 30-42 | Hold one to the tests | Design stage | With your agent closed, take the log line you keep coming back to and write it as a problem: what happens in your life, then "I need something that..." Put it on the board and hold it to the ten tests in stage 00, marking each yes, not yet, or I don't know. A "not yet" is the next thing to find out, not a failure. On the board: *Problem tests*. |
 | 42-52 | Start | Reflection | Before you leave, name two people who might have this problem, and write three questions for them that each start "Tell me about the last time you..." Do not describe an app. This week is stage 00, then stage 01 once your problem holds: the smallest real version, live with real data, in the hands of one of those two people. The prompt: "Who are the two people you will talk to this week, and what is your first "Tell me about the last time you..." question?" |
 | 52-56 | Who else has it? | Question | Only your leaders see your answer. The prompt: "How sure are you, right now, that someone besides you has this problem?" |
-| 56-60 | What is still muddy? | Question | Anything from tonight that is not clear yet. Your leaders read every answer before the next session. The prompt: "What is still muddy for you?" |
+| 56-60 | Your questions | Question | Anything from this session you are still wondering about. Your leaders read every answer before the next session. The prompt: "What questions do you still have?" |
 
 Every scene can be changed on the session's page before it runs, and in the Meet add-on while it runs.
 
@@ -284,7 +284,7 @@ and shown on the main stage without names only if you choose:
 1. **How sure are you, right now, that someone besides you has this
    problem?** (a scale of 5, from "Not sure at all" to "I could name
    them").
-2. **What is still muddy?** (in their own words).
+2. **What questions do you still have?** (in their own words).
 
 The scale is not a score. It tells you who is going into the
 conversations with a guess and who is going in with names, and the

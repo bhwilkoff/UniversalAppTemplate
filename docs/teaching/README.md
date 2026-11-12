@@ -59,7 +59,7 @@ learner's own app. It has four parts, in this order:
    the board.
 3. **Start.** Everyone sends the first prompt of the next stage before
    they leave, so the week begins in the room.
-4. **The check.** The week's question, and what is still muddy, read by
+4. **The check.** The week's question, and the questions people still have, read by
    the leader before the next session.
 
 Prep and week 5 bend the shape: prep's build is the setup itself,
@@ -74,7 +74,7 @@ cohort stays in the one call, and each person shows to everyone.
 | Break | 3 | none |
 | The one thing, then trying it | 7 and 13 | 6 and 11 |
 | Start | 10 | 9 |
-| The week's question, and what is still muddy | 4 and 3 | 4 and 4 |
+| The week's question, and your questions | 4 and 3 | 4 and 4 |
 
 The same scenes are in [`runs-of-show.json`](runs-of-show.json), and the
 hub makes every new cohort's sessions from that file, choosing the

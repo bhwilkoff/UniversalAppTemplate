@@ -71,7 +71,7 @@ written, played with, and published.
 | 45-58 | Choose your number | Design stage | Write the one number about your app you will read this week, where it comes from, and what it would look like if its reader could not read. Hold it to the rules on the board, then name the person you will show it to. On the board: *Blank*. |
 | 58-68 | Start | Reflection | Before you leave, send the first prompt of stage 06, with the number you chose tonight. Then start the log for stage 07: each time you use your own app this week and want it to do something it does not, write one line. Next week's feature comes from that log, not from a list. The prompt: "What is one thing you have already wanted your app to do while using it yourself?" |
 | 68-72 | What did they notice first? | Question | The prompt: "Rank what the other person noticed first." |
-| 72-75 | What is still muddy? | Question | Anything from tonight that is not clear yet. Your leaders read every answer before the next session. The prompt: "What is still muddy for you?" |
+| 72-75 | Your questions | Question | Anything from this session you are still wondering about. Your leaders read every answer before the next session. The prompt: "What questions do you still have?" |
 
 **In the rehearsal rooms,** each builder's turn runs these scenes, 8 minutes in all: say what you want to know, then show it on the device (3), explain one decision, agent closed (2), one question, then the three answers (2), what is next, and ready or not yet (1). The room's prompt is on screen the whole time.
 
@@ -80,12 +80,12 @@ written, played with, and published.
 | Minutes (60) | Scene | Kind | What happens |
 |---|---|---|---|
 | 0-4 | Arrive | Talk | One line in the chat: who held your app this week, or what is in the way. Then what I read in your answers last week, and what I changed. |
-| 4-26 | Show what you built | Presenter | With everyone in the call, about five minutes each. Each person in turn: say what you want to know, show it on the device, and explain one decision with your agent closed (a decision, never the code). The others ask one question to understand it, then answer the three questions: where is it going, how is it going, and what is next. The builder ends by saying what they will do next, and ready or not yet. The prompt: "Show the screenshot that proved a fix, and what it would have looked like if the fix had failed. Then show your app on the other person's device beside the guess you wrote before they held it: what did they do first?" |
+| 4-26 | Show what you built | Presenter | With everyone in the call, about five minutes each. Each person in turn: say what you want to know, put it on the main stage with Show my app, and explain one decision with your agent closed (a decision, never the code). The others ask one question to understand it, then answer the three questions: where is it going, how is it going, and what is next. The builder ends by saying what they will do next, and ready or not yet. The prompt: "Show the screenshot that proved a fix, and what it would have looked like if the fix had failed. Then show your app on the other person's device beside the guess you wrote before they held it: what did they do first?" |
 | 26-32 | Numbers that tell the truth | Talk | Once other people hold your app, you can no longer see it by using it yourself, so you read numbers about it. Stage 06's rules keep those numbers honest. A reader that cannot read says so, and a missing number is empty, never zero. Count only what servers and stores already see, with no tracking added to the app. And a number you aim at stops telling you the truth, so you read it, you do not chase it. |
 | 32-43 | Choose your number | Design stage | Write the one number about your app you will read this week, where it comes from, and what it would look like if its reader could not read. Hold it to the rules on the board, then name the person you will show it to. On the board: *Blank*. |
 | 43-52 | Start | Reflection | Before you leave, send the first prompt of stage 06, with the number you chose tonight. Then start the log for stage 07: each time you use your own app this week and want it to do something it does not, write one line. Next week's feature comes from that log, not from a list. The prompt: "What is one thing you have already wanted your app to do while using it yourself?" |
 | 52-56 | What did they notice first? | Question | The prompt: "Rank what the other person noticed first." |
-| 56-60 | What is still muddy? | Question | Anything from tonight that is not clear yet. Your leaders read every answer before the next session. The prompt: "What is still muddy for you?" |
+| 56-60 | Your questions | Question | Anything from this session you are still wondering about. Your leaders read every answer before the next session. The prompt: "What questions do you still have?" |
 
 Every scene can be changed on the session's page before it runs, and in the Meet add-on while it runs.
 
@@ -251,7 +251,7 @@ and shown on the main stage without names only if you choose:
 1. **Rank what the other person noticed first.** (a ranking). Choices:
    What it is for; How it looks; What it does first; Something that
    broke; How fast it is.
-2. **What is still muddy?** (in their own words).
+2. **What questions do you still have?** (in their own words).
 
 **Also prepared,** in the cohort's question bank: "What is the
 difference between a fix that is verified and a fix that is shipped?",

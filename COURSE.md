@@ -176,65 +176,49 @@ The cost of a stable group is that you see fewer of your classmates
 closely. The week 3 look and week 5's showing, open to everyone, are
 where that evens out.
 
-## The six parts of a session
+## The four parts of a session
 
-Each live session runs about 75 minutes, in the same six parts every
-week, so that nobody spends the first ten minutes wondering what
-happens next. The [weekly guides](docs/teaching/README.md) give each
-part its minutes, and say how to fit the session into 60 or 90.
+<!-- Drafted by Claude on November 12, 2026, from how the cohorts now run
+(sessions inside a Google Meet call with the Human Shaped add-on), for
+Ben's review. -->
 
-1. **Arrive.** Everyone writes one line in the chat as they come in:
-   what they shipped this week, or where they are stuck. Then the
-   teacher says, in a minute or two, what they read in last week's
-   checks for understanding and what they changed because of it. That
-   minute is what makes the check worth answering. A student who wrote
-   that they are stuck gets asked, in the chat, whether they would like
-   theirs to be the stuck moment the group works on, or to stay a few
-   minutes after. Nobody is named out loud for being stuck.
-2. **Show what you built.** In their groups of three, about eight
-   minutes each, someone keeping time. Each student says in one line
-   what they want to know from their partners, shows their "Be ready
-   to..." work on the device it runs on, and explains one decision
-   behind it with the agent closed (a decision, never the code). Their
-   partners ask one question to understand it better before saying
-   anything about it, and "what did you give up?" is a good one. Then
-   the partners answer three questions while the student listens: where
-   is it going, how is it going, and what is next. The student ends by
-   saying what they will do next, and whether the stage is ready or not
-   yet, which the next section explains. The teacher visits the groups,
-   says so on arriving so that nobody stops to perform, and listens for
-   one thing that comes up in more than one group.
-3. **One value at work.** Back together, one person shares a decision
-   their values changed that week, and what it cost them. Then the
-   teacher names the one thing they heard across the groups. This part
-   gets its own few minutes, after the groups rather than inside them,
-   because a value said to the whole cohort is a value other people can
-   borrow.
-4. **Read one real prompt together, trying it first.** The teacher puts
-   up a real situation (the screenshot, the bug, what the agent said)
-   without the prompt that answered it. Everyone writes the prompt they
-   would send, on their own, then compares it with a partner, and only
-   then does the real prompt go up, so the conversation is about the
-   difference: what the builder wanted, what the agent got wrong, and
-   how the prompt fixed it. For the deeper part of a skill, trying first
-   and comparing after teaches more than seeing the answer first. The
-   situations move toward the cohort's own work as the weeks go on. In
-   the first two weeks they come from the stages. In weeks 3 and 4 they
-   come from a classmate's real stuck moment, shared with their
-   permission. In week 5, someone who wants to leads with a moment of
-   their own. Nobody is required to lead.
-5. **Start.** Everyone writes the first prompt of the coming week and
-   sends it to their agent before they leave, with the four questions on
-   the wall and a room open for anyone who gets stuck. I want everyone
-   to walk away from the session with the week already begun, rather
-   than with a plan to begin it.
-6. **Check for understanding.** In the last three minutes, every student
-   answers two questions privately, on the cohort's live page or in a
-   message only the teacher sees, and never in the shared chat, where
-   the first answer shapes all the others. The first is the week's
-   question, drawn from its stages, such as "What can you decide or judge
-   about your app now that you could not last week?" The second is
-   always the same: "What is still muddy?" The teacher reads every
+Each live session runs 60 minutes, in the same four parts every week,
+so that nobody spends the first ten minutes wondering what happens next.
+Every part points at the learner's own app, and everything a person is
+asked to do happens inside the call: they answer in the Human Shaped
+panel or on the main stage, and they show their work from the panel
+rather than by sharing a screen. The [weekly guides](docs/teaching/README.md)
+give each part its minutes.
+
+1. **Show what you built.** Everyone arrives with one line in the chat:
+   what they shipped this week, or where they are stuck, and the teacher
+   says in a minute what they read in last week's answers and what they
+   changed because of them, which is what makes those answers worth
+   writing. Nobody is named out loud for being stuck. Then each person,
+   in turn, puts their "Be ready to..." work on the main stage with Show
+   my app, so everyone gets their own working copy to try, says in one
+   line what they want to know, and explains one decision behind it with
+   the agent closed (a decision, never the code). The others ask one
+   question to understand it before saying anything about it, and then
+   answer the three questions while the builder listens: where is it
+   going, how is it going, and what is next. The builder ends by saying
+   what they will do next, and whether the stage is ready or not yet. It
+   is the largest part, because it is the only time anyone sees the app
+   in someone else's hands. A cohort of eight or more shows in groups of
+   three, in breakout rooms, with the teacher visiting each.
+2. **One thing that unblocks the next stage.** A short talk from the
+   stage's own text, a few slides with one point each, and then everyone
+   tries it on their own app, often on the board or with a partner.
+3. **Start.** Everyone writes the first prompt of the coming week and
+   sends it to their agent before they leave, with prompt starters on the
+   stage ("This is done when ___", "It must never ___"). I want everyone
+   to walk away with the week already begun, rather than with a plan to
+   begin it.
+4. **The check.** In the last few minutes, everyone answers two
+   questions privately, in the panel, where only the teacher reads them
+   and the first answer cannot shape all the others. The first is the
+   week's question, drawn from its stages. The second is always the
+   same: "What questions do you still have?" The teacher reads every
    answer before the next session, because those lines are how a teacher
    finds out who understood the week and who needs a word, and then
    opens the next session by saying what they heard.

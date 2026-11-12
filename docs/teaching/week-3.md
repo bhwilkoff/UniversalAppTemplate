@@ -54,7 +54,7 @@ written, played with, and published
 | 45-58 | What would you ask to see? | Design stage | Take one thing your agent said it fixed this week. On the board, write the prompt you would send asking it to prove the fix, and what the screen would look like if the fix had not worked. Then read a partner's, and change yours if theirs asks for better evidence. On the board: *Read one real prompt*. |
 | 58-68 | Start | Reflection | Before you leave, send the first prompt of stage 04: ask your agent to prove its next fix on your own device, with a screenshot. Then plan stage 05: the person who will hold your app this week, the device they will hold it on, and the free way it gets there, a link, a test track, or the web. The prompt: "Who will hold your app this week, on which device, and how will it get there for free?" |
 | 68-72 | What do you ask to see? | Question | In your own words. Only your leaders read it. The prompt: "When your agent says something is fixed, what do you ask to see, and why is its word not enough?" |
-| 72-75 | What is still muddy? | Question | Anything from tonight that is not clear yet. Your leaders read every answer before the next session. The prompt: "What is still muddy for you?" |
+| 72-75 | Your questions | Question | Anything from this session you are still wondering about. Your leaders read every answer before the next session. The prompt: "What questions do you still have?" |
 
 **In the rehearsal rooms,** each builder's turn runs these scenes, 8 minutes in all: say what you want to know, then show it on the device (3), explain one decision, agent closed (2), one question, then the three answers (2), what is next, and ready or not yet (1). The room's prompt is on screen the whole time.
 
@@ -63,12 +63,12 @@ written, played with, and published
 | Minutes (60) | Scene | Kind | What happens |
 |---|---|---|---|
 | 0-4 | Arrive | Talk | One line in the chat: the cell in your parity matrix that your own eyes proved wrong. Then what I read in your answers last week, and what I changed. |
-| 4-26 | Show what you built | Presenter | With everyone in the call, about five minutes each. Each person in turn: say what you want to know, show it on the device, and explain one decision with your agent closed (a decision, never the code). The others ask one question to understand it, then answer the three questions: where is it going, how is it going, and what is next. The builder ends by saying what they will do next, and ready or not yet. The prompt: "Show your matrix and the cell your eyes proved wrong, then your app on the oldest device it supports: the newest feature that device will not show, and why the new look fits your people." |
+| 4-26 | Show what you built | Presenter | With everyone in the call, about five minutes each. Each person in turn: say what you want to know, put it on the main stage with Show my app, and explain one decision with your agent closed (a decision, never the code). The others ask one question to understand it, then answer the three questions: where is it going, how is it going, and what is next. The builder ends by saying what they will do next, and ready or not yet. The prompt: "Show your matrix and the cell your eyes proved wrong, then your app on the oldest device it supports: the newest feature that device will not show, and why the new look fits your people." |
 | 26-32 | Why the agent cannot grade itself | Talk | An agent reports what it intended. "I fixed it" is true about the code and says nothing about the app, and everything short of the real device lies a little: the simulator allows what a real device forbids, and a log line that says "shown" does not mean a person could read it. So the agent does the testing, and the evidence comes from outside it: a picture of the actual screen, a number read from the device, or a person holding it. The agent is never the tester. |
 | 32-43 | What would you ask to see? | Design stage | Take one thing your agent said it fixed this week. On the board, write the prompt you would send asking it to prove the fix, and what the screen would look like if the fix had not worked. Then read a partner's, and change yours if theirs asks for better evidence. On the board: *Read one real prompt*. |
 | 43-52 | Start | Reflection | Before you leave, send the first prompt of stage 04: ask your agent to prove its next fix on your own device, with a screenshot. Then plan stage 05: the person who will hold your app this week, the device they will hold it on, and the free way it gets there, a link, a test track, or the web. The prompt: "Who will hold your app this week, on which device, and how will it get there for free?" |
 | 52-56 | What do you ask to see? | Question | In your own words. Only your leaders read it. The prompt: "When your agent says something is fixed, what do you ask to see, and why is its word not enough?" |
-| 56-60 | What is still muddy? | Question | Anything from tonight that is not clear yet. Your leaders read every answer before the next session. The prompt: "What is still muddy for you?" |
+| 56-60 | Your questions | Question | Anything from this session you are still wondering about. Your leaders read every answer before the next session. The prompt: "What questions do you still have?" |
 
 Every scene can be changed on the session's page before it runs, and in the Meet add-on while it runs.
 
@@ -230,7 +230,7 @@ and shown on the main stage without names only if you choose:
 
 1. **When your agent says something is fixed, what do you ask to see,
    and why is its word not enough?** (in their own words).
-2. **What is still muddy?** (in their own words).
+2. **What questions do you still have?** (in their own words).
 
 **Also prepared:** "How do you know your last fix is real?"
 
