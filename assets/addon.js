@@ -350,12 +350,15 @@
         // A breakout room follows the session its cohort's call is running
         // (found in a learner's real call: a room during a rerun opened the
         // schedule's session, and with no dates, none at all).
-        db.from('call_runs').select('session_id').eq('cohort_id', id).gt('ends_at', new Date().toISOString()).order('set_at', { ascending: false }).limit(1)
+        db.from('call_runs').select('session_id, code').eq('cohort_id', id).gt('ends_at', new Date().toISOString()).order('set_at', { ascending: false }).limit(1)
       ]).then(function (res) {
         var bad = res.slice(0, 5).filter(function (r) { return r.error; })[0];
         if (bad) return fail('The session could not be loaded: ' + bad.error.message);
         var ss = res[0].data;
-        var running = S.room && S.room.groupId && !S.room.sessionId && !res[5].error && res[5].data && res[5].data[0] ? res[5].data[0].session_id : null;
+        var run = S.room && S.room.groupId && !S.room.sessionId && !res[5].error && res[5].data && res[5].data[0] ? res[5].data[0] : null;
+        var running = run ? run.session_id : null;
+        // The way back from a room is the call that is running the session.
+        S.mainCall = run && run.code ? 'https://meet.google.com/' + run.code : null;
         if (!ss.length) return fail('This cohort has no sessions yet.');
         S.cohort = cohort;
         S.people = res[1].data;
@@ -852,7 +855,7 @@
       .sort(function (a, b) { return a.name.toLowerCase().localeCompare(b.name.toLowerCase()); });
     var show = S.parts.filter(function (p) { return p.key === 'show'; })[0];
     S.signals = window.LiveSignals.start({
-      db: db, cohort: S.cohort, session: S.session, meId: S.me.id, teaching: S.teaching, groups: S.groups,
+      db: db, cohort: S.cohort, session: S.mainCall ? Object.assign({}, S.session, { meet_url: S.mainCall }) : S.session, meId: S.me.id, teaching: S.teaching, groups: S.groups,
       inRoom: function () { return !!S.room.groupId; },
       memberId: function () { return S.asMember || S.me.id; },
       // A card a leader shows goes on the main stage too, the one place
@@ -1608,7 +1611,7 @@
     var mine = S.groups.some(function (g) { return g.group_members.some(function (m) { return m.user_id === S.me.id; }); });
     if (!S.groups.length || (!S.teaching && !mine && !S.room.groupId)) return;
     S.rooms = window.RoomBoard.start({
-      db: db, cohort: S.cohort, session: S.session, meId: S.me.id, teaching: S.teaching, groups: S.groups, people: S.people,
+      db: db, cohort: S.cohort, session: S.mainCall ? Object.assign({}, S.session, { meet_url: S.mainCall }) : S.session, meId: S.me.id, teaching: S.teaching, groups: S.groups, people: S.people,
       names: S.names, nameOf: nameOf, mount: $('[data-rooms]'), onlyGroup: S.room.groupId || null, showLinks: !S.room.groupId,
       turn: L.roomTurn(roomsScene(), 3), prompt: roomsPrompt(),
       boardLink: function (gid) { var l = A.boardLinks(S.cohort, S.session, gid); return l ? l.board : null; },
