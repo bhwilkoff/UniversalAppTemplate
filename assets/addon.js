@@ -136,12 +136,23 @@
     try { localStorage.removeItem(OUT); } catch (e) {}
     // A tab without a GitHub token gets a fresh one first (GitHubToken).
     if (window.GitHubToken) window.GitHubToken.ensure(db, session);
-    // In a call nothing stands between a person and the session.
-    if (!GL || framed) return start(session);
+    // A Google account the site has not seen yet makes an empty account.
+    // Before it opens, the person may sign in with GitHub once, and that
+    // Google account leads to their own cohorts from then on (migration
+    // 20261112060000). "Not now" goes on, and is remembered for this account.
+    if (!GL || session.user.is_anonymous || laterFor(session.user.id)) return start(session);
     return db.from('profiles').select('github_login').eq('id', session.user.id).maybeSingle().then(function (p) {
-      if (!p.error && GL.needsGitHub(p.data)) return show('link-github');
+      if (!p.error && GL.needsGitHub(p.data)) return askForGitHub(session);
       start(session);
     }, function () { start(session); });
+  }
+  function laterKey(uid) { return 'hs-github-later-' + uid; }
+  function laterFor(uid) { try { return localStorage.getItem(laterKey(uid)) === '1'; } catch (e) { return false; } }
+  function askForGitHub(session) {
+    var email = (session.user && (session.user.email || (session.user.user_metadata || {}).email)) || '';
+    $('[data-connect-who]').textContent = email;
+    $('[data-connect-who]').hidden = !email;
+    show('link-github');
   }
 
   root.querySelectorAll('[data-sign-out]').forEach(function (b) {
@@ -162,18 +173,31 @@
 
   // Without GitHub the panel still runs a session; what lives on GitHub
   // (the cohort's conversation) waits until it is linked.
-  $('[data-github-later]').addEventListener('click', function () { if (current) start(current); });
+  $('[data-github-later]').addEventListener('click', function () {
+    if (!current) return;
+    try { localStorage.setItem(laterKey(current.user.id), '1'); } catch (e) {}
+    start(current);
+  });
+  // Sign in with GitHub, bringing this Google account along: the empty
+  // account offers a one-time code, the small window signs in with GitHub,
+  // and the GitHub account takes the code when the sign-in comes back.
+  var merging = null;
   $('[data-link-github]').addEventListener('click', function () {
     var status = $('[data-link-status]');
-    popup = window.open(GL.linkWindowUrl(location.origin), 'hs-link', 'popup,width=480,height=720');
+    var button = this;
+    // The window opens inside the press, or the browser blocks it.
+    popup = window.open('/account/?handoff=meet&via=github', 'hs-signin-' + Date.now(), 'popup,width=480,height=720');
     if (!popup) { status.textContent = 'Your browser blocked the small window.'; return; }
-    status.textContent = 'Link your GitHub in the small window, and this panel will follow.';
-  });
-  // The link window asks for this panel's sign-in, to link GitHub to it.
-  window.addEventListener('message', function (event) {
-    if (!GL || !current || !GL.isWant(event, location.origin, popup)) return;
-    var msg = A.handoff(current);
-    if (msg) popup.postMessage(msg, location.origin);
+    button.disabled = true;
+    status.textContent = '';
+    merging = db.rpc('offer_account_merge').then(function (r) {
+      if (r.error) status.textContent = 'This Google account could not be added: ' + r.error.message + '. You can still sign in with GitHub.';
+      return r.error ? null : r.data;
+    }, function () { return null; });
+    clearInterval(popupWatch);
+    popupWatch = setInterval(function () {
+      if (popup && popup.closed) { clearInterval(popupWatch); popup = null; if (!S.me) button.disabled = false; }
+    }, 1000);
   });
 
   $('[data-popup]').addEventListener('click', function () {
@@ -197,10 +221,19 @@
   window.addEventListener('message', function (event) {
     var tokens = A.acceptHandoff(event, location.origin, popup);
     if (!tokens) return;
-    db.auth.setSession(tokens).then(function (r) {
-      if (r.error || !r.data || !r.data.session) { $('[data-signin-status]').textContent = 'The sign-in could not be used here: ' + (r.error ? r.error.message : 'no session') + '.'; $('[data-fallback]').hidden = false; return; }
-      clearInterval(popupWatch);
-      proceed(r.data.session);
+    // The empty account's code is asked for before the sign-in changes.
+    var offered = merging;
+    merging = null;
+    Promise.resolve(offered).then(function (code) {
+      return db.auth.setSession(tokens).then(function (r) {
+        if (r.error || !r.data || !r.data.session) { $('[data-signin-status]').textContent = 'The sign-in could not be used here: ' + (r.error ? r.error.message : 'no session') + '.'; $('[data-fallback]').hidden = false; return; }
+        clearInterval(popupWatch);
+        if (!code) return proceed(r.data.session);
+        return db.rpc('accept_account_merge', { merge_code: code }).then(function (m) {
+          if (m.error) $('[data-signin-status]').textContent = 'Signed in with GitHub. The Google account was not added: ' + m.error.message;
+          proceed(r.data.session);
+        }, function () { proceed(r.data.session); });
+      });
     });
   });
 

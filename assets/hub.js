@@ -51,6 +51,19 @@
   // signed in, this page hands the session to the panel that opened it
   // (window.opener, this origin only) and closes (assets/addon.js).
   var handoffMode = params.get('handoff') === 'meet';
+  // The panel's "Sign in with GitHub" opens /account/?handoff=meet&via=github:
+  // straight to GitHub, with no second choice of how to sign in.
+  var viaGitHub = handoffMode && params.get('via') === 'github';
+  function hasGitHub(session) {
+    var p = (session && session.user && session.user.app_metadata && session.user.app_metadata.providers) || [];
+    return p.indexOf('github') !== -1;
+  }
+  function goToGitHub() {
+    show('loading');
+    try { window.sessionStorage.setItem('hs-handoff', '1'); } catch (e) {}
+    db.auth.signInWithOAuth({ provider: 'github', options: { redirectTo: location.origin + '/account/?handoff=meet' } })
+      .then(function (r) { if (r.error) fail(r.error.message); });
+  }
   // The add-on's in-class chat (R15) opens /account/?handoff=github: this
   // window signs in with GitHub (at once, when the app is already
   // authorized), and hands only the GitHub token to the panel that opened
@@ -158,32 +171,51 @@
   // The ways to sign in to this account, with linking and unlinking. The
   // last one cannot be taken away (Supabase refuses that too).
   var googleLinkShown = false;
+  // A Google-only account takes GitHub by signing in with it: the account
+  // offers a one-time code, GitHub's sign-in comes back here, and the GitHub
+  // account takes the code, so the Google sign-in moves onto it (migration
+  // 20261112060000). This works whether or not that GitHub account is new.
+  var MERGE = 'hs-merge-code', mergeNote = '';
+  function signInWithGitHubKeepingGoogle(status) {
+    return db.rpc('offer_account_merge').then(function (r) {
+      if (r.error) throw r.error;
+      try { window.sessionStorage.setItem(MERGE, r.data); } catch (e) {}
+      return db.auth.signInWithOAuth({ provider: 'github', options: { redirectTo: location.origin + '/account/' } });
+    }).catch(function (e) { status.textContent = 'GitHub sign-in did not start: ' + said(e) + '.'; });
+  }
   function drawLinked() {
     var list = root.querySelector('[data-linked]');
     var status = root.querySelector('[data-linked-status]');
     if (!G || !list) return;
+    if (mergeNote) { status.textContent = mergeNote; mergeNote = ''; }
     db.auth.getUserIdentities().then(function (r) {
       var ids = (r.data && r.data.identities) || [];
       list.replaceChildren();
-      [['github', 'GitHub'], ['google', 'Google']].forEach(function (pv) {
-        var idn = G.identityFor(ids, pv[0]);
+      var rows = [];
+      var gh = G.identityFor(ids, 'github');
+      rows.push(['github', 'GitHub', gh]);
+      var googles = ids.filter(function (i) { return i && i.provider === 'google'; });
+      if (googles.length) googles.forEach(function (g) { rows.push(['google', 'Google', g]); });
+      else rows.push(['google', 'Google', null]);
+      rows.forEach(function (pv) {
+        var idn = pv[2];
         var data = (idn && idn.identity_data) || {};
         var li = el('li');
         li.appendChild(el('strong', null, pv[1]));
         li.appendChild(document.createTextNode(idn
           ? (pv[0] === 'github' && data.user_name ? ', linked as @' + data.user_name : data.email ? ', linked as ' + data.email : ', linked')
           : ', not linked'));
-        if (idn && G.canUnlink(ids, pv[0])) {
+        if (idn && ids.length >= 2) {
           var b = el('button', 'btn-secondary small', 'Unlink');
           b.type = 'button';
           b.addEventListener('click', function () {
-            window.UI.confirm({ title: 'Unlink ' + pv[1] + '?', body: pv[0] === 'github' ? 'Without GitHub, your cohorts cannot reach you.' : 'You will sign in with GitHub only.', action: 'Unlink ' + pv[1] }).then(function (ok) { if (ok) unlink(); });
+            window.UI.confirm({ title: 'Unlink ' + (data.email || pv[1]) + '?', body: pv[0] === 'github' ? 'Without GitHub, your cohorts cannot reach you.' : 'That Google account will no longer sign you in.', action: 'Unlink' }).then(function (ok) { if (ok) unlink(); });
           });
           function unlink() {
             b.disabled = true;
             db.auth.unlinkIdentity(idn).then(function (u) {
               if (u.error) { b.disabled = false; status.textContent = 'Not unlinked: ' + u.error.message + '.'; return; }
-              status.textContent = pv[1] + ' unlinked';
+              status.textContent = (data.email || pv[1]) + ' unlinked';
               load();
             });
           }
@@ -191,28 +223,28 @@
           li.appendChild(b);
         }
         if (!idn && pv[0] === 'github') {
-          var l = el('button', 'btn-secondary small', 'Link GitHub');
+          var l = el('button', 'btn-secondary small', 'Sign in with GitHub');
           l.type = 'button';
-          l.addEventListener('click', function () {
-            linkGitHub(location.origin + '/account/').catch(function (e) { status.textContent = 'Linking GitHub did not start: ' + said(e) + '.'; });
-          });
+          l.addEventListener('click', function () { l.disabled = true; signInWithGitHubKeepingGoogle(status).then(function () { l.disabled = false; }); });
           li.appendChild(document.createTextNode(' '));
           li.appendChild(l);
         }
         list.appendChild(li);
       });
+      // Any number of Google accounts can sign in to one account.
       var googleBox = root.querySelector('[data-google-link]');
-      var hasGoogle = !!G.identityFor(ids, 'google');
-      googleBox.hidden = hasGoogle;
-      if (!hasGoogle && !googleLinkShown && window.HSGoogle) {
+      var addLabel = root.querySelector('[data-google-add]');
+      googleBox.hidden = false;
+      if (addLabel) addLabel.hidden = false;
+      if (!googleLinkShown && window.HSGoogle) {
         googleLinkShown = true;
         window.HSGoogle.mount({
           db: db, button: googleBox, link: true, prompt: false, theme: theme(),
-          onSession: function () { status.textContent = 'Google linked'; googleLinkShown = false; drawLinked(); },
+          onSession: function () { status.textContent = 'Google account added'; googleLinkShown = false; drawLinked(); },
           onError: function (e) {
             status.textContent = G.alreadyLinkedElsewhere(e)
-              ? 'That Google account belongs to another account here. Delete that account first, then link it.'
-              : 'Linking Google did not finish: ' + said(e) + '.';
+              ? 'That Google account belongs to another account here. Sign in with it in Meet, then choose Sign in with GitHub.'
+              : 'Adding the Google account did not finish: ' + said(e) + '.';
           }
         });
       }
@@ -409,15 +441,27 @@
       var session = s.data && s.data.session;
       if (githubMode) return githubHandOff(session);
       if (!session) {
-        if (arrivalError) fail(arrivalError); else { show('signed-out'); showGoogleSignIn(); }
+        if (arrivalError) fail(arrivalError);
+        else if (viaGitHub) goToGitHub();
+        else { show('signed-out'); showGoogleSignIn(); }
         return;
       }
+      // The panel asked for GitHub, and this window holds a sign-in without it.
+      if (handoffMode && viaGitHub && !hasGitHub(session)) return goToGitHub();
       if (handoffMode) return handOff(session);
       // The token goes to the server before the page moves on, or the move cancels
       // the trade and this sign-in is never kept (found November 6, 2026).
       if (welcome) return Promise.race([keepGitHubToken(session), new Promise(function (ok) { setTimeout(ok, 4000); })]).then(function () { location.replace('/'); }, function () { location.replace('/'); });
       var uid = session.user.id;
       keepGitHubToken(session);
+      var mergeCode = null;
+      try { mergeCode = window.sessionStorage.getItem(MERGE); window.sessionStorage.removeItem(MERGE); } catch (e) {}
+      if (mergeCode && hasGitHub(session)) {
+        return db.rpc('accept_account_merge', { merge_code: mergeCode }).then(function (m) {
+          if (m.error) mergeNote = 'GitHub is signed in, and the Google account was not added: ' + m.error.message;
+          load();
+        }, function () { load(); });
+      }
       return Promise.all([
         db.from('profiles').select('github_login, display_name, avatar_url, say_like').eq('id', uid).single(),
         db.from('enrollments').select('status, role, cohorts(id, slug, title, starts_on, weeks, schedule, description, status, session_weekday, session_time, session_minutes, time_zone)').eq('user_id', uid).neq('status', 'left'),

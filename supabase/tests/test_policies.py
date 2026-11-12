@@ -3522,6 +3522,57 @@ def main():
     check("a guest cannot change the rest of their row",
           attempt(as_user("dee"), "update public.call_guests set member_id = %s where user_id = %s returning 1", (people["bea"], people["dee"])) and last_rows == [])
 
+    # Another Google account joins a GitHub account (migration 20261112060000).
+    def google_account(name, sub):
+        as_system()
+        uid = new_account(name, {"provider": "google", "providers": ["google"]}, {"name": name, "email": name + "@example.edu"})
+        su.execute("insert into auth.identities (user_id, provider, provider_id, identity_data) values (%s, 'google', %s, %s)",
+                   (uid, sub, json.dumps({"email": name + "@example.edu"})))
+        return uid
+    def offer(name):
+        return last_rows[0][0] if attempt(as_user(name), "select public.offer_account_merge()") else None
+    def users_google(uid):
+        su.execute("reset role")
+        su.execute("select provider_id from auth.identities where user_id = %s and provider = 'google' order by provider_id", (uid,))
+        return [r[0] for r in su.fetchall()]
+    def exists_user(uid):
+        su.execute("reset role")
+        su.execute("select count(*) from auth.users where id = %s", (uid,))
+        return su.fetchone()[0] == 1
+    gwen = google_account("gwen", "g-gwen")
+    check("a GitHub account cannot offer itself to be merged", offer("ben") is None and "already has GitHub" in last_reason[0])
+    check("an agent cannot offer an account", not attempt(as_agent("gwen"), "select public.offer_account_merge()"))
+    code = offer("gwen")
+    check("a new Google-only account offers a code", code is not None)
+    check("a Google-only account cannot take it", not attempt(as_user("gwen"), "select public.accept_account_merge(%s)", (code,)) and "Sign in with GitHub" in last_reason[0])
+    check("an agent cannot take it either", not attempt(as_agent("ben"), "select public.accept_account_merge(%s)", (code,)))
+    before = users_google(people["ben"])
+    check("the person's GitHub account takes it", attempt(as_user("ben"), "select public.accept_account_merge(%s)", (code,)) and "gwen@example.edu" in (last_rows[0][0] or []))
+    check("and the Google sign-in now leads to that account", users_google(people["ben"]) == sorted(before + ["g-gwen"]) and users_google(gwen) == [])
+    check("the empty account is gone", not exists_user(gwen))
+    check("a code works once", not attempt(as_user("bea"), "select public.accept_account_merge(%s)", (code,)) and "expired" in last_reason[0])
+
+    gus = google_account("gus", "g-gus")
+    code = offer("gus")
+    su.execute("reset role")
+    su.execute("update private.account_merges set created_at = now() - interval '16 minutes' where code = %s", (code,))
+    check("a code older than 15 minutes is refused", not attempt(as_user("ben"), "select public.accept_account_merge(%s)", (code,)) and users_google(gus) == ["g-gus"])
+
+    code = offer("gus")
+    su.execute("reset role")
+    su.execute("insert into public.call_guests (cohort_id, user_id, name) values (%s, %s, 'gus')", (cc, gus))
+    check("an account with something in it gives up its Google sign-in",
+          attempt(as_user("bea"), "select public.accept_account_merge(%s)", (code,)) and users_google(people["bea"])[-1:] == ["g-gus"])
+    check("and stays, with what it holds", exists_user(gus) and attempt(as_user("ben"), "select 1 from public.call_guests where user_id = %s", (gus,)))
+
+    gia = google_account("gia", "g-gia")
+    code = offer("gia")
+    as_system()
+    su.execute("insert into auth.identities (user_id, provider, provider_id, identity_data) values (%s, 'github', '991', %s)",
+               (gia, json.dumps({"user_name": "gia-gh", "provider_id": "991"})))
+    check("an account that gained GitHub of its own is never merged away",
+          not attempt(as_user("ben"), "select public.accept_account_merge(%s)", (code,)) and exists_user(gia) and users_google(gia) == ["g-gia"])
+
     conn.rollback()
     conn.close()
     failed = [n for n, ok in results if not ok]

@@ -1430,3 +1430,27 @@ refuses, the Accept button still leads to GitHub's own page.
 **Why:** Ben asked for a study of Minerva's Forum "for inspiration... not to implement everything," then: "Feedback that is given directly to the learner should be private to them. I think that if the leader is aware of their own talk time, they are more likely to ask questions rather than continue to talk (dominating the conversation). And yes, a session without a call should be possible. Please implement what you have learned from forum and all that you have documented." The study's notes stay private, since they describe Minerva's product; what came of it is described here in Human Shaped's own words.
 
 **How to apply:** The recording tab lists a session's moments beside the video (parts, questions, answers, reactions, talk, work shown, marks, feedback), each opening that second; a learner sees only their own (session-replay.js, replay-lib.js). `sessions.recording_started_at` places what the add-on kept by the clock, written by the recorder or lined up once by a leader. Marks (`session_marks`) are private to whoever made them. Feedback (`moment_feedback`) is a draft until the leader shares it, then reaches the learner in their own private repository through the reminders function, and cannot be taken back. Announcements post as issues in the cohort repository at the time chosen. A leader's own talk share shows on the After tab and in their panel, from the recording. Not taken from the study: tracking whether a tab is in front, grades and rubric scores, absence ledgers, tables comparing learners, and controls Meet already has.
+
+## Any Google account leads to your GitHub account (November 12, 2026)
+
+Ben, signed in to Meet as one Google account while his Human Shaped account
+knew two others: "any account you login with on Google Meet will be able to
+see the cohorts you have, so long as you are logged in on Github correctly
+... it has to be far easier to login and the process needs to be intuitive
+throughout."
+
+**Why:** GitHub is the identity that holds cohorts, and people sign in to
+Meet with whatever Google account their school or work gives them. A Google
+account the site had never seen made an empty account, and the old "Link
+your GitHub" step could only delete it, so the same Google account started
+over every time.
+
+**How to apply:** An account may hold any number of Google sign-ins. When a
+Google sign-in lands on an empty account, the panel asks once for GitHub;
+the empty account offers a one-time code (`offer_account_merge`), the small
+window goes straight to GitHub, and the GitHub account takes the code
+(`accept_account_merge`), which moves the Google sign-in onto it and removes
+the empty account only if nothing else belongs to it. "Not now" goes on and
+is remembered for that account. /account/ lists every Google account and adds
+more. Holding both sign-ins at once is the proof of ownership; never move an
+identity on one sign-in alone.
