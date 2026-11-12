@@ -762,9 +762,7 @@
   }
 
   root.querySelector('[data-link-github]').addEventListener('click', function () {
-    linkGitHub(location.origin + '/account/').catch(function (e) {
-      root.querySelector('[data-linked-status]').textContent = 'Linking GitHub did not start: ' + said(e) + '.';
-    });
+    signInWithGitHubKeepingGoogle(root.querySelector('[data-linked-status]'));
   });
 
   // The header's account menu signs out through /account/?sign-out, on any
