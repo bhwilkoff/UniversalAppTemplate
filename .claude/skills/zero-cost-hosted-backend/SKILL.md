@@ -219,6 +219,38 @@ Two conditions: track the gap explicitly (a deferred row in the
 parity/backlog doc, not silence), and **never fake the feature's
 output** — a dormant toggle is honest; a fabricated result is not.
 
+## Lessons from a live cohort platform (2026-11)
+
+A free cohort platform (humanshaped.org) ran live classes on Supabase. What
+it measured:
+
+- **Realtime change events are seconds slow.** `postgres_changes` passes the
+  write log and an RLS check per subscriber: 2 to 5 seconds from one person's
+  write to another's screen. For anything people watch together, send a
+  **broadcast** nudge on a channel right after the write and let receivers
+  reload; keep change events and a slow poll as fallbacks.
+- **Supabase realtime free tier is 200 connections**, and overage restricts
+  the whole organization. Public, many-person rooms belong on a separate
+  service (a Cloudflare Durable Object held 1,000 sockets at 151 ms median).
+- **`on delete cascade` is a data-loss decision.** A breakout room's group was
+  deleted when breakouts ended, and every room's answers went with it. Rows
+  people's work hangs off are marked ended, never deleted, and a policy test
+  proves the work survives.
+- **`signOut()` defaults to signing out everywhere.** Never sign a session out
+  to get a clean test state; use a fresh profile or an anonymous sign-in.
+- **Anonymous sign-ins** let anyone with a link take part as a guest; record
+  guests per group and let an organizer tie a guest to a member.
+- **Test RLS in an embedded Postgres** (`pgserver`, Python 3.12) on every
+  migration: apply them all, then act as each role. Include negative checks
+  (refused, or zero rows) and checks that a delete keeps what it must. A
+  refused UPDATE returns zero rows, not an error, so assert on the rows.
+- **Migrations without the dashboard**: POST SQL to the Management API
+  (`/v1/projects/<ref>/database/query`) with a personal access token kept in
+  a mode-600 file, then record the version in
+  `supabase_migrations.schema_migrations`.
+- A **SECURITY DEFINER function that changes one field** (a guest setting
+  their own link) is safer than an UPDATE grant on the whole row.
+
 ## Free-tier viability
 
 All of the above fits free tiers at hobby-to-small-community scale,

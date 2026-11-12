@@ -167,3 +167,13 @@ Add a dated entry each time a member experience teaches something new.
   disclosures for rare detail). An audit found about 35 privacy sentences
   and 25 state sentences that one visibility marker and one status label
   would replace.
+- **2026-11-12, a live class inside a video call.** A guest learner's real
+  call found that three features read only the members' table (saving an
+  app's address, being featured, appearing in app lists), so the audience a
+  demo is for could do none of them. Test every feature as a guest. The same
+  pass found one feature named two ways ("Pick who shows next" in one place,
+  "Feature someone" in another), old vocabulary that had outlived its feature,
+  and instructions for joining that did not match what a learner actually had
+  to press. Words are part of the interface: one name per feature, the same
+  everywhere, and each instruction checked against a real person doing it.
+  The live-session lessons are in `live-learning-sessions`.

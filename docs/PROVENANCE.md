@@ -25,6 +25,17 @@ nobody rediscovers an exclusion.
   started from this template. It also built three skills the 09-30 audit
   recommended and never landed. The record is
   `docs/maintaining/ARCHIVE-WATCH-GAP-AUDIT-2026-10-22.md`.
+- **2026-11-12**, humanshaped.org, the free cohort platform this template
+  is taught through: a Google Meet™ add-on, live sessions, and the GitHub,
+  Drive, Calendar, and Supabase pieces under them, from October 3 to
+  November 12, 2026. Everything was measured in real calls with real
+  learners and test profiles. Three skills came out of it
+  (`google-meet-addon`, `live-learning-sessions`,
+  `github-and-google-learning-infrastructure`), along with lessons added to
+  `web-platform-patterns`, `zero-cost-hosted-backend`, and
+  `learner-experience-design`. Left behind on purpose: anything naming a
+  cohort's learners, their transcripts, or a partner institution's content,
+  and the site's own code, which lives on its `site` branch.
 
 ## Coverage: domain → home in this template
 
@@ -58,6 +69,9 @@ nobody rediscovers an exclusion.
 | Monetizing around IP you don't own (license-then-monetize, the own-engineering line, entitlement architecture, decision gates) | `third-party-ip-monetization` skill |
 | Two-agent handoff (single-file channel, directional outboxes, ownership lists, provenance-cited deliveries) | `two-agent-handoff` skill |
 | Next-OS additive adoption (dual runtime+compile gates, the SDK-conditional flag, Compat wrapper, beta-Xcode submit trap) | `cloud-appstore-submission` Rule 6 (amended), Decision 048 |
+| Google Meet™ add-ons (two frames with no shared storage, popup sign-in, activities and rejoining, the 10-minute partitioned cache, fitting a stage, multi-profile testing, Marketplace trademark and scope review) | `google-meet-addon` skill |
+| Live learning sessions (show state, guests by link, live questions, breakouts from a pool of links, reruns, replay beside a recording, private feedback, cascade data loss, session and exchange writing) | `live-learning-sessions` skill, `learner-experience-design` Lessons |
+| GitHub and Google as free infrastructure (public GitHub App, per-cohort and per-person private repos, issues as notices, Actions timing, drive.file video with a relay, Calendar, consent screen) | `github-and-google-learning-infrastructure` skill, `zero-cost-hosted-backend` §Lessons from a live cohort platform |
 | Android release symbols + ML Kit (embed-in-AAB, zip -D, jarsigner; unbundled-vs-bundled) | `android-production-gotchas` §Release engineering, `play-cli-submission` Rule 9 |
 | Display vocabulary as a render-layer contract; word-prefix search; image-first sort; two-phase catalog load | `shared-data-plane-contract` §Client consumption rules, DATA-CONTRACT template §5.5, Decision 052 |
 | Teaching-surface platform asymmetry (walkthroughs iOS-only; documented rejections elsewhere) | `universal-feature-states` (amended), PARITY.md §3b |

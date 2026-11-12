@@ -1,8 +1,8 @@
 # The skills
 
-There are 147 folders in this directory. 57 of them I wrote, one lesson
-at a time, while building BOBA Playbook, Bsky Dreams, Tidbits Trivia and
-Archive Watch. The other 90 came from people who wrote good skills
+There are 154 folders in this directory. 64 of them I wrote, one lesson
+at a time, while building BOBA Playbook, Bsky Dreams, Tidbits Trivia,
+Archive Watch, and humanshaped.org. The other 90 came from people who wrote good skills
 before I needed them, and they are credited below.
 
 This page says what each one is for, when it fires, and where it came
@@ -91,6 +91,7 @@ them. "From" names the app where the lesson was learned.
 | `evidence-gated-catalog-curation` | Deciding what a catalog you did not make may show, hide, recommend, or say: a claim a reader can open, an uploader's word is not evidence, restore by evidence, never recommended but always findable, provenance on every field. | Archive Watch |
 | `internet-archive-source` | Reading archive.org honestly: scrape vs search, throttled is not empty, the connection limit, upload dates, items that hold many works, private files, storage nodes. | Archive Watch |
 | `web-catalog-data-layer` | A worked example: how Archive Watch's web app reads the shared catalog. Read `shared-data-plane-contract` first. | Archive Watch |
+| `github-and-google-learning-infrastructure` | When a free platform leans on GitHub and Google for sign-in, a shared space, private notices, videos, and calendars instead of running its own, including the traps that only show up for people outside your own team. | humanshaped.org |
 
 ### Stage 03: Going native
 
@@ -150,6 +151,8 @@ them. "From" names the app where the lesson was learned.
 | `cross-platform-determinism` | A value (a daily pick, a shuffle) that must come out identical on every platform. | Tidbits Trivia |
 | `values-based-feed-ranking` | A feed or "for you" surface that passes the four questions as a ranking function. | Bsky Dreams |
 | `web-content-extraction` | Reader mode and link previews from pages you do not control. | Bsky Dreams |
+| `google-meet-addon` | An app that runs inside Google Meet™: what its two frames can and cannot do, why a fix takes ten minutes to show up, how to fit content to whatever stage Meet gives you, and how to test it honestly with more than one person in a real call. | humanshaped.org |
+| `live-learning-sessions` | A live class that people follow together: questions answered in the room, guests who join by link, breakout rooms that keep their work, a session run again for someone who missed it, a replay beside the recording, and how to write the session itself so that it gets people thinking. | humanshaped.org |
 | `camera-recognition-pipeline` | Identifying physical objects with the camera. | BOBA Playbook |
 | `realitykit-3d-card-rendering` | 3D card rendering on iOS. | BOBA Playbook |
 

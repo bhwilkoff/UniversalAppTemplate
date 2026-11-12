@@ -211,6 +211,25 @@ lines, nothing else.
 - The Safari body rule (`docs/platforms/web.md`): `100dvh` flex-column body,
   `main { flex:1; overflow-y:auto; min-height:0 }`, no
   `viewport-fit=cover`.
+- **Content that must fit a box you don't control** (an embedded frame, a
+  video-call stage): lay out by the container's own width with
+  `container-type: inline-size` and `@container`, then after each draw and on
+  resize measure the content against `window.innerHeight` (a grid container
+  grows with its content, so its own box always "fits") and scale the view
+  with CSS `zoom` until it fits. Skip views that fill on purpose (an iframe, a
+  canvas board). Clamp fixed chrome (`clamp(2.25rem, 7vmin, 3.25rem)`) so a
+  small box keeps its height for content. See `google-meet-addon`.
+- **`summary { display: flex }` removes the native disclosure marker.** A
+  closed `<details>` then reads as an empty heading. Keep `display: list-item`
+  where people must see it opens.
+- **Hiding a section someone still draws into**: hide it with CSS, never by
+  leaving it out of the page. Code that looks it up with `querySelector` gets
+  null and stops (a learner's whole panel failed to open this way).
+- **Markdown fill-in blanks**: two `___` on one line render as bold. Escape
+  runs of three or more underscores (outside code fences) before rendering.
+- **Chrome partitions its HTTP cache by top-level site.** A page framed
+  inside another site (a Meet add-on) can stay stale for the full cache time
+  even after a plain `curl` shows the new version. Version every asset.
 
 ## Native media controls: never draw one twice
 

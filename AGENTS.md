@@ -62,6 +62,7 @@ Sources: `docs/research/gemini-and-other-agents.md`. Rows follow the
 | Serving a catalog's images/media | `image-cdn-discipline` |
 | Sync, sign-in, progress across devices | `per-ecosystem-sync-islands` |
 | Users see EACH OTHER'S data (profiles, roles, moderation) | `zero-cost-hosted-backend` (vs `per-ecosystem-sync-islands`, Decision 047) |
+| GitHub, Drive, or Calendar as a free platform's sign-in, shared space, or notices | `github-and-google-learning-infrastructure` |
 | Deriving a shipped corpus from a messy source | `content-corpus-derivation` |
 | Deciding what a catalog you did not author may show, hide, recommend, or say (rights, provenance, wrong matches, versions) | `evidence-gated-catalog-curation` |
 | Reading archive.org (enumerating, metadata, picking files, streaming) | `internet-archive-source` |
@@ -100,6 +101,7 @@ Sources: `docs/research/gemini-and-other-agents.md`. Rows follow the
 | Capturing camera, mic, or another app's audio, mixing sources, or publishing live (RTMP) | `live-capture-and-broadcast` |
 | Vertical social video (Reels, Shorts, TikTok), burned captions, posting cadence | `social-video-teaser-craft` |
 | Real-time multiplayer, or a $0 watch party | `cross-platform-multiplayer` + `zero-cost-hosted-backend` |
+| A Google Meet add-on, or live class sessions (questions, guests, breakouts, replay) | `google-meet-addon` + `live-learning-sessions` |
 | A value identical on every platform (daily pick, hash) | `cross-platform-determinism` |
 | Any algorithmic feed / discovery / "for you" surface | `values-based-feed-ranking` |
 | Reader mode or link-preview cards | `web-content-extraction` |

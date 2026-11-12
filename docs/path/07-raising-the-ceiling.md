@@ -170,6 +170,8 @@ build.
 - `cross-platform-multiplayer` and `cross-platform-determinism` for
   anything live or shared across platforms.
 - `smart-tv-platform-expansion` for the living room beyond Apple.
+- `google-meet-addon` and `live-learning-sessions` for an app that runs
+  inside a Google Meet™ call, such as a class that everyone follows together.
 - `app-intents`, `widgetkit` and the other Apple framework skills for
   each system feature.
 
