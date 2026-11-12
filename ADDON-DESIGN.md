@@ -234,3 +234,15 @@ Tested in a real Meet call with a leader and a learner profile, running Week 3 s
 | 12 | No part clock on the stage | Seen in the call |
 | 13 | The recording control says Take the recording notice down | Built |
 | 14 | The last part reads as a fact | Built |
+
+### From Ben's words after Week 2 (second round, November 11, 2026)
+
+| Ask | Fix | State |
+|---|---|---|
+| "What I can do to prep for the next step" | Coming next at the foot of Now: kind, minutes, the question it asks, Show your app, what goes on the stage | Seen in the call |
+| "Open and close each one of the tools easily" | A tile that is on carries Take down, Stop, or Close it | Seen in the call (Propose and vote, clock, an app) |
+| "Not clear where to go for voting on things, any of the tools" | A learner's Now is headed Propose an idea, and vote, or Try the website on your stage | Seen in the call; a learner proposed from the panel and voted from the stage |
+| Show your app from the leader's side | Who is ready leads Now with Show it | Seen in the call |
+| "Supposed to be on the plan tab" | Plan offers Edit this part only on the current part | Built |
+| "I've got to open this back up" | A closed side panel only hides; the stage keeps working | Seen in the call. Reopening is three presses in Meet's own menus |
+| Found in the call | A started clock now has its own corner over every stage view; a website or Propose and vote comes down on a new part | Seen in the call |
