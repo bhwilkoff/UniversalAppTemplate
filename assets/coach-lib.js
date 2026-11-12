@@ -39,7 +39,7 @@
     cue: { where: 'panel', target: 'stageline', text: 'People new to Human Shaped now see a one-line hint on their own stage. Say it aloud too, the first time.' }
   };
 
-  var STORE = 'hs-coach';
+  var STORE = 'hs-coach-2';
   function read(store) {
     try { var v = JSON.parse(store.getItem(STORE) || '[]'); return Array.isArray(v) ? v : []; } catch (e) { return []; }
   }
