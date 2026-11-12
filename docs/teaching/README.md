@@ -21,7 +21,7 @@ that is what every guide is built around.
 
 | Session | Leads with | What gets shown | Guide |
 |---|---|---|---|
-| Prep | Publish | Setup: the app's address, open on a phone | [Prep](before.md) |
+| Prep | Publish | Setup: the app, live at its own address | [Prep](before.md) |
 | Week 1 | Write | The noticing log, which the session turns into one problem held to the tests | [Week 1](week-1.md) |
 | Week 2 | Play | 00 and 01: the problem statement, the two conversations, and the first app in the hands of a person they talked to | [Week 2](week-2.md) |
 | Week 3 | Play, then publish | 02 and 03: the matrix and one cell proved wrong, the oldest device and what it will not show, and the app's own look | [Week 3](week-3.md) |

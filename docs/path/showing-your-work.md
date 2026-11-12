@@ -130,7 +130,7 @@ the same feedback is still within reach. These three work best
 together, because each one sees something the others cannot.
 
 - **A friend as a partner.** Ask one person to open your app's address
-  on their own phone once a stage, to listen while you explain one
+  on their own device once a stage, to listen while you explain one
   decision, and to answer the three questions. They do not need to know
   anything about building software, because the questions are about the
   app, not the code. If they are building something too, trade.

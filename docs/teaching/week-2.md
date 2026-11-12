@@ -47,7 +47,7 @@ verb each person names. The play starts before they leave.
 | Minutes (75) | Scene | Kind | What happens |
 |---|---|---|---|
 | 0-5 | Arrive | Talk | One line in the chat: what the person you talked to did first with your app, or what is in the way. Then what I read in your answers last week, and what I changed. |
-| 5-35 | Show what you built | Rehearsal rooms | In your group's room. Each person in turn: say what you want to know, show it on the device, and explain one decision with your agent closed (a decision, never the code). The others ask one question to understand it, then answer the three questions: where is it going, how is it going, and what is next. The builder ends by saying what they will do next, and ready or not yet. The prompt: "Read your problem statement and the version before it, then show the app on your phone: what the real data taught you, and what the person you talked to did with it." |
+| 5-35 | Show what you built | Rehearsal rooms | In your group's room. Each person in turn: say what you want to know, show it on the device, and explain one decision with your agent closed (a decision, never the code). The others ask one question to understand it, then answer the three questions: where is it going, how is it going, and what is next. The builder ends by saying what they will do next, and ready or not yet. The prompt: "Read your problem statement and the version before it, then show your app: what the real data taught you, and what the person you talked to did with it." |
 | 35-38 | Break | Break |  |
 | 38-45 | Two layers | Talk | Every app built from the template has two layers. The data plane holds what is the same everywhere (what exists, what is allowed, and what it is called), and it is built once. The native layer holds what should feel born on each device: its controls, its gestures, and its look. Archive Watch's contract says it in one line: no client re-implements or re-hosts any part of the pipeline. Tonight you sort your own app into those two layers. |
 | 45-58 | One verb, twice | Design stage | Write the one thing your app must do on every device. Then draw it twice: once on the device you started with, and once on the device your people reach for next, each with that device's own controls. Mark what lives in the data and what lives in the device. On the board: *Blank*. |
@@ -62,7 +62,7 @@ verb each person names. The play starts before they leave.
 | Minutes (60) | Scene | Kind | What happens |
 |---|---|---|---|
 | 0-4 | Arrive | Talk | One line in the chat: what the person you talked to did first with your app, or what is in the way. Then what I read in your answers last week, and what I changed. |
-| 4-26 | Show what you built | Presenter | With everyone in the call, about five minutes each. Each person in turn: say what you want to know, show it on the device, and explain one decision with your agent closed (a decision, never the code). The others ask one question to understand it, then answer the three questions: where is it going, how is it going, and what is next. The builder ends by saying what they will do next, and ready or not yet. The prompt: "Read your problem statement and the version before it, then show the app on your phone: what the real data taught you, and what the person you talked to did with it." |
+| 4-26 | Show what you built | Presenter | With everyone in the call, about five minutes each. Each person in turn: say what you want to know, show it on the device, and explain one decision with your agent closed (a decision, never the code). The others ask one question to understand it, then answer the three questions: where is it going, how is it going, and what is next. The builder ends by saying what they will do next, and ready or not yet. The prompt: "Read your problem statement and the version before it, then show your app: what the real data taught you, and what the person you talked to did with it." |
 | 26-32 | Two layers | Talk | Every app built from the template has two layers. The data plane holds what is the same everywhere (what exists, what is allowed, and what it is called), and it is built once. The native layer holds what should feel born on each device: its controls, its gestures, and its look. Archive Watch's contract says it in one line: no client re-implements or re-hosts any part of the pipeline. Tonight you sort your own app into those two layers. |
 | 32-43 | One verb, twice | Design stage | Write the one thing your app must do on every device. Then draw it twice: once on the device you started with, and once on the device your people reach for next, each with that device's own controls. Mark what lives in the data and what lives in the device. On the board: *Blank*. |
 | 43-52 | Start | Reflection | Write the one rule about your data that every platform must follow. Then, before you leave, send the first prompt of stage 02: ask your agent to read your parity matrix with you and trim what your app does not need. Stage 03, a second platform that feels born there, follows once the matrix is honest. The prompt: "What is the first prompt of stage 02 you sent tonight?" |
@@ -101,7 +101,7 @@ Every scene can be changed on the session's page before it runs, and in the Meet
 
 The cohort's build, from `COURSE.md`: the problem statement and the
 version before it, what they heard in their two conversations, the why,
-the one rule, and the app on their phone, with what the real data
+the one rule, and the app at its address, with what the real data
 taught them and what the person they talked to did with it. The stages'
 own lines ask for the same:
 
@@ -110,7 +110,7 @@ own lines ask for the same:
 > your one rule, and to explain why you drew that line where you did and
 > what it will cost you.
 
-> Be ready to show the app on your phone, to name one thing the real data
+> Be ready to show the app at its address, to name one thing the real data
 > taught you that fake data would have hidden, to say what the person you
 > talked to did with it and whether it did what your problem statement
 > says, and to explain why you started on the platform you chose.
@@ -120,7 +120,7 @@ the student's own words, revised after critique and after two real
 conversations, with who has it and why a computer cannot simply solve
 it, and the problem is posted where other people can read it. For stage
 01: the app is live at a real address, full of real data a pipeline
-brought in, after at least two rounds from the student's own phone, and
+brought in, after at least two rounds from the student's own device, and
 one of the people they talked to has used it.
 
 **What to look for.**
@@ -130,7 +130,7 @@ one of the people they talked to has used it.
 - A conversation note about a specific past time ("the last time you
   tried to..."), not an opinion about the idea
   ([note 06, finding a problem worth solving](../research/curriculum/06-instructional-design.md)).
-- The app on a real phone, at a real address, with real items in it.
+- The app at a real address, open on a real device, with real items in it.
 - What the person did first, written in their words, and a sentence on
   whether it matched the problem statement.
 
@@ -145,7 +145,7 @@ that only exists on the builder's computer. Typed-in sample data.
 Each group goes to its room with the prompt on screen, and each person
 takes about eight minutes, with someone in the group keeping time. They
 say in one line what they want to know, read their problem statement and
-the version before it, and then show the app on their phone, naming what
+the version before it, and then show the app with Show my app, naming what
 the real data taught them and what the person they talked to did with
 it. The decision they explain with the agent closed is one the stages
 ask for: why they drew their one rule where they did, or why they

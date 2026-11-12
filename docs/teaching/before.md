@@ -2,9 +2,9 @@
 
 **Where the cohort is.** Everyone has spent the week on [Getting set
 up](../path/setup.md), which counts nine steps on a Mac from "no GitHub
-account" to "my app is live on my phone", and only a few of them are
+account" to "my app is live at its own address", and only a few of them are
 things a person does with their own hands. Some people will arrive with
-their app's address on their phone. Some will arrive stuck on a sign-in
+their app live at its own address. Some will arrive stuck on a sign-in
 that did not finish. Both are fine.
 
 This session is different from the five that follow. Nobody shows a
@@ -20,7 +20,7 @@ seeing what a good build looks like before anyone has to make one.
 
 *Written by Claude, awaiting Ben's review (curriculum milestone C5, October 7, 2026).*
 
-**Publish.** This session leads with publishing, before anything is built: everyone opens the app's address on their own phone and shows it to two people they have only just met. Writing starts at the end, with a noticing log that everyone keeps for the five days before week 1.
+**Publish.** This session leads with publishing, before anything is built: everyone opens their app's address and shows it to two people they have only just met. Writing starts at the end, with a noticing log that everyone keeps for the five days before week 1.
 
 The question the whole session turns on: **What do I need in order to build at all?**
 
@@ -37,14 +37,14 @@ written, played with, and published
 |---|---|---|---|
 | 0-8 | Arrive | Talk | Your name, where you are joining from, and one thing in your life you wish worked differently. That last line is the first entry in the log you start tonight. |
 | 8-15 | How we talk to one another | Talk | The four rules, said aloud: no correcting what does not matter, no acting surprised, no taking over, and no small digs at who someone is. When one is broken, someone says so plainly, the person says thanks, and we move on. |
-| 15-35 | Show what you set up | Rehearsal rooms | In your group's room, each person opens their app's address on their phone and holds it up. If setup stopped somewhere, show where it stopped, and the group works through it together. Being stuck tonight is the most useful thing anyone can bring. The prompt: "Show your app's address on your phone, or where setup stopped, and say one thing in your life you wish worked differently." |
+| 15-35 | Show what you set up | Rehearsal rooms | In your group's room, each person shows their app's address. If setup stopped somewhere, show where it stopped, and the group works through it together. Being stuck tonight is the most useful thing anyone can bring. The prompt: "Show your app's address, or where setup stopped, and say one thing in your life you wish worked differently." |
 | 35-38 | Break | Break |  |
 | 38-53 | What a build looks like | Design stage | Every session from week 1 opens with each person showing the week's work on a device. Here is a strong build and a weak one, side by side. Then everyone practices the three questions on the weak one: where is it going, how is it going, and what is next. On the board: *The three questions*. |
 | 53-65 | Start your noticing log | Reflection | For five days, write one line whenever one of these happens: I wished something worked differently. I gave up on something I care about. I did something the long way because nothing helped. Someone I know struggled with the same thing. No app ideas yet, just what happened. Write today's line now, before you leave: this log is where week 1's problem comes from. The prompt: "What is one thing that happened today that could go in your log?" |
 | 65-70 | Check for understanding | Question | In your own words. Only your leaders read it. The prompt: "What do you hope your app will do for someone?" |
 | 70-75 | What is still muddy? | Question | Anything from tonight that is not clear yet. Your leaders read every answer before the next session. The prompt: "What is still muddy for you?" |
 
-**In the rehearsal rooms,** each builder's turn runs these scenes, 6 minutes in all: show the address on your phone, or where it stopped (3), one thing you wish worked differently (2), one question to understand it (1). The room's prompt is on screen the whole time.
+**In the rehearsal rooms,** each builder's turn runs these scenes, 6 minutes in all: show the address, or where it stopped (3), one thing you wish worked differently (2), one question to understand it (1). The room's prompt is on screen the whole time.
 
 **At 60 minutes,** for a cohort of fewer than eight learners, everyone stays in the one call:
 
@@ -52,7 +52,7 @@ written, played with, and published
 |---|---|---|---|
 | 0-5 | Arrive | Talk | Your name, where you are joining from, and one thing in your life you wish worked differently. That last line is the first entry in the log you start tonight. |
 | 5-10 | How we talk to one another | Talk | The four rules, said aloud: no correcting what does not matter, no acting surprised, no taking over, and no small digs at who someone is. When one is broken, someone says so plainly, the person says thanks, and we move on. |
-| 10-30 | Show what you set up | Presenter | Each person in turn opens their app's address on their phone and holds it up. If setup stopped somewhere, show where it stopped, and we work through it together, where everyone can see. Being stuck tonight is the most useful thing anyone can bring. The prompt: "Show your app's address on your phone, or where setup stopped." |
+| 10-30 | Show what you set up | Presenter | Each person in turn puts their app on the main stage with Show my app in the Human Shaped panel. If setup stopped somewhere, show where it stopped, and we work through it together, where everyone can see. Being stuck tonight is the most useful thing anyone can bring. The prompt: "Show your app's address, or where setup stopped." |
 | 30-42 | What a build looks like | Design stage | Every session from week 1 opens with each person showing the week's work on a device. Here is a strong build and a weak one, side by side. Then everyone practices the three questions on the weak one: where is it going, how is it going, and what is next. On the board: *The three questions*. |
 | 42-52 | Start your noticing log | Reflection | For five days, write one line whenever one of these happens: I wished something worked differently. I gave up on something I care about. I did something the long way because nothing helped. Someone I know struggled with the same thing. No app ideas yet, just what happened. Write today's line now, before you leave: this log is where week 1's problem comes from. The prompt: "What is one thing that happened today that could go in your log?" |
 | 52-56 | Check for understanding | Question | In your own words. Only your leaders read it. The prompt: "What do you hope your app will do for someone?" |
@@ -98,14 +98,14 @@ wrong is what the method looks like when it is working.
 
 The build for this week is the last line of Getting set up:
 
-> Be ready to open your app's address on your phone, and to say in one
+> Be ready to open your app's address, and to say in one
 > sentence what you want it to do for someone you know.
 
 **The bar.** "You have your own copy of the template on GitHub, an agent
 that can read and change it, and your app's name at its own address."
 
-**What to look for.** The address opens on the phone, not the laptop,
-and shows the app's name. The sentence names a person or a group the
+**What to look for.** The address opens for anyone, on any device, not
+only on the builder's own computer, and shows the app's name. The sentence names a person or a group the
 student actually knows, and says what the app does for them rather than
 listing features. A student whose address only works on the computer,
 or whose sentence is about "users," is not yet there, and the main room
@@ -205,9 +205,9 @@ hand.
 
 *Written by Claude, awaiting Ben's review (curriculum milestone C5, October 7, 2026).*
 
-**The task.** Set up, and open the app's address on your phone. Then keep a noticing log for five days, one line whenever one of its four prompts happens, with no app ideas in it.
+**The task.** Set up, and open your app's address. Then keep a noticing log for five days, one line whenever one of its four prompts happens, with no app ideas in it.
 
-**Evidence a person can open.** The repository, and the address open on a phone. The log stays private; what it becomes in week 1 is the evidence.
+**Evidence a person can open.** The repository, and the address open for anyone. The log stays private; what it becomes in week 1 is the evidence.
 
 **On the credential.** The repository is the credential's first evidence. Students do the thing itself, and what they
 make is the evidence; nobody writes a report about it
@@ -241,7 +241,7 @@ twenty minutes before the trio is a default each person can move.
 
 Read the checks and write your two sentences for next week's opening.
 Reach out within two days to anyone who missed the session or left
-without their address on their phone, and offer them half an hour
+without their app live at its address, and offer them half an hour
 before week 1. Then confirm the groups of three, and send each group
 its names, so everyone knows who they will be showing next week.
 

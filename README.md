@@ -73,9 +73,9 @@ make, why it is built that way, what to do, and what to bring back.
 
 | Stage | What you will do |
 |---|---|
-| [Getting set up](docs/path/setup.md) | A GitHub account, your own copy, an agent, and your app's address on your phone. |
+| [Getting set up](docs/path/setup.md) | A GitHub account, your own copy, an agent, and your app live at its own address. |
 | [00. Why we build](docs/path/00-why-we-build.md) | Write down your values where the agent will read them. |
-| [01. The first prototype](docs/path/01-first-prototype.md) | One platform, real data, on a phone, this week. |
+| [01. The first prototype](docs/path/01-first-prototype.md) | One platform, real data, live at its own address, this week. |
 | [02. The shape of an app](docs/path/02-shape-of-an-app.md) | One data plane, native apps, and `PARITY.md`. |
 | [03. Going native](docs/path/03-going-native.md) | Add Apple and Android, and choose your floors by the hardware they reach. |
 | [04. Seeing it work](docs/path/04-seeing-it-work.md) | Real devices, honest instruments, and leaving the room as you found it. |
@@ -122,7 +122,7 @@ starts from your app.
    reads.) [Getting set up](docs/path/setup.md) says what each one costs.
 3. Tell it why your app exists (stage 00), then what you want and where
    the truth lives (stage 01). It will build the first version and put
-   it live at an address you can open on your phone.
+   it live at an address anyone can open, on any device.
 
 Everything else waits until you need it. `docs/path/talking-to-your-agent.md`
 is the one page to keep open while you work.
@@ -136,7 +136,7 @@ is the one page to keep open while you work.
 | `docs/path/` | The nine stages, and two companions: talking to your agent, and showing your work. |
 | `COURSE.md`, `docs/teaching/` | The five-week cohort built on the stages, and a one-page guide for each of its live sessions. |
 | `docs/` | The reference docs each stage points to. Map: [`docs/README.md`](docs/README.md). |
-| `.claude/skills/` | 147 skills, 57 of them written from shipped apps. Catalog: [`.claude/skills/README.md`](.claude/skills/README.md). |
+| `.claude/skills/` | 154 skills, 64 of them written from shipped apps. Catalog: [`.claude/skills/README.md`](.claude/skills/README.md). |
 | `tools/` | Device testing, store submission, CI and Pulse tooling. Catalog: [`tools/README.md`](tools/README.md). |
 | `index.html`, `css/`, `js/` | The web app: plain HTML, CSS and JavaScript, no build step. |
 | `apple/` | Swift starter for one universal Xcode target (iPhone, iPad, Mac, Apple TV). See `apple/README.md`. |

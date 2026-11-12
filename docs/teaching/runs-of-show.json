@@ -27,12 +27,12 @@
           "kind": "rooms",
           "title": "Show what you set up",
           "minutes": 20,
-          "body": "In your group's room, each person opens their app's address on their phone and holds it up. If setup stopped somewhere, show where it stopped, and the group works through it together. Being stuck tonight is the most useful thing anyone can bring.",
+          "body": "In your group's room, each person shows their app's address. If setup stopped somewhere, show where it stopped, and the group works through it together. Being stuck tonight is the most useful thing anyone can bring.",
           "config": {
-            "prompt": "Show your app's address on your phone, or where setup stopped, and say one thing in your life you wish worked differently.",
+            "prompt": "Show your app's address, or where setup stopped, and say one thing in your life you wish worked differently.",
             "room_scenes": [
               {
-                "title": "Show the address on your phone, or where it stopped",
+                "title": "Show the address, or where it stopped",
                 "minutes": 3
               },
               {
@@ -138,9 +138,9 @@
             "kind": "presenter",
             "title": "Show what you set up",
             "minutes": 20,
-            "body": "Each person in turn opens their app's address on their phone and holds it up. If setup stopped somewhere, show where it stopped, and we work through it together, where everyone can see. Being stuck tonight is the most useful thing anyone can bring.",
+            "body": "Each person in turn puts their app on the main stage with Show my app in the Human Shaped panel. If setup stopped somewhere, show where it stopped, and we work through it together, where everyone can see. Being stuck tonight is the most useful thing anyone can bring.",
             "config": {
-              "prompt": "Show your app's address on your phone, or where setup stopped."
+              "prompt": "Show your app's address, or where setup stopped."
             },
             "note": "Watch for anyone whose setup is still stuck, and fix one in front of everyone: it teaches the room how to ask their agent for help."
           },
@@ -405,7 +405,7 @@
           "minutes": 30,
           "body": "In your group's room. Each person in turn: say what you want to know, show it on the device, and explain one decision with your agent closed (a decision, never the code). The others ask one question to understand it, then answer the three questions: where is it going, how is it going, and what is next. The builder ends by saying what they will do next, and ready or not yet.",
           "config": {
-            "prompt": "Read your problem statement and the version before it, then show the app on your phone: what the real data taught you, and what the person you talked to did with it.",
+            "prompt": "Read your problem statement and the version before it, then show your app: what the real data taught you, and what the person you talked to did with it.",
             "room_scenes": [
               {
                 "title": "Say what you want to know, then show it on the device",
@@ -514,7 +514,7 @@
             "minutes": 22,
             "body": "With everyone in the call, about five minutes each. Each person in turn: say what you want to know, show it on the device, and explain one decision with your agent closed (a decision, never the code). The others ask one question to understand it, then answer the three questions: where is it going, how is it going, and what is next. The builder ends by saying what they will do next, and ready or not yet.",
             "config": {
-              "prompt": "Read your problem statement and the version before it, then show the app on your phone: what the real data taught you, and what the person you talked to did with it."
+              "prompt": "Read your problem statement and the version before it, then show your app: what the real data taught you, and what the person you talked to did with it."
             },
             "note": "Watch for a problem statement unchanged since week 1, for \"my friend liked it\" in place of what they did, and for a first version that grew past the smallest thing."
           },

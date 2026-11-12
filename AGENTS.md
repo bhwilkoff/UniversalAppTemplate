@@ -1,5 +1,11 @@
 # [APP NAME]: Agent Project Context
 
+**A fresh copy** (`[APP NAME]` above, SCRATCHPAD.md says NOT STARTED):
+walk the owner through `docs/path/setup.md`, then stage 00. The owner
+writes why the app exists and who it is for; ask and record their
+words, never fill them in yourself. Start on the web, live at its own
+address; other platforms wait for stages 02 and 03.
+
 ## Why we build
 
 Every feature in this app is built in service of human learning and
@@ -148,7 +154,8 @@ conventions, and which skill fires first.
 - **One version everywhere, bumped on every ship**, from
   `AppVersion.xcconfig` (`tools/test_version_contract.py`).
 - **One identity everywhere**, set once with
-  `tools/set_app_identity.py`; never leave `com.example.appname` in a copy.
+  `tools/set_app_identity.py` when the owner names it; never ship
+  `com.example.appname`.
 - **Native components first**; no third-party Swift packages.
 - **Secrets never in git**, and never in cleartext on disk.
 
@@ -202,9 +209,10 @@ real-device check before "done."
 
 <!-- FILL IN: One paragraph on what your app does and who it's for -->
 
-Available as a **web app**, a **native iOS/iPadOS app**, a **native
-macOS app**, a **native Apple TV (tvOS) app**, and a **native Android
-app**: five core platforms, one feature set. Optional: **Windows**
+Every app starts as a **web app**, and can grow to a **native
+iOS/iPadOS app**, a **native macOS app**, a **native Apple TV (tvOS)
+app**, and a **native Android app**: five core platforms, one feature
+set. Optional: **Windows**
 (`windows/`), **smart-TV web** (webOS / Tizen / Cast, via
 `tv.js`/`tv.css`), **Android TV / Fire TV** (the same Android app), and
 **Roku** (`roku-brightscript-app`). When adding to one platform, note the
@@ -215,8 +223,8 @@ like iOS, macOS like a Mac (pointer + keyboard + menu bar + resizable
 windows), tvOS like the living room, Android like Android. The verbs are
 identical; the idioms aren't.
 
-Not every app needs all five. Decide the platform set in M0 and record it
-in DECISIONS.md. tvOS earns its place when the content is lean-back
+Not every app needs all five. The owner decides the platform set when a
+second platform comes up (stage 02 or 03); record it in DECISIONS.md. tvOS earns its place when the content is lean-back
 (video, music, ambient, photos); macOS when the app wants a
 desktop-class or document/pro surface, and it is the cheapest port (it
 shares the whole Apple Core). A skipped platform is a 🚫 column in
@@ -318,7 +326,7 @@ Binding docs for everything unattended. Read the doc before re-deriving.
   fail).
 - **`docs/MEDIA-PLAYBACK.md`**: media apps only, streaming and captions.
 - **`docs/PROVENANCE.md`**: when you learn something template-worthy in an
-  app repo, upstream the generic form here in the same session and
+  app repo, upstream the generic form to the template in the same session and
   update the map. App-local docs are where lessons go to be lost.
 - **`docs/DEVICE-HARNESSES.md`**: per-platform observation harnesses; an
   instrument says when it is blind, never perturbs what it measures, and
@@ -345,7 +353,7 @@ alignment, then ship.
 *intended*, not what it *did*. Check the actual diff before reporting
 work as done.
 
-**Auto-pace decisiveness.** When the direction is reasonably inferable,
+**Auto-pace decisiveness.** When how to build is reasonably inferable,
 make the call and keep going. Reserve questions for decisions only the
 user can make.
 
@@ -353,7 +361,7 @@ user can make.
 can't observe the result, build an offline sim that produces a PNG and
 look at it. Type checks and tests confirm code, not features; "compiles"
 is not "works." **After touching any shared file, re-build every platform
-that consumes it**: the tvOS build going green after an iOS change is
+you have that consumes it**: the tvOS build going green after an iOS change is
 part of "done." **Show the evidence, not the claim:** the command you
 ran and what it returned, or a screenshot of the result.
 
@@ -396,7 +404,8 @@ State section first, then work.
 - **Side doors (feeds, MCP) are findable on the website, never featured
   in the apps.** *No check yet.*
 - **One spelling locale, linted.** *Check: `tools/test_us_english.py`.*
-- **Always ensure cross-platform parity.** Mirror on the other platforms
+- **Always ensure cross-platform parity** once a second platform exists.
+  Mirror on the other platforms
   in the same change set where feasible AND update PARITY.md. Don't ship
   one and wait to be asked. A platform you can't reach right now gets ⏳
   with a note, never silence.

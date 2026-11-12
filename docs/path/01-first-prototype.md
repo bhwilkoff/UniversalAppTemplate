@@ -46,7 +46,7 @@ small too, and it should be.
 ## What I want
 
 I want someone who has never shipped an app to see their idea running
-on their own phone, with real data in it, before the first week is out.
+at its own address, with real data in it, before the first week is out.
 Not a mockup. A thing they can hold and be disappointed by in useful
 ways, because the disappointment is where the next round of work comes
 from.
@@ -60,8 +60,8 @@ student already has a browser.
 
 If you do not know where your people are, start on the web. It costs
 nothing, it needs no developer account, and the agent can put it live
-on GitHub Pages at a real address you can open on your phone the same
-day. The native apps come in stage 03, and they come faster because the
+on GitHub Pages at a real address that opens on a phone, a tablet, or a
+computer the same day. The native apps come in stage 03, and they come faster because the
 web version already taught you what the app is.
 
 ## Real data
@@ -104,7 +104,7 @@ agent does the rest of the setup, and will tell you if it needs you.
 
 The steps are one round of write, play, publish. The first three come
 before the agent is open, the middle ones are play, with the agent and
-on your phone, and the last one publishes to a person.
+on your own device, and the last one publishes to a person.
 
 1. **Write your first answer.** Before any prompt, answer this stage's
    question in two or three sentences in your note. Being wrong is fine.
@@ -160,7 +160,7 @@ on your phone, and the last one publishes to a person.
    Yours can be smaller, and it should be: the smallest thing that does
    what your problem statement says for the person you have in mind. If
    you are starting on the web, make "done" mean that the web version is
-   live on GitHub Pages and you can open it on your phone. Then paste the
+   live on GitHub Pages and you can open it on your own device. Then paste the
    whole kickoff in one message. The agent will do the research, build the pipeline for
    your source, build the first screens, and put it live. The
    `web-platform-patterns` and `universal-feature-states` skills carry a
@@ -178,8 +178,8 @@ on your phone, and the last one publishes to a person.
    > keep pushing forward with the next round of work to fully build
    > out this game/app
 
-6. **Play: use it, with your note open.** Open the live address on your phone
-   and use the app for real, for ten minutes, the way the person you are
+6. **Play: use it, with your note open.** Open the live address on the device you
+   use most and use the app for real, for ten minutes, the way the person you are
    building it for would. Under a "Next:" heading in your note, write
    each thing you notice as its own numbered item: where it is, what is
    wrong, what it should be.
@@ -221,13 +221,13 @@ Where the agents differ, one line each
   agent's commands in a sandbox, and use `/plan` to read its plan and
   comment on it before it builds.
 - **The open path:** use Aider with a fully open model in Ollama. These
-  models cannot see your phone, so in step 6 you are the agent's eyes:
+  models cannot see your screen, so in step 6 you are the agent's eyes:
   describe what you see in words. Start on the web
   ([the open pathway](../research/curriculum/04-open-pathway.md)).
 
 **When you are ready to move on,** your app is live at a real address,
 it is full of real data that a pipeline brought in, you have sent at
-least two rounds from your own phone, and one of the people you talked
+least two rounds from your own device, and one of the people you talked
 to has used it, with what they did first and what they said written in
 your note. The app works on one platform.
 Stage 02 is about deciding what it means for it to be the same app on
@@ -242,7 +242,7 @@ is never required, and it is never counted.
 
 - *The agent says it fixed something you still see.* Ask yourself: did I
   say what I saw, where, and on which device? Try a screenshot, and check
-  that your phone is not showing an old cached version of the page. Ask
+  that your browser is not showing an old cached version of the page. Ask
   your group if it keeps happening ([stuck playing](../stuck/playing/cannot-see-the-fix.md)).
 - *There is not enough real data, or it is not the right kind.* Ask
   yourself: what is this app actually about, in real things? Try asking
@@ -257,7 +257,7 @@ is never required, and it is never counted.
 the agent's role, your essential work, one thing you learned, and your
 growth edge.
 
-Be ready to show the app on your phone, to name one thing the real data
+Be ready to show the app at its address, to name one thing the real data
 taught you that fake data would have hidden, to say what the person you
 talked to did with it and whether it did what your problem statement
 says, and to explain why you started on the platform you chose.

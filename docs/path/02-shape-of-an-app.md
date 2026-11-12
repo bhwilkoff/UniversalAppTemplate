@@ -1,7 +1,7 @@
 # 02. The shape of an app
 
 **Where you are.** One platform is live, full of real data, and you have
-sent it a few rounds of feedback from your own phone. Before a second
+sent it a few rounds of feedback from your own device. Before a second
 platform exists, it is time to decide what "the same app" means.
 
 <!-- The question, the first two steps, the step labels, the last step,

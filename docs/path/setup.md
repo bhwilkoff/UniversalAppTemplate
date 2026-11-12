@@ -5,11 +5,11 @@
 **Where you are.** You have an idea for an app, or the beginning of one,
 and nothing else yet: maybe not a GitHub account, and maybe not an AI
 agent. This page gets you from there to your own copy of this template,
-an agent that can work in it, and your app's own address open on your
-phone.
+an agent that can work in it, and your app's own address, open in a
+browser on whatever device you have.
 
 When I counted every step from a fresh browser on October 1, 2026, the
-shortest path from "no GitHub account" to "my app is live on my phone"
+shortest path from "no GitHub account" to "my app is live at its own address"
 was nine steps on a Mac, and only a few of them were things a person has
 to do with their own hands. The rest are things you ask your agent to do
 for you, which is the first lesson of the whole path, so it might as
@@ -20,7 +20,7 @@ well be the first thing you try.
 ## What I want
 
 I want the first hour to end with something that is yours: an address
-with your app's name on it, open on the phone in your pocket. Not a
+with your app's name on it, that anyone can open in a browser. Not a
 tutorial project, and not a screenshot of someone else's app. It is a
 small thing, and yet it changes what the next five weeks feel like,
 because from then on you are improving something that exists rather
@@ -141,8 +141,9 @@ them is a conversation.
    > app's name], push it, turn on GitHub Pages for this repository,
    > and tell me the address when it is live.
 
-8. **Open that address on your phone.** That is the first win: your
-   app's own name, at its own address, on a device you carry with you.
+8. **Open that address on any device you have,** a phone, a tablet, or
+   the computer you are working on. That is the first win: your app's
+   own name, at its own address, wherever there is a browser.
    It is also how you know the agent is really working: not because it
    said so, but because you can see the name on your own screen.
 
@@ -223,8 +224,8 @@ can change it later.
 **Then make the same first two requests** from step 6 and step 7 above.
 A small model does exactly what you ask rather than what you meant, so
 ask for one thing at a time, and if it writes a command, run it yourself
-and tell it what happened. When your app's name shows up at its address
-on your phone, you know it works.
+and tell it what happened. When your app's name shows up at its address,
+you know it works.
 
 **What this path does not escape.** GitHub, where your app lives, is
 owned by Microsoft, and the downloads come from companies even when the
@@ -249,5 +250,5 @@ read and change it, and your app's name at its own address. Nothing
 about the app is real yet, which is exactly the right place to start
 [stage 00](00-why-we-build.md).
 
-Be ready to open your app's address on your phone, and to say in one
+Be ready to open your app's address, and to say in one
 sentence what you want it to do for someone you know.

@@ -7,66 +7,67 @@
 > See `PARITY.md` for the cross-platform feature matrix (the single
 > source of truth; don't duplicate rows here).
 >
-> New to this template? Start with `docs/path/00-why-we-build.md` and
-> `docs/path/01-first-prototype.md` before filling anything in.
->
 > The Current State block below is injected at every session start.
 > If it drifts behind the code, fix it FIRST, then work. A stale
 > scratchpad is worse than none.
 
 ## Current state
 
-- **Status**: NOT STARTED
+- **Status**: NOT STARTED. This is a fresh copy of the template.
 - **Active milestone**: M0
 - **Last session**: none yet
 - **Next actions**:
-  1. Read `docs/path/00-why-we-build.md` and
-     `docs/path/01-first-prototype.md`
-  2. Decide the platform set (all five? skip tvOS? add Windows?)
-     → DECISIONS.md
-  3. Fill in AGENTS.md project identity sections (CLAUDE.md imports it)
-  4. Rename the app in `project.yml`, then the agent runs
-     `xcodegen generate` and builds iOS, tvOS, and macOS unsigned,
-     per apple/README.md
-  5. Open `android/` in Android Studio, rename `com.example.appname`
-  6. Enable GitHub Pages on main branch (+ `.nojekyll` if serving
-     `/.well-known/`)
-  7. Drop verification files in `/.well-known/` once the
-     `appID` / `package_name` / fingerprints are known
+  1. If the app is not live yet, finish `docs/path/setup.md` with the
+     owner: put the web app's name on it, turn on GitHub Pages, and
+     tell the owner its address so they can open it on any device.
+  2. Stage 00 (`docs/path/00-why-we-build.md`): the owner says why the
+     app exists and who it is for. Ask, listen, and write their words
+     into AGENTS.md ("Why we build", "What this app does"); never write
+     the values for them.
+  3. Stage 01 (`docs/path/01-first-prototype.md`): one platform (the
+     web, unless the owner's people are somewhere else), real data,
+     live at its own address.
+  4. Leave other platforms for stages 02 and 03, and log the platform
+     set in DECISIONS.md when the owner decides it.
 - **Open questions**: none yet
 
 ---
 
 ## Milestones
 
-### M0: Project setup
+### M0: A first version, live at its own address
 
-- [ ] Platform set decided + logged in DECISIONS.md
-- [ ] AGENTS.md filled in with project identity (app name, what it
-      does, tech-stack specifics, design tokens)
-- [ ] PARITY.md skeleton sections filled in with intended verbs
-- [ ] **Web**: runs locally out of the box
-      (`python3 -m http.server 8080`, then http://localhost:8080);
-      `index.html`, `css/styles.css`, `js/app.js` render your first
-      view; GitHub Pages enabled
-- [ ] **Apple (universal)**: the project is generated from
-      `project.yml` by the agent, never clicked through Xcode. Rename
-      `AppName` and the bundle ids in `project.yml` (no spaces), run
-      `xcodegen generate`, then build unsigned for iOS Simulator,
-      tvOS Simulator, and macOS and run the Core tests, per
-      `apple/README.md`. ONE target, four destinations; sources stay
-      in `apple/`; `AppVersion.xcconfig` is already wired
-- [ ] **Android**: `cd android && ./gradlew :app:assembleDebug`
-      builds out of the box; open `android/` in Android Studio; rename
+- [ ] The web app carries the app's name and is live on GitHub Pages
+- [ ] AGENTS.md "Why we build" and "What this app does" hold the
+      owner's own words (stage 00)
+- [ ] One platform, real data from a real source, live at its address
+      (stage 01)
+- [ ] One person the owner knows has used it, and what they did first
+      is written down
+
+### When you go native (stage 03)
+
+Only when the owner decides to add a platform, and logs the platform
+set in DECISIONS.md. The agent does each of these; the owner never
+clicks through Xcode or Android Studio.
+
+- [ ] **Apple (universal)**: rename `AppName` and the bundle ids in
+      `project.yml` (no spaces), run `xcodegen generate`, then build
+      unsigned for iOS Simulator, tvOS Simulator, and macOS and run the
+      Core tests, per `apple/README.md`. One target, four destinations;
+      sources stay in `apple/`; `AppVersion.xcconfig` is already wired
+- [ ] **Android**: `cd android && ./gradlew :app:assembleDebug`; rename
       the package from `com.example.appname` to your reverse-DNS and
       rebuild; smoke-test on a device or emulator
+- [ ] **Links**: drop verification files in `/.well-known/` (with
+      `.nojekyll`) once the `appID`, `package_name`, and fingerprints
+      are known
 - [ ] **CI / submission**: `.github/workflows/appstore-build.yml`
       (one workflow covers iOS + macOS + tvOS) with the seven signing
       secrets seeded per `docs/CLOUD-SUBMISSION.md`;
       `.github/workflows/android-build.yml` for CI builds and
       `.github/workflows/play-release.yml` to publish to Play (internal
       track first, then promote)
-- [ ] First commit pushed
 
 ### M1: [First user-visible capability]
 
@@ -82,10 +83,7 @@ Before implementing, run the `learning-orientation-design` skill:
 **Acceptance criteria** (observable by users, not developers):
 
 - [ ] Web: …
-- [ ] iOS: …
-- [ ] macOS: …
-- [ ] tvOS: …
-- [ ] Android: …
+- [ ] (each platform you have added: …)
 
 **Parity check**: update PARITY.md row(s) for this capability in
 the same change set. Reject the PR if PARITY.md is silent.
@@ -95,10 +93,7 @@ the same change set. Reject the PR if PARITY.md is silent.
 - Learning-orientation check passed
 - **Acceptance**:
   - [ ] Web: …
-  - [ ] iOS: …
-  - [ ] macOS: …
-  - [ ] tvOS: …
-  - [ ] Android: …
+  - [ ] (each platform you have added: …)
 
 ---
 
@@ -148,40 +143,3 @@ the entry retire when circumstances change).
 
 <!-- Append-only. Format: state found → work done → state left.
      Keep entries short: one paragraph per session. -->
-
-**2026-08-24: Windows scaffold + Tidbits lessons ported.** Found: sixth-gen
-template with docs/windows/ present but no `windows/` source scaffold, a
-WINDOWS-STORE-SUBMISSION.md that was an unadapted Tidbits copy (real Store
-IDs), a playbook describing a pre-ship layout, and no vendored Windows skill.
-Done: committed the `windows/` scaffold (AppName.Core / .App / .HeadlessTests /
-.Windows: the as-shipped Tidbits architecture with every version gotcha
-pre-solved; builds clean, 11 headless tests pass, shell PNGs verified light +
-dark at 1180×760 and the 900×680 floor, versions stamped from
-AppVersion.xcconfig); generalized WINDOWS-STORE-SUBMISSION.md (placeholders +
-§0 checklist, all 12 gotchas + IAP §7 kept); rewrote WINDOWS-PLAYBOOK.md to the
-as-built flat layout (.NET 10, TFM-isolation, DPAPI, narrow-width shell
-renders, network-race flag); added the `windows-production-gotchas` skill;
-added a `## Windows app` CLAUDE.md section + Windows columns in both design
-tables; appended DECISIONS 035–039 (anonymous-account deletion, query-not-load,
-generator merge guards, randomness-outside-selection, per-store billing
-shapes); README tree/step-12 + CONTRIBUTING now name the scaffold. Left: green;
-Store assets (7 PNGs) intentionally not generated (per-app branding);
-first-Windows-run baselines armed via `-f update_baselines=true` as documented.
-
-**2026-08-24 (second pass): parity + store-approval hardening.** Found: the
-scaffold wave left three lesson families unported: multi-store IAP release
-choreography, Play pre-launch/publish traps, and the parity-audit method
-lessons. Done: new `docs/store/IAP-RELEASE-CHOREOGRAPHY.md` (financial
-paperwork as owner-only critical path, one-review-submission-per-IAP-product /
-ship serially, the Ready-to-Submit trap, per-platform License Agreement,
-empty-success vs thrown-error, per-store query shapes, real-provisioning-only
-purchase verification, the launch-order checklist); store-submission-playbook
-gained the IAP section + the internal-track-has-no-pre-launch-report /
-Test-Lab-yourself / refused-to-auto-submit / all-or-nothing-submit bullets;
-play-cli-submission gained Rules 7–8 (Console stalls, testlab-android.sh);
-cross-platform-parity-discipline gained the degenerate-outcome audit pass
-(tie/zero/empty/cold-quit), the both-directions stale-⏳ check (false docs vs
-false cells), and the failure-class organization for whole-platform-port
-audits; tvos-platform-patterns gained the SignInWithAppleButton-in-Form
-swallowed-click gotcha; CLAUDE.md table + README tree point at the new doc.
-Left: green.

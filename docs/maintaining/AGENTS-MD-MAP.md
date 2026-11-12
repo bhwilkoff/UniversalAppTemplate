@@ -86,7 +86,7 @@ wording, with the examples, is in the linked page.
 | Fill in what the app does | Kept |
 | Five core platforms, the optional ones; note equivalent work in SCRATCHPAD.md, update PARITY.md | Kept |
 | Feature parity, not design consistency | Kept |
-| Decide the platform set in M0, record it; when tvOS and macOS earn their place | Kept |
+| The owner decides the platform set when a second platform comes up (stage 02 or 03), recorded; when tvOS and macOS earn their place | Kept, reworded 2026-11-12 for fresh copies |
 | A skipped platform is a 🚫 column with a reason | Kept |
 
 ### Web app

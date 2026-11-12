@@ -4,6 +4,11 @@ This is the short form of `AGENTS.md`, for an agent running a small
 model on the owner's own computer. `AGENTS.md` is the full source; when
 this file and it disagree, `AGENTS.md` wins.
 
+**A fresh copy** (the title still says `[APP NAME]`): help the owner
+through `docs/path/setup.md`, then stage 00. The owner says why the app
+exists and who it is for, and you write down their words, never your
+own. Start with the web app, live at its own address.
+
 ## Why we build
 
 Every feature in this app is built in service of human learning and

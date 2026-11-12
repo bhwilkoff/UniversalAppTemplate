@@ -82,8 +82,8 @@ in the table links to the guide for its session, in
 
 | Week | Leads with, and the week's question | Stages this week | Where the app gets to | Shown at the next session |
 |---|---|---|---|---|
-| [Cohort Prep](docs/teaching/before.md) | **Publish.** What do I need in order to build at all? | [Getting set up](docs/path/setup.md) | A GitHub account, a copy of the template, an AI agent connected to it (Claude, Gemini, or the open path), and a computer set up to build and test. The first win: their own app's address open on their phone, showing its name. | The address, on their phone, and five days of their noticing log. |
-| [1](docs/teaching/week-1.md) | **Write.** What problem in my own life is worth building something for, and who else has it? | 00. Why we build, 01. The first prototype | A problem chosen from five candidates held to the ten tests, a problem statement in their own words revised after critique and two real conversations, why a computer cannot simply solve it, an agent that knows why the app exists and who it is for, and the smallest real version live at a real address with real data, in the hands of one of the people they talked to. | The problem statement and the version before it, what they heard in their conversations, the why, the one rule, and the app on their phone, with what the real data taught them and what that person did with it. |
+| [Cohort Prep](docs/teaching/before.md) | **Publish.** What do I need in order to build at all? | [Getting set up](docs/path/setup.md) | A GitHub account, a copy of the template, an AI agent connected to it (Claude, Gemini, or the open path), and a computer set up to build and test. The first win: their own app live at its own address, showing its name. | The address, open for anyone, and five days of their noticing log. |
+| [1](docs/teaching/week-1.md) | **Write.** What problem in my own life is worth building something for, and who else has it? | 00. Why we build, 01. The first prototype | A problem chosen from five candidates held to the ten tests, a problem statement in their own words revised after critique and two real conversations, why a computer cannot simply solve it, an agent that knows why the app exists and who it is for, and the smallest real version live at a real address with real data, in the hands of one of the people they talked to. | The problem statement and the version before it, what they heard in their conversations, the why, the one rule, and the app at its address, with what the real data taught them and what that person did with it. |
 | [2](docs/teaching/week-2.md) | **Play.** What has to be the same on every device, and what should feel as if it was born there? | 02. The shape of an app, 03. Going native | A parity matrix the student has read and trimmed, a second platform running on their own device, and a look that comes from the app's why. | One verb on both platforms, each in its own idiom, one cell their own eyes proved wrong, and the app's own look beside the template's. |
 | [3](docs/teaching/week-3.md) | **Play, then publish.** How do I know it works, and what happens when someone I did not build it with holds it? | 04. Seeing it work, 05. Shipping | The agent proving its fixes on the student's devices, and the app installed on a device the student did not build it on, through a direct share, a test track, or a store. | A screenshot that proved a fix, and the app on someone else's device, with what that person did and said. |
 | [4](docs/teaching/week-4.md) | **Publish, then write.** What is happening to it when I am not holding it, and what do I want now that I live with it? | 06. Keeping it running, 07. Raising the ceiling | One honest number about the app taken back to its people, and one feature the student wanted from their own use. | The number and what its people said about it, and the feature with the reason it exists. |
@@ -100,7 +100,7 @@ The week before week 1 is for getting set up and for meeting the people
 you will build beside, because nobody should be asked to say what they
 think of someone's work before they know who is in the room. [Getting
 set up](docs/path/setup.md) takes each student from no GitHub account to
-their own app's address on their phone, and the setup session is where
+their own app live at its own address, and the setup session is where
 anything still stuck gets unstuck, in front of people who will need the
 same answer. It is also when each student starts a five-day noticing
 log, one line whenever they wished something worked differently, gave up
@@ -254,8 +254,8 @@ no points, and no partial credit, only two answers: ready, or not yet.
 **The builder judges first.** Before the session, each student reads the
 stage's paragraph and decides, for each thing it names, whether their
 app is there. A partner confirms by seeing it on a device, not by
-hearing about it, because "it works" is a claim and a phone in
-someone's hand is evidence.
+hearing about it, because "it works" is a claim and an app open in
+front of someone is evidence.
 
 **"Not yet" says what is missing, and costs nothing.** Doing it again is
 free, and there is no deadline to miss. The cohort keeps its weekly
@@ -291,12 +291,14 @@ at the start of the first session.
   and not equally, so a camera is a choice and not a measure of
   attention. Nobody's participation is ever counted by their camera.
 - There are other ways to be in the room: a line in the chat, a raised
-  hand, your phone's screen shared, and your answers to the check.
+  hand, a reaction, your app on the main stage, and your answers to the
+  check.
 - Cameras do the most good while showing and while talking in a small
   group. During the start of the week's work, off is fine, and hiding
   your own picture helps.
-- Show the app by sharing your phone's screen, which puts everyone's
-  eyes on the work rather than on a face.
+- Show the app with Show my app in the Human Shaped panel, which puts
+  it on everyone's main stage as their own working copy, so everyone's
+  eyes are on the work rather than on a face.
 - Any session longer than an hour has a short break near its middle.
 
 The cost is that a teacher sees less of the room. The check for

@@ -273,9 +273,8 @@ agent:
    the two people you talked to.
 5. **Build the smallest real version,** in
    [stage 01](../path/01-first-prototype.md), once the problem holds:
-   one platform, real data, this week, live at an address you can open
-   on your phone, and in the hands of one of the two people you talked
-   to.
+   one platform, real data, this week, live at an address anyone can
+   open, and in the hands of one of the two people you talked to.
 
 ## The check
 
@@ -358,4 +357,4 @@ session, came without a log, or put themselves at the low end of the
 scale, and offer to help them find their two people.
 
 Next week, everyone brings back a problem that has met real people,
-and the first version of the app on their phone.
+and the first version of the app, live at its address.
