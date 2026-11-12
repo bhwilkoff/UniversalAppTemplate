@@ -24,7 +24,7 @@
   var WEEKS = {
     prep: {
       template: "questions",
-      room: "Show your app's address on your phone, or where setup stopped, and say one thing in your life you wish worked differently.",
+      room: "Show your app's address, or where setup stopped, and say one thing in your life you wish worked differently.",
       watch: "Watch for anyone whose setup is still stuck, and fix one in front of everyone: it teaches the room how to ask their agent for help.",
       questions: [
         {"kind": "short", "prompt": "What do you hope your app will do for someone?"},
@@ -39,18 +39,18 @@
       watch: "Watch for log lines that are already app ideas (\"an app that...\"), and steer back to what happened.",
       questions: [
         {"kind": "scale", "prompt": "How sure are you, right now, that someone besides you has this problem?", "choices": ["Not sure at all", "I could name them"], "points": 5},
-        {"kind": "short", "prompt": "What is still unclear?"},
+        {"kind": "short", "prompt": "What questions do you still have?"},
         {"kind": "multi", "prompt": "Which of these does your problem statement do?", "choices": ["Starts from something that happens in my life", "Says what a better life would look like", "Names who else has it", "Never names a technology"]},
         {"kind": "rank", "prompt": "Which questions for your two conversations will tell you the most?", "choices": ["Tell me about the last time you...", "What did you try?", "What happened next?", "Who else deals with this?"]}
       ]
     },
     2: {
       template: "blank",
-      room: "Read your problem statement and the version before it, then show the app on your phone: what the real data taught you, and what the person you talked to did with it.",
+      room: "Read your problem statement and the version before it, then show your app: what the real data taught you, and what the person you talked to did with it.",
       watch: "Watch for a problem statement unchanged since week 1, for \"my friend liked it\" in place of what they did, and for a first version that grew past the smallest thing.",
       questions: [
         {"kind": "multi", "prompt": "Which of these belong in the data, so every platform gets them the same way? Choose every one.", "choices": ["A film's title and year", "Whether a film is saved", "A trivia question's correct answer", "Swipe to go back", "The size of the play button"]},
-        {"kind": "short", "prompt": "What is still unclear?"}
+        {"kind": "short", "prompt": "What questions do you still have?"}
       ]
     },
     3: {
@@ -60,7 +60,7 @@
       questions: [
         {"kind": "short", "prompt": "When your agent says something is fixed, what do you ask to see, and why is its word not enough?"},
         {"kind": "short", "prompt": "How do you know your last fix is real?"},
-        {"kind": "short", "prompt": "What is still unclear?"}
+        {"kind": "short", "prompt": "What questions do you still have?"}
       ]
     },
     4: {
@@ -72,7 +72,7 @@
         {"kind": "rank", "prompt": "Rank what the other person noticed first.", "choices": ["What it is for", "How it looks", "What it does first", "Something that broke", "How fast it is"]},
         {"kind": "words", "prompt": "In one word, how did it feel to hand it over?"},
         {"kind": "short", "prompt": "What is one thing about your app you can no longer see by using it yourself, and how will you find out about it?"},
-        {"kind": "short", "prompt": "What is still unclear?"}
+        {"kind": "short", "prompt": "What questions do you still have?"}
       ]
     },
     5: {
@@ -83,7 +83,7 @@
         {"kind": "short", "prompt": "What is enough about this version, for now, and for whom?"},
         {"kind": "short", "prompt": "What waits for the next version?"},
         {"kind": "short", "prompt": "What will your agent know at the start of your next app that it did not know in week 1, and where does that knowledge live?"},
-        {"kind": "short", "prompt": "What is still unclear?"}
+        {"kind": "short", "prompt": "What questions do you still have?"}
       ]
     }
   };

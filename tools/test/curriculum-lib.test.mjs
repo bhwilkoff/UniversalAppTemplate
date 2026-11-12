@@ -84,7 +84,7 @@ test('a published week that does not fit falls back to the defaults', () => {
 test('making the sessions again adds no second copy of a question', () => {
   const wanted = K.defaultQuestions(1);
   assert.equal(K.newQuestions(wanted, []).length, wanted.length);
-  assert.equal(K.newQuestions(wanted, [{ kind: 'short', prompt: '  what is still UNCLEAR? ' }]).length, wanted.length - 1);
+  assert.equal(K.newQuestions(wanted, [{ kind: 'short', prompt: '  what questions do you still HAVE? ' }]).length, wanted.length - 1);
   assert.equal(K.newQuestions(wanted.concat(wanted), []).length, wanted.length);
 });
 
