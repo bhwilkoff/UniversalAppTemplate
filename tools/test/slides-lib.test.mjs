@@ -74,3 +74,11 @@ test('a GitHub read that failed can be tried again', () => {
   lib.ghDrop('x/y|issues');
   assert.equal(lib.ghHas('x/y|issues'), false);
 });
+test('a blank to fill in stays a blank, two to a line included, and code is left as written', () => {
+  assert.equal(lib.blanks('- helps ___ to ___'), '- helps \\_\\_\\_ to \\_\\_\\_');
+  assert.equal(lib.blanks('- It must never ___'), '- It must never \\_\\_\\_');
+  assert.equal(lib.blanks('- __bold__ and snake_case'), '- __bold__ and snake_case');
+  assert.equal(lib.blanks('- already \\_\\_\\_'), '- already \\_\\_\\_');
+  assert.equal(lib.blanks('```\nx = a___b\n```'), '```\nx = a___b\n```');
+  assert.ok(lib.deck('## A\n\n- helps ___ to ___').includes('helps \\_\\_\\_ to \\_\\_\\_'));
+});

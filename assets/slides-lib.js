@@ -123,7 +123,17 @@
   }
 
   // What the renderer reads: the site's look, and no closing QR code.
-  function deck(text) { return text ? HEAD + ghExpand(clean(text)) : ''; }
+  // A blank to fill in (___) stays a blank: two on one line read as bold
+  // ("helps ___ to ___" drew as "helps _ to ___" in bold, found running the
+  // demo session's prompt stems). Code fences keep their text as written.
+  function blanks(text) {
+    var fence = false;
+    return String(text || '').split('\n').map(function (l) {
+      if (/^```/.test(l)) { fence = !fence; return l; }
+      return fence ? l : l.replace(/(\\?)(_{3,})/g, function (all, esc, run) { return esc ? all : run.replace(/_/g, '\\_'); });
+    }).join('\n');
+  }
+  function deck(text) { return text ? HEAD + ghExpand(blanks(clean(text))) : ''; }
 
   // A step inside a part's deck, or null when the step leaves the part.
   function step(total, at, delta) {
@@ -182,7 +192,7 @@
   }
   function slideAt(text, caret) { return Math.max(0, count(String(text || '').slice(0, caret)) - 1); }
 
-  var lib = { ghAll: ghAll, ghDrop: ghDrop, ghLinks: ghLinks, ghSpecs: ghSpecs, ghHold: ghHold, ghHas: ghHas, ghExpand: ghExpand, HEAD: HEAD, split: split, count: count, withoutNotes: withoutNotes, notes: notes, deck: deck, clean: clean, frames: frames, frameOf: frameOf, step: step, arrive: arrive, ADD: ADD, NOTE: NOTE, insert: insert, insertNote: insertNote, offset: offset, slideAt: slideAt };
+  var lib = { ghAll: ghAll, ghDrop: ghDrop, ghLinks: ghLinks, ghSpecs: ghSpecs, ghHold: ghHold, ghHas: ghHas, ghExpand: ghExpand, HEAD: HEAD, split: split, count: count, withoutNotes: withoutNotes, notes: notes, deck: deck, blanks: blanks, clean: clean, frames: frames, frameOf: frameOf, step: step, arrive: arrive, ADD: ADD, NOTE: NOTE, insert: insert, insertNote: insertNote, offset: offset, slideAt: slideAt };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
   else root.SlidesLib = lib;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

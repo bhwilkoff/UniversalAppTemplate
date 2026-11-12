@@ -3536,3 +3536,28 @@ a.person-name:hover { text-decoration: underline; }
 .p2-panel label.ui-switch-row input { width: auto; margin: 0; flex: none; }
 .p2-compare ul { list-style: none; padding: 0; margin: 8px 0; }
 .p2-compare > summary { cursor: pointer; font-weight: 600; }
+
+/* A view's choices follow the width it has, not the window's (Ben, November
+   12, 2026: "The content should be responsive to screen size"). Beside a
+   document, or on a narrow stage, each row stacks: the label on its own line,
+   its bar and count beneath, and long choices in one column. */
+.stage-body { container-type: inline-size; }
+@container (max-width: 40rem) {
+  .stage-choices.counted li, .stage-choices.is-pickable.counted li { grid-template-columns: minmax(0, 1fr) auto; }
+  .stage-choices.counted .label, .stage-choices.is-pickable.counted .stage-pick { grid-column: 1 / -1; }
+  .stage-choices.long, .stage-choices.long.many { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* The strip and its lane follow the stage's size too, so a small stage keeps
+   most of its height for what is shown. */
+.has-strip { --strip: clamp(2.25rem, 7vmin, 3.25rem); --lane: clamp(1.5rem, 6vmin, 2.75rem); }
+.has-strip .stage-react { font-size: clamp(1rem, 3.4vmin, 1.35rem); }
+
+/* A Writing part's slide beside its question, drawn whole in the space. */
+.stage-beside.is-slide .stage-app-frame { display: grid; place-items: center; background: #131916; }
+.stage-beside.is-slide .stage-app-frame svg { display: block; width: 100%; height: 100%; }
+.stage-beside.is-slide:not([hidden]) { grid-template-rows: minmax(0, 1fr); }
+/* A leader can go back to any part from Plan, finished ones included (found
+   running the demo session: past parts had no Go, so the only way back was
+   Back, one slide and one point at a time). */
+.p2-panel .show-scene.is-done .show-tools { display: block; }

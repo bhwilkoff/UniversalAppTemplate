@@ -209,6 +209,10 @@
         // The part's own material goes up beside its question.
         var beside = state.doc ? docOf(state.doc) : null;
         if (beside) view.doc = beside;
+        // A Writing part's slide stays beside its question, so the prompt
+        // stems on it stay in view while people write (found running the
+        // demo session: the question covered the stems).
+        else if (state.besideSlides) { var bs = slidesOf(state.besideSlides); if (bs) view.slide = bs; }
         return view;
       }
     }
@@ -382,6 +386,7 @@
       if (v.rerun === true) cv.rerun = true;
       if (v.shown && typeof v.shown.text === 'string') cv.shown = answerOf(v.shown);
       if (v.doc) { var cd = docOf(v.doc); if (cd) cv.doc = cd; }
+      else if (v.slide) { var cs = slidesOf(v.slide); if (cs) cv.slide = cs; }
       return cv;
     }
     if (v.mode === 'studio' && v.studio && typeof v.studio.text === 'string') return { mode: 'studio', part: part, studio: studioOf(v.studio) };

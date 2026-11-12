@@ -258,3 +258,14 @@ What the add-on gained (DECISIONS.md, "What another class platform taught"):
 - **Say it like** beside names in People and under a featured name on the stage, from each person's account page.
 - **The cohort's groups**: breakouts can be kept as named groups and launched again in one press.
 - **Side by side**: two or three people's apps on the stage at once (stage `apps`), and a part's document beside its open question.
+
+## Every stage fits its screen, November 12, 2026
+
+Ben: "The content should be responsive to screen size." Found running the demo session on a laptop-sized window.
+
+- **A view fits the stage it is on.** Type is sized to the stage with a readable floor; when a view still runs past the space above the strip, the whole view scales down until it fits, again on every resize. Slides end above the strip and scale whole.
+- **Choices follow the width they have.** Beside a document, or on a narrow stage, each choice stacks its label over its bar and count, and long choices take one column (a container query on the view, not the window).
+- **The strip follows the stage too.** It and its lane shrink on a small stage, so what is shown keeps most of the height.
+- **A Writing part keeps its slide beside its question,** so the prompt stems on it stay in view while people write; a part's document still takes that place when it has one.
+- **A blank to fill in stays a blank.** Three or more underscores on a slide draw as a blank line, never as bold, so "helps ___ to ___" reads as written.
+- **Plan's Go is on every part,** finished ones included, so a leader can return to any part in one press.

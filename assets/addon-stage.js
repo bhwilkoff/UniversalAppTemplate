@@ -32,7 +32,46 @@
     return left ? L.clock(left) : 'Time is up';
   }
 
+  // Every view fits the stage it is shown on, whatever its size (Ben,
+  // November 12, 2026: "The content should be responsive to screen size").
+  // Type is sized to the stage, with a floor so it stays readable; when a
+  // view still runs past the space above the strip (a question with four
+  // choices on a laptop-sized stage), the whole view scales down to fit.
+  var fitFrame = 0;
+  function fitSoon() { cancelAnimationFrame(fitFrame); fitFrame = requestAnimationFrame(fit); }
+  function extent(box) {
+    var top = Infinity, bottom = -Infinity;
+    Array.prototype.forEach.call(box.children, function (k) {
+      var r = k.getBoundingClientRect();
+      if (!r.height) return;
+      top = Math.min(top, r.top); bottom = Math.max(bottom, r.bottom);
+    });
+    return bottom > top ? bottom - top : 0;
+  }
+  function fit() {
+    var ready = root.querySelector('.stage-ready:not([hidden])');
+    if (!ready) return;
+    ready.querySelectorAll('.stage-body').forEach(function (b) { b.style.zoom = ''; });
+    var body = ready.querySelector('.stage-body:not([hidden])');
+    if (!body) return;
+    var cs = getComputedStyle(ready), box = ready.getBoundingClientRect(), head = ready.querySelector('.stage-head');
+    var top = head && head.getBoundingClientRect().height ? head.getBoundingClientRect().bottom + (parseFloat(cs.rowGap) || 0) : box.top + (parseFloat(cs.paddingTop) || 0);
+    // The stage's own box grows with what is in it, so the window is the limit.
+    var room = Math.min(box.bottom, window.innerHeight) - (parseFloat(cs.paddingBottom) || 0) - top;
+    var need = extent(body);
+    if (room <= 0 || need <= room) return;
+    var z = Math.max(0.4, room / need);
+    for (var i = 0; i < 8; i++) {
+      body.style.zoom = String(z);
+      if (extent(body) <= room + 1 || z <= 0.4) break;
+      z = Math.max(0.4, z * 0.94);
+    }
+  }
+  window.addEventListener('resize', fitSoon);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitSoon);
+
   function draw() {
+    fitSoon();
     root.querySelectorAll('[data-view]').forEach(function (v) { v.hidden = v.getAttribute('data-view') !== view.mode; });
     $('[data-stage-rec]').hidden = !view.recording;
     var part = view.part;
@@ -189,7 +228,7 @@
     drawApp(view.mode === 'app' ? view : null);
     drawDoc(view.mode === 'doc' ? view : null);
     drawApps(view.mode === 'apps' ? view : null);
-    drawBeside(view.mode === 'check' && view.doc ? view.doc : null);
+    drawBeside(view.mode === 'check' && view.doc ? view.doc : null, view.mode === 'check' && !view.doc && view.slide ? view.slide : null);
     if (view.mode === 'people') {
       var pl = $('[data-people-list]'); pl.replaceChildren();
       pl.classList.toggle('many', view.who.length > 3);
@@ -305,10 +344,21 @@
 
   // A part's material beside its open question, so people answer with it in view.
   var besideSrc = null;
-  function drawBeside(doc) {
+  function drawBeside(doc, slide) {
     var side = $('[data-beside]'), box = $('[data-beside-frame]');
-    side.hidden = !doc;
-    root.classList.toggle('has-beside', !!doc);
+    side.hidden = !doc && !slide;
+    root.classList.toggle('has-beside', !!(doc || slide));
+    side.querySelector('.stage-app-bar').hidden = !doc;
+    side.classList.toggle('is-slide', !doc && !!slide);
+    if (!doc && slide) {
+      var key = 'slide:' + slide.at + ':' + slide.shown + ':' + slide.text.length;
+      if (key === besideSrc) return;
+      besideSrc = key;
+      var svg = '';
+      try { svg = slide.shown ? window.DeckKit.frame(slide.text, slide.at, slide.shown) : (window.DeckKit.render(slide.text)[slide.at] || ''); } catch (e) {}
+      box.innerHTML = svg;
+      return;
+    }
     if (!doc) { if (besideSrc) { besideSrc = null; box.replaceChildren(); } return; }
     $('[data-beside-name]').textContent = doc.name;
     $('[data-beside-open]').href = doc.url;

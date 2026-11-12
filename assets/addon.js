@@ -2909,6 +2909,7 @@
       onStage: S.onStage || (S.card ? null : partCheckPin()), beside: S.onStage && (S.onStage.kind === 'answer' || S.onStage.kind === 'work') ? partCheckPin() || latestCheckPin() : null, checks: S.checks, results: S.results, items: S.items, names: S.names, sayLike: S.sayLike || {}, appUrls: appUrls(), audience: V ? V.audienceOf(part) : null,
       welcome: lib.welcome(S.cohort, S.session, S.list && S.list.length ? S.list : S.parts), scene: scene, slides: slidesView(part),
       doc: part && part.own && part.config && part.config.show ? part.config.show : null,
+      besideSlides: part && part.own && part.kind === 'reflection' ? slidesView(part) : null,
       onStageDetail: S.onStageDetail || null,
       path: window.RosterLib && S.onStage && S.onStage.kind === 'path' ? window.RosterLib.pathView(rosterNow()) : null,
       rooms: S.onStage && S.onStage.kind === 'rooms' ? Object.keys(S.roomPlaces).map(function (k) { return S.roomPlaces[k]; }) : null
