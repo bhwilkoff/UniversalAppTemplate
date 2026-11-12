@@ -3058,7 +3058,7 @@
   var CL = window.CoachLib, CO = window.Coach;
   var C = { steps: null, i: 0, later: null, hint: null, role: null, tourKey: null };
   var coachStore = (function () { try { return window.localStorage; } catch (e) { return null; } })();
-  function coachTarget(name) {
+  function coachTarget(name, exists) {
     var F = S.frame;
     if (!F) return null;
     var n = null;
@@ -3070,7 +3070,7 @@
     else if (name === 'room') n = root.querySelector('[data-sig-where] .btn-primary');
     else if (name === 'show') n = showMineButton();
     // Something in a tab that is not open: point at its tab instead.
-    if (n && CO && !CO.visible(n)) {
+    if (n && !exists && CO && !CO.visible(n)) {
       var pane = n.closest && n.closest('[data-pane]');
       n = pane ? F.tab(pane.getAttribute('data-pane')) : null;
     }
@@ -3100,9 +3100,12 @@
     S.frame.onHelp(function () { coachTour(true); });
     if (!force && coachStore && CL.seen(coachStore, 'tour:' + C.role)) return;
     // A learner's tour starts with the stage, so it waits a little for one.
+    // It starts once the panel is showing, and a learner's waits a little for a stage.
     var waited = 0;
     (function go() {
-      if (!S.teaching && !S.stageOn && waited < 8) { waited += 1; return setTimeout(go, 1000); }
+      var shown = CO.visible(S.frame.el);
+      if ((!shown || (!S.teaching && !S.stageOn)) && waited < 10) { waited += 1; return setTimeout(go, 1000); }
+      if (!shown) return;
       coachTour(false);
     })();
   }
@@ -3111,7 +3114,10 @@
     coachEndHint(false);
     var t = CL.tour(C.role, S.stageOn);
     // A panel step whose place is not on this panel (no app in this cohort) is left out.
-    C.steps = t.now.filter(function (st) { return st.where !== 'panel' || !!coachTarget(st.target); }); C.later = force ? null : (t.later.length ? t.later : null); C.i = 0; C.tourKey = 'tour:' + C.role;
+    // Whether a place exists, not whether it is drawn yet: the panel can still
+    // be hidden when this runs (found November 12, 2026: a leader's tour lost
+    // every step and was marked seen before the panel showed).
+    C.steps = t.now.filter(function (st) { return st.where !== 'panel' || !!coachTarget(st.target, true); }); C.later = force ? null : (t.later.length ? t.later : null); C.i = 0; C.tourKey = 'tour:' + C.role;
     if (!C.steps.length) return coachFinish();
     coachStep();
   }
