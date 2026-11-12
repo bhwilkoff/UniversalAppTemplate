@@ -14,12 +14,12 @@
     learner: [
       { key: 'stage', where: 'stage', target: 'stage', text: 'A live class, not only a call: your leader moves this screen for everyone, and you can click what is on it.' },
       { key: 'reacts', where: 'stage', target: 'reacts', text: 'React, or ask your leader something, here at any time, without unmuting.' },
-      { key: 'asks', where: 'panel', target: 'asks', text: 'This panel is yours, and it follows the session. Ask your leader for a turn to talk, a link, or rooms here.' },
-      { key: 'mine', where: 'panel', target: 'tab:mine', text: 'Mine holds your own work in this class: your answers, your app, and your notes.' }
+      { key: 'asks', where: 'panel', target: 'asks', text: 'Your own panel, which follows the session. Ask your leader here for a question, a message, a link, the board, or rooms.' },
+      { key: 'mine', where: 'panel', target: 'tab:mine', text: 'Mine holds your own place in this class: your app, and the questions you have answered.' }
     ],
     leader: [
       { key: 'now', where: 'panel', target: 'tab:now', text: 'Now is the part that is happening, with your notes for it. Learners never see your notes.' },
-      { key: 'next', where: 'panel', target: 'next', text: 'Next moves everyone’s stage: the next slide, then the next part.' },
+      { key: 'next', where: 'panel', target: 'next', text: 'Next moves everyone’s stage: the next slide, then the next part.', closed: 'Until the main stage is open, this button opens it. Then it moves everyone: the next slide, then the next part.' },
       { key: 'plan', where: 'panel', target: 'tab:plan', text: 'Plan is the whole session. Go takes everyone to any part.' },
       { key: 'tools', where: 'panel', target: 'tab:tools', text: 'Tools put things on the stage: a question, someone’s app, the board, or rooms.' }
     ]

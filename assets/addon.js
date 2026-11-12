@@ -3110,6 +3110,9 @@
   function coachStep() {
     var st = C.steps[C.i];
     if (st.where === 'panel' && st.target.indexOf('tab:') === 0 && S.frame) S.frame.show(st.target.slice(4));
+    // Words that match the button as it reads right now.
+    var nb = st.closed && S.frame && S.frame.nextButton();
+    if (nb && /main stage/i.test(nb.textContent || '')) st = Object.assign({}, st, { text: st.closed });
     coachDraw(st, C.i + 1, C.steps.length, C.i + 1 < C.steps.length ? 'Next' : 'Got it');
   }
   function coachNext() {
