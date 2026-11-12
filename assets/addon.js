@@ -2325,6 +2325,13 @@
     box.hidden = !box.children.length;
   }
 
+  // The session's board wears the current part's template, when that part is
+  // on the board (found running the demo session: only breakout rooms' boards
+  // carried it, so the board everyone shares opened empty).
+  function boardTemplate() {
+    var p = partNow();
+    return p && p.own && p.kind === 'design' && p.config ? p.config.template || null : null;
+  }
   function drawBoardPin() {
     if (!S.boardPin) return;
     var on = S.onStage && S.onStage.kind === 'board';
@@ -2334,7 +2341,7 @@
     });
     b.setAttribute('aria-pressed', String(!!on));
     S.boardPin.replaceChildren(b);
-    var links = A.boardLinks(S.cohort, S.session, null, null);
+    var links = A.boardLinks(S.cohort, S.session, null, boardTemplate());
     if (links && links.board) { var a = newTab(el('a', 'btn-secondary', 'Open the board')); a.href = links.board; S.boardPin.appendChild(a); }
   }
   // Something that shows on the main stage opens the stage first, if it is not open.
@@ -2897,7 +2904,7 @@
       card: S.onStage ? null : S.card || null,
       answerable: !S.teaching,
       studio: S.studioKey ? { key: S.studioKey, text: S.studioHeld != null ? S.studioHeld : (S.decks || {})[S.studioKey] || (sceneOf(S.studioKey) || {}).slides || '', gh: window.SlidesLib ? window.SlidesLib.ghAll() : {} } : null,
-      boardStage: (A.boardLinks(S.cohort, S.session, null, null) || {}).stage,
+      boardStage: (A.boardLinks(S.cohort, S.session, null, boardTemplate()) || {}).stage,
       mineOf: function (k) { var x = myAnswer(k); return x ? { choice: x.choice, picks: Array.isArray(x.value) ? x.value : undefined, body: x.body } : null; },
       onStage: S.onStage || (S.card ? null : partCheckPin()), beside: S.onStage && (S.onStage.kind === 'answer' || S.onStage.kind === 'work') ? partCheckPin() || latestCheckPin() : null, checks: S.checks, results: S.results, items: S.items, names: S.names, sayLike: S.sayLike || {}, appUrls: appUrls(), audience: V ? V.audienceOf(part) : null,
       welcome: lib.welcome(S.cohort, S.session, S.list && S.list.length ? S.list : S.parts), scene: scene, slides: slidesView(part),
