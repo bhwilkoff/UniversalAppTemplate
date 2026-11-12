@@ -488,7 +488,7 @@
     if (!src) return;
     var f = document.createElement('iframe');
     f.src = src;
-    f.title = 'The design stage';
+    f.title = 'The board';
     f.setAttribute('allow', 'clipboard-read; clipboard-write');
     box.appendChild(f);
   }

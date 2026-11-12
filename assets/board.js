@@ -173,8 +173,11 @@
     if (!S.board) return;
     var parts = [];
     if (S.board.locked) parts.push(S.teaching ? 'The board is locked, so only leaders can draw on it.' : 'Your leader has locked the board, so it is here to look at and download.');
-    if (S.X) parts.push(S.live ? 'Live with everyone on the board.' : 'Not live right now, so the board checks for changes every ten seconds.');
-    if (S.here.length > 1) parts.push('Here now: ' + S.here.join(', ') + '.');
+    // On the main stage only what someone needs to know: locked, not live,
+    // and saved (found in a real call: the line ran to three sentences).
+    if (S.X && !S.live) parts.push('Not live right now, so the board checks for changes every ten seconds.');
+    else if (S.X && !P.stage) parts.push('Live with everyone on the board.');
+    if (S.here.length > 1 && !P.stage) parts.push('Here now: ' + S.here.join(', ') + '.');
     if (S.savedAt) parts.push('Saved at ' + S.savedAt.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) + '.');
     status(parts.join(' '));
   }
@@ -274,7 +277,9 @@
       if (!text || !S.api) return;
       var st = S.api.getAppState(), z = st.zoom.value, now = Date.now();
       var n = S.api.getSceneElements().filter(function (e) { return e.customData && e.customData.by === S.me.id && e.type === 'rectangle'; }).length;
-      var x = st.width / 2 / z - st.scrollX - 120 + (n % 5) * 28, y = st.height / 2 / z - st.scrollY - 80 + (n % 5) * 28;
+      var mid = { x: st.width / 2 / z - st.scrollX, y: st.height / 2 / z - st.scrollY, w: st.width / z };
+      var spot = B.noteSpot(S.api.getSceneElements(), mid);
+      var x = spot ? spot.x : mid.x - 120 + (n % 5) * 28, y = spot ? spot.y : mid.y - 80 + (n % 5) * 28;
       var made = B.noteElements({ id: 'n' + now.toString(36) + Math.random().toString(36).slice(2, 6), by: S.asMember || S.me.id, name: myName(), text: text, x: x, y: y, now: now });
       S.api.updateScene({ elements: S.api.getSceneElementsIncludingDeleted().concat(S.X.restoreElements(made, null)), captureUpdate: S.X.CaptureUpdateAction.IMMEDIATELY });
       input.value = '';

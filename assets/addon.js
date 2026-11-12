@@ -457,6 +457,9 @@
       unavailable: function () {
         var off = [];
         off.push('cue-talk', 'cue-rooms');
+        // A learner's Mine shows their app and Show my app at the top, so the
+        // list of who is waiting to show would only repeat it.
+        if (S.newPanel && !S.teaching) off.push('wings');
         if (!S.groups.length) off.push('rooms', 'cue-rooms', 'brought');
         var list = S.list || S.parts || [];
         if (!list.some(function (x) { return x.kind === 'design' || x.key === 'prompt'; })) off.push('design');
@@ -593,6 +596,10 @@
       }
     });
     S.classChannel.onNudge('guests', function () { if (S.isGuest || S.teaching) { loadGuests(); refreshLive(); } });
+    // A leader's move reaches learners at once over the call's channel; the
+    // database's own change events, seconds slower, stay as the fallback
+    // (found in a learner's real call: their stage trailed by about five seconds).
+    S.classChannel.onNudge('show', function () { if (!S.teaching && S.run && S.run.reload) S.run.reload(); });
   }
 
   // Recognition for a skill shown in class (R16). A teacher names the
@@ -827,7 +834,7 @@
     }
     list('Human Shaped open', r.here, false);
     list('Not open yet', r.missing, true);
-    if (r.missing.length) d.appendChild(el('p', 'small', 'Someone in the call without it open needs Join activity at the top of Meet, or Human Shaped under Activities.'));
+    if (r.missing.length) d.appendChild(el('p', 'small', 'Anyone in the call without it open presses the activity icon at the top right of Meet, then Join activity.'));
     drawGuestRows(d);
     if (!S.newPanel) {
       var acts = el('div', 'actions');
@@ -1656,12 +1663,12 @@
   function drawGroups(box) {
     var groups = S.room.groupId ? S.groups.filter(function (g) { return g.id === S.room.groupId; })
       : S.teaching ? S.groups : S.groups.filter(function (g) { return g.group_members.some(function (m) { return m.user_id === S.me.id; }); });
-    if (!groups.length) { box.appendChild(el('p', 'small', 'There are no trios yet, so everyone stays in the main room.')); return; }
+    if (!groups.length) { box.appendChild(el('p', 'small', 'There are no groups yet, so everyone stays in the main room.')); return; }
     groups.forEach(function (g) {
       var card = el('article', 'addon-card');
       card.appendChild(el('h3', null, g.name));
       if (!S.room.groupId && safe(g.meet_url)) {
-        var go = newTab(el('a', null, S.teaching ? 'Visit its rehearsal room' : 'Go to your rehearsal room')); go.href = g.meet_url;
+        var go = newTab(el('a', null, S.teaching ? 'Visit its room' : 'Go to your group’s room')); go.href = g.meet_url;
         card.appendChild(el('p', 'small')).appendChild(go);
       }
       var ids = g.group_members.map(function (m) { return m.user_id; });
@@ -1778,7 +1785,7 @@
     // What only on_stage() can give is read once the pin is saved, or it
     // would read the stage as it was a moment ago.
     var saving = S.run && S.run.shared && S.teaching ? S.run.pin(v) : null;
-    Promise.resolve(saving).then(loadStageDetail, loadStageDetail);
+    Promise.resolve(saving).then(function () { shoutShow(); loadStageDetail(); }, loadStageDetail);
     drawQueue(); drawChecks(); drawRoster(); drawRoomsToggle(); sendStage(); drawRunInfo(); drawApps();
     drawBoardPin(); drawPartTools();
   }
@@ -1972,7 +1979,8 @@
       return;
     }
     // A heading that says what this does (Week 2: unlabeled controls).
-    wrap.appendChild(el('p', 'p2-label', 'Pick who shows next'));
+    // One name for the feature everywhere: the tile in Tools says the same.
+    wrap.appendChild(el('p', 'p2-label', 'Feature someone'));
     var row = el('div', 'actions');
     var how = el('select'); how.setAttribute('aria-label', 'Whom to feature');
     [{ key: 'random', label: 'At random' }, { key: 'quiet', label: 'Someone quiet so far' }].concat(voteChoices()).forEach(function (o) {
@@ -2348,7 +2356,7 @@
       var row = el('div', 'p2-ask is-request');
       var words = el('span');
       words.appendChild(el('strong', null, nameOf(r.user_id)));
-      words.appendChild(document.createTextNode(r.kind === 'other' && r.body ? ' asks: ' + r.body : ' asks: ' + ASKS[r.kind] + (r.body ? ': ' + r.body : '')));
+      words.appendChild(document.createTextNode(r.kind === 'other' && r.body ? ' asks: \u201c' + r.body + '\u201d' : ' asks for ' + ASKS[r.kind] + (r.body ? ': \u201c' + r.body + '\u201d' : '')));
       row.appendChild(words);
       var acts = el('span', 'p2-ask-acts');
       acts.appendChild(button('Do it', 'btn-secondary small', function () { doRequest(r); }));
@@ -2903,7 +2911,9 @@
   // After a leader moves the show: the new part in view (found in the
   // live Meet test: the panel stayed where the button was, parts away),
   // and its planned question asked.
+  function shoutShow() { if (S.teaching && S.classChannel) S.classChannel.nudge('show'); }
   function afterMove() {
+    shoutShow();
     if (S.newPanel) S.frame.show('now');
     var now = root.querySelector('[data-show] [aria-current="step"]');
     if (now && now.scrollIntoView) now.scrollIntoView({ block: 'start', behavior: 'smooth' });
@@ -3040,7 +3050,7 @@
     Promise.resolve(side.startActivity({ mainStageUrl: location.origin + '/addon/stage/', sidePanelUrl: location.origin + '/addon/' })).then(function () {
       S.stageOn = true;
       stageButtons(true);
-      status.textContent = 'The main stage is open. Ask everyone to press Join activity at the top of Meet.';
+      status.textContent = 'The main stage is open. Ask everyone to press the activity icon at the top right of Meet, then Join activity.';
     }, function (err) {
       status.textContent = A.stageError(err);
     });

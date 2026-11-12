@@ -203,12 +203,12 @@
       } else if (qk !== 'words' && qk !== 'short') p.items = (c.options || []).slice(0, 8);
       // The room reads this on the main stage, so it speaks to learners.
       p.note = {
-        choice: 'Choose one in your panel; the count shows here, without names, once your leader shows it.',
-        multi: 'Choose any that fit in your panel; the count shows here, without names, once your leader shows it.',
-        scale: 'Pick a point in your panel; the count shows here, without names, once your leader shows it.',
-        rank: 'Put these in order in your panel; the average order shows here, without names, once your leader shows it.',
-        words: 'Give a word or a few in your panel; the words show here together, without names, once your leader shows them.',
-        short: 'Answer in your own words in your panel; your leader reads the answers and shows them here only if they choose.'
+        choice: 'Choose one in your panel, and the counts show here without names.',
+        multi: 'Choose any that fit in your panel, and the counts show here without names.',
+        scale: 'Pick a point in your panel, and the counts show here without names.',
+        rank: 'Put these in order in your panel, and the average order shows here without names.',
+        words: 'Give a word or a few in your panel, and the words show here together without names.',
+        short: 'Answer in your own words in your panel, and your leader may show one here without its name.'
       }[qk];
     } else if (k.key === 'presenter') {
       p.note = c.prompt || 'The work being shown fills the stage.';

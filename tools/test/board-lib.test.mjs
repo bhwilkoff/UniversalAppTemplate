@@ -186,3 +186,24 @@ test('each person has their own dot, so votes never overwrite', () => {
   assert.equal(lib.votesOn(card.concat([a, b]), 'n1').length, 2);
   assert.equal(lib.voteDot({ note: 'gone', by: 'a', elements: card, now: 2 }), null);
 });
+
+test('a new note goes into the template frame in view, or the first, and stacks without hiding the last', () => {
+  const tpl = lib.templateElements('moves', 1);
+  const frames = tpl.filter((e) => e.type === 'rectangle');
+  assert.equal(frames.length, 3);
+  // Mid-view between frames: the first frame (Write).
+  const first = lib.noteSpot(tpl, { x: -500, y: -500 });
+  assert.ok(first.x > frames[0].x && first.x < frames[0].x + frames[0].width && first.y > frames[0].y);
+  // The whole board in view, its middle on Play: still the first frame.
+  const wide = lib.noteSpot(tpl, { x: frames[1].x + 100, y: frames[1].y + 100, w: 1400 });
+  assert.ok(wide.x > frames[0].x && wide.x < frames[0].x + frames[0].width);
+  // Zoomed in on Play: there.
+  const play = lib.noteSpot(tpl, { x: frames[1].x + 100, y: frames[1].y + 100, w: 500 });
+  assert.ok(play.x > frames[1].x && play.x < frames[1].x + frames[1].width);
+  // A second note in the same frame sits lower and to the right.
+  const note = lib.noteElements({ id: 'n1', by: 'a', text: 'x', x: first.x, y: first.y, now: 1 });
+  const next = lib.noteSpot(tpl.concat(note), null);
+  assert.ok(next.x > first.x && next.y > first.y);
+  // No template: no spot, and the note goes mid-view.
+  assert.equal(lib.noteSpot(note, null), null);
+});

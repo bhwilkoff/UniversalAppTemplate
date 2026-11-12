@@ -3561,3 +3561,12 @@ a.person-name:hover { text-decoration: underline; }
    running the demo session: past parts had no Go, so the only way back was
    Back, one slide and one point at a time). */
 .p2-panel .show-scene.is-done .show-tools { display: block; }
+
+/* A learner's Mine keeps the browser's own disclosure marker on each section,
+   so a closed one reads as something to open, not an empty heading. */
+.p2-panel .p2-pane[data-pane="mine"] .show-slot > summary { display: list-item; }
+/* An answer put on the stage is the moment's point: set as a quote, larger than
+   the field under it, so it never reads as something to type into. */
+.stage-shown .stage-answer { padding: 0; font-size: clamp(1.25rem, 4vmin, 2.6rem); font-weight: 600; line-height: 1.25; quotes: "\201C" "\201D"; }
+.stage-shown .stage-answer::before { content: open-quote; }
+.stage-shown .stage-answer::after { content: close-quote; }

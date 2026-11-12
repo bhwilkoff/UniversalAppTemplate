@@ -269,3 +269,14 @@ Ben: "The content should be responsive to screen size." Found running the demo s
 - **A Writing part keeps its slide beside its question,** so the prompt stems on it stay in view while people write; a part's document still takes that place when it has one.
 - **A blank to fill in stays a blank.** Three or more underscores on a slide draw as a blank line, never as bold, so "helps ___ to ___" reads as written.
 - **Plan's Go is on every part,** finished ones included, so a leader can return to any part in one press.
+
+## What a learner's real call showed, November 12, 2026
+
+Ben: "You should definitely do a learner panel test," then "Can we solve for the 'still rough' stuff and anything else you have documented that needs to be polished (look for both design and the language we are using for each feature)?"
+
+- **A leader's move reaches learners at once.** After every move or pin the leader's panel nudges the call's channel, and each learner's panel reads the show again; the database's change events, seconds slower, stay as the fallback.
+- **A board note starts in the template's first frame**, each next one a little lower and to the right, unless the person has zoomed in on one frame. Notes are written in Write a note at the foot of the board.
+- **One name per feature.** Featuring is Feature someone in Now and in Tools; the board is The board on the stage; the rooms are Every room; a group's own call is its room, never a rehearsal room or a trio.
+- **A learner's Mine** keeps each closed section's disclosure marker, and leaves out who is waiting to show, which Show my app at the top already covers. A guest's link says Sign in as a member of this cohort.
+- **Joining late** is the activity icon at the top right of Meet, then Join activity, wherever the panel tells people how.
+- **Words on the stage** keep one fact each: where to answer, and that counts show without names. An answer put on the stage is set as a quote. A learner's request reads "asks for a message on the stage: “…”".

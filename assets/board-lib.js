@@ -204,6 +204,23 @@
       words(id + '-n', group, o.x + 12, o.y + NOTE_H - 26, String(o.name || '').slice(0, 40), 14, '#4e5b55', o.now, data)
     ];
   }
+  // Where a new note goes on a board with a template: the first frame, where
+  // every template begins, unless the person has zoomed in on one frame (their
+  // view is narrower than two frames), and then that one, each next note a little lower and to the right of the last, so
+  // none hides another. Null with no template, and the note goes mid-view.
+  // Found in a real call: a note asked for "under Write" landed in Play.
+  function noteSpot(elements, view) {
+    var frames = (elements || []).filter(function (e) { return !e.isDeleted && e.type === 'rectangle' && /^tpl-/.test(String(e.id)); })
+      .sort(function (a, b) { return Number(String(a.id).split('-').pop()) - Number(String(b.id).split('-').pop()); });
+    if (!frames.length) return null;
+    function inside(f, x, y) { return x >= f.x && x <= f.x + f.width && y >= f.y && y <= f.y + f.height; }
+    var close = view && view.w && view.w < frames[0].width * 2;
+    var f = (close && frames.filter(function (r) { return inside(r, view.x, view.y); })[0]) || frames[0];
+    var k = (elements || []).filter(function (e) {
+      return !e.isDeleted && e.type === 'rectangle' && e.customData && e.customData.note && inside(f, e.x + e.width / 2, e.y + e.height / 2);
+    }).length;
+    return { x: f.x + 20 + (k % 6) * 26, y: f.y + 110 + (k % 6) * 22 };
+  }
   function noteAt(elements, ids) {
     for (var i = 0; i < elements.length; i++) {
       var e = elements[i];
@@ -396,7 +413,7 @@
   var lib = {
     DAY: DAY, MAX_MESSAGE_BYTES: MAX_MESSAGE_BYTES, SAVE_EVERY: SAVE_EVERY, CATCH_UP_AFTER: CATCH_UP_AFTER, CATCH_UP_EVERY: CATCH_UP_EVERY, MESSAGES_PER_SECOND: MESSAGES_PER_SECOND,
     params: params, pickSession: pickSession, topic: topic, link: link,
-    TEMPLATES: TEMPLATES, template: template, templateElements: templateElements, noteColor: noteColor, noteElements: noteElements, noteAt: noteAt, votesOn: votesOn, voteDot: voteDot, needsTemplate: needsTemplate,
+    TEMPLATES: TEMPLATES, template: template, templateElements: templateElements, noteColor: noteColor, noteElements: noteElements, noteAt: noteAt, noteSpot: noteSpot, votesOn: votesOn, voteDot: voteDot, needsTemplate: needsTemplate,
     unsent: unsent, markSeen: markSeen, syncable: syncable, keepLocal: keepLocal, merge: merge,
     bytes: bytes, batches: batches, sendInterval: sendInterval, pointerInterval: pointerInterval, throttle: throttle,
     sameGeneration: sameGeneration, canDraw: canDraw, colorFor: colorFor, fileName: fileName
