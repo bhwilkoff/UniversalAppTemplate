@@ -3155,7 +3155,8 @@ select:not([multiple]) {
 [data-pane="tools"][data-tool] > .p2-toolset > :not(.is-tool) { display: none; }
 [data-pane="tools"][data-tool] > .is-tool > summary { display: none; }
 .p2-ask.is-request { display: grid; gap: 6px; }
-.p2-ask-acts { display: flex; gap: 6px; }
+.p2-ask-acts { display: flex; flex-wrap: wrap; gap: 6px; }
+.p2-ask-acts .btn-secondary { white-space: nowrap; }
 .p2-label { margin: 0 0 6px; font-size: 0.85rem; font-weight: 600; }
 .p2-asks-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
 .p2-ask-form { display: flex; gap: 6px; margin-bottom: 8px; }
