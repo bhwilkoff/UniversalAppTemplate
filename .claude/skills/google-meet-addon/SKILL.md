@@ -41,6 +41,27 @@ paid for by a feature that passed a test and then failed in Meet.
 - Keyboard shortcuts work with focus in your frames, never with focus on
   Meet's own page; only a Chrome extension gets past that.
 
+## Orienting people who have never used an add-on
+
+People know video calls, not add-ons, so they cannot tell what is possible,
+where to look, or what to focus on.
+
+- **A learner's stage shows only what that learner's own panel sends.** While
+  the panel loads (about ten seconds was measured), the stage cannot know
+  where the session is. It must never claim the session has not begun: say it
+  is joining, then say how to bring the panel back.
+- **Show people around on the real panel and stage, one place at a time,** the
+  first time a panel opens. Use four stops at most. A learner's tour starts on
+  the stage ("a live class, not only a call"). Then teach each new thing in one
+  line the first time it appears: a question, a classmate's app, a room, a turn
+  to show. Upfront tutorials measured no better than none (NN/g), so keep the
+  tour short.
+- **One callout across both frames.** The panel decides, and the stage draws
+  what its own panel tells it. Escape pressed in either frame must close a step
+  drawn in the other.
+- **Check every step's words against the button as it reads at that moment.**
+  A step said "Next" while the button read "Open the main stage".
+
 ## Caching: why a fix "doesn't work" for ten minutes
 
 - GitHub Pages serves HTML with a 10-minute cache, and Chrome partitions its
