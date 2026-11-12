@@ -9,7 +9,7 @@
 
   // o: { db, mount, video, cohort, session, me, leading, outcomes, hideNames() }
   function draw(o) {
-    var R = window.ReplayLib, S = window.SessionStoryLib, U = window.UI, RL = window.ReactLib, T = window.TeachLib;
+    var R = window.ReplayLib, S = window.SessionStoryLib, U = window.UI, RL = window.ReactLib, LL = window.LiveLib;
     var db = o.db, box = o.mount, v = o.video, session = o.session, cohort = o.cohort;
     var K = { rows: [], view: 'all', person: '', names: {}, feedback: [], marks: [], data: null };
     box.replaceChildren(el('p', 'small', 'Gathering the moments…'));
@@ -44,7 +44,7 @@
         startedAt: session.recording_started_at, length: K.length,
         sceneTitle: function (id) { return titles[id] || null; },
         events: d.events, checks: d.checks, queue: d.queue, talk: d.talk, marks: K.marks, feedback: K.feedback,
-        answers: d.answers, answerText: function (k, a) { return T && k ? T.answerText(k, a) : (a.body || ''); },
+        answers: d.answers, answerText: function (k, a) { return LL && k ? (LL.answerText(k, a) || '') : (a.body || ''); },
         nameOf: nameOf
       });
     }
