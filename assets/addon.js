@@ -1491,6 +1491,10 @@
   function tick() {
     var part = partNow();
     drawRunInfo();
+    // The part's purpose follows the part on every tick (found in a learner's
+    // real call: after breakouts, a learner's panel kept the rooms part's
+    // purpose under two later parts).
+    if ((part ? part.key : null) !== S.partToolsKey) drawPartTools();
     // With the show running, the current scene carries the clock (R3).
     $('[data-clock]').hidden = shared();
     if (shared()) return;
@@ -1786,6 +1790,7 @@
     if (!box) return;
     box.replaceChildren();
     var part = partNow(), c = part && part.own ? part.config || {} : {};
+    S.partToolsKey = part ? part.key : null;
     // What the part is for (scenes.goal), for everyone in the call.
     if (part && part.goal) box.appendChild(el('p', 'p2-goal', part.goal));
     if (S.teaching && c.show && c.show.url) {
