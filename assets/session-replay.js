@@ -257,7 +257,7 @@
         fbs.appendChild(ful);
         box.appendChild(fbs);
       }
-      var bar = el('div', 'replay-bar');
+      var bar = el('div', 'replay-bar cohort-form');
       var which = el('select'); which.setAttribute('aria-label', 'Which moments');
       [['all', 'Every moment'], ['parts', 'Parts and questions'], ['talk', 'Who spoke'], ['mine', o.leading ? 'Your marks and feedback' : 'Your marks and feedback']].forEach(function (x) { which.appendChild(new Option(x[1], x[0])); });
       which.value = K.view;
