@@ -346,11 +346,16 @@
         db.from('enrollments').select('user_id, app_url, profiles(github_login, display_name, say_like)').eq('cohort_id', id).neq('status', 'left'),
         db.from('cohort_teachers').select('user_id, profiles(github_login, display_name, say_like)').eq('cohort_id', id),
         db.from('groups').select('*, group_members(user_id)').eq('cohort_id', id).order('name'),
-        db.from('call_guests').select('*').eq('cohort_id', id).order('joined_at', { ascending: false })
+        db.from('call_guests').select('*').eq('cohort_id', id).order('joined_at', { ascending: false }),
+        // A breakout room follows the session its cohort's call is running
+        // (found in a learner's real call: a room during a rerun opened the
+        // schedule's session, and with no dates, none at all).
+        db.from('call_runs').select('session_id').eq('cohort_id', id).gt('ends_at', new Date().toISOString()).order('set_at', { ascending: false }).limit(1)
       ]).then(function (res) {
-        var bad = res.filter(function (r) { return r.error; })[0];
+        var bad = res.slice(0, 5).filter(function (r) { return r.error; })[0];
         if (bad) return fail('The session could not be loaded: ' + bad.error.message);
         var ss = res[0].data;
+        var running = S.room && S.room.groupId && !S.room.sessionId && !res[5].error && res[5].data && res[5].data[0] ? res[5].data[0].session_id : null;
         if (!ss.length) return fail('This cohort has no sessions yet.');
         S.cohort = cohort;
         S.people = res[1].data;
@@ -364,10 +369,13 @@
         var t = lib.currentAndNext(ss, new Date(), cohort.session_minutes);
         var named = standalone && standaloneNumber != null ? ss.filter(function (x) { return x.number === standaloneNumber; })[0] : null;
         // A session a leader chose for this call runs instead of the schedule's.
-        var chosen = S.room && S.room.sessionId ? ss.filter(function (x) { return x.id === S.room.sessionId; })[0] : null;
+        var chosenId = (S.room && S.room.sessionId) || running;
+        var chosen = chosenId ? ss.filter(function (x) { return x.id === chosenId; })[0] : null;
         S.sessions = ss;
-        S.callRun = chosen ? chosen.id : null;
-        S.session = named || chosen || (t.live ? t.next : (t.next || t.current));
+        S.callRun = chosen && S.room && S.room.sessionId ? chosen.id : null;
+        // Sessions with no dates (a course brought in, or a demonstration) have
+        // no next or current one, so the first stands in rather than nothing.
+        S.session = named || chosen || (t.live ? t.next : (t.next || t.current)) || ss[0];
         S.prev = ss.filter(function (x) { return x.number === S.session.number - 1; })[0] || null;
         S.parts = lib.agenda(cohort.session_minutes);
         var since = S.prev && S.prev.starts_at ? S.prev.starts_at : new Date(Date.now() - 8 * 86400000).toISOString();
@@ -1980,6 +1988,12 @@
   function choose(part) {
     var r = rosterNow(), how = S.featureHow || 'random';
     var pool = (r ? (r.here.length ? r.here : r.missing) : []).filter(function (p) { return (S.teacherIds || []).indexOf(p.id) < 0; });
+    // Guests in the call can be featured too (found in a learner's real call:
+    // with only guests here, there was "no one to choose").
+    (S.guests || []).forEach(function (g) {
+      if (g.member_id || !(S.presence || {})[g.user_id] || S.people.some(function (p) { return p.user_id === g.user_id; })) return;
+      if (!pool.some(function (p) { return p.id === g.user_id; })) pool.push({ id: g.user_id, name: S.names[g.user_id] || 'A guest' });
+    });
     var vote = /^vote:([^:]+):(\d+)$/.exec(how);
     if (vote) {
       var chose = {};
