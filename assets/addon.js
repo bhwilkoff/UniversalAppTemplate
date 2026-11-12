@@ -1837,7 +1837,7 @@
     if (S.teaching && c.show && c.show.url) {
       var row = el('div', 'actions');
       var up = S.onStage && S.onStage.kind === 'doc';
-      if (part.slides) row.appendChild(button(up ? 'Back to the slides' : 'Show the document', 'btn-secondary small', function () { setPin(up ? null : { kind: 'doc' }); }));
+      if (part.slides && !isPdf(c.show.url)) row.appendChild(button(up ? 'Back to the slides' : 'Show the document', 'btn-secondary small', function () { setPin(up ? null : { kind: 'doc' }); }));
       var a = el('a', 'link-button', c.show.name || 'The document'); a.href = c.show.url; a.target = '_blank'; a.rel = 'noopener';
       row.appendChild(a);
       box.appendChild(row);
@@ -3001,12 +3001,20 @@
       mineOf: function (k) { var x = myAnswer(k); return x ? { choice: x.choice, picks: Array.isArray(x.value) ? x.value : undefined, body: x.body } : null; },
       onStage: S.onStage || (S.card ? null : partCheckPin()), beside: S.onStage && (S.onStage.kind === 'answer' || S.onStage.kind === 'work') ? partCheckPin() || latestCheckPin() : null, checks: S.checks, results: S.results, items: S.items, names: S.names, sayLike: S.sayLike || {}, appUrls: appUrls(), audience: V ? V.audienceOf(part) : null,
       welcome: lib.welcome(S.cohort, S.session, S.list && S.list.length ? S.list : S.parts), scene: scene, slides: slidesView(part),
-      doc: part && part.own && part.config && part.config.show ? part.config.show : null,
-      besideSlides: part && part.own && part.kind === 'reflection' ? slidesView(part) : null,
+      doc: partDoc(part),
+      besideSlides: part && part.own && (part.kind === 'reflection' || (part.kind === 'question' && part.slides)) ? slidesView(part) : null,
       onStageDetail: S.onStageDetail || null,
       path: window.RosterLib && S.onStage && S.onStage.kind === 'path' ? window.RosterLib.pathView(rosterNow()) : null,
       rooms: S.onStage && S.onStage.kind === 'rooms' ? Object.keys(S.roomPlaces).map(function (k) { return S.roomPlaces[k]; }) : null
     });
+  }
+  // The part's document for the stage. A PDF never draws inside Meet's frames
+  // (measured: Chrome's viewer shows a broken page there), so a part whose
+  // PDF became slides shows the slides instead.
+  function isPdf(url) { return /\.pdf($|[?#])/i.test(url || ''); }
+  function partDoc(part) {
+    var d = part && part.own && part.config && part.config.show ? part.config.show : null;
+    return d && isPdf(d.url) && part.slides ? null : d;
   }
   // A question part's own question is what its stage shows, with the
   // count once the leader shows results (found in the live Meet test:

@@ -244,6 +244,18 @@
     // Every rehearsal room at a glance (R12): its name, where its turns
     // are, its step's clock, and whether it asked for the teacher.
     if (on && on.kind === 'rooms') return { mode: 'rooms', part: part, rooms: roomsOf(state.rooms) };
+    // People featured during a part with slides keep the slides on the stage,
+    // with their names over them: the slide is what they are talking about
+    // (found running an imported "Discussion with resource" part, where the
+    // names took the slide's place). Meet's own pinned tiles show their faces.
+    if (on && (on.kind === 'people' || on.kind === 'person') && state.slides) {
+      var keep = slidesOf(state.slides);
+      var ids = on.kind === 'people' ? (on.ids || []) : [on.id];
+      if (keep) {
+        keep.who = ids.slice(0, 8).map(function (id) { return cut((state.names || {})[id] || 'Someone', 80); });
+        return { mode: 'slides', part: part, slides: keep };
+      }
+    }
     // Several featured at once, by name.
     if (on && on.kind === 'people') {
       var names = (on.ids || []).slice(0, 8).map(function (id) { return cut((state.names || {})[id] || 'Someone', 80); });
@@ -322,6 +334,7 @@
     var links = (Array.isArray(d.links) ? d.links : []).filter(function (l) { return l && typeof l.label === 'string' && /^https:\/\/github\.com\//.test(l.url || ''); })
       .slice(0, 6).map(function (l) { return { label: cut(l.label, 60), url: cut(l.url, 300) }; });
     if (links.length) out.links = links;
+    if (Array.isArray(d.who)) out.who = d.who.filter(function (x) { return typeof x === 'string' && x; }).slice(0, 8).map(function (x) { return cut(x, 80); });
     return out;
   }
 

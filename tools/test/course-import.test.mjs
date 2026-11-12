@@ -55,7 +55,7 @@ test('each class is a session, in class order, named by its topic', () => {
 test('every element type lands somewhere, and nothing is silently dropped', () => {
   const r = convert(course);
   const s = r.sessions[0].scenes;
-  assert.deepEqual(s.map((x) => x.kind), ['talk', 'question', 'talk', 'rooms', 'presenter']);
+  assert.deepEqual(s.map((x) => x.kind), ['talk', 'question', 'talk', 'rooms', 'talk']);
   // Slides, a document to show, and leader notes from instructions, engagement, and focus questions.
   assert.equal(s[0].deck, '## Hello\n\n- One\n- **Two**');
   assert.deepEqual(s[0].config.show, { url: 'https://course-resources.minerva.edu/uploaded_files/x/goals.pdf', name: 'Goals sheet' });
@@ -75,7 +75,7 @@ test('every element type lands somewhere, and nothing is silently dropped', () =
   // A Minerva workbook in a breakout becomes the rooms' group workbook.
   assert.deepEqual(s[3].config.group_docs.map((d) => d.name), ['Group 1']);
   assert.deepEqual(s[3].config.workbooks_refs, ['wb:11111111-2222-3333-4444-555555555555']);
-  // Someone quiet is featured.
+  // Someone quiet is featured, in a talk: an imported course has no apps to show.
   assert.deepEqual(s[4].config, { feature: 'quiet' });
   // A class material no step uses becomes a reading; a Minerva workbook says so.
   const reads = r.sessions[0].readings;

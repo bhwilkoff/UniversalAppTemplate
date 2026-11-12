@@ -284,13 +284,16 @@
       catch (e) { console.log('[stage] the slides did not draw: ' + (e && e.message)); deckSlides = []; deckWords = []; }
     }
     var at = Math.min(d.at, Math.max(0, deckSlides.length - 1));
-    var key = at + ':' + d.shown;
+    var key = at + ':' + d.shown + ':' + (Array.isArray(d.who) ? d.who.join('|') : '');
     if (key === shownKey) return;
     shownKey = key;
     var svg = deckSlides[at] || '';
     if (d.shown) { try { svg = window.DeckKit.frame(d.text, at, d.shown); } catch (e) {} }
     box.innerHTML = svg;
     box.setAttribute('aria-label', (deckWords[at] || []).join('. '));
+    var who = $('[data-slide-who]'), names = Array.isArray(d.who) ? d.who : [];
+    who.hidden = !names.length;
+    who.textContent = names.join(', ');
     // A new slide fades in; a point arriving on the same slide does not.
     box.classList.toggle('is-new', at !== shownAt);
     shownAt = at;
@@ -350,7 +353,10 @@
     var side = $('[data-beside]'), box = $('[data-beside-frame]');
     side.hidden = !doc && !slide;
     root.classList.toggle('has-beside', !!(doc || slide));
-    side.querySelector('.stage-app-bar').hidden = !doc;
+    if (!doc && !slide) root.classList.remove('beside-big');
+    // The bar keeps Enlarge for a slide too; the name and the link are a document's.
+    $('[data-beside-name]').hidden = !doc;
+    $('[data-beside-open]').hidden = !doc;
     side.classList.toggle('is-slide', !doc && !!slide);
     if (!doc && slide) {
       var key = 'slide:' + slide.at + ':' + slide.shown + ':' + slide.text.length;
@@ -366,8 +372,17 @@
     $('[data-beside-open]').href = doc.url;
     if (doc.url === besideSrc) return;
     besideSrc = doc.url;
+    root.classList.remove('beside-big');
     box.replaceChildren(docElement(doc));
   }
+  // Each person can enlarge what sits beside a question on their own stage,
+  // to read it, and put it back.
+  var bigButton = $('[data-beside-big]');
+  if (bigButton) bigButton.addEventListener('click', function () {
+    var big = root.classList.toggle('beside-big');
+    bigButton.textContent = big ? 'Back to the question' : 'Enlarge';
+    bigButton.setAttribute('aria-pressed', big ? 'true' : 'false');
+  });
 
   // What a document is decides how it is shown: a picture or a video fits the
   // space it has, and anything else is framed (found running an imported
@@ -388,13 +403,19 @@
       v.setAttribute('aria-label', doc.name);
       return v;
     }
+    // Chrome will not draw a PDF inside Meet's frames (measured in a real
+    // call: a broken page, sandboxed or not), so a PDF opens in its own tab.
+    if (PDF_FILE.test(url)) {
+      var card = el('div', 'stage-doc-card');
+      var open = el('a', 'btn-primary', 'Open the PDF');
+      open.href = url; open.target = '_blank'; open.rel = 'noopener';
+      card.appendChild(open);
+      return card;
+    }
     var f = document.createElement('iframe');
-    // A PDF opens at its page, fitted to the frame (a #page in the address
-    // is kept). It opens only unsandboxed: Chrome will not run its viewer in
-    // a sandboxed frame (found in a real call: a broken-page icon).
-    f.src = PDF_FILE.test(url) && url.indexOf('#') === -1 ? url + '#view=Fit' : url;
+    f.src = url;
     f.title = doc.name;
-    if (!PDF_FILE.test(url)) f.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-downloads');
+    f.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-downloads');
     f.setAttribute('referrerpolicy', 'no-referrer');
     return f;
   }

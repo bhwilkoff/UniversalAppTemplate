@@ -322,9 +322,12 @@ export function convert(exported) {
           first.push(s);
         });
         if (!first.length) {
-          const kind = feature && feature !== 'teacher' ? 'presenter' : board ? 'design' : 'talk';
+          // A step that features people is a talk with featuring, never a
+          // Showing work part: that kind hands every learner Show my app
+          // (found running an imported training course, which had no apps).
+          const kind = board ? 'design' : 'talk';
           const s = scene(kind, stepTitle);
-          if (kind === 'presenter') { s.config = {}; counts.featured += 1; }
+          if (feature && feature !== 'teacher') { s.config = {}; counts.featured += 1; }
           if (kind === 'design') s.config = { template: 'blank' };
           if (results || compare) s.config.results_of_ref = 'el:' + (compare || results);
           first.push(s);
@@ -334,7 +337,7 @@ export function convert(exported) {
         if (feature && feature !== 'group') {
           first[0].config.feature = feature;
           if (featureCount > 1) first[0].config.feature_count = Math.min(8, featureCount);
-        } else if (feature === 'group' && first[0].kind === 'presenter') first[0].config.feature = 'group';
+        } else if (feature === 'group' && first[0].kind === 'talk') first[0].config.feature = 'group';
         const lead = first[0];
         if (slides.length) { lead.deck = slides.join('\n\n---\n\n'); counts.slides += slides.length; }
         if (shows.length) {
