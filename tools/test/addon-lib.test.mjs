@@ -428,3 +428,19 @@ test('one answer on the stage sits beside its open question, which still takes a
 test('the leader reads that one answer sits under the open question', () => {
   assert.equal(lib.stageSays({ mode: 'check', prompt: 'Q', shown: { text: 'A' } }), 'One answer, under the open question');
 });
+
+test('people featured during a part with slides keep the slide, with their names over it', () => {
+  const part = { key: 'p', name: 'Discussion', endsAt: null };
+  const names = { a: 'Ana', b: 'Bo' };
+  const slides = { text: '## One', at: 0, shown: 0 };
+  const v = lib.stageView({ part, slides, names, onStage: { kind: 'people', ids: ['a', 'b'] } });
+  assert.equal(v.mode, 'slides');
+  assert.deepEqual(v.slides.who, ['Ana', 'Bo']);
+  const one = lib.stageView({ part, slides, names, onStage: { kind: 'person', id: 'a' } });
+  assert.deepEqual(one.slides.who, ['Ana']);
+  // The names survive the trip to the stage, and only as plain names.
+  const back = lib.readStageMessage(lib.stageMessage(v, false, true));
+  assert.deepEqual(back.slides.who, ['Ana', 'Bo']);
+  // Without slides, featuring still shows the people.
+  assert.equal(lib.stageView({ part, names, onStage: { kind: 'people', ids: ['a'] } }).mode, 'people');
+});
