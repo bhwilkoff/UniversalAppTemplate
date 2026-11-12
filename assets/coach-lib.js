@@ -15,7 +15,7 @@
       { key: 'stage', where: 'stage', target: 'stage', text: 'A live class, not only a call: your leader moves this screen for everyone, and you can click what is on it.' },
       { key: 'reacts', where: 'stage', target: 'reacts', text: 'React, or ask your leader something, here at any time, without unmuting.' },
       { key: 'asks', where: 'panel', target: 'asks', text: 'Ask your leader a question here at any time. Only your leader sees it.' },
-      { key: 'app', where: 'panel', target: 'yourapp', text: 'When it is your turn, show your app to everyone here, or open a classmate’s app on your own screen.' }
+      { key: 'app', where: 'panel', target: 'yourapp', text: 'When it is your turn, show your app to everyone here, or open a classmate’s app on your own screen.', noapp: 'Add your app’s address here, so you can show it to everyone when it is your turn.' }
     ],
     leader: [
       { key: 'now', where: 'panel', target: 'tab:now', text: 'Now is the part that is happening, with your notes for it. Learners never see your notes.' },

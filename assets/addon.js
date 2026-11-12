@@ -3127,6 +3127,8 @@
     // Words that match the button as it reads right now.
     var nb = st.closed && S.frame && S.frame.nextButton();
     if (nb && /main stage/i.test(nb.textContent || '')) st = Object.assign({}, st, { text: st.closed });
+    // No app yet: the step says what to do first.
+    if (st.noapp && S.mineApp && S.mineApp.querySelector('input')) st = Object.assign({}, st, { text: st.noapp });
     coachDraw(st, C.i + 1, C.steps.length, C.i + 1 < C.steps.length ? 'Next' : 'Got it');
   }
   function coachNext() {
