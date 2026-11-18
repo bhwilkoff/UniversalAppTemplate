@@ -1253,7 +1253,7 @@
     if (!S.nowHead) { S.nowHead = el('h2', 'p2-now-head'); now.insertBefore(S.nowHead, now.firstChild); }
     var showing = !!(part && part.kind === 'presenter');
     var room = S.svc && S.svc.showing ? S.svc.showing() : null;
-    var head = questionWaiting() ? 'Answer the question' : room === 'board' ? 'Propose an idea, and vote' : room === 'page' ? 'Try the website on your screen' : showing ? 'Your turn to show' : '';
+    var head = questionWaiting() ? 'Answer the question' : room === 'board' ? 'Propose an idea, and vote' : room === 'page' ? 'Try the website on your screen' : '';
     if (S.nowHead.textContent !== head) S.nowHead.textContent = head;
     S.nowHead.hidden = !head;
     if (now.firstChild !== S.nowHead) now.insertBefore(S.nowHead, now.firstChild);
@@ -1328,6 +1328,9 @@
   }
   function nextStep() {
     var part = partNow(), info = slideInfo();
+    // A panel opened partway through a part has already arrived there; its
+    // first slide step must not reopen a question the leader closed.
+    if (part && S.askedFor === undefined) S.askedFor = part.key;
     if (!S.teaching) return null;
     if (!S.stageOn && !standalone) return { label: 'Open the main stage', go: 'stage' };
     if (!part) return { label: 'Start the session', go: 'start' };
