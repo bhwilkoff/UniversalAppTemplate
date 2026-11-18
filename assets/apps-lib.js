@@ -195,6 +195,9 @@
     var purposeMatch = body.match(/\*\*What it is for, and who it is for\.?\*\*([\s\S]*?)(?=\n#{1,3} |\n---|$)/);
     var purpose = purposeMatch ? plain(purposeMatch[1]) : '';
     if (/^One or two sentences, in your own words\.?$/i.test(purpose)) purpose = '';
+    // A purpose still waiting for its builder reads "(Ben's words.)" or
+    // another note in parentheses: not the app's own words yet.
+    if (/^\(.*\)$/.test(purpose)) purpose = '';
     var principles = [];
     var re = /\n## (\d{1,2})\. ([^\n]+)\n([\s\S]*?)(?=\n## |$)/g, m;
     while ((m = re.exec('\n' + body))) {

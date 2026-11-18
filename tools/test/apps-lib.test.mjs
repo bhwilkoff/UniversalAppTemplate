@@ -237,3 +237,10 @@ test('a page of nothing but automatic updates sends the feed to the owner\'s own
   assert.equal(lib.needsOwnerLook(undefined), false);
   assert.equal(lib.ownerCommitsPath('bhwilkoff/Archive-Watch'), 'repos/bhwilkoff/Archive-Watch/commits?author=bhwilkoff&per_page=20');
 });
+
+test('a purpose left as a note in parentheses is not the app\'s words', () => {
+  const md = '---\napp: "Ear Drama"\n---\n\n**What it is for, and who it is for.** *(Ben\'s words.)*\n\n## How to fill this in\n';
+  assert.equal(lib.parseDeclaration(md).purpose, '');
+  const real = '---\napp: "X"\n---\n\n**What it is for, and who it is for.** Radio for bedtime (and the car).\n';
+  assert.equal(lib.parseDeclaration(real).purpose, 'Radio for bedtime (and the car).');
+});
