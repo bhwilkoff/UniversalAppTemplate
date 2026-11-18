@@ -538,7 +538,7 @@
       case 'welcome': return 'The welcome';
       case 'card': return 'A card: ' + q(v.card && v.card.body);
       case 'check': return v.shown ? 'One answer, under the open question' : (v.count ? 'Answers to ' : 'The question ') + q(v.prompt) + (v.doc ? ', beside its document' : '');
-      case 'app': return (v.who || 'Someone') + '\u2019s app';
+      case 'app': return (v.who || 'Someone') + (/\/share\/\?screen=/.test(v.url || '') ? '\u2019s screen' : '\u2019s app');
       case 'apps': return 'Apps side by side: ' + (v.apps || []).map(function (a) { return a.who; }).join(', ');
       case 'item': return (v.who || 'Someone') + '\u2019s link';
       case 'blank': return 'Nothing';

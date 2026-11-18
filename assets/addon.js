@@ -1332,7 +1332,7 @@
     // first slide step must not reopen a question the leader closed.
     if (part && S.askedFor === undefined) S.askedFor = part.key;
     if (!S.teaching) return null;
-    if (!S.stageOn && !standalone) return { label: 'Open the main stage', go: 'stage' };
+    if (!S.stageOn && !S.panelsOnly && !standalone) return { label: 'Open the main stage', go: 'stage' };
     if (!part) return { label: 'Start the session', go: 'start' };
     // The welcome pinned over a part hides it: the first press takes the
     // welcome off, so the room sees the slide the leader is on (Week 3
@@ -1762,6 +1762,11 @@
       if (bad) { $('[data-sync]').textContent = 'The panel could not read the latest changes: ' + bad.error.message; return; }
       S.items = res[0].data; S.checks = res[1].data; S.answers = res[2].data;
       S.requests = res[3].data || [];
+      // A screen whose sharer stopped comes off the stage on its own.
+      if (S.teaching && S.onStage && S.onStage.kind === 'item') {
+        var up = (S.items || []).filter(function (x) { return x.id === S.onStage.id; })[0];
+        if (up && up.kind === 'screen' && up.state === 'shown') setPin(null);
+      }
       if (S.breakouts) S.breakouts.draw();
       if (S.isGuest) loadGuests();
       var visible = S.checks.filter(function (k) { return L.kindOf(k) !== 'short' && (S.teaching || k.show_tally); });
@@ -3386,6 +3391,7 @@
     if (S.teaching && S.tiles) drawTiles();
     if (!S.frame || !S.frame.stage) return;
     if (!S.teaching || standalone) return S.frame.stage(null);
+    if (!S.stageOn && S.panelsOnly) return S.frame.stage({ what: 'In everyone’s panel: ' + A.stageSays(view), action: stageExtra() ? { label: 'Clear', go: clearStage } : null });
     if (!S.stageOn) return S.frame.stage({ what: 'Closed', action: { label: 'Open it', go: function () { $('[data-open-stage]').click(); } } });
     S.frame.stage({ what: A.stageSays(view), action: stageExtra() ? { label: 'Clear', go: clearStage } : null });
   }

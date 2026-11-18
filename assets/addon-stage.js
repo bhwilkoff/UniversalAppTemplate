@@ -334,6 +334,7 @@
     // their screen (assets/screen-share.js), streamed to this stage alone.
     var screenId = window.ScreenShare && window.ScreenShare.idOf(v.url);
     $('[data-app-open]').hidden = !!screenId;
+    $('[data-app-kind]').textContent = screenId ? 'screen' : 'app';
     if (screenId && window.supabase && window.HUB) {
       if (!screenDb) screenDb = window.supabase.createClient(window.HUB.url, window.HUB.key, { auth: { persistSession: false, autoRefreshToken: false } });
       var wrap = document.createElement('div'); wrap.className = 'stage-screen';
