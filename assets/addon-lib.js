@@ -354,8 +354,11 @@
   var STAGE = 'hs-stage';
   // `recording` rides with every view: the stage marks it, because people
   // without the panel open see only the stage.
-  function stageMessage(view, recording, learner, stance) {
+  // `rooms`: breakout rooms are open and this learner is not in one, so the
+  // stage can say so even when Meet has folded their panel away.
+  function stageMessage(view, recording, learner, stance, rooms) {
     var m = { type: STAGE, v: 1, view: view, learner: learner === true, recording: recording === true };
+    if (rooms === true) m.rooms = true;
     if (stance && stance.open === true) m.stances = true;
     if (stance && num(stance.total)) m.stance = { agree: Number(stance.agree) || 0, unsure: Number(stance.unsure) || 0, disagree: Number(stance.disagree) || 0, total: Number(stance.total) || 0 };
     return JSON.stringify(m);
@@ -367,6 +370,7 @@
     try { m = typeof payload === 'string' ? JSON.parse(payload) : payload; } catch (e) { m = null; }
     if (m && m.recording === true) v.recording = true;
     if (m && m.learner === true) v.learner = true;
+    if (m && m.rooms === true) v.rooms = true;
     if (m && m.stances === true) v.stances = true;
     if (m && m.stance && num(m.stance.total)) v.stance = { agree: Number(m.stance.agree) || 0, unsure: Number(m.stance.unsure) || 0, disagree: Number(m.stance.disagree) || 0, total: Number(m.stance.total) || 0 };
     return v;

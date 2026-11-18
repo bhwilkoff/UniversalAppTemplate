@@ -903,6 +903,7 @@
       // reached learners' panels and nowhere else).
       onChange: function (st) {
         breakoutsChanged(st);
+        if (!S.teaching && !!(st && st.rooms) !== !!S.roomsSent) { S.roomsSent = !!(st && st.rooms); sendStage(); }
         var c = st && st.card ? { id: st.card.id, body: st.card.body, endsAt: st.card.ends_at ? Date.parse(st.card.ends_at) : null } : null;
         var rec = !!(st && st.recording);
         if (JSON.stringify(c) === JSON.stringify(S.card || null) && rec === !!S.recording) return;
@@ -2298,7 +2299,7 @@
     var mine = (S.requests || []).filter(function (r) { return r.user_id === who(); }).slice(-3).reverse();
     mine.forEach(function (r) {
       var line = el('div', 'p2-ask');
-      line.appendChild(el('span', null, r.body || (ASKS[r.kind] || '')));
+      line.appendChild(el('span', null, r.kind === 'help' ? 'You asked your leader to come to ' + (r.body || 'your room') : r.body || (ASKS[r.kind] || '')));
       if (r.state === 'waiting') line.appendChild(button('Take it back', 'btn-secondary small', function () { db.from('live_requests').delete().eq('id', r.id).then(function () { refreshLive(); }); }));
       else line.appendChild(el('span', 'p2-state', r.state === 'done' ? 'Answered' : 'Not now'));
       box.appendChild(line);
@@ -2366,7 +2367,8 @@
           S.people.forEach(function (p) { if (p.user_id === who()) p.app_url = c.url; });
           input.blur(); drawMyApp();
           checkSite(c.url).then(function (k) {
-            if (!k.ok && S.mineApp) S.mineApp.appendChild(el('p', 'small', k.why === 'unreachable' ? 'Saved, but that address says not found right now. Check that it opens in a new tab.' : 'Saved, but your app will not open inside another page, so share your screen when it is your turn.'));
+            S.myAppWarn = k.ok ? null : { url: c.url, text: k.why === 'unreachable' ? 'That address says not found right now. Check that it opens in a new tab.' : 'Your app will not open inside another page, so share your screen when it is your turn.' };
+            drawMyApp();
           });
         });
       });
@@ -2386,6 +2388,7 @@
     addr.appendChild(document.createTextNode(app.label + ' '));
     addr.appendChild(button('Change it', 'link-button', function () { S.editApp = true; drawMyApp(); }));
     box.appendChild(addr);
+    if (S.myAppWarn && S.myAppWarn.url === S.myApp) box.appendChild(el('p', 'small', S.myAppWarn.text));
   }
   // Everyone in the call with an app: members, and guests who are not tied
   // to a member (a tied guest's app is that member's).
@@ -3314,7 +3317,7 @@
     drawStageLine(view);
     coachCheck(view);
     if (!S.stageOn || !side || !S.session) return;
-    try { Promise.resolve(side.notifyMainStage(A.stageMessage(view, !!S.recording, !S.teaching, S.svc ? S.svc.stance() : null))).catch(function () {}); } catch (e) {}
+    try { Promise.resolve(side.notifyMainStage(A.stageMessage(view, !!S.recording, !S.teaching, S.svc ? S.svc.stance() : null, !S.teaching && !(S.room && S.room.groupId) && !!(S.signals && S.signals.state() && S.signals.state().rooms)))).catch(function () {}); } catch (e) {}
   }
   // Something a leader put up over the part's own plan: a pin, a card, a
   // website or Propose and vote. Clear takes it down; the part's own slide

@@ -72,10 +72,17 @@
   window.addEventListener('resize', fitSoon);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitSoon);
 
+  (function () {
+    var b = document.querySelector('[data-stage-rooms-open]');
+    if (b) b.addEventListener('click', function () { try { Promise.resolve(stageClient.loadSidePanel()).catch(function () {}); } catch (e) {} });
+  })();
   function draw() {
     fitSoon();
     root.querySelectorAll('[data-view]').forEach(function (v) { v.hidden = v.getAttribute('data-view') !== view.mode; });
     $('[data-stage-rec]').hidden = !view.recording;
+    // Meet can fold a learner's panel away (seen after Join activity on
+    // 2026-11-18), and the panel holds Join your room.
+    $('[data-stage-rooms]').hidden = !(view.rooms && stageClient && stageClient.loadSidePanel);
     var part = view.part;
     // The part sits small at the top when something else has the stage.
     // A clock the leader started shows over whatever the stage shows (found

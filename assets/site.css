@@ -3125,8 +3125,12 @@ select:not([multiple]) {
 .board-notes input { width: min(16rem, 40vw); min-height: 40px; padding: 0.3rem 0.6rem; border: 1px solid var(--muted); border-radius: 10px; background: var(--card); color: var(--ink); font: inherit; font-size: 0.95rem; }
 .board-notes .btn-primary.small { color: var(--on-ink); }
 .board-notes .btn-secondary.small { color: var(--ink); white-space: nowrap; }
-.p2-ask { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.5rem 0.6rem; margin-bottom: 0.5rem; border-radius: 8px; background: rgb(168 199 250 / 0.14); font-size: 0.9rem; }
+.p2-ask { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.5rem 0.6rem; margin-bottom: 0.5rem; border-radius: 8px; background: rgb(168 199 250 / 0.14); font-size: 0.9rem; }
 .p2-state { margin: 0 0 0.4rem; font-size: 0.9rem; }
+.p2-ask > [role="status"]:not(:empty) { flex-basis: 100%; }
+.stage-rooms { position: absolute; top: 1rem; left: 50%; transform: translateX(-50%); z-index: 5; display: flex; gap: 0.75rem; align-items: center; padding: 0.6rem 1rem; border-radius: 12px; background: var(--card); border: 2px solid var(--accent); }
+.stage-rooms[hidden] { display: none; }
+.stage-rooms p { margin: 0; font-weight: 600; }
 .p2-myapp { margin-bottom: 0.75rem; }
 .p2-myapp[hidden], .p2-asks[hidden] { display: none; }
 
