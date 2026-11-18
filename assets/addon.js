@@ -2660,19 +2660,55 @@
     d.appendChild(acts);
     box.appendChild(d);
   }
+  // A leader puts in or changes a member's app address, checked first.
+  function editAddress(li, p) {
+    var f = el('form', 'p2-ask-form'), input = el('input'), said = el('span', 'small');
+    input.type = 'url'; input.placeholder = 'https://'; input.value = p.app_url || '';
+    input.setAttribute('aria-label', 'App address for ' + (S.names[p.user_id] || 'this person'));
+    var go = el('button', 'btn-secondary small', 'Save'); go.type = 'submit';
+    said.setAttribute('role', 'status');
+    f.appendChild(input); f.appendChild(go);
+    li.appendChild(f); li.appendChild(said); input.focus();
+    f.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      var c = L.classifyLink(input.value.trim());
+      if (!c) { said.textContent = 'A full address that starts with https://'; return; }
+      said.textContent = 'Checking the address…';
+      checkSite(c.url).then(function (k) {
+        return db.from('enrollments').update({ app_url: c.url }).eq('cohort_id', S.cohort.id).eq('user_id', p.user_id).select('user_id').then(function (r) {
+          if (r.error || !r.data || !r.data.length) { said.textContent = 'Not saved' + (r.error ? ': ' + r.error.message : '.'); return; }
+          p.app_url = c.url;
+          S.people.forEach(function (m) { if (m.user_id === p.user_id) m.app_url = c.url; });
+          input.blur(); drawApps();
+          if (!k.ok && S.appsBox) S.appsBox.appendChild(el('p', 'small', siteProblem(k, S.names[p.user_id] || 'Their')));
+        });
+      });
+    });
+  }
   function drawApps() {
     var box = S.appsBox;
     if (!box) return;
-    if (box.contains(document.activeElement) && document.activeElement.type === 'checkbox') return;
+    if (box.contains(document.activeElement) && (document.activeElement.type === 'checkbox' || document.activeElement.tagName === 'INPUT')) return;
     box.replaceChildren();
     var rows = withApps().filter(function (p) { return p.app_url && L.classifyLink(p.app_url); });
-    box.hidden = !rows.length;
-    if (!rows.length) return;
+    // Members with no address yet are listed too, so a leader can add one for
+    // them (Week 3 debrief: "switch out the URL for somebody's app").
+    var bare = (S.people || []).filter(function (p) { return !p.app_url || !L.classifyLink(p.app_url); });
+    box.hidden = !rows.length && !bare.length;
+    if (!rows.length && !bare.length) return;
     box.appendChild(el('p', 'kicker', 'Apps'));
     var ul = el('ul', 'roster-list');
+    bare.forEach(function (p) {
+      var li = el('li', 'roster-guest');
+      li.appendChild(el('span', 'roster-name', S.names[p.user_id] || 'Someone'));
+      li.appendChild(el('span', 'small', 'No address yet'));
+      li.appendChild(button('Add one', 'link-button', function () { editAddress(li, p); }));
+      ul.appendChild(li);
+    });
     rows.forEach(function (p) {
       var li = el('li', 'roster-guest');
       li.appendChild(el('span', 'roster-name', S.names[p.user_id] || 'Someone'));
+      if (S.people.some(function (m) { return m.user_id === p.user_id; })) li.appendChild(button('Change', 'link-button', function () { editAddress(li, p); }));
       var live = S.onStage && S.onStage.kind === 'item' && (S.items.filter(function (x) { return x.id === S.onStage.id; })[0] || {}).user_id === p.user_id;
       li.appendChild(button(live ? 'Take it down' : 'Show it', 'btn-secondary small', function () {
         if (live) return db.from('live_queue').update({ state: 'shown' }).eq('id', S.onStage.id).then(function () { setPin(null); refreshLive(); });
