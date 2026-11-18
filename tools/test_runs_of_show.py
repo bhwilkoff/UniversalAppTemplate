@@ -74,10 +74,22 @@ for s in sessions:
             check(0 < inner * 3 <= sc["minutes"], f"{name}: three turns fit inside {sc.get('title')}",
                   f"{inner} x 3 > {sc['minutes']}")
     check(any(sc["kind"] == "question" for sc in scenes), f"{name}: has a question scene")
-    # Every session tries the week's one thing on the board, except week 5,
-    # whose showing takes the board's place (the rewrite of October 23, 2026).
-    if name != "week-5":
-        check(any(sc["kind"] == "design" for sc in scenes), f"{name}: has a design stage scene")
+    # Every session runs the routine in docs/teaching/leading-a-session.md
+    # (Ben, 2026-11-18): a writing part that sends the next round, and Your
+    # questions last. Weeks 2 to 4 are the routine exactly in one call: plans,
+    # try each app, write your next round, your questions, with no talk that
+    # could be given to any cohort.
+    sixty = (s.get("lengths") or {}).get("60", [])
+    for label, plan in (("75", scenes), ("60", sixty)):
+        check(any(sc["kind"] == "reflection" for sc in plan), f"{name} ({label}): has a writing part that sends the next round")
+        check(bool(plan) and plan[-1].get("config", {}).get("prompt") == "What questions do you still have?",
+              f"{name} ({label}): ends with Your questions")
+    if name in ("week-2", "week-3", "week-4"):
+        check([sc["kind"] for sc in sixty] == ["talk", "presenter", "reflection", "question"],
+              f"{name}: its 60-minute plan is the routine (plans, try each app, next round, questions)",
+              ", ".join(sc["kind"] for sc in sixty))
+        check(sum(sc["minutes"] for sc in sixty if sc["kind"] == "presenter") >= 30,
+              f"{name}: trying each app is most of the hour")
     for minutes, other in (s.get("lengths") or {}).items():
         total = sum(sc.get("minutes", 0) for sc in other)
         check(total == int(minutes), f"{name}: its {minutes}-minute plan fills {minutes} minutes", f"{total}")

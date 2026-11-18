@@ -35,16 +35,15 @@ written, played with, and published
 
 | Minutes (75) | Scene | Kind | What happens |
 |---|---|---|---|
-| 0-8 | Arrive | Talk | Your name, where you are joining from, and one thing in your life you wish worked differently. That last line is the first entry in the log you start tonight. |
-| 8-15 | How we talk to one another | Talk | The four rules, said aloud: no correcting what does not matter, no acting surprised, no taking over, and no small digs at who someone is. When one is broken, someone says so plainly, the person says thanks, and we move on. |
-| 15-35 | Show what you set up | Rehearsal rooms | In your group's room, each person shows their app's address. If setup stopped somewhere, show where it stopped, and the group works through it together. Being stuck tonight is the most useful thing anyone can bring. The prompt: "Show your app's address, or where setup stopped, and say one thing in your life you wish worked differently." |
-| 35-38 | Break | Break |  |
-| 38-53 | What a build looks like | Design stage | Every session from week 1 opens with each person showing the week's work on a device. Here is a strong build and a weak one, side by side. Then everyone practices the three questions on the weak one: where is it going, how is it going, and what is next. On the board: *The three questions*. |
-| 53-65 | Start your noticing log | Reflection | For five days, write one line whenever one of these happens: I wished something worked differently. I gave up on something I care about. I did something the long way because nothing helped. Someone I know struggled with the same thing. No app ideas yet, just what happened. Write today's line now, before you leave: this log is where week 1's problem comes from. The prompt: "What is one thing that happened today that could go in your log?" |
-| 65-70 | Check for understanding | Question | In your own words. Only your leaders read it. The prompt: "What do you hope your app will do for someone?" |
-| 70-75 | Your questions | Question | Anything from this session you are still wondering about. Your leaders read every answer before the next session. The prompt: "What questions do you still have?" |
+| 0-5 | Arrive | Talk | Your name, where you are joining from, and one thing in your life you wish worked differently. That last line is the first entry in the log you start tonight. |
+| 5-10 | How we talk to one another | Talk | The four rules, said aloud: no correcting what does not matter, no acting surprised, no taking over, and no small digs at who someone is. When one is broken, someone says so plainly, the person says thanks, and we move on. |
+| 10-40 | Open each app | Rehearsal rooms | In your group's room, each person shows their app's address, or where setup stopped, and the group works through it. The prompt: "Show your app's address, or where setup stopped." |
+| 40-43 | Break | Break |  |
+| 43-55 | What a build looks like | Design stage | Every session from week 1 opens with each person showing the week's work on a device. Here is a strong build and a weak one, side by side. Then everyone practices the three questions on the weak one: where is it going, how is it going, and what is next. On the board: *The three questions*. |
+| 55-70 | Start your noticing log | Reflection | For five days, write one line whenever one of these happens: I wished something worked differently. I gave up on something I care about. I did something the long way because nothing helped. Someone I know struggled with the same thing. No app ideas yet, just what happened. Write today's line now, before you leave: this log is where week 1's problem comes from. The prompt: "What is one thing that happened today that could go in your log?" |
+| 70-75 | Your questions | Question | Only your leaders read the answers. The prompt: "What questions do you still have?" |
 
-**In the rehearsal rooms,** each builder's turn runs these scenes, 6 minutes in all: show the address, or where it stopped (3), one thing you wish worked differently (2), one question to understand it (1). The room's prompt is on screen the whole time.
+**In the rehearsal rooms,** each builder's turn runs these scenes, 10 minutes in all: show your address (4), work through what stopped (6). The room's prompt is on screen the whole time.
 
 **At 60 minutes,** for a cohort of fewer than eight learners, everyone stays in the one call:
 
@@ -52,11 +51,10 @@ written, played with, and published
 |---|---|---|---|
 | 0-5 | Arrive | Talk | Your name, where you are joining from, and one thing in your life you wish worked differently. That last line is the first entry in the log you start tonight. |
 | 5-10 | How we talk to one another | Talk | The four rules, said aloud: no correcting what does not matter, no acting surprised, no taking over, and no small digs at who someone is. When one is broken, someone says so plainly, the person says thanks, and we move on. |
-| 10-30 | Show what you set up | Presenter | Each person in turn puts their app on the main stage with Show my app in the Human Shaped panel. If setup stopped somewhere, show where it stopped, and we work through it together, where everyone can see. Being stuck tonight is the most useful thing anyone can bring. The prompt: "Show your app's address, or where setup stopped." |
-| 30-42 | What a build looks like | Design stage | Every session from week 1 opens with each person showing the week's work on a device. Here is a strong build and a weak one, side by side. Then everyone practices the three questions on the weak one: where is it going, how is it going, and what is next. On the board: *The three questions*. |
-| 42-52 | Start your noticing log | Reflection | For five days, write one line whenever one of these happens: I wished something worked differently. I gave up on something I care about. I did something the long way because nothing helped. Someone I know struggled with the same thing. No app ideas yet, just what happened. Write today's line now, before you leave: this log is where week 1's problem comes from. The prompt: "What is one thing that happened today that could go in your log?" |
-| 52-56 | Check for understanding | Question | In your own words. Only your leaders read it. The prompt: "What do you hope your app will do for someone?" |
-| 56-60 | Your questions | Question | Anything from this session you are still wondering about. Your leaders read every answer before the next session. The prompt: "What questions do you still have?" |
+| 10-34 | Open each app | Presenter | Each person shows their app's address with Show my app to everyone  If setup stopped, show where it stopped, and we work through it together The prompt: "Show your app's address, or where setup stopped." |
+| 34-44 | What a build looks like | Design stage | Every session from week 1 opens with each person showing the week's work on a device. Here is a strong build and a weak one, side by side. Then everyone practices the three questions on the weak one: where is it going, how is it going, and what is next. On the board: *The three questions*. |
+| 44-56 | Start your noticing log | Reflection | For five days, write one line whenever one of these happens: I wished something worked differently. I gave up on something I care about. I did something the long way because nothing helped. Someone I know struggled with the same thing. No app ideas yet, just what happened. Write today's line now, before you leave: this log is where week 1's problem comes from. The prompt: "What is one thing that happened today that could go in your log?" |
+| 56-60 | Your questions | Question | Only your leaders read the answers. The prompt: "What questions do you still have?" |
 
 Every scene can be changed on the session's page before it runs, and in the Meet add-on while it runs.
 

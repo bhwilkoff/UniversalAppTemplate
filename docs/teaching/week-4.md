@@ -64,28 +64,23 @@ written, played with, and published.
 
 | Minutes (75) | Scene | Kind | What happens |
 |---|---|---|---|
-| 0-5 | Arrive | Talk | One line in the chat: who held your app this week, or what is in the way. Then what I read in your answers last week, and what I changed. |
-| 5-35 | Show what you built | Rehearsal rooms | In your group's room. Each person in turn: say what you want to know, show it on the device, and explain one decision with your agent closed (a decision, never the code). The others ask one question to understand it, then answer the three questions: where is it going, how is it going, and what is next. The builder ends by saying what they will do next, and ready or not yet. The prompt: "Show the screenshot that proved a fix, and what it would have looked like if the fix had failed. Then show your app on the other person's device beside the guess you wrote before they held it: what did they do first?" |
-| 35-38 | Break | Break |  |
-| 38-45 | Numbers that tell the truth | Talk | Once other people hold your app, you can no longer see it by using it yourself, so you read numbers about it. Stage 06's rules keep those numbers honest. A reader that cannot read says so, and a missing number is empty, never zero. Count only what servers and stores already see, with no tracking added to the app. And a number you aim at stops telling you the truth, so you read it, you do not chase it. |
-| 45-58 | Choose your number | Design stage | Write the one number about your app you will read this week, where it comes from, and what it would look like if its reader could not read. Hold it to the rules on the board, then name the person you will show it to. On the board: *Blank*. |
-| 58-68 | Start | Reflection | Before you leave, send the first prompt of stage 06, with the number you chose tonight. Then start the log for stage 07: each time you use your own app this week and want it to do something it does not, write one line. Next week's feature comes from that log, not from a list. The prompt: "What is one thing you have already wanted your app to do while using it yourself?" |
-| 68-72 | What did they notice first? | Question | The prompt: "Rank what the other person noticed first." |
-| 72-75 | Your questions | Question | Anything from this session you are still wondering about. Your leaders read every answer before the next session. The prompt: "What questions do you still have?" |
+| 0-8 | Your plans from last week | Talk | My plan was ___  What happened was ___ |
+| 8-38 | Try each app | Rehearsal rooms | In your group's room, nine minutes for each builder: their question, three quiet minutes trying it, what you did and what happened, "I wonder if", then one decision and what changes first. The prompt: "Show what happened when someone else used your app, and ask one question about it." |
+| 38-41 | Break | Break |  |
+| 41-50 | What we saw | Talk | One person from each group: one thing someone did with an app  Then what it suggests |
+| 50-69 | Write your next round | Reflection | I tried my app, and here is what I saw: 1. ___ 2. ___ 3. ___  Start with ___  This is done when ___  It must never ___ The prompt: "Paste the round you are sending to your agent." |
+| 69-75 | Your questions | Question | Only your leaders read the answers. The prompt: "What questions do you still have?" |
 
-**In the rehearsal rooms,** each builder's turn runs these scenes, 8 minutes in all: say what you want to know, then show it on the device (3), explain one decision, agent closed (2), one question, then the three answers (2), what is next, and ready or not yet (1). The room's prompt is on screen the whole time.
+**In the rehearsal rooms,** each builder's turn runs these scenes, 9 minutes in all: the builder's question (1), try it quietly (3), what you did and what happened (2), i wonder if (1), one decision, and what changes first (2). The room's prompt is on screen the whole time.
 
 **At 60 minutes,** for a cohort of fewer than eight learners, everyone stays in the one call:
 
 | Minutes (60) | Scene | Kind | What happens |
 |---|---|---|---|
-| 0-4 | Arrive | Talk | One line in the chat: who held your app this week, or what is in the way. Then what I read in your answers last week, and what I changed. |
-| 4-26 | Show what you built | Presenter | With everyone in the call, about five minutes each. Each person in turn: say what you want to know, put it on the main stage with Show my app, and explain one decision with your agent closed (a decision, never the code). The others ask one question to understand it, then answer the three questions: where is it going, how is it going, and what is next. The builder ends by saying what they will do next, and ready or not yet. The prompt: "Show the screenshot that proved a fix, and what it would have looked like if the fix had failed. Then show your app on the other person's device beside the guess you wrote before they held it: what did they do first?" |
-| 26-32 | Numbers that tell the truth | Talk | Once other people hold your app, you can no longer see it by using it yourself, so you read numbers about it. Stage 06's rules keep those numbers honest. A reader that cannot read says so, and a missing number is empty, never zero. Count only what servers and stores already see, with no tracking added to the app. And a number you aim at stops telling you the truth, so you read it, you do not chase it. |
-| 32-43 | Choose your number | Design stage | Write the one number about your app you will read this week, where it comes from, and what it would look like if its reader could not read. Hold it to the rules on the board, then name the person you will show it to. On the board: *Blank*. |
-| 43-52 | Start | Reflection | Before you leave, send the first prompt of stage 06, with the number you chose tonight. Then start the log for stage 07: each time you use your own app this week and want it to do something it does not, write one line. Next week's feature comes from that log, not from a list. The prompt: "What is one thing you have already wanted your app to do while using it yourself?" |
-| 52-56 | What did they notice first? | Question | The prompt: "Rank what the other person noticed first." |
-| 56-60 | Your questions | Question | Anything from this session you are still wondering about. Your leaders read every answer before the next session. The prompt: "What questions do you still have?" |
+| 0-6 | Your plans from last week | Talk | My plan was ___  What happened was ___ |
+| 6-42 | Try each app | Presenter | The builder asks one question about the app  Everyone tries it, quietly, for three minutes  I tried to ___. What happened was ___. I expected ___.  One "I wonder if", then the builder explains one decision and what they will change first The prompt: "Show what happened when someone else used your app, and ask one question about it." |
+| 42-56 | Write your next round | Reflection | I tried my app, and here is what I saw: 1. ___ 2. ___ 3. ___  Start with ___  This is done when ___  It must never ___ The prompt: "Paste the round you are sending to your agent." |
+| 56-60 | Your questions | Question | Only your leaders read the answers. The prompt: "What questions do you still have?" |
 
 Every scene can be changed on the session's page before it runs, and in the Meet add-on while it runs.
 

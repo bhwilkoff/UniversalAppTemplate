@@ -66,27 +66,22 @@ written, played with, and published.
 
 | Minutes (75) | Scene | Kind | What happens |
 |---|---|---|---|
-| 0-5 | Arrive | Talk | Guests, welcome. The four rules once more, for everyone here tonight. Then one line in the chat from each builder: the feature you will show. |
-| 5-17 | Last look in your group | Rehearsal rooms | In your group's room, each person shows the feature and the number once, the way they will show them to everyone, and explains one part the agent wrote and how they know it works. The prompt: "Show the feature and your number once, and explain one part the agent wrote and how you know it works." |
-| 17-20 | Break | Break |  |
-| 20-48 | The showing | Presenter | Each builder, about three minutes: the feature you wanted from living with your app, shown on your newest device; the sentence an older device shows instead; and your one honest number, with what its people said. Guests may ask one question each. The prompt: "Show the feature, the sentence an older device shows, and your number." |
-| 48-54 | From reason to rule to check | Talk | Values climb. A reason is the "Why we build" paragraph your agent weighs like advice. A rule is a standing instruction in your own words, dated the day the agent crossed a line. A check is a test that fails when the line is crossed, so the agent cannot cross it without being told. Stage 08 is where your app's lessons climb, so the next app starts knowing them. |
-| 54-67 | Start | Reflection | The cohort chooses one lesson to send back to the template, so the next builder does not have to learn it. Then, before you leave, send the first prompt of stage 08: ask your agent which of your app's lessons belong in a skill or a memory. The prompt: "What is one lesson the next builder should not have to learn?" |
-| 67-71 | Enough, for now | Question | In your own words. Only your leaders read it. The prompt: "What is enough about this version, for now, and for whom?" |
-| 71-75 | Your questions | Question | Anything from this session you are still wondering about. Your leaders read every answer before the next session. The prompt: "What questions do you still have?" |
+| 0-4 | Welcome | Talk | Guests are welcome  Each builder shows their app, and one decision behind it |
+| 4-56 | The showing | Presenter | The builder says who the app is for  Everyone tries it  The builder explains one decision, and what waits for the next version The prompt: "Show your app, the feature you wanted, and one decision behind it." |
+| 56-59 | Break | Break |  |
+| 59-71 | What the next builder should not have to learn | Reflection | The lesson: ___  Where it lives now (a memory, a skill, a decision): ___ The prompt: "What is one lesson the next builder should not have to learn?" |
+| 71-75 | Your questions | Question | Only your leaders read the answers. The prompt: "What questions do you still have?" |
 
-**In the rehearsal rooms,** each builder's turn runs these scenes, 4 minutes in all: show it once, as you will tonight (3), one part the agent wrote, and how you know it works (1). The room's prompt is on screen the whole time.
+
 
 **At 60 minutes,** for a cohort of fewer than eight learners, everyone stays in the one call:
 
 | Minutes (60) | Scene | Kind | What happens |
 |---|---|---|---|
-| 0-4 | Arrive | Talk | Guests, welcome. The four rules once more, for everyone here tonight. Then one line in the chat from each builder: the feature you will show. |
-| 4-30 | The showing | Presenter | Each builder, about three minutes: the feature you wanted from living with your app, shown on your newest device; the sentence an older device shows instead; and your one honest number, with what its people said. Guests may ask one question each. The prompt: "Show the feature, the sentence an older device shows, and your number." |
-| 30-36 | From reason to rule to check | Talk | Values climb. A reason is the "Why we build" paragraph your agent weighs like advice. A rule is a standing instruction in your own words, dated the day the agent crossed a line. A check is a test that fails when the line is crossed, so the agent cannot cross it without being told. Stage 08 is where your app's lessons climb, so the next app starts knowing them. |
-| 36-51 | Start | Reflection | The cohort chooses one lesson to send back to the template, so the next builder does not have to learn it. Then, before you leave, send the first prompt of stage 08: ask your agent which of your app's lessons belong in a skill or a memory. The prompt: "What is one lesson the next builder should not have to learn?" |
-| 51-56 | Enough, for now | Question | In your own words. Only your leaders read it. The prompt: "What is enough about this version, for now, and for whom?" |
-| 56-60 | Your questions | Question | Anything from this session you are still wondering about. Your leaders read every answer before the next session. The prompt: "What questions do you still have?" |
+| 0-4 | Welcome | Talk | Guests are welcome  Each builder shows their app, and one decision behind it |
+| 4-44 | The showing | Presenter | The builder says who the app is for  Everyone tries it  The builder explains one decision, and what waits for the next version The prompt: "Show your app, the feature you wanted, and one decision behind it." |
+| 44-56 | What the next builder should not have to learn | Reflection | The lesson: ___  Where it lives now (a memory, a skill, a decision): ___ The prompt: "What is one lesson the next builder should not have to learn?" |
+| 56-60 | Your questions | Question | Only your leaders read the answers. The prompt: "What questions do you still have?" |
 
 Every scene can be changed on the session's page before it runs, and in the Meet add-on while it runs.
 

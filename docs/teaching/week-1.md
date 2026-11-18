@@ -65,28 +65,24 @@ written, played with, and published
 
 | Minutes (75) | Scene | Kind | What happens |
 |---|---|---|---|
-| 0-5 | Arrive | Talk | One line in the chat from your noticing log: the one you keep thinking about. Then what I read in your answers last session, and what I changed because of them. |
-| 5-29 | Show what you built | Rehearsal rooms | In your group's room, each person reads from the log they kept for five days. The prompt: "Read three lines from your noticing log, say which one you keep coming back to, and why. Questions are about what happened, never about an app." |
-| 29-32 | Break | Break |  |
-| 32-39 | Computer-shaped and human-shaped | Talk | A computer-shaped problem is one a database and some code can take control of: counting, sorting, reminding. A human-shaped problem is something in your life that has gone unsolved for months or years, that you wonder about often, and that you cannot do yourself with the tools you have. It is about people's stories more than data points. This week you choose one, and your agent stays closed until you have, because the problem has to be yours before anyone helps. |
-| 39-53 | Hold one to the tests | Design stage | With your agent closed, take the log line you keep coming back to and write it as a problem: what happens in your life, then "I need something that..." Put it on the board and hold it to the ten tests in stage 00, marking each yes, not yet, or I don't know. A "not yet" is the next thing to find out, not a failure. On the board: *Problem tests*. |
-| 53-65 | Start | Reflection | Before you leave, name two people who might have this problem, and write three questions for them that each start "Tell me about the last time you..." Do not describe an app. This week is stage 00, then stage 01 once your problem holds: the smallest real version, live with real data, in the hands of one of those two people. The prompt: "Who are the two people you will talk to this week, and what is your first "Tell me about the last time you..." question?" |
-| 65-70 | Who else has it? | Question | Only your leaders see your answer. The prompt: "How sure are you, right now, that someone besides you has this problem?" |
-| 70-75 | Your questions | Question | Anything from this session you are still wondering about. Your leaders read every answer before the next session. The prompt: "What questions do you still have?" |
+| 0-8 | What your log holds | Talk | One line from your noticing log  Who else it happens to |
+| 8-41 | Hear each problem | Rehearsal rooms | In your group's room, each person reads the log line they keep coming back to; the others ask one question each about what happened, never about an app. The prompt: "Read the noticing log line you keep coming back to, and say why." |
+| 41-44 | Break | Break |  |
+| 44-56 | Hold yours to the tests | Design stage | Your own problem on the board  Hold it to the tests, one at a time On the board: *Problem tests*. |
+| 56-71 | Write your first prompt | Reflection | I want to build an app that helps ___ to ___  Start with ___  This is done when ___  It must never ___ The prompt: "Paste the first prompt you are sending to your agent." |
+| 71-75 | Your questions | Question | Only your leaders read the answers. The prompt: "What questions do you still have?" |
 
-**In the rehearsal rooms,** each builder's turn runs these scenes, 7 minutes in all: read three lines from your log (3), the one you keep coming back to, and why (2), one question about what happened (2). The room's prompt is on screen the whole time.
+**In the rehearsal rooms,** each builder's turn runs these scenes, 11 minutes in all: read the line, and why (2), one question each about what happened (5), which problem you will keep (4). The room's prompt is on screen the whole time.
 
 **At 60 minutes,** for a cohort of fewer than eight learners, everyone stays in the one call:
 
 | Minutes (60) | Scene | Kind | What happens |
 |---|---|---|---|
-| 0-4 | Arrive | Talk | One line in the chat from your noticing log: the one you keep thinking about. Then what I read in your answers last session, and what I changed because of them. |
-| 4-24 | Show what you built | Presenter | With everyone in the call, about five minutes each: read three lines from the log you kept for five days, say which one you keep coming back to and why, and hear one question about what happened. The prompt: "Read three lines from your noticing log, say which one you keep coming back to, and why. Questions are about what happened, never about an app." |
-| 24-30 | Computer-shaped and human-shaped | Talk | A computer-shaped problem is one a database and some code can take control of: counting, sorting, reminding. A human-shaped problem is something in your life that has gone unsolved for months or years, that you wonder about often, and that you cannot do yourself with the tools you have. It is about people's stories more than data points. This week you choose one, and your agent stays closed until you have, because the problem has to be yours before anyone helps. |
-| 30-42 | Hold one to the tests | Design stage | With your agent closed, take the log line you keep coming back to and write it as a problem: what happens in your life, then "I need something that..." Put it on the board and hold it to the ten tests in stage 00, marking each yes, not yet, or I don't know. A "not yet" is the next thing to find out, not a failure. On the board: *Problem tests*. |
-| 42-52 | Start | Reflection | Before you leave, name two people who might have this problem, and write three questions for them that each start "Tell me about the last time you..." Do not describe an app. This week is stage 00, then stage 01 once your problem holds: the smallest real version, live with real data, in the hands of one of those two people. The prompt: "Who are the two people you will talk to this week, and what is your first "Tell me about the last time you..." question?" |
-| 52-56 | Who else has it? | Question | Only your leaders see your answer. The prompt: "How sure are you, right now, that someone besides you has this problem?" |
-| 56-60 | Your questions | Question | Anything from this session you are still wondering about. Your leaders read every answer before the next session. The prompt: "What questions do you still have?" |
+| 0-6 | What your log holds | Talk | One line from your noticing log  Who else it happens to |
+| 6-30 | Hear each problem | Presenter | The builder reads the line they keep coming back to, and why  Each person asks one question about what happened, never about an app  The builder says which problem they will keep, and who else has it The prompt: "Read the noticing log line you keep coming back to, and say why." |
+| 30-42 | Hold yours to the tests | Design stage | Your own problem on the board  Hold it to the tests, one at a time On the board: *Problem tests*. |
+| 42-56 | Write your first prompt | Reflection | I want to build an app that helps ___ to ___  Start with ___  This is done when ___  It must never ___ The prompt: "Paste the first prompt you are sending to your agent." |
+| 56-60 | Your questions | Question | Only your leaders read the answers. The prompt: "What questions do you still have?" |
 
 Every scene can be changed on the session's page before it runs, and in the Meet add-on while it runs.
 
