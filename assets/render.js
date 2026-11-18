@@ -24,6 +24,7 @@
     'docs/path/07-raising-the-ceiling.md': '/path/07/',
     'docs/path/08-working-with-ai.md': '/path/08/',
     'docs/teaching/README.md': '/teach/guide/weeks/',
+    'docs/teaching/leading-a-session.md': '/teach/guide/session/',
     'docs/teaching/before.md': '/teach/guide/before/',
     'docs/teaching/week-1.md': '/teach/guide/week-1/',
     'docs/teaching/week-2.md': '/teach/guide/week-2/',
