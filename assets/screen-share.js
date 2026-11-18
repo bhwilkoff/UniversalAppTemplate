@@ -70,13 +70,44 @@
   function watch(o) {
     var ch = channel(o.db, o.id), me = uuid(), pc = null, done = false, asked = null, got = false;
     function state(s) { if (o.onState) o.onState(s); }
+    // Meet's stage frame has autoplay turned off (measured 2026-10-28), so a
+    // <video> stays black without a press. Where the browser can read the
+    // frames themselves (MediaStreamTrackProcessor), they are drawn on a canvas,
+    // which needs no permission; otherwise the video asks to be pressed.
+    var reading = null;
+    function show(stream, track) {
+      o.video.srcObject = stream;
+      var P = root.MediaStreamTrackProcessor;
+      if (P && o.canvas && track && track.kind === 'video') {
+        try {
+          var reader = new P({ track: track }).readable.getReader(), g = o.canvas.getContext('2d');
+          reading = reader;
+          o.canvas.hidden = false; o.video.hidden = true;
+          (function pump() {
+            reader.read().then(function (r) {
+              if (r.done || reading !== reader) return;
+              var f = r.value;
+              if (o.canvas.width !== f.displayWidth) { o.canvas.width = f.displayWidth; o.canvas.height = f.displayHeight; }
+              g.drawImage(f, 0, 0, o.canvas.width, o.canvas.height);
+              f.close();
+              pump();
+            }, function () {});
+          })();
+          state('showing');
+          return;
+        } catch (e) { reading = null; }
+      }
+      if (o.canvas) o.canvas.hidden = true;
+      o.video.hidden = false;
+      Promise.resolve(o.video.play()).then(function () { state('showing'); }, function () { state('press'); });
+    }
     function ask() { if (!done && !got) say(ch, 'want', { viewer: me }); }
     ch.on('broadcast', { event: 'offer' }, function (m) {
       var p = m.payload || {};
       if (p.to !== me || done) return;
       if (pc) try { pc.close(); } catch (e) {}
       pc = new RTCPeerConnection({ iceServers: ICE });
-      pc.ontrack = function (e) { got = true; o.video.srcObject = e.streams[0]; state('showing'); };
+      pc.ontrack = function (e) { got = true; show(e.streams[0], e.track); };
       pc.onicecandidate = function (e) { if (e.candidate) say(ch, 'ice-up', { viewer: me, candidate: e.candidate.toJSON() }); };
       pc.onconnectionstatechange = function () {
         if (pc.connectionState === 'failed') { got = false; state('blocked'); }
@@ -92,12 +123,17 @@
       if (p.to === me && pc && p.candidate) pc.addIceCandidate(p.candidate).catch(function () {});
     });
     ch.on('broadcast', { event: 'ready' }, function () { if (!got) ask(); });
-    ch.on('broadcast', { event: 'end' }, function () { got = false; if (pc) try { pc.close(); } catch (e) {} pc = null; o.video.srcObject = null; state('ended'); });
+    ch.on('broadcast', { event: 'end' }, function () {
+      got = false; reading = null;
+      if (pc) try { pc.close(); } catch (e) {}
+      pc = null; o.video.srcObject = null;
+      state('ended');
+    });
     state('waiting');
     ch.subscribe(function (status) { if (status === 'SUBSCRIBED') { ask(); asked = setInterval(ask, 4000); } });
     return {
       stop: function () {
-        done = true; clearInterval(asked);
+        done = true; clearInterval(asked); reading = null;
         if (pc) try { pc.close(); } catch (e) {}
         o.video.srcObject = null;
         try { o.db.removeChannel(ch); } catch (e) {}

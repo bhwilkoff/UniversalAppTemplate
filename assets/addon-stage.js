@@ -359,11 +359,14 @@
       if (!screenDb) screenDb = window.supabase.createClient(window.HUB.url, window.HUB.key, { auth: { persistSession: false, autoRefreshToken: false } });
       var wrap = document.createElement('div'); wrap.className = 'stage-screen';
       var video = document.createElement('video'); video.autoplay = true; video.muted = true; video.playsInline = true;
+      var canvas = document.createElement('canvas'); canvas.hidden = true;
       var line = document.createElement('p'); line.className = 'stage-screen-line';
-      wrap.appendChild(video); wrap.appendChild(line);
+      var press = document.createElement('button'); press.type = 'button'; press.className = 'btn-primary stage-screen-press'; press.textContent = 'Press to watch'; press.hidden = true;
+      press.addEventListener('click', function () { Promise.resolve(video.play()).then(function () { press.hidden = true; line.hidden = true; }, function () {}); });
+      wrap.appendChild(video); wrap.appendChild(canvas); wrap.appendChild(line); wrap.appendChild(press);
       box.replaceChildren(wrap);
       var words = { waiting: 'Connecting to ' + v.who + '’s screen…', showing: '', blocked: 'This network will not carry the screen. ' + v.who + ' can share with Meet’s own Present now.', ended: v.who + ' stopped sharing.' };
-      screenWatch = window.ScreenShare.watch({ db: screenDb, id: screenId, video: video, onState: function (st) { line.textContent = words[st] || ''; line.hidden = !words[st]; } });
+      screenWatch = window.ScreenShare.watch({ db: screenDb, id: screenId, video: video, canvas: canvas, onState: function (st) { press.hidden = st !== 'press'; line.textContent = words[st] || ''; line.hidden = !words[st]; } });
       return;
     }
     var f = document.createElement('iframe');
