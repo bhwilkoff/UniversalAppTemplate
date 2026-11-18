@@ -3357,30 +3357,38 @@
     });
   });
 
-  // Close the main stage and keep the activity (Ben, Week 3 debrief, November
-  // 18, 2026: "I still cannot figure out where to close the main stage so that
-  // someone can share their screen without ending the activity"). The stage
-  // opens because the activity's starting state names it, so the activity is
-  // started again naming only the panel. Open the main stage names both again.
+  // Close the main stage so someone can share their screen (Ben, Week 3
+  // debrief, November 18, 2026). Measured in a real call that day: Meet keeps
+  // the stage for as long as the activity runs; a second startActivity during
+  // it is refused ("Operation cannot be performed while an activity is
+  // ongoing"), pinning a tile for everyone leaves the stage as it is, and the
+  // SDK has no call that closes only the stage. Ending the activity closes it,
+  // and everyone's panel with it; when the stage opens again, Meet shows each
+  // person a Join activity card where their panel was, and one press brings
+  // back the stage and the panel. So this asks first, in place, and says so.
   $('[data-close-stage]').addEventListener('click', function () {
-    var status = $('[data-stage-status]');
+    var status = $('[data-stage-status]'), btn = this;
+    if (!btn.getAttribute('data-sure')) {
+      btn.setAttribute('data-sure', '1');
+      btn.textContent = 'Close it for everyone';
+      status.textContent = 'Human Shaped closes for everyone, and a screen share gets the whole window. Afterward everyone presses Join activity.';
+      clearTimeout(S.closeSureTimer);
+      S.closeSureTimer = setTimeout(function () { btn.removeAttribute('data-sure'); btn.textContent = 'Close the main stage'; status.textContent = ''; }, 15000);
+      return;
+    }
+    clearTimeout(S.closeSureTimer);
+    btn.removeAttribute('data-sure'); btn.textContent = 'Close the main stage';
     status.textContent = 'Closing the main stage…';
-    var only = { sidePanelUrl: location.origin + '/addon/' };
-    Promise.resolve().then(function () { return side.startActivity(only); }).then(function () {
-      console.log('[addon] close stage: startActivity(side panel only) resolved');
+    Promise.resolve().then(function () { return side.endActivity(); }).then(function () {
       S.stageOn = false; stageButtons(false);
-      status.textContent = 'The main stage is closed and the activity goes on. Open the main stage brings it back for everyone.';
+      status.textContent = 'The main stage is closed. To bring it back, open Human Shaped from Meeting tools.';
     }, function (err) {
-      console.log('[addon] close stage: startActivity(side panel only) failed: ' + (err && (err.message || err.name) || err));
-      return Promise.resolve().then(function () { return side.setActivityStartingState(only); }).then(function () {
-        status.textContent = 'Meet would not close the stage now (' + (err && (err.message || err.name) || 'no reason given') + '). People who join from here on get the panel only.';
-      }, function (e2) {
-        status.textContent = 'Meet would not close the stage: ' + (err && (err.message || err.name) || 'no reason given') + '; ' + (e2 && (e2.message || e2.name) || '') ;
-      });
+      status.textContent = 'Meet would not close it: ' + (err && (err.message || err.name) || 'no reason given') + '. Meet’s own End activity, at the top right, does the same.';
     });
   });
-  // The panel never ends Meet's activity: that closes every learner's panel
-  // (Week 2, November 11). Meet's own End activity does it, at the end.
+  // The panel ends Meet's activity only from Close the main stage, which asks
+  // first (Week 2, November 11: a Close that ended it unasked cost learners
+  // their panels for up to 25 minutes).
   function stageButtons(open) {
     if (!S.teaching || standalone) return;
     $('[data-open-stage]').hidden = !!open;
