@@ -979,6 +979,7 @@
     if (standalone) document.title = (window.CohortLib ? window.CohortLib.sessionName(S.session.number, S.cohort) : 'Week ' + S.session.number) + ', ' + S.cohort.title + ' | Human Shaped';
     $('[data-fallback-link]').href = '/addon/?c=' + encodeURIComponent(S.cohort.slug) + '&s=' + S.session.number;
     $('[data-open-stage]').hidden = !S.teaching || standalone;
+    $('[data-open-panels]').hidden = !S.teaching || standalone || !!S.stageOn;
     stageButtons(S.stageOn);
     // The main stage is a leader's first move in a call, so its button sits
     // at the top of the panel, not below every part.
@@ -1088,7 +1089,7 @@
     if (S.teaching) {
       var stage = el('section', 'p2-group');
       var acts = el('div', 'actions');
-      ['[data-open-stage]', '[data-close-stage]', '[data-welcome-toggle]'].forEach(function (s) { acts.appendChild($(s)); });
+      ['[data-open-stage]', '[data-open-panels]', '[data-close-stage]', '[data-welcome-toggle]'].forEach(function (s) { acts.appendChild($(s)); });
       stage.appendChild(acts);
       stage.appendChild($('[data-stage-status]'));
       F.put('tools', stage);
@@ -3344,6 +3345,23 @@
     if (shared()) S.run.go(first.key).then(function () { return S.run.clock(true); });
     else { S.chosenPart = first.key; drawPart(true); }
   });
+  // Everyone's panel, and no main stage (Ben, November 18, 2026: the activity
+  // should "flow from one person to another without having to leave a massive
+  // main stage slide on the screen"). Meet then gives the call's own tiles and
+  // any screen share the whole window, and the session runs in each panel.
+  $('[data-open-panels]').addEventListener('click', function () {
+    var status = $('[data-stage-status]');
+    status.textContent = 'Opening everyone’s panel…';
+    Promise.resolve().then(function () { return side.startActivity({ sidePanelUrl: location.origin + '/addon/' }); }).then(function () {
+      S.panelsOnly = true; S.stageOn = false; stageButtons(false);
+      $('[data-open-panels]').hidden = true; $('[data-close-stage]').hidden = true;
+      status.textContent = 'Everyone’s panel is open, with no main stage. Ask everyone to press Join activity.';
+      console.log('[addon] panels only: startActivity(side panel only) resolved');
+    }, function (err) {
+      status.textContent = 'Meet would not open the panels: ' + (err && (err.message || err.name) || 'no reason given');
+      console.log('[addon] panels only failed: ' + (err && (err.message || err.name) || err));
+    });
+  });
   $('[data-open-stage]').addEventListener('click', function () {
     var status = $('[data-stage-status]');
     status.textContent = 'Opening the main stage…';
@@ -3394,7 +3412,8 @@
   // their panels for up to 25 minutes).
   function stageButtons(open) {
     if (!S.teaching || standalone) return;
-    $('[data-open-stage]').hidden = !!open;
+    $('[data-open-stage]').hidden = !!open || !!S.panelsOnly;
+    $('[data-open-panels]').hidden = !!open || !!S.panelsOnly;
     $('[data-close-stage]').hidden = !open;
     sendStage();
   }
