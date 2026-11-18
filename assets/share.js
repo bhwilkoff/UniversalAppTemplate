@@ -56,7 +56,9 @@
       g.fillStyle = '#fff'; g.font = 'bold 72px sans-serif'; g.fillText('Test picture from /share/', 120, 300);
       g.font = '48px sans-serif'; g.fillText('Seconds since it started: ' + sec, 120, 420);
       g.fillStyle = '#9fd3b0'; g.fillRect(120 + (sec % 10) * 100, 500, 80, 80);
-      if (stream) requestAnimationFrame(tick); else setTimeout(tick, 100);
+      // A timer, not requestAnimationFrame, which Chrome pauses in a tab that
+      // is not in front, and a paused canvas sends no frames.
+      setTimeout(tick, 100);
     })();
     return c.captureStream(15);
   }
