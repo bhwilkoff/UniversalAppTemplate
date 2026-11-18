@@ -92,6 +92,7 @@
       var sc = view.scene;
       drawBoard(sc.board || null);
       $('[data-s-eyebrow]').textContent = sc.eyebrow;
+      $('[data-s-eyebrow]').hidden = !sc.eyebrow;
       $('[data-s-title]').textContent = sc.title;
       var lines = $('[data-s-lines]'); lines.replaceChildren();
       // Long words get a smaller size rather than a cut (found in the live
@@ -124,7 +125,8 @@
       // A learner who can answer reads what to do; everyone else, what it is.
       var canPick = view.answerable && ['choice', 'scale', 'multi'].indexOf(view.kind) >= 0, canWrite = view.answerable && (view.kind === 'short' || view.kind === 'words');
       $('[data-check-kicker]').textContent = view.rerun ? 'Asked again: how have the answers moved?'
-        : canPick ? (view.kind === 'multi' ? 'Choose any that fit' : 'Choose your answer') : canWrite ? 'Write your answer' : 'A question for everyone';
+        : canPick ? (view.kind === 'multi' ? 'Choose any that fit' : 'Choose your answer') : '';
+      $('[data-check-kicker]').hidden = !$('[data-check-kicker]').textContent;
       // With the results shown, the bars come from them (an order is
       // sorted, first place at the top); before, the choices alone.
       var count = view.count;
@@ -591,7 +593,7 @@
     root.querySelectorAll('[data-ends]').forEach(function (p) {
       var ends = Number(p.getAttribute('data-ends'));
       var left = p.getAttribute('data-ends') ? A.timeLeft(ends, Date.now()) : null;
-      p.textContent = left == null ? '' : left ? L.clock(left) + ' left in this step' : 'Time to move on';
+      p.textContent = left == null ? '' : left ? L.clock(left) + ' left in this part' : 'Time is up';
       p.classList.toggle('is-over', left === 0);
     });
     if (view.mode === 'card') {

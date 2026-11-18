@@ -277,7 +277,7 @@ Ben: "You should definitely do a learner panel test," then "Can we solve for the
 - **A leader's move reaches learners at once.** After every move or pin the leader's panel nudges the call's channel, and each learner's panel reads the show again; the database's change events, seconds slower, stay as the fallback.
 - **A board note starts in the template's first frame**, each next one a little lower and to the right, unless the person has zoomed in on one frame. Notes are written in Write a note at the foot of the board.
 - **One name per feature.** Featuring is Feature someone in Now and in Tools; the board is The board on the stage; the rooms are Every room; a group's own call is its room, never a rehearsal room or a trio.
-- **A learner's Mine** keeps each closed section's disclosure marker, and leaves out who is waiting to show, which Show my app at the top already covers. A guest's link says Sign in as a member of this cohort.
+- **A learner's panel** (one view since 2026-11-12; the word "Mine" is retired because it named nothing) keeps each closed section's disclosure marker, and leaves out who is waiting to show, which Show my app at the top already covers. A guest's link says Sign in as a member of this cohort.
 - **Joining late** is the activity icon at the top right of Meet, then Join activity, wherever the panel tells people how.
 - **Words on the stage** keep one fact each: where to answer, and that counts show without names. An answer put on the stage is set as a quote. A learner's request reads "asks for a message on the stage: “…”".
 
@@ -289,7 +289,7 @@ tools." Research and the call that prompted it: research/notes/addon-onboarding-
 1. **The first time a panel opens, it shows its person around, one place at a
    time.** A learner's tour names the stage first (a live class the leader
    moves, which they can click), then reactions and Ask, then their panel, then
-   Mine; stage stops wait until their stage is open. A leader's names Now, Next,
+   the learner's panel; stage stops wait until their stage is open. A leader's names Now, Next,
    Plan, and Tools. Four stops at most, Next on each, and ? in the header
    replays it.
 2. **Each new thing is taught the first time it appears, in one line:** a

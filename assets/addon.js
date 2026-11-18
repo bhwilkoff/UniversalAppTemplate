@@ -1253,7 +1253,7 @@
     if (!S.nowHead) { S.nowHead = el('h2', 'p2-now-head'); now.insertBefore(S.nowHead, now.firstChild); }
     var showing = !!(part && part.kind === 'presenter');
     var room = S.svc && S.svc.showing ? S.svc.showing() : null;
-    var head = questionWaiting() ? 'Answer the question' : room === 'board' ? 'Propose an idea, and vote' : room === 'page' ? 'Try the website on your screen' : showing ? 'Show your app' : '';
+    var head = questionWaiting() ? 'Answer the question' : room === 'board' ? 'Propose an idea, and vote' : room === 'page' ? 'Try the website on your screen' : showing ? 'Your turn to show' : '';
     if (S.nowHead.textContent !== head) S.nowHead.textContent = head;
     S.nowHead.hidden = !head;
     if (now.firstChild !== S.nowHead) now.insertBefore(S.nowHead, now.firstChild);
@@ -1277,7 +1277,7 @@
       lines.push((nx.kindName || 'Part') + (nx.minutes ? ', ' + nx.minutes + ' min' : ''));
       var q = nx.own ? plannedAsk(nx) : null;
       if (q) lines.push('Asks everyone \u201c' + q.prompt + '\u201d when you get there');
-      if (nx.kind === 'presenter') lines.push('Each learner gets Show your app at the top of their panel');
+      if (nx.kind === 'presenter') lines.push('Each learner gets Show my app to everyone at the top of their panel');
       if (nx.kind === 'design') lines.push('Puts the board on the stage');
       else if (!q) lines.push(nx.slides ? 'Puts its slides on the stage' : 'Puts its title and words on the stage');
       if (nx.goal) lines.push(nx.goal);
@@ -1306,9 +1306,9 @@
     }
     var open = (S.checks || []).filter(function (k) { return k.state === 'open'; });
     var lines = [];
-    if (open.length) lines.push('Their panel: Answer the question, \u201c' + open[0].prompt + '\u201d, at the top of Now');
-    else if (part && part.kind === 'presenter') lines.push('Their panel: Show your app, at the top of Now');
-    else lines.push('Their panel: reactions, and Ask your leader');
+    if (open.length) lines.push('Their panel: the question, \u201c' + open[0].prompt + '\u201d, at the top');
+    else if (part && part.kind === 'presenter') lines.push('Their panel: Show my app to everyone, at the top');
+    else lines.push('Their panel: Ask your leader');
     var v = S.session ? currentView() : null;
     var writes = v && (v.kind === 'short' || v.kind === 'words');
     if (v && v.mode === 'check' && S.stageOn) lines.push('Their stage: ' + A.stageSays(v) + ', with ' + (v.count ? 'the counts and ' : '') + (writes ? 'a box to write in' : 'buttons to answer'));
@@ -1333,7 +1333,7 @@
     if (!part) return { label: 'Start the session', go: 'start' };
     if (info && info.next !== 'Next part') return { label: info.next, go: 'step' };
     var list = S.list || [], at = list.indexOf(part), after = list[at + 1];
-    return after ? { label: 'Next: ' + after.name, go: 'step' } : { label: 'This is the last part', disabled: true };
+    return after ? { label: 'Next part', go: 'step' } : { label: 'Last part', disabled: true };
   }
   function nextMove() {
     var n = nextStep();
@@ -2897,6 +2897,10 @@
     var part = partNow();
     if (!S.teaching || !part || !part.own) return;
     var q = plannedAsk(part);
+    // Only arriving at a part opens its question again; a slide step inside
+    // it leaves a question the leader closed closed (Ben, 2026-11-18).
+    var arrived = S.askedFor !== part.key;
+    S.askedFor = part.key;
     // The question another part asked closes, so learners only ever face
     // what this part asks, on every kind of part (found in a real call: a
     // Writing part's panel still showed the question from a part left
@@ -2920,7 +2924,7 @@
     if (pair && !pair.first) pair = null;
     if (pair) {
       if (pair.first && pair.first.state === 'open') changeCheck(pair.first, { state: 'closed' });
-      if (pair.again) { if (pair.again.state !== 'open') changeCheck(pair.again, { state: 'open' }); return; }
+      if (pair.again) { if (pair.again.state !== 'open' && arrived) changeCheck(pair.again, { state: 'open' }); return; }
       if (!pair.first || S.autoAsked[part.key]) return;
       S.autoAsked[part.key] = true;
       var tallyAgain = part.config && typeof part.config.show_tally === 'boolean' ? part.config.show_tally : $('[data-ask-tally]').checked;
@@ -2931,7 +2935,7 @@
     // (found in the live Meet test: Back showed a question no one could
     // answer); a first arrival asks it, once.
     var mine = (S.checks || []).filter(function (k) { return k.prompt === q.prompt; })[0];
-    if (mine) { if (mine.state !== 'open') changeCheck(mine, { state: 'open' }); return; }
+    if (mine) { if (mine.state !== 'open' && arrived) changeCheck(mine, { state: 'open' }); return; }
     if (S.autoAsked[part.key]) return;
     S.autoAsked[part.key] = true;
     // Its own card says it is open, so only a problem leaves a line.
@@ -2983,6 +2987,12 @@
     if (part && SL && V && (shared() || part.own)) {
       var s = S.draft && S.draft.key === part.key ? V.draft(part, S.draft.fields) : part;
       scene = SL.stagePreview(V.asRow(s));
+      // A part's question the leader closed says so, rather than still asking
+      // for answers nobody can give (Ben, 2026-11-18: "Close it" seemed to do
+      // nothing, because the stage kept the question and its instructions).
+      var planned = s.kind === 'question' || s.kind === 'reflection' ? plannedAsk(s) : null;
+      var askedIt = planned ? (S.checks || []).filter(function (k) { return k.prompt === planned.prompt; }) : [];
+      if (askedIt.length && !askedIt.some(function (k) { return k.state === 'open'; })) scene.note = 'This question is closed.';
       // A design scene puts the board itself on the main stage (R5): the
       // room's own board in a trio's call, the session's in the main room.
       if (s.kind === 'design') {

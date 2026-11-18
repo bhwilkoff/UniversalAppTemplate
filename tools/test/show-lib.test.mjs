@@ -63,7 +63,9 @@ test('copying starts from the latest earlier week that has a run of show', () =>
 
 test('the preview shows what the main stage will', () => {
   const q = S.stagePreview({ kind: 'question', title: 'Check', minutes: 3, config: { prompt: 'Which one?', options: ['This', 'That'] } });
-  assert.equal(q.eyebrow, 'Question');
+  // The stage names no kind of part; the title says what it is (2026-11-18).
+  assert.equal(q.eyebrow, '');
+  assert.equal(S.stagePreview({ kind: 'break', title: 'Pause', minutes: 5, config: {} }).eyebrow, 'Break');
   assert.deepEqual(q.lines, ['Which one?']);
   assert.deepEqual(q.items, ['This', 'That']);
   const r = S.stagePreview({ kind: 'rooms', title: 'Rooms', minutes: 25, config: { room_scenes: [{ title: 'Their question', minutes: 2 }] } });
@@ -89,7 +91,8 @@ test('a question scene carries its kind, and the stage preview says how it is an
   assert.match(S.problem({ ...ok, config: { prompt: 'x', kind: 'words', options: ['a', 'b'] } }), /no choices/);
   const words = S.stagePreview({ kind: 'question', title: 'Word', minutes: 3, config: { prompt: 'One word', kind: 'words' } });
   assert.deepEqual(words.items, []);
-  assert.match(words.note, /words show here together/);
+  assert.equal(words.note, 'No names are shown.');
+  assert.equal(S.stagePreview({ kind: 'question', title: 'Q', minutes: 3, config: { prompt: 'Why?', kind: 'short' } }).note, 'Only your leaders read the answers.');
   assert.deepEqual(S.cleanConfig('question', { prompt: 'x', kind: 'multi', options: ['a', 'b'], question_id: 'q', template: 't' }), { prompt: 'x', kind: 'multi', options: ['a', 'b'], question_id: 'q' });
 });
 

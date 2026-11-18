@@ -492,7 +492,7 @@ real learners.
 ## The shared main stage in real calls (November 6, 2026)
 
 Passed in a real call, leader and learner on this Mac: a learner's live app on both
-stages, typed into; a learner asking from Mine and the leader's Show it in Now; a
+stages, typed into; a learner asking from their panel and the leader's Show it in Now; a
 leader showing anyone's app from Tools; answering and reacting on the stage; the board
 filling the stage, with a note, names, and two people's votes; and commits from GitHub
 on a slide on the stage. Not tried: a GitHub slide on a learner's stage, a page that

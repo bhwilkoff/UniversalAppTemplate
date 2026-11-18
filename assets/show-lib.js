@@ -192,7 +192,7 @@
   function stagePreview(scene) {
     var k = kind(scene.kind) || KINDS[0];
     var c = scene.config || {};
-    var p = { eyebrow: k.name, title: String(scene.title || ''), lines: [], items: [], minutes: Number(scene.minutes) || 0 };
+    var p = { eyebrow: k.key === 'break' ? k.name : '', title: String(scene.title || ''), lines: [], items: [], minutes: Number(scene.minutes) || 0 };
     if (scene.body) p.lines = String(scene.body).split(/\n{2,}/).map(function (x) { return x.trim(); }).filter(Boolean).slice(0, 4);
     if (k.key === 'question') {
       if (c.prompt) p.lines = [c.prompt];
@@ -202,14 +202,7 @@
         for (var i = 1; i <= n && i <= 10; i++) p.items.push(i === 1 && ends[0] ? '1 (' + ends[0] + ')' : i === n && ends[1] ? i + ' (' + ends[1] + ')' : String(i));
       } else if (qk !== 'words' && qk !== 'short') p.items = (c.options || []).slice(0, 8);
       // The room reads this on the main stage, so it speaks to learners.
-      p.note = {
-        choice: 'Choose one in your panel, and the counts show here without names.',
-        multi: 'Choose any that fit in your panel, and the counts show here without names.',
-        scale: 'Pick a point in your panel, and the counts show here without names.',
-        rank: 'Put these in order in your panel, and the average order shows here without names.',
-        words: 'Give a word or a few in your panel, and the words show here together without names.',
-        short: 'Answer in your own words in your panel, and your leader may show one here without its name.'
-      }[qk];
+      p.note = qk === 'short' ? 'Only your leaders read the answers.' : 'No names are shown.';
     } else if (k.key === 'presenter') {
       p.note = c.prompt || 'The work being shown fills the stage.';
     } else if (k.key === 'design') {
