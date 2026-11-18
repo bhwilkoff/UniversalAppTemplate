@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Share your screen | Human Shaped</title>
+  <meta name="description" content="Share your screen onto the Human Shaped stage in a Meet call, so everyone sees it where the slide was.">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#131916" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="/assets/favicon.svg?v=20261006q" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/site.css?v=20261119d">
+  <script>
+    (function () {
+      try { var saved = localStorage.getItem('hs-theme'); if (saved === 'light' || saved === 'dark') document.documentElement.setAttribute('data-theme', saved); } catch (e) {}
+    })();
+  </script>
+  <style>
+    .share-page { max-width: 30rem; margin: 0 auto; padding: 1.25rem 1rem 2rem; }
+    .share-page video { width: 100%; border-radius: .75rem; background: #000; margin: .5rem 0; }
+  </style>
+</head>
+<body data-no-app-nav>
+  <!-- Share a screen onto the stage (November 18, 2026). Meet frames the
+       add-on without screen capture, so the panel opens this window. -->
+  <main class="share-page" data-share aria-live="polite">
+    <p class="ui-label">Share your screen</p>
+    <section data-state="loading"><p>Loading</p></section>
+    <section data-state="ready" hidden>
+      <h1>Share your screen on the stage</h1>
+      <p>Everyone sees it where the slide was, in their own Meet window.</p>
+      <div class="actions"><button class="btn-primary" type="button" data-start>Choose what to share</button></div>
+      <p class="small" role="status" data-share-status></p>
+    </section>
+    <section data-state="sharing" hidden>
+      <h1>Your screen is ready</h1>
+      <p data-line>Your leader puts it on the stage.</p>
+      <video data-preview autoplay muted playsinline></video>
+      <div class="actions"><button class="btn-primary" type="button" data-stop>Stop sharing</button></div>
+    </section>
+    <section data-state="done" hidden>
+      <h1>You stopped sharing</h1>
+      <p>You can close this window.</p>
+    </section>
+    <section data-state="none" hidden>
+      <h1>Open this from your Human Shaped panel</h1>
+      <p>In the Meet call, press Share my screen in your panel.</p>
+    </section>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" defer></script>
+  <script src="/assets/hub-config.js?v=20261016a" defer></script>
+  <script src="/assets/google-signin-lib.js" defer></script>
+  <script src="/assets/addon-lib.js?v=20261119a" defer></script>
+  <script src="/assets/screen-share.js?v=20261119d" defer></script>
+  <script src="/assets/share.js?v=20261119d" defer></script>
+</body>
+</html>

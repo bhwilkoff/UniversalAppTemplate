@@ -319,15 +319,32 @@
   var boardSrc = null;
   // Everyone's own working copy of a person's app. The frame stays put through
   // every later message, or a person's place in the app would be lost.
-  var appUrl = null;
+  var appUrl = null, screenWatch = null, screenDb = null;
+  function stopScreen() { if (screenWatch) { screenWatch.stop(); screenWatch = null; } }
   function drawApp(v) {
     var box = $('[data-app-frame]');
-    if (!v) { if (appUrl) { appUrl = null; box.replaceChildren(); } return; }
+    if (!v) { if (appUrl) { appUrl = null; stopScreen(); box.replaceChildren(); } return; }
     $('[data-app-who]').textContent = v.who;
     $('[data-app-open]').href = v.url;
     $('[data-app-note]').textContent = v.audience || v.note || '';
     if (v.url === appUrl) return;
     appUrl = v.url;
+    stopScreen();
+    // A screen someone shares from their /share/ window: the stage becomes
+    // their screen (assets/screen-share.js), streamed to this stage alone.
+    var screenId = window.ScreenShare && window.ScreenShare.idOf(v.url);
+    $('[data-app-open]').hidden = !!screenId;
+    if (screenId && window.supabase && window.HUB) {
+      if (!screenDb) screenDb = window.supabase.createClient(window.HUB.url, window.HUB.key, { auth: { persistSession: false, autoRefreshToken: false } });
+      var wrap = document.createElement('div'); wrap.className = 'stage-screen';
+      var video = document.createElement('video'); video.autoplay = true; video.muted = true; video.playsInline = true;
+      var line = document.createElement('p'); line.className = 'stage-screen-line';
+      wrap.appendChild(video); wrap.appendChild(line);
+      box.replaceChildren(wrap);
+      var words = { waiting: 'Connecting to ' + v.who + '’s screen…', showing: '', blocked: 'This network will not carry the screen. ' + v.who + ' can share with Meet’s own Present now.', ended: v.who + ' stopped sharing.' };
+      screenWatch = window.ScreenShare.watch({ db: screenDb, id: screenId, video: video, onState: function (st) { line.textContent = words[st] || ''; line.hidden = !words[st]; } });
+      return;
+    }
     var f = document.createElement('iframe');
     f.src = v.url;
     f.title = v.who + '’s app';

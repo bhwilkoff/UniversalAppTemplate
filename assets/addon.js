@@ -2334,6 +2334,12 @@
     drawClassApps(); drawBack();
     var app = S.myApp && !S.editApp ? L.classifyLink(S.myApp) : null;
     box.hidden = false;
+    // Share a screen onto the stage (Ben, November 18, 2026: the stage
+    // "simply converts from a slide to the app that is being demoed or the
+    // screen share that someone requests"): for an app that has no address
+    // yet, or one that will not open inside another page.
+    var screenWaiting = L.queue(S.items).waiting.filter(function (x) { return x.user_id === who() && x.kind === 'screen'; })[0];
+    if (!screenWaiting) box.appendChild(button('Share my screen on the stage', 'btn-secondary small p2-share-screen', openShare));
     if (!app) {
       // No address yet: add it here, without leaving the call.
       var f = el('form', 'p2-ask-form'), input = el('input'), said = el('span', 'small');
@@ -2452,9 +2458,13 @@
     var staged = S.onStage && S.onStage.kind === 'item' ? S.onStage.id : null;
     L.queue(S.items).waiting.filter(function (x) { return x.id !== staged; }).forEach(function (item) {
       var row = el('div', 'p2-ask');
-      row.appendChild(el('span', null, nameOf(item.user_id) + ' is ready to show'));
+      var isScreen = item.kind === 'screen';
+      row.appendChild(el('span', null, nameOf(item.user_id) + (isScreen ? ' is ready to show their screen' : ' is ready to show')));
       var said = el('span', 'small'); said.setAttribute('role', 'status');
-      row.appendChild(button('Show it', 'btn-secondary small', function () { showChecked(item.url, nameOf(item.user_id), said, function () { setPin({ kind: 'item', id: item.id }); }); }));
+      row.appendChild(button('Show it', 'btn-secondary small', function () {
+        if (isScreen) return setPin({ kind: 'item', id: item.id });
+        showChecked(item.url, nameOf(item.user_id), said, function () { setPin({ kind: 'item', id: item.id }); });
+      }));
       row.appendChild(said);
       box.appendChild(row);
     });
@@ -2661,6 +2671,18 @@
     d.appendChild(acts);
     box.appendChild(d);
   }
+  // The /share/ window takes this panel's sign-in, as /record/ does.
+  function openShare() {
+    var url = '/share/?c=' + encodeURIComponent(S.cohort.slug) + '&s=' + S.session.number + (S.asMember ? '&m=' + encodeURIComponent(S.asMember) : '');
+    S.shareWin = window.open(url, 'hs-share', 'popup,width=520,height=720');
+  }
+  window.addEventListener('message', function (event) {
+    if (!S.shareWin || !window.GoogleSignInLib || !window.GoogleSignInLib.isWant(event, location.origin, S.shareWin)) return;
+    db.auth.getSession().then(function (r) {
+      var se = r.data && r.data.session;
+      if (se) S.shareWin.postMessage(A.handoff(se), location.origin);
+    });
+  });
   // A leader puts in or changes a member's app address, checked first.
   function editAddress(li, p) {
     var f = el('form', 'p2-ask-form'), input = el('input'), said = el('span', 'small');
