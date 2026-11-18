@@ -1331,6 +1331,11 @@
     if (!S.teaching) return null;
     if (!S.stageOn && !standalone) return { label: 'Open the main stage', go: 'stage' };
     if (!part) return { label: 'Start the session', go: 'start' };
+    // The welcome pinned over a part hides it: the first press takes the
+    // welcome off, so the room sees the slide the leader is on (Week 3
+    // rehearsal, 2026-11-18: Next slide moved the panel while the stage
+    // stayed on the welcome).
+    if (S.onStage && S.onStage.kind === 'welcome') return { label: 'Start the session', go: 'unwelcome' };
     if (info && info.next !== 'Next part') return { label: info.next, go: 'step' };
     var list = S.list || [], at = list.indexOf(part), after = list[at + 1];
     return after ? { label: 'Next part', go: 'step' } : { label: 'Last part', disabled: true };
@@ -1340,6 +1345,7 @@
     if (!n || n.disabled) return;
     if (n.go === 'stage') return $('[data-open-stage]').click();
     if (n.go === 'start') return $('[data-start-session]').click();
+    if (n.go === 'unwelcome') return setPin(null);
     if (S.run) S.run.step(1).then(afterMove);
   }
   // Which session this call runs: the schedule's, or any other the leader picks
@@ -2348,7 +2354,7 @@
       var li = el('li', 'p2-class-app'), name = S.names[p.user_id] || 'Someone';
       var on = S.myStage && S.myStage.url === p.app_url;
       li.appendChild(el('span', null, name + (p.app_name ? ': ' + p.app_name : '')));
-      if (A.frameable(p.app_url)) li.appendChild(button(on ? 'On your screen' : 'Open it on my screen', 'link-button', function () { tryOnMyStage(p.app_url, name); }));
+      if (A.frameable(p.app_url)) li.appendChild(button(on ? 'Trying it' : 'Try it', 'link-button', function () { tryOnMyStage(p.app_url, name); }));
       var a = newTab(el('a', 'link-button', 'Open in a new tab')); a.href = p.app_url; li.appendChild(a);
       ul.appendChild(li);
     });
