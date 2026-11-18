@@ -896,6 +896,7 @@
     S.signals = window.LiveSignals.start({
       db: db, cohort: S.cohort, session: S.mainCall ? Object.assign({}, S.session, { meet_url: S.mainCall }) : S.session, meId: S.me.id, teaching: S.teaching, groups: S.groups,
       inRoom: function () { return !!S.room.groupId; },
+      roomGroup: function () { return S.room.groupId ? S.groups.filter(function (g) { return g.id === S.room.groupId; })[0] || null : null; },
       memberId: function () { return S.asMember || S.me.id; },
       // A card a leader shows goes on the main stage too, the one place
       // the whole call is looking (found in the loop's live Meet test: it
@@ -1648,6 +1649,7 @@
     $('[data-breakouts]').replaceChildren();
     S.breakouts = window.Breakouts.start({
       db: db, mount: $('[data-breakouts]'), cohort: S.cohort, session: S.session, signals: S.signals, nameOf: nameOf,
+      meId: S.me.id, requests: function () { return S.requests || []; },
       groups: function () { return S.groups; }, presence: function () { return S.presence || {}; }, reload: reloadGroups,
       preset: function () {
         var part = partNow();
@@ -1747,6 +1749,7 @@
       if (bad) { $('[data-sync]').textContent = 'The panel could not read the latest changes: ' + bad.error.message; return; }
       S.items = res[0].data; S.checks = res[1].data; S.answers = res[2].data;
       S.requests = res[3].data || [];
+      if (S.breakouts) S.breakouts.draw();
       if (S.isGuest) loadGuests();
       var visible = S.checks.filter(function (k) { return L.kindOf(k) !== 'short' && (S.teaching || k.show_tally); });
       // A question asked again (R17) needs its first results too, even closed.
@@ -2219,7 +2222,12 @@
   }
 
   // Anything a leader can do, a learner can ask for, and a leader decides.
-  var ASKS = { question: 'a question for everyone', card: 'a message on the stage', board: 'the board', breakouts: 'breakouts', other: 'their own question' };
+  var ASKS = { question: 'a question for everyone', card: 'a message on the stage', board: 'the board', breakouts: 'breakouts', other: 'their own question', help: 'you to come to their room' };
+  // The room a help request came from: the asker's breakout group.
+  function helpGroup(r) {
+    return S.groups.filter(function (g) { return g.breakout && (g.group_members || []).some(function (m) { return m.user_id === r.user_id; }); })[0]
+      || S.groups.filter(function (g) { return g.name === r.body; })[0] || null;
+  }
   function decide(r, state) {
     return db.from('live_requests').update({ state: state }).eq('id', r.id).then(function () { refreshLive(); });
   }
@@ -2390,19 +2398,27 @@
       var row = el('div', 'p2-ask is-request');
       var words = el('span');
       words.appendChild(el('strong', null, nameOf(r.user_id)));
-      words.appendChild(document.createTextNode(r.kind === 'other' && r.body ? ' asks: \u201c' + r.body + '\u201d' : ' asks for ' + ASKS[r.kind] + (r.body ? ': \u201c' + r.body + '\u201d' : '')));
+      words.appendChild(document.createTextNode(r.kind === 'help' ? ' asks you to come to ' + (r.body || 'their room') : r.kind === 'other' && r.body ? ' asks: \u201c' + r.body + '\u201d' : ' asks for ' + ASKS[r.kind] + (r.body ? ': \u201c' + r.body + '\u201d' : '')));
       row.appendChild(words);
       var acts = el('span', 'p2-ask-acts');
       // A learner's question is answered aloud, or put to everyone; "Do it"
       // meant nothing for a question (Ben, November 12, 2026).
-      if (r.kind === 'other') {
+      var helpRoom = r.kind === 'help' ? helpGroup(r) : null;
+      if (r.kind === 'help') {
+        if (helpRoom && /^https:/.test(helpRoom.meet_url || '')) {
+          var go = newTab(el('a', 'btn-secondary small', 'Go to the room')); go.href = helpRoom.meet_url;
+          go.addEventListener('click', function () { decide(r, 'done'); });
+          acts.appendChild(go);
+        }
+        acts.appendChild(button('Done', 'btn-secondary small', function () { decide(r, 'done'); }));
+      } else if (r.kind === 'other') {
         acts.appendChild(button('I answered it', 'btn-secondary small', function () { decide(r, 'done'); }));
         if (S.signals && r.body) acts.appendChild(button('Show it to everyone', 'btn-secondary small', function () {
           S.signals.send('card', { body: String(r.body).slice(0, 400), ends_at: new Date(Date.now() + 300000).toISOString() }, el('span'));
           decide(r, 'done');
         }));
       } else acts.appendChild(button('Do it', 'btn-secondary small', function () { doRequest(r); }));
-      acts.appendChild(button('Not now', 'btn-secondary small', function () { decide(r, 'declined'); }));
+      if (r.kind !== 'help') acts.appendChild(button('Not now', 'btn-secondary small', function () { decide(r, 'declined'); }));
       row.appendChild(acts);
       box.appendChild(row);
     });

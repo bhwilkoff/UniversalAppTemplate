@@ -73,7 +73,47 @@
         }).then(function () { placed = {}; status(''); draw(); });
       });
     }
-    function callBack() { o.signals.send('together', {}, { textContent: '' }).then(draw); }
+    // Call everyone back gives the rooms thirty seconds to finish (Meet's own
+    // breakouts do the same): the rooms' clock moves to thirty seconds from
+    // now, and when it reaches zero every room's panel says come back.
+    function callBack() {
+      var st = o.signals.state();
+      if (!st.rooms) return;
+      var left = (Date.parse(st.rooms.ends_at) || Infinity) - Date.now();
+      if (left <= 31000) { o.signals.send('together', {}, { textContent: '' }).then(draw); return; }
+      o.db.from('live_signals').update({ ends_at: new Date(Date.now() + 30000).toISOString() }).eq('id', st.rooms.id)
+        .then(function () { return o.signals.refresh(); }).then(draw);
+    }
+    function sendNote(text, said) {
+      var body = String(text || '').replace(/\s+/g, ' ').trim();
+      if (!body) { said.textContent = 'Write the message first.'; return Promise.resolve(false); }
+      if (body.length > 200) { said.textContent = 'At most 200 characters.'; return Promise.resolve(false); }
+      return o.db.from('live_signals').insert({ cohort_id: o.cohort.id, session_id: o.session.id, created_by: o.meId, kind: 'note', body: body })
+        .then(function (r) { said.textContent = r.error ? 'Not sent: ' + r.error.message : ''; return o.signals.refresh().then(function () { return !r.error; }); });
+    }
+    // Each room's group workbook so far, read at most every fifteen seconds.
+    var work = {}, workAt = 0;
+    function readWork() {
+      var ids = o.groups().filter(function (g) { return g.breakout; }).map(function (g) { return g.id; });
+      if (!ids.length || Date.now() - workAt < 15000) return;
+      workAt = Date.now();
+      o.db.from('workbook_answers').select('group_id, value, updated_at').in('group_id', ids).then(function (r) {
+        if (r.error) return;
+        var next = {};
+        (r.data || []).forEach(function (a) {
+          if (a.value == null || String(typeof a.value === 'string' ? a.value : JSON.stringify(a.value)).replace(/[\s"\[\]{}]/g, '') === '') return;
+          var w = next[a.group_id] || (next[a.group_id] = { n: 0, at: 0 });
+          w.n++; w.at = Math.max(w.at, Date.parse(a.updated_at) || 0);
+        });
+        var changed = JSON.stringify(next) !== JSON.stringify(work);
+        work = next;
+        if (changed && !box.querySelector("input:focus, select:focus")) draw();
+      });
+    }
+    function helpFor(g) {
+      var ids = (g.group_members || []).map(function (m) { return m.user_id; });
+      return (o.requests ? o.requests() : []).filter(function (r) { return r.kind === 'help' && r.state === 'waiting' && (ids.indexOf(r.user_id) >= 0 || r.body === g.name); })[0] || null;
+    }
     function more() {
       var st = o.signals.state();
       if (!st.rooms) return;
@@ -169,6 +209,26 @@
       return wrap;
     }
 
+    function ago(t) {
+      var s = Math.max(0, Math.round((Date.now() - t) / 1000));
+      return s < 60 ? 'just now' : Math.round(s / 60) + (Math.round(s / 60) === 1 ? ' minute ago' : ' minutes ago');
+    }
+    // A message every room's panel shows while the rooms run.
+    function noteForm(note) {
+      var f = el('form', 'cohort-form breakouts-note');
+      var lab = el('label', null, 'Message every room');
+      var inp = el('input'); inp.type = 'text'; inp.maxLength = 200;
+      lab.appendChild(inp); f.appendChild(lab);
+      var acts = el('div', 'actions'), said = el('span', 'ui-inline-status'); said.setAttribute('role', 'status');
+      var go = el('button', 'btn-secondary small', 'Send to every room'); go.type = 'submit';
+      acts.appendChild(go); acts.appendChild(said); f.appendChild(acts);
+      if (note) f.appendChild(el('p', 'small', 'Every room sees: \u201c' + note.body + '\u201d'));
+      f.addEventListener('submit', function (ev) {
+        ev.preventDefault(); go.disabled = true;
+        sendNote(inp.value, said).then(function (ok) { go.disabled = false; if (ok) { inp.value = ''; draw(); } });
+      });
+      return f;
+    }
     function statusLine() { var s = el('p', 'small', said); s.setAttribute('data-breakout-status', ''); s.setAttribute('role', 'status'); return s; }
 
     function list(presence) {
@@ -179,6 +239,10 @@
         li.appendChild(el('span', 'breakouts-room-name', g.name));
         li.appendChild(el('span', 'small', a.here.length + ' of ' + a.total + ' there'));
         if (names) li.appendChild(el('span', 'small breakouts-names', names));
+        var w = work[g.id];
+        if (g.breakout) li.appendChild(el('span', 'small', w ? w.n + (w.n === 1 ? ' answer' : ' answers') + ' in their workbook, last saved ' + ago(w.at) : 'Nothing saved in their workbook yet'));
+        var h = helpFor(g);
+        if (h) { li.classList.add('is-asking'); li.appendChild(el('strong', 'breakouts-help', o.nameOf(h.user_id) + ' asks you to come')); }
         if (/^https:/.test(g.meet_url || '')) { var v = el('a', 'btn-secondary small', 'Visit'); v.href = g.meet_url; v.target = '_blank'; v.rel = 'noopener'; li.appendChild(v); }
         ul.appendChild(li);
       });
@@ -193,9 +257,13 @@
         box.appendChild(el('h3', null, 'In breakouts'));
         box.appendChild(list(presence));
         var acts = el('div', 'actions');
-        acts.appendChild(button('Call everyone back', 'btn-primary', callBack));
+        var leftMs = (Date.parse(st.rooms.ends_at) || Infinity) - Date.now();
+        if (leftMs <= 31000 && leftMs > 0) box.appendChild(el('p', 'small', 'Everyone comes back when the rooms’ clock reaches zero.'));
+        acts.appendChild(button(leftMs <= 31000 ? 'Call everyone back now' : 'Call everyone back', 'btn-primary', callBack));
         acts.appendChild(button('Add 5 minutes', 'btn-secondary', more));
         box.appendChild(acts);
+        box.appendChild(noteForm(st.note));
+        readWork();
       } else if (st.together || o.groups().some(function (g) { return g.breakout; })) {
         box.appendChild(el('h3', null, st.together ? 'Coming back' : 'Breakouts are over'));
         var waiting = roomsNow().reduce(function (n, g) { return n + L.arrived(g, presence).here.length; }, 0);

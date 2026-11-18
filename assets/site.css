@@ -1762,6 +1762,13 @@ div.slide-pick { cursor: default; }
 .breakouts-room-name { font-weight: 600; }
 .breakouts-names { grid-column: 1; }
 .breakouts-rooms .btn-secondary { grid-column: 2; grid-row: 1 / span 2; }
+.breakouts-rooms li > .small, .breakouts-help { grid-column: 1; }
+.breakouts-rooms li.is-asking { border: 2px solid var(--accent); border-radius: 8px; padding: 0.4rem 0.5rem; }
+.breakouts-help { font-weight: 600; }
+.breakouts-note { margin-top: 0.5rem; }
+.signal-note { border: 1px solid var(--rule); border-radius: 8px; padding: 0.5rem 0.6rem; margin-top: 0.5rem; background: var(--card); }
+.signal-note p { margin: 0; }
+.signal-help { margin-top: 0.5rem; }
 [data-questions] { scroll-margin-top: 8rem; }
 .show-slide-place { margin: 0; }
 .show-slide-note { font-weight: 600; white-space: pre-line; }

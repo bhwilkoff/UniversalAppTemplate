@@ -70,7 +70,7 @@
       var now = Date.now(), coarse = reduced();
       st = K.state(rows, now);
       var w = K.where(st, now, coarse), sc = K.screen(st, now, coarse);
-      var next = [w && w.kind, w && w.because, w && w.warn, w && w.signal.id, st.card && st.card.id, st.stage && st.stage.id,
+      var next = [w && w.kind, w && w.because, w && w.warn, w && w.signal.id, st.card && st.card.id, st.note && st.note.id, asked && asked.id, st.stage && st.stage.id,
         st.recording && st.recording.id, st.talk && st.talk.id, note && note.teacher_talk_share, sc && sc.kind, sc && sc.clock && sc.clock.done, coarse].join('|');
       if (force || next !== sig) {
         sig = next;
@@ -117,6 +117,37 @@
       if (share) m.recording.appendChild(el('p', 'small', share));
     }
 
+    // A room asks its leader to come (Meet's own "Ask for help"): one
+    // request per room at a time, and the leader's room list says which.
+    var asked = null;
+    function helpControl() {
+      var wrap = el('div', 'actions signal-help');
+      var group = opts.roomGroup ? opts.roomGroup() : null;
+      if (!group) return wrap;
+      if (asked && asked.groupId === group.id) {
+        wrap.appendChild(el('p', 'small', 'Your leader has been asked to come to your room.'));
+        wrap.appendChild(button('Take it back', 'btn-secondary small', function () {
+          db.from('live_requests').delete().eq('id', asked.id).then(function () { asked = null; draw(true); });
+        }));
+        return wrap;
+      }
+      wrap.appendChild(button('Ask your leader to come', 'btn-secondary small', function () {
+        var who = opts.memberId ? opts.memberId() : opts.meId;
+        db.from('live_requests').insert({ cohort_id: opts.cohort.id, session_id: opts.session.id, user_id: who, kind: 'help', body: String(group.name || 'A room').slice(0, 200) })
+          .select('id').single().then(function (r) { if (!r.error) { asked = { id: r.data.id, groupId: group.id }; draw(true); } });
+      }));
+      return wrap;
+    }
+    function findAsked() {
+      var group = opts.roomGroup ? opts.roomGroup() : null;
+      if (!group || opts.teaching) return;
+      var who = opts.memberId ? opts.memberId() : opts.meId;
+      db.from('live_requests').select('id, body').eq('session_id', opts.session.id).eq('kind', 'help').eq('state', 'waiting').eq('user_id', who).then(function (r) {
+        var mine = (r.data || []).filter(function (x) { return x.body === String(group.name || 'A room').slice(0, 200); })[0];
+        asked = mine ? { id: mine.id, groupId: group.id } : null; draw(true);
+      });
+    }
+
     function drawWhere(w) {
       var box = m.where; box.replaceChildren();
       box.hidden = !w;
@@ -138,7 +169,15 @@
       if (opts.inRoom && opts.inRoom()) {
         box.appendChild(el('p', 'signal-title', 'You are in your room'));
         if (w.signal.ends_at) box.appendChild(el('p', 'signal-time')).appendChild(clockFor(w.signal.ends_at, now, coarse, ''));
-        if (w.warn) box.appendChild(el('p', null, 'Two minutes left: finish the thought you are on, and save what your room made.'));
+        if (w.clock && w.clock.left <= 30) box.appendChild(el('p', null, 'Finish your sentence: everyone goes back to the main room when the clock reaches zero.'));
+        else if (w.warn) box.appendChild(el('p', null, 'Two minutes left: finish the thought you are on, and save what your room made.'));
+        if (st.note) {
+          var n = el('div', 'signal-note');
+          n.appendChild(el('p', 'p2-label', 'From your leader'));
+          n.appendChild(el('p', null, st.note.body));
+          box.appendChild(n);
+        }
+        box.appendChild(helpControl());
         return;
       }
       var who = opts.memberId ? opts.memberId() : opts.meId;
@@ -466,7 +505,7 @@
       if (mq.addEventListener) mq.addEventListener('change', function () { draw(true); });
     }
 
-    refresh().then(listen);
+    refresh().then(listen).then(findAsked);
     return { refresh: refresh, state: function () { return st; }, send: send, redraw: function () { draw(true); },
       clearKind: function (kind) { return st[kind] ? clear(st[kind], { textContent: '' }) : Promise.resolve(); } };
   }

@@ -53,6 +53,10 @@
       if (end == null || t - end < BACK_FOR_MS) out.rooms = lastRooms;
     }
     if (!roomsNewer && lastBack && !lastBack.cleared_at && t - ms(lastBack.created_at) < BACK_FOR_MS) out.together = lastBack;
+    // A note to every room shows only while those rooms run, and only one
+    // sent after they launched, so last week's never reaches this week's.
+    var note = newest('note');
+    out.note = out.rooms && note && ms(note.created_at) >= ms(out.rooms.created_at) ? note : null;
     // A timed card goes a minute after its time runs out, so its words
     // ("5 minutes left") never sit beside Time is up for long (found in
     // the loop's live Meet test).

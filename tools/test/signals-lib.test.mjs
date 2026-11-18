@@ -235,3 +235,14 @@ test('a timed card goes a minute after its time runs out; an untimed one stays',
   const plain = { id: 'c2', kind: 'card', body: 'Stretch', created_at: iso(T0), ends_at: null, cleared_at: null };
   assert.equal(lib.state([plain], T0 + min(30)).card.id, 'c2');
 });
+
+test('a note to every room shows only while the rooms it was sent to run', () => {
+  const old = sig('note', T0 - min(30), { body: 'From last time' });
+  const rooms = sig('rooms', T0, { ends_at: iso(T0 + min(10)) });
+  const note = sig('note', T0 + min(2), { body: 'Five minutes left: pick one change' });
+  assert.equal(lib.state([old, rooms], T0 + min(1)).note, null);
+  assert.equal(lib.state([old, rooms, note], T0 + min(3)).note, note);
+  const back = sig('together', T0 + min(6));
+  assert.equal(lib.state([rooms, note, back], T0 + min(7)).note, null);
+  assert.equal(lib.state([note], T0 + min(3)).note, null);
+});
