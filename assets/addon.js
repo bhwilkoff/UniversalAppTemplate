@@ -1344,12 +1344,22 @@
     var list = S.list || [], at = list.indexOf(part), after = list[at + 1];
     return after ? { label: 'Next part', go: 'step' } : { label: 'Last part', disabled: true };
   }
+  function stale() {
+    var st = shared() && S.run.state(), begins = Date.parse(S.session && S.session.starts_at);
+    if (!st || !st.scene_started_at || !isFinite(begins) || Date.now() < begins - 10 * 60000) return false;
+    return Date.parse(st.scene_started_at) < begins - 10 * 60000;
+  }
   function nextMove() {
     var n = nextStep();
     if (!n || n.disabled) return;
     if (n.go === 'stage') return $('[data-open-stage]').click();
     if (n.go === 'start') return $('[data-start-session]').click();
-    if (n.go === 'unwelcome') return setPin(null);
+    // A part made current in a rehearsal before the session keeps a clock
+    // that ran out long ago (Week 3: part 1 read 0:00 all part). The first
+    // move once the session has begun starts it again, and taking the
+    // welcome off with no part begun begins the first.
+    if (S.run && stale()) S.run.clock(true);
+    if (n.go === 'unwelcome') return shared() && !S.run.current() ? $('[data-start-session]').click() : setPin(null);
     if (S.run) S.run.step(1).then(afterMove);
   }
   // Which session this call runs: the schedule's, or any other the leader picks
