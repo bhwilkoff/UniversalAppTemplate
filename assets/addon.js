@@ -1087,7 +1087,7 @@
     if (S.teaching) {
       var stage = el('section', 'p2-group');
       var acts = el('div', 'actions');
-      ['[data-open-stage]', '[data-welcome-toggle]'].forEach(function (s) { acts.appendChild($(s)); });
+      ['[data-open-stage]', '[data-close-stage]', '[data-welcome-toggle]'].forEach(function (s) { acts.appendChild($(s)); });
       stage.appendChild(acts);
       stage.appendChild($('[data-stage-status]'));
       F.put('tools', stage);
@@ -3357,11 +3357,34 @@
     });
   });
 
+  // Close the main stage and keep the activity (Ben, Week 3 debrief, November
+  // 18, 2026: "I still cannot figure out where to close the main stage so that
+  // someone can share their screen without ending the activity"). The stage
+  // opens because the activity's starting state names it, so the activity is
+  // started again naming only the panel. Open the main stage names both again.
+  $('[data-close-stage]').addEventListener('click', function () {
+    var status = $('[data-stage-status]');
+    status.textContent = 'Closing the main stage…';
+    var only = { sidePanelUrl: location.origin + '/addon/' };
+    Promise.resolve().then(function () { return side.startActivity(only); }).then(function () {
+      console.log('[addon] close stage: startActivity(side panel only) resolved');
+      S.stageOn = false; stageButtons(false);
+      status.textContent = 'The main stage is closed and the activity goes on. Open the main stage brings it back for everyone.';
+    }, function (err) {
+      console.log('[addon] close stage: startActivity(side panel only) failed: ' + (err && (err.message || err.name) || err));
+      return Promise.resolve().then(function () { return side.setActivityStartingState(only); }).then(function () {
+        status.textContent = 'Meet would not close the stage now (' + (err && (err.message || err.name) || 'no reason given') + '). People who join from here on get the panel only.';
+      }, function (e2) {
+        status.textContent = 'Meet would not close the stage: ' + (err && (err.message || err.name) || 'no reason given') + '; ' + (e2 && (e2.message || e2.name) || '') ;
+      });
+    });
+  });
   // The panel never ends Meet's activity: that closes every learner's panel
   // (Week 2, November 11). Meet's own End activity does it, at the end.
   function stageButtons(open) {
     if (!S.teaching || standalone) return;
     $('[data-open-stage]').hidden = !!open;
+    $('[data-close-stage]').hidden = !open;
     sendStage();
   }
   // ------------------------------------------------------------------
