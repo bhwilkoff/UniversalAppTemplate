@@ -1253,7 +1253,7 @@
     if (!S.nowHead) { S.nowHead = el('h2', 'p2-now-head'); now.insertBefore(S.nowHead, now.firstChild); }
     var showing = !!(part && part.kind === 'presenter');
     var room = S.svc && S.svc.showing ? S.svc.showing() : null;
-    var head = questionWaiting() ? 'Answer the question' : room === 'board' ? 'Propose an idea, and vote' : room === 'page' ? 'Try the website on your screen' : '';
+    var head = questionWaiting() ? (part && part.kind === 'reflection' ? '' : 'Answer the question') : room === 'board' ? 'Propose an idea, and vote' : room === 'page' ? 'Try the website on your screen' : '';
     if (S.nowHead.textContent !== head) S.nowHead.textContent = head;
     S.nowHead.hidden = !head;
     if (now.firstChild !== S.nowHead) now.insertBefore(S.nowHead, now.firstChild);
