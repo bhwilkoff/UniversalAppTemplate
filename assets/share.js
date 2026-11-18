@@ -47,6 +47,19 @@
       });
   }
 
+  function testPicture() {
+    var c = document.createElement('canvas'); c.width = 1280; c.height = 720;
+    var g = c.getContext('2d'), t0 = Date.now();
+    (function tick() {
+      var sec = Math.floor((Date.now() - t0) / 1000);
+      g.fillStyle = '#1f3b2d'; g.fillRect(0, 0, 1280, 720);
+      g.fillStyle = '#fff'; g.font = 'bold 72px sans-serif'; g.fillText('Test picture from /share/', 120, 300);
+      g.font = '48px sans-serif'; g.fillText('Seconds since it started: ' + sec, 120, 420);
+      g.fillStyle = '#9fd3b0'; g.fillRect(120 + (sec % 10) * 100, 500, 80, 80);
+      if (stream) requestAnimationFrame(tick); else setTimeout(tick, 100);
+    })();
+    return c.captureStream(15);
+  }
   function stop() {
     if (live) { live.stop(); live = null; }
     if (stream) stream.getTracks().forEach(function (t) { t.stop(); });
@@ -57,9 +70,13 @@
 
   $('[data-start]').addEventListener('click', function () {
     var status = $('[data-share-status]');
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) { status.textContent = 'This browser cannot share a screen. Use Chrome on a computer.'; return; }
+    if (params.get('test') !== '1' && (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia)) { status.textContent = 'This browser cannot share a screen. Use Chrome on a computer.'; return; }
     status.textContent = '';
-    navigator.mediaDevices.getDisplayMedia({ video: { frameRate: 15 }, audio: false }).then(function (s) {
+    // ?test=1 streams a moving test picture instead of a picked screen, so the
+    // whole path (queue, Show it, the handshake, every stage) can be checked
+    // without the browser's picker, which no script can press.
+    var pick = params.get('test') === '1' ? Promise.resolve(testPicture()) : navigator.mediaDevices.getDisplayMedia({ video: { frameRate: 15 }, audio: false });
+    pick.then(function (s) {
       stream = s;
       var id = X.uuid();
       return db.from('live_queue').insert({ cohort_id: K.cohort.id, session_id: K.session.id, user_id: member || K.me.id, kind: 'screen', url: X.urlOf(location.origin, id) })
