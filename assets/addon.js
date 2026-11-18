@@ -2311,6 +2311,27 @@
     if (!box) return;
     if (box.contains(document.activeElement) && document.activeElement.tagName === 'INPUT') return;
     box.replaceChildren();
+    // Without a name the leader's lists show a GitHub login (Week 3, 2026-11-18:
+    // "fakiyaaa" beside full names). Asked once, here, and kept on the profile.
+    var mine = S.people.filter(function (p) { return p.user_id === S.me.id; })[0];
+    if (mine && mine.profiles && !mine.profiles.display_name && !S.asMember) {
+      var nf = el('form', 'p2-ask-form'), ni = el('input'), nsaid = el('span', 'small');
+      ni.type = 'text'; ni.maxLength = 80; ni.setAttribute('aria-label', 'Your name');
+      var ngo = el('button', 'btn-secondary small', 'Save'); ngo.type = 'submit';
+      nf.appendChild(ni); nf.appendChild(ngo);
+      box.appendChild(el('p', 'p2-label', 'Your name, as the class sees it'));
+      box.appendChild(nf); box.appendChild(nsaid);
+      nf.addEventListener('submit', function (ev) {
+        ev.preventDefault();
+        var v = ni.value.replace(/\s+/g, ' ').trim();
+        if (!v) { nsaid.textContent = 'Write your name first.'; return; }
+        db.from('profiles').update({ display_name: v }).eq('id', S.me.id).select('display_name').single().then(function (r) {
+          if (r.error) { nsaid.textContent = 'Not saved: ' + r.error.message; return; }
+          mine.profiles.display_name = r.data.display_name; S.names[S.me.id] = r.data.display_name;
+          ni.blur(); drawMyApp();
+        });
+      });
+    }
     drawClassApps(); drawBack();
     var app = S.myApp && !S.editApp ? L.classifyLink(S.myApp) : null;
     box.hidden = false;
