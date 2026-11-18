@@ -142,6 +142,15 @@ Playbook is not in active development and stands as the proof point for
 large databases, huge numbers of files, camera scanning, 3D on iOS, and
 pricing models.
 
+**Ear Drama joins the showcase (Ben, 2026-11-18)** as "one of the apps
+that demonstrates Human Shaped Principles": the first app made from the
+template on its first day, listed in the directory as `template`, with
+its own case study (`docs/human-shaped/case-study-ear-drama.md` in the
+template, `/why/ear-drama/`). Its pictures are its own App Store set,
+since it is in App Review. It joins the home page's "Working software,
+in the stores today" row when its listing is live, and not before,
+because that heading would not be true of it yet.
+
 **GitHub skills are taught throughout the cohort.** No "merge as the
 ship moment" framing.
 

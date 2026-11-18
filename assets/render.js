@@ -65,7 +65,8 @@
 
   // The founding apps a case study can show (assets/apps/).
   var CASE_APPS = {
-    'Archive Watch': { shot: '/assets/apps/archive-watch-1.webp', page: '/apps/app/?r=bhwilkoff/Archive-Watch' }
+    'Archive Watch': { shot: '/assets/apps/archive-watch-1.webp', page: '/apps/app/?r=bhwilkoff/Archive-Watch' },
+    'Ear Drama': { shot: '/assets/apps/ear-drama-1.webp', page: '/apps/app/?r=bhwilkoff/Ear-Drama' }
   };
 
   // Where a link in a template file goes on this site: its own page here,

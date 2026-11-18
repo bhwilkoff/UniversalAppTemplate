@@ -281,7 +281,8 @@
       if (site) links.appendChild(li(link(site, site.replace(/^https:\/\//, '').replace(/\/$/, ''))));
       lib.storeLinks(app.stores).forEach(function (s) { links.appendChild(li(link(s.href, s.text))); });
       links.appendChild(li(link('https://github.com/' + repo, 'Its repository')));
-      if (app.slug === 'archive-watch') links.appendChild(li(link('https://github.com/bhwilkoff/UniversalAppTemplate/blob/main/docs/human-shaped/case-study-archive-watch.md', 'How it was built, month by month')));
+      var study = { 'archive-watch': 'How it was built, month by month', 'ear-drama': 'How it was built from the template' }[app.slug];
+      if (study) links.appendChild(li(link('https://github.com/bhwilkoff/UniversalAppTemplate/blob/main/docs/human-shaped/case-study-' + app.slug + '.md', study)));
     }
 
     function drawCommits(repo) {

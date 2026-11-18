@@ -22,7 +22,10 @@ const APPS = [
   { key: 'bsky-dreams', name: 'Bsky Dreams', bundle: 'app.bskydreams.ios' },
   // Not on the App Store: its pictures stay the store screenshots already in
   // assets/apps/ (Ben, October 6).
-  { key: 'boba-playbook', name: 'BOBA Playbook', bundle: 'app.bobaplaybook.ios', keep: true }
+  { key: 'boba-playbook', name: 'BOBA Playbook', bundle: 'app.bobaplaybook.ios', keep: true },
+  // In App Review on 2026-11-18: its pictures are its own store set, made in
+  // its repository (assets/apps/README.md), until the listing is live.
+  { key: 'ear-drama', name: 'Ear Drama', bundle: 'app.eardrama', keep: true }
 ];
 const WIDTH = 600;
 

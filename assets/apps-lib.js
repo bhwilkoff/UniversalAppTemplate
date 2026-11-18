@@ -292,7 +292,8 @@
     'archive-watch': { n: 2 },
     'tidbits-trivia': { n: 2 },
     'boba-playbook': { n: 2 },
-    'bsky-dreams': { n: 2 }
+    'bsky-dreams': { n: 2 },
+    'ear-drama': { n: 2 }
   };
   function shotsOf(app) {
     var repo = app && (app.repo || repoPath(app.repository));
