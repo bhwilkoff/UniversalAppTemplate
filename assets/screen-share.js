@@ -69,7 +69,14 @@
   // A stage: asks for the picture until it has it, and says what is happening.
   function watch(o) {
     var ch = channel(o.db, o.id), me = uuid(), pc = null, done = false, asked = null, got = false;
-    function state(s) { if (o.onState) o.onState(s); }
+    function state(s, detail) { if (o.onState) o.onState(s, detail); }
+    // What this stage knows when no picture comes, said on the stage itself,
+    // since a stage inside Meet has no console anyone can read.
+    var frames = 0, route = '', track0 = null;
+    function check() {
+      if (frames || done || !got) return;
+      state('noframes', route + ', track ' + (track0 ? (track0.muted ? 'muted' : 'live') + '/' + track0.readyState : 'none') + ', connection ' + (pc ? pc.connectionState : 'none'));
+    }
     // Meet's stage frame has autoplay turned off (measured 2026-10-28), so a
     // <video> stays black without a press. Where the browser can read the
     // frames themselves (MediaStreamTrackProcessor), they are drawn on a canvas,
@@ -77,12 +84,15 @@
     var reading = null;
     function show(stream, track) {
       o.video.srcObject = stream;
+      track0 = track; frames = 0;
+      setTimeout(check, 6000);
       var P = root.MediaStreamTrackProcessor;
       if (P && o.canvas && track && track.kind === 'video') {
         try {
           var reader = new P({ track: track }).readable.getReader(), g = o.canvas.getContext('2d');
           reading = reader;
           o.canvas.hidden = false; o.video.hidden = true;
+          route = 'canvas';
           (function pump() {
             reader.read().then(function (r) {
               if (r.done || reading !== reader) return;
@@ -90,16 +100,18 @@
               if (o.canvas.width !== f.displayWidth) { o.canvas.width = f.displayWidth; o.canvas.height = f.displayHeight; }
               g.drawImage(f, 0, 0, o.canvas.width, o.canvas.height);
               f.close();
+              if (!frames++) state('showing');
               pump();
             }, function () {});
           })();
-          state('showing');
           return;
-        } catch (e) { reading = null; }
+        } catch (e) { reading = null; route = 'canvas failed: ' + (e && e.message || e); }
       }
       if (o.canvas) o.canvas.hidden = true;
       o.video.hidden = false;
-      Promise.resolve(o.video.play()).then(function () { state('showing'); }, function () { state('press'); });
+      route = route || 'video';
+      o.video.onplaying = function () { frames++; };
+      Promise.resolve(o.video.play()).then(function () { frames++; state('showing'); }, function () { state('press'); });
     }
     function ask() { if (!done && !got) say(ch, 'want', { viewer: me }); }
     ch.on('broadcast', { event: 'offer' }, function (m) {

@@ -366,7 +366,11 @@
       wrap.appendChild(video); wrap.appendChild(canvas); wrap.appendChild(line); wrap.appendChild(press);
       box.replaceChildren(wrap);
       var words = { waiting: 'Connecting to ' + v.who + '’s screen…', showing: '', blocked: 'This network will not carry the screen. ' + v.who + ' can share with Meet’s own Present now.', ended: v.who + ' stopped sharing.' };
-      screenWatch = window.ScreenShare.watch({ db: screenDb, id: screenId, video: video, canvas: canvas, onState: function (st) { press.hidden = st !== 'press'; line.textContent = words[st] || ''; line.hidden = !words[st]; } });
+      screenWatch = window.ScreenShare.watch({ db: screenDb, id: screenId, video: video, canvas: canvas, onState: function (st, detail) {
+        press.hidden = st !== 'press';
+        var t = st === 'noframes' ? 'Connected to ' + v.who + '’s screen, but no picture yet (' + detail + ').' : words[st] || '';
+        line.textContent = t; line.hidden = !t;
+      } });
       return;
     }
     var f = document.createElement('iframe');
