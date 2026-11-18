@@ -15,7 +15,7 @@ test("a learner's tour starts on the stage, and waits for it when it is not open
   const closed = C.tour('learner', false);
   assert.deepEqual(closed.now.map((s) => s.key), ['asks', 'app']);
   assert.deepEqual(closed.later.map((s) => s.key), ['stage', 'reacts']);
-  assert.deepEqual(C.tour('leader', false).now.map((s) => s.key), ['now', 'next', 'plan', 'tools']);
+  assert.deepEqual(C.tour('leader', false).now.map((s) => s.key), ['now', 'next', 'tools']);
 });
 
 test('a hint is due the first time its thing appears, one at a time, and never again once seen', () => {

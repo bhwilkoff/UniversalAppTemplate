@@ -18,9 +18,8 @@
       { key: 'app', where: 'panel', target: 'yourapp', text: 'When it is your turn, show your app to everyone here, or open a classmate’s app on your own screen.', noapp: 'Add your app’s address here, so you can show it to everyone when it is your turn.' }
     ],
     leader: [
-      { key: 'now', where: 'panel', target: 'tab:now', text: 'Now is the part that is happening, with your notes for it. Learners never see your notes.' },
+      { key: 'now', where: 'panel', target: 'tab:now', text: 'Session is the part that is happening, with your notes for it, then the whole plan. Learners never see your notes.' },
       { key: 'next', where: 'panel', target: 'next', text: 'Next moves everyone’s stage: the next slide, then the next part.', closed: 'Until the main stage is open, this button opens it. Then it moves everyone: the next slide, then the next part.' },
-      { key: 'plan', where: 'panel', target: 'tab:plan', text: 'Plan is the whole session. Go takes everyone to any part.' },
       { key: 'tools', where: 'panel', target: 'tab:tools', text: 'Tools put things on the stage: a question, someone’s app, the board, or rooms.' }
     ]
   };

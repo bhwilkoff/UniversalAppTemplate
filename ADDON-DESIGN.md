@@ -23,8 +23,7 @@ Leader                         Learner
 
 | Tab | Holds |
 |---|---|
-| Now | Leader: this moment. Before the session, open the stage and start. In a part, what people are asking for, your notes, and what the part needs: the question's answers, who shows next, rooms and their clock. |
-| Plan | Every part, one line each. Go to one; change one. |
+| Session | Leader: this moment, then the whole plan below it. Before the session, open the stage and start. In a part, what people are asking for, your notes, and what the part needs: the question's answers, who shows next, rooms and their clock. Under it, every part, one line each: go to one, change one. (Now and Plan were two tabs until Ben, November 18, 2026: "I still do not understand the difference between now and plan ... It seems like too many things in the sidebar.") |
 | Tools | Tiles for what you do to the room: main stage, a question, apps, breakouts, a card, the board, recording. |
 | People | Who is here, who answered, guests and who they are, recognition. |
 | Now (learner) | Where to go, then what is being asked. |

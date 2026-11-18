@@ -8,7 +8,10 @@
   function mount(o) {
     var ready = o.into || o.root.querySelector('[data-state="ready"]');
     // A learner's panel is one view, with no tabs (Ben, November 12, 2026).
-    var tabs = o.tabs ? o.tabs : o.teaching ? [['now', 'Now'], ['plan', 'Plan'], ['tools', 'Tools'], ['people', 'People']] : [['now', 'The class']];
+    // Now and Plan are one tab, Session: this part first, then the whole plan
+    // (Ben, November 18, 2026: "I still do not understand the difference
+    // between now and plan ... It seems like too many things in the sidebar").
+    var tabs = o.tabs ? o.tabs : o.teaching ? [['now', 'Session'], ['tools', 'Tools'], ['people', 'People']] : [['now', 'The class']];
     var shell = el('div', 'p2');
     var top = el('header', 'p2-top');
     var row = el('div', 'p2-top-row');
@@ -67,6 +70,14 @@
       p.setAttribute('role', 'tabpanel'); p.setAttribute('aria-label', t[1]); p.setAttribute('data-pane', t[0]);
       body.appendChild(p); panes[t[0]] = p;
     });
+    // The plan lives in Session, after everything about this part.
+    var plan = null;
+    if (o.teaching && !o.tabs) {
+      var now = panes.now, nowBox = el('div', 'p2-now');
+      plan = el('section', 'p2-plan'); plan.setAttribute('aria-label', 'The plan'); plan.setAttribute('data-pane', 'now');
+      now.appendChild(nowBox); now.appendChild(plan);
+    }
+    function paneOf(key) { return plan ? (key === 'plan' ? plan : key === 'now' ? panes.now.firstChild : panes[key]) : panes[key]; }
     shell.appendChild(body);
     var bar = el('footer', 'p2-bar');
     var back = el('button', 'btn-secondary p2-back', 'Back'); back.type = 'button';
@@ -83,6 +94,7 @@
     back.addEventListener('click', function () { if (onBack) onBack(); });
 
     function show(key) {
+      if (key === 'plan' && plan) { show('now'); if (plan.scrollIntoView) plan.scrollIntoView({ block: 'start' }); return; }
       if (!panes[key]) return;
       current = key;
       Object.keys(panes).forEach(function (k) {
@@ -99,15 +111,15 @@
     return {
       el: shell, low: low,
       // What the tour points at, and its own button.
-      tab: function (key) { return buttons[key] || null; },
+      tab: function (key) { return buttons[key === 'plan' && plan ? 'now' : key] || null; },
       nextButton: function () { return next; },
       stageLine: function () { return stage; },
       onHelp: function (fn) { onHelp = fn; help.hidden = !fn; },
-      pane: function (key) { return panes[key]; },
+      pane: paneOf,
       show: show,
       current: function () { return current; },
-      put: function (key, node) { if (node && panes[key] && node.parentNode !== panes[key]) panes[key].appendChild(node); },
-      dot: function (key) { if (buttons[key] && key !== current) buttons[key].querySelector('.p2-dot').hidden = false; },
+      put: function (key, node) { var p = paneOf(key); if (node && p && node.parentNode !== p) p.appendChild(node); },
+      dot: function (key) { if (key === 'plan' && plan) key = 'now'; if (buttons[key] && key !== current) buttons[key].querySelector('.p2-dot').hidden = false; },
       // title, time, chips [{ text, on }], next { label, disabled }, canBack
       draw: function (s) {
         var key = JSON.stringify([s.title, s.step, s.chips, s.next && s.next.label, s.next && s.next.disabled, s.canBack]);
