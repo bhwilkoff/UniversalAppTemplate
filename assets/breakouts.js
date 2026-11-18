@@ -174,6 +174,7 @@
         launch(false, L.fromGroups(saved(), everyone().map(function (p) { return p.id; })));
       }));
       if (!stable().length && lastRooms()) acts.appendChild(button('Same rooms as last time', 'btn-secondary', function () { launch(true); }));
+      acts.appendChild(button('Practice with pretend learners', 'btn-secondary', startPractice));
       d.appendChild(acts);
       if (!fixed.length) d.appendChild(keepForm(rooms, d));
       d.appendChild(statusLine());
@@ -250,10 +251,71 @@
       return ul;
     }
 
+    // Practice with pretend learners (Hudek's practice mode): the whole
+    // In breakouts view, drawn from rooms that exist only in this panel, so a
+    // leader can rehearse launching, a help request, a message, and the call
+    // back alone. Nothing is written and no one else sees it.
+    var practice = null, practiceTimer = null;
+    function startPractice() {
+      var names = ['Ada', 'Bea', 'Cal', 'Dev', 'Eli', 'Fay', 'Gus', 'Hal', 'Ivy'];
+      practice = { ends: Date.now() + 3 * 60000, note: null, help: null, work: {}, rooms: [0, 1, 2].map(function (i) {
+        return { id: 'practice-' + i, name: 'Room ' + (i + 1), people: names.slice(i * 3, i * 3 + 3).map(function (n) { return n + ' (pretend)'; }) };
+      }) };
+      clearInterval(practiceTimer);
+      practiceTimer = setInterval(function () {
+        if (!practice) { clearInterval(practiceTimer); return; }
+        var r = practice.rooms[Math.floor(Math.random() * 3)];
+        practice.work[r.id] = (practice.work[r.id] || 0) + 1;
+        if (!practice.help && Date.now() > practice.ends - 2.5 * 60000) practice.help = practice.rooms[1].people[0];
+        if (!box.querySelector('input:focus')) draw();
+      }, 8000);
+      draw();
+    }
+    function drawPractice() {
+      var left = practice.ends - Date.now(), over = left <= 0;
+      box.appendChild(el('h3', null, over ? 'Practice: coming back' : 'Practice: in breakouts'));
+      box.appendChild(el('p', 'small', 'Pretend learners, in this panel only. No one else sees this.'));
+      box.appendChild(el('p', 'small', over ? 'Time is up: every room’s panel would say come back now.' : Math.ceil(left / 1000) + ' seconds left in the rooms'));
+      var ul = el('ul', 'breakouts-rooms');
+      practice.rooms.forEach(function (r) {
+        var li = el('li');
+        li.appendChild(el('span', 'breakouts-room-name', r.name));
+        li.appendChild(el('span', 'small', '3 of 3 there'));
+        li.appendChild(el('span', 'small breakouts-names', r.people.join(', ')));
+        var n = practice.work[r.id] || 0;
+        li.appendChild(el('span', 'small', n ? n + (n === 1 ? ' answer' : ' answers') + ' in their workbook' : 'Nothing saved in their workbook yet'));
+        if (practice.help && r.people.indexOf(practice.help) >= 0) {
+          li.classList.add('is-asking');
+          li.appendChild(el('strong', 'breakouts-help', practice.help + ' asks you to come'));
+          li.appendChild(button('Done', 'btn-secondary small', function () { practice.help = 'answered'; draw(); }));
+        }
+        ul.appendChild(li);
+      });
+      box.appendChild(ul);
+      var acts = el('div', 'actions');
+      if (!over) {
+        acts.appendChild(button(left <= 31000 ? 'Call everyone back now' : 'Call everyone back', 'btn-primary', function () { practice.ends = left <= 31000 ? Date.now() : Date.now() + 30000; draw(); }));
+        acts.appendChild(button('Add 5 minutes', 'btn-secondary', function () { practice.ends += 5 * 60000; draw(); }));
+      }
+      acts.appendChild(button('End practice', 'btn-secondary', function () { practice = null; clearInterval(practiceTimer); draw(true); }));
+      box.appendChild(acts);
+      if (!over) {
+        var f = el('form', 'cohort-form breakouts-note');
+        var lab = el('label', null, 'Message every room'), inp = el('input'); inp.type = 'text'; inp.maxLength = 200;
+        lab.appendChild(inp); f.appendChild(lab);
+        var go = el('button', 'btn-secondary small', 'Send to every room'); go.type = 'submit';
+        f.appendChild(el('div', 'actions')).appendChild(go);
+        if (practice.note) f.appendChild(el('p', 'small', 'Every room would see: \u201c' + practice.note + '\u201d'));
+        f.addEventListener('submit', function (ev) { ev.preventDefault(); var t = inp.value.replace(/\s+/g, ' ').trim(); if (t) { practice.note = t.slice(0, 200); draw(); } });
+        box.appendChild(f);
+      }
+    }
+
     function draw(keep) {
       var st = o.signals.state() || {}, presence = o.presence() || {};
       var open = keep === true;
       box.replaceChildren();
+      if (practice && !st.rooms && !st.together) { drawPractice(); return; }
       var over = st.rooms && st.rooms.ends_at && Date.parse(st.rooms.ends_at) <= Date.now();
       if (over) clearTimeout(overTimer);
       else if (st.rooms && st.rooms.ends_at) { clearTimeout(overTimer); overTimer = setTimeout(function () { draw(); }, Math.max(1000, Date.parse(st.rooms.ends_at) - Date.now() + 500)); }
