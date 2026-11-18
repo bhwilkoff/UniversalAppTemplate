@@ -105,6 +105,25 @@ you still have?" The leader answers two or three aloud and the rest
 before the next session, and opens that session by saying what they
 read.
 
+## Keeping the hour
+
+The first time we ran this routine, on November 18, 2026, the plans took
+eleven minutes instead of six, trying the apps ran eight minutes past its
+clock, and the next round, the part that turns the hour into a week of
+work, got about ninety seconds before people had to leave. Nobody wrote a
+round, and nobody answered the last question. The routine only works if
+the clock protects the part that comes last.
+
+So the times are held by the clock, not by how the conversation feels.
+Each plan is thirty seconds, and the leader thanks the person and calls
+the next name when it is up. Each builder's nine minutes ends when the
+nine minutes end, even in the middle of a good idea; the idea goes into
+that builder's round. When the clock on Try each app reaches zero, the
+leader presses Next part, whoever is still waiting, and the builders not
+reached go first next week. With five builders or more, the leader gives
+each one seven minutes, or moves to rooms of three, rather than taking
+time from the round.
+
 ## Words on the stage and in the panel
 
 Every word we put on the main stage or in the panel has to mean
