@@ -226,6 +226,9 @@
         if (frame) {
           var appView = { mode: 'app', part: part, who: cut((state.names || {})[i.user_id] || 'Someone', 80), url: frame, note: i.note ? cut(i.note, 300) : null };
           if (typeof state.audience === 'string' && state.audience) appView.audience = cut(state.audience, 300);
+          // The part's slide stays in a corner while an app or a screen fills
+          // the stage, so the routine's stems stay in front of everyone.
+          if (state.cornerSlides) { var cs0 = slidesOf(state.cornerSlides); if (cs0) appView.slide = cs0; }
           return appView;
         }
         var itemView = { mode: 'item', part: part, who: cut((state.names || {})[i.user_id] || 'Someone', 80), what: cut(label, 200), note: i.note ? cut(i.note, 300) : null };
@@ -412,6 +415,7 @@
       if (!live) return null;
       var av = { mode: 'app', part: part, who: cut(v.who || 'Someone', 80), url: live, note: v.note ? cut(v.note, 300) : null };
       if (typeof v.audience === 'string' && v.audience) av.audience = cut(v.audience, 300);
+      if (v.slide) { var as = slidesOf(v.slide); if (as) av.slide = as; }
       return av;
     }
     if (v.mode === 'item' && typeof v.what === 'string') {

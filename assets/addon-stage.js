@@ -319,10 +319,30 @@
   var boardSrc = null;
   // Everyone's own working copy of a person's app. The frame stays put through
   // every later message, or a person's place in the app would be lost.
+  // The part's slide in a corner of an app or a screen; each person can hide
+  // it on their own stage, and it comes back with the next slide.
+  var cornerKey = null, cornerHidden = null;
+  function drawCorner(slide) {
+    var box = $('[data-app-corner]');
+    if (!box) return;
+    var key = slide ? slide.at + ':' + slide.shown + ':' + slide.text.length : null;
+    if (!slide || cornerHidden === key) { box.hidden = true; return; }
+    box.hidden = false;
+    if (key === cornerKey) return;
+    cornerKey = key;
+    var svg = '';
+    try { svg = slide.shown ? window.DeckKit.frame(slide.text, slide.at, slide.shown) : (window.SlidesLib.render(window.DeckKit, slide.text)[slide.at] || ''); } catch (e) {}
+    $('[data-app-corner-slide]').innerHTML = svg;
+  }
+  (function () {
+    var h = document.querySelector('[data-app-corner-hide]');
+    if (h) h.addEventListener('click', function () { cornerHidden = cornerKey; $('[data-app-corner]').hidden = true; });
+  })();
   var appUrl = null, screenWatch = null, screenDb = null;
   function stopScreen() { if (screenWatch) { screenWatch.stop(); screenWatch = null; } }
   function drawApp(v) {
     var box = $('[data-app-frame]');
+    drawCorner(v && v.slide ? v.slide : null);
     if (!v) { if (appUrl) { appUrl = null; stopScreen(); box.replaceChildren(); } return; }
     $('[data-app-who]').textContent = v.who;
     $('[data-app-open]').href = v.url;

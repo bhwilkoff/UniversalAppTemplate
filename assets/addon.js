@@ -1087,6 +1087,8 @@
       var stage = el('section', 'p2-group');
       var acts = el('div', 'actions');
       ['[data-open-stage]', '[data-open-panels]', '[data-close-stage]', '[data-welcome-toggle]'].forEach(function (s) { acts.appendChild($(s)); });
+      // The leader shares a screen onto the stage the same way a learner does.
+      acts.appendChild(button('Share my screen on the stage', 'btn-secondary', function () { openShare(); }));
       stage.appendChild(acts);
       stage.appendChild($('[data-stage-status]'));
       F.put('tools', stage);
@@ -3171,6 +3173,7 @@
       welcome: lib.welcome(S.cohort, S.session, S.list && S.list.length ? S.list : S.parts), scene: scene, slides: slidesView(part),
       doc: partDoc(part),
       besideSlides: part && part.own && (part.kind === 'reflection' || (part.kind === 'question' && part.slides)) ? slidesView(part) : null,
+      cornerSlides: part && part.own && part.slides ? slidesView(part) : null,
       onStageDetail: S.onStageDetail || null,
       path: window.RosterLib && S.onStage && S.onStage.kind === 'path' ? window.RosterLib.pathView(rosterNow()) : null,
       rooms: S.onStage && S.onStage.kind === 'rooms' ? Object.keys(S.roomPlaces).map(function (k) { return S.roomPlaces[k]; }) : null
