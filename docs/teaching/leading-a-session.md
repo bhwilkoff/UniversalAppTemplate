@@ -59,12 +59,15 @@ Every builder gets the same nine minutes, in the same order:
    wrote before the session.
 2. **Everyone tries the app, quietly** (3 minutes), in their own copy
    on the stage, with Show my app to everyone.
-3. **Each person says what they did and what happened** (3 minutes),
+3. **Each person says what they did and what happened** (2 minutes),
    with "I tried to ___," "What happened was ___," and "I expected
    ___." Nobody says what they think of the app until they have said
    what they did.
 4. **One "I wonder if"** from anyone (1 minute).
-5. **The builder says what they will change first** (1 minute).
+5. **The builder explains one decision, with the agent closed, and
+   what they will change first** (2 minutes). A decision, never the
+   code: if they cannot explain it, that is their next prompt
+   ([Showing your work](../path/showing-your-work.md)).
 
 The builder listens and writes; they do not explain or defend while
 people are saying what happened. The leader calls on people by name, in
