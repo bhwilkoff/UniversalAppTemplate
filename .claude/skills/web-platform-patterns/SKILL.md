@@ -137,9 +137,19 @@ lines, nothing else.
 
 ## Service worker discipline
 
-- **Shell cache-first, with a version string bumped on EVERY shell
-  change** (`const CACHE = 'shell-v7'`) — a forgotten bump is the
-  classic "deployed but users see the old app."
+- **Shell cache-first, with a version string STAMPED AT DEPLOY, never
+  bumped by hand.** A forgotten bump is the classic "deployed but users
+  see the old app": Ear Drama shipped 9 web commits under one hand-set
+  `ed-shell-v71` (2026-11-16). The deploy step hashes `sw.js` and the
+  shell files (never the data) into the cache name, and a test with a
+  negative control fails when a shell change leaves the stamp unchanged.
+- **An open page offers Reload; it never reloads itself.** When a new
+  worker takes over, show "A new version is ready" with a Reload button,
+  and check for an update again on `visibilitychange` to visible, since
+  a phone tab can stay open for weeks.
+- **No DOM call is handed a bare null.** `append`, `prepend`, and
+  `replaceChildren` draw a null argument as the text "null" (a ternary
+  ending `: null`). `tools/test_js_null_children.py` fails on the pattern.
 - **`fetch(url, {cache:'no-store'})` does NOT bypass a service
   worker.** A fetch that "proves the server is wrong" may be the worker
   answering. Clear the SW (DevTools > Application) before trusting it.

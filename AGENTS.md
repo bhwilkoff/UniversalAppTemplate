@@ -66,6 +66,8 @@ Sources: `docs/research/gemini-and-other-agents.md`. Rows follow the
 | Shared data the clients consume | `shared-data-plane-contract` (worked example: `web-catalog-data-layer`) |
 | Stable entity IDs, or an ID formula/migration | `canonical-entity-identity` |
 | Serving a catalog's images/media | `image-cdn-discipline` |
+| Pictures you did not make, in one slot or as one set (shape, crop, grade, mount) | `artwork-presentation-design` + `uniform-imagery-design` |
+| Browsing, playing, making from, or sharing a big catalog of sparse records | `catalog-experience-design` |
 | Sync, sign-in, progress across devices | `per-ecosystem-sync-islands` |
 | Users see EACH OTHER'S data (profiles, roles, moderation) | `zero-cost-hosted-backend` (vs `per-ecosystem-sync-islands`, Decision 047) |
 | GitHub, Drive, or Calendar as a free platform's sign-in, shared space, or notices | `github-and-google-learning-infrastructure` |

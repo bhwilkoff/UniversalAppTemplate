@@ -31,6 +31,10 @@ gh workflow run play-release.yml -f promote=<versionCode>  # the SAME artifact t
 
 Auth is a **service-account JSON key** (from a GCP project) with the `https://www.googleapis.com/auth/androidpublisher` scope, and that service account **granted access in the Play Console** (Users & permissions → invite the SA email → release permissions). No OAuth user flow, no interactive login — the SA key is the whole credential. Keep it out of git (`~/.config/…` or a CI secret).
 
+**The grant is per app.** A service account that publishes your other apps uploads the bundle and edits the track for a new one, then the commit answers 403 "The caller does not have permission" until it is granted release permissions on THAT app (Ear Drama, 2026-10-28). Check it with a read-only probe before the first release.
+
+**A never-published app takes only draft releases** ("Only releases with status draft may be created on draft app"). `tools/play-publish.py` keeps the uploaded bundle as a draft and tells the owner to finish the app's setup in the Console. Its package comes from `PLAY_PACKAGE`, else `tools/app_config.py`; Ear Drama's first CI release defaulted to `com.example.appname`.
+
 ## Rule 3: versionCode +1 on EVERY upload; versionName is not yours to type
 
 Bump `versionCode` for every AAB you upload. Play permanently rejects any `versionCode` it has seen, **even one uploaded to a draft track and never shipped**. `versionName` is READ from `AppVersion.xcconfig` by the Gradle build (held by `tools/test_version_contract.py`), so it cannot drift from the Apple marketing version; only `versionCode` is bumped. Anything that can refuse the upload must be checked BEFORE the bump: **release notes are capped at 500 characters**, and a refusal after the bump has spent the versionCode. Don't start a new upload while a previous release is still in review; batch trivial releases. (Archive Watch's owner made it a rule: no new Play version until the one in review is approved; commit fixes freely meanwhile.)

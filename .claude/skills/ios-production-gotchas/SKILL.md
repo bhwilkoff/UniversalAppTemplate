@@ -251,6 +251,9 @@ safe.
   `.containerRelativeFrame([.horizontal, .vertical])`, not
   `GeometryReader` (unreliable inside a `NavigationStack`).
 - Streaming from flaky hosts: `resilient-media-streaming`.
+- **Network audio never uses `AVURLAssetPreferPreciseDurationAndTimingKey`**:
+  it downloads the whole file before the first sound while the player
+  claims to be playing (Ear Drama: up to 44 s). `docs/MEDIA-PLAYBACK.md` 4a.
 
 - **A background download held for Wi-Fi fails silently.** With cellular
   off for the app (or `allowsCellularAccess = false`), the system holds the
@@ -285,6 +288,17 @@ safe.
   any claim of Duo support wait for a store build made with 27.1 (see
   `store-submission-playbook`), and only the real device proves the open
   and folded poses.
+- **Work that must outlive a re-layout lives in Core, never in a view.**
+  A fold, unfold, or size-class change starts and stops nothing: Ear
+  Drama's owner held the first App Store submission until a recording
+  survived closing the Duo mid-take (Decision 080). Choose a
+  presentation once, when it opens, so a fold never dismisses it, and let
+  width decide, never the device model.
+- **UI tests scroll by swiping the largest scroll view, never the app
+  element.** On an open Duo, XCUITest reports the app's frame in portrait
+  (669x951) while the window is landscape, so swipes on the app did
+  nothing. XCUITest also screenshots the primary display, which is OFF on
+  an open Duo: run `tools/frame_blind.py` on every frame.
 
 ## Camera + capture
 

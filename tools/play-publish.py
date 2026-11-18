@@ -13,7 +13,8 @@ change for review automatically (changesNotSentForReview), the edit is committed
 without the review request and the owner is told to send it from the Console.
 Env:    PLAY_SERVICE_ACCOUNT_JSON  path to the service-account JSON key
                                    (default ~/.config/play/PLAY_SERVICE_ACCOUNT.json)
-        PLAY_PACKAGE               package name (default com.example.appname)
+        PLAY_PACKAGE               package name (default: ANDROID_PACKAGE in tools/app_config.py,
+                                   which tools/set_app_identity.py sets)
                                    NOTE: this is the Play applicationId, which can DIFFER from the
                                    Gradle `namespace`. Use the applicationId here.
 
@@ -22,6 +23,16 @@ The service account must be granted release permissions for the app in Play Cons
 Requires: google-api-python-client, google-auth (tools/submit-play.sh installs them into a venv).
 """
 import sys, os, argparse, time
+
+
+def _config_package():
+    # A copy that never set PLAY_PACKAGE once published to com.example.appname.
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    try:
+        import app_config
+        return app_config.ANDROID_PACKAGE
+    except Exception:
+        return "com.example.appname"
 
 # Play caps release notes at 500 characters and enforces it at COMMIT, the last
 # call, after the bundle is built and uploaded. A 513-character note once failed a
@@ -77,7 +88,9 @@ def main():
             f"Shorten them by {len(notes) - NOTES_MAX} and re-run; nothing has been "
             f"uploaded.")
 
-    pkg = os.environ.get("PLAY_PACKAGE", "com.example.appname")
+    pkg = os.environ.get("PLAY_PACKAGE") or _config_package()
+    if pkg == "com.example.appname":
+        raise SystemExit("PLAY_PACKAGE is the template's placeholder; run tools/set_app_identity.py first.")
     key = os.environ.get("PLAY_SERVICE_ACCOUNT_JSON",
                          os.path.expanduser("~/.config/play/PLAY_SERVICE_ACCOUNT.json"))
     if not os.path.isfile(args.aab):
@@ -117,9 +130,23 @@ def main():
             release["releaseNotes"] = [{"language": "en-US", "text": notes}]
 
         # A PUT of the whole track: repeating it is harmless.
-        with_retries("update track", lambda: edits.tracks().update(
-            packageName=pkg, editId=edit_id, track=args.track,
-            body={"track": args.track, "releases": [release]}).execute(), HttpError)
+        def put_track():
+            return edits.tracks().update(
+                packageName=pkg, editId=edit_id, track=args.track,
+                body={"track": args.track, "releases": [release]}).execute()
+        try:
+            with_retries("update track", put_track, HttpError)
+        except HttpError as e:
+            # An app never published (its store listing and content forms unfinished)
+            # takes only draft releases: "Only releases with status draft may be
+            # created on draft app." The bundle is already uploaded; keep it as a draft.
+            if "draft app" not in str(e) or status == "draft":
+                raise
+            status = release["status"] = "draft"
+            release.pop("userFraction", None)
+            print("  Play: this app has never been published, so the release is a DRAFT.")
+            print("  OWNER: finish the app's setup in Play Console, then roll the draft out.")
+            with_retries("update track", put_track, HttpError)
         print(f"track '{args.track}' → versionCode {vc} ({status}"
               + (f", rollout {args.rollout}" if args.rollout and not args.draft else "") + ")")
 

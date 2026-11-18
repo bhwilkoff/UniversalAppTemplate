@@ -134,6 +134,27 @@ them as an explicit OWNER list.
   them after 30 without a refresh, and deletes on sign-out and on
   `invalid_grant`).
 
+### "Information Needed" (Guideline 2.1): the screen recording
+
+An app with accounts or people's own content will often be asked for "a
+screen recording captured on a physical device" that starts at launch and
+shows sign-in, account deletion, and how people report and block one
+another. Describing them in the notes is not enough: Ear Drama's first
+answer was asked for again (2026-11-15). The agent can make most of it:
+
+- An XCUITest tour at a human pace on a real iPhone over USB, captured
+  by looping `xcrun devicectl device capture screenshot
+  --display-unique-id <id>` (about 0.7 fps), then normalized and joined
+  with ffmpeg (1920x1080, 30 fps). `devicectl device info displays` can
+  name the wrong active display; check a frame with `tools/frame_blind.py`.
+- iOS asks for "Enable UI Automation" with Touch ID or Face ID, and
+  sign-in with Face ID is the owner's own clip, so the owner is at the
+  device for a few minutes.
+- Upload with `tools/asc_review_attachment.py --platform IOS --file x.mp4`
+  (under 500 MB), and say in the review notes what each minute shows.
+- Connect refuses What's New on an app's FIRST version (409);
+  `tools/asc_release.py` skips it there.
+
 ## App Store (tvOS) — the extra mile
 
 - **Layered icon (imagestack), not a flat PNG**: App Icon + App

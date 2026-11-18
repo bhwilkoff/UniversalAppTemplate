@@ -50,6 +50,17 @@ section 4 walks through setting them up.
 | `tools/mac_window_shot.swift` | `winshot`: one window of one app | built to `build/bin/winshot` on first use |
 | `tools/dev_cleanup.sh` | Reports stray local processes; `--stop` ends them; `volume-guard -- <cmd>` restores volume | |
 
+**A frame of one flat color is blind, not unreadable.** OCR that reads
+zero words finds nothing to complain about, so two pure-black frames
+passed an OCR check (Ear Drama, 2026-11-14: XCUITest shot the display an
+open iPhone Duo had turned off). `tools/frame_blind.py` marks a frame
+BLIND when 99% of it sits within a few levels of one color, and a runner
+treats BLIND as "the instrument saw nothing," never as a pass. In the
+same family: a test filter that matched nothing ("Executed 0 tests")
+proves nothing, a system overlay in the frame fails the test (element
+queries match through it), and an `open(URL)` the device never relaunched
+for is a harness BLIND result, not an app failure.
+
 ScreenOCR reports coordinates with a bottom-left origin (Vision's
 convention). Flip `y` before comparing against a top-left rectangle, or
 you will keep the wrong half of the screen.

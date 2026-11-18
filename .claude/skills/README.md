@@ -83,12 +83,15 @@ them. "From" names the app where the lesson was learned.
 |---|---|---|
 | `cross-platform-parity-discipline` | Running `PARITY.md`: same verb, native idiom; honest cells; the periodic audit that catches rows that quietly became false. | BOBA Playbook, Archive Watch |
 | `shared-data-plane-contract` | Build the data once, publish it, and make every app a consumer. What a browser can and cannot fetch. Contract tests. | Archive Watch |
-| `canonical-entity-identity` | One stable ID and one image per thing, the same on every platform, and how to migrate IDs without breaking anyone. | BOBA Playbook |
+| `canonical-entity-identity` | One stable ID and one image per thing, the same on every platform, and how to migrate IDs without breaking anyone, including the parents (series, shows) a fix moves. | BOBA Playbook, Ear Drama |
 | `per-ecosystem-sync-islands` | Sync each person's data on their own cloud (CloudKit on Apple, Google Drive on Android and web), with no server to run. | Archive Watch |
 | `zero-cost-hosted-backend` | When people need to see one another's data: a hosted database for accounts and user data only, and everything else static. | BOBA Playbook |
-| `image-cdn-discipline` | Two sizes of every image on a CDN, never in git, and never a box that reshapes art you did not make. | BOBA Playbook, Archive Watch |
+| `image-cdn-discipline` | Two sizes of every image on a CDN, never in git, and never a box that reshapes art you did not make. | BOBA Playbook, Archive Watch, Ear Drama |
+| `artwork-presentation-design` | Pictures of any shape in one slot: the slot takes the picture's shape, crops only around a face found once in the pipeline, a typographic card when there is no picture, and never blur-and-bars. | Ear Drama |
+| `uniform-imagery-design` | Making photos, scans, and cartoons you did not make read as one set: one crop, one tonal grade, one mount, one size floor, and never changing what a picture shows. | Ear Drama |
 | `content-corpus-derivation` | Deriving a shipped set of facts or questions from a messy source, at build time. | Tidbits Trivia |
 | `evidence-gated-catalog-curation` | Deciding what a catalog you did not make may show, hide, recommend, or say: a claim a reader can open, an uploader's word is not evidence, restore by evidence, never recommended but always findable, provenance on every field. | Archive Watch |
+| `catalog-experience-design` | A large catalog where most records are sparse: design the bare record first, decide what earns a list row, separate the real works from the long tail, and give every level of content one skeleton of fixed slots. | Ear Drama |
 | `internet-archive-source` | Reading archive.org honestly: scrape vs search, throttled is not empty, the connection limit, upload dates, items that hold many works, private files, storage nodes. | Archive Watch |
 | `web-catalog-data-layer` | A worked example: how Archive Watch's web app reads the shared catalog. Read `shared-data-plane-contract` first. | Archive Watch |
 | `github-and-google-learning-infrastructure` | When a free platform leans on GitHub and Google for sign-in, a shared space, private notices, videos, and calendars instead of running its own, including the traps that only show up for people outside your own team. | humanshaped.org |

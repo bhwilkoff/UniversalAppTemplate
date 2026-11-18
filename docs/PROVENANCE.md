@@ -37,6 +37,28 @@ nobody rediscovers an exclusion.
   cohort's learners, their transcripts, or a partner institution's content,
   and the site's own code, which lives on its `site` branch.
 
+- **2026-11-18**, Ear Drama decisions 054 to 080 and everything since
+  the October 23 upstream, the first app made from this template from its
+  first day. Three skills came out of it (`artwork-presentation-design`,
+  `uniform-imagery-design`, `catalog-experience-design`), with lessons
+  added to `canonical-entity-identity` (parents forward by a majority of
+  their children), `image-cdn-discipline`, `web-platform-patterns` (the
+  shell version stamped at deploy), `resilient-media-streaming` and
+  `docs/MEDIA-PLAYBACK.md` (precise timing, dynamics-processor leveling,
+  progress watchdogs), `store-submission-playbook` (the App Review screen
+  recording), `play-cli-submission`, `ios-production-gotchas` (the Duo),
+  `docs/DEVICE-HARNESSES.md` (blind frames), and
+  `docs/ENGINEERING-PROCESS.md`, plus fixes to `tools/asc_release.py`,
+  `tools/play-publish.py`, and `play-release.yml`, and three tools
+  (`frame_blind.py`, `test_js_null_children.py`,
+  `asc_review_attachment.py`). The story is
+  `docs/human-shaped/case-study-ear-drama.md`. Left behind on purpose:
+  radio-drama rulings, rights and take-down choices that are the owner's
+  legal calls, the script reader and Stations, on-device voices
+  (Kokoro), Worker-verified sign-in (worth a section in
+  `zero-cost-hosted-backend` when a second app needs it), and the shell
+  stamping tool itself, since the template ships no service worker yet.
+
 ## Coverage: domain → home in this template
 
 | Domain | Lives in |

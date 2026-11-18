@@ -99,6 +99,18 @@ Add a small reconnect wrapper:
 ## Cross-platform invariants
 
 - **Resume = timecode, not percent**, persisted per item.
+- **A stall watchdog judges progress, not elapsed time.** Fail a load
+  only after ~30 s with no new bytes AND no position movement; a trickle,
+  a deliberate pause, a local file, or a seek in flight never trips it.
+  (Ear Drama: a real iPad sat at `AVPlayerItem` status 0 for minutes with
+  no error; a slow seek was then misread as a stall.)
+- **An item that ends far short of its catalog length failed; it did
+  not finish.** Retry, then the next copy, then show the error. (After a
+  -1008 fallback AVFoundation played 5 s of a 1,774 s file, ended the
+  item, and sat silent.)
+- **Play on the item already loaded resumes it in place**, and a retry
+  keeps a pause: every platform's recovery once restarted what the person
+  had paused.
 - **Derivative/quality selection happens at build/publish time**,
   identically for every client — never per-client ceilings.
 - Diagnostics stay in the codebase **env-gated**

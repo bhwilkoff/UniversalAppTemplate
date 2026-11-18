@@ -137,6 +137,40 @@ If you caption uncaptioned media with `SpeechAnalyzer`:
   Live on-device captioning the viewer opted into is different: it's
   labeled, ephemeral, and better than a blank screen.
 
+## 4a. Audio that starts at once, at an even volume
+
+From Ear Drama (radio from archive.org), Decisions 070 and 077.
+
+- **Never ask AVFoundation for precise timing on a network item.**
+  `AVURLAssetPreferPreciseDurationAndTimingKey` downloads the WHOLE file
+  before the first sound while `timeControlStatus` already reads
+  `.playing` and the clock stands still: 1.2 to 44 s to first audio (a
+  70 MB MP3) with the key, 0.6 to 2.2 s without it; tap to a moving clock
+  went from 2.7 to 12.3 s to 1.5 to 3.1 s. Sniff the first 64 KB of frame
+  headers instead, and reopen with precise timing only for a
+  variable-bitrate file with no Xing, Info, or VBRI table, the one case
+  where only the frames know the length. A start-time measurement puts a
+  query string on every trial (or interleaves arms) so caching cannot
+  flatter the second arm (`tools/measure_start_times.sh`).
+- **Level volume with each platform's own dynamics processor, at one set
+  of numbers, never with per-file gain.** Web: a `DynamicsCompressorNode`
+  on the `<audio>` element. Apple: Apple's DynamicsProcessor unit in an
+  `MTAudioProcessingTap` on the item's audio track. Android:
+  `android.media.audiofx.DynamicsProcessing` on the player's audio
+  session. Ear Drama's numbers, tested on all three: threshold -24 dBFS,
+  ratio 4 (speech is evened, not flattened), attack 3 ms, release 250 ms,
+  makeup 10.8 dB (the browser's own rule, 0.6 x the compression at
+  0 dBFS), a 12 dB knee where there is one. Measured: passages 34 dB
+  apart come out 21 dB apart. Per-file gain needed a 25 GB-a-day
+  measuring run, left every new copy at unity, and on the web can only
+  cut (gain above 1 clips), which reached a -18 LUFS target on 54% of 183
+  files.
+- The leveler is on by default with one switch to turn it off. A tap or
+  effect that cannot be made plays unleveled and never stops playback.
+  iPhone and iPad web cannot level (a page's AudioContext stops at the
+  lock screen), so the switch says "Not in this browser" there.
+- Fades and mute act on the player's own volume, after the leveler.
+
 ## 5. How this domain is verified
 
 All of `docs/DEVICE-HARNESSES.md` applies with force here, because every

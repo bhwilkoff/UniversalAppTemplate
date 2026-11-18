@@ -42,6 +42,13 @@ and mentions accumulate.
 and "could not tell" look different to the caller. If they do not, that
 is the bug, before any other behavior gets written.
 
+**Never delete on a timer while a write may be pending.** Ear Drama's
+cleanup of empty recordings ran on a 2 s timer and deleted a take that
+was still encoding, with its parent record (2026-11-15). Wait for the
+writes to finish, then decide. The same goes for a "last checked" stamp:
+write it only after the check completes, or a crash mid-check reads as
+checked.
+
 ## 2. A green run is not a working run
 
 Every serious pipeline failure in Archive Watch's history was green.
