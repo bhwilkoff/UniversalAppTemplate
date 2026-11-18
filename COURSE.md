@@ -178,50 +178,35 @@ where that evens out.
 
 ## The four parts of a session
 
-<!-- Drafted by Claude on November 12, 2026, from how the cohorts now run
-(sessions inside a Google Meet call with the Human Shaped add-on), for
-Ben's review. -->
+<!-- Rewritten by Claude on November 18, 2026, at Ben's request, to match
+docs/teaching/leading-a-session.md. Awaiting Ben's review. -->
 
-Each live session runs 60 minutes, in the same four parts every week,
-so that nobody spends the first ten minutes wondering what happens next.
-Every part points at the learner's own app, and everything a person is
-asked to do happens inside the call: they answer in the Human Shaped
-panel or on the main stage, and they show their work from the panel
-rather than by sharing a screen. The [weekly guides](docs/teaching/README.md)
-give each part its minutes.
+Each live session runs 60 minutes, in the same four parts every week, so
+that nobody spends the first ten minutes wondering what happens next and
+everyone makes progress on their own app. It is one round of the way I
+build, done with other people's hands on the app: use it, write down what
+you saw, hand it to the agent, and check it next time. Everything happens
+inside the call, in the Human Shaped panel or on the main stage.
 
-1. **Show what you built.** Everyone arrives with one line in the chat:
-   what they shipped this week, or where they are stuck, and the teacher
-   says in a minute what they read in last week's answers and what they
-   changed because of them, which is what makes those answers worth
-   writing. Nobody is named out loud for being stuck. Then each person,
-   in turn, puts their "Be ready to..." work on the main stage with Show
-   my app, so everyone gets their own working copy to try, says in one
-   line what they want to know, and explains one decision behind it with
-   the agent closed (a decision, never the code). The others ask one
-   question to understand it before saying anything about it, and then
-   answer the three questions while the builder listens: where is it
-   going, how is it going, and what is next. The builder ends by saying
-   what they will do next, and whether the stage is ready or not yet. It
-   is the largest part, because it is the only time anyone sees the app
-   in someone else's hands. A cohort of eight or more shows in groups of
-   three, in breakout rooms, with the teacher visiting each.
-2. **One thing that unblocks the next stage.** A short talk from the
-   stage's own text, a few slides with one point each, and then everyone
-   tries it on their own app, often on the board or with a partner.
-3. **Start.** Everyone writes the first prompt of the coming week and
-   sends it to their agent before they leave, with prompt starters on the
-   stage ("This is done when ___", "It must never ___"). I want everyone
-   to walk away with the week already begun, rather than with a plan to
-   begin it.
-4. **The check.** In the last few minutes, everyone answers two
-   questions privately, in the panel, where only the teacher reads them
-   and the first answer cannot shape all the others. The first is the
-   week's question, drawn from its stages. The second is always the
-   same: "What questions do you still have?" The teacher reads every
-   answer before the next session, because those lines are how a teacher
-   finds out who understood the week and who needs a word, and then
-   opens the next session by saying what they heard.
+1. **Your plans from last week.** In a fixed order, each person says what
+   they planned and what happened, in two lines.
+2. **Try each app.** Nine minutes for each builder: they ask their one
+   question, everyone tries the app in their own copy, each person says
+   what they did and what happened before anyone says what they think,
+   and the builder says what they will change first.
+3. **Write your next round.** Everyone turns what they saw into a
+   numbered list for their agent, with "Start with," "This is done
+   when," and "It must never," sends it before they leave, and reads the
+   first item aloud.
+4. **Your questions.** "What questions do you still have?", privately, in
+   the panel. The teacher reads every answer and opens the next session
+   with what they read.
+
+[`docs/teaching/leading-a-session.md`](docs/teaching/leading-a-session.md)
+is the leader's guide to the routine: what to prepare, what to say, what
+goes on the stage, the rules for every word on it, and what to press in
+the add-on. A cohort of eight or more tries apps in groups of three, in
+breakout rooms, with the teacher visiting each.
 
 Showing and explaining are not saved for the live session. Every
 stage's "Be ready to..." line asks for something to show and a decision

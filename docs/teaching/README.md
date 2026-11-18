@@ -44,37 +44,27 @@ is the center of every session.
 
 ## The shape of every session
 
-*Written by Claude, awaiting Ben's review (the rewrite of October 23, 2026, after Ben found the earlier scenes "a non-sequitur for the learners and unconnected to the actual work of building apps").*
+Every session is one round of the way I build, with other people's
+hands on the app, and it runs the same four parts every week:
 
-Every session is one round of Write, Play, Publish, the same three moves
-as stage 00, at the size of a week, and every part of it points at the
-learner's own app. It has four parts, in this order:
+1. **Your plans from last week**, two lines each, in a fixed order.
+2. **Try each app**: nine minutes per builder, their question first,
+   everyone trying it, what people did before what they think.
+3. **Write your next round**: a numbered list of what they saw, sent to
+   their agent before they leave, with the first item read aloud.
+4. **Your questions**, private, read by the leader before next time.
 
-1. **Build.** Each person shows the "Be ready to..." of the stage
-   they just finished, on a device, explains one decision with the agent
-   closed, and hears the three questions. It is the largest part, because
-   it is the only time anyone sees the app in someone else's hands.
-2. **One thing that unblocks the next stage.** A short talk from the
-   stage's own text, then everyone tries it on their own app, often on
-   the board.
-3. **Start.** Everyone sends the first prompt of the next stage before
-   they leave, so the week begins in the room.
-4. **The check.** The week's question, and the questions people still have, read by
-   the leader before the next session.
+[`leading-a-session.md`](leading-a-session.md) is the leader's guide:
+preparing from each person's repository and answers, what goes on the
+stage, the rules for every word on it, and what to press in the add-on.
+A cohort of eight or more tries apps in groups of three, in rooms, with
+the leader visiting each.
 
-Prep and week 5 bend the shape: prep's build is the setup itself,
-and week 5's is the showing, open to guests. A cohort of eight learners
-or more brings back in groups of three, in rehearsal rooms; a smaller
-cohort stays in the one call, and each person shows to everyone.
-
-| Part | 75 minutes, in groups | 60 minutes, one call |
-|---|---|---|
-| Arrive | 5 | 4 |
-| Build | 30 (rehearsal rooms) | 22 (each person to everyone) |
-| Break | 3 | none |
-| The one thing, then trying it | 7 and 13 | 6 and 11 |
-| Start | 10 | 9 |
-| The week's question, and your questions | 4 and 3 | 4 and 4 |
+**Not yet matched (2026-11-18):** the weekly guides below and
+`runs-of-show.json` still carry the older shape, with a part called "the
+one thing that unblocks the next stage." That part is where generic
+slides came from, and it is being folded into Write your next round, said
+about each person's real app.
 
 The same scenes are in [`runs-of-show.json`](runs-of-show.json), and the
 hub makes every new cohort's sessions from that file, choosing the
