@@ -89,3 +89,25 @@ print(json.dumps(words.place(said, turns)))`;
     [null, null, 'Later.'],
   ]);
 });
+
+test('Drive’s transcript becomes whole-second stretches, and anything else is refused', async () => {
+  const { captionsFrom, hasAsrTrack, captionsUrls, captionsDue } = await import('../../supabase/functions/session-read/logic.js');
+  const xml = '<?xml version="1.0" encoding="utf-8" ?><transcript><text start="4.08" dur="5.2">All right, cool. We are started feeling</text>' +
+    '<text start="7.6" dur="5.959">good</text><text start="9.28" dur="4.279">about it.</text><text start="14.08" dur="5.199">Sattik&#39;s plan &amp; yours</text></transcript>';
+  const lines = captionsFrom(xml);
+  assert.deepEqual(lines, [
+    { started_s: 4, ended_s: 14, body: 'All right, cool. We are started feeling good about it.' },
+    { started_s: 14, ended_s: 20, body: 'Sattik\'s plan & yours' },
+  ]);
+  assert.equal(captionsFrom('<html>Error 400</html>'), null);
+  assert.equal(hasAsrTrack('<transcript_list><track id="0" kind="asr" name="" lang_code="en" lang_original="English"/></transcript_list>'), true);
+  assert.equal(hasAsrTrack('<transcript_list></transcript_list>'), false);
+  assert.match(captionsUrls('abc_123').track, /^https:\/\/drive\.google\.com\/timedtext\?id=abc_123&v=abc_123&type=track&lang=en&kind=asr/);
+  const s = { recording_url: 'https://drive.google.com/file/d/1-7GVOzynQjj-0jQ3H3inGHkO3tQgEFr9/view' };
+  const now = new Date('2026-11-18T22:00:00Z');
+  assert.equal(captionsDue(s, null, now), true);
+  assert.equal(captionsDue(s, { recording_url: s.recording_url, state: 'done' }, now), false);
+  assert.equal(captionsDue(s, { recording_url: s.recording_url, state: 'waiting', first_at: '2026-11-18T21:30:00Z', checked_at: '2026-11-18T21:55:00Z' }, now), false);
+  assert.equal(captionsDue(s, { recording_url: s.recording_url, state: 'waiting', first_at: '2026-11-18T21:30:00Z', checked_at: '2026-11-18T21:50:00Z' }, now), true);
+  assert.equal(captionsDue(s, { recording_url: s.recording_url, state: 'waiting', first_at: '2026-11-15T21:30:00Z', checked_at: '2026-11-18T20:00:00Z' }, now), false);
+});

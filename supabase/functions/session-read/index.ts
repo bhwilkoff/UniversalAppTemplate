@@ -14,7 +14,7 @@ import { createClient } from 'npm:@supabase/supabase-js@2';
 import { createAppAuth } from 'npm:@octokit/auth-app@7';
 import { createRemoteJWKSet, jwtVerify } from 'npm:jose@5';
 import { WORKFLOW, WORKFLOW_PATH } from '../_shared/session-read-workflow.js';
-import { ISSUER, AUDIENCE, callerOk, clean, cleanWords, driveId, due, fullName } from './logic.js';
+import { ISSUER, AUDIENCE, callerOk, clean, cleanWords, driveId, due, fullName, captionsUrls, hasAsrTrack, captionsFrom, captionsDue } from './logic.js';
 
 const reply = (status: number, body: unknown) =>
   new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
@@ -52,18 +52,54 @@ async function github(token: string, method: string, path: string, body?: unknow
 
 const decoded = (b64: string) => new TextDecoder().decode(Uint8Array.from(atob(b64.replace(/\s/g, '')), (c) => c.charCodeAt(0)));
 
+// Drive's own transcript, asked for on every tick until it is there (logic.js,
+// captionsDue). One plain HTTPS request each, with no sign-in: Drive answers
+// for a file shared by link.
+// deno-lint-ignore no-explicit-any
+async function captions(db: any, sessions: any[], now: Date) {
+  const kept = await db.from('session_caption_reads').select('*');
+  if (kept.error) return [`captions: ${kept.error.message}`];
+  // deno-lint-ignore no-explicit-any
+  const byId = new Map(kept.data.map((r: any) => [r.session_id, r]));
+  const notes: string[] = [];
+  for (const s of sessions.filter((x) => captionsDue(x, byId.get(x.id) || null, now)).slice(0, 4)) {
+    const id = driveId(s.recording_url)!;
+    // deno-lint-ignore no-explicit-any
+    const prior = byId.get(s.id) as any;
+    const base = { session_id: s.id, cohort_id: s.cohort_id, recording_url: s.recording_url, checked_at: now.toISOString(),
+      first_at: prior && prior.recording_url === s.recording_url ? prior.first_at : now.toISOString() };
+    const u = captionsUrls(id);
+    let list: Response;
+    try { list = await fetch(u.list, { signal: AbortSignal.timeout(15000) }); } catch { notes.push(`${s.id}: list unreachable`); continue; }
+    const listXml = await list.text();
+    if (list.status === 403 || list.status === 404) { await db.from('session_caption_reads').upsert({ ...base, state: 'private', lines: null }); continue; }
+    if (!list.ok || !hasAsrTrack(listXml)) { await db.from('session_caption_reads').upsert({ ...base, state: 'waiting', lines: null }); continue; }
+    let track: Response;
+    try { track = await fetch(u.track, { signal: AbortSignal.timeout(30000) }); } catch { notes.push(`${s.id}: track unreachable`); continue; }
+    const lines = track.ok ? captionsFrom(await track.text()) : null;
+    if (!lines || !lines.length) { await db.from('session_caption_reads').upsert({ ...base, state: 'waiting', lines: null }); continue; }
+    const gone = await db.from('session_captions').delete().eq('session_id', s.id);
+    if (gone.error) { notes.push(`${s.id}: ${gone.error.message}`); continue; }
+    const put = await db.from('session_captions').insert(lines.map((l) => ({ ...l, session_id: s.id, cohort_id: s.cohort_id })));
+    if (put.error) { notes.push(`${s.id}: ${put.error.message}`); continue; }
+    await db.from('session_caption_reads').upsert({ ...base, state: 'done', lines: lines.length });
+  }
+  return notes;
+}
+
 // deno-lint-ignore no-explicit-any
 async function tick(db: any) {
   const now = new Date();
   const rows = await db.from('sessions').select('id, cohort_id, recording_url, cohorts(github_repo)').not('recording_url', 'is', null);
   if (rows.error) return reply(500, { message: rows.error.message });
+  const captionNotes = await captions(db, rows.data, now);
   const reads = await db.from('session_reads').select('*');
   if (reads.error) return reply(500, { message: reads.error.message });
   // deno-lint-ignore no-explicit-any
   const byId = new Map(reads.data.map((r: any) => [r.session_id, r]));
   // deno-lint-ignore no-explicit-any
   const todo = rows.data.filter((s: any) => due(s, byId.get(s.id) || null, now)).slice(0, 2);
-  if (!todo.length) return reply(200, { started: [] });
+  if (!todo.length) return reply(200, { started: [], captions: captionNotes });
   const token = await appToken();
   const started: string[] = [], problems: string[] = [];
   for (const s of todo) {
@@ -83,7 +119,7 @@ async function tick(db: any) {
     await db.from('session_reads').upsert({ session_id: s.id, cohort_id: s.cohort_id, recording_url: s.recording_url, state: 'running', tries, started_at: now.toISOString(), problem: null });
     started.push(s.id);
   }
-  return reply(problems.length ? 207 : 200, { started, problems });
+  return reply(problems.length ? 207 : 200, { started, problems, captions: captionNotes });
 }
 
 // deno-lint-ignore no-explicit-any

@@ -538,7 +538,10 @@
       db.from('session_talk').select('user_id, name, started_s, ended_s').eq('session_id', session.id).limit(5000),
       db.from('session_reads').select('state, read_seconds').eq('session_id', session.id).maybeSingle(),
       db.from('cohort_teachers').select('user_id, profiles(github_login, display_name)').eq('cohort_id', cohort.id),
-      db.from('session_words').select('user_id, name, started_s, body').eq('session_id', session.id).order('started_s').limit(5000)
+      db.from('session_words').select('user_id, name, started_s, body').eq('session_id', session.id).order('started_s').limit(5000),
+      // Google Drive's own transcript, ready minutes after the recording, until
+      // the runner's (with who said what) arrives. Leaders only: it has no names.
+      leading ? db.from('session_captions').select('started_s, body').eq('session_id', session.id).order('started_s').limit(5000) : Promise.resolve({ data: [] })
     ]).then(function (res) {
       if (res.some(function (r) { return r.error; })) { box.appendChild(el('p', 'small', 'What happened could not be read.')); return; }
       var ids = res[1].data.map(function (k) { return k.id; }), names = {};
@@ -551,6 +554,10 @@
         answers: res[2].data.filter(function (a) { return ids.indexOf(a.check_id) >= 0; }) });
       var stops = leading ? L.stops(res[0].data) : [];
       var words = L.said(res[9].data, names);
+      if (!words.length && res[10] && !res[10].error && res[10].data.length) words = res[10].data.map(function (c) {
+        var m = Math.floor(c.started_s / 60), sec = c.started_s % 60;
+        return { who: '', at: m + ':' + (sec < 10 ? '0' : '') + sec, text: c.body };
+      });
       if (!who.length && !stops.length && !words.length) { box.appendChild(U.empty('Nothing was kept from this session')); return; }
       if (stops.length) {
         box.appendChild(el('h3', null, 'How it moved'));
@@ -616,12 +623,12 @@
     var note = el('p', 'ui-meta-line');
     note.appendChild(leading ? U.visibility('staff', 'Everyone’s words') : U.visibility('teachers', 'Your words'));
     fold.appendChild(note);
-    fold.appendChild(el('p', 'small', 'Software wrote this from the recording, so a word or a name can be wrong.'));
+    fold.appendChild(el('p', 'small', words.length && !words[0].who ? 'Google Drive wrote this from the recording, without names. Who said what comes later, from the full reading.' : 'Software wrote this from the recording, so a word or a name can be wrong.'));
     var list = el('ol');
     words.forEach(function (w) {
       var li = el('li');
       var head = el('p', 'session-said-who');
-      if (leading) head.appendChild(el('strong', null, w.who));
+      if (leading && w.who) head.appendChild(el('strong', null, w.who));
       head.appendChild(el('span', 'small', w.at));
       li.appendChild(head);
       li.appendChild(el('p', null, w.text));

@@ -80,3 +80,57 @@ export function cleanWords(body, people) {
   }
   return said;
 }
+
+// Google Drive's own transcript of a recording (Ben, November 18, 2026: "You
+// have got to figure out a programatic/API way of getting the transcript").
+// Drive makes an automatic English track for a video, and for a file shared
+// by link it answers at drive.google.com/timedtext with no sign-in: type=list
+// names the tracks, and type=track returns <text start dur> lines. These are
+// the addresses Drive's own player uses; Google does not document them, so the
+// runner's transcript stays as the backup.
+export const CAPTIONS_HOST = 'https://drive.google.com/timedtext';
+export function captionsUrls(id) {
+  const base = `${CAPTIONS_HOST}?id=${encodeURIComponent(id)}&v=${encodeURIComponent(id)}`;
+  return { list: base + '&type=list', track: base + '&type=track&lang=en&kind=asr&name=' };
+}
+export function hasAsrTrack(listXml) {
+  return /<track\b[^>]*\bkind="asr"[^>]*\blang_code="en/.test(String(listXml || '')) || /<track\b[^>]*\blang_code="en[^>]*\bkind="asr"/.test(String(listXml || ''));
+}
+// Drive escapes its text twice (&amp;#39;), so the ampersand goes first.
+function unescapeXml(s) {
+  return s.replace(/&amp;/g, '&').replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(Number(n))).replace(/&#x([0-9a-f]+);/gi, (_, n) => String.fromCodePoint(parseInt(n, 16)))
+    .replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+}
+// Drive's lines are a few words each and overlap; they are joined into
+// stretches that end at the end of a sentence, or after twenty seconds, with
+// whole seconds that never run backwards. Null when it is not a transcript.
+export function captionsFrom(xml) {
+  const text = String(xml || '');
+  if (!/^\s*(<\?xml[^>]*>\s*)?<transcript\b/.test(text)) return null;
+  const out = [];
+  let cur = null;
+  for (const m of text.matchAll(/<text\b([^>]*)>([\s\S]*?)<\/text>/g)) {
+    const start = Number((/\bstart="([\d.]+)"/.exec(m[1]) || [])[1]);
+    const dur = Number((/\bdur="([\d.]+)"/.exec(m[1]) || [])[1] || 0);
+    const words = unescapeXml(m[2]).replace(/\s+/g, ' ').trim();
+    if (!isFinite(start) || !words) continue;
+    if (!cur) cur = { started_s: Math.floor(start), ended_s: Math.floor(start) + 1, body: '' };
+    cur.body = (cur.body + ' ' + words).trim();
+    cur.ended_s = Math.max(cur.ended_s, Math.ceil(start + (isFinite(dur) ? dur : 0)), cur.started_s + 1);
+    if (/[.?!]$/.test(words) || start - cur.started_s >= 20 || cur.body.length > 1500) { out.push(cur); cur = null; }
+    if (out.length > 5000) return null;
+  }
+  if (cur) out.push(cur);
+  for (let i = 1; i < out.length; i++) if (out[i].started_s < out[i - 1].started_s) out[i].started_s = out[i - 1].started_s;
+  return out.map((l) => ({ ...l, ended_s: Math.max(l.ended_s, l.started_s + 1), body: l.body.slice(0, 8000) }));
+}
+// Drive makes its track some time after the upload: ask every tick for the
+// first two hours, then hourly for two days, then stop.
+export function captionsDue(session, row, now) {
+  if (!driveId(session.recording_url)) return false;
+  if (!row || row.recording_url !== session.recording_url) return true;
+  if (row.state === 'done' || row.state === 'private') return false;
+  const age = now.getTime() - Date.parse(row.first_at), since = now.getTime() - Date.parse(row.checked_at);
+  if (age > 48 * 3600000) return false;
+  return age < 2 * 3600000 ? since >= 9 * 60000 : since >= 59 * 60000;
+}
