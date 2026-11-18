@@ -53,8 +53,8 @@ def rooms_line(scenes):
 
 
 def section(week):
-    out = [START, "", "*Written by Claude, awaiting Ben's review (the rewrite of October 23, 2026, in four parts: "
-           "show the stage's work, one thing that unblocks the next stage, start it, and the check).* "
+    out = [START, "", "*Written by Claude, awaiting Ben's review (the routine of November 18, 2026, in "
+           "[`leading-a-session.md`](leading-a-session.md): your plans from last week, try each app, write your next round, your questions).* "
            "Generated from [`runs-of-show.json`](runs-of-show.json) by `tools/teaching_tables.py`; change the JSON, then run it.", "",
            table(week["scenes"], sum(s["minutes"] for s in week["scenes"])), "", rooms_line(week["scenes"]).rstrip()]
     for minutes, scenes in sorted((week.get("lengths") or {}).items()):

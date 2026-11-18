@@ -60,12 +60,6 @@ stage, the rules for every word on it, and what to press in the add-on.
 A cohort of eight or more tries apps in groups of three, in rooms, with
 the leader visiting each.
 
-**Not yet matched (2026-11-18):** the weekly guides below and
-`runs-of-show.json` still carry the older shape, with a part called "the
-one thing that unblocks the next stage." That part is where generic
-slides came from, and it is being folded into Write your next round, said
-about each person's real app.
-
 The same scenes are in [`runs-of-show.json`](runs-of-show.json), and the
 hub makes every new cohort's sessions from that file, choosing the
 version that matches the cohort's session length, so a leader opens each

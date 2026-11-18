@@ -211,7 +211,7 @@
           "kind": "design",
           "title": "Hold yours to the tests",
           "minutes": 12,
-          "body": "Your own problem on the board\n\nHold it to the tests, one at a time",
+          "body": "Your own problem on the board, with your agent closed\n\nHold it to the tests, one at a time",
           "config": {
             "template": "problem-tests"
           },
@@ -219,13 +219,13 @@
         },
         {
           "kind": "reflection",
-          "title": "Write your first prompt",
+          "title": "Plan your two conversations",
           "minutes": 15,
-          "body": "I want to build an app that helps ___ to ___\n\nStart with ___\n\nThis is done when ___\n\nIt must never ___",
+          "body": "Who I will talk to: ___ and ___\n\nTell me about the last time you ___\n\nWhat did you try? What happened next?",
           "config": {
-            "prompt": "Paste the first prompt you are sending to your agent."
+            "prompt": "Who are the two people you will talk to this week, and what is your first \"Tell me about the last time you...\" question?"
           },
-          "note": "Show a real round first: a numbered list someone sent their agent after using their app, each line something they saw (the leader's own, or one shared with permission). Then quiet minutes: everyone writes in the box in their panel and sends the same words to their agent before the part ends. In the last two minutes each person reads their Start with line aloud, in the same order, with no applause and no comment; those lines open the next session. This week the round is the first prompt: it comes from the problem they kept, and it asks for the smallest real version, live at its own address, with real data."
+          "note": "With the agent closed: this week is stage 00, then stage 01 once the problem holds, and the two conversations come before anyone builds. Each person names two people who might have the problem and writes questions about what happened, never describing an app, then reads their first question aloud, in the same order, with no comment. Once the problem holds after the conversations, the first prompt asks for the smallest real version, live with real data, in the hands of one of those two people, and it starts \"I want to build an app that helps ___ to ___.\""
         },
         {
           "kind": "question",
@@ -297,7 +297,7 @@
             "kind": "design",
             "title": "Hold yours to the tests",
             "minutes": 12,
-            "body": "Your own problem on the board\n\nHold it to the tests, one at a time",
+            "body": "Your own problem on the board, with your agent closed\n\nHold it to the tests, one at a time",
             "config": {
               "template": "problem-tests"
             },
@@ -305,13 +305,13 @@
           },
           {
             "kind": "reflection",
-            "title": "Write your first prompt",
+            "title": "Plan your two conversations",
             "minutes": 14,
-            "body": "I want to build an app that helps ___ to ___\n\nStart with ___\n\nThis is done when ___\n\nIt must never ___",
+            "body": "Who I will talk to: ___ and ___\n\nTell me about the last time you ___\n\nWhat did you try? What happened next?",
             "config": {
-              "prompt": "Paste the first prompt you are sending to your agent."
+              "prompt": "Who are the two people you will talk to this week, and what is your first \"Tell me about the last time you...\" question?"
             },
-            "note": "Show a real round first: a numbered list someone sent their agent after using their app, each line something they saw (the leader's own, or one shared with permission). Then quiet minutes: everyone writes in the box in their panel and sends the same words to their agent before the part ends. In the last two minutes each person reads their Start with line aloud, in the same order, with no applause and no comment; those lines open the next session. This week the round is the first prompt: it comes from the problem they kept, and it asks for the smallest real version, live at its own address, with real data."
+            "note": "With the agent closed: this week is stage 00, then stage 01 once the problem holds, and the two conversations come before anyone builds. Each person names two people who might have the problem and writes questions about what happened, never describing an app, then reads their first question aloud, in the same order, with no comment. Once the problem holds after the conversations, the first prompt asks for the smallest real version, live with real data, in the hands of one of those two people, and it starts \"I want to build an app that helps ___ to ___.\""
           },
           {
             "kind": "question",
@@ -797,7 +797,7 @@
           "config": {
             "prompt": "What is one lesson the next builder should not have to learn?"
           },
-          "note": "Show a real round first: a numbered list someone sent their agent after using their app, each line something they saw (the leader's own, or one shared with permission). Then quiet minutes: everyone writes in the box in their panel and sends the same words to their agent before the part ends. In the last two minutes each person reads their Start with line aloud, in the same order, with no applause and no comment; those lines open the next session. Stage 08: each person names one lesson the next builder should not have to learn, and where their agent will find it."
+          "note": "Stage 08: each person names one lesson the next builder should not have to learn, and where their agent will find it (a memory, a skill, or a decision). Show a real one first. In the last two minutes each person reads their lesson aloud, in the same order, with no applause and no comment."
         },
         {
           "kind": "question",
@@ -856,7 +856,7 @@
             "config": {
               "prompt": "What is one lesson the next builder should not have to learn?"
             },
-            "note": "Show a real round first: a numbered list someone sent their agent after using their app, each line something they saw (the leader's own, or one shared with permission). Then quiet minutes: everyone writes in the box in their panel and sends the same words to their agent before the part ends. In the last two minutes each person reads their Start with line aloud, in the same order, with no applause and no comment; those lines open the next session. Stage 08: each person names one lesson the next builder should not have to learn, and where their agent will find it."
+            "note": "Stage 08: each person names one lesson the next builder should not have to learn, and where their agent will find it (a memory, a skill, or a decision). Show a real one first. In the last two minutes each person reads their lesson aloud, in the same order, with no applause and no comment."
           },
           {
             "kind": "question",

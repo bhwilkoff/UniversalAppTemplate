@@ -1,9 +1,10 @@
 # Week 3: proof that it works, and someone else's hands
 
 <!-- This guide: rebuilt from research note 06 (docs/research/curriculum/
-06-instructional-design.md, section 4) by Claude, awaiting Ben's review,
-October 7, 2026. Ben's own stories and prompts are quoted from the
-stages. -->
+06-instructional-design.md, section 4) by Claude, October 7, 2026, and
+rewritten on November 18, 2026, at Ben's request, on the routine in
+docs/teaching/leading-a-session.md. Awaiting Ben's review. Ben's own
+stories and prompts are quoted from the stages. -->
 
 **Where the cohort is.** Week 2 was [stage 02](../path/02-shape-of-an-app.md)
 and [stage 03](../path/03-going-native.md). Everyone read and trimmed a
@@ -11,19 +12,13 @@ parity matrix, wrote at least one rule about their data that the
 pipeline now enforces, got a second platform running on their own device
 in its own idiom, chose a floor from a measurement, and gave the app a
 look that comes from its why. Everyone also opened two apps from outside
-their group and left the three questions in writing.
+their group and wrote down what they did and what happened.
 
-Tonight shows that work, and starts the week ahead: [stage
-04](../path/04-seeing-it-work.md), where the agent stops relying on the
-builder to find its mistakes, and [stage 05](../path/05-shipping.md),
-where the app reaches a device the builder did not build it on. This is
-the week the app leaves your hands.
-
-Everything tonight points at each learner's own app: they show last
-week's work on their own device, hear why an agent's "fixed" is not
-evidence, write the prompt that would make their own agent prove one of
-its fixes, and leave having sent the first prompt of stage 04 and named
-the person who will hold their app this week.
+Tonight everyone tries those apps together, and the week ahead is
+[stage 04](../path/04-seeing-it-work.md), where the agent stops relying
+on the builder to find its mistakes, and [stage
+05](../path/05-shipping.md), where the app reaches a device the builder
+did not build it on. This is the week the app leaves your hands.
 
 **The agent is never the tester.**
 
@@ -33,17 +28,13 @@ the person who will hold their app this week.
 from using the app on the device, and ends with publish, because the
 week ends with the app in someone else's hands.
 
-The question the whole session turns on: **How do I know it works, and
-what happens when someone I did not build it with holds it?**
-
-Every session is one round of Write, Play, Publish at a larger size,
-the same three moves as stage 00, and the principles decide what gets
-written, played with, and published
-([`00-curriculum-design.md`](../research/curriculum/00-curriculum-design.md)).
+The question the week turns on: **How do I know it works, and what
+happens when someone I did not build it with holds it?** Tonight that
+question is asked about each app in turn, while people are holding it.
 
 ## The run of show
 
-*Written by Claude, awaiting Ben's review (the rewrite of October 23, 2026, in four parts: show the stage's work, one thing that unblocks the next stage, start it, and the check).* Generated from [`runs-of-show.json`](runs-of-show.json) by `tools/teaching_tables.py`; change the JSON, then run it.
+*Written by Claude, awaiting Ben's review (the routine of November 18, 2026, in [`leading-a-session.md`](leading-a-session.md): your plans from last week, try each app, write your next round, your questions).* Generated from [`runs-of-show.json`](runs-of-show.json) by `tools/teaching_tables.py`; change the JSON, then run it.
 
 | Minutes (75) | Scene | Kind | What happens |
 |---|---|---|---|
@@ -77,23 +68,17 @@ Every scene can be changed on the session's page before it runs, and in the Meet
 - Anyone who has not yet named a person outside the cohort whose device
   the app could reach this week.
 
-## The opening
-
-> Welcome back. Two weeks ago your app was an idea and a problem
-> statement. Tonight it runs on two devices and wears its own look. This
-> week it leaves your hands, and that changes what "done" means: it is
-> no longer done when it works for you. Before you show, say in one line
-> what you want your partners to tell you.
->
-> After the break, we will take one thing your agent told you it fixed
-> this week, and work out what you would ask to see before you believed
-> it.
-
 ## What they show
 
-The cohort's build, from `COURSE.md`: one verb on both platforms,
-each in its own idiom, one cell their own eyes proved wrong, and the
-app's own look beside the template's. The stages' own lines:
+Before the session, read each person's answer on the session page (what
+they want someone to try, and the one thing they want to know), open
+every app at its address, and look at each repository's history,
+branches included. Write a slide for each builder with their name,
+their app, and what changed this week, and read the notes from the two
+visitors each app had during the week, because they often name what is
+worth trying first.
+
+The stages ask each builder to be ready for this:
 
 > Be ready to show your matrix and one cell the audit or your own eyes
 > proved wrong, and to explain the rule about your data that you decided,
@@ -103,69 +88,65 @@ app's own look beside the template's. The stages' own lines:
 > chose it, the newest feature it will not show there, and why its new
 > look fits the people it is for.
 
-**The bar.** For stage 02: "there is a matrix you have read and trimmed,
-one rule about your data that you decided and the pipeline now
-enforces, and every Share button points at your web address." For stage
-03: the second platform is on the student's own device, does the same
-things as the first in its own idiom, has a floor chosen from a
-measurement, and looks like the student's app rather than the template.
+**The bar.** A matrix the builder has read and trimmed, one rule about
+their data that the pipeline enforces, and a second platform on their
+own device that does the same things as the first in its own idiom,
+with a floor chosen from a measurement and a look that is theirs rather
+than the template's. **Signs of "not yet"** are a matrix nobody has
+read, "the agent picked the floor," and an app that still wears the
+template's colors and type.
 
-**What to look for.**
+## Your plans from last week
 
-- One verb (search, save, share) done on both platforms, with each
-  platform's own controls. The same result reached in two different
-  ways is right. The same screen squeezed onto a second device is not.
-- A matrix with marks on it: rows struck out, cells questioned.
-- A rule about the data that the student decided, said in their words,
-  with the reason it sits where it does.
-- A floor chosen from what the agent measured.
-- A look that came from choosing among directions, explained by who the
-  app is for.
+Open by saying what you read in last week's questions and what you
+changed because of it. Then put up the table: each person, the "Start
+with" line they read aloud at the end of week 2, and what their app does
+today. In a fixed order, each person says "My plan was ___" and "What
+happened was ___," in about thirty seconds. "Not started yet" is an
+ordinary answer, said plainly and passed over, and when someone changed
+their plan, ask what changed it.
 
-**Signs of "not yet."** A matrix nobody has read. "The agent picked the
-floor." An app that still wears the template's colors and type.
+## Try each app
 
-## Show what you built
+Every builder gets the same nine minutes, in the same order as the
+plans: their one question (1 minute), everyone trying it quietly in
+their own working copy (3 minutes), what each person did and what
+happened (2 minutes), one "I wonder if" (1 minute), and one decision,
+with the agent closed, and what they will change first (2 minutes).
+Each builder presses Show my app to everyone, and you press Show it.
+Nobody says what they think until they have said what they did, the
+builder listens and writes, and you call on people by name after the
+three minutes.
 
-*Written by Claude, awaiting Ben's review (the rewrite of October 23, 2026).*
+This week the thing to listen for is the word "works." When a builder
+says something works, or that the agent fixed it, ask what they saw on
+their own screen. An agent reports what it intended, so "I fixed it" is
+true about the code and says nothing about the app, and everything short
+of the real device lies a little: a simulator lets the app write where a
+real Apple TV forbids it, and a log line that says "caption shown" does
+not mean a person could read it. A builder who can say what they saw,
+or what a screenshot from the device shows, has evidence; a builder who
+can only repeat the agent has the next line of their round. The three
+quiet minutes are themselves stage 05 in small, because several people
+who did not build the app are holding it, so when someone gets stuck,
+ask the builder what they would have explained, and then point out that
+the person they hand it to this week will not have them there to
+explain it.
 
-Send the groups to their rehearsal rooms with the prompt on screen, and
-someone in each room keeping time. Each builder says in one line what
-they want to know, then shows their matrix with the cell their own eyes
-proved wrong, and the app running on the oldest device it supports,
-naming the newest feature that device will not show and why the new
-look fits the people it is for. They explain one decision with the
-agent closed, their partners ask one question before answering the
-three, and the builder ends with what is next, and ready or not yet.
-Visit the rooms, say so as you arrive, and listen for the bars and the
-signs of "not yet" above, especially a second platform shown only in a
-simulator, which is exactly what the talk after the break is about.
+A builder with nothing new to try still gets their nine minutes: they
+say who the app is for and what its first screen would show, each
+person asks one question to understand it, and they leave with that
+prompt half written. In the 75-minute version, groups of three try one
+another's apps in rooms, and after the break one person from each group
+says one thing someone did with an app, then what it suggests.
 
-In the 60-minute version there are no rooms: everyone stays in the
-call, each person gets about five minutes, and the whole cohort plays
-the partners, so keep the question and the three answers to one or two
-voices each.
+## Write your next round
 
-## Why the agent cannot grade itself
-
-*Written by Claude, awaiting Ben's review (the rewrite of October 23, 2026).*
-
-A short talk, taken from [stage 04](../path/04-seeing-it-work.md)'s
-section of the same name. An agent reports what it intended, so "I
-fixed it" is true about the code and says nothing about the app, and
-everything short of the real device lies a little: a simulator lets the
-app write where a real Apple TV forbids it, and a log line that says
-"caption shown" does not mean a person could read it. So the agent does
-the testing, and the evidence comes from outside it, a picture of the
-actual screen, a number read from the device, or a person holding it.
-If there is time, name the rungs of stage 04's ladder (doors,
-simulators, real devices, a person) and say that the agent should use
-the cheapest rung that can actually see the bug.
-
-One story from stage 04 makes the point well. In Bsky Dreams' first
-month the feed was showing posts twice, the agent had tried three fixes
-that did not work, and it was still saying they did, so the prompt
-stopped asking for a fourth fix and asked for a way to see the problem:
+Show a real round first. One from stage 04 fits this week well: in Bsky
+Dreams' first month the feed was showing posts twice, the agent had
+tried three fixes that did not work and was still saying they did, so
+my round stopped asking for a fourth fix and asked for a way to see the
+problem:
 
 > You have clearly not found the root cause of the issue, nor are you
 > actually testing to make sure that it is fixed before telling me
@@ -173,65 +154,43 @@ stopped asking for a fourth fix and asked for a way to see the problem:
 > post is rendered a signgle time and continue to work until your
 > code passes that test.
 
-End by asking everyone to think of one thing in their own app they have
-taken the agent's word for, because that is what they bring to the
-board next. The talk is the same in the 60-minute version, a minute
-shorter.
+Then the form:
 
-## What would you ask to see?
+- I tried my app, and here is what I saw: 1. ___ 2. ___ 3. ___
+- Start with ___
+- This is done when ___
+- It must never ___
 
-*Written by Claude, awaiting Ben's review (the rewrite of October 23, 2026).*
+This week "This is done when" is something they will see on their own
+device, which is the first prompt of stage 04 in one line: the agent
+proves its fix with a screenshot from that device, and one phone is
+enough. A line that says only "make sure it works" still leaves the
+agent grading itself, so ask what the screen would look like if the fix
+had not worked. The round can end with who holds the app next, on which
+device, and how it gets there for free, a link, a test track, or the
+web (stage 05's "Sharing it for free" says what each costs, and the web
+version is the only free way to reach someone's iPhone). Tell them the
+one thing that makes that person worth asking: give them one thing to
+do, then watch without explaining, and write down what they did, where
+they paused, and what they said, in their words.
 
-Put up the board from the *Read one real prompt* template, but tonight
-every learner fills it from their own app rather than from someone
-else's situation. Each person picks one thing their agent said it fixed
-this week, writes the prompt they would send asking it to prove the fix
-on their device, and writes what the screen would look like if the fix
-had not worked. Then they read a partner's and change their own if the
-partner's asks for better evidence. The second line is the one to watch
-for, because a person who can say what failure would look like has a
-test that could fail, and a prompt that only says "make sure it works"
-still leaves the agent grading itself. In the 60-minute version the
-partners are whoever sits next to them on the board, and you can read
-one or two aloud to the whole call.
+Everyone writes in the box in their panel and sends the same words to
+their agent before the part ends. In the last two minutes each person
+reads their "Start with" line aloud, in the same order, with no applause
+and no comment, and those lines open week 4.
 
-## Start
+## Your questions
 
-*Written by Claude, awaiting Ben's review (the rewrite of October 23, 2026).*
+One private question in the panel: "What questions do you still have?"
+Only the leaders read the answers. Answer two or three aloud, the rest
+before week 4, and open week 4 by saying what you read.
 
-Everyone sends the first prompt of [stage 04](../path/04-seeing-it-work.md)
-before they leave, asking their agent to prove its next fix on their own
-device with a screenshot, and one phone is enough. The prompt from the
-board is usually the right one to send. Then they plan [stage
-05](../path/05-shipping.md) by answering the prompt on screen: who will
-hold the app this week, on which device, and how it gets there for
-free, a link, a test track, or the web (stage 05's "Sharing it for
-free" says what each free way costs, and the web version is the only
-free way to reach someone's iPhone).
-
-While they plan, say the one thing that makes the person worth asking:
-give them one thing to do, then watch without explaining, and write
-down what they did, where they paused, and what they said, in their
-words. The urge to explain is strong, and every explanation hides
-something the person would have found confusing, so ask everyone to
-write the one thing they will ask their person to do. This scene runs
-the same way in both versions, with a room open, or in the 60-minute
-version a few minutes after, for anyone whose prompt gets stuck.
-
-## The check
-
-The question scenes at the end of the run of show, answered privately,
-and shown on the main stage without names only if you choose:
-
-1. **When your agent says something is fixed, what do you ask to see,
-   and why is its word not enough?** (in their own words).
-2. **What questions do you still have?** (in their own words).
-
-**Also prepared:** "How do you know your last fix is real?"
-
-The answer you hope for names evidence from outside the agent: a
+The week's own question goes on the session page before week 4, beside
+each builder's own question: "How do you know your last fix is real?"
+The answer you hope for names evidence from outside the agent, a
 screenshot from the device, a measurement, or a test that could have
-failed. An answer that trusts the agent's report is worth a word.
+failed, and an answer that trusts the agent's report is worth a word
+before the session.
 
 ## The task, and its evidence
 
@@ -263,21 +222,21 @@ point people to:
 And the ladder for any of them: name the kind of stuck, write three
 lines (what you tried, what you expected, what you saw), ask the agent
 for a way to understand it rather than the fix, look on the device and
-at the last thing that worked, then your trio, then the teacher. About
-twenty minutes before the trio is a default each person can move.
+at the last thing that worked, then your group, then the teacher. About
+twenty minutes before the group is a default each person can move.
 
 ## The close
 
-> Answer the questions on the live page before you go. Next week, bring
-> a screenshot that proved a fix, and your app on a device you did not
+> Answer the question in your panel before you go. Next week, bring a
+> screenshot that proved a fix, and your app on a device you did not
 > build it on, with what that person did and said, in their own words,
 > in your note.
 
 ## After the session
 
-Read the checks, write your two sentences, and reach out within two
-days to anyone who missed the session or brought nothing back. Week 4 is also the first of the
-sessions where you look closely at every build, so set aside time
-the day after it.
+Read the answers and write what you will say about them at the start of
+week 4, and reach out within two days to anyone who missed the session
+or did not send a round. Week 4 is also the first of the sessions where
+you look closely at every build, so set aside time the day after it.
 
 Next week, the app in someone else's hands.

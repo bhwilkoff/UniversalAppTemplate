@@ -1,5 +1,9 @@
 # Cohort Prep: getting set up and meeting your group
 
+<!-- Rewritten by Claude on November 18, 2026, at Ben's request, on the
+routine in docs/teaching/leading-a-session.md and the rebuilt
+runs-of-show.json. Awaiting Ben's review. -->
+
 **Where the cohort is.** Everyone has spent the week on [Getting set
 up](../path/setup.md), which counts nine steps on a Mac from "no GitHub
 account" to "my app is live at its own address", and only a few of them are
@@ -7,31 +11,29 @@ things a person does with their own hands. Some people will arrive with
 their app live at its own address. Some will arrive stuck on a sign-in
 that did not finish. Both are fine.
 
-This session is different from the five that follow. Nobody shows a
-stage's work yet, and nobody is asked what they think of anyone else's
-app, because people need to know who is in the room before they will
-show it something unfinished. So, this session is for getting everyone
-unstuck, meeting their group, hearing how we talk to one another, and
-seeing what a good build looks like before anyone has to make one.
+This session is different from the five that follow, because nobody
+tries anyone's app yet and nobody is asked what they think of someone
+else's work. People need to know who is in the room before they will
+show it something unfinished, so tonight is for getting everyone
+unstuck, hearing how we talk to one another, seeing what a strong build
+looks like before anyone has to make one, and starting the log that
+week 1 is built on.
 
 **Know who is in the room first.**
 
 ## The move and the question
 
-*Written by Claude, awaiting Ben's review (curriculum milestone C5, October 7, 2026).*
+**Publish.** This session leads with publishing, before anything is
+built: everyone opens their app's address where the others can see it.
+Writing starts at the end, with a noticing log that everyone keeps for
+the five days before week 1.
 
-**Publish.** This session leads with publishing, before anything is built: everyone opens their app's address and shows it to two people they have only just met. Writing starts at the end, with a noticing log that everyone keeps for the five days before week 1.
-
-The question the whole session turns on: **What do I need in order to build at all?**
-
-Every session is one round of Write, Play, Publish at a larger size,
-the same three moves as stage 00, and the principles decide what gets
-written, played with, and published
-([`00-curriculum-design.md`](../research/curriculum/00-curriculum-design.md)).
+The question the whole session turns on: **What do I need in order to
+build at all?**
 
 ## The run of show
 
-*Written by Claude, awaiting Ben's review (the rewrite of October 23, 2026, in four parts: show the stage's work, one thing that unblocks the next stage, start it, and the check).* Generated from [`runs-of-show.json`](runs-of-show.json) by `tools/teaching_tables.py`; change the JSON, then run it.
+*Written by Claude, awaiting Ben's review (the routine of November 18, 2026, in [`leading-a-session.md`](leading-a-session.md): your plans from last week, try each app, write your next round, your questions).* Generated from [`runs-of-show.json`](runs-of-show.json) by `tools/teaching_tables.py`; change the JSON, then run it.
 
 | Minutes (75) | Scene | Kind | What happens |
 |---|---|---|---|
@@ -60,20 +62,29 @@ Every scene can be changed on the session's page before it runs, and in the Meet
 
 **What to watch for tonight.**
 
-- Anyone whose setup is still stuck. Bring them to the main room and work through it where others can watch.
-- Anyone who has not met their trio yet.
+- Anyone whose setup is still stuck. Work through one of them in front
+  of everyone, because it shows the room how to ask their agent for help.
+- Anyone who has not yet met the people they will be trying apps with
+  next week.
 
-## The opening
+## Arrive
+
+Open with what the next six weeks ask, said in your own words or in
+these:
 
 > Welcome. Before anything else, I want you to know what the next six
 > weeks ask of you: one app of your own, built with your agent, and
-> shown each week to two other people who are building theirs. Tonight
-> nobody shows a stage, and nobody gives anyone feedback. We are here to
-> get everyone set up, to meet your group, and to see what a good
-> build looks like before you have to make one. Cameras are
-> welcome and never required, and the chat counts as being here. Let's
-> start with names, and one sentence each: what do you want your app to
-> do for someone you know?
+> tried each week by other people who are building theirs. Tonight
+> nobody tries anyone's app and nobody gives anyone feedback. We are
+> here to get everyone set up, to meet one another, and to see what a
+> strong build looks like before you have to make one. Cameras are
+> welcome and never required, and the chat counts as being here.
+
+Then go around in a fixed order, and each person says their name, where
+they are joining from, and one thing in their life they wish worked
+differently. Say before you start that the last part is the first entry
+in the log they begin tonight, so nobody needs a clever answer, only a
+true one.
 
 ## How we talk to one another
 
@@ -92,33 +103,41 @@ from "UI feedback pass" to "UI feedback round 7", each round a list of
 what was still wrong. The point to land is that a long list of what is
 wrong is what the method looks like when it is working.
 
-## What they show
+## Open each app
 
 The build for this week is the last line of Getting set up:
 
 > Be ready to open your app's address, and to say in one
 > sentence what you want it to do for someone you know.
 
+In the one call, each person presses Show my app to everyone in their
+panel and you press Show it, so the address opens for everyone at once.
+Anyone whose setup stopped shows where it stopped instead, and the whole
+call works through it with them. Choose one of those to fix slowly and
+out loud, with the builder asking their agent and everyone watching,
+because the room learns more from one stuck setup solved in public than
+from five that worked. In the 75-minute version each group of three
+does the same in its own room, four minutes to show the address and six
+to work through what stopped, and you bring anyone still stuck back to
+the main room.
+
 **The bar.** "You have your own copy of the template on GitHub, an agent
 that can read and change it, and your app's name at its own address."
-
-**What to look for.** The address opens for anyone, on any device, not
-only on the builder's own computer, and shows the app's name. The sentence names a person or a group the
-student actually knows, and says what the app does for them rather than
-listing features. A student whose address only works on the computer,
-or whose sentence is about "users," is not yet there, and the main room
-is where that gets fixed tonight.
+The address opens for anyone, on any device, not only on the builder's
+own computer, and shows the app's name. An address that only works on
+the builder's computer is not yet there, and tonight is when that gets
+fixed.
 
 ## A strong build and a weak one
 
-This is the design stage scene. Put the board on the main stage from the
-*The three questions* template, so everyone writes their three answers
-for the weak example where the others can see them.
-
-Show both, on screen, for half of what stage 00 will ask once each
-person has found their problem: "Be ready to share your 'why we build'
-paragraph, the people outside your screen, and your one rule, and to
-explain why you drew that line where you did and what it will cost you."
+From week 1 on, most of every session is people trying one another's
+apps and the builder explaining one decision, so it helps to see what a
+build looks like before anyone has to bring one. Put the board on the
+main stage from the *The three questions* template, and show both
+examples for half of what stage 00 will ask once each person has found
+their problem: "Be ready to share your 'why we build' paragraph, the
+people outside your screen, and your one rule, and to explain why you
+drew that line where you did and what it will cost you."
 
 **The strong one** is built from Archive Watch, from stage 00 itself.
 The rule is "No AI-written lists or copy in the product," dated, and in
@@ -134,16 +153,14 @@ build and keep running instead.
 nobody: "This is Archive Watch. It's for people who like old movies. My
 rule is no AI. It's going pretty well."
 
-Put everyone in pairs for three minutes to answer the three questions
-about the weak one: where is it going, how is it going, and what is
-next. Then ask the whole room what they could not answer, and why. The
-answers people reach for are the reasons the strong one is strong: it
-names who the app touches, it draws a line with a reason, and it says
-what holding that line costs.
+Everyone writes three answers about the weak one on the board, where
+the others can see them: where is it going, how is it going, and what
+is next. Then ask the whole room what they could not answer, and why.
+The answers people reach for are the reasons the strong one is strong:
+it names who the app touches, it draws a line with a reason, and it
+says what holding that line costs.
 
 ## Start your noticing log
-
-*Written by Claude, awaiting Ben's review (from research note 06, October 7, 2026).*
 
 Nobody chooses a problem tonight. None of my apps began as an idea for
 an app: each began with part of my life that kept bothering me, and I
@@ -171,44 +188,46 @@ than thinking things up (Paul Graham,
 ["How to Get Startup Ideas,"](http://www.paulgraham.com/startupideas.html)
 2012).
 
-Say three things about the log before anyone leaves:
+Say three things about the log before anyone writes:
 
 1. **No app ideas yet.** Write what happened, not what to build. An
    idea for an app on day one closes the door on the problem underneath
    it.
-2. **Keep it anywhere.** A notes app on the phone, paper, or the app's
-   own note. The log is private, and nobody reads it unless its owner
-   reads a line aloud.
+2. **Keep it anywhere.** A notes app, paper, or the app's own note. The
+   log is private, and nobody reads it unless its owner reads a line
+   aloud.
 3. **Bring it to week 1.** The whole session starts from it.
 
-Then ask everyone to write the first line before they go, while you
-watch the clock.
+Then give quiet minutes for the first line, starting from what each
+person said when they arrived, and have everyone paste one line into
+the panel before the part ends.
 
-## The check
+## Your questions
 
-The question scenes at the end of the run of show, answered privately, and
-shown on the main stage without names only if you choose:
+One private question in the panel, the same one that ends every
+session: "What questions do you still have?" Only the leaders read the
+answers. Answer two or three aloud before people leave, answer the rest
+before week 1, and open week 1 by saying what you read.
 
-1. **What do you hope this app will do for someone?** (in their own words).
-2. **How ready do you feel to build?** (a scale), of 5, from "Not ready yet" to "Ready to build".
-
-**Also prepared,** from this guide's first version, for when you want the stage's own question instead: "What did your agent do for you during setup that you expected to have to do yourself?"
-
-That question is the stage's own lesson ("You make the accounts. The agent
-does the rest.") turned into a question, and the answers tell you who has
-already started to hand the agent work and who is still doing it all by
-hand.
+Prep's own questions stay in the cohort's question bank. The one worth
+asking on the session page before Prep, while setup is still fresh, is
+"What did your agent do for you during setup that you expected to have
+to do yourself?" The answers tell you who has already started to hand
+the agent work and who is still doing it all by hand.
 
 ## The task, and its evidence
 
-*Written by Claude, awaiting Ben's review (curriculum milestone C5, October 7, 2026).*
+**The task.** Set up, and open your app's address. Then keep a noticing
+log for five days, one line whenever one of its four prompts happens,
+with no app ideas in it.
 
-**The task.** Set up, and open your app's address. Then keep a noticing log for five days, one line whenever one of its four prompts happens, with no app ideas in it.
+**Evidence a person can open.** The repository, and the address open
+for anyone. The log stays private; what it becomes in week 1 is the
+evidence.
 
-**Evidence a person can open.** The repository, and the address open for anyone. The log stays private; what it becomes in week 1 is the evidence.
-
-**On the credential.** The repository is the credential's first evidence. Students do the thing itself, and what they
-make is the evidence; nobody writes a report about it
+**On the credential.** The repository is the credential's first
+evidence. Students do the thing itself, and what they make is the
+evidence; nobody writes a report about it
 ([`05-inquiry-and-evidence.md`](../research/curriculum/05-inquiry-and-evidence.md)).
 
 ## When someone is stuck
@@ -223,24 +242,24 @@ point people to:
 And the ladder for any of them: name the kind of stuck, write three
 lines (what you tried, what you expected, what you saw), ask the agent
 for a way to understand it rather than the fix, look on the device and
-at the last thing that worked, then your trio, then the teacher. About
-twenty minutes before the trio is a default each person can move.
+at the last thing that worked, then your group, then the teacher. About
+twenty minutes before the group is a default each person can move.
 
 ## The close
 
-> Before you go, answer the two questions on the live page. Only I will
-> see them, and I will read every one before next week. This week you
-> will not build anything new. You will keep your log, one line at a
-> time, and next week we start from it, together, to find the problem in
-> your life that is worth building something for. Nobody has to know
-> what it is yet, and it is better if you don't.
+> Before you go, answer the question in your panel. Only I will see
+> it, and I will read every one before next week. This week you will
+> not build anything new. You will keep your log, one line at a time,
+> and next week we start from it, together, to find the problem in your
+> life that is worth building something for. Nobody has to know what it
+> is yet, and it is better if you don't.
 
 ## After the session
 
-Read the checks and write your two sentences for next week's opening.
-Reach out within two days to anyone who missed the session or left
-without their app live at its address, and offer them half an hour
+Read the answers and write what you will say about them at the start of
+week 1. Reach out within two days to anyone who missed the session or
+left without their app live at its address, and offer them half an hour
 before week 1. Then confirm the groups of three, and send each group
-its names, so everyone knows who they will be showing next week.
+its names, so everyone knows whose apps they will be trying.
 
 Next week, everyone starts from their log.
