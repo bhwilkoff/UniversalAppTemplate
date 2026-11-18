@@ -783,12 +783,23 @@
   function open() {
     if (roomPage) { useRoom(); return; }
     if (!cfg.cloudProjectNumber) { $('[data-error-text]').textContent = 'This add-on is not set up yet.'; return show('error'); }
-    Promise.race([
+    // In the panel (?inpanel=1): the same stage, small, with the panel that
+    // holds it standing in for Meet's messages.
+    var inPanel = /[?&]inpanel=1\b/.test(location.search) && window.parent !== window;
+    var client = inPanel ? Promise.resolve({
+      notifySidePanel: function (p) { window.parent.postMessage({ hsPanel: p }, location.origin); return Promise.resolve(); },
+      on: function (ev, h) {
+        if (ev !== 'frameToFrameMessage') return;
+        window.addEventListener('message', function (e) { if (e.source === window.parent && e.origin === location.origin && e.data && e.data.hsStage != null) h({ payload: e.data.hsStage }); });
+      }
+    }) : Promise.race([
       window.meet.addon.createAddonSession({ cloudProjectNumber: String(cfg.cloudProjectNumber) }),
       new Promise(function (_, no) { setTimeout(function () { no(new Error('timeout')); }, 10000); })
     ]).then(function (session) {
       return session.createMainStageClient();
-    }).then(function (stage) {
+    });
+    if (inPanel) document.documentElement.classList.add('stage-in-panel');
+    client.then(function (stage) {
       stageClient = stage;
       if (roomCode) {
         stage.on('frameToFrameMessage', function (m) { var f = m && RL.readFrame(m.payload); if (f && room) heardFrame(f); });

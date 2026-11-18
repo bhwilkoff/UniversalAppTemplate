@@ -610,10 +610,7 @@
       db: db, auth: current, cohort: S.cohort, me: S.me, name: S.names[S.me.id] || null,
       log: function (kind, detail) { if (S.keeping) S.keeping(kind, detail); },
       mount: $('[data-react]'),
-      onStage: function (payload) {
-        if (!S.stageOn || !side) return;
-        try { Promise.resolve(side.notifyMainStage(payload)).catch(function () {}); } catch (e) {}
-      },
+      onStage: function (payload) { stageSend(payload); },
       onPresence: function (state) {
         S.presence = state;
         var members = (S.teacherIds || []).concat(S.people.map(function (p) { return p.user_id; }));
@@ -726,9 +723,9 @@
     var shared = CL.shared(S.presence || {}, S.teacherIds || []);
     S.code.show(shared);
     var msg = CL.stageMessage(shared);
-    if (msg !== S.codeStageSent && S.stageOn && side) {
+    if (msg !== S.codeStageSent && stageThere()) {
       S.codeStageSent = msg;
-      try { Promise.resolve(side.notifyMainStage(msg)).catch(function () {}); } catch (e) {}
+      stageSend(msg);
     }
   }
 
@@ -3221,8 +3218,8 @@
     return S.mineApp ? Array.prototype.filter.call(S.mineApp.querySelectorAll('button'), function (b) { return /^Show my app/.test(b.textContent || ''); })[0] || null : null;
   }
   function toStage(step) {
-    if (!side || !S.stageOn || !CL) return;
-    try { Promise.resolve(side.notifyMainStage(CL.message(step))).catch(function () {}); } catch (e) {}
+    if (!stageThere() || !CL) return;
+    stageSend(CL.message(step));
   }
   function coachDraw(step, n, of, label) {
     if (!CO) return;
@@ -3317,9 +3314,41 @@
     var view = S.session ? currentView() : null;
     drawStageLine(view);
     coachCheck(view);
-    if (!S.stageOn || !side || !S.session) return;
-    try { Promise.resolve(side.notifyMainStage(A.stageMessage(view, !!S.recording, !S.teaching, S.svc ? S.svc.stance() : null, !S.teaching && !(S.room && S.room.groupId) && !!(S.signals && S.signals.state() && S.signals.state().rooms)))).catch(function () {}); } catch (e) {}
+    drawPanelStage();
+    if (!stageThere() || !S.session) return;
+    stageSend(A.stageMessage(view, !!S.recording, !S.teaching, S.svc ? S.svc.stance() : null, !S.teaching && !(S.room && S.room.groupId) && !!(S.signals && S.signals.state() && S.signals.state().rooms) && !!S.stageOn));
   }
+  // The stage in the panel (Ben, November 18, 2026: the activity should "flow
+  // from one person to another without having to leave a massive main stage
+  // slide on the screen"). With no main stage open, the same stage page runs
+  // small at the top of the panel, fed by the same messages through the
+  // browser instead of Meet, so Meet's window stays the people's and any
+  // screen share's, and everyone still sees and answers the part.
+  function stageThere() { return !!((S.stageOn && side) || (S.mini && S.mini.ready)); }
+  function stageSend(payload) {
+    if (S.stageOn && side) { try { Promise.resolve(side.notifyMainStage(payload)).catch(function () {}); } catch (e) {} }
+    if (S.mini && S.mini.ready && S.mini.frame.contentWindow) { try { S.mini.frame.contentWindow.postMessage({ hsStage: payload }, location.origin); } catch (e) {} }
+  }
+  function drawPanelStage() {
+    if (standalone || !S.frame || !S.session) return;
+    var want = !S.stageOn && !(S.room && S.room.groupId);
+    if (!S.mini && want) {
+      var box = el('section', 'p2-mini-stage'), f = document.createElement('iframe');
+      box.setAttribute('aria-label', 'What is on the stage');
+      f.title = 'What is on the stage';
+      f.src = location.origin + '/addon/stage/?inpanel=1';
+      f.setAttribute('allow', 'clipboard-read; clipboard-write');
+      box.appendChild(f);
+      var pane = S.frame.pane('now');
+      if (pane) pane.insertBefore(box, pane.firstChild);
+      S.mini = { box: box, frame: f, ready: false };
+    }
+    if (S.mini) S.mini.box.hidden = !want;
+  }
+  window.addEventListener('message', function (e) {
+    if (!S.mini || e.source !== S.mini.frame.contentWindow || e.origin !== location.origin || !e.data || e.data.hsPanel == null) return;
+    onFrame({ payload: e.data.hsPanel }, true);
+  });
   // Something a leader put up over the part's own plan: a pin, a card, a
   // website or Propose and vote. Clear takes it down; the part's own slide
   // or question comes back. Nothing here ends Meet's activity (Week 2: Close
@@ -3467,6 +3496,20 @@
     show('loading');
     asGuest();
   });
+  // What a stage says to this panel: the main stage through Meet, or the
+  // stage in the panel through the browser.
+  function onFrame(m, inPanel) {
+    if (m && opened && opened.frame(m.payload)) return;
+    if (m && A.isHello(m.payload)) {
+      if (inPanel) { S.mini.ready = true; }
+      else { S.stageOn = true; stageButtons(true); }
+      sendStage(); S.codeStageSent = null; drawCode();
+    }
+    var did = m && A.readAct(m.payload);
+    if (did) stageAct(did);
+    var key = m && A.readKey(m.payload);
+    if (key && S.classChannel) S.classChannel.press(key);
+  }
   function open() {
     show('loading');
     if (!cfg.cloudProjectNumber) return fail('This add-on is not set up yet: it needs its Google Cloud project number in assets/addon-config.js.');
@@ -3474,14 +3517,7 @@
       return session.createSidePanelClient();
     }).then(function (client) {
       side = client;
-      side.on('frameToFrameMessage', function (m) {
-        if (m && opened && opened.frame(m.payload)) return;
-        if (m && A.isHello(m.payload)) { S.stageOn = true; stageButtons(true); sendStage(); S.codeStageSent = null; drawCode(); }
-        var did = m && A.readAct(m.payload);
-        if (did) stageAct(did);
-        var key = m && A.readKey(m.payload);
-        if (key && S.classChannel) S.classChannel.press(key);
-      });
+      side.on('frameToFrameMessage', function (m) { onFrame(m, false); });
       return signIn().then(function (s) {
         if (s) return proceed(s);
         return strangerCall().then(function (code) {
