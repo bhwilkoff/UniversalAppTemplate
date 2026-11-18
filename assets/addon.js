@@ -2312,12 +2312,13 @@
     if (box.contains(document.activeElement) && document.activeElement.tagName === 'INPUT') return;
     box.replaceChildren();
     drawClassApps(); drawBack();
-    var app = S.myApp ? L.classifyLink(S.myApp) : null;
+    var app = S.myApp && !S.editApp ? L.classifyLink(S.myApp) : null;
     box.hidden = false;
     if (!app) {
       // No address yet: add it here, without leaving the call.
       var f = el('form', 'p2-ask-form'), input = el('input'), said = el('span', 'small');
       input.type = 'url'; input.placeholder = 'https://'; input.setAttribute('aria-label', 'Your app’s address');
+      if (S.editApp && S.myApp) input.value = S.myApp;
       var go = el('button', 'btn-primary small', 'Save'); go.type = 'submit';
       said.setAttribute('role', 'status');
       f.appendChild(input); f.appendChild(go);
@@ -2340,9 +2341,12 @@
           if (r.error || !r.data || !r.data.length) { said.textContent = 'Not saved' + (r.error ? ': ' + r.error.message : '.'); return; }
           (S.guests || []).forEach(function (g) { if (g.user_id === S.me.id) g.app_url = c.url; });
           if (S.classChannel) S.classChannel.nudge('guests');
-          S.myApp = c.url;
+          S.myApp = c.url; S.editApp = false;
           S.people.forEach(function (p) { if (p.user_id === who()) p.app_url = c.url; });
           input.blur(); drawMyApp();
+          checkSite(c.url).then(function (k) {
+            if (!k.ok && S.mineApp) S.mineApp.appendChild(el('p', 'small', k.why === 'unreachable' ? 'Saved, but that address says not found right now. Check that it opens in a new tab.' : 'Saved, but your app will not open inside another page, so share your screen when it is your turn.'));
+          });
         });
       });
       return;
@@ -2357,6 +2361,10 @@
     box.appendChild(button('Show my app to everyone', 'btn-primary', function () {
       db.from('live_queue').insert({ cohort_id: S.cohort.id, session_id: S.session.id, user_id: who(), kind: app.kind, url: app.url }).then(function (r) { if (!r.error) refreshLive(); });
     }));
+    var addr = el('p', 'small p2-my-address');
+    addr.appendChild(document.createTextNode(app.label + ' '));
+    addr.appendChild(button('Change it', 'link-button', function () { S.editApp = true; drawMyApp(); }));
+    box.appendChild(addr);
   }
   // Everyone in the call with an app: members, and guests who are not tied
   // to a member (a tied guest's app is that member's).
@@ -2396,6 +2404,24 @@
     box.hidden = !S.myStage;
     if (S.myStage) box.appendChild(button('Back to the class', 'btn-primary small', function () { tryOnMyStage(null); }));
   }
+  // Whether an app's address can be shown on the stage, asked of the rooms
+  // worker before it goes up (Week 3, 2026-11-18: an old address said "not
+  // found" and the stage showed a blank white frame). Anything the check
+  // cannot answer lets the app go up as before.
+  function checkSite(url) {
+    if (!cfg.rooms || !window.fetch) return Promise.resolve({ ok: true });
+    return fetch(cfg.rooms + '/frame?url=' + encodeURIComponent(url)).then(function (r) { return r.json(); })
+      .then(function (c) { return c && c.why === 'address' ? { ok: true } : c || { ok: true }; }, function () { return { ok: true }; });
+  }
+  function siteProblem(c, who) {
+    if (c.ok) return '';
+    return c.why === 'unreachable' ? who + '’s address says not found. Ask them to check it opens, or to share their screen.'
+      : who + '’s app will not open inside another page. Use Open in a new tab, or ask them to share their screen.';
+  }
+  function showChecked(url, who, said, go) {
+    said.textContent = 'Checking the address…';
+    return checkSite(url).then(function (c) { said.textContent = siteProblem(c, who); if (c.ok) go(); });
+  }
   // A learner asking to show comes to the leader where the leader is looking.
   function drawAsks() {
     var box = S.nowAsks;
@@ -2405,7 +2431,9 @@
     L.queue(S.items).waiting.filter(function (x) { return x.id !== staged; }).forEach(function (item) {
       var row = el('div', 'p2-ask');
       row.appendChild(el('span', null, nameOf(item.user_id) + ' is ready to show'));
-      row.appendChild(button('Show it', 'btn-secondary small', function () { setPin({ kind: 'item', id: item.id }); }));
+      var said = el('span', 'small'); said.setAttribute('role', 'status');
+      row.appendChild(button('Show it', 'btn-secondary small', function () { showChecked(item.url, nameOf(item.user_id), said, function () { setPin({ kind: 'item', id: item.id }); }); }));
+      row.appendChild(said);
       box.appendChild(row);
     });
     (S.requests || []).filter(function (r) { return r.state === 'waiting'; }).forEach(function (r) {
@@ -2627,11 +2655,14 @@
       var live = S.onStage && S.onStage.kind === 'item' && (S.items.filter(function (x) { return x.id === S.onStage.id; })[0] || {}).user_id === p.user_id;
       li.appendChild(button(live ? 'Take it down' : 'Show it', 'btn-secondary small', function () {
         if (live) return db.from('live_queue').update({ state: 'shown' }).eq('id', S.onStage.id).then(function () { setPin(null); refreshLive(); });
-        db.rpc('queue_member_app', { s: S.session.id, member: p.user_id }).then(function (r) {
-          if (r.error) return;
-          refreshLive().then(function () { setPin({ kind: 'item', id: r.data }); drawApps(); });
+        showChecked(p.app_url, S.names[p.user_id] || 'Their', said, function () {
+          db.rpc('queue_member_app', { s: S.session.id, member: p.user_id }).then(function (r) {
+            if (r.error) { said.textContent = r.error.message; return; }
+            refreshLive().then(function () { setPin({ kind: 'item', id: r.data }); drawApps(); });
+          });
         });
       }));
+      var said = el('span', 'small roster-said'); said.setAttribute('role', 'status'); li.appendChild(said);
       ul.appendChild(li);
     });
     box.appendChild(ul);
