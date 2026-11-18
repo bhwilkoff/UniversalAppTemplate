@@ -1758,11 +1758,9 @@ div.slide-pick { cursor: default; }
 .breakouts-people, .breakouts-rooms { list-style: none; margin: 0.4rem 0; padding: 0; display: grid; gap: 0.35rem; }
 .breakouts-people li { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; }
 .breakouts-people select { min-height: 32px; font: inherit; border: 1px solid var(--rule); border-radius: 8px; background: var(--card); color: var(--ink); }
-.breakouts-rooms li { display: grid; grid-template-columns: 1fr auto; gap: 0.1rem 0.5rem; align-items: center; }
+.breakouts-rooms li { display: flex; flex-direction: column; align-items: flex-start; gap: 0.15rem; }
 .breakouts-room-name { font-weight: 600; }
-.breakouts-names { grid-column: 1; }
-.breakouts-rooms .btn-secondary { grid-column: 2; grid-row: 1 / span 2; }
-.breakouts-rooms li > .small, .breakouts-help { grid-column: 1; }
+.breakouts-rooms li > .btn-secondary { order: 9; margin-top: 0.25rem; width: auto; }
 .breakouts-rooms li.is-asking { border: 2px solid var(--accent); border-radius: 8px; padding: 0.4rem 0.5rem; }
 .breakouts-help { font-weight: 600; }
 .breakouts-note { margin-top: 0.5rem; }

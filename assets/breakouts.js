@@ -11,6 +11,7 @@
   function button(label, cls, fn) { var b = el('button', cls, label); b.type = 'button'; b.addEventListener('click', fn); return b; }
 
   function start(o) {
+    var overTimer = null;
     var box = o.mount, count = null, minutes = 10, minutesSet = false, placed = {}, said = '';
 
     function everyone() { return o.people(); }
@@ -28,7 +29,7 @@
       // A part sets the rooms: as many as its group size needs, or its count,
       // and never an empty room.
       var wanted = pre.size ? Math.ceil(ids.length / pre.size) : pre.groups;
-      var n = count || (wanted ? Math.max(1, Math.min(wanted, ids.length || 1)) : L.roomCount(ids.length));
+      var n = count || (wanted ? Math.max(1, Math.min(wanted, ids.length || 1)) : Math.min(L.roomCount(ids.length), Math.max(1, ids.length)));
       var dealt = L.split(ids, n);
       var rooms = dealt.map(function () { return []; });
       dealt.forEach(function (room, i) {
@@ -253,7 +254,10 @@
       var st = o.signals.state() || {}, presence = o.presence() || {};
       var open = keep === true;
       box.replaceChildren();
-      if (st.rooms) {
+      var over = st.rooms && st.rooms.ends_at && Date.parse(st.rooms.ends_at) <= Date.now();
+      if (over) clearTimeout(overTimer);
+      else if (st.rooms && st.rooms.ends_at) { clearTimeout(overTimer); overTimer = setTimeout(function () { draw(); }, Math.max(1000, Date.parse(st.rooms.ends_at) - Date.now() + 500)); }
+      if (st.rooms && !over) {
         box.appendChild(el('h3', null, 'In breakouts'));
         box.appendChild(list(presence));
         var acts = el('div', 'actions');
@@ -264,8 +268,9 @@
         box.appendChild(acts);
         box.appendChild(noteForm(st.note));
         readWork();
-      } else if (st.together || o.groups().some(function (g) { return g.breakout; })) {
-        box.appendChild(el('h3', null, st.together ? 'Coming back' : 'Breakouts are over'));
+      } else if (over || st.together || o.groups().some(function (g) { return g.breakout; })) {
+        box.appendChild(el('h3', null, over || st.together ? 'Coming back' : 'Breakouts are over'));
+        if (over || st.together) box.appendChild(list(presence));
         var waiting = roomsNow().reduce(function (n, g) { return n + L.arrived(g, presence).here.length; }, 0);
         box.appendChild(el('p', 'small', waiting ? waiting + ' still in a room' : 'No one is in a room'));
         var acts2 = el('div', 'actions');

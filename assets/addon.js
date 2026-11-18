@@ -1430,6 +1430,10 @@
     var b = $('[data-breakouts]'), running = !!(st.rooms || st.together), pane = S.frame.pane('now');
     if (b && running && b.parentNode !== pane) { pane.insertBefore(b, pane.firstChild); S.frame.show('now'); }
     if (b && !running && b.parentNode === pane) S.frame.pane('tools').insertBefore(b, S.frameTools);
+    // A learner's room, and the call back, come before the question (found in
+    // the breakout test, 2026-11-18: Join your room sat below the question).
+    var w = $('[data-sig-where]');
+    if (w && !S.teaching && running && w.parentNode && w.parentNode.firstChild !== w) w.parentNode.insertBefore(w, w.parentNode.firstChild);
   }
 
   // Where the show is in this part's slides, for the plan and the stage.
