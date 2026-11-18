@@ -11,7 +11,7 @@
   function button(label, cls, fn) { var b = el('button', cls, label); b.type = 'button'; b.addEventListener('click', fn); return b; }
 
   function start(o) {
-    var overTimer = null;
+    var overTimer = null, workTimer = null;
     var box = o.mount, count = null, minutes = 10, minutesSet = false, placed = {}, said = '';
 
     function everyone() { return o.people(); }
@@ -96,7 +96,7 @@
     var work = {}, workAt = 0;
     function readWork() {
       var ids = o.groups().filter(function (g) { return g.breakout; }).map(function (g) { return g.id; });
-      if (!ids.length || Date.now() - workAt < 15000) return;
+      if (!ids.length || Date.now() - workAt < 10000) return;
       workAt = Date.now();
       o.db.from('workbook_answers').select('group_id, value, updated_at').in('group_id', ids).then(function (r) {
         if (r.error) return;
@@ -330,6 +330,9 @@
         box.appendChild(acts);
         box.appendChild(noteForm(st.note));
         readWork();
+        // Nothing tells this panel when a room saves, so it reads again while
+        // the rooms run (found in the breakout test: the count never moved).
+        if (!workTimer) workTimer = setInterval(function () { if (o.signals.state().rooms) readWork(); else { clearInterval(workTimer); workTimer = null; } }, 15000);
       } else if (over || st.together || o.groups().some(function (g) { return g.breakout; })) {
         box.appendChild(el('h3', null, over || st.together ? 'Coming back' : 'Breakouts are over'));
         if (over || st.together) box.appendChild(list(presence));
