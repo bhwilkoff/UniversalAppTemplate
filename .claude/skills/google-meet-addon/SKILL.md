@@ -41,6 +41,44 @@ paid for by a feature that passed a test and then failed in Meet.
 - Keyboard shortcuts work with focus in your frames, never with focus on
   Meet's own page; only a Chrome extension gets past that.
 
+## The stage gives way: measured November 18, 2026
+
+The SDK on gstatic was 1.2.0, the only version. A panel's client offers
+`startActivity`, `endActivity`, `setActivityStartingState`,
+`getActivityStartingState`, `notifyMainStage`, and `getMeetingInfo`; a
+stage's offers `notifySidePanel`, `loadSidePanel`, and `unloadSidePanel`.
+`closeAddon` does nothing during an activity.
+
+- **Nothing closes only the main stage.** `startActivity` while one runs
+  is refused ("Operation cannot be performed while an activity is
+  ongoing"). `endActivity` closes every frame, and a restart shows each
+  person Meet's "Join activity" card again.
+- **An activity may name only `sidePanelUrl`.** Everyone's panel opens and
+  Meet's big window stays free for people and screen shares. After Join
+  activity, Meet may leave a joiner's panel folded until they press the
+  activity icon.
+- So never force a big slide to stay up just to keep the activity alive.
+  Routes that worked: run the stage page **inside the panel** (an iframe,
+  messages by `postMessage`) whenever no main stage is open; let the main
+  stage **turn into** what is shown (an app, a shared screen) with the
+  slide kept in a small corner each person can hide; end the activity
+  only after asking.
+- **A shared screen on the stage:** the frames cannot capture, so a popup
+  the panel opens calls `getDisplayMedia` and sends the picture peer to
+  peer (WebRTC, public STUN) to every stage that asks, with the handshake
+  on a realtime broadcast channel. The stage frame has autoplay off, so a
+  `<video>` stays black: read frames with `MediaStreamTrackProcessor` and
+  draw them on a canvas, falling back to a "Press to watch" button.
+- **Background tabs throttle a test picture**: Chrome pauses
+  `requestAnimationFrame` and slows timers in a hidden tab, so a canvas
+  test source must tick from a Worker clock, or the stage shows a frozen
+  frame that looks like a bug in the stage.
+- **Put diagnostics on the stage itself** (route, track muted or live,
+  connection state): a stage inside Meet has no console anyone can read.
+- Ben's rule from that day: there is never one way to solve a problem.
+  When Meet seems to forbid something, list several routes and measure
+  which the SDK allows before building one.
+
 ## Orienting people who have never used an add-on
 
 People know video calls, not add-ons, so they cannot tell what is possible,
