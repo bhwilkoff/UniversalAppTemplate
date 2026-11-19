@@ -50,16 +50,19 @@
   function testPicture() {
     var c = document.createElement('canvas'); c.width = 1280; c.height = 720;
     var g = c.getContext('2d'), t0 = Date.now();
-    (function tick() {
+    function tick() {
       var sec = Math.floor((Date.now() - t0) / 1000);
       g.fillStyle = '#1f3b2d'; g.fillRect(0, 0, 1280, 720);
       g.fillStyle = '#fff'; g.font = 'bold 72px sans-serif'; g.fillText('Test picture from /share/', 120, 300);
       g.font = '48px sans-serif'; g.fillText('Seconds since it started: ' + sec, 120, 420);
       g.fillStyle = '#9fd3b0'; g.fillRect(120 + (sec % 10) * 100, 500, 80, 80);
-      // A timer, not requestAnimationFrame, which Chrome pauses in a tab that
-      // is not in front, and a paused canvas sends no frames.
-      setTimeout(tick, 100);
-    })();
+    }
+    tick();
+    // The clock lives in a worker: Chrome pauses requestAnimationFrame in a tab
+    // that is not in front and slows its timers to once a minute after five
+    // minutes there, and a canvas that is not redrawn sends no frames.
+    var w = new Worker(URL.createObjectURL(new Blob(['setInterval(function(){postMessage(0)},100)'], { type: 'text/javascript' })));
+    w.onmessage = tick;
     return c.captureStream(15);
   }
   function stop() {
