@@ -323,3 +323,13 @@ something, react, go to a room and back, bookmark a moment.
 4. **Plain words for what happens:** Show my app to everyone; Open it on my
    screen; Back to the class; Bookmark this moment (not "mark", which names
    marking a path stage ready).
+
+## The stage flows from person to person (November 18, 2026)
+
+Ben, after Week 3: "We are actually trying to allow for the activity to continue and to flow from one person to another without having to leave a massive main stage slide on the screen," and "make it so that the stage itself simply converts from a slide to the app that is being demoed or the screen share that someone requests to do."
+
+1. **The stage becomes what is being shown.** An app at its address (Show it, checked first), or a screen: Share my screen on the stage opens /share/, which captures in its own window and streams peer to peer to every stage. Meet's stage frame has autoplay off, so a screen is drawn frame by frame on a canvas.
+2. **The part's slide stays in a corner** while an app or a screen fills the stage, so the routine's lines stay in front of everyone; each person can hide it.
+3. **An activity can have no stage.** Open everyone's panel starts it with only the panel, and Meet's window stays the people's and any screen share's.
+4. **The stage lives in each panel** whenever no main stage is open: the same page, fed the same messages through the browser.
+5. **Close the main stage** ends the activity after saying so; everyone comes back with one Join activity. Meet refuses a second start while an activity runs, and has no call that closes only the stage (measured in a real call).
