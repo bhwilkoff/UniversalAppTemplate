@@ -1294,3 +1294,38 @@ for the builder. Write down in advance what silence means.
 with the rights holder absent; the builder gains months of work kept
 pointed at something that can last; the cost is a slower start and a
 smaller first version.
+
+---
+
+## 055 — Every app is built so it can end well
+*Date: 2026-11-21 (from BOBA Playbook's sunset)*
+
+From the first deploy: every cloud resource carries the project's
+prefix, a person can export their own data, the privacy, terms, and
+data-deletion pages are static files that outlive the app, media sits
+behind a domain the project owns, borrowed content lives in its own
+directories, and the repo keeps an inventory (names only) of every
+key, OAuth client, store listing, and registration. When the end comes,
+the teardown follows `app-sunset-playbook`: inventory before deleting,
+exports and personal notice before pausing, pause before deleting, and
+delete by prefix only.
+
+**Why**: BOBA Playbook's shutdown had to unwind a hosted database with
+32 real accounts, ten Workers, an R2 bucket, a D1 database, four KV
+namespaces, two store presences, and a dozen third-party registrations,
+on a cloud account and a database org other projects still used. The
+prefix was the only safe filter on the shared account, a key turned up
+committed in a setup doc, the R2 bucket could not be deleted until a
+lifecycle rule emptied it, and Play still required the data-deletion
+URL after the app was unpublished. Each of those is free to prepare on
+day one and expensive to discover on the last.
+
+**How to apply**: the Part 0 rules of `app-sunset-playbook` when the
+backend is first stood up (Decision 047 picks the posture); the rest of
+the skill on the day. The repo ends archived, with a code-only license,
+a post mortem, and the lessons upstreamed here.
+
+**Who was in the room, who gains, who pays:** the owner deciding to
+stop; the people who used the app gain their data back and a promise
+kept; the owner pays a day of careful teardown instead of a week of
+discovery.

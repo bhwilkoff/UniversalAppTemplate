@@ -151,6 +151,27 @@ them safe:
 - The loop reads its own plan and runbooks before inventing a new way
   to do something.
 
+## When it ends
+
+<!-- Written by Claude, awaiting Ben's review (from BOBA Playbook's
+sunset, 2026-11-21). -->
+
+Keeping an app running includes the day you stop. I want the people
+who trusted an app with their collections to get their work back, to
+hear plainly what is happening and when, and to have every promise kept
+to the day. When BOBA Playbook ended, that meant an export emailed to
+each person who had saved anything, a static shutdown page at the same
+address, the privacy and data-deletion pages left live because Google
+Play still required them, and a deletion date that was met.
+
+Most of what makes an ending go well is decided on the first day, not
+the last: every cloud resource named with the project's prefix, so a
+shared account can be cleaned without touching anything else; a data
+export people can already use; legal pages that do not depend on the
+app; and a list of every key and registration the app holds. The
+`app-sunset-playbook` skill has those rules and the order for the
+teardown itself, including the store traps that cost me time.
+
 ## What it costs
 
 Pulse needs a key from every store it reads, and each store hands them

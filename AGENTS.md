@@ -104,6 +104,7 @@ Sources: `docs/research/gemini-and-other-agents.md`. Rows follow the
 | Store downloads, installs, reviews, crashes | `store-metrics-pipelines` |
 | Adding/editing ANY scheduled workflow, or CI failures / alert noise | `ci-fleet-engineering` |
 | Running an unattended multi-tick development loop | `autonomous-loop-cadence` |
+| Shutting an app down, or making sure it can end well | `app-sunset-playbook` |
 | **07 Raising the ceiling** | |
 | Video/audio streaming from hosts you don't control | `resilient-media-streaming` |
 | SharePlay / Group Activities | `shareplay-activities` |

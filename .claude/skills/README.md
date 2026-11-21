@@ -1,6 +1,6 @@
 # The skills
 
-There are 154 folders in this directory. 64 of them I wrote, one lesson
+There are 155 folders in this directory. 65 of them I wrote, one lesson
 at a time, while building BOBA Playbook, Bsky Dreams, Tidbits Trivia,
 Archive Watch, and humanshaped.org. The other 90 came from people who wrote good skills
 before I needed them, and they are credited below.
@@ -142,6 +142,7 @@ them. "From" names the app where the lesson was learned.
 | `store-metrics-pipelines` | Getting downloads, installs, ratings, reviews and crashes out of each store's API, and the traps in each. | Archive Watch |
 | `ci-fleet-engineering` | Scheduled workflows that never lose work and never cry wolf. | Archive Watch |
 | `autonomous-loop-cadence` | Running an agent in timed ticks across several platforms. | BOBA Playbook |
+| `app-sunset-playbook` | Ending an app well: what to build on day one so it can end, then exports and notice, store unpublishing, teardown by project prefix, and the public record. | BOBA Playbook |
 
 ### Stage 07: Raising the ceiling
 
