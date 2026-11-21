@@ -59,6 +59,22 @@ nobody rediscovers an exclusion.
   `zero-cost-hosted-backend` when a second app needs it), and the shell
   stamping tool itself, since the template ships no service worker yet.
 
+- **2026-11-21**, BOBA Playbook's shutdown. BOBA closed on 2026-11-21
+  because it never got approval from the publisher whose game it was
+  built on, and its `POSTMORTEM.md` and `SUNSET_PLAN.md` were the new
+  sources. The root-cause lesson became a rule (Decision 054, Part 0 of
+  `third-party-ip-monetization`, Step 0 of
+  `multiplatform-expansion-method`, stage 00's "Ask whose it is"), the
+  teardown became a skill (`app-sunset-playbook`, Decision 055, stage
+  06's "When it ends"), and App Review's findings went into
+  `store-submission-playbook`. A gap scan of BOBA's memory files against
+  the 2026-08-26 port also added a few lessons to
+  `third-party-revocation-resilience`, `zero-cost-hosted-backend`,
+  `web-platform-patterns`, `android-production-gotchas`, and
+  `image-cdn-discipline`. Left behind on purpose: the publisher's
+  content, the people's exports and emails, account and app
+  identifiers, and BOBA's shutdown page itself.
+
 ## Coverage: domain → home in this template
 
 | Domain | Lives in |
@@ -121,6 +137,11 @@ nobody rediscovers an exclusion.
 | iPhone Duo, App Store creative assets, Asset Library API, public-Xcode rule | `ios-production-gotchas`, `store-submission-playbook`, `tools/asc_asset_library.py` + `asc_stage_assets.py` |
 | Push races, durable failure memory, ingest gated before publish, fair queues | `docs/CI-FLEET.md` §2-3, `ci-fleet-engineering`, `pulse.yml` and `play-release.yml` retry loops |
 | Standing rules on words and AI in the product | `learning-orientation-design`, `mobile-first-density-design`, `AGENTS.md` Standing instructions |
+| Permission before building on IP you don't own; scope and platforms grow with people and permission (BOBA shutdown, 2026-11-21) | `third-party-ip-monetization` Part 0, `multiplatform-expansion-method` Step 0, `docs/path/00-why-we-build.md` "Ask whose it is", Decision 054 |
+| Ending an app well (day-one readiness, inventory, Day 0 order, store unpublish and delete traps, revocation before key deletion, delete by prefix, R2 lifecycle emptying, deletion URL kept live, code-only license, post mortem) | `app-sunset-playbook` skill, `docs/path/06-keeping-it-running.md` "When it ends", Decision 055 |
+| App Review on every device class, Guideline 4.1 is permission not wording, ASC Version string is free text, real screenshots never mockups, Play icon without alpha | `store-submission-playbook` |
+| Bulk automation under a personal account (rate limit, then deactivation) | `third-party-revocation-resilience` "Your own account is a dependency too" |
+| Worker-to-Worker service bindings, project prefixes on shared accounts, driving the hosted database from an agent | `zero-cost-hosted-backend` |
 
 ## Deliberate exclusions (do not "rediscover" these)
 
