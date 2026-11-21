@@ -211,6 +211,31 @@ pitch an app. You are listening for their story, because human-shaped
 problems "see the world as interrelated stories to be told, experienced,
 and added to."
 
+### Ask whose it is
+
+<!-- Written by Claude, awaiting Ben's review (from BOBA Playbook's
+post mortem, 2026-11-21). -->
+
+Some problems live inside something another person owns: a game, a
+show, a set of cards, a community's data. If yours does, there is a
+third conversation to have before you build, and it is with the owner.
+BOBA Playbook was a companion app for a trading-card game, and I built
+a web app, an Android app and an iOS app, with pipelines for card art
+and prices, before the publisher ever said yes. They never did, so on
+November 21, 2026, I shut it down. Apple had already said the same
+thing over the summer, when it rejected the iOS app twice for using the
+game's name without permission, and a disclaimer did not change that.
+
+So, if the problem rests on someone else's work, you make asking the
+owner the first milestone, not the last one. A one-page description of
+what you want to build and why, and the small prototype from stage 01,
+are enough to ask with. Until you have a written yes, keep the build to
+the one small thing that tells you whether people want it, because the
+engineering was never what stood in my way. Permission and people were,
+and building more did nothing about either
+(`third-party-ip-monetization` has the shape of the ask, and Decision
+054 is the rule).
+
 ## Where the values live in this template
 
 There are three places, and each one is read at a different moment.

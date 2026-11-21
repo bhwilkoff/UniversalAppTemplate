@@ -1,6 +1,6 @@
 ---
 name: store-submission-playbook
-description: "Use when preparing ANY store submission (App Store iOS/iPadOS/tvOS/macOS, Google Play, Amazon Appstore, Roku, Samsung Tizen, Microsoft Store): TestFlight/internal tracks, listings, screenshots, signing, review prep, IAP launches, post-approval follow-ups. Carries the cloud-and-CLI default pathway, floors chosen by hardware, layered tvOS icons, Play App Signing vs upload-key fingerprints, AASA/assetlinks serving, the 12-tester rule, screenshot env hooks, privacy manifests, account deletion, one-submission-per-IAP-product and Ready-to-Submit traps, pre-launch report = Test Lab, driving a store console in a browser, and the Roku / Amazon / Fire TV / Tizen traps. Triggers on App Store submission, Play Console, TestFlight, app review, store listing, screenshots, signing, assetlinks, AASA, privacy manifest, release prep, IAP, paywall empty, Ready to Submit, Roku dashboard, certification, Amazon Appstore, Fire TV, Tizen."
+description: "Use when preparing ANY store submission (App Store iOS/iPadOS/tvOS/macOS, Google Play, Amazon Appstore, Roku, Samsung Tizen, Microsoft Store): TestFlight/internal tracks, listings, screenshots, signing, review prep, IAP launches, post-approval follow-ups. Carries the cloud-and-CLI default pathway, floors chosen by hardware, layered tvOS icons, Play App Signing vs upload-key fingerprints, AASA/assetlinks serving, the 12-tester rule, screenshot env hooks, privacy manifests, account deletion, one-submission-per-IAP-product and Ready-to-Submit traps, pre-launch report = Test Lab, driving a store console in a browser, and the Roku / Amazon / Fire TV / Tizen traps. Triggers on Guideline 4.1, Copycats, iPad rejection, App Store submission, Play Console, TestFlight, app review, store listing, screenshots, signing, assetlinks, AASA, privacy manifest, release prep, IAP, paywall empty, Ready to Submit, Roku dashboard, certification, Amazon Appstore, Fire TV, Tizen."
 ---
 
 # Store Submission Playbook
@@ -54,6 +54,13 @@ them as an explicit OWNER list.
   rendered VERBATIM where the license requires it; privacy policy;
   account deletion if any sign-in exists (both stores reject
   without it).
+- **Store screenshots are real captures of the running app**, never
+  HTML or design-tool mockups imitating its UI. Mockups read as fake
+  within seconds, and BOBA's owner rejected a set on sight (*"Why
+  would we use these instead of screenshots from the app?"*). If the
+  device cannot be driven this session, defer the screenshots; do not
+  fake them. Designed graphics (feature graphic, icon) are a different
+  slot and may be composed.
 - **Icon discipline**: every store/asset icon derives from the ONE
   canonical master in `branding/` (Decision-level: delete retired
   masters from the repo entirely — a stale master WILL get picked
@@ -62,6 +69,22 @@ them as an explicit OWNER list.
 
 ## App Store (iOS / iPadOS)
 
+- **Walk sign-in and account deletion on EVERY device class the binary
+  declares**, not just the phone you develop on. A universal app is
+  often reviewed on an iPad: BOBA Playbook's iPad sign-in was a dead
+  button (a sheet presented from a popover, see `ios-production-gotchas`),
+  which also made account deletion unreachable, and both came back as
+  rejections (2.1(a) and 5.1.1(v)).
+- **Guideline 4.1 (Copycats) is about permission, not wording.** A
+  third-party brand in the name, icon or screenshots without the rights
+  holder's permission is rejected, and a non-affiliation disclaimer does
+  not change the outcome (BOBA was rejected twice). Have written
+  permission ready, or keep the brand out of the listing
+  (`third-party-ip-monetization` Part 0).
+- **The App Store Connect "Version" string is free text**, independent
+  of `MARKETING_VERSION`/build lineage. The only hard rule on a
+  resubmission is a build number higher than the last upload; do not
+  spend a session reconciling "1.0" with an internal 2.4xx.
 - App ID + capabilities (SiwA, iCloud, Push, App Groups) before the
   first archive; capability changes invalidate provisioning.
 - `PrivacyInfo.xcprivacy` privacy manifest — required; include
@@ -212,6 +235,11 @@ Shares the Apple pre-flight above; the Mac-specific gates:
 - Listing assets: 512 icon, 1024×500 feature graphic, phone
   screenshots; deep-link-driven screenshot generation works the
   same as Apple.
+- **The Play listing icon must have no alpha channel**, even a fully
+  opaque one. Flatten onto a solid background (PIL `paste` with the
+  alpha as mask); `sips -s hasAlpha no` errors instead. Derive it, and
+  the feature graphic, from the canonical icon master by resizing, never
+  by redrawing the mark from vector.
 - Manifest audit before submitting: every deep-link host/path the
   app EMITS (share links, App Links routes) must be declared in an
   intent-filter, and every route must land on the right screen —

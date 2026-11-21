@@ -166,7 +166,7 @@ them. "From" names the app where the lesson was learned.
 | `human-shaped-review` | Feedback on your app from your own AI agent, walking the fifteen Human-Shaped Principles as questions with evidence. It never grades, it says what it could not see, it labels itself as AI, and you decide whether to share it. | The Human-Shaped Principles, October 2026 |
 | `two-agent-handoff` | Two different AI agents working on one project through a single handoff file. | BOBA Playbook |
 | `third-party-revocation-resilience` | Every outside data source can be taken away. Plan the exit before you depend on it. | BOBA Playbook |
-| `third-party-ip-monetization` | Charging for an app built around something you do not own. | BOBA Playbook |
+| `third-party-ip-monetization` | Building on something you do not own: asking the owner first, and charging for it only after. | BOBA Playbook |
 | `provenance-honest-market-data` | Prices and valuations that say what kind of number they are. | BOBA Playbook |
 | `marketplace-adjacent-design` | Letting people trade with one another without the app ever touching money. | BOBA Playbook |
 

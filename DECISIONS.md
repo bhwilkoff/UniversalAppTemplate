@@ -1262,3 +1262,35 @@ platform still maps tokens into its own idiom by hand (Android's
 `Theme.kt` slots, Windows control styles, Apple views), and Apple keeps
 system text styles for Dynamic Type. A deleted platform folder is
 skipped, not recreated.
+
+---
+
+## 054 — Permission comes before scale: on someone else's IP, the licensing conversation is the first milestone
+*Date: 2026-11-21 (from BOBA Playbook's shutdown and post mortem)*
+
+When an app's subject matter belongs to someone else (a game, a show,
+a catalog, a community's data), ask the owner before building past a
+prototype, and get the answer in writing. Until there is a yes, build
+only what tells you whether people want the thing: one platform, data
+you may use, and no store listing that carries their brand. More
+generally, scope and platforms grow when people and permission ask for
+them, never because an agent makes building cheap.
+
+**Why**: BOBA Playbook built three native clients, an image pipeline, a
+pricing pipeline, practice battles and 3D card videos before the
+publisher ever said yes. It never did, App Review rejected the iOS app
+twice under Guideline 4.1 (Copycats) despite a non-affiliation
+disclaimer, and the app shut down on 2026-11-21 with 32 accounts. The
+engineering was never the constraint; audience and permission were, and
+every added platform did nothing about either while multiplying what
+had to be torn down.
+
+**How to apply**: the `third-party-ip-monetization` skill, Part 0, before
+the first pipeline that ingests the owner's content; the `multiplatform-expansion-method`
+skill, Step 0, before any new platform; stage 00's "Ask whose it is"
+for the builder. Write down in advance what silence means.
+
+**Who was in the room, who gains, who pays:** the builder and an agent,
+with the rights holder absent; the builder gains months of work kept
+pointed at something that can last; the cost is a slower start and a
+smaller first version.

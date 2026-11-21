@@ -10,6 +10,21 @@ several times — distilled from expanding a shipped tvOS app to
 iOS/iPadOS, macOS, web PWA, and Android, with all five reaching their
 stores.
 
+## Step 0: Earn the next platform
+
+With an agent, a new platform is cheap to build and expensive to keep:
+every one is another review queue, another set of gotchas, and another
+column of `PARITY.md` that has to stay true. So the trigger for
+expansion is never "we can": it is people asking for it on a platform
+they already use, and, when the app rests on someone else's IP,
+written permission to exist at all (`third-party-ip-monetization`
+Part 0). BOBA Playbook shipped web, Android and iOS in parallel, plus
+practice battles, 3D card videos and a trading design, and its post
+mortem names the cost plainly: audience and permission were the
+constraints, and adding platforms did nothing about either. One
+platform done well, and the conversation with the rights holder, would
+have answered more, sooner (Decision 054).
+
 ## Step 1 — Find the seam
 
 Every app separates into two layers. The expansion only rebuilds the

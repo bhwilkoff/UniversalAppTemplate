@@ -55,6 +55,7 @@ Sources: `docs/research/gemini-and-other-agents.md`. Rows follow the
 | Proposing or reviewing ANY feature, especially AI or automation | `learning-orientation-design` |
 | Starting any feature change | `feature-shipping-discipline` |
 | Logging an architecture decision | `architectural-decision-log` |
+| The app rests on IP you don't own: ask the owner first | `third-party-ip-monetization` |
 | UI / IA work once a platform has a design doc | `binding-design-doc-discipline` |
 | **01 First prototype** | |
 | Any web UI, routing, data, offline or image work | `web-platform-patterns` |

@@ -1,6 +1,6 @@
 ---
 name: third-party-ip-monetization
-description: Use when planning to monetize an app built around IP or content you don't own — a fan app, a companion app, a catalog/collection app for someone else's game, cards, shows, or music — or when choosing between seeking a license, restructuring what's paid, and accepting gray-zone risk. Carries the takedown-asymmetry principle, the verbatim-policy discipline, the three paths (license / monetize-only-your-own-work / status-quo), the FREE-TIER-PAID surface audit, single-SKU launch with numeric triggers, the entitlement architecture, and the pre-committed decision gates. Triggers on monetization, subscription, paywall, fan app, companion app, licensing, IP risk, rights holder, cease and desist risk, pricing tier, entitlements, "can we charge for this".
+description: Use BEFORE building an app on IP or content you don't own (secure permission first; the licensing conversation is milestone one), and when planning to monetize an app built around IP or content you don't own — a fan app, a companion app, a catalog/collection app for someone else's game, cards, shows, or music — or when choosing between seeking a license, restructuring what's paid, and accepting gray-zone risk. Carries the takedown-asymmetry principle, the verbatim-policy discipline, the three paths (license / monetize-only-your-own-work / status-quo), the FREE-TIER-PAID surface audit, single-SKU launch with numeric triggers, the entitlement architecture, and the pre-committed decision gates. Triggers on building on someone else's IP, licensing first, permission, publisher approval, Guideline 4.1, Copycats, monetization, subscription, paywall, fan app, companion app, licensing, IP risk, rights holder, cease and desist risk, pricing tier, entitlements, "can we charge for this".
 ---
 
 # Third-Party IP Monetization
@@ -10,6 +10,38 @@ matter — the cards, the game, the catalog, the universe — belongs to
 someone else. Distilled from a shipped companion app's monetization
 review (policy texts retrieved verbatim the same day the framework
 was written).
+
+## Part 0: Permission before building (the first milestone)
+
+BOBA Playbook, a companion app for a trading-card game, built three
+native-quality clients, an image pipeline and a pricing pipeline
+before getting a yes from the publisher. It never got one, and it shut
+down on 2026-11-21 (see `app-sunset-playbook`). App Review had already
+said the same thing formally: rejected under **Guideline 4.1
+(Copycats)** for using the brand without the rights holder's
+permission, resubmitted with a non-affiliation disclaimer, rejected
+again under 4.1. Engineering effort was never the constraint;
+permission and audience were, and more platforms did nothing for
+either.
+
+- **The licensing conversation is milestone one, not the last
+  milestone.** Before any pipeline that ingests the owner's content and
+  before any second platform, ask. A one-page pitch and a web prototype
+  are enough to ask the question (Path A below has the shape of the
+  ask).
+- **Until there is a written yes, build only what answers "do folks
+  want this?"** One platform, the smallest real thing, data you are
+  allowed to use. No store submission that puts their name or art in
+  the listing: 4.1 is decided by the brand in the name, icon and
+  screenshots, and a disclaimer does not fix it. Be ready to show
+  App Review written permission for any third-party brand you use.
+- **Pre-commit what silence means.** Write down how long you will wait
+  and what no reply means for the plan (usually: stay at prototype
+  scope, or pivot to subject matter you can use). Most asks get no
+  reply; the gate keeps silence from turning into a slow default yes.
+- **Everything the owner supplies is borrowed until it is licensed**:
+  the content, the art, the brand, and the community's trust. Treat
+  each as revocable (`third-party-revocation-resilience`).
 
 ## The asymmetry comes first
 
@@ -160,6 +192,7 @@ commission program.
 
 ## Anti-patterns
 
+- Building the full product first and asking the rights holder last.
 - Monetizing first and researching the fan-content policy after.
 - Paraphrased policy summaries with no retrieval date.
 - A paywall in front of the third party's content because "our
