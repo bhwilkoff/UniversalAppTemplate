@@ -175,6 +175,8 @@ test('the builder\'s own words come from the declaration, then the directory, th
 test('where an app stands, and where to talk about it', () => {
   assert.equal(lib.statusText({ status: 'founding' }, null), 'One of the four apps the method came from');
   assert.equal(lib.statusText({ status: 'founding' }, { status: 'declared' }), 'Aligned with Human Shaped');
+  assert.equal(lib.statusText({ status: 'founding', retired: '2026-11-21' }, null), 'One of the four apps the method came from, retired in November 2026');
+  assert.equal(lib.statusText({ status: 'listed', retired: '2026-11-21' }, { status: 'declared' }), 'Retired in November 2026');
   assert.equal(lib.statusText({ status: 'cohort' }, { status: '' }), 'Being built in a cohort');
   assert.deepEqual(lib.conversation('a/b', { has_discussions: true, has_issues: true }), { href: 'https://github.com/a/b/discussions', kind: 'discussions' });
   assert.deepEqual(lib.conversation('a/b', { has_discussions: false, has_issues: true }), { href: 'https://github.com/a/b/issues', kind: 'issues' });

@@ -157,7 +157,7 @@
     else card.appendChild(cover);
     var h = el('h3'); h.appendChild(href ? link(href, app.name) : document.createTextNode(app.name)); card.appendChild(h);
     // The founding apps' status is said once, on /apps/ and their own pages.
-    if (app.status !== 'founding') card.appendChild(el('p', 'status', lib.statusText(app, app.declaration && typeof app.declaration === 'object' ? app.declaration : null)));
+    if (app.status !== 'founding' || app.retired) card.appendChild(el('p', 'status', lib.statusText(app, app.declaration && typeof app.declaration === 'object' ? app.declaration : null)));
     if (app.in_its_own_words) card.appendChild(el('p', 'own', '“' + app.in_its_own_words + '”'));
     var names = lib.platformNames(app.platforms);
     var facts = [];
@@ -168,6 +168,7 @@
       var links = el('ul', 'links');
       links.setAttribute('aria-label', app.name + ' links');
       if (href) links.appendChild(li(link(href, 'Follow its work')));
+      if (lib.safeUrl(app.postmortem)) links.appendChild(li(link(app.postmortem, 'Read its post mortem')));
       if (lib.safeUrl(app.website)) links.appendChild(li(link(app.website, app.website.replace(/^https:\/\//, '').replace(/\/$/, ''))));
       lib.storeLinks(app.stores).forEach(function (st) { links.appendChild(li(link(st.href, st.text))); });
       card.appendChild(links);
@@ -278,6 +279,7 @@
       $('[data-facts]').textContent = facts.length ? facts.join(', ') + '.' : '';
       var links = $('[data-links]'); links.replaceChildren();
       var site = lib.safeUrl(app.website) || (d && d.website);
+      if (lib.safeUrl(app.postmortem)) links.appendChild(li(link(app.postmortem, 'Read its post mortem')));
       if (site) links.appendChild(li(link(site, site.replace(/^https:\/\//, '').replace(/\/$/, ''))));
       lib.storeLinks(app.stores).forEach(function (s) { links.appendChild(li(link(s.href, s.text))); });
       links.appendChild(li(link('https://github.com/' + repo, 'Its repository')));

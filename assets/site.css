@@ -1682,6 +1682,8 @@ label.check { min-height: 2.25rem; }
 /* Every app on the same device (iPhone App Store screenshots): two by two,
    then four across. */
 .shots:not(:has(.shot-tv)) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+/* Three phones sit side by side at every width rather than leaving a gap. */
+.shots:not(:has(.shot-tv)):has(> :nth-child(3):last-child) { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .shot-phone img { aspect-ratio: 600 / 1000; object-fit: cover; object-position: top; border-radius: 16px; }
 .shot-name { display: block; margin-top: 0.6rem; font-weight: 600; font-size: 0.95rem; }
 .shots a:hover .shot-name { text-decoration: underline; text-decoration-color: var(--band-accent); text-underline-offset: 0.2em; }

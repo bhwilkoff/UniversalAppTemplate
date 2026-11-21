@@ -237,11 +237,20 @@
   }
 
   // One line that says where an app stands, in the two marks' words
+  // "November 2026" from "2026-11-21"; the raw value if it isn't a date.
+  var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  function monthYear(iso) {
+    var m = /^(\d{4})-(\d{2})/.exec(String(iso || ''));
+    return m && Number(m[2]) >= 1 && Number(m[2]) <= 12 ? MONTHS[Number(m[2]) - 1] + ' ' + m[1] : String(iso || '');
+  }
+
   // (DECISIONS.md, October 5, 2026): an app whose HUMAN-SHAPED.md
   // answers the principles is aligned with Human Shaped, whether every
   // answer is "meets" yet or not, and one made from the template is
   // endorsed by it.
   function statusText(app, declaration) {
+    // A retired app says so first, whatever else is true of it.
+    if (app && app.retired) return (app.status === 'founding' ? 'One of the four apps the method came from, retired in ' : 'Retired in ') + monthYear(app.retired);
     if (declaration && declaration.status === 'withdrawn') return 'Its answers to the principles have been withdrawn';
     if (declaration && declaration.principles && declaration.principles.length) return 'Aligned with Human Shaped';
     if (declaration && (declaration.status === 'declared' || declaration.status === 'working toward')) return 'Aligned with Human Shaped';
@@ -294,7 +303,6 @@
   var SHOTS = {
     'archive-watch': { n: 2 },
     'tidbits-trivia': { n: 2 },
-    'boba-playbook': { n: 2 },
     'bsky-dreams': { n: 2 },
     'ear-drama': { n: 2 }
   };

@@ -14,7 +14,5 @@ listings, 600 pixels wide, and rewrites the table below.
 | tidbits-trivia-2.webp | Tidbits Trivia, App Store (id6782202277), iPhone screenshot 2 |
 | bsky-dreams-1.webp | Bsky Dreams, App Store (id6760909675), iPhone screenshot 1 |
 | bsky-dreams-2.webp | Bsky Dreams, App Store (id6760909675), iPhone screenshot 2 |
-| boba-playbook-1.webp | bhwilkoff/BOBA-Playbook `tools/screenshots/public/screenshots/home.png` |
-| boba-playbook-2.webp | bhwilkoff/BOBA-Playbook `tools/screenshots/public/screenshots/play.png` |
 | ear-drama-1.webp | bhwilkoff/Ear-Drama `build/store-shots/final/iphone/01-hear-and-make.png`, the App Store set for 1.0.133 (not yet live) |
 | ear-drama-2.webp | bhwilkoff/Ear-Drama `build/store-shots/final/iphone/02-play-and-record.png` |
