@@ -134,6 +134,20 @@ until proven otherwise.
 - **Centroid-aware `rememberTransformableState` lambda parameter
   order is `(centroid, zoom, pan, rotation)`** — centroid FIRST;
   the wrong order compiles (positional aliases) and breaks at use.
+- **A controlled text field fed by a debounced flow eats keystrokes.**
+  `SearchBarDefaults.InputField` and `TextField(value = ...)` show
+  exactly the `query` they are given; if that comes from a
+  `debounce`d upstream, any recomposition inside the debounce window
+  writes the stale value back and the IME rolls the keystroke away
+  ("I can't type in the search bar"). The visible query is always
+  immediate; debounce only the filter that reads it. (`distinctUntilChanged()`
+  on a `StateFlow` is a deprecated no-op.)
+- **Call extension functions on an implicit receiver unqualified.**
+  Inside `Modifier.pointerInput { }`, a fully qualified
+  `androidx.compose.foundation.gestures.detectHorizontalDragGestures(...)`
+  is an unresolved reference; import it and call
+  `detectHorizontalDragGestures(...)`. The same holds for
+  `LazyListScope.items`, `DrawScope` and `PointerInputScope` helpers.
 
 - **Lazy keys must be UNIQUE, not merely stable.** A key built from a
   display field (a file name, a title) collides the day two rows share it

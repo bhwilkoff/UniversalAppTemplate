@@ -68,7 +68,10 @@ platform and no client-side fix can help.
 - Production requires a **custom domain attached to the CDN zone** so
   real edge caching applies. (For R2 that means the zone must be on
   Cloudflare DNS — check the nameserver prerequisite early; it can be
-  the actual blocker.)
+  the actual blocker.) **Attach it on day one**, before the first
+  public link: BOBA Playbook stayed on `r2.dev` for its whole life
+  because its DNS sat with another host, and the slow long tail was the
+  most visible cost of that one deferred step.
 - **Do the domain move BEFORE any bulk asset regeneration**, so the
   new bytes land behind a real cache instead of warming a domain
   you're about to abandon.

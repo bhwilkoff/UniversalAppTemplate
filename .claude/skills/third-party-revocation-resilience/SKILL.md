@@ -36,6 +36,29 @@ path designed BEFORE the feature ships on top of it:
   keys.** Your canonical IDs are yours; theirs are a mapped,
   droppable column.
 
+### Your own account is a dependency too
+
+Automation that runs under a PERSONAL account (a user token driving an
+exporter or scraper against a chat platform, a social site, a
+marketplace) puts the person at risk, not the script. BOBA Playbook
+pulled card art from a community's chat history with an exporter run
+under the owner's own token: running channels in parallel locked his
+desktop client within seconds, and over the following days the
+platform's anti-abuse system deactivated the account outright. Rules:
+
+- **Never run bulk automation under the owner's personal identity.**
+  Use the platform's sanctioned bot or API path with its own
+  credentials and permission, or ask a member of the community to share
+  the asset by hand.
+- **One token means one rate-limit bucket.** Concurrency on a user
+  token multiplies the request rate the platform sees; if it must run
+  at all, it runs sequentially.
+- **A ban is tied to more than the token** (device, network), so a new
+  account from the same machine is not a fresh start. When a platform
+  says stop, the source is closed: remove the scripts, the scheduled
+  jobs, and the stored token the same day, and record the rule so no
+  later session proposes it again.
+
 ### Shared per-app quotas (a slow revocation)
 
 Many APIs meter quota per PROJECT (the one behind the app's shipped

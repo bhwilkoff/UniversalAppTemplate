@@ -267,6 +267,27 @@ but each service has a ceiling you should know before designing:
   hence the CDN rule above.
 - **Zero-egress object storage** is the piece that makes image-heavy
   apps free; egress-billed buckets are the trap.
+- **A Worker cannot fetch another Worker's public URL on the same
+  account.** The edge returns 404 and the destination never runs, with
+  no log on either side, while the same URL works from curl. Declare a
+  service binding (`[[services]] binding = "X_SVC", service = "app-x"`)
+  and call `env.X_SVC.fetch(new Request("https://internal/path?q"))`;
+  only the path and query matter.
+- **Free tiers push several projects onto one account.** Name every
+  Worker, bucket, database, and KV namespace with the project's prefix
+  from the first deploy; it is the only safe filter the day one project
+  is torn down (`app-sunset-playbook`).
+
+## Driving the hosted database from an agent
+
+- **A SQL tool call is its own session.** A `CREATE TEMP TABLE` is gone
+  before the next call; multi-step migrations use a regular staging
+  table and drop it explicitly at the end.
+- **Large literal SQL hits the tool's transport limit** (about 600 KB
+  through the Supabase MCP server; a 2 MB `INSERT ... VALUES` for an
+  18,000-row ID migration failed). Bulk loads go through the REST
+  endpoint with the service key in batches, or are chunked to a few
+  hundred rows.
 
 When a ceiling approaches, the escape valve is per-service and
 incremental — upgrade the one service, not the architecture.

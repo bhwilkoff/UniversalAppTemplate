@@ -29,6 +29,13 @@ deploy-reality layer** that vanilla web apps live or die on.
 
 ## View system architecture
 
+- **A top-level `const` in a classic script is a global name but NOT a
+  `window` property.** `const Auth = (() => {...})()` is reachable as
+  bare `Auth` from every later script, while `window.Auth?.open?.()` is
+  always `undefined`, silently, so a feature gated on it never appears
+  (BOBA's signed-in menu item vanished this way). Call the bare name
+  behind `typeof Auth !== 'undefined'`, or assign `window.Auth = Auth`
+  explicitly where another file reads it from `window`.
 - Each view is a `<section>`; `showView(name)` toggles `hidden`.
   **Per-view `IntersectionObserver`s are disconnected on every view
   switch** — leaked observers from a previous view fire on recycled
