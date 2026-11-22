@@ -128,6 +128,7 @@ fail.
 | `test_gtv_scenario.py`, `test_roku_run.py` | The Google TV and Roku runners parse what devices really return. |
 | `test_web.sh` | Every web test in one command, plus a syntax check of every script and a brace count of every stylesheet. |
 | `test_tv_focus.mjs`, `test_tv_ua.mjs`, `test_packaged_origin.mjs` | The TV web layer's focus engine, its detection, and its packaged build. |
+| `test_no_secrets.py`, `test_secrets_sh.py` | No secret in git (proved on planted samples, run as `.githooks/pre-commit` and `secrets-check.yml`), and `secrets.sh` never prints a value or runs anything but its recipes. |
 | `test_us_english.py` | One spelling locale in every string a person reads, on every platform. Exceptions carry their reason. |
 | `test_fire_tv_manifest.py`, `test_version_contract.py`, `test_ios_floor.py`, `test_tvos_floor.py` | The store gates above. |
 

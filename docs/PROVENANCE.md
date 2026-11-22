@@ -59,6 +59,18 @@ nobody rediscovers an exclusion.
   `zero-cost-hosted-backend` when a second app needs it), and the shell
   stamping tool itself, since the template ships no service worker yet.
 
+- **2026-11-22**, Ear Drama's secrets work (Decision 085): the owner's
+  "I do not want to set or keep track of keys and passwords for this
+  repo." became the `secrets-without-bookkeeping` skill, a secret scan as
+  pre-commit hook and CI check, a fixed-recipe `tools/secrets.sh`, and
+  Worker and workflow templates for GitHub OIDC. Also the lesson that a
+  workflow's trigger is checked before anything is called shipped (its
+  build workflow was dispatch-only and nothing reached TestFlight for six
+  days). Left behind on purpose: Ear Drama's Worker secret names, its
+  take-down and school-request routes, and its OIDC test file, which
+  rides on that Worker's test helpers (the refused cases are listed in
+  the template's header instead).
+
 - **2026-11-21**, BOBA Playbook's shutdown. BOBA closed on 2026-11-21
   because it never got approval from the publisher whose game it was
   built on, and its `POSTMORTEM.md` and `SUNSET_PLAN.md` were the new
@@ -88,6 +100,7 @@ nobody rediscovers an exclusion.
 | Media streaming + captions (loader invariants, AirPlay/Cast conflicts, HLS shapes, live captions, subtitle judging) | `docs/MEDIA-PLAYBACK.md` (the distillation), `resilient-media-streaming` skill (the core pattern) |
 | Windows / MSIX | `docs/windows/`, WINDOWS-DESIGN template, `tools/stamp_msix_version.py`, reference workflows, Decision 029 |
 | Store submission (Apple cloud default, Play CLI, screenshots, IAP) | `docs/CLOUD-SUBMISSION.md`, `cloud-appstore-submission` + `play-cli-submission` + `store-submission-playbook` skills, `tools/submit-*` + `asc_*` cluster, `docs/store/` (IAP troubleshooting + choreography, screenshot rules, Play dashboard recommendations, Play API key) |
+| Secrets (OIDC for owner-only routes, one home per secret, fixed-recipe `tools/secrets.sh`, a scan as hook and CI, the classifier facts, check a workflow's trigger before saying it shipped) | `secrets-without-bookkeeping` skill, `tools/test_no_secrets.py` + `tools/no_secrets_allowlist.txt`, `.githooks/pre-commit`, `secrets-check.yml`, `tools/secrets.sh` + `tools/test_secrets_sh.py`, `docs/templates/worker-github-oidc-template.js`, `docs/templates/operator-workflow-template.yml` (from Ear Drama Decision 085, 2026-11-22) |
 | Sync (CloudKit query-free pattern, Drive App Data, history-vs-progress) | `per-ecosystem-sync-islands` skill, `docs/runbooks/cloudkit-setup.md`, `docs/runbooks/google-oauth-setup.md`, `docs/research/sync-architecture.md` |
 | Shared data plane (SQLite delivery, CORS/Range matrix, additive evolution, forwarding addresses, marker/evidence rules) | `shared-data-plane-contract` + `web-catalog-data-layer` skills, DATA-CONTRACT template, `docs/CI-FLEET.md` §7, Decision 034 |
 | Data recovery + git forensics | `docs/runbooks/data-recovery.md` |

@@ -39,6 +39,11 @@ ROKU_CHANNEL_NAME = "AppName"
 APPLE_APP_STORE_ID = ""                           # e.g. "1234567890"
 GITHUB_REPO = ""                                  # e.g. "owner/Repo"
 PRODUCT_NAME = "AppName"                          # how a human writes it
+# tools/secrets.sh: the Keychain account and service prefix (`appname:ASC_KEY_P8`), and the
+# Cloudflare Worker's folder and name when the app has one (empty = no Worker recipes).
+SECRETS_NAME = "appname"
+WORKER_DIR = "worker"
+WORKER_NAME = ""                                  # e.g. "appname-api"
 PRODUCT_SITE = "https://example.com"              # the public site, no slash
 # What counts as somebody talking about US when searching the open web. The
 # LOOSE term is matched only alongside a corroborating word, because a product

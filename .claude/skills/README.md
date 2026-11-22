@@ -143,6 +143,7 @@ them. "From" names the app where the lesson was learned.
 | `ci-fleet-engineering` | Scheduled workflows that never lose work and never cry wolf. | Archive Watch |
 | `autonomous-loop-cadence` | Running an agent in timed ticks across several platforms. | BOBA Playbook |
 | `app-sunset-playbook` | Ending an app well: what to build on day one so it can end, then exports and notice, store unpublishing, teardown by project prefix, and the public record. | BOBA Playbook |
+| `secrets-without-bookkeeping` | No key for the owner to keep: remove the secret (CI-signed OIDC tokens), give each survivor one home, let agents move values only through a fixed-recipe script, fail every commit and CI run on a secret shape, and check a workflow's trigger before saying it shipped. | Ear Drama |
 
 ### Stage 07: Raising the ceiling
 

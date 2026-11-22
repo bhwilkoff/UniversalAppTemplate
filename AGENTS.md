@@ -115,7 +115,7 @@ Sources: `docs/research/gemini-and-other-agents.md`. Rows follow the
 | A value identical on every platform (daily pick, hash) | `cross-platform-determinism` |
 | Any algorithmic feed / discovery / "for you" surface | `values-based-feed-ranking` |
 | Reader mode or link-preview cards | `web-content-extraction` |
-| Third-party sign-in from an installed app, or a per-app API quota | `authentication` + `third-party-revocation-resilience` |
+| Third-party sign-in from an installed app, a per-app API quota, or ANY key/token/password | `authentication` + `third-party-revocation-resilience` + `secrets-without-bookkeeping` |
 | Identifying physical objects with the live camera | `camera-recognition-pipeline` |
 | 3D card rendering in RealityKit | `realitykit-3d-card-rendering` |
 | **08 Working with AI, and hard choices** | |
@@ -161,7 +161,7 @@ conventions, and which skill fires first.
   `tools/set_app_identity.py` when the owner names it; never ship
   `com.example.appname`.
 - **Native components first**; no third-party Swift packages.
-- **Secrets never in git**, and never in cleartext on disk.
+- **Secrets never in git**, and never in cleartext on disk. *Check: `tools/test_no_secrets.py`.*
 
 ---
 
