@@ -16,7 +16,7 @@ without them ("You must upload an iMessage screenshot").
 Runs in CI, not here. The ASC issuer id lives in GitHub secrets and should stay
 there — `.github/workflows/appstore-submit.yml` passes it in.
 
-    ASC_KEY_ID=... ASC_ISSUER_ID=... python3 tools/asc_submit.py \
+    python3 tools/asc_submit.py \
         --set IMESSAGE_APP_IPHONE_67=branding/store-screenshots/imessage-iphone-6.9 \
         --set IMESSAGE_APP_IPAD_PRO_3GEN_129=branding/store-screenshots/imessage-ipad-13
 
@@ -43,14 +43,10 @@ PLATFORM = "IOS"          # set from --platform in main()
 
 def token():
     import jwt
-    kid = os.environ.get("ASC_KEY_ID") or sys.exit("set ASC_KEY_ID")
-    iss = os.environ.get("ASC_ISSUER_ID") or sys.exit("set ASC_ISSUER_ID")
-    key = os.environ.get("ASC_KEY_P8")
-    if not key:
-        path = os.environ.get(
-            "ASC_KEY_PATH",
-            os.path.expanduser(f"~/.appstoreconnect/private_keys/AuthKey_{kid}.p8"))
-        key = pathlib.Path(path).read_text()
+    import asc_key
+    kid = asc_key.value("ASC_KEY_ID") or sys.exit("no ASC_KEY_ID (environment or Keychain)")
+    iss = asc_key.value("ASC_ISSUER_ID") or sys.exit("no ASC_ISSUER_ID (environment or Keychain)")
+    key = asc_key.key_pem(kid)
     now = int(time.time())
     return jwt.encode({"iss": iss, "iat": now, "exp": now + 19 * 60,
                        "aud": "appstoreconnect-v1"},

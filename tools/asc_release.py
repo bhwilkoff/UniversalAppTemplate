@@ -55,8 +55,8 @@ NO SUBMISSION WITHOUT WHAT'S NEW
   refuses up front instead.
 
 CONFIG (env wins over tools/app_config.py):
-  ASC_KEY_ID, ASC_ISSUER_ID     the App Store Connect API key (the .p8 lives in
-                                ~/.appstoreconnect/private_keys or ASC_KEY_PATH)
+  ASC_KEY_ID, ASC_ISSUER_ID     the App Store Connect API key; unset locally, they and the
+                                .p8 come from the login Keychain (tools/asc_key.py)
   APP_BUNDLE                    bundle id of the ONE app record all platforms share
                                 (default: app_config.APPLE_BUNDLE_ID)
   APP_STORE_PLATFORMS           comma list of what `all` means, e.g. "ios,mac"
@@ -488,9 +488,10 @@ def main(argv=None):
               file=sys.stderr)
         return 1
 
+    import asc_key
     for var in ("ASC_KEY_ID", "ASC_ISSUER_ID"):
-        if not os.environ.get(var):
-            sys.exit(f"set {var} (see tools/asc-credentials.env)")
+        if not asc_key.value(var):
+            sys.exit(f"no {var} (environment or Keychain; tools/asc_key.py)")
 
     aid = app_id()
     return status(aid, a.build) if a.mode == "status" else ship(aid, a)

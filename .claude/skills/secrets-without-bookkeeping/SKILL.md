@@ -39,7 +39,12 @@ and never in cleartext on disk.
      Keychain, read at use time with
      `security find-generic-password -a ACCOUNT -s NAME -w` into a pipe
      or a child's environment. Store with `security -i` (the command is
-     read from stdin, so the value is not in `ps`).
+     read from stdin, so the value is not in `ps`). The ASC key has a
+     ready reader: `tools/asc_key.py` (environment first, then
+     `<SECRETS_NAME>:ASC_*`, then the team's shared items when
+     `SHARED_ASC_KEYCHAIN_ACCOUNT` is set in `tools/app_config.py`) and
+     `tools/with_asc.sh COMMAND` (a private temp `.p8`, removed on exit);
+     `tools/test_asc_key.py` proves it with a fake `security`.
    Apple has no federation for App Store Connect keys or signing, so the
    `.p8`, the `.p12` files and their password must exist: one home each.
 3. **Nothing in git, nothing in cleartext on disk.** No `.env`, no

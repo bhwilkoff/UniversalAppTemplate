@@ -160,8 +160,9 @@ CONFIG block), plus whatever `XCCONFIG_SECRETS` names.
 
 First get an **App Store Connect API key**: App Store Connect, *Users and Access, Integrations,
 App Store Connect API*, generate a key (role **App Manager** or Admin). Note the **Key ID** and
-**Issuer ID**, and download `AuthKey_<KEYID>.p8` (it downloads once) to
-`~/.appstoreconnect/private_keys/`.
+**Issuer ID**, and download `AuthKey_<KEYID>.p8` (it downloads once), then move it into the login Keychain
+(`tools/secrets.sh keychain-import-asc --delete`) so no file stays on disk; the local tools read it with
+`tools/asc_key.py` / `tools/with_asc.sh`. The seeding commands below need the file once: run them under it.
 
 ```bash
 export ASC_KEY_ID=<KEYID> ASC_ISSUER_ID=<ISSUER-UUID> ASC_ORG_NAME="<ORG_NAME>"

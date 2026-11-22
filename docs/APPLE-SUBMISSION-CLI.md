@@ -148,8 +148,7 @@ version sits in `WAITING_FOR_REVIEW`, with no withdrawal. `asc_release.py ship` 
 already in review, so change it on that version with the one-platform tool:
 
 ```bash
-set -a; . tools/asc-credentials.env; set +a
-python3 tools/asc_submit.py --platform ios --release-type MANUAL
+tools/with_asc.sh python3 tools/asc_submit.py --platform ios --release-type MANUAL
 ```
 
 Anything that edits reviewable content (screenshots, notes, the attached build) needs an editable
@@ -212,8 +211,17 @@ starve each other of it. Ship the product-carrying platform first
 
 The submission runs in CI because the credentials live in GitHub secrets and belong in one place:
 `ASC_KEY_ID`, `ASC_ISSUER_ID`, `ASC_KEY_P8` (**base64**, not raw PEM; raw fails with `Unable to
-load PEM file ... MalformedFraming`). Running locally works too, with the `.p8` in
-`~/.appstoreconnect/private_keys/` and the two ids in the gitignored `tools/asc-credentials.env`.
+load PEM file ... MalformedFraming`).
+
+Locally the key lives in the login Keychain, never as a file on disk. `tools/asc_key.py` reads the
+environment first (CI), then this app's own items (`<SECRETS_NAME>:ASC_KEY_P8`, `:ASC_KEY_ID`,
+`:ASC_ISSUER_ID`, written by `tools/secrets.sh keychain-import-asc`), then, when
+`SHARED_ASC_KEYCHAIN_ACCOUNT` in `tools/app_config.py` names an account, the Apple team's shared
+items under it (`<account>:ASC_KEY_P8` and the ids, each a chunk count with base64 pieces at
+`<NAME>.0 ...`). The Python tools (`asc.py`, `asc_certs.py`, `asc_profiles.py`, `asc_submit.py`,
+`asc_release.py`, `pulse_collect.py`) use it directly; `tools/with_asc.sh COMMAND` gives a shell
+script or any command a private temp `.p8` (removed on exit) and the two ids, and
+`tools/submit-appstore.sh` wraps itself with it. Test: `python3 tools/test_asc_key.py`.
 
 ---
 

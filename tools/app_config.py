@@ -42,6 +42,10 @@ PRODUCT_NAME = "AppName"                          # how a human writes it
 # tools/secrets.sh: the Keychain account and service prefix (`appname:ASC_KEY_P8`), and the
 # Cloudflare Worker's folder and name when the app has one (empty = no Worker recipes).
 SECRETS_NAME = "appname"
+# One Apple team, several apps: the Keychain account that holds the team's shared ASC key
+# (`<account>:ASC_KEY_P8`, `:ASC_KEY_ID`, `:ASC_ISSUER_ID`, chunked). tools/asc_key.py falls back to it when
+# this app's own `appname:ASC_*` items are absent. Empty = no fallback.
+SHARED_ASC_KEYCHAIN_ACCOUNT = ""
 WORKER_DIR = "worker"
 WORKER_NAME = ""                                  # e.g. "appname-api"
 PRODUCT_SITE = "https://example.com"              # the public site, no slash
