@@ -168,6 +168,9 @@ them. "From" names the app where the lesson was learned.
 | `two-agent-handoff` | Two different AI agents working on one project through a single handoff file. | BOBA Playbook |
 | `third-party-revocation-resilience` | Every outside data source can be taken away. Plan the exit before you depend on it. | BOBA Playbook |
 | `third-party-ip-monetization` | Building on something you do not own: asking the owner first, and charging for it only after. | BOBA Playbook |
+| `finance-app-foundations` | Apps that hold people's financial data: earning FinanceKit, money as integer cents, imports that never duplicate, reconciling an export with FinanceKit later, and the App Review rules finance apps trip. | CentMemo; review lessons from Tidbits Trivia |
+| `money-story-design` | How people look at and write about their own spending: the unexamined purchases first, a memo in their own words, values they name, stories they can read and share, and no scores or shame. | CentMemo |
+| `claude-connector-mcp` | Letting a person's own Claude read their data: a read-only MCP server on Supabase behind its OAuth server, agent writes refused in SQL, tool design, the Connectors Directory checklist, and testing Claude Duet. | humanshaped.org, CentMemo |
 | `provenance-honest-market-data` | Prices and valuations that say what kind of number they are. | BOBA Playbook |
 | `marketplace-adjacent-design` | Letting people trade with one another without the app ever touching money. | BOBA Playbook |
 

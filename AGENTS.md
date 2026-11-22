@@ -123,6 +123,7 @@ Sources: `docs/research/gemini-and-other-agents.md`. Rows follow the
 | Coordinating with a second AI agent surface | `two-agent-handoff` |
 | Adding a third-party data dependency, or a partner revokes one | `third-party-revocation-resilience` |
 | Monetizing an app built around IP/content you don't own | `third-party-ip-monetization` |
+| Money, Claude connectors | `finance-app-foundations` + `money-story-design` + `claude-connector-mcp` |
 | Prices or market data from third-party listings | `provenance-honest-market-data` |
 | User-to-user trading / selling / matching | `marketplace-adjacent-design` + `docs/templates/TRADE-DESIGN-template.md` |
 

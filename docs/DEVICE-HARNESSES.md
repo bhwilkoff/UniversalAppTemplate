@@ -833,3 +833,29 @@ python3 tools/win_run.py --only home,library
   screenshot.
 
 Start with the platform your people use most.
+
+## Lessons from CentMemo's bench (2026-11-21)
+
+- **XCUITest on a device that never ran UI tests** fails with "Timed out
+  while enabling automation mode" until a person unlocks it and turns on
+  Settings > Developer > Enable UI Automation. One retry, then hand it to
+  the owner; the OCR glass tier still runs meanwhile.
+- **An unanswered permission prompt outlives the run.** If a test ends while
+  a system prompt (Photos) is up, iOS shows it again at the next launch,
+  before the app asks for anything, so a later "prompt too early" failure
+  can be the leftover. Answer prompts in the test that causes them, and on
+  the owner's phone answer with the least privilege ("Don't Allow").
+- **Never place a caret by tapping text.** A tap put the caret at the start
+  or mid-text, so backspaces deleted nothing and leftover test data grew.
+  Select (`tap(withNumberOfTaps: 3, numberOfTouches: 1)` on the element),
+  then delete. `XCUICoordinate` has no multi-tap.
+- **The floating tab bar takes taps** in the bottom ~80 pt, over form
+  content too. A SwiftUI `Form` renders lazily: swipe its collection view,
+  not the app, until the element exists.
+- **A test that fails mid-way leaves data**, and a test target that fails to
+  compile makes the next run cover nothing while an old log still reads
+  like a result. Check the server and the build log after any failure.
+- **Headless Chrome `--window-size` has a floor near 500 px**, so a "375 px"
+  screenshot taken that way shows false clipping. Measure phone widths with
+  `Emulation.setDeviceMetricsOverride` over CDP. A hash-only navigation keeps
+  the document, so an injected session needs a reload.
