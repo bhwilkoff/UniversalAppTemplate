@@ -14,7 +14,7 @@ import { createClient } from 'npm:@supabase/supabase-js@2';
 import { createAppAuth } from 'npm:@octokit/auth-app@7';
 import { createRemoteJWKSet, jwtVerify } from 'npm:jose@5';
 import { WORKFLOW, WORKFLOW_PATH } from '../_shared/session-read-workflow.js';
-import { ISSUER, AUDIENCE, callerOk, clean, cleanWords, driveId, due, fullName, captionsUrls, hasAsrTrack, captionsFrom, captionsDue } from './logic.js';
+import { ISSUER, AUDIENCE, callerOk, clean, cleanWords, driveId, due, fullName, captionsUrls, hasAsrTrack, captionsFrom, captionsDue, startFailed, MOST_TRIES } from './logic.js';
 
 const reply = (status: number, body: unknown) =>
   new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
@@ -70,12 +70,13 @@ async function captions(db: any, sessions: any[], now: Date) {
       first_at: prior && prior.recording_url === s.recording_url ? prior.first_at : now.toISOString() };
     const u = captionsUrls(id);
     let list: Response;
-    try { list = await fetch(u.list, { signal: AbortSignal.timeout(15000) }); } catch { notes.push(`${s.id}: list unreachable`); continue; }
+    // Unreachable still writes the row, so its 48-hour window starts and it is not asked every tick forever.
+    try { list = await fetch(u.list, { signal: AbortSignal.timeout(15000) }); } catch { notes.push(`${s.id}: list unreachable`); await db.from('session_caption_reads').upsert({ ...base, state: 'waiting', lines: null }); continue; }
     const listXml = await list.text();
     if (list.status === 403 || list.status === 404) { await db.from('session_caption_reads').upsert({ ...base, state: 'private', lines: null }); continue; }
     if (!list.ok || !hasAsrTrack(listXml)) { await db.from('session_caption_reads').upsert({ ...base, state: 'waiting', lines: null }); continue; }
     let track: Response;
-    try { track = await fetch(u.track, { signal: AbortSignal.timeout(30000) }); } catch { notes.push(`${s.id}: track unreachable`); continue; }
+    try { track = await fetch(u.track, { signal: AbortSignal.timeout(30000) }); } catch { notes.push(`${s.id}: track unreachable`); await db.from('session_caption_reads').upsert({ ...base, state: 'waiting', lines: null }); continue; }
     const lines = track.ok ? captionsFrom(await track.text()) : null;
     if (!lines || !lines.length) { await db.from('session_caption_reads').upsert({ ...base, state: 'waiting', lines: null }); continue; }
     const gone = await db.from('session_captions').delete().eq('session_id', s.id);
@@ -99,7 +100,9 @@ async function tick(db: any) {
   const byId = new Map(reads.data.map((r: any) => [r.session_id, r]));
   // deno-lint-ignore no-explicit-any
   const todo = rows.data.filter((s: any) => due(s, byId.get(s.id) || null, now)).slice(0, 2);
-  if (!todo.length) return reply(200, { started: [], captions: captionNotes });
+  // deno-lint-ignore no-explicit-any
+  const stopped_trying = reads.data.filter((r: any) => r.state !== 'done' && r.tries >= MOST_TRIES).map((r: any) => `${r.session_id}: ${r.problem || r.state}`);
+  if (!todo.length) return reply(200, { started: [], captions: captionNotes, stopped_trying });
   const token = await appToken();
   const started: string[] = [], problems: string[] = [];
   for (const s of todo) {
@@ -109,17 +112,25 @@ async function tick(db: any) {
     const same = there.status === 200 && decoded(there.body.content) === WORKFLOW;
     if (!same) {
       const put = await github(token, 'PUT', at, { message: 'Read who was speaking in session recordings', content: utf8(WORKFLOW), sha: there.body?.sha });
-      if (put.status !== 200 && put.status !== 201) { problems.push(`${s.id}: file ${put.status}`); continue; }
+      if (put.status !== 200 && put.status !== 201) {
+        problems.push(`${s.id}: file ${put.status}`);
+        await db.from('session_reads').upsert(startFailed(byId.get(s.id), s, `GitHub refused the workflow file: ${put.status}`, now));
+        continue;
+      }
       continue; // GitHub takes a moment to know a new workflow; the next tick starts it.
     }
     const prior = byId.get(s.id) as { tries?: number; recording_url?: string } | undefined;
     const tries = prior && prior.recording_url === s.recording_url ? (prior.tries || 0) + 1 : 1;
     const go = await github(token, 'POST', `/repos/${repo}/dispatches`, { event_type: 'read-session', client_payload: { session: s.id } });
-    if (go.status !== 204) { problems.push(`${s.id}: start ${go.status}`); continue; }
+    if (go.status !== 204) {
+      problems.push(`${s.id}: start ${go.status}`);
+      await db.from('session_reads').upsert(startFailed(prior, s, `GitHub refused the start: ${go.status}`, now));
+      continue;
+    }
     await db.from('session_reads').upsert({ session_id: s.id, cohort_id: s.cohort_id, recording_url: s.recording_url, state: 'running', tries, started_at: now.toISOString(), problem: null });
     started.push(s.id);
   }
-  return reply(problems.length ? 207 : 200, { started, problems, captions: captionNotes });
+  return reply(problems.length ? 207 : 200, { started, problems, captions: captionNotes, stopped_trying });
 }
 
 // deno-lint-ignore no-explicit-any

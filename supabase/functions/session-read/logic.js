@@ -41,7 +41,19 @@ export function due(session, read, now) {
   if (!driveId(session.recording_url) || !session.cohorts?.github_repo) return false;
   if (!read || read.recording_url !== session.recording_url) return true;
   if (read.state === 'done' || read.tries >= MOST_TRIES) return false;
-  return now.getTime() - Date.parse(read.started_at) > STALE_MS;
+  // Each try waits twice as long as the one before (Ben 2026-11-23: "fix the
+  // re-scan of the exact same failures. We should never build something that
+  // does that.").
+  return now.getTime() - Date.parse(read.started_at) > STALE_MS * 2 ** Math.max(0, (read.tries || 1) - 1);
+}
+
+// The row for a read that could not even be started (GitHub refused the
+// workflow file or the dispatch). It counts as a try, so the session waits
+// like any other failure instead of being picked again next tick.
+export function startFailed(prior, session, problem, now) {
+  const tries = prior && prior.recording_url === session.recording_url ? (prior.tries || 0) + 1 : 1;
+  return { session_id: session.id, cohort_id: session.cohort_id, recording_url: session.recording_url, state: 'failed', tries,
+    started_at: now.toISOString(), problem: String(problem).slice(0, 200) };
 }
 
 // A finished reading, made safe to keep: whole seconds in order, only people

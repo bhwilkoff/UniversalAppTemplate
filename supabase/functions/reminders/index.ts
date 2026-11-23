@@ -18,6 +18,7 @@ import { createClient } from 'npm:@supabase/supabase-js@2';
 import { createAppAuth } from 'npm:@octokit/auth-app@7';
 import './reminders-lib.js';
 import { collaboratorRequest, repoName, wantedRole } from './plan.js';
+import { failure, givenUp, pick, waiting } from '../_shared/retry.js';
 
 // deno-lint-ignore no-explicit-any
 const R = (globalThis as any).ReminderLib;
@@ -68,8 +69,39 @@ Deno.serve(async (req) => {
   const problems: string[] = [], repaired: string[] = [], sent: unknown[] = [];
   const login = (p: unknown) => (p as { github_login?: string } | null)?.github_login || '';
 
+  // An item that failed waits, then is given up on and listed (_shared/retry.js).
+  const failedRows = await db.from('job_failures').select('*').eq('job', 'reminders');
+  if (failedRows.error) return reply(500, { message: failedRows.error.message });
+  // deno-lint-ignore no-explicit-any
+  const failures = new Map<string, any>(failedRows.data.map((r: { item: string }) => [r.item, r]));
+  // Joining the organization reopens a delivery that failed before it.
+  const joinedRows = await db.from('github_access').select('user_id, updated_at').in('cohort_id', ids).eq('state', 'member');
+  const joined = new Map<string, number>();
+  for (const j of joinedRows.data || []) joined.set(j.user_id, Math.max(joined.get(j.user_id) || 0, Date.parse(j.updated_at)));
+  const skip = (item: string) => {
+    const row = failures.get(item);
+    const uid = item.startsWith('deliver:') ? item.split(':')[1] : '';
+    if (row && uid && (joined.get(uid) || 0) > Date.parse(row.failed_at)) return false;
+    return waiting(row, now);
+  };
+  const failed = async (item: string, reason: string) => {
+    problems.push(`${item}: ${reason}`);
+    if (dry) return;
+    const row = failure(failures.get(item), 'reminders', item, reason, now);
+    failures.set(item, row);
+    await db.from('job_failures').upsert(row);
+  };
+  const cleared = async (prefix: string) => {
+    const gone = [...failures.keys()].filter((k) => k === prefix || k.startsWith(prefix + ':'));
+    if (!gone.length || dry) return;
+    for (const k of gone) failures.delete(k);
+    await db.from('job_failures').delete().eq('job', 'reminders').in('item', gone);
+  };
+
   // An invitation accepted without the hub hearing: GitHub is the truth.
   for (const a of access.data!) {
+    const roleItem = `role:${a.user_id}:${a.cohort_id}`;
+    if (skip(roleItem)) continue;
     const m = members.data!.find((x) => x.user_id === a.user_id && x.cohort_id === a.cohort_id);
     const l = (leaders.data!.find((x) => x.user_id === a.user_id && x.cohort_id === a.cohort_id));
     const who = login((m || l)?.profiles);
@@ -81,7 +113,10 @@ Deno.serve(async (req) => {
     const want = wantedRole({ teaches: !!l, enrolled: !!m, chosen });
     const q = collaboratorRequest(repoName(cohort), who, want);
     const r = await gh(q.method, q.path, q.body);
-    if (r.status >= 300) { problems.push(`${who}: role ${r.status}`); continue; }
+    if (r.status >= 300) { await failed(roleItem, `role ${r.status}`); continue; }
+    // Joined since: deliveries that failed because they were not a member may go now.
+    await cleared(roleItem);
+    await cleared(`deliver:${a.user_id}`);
     await db.from('github_access').update({ state: 'member', detail: null, repo_role: want, updated_at: now.toISOString() }).eq('cohort_id', a.cohort_id).eq('user_id', a.user_id);
   }
 
@@ -111,9 +146,12 @@ Deno.serve(async (req) => {
 
     const send = async (uid: string, who: string, due: boolean, body: string | null) => {
       if (!body) return;
+      const item = `deliver:${uid}:${c.id}`;
+      if (skip(item)) return;
       if (dry) { sent.push({ to: who, cohort: c.slug, digest: due, body }); return; }
-      const ok = await deliver(db, gh, uid, who, c, thread(uid), body, due, now, problems);
-      if (ok) sent.push({ to: who, cohort: c.slug, digest: due });
+      const why = await deliver(db, gh, uid, who, c, thread(uid), body, due, now);
+      if (why) await failed(item, why);
+      else { sent.push({ to: who, cohort: c.slug, digest: due }); await cleared(item); }
       await pause();
     };
 
@@ -154,9 +192,10 @@ Deno.serve(async (req) => {
   // Announcements whose time has come, as issues in the cohort repository,
   // so GitHub carries them to everyone watching it.
   const posted: unknown[] = [];
-  const due = await db.from('cohort_announcements').select('*').in('cohort_id', ids).is('sent_at', null).lte('send_at', now.toISOString()).order('send_at').limit(10);
-  await nameOf((due.data || []).map((a) => a.author_id));
-  for (const a of (due.data || [])) {
+  const dueRows = await db.from('cohort_announcements').select('*').in('cohort_id', ids).is('sent_at', null).lte('send_at', now.toISOString()).order('send_at');
+  const due = pick(dueRows.data, failures, (a: { id: string }) => `announce:${a.id}`, now, 10);
+  await nameOf(due.map((a) => a.author_id));
+  for (const a of due) {
     const c = cohorts.find((x) => x.id === a.cohort_id)!;
     const ap = names.get(a.author_id);
     const author = ap?.display_name || ap?.github_login || 'A leader';
@@ -164,8 +203,10 @@ Deno.serve(async (req) => {
     if (dry) { posted.push({ cohort: c.slug, title: a.title }); continue; }
     const made = await gh('POST', `/repos/${c.github_repo}/issues`, { title: a.title, body });
     if (made.status >= 300) {
-      await db.from('cohort_announcements').update({ problem: `GitHub said ${made.status}` }).eq('id', a.id);
-      problems.push(`announcement ${a.id}: ${made.status}`);
+      const item = `announce:${a.id}`;
+      await failed(item, `GitHub said ${made.status}`);
+      const row = failures.get(item);
+      await db.from('cohort_announcements').update({ problem: givenUp(row) ? `GitHub said ${made.status}; not tried again after ${row.tries} tries` : `GitHub said ${made.status}; tried ${row.tries} times` }).eq('id', a.id);
       continue;
     }
     // Pinned when GitHub allows it; an unpinned issue still reaches everyone.
@@ -178,10 +219,11 @@ Deno.serve(async (req) => {
   // Feedback a leader shared, into each learner's own thread. Someone who
   // stopped reminders still reads it on the session page.
   const given: unknown[] = [];
-  const fb = await db.from('moment_feedback').select('*, sessions(number)').in('cohort_id', ids).not('shared_at', 'is', null).is('delivered_at', null).limit(50);
+  const fbRows = await db.from('moment_feedback').select('*, sessions(number)').in('cohort_id', ids).not('shared_at', 'is', null).is('delivered_at', null).order('shared_at');
+  const fb = (fbRows.data || []).filter((f: { learner_id: string; cohort_id: string }) => !skip(`deliver:${f.learner_id}:${f.cohort_id}`)).slice(0, 50);
   const freshThreads = (await db.from('reminder_threads').select('*').in('cohort_id', ids)).data || [];
-  await nameOf((fb.data || []).flatMap((f) => [f.author_id, f.learner_id]));
-  for (const f of (fb.data || [])) {
+  await nameOf(fb.flatMap((f) => [f.author_id, f.learner_id]));
+  for (const f of fb) {
     const c = cohorts.find((x) => x.id === f.cohort_id)!;
     const who = names.get(f.learner_id)?.github_login || '';
     const au = names.get(f.author_id);
@@ -192,15 +234,19 @@ Deno.serve(async (req) => {
     const body = R.feedbackMessage({ author: au?.display_name || au?.github_login, number: f.sessions?.number, schedule: c.schedule, at: f.at_s, body: f.body, outcome: f.outcome, slug: c.slug });
     if (dry) { given.push({ to: who, cohort: c.slug }); continue; }
     const t = freshThreads.find((x) => x.user_id === f.learner_id && x.cohort_id === c.id) || null;
-    const ok = await deliver(db, gh, f.learner_id, who, c, t, body, false, now, problems);
-    if (ok) {
+    const item = `deliver:${f.learner_id}:${c.id}`;
+    const why = await deliver(db, gh, f.learner_id, who, c, t, body, false, now);
+    if (why) await failed(item, why);
+    else {
+      await cleared(item);
       await db.from('moment_feedback').update({ delivered_at: now.toISOString(), problem: null }).eq('id', f.id);
       given.push({ to: who, cohort: c.slug });
       if (!t) freshThreads.push(...((await db.from('reminder_threads').select('*').eq('user_id', f.learner_id).eq('cohort_id', c.id)).data || []));
     }
     await pause();
   }
-  return reply(problems.length ? 207 : 200, { dry, repaired, sent, posted, given, problems });
+  const stopped_trying = [...failures.values()].filter(givenUp).map((r) => `${r.item}: ${r.reason}`);
+  return reply(problems.length ? 207 : 200, { dry, repaired, sent, posted, given, problems, stopped_trying });
 });
 
 // deno-lint-ignore no-explicit-any
@@ -212,28 +258,29 @@ async function isMember(gh: GH, who: string) {
 
 // One message into the person's own thread, making the repository and
 // issue the first time. Only an organization member is added: adding
-// anyone else would send them a second invitation.
+// anyone else would send them a second invitation. Returns null when it
+// went, or why it did not.
 // deno-lint-ignore no-explicit-any
-async function deliver(db: any, gh: GH, uid: string, who: string, c: { id: string; title: string }, t: any, body: string, due: boolean, now: Date, problems: string[]) {
+async function deliver(db: any, gh: GH, uid: string, who: string, c: { id: string; title: string }, t: any, body: string, due: boolean, now: Date): Promise<string | null> {
   const stamp: Record<string, string> = { events_seen_at: now.toISOString() };
   if (due) stamp.last_digest_on = R.localDay(now, (c as unknown as { time_zone: string }).time_zone);
   if (t) {
     const r = await gh('POST', `/repos/${ORG}/${t.repo}/issues/${t.issue_number}/comments`, { body });
-    if (r.status >= 300) { problems.push(`${who}: comment ${r.status}`); return false; }
+    if (r.status >= 300) return `${who}: comment ${r.status}`;
     await db.from('reminder_threads').update(stamp).eq('user_id', uid).eq('cohort_id', c.id);
-    return true;
+    return null;
   }
-  if (!(await isMember(gh, who))) return false;
+  if (!(await isMember(gh, who))) return `${who}: not an organization member`;
   const repo = R.repoFor(who);
   const made = await gh('POST', `/orgs/${ORG}/repos`, { name: repo, private: true, has_issues: true, has_wiki: false, has_projects: false, description: `Reminders for ${who} from Human Shaped. Only you and the organization's owners can see this.` });
-  if (made.status >= 300 && made.status !== 422) { problems.push(`${who}: repository ${made.status}`); return false; }
+  if (made.status >= 300 && made.status !== 422) return `${who}: repository ${made.status}`;
   const add = await gh('PUT', `/repos/${ORG}/${repo}/collaborators/${encodeURIComponent(who)}`, { permission: 'triage' });
-  if (add.status >= 300) { problems.push(`${who}: access ${add.status}`); return false; }
+  if (add.status >= 300) return `${who}: access ${add.status}`;
   const issue = await gh('POST', `/repos/${ORG}/${repo}/issues`, { title: R.issueTitle(c.title), body });
-  if (issue.status >= 300) { problems.push(`${who}: issue ${issue.status}`); return false; }
+  if (issue.status >= 300) return `${who}: issue ${issue.status}`;
   const saved = await db.from('reminder_threads').insert({ user_id: uid, cohort_id: c.id, repo, issue_number: issue.body.number, ...stamp });
-  if (saved.error) { problems.push(`${who}: ${saved.error.message}`); return false; }
-  return true;
+  if (saved.error) return `${who}: ${saved.error.message}`;
+  return null;
 }
 
 function github(token: string): GH {
