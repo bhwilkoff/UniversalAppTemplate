@@ -67,6 +67,9 @@ jobs:
       # upgrade stopped at "7 of 8 SDK package licenses not accepted" and failed the job
       # (Ear Drama). The runner's preinstalled SDK builds android-build.yml on every push.
       - uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
+          cache-cleanup: on-success
 
       - uses: actions/setup-python@v5
         with:
