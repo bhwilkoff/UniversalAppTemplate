@@ -155,6 +155,7 @@ nobody rediscovers an exclusion.
 | App Review on every device class, Guideline 4.1 is permission not wording, ASC Version string is free text, real screenshots never mockups, Play icon without alpha | `store-submission-playbook` |
 | Bulk automation under a personal account (rate limit, then deactivation) | `third-party-revocation-resilience` "Your own account is a dependency too" |
 | Worker-to-Worker service bindings, project prefixes on shared accounts, driving the hosted database from an agent | `zero-cost-hosted-backend` |
+| One free account is one budget: alarm floors, write throttles, storage-tolerant rooms, client backoff, one beacon per visit, broadcast fan-out, idle-project pausing (Ear Drama alarm loop broke the Human Shaped rooms, 2026-11-23) | `zero-cost-hosted-backend` "One account is one budget" |
 
 ## Deliberate exclusions (do not "rediscover" these)
 

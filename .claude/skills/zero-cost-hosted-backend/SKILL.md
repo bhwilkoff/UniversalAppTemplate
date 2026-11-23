@@ -278,6 +278,49 @@ but each service has a ceiling you should know before designing:
   from the first deploy; it is the only safe filter the day one project
   is torn down (`app-sunset-playbook`).
 
+### One account is one budget (2026-11-23)
+
+The owner: "We should not be anywhere close to the limits on any plan if
+we are using them correctly." On a free plan the daily allowances (Workers
+requests, Durable Object requests, duration and rows written, D1 writes,
+KV writes) belong to the **account**, not the project. One app's bug took
+every app down: a Durable Object alarm in one project rescheduled itself
+in the past, fired, saved, and repeated for hours, and the next morning
+an unrelated app's rooms threw `1101` because every object that woke and
+read its storage hit "Exceeded allowed rows written in Durable Objects
+free tier". So a free-tier limit being hit means a runaway somewhere, not
+growth. Find it before blaming usage, and read it from the source:
+`npx wrangler@latest tail <worker>` names the exact error (an old
+Homebrew wrangler may not read the keyring login).
+
+Rules that keep every app far from the limits:
+
+- **Every alarm has a floor and a test.** `setAlarm(Math.max(at, Date.now() + 5000))`,
+  and a test that fails if any path sets an alarm at or before now.
+  Re-arm only when the time moves earlier; each `setAlarm` is a row.
+- **Write what changed, at most so often.** Each `put()` key is a row.
+  Put only the keys that changed, and throttle saves (one per few
+  seconds) behind a timer; a pending timer keeps the object awake, so
+  hibernation loses nothing.
+- **Survive storage refusing.** An object whose state lives one session
+  (a call's room) goes on from memory when `storage.get` or `put`
+  throws, instead of failing every request.
+- **Clients back off and rest.** Reconnect after at least 1 s, doubling
+  to 60 s with jitter; forget failures only after 30 steady seconds (a
+  server that answers then drops must not pull every client back at
+  once); wait while the tab is hidden. Long-poll instead of polling,
+  and stop polling hidden tabs.
+- **One request per visit for analytics.** Count routes in memory and
+  send one `sendBeacon` on `pagehide`; write them in one `DB.batch`.
+  Deploy the Worker that accepts the new shape before the client.
+- **Broadcast channels multiply.** On Supabase Realtime every broadcast
+  is delivered to every subscriber and each delivery counts. Send WebRTC
+  candidates inside the offer and answer (wait for gathering, two seconds
+  at most), not one broadcast each.
+- **Free projects pause.** A Supabase project with no scheduled work
+  pauses after a week idle; let an always-busy project call its public
+  route once a day, and trim `cron.job_run_details`, which never shrinks.
+
 ## Driving the hosted database from an agent
 
 - **A SQL tool call is its own session.** A `CREATE TEMP TABLE` is gone
