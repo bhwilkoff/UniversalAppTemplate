@@ -58,3 +58,19 @@ test('a session-read GitHub will not start counts as a try and waits longer each
   assert.equal(due(s, second, new Date(t0.getTime() + 151 * 60000)), false, 'the second wait is longer than the first');
   assert.equal(due(s, second, new Date(t0.getTime() + 301 * 60000)), true);
 });
+
+test('a session thread GitHub will not open is tried twice in its day, not every hour', async () => {
+  const { due: threadDue } = await import('../../supabase/functions/github-tick/tick.js');
+  const c = { slug: 'k', status: 'running', github_repo: 'humanshaped/k', time_zone: 'America/Denver' };
+  const rows = [{ id: 's', starts_at: '2026-11-24T12:00:00Z', discussion_number: null, cohorts: c }];
+  const failures = new Map();
+  let now = new Date('2026-11-23T12:30:00Z'), tries = 0;
+  for (let h = 0; h < 24; h++) {
+    for (const s of pick(threadDue(rows, now), failures, (r) => `thread:${r.id}`, now, Infinity)) {
+      tries++;
+      failures.set(`thread:${s.id}`, failure(failures.get(`thread:${s.id}`), 'github-tick', `thread:${s.id}`, 'no category to post in', now));
+    }
+    now = new Date(now.getTime() + 3600000);
+  }
+  assert.equal(tries, 2);
+});

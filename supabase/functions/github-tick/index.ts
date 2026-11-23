@@ -20,6 +20,7 @@ import { createRemoteJWKSet, jwtVerify } from 'npm:jose@5';
 import './discussions-lib.js';
 import './session-thread-lib.js';
 import { callerOk, due, whenLine, ISSUER, AUDIENCE } from './tick.js';
+import { failure, pick } from '../_shared/retry.js';
 
 // deno-lint-ignore no-explicit-any
 const D = (globalThis as any).DiscussionsLib;
@@ -48,25 +49,35 @@ Deno.serve(async (req) => {
     .select('id, cohort_id, number, title, starts_at, discussion_number, cohorts(slug, status, schedule, github_repo, time_zone)')
     .is('discussion_number', null).gt('starts_at', now.toISOString()).lte('starts_at', until);
   if (rows.error) return reply(500, { message: rows.error.message });
-  const sessions = due(rows.data, now);
+  // A thread GitHub would not open waits before it is tried again (_shared/retry.js;
+  // Ben 2026-11-23: "fix the re-scan of the exact same failures").
+  const failedRows = await db.from('job_failures').select('*').eq('job', 'github-tick');
+  if (failedRows.error) return reply(500, { message: failedRows.error.message });
+  // deno-lint-ignore no-explicit-any
+  const failures = new Map<string, any>(failedRows.data.map((r: { item: string }) => [r.item, r]));
+  const sessions = pick(due(rows.data, now), failures, (s: { id: string }) => `thread:${s.id}`, now, Infinity);
   if (!sessions.length) return reply(200, { opened: [] });
+  const failed = async (id: string, why: string) => {
+    problems.push(why);
+    await db.from('job_failures').upsert(failure(failures.get(`thread:${id}`), 'github-tick', `thread:${id}`, why, now));
+  };
 
   const token = await appToken();
   if (!token) return reply(503, { message: 'The GitHub App is not set up.' });
+  const problems: string[] = [];
 
   const opened: string[] = [];
-  const problems: string[] = [];
   for (const s of sessions) {
     const repo = s.cohorts.github_repo;
     const found = await graphql(token, S.BY_NUMBER, S.variables(repo, null));
     const where = found.data ? S.shape(found.data) : null;
     const category = where ? S.category(where.categories) : null;
-    if (!where || !category) { problems.push(`${repo} week ${s.number}: ${found.problem || 'no category to post in'}`); continue; }
+    if (!where || !category) { await failed(s.id, `${repo} week ${s.number}: ${found.problem || 'no category to post in'}`); continue; }
     const live = 'https://humanshaped.org/session/?c=' + encodeURIComponent(s.cohorts.slug) + '&s=' + Number(s.number);
     const body = S.body(s, live) + '\n\n' + whenLine(s.starts_at, s.cohorts.time_zone);
     const made = await graphql(token, D.CREATE, { repositoryId: where.repositoryId, categoryId: category.id, title: S.title(s), body });
     const number = made.data?.createDiscussion?.discussion?.number;
-    if (!number) { problems.push(`${repo} week ${s.number}: ${made.problem || 'not made'}`); continue; }
+    if (!number) { await failed(s.id, `${repo} week ${s.number}: ${made.problem || 'not made'}`); continue; }
     // A leader may have opened one from /live/ in the meantime; theirs stays.
     const saved = await db.from('sessions').update({ discussion_number: number }).eq('id', s.id).is('discussion_number', null).select('id');
     if (saved.error || !saved.data.length) problems.push(`${repo} week ${s.number}: made #${number}, but the session already had a thread`);
