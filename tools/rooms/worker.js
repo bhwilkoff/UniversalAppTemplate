@@ -53,13 +53,22 @@ export class Room extends DurableObject {
   constructor(ctx, env) {
     super(ctx, env);
     this.room = blank();
-    this.timer = null; this.floats = []; this.floatTimer = null; this.dirty = false; this.alarmAt = 0;
+    this.timer = null; this.saveTimer = null; this.floats = []; this.floatTimer = null; this.dirty = false; this.alarmAt = 0;
     this.rates = new WeakMap();
+    // A room lasts one call, so storage only carries it across a restart. When
+    // storage refuses (seen November 23, 2026: every room with saved state threw
+    // 1101 on waking, and the whole call lost its room), the room goes on from
+    // memory instead of failing.
     ctx.blockConcurrencyWhile(async () => {
-      const kept = await ctx.storage.get('room');
-      if (kept) this.room = Object.assign(blank(), kept);
-      this.room.html = (await ctx.storage.get('html')) || '';
-      this.alarmAt = (await ctx.storage.getAlarm()) || 0;
+      try {
+        const kept = await ctx.storage.get('room');
+        if (kept) this.room = Object.assign(blank(), kept);
+        this.room.html = (await ctx.storage.get('html')) || '';
+        this.alarmAt = (await ctx.storage.getAlarm()) || 0;
+      } catch (e) {
+        console.log('[room] storage unreadable, starting from memory: ' + (e && e.message));
+        this.room = blank();
+      }
     });
     ctx.setWebSocketAutoResponse(new WebSocketRequestResponsePair('ping', 'pong'));
   }
@@ -99,20 +108,25 @@ export class Room extends DurableObject {
       try { s.ws.send(out); } catch (e) { /* it has gone */ }
       if (words && s.who.pid === this.room.host) this.send(s.ws, Object.assign({ t: 'words' }, words));
     });
-    if (this.dirty) this.save();
+    // One row is written per save, so a busy room saves at most every five
+    // seconds. A pending timer keeps the object awake, so nothing is lost to
+    // hibernation; a crash or a deploy loses at most those five seconds.
+    if (this.dirty && !this.saveTimer) this.saveTimer = setTimeout(() => { this.saveTimer = null; this.save(); }, 5000);
     this.dirty = false;
   }
   save() {
     if (!this.room.on) return;
     const { html, ...kept } = this.room;
-    this.ctx.storage.put('room', kept);
+    const quiet = (e) => console.log('[room] storage refused a save: ' + (e && e.message));
+    try { this.ctx.storage.put('room', kept).catch(quiet); } catch (e) { quiet(e); }
     const now = Date.now();
-    if (this.alarmAt < now + DAY - 3600000) { this.alarmAt = now + DAY; this.ctx.storage.setAlarm(this.alarmAt); }
+    if (this.alarmAt < now + DAY - 3600000) { this.alarmAt = now + DAY; try { this.ctx.storage.setAlarm(this.alarmAt).catch(quiet); } catch (e) { quiet(e); } }
   }
   async alarm() {
+    if (this.saveTimer) { clearTimeout(this.saveTimer); this.saveTimer = null; }
     for (const s of this.sockets()) this.send(s.ws, { t: 'ended' });
     this.room = blank();
-    await this.ctx.storage.deleteAll();
+    try { await this.ctx.storage.deleteAll(); } catch (e) { /* storage refused; the room is blank in memory */ }
   }
 
   allowed(ws, host) {
@@ -169,8 +183,9 @@ export class Room extends DurableObject {
     if (m.t === 'end') {
       if (me.pid !== this.room.host) return;
       const out = this.sockets();
+      if (this.saveTimer) { clearTimeout(this.saveTimer); this.saveTimer = null; }
       this.room = blank();
-      await this.ctx.storage.deleteAll();
+      try { await this.ctx.storage.deleteAll(); } catch (e) { /* storage refused; the room is blank in memory */ }
       this.alarmAt = 0; this.dirty = false;
       out.forEach((s) => this.send(s.ws, { t: 'ended' }));
       this.soonQuiet();
@@ -183,7 +198,7 @@ export class Room extends DurableObject {
     if (did.error) return this.send(ws, { t: 'error', text: did.error });
     if (did.talk) { const out = JSON.stringify({ t: 'talk', v: this.room.talkV, text: this.room.talk }); this.sockets().forEach((s) => { try { s.ws.send(out); } catch (e) { /* gone */ } }); }
     if (did.html) {
-      await this.ctx.storage.put('html', this.room.html);
+      try { await this.ctx.storage.put('html', this.room.html); } catch (e) { console.log('[room] storage refused the page: ' + (e && e.message)); }
       const out = JSON.stringify({ t: 'html', v: this.room.htmlV, html: this.room.html });
       this.sockets().forEach((s) => { try { s.ws.send(out); } catch (e) { /* gone */ } });
     }

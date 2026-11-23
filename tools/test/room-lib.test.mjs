@@ -134,3 +134,18 @@ test('a panel and its own stage talk only in their own messages', () => {
   assert.equal(R.readFrame('not json'), null);
   assert.equal(R.readFrame(R.frameMessage('hello')).k, 'hello');
 });
+
+// A room that answers and then drops (a failing Durable Object, November 23,
+// 2026) must not be asked again every few hundred milliseconds by every panel
+// and stage in a call: the whole Cloudflare account shares one daily budget.
+test('reconnecting waits at least a second, grows to a minute, and forgets failures only after thirty steady seconds', () => {
+  for (let tries = 0; tries < 30; tries++) for (const r of [0, 0.5, 0.999]) {
+    const d = R.retryDelay(tries, r);
+    assert.ok(d >= 1000 && d <= 60000, `tries ${tries}, r ${r}: ${d}`);
+  }
+  assert.ok(R.retryDelay(1, 0.5) < R.retryDelay(4, 0.5));
+  assert.equal(R.retryDelay(20, 0.5), 60000);
+  assert.equal(R.steady(2000), false);
+  assert.equal(R.steady(29999), false);
+  assert.equal(R.steady(30000), true);
+});

@@ -18,7 +18,7 @@
   function saveName(n) { try { localStorage.setItem(NAME, n); } catch (e) {} }
 
   function connect(o) {
-    var on = o.on || {}, ws = null, closed = false, swapping = false, tries = 0, ping = null, queue = [], you = null, name = o.name || savedName();
+    var on = o.on || {}, ws = null, closed = false, swapping = false, tries = 0, openedAt = 0, ping = null, queue = [], you = null, name = o.name || savedName();
     var mySecret = secret();
     function status(s) { if (on.status) on.status(s); }
     function send(m) {
@@ -27,13 +27,13 @@
     }
     function open() {
       ws = new WebSocket(window.RoomLib.socket(window.MEET_ADDON.rooms, o.code));
-      ws.onopen = function () { ws.send(JSON.stringify({ t: 'hello', secret: mySecret, name: name, role: o.role })); };
+      ws.onopen = function () { openedAt = Date.now(); ws.send(JSON.stringify({ t: 'hello', secret: mySecret, name: name, role: o.role })); };
       ws.onmessage = function (e) {
         if (e.data === 'pong') return;
         var m;
         try { m = JSON.parse(e.data); } catch (x) { return; }
         if (m.t === 'welcome') {
-          you = m.you; tries = 0; status('on');
+          you = m.you; status('on');
           if (on.welcome) on.welcome(m);
           var q = queue; queue = [];
           q.forEach(function (s) { ws.send(s); });
@@ -51,13 +51,25 @@
         if (closed) return;
         if (swapping) { swapping = false; return open(); }
         status('off');
+        if (openedAt && window.RoomLib.steady(Date.now() - openedAt)) tries = 0;
+        openedAt = 0;
+        setTimeout(again, window.RoomLib.retryDelay(tries));
         tries += 1;
-        setTimeout(open, Math.min(10000, 400 * Math.pow(1.7, tries)) + Math.random() * 300);
       };
       ws.onerror = function () { try { ws.close(); } catch (e) {} };
     }
+    // A tab nobody is looking at waits to reconnect until it is seen again.
+    function again() {
+      if (closed) return;
+      if (typeof document === 'undefined' || !document.hidden) return open();
+      document.addEventListener('visibilitychange', function seen() {
+        if (document.hidden) return;
+        document.removeEventListener('visibilitychange', seen);
+        if (!closed) open();
+      });
+    }
     open();
-    ping = setInterval(function () { if (ws && ws.readyState === 1) ws.send('ping'); }, 30000);
+    ping = setInterval(function () { if (ws && ws.readyState === 1) ws.send('ping'); }, 50000);
     return {
       send: send,
       you: function () { return you; },

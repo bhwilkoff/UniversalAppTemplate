@@ -24,6 +24,17 @@
   }
   function channel(db, id) { return db.channel('screen:' + id, { config: { broadcast: { self: false, ack: false } } }); }
   function say(ch, event, payload) { try { ch.send({ type: 'broadcast', event: event, payload: payload }); } catch (e) {} }
+  // Every broadcast reaches every stage on the channel, and Realtime's free
+  // plan counts each delivery, so candidates are not sent one at a time: each
+  // side waits for its candidates (two seconds at most) and sends them inside
+  // its offer or answer.
+  function gathered(pc) {
+    return new Promise(function (done) {
+      if (pc.iceGatheringState === 'complete') return done();
+      var t = setTimeout(done, 2000);
+      pc.addEventListener('icegatheringstatechange', function () { if (pc.iceGatheringState === 'complete') { clearTimeout(t); done(); } });
+    });
+  }
 
   // The sharer: one peer connection for each stage that asks.
   function present(o) {
@@ -37,9 +48,8 @@
       var pc = new RTCPeerConnection({ iceServers: ICE });
       peers[v] = pc;
       o.stream.getTracks().forEach(function (t) { pc.addTrack(t, o.stream); });
-      pc.onicecandidate = function (e) { if (e.candidate) say(ch, 'ice', { to: v, candidate: e.candidate.toJSON() }); };
       pc.onconnectionstatechange = function () { if (pc.connectionState === 'failed' || pc.connectionState === 'closed') drop(v); else count(); };
-      pc.createOffer().then(function (offer) { return pc.setLocalDescription(offer); }).then(function () {
+      pc.createOffer().then(function (offer) { return pc.setLocalDescription(offer); }).then(function () { return gathered(pc); }).then(function () {
         say(ch, 'offer', { to: v, sdp: pc.localDescription.sdp });
       }).catch(function () { drop(v); });
     });
@@ -54,7 +64,7 @@
     ch.subscribe(function (status) {
       if (status !== 'SUBSCRIBED') return;
       say(ch, 'ready', {});
-      beat = setInterval(function () { say(ch, 'ready', {}); }, 5000);
+      beat = setInterval(function () { say(ch, 'ready', {}); }, 20000);
     });
     return {
       stop: function () {
@@ -68,7 +78,7 @@
 
   // A stage: asks for the picture until it has it, and says what is happening.
   function watch(o) {
-    var ch = channel(o.db, o.id), me = uuid(), pc = null, done = false, asked = null, got = false;
+    var ch = channel(o.db, o.id), me = uuid(), pc = null, done = false, asked = null, got = false, failures = 0;
     function state(s, detail) { if (o.onState) o.onState(s, detail); }
     // What this stage knows when no picture comes, said on the stage itself,
     // since a stage inside Meet has no console anyone can read.
@@ -113,20 +123,23 @@
       o.video.onplaying = function () { frames++; };
       Promise.resolve(o.video.play()).then(function () { frames++; state('showing'); }, function () { state('press'); });
     }
-    function ask() { if (!done && !got) say(ch, 'want', { viewer: me }); }
+    // A network that blocks peer connections fails the same way every time,
+    // so after two failures the stage stops asking and says it is blocked.
+    function ask() { if (!done && !got && failures < 2) say(ch, 'want', { viewer: me }); }
     ch.on('broadcast', { event: 'offer' }, function (m) {
       var p = m.payload || {};
       if (p.to !== me || done) return;
       if (pc) try { pc.close(); } catch (e) {}
       pc = new RTCPeerConnection({ iceServers: ICE });
       pc.ontrack = function (e) { got = true; show(e.streams[0], e.track); };
-      pc.onicecandidate = function (e) { if (e.candidate) say(ch, 'ice-up', { viewer: me, candidate: e.candidate.toJSON() }); };
       pc.onconnectionstatechange = function () {
-        if (pc.connectionState === 'failed') { got = false; state('blocked'); }
+        if (pc.connectionState === 'connected') failures = 0;
+        if (pc.connectionState === 'failed') { got = false; failures += 1; state('blocked'); }
         if (pc.connectionState === 'disconnected') { got = false; state('waiting'); }
       };
       pc.setRemoteDescription({ type: 'offer', sdp: p.sdp }).then(function () { return pc.createAnswer(); })
         .then(function (a) { return pc.setLocalDescription(a); })
+        .then(function () { return gathered(pc); })
         .then(function () { say(ch, 'answer', { viewer: me, sdp: pc.localDescription.sdp }); })
         .catch(function () { state('blocked'); });
     });
@@ -142,7 +155,7 @@
       state('ended');
     });
     state('waiting');
-    ch.subscribe(function (status) { if (status === 'SUBSCRIBED') { ask(); asked = setInterval(ask, 4000); } });
+    ch.subscribe(function (status) { if (status === 'SUBSCRIBED') { ask(); asked = setInterval(ask, 10000); } });
     return {
       stop: function () {
         done = true; clearInterval(asked); reading = null;

@@ -157,7 +157,17 @@
     return m;
   }
 
-  var lib = { CODE: CODE, TEMPLATE: TEMPLATE, STARTER: STARTER, code: code, codeOfSearch: codeOfSearch, link: link, socket: socket, repoOf: repoOf, siteOf: siteOf, pagesUrl: pagesUrl, pageFile: pageFile, commitUrl: commitUrl, rawUrl: rawUrl, editUrl: editUrl, assetBase: assetBase, withBase: withBase, titleOf: titleOf, deckBody: deckBody, stops: stops, stopAt: stopAt, nextStep: nextStep, people: people, here: here, toView: toView, frameMessage: frameMessage, readFrame: readFrame };
+  // How long to wait before reconnecting: at least a second, doubling to a
+  // minute, spread at random so a call's sockets do not return together. A
+  // socket counts as healthy again only after thirty steady seconds, so a room
+  // that answers and then drops cannot pull every client back at once.
+  function retryDelay(tries, r) {
+    var base = Math.min(60000, 1000 * Math.pow(2, Math.max(0, tries || 0)));
+    return Math.round(Math.max(1000, Math.min(60000, base * (0.5 + (r == null ? Math.random() : r)))));
+  }
+  function steady(openMs) { return openMs >= 30000; }
+
+  var lib = { retryDelay: retryDelay, steady: steady, CODE: CODE, TEMPLATE: TEMPLATE, STARTER: STARTER, code: code, codeOfSearch: codeOfSearch, link: link, socket: socket, repoOf: repoOf, siteOf: siteOf, pagesUrl: pagesUrl, pageFile: pageFile, commitUrl: commitUrl, rawUrl: rawUrl, editUrl: editUrl, assetBase: assetBase, withBase: withBase, titleOf: titleOf, deckBody: deckBody, stops: stops, stopAt: stopAt, nextStep: nextStep, people: people, here: here, toView: toView, frameMessage: frameMessage, readFrame: readFrame };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
   else root.RoomLib = lib;
 })(typeof globalThis !== 'undefined' ? globalThis : this);
