@@ -9,4 +9,4 @@ F=supabase/functions/github-tick
 cp assets/discussions-lib.js assets/session-thread-lib.js "$F/"
 trap 'rm -f "$F/discussions-lib.js" "$F/session-thread-lib.js"' EXIT
 SUPABASE_ACCESS_TOKEN="$(tr -d '\n\r ' < "$HOME/.humanshaped/supabase-token")" \
-  npx -y supabase@latest functions deploy github-tick --project-ref bifrieqzkihuxfzttgvd --no-verify-jwt --use-api
+  npx -y supabase@latest functions deploy github-tick --project-ref bifrieqzkihuxfzttgvd --no-verify-jwt --use-api --yes
