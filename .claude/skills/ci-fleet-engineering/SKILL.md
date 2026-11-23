@@ -55,7 +55,15 @@ and no run may destroy work — its own or another's.**
 11. **Failures are remembered on the item, not the runner.** A failure list on
    the runner dies with it, and the same poison items lead every run. Cap a
    download's total time, not only each read. Adopt an artifact already
-   hosted before regenerating it.
+   hosted before regenerating it. The owner, 2026-11-23, on a job that
+   re-scanned the same 2,354 failing films four times a day: "We should
+   never build something that does that." Every selector that picks "not
+   yet done" also reads a recorded outcome per item (result, reason,
+   attempts, time) and skips recent failures with growing backoff (1, 7,
+   30 days) and a cap, after which the item is reported, not retried. A
+   tool version constant reopens failures once, so a fixed bug gets its
+   retry. A summary whose failure count is the same every run is a bug to
+   root-cause (that job's "no shots" was wrong, not slow).
 12. **Ingest hands off to the gate, and the gate publishes.** Never let
    discovery publish new items before the audits that judge them have run.
    Give each source of a shared queue a fair share.
