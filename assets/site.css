@@ -3124,7 +3124,7 @@ select:not([multiple]) {
 .stage-ready:has(.has-board:not([hidden])) .stage-reacts { display: none; }
 .board-frame { position: relative; }
 /* Beside Excalidraw's own zoom and undo, never over them. */
-.board-notes:not([hidden]) { position: absolute; z-index: 6; left: 15.75rem; right: 4.25rem; bottom: 0.75rem; display: flex; justify-content: center; pointer-events: none; }
+.board-notes:not([hidden]) { position: absolute; z-index: 6; left: 15.75rem; right: 4.25rem; bottom: 0.75rem; display: flex; justify-content: flex-start; pointer-events: none; }
 .board-notes form { display: flex; gap: 0.3rem; margin: 0; width: min(24rem, 100%); padding: 0.25rem; border-radius: 12px; background: var(--card); box-shadow: 0 1px 6px rgb(0 0 0 / 0.18); pointer-events: auto; }
 .board-notes input { flex: 1; min-width: 0; min-height: 36px; padding: 0.25rem 0.6rem; border: 1px solid var(--muted); border-radius: 9px; background: var(--card); color: var(--ink); font: inherit; font-size: 0.95rem; }
 .board-notes .btn-primary.small { color: var(--on-ink); min-height: 36px; padding-block: 0.2rem; }

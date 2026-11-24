@@ -269,6 +269,12 @@
     };
   }
 
+  // Keys handed over by the stage reach Excalidraw only through its own box.
+  window.addEventListener('focus', function () {
+    var box = document.querySelector('.excalidraw');
+    if (box && (!document.activeElement || document.activeElement === document.body)) box.focus();
+  });
+
   // Notes: what a class does most on a board.
   // What is in view, clear of the tools along its edges.
   function view() {
@@ -278,7 +284,7 @@
     return { x: (l + (st.width - l - r) / 2) / z - st.scrollX, y: (t + (st.height - t - b) / 2) / z - st.scrollY, w: (st.width - l - r) / z, h: (st.height - t - b) / z };
   }
   function fit(elements, animate) {
-    S.api.scrollToContent(B.drawn(elements), { fitToViewport: true, maxZoom: 1, viewportZoomFactor: 0.8, animate: !!animate });
+    S.api.scrollToContent(B.drawn(elements), { fitToViewport: true, maxZoom: 1, viewportZoomFactor: 0.96, animate: !!animate, canvasOffsets: { top: 76, right: 20, bottom: 96, left: 20 } });
   }
   // Measured by Excalidraw itself, so the words wrap the way they will when
   // the card is resized.

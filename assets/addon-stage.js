@@ -632,6 +632,12 @@
     });
   }
 
+  function boardFrame() { return root.querySelector('[data-view="scene"]:not([hidden]) [data-s-board] iframe'); }
+  function toBoard() {
+    var f = boardFrame();
+    if (f) try { f.contentWindow.focus(); } catch (e) {}
+    return !!f;
+  }
   function drawBoard(src) {
     var box = $('[data-s-board]');
     root.querySelector('[data-view="scene"]').classList.toggle('has-board', !!src);
@@ -643,7 +649,7 @@
     var f = document.createElement('iframe');
     f.src = src;
     f.title = 'The board';
-    f.setAttribute('allow', 'clipboard-read; clipboard-write');
+    f.setAttribute('allow', 'clipboard-read; clipboard-write; fullscreen');
     box.appendChild(f);
   }
 
@@ -945,6 +951,9 @@
       view = { mode: 'part', part: null };
       show('ready'); draw();
       document.addEventListener('keydown', function (e) {
+        // With the board up, keys are its tools; a 1 on this frame sent a
+        // reaction in place of choosing a tool (found in a real call).
+        if (toBoard()) return;
         var msg = A.keyMessage(e);
         if (!msg) return;
         e.preventDefault();
