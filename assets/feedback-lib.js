@@ -22,7 +22,7 @@
     var who = function (id) { return names[id] || 'Someone'; };
     var items = [];
     (o.notes || []).forEach(function (n) {
-      items.push({ kind: 'note', id: 'note:' + n.id, noteId: n.id, who: who(n.author_id), at: n.created_at, text: n.body, href: null, about: null });
+      items.push({ kind: 'note', id: 'note:' + n.id, noteId: n.id, who: n.author_id ? who(n.author_id) : 'Your leader', at: n.created_at, text: n.body, href: null, about: null });
     });
     (o.shares || []).forEach(function (s) {
       if (s.user_id && o.me && s.user_id !== o.me) return;

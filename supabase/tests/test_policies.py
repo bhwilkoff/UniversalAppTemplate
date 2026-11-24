@@ -3691,6 +3691,87 @@ def main():
     check("a leader cannot take their own name off a question while they are here",
           not attempt(as_user("ben"), "update public.live_checks set created_by = null where created_by = %s", (people["ben"],)) and "stays in the session" in last_reason[0])
 
+    # A leader deletes their account, and the cohort stays (migration
+    # 20261124030000).
+    as_system()
+    mara = new_account("mara", {"provider": "github"}, {"user_name": "mara", "provider_id": "7711"})
+    nia = new_account("nia", {"provider": "github"}, {"user_name": "nia", "provider_id": "7712"})
+    ovi = new_account("ovi", {"provider": "github"}, {"user_name": "ovi", "provider_id": "7713"})
+    su.execute("insert into public.teachers (user_id, invited_by) values (%s, %s), (%s, %s)", (mara, people["ben"], ovi, mara))
+    def made_cohort(slug):
+        attempt(as_user("mara"), "insert into public.cohorts (slug, title, created_by, status) values (%s, 'Mara', %s, 'open') returning id", (slug, mara))
+        return last_rows[0][0]
+    alone, shared = made_cohort("mara-alone"), made_cohort("mara-shared")
+    attempt(as_user("mara"), "insert into public.cohort_teachers (cohort_id, user_id) values (%s, %s)", (shared, ovi))
+    attempt(as_user("nia"), "insert into public.enrollments (cohort_id, user_id) values (%s, %s)", (alone, nia))
+    attempt(as_user("mara"), "insert into public.sessions (cohort_id, number, title) values (%s, 1, 'First')", (alone,))
+    attempt(as_user("mara"), "insert into public.teacher_notes (cohort_id, student_id, author_id, body) values (%s, %s, %s, 'Keep going.')", (alone, nia, mara))
+    poll = "insert into public.time_polls (title, time_zone, days, first_minute, last_minute, step_minutes, cohort_id, host_name) values ('When', 'America/Denver', '{1}', 1020, 1200, 60, %s, 'Mara') returning id, token"
+    attempt(as_user("mara"), poll, (alone,)); poll_id, poll_tok = last_rows[0]
+    attempt(as_user("mara"), poll, (None,)); own_poll = last_rows[0][0]
+    attempt(as_user("mara"), addq, (alone, "short", "For the cohort?", None, None, mara)); cq = last_rows[0][0]
+    attempt(as_user("mara"), addq, (None, "short", "Only mine?", None, None, mara)); oq = last_rows[0][0]
+    attempt(as_user("mara"), mkx, ("Inside", alone, "maraopening001", "video/mp4", "camera", 20, "Say hello")); ex = last_rows[0][0]
+    attempt(as_user("mara"), mkx, ("Mine", None, "maraopening002", "video/mp4", "camera", 20, None)); own_ex = last_rows[0][0]
+    as_system()
+    su.execute("select id from public.exchange_posts where exchange_id = (select id from public.exchanges where token = %s)", (ex,))
+    opening = su.fetchone()[0]
+    attempt(as_user("nia"), post, (ex, "niareplyvideo01", "video/mp4", "camera", 12, "Hello", opening))
+    attempt(as_user("nia"), post, (ex, "niareplyvideo02", "video/mp4", "camera", 12, "And this", None))
+    as_system()
+    su.execute("insert into public.cohort_announcements (cohort_id, author_id, title, body, send_at, sent_at, issue_url) values (%s, %s, 'Sent', 'Already.', now(), now(), 'https://github.com/humanshaped/x/issues/1')", (alone, mara))
+    su.execute("insert into public.repo_roles (cohort_id, user_id, role, set_by) values (%s, %s, 'write', %s)", (alone, nia, mara))
+    su.execute("insert into public.time_poll_answers (poll_id, name, works, invited, contact) values (%s, 'Nia', '{1500}', true, 'nia@example.edu')", (poll_id,))
+    check("an agent cannot delete a leader's account", not attempt(as_agent("mara"), "select public.delete_my_account()"))
+    check("someone who made two cohorts and invited a leader can delete their account",
+          attempt(as_user("mara"), "select public.delete_my_account()") and not exists_user(mara))
+    as_system()
+    su.execute("select slug, created_by from public.cohorts where id in (%s, %s) order by slug", (alone, shared))
+    check("both cohorts stay, without saying who made them", su.fetchall() == [("mara-alone", None), ("mara-shared", None)])
+    su.execute("select user_id::text from public.cohort_teachers where cohort_id = %s", (alone,))
+    check("the cohort nobody else led has the hub's admin for a leader", su.fetchall() == [(people["ben"],)])
+    su.execute("select user_id::text from public.cohort_teachers where cohort_id = %s", (shared,))
+    check("the cohort someone else leads stays theirs alone", su.fetchall() == [(ovi,)])
+    su.execute("select invited_by from public.teachers where user_id = %s", (ovi,))
+    check("a leader they invited still leads", su.fetchone() == (None,))
+    check("the admin now leads it: they can open its next session",
+          attempt(as_user("ben"), "insert into public.sessions (cohort_id, number) values (%s, 2) returning id", (alone,)))
+    check("the learner still has the cohort and its session",
+          attempt(as_user("nia"), "select title from public.sessions where cohort_id = %s and number = 1", (alone,)) and last_rows == [("First",)])
+    check("and the note they were given, with no name on it",
+          attempt(as_user("nia"), "select body, author_id from public.teacher_notes where student_id = %s", (nia,)) and last_rows == [("Keep going.", None)])
+    check("which they can still remove",
+          attempt(as_user("nia"), "delete from public.teacher_notes where student_id = %s returning 1", (nia,)) and len(last_rows) == 1)
+    ok = attempt(as_user("nia"), see, (ex,))
+    x = last_rows[0][0] if ok else {}
+    check("the cohort's exchange stays, from a leader, with every learner's video",
+          ok and x and x["maker"]["name"] == "A leader" and sorted(v["drive_file_id"] for v in x["posts"]) == ["niareplyvideo01", "niareplyvideo02"])
+    check("it is still listed", attempt(as_user("nia"), "select title from public.cohort_exchanges(%s)", (alone,)) and last_rows == [("Inside",)])
+    check("the new leader can moderate it", attempt(as_user("ben"), see, (ex,)) and last_rows[0][0]["can_moderate"] is True)
+    check("their own exchange went with them", attempt(as_user("nia"), see, (own_ex,)) and last_rows == [(None,)])
+    as_system()
+    su.execute("select id::text, created_by, host_name from public.time_polls where id in (%s, %s)", (poll_id, own_poll))
+    check("the cohort's time poll stays and their own goes", su.fetchall() == [(str(poll_id), None, None)])
+    su.execute("select name from public.time_poll_answers where poll_id = %s", (poll_id,))
+    check("with the people it invited, and not the leader's times", su.fetchall() == [("Nia",)])
+    check("its link still works", attempt(as_user(None), "select public.time_poll(%s) ->> 'teacher'", (poll_tok,)) and last_rows == [("A leader",)])
+    as_system()
+    su.execute("select id::text from public.questions where id in (%s, %s)", (cq, oq))
+    check("the cohort's question stays and their own goes", su.fetchall() == [(str(cq),)])
+    su.execute("select sent_at is not null, issue_url is not null, author_id from public.cohort_announcements where cohort_id = %s", (alone,))
+    check("an announcement already sent stays sent", su.fetchall() == [(True, True, None)])
+    check("no one can make a cohort that names no one",
+          not attempt(as_user("ovi"), "insert into public.cohorts (slug, title, created_by) values ('nobody', 'Nobody', null)"))
+    check("nor clear who made one while they are here",
+          not attempt(as_user("ben"), "update public.cohorts set created_by = null where id = %s returning 1", (cc,)) and "keeps the person" in last_reason[0])
+    check("nor does a co-leader become the one who made it",
+          attempt(as_user("ben"), "insert into public.cohort_teachers (cohort_id, user_id) values (%s, %s)", (cc, ovi))
+          and not attempt(as_user("ovi"), "update public.cohorts set created_by = %s where id = %s returning 1", (ovi, cc)) and "keeps the person" in last_reason[0])
+    check("the last admin's own cohorts stay too",
+          attempt(as_user("ben"), "select public.delete_my_account()") and not exists_user(people["ben"]))
+    as_system(); su.execute("select count(*) from public.cohorts where id = %s", (alone,))
+    check("even with nobody left to lead them", su.fetchone() == (1,))
+
     conn.rollback()
     conn.close()
     failed = [n for n, ok in results if not ok]

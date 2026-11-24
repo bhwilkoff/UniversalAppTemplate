@@ -682,7 +682,7 @@
         var notes = r.error ? [] : r.data;
         section.hidden = !notes.length;
         if (!notes.length) return;
-        var ids = notes.map(function (n) { return n.author_id; }).filter(function (v, i, a) { return a.indexOf(v) === i; });
+        var ids = notes.map(function (n) { return n.author_id; }).filter(function (v, i, a) { return v && a.indexOf(v) === i; });
         return db.from('profiles').select('id, display_name, github_login').in('id', ids).then(function (pr) {
           var names = {};
           (pr.data || []).forEach(function (p) { names[p.id] = p.display_name || p.github_login; });
