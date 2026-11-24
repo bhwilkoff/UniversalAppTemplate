@@ -228,3 +228,32 @@ test('a new note goes into the template frame in view, or the first, and covers 
     }
   }
 });
+
+test('any secure page may go on the board, but for GitHub and this site, and players keep their own handling', () => {
+  assert.equal(lib.embeddable('https://eardrama.org/', 'humanshaped.org'), true);
+  for (const bad of ['http://eardrama.org/', 'https://github.com/a/b', 'https://humanshaped.org/account/', 'https://www.humanshaped.org/', 'https://127.0.0.1/x', 'javascript:alert(1)', 'words', 'https://a.example/' + 'x'.repeat(600)]) assert.equal(lib.embeddable(bad, '127.0.0.1'), false, bad);
+  assert.equal(lib.embeddable('https://www.youtube.com/watch?v=x', 'humanshaped.org'), undefined);
+  assert.equal(lib.embedOwn('https://www.youtube.com/watch?v=x', 'humanshaped.org'), false);
+});
+test('a link to a thing on a board here is told from any other link', () => {
+  assert.equal(lib.elementOf('https://humanshaped.org/board/?c=a&s=week-1&element=abc', 'humanshaped.org'), 'abc');
+  assert.equal(lib.elementOf('https://evil.example/board/?element=abc', 'humanshaped.org'), null);
+  assert.equal(lib.elementOf('https://humanshaped.org/session/?element=abc', 'humanshaped.org'), null);
+});
+test('a library comes only from Excalidraw', () => {
+  assert.equal(lib.libraryHost('https://libraries.excalidraw.com/libraries/a/b.excalidrawlib'), true);
+  assert.equal(lib.libraryHost('https://raw.githubusercontent.com/excalidraw/excalidraw-libraries/main/x'), true);
+  for (const bad of ['http://libraries.excalidraw.com/x', 'https://notexcalidraw.com/x', 'https://raw.githubusercontent.com/other/x']) assert.equal(lib.libraryHost(bad), false, bad);
+});
+test('a saved board opens beside what is here, under new names that still point at one another', () => {
+  const card = lib.noteElements({ id: 'n1', by: 'u', name: 'Bea', text: 'x', x: 0, y: 0, now: 1 });
+  const arrow = { id: 'a', type: 'arrow', x: 0, y: 0, width: 10, height: 10, groupIds: ['g'], boundElements: null, startBinding: { elementId: 'n1' }, endBinding: { elementId: 'gone' } };
+  const vote = lib.voteDot({ note: 'n1', by: 'b', elements: card, now: 1 });
+  const out = lib.beside([...card, arrow, vote], card, 's', {}), by = Object.fromEntries(out.map((e) => [e.id, e]));
+  assert.equal(out.length, 3);
+  assert.equal(by['os-n1-t'].containerId, 'os-n1');
+  assert.equal(by['os-n1'].boundElements[0].id, 'os-n1-t');
+  assert.equal(by['os-n1'].customData.note, 'os-n1');
+  assert.ok(by['os-n1'].x >= card[0].x + card[0].width);
+  assert.deepEqual([by['os-a'].startBinding.elementId, by['os-a'].endBinding], ['os-n1', null]);
+});

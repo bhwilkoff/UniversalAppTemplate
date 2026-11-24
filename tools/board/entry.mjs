@@ -6,5 +6,7 @@ export { createElement, Fragment } from 'react';
 export { createRoot } from 'react-dom/client';
 export {
   Excalidraw, MainMenu, CaptureUpdateAction, reconcileElements, restoreElements,
-  getSceneVersion, exportToBlob, exportToSvg, serializeAsJSON
+  getSceneVersion, exportToBlob, exportToSvg, serializeAsJSON,
+  loadFromBlob, loadSceneOrLibraryFromBlob, parseLibraryTokensFromUrl, isElementLink,
+  zoomToFitBounds, getVisibleSceneBounds, UserIdleState, convertToExcalidrawElements, normalizeLink, MIME_TYPES
 } from '@excalidraw/excalidraw';

@@ -24,7 +24,7 @@
   var lib = window.CohortLib;
   var db = (window.HUB.client ? window.HUB.client() : window.supabase.createClient(window.HUB.url, window.HUB.key));
   var P = B.params(location.search);
-  var VENDOR = '/assets/vendor/excalidraw-0.18.1/excalidraw.js';
+  var VENDOR = '/assets/vendor/excalidraw-0.18.1/excalidraw.js?v=20261124c';
   // Excalidraw's fonts, from the same version on jsDelivr (fixed files).
   window.EXCALIDRAW_ASSET_PATH = 'https://cdn.jsdelivr.net/npm/@excalidraw/excalidraw@0.18.1/dist/prod/';
   var POLL = 10000;
@@ -47,6 +47,7 @@
   function status(m) { $('[data-say]').textContent = m; }
 
   function theme() {
+    if (S.theme && S.theme !== 'system') return S.theme;
     var t = document.documentElement.getAttribute('data-theme');
     if (t === 'dark' || t === 'light') return t;
     return window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -102,7 +103,8 @@
           var bad = res.filter(function (r) { return r.error; })[0];
           if (bad) return fail('The board could not be opened: ' + bad.error.message);
           var sessions = res[0].data || [];
-          S.teaching = (res[1].data || []).some(function (t) { return t.user_id === S.me.id; });
+          S.leaders = {}; (res[1].data || []).forEach(function (t) { S.leaders[t.user_id] = true; });
+          S.teaching = !!S.leaders[S.me.id];
           S.groups = res[2].data || [];
           if (!sessions.length) return show('not-member');
           var t = lib.currentAndNext(sessions, new Date(), S.cohort.session_minutes);
@@ -215,7 +217,7 @@
   function canDraw() { return B.canDraw(S.board, S.teaching); }
 
   function props() {
-    var X = S.X;
+    var X = S.X, T = S.tools ? S.tools.props : {};
     return {
       // window.__board is read by tools/board/sync-check.mjs, the two-page test.
       excalidrawAPI: function (api) {
@@ -238,23 +240,29 @@
           drawNotes();
           drawCardsSoon();
           setTimeout(render, 0);
+          if (S.tools) S.tools.ready();
+          api.onUserFollow(onFollow);
+          api.onScrollChange(function () { drawCardsSoon(); shareView(); });
           if (S.upgraded) setTimeout(function () { sendScene(); saveSoon(); }, 0);
         }
       },
       initialData: S.initial,
       onChange: onChange,
       onPointerUpdate: onPointer,
+      generateIdForFile: T.generateIdForFile, validateEmbeddable: T.validateEmbeddable, renderEmbeddable: T.renderEmbeddable,
+      generateLinkForSelection: T.generateLinkForSelection, onLinkOpen: T.onLinkOpen, onLibraryChange: T.onLibraryChange, libraryReturnUrl: T.libraryReturnUrl,
       isCollaborating: true,
       // No AI in the board: the cohort's own agents are where AI belongs.
       aiEnabled: false,
-      viewModeEnabled: !canDraw(),
+      // Locked is look-only; otherwise each person may choose view mode themselves.
+      viewModeEnabled: canDraw() ? undefined : true,
       theme: theme(),
       name: B.fileName(S.cohort.slug, S.session, S.group && S.group.name, 'x').replace(/-board\.x$/, ''),
       langCode: 'en',
       UIOptions: {
-        tools: { image: false },
+        tools: { image: !!S.tools },
         canvasActions: {
-          loadScene: false, clearCanvas: false, saveToActiveFile: false, toggleTheme: false,
+          loadScene: false, clearCanvas: false, saveToActiveFile: false, toggleTheme: true,
           changeViewBackgroundColor: canDraw(), export: { saveFileToDisk: true }, saveAsImage: true
         }
       }
@@ -386,9 +394,12 @@
     var X = S.X, M = X.MainMenu;
     function item(key, label, fn) { return X.createElement(M.Item, { key: key, onSelect: fn }, label); }
     var out = [item('fit', 'Show everything', function () { fit(S.api.getSceneElements(), true); })];
+    if (S.teaching) out.push(item('gather', 'Bring everyone here', gather));
     if (canDraw() && S.pages && S.pages.pick) out.push(item('pages', 'Add a PDF or pictures', function () { S.pages.pick(); }));
-    out.push(item('png', 'Download as a picture', function () { exportAs('png'); }), item('file', 'Download the board', function () { exportAs('excalidraw'); }));
+    if (canDraw() && S.tools) out.push(item('open', 'Add a saved board', function () { S.tools.openFile(); }));
+    out.push(X.createElement(M.Separator, { key: 's0' }), item('png', 'Download with names and votes', function () { exportAs('png'); }), X.createElement(M.DefaultItems.SaveAsImage, { key: 'img' }), item('file', 'Download the board', function () { exportAs('excalidraw'); }));
     out.push(X.createElement(M.Separator, { key: 's1' }), X.createElement(M.DefaultItems.SearchMenu, { key: 'find' }), X.createElement(M.DefaultItems.Help, { key: 'help' }));
+    out.push(X.createElement(M.DefaultItems.ToggleTheme, { key: 'theme', allowSystemTheme: true, theme: S.theme || 'system', onSelect: function (t) { S.theme = t; render(); } }));
     if (canDraw()) out.push(X.createElement(M.DefaultItems.ChangeCanvasBackground, { key: 'bg' }));
     if (S.teaching) out.push(X.createElement(M.Separator, { key: 's2' }),
       item('lock', S.board.locked ? 'Unlock the board' : 'Lock the board', function () { $('[data-lock]').click(); }),
@@ -398,6 +409,10 @@
 
   function mount() {
     var X = S.X;
+    if (window.BoardTools) S.tools = window.BoardTools.start({
+      db: db, X: X, api: function () { return S.api; }, board: function () { return S.board; }, cohort: S.cohort, session: S.session,
+      groupId: S.group ? S.group.id : null, me: S.me, canDraw: canDraw, changed: function () { sendScene(); saveSoon(); }
+    });
     var existing = X.restoreElements(sceneOf(S.board), null);
     B.markSeen(S.seen, existing);
     B.markSeen(S.saved, existing);
@@ -418,8 +433,18 @@
   function render() { if (S.reactRoot) S.reactRoot.render(S.X.createElement(S.X.Excalidraw, props(), menu())); }
   function sceneOf(board) { return (board && board.scene && board.scene.elements) || []; }
 
-  function onChange(elements) {
+  function onChange(elements, appState, files) {
     if (!S.api) return;
+    if (S.tools) S.tools.onFiles(files);
+    // "Unlock all" reaches the votes too, which nobody can see to leave alone:
+    // they lock again, and are never part of a selection.
+    if (canDraw() && elements.some(function (e) { return !e.isDeleted && e.customData && e.customData.vote && !e.locked; })) {
+      var again = B.upgradeNotes(S.api.getSceneElementsIncludingDeleted(), Date.now()), keepIds = {};
+      Object.keys(appState.selectedElementIds || {}).forEach(function (id) { if (again.ids.indexOf(id) < 0) keepIds[id] = true; });
+      setTimeout(function () { S.api.updateScene({ elements: again.elements, appState: { selectedElementIds: keepIds }, captureUpdate: S.X.CaptureUpdateAction.NEVER }); }, 0);
+      return;
+    }
+    shareSelection(appState);
     if (S.pages) S.pages.sync(elements);
     drawCardsSoon();
     root.querySelector('.board-frame').classList.toggle('has-selection', Object.keys(S.api.getAppState().selectedElementIds || {}).length > 0);
@@ -441,7 +466,9 @@
     sendScene();
     saveSoon();
   }
-  function hasUnsent(elements) { return B.unsent(B.syncable(elements), S.seen).length > 0; }
+  // Everything but a picture still being kept, which goes once it is.
+  function sharable(elements) { return B.syncable(elements).filter(function (e) { return !(S.tools && S.tools.waiting(e)); }); }
+  function hasUnsent(elements) { return B.unsent(sharable(elements), S.seen).length > 0; }
 
   // Elements from someone else, merged the way Excalidraw's own
   // collaboration merges them. restoreElements is given no local copy, as
@@ -473,7 +500,7 @@
 
   var sendScene = B.throttle(function () {
     if (!S.api || !canDraw()) return;
-    var changed = B.unsent(B.syncable(S.api.getSceneElementsIncludingDeleted()), S.seen);
+    var changed = B.unsent(sharable(S.api.getSceneElementsIncludingDeleted()), S.seen);
     if (!changed.length) return;
     var cut = B.batches(changed);
     if (S.live) {
@@ -493,24 +520,92 @@
 
   function onPointer(e) {
     if (!e || !e.pointer || !S.me) return;
-    sendPointer({ id: S.me.id, name: myName(), x: e.pointer.x, y: e.pointer.y, tool: e.pointer.tool, button: e.button });
+    sendPointer({ id: S.me.id, name: myName(), x: e.pointer.x, y: e.pointer.y, tool: e.pointer.tool, button: e.button, sel: selection() });
+  }
+  // What this person has selected, which the others see outlined in their color.
+  function selection() {
+    var ids = S.api ? S.api.getAppState().selectedElementIds || {} : {};
+    return Object.keys(ids).filter(function (k) { return ids[k]; }).slice(0, 40);
+  }
+  function shareSelection() {
+    var key = selection().join();
+    if (key === S.selKey) return;
+    S.selKey = key;
+    sendPointer(Object.assign({ id: S.me.id, name: myName(), sel: selection() }, {}));
   }
   function myName() {
     if (S.asName) return S.asName;
     var m = (S.me && S.me.user_metadata) || {};
     return m.full_name || m.name || m.user_name || m.preferred_username || 'Someone';
   }
-
-  function showPointer(p) {
-    if (!S.api || !p || p.id === S.me.id) return;
-    var color = B.colorFor(p.id);
-    S.collaborators.set(p.id, {
-      id: p.id, socketId: p.id, username: p.name,
-      pointer: { x: p.x, y: p.y, tool: p.tool === 'laser' ? 'laser' : 'pointer' },
-      button: p.button === 'down' ? 'down' : 'up', color: { background: color, stroke: color }
-    });
-    S.api.updateScene({ collaborators: new Map(S.collaborators) });
+  function myFace() {
+    var m = (S.me && S.me.user_metadata) || {};
+    return /^https:\/\//.test(m.avatar_url || '') ? m.avatar_url : null;
   }
+
+  // Everyone on the board, as Excalidraw's own list of people: pressing a face
+  // follows that person's view.
+  function person(id, fields) {
+    var was = S.collaborators.get(id) || {}, color = B.colorFor(id);
+    S.collaborators.set(id, Object.assign({}, was, { id: id, socketId: id, color: { background: color, stroke: color } }, fields));
+  }
+  function showPeople() { if (S.api) S.api.updateScene({ collaborators: new Map(S.collaborators) }); }
+  function showPointer(p) {
+    if (!S.api || !p || !p.id || p.id === S.me.id) return;
+    var f = { username: p.name, selectedElementIds: (p.sel || []).reduce(function (m, k) { m[k] = true; return m; }, {}) };
+    if (typeof p.x === 'number') { f.pointer = { x: p.x, y: p.y, tool: p.tool === 'laser' ? 'laser' : 'pointer' }; f.button = p.button === 'down' ? 'down' : 'up'; }
+    person(p.id, f);
+    showPeople();
+  }
+
+  // Following: the person followed sends what they can see while anyone
+  // follows them, and each follower's view goes there.
+  function onFollow(e) {
+    if (!e || !e.userToFollow || !S.live) return;
+    S.channel.send({ type: 'broadcast', event: 'follow', payload: { from: S.me.id, to: e.userToFollow.socketId, on: e.action === 'FOLLOW' } });
+  }
+  var sendView = B.throttle(function () {
+    if (!S.live || !S.api || !S.followers || !S.followers.size) return;
+    S.channel.send({ type: 'broadcast', event: 'view', payload: { id: S.me.id, bounds: S.X.getVisibleSceneBounds(S.api.getAppState()) } });
+  }, function () { return B.pointerInterval(S.here.length); });
+  function shareView() { if (S.followers && S.followers.size) sendView(); }
+  function heardFollow(m) {
+    if (!m || m.to !== S.me.id || m.from === S.me.id) return;
+    S.followers = S.followers || new Set();
+    if (m.on) S.followers.add(m.from); else S.followers.delete(m.from);
+    S.api.updateScene({ appState: { followedBy: new Set(S.followers) } });
+    if (m.on) sendView();
+  }
+  function goTo(bounds, animate) {
+    if (!Array.isArray(bounds) || bounds.length !== 4 || !bounds.every(isFinite)) return;
+    var st = S.api.getAppState(), to = S.X.zoomToFitBounds({ appState: st, bounds: bounds, fitToViewport: true, viewportZoomFactor: 1 }).appState;
+    S.api.updateScene({ appState: { scrollX: to.scrollX, scrollY: to.scrollY, zoom: to.zoom } });
+    drawCardsSoon();
+  }
+  function heardView(m) {
+    var st = S.api && S.api.getAppState();
+    if (!m || !st || !st.userToFollow || st.userToFollow.socketId !== m.id) return;
+    if (st.followedBy && st.followedBy.has(m.id)) return;
+    goTo(m.bounds);
+  }
+  // A leader brings everyone's view to what they are looking at, once.
+  function gather() {
+    if (!S.live) return S.api.setToast({ message: 'Not live right now, so nobody’s view was moved.', duration: 4000 });
+    S.channel.send({ type: 'broadcast', event: 'gather', payload: { id: S.me.id, bounds: S.X.getVisibleSceneBounds(S.api.getAppState()) } });
+    S.api.setToast({ message: 'Everyone is looking where you are.', duration: 2500 });
+  }
+  function heardGather(m) { if (m && S.leaders && S.leaders[m.id] && m.id !== S.me.id && S.api) goTo(m.bounds); }
+
+  // Away, or idle for a minute, the way Excalidraw shows it on a face.
+  var idleTimer = null, idleNow = null;
+  function idle(state) {
+    if (state === idleNow) return;
+    idleNow = state;
+    if (S.live) S.channel.send({ type: 'broadcast', event: 'idle', payload: { id: S.me.id, state: state } });
+  }
+  function awake() { clearTimeout(idleTimer); idle('active'); idleTimer = setTimeout(function () { idle('idle'); }, 60000); }
+  ['pointermove', 'keydown'].forEach(function (ev) { document.addEventListener(ev, awake, { passive: true }); });
+  document.addEventListener('visibilitychange', function () { if (document.hidden) { clearTimeout(idleTimer); idle('away'); } else awake(); });
 
   // A small message that tells everyone to read the board again: after a
   // teacher locks, unlocks, or clears it, or after a save too large to send.
@@ -533,6 +628,10 @@
       })
       .on('broadcast', { event: 'pointer' }, function (m) { showPointer(m.payload); })
       .on('broadcast', { event: 'board' }, function () { reread(); })
+      .on('broadcast', { event: 'follow' }, function (m) { if (S.api) heardFollow(m.payload); })
+      .on('broadcast', { event: 'view' }, function (m) { heardView(m.payload); })
+      .on('broadcast', { event: 'gather' }, function (m) { heardGather(m.payload); })
+      .on('broadcast', { event: 'idle' }, function (m) { var p = m.payload || {}; if (p.id && p.id !== S.me.id && S.collaborators.has(p.id)) { person(p.id, { userState: p.state }); showPeople(); } })
       .on('presence', { event: 'sync' }, function () {
         var state = S.channel.presenceState(), names = [], ids = {};
         Object.keys(state).forEach(function (k) {
@@ -542,7 +641,12 @@
         });
         S.here = names;
         S.collaborators.forEach(function (_, id) { if (!ids[id]) S.collaborators.delete(id); });
-        if (S.api) S.api.updateScene({ collaborators: new Map(S.collaborators) });
+        Object.keys(ids).forEach(function (id) {
+          var p = state[id][0] || {};
+          person(id, { username: p.name || 'Someone', avatarUrl: p.face || undefined, isCurrentUser: id === S.me.id });
+        });
+        if (S.followers) S.followers.forEach(function (id) { if (!ids[id]) S.followers.delete(id); });
+        showPeople();
         syncLine();
       });
     poll(true);
@@ -550,7 +654,8 @@
       if (state === 'SUBSCRIBED') {
         S.live = true;
         poll(false);
-        S.channel.track({ name: myName() });
+        S.channel.track({ name: myName(), face: myFace() });
+        awake();
         reread();   // whatever was drawn while this page was not listening
         sendScene();
       } else if (state === 'CHANNEL_ERROR' || state === 'TIMED_OUT' || state === 'CLOSED') {
@@ -609,7 +714,7 @@
   // ------------------------------------------------------------------
 
   function toSave() {
-    return S.api ? B.unsent(B.syncable(S.api.getSceneElementsIncludingDeleted()), S.saved) : [];
+    return S.api ? B.unsent(sharable(S.api.getSceneElementsIncludingDeleted()), S.saved) : [];
   }
 
   function saveNow() {

@@ -44,7 +44,7 @@ export const people = {
 };
 export const hub = {
   cohort: { id: randomUUID(), slug: 'stand-in', title: 'Stand-in cohort (delete me)', session_minutes: 75, status: 'running' },
-  sessions: [], groups: [{ id: GROUP, name: 'Trio A', group_members: [{ user_id: BEA }] }], boards: []
+  sessions: [], libraries: {}, files: new Map(), uploadFails: 0, groups: [{ id: GROUP, name: 'Trio A', group_members: [{ user_id: BEA }] }], boards: []
 };
 hub.sessions.push({ id: randomUUID(), cohort_id: hub.cohort.id, number: 1, starts_at: new Date(Date.now() - 600000).toISOString(), title: 'Week 1' });
 hub.sessions.push({ id: randomUUID(), cohort_id: hub.cohort.id, number: 2, starts_at: new Date(Date.now() + 6 * 86400000).toISOString(), title: 'Week 2' });
@@ -79,6 +79,10 @@ function answer(uid, q) {
     case 'sessions': return one(hub.sessions);
     case 'cohort_teachers': return one([{ user_id: BEN }]);
     case 'groups': return one(hub.groups);
+    case 'board_libraries': {
+      if (q.op === 'upsert') { hub.libraries[uid] = copy(q.values.items); return { data: null, error: null }; }
+      return one(hub.libraries[uid] ? [{ items: hub.libraries[uid] }] : []);
+    }
     case 'boards': {
       let rows = hub.boards.filter(b => seesBoard(uid, b) && (!f.id || b.id === f.id) && (!f.session_id || b.session_id === f.session_id));
       if (q.op === 'update') {
@@ -125,12 +129,20 @@ export async function open(who, query, size = { width: 1280, height: 800 }, harn
   await ctx.route(/cdn\.jsdelivr\.net\/npm\/@supabase\/supabase-js/, async route => {
     route.fulfill({ contentType: 'text/javascript', body: await readFile(join(here, 'fake-supabase.js'), 'utf8') });
   });
+  // Meet frames the stage from another site, where Chrome has no file pickers.
+  await ctx.addInitScript(() => { try { delete Window.prototype.showOpenFilePicker; delete Window.prototype.showSaveFilePicker; delete window.showOpenFilePicker; delete window.showSaveFilePicker; } catch (e) {} });
   await ctx.addInitScript((s) => { window.__FAKE_SESSION = s; }, { access_token: 'stand-in-' + who, user: people[who] });
   const page = await ctx.newPage();
   const info = { who, topic: null, dropped: false, errors: [] };
   pages.set(page, info);
   page.on('pageerror', e => info.errors.push(e.message));
   await page.exposeBinding('__fakeDb', (src, q) => answer(people[who].id, q));
+  await page.exposeBinding('__fakeUpload', (src, path, body, type) => {
+    if (hub.uploadFails > 0) { hub.uploadFails--; return { data: null, error: { message: 'the stand-in refused it' } }; }
+    if (!['image/png', 'image/jpeg', 'image/webp', 'image/gif'].includes(type)) return { data: null, error: { message: 'mime type ' + type + ' is not supported' } };
+    hub.files.set(path, { body, type }); return { data: { path }, error: null };
+  });
+  await page.exposeBinding('__fakeDownload', (src, path) => hub.files.get(path) || null);
   await page.exposeBinding('__fakeJoin', (src, topic, isPrivate) => { info.topic = topic; if (!isPrivate) stats.joinsNotPrivate++; return !!isPrivate; });
   await page.exposeBinding('__fakeSend', async (src, topic, event, payload) => {
     const size = Buffer.byteLength(JSON.stringify(payload));

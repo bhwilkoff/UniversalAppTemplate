@@ -18,6 +18,7 @@
       gte: function () { return b; },
       single: function () { q.single = true; return b; },
       update: function (v) { q.op = 'update'; q.values = v; return b; },
+      upsert: function (v) { q.op = 'upsert'; q.values = v; return b; },
       maybeSingle: function () { q.single = true; return b; },
       then: function (ok, bad) { return window.__fakeDb(q).then(ok, bad); }
     };
@@ -53,7 +54,22 @@
         },
         realtime: { setAuth: function () { return Promise.resolve(); } },
         from: query,
-        storage: { from: function () { return { list: function () { return Promise.resolve({ data: [] }); }, remove: function () { return Promise.resolve({}); }, createSignedUrl: function () { return Promise.resolve({ data: null, error: { message: 'stand-in' } }); } }; } },
+        storage: { from: function () { return {
+          list: function () { return Promise.resolve({ data: [] }); }, remove: function () { return Promise.resolve({}); },
+          upload: function (path, blob, o) {
+            return blob.arrayBuffer().then(function (buf) {
+              var b = new Uint8Array(buf), t = ''; for (var k = 0; k < b.length; k++) t += String.fromCharCode(b[k]);
+              return window.__fakeUpload(path, btoa(t), o && o.contentType);
+            });
+          },
+          download: function (path) {
+            return window.__fakeDownload(path).then(function (r) {
+              if (!r) return { data: null, error: { message: 'Object not found' } };
+              var t = atob(r.body), b = new Uint8Array(t.length); for (var k = 0; k < t.length; k++) b[k] = t.charCodeAt(k);
+              return { data: new Blob([b], { type: r.type }), error: null };
+            });
+          }
+        }; } },
         functions: { invoke: function () { return Promise.resolve({ data: null, error: { message: 'stand-in' } }); } },
         rpc: function (name, args) { return window.__fakeDb({ rpc: name, args: args }); },
         channel: function (topic, opts) {

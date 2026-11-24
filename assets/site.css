@@ -3132,6 +3132,9 @@ select:not([multiple]) {
 .board-frame:has(.excalidraw--mobile) .board-notes:not([hidden]) { left: 4.5rem; right: 7.5rem; bottom: 1.1rem; }
 .board-frame:has(.excalidraw--mobile) .board-notes form { box-shadow: none; }
 .board-frame.has-selection:has(.excalidraw--mobile) .board-notes { display: none; }
+/* Excalidraw's own messages sit above the note bar, not on it. */
+.board-canvas .excalidraw .follow-mode__badge { bottom: 4rem; }
+.board-canvas .excalidraw .Toast { bottom: 4.5rem; }
 /* A card's writer and votes, between the drawing and Excalidraw's tools. */
 .board-cards { position: absolute; inset: 0; z-index: 3; overflow: hidden; pointer-events: none; }
 .board-card { position: absolute; top: 0; left: 0; display: flex; align-items: center; justify-content: space-between; gap: 0.4rem; transform-origin: 0 0; font-family: var(--sans); font-size: 13px; line-height: 1.2; color: #4e5b55; }
@@ -3143,8 +3146,6 @@ select:not([multiple]) {
 .excalidraw.theme--dark .board-card { color: #c9d1cc; }
 /* On the stage, the tools explain themselves; their running hints sat over the drawing. */
 .board-stage .HintViewer { display: none; }
-/* A shelf of saved shapes means nothing in a session. */
-.board-canvas .default-sidebar-trigger { display: none; }
 .p2-ask { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.5rem 0.6rem; margin-bottom: 0.5rem; border-radius: 8px; background: rgb(168 199 250 / 0.14); font-size: 0.9rem; }
 .p2-state { margin: 0 0 0.4rem; font-size: 0.9rem; }
 .p2-ask > [role="status"]:not(:empty) { flex-basis: 100%; }

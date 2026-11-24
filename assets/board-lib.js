@@ -310,6 +310,60 @@
     return out;
   }
 
+  // ------------------------------------------------------------------
+  // Websites, links, libraries, and saved boards
+  // ------------------------------------------------------------------
+
+  function urlOf(link) { try { return new URL(String(link || '')); } catch (e) { return null; } }
+  // Sites Excalidraw already knows how to embed (a video's player, a Figma
+  // file), which keep its own handling.
+  var KNOWN = /(^|\.)(youtube\.com|youtu\.be|vimeo\.com|figma\.com|excalidraw\.com|twitter\.com|x\.com|simplepdf\.eu|stackblitz\.com|val\.town|giphy\.com|reddit\.com)$|^gist\.github\.com$/;
+  // Any other secure page may go on the board, but for GitHub, which refuses
+  // to be framed, and this site, whose own pages would share the board's sign-in.
+  function embedOwn(link, host) {
+    var u = urlOf(link);
+    return !!u && u.protocol === 'https:' && u.href.length <= 500 && !KNOWN.test(u.hostname) && !/(^|\.)github\.com$/.test(u.hostname) && u.hostname !== host && !/(^|\.)humanshaped\.org$/.test(u.hostname);
+  }
+  function embeddable(link, host) {
+    var u = urlOf(link);
+    if (!u) return false;
+    return KNOWN.test(u.hostname) ? undefined : embedOwn(link, host);
+  }
+  // The thing on a board that a link points to, when it is a link to a board here.
+  function elementOf(link, host) {
+    var u = urlOf(link);
+    return u && u.host === host && /^\/board\/?$/.test(u.pathname) ? u.searchParams.get('element') : null;
+  }
+  function libraryHost(link) {
+    var u = urlOf(link);
+    return !!u && u.protocol === 'https:' && (/(^|\.)excalidraw\.com$/.test(u.hostname) || (u.hostname === 'raw.githubusercontent.com' && u.pathname.indexOf('/excalidraw/excalidraw-libraries/') === 0));
+  }
+  function bounds(els) {
+    if (!els.length) return null;
+    var l = Infinity, t = Infinity, r = -Infinity, b = -Infinity;
+    els.forEach(function (e) { l = Math.min(l, e.x); t = Math.min(t, e.y); r = Math.max(r, e.x + (e.width || 0)); b = Math.max(b, e.y + (e.height || 0)); });
+    return { l: l, t: t, r: r, b: b };
+  }
+  // A saved board's elements, to the right of what is here and under new
+  // names that still point at one another.
+  function beside(els, here, stamp, fileMap) {
+    var a = bounds(els), h = bounds(here || []);
+    if (!a) return [];
+    var dx = h ? h.r + 80 - a.l : 0, dy = h ? h.t - a.t : 0, ids = {}, groups = {};
+    els.forEach(function (e) { ids[e.id] = 'o' + stamp + '-' + e.id; (e.groupIds || []).forEach(function (g) { groups[g] = 'g' + stamp + '-' + g; }); });
+    function bind(x) { return x && ids[x.elementId] ? Object.assign({}, x, { elementId: ids[x.elementId] }) : null; }
+    return els.map(function (e) {
+      var o = Object.assign({}, e, { id: ids[e.id], x: e.x + dx, y: e.y + dy, index: null, groupIds: (e.groupIds || []).map(function (g) { return groups[g]; }),
+        frameId: e.frameId ? ids[e.frameId] || null : null, boundElements: (e.boundElements || []).filter(function (x) { return ids[x.id]; }).map(function (x) { return Object.assign({}, x, { id: ids[x.id] }); }) });
+      if ('containerId' in e) o.containerId = e.containerId ? ids[e.containerId] || null : null;
+      if ('startBinding' in e) { o.startBinding = bind(e.startBinding); o.endBinding = bind(e.endBinding); }
+      if (e.fileId) o.fileId = (fileMap || {})[e.fileId] || e.fileId;
+      if (e.customData && e.customData.note) o.customData = Object.assign({}, e.customData, { note: o.id });
+      if (e.customData && e.customData.vote) o.customData = null;
+      return o;
+    }).filter(function (e) { return !(e.type === 'ellipse' && e.opacity === 0 && e.locked); });
+  }
+
   // Words broken into lines of at most `width` characters.
   // Wraps each line the words already have (a hint may list things, one
   // to a line) to the frame's width.
@@ -483,7 +537,7 @@
   var lib = {
     DAY: DAY, MAX_MESSAGE_BYTES: MAX_MESSAGE_BYTES, SAVE_EVERY: SAVE_EVERY, CATCH_UP_AFTER: CATCH_UP_AFTER, CATCH_UP_EVERY: CATCH_UP_EVERY, MESSAGES_PER_SECOND: MESSAGES_PER_SECOND,
     params: params, pickSession: pickSession, topic: topic, link: link,
-    TEMPLATES: TEMPLATES, template: template, templateElements: templateElements, noteColor: noteColor, noteElements: noteElements, settleNote: settleNote, isNote: isNote, upgradeNotes: upgradeNotes, noteSpot: noteSpot, votesOn: votesOn, voteDot: voteDot, drawn: drawn, cardLine: cardLine, forPicture: forPicture, needsTemplate: needsTemplate,
+    TEMPLATES: TEMPLATES, template: template, templateElements: templateElements, noteColor: noteColor, noteElements: noteElements, settleNote: settleNote, isNote: isNote, upgradeNotes: upgradeNotes, noteSpot: noteSpot, votesOn: votesOn, voteDot: voteDot, drawn: drawn, cardLine: cardLine, forPicture: forPicture, embedOwn: embedOwn, embeddable: embeddable, elementOf: elementOf, libraryHost: libraryHost, beside: beside, needsTemplate: needsTemplate,
     unsent: unsent, markSeen: markSeen, syncable: syncable, keepLocal: keepLocal, merge: merge,
     bytes: bytes, batches: batches, sendInterval: sendInterval, pointerInterval: pointerInterval, throttle: throttle,
     sameGeneration: sameGeneration, canDraw: canDraw, colorFor: colorFor, fileName: fileName
