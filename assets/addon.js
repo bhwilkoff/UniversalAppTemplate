@@ -330,6 +330,11 @@
   }
   function stopCallRun(said) {
     var code = S.room && S.room.code;
+    // The run started the call's room under the cohort's title; left on, it
+    // reopened as an open room the leader had to end before picking another
+    // cohort's session (rehearsal, November 23, 2026).
+    var room = S.svc && S.teaching && S.svc.state();
+    if (room && room.on) S.svc.send({ t: 'end' });
     return db.rpc('stop_call_run', { code: code }).then(function (r) {
       if (r.error) { if (said) said(r.error.message); return; }
       try { sessionStorage.removeItem('hs-call-run:' + code); } catch (e) {}
@@ -2111,6 +2116,9 @@
       S.featurePick = list.length ? { part: part.key, list: list } : null;
       if (!list.length) S.featureSaid = vote ? 'No one here chose that yet.' : 'There is no one to choose yet.';
       drawPartTools();
+      // The choice drew below the panel's fold (rehearsal, November 23, 2026).
+      var shown = document.querySelector('.p2-picks') || document.querySelector('.p2-feature');
+      if (shown && shown.scrollIntoView) shown.scrollIntoView({ block: 'nearest' });
     });
   }
   // Each breakout room's work, for its debrief (Course Builder's Feature
