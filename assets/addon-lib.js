@@ -105,7 +105,10 @@
   //   state.welcome  CohortLib.welcome(), shown when the teacher puts it
   //                  on the stage, and before any part has begun
   function studioOf(d) {
-    return { key: cut(d.key, 60), text: cut(d.text, 60000), gh: d.gh && typeof d.gh === 'object' ? d.gh : {} };
+    var out = { key: cut(d.key, 60), text: cut(d.text, 60000), gh: d.gh && typeof d.gh === 'object' ? d.gh : {} };
+    // Where on the slide the leader pressed, so the editor opens there.
+    if (d.at && isFinite(d.at.slide) && isFinite(d.at.x) && isFinite(d.at.y)) out.at = { slide: Number(d.at.slide), x: Number(d.at.x), y: Number(d.at.y) };
+    return out;
   }
   function frameable(url) {
     var u;

@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>How it was built | Human Shaped</title>
-  <meta name="description" content="How the Human Shaped add-on for Google Meet was built by one educator with a coding agent, how a Course Builder course comes into it, and how to try it and take the method with you.">
+  <title>How I built it | Human Shaped</title>
+  <meta name="description" content="How Ben Wilkoff built the Human Shaped add-on for Google Meet with an agent, what happened when he brought a Course Builder course into it, and how you can try it for yourself.">
   <link rel="canonical" href="https://humanshaped.org/meet/built/">
   <meta property="og:url" content="https://humanshaped.org/meet/built/">
   <meta property="og:site_name" content="Human Shaped">
-  <meta property="og:title" content="How it was built">
-  <meta property="og:description" content="How the Human Shaped add-on for Google Meet was built by one educator with a coding agent, how a Course Builder course comes into it, and how to try it and take the method with you.">
+  <meta property="og:title" content="How I built it">
+  <meta property="og:description" content="How Ben Wilkoff built the Human Shaped add-on for Google Meet with an agent, what happened when he brought a Course Builder course into it, and how you can try it for yourself.">
   <meta property="og:type" content="website">
   <meta property="og:image" content="https://humanshaped.org/assets/og.png">
   <meta property="og:image:width" content="1200">
@@ -68,47 +68,48 @@
   <main id="main">
     <!-- A page to share after a demo (Ben, November 23, 2026, on making the
          work "shareable" for Minerva faculty and staff who build with
-         agents). Words by Claude, awaiting Ben's review. -->
+         agents). Rewritten November 24, 2026, after Ben called the first
+         version "pretty AI-coded". Words by Claude, awaiting Ben's review. -->
     <div class="wrap">
       <header class="page-head">
         <div>
-          <h1>How it was built.</h1>
-          <p class="lead">Human Shaped's add-on for Google Meet&trade; was built by one educator working with a coding agent and a template repository of skills, and everything it learned along the way is in that template, free, for anyone who wants to build tools for learning the same way.</p>
+          <h1>How I built it.</h1>
+          <p class="lead">On November 4, 2026, I opened up my first session with this add-on approved and installed, and none of the folks in my cohort could see the main stage. Everything I have built since then started with that hour.</p>
         </div>
       </header>
 
-      <section class="section first" aria-label="How it was built">
+      <section class="section first" aria-label="How I built it">
         <div class="topics single">
-          <div class="topic" id="try">
-            <h2>Try it in a call of your own.</h2>
+          <div class="topic" id="agent">
+            <h2>What I wanted.</h2>
             <div class="prose">
-              <p>Add Human Shaped from the <a href="https://workspace.google.com/marketplace/app/human_shaped/1086485459450" target="_blank" rel="noopener">Google Workspace Marketplace&trade;</a>, start a Meet call, and open it from Activities. In a call that is not a cohort's, you need no account at all: Start a session gives you slides with your own notes, questions counted without names, a vote on ideas, stances, a clock, and a website on the main stage where everyone in the call gets their own working copy. <a href="/meet/before/">Trying it takes five minutes</a>, and <a href="/meet/">everything it does</a> is on its own page.</p>
+              <p>People understand a video conference, but almost no one has been in a learning session that happens inside of one. I wanted my learners to be able to answer a question, show one another what they have made, and ask for help without ever leaving the call. And I wanted to be able to lead all of it without having two other pages open.</p>
+              <p>I build with an agent. I decide what we are making and why, I use it with real people, and I say so when it doesn't make sense. The agent writes the code. That sounds tidy, but it wasn't, because a thing can look finished in a browser and still not work at all inside of a call. So, I made one rule: nothing is finished until we have seen it work in a real Google Meet&trade; call, with a leader and a learner in it.</p>
+              <p>That rule has taught us a great many things that we couldn't find written down anywhere. Meet won't draw a PDF on the main stage. The panel and the stage can't see what the other one has saved. And the add-on can't use your microphone, although a window that it opens can. All of those lessons are now in the template, which means that the next person won't have to learn them the way that we did.</p>
             </div>
           </div>
 
           <div class="topic" id="course-builder">
-            <h2>A Course Builder course, running in Meet.</h2>
+            <h2>Bringing in a Course Builder course.</h2>
             <div class="prose">
-              <p>A leader makes an export in Course Builder and pastes its link into <a href="/teach/import/">Bring in a course</a> without opening it, because the link works only once. Human Shaped hands Course Builder its own address and waits for the course to arrive, and it becomes a draft cohort with every session and every part in order. Nothing about people comes with it.</p>
-              <p>Each Forum step has a place in the call. A poll is a question on the main stage, a repoll asks it again beside the first, poll results become a debrief that pins the answers, and Feature User keeps its Quiet, Random, and Voting choices, with Quiet counted from what was actually recorded in that call. Breakouts open as Meet rooms sized the way the step says, and each room fills in its own copy of the workbook together.</p>
-              <p>Running the imported course in real calls changed three things: Meet's frames cannot draw a PDF, so each one became picture slides; a workbook that held real applicants' documents was blurred; and the learning outcomes, which arrive as numbers, take their names from Course Builder's outcomes file.</p>
+              <p>I already had a course inside of Minerva's Course Builder, and I wanted to know if I could run it in Meet without building it all over again. So, we figured out how to bring it over. You export the course, paste the link into <a href="/teach/import/">Bring in a course</a> (please don't open it first, because it only works once), and every session shows up as a draft that you can revise. Nothing about the people in the course comes with it.</p>
+              <p>If you have taught in Forum, you will recognize what happens next. Polls become questions on the main stage, and a repoll sits beside the first set of answers so that you can see what changed. You can still feature someone who has been quiet, and it will tell you why it chose them. Breakout groups get their own Meet rooms, and they fill in their workbooks together.</p>
+              <p>And yet, the first time I tried to run one of those sessions, a huge number of the resources were too big for the window or didn't load at all. We turned the PDFs into slides. We blurred a workbook that had real applicants in it. We went back and found the names for the learning outcomes, which had come over as nothing but numbers. I only knew about any of that because I tried to teach with it.</p>
             </div>
           </div>
 
-          <div class="topic" id="agent">
-            <h2>One educator, one agent, a template.</h2>
+          <div class="topic" id="try">
+            <h2>Try it in a call of your own.</h2>
             <div class="prose">
-              <p>Since October 1, 2026, the site and the add-on have taken more than a thousand commits and nearly a hundred database changes, written with a coding agent. The educator decided what to build and why, used it, and judged it; the agent wrote the code and ran the checks. The habit that mattered most was simple to say and hard to keep: no feature counted as done until it worked in a real Meet call, with a leader and a learner in it.</p>
-              <p>That habit is how we learned the things no documentation said. Meet's main stage cannot draw a PDF. The panel and the stage share no storage, so two browser tabs can never prove that something passes from one to the other. The add-on's own frame is refused the microphone and the screen, while a window it opens is not. Each of these is now a rule in the template, so the next tool built from it starts out knowing.</p>
-              <p>It all runs at no cost, on free tiers of GitHub Pages, Supabase, and Cloudflare Workers, which also means every job has to be built to use very little, and a run that repeats the same failing work is treated as a bug rather than a schedule.</p>
+              <p>You don't need an account for this. Add Human Shaped from the <a href="https://workspace.google.com/marketplace/app/human_shaped/1086485459450" target="_blank" rel="noopener">Google Workspace Marketplace&trade;</a>, start a Meet call, and open it up from Activities. You will have slides with your own notes, questions, a way to vote on ideas, and a main stage where everyone in the call can try out the same website. <a href="/meet/before/">It takes about five minutes to get started</a>, and you can read about <a href="/meet/">everything it does</a> first if you would rather.</p>
             </div>
           </div>
 
           <div class="topic" id="take">
-            <h2>Take the method with you.</h2>
+            <h2>Build something of your own.</h2>
             <div class="prose">
-              <p><a href="https://github.com/bhwilkoff/UniversalAppTemplate">The template</a> is a repository you copy to start your own app, with skills your agent reads before it builds. The ones behind this add-on are <a href="https://github.com/bhwilkoff/UniversalAppTemplate/tree/main/.claude/skills/google-meet-addon">google-meet-addon</a>, <a href="https://github.com/bhwilkoff/UniversalAppTemplate/tree/main/.claude/skills/live-learning-sessions">live-learning-sessions</a>, and <a href="https://github.com/bhwilkoff/UniversalAppTemplate/tree/main/.claude/skills/zero-cost-hosted-backend">zero-cost-hosted-backend</a>, and the add-on's own code and design notes are on the template's <a href="https://github.com/bhwilkoff/UniversalAppTemplate/tree/site">site branch</a>.</p>
-              <p>If you would rather learn to build this way with other people, <a href="/cohorts/">our cohorts are free</a>, and what you build is yours.</p>
+              <p>Everything that I know about building this way is in <a href="https://github.com/bhwilkoff/UniversalAppTemplate">the Universal App Template</a>. You make a copy of it, and your agent reads what we have learned before it builds anything for you. If you are interested in making something for a live class, start with <a href="https://github.com/bhwilkoff/UniversalAppTemplate/tree/main/.claude/skills/google-meet-addon">what we know about Meet add-ons</a>, <a href="https://github.com/bhwilkoff/UniversalAppTemplate/tree/main/.claude/skills/live-learning-sessions">what we know about live sessions</a>, and <a href="https://github.com/bhwilkoff/UniversalAppTemplate/tree/main/.claude/skills/zero-cost-hosted-backend">how we run all of it for free</a>. The <a href="https://github.com/bhwilkoff/UniversalAppTemplate/tree/site">code for the add-on</a> is there too.</p>
+              <p>If you would rather learn to build with other people, <a href="/cohorts/">our cohorts are free</a>. What you make is yours, and I would love to see it.</p>
               <p class="small">Google Meet&trade; and Google Workspace Marketplace&trade; are trademarks of Google LLC.</p>
             </div>
           </div>

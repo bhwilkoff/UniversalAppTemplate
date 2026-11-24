@@ -707,7 +707,21 @@
     }, true);
     if (window.ResizeObserver) new ResizeObserver(function () { if (K && !typing) drawHits(); }).observe(canvas);
 
-    E.load().then(function (kit) { K = kit; drawAdder(); redraw(); needGitHub(); }, function () { box.replaceChildren(el('p', 'small', 'The slides cannot be drawn here.')); });
+    // Opened from a press on a slide's words: that slide, with those words open.
+    function startAt() {
+      if (!o.at || readOnly || !list.length) return;
+      at = Math.max(0, Math.min(list.length - 1, o.at.slide || 0));
+      redraw();
+      var c = canvas.getBoundingClientRect(), x = c.left + o.at.x / W * c.width, y = c.top + o.at.y / H * c.height;
+      var best = null, near = 60;
+      Array.prototype.forEach.call(hits.querySelectorAll('.studio-hit:not(.is-block)'), function (h) {
+        var r = h.getBoundingClientRect();
+        var d = Math.hypot(Math.max(r.left - x, 0, x - r.right), Math.max(r.top - y, 0, y - r.bottom));
+        if (d < near) { near = d; best = h; }
+      });
+      if (best) best.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, cancelable: true }));
+    }
+    E.load().then(function (kit) { K = kit; drawAdder(); redraw(); needGitHub(); startAt(); }, function () { box.replaceChildren(el('p', 'small', 'The slides cannot be drawn here.')); });
 
     return { text: text, flush: function () { finish(); clearTimeout(timer); return o.onChange ? o.onChange(text()) : null; } };
   }

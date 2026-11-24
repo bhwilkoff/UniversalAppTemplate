@@ -487,8 +487,7 @@
       editSlides: function (key) {
         // The real editor, on the leader's own stage; a window if the stage is closed.
         if (!S.stageOn) return window.open('/session/?c=' + encodeURIComponent(S.cohort.slug) + '&s=' + S.session.number + '&t=plan&part=' + encodeURIComponent(key), 'hs-slides', 'popup,width=1280,height=820');
-        S.studioKey = key; S.studioHeld = null;
-        drawAsks(); sendStage();
+        startStudio(key, null);
       },
       // What does not apply to this cohort stays out of sight: rooms
       // without groups, a board without a board part (JOURNEYS.md).
@@ -1147,7 +1146,7 @@
     // stage, where everyone sees it, so their panel does not repeat them.
     if (S.teaching) F.low.appendChild($('[data-react]')); else $('[data-react]').hidden = true;
     drawMark(F.low);
-    F.on(function () { nextMove(); }, function () { if (S.run) S.run.step(-1).then(afterMove); });
+    F.on(function () { nextMove(); }, function () { if (S.studioKey) studioDone(); if (S.run) S.run.step(-1).then(afterMove); });
     if (S.teaching && F.onNudge) F.onNudge(nudgeClock);
   }
   // A running part clock moves by half a minute either way.
@@ -1358,6 +1357,7 @@
   function nextMove() {
     var n = nextStep();
     if (!n || n.disabled) return;
+    if (S.studioKey) studioDone();
     if (n.go === 'stage') return $('[data-open-stage]').click();
     if (n.go === 'start') return $('[data-start-session]').click();
     // A part made current in a rehearsal before the session keeps a clock
@@ -1794,6 +1794,7 @@
         drawPartTools();
         loadStageDetail();
         sendStage();
+        sendHeld();
       });
     });
   }
@@ -2901,16 +2902,34 @@
     S.decks = S.decks || {}; S.decks[key] = text;
     return db.rpc('save_scene_deck', { scene: key, source: text }).then(function (r) { if (r.error) console.log('[addon] slides not saved: ' + r.error.message); });
   }
+  function startStudio(key, at) {
+    S.studioKey = key; S.studioHeld = null; S.studioAt = at;
+    drawAsks(); sendStage();
+  }
   function studioDone() {
     var key = S.studioKey, held = S.studioHeld;
-    S.studioKey = null; S.studioHeld = null;
-    (held != null ? saveDeck(key, held) : Promise.resolve()).then(function () { drawAsks(); sendStage(); });
+    S.studioKey = null; S.studioHeld = null; S.studioAt = null;
+    // The stage hands over its last words as its editor closes.
+    S.studioLast = { key: key, at: Date.now() };
+    (held != null ? saveDeck(key, held) : Promise.resolve()).then(function () { return held != null && S.run ? S.run.reload() : null; }).then(function () { drawAsks(); sendStage(); });
+    drawAsks(); sendStage();
   }
   function stageAct(a) {
     if (a.a === 'coach') return a.do === 'next' ? coachNext() : coachClose();
     if (a.a === 'room' && S.svc && a.m && ['vote', 'note', 'unnote', 'stance'].indexOf(a.m.t) >= 0) return S.svc.send(a.m);
     if (a.a === 'react' && S.classChannel) return S.classChannel.press({ key: String(a.key), target: {} });
     if (a.a === 'request' && !S.teaching && ASKS[a.kind]) return sendRequest(a.kind, a.body);
+    // A leader's press on the words of a slide opens the editor at those words.
+    if (a.a === 'edit' && S.teaching && !S.studioKey) {
+      var here = partNow();
+      if (here && here.own && here.slides) startStudio(here.key, { slide: Number(a.slide) || 0, x: Number(a.x) || 0, y: Number(a.y) || 0 });
+      return;
+    }
+    if (a.a === 'studioDone') return S.teaching && S.studioKey ? studioDone() : null;
+    if (a.a === 'deck' && S.teaching && !S.studioKey && S.studioLast && a.key === S.studioLast.key && Date.now() - S.studioLast.at < 5000) {
+      if (String(a.text) !== (S.decks || {})[a.key]) saveDeck(a.key, String(a.text)).then(function () { return S.run ? S.run.reload() : null; });
+      return;
+    }
     if (a.a === 'deck' && S.teaching && a.key === S.studioKey) {
       // Half-typed words never reach a room that is watching this part.
       var watching = (partNow() || {}).key === a.key;
@@ -2919,7 +2938,7 @@
     }
     if (a.a !== 'answer' || S.teaching) return;
     var k = S.checks.filter(function (x) { return x.id === a.id && x.state === 'open'; })[0];
-    if (!k) return;
+    if (!k) { var at = partNow(); S.heldAnswer = at ? { key: at.key, act: a, at: Date.now() } : null; return sendHeld(); }
     var row = L.answerRow(k, a.body != null ? { body: String(a.body) } : a.picks ? { picks: a.picks } : { choice: a.choice });
     if (row.error) return;
     if (row.value == null) delete row.value;
@@ -3148,7 +3167,7 @@
       var mp = part ? { key: part.key, name: part.name, endsAt: null } : null, fu = A.frameable(S.myStage.url);
       return fu ? { mode: 'app', part: mp, who: S.myStage.who, url: fu, note: null } : { mode: 'item', part: mp, who: S.myStage.who, what: S.myStage.url, note: null };
     }
-    var scene = null;
+    var scene = null, soon = arriving(part);
     if (part && SL && V && (shared() || part.own)) {
       var s = S.draft && S.draft.key === part.key ? V.draft(part, S.draft.fields) : part;
       scene = SL.stagePreview(V.asRow(s));
@@ -3165,6 +3184,11 @@
         if (links) scene.board = links.stage;
       }
     }
+    // A question pinned before its row reaches this panel, or one since closed,
+    // has nothing to show, and the stage fell to the part's bare title for a
+    // moment between two questions. It follows the part until then.
+    var pinned = S.onStage;
+    if (pinned && pinned.kind === 'check' && !(S.checks || []).some(function (k) { return k.id === pinned.id && (k.state === 'open' || pinned.results); })) pinned = null;
     return A.stageView({
       // A part's clock is the leader's, in the panel; the stage shows a clock
       // only when the leader starts one (Week 2: "Time is up" sat on the stage
@@ -3172,12 +3196,12 @@
       part: part ? { key: part.key, name: part.name, endsAt: null } : null,
       // A card outranks the part's own question; only a leader's own pin
       // outranks the card.
-      card: S.onStage ? null : S.card || null,
+      card: pinned ? null : S.card || null,
       answerable: !S.teaching,
-      studio: S.studioKey ? { key: S.studioKey, text: S.studioHeld != null ? S.studioHeld : (S.decks || {})[S.studioKey] || (sceneOf(S.studioKey) || {}).slides || '', gh: window.SlidesLib ? window.SlidesLib.ghAll() : {} } : null,
+      studio: S.studioKey ? { key: S.studioKey, text: S.studioHeld != null ? S.studioHeld : (S.decks || {})[S.studioKey] || (sceneOf(S.studioKey) || {}).slides || '', at: S.studioAt, gh: window.SlidesLib ? window.SlidesLib.ghAll() : {} } : null,
       boardStage: (A.boardLinks(S.cohort, S.session, null, boardTemplate()) || {}).stage,
       mineOf: function (k) { var x = myAnswer(k); return x ? { choice: x.choice, picks: Array.isArray(x.value) ? x.value : undefined, body: x.body } : null; },
-      onStage: S.onStage || (S.card ? null : partCheckPin()), beside: S.onStage && (S.onStage.kind === 'answer' || S.onStage.kind === 'work') ? partCheckPin() || latestCheckPin() : null, checks: S.checks, results: S.results, items: S.items, names: S.names, sayLike: S.sayLike || {}, appUrls: appUrls(), audience: V ? V.audienceOf(part) : null,
+      onStage: pinned || (S.card ? null : partCheckPin() || (soon ? { kind: 'check', id: soon.id } : null)), beside: pinned && (pinned.kind === 'answer' || pinned.kind === 'work') ? partCheckPin() || latestCheckPin() : null, checks: soon ? (S.checks || []).filter(function (k) { return k.id !== soon.id; }).concat([soon]) : S.checks, results: S.results, items: S.items, names: S.names, sayLike: S.sayLike || {}, appUrls: appUrls(), audience: V ? V.audienceOf(part) : null,
       welcome: lib.welcome(S.cohort, S.session, S.list && S.list.length ? S.list : S.parts), scene: scene, slides: slidesView(part),
       doc: partDoc(part),
       besideSlides: part && part.own && (part.kind === 'reflection' || (part.kind === 'question' && part.slides)) ? slidesView(part) : null,
@@ -3220,6 +3244,38 @@
   function latestCheckPin() {
     var open = (S.checks || []).filter(function (k) { return k.state === 'open'; });
     return open.length ? { kind: 'check', id: open[0].id } : null;  // newest first, as read
+  }
+  // Arriving at a question. The show moves first and the question's row is
+  // written a moment later, so for that moment there is nothing to answer and
+  // the stage drew the part's plain slide, or "This question is closed" on the
+  // way back, before the question itself (Ben, November 24, 2026: "It
+  // shouldn't show a slide briefly before going to the next slide"). Until the
+  // row is there, the stage draws the question from the plan.
+  var ARRIVING = 3000;
+  function arriving(part) {
+    var key = part ? part.key : null;
+    if (S.arriveKey !== key) {
+      // A panel opened partway through has already arrived.
+      S.arriveAt = S.arriveKey === undefined ? 0 : Date.now();
+      S.arriveKey = key;
+      if (part && (part.kind === 'question' || part.kind === 'reflection')) setTimeout(sendStage, ARRIVING + 50);
+    }
+    if (!part || !part.own || !S.arriveAt || Date.now() - S.arriveAt > ARRIVING) return null;
+    var q = part.kind === 'question' || part.kind === 'reflection' ? plannedAsk(part) : null;
+    if (!q) return null;
+    var pair = rerunPair(part), first = pair && pair.first;
+    var was = (S.checks || []).filter(function (k) { return first ? k.rerun_of === first.id : k.prompt === q.prompt && !k.rerun_of; })[0];
+    if (was && was.state === 'open') { S.arriveAt = 0; return null; }
+    if (was && part.kind === 'reflection') return null;
+    var tally = part.config && part.config.show_tally === true;
+    return Object.assign({ choices: null, points: null }, q, was || {}, { id: was ? was.id : 'arriving', state: 'open', show_tally: was ? was.show_tally : tally, rerun_of: first ? first.id : null });
+  }
+  // A choice pressed in that moment is kept, and sent once its question opens.
+  function sendHeld() {
+    var h = S.heldAnswer, part = partNow(), k = h && part && part.key === h.key ? partCheck() : null;
+    if (!h) return;
+    if (Date.now() - h.at > 5000 || !part || part.key !== h.key) { S.heldAnswer = null; return; }
+    if (k) { S.heldAnswer = null; stageAct(Object.assign({}, h.act, { id: k.id })); }
   }
   function partCheckPin() {
     var part = partNow(), k = partCheck();

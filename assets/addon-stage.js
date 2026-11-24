@@ -480,6 +480,33 @@
     return f;
   }
 
+  // A leader changes a slide by pressing its words on their own stage, the way
+  // an open room and the session page already work (Ben, November 24, 2026:
+  // "Usually, I can edit the content on the slides by clicking into the slide").
+  // Only words take the press, so a stray one on the paper does nothing.
+  function leaderSlide() { return !!view && view.mode === 'slides' && !view.learner && !room && !!stageClient && !document.documentElement.classList.contains('stage-in-panel'); }
+  function wordsAt(ev) {
+    if (!leaderSlide()) return null;
+    var svg = $('[data-slide]').querySelector('svg');
+    if (!svg) return null;
+    var pad = 8, hit = Array.prototype.some.call(svg.querySelectorAll('text'), function (t) {
+      var r = t.getBoundingClientRect();
+      return r.width && ev.clientX >= r.left - pad && ev.clientX <= r.right + pad && ev.clientY >= r.top - pad && ev.clientY <= r.bottom + pad;
+    });
+    if (!hit) return null;
+    var m = svg.getScreenCTM();
+    return m ? { x: (ev.clientX - m.e) / m.a, y: (ev.clientY - m.f) / m.d } : null;
+  }
+  (function () {
+    var box = $('[data-slide]');
+    if (!box) return;
+    box.addEventListener('pointermove', function (ev) { box.style.cursor = wordsAt(ev) ? 'text' : ''; });
+    box.addEventListener('click', function (ev) {
+      var p = wordsAt(ev);
+      if (p) act({ a: 'edit', slide: view.slides.at, x: p.x, y: p.y });
+    });
+  })();
+
   // A part's document, framed for everyone; the frame stays through later
   // messages so a person's place in it is kept.
   var docSrc = null;
@@ -498,15 +525,22 @@
   var studioKey = null, studioApi = null;
   function drawStudio(d) {
     var box = $('[data-studio]');
-    if (!d) { if (studioKey) { studioKey = null; box.replaceChildren(); } return; }
+    if (!d) {
+      if (studioKey) {
+        // Words typed a moment ago go with it.
+        if (!room && studioApi) studioApi.flush();
+        studioKey = null; studioApi = null; box.replaceChildren();
+      }
+      return;
+    }
     if (d.key === studioKey || !window.SlideStudio) return;
     studioKey = d.key;
     Object.keys(d.gh || {}).forEach(function (k) { window.SlidesLib.ghHold(k, d.gh[k]); });
-    // In a room, Done sits with the studio's own buttons, and the notes never
+    // Done sits with the studio's own buttons. In a room, the notes never
     // leave this browser.
-    var done = null;
-    if (room) { done = el('button', 'btn-secondary small', 'Done'); done.type = 'button'; done.addEventListener('click', function () { act({ a: 'studioDone' }); }); }
-    studioApi = window.SlideStudio.mount(box, { text: d.text, done: done, onChange: function (t) { act({ a: 'deck', key: d.key, text: t }); } });
+    var done = el('button', 'btn-primary small', 'Done'); done.type = 'button';
+    done.addEventListener('click', function () { if (!room && studioApi) studioApi.flush(); act({ a: 'studioDone' }); });
+    studioApi = window.SlideStudio.mount(box, { text: d.text, done: done, at: d.at, onChange: function (t) { act({ a: 'deck', key: d.key, text: t }); } });
     var head = room && box.querySelector('.studio-notes-head');
     if (head && window.UI) head.replaceChildren(window.UI.visibility('device', 'Your notes'));
   }
@@ -518,7 +552,9 @@
     box.hidden = !on;
     if (!on) { box.replaceChildren(); box.dataset.id = ''; return; }
     if (box.dataset.id === view.id && box.contains(document.activeElement)) return;
-    box.dataset.id = view.id;
+    // The question drawn while it opened is the same one: keep what was typed.
+    if (box.dataset.id === 'arriving' && box.dataset.prompt === view.prompt && box.contains(document.activeElement)) { box.dataset.id = view.id; return; }
+    box.dataset.id = view.id; box.dataset.prompt = view.prompt;
     box.replaceChildren();
     var input = el(view.kind === 'words' ? 'input' : 'textarea');
     input.setAttribute('aria-label', 'Your answer');
