@@ -3150,6 +3150,13 @@ select:not([multiple]) {
 /* A locked or unsynced board says so in the corner Meet's own tile leaves free. */
 .board-stage .board-head { right: auto; left: 0; bottom: 3.6rem; }
 .board-stage .board-status { text-align: left; }
+/* Excalidraw's own windows speak in the site's type, not the browser's. */
+.excalidraw, .excalidraw.excalidraw-modal-container { --ui-font: var(--sans); font-family: var(--sans); }
+.excalidraw-modal-container h2, .excalidraw-modal-container h3, .excalidraw-modal-container .ImageExportModal { font-family: var(--sans); }
+/* The window that saves what Meet's frame will not. */
+.board-save-main { display: grid; gap: 1rem; max-width: 34rem; margin: 0 auto; padding: 1.5rem 1.25rem; }
+.board-save-main h1 { font-size: 1.15rem; overflow-wrap: anywhere; }
+.board-save-main img { max-width: 100%; max-height: 50vh; object-fit: contain; justify-self: start; border: 1px solid var(--rule); border-radius: 8px; background: #fff; }
 /* A card's writer and votes, between the drawing and Excalidraw's tools. */
 .board-cards { position: absolute; inset: 0; z-index: 3; overflow: hidden; pointer-events: none; }
 .board-card { position: absolute; top: 0; left: 0; display: flex; align-items: center; justify-content: space-between; gap: 0.4rem; transform-origin: 0 0; font-family: var(--sans); font-size: 13px; line-height: 1.2; color: #4e5b55; }

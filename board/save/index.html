@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Save from the board | Human Shaped</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#131916" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="/assets/favicon.svg?v=20261006q" type="image/svg+xml">
+  <link rel="stylesheet" href="/assets/site.css?v=20261124i">
+</head>
+<body class="board-save" data-no-app-nav>
+  <!-- Meet's frame lets nothing be saved or copied from inside it, so the board
+       opens this window to do both (measured in a real call, November 24, 2026).
+       It takes one thing, only from the board that opened it. Words by Claude,
+       awaiting Ben's review. -->
+  <main class="board-save-main">
+    <h1 data-name>Save from the board</h1>
+    <img data-picture alt="What is being saved" hidden>
+    <p class="actions">
+      <button class="btn-primary" type="button" data-save disabled>Save it</button>
+      <button class="btn-secondary" type="button" data-copy hidden>Copy it</button>
+    </p>
+    <p class="small" role="status" data-said></p>
+  </main>
+  <script src="/assets/board-save.js?v=20261124i" defer></script>
+</body>
+</html>

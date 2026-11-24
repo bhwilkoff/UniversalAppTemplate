@@ -25,8 +25,48 @@
     });
   }
 
+  // Inside Meet's frame a download never starts and the clipboard refuses, with
+  // no word to anyone (measured in a real call, November 24, 2026). A window the
+  // board opens is not in that frame, so saving and copying happen there. It
+  // has to open on the press itself, before the file is ready.
+  function inFrame() { try { return window.top !== window.self && window.top.location.origin !== location.origin; } catch (e) { return true; } }
+  function handOff(o) {
+    var w = window.open('/board/save/', '_blank', 'popup,width=560,height=600');
+    if (!w) return Promise.reject(new Error('the browser did not let a window open to save it in'));
+    return new Promise(function (yes, no) {
+      var timer = setTimeout(function () { done(); no(new Error('the window to save it in did not answer')); }, 20000);
+      function done() { clearTimeout(timer); window.removeEventListener('message', hear); }
+      function hear(e) {
+        if (e.source !== w || e.origin !== location.origin || !e.data || !e.data.hsSaveReady) return;
+        done();
+        Promise.resolve(o.blob).then(function (blob) { w.postMessage({ hsSave: { blob: blob, name: o.name, copy: !!o.copy } }, location.origin); yes(); }, no);
+      }
+      window.addEventListener('message', hear);
+    });
+  }
+  function outOfFrame(say) {
+    if (!inFrame()) return;
+    var click = HTMLAnchorElement.prototype.click;
+    HTMLAnchorElement.prototype.click = function () {
+      if (!this.download || !/^(blob|data):/.test(this.href)) return click.call(this);
+      handOff({ name: this.download, blob: dataUrlBlob(this.href) }).catch(function (e) { say('Not saved: ' + e.message + '. Open the board in its own tab to save it.'); });
+    };
+    var clip = navigator.clipboard;
+    if (clip && clip.write) {
+      var write = clip.write.bind(clip);
+      clip.write = function (items) {
+        return write(items).catch(function (e) {
+          var it = items && items[0];
+          if (!it || it.types.indexOf('image/png') < 0) throw e;
+          return handOff({ name: 'board.png', blob: it.getType('image/png'), copy: true });
+        });
+      };
+    }
+  }
+
   // o: { db, X, api(), board(), cohort, session, me, canDraw(), say(text), changed(), stage }
   function start(o) {
+    outOfFrame(function (t) { var api = o.api(); if (api) api.setToast({ message: t, closable: true, duration: 9000 }); });
     var X = o.X, store = o.db.storage ? o.db.storage.from(P.BUCKET) : null;
 
     // ---------------- pictures ----------------

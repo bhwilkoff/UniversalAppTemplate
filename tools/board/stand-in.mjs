@@ -113,12 +113,13 @@ export async function presenceSync(topic) {
   }
 }
 
-export const browser = await chromium.launch({ executablePath: CHROME, headless: true });
-export async function open(who, query, size = { width: 1280, height: 800 }, harness = null, device = {}) {
+export const browser = await chromium.launch({ executablePath: CHROME, headless: true, args: ['--disable-features=LocalNetworkAccessChecks,BlockInsecurePrivateNetworkRequests,PrivateNetworkAccessForNavigations,LocalNetworkAccessChecksForNavigations,LocalNetworkAccessForSubframeNavigations'] });
+export async function open(who, query, size = { width: 1280, height: 800 }, harness = null, device = {}, host = null) {
   if (!people[who]) people[who] = { id: randomUUID(), user_metadata: { user_name: who, full_name: 'Person ' + who.slice(1) } };
   const ctx = await browser.newContext({ viewport: size, ...device });
   if (harness) {
-    await ctx.route(origin + '/__harness', route => route.fulfill({ contentType: 'text/html', body: harness }));
+    // On another host than the board's, the way Meet is.
+    await ctx.route((host ? origin.replace('127.0.0.1', host) : origin) + '/__harness', route => route.fulfill({ contentType: 'text/html', body: harness }));
     // A stand-in for Meet's add-on SDK: the main stage's client, whose
     // message handler the test calls the way the panel's notifyMainStage would.
     await ctx.addInitScript(() => {
@@ -156,7 +157,7 @@ export async function open(who, query, size = { width: 1280, height: 800 }, harn
     (presence[topic] = presence[topic] || {})[people[who].id] = [meta];
     await presenceSync(topic);
   });
-  await page.goto(harness ? origin + '/__harness' : origin + '/board/' + query);
+  await page.goto(harness ? (host ? origin.replace('127.0.0.1', host) : origin) + '/__harness' : origin + '/board/' + query);
   return page;
 }
 

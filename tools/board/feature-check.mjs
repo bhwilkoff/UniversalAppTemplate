@@ -5,7 +5,7 @@
 // diagrams pasted in, search, grid, snapping, zen, view mode, theme, pages.
 //
 //   cd tools/board && npm ci && node feature-check.mjs [screenshot folder]
-import { hub, live, check, until, open, shots, browser, server, results, pages, BoardLib } from './stand-in.mjs';
+import { origin, hub, live, check, until, open, shots, browser, server, results, pages, BoardLib } from './stand-in.mjs';
 import { join } from 'node:path';
 import { writeFileSync, mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -223,6 +223,24 @@ await ben.locator('[data-testid="main-menu-trigger"]').click(); await snap(ben, 
   check('and its words stay in their shapes', (await els(bea)).filter((e) => e.containerId).every((t) => !!t.containerId) && (await els(bea)).filter((e) => e.containerId).length === 2 && new Set((await els(bea)).filter((e) => e.containerId).map((e) => e.containerId)).size === 2);
   const [pf] = await Promise.all([ben.waitForEvent('filechooser', { timeout: 8000 }).catch(() => null), menu(ben, 'Add a PDF or pictures')]); if (pf) await pf.setFiles(join(tmp, 'pick.png'));
   check('a picture as a page, locked under the drawing, for everyone', !!pf && await settle((b) => b.some((e) => e.type === 'image' && e.locked), 9000) && await until(() => ev(bea, () => window.__board.api.getSceneElements().filter((e) => e.type === 'image').every((e) => !!window.__board.api.getFiles()[e.fileId])), 9000));
+}
+// ---------------- saving and copying from inside a frame like Meet's
+{
+  const p = await open('ben', null, { width: 1000, height: 640 }, '<!doctype html><body style="margin:0"><iframe sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox" src="' + origin + '/board/?c=stand-in&s=week-1&view=stage&light" style="border:0;width:100vw;height:100vh"></iframe></body>', { }, 'localhost');
+  const f = () => p.frames().find((x) => /\/board\/\?/.test(x.url())); await until(async () => f() && await f().evaluate(() => !!(window.__board && window.__board.state.live)).catch(() => false), 25000); await p.waitForTimeout(600);
+  const pop = async (act) => { const [w] = await Promise.all([p.context().waitForEvent('page', { timeout: 8000 }).catch(() => null), act()]); return w; };
+  const item = (label) => async () => { await f().locator('[data-testid="main-menu-trigger"]').click(); await p.waitForTimeout(250); await f().locator('.dropdown-menu').getByText(label, { exact: true }).click(); };
+  for (const [label, want] of [['Download with names and votes', /\.png$/], ['Download the board', /\.excalidraw$/]]) {
+    let got = null; const w = await pop(item(label)); if (w) { const d = await w.waitForEvent('download', { timeout: 8000 }).catch(() => null); got = d && d.suggestedFilename(); await w.waitForTimeout(300); if (shots) await w.screenshot({ path: join(shots, 'save-window.png') }); }
+    check('in Meet’s frame, “' + label + '” saves from a window of its own (' + got + ')', !!got && want.test(got)); if (w) await w.close();
+  }
+  await item('Export image...')(); await p.waitForTimeout(800); if (shots) await p.screenshot({ path: join(shots, 'export-framed.png') });
+  let got = null; const w = await pop(() => f().locator('.ImageExportModal').getByText('PNG', { exact: true }).click()); if (w) { const d = await w.waitForEvent('download', { timeout: 8000 }).catch(() => null); got = d && d.suggestedFilename(); await w.close(); }
+  check('and so does the export window (' + got + ')', /\.png$/.test(got || ''));
+  await p.context().grantPermissions([]); const c = await pop(() => f().locator('.ImageExportModal').getByText('Copy to clipboard', { exact: true }).click()); if (c) await c.waitForTimeout(1200);
+  const said = c && await c.locator('[data-said]').textContent(); check('and copying, which Meet’s frame refuses, is offered there (' + said + ')', /Copied|Press Copy it/.test(said || '') && await c.locator('[data-copy]').isVisible()); if (c) await c.close();
+  const alone = await p.context().newPage(); await alone.goto(origin + '/board/save/'); await alone.evaluate(() => window.postMessage({ hsSave: { blob: new Blob(['x'], { type: 'image/png' }), name: 'x.png' } }, '*')); await alone.waitForTimeout(300);
+  check('that window takes nothing from anyone but the board that opened it', await alone.locator('[data-save]').isDisabled()); await alone.close(); pages.delete(p); await p.context().close();
 }
 check('no page threw an error', [...pages.values()].every((i) => !i.errors.length) || (console.log([...pages.values()].map((i) => i.errors)), false));
 await browser.close(); server.close();
