@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>How it was built | Human Shaped</title>
+  <meta name="description" content="How the Human Shaped add-on for Google Meet was built by one educator with a coding agent, how a Course Builder course comes into it, and how to try it and take the method with you.">
+  <link rel="canonical" href="https://humanshaped.org/meet/built/">
+  <meta property="og:url" content="https://humanshaped.org/meet/built/">
+  <meta property="og:site_name" content="Human Shaped">
+  <meta property="og:title" content="How it was built">
+  <meta property="og:description" content="How the Human Shaped add-on for Google Meet was built by one educator with a coding agent, how a Course Builder course comes into it, and how to try it and take the method with you.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://humanshaped.org/assets/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="The human-shaped wordmark, with its hyphen drawn as an arch, above the line: apps that wear the builder&#x27;s values on their sleeves.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#131916" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="/assets/favicon.svg?v=20261006q" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20261006q">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/site.css?v=20261119h">
+  <script>
+    (function () {
+      var q = location.search, t = null;
+      if (/[?&]dark\b/.test(q)) t = 'dark'; else if (/[?&]light\b/.test(q)) t = 'light';
+      else { try { t = localStorage.getItem('hs-theme'); } catch (e) {} }
+      if (t) document.documentElement.setAttribute('data-theme', t);
+      // Signed in: the page wears the hub's sidebar (PAGES.md), chosen before
+      // it draws, from the session this browser keeps.
+      try { var se = JSON.parse(localStorage.getItem('sb-bifrieqzkihuxfzttgvd-auth-token') || 'null'); if (se && se.user && se.expires_at * 1000 > Date.now() - 7 * 864e5) document.documentElement.setAttribute('data-signed-in', ''); } catch (e) {}
+      try { if (localStorage.getItem('hs-nav') === 'collapsed') document.documentElement.setAttribute('data-nav', 'collapsed'); } catch (e) {}
+    })();
+  </script>
+  <script src="/assets/site.js?v=20261022o" defer></script>
+  <script src="/assets/ui.js?v=20261112b" defer></script>
+</head>
+<body>
+    <a class="skip" href="#main">Skip to the page</a>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
+      <nav class="nav" aria-label="Main">
+        <ul>
+          <li><a href="/principles/">Principles</a></li>
+          <li><a href="/cohorts/">Cohorts</a></li>
+          <li><a href="/apps/">Apps</a></li>
+          <li><a href="/events/">Events</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <button class="theme-toggle" type="button" aria-label="Switch between light and dark" data-theme-toggle>
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022j#moon"/></svg>
+        </button>
+        <a class="btn-primary small" href="/account/">
+          <svg aria-hidden="true" focusable="false"><use href="/assets/icons.svg?v=20261022j#github"/></svg>
+          <span>Sign in<span class="long"> with GitHub</span></span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- A page to share after a demo (Ben, November 23, 2026, on making the
+         work "shareable" for Minerva faculty and staff who build with
+         agents). Words by Claude, awaiting Ben's review. -->
+    <div class="wrap">
+      <header class="page-head">
+        <div>
+          <h1>How it was built.</h1>
+          <p class="lead">Human Shaped's add-on for Google Meet&trade; was built by one educator working with a coding agent and a template repository of skills, and everything it learned along the way is in that template, free, for anyone who wants to build tools for learning the same way.</p>
+        </div>
+      </header>
+
+      <section class="section first" aria-label="How it was built">
+        <div class="topics single">
+          <div class="topic" id="try">
+            <h2>Try it in a call of your own.</h2>
+            <div class="prose">
+              <p>Add Human Shaped from the <a href="https://workspace.google.com/marketplace/app/human_shaped/1086485459450" target="_blank" rel="noopener">Google Workspace Marketplace&trade;</a>, start a Meet call, and open it from Activities. In a call that is not a cohort's, you need no account at all: Start a session gives you slides with your own notes, questions counted without names, a vote on ideas, stances, a clock, and a website on the main stage where everyone in the call gets their own working copy. <a href="/meet/before/">Trying it takes five minutes</a>, and <a href="/meet/">everything it does</a> is on its own page.</p>
+            </div>
+          </div>
+
+          <div class="topic" id="course-builder">
+            <h2>A Course Builder course, running in Meet.</h2>
+            <div class="prose">
+              <p>A leader makes an export in Course Builder and pastes its link into <a href="/teach/import/">Bring in a course</a> without opening it, because the link works only once. Human Shaped hands Course Builder its own address and waits for the course to arrive, and it becomes a draft cohort with every session and every part in order. Nothing about people comes with it.</p>
+              <p>Each Forum step has a place in the call. A poll is a question on the main stage, a repoll asks it again beside the first, poll results become a debrief that pins the answers, and Feature User keeps its Quiet, Random, and Voting choices, with Quiet counted from what was actually recorded in that call. Breakouts open as Meet rooms sized the way the step says, and each room fills in its own copy of the workbook together.</p>
+              <p>Running the imported course in real calls changed three things: Meet's frames cannot draw a PDF, so each one became picture slides; a workbook that held real applicants' documents was blurred; and the learning outcomes, which arrive as numbers, take their names from Course Builder's outcomes file.</p>
+            </div>
+          </div>
+
+          <div class="topic" id="agent">
+            <h2>One educator, one agent, a template.</h2>
+            <div class="prose">
+              <p>Since October 1, 2026, the site and the add-on have taken more than a thousand commits and nearly a hundred database changes, written with a coding agent. The educator decided what to build and why, used it, and judged it; the agent wrote the code and ran the checks. The habit that mattered most was simple to say and hard to keep: no feature counted as done until it worked in a real Meet call, with a leader and a learner in it.</p>
+              <p>That habit is how we learned the things no documentation said. Meet's main stage cannot draw a PDF. The panel and the stage share no storage, so two browser tabs can never prove that something passes from one to the other. The add-on's own frame is refused the microphone and the screen, while a window it opens is not. Each of these is now a rule in the template, so the next tool built from it starts out knowing.</p>
+              <p>It all runs at no cost, on free tiers of GitHub Pages, Supabase, and Cloudflare Workers, which also means every job has to be built to use very little, and a run that repeats the same failing work is treated as a bug rather than a schedule.</p>
+            </div>
+          </div>
+
+          <div class="topic" id="take">
+            <h2>Take the method with you.</h2>
+            <div class="prose">
+              <p><a href="https://github.com/bhwilkoff/UniversalAppTemplate">The template</a> is a repository you copy to start your own app, with skills your agent reads before it builds. The ones behind this add-on are <a href="https://github.com/bhwilkoff/UniversalAppTemplate/tree/main/.claude/skills/google-meet-addon">google-meet-addon</a>, <a href="https://github.com/bhwilkoff/UniversalAppTemplate/tree/main/.claude/skills/live-learning-sessions">live-learning-sessions</a>, and <a href="https://github.com/bhwilkoff/UniversalAppTemplate/tree/main/.claude/skills/zero-cost-hosted-backend">zero-cost-hosted-backend</a>, and the add-on's own code and design notes are on the template's <a href="https://github.com/bhwilkoff/UniversalAppTemplate/tree/site">site branch</a>.</p>
+              <p>If you would rather learn to build this way with other people, <a href="/cohorts/">our cohorts are free</a>, and what you build is yours.</p>
+              <p class="small">Google Meet&trade; and Google Workspace Marketplace&trade; are trademarks of Google LLC.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+  
+
+
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="footer-brand">
+        <a class="wordmark" href="/" aria-label="Human Shaped, home"><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></a>
+        <p>The ideas, the method, the tools, and the cohorts are free, and what you build is yours.</p>
+        <p><a href="/about/">About Human Shaped</a></p>
+      </div>
+      <nav class="footer-links" aria-label="More of the site">
+        <div>
+          <p class="footer-head">Take part</p>
+          <ul>
+            <li><a href="/account/">Your account</a></li>
+            <li><a href="/teach/">Lead a cohort</a></li>
+            <li><a href="/connect/">Connect your agent</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="footer-head">On GitHub</p>
+          <ul>
+            <li><a href="https://github.com/bhwilkoff/UniversalAppTemplate">The template</a></li>
+            <li><a href="https://github.com/orgs/humanshaped/discussions">Discussions</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="footer-head">The fine print</p>
+          <ul>
+            <li><a href="/support/">Help</a></li>
+            <li><a href="/privacy/">Privacy</a></li>
+            <li><a href="/terms/">Terms</a></li>
+          </ul>
+        </div>
+      </nav>
+      <p class="footer-made">Made by <a href="https://learningischange.com">Ben Wilkoff</a>, with <a href="/support/#credits">help from people and tools</a>.</p>
+    </div>
+  </footer>
+</body>
+</html>
