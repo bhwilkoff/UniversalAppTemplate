@@ -58,3 +58,12 @@ the notice are what we have instead of a paid button.
 
 Run the test call in the recorder's README before cohort 1, and bring
 back what it found.
+
+## The board's tests
+
+`tools/board/` drives the real board as two people in headless Chrome, at
+the size of a laptop's Meet stage: `use-check.mjs` (notes, resizing,
+votes), `feature-check.mjs` (every Excalidraw feature), and
+`sync-check.mjs` (keeping two screens the same). Run all three after any
+change to the board, and then try it in a real call, because the stage's
+size, its keys, and a slow save were each found only there.
