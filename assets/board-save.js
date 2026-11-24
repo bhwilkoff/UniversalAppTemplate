@@ -28,7 +28,11 @@
     var picture = /^image\/(png|svg\+xml|jpeg|webp)$/.test(file.blob.type);
     if (picture) { $('[data-picture]').src = URL.createObjectURL(file.blob); $('[data-picture]').hidden = false; }
     $('[data-copy]').hidden = file.blob.type !== 'image/png';
-    if (m.copy) copy(); else save();
+    if (m.copy) return copy();
+    save();
+    // Saved, and nothing more to do here unless the person turns to it.
+    var close = setTimeout(function () { window.close(); }, 4000);
+    ['pointermove', 'keydown'].forEach(function (ev) { window.addEventListener(ev, function () { clearTimeout(close); }, { once: true }); });
   });
   if (window.opener) window.opener.postMessage({ hsSaveReady: true }, location.origin);
   else say('Nothing to save here. Open the board and choose what to download.');

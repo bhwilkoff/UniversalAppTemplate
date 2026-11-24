@@ -3152,7 +3152,7 @@ select:not([multiple]) {
 .board-stage .board-status { text-align: left; }
 /* Excalidraw's own windows speak in the site's type, not the browser's. */
 .excalidraw, .excalidraw.excalidraw-modal-container { --ui-font: var(--sans); font-family: var(--sans); }
-.excalidraw-modal-container h2, .excalidraw-modal-container h3, .excalidraw-modal-container .ImageExportModal { font-family: var(--sans); }
+html .excalidraw h2, html .excalidraw .ImageExportModal h3, html .excalidraw .ImageExportModal__settings__setting__label, html .excalidraw .ExcTextField__label, html .excalidraw .ExcTextField__input input, html .excalidraw .RadioGroup__choice, html .excalidraw .OverwriteConfirm__Description, html .excalidraw__embeddable-container .excalidraw__embeddable-hint { font-family: var(--sans); }
 /* The window that saves what Meet's frame will not. */
 .board-save-main { display: grid; gap: 1rem; max-width: 34rem; margin: 0 auto; padding: 1.5rem 1.25rem; }
 .board-save-main h1 { font-size: 1.15rem; overflow-wrap: anywhere; }
