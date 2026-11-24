@@ -19,12 +19,19 @@ const out = join(here, '../../assets/vendor', 'excalidraw-' + pkg.version);
 // at 500 tall under 1000 wide. A laptop's Meet stage beside the panel is about
 // 816 by 460 (measured November 24, 2026), so those limits are lower here: a
 // phone still gets it, and a stage gets the whole board.
-const LIMITS = [/\bNE=730,FE=1e3,BE=500\b/, 'NE=560,FE=1e3,BE=320'];
-let patched = 0;
+// And its zoom-to-fit stays clear of the style panel, which the stage keeps on
+// the right, and of the note bar (with the panel measured as if on the left, the
+// board zoomed to 10% on nothing; found in a real call the same day).
+const PATCHES = [
+  ['NE=730,FE=1e3,BE=500', 'NE=560,FE=1e3,BE=320'],
+  ['right:Math.max(this.state.width-(r?.left??this.state.width)+i,0),bottom:i,left:Math.max(n?.right??0,0)+i}',
+    'right:Math.max(this.state.width-Math.min(r?.left??this.state.width,n&&n.left>this.state.width/2?n.left:this.state.width)+i,0),bottom:80,left:(n&&n.left<=this.state.width/2?Math.max(n.right,0):0)+i}']
+];
+const patched = PATCHES.map(() => 0);
 const laptopStage = { name: 'laptop-stage', setup(b) {
   b.onLoad({ filter: /@excalidraw[\\/]excalidraw[\\/]dist[\\/]prod[\\/].*\.js$/ }, (args) => {
     let contents = readFileSync(args.path, 'utf8');
-    if (LIMITS[0].test(contents)) { contents = contents.replace(LIMITS[0], LIMITS[1]); patched++; }
+    PATCHES.forEach(([from, to], i) => { if (contents.includes(from)) { contents = contents.replace(from, to); patched[i]++; } });
     return { contents, loader: 'js' };
   });
 } };
@@ -43,7 +50,7 @@ await build({
   logLevel: 'warning',
   plugins: [laptopStage]
 });
-if (patched !== 1) throw new Error('Excalidraw’s phone-layout limits were not found (' + patched + '); read its constants again.');
+if (patched.some((n) => n !== 1)) throw new Error('Excalidraw changed under our two patches (' + patched + '); read its source again.');
 copyFileSync(join(here, 'node_modules/@excalidraw/excalidraw/dist/prod/index.css'), join(out, 'excalidraw.css'));
 const license = readFileSync(join(here, 'EXCALIDRAW-LICENSE.txt'), 'utf8');
 const react = readFileSync(join(here, 'node_modules/react/LICENSE'), 'utf8');

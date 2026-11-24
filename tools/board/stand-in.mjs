@@ -44,7 +44,7 @@ export const people = {
 };
 export const hub = {
   cohort: { id: randomUUID(), slug: 'stand-in', title: 'Stand-in cohort (delete me)', session_minutes: 75, status: 'running' },
-  sessions: [], libraries: {}, files: new Map(), uploadFails: 0, groups: [{ id: GROUP, name: 'Trio A', group_members: [{ user_id: BEA }] }], boards: []
+  sessions: [], libraries: {}, files: new Map(), uploadFails: 0, saveDelay: 0, groups: [{ id: GROUP, name: 'Trio A', group_members: [{ user_id: BEA }] }], boards: []
 };
 hub.sessions.push({ id: randomUUID(), cohort_id: hub.cohort.id, number: 1, starts_at: new Date(Date.now() - 600000).toISOString(), title: 'Week 1' });
 hub.sessions.push({ id: randomUUID(), cohort_id: hub.cohort.id, number: 2, starts_at: new Date(Date.now() + 6 * 86400000).toISOString(), title: 'Week 2' });
@@ -136,7 +136,7 @@ export async function open(who, query, size = { width: 1280, height: 800 }, harn
   const info = { who, topic: null, dropped: false, errors: [] };
   pages.set(page, info);
   page.on('pageerror', e => info.errors.push(e.message));
-  await page.exposeBinding('__fakeDb', (src, q) => answer(people[who].id, q));
+  await page.exposeBinding('__fakeDb', async (src, q) => { const r = answer(people[who].id, q); if (q.rpc === 'save_board' && hub.saveDelay) await new Promise((ok) => setTimeout(ok, hub.saveDelay)); return r; });
   await page.exposeBinding('__fakeUpload', (src, path, body, type) => {
     if (hub.uploadFails > 0) { hub.uploadFails--; return { data: null, error: { message: 'the stand-in refused it' } }; }
     if (!['image/png', 'image/jpeg', 'image/webp', 'image/gif'].includes(type)) return { data: null, error: { message: 'mime type ' + type + ' is not supported' } };

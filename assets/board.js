@@ -24,7 +24,7 @@
   var lib = window.CohortLib;
   var db = (window.HUB.client ? window.HUB.client() : window.supabase.createClient(window.HUB.url, window.HUB.key));
   var P = B.params(location.search);
-  var VENDOR = '/assets/vendor/excalidraw-0.18.1/excalidraw.js?v=20261124d';
+  var VENDOR = '/assets/vendor/excalidraw-0.18.1/excalidraw.js?v=20261124f';
   // Excalidraw's fonts, from the same version on jsDelivr (fixed files).
   window.EXCALIDRAW_ASSET_PATH = 'https://cdn.jsdelivr.net/npm/@excalidraw/excalidraw@0.18.1/dist/prod/';
   var POLL = 10000;
@@ -728,11 +728,19 @@
     var els = toSave();
     if (!els.length) return Promise.resolve();
     S.saving = true;
+    // What is sent, noted now: Excalidraw changes a shape in place while it is
+    // drawn, so by the time the answer came this marked the finished shape saved
+    // when only its first point had been (found in a real call: a rectangle kept
+    // as 0 by 0).
+    var sent = els.map(function (e) { return { id: e.id, version: e.version }; });
     return db.rpc('save_board', { b: S.board.id, gen: S.board.generation, elements: els }).then(function (r) {
       S.saving = false;
       if (r.error) { status('The board was not saved just now: ' + r.error.message + '. It will try again.'); return; }
       var row = (r.data || [])[0];
-      if (row && row.saved) { B.markSeen(S.saved, els); S.savedAt = new Date(); syncLine(); }
+      if (row && row.saved) {
+        B.markSeen(S.saved, sent); S.savedAt = new Date(); syncLine();
+        if (toSave().length) saveSoon();
+      }
       else reread();   // locked or cleared since this page last looked
     }, function () { S.saving = false; });
   }

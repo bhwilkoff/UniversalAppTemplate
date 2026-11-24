@@ -196,6 +196,22 @@ await ev(ben, () => window.__board.api.updateScene({ appState: { scrollX: 3000 }
 await press('?'); check('help', await until(() => ben.locator('.HelpDialog').count().then((n) => n > 0))); await ben.keyboard.press('Escape');
 await ben.locator('[data-testid="main-menu-trigger"]').click(); await snap(ben, 'menu'); await ben.locator('.dropdown-menu [title*="ark"], .dropdown-menu label:has([value="dark"])').first().click().catch(() => {}); check('dark, for one person only', await until(async () => (await st(ben, 'theme')) === 'dark') && (await st(bea, 'theme')) === 'light'); await ben.keyboard.press('Escape'); await ben.mouse.click(900, 620);
 
+// ---------------- a save that is slow to answer
+{
+  await reset(); await ben.waitForTimeout(6000); hub.saveDelay = 1500;
+  await tool(ben, 'rectangle'); await ben.mouse.move(300, 250); await ben.mouse.down(); await ben.mouse.move(305, 255);
+  await until(() => hub.boards[0].scene.elements.some((e) => e.type === 'rectangle' && !e.isDeleted), 9000);
+  await ben.mouse.move(520, 420, { steps: 8 }); await ben.mouse.up();
+  const id = (await els(ben))[0].id, w = (await els(ben))[0].width;
+  check('a shape still being drawn while a save is out is saved as it ended up', await until(() => { const e = hub.boards[0].scene.elements.find((x) => x.id === id); return e && Math.abs(e.width - w) < 1; }, 12000));
+  hub.saveDelay = 0;
+  const p = await open('bea', q, { width: 816, height: 460 }); await until(() => live(p), 20000); await ev(p, () => window.__board.api.updateScene({ appState: { scrollX: 5000 } }));
+  await ev(p, () => { const a = window.__board.api; a.updateScene({ appState: { selectedElementIds: { [a.getSceneElements()[0].id]: true } } }); }); await p.waitForTimeout(400); await focus(p); await p.keyboard.press('Shift+1'); await p.waitForTimeout(400); await snap(p, 'fit');
+  const z = await st(p, 'zoom'), b = (await els(p)).find((e) => e.id === id), s = await at(p, b.x, b.y), t = await at(p, b.x + b.width, b.y + b.height);
+  check('zoom to fit stays clear of the style panel on the stage', z.value > 0.3 && s.x >= 0 && t.x <= 620 && s.y >= 50 && t.y <= 400); pages.delete(p); await p.context().close();
+  await reset(); await rect(400, 250); await selectAll(); await ben.keyboard.press('Enter'); await ben.keyboard.type('kept'); await ben.keyboard.press('Escape');
+}
+
 // ---------------- files
 {
   await menu(ben, 'Export image...'); check('the export dialog opens, with its preview', await until(() => ben.locator('.ImageExportModal').count().then((n) => n > 0))); await snap(ben, 'export');
