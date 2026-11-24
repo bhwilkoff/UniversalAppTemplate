@@ -548,8 +548,7 @@ credential's evidence.
      gray (M6).
   5. All new copy from M1, M2, M7, and M8 is drafted in Ben's voice and
      waits for his read (Ben, October 3: a copy audit comes later).
-  6. Shorten AGENTS.md below 24,000 bytes so Antigravity reads all of
-     it (moving platform detail into docs it points to)? Recommended.
+  6. ~~Shorten AGENTS.md below 24,000 bytes~~ (done; a test holds it).
   7. Which Google lane the course names, now that Gemini CLI is paid
      and Antigravity's free limit is unpublished.
   8. Link all of the template's skills into .agents/skills/, or keep
@@ -565,7 +564,9 @@ credential's evidence.
   11. Discussions: Announcements and Polls left to GitHub for everyone;
       "Sign in again" by hand rather than automatically.
 
-- **Connecting students' agents, once** (core item 3; the design and
+- ~~**Connecting students' agents, once**~~ (the OAuth server answers;
+  checked November 24, 2026. The consent page's words still wait for
+  Ben's read) (core item 3; the design and
   sources are in `research/notes/agent-connection-notes.md`). In the
   Supabase dashboard for humanshaped-hub: Authentication, OAuth Server,
   switch on the OAuth 2.1 server and dynamic client registration, and
@@ -574,7 +575,8 @@ credential's evidence.
   from claude.ai, Claude Code, and Gemini CLI before anything links to
   it.
 
-- **Cohort conversation setup, once** (core item 2; the design and its
+- ~~**Cohort conversation setup, once**~~ (done; cohorts have used it
+  since October) (core item 2; the design and its
   sources are in `research/notes/cohort-conversation-notes.md`). Each
   cohort gets a private repository in `humanshaped` with Discussions on
   and a secret team of its members, and sign-in moves from the OAuth app
@@ -611,9 +613,9 @@ credential's evidence.
   Ben's words (principle 13), so they wait for him.
 - **Confirm the licenses:** CC BY 4.0 for the words and MIT for the code
   (`LICENSE.md`), chosen as the open default.
-- **A real test of the session recorder** before cohort 1, since the
-  site promises recorded sessions.
-- **Authorize "Human Shaped" once on GitHub** (the secret is saved and
+- ~~A real test of the session recorder~~ (sessions have been recorded
+  and read since Week 2).
+- ~~**Authorize "Human Shaped" once on GitHub**~~ (done) (the secret is saved and
   the hand-off to GitHub is verified; the agent's browser cannot click
   Authorize for an account owner). Then the agent makes Ben the first
   teacher and tests /account/, /teach/, and /cohort/ for real.
@@ -1497,6 +1499,10 @@ anything with a drop or delete waits on the terminal's confirmation.
    what was already committed.
 
 ## Where to pick up
+
+**This file's log stops on November 18, 2026.** What has happened since is
+in DECISIONS.md, ADDON-DESIGN.md, and the commits. Below is the October
+list, kept as it was.
 
 1. Check on the milestone agents (M1, M2, M6). Review each branch they
    report, run its tests and look at it, merge what is verified into

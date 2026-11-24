@@ -55,7 +55,7 @@ Measured in a real call: each person's stage takes their own clicks and keys, Me
 | A question | Learners, on the stage | Choices are buttons, and words are typed there. The panel saves them |
 | Reactions | Everyone | A centered strip at the very foot of the stage, with a lane above it where sent reactions float; every view ends above both, so they never cover what is shown (Ben, November 11, 2026) |
 | A classmate's app, for one person | A learner, from their classmates' apps | Open it on my screen shows it on that learner's own stage only, never everyone's, until Back to the class; nothing is written to the shared show |
-| The board | Everyone | It fills the stage. Add a note, select it, Vote for this. Each vote is its own dot |
+| The board | Everyone | It fills the stage, with every Excalidraw tool but its AI (DECISIONS.md, November 24, 2026). Write a note at the foot; a note is one card that resizes from any side, with its writer and its votes under it and Vote on the card. Anyone can follow a person; a leader can bring everyone to one place, lock it, or clear it. Saving and copying open a small window, because Meet blocks both. A name leaves its notes when that account is deleted |
 | GitHub | A leader adds it to a slide | Issues, pull requests, commits, a README, or the repository, drawn on the slide; rows open on GitHub from the stage |
 
 ## Asking
@@ -274,7 +274,7 @@ Ben: "The content should be responsive to screen size." Found running the demo s
 Ben: "You should definitely do a learner panel test," then "Can we solve for the 'still rough' stuff and anything else you have documented that needs to be polished (look for both design and the language we are using for each feature)?"
 
 - **A leader's move reaches learners at once.** After every move or pin the leader's panel nudges the call's channel, and each learner's panel reads the show again; the database's change events, seconds slower, stay as the fallback.
-- **A board note starts in the template's first frame**, each next one a little lower and to the right, unless the person has zoomed in on one frame. Notes are written in Write a note at the foot of the board.
+- **A board note starts in the template's first frame**, each next one in a free place, unless the person has zoomed in on one frame. Notes are written in Write a note at the foot of the board.
 - **One name per feature.** Featuring is Feature someone in Now and in Tools; the board is The board on the stage; the rooms are Every room; a group's own call is its room, never a rehearsal room or a trio.
 - **A learner's panel** (one view since 2026-11-12; the word "Mine" is retired because it named nothing) keeps each closed section's disclosure marker, and leaves out who is waiting to show, which Show my app at the top already covers. A guest's link says Sign in as a member of this cohort.
 - **Joining late** is the activity icon at the top right of Meet, then Join activity, wherever the panel tells people how.

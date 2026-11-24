@@ -95,6 +95,20 @@ grant select, insert, delete on storage.objects to authenticated;
 grant execute on function storage.foldername(text) to anon, authenticated;
 """
 
+# pg_cron's table and its two functions, so a migration that schedules a
+# job runs here too. Nothing is ever run from it.
+CRON_STUB = """
+create schema cron;
+create table cron.job (jobid bigserial primary key, jobname text, schedule text, command text);
+create table cron.job_run_details (jobid bigint, end_time timestamptz);
+create function cron.schedule(n text, s text, c text) returns bigint language sql as $$
+  insert into cron.job (jobname, schedule, command) values (n, s, c) returning jobid
+$$;
+create function cron.unschedule(j bigint) returns boolean language sql as $$
+  with gone as (delete from cron.job where jobid = j returning 1) select exists (select 1 from gone)
+$$;
+"""
+
 GRANTS = """
 grant usage on schema public to anon, authenticated;
 grant select on all tables in schema public to anon, authenticated;
@@ -119,6 +133,7 @@ def main():
     su.execute(AUTH_STUB)
     su.execute(REALTIME_STUB)
     su.execute(STORAGE_STUB)
+    su.execute(CRON_STUB)
     for path in sorted((ROOT / "migrations").glob("*.sql")):
         # The scheduler's extensions exist on Supabase, not in this Postgres.
         su.execute(path.read_text().replace("create extension if not exists pg_cron;", "").replace("create extension if not exists pg_net;", ""))
@@ -3582,6 +3597,99 @@ def main():
                (gia, json.dumps({"user_name": "gia-gh", "provider_id": "991"})))
     check("an account that gained GitHub of its own is never merged away",
           not attempt(as_user("ben"), "select public.accept_account_merge(%s)", (code,)) and exists_user(gia) and users_google(gia) == ["g-gia"])
+
+    # A person's shelf of shapes (migration 20261124010000).
+    check("someone keeps a shelf of shapes for the board",
+          attempt(as_user("bea"), "insert into public.board_libraries (items) values ('[{\"id\": \"s1\"}]') returning user_id", ()) and last_rows == [(people["bea"],)])
+    for who in ("ben", "eve", "dee"):
+        cur = as_user(who); cur.execute("select count(*) from public.board_libraries")
+        check("%s does not see bea's shelf" % who, cur.fetchone()[0] == 0)
+    check("nor does the public", not attempt(as_user(None), "select count(*) from public.board_libraries") or last_rows == [(0,)])
+    check("nobody writes to another person's shelf",
+          not attempt(as_user("eve"), "insert into public.board_libraries (user_id, items) values (%s, '[]')", (people["fay"],))
+          and attempt(as_user("eve"), "update public.board_libraries set items = '[]' where user_id = %s returning 1", (people["bea"],)) and last_rows == [])
+    check("nor gives theirs away", not attempt(as_user("bea"), "update public.board_libraries set user_id = %s", (people["fay"],)))
+    check("an agent reads its person's shelf", attempt(as_agent("bea"), "select items -> 0 ->> 'id' from public.board_libraries") and last_rows == [("s1",)])
+    check("and cannot change it, add one, or remove it",
+          attempt(as_agent("bea"), "update public.board_libraries set items = '[]' returning 1") and last_rows == []
+          and not attempt(as_agent("eve"), "insert into public.board_libraries (items) values ('[]')")
+          and attempt(as_agent("bea"), "delete from public.board_libraries returning 1") and last_rows == [])
+    check("a shelf is a list", not attempt(as_user("bea"), "update public.board_libraries set items = '{}'"))
+    check("and no larger than a megabyte", not attempt(as_user("bea"), "update public.board_libraries set items = %s", (json.dumps(["x" * 1000001]),)))
+
+    # Deleting an account: what someone put on a board stays, without their
+    # name, and the board goes on working (migration 20261124020000).
+    as_system()
+    zed = new_account("zelda", {"provider": "github"}, {"user_name": "zelda", "provider_id": "7701"})
+    yan = new_account("yanni", {"provider": "github"}, {"user_name": "yanni", "provider_id": "7702"})
+    ben = as_user("ben")
+    attempt(ben, "insert into public.cohorts (slug, title, created_by, status) values ('forget-test', 'Forget', %s, 'open') returning id", (people["ben"],))
+    zc = last_rows[0][0]
+    attempt(ben, "insert into public.sessions (cohort_id, number) values (%s, 1) returning id", (zc,))
+    z1 = last_rows[0][0]
+    for name in ("zelda", "yanni"):
+        attempt(as_user(name), "insert into public.enrollments (cohort_id, user_id) values (%s, %s)", (zc, people[name]))
+    attempt(as_user("zelda"), "select id from public.open_board(%s, %s, null)", (zc, z1))
+    zb = last_rows[0][0]
+    def card(nid, who, name, version=1):
+        return dict(el(nid, version, 5), customData={"note": nid, "by": who, "name": name, "pin": True})
+    def vote(nid, who):
+        return dict(el("vote-%s-%s" % (nid, who), 1, 5), customData={"vote": nid, "by": who})
+    words = dict(el("n1-t", 1, 5), type="text", text="my idea")
+    attempt(as_user("zelda"), "select saved from public.save_board(%s, 0, %s)", (zb, json.dumps(
+        [card("n1", people["zelda"], "Zed Z"), words, card("n2", people["yanni"], "Yan Y"), vote("n2", people["zelda"]), vote("n1", people["yanni"])])))
+    check("the last person to draw on a board they opened can delete their account",
+          attempt(as_user("zelda"), "select public.delete_my_account()") and not exists_user(people["zelda"]))
+    def board_now():
+        as_system()
+        su.execute("select scene from public.boards where id = %s", (zb,))
+        return {e["id"]: e for e in su.fetchone()[0]["elements"]}
+    now = board_now()
+    check("their note stays, with its words and without their name",
+          now.get("n1", {}).get("customData") == {"note": "n1", "pin": True} and now.get("n1-t", {}).get("text") == "my idea")
+    check("their vote goes, and nothing on the board names them", "vote-n2-%s" % people["zelda"] not in now
+          and people["zelda"] not in json.dumps(now) and "Zed" not in json.dumps(now))
+    check("everyone else's names and votes stay",
+          now.get("n2", {}).get("customData", {}).get("name") == "Yan Y" and "vote-n1-%s" % people["yanni"] in now)
+    as_system(); su.execute("select created_by, updated_by from public.boards where id = %s", (zb,))
+    check("the board no longer says who opened it or drew last", su.fetchone() == (None, None))
+    check("a page still open when they left saves",
+          attempt(as_user("yanni"), "select saved from public.save_board(%s, 0, %s)", (zb, json.dumps(
+              [card("n1", people["zelda"], "Zed Z", version=9), vote("n2", people["zelda"])]))) and last_rows == [(True,)])
+    now = board_now()
+    check("and does not bring the name back", now["n1"]["version"] == 9 and people["zelda"] not in json.dumps(now) and "Zed" not in json.dumps(now))
+    check("and says who saved it", attempt(as_user("yanni"), "select updated_by from public.boards where id = %s", (zb,)) and last_rows == [(people["yanni"],)])
+    check("a person cannot unsay who opened a board, or say someone else did",
+          not attempt(as_user("yanni"), "update public.boards set created_by = %s where id = %s", (people["yanni"], zb)))
+    attempt(as_user("ben"), "insert into public.sessions (cohort_id, number) values (%s, 2) returning id", (zc,))
+    attempt(as_user("yanni"), "select id from public.open_board(%s, %s, null)", (zc, last_rows[0][0]))
+    check("nor can anyone empty it while the person is here",
+          not attempt(as_user("ben"), "update public.boards set created_by = null where id = %s", (last_rows[0][0],)) and "stays with its session" in last_reason[0])
+
+    # The same for everything else that only says who did it.
+    as_system()
+    su.execute("""select count(*) from public.workbook_answers where updated_by = %s""", (people["bea"],))
+    wrote = su.fetchone()[0]
+    check("someone who wrote in a room's workbook can delete their account",
+          wrote > 0 and attempt(as_user("bea"), "select public.delete_my_account()") and not exists_user(people["bea"]))
+    as_system()
+    lil = new_account("lilith", {"provider": "github"}, {"user_name": "lilith", "provider_id": "7703"})
+    su.execute("insert into public.teachers (user_id) values (%s) on conflict do nothing", (lil,))
+    su.execute("select set_config('request.jwt.claim.sub', %s, false)", (lil,))
+    su.execute("update public.show_state set stage = 'welcome', stage_ref = null returning session_id")
+    touched = len(su.fetchall())
+    su.execute("update public.scene_notes set body = body")
+    su.execute("insert into public.scenes (cohort_id, session_id, position, kind, title, minutes) values (%s, %s, 0, 'talk', 'Hello', 3) returning created_by", (zc, z1))
+    made_scene = su.fetchone()[0] == lil
+    su.execute("insert into public.live_checks (cohort_id, session_id, created_by, prompt, kind) values (%s, %s, %s, 'Why?', 'short') returning id", (zc, z1, lil))
+    su.execute("insert into public.live_signals (cohort_id, session_id, created_by, kind, body) values (%s, %s, %s, 'card', 'Hi')", (zc, z1, lil))
+    check("a leader who ran a session can delete their account",
+          touched > 0 and made_scene and attempt(as_user("lilith"), "select public.delete_my_account()") and not exists_user(lil))
+    as_system()
+    su.execute("select created_by from public.scenes where session_id = %s", (z1,))
+    check("what they made stays, without them", su.fetchall() == [(None,)])
+    check("a leader cannot take their own name off a question while they are here",
+          not attempt(as_user("ben"), "update public.live_checks set created_by = null where created_by = %s", (people["ben"],)) and "stays in the session" in last_reason[0])
 
     conn.rollback()
     conn.close()
