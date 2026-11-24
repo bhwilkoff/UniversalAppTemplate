@@ -38,6 +38,7 @@ export const origin = 'http://127.0.0.1:' + server.address().port;
 // The stand-in hub
 // ---------------------------------------------------------------------
 const BEN = randomUUID(), BEA = randomUUID(), GROUP = randomUUID();
+// Anyone named p0, p1, and so on is another member of the cohort.
 export const people = {
   ben: { id: BEN, user_metadata: { user_name: 'bhwilkoff', full_name: 'Ben' } },
   bea: { id: BEA, user_metadata: { user_name: 'bea', full_name: 'Bea' } }
@@ -53,7 +54,7 @@ const teaches = (uid) => uid === BEN;
 const seesBoard = (uid, b) => teaches(uid) || !b.group_id || hub.groups.some(g => g.id === b.group_id && g.group_members.some(m => m.user_id === uid));
 export const stats = { messages: 0, largest: 0, saves: 0, joinsNotPrivate: 0 };
 
-function answer(uid, q) {
+export function answer(uid, q) {
   if (q.rpc === 'open_board') {
     const { c, s, g } = q.args;
     let b = hub.boards.find(x => x.session_id === s && (x.group_id || null) === (g || null));
@@ -106,15 +107,16 @@ export async function deliver(from, topic, event, payload) {
     await page.evaluate(([t, e, p]) => window.__fakeDeliver(t, e, p), [topic, event, payload]).catch(() => {});
   }
 }
-async function presenceSync(topic) {
+export async function presenceSync(topic) {
   for (const [page, info] of pages) {
     if (info.topic === topic && !info.dropped) await page.evaluate(([t, s]) => window.__fakePresence(t, s), [topic, presence[topic] || {}]).catch(() => {});
   }
 }
 
 export const browser = await chromium.launch({ executablePath: CHROME, headless: true });
-export async function open(who, query, size = { width: 1280, height: 800 }, harness = null) {
-  const ctx = await browser.newContext({ viewport: size });
+export async function open(who, query, size = { width: 1280, height: 800 }, harness = null, device = {}) {
+  if (!people[who]) people[who] = { id: randomUUID(), user_metadata: { user_name: who, full_name: 'Person ' + who.slice(1) } };
+  const ctx = await browser.newContext({ viewport: size, ...device });
   if (harness) {
     await ctx.route(origin + '/__harness', route => route.fulfill({ contentType: 'text/html', body: harness }));
     // A stand-in for Meet's add-on SDK: the main stage's client, whose
@@ -146,7 +148,7 @@ export async function open(who, query, size = { width: 1280, height: 800 }, harn
   await page.exposeBinding('__fakeJoin', (src, topic, isPrivate) => { info.topic = topic; if (!isPrivate) stats.joinsNotPrivate++; return !!isPrivate; });
   await page.exposeBinding('__fakeSend', async (src, topic, event, payload) => {
     const size = Buffer.byteLength(JSON.stringify(payload));
-    stats.messages++; stats.largest = Math.max(stats.largest, size);
+    stats.messages++; { const s = Math.floor(Date.now() / 1000); stats.sec = stats.sec || {}; stats.sec[s] = (stats.sec[s] || 0) + 1; stats.peak = Math.max(stats.peak || 0, stats.sec[s]); } stats.largest = Math.max(stats.largest, size);
     if (size > 256 * 1024) throw new Error('A message over 256 KB, which Realtime would refuse: ' + size);
     await deliver(page, topic, event, payload);
   });

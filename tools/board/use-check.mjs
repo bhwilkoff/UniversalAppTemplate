@@ -168,8 +168,8 @@ await ben.evaluate(() => window.__board.api.updateScene({ appState: { zoom: { va
   check('two people opening it settle on the same copy', await until(async () => JSON.stringify(await els(p)) === JSON.stringify(await els(p2)), 12000));
 }
 // Small stage (a laptop beside the panel) and dark.
-for (const [n, w, h, extra] of [['phone', 390, 600, ''], ['large', 1300, 720, ''], ['dark', 816, 460, '&dark']]) {
-  const p = await open('bea', q.replace('&light', extra || '&light'), { width: w, height: h }); await until(() => live(p), 20000); await p.waitForTimeout(1200); await snap(p, n); pages.delete(p); await p.context().close();
+for (const [n, w, h, extra] of [['sideways', 830, 300, ''], ['phone', 390, 600, ''], ['large', 1300, 720, ''], ['dark', 816, 460, '&dark']]) {
+  const p = await open('bea', q.replace('&light', extra || '&light'), { width: w, height: h }); await until(() => live(p), 20000); await p.waitForTimeout(1200); await snap(p, n); check(n + ' (' + w + ' by ' + h + '): the note box is on the screen', await p.evaluate(() => { const r = document.querySelector('[data-notes]').getBoundingClientRect(); return r.bottom <= innerHeight && r.top >= 0 && r.right <= innerWidth; })); pages.delete(p); await p.context().close();
 }
 check('no page threw an error', [...pages.values()].every((i) => !i.errors.length) || (console.log([...pages.values()].map((i) => i.errors)), false));
 await browser.close(); server.close();

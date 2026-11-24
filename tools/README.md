@@ -63,7 +63,9 @@ back what it found.
 
 `tools/board/` drives the real board as two people in headless Chrome, at
 the size of a laptop's Meet stage: `use-check.mjs` (notes, resizing,
-votes), `feature-check.mjs` (every Excalidraw feature), and
-`sync-check.mjs` (keeping two screens the same). Run all three after any
-change to the board, and then try it in a real call, because the stage's
+votes), `feature-check.mjs` (every Excalidraw feature), `sync-check.mjs`
+(keeping two screens the same), `many-check.mjs` (twelve people at once;
+run it several times, since what it finds is timing), `touch-check.mjs`
+(fingers and a pencil), and `device-check.mjs` (a real Android phone over
+adb, under its lease). Run them after any change to the board, and then try it in a real call, because the stage's
 size, its keys, and a slow save were each found only there.

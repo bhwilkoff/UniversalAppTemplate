@@ -205,14 +205,31 @@
     H = Math.max(H, th + 2 * PAD);
     return [
       shape('rectangle', id, o.x, o.y, W, H, o.now, {
-        backgroundColor: o.color || noteColor(o.by), strokeColor: edge(o.color || noteColor(o.by)), boundElements: [{ type: 'text', id: id + '-t' }],
+        index: o.index || null, backgroundColor: o.color || noteColor(o.by), strokeColor: edge(o.color || noteColor(o.by)), boundElements: [{ type: 'text', id: id + '-t' }],
         customData: { note: id, by: o.by, name: String(o.name || '').slice(0, 40) }
       }),
       shape('text', id + '-t', o.x + PAD, o.y + (H - th) / 2, W - 2 * PAD, th, o.now, {
-        text: said, originalText: said, fontSize: SIZE, fontFamily: 5, textAlign: 'center', verticalAlign: 'middle',
+        index: o.index ? o.index + 'V' : null, text: said, originalText: said, fontSize: SIZE, fontFamily: 5, textAlign: 'center', verticalAlign: 'middle',
         containerId: id, autoResize: true, lineHeight: 1.25
       })
     ];
+  }
+  // Where a new thing sits among the layers: after everything, with a few random
+  // digits of its own. Left to itself Excalidraw gives twelve notes added at once
+  // the one same place, and then every screen renumbers all of them.
+  var DIGITS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+  function afterAll(elements, random) {
+    var top = '';
+    (elements || []).forEach(function (e) { if (typeof e.index === 'string' && e.index > top) top = e.index; });
+    var head = top.charAt(0), n = /[a-z]/.test(head) ? head.charCodeAt(0) - 97 + 1 : 1;
+    if (!/[a-z]/.test(head)) { head = 'a'; top = 'a0'; }
+    var d = top.slice(1, 1 + n).split(''), i = n - 1;
+    while (i >= 0 && d[i] === 'z') { d[i] = '0'; i -= 1; }
+    if (i >= 0) d[i] = DIGITS[DIGITS.indexOf(d[i]) + 1];
+    else { if (head === 'z') return null; head = String.fromCharCode(head.charCodeAt(0) + 1); d.push('0'); }
+    var tail = '', r = random || Math.random;
+    for (var k = 0; k < 5; k++) tail += DIGITS[1 + Math.floor(r() * 61)];
+    return head + d.join('') + tail;
   }
   // Once Excalidraw has measured the words: the card grows to hold them, and
   // they sit in its middle.
@@ -288,6 +305,24 @@
     }
     return best || { x: mid.x - W / 2, y: mid.y - H / 2, w: W, h: H };
   }
+  // Notes added in the same second each took the same free place, since no
+  // screen had heard of the others yet. Of the notes on one place, the first by
+  // name stays and the others each take the next free one, so every screen
+  // moves only its own and they come apart at once. Null when this one stays.
+  function makeRoom(elements, id, view) {
+    var mine = elements.filter(function (e) { return e.id === id; })[0];
+    if (!isNote(mine)) return null;
+    var first = elements.filter(function (e) { return isNote(e) && e.id !== id && e.id < id && overlaps(e, mine.x, mine.y, mine.width, mine.height); });
+    if (!first.length) return null;
+    // As if every later note were not there yet, then one place for each before it.
+    var known = elements.filter(function (e) { return e.id !== id && !(isNote(e) && e.id > id && overlaps(e, mine.x, mine.y, mine.width, mine.height)); });
+    var spot = null;
+    for (var k = 0; k < first.length; k++) {
+      spot = noteSpot(known, view);
+      known = known.concat([shape('rectangle', 'room-' + k, spot.x, spot.y, mine.width, mine.height, 0, { customData: { note: 'room-' + k } })]);
+    }
+    return { x: spot.x, y: spot.y };
+  }
   // A vote is an element of its own, one per person per note, so a class voting
   // at once never overwrites one another (a shared count would: a board settles
   // element by element). It is not drawn; the page counts them onto the card.
@@ -298,7 +333,7 @@
     var card = o.elements.filter(function (e) { return e.id === o.note; })[0];
     if (!card) return null;
     return shape('ellipse', 'vote-' + o.note + '-' + o.by, card.x + card.width / 2, card.y + card.height / 2, 1, 1, o.now, {
-      opacity: 0, locked: true, customData: { vote: o.note, by: o.by }
+      index: o.index || null, opacity: 0, locked: true, customData: { vote: o.note, by: o.by }
     });
   }
   // What is drawn on the board: everything but the votes.
@@ -410,6 +445,20 @@
     return seen;
   }
 
+  // Two copies that reached one version apart from each other. Where the one
+  // here wins, it has to go out again: counting by version alone, this page had
+  // "seen" that version when the other copy came in, so the winner was never
+  // sent and two screens stayed different for good (found with twelve people on
+  // one board, where Excalidraw renumbers everyone's layers at once).
+  function ahead(seen, local, remote) {
+    var mine = {}, out = [];
+    (local || []).forEach(function (e) { mine[e.id] = e; });
+    (remote || []).forEach(function (r) {
+      var l = r && mine[r.id];
+      if (l && l.version === r.version && l.versionNonce !== r.versionNonce && keepLocal(l, r)) { seen[r.id] = r.version - 1; out.push(r.id); }
+    });
+    return out;
+  }
   // What is worth sending and saving: everything, except elements erased
   // more than a day ago (excalidraw-app/data/index.ts keeps the same day).
   function syncable(elements, now) {
@@ -545,8 +594,8 @@
   var lib = {
     DAY: DAY, MAX_MESSAGE_BYTES: MAX_MESSAGE_BYTES, SAVE_EVERY: SAVE_EVERY, CATCH_UP_AFTER: CATCH_UP_AFTER, CATCH_UP_EVERY: CATCH_UP_EVERY, MESSAGES_PER_SECOND: MESSAGES_PER_SECOND,
     params: params, pickSession: pickSession, topic: topic, link: link,
-    TEMPLATES: TEMPLATES, template: template, templateElements: templateElements, noteColor: noteColor, noteElements: noteElements, settleNote: settleNote, isNote: isNote, upgradeNotes: upgradeNotes, noteSpot: noteSpot, votesOn: votesOn, voteDot: voteDot, drawn: drawn, cardLine: cardLine, forPicture: forPicture, embedOwn: embedOwn, embeddable: embeddable, elementOf: elementOf, libraryHost: libraryHost, beside: beside, needsTemplate: needsTemplate,
-    unsent: unsent, markSeen: markSeen, syncable: syncable, keepLocal: keepLocal, merge: merge,
+    TEMPLATES: TEMPLATES, template: template, templateElements: templateElements, noteColor: noteColor, noteElements: noteElements, settleNote: settleNote, isNote: isNote, upgradeNotes: upgradeNotes, noteSpot: noteSpot, makeRoom: makeRoom, afterAll: afterAll, votesOn: votesOn, voteDot: voteDot, drawn: drawn, cardLine: cardLine, forPicture: forPicture, embedOwn: embedOwn, embeddable: embeddable, elementOf: elementOf, libraryHost: libraryHost, beside: beside, needsTemplate: needsTemplate,
+    unsent: unsent, markSeen: markSeen, ahead: ahead, syncable: syncable, keepLocal: keepLocal, merge: merge,
     bytes: bytes, batches: batches, sendInterval: sendInterval, pointerInterval: pointerInterval, throttle: throttle,
     sameGeneration: sameGeneration, canDraw: canDraw, colorFor: colorFor, fileName: fileName
   };

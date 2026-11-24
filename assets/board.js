@@ -330,11 +330,30 @@
   function addNote(text) {
     var now = Date.now(), v = view(), spot = B.noteSpot(S.api.getSceneElements(), v);
     var id = 'n' + now.toString(36) + Math.random().toString(36).slice(2, 6);
-    var made = settled(ready(B.noteElements({ id: id, by: S.asMember || S.me.id, name: myName(), text: text, x: spot.x, y: spot.y, w: spot.w, h: spot.h, now: now })));
+    var made = settled(ready(B.noteElements({ id: id, by: S.asMember || S.me.id, name: myName(), text: text, x: spot.x, y: spot.y, w: spot.w, h: spot.h, now: now, index: B.afterAll(S.api.getSceneElementsIncludingDeleted()) })));
     S.api.updateScene({ elements: S.api.getSceneElementsIncludingDeleted().concat(made), appState: { selectedElementIds: {} }, captureUpdate: S.X.CaptureUpdateAction.IMMEDIATELY });
+    S.fresh = { id: id, at: now, view: v };
+    for (var k = 1; k <= 14; k++) setTimeout(makeRoomSoon, k * 800 + Math.random() * 400);
     // The view moves only when the new card would be out of it.
     var c = made[0], inView = c.x >= v.x - v.w / 2 && c.x + c.width <= v.x + v.w / 2 && c.y >= v.y - v.h / 2 && c.y + c.height <= v.y + v.h / 2;
     if (!inView) setTimeout(function () { fit(S.api.getSceneElements(), true); }, 0);
+  }
+  // This person's newest note makes room for one added in the same moment, for
+  // a few seconds and only while nobody has touched it.
+  var roomTimer = null;
+  function makeRoomSoon() {
+    if (!S.fresh || Date.now() - S.fresh.at > 12000) return;
+    if (roomTimer) return;
+    roomTimer = setTimeout(function () {
+      roomTimer = null;
+      if (!S.fresh) return;
+      var f = S.fresh, all = S.api.getSceneElementsIncludingDeleted(), card = all.filter(function (e) { return e.id === f.id; })[0];
+      if (!card || card.isDeleted || (S.api.getAppState().selectedElementIds || {})[f.id]) { S.fresh = null; return; }
+      var to = B.makeRoom(all.filter(function (e) { return !e.isDeleted; }), f.id, f.view);
+      if (!to) return;
+      var dx = to.x - card.x, dy = to.y - card.y;
+      S.api.updateScene({ elements: all.map(function (e) { return e.id === f.id || e.containerId === f.id ? bump(e, { x: e.x + dx, y: e.y + dy }) : e; }), captureUpdate: S.X.CaptureUpdateAction.NEVER });
+    }, 250);
   }
   function bump(e, fields) { return Object.assign({}, e, fields, { version: e.version + 1, versionNonce: Math.floor(Math.random() * 1e9), updated: Date.now() }); }
   function voteFor(note) {
@@ -344,7 +363,7 @@
     if (mine) next = all.map(function (e) { return e.id === mine.id ? bump(e, { isDeleted: true }) : e; });
     else {
       var gone = all.filter(function (e) { return e.id === 'vote-' + note + '-' + S.me.id; })[0];
-      var dot = B.voteDot({ note: note, by: S.me.id, elements: all, now: Date.now() });
+      var dot = B.voteDot({ note: note, by: S.me.id, elements: all, now: Date.now(), index: B.afterAll(all) });
       if (!dot) return;
       next = gone ? all.map(function (e) { return e === gone ? bump(e, { x: dot.x, y: dot.y, isDeleted: false, opacity: 0, locked: true, groupIds: [] }) : e; }) : all.concat(S.X.restoreElements([dot], null));
     }
@@ -364,6 +383,8 @@
     }
     var els = S.api.getSceneElements(), st = S.api.getAppState(), z = st.zoom.value, live = {};
     var editing = st.editingTextElement && st.editingTextElement.containerId;
+    // With a drawing tool in hand, a stroke may begin or pass over a vote.
+    cardLayer.classList.toggle('is-drawing', ['selection', 'hand'].indexOf(st.activeTool.type) < 0);
     els.forEach(function (e) {
       if (!B.isNote(e)) return;
       live[e.id] = true;
@@ -371,6 +392,7 @@
       if (!n) {
         n = cards[e.id] = document.createElement('div');
         n.className = 'board-card';
+        n.dataset.note = e.id;
         n.appendChild(document.createElement('span'));
         var b = document.createElement('button'); b.type = 'button';
         b.addEventListener('pointerdown', function (ev) { ev.stopPropagation(); });
@@ -488,12 +510,14 @@
     var local = S.api.getSceneElementsIncludingDeleted(), mine = {};
     local.forEach(function (e) { mine[e.id] = e; });
     B.markSeen(S.seen, remote);
+    B.ahead(S.seen, local, remote);
     var newer = remote.filter(function (r) { return r && r.id && !B.keepLocal(mine[r.id], r); });
     if (newer.length) {
       var merged = X.reconcileElements(local, X.restoreElements(newer, null), S.api.getAppState());
       S.lastVersion = X.getSceneVersion(merged);
       S.api.updateScene({ elements: merged, captureUpdate: X.CaptureUpdateAction.NEVER });
       local = merged;
+      makeRoomSoon();
     }
     // An edit of this page's own that the merge carried along still goes
     // to everyone and is saved.
@@ -707,8 +731,9 @@
         S.api.updateScene({ elements: fresh, captureUpdate: S.X.CaptureUpdateAction.NEVER });
         if (S.api.history && S.api.history.clear) S.api.history.clear();
       } else {
-        applyRemote(sceneOf(r.data));
         B.markSeen(S.saved, sceneOf(r.data));
+        B.ahead(S.saved, S.api ? S.api.getSceneElementsIncludingDeleted() : [], sceneOf(r.data));
+        applyRemote(sceneOf(r.data));
       }
       if (was.locked !== r.data.locked) { render(); drawHead(); drawNotes(); drawCardsSoon(); }
       syncLine();

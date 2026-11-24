@@ -257,3 +257,37 @@ test('a saved board opens beside what is here, under new names that still point 
   assert.ok(by['os-n1'].x >= card[0].x + card[0].width);
   assert.deepEqual([by['os-a'].startBinding.elementId, by['os-a'].endBinding], ['os-n1', null]);
 });
+
+test('notes added in the same moment come apart, each moving only its own', () => {
+  const view = { x: 400, y: 230, w: 776, h: 284 };
+  let els = ['n1', 'n2', 'n3', 'n4', 'n5'].flatMap((id) => lib.noteElements({ id, by: id, name: id, text: 'x', x: 20, y: 76, now: 1 }));
+  const moves = ['n1', 'n2', 'n3', 'n4', 'n5'].map((id) => [id, lib.makeRoom(els, id, view)]);
+  assert.equal(moves[0][1], null);
+  els = els.map((e) => { const m = moves.find(([id]) => id === e.id); return m && m[1] ? { ...e, ...m[1] } : e; });
+  const notes = els.filter(lib.isNote);
+  assert.equal(new Set(notes.map((n) => n.x + ',' + n.y)).size, 5);
+  for (const n of notes) assert.equal(lib.makeRoom(els, n.id, view), null);
+});
+
+test('where two copies reached one version apart, the one that wins goes out again', () => {
+  const l = { id: 'a', version: 5, versionNonce: 1 }, r = { id: 'a', version: 5, versionNonce: 9 };
+  const seen = lib.markSeen({}, [r]);
+  assert.equal(lib.unsent([l], seen).length, 0);
+  assert.deepEqual(lib.ahead(seen, [l], [r]), ['a']);
+  assert.equal(lib.unsent([l], seen).length, 1);
+  assert.deepEqual(lib.ahead(lib.markSeen({}, [l]), [r], [l]), []);
+  assert.deepEqual(lib.ahead(lib.markSeen({}, [l]), [l], [l]), []);
+});
+
+test('a new thing goes after every layer, each with a place of its own', () => {
+  const one = lib.afterAll([{ index: 'a1' }, { index: 'a0V' }]), two = lib.afterAll([{ index: 'a1' }]);
+  assert.ok(one > 'a1' && one < 'a3');
+  assert.notEqual(one, two);
+  assert.ok(!/0$/.test(one));
+  assert.match(lib.afterAll([]), /^a1.{5}$/);
+  assert.match(lib.afterAll([{ index: 'az' }]), /^b00/);
+  assert.ok(lib.afterAll([{ index: 'az' }]) > 'azzzzz');
+  assert.match(lib.afterAll([{ index: 'bzz9' }]), /^c000/);
+  const [card, words] = lib.noteElements({ id: 'n', by: 'b', text: 'x', x: 0, y: 0, now: 1, index: one });
+  assert.ok(words.index > card.index);
+});

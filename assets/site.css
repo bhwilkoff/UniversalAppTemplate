@@ -1482,7 +1482,7 @@ label.check { min-height: 2.25rem; }
 .board-stage .board-head { padding: 0.35rem var(--gutter); position: absolute; z-index: 5; right: 0; bottom: 3.5rem; max-width: 22rem; pointer-events: none; }
 .board-stage .board-status { font-size: 0.85rem; text-align: right; }
 .board-stage .board-ready { position: relative; }
-.board-stage .board-canvas { height: 100svh; max-height: none; border: 0; }
+.board-stage .board-canvas { height: 100svh; min-height: 0; max-height: none; border: 0; }
 
 /* A member's role beside their name: only mentors carry a word (mentor-lib.js). */
 .role-tag { margin-left: 0.4rem; font-size: 0.85em; font-weight: 600; color: var(--accent); }
@@ -3158,6 +3158,7 @@ select:not([multiple]) {
 .board-card button[aria-pressed="true"] { background: #1F4D3A; color: #fff; }
 .board-card button:disabled { opacity: 1; cursor: default; }
 .board-card button[hidden] { display: none; }
+.board-cards.is-drawing .board-card button { pointer-events: none; }
 .excalidraw.theme--dark .board-card { color: #c9d1cc; }
 /* On the stage, the tools explain themselves; their running hints sat over the drawing. */
 .board-stage .HintViewer { display: none; }
