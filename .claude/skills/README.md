@@ -1,6 +1,6 @@
 # The skills
 
-There are 155 folders in this directory. 65 of them I wrote, one lesson
+There are 163 folders in this directory. 73 of them I wrote, one lesson
 at a time, while building BOBA Playbook, Bsky Dreams, Tidbits Trivia,
 Archive Watch, and humanshaped.org. The other 90 came from people who wrote good skills
 before I needed them, and they are credited below.
@@ -156,6 +156,7 @@ them. "From" names the app where the lesson was learned.
 | `cross-platform-determinism` | A value (a daily pick, a shuffle) that must come out identical on every platform. | Tidbits Trivia |
 | `values-based-feed-ranking` | A feed or "for you" surface that passes the four questions as a ranking function. | Bsky Dreams |
 | `web-content-extraction` | Reader mode and link previews from pages you do not control. | Bsky Dreams |
+| `shared-canvas-editing` | A board that many people draw on at once: which copy wins, why two screens can stay different for good, a note as one thing you can resize, names that leave with an account, and the twelve-person test that finds what two people never will. | humanshaped.org |
 | `google-meet-addon` | An app that runs inside Google Meet™: what its two frames can and cannot do, why a fix takes ten minutes to show up, how to fit content to whatever stage Meet gives you, and how to test it honestly with more than one person in a real call. | humanshaped.org |
 | `live-learning-sessions` | A live class that people follow together: questions answered in the room, guests who join by link, breakout rooms that keep their work, a session run again for someone who missed it, a replay beside the recording, and how to write the session itself so that it gets people thinking. | humanshaped.org |
 | `camera-recognition-pipeline` | Identifying physical objects with the camera. | BOBA Playbook |
@@ -169,6 +170,9 @@ them. "From" names the app where the lesson was learned.
 | `two-agent-handoff` | Two different AI agents working on one project through a single handoff file. | BOBA Playbook |
 | `third-party-revocation-resilience` | Every outside data source can be taken away. Plan the exit before you depend on it. | BOBA Playbook |
 | `third-party-ip-monetization` | Building on something you do not own: asking the owner first, and charging for it only after. | BOBA Playbook |
+| `finance-app-foundations` | Apps that hold people's financial data: earning FinanceKit, money as integer cents, imports that never duplicate, reconciling an export with FinanceKit later, and the App Review rules finance apps trip. | CentMemo; review lessons from Tidbits Trivia |
+| `money-story-design` | How people look at and write about their own spending: the unexamined purchases first, a memo in their own words, values they name, stories they can read and share, and no scores or shame. | CentMemo |
+| `claude-connector-mcp` | Letting a person's own Claude read their data: a read-only MCP server on Supabase behind its OAuth server, agent writes refused in SQL, tool design, the Connectors Directory checklist, and testing Claude Duet. | humanshaped.org, CentMemo |
 | `provenance-honest-market-data` | Prices and valuations that say what kind of number they are. | BOBA Playbook |
 | `marketplace-adjacent-design` | Letting people trade with one another without the app ever touching money. | BOBA Playbook |
 

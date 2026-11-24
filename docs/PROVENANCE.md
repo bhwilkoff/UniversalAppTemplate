@@ -37,6 +37,14 @@ nobody rediscovers an exclusion.
   cohort's learners, their transcripts, or a partner institution's content,
   and the site's own code, which lives on its `site` branch.
 
+- **2026-11-24**, humanshaped.org's board, rebuilt after it failed in a
+  live demo and then tested in real Meet™ calls, with twelve simulated
+  people, and on a phone. It became `shared-canvas-editing`, with the blocked
+  downloads, keys, and stage size added to `google-meet-addon`, and an
+  account's deletion (guards that refuse it) and a rotted policy suite added
+  to `zero-cost-hosted-backend`. Left behind on purpose: the board's own code,
+  which lives on the `site` branch.
+
 - **2026-11-18**, Ear Drama decisions 054 to 080 and everything since
   the October 23 upstream, the first app made from this template from its
   first day. Three skills came out of it (`artwork-presentation-design`,
@@ -101,6 +109,7 @@ nobody rediscovers an exclusion.
 | Windows / MSIX | `docs/windows/`, WINDOWS-DESIGN template, `tools/stamp_msix_version.py`, reference workflows, Decision 029 |
 | Store submission (Apple cloud default, Play CLI, screenshots, IAP) | `docs/CLOUD-SUBMISSION.md`, `cloud-appstore-submission` + `play-cli-submission` + `store-submission-playbook` skills, `tools/submit-*` + `asc_*` cluster, `docs/store/` (IAP troubleshooting + choreography, screenshot rules, Play dashboard recommendations, Play API key) |
 | Secrets (OIDC for owner-only routes, one home per secret, fixed-recipe `tools/secrets.sh`, a scan as hook and CI, the classifier facts, check a workflow's trigger before saying it shipped) | `secrets-without-bookkeeping` skill, `tools/test_no_secrets.py` + `tools/no_secrets_allowlist.txt`, `.githooks/pre-commit`, `secrets-check.yml`, `tools/secrets.sh` + `tools/test_secrets_sh.py`, `docs/templates/worker-github-oidc-template.js`, `docs/templates/operator-workflow-template.yml` (from Ear Drama Decision 085, 2026-11-22) |
+| Finance apps and Claude connectors (FinanceKit, integer cents, idempotent imports, read-only MCP on Supabase, money-story UI, brand-collision color search) | `finance-app-foundations` + `money-story-design` + `claude-connector-mcp` skills, `tools/colorsearch/` (from CentMemo, 2026-11-21) |
 | Sync (CloudKit query-free pattern, Drive App Data, history-vs-progress) | `per-ecosystem-sync-islands` skill, `docs/runbooks/cloudkit-setup.md`, `docs/runbooks/google-oauth-setup.md`, `docs/research/sync-architecture.md` |
 | Shared data plane (SQLite delivery, CORS/Range matrix, additive evolution, forwarding addresses, marker/evidence rules) | `shared-data-plane-contract` + `web-catalog-data-layer` skills, DATA-CONTRACT template, `docs/CI-FLEET.md` §7, Decision 034 |
 | Data recovery + git forensics | `docs/runbooks/data-recovery.md` |
@@ -120,6 +129,7 @@ nobody rediscovers an exclusion.
 | Monetizing around IP you don't own (license-then-monetize, the own-engineering line, entitlement architecture, decision gates) | `third-party-ip-monetization` skill |
 | Two-agent handoff (single-file channel, directional outboxes, ownership lists, provenance-cited deliveries) | `two-agent-handoff` skill |
 | Next-OS additive adoption (dual runtime+compile gates, the SDK-conditional flag, Compat wrapper, beta-Xcode submit trap) | `cloud-appstore-submission` Rule 6 (amended), Decision 048 |
+| Many people editing one canvas (merge rules, equal versions, unique layer order, one card as one element, names leaving with an account, the twelve-person suite) | `shared-canvas-editing` skill (from humanshaped.org's board, 2026-11-24) |
 | Google Meet™ add-ons (two frames with no shared storage, popup sign-in, activities and rejoining, the 10-minute partitioned cache, fitting a stage, multi-profile testing, Marketplace trademark and scope review) | `google-meet-addon` skill |
 | Live learning sessions (show state, guests by link, live questions, breakouts from a pool of links, reruns, replay beside a recording, private feedback, cascade data loss, session and exchange writing) | `live-learning-sessions` skill, `learner-experience-design` Lessons |
 | GitHub and Google as free infrastructure (public GitHub App, per-cohort and per-person private repos, issues as notices, Actions timing, drive.file video with a relay, Calendar, consent screen) | `github-and-google-learning-infrastructure` skill, `zero-cost-hosted-backend` §Lessons from a live cohort platform |

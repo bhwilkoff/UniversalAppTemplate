@@ -20,6 +20,10 @@ paid for by a feature that passed a test and then failed in Meet.
 | Meet refuses `requestStorageAccess`. The frames never see the site's first-party cookies or storage. | Sign-in inside Meet goes through a **popup** window on your origin that hands the session back by postMessage. A popup is unsandboxed and top-level. |
 | The add-on iframe has no `allow` attribute: camera, microphone, display-capture, autoplay, clipboard-write, and fullscreen are all denied. | The panel cannot record or hear the call. A popup it opens can (getDisplayMedia + getUserMedia + MediaRecorder). |
 | The stage takes each person's own clicks and keys, can `fetch` public APIs, and can frame a learner's `github.io` app (each person gets their own working copy). | A shared stage can be interactive: answer on the stage, try a classmate's app. github.com itself sends `X-Frame-Options: deny`; check XFO/frame-ancestors server-side before framing any URL, and always offer Open in a new tab. |
+| A download never starts inside Meet's frame and `clipboard.write` is refused, both **with nothing shown** (real calls, 2026-11-24). | Open a small window of your own origin on the press and hand it the file by postMessage, checking the opener and origin. It saves or copies, says so, and closes itself. Route every save and copy through it, a library's own export dialogs included. |
+| A key press on the stage goes to the stage page, not to an editor it frames. | When nothing is being typed, hand the key to the framed editor, or its shortcuts look dead. |
+| A stage beside the panel on a laptop measured 816 by 395 to 816 by 460. | A library's breakpoints may call that a phone. Read them and change them in the build (`shared-canvas-editing`). |
+| Meet draws its own tile over the stage's bottom right corner. | Keep status lines and controls out of it. |
 | A stage page that never calls `createMainStageClient` leaves Meet on "Loading", then "The add-on couldn't start". | The stage must create its client at once, even when it has nothing to show yet. |
 | `createCoDoingClient` exists in the SDK but is undocumented and refused, with or without an activity. | Do not build on it. Use your own realtime channel. |
 | Chrome draws **no PDF** inside Meet's frames, sandboxed or not (a broken-page icon). A picture or video in a plain iframe draws at its natural size and spills off the stage. | Render a PDF deck's pages to images and show them as slides the leader moves for everyone; give any other PDF an "Open the PDF" card. Show pictures in `<img>` and videos in `<video controls>` with `object-fit: contain`, and let each person enlarge what sits beside a question. |
@@ -164,6 +168,12 @@ browser tabs (which share storage) and failed in Meet (whose frames do not).
   real person, can report them.
 - **Test what a second person sees, in every role** (leader, co-leader,
   member, guest, guest in a breakout room). Each role found its own bug.
+- The browser extension that drives a profile **cancels every native file
+  chooser**, outside Meet too (proved with a control page). Test a picker's
+  result another way, and have a person press it once in a call.
+- A profile that has the extension but is not signed in to it cannot be a
+  person in the call. Three real people take three signed-in profiles, so a
+  crowd is simulated and only the last check is live.
 - Test an editor by **changing what is already there**, then pressing each
   button once after typing. Adding and deleting passed while editing broke.
 
@@ -194,6 +204,7 @@ browser tabs (which share storage) and failed in Meet (whose frames do not).
 ## See also
 
 - `live-learning-sessions`: the live-class platform built on this.
+- `shared-canvas-editing`: a board everyone draws on.
 - `github-and-google-learning-infrastructure`: Drive, Calendar, GitHub, and
   the OAuth app behind the add-on.
 - `device-observation-harness`: the general instrument rules.

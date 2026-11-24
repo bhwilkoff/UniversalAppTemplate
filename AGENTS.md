@@ -111,6 +111,7 @@ Sources: `docs/research/gemini-and-other-agents.md`. Rows follow the
 | Capturing camera, mic, or another app's audio, mixing sources, or publishing live (RTMP) | `live-capture-and-broadcast` |
 | Vertical social video (Reels, Shorts, TikTok), burned captions, posting cadence | `social-video-teaser-craft` |
 | Real-time multiplayer, or a $0 watch party | `cross-platform-multiplayer` + `zero-cost-hosted-backend` |
+| A board or document many people edit at once | `shared-canvas-editing` |
 | A Google Meet add-on, or live class sessions (questions, guests, breakouts, replay) | `google-meet-addon` + `live-learning-sessions` |
 | A value identical on every platform (daily pick, hash) | `cross-platform-determinism` |
 | Any algorithmic feed / discovery / "for you" surface | `values-based-feed-ranking` |
@@ -123,26 +124,26 @@ Sources: `docs/research/gemini-and-other-agents.md`. Rows follow the
 | Coordinating with a second AI agent surface | `two-agent-handoff` |
 | Adding a third-party data dependency, or a partner revokes one | `third-party-revocation-resilience` |
 | Monetizing an app built around IP/content you don't own | `third-party-ip-monetization` |
+| Money, Claude connectors | `finance-app-foundations` + `money-story-design` + `claude-connector-mcp` |
 | Prices or market data from third-party listings | `provenance-honest-market-data` |
 | User-to-user trading / selling / matching | `marketplace-adjacent-design` + `docs/templates/TRADE-DESIGN-template.md` |
 
 ### Where each platform's rules live
 
-Read the page BEFORE touching that platform: stack, layout, critical
-conventions, and which skill fires first.
+Read the page BEFORE touching that platform.
 
-- `docs/platforms/web.md`: any web work (views, routing, CSS, data,
-  offline, deploys); the Safari layout rule and the web APIs to reach for.
-- `docs/platforms/apple.md`: any Swift work, or choosing a floor; the
-  universal target, `project.yml`, and the macOS and tvOS guardrails.
+- `docs/platforms/web.md`: any web work; the Safari layout rule and the
+  web APIs to reach for.
+- `docs/platforms/apple.md`: any Swift work, or choosing a floor; the macOS
+  and tvOS guardrails.
 - `docs/platforms/android.md`: any Kotlin / Compose work, or choosing `minSdk`.
 - `docs/platforms/windows.md`: any Windows work (optional platform); then
   `docs/windows/WINDOWS-PLAYBOOK.md`.
 - `docs/platforms/tv.md`: Android TV, Fire TV, webOS, Tizen, Cast, Roku;
   then `docs/TV-PLATFORMS.md`. Apple TV is in `apple.md` and
   `docs/TVOS-PLAYBOOK.md`.
-- `docs/platforms/design-system.md`: changing the look, a color, type,
-  haptics, or icons on any platform.
+- `docs/platforms/design-system.md`: the look, color, type, haptics, or
+  icons on any platform.
 - `docs/platforms/shared-data.md`: a second client reads your data, a
   value must match on every platform, or anything multiplayer.
 
@@ -177,7 +178,7 @@ not another implementation attempt.
    The bug is in the layer whose actual output diverges from its
    expected output.
 3. **Use `print` (or `console.log` / `Log.d`), not `os.Logger`**: it
-   lands in the console immediately with zero setup.
+   lands in the console at once.
 4. **For invisible UI bugs, add a temporary visual overlay** so the
    numbers appear on the screenshot (a real device, a TV across the
    room). Doubly important on tvOS, where focus, animation, and video

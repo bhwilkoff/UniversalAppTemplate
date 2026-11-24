@@ -232,6 +232,21 @@ it measured:
 - **Supabase realtime free tier is 200 connections**, and overage restricts
   the whole organization. Public, many-person rooms belong on a separate
   service (a Cloudflare Durable Object held 1,000 sockets at 151 ms median).
+- **A guard trigger can make an account impossible to delete.** `on delete
+  set null` is an UPDATE, so it fires the row's triggers. One that pins
+  `created_by` raises, and one that sets `updated_by := auth.uid()` puts the
+  leaving person's id back and breaks the foreign key. On 2026-11-24 anyone
+  who had opened a board, written in a shared workbook, or led a session could
+  not delete their account, and no test had tried. Let the guard return the
+  row untouched when all that changed is such a column, now null, for an id no
+  longer in `auth.users`. Then have the policy suite delete **every** account
+  it made, as that person, and read each refusal.
+- **A name copied into JSON outlives the account.** Cascades reach columns, not
+  a name inside a document. List every place one is copied before a privacy
+  page promises it goes.
+- **A policy suite rots when a migration needs an extension** it does not stub
+  (`pg_cron`): it stopped at startup for a day, and every rule after that was
+  unchecked. Stub the extension, and run the suite in the same change.
 - **`on delete cascade` is a data-loss decision.** A breakout room's group was
   deleted when breakouts ended, and every room's answers went with it. Rows
   people's work hangs off are marked ended, never deleted, and a policy test
