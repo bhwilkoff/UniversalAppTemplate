@@ -172,72 +172,142 @@
     return out;
   }
 
-  // A note on the board: a colored card, its words, and who wrote it, moved as
-  // one. A vote is a dot of its own, so a class voting at once never overwrites
-  // one another (a shared count would: a board settles element by element).
-  var NOTE_W = 240, NOTE_H = 160;
+  // A note on the board: one card whose words belong to it, the way Excalidraw
+  // keeps words inside a shape, so it resizes from any side or corner and its
+  // words wrap to fit (Ben, November 24, 2026: a board "that doesn't struggle to
+  // resize cards"). It was a card, its words, and its writer's name grouped as
+  // three shapes, which Excalidraw can only stretch together. The name and the
+  // votes are drawn over the card by the page, so nothing rides in a group.
+  var NOTE_W = 220, NOTE_H = 120, IN_FRAME = { w: 180, h: 90 }, PAD = 12;
   var NOTE_COLORS = ['#FFE08A', '#B7E4C7', '#DCC4F0', '#A9D6F5', '#F9C5B5', '#E6E6A8'];
   function noteColor(id) {
     var h = 0;
     String(id).split('').forEach(function (c) { h = (h * 31 + c.charCodeAt(0)) >>> 0; });
     return NOTE_COLORS[h % NOTE_COLORS.length];
   }
-  function shape(type, id, group, x, y, w, h, now, extra) {
+  function shape(type, id, x, y, w, h, now, extra) {
     return Object.assign({
       id: id, type: type, x: x, y: y, width: w, height: h, angle: 0, strokeColor: '#1e1e1e', backgroundColor: 'transparent', fillStyle: 'solid',
-      strokeWidth: 1, strokeStyle: 'solid', roughness: 0, opacity: 100, groupIds: [group], frameId: null, roundness: type === 'rectangle' ? { type: 3 } : null,
+      strokeWidth: 1, strokeStyle: 'solid', roughness: 0, opacity: 100, groupIds: [], frameId: null, roundness: type === 'rectangle' ? { type: 3 } : null,
       seed: 1, version: 1, versionNonce: 1, isDeleted: false, boundElements: null, updated: now, link: null, locked: false
     }, extra || {});
   }
-  function words(id, group, x, y, value, size, color, now, data) {
-    var lines = wrap(value, Math.floor((NOTE_W - 24) / (size * 0.55)));
-    return shape('text', id, group, x, y, NOTE_W - 24, lines.length * size * 1.25, now, {
-      strokeColor: color, text: lines.join('\n'), originalText: lines.join('\n'), fontSize: size, fontFamily: 5, textAlign: 'left', verticalAlign: 'top',
-      containerId: null, autoResize: true, lineHeight: 1.25, customData: data
-    });
-  }
   function noteElements(o) {
-    var id = o.id, group = 'note-' + id, data = { note: id, by: o.by };
+    var id = o.id, W = o.w || NOTE_W, H = o.h || NOTE_H, said = String(o.text).slice(0, 200);
+    var lines = wrap(said, Math.max(4, Math.floor((W - 2 * PAD) / 11))), th = lines.length * 25;
+    H = Math.max(H, th + 2 * PAD);
     return [
-      shape('rectangle', id, group, o.x, o.y, NOTE_W, NOTE_H, o.now, { backgroundColor: o.color || noteColor(o.by), strokeColor: 'transparent', customData: data }),
-      words(id + '-t', group, o.x + 12, o.y + 32, String(o.text).slice(0, 200), 20, '#1e1e1e', o.now, data),
-      words(id + '-n', group, o.x + 12, o.y + NOTE_H - 26, String(o.name || '').slice(0, 40), 14, '#4e5b55', o.now, data)
+      shape('rectangle', id, o.x, o.y, W, H, o.now, {
+        backgroundColor: o.color || noteColor(o.by), strokeColor: 'transparent', boundElements: [{ type: 'text', id: id + '-t' }],
+        customData: { note: id, by: o.by, name: String(o.name || '').slice(0, 40) }
+      }),
+      shape('text', id + '-t', o.x + PAD, o.y + (H - th) / 2, W - 2 * PAD, th, o.now, {
+        text: said, originalText: said, fontSize: 20, fontFamily: 5, textAlign: 'center', verticalAlign: 'middle',
+        containerId: id, autoResize: true, lineHeight: 1.25
+      })
     ];
   }
-  // Where a new note goes on a board with a template: the first frame, where
-  // every template begins, unless the person has zoomed in on one frame (their
-  // view is narrower than two frames), and then that one, each next note a little lower and to the right of the last, so
-  // none hides another. Null with no template, and the note goes mid-view.
-  // Found in a real call: a note asked for "under Write" landed in Play.
+  // Once Excalidraw has measured the words: the card grows to hold them, and
+  // they sit in its middle.
+  function settleNote(card, text) {
+    var h = Math.max(card.height, text.height + 2 * PAD);
+    return [Object.assign({}, card, { height: h }), Object.assign({}, text, {
+      x: card.x + (card.width - text.width) / 2, y: card.y + (h - text.height) / 2
+    })];
+  }
+  function isNote(e) { return !!e && !e.isDeleted && e.type === 'rectangle' && !!e.customData && !!e.customData.note; }
+  // A note made before November 24, 2026 becomes one card: its words move
+  // inside it, its name is kept on the card, and its votes leave the group.
+  // The same answer on every screen, so two people opening a board at once
+  // settle on one copy.
+  function upgradeNotes(elements, now) {
+    var by = {}, change = {};
+    (elements || []).forEach(function (e) { by[e.id] = e; });
+    function set(e, fields) { change[e.id] = Object.assign({}, e, fields, { version: e.version + 1, versionNonce: 1, updated: now }); }
+    (elements || []).forEach(function (e) {
+      if (!isNote(e)) return;
+      var t = by[e.id + '-t'], n = by[e.id + '-n'];
+      if (!t || t.isDeleted || t.containerId) return;
+      var words = t.originalText && t.originalText.indexOf('\n') < 0 ? t.originalText : String(t.text || '').replace(/\s*\n\s*/g, ' ');
+      var th = wrap(words, Math.max(4, Math.floor((e.width - 2 * PAD) / 11))).length * 25;
+      set(e, { groupIds: [], boundElements: [{ type: 'text', id: t.id }], height: Math.max(e.height, th + 2 * PAD),
+        customData: Object.assign({}, e.customData, { name: n ? String(n.originalText || n.text || '').replace(/\s*\n\s*/g, ' ') : '' }) });
+      set(t, { groupIds: [], containerId: e.id, text: words, originalText: words, textAlign: 'center', verticalAlign: 'middle', fontSize: t.fontSize || 20 });
+      if (n && !n.isDeleted) set(n, { isDeleted: true, groupIds: [] });
+    });
+    (elements || []).forEach(function (e) {
+      if (e.isDeleted || !e.customData || !e.customData.vote || (e.opacity === 0 && e.locked)) return;
+      set(e, { groupIds: [], opacity: 0, locked: true });
+    });
+    var ids = Object.keys(change);
+    return { changed: ids.length > 0, ids: ids, elements: (elements || []).map(function (e) { return change[e.id] || e; }) };
+  }
+  // Where a new note goes, so that it covers nothing. On a board with a
+  // template: the first frame, where every template begins, unless the person
+  // has zoomed in on one frame (their view is narrower than two frames), and
+  // then that one. With no template, the free place nearest the middle of view.
+  function overlaps(e, x, y, w, h) {
+    var l = Math.min(e.x, e.x + e.width), t = Math.min(e.y, e.y + e.height);
+    return x < l + Math.abs(e.width) && x + w > l && y < t + Math.abs(e.height) + 8 && y + h + 8 > t;
+  }
   function noteSpot(elements, view) {
-    var frames = (elements || []).filter(function (e) { return !e.isDeleted && e.type === 'rectangle' && /^tpl-/.test(String(e.id)); })
+    var shown = (elements || []).filter(function (e) { return !e.isDeleted; });
+    var frames = shown.filter(function (e) { return e.type === 'rectangle' && /^tpl-/.test(String(e.id)); })
       .sort(function (a, b) { return Number(String(a.id).split('-').pop()) - Number(String(b.id).split('-').pop()); });
-    if (!frames.length) return null;
     function inside(f, x, y) { return x >= f.x && x <= f.x + f.width && y >= f.y && y <= f.y + f.height; }
-    var close = view && view.w && view.w < frames[0].width * 2;
-    var f = (close && frames.filter(function (r) { return inside(r, view.x, view.y); })[0]) || frames[0];
-    var k = (elements || []).filter(function (e) {
-      return !e.isDeleted && e.type === 'rectangle' && e.customData && e.customData.note && inside(f, e.x + e.width / 2, e.y + e.height / 2);
-    }).length;
-    return { x: f.x + 20 + (k % 6) * 26, y: f.y + 110 + (k % 6) * 22 };
-  }
-  function noteAt(elements, ids) {
-    for (var i = 0; i < elements.length; i++) {
-      var e = elements[i];
-      if (!e.isDeleted && ids[e.id] && e.customData && e.customData.note) return e.customData.note;
+    var taken = shown.filter(function (e) { return !/^tpl-/.test(String(e.id)) && !(e.customData && e.customData.vote) && !e.containerId; });
+    function free(x, y, w, h) { return !taken.some(function (e) { return overlaps(e, x, y, w, h); }); }
+    if (frames.length) {
+      var close = view && view.w && view.w < frames[0].width * 2;
+      var f = (close && frames.filter(function (r) { return inside(r, view.x, view.y); })[0]) || frames[0];
+      var w = IN_FRAME.w, h = IN_FRAME.h;
+      for (var y = f.y + 96; y + h <= f.y + f.height; y += h + 36) {
+        for (var x = f.x + 20; x + w <= f.x + f.width; x += w + 16) if (free(x, y, w, h)) return { x: x, y: y, w: w, h: h };
+      }
+      var k = taken.filter(function (e) { return isNote(e) && inside(f, e.x + e.width / 2, e.y + e.height / 2); }).length;
+      return { x: f.x + 30 + (k % 6) * 26, y: f.y + 110 + (k % 6) * 22, w: w, h: h };
     }
-    return null;
+    var W = NOTE_W, H = NOTE_H, sx = W + 24, sy = H + 52, mid = view || { x: 0, y: 0 }, best = null, far = Infinity;
+    // In line with the notes already there, so a class's notes make rows.
+    var first = shown.filter(isNote)[0];
+    var ox = first ? first.x + W / 2 + Math.round((mid.x - first.x - W / 2) / sx) * sx : mid.x, oy = first ? first.y + H / 2 + Math.round((mid.y - first.y - H / 2) / sy) * sy : mid.y;
+    for (var r = -12; r <= 12; r++) for (var c = -12; c <= 12; c++) {
+      var cx = ox + c * sx, cy = oy + r * sy, px = cx - W / 2, py = cy - H / 2;
+      // Places in view first, then the nearest.
+      var out = view && view.w && (Math.abs(cx - mid.x) + W / 2 > view.w / 2 || Math.abs(cy - mid.y) + H / 2 > (view.h || view.w) / 2);
+      var d = Math.hypot(cx - mid.x, cy - mid.y) + (out ? 1e6 : 0);
+      if (d < far && free(px, py, W, H)) { far = d; best = { x: px, y: py, w: W, h: H }; }
+    }
+    return best || { x: mid.x - W / 2, y: mid.y - H / 2, w: W, h: H };
   }
+  // A vote is an element of its own, one per person per note, so a class voting
+  // at once never overwrites one another (a shared count would: a board settles
+  // element by element). It is not drawn; the page counts them onto the card.
   function votesOn(elements, note) {
     return elements.filter(function (e) { return !e.isDeleted && e.customData && e.customData.vote === note; });
   }
   function voteDot(o) {
     var card = o.elements.filter(function (e) { return e.id === o.note; })[0];
     if (!card) return null;
-    var n = votesOn(o.elements, o.note).length;
-    return shape('ellipse', 'vote-' + o.note + '-' + o.by, card.groupIds[0], card.x + 12 + (n % 9) * 24, card.y + 8 + Math.floor(n / 9) * 24, 18, 18, o.now, {
-      backgroundColor: '#1F4D3A', strokeColor: '#1F4D3A', customData: { vote: o.note, by: o.by }
+    return shape('ellipse', 'vote-' + o.note + '-' + o.by, card.x + card.width / 2, card.y + card.height / 2, 1, 1, o.now, {
+      opacity: 0, locked: true, customData: { vote: o.note, by: o.by }
     });
+  }
+  // What is drawn on the board: everything but the votes.
+  function drawn(elements) { return (elements || []).filter(function (e) { return !e.isDeleted && !(e.customData && e.customData.vote); }); }
+  function cardLine(card, votes) {
+    return [card.customData.name || '', votes ? votes + (votes === 1 ? ' vote' : ' votes') : ''].filter(Boolean).join(', ');
+  }
+  // The board as a picture: each card's name and votes as words beneath it.
+  function forPicture(elements, now) {
+    var out = drawn(elements);
+    out.filter(isNote).forEach(function (c) {
+      var line = cardLine(c, votesOn(elements, c.id).length);
+      if (line) out.push(shape('text', c.id + '-line', c.x, c.y + c.height + 4, line.length * 8, 18, now, {
+        strokeColor: '#4e5b55', text: line, originalText: line, fontSize: 14, fontFamily: 5, textAlign: 'left', verticalAlign: 'top', containerId: null, autoResize: true, lineHeight: 1.25
+      }));
+    });
+    return out;
   }
 
   // Words broken into lines of at most `width` characters.
@@ -413,7 +483,7 @@
   var lib = {
     DAY: DAY, MAX_MESSAGE_BYTES: MAX_MESSAGE_BYTES, SAVE_EVERY: SAVE_EVERY, CATCH_UP_AFTER: CATCH_UP_AFTER, CATCH_UP_EVERY: CATCH_UP_EVERY, MESSAGES_PER_SECOND: MESSAGES_PER_SECOND,
     params: params, pickSession: pickSession, topic: topic, link: link,
-    TEMPLATES: TEMPLATES, template: template, templateElements: templateElements, noteColor: noteColor, noteElements: noteElements, noteAt: noteAt, noteSpot: noteSpot, votesOn: votesOn, voteDot: voteDot, needsTemplate: needsTemplate,
+    TEMPLATES: TEMPLATES, template: template, templateElements: templateElements, noteColor: noteColor, noteElements: noteElements, settleNote: settleNote, isNote: isNote, upgradeNotes: upgradeNotes, noteSpot: noteSpot, votesOn: votesOn, voteDot: voteDot, drawn: drawn, cardLine: cardLine, forPicture: forPicture, needsTemplate: needsTemplate,
     unsent: unsent, markSeen: markSeen, syncable: syncable, keepLocal: keepLocal, merge: merge,
     bytes: bytes, batches: batches, sendInterval: sendInterval, pointerInterval: pointerInterval, throttle: throttle,
     sameGeneration: sameGeneration, canDraw: canDraw, colorFor: colorFor, fileName: fileName

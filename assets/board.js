@@ -234,8 +234,11 @@
           // On the main stage, or with a template just laid, everything on
           // the board fits the screen when it opens (once, so no one's view
           // jumps while they draw).
-          S.fitPending = !!(S.seeded || P.stage);
+          S.fitPending = !!(S.seeded || P.stage) && S.initial.elements.some(function (e) { return !e.isDeleted; });
           drawNotes();
+          drawCardsSoon();
+          setTimeout(render, 0);
+          if (S.upgraded) setTimeout(function () { sendScene(); saveSoon(); }, 0);
         }
       },
       initialData: S.initial,
@@ -258,11 +261,35 @@
     };
   }
 
-  // Notes and dot votes: what a class does on a board, in two presses.
+  // Notes: what a class does most on a board.
+  // What is in view, clear of the tools along its edges.
+  function view() {
+    var st = S.api.getAppState(), z = st.zoom.value, wide = st.width >= 730;
+    var small = !!$('[data-canvas]').querySelector('.excalidraw--mobile');
+    var l = wide && !small ? 232 : 12, r = small ? 44 : 24, t = 76, b = small ? 116 : 110;
+    return { x: (l + (st.width - l - r) / 2) / z - st.scrollX, y: (t + (st.height - t - b) / 2) / z - st.scrollY, w: (st.width - l - r) / z, h: (st.height - t - b) / z };
+  }
+  function fit(elements, animate) {
+    S.api.scrollToContent(B.drawn(elements), { fitToViewport: true, maxZoom: 1, viewportZoomFactor: 0.8, animate: !!animate });
+  }
+  // Measured by Excalidraw itself, so the words wrap the way they will when
+  // the card is resized.
+  function ready(els) { return S.X.restoreElements(els, null, { refreshDimensions: true, repairBindings: true }); }
+  function settled(els) {
+    var by = {}; els.forEach(function (e) { by[e.id] = e; });
+    els.forEach(function (e) {
+      if (!B.isNote(e) || !by[e.id + '-t']) return;
+      var pair = B.settleNote(e, by[e.id + '-t']);
+      by[e.id] = pair[0]; by[e.id + '-t'] = pair[1];
+    });
+    return els.map(function (e) { return by[e.id]; });
+  }
   function drawNotes() {
     var bar = $('[data-notes]');
-    if (!bar || !canDraw()) return;
-    bar.hidden = false;
+    if (!bar) return;
+    bar.hidden = !canDraw();
+    if (S.notesWired) return;
+    S.notesWired = true;
     // Someone tied to a member writes as that member.
     db.from('call_guests').select('member_id').eq('cohort_id', S.cohort.id).eq('user_id', S.me.id).maybeSingle().then(function (g) {
       var id = g.data && g.data.member_id;
@@ -270,46 +297,103 @@
       S.asMember = id;
       db.from('profiles').select('display_name, github_login').eq('id', id).maybeSingle().then(function (p) { if (p.data) S.asName = p.data.display_name || p.data.github_login; });
     });
-    var form = bar.querySelector('form'), vote = bar.querySelector('[data-vote]'), input = form.querySelector('input');
+    var form = bar.querySelector('form'), input = form.querySelector('input');
     form.addEventListener('submit', function (ev) {
       ev.preventDefault();
       var text = input.value.trim();
-      if (!text || !S.api) return;
-      var st = S.api.getAppState(), z = st.zoom.value, now = Date.now();
-      var n = S.api.getSceneElements().filter(function (e) { return e.customData && e.customData.by === S.me.id && e.type === 'rectangle'; }).length;
-      var mid = { x: st.width / 2 / z - st.scrollX, y: st.height / 2 / z - st.scrollY, w: st.width / z };
-      var spot = B.noteSpot(S.api.getSceneElements(), mid);
-      var x = spot ? spot.x : mid.x - 120 + (n % 5) * 28, y = spot ? spot.y : mid.y - 80 + (n % 5) * 28;
-      var made = B.noteElements({ id: 'n' + now.toString(36) + Math.random().toString(36).slice(2, 6), by: S.asMember || S.me.id, name: myName(), text: text, x: x, y: y, now: now });
-      S.api.updateScene({ elements: S.api.getSceneElementsIncludingDeleted().concat(S.X.restoreElements(made, null)), captureUpdate: S.X.CaptureUpdateAction.IMMEDIATELY });
+      if (!text || !S.api || !canDraw()) return;
       input.value = '';
-      // Everything stays in view, at no more than life size.
-      setTimeout(function () { S.api.scrollToContent(S.api.getSceneElements(), { fitToViewport: true, maxZoom: 1, viewportZoomFactor: 0.8, animate: true }); }, 0);
-    });
-    vote.addEventListener('click', function () {
-      if (!S.api) return;
-      var all = S.api.getSceneElementsIncludingDeleted(), note = B.noteAt(all, S.api.getAppState().selectedElementIds);
-      if (!note) return;
-      var mine = B.votesOn(all, note).filter(function (e) { return e.customData.by === S.me.id; })[0], next;
-      function bump(e, fields) { return Object.assign({}, e, fields, { version: e.version + 1, versionNonce: Math.floor(Math.random() * 1e9), updated: Date.now() }); }
-      if (mine) next = all.map(function (e) { return e.id === mine.id ? bump(e, { isDeleted: true }) : e; });
-      else {
-        var gone = all.filter(function (e) { return e.id === 'vote-' + note + '-' + S.me.id; })[0];
-        var dot = B.voteDot({ note: note, by: S.me.id, elements: all, now: Date.now() });
-        next = gone ? all.map(function (e) { return e === gone ? bump(e, { x: dot.x, y: dot.y, isDeleted: false }) : e; }) : all.concat(S.X.restoreElements([dot], null));
-      }
-      S.api.updateScene({ elements: next, captureUpdate: S.X.CaptureUpdateAction.IMMEDIATELY });
-      syncVote();
+      // Measured in the board's own lettering, or the first note's words ran
+      // past its edges until the font arrived.
+      lettering().then(function () { addNote(text); });
     });
   }
-  function syncVote() {
-    var vote = $('[data-vote]');
-    if (!vote || !S.api) return;
-    var all = S.api.getSceneElements(), note = B.noteAt(all, S.api.getAppState().selectedElementIds);
-    vote.hidden = !note;
-    if (!note) return;
-    var mine = B.votesOn(all, note).some(function (e) { return e.customData.by === S.me.id; });
-    vote.textContent = mine ? 'Take my vote back' : 'Vote for this';
+  function lettering() {
+    var wait = new Promise(function (r) { setTimeout(r, 2000); });
+    var font = document.fonts && document.fonts.load ? document.fonts.load('20px Excalifont', 'Aa').catch(function () {}) : null;
+    return Promise.race([Promise.resolve(font), wait]);
+  }
+  function addNote(text) {
+    var now = Date.now(), v = view(), spot = B.noteSpot(S.api.getSceneElements(), v);
+    var id = 'n' + now.toString(36) + Math.random().toString(36).slice(2, 6);
+    var made = settled(ready(B.noteElements({ id: id, by: S.asMember || S.me.id, name: myName(), text: text, x: spot.x, y: spot.y, w: spot.w, h: spot.h, now: now })));
+    S.api.updateScene({ elements: S.api.getSceneElementsIncludingDeleted().concat(made), appState: { selectedElementIds: {} }, captureUpdate: S.X.CaptureUpdateAction.IMMEDIATELY });
+    // The view moves only when the new card would be out of it.
+    var c = made[0], inView = c.x >= v.x - v.w / 2 && c.x + c.width <= v.x + v.w / 2 && c.y >= v.y - v.h / 2 && c.y + c.height <= v.y + v.h / 2;
+    if (!inView) setTimeout(function () { fit(S.api.getSceneElements(), true); }, 0);
+  }
+  function bump(e, fields) { return Object.assign({}, e, fields, { version: e.version + 1, versionNonce: Math.floor(Math.random() * 1e9), updated: Date.now() }); }
+  function voteFor(note) {
+    if (!S.api || !canDraw()) return;
+    var all = S.api.getSceneElementsIncludingDeleted();
+    var mine = B.votesOn(all, note).filter(function (e) { return e.customData.by === S.me.id; })[0], next;
+    if (mine) next = all.map(function (e) { return e.id === mine.id ? bump(e, { isDeleted: true }) : e; });
+    else {
+      var gone = all.filter(function (e) { return e.id === 'vote-' + note + '-' + S.me.id; })[0];
+      var dot = B.voteDot({ note: note, by: S.me.id, elements: all, now: Date.now() });
+      if (!dot) return;
+      next = gone ? all.map(function (e) { return e === gone ? bump(e, { x: dot.x, y: dot.y, isDeleted: false, opacity: 0, locked: true, groupIds: [] }) : e; }) : all.concat(S.X.restoreElements([dot], null));
+    }
+    S.api.updateScene({ elements: next, captureUpdate: S.X.CaptureUpdateAction.NEVER });
+  }
+
+  // Each card's writer and votes, drawn over the board just under the card, at
+  // the board's own scroll and zoom. Between Excalidraw's canvas and its tools.
+  var cards = {}, cardLayer = null, cardFrame = 0;
+  function drawCardsSoon() { cancelAnimationFrame(cardFrame); cardFrame = requestAnimationFrame(drawCards); }
+  function drawCards() {
+    var host = $('[data-canvas]').querySelector('.excalidraw');
+    if (!host || !S.api) return;
+    if (!cardLayer || cardLayer.parentNode !== host) {
+      if (!cardLayer) { cardLayer = document.createElement('div'); cardLayer.className = 'board-cards'; }
+      host.appendChild(cardLayer);
+    }
+    var els = S.api.getSceneElements(), st = S.api.getAppState(), z = st.zoom.value, live = {};
+    var editing = st.editingTextElement && st.editingTextElement.containerId;
+    els.forEach(function (e) {
+      if (!B.isNote(e)) return;
+      live[e.id] = true;
+      var n = cards[e.id];
+      if (!n) {
+        n = cards[e.id] = document.createElement('div');
+        n.className = 'board-card';
+        n.appendChild(document.createElement('span'));
+        var b = document.createElement('button'); b.type = 'button';
+        b.addEventListener('pointerdown', function (ev) { ev.stopPropagation(); });
+        b.addEventListener('click', function (ev) { ev.stopPropagation(); voteFor(e.id); });
+        n.appendChild(b);
+        cardLayer.appendChild(n);
+      }
+      var votes = B.votesOn(els, e.id), mine = votes.some(function (x) { return x.customData.by === S.me.id; });
+      n.firstChild.textContent = e.customData.name || '';
+      var btn = n.lastChild;
+      btn.textContent = votes.length ? votes.length + (votes.length === 1 ? ' vote' : ' votes') : 'Vote';
+      btn.setAttribute('aria-pressed', String(mine));
+      btn.setAttribute('aria-label', (mine ? 'Take my vote back. ' : 'Vote for this. ') + votes.length + ' so far.');
+      btn.disabled = !canDraw();
+      btn.hidden = !canDraw() && !votes.length;
+      var s = Math.max(0.55, Math.min(1.25, z));
+      n.style.width = (e.width * z / s) + 'px';
+      n.style.transform = 'translate(' + ((e.x + st.scrollX) * z) + 'px,' + ((e.y + e.height + st.scrollY) * z + 10) + 'px) scale(' + s + ')';
+      n.style.visibility = editing === e.id || e.angle ? 'hidden' : '';
+    });
+    Object.keys(cards).forEach(function (id) { if (!live[id]) { cards[id].remove(); delete cards[id]; } });
+  }
+
+  // What the board offers beyond drawing, in the one menu the stage has too
+  // (it was all in the page's head, which the stage hides).
+  function menu() {
+    var X = S.X, M = X.MainMenu;
+    function item(key, label, fn) { return X.createElement(M.Item, { key: key, onSelect: fn }, label); }
+    var out = [item('fit', 'Show everything', function () { fit(S.api.getSceneElements(), true); })];
+    if (canDraw() && S.pages && S.pages.pick) out.push(item('pages', 'Add a PDF or pictures', function () { S.pages.pick(); }));
+    out.push(item('png', 'Download as a picture', function () { exportAs('png'); }), item('file', 'Download the board', function () { exportAs('excalidraw'); }));
+    out.push(X.createElement(M.Separator, { key: 's1' }), X.createElement(M.DefaultItems.SearchMenu, { key: 'find' }), X.createElement(M.DefaultItems.Help, { key: 'help' }));
+    if (canDraw()) out.push(X.createElement(M.DefaultItems.ChangeCanvasBackground, { key: 'bg' }));
+    if (S.teaching) out.push(X.createElement(M.Separator, { key: 's2' }),
+      item('lock', S.board.locked ? 'Unlock the board' : 'Lock the board', function () { $('[data-lock]').click(); }),
+      item('clear', 'Clear the board', function () { $('[data-clear]').click(); }));
+    return X.createElement(M, null, out);
   }
 
   function mount() {
@@ -317,6 +401,9 @@
     var existing = X.restoreElements(sceneOf(S.board), null);
     B.markSeen(S.seen, existing);
     B.markSeen(S.saved, existing);
+    // Notes from before they were one card become one, by anyone who may draw.
+    var up = canDraw() ? B.upgradeNotes(existing, Date.now()) : { changed: false };
+    if (up.changed) { S.upgraded = true; existing = settled(ready(up.elements)); }
     // A design scene's template (R5), laid only on a board that has never
     // had anything on it, by anyone who may draw. Its ids are fixed, so
     // two people opening the same empty board make one copy.
@@ -328,16 +415,17 @@
     new MutationObserver(render).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
     if (window.matchMedia) matchMedia('(prefers-color-scheme: dark)').addEventListener('change', render);
   }
-  function render() { if (S.reactRoot) S.reactRoot.render(S.X.createElement(S.X.Excalidraw, props())); }
+  function render() { if (S.reactRoot) S.reactRoot.render(S.X.createElement(S.X.Excalidraw, props(), menu())); }
   function sceneOf(board) { return (board && board.scene && board.scene.elements) || []; }
 
   function onChange(elements) {
     if (!S.api) return;
     if (S.pages) S.pages.sync(elements);
-    syncVote();
+    drawCardsSoon();
+    root.querySelector('.board-frame').classList.toggle('has-selection', Object.keys(S.api.getAppState().selectedElementIds || {}).length > 0);
     if (S.fitPending && S.api.scrollToContent && elements.some(function (e) { return !e.isDeleted; })) {
       S.fitPending = false;
-      setTimeout(function () { S.api.scrollToContent(S.api.getSceneElements(), { fitToViewport: true, maxZoom: 1, viewportZoomFactor: 0.8 }); }, 50);
+      setTimeout(function () { fit(S.api.getSceneElements()); }, 50);
     }
     var v = S.X.getSceneVersion(elements);
     var same = v === S.lastVersion;
@@ -356,20 +444,27 @@
   function hasUnsent(elements) { return B.unsent(B.syncable(elements), S.seen).length > 0; }
 
   // Elements from someone else, merged the way Excalidraw's own
-  // collaboration merges them. Marking them seen first keeps this page
-  // from sending them straight back.
+  // collaboration merges them. restoreElements is given no local copy, as
+  // there: with one, it raises an older element's version above the one here,
+  // so reading the saved board undid whatever was being resized (found
+  // November 24, 2026). Marking them seen first keeps this page from sending
+  // them straight back, and a message with nothing newer changes nothing.
   function applyRemote(remote) {
     if (!S.api || !remote || !remote.length) return;
     var X = S.X;
-    var local = S.api.getSceneElementsIncludingDeleted();
-    var restored = X.restoreElements(remote, local);
-    B.markSeen(S.seen, restored);
-    var merged = X.reconcileElements(local, restored, S.api.getAppState());
-    S.lastVersion = X.getSceneVersion(merged);
-    S.api.updateScene({ elements: merged, captureUpdate: X.CaptureUpdateAction.NEVER });
+    var local = S.api.getSceneElementsIncludingDeleted(), mine = {};
+    local.forEach(function (e) { mine[e.id] = e; });
+    B.markSeen(S.seen, remote);
+    var newer = remote.filter(function (r) { return r && r.id && !B.keepLocal(mine[r.id], r); });
+    if (newer.length) {
+      var merged = X.reconcileElements(local, X.restoreElements(newer, null), S.api.getAppState());
+      S.lastVersion = X.getSceneVersion(merged);
+      S.api.updateScene({ elements: merged, captureUpdate: X.CaptureUpdateAction.NEVER });
+      local = merged;
+    }
     // An edit of this page's own that the merge carried along still goes
     // to everyone and is saved.
-    if (canDraw() && hasUnsent(merged)) { sendScene(); saveSoon(); }
+    if (canDraw() && hasUnsent(local)) { sendScene(); saveSoon(); }
   }
 
   // ------------------------------------------------------------------
@@ -504,7 +599,7 @@
         applyRemote(sceneOf(r.data));
         B.markSeen(S.saved, sceneOf(r.data));
       }
-      if (was.locked !== r.data.locked) { render(); drawHead(); }
+      if (was.locked !== r.data.locked) { render(); drawHead(); drawNotes(); drawCardsSoon(); }
       syncLine();
     });
   }
@@ -571,6 +666,7 @@
     if (!S.api) return;
     var X = S.X;
     var elements = S.api.getSceneElements(), files = S.api.getFiles();
+    if (kind !== 'excalidraw') elements = X.restoreElements(B.forPicture(elements, Date.now()), null);
     var appState = Object.assign({}, S.api.getAppState(), { exportBackground: true, exportWithDarkMode: false });
     var name = B.fileName(S.cohort.slug, S.session, S.group && S.group.name, kind);
     if (kind === 'excalidraw') {

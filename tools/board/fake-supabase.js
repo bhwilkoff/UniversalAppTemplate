@@ -10,10 +10,13 @@
       select: function () { if (q.op !== 'update') q.op = 'select'; return b; },
       eq: function (c, v) { q.filters.push(['eq', c, v]); return b; },
       neq: function (c, v) { q.filters.push(['neq', c, v]); return b; },
+      is: function (c, v) { q.filters.push(['is', c, v]); return b; },
+      in: function (c, v) { q.filters.push(['in', c, v]); return b; },
       not: function (c, o, v) { q.filters.push(['not', c, v]); return b; },
       order: function () { return b; },
       limit: function () { return b; },
       gte: function () { return b; },
+      single: function () { q.single = true; return b; },
       update: function (v) { q.op = 'update'; q.values = v; return b; },
       maybeSingle: function () { q.single = true; return b; },
       then: function (ok, bad) { return window.__fakeDb(q).then(ok, bad); }
@@ -50,6 +53,8 @@
         },
         realtime: { setAuth: function () { return Promise.resolve(); } },
         from: query,
+        storage: { from: function () { return { list: function () { return Promise.resolve({ data: [] }); }, remove: function () { return Promise.resolve({}); }, createSignedUrl: function () { return Promise.resolve({ data: null, error: { message: 'stand-in' } }); } }; } },
+        functions: { invoke: function () { return Promise.resolve({ data: null, error: { message: 'stand-in' } }); } },
         rpc: function (name, args) { return window.__fakeDb({ rpc: name, args: args }); },
         channel: function (topic, opts) {
           var ch = { topic: topic, handlers: {}, presence: {}, connected: false, status: null, private: !!(opts && opts.config && opts.config.private) };

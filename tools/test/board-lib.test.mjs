@@ -167,43 +167,64 @@ test('a design stage template is the course’s words, laid once, with ids that 
   assert.ok(prompt.filter((e) => e.type === 'text').every((t) => t.width <= 380));
 });
 
-test('a note is one card with its words and its writer', () => {
-  const made = lib.noteElements({ id: 'n1', by: 'u1', name: 'Bea', text: 'An idea', x: 10, y: 20, now: 1 });
-  assert.equal(made.length, 3);
-  assert.equal(new Set(made.map((e) => e.groupIds[0])).size, 1);
-  assert.equal(made[0].type, 'rectangle');
-  assert.equal(made[1].text, 'An idea');
-  assert.equal(lib.noteAt(made, { 'n1-t': true }), 'n1');
-  assert.equal(lib.noteAt(made, { other: true }), null);
+test('a note is one card that holds its own words, so it resizes as one', () => {
+  const [card, words] = lib.noteElements({ id: 'n1', by: 'u1', name: 'Bea', text: 'An idea', x: 10, y: 20, now: 1 });
+  assert.equal(card.type, 'rectangle');
+  assert.equal(words.containerId, 'n1');
+  assert.deepEqual(card.boundElements, [{ type: 'text', id: words.id }]);
+  assert.deepEqual([card.groupIds, words.groupIds], [[], []]);
+  assert.equal(card.customData.name, 'Bea');
+  assert.equal(lib.isNote(card), true);
+  const [tall] = lib.noteElements({ id: 'n2', by: 'u1', text: 'word '.repeat(40), x: 0, y: 0, now: 1 });
+  assert.ok(tall.height > card.height);
+  const [grown, middle] = lib.settleNote(card, { ...words, width: 100, height: 300 });
+  assert.equal(grown.height, 324);
+  assert.equal(middle.y, 20 + 12);
 });
-
-test('each person has their own dot, so votes never overwrite', () => {
-  const card = lib.noteElements({ id: 'n1', by: 'u1', text: 'x', x: 0, y: 0, now: 1 });
+test('a note from before is made into one card, the same on every screen', () => {
+  const data = { note: 'n1', by: 'u1' }, base = { groupIds: ['note-n1'], version: 2, versionNonce: 5, isDeleted: false, width: 240, height: 160, x: 0, y: 0 };
+  const old = [
+    { ...base, id: 'n1', type: 'rectangle', customData: data },
+    { ...base, id: 'n1-t', type: 'text', text: 'An\nidea', originalText: 'An\nidea', fontSize: 20, customData: data },
+    { ...base, id: 'n1-n', type: 'text', text: 'Bea', originalText: 'Bea', customData: data },
+    { ...base, id: 'vote-n1-u2', type: 'ellipse', opacity: 100, customData: { vote: 'n1', by: 'u2' } },
+    { ...base, id: 'line', type: 'freedraw', groupIds: [] }
+  ];
+  const up = lib.upgradeNotes(old, 9), by = Object.fromEntries(up.elements.map((e) => [e.id, e]));
+  assert.equal(by['n1-t'].containerId, 'n1');
+  assert.equal(by['n1-t'].originalText, 'An idea');
+  assert.equal(by.n1.customData.name, 'Bea');
+  assert.equal(by['n1-n'].isDeleted, true);
+  assert.deepEqual([by['vote-n1-u2'].opacity, by['vote-n1-u2'].locked], [0, true]);
+  assert.equal(by.line, old[4]);
+  assert.deepEqual(lib.upgradeNotes(old, 9), up);
+  assert.equal(lib.upgradeNotes(up.elements, 10).changed, false);
+});
+test('each person has their own vote, so votes never overwrite, and none is drawn', () => {
+  const card = lib.noteElements({ id: 'n1', by: 'u1', name: 'Bea', text: 'x', x: 0, y: 0, now: 1 });
   const a = lib.voteDot({ note: 'n1', by: 'a', elements: card, now: 2 });
   const b = lib.voteDot({ note: 'n1', by: 'b', elements: card.concat([a]), now: 2 });
   assert.notEqual(a.id, b.id);
-  assert.notEqual(a.x, b.x);
-  assert.equal(lib.votesOn(card.concat([a, b]), 'n1').length, 2);
+  const all = card.concat([a, b]);
+  assert.equal(lib.votesOn(all, 'n1').length, 2);
+  assert.equal(lib.drawn(all).length, 2);
+  assert.equal(lib.forPicture(all, 3).pop().text, 'Bea, 2 votes');
   assert.equal(lib.voteDot({ note: 'gone', by: 'a', elements: card, now: 2 }), null);
 });
-
-test('a new note goes into the template frame in view, or the first, and stacks without hiding the last', () => {
+test('a new note goes into the template frame in view, or the first, and covers nothing', () => {
   const tpl = lib.templateElements('moves', 1);
   const frames = tpl.filter((e) => e.type === 'rectangle');
-  assert.equal(frames.length, 3);
-  // Mid-view between frames: the first frame (Write).
+  const inFrame = (f, p) => p.x > f.x && p.x < f.x + f.width && p.y > f.y;
   const first = lib.noteSpot(tpl, { x: -500, y: -500 });
-  assert.ok(first.x > frames[0].x && first.x < frames[0].x + frames[0].width && first.y > frames[0].y);
-  // The whole board in view, its middle on Play: still the first frame.
-  const wide = lib.noteSpot(tpl, { x: frames[1].x + 100, y: frames[1].y + 100, w: 1400 });
-  assert.ok(wide.x > frames[0].x && wide.x < frames[0].x + frames[0].width);
-  // Zoomed in on Play: there.
-  const play = lib.noteSpot(tpl, { x: frames[1].x + 100, y: frames[1].y + 100, w: 500 });
-  assert.ok(play.x > frames[1].x && play.x < frames[1].x + frames[1].width);
-  // A second note in the same frame sits lower and to the right.
-  const note = lib.noteElements({ id: 'n1', by: 'a', text: 'x', x: first.x, y: first.y, now: 1 });
-  const next = lib.noteSpot(tpl.concat(note), null);
-  assert.ok(next.x > first.x && next.y > first.y);
-  // No template: no spot, and the note goes mid-view.
-  assert.equal(lib.noteSpot(note, null), null);
+  assert.ok(inFrame(frames[0], first));
+  assert.ok(inFrame(frames[0], lib.noteSpot(tpl, { x: frames[1].x + 100, y: frames[1].y + 100, w: 1400 })));
+  assert.ok(inFrame(frames[1], lib.noteSpot(tpl, { x: frames[1].x + 100, y: frames[1].y + 100, w: 500 })));
+  for (const [start, v] of [[tpl, null], [[], { x: 0, y: 0, w: 900, h: 500 }]]) {
+    let els = start;
+    for (let i = 0; i < 4; i++) {
+      const p = lib.noteSpot(els, v);
+      for (const n of els.filter(lib.isNote)) assert.ok(p.x >= n.x + n.width || p.x + p.w <= n.x || p.y >= n.y + n.height || p.y + p.h <= n.y, 'covers a note');
+      els = els.concat(lib.noteElements({ id: 'n' + i, by: 'a', text: 'x', ...p, now: 1 }));
+    }
+  }
 });

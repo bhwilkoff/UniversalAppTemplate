@@ -155,7 +155,7 @@
     var addBtn = button('Add a PDF or pictures', function () { pick.click(); });
     box.appendChild(addBtn);
     box.appendChild(button('Fit everything on the board', function () {
-      var api = o.api(); if (api) api.scrollToContent(api.getSceneElements(), { fitToViewport: true, viewportZoomFactor: 0.9 });
+      var api = o.api(); if (api) api.scrollToContent(window.BoardLib ? window.BoardLib.drawn(api.getSceneElements()) : api.getSceneElements(), { fitToViewport: true, viewportZoomFactor: 0.9 });
     }));
 
     if (o.teaching) {
@@ -203,7 +203,7 @@
       addBtn.title = ok ? '' : 'The board is locked, so only a leader can add pages.';
     }
     canAdd();
-    return { sync: sync, refresh: canAdd };
+    return { sync: sync, refresh: canAdd, pick: function () { pick.click(); } };
   }
 
   window.BoardPages = { start: start };

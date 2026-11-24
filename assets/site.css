@@ -3122,11 +3122,29 @@ select:not([multiple]) {
 [data-view="scene"].has-board .stage-board:not([hidden]) { height: 100%; min-height: 0; border: 0; border-radius: 0; }
 [data-view="scene"].has-board .stage-board iframe { height: 100%; min-height: 0; }
 .stage-ready:has(.has-board:not([hidden])) .stage-reacts { display: none; }
-.board-notes:not([hidden]) { position: absolute; z-index: 6; left: 50%; bottom: 0.6rem; transform: translateX(-50%); display: flex; gap: 0.4rem; align-items: center; padding: 0.3rem; border-radius: 12px; background: var(--card); box-shadow: 0 2px 10px rgb(0 0 0 / 0.25); }
-.board-notes form { display: flex; gap: 0.3rem; margin: 0; }
-.board-notes input { width: min(16rem, 40vw); min-height: 40px; padding: 0.3rem 0.6rem; border: 1px solid var(--muted); border-radius: 10px; background: var(--card); color: var(--ink); font: inherit; font-size: 0.95rem; }
-.board-notes .btn-primary.small { color: var(--on-ink); }
-.board-notes .btn-secondary.small { color: var(--ink); white-space: nowrap; }
+.board-frame { position: relative; }
+/* Beside Excalidraw's own zoom and undo, never over them. */
+.board-notes:not([hidden]) { position: absolute; z-index: 6; left: 15.75rem; right: 4.25rem; bottom: 0.75rem; display: flex; justify-content: center; pointer-events: none; }
+.board-notes form { display: flex; gap: 0.3rem; margin: 0; width: min(24rem, 100%); padding: 0.25rem; border-radius: 12px; background: var(--card); box-shadow: 0 1px 6px rgb(0 0 0 / 0.18); pointer-events: auto; }
+.board-notes input { flex: 1; min-width: 0; min-height: 36px; padding: 0.25rem 0.6rem; border: 1px solid var(--muted); border-radius: 9px; background: var(--card); color: var(--ink); font: inherit; font-size: 0.95rem; }
+.board-notes .btn-primary.small { color: var(--on-ink); min-height: 36px; padding-block: 0.2rem; }
+/* Excalidraw's small layout keeps its tools along the bottom edge. */
+.board-frame:has(.excalidraw--mobile) .board-notes:not([hidden]) { left: 4.5rem; right: 7.5rem; bottom: 1.1rem; }
+.board-frame:has(.excalidraw--mobile) .board-notes form { box-shadow: none; }
+.board-frame.has-selection:has(.excalidraw--mobile) .board-notes { display: none; }
+/* A card's writer and votes, between the drawing and Excalidraw's tools. */
+.board-cards { position: absolute; inset: 0; z-index: 3; overflow: hidden; pointer-events: none; }
+.board-card { position: absolute; top: 0; left: 0; display: flex; align-items: center; justify-content: space-between; gap: 0.4rem; transform-origin: 0 0; font-family: var(--sans); font-size: 13px; line-height: 1.2; color: #4e5b55; }
+.board-card span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.board-card button { flex: none; min-height: 24px; padding: 1px 9px; border: 1px solid #1F4D3A; border-radius: 999px; background: #fff; color: #1F4D3A; font: inherit; font-weight: 600; cursor: pointer; pointer-events: auto; }
+.board-card button[aria-pressed="true"] { background: #1F4D3A; color: #fff; }
+.board-card button:disabled { opacity: 1; cursor: default; }
+.board-card button[hidden] { display: none; }
+.excalidraw.theme--dark .board-card { color: #c9d1cc; }
+/* On the stage, the tools explain themselves; their running hints sat over the drawing. */
+.board-stage .HintViewer { display: none; }
+/* A shelf of saved shapes means nothing in a session. */
+.board-canvas .default-sidebar-trigger { display: none; }
 .p2-ask { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.5rem 0.6rem; margin-bottom: 0.5rem; border-radius: 8px; background: rgb(168 199 250 / 0.14); font-size: 0.9rem; }
 .p2-state { margin: 0 0 0.4rem; font-size: 0.9rem; }
 .p2-ask > [role="status"]:not(:empty) { flex-basis: 100%; }
