@@ -53,6 +53,7 @@
         status('off');
         if (openedAt && window.RoomLib.steady(Date.now() - openedAt)) tries = 0;
         openedAt = 0;
+        if (window.RoomLib.refusedHere && window.RoomLib.refusedHere(tries, location.hostname, window.MEET_ADDON.rooms)) return;
         setTimeout(again, window.RoomLib.retryDelay(tries));
         tries += 1;
       };

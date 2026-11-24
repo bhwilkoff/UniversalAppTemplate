@@ -149,3 +149,11 @@ test('reconnecting waits at least a second, grows to a minute, and forgets failu
   assert.equal(R.steady(29999), false);
   assert.equal(R.steady(30000), true);
 });
+
+test('only a copy of the site on this computer stops asking the live rooms, after five tries', () => {
+  const live = 'https://humanshaped-rooms.benwilkoff.workers.dev';
+  assert.equal(R.refusedHere(5, 'localhost', live), true);
+  assert.equal(R.refusedHere(4, 'localhost', live), false);
+  assert.equal(R.refusedHere(500, 'humanshaped.org', live), false);
+  assert.equal(R.refusedHere(500, 'localhost', 'http://localhost:8787'), false);
+});

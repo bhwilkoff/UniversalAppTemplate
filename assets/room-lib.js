@@ -166,8 +166,14 @@
     return Math.round(Math.max(1000, Math.min(60000, base * (0.5 + (r == null ? Math.random() : r)))));
   }
   function steady(openMs) { return openMs >= 30000; }
+  // A copy of the site on this computer is refused by the live rooms (their
+  // ORIGINS), so it stops asking. One left open asked for hours (November 24, 2026).
+  function refusedHere(tries, pageHost, rooms) {
+    var local = /^(localhost|127\.0\.0\.1|\[::1\])$/;
+    return tries >= 5 && local.test(pageHost || '') && !local.test(new URL(rooms).hostname);
+  }
 
-  var lib = { retryDelay: retryDelay, steady: steady, CODE: CODE, TEMPLATE: TEMPLATE, STARTER: STARTER, code: code, codeOfSearch: codeOfSearch, link: link, socket: socket, repoOf: repoOf, siteOf: siteOf, pagesUrl: pagesUrl, pageFile: pageFile, commitUrl: commitUrl, rawUrl: rawUrl, editUrl: editUrl, assetBase: assetBase, withBase: withBase, titleOf: titleOf, deckBody: deckBody, stops: stops, stopAt: stopAt, nextStep: nextStep, people: people, here: here, toView: toView, frameMessage: frameMessage, readFrame: readFrame };
+  var lib = { retryDelay: retryDelay, steady: steady, refusedHere: refusedHere, CODE: CODE, TEMPLATE: TEMPLATE, STARTER: STARTER, code: code, codeOfSearch: codeOfSearch, link: link, socket: socket, repoOf: repoOf, siteOf: siteOf, pagesUrl: pagesUrl, pageFile: pageFile, commitUrl: commitUrl, rawUrl: rawUrl, editUrl: editUrl, assetBase: assetBase, withBase: withBase, titleOf: titleOf, deckBody: deckBody, stops: stops, stopAt: stopAt, nextStep: nextStep, people: people, here: here, toView: toView, frameMessage: frameMessage, readFrame: readFrame };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
   else root.RoomLib = lib;
 })(typeof globalThis !== 'undefined' ? globalThis : this);
