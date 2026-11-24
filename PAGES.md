@@ -168,6 +168,3 @@ Each line is work to do; remove it when the page matches its row.
   research/notes/audit-2026-10-21/ lists each one and the component
   (DESIGN-KIT.md, `assets/ui.js`) that replaces it.
 - The MCP server's words still say teacher and student in places.
-- `/signin-check/` is a temporary diagnostic page and should go once the
-  Safari sign-in hang is settled.
-- `/design/…` holds old design explorations at public addresses.

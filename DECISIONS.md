@@ -430,8 +430,8 @@ answering the principles."
 
 ## The home page's claim, the principles' grammar, and the arch (October 5, 2026, evening)
 
-Ben chose the first of the three tries in `design/round-3/` (the
-principles themselves as the picture) and changed its headline.
+Ben chose the first of three tries (the mockups left the site on November
+24, 2026, and are in the git history) (the principles themselves as the picture) and changed its headline.
 
 **The headline centers the builder.** "Apps that wear the builder's
 values on their sleeves." In Ben's words: "since we are talking about
@@ -1331,7 +1331,7 @@ refuses, the Accept button still leads to GitHub's own page.
 
 ## A leader can delete their account, and the cohort stays
 
-**Nothing a leader made for a cohort refuses their deletion or leaves with them; it only stops saying who.** Ben, November 24, 2026: "A leader should be able to delete their account, but the cohort should stay." **Why:** four references refused it, and five would have taken learners' things along: an exchange with everyone's videos in it, the time poll that holds the invitations, the question bank, announcements, and the notes learners were told are theirs. **How to apply:** a column that says who made a cohort's thing is nullable and `on delete set null`, its guard begins with `private.only_forgets`, and whatever reads the maker uses a left join ("A leader"). `private.leader_goes` deletes what belongs to no cohort, and gives a cohort nobody else leads to the longest-standing admin. Feedback a leader wrote still goes, as the privacy page says. Who made a cohort never changes by hand.
+**Nothing a leader made for a cohort refuses their deletion or leaves with them; it only stops saying who.** Ben, November 24, 2026: "A leader should be able to delete their account, but the cohort should stay." **Why:** four references refused it, and five would have taken learners' things along: an exchange with everyone's videos in it, the time poll that holds the invitations, the question bank, announcements, and the notes learners were told are theirs. **How to apply:** a column that says who made a cohort's thing is nullable and `on delete set null`, its guard begins with `private.only_forgets`, and whatever reads the maker uses a left join ("A leader"). `private.leader_goes` deletes what belongs to no cohort, and gives a cohort nobody else leads to Ben (the same day: "you should make me the leader of the cohort to preserve content"). Feedback a leader wrote still goes, as the privacy page says. Who made a cohort never changes by hand.
 
 ## A learner asks, and a leader decides
 

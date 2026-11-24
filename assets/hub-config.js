@@ -19,7 +19,8 @@ window.HUB = {
 // forever on sign-in checks. Each request to the hub's data and sign-in
 // gets 20 seconds, so a stalled one fails and is tried again rather than
 // holding up every check behind it; and the sign-in library's last steps
-// (names only, never tokens) are kept for /signin-check/ to show.
+// (names only, never tokens) are kept in memory: HUB.trace() shows
+// them in the console.
 (function () {
   var HUB = window.HUB, db = null, trace = [];
   var LIMIT = 20000;

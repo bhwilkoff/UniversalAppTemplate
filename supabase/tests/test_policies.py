@@ -3698,6 +3698,9 @@ def main():
     nia = new_account("nia", {"provider": "github"}, {"user_name": "nia", "provider_id": "7712"})
     ovi = new_account("ovi", {"provider": "github"}, {"user_name": "ovi", "provider_id": "7713"})
     su.execute("insert into public.teachers (user_id, invited_by) values (%s, %s), (%s, %s)", (mara, people["ben"], ovi, mara))
+    # An admin of longer standing than Ben, who is still not the one it goes to.
+    su.execute("update public.teachers set can_admin = true, created_at = '2020-01-01' where user_id = %s", (people["dee"],))
+    check("another admin has stood longer than Ben", su.rowcount == 1)
     def made_cohort(slug):
         attempt(as_user("mara"), "insert into public.cohorts (slug, title, created_by, status) values (%s, 'Mara', %s, 'open') returning id", (slug, mara))
         return last_rows[0][0]
@@ -3729,12 +3732,12 @@ def main():
     su.execute("select slug, created_by from public.cohorts where id in (%s, %s) order by slug", (alone, shared))
     check("both cohorts stay, without saying who made them", su.fetchall() == [("mara-alone", None), ("mara-shared", None)])
     su.execute("select user_id::text from public.cohort_teachers where cohort_id = %s", (alone,))
-    check("the cohort nobody else led has the hub's admin for a leader", su.fetchall() == [(people["ben"],)])
+    check("the cohort nobody else led has Ben for a leader", su.fetchall() == [(people["ben"],)])
     su.execute("select user_id::text from public.cohort_teachers where cohort_id = %s", (shared,))
     check("the cohort someone else leads stays theirs alone", su.fetchall() == [(ovi,)])
     su.execute("select invited_by from public.teachers where user_id = %s", (ovi,))
     check("a leader they invited still leads", su.fetchone() == (None,))
-    check("the admin now leads it: they can open its next session",
+    check("Ben now leads it: and can open its next session",
           attempt(as_user("ben"), "insert into public.sessions (cohort_id, number) values (%s, 2) returning id", (alone,)))
     check("the learner still has the cohort and its session",
           attempt(as_user("nia"), "select title from public.sessions where cohort_id = %s and number = 1", (alone,)) and last_rows == [("First",)])
@@ -3767,10 +3770,12 @@ def main():
     check("nor does a co-leader become the one who made it",
           attempt(as_user("ben"), "insert into public.cohort_teachers (cohort_id, user_id) values (%s, %s)", (cc, ovi))
           and not attempt(as_user("ovi"), "update public.cohorts set created_by = %s where id = %s returning 1", (ovi, cc)) and "keeps the person" in last_reason[0])
-    check("the last admin's own cohorts stay too",
+    check("Ben's own cohorts stay too",
           attempt(as_user("ben"), "select public.delete_my_account()") and not exists_user(people["ben"]))
     as_system(); su.execute("select count(*) from public.cohorts where id = %s", (alone,))
-    check("even with nobody left to lead them", su.fetchone() == (1,))
+    check("and what nobody else leads goes to the admin who is left", su.fetchone() == (1,))
+    su.execute("select user_id::text from public.cohort_teachers where cohort_id = %s", (alone,))
+    check("by name", su.fetchall() == [(people["dee"],)])
 
     conn.rollback()
     conn.close()
