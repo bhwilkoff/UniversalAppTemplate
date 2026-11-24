@@ -15,6 +15,20 @@ const here = dirname(fileURLToPath(import.meta.url));
 const pkg = JSON.parse(readFileSync(join(here, 'node_modules/@excalidraw/excalidraw/package.json'), 'utf8'));
 const out = join(here, '../../assets/vendor', 'excalidraw-' + pkg.version);
 
+// Excalidraw's phone layout (no styles, zoom, or people) starts at 730 wide, or
+// at 500 tall under 1000 wide. A laptop's Meet stage beside the panel is about
+// 816 by 460 (measured November 24, 2026), so those limits are lower here: a
+// phone still gets it, and a stage gets the whole board.
+const LIMITS = [/\bNE=730,FE=1e3,BE=500\b/, 'NE=560,FE=1e3,BE=320'];
+let patched = 0;
+const laptopStage = { name: 'laptop-stage', setup(b) {
+  b.onLoad({ filter: /@excalidraw[\\/]excalidraw[\\/]dist[\\/]prod[\\/].*\.js$/ }, (args) => {
+    let contents = readFileSync(args.path, 'utf8');
+    if (LIMITS[0].test(contents)) { contents = contents.replace(LIMITS[0], LIMITS[1]); patched++; }
+    return { contents, loader: 'js' };
+  });
+} };
+
 rmSync(out, { recursive: true, force: true });
 mkdirSync(out, { recursive: true });
 await build({
@@ -26,8 +40,10 @@ await build({
   outdir: out,
   define: { 'process.env.NODE_ENV': '"production"' },
   legalComments: 'none',
-  logLevel: 'warning'
+  logLevel: 'warning',
+  plugins: [laptopStage]
 });
+if (patched !== 1) throw new Error('Excalidraw’s phone-layout limits were not found (' + patched + '); read its constants again.');
 copyFileSync(join(here, 'node_modules/@excalidraw/excalidraw/dist/prod/index.css'), join(out, 'excalidraw.css'));
 const license = readFileSync(join(here, 'EXCALIDRAW-LICENSE.txt'), 'utf8');
 const react = readFileSync(join(here, 'node_modules/react/LICENSE'), 'utf8');

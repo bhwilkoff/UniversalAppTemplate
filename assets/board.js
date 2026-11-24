@@ -24,7 +24,7 @@
   var lib = window.CohortLib;
   var db = (window.HUB.client ? window.HUB.client() : window.supabase.createClient(window.HUB.url, window.HUB.key));
   var P = B.params(location.search);
-  var VENDOR = '/assets/vendor/excalidraw-0.18.1/excalidraw.js?v=20261124c';
+  var VENDOR = '/assets/vendor/excalidraw-0.18.1/excalidraw.js?v=20261124d';
   // Excalidraw's fonts, from the same version on jsDelivr (fixed files).
   window.EXCALIDRAW_ASSET_PATH = 'https://cdn.jsdelivr.net/npm/@excalidraw/excalidraw@0.18.1/dist/prod/';
   var POLL = 10000;
@@ -180,7 +180,7 @@
     if (S.X && !S.live) parts.push('Not live right now, so the board checks for changes every ten seconds.');
     else if (S.X && !P.stage) parts.push('Live with everyone on the board.');
     if (S.here.length > 1 && !P.stage) parts.push('Here now: ' + S.here.join(', ') + '.');
-    if (S.savedAt) parts.push('Saved at ' + S.savedAt.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) + '.');
+    if (S.savedAt && !P.stage) parts.push('Saved at ' + S.savedAt.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) + '.');
     status(parts.join(' '));
   }
 
@@ -272,9 +272,9 @@
   // Notes: what a class does most on a board.
   // What is in view, clear of the tools along its edges.
   function view() {
-    var st = S.api.getAppState(), z = st.zoom.value, wide = st.width >= 730;
+    var st = S.api.getAppState(), z = st.zoom.value;
     var small = !!$('[data-canvas]').querySelector('.excalidraw--mobile');
-    var l = wide && !small ? 232 : 12, r = small ? 44 : 24, t = 76, b = small ? 116 : 110;
+    var l = st.width >= 1000 ? 232 : 20, r = small ? 44 : 20, t = 76, b = small ? 116 : 100;
     return { x: (l + (st.width - l - r) / 2) / z - st.scrollX, y: (t + (st.height - t - b) / 2) / z - st.scrollY, w: (st.width - l - r) / z, h: (st.height - t - b) / z };
   }
   function fit(elements, animate) {

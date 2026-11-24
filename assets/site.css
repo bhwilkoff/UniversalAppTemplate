@@ -3133,8 +3133,20 @@ select:not([multiple]) {
 .board-frame:has(.excalidraw--mobile) .board-notes form { box-shadow: none; }
 .board-frame.has-selection:has(.excalidraw--mobile) .board-notes { display: none; }
 /* Excalidraw's own messages sit above the note bar, not on it. */
-.board-canvas .excalidraw .follow-mode__badge { bottom: 4rem; }
+.board-canvas .excalidraw .follow-mode__badge { margin-bottom: 4rem; }
 .board-canvas .excalidraw .Toast { bottom: 4.5rem; }
+/* With the board up, the whole stage is the board: reactions wait in the panel
+   and the lane above them closes, unless stances are open or a learner can ask. */
+.has-strip .stage-ready:has(.has-board:not([hidden])) .react-layer { border: 0; background: none; pointer-events: none; }
+.has-strip .stage-ready:has(.has-board:not([hidden])) [data-view="scene"].has-board:not([hidden]) { bottom: 0; }
+.has-strip .stage-ready:has(.has-board:not([hidden])):has(.stage-stance:not([hidden])) [data-view="scene"].has-board:not([hidden]) { bottom: var(--strip); }
+.has-strip .stage-ready:has(.has-board:not([hidden])):not(:has(.stage-stance:not([hidden]))) .stage-reacts { display: none; }
+/* On a laptop's stage the library is its picture alone. */
+@media (max-width: 62rem) {
+  .board-canvas .excalidraw .sidebar-trigger__label { display: none; }
+  /* Styles open on the right there, since notes fill from the left. */
+  .board-stage .excalidraw:not(.excalidraw--mobile) .selected-shape-actions .App-menu__left { position: fixed; top: 4.25rem; right: 0.75rem; left: auto; max-height: calc(100vh - 8.25rem) !important; }
+}
 /* A card's writer and votes, between the drawing and Excalidraw's tools. */
 .board-cards { position: absolute; inset: 0; z-index: 3; overflow: hidden; pointer-events: none; }
 .board-card { position: absolute; top: 0; left: 0; display: flex; align-items: center; justify-content: space-between; gap: 0.4rem; transform-origin: 0 0; font-family: var(--sans); font-size: 13px; line-height: 1.2; color: #4e5b55; }

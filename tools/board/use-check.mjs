@@ -7,7 +7,8 @@
 //   cd tools/board && npm ci && node use-check.mjs [screenshot folder]
 import { hub, live, check, until, open, shots, browser, server, results, pages, deliver, BoardLib, drawRect } from './stand-in.mjs';
 import { join } from 'node:path';
-const W = { width: 1000, height: 560 }, q = '?c=stand-in&s=week-1&view=stage&light';
+// A laptop's Meet stage beside the panel, measured November 24, 2026.
+const W = { width: 816, height: 460 }, q = '?c=stand-in&s=week-1&view=stage&light';
 const ben = await open('ben', q, W), bea = await open('bea', q, W);
 await until(async () => await live(ben) && await live(bea), 20000);
 const snap = async (p, n) => { if (shots) await p.screenshot({ path: join(shots, n + '.png') }); };
@@ -31,7 +32,8 @@ await snap(ben, 'notes');
 check('the note bar covers none of Excalidraw’s buttons', await ben.evaluate(() => { const b = document.querySelector('[data-notes] form').getBoundingClientRect(); return [...document.querySelectorAll('.excalidraw button')].filter((x) => !x.closest('.board-cards')).every((x) => { const r = x.getBoundingClientRect(); return !r.width || r.right <= b.left || r.left >= b.right || r.bottom <= b.top || r.top >= b.bottom; }); }));
 
 // The words as drawn: wider than the card means they spill out of it.
-check('the words are measured in the board’s own lettering', await ben.evaluate(() => { const c = document.createElement('canvas').getContext('2d'); c.font = '20px Excalifont'; return document.fonts.check('20px Excalifont') && window.__board.api.getSceneElements().filter((e) => e.containerId).every((t) => t.text.split('\n').every((l) => c.measureText(l).width <= 220)); }));
+check('the words are measured in the board’s own lettering', await ben.evaluate(() => { const c = document.createElement('canvas').getContext('2d'); c.font = '18px Excalifont'; return document.fonts.check('20px Excalifont') && window.__board.api.getSceneElements().filter((e) => e.containerId).every((t) => t.text.split('\n').every((l) => c.measureText(l).width <= 180)); }));
+await ben.evaluate(() => window.__board.api.updateScene({ appState: { scrollX: 90, scrollY: 40 } })); await ben.waitForTimeout(200);
 const id = ns[0].id, words = async (p) => (await els(p)).find((e) => e.box === id);
 async function resize(side, dx, dy) {
   await clear(ben); const c = await pick(ben, id);
@@ -48,7 +50,7 @@ for (const [side, dx, dy, ok] of [
   const [a, b] = await resize(side, dx, dy);
   check('a note resizes from its ' + side + ' side', ok(a, b) || (console.log(a.x, a.y, a.w, a.h, b.x, b.y, b.w, b.h), false)); if (!ok(a, b)) await snap(ben, 'fail-' + side);
 }
-check('resizing never stretches the words', (await words(ben)).fs === 20);
+check('resizing never stretches the words', (await words(ben)).fs === 18);
 check('the words stay inside the card', await (async () => { const t = await words(ben), c = await get(ben, id); return t.x >= c.x - 1 && t.x + t.w <= c.x + c.w + 1 && t.y >= c.y - 1 && t.y + t.h <= c.y + c.h + 1; })());
 check('the resized note is the same on the other screen', await same(id));
 await snap(ben, 'resized');
@@ -86,6 +88,7 @@ await snap(ben, 'resized');
 }
 // Votes.
 {
+  for (const p of [ben, bea]) { await clear(p); await p.evaluate(() => window.__board.api.scrollToContent(window.__board.api.getSceneElements(), { fitToViewport: true, maxZoom: 1, viewportZoomFactor: 0.6 })); await p.waitForTimeout(300); }
   const btn = (p) => p.locator('.board-card button').nth(0);
   await clear(ben);
   await btn(ben).click(); await bea.locator('.board-card button').nth(0).click();
@@ -111,25 +114,26 @@ await snap(ben, 'resized');
 }
 // Every tool.
 {
-  const box = await ben.locator('[data-canvas]').boundingBox(); let y = 120;
+  const box = await ben.locator('[data-canvas]').boundingBox(); let y = 74; for (const p of [ben, bea]) await p.evaluate(() => window.__board.api.updateScene({ appState: { scrollX: 60, scrollY: 900, zoom: { value: 1 } } })); await ben.waitForTimeout(200);
   for (const [key, type] of [['r', 'rectangle'], ['d', 'diamond'], ['o', 'ellipse'], ['a', 'arrow'], ['l', 'line'], ['p', 'freedraw']]) {
     const had = (await els(ben)).length; await clear(ben); await ben.locator('.excalidraw canvas.interactive').focus().catch(() => {});
     await ben.evaluate((t) => window.__board.api.setActiveTool({ type: t }), type);
-    await drag(ben, { x: box.x + box.width - 190, y: box.y + y }, { x: box.x + box.width - 120, y: box.y + y + 34 }); if (type === 'line' || type === 'arrow') await ben.keyboard.press('Escape'); y += 48;
+    await drag(ben, { x: box.x + 60, y: box.y + y }, { x: box.x + 130, y: box.y + y + 34 }); if (type === 'line' || type === 'arrow') await ben.keyboard.press('Escape'); y += 52;
     check('the ' + type + ' tool draws, and it reaches the other screen', await until(async () => (await els(ben)).length === had + 1 && (await els(bea)).length === had + 1 && (await els(bea)).some((e) => e.type === type), 4000));
   }
   await clear(ben); await ben.evaluate(() => window.__board.api.setActiveTool({ type: 'text' }));
-  await ben.mouse.click(box.x + box.width - 260, box.y + 100); await ben.waitForTimeout(150); await ben.keyboard.type('Typed'); await ben.keyboard.press('Escape');
+  await ben.mouse.click(box.x + 300, box.y + 130); await ben.waitForTimeout(150); await ben.keyboard.type('Typed'); await ben.keyboard.press('Escape');
   check('the text tool types, and it reaches the other screen', await until(async () => (await els(bea)).some((e) => e.text === 'Typed')));
   const target = (await els(ben)).find((e) => e.type === 'diamond'), p = await at(ben, target.x + target.w / 2, target.y + 1);
   await clear(ben); await ben.evaluate(() => window.__board.api.setActiveTool({ type: 'eraser' })); await drag(ben, { x: p.x - 14, y: p.y + 2 }, { x: p.x + 14, y: p.y + 6 });
   check('the eraser erases, on both screens', await until(async () => !(await els(bea)).some((e) => e.id === target.id), 4000));
-  await ben.evaluate(() => window.__board.api.setActiveTool({ type: 'frame' })); await drag(ben, { x: box.x + 240, y: box.y + 80 }, { x: box.x + 330, y: box.y + 130 });
+  await ben.evaluate(() => window.__board.api.setActiveTool({ type: 'frame' })); await drag(ben, { x: box.x + 400, y: box.y + 200 }, { x: box.x + 490, y: box.y + 250 });
   check('the frame tool draws, on both screens', await until(async () => (await els(bea)).some((e) => e.type === 'frame'), 4000));
   await ben.evaluate(() => window.__board.api.setActiveTool({ type: 'laser' })); await drag(ben, { x: box.x + 260, y: box.y + 200 }, { x: box.x + 360, y: box.y + 240 });
   check('the laser pointer shows on the other screen', await until(() => bea.evaluate(() => [...window.__board.api.getAppState().collaborators.values()].some((c) => c.pointer && c.pointer.tool === 'laser')), 4000));
   await ben.evaluate(() => window.__board.api.setActiveTool({ type: 'selection' }));
   // An arrow tied to a card follows it.
+  await ben.evaluate(() => { const a = window.__board.api; a.scrollToContent(a.getSceneElements().filter((e) => e.customData && e.customData.note), { fitToViewport: true, maxZoom: 1, viewportZoomFactor: 0.5 }); }); await ben.waitForTimeout(300);
   const a = await get(ben, id), b = (await notes(ben)).find((n) => n.id !== id);
   await clear(ben); await ben.evaluate(() => window.__board.api.setActiveTool({ type: 'arrow' }));
   await drag(ben, await at(ben, a.x + a.w + 4, a.y + a.h / 2), await at(ben, b.x + b.w / 2, b.y - 4)); await ben.keyboard.press('Escape');
@@ -164,7 +168,7 @@ await ben.evaluate(() => window.__board.api.updateScene({ appState: { zoom: { va
   check('two people opening it settle on the same copy', await until(async () => JSON.stringify(await els(p)) === JSON.stringify(await els(p2)), 12000));
 }
 // Small stage (a laptop beside the panel) and dark.
-for (const [n, w, h, extra] of [['small', 700, 400, ''], ['laptop', 860, 480, ''], ['dark', 1000, 560, '&dark']]) {
+for (const [n, w, h, extra] of [['phone', 390, 600, ''], ['large', 1300, 720, ''], ['dark', 816, 460, '&dark']]) {
   const p = await open('bea', q.replace('&light', extra || '&light'), { width: w, height: h }); await until(() => live(p), 20000); await p.waitForTimeout(1200); await snap(p, n); pages.delete(p); await p.context().close();
 }
 check('no page threw an error', [...pages.values()].every((i) => !i.errors.length) || (console.log([...pages.values()].map((i) => i.errors)), false));

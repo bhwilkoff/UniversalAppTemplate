@@ -178,8 +178,8 @@ test('a note is one card that holds its own words, so it resizes as one', () => 
   const [tall] = lib.noteElements({ id: 'n2', by: 'u1', text: 'word '.repeat(40), x: 0, y: 0, now: 1 });
   assert.ok(tall.height > card.height);
   const [grown, middle] = lib.settleNote(card, { ...words, width: 100, height: 300 });
-  assert.equal(grown.height, 324);
-  assert.equal(middle.y, 20 + 12);
+  assert.equal(grown.height, 320);
+  assert.equal(middle.y, 20 + 10);
 });
 test('a note from before is made into one card, the same on every screen', () => {
   const data = { note: 'n1', by: 'u1' }, base = { groupIds: ['note-n1'], version: 2, versionNonce: 5, isDeleted: false, width: 240, height: 160, x: 0, y: 0 };

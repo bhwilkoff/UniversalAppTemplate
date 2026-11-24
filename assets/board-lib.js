@@ -178,7 +178,8 @@
   // resize cards"). It was a card, its words, and its writer's name grouped as
   // three shapes, which Excalidraw can only stretch together. The name and the
   // votes are drawn over the card by the page, so nothing rides in a group.
-  var NOTE_W = 220, NOTE_H = 120, IN_FRAME = { w: 180, h: 90 }, PAD = 12;
+  // Six fit on a laptop's Meet stage (816 by 460) at life size.
+  var NOTE_W = 180, NOTE_H = 90, IN_FRAME = { w: 180, h: 90 }, PAD = 10, SIZE = 18;
   var NOTE_COLORS = ['#FFE08A', '#B7E4C7', '#DCC4F0', '#A9D6F5', '#F9C5B5', '#E6E6A8'];
   function noteColor(id) {
     var h = 0;
@@ -192,17 +193,23 @@
       seed: 1, version: 1, versionNonce: 1, isDeleted: false, boundElements: null, updated: now, link: null, locked: false
     }, extra || {});
   }
+  // A card's edge, a darker shade of it, so two of one color stay two.
+  function edge(hex) {
+    var m = /^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(hex || '');
+    if (!m) return '#1e1e1e';
+    return '#' + [m[1], m[2], m[3]].map(function (x) { return ('0' + Math.round(parseInt(x, 16) * 0.72).toString(16)).slice(-2); }).join('');
+  }
   function noteElements(o) {
     var id = o.id, W = o.w || NOTE_W, H = o.h || NOTE_H, said = String(o.text).slice(0, 200);
-    var lines = wrap(said, Math.max(4, Math.floor((W - 2 * PAD) / 11))), th = lines.length * 25;
+    var lines = wrap(said, Math.max(4, Math.floor((W - 2 * PAD) / (SIZE * 0.55)))), th = lines.length * SIZE * 1.25;
     H = Math.max(H, th + 2 * PAD);
     return [
       shape('rectangle', id, o.x, o.y, W, H, o.now, {
-        backgroundColor: o.color || noteColor(o.by), strokeColor: 'transparent', boundElements: [{ type: 'text', id: id + '-t' }],
+        backgroundColor: o.color || noteColor(o.by), strokeColor: edge(o.color || noteColor(o.by)), boundElements: [{ type: 'text', id: id + '-t' }],
         customData: { note: id, by: o.by, name: String(o.name || '').slice(0, 40) }
       }),
       shape('text', id + '-t', o.x + PAD, o.y + (H - th) / 2, W - 2 * PAD, th, o.now, {
-        text: said, originalText: said, fontSize: 20, fontFamily: 5, textAlign: 'center', verticalAlign: 'middle',
+        text: said, originalText: said, fontSize: SIZE, fontFamily: 5, textAlign: 'center', verticalAlign: 'middle',
         containerId: id, autoResize: true, lineHeight: 1.25
       })
     ];
@@ -248,7 +255,9 @@
   // then that one. With no template, the free place nearest the middle of view.
   function overlaps(e, x, y, w, h) {
     var l = Math.min(e.x, e.x + e.width), t = Math.min(e.y, e.y + e.height);
-    return x < l + Math.abs(e.width) && x + w > l && y < t + Math.abs(e.height) + 8 && y + h + 8 > t;
+    // A note's name and votes sit under it, so its place is that much taller.
+    var under = isNote(e) ? 38 : 8;
+    return x < l + Math.abs(e.width) && x + w > l && y < t + Math.abs(e.height) + under && y + h + 8 > t;
   }
   function noteSpot(elements, view) {
     var shown = (elements || []).filter(function (e) { return !e.isDeleted; });
@@ -261,21 +270,20 @@
       var close = view && view.w && view.w < frames[0].width * 2;
       var f = (close && frames.filter(function (r) { return inside(r, view.x, view.y); })[0]) || frames[0];
       var w = IN_FRAME.w, h = IN_FRAME.h;
-      for (var y = f.y + 96; y + h <= f.y + f.height; y += h + 36) {
+      for (var y = f.y + 96; y + h <= f.y + f.height; y += h + 40) {
         for (var x = f.x + 20; x + w <= f.x + f.width; x += w + 16) if (free(x, y, w, h)) return { x: x, y: y, w: w, h: h };
       }
       var k = taken.filter(function (e) { return isNote(e) && inside(f, e.x + e.width / 2, e.y + e.height / 2); }).length;
       return { x: f.x + 30 + (k % 6) * 26, y: f.y + 110 + (k % 6) * 22, w: w, h: h };
     }
-    var W = NOTE_W, H = NOTE_H, sx = W + 24, sy = H + 52, mid = view || { x: 0, y: 0 }, best = null, far = Infinity;
-    // In line with the notes already there, so a class's notes make rows.
+    // Read like a page: from the top left of what is in view, a row at a time,
+    // in line with the notes already there, and below when the view is full.
+    var W = NOTE_W, H = NOTE_H, sx = W + 20, sy = H + 46, mid = view || { x: 0, y: 0, w: 4 * sx, h: 3 * sy };
+    var vw = mid.w || 4 * sx, vh = mid.h || 3 * sy, left = mid.x - vw / 2, top = mid.y - vh / 2, best = null, far = Infinity;
     var first = shown.filter(isNote)[0];
-    var ox = first ? first.x + W / 2 + Math.round((mid.x - first.x - W / 2) / sx) * sx : mid.x, oy = first ? first.y + H / 2 + Math.round((mid.y - first.y - H / 2) / sy) * sy : mid.y;
-    for (var r = -12; r <= 12; r++) for (var c = -12; c <= 12; c++) {
-      var cx = ox + c * sx, cy = oy + r * sy, px = cx - W / 2, py = cy - H / 2;
-      // Places in view first, then the nearest.
-      var out = view && view.w && (Math.abs(cx - mid.x) + W / 2 > view.w / 2 || Math.abs(cy - mid.y) + H / 2 > (view.h || view.w) / 2);
-      var d = Math.hypot(cx - mid.x, cy - mid.y) + (out ? 1e6 : 0);
+    var ox = first ? first.x + Math.ceil((left - first.x) / sx) * sx : left, oy = first ? first.y + Math.ceil((top - first.y) / sy) * sy : top;
+    for (var r = 0; r < 30; r++) for (var c = 0; c < Math.max(1, Math.floor((left + vw - ox + 20) / sx)); c++) {
+      var px = ox + c * sx, py = oy + r * sy, d = r * 1000 + c;
       if (d < far && free(px, py, W, H)) { far = d; best = { x: px, y: py, w: W, h: H }; }
     }
     return best || { x: mid.x - W / 2, y: mid.y - H / 2, w: W, h: H };
