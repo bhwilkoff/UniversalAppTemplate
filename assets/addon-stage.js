@@ -305,9 +305,9 @@
     shownKey = key;
     var svg = deckSlides[at] || '';
     if (d.shown) { try { svg = kit().frame(d.text, at, d.shown); } catch (e) {} }
-    // A slide that moves is drawn in 3D on this stage (assets/motion-kit.js);
+    // A kinetic slide is drawn in 3D on this stage (assets/kinetic-kit.js);
     // where it cannot be, the same slide stays still.
-    var moving = !!window.MotionKit && window.MotionKit.show(box, d.text, at, d.shown, svg);
+    var moving = !!window.KineticKit && window.KineticKit.show(box, d.text, at, d.shown, svg);
     if (!moving) box.innerHTML = svg;
     box.setAttribute('aria-label', (deckWords[at] || []).join('. '));
     var who = $('[data-slide-who]'), names = Array.isArray(d.who) ? d.who : [];
@@ -491,7 +491,7 @@
   function leaderSlide() { return !!view && view.mode === 'slides' && !view.learner && !room && !!stageClient && !document.documentElement.classList.contains('stage-in-panel'); }
   function wordsAt(ev) {
     if (!leaderSlide()) return null;
-    if ($('[data-slide]').querySelector('.motion')) return { x: 0, y: 0 };
+    if ($('[data-slide]').querySelector('.kinetic')) return { x: 0, y: 0 };
     var svg = $('[data-slide]').querySelector('svg');
     if (!svg) return null;
     var pad = 8, hit = Array.prototype.some.call(svg.querySelectorAll('text'), function (t) {

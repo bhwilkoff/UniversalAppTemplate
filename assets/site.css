@@ -1358,17 +1358,37 @@ body.addon-body { min-height: 100vh; }
 .stage-slide-frame.is-new svg { animation: stage-slide-in 220ms ease-out; }
 @keyframes stage-slide-in { from { opacity: 0; } to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .stage-slide-frame.is-new svg { animation: none; } }
-/* A slide that moves (assets/motion-kit.js): the still slide's paper and
+/* A kinetic slide (assets/kinetic-kit.js): the still slide's paper and
    headline under a 3D canvas, both fitted to the slide's own shape. */
-.motion { position: absolute; inset: 0; display: grid; place-items: center; }
-.motion-frame { position: relative; }
-.stage-slide-frame .motion-still svg, .motion-still svg, .motion-canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
-.motion-canvas[hidden] { display: none; }
-.stage-slide-frame.is-new .motion-still svg { animation: none; }
-.stage-slide-frame.is-new .motion { animation: stage-slide-in 220ms ease-out; }
-@media (prefers-reduced-motion: reduce) { .stage-slide-frame.is-new .motion { animation: none; } }
+.kinetic { position: absolute; inset: 0; display: grid; place-items: center; }
+.kinetic-frame { position: relative; }
+.stage-slide-frame .kinetic-still svg, .kinetic-still svg, .kinetic-canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
+.kinetic-canvas[hidden] { display: none; }
+.kinetic-top { position: absolute; inset: 0; pointer-events: none; }
+.stage-slide-frame .kinetic-top svg, .kinetic-top svg { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
+.kinetic-canvas[hidden] + .kinetic-top { display: none; }
+.stage-slide-frame.is-new .kinetic-still svg { animation: none; }
+.stage-slide-frame.is-new .kinetic { animation: stage-slide-in 220ms ease-out; }
+@media (prefers-reduced-motion: reduce) { .stage-slide-frame.is-new .kinetic { animation: none; } }
 .studio-play-art { position: relative; }
-.studio-play-art .motion-still svg { width: 100%; height: 100%; }
+.studio-play-art .kinetic-still svg { width: 100%; height: 100%; }
+.studio-kinetic { display: grid; gap: 0.5rem; }
+.kinetic-kinds { display: grid; grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr)); gap: 0.4rem; }
+.kinetic-kind { all: unset; box-sizing: border-box; display: grid; gap: 0.25rem; padding: 0.3rem; border-radius: 8px; cursor: pointer; font-size: 0.75rem; line-height: 1.25; color: var(--muted, #C1CAC5); outline: 2px solid transparent; }
+.kinetic-kind img { display: block; width: 100%; aspect-ratio: 8 / 5; object-fit: cover; border-radius: 5px; background: #1B2320; }
+.kinetic-kind:hover, .kinetic-kind:focus-visible { outline-color: var(--rule, #3A4540); }
+.kinetic-kind[aria-checked="true"] { outline-color: var(--accent, #DCC4F0); color: var(--ink, #E8EDEA); }
+.kinetic-when { margin: 0; }
+.kinetic-now { display: grid; grid-template-columns: 5rem 1fr; gap: 0.6rem; align-items: center; cursor: pointer; list-style: none; padding: 0.3rem; border-radius: 8px; }
+.kinetic-now::-webkit-details-marker { display: none; }
+.kinetic-now:hover, .kinetic-now:focus-visible { background: var(--rule, #28302C); }
+.kinetic-now img { width: 100%; aspect-ratio: 8 / 5; object-fit: cover; border-radius: 5px; }
+.kinetic-now > span { display: grid; gap: 0.1rem; }
+.kinetic-fold[open] .kinetic-kinds { margin-top: 0.4rem; }
+.kinetic-points { list-style: decimal; margin: 0; padding-left: 1.4rem; display: grid; gap: 0.5rem; }
+.kinetic-point { display: grid; gap: 0.3rem; }
+.kinetic-point-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem; }
+.kinetic-point-pic { width: 3rem; height: 2rem; object-fit: cover; border-radius: 4px; }
 .addon-stage .stage-head { position: relative; z-index: 1; }
 .stage-ready:has(.stage-slide:not([hidden])) .addon-mark { visibility: hidden; }
 .stage-board iframe { display: block; width: 100%; height: 100%; min-height: 60vh; border: 0; }

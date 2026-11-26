@@ -178,7 +178,7 @@
 
   // A table, chart, or diagram on a slide: where it sits, and its text.
   function block(lines) {
-    var from = lines.findIndex(function (l) { return /^```\s*(sheet|diagram|github|motion)\b/.test(l); });
+    var from = lines.findIndex(function (l) { return /^```\s*(sheet|diagram|github|kinetic|motion)\b/.test(l); });
     if (from < 0) return null;
     var to = from + 1;
     while (to < lines.length && !/^```/.test(lines[to])) to += 1;
@@ -191,16 +191,38 @@
     a.splice.apply(a, [b.from + 1, b.to - b.from - 1].concat(String(body).split('\n')));
     return a;
   }
-  // A moving slide's kind, set in its fence's head.
-  function setMotionKind(body, kind) {
+  // A kinetic slide's kind, set in its fence's head.
+  function setKineticKind(body, kind) {
     var head = /^---\n([\s\S]*?)\n---(\n|$)/.exec(body);
     if (!head) return '---\nkind: ' + kind + '\n---\n' + body;
     var inner = /^kind:/m.test(head[1]) ? head[1].replace(/^kind:.*$/m, 'kind: ' + kind) : head[1] + '\nkind: ' + kind;
     return '---\n' + inner + '\n---' + head[2] + body.slice(head[0].length);
   }
-  // A slide made to move: its own points become the moving points, so nothing
+  // A kinetic fence's points, each its words and maybe a picture, and back.
+  function kineticPoints(body) {
+    var head = /^---\n[\s\S]*?\n---\n?/.exec(body), rest = head ? body.slice(head[0].length) : body;
+    return rest.split('\n').map(function (l) { var m = POINT.exec(l); return m && m[2].trim() ? L.pointOf(m[2].trim()) : null; }).filter(Boolean);
+  }
+  function setKineticPoints(body, points) {
+    var head = /^---\n[\s\S]*?\n---\n?/.exec(body);
+    var out = points.map(function (p) {
+      var words = String(p.words || '').replace(/\s*\n\s*/g, ' ').trim();
+      var pic = p.picture && p.picture.url ? ' ![' + String(p.picture.alt || words).replace(/[\[\]]/g, '') + '](' + p.picture.url + ')' : '';
+      return '- ' + (words || 'A point') + pic;
+    });
+    return (head ? head[0].replace(/\n?$/, '\n') : '') + out.join('\n');
+  }
+  // A kinetic slide made plain again: its points become the slide's points.
+  function makeStill(lines) {
+    var b = block(lines);
+    if (!b || !/^(kinetic|motion)$/.test(b.app)) return lines;
+    var a = lines.slice(), pts = kineticPoints(b.body).map(function (p) { return '- ' + p.words; });
+    a.splice.apply(a, [b.from, b.to - b.from + 1].concat(pts));
+    return a;
+  }
+  // A slide made kinetic: its own points become the kinetic points, so nothing
   // the leader wrote is lost; a slide with no points gets three to write over.
-  function makeMoving(lines, fence) {
+  function makeKinetic(lines, fence) {
     var points = [], kept = [], notes = [];
     lines.forEach(function (l) {
       var m = POINT.exec(l);
@@ -258,7 +280,7 @@
   var lib = { slides: slides, join: join, pieces: pieces, editable: editable, setWords: setWords, addAfter: addAfter, remove: remove,
     plain: plain, match: match, LAYOUTS: LAYOUTS, layoutOf: layoutOf, setLayout: setLayout, revealed: revealed,
     setRevealed: setRevealed, iconOf: iconOf, setIcon: setIcon, noteOf: noteOf, setNote: setNote, block: block, setBlock: setBlock,
-    grid: grid, ungrid: ungrid, setMotionKind: setMotionKind, makeMoving: makeMoving, outline: outline, setOutline: setOutline, even: even, move: move,
+    grid: grid, ungrid: ungrid, setKineticKind: setKineticKind, makeKinetic: makeKinetic, kineticPoints: kineticPoints, setKineticPoints: setKineticPoints, makeStill: makeStill, outline: outline, setOutline: setOutline, even: even, move: move,
     picture: picture, setPicture: setPicture, removePicture: removePicture };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
   else root.SlideModel = lib;

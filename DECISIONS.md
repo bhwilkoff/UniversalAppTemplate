@@ -1517,50 +1517,64 @@ blank page becomes a place to write), so nobody needs access to another
 organization's Drive. Course Builder's template lines ("[Useful for: ...]",
 "[do a subsequent task]", "n/a") leave leaders' notes on import.
 
-## Slides that move (November 26, 2026)
+## Kinetic slides (November 26, 2026)
 
-**A slide can move: a `motion` fence names how its points arrive (blocks stack
-up, cards land in a pile, or cards come forward), and each point is one step of
-the deck the leader already walks with Next.** Ben, November 26, 2026: "I'd like
-to make the presentations that are possible within the Google meet add-on and on
-humanshaped.org, like these", pointing at a deck where every slide is a 3D
-scene, with a builder spec, "but please make use of the repository to make sure
-that what we build fits within our overall scope."
+**A slide can be kinetic: a `kinetic` fence names how its points arrive, out of
+twelve kinds, and each point is one step of the deck the leader already walks
+with Next.** Ben, November 26, 2026: "I'd like to make the presentations that
+are possible within the Google meet add-on and on humanshaped.org, like these",
+pointing at a deck where every slide is a 3D scene, with a builder spec, "but
+please make use of the repository to make sure that what we build fits within
+our overall scope." Then: "The slides should be called 'Kinetic' slides. I'd
+like you to develop at least 10 different types ... I'd like to be able to add
+images if possible at some point."
 
 **Why:** the spec proposed a second system: deck files in GitHub, a new editor
 with a GitHub token, a new sync channel, and a privately published add-on. The
 site already has each of those things in its own form. Decks are database rows
 edited in the slide studio, every stage already follows one shared position
 (slide and step), Meet's co-doing client is refused to add-ons (measured
-November 7), and the add-on is public. So a moving slide is one more block in
+November 7), and the add-on is public. So a kinetic slide is one more block in
 the deck we have: nothing new is sent through a call, a late joiner's stage opens
 with the pieces already in place, and a leader writes it the way they write a
-table or a diagram. A small library of kinds, each saying something (building
-up, piling up, one question at a time), serves understanding better than a new
-spectacle for every talk, which is the spec's own argument for templates.
+table or a diagram. Each kind says something about how its points relate
+(built up, piled up, one at a time, in turn, in order, in a cycle, one causing
+the next, rising, narrowing, growing, in time, said large), which serves
+understanding better than a new spectacle for every talk, the spec's own
+argument for a library of templates. The kinds take their metaphors from the
+reference deck and from common visual ones; nothing of that deck's code, art, or
+words is used.
 
 **How to apply:** the text is
 
-    ```motion
+    ```kinetic
     ---
-    kind: stack | pile | forward
+    kind: stack | pile | forward | spotlight | path | loop | dominoes | stairs | target | grow | timeline | gather
     ---
     - One point
-    - The next point
+    - A point with a picture ![what it shows](https://...)
+    - When: a timeline point puts its "when" on the line
     ```
 
-with at most eight points. `SlidesLib.motionOf` reads it and `frames` stops at
-each point. The stage draws it with `assets/motion-kit.js`, which loads three.js
-(vendored, `assets/vendor/three-0.170.0`, MIT) only when a moving slide is
-showing, keeps one WebGL context per stage, honors reduced motion by placing
-each piece without moving it, and plays no sound. Every other place a slide is
-drawn (thumbnails, the corner of an app, the session page, a device without
-WebGL 2, a lost context) gets `SlidesLib.still`: the headline and the points as
-an ordinary point-by-point slide, so the fallback is the same slide, not a
-picture of it. Every drawing of a deck goes through `SlidesLib.kit(DeckKit)`;
-calling the deck kit directly would draw a moving slide as a code block. In the
-studio, Moving under "Add to this slide" turns the slide's own points into the
-moving points, and Play shows them moving. A new kind is a function in
-`KINDS` in motion-kit.js and a row in `MOTION_KINDS`; look at it with
-`node tools/motion/look.mjs <folder>` before it ships. Not yet checked: a real
-Meet call, Safari, and a low-end Chromebook.
+with at most eight points (`SlidesLib.KINETIC_KINDS` names each kind and when to
+use it). The first slides used the fence name `motion`, which still reads.
+`SlidesLib.kineticOf` reads it and `frames` stops at each point. The stage draws
+it with `assets/kinetic-kit.js`, which loads three.js (vendored,
+`assets/vendor/three-0.170.0`, MIT) only when a kinetic slide is showing, keeps
+one WebGL context per stage, honors reduced motion by placing each piece without
+moving it, announces each new point to screen readers, and plays no sound.
+Pictures are drawn on the card of the kinds that have cards, and only from hosts
+that allow it (CORS: Supabase storage and humanshaped.org do); one that fails
+leaves the words. Every other place a slide is drawn (thumbnails, the corner of
+an app, the session page, a device without WebGL 2, a lost context) gets
+`SlidesLib.still`: the headline and the points as an ordinary point-by-point
+slide, so the fallback is the same slide, not a picture of it. Every drawing of a
+deck goes through `SlidesLib.kit(DeckKit)`; calling the deck kit directly would
+draw a kinetic slide as a code block. In the studio, Kinetic under "Add to this
+slide" turns the slide's own points into kinetic points; the side shows each
+kind as a picture (`assets/kinetic/<kind>.png`, made by `look.mjs --thumbs`) and
+each point as a row with its picture, Up, and Remove; Play shows it moving. A new
+kind is a function in `KINDS` in kinetic-kit.js and a row in `KINETIC_KINDS`;
+look at it with `node tools/motion/look.mjs <folder>` before it ships, which
+draws every kind at every step, stepping back, with one point and eight, and
+with a picture.

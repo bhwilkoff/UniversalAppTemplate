@@ -146,16 +146,31 @@ test('a slide holds one picture: added before the notes, kept out of the words, 
   assert.equal(M.picture(['![x](http://x.org/p.jpg)']), null);
 });
 
-test('a moving slide is a block, and its kind changes in its head', () => {
-  const lines = M.slides('## A\n\n```motion\n---\nkind: stack\n---\n- One\n```')[0];
+test('a kinetic slide is a block, and its kind changes in its head', () => {
+  const lines = M.slides('## A\n\n```kinetic\n---\nkind: stack\n---\n- One\n```')[0];
   const b = M.block(lines);
-  assert.equal(b.app, 'motion');
-  assert.equal(M.setMotionKind(b.body, 'forward'), '---\nkind: forward\n---\n- One');
-  assert.equal(M.setMotionKind('- One', 'pile'), '---\nkind: pile\n---\n- One');
+  assert.equal(b.app, 'kinetic');
+  assert.equal(M.setKineticKind(b.body, 'forward'), '---\nkind: forward\n---\n- One');
+  assert.equal(M.setKineticKind('- One', 'pile'), '---\nkind: pile\n---\n- One');
 });
-test('making a slide move keeps its points as the moving points', () => {
-  const fence = ['```motion', '---', 'kind: stack', '---', '- The first piece', '```'];
-  const out = M.makeMoving(['## A', '', '- Mine', '- Also mine', '', '> note'], fence);
-  assert.deepEqual(out, ['## A', '', '```motion', '---', 'kind: stack', '---', '- Mine', '- Also mine', '```', '', '> note']);
-  assert.deepEqual(M.makeMoving(['## A'], fence), ['## A', ''].concat(fence));
+test('making a slide kinetic keeps its points as the kinetic points', () => {
+  const fence = ['```kinetic', '---', 'kind: stack', '---', '- The first piece', '```'];
+  const out = M.makeKinetic(['## A', '', '- Mine', '- Also mine', '', '> note'], fence);
+  assert.deepEqual(out, ['## A', '', '```kinetic', '---', 'kind: stack', '---', '- Mine', '- Also mine', '```', '', '> note']);
+  assert.deepEqual(M.makeKinetic(['## A'], fence), ['## A', ''].concat(fence));
+});
+test('a kinetic slide\'s points come out as rows and go back with their pictures', () => {
+  const body = '---\nkind: pile\n---\n- One\n- Two ![A sketch](https://e.org/a.png)';
+  const pts = M.kineticPoints(body);
+  assert.deepEqual(pts.map((p) => p.words), ['One', 'Two']);
+  assert.equal(M.setKineticPoints(body, pts), body);
+  pts[0].picture = { url: 'https://e.org/b.png', alt: 'One [x]' };
+  pts.push({ words: '  Three\nlines ', picture: null });
+  assert.equal(M.setKineticPoints(body, pts), '---\nkind: pile\n---\n- One ![One x](https://e.org/b.png)\n- Two ![A sketch](https://e.org/a.png)\n- Three lines');
+});
+
+test('a kinetic slide made plain keeps its points, in order, and its notes', () => {
+  const lines = M.slides('## A\n\n```kinetic\n---\nkind: loop\n---\n- One ![x](https://e.org/x.png)\n- Two\n```\n\n> note')[0];
+  assert.deepEqual(M.makeStill(lines), ['## A', '', '- One', '- Two', '', '> note']);
+  assert.deepEqual(M.makeStill(['## A', '- b']), ['## A', '- b']);
 });

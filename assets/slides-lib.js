@@ -39,46 +39,64 @@
     });
     return n;
   }
-  // A slide that moves (DECISIONS.md, "Slides that move"): a fence naming how
-  // its points arrive, each point one step, drawn in 3D on the main stage by
-  // assets/motion-kit.js. Everywhere else it is the same points as a list.
-  var MOTION = /^```\s*motion\b/;
-  var MOTION_KINDS = [
-    { key: 'stack', name: 'Blocks stack up' },
-    { key: 'pile', name: 'Cards land in a pile' },
-    { key: 'forward', name: 'Cards come forward' }
+  // A kinetic slide (DECISIONS.md, "Kinetic slides"): a fence naming how its
+  // points arrive, each point one step, drawn in 3D on the main stage by
+  // assets/kinetic-kit.js. Everywhere else it is the same points as a list.
+  // A point may carry a picture, ![what it shows](https://...), which kinds
+  // with a card or a sign draw on it. The first slides, written on November 26,
+  // used the fence name motion, which still reads.
+  var KINETIC = /^```\s*(kinetic|motion)\b/;
+  var KINETIC_KINDS = [
+    { key: 'stack', name: 'Blocks stack up', when: 'Something built a piece at a time' },
+    { key: 'pile', name: 'Cards land in a pile', when: 'Notes, feedback, or things gathered' },
+    { key: 'forward', name: 'Cards come forward', when: 'One question or idea at a time' },
+    { key: 'spotlight', name: 'A spotlight moves', when: 'Taking turns, or people in order' },
+    { key: 'path', name: 'A path, stop by stop', when: 'Steps in order, or a journey' },
+    { key: 'loop', name: 'Around a loop', when: 'A cycle that repeats' },
+    { key: 'dominoes', name: 'Dominoes fall', when: 'Each thing leads to the next' },
+    { key: 'stairs', name: 'Stairs climb', when: 'Levels, from where you start to where you reach' },
+    { key: 'target', name: 'Rings close in', when: 'From the broad to the point' },
+    { key: 'grow', name: 'Plants grow', when: 'Ideas that grow from small beginnings' },
+    { key: 'timeline', name: 'A timeline', when: 'Things in the order they happened' },
+    { key: 'gather', name: 'Words gather', when: 'One idea at a time, said large' }
   ];
-  var MOTION_MOST = 8;
-  function motionOf(lines) {
+  var KINETIC_MOST = 8;
+  var POINT_PICTURE = /!\[([^\]]*)\]\((https:\/\/[^\s)]+)\)/;
+  function pointOf(text) {
+    var m = POINT_PICTURE.exec(text);
+    var words = text.replace(POINT_PICTURE, ' ').replace(/\s+/g, ' ').trim();
+    return { words: words || (m ? m[1] : ''), picture: m ? { alt: m[1] || words, url: m[2] } : null };
+  }
+  function kineticOf(lines) {
     lines = lines || [];
     var from = -1;
-    for (var k = 0; k < lines.length; k++) if (MOTION.test(lines[k])) { from = k; break; }
+    for (var k = 0; k < lines.length; k++) if (KINETIC.test(lines[k])) { from = k; break; }
     if (from < 0) return null;
     var to = from + 1;
     while (to < lines.length && !/^```/.test(lines[to])) to += 1;
     var body = lines.slice(from + 1, to).join('\n');
     var head = /^---\n([\s\S]*?)\n---(\n|$)/.exec(body);
     var kind = head ? ((/^kind:\s*(\S+)/m.exec(head[1]) || [])[1] || '') : '';
-    if (!MOTION_KINDS.some(function (x) { return x.key === kind; })) kind = 'stack';
-    var beats = (head ? body.slice(head[0].length) : body).split('\n')
-      .map(function (l) { var m = /^\s*[-*]\s+(.*)$/.exec(l); return m ? m[1].trim() : ''; })
-      .filter(Boolean).slice(0, MOTION_MOST);
+    if (!KINETIC_KINDS.some(function (x) { return x.key === kind; })) kind = 'stack';
+    var points = (head ? body.slice(head[0].length) : body).split('\n')
+      .map(function (l) { var m = /^\s*[-*]\s+(.*)$/.exec(l); return m ? pointOf(m[1].trim()) : null; })
+      .filter(function (p) { return p && p.words; }).slice(0, KINETIC_MOST);
     var title = '';
     for (var h = 0; h < lines.length; h++) if (/^#{1,2}\s/.test(lines[h])) { title = lines[h].replace(/^#{1,2}\s+/, '').replace(/\s*\{[^}]*\}\s*$/, '').trim(); break; }
-    return { kind: kind, beats: beats, title: title, from: from, to: to };
+    return { kind: kind, points: points, beats: points.map(function (p) { return p.words; }), title: title, from: from, to: to };
   }
   function bare(text) { var t = String(text || ''); return t.indexOf(HEAD) === 0 ? t.slice(HEAD.length) : t; }
-  function motionAt(text, i) { return motionOf(split(bare(text))[i]); }
-  // The deck as a renderer that cannot move draws it: each moving slide becomes
+  function kineticAt(text, i) { return kineticOf(split(bare(text))[i]); }
+  // The deck as a renderer that cannot move draws it: each kinetic slide becomes
   // its headline and its points, so a thumbnail, the session page, and a
   // device without 3D show what the stage shows, a point at a time.
   function still(text) {
     var t = String(text || '');
-    if (!/```\s*motion\b/.test(t)) return t;
+    if (!/```\s*(kinetic|motion)\b/.test(t)) return t;
     var head = t.indexOf(HEAD) === 0 ? HEAD : '';
     var out = [], slide = [], fence = false;
     function flush() {
-      var m = motionOf(slide);
+      var m = kineticOf(slide);
       if (!m) { out.push.apply(out, slide); slide = []; return; }
       var heads = slide.filter(function (l) { return /^#{1,2}\s/.test(l); }).slice(0, 1);
       var notes = slide.filter(function (l) { return /^>/.test(l); });
@@ -93,7 +111,7 @@
     flush();
     return head + out.join('\n');
   }
-  // The deck kit, drawing every moving slide as its points. One wrapper a kit.
+  // The deck kit, drawing every kinetic slide as its points. One wrapper a kit.
   function kit(K) {
     if (!K) return K;
     if (K.__still) return K;
@@ -111,14 +129,14 @@
   }
 
   // Every stop in a deck, in order: { slide, shown }, where shown is how many
-  // of its lines are drawn (Infinity for all of them). A moving slide stops at
+  // of its lines are drawn (Infinity for all of them). A kinetic slide stops at
   // each of its points.
   function frames(text) {
     var out = [];
     split(text).forEach(function (s, i) {
       var build = s.some(function (l) { return BUILD.test(l); });
-      var moving = motionOf(s);
-      var n = moving ? moving.beats.length : build ? lines(s) : 0;
+      var moving = kineticOf(s);
+      var n = moving ? moving.points.length : build ? lines(s) : 0;
       if (n < 2) { out.push({ slide: i, shown: Infinity }); return; }
       for (var k = 1; k <= n; k++) out.push({ slide: i, shown: k === n ? Infinity : k });
     });
@@ -258,7 +276,7 @@
     { key: 'chart', label: 'Chart', text: '## A chart\n\n```sheet\n---\nchart: bar\n---\nName | Count:number\n--- | ---\nFirst | 3\nSecond | 5\n```\n' },
     { key: 'github', label: 'GitHub', text: '## From GitHub\n\n```github\nrepo: \nshow: issues\n```\n' },
     { key: 'diagram', label: 'Diagram', text: '## A diagram\n\n```diagram\n---\nkind: mind\n---\n- The center\n  - One branch\n  - Another branch\n```\n' },
-    { key: 'motion', label: 'Moving', text: '## One idea, built a piece at a time\n\n```motion\n---\nkind: stack\n---\n- The first piece\n- The next piece\n- The last piece\n```\n' }
+    { key: 'kinetic', label: 'Kinetic', text: '## One idea, built a piece at a time\n\n```kinetic\n---\nkind: stack\n---\n- The first piece\n- The next piece\n- The last piece\n```\n' }
   ];
   var NOTE = '> What you want to remember to say\n';
 
@@ -295,7 +313,7 @@
   }
   function slideAt(text, caret) { return Math.max(0, count(String(text || '').slice(0, caret)) - 1); }
 
-  var lib = { ghAll: ghAll, ghDrop: ghDrop, ghLinks: ghLinks, ghSpecs: ghSpecs, ghHold: ghHold, ghHas: ghHas, ghExpand: ghExpand, HEAD: HEAD, split: split, count: count, withoutNotes: withoutNotes, notes: notes, deck: deck, render: render, pictures: pictures, blanks: blanks, clean: clean, frames: frames, frameOf: frameOf, step: step, arrive: arrive, ADD: ADD, NOTE: NOTE, insert: insert, insertNote: insertNote, offset: offset, slideAt: slideAt, MOTION_KINDS: MOTION_KINDS, MOTION_MOST: MOTION_MOST, motionOf: motionOf, motionAt: motionAt, still: still, kit: kit };
+  var lib = { ghAll: ghAll, ghDrop: ghDrop, ghLinks: ghLinks, ghSpecs: ghSpecs, ghHold: ghHold, ghHas: ghHas, ghExpand: ghExpand, HEAD: HEAD, split: split, count: count, withoutNotes: withoutNotes, notes: notes, deck: deck, render: render, pictures: pictures, blanks: blanks, clean: clean, frames: frames, frameOf: frameOf, step: step, arrive: arrive, ADD: ADD, NOTE: NOTE, insert: insert, insertNote: insertNote, offset: offset, slideAt: slideAt, KINETIC_KINDS: KINETIC_KINDS, KINETIC_MOST: KINETIC_MOST, kineticOf: kineticOf, kineticAt: kineticAt, pointOf: pointOf, still: still, kit: kit };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
   else root.SlidesLib = lib;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

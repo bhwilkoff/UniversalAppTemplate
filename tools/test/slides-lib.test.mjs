@@ -96,39 +96,53 @@ test('a slide that is only a picture draws the picture, fitted to the slide', ()
   assert.match(out[3], /<text>words<\/text>/);
 });
 
-// Slides that move (DECISIONS.md, "Slides that move").
-const MOVING = '## How we built it\n\n```motion\n---\nkind: pile\n---\n- One\n- Two\n- Three\n```\n\n> Say why\n\n---\n\n## Plain\n\n- a';
-test('a moving slide stops at each of its points, and a plain slide after it is untouched', () => {
-  assert.deepEqual(lib.frames(MOVING), [{ slide: 0, shown: 1 }, { slide: 0, shown: 2 }, { slide: 0, shown: Infinity }, { slide: 1, shown: Infinity }]);
+// Kinetic slides (DECISIONS.md, "Kinetic slides").
+const KINETIC = '## How we built it\n\n```kinetic\n---\nkind: pile\n---\n- One\n- Two ![A sketch](https://example.org/a.png)\n- Three\n```\n\n> Say why\n\n---\n\n## Plain\n\n- a';
+test('a kinetic slide stops at each of its points, and a plain slide after it is untouched', () => {
+  assert.deepEqual(lib.frames(KINETIC), [{ slide: 0, shown: 1 }, { slide: 0, shown: 2 }, { slide: 0, shown: Infinity }, { slide: 1, shown: Infinity }]);
 });
-test('a moving slide is read from the deck the stage is sent, head and all', () => {
-  const m = lib.motionAt(lib.deck(MOVING), 0);
+test('a kinetic slide is read from the deck the stage is sent, head, pictures, and all', () => {
+  const m = lib.kineticAt(lib.deck(KINETIC), 0);
   assert.equal(m.kind, 'pile');
   assert.deepEqual(m.beats, ['One', 'Two', 'Three']);
+  assert.deepEqual(m.points[1].picture, { alt: 'A sketch', url: 'https://example.org/a.png' });
+  assert.equal(m.points[0].picture, null);
   assert.equal(m.title, 'How we built it');
-  assert.equal(lib.motionAt(lib.deck(MOVING), 1), null);
+  assert.equal(lib.kineticAt(lib.deck(KINETIC), 1), null);
 });
-test('a kind nobody knows moves as blocks, and no more points than a stage can hold', () => {
-  const many = '## A\n\n```motion\n---\nkind: spin\n---\n' + Array.from({ length: 12 }, (_, i) => '- P' + i).join('\n') + '\n```';
-  const m = lib.motionAt(many, 0);
+test('a picture with no words lends its words to the point, and only https pictures count', () => {
+  assert.deepEqual(lib.pointOf('![The hub](https://e.org/h.png)'), { words: 'The hub', picture: { alt: 'The hub', url: 'https://e.org/h.png' } });
+  assert.equal(lib.pointOf('See ![x](http://e.org/h.png)').picture, null);
+});
+test('slides written with the first fence name, motion, still read', () => {
+  assert.equal(lib.kineticAt('## A\n\n```motion\n---\nkind: forward\n---\n- One\n```', 0).kind, 'forward');
+});
+test('there are at least ten kinds, each named and with when to use it', () => {
+  assert.ok(lib.KINETIC_KINDS.length >= 10);
+  for (const k of lib.KINETIC_KINDS) { assert.match(k.key, /^[a-z]+$/); assert.ok(k.name && k.when); }
+  for (const k of lib.KINETIC_KINDS) assert.equal(lib.kineticAt('## A\n\n```kinetic\n---\nkind: ' + k.key + '\n---\n- One\n```', 0).kind, k.key);
+});
+test('a kind nobody knows becomes blocks, and no more points than a stage can hold', () => {
+  const many = '## A\n\n```kinetic\n---\nkind: spin\n---\n' + Array.from({ length: 12 }, (_, i) => '- P' + i).join('\n') + '\n```';
+  const m = lib.kineticAt(many, 0);
   assert.equal(m.kind, 'stack');
-  assert.equal(m.beats.length, lib.MOTION_MOST);
-  assert.equal(lib.motionAt('## A\n\n```motion\n- Only\n```', 0).kind, 'stack');
+  assert.equal(m.points.length, lib.KINETIC_MOST);
+  assert.equal(lib.kineticAt('## A\n\n```kinetic\n- Only\n```', 0).kind, 'stack');
 });
 test('where nothing can move, the slide is its headline, its points, and its notes', () => {
-  const s = lib.still(lib.deck(MOVING));
+  const s = lib.still(lib.deck(KINETIC));
   assert.ok(s.startsWith(lib.HEAD));
   assert.match(s, /## How we built it\n\n- One\n- Two\n- Three\n\n> Say why/);
-  assert.doesNotMatch(s, /motion|kind:/);
+  assert.doesNotMatch(s, /kinetic|kind:|example\.org/);
   assert.match(s, /## Plain\n\n- a/);
   assert.equal(lib.still('## A\n\n- b'), '## A\n\n- b');
 });
-test('the kit wrapper draws moving slides still, once per kit', () => {
+test('the kit wrapper draws kinetic slides still, once per kit', () => {
   const seen = [];
   const K = { render: (t) => { seen.push(t); return []; }, words: (t) => { seen.push(t); return []; }, frame: (t) => { seen.push(t); return ''; } };
   const w = lib.kit(K);
   assert.equal(lib.kit(K), w);
   assert.equal(lib.kit(w), w);
-  w.render(MOVING); w.words(MOVING); w.frame(MOVING, 0, 1);
-  assert.ok(seen.every((t) => !/```motion/.test(t)));
+  w.render(KINETIC); w.words(KINETIC); w.frame(KINETIC, 0, 1);
+  assert.ok(seen.every((t) => !/```kinetic/.test(t)));
 });

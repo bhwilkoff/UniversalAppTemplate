@@ -188,7 +188,7 @@
         hit.addEventListener('click', function (ev) { if (ev.detail === 0) { finish(); open(it.line); } });
         hits.appendChild(hit);
       });
-      var b = M.block(lines), inner = b && b.app === 'motion' ? svg : svg.querySelector('svg');
+      var b = M.block(lines), inner = b && (b.app === 'kinetic' || b.app === 'motion') ? svg : svg.querySelector('svg');
       if (b && inner) {
         var spots = spotsOf(b, inner);
         spots.forEach(function (c, n) {
@@ -270,7 +270,7 @@
     var TYPE = /:(number|money|text|name|date|percent)$/;
     var cell = null;
     function openSpot(n) {
-      var lines = list[at], b = M.block(lines), inner = art.querySelector(b && b.app === 'motion' ? 'svg' : 'svg svg');
+      var lines = list[at], b = M.block(lines), inner = art.querySelector(b && (b.app === 'kinetic' || b.app === 'motion') ? 'svg' : 'svg svg');
       if (!b || !inner) return;
       var spots = spotsOf(b, inner), c = spots[n];
       if (!c) return;
@@ -487,11 +487,11 @@
         more.appendChild(el('p', 'ui-label', 'Add to this slide'));
         var row = el('div', 'studio-adds');
         if (!pic) row.appendChild(button('Picture', null, function () { addPicture(more); }));
-        ['table', 'chart', 'diagram', 'github', 'motion'].forEach(function (k) {
+        ['table', 'chart', 'diagram', 'github', 'kinetic'].forEach(function (k) {
           var a = L.ADD.filter(function (x) { return x.key === k; })[0];
           row.appendChild(button(a.label, null, function () {
             var fence = /```[\s\S]*```/.exec(a.text)[0].replace('repo: ', 'repo: ' + ((o.github && o.github.repo) || '')).split('\n');
-            if (k === 'motion') { edit(function (x) { return M.makeMoving(x, fence); }); return; }
+            if (k === 'kinetic') { edit(function (x) { return M.makeKinetic(x, fence); }); return; }
             edit(function (x) { return x.concat([''], fence); });
           }));
         });
@@ -550,6 +550,93 @@
       changed(); redraw();
     }
 
+    // A kinetic slide: how its points arrive, chosen from pictures of each
+    // kind, and its points, each a row with its words and maybe a picture.
+    // Play steps through it the way the room will see it.
+    function kineticEditor(b, write) {
+      var box = el('div', 'studio-kinetic');
+      box.appendChild(el('p', 'ui-label', 'Kinetic'));
+      var now = (L.kineticOf(list[at]) || {}).kind || 'stack';
+      var fold = el('details', 'kinetic-fold'), sum = el('summary', 'kinetic-now');
+      fold.appendChild(sum);
+      var kinds = el('div', 'kinetic-kinds'); kinds.setAttribute('role', 'radiogroup'); kinds.setAttribute('aria-label', 'How the points arrive');
+      var when = el('p', 'small kinetic-when');
+      L.KINETIC_KINDS.forEach(function (k) {
+        var pick = el('button', 'kinetic-kind'); pick.type = 'button';
+        pick.setAttribute('role', 'radio'); pick.setAttribute('aria-checked', String(k.key === now)); pick.title = k.when;
+        var img = el('img'); img.src = '/assets/kinetic/' + k.key + '.png'; img.alt = ''; img.loading = 'lazy';
+        pick.appendChild(img); pick.appendChild(el('span', null, k.name));
+        pick.addEventListener('click', function () { remember(); write(M.setKineticKind(M.block(list[at]).body, k.key)); drawSide(); });
+        kinds.appendChild(pick);
+        if (k.key === now) {
+          when.textContent = 'For ' + k.when.charAt(0).toLowerCase() + k.when.slice(1) + '.';
+          var t = el('img'); t.src = img.src; t.alt = ''; sum.appendChild(t);
+          var words = el('span'); words.appendChild(el('strong', null, k.name)); words.appendChild(el('span', 'small', 'Choose another')); sum.appendChild(words);
+        }
+      });
+      fold.appendChild(kinds);
+      box.appendChild(fold); box.appendChild(when);
+      var pts = M.kineticPoints(b.body);
+      function save(quiet) { write(M.setKineticPoints(M.block(list[at]).body, pts), quiet); }
+      var rows = el('ol', 'kinetic-points'); rows.setAttribute('aria-label', 'The points, each one step');
+      pts.forEach(function (p, i) {
+        var row = el('li', 'kinetic-point');
+        var words = el('input'); words.value = p.words; words.setAttribute('aria-label', 'Point ' + (i + 1));
+        words.addEventListener('focus', remember);
+        words.addEventListener('input', function () { pts[i].words = words.value; save(true); });
+        row.appendChild(words);
+        var tools = el('div', 'kinetic-point-tools');
+        if (p.picture) {
+          var thumb = el('img', 'kinetic-point-pic'); thumb.src = p.picture.url; thumb.alt = p.picture.alt || '';
+          tools.appendChild(thumb);
+          tools.appendChild(button('Remove picture', 'btn-secondary small', function () { remember(); pts[i].picture = null; save(); drawSide(); }));
+        } else tools.appendChild(button('Picture', 'btn-secondary small', function () { pointPicture(row, i); }));
+        var up = button('Up', 'btn-secondary small', function () { remember(); pts = M.move(pts, i, i - 1); save(); drawSide(); });
+        up.disabled = i === 0; up.setAttribute('aria-label', 'Move point ' + (i + 1) + ' up');
+        var drop = button('Remove', 'btn-secondary small', function () { remember(); pts.splice(i, 1); save(); drawSide(); });
+        drop.disabled = pts.length < 2; drop.setAttribute('aria-label', 'Remove point ' + (i + 1));
+        tools.appendChild(up); tools.appendChild(drop);
+        row.appendChild(tools);
+        rows.appendChild(row);
+      });
+      box.appendChild(rows);
+      var more = el('div', 'studio-adds');
+      var add = button('Add a point', null, function () { remember(); pts.push({ words: 'The next point', picture: null }); save(); drawSide(); var f = side.querySelectorAll('.kinetic-point input'); if (f.length) { f[f.length - 1].focus(); f[f.length - 1].select(); } });
+      add.disabled = pts.length >= L.KINETIC_MOST;
+      more.appendChild(add);
+      if (window.KineticKit && window.KineticKit.canMove()) more.appendChild(button('Play it', null, play));
+      box.appendChild(more);
+      if (pts.length >= L.KINETIC_MOST) box.appendChild(el('p', 'small', 'Eight points at most, so each one can be read.'));
+      function pointPicture(row, i) {
+        if (row.querySelector('[data-add-picture]')) return;
+        var form = el('div', 'studio-picture-add'); form.setAttribute('data-add-picture', '');
+        var said = el('p', 'small'); said.setAttribute('role', 'status');
+        var put = function (url) { remember(); pts[i].picture = { url: url, alt: pts[i].words }; save(); drawSide(); };
+        if (o.upload) {
+          var lab = el('label', 'btn-secondary small studio-file', 'Choose a picture');
+          var file = el('input'); file.type = 'file'; file.accept = 'image/png,image/jpeg,image/webp'; file.className = 'visually-hidden';
+          lab.appendChild(file);
+          file.addEventListener('change', function () {
+            var f = file.files && file.files[0];
+            if (!f) return;
+            said.textContent = 'Adding the picture…';
+            o.upload(f).then(put, function (e) { said.textContent = 'The picture was not added: ' + (e && e.message ? e.message : e) + '.'; });
+          });
+          form.appendChild(lab);
+        }
+        var addr = el('input'); addr.type = 'url'; addr.placeholder = 'https://'; addr.setAttribute('aria-label', 'The picture’s address');
+        var go = button('Add', null, function () {
+          var u = addr.value.trim();
+          if (!/^https:\/\/\S+$/.test(u)) { said.textContent = 'A full address that starts with https://'; return; }
+          put(u);
+        });
+        form.appendChild(addr); form.appendChild(go); form.appendChild(said);
+        row.appendChild(form);
+        (o.upload ? form.querySelector('label') : addr).focus();
+      }
+      return box;
+    }
+
     function blockEditor(b) {
       var wrap = el('div', 'studio-group');
       wrap.setAttribute('data-block', '');
@@ -572,26 +659,8 @@
         repo.addEventListener('focus', remember); repo.addEventListener('change', put);
         what.addEventListener('change', function () { remember(); put(); });
         wrap.appendChild(repo); wrap.appendChild(known); wrap.appendChild(what);
-      } else if (b.app === 'motion') {
-        // How the points arrive, and the points; the stage shows them moving,
-        // and Play here steps through them as the room will see them.
-        wrap.appendChild(el('p', 'ui-label', 'Moving'));
-        var how = el('select'); how.setAttribute('aria-label', 'How the points arrive');
-        L.MOTION_KINDS.forEach(function (x) { how.appendChild(new Option(x.name, x.key)); });
-        how.value = (L.motionOf(list[at]) || {}).kind || 'stack';
-        how.addEventListener('change', function () { remember(); write(M.setMotionKind(M.block(list[at]).body, how.value)); });
-        wrap.appendChild(how);
-        var pts = el('textarea'); pts.rows = 6; pts.setAttribute('aria-label', 'The points, one a line, each one step');
-        var head = /^---\n[\s\S]*?\n---\n?/.exec(b.body);
-        pts.value = (head ? b.body.slice(head[0].length) : b.body).replace(/^\s*[-*]\s+/gm, '');
-        pts.addEventListener('focus', remember);
-        pts.addEventListener('input', function () {
-          var fresh = M.block(list[at]).body, h = /^---\n[\s\S]*?\n---\n?/.exec(fresh);
-          var points = pts.value.split('\n').map(function (l) { return l.trim(); }).filter(Boolean).slice(0, L.MOTION_MOST).map(function (l) { return '- ' + l; });
-          write((h ? h[0].replace(/\n?$/, '\n') : '') + points.join('\n'));
-        });
-        wrap.appendChild(pts);
-        if (window.MotionKit && window.MotionKit.canMove()) wrap.appendChild(button('Play it', null, play));
+      } else if (b.app === 'kinetic' || b.app === 'motion') {
+        wrap.appendChild(kineticEditor(b, write));
       } else if (b.app === 'diagram') {
         wrap.appendChild(el('p', 'ui-label', 'Branches'));
         var d = el('textarea'); d.rows = 8; d.value = b.body; d.setAttribute('aria-label', 'The diagram as an outline');
@@ -647,7 +716,8 @@
         }
         wrap.appendChild(row);
       }
-      wrap.appendChild(button('Remove it', 'btn-secondary small', function () {
+      if (b.app === 'kinetic' || b.app === 'motion') wrap.appendChild(button('Make it a plain slide', 'btn-secondary small', function () { edit(M.makeStill); }));
+      else wrap.appendChild(button('Remove it', 'btn-secondary small', function () {
         edit(function (a) { var x = M.block(a), c = a.slice(); c.splice(x.from, x.to - x.from + 1); return c; });
       }));
       return wrap;
@@ -679,14 +749,14 @@
       function show() {
         var f = steps[i];
         var svg = f.shown === Infinity ? K.render(deck)[f.slide] : K.frame(deck, f.slide, f.shown);
-        if (!(window.MotionKit && window.MotionKit.show(art2, deck, f.slide, f.shown === Infinity ? 0 : f.shown, svg))) art2.innerHTML = svg;
+        if (!(window.KineticKit && window.KineticKit.show(art2, deck, f.slide, f.shown === Infinity ? 0 : f.shown, svg))) art2.innerHTML = svg;
       }
       d.addEventListener('keydown', function (ev) {
         if (['ArrowRight', 'ArrowDown', ' ', 'PageDown'].indexOf(ev.key) >= 0) { ev.preventDefault(); i = Math.min(steps.length - 1, i + 1); show(); }
         if (['ArrowLeft', 'ArrowUp', 'PageUp'].indexOf(ev.key) >= 0) { ev.preventDefault(); i = Math.max(0, i - 1); show(); }
       });
       art2.addEventListener('click', function () { i = Math.min(steps.length - 1, i + 1); show(); });
-      d.addEventListener('close', function () { if (window.MotionKit) window.MotionKit.drop(art2); d.remove(); });
+      d.addEventListener('close', function () { if (window.KineticKit) window.KineticKit.drop(art2); d.remove(); });
       document.body.appendChild(d);
       show();
       d.showModal();

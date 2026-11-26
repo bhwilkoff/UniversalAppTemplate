@@ -1,22 +1,33 @@
 <!doctype html>
-<html><head><meta charset="utf-8"><meta name="robots" content="noindex"><title>Motion check</title>
+<html><head><meta charset="utf-8"><meta name="robots" content="noindex"><title>Kinetic check</title>
 <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/site.css">
 <style>body{margin:0;background:#131916}.cell{width:960px;height:600px;position:relative}.row{display:flex;gap:8px;margin-bottom:8px}</style>
 </head><body>
-<!-- Draws a moving slide beside its still slide, at a step from the address:
-     /tools/motion/check.html?kind=stack&shown=2 -->
+<!-- Draws a kinetic slide beside its still slide, at a step from the address:
+     /tools/motion/check.html?kind=stack&shown=2&n=4&back=1&pic=1
+     back=1 shows the step after first and then steps back to it. -->
 <div class="row"><div class="cell stage-slide-frame" id="m"></div><div class="cell stage-slide-frame" id="s"></div></div>
 <script src="/assets/vendor/deck-kit.js"></script>
 <script src="/assets/slides-lib.js"></script>
-<script src="/assets/motion-kit.js"></script>
+<script src="/assets/kinetic-kit.js"></script>
 <script>
-  var q = new URLSearchParams(location.search), kind = q.get('kind') || 'stack', shown = Number(q.get('shown') || 0);
-  var raw = '## How we built the stage\n\n```motion\n---\nkind: ' + kind + '\n---\n- We wrote down what a leader needs\n- We tried it in a real Meet call\n- We fixed what broke\n- We tried it again with learners\n```\n\n> A note\n';
+  var q = new URLSearchParams(location.search), kind = q.get('kind') || 'stack', shown = Number(q.get('shown') || 0), n = Number(q.get('n') || 4);
+  var SAY = {
+    timeline: ['Nov 4: The first session in Meet', 'Nov 11: Breakouts with workbooks', 'Nov 18: The four-part routine', 'Dec 2: In their shoes', 'Dec 9: Finishing touches', 'Dec 16: A last look', 'Jan 6: The next cohort', 'Jan 13: Week two'],
+    gather: ['Try it as the person it is for', 'Say what you did', 'Then decide', 'One more idea', 'And another', 'Six', 'Seven', 'Eight'],
+    def: ['We wrote down what a leader needs', 'We tried it in a real Meet call', 'We fixed what broke', 'We tried it again with learners', 'We asked what was still unclear', 'We changed the plan', 'We wrote the next round', 'We shipped it']
+  };
+  var say = (SAY[kind] || SAY.def).slice(0, n);
+  var pic = q.get('pic') ? ' ![A desk with a laptop](https://humanshaped.org/assets/photos/desk-800.webp)' : '';
+  var raw = '## How we built the stage\n\n```kinetic\n---\nkind: ' + kind + '\n---\n' + say.map(function (s, i) { return '- ' + s + (i === 0 ? pic : ''); }).join('\n') + '\n```\n\n> A note\n';
   var L = SlidesLib, K = L.kit(DeckKit), text = L.deck(raw);
-  var svg = shown ? K.frame(text, 0, shown) : K.render(text)[0];
-  document.getElementById('s').innerHTML = svg;
-  var took = MotionKit.show(document.getElementById('m'), text, 0, shown, svg);
-  document.title = 'took:' + took;
+  function at(step) {
+    var svg = step ? K.frame(text, 0, step) : K.render(text)[0];
+    document.getElementById('s').innerHTML = svg;
+    return KineticKit.show(document.getElementById('m'), text, 0, step, svg);
+  }
+  if (q.get('back')) { at(shown + 1); setTimeout(function () { at(shown); }, 2500); }
+  else document.title = 'took:' + at(shown);
 </script>
 </body></html>
