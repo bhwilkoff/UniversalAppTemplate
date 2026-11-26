@@ -148,7 +148,8 @@ not pixels**: the slide and the step. A 3D or animated slide is then just a
 slide whose steps move pieces, drawn locally at full frame rate, and it rides
 whatever already keeps stages in step (Meet's co-doing client is refused to
 add-ons; measured November 7, 2026). Worked example: humanshaped.org's
-`motion` fence, DECISIONS.md "Slides that move" (November 26, 2026).
+kinetic slides, twelve kinds in a `kinetic` fence, DECISIONS.md "Kinetic
+slides" (November 26, 2026), passed in a real call with a leader and a learner.
 
 - **One more block in the deck you have, not a second presentation system.**
   The step count comes from the slide's text, so Next, Back, a late joiner,
@@ -164,6 +165,13 @@ add-ons; measured November 7, 2026). Worked example: humanshaped.org's
   sound off: it competes with the speaker.
 - **Words on 3D faces come from a 2D canvas texture** in the site's own
   typeface, fitted to the face, so no text library is needed.
+- **Size for Meet's stage, not a laptop screen.** With the panel open the
+  stage is about 800 pixels wide: a scene that reads at 960 needs its words
+  larger and its camera closer there. Lay the headline over the 3D with a rim
+  of the page color so a tall piece never hides it.
+- **A background window draws slowly** (requestAnimationFrame is throttled),
+  so a learner's stage may finish a move late; put every piece where its step
+  says, never count frames.
 - **Look at every kind at every step** in headless Chrome with SwiftShader
   (`--use-angle=swiftshader --enable-unsafe-swiftshader`) before it ships;
   allow several seconds a step, because software WebGL runs at a few frames
