@@ -188,7 +188,7 @@
         hit.addEventListener('click', function (ev) { if (ev.detail === 0) { finish(); open(it.line); } });
         hits.appendChild(hit);
       });
-      var b = M.block(lines), inner = svg.querySelector('svg');
+      var b = M.block(lines), inner = b && b.app === 'motion' ? svg : svg.querySelector('svg');
       if (b && inner) {
         var spots = spotsOf(b, inner);
         spots.forEach(function (c, n) {
@@ -270,7 +270,7 @@
     var TYPE = /:(number|money|text|name|date|percent)$/;
     var cell = null;
     function openSpot(n) {
-      var lines = list[at], b = M.block(lines), inner = art.querySelector('svg svg');
+      var lines = list[at], b = M.block(lines), inner = art.querySelector(b && b.app === 'motion' ? 'svg' : 'svg svg');
       if (!b || !inner) return;
       var spots = spotsOf(b, inner), c = spots[n];
       if (!c) return;
@@ -487,10 +487,11 @@
         more.appendChild(el('p', 'ui-label', 'Add to this slide'));
         var row = el('div', 'studio-adds');
         if (!pic) row.appendChild(button('Picture', null, function () { addPicture(more); }));
-        ['table', 'chart', 'diagram', 'github'].forEach(function (k) {
+        ['table', 'chart', 'diagram', 'github', 'motion'].forEach(function (k) {
           var a = L.ADD.filter(function (x) { return x.key === k; })[0];
           row.appendChild(button(a.label, null, function () {
             var fence = /```[\s\S]*```/.exec(a.text)[0].replace('repo: ', 'repo: ' + ((o.github && o.github.repo) || '')).split('\n');
+            if (k === 'motion') { edit(function (x) { return M.makeMoving(x, fence); }); return; }
             edit(function (x) { return x.concat([''], fence); });
           }));
         });
@@ -571,6 +572,26 @@
         repo.addEventListener('focus', remember); repo.addEventListener('change', put);
         what.addEventListener('change', function () { remember(); put(); });
         wrap.appendChild(repo); wrap.appendChild(known); wrap.appendChild(what);
+      } else if (b.app === 'motion') {
+        // How the points arrive, and the points; the stage shows them moving,
+        // and Play here steps through them as the room will see them.
+        wrap.appendChild(el('p', 'ui-label', 'Moving'));
+        var how = el('select'); how.setAttribute('aria-label', 'How the points arrive');
+        L.MOTION_KINDS.forEach(function (x) { how.appendChild(new Option(x.name, x.key)); });
+        how.value = (L.motionOf(list[at]) || {}).kind || 'stack';
+        how.addEventListener('change', function () { remember(); write(M.setMotionKind(M.block(list[at]).body, how.value)); });
+        wrap.appendChild(how);
+        var pts = el('textarea'); pts.rows = 6; pts.setAttribute('aria-label', 'The points, one a line, each one step');
+        var head = /^---\n[\s\S]*?\n---\n?/.exec(b.body);
+        pts.value = (head ? b.body.slice(head[0].length) : b.body).replace(/^\s*[-*]\s+/gm, '');
+        pts.addEventListener('focus', remember);
+        pts.addEventListener('input', function () {
+          var fresh = M.block(list[at]).body, h = /^---\n[\s\S]*?\n---\n?/.exec(fresh);
+          var points = pts.value.split('\n').map(function (l) { return l.trim(); }).filter(Boolean).slice(0, L.MOTION_MOST).map(function (l) { return '- ' + l; });
+          write((h ? h[0].replace(/\n?$/, '\n') : '') + points.join('\n'));
+        });
+        wrap.appendChild(pts);
+        if (window.MotionKit && window.MotionKit.canMove()) wrap.appendChild(button('Play it', null, play));
       } else if (b.app === 'diagram') {
         wrap.appendChild(el('p', 'ui-label', 'Branches'));
         var d = el('textarea'); d.rows = 8; d.value = b.body; d.setAttribute('aria-label', 'The diagram as an outline');
@@ -657,14 +678,15 @@
       d.appendChild(art2); d.appendChild(close);
       function show() {
         var f = steps[i];
-        art2.innerHTML = f.shown === Infinity ? K.render(deck)[f.slide] : K.frame(deck, f.slide, f.shown);
+        var svg = f.shown === Infinity ? K.render(deck)[f.slide] : K.frame(deck, f.slide, f.shown);
+        if (!(window.MotionKit && window.MotionKit.show(art2, deck, f.slide, f.shown === Infinity ? 0 : f.shown, svg))) art2.innerHTML = svg;
       }
       d.addEventListener('keydown', function (ev) {
         if (['ArrowRight', 'ArrowDown', ' ', 'PageDown'].indexOf(ev.key) >= 0) { ev.preventDefault(); i = Math.min(steps.length - 1, i + 1); show(); }
         if (['ArrowLeft', 'ArrowUp', 'PageUp'].indexOf(ev.key) >= 0) { ev.preventDefault(); i = Math.max(0, i - 1); show(); }
       });
       art2.addEventListener('click', function () { i = Math.min(steps.length - 1, i + 1); show(); });
-      d.addEventListener('close', function () { d.remove(); });
+      d.addEventListener('close', function () { if (window.MotionKit) window.MotionKit.drop(art2); d.remove(); });
       document.body.appendChild(d);
       show();
       d.showModal();

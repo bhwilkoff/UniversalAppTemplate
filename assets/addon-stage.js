@@ -291,11 +291,12 @@
   // deck is drawn once and each slide kept, so moving through it is instant,
   // and the words are read out for anyone who cannot see the picture.
   var deckText = null, deckSlides = [], deckWords = [], shownKey = null, shownAt = null;
+  function kit() { return window.SlidesLib.kit(window.DeckKit); }
   function drawSlide(d) {
     var box = $('[data-slide]');
     if (d.text !== deckText) {
       deckText = d.text; shownKey = null;
-      try { deckSlides = window.SlidesLib.render(window.DeckKit, d.text); deckWords = window.DeckKit.words(d.text); window.SlidesLib.pictures(d.text).forEach(function (pic, i) { if (pic) deckWords[i] = [pic.alt || 'A picture']; }); }
+      try { deckSlides = window.SlidesLib.render(kit(), d.text); deckWords = kit().words(d.text); window.SlidesLib.pictures(d.text).forEach(function (pic, i) { if (pic) deckWords[i] = [pic.alt || 'A picture']; }); }
       catch (e) { console.log('[stage] the slides did not draw: ' + (e && e.message)); deckSlides = []; deckWords = []; }
     }
     var at = Math.min(d.at, Math.max(0, deckSlides.length - 1));
@@ -303,8 +304,11 @@
     if (key === shownKey) return;
     shownKey = key;
     var svg = deckSlides[at] || '';
-    if (d.shown) { try { svg = window.DeckKit.frame(d.text, at, d.shown); } catch (e) {} }
-    box.innerHTML = svg;
+    if (d.shown) { try { svg = kit().frame(d.text, at, d.shown); } catch (e) {} }
+    // A slide that moves is drawn in 3D on this stage (assets/motion-kit.js);
+    // where it cannot be, the same slide stays still.
+    var moving = !!window.MotionKit && window.MotionKit.show(box, d.text, at, d.shown, svg);
+    if (!moving) box.innerHTML = svg;
     box.setAttribute('aria-label', (deckWords[at] || []).join('. '));
     var who = $('[data-slide-who]'), names = Array.isArray(d.who) ? d.who : [];
     who.hidden = !names.length;
@@ -331,7 +335,7 @@
     if (key === cornerKey) return;
     cornerKey = key;
     var svg = '';
-    try { svg = slide.shown ? window.DeckKit.frame(slide.text, slide.at, slide.shown) : (window.SlidesLib.render(window.DeckKit, slide.text)[slide.at] || ''); } catch (e) {}
+    try { svg = slide.shown ? kit().frame(slide.text, slide.at, slide.shown) : (window.SlidesLib.render(kit(), slide.text)[slide.at] || ''); } catch (e) {}
     $('[data-app-corner-slide]').innerHTML = svg;
   }
   (function () {
@@ -423,7 +427,7 @@
       if (key === besideSrc) return;
       besideSrc = key;
       var svg = '';
-      try { svg = slide.shown ? window.DeckKit.frame(slide.text, slide.at, slide.shown) : (window.SlidesLib.render(window.DeckKit, slide.text)[slide.at] || ''); } catch (e) {}
+      try { svg = slide.shown ? kit().frame(slide.text, slide.at, slide.shown) : (window.SlidesLib.render(kit(), slide.text)[slide.at] || ''); } catch (e) {}
       box.innerHTML = svg;
       return;
     }
@@ -487,6 +491,7 @@
   function leaderSlide() { return !!view && view.mode === 'slides' && !view.learner && !room && !!stageClient && !document.documentElement.classList.contains('stage-in-panel'); }
   function wordsAt(ev) {
     if (!leaderSlide()) return null;
+    if ($('[data-slide]').querySelector('.motion')) return { x: 0, y: 0 };
     var svg = $('[data-slide]').querySelector('svg');
     if (!svg) return null;
     var pad = 8, hit = Array.prototype.some.call(svg.querySelectorAll('text'), function (t) {

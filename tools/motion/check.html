@@ -1,0 +1,22 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><meta name="robots" content="noindex"><title>Motion check</title>
+<link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/site.css">
+<style>body{margin:0;background:#131916}.cell{width:960px;height:600px;position:relative}.row{display:flex;gap:8px;margin-bottom:8px}</style>
+</head><body>
+<!-- Draws a moving slide beside its still slide, at a step from the address:
+     /tools/motion/check.html?kind=stack&shown=2 -->
+<div class="row"><div class="cell stage-slide-frame" id="m"></div><div class="cell stage-slide-frame" id="s"></div></div>
+<script src="/assets/vendor/deck-kit.js"></script>
+<script src="/assets/slides-lib.js"></script>
+<script src="/assets/motion-kit.js"></script>
+<script>
+  var q = new URLSearchParams(location.search), kind = q.get('kind') || 'stack', shown = Number(q.get('shown') || 0);
+  var raw = '## How we built the stage\n\n```motion\n---\nkind: ' + kind + '\n---\n- We wrote down what a leader needs\n- We tried it in a real Meet call\n- We fixed what broke\n- We tried it again with learners\n```\n\n> A note\n';
+  var L = SlidesLib, K = L.kit(DeckKit), text = L.deck(raw);
+  var svg = shown ? K.frame(text, 0, shown) : K.render(text)[0];
+  document.getElementById('s').innerHTML = svg;
+  var took = MotionKit.show(document.getElementById('m'), text, 0, shown, svg);
+  document.title = 'took:' + took;
+</script>
+</body></html>

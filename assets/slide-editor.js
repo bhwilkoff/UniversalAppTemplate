@@ -13,10 +13,10 @@
   function el(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
 
   function load() {
-    if (window.DeckKit) return Promise.resolve(window.DeckKit);
+    if (window.DeckKit) return Promise.resolve(L.kit(window.DeckKit));
     if (!loading) loading = new Promise(function (ok, no) {
       var s = document.createElement('script');
-      s.src = SRC; s.onload = function () { ok(window.DeckKit); }; s.onerror = no;
+      s.src = SRC; s.onload = function () { ok(L.kit(window.DeckKit)); }; s.onerror = no;
       document.head.appendChild(s);
     });
     return loading;

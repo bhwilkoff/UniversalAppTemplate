@@ -95,3 +95,40 @@ test('a slide that is only a picture draws the picture, fitted to the slide', ()
   assert.match(out[1], /<text>words<\/text>/);
   assert.match(out[3], /<text>words<\/text>/);
 });
+
+// Slides that move (DECISIONS.md, "Slides that move").
+const MOVING = '## How we built it\n\n```motion\n---\nkind: pile\n---\n- One\n- Two\n- Three\n```\n\n> Say why\n\n---\n\n## Plain\n\n- a';
+test('a moving slide stops at each of its points, and a plain slide after it is untouched', () => {
+  assert.deepEqual(lib.frames(MOVING), [{ slide: 0, shown: 1 }, { slide: 0, shown: 2 }, { slide: 0, shown: Infinity }, { slide: 1, shown: Infinity }]);
+});
+test('a moving slide is read from the deck the stage is sent, head and all', () => {
+  const m = lib.motionAt(lib.deck(MOVING), 0);
+  assert.equal(m.kind, 'pile');
+  assert.deepEqual(m.beats, ['One', 'Two', 'Three']);
+  assert.equal(m.title, 'How we built it');
+  assert.equal(lib.motionAt(lib.deck(MOVING), 1), null);
+});
+test('a kind nobody knows moves as blocks, and no more points than a stage can hold', () => {
+  const many = '## A\n\n```motion\n---\nkind: spin\n---\n' + Array.from({ length: 12 }, (_, i) => '- P' + i).join('\n') + '\n```';
+  const m = lib.motionAt(many, 0);
+  assert.equal(m.kind, 'stack');
+  assert.equal(m.beats.length, lib.MOTION_MOST);
+  assert.equal(lib.motionAt('## A\n\n```motion\n- Only\n```', 0).kind, 'stack');
+});
+test('where nothing can move, the slide is its headline, its points, and its notes', () => {
+  const s = lib.still(lib.deck(MOVING));
+  assert.ok(s.startsWith(lib.HEAD));
+  assert.match(s, /## How we built it\n\n- One\n- Two\n- Three\n\n> Say why/);
+  assert.doesNotMatch(s, /motion|kind:/);
+  assert.match(s, /## Plain\n\n- a/);
+  assert.equal(lib.still('## A\n\n- b'), '## A\n\n- b');
+});
+test('the kit wrapper draws moving slides still, once per kit', () => {
+  const seen = [];
+  const K = { render: (t) => { seen.push(t); return []; }, words: (t) => { seen.push(t); return []; }, frame: (t) => { seen.push(t); return ''; } };
+  const w = lib.kit(K);
+  assert.equal(lib.kit(K), w);
+  assert.equal(lib.kit(w), w);
+  w.render(MOVING); w.words(MOVING); w.frame(MOVING, 0, 1);
+  assert.ok(seen.every((t) => !/```motion/.test(t)));
+});

@@ -39,13 +39,86 @@
     });
     return n;
   }
+  // A slide that moves (DECISIONS.md, "Slides that move"): a fence naming how
+  // its points arrive, each point one step, drawn in 3D on the main stage by
+  // assets/motion-kit.js. Everywhere else it is the same points as a list.
+  var MOTION = /^```\s*motion\b/;
+  var MOTION_KINDS = [
+    { key: 'stack', name: 'Blocks stack up' },
+    { key: 'pile', name: 'Cards land in a pile' },
+    { key: 'forward', name: 'Cards come forward' }
+  ];
+  var MOTION_MOST = 8;
+  function motionOf(lines) {
+    lines = lines || [];
+    var from = -1;
+    for (var k = 0; k < lines.length; k++) if (MOTION.test(lines[k])) { from = k; break; }
+    if (from < 0) return null;
+    var to = from + 1;
+    while (to < lines.length && !/^```/.test(lines[to])) to += 1;
+    var body = lines.slice(from + 1, to).join('\n');
+    var head = /^---\n([\s\S]*?)\n---(\n|$)/.exec(body);
+    var kind = head ? ((/^kind:\s*(\S+)/m.exec(head[1]) || [])[1] || '') : '';
+    if (!MOTION_KINDS.some(function (x) { return x.key === kind; })) kind = 'stack';
+    var beats = (head ? body.slice(head[0].length) : body).split('\n')
+      .map(function (l) { var m = /^\s*[-*]\s+(.*)$/.exec(l); return m ? m[1].trim() : ''; })
+      .filter(Boolean).slice(0, MOTION_MOST);
+    var title = '';
+    for (var h = 0; h < lines.length; h++) if (/^#{1,2}\s/.test(lines[h])) { title = lines[h].replace(/^#{1,2}\s+/, '').replace(/\s*\{[^}]*\}\s*$/, '').trim(); break; }
+    return { kind: kind, beats: beats, title: title, from: from, to: to };
+  }
+  function bare(text) { var t = String(text || ''); return t.indexOf(HEAD) === 0 ? t.slice(HEAD.length) : t; }
+  function motionAt(text, i) { return motionOf(split(bare(text))[i]); }
+  // The deck as a renderer that cannot move draws it: each moving slide becomes
+  // its headline and its points, so a thumbnail, the session page, and a
+  // device without 3D show what the stage shows, a point at a time.
+  function still(text) {
+    var t = String(text || '');
+    if (!/```\s*motion\b/.test(t)) return t;
+    var head = t.indexOf(HEAD) === 0 ? HEAD : '';
+    var out = [], slide = [], fence = false;
+    function flush() {
+      var m = motionOf(slide);
+      if (!m) { out.push.apply(out, slide); slide = []; return; }
+      var heads = slide.filter(function (l) { return /^#{1,2}\s/.test(l); }).slice(0, 1);
+      var notes = slide.filter(function (l) { return /^>/.test(l); });
+      out.push.apply(out, heads.concat([''], m.beats.map(function (b) { return '- ' + b; }), notes.length ? [''].concat(notes) : [], ['']));
+      slide = [];
+    }
+    t.slice(head.length).split('\n').forEach(function (l) {
+      if (/^```/.test(l)) fence = !fence;
+      if (!fence && /^---\s*$/.test(l)) { flush(); out.push(l); return; }
+      slide.push(l);
+    });
+    flush();
+    return head + out.join('\n');
+  }
+  // The deck kit, drawing every moving slide as its points. One wrapper a kit.
+  function kit(K) {
+    if (!K) return K;
+    if (K.__still) return K;
+    if (!K.__stillKit) {
+      var w = {};
+      Object.keys(K).forEach(function (n) { w[n] = K[n]; });
+      w.render = function (t) { return K.render(still(t)); };
+      w.words = function (t) { return K.words(still(t)); };
+      w.frame = function (t, a, s) { return K.frame(still(t), a, s); };
+      if (K.lint) w.lint = function (t) { return K.lint(still(t)); };
+      w.__still = true;
+      try { Object.defineProperty(K, '__stillKit', { value: w }); } catch (e) { return w; }
+    }
+    return K.__stillKit;
+  }
+
   // Every stop in a deck, in order: { slide, shown }, where shown is how many
-  // of its lines are drawn (Infinity for all of them).
+  // of its lines are drawn (Infinity for all of them). A moving slide stops at
+  // each of its points.
   function frames(text) {
     var out = [];
     split(text).forEach(function (s, i) {
       var build = s.some(function (l) { return BUILD.test(l); });
-      var n = build ? lines(s) : 0;
+      var moving = motionOf(s);
+      var n = moving ? moving.beats.length : build ? lines(s) : 0;
       if (n < 2) { out.push({ slide: i, shown: Infinity }); return; }
       for (var k = 1; k <= n; k++) out.push({ slide: i, shown: k === n ? Infinity : k });
     });
@@ -184,7 +257,8 @@
     { key: 'table', label: 'Table', text: '## A table\n\n```sheet\nName | Count\n--- | ---\nFirst | 3\nSecond | 5\n```\n' },
     { key: 'chart', label: 'Chart', text: '## A chart\n\n```sheet\n---\nchart: bar\n---\nName | Count:number\n--- | ---\nFirst | 3\nSecond | 5\n```\n' },
     { key: 'github', label: 'GitHub', text: '## From GitHub\n\n```github\nrepo: \nshow: issues\n```\n' },
-    { key: 'diagram', label: 'Diagram', text: '## A diagram\n\n```diagram\n---\nkind: mind\n---\n- The center\n  - One branch\n  - Another branch\n```\n' }
+    { key: 'diagram', label: 'Diagram', text: '## A diagram\n\n```diagram\n---\nkind: mind\n---\n- The center\n  - One branch\n  - Another branch\n```\n' },
+    { key: 'motion', label: 'Moving', text: '## One idea, built a piece at a time\n\n```motion\n---\nkind: stack\n---\n- The first piece\n- The next piece\n- The last piece\n```\n' }
   ];
   var NOTE = '> What you want to remember to say\n';
 
@@ -221,7 +295,7 @@
   }
   function slideAt(text, caret) { return Math.max(0, count(String(text || '').slice(0, caret)) - 1); }
 
-  var lib = { ghAll: ghAll, ghDrop: ghDrop, ghLinks: ghLinks, ghSpecs: ghSpecs, ghHold: ghHold, ghHas: ghHas, ghExpand: ghExpand, HEAD: HEAD, split: split, count: count, withoutNotes: withoutNotes, notes: notes, deck: deck, render: render, pictures: pictures, blanks: blanks, clean: clean, frames: frames, frameOf: frameOf, step: step, arrive: arrive, ADD: ADD, NOTE: NOTE, insert: insert, insertNote: insertNote, offset: offset, slideAt: slideAt };
+  var lib = { ghAll: ghAll, ghDrop: ghDrop, ghLinks: ghLinks, ghSpecs: ghSpecs, ghHold: ghHold, ghHas: ghHas, ghExpand: ghExpand, HEAD: HEAD, split: split, count: count, withoutNotes: withoutNotes, notes: notes, deck: deck, render: render, pictures: pictures, blanks: blanks, clean: clean, frames: frames, frameOf: frameOf, step: step, arrive: arrive, ADD: ADD, NOTE: NOTE, insert: insert, insertNote: insertNote, offset: offset, slideAt: slideAt, MOTION_KINDS: MOTION_KINDS, MOTION_MOST: MOTION_MOST, motionOf: motionOf, motionAt: motionAt, still: still, kit: kit };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
   else root.SlidesLib = lib;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

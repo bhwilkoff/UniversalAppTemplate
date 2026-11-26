@@ -178,7 +178,7 @@
 
   // A table, chart, or diagram on a slide: where it sits, and its text.
   function block(lines) {
-    var from = lines.findIndex(function (l) { return /^```\s*(sheet|diagram|github)\b/.test(l); });
+    var from = lines.findIndex(function (l) { return /^```\s*(sheet|diagram|github|motion)\b/.test(l); });
     if (from < 0) return null;
     var to = from + 1;
     while (to < lines.length && !/^```/.test(lines[to])) to += 1;
@@ -191,6 +191,28 @@
     a.splice.apply(a, [b.from + 1, b.to - b.from - 1].concat(String(body).split('\n')));
     return a;
   }
+  // A moving slide's kind, set in its fence's head.
+  function setMotionKind(body, kind) {
+    var head = /^---\n([\s\S]*?)\n---(\n|$)/.exec(body);
+    if (!head) return '---\nkind: ' + kind + '\n---\n' + body;
+    var inner = /^kind:/m.test(head[1]) ? head[1].replace(/^kind:.*$/m, 'kind: ' + kind) : head[1] + '\nkind: ' + kind;
+    return '---\n' + inner + '\n---' + head[2] + body.slice(head[0].length);
+  }
+  // A slide made to move: its own points become the moving points, so nothing
+  // the leader wrote is lost; a slide with no points gets three to write over.
+  function makeMoving(lines, fence) {
+    var points = [], kept = [], notes = [];
+    lines.forEach(function (l) {
+      var m = POINT.exec(l);
+      if (m && m[2].trim()) points.push('- ' + m[2].trim());
+      else if (/^>/.test(l)) notes.push(l);
+      else if (!m) kept.push(l);
+    });
+    var f = fence.slice();
+    if (points.length) { var open = f.indexOf('---'), at = open < 0 ? 0 : f.indexOf('---', open + 1); f = f.slice(0, at + 1).concat(points, ['```']); }
+    return trim(kept).concat([''], f, notes.length ? [''].concat(notes) : []);
+  }
+
   // A sheet's text as rows of cells, and back. The head holds a chart's kind.
   function grid(body) {
     var head = /^---\n([\s\S]*?)\n---\n/.exec(body), rest = head ? body.slice(head[0].length) : body;
@@ -236,7 +258,7 @@
   var lib = { slides: slides, join: join, pieces: pieces, editable: editable, setWords: setWords, addAfter: addAfter, remove: remove,
     plain: plain, match: match, LAYOUTS: LAYOUTS, layoutOf: layoutOf, setLayout: setLayout, revealed: revealed,
     setRevealed: setRevealed, iconOf: iconOf, setIcon: setIcon, noteOf: noteOf, setNote: setNote, block: block, setBlock: setBlock,
-    grid: grid, ungrid: ungrid, outline: outline, setOutline: setOutline, even: even, move: move,
+    grid: grid, ungrid: ungrid, setMotionKind: setMotionKind, makeMoving: makeMoving, outline: outline, setOutline: setOutline, even: even, move: move,
     picture: picture, setPicture: setPicture, removePicture: removePicture };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
   else root.SlideModel = lib;

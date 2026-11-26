@@ -145,3 +145,17 @@ test('a slide holds one picture: added before the notes, kept out of the words, 
   // Only an https picture counts.
   assert.equal(M.picture(['![x](http://x.org/p.jpg)']), null);
 });
+
+test('a moving slide is a block, and its kind changes in its head', () => {
+  const lines = M.slides('## A\n\n```motion\n---\nkind: stack\n---\n- One\n```')[0];
+  const b = M.block(lines);
+  assert.equal(b.app, 'motion');
+  assert.equal(M.setMotionKind(b.body, 'forward'), '---\nkind: forward\n---\n- One');
+  assert.equal(M.setMotionKind('- One', 'pile'), '---\nkind: pile\n---\n- One');
+});
+test('making a slide move keeps its points as the moving points', () => {
+  const fence = ['```motion', '---', 'kind: stack', '---', '- The first piece', '```'];
+  const out = M.makeMoving(['## A', '', '- Mine', '- Also mine', '', '> note'], fence);
+  assert.deepEqual(out, ['## A', '', '```motion', '---', 'kind: stack', '---', '- Mine', '- Also mine', '```', '', '> note']);
+  assert.deepEqual(M.makeMoving(['## A'], fence), ['## A', ''].concat(fence));
+});

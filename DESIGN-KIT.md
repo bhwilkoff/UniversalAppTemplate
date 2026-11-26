@@ -255,7 +255,9 @@ and drawn by `assets/vendor/deck-kit.js`. A slide says one thing: a headline of
 a few words, and the words a leader will speak go in a `>` note, never on the
 slide (Ben, November 4, 2026; research/notes/stage-slides-notes.md). The editor
 adds a real example to write over, and says what will not fit. A slide is drawn
-only by the deck kit, in the site's own colors.
+only by the deck kit, in the site's own colors, except a slide that moves: a
+`motion` fence whose points arrive one step at a time in 3D on the stage
+(`assets/motion-kit.js`), and are the deck kit's plain points everywhere else.
 
 ## What it never uses (R§4)
 Tracked capitals, a label above a heading unless it carries information,
