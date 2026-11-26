@@ -141,6 +141,34 @@ roughly 800 by 450 CSS pixels. Measured failures and fixes:
    Chrome at 560x315, 805x455, and 1280x720. The harness copy must be
    regenerated from the live page each time.
 
+## Animated and 3D slides on the stage
+
+Each participant's stage renders on its own machine, so share a **position,
+not pixels**: the slide and the step. A 3D or animated slide is then just a
+slide whose steps move pieces, drawn locally at full frame rate, and it rides
+whatever already keeps stages in step (Meet's co-doing client is refused to
+add-ons; measured November 7, 2026). Worked example: humanshaped.org's
+`motion` fence, DECISIONS.md "Slides that move" (November 26, 2026).
+
+- **One more block in the deck you have, not a second presentation system.**
+  The step count comes from the slide's text, so Next, Back, a late joiner,
+  and the editor need nothing new.
+- **Every piece animates toward where its step puts it.** Going back plays
+  the move in reverse, and a late joiner's stage opens with the pieces placed.
+- **The fallback is the same slide as plain points**, used in thumbnails, in
+  previews, without WebGL 2, and when the context is lost. It is not a
+  pre-rendered picture.
+- **Load the 3D library only when such a slide is showing** (vendor it,
+  pinned), keep one WebGL context per stage (browsers cap them), honor
+  `prefers-reduced-motion` by placing pieces without moving them, and keep
+  sound off: it competes with the speaker.
+- **Words on 3D faces come from a 2D canvas texture** in the site's own
+  typeface, fitted to the face, so no text library is needed.
+- **Look at every kind at every step** in headless Chrome with SwiftShader
+  (`--use-angle=swiftshader --enable-unsafe-swiftshader`) before it ships;
+  allow several seconds a step, because software WebGL runs at a few frames
+  a second.
+
 ## Testing: two tabs are not Meet
 
 The single most expensive lesson: a panel-to-stage feature passed in two

@@ -45,6 +45,14 @@ nobody rediscovers an exclusion.
   to `zero-cost-hosted-backend`. Left behind on purpose: the board's own code,
   which lives on the `site` branch.
 
+- **2026-11-26**, humanshaped.org's slides that move: 3D slides on a Meet™
+  stage, kept in step by sharing the slide and the step rather than a new
+  sync channel, built in place of a separate deck builder a spec proposed.
+  Added to `google-meet-addon` as "Animated and 3D slides on the stage".
+  Checked in a stand-in call (real panels and stages, a fake database) and
+  in headless Chrome. Not yet checked in a real call or in Safari. Left behind
+  on purpose: the motion kit's code, which lives on the `site` branch.
+
 - **2026-11-18**, Ear Drama decisions 054 to 080 and everything since
   the October 23 upstream, the first app made from this template from its
   first day. Three skills came out of it (`artwork-presentation-design`,
