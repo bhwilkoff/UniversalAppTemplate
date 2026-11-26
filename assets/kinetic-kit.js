@@ -338,8 +338,8 @@
       var at = curve.getPoint(stops[i]), g = new T.Group();
       var post = new T.Mesh(new T.CylinderGeometry(0.05, 0.05, 1.4, 10), new T.MeshStandardMaterial({ color: '#8a958f' }));
       post.position.y = 0.7; post.castShadow = true; g.add(post);
-      var c = card(T, point, i, { w: 3.0, h: 1.7, d: 0.06, size: 74, most: 3 });
-      c.position.y = 1.4 + 0.85; g.add(c);
+      var c = card(T, point, i, { w: 3.5, h: 1.95, d: 0.06, size: 74, most: 3 });
+      c.position.y = 1.4 + 0.97; g.add(c);
       g.position.set(at.x, 0, at.z - 0.35); w.scene.add(g);
       var it = piece(function (p) { var e = easeOut(clamp(p * 1.4 - 0.25)); g.visible = p > 0; g.scale.set(1, Math.max(0.001, e), 1); c.material[4].color.setScalar(i < beat - 1 ? 0.78 : 1); });
       items.push(it);
@@ -349,8 +349,8 @@
     var walker = new T.Mesh(new T.SphereGeometry(0.28, 28, 20), new T.MeshStandardMaterial({ color: ACCENTS[0], roughness: 0.4 }));
     walker.castShadow = true; w.scene.add(walker);
     var trav = { t: 0, from: 0, to: 0, p: 1 };
-    w.camera.position.set(0, 9.6, 19.5);
-    w.camera.lookAt(0, 1.1, 0.6);
+    w.camera.position.set(0, 8.4, 16.8);
+    w.camera.lookAt(0, 1.3, 0.6);
     return kind(w, items, function (b, now) {
       beat = b; upto(signs, b);
       var goal = stops[Math.max(0, b - 1)];
@@ -378,7 +378,7 @@
       var bead = new T.Mesh(new T.SphereGeometry(0.09, 10, 8), new T.MeshStandardMaterial({ color: '#3d4842' }));
       bead.position.set(p.x, 0.09, p.z); w.scene.add(bead); beads.push({ m: bead, a: a });
     }
-    var cw = Math.min(2.7, 15 / n);
+    var cw = Math.min(3.4, 16 / n);
     var stations = points.map(function (point, i) {
       var p = pos(ang(i)), g = new T.Group(), c = card(T, point, i, { w: cw, h: cw * 0.6, size: 80, most: 3 });
       c.position.y = cw * 0.3 + 0.15; g.add(c); g.position.set(p.x, 0, p.z); w.scene.add(g);
@@ -390,8 +390,8 @@
     var marker = new T.Mesh(new T.SphereGeometry(0.24, 24, 16), new T.MeshStandardMaterial({ color: ACCENTS[2], roughness: 0.35 }));
     marker.castShadow = true; w.scene.add(marker);
     var trav = { a: ang(0), from: ang(0), to: ang(0), p: 1 }, lit = ang(0);
-    w.camera.position.set(0, 10.4, 16.2);
-    w.camera.lookAt(0, 1.4, -0.4);
+    w.camera.position.set(0, 9.2, 14.2);
+    w.camera.lookAt(0, 1.3, -0.2);
     return kind(w, items, function (b, now) {
       only(stations, b);
       stations.forEach(function (s, i) { s.seen = i < b - 1; });
@@ -433,7 +433,7 @@
     return kind(w, items, function (b, now) {
       doms.forEach(function (d, i) { d.it.to = i < b - 1 ? 1 : 0; });
       var c = doms[Math.max(0, b - 1)];
-      cam.to([c.x + 4.6, 7.6, c.z + 15], [c.x, 1.9, c.z - 0.6], now);
+      cam.to([c.x + 3.8, 6.6, c.z + 12.2], [c.x, 1.7, c.z - 0.6], now);
     }, function (dt, t, still) { return cam.step(dt, still); });
   };
 
@@ -527,7 +527,7 @@
   // Plants grow: each point is a pot whose stem rises, leaves open, and the
   // point's words bloom at the top.
   KINDS.grow = function (T, points) {
-    var beat = 0, w = world(T), n = points.length, items = [], span = Math.min(2.9, 13.5 / n), tw = Math.min(2.7, span * 0.95);
+    var beat = 0, w = world(T), n = points.length, items = [], span = Math.min(3.2, 13.5 / n), tw = Math.min(3.1, span * 0.97);
     points.forEach(function (point, i) {
       var x = (i - (n - 1) / 2) * span, hgt = 1.3 + (n > 1 ? i / (n - 1) : 0) * 1.1;
       var pot = new T.Mesh(new T.CylinderGeometry(0.55, 0.42, 0.75, 28), new T.MeshStandardMaterial({ color: '#B98A6E', roughness: 0.85 }));
@@ -548,8 +548,8 @@
         c.visible = bp > 0; c.scale.setScalar(Math.max(0.001, bp)); c.position.set(x - sway * h, 0.75 + h + tw * 0.31 * bp, 0.05); c.rotation.z = sway;
       }));
     });
-    w.camera.position.set(0, 4.2, 17.5);
-    w.camera.lookAt(0, 2.75, 0);
+    w.camera.position.set(0, 4.2, 16);
+    w.camera.lookAt(0, 2.8, 0);
     return kind(w, items, function (b) { beat = b; upto(items, b); }, function (dt, t, still) { return !still; });
   };
 
@@ -566,11 +566,11 @@
       var x = x0 + i * gap, m = /^([^:]{1,18}):\s+(.+)$/.exec(point.words), when = m ? m[1] : '', words = m ? m[2] : point.words;
       var dot = new T.Mesh(new T.CylinderGeometry(0.22, 0.22, 0.12, 24), new T.MeshStandardMaterial({ color: accent(i), roughness: 0.4 }));
       dot.castShadow = true; w.scene.add(dot);
-      var c = card(T, { words: words, img: point.img }, i, { w: 3.4, h: 2.1, d: 0.05, size: 76, most: 4 }); w.scene.add(c);
+      var c = card(T, { words: words, img: point.img }, i, { w: 3.6, h: 2.2, d: 0.05, size: 78, most: 4 }); w.scene.add(c);
       var tag = null;
       if (when) {
-        tag = new T.Mesh(new T.PlaneGeometry(2.6, 0.54), new T.MeshBasicMaterial({ map: face(T, when, { w: 520, h: 108, bg: 'transparent', fg: '#C1CAC5', size: 60, most: 1, pad: 0.02, weight: 500 }), transparent: true, toneMapped: false, depthWrite: false }));
-        tag.position.set(x, 0.32, 1.25); w.scene.add(tag);
+        tag = new T.Mesh(new T.PlaneGeometry(3.0, 0.62), new T.MeshBasicMaterial({ map: face(T, when, { w: 600, h: 124, bg: 'transparent', fg: '#E8EDEA', size: 72, most: 1, pad: 0.02, weight: 600 }), transparent: true, toneMapped: false, depthWrite: false }));
+        tag.position.set(x, 0.5, 1.5); w.scene.add(tag);
       }
       items.push(piece(function (p) {
         c.material[4].color.setScalar(i < beat - 1 ? 0.78 : 1);
@@ -585,7 +585,7 @@
     return kind(w, items, function (b, now) {
       beat = b; upto(items, b);
       var x = n <= 3 ? 0 : xs[Math.max(0, b - 1)] - Math.sign(xs[Math.max(0, b - 1)]) * Math.min(Math.abs(xs[Math.max(0, b - 1)]), gap * 0.5);
-      cam.to([x + 1.2, 3.6, n <= 3 ? 17 : 15], [x, 1.3, 0], now);
+      cam.to([x + 1.0, 3.4, n <= 3 ? 15 : 13], [x, 1.35, 0], now);
     }, function (dt, t, still) { return cam.step(dt, still); });
   };
 
