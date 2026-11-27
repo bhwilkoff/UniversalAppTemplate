@@ -265,6 +265,18 @@ it measured:
   `supabase_migrations.schema_migrations`.
 - A **SECURITY DEFINER function that changes one field** (a guest setting
   their own link) is safer than an UPDATE grant on the whole row.
+- **A storage area with no remove rule can only grow.** Slide pictures went
+  into a public, add-only bucket: a wrong screenshot could not be taken down
+  without the project's master key, and nothing said which files a deck still
+  used. Tie each file to the record that uses it: a private folder per record
+  (`<cohort>/<deck>/<name>`), a short name in the record (`pic:name.webp`)
+  instead of an address, deleted when the record stops naming it or is
+  deleted, and copied when the record is copied, so no two records share a
+  file. A page that is not signed in (a Meet stage) gets short-lived signed
+  links from a signed-in page beside it; never save a signed link.
+- **Storage deletes only what the person may also read.** `remove()` with a
+  delete rule and no matching read rule returns success and removes nothing.
+  Give whoever removes a read rule too, and assert on the returned list.
 
 ## Free-tier viability
 
