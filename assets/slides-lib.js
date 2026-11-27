@@ -61,7 +61,7 @@
     { key: 'gather', name: 'Words gather', when: 'One idea at a time, said large', pictures: false }
   ];
   var KINETIC_MOST = 8;
-  var POINT_PICTURE = /!\[([^\]]*)\]\((https:\/\/[^\s)]+)\)/;
+  var POINT_PICTURE = /!\[([^\]]*)\]\(((?:https:\/\/|pic:)[^\s)]+)\)/;
   function pointOf(text) {
     var m = POINT_PICTURE.exec(text);
     var words = text.replace(POINT_PICTURE, ' ').replace(/\s+/g, ' ').trim();
@@ -86,7 +86,50 @@
     return { kind: kind, points: points, beats: points.map(function (p) { return p.words; }), title: title, from: from, to: to };
   }
   function bare(text) { var t = String(text || ''); return t.indexOf(HEAD) === 0 ? t.slice(HEAD.length) : t; }
-  function kineticAt(text, i) { return kineticOf(split(bare(text))[i]); }
+  function kineticAt(text, i) { return kineticOf(split(bare(resolve(text)))[i]); }
+
+  // A picture a deck owns is written ![words](pic:name.webp): it lives in the
+  // private deck-pictures storage, in the deck's own folder, and only a page
+  // that is signed in can make links to it (DeckPictures.prepare). Those links
+  // are kept here by name, and every drawing reads the deck through resolve(),
+  // so the editor's text keeps the short name and never a link that runs out.
+  var PICS = {};
+  var PIC_NAME = /^[a-z0-9]{6,40}\.(webp|png|jpe?g)$/;
+  var PIC_REF = /!\[([^\]]*)\]\(pic:([^\s)]+)\)/g;
+  // How many links were new, so a page that keeps drawn slides draws again.
+  function usePictures(map) {
+    var n = 0;
+    Object.keys(map || {}).forEach(function (k) {
+      if (PIC_NAME.test(k) && /^https:\/\//.test(map[k] || '') && PICS[k] !== map[k]) { PICS[k] = map[k]; n++; }
+    });
+    return n;
+  }
+  function picNames(text) {
+    var out = [], m, re = new RegExp(PIC_REF.source, 'g'), t = String(text || '');
+    while ((m = re.exec(t))) if (PIC_NAME.test(m[2]) && out.indexOf(m[2]) < 0) out.push(m[2]);
+    return out;
+  }
+  function picsFor(text) {
+    var out = {};
+    picNames(text).forEach(function (n) { if (PICS[n]) out[n] = PICS[n]; });
+    return out;
+  }
+  function pictureUrl(src) {
+    var m = /^pic:(.+)$/.exec(String(src || ''));
+    return m ? PICS[m[1]] || '' : String(src || '');
+  }
+  // A picture with no link yet is its words alone on a line of its own, and
+  // nothing beside other words, until the link comes.
+  function resolve(text) {
+    var t = String(text || '');
+    if (t.indexOf('](pic:') < 0) return t;
+    return t.split('\n').map(function (line) {
+      return line.replace(new RegExp(PIC_REF.source, 'g'), function (all, alt, name) {
+        if (PICS[name]) return '![' + alt + '](' + PICS[name] + ')';
+        return line.trim() === all ? alt : '';
+      });
+    }).join('\n');
+  }
   // The deck as a renderer that cannot move draws it: each kinetic slide becomes
   // its headline and its points, so a thumbnail, the session page, and a
   // device without 3D show what the stage shows, a point at a time.
@@ -118,10 +161,10 @@
     if (!K.__stillKit) {
       var w = {};
       Object.keys(K).forEach(function (n) { w[n] = K[n]; });
-      w.render = function (t) { return K.render(still(t)); };
-      w.words = function (t) { return K.words(still(t)); };
-      w.frame = function (t, a, s) { return K.frame(still(t), a, s); };
-      if (K.lint) w.lint = function (t) { return K.lint(still(t)); };
+      w.render = function (t) { return K.render(still(resolve(t))); };
+      w.words = function (t) { return K.words(still(resolve(t))); };
+      w.frame = function (t, a, s) { return K.frame(still(resolve(t)), a, s); };
+      if (K.lint) w.lint = function (t) { return K.lint(still(resolve(t))); };
       w.__still = true;
       try { Object.defineProperty(K, '__stillKit', { value: w }); } catch (e) { return w; }
     }
@@ -237,7 +280,7 @@
     return m ? { alt: m[1], url: m[2] } : null;
   }
   function pictures(text) {
-    var t = String(text || '');
+    var t = resolve(text);
     if (t.indexOf(HEAD) === 0) t = t.slice(HEAD.length);
     return split(t).map(pictureOf);
   }
@@ -250,6 +293,7 @@
   }
   // The renderer's slides, with each picture slide drawn as its picture.
   function render(kit, text) {
+    text = resolve(text);
     var out = kit.render(text), pics = pictures(text);
     return out.map(function (svg, i) { return pics[i] ? pictureSvg(svg, pics[i]) : svg; });
   }
@@ -313,7 +357,7 @@
   }
   function slideAt(text, caret) { return Math.max(0, count(String(text || '').slice(0, caret)) - 1); }
 
-  var lib = { ghAll: ghAll, ghDrop: ghDrop, ghLinks: ghLinks, ghSpecs: ghSpecs, ghHold: ghHold, ghHas: ghHas, ghExpand: ghExpand, HEAD: HEAD, split: split, count: count, withoutNotes: withoutNotes, notes: notes, deck: deck, render: render, pictures: pictures, blanks: blanks, clean: clean, frames: frames, frameOf: frameOf, step: step, arrive: arrive, ADD: ADD, NOTE: NOTE, insert: insert, insertNote: insertNote, offset: offset, slideAt: slideAt, KINETIC_KINDS: KINETIC_KINDS, KINETIC_MOST: KINETIC_MOST, kineticOf: kineticOf, kineticAt: kineticAt, pointOf: pointOf, still: still, kit: kit };
+  var lib = { ghAll: ghAll, ghDrop: ghDrop, ghLinks: ghLinks, ghSpecs: ghSpecs, ghHold: ghHold, ghHas: ghHas, ghExpand: ghExpand, HEAD: HEAD, split: split, count: count, withoutNotes: withoutNotes, notes: notes, deck: deck, render: render, pictures: pictures, blanks: blanks, clean: clean, frames: frames, frameOf: frameOf, step: step, arrive: arrive, ADD: ADD, NOTE: NOTE, insert: insert, insertNote: insertNote, offset: offset, slideAt: slideAt, KINETIC_KINDS: KINETIC_KINDS, KINETIC_MOST: KINETIC_MOST, kineticOf: kineticOf, kineticAt: kineticAt, pointOf: pointOf, still: still, kit: kit, usePictures: usePictures, picNames: picNames, picsFor: picsFor, pictureUrl: pictureUrl, resolve: resolve, PIC_NAME: PIC_NAME };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
   else root.SlidesLib = lib;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

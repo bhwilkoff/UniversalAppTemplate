@@ -234,7 +234,8 @@
   });
   function deleteDraft(b) {
     b.disabled = true;
-    db.from('cohorts').delete().eq('id', current.id).eq('status', 'draft').select('id').then(function (r) {
+    var pics = window.DeckPictures ? window.DeckPictures.forgetCohort(db, current.id) : Promise.resolve();
+    pics.then(function () { return db.from('cohorts').delete().eq('id', current.id).eq('status', 'draft').select('id'); }).then(function (r) {
       b.disabled = false;
       if (r.error || !r.data.length) return say('[data-detail-message]', 'It could not be deleted: ' + (r.error ? r.error.message : 'only drafts can be deleted') + '.');
 if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign('/teach/');

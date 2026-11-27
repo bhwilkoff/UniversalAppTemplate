@@ -1454,6 +1454,12 @@
     return { at: stop.slide, count: SD.count(part.slides), note: source ? SD.notes(source)[stop.slide] || '' : '',
       next: !next ? 'Next part' : next.slide === stop.slide ? 'Next point' : 'Next slide' };
   }
+  // Links to the pictures a part's deck owns, made here because the panel is
+  // signed in; they reach the stage with every message (A.stageMessage).
+  function deckPictures(part, text) {
+    if (!window.DeckPictures || !part || !part.own || !part.id) return;
+    window.DeckPictures.prepare(db, S.cohort.id, part.id, text).then(function (got) { if (got) sendStage(); });
+  }
   function slidesView(part) {
     var SD = window.SlidesLib;
     if (!part || !SD) return null;
@@ -1465,6 +1471,7 @@
     var stop = stops[at] || { slide: 0, shown: Infinity };
     // What this deck shows from GitHub, fetched here because the panel is signed in.
     if (window.GitHubBlock) window.GitHubBlock.preload(db, S.cohort.id, text).then(function (got) { if (got) sendStage(); });
+    deckPictures(part, text);
     return { text: SD.deck(text), at: stop.slide, shown: stop.shown === Infinity ? 0 : stop.shown, links: SD.ghLinks(text, stop.slide) };
   }
   function pinnedText() {
@@ -3410,7 +3417,9 @@
     coachCheck(view);
     drawPanelStage();
     if (!stageThere() || !S.session) return;
-    stageSend(A.stageMessage(view, !!S.recording, !S.teaching, S.svc ? S.svc.stance() : null, !S.teaching && !(S.room && S.room.groupId) && !!(S.signals && S.signals.state() && S.signals.state().rooms) && !!S.stageOn));
+    if (view && view.mode === 'studio' && view.studio) deckPictures(sceneOf(view.studio.key), view.studio.text);
+    var pics = window.SlidesLib && view ? window.SlidesLib.picsFor(JSON.stringify(view)) : null;
+    stageSend(A.stageMessage(view, !!S.recording, !S.teaching, S.svc ? S.svc.stance() : null, !S.teaching && !(S.room && S.room.groupId) && !!(S.signals && S.signals.state() && S.signals.state().rooms) && !!S.stageOn, pics));
   }
   // The stage in the panel (Ben, November 18, 2026: the activity should "flow
   // from one person to another without having to leave a massive main stage

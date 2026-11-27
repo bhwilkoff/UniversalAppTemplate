@@ -939,6 +939,7 @@
         var v = A.readStageMessage(m.payload);
         if (!v) return;
         last = m.payload; view = v; heard = true;
+        if (v.pics && window.SlidesLib && window.SlidesLib.usePictures(v.pics)) deckText = null;
         $('[data-stage-waiting]').hidden = true;
         show('ready'); draw();
         // Only when the view rebuilt what the callout points at.

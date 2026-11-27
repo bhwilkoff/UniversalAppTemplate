@@ -537,7 +537,7 @@
     function pictureEditor(pic) {
       var wrap = el('div', 'studio-group');
       wrap.appendChild(el('p', 'ui-label', 'Picture'));
-      var img = el('img', 'studio-picture'); img.src = pic.url; img.alt = '';
+      var img = el('img', 'studio-picture'); img.src = window.SlidesLib.pictureUrl(pic.url); img.alt = '';
       wrap.appendChild(img);
       var words = el('input'); words.value = pic.alt; words.placeholder = 'What it shows'; words.setAttribute('aria-label', 'What the picture shows, read out in its place');
       words.addEventListener('focus', remember);
@@ -596,7 +596,7 @@
         row.appendChild(long);
         var tools = el('div', 'kinetic-point-tools');
         if (p.picture) {
-          var thumb = el('img', 'kinetic-point-pic'); thumb.src = p.picture.url; thumb.alt = p.picture.alt || '';
+          var thumb = el('img', 'kinetic-point-pic'); thumb.src = window.SlidesLib.pictureUrl(p.picture.url); thumb.alt = p.picture.alt || '';
           tools.appendChild(thumb);
           tools.appendChild(button('Remove picture', 'btn-secondary small', function () { remember(); pts[i].picture = null; save(); drawSide(); }));
         } else if (pictured) tools.appendChild(button('Picture', 'btn-secondary small', function () { pointPicture(row, i); }));

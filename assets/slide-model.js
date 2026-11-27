@@ -148,9 +148,10 @@
     return a;
   }
 
-  // A picture on a slide, written ![words](https://...): where it sits, its
-  // address, and the words read out in its place. One to a slide.
-  var PICTURE = /^!\[([^\]]*)\]\((https:\/\/[^\s)]+)\)$/;
+  // A picture on a slide, written ![words](https://...), or ![words](pic:name)
+  // for one the deck owns: where it sits, its address, and the words read out
+  // in its place. One to a slide.
+  var PICTURE = /^!\[([^\]]*)\]\(((?:https:\/\/|pic:)[^\s)]+)\)$/;
   function picture(lines) {
     for (var i = 0; i < lines.length; i++) {
       var m = PICTURE.exec(String(lines[i]).trim());

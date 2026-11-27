@@ -213,7 +213,7 @@
       if (s.slides && window.SlideStudio) {
         var deck = el('div');
         page.appendChild(deck);
-        window.SlideStudio.mount(deck, { text: s.slides, readOnly: true, github: githubOpts() });
+        pictures(s.id, s.slides).then(function () { if (deck.isConnected) window.SlideStudio.mount(deck, { text: s.slides, readOnly: true, github: githubOpts() }); });
       } else page.appendChild(preview(s));
       var c = s.config || {}, detail = el('div', 'scene-detail');
       paragraphs(s.body).forEach(function (p) { detail.appendChild(p); });
@@ -223,28 +223,24 @@
     }
     function leave(id) { opts.go(id); }
     function githubOpts() { return { db: db, cohortId: cohort.id, repo: cohort.github_repo || '', repos: opts.repos || [] }; }
-    // A picture for a slide, stored under the cohort's id in the public
-    // slide-pictures bucket, where only the cohort's leaders may add one.
-    function uploadPicture(file) {
-      if (!/^image\/(png|jpeg|webp)$/.test(file.type)) return Promise.reject(new Error('choose a PNG, JPEG, or WebP picture'));
-      if (file.size > 5 * 1024 * 1024) return Promise.reject(new Error('choose a picture under 5 MB'));
-      var ext = file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg';
-      var path = cohort.id + '/' + window.crypto.randomUUID() + '.' + ext;
-      var store = db.storage.from('slide-pictures');
-      return db.auth.getSession().then(function () {
-        return store.upload(path, file, { contentType: file.type, cacheControl: '31536000' });
-      }).then(function (r) {
-        if (r.error) throw r.error;
-        return store.getPublicUrl(path).data.publicUrl;
-      });
+    // A part's pictures live in its own folder (DeckPictures); the links to
+    // them are made before its slides draw.
+    var DP = window.DeckPictures;
+    function pictures(sceneId, text) { return DP ? DP.prepare(db, cohort.id, sceneId, text) : Promise.resolve(false); }
+    function uploadTo(sceneId) { return function (file) { return DP.upload(db, cohort.id, sceneId, file); }; }
+    function tidy(sceneId) {
+      if (!DP || readOnly || !sceneId) return;
+      var sc = scenes.filter(function (x) { return x.id === sceneId; })[0];
+      DP.tidy(db, cohort.id, sceneId, decks[sceneId] != null ? decks[sceneId] : (sc && sc.slides) || '');
     }
-    // Everything waiting to save lands before the page changes.
+    // Everything waiting to save lands before the page changes, and then the
+    // deck just left lets go of the pictures it no longer uses.
     function setPart(id) {
       if (id === part) return Promise.resolve();
-      var pending = studio ? studio.flush() : null;
+      var pending = studio ? studio.flush() : null, left = studio ? part : null;
       studio = null;
       part = id;
-      return Promise.resolve(pending).then(load);
+      return Promise.resolve(pending).then(function () { tidy(left); return load(); });
     }
 
     function preview(s) {
@@ -253,6 +249,7 @@
         deckBox.setAttribute('role', 'img');
         deckBox.setAttribute('aria-label', 'The first slide of ' + s.title);
         window.SlideEditor.thumb(deckBox, s.slides);
+        pictures(s.id, s.slides).then(function (got) { if (got && deckBox.isConnected) window.SlideEditor.thumb(deckBox, s.slides); });
         return deckBox;
       }
       var p = S.stagePreview(s);
@@ -358,7 +355,11 @@
         stageBox.hidden = !deckBox.hidden;
         if (!stageBox.hidden) stageBox.replaceChildren(preview(s));
       }
-      if (window.SlideStudio) studio = window.SlideStudio.mount(deckBox, { text: decks[s.id] || s.slides || '', onChange: saveDeck, github: githubOpts(), upload: uploadPicture });
+      if (window.SlideStudio) pictures(s.id, decks[s.id] || s.slides || '').then(function () {
+        if (part !== s.id || !deckBox.isConnected) return;
+        studio = window.SlideStudio.mount(deckBox, { text: decks[s.id] || s.slides || '', onChange: saveDeck, github: githubOpts(), upload: DP ? uploadTo(s.id) : null });
+        tidy(s.id);
+      });
       function saved(text) { msg.textContent = text; }
 
       function saveDeck(text) {
@@ -460,6 +461,7 @@
       db.from('scenes').delete().eq('id', s.id).select('id').then(function (r) {
         if (r.error || !r.data.length) { say('Not removed: ' + (r.error ? r.error.message : 'the database refused') + '.'); return; }
         say(s.title + ' is removed.');
+        if (DP) DP.forget(db, cohort.id, s.id);
         studio = null;
         opts.go(null);
       });

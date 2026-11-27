@@ -1589,3 +1589,35 @@ scene's lights free their shadow maps). The studio warns under a point longer
 than eight words, offers Picture only on kinds that draw one (blocks and
 gathering words draw words only, `pictures: false`), and says so when a kind
 change leaves pictures unshown.
+
+## A deck owns its pictures (November 27, 2026)
+
+**Each picture on a slide lives in its deck's own folder of the private
+`deck-pictures` storage, `<cohort>/<part>/<name>`, and the deck names it
+`![words](pic:name.webp)`. A picture the deck stops using is deleted when the
+leader next opens or leaves the deck, and removing a part or a draft cohort
+deletes its folder.** Ben, November 27, 2026, on a test picture nobody could
+remove from the public `slide-pictures` bucket: "That doesn't bode well for
+being able to do this in production", then "I don't love this implementation
+at all ... I think you need to do more research", and on this design: "That
+seems far more sustainable."
+
+**Why:** the old bucket was public and add-only, so a wrong screenshot (a
+learner's name, an email) stayed open to anyone with its address and only the
+project's master key could take it down, and nothing said which files any deck
+still used. The board already kept its files per board in a private bucket,
+and tldraw and Excalidraw both tie a picture to the document that holds it and
+clean it up with that document. One folder per deck means no two decks share a
+file, so deleting one can never break another deck. Private storage means the
+not-signed-in Meet stage cannot read a picture by itself: each person's
+signed-in panel makes twelve-hour links (`DeckPictures.prepare`) and sends them
+with every stage message (`pics`), and the deck's text keeps the short name, so
+no link that runs out is ever saved. Pictures are shrunk to 2000 px and WebP in
+the browser before upload.
+
+**How to apply:** never write a storage address into a deck; upload through
+`DeckPictures.upload` and keep `pic:` names. Anything that copies a part to a
+new part must copy its folder too (today `copy_scenes` copies no slides at all,
+so nothing is copied). Tidying never runs mid-edit, so undo never reaches for a
+deleted file, and skips files under ten minutes old. The old public bucket is
+emptied by the move in `20261127020000_slide_pictures_gone.sql`.

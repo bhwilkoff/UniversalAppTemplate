@@ -362,8 +362,11 @@
   // without the panel open see only the stage.
   // `rooms`: breakout rooms are open and this learner is not in one, so the
   // stage can say so even when Meet has folded their panel away.
-  function stageMessage(view, recording, learner, stance, rooms) {
+  // pics: links to the pictures the view's decks own (DeckPictures), made by
+  // this person's signed-in panel because their stage is not signed in.
+  function stageMessage(view, recording, learner, stance, rooms, pics) {
     var m = { type: STAGE, v: 1, view: view, learner: learner === true, recording: recording === true };
+    if (pics && typeof pics === 'object' && Object.keys(pics).length) m.pics = pics;
     if (rooms === true) m.rooms = true;
     if (stance && stance.open === true) m.stances = true;
     if (stance && num(stance.total)) m.stance = { agree: Number(stance.agree) || 0, unsure: Number(stance.unsure) || 0, disagree: Number(stance.disagree) || 0, total: Number(stance.total) || 0 };
@@ -377,6 +380,14 @@
     if (m && m.recording === true) v.recording = true;
     if (m && m.learner === true) v.learner = true;
     if (m && m.rooms === true) v.rooms = true;
+    if (m && m.pics && typeof m.pics === 'object') {
+      var pics = {};
+      Object.keys(m.pics).slice(0, 80).forEach(function (k) {
+        var u = m.pics[k];
+        if (/^[a-z0-9]{6,40}\.(webp|png|jpe?g)$/.test(k) && typeof u === 'string' && /^https:\/\//.test(u) && u.length <= 1500) pics[k] = u;
+      });
+      if (Object.keys(pics).length) v.pics = pics;
+    }
     if (m && m.stances === true) v.stances = true;
     if (m && m.stance && num(m.stance.total)) v.stance = { agree: Number(m.stance.agree) || 0, unsure: Number(m.stance.unsure) || 0, disagree: Number(m.stance.disagree) || 0, total: Number(m.stance.total) || 0 };
     return v;

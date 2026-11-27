@@ -3537,15 +3537,30 @@ def main():
     check("a guest cannot change the rest of their row",
           attempt(as_user("dee"), "update public.call_guests set member_id = %s where user_id = %s returning 1", (people["bea"], people["dee"])) and last_rows == [])
 
-    # Pictures for slides (migration 20261112070000): a cohort's leaders add
-    # them under the cohort's id; nobody else writes there.
-    def add_pic(name, path):
-        return attempt(as_user(name), "insert into storage.objects (bucket_id, name, owner) values ('slide-pictures', %s, auth.uid())", (path,))
-    check("a leader adds a picture to their cohort's slides", add_pic("ben", "%s/p1.jpg" % cc))
-    check("a learner in that cohort cannot", not add_pic("bea", "%s/p2.jpg" % cc))
-    check("nor can someone outside it", not add_pic("dee", "%s/p3.jpg" % cc))
-    check("nor can a leader write outside a cohort's folder", not add_pic("ben", "loose/p4.jpg"))
-    check("nor can a leader's agent", not attempt(as_agent("ben"), "insert into storage.objects (bucket_id, name, owner) values ('slide-pictures', %s, auth.uid())", ("%s/p5.jpg" % cc,)))
+    # Pictures a deck owns (migration 20261127010000): a cohort's leaders add
+    # them in a part's own folder and remove them; anyone in the cohort, a call
+    # guest too, reads them; nobody else does anything.
+    def pic(cur, sql, path):
+        return attempt(cur, sql, ("deck-pictures", path))
+    ADD = "insert into storage.objects (bucket_id, name, owner) values (%s, %s, auth.uid())"
+    READ = "select name from storage.objects where bucket_id = %s and name = %s"
+    DROP = "delete from storage.objects where bucket_id = %s and name = %s returning name"
+    good = "%s/%s/abc123def4.webp" % (cc, sc)
+    check("a leader adds a picture to a part of their cohort", pic(as_user("ben"), ADD, good))
+    check("a learner in that cohort cannot", not pic(as_user("bea"), ADD, "%s/%s/bea12345.webp" % (cc, sc)))
+    check("nor can someone outside it", not pic(as_user("cal"), ADD, "%s/%s/cal12345.webp" % (cc, sc)))
+    check("nor can a leader's agent", not pic(as_agent("ben"), ADD, "%s/%s/agent1234.webp" % (cc, sc)))
+    check("only in a part's folder", not pic(as_user("ben"), ADD, "%s/loose1234.webp" % cc))
+    check("only a part of that cohort", not pic(as_user("ben"), ADD, "%s/%s/other1234.webp" % (cc, uuid.uuid4())))
+    check("only a plain picture name", not pic(as_user("ben"), ADD, "%s/%s/../x.webp" % (cc, sc)) and not pic(as_user("ben"), ADD, "%s/%s/a.svg" % (cc, sc)))
+    check("a learner in the cohort reads it", pic(as_user("bea"), READ, good) and last_rows == [(good,)])
+    check("a guest in its call reads it", pic(as_user("dee"), READ, good) and last_rows == [(good,)])
+    check("someone outside it reads nothing", pic(as_user("cal"), READ, good) and last_rows == [])
+    check("a learner cannot remove it", pic(as_user("bea"), DROP, good) and last_rows == [])
+    check("nor can a leader's agent", pic(as_agent("ben"), DROP, good) and last_rows == [])
+    check("a leader removes it", pic(as_user("ben"), DROP, good) and last_rows == [(good,)])
+    check("nobody adds to the old public bucket any more",
+          not attempt(as_user("ben"), "insert into storage.objects (bucket_id, name, owner) values ('slide-pictures', %s, auth.uid())", ("%s/p1.jpg" % cc,)))
 
     # Another Google account joins a GitHub account (migration 20261112060000).
     def google_account(name, sub):
