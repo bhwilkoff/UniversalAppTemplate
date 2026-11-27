@@ -1362,16 +1362,14 @@ body.addon-body { min-height: 100vh; }
    headline under a 3D canvas, both fitted to the slide's own shape. */
 .kinetic { position: absolute; inset: 0; display: grid; place-items: center; }
 .kinetic-frame { position: relative; }
-.stage-slide-frame .kinetic-still svg, .kinetic-still svg, .kinetic-canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
+.kinetic .kinetic-frame .kinetic-still svg, .kinetic .kinetic-frame .kinetic-top svg, .kinetic-canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; animation: none; }
 .kinetic-canvas[hidden] { display: none; }
 .kinetic-top { position: absolute; inset: 0; pointer-events: none; }
-.stage-slide-frame .kinetic-top svg, .kinetic-top svg { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
 .kinetic-canvas[hidden] + .kinetic-top { display: none; }
 .stage-slide-frame.is-new .kinetic-still svg { animation: none; }
 .stage-slide-frame.is-new .kinetic { animation: stage-slide-in 220ms ease-out; }
 @media (prefers-reduced-motion: reduce) { .stage-slide-frame.is-new .kinetic { animation: none; } }
 .studio-play-art { position: relative; }
-.studio-play-art .kinetic-still svg { width: 100%; height: 100%; }
 .studio-kinetic { display: grid; gap: 0.5rem; }
 .kinetic-kinds { display: grid; grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr)); gap: 0.4rem; }
 .kinetic-kind { all: unset; box-sizing: border-box; display: grid; gap: 0.25rem; padding: 0.3rem; border-radius: 8px; cursor: pointer; font-size: 0.75rem; line-height: 1.25; color: var(--muted, #C1CAC5); outline: 2px solid transparent; }
