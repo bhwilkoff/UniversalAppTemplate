@@ -192,7 +192,8 @@
       update: function (dt, t, still) {
         var busy = settle(items, dt, still);
         items.forEach(function (it) { if (it.apply) it.apply(it.p, t, still); });
-        return (onUpdate ? onUpdate(dt, t, still) : false) || busy;
+        var more = onUpdate ? onUpdate(dt, t, still) : false;
+        return busy ? true : more;
       }
     };
   }
@@ -277,7 +278,7 @@
         var s = lerp(0.42, 1, o); c.g.scale.set(s, s, s);
         c.g.rotation.set(-0.05 * (1 - o), Math.PI * (1 - u), 0);
       });
-      return !still;
+      return still ? false : 'idle';
     });
   };
 
@@ -550,7 +551,7 @@
     });
     w.camera.position.set(0, 4.2, 16);
     w.camera.lookAt(0, 2.8, 0);
-    return kind(w, items, function (b) { beat = b; upto(items, b); }, function (dt, t, still) { return !still; });
+    return kind(w, items, function (b) { beat = b; upto(items, b); }, function (dt, t, still) { return still ? false : 'idle'; });
   };
 
   // A timeline: a rail runs across the floor, and each step drops a marker on
@@ -607,7 +608,7 @@
       for (var y = 0; y < ch; y += 2) for (var x = 0; x < cw; x += 2) if (data[(y * cw + x) * 4 + 3] > 128) filled.push([x, y]);
       var out = [], step = Math.max(1, filled.length / N);
       for (var k = 0; k < N; k++) {
-        var f = filled[Math.floor((k * step) % Math.max(1, filled.length))] || [cw / 2, ch / 2];
+        var f = filled[Math.floor((((k * 7) % N) * step) % Math.max(1, filled.length))] || [cw / 2, ch / 2];
         out.push(new T.Vector3((f[0] / cw - 0.5) * 11.6 + (hash(k + 5) - 0.5) * 0.03, 2.75 - (f[1] / ch - 0.5) * 4.25, (hash(k + 7) - 0.5) * 0.08));
       }
       return out;
@@ -633,6 +634,7 @@
     var at = -1;
     return {
       scene: w.scene, camera: w.camera,
+      low: function () { mesh.count = Math.round(N * 0.5); },
       set: function (b, quick) {
         var goal = b > 0 ? shapes[b - 1] : rest;
         if (b - 1 === at) return;
@@ -643,7 +645,7 @@
       update: function (dt, t, still) {
         prog.p = still ? 1 : Math.min(1, prog.p + dt / 1.5);
         draw(t, still);
-        return !still;
+        return prog.p < 1 || (still ? false : 'idle');
       }
     };
   };
@@ -653,6 +655,7 @@
       if (o.geometry) o.geometry.dispose();
       var m = o.material;
       (Array.isArray(m) ? m : m ? [m] : []).forEach(function (x) { if (x.map) x.map.dispose(); x.dispose(); });
+      if (o.isLight && o.shadow && o.shadow.dispose) o.shadow.dispose();
     });
   }
 
@@ -665,7 +668,7 @@
     var said = document.createElement('p'); said.className = 'visually-hidden'; said.setAttribute('aria-live', 'polite');
     var top = document.createElement('div'); top.className = 'kinetic-top'; top.setAttribute('aria-hidden', 'true');
     frame.appendChild(still); frame.appendChild(canvas); frame.appendChild(top); el.appendChild(frame); el.appendChild(said);
-    var st = { el: el, frame: frame, still: still, top: top, canvas: canvas, said: said, renderer: null, kind: null, key: null, want: null, raf: 0, broken: false, last: 0 };
+    var st = { el: el, frame: frame, still: still, top: top, canvas: canvas, said: said, times: [], low: false, idle: false, renderer: null, kind: null, key: null, want: null, raf: 0, broken: false, last: 0 };
     st.fit = function () {
       var r = box.getBoundingClientRect(), fw = Math.min(r.width, r.height * W / H), fh = fw * H / W;
       if (!fw) return;
@@ -685,15 +688,41 @@
     st.renderer.render(st.kind.scene, st.kind.camera);
     return busy;
   }
+  // A computer that cannot keep up while pieces move (most of 24 frames
+  // slower than 45 ms) draws from then on at its own pixel size, without
+  // shadows, with half the gathering pieces, and with nothing moving between
+  // steps, so the class sees every step rather than a stutter.
+  function slow(st) {
+    if (st.low) return;
+    st.low = true;
+    console.log('[kinetic] this computer is slow here, so the slides draw lighter');
+    st.renderer.setPixelRatio(1);
+    st.renderer.shadowMap.enabled = false;
+    lighter(st);
+    st.fit();
+  }
+  function lighter(st) {
+    if (!st.kind) return;
+    st.kind.scene.traverse(function (o) { var m = o.material; (Array.isArray(m) ? m : m ? [m] : []).forEach(function (x) { x.needsUpdate = true; }); });
+    if (st.kind.low) st.kind.low();
+  }
   function run(st) {
     if (st.raf || !st.kind || st.broken) return;
     st.last = performance.now();
     st.raf = requestAnimationFrame(function tick(now) {
       st.raf = 0;
       if (!st.kind || !st.el.isConnected || document.hidden) return;
-      var dt = Math.min(0.05, (now - st.last) / 1000);
+      var gap = (now - st.last) / 1000;
+      if (st.idle && gap < 1 / 30) { st.raf = requestAnimationFrame(tick); return; }
+      var dt = Math.min(0.05, gap);
       st.last = now;
-      if (draw(st, dt) && !calm()) st.raf = requestAnimationFrame(tick);
+      var busy = draw(st, dt);
+      st.idle = busy === 'idle';
+      if (busy === true && KineticKit.quality === 'auto') {
+        st.times.push(gap); if (st.times.length > 24) st.times.shift();
+        if (st.times.length === 24 && st.times.filter(function (x) { return x > 0.045; }).length > 16) slow(st);
+      }
+      if (busy && !calm() && !(st.idle && st.low)) st.raf = requestAnimationFrame(tick);
     });
   }
 
@@ -707,8 +736,9 @@
         st.renderer.setClearColor(0x000000, 0);
         st.renderer.outputColorSpace = T.SRGBColorSpace;
         st.renderer.toneMapping = T.NeutralToneMapping;
-        st.renderer.shadowMap.enabled = true;
+        st.renderer.shadowMap.enabled = KineticKit.quality !== 'low';
         st.renderer.shadowMap.type = T.PCFSoftShadowMap;
+        if (KineticKit.quality === 'low') { st.low = true; st.renderer.setPixelRatio(1); }
       } catch (e) { console.log('[kinetic] no 3D here: ' + (e && e.message)); st.broken = true; st.still.innerHTML = st.svg || ''; return; }
       st.fit();
     }
@@ -718,6 +748,7 @@
       try { st.kind = (KINDS[want.m.kind] || KINDS.stack)(T, points); }
       catch (e) { console.log('[kinetic] the ' + want.m.kind + ' slide did not build: ' + (e && e.message)); st.kind = null; st.key = null; st.broken = true; st.still.innerHTML = st.svg || ''; return; }
       st.key = want.key;
+      if (st.low) lighter(st);
       st.kind.set(Math.max(0, want.beat - 1), true);
       st.kind.update(0, 0, true);
     }
@@ -785,5 +816,6 @@
     box.__kinetic = null;
   }
 
-  window.KineticKit = { show: show, clear: clear, drop: drop, canMove: canMove, KINDS: Object.keys(KINDS) };
+  // quality: 'auto' steps down on a slow computer; 'low' and 'high' are for checks.
+  var KineticKit = window.KineticKit = { show: show, clear: clear, drop: drop, canMove: canMove, KINDS: Object.keys(KINDS), quality: 'auto' };
 })();

@@ -1578,3 +1578,14 @@ kind is a function in `KINDS` in kinetic-kit.js and a row in `KINETIC_KINDS`;
 look at it with `node tools/motion/look.mjs <folder>` before it ships, which
 draws every kind at every step, stepping back, with one point and eight, and
 with a picture.
+
+A computer that cannot keep up while pieces move (most of 24 frames slower
+than 45 ms) draws from then on at its own pixel size, without shadows, with
+half the gathering pieces, and with nothing moving between steps, so a class
+sees every step rather than a stutter. Between steps a kind that sways draws at
+most 30 frames a second. `look.mjs` also checks reduced motion, the lighter
+drawing, and fifty trips through every kind for anything that grows (each
+scene's lights free their shadow maps). The studio warns under a point longer
+than eight words, offers Picture only on kinds that draw one (blocks and
+gathering words draw words only, `pictures: false`), and says so when a kind
+change leaves pictures unshown.

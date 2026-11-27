@@ -47,7 +47,7 @@
   // used the fence name motion, which still reads.
   var KINETIC = /^```\s*(kinetic|motion)\b/;
   var KINETIC_KINDS = [
-    { key: 'stack', name: 'Blocks stack up', when: 'Something built a piece at a time' },
+    { key: 'stack', name: 'Blocks stack up', when: 'Something built a piece at a time', pictures: false },
     { key: 'pile', name: 'Cards land in a pile', when: 'Notes, feedback, or things gathered' },
     { key: 'forward', name: 'Cards come forward', when: 'One question or idea at a time' },
     { key: 'spotlight', name: 'A spotlight moves', when: 'Taking turns, or people in order' },
@@ -58,7 +58,7 @@
     { key: 'target', name: 'Rings close in', when: 'From the broad to the point' },
     { key: 'grow', name: 'Plants grow', when: 'Ideas that grow from small beginnings' },
     { key: 'timeline', name: 'A timeline', when: 'Things in the order they happened' },
-    { key: 'gather', name: 'Words gather', when: 'One idea at a time, said large' }
+    { key: 'gather', name: 'Words gather', when: 'One idea at a time, said large', pictures: false }
   ];
   var KINETIC_MOST = 8;
   var POINT_PICTURE = /!\[([^\]]*)\]\((https:\/\/[^\s)]+)\)/;

@@ -308,7 +308,7 @@
         clearTimeout(live);
         live = setTimeout(function () { if (typing && typing.node === box2) { paint(); changed(); } }, 250);
       });
-      box2.addEventListener('blur', function () { if (typing && typing.node === box2) finish(); });
+      box2.addEventListener('blur', function (ev) { if (typing && typing.node === box2) finish(!!ev.relatedTarget && side.contains(ev.relatedTarget)); });
       box2.addEventListener('keydown', function (ev) {
         if (ev.key === 'Escape') {
           ev.preventDefault(); typing.cancelled = true; finish();
@@ -397,7 +397,7 @@
         clearTimeout(live);
         live = setTimeout(function () { if (typing && typing.node === box2) { paint(); drawHits(); changed(); } }, 250);
       });
-      box2.addEventListener('blur', function () { if (typing && typing.node === box2) finish(); });
+      box2.addEventListener('blur', function (ev) { if (typing && typing.node === box2) finish(!!ev.relatedTarget && side.contains(ev.relatedTarget)); });
       box2.addEventListener('keydown', function (ev) {
         if (ev.key === 'Escape') { ev.preventDefault(); typing.cancelled = true; finish(); return; }
         if (ev.key === 'Enter') {
@@ -417,7 +417,9 @@
         }
       });
     }
-    function finish() {
+    // keepSide: the focus is moving into the side, so redrawing the side would
+    // take away the field just pressed (found typing a kinetic slide's points).
+    function finish(keepSide) {
       if (!typing) return;
       var t = typing; typing = null;
       if (t.spot) {
@@ -425,7 +427,7 @@
         t.node.remove();
         t.write(t.cancelled ? t.before : said2);
         if (t.cancelled || said2.trim() === t.before) past.pop();
-        changed(); drawBar(); paint(); drawHits(); drawSide();
+        changed(); drawBar(); paint(); drawHits(); if (!keepSide) drawSide();
         return;
       }
       if (t.node) {
@@ -436,7 +438,7 @@
         else if (words) list[at] = M.setWords(list[at], t.line, words);
         else list[at] = M.setWords(list[at], t.line, t.before);
       }
-      changed(); drawBar(); paint(); drawHits(); drawSide();
+      changed(); drawBar(); paint(); drawHits(); if (!keepSide) drawSide();
     }
 
     function drawSide() {
@@ -576,21 +578,28 @@
       });
       fold.appendChild(kinds);
       box.appendChild(fold); box.appendChild(when);
-      var pts = M.kineticPoints(b.body);
+      var pts = M.kineticPoints(b.body), kindNow = L.KINETIC_KINDS.filter(function (k) { return k.key === now; })[0] || {};
+      var pictured = kindNow.pictures !== false;
       function save(quiet) { write(M.setKineticPoints(M.block(list[at]).body, pts), quiet); }
       var rows = el('ol', 'kinetic-points'); rows.setAttribute('aria-label', 'The points, each one step');
       pts.forEach(function (p, i) {
         var row = el('li', 'kinetic-point');
         var words = el('input'); words.value = p.words; words.setAttribute('aria-label', 'Point ' + (i + 1));
         words.addEventListener('focus', remember);
-        words.addEventListener('input', function () { pts[i].words = words.value; save(true); });
+        // Words shrink to fit their piece, so a long point turns small on the
+        // stage, and smallest of all when words gather.
+        var long = el('p', 'small kinetic-long', 'Long points get small on the stage. Eight words or fewer read best.');
+        var tooLong = function () { long.hidden = String(words.value).trim().split(/\s+/).length <= 8; };
+        tooLong();
+        words.addEventListener('input', function () { pts[i].words = words.value; tooLong(); save(true); });
         row.appendChild(words);
+        row.appendChild(long);
         var tools = el('div', 'kinetic-point-tools');
         if (p.picture) {
           var thumb = el('img', 'kinetic-point-pic'); thumb.src = p.picture.url; thumb.alt = p.picture.alt || '';
           tools.appendChild(thumb);
           tools.appendChild(button('Remove picture', 'btn-secondary small', function () { remember(); pts[i].picture = null; save(); drawSide(); }));
-        } else tools.appendChild(button('Picture', 'btn-secondary small', function () { pointPicture(row, i); }));
+        } else if (pictured) tools.appendChild(button('Picture', 'btn-secondary small', function () { pointPicture(row, i); }));
         var up = button('Up', 'btn-secondary small', function () { remember(); pts = M.move(pts, i, i - 1); save(); drawSide(); });
         up.disabled = i === 0; up.setAttribute('aria-label', 'Move point ' + (i + 1) + ' up');
         var drop = button('Remove', 'btn-secondary small', function () { remember(); pts.splice(i, 1); save(); drawSide(); });
@@ -600,6 +609,7 @@
         rows.appendChild(row);
       });
       box.appendChild(rows);
+      if (!pictured && pts.some(function (p) { return p.picture; })) box.appendChild(el('p', 'small', kindNow.name + ' draws words only, so these pictures show when you choose a kind with cards.'));
       var more = el('div', 'studio-adds');
       var add = button('Add a point', null, function () { remember(); pts.push({ words: 'The next point', picture: null }); save(); drawSide(); var f = side.querySelectorAll('.kinetic-point input'); if (f.length) { f[f.length - 1].focus(); f[f.length - 1].select(); } });
       add.disabled = pts.length >= L.KINETIC_MOST;

@@ -1,11 +1,13 @@
 // Draws every kind of kinetic slide at every step in headless Chrome, with the
 // still slide beside it, and saves a picture of each, so a change to
 // assets/kinetic-kit.js is looked at before it ships. It also steps back, draws
-// one point and eight, and a picture on a point, and fails on any error.
+// one point and eight, and a picture on a point, and fails on any error. First
+// it checks reduced motion, the lighter drawing for a slow computer, and fifty
+// trips through every kind for anything that grows.
 // --thumbs writes the studio's pictures of each kind to assets/kinetic/.
 // Uses the board's copy of playwright-core (cd tools/board && npm ci first).
 //
-//   node tools/motion/look.mjs <folder for the pictures> [--thumbs] [kind ...]
+//   node tools/motion/look.mjs <folder for the pictures> [--thumbs] [--only-checks] [kind ...]
 import { createServer } from 'node:http';
 import { readFile, mkdir } from 'node:fs/promises';
 import { execFileSync } from 'node:child_process';
@@ -35,7 +37,7 @@ const server = createServer(async (req, res) => {
 });
 await new Promise((r) => server.listen(0, '127.0.0.1', r));
 const origin = 'http://127.0.0.1:' + server.address().port;
-const browser = await chromium.launch({ executablePath: CHROME, headless: true, args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
+const browser = await chromium.launch({ executablePath: CHROME, headless: true, args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--enable-precise-memory-info'] });
 const page = await browser.newPage({ viewport: { width: 1928, height: 608 } });
 const said = [];
 page.on('console', (m) => { if (!/GL Driver|status of 404/.test(m.text())) said.push(m.text()); });
@@ -49,6 +51,50 @@ async function look(kind, query, name, wait = 4500) {
   if (!ok || !seen || !seen.calls || seen.broken) { failed += 1; said.push(kind + ' ' + query + ': nothing drawn ' + JSON.stringify(seen)); }
   await page.screenshot({ path: join(out, name + '.png'), clip: { x: 0, y: 0, width: 960, height: 600 } });
 }
+// Reduced motion: each piece is placed at once and nothing keeps drawing.
+await page.emulateMedia({ reducedMotion: 'reduce' });
+for (const kind of ['stack', 'forward', 'gather']) {
+  await page.goto(origin + '/tools/motion/check.html?kind=' + kind + '&shown=2');
+  await page.waitForFunction(() => { const c = document.querySelector('.kinetic-canvas'); return c && !c.hidden; }, null, { timeout: 15000 });
+  await page.waitForTimeout(600);
+  const r = await page.evaluate(() => { const st = document.getElementById('m').__kinetic; return { raf: st.raf, busy: st.kind.update(0, 0, true) }; });
+  if (r.raf || r.busy) { failed += 1; said.push(kind + ' with reduced motion kept moving ' + JSON.stringify(r)); }
+  await page.screenshot({ path: join(out, kind + '-calm.png'), clip: { x: 0, y: 0, width: 960, height: 600 } });
+}
+await page.emulateMedia({ reducedMotion: 'no-preference' });
+// A slow computer: lighter drawing, still every piece in place.
+for (const kind of ['pile', 'gather']) {
+  await page.goto(origin + '/tools/motion/check.html?kind=' + kind + '&shown=0&q=low');
+  await page.waitForFunction(() => { const c = document.querySelector('.kinetic-canvas'); return c && !c.hidden; }, null, { timeout: 15000 });
+  await page.waitForTimeout(4000);
+  const r = await page.evaluate(() => { const st = document.getElementById('m').__kinetic; return { low: st.low, shadows: st.renderer.shadowMap.enabled, ratio: st.renderer.getPixelRatio() }; });
+  if (!r.low || r.shadows || r.ratio !== 1) { failed += 1; said.push(kind + ' did not draw lighter ' + JSON.stringify(r)); }
+  await page.screenshot({ path: join(out, kind + '-low.png'), clip: { x: 0, y: 0, width: 960, height: 600 } });
+}
+// On its own, a computer this slow (software WebGL) steps down within a few
+// steps, and the steps keep coming.
+{
+  await page.goto(origin + '/tools/motion/check.html?kind=stack&shown=1&q=auto&n=8');
+  await page.waitForFunction(() => { const c = document.querySelector('.kinetic-canvas'); return c && !c.hidden; }, null, { timeout: 15000 });
+  const r = await page.evaluate(async () => {
+    const box = document.getElementById('m'), t = SlidesLib.deck(document.title && window.__raw || '');
+    for (let s = 2; s <= 8; s++) { at(s); await new Promise((ok) => setTimeout(ok, 1800)); }
+    const st = box.__kinetic; return { low: st.low, beat: st.want.beat, shadows: st.renderer.shadowMap.enabled, times: st.times.map((x) => Math.round(x * 1000)) };
+  });
+  if (!r.low || r.beat !== 8) { failed += 1; said.push('a slow computer did not step down on its own ' + JSON.stringify(r)); }
+  else said.push('stepped down on its own: ' + JSON.stringify(r));
+}
+// Fifty trips through every kind in one box: nothing the 3D holds may grow.
+{
+  await page.goto(origin + '/tools/motion/check.html?kind=stack&shown=1');
+  await page.waitForFunction(() => { const c = document.querySelector('.kinetic-canvas'); return c && !c.hidden; }, null, { timeout: 15000 });
+  const trips = await page.evaluate(() => window.cycle(50));
+  const first = trips[11], last = trips[trips.length - 1 - ((trips.length - 12) % 12)];
+  const grew = last.geometries > first.geometries + 2 || last.textures > first.textures + 2;
+  said.push('after 12 trips: ' + JSON.stringify(first) + '; after ' + (trips.indexOf(last) + 1) + ': ' + JSON.stringify(last));
+  if (grew) { failed += 1; said.push('the 3D grew across fifty trips'); }
+}
+if (args.includes('--only-checks')) { await browser.close(); server.close(); console.log([...new Set(said)].join('\n')); console.log(failed ? failed + ' failed' : 'reduced motion, lighter drawing, and fifty trips all passed'); process.exit(failed ? 1 : 0); }
 for (const kind of kinds) {
   for (const shown of [1, 2, 3, 0]) await look(kind, 'shown=' + shown, kind + '-' + (shown || 'all'));
   await look(kind, 'shown=2&back=1', kind + '-back', 6500);

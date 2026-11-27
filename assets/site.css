@@ -1388,6 +1388,8 @@ body.addon-body { min-height: 100vh; }
 .kinetic-points { list-style: decimal; margin: 0; padding-left: 1.4rem; display: grid; gap: 0.5rem; }
 .kinetic-point { display: grid; gap: 0.3rem; }
 .kinetic-point-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem; }
+.kinetic-long { margin: 0; color: var(--muted); }
+.kinetic-long[hidden] { display: none; }
 .kinetic-point-pic { width: 3rem; height: 2rem; object-fit: cover; border-radius: 4px; }
 .addon-stage .stage-head { position: relative; z-index: 1; }
 .stage-ready:has(.stage-slide:not([hidden])) .addon-mark { visibility: hidden; }

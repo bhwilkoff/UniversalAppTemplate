@@ -146,3 +146,8 @@ test('the kit wrapper draws kinetic slides still, once per kit', () => {
   w.render(KINETIC); w.words(KINETIC); w.frame(KINETIC, 0, 1);
   assert.ok(seen.every((t) => !/```kinetic/.test(t)));
 });
+
+test('the kinds that draw words only say so, so the editor can offer pictures only where they show', () => {
+  const words = lib.KINETIC_KINDS.filter((k) => k.pictures === false).map((k) => k.key);
+  assert.deepEqual(words.sort(), ['gather', 'stack']);
+});

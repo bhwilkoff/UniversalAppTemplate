@@ -21,7 +21,22 @@
   var say = (SAY[kind] || SAY.def).slice(0, n);
   var pic = q.get('pic') ? ' ![A desk with a laptop](https://humanshaped.org/assets/photos/desk-800.webp)' : '';
   var raw = '## How we built the stage\n\n```kinetic\n---\nkind: ' + kind + '\n---\n' + say.map(function (s, i) { return '- ' + s + (i === 0 ? pic : ''); }).join('\n') + '\n```\n\n> A note\n';
+  KineticKit.quality = q.get('q') || 'high';
   var L = SlidesLib, K = L.kit(DeckKit), text = L.deck(raw);
+  // Fifty trips in and out of every kind in one box: what the 3D holds after
+  // each, so anything that grows is a leak.
+  window.cycle = async function (n) {
+    var box = document.getElementById('m'), kinds = L.KINETIC_KINDS.map(function (k) { return k.key; }), out = [];
+    for (var i = 0; i < n; i++) {
+      var k = kinds[i % kinds.length];
+      var t = L.deck('## Trip ' + i + '\n\n```kinetic\n---\nkind: ' + k + '\n---\n- One point\n- Another point\n```');
+      KineticKit.show(box, t, 0, 2, '');
+      await new Promise(function (r) { setTimeout(r, 120); });
+      var st = box.__kinetic, m = st && st.renderer ? st.renderer.info.memory : {};
+      out.push({ kind: k, geometries: m.geometries, textures: m.textures, heap: performance.memory ? Math.round(performance.memory.usedJSHeapSize / 1e6) : null });
+    }
+    return out;
+  };
   function at(step) {
     var svg = step ? K.frame(text, 0, step) : K.render(text)[0];
     document.getElementById('s').innerHTML = svg;
