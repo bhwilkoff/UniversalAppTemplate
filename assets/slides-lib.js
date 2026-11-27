@@ -161,9 +161,11 @@
     if (!K.__stillKit) {
       var w = {};
       Object.keys(K).forEach(function (n) { w[n] = K[n]; });
-      w.render = function (t) { return K.render(still(resolve(t))); };
+      // A slide that is only a picture draws the picture here too, so the
+      // studio's canvas and film show it and not its words as a link.
+      w.render = function (t) { var r = resolve(t), p = pictures(r); return K.render(still(r)).map(function (svg, i) { return p[i] ? pictureSvg(svg, p[i]) : svg; }); };
       w.words = function (t) { return K.words(still(resolve(t))); };
-      w.frame = function (t, a, s) { return K.frame(still(resolve(t)), a, s); };
+      w.frame = function (t, a, s) { var r = resolve(t), p = pictures(r)[a]; var svg = K.frame(still(r), a, s); return p ? pictureSvg(svg, p) : svg; };
       if (K.lint) w.lint = function (t) { return K.lint(still(resolve(t))); };
       w.__still = true;
       try { Object.defineProperty(K, '__stillKit', { value: w }); } catch (e) { return w; }
@@ -293,6 +295,7 @@
   }
   // The renderer's slides, with each picture slide drawn as its picture.
   function render(kit, text) {
+    if (kit && kit.__still) return kit.render(text);
     text = resolve(text);
     var out = kit.render(text), pics = pictures(text);
     return out.map(function (svg, i) { return pics[i] ? pictureSvg(svg, pics[i]) : svg; });

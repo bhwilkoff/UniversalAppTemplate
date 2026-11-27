@@ -102,3 +102,14 @@ test('a link that changed tells the stage to draw again', () => {
   assert.equal(SL.usePictures({ 'gggggg7777.webp': 'https://store.example/1' }), 0);
   assert.equal(SL.usePictures({ 'gggggg7777.webp': 'https://store.example/2' }), 1);
 });
+
+test('a slide that is only a picture draws the picture through the kit, in the studio as on the stage', () => {
+  SL.usePictures({ 'hhhhhh8888.jpg': 'https://store.example/sign/h?token=t' });
+  const fake = { render: (t) => t.split(/\n---\n/).map((x) => '<svg viewBox="0 0 1600 900"><text>' + x + '</text></svg>'), words: () => [], frame: (t, a) => '<svg viewBox="0 0 1600 900"></svg>' };
+  const K = SL.kit(fake);
+  const svgs = K.render('# One\n---\n![welcome](pic:hhhhhh8888.jpg)');
+  assert.doesNotMatch(svgs[0], /<image/);
+  assert.match(svgs[1], /<image href="https:\/\/store\.example\/sign\/h\?token=t"/);
+  assert.match(K.frame('# One\n---\n![welcome](pic:hhhhhh8888.jpg)', 1, 0), /<image/);
+  assert.equal(SL.render(K, '![welcome](pic:hhhhhh8888.jpg)')[0].match(/<image/g).length, 1);
+});
