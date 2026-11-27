@@ -116,7 +116,13 @@
       if (step.act === 'stage') return openStage();
       if (step.act === 'close') return send({ t: 'close' });
       if (step.act === 'talk') return F.show('slides');
-      if (step.act === 'slides') return send({ t: 'show', show: 'slides' });
+      if (step.act === 'slides') {
+        // Starting fresh lands on the first stop, so a slide that builds starts
+        // with its first point rather than whole (found with a kinetic slide).
+        var first = stops()[0], fresh = !(room.at > 0 || room.shown);
+        if (fresh && first && first.shown) return send({ t: 'go', at: first.slide, shown: first.shown });
+        return send({ t: 'show', show: 'slides' });
+      }
       if (step.act === 'next') send({ t: 'go', at: step.to.slide, shown: step.to.shown });
     }
     function back() {

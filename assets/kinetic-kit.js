@@ -326,8 +326,8 @@
   // hops along them, and each stop's sign rises as it is reached.
   KINDS.path = function (T, points) {
     var w = world(T), n = points.length, items = [];
-    var curve = new T.CatmullRomCurve3([new T.Vector3(-6.4, 0, 3.2), new T.Vector3(-3, 0, 0.6), new T.Vector3(0, 0, 2.2), new T.Vector3(3.2, 0, -0.4), new T.Vector3(6.2, 0, 1.4)]);
-    var stops = points.map(function (p, i) { return n === 1 ? 0.5 : 0.04 + 0.92 * i / (n - 1); });
+    var curve = new T.CatmullRomCurve3([new T.Vector3(-5.3, 0, 3.0), new T.Vector3(-2.6, 0, 0.6), new T.Vector3(0, 0, 2.2), new T.Vector3(2.7, 0, -0.4), new T.Vector3(5.2, 0, 1.4)]);
+    var stops = points.map(function (p, i) { return n === 1 ? 0.5 : 0.12 + 0.76 * i / (n - 1); });
     var stones = [], count = 34, stoneMat = new T.MeshStandardMaterial({ color: '#3d4842', roughness: 0.95 });
     for (var k = 0; k < count; k++) {
       var t = k / (count - 1), at = curve.getPoint(t);
@@ -337,10 +337,12 @@
     }
     var signs = points.map(function (point, i) {
       var at = curve.getPoint(stops[i]), g = new T.Group();
-      var post = new T.Mesh(new T.CylinderGeometry(0.05, 0.05, 1.4, 10), new T.MeshStandardMaterial({ color: '#8a958f' }));
-      post.position.y = 0.7; post.castShadow = true; g.add(post);
-      var c = card(T, point, i, { w: 3.5, h: 1.95, d: 0.06, size: 74, most: 3 });
-      c.position.y = 1.4 + 0.97; g.add(c);
+      // Neighboring signs stand at two heights, so none covers another's words.
+      var rows = n > 5 ? 3 : 2, tall = 1.3 + (i % rows) * (rows === 3 ? 1.45 : 2.05), sw = n > 5 ? 2.4 : n > 4 ? 2.9 : 3.3;
+      var post = new T.Mesh(new T.CylinderGeometry(0.05, 0.05, tall, 10), new T.MeshStandardMaterial({ color: '#8a958f' }));
+      post.position.y = tall / 2; post.castShadow = true; g.add(post);
+      var c = card(T, point, i, { w: sw, h: sw * 0.56, d: 0.06, size: 74, most: 3 });
+      c.position.y = tall + sw * 0.28; g.add(c);
       g.position.set(at.x, 0, at.z - 0.35); w.scene.add(g);
       var it = piece(function (p) { var e = easeOut(clamp(p * 1.4 - 0.25)); g.visible = p > 0; g.scale.set(1, Math.max(0.001, e), 1); c.material[4].color.setScalar(i < beat - 1 ? 0.78 : 1); });
       items.push(it);
@@ -350,8 +352,8 @@
     var walker = new T.Mesh(new T.SphereGeometry(0.28, 28, 20), new T.MeshStandardMaterial({ color: ACCENTS[0], roughness: 0.4 }));
     walker.castShadow = true; w.scene.add(walker);
     var trav = { t: 0, from: 0, to: 0, p: 1 };
-    w.camera.position.set(0, 8.4, 16.8);
-    w.camera.lookAt(0, 1.3, 0.6);
+    w.camera.position.set(0, 8.2, 17.4);
+    w.camera.lookAt(0, 2.3, 0.6);
     return kind(w, items, function (b, now) {
       beat = b; upto(signs, b);
       var goal = stops[Math.max(0, b - 1)];
@@ -381,9 +383,9 @@
     }
     var cw = Math.min(3.4, 16 / n);
     var stations = points.map(function (point, i) {
-      var p = pos(ang(i)), g = new T.Group(), c = card(T, point, i, { w: cw, h: cw * 0.6, size: 80, most: 3 });
-      c.position.y = cw * 0.3 + 0.15; g.add(c); g.position.set(p.x, 0, p.z); w.scene.add(g);
-      var it = piece(function (q) { var e = easeOut(q); g.position.y = e * 0.35; var s = 0.82 + e * 0.28; g.scale.set(s, s, s); c.material[4].color.setScalar(lerp(0.62, 1, Math.min(1, q * 2 + (it.seen ? 1 : 0)))); });
+      var p = pos(ang(i)), g = new T.Group(), c = card(T, point, i, { w: cw, h: cw * 0.7, size: 80, most: 4 });
+      c.position.y = cw * 0.35 + 0.15; g.add(c); g.position.set(p.x, 0, p.z); w.scene.add(g);
+      var it = piece(function (q) { var e = easeOut(q); g.position.y = e * 0.35; var s = 0.9 + e * 0.2; g.scale.set(s, s, s); c.material[4].color.setScalar(lerp(0.62, 1, Math.min(1, q * 2 + (it.seen ? 1 : 0)))); });
       it.seen = false;
       items.push(it);
       return it;
@@ -413,10 +415,10 @@
   // Dominoes fall: the points stand in a line going away, and each step tips
   // the front one over, face up, to show the one behind it.
   KINDS.dominoes = function (T, points) {
-    var w = world(T), n = points.length, items = [], dh = 3.0, dw = 2.3, dd = 0.34, gap = 3.25;
+    var w = world(T), n = points.length, items = [], dh = 3.0, dw = 2.9, dd = 0.34, gap = 3.25;
     var doms = points.map(function (point, i) {
       var side = new T.MeshStandardMaterial({ color: '#2b3430', roughness: 0.6 });
-      var front = new T.MeshStandardMaterial({ map: face(T, point.words, { w: Math.round(dw * 200), h: Math.round(dh * 200), bg: INK, fg: DARK, stripe: accent(i), size: 80, most: 5, pad: 0.1 }, point.img), roughness: 0.6 });
+      var front = new T.MeshStandardMaterial({ map: face(T, point.words, { w: Math.round(dw * 200), h: Math.round(dh * 200), bg: INK, fg: DARK, stripe: accent(i), size: 88, most: 4, pad: 0.09 }, point.img), roughness: 0.6 });
       var m = new T.Mesh(new T.BoxGeometry(dw, dh, dd), [side, side, side, side, front, side]);
       m.castShadow = true; m.receiveShadow = true;
       m.position.set(0, dh / 2, dd / 2);
@@ -434,7 +436,7 @@
     return kind(w, items, function (b, now) {
       doms.forEach(function (d, i) { d.it.to = i < b - 1 ? 1 : 0; });
       var c = doms[Math.max(0, b - 1)];
-      cam.to([c.x + 3.8, 6.6, c.z + 12.2], [c.x, 1.7, c.z - 0.6], now);
+      cam.to([c.x + 3.3, 6.0, c.z + 10.6], [c.x, 1.7, c.z - 0.5], now);
     }, function (dt, t, still) { return cam.step(dt, still); });
   };
 
@@ -585,7 +587,7 @@
     var cam = rig(T, w.camera, [0, 3.4, 11], [0, 1.5, 0]);
     return kind(w, items, function (b, now) {
       beat = b; upto(items, b);
-      var x = n <= 3 ? 0 : xs[Math.max(0, b - 1)] - Math.sign(xs[Math.max(0, b - 1)]) * Math.min(Math.abs(xs[Math.max(0, b - 1)]), gap * 0.5);
+      var x = n <= 3 ? 0 : xs[Math.max(0, b - 1)];
       cam.to([x + 1.0, 3.4, n <= 3 ? 15 : 13], [x, 1.35, 0], now);
     }, function (dt, t, still) { return cam.step(dt, still); });
   };

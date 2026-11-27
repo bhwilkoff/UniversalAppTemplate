@@ -83,7 +83,7 @@
   // The first heading of a talk, for its title.
   function titleOf(text) {
     var m = /^#{1,3}\s+(.+?)\s*(\{.*\})?\s*$/m.exec(String(text || ''));
-    return m ? m[1].slice(0, 120) : '';
+    return m ? m[1].replace(/^:[a-z0-9-]+:\s*/, '').slice(0, 120) : '';
   }
 
   // A stop in the talk: { slide, shown }, with shown 0 for the whole slide, the
@@ -109,7 +109,9 @@
     if (!list.length) return { label: 'Write your slides', act: 'talk' };
     var i = stopAt(list, room.at, room.shown);
     if (i >= list.length - 1) return { label: 'Last slide', act: null, disabled: true };
-    return { label: 'Next slide', act: 'next', to: list[i + 1] };
+    // Within a slide that builds (point by point, or kinetic), the next press
+    // brings the next point, as the cohort panel says.
+    return { label: list[i + 1].slide === list[i].slide ? 'Next point' : 'Next slide', act: 'next', to: list[i + 1] };
   }
 
   function people(room) { return (room && room.people) || []; }

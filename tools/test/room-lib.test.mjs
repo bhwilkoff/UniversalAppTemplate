@@ -37,6 +37,7 @@ test('a page loads its own files from one commit, and base comes first', () => {
 test('the title is the first heading', () => {
   assert.equal(R.titleOf('> note\n\n# One thing {.build}\n\n---\n\n# Two'), 'One thing');
   assert.equal(R.titleOf('nothing'), '');
+  assert.equal(R.titleOf('## :lightbulb: What questions do you still have?'), 'What questions do you still have?');
 });
 
 test('the host\'s one button names the next step', () => {
@@ -49,6 +50,8 @@ test('the host\'s one button names the next step', () => {
   assert.equal(R.nextStep(room({ show: 'board', at: 1 }), { stageOn: true, stops: list }).label, 'Back to the slides');
   assert.deepEqual(R.nextStep(room({ show: 'slides' }), { stageOn: true, stops: list }).to, { slide: 1, shown: 1 });
   assert.ok(R.nextStep(room({ show: 'slides', at: 1, shown: 0 }), { stageOn: true, stops: list }).disabled);
+  assert.equal(R.nextStep(room({ show: 'slides' }), { stageOn: true, stops: list }).label, 'Next slide');
+  assert.equal(R.nextStep(room({ show: 'slides', at: 1, shown: 1 }), { stageOn: true, stops: list }).label, 'Next point');
 });
 
 const q = { id: 'q1', kind: 'choice', prompt: 'Which?', choices: ['One', 'Two'], reveal: true, open: true };
