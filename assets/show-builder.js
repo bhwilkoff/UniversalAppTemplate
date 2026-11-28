@@ -365,6 +365,7 @@
       call.appendChild(roomBox);
       var by = c.group_size ? 'size' : 'rooms';
       var rcount = el('input'); rcount.type = 'number'; rcount.name = 'count'; rcount.min = 1; rcount.max = 40; rcount.value = c.group_size || c.groups || '';
+      roomBox.appendChild(el('p', 'part-call-head', 'Make rooms by'));
       var byWrap = el('div', 'choices');
       [['rooms', 'Rooms'], ['size', 'People in each room']].forEach(function (o) {
         var l = el('label', 'check'), r = el('input'); r.type = 'radio'; r.name = 'by'; r.value = o[0]; r.checked = by === o[0];
@@ -461,7 +462,13 @@
       more.appendChild(el('summary', null, 'More about this part'));
       f.appendChild(more);
       f.appendChild(call);
+      var slidesHead = el('p', 'part-slides-head', 'Slides beside it');
       function tuck() {
+        // Talk and Writing are their slides; on any other part the slides sit
+        // after its own fields.
+        var lead = ['talk', 'reflection'].indexOf(kindSel.value) >= 0;
+        if (lead) { slidesHead.remove(); f.insertBefore(deckBox, top.nextSibling); }
+        else { f.insertBefore(slidesHead, more); f.insertBefore(deckBox, more); }
         var deck = !deckBox.hidden;
         more.hidden = !deck;
         [bodyL, noteL].forEach(function (x) { (deck ? more : f).appendChild(x); });

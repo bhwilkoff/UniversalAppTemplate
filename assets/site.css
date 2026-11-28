@@ -3748,3 +3748,6 @@ html.stage-in-panel .stage-corner { display: none !important; }
 .part-call > label, .part-call-rooms > label { display: grid; gap: 0.2rem; margin: 0.6rem 0; }
 .part-call-rooms .choices { display: flex; flex-wrap: wrap; gap: 0.25rem 1rem; }
 .part-call-head { margin: 0.9rem 0 0.3rem; font-weight: 600; }
+.part-form label.check { display: flex; align-items: center; gap: 0.5rem; font-weight: 400; }
+.part-form label.check input { width: auto; }
+.part-slides-head { margin: 1rem 0 0.4rem; font-weight: 600; }
