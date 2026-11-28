@@ -93,7 +93,13 @@
     var out = [];
     if (m.comingUp && m.comingUp.length) out.push('next');
     if (m.waiting && m.waiting.length) out.push('waiting');
-    out.push('learning', 'leading', 'work');
+    out.push('learning', 'leading');
+    // Someone whose cohorts are all their leaders' own courses (any subject)
+    // and who has no app is not asked for one.
+    var cs = m.cohorts || [];
+    var ownOnly = cs.length && cs.every(function (c) { return c.schedule === 'custom'; }) && !m.builderApp && !(m.listedApps || []).length
+      && !cs.some(function (c) { return c.enrollment && c.enrollment.app_repo; });
+    if (!ownOnly) out.push('work');
     return out;
   }
 

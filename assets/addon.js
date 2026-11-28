@@ -420,7 +420,9 @@
         // no next or current one, so the first stands in rather than nothing.
         S.session = named || chosen || (t.live ? t.next : (t.next || t.current)) || ss[0];
         S.prev = ss.filter(function (x) { return x.number === S.session.number - 1; })[0] || null;
-        S.parts = lib.agenda(cohort.session_minutes);
+        // A cohort on its leaders' own subject never runs on the Human Shaped
+        // course's six parts: a session with no plan of its own has none.
+        S.parts = lib.course && !lib.course(cohort) ? [] : lib.agenda(cohort.session_minutes);
         var since = S.prev && S.prev.starts_at ? S.prev.starts_at : new Date(Date.now() - 8 * 86400000).toISOString();
         // Leaders' notes for each part, which only leaders can read (found
         // in Week 1: they were written on the session page and never reached
@@ -1134,6 +1136,7 @@
       S.appSection = el('section', 'p2-group p2-learn-app'); S.appSection.setAttribute('aria-label', 'Your app');
       S.mineApp = el('div', 'p2-myapp'); S.appSection.appendChild(S.mineApp);
       S.classApps = el('div', 'p2-class-apps'); S.appSection.appendChild(S.classApps);
+      S.appSection.hidden = S.cohort && S.cohort.schedule === 'custom';
       now.appendChild(S.appSection);
       S.mineAsk = el('section', 'p2-group p2-mine-ask'); S.mineAsk.setAttribute('aria-label', 'Ask your leader'); now.appendChild(S.mineAsk);
       now.appendChild(S.frameTools);
@@ -2583,7 +2586,7 @@
     function unpin() { setPin(null); }
     add('Main stage', S.stageTools, { on: !!S.stageOn }); add('Ask a question', S.askTool, { on: asked, off: newest ? function () { if (S.onStage && S.onStage.id === newest.id) setPin(null); changeCheck(newest, { state: 'closed' }); } : null, offLabel: 'Close it' });
     add('Breakouts', S.breakTool); add('The board', S.boardTool, { on: !!(S.onStage && S.onStage.kind === 'board'), off: unpin, offLabel: 'Take down' });
-    if (S.appsBox && S.appsBox.childElementCount) add('Apps', S.appsBox, { on: !!(S.onStage && S.onStage.kind === 'item'), off: unpin, offLabel: 'Take down' });
+    if (S.appsBox && S.appsBox.childElementCount && S.cohort.schedule !== 'custom') add('Apps', S.appsBox, { on: !!(S.onStage && S.onStage.kind === 'item'), off: unpin, offLabel: 'Take down' });
     add('Show a website', S.svcSite, { on: showing === 'page', off: function () { S.svc.takeDown(); }, offLabel: 'Take down' });
     add('A clock', S.svcClock, { on: !!(room.on && room.clock), off: function () { S.svc.send({ t: 'clock', seconds: 0 }); }, offLabel: 'Stop' });
     add('Propose and vote', S.svcVote, { on: showing === 'board', off: function () { S.svc.takeDown(); }, offLabel: 'Take down' });

@@ -73,17 +73,29 @@
     return hubPages;
   }
 
+  // A cohort on its leaders' own subject shows nothing that only the Human
+  // Shaped course has: apps, the path's stages, builds, AI reviews.
+  function ownCourse() {
+    var own = !lib.course(cohort);
+    document.documentElement.toggleAttribute('data-own-course', own);
+    if (!own) return;
+    var h = document.getElementById('people-title'); if (h) h.textContent = 'People';
+    var kind = $('[data-share-form]') && $('[data-share-form]').elements.kind;
+    if (kind) Array.prototype.slice.call(kind.options).forEach(function (o) { if (o.value === 'bring-back' || o.value === 'ai-review') o.remove(); });
+  }
+
   function personCard(e) {
     var card = el('article', 'app');
-    card.appendChild(el('h3', null, e.app_name || nameOf(e.profiles)));
+    var appName = lib.course(cohort) ? e.app_name : null;
+    card.appendChild(el('h3', null, appName || nameOf(e.profiles)));
     var by = el('p', 'facts');
-    by.appendChild(document.createTextNode((e.app_name ? 'Built by ' + nameOf(e.profiles) + ', ' : '')));
+    by.appendChild(document.createTextNode((appName ? 'Built by ' + nameOf(e.profiles) + ', ' : '')));
     if (e.profiles) by.appendChild(link('https://github.com/' + encodeURIComponent(e.profiles.github_login), '@' + e.profiles.github_login));
     var role = window.MentorLib ? window.MentorLib.roleLabel(e.role) : '';
     by.appendChild(el('span', 'role-tag', 'Learner'));
     if (role) by.appendChild(el('span', 'role-tag', role));
     card.appendChild(by);
-    if (e.role === 'mentor' && !e.app_repo) {
+    if ((e.role === 'mentor' && !e.app_repo) || !lib.course(cohort)) {
       return card;
     }
     var repo = lib.repoPath(e.app_repo);
@@ -247,6 +259,7 @@
     }).catch(function () { return null; });
   }
   function drawBars() {
+    if (!lib.course(cohort)) return;
     var box = $('[data-ready-bar]');
     box.replaceChildren();
     var stages = week ? lib.stagesForWeek(week) : [];
@@ -287,6 +300,7 @@
         if (c.error) return fail('This cohort could not be opened: ' + c.error.message);
         if (!c.data) return show('not-member');
         cohort = c.data;
+        ownCourse();
         if (byId) {
           var u = new URL(location.href); u.searchParams.set('c', cohort.slug);
           history.replaceState(history.state, '', u.pathname + u.search);
@@ -345,6 +359,7 @@
   // template. Words by Claude, awaiting Ben's review.
   function drawShowcase(sessions) {
     var S = window.ShowcaseLib;
+    if (!lib.course(cohort)) return;
     var box = $('[data-last-week]');
     if (!S || !box) return;
     var open = (sessions || []).filter(function (s) { return s.public_showcase; })[0];

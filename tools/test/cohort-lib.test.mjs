@@ -170,3 +170,9 @@ test('outcomes take their names from the catalog, keep names given, and a sessio
   assert.equal(r.outcomes[2].name, null);
   assert.deepEqual(C.sessionOutcomes({ outcomes: ['glo:7', 'glo:8'] }, { outcomes: r.outcomes }).map((o) => o.name), ['professionalism']);
 });
+
+test('a custom cohort\'s getting-ready steps ask for no app, setup path, or agent', () => {
+  const keys = (c) => lib.setupSteps({}, null, c).map(s => s.key);
+  assert.deepEqual(keys({ schedule: 'custom', github_team: 't' }), ['talk', 'meet']);
+  assert.deepEqual(keys({ schedule: 'weekly' }), ['setup', 'app', 'meet', 'agent']);
+});

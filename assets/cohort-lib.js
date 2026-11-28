@@ -172,15 +172,21 @@
   // invitation, which arrives as they join; getting set up, which ends
   // with the app live at an address; telling the cohort where it is; and
   // the Meet add-on, which the hub cannot see either.
+  // Whether a cohort runs the Human Shaped course (weekly) rather than its
+  // leaders' own course on any subject (custom), where nothing assumes an
+  // app, the path's stages, or the course's six parts.
+  function course(cohort) { return !cohort || cohort.schedule !== 'custom'; }
+
   function setupSteps(mine, access, cohort) {
     var steps = [];
     if (cohort && cohort.github_team) {
       steps.push({ key: 'talk', label: 'Accept the GitHub invitation', tab: 'talk', done: !!(access && access.state === 'member') });
     }
-    steps.push({ key: 'setup', label: 'Get set up', href: '/path/setup/', done: !!(mine && mine.app_url) });
-    steps.push({ key: 'app', label: 'Add your app', tab: 'mine', done: !!(mine && mine.app_repo && mine.app_url) });
+    var hs = course(cohort);
+    if (hs) steps.push({ key: 'setup', label: 'Get set up', href: '/path/setup/', done: !!(mine && mine.app_url) });
+    if (hs) steps.push({ key: 'app', label: 'Add your app', tab: 'mine', done: !!(mine && mine.app_repo && mine.app_url) });
     steps.push({ key: 'meet', label: 'Add Human Shaped to Google Meet', href: '/meet/#add', done: null });
-    steps.push({ key: 'agent', label: 'Connect your agent', href: '/connect/', done: null });
+    if (hs) steps.push({ key: 'agent', label: 'Connect your agent', href: '/connect/', done: null });
     return steps;
   }
 
@@ -274,7 +280,7 @@
   }
 
   var lib = {
-    outcomeText: outcomeText, nameOutcomes: nameOutcomes, sessionOutcomes: sessionOutcomes,
+    course: course, outcomeText: outcomeText, nameOutcomes: nameOutcomes, sessionOutcomes: sessionOutcomes,
     welcome: welcome, blocks: blocks, sessionName: sessionName, sessionTitle: sessionTitle, sessionUrl: sessionUrl,
     setupSteps: setupSteps, agenda: agenda, partNow: partNow, stagesForWeek: stagesForWeek, stagesShownAt: stagesShownAt, stageFile: stageFile,
     readyBar: readyBar, readinessText: readinessText, seenText: seenText, canConfirm: canConfirm, partnersOf: partnersOf,

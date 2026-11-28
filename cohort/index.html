@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261128e">
+  <link rel="stylesheet" href="/assets/site.css?v=20261128f">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -130,7 +130,7 @@
             <ol class="setup-steps" data-setup-steps></ol>
           </section>
           <!-- The last week (H5): words by Claude, awaiting Ben's review. -->
-          <section class="cohort-card" aria-labelledby="last-week-title" data-last-week hidden>
+          <section class="cohort-card" aria-labelledby="last-week-title" data-last-week data-course-only hidden>
             <h2 id="last-week-title">The last week</h2>
             <div data-showcase-line hidden>
               <p class="ui-meta-line"><span data-status="showing.open"></span> <span data-vis="link"></span></p>
@@ -201,7 +201,7 @@
               <div class="ui-toolbar"><button class="btn-secondary" type="button" data-group-open>Add a group</button></div>
               <form class="cohort-form group-form" data-group-form hidden>
                 <label>Name <input name="name" required maxlength="60" placeholder="Group 1"></label>
-                <label>What it is for <input name="expectations" maxlength="400" placeholder="Show each other your build before each session"></label>
+                <label>What it is for <input name="expectations" maxlength="400" placeholder="Meet before each session"></label>
                 <div class="actions"><button class="btn-primary" type="submit">Add group</button><button class="btn-secondary" type="button" data-group-cancel>Cancel</button></div>
               </form>
               </section>
@@ -219,7 +219,7 @@
                   </div>
                 </form>
               </section>
-              <section class="panel-section" aria-labelledby="apps-title">
+              <section class="panel-section" aria-labelledby="apps-title" data-course-only>
                 <h2 id="apps-title">Apps</h2>
               <p class="ui-inline-status" data-submissions-intro></p>
               <div data-submissions></div>
@@ -243,7 +243,7 @@
           </section>
           </div>
           <div data-tab="people" hidden>
-          <section aria-labelledby="asks-title">
+          <section aria-labelledby="asks-title" data-course-only>
             <h2 id="asks-title">Try my app</h2>
             <div data-asks></div>
           </section>
@@ -260,7 +260,7 @@
             <p class="ui-meta-line"><span data-vis="teachers"></span> Named in your credential, which is public, once it is signed.</p>
             <ul class="recognized-list" data-recognized></ul>
           </section>
-          <section aria-labelledby="mine-title" data-student-only>
+          <section aria-labelledby="mine-title" data-student-only data-course-only>
             <h2 id="mine-title">Your app</h2>
             <!-- The words about submitting and hiding were written by Claude
                  for milestone M10 and await Ben's review. -->
@@ -300,7 +300,7 @@
                 <label>What you want your group to tell you <input name="want_to_know" maxlength="300"><span class="hint">One line, which opens your turn in your group at the next session.</span></label>
                 <fieldset class="ready-mark" hidden>
                   <legend>Ready to move on, or not yet?</legend>
-                  <div class="ready-bar" data-ready-bar></div>
+                  <div class="ready-bar" data-ready-bar data-course-only></div>
                   <label class="check"><input type="radio" name="readiness" value="ready"> Ready, because it meets the bar</label>
                   <label class="check"><input type="radio" name="readiness" value="not-yet"> Not yet</label>
                   <label data-missing-wrap hidden>What is still missing <textarea name="missing" rows="2" maxlength="1000"></textarea></label>
@@ -340,7 +340,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" defer></script>
   <script src="/assets/hub-config.js?v=20261016a" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.4.16/purify.min.js" integrity="sha512-flQmhkXNRQ3iUfvtdCobtpMjCb6kE+zLnTiAulAQJ3WykVfy84JvCMOo6vhwWXHTXjR25h9Zj+LyGFRWKjRoag==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
-  <script src="/assets/cohort-lib.js?v=20261111h" defer></script>
+  <script src="/assets/cohort-lib.js?v=20261128a" defer></script>
   <script src="/assets/submit-lib.js?v=20261022a" defer></script>
   <script src="/assets/discussions-lib.js" defer></script>
   <script src="/assets/github-token.js?v=20261106b" defer></script>
@@ -379,10 +379,10 @@
   <script src="/assets/show-builder.js?v=20261128e" defer></script>
   <script src="/assets/calendar-lib.js?v=20261112b" defer></script>
   <script src="/assets/leader-calendar.js?v=20261112b" defer></script>
-  <script src="/assets/teach-cohort.js?v=20261127a" defer></script>
+  <script src="/assets/teach-cohort.js?v=20261128a" defer></script>
   <script src="/assets/record-lib.js?v=20261111i" defer></script>
   <script src="/assets/announcements.js?v=20261112b" defer></script>
-  <script src="/assets/cohort.js?v=20261112m" defer></script>
+  <script src="/assets/cohort.js?v=20261128a" defer></script>
   <script src="/assets/exchange-lib.js?v=20261107a" defer></script>
   <script src="/assets/exchange-list.js?v=20261022d" defer></script>
 

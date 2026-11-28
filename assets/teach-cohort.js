@@ -690,7 +690,8 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
       if (st) head.appendChild(st);
       card.appendChild(head);
       var work = el('p', 'person-work');
-      if (p.app_url) { var a = el('a', null, p.app_name || p.app_url.replace(/^https:\/\//, '')); a.href = p.app_url; a.target = '_blank'; a.rel = 'noopener'; work.appendChild(a); }
+      if (current.schedule === 'custom') work.hidden = true;
+      else if (p.app_url) { var a = el('a', null, p.app_name || p.app_url.replace(/^https:\/\//, '')); a.href = p.app_url; a.target = '_blank'; a.rel = 'noopener'; work.appendChild(a); }
       else work.textContent = p.app_name || 'No app added yet';
       if (p.app_repo) { work.appendChild(document.createTextNode(' · ')); var r = el('a', null, 'Repository'); r.href = 'https://github.com/' + p.app_repo; r.target = '_blank'; r.rel = 'noopener'; work.appendChild(r); }
       card.appendChild(work);
@@ -826,6 +827,7 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
 
   function drawSubmissions(people, sessions, hides) {
     var S = window.SubmitLib;
+    if (current.schedule === 'custom') { needs.set('apps', null); return; }
     var box = $('[data-submissions]');
     box.replaceChildren();
     var win = S.submissionWindow(current, sessions, new Date());

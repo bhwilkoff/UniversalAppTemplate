@@ -104,3 +104,9 @@ test('a cohort on its own schedule counts sessions, not weeks', () => {
   assert.equal(lib.cohortState(K, live).meta, 'Session 2');
   assert.equal(lib.cohortState(C, lib.cohortNow(C, S, new Date('2026-10-27T23:30:00Z'))).meta, 'Week 2');
 });
+
+test('a person only in their leaders\' own courses, with no app, is not asked for one', () => {
+  assert.deepEqual(lib.sections({ cohorts: [{ schedule: 'custom', enrollment: {} }] }), ['learning', 'leading']);
+  assert.deepEqual(lib.sections({ cohorts: [{ schedule: 'custom', enrollment: {} }, { schedule: 'weekly', enrollment: {} }] }), ['learning', 'leading', 'work']);
+  assert.deepEqual(lib.sections({ cohorts: [{ schedule: 'custom', enrollment: { app_repo: 'a/b' } }] }), ['learning', 'leading', 'work']);
+});

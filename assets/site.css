@@ -3751,3 +3751,7 @@ html.stage-in-panel .stage-corner { display: none !important; }
 .part-form label.check { display: flex; align-items: center; gap: 0.5rem; font-weight: 400; }
 .part-form label.check input { width: auto; }
 .part-slides-head { margin: 1rem 0 0.4rem; font-weight: 600; }
+
+/* A cohort running its leaders' own course (schedule custom) hides what
+   only the Human Shaped course has: apps, the path's stages, its lessons. */
+[data-own-course] [data-course-only] { display: none !important; }
