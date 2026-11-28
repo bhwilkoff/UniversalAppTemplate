@@ -374,7 +374,8 @@
               var td = el('td');
               if (!c.fill) td.textContent = c.text;
               else {
-                var k = i + ',' + j, inp = field('input', 'Row ' + (i + 1) + ', column ' + (j + 1), mine[k] || ''); inp.maxLength = 500;
+                var head = [r[0] && !r[0].fill ? r[0].text : '', b.rows[0] && b.rows[0][j] && !b.rows[0][j].fill ? b.rows[0][j].text : ''].filter(Boolean).join(', ');
+                var k = i + ',' + j, inp = field('input', head || 'Row ' + (i + 1) + ', column ' + (j + 1), mine[k] || ''); inp.maxLength = 500;
                 inp.addEventListener('change', function () { mine[k] = inp.value; save(b.key, mine); });
                 td.appendChild(inp);
               }
@@ -386,12 +387,23 @@
         }
         box.appendChild(part);
       });
+      // Meet's panel frame cannot download, so the copy opens in its own
+      // window, where it can be saved or copied (found in a real call).
       box.appendChild(btn('Keep a copy', 'btn-secondary', function () {
         var md = window.SessionPlan ? window.SessionPlan.myCopy(w, a) : '';
-        var link = document.createElement('a');
-        link.href = URL.createObjectURL(new Blob([md], { type: 'text/markdown' }));
-        link.download = w.title.replace(/[^A-Za-z0-9 ._-]+/g, '').trim().slice(0, 80) + '.md';
-        document.body.appendChild(link); link.click(); link.remove();
+        var name = w.title.replace(/[^A-Za-z0-9 ._-]+/g, '').trim().slice(0, 80) + '.md';
+        var win = window.open('', '_blank');
+        if (!win) return say('The copy could not open. Allow pop-ups for this call and try again.');
+        var d = win.document;
+        d.title = w.title;
+        var css = d.createElement('style');
+        css.textContent = 'body{font:16px/1.5 system-ui,sans-serif;max-width:46rem;margin:2rem auto;padding:0 1rem;color:#1b1b1b}pre{white-space:pre-wrap;background:#f4f4f2;padding:1rem;border-radius:8px}a{display:inline-block;margin:0 0 1rem;padding:.5rem 1rem;border:1px solid #1b1b1b;border-radius:999px;color:inherit;text-decoration:none}';
+        d.head.appendChild(css);
+        var h = d.createElement('h1'); h.textContent = w.title; d.body.appendChild(h);
+        var link = d.createElement('a'); link.textContent = 'Download ' + name; link.download = name;
+        link.href = 'data:text/markdown;charset=utf-8,' + encodeURIComponent(md);
+        d.body.appendChild(link);
+        var pre = d.createElement('pre'); pre.textContent = md; d.body.appendChild(pre);
       }));
       pane.appendChild(box);
     }
@@ -428,6 +440,8 @@
           pane.appendChild(out('Open it in a new tab', room.page.url));
         }
         if (newSha) pane.appendChild(btn('Show the new version', 'btn-secondary', function () { var r = room.page; send({ t: 'page', owner: r.owner, repo: r.repo, sha: newSha, path: r.path }); newSha = null; }));
+      } else if (room.show === 'workbook' && room.workbook) {
+        pane.appendChild(el('p', 'small', 'The workbook is in everyone’s panel.'));
       } else if (room.show === 'draw') {
         pane.appendChild(el('h2', null, 'Drawing together'));
         pane.appendChild(btn('Start a new drawing', 'btn-secondary', function () { send({ t: 'draw', clear: true }); }));

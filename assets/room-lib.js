@@ -138,7 +138,7 @@
     }
     if (room.show === 'draw') return { mode: 'roomdraw', part: part };
     // A workbook is answered in each person's own panel; the stage says so.
-    if (room.show === 'workbook' && room.workbook) return { mode: 'card', part: null, card: { body: room.workbook.title + ': answer it in the Human Shaped panel beside the call.', endsAt: part ? part.endsAt : null } };
+    if (room.show === 'workbook' && room.workbook) return { mode: 'card', part: null, card: { body: 'Answer “' + room.workbook.title + '” in the Human Shaped panel beside the call.', endsAt: part ? part.endsAt : null } };
     if (room.show === 'board') return { mode: 'roomboard', part: part, prompt: room.board || '', notes: room.notes || [], you: c.you, host: room.host === c.you };
     if (room.show === 'page' && room.page) return { mode: 'page', part: part, page: room.page, mstate: room.mstate || null, html: room.page.owner || room.page.url ? null : (c.html || '') };
     if (room.show === 'card' && room.card) return { mode: 'card', part: null, card: { body: room.card, endsAt: part ? part.endsAt : null } };
