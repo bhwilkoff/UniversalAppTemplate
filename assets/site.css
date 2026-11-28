@@ -3768,3 +3768,10 @@ html.stage-in-panel .stage-corner { display: none !important; }
 .stage-credit { position: absolute; left: 0.5rem; bottom: 0.5rem; margin: 0; padding: 0.2rem 0.5rem; border-radius: 0.35rem; background: rgba(22, 32, 25, 0.82); color: #fff; font-size: 0.75rem; }
 .stage-credit a { color: #fff; }
 .model-how { display: grid; gap: 0.25rem; margin-bottom: 0.5rem; }
+
+/* A session from the host's Drive, run part by part in an open room. */
+.open-plan-parts { list-style: none; margin: 0 0 0.6rem; padding: 0; display: grid; gap: 0.3rem; }
+.open-plan-part { display: grid; width: 100%; text-align: left; gap: 0.05rem; padding: 0.45rem 0.6rem; border: 1px solid var(--rule); border-radius: 0.45rem; background: var(--card); color: var(--ink); font: inherit; cursor: pointer; }
+.open-plan-part[aria-current] { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.open-plan-kind { color: var(--muted); font-size: 0.8rem; }
+.open-plan-title { font-weight: 600; }

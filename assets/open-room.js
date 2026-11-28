@@ -4,7 +4,7 @@
 // stays here is the host's own talk, notes, and repository, in this browser.
 (function () {
   var R = window.RoomLib, SL = window.SlidesLib, L = window.LiveLib, RX = window.ReactLib, A = window.AddonLib;
-  var TALK = 'hs-room-talk', REPO = 'hs-room-repo', EDIT = 'hs-room-edit', GH = 'hs-room-github', DRIVE = 'hs-room-drive';
+  var TALK = 'hs-room-talk', REPO = 'hs-room-repo', EDIT = 'hs-room-edit', GH = 'hs-room-github', DRIVE = 'hs-room-drive', PLAN = 'hs-room-plan';
   function el(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
   function btn(label, cls, fn) { var b = el('button', cls || 'btn-secondary', label); b.type = 'button'; b.addEventListener('click', fn); return b; }
   function out(label, href, cls) { var a = el('a', cls || '', label); a.href = href; a.target = '_blank'; a.rel = 'noopener'; return a; }
@@ -17,6 +17,7 @@
     var box = o.root.querySelector('[data-state="open"]');
     var room = null, you = null, F = null, frameRole = null, online = true, ended = false, stageOn = false;
     var words = null, mine = null, tool = null, newSha = null, confirmEnd = false, watching = false;
+    var plan = (function () { try { var x = JSON.parse(get(PLAN) || 'null'); return x && Array.isArray(x.parts) && x.parts.length ? x : null; } catch (e) { return null; } })();
     var talk = get(TALK) || R.STARTER, repo = R.repoOf(get(REPO) || ''), lobby = null, person = { name: o.name, member: o.member, github: o.github || '' };
     var status = el('p', 'small'); status.setAttribute('role', 'status');
     var name = o.name || window.RoomClient.savedName();
@@ -193,7 +194,7 @@
     function drawNow() {
       if (!F || !room || !room.on) return;
       var host = isHost();
-      var key = JSON.stringify([host, room.show, room.at, room.shown, room.question, room.summary, room.notes, room.board, editing(), room.page, room.card, room.clock && room.clock.endsAt, room.canTakeOver, mine, words, newSha, talk.length, roomDeck && roomDeck.length, stageUp()]);
+      var key = JSON.stringify([plan && plan.at, plan && plan.parts.length, host, room.show, room.at, room.shown, room.question, room.summary, room.notes, room.board, editing(), room.page, room.card, room.clock && room.clock.endsAt, room.canTakeOver, mine, words, newSha, talk.length, roomDeck && roomDeck.length, stageUp()]);
       if (key === nowKey) return;
       var pane = F.pane('now');
       // A half-written note or answer stays while the room changes around it.
@@ -217,7 +218,36 @@
       if (r.rows.length) pane.appendChild(list);
       pane.appendChild(el('p', 'small', L.counted(r.total, 'answer', 'answers') + ', with no names.'));
     }
+    // A session from the host's Drive, run part by part (SessionPlan).
+    var KIND_WORD = { talk: 'Slides', question: 'Question', model: 'Model', site: 'Website', card: 'Card', clock: 'Clock' };
+    function runPart(i) {
+      var P = window.SessionPlan, part = plan && plan.parts[i];
+      if (!P || !part) return;
+      plan.at = i; put(PLAN, JSON.stringify(plan));
+      if (part.kind === 'talk') { talk = part.slides; put(TALK, talk); slidesKey = null; sendTalk(true); }
+      else P.messages(part).forEach(send);
+      nowKey = null; drawNow();
+    }
+    function planNow(pane) {
+      var box = el('section', 'p2-group open-plan');
+      box.appendChild(el('h2', null, plan.title || 'Your session'));
+      var ol = el('ol', 'open-plan-parts');
+      plan.parts.forEach(function (p, i) {
+        var li = el('li'), b = el('button', 'open-plan-part'); b.type = 'button';
+        if (i === plan.at) b.setAttribute('aria-current', 'step');
+        b.appendChild(el('span', 'open-plan-kind', KIND_WORD[p.kind] || p.kind));
+        b.appendChild(el('span', 'open-plan-title', p.title));
+        b.addEventListener('click', function () { runPart(i); });
+        li.appendChild(b); ol.appendChild(li);
+      });
+      box.appendChild(ol);
+      var next = plan.at == null ? 0 : plan.at + 1;
+      if (next < plan.parts.length) box.appendChild(btn('Next: ' + plan.parts[next].title, 'btn-primary', function () { runPart(next); }));
+      box.appendChild(btn('Put the session away', 'link-button', function () { plan = null; put(PLAN, ''); nowKey = null; drawNow(); }));
+      pane.appendChild(box);
+    }
     function hostNow(pane) {
+      if (plan) planNow(pane);
       var list = stops();
       if (editing()) pane.appendChild(editRow());
       if (room.show === 'slides') {
@@ -403,6 +433,7 @@
     // sessions" folder, through the Google account you already use in Meet.
     // No GitHub and no account here.
     var driveFiles = null;
+    function firstTalk() { var i = -1; (plan ? plan.parts : []).some(function (p, n) { if (p.kind === 'talk') { i = n; return true; } return false; }); return i; }
     function drawDrive(box) {
       var D = window.MyDrive, line = slideLine, held = (function () { try { return JSON.parse(get(DRIVE) || 'null'); } catch (e) { return null; } })();
       box.appendChild(el('h2', null, 'Keep them in your Drive'));
@@ -411,7 +442,9 @@
       acts.appendChild(btn('Save to my Drive', 'btn-secondary', function () {
         line.textContent = 'Saving to your Drive…';
         var title = (room && room.title) || R.titleOf(talk) || 'A session';
-        D.connect().then(function (token) { return D.save(token, D.session(title, talk), held && held.id).catch(function (e) { if (held && held.id) return D.save(token, D.session(title, talk)); throw e; }); })
+        var P = window.SessionPlan, body = plan && P ? P.session(plan.title || title, plan.parts.map(function (p, i) { return p.kind === 'talk' && i === firstTalk() ? Object.assign({}, p, { slides: talk }) : p; })) : D.session(title, talk);
+        if (plan) title = body.title;
+        D.connect().then(function (token) { return D.save(token, body, held && held.id).catch(function (e) { if (held && held.id) return D.save(token, body); throw e; }); })
           .then(function (id) { put(DRIVE, JSON.stringify({ id: id, name: title })); line.textContent = 'Saved in your Drive.'; slidesKey = null; drawSlides(); }, function (e) { line.textContent = e.message; });
       }));
       acts.appendChild(btn('Open from my Drive', 'btn-secondary', function () {
@@ -428,6 +461,9 @@
             line.textContent = 'Opening…';
             D.open(driveFiles.token, f.id).then(function (sess) {
               talk = D.talkOf(sess) || talk; put(TALK, talk); put(DRIVE, JSON.stringify({ id: f.id, name: sess.title || f.name }));
+              var parts = window.SessionPlan ? window.SessionPlan.clean(sess.parts) : [];
+              plan = parts.length > 1 || (parts[0] && parts[0].kind !== 'talk') ? { title: sess.title || '', parts: parts, at: null } : null;
+              put(PLAN, plan ? JSON.stringify(plan) : ''); nowKey = null; drawNow();
               driveFiles = null; sendTalk(room && room.show === 'slides'); line.textContent = 'Opened.'; slidesKey = null; drawSlides();
             }, function (e) { line.textContent = e.message; });
           });
