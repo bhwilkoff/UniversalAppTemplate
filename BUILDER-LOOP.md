@@ -22,6 +22,14 @@ test it as a person would (Chrome, live site, labeled "(delete me)"
 data), commit, push, and log it below. "Fixed" and "verified" stay
 separate words. One tick, one commit.
 
+## For Ben
+
+- **Credentials in a cohort on another subject.** A credential today
+  needs an app ("Needs a repository and a live address"). In a custom
+  cohort the app fields are hidden, so no learner there can earn one.
+  Hide credentials for custom cohorts, or let the leader name other
+  evidence? (Not changed.)
+
 ## Ben's answers (November 28)
 
 - **Who builds cohorts:** approved teachers only (today's gate stays).
@@ -51,7 +59,7 @@ by the Course Builder import or by SQL.
   A deck on every part kind, not only talk and reflection.
 - [x] B4. `copy_scenes` copies decks (scene_decks and slides) and
   pictures too.
-- [ ] B5. Any subject: /teach/new starts from scratch by default; the
+- [x] B5. Any subject: /teach/new starts from scratch by default; the
   Human Shaped curriculum is a starting point you choose. Audit what
   still says Prep, Week N, apps, or the path in a custom cohort. Seen
   in the B1 test: a custom cohort's "Before the first session" still
@@ -156,3 +164,20 @@ breakout state.
   the copied slide draws its picture. Also fixed: plan cards began
   ", 5 min". Not yet seen: a copied workbook's pictures (Leaf Lab Notes
   had none left).
+- 2026-11-28, tick 5 (B5, 23bc7e5a, ad3e2639). A new cohort starts by
+  choosing "The Human Shaped course" or "Your own course" (neither picked
+  ahead), and question 2 asks only who it is for. An audit agent listed
+  18 places a custom cohort still showed the course; for custom cohorts
+  (CohortLib.course): Getting ready drops Get set up, Add your app, and
+  Connect your agent; Your app, Try my app, stage bars, the last week's
+  lesson, and the leader's Apps list are hidden (`data-own-course` on the
+  page, `data-course-only` on sections); people show names only; sharing
+  offers feedback and questions only; the home's Your work is hidden for
+  someone only in such cohorts without an app; the add-on never falls
+  back to the six parts and hides the app section and Apps tool. 731
+  node tests. **Verified live as Ben (leader):** the form, and the
+  cohort page's gates (own-course mark, People, Apps and Your app
+  hidden, two share kinds). Not yet seen: a learner's view and the
+  add-on in a custom cohort (B7). Left as is: the leader's optional
+  Connect your agent step, roster wording "their build", the old panel's
+  path toggle, and credentials (For Ben).
