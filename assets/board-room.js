@@ -54,6 +54,16 @@
     last = v;
     if (!timer) timer = setTimeout(send, EVERY);
   }
+  // An element whose ordering key is not one Excalidraw could have made
+  // ("b2" from a test script, found in a real call) makes it throw and draw
+  // nothing; such a key is dropped so Excalidraw gives the element a new one.
+  var B62 = /^[0-9A-Za-z]+$/;
+  function okIndex(k) {
+    if (typeof k !== 'string' || !k || !B62.test(k)) return false;
+    var c = k.charCodeAt(0), n = c >= 97 && c <= 122 ? c - 97 + 2 : c >= 65 && c <= 90 ? 90 - c + 2 : 0;
+    return n > 0 && k.length >= n && k.charAt(k.length - 1) !== '0';
+  }
+  function clean(list) { return list.map(function (e) { return e && e.index != null && !okIndex(e.index) ? Object.assign({}, e, { index: null }) : e; }); }
   function apply(remote, whole) {
     if (!api) { waiting.push([remote, whole]); return; }
     if (whole && !remote.length) {
@@ -61,8 +71,14 @@
       api.updateScene({ elements: [], captureUpdate: X.CaptureUpdateAction.NEVER });
       return;
     }
+    remote = clean(remote);
     markSeen(remote);
-    var merged = X.reconcileElements(api.getSceneElementsIncludingDeleted(), X.restoreElements(remote, null), api.getAppState());
+    var merged;
+    try { merged = X.reconcileElements(api.getSceneElementsIncludingDeleted(), X.restoreElements(remote, null), api.getAppState()); }
+    catch (e) {
+      // One more try with every incoming key dropped, rather than nothing drawn.
+      merged = X.reconcileElements(api.getSceneElementsIncludingDeleted(), X.restoreElements(remote.map(function (x) { return Object.assign({}, x, { index: null }); }), null), api.getAppState());
+    }
     last = X.getSceneVersion(merged);
     api.updateScene({ elements: merged, captureUpdate: X.CaptureUpdateAction.NEVER });
     if (whole) setTimeout(function () { if (api.scrollToContent) api.scrollToContent(undefined, { fitToContent: true }); }, 50);
