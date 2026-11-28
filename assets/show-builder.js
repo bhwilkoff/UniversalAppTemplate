@@ -103,7 +103,7 @@
       if (!scenes.length && !readOnly) {
         var C = window.CurriculumLib, week = C && cohort.schedule !== 'custom' ? C.weekOf(session.number) : null;
         if (week != null && window.CurriculumSeed) start.appendChild(button(C.startLabel(week), 'btn-primary', startPlan));
-        start.appendChild(button('Start from the six parts', 'btn-secondary', startDefault));
+        if (cohort.schedule !== 'custom') start.appendChild(button('Start from the six parts', 'btn-secondary', startDefault));
         var from = S.copySource(opts.sessions, session, withScenes);
         if (from) start.appendChild(button('Copy ' + (cohort.schedule === 'custom' ? 'session ' : 'week ') + from.number + '’s run of show', 'btn-secondary', function () { copyFrom(from); }));
       }
@@ -118,7 +118,7 @@
         hour.appendChild(seg);
         list.appendChild(card(s, i, at[i]));
       });
-      if (!readOnly && scenes.length) list.appendChild(adder());
+      if (!readOnly) list.appendChild(adder());
     }
     function plainClick(ev) { return !(ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.button); }
     // Three families of what a part asks of people, so the hour reads at a glance.
