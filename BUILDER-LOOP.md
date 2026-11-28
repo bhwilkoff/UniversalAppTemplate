@@ -318,3 +318,10 @@ breakout state.
   image/webp with no sign-in. Not yet seen: that slide drawing its
   picture on a stage in a call. Each save makes a new file (no update in
   place yet).
+- 2026-11-28, tick 14 (a2d06cab). Shared models in cohort calls: the
+  stage has no room there, so its model's change goes as a room act
+  (`mstate` added to the panel's allowed room acts) to its own panel,
+  which sends it through CohortRoom; CohortRoom's view and AddonLib's
+  stage view now carry `together` and the room's `mstate` (tested; 738
+  node tests). Not yet seen: two people in a cohort call sharing one
+  model; fold into B7 with a test learner.
