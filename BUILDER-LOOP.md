@@ -37,9 +37,18 @@ separate words. One tick, one commit.
   this stays sustainable and free... I also want it to work well and
   seamlessly, whether they are full Human Shaped cohort members or
   simply attending a single session with someone using the add-on."
-  Proposed in reply (waiting on his yes): attendees never sign in, live
-  state stays on the rooms worker, and a host without a cohort keeps
-  their sessions as files in their own Google Drive (`drive.file`).
+  Proposed in reply: attendees never sign in, live state stays on the
+  rooms worker, and a host without a cohort keeps their sessions as
+  files in their own Google Drive (`drive.file`). **Approved, November
+  28:** "Yes. I approve keeping a non-cohort host's sessions in their own
+  Google Drive. That aligns with the idea of all learners getting keep
+  their own data too."
+- **Ideas at Play:** "I'm meeting with Alexis on Thursday and it would be
+  great to demonstrate what is possible. He has given me full approval
+  to integrate according to the sharing/privacy/copyright info on his
+  site." So I1 is done; I2 and I3 are open, and a working demo is due
+  before Thursday, December 3, 2026. Follow each model's CC BY 4.0 terms
+  (credit, link, note changes) and the site's privacy page.
 
 ## Backlog
 
@@ -73,7 +82,7 @@ by the Course Builder import or by SQL.
 - [ ] B7. End to end: build a non-Human-Shaped cohort "(delete me)" from
   nothing in Chrome as Ben, run a session in a real Meet call, clean up.
 
-### A. The add-on with no GitHub (storage design waits on Ben's yes)
+### A. The add-on with no GitHub (Drive storage approved November 28)
 
 - [ ] A1. Measure: can the Meet panel get a `drive.file` token through
   Google's popup? (The add-on lists only email and profile; the site's
@@ -90,7 +99,7 @@ by the Course Builder import or by SQL.
   never sign in.
 - [ ] A6. A real call with two attendees.
 
-### I. Ideas at Play
+### I. Ideas at Play (demo for Ben's meeting with Alexis, Thursday December 3)
 
 Findings (November 28): ~90 interactive teaching models by Alexis
 Diamond (Minerva) and others, CC BY 4.0 on every model, no account
@@ -99,8 +108,7 @@ needed. Catalog and detail pages send `X-Frame-Options: DENY`;
 model exposes `window.artifact.getState/setState`, made for shared
 breakout state.
 
-- [ ] I1. Ben decides whether to tell or ask Alexis Diamond
-  (hello@ideasatplay.org) before we frame or host copies.
+- [x] I1. Ben asked Alexis Diamond: full approval under the site's terms.
 - [ ] I2. A "Model" tool: pick a model, every attendee gets their own in
   the panel, the host can put one on the stage; version pinned; the
   "Cite this" credit shown.
@@ -181,3 +189,6 @@ breakout state.
   add-on in a custom cohort (B7). Left as is: the leader's optional
   Connect your agent step, roster wording "their build", the old panel's
   path toggle, and credentials (For Ben).
+- 2026-11-28: Ben approved Drive storage for hosts without a cohort, and
+  Alexis Diamond approved integrating Ideas at Play; order from here:
+  I2 (demo by Thursday), then A1 to A6 and I3, with B6 to B8 between.
