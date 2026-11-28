@@ -87,7 +87,7 @@ by the Course Builder import or by SQL.
 - [ ] A1. Measure: can the Meet panel get a `drive.file` token through
   Google's popup? (The add-on lists only email and profile; the site's
   pages ask for `drive.file` at use, in the same Google project.)
-- [ ] A2. A session file: one JSON in the builder's own shape (parts,
+- [x] A2. A session file: one JSON in the builder's own shape (parts,
   decks, workbooks, questions); the builder saves to Drive for a host
   without a cohort.
 - [ ] A3. An open room runs a whole session: parts in order, Next, each
@@ -260,3 +260,18 @@ breakout state.
   answered", one state message, no echo. Not yet: the worker deploy
   (wrangler is signed out here; `wrangler login` is Ben's), then a real
   call with two people.
+- 2026-11-28, tick 11 (A2, A3 begun; 6fec8780, f476eddb). SessionPlan
+  (assets/session-plan.js, 3 tests): one session-file shape (talk,
+  question, model, site, card, clock) and the room messages each part
+  sends; fromScenes turns a cohort session's plan and decks into a file
+  (breakouts, the board, showing work, and writing become cards with
+  their prompts; breaks become clocks). The open room runs a session
+  opened from Drive part by part in Now (parts list, Next, Put the
+  session away), and Save to my Drive keeps the whole session. The
+  session page's Plan has "Run it in any call: Save to my Drive" for
+  leaders. 737 node tests. **Seen live:** the button on Session 1;
+  pressing it showed "Saving to your Drive…" while Google's window
+  waited on Ben (the one-time drive.file approval for
+  benwilkoff@gmail.com). Not yet seen: a saved file, and a session run
+  in a call. Waiting on Ben: that approval, and `wrangler login` for the
+  shared-model deploy.
