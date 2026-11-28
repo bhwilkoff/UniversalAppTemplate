@@ -220,11 +220,28 @@
         db.from('scene_decks').select('scene_id, body').eq('cohort_id', cohort.id)
       ]).then(function (r) {
         if (r[1].error) throw new Error(r[1].error.message);
-        var decks = {};
+        var decks = {}, scenes = r[1].data || [], token2 = r[0];
         (r[2].data || []).forEach(function (d) { decks[d.scene_id] = d.body; });
-        var file = window.SessionPlan.session(lib.sessionTitle(session, cohort), window.SessionPlan.fromScenes(r[1].data || [], decks));
-        if (!file.parts.length) throw new Error('This plan has nothing a call can run yet.');
-        return window.MyDrive.save(r[0], file).then(function () { return file; });
+        // Each slide picture goes into the leader's Drive, link readable, so a
+        // call with no account can draw it (A7).
+        var jobs = [];
+        scenes.forEach(function (sc) {
+          var text = decks[sc.id] || sc.slides || '', names = window.SlidesLib ? window.SlidesLib.picNames(text) : [];
+          names.forEach(function (name) {
+            jobs.push(db.storage.from('deck-pictures').createSignedUrl(cohort.id + '/' + sc.id + '/' + name, 600).then(function (u) {
+              if (!u.data || !u.data.signedUrl) throw new Error('A picture could not be read.');
+              return fetch(u.data.signedUrl).then(function (x) { if (!x.ok) throw new Error('A picture could not be read.'); return x.blob(); });
+            }).then(function (blob) { return window.MyDrive.picture(token2, blob, name); }).then(function (url) {
+              decks[sc.id] = String(decks[sc.id] || sc.slides || '').split('(pic:' + name + ')').join('(' + url + ')');
+            }));
+          });
+        });
+        U.say(said, jobs.length ? 'Copying ' + jobs.length + (jobs.length === 1 ? ' picture' : ' pictures') + ' to your Drive…' : 'Saving to your Drive…');
+        return Promise.all(jobs).then(function () {
+          var file = window.SessionPlan.session(lib.sessionTitle(session, cohort), window.SessionPlan.fromScenes(scenes, decks));
+          if (!file.parts.length) throw new Error('This plan has nothing a call can run yet.');
+          return window.MyDrive.save(token2, file).then(function () { return file; });
+        });
       }).then(function (file) { U.say(said, 'Saved in your Drive, ' + file.parts.length + (file.parts.length === 1 ? ' part.' : ' parts.') + ' Open it from Slides in any call.'); },
         function (e) { U.say(said, e.message, 'problem'); });
     };

@@ -105,11 +105,27 @@
     });
   }
 
+  // A slide picture copied into the host's sessions folder and readable by
+  // anyone with its link (Ben, November 28, 2026: "it is fine if the images
+  // are available to anyone with the link"), so a call with no account can
+  // draw it. Resolves the address a slide uses.
+  function picture(token, blob, name) {
+    return folder(token).then(function (parent) {
+      var b = 'hs' + Math.random().toString(36).slice(2);
+      var meta = { name: String(name || 'picture').slice(0, 120), parents: [parent], appProperties: { humanshaped: 'session-picture' } };
+      var body = new Blob(['--' + b + '\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n' + JSON.stringify(meta) + '\r\n--' + b + '\r\nContent-Type: ' + (blob.type || 'image/webp') + '\r\n\r\n', blob, '\r\n--' + b + '--']);
+      return call(token, 'POST', UPLOAD + '?uploadType=multipart&fields=id', body, 'multipart/related; boundary=' + b);
+    }).then(function (f) {
+      return call(token, 'POST', API + '/files/' + encodeURIComponent(f.id) + '/permissions', JSON.stringify({ role: 'reader', type: 'anyone' })).then(function () { return pictureUrl(f.id); });
+    });
+  }
+  function pictureUrl(id) { return 'https://drive.google.com/thumbnail?id=' + encodeURIComponent(id) + '&sz=w2000'; }
+
   function session(title, talk) {
     return { kind: KIND, version: 1, title: String(title || '').slice(0, 120), parts: [{ kind: 'talk', title: 'Slides', slides: String(talk || '') }] };
   }
   // A session's slides, from its first part that has them.
   function talkOf(s) { var p = (s && s.parts || []).filter(function (x) { return typeof x.slides === 'string'; })[0]; return p ? p.slides : ''; }
 
-  root.MyDrive = { connect: connect, list: list, save: save, open: open, session: session, talkOf: talkOf, KIND: KIND };
+  root.MyDrive = { connect: connect, list: list, save: save, open: open, picture: picture, session: session, talkOf: talkOf, KIND: KIND };
 })(typeof window !== 'undefined' ? window : this);
