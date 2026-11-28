@@ -59,7 +59,7 @@
       .forEach(function (k) { var o = el('option', null, k.name); o.value = k.key; kind.appendChild(o); });
     var kindLine = el('span', 'hint');
     var kindL = labelled('How people answer', kind); kindL.insertBefore(kindLine, kind);
-    var prompt = el('textarea'); prompt.name = 'prompt'; prompt.rows = 2; prompt.maxLength = 500; prompt.required = true;
+    var prompt = el('textarea'); prompt.name = 'prompt'; prompt.rows = 2; prompt.maxLength = 500; prompt.required = true; prompt.placeholder = 'What would you like everyone to answer?';
     var choices = el('textarea'); choices.name = 'choices'; choices.rows = 4;
     var choicesL = labelled('Choices', choices, 'One on each line, two to eight.');
     var points = el('input'); points.name = 'points'; points.type = 'number'; points.min = '3'; points.max = '10'; points.inputMode = 'numeric';

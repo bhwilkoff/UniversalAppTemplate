@@ -143,7 +143,7 @@
       input.maxLength = 60; input.autocomplete = 'name';
       s.appendChild(input);
       s.appendChild(btn('Start a session', 'btn-primary', startRoom));
-      s.appendChild(el('p', 'small', 'Free, with no account. Nothing is kept after the call.'));
+      s.appendChild(el('p', 'small', 'Free, with no account. The room is erased when the call ends.'));
       s.appendChild(status);
       if (leads.length && o.runSession) s.appendChild(runPick());
       s.appendChild(links());

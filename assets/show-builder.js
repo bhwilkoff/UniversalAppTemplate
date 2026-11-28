@@ -173,7 +173,9 @@
       return li;
     }
     function addPart(k) {
-      var raw = k === 'question' ? { prompt: 'Your question' } : k === 'rooms' ? { prompt: 'What the rooms are for', room_scenes: [{ title: 'Talk it over', minutes: 5 }] } : k === 'presenter' ? { prompt: 'What each person shows' } : k === 'reflection' ? { prompt: 'Your question' } : {};
+      // A new part starts empty: its words are the leader's, and the form's
+      // hints say what each box is for (BUILDER-LOOP B8).
+      var raw = k === 'rooms' ? { room_scenes: [{ title: 'Talk it over', minutes: 5 }] } : {};
       var row = { cohort_id: cohort.id, session_id: session.id, position: nextPosition(), kind: k, title: plain(k), minutes: 5, body: null, config: S.cleanConfig(k, raw) };
       say('Adding…');
       db.from('scenes').insert(row).select('id').single().then(function (r) {
@@ -422,6 +424,7 @@
         templateL.hidden = uses.indexOf('template') === -1;
         roomsL.hidden = uses.indexOf('room_scenes') === -1;
         promptLabel.textContent = { presenter: 'What each person shows', question: 'The question', rooms: 'What the rooms are for', reflection: 'The closing question' }[kindSel.value] || 'Prompt';
+        prompt.placeholder = { presenter: 'Show the part you changed this week', rooms: 'Compare your answers and agree on one', reflection: 'What will you try before next time?' }[kindSel.value] || '';
         bodyL.hidden = kindSel.value === 'question';
         fitCall();
       }
