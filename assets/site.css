@@ -929,12 +929,12 @@ label.check { display: flex; gap: 0.5rem; align-items: center; font-weight: 400;
 .live-page .live-tally li { grid-template-columns: minmax(0, 1fr) auto; }
 .live-page .question-words { margin-top: 0.75rem; font-size: 0.95rem; }
 .live-page .question-scale-points { grid-template-columns: repeat(auto-fill, minmax(4.5rem, 1fr)); }
-.live-page .question-rank { margin: 0.5rem 0 0; padding: 0; list-style: none; display: grid; gap: 0.4rem; counter-reset: rank; }
-.live-page .question-rank li { counter-increment: rank; display: grid; grid-template-columns: 1.75rem minmax(0, 1fr); gap: 0.35rem 0.5rem; align-items: center; padding: 0.5rem 0.75rem; border: 1px solid var(--rule); border-radius: var(--radius); background: var(--card); }
-.live-page .question-rank li::before { content: counter(rank) "."; font-weight: 650; color: var(--accent); font-variant-numeric: tabular-nums; }
-.live-page .question-rank .label { overflow-wrap: anywhere; }
-.live-page .question-rank-moves { grid-column: 2; display: flex; gap: 0.5rem; flex-wrap: wrap; }
-.live-page .question-rank-moves .btn-secondary { min-height: 2.25rem; font-size: 0.9rem; padding: 0.25rem 0.75rem; }
+:is(.live-page, .addon-panel) .question-rank { margin: 0.5rem 0 0; padding: 0; list-style: none; display: grid; gap: 0.4rem; counter-reset: rank; }
+:is(.live-page, .addon-panel) .question-rank li { counter-increment: rank; display: grid; grid-template-columns: 1.75rem minmax(0, 1fr); gap: 0.35rem 0.5rem; align-items: center; padding: 0.5rem 0.75rem; border: 1px solid var(--rule); border-radius: var(--radius); background: var(--card); }
+:is(.live-page, .addon-panel) .question-rank li::before { content: counter(rank) "."; font-weight: 650; color: var(--accent); font-variant-numeric: tabular-nums; }
+:is(.live-page, .addon-panel) .question-rank .label { overflow-wrap: anywhere; }
+:is(.live-page, .addon-panel) .question-rank-moves { grid-column: 2; display: flex; gap: 0.5rem; flex-wrap: wrap; }
+:is(.live-page, .addon-panel) .question-rank-moves .btn-secondary { min-height: 2.25rem; font-size: 0.9rem; padding: 0.25rem 0.75rem; }
 .live-page .question-fields { display: grid; gap: 0.75rem; }
 .question-fields .hint { display: block; }
 .live-page .question-scale:not([hidden]) { display: grid; gap: 0.75rem; }

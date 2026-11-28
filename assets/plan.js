@@ -12,7 +12,7 @@
   var DRAFT = 'hs-plan-draft';
   var KINDS = [['talk', 'Slides'], ['question', 'Question'], ['model', 'Model'], ['site', 'Website'], ['card', 'Card'], ['clock', 'Clock'], ['workbook', 'Workbook']];
   var NAME = {}; KINDS.forEach(function (k) { NAME[k[0]] = k[1]; });
-  var ASKS = [['choice', 'One choice'], ['multi', 'Several choices'], ['scale', 'A scale'], ['words', 'A few words'], ['short', 'In their own words']];
+  var ASKS = [['choice', 'One choice'], ['multi', 'Several choices'], ['scale', 'A scale'], ['words', 'A few words'], ['short', 'In their own words'], ['rank', 'Put in order']];
   var plan = null, open = null, studio = null, fileId = null, files = null;
 
   function $(s) { return root.querySelector(s); }
@@ -50,7 +50,7 @@
       function sync() { p.choices = rows.get().map(function (r) { return r.c || ''; }); keep(); }
       mount.addEventListener('input', sync);
       mount.addEventListener('click', function () { setTimeout(sync); });
-      function fit() { mount.hidden = ['choice', 'multi'].indexOf(how.value) < 0; }
+      function fit() { mount.hidden = ['choice', 'multi', 'rank'].indexOf(how.value) < 0; }
       how.addEventListener('change', function () { p.ask = how.value; fit(); keep(); });
       fit();
       return;

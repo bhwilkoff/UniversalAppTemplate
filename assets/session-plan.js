@@ -4,7 +4,7 @@
 //
 // A part is one of:
 //   { kind: 'talk', title, slides }                      slides in the deck syntax
-//   { kind: 'question', title, prompt, ask, choices }    ask: choice|multi|scale|words|short
+//   { kind: 'question', title, prompt, ask, choices }    ask: choice|multi|scale|words|short|rank
 //   { kind: 'model', title, url, together }              an Ideas at Play model
 //   { kind: 'site', title, url }                         a website
 //   { kind: 'card', title, body }                        words on every stage
@@ -14,7 +14,7 @@
 //     (a cohort workbook's own block shape, without files)
 (function (root) {
   var KIND = 'human-shaped-session';
-  var ASKS = ['choice', 'multi', 'scale', 'words', 'short'];
+  var ASKS = ['choice', 'multi', 'scale', 'words', 'short', 'rank'];
   var MODEL = /^https:\/\/ideasatplay\.org\/play\/[a-z0-9-]{1,140}\?v=\d{1,4}$/;
 
   // A workbook's blocks that can run in a room, in the cohort workbook's own
@@ -52,8 +52,9 @@
       if (p.kind === 'question') {
         var ask = ASKS.indexOf(p.ask) >= 0 ? p.ask : 'short', prompt = str(p.prompt, 500);
         var choices = (Array.isArray(p.choices) ? p.choices : []).map(function (c) { return str(c, 120); }).filter(Boolean).slice(0, 8);
-        if (!prompt || ((ask === 'choice' || ask === 'multi') && choices.length < 2)) return null;
-        return { kind: 'question', title: title || 'Question', prompt: prompt, ask: ask, choices: ask === 'choice' || ask === 'multi' ? choices : [] };
+        var listed = ask === 'choice' || ask === 'multi' || ask === 'rank';
+        if (!prompt || (listed && choices.length < 2)) return null;
+        return { kind: 'question', title: title || 'Question', prompt: prompt, ask: ask, choices: listed ? choices : [] };
       }
       if (p.kind === 'model') return MODEL.test(p.url || '') ? { kind: 'model', title: title || 'A model', url: p.url, together: p.together === true } : null;
       if (p.kind === 'site') return https(p.url) ? { kind: 'site', title: title || 'A website', url: p.url } : null;

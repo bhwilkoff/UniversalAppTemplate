@@ -8,7 +8,7 @@ export const LIMITS = { talk: 42000, html: 100000, title: 120, name: 60, prompt:
 export const REACTIONS = ['smile', 'laugh', 'love', 'clap', 'snaps', 'ponder', 'mind', 'frown'];
 export const STANCES = ['agree', 'unsure', 'disagree'];
 const SHOWS = ['welcome', 'slides', 'question', 'board', 'page', 'card', 'blank', 'draw', 'workbook'];
-const KINDS = ['choice', 'multi', 'scale', 'words', 'short'];
+const KINDS = ['choice', 'multi', 'scale', 'words', 'short', 'rank'];
 export const TAKE_OVER_MS = 60000;
 
 function text(v, n) { return String(v == null ? '' : v).replace(/\u0000/g, '').slice(0, n); }
@@ -104,6 +104,13 @@ export function summary(room) {
     all.forEach((a) => (a.picks || (a.choice ? [a.choice] : [])).forEach((c) => { if (c >= 1 && c <= n) counts[c - 1] += 1; }));
     out.counts = counts;
   }
+  // A ranking: each choice's average place, first being 1.
+  if (q.kind === 'rank') {
+    const n = q.choices.length, sum = new Array(n).fill(0);
+    let count = 0;
+    all.forEach((a) => { if (Array.isArray(a.order) && a.order.length === n) { count += 1; a.order.forEach((c, at) => { sum[c - 1] += at + 1; }); } });
+    out.places = sum.map((s) => (count ? Math.round((s / count) * 100) / 100 : null));
+  }
   if (q.kind === 'words') {
     const by = {};
     all.forEach((a) => { const w = line(a.body, 60).toLowerCase(); if (w) by[w] = (by[w] || 0) + 1; });
@@ -155,6 +162,13 @@ function cleanAnswer(q, m) {
     const max = q.kind === 'scale' ? q.points : q.choices.length;
     const c = Number(m.choice);
     return Number.isInteger(c) && c >= 1 && c <= max ? { choice: c } : null;
+  }
+  if (q.kind === 'rank') {
+    const n = q.choices.length;
+    if (!Array.isArray(m.order) || m.order.length !== n) return null;
+    const order = m.order.map(Number);
+    const ok = order.every((c) => Number.isInteger(c) && c >= 1 && c <= n) && new Set(order).size === n;
+    return ok ? { order } : null;
   }
   if (q.kind === 'multi') {
     if (!Array.isArray(m.picks)) return null;
@@ -219,7 +233,7 @@ export function apply(room, who, m, now, opts) {
       const prompt = line(m.prompt, LIMITS.prompt);
       if (!kind || !prompt) return { error: 'Write the question first.' };
       const choices = Array.isArray(m.choices) ? m.choices.map((c) => line(c, LIMITS.choice)).filter(Boolean).slice(0, LIMITS.choices) : [];
-      if ((kind === 'choice' || kind === 'multi') && choices.length < 2) return { error: 'Give at least two choices, one on each line.' };
+      if ((kind === 'choice' || kind === 'multi' || kind === 'rank') && choices.length < 2) return { error: 'Give at least two choices, one on each line.' };
       room.seq += 1;
       room.question = { id: 'q' + room.seq, kind, prompt, choices: kind === 'words' || kind === 'short' ? null : choices, points: kind === 'scale' ? int(m.points, 2, 10) : null, reveal: m.reveal === true, open: true };
       room.answers = {}; room.show = 'question';

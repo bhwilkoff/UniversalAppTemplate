@@ -75,3 +75,10 @@ test('a cohort session brings its workbooks: a room part’s just after it, the 
   assert.deepEqual(parts.map((p) => p.kind + ':' + p.title), ['card:Rooms', 'workbook:Group notes', 'question:Check', 'workbook:Exit ticket']);
   assert.deepEqual(parts[3].blocks, [{ key: 'b1', type: 'text', text: 'Look:\nthen answer.' }, { key: 'b2', type: 'free', text: 'One thing you learned' }]);
 });
+
+test('a ranking question keeps its choices in a session file, from a cohort plan too', () => {
+  const p = P.clean([{ kind: 'question', title: 'R', prompt: 'Order', ask: 'rank', choices: ['A', 'B', 'C'] }, { kind: 'question', prompt: 'One', ask: 'rank', choices: ['A'] }]);
+  assert.deepEqual(p, [{ kind: 'question', title: 'R', prompt: 'Order', ask: 'rank', choices: ['A', 'B', 'C'] }]);
+  const f = P.fromScenes([{ id: 's', kind: 'question', title: 'Matters', config: { prompt: 'Rank these', kind: 'rank', options: ['Speed', 'Care'] } }], {});
+  assert.deepEqual(f[0], { kind: 'question', title: 'Matters', prompt: 'Rank these', ask: 'rank', choices: ['Speed', 'Care'] });
+});

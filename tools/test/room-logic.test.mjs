@@ -370,3 +370,15 @@ test('each person answers their own workbook, sees only their own, and the host 
   assert.match(apply(r, B, { t: 'wbAnswer', id, key: 'b2', value: 'y' }, 11).error, /closed/);
   assert.equal(apply(r, A, { t: 'wbCollect' }, 12).reply.people.length, 1);
 });
+
+test('a ranking question takes each person’s whole order and shows each choice’s average place', () => {
+  const r = started(), C = { pid: 'c', name: 'Cy', isHere: () => true };
+  assert.match(apply(r, A, { t: 'ask', kind: 'rank', prompt: 'Order these', choices: ['Only one'] }, 2).error, /two choices/);
+  apply(r, A, { t: 'ask', kind: 'rank', prompt: 'Order these', choices: ['Fast', 'Kind', 'Cheap'] }, 3);
+  const id = r.question.id;
+  assert.match(apply(r, B, { t: 'answer', id, order: [1, 2] }, 4).error, /could not be read/);
+  assert.match(apply(r, B, { t: 'answer', id, order: [1, 1, 2] }, 4).error, /could not be read/);
+  assert.deepEqual(apply(r, B, { t: 'answer', id, order: [2, 1, 3] }, 5).mine.answer, { order: [2, 1, 3] });
+  apply(r, C, { t: 'answer', id, order: [2, 3, 1] }, 6);
+  assert.deepEqual(summary(r), { total: 2, places: [2.5, 1, 2.5] });
+});

@@ -16,7 +16,7 @@
   function mount(o) {
     var box = o.root.querySelector('[data-state="open"]');
     var room = null, you = null, F = null, frameRole = null, online = true, ended = false, stageOn = false;
-    var words = null, works = null, myWork = null, wbMine = null, wbSaved = null, mine = null, tool = null, newSha = null, confirmEnd = false, watching = false;
+    var words = null, works = null, myWork = null, wbMine = null, wbSaved = null, rankDraft = null, mine = null, tool = null, newSha = null, confirmEnd = false, watching = false;
     var plan = (function () { try { var x = JSON.parse(get(PLAN) || 'null'); return x && Array.isArray(x.parts) && x.parts.length ? x : null; } catch (e) { return null; } })();
     var talk = get(TALK) || R.STARTER, repo = R.repoOf(get(REPO) || ''), lobby = null, person = { name: o.name, member: o.member, github: o.github || '' };
     var status = el('p', 'small'); status.setAttribute('role', 'status');
@@ -482,7 +482,14 @@
       var q = room.question, a = mine && mine.id === q.id ? mine.answer : null;
       pane.appendChild(el('h2', null, q.prompt));
       var kind = q.kind;
-      if (kind === 'short' || kind === 'words') {
+      if (kind === 'rank' && window.QuestionView && window.QuestionView.rankList) {
+        // The order being made survives the room redrawing as others answer.
+        var n = q.choices.length;
+        if (!rankDraft || rankDraft.id !== q.id) rankDraft = { id: q.id, order: a && a.order && a.order.length === n ? a.order.slice() : q.choices.map(function (c, i) { return i + 1; }) };
+        var order = rankDraft.order;
+        pane.appendChild(window.QuestionView.rankList(q, order.slice(), function (o) { order = o; rankDraft.order = o; }));
+        pane.appendChild(btn(a ? 'Change my order' : 'Send my order', 'btn-secondary', function () { send({ t: 'answer', id: q.id, order: order }); }));
+      } else if (kind === 'short' || kind === 'words') {
         var f = el('form', 'open-add'), i = field(kind === 'words' ? 'input' : 'textarea', 'Your answer', a ? a.body : '');
         i.maxLength = kind === 'words' ? 60 : 1000;
         f.appendChild(i);
@@ -758,7 +765,7 @@
     }
 
     function questionTool(pane, line) {
-      var kinds = [['choice', 'One choice'], ['multi', 'Any choices'], ['scale', 'A scale'], ['words', 'A few words'], ['short', 'Sentences']], kind = 'choice';
+      var kinds = [['choice', 'One choice'], ['multi', 'Any choices'], ['scale', 'A scale'], ['words', 'A few words'], ['short', 'Sentences'], ['rank', 'Put in order']], kind = 'choice';
       var prompt = field('textarea', 'Your question'); prompt.rows = 2; prompt.maxLength = 500;
       var choices = field('textarea', 'Choices, one on each line'); choices.rows = 3;
       var low = field('input', 'Low end, optional'), high = field('input', 'High end, optional');
@@ -767,7 +774,7 @@
       var lab = el('label', 'check open-check'); lab.appendChild(reveal); lab.appendChild(document.createTextNode(' Show results as answers come in'));
       function fit(k) {
         kind = k;
-        choices.hidden = !(k === 'choice' || k === 'multi'); ends.hidden = k !== 'scale'; lab.hidden = k === 'short';
+        choices.hidden = !(k === 'choice' || k === 'multi' || k === 'rank'); ends.hidden = k !== 'scale'; lab.hidden = k === 'short';
       }
       var g = el('div', 'p2-group');
       g.appendChild(el('h3', 'open-label', 'People answer with'));

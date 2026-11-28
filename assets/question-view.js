@@ -264,5 +264,5 @@
     return out;
   }
 
-  window.QuestionView = { fields: fields, answer: answer, results: results, ready: ready, readResults: readResults, askRow: askRow };
+  window.QuestionView = { rankList: rankList, fields: fields, answer: answer, results: results, ready: ready, readResults: readResults, askRow: askRow };
 })();
