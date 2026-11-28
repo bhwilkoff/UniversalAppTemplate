@@ -24,8 +24,9 @@ separate words. One tick, one commit.
 
 ## For Ben
 
-- **Delete "Randomness test (delete me).json"** in your Drive's Human
-  Shaped sessions folder when you like; it is the /plan/ test file.
+- **Delete "Randomness test (delete me).json" and "What did you notice?
+  answers 2026-11-28.csv"** in your Drive's Human Shaped sessions folder
+  when you like; they are test files.
 
 - **Credentials in a cohort on another subject.** A credential today
   needs an app ("Needs a repository and a live address"). In a custom
@@ -87,7 +88,7 @@ by the Course Builder import or by SQL.
 
 ### A. The add-on with no GitHub (Drive storage approved November 28)
 
-- [ ] A1. Measure: can the Meet panel get a `drive.file` token through
+- [x] A1. Measure (done in tick 13: the panel's Drive consent and save worked in a real call): can the Meet panel get a `drive.file` token through
   Google's popup? (The add-on lists only email and profile; the site's
   pages ask for `drive.file` at use, in the same Google project.)
 - [x] A2. A session file: one JSON in the builder's own shape (parts,
@@ -95,7 +96,7 @@ by the Course Builder import or by SQL.
   without a cohort.
 - [x] A3. An open room runs a whole session: parts in order, Next, each
   kind on the rooms worker.
-- [ ] A4. Cohort-only tools in open rooms, on the worker: board,
+- [x] A4. Cohort-only tools in open rooms (ticks 20 to 25), on the worker: board,
   workbooks (answers in the room, saved to the host's Drive at the end),
   breakouts as room codes, feature someone, show your work.
 - [x] A7. Pictures in a session saved to Drive: deck pictures live in
@@ -470,3 +471,24 @@ breakout state.
   Found and fixed: the pressed Show button drew as a blank pill (now the
   accent color, like answer choices), and a person alone in a room read
   "No one yet" (now "Just you"). Not seen: those two fixes in a call.
+- 2026-11-28, tick 25 (A4 workbooks, 382c95b1; worker c2efad30;
+  fixes ed343805). A session file's workbook part, in the cohort
+  workbook's own blocks (words, an answer in words, a choice, a table
+  with blanks; no files), edited on /plan/ and run from the open room.
+  Each person answers in their own panel and sees only their own; the
+  host sees how many have answered, closes or reopens it, and saves
+  everyone's answers to their own Drive as a CSV. Tests: room rules
+  and session file (748 pass); terminal check on the live worker. Seen
+  in a real two-person call (rjf-tsii-azt): built "What did you
+  notice?" on /plan/ (three blocks) and saved it into the same file;
+  the leader opened it from Drive and ran it; benhstest1 answered all
+  three; the leader's Now read "1 person has answered"; Save put
+  "What did you notice? answers 2026-11-28.csv" in Ben's Drive, read
+  back through the connector: one row, benhstest1, the words, "The
+  clumpy one", 23 and 25. Found and fixed: Keep a copy did nothing,
+  since Meet's panel frame cannot download (now it opens the copy in
+  its own window with a download link and the text); the stage read
+  "What did you notice?: answer it…"; the host's Now said the welcome
+  was up; blanks were labeled "Row 2, column 2" (now by their row and
+  column headings). Not seen: those fixes in a call. Left in Ben's
+  Drive: the answers CSV (test data, delete with the Randomness file).
