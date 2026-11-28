@@ -79,7 +79,7 @@ by the Course Builder import or by SQL.
 - [x] B8. A new part starts with placeholder words saved as its prompt
   ("What the rooms are for", "Your question"); they should be hints
   people type over, not content.
-- [ ] B7. End to end: build a non-Human-Shaped cohort "(delete me)" from
+- [x] B7. End to end: build a non-Human-Shaped cohort "(delete me)" from
   nothing in Chrome as Ben, run a session in a real Meet call, clean up.
 
 ### A. The add-on with no GitHub (Drive storage approved November 28)
@@ -350,3 +350,14 @@ breakout state.
   labels were squeezed off the right edge in the cohort panel; fixed in
   CSS. Next: breakouts from a standing group with the learner in it, a
   group workbook in the room, then cleanup.
+- 2026-11-28, tick 17 (B7 done, 280cd1a7). Standing groups cannot be
+  made with one learner (the cohort page shows Groups at eight learners
+  or more, Ben's decision 8), so launching them as breakouts is not
+  seen live; breakouts and a group workbook in a breakout room were not
+  run this time. Delete workbook verified (the original Leaf Lab Notes
+  gone, Session 2's copy kept); found that a breakout part still named
+  the deleted workbook, fixed (it now unlinks itself). Ended the call
+  in both profiles. Cleanup through the site: Draft, then Delete this
+  draft; the database then held no cohort, sessions, enrollment, or
+  storage files for it. Kept: the two session files and one picture in
+  Ben's Drive (Human Shaped sessions folder), useful for Thursday.
