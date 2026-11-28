@@ -189,7 +189,9 @@ export class Room extends DurableObject {
       if (!this.room.on || this.room.show !== 'draw') return;
       const x = Number(m.x), y = Number(m.y);
       if (!Number.isFinite(x) || !Number.isFinite(y) || Math.abs(x) > 1e6 || Math.abs(y) > 1e6) return;
-      this.toStages({ t: 'pointer', id: me.pid.slice(0, 8), name: (me.name || '').slice(0, 40), x: Math.round(x), y: Math.round(y), down: m.down === true }, ws);
+      // A stage connects without a name; the same person's panel has it.
+      const named = me.name || ((this.sockets().find((x) => x.who.pid === me.pid && x.who.name) || {}).who || {}).name || '';
+      this.toStages({ t: 'pointer', id: me.pid.slice(0, 8), name: named.slice(0, 40), x: Math.round(x), y: Math.round(y), down: m.down === true }, ws);
       return;
     }
 
