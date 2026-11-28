@@ -90,11 +90,15 @@ by the Course Builder import or by SQL.
 - [x] A2. A session file: one JSON in the builder's own shape (parts,
   decks, workbooks, questions); the builder saves to Drive for a host
   without a cohort.
-- [ ] A3. An open room runs a whole session: parts in order, Next, each
+- [x] A3. An open room runs a whole session: parts in order, Next, each
   kind on the rooms worker.
 - [ ] A4. Cohort-only tools in open rooms, on the worker: board,
   workbooks (answers in the room, saved to the host's Drive at the end),
   breakouts as room codes, feature someone, show your work.
+- [ ] A7. Pictures in a session saved to Drive: deck pictures live in
+  the private deck-pictures bucket, which a no-account room cannot read,
+  so they show as their words. Copy each into the host's Drive (link
+  readable) on save and point the slide at it, or ask Ben.
 - [ ] A5. No GitHub prompt anywhere on the open-room path; attendees
   never sign in.
 - [ ] A6. A real call with two attendees.
@@ -283,3 +287,13 @@ breakout state.
   sessions folder. Wrangler is signed in (Ben); `wrangler deploy` of the
   rooms worker was refused by the auto-mode classifier, so it waits on
   Ben running it or allowing it.
+- 2026-11-28, tick 12 (A3 verified). **Real Meet call** (cgq-ztoc-uav,
+  benwilkoff@gmail.com, no account in the room): Start a session,
+  Slides, Open from my Drive (Google's account window, chosen from the
+  terminal), the panel listed "Session 1: How Leaves Make Food"; opening
+  it put the session in Now (Question, Card "In groups", Slides "Talk",
+  Next); Next ran each part on the stage in turn: the question, the
+  card, the slides. Found: the slide's picture showed only its words,
+  because deck pictures are in a private bucket a no-account room cannot
+  read (A7). Also: Google asks to choose an account each time a call
+  first opens Drive. Call ended.
