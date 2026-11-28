@@ -57,7 +57,10 @@
       return rooms.length ? rooms : null;
     }
     // The cohort's own groups, named once and kept on the cohort.
-    function saved() { return Array.isArray(o.cohort.groups) ? o.cohort.groups.filter(function (g) { return g && Array.isArray(g.members) && g.members.length; }) : []; }
+    function saved() {
+      var kept = Array.isArray(o.cohort.groups) ? o.cohort.groups.filter(function (g) { return g && Array.isArray(g.members) && g.members.length; }) : [];
+      return kept.length ? kept : L.standingGroups(o.groups ? o.groups() : []);
+    }
     function launch(again, given) {
       var mins = Number(minutesSet ? minutes : preset().minutes || minutes);
       var rooms = given ? given.rooms : again === true ? lastRooms() : plan();

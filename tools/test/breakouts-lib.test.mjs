@@ -36,3 +36,13 @@ test('the cohort’s groups become rooms for the people here, and newcomers join
 test('rooms kept as groups carry names, and an empty room is not kept', () => {
   assert.deepEqual(lib.toGroups([['a'], [], ['b', 'c']], ['  Front  row ', 'x', '']), [{ name: 'Front row', members: ['a'] }, { name: 'Group 3', members: ['b', 'c'] }]);
 });
+
+test('standing groups from the cohort page become groups breakouts can launch', () => {
+  const rows = [
+    { name: 'Roots', breakout: false, ended_at: null, group_members: [{ user_id: 'a' }, { user_id: 'b' }] },
+    { name: 'Room 1', breakout: true, ended_at: null, group_members: [{ user_id: 'c' }] },
+    { name: 'Old', breakout: false, ended_at: '2026-11-01', group_members: [{ user_id: 'd' }] },
+    { name: 'Empty', breakout: false, ended_at: null, group_members: [] }
+  ];
+  assert.deepEqual(lib.standingGroups(rows), [{ name: 'Roots', members: ['a', 'b'] }]);
+});

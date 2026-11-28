@@ -62,7 +62,16 @@
     }).filter(function (g) { return g.members.length; });
   }
 
-  var lib = { roomCount: roomCount, split: split, shuffle: shuffle, isIn: isIn, arrived: arrived, fromGroups: fromGroups, toGroups: toGroups };
+  // The cohort's standing groups (the groups a leader keeps on the cohort
+  // page: not breakout rooms, not ended), in the shape cohorts.groups keeps,
+  // so groups made before class can be launched as rooms.
+  function standingGroups(rows) {
+    return (rows || []).filter(function (g) { return g && !g.breakout && !g.ended_at; }).map(function (g) {
+      return { name: String(g.name || '').slice(0, 60), members: (g.group_members || []).map(function (m) { return m.user_id; }) };
+    }).filter(function (g) { return g.members.length; });
+  }
+
+  var lib = { standingGroups: standingGroups, roomCount: roomCount, split: split, shuffle: shuffle, isIn: isIn, arrived: arrived, fromGroups: fromGroups, toGroups: toGroups };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
   else root.BreakoutsLib = lib;
 })(typeof globalThis !== 'undefined' ? globalThis : this);
