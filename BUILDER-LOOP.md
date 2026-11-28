@@ -41,7 +41,7 @@ What the mapping found: a course on any subject can already exist as a
 custom cohort; what is missing is editors. Today these are written only
 by the Course Builder import or by SQL.
 
-- [ ] B1. Session: edit `before`, `readings`, and the session's
+- [x] B1. Session: edit `before`, `readings`, and the session's
   `outcomes`; cohort: edit `outcomes` (on /teach/cohort/edit).
 - [ ] B2. Workbooks: create, rename, reorder, delete; edit blocks (text,
   free, choice, table, file) with images in `workbook-files`.
@@ -53,7 +53,11 @@ by the Course Builder import or by SQL.
   pictures too.
 - [ ] B5. Any subject: /teach/new starts from scratch by default; the
   Human Shaped curriculum is a starting point you choose. Audit what
-  still says Prep, Week N, apps, or the path in a custom cohort.
+  still says Prep, Week N, apps, or the path in a custom cohort. Seen
+  in the B1 test: a custom cohort's "Before the first session" still
+  lists "Make the GitHub repository" and "Connect your agent"; the Plan
+  tab's "Before the next session" and the Before tab's "Before this
+  session" overlap in meaning.
 - [ ] B6. Cohort groups editor (`cohorts.groups`).
 - [ ] B7. End to end: build a non-Human-Shaped cohort "(delete me)" from
   nothing in Chrome as Ben, run a session in a real Meet call, clean up.
@@ -95,3 +99,13 @@ breakout state.
 ## Log
 
 - 2026-11-28: loop planned from three mapping reports.
+- 2026-11-28, tick 1 (B1, 21e0d731). Cohort form question 8 "What will
+  people practice?" writes `cohorts.outcomes` (new ones get `o:` ids,
+  imported ones keep id and ref); the session's Before tab gives leaders
+  a form for `before`, `readings`, and `outcomes`. New kit part
+  `UI.editRows` (DESIGN-KIT.md). 723 node tests pass. **Verified live as
+  Ben:** made "Plant Biology test (delete me)" (custom, draft) with two
+  outcomes, Session 1 "How Leaves Make Food" with words, a reading, and
+  one outcome; the rows read back from the database as typed. Not yet
+  seen: a learner's view of these (same drawing code the imports use).
+  The test cohort stays for B2 to B7, then goes.
