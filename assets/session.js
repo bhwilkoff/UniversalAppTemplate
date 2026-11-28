@@ -616,7 +616,9 @@
     });
     // What to bring comes from the plan's bring-back part.
     bringReady = db.from('scenes').select('kind, title, config, position').eq('session_id', session.id).order('position').then(function (r) {
-      var bring = (r.data || []).filter(function (x) { return (x.kind === 'rooms' || x.kind === 'presenter') && x.config && x.config.prompt; })[0];
+      // Bringing your build is the Human Shaped course's; a leader's own course
+      // says what comes before a session in its own words (Before this session).
+      var bring = lib.course(cohort) ? (r.data || []).filter(function (x) { return (x.kind === 'rooms' || x.kind === 'presenter') && x.config && x.config.prompt; })[0] : null;
       var sec = $('[data-bring-section]');
       // What to bring matters only before the session.
       sec.hidden = !bring || !!finished;

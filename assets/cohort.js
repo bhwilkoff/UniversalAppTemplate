@@ -80,6 +80,7 @@
     document.documentElement.toggleAttribute('data-own-course', own);
     if (!own) return;
     var h = document.getElementById('people-title'); if (h) h.textContent = 'People';
+    var sh = document.getElementById('share-title'); if (sh) sh.textContent = 'Share with the cohort';
     var kind = $('[data-share-form]') && $('[data-share-form]').elements.kind;
     if (kind) Array.prototype.slice.call(kind.options).forEach(function (o) { if (o.value === 'bring-back' || o.value === 'ai-review') o.remove(); });
   }
@@ -832,7 +833,7 @@
       if (room && part && part.key === 'show') { var gr = link(room, 'Join your group’s room'); gr.className = 'btn-primary'; na.appendChild(gr); }
       if (t.next.mode !== 'own' && safe(t.next.meet_url)) { var j = link(t.next.meet_url, 'Join the call'); j.className = room && part && part.key === 'show' ? 'btn-secondary' : 'btn-primary'; na.appendChild(j); }
     } else {
-      $('[data-next-when]').textContent = sessions.length ? 'All sessions done' : 'Not scheduled yet';
+      $('[data-next-when]').textContent = !sessions.length ? 'Not scheduled yet' : sessions.some(function (x) { return x.starts_at; }) ? 'All sessions done' : 'Dates to come';
     }
 
     $('[data-group-section]').hidden = !myGroup;
