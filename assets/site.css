@@ -3724,3 +3724,21 @@ html.stage-in-panel .stage-corner { display: none !important; }
 .ui-edit-button:disabled { opacity: 0.35; cursor: default; }
 .ui-edit-button:hover:not(:disabled) { border-color: var(--accent); }
 @media (min-width: 40rem) { .ui-edit-fields { grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); } .ui-edit-fields label.is-long { grid-column: 1 / -1; } }
+
+/* A leader's workbook (/teach/workbook/). */
+.wb-edit { max-width: 46rem; }
+.wb-edit-blocks { list-style: none; margin: 0 0 1rem; padding: 0; display: grid; gap: 1rem; }
+.wb-edit-block { display: grid; gap: 0.6rem; padding: 1rem; border: 1px solid var(--rule); border-radius: 0.5rem; background: var(--card); }
+.wb-edit-head { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.wb-edit-head h3 { margin: 0; font-size: 1rem; }
+.wb-edit-moves { flex-direction: row; }
+.wb-edit-field { display: grid; gap: 0.2rem; }
+.wb-edit-field textarea { width: 100%; }
+.wb-edit-picture { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+.wb-edit-table-scroll { overflow-x: auto; }
+.wb-edit-table table { border-collapse: collapse; }
+.wb-edit-table td { padding: 0.15rem; }
+.wb-edit-table input { min-width: 7rem; width: 100%; }
+.wb-edit-add { flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+.wb-edit-preview { max-width: 46rem; margin: 2rem 0; padding-top: 1rem; border-top: 1px solid var(--rule); }
+.session-workbook-add { margin: 0 0 1rem; display: flex; align-items: center; gap: 0.5rem; }

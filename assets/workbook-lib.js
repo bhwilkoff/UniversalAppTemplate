@@ -149,7 +149,69 @@
     return !(w.blocks || []).length || w.blocks.some(function (b) { return /\[(An )?image\]/i.test(String(b.text || '')); });
   }
 
-  var lib = { normalize: normalize, parts: parts, sameShape: sameShape, waiting: waiting, deltaText: deltaText, answerOf: answerOf, summary: summary };
+  // ---- a leader's editing (/teach/workbook/) -----------------------------
+  // A new block's key is one no block in it has had, so adding or moving a
+  // block never moves anyone's answers to another question.
+  function nextKey(blocks) {
+    var n = 0;
+    (blocks || []).forEach(function (b) { var m = /^b(\d+)$/.exec(b && b.key); if (m) n = Math.max(n, Number(m[1])); });
+    return 'b' + (n + 1);
+  }
+  function newBlock(type, blocks) {
+    var b = { key: nextKey(blocks), type: type, text: '' };
+    if (type === 'free') b.height = 'short';
+    if (type === 'choice') { b.multiple = false; b.choices = ['', '']; }
+    if (type === 'table') b.rows = [[{ text: '', fill: false }, { text: '', fill: false }], [{ text: '', fill: true }, { text: '', fill: true }]];
+    return b;
+  }
+  // A table as a leader typed it: a cell with words is fixed, an empty one is
+  // for people to fill in. Rows keep the widest row's length.
+  function tableFrom(grid) {
+    var rows = (grid || []).slice(0, 40).map(function (r) { return (r || []).slice(0, 12).map(function (t) { return cut(String(t == null ? '' : t).trim(), 500); }); });
+    var w = rows.reduce(function (m, r) { return Math.max(m, r.length); }, 0);
+    return rows.filter(function (r) { return r.length; }).map(function (r) {
+      while (r.length < w) r.push('');
+      return r.map(function (t) { return { text: t, fill: !t }; });
+    });
+  }
+  // Blocks fit to keep: known types, words cut to size, choices without blanks,
+  // unique keys. What is wrong for a person to fix comes back as `problem`.
+  function cleanBlocks(blocks) {
+    var seen = {}, problem = null;
+    var out = (blocks || []).slice(0, 120).map(function (b, i) {
+      if (!b || ['text', 'free', 'choice', 'table', 'file'].indexOf(b.type) < 0) return null;
+      var key = /^b\d+$/.test(b.key) && !seen[b.key] ? b.key : null;
+      if (!key) return null;
+      seen[key] = true;
+      var o = { key: key, type: b.type, text: cut(String(b.text || '').trim(), 6000) };
+      var n = i + 1;
+      if (b.type !== 'text' && !o.text && !problem) problem = 'Block ' + n + ' needs its question.';
+      if (b.type === 'text' && !o.text && !problem) problem = 'Block ' + n + ' has no words.';
+      if (b.type === 'free') o.height = b.height === 'long' ? 'long' : 'short';
+      if (b.type === 'choice') {
+        o.multiple = !!b.multiple;
+        o.choices = (b.choices || []).map(function (c) { return cut(String(c || '').trim(), 300); }).filter(Boolean).slice(0, 30);
+        if (o.choices.length < 2 && !problem) problem = 'Block ' + n + ' needs at least two choices.';
+      }
+      if (b.type === 'table') {
+        o.rows = (b.rows || []).slice(0, 40).map(function (r) { return (r || []).slice(0, 12).map(function (c) { return { text: cut(String((c && c.text) || ''), 500), fill: !!(c && c.fill) }; }); });
+        if (!o.rows.some(function (r) { return r.some(function (c) { return c.fill; }); }) && !problem) problem = 'Block ' + n + ' has no empty cell to fill in.';
+      }
+      return o;
+    }).filter(Boolean);
+    return { blocks: out, problem: problem };
+  }
+  // The next free image name in a workbook, "i4.png", from the names its
+  // blocks already use.
+  function nextImage(blocks, type) {
+    var n = 0;
+    (blocks || []).forEach(function (b) {
+      String((b && b.text) || '').split('\n').forEach(function (l) { var m = IMAGE_LINE.exec(l.trim()); if (m) n = Math.max(n, Number(/^i(\d+)/.exec(m[1])[1])); });
+    });
+    return n >= 999 ? null : imageName(n + 1, type);
+  }
+
+  var lib = { nextKey: nextKey, newBlock: newBlock, tableFrom: tableFrom, cleanBlocks: cleanBlocks, nextImage: nextImage, normalize: normalize, parts: parts, sameShape: sameShape, waiting: waiting, deltaText: deltaText, answerOf: answerOf, summary: summary };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
   else root.WorkbookLib = lib;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

@@ -79,3 +79,39 @@ test('blocks replace others only in the same shape, and a workbook waits for its
   assert.equal(W.waiting({ blocks: [{ text: 'See [image][image]' }] }), true);
   assert.equal(W.waiting({ blocks: a }), false);
 });
+
+test('a new block takes a key no block has had, even after a removal', () => {
+  assert.equal(W.nextKey([{ key: 'b1' }, { key: 'b4' }]), 'b5');
+  assert.equal(W.nextKey([]), 'b1');
+  const b = W.newBlock('choice', [{ key: 'b2' }]);
+  assert.deepEqual(b, { key: 'b3', type: 'choice', text: '', multiple: false, choices: ['', ''] });
+});
+
+test('a typed table: words are fixed, empty cells are filled in', () => {
+  assert.deepEqual(W.tableFrom([['Plant', 'Light'], ['Fern', ''], ['Cactus']]), [
+    [{ text: 'Plant', fill: false }, { text: 'Light', fill: false }],
+    [{ text: 'Fern', fill: false }, { text: '', fill: true }],
+    [{ text: 'Cactus', fill: false }, { text: '', fill: true }]
+  ]);
+});
+
+test('cleanBlocks keeps good blocks and names the first problem', () => {
+  const r = W.cleanBlocks([
+    { key: 'b1', type: 'text', text: ' Read this ' },
+    { key: 'b2', type: 'choice', text: 'Pick', choices: ['A', ' ', 'B'] },
+    { key: 'b2', type: 'free', text: 'Duplicate key' },
+    { key: 'b3', type: 'bogus', text: 'x' },
+    { key: 'b4', type: 'choice', text: 'Only one', choices: ['A'] }
+  ]);
+  assert.deepEqual(r.blocks.map(b => b.key), ['b1', 'b2', 'b4']);
+  assert.equal(r.blocks[0].text, 'Read this');
+  assert.deepEqual(r.blocks[1].choices, ['A', 'B']);
+  assert.equal(r.problem, 'Block 5 needs at least two choices.');
+  assert.equal(W.cleanBlocks([{ key: 'b1', type: 'table', text: 'T', rows: [[{ text: 'a', fill: false }]] }]).problem, 'Block 1 has no empty cell to fill in.');
+  assert.equal(W.cleanBlocks([{ key: 'b1', type: 'free', text: 'Why?' }]).problem, null);
+});
+
+test('nextImage counts past the names already used', () => {
+  assert.equal(W.nextImage([{ text: 'a\n![](i2.png)\n![](i7.jpg)' }], 'webp'), 'i8.webp');
+  assert.equal(W.nextImage([], 'jpeg'), 'i1.jpg');
+});

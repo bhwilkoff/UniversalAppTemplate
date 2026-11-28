@@ -188,6 +188,22 @@
     if (v.getAttribute('src') !== play) v.src = play;
   }
 
+  // A leader starts a workbook here and makes it on its own page.
+  function workbookAdd(cohort, session, all) {
+    var bar = el('p', 'session-workbook-add'), said = el('span', 'ui-inline-status');
+    said.setAttribute('role', 'status');
+    var b = U.button('Add a workbook', 'btn-secondary', function () {
+      b.disabled = true; U.say(said, 'Adding');
+      var pos = all.reduce(function (m, w) { return Math.max(m, w.position + 1); }, 0);
+      db.from('workbooks').insert({ cohort_id: cohort.id, session_id: session.id, kind: 'individual', position: Math.min(pos, 99), title: 'A workbook', blocks: [] }).select('id').single().then(function (q) {
+        if (q.error) { b.disabled = false; return U.say(said, 'Not added: ' + q.error.message, 'problem'); }
+        location.assign('/teach/workbook/?w=' + q.data.id);
+      });
+    });
+    bar.appendChild(b); bar.appendChild(said);
+    return bar;
+  }
+
   // The session's individual workbooks (workbooks, migration 20261111050000):
   // each person answers their own here, saved as they go; a leader reads
   // everyone's answers. Group workbooks are answered in breakout rooms.
@@ -197,7 +213,8 @@
     box.replaceChildren();
     db.from('workbooks').select('*').eq('session_id', session.id).order('position').then(function (r) {
       var list = (r.data || []).filter(function (w) { return leading || w.kind === 'individual'; });
-      box.hidden = !list.length;
+      box.hidden = !list.length && !leading;
+      if (leading) box.appendChild(workbookAdd(cohort, session, r.data || []));
       if (!list.length) return;
       var ids = list.map(function (w) { return w.id; });
       var answersQ = db.from('workbook_answers').select('*').in('workbook_id', ids);
@@ -212,6 +229,7 @@
           var sec = el('section', 'session-workbook');
           var head = el('h2', null, w.title);
           sec.appendChild(head);
+          if (leading) { sec.appendChild(link('Change', '/teach/workbook/?w=' + w.id, 'btn-secondary small')); }
           if (leading) sec.appendChild(el('p', 'small', w.kind === 'group' ? 'Each breakout room answers it together.' : 'Each person answers their own.'));
           else if (U.visibility) sec.appendChild(U.visibility('teachers', 'Your answers'));
           var body = el('div');
