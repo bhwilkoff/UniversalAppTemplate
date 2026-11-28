@@ -186,7 +186,7 @@
     function view(part) {
       if (!room || !room.on) return null;
       var clockPart = room.clock ? { key: 'clock', name: room.clock.label || '', endsAt: room.clock.endsAt } : null;
-      if (room.show === 'page' && room.page && room.page.url) return { mode: 'page', part: clockPart || part, page: { url: room.page.url, v: room.page.v || 0, name: room.page.name || '' }, html: null };
+      if (room.show === 'page' && room.page && room.page.url) return { mode: 'page', part: clockPart || part, page: { url: room.page.url, v: room.page.v || 0, name: room.page.name || '', together: room.page.together === true }, mstate: room.page.together && room.mstate ? room.mstate : null, html: null };
       if (room.show === 'board') return { mode: 'roomboard', part: clockPart || part, prompt: room.board || '', notes: (room.notes || []).map(function (n) { return { id: n.id, text: n.text, name: n.name || '', votes: n.votes.length, mine: n.votes.indexOf(you) >= 0, by: n.by === you }; }), host: isHost() };
       return null;
     }

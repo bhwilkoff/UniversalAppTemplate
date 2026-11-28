@@ -849,7 +849,12 @@
   var modelFrame = null, modelSeq = -1, modelView = null;
   window.addEventListener('message', function (e) {
     if (!modelFrame || e.source !== modelFrame.contentWindow || !e.data) return;
-    if (e.data.hsModel === 'state' && typeof e.data.state === 'string' && room && room.send) room.send({ t: 'mstate', state: e.data.state });
+    // An open room's stage has the room itself; a cohort call's stage sends
+    // the change to its own panel, which sends it to the call's room.
+    if (e.data.hsModel === 'state' && typeof e.data.state === 'string') {
+      if (room && room.send) room.send({ t: 'mstate', state: e.data.state });
+      else act({ a: 'room', m: { t: 'mstate', state: e.data.state } });
+    }
     if (e.data.hsModel === 'ready') { modelSeq = -1; shareState(modelView); }
   });
   function shareState(v) {

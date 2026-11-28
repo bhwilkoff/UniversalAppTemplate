@@ -2928,7 +2928,7 @@
   }
   function stageAct(a) {
     if (a.a === 'coach') return a.do === 'next' ? coachNext() : coachClose();
-    if (a.a === 'room' && S.svc && a.m && ['vote', 'note', 'unnote', 'stance'].indexOf(a.m.t) >= 0) return S.svc.send(a.m);
+    if (a.a === 'room' && S.svc && a.m && ['vote', 'note', 'unnote', 'stance', 'mstate'].indexOf(a.m.t) >= 0) return S.svc.send(a.m);
     if (a.a === 'react' && S.classChannel) return S.classChannel.press({ key: String(a.key), target: {} });
     if (a.a === 'request' && !S.teaching && ASKS[a.kind]) return sendRequest(a.kind, a.body);
     // A leader's press on the words of a slide opens the editor at those words.

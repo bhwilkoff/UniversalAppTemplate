@@ -452,7 +452,11 @@
     // address, and Propose and vote's ideas with their counts.
     if (v.mode === 'page' && v.page && typeof v.page.url === 'string') {
       var pu = frameable(v.page.url);
-      return pu ? { mode: 'page', part: part, page: { url: pu, v: Math.max(0, Math.floor(num(v.page.v) || 0)), name: cut(v.page.name || '', 80) }, html: null } : null;
+      // One shared model (ModelPicker): whether it is shared, and the room's
+      // newest state for it, so this stage can take it in.
+      var together = v.page.together === true && /^https:\/\/ideasatplay\.org\/play\//.test(pu || '');
+      var ms = together && v.mstate && typeof v.mstate.state === 'string' && v.mstate.state.length <= 20000 ? { state: v.mstate.state, seq: Math.max(0, Math.floor(num(v.mstate.seq) || 0)) } : null;
+      return pu ? { mode: 'page', part: part, page: { url: pu, v: Math.max(0, Math.floor(num(v.page.v) || 0)), name: cut(v.page.name || '', 80), together: together }, mstate: ms, html: null } : null;
     }
     if (v.mode === 'roomboard' && Array.isArray(v.notes)) {
       return { mode: 'roomboard', part: part, prompt: cut(v.prompt || '', 500), host: v.host === true, cohort: true,

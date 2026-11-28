@@ -444,3 +444,13 @@ test('people featured during a part with slides keep the slide, with their names
   // Without slides, featuring still shows the people.
   assert.equal(lib.stageView({ part, names, onStage: { kind: 'people', ids: ['a'] } }).mode, 'people');
 });
+
+test('a shared model keeps its shared state on the way to a cohort call\'s stage, and nothing else does', () => {
+  const url = 'https://ideasatplay.org/play/do-random-events-cluster-9f6544?v=4';
+  const v = lib.readStageMessage(lib.stageMessage({ mode: 'page', part: null, page: { url, v: 0, name: 'M', together: true }, mstate: { state: '{"a":1}', seq: 3 } }));
+  assert.equal(v.page.together, true);
+  assert.deepEqual(v.mstate, { state: '{"a":1}', seq: 3 });
+  const solo = lib.readStageMessage(lib.stageMessage({ mode: 'page', part: null, page: { url: 'https://example.com/app/', together: true }, mstate: { state: '{}', seq: 1 } }));
+  assert.equal(solo.page.together, false);
+  assert.equal(solo.mstate, null);
+});
