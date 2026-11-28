@@ -49,7 +49,7 @@ by the Course Builder import or by SQL.
   on the stage), results_of, feature and feature_count, show_tally,
   rerun_of; rooms: groups, group_size, sorting, group_docs, workbooks.
   A deck on every part kind, not only talk and reflection.
-- [ ] B4. `copy_scenes` copies decks (scene_decks and slides) and
+- [x] B4. `copy_scenes` copies decks (scene_decks and slides) and
   pictures too.
 - [ ] B5. Any subject: /teach/new starts from scratch by default; the
   Human Shaped curriculum is a starting point you choose. Audit what
@@ -142,3 +142,17 @@ breakout state.
   the one imports already use). One Chrome tab stopped answering
   ("Cannot access a chrome-extension:// URL of different extension")
   after a save; a new tab worked.
+- 2026-11-28, tick 4 (B4, 829de627). copy_scenes (migration
+  20261128010000, applied) carries each part's slides and speaker notes
+  (scene_decks), purpose, the group workbooks its rooms answer (made the
+  new session's own), and points an earlier-question part at the copied
+  question; the page then copies deck and workbook pictures in storage
+  and says how many it could not. Policy suite 1201 of 1201; with the
+  migration taken out, exactly the two new checks fail. **Verified live
+  as Ben:** Session 1 got a Talk part with an uploaded picture; Session 2
+  copied it ("Copied 3 parts from session 1, with their slides and your
+  notes"): the talk part has its slides and one picture in its own
+  folder, the rooms part names a workbook that belongs to Session 2, and
+  the copied slide draws its picture. Also fixed: plan cards began
+  ", 5 min". Not yet seen: a copied workbook's pictures (Leaf Lab Notes
+  had none left).
