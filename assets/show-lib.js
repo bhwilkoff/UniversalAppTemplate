@@ -136,6 +136,50 @@
     return out;
   }
 
+  // The settings a leader sets for how a part runs in the call, from the
+  // builder's "In the call" fields, as config keys for the part's kind:
+  // a page or document on the stage, whom to feature, an earlier question's
+  // answers, a question's counts and rerun, and how breakout rooms are made.
+  function callConfig(k, v) {
+    v = v || {};
+    var out = {}, url = String(v.show_url || '').trim();
+    if (/^https:\/\/\S+$/.test(url)) {
+      out.show = { url: url.slice(0, 2000) };
+      var nm = String(v.show_name || '').trim();
+      if (nm) out.show.name = nm.slice(0, 200);
+    }
+    if (['teacher', 'random', 'quiet', 'group'].indexOf(v.feature) >= 0) {
+      out.feature = v.feature;
+      var n = parseInt(v.feature_count, 10);
+      if (n >= 1 && n <= 8 && v.feature !== 'group') out.feature_count = n;
+    }
+    if (/^[0-9a-f-]{36}$/.test(v.results_of || '')) out.results_of = v.results_of;
+    if (k === 'question') {
+      if (v.show_tally) out.show_tally = true;
+      if (/^[0-9a-f-]{36}$/.test(v.rerun_of || '')) out.rerun_of = v.rerun_of;
+    }
+    if (k === 'rooms') {
+      var count = parseInt(v.count, 10);
+      if (count >= 1 && count <= 40) out[v.by === 'size' ? 'group_size' : 'groups'] = count;
+      if (v.sorting === 'random' || v.sorting === 'roster') out.sorting = v.sorting;
+      var docs = (v.group_docs || []).map(function (d) { return { name: String((d && d.name) || '').trim().slice(0, 120), url: String((d && d.url) || '').trim() }; })
+        .filter(function (d) { return d.name && /^https:\/\/\S+$/.test(d.url) && d.url.length <= 2000; }).slice(0, 40);
+      if (docs.length) out.group_docs = docs;
+      var wbs = (v.workbooks || []).filter(function (id) { return /^[0-9a-f-]{36}$/.test(id); }).slice(0, 40);
+      if (wbs.length) out.workbooks = wbs;
+    }
+    return out;
+  }
+  // A typed setting that cannot be kept, in a sentence, or null.
+  function callProblem(v) {
+    v = v || {};
+    var url = String(v.show_url || '').trim();
+    if (url && !/^https:\/\/\S+$/.test(url)) return 'The page to show starts with https:// and has no spaces.';
+    var bad = (v.group_docs || []).filter(function (d) { return d && (d.name || d.url) && !(String(d.name || '').trim() && /^https:\/\/\S+$/.test(String(d.url || '').trim())); })[0];
+    if (bad) return 'Each room document needs a name and a link that starts with https://.';
+    return null;
+  }
+
   // The first problem with a scene as a sentence, or null when it fits.
   function problem(scene) {
     var k = kind(scene && scene.kind);
@@ -227,7 +271,7 @@
   var lib = {
     KINDS: KINDS, PART_KIND: PART_KIND, kind: kind, roomScenes: roomScenes, defaultShow: defaultShow, total: total,
     fitText: fitText, startTimes: startTimes, moved: moved, optionsFromText: optionsFromText,
-    roomScenesFromText: roomScenesFromText, roomScenesToText: roomScenesToText, cleanConfig: cleanConfig, carriedConfig: carriedConfig,
+    roomScenesFromText: roomScenesFromText, roomScenesToText: roomScenesToText, cleanConfig: cleanConfig, carriedConfig: carriedConfig, callConfig: callConfig, callProblem: callProblem,
     problem: problem, copySource: copySource, stagePreview: stagePreview
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;

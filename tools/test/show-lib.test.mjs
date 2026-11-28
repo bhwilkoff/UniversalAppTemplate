@@ -109,3 +109,20 @@ test('a part keeps what its form does not edit, for the kind it is now', () => {
   assert.deepEqual(S.carriedConfig('question', c), { show: { url: 'https://a.example' }, feature: 'random', feature_count: 3, show_tally: false, rerun_of: 'q' });
   assert.deepEqual(S.carriedConfig('talk', {}), {});
 });
+
+test('callConfig keeps each kind its own call settings', () => {
+  const id = '11111111-2222-3333-4444-555555555555';
+  assert.deepEqual(S.callConfig('talk', { show_url: 'https://example.org/doc', show_name: 'The doc', feature: 'random', feature_count: '3', results_of: id, show_tally: true }),
+    { show: { url: 'https://example.org/doc', name: 'The doc' }, feature: 'random', feature_count: 3, results_of: id });
+  assert.deepEqual(S.callConfig('question', { show_tally: true, rerun_of: id, show_url: 'http://no' }), { show_tally: true, rerun_of: id });
+  assert.deepEqual(S.callConfig('rooms', { count: '4', by: 'size', sorting: 'random', group_docs: [{ name: 'Notes', url: 'https://docs.google.com/x' }, { name: '', url: '' }], workbooks: [id, 'nope'] }),
+    { group_size: 4, sorting: 'random', group_docs: [{ name: 'Notes', url: 'https://docs.google.com/x' }], workbooks: [id] });
+  assert.deepEqual(S.callConfig('rooms', { count: '6', by: 'rooms' }), { groups: 6 });
+  assert.deepEqual(S.callConfig('talk', { feature: 'group', feature_count: 2 }), { feature: 'group' });
+});
+
+test('callProblem names a bad link in a sentence', () => {
+  assert.equal(S.callProblem({ show_url: 'example.org' }), 'The page to show starts with https:// and has no spaces.');
+  assert.equal(S.callProblem({ group_docs: [{ name: 'A', url: 'ftp://x' }] }), 'Each room document needs a name and a link that starts with https://.');
+  assert.equal(S.callProblem({ show_url: '', group_docs: [{ name: '', url: '' }] }), null);
+});

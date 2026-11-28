@@ -327,6 +327,90 @@
       var noteL = field('Your note for the whole part', note);
       var promptLabel = promptL.firstChild;
 
+      // How the part runs in the call: what goes on the stage, whom to
+      // feature, an earlier question's answers, and for rooms how they are made.
+      var call = el('details', 'ui-disclosure part-call');
+      call.appendChild(el('summary', null, 'In the call'));
+      function callField(label, input, hint) {
+        var l = el('label', null, label);
+        if (hint) l.appendChild(el('span', 'hint', hint));
+        l.appendChild(input); call.appendChild(l);
+        return l;
+      }
+      function pick(name, items, value) {
+        var sel = el('select'); sel.name = name;
+        items.forEach(function (it) { var o = el('option', null, it[1]); o.value = it[0]; sel.appendChild(o); });
+        sel.value = value || '';
+        return sel;
+      }
+      var showUrl = el('input'); showUrl.type = 'url'; showUrl.name = 'show_url'; showUrl.placeholder = 'https://'; showUrl.value = (c.show && c.show.url) || '';
+      callField('A page or document on the stage', showUrl);
+      var showName = el('input'); showName.name = 'show_name'; showName.maxLength = 200; showName.value = (c.show && c.show.name) || '';
+      var showNameL = callField('Its name', showName);
+      var feature = pick('feature', [['', 'Nobody'], ['teacher', 'You choose'], ['random', 'At random'], ['quiet', 'Someone quiet so far'], ['group', 'A breakout room']], c.feature);
+      callField('Feature', feature);
+      var fcount = el('input'); fcount.type = 'number'; fcount.name = 'feature_count'; fcount.min = 1; fcount.max = 8; fcount.value = c.feature_count || 1;
+      var fcountL = callField('How many people', fcount);
+      var earlier = scenes.slice(0, index == null ? scenes.length : index).filter(function (x) { return x.kind === 'question' && (!s || x.id !== s.id); });
+      var asks = [['', 'None']].concat(earlier.map(function (x) { return [x.id, x.title]; }));
+      var resultsOf = pick('results_of', asks, c.results_of);
+      var resultsL = callField('Show the answers of', resultsOf);
+      var tallyL = el('label', 'check'), tally = el('input');
+      tally.type = 'checkbox'; tally.name = 'show_tally'; tally.checked = !!c.show_tally;
+      tallyL.appendChild(tally); tallyL.appendChild(document.createTextNode(' Everyone sees the counts'));
+      call.appendChild(tallyL);
+      var rerun = pick('rerun_of', asks, c.rerun_of);
+      var rerunL = callField('Ask an earlier question again', rerun);
+      var roomBox = el('div', 'part-call-rooms');
+      call.appendChild(roomBox);
+      var by = c.group_size ? 'size' : 'rooms';
+      var rcount = el('input'); rcount.type = 'number'; rcount.name = 'count'; rcount.min = 1; rcount.max = 40; rcount.value = c.group_size || c.groups || '';
+      var byWrap = el('div', 'choices');
+      [['rooms', 'Rooms'], ['size', 'People in each room']].forEach(function (o) {
+        var l = el('label', 'check'), r = el('input'); r.type = 'radio'; r.name = 'by'; r.value = o[0]; r.checked = by === o[0];
+        l.appendChild(r); l.appendChild(document.createTextNode(' ' + o[1])); byWrap.appendChild(l);
+      });
+      var rl = el('label', null, 'How many'); rl.appendChild(rcount); roomBox.appendChild(byWrap); roomBox.appendChild(rl);
+      var sorting = pick('sorting', [['', 'You choose in the call'], ['random', 'At random'], ['roster', 'In roster order']], c.sorting);
+      var sl = el('label', null, 'Who goes where'); sl.appendChild(sorting); roomBox.appendChild(sl);
+      roomBox.appendChild(el('p', 'part-call-head', 'Documents dealt to the rooms'));
+      var docsMount = el('div'); roomBox.appendChild(docsMount);
+      var docs = window.UI && window.UI.editRows ? window.UI.editRows(docsMount, { fields: [{ key: 'name', label: 'Name', max: 120 }, { key: 'url', label: 'Link', type: 'url', placeholder: 'https://' }], rows: c.group_docs || [], add: 'Add a document', most: 40 }) : null;
+      docsMount.addEventListener('click', function (ev) { if (ev.target.closest('button')) soon(); });
+      roomBox.appendChild(el('p', 'part-call-head', 'Workbooks the rooms answer'));
+      var wbBox = el('div', 'choices'); roomBox.appendChild(wbBox);
+      var chosenWb = {};
+      (c.workbooks || []).forEach(function (id) { chosenWb[id] = true; });
+      db.from('workbooks').select('id, title').eq('session_id', session.id).eq('kind', 'group').order('position').then(function (r) {
+        var list = r.data || [];
+        (c.workbooks || []).forEach(function (id) { if (!list.some(function (w) { return w.id === id; })) list.push({ id: id, title: 'A workbook from another session' }); });
+        if (!list.length) wbBox.appendChild(el('p', 'small', 'No group workbooks in this session yet'));
+        list.forEach(function (w) {
+          var l = el('label', 'check'), b = el('input'); b.type = 'checkbox'; b.name = 'workbook'; b.value = w.id; b.checked = !!chosenWb[w.id];
+          l.appendChild(b); l.appendChild(document.createTextNode(' ' + w.title)); wbBox.appendChild(l);
+        });
+      });
+      function callValues() {
+        return {
+          show_url: showUrl.value, show_name: showName.value, feature: feature.value, feature_count: fcount.value, results_of: resultsOf.value,
+          show_tally: tally.checked, rerun_of: rerun.value, count: rcount.value, by: (call.querySelector('[name=by]:checked') || {}).value,
+          sorting: sorting.value, group_docs: docs ? docs.get() : (c.group_docs || []),
+          workbooks: Array.prototype.map.call(wbBox.querySelectorAll('input:checked'), function (b) { return b.value; })
+        };
+      }
+      function fitCall() {
+        var k = kindSel.value;
+        showNameL.hidden = !showUrl.value.trim();
+        fcountL.hidden = !feature.value || feature.value === 'group';
+        resultsL.hidden = !earlier.length;
+        tallyL.hidden = k !== 'question';
+        rerunL.hidden = k !== 'question' || !earlier.length;
+        roomBox.hidden = k !== 'rooms';
+      }
+      call.addEventListener('input', fitCall);
+      call.addEventListener('change', fitCall);
+      call.open = !!(c.show || c.feature || c.results_of || c.rerun_of || c.groups || c.group_size || (c.group_docs || []).length || (c.workbooks || []).length);
+
       function fitKind() {
         var k = S.kind(kindSel.value);
         var uses = k ? k.keys : [];
@@ -338,7 +422,7 @@
         roomsL.hidden = uses.indexOf('room_scenes') === -1;
         promptLabel.textContent = { presenter: 'What each person shows', question: 'The question', rooms: 'What the rooms are for', reflection: 'The closing question' }[kindSel.value] || 'Prompt';
         bodyL.hidden = kindSel.value === 'question';
-        deckBox.hidden = ['talk', 'reflection'].indexOf(kindSel.value) < 0;
+        fitCall();
       }
       kindSel.addEventListener('change', fitKind);
       fitKind();
@@ -376,10 +460,12 @@
       var more = el('details', 'ui-disclosure part-more');
       more.appendChild(el('summary', null, 'More about this part'));
       f.appendChild(more);
+      f.appendChild(call);
       function tuck() {
         var deck = !deckBox.hidden;
         more.hidden = !deck;
         [bodyL, noteL].forEach(function (x) { (deck ? more : f).appendChild(x); });
+        f.appendChild(call);
         f.appendChild(acts);
         drawStage();
       }
@@ -405,10 +491,9 @@
         };
         var p = S.problem(row);
         if (p) { saved(p); return; }
-        // What this form does not show stays: a part's document, whom to
-        // feature, its breakout groups and workbooks, and its question's
-        // settings, all brought from Course Builder or set elsewhere.
-        row.config = Object.assign(S.carriedConfig(k, c), row.config);
+        var cv = callValues(), cp = S.callProblem(cv);
+        if (cp) { saved(cp); return; }
+        row.config = Object.assign(S.callConfig(k, cv), row.config);
         row.goal = goal.value.trim() || null;
         saved('Saving…');
         return Promise.all([db.from('scenes').update(row).eq('id', s.id).select('id').single(), saveNote(s.id, note.value.trim())]).then(function (both) {
