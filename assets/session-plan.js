@@ -83,8 +83,17 @@
   // each part's slides first, then what it asks or shows. Kinds a room cannot
   // run on its own (breakouts, the board, showing work) become a card with
   // their prompt, so the host still has the words.
-  function fromScenes(scenes, decks) {
-    var out = [];
+  // Workbooks (the cohort's rows: { id, kind, title, blocks }) come along as
+  // workbook parts: a room part's workbooks just after it, and the session's
+  // other individual workbooks at the end. A picture in a block's words stays
+  // in the cohort's private storage, so its line is left out.
+  function wbPart(w) {
+    var bl = (w.blocks || []).map(function (b) { return Object.assign({}, b, { text: String(b.text || '').split('\n').filter(function (l) { return !/^!\[\]\([^)]*\)$/.test(l.trim()); }).join('\n') }); });
+    return { kind: 'workbook', title: w.title, blocks: bl };
+  }
+  function fromScenes(scenes, decks, workbooks) {
+    var out = [], byId = {}, used = {};
+    (workbooks || []).forEach(function (w) { if (w && w.id) byId[w.id] = w; });
     (scenes || []).forEach(function (s) {
       var c = s.config || {}, deck = (decks && decks[s.id]) || s.slides || '';
       if (deck && String(deck).trim()) out.push({ kind: 'talk', title: s.title, slides: deck });
@@ -92,7 +101,9 @@
       else if (c.show && c.show.url) out.push(MODEL.test(c.show.url) ? { kind: 'model', title: c.show.name || s.title, url: c.show.url } : { kind: 'site', title: c.show.name || s.title, url: c.show.url });
       else if (['rooms', 'design', 'presenter', 'reflection'].indexOf(s.kind) >= 0 && c.prompt) out.push({ kind: 'card', title: s.title, body: c.prompt });
       else if (s.kind === 'break') out.push({ kind: 'clock', title: s.title, minutes: s.minutes });
+      (Array.isArray(c.workbooks) ? c.workbooks : []).forEach(function (id) { if (byId[id] && !used[id]) { used[id] = true; out.push(wbPart(byId[id])); } });
     });
+    (workbooks || []).forEach(function (w) { if (w && w.id && !used[w.id] && w.kind !== 'group') out.push(wbPart(w)); });
     return clean(out);
   }
 

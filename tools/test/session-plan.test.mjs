@@ -60,3 +60,18 @@ test('a workbook’s answers become a CSV for the host and Markdown for each per
   const md = P.myCopy({ title: 'W', blocks }, { b2: 'Clumps', b3: [1], b4: { '0,1': '12' } });
   assert.equal(md, '# W\n\nRead this.\n\n**Notice?**\n\nClumps\n\n**Pick**\n\n- [ ] Left\n- [x] Right\n\n**Count**\n\n| Stars | 12 |\n| --- | --- |\n');
 });
+
+test('a cohort session brings its workbooks: a room part’s just after it, the other individual ones at the end, pictures left out', () => {
+  const scenes = [
+    { id: 's1', kind: 'rooms', title: 'Rooms', config: { prompt: 'Talk it over', workbooks: ['g1'] } },
+    { id: 's2', kind: 'question', title: 'Check', config: { prompt: 'Ready?', kind: 'short' } }
+  ];
+  const workbooks = [
+    { id: 'g1', kind: 'group', title: 'Group notes', blocks: [{ key: 'b1', type: 'free', text: 'What did your room decide?' }] },
+    { id: 'g2', kind: 'group', title: 'Unused group', blocks: [{ key: 'b1', type: 'free', text: 'x' }] },
+    { id: 'i1', kind: 'individual', title: 'Exit ticket', blocks: [{ key: 'b1', type: 'text', text: 'Look:\n![](i1.png)\nthen answer.' }, { key: 'b2', type: 'free', text: 'One thing you learned' }, { key: 'b3', type: 'file', text: 'Upload' }] }
+  ];
+  const parts = P.fromScenes(scenes, {}, workbooks);
+  assert.deepEqual(parts.map((p) => p.kind + ':' + p.title), ['card:Rooms', 'workbook:Group notes', 'question:Check', 'workbook:Exit ticket']);
+  assert.deepEqual(parts[3].blocks, [{ key: 'b1', type: 'text', text: 'Look:\nthen answer.' }, { key: 'b2', type: 'free', text: 'One thing you learned' }]);
+});

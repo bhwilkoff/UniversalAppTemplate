@@ -217,7 +217,8 @@
       var token = window.MyDrive.connect();
       Promise.all([token,
         db.from('scenes').select('*').eq('session_id', session.id).order('position'),
-        db.from('scene_decks').select('scene_id, body').eq('cohort_id', cohort.id)
+        db.from('scene_decks').select('scene_id, body').eq('cohort_id', cohort.id),
+        db.from('workbooks').select('id, kind, title, blocks').eq('session_id', session.id).order('position')
       ]).then(function (r) {
         if (r[1].error) throw new Error(r[1].error.message);
         var decks = {}, scenes = r[1].data || [], token2 = r[0];
@@ -238,7 +239,7 @@
         });
         U.say(said, jobs.length ? 'Copying ' + jobs.length + (jobs.length === 1 ? ' picture' : ' pictures') + ' to your Drive…' : 'Saving to your Drive…');
         return Promise.all(jobs).then(function () {
-          var file = window.SessionPlan.session(lib.sessionTitle(session, cohort), window.SessionPlan.fromScenes(scenes, decks));
+          var file = window.SessionPlan.session(lib.sessionTitle(session, cohort), window.SessionPlan.fromScenes(scenes, decks, r[3].data || []));
           if (!file.parts.length) throw new Error('This plan has nothing a call can run yet.');
           return window.MyDrive.save(token2, file).then(function () { return file; });
         });
