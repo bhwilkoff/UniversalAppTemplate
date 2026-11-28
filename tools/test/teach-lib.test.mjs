@@ -182,3 +182,21 @@ test('a stored moment fills a form in the cohort\'s own zone', () => {
   const back = lib.zonedToUtc('2026-12-01', '17:00', 'America/Denver').toISOString();
   assert.equal(back, '2026-12-02T00:00:00.000Z');
 });
+
+test('outcomesFrom keeps ids and refs, names new ones, drops empty rows', () => {
+  const old = [{ id: 'glo:7', ref: 7, name: 'audience', text: 'Old' }];
+  const out = lib.outcomesFrom([{ id: 'glo:7', name: ' audience ', text: 'Know who it is for' }, { name: '' }, { name: 'Explain photosynthesis', text: '' }], old);
+  assert.equal(out.length, 2);
+  assert.deepEqual(out[0], { id: 'glo:7', ref: 7, name: 'audience', text: 'Know who it is for' });
+  assert.match(out[1].id, /^o:[a-z0-9]+$/);
+  assert.equal(out[1].text, null);
+  assert.equal(lib.outcomesFrom([{ id: 'glo:999', name: 'x' }], old)[0].id.startsWith('o:'), true);
+});
+
+test('readingsFrom keeps titles, https links, and notes only', () => {
+  const out = lib.readingsFrom([{ title: 'Chapter 1', url: 'https://example.org/a', note: 'pages 1-9' }, { title: '', url: 'https://x.org' }, { title: 'Bad link', url: 'javascript:alert(1)' }]);
+  assert.deepEqual(out, [{ title: 'Chapter 1', url: 'https://example.org/a', note: 'pages 1-9' }, { title: 'Bad link' }]);
+  assert.equal(lib.readingProblem({ title: 'A', url: 'http://x.org' }), 'A link starts with https:// and has no spaces.');
+  assert.equal(lib.readingProblem({ title: '', url: 'https://x.org' }), 'Give each link a title people will recognize.');
+  assert.equal(lib.readingProblem({ title: 'A', url: '' }), null);
+});

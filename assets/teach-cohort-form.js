@@ -22,7 +22,11 @@
   // name until the teacher changes it, and a preview shows the cohort as
   // /cohorts/ will list it.
   var form = $('[data-cohort-form]');
-  var editing = null, slugTouched = false;
+  var editing = null, slugTouched = false, oldOutcomes = [];
+  var outcomesEdit = window.UI && window.UI.editRows ? window.UI.editRows($('[data-outcomes-edit]'), {
+    fields: [{ key: 'name', label: 'Outcome', max: 120, placeholder: 'Explain how plants make food' }, { key: 'text', label: 'What it means', long: true, max: 600 }],
+    add: 'Add an outcome', most: 300
+  }) : null;
   var TL = window.TeachLib;
   function showSlug() {
     var f = form.elements, slug = f.slug.value;
@@ -74,6 +78,8 @@
     f.github_repo.value = c && c.github_repo ? c.github_repo : '';
     f.github_team.value = c && c.github_team ? c.github_team : '';
     form.querySelector('.by-hand').open = !!(c && (c.github_repo || c.github_team));
+    oldOutcomes = c && Array.isArray(c.outcomes) ? c.outcomes : [];
+    if (outcomesEdit) outcomesEdit.set(oldOutcomes);
     showSlug();
     drawPreview();
     f.title.focus({ preventScroll: true });
@@ -149,6 +155,7 @@
       github_repo: f.github_repo.value.trim() || null,
       github_team: f.github_team.value.trim() || null
     };
+    if (outcomesEdit) row.outcomes = TL.outcomesFrom(outcomesEdit.get(), oldOutcomes);
     // Finishing a cohort deletes its boards (migration 20261003150000), so
     // the pages placed on them go first (R13): a file in storage cannot be
     // removed from SQL.

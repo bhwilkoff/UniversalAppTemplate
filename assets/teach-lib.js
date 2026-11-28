@@ -266,7 +266,47 @@
     return first + length + (c.capacity ? ', with room for ' + c.capacity + ' people' : '') + '.';
   }
 
-  var lib = { zonedToUtc: zonedToUtc, zonedParts: zonedParts, sessionDates: sessionDates, sessionRows: sessionRows, meetSetup: meetSetup, lastStarted: lastStarted, checkAnswers: checkAnswers, waitingForFeedback: waitingForFeedback, scheduleText: scheduleText, slugFrom: slugFrom, slugProblem: slugProblem, openingLine: openingLine, cohortSetupSteps: cohortSetupSteps, calendarNote: calendarNote, meetRequestNote: meetRequestNote, requestState: requestState, waitingRequests: waitingRequests, WEEKDAYS: WEEKDAYS };
+  // A leader's outcomes (cohorts.outcomes) from the rows they typed: an
+  // existing outcome keeps its id and Course Builder ref, a new one gets an
+  // "o:" id, and an empty row is dropped. Names stay short; text is optional.
+  function outcomesFrom(rows, old) {
+    var kept = {}, out = [], seen = {};
+    (Array.isArray(old) ? old : []).forEach(function (o) { if (o && o.id) kept[o.id] = o; });
+    (rows || []).forEach(function (r) {
+      var name = String((r && r.name) || '').trim().slice(0, 120), text = String((r && r.text) || '').trim().slice(0, 600);
+      if (!name) return;
+      var id = r.id && kept[r.id] ? r.id : 'o:' + Math.random().toString(36).slice(2, 10);
+      if (seen[id]) return;
+      seen[id] = true;
+      out.push(Object.assign({}, kept[id] || {}, { id: id, name: name, text: text || null }));
+    });
+    return out.slice(0, 300);
+  }
+  // A session's readings (sessions.readings) from typed rows: a title is
+  // needed, a link must be https, a note is optional.
+  function readingsFrom(rows) {
+    var out = [];
+    (rows || []).forEach(function (r) {
+      var title = String((r && r.title) || '').trim().slice(0, 300);
+      if (!title) return;
+      var url = String(r.url || '').trim(), note = String(r.note || '').trim().slice(0, 1000);
+      var item = { title: title };
+      if (/^https:\/\/\S+$/.test(url)) item.url = url;
+      if (note) item.note = note;
+      out.push(item);
+    });
+    return out.slice(0, 60);
+  }
+  // A reading's link problem in plain words, or null.
+  function readingProblem(r) {
+    var url = String((r && r.url) || '').trim();
+    if (!url) return null;
+    if (!/^https:\/\/\S+$/.test(url)) return 'A link starts with https:// and has no spaces.';
+    if (!String(r.title || '').trim()) return 'Give each link a title people will recognize.';
+    return null;
+  }
+
+  var lib = { outcomesFrom: outcomesFrom, readingsFrom: readingsFrom, readingProblem: readingProblem, zonedToUtc: zonedToUtc, zonedParts: zonedParts, sessionDates: sessionDates, sessionRows: sessionRows, meetSetup: meetSetup, lastStarted: lastStarted, checkAnswers: checkAnswers, waitingForFeedback: waitingForFeedback, scheduleText: scheduleText, slugFrom: slugFrom, slugProblem: slugProblem, openingLine: openingLine, cohortSetupSteps: cohortSetupSteps, calendarNote: calendarNote, meetRequestNote: meetRequestNote, requestState: requestState, waitingRequests: waitingRequests, WEEKDAYS: WEEKDAYS };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
   else root.TeachLib = lib;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

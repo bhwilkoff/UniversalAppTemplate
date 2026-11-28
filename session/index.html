@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css?v=20261126e">
+  <link rel="stylesheet" href="/assets/site.css?v=20261128a">
   <script>
     (function () {
       var q = location.search, t = null;
@@ -38,7 +38,7 @@
     })();
   </script>
   <script src="/assets/site.js?v=20261022o" defer></script>
-  <script src="/assets/ui.js?v=20261112b" defer></script>
+  <script src="/assets/ui.js?v=20261128a" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to the page</a>
@@ -113,6 +113,22 @@
               <h2 id="outcomes-head">What it practices</h2>
               <ul class="session-outcomes-list" data-outcomes></ul>
             </section>
+            <form class="cohort-form session-before-form" data-before-form hidden>
+              <label>Before this session
+                <span class="hint"><span data-vis="cohort"></span></span>
+                <textarea name="before" rows="5" maxlength="20000"></textarea>
+              </label>
+              <fieldset>
+                <legend>Readings and materials</legend>
+                <div data-readings-edit></div>
+              </fieldset>
+              <fieldset>
+                <legend>What it practices</legend>
+                <div class="choices" data-outcome-checks></div>
+                <p><a class="btn-secondary small" data-outcomes-link>Change the cohort&rsquo;s outcomes</a></p>
+              </fieldset>
+              <div class="actions"><button class="btn-secondary" type="submit">Save</button><span class="ui-inline-status" role="status" data-before-status></span></div>
+            </form>
             <section class="session-workbooks" aria-label="Workbooks" data-workbooks hidden></section>
             <section class="session-prep" aria-label="Before this session" data-prep-section hidden>
               <p class="small" data-prep-note></p>
@@ -201,7 +217,7 @@
   <script src="/assets/slide-studio.js?v=20261127a" defer></script>
   <script src="/assets/show-lib.js?v=20261118a" defer></script>
   <script src="/assets/curriculum-pages-lib.js" defer></script>
-  <script src="/assets/teach-lib.js?v=20261111b" defer></script>
+  <script src="/assets/teach-lib.js?v=20261128a" defer></script>
   <script src="/assets/curriculum-lib.js?v=20261112q" defer></script>
   <script src="/assets/curriculum-seed.js?v=20261107a" defer></script>
   <script src="/assets/show-builder.js?v=20261127a" defer></script>
@@ -213,7 +229,7 @@
   <script src="/assets/session-replay.js?v=20261112zc" defer></script>
   <script src="/assets/workbook-lib.js?v=20261111c" defer></script>
   <script src="/assets/workbook-view.js?v=20261111b" defer></script>
-  <script src="/assets/session.js?v=20261118c" defer></script>
+  <script src="/assets/session.js?v=20261128a" defer></script>
 
   <footer class="site-footer">
     <div class="wrap">

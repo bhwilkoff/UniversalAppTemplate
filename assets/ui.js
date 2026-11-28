@@ -166,6 +166,52 @@
     return a;
   }
 
+  // ---- edit rows: a list a leader types, one row per thing -------------
+  // UI.editRows(mount, { fields: [{ key, label, long, max, type }], rows,
+  // add: 'Add a reading', most: 60 }) draws each row's fields with Move up
+  // and Remove, and an add button below; .get() returns the typed rows,
+  // each keeping any keys it came with (an id) that it has no field for.
+  function editRows(mount, o) {
+    var list = el('ol', 'ui-edit-rows'), data = [], most = o.most || 60;
+    var add = button(o.add || 'Add', 'btn-secondary small');
+    mount.replaceChildren(list, add);
+    function draw(focusAt) {
+      list.replaceChildren();
+      data.forEach(function (r, i) {
+        var li = el('li', 'ui-edit-row'), box = el('div', 'ui-edit-fields');
+        o.fields.forEach(function (f, n) {
+          var lab = el('label', f.long ? 'is-long' : null), inp = el(f.long ? 'textarea' : 'input');
+          lab.appendChild(el('span', 'ui-edit-label', f.label));
+          if (f.long) inp.rows = 2; else inp.type = f.type || 'text';
+          if (f.max) inp.maxLength = f.max;
+          if (f.placeholder) inp.placeholder = f.placeholder;
+          inp.value = r[f.key] == null ? '' : r[f.key];
+          inp.addEventListener('input', function () { r[f.key] = inp.value; });
+          lab.appendChild(inp);
+          box.appendChild(lab);
+          if (focusAt === i && n === 0) setTimeout(function () { inp.focus(); });
+        });
+        li.appendChild(box);
+        var side = el('div', 'ui-edit-side');
+        var up = button('', 'ui-edit-button', function () { data.splice(i - 1, 0, data.splice(i, 1)[0]); draw(); });
+        up.appendChild(icon('arrow-up')); up.setAttribute('aria-label', 'Move up'); up.title = 'Move up'; up.disabled = i === 0;
+        var rm = button('', 'ui-edit-button', function () { data.splice(i, 1); draw(); add.disabled = data.length >= most; });
+        rm.appendChild(icon('trash')); rm.setAttribute('aria-label', 'Remove'); rm.title = 'Remove';
+        side.appendChild(up); side.appendChild(rm);
+        li.appendChild(side);
+        list.appendChild(li);
+      });
+      list.hidden = !data.length;
+    }
+    add.addEventListener('click', function () {
+      if (data.length >= most) return;
+      data.push({}); draw(data.length - 1); add.disabled = data.length >= most;
+    });
+    function set(rows) { data = (rows || []).map(function (r) { return Object.assign({}, r); }); draw(); add.disabled = data.length >= most; }
+    set(o.rows);
+    return { get: function () { return data.map(function (r) { return Object.assign({}, r); }); }, set: set };
+  }
+
   // ---- results: beside the control, kept until the next action ----------
   function say(target, text, tone) {
     if (!target) return;
@@ -359,7 +405,7 @@
 
   root.UI = {
     el: el, icon: icon, status: status, visibility: visibility, facts: facts, count: count, tag: tag,
-    row: row, rows: rows, empty: empty, disclosure: disclosure, button: button, link: link,
+    row: row, rows: rows, editRows: editRows, empty: empty, disclosure: disclosure, button: button, link: link,
     say: say, confirm: confirm, confirmStep: confirmStep, gate: gate, skeleton: skeleton, tabs: tabs, hydrate: hydrate,
     STATUS: STATUS, AUDIENCES: AUDIENCES, GATES: GATES
   };

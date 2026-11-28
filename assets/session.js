@@ -132,9 +132,11 @@
     pager.hidden = sessions.length < 2;
 
     // What to bring, which the plan's build part asks for.
+    K.leading = leading;
     drawPlan(cohort, sessions, session, leading, finished);
     drawPrep(cohort, session, leading);
-    drawBefore(session);
+    drawBefore(session, leading);
+    drawBeforeForm(cohort, session, leading);
     K.outcomes = drawOutcomes(session, cohort);
     drawAfterWork(session, leading);
     drawWorkbooks(cohort, session, leading);
@@ -260,10 +262,10 @@
   function drawOutcomes(session, cohort) {
     var list = lib.sessionOutcomes ? lib.sessionOutcomes(session, cohort) : [];
     var ul = $('[data-outcomes]'); ul.replaceChildren();
-    $('[data-outcomes-section]').hidden = !list.length;
+    $('[data-outcomes-section]').hidden = !list.length || K.leading;
     list.forEach(function (o) {
       var li = el('li');
-      li.appendChild(el('strong', null, '#' + o.name));
+      li.appendChild(el('strong', null, (/\s/.test(o.name) ? '' : '#') + o.name));
       if (o.text) li.appendChild(el('span', null, ' ' + o.text));
       ul.appendChild(li);
     });
@@ -291,11 +293,52 @@
     };
   }
 
-  function drawBefore(session) {
+  // A leader writes what comes before the session, its readings, and the
+  // cohort outcomes it practices (sessions.before, readings, outcomes).
+  function drawBeforeForm(cohort, session, leading) {
+    var f = $('[data-before-form]');
+    f.hidden = !leading;
+    if (!leading || !U.editRows || !window.TeachLib) return;
+    var TL = window.TeachLib;
+    f.elements.before.value = session.before || '';
+    var reads = U.editRows($('[data-readings-edit]'), {
+      fields: [{ key: 'title', label: 'Title', max: 300 }, { key: 'url', label: 'Link', type: 'url', placeholder: 'https://' }, { key: 'note', label: 'Note', long: true, max: 1000 }],
+      rows: Array.isArray(session.readings) ? session.readings : [], add: 'Add a reading', most: 60
+    });
+    var checks = $('[data-outcome-checks]'), all = Array.isArray(cohort.outcomes) ? cohort.outcomes.filter(function (o) { return o && o.id && o.name; }) : [];
+    var chosen = {};
+    (session.outcomes || []).forEach(function (id) { chosen[id] = true; });
+    checks.replaceChildren();
+    if (!all.length) checks.appendChild(U.empty('The cohort has no outcomes yet'));
+    all.forEach(function (o) {
+      var lab = el('label', 'check'), box = el('input');
+      box.type = 'checkbox'; box.value = o.id; box.checked = !!chosen[o.id];
+      lab.appendChild(box); lab.appendChild(document.createTextNode(' ' + o.name));
+      checks.appendChild(lab);
+    });
+    $('[data-outcomes-link]').href = '/teach/cohort/edit/?c=' + cohort.id;
+    f.onsubmit = function (ev) {
+      ev.preventDefault();
+      var said = $('[data-before-status]'), rows = reads.get(), wrong = null;
+      rows.forEach(function (r) { wrong = wrong || TL.readingProblem(r); });
+      if (wrong) return U.say(said, wrong, 'problem');
+      var picked = Array.prototype.map.call(checks.querySelectorAll('input:checked'), function (b) { return b.value; }).slice(0, 60);
+      var row = { before: f.elements.before.value.trim() || null, readings: TL.readingsFrom(rows), outcomes: picked };
+      U.say(said, 'Saving');
+      db.from('sessions').update(row).eq('id', session.id).then(function (r) {
+        if (r.error) return U.say(said, 'Not saved: ' + r.error.message, 'problem');
+        Object.assign(session, row);
+        reads.set(row.readings);
+        U.say(said, 'Saved');
+      });
+    };
+  }
+
+  function drawBefore(session, leading) {
     var sec = $('[data-before-section]'), box = $('[data-before-text]'), ul = $('[data-readings]');
     var reads = Array.isArray(session.readings) ? session.readings.filter(function (r) { return r && r.title; }) : [];
     box.replaceChildren(); ul.replaceChildren();
-    sec.hidden = !session.before && !reads.length;
+    sec.hidden = leading || (!session.before && !reads.length);
     function fill(node, parts) {
       parts.forEach(function (r) {
         var n;

@@ -164,6 +164,13 @@ One thing per row: its title (the row's only link to its page) → a meta
 line of short facts → status and visibility → at most two secondary
 actions, danger last. No filled buttons in rows.
 
+### Edit rows — `UI.editRows(mount, { fields, rows, add, most })`
+
+A list a leader types, one row per thing: a cohort's outcomes, a
+session's readings. Each row has its fields, Move up, and Remove; one
+add button sits below. `.get()` returns the rows, each keeping keys it
+has no field for (an id), so an edit never drops what it cannot show.
+
 ### Empty state — `UI.empty(text, action)` (R§6.8)
 One line of at most eight words saying what is absent ("No polls yet"),
 and at most one action, a verb naming the thing ("Make a poll"). Never
