@@ -109,7 +109,7 @@ model exposes `window.artifact.getState/setState`, made for shared
 breakout state.
 
 - [x] I1. Ben asked Alexis Diamond: full approval under the site's terms.
-- [ ] I2. A "Model" tool: pick a model, every attendee gets their own in
+- [x] I2. A "Model" tool: pick a model, every attendee gets their own in
   the panel, the host can put one on the stage; version pinned; the
   "Cite this" credit shown.
 - [ ] I3. After I1: shared state for pairs or rooms through the room,
@@ -192,3 +192,18 @@ breakout state.
 - 2026-11-28: Ben approved Drive storage for hosts without a cohort, and
   Alexis Diamond approved integrating Ideas at Play; order from here:
   I2 (demo by Thursday), then A1 to A6 and I3, with B6 to B8 between.
+- 2026-11-28, tick 6 (I2, 2a4d9eb4). "Give everyone a model": a host
+  picks one of 78 Ideas at Play models (assets/ideas-at-play.json, read
+  from their own pages by tools/ideas-at-play/catalog.py: title, author
+  from the page's own Cite this, newest version, description; every one
+  CC BY 4.0) and it goes on the main stage through the room's existing
+  site message, so each person's stage is their own working copy. In
+  open rooms (open-room.js) and cohort calls (cohort-room.js, addon.js
+  tile). Every stage credits it: title (linked), author, Ideas at Play,
+  CC BY 4.0. **Verified outside Meet:** a host client in one tab found
+  "Do Random Events Cluster?" by search and put it up; an attendee stage
+  in a second tab drew it with the credit, and clicking a star field
+  scored ("Correct. Field A is the real random one"). Room
+  tst-modl-dmo ended. Not yet seen: a real Meet call, phone width, and
+  the panel tile itself (the panel page refused the browser tool,
+  "Cannot access a chrome-extension:// URL of different extension").
