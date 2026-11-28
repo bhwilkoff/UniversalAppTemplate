@@ -13,10 +13,11 @@ export const TAKE_OVER_MS = 60000;
 
 function text(v, n) { return String(v == null ? '' : v).replace(/\u0000/g, '').slice(0, n); }
 function line(v, n) { return text(v, n * 2).replace(/\s+/g, ' ').trim().slice(0, n); }
+function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
 function int(v, lo, hi) { const n = Math.floor(Number(v)); return Number.isFinite(n) ? Math.max(lo, Math.min(hi, n)) : lo; }
 
 export function blank() {
-  return { on: false, host: null, hostName: '', hostLeft: null, title: '', talk: '', talkV: 0, at: 0, shown: 0, show: 'welcome', question: null, answers: {}, notes: [], board: '', page: null, html: '', htmlV: 0, card: '', clock: null, stances: {}, works: {}, worksOpen: false, seq: 0 };
+  return { on: false, host: null, hostName: '', hostLeft: null, title: '', talk: '', talkV: 0, at: 0, shown: 0, show: 'welcome', question: null, answers: {}, notes: [], board: '', page: null, html: '', htmlV: 0, card: '', clock: null, stances: {}, works: {}, worksOpen: false, groups: null, seq: 0 };
 }
 
 // A website a host shows by its address: https only, and never this site or the
@@ -30,6 +31,10 @@ export function siteOk(u) {
   if (x.protocol !== 'https:' || x.username || x.password || OURS.test(x.hostname) || x.href.length > LIMITS.url) return null;
   return x.href;
 }
+
+// A Meet call's own address, the only place a breakout room can send people.
+const MEETLINK = /^https:\/\/meet\.google\.com\/([a-z]{3}-[a-z]{4}-[a-z]{3})(?:[/?#].*)?$/;
+export function meetOk(u) { const x = MEETLINK.exec(String(u || '').trim()); return x ? 'https://meet.google.com/' + x[1] : null; }
 
 export function repoOk(owner, repo) { return /^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})$/.test(owner || '') && /^[A-Za-z0-9._-]{1,100}$/.test(repo || '') && !/^\.+$/.test(repo); }
 
@@ -69,7 +74,8 @@ export function publicRoom(room, here) {
     summary: summary(room),
     notes: room.notes, board: room.board, page, mstate: room.page && room.page.together && room.mstate ? room.mstate : null, card: room.card, clock: room.clock, stance: stanceCounts(room), stancesOpen: room.stancesOpen === true,
     people: here.people.slice(0, LIMITS.people), here: here.count, hostHere: here.hostHere, stages: here.stages,
-    canTakeOver: room.on && !here.hostHere && room.hostLeft != null, worksOpen: room.worksOpen === true
+    canTakeOver: room.on && !here.hostHere && room.hostLeft != null, worksOpen: room.worksOpen === true,
+    groups: room.groups ? room.groups.map((g) => ({ link: g.link, members: g.members.slice() })) : null
   };
 }
 
@@ -103,7 +109,7 @@ function cleanAnswer(q, m) {
   return body ? { body } : null;
 }
 
-const HOST_ONLY = new Set(['stances', 'talk', 'go', 'show', 'ask', 'reveal', 'close', 'clear', 'unnoteAny', 'page', 'site', 'board', 'pasted', 'card', 'clock', 'clockAdd', 'hand', 'title', 'works', 'feature']);
+const HOST_ONLY = new Set(['stances', 'talk', 'go', 'show', 'ask', 'reveal', 'close', 'clear', 'unnoteAny', 'page', 'site', 'board', 'pasted', 'card', 'clock', 'clockAdd', 'hand', 'title', 'works', 'feature', 'groups']);
 
 // who: { pid, name, here(pid) }. Returns what changed: { room?, talk?, html?,
 // to?, error?, ended? }; no result means nothing did.
@@ -291,6 +297,19 @@ export function apply(room, who, m, now, opts) {
       const again = room.page && room.page.url === w.url ? (room.page.v || 0) + 1 : 0;
       room.page = { url: w.url, v: again, name: w.name ? w.name + '’s work' : 'Someone’s work' };
       delete room.mstate; room.html = ''; room.show = 'page';
+      return { room: true };
+    }
+    // Breakout rooms: the host brings Meet links (each made with meet.new),
+    // and everyone here but the host is dealt into them in a shuffled order.
+    // Who is in which room is shown to everyone, as Meet's own breakouts do.
+    case 'groups': {
+      if (m.open === false) { room.groups = null; return { room: true }; }
+      const links = [...new Set((Array.isArray(m.links) ? m.links : []).map(meetOk).filter(Boolean))].slice(0, 20);
+      if (links.length < 2) return { error: 'Add at least two Meet links.' };
+      const people = (who.present || []).filter((id) => id !== room.host);
+      const order = (opts.shuffle || shuffle)(people.slice());
+      room.groups = links.map((link) => ({ link, members: [] }));
+      order.forEach((id, i) => room.groups[i % links.length].members.push(id));
       return { room: true };
     }
     default:

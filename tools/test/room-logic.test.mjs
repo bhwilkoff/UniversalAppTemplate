@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { apply, blank, publicRoom, summary, hostWords, hostWorks, repoOk, siteOk, stanceCounts, TAKE_OVER_MS, LIMITS } from '../rooms/room-logic.js';
+import { apply, blank, publicRoom, summary, hostWords, hostWorks, meetOk, repoOk, siteOk, stanceCounts, TAKE_OVER_MS, LIMITS } from '../rooms/room-logic.js';
 
 const A = { pid: 'a', name: 'Ana', isHere: () => true }, B = { pid: 'b', name: 'Bo', isHere: () => true };
 function started() { const r = blank(); apply(r, A, { t: 'start', title: 'Hello' }, 1); return r; }
@@ -14,7 +14,7 @@ test('the first to start is the host, and nobody else can start over them', () =
 
 test('only the host runs the room', () => {
   const r = started();
-  ['talk', 'go', 'show', 'ask', 'reveal', 'close', 'clear', 'page', 'site', 'board', 'pasted', 'card', 'clock', 'clockAdd', 'hand', 'title', 'works', 'feature'].forEach((t) => {
+  ['talk', 'go', 'show', 'ask', 'reveal', 'close', 'clear', 'page', 'site', 'board', 'pasted', 'card', 'clock', 'clockAdd', 'hand', 'title', 'works', 'feature', 'groups'].forEach((t) => {
     assert.match(apply(r, B, { t }, 2).error, /Only the host/, t);
   });
 });
@@ -280,4 +280,26 @@ test('the host features one offer on the stage under its maker’s name, and sto
   assert.equal(hostWorks(r), null);
   assert.deepEqual(r.works, {});
   assert.match(apply(r, B, { t: 'work', url: 'https://bo.example/' }, 7).error, /not asking/);
+});
+
+test('breakout rooms deal everyone but the host into the Meet links, and the host brings them back', () => {
+  const r = started(), same = (a) => a;
+  const who = { ...A, present: ['a', 'b', 'c', 'd'] };
+  assert.match(apply(r, who, { t: 'groups', links: ['https://meet.google.com/abc-defg-hij'] }, 2).error, /at least two/);
+  assert.match(apply(r, who, { t: 'groups', links: ['https://meet.google.com/abc-defg-hij', 'https://meet.google.com/abc-defg-hij?authuser=1'] }, 2).error, /at least two/);
+  assert.match(apply(r, who, { t: 'groups', links: ['https://zoom.us/j/1', 'https://example.org/'] }, 2).error, /at least two/);
+  assert.deepEqual(apply(r, who, { t: 'groups', links: ['https://meet.google.com/abc-defg-hij?pli=1', 'meet.google.com/xyz', 'https://meet.google.com/klm-nopq-rst'] }, 3, { shuffle: same }), { room: true });
+  assert.deepEqual(publicRoom(r).groups, [
+    { link: 'https://meet.google.com/abc-defg-hij', members: ['b', 'd'] },
+    { link: 'https://meet.google.com/klm-nopq-rst', members: ['c'] }
+  ]);
+  assert.deepEqual(apply(r, A, { t: 'groups', open: false }, 4), { room: true });
+  assert.equal(publicRoom(r).groups, null);
+});
+
+test('only a Meet call address counts as a breakout room', () => {
+  assert.equal(meetOk(' https://meet.google.com/abc-defg-hij#x '), 'https://meet.google.com/abc-defg-hij');
+  assert.equal(meetOk('http://meet.google.com/abc-defg-hij'), null);
+  assert.equal(meetOk('https://meet.google.com.evil.example/abc-defg-hij'), null);
+  assert.equal(meetOk('https://meet.google.com/abc-defg-hijk'), null);
 });

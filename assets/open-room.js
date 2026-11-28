@@ -196,7 +196,7 @@
     function drawNow() {
       if (!F || !room || !room.on) return;
       var host = isHost();
-      var key = JSON.stringify([plan && plan.at, plan && plan.parts.length, host, room.show, room.at, room.shown, room.question, room.summary, room.notes, room.board, editing(), room.page, room.card, room.clock && room.clock.endsAt, room.canTakeOver, room.worksOpen, works, myWork, mine, words, newSha, talk.length, roomDeck && roomDeck.length, stageUp()]);
+      var key = JSON.stringify([plan && plan.at, plan && plan.parts.length, host, room.show, room.at, room.shown, room.question, room.summary, room.notes, room.board, editing(), room.page, room.card, room.clock && room.clock.endsAt, room.canTakeOver, room.worksOpen, room.groups, room.people, works, myWork, mine, words, newSha, talk.length, roomDeck && roomDeck.length, stageUp()]);
       if (key === nowKey) return;
       var pane = F.pane('now');
       // A half-written note or answer stays while the room changes around it.
@@ -284,8 +284,31 @@
       }
       pane.appendChild(box);
     }
+    // Breakout rooms (room-logic.js 'groups'): who is in which Meet call.
+    function personName(id) { var p = (room.people || []).filter(function (x) { return x.id === id; })[0]; return (p && p.name) || 'Someone'; }
+    function groupsNow(pane, host) {
+      var box = el('section', 'p2-group open-groups');
+      var mineAt = -1;
+      room.groups.forEach(function (g, i) { if (g.members.indexOf(you) >= 0) mineAt = i; });
+      box.appendChild(el('h2', null, host ? 'Breakout rooms' : mineAt >= 0 ? 'Your room' : 'Choose a room'));
+      if (!host) box.appendChild(el('p', 'small', 'Leave this call, then join your room.'));
+      var ol = el('ol', 'open-group-list');
+      room.groups.forEach(function (g, i) {
+        if (!host && mineAt >= 0 && i !== mineAt) return;
+        var li = el('li');
+        li.appendChild(el('strong', null, 'Room ' + (i + 1)));
+        var names = g.members.filter(function (id) { return id !== you; }).map(personName);
+        li.appendChild(el('span', 'small', names.length ? (host ? '' : 'With ') + names.join(', ') : 'No one yet'));
+        li.appendChild(out(host ? 'Visit' : 'Join room ' + (i + 1), g.link, host ? 'btn-secondary small' : 'btn-primary'));
+        ol.appendChild(li);
+      });
+      box.appendChild(ol);
+      if (host) box.appendChild(btn('Bring everyone back', 'btn-secondary', function () { send({ t: 'groups', open: false }); }));
+      pane.appendChild(box);
+    }
     function hostNow(pane) {
       if (plan) planNow(pane);
+      if (room.groups) groupsNow(pane, true);
       if (room.worksOpen) worksNow(pane);
       var list = stops();
       if (editing()) pane.appendChild(editRow());
@@ -333,6 +356,7 @@
     }
     function guestNow(pane) {
       if (room.canTakeOver) pane.appendChild(btn('Take over as host', 'btn-secondary', function () { send({ t: 'claim' }); }));
+      if (room.groups) groupsNow(pane, false);
       if (room.worksOpen) offerWork(pane);
       if (room.show === 'question' && room.question && room.question.open) return answer(pane);
       if (room.show === 'board') {
@@ -552,7 +576,7 @@
     // Tools
     // --------------------------------------------------------------
 
-    var TOOLS = [['question', 'Question', 'chats-circle'], ['board', 'Propose and vote', 'check-circle'], ['site', 'Show a website', 'globe-simple'], ['model', 'Give everyone a model', 'book-open-text'], ['work', 'Show your work', 'app-window'], ['clock', 'Clock', 'clock'], ['message', 'Message', 'megaphone-simple'], ['clear', 'Clear stage', 'eye-slash']];
+    var TOOLS = [['question', 'Question', 'chats-circle'], ['board', 'Propose and vote', 'check-circle'], ['site', 'Show a website', 'globe-simple'], ['model', 'Give everyone a model', 'book-open-text'], ['work', 'Show your work', 'app-window'], ['groups', 'Breakout rooms', 'door-open'], ['clock', 'Clock', 'clock'], ['message', 'Message', 'megaphone-simple'], ['clear', 'Clear stage', 'eye-slash']];
     function drawTools() {
       var pane = F && F.pane('kit');
       if (!pane) return;
@@ -577,12 +601,29 @@
       head.appendChild(el('h2', null, TOOLS.filter(function (t) { return t[0] === tool; })[0][1]));
       pane.appendChild(head);
       var line = el('p', 'small'); line.setAttribute('role', 'status');
-      ({ work: workTool, question: questionTool, board: boardTool, site: siteTool, model: modelTool, clock: clockTool, message: messageTool })[tool](pane, line);
+      ({ groups: groupsTool, work: workTool, question: questionTool, board: boardTool, site: siteTool, model: modelTool, clock: clockTool, message: messageTool })[tool](pane, line);
       pane.appendChild(line);
     }
     function done() { tool = null; drawTools(); F.show('now'); }
     // Everyone gets a box for the address of something they made; the offers
     // come to the host's Now, by name, and the host puts one on the stage.
+    // The host makes a Meet call for each room (meet.new) and pastes the
+    // links; everyone here but the host is dealt into them.
+    function groupsTool(pane, line) {
+      if (room && room.groups) return pane.appendChild(btn('Bring everyone back', 'btn-secondary', function () { send({ t: 'groups', open: false }); done(); }));
+      var f = el('form', 'open-add'), t = field('textarea', 'A Meet link for each room, one per line');
+      t.rows = 4;
+      f.appendChild(t);
+      f.appendChild(out('Make a Meet link', 'https://meet.new', 'link-button'));
+      var s = el('button', 'btn-primary', 'Send everyone to a room'); s.type = 'submit'; f.appendChild(s);
+      f.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var links = t.value.split(/\s+/).filter(Boolean);
+        if (links.length < 2) return (line.textContent = 'Add at least two Meet links.');
+        send({ t: 'groups', links: links }); done();
+      });
+      pane.appendChild(f);
+    }
     function workTool(pane) {
       if (room && room.worksOpen) return pane.appendChild(btn('Stop asking', 'btn-secondary', function () { send({ t: 'works', open: false }); done(); }));
       pane.appendChild(btn('Ask everyone for their work', 'btn-primary', function () { send({ t: 'works', open: true }); done(); }));
