@@ -253,7 +253,7 @@
     function worksNow(pane) {
       var box = el('section', 'p2-group open-works');
       box.appendChild(el('h2', null, 'Work to show'));
-      var list = (works && works.works) || [];
+      var list = Array.isArray(works) ? works : [];
       if (!list.length) box.appendChild(el('p', 'small', 'No one has offered yet.'));
       var ul = el('ul', 'open-notes');
       list.forEach(function (w) {
