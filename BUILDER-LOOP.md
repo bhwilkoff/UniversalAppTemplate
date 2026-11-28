@@ -100,7 +100,7 @@ by the Course Builder import or by SQL.
   so they show as their words. Copy each into the host's Drive (link
   readable) on save and point the slide at it. Ben, November 28: "it is
   fine if the images are available to anyone with the link."
-- [ ] A5. No GitHub prompt anywhere on the open-room path; attendees
+- [x] A5. No GitHub prompt anywhere on the open-room path; attendees
   never sign in.
 - [ ] A6. A real call with two attendees.
 
@@ -361,3 +361,12 @@ breakout state.
   draft; the database then held no cohort, sessions, enrollment, or
   storage files for it. Kept: the two session files and one picture in
   Ben's Drive (Human Shaped sessions folder), useful for Thursday.
+- 2026-11-28, tick 18 (A5, 6a5a9039). After a Google sign-in, the panel
+  asked a Google-only person to link GitHub before anything else. Now it
+  asks only when the call is a cohort's own (is_cohort_call), where
+  linking is how a member's Google account finds their cohorts; in any
+  other call the person goes straight to the open room. Audit of the
+  open-room path: the only other GitHub mentions are optional (Sign in
+  in the lobby's links, "Or keep them in GitHub" under Drive). Not seen
+  live: needs a Google account with no GitHub (none of the usable
+  profiles; the Minerva profile is off-limits).
