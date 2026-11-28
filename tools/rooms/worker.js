@@ -3,7 +3,7 @@
 // It keeps no accounts, and a room is erased when its host ends it or a day
 // after its last change. Sockets hibernate, so an idle room costs nothing.
 import { DurableObject } from 'cloudflare:workers';
-import { apply, blank, publicRoom, hostWords, siteOk, REACTIONS, LIMITS } from './room-logic.js';
+import { apply, blank, publicRoom, hostWords, hostWorks, siteOk, REACTIONS, LIMITS } from './room-logic.js';
 
 const CODE = /^[a-z]{3}-[a-z]{4}-[a-z]{3}$/;
 const DAY = 86400000, MAX_SOCKETS = 600;
@@ -103,10 +103,11 @@ export class Room extends DurableObject {
   }
   flush() {
     const out = JSON.stringify({ t: 'room', room: publicRoom(this.room, this.here()) });
-    const words = hostWords(this.room);
+    const words = hostWords(this.room), works = hostWorks(this.room);
     this.sockets().forEach((s) => {
       try { s.ws.send(out); } catch (e) { /* it has gone */ }
       if (words && s.who.pid === this.room.host) this.send(s.ws, Object.assign({ t: 'words' }, words));
+      if (works && s.who.pid === this.room.host) this.send(s.ws, Object.assign({ t: 'works' }, works));
     });
     // One row is written per save, so a busy room saves at most every five
     // seconds. A pending timer keeps the object awake, so nothing is lost to
@@ -157,6 +158,10 @@ export class Room extends DurableObject {
       this.send(ws, { t: 'room', room: publicRoom(this.room, this.here()) });
       const words = hostWords(this.room);
       if (words && me.pid === this.room.host) this.send(ws, Object.assign({ t: 'words' }, words));
+      const works = hostWorks(this.room);
+      if (works && me.pid === this.room.host) this.send(ws, Object.assign({ t: 'works' }, works));
+      const mw = this.room.worksOpen && this.room.works && this.room.works[me.pid];
+      if (mw) this.send(ws, { t: 'myWork', url: mw.url });
       this.soonQuiet();
       return;
     }
@@ -202,6 +207,7 @@ export class Room extends DurableObject {
       const out = JSON.stringify({ t: 'html', v: this.room.htmlV, html: this.room.html });
       this.sockets().forEach((s) => { try { s.ws.send(out); } catch (e) { /* gone */ } });
     }
+    if (did.myWork !== undefined) this.sockets().forEach((s) => { if (s.who.pid === me.pid) this.send(s.ws, { t: 'myWork', url: did.myWork }); });
     if (did.mine) this.sockets().forEach((s) => { if (s.who.pid === me.pid) this.send(s.ws, { t: 'mine', mine: did.mine }); });
     if (did.room) this.soon();
   }

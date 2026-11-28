@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { apply, blank, publicRoom, summary, hostWords, repoOk, siteOk, stanceCounts, TAKE_OVER_MS, LIMITS } from '../rooms/room-logic.js';
+import { apply, blank, publicRoom, summary, hostWords, hostWorks, repoOk, siteOk, stanceCounts, TAKE_OVER_MS, LIMITS } from '../rooms/room-logic.js';
 
 const A = { pid: 'a', name: 'Ana', isHere: () => true }, B = { pid: 'b', name: 'Bo', isHere: () => true };
 function started() { const r = blank(); apply(r, A, { t: 'start', title: 'Hello' }, 1); return r; }
@@ -14,7 +14,7 @@ test('the first to start is the host, and nobody else can start over them', () =
 
 test('only the host runs the room', () => {
   const r = started();
-  ['talk', 'go', 'show', 'ask', 'reveal', 'close', 'clear', 'page', 'site', 'board', 'pasted', 'card', 'clock', 'clockAdd', 'hand', 'title'].forEach((t) => {
+  ['talk', 'go', 'show', 'ask', 'reveal', 'close', 'clear', 'page', 'site', 'board', 'pasted', 'card', 'clock', 'clockAdd', 'hand', 'title', 'works', 'feature'].forEach((t) => {
     assert.match(apply(r, B, { t }, 2).error, /Only the host/, t);
   });
 });
@@ -249,4 +249,35 @@ test('only an Ideas at Play model can be shared, and a page shown alone shares n
   assert.match(apply(r, B, { t: 'mstate', state: '{}' }, 3).error, /No shared model/);
   apply(r, A, { t: 'site', url: 'https://ideasatplay.org/play/x-1a2b3c?v=1' }, 4);
   assert.match(apply(r, B, { t: 'mstate', state: '{}' }, 5).error, /No shared model/);
+});
+
+test('show your work: the host asks, each person offers one address, and only the host sees the list', () => {
+  const r = started();
+  assert.match(apply(r, B, { t: 'work', url: 'https://bo.example/' }, 2).error, /not asking/);
+  assert.equal(hostWorks(r), null);
+  apply(r, A, { t: 'works', open: true }, 3);
+  assert.equal(publicRoom(r).worksOpen, true);
+  assert.deepEqual(apply(r, B, { t: 'work', url: 'https://bo.example/' }, 4), { room: true, myWork: 'https://bo.example/' });
+  assert.deepEqual(apply(r, B, { t: 'work', url: 'https://bo.example/v2' }, 5), { room: true, myWork: 'https://bo.example/v2' });
+  assert.deepEqual(hostWorks(r), { works: [{ id: 'b', name: 'Bo', url: 'https://bo.example/v2', at: 5 }] });
+  assert.match(apply(r, B, { t: 'work', url: 'http://bo.example/' }, 6).error, /https/);
+  assert.match(apply(r, B, { t: 'work', url: 'https://humanshaped.org/x' }, 6).error, /cannot be shown/);
+  assert.equal(JSON.stringify(publicRoom(r)).includes('bo.example'), false);
+  assert.deepEqual(apply(r, B, { t: 'work', url: '' }, 7), { room: true, myWork: null });
+  assert.deepEqual(hostWorks(r), { works: [] });
+});
+
+test('the host features one offer on the stage under its maker’s name, and stopping erases every offer', () => {
+  const r = started();
+  apply(r, A, { t: 'works', open: true }, 2);
+  apply(r, B, { t: 'work', url: 'https://bo.example/' }, 3);
+  assert.deepEqual(apply(r, A, { t: 'feature', id: 'b' }, 4), { room: true });
+  assert.equal(r.show, 'page');
+  assert.deepEqual(publicRoom(r).page.url, 'https://bo.example/');
+  assert.equal(publicRoom(r).page.name, 'Bo’s work');
+  assert.match(apply(r, A, { t: 'feature', id: 'nobody' }, 5).error, /taken back/);
+  apply(r, A, { t: 'works', open: false }, 6);
+  assert.equal(hostWorks(r), null);
+  assert.deepEqual(r.works, {});
+  assert.match(apply(r, B, { t: 'work', url: 'https://bo.example/' }, 7).error, /not asking/);
 });

@@ -42,6 +42,8 @@
         else if (m.t === 'html' && on.html) on.html(m.html, m.v);
         else if (m.t === 'mine' && on.mine) on.mine(m.mine);
         else if (m.t === 'words' && on.words) on.words(m);
+        else if (m.t === 'works' && on.works) on.works(m.works);
+        else if (m.t === 'myWork' && on.myWork) on.myWork(m.url);
         else if (m.t === 'floats' && on.floats) on.floats(m.floats);
         else if (m.t === 'ended' && on.ended) on.ended();
         else if (m.t === 'error' && on.error) on.error(m.text);

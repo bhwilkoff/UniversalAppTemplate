@@ -16,7 +16,7 @@ function line(v, n) { return text(v, n * 2).replace(/\s+/g, ' ').trim().slice(0,
 function int(v, lo, hi) { const n = Math.floor(Number(v)); return Number.isFinite(n) ? Math.max(lo, Math.min(hi, n)) : lo; }
 
 export function blank() {
-  return { on: false, host: null, hostName: '', hostLeft: null, title: '', talk: '', talkV: 0, at: 0, shown: 0, show: 'welcome', question: null, answers: {}, notes: [], board: '', page: null, html: '', htmlV: 0, card: '', clock: null, stances: {}, seq: 0 };
+  return { on: false, host: null, hostName: '', hostLeft: null, title: '', talk: '', talkV: 0, at: 0, shown: 0, show: 'welcome', question: null, answers: {}, notes: [], board: '', page: null, html: '', htmlV: 0, card: '', clock: null, stances: {}, works: {}, worksOpen: false, seq: 0 };
 }
 
 // A website a host shows by its address: https only, and never this site or the
@@ -69,8 +69,16 @@ export function publicRoom(room, here) {
     summary: summary(room),
     notes: room.notes, board: room.board, page, mstate: room.page && room.page.together && room.mstate ? room.mstate : null, card: room.card, clock: room.clock, stance: stanceCounts(room), stancesOpen: room.stancesOpen === true,
     people: here.people.slice(0, LIMITS.people), here: here.count, hostHere: here.hostHere, stages: here.stages,
-    canTakeOver: room.on && !here.hostHere && room.hostLeft != null
+    canTakeOver: room.on && !here.hostHere && room.hostLeft != null, worksOpen: room.worksOpen === true
   };
+}
+
+// What people offered to show, for the host only: each person's name and
+// address. Offers are erased when the host stops asking or the room ends.
+export function hostWorks(room) {
+  if (!room.worksOpen) return null;
+  const w = room.works || {};
+  return { works: Object.keys(w).map((id) => ({ id, name: w[id].name, url: w[id].url, at: w[id].at })).sort((a, b) => a.at - b.at) };
 }
 
 // The words behind a question's count, for the host, with no names.
@@ -95,7 +103,7 @@ function cleanAnswer(q, m) {
   return body ? { body } : null;
 }
 
-const HOST_ONLY = new Set(['stances', 'talk', 'go', 'show', 'ask', 'reveal', 'close', 'clear', 'unnoteAny', 'page', 'site', 'board', 'pasted', 'card', 'clock', 'clockAdd', 'hand', 'title']);
+const HOST_ONLY = new Set(['stances', 'talk', 'go', 'show', 'ask', 'reveal', 'close', 'clear', 'unnoteAny', 'page', 'site', 'board', 'pasted', 'card', 'clock', 'clockAdd', 'hand', 'title', 'works', 'feature']);
 
 // who: { pid, name, here(pid) }. Returns what changed: { room?, talk?, html?,
 // to?, error?, ended? }; no result means nothing did.
@@ -262,6 +270,29 @@ export function apply(room, who, m, now, opts) {
     case 'stances':
       room.stances = {}; room.stancesOpen = m.open === true;
       return { room: true };
+    // Show your work: the host asks, each person offers one address (again
+    // to change it, empty to take it back), and the host puts one on the stage.
+    case 'works':
+      room.works = {}; room.worksOpen = m.open === true;
+      return { room: true };
+    case 'work': {
+      if (!room.on || !room.worksOpen) return { error: 'The host is not asking for work right now.' };
+      room.works = room.works || {};
+      if (m.url == null || m.url === '') { delete room.works[who.pid]; return { room: true, myWork: null }; }
+      const href = siteOk(m.url);
+      if (!href) return { error: 'That address cannot be shown here. Use a page that starts with https://.' };
+      if (!room.works[who.pid] && Object.keys(room.works).length >= LIMITS.people) return { error: 'The list is full.' };
+      room.works[who.pid] = { url: href, name: line(who.name, LIMITS.name), at: now };
+      return { room: true, myWork: href };
+    }
+    case 'feature': {
+      const w = room.works && room.works[m.id];
+      if (!w) return { error: 'That offer was taken back.' };
+      const again = room.page && room.page.url === w.url ? (room.page.v || 0) + 1 : 0;
+      room.page = { url: w.url, v: again, name: w.name ? w.name + '’s work' : 'Someone’s work' };
+      delete room.mstate; room.html = ''; room.show = 'page';
+      return { room: true };
+    }
     default:
       return { error: 'That message was not understood.' };
   }

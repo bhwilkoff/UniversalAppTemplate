@@ -16,7 +16,7 @@
   function mount(o) {
     var box = o.root.querySelector('[data-state="open"]');
     var room = null, you = null, F = null, frameRole = null, online = true, ended = false, stageOn = false;
-    var words = null, mine = null, tool = null, newSha = null, confirmEnd = false, watching = false;
+    var words = null, works = null, myWork = null, mine = null, tool = null, newSha = null, confirmEnd = false, watching = false;
     var plan = (function () { try { var x = JSON.parse(get(PLAN) || 'null'); return x && Array.isArray(x.parts) && x.parts.length ? x : null; } catch (e) { return null; } })();
     var talk = get(TALK) || R.STARTER, repo = R.repoOf(get(REPO) || ''), lobby = null, person = { name: o.name, member: o.member, github: o.github || '' };
     var status = el('p', 'small'); status.setAttribute('role', 'status');
@@ -28,9 +28,11 @@
       welcome: function (m) { you = m.you; mine = m.mine; },
       room: function (r) { room = r; if (r.on) ended = false; draw(); },
       words: function (w) { words = w; drawNow(); },
+      works: function (w) { works = w; drawNow(); },
+      myWork: function (u) { myWork = u; drawNow(); },
       talk: function (t) { roomDeck = t; drawNow(); drawTop(); drawSlides(); },
       mine: function (m) { mine = m; drawNow(); },
-      ended: function () { ended = true; roomDeck = null; mine = null; words = null; tool = null; },
+      ended: function () { ended = true; roomDeck = null; mine = null; words = null; works = null; myWork = null; tool = null; },
       error: function (t) { say(t); },
       status: function (s) {
         online = s === 'on'; drawTop();
@@ -194,7 +196,7 @@
     function drawNow() {
       if (!F || !room || !room.on) return;
       var host = isHost();
-      var key = JSON.stringify([plan && plan.at, plan && plan.parts.length, host, room.show, room.at, room.shown, room.question, room.summary, room.notes, room.board, editing(), room.page, room.card, room.clock && room.clock.endsAt, room.canTakeOver, mine, words, newSha, talk.length, roomDeck && roomDeck.length, stageUp()]);
+      var key = JSON.stringify([plan && plan.at, plan && plan.parts.length, host, room.show, room.at, room.shown, room.question, room.summary, room.notes, room.board, editing(), room.page, room.card, room.clock && room.clock.endsAt, room.canTakeOver, room.worksOpen, works, myWork, mine, words, newSha, talk.length, roomDeck && roomDeck.length, stageUp()]);
       if (key === nowKey) return;
       var pane = F.pane('now');
       // A half-written note or answer stays while the room changes around it.
@@ -246,8 +248,45 @@
       box.appendChild(btn('Put the session away', 'link-button', function () { plan = null; put(PLAN, ''); nowKey = null; drawNow(); }));
       pane.appendChild(box);
     }
+    // Show your work: the offers, by name, each one a button that puts it on
+    // the stage (room-logic.js 'works', 'work', 'feature').
+    function worksNow(pane) {
+      var box = el('section', 'p2-group open-works');
+      box.appendChild(el('h2', null, 'Work to show'));
+      var list = (works && works.works) || [];
+      if (!list.length) box.appendChild(el('p', 'small', 'No one has offered yet.'));
+      var ul = el('ul', 'open-notes');
+      list.forEach(function (w) {
+        var li = el('li'), on = room.show === 'page' && room.page && room.page.url === w.url;
+        var who = el('span'); who.appendChild(el('strong', null, w.name || 'Someone'));
+        who.appendChild(el('span', 'small open-work-url', ' ' + w.url.replace(/^https:\/\//, '')));
+        li.appendChild(who);
+        var b = btn(on ? 'On the stage' : 'Show', 'btn-secondary small', function () { send({ t: 'feature', id: w.id }); });
+        b.setAttribute('aria-pressed', String(!!on));
+        li.appendChild(b); ul.appendChild(li);
+      });
+      if (list.length) box.appendChild(ul);
+      box.appendChild(btn('Stop asking', 'link-button', function () { send({ t: 'works', open: false }); }));
+      pane.appendChild(box);
+    }
+    function offerWork(pane) {
+      var box = el('section', 'p2-group open-works');
+      box.appendChild(el('h2', null, 'Show your work'));
+      var f = el('form', 'open-add'), i = field('input', 'Its address', myWork || '');
+      i.type = 'url'; i.placeholder = 'https://'; i.maxLength = 2000;
+      f.appendChild(i);
+      var s = el('button', 'btn-secondary', myWork ? 'Change it' : 'Offer it'); s.type = 'submit'; f.appendChild(s);
+      f.addEventListener('submit', function (e) { e.preventDefault(); if (i.value.trim()) { send({ t: 'work', url: i.value.trim() }); i.blur(); } });
+      box.appendChild(f);
+      if (myWork) {
+        box.appendChild(el('p', 'small', 'Offered. The host chooses what goes on the stage.'));
+        box.appendChild(btn('Take it back', 'link-button', function () { send({ t: 'work', url: '' }); }));
+      }
+      pane.appendChild(box);
+    }
     function hostNow(pane) {
       if (plan) planNow(pane);
+      if (room.worksOpen) worksNow(pane);
       var list = stops();
       if (editing()) pane.appendChild(editRow());
       if (room.show === 'slides') {
@@ -294,6 +333,7 @@
     }
     function guestNow(pane) {
       if (room.canTakeOver) pane.appendChild(btn('Take over as host', 'btn-secondary', function () { send({ t: 'claim' }); }));
+      if (room.worksOpen) offerWork(pane);
       if (room.show === 'question' && room.question && room.question.open) return answer(pane);
       if (room.show === 'board') {
         pane.appendChild(el('h2', null, room.board));
@@ -512,7 +552,7 @@
     // Tools
     // --------------------------------------------------------------
 
-    var TOOLS = [['question', 'Question', 'chats-circle'], ['board', 'Propose and vote', 'check-circle'], ['site', 'Show a website', 'globe-simple'], ['model', 'Give everyone a model', 'book-open-text'], ['clock', 'Clock', 'clock'], ['message', 'Message', 'megaphone-simple'], ['clear', 'Clear stage', 'eye-slash']];
+    var TOOLS = [['question', 'Question', 'chats-circle'], ['board', 'Propose and vote', 'check-circle'], ['site', 'Show a website', 'globe-simple'], ['model', 'Give everyone a model', 'book-open-text'], ['work', 'Show your work', 'app-window'], ['clock', 'Clock', 'clock'], ['message', 'Message', 'megaphone-simple'], ['clear', 'Clear stage', 'eye-slash']];
     function drawTools() {
       var pane = F && F.pane('kit');
       if (!pane) return;
@@ -537,10 +577,16 @@
       head.appendChild(el('h2', null, TOOLS.filter(function (t) { return t[0] === tool; })[0][1]));
       pane.appendChild(head);
       var line = el('p', 'small'); line.setAttribute('role', 'status');
-      ({ question: questionTool, board: boardTool, site: siteTool, model: modelTool, clock: clockTool, message: messageTool })[tool](pane, line);
+      ({ work: workTool, question: questionTool, board: boardTool, site: siteTool, model: modelTool, clock: clockTool, message: messageTool })[tool](pane, line);
       pane.appendChild(line);
     }
     function done() { tool = null; drawTools(); F.show('now'); }
+    // Everyone gets a box for the address of something they made; the offers
+    // come to the host's Now, by name, and the host puts one on the stage.
+    function workTool(pane) {
+      if (room && room.worksOpen) return pane.appendChild(btn('Stop asking', 'btn-secondary', function () { send({ t: 'works', open: false }); done(); }));
+      pane.appendChild(btn('Ask everyone for their work', 'btn-primary', function () { send({ t: 'works', open: true }); done(); }));
+    }
     // A model from Ideas at Play on every stage, a copy for each person (ModelPicker).
     function modelTool(pane) { if (window.ModelPicker) window.ModelPicker.mount(pane, { send: send, done: done }); }
     // One choice from a few, as a row of buttons, so every choice is in sight.
