@@ -522,3 +522,15 @@ breakout state.
   room, a slider moved to a = 3.5 on one and read a = 3.5 on the other.
   Its prediction radios did not follow, because that model's own render
   never draws them from state. A run sheet for the demo is in For Ben.
+- 2026-11-28, tick 27 (698cb362). Saving a cohort session to Drive now
+  brings its workbooks: a room part's workbooks just after it, the
+  session's other individual workbooks at the end; picture lines (the
+  cohort's private storage) and file blocks are left out. Test added
+  (session-plan). The open room's Save to my Drive already updated the
+  same file (it passes the file's id), so that open item is closed.
+  Seen live: on the Human Shaped demo cohort's Session 1, Save to my
+  Drive said "Saved in your Drive, 20 parts"; the file read back with
+  "Your room's first test" (text, free, table) as part 13, after its
+  room part, and "Before the call" (text, choice, free) as part 20.
+  Left in Ben's Drive: "Session 1: An hour of Human Shaped.json", a
+  runnable copy of the demo session for any call.
