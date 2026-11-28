@@ -229,3 +229,7 @@ breakout state.
   the call ends" (its slides can be kept in Drive). **Verified live as
   Ben:** a new Writing part in Session 2 has an empty prompt with its
   hint. The Drive window from tick 7 still waits on Ben.
+- 2026-11-28, A1 answered by Ben: "It opened the sign-in window." So
+  Google's Drive window does open from inside Meet's side panel (as its
+  own Chrome window). Still to see: that the panel gets the token back
+  and the file lands in Drive once the account is chosen.
