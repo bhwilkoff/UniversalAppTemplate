@@ -24,6 +24,9 @@ separate words. One tick, one commit.
 
 ## For Ben
 
+- **Deploy the rooms worker** for Show your work:
+  `! cd ~/Documents/GitHub/humanshaped-site/tools/rooms && npx wrangler deploy`
+
 - **Delete "Randomness test (delete me).json"** in your Drive's Human
   Shaped sessions folder when you like; it is the /plan/ test file.
 
@@ -390,3 +393,18 @@ breakout state.
   the card. Left: that test file in Ben's Drive (the connector cannot
   trash a file the site made; Ben deletes it in Drive). Not seen: a
   picture uploaded from /plan/ drawn on a stage.
+- 2026-11-28, tick 20 (A4 part, 31dc19ac; wording, 3b9a657a). Show your
+  work in open rooms: Tools has "Show your work"; the host asks, each
+  person's Now gets a box for one https address (Offer it, Change it,
+  Take it back), the host's Now lists the offers by name with Show,
+  and Show puts that one on every stage as "<name>'s work". Only the
+  host receives the list; Stop asking erases every offer. Worker:
+  works/work/feature in room-logic.js with two tests (740 pass). Not
+  live: the worker needs `npx wrangler deploy` (asked of Ben);
+  tools/rooms/check-works.mjs tells whether the deployed worker has it
+  (today: "That message was not understood", the old one). Also: a
+  custom cohort's card on /cohorts/ says "Its own course, not the
+  Human Shaped weeks", and a leader's feedback in a custom cohort is
+  "on what they shared", not "their build". Left as is: the leader's
+  "Connect your agent" step, because the Human Shaped connector answers
+  for any cohort, not only the course.
