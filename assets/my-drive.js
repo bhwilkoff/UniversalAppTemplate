@@ -51,6 +51,10 @@
     });
   }
 
+  // Whether Drive is connected right now, so a page can ask for the click
+  // that connects it before an action that cannot open Google's window.
+  function connected() { return !!(held && held.expires > Date.now() + 60000); }
+
   function call(token, method, url, body, type) {
     return fetch(url, { method: method, headers: Object.assign({ Authorization: 'Bearer ' + token }, body ? { 'Content-Type': type || 'application/json' } : {}), body: body })
       .then(function (r) {
@@ -137,5 +141,5 @@
   // A session's slides, from its first part that has them.
   function talkOf(s) { var p = (s && s.parts || []).filter(function (x) { return typeof x.slides === 'string'; })[0]; return p ? p.slides : ''; }
 
-  root.MyDrive = { connect: connect, list: list, save: save, open: open, picture: picture, file: file, session: session, talkOf: talkOf, KIND: KIND };
+  root.MyDrive = { connected: connected, connect: connect, list: list, save: save, open: open, picture: picture, file: file, session: session, talkOf: talkOf, KIND: KIND };
 })(typeof window !== 'undefined' ? window : this);

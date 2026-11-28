@@ -29,12 +29,24 @@
   // ---- one part's fields, by kind ------------------------------------------
   function partFields(p, box) {
     if (p.kind === 'talk') {
+      // A picture goes to the host's Drive, and Google's window opens only
+      // from a click, never from choosing a file (found November 28).
+      if (!D.connected()) {
+        var row = el('p', 'plan-connect');
+        var cb = U.button('Connect your Drive to add pictures', 'btn-secondary small', function () {
+          D.connect().then(function () { row.remove(); }, function (e) { said(e.message, 'problem'); });
+        });
+        row.appendChild(cb); box.appendChild(row);
+      }
       var deck = el('div', 'plan-deck'); box.appendChild(deck);
       if (window.SlideStudio) {
         studio = window.SlideStudio.mount(deck, {
           text: p.slides || '# A title\n\n- What you will say',
           onChange: function (t) { p.slides = t; keep(); },
-          upload: function (file) { return D.connect().then(function (token) { return D.picture(token, file, file.name); }); }
+          upload: function (file) {
+            if (!D.connected()) return Promise.reject(new Error('Press Connect your Drive to add pictures first.'));
+            return D.connect().then(function (token) { return D.picture(token, file, file.name); });
+          }
         });
         if (!p.slides) p.slides = '# A title\n\n- What you will say';
       }
