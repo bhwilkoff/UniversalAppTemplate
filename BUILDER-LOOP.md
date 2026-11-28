@@ -243,3 +243,20 @@ breakout state.
   live: needs learners in the test cohort and a call (B7). Question for
   later: should "Keep these rooms as the cohort's groups" write standing
   groups too, so there is one kind?
+- 2026-11-28, tick 10 (I3 built, c99da017; waits on deploying the
+  rooms worker). The model picker offers "A copy for each person" or
+  "One model everyone shares". A shared model runs this site's copy of
+  its own file (catalog.py keeps 77 of 78, 8 MB, assets/ideas-at-play/;
+  CC BY 4.0) with a bridge that passes window.artifact's state to the
+  stage; the stage sends it through the room (`site` gains `together`,
+  new `mstate` message any person may send, JSON up to 20,000
+  characters, tested in room-logic.test.mjs) and hands each new state to
+  every stage. The credit adds "shared through Human Shaped". Until the
+  worker is deployed, a shared model falls back to a copy for each
+  person; cohort calls fall back too (the panel's view drops `together`).
+  **Verified in Chrome:** two copies of "Do Random Events Cluster?" on
+  one page, joined by the bridge; clicking star field A in the left copy
+  turned the right copy to "Correct. Field A..." and "1 correct of 1
+  answered", one state message, no echo. Not yet: the worker deploy
+  (wrangler is signed out here; `wrangler login` is Ben's), then a real
+  call with two people.
