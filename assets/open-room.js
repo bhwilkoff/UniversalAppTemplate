@@ -452,6 +452,7 @@
         D.connect().then(function (token) { return D.list(token).then(function (l) { driveFiles = { token: token, list: l }; line.textContent = l.length ? '' : 'No sessions in your Drive yet.'; slidesKey = null; drawSlides(); }); }, function (e) { line.textContent = e.message; });
       }));
       box.appendChild(acts);
+      box.appendChild(out('Plan a whole session', '/plan/'));
       if (driveFiles && driveFiles.list.length) {
         var ul = el('ul', 'open-sites');
         driveFiles.list.forEach(function (f) {

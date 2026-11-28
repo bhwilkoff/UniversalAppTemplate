@@ -142,6 +142,7 @@ role you hold and the role named on the page, never a switcher.
 | `/teach/new/` | Planning a new cohort | Fill it in; saving opens its Setup |
 | `/teach/import/` | Bringing in a course from Course Builder | Paste an export link; when the course arrives, open the draft cohort it made. Bring in the workbooks fills each waiting workbook from the workbooks file |
 | `/teach/workbook/?w=<id>` | One workbook, for its leaders | Its title, who answers it (each person or each breakout room), its blocks (words, a question, choices, a table, a link to hand in) with pictures, what people see, and Delete. Started from Add a workbook on a session's Before |
+| `/plan/` | Anyone with a Google account, no account here | Start a new session or open one from their Drive; its name and parts (slides in the slide studio, a question, an Ideas at Play model, a website, a card, a clock), moved and removed; Save to my Drive. Linked from the add-on's open room (Slides, Keep them in your Drive) |
 | `/teach/cohort/?c=` | Forwards to the cohort's page, `/cohort/?c=` | |
 | `/teach/cohort/edit/?c=` | That cohort's details | Change them; saving returns to the cohort |
 | `/teach/feedback/` | What your cohorts are waiting on you for | Answer each |

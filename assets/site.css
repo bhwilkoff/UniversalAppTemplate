@@ -3777,3 +3777,22 @@ html.stage-in-panel .stage-corner { display: none !important; }
 .open-plan-title { font-weight: 600; }
 .model-how label.check { display: flex; flex-direction: row; align-items: center; gap: 0.5rem; width: 100%; text-align: left; }
 .model-how label.check input { width: auto; height: auto; margin: 0; flex: 0 0 auto; }
+
+/* Plan a session (/plan/): a whole session in the host's own Drive. */
+.plan { max-width: 52rem; }
+.plan-field { display: grid; gap: 0.25rem; margin: 0.6rem 0; }
+.plan-field input, .plan-field textarea, .plan-field select { width: 100%; }
+.plan-title input { font-size: 1.15rem; }
+.plan-files, .plan-parts { list-style: none; margin: 0.75rem 0; padding: 0; display: grid; gap: 0.5rem; }
+.plan-file { display: flex; justify-content: space-between; gap: 1rem; width: 100%; padding: 0.6rem 0.8rem; border: 1px solid var(--rule); border-radius: 0.5rem; background: var(--card); color: var(--ink); font: inherit; text-align: left; cursor: pointer; }
+.plan-file-when { color: var(--muted); }
+.plan-part { border: 1px solid var(--rule); border-radius: 0.5rem; background: var(--card); }
+.plan-part.is-open { border-color: var(--accent); }
+.plan-part-head { display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0.5rem 0.4rem 0; }
+.plan-part-name { flex: 1; display: grid; gap: 0.05rem; padding: 0.35rem 0.8rem; border: 0; background: none; color: var(--ink); font: inherit; text-align: left; cursor: pointer; }
+.plan-part-kind { color: var(--muted); font-size: 0.8rem; }
+.plan-part-title { font-weight: 600; }
+.plan-moves { flex-direction: row; }
+.plan-part-body { padding: 0 0.8rem 0.8rem; }
+.plan-chosen { margin: 0.4rem 0; }
+.plan-add { flex-wrap: wrap; gap: 0.5rem; margin: 0.5rem 0 1rem; }
