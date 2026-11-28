@@ -45,7 +45,7 @@ by the Course Builder import or by SQL.
   `outcomes`; cohort: edit `outcomes` (on /teach/cohort/edit).
 - [x] B2. Workbooks: create, rename, reorder, delete; edit blocks (text,
   free, choice, table, file) with images in `workbook-files`.
-- [ ] B3. Part settings for every config key: show (a page or document
+- [x] B3. Part settings for every config key: show (a page or document
   on the stage), results_of, feature and feature_count, show_tally,
   rerun_of; rooms: groups, group_size, sorting, group_docs, workbooks.
   A deck on every part kind, not only talk and reflection.
@@ -59,6 +59,9 @@ by the Course Builder import or by SQL.
   tab's "Before the next session" and the Before tab's "Before this
   session" overlap in meaning.
 - [ ] B6. Cohort groups editor (`cohorts.groups`).
+- [ ] B8. A new part starts with placeholder words saved as its prompt
+  ("What the rooms are for", "Your question"); they should be hints
+  people type over, not content.
 - [ ] B7. End to end: build a non-Human-Shaped cohort "(delete me)" from
   nothing in Chrome as Ben, run a session in a real Meet call, clean up.
 
@@ -121,3 +124,21 @@ breakout state.
   b1 b2 b4 b3 in the database), added a picture (signed link drew in the
   preview), removed it and saved (the file left storage). Not yet seen:
   Delete workbook (at cleanup), a group workbook dealt to rooms (B3).
+- 2026-11-28, tick 3 (B3, 6fcc8386, c7363dc6, b5b976ab). Every part's
+  page has "In the call": a page or document on the stage, whom to
+  feature and how many, an earlier question's answers, a question's
+  counts and rerun, and for rooms how many (rooms or people each), who
+  goes where, documents and group workbooks dealt to them
+  (ShowLib.callConfig, tested). Any part can have slides (the add-on
+  already draws them beside a question and in the corner of others); on
+  parts other than Talk and Writing they sit after the part's fields.
+  An empty plan now offers Add a part, and the Human Shaped six parts
+  only to weekly cohorts. 729 node tests. **Verified live as Ben:** a
+  question part saved feature random x2 and show_tally; a rooms part
+  saved 3 rooms at random, a room document, and the group workbook
+  Leaf Lab Notes (made group on its page); the database's own
+  scene_config_ok accepted both, and the form reloads them. Not yet
+  seen: these parts run in a real Meet call (the add-on's handling is
+  the one imports already use). One Chrome tab stopped answering
+  ("Cannot access a chrome-extension:// URL of different extension")
+  after a save; a new tab worked.
