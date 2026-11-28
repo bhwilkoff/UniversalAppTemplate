@@ -325,3 +325,17 @@ breakout state.
   stage view now carry `together` and the room's `mstate` (tested; 738
   node tests). Not yet seen: two people in a cohort call sharing one
   model; fold into B7 with a test learner.
+- 2026-11-28, tick 15 (B7 part 1, d1aab815). Opened the plant biology
+  test cohort for joining (status open, listed on /cohorts/ under its
+  "(delete me)" name) and joined as test learner benhstest1 from its own
+  Chrome profile. **Seen as the learner:** the own-course page (no Your
+  app, Try my app, or stage bars; People; two share kinds), and Session
+  1's Before with its words, reading, and outcome. Found and fixed: This
+  week said "All sessions done" for undated sessions (now "Dates to
+  come"); "What to bring" took a breakout's prompt (the course's build;
+  now hidden for own courses); "Bring something back" became "Share with
+  the cohort" for own courses. Also found, not fixed: /cohorts/ calls
+  every cohort "five weeks of building one real app". Next: a real call
+  with Ben's profile leading and benhstest1 joining (shared model,
+  breakouts from standing groups, a group workbook in a room), then
+  clean up the test cohort.
