@@ -175,6 +175,8 @@ nobody rediscovers an exclusion.
 | Worker-to-Worker service bindings, project prefixes on shared accounts, driving the hosted database from an agent | `zero-cost-hosted-backend` |
 | One free account is one budget: alarm floors, write throttles, storage-tolerant rooms, client backoff, one beacon per visit, broadcast fan-out, idle-project pausing (Ear Drama alarm loop broke the Human Shaped rooms, 2026-11-23) | `zero-cost-hosted-backend` "One account is one budget" |
 
+| An add-on with no account: the call's room as the backend, the host's Drive for anything kept, clicks for Google's window, answers that need a way out, breakouts by pasted Meet links with names kept at dealing, framing checked on offer, a terminal crowd; a drawing relayed by a room, pointers never kept, malformed layer keys (humanshaped.org builder loop, 2026-11-28) | `google-meet-addon` "An add-on that needs no account", `shared-canvas-editing` "With no database" and merge rule 8 |
+
 ## Deliberate exclusions (do not "rediscover" these)
 
 - **Archive Watch's Watch Together Studio and Creation Studio engines**
