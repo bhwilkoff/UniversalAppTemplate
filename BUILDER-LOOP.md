@@ -98,7 +98,8 @@ by the Course Builder import or by SQL.
 - [ ] A7. Pictures in a session saved to Drive: deck pictures live in
   the private deck-pictures bucket, which a no-account room cannot read,
   so they show as their words. Copy each into the host's Drive (link
-  readable) on save and point the slide at it, or ask Ben.
+  readable) on save and point the slide at it. Ben, November 28: "it is
+  fine if the images are available to anyone with the link."
 - [ ] A5. No GitHub prompt anywhere on the open-room path; attendees
   never sign in.
 - [ ] A6. A real call with two attendees.
@@ -116,7 +117,7 @@ breakout state.
 - [x] I2. A "Model" tool: pick a model, every attendee gets their own in
   the panel, the host can put one on the stage; version pinned; the
   "Cite this" credit shown.
-- [ ] I3. After I1: shared state for pairs or rooms through the room,
+- [x] I3. After I1: shared state for pairs or rooms through the room,
   using the model's getState/setState.
 
 ## Log
@@ -297,3 +298,13 @@ breakout state.
   because deck pictures are in a private bucket a no-account room cannot
   read (A7). Also: Google asks to choose an account each time a call
   first opens Drive. Call ended.
+- 2026-11-28, I3 verified. Ben ran `wrangler deploy` (rooms worker
+  version 7680192a). Room tst-shar-mdl: a host client put up "Do Random
+  Events Cluster?" with together; both stages ran the bridged copy, the
+  credit read "shared through Human Shaped"; clicking star field A on
+  stage B turned untouched stage A to "Correct. Field A..." and "1
+  correct of 1 answered", and the room's mstate held the state (seq 1).
+  Found and fixed: the credit line sat over the model's corner and took
+  a click meant for the model; it now lets clicks through except on its
+  link. Room ended. Not yet: two people in a real Meet call; cohort
+  calls still fall back to a copy each.

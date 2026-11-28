@@ -3765,8 +3765,8 @@ html.stage-in-panel .stage-corner { display: none !important; }
 .model-by { color: var(--muted); font-size: 0.85rem; }
 .model-source { margin-top: 0.5rem; color: var(--muted); }
 .stage-app-frame { position: relative; }
-.stage-credit { position: absolute; left: 0.5rem; bottom: 0.5rem; margin: 0; padding: 0.2rem 0.5rem; border-radius: 0.35rem; background: rgba(22, 32, 25, 0.82); color: #fff; font-size: 0.75rem; }
-.stage-credit a { color: #fff; }
+.stage-credit { position: absolute; left: 0.5rem; bottom: 0.5rem; margin: 0; padding: 0.2rem 0.5rem; border-radius: 0.35rem; background: rgba(22, 32, 25, 0.82); color: #fff; font-size: 0.75rem; pointer-events: none; opacity: 0.85; }
+.stage-credit a { color: #fff; pointer-events: auto; }
 .model-how { display: grid; gap: 0.25rem; margin-bottom: 0.5rem; }
 
 /* A session from the host's Drive, run part by part in an open room. */
