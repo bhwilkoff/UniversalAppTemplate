@@ -290,8 +290,8 @@ test('breakout rooms deal everyone but the host into the Meet links, and the hos
   assert.match(apply(r, who, { t: 'groups', links: ['https://zoom.us/j/1', 'https://example.org/'] }, 2).error, /at least two/);
   assert.deepEqual(apply(r, who, { t: 'groups', links: ['https://meet.google.com/abc-defg-hij?pli=1', 'meet.google.com/xyz', 'https://meet.google.com/klm-nopq-rst'] }, 3, { shuffle: same }), { room: true });
   assert.deepEqual(publicRoom(r).groups, [
-    { link: 'https://meet.google.com/abc-defg-hij', members: ['b', 'd'] },
-    { link: 'https://meet.google.com/klm-nopq-rst', members: ['c'] }
+    { link: 'https://meet.google.com/abc-defg-hij', members: ['b', 'd'], names: ['', ''] },
+    { link: 'https://meet.google.com/klm-nopq-rst', members: ['c'], names: [''] }
   ]);
   assert.deepEqual(apply(r, A, { t: 'groups', open: false }, 4), { room: true });
   assert.equal(publicRoom(r).groups, null);
@@ -381,4 +381,10 @@ test('a ranking question takes each person’s whole order and shows each choice
   assert.deepEqual(apply(r, B, { t: 'answer', id, order: [2, 1, 3] }, 5).mine.answer, { order: [2, 1, 3] });
   apply(r, C, { t: 'answer', id, order: [2, 3, 1] }, 6);
   assert.deepEqual(summary(r), { total: 2, places: [2.5, 1, 2.5] });
+});
+
+test('breakout rooms keep everyone’s name from when they were dealt, for after they leave', () => {
+  const r = started();
+  apply(r, { ...A, present: [{ id: 'a', name: 'Ana' }, { id: 'b', name: 'Bo' }, { id: 'c', name: 'Cy' }] }, { t: 'groups', links: ['https://meet.google.com/abc-defg-hij', 'https://meet.google.com/klm-nopq-rst'] }, 2, { shuffle: (x) => x });
+  assert.deepEqual(publicRoom(r).groups.map((g) => g.names), [['Bo'], ['Cy']]);
 });

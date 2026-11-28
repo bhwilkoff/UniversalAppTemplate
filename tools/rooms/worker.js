@@ -226,7 +226,7 @@ export class Room extends DurableObject {
 
     const here = this.here();
     const pids = new Set(here.people.map((p) => p.id));
-    const did = apply(this.room, { pid: me.pid, name: me.name, hostHere: here.hostHere, isHere: (id) => pids.has(id), present: [...pids] }, m, Date.now(), { blocked: String(this.env.BLOCKED_REPOS || '').toLowerCase().split(' ').filter(Boolean) });
+    const did = apply(this.room, { pid: me.pid, name: me.name, hostHere: here.hostHere, isHere: (id) => pids.has(id), present: here.people }, m, Date.now(), { blocked: String(this.env.BLOCKED_REPOS || '').toLowerCase().split(' ').filter(Boolean) });
     if (did.error) return this.send(ws, { t: 'error', text: did.error });
     if (did.talk) { const out = JSON.stringify({ t: 'talk', v: this.room.talkV, text: this.room.talk }); this.sockets().forEach((s) => { try { s.ws.send(out); } catch (e) { /* gone */ } }); }
     if (did.html) {

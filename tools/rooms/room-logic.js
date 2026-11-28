@@ -138,7 +138,7 @@ export function publicRoom(room, here) {
     canTakeOver: room.on && !here.hostHere && room.hostLeft != null, worksOpen: room.worksOpen === true,
     workbook: room.workbook ? { id: room.workbook.id, title: room.workbook.title, blocks: room.workbook.blocks, open: room.workbook.open } : null,
     wbCount: room.workbook ? Object.keys(room.wbAnswers || {}).length : 0,
-    groups: room.groups ? room.groups.map((g) => ({ link: g.link, members: g.members.slice() })) : null
+    groups: room.groups ? room.groups.map((g) => ({ link: g.link, members: g.members.slice(), names: (g.names || []).slice() })) : null
   };
 }
 
@@ -376,10 +376,13 @@ export function apply(room, who, m, now, opts) {
       if (m.open === false) { room.groups = null; return { room: true }; }
       const links = [...new Set((Array.isArray(m.links) ? m.links : []).map(meetOk).filter(Boolean))].slice(0, 20);
       if (links.length < 2) return { error: 'Add at least two Meet links.' };
-      const people = (who.present || []).filter((id) => id !== room.host);
-      const order = (opts.shuffle || shuffle)(people.slice());
-      room.groups = links.map((link) => ({ link, members: [] }));
-      order.forEach((id, i) => room.groups[i % links.length].members.push(id));
+      // Names are kept from this moment: once people leave for their rooms
+      // they are no longer here to be named (found in a real call).
+      const present = (who.present || []).map((p) => (typeof p === 'string' ? { id: p, name: '' } : p)).filter((p) => p && p.id && p.id !== room.host);
+      const named = {}; present.forEach((p) => { named[p.id] = line(p.name, LIMITS.name); });
+      const order = (opts.shuffle || shuffle)(present.map((p) => p.id));
+      room.groups = links.map((link) => ({ link, members: [], names: [] }));
+      order.forEach((id, i) => { const g = room.groups[i % links.length]; g.members.push(id); g.names.push(named[id] || ''); });
       return { room: true };
     }
     // Drawing together: a drawing on every stage that anyone in the call can
