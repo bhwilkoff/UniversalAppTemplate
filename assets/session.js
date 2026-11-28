@@ -134,6 +134,7 @@
     // What to bring, which the plan's build part asks for.
     K.leading = leading;
     drawPlan(cohort, sessions, session, leading, finished);
+    drawPlanDrive(cohort, session, leading);
     drawPrep(cohort, session, leading);
     drawBefore(session, leading);
     drawBeforeForm(cohort, session, leading);
@@ -202,6 +203,31 @@
     });
     bar.appendChild(b); bar.appendChild(said);
     return bar;
+  }
+
+  // A leader keeps this session's plan as a file in their own Drive, to run
+  // in any Meet call with Human Shaped, cohort or not (SessionPlan, MyDrive).
+  function drawPlanDrive(cohort, session, leading) {
+    var sec = $('[data-plan-drive]'), b = $('[data-plan-drive-save]'), said = $('[data-plan-drive-status]');
+    sec.hidden = !leading || !window.MyDrive || !window.SessionPlan;
+    if (sec.hidden) return;
+    b.onclick = function () {
+      U.say(said, 'Saving to your Drive…');
+      // The Google window opens from this click, before anything is read.
+      var token = window.MyDrive.connect();
+      Promise.all([token,
+        db.from('scenes').select('*').eq('session_id', session.id).order('position'),
+        db.from('scene_decks').select('scene_id, body').eq('cohort_id', cohort.id)
+      ]).then(function (r) {
+        if (r[1].error) throw new Error(r[1].error.message);
+        var decks = {};
+        (r[2].data || []).forEach(function (d) { decks[d.scene_id] = d.body; });
+        var file = window.SessionPlan.session(lib.sessionTitle(session, cohort), window.SessionPlan.fromScenes(r[1].data || [], decks));
+        if (!file.parts.length) throw new Error('This plan has nothing a call can run yet.');
+        return window.MyDrive.save(r[0], file).then(function () { return file; });
+      }).then(function (file) { U.say(said, 'Saved in your Drive, ' + file.parts.length + (file.parts.length === 1 ? ' part.' : ' parts.') + ' Open it from Slides in any call.'); },
+        function (e) { U.say(said, e.message, 'problem'); });
+    };
   }
 
   // The session's individual workbooks (workbooks, migration 20261111050000):
