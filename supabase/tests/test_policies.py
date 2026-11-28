@@ -2122,8 +2122,18 @@ def main():
     check("and the scenes are in the new order", [r[0] for r in ben.fetchall()] == [a3, a1, a2])
     check("reordering refuses a list that leaves a scene out",
           not attempt(ben, "select public.reorder_scenes(%s, %s::uuid[])", (s1, "{%s,%s}" % (a1, a2))))
+    ben.execute("select public.save_scene_deck(id, %s) from public.scenes where session_id = %s and kind = 'talk'", ("# Hello\n> say hi", s1))
+    ben.execute("update public.scenes set goal = 'Why it matters', config = config || jsonb_build_object('results_of', (select id from public.scenes where session_id = %s and kind = 'question')::text) where session_id = %s and kind = 'talk'", (s1, s1))
+    ben.execute("insert into public.workbooks (cohort_id, session_id, kind, title, blocks) values (%s, %s, 'group', 'Room work', '[{\"key\":\"b1\",\"type\":\"free\",\"text\":\"Why?\"}]') returning id", (sc, s1))
+    old_wb = ben.fetchone()[0]
+    ben.execute("update public.scenes set config = config || jsonb_build_object('workbooks', jsonb_build_array(%s::text)) where session_id = %s and kind = 'rooms'", (str(old_wb), s1))
     check("a teacher copies last week's run of show into an empty session",
           attempt(ben, "select public.copy_scenes(%s, %s)", (s1, s2)) and last_rows == [(3,)])
+    ben.execute("select s.slides, s.goal, d.body, s.config->>'results_of' = (select id::text from public.scenes where session_id = %s and kind = 'question') from public.scenes s join public.scene_decks d on d.scene_id = s.id where s.session_id = %s and s.kind = 'talk'", (s2, s2))
+    check("the copy keeps a part's slides, its speaker notes, and its purpose, and points at the copied question",
+          ben.fetchone() == ("# Hello", "Why it matters", "# Hello\n> say hi", True))
+    ben.execute("select w.title, w.session_id = %s, w.id <> %s from public.scenes s join public.workbooks w on w.id = (s.config->'workbooks'->>0)::uuid where s.session_id = %s and s.kind = 'rooms'", (s2, old_wb, s2))
+    check("and a room's group workbook comes along as the new session's own", ben.fetchone() == ("Room work", True, True))
     ben.execute("select kind from public.scenes where session_id = %s order by position", (s2,))
     check("the copy keeps the order and kinds", [r[0] for r in ben.fetchall()] == ["question", "talk", "rooms"])
     ben.execute("select count(*) from public.scene_notes n join public.scenes s on s.id = n.scene_id where s.session_id = %s", (s2,))

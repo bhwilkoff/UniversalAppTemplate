@@ -587,9 +587,42 @@
       say('Copying ' + (cohort.schedule === 'custom' ? 'session ' : 'week ') + from.number + '…');
       db.rpc('copy_scenes', { from_session: from.id, to_session: session.id }).then(function (r) {
         if (r.error) { say('Not copied: ' + r.error.message); return; }
-        say('Copied ' + r.data + ' scenes from ' + (cohort.schedule === 'custom' ? 'session ' : 'week ') + from.number + ', with your notes.');
-        load();
+        var n = r.data;
+        say('Copying the pictures…');
+        return copyPictures(from).then(function (missed) {
+          say('Copied ' + n + ' parts from ' + (cohort.schedule === 'custom' ? 'session ' : 'week ') + from.number + ', with their slides and your notes.' + (missed ? ' ' + missed + (missed === 1 ? ' picture was' : ' pictures were') + ' not copied.' : ''));
+          load();
+        });
       });
+    }
+
+    // Storage cannot be copied from SQL, so the copied parts' deck pictures
+    // and their rooms' workbook pictures are copied here, part by part in
+    // order. Resolves with how many could not be copied.
+    function copyPictures(from) {
+      var missed = 0;
+      function copyFolder(bucket, fromDir, toDir) {
+        var store = db.storage.from(bucket);
+        return store.list(fromDir, { limit: 1000 }).then(function (l) {
+          return Promise.all(((l && l.data) || []).filter(function (f) { return f.id; }).map(function (f) {
+            return store.copy(fromDir + '/' + f.name, toDir + '/' + f.name).then(function (c) { if (c.error) missed += 1; });
+          }));
+        }).catch(function () { missed += 1; });
+      }
+      return Promise.all([
+        db.from('scenes').select('id, position, config').eq('session_id', from.id).order('position'),
+        db.from('scenes').select('id, position, config').eq('session_id', session.id).order('position')
+      ]).then(function (res) {
+        var olds = res[0].data || [], news = res[1].data || [], jobs = [];
+        olds.forEach(function (o, i) {
+          var nw = news[i];
+          if (!nw || nw.position !== o.position) return;
+          jobs.push(copyFolder('deck-pictures', cohort.id + '/' + o.id, cohort.id + '/' + nw.id));
+          var ow = (o.config && o.config.workbooks) || [], nwb = (nw.config && nw.config.workbooks) || [];
+          ow.forEach(function (id, k) { if (nwb[k] && nwb[k] !== id) jobs.push(copyFolder('workbook-files', cohort.id + '/' + id, cohort.id + '/' + nwb[k])); });
+        });
+        return Promise.all(jobs);
+      }).then(function () { return missed; }, function () { return missed + 1; });
     }
 
     load();
