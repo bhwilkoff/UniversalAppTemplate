@@ -7,6 +7,7 @@
    "slug": "a-line-that-predicts-earnings-673b65",
    "title": "A Line That Predicts Earnings",
    "v": 9,
+   "copy": "/assets/ideas-at-play/a-line-that-predicts-earnings-673b65.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "Groups guess 1975 earnings from 1974 earnings in the lalonde data, fit lm(re75 ~ re74) in R, read the intercept and slope, separate variables from parameters, then judge the line by its RMSE against…"
@@ -15,6 +16,7 @@
    "slug": "a-treaty-to-stop-superintelligence-miris-draft-agreement-on-ce6377",
    "title": "A treaty to stop superintelligence: MIRI’s draft agreement on one page",
    "v": 1,
+   "copy": "/assets/ideas-at-play/a-treaty-to-stop-superintelligence-miris-draft-agreement-on-ce6377.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "An interactive model on Compute Thresholds in AI Governance (Political science, International Agreements and Arms Control), free on Ideas at Play."
@@ -23,6 +25,7 @@
    "slug": "angry-or-weary-sensitivity-analysis-in-darfur-9571b0",
    "title": "Angry or weary? Sensitivity analysis in Darfur",
    "v": 14,
+   "copy": "/assets/ideas-at-play/angry-or-weary-sensitivity-analysis-in-darfur-9571b0.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "An interactive model with coding exercises on Robustness Value (Statistics, Causal inference) for undergraduate courses, free on Ideas at Play."
@@ -31,6 +34,7 @@
    "slug": "area-not-height-the-normal-curve-in-r-30ee31",
    "title": "Area, Not Height: the normal curve in R",
    "v": 3,
+   "copy": "/assets/ideas-at-play/area-not-height-the-normal-curve-in-r-30ee31.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "An interactive model with coding exercises on Normal Probability as Area (Statistics, Probability Distributions) for undergraduate courses, free on Ideas at Play."
@@ -39,6 +43,7 @@
    "slug": "average-effect-or-quantile-effect-att-vs-qtet-for-the-treate-866b37",
    "title": "Average effect or quantile effect? ATT vs. QTET for the treated",
    "v": 2,
+   "copy": "/assets/ideas-at-play/average-effect-or-quantile-effect-att-vs-qtet-for-the-treate-866b37.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "An interactive model on Quantile Treatment Effect for Treated (Statistics, causal inference) for graduate courses, free on Ideas at Play."
@@ -47,6 +52,7 @@
    "slug": "averages-pile-up-building-a-sampling-distribution-in-r-cb0a41",
    "title": "Averages Pile Up: building a sampling distribution in R",
    "v": 1,
+   "copy": "/assets/ideas-at-play/averages-pile-up-building-a-sampling-distribution-in-r-cb0a41.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "Take 10,000 random samples of 30 from a skewed population in R, average each one, and watch the averages pile into a narrow bell around μ: the sampling distribution of the mean, its standard error…"
@@ -55,6 +61,7 @@
    "slug": "bootstrapping-breakfast-how-a-child-builds-a-concept-b0f48f",
    "title": "Bootstrapping Breakfast: how a child builds a concept",
    "v": 4,
+   "copy": "/assets/ideas-at-play/bootstrapping-breakfast-how-a-child-builds-a-concept-b0f48f.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "An interactive model on Concept Bootstrapping (Psychology, Cognitive development) for undergraduate courses, free on Ideas at Play."
@@ -63,6 +70,7 @@
    "slug": "rich-in-a-poor-country-or-poor-in-a-rich-country-remix-e0271f",
    "title": "Brazil and Switzerland",
    "v": 2,
+   "copy": "/assets/ideas-at-play/rich-in-a-poor-country-or-poor-in-a-rich-country-remix-e0271f.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "Rodrik's teaser, run on 2024 WID data for 195 countries. Students predict the winner, then find that the answer reverses as the percentile narrows and reverses again before tax."
@@ -71,6 +79,7 @@
    "slug": "build-a-binomial-4ac1d0",
    "title": "Build a Binomial",
    "v": 8,
+   "copy": "/assets/ideas-at-play/build-a-binomial-4ac1d0.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "Sixteen admitted students who each accept with probability 0.7: n, p and k sliders build the binomial, shade P(X ≤ k), and show when the shape is lopsided; one run of the trials shows the Bernoullis…"
@@ -79,6 +88,7 @@
    "slug": "catch-the-mean-confidence-intervals-for-a-mean-in-r-44afde",
    "title": "Catch the Mean: confidence intervals for a mean in R",
    "v": 7,
+   "copy": "/assets/ideas-at-play/catch-the-mean-confidence-intervals-for-a-mean-in-r-44afde.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "An interactive model with coding exercises on Confidence Interval for a Mean (Statistics, Confidence Intervals) for undergraduate courses, free on Ideas at Play."
@@ -87,6 +97,7 @@
    "slug": "checking-balance-then-searching-for-it-you-are-the-genetic-a-69216d",
    "title": "Checking balance, then searching for it: you are the genetic algorithm",
    "v": 9,
+   "copy": "/assets/ideas-at-play/checking-balance-then-searching-for-it-you-are-the-genetic-a-69216d.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "An interactive model on Covariate Balance Matching (Statistics, causal inference) for graduate courses, free on Ideas at Play."
@@ -95,6 +106,7 @@
    "slug": "confounder-collider-or-neutral-choosing-controls-on-the-tita-aae519",
    "title": "Confounder, collider, or neutral? Choosing controls on the Titanic",
    "v": 3,
+   "copy": "/assets/ideas-at-play/confounder-collider-or-neutral-choosing-controls-on-the-tita-aae519.html",
    "author": "Alex Korablev",
    "year": 2026,
    "about": "An interactive model on Bad controls and colliders (Statistics, Causal inference) for undergraduate courses, free on Ideas at Play."
@@ -103,6 +115,7 @@
    "slug": "did-the-queenpin-reduce-violence-3fd643",
    "title": "Did the Queenpin Reduce Violence?",
    "v": 6,
+   "copy": "/assets/ideas-at-play/did-the-queenpin-reduce-violence-3fd643.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "Groups investigate a 2026 synthetic-control study claiming a woman cartel leader reduced visible violence: they read the claim, run placebo, leave-one-out and backdating checks on the authors' own…"
@@ -111,6 +124,7 @@
    "slug": "disjoint-is-not-independent-6e3f74",
    "title": "Disjoint Is Not Independent",
    "v": 6,
+   "copy": "/assets/ideas-at-play/disjoint-is-not-independent-6e3f74.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "On the 36-outcome grid for two dice, groups test whether events overlap, compare P(A and B) with P(A) × P(B), discover that disjoint events can never be independent, and hunt for a pair that…"
@@ -119,6 +133,7 @@
    "slug": "do-dogs-make-their-owners-happier-four-study-designs-one-tow-eb965a",
    "title": "Do dogs make their owners happier? Four study designs, one town",
    "v": 2,
+   "copy": "/assets/ideas-at-play/do-dogs-make-their-owners-happier-four-study-designs-one-tow-eb965a.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "An interactive model on Observational vs Experimental Studies (Statistics, causal inference) for high school courses, free on Ideas at Play."
@@ -127,6 +142,7 @@
    "slug": "do-random-events-cluster-9f6544",
    "title": "Do Random Events Cluster?",
    "v": 4,
+   "copy": "/assets/ideas-at-play/do-random-events-cluster-9f6544.html",
    "author": "Alex Korablev",
    "year": 2026,
    "about": "Students test Pinker's claim that random events cluster through a star-field game, coin-flip streaks, sample-size histograms and a kidney-stone Simpson's paradox case."
@@ -135,6 +151,7 @@
    "slug": "do-these-two-mutants-break-the-same-gene-3e23ff",
    "title": "Do These Two Mutants Break the Same Gene?",
    "v": 11,
+   "copy": "/assets/ideas-at-play/do-these-two-mutants-break-the-same-gene-3e23ff.html",
    "author": "Jon Wilkins",
    "year": 2026,
    "about": "Run a simulated C. elegans screen: four recessive mutants all give a vulval-less worm. Cross them in pairs, read the complementation table, sort the mutants into genes, then see how a dominant…"
@@ -143,6 +160,7 @@
    "slug": "does-the-shape-matter-dc8a2f",
    "title": "Does the Shape Matter?",
    "v": 4,
+   "copy": "/assets/ideas-at-play/does-the-shape-matter-dc8a2f.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "A pre-class poll, made interactive: one draw lands far from the mean; is a second sample's mean of 31 likely closer, whatever the population's shape? Students switch between Normal, skewed,…"
@@ -151,6 +169,7 @@
    "slug": "truth-in-r-remix-cab3ab",
    "title": "Exclusive or in R",
    "v": 4,
+   "copy": "/assets/ideas-at-play/truth-in-r-remix-cab3ab.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "Three short R exercises on one connective, exclusive or: predict what xor(P, Q) gives in each row of a truth table, build XOR from AND, OR and NOT, then find the row where inclusive OR and XOR…"
@@ -159,6 +178,7 @@
    "slug": "favorite-learning-techniques-three-hearts-each-cfeb99",
    "title": "Favorite learning techniques: three hearts each",
    "v": 3,
+   "copy": "/assets/ideas-at-play/favorite-learning-techniques-three-hearts-each-cfeb99.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "An interactive model on Effective Learning Techniques (Education, Learning Strategies), free on Ideas at Play."
@@ -167,6 +187,7 @@
    "slug": "who-captures-the-profit-five-forces-in-action-ce9d73",
    "title": "Five Forces in Action",
    "v": 9,
+   "copy": "/assets/ideas-at-play/who-captures-the-profit-five-forces-in-action-ce9d73.html",
    "author": "Torsten Doering",
    "year": 2026,
    "about": "Breakout groups predict the profitability of a fast-growing fictional meal-kit market, sort eight facts into the five forces, then set the dials and watch the profit left to the industry shrink…"
@@ -175,6 +196,7 @@
    "slug": "sutva-violation-f378ca",
    "title": "Four Units, Three Worlds: when does a unit have exactly two potential outcomes?",
    "v": 1,
+   "copy": "/assets/ideas-at-play/sutva-violation-f378ca.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "Flip treatment assignments for four units in three worlds (SUTVA holds, interference, hidden versions of treatment) and see when each unit stops having just two potential outcomes."
@@ -183,6 +205,7 @@
    "slug": "how-large-is-large-enough-55e011",
    "title": "How Large Is Large Enough?",
    "v": 6,
+   "copy": "/assets/ideas-at-play/how-large-is-large-enough-55e011.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "Five populations (bell, flat, skewed, two-peaked, Cauchy) and a sample-size dial: sample means turn bell-shaped fast for symmetric populations, slowly for skewed ones, and never for the Cauchy,…"
@@ -191,6 +214,7 @@
    "slug": "how-surprising-is-496-grams-pre-class-what-a-p-value-means-c0afe1",
    "title": "How Surprising Is 496 Grams? (pre-class): what a p-value means",
    "v": 2,
+   "copy": "/assets/ideas-at-play/how-surprising-is-496-grams-pre-class-what-a-p-value-means-c0afe1.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "Shorter, more conceptual pre-class version of How Surprising Is 496 Grams?: predict, simulate the world of the null hypothesis in one short R edit, then say what the p-value means and decide at α =…"
@@ -199,6 +223,7 @@
    "slug": "how-surprising-is-496-grams-hypothesis-tests-and-p-values-in-2e8c52",
    "title": "How Surprising Is 496 Grams? Hypothesis tests and p-values in R",
    "v": 5,
+   "copy": "/assets/ideas-at-play/how-surprising-is-496-grams-hypothesis-tests-and-p-values-in-2e8c52.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "An interactive model with coding exercises on P-value (Statistics, Hypothesis Testing) for undergraduate courses, free on Ideas at Play."
@@ -207,6 +232,7 @@
    "slug": "how-tight-is-the-bunch-4aba5f",
    "title": "How Tight Is the Bunch?",
    "v": 1,
+   "copy": "/assets/ideas-at-play/how-tight-is-the-bunch-4aba5f.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "Students predict what happens to the scatter of sample means when n goes from 9 to 36, then click through samples of 1 to 100 exam scores and watch 1,000 sample means bunch tighter: the standard…"
@@ -215,6 +241,7 @@
    "slug": "kidney-stones-and-simpsons-paradox-08198e",
    "title": "Kidney Stones and Simpson’s Paradox",
    "v": 2,
+   "copy": "/assets/ideas-at-play/kidney-stones-and-simpsons-paradox-08198e.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "An interactive model with coding exercises on Simpson's Paradox (Statistics, Simpson’s paradox and confounding) for undergraduate courses, free on Ideas at Play."
@@ -223,6 +250,7 @@
    "slug": "lords-paradox-two-statisticians-one-dataset-05d1b2",
    "title": "Lord's Paradox: Two Statisticians, One Dataset",
    "v": 21,
+   "copy": "/assets/ideas-at-play/lords-paradox-two-statisticians-one-dataset-05d1b2.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "Two statisticians analyse the same six students' weights and reach opposite conclusions. Students compute both analyses in R and then work out what each one assumes about the missing counterfactual."
@@ -231,6 +259,7 @@
    "slug": "lucky-or-protected-c5a631",
    "title": "Lucky, or Protected?",
    "v": 6,
+   "copy": "/assets/ideas-at-play/lucky-or-protected-c5a631.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "Three crew members with antibodies escaped a virus that infected 103 of the other 117 aboard a fishing trawler. Step by step, students model"
@@ -239,6 +268,7 @@
    "slug": "matching-and-genetic-matching-five-questions-c68848",
    "title": "Matching and genetic matching: ten questions",
    "v": 6,
+   "copy": "/assets/ideas-at-play/matching-and-genetic-matching-five-questions-c68848.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "An interactive model on Genetic Matching (Statistics, Causal inference) for graduate courses, free on Ideas at Play."
@@ -247,6 +277,7 @@
    "slug": "measured-in-standard-errors-z-scores-and-t-statistics-870ae5",
    "title": "Measured in Standard Errors: z-scores and t-statistics",
    "v": 4,
+   "copy": "/assets/ideas-at-play/measured-in-standard-errors-z-scores-and-t-statistics-870ae5.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "A quick reminder of the sampling distribution of the mean (SE = σ/√n), z-scores for a single value and for a sample mean, and the t-statistic: why using s for σ thickens the tails, df = n − 1, and…"
@@ -255,6 +286,7 @@
    "slug": "movers-and-fakers-what-an-alignment-faking-test-can-and-cann-716e26",
    "title": "Movers and Fakers: what an alignment-faking test can and cannot tell you",
    "v": 5,
+   "copy": "/assets/ideas-at-play/movers-and-fakers-what-an-alignment-faking-test-can-and-cann-716e26.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "An interactive model on Partial Identification of Recall (Statistics, Measurement and Classification Bounds), free on Ideas at Play."
@@ -263,6 +295,7 @@
    "slug": "one-trial-many-trials-remix-97a3ff",
    "title": "One Trial, Many Trials (remix)",
    "v": 8,
+   "copy": "/assets/ideas-at-play/one-trial-many-trials-remix-97a3ff.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "Students run a simulated tutoring experiment again and again, and see that any single RCT estimate misses the true effect while the average of many lands on it. They also see the spread of estimates…"
@@ -271,6 +304,7 @@
    "slug": "pierre-the-aspirin-and-the-party-what-is-the-effect-235b91",
    "title": "Pierre, the aspirin and the party: what is “the effect”?",
    "v": 3,
+   "copy": "/assets/ideas-at-play/pierre-the-aspirin-and-the-party-what-is-the-effect-235b91.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "An interactive model on Potential Outcomes (Statistics, causal inference) for undergraduate courses, free on Ideas at Play."
@@ -279,6 +313,7 @@
    "slug": "praise-or-yell-5ad08e",
    "title": "Praise or Yell?",
    "v": 3,
+   "copy": "/assets/ideas-at-play/praise-or-yell-5ad08e.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "Daniel Kahneman's flight-instructor story, made interactive: landings get worse after praise and better after yelling, even when neither does anything. Students run a simulated flight school (skill…"
@@ -287,6 +322,7 @@
    "slug": "python-together-simulating-coin-flips-2deacf",
    "title": "Python together: simulating coin flips",
    "v": 2,
+   "copy": "/assets/ideas-at-play/python-together-simulating-coin-flips-2deacf.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "Groups write and run Python together in the browser: simulate coin flips, find streaks, and use pandas on a class dataset to judge whether a coin is fair."
@@ -295,6 +331,7 @@
    "slug": "quantity-or-variety-the-suspect-eliminator-483fd8",
    "title": "Quantity or Variety — the Suspect Eliminator",
    "v": 6,
+   "copy": "/assets/ideas-at-play/quantity-or-variety-the-suspect-eliminator-483fd8.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "An interactive model on Enumerative vs Eliminative Induction (Philosophy, Logic and Critical Reasoning) for undergraduate courses, free on Ideas at Play."
@@ -303,6 +340,7 @@
    "slug": "r-together-is-this-coin-fair-d47121",
    "title": "R together: is this coin fair?",
    "v": 3,
+   "copy": "/assets/ideas-at-play/r-together-is-this-coin-fair-d47121.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "Groups write and run R together in the browser: simulate coin flips, then use read.csv, aggregate and binom.test on a class dataset to judge whether a coin is fair."
@@ -311,6 +349,7 @@
    "slug": "racquetball-one-rally-at-a-time-8fa617",
    "title": "Racquetball, One Rally at a Time",
    "v": 8,
+   "copy": "/assets/ideas-at-play/racquetball-one-rally-at-a-time-8fa617.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "Debrief of the pre-class racquetball simulation: step through one game as a two-state machine, fix the R model, rerun it with dials against the exact 82.6%, and decide how sure 1,000 simulated games…"
@@ -319,6 +358,7 @@
    "slug": "rawls-and-ai-what-political-liberalism-asks-of-ai-governance-19b7d9",
    "title": "Rawls and AI: what political liberalism asks of AI governance",
    "v": 1,
+   "copy": "/assets/ideas-at-play/rawls-and-ai-what-political-liberalism-asks-of-ai-governance-19b7d9.html",
    "author": "Margaret Jenkins",
    "year": 2026,
    "about": "An interactive model on Rawlsian Political Liberalism (Philosophy, Political Philosophy) for undergraduate courses, free on Ideas at Play."
@@ -327,6 +367,7 @@
    "slug": "read-utopia-twice-connotation-in-szymborskas-poem-019056",
    "title": "Read “Utopia” twice: connotation in Szymborska's poem",
    "v": 7,
+   "copy": "/assets/ideas-at-play/read-utopia-twice-connotation-in-szymborskas-poem-019056.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "A group reads Szymborska's"
@@ -335,6 +376,7 @@
    "slug": "61-birds-eye-view-of-rdd-remix-f728d2",
    "title": "Reading the jump (pre-class): regression discontinuity at age 21",
    "v": 5,
+   "copy": "/assets/ideas-at-play/61-birds-eye-view-of-rdd-remix-f728d2.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "A 15-minute pre-class version of a regression discontinuity tour built on Carpenter and Dobkin's (2009) drinking-age data. Students predict the jump at 21, size it under different windows and curve…"
@@ -343,6 +385,7 @@
    "slug": "real-or-big-pre-class-testing-a-difference-of-means-98fd9f",
    "title": "Real, or Big? (pre-class): testing a difference of means",
    "v": 2,
+   "copy": "/assets/ideas-at-play/real-or-big-pre-class-testing-a-difference-of-means-98fd9f.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "Shorter pre-class version of Real, or Big?: read two outbreak data sets, test the gap between two pesticide means in one short R edit, and see why the 95% interval for the gap leaves out 0 exactly…"
@@ -351,6 +394,7 @@
    "slug": "real-or-big-a-difference-of-means-and-its-effect-size-in-r-e81853",
    "title": "Real, or Big? A difference of means and its effect size in R",
    "v": 3,
+   "copy": "/assets/ideas-at-play/real-or-big-a-difference-of-means-and-its-effect-size-in-r-e81853.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "An interactive model with coding exercises on Cohen's d effect size (Statistics, Hypothesis Testing) for undergraduate courses, free on Ideas at Play."
@@ -359,6 +403,7 @@
    "slug": "rent-control-modelled-with-utility-who-gains-who-loses-and-w-7827d7",
    "title": "Rent control, modelled with utility: who gains, who loses, and when",
    "v": 2,
+   "copy": "/assets/ideas-at-play/rent-control-modelled-with-utility-who-gains-who-loses-and-w-7827d7.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "An interactive model on Rent Control Effects (Economics, Microeconomic Policy Analysis) for undergraduate courses, free on Ideas at Play."
@@ -367,6 +412,7 @@
    "slug": "rich-and-poor-farmers-what-does-regression-recover-32963f",
    "title": "Rich and Poor Farmers: What Does Regression Recover?",
    "v": 9,
+   "copy": "/assets/ideas-at-play/rich-and-poor-farmers-what-does-regression-recover-32963f.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "A Coding workbook in R. Students simulate 100 farmers with both potential outcomes, compute the naïve gap, ATE, ATT, ATC and selection bias, then see that a regression with a control matches none of…"
@@ -375,6 +421,7 @@
    "slug": "same-average-wait-same-experience-quantile-treatment-effects-a64656",
    "title": "Same average wait, same experience? Quantile treatment effects in Uber's ETA experiment",
    "v": 2,
+   "copy": "/assets/ideas-at-play/same-average-wait-same-experience-quantile-treatment-effects-a64656.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "An interactive model on Quantile Treatment Effects (Statistics, causal inference) for undergraduate courses, free on Ideas at Play."
@@ -383,6 +430,7 @@
    "slug": "same-estimator-four-ways-to-assign-treatment-1835bc",
    "title": "Same estimator, four ways to assign treatment",
    "v": 3,
+   "copy": "/assets/ideas-at-play/same-estimator-four-ways-to-assign-treatment-1835bc.html",
    "author": "Alex Korablev",
    "year": 2026,
    "about": "An interactive model on Treatment Assignment Mechanism (Statistics, Causal inference) for undergraduate courses, free on Ideas at Play."
@@ -391,6 +439,7 @@
    "slug": "scavenger-hunt-king-tomz-wittenberg-2000-12e26f",
    "title": "Scavenger Hunt: King Tomz Wittenberg (2000)",
    "v": 2,
+   "copy": "/assets/ideas-at-play/scavenger-hunt-king-tomz-wittenberg-2000-12e26f.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "Students read the model's expected probability of voting by age for one hypothetical person, with confidence bars, and learn the curve is about a person you define while the bars show uncertainty in…"
@@ -399,6 +448,7 @@
    "slug": "selection-bias-c17dff",
    "title": "Selection Bias Lives in Y(0)",
    "v": 1,
+   "copy": "/assets/ideas-at-play/selection-bias-c17dff.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "Ten units, with treatment targeted at those with the highest X. Turn the dials for how X shifts baseline outcomes and treatment effects, and see when the naive comparison equals the ATT, and how…"
@@ -407,6 +457,7 @@
    "slug": "seven-types-of-induction-skeleton-forms-28d4c3",
    "title": "Seven Types of Induction — Skeleton Forms",
    "v": 10,
+   "copy": "/assets/ideas-at-play/seven-types-of-induction-skeleton-forms-28d4c3.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "Students sort nine skeleton argument forms into Wilkins's seven types of induction, after predicting whether all induction runs from particular to general. This revision removes the word"
@@ -415,6 +466,7 @@
    "slug": "sort-the-lalonde-columns-11be66",
    "title": "Sort the LaLonde Columns",
    "v": 5,
+   "copy": "/assets/ideas-at-play/sort-the-lalonde-columns-11be66.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "Groups sort the 12 lalonde columns into nominal, ordinal, discrete and continuous, then see which summaries each type allows (a 0/1 column's mean is a share) and classify a new 5-point satisfaction…"
@@ -423,6 +475,7 @@
    "slug": "strength-and-reliability-arguments-c-d-e-1ccefb",
    "title": "Strength and Reliability — Arguments C, D, E",
    "v": 7,
+   "copy": "/assets/ideas-at-play/strength-and-reliability-arguments-c-d-e-1ccefb.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "Sort Wilkins's donkey arguments, then turn the dials to see that strength and reliability are separate. Both are now judged against your own bar for action:"
@@ -431,6 +484,7 @@
    "slug": "subclassification-on-the-titanic-20aef4",
    "title": "Subclassification on the Titanic",
    "v": 3,
+   "copy": "/assets/ideas-at-play/subclassification-on-the-titanic-20aef4.html",
    "author": "Alex Korablev",
    "year": 2026,
    "about": "An interactive model on Subclassification (Statistics, Causal inference) for undergraduate courses, free on Ideas at Play."
@@ -439,6 +493,7 @@
    "slug": "ten-fallacies-to-avoid-skeleton-forms-29d5e1",
    "title": "Ten Fallacies to Avoid — Skeleton Forms",
    "v": 2,
+   "copy": "/assets/ideas-at-play/ten-fallacies-to-avoid-skeleton-forms-29d5e1.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "An interactive model on Informal Fallacies (Philosophy, Logic and Critical Reasoning) for undergraduate courses, free on Ideas at Play."
@@ -447,6 +502,7 @@
    "slug": "the-balance-point-08ff61",
    "title": "The Balance Point",
    "v": 7,
+   "copy": "/assets/ideas-at-play/the-balance-point-08ff61.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "The lesson's wheel game as a probability distribution with a fulcrum at its expected value: a penalty dial moves the balance point, 1,000 spins land on it, and students find the penalty that makes…"
@@ -455,6 +511,7 @@
    "slug": "the-beach-on-the-hill-isostasy-and-the-rising-land-4bd078",
    "title": "The Beach on the Hill: isostasy and the rising land",
    "v": 5,
+   "copy": "/assets/ideas-at-play/the-beach-on-the-hill-isostasy-and-the-rising-land-4bd078.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "Why is there a beach 286 m up a Swedish hillside? Students float crust on the mantle, find a mountain's root in one line of Python, melt an ice sheet and watch the land rise for thousands of years,…"
@@ -463,6 +520,7 @@
    "slug": "the-complexity-of-negation-68e250",
    "title": "The Complexity of Negation",
    "v": 3,
+   "copy": "/assets/ideas-at-play/the-complexity-of-negation-68e250.html",
    "author": "Alex Korablev",
    "year": 2026,
    "about": "A formal-logic companion on negating sentences precisely: connectives, a truth-table builder, De Morgan's laws and the meaning of"
@@ -471,6 +529,7 @@
    "slug": "the-internship-sprint-lotteries-with-unequal-odds-a2f90d",
    "title": "The Internship Sprint: random assignment with unequal probabilities",
    "v": 7,
+   "copy": "/assets/ideas-at-play/the-internship-sprint-lotteries-with-unequal-odds-a2f90d.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "An interactive model on Local Average Treatment Effect (Economics, General) for undergraduate courses, free on Ideas at Play."
@@ -479,6 +538,7 @@
    "slug": "lalonde-43379b",
    "title": "The LaLonde Problem: regression with and without a randomized control group",
    "v": 1,
+   "copy": null,
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "Choose a control group (the NSW experiment's randomized controls or 15,992 survey respondents) and the predictors in lm(), and see whether regression recovers the experimental effect of job training…"
@@ -487,6 +547,7 @@
    "slug": "the-logistic-squeeze-remix-80843a",
    "title": "The Logistic Squeeze (remix)",
    "v": 2,
+   "copy": "/assets/ideas-at-play/the-logistic-squeeze-remix-80843a.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "A logistic regression is a straight line on the logit scale, squeezed through the logistic function into a probability. This version adds a comprehension question and a reflection question at the…"
@@ -495,6 +556,7 @@
    "slug": "the-midnight-fact-check-eb39ae",
    "title": "The Midnight Fact-Check",
    "v": 4,
+   "copy": "/assets/ideas-at-play/the-midnight-fact-check-eb39ae.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "A fact-check desk has until midnight to rate a mayor's claim that equal household incomes mean equal pay. A census table on workers per household shows when a proxy variable tracks what it stands…"
@@ -503,6 +565,7 @@
    "slug": "the-net-and-the-interval-hypothesis-tests-confidence-interva-ddab50",
    "title": "The Net and the Interval: hypothesis tests, confidence intervals and multiple comparisons in R",
    "v": 1,
+   "copy": "/assets/ideas-at-play/the-net-and-the-interval-hypothesis-tests-confidence-interva-ddab50.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "An interactive model with coding exercises on Multiple Comparisons Correction (Statistics, Hypothesis Testing) for undergraduate courses, free on Ideas at Play."
@@ -511,6 +574,7 @@
    "slug": "the-positive-test-fa15c9",
    "title": "The Positive Test",
    "v": 8,
+   "copy": "/assets/ideas-at-play/the-positive-test-fa15c9.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "A COVID test that catches 95% of cases, 1,000 test-takers and a slider for how common COVID is: when 2% have it, a positive result means only 16%. Counting, not formulas, untangles confusion of the…"
@@ -519,6 +583,7 @@
    "slug": "the-two-lenses-argument-h-43b3cd",
    "title": "The Two Lenses — Argument H",
    "v": 5,
+   "copy": "/assets/ideas-at-play/the-two-lenses-argument-h-43b3cd.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "An interactive model on Deductive vs Inductive Arguments (Philosophy, Logic and Critical Reasoning) for undergraduate courses, free on Ideas at Play."
@@ -527,6 +592,7 @@
    "slug": "truth-in-python-47c62f",
    "title": "Truth in Python",
    "v": 4,
+   "copy": "/assets/ideas-at-play/truth-in-python-47c62f.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "Prototype for CS50: a Python version of the CS350 Lesson 3 workbook Truth in R. Students write OR, AND and NOT in Python, see how parentheses change the order Python works out a sentence, build the…"
@@ -535,6 +601,7 @@
    "slug": "truth-in-r-b317c2",
    "title": "Truth in R",
    "v": 8,
+   "copy": "/assets/ideas-at-play/truth-in-r-b317c2.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "CS350 Lesson 3: a nine-cell R workbook for an introductory deductive-logic session. Students write OR, AND and NOT in R, see how parentheses change the order R works out a sentence, build the…"
@@ -543,6 +610,7 @@
    "slug": "turn-the-v-dial-district-13-one-page-013a09",
    "title": "Turn the V dial: District 13 (one page)",
    "v": 2,
+   "copy": "/assets/ideas-at-play/turn-the-v-dial-district-13-one-page-013a09.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "An interactive model on Synthetic Control Predictor Weights (Statistics, Causal inference) for graduate courses, free on Ideas at Play."
@@ -551,6 +619,7 @@
    "slug": "turn-the-v-dial-predictor-weights-in-synthetic-control-a8b0c3",
    "title": "Turn the V dial: predictor weights in synthetic control",
    "v": 9,
+   "copy": "/assets/ideas-at-play/turn-the-v-dial-predictor-weights-in-synthetic-control-a8b0c3.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "An interactive model on Predictor Weights V (Statistics, Causal inference) for graduate courses, free on Ideas at Play."
@@ -559,6 +628,7 @@
    "slug": "unconfoundedness-common-support-and-which-effect-you-want-1b87c6",
    "title": "Unconfoundedness, common support, and which effect you want",
    "v": 3,
+   "copy": "/assets/ideas-at-play/unconfoundedness-common-support-and-which-effect-you-want-1b87c6.html",
    "author": "Alex Korablev",
    "year": 2026,
    "about": "An interactive model on Unconfoundedness and Common Support (Statistics, Causal inference) for undergraduate courses, free on Ideas at Play."
@@ -567,6 +637,7 @@
    "slug": "what-is-truth-da88c0",
    "title": "What is Truth?",
    "v": 12,
+   "copy": "/assets/ideas-at-play/what-is-truth-da88c0.html",
    "author": "Alex Korablev",
    "year": 2026,
    "about": "A conceptual companion on logical sentences, tautologies, contradictions, consistency, and why R's == is not logical equivalence."
@@ -575,6 +646,7 @@
    "slug": "what-settles-and-what-doesnt-a34813",
    "title": "What Settles and What Doesn't",
    "v": 6,
+   "copy": "/assets/ideas-at-play/what-settles-and-what-doesnt-a34813.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "Flip a fair coin up to 10,000 times in 20 runs: the share of heads settles at 0.5 while the heads-minus-tails gap keeps growing, which is why the gambler's fallacy fails. Then a Cauchy running mean…"
@@ -583,6 +655,7 @@
    "slug": "which-effect-does-the-regression-estimate-controlling-for-a-c8eb87",
    "title": "Which Effect Does the Regression Estimate? Controlling for a confounder and the ATE, ATT and ATC",
    "v": 2,
+   "copy": "/assets/ideas-at-play/which-effect-does-the-regression-estimate-controlling-for-a-c8eb87.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "A hundred farmers, an irrigation pump, and the coefficient you get when you control for wealth: does the regression estimate the ATE, ATT or ATC? This revision makes every control shared state so…"
@@ -591,6 +664,7 @@
    "slug": "who-gets-cleaned-out-bd6a2d",
    "title": "Who Gets Cleaned Out?",
    "v": 7,
+   "copy": "/assets/ideas-at-play/who-gets-cleaned-out-bd6a2d.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "Students design, step by step and without code, the logic for removing controls who live with a treated person in an individually randomized experiment: choosing the essential column, building test…"
@@ -599,6 +673,7 @@
    "slug": "who-stops-the-spread-herd-immunity-in-a-virus-model-0e1932",
    "title": "Who Stops the Spread? Herd Immunity in a Virus Model",
    "v": 4,
+   "copy": "/assets/ideas-at-play/who-stops-the-spread-herd-immunity-in-a-virus-model-0e1932.html",
    "author": "Cheryl Moy",
    "year": 2026,
    "about": "Students predict how many people a measles-like virus infects when half the population is vaccinated, then run an agent-based contagion model and a coverage sweep. They find that the unvaccinated…"
@@ -607,6 +682,7 @@
    "slug": "who-took-the-hint-what-a-monitorability-score-can-and-cannot-16fe36",
    "title": "Who Took the Hint? What a monitorability score can and cannot see",
    "v": 9,
+   "copy": "/assets/ideas-at-play/who-took-the-hint-what-a-monitorability-score-can-and-cannot-16fe36.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "An AI model answers a quiz question with and without a hint. Comparing the two shows how many answers the hint changed, but not how often the model used the hint, and the usual monitorability score…"
@@ -615,6 +691,7 @@
    "slug": "who-voted-for-peace-sensitivity-analysis-in-colombia-0b0969",
    "title": "Who voted for peace? Sensitivity analysis in Colombia",
    "v": 16,
+   "copy": "/assets/ideas-at-play/who-voted-for-peace-sensitivity-analysis-in-colombia-0b0969.html",
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "An interactive model with coding exercises on Sensitivity Analysis (Statistics, Causal inference) for undergraduate courses, free on Ideas at Play."
@@ -623,6 +700,7 @@
    "slug": "why-95-finding-the-herd-immunity-threshold-for-measles-8744ce",
    "title": "Why 95%? Finding the Herd Immunity Threshold for Measles",
    "v": 12,
+   "copy": "/assets/ideas-at-play/why-95-finding-the-herd-immunity-threshold-for-measles-8744ce.html",
    "author": "Cheryl Moy",
    "year": 2026,
    "about": "Groups predict how much vaccination stops measles, then run a seeded 400-person outbreak model to see why the threshold depends on how many people one case infects. They compare measles with a…"

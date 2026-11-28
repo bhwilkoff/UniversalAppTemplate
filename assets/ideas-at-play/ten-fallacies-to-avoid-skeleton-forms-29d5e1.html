@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ten Fallacies to Avoid</title>
+<style>
+  :root{
+    box-sizing:border-box;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+    --bg:#f0ebe6; --card:#ffffff; --ink:#3c3732; --mute:#78736e; --faint:#e3dcd4;
+    --clay:#905112; --clay-soft:#f6ece1; --teal:#2e6f8e; --teal-soft:#e8f0f4;
+    --good:#3f6b4a; --good-soft:#e9f1eb; --bad:#8a3a3a; --bad-soft:#f6ebeb;
+    --shadow:0 1px 2px rgba(60,55,50,.07), 0 8px 24px rgba(60,55,50,.06);
+    color-scheme:light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#211f1d; --card:#2b2825; --ink:#ece7e1; --mute:#a9a29a; --faint:#3b3733;
+      --clay:#d79a52; --clay-soft:#3a2f23; --teal:#8fc0d6; --teal-soft:#24333a;
+      --good:#8dc39c; --good-soft:#26332a; --bad:#e09a9a; --bad-soft:#362626;
+      --shadow:none; color-scheme:dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#211f1d; --card:#2b2825; --ink:#ece7e1; --mute:#a9a29a; --faint:#3b3733;
+    --clay:#d79a52; --clay-soft:#3a2f23; --teal:#8fc0d6; --teal-soft:#24333a;
+    --good:#8dc39c; --good-soft:#26332a; --bad:#e09a9a; --bad-soft:#362626;
+    --shadow:none; color-scheme:dark;
+  }
+  *,*::before,*::after{box-sizing:inherit}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:16px/1.55 "Helvetica Neue",Helvetica,Arial,sans-serif}
+  .wrap{max-width:1060px;margin:0 auto;padding:28px 20px 72px}
+  .eyebrow{font-family:Georgia,"Times New Roman",serif;color:var(--clay);
+    letter-spacing:.14em;text-transform:uppercase;font-size:12px;margin:0 0 6px}
+  h1{font-family:Georgia,"Times New Roman",serif;font-weight:400;
+    font-size:clamp(26px,4.2vw,40px);line-height:1.15;margin:0 0 10px}
+  .lede{margin:0 0 22px;max-width:64ch;color:var(--mute)}
+  .card{background:var(--card);border-radius:14px;padding:20px 22px;
+    box-shadow:var(--shadow);margin-bottom:18px}
+  h2{font-family:Georgia,"Times New Roman",serif;font-weight:400;font-size:21px;margin:0 0 4px}
+  .sub{color:var(--mute);font-size:14px;margin:0 0 16px}
+  .hint{font-size:13px;color:var(--mute);margin:10px 0 0}
+
+  /* ---- prediction ---- */
+  .seg{display:inline-flex;border:1px solid var(--faint);border-radius:10px;overflow:hidden}
+  .seg button{appearance:none;border:0;background:transparent;color:var(--ink);
+    font:inherit;font-size:14px;padding:10px 18px;cursor:pointer}
+  .seg button + button{border-left:1px solid var(--faint)}
+  .seg button[aria-pressed="true"]{background:var(--teal);color:var(--card)}
+
+  /* ---- sorter ---- */
+  .bank{display:flex;flex-wrap:wrap;gap:12px;min-height:96px;padding:14px;
+    background:var(--bg);border:1px dashed var(--faint);border-radius:12px}
+  .bank.drop-ok,.zone.drop-ok{outline:2px solid var(--teal);outline-offset:2px}
+  .arg{
+    flex:1 1 280px;min-width:0;text-align:left;background:var(--card);
+    border:1px solid var(--faint);border-left:4px solid var(--clay);
+    border-radius:8px;padding:12px 14px;font:inherit;font-size:14px;color:var(--ink);
+    cursor:grab;box-shadow:var(--shadow)
+  }
+  .arg:active{cursor:grabbing}
+  .arg[aria-pressed="true"]{outline:2px solid var(--teal);outline-offset:2px;background:var(--teal-soft)}
+  .arg b{display:block;font-family:Georgia,"Times New Roman",serif;font-size:15px;margin-bottom:5px}
+  .arg var{font-family:Georgia,"Times New Roman",serif;font-weight:bold;color:var(--clay)}
+  .arg .fb{display:block;margin-top:9px;padding-top:9px;border-top:1px solid var(--faint);font-size:13px}
+  .arg.ok .fb{color:var(--good)} .arg.no .fb{color:var(--bad)} .arg.part .fb{color:var(--clay)}
+  .arg.ok{border-left-color:var(--good)} .arg.no{border-left-color:var(--bad)}
+  .zone .arg{flex:none}
+
+  .board{display:grid;gap:10px;margin-top:18px;grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
+  .zone{border:1px dashed var(--faint);border-radius:12px;padding:12px;background:var(--bg);
+    min-height:110px;display:flex;flex-direction:column;gap:10px}
+  .zone > .zl{font-family:Georgia,"Times New Roman",serif;font-size:16px;color:var(--ink)}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:16px}
+  .btn{appearance:none;border:1px solid var(--clay);background:transparent;color:var(--clay);
+    font:inherit;font-size:14px;padding:10px 18px;border-radius:999px;cursor:pointer}
+  .btn:hover{background:var(--clay);color:var(--card)}
+  .btn.ghost{border-color:var(--faint);color:var(--mute)}
+  .btn.ghost:hover{background:var(--faint);color:var(--ink)}
+  .btn:focus-visible,.arg:focus-visible,.zone:focus-visible,.seg button:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+
+  /* ---- reveal ---- */
+  .explain{margin-top:20px;padding:16px 18px;border-radius:12px;background:var(--teal-soft)}
+  .explain p{margin:0 0 10px;font-size:14.5px;max-width:72ch}
+  .explain p:last-child{margin-bottom:0}
+  .explain .xh{font-family:Georgia,"Times New Roman",serif;font-size:17px;margin-bottom:8px}
+
+  body.projector{font-size:24px}
+  body.projector .arg{font-size:20px}
+  body.projector .arg b,body.projector .zone > .zl{font-size:21px}
+  body.projector .sub,body.projector .hint,body.projector .explain p{font-size:20px}
+  body.projector .board{grid-template-columns:repeat(auto-fill,minmax(320px,1fr))}
+
+  footer{color:var(--mute);font-size:13px;margin-top:26px;display:flex;
+    justify-content:space-between;flex-wrap:wrap;gap:8px}
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  /* Instructor freeze: a small box in the lower left. */
+  .freeze{position:fixed;left:10px;bottom:10px;z-index:20;display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+    padding:6px 8px;border-radius:10px;background:var(--card);border:1px solid var(--faint);box-shadow:var(--shadow);
+    font-size:13px;color:var(--mute);max-width:calc(100vw - 80px)}
+  .freeze input{width:9em;font:inherit;padding:4px 6px;border:1px solid var(--faint);border-radius:6px;background:var(--bg);color:var(--ink)}
+  .freeze input[aria-invalid="true"]{border-color:var(--bad)}
+  .freeze button{font:inherit;padding:4px 10px;border-radius:6px;border:1px solid var(--faint);background:var(--bg);color:var(--ink);cursor:pointer}
+  .freeze-note{color:var(--ink);font-weight:600}
+  .freeze-note:empty{display:none}
+  html.frozen .wrap{opacity:.75;cursor:not-allowed}
+  body{padding-bottom:56px}
+  @media (prefers-reduced-motion: reduce){*{transition:none!important}}
+  .source{color:var(--mute);font-size:13px;margin:26px 0 0;max-width:72ch}
+  .source + footer{margin-top:8px}
+</style>
+</head>
+<body class="laptop">
+<div class="wrap">
+  <p class="eyebrow">CS350 · Fallacies · Ten to avoid</p>
+  <h1>Ten fallacies to avoid</h1>
+  <p class="lede">Ten skeleton arguments, with the letters left as blanks. Each one has the shape of a common fallacy: a flaw in how the premises support the conclusion. Sort them by shape alone — there is no content to lean on.</p>
+
+  <div class="card">
+    <h2>Before you sort: if an argument commits a fallacy, does that show its conclusion is false?</h2>
+    <p class="sub">Agree on an answer as a group.</p>
+    <div class="seg" role="group" aria-label="Your prediction">
+      <button type="button" id="guessYes" aria-pressed="false">Yes</button>
+      <button type="button" id="guessNo" aria-pressed="false">No</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Which fallacy is each argument?</h2>
+    <p class="sub">Drag a card, or tap it and then tap a fallacy. Each fallacy gets exactly one card.</p>
+
+    <div class="bank" id="bank" data-zone="bank"></div>
+    <div class="board" id="board"></div>
+
+    <div class="row">
+      <button class="btn" type="button" id="checkBtn">Check my sort</button>
+      <button class="btn ghost" type="button" id="resetBtn">Reset</button>
+      <span class="hint" id="sortStatus" style="margin:0"></span>
+    </div>
+
+    <div class="explain" id="reveal" hidden>
+      <p class="xh">A fallacy is a flaw in the support, not proof that the conclusion is false</p>
+      <p id="revealGuess"></p>
+      <p>In the words of the list these definitions come from: “A fallacious argument may nevertheless have a true conclusion; the defect lies in the inadequate reasoning offered in support of it.” Concluding that a claim is false because someone argued for it badly is itself on the list, as the <em>argument from fallacy</em>.</p>
+      <p>Several of these are damaged versions of good inductive forms. A hasty generalization is a generalization from too little; deferring to a title is the bad twin of a legitimate argument from expertise; post hoc mistakes a sequence in time for a causal inference. The shape alone rarely settles it: what matters is the evidence behind each premise.</p>
+      <p><strong>To discuss:</strong> pick one card and fill in its blanks with an argument whose conclusion is actually true. What would a better argument for the same conclusion look like?</p>
+    </div>
+  </div>
+
+  <p class="source">Definitions: Wikipedia contributors (2026). <cite>List of fallacies</cite>. In <cite>Wikipedia, The Free Encyclopedia</cite>. Retrieved 1 November 2026, from en.wikipedia.org/wiki/List_of_fallacies.</p>
+
+  <footer>
+    <span>Minerva University® · Professor Alexis Diamond</span>
+    <span>#fallacies</span>
+  </footer>
+</div>
+<div class="freeze" id="freezeBox" role="group" aria-label="Instructor freeze">
+  <span class="freeze-note" id="freezeNote"></span>
+  <span id="freezeForm">
+    <label class="sr" for="freezeCode">Instructor code</label>
+    <input id="freezeCode" type="password" autocomplete="off" placeholder="Instructor code">
+    <button type="button" id="freezeBtn">Freeze</button>
+  </span>
+  <button type="button" id="unfreezeBtn" hidden>Unfreeze</button>
+</div>
+<p class="sr" aria-live="polite" id="live"></p>
+
+<script>
+(function(){
+  var $ = function(s){ return document.querySelector(s); };
+  var $$ = function(s){ return Array.prototype.slice.call(document.querySelectorAll(s)); };
+
+  /* ---------------- content ----------------
+     The ten fallacies, each defined as on Wikipedia’s list, and one skeleton argument per fallacy. */
+  var TYPES = [
+    { id:'adhom',     name:'Ad hominem' },
+    { id:'straw',     name:'Straw man' },
+    { id:'dilemma',   name:'False dilemma' },
+    { id:'slope',     name:'Slippery slope' },
+    { id:'hasty',     name:'Hasty generalization' },
+    { id:'posthoc',   name:'Post hoc ergo propter hoc' },
+    { id:'authority', name:'Appeal to authority' },
+    { id:'circular',  name:'Circular reasoning' },
+    { id:'populum',   name:'Ad populum (bandwagon)' },
+    { id:'cherry',    name:'Cherry picking' }
+  ];
+  /* One skeleton per fallacy; blanks in <var>. No card or note uses a content word from any
+     fallacy's name (see the assertion), so the names can't be matched by vocabulary. */
+  var FORMS = {
+    adhom: { type:'adhom',
+      text:'<var>P</var> argues that <var>X</var>. <var>P</var> is dishonest, rude, or has a bad record. Therefore, <var>X</var> should be rejected.',
+      ok:'Right. The premises are about the person, not about X. Even a dishonest speaker can say something true; the case for X has to be judged on its own evidence.',
+      part:{ straw:'Close: both dodge the actual case. But nothing here distorts what P said; the attack lands on P personally.' },
+      other:'Look at what the second premise is about: the claim, or the one making it?' },
+    straw: { type:'straw',
+      text:'<var>P</var> holds <var>X</var>. <var>Q</var> describes <var>P</var> as holding <var>X+</var>, a more extreme claim <var>P</var> never made. <var>X+</var> is absurd. Therefore, <var>P</var> is wrong.',
+      ok:'Right. Q refutes a distorted version of the view, not the one P holds. Defeating X+ says nothing about X.',
+      part:{ adhom:'Close: both miss the actual case. But P is not attacked personally here; P’s view is rewritten into something easier to knock down.' },
+      other:'Compare X, which P holds, with X+, which Q attacks. Are they the same claim?' },
+    dilemma: { type:'dilemma',
+      text:'Either <var>X</var> or <var>Y</var>; no other option is mentioned. <var>Y</var> is unacceptable. Therefore, <var>X</var>.',
+      ok:'Right. The form itself is valid; the trouble is the first premise, which presents two options as the only ones when others exist.',
+      other:'Count the options the first premise allows. Are there really only that many?' },
+    slope: { type:'slope',
+      text:'If we allow <var>X</var>, then <var>Y</var> will follow, then <var>Z</var>, and in the end <var>W</var>, a disaster. Therefore, we must not allow <var>X</var>.',
+      ok:'Right. Each link in the chain is asserted, not shown. A chain is only as likely as all its links together, so the disaster is far less certain than the first step.',
+      part:{ posthoc:'Close: both claim that one thing leads to another. But this one predicts a chain of future events from a single first step.' },
+      other:'Follow the chain from X to W. Is any link supported, or only asserted?' },
+    hasty: { type:'hasty',
+      text:'A few members of group <var>G</var> that I happened to meet have property <var>Q</var>. Therefore, all members of <var>G</var> have property <var>Q</var>.',
+      ok:'Right. A broad conclusion rests on a small, unplanned sample. The same form with a large, representative sample would be a strong inductive argument.',
+      part:{ cherry:'Close: both rest on a poor base of evidence. But no contrary cases are being hidden here; the sample is simply too small and too haphazard.' },
+      other:'How many cases support the conclusion, and how were they found?' },
+    posthoc: { type:'posthoc',
+      text:'<var>X</var> happened. Then <var>Y</var> happened. Therefore, <var>X</var> made <var>Y</var> happen.',
+      ok:'Right. Order in time is the only evidence offered. Y may have followed X by coincidence, or both may share some third source.',
+      part:{ slope:'Close: both claim that one thing leads to another. But this one looks back at two events that have already happened.' },
+      other:'What is the only link between X and Y in the premises?' },
+    authority: { type:'authority',
+      text:'<var>P</var> holds an impressive title or a high position. <var>P</var> says <var>X</var>, a claim outside <var>P</var>’s field. Therefore, <var>X</var> is true.',
+      ok:'Right. The support for X is P’s standing, not P’s knowledge of the subject. Deferring to a genuine expert speaking within their field can be a strong inductive argument; deferring to status is not.',
+      part:{ populum:'Close: both trust who holds the view rather than the evidence. But here it is one impressive person, not a crowd.' },
+      other:'Why should we believe X? Look at what the premises say about P.' },
+    circular: { type:'circular',
+      text:'<var>X</var> is true because <var>Y</var>. And <var>Y</var> is true because <var>X</var>.',
+      ok:'Right. The conclusion is already assumed in the support offered for it, so the argument goes nowhere: anyone who doubts X is given no new grounds to accept it.',
+      other:'Trace the support back. Where does it end up?' },
+    populum: { type:'populum',
+      text:'Most people believe <var>X</var>, or are doing <var>X</var>. Therefore, <var>X</var> is true, or good.',
+      ok:'Right. A head count is offered in place of evidence. Many people can share a mistaken belief, and widespread practice does not make something good.',
+      part:{ authority:'Close: both rest on who holds the view rather than the evidence. But here it is a crowd, not one impressive person.' },
+      other:'What is the evidence for X: facts about X, or facts about the people who accept it?' },
+    cherry: { type:'cherry',
+      text:'Cases <var>A</var>, <var>B</var> and <var>C</var> support <var>X</var>. Cases <var>D</var> to <var>Z</var>, which count against <var>X</var>, go unmentioned. Therefore, <var>X</var>.',
+      ok:'Right. The evidence shown is real, but it was selected: the cases that cut the other way are left out. A fair argument weighs all the relevant cases.',
+      part:{ hasty:'Close: both rest on a poor base of evidence. But the problem here is not a small sample; contrary cases exist and are hidden.' },
+      other:'What happens to cases D to Z in this argument?' }
+  };
+  // Content words of the ten names (and their stems); none may appear on a card or in a note.
+  var NAME_WORDS = /\b(ad|hominem|straw|man|men|false\w*|dilemma\w*|slipper\w*|slope\w*|hast\w*|general\w*|post|hoc|ergo|propter|appeal\w*|authorit\w*|circular\w*|reason\w*|popul\w*|bandwagon\w*|cherr\w*|pick\w*)\b/i;
+  // Shuffled once, so the page never lists the arguments in the zones' order.
+  var CARDS = ['slope','circular','adhom','cherry','posthoc','straw','populum','dilemma','authority','hasty'];
+  var ZONES = ['bank'].concat(TYPES.map(function(t){ return t.id; }));
+
+  /* Build the cards and the seven zones from the content above. */
+  CARDS.forEach(function(id, i){
+    var b = document.createElement('button');
+    b.className = 'arg'; b.type = 'button'; b.id = id; b.draggable = true;
+    b.setAttribute('aria-pressed', 'false');
+    b.innerHTML = '<b>Argument ' + (i + 1) + '</b>' + FORMS[id].text;
+    $('#bank').appendChild(b);
+  });
+  TYPES.forEach(function(t){
+    var z = document.createElement('div');
+    z.className = 'zone'; z.tabIndex = 0; z.setAttribute('data-zone', t.id);
+    z.innerHTML = '<span class="zl">' + t.name + '</span>';
+    $('#board').appendChild(z);
+  });
+
+  /* ---------------- state ----------------
+     Everything a student can change, in one object (shared in breakouts). */
+  function emptyPlace(){ var p = {}; CARDS.forEach(function(id){ p[id] = 'bank'; }); return p; }
+  var state = { guess:'', place:emptyPlace(), selected:'', checked:false, said:'', frozenBy:'' };
+  var listeners = [];
+  function getState(){ return JSON.parse(JSON.stringify(state)); }
+  function notify(){ var s = getState(); listeners.forEach(function(fn){ try{ fn(s); }catch(e){} }); }
+  function change(patch, msg){
+    // The announcement is shared too, so a teammate's screen reader hears the same thing.
+    patch.said = msg || '';
+    Object.keys(patch).forEach(function(k){ state[k] = patch[k]; });
+    render(); notify();
+  }
+
+  function cardName(id){ return 'Argument ' + (CARDS.indexOf(id) + 1); }
+  function typeName(z){ for(var i = 0; i < TYPES.length; i++) if(TYPES[i].id === z) return TYPES[i].name; return 'the bank'; }
+  function zoneEl(z){ return document.querySelector('[data-zone="' + z + '"]'); }
+
+  function place(id, z){
+    if(CARDS.indexOf(id) < 0 || ZONES.indexOf(z) < 0) return;
+    var p = JSON.parse(JSON.stringify(state.place)); p[id] = z;
+    change({ place:p, selected:'', checked:false }, cardName(id) + ' placed in ' + typeName(z) + '.');
+  }
+
+  /* What "Check my sort" says about one card in one zone (null: still in the bank). */
+  function feedbackFor(id, z){
+    if(z === 'bank') return null;
+    var f = FORMS[id];
+    if(f.type === z) return { cls:'ok', text:f.ok };
+    if(f.part && f.part[z]) return { cls:'part', text:f.part[z] };
+    return { cls:'no', text:f.other };
+  }
+
+  function renderSort(){
+    // Cards sit in their zones in a fixed order; only moved when needed (keeps focus).
+    ZONES.forEach(function(z){
+      var el = zoneEl(z);
+      var want = CARDS.filter(function(id){ return state.place[id] === z; });
+      var have = Array.prototype.filter.call(el.children, function(c){ return c.classList.contains('arg'); }).map(function(c){ return c.id; });
+      if(want.join() !== have.join()) want.forEach(function(id){ el.appendChild(document.getElementById(id)); });
+    });
+    var unplaced = 0, right = 0;
+    CARDS.forEach(function(id){
+      var card = document.getElementById(id);
+      card.setAttribute('aria-pressed', state.selected === id ? 'true' : 'false');
+      card.classList.remove('ok','no','part');
+      var old = card.querySelector('.fb'); if(old) old.remove();
+      if(state.place[id] === 'bank') unplaced++;
+      if(!state.checked) return;
+      var f = feedbackFor(id, state.place[id]);
+      if(!f) return;
+      if(f.cls === 'ok') right++;
+      card.classList.add(f.cls);
+      var fb = document.createElement('span'); fb.className = 'fb'; fb.textContent = f.text;
+      card.appendChild(fb);
+    });
+    var done = state.checked && !unplaced;
+    $('#sortStatus').textContent = !state.checked ? (CARDS.length - unplaced) + ' of ' + CARDS.length + ' placed.'
+      : unplaced ? unplaced + ' still in the bank — place them all for full feedback.'
+      : right + ' of ' + CARDS.length + ' match the intended fallacy. Read the note on each card.';
+    $('#reveal').hidden = !done;
+    $('#revealGuess').textContent = !state.guess ? 'You did not record a prediction.'
+      : state.guess === 'yes' ? 'You predicted that a fallacy shows the conclusion is false. It does not — and that inference is itself a fallacy.'
+      : 'You predicted that a fallacy does not show the conclusion is false. That is right.';
+  }
+
+  function renderGuess(){
+    $('#guessYes').setAttribute('aria-pressed', state.guess === 'yes' ? 'true' : 'false');
+    $('#guessNo').setAttribute('aria-pressed', state.guess === 'no' ? 'true' : 'false');
+  }
+
+  /* drag and drop */
+  $$('.arg').forEach(function(card){
+    card.addEventListener('dragstart', function(e){
+      e.dataTransfer.setData('text/plain', card.id);
+      e.dataTransfer.effectAllowed = 'move';
+    });
+  });
+  $$('[data-zone]').forEach(function(zone){
+    zone.addEventListener('dragover', function(e){
+      e.preventDefault(); e.dataTransfer.dropEffect = 'move';
+      zone.classList.add('drop-ok');
+    });
+    zone.addEventListener('dragleave', function(){ zone.classList.remove('drop-ok'); });
+    zone.addEventListener('drop', function(e){
+      e.preventDefault(); zone.classList.remove('drop-ok');
+      var z = (e.target.closest('[data-zone]') || zone).getAttribute('data-zone');
+      place(e.dataTransfer.getData('text/plain'), z);
+    });
+  });
+
+  /* tap / keyboard path — works where drag does not */
+  $$('.arg').forEach(function(card){
+    card.addEventListener('click', function(e){
+      e.stopPropagation();
+      if(state.selected === card.id) change({ selected:'' }, 'Selection cleared.');
+      else change({ selected:card.id }, cardName(card.id) + ' selected. Now choose a fallacy.');
+    });
+  });
+  $$('[data-zone]').forEach(function(zone){
+    function take(){ if(state.selected) place(state.selected, zone.getAttribute('data-zone')); }
+    zone.addEventListener('click', take);
+    zone.addEventListener('keydown', function(e){
+      if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); take(); }
+    });
+  });
+
+  $('#guessYes').addEventListener('click', function(){ change({ guess:'yes' }, 'Prediction recorded: yes.'); });
+  $('#guessNo').addEventListener('click', function(){ change({ guess:'no' }, 'Prediction recorded: no.'); });
+  $('#checkBtn').addEventListener('click', function(){ change({ checked:true }, 'Feedback shown.'); });
+  $('#resetBtn').addEventListener('click', function(){
+    change({ place:emptyPlace(), selected:'', checked:false }, 'Reset.');
+  });
+
+  function render(){ renderGuess(); renderSort(); renderFreeze(); $('#live').textContent = state.said; }
+
+  function clean(k, v){
+    if(k === 'frozenBy') return typeof v === 'string' ? v.slice(0, 16) : undefined;
+    if(k === 'guess') return v === '' || v === 'yes' || v === 'no' ? v : undefined;
+    if(k === 'place'){
+      if(!v || typeof v !== 'object') return undefined;
+      var p = {}; CARDS.forEach(function(id){ p[id] = ZONES.indexOf(v[id]) > -1 ? v[id] : 'bank'; }); return p;
+    }
+    if(k === 'selected') return v === '' || CARDS.indexOf(v) > -1 ? v : undefined;
+    if(k === 'said') return typeof v === 'string' ? v.slice(0, 200) : undefined;
+    if(k === 'checked') return typeof v === 'boolean' ? v : undefined;
+  }
+
+  /* ---------------- instructor freeze ---------------- */
+  // Typing the course code freezes the page for everyone else in the room. frozenBy is
+  // shared; ME belongs to this screen only, so the instructor's own screen stays live.
+  // Entering the code again (say, after a reload) hands the freeze to this screen.
+  var FREEZE_CODE = 'CS350';
+  var ME = Math.random().toString(36).slice(2, 10);
+  function renderFreeze(){
+    var mine = state.frozenBy !== '' && state.frozenBy === ME;
+    var held = state.frozenBy !== '' && !mine;
+    document.getElementById('freezeNote').textContent = mine ? 'Frozen for your room.' : held ? 'Paused by your professor.' : '';
+    document.getElementById('freezeForm').hidden = mine;
+    document.getElementById('unfreezeBtn').hidden = !mine;
+    document.querySelector('.wrap').inert = held;
+    document.documentElement.classList.toggle('frozen', held);
+  }
+  // The platform's sandbox blocks form submission, so Enter and the button call this directly.
+  function tryFreeze(){
+    var box = document.getElementById('freezeCode'), typed = box.value.trim();
+    if(!typed) return;
+    box.value = '';
+    var ok = typed.toUpperCase() === FREEZE_CODE;
+    box.setAttribute('aria-invalid', ok ? 'false' : 'true');
+    if(ok) change({ frozenBy: ME }, 'Your professor paused the page.');
+  }
+  document.getElementById('freezeCode').addEventListener('keydown', function(e){ if(e.key === 'Enter'){ e.preventDefault(); tryFreeze(); } });
+  document.getElementById('freezeBtn').addEventListener('click', tryFreeze);
+  document.getElementById('unfreezeBtn').addEventListener('click', function(){ change({ frozenBy: '' }, 'Your professor unpaused the page.'); });
+
+  window.artifact = {
+    getState: getState,
+    // Merge and redraw; ignores unknown keys and never fires onChange.
+    setState: function(p){
+      Object.keys(p || {}).forEach(function(k){
+        if(!Object.prototype.hasOwnProperty.call(state, k)) return;
+        var v = clean(k, p[k]); if(v !== undefined) state[k] = v;
+      });
+      render();
+    },
+    onChange: function(fn){ listeners.push(fn); return function(){ listeners = listeners.filter(function(x){ return x !== fn; }); }; },
+    controls: [
+      { key:'guess', label:'Prediction: does a fallacy show that the conclusion is false?', kind:'choice', options:[{ value:'', label:'Not answered' }, { value:'yes', label:'Yes' }, { value:'no', label:'No' }] },
+      { key:'place', label:'Where each argument is sorted', kind:'choice', options:ZONES.map(function(z){ return { value:z, label: z === 'bank' ? 'Not placed yet' : typeName(z) }; }) },
+      { key:'checked', label:'Check my sort', kind:'toggle' }
+    ],
+    responses: [],
+    assertions: [
+      { name:'Each of the ten fallacies is the answer for exactly one card', run:function(){ return TYPES.every(function(t){ return CARDS.filter(function(id){ return FORMS[id].type === t.id; }).length === 1; }) && CARDS.length === TYPES.length; } },
+      { name:'Every card in every zone gets non-empty feedback (no dead ends)', run:function(){ return CARDS.every(function(id){ return TYPES.every(function(t){ var f = feedbackFor(id, t.id); return f && f.text.length > 20; }) && feedbackFor(id, 'bank') === null; }); } },
+      { name:'Exactly one zone counts as right for each card', run:function(){ return CARDS.every(function(id){ return TYPES.filter(function(t){ return feedbackFor(id, t.id).cls === 'ok'; }).length === 1; }); } },
+      { name:'No card or note repeats a content word from any fallacy’s name', run:function(){ return CARDS.every(function(id){ var f = FORMS[id], texts = [f.text.replace(/<[^>]+>/g, ''), f.ok, f.other].concat(Object.keys(f.part || {}).map(function(k){ return f.part[k]; })); return texts.every(function(t){ return !NAME_WORDS.test(t); }); }); } },
+      { name:'Partial credit runs both ways for each close pair', run:function(){ return CARDS.every(function(id){ return Object.keys(FORMS[id].part || {}).every(function(z){ return FORMS[z].part && FORMS[z].part[id]; }); }); } },
+      { name:'Every card keeps at least one blank', run:function(){ return CARDS.every(function(id){ return /<var>/.test(FORMS[id].text); }); } }
+    ],
+    referenceCases: []
+  };
+
+  render();
+})();
+</script>
+
+<script>
+(function () {
+  var cfg = {"versionId":"cmvxwmmbh000107jt8rq1zlxb","appOrigin":"https://ideasatplay.org","direct":null};
+  var t0 = Date.now(), scrolled = false, acted = false, reached = false, shown = false, config = null;
+  var framed = parent !== window;
+  function onScreen(el) {
+    if (!el.getClientRects().length) return false;
+    var r = el.getBoundingClientRect();
+    return r.top < innerHeight && r.bottom > 0;
+  }
+  function atBottom() {
+    var f = document.querySelector("footer[data-kc-credit]");
+    if (f) return f.getBoundingClientRect().top <= innerHeight;
+    var d = document.documentElement;
+    return scrollY + innerHeight >= d.scrollHeight - 48;
+  }
+  // { cur, last } when the page moves through numbered steps, else null.
+  function steps() {
+    var a = window.artifact;
+    try {
+      var c = a && Array.isArray(a.controls) ? a.controls.filter(function (x) { return x && x.key === "step" && typeof x.max === "number"; })[0] : null;
+      if (c) { var s = a.getState(); if (s && typeof s.step === "number") return { cur: s.step, last: c.max }; }
+    } catch (e) {}
+    var cur = document.querySelector('[aria-current="step"]');
+    if (cur && cur.parentElement) {
+      var sib = Array.prototype.filter.call(cur.parentElement.children, function (x) { return x.getClientRects().length; });
+      return { cur: sib.indexOf(cur), last: sib.length - 1 };
+    }
+    return null;
+  }
+  function finished() {
+    var mark = document.querySelector("[data-kc-end]");
+    if (mark) return onScreen(mark);
+    var s = steps();
+    if (s) return s.cur >= s.last && atBottom();
+    return atBottom() && (scrolled || (acted && Date.now() - t0 > 60000));
+  }
+  // The student link remembers a rating in its own storage where the browser allows it.
+  var KEY = "kc-rated-" + cfg.versionId;
+  function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
+  if (cfg.direct) config = { ask: !store(KEY), preview: false, labels: cfg.direct.labels };
+  var visitor = (function () {
+    var v = store("kc-visitor");
+    if (!v) { v = ""; for (var i = 0; i < 24; i++) v += "abcdefghijklmnopqrstuvwxyz0123456789".charAt(Math.floor(Math.random() * 36)); store("kc-visitor", v); }
+    return v;
+  })();
+  var pending = {}, seq = 0;
+  function save(score, comment) {
+    if (cfg.direct) {
+      var body = { versionId: cfg.versionId, score: score, context: "share", visitor: visitor };
+      if (comment) body.comment = comment;
+      // text/plain: a simple request, so no preflight is needed.
+      return fetch(cfg.direct.endpoint, { method: "POST", credentials: "omit", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(body) })
+        .then(function (r) { if (r.ok) store(KEY, String(score)); return r.ok; }, function () { return false; });
+    }
+    return new Promise(function (resolve) {
+      var id = ++seq; pending[id] = resolve;
+      parent.postMessage({ type: "kc:rate", versionId: cfg.versionId, id: id, score: score, comment: comment || "" }, cfg.appOrigin);
+      setTimeout(function () { if (pending[id]) { delete pending[id]; resolve(false); } }, 15000);
+    });
+  }
+  var B = "display:inline-block;margin:3px 6px 3px 0;padding:4px 10px;border:1px solid #a8a29e;border-radius:6px;background:#fff;color:#1c1917;font:inherit;cursor:pointer";
+  function el(tag, attrs, text) { var e = document.createElement(tag); for (var k in attrs) e.setAttribute(k, attrs[k]); if (text) e.textContent = text; return e; }
+  function show() {
+    if (shown || !config || !config.ask) return;
+    shown = true;
+    clearInterval(timer);
+    var L = config.labels;
+    var box = el("div", { "data-kc-rating": "", "data-kc-personal": "", role: "region", "aria-label": L.ask, lang: L.lang, dir: L.dir,
+      style: "box-sizing:border-box;max-width:760px;margin:24px auto 0;padding:10px 14px;border:1px solid #d6d3d1;border-radius:10px;background:#fafaf9;color:#1c1917;font:14px/1.5 system-ui,-apple-system,sans-serif;text-align:start" });
+    var live = el("div", { "aria-live": "polite" });
+    box.appendChild(live);
+    function ask(msg) {
+      live.innerHTML = "";
+      live.appendChild(el("span", { style: "font-weight:600;margin-inline-end:8px" }, L.ask));
+      [1, 2, 3].forEach(function (s) {
+        var b = el("button", { type: "button", style: B }, s + " · " + L["s" + s]);
+        b.addEventListener("click", function () {
+          live.querySelectorAll("button").forEach(function (x) { x.disabled = true; });
+          save(s, "").then(function (ok) { if (ok) comment(s); else ask(L.error); });
+        });
+        live.appendChild(b);
+      });
+      if (config.preview) live.appendChild(el("div", { style: "font-size:12px;color:#57534e" }, L.preview));
+      if (msg) live.appendChild(el("div", { role: "alert", style: "color:#991b1b;font-size:13px" }, msg));
+    }
+    function comment(score) {
+      live.innerHTML = "";
+      var id = "kc-rate-comment";
+      live.appendChild(el("label", { for: id, style: "display:block;font-weight:600;margin-bottom:4px" }, L.comment));
+      var row = el("div", { style: "display:flex;flex-wrap:wrap;gap:6px;align-items:center" });
+      var input = el("input", { id: id, type: "text", maxlength: "1000", autocomplete: "off", dir: "auto",
+        style: "flex:1 1 260px;min-width:0;box-sizing:border-box;padding:5px 8px;border:1px solid #a8a29e;border-radius:6px;background:#fff;color:#1c1917;font:inherit" });
+      var send = el("button", { type: "button", style: B + ";background:#292524;color:#fff;border-color:#292524" }, L.send);
+      var skip = el("button", { type: "button", style: B }, L.skip);
+      function done() { live.innerHTML = ""; live.appendChild(el("span", { style: "font-weight:600" }, L.thanks)); setTimeout(function () { box.remove(); }, 2000); }
+      send.addEventListener("click", function () {
+        var text = input.value.trim();
+        if (!text) return done();
+        send.disabled = skip.disabled = true;
+        save(score, text).then(function (ok) { if (ok) done(); else { send.disabled = skip.disabled = false; live.appendChild(el("div", { role: "alert", style: "color:#991b1b;font-size:13px" }, L.error)); } });
+      });
+      input.addEventListener("keydown", function (e) { if (e.key === "Enter") send.click(); });
+      skip.addEventListener("click", done);
+      row.appendChild(input); row.appendChild(send); row.appendChild(skip);
+      live.appendChild(row);
+      input.focus();
+    }
+    ask("");
+    var mark = document.querySelector("[data-kc-end]"), foot = document.querySelector("footer[data-kc-credit]");
+    if (mark) mark.insertAdjacentElement("afterend", box);
+    else if (foot) foot.parentNode.insertBefore(box, foot);
+    else document.body.appendChild(box);
+  }
+  function check() {
+    if (!reached && finished()) reached = true;
+    if (reached) show();
+  }
+  window.addEventListener("message", function (e) {
+    if (e.source !== parent || !e.data || e.data.versionId !== cfg.versionId) return;
+    var d = e.data;
+    if (d.type === "kc:rate-config" && !cfg.direct) { config = { ask: !!d.ask, preview: !!d.preview, labels: d.labels }; check(); }
+    if (d.type === "kc:rate-result" && pending[d.id]) { pending[d.id](!!d.ok); delete pending[d.id]; }
+  });
+  // The app page may start listening after this page loads: ask a few times.
+  var hellos = 0;
+  function hello() { if (framed && !cfg.direct && !config && hellos++ < 8) parent.postMessage({ type: "kc:rate-hello", versionId: cfg.versionId }, cfg.appOrigin); }
+  hello();
+  var timer = setInterval(function () { if (hellos < 8 && !config) hello(); check(); }, 800);
+  window.addEventListener("scroll", function () { if (scrollY > 0) scrolled = true; check(); }, { passive: true });
+  ["click", "input", "keydown"].forEach(function (t) { document.addEventListener(t, function (e) { if (e.target && e.target.closest && e.target.closest("[data-kc-rating]")) return; acted = true; setTimeout(check, 50); }, true); });
+})();
+</script></body>
+</html>

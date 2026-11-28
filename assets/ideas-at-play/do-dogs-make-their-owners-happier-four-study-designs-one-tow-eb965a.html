@@ -1,0 +1,743 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Do dogs make their owners happier? Four study designs, one town</title>
+<style>
+:root{
+  --bg:#fbfaf7;--card:#ffffff;--ink:#22252a;--muted:#5b626d;--rule:#d6d2ca;--faint:#efece6;
+  --accent:#2E4057;--warm:#b4480a;--fur:#c8915a;--fur2:#8a5a33;
+}
+@media (prefers-color-scheme: dark){
+  :root{--bg:#16181c;--card:#1f2228;--ink:#ece9e3;--muted:#a9afb8;--rule:#3b4048;--faint:#2a2e35;--accent:#9dbfe3;--warm:#ffa366;--fur:#d9a56c;--fur2:#a9713f;}
+}
+*{box-sizing:border-box}
+[hidden]{display:none !important}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+main{max-width:1100px;margin:0 auto;padding:12px 20px 30px}
+h1{font-size:1.3rem;line-height:1.25;margin:0;font-weight:650}
+.topbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+button{font:inherit;font-size:14px;min-height:30px;padding:4px 11px;border:1px solid var(--rule);border-radius:8px;background:var(--card);color:var(--ink);cursor:pointer}
+button:hover:not(:disabled){border-color:var(--muted)}
+button[aria-pressed="true"],button[aria-current="step"]{background:var(--accent);color:var(--card);border-color:var(--accent)}
+button.primary{background:var(--accent);color:var(--card);border-color:var(--accent)}
+button:disabled{opacity:.45;cursor:default}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.seg{display:inline-flex;flex-wrap:wrap;border:1px solid var(--rule);border-radius:8px;overflow:hidden}
+.seg button{border:0;border-radius:0;border-inline-end:1px solid var(--rule)}
+.seg button:last-child{border-inline-end:0}
+.stepbar{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.stepbar button{font-size:13px}
+.card{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:12px 20px 14px}
+.stepnum{font-size:13px;color:var(--muted);margin:0}
+#stepH{font-size:1.2rem;margin:.1em 0 .25em}
+.hint{margin:0 0 .6em;max-width:82ch}
+.hint:empty{display:none}
+.note{font-size:13px;color:var(--muted)}
+.work{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:24px;align-items:start}
+@media (max-width:820px){.work{grid-template-columns:minmax(0,1fr)}}
+.intro{display:grid;grid-template-columns:200px minmax(0,1fr);gap:24px;align-items:center}
+@media (max-width:620px){.intro{grid-template-columns:minmax(0,1fr)}}
+.dogart{width:100%;max-width:200px}
+.hyp{font-family:Georgia,"Iowan Old Style","Times New Roman",serif;font-size:1.25rem;line-height:1.35;margin:.2em 0 .5em}
+.q{margin:.5em 0 .25em;font-weight:600}
+.choices{display:flex;flex-wrap:wrap;gap:6px}
+.fb{margin:.35em 0 0;font-size:14px}
+.box{border-inline-start:3px solid var(--accent);padding:6px 12px;margin:.6em 0 0;background:var(--faint);border-radius:0 8px 8px 0;font-size:14.5px}
+.box p{margin:.25em 0}
+.verdict{font-weight:700}
+/* people grids */
+.panels{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.panel h3{font-size:14px;margin:0 0 4px;display:flex;align-items:center;gap:6px;font-weight:600}
+.panel h3 svg{width:26px;height:22px;flex:none}
+.grid{display:flex;flex-wrap:wrap;gap:3px}
+.c{width:13px;height:13px;border-radius:50%;border:2px solid var(--accent);display:inline-block}
+.c.s{background:var(--accent)}
+.c.dim{opacity:.16}
+.c.wait{border-color:var(--rule);border-style:dashed}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12.5px;color:var(--muted);margin:.5em 0 0}
+.legend .c{width:11px;height:11px;vertical-align:-1px;margin-inline-end:4px}
+.strip{position:relative;height:64px;border-bottom:1px solid var(--rule);margin:4px 0 2px}
+.strip .c{position:absolute;width:11px;height:11px;margin-left:-5.5px}
+.strip .mean{position:absolute;top:0;bottom:-4px;border-inline-start:2px dashed var(--ink)}
+.axis{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
+.lens{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:.7em;font-size:14px}
+.ctlrow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:.4em 0}
+.toggle{display:flex;align-items:center;gap:8px;font-size:14px;margin:.25em 0}
+table{border-collapse:collapse;width:100%;font-size:14px;border-top:1.5px solid var(--ink);border-bottom:1.5px solid var(--ink);margin:.3em 0}
+th,td{padding:4px 8px;text-align:start;vertical-align:top}
+thead th{border-bottom:1px solid var(--ink);font-weight:600}
+td.num,th.num{text-align:end;font-variant-numeric:tabular-nums;white-space:nowrap}
+textarea{width:100%;font:inherit;font-size:14px;padding:6px 8px;border:1px solid var(--rule);border-radius:6px;background:var(--bg);color:var(--ink)}
+label.big{display:block;font-weight:600;margin:.6em 0 .2em}
+.moves{display:flex;justify-content:space-between;gap:8px;margin-top:10px}
+details{margin-top:14px;font-size:14px}
+details ul{margin:.4em 0;padding-inline-start:1.2em;max-width:80ch}
+.kind{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-inline-end:6px}
+body.projector{font-size:22px}
+body.projector main{max-width:1700px}
+body.projector h1{font-size:2.1rem}
+body.projector #stepH{font-size:1.7rem}
+body.projector button,body.projector table,body.projector .toggle,body.projector .lens,body.projector .box,body.projector .fb{font-size:19px}
+body.projector .note,body.projector .stepnum,body.projector .legend,body.projector .axis{font-size:17px}
+body.projector .panel h3{font-size:19px}
+body.projector .c{width:18px;height:18px}
+body.projector .hyp{font-size:1.6rem}
+body.projector .dogart{max-width:280px}
+body.projector .intro{grid-template-columns:280px minmax(0,1fr)}
+@media (prefers-reduced-motion:no-preference){.c{transition:opacity .2s,background .2s}}
+</style>
+</head>
+<body class="laptop">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="dog" viewBox="0 0 120 100">
+    <path d="M24 64 C10 56 8 40 16 30" fill="none" stroke="var(--fur2)" stroke-width="6" stroke-linecap="round"/>
+    <ellipse cx="44" cy="66" rx="27" ry="18" fill="var(--fur)"/>
+    <ellipse cx="30" cy="80" rx="13" ry="10" fill="var(--fur)"/>
+    <rect x="22" y="84" width="16" height="7" rx="3.5" fill="var(--fur2)"/>
+    <rect x="52" y="60" width="9" height="30" rx="4" fill="var(--fur)"/>
+    <rect x="62" y="58" width="9" height="32" rx="4" fill="var(--fur)"/>
+    <rect x="50" y="86" width="12" height="6" rx="3" fill="var(--fur2)"/>
+    <rect x="60" y="86" width="13" height="6" rx="3" fill="var(--fur2)"/>
+    <path d="M56 50 Q66 58 78 50" fill="none" stroke="var(--accent)" stroke-width="5" stroke-linecap="round"/>
+    <circle cx="70" cy="36" r="18" fill="var(--fur)"/>
+    <ellipse cx="88" cy="43" rx="12" ry="8.5" fill="var(--fur)"/>
+    <circle cx="99" cy="40" r="3.6" fill="var(--ink)"/>
+    <path d="M86 49 Q91 54 97 49" fill="none" stroke="var(--ink)" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="76" cy="31" r="2.6" fill="var(--ink)"/>
+    <path d="M60 22 C50 24 49 42 54 50 C60 46 66 34 65 23 Z" fill="var(--fur2)"/>
+  </symbol>
+</svg>
+<main>
+  <div class="topbar">
+    <h1>Do dogs make their owners happier?</h1>
+    <div class="seg" role="group" aria-label="Text size">
+      <button type="button" id="scLaptop" aria-pressed="true">Laptop</button>
+      <button type="button" id="scProj" aria-pressed="false">Projector</button>
+    </div>
+  </div>
+  <nav class="stepbar" id="stepbar" aria-label="Steps"></nav>
+  <section class="card" aria-labelledby="stepH">
+    <p class="stepnum" id="stepNum"></p>
+    <h2 id="stepH" tabindex="-1"></h2>
+    <p class="hint" id="stepHint"></p>
+
+    <!-- 0 Intro -->
+    <div id="v0" hidden>
+      <div class="intro">
+        <svg class="dogart" viewBox="0 0 120 100" role="img" aria-label="A drawing of a smiling dog sitting down"><use href="#dog"/></svg>
+        <div>
+          <p class="hyp">H: Dogs cause an increase in their owner's happiness because of the positive psychological effects of the relationship.</p>
+          <p>This town has 400 people, and some of them own a dog. The question is about <strong>owning</strong> one: having a dog of your own, living with it and caring for it. Being near a dog doesn't count: petting a stranger's dog, passing one in the park or walking one for money is not the same as owning it.</p>
+          <p>The town has a hidden answer: here, owning a dog raises a person's happiness by <em>nothing</em>, <em>a little</em> or <em>a lot</em>. You will run four studies and decide which ones you can trust. As you go, ask whether each study measures what <strong>owning</strong> a dog does, or only what being near one does.</p>
+          <p class="q" id="trustQ">Before you start: which kind of study do you expect to get closest to the truth?</p>
+          <div class="choices" role="group" aria-labelledby="trustQ" id="trustChoices"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1–4 Studies -->
+    <div id="vStudy" hidden>
+      <div class="work">
+        <div id="vis" aria-live="off"></div>
+        <div>
+          <p class="q" id="clsQ">Is this study observational or interventional?</p>
+          <div class="choices" role="group" aria-labelledby="clsQ">
+            <button type="button" data-cls="obs" aria-pressed="false">Observational</button>
+            <button type="button" data-cls="int" aria-pressed="false">Interventional</button>
+          </div>
+          <p class="fb" id="clsFb"></p>
+          <div id="runBox"></div>
+          <div class="box" id="result" aria-live="polite" hidden></div>
+          <div class="lens" id="lensRow" hidden><span>Look under the hood:</span><span id="lensBtns" class="choices"></span></div>
+          <p class="fb" id="lensFb"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5 Scoreboard -->
+    <div id="v5" hidden>
+      <table>
+        <thead><tr><th>Study</th><th>Your call</th><th>What it found</th><th>Verdict</th><th id="truthH" hidden>Measures owners' happiness?</th></tr></thead>
+        <tbody id="board"></tbody>
+      </table>
+      <div class="ctlrow">
+        <button type="button" class="primary" id="revealBtn">Reveal this town's truth</button>
+        <button type="button" id="batchBtn" hidden>Run all four studies in 30 more towns</button>
+        <button type="button" id="newTown">Move to a new town</button>
+      </div>
+      <div class="box" id="truthBox" hidden></div>
+      <div id="batchBox" hidden></div>
+    </div>
+
+    <!-- 6 Reflect -->
+    <div id="v6" hidden>
+      <label class="big" for="ansAlt">Pick one study. Which alternative explanation could it not rule out?</label>
+      <textarea id="ansAlt" rows="3" maxlength="1500"></textarea>
+      <label class="big" for="ansFix">How would you change that study so it could rule the explanation out?</label>
+      <textarea id="ansFix" rows="3" maxlength="1500"></textarea>
+      <p class="note">One answer per group: everyone in your session edits the same boxes.</p>
+    </div>
+
+    <div class="moves">
+      <button type="button" id="prevStep">← Previous</button>
+      <button type="button" class="primary" id="nextStep">Next →</button>
+    </div>
+  </section>
+  <details>
+    <summary>How this town works</summary>
+    <ul id="ledger"></ul>
+    <p class="note">Left out: anything beyond these four studies, ethics and cost of each design, and how happiness itself is measured.</p>
+  </details>
+</main>
+<script>
+(function(){
+'use strict';
+var LEDGER = [
+  ['simplification', 'Each person has a happiness score: 50 + 8 × how cheerful they already are + the dog effect if they own a dog + noise. The dog effect is 0, 5 or 10 points, picked at random for each town and hidden until the scoreboard.'],
+  ['distribution', 'Already-cheerful people are more likely to own a dog (about 53% of owners are in the most cheerful third, against 27% of non-owners). This is the alternative explanation built into the town.'],
+  ['simplification', 'Whether someone smiles depends on their happiness, on a dog being beside them at that moment, and on a funny podcast (20% of people). The last two have nothing to do with owning a dog.'],
+  ['parameter', 'Study 1: 60 passers-by per evening; owners are in the park more often, and 8% of non-owners pass with a dog they walk for money. Study 2: 50 owners and 50 non-owners; oxytocin rises one unit per happiness point, plus noise. Study 3: 120 strangers, coin-flip assignment. Study 4: 100 people about to adopt (more cheerful than average), coin-flip assignment, happiness change over five months.'],
+  ['interpretation', '"Difference found" means the gap is more than twice its standard error (roughly p < 0.05). "No clear difference" does not mean there is no effect.'],
+  ['parameter', 'Optional twists in study 4: new-puppy excitement adds 4 points to adopters; frustration at waiting takes 3 points from those who wait.'],
+  ['data', 'The four study designs are the lesson plan\'s scenarios; the town and every number in it are simulated, not data.']
+];
+// The dog-town model (pure, seeded). Shared by the page and the tuning script.
+function rng(seed){ var a = seed >>> 0; return function(){ a = (a + 0x6D2B79F5) >>> 0; var t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+function gauss(r){ var u = 1 - r(), v = r(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); }
+function sig(x){ return 1 / (1 + Math.exp(-x)); }
+var POP = 400, EFFECTS = [0, 5, 10], CHEERFUL = 0.43;
+function makeTown(seed){
+  var r = rng(seed * 7919 + 1), effect = EFFECTS[Math.floor(r() * 3)], people = [];
+  for(var i = 0; i < POP; i++){
+    var cheer = gauss(r), dog = r() < sig(-0.5 + 0.9 * cheer), podcast = r() < 0.2;
+    people.push({ cheer: cheer, cheerful: cheer > CHEERFUL, dog: dog, podcast: podcast, H: 50 + 8 * cheer + effect * (dog ? 1 : 0) + 5 * gauss(r) });
+  }
+  return { seed: seed, effect: effect, people: people };
+}
+// Smiling right now: happiness, a dog beside you this moment, and a funny podcast.
+function smileP(H, dogHere, podcast){ return sig(-1.3 + 0.08 * (H - 50) + 1.2 * (dogHere ? 1 : 0) + 1.3 * (podcast ? 1 : 0)); }
+// Study 1: two hours in the park each evening; owners walk there more, and some dogs come with paid walkers.
+function park(town, evenings){
+  var r = rng(town.seed * 7919 + 2), out = [], n = evenings * 60;
+  for(var k = 0; k < n; k++){
+    var p; do { p = town.people[Math.floor(r() * POP)]; } while(r() > (p.dog ? 1 : 0.4));
+    var walker = !p.dog && r() < 0.08, withDog = p.dog || walker;
+    out.push({ withDog: withDog, owner: p.dog, walker: walker, cheerful: p.cheerful, podcast: p.podcast, smile: r() < smileP(p.H, withDog, p.podcast) });
+  }
+  return out;
+}
+// Study 2: 50 owners and 50 non-owners give blood; oxytocin follows happiness.
+function lab(town){
+  var r = rng(town.seed * 7919 + 3), own = [], non = [], pool = town.people.slice();
+  for(var i = pool.length - 1; i > 0; i--){ var j = Math.floor(r() * (i + 1)), t = pool[i]; pool[i] = pool[j]; pool[j] = t; }
+  pool.forEach(function(p){ var g = p.dog ? own : non; if(g.length < 50) g.push({ cheerful: p.cheerful, v: 100 + (p.H - 50) + 8 * gauss(r) }); });
+  return { own: own, non: non };
+}
+// Study 3: 120 strangers; a coin decides whether the trained dog approaches.
+function trained(town){
+  var r = rng(town.seed * 7919 + 4), out = [];
+  for(var k = 0; k < 120; k++){
+    var p = town.people[Math.floor(r() * POP)], approach = r() < 0.5, u = r();
+    out.push({ approach: approach, cheerful: p.cheerful, smile: u < smileP(p.H, approach, p.podcast) });
+  }
+  return out;
+}
+// Study 4: 100 people about to adopt; a coin decides who adopts now and who waits six months.
+function adoption(town, opt){
+  var r = rng(town.seed * 7919 + 5), out = [], tries = 0;
+  while(out.length < 100 && tries++ < 20000){
+    var p = town.people[Math.floor(r() * POP)];
+    if(p.dog || r() > sig(p.cheer)) continue;
+    var now = r() < 0.5, noise = 6 * gauss(r);
+    out.push({ now: now, cheerful: p.cheerful, change: (now ? town.effect + (opt.excite ? 4 : 0) : (opt.frustrate ? -3 : 0)) + noise });
+  }
+  return out;
+}
+function propDiff(a, b){ var pa = a.filter(Boolean).length / a.length, pb = b.filter(Boolean).length / b.length, se = Math.sqrt(pa * (1 - pa) / a.length + pb * (1 - pb) / b.length) || 1e-9; return { a: pa, b: pb, diff: pa - pb, z: (pa - pb) / se, na: a.length, nb: b.length }; }
+function meanDiff(a, b){ var m = function(x){ return x.reduce(function(s, v){ return s + v; }, 0) / x.length; }, v = function(x){ var mu = m(x); return x.reduce(function(s, y){ return s + (y - mu) * (y - mu); }, 0) / (x.length - 1); };
+  var ma = m(a), mb = m(b), se = Math.sqrt(v(a) / a.length + v(b) / b.length) || 1e-9; return { a: ma, b: mb, diff: ma - mb, z: (ma - mb) / se, na: a.length, nb: b.length }; }
+function results(town, opt){
+  var pk = park(town, opt.evenings || 5), lb = lab(town), tr = trained(town), ad = adoption(town, opt);
+  return {
+    park: propDiff(pk.filter(function(x){ return x.withDog; }).map(function(x){ return x.smile; }), pk.filter(function(x){ return !x.withDog; }).map(function(x){ return x.smile; })),
+    lab: meanDiff(lb.own.map(function(x){ return x.v; }), lb.non.map(function(x){ return x.v; })),
+    trained: propDiff(tr.filter(function(x){ return x.approach; }).map(function(x){ return x.smile; }), tr.filter(function(x){ return !x.approach; }).map(function(x){ return x.smile; })),
+    adoption: meanDiff(ad.filter(function(x){ return x.now; }).map(function(x){ return x.change; }), ad.filter(function(x){ return !x.now; }).map(function(x){ return x.change; }))
+  };
+}
+/* ---------- Studies ---------- */
+var STUDIES = [
+  { id: 'park', tab: '1 Park', h: 'Study 1: Do people with dogs smile more?', cls: 'obs',
+    text: 'Researchers sit in a park from 5 to 7 pm and record, for everyone who walks past, whether they have a dog and whether they are smiling.',
+    why: { obs: 'Right: the researchers only record who has a dog and who smiles. Nobody is given a dog.', int: 'Not quite: nothing is changed by the researchers. They only record who has a dog and who smiles, so it is observational.' },
+    lens: [['cheerful', 'Already cheerful'], ['podcast', 'Listening to a podcast'], ['walker', 'Paid dog walker']] },
+  { id: 'lab', tab: '2 Lab', h: 'Study 2: Do dog owners have more oxytocin?', cls: 'obs',
+    text: 'Oxytocin is a brain chemical linked to positive feelings. Researchers bring 50 dog owners and 50 non-owners into the lab and measure it in a blood sample.',
+    why: { obs: 'Right: taking blood is a measurement, not an intervention. Who owns a dog was not decided by the researchers.', int: 'Not quite: a lab and a blood draw feel like an experiment, but dog ownership was not assigned. It is observational.' },
+    lens: [['cheerful', 'Already cheerful']] },
+  { id: 'trained', tab: '3 Trained dog', h: 'Study 3: Do people smile when a dog comes up to them?', cls: 'int',
+    text: 'Researchers sit in a busy park with a trained dog. For each passer-by a coin decides: the dog approaches, or the dog stays hidden. They record who smiles.',
+    why: { int: 'Right: the researchers decide who meets the dog, by coin flip.', obs: 'Not quite: the researchers decide who meets the dog, by coin flip. That is an intervention.' },
+    lens: [['cheerful', 'Already cheerful']] },
+  { id: 'adoption', tab: '4 Adoption', h: 'Study 4: Are people happier after they adopt?', cls: 'int',
+    text: '100 people are about to adopt from the same shelter. A coin decides who adopts now and who waits six months. Everyone fills in a happiness questionnaire at the start and after five months.',
+    why: { int: 'Right: the researchers decide who gets a dog now and who waits.', obs: 'Not quite: the researchers decide who gets a dog now and who waits. That is an intervention.' },
+    lens: [['cheerful', 'Already cheerful']] }
+];
+var STEPS = [{ tab: 'Town', h: 'Your town has a hidden answer', hint: '' }]
+  .concat(STUDIES.map(function(s){ return { tab: s.tab, h: s.h, hint: s.text, study: s }; }))
+  .concat([{ tab: 'Scoreboard', h: 'Which studies can you trust?', hint: 'Your four results side by side. Decide which you trust, then reveal the truth.' },
+           { tab: 'Reflect', h: 'Rule out the alternative', hint: '' }]);
+var TRUST = [['observational', 'An observational study'], ['interventional', 'An interventional study'], ['same', 'They will agree']];
+var MEASURES = { park: 'Partly: smiles mix happiness, a dog beside you right now, and podcasts', lab: 'Yes, but owners were already more cheerful', trained: 'No: strangers\' reaction to a dog, not owners\' happiness', adoption: 'Yes: owners\' change in happiness' };
+/* ---------- State (shared in a live session) ---------- */
+var state = { step: 0, scale: 'laptop', town: 1, trust: '', cls_park: '', cls_lab: '', cls_trained: '', cls_adoption: '',
+  evenings: 0, labRun: false, flips: 0, adoptRun: false, excite: false, frustrate: false,
+  lens_park: '', lens_lab: '', lens_trained: '', lens_adoption: '', revealed: false, batch: false, ansAlt: '', ansFix: '' };
+var listeners = [];
+function validEntry(k, v){
+  if(k === 'step' || k === 'town' || k === 'evenings' || k === 'flips') return typeof v === 'number' && isFinite(v);
+  if(k === 'scale') return v === 'laptop' || v === 'projector';
+  if(k === 'trust') return v === '' || TRUST.some(function(t){ return t[0] === v; });
+  if(/^cls_/.test(k)) return k.slice(4) in MEASURES && (v === '' || v === 'obs' || v === 'int');
+  if(/^lens_/.test(k)) return k.slice(5) in MEASURES && (v === '' || v === 'cheerful' || v === 'podcast' || v === 'walker');
+  if(['labRun', 'adoptRun', 'excite', 'frustrate', 'revealed', 'batch'].indexOf(k) >= 0) return typeof v === 'boolean';
+  if(k === 'ansAlt' || k === 'ansFix') return typeof v === 'string' && v.length <= 1500;
+  return false;
+}
+function apply(p){
+  Object.keys(p || {}).forEach(function(k){
+    var v = p[k];
+    if(!validEntry(k, v)) return;
+    if(k === 'step') v = Math.max(0, Math.min(STEPS.length - 1, Math.round(v)));
+    if(k === 'town') v = Math.max(1, Math.min(1e6, Math.round(v)));
+    if(k === 'evenings') v = Math.max(0, Math.min(5, Math.round(v)));
+    if(k === 'flips') v = Math.max(0, Math.min(120, Math.round(v)));
+    state[k] = v;
+  });
+}
+function getState(){ return JSON.parse(JSON.stringify(state)); }
+function change(p){ apply(p); render(); var s = getState(); listeners.forEach(function(fn){ try{ fn(s); }catch(e){} }); }
+function setState(p){ if(!p || typeof p !== 'object') return; apply(p); render(); }
+/* ---------- Helpers ---------- */
+var esc = function(s){ return String(s).replace(/[&<>"']/g, function(c){ return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+function pct(x){ return Math.round(x * 100) + '%'; }
+function pts(x, d){ return (x >= 0 ? '+' : '−') + Math.abs(x).toFixed(d == null ? 1 : d); }
+function verdict(r){ return r.z > 2 ? 'Difference found' : r.z < -2 ? 'Difference the other way' : 'No clear difference'; }
+var DOG = '<svg viewBox="0 0 120 100" aria-hidden="true"><use href="#dog"/></svg>';
+var townCache = {};
+function town(){
+  if(!townCache[state.town]){ townCache = {}; townCache[state.town] = makeTown(state.town); }
+  return townCache[state.town];
+}
+function cell(p, cls){ return '<span class="c' + (p.smile ? ' s' : '') + (cls || '') + '" data-cheerful="' + (p.cheerful ? 1 : 0) + '" data-podcast="' + (p.podcast ? 1 : 0) + '" data-walker="' + (p.walker ? 1 : 0) + '"></span>'; }
+var LEG_SMILE = '<div class="legend"><span><span class="c s"></span>smiling</span><span><span class="c"></span>not smiling</span></div>';
+/* What each study shows now (the results its run has produced so far). */
+function studyResult(id){
+  var t = town();
+  if(id === 'park'){
+    if(!state.evenings) return null;
+    var pk = park(t, state.evenings), d = pk.filter(function(x){ return x.withDog; }), n = pk.filter(function(x){ return !x.withDog; });
+    return { rows: pk, r: propDiff(d.map(function(x){ return x.smile; }), n.map(function(x){ return x.smile; })) };
+  }
+  if(id === 'lab'){
+    if(!state.labRun) return null;
+    var lb = lab(t); return { lab: lb, r: meanDiff(lb.own.map(function(x){ return x.v; }), lb.non.map(function(x){ return x.v; })) };
+  }
+  if(id === 'trained'){
+    if(!state.flips) return null;
+    var tr = trained(t).slice(0, state.flips), a = tr.filter(function(x){ return x.approach; }), h = tr.filter(function(x){ return !x.approach; });
+    return { rows: tr, r: a.length && h.length ? propDiff(a.map(function(x){ return x.smile; }), h.map(function(x){ return x.smile; })) : null };
+  }
+  if(!state.adoptRun) return null;
+  var ad = adoption(t, { excite: state.excite, frustrate: state.frustrate });
+  return { rows: ad, r: meanDiff(ad.filter(function(x){ return x.now; }).map(function(x){ return x.change; }), ad.filter(function(x){ return !x.now; }).map(function(x){ return x.change; })) };
+}
+function summaryText(id, res){
+  var r = res && res.r; if(!r) return '';
+  if(id === 'park') return 'Smiling: <strong>' + pct(r.a) + '</strong> of ' + r.na + ' people with a dog, <strong>' + pct(r.b) + '</strong> of ' + r.nb + ' without.';
+  if(id === 'lab') return 'Average oxytocin: <strong>' + r.a.toFixed(1) + '</strong> for owners, <strong>' + r.b.toFixed(1) + '</strong> for non-owners (' + pts(r.diff) + ').';
+  if(id === 'trained') return 'Smiling: <strong>' + pct(r.a) + '</strong> of ' + r.na + ' people the dog approached, <strong>' + pct(r.b) + '</strong> of ' + r.nb + ' it hid from.';
+  return 'Change in happiness after five months: <strong>' + pts(r.a) + '</strong> for ' + r.na + ' who adopted now, <strong>' + pts(r.b) + '</strong> for ' + r.nb + ' who waited.';
+}
+/* ---------- Building the page ---------- */
+var stepbar = document.getElementById('stepbar');
+STEPS.forEach(function(s, i){
+  var b = document.createElement('button'); b.type = 'button'; b.textContent = s.tab;
+  b.addEventListener('click', function(){ goStep(i); });
+  stepbar.appendChild(b);
+});
+document.getElementById('ledger').innerHTML = LEDGER.map(function(l){ return '<li><span class="kind">' + l[0] + '</span>' + esc(l[1]) + '</li>'; }).join('');
+document.getElementById('trustChoices').innerHTML = TRUST.map(function(t){ return '<button type="button" data-trust="' + t[0] + '" aria-pressed="false">' + t[1] + '</button>'; }).join('');
+var animating = null; // a park run being revealed on this screen: { until, shown }
+function goStep(i){ change({ step: i }); window.scrollTo(0, 0); document.getElementById('stepH').focus(); }
+document.getElementById('prevStep').addEventListener('click', function(){ goStep(state.step - 1); });
+document.getElementById('nextStep').addEventListener('click', function(){ goStep(state.step + 1); });
+document.getElementById('scLaptop').addEventListener('click', function(){ change({ scale: 'laptop' }); });
+document.getElementById('scProj').addEventListener('click', function(){ change({ scale: 'projector' }); });
+document.getElementById('trustChoices').addEventListener('click', function(e){ var b = e.target.closest('[data-trust]'); if(b) change({ trust: b.getAttribute('data-trust') }); });
+document.querySelectorAll('[data-cls]').forEach(function(b){ b.addEventListener('click', function(){ var s = STEPS[state.step].study, p = {}; if(!s) return; p['cls_' + s.id] = b.getAttribute('data-cls'); change(p); }); });
+document.getElementById('lensBtns').addEventListener('click', function(e){
+  var b = e.target.closest('[data-lens]'), s = STEPS[state.step].study, p = {}; if(!b || !s) return;
+  var v = b.getAttribute('data-lens'); p['lens_' + s.id] = state['lens_' + s.id] === v ? '' : v; change(p);
+});
+document.getElementById('runBox').addEventListener('click', function(e){
+  var b = e.target.closest('[data-run]'); if(!b) return;
+  var a = b.getAttribute('data-run');
+  if(a === 'park'){ animating = { from: 0, start: performance.now() }; change({ evenings: Number(b.getAttribute('data-n')) }); tick(); }
+  if(a === 'lab') change({ labRun: true });
+  if(a === 'flip1') change({ flips: state.flips + 1 });
+  if(a === 'flip10') change({ flips: state.flips + 10 });
+  if(a === 'flipAll') change({ flips: 120 });
+  if(a === 'adopt') change({ adoptRun: true });
+});
+document.getElementById('runBox').addEventListener('change', function(e){
+  if(e.target.id === 'excite') change({ excite: e.target.checked });
+  if(e.target.id === 'frustrate') change({ frustrate: e.target.checked });
+});
+document.getElementById('revealBtn').addEventListener('click', function(){ change({ revealed: true }); });
+document.getElementById('batchBtn').addEventListener('click', function(){ change({ batch: true }); });
+document.getElementById('newTown').addEventListener('click', function(){
+  change({ town: state.town + 1, evenings: 0, labRun: false, flips: 0, adoptRun: false, revealed: false, batch: false, lens_park: '', lens_lab: '', lens_trained: '', lens_adoption: '' });
+});
+['ansAlt', 'ansFix'].forEach(function(id){ document.getElementById(id).addEventListener('input', function(e){ var p = {}; p[id] = e.target.value.slice(0, 1500); change(p); }); });
+// The park run fills in over about two seconds on the screen that pressed play.
+function tick(){
+  if(!animating) return;
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var f = reduce ? 1 : Math.min(1, (performance.now() - animating.start) / 1800);
+  var cells = document.querySelectorAll('#vis .grid .c'), n = Math.round(f * cells.length);
+  for(var i = 0; i < cells.length; i++){ var o = Number(cells[i].getAttribute('data-order')); cells[i].style.visibility = o < n ? '' : 'hidden'; }
+  document.getElementById('result').style.visibility = f < 1 ? 'hidden' : '';
+  if(f < 1) requestAnimationFrame(tick); else animating = null;
+}
+/* ---------- Render ---------- */
+var visKey = '';
+function renderVis(s, res){
+  var vis = document.getElementById('vis'), key = s.id + '|' + state.town + '|' + JSON.stringify(res ? [state.evenings, state.flips, state.excite, state.frustrate] : 0), html = '';
+  if(key === visKey) return;
+  visKey = key;
+  if(s.id === 'park'){
+    if(!res){ html = '<p class="note">Nobody has walked past yet.</p>'; }
+    else {
+      var order = 0, d = '', n = '';
+      res.rows.forEach(function(p){ var c = cell(p).replace('<span ', '<span data-order="' + (order++) + '" '); if(p.withDog) d += c; else n += c; });
+      html = '<div class="panels"><div class="panel"><h3>' + DOG + 'With a dog</h3><div class="grid">' + d + '</div></div><div class="panel"><h3>Without a dog</h3><div class="grid">' + n + '</div></div></div>' + LEG_SMILE;
+    }
+  } else if(s.id === 'lab'){
+    if(!res){ html = '<p class="note">Nobody has come to the lab yet.</p>'; }
+    else {
+      var all = res.lab.own.concat(res.lab.non).map(function(x){ return x.v; }), lo = Math.floor(Math.min.apply(null, all) / 10) * 10, hi = Math.ceil(Math.max.apply(null, all) / 10) * 10;
+      var X = function(v){ return ((v - lo) / (hi - lo) * 100).toFixed(2) + '%'; };
+      var strip = function(arr, label, dog){
+        var m = arr.reduce(function(a, x){ return a + x.v; }, 0) / arr.length, rows = {};
+        return '<div class="panel"><h3>' + (dog ? DOG : '') + label + ' (50)</h3><div class="strip">' + arr.map(function(x){
+          var b = Math.round((x.v - lo) / (hi - lo) * 40); rows[b] = (rows[b] || 0) + 1;
+          return '<span class="c s" data-cheerful="' + (x.cheerful ? 1 : 0) + '" style="left:' + X(x.v) + ';bottom:' + ((rows[b] - 1) * 12) + 'px"></span>';
+        }).join('') + '<span class="mean" style="left:' + X(m) + '" title="average"></span></div></div>';
+      };
+      html = strip(res.lab.own, 'Dog owners', true) + strip(res.lab.non, 'Non-owners', false) + '<div class="axis"><span>' + lo + '</span><span>Oxytocin (dashed line = average)</span><span>' + hi + '</span></div>';
+    }
+  } else if(s.id === 'trained'){
+    var all3 = trained(town()), a = '', h = '', w = '';
+    all3.forEach(function(p, i){ if(i >= state.flips){ w += '<span class="c wait"></span>'; return; } if(p.approach) a += cell(p); else h += cell(p); });
+    html = '<div class="panels"><div class="panel"><h3>' + DOG + 'Dog approached</h3><div class="grid">' + a + '</div></div><div class="panel"><h3>Dog stayed hidden</h3><div class="grid">' + h + '</div></div></div>' +
+      (state.flips < 120 ? '<p class="note" style="margin:.5em 0 .2em">Still waiting for a coin flip: ' + (120 - state.flips) + '</p><div class="grid">' + w + '</div>' : '') + LEG_SMILE;
+  } else {
+    if(!res){ html = '<p class="note">Nobody has been assigned yet.</p>'; }
+    else {
+      var bar = function(arr, label, dog){
+        var srt = arr.slice().sort(function(x, y){ return y.change - x.change; });
+        return '<div class="panel"><h3>' + (dog ? DOG : '') + label + ' (' + arr.length + ')</h3><div class="grid">' + srt.map(function(x){ return '<span class="c' + (x.change > 0 ? ' s' : '') + '" data-cheerful="' + (x.cheerful ? 1 : 0) + '"></span>'; }).join('') + '</div></div>';
+      };
+      html = '<div class="panels">' + bar(res.rows.filter(function(x){ return x.now; }), 'Adopt now', true) + bar(res.rows.filter(function(x){ return !x.now; }), 'Wait six months', false) + '</div>' +
+        '<div class="legend"><span><span class="c s"></span>happier after five months</span><span><span class="c"></span>not happier</span></div>';
+    }
+  }
+  vis.innerHTML = html;
+  vis.querySelectorAll('svg').forEach(function(x){ x.setAttribute('focusable', 'false'); });
+}
+function lensShare(sel, attr){ var c = document.querySelectorAll(sel); if(!c.length) return null; var k = 0; c.forEach(function(x){ if(x.getAttribute('data-' + attr) === '1') k++; }); return k / c.length; }
+function renderStudy(s){
+  var res = studyResult(s.id), cls = state['cls_' + s.id];
+  document.querySelectorAll('[data-cls]').forEach(function(b){ b.setAttribute('aria-pressed', String(b.getAttribute('data-cls') === cls)); });
+  document.getElementById('clsFb').textContent = cls ? s.why[cls] : 'Decide as a group before you run it.';
+  var run = document.getElementById('runBox'), html;
+  if(s.id === 'park') html = '<p class="q">Run it</p><div class="ctlrow">' + [1, 3, 5].map(function(n){ return '<button type="button" data-run="park" data-n="' + n + '"' + (state.evenings === n ? ' aria-pressed="true"' : '') + '>' + n + ' evening' + (n > 1 ? 's' : '') + '</button>'; }).join('') + '</div>';
+  else if(s.id === 'lab') html = '<p class="q">Run it</p><div class="ctlrow"><button type="button" data-run="lab"' + (state.labRun ? ' disabled' : '') + '>Bring 100 people to the lab</button></div>';
+  else if(s.id === 'trained') html = '<p class="q">You flip the coin</p><div class="ctlrow"><button type="button" data-run="flip1"' + (state.flips >= 120 ? ' disabled' : '') + '>Next person</button><button type="button" data-run="flip10"' + (state.flips >= 120 ? ' disabled' : '') + '>Next 10</button><button type="button" data-run="flipAll"' + (state.flips >= 120 ? ' disabled' : '') + '>Everyone left</button></div>';
+  else html = '<p class="q">Run it</p><div class="ctlrow"><button type="button" data-run="adopt"' + (state.adoptRun ? ' disabled' : '') + '>Flip a coin for each of the 100</button></div>' +
+    (state.adoptRun ? '<label class="toggle"><input type="checkbox" id="excite"' + (state.excite ? ' checked' : '') + '> New-puppy excitement</label><label class="toggle"><input type="checkbox" id="frustrate"' + (state.frustrate ? ' checked' : '') + '> Waiting is frustrating</label>' : '');
+  if(run.getAttribute('data-html') !== html){ run.innerHTML = html; run.setAttribute('data-html', html); }
+  renderVis(s, res);
+  var box = document.getElementById('result'), r = res && res.r;
+  box.hidden = !r;
+  if(r) box.innerHTML = '<p>' + summaryText(s.id, res) + '</p><p class="verdict">' + verdict(r) + (s.id === 'trained' && state.flips < 120 ? ' so far' : '') + '</p>';
+  // Under the hood: highlight one hidden trait and compare its share between the two groups.
+  var lensOn = !!r, lens = state['lens_' + s.id];
+  document.getElementById('lensRow').hidden = !lensOn;
+  var btns = s.lens.map(function(l){ return '<button type="button" data-lens="' + l[0] + '" aria-pressed="' + (lens === l[0]) + '">' + l[1] + '</button>'; }).join('');
+  var lb = document.getElementById('lensBtns'); if(lb.getAttribute('data-html') !== btns){ lb.innerHTML = btns; lb.setAttribute('data-html', btns); }
+  document.querySelectorAll('#vis .c[data-cheerful]').forEach(function(c){ c.classList.toggle('dim', !!lens && c.getAttribute('data-' + lens) !== '1'); });
+  var fb = '';
+  if(lensOn && lens){
+    var panels = document.querySelectorAll('#vis .panel'), A = lensShare('#vis .panel:nth-child(1) .c', lens), B = lensShare('#vis .panel:nth-child(2) .c', lens);
+    var names = [panels[0] && panels[0].textContent.replace(/\s*\(\d+\)$/, ''), panels[1] && panels[1].textContent.replace(/\s*\(\d+\)$/, '')];
+    if(A !== null && B !== null) fb = esc(s.lens.filter(function(l){ return l[0] === lens; })[0][1]) + ': ' + pct(A) + ' of “' + esc(names[0]) + '”, ' + pct(B) + ' of “' + esc(names[1]) + '”. ';
+    fb += {
+      park_cheerful: 'People with a dog were already more cheerful: they would smile more even without the dog.',
+      park_podcast: 'Podcast listeners smile either way: noise in the measure, not happiness from a dog.',
+      park_walker: 'Some “owners” are paid walkers. They smile at the dog beside them, which says nothing about owning one.',
+      lab_cheerful: 'Owners were more cheerful before they ever had a dog, so their oxytocin would be higher anyway.',
+      trained_cheerful: 'The coin decided who met the dog, so any gap here is chance. But these are strangers, not owners.',
+      adoption_cheerful: 'The coin decided who adopted, so any gap here is chance, not who chose a dog. It shrinks with more people.'
+    }[s.id + '_' + lens];
+  } else if(lensOn) fb = 'Pick a trait to see who is in each group.';
+  document.getElementById('lensFb').textContent = fb;
+}
+function allResults(){ var o = {}; STUDIES.forEach(function(s){ o[s.id] = studyResult(s.id); }); return o; }
+function renderBoard(){
+  var R = allResults(), t = town();
+  document.getElementById('truthH').hidden = !state.revealed;
+  document.getElementById('board').innerHTML = STUDIES.map(function(s, i){
+    var r = R[s.id] && R[s.id].r, c = state['cls_' + s.id];
+    var call = c ? (c === 'obs' ? 'Observational' : 'Interventional') + (c === s.cls ? ' ✓' : ' ✗') : '<span class="note">not chosen</span>';
+    var found = r ? (s.id === 'park' || s.id === 'trained' ? pts((r.diff) * 100, 0) + ' points of smiling' : s.id === 'lab' ? pts(r.diff) + ' oxytocin' : pts(r.diff) + ' happiness') : '<span class="note">not run yet</span>';
+    return '<tr><td>' + (i + 1) + '. ' + ['Park smiles', 'Oxytocin lab', 'Trained dog', 'Adoption delay'][i] + '</td><td>' + call + '</td><td class="num">' + found + '</td><td>' + (r ? verdict(r) : '') + '</td>' +
+      (state.revealed ? '<td>' + MEASURES[s.id] + '</td>' : '') + '</tr>';
+  }).join('');
+  document.getElementById('revealBtn').hidden = state.revealed;
+  document.getElementById('batchBtn').hidden = !state.revealed || state.batch;
+  var tb = document.getElementById('truthBox');
+  tb.hidden = !state.revealed;
+  if(state.revealed){
+    var word = t.effect === 0 ? 'nothing' : t.effect === 5 ? 'a little (5 points)' : 'a lot (10 points)';
+    var trustTxt = state.trust ? ' Before you started, you said: ' + { observational: 'an observational study would get closest.', interventional: 'an interventional study would get closest.', same: 'the studies would agree.' }[state.trust] : '';
+    tb.innerHTML = '<p>In this town a dog raises its owner\'s happiness by <strong>' + word + '</strong>.' + trustTxt + '</p>' +
+      (t.effect === 0 ? '<p>Any study that found owners happier was fooled by something else: who chooses a dog, a dog beside you right now, or podcasts.</p>' : '<p>Several studies may point the right way here. Run more towns to see which ones would have said the same thing if dogs did nothing.</p>');
+  }
+  var bb = document.getElementById('batchBox');
+  bb.hidden = !state.batch;
+  if(state.batch) bb.innerHTML = batchTable();
+}
+// All four studies in 30 more towns: how often each finds a difference, by the hidden truth.
+function batchTable(){
+  var rows = { park: [0, 0, 0, 0], lab: [0, 0, 0, 0], trained: [0, 0, 0, 0], adoption: [0, 0, 0, 0] };
+  for(var k = 1; k <= 30; k++){
+    var t = makeTown(state.town + 1000 + k), R = results(t, { evenings: 5 }), none = t.effect === 0;
+    Object.keys(rows).forEach(function(id){ var x = rows[id]; if(none){ x[1]++; if(R[id].z > 2) x[0]++; } else { x[3]++; if(R[id].z > 2) x[2]++; } });
+  }
+  var cellTxt = function(a, n){ return n ? a + ' of ' + n : '—'; };
+  return '<table><thead><tr><th>Study</th><th class="num">Found a difference: towns where dogs do nothing</th><th class="num">…where dogs help</th></tr></thead><tbody>' +
+    STUDIES.map(function(s, i){ var x = rows[s.id]; return '<tr><td>' + (i + 1) + '. ' + ['Park smiles', 'Oxytocin lab', 'Trained dog', 'Adoption delay'][i] + '</td><td class="num">' + cellTxt(x[0], x[1]) + '</td><td class="num">' + cellTxt(x[2], x[3]) + '</td></tr>'; }).join('') +
+    '</tbody></table><p class="note">A study you can trust finds a difference where dogs help and not where they do nothing. Same settings as yours: 5 evenings, all 120 strangers, no study-4 twists.</p>';
+}
+function renderReflect(){ ['ansAlt', 'ansFix'].forEach(function(id){ var tb = document.getElementById(id); if(tb.value !== state[id] && document.activeElement !== tb) tb.value = state[id]; }); }
+function render(){
+  document.body.className = state.scale;
+  document.getElementById('scLaptop').setAttribute('aria-pressed', String(state.scale === 'laptop'));
+  document.getElementById('scProj').setAttribute('aria-pressed', String(state.scale === 'projector'));
+  var step = STEPS[state.step];
+  document.getElementById('stepNum').textContent = 'Step ' + state.step + ' of ' + (STEPS.length - 1) + ' · Town ' + state.town;
+  document.getElementById('stepH').textContent = step.h;
+  document.getElementById('stepHint').textContent = step.hint;
+  [].forEach.call(stepbar.children, function(b, i){ if(i === state.step) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current'); });
+  document.getElementById('v0').hidden = state.step !== 0;
+  document.getElementById('vStudy').hidden = !step.study;
+  document.getElementById('v5').hidden = state.step !== 5;
+  document.getElementById('v6').hidden = state.step !== 6;
+  document.querySelectorAll('[data-trust]').forEach(function(b){ b.setAttribute('aria-pressed', String(state.trust === b.getAttribute('data-trust'))); });
+  if(step.study) renderStudy(step.study); else visKey = '';
+  if(state.step === 5) renderBoard();
+  if(state.step === 6) renderReflect();
+  document.getElementById('prevStep').disabled = state.step === 0;
+  document.getElementById('nextStep').disabled = state.step === STEPS.length - 1;
+}
+/* ---------- Contract ---------- */
+window.artifact = {
+  getState: getState,
+  setState: setState,
+  onChange: function(fn){ listeners.push(fn); return function(){ listeners = listeners.filter(function(f){ return f !== fn; }); }; },
+  controls: [
+    { key: 'step', label: 'Step', kind: 'range', min: 0, max: STEPS.length - 1, step: 1 },
+    { key: 'town', label: 'Town (seed)', kind: 'range', min: 1, max: 1000000, step: 1 },
+    { key: 'trust', label: 'Prediction: which study gets closest', kind: 'choice', options: [''].concat(TRUST.map(function(t){ return t[0]; })) },
+    { key: 'cls_park', label: 'Study 1 type', kind: 'choice', options: ['', 'obs', 'int'] },
+    { key: 'cls_lab', label: 'Study 2 type', kind: 'choice', options: ['', 'obs', 'int'] },
+    { key: 'cls_trained', label: 'Study 3 type', kind: 'choice', options: ['', 'obs', 'int'] },
+    { key: 'cls_adoption', label: 'Study 4 type', kind: 'choice', options: ['', 'obs', 'int'] },
+    { key: 'evenings', label: 'Study 1: evenings in the park', kind: 'range', min: 0, max: 5, step: 1 },
+    { key: 'labRun', label: 'Study 2: run', kind: 'toggle' },
+    { key: 'flips', label: 'Study 3: coin flips done', kind: 'range', min: 0, max: 120, step: 1 },
+    { key: 'adoptRun', label: 'Study 4: run', kind: 'toggle' },
+    { key: 'excite', label: 'Study 4: new-puppy excitement', kind: 'toggle' },
+    { key: 'frustrate', label: 'Study 4: waiting is frustrating', kind: 'toggle' },
+    { key: 'revealed', label: 'Reveal the truth', kind: 'toggle' },
+    { key: 'batch', label: 'Run 30 more towns', kind: 'toggle' },
+    { key: 'scale', label: 'Text size', kind: 'choice', options: ['laptop', 'projector'] }
+  ],
+  responses: [
+    { key: 'ansAlt', prompt: 'Pick one study. Which alternative explanation could it not rule out?' },
+    { key: 'ansFix', prompt: 'How would you change that study so it could rule the explanation out?' }
+  ],
+  assertions: [
+    { name: 'Every town\'s hidden dog effect is 0, 5 or 10, and all three occur across towns', run: function(){
+      var seen = {}; for(var s = 1; s <= 40; s++) seen[makeTown(s).effect] = 1; return Object.keys(seen).sort().join() === '0,10,5'; } },
+    { name: 'Where dogs do nothing, the park study still finds a difference in most towns (selection and the dog beside you)', run: function(){
+      var n = 0, y = 0; for(var s = 1; s <= 120 && n < 25; s++){ var t = makeTown(s); if(t.effect) continue; n++; if(results(t, { evenings: 5 }).park.z > 2) y++; } return n >= 25 && y / n >= 0.85; } },
+    { name: 'Where dogs do nothing, the randomized adoption study rarely finds a difference (at most 10% of towns)', run: function(){
+      var n = 0, y = 0; for(var s = 1; s <= 150 && n < 40; s++){ var t = makeTown(s); if(t.effect) continue; n++; if(results(t, { evenings: 5 }).adoption.z > 2) y++; } return n >= 40 && y / n <= 0.10; } },
+    { name: 'The adoption study\'s estimate averages the true effect (within 1 point over 60 towns)', run: function(){
+      var e = 0, est = 0; for(var s = 1; s <= 60; s++){ var t = makeTown(s); e += t.effect; est += results(t, {}).adoption.diff; } return Math.abs(est / 60 - e / 60) < 1; } },
+    { name: 'Coin flips balance the already-cheerful between adoption groups (gap under 5 points on average)', run: function(){
+      var g = 0; for(var s = 1; s <= 60; s++){ var a = adoption(makeTown(s), {}), now = a.filter(function(x){ return x.now; }), w = a.filter(function(x){ return !x.now; });
+        g += now.filter(function(x){ return x.cheerful; }).length / now.length - w.filter(function(x){ return x.cheerful; }).length / w.length; } return Math.abs(g / 60) < 0.05; } },
+    { name: 'New-puppy excitement shifts the adoption estimate by exactly 4 points; frustration by exactly 3', run: function(){
+      var t = makeTown(7), b = results(t, {}).adoption.diff; return Math.abs(results(t, { excite: true }).adoption.diff - b - 4) < 1e-9 && Math.abs(results(t, { frustrate: true }).adoption.diff - b - 3) < 1e-9; } },
+    { name: 'The trained-dog study finds about the same smile gap whatever the true effect (it measures something else)', run: function(){
+      var by = { 0: [], 5: [], 10: [] }; for(var s = 1; s <= 90; s++){ var t = makeTown(s); by[t.effect].push(results(t, {}).trained.diff); }
+      var m = function(a){ return a.reduce(function(x, y){ return x + y; }, 0) / a.length; }; return Math.abs(m(by[0]) - m(by[10])) < 0.05 && m(by[0]) > 0.15; } },
+    { name: 'Invalid keys and values are ignored', run: function(){ var b = JSON.stringify(state); apply({ cls_zoo: 'obs', lens_park: 'x', trust: 'maybe', step: 'x', foo: 1 }); return JSON.stringify(state) === b; } }
+  ],
+  referenceCases: []
+};
+render();
+})();
+</script>
+
+<script>
+(function () {
+  var cfg = {"versionId":"cmw14d33s000508jyspbafmsg","appOrigin":"https://ideasatplay.org","direct":null};
+  var t0 = Date.now(), scrolled = false, acted = false, reached = false, shown = false, config = null;
+  var framed = parent !== window;
+  function onScreen(el) {
+    if (!el.getClientRects().length) return false;
+    var r = el.getBoundingClientRect();
+    return r.top < innerHeight && r.bottom > 0;
+  }
+  function atBottom() {
+    var f = document.querySelector("footer[data-kc-credit]");
+    if (f) return f.getBoundingClientRect().top <= innerHeight;
+    var d = document.documentElement;
+    return scrollY + innerHeight >= d.scrollHeight - 48;
+  }
+  // { cur, last } when the page moves through numbered steps, else null.
+  function steps() {
+    var a = window.artifact;
+    try {
+      var c = a && Array.isArray(a.controls) ? a.controls.filter(function (x) { return x && x.key === "step" && typeof x.max === "number"; })[0] : null;
+      if (c) { var s = a.getState(); if (s && typeof s.step === "number") return { cur: s.step, last: c.max }; }
+    } catch (e) {}
+    var cur = document.querySelector('[aria-current="step"]');
+    if (cur && cur.parentElement) {
+      var sib = Array.prototype.filter.call(cur.parentElement.children, function (x) { return x.getClientRects().length; });
+      return { cur: sib.indexOf(cur), last: sib.length - 1 };
+    }
+    return null;
+  }
+  function finished() {
+    var mark = document.querySelector("[data-kc-end]");
+    if (mark) return onScreen(mark);
+    var s = steps();
+    if (s) return s.cur >= s.last && atBottom();
+    return atBottom() && (scrolled || (acted && Date.now() - t0 > 60000));
+  }
+  // The student link remembers a rating in its own storage where the browser allows it.
+  var KEY = "kc-rated-" + cfg.versionId;
+  function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
+  if (cfg.direct) config = { ask: !store(KEY), preview: false, labels: cfg.direct.labels };
+  var visitor = (function () {
+    var v = store("kc-visitor");
+    if (!v) { v = ""; for (var i = 0; i < 24; i++) v += "abcdefghijklmnopqrstuvwxyz0123456789".charAt(Math.floor(Math.random() * 36)); store("kc-visitor", v); }
+    return v;
+  })();
+  var pending = {}, seq = 0;
+  function save(score, comment) {
+    if (cfg.direct) {
+      var body = { versionId: cfg.versionId, score: score, context: "share", visitor: visitor };
+      if (comment) body.comment = comment;
+      // text/plain: a simple request, so no preflight is needed.
+      return fetch(cfg.direct.endpoint, { method: "POST", credentials: "omit", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(body) })
+        .then(function (r) { if (r.ok) store(KEY, String(score)); return r.ok; }, function () { return false; });
+    }
+    return new Promise(function (resolve) {
+      var id = ++seq; pending[id] = resolve;
+      parent.postMessage({ type: "kc:rate", versionId: cfg.versionId, id: id, score: score, comment: comment || "" }, cfg.appOrigin);
+      setTimeout(function () { if (pending[id]) { delete pending[id]; resolve(false); } }, 15000);
+    });
+  }
+  var B = "display:inline-block;margin:3px 6px 3px 0;padding:4px 10px;border:1px solid #a8a29e;border-radius:6px;background:#fff;color:#1c1917;font:inherit;cursor:pointer";
+  function el(tag, attrs, text) { var e = document.createElement(tag); for (var k in attrs) e.setAttribute(k, attrs[k]); if (text) e.textContent = text; return e; }
+  function show() {
+    if (shown || !config || !config.ask) return;
+    shown = true;
+    clearInterval(timer);
+    var L = config.labels;
+    var box = el("div", { "data-kc-rating": "", "data-kc-personal": "", role: "region", "aria-label": L.ask, lang: L.lang, dir: L.dir,
+      style: "box-sizing:border-box;max-width:760px;margin:24px auto 0;padding:10px 14px;border:1px solid #d6d3d1;border-radius:10px;background:#fafaf9;color:#1c1917;font:14px/1.5 system-ui,-apple-system,sans-serif;text-align:start" });
+    var live = el("div", { "aria-live": "polite" });
+    box.appendChild(live);
+    function ask(msg) {
+      live.innerHTML = "";
+      live.appendChild(el("span", { style: "font-weight:600;margin-inline-end:8px" }, L.ask));
+      [1, 2, 3].forEach(function (s) {
+        var b = el("button", { type: "button", style: B }, s + " · " + L["s" + s]);
+        b.addEventListener("click", function () {
+          live.querySelectorAll("button").forEach(function (x) { x.disabled = true; });
+          save(s, "").then(function (ok) { if (ok) comment(s); else ask(L.error); });
+        });
+        live.appendChild(b);
+      });
+      if (config.preview) live.appendChild(el("div", { style: "font-size:12px;color:#57534e" }, L.preview));
+      if (msg) live.appendChild(el("div", { role: "alert", style: "color:#991b1b;font-size:13px" }, msg));
+    }
+    function comment(score) {
+      live.innerHTML = "";
+      var id = "kc-rate-comment";
+      live.appendChild(el("label", { for: id, style: "display:block;font-weight:600;margin-bottom:4px" }, L.comment));
+      var row = el("div", { style: "display:flex;flex-wrap:wrap;gap:6px;align-items:center" });
+      var input = el("input", { id: id, type: "text", maxlength: "1000", autocomplete: "off", dir: "auto",
+        style: "flex:1 1 260px;min-width:0;box-sizing:border-box;padding:5px 8px;border:1px solid #a8a29e;border-radius:6px;background:#fff;color:#1c1917;font:inherit" });
+      var send = el("button", { type: "button", style: B + ";background:#292524;color:#fff;border-color:#292524" }, L.send);
+      var skip = el("button", { type: "button", style: B }, L.skip);
+      function done() { live.innerHTML = ""; live.appendChild(el("span", { style: "font-weight:600" }, L.thanks)); setTimeout(function () { box.remove(); }, 2000); }
+      send.addEventListener("click", function () {
+        var text = input.value.trim();
+        if (!text) return done();
+        send.disabled = skip.disabled = true;
+        save(score, text).then(function (ok) { if (ok) done(); else { send.disabled = skip.disabled = false; live.appendChild(el("div", { role: "alert", style: "color:#991b1b;font-size:13px" }, L.error)); } });
+      });
+      input.addEventListener("keydown", function (e) { if (e.key === "Enter") send.click(); });
+      skip.addEventListener("click", done);
+      row.appendChild(input); row.appendChild(send); row.appendChild(skip);
+      live.appendChild(row);
+      input.focus();
+    }
+    ask("");
+    var mark = document.querySelector("[data-kc-end]"), foot = document.querySelector("footer[data-kc-credit]");
+    if (mark) mark.insertAdjacentElement("afterend", box);
+    else if (foot) foot.parentNode.insertBefore(box, foot);
+    else document.body.appendChild(box);
+  }
+  function check() {
+    if (!reached && finished()) reached = true;
+    if (reached) show();
+  }
+  window.addEventListener("message", function (e) {
+    if (e.source !== parent || !e.data || e.data.versionId !== cfg.versionId) return;
+    var d = e.data;
+    if (d.type === "kc:rate-config" && !cfg.direct) { config = { ask: !!d.ask, preview: !!d.preview, labels: d.labels }; check(); }
+    if (d.type === "kc:rate-result" && pending[d.id]) { pending[d.id](!!d.ok); delete pending[d.id]; }
+  });
+  // The app page may start listening after this page loads: ask a few times.
+  var hellos = 0;
+  function hello() { if (framed && !cfg.direct && !config && hellos++ < 8) parent.postMessage({ type: "kc:rate-hello", versionId: cfg.versionId }, cfg.appOrigin); }
+  hello();
+  var timer = setInterval(function () { if (hellos < 8 && !config) hello(); check(); }, 800);
+  window.addEventListener("scroll", function () { if (scrollY > 0) scrolled = true; check(); }, { passive: true });
+  ["click", "input", "keydown"].forEach(function (t) { document.addEventListener(t, function (e) { if (e.target && e.target.closest && e.target.closest("[data-kc-rating]")) return; acted = true; setTimeout(check, 50); }, true); });
+})();
+</script></body>
+</html>

@@ -1,0 +1,1534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Quantity or Variety — the Suspect Eliminator</title>
+<style>
+  :root{
+    box-sizing:border-box;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+    --bg:#f0ebe6; --card:#ffffff; --ink:#3c3732; --mute:#78736e; --faint:#e3dcd4;
+    --clay:#905112; --clay-soft:#f6ece1; --teal:#2e6f8e; --teal-soft:#e8f0f4;
+    --good:#3f6b4a; --good-soft:#e9f1eb; --bad:#8a3a3a; --bad-soft:#f6ebeb;
+    --shadow:0 1px 2px rgba(60,55,50,.07), 0 8px 24px rgba(60,55,50,.06);
+    color-scheme:light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#211f1d; --card:#2b2825; --ink:#ece7e1; --mute:#a9a29a; --faint:#3b3733;
+      --clay:#d79a52; --clay-soft:#3a2f23; --teal:#8fc0d6; --teal-soft:#24333a;
+      --good:#8dc39c; --good-soft:#26332a; --bad:#e09a9a; --bad-soft:#362626;
+      --shadow:none; color-scheme:dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#211f1d; --card:#2b2825; --ink:#ece7e1; --mute:#a9a29a; --faint:#3b3733;
+    --clay:#d79a52; --clay-soft:#3a2f23; --teal:#8fc0d6; --teal-soft:#24333a;
+    --good:#8dc39c; --good-soft:#26332a; --bad:#e09a9a; --bad-soft:#362626;
+    --shadow:none; color-scheme:dark;
+  }
+  *,*::before,*::after{box-sizing:inherit}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:16px/1.55 "Helvetica Neue",Helvetica,Arial,sans-serif}
+  .wrap{max-width:1120px;margin:0 auto;padding:28px 18px 72px}
+  .eyebrow{font-family:Georgia,"Times New Roman",serif;color:var(--clay);
+    letter-spacing:.14em;text-transform:uppercase;font-size:12px;margin:0 0 6px}
+  h1{font-family:Georgia,"Times New Roman",serif;font-weight:400;
+    font-size:clamp(25px,4.2vw,38px);line-height:1.15;margin:0 0 10px}
+  .lede{margin:0 0 22px;max-width:66ch;color:var(--mute)}
+  .card{background:var(--card);border-radius:14px;padding:18px 20px;
+    box-shadow:var(--shadow);margin-bottom:18px}
+  h2{font-family:Georgia,"Times New Roman",serif;font-weight:400;font-size:20px;margin:0 0 4px}
+  .sub{color:var(--mute);font-size:14px;margin:0 0 14px}
+  .hint{font-size:13px;color:var(--mute);margin:10px 0 0}
+  .cols{display:grid;gap:18px}
+  @media(min-width:880px){.cols{grid-template-columns:360px 1fr;align-items:start}}
+
+  .primer{display:grid;gap:12px}
+  @media(min-width:760px){.primer{grid-template-columns:1fr 1fr}}
+  .def{border:1px solid var(--faint);border-radius:12px;overflow:hidden;background:var(--bg)}
+  .def.enum{border-left:4px solid var(--clay)}
+  .def.elim{border-left:4px solid var(--teal)}
+  .def > button{display:block;width:100%;text-align:left;appearance:none;background:transparent;
+    border:0;font:inherit;color:var(--ink);padding:13px 15px;cursor:pointer}
+  .def > button:hover{background:var(--card)}
+  .def .term{font-family:Georgia,"Times New Roman",serif;font-size:18px;display:block}
+  .def .gloss{font-size:13px;color:var(--mute);display:block;margin-top:3px}
+  .def .chev{float:right;color:var(--mute);font-size:13px}
+  .def .body{padding:0 15px 14px;font-size:14px}
+  .def .body p{margin:0 0 9px}
+  .def .body p:last-child{margin-bottom:0}
+  .def .ex{background:var(--card);border-radius:8px;padding:10px 12px;font-size:13.5px}
+  .tally{margin-top:12px;background:var(--bg);border-radius:10px;padding:12px 14px;font-size:14px}
+  .tally b{font-family:Georgia,"Times New Roman",serif;font-weight:400;font-size:17px}
+  .stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+  .stat{background:var(--bg);border-radius:10px;padding:10px 12px}
+  .stat .k{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--mute)}
+  .stat .v{font-family:Georgia,"Times New Roman",serif;font-size:26px;line-height:1.2}
+
+  .shop{display:grid;gap:8px}
+  .buy{display:flex;align-items:center;gap:10px;width:100%;text-align:left;
+    appearance:none;background:var(--card);border:1px solid var(--faint);
+    border-left:4px solid var(--teal);border-radius:10px;padding:11px 13px;
+    font:inherit;font-size:14px;color:var(--ink);cursor:pointer}
+  .buy:hover:not(:disabled){background:var(--teal-soft)}
+  .buy:disabled{opacity:.45;cursor:not-allowed}
+  .buy.repeat{border-left-color:var(--clay)}
+  .buy .nm{flex:1}
+  .buy .tagk{font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--mute)}
+  .buy .cnt{font-family:Georgia,"Times New Roman",serif;font-size:17px;color:var(--mute);min-width:1.4em;text-align:right}
+  .btn{appearance:none;border:1px solid var(--clay);background:transparent;color:var(--clay);
+    font:inherit;font-size:14px;padding:9px 16px;border-radius:999px;cursor:pointer}
+  .btn:hover{background:var(--clay);color:var(--card)}
+  .btn.solid{background:var(--clay);color:var(--card)}
+  .btn.solid:hover{background:var(--ink);border-color:var(--ink)}
+  .toprow{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 16px}
+  .accuse{margin-top:14px;border-radius:12px;padding:14px 16px;background:var(--clay-soft)}
+  .accuse p{margin:0 0 10px;font-size:14px}
+  .accuse p:last-child{margin-bottom:0}
+  .accuse .big{font-family:Georgia,"Times New Roman",serif;font-size:18px}
+  .accuse.done{background:var(--good-soft)}
+  .accuse.wrong{background:var(--bad-soft)}
+  .sus{text-align:left;width:100%;font:inherit;color:inherit;cursor:pointer;display:block}
+  .sus[aria-pressed="true"]{outline:2px solid var(--clay);outline-offset:1px}
+  .sus:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+  .btn.ghost{border-color:var(--faint);color:var(--mute)}
+  .btn.ghost:hover{background:var(--faint);color:var(--ink)}
+  .btn:focus-visible,.buy:focus-visible,input:focus-visible,textarea:focus-visible,summary:focus-visible{
+    outline:2px solid var(--teal);outline-offset:2px}
+  .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+
+  .seg{display:flex;border:1px solid var(--faint);border-radius:10px;overflow:hidden}
+  .seg button{flex:1;appearance:none;border:0;background:transparent;color:var(--ink);
+    font:inherit;font-size:13px;padding:9px 4px;cursor:pointer}
+  .seg button + button{border-left:1px solid var(--faint)}
+  .seg button[aria-pressed="true"]{background:var(--teal);color:var(--card)}
+  .alarm{margin-top:14px;border-radius:12px;padding:12px 14px;font-size:14px;
+    background:var(--bad-soft);color:var(--bad);border:1px solid var(--bad)}
+  .alarm b{font-weight:bold}
+  .reads{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px}
+  .reads span{font-size:11px;padding:2px 6px;border-radius:999px;background:var(--card);
+    border:1px solid var(--faint);color:var(--mute)}
+  .reads span.odd{border-color:var(--clay);color:var(--clay)}
+  .finds{margin-top:14px;border-radius:12px;background:var(--teal-soft);padding:13px 15px}
+  .finds h3{font-family:Georgia,"Times New Roman",serif;font-weight:400;font-size:16px;margin:0 0 9px}
+  .finds ul{list-style:none;margin:0;padding:0}
+  .finds li{display:flex;gap:10px;align-items:baseline;padding:7px 0;border-top:1px solid var(--faint)}
+  .finds li:first-of-type{border-top:0}
+  .finds li .what{flex:1;font-size:14px}
+  .finds li .val{font-family:Georgia,"Times New Roman",serif;font-size:19px;white-space:nowrap}
+  .finds li .corro{font-size:12px;color:var(--mute);display:block;margin-top:2px}
+  .finds li.fresh .val{color:var(--clay)}
+  .finds .none{font-size:14px;color:var(--mute);margin:0}
+  .log{margin-top:14px;background:var(--bg);border-radius:10px;padding:12px;
+    max-height:190px;overflow:auto;font-size:13px}
+  .log p{margin:0 0 9px;padding-left:12px;border-left:3px solid var(--faint)}
+  .log p:last-child{margin-bottom:0}
+  .log p.elim{border-left-color:var(--teal)}
+  .log p.enum{border-left-color:var(--clay)}
+  .log b{font-weight:bold}
+
+  .grid{display:grid;gap:9px;grid-template-columns:repeat(auto-fill,minmax(112px,1fr))}
+  .sus{background:var(--bg);border:1px solid var(--faint);border-radius:9px;padding:9px;font-size:11.5px}
+  .sus .id{display:block;font-family:Georgia,"Times New Roman",serif;font-size:15px;margin-bottom:5px;color:var(--ink)}
+  .sus .pc{float:right;font-size:11px;color:var(--mute);font-family:"Helvetica Neue",Helvetica,Arial,sans-serif}
+  .sus .pbar{display:block;height:4px;border-radius:999px;background:var(--faint);margin:0 0 7px;overflow:hidden}
+  .sus .pbar i{display:block;height:100%;background:var(--teal);border-radius:999px}
+  .sus.hit .pbar i{background:var(--clay)}
+  .sus .t{display:flex;justify-content:space-between;gap:6px;color:var(--mute)}
+  .sus .t b{font-weight:normal;color:var(--ink)}
+  .sus .t.cut b{color:var(--bad);text-decoration:line-through}
+  .sus.out{opacity:.4}
+  .sus.out .id{text-decoration:line-through}
+  .sus.hit{border-color:var(--teal);box-shadow:inset 0 0 0 1px var(--teal)}
+
+  label.lbl{display:block;font-weight:bold;font-size:13px;margin-bottom:5px}
+  .lblv{font-family:Georgia,"Times New Roman",serif;font-size:16px;font-weight:400;color:var(--clay);margin-left:2px}
+  input[type=range]{width:100%;accent-color:var(--teal)}
+  .scale{display:flex;justify-content:space-between;font-size:12px;color:var(--mute)}
+  .code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+  .exprbox{display:flex;align-items:center;gap:6px;background:var(--bg);
+    border:1px solid var(--faint);border-radius:10px;padding:10px 12px;flex-wrap:wrap}
+  .exprbox .fix{color:var(--clay);font-size:13px;white-space:nowrap}
+  .exprbox input{flex:1 1 220px;min-width:0;background:transparent;border:0;
+    color:var(--ink);font-size:14px;padding:3px 0}
+  .out{margin-top:10px;background:var(--bg);border-radius:10px;padding:12px;font-size:13.5px}
+  .out.err{background:var(--bad-soft);color:var(--bad)}
+  textarea{width:100%;min-height:84px;border:1px solid var(--faint);border-radius:10px;
+    background:var(--bg);color:var(--ink);font:inherit;font-size:15px;padding:11px;resize:vertical}
+  details{background:var(--bg);border-radius:10px;padding:12px 14px;margin-top:10px}
+  summary{cursor:pointer;font-weight:bold;font-size:14px}
+  details table{width:100%;border-collapse:collapse;margin-top:10px;font-size:13px}
+  details td{border-top:1px solid var(--faint);padding:7px 6px;vertical-align:top}
+  details td:first-child{white-space:nowrap;color:var(--clay);font-size:11px;
+    letter-spacing:.05em;text-transform:uppercase;padding-right:12px}
+  footer{color:var(--mute);font-size:13px;margin-top:26px;display:flex;
+    justify-content:space-between;flex-wrap:wrap;gap:8px}
+  .opts{display:grid;gap:8px;margin-top:6px}
+  .opts label{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--faint);border-radius:10px;
+    padding:10px 12px;cursor:pointer;min-height:44px;font-size:15px;background:var(--card)}
+  .opts input{accent-color:var(--teal);width:18px;height:18px;margin:2px 0 0;flex:none}
+  .opts label:focus-within{outline:2px solid var(--teal);outline-offset:2px}
+  .gatefb{margin:12px 0 0;padding:12px 14px;border-radius:10px;font-size:14.5px;background:var(--bg)}
+  .gatefb.ok{background:var(--good-soft)} .gatefb.no{background:var(--bad-soft)}
+  .gatefb:empty{display:none}
+  [hidden]{display:none !important}
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .source{color:var(--mute);font-size:13px;margin:26px 0 0;max-width:72ch}
+  .source + footer{margin-top:8px}
+  /* Instructor freeze: a small box in the lower left. */
+  .freeze{position:fixed;left:10px;bottom:10px;z-index:20;display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+    padding:6px 8px;border-radius:10px;background:var(--card);border:1px solid var(--faint);box-shadow:var(--shadow);
+    font-size:13px;color:var(--mute);max-width:calc(100vw - 80px)}
+  .freeze input{width:9em;font:inherit;padding:4px 6px;border:1px solid var(--faint);border-radius:6px;background:var(--bg);color:var(--ink)}
+  .freeze input[aria-invalid="true"]{border-color:var(--bad)}
+  .freeze button{font:inherit;padding:4px 10px;border-radius:6px;border:1px solid var(--faint);background:var(--bg);color:var(--ink);cursor:pointer}
+  .freeze-note{color:var(--ink);font-weight:600}
+  .freeze-note:empty{display:none}
+  html.frozen .wrap{opacity:.75;cursor:not-allowed}
+  body{padding-bottom:56px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">CS350 · Inductive reasoning</p>
+  <h1>Quantity or variety?</h1>
+  <div class="toprow" id="toprow" hidden>
+    <button class="btn solid" type="button" id="newCase">New case</button>
+    <button class="btn" type="button" id="resetTop">Start this case over</button>
+  </div>
+  <p class="lede">An inductive argument can be strengthened two ways: more of the same evidence, or a different kind of evidence. Wilkins calls these enumerative and eliminative induction. You have a budget. Spend it, and watch which kind of spending actually narrows the field.</p>
+
+  <div class="card">
+    <h2>Two ways to make an inductive argument stronger</h2>
+    <p class="sub">Open each one. Then watch which kind of spending each purchase below counts as.</p>
+    <div class="primer">
+      <div class="def enum">
+        <button type="button" id="defEnum" aria-expanded="false" aria-controls="bodyEnum">
+          <span class="chev" id="chevEnum">+</span>
+          <span class="term">Quantity — <em>enumerative</em> induction</span>
+          <span class="gloss">More of the same kind of evidence.</span>
+        </button>
+        <div class="body" id="bodyEnum" hidden>
+          <p>You already have a blood analysis. You commission a second one. The new reading agrees with the first, and your belief that the culprit’s blood type really is O goes up.</p>
+          <p>What this buys you is a firmer <strong>premise</strong>. If readings are perfect it can buy nothing else, since the second reading can only repeat the first. Once readings can be wrong, agreement concentrates belief and disagreement spreads it back out — so quantity starts to pay.</p>
+          <p class="ex">In the reading: enlarging the sample. Every donkey you meet after the first is enumerative — the argument about donkeys and carrots gets stronger because the sample grows, not because a new kind of observation enters.</p>
+        </div>
+      </div>
+      <div class="def elim">
+        <button type="button" id="defElim" aria-expanded="false" aria-controls="bodyElim">
+          <span class="chev" id="chevElim">+</span>
+          <span class="term">Variety — <em>eliminative</em> induction</span>
+          <span class="gloss">A different kind of evidence.</span>
+        </button>
+        <div class="body" id="bodyElim" hidden>
+          <p>You have a blood analysis, and now you buy the security camera. It speaks to something the blood could not: height. Suspects who matched on blood but are the wrong height now fall away.</p>
+          <p>The name comes from what it does to <strong>competing hypotheses</strong>. Each new kind of evidence pushes down a different set of rival explanations, and the hypothesis that survives all of them is the stronger for it.</p>
+          <p class="ex">In the reading: blood type, then height, then handedness. Each is a different axis, so each cuts the field again — which is why eliminative induction matters most when you are trying to establish a cause.</p>
+        </div>
+      </div>
+    </div>
+    <p class="tally" id="tally" hidden></p>
+  </div>
+
+  <div class="card" id="gateCard">
+    <h2>Before you investigate: which step adds variety?</h2>
+    <p class="sub">Footprints at a crime scene suggest the culprit wears size 10 shoes. Agree on an answer as a group; the investigation opens once you choose.</p>
+    <p class="lbl" id="gateLbl" style="font-size:15px">Which next step is <em>eliminative</em> induction (a different kind of evidence) rather than <em>enumerative</em> induction (more of the same)?</p>
+    <div class="opts" role="radiogroup" aria-labelledby="gateLbl" id="gateOpts"></div>
+    <p class="gatefb" id="gateFb" aria-live="polite"></p>
+  </div>
+
+  <div class="cols" id="game" hidden>
+    <div>
+      <div class="card">
+        <h2>The investigation</h2>
+        <p class="sub" id="budgetSub">Each purchase costs one unit of budget. There are four kinds of evidence and five units to spend, so you have a real choice about how to spend the last one.</p>
+        <div class="stats">
+          <div class="stat"><div class="k">Budget left</div><div class="v" id="sBudget">5</div></div>
+          <div class="stat"><div class="k">Still in play (≥1%)</div><div class="v" id="sLeft">50</div></div>
+          <div class="stat"><div class="k">Leading suspect</div><div class="v" id="sTop">—</div></div>
+          <div class="stat"><div class="k">Its share</div><div class="v" id="sShare">2.0%</div></div>
+        </div>
+        <div class="shop" id="shop"></div>
+        <div class="row">
+          <button class="btn ghost" type="button" id="reset">Start over</button>
+        </div>
+        <div class="alarm" id="alarm" hidden></div>
+        <div class="finds" id="finds" aria-live="polite"></div>
+        <div class="log" id="log" aria-live="polite"></div>
+      </div>
+
+      <div class="card">
+        <h2>Case settings</h2>
+        <p class="sub">A different case number deals a different pool of suspects. Nothing is random at run time: the same number always deals the same pool.</p>
+        <label class="lbl" for="caseNumber">Case number: <span class="lblv" id="caseOut">7</span></label>
+        <input type="range" id="caseNumber" min="1" max="24" step="1" value="7">
+        <div class="scale"><span>1</span><span>24</span></div>
+        <label class="lbl" id="relLbl" style="margin-top:14px">How reliable is each reading?</label>
+        <div class="seg" role="group" aria-labelledby="relLbl" id="relSeg"></div>
+        <p class="hint" id="relBlurb"></p>
+        <label class="lbl" for="budget" style="margin-top:14px">Investigation budget: <span class="lblv" id="budgetOut">5</span></label>
+        <input type="range" id="budget" min="1" max="8" step="1" value="5">
+        <div class="scale"><span>1</span><span>8</span></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <h2>Suspect pool</h2>
+        <p class="sub" id="poolSub">Nobody is ruled out yet.</p>
+        <div class="grid" id="grid"></div>
+        <div class="accuse" id="accuse"></div>
+      </div>
+
+      <div class="card">
+        <h2>Filter the pool yourself, in R</h2>
+        <p class="sub">Write the condition as you would in R. It runs as you type, against all <span id="poolN">50</span> suspects — including the ones your evidence has already ruled out.</p>
+        <div class="exprbox">
+          <span class="fix code">subset(suspects,</span>
+          <label class="sr" for="filterExpr">Filter condition in R</label>
+          <input id="filterExpr" class="code" type="text" spellcheck="false" autocomplete="off"
+                 value='blood == "O" &amp; hand == "Left"'>
+          <span class="fix code">)</span>
+        </div>
+        <p class="hint">Columns: <span class="code">blood</span> ("A","B","AB","O"), <span class="code">height</span> ("Short","Average","Tall"), <span class="code">hand</span> ("Right","Left"), <span class="code">alibi</span> ("None","Weak","Solid"), <span class="code">id</span>. Operators: <span class="code">&amp;</span> is AND, <span class="code">|</span> is OR, <span class="code">!</span> is NOT, <span class="code">==</span> tests equality, <span class="code">!=</span> tests inequality. <span class="code">%in%</span> works too: <span class="code">blood %in% c("A","O")</span>.</p>
+        <div class="out" id="exprOut"></div>
+      </div>
+
+      <div class="card">
+        <h2>Work these out</h2>
+        <p class="sub">One or two sentences each. Be ready to share.</p>
+        <p><label class="lbl" for="q1">1. With reliability on Perfect, buy the same kind of evidence twice. Nothing moves. Now set reliability to Low and do it again. What does the second purchase buy you in each case, and what does the difference tell you about when quantity is worth paying for?</label></p>
+        <textarea id="q1"></textarea>
+        <p style="margin-top:14px"><label class="lbl" for="q2">2. With the budget at 5, try two allocations: all four kinds of evidence plus one repeat, and then only three kinds with the other two units spent on confirmation. Where does each leave you, and what did the extra breadth cost you in certainty about any one finding?</label></p>
+        <textarea id="q2"></textarea>
+        <p style="margin-top:14px"><label class="lbl" for="q3">3. Set reliability to Low and, across several case numbers, spend four of your five units on breadth: one of each kind of evidence. What goes wrong, and how would you have to spend differently to guard against it? Say what this does to the claim that variety always beats quantity.</label></p>
+        <textarea id="q3"></textarea>
+      </div>
+
+      <details>
+        <summary>Assumption ledger — what this page encodes</summary>
+        <table id="ledger"></table>
+      </details>
+    </div>
+  </div>
+
+  <p class="source">Source: Wilkins, J. F. (2020). <cite>Inductive reasoning</cite> [Course reading, CS50 Formal Analyses]. Minerva Schools at KGI. See the section “Strategies for Strengthening Inductive Arguments”.</p>
+
+  <footer>
+    <span>Minerva University® · Professor Alexis Diamond</span>
+    <span>#induction · ideasatplay.org</span>
+  </footer>
+</div>
+<div class="freeze" id="freezeBox" role="group" aria-label="Instructor freeze">
+  <span class="freeze-note" id="freezeNote"></span>
+  <span id="freezeForm">
+    <label class="sr" for="freezeCode">Instructor code</label>
+    <input id="freezeCode" type="password" autocomplete="off" placeholder="Instructor code">
+    <button type="button" id="freezeBtn">Freeze</button>
+  </span>
+  <button type="button" id="unfreezeBtn" hidden>Unfreeze</button>
+</div>
+<p class="sr" aria-live="polite" id="live"></p>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------------- constants ---------------- */
+
+  var TRAITS = [
+    { key:'blood',  label:'Blood analysis',        noun:'blood type',  values:['A','B','AB','O'] },
+    { key:'height', label:'Security camera',       noun:'height',      values:['Short','Average','Tall'] },
+    { key:'hand',   label:'Forensics',             noun:'handedness',  values:['Right','Left'] },
+    { key:'alibi',  label:'Detective interviews',  noun:'alibi',       values:['None','Weak','Solid'] }
+  ];
+  var POOL_SIZE = 50;
+
+  var RELIABILITY = [
+    { key:'perfect', label:'Perfect',  p:1.00, blurb:'Every reading reports the truth.' },
+    { key:'high',    label:'High',     p:0.90, blurb:'About one reading in ten is wrong.' },
+    { key:'low',     label:'Low',      p:0.65, blurb:'About one reading in three is wrong.' },
+    { key:'none',    label:'None',     p:0.00, blurb:'Readings are noise: any value, at random.' }
+  ];
+  function relByKey(k){
+    for(var i=0;i<RELIABILITY.length;i++){ if(RELIABILITY[i].key===k) return RELIABILITY[i]; }
+    return RELIABILITY[0];
+  }
+
+  var LEDGER = [
+    ['interpretation','Evidence reveals one trait of the culprit per reading, correctly with a probability you set: 1 at Perfect, 0.9 at High, 0.65 at Low, and at None the reading is drawn uniformly at random from the trait’s values.'],
+    ['interpretation','No suspect is removed from the pool. Each suspect holds a share of belief, started uniform at 1 in 50 and multiplied by each reading: by the reliability p when the suspect matches it, and by (1 − p) spread over the other values when they do not. This is Bayes’ rule with a flat prior. At Perfect, (1 − p) is zero, so one mismatch takes a share to zero; below Perfect every suspect keeps some share. At None (p = 0) readings carry no information, so belief stays uniform.'],
+    ['interpretation','The findings panel still reports the most common reading of each kind as a summary, but the scores behind the grid use every reading, including the ones that disagree.'],
+    ['interpretation','Eliminative induction is operationalised as a new kind of evidence pushing down the share of every suspect who does not fit it. With perfect readings that share falls to zero, which is ruling a suspect out in Wilkins’s sense, where the competing hypotheses are suspects; with fallible readings a misfit is weakened, never eliminated.'],
+    ['interpretation','Enumerative induction is operationalised as a repeat purchase of the same kind of evidence: it corroborates, or unsettles, a finding already made. With perfect readings it changes nothing; with fallible readings it shifts belief among suspects the earlier evidence already favoured, but rules no new kind of rival out.'],
+    ['simplification','A suspect has exactly four independent traits. Real evidence is correlated — height and handedness would both bear on, say, the angle of a blow.'],
+    ['simplification','All four kinds of evidence cost the same and share one reliability setting; no kind is more trustworthy than another, and reliability cannot be set per kind.'],
+    ['simplification','Readings of the same kind are independent, so a systematically biased instrument — one that is wrong the same way every time — cannot be represented, and repeat purchases always help more than they would in reality.'],
+    ['simplification','A suspect below one percent is faded and counted out of the “in play” figure, but they are not eliminated; the threshold is a display convention, not part of the model.'],
+    ['simplification','The prior is flat: before any evidence every suspect is equally likely, which ignores everything an investigator would already know.'],
+    ['simplification','Order of purchase does not affect the final surviving set — only the story the log tells — because the record depends on which readings exist, not when they were bought.'],
+    ['parameter','Pool size is fixed at 50 suspects.'],
+    ['parameter','Budget defaults to 5 and can be set between 1 and 8. There are only 4 kinds of evidence, so above a budget of 4 you must repeat something (or leave units unspent), and at 4 or below every repeat costs you a kind. Either way, spending is a trade-off between breadth and corroboration.'],
+    ['distribution','Each trait is drawn independently and uniformly over its values, so blood type splits roughly 1 in 4 and handedness roughly 1 in 2 — hence a single handedness purchase eliminates far fewer suspects than a blood purchase.'],
+    ['distribution','Because traits are uniform and independent, a suspect other than the culprit matches all four traits with probability 1 in 72 (4 × 3 × 2 × 3). The culprit always survives a full sweep of perfect evidence, and on average 49 ÷ 72 ≈ 0.68 other suspects survive with them, so the culprit ends up alone only about half the time (14 of the 24 case numbers).'],
+    ['simplification','The filter box accepts a deliberately small slice of R — comparisons, &, |, !, and %in% — and evaluates it in the browser. It is not an R interpreter, and R features beyond that slice will not work.'],
+    ['simplification','Charging a suspect is scored only as right or wrong against the generated culprit. Nothing models the standard of proof a charge would really have to meet, and the page deliberately lets you charge before your budget is spent.'],
+    ['data','No real case data. The pool is generated by a seeded pseudo-random number generator; a given case number always produces the same 50 suspects and the same culprit.']
+  ];
+
+  /* The opening question. Any answer opens the game (gated on answered, never on correct). */
+  var GATE = [
+    { value:'second', label:'Have a second expert measure the same footprints.',
+      fb:'Not quite. A second measurement of the same footprints is more of the same kind of evidence: quantity, or enumerative induction. It can make you surer the size really is 10, but it can’t tell apart two suspects who both wear size 10.' },
+    { value:'prints', right:true, label:'Check the fingerprints on the door handle.',
+      fb:'Right. Fingerprints are a different kind of evidence: variety, or eliminative induction. They speak to something the footprints can’t, so suspects who wear size 10 but have the wrong prints drop away.' },
+    { value:'reread', label:'Ask the first expert to reread their own report.',
+      fb:'Not quite. Rereading the same report adds no new evidence at all: neither more of the same nor a different kind.' }
+  ];
+  function gateOption(v){ for(var i = 0; i < GATE.length; i++) if(GATE[i].value === v) return GATE[i]; return null; }
+
+  /* ---------------- pure model ---------------- */
+
+  function mulberry32(a){
+    return function(){
+      a |= 0; a = a + 0x6D2B79F5 | 0;
+      var t = Math.imul(a ^ a >>> 15, 1 | a);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+
+  function makePool(caseNumber){
+    var rnd = mulberry32(caseNumber * 2654435761 % 4294967296);
+    var pool = [];
+    for(var i = 1; i <= POOL_SIZE; i++){
+      var s = { id:i };
+      TRAITS.forEach(function(t){
+        s[t.key] = t.values[Math.floor(rnd() * t.values.length)];
+      });
+      pool.push(s);
+    }
+    var culprit = pool[Math.floor(rnd() * pool.length)];
+    return { pool:pool, culprit:culprit };
+  }
+
+  // one lab reading: deterministic given case, trait, reading index and reliability
+  function readingValue(caseNumber, traitKey, idx, culprit, relKey){
+    var t = traitByKey(traitKey), vals = t.values, truth = culprit[traitKey];
+    var rel = relByKey(relKey);
+    if(rel.p >= 1) return truth;
+    var ti = TRAITS.map(function(x){ return x.key; }).indexOf(traitKey);
+    var rnd = mulberry32((caseNumber * 7919 + ti * 104729 + idx * 1299721) >>> 0);
+    rnd();                                   // discard the first draw, which is weakly seeded
+    if(rel.p <= 0) return vals[Math.floor(rnd() * vals.length)];
+    if(rnd() < rel.p) return truth;
+    var wrong = vals.filter(function(v){ return v !== truth; });
+    return wrong[Math.floor(rnd() * wrong.length)];
+  }
+
+  // every reading bought of one kind, in purchase order
+  function readingsFor(caseNumber, traitKey, n, culprit, relKey){
+    var out = [];
+    for(var i = 0; i < n; i++) out.push(readingValue(caseNumber, traitKey, i, culprit, relKey));
+    return out;
+  }
+
+  // what the record currently says a trait is: the majority of its readings,
+  // ties broken by the earliest reading among the tied values
+  function finding(reads){
+    if(!reads.length) return null;
+    var tally = {};
+    reads.forEach(function(v){ tally[v] = (tally[v] || 0) + 1; });
+    var best = null, bestN = 0;
+    reads.forEach(function(v){ if(tally[v] > bestN){ best = v; bestN = tally[v]; } });
+    return { value:best, agree:bestN, of:reads.length, split:Object.keys(tally).length > 1 };
+  }
+
+  // the record: one finding per kind of evidence bought at least once
+  function record(caseNumber, culprit, purchases, relKey){
+    var rec = {};
+    TRAITS.forEach(function(t){
+      var n = purchases[t.key] || 0;
+      if(!n) return;
+      var reads = readingsFor(caseNumber, t.key, n, culprit, relKey);
+      rec[t.key] = finding(reads);
+      rec[t.key].reads = reads;
+      rec[t.key].true_ = culprit[t.key];
+      rec[t.key].wrong = rec[t.key].value !== culprit[t.key];
+    });
+    return rec;
+  }
+
+  // suspects consistent with the record — note this uses what the evidence SAYS,
+  // not what is true, which is the whole point once readings can be wrong
+  function survivorsOf(pool, rec){
+    var keys = Object.keys(rec);
+    return pool.filter(function(s){
+      return keys.every(function(k){ return s[k] === rec[k].value; });
+    });
+  }
+
+  // every reading bought so far, flattened
+  function allReadings(caseNumber, culprit, purchases, relKey){
+    var out = [];
+    TRAITS.forEach(function(t){
+      var n = purchases[t.key] || 0;
+      readingsFor(caseNumber, t.key, n, culprit, relKey).forEach(function(v){
+        out.push({ key:t.key, value:v });
+      });
+    });
+    return out;
+  }
+
+  // posterior over suspects: no elimination, just how well each one fits the readings.
+  // Each reading multiplies a suspect's weight by p if it matches, and by the
+  // chance of a misreading landing on that value if it does not.
+  function scoreSuspects(pool, reads, relKey){
+    var p = relByKey(relKey).p;
+    var w = pool.map(function(s){
+      if(p <= 0) return 1;                       // noise carries no information at all
+      var x = 1;
+      reads.forEach(function(r){
+        var k = traitByKey(r.key).values.length;
+        x *= (s[r.key] === r.value) ? p : (1 - p) / (k - 1);
+      });
+      return x;
+    });
+    var total = w.reduce(function(a, b){ return a + b; }, 0);
+    return w.map(function(x){ return total > 0 ? x / total : 0; });
+  }
+
+  // kept for the perfect-evidence case: consistency with the culprit's true traits
+  function survivors(pool, culprit, kinds){
+    return pool.filter(function(s){
+      return kinds.every(function(k){ return s[k] === culprit[k]; });
+    });
+  }
+
+  function kindsBought(purchases){
+    return TRAITS.filter(function(t){ return (purchases[t.key] || 0) > 0; })
+                 .map(function(t){ return t.key; });
+  }
+
+  function totalBuys(purchases){
+    return TRAITS.reduce(function(n,t){ return n + (purchases[t.key] || 0); }, 0);
+  }
+
+  function traitByKey(k){
+    for(var i=0;i<TRAITS.length;i++){ if(TRAITS[i].key === k) return TRAITS[i]; }
+    return null;
+  }
+
+  /* ---------------- state ---------------- */
+
+  var state = {
+    caseNumber: 7,
+    budget: 5,
+    reliability: 'perfect',
+    accused: null,
+    charged: null,
+    purchases: { blood:0, height:0, hand:0, alibi:0 },
+    order: [],              // sequence of purchases, for the log
+    openEnum: false,
+    openElim: false,
+    filterExpr: 'blood == "O" & hand == "Left"',
+    q1: '', q2: '', q3: '',
+    gate: '',             // answer to the opening question; the game opens once it is answered
+    frozenBy: ''          // the screen that froze the room (instructor freeze)
+  };
+
+  var listeners = [];
+
+  function copy(o){ return JSON.parse(JSON.stringify(o)); }
+
+  function normalise(){
+    // Numbers that arrive as junk fall back to the defaults instead of becoming NaN.
+    var cn = Math.round(+state.caseNumber), bu = Math.round(+state.budget);
+    state.caseNumber = isFinite(cn) ? Math.min(24, Math.max(1, cn)) : 7;
+    state.budget = isFinite(bu) ? Math.min(8, Math.max(1, bu)) : 5;
+    if(!relByKey(state.reliability) || RELIABILITY.map(function(r){return r.key;}).indexOf(state.reliability) === -1){
+      state.reliability = 'perfect';
+    }
+    var ids = {};
+    for(var z = 1; z <= POOL_SIZE; z++) ids[z] = true;
+    if(!ids[state.accused]) state.accused = null;
+    if(!ids[state.charged]) state.charged = null;
+    if(state.charged) state.accused = state.charged;
+    state.openEnum = !!state.openEnum;
+    state.openElim = !!state.openElim;
+    if(!gateOption(state.gate)) state.gate = '';
+    state.frozenBy = typeof state.frozenBy === 'string' ? state.frozenBy.slice(0, 16) : '';
+    ['filterExpr', 'q1', 'q2', 'q3'].forEach(function(k){ if(typeof state[k] !== 'string') state[k] = ''; });
+    TRAITS.forEach(function(t){
+      var n = Math.round(+state.purchases[t.key]);
+      state.purchases[t.key] = isFinite(n) ? Math.max(0, n) : 0;
+    });
+    // Keep order consistent with the counts first (set programmatically, it may arrive short,
+    // long or with unknown kinds), so the budget trim below always has a purchase to drop.
+    if(!Array.isArray(state.order)) state.order = [];
+    var counted = {};
+    state.order = state.order.filter(function(k){
+      if(!traitByKey(k) || !state.purchases[k]) return false;
+      counted[k] = (counted[k] || 0) + 1;
+      return counted[k] <= state.purchases[k];
+    });
+    TRAITS.forEach(function(t){
+      var have = counted[t.key] || 0;
+      while(have < state.purchases[t.key]){ state.order.push(t.key); have++; }
+    });
+    // Trim purchases that exceed the budget: the most recent go first.
+    while(totalBuys(state.purchases) > state.budget){
+      var last = state.order.pop();
+      state.purchases[last] -= 1;
+    }
+  }
+
+  function emit(){
+    var snap = copy(state);
+    listeners.slice().forEach(function(fn){ try{ fn(snap); }catch(e){} });
+  }
+
+  function change(mutate){ mutate(); normalise(); render(); emit(); }
+
+  /* ---------------- render ---------------- */
+
+  var $ = function(id){ return document.getElementById(id); };
+
+  function setText(el, t){ if(el.textContent !== t) el.textContent = t; }
+  function setBox(el, v){ if(el.value !== v) el.value = v; }
+
+  function render(){
+    // Some controls are rebuilt on every render; note which one has keyboard focus to restore it.
+    var ae = document.activeElement, fBox = ae && ae.closest ? ae.closest('#relSeg, #shop, #grid, #accuse') : null;
+    var fIdx = fBox ? Array.prototype.indexOf.call(fBox.querySelectorAll('button'), ae) : -1;
+    var built = makePool(state.caseNumber);
+    var pool = built.pool, culprit = built.culprit;
+    var kinds = kindsBought(state.purchases);
+    var rec = record(state.caseNumber, culprit, state.purchases, state.reliability);
+    var reads = allReadings(state.caseNumber, culprit, state.purchases, state.reliability);
+    var score = scoreSuspects(pool, reads, state.reliability);
+    var EPS = 1e-9;
+    var maxScore = Math.max.apply(null, score.concat([0]));
+    var leaders = [];
+    score.forEach(function(x, i){ if(x >= maxScore - EPS) leaders.push(i); });
+    var topIdx = leaders[0];
+    var culpritIdx = pool.indexOf(culprit);
+    var culpritScore = score[culpritIdx] || 0;
+    var culpritLeads = culpritScore >= maxScore - EPS;
+    var culpritRank = score.filter(function(x){ return x > culpritScore + EPS; }).length + 1;
+    var tiedWithCulprit = score.filter(function(x){ return Math.abs(x - culpritScore) <= EPS; }).length;
+    var inPlay = score.filter(function(x){ return x >= 0.01; }).length;
+    var alive = pool.filter(function(s, i){ return score[i] >= 0.01; });
+    var culpritOut = culpritScore < 0.01;
+    var spent = totalBuys(state.purchases);
+    var left = state.budget - spent;
+
+    setText($('sBudget'), String(left));
+    setText($('sLeft'), String(inPlay));
+    setText($('sTop'), !reads.length ? 'all tied'
+      : (leaders.length > 1 ? leaders.length + ' tied' : '#' + pool[topIdx].id));
+    setText($('sShare'), (maxScore * 100).toFixed(maxScore < 0.1 ? 1 : 0) + '%' +
+      (leaders.length > 1 && reads.length ? ' each' : ''));
+    setText($('caseOut'), String(state.caseNumber));
+    /* opening question: the game stays hidden until it is answered */
+    var gated = !gateOption(state.gate), go = gateOption(state.gate);
+    $('game').hidden = gated; $('toprow').hidden = gated; $('tally').hidden = gated;
+    Array.prototype.forEach.call(document.querySelectorAll('#gateOpts input'), function(r){ r.checked = r.value === state.gate; });
+    $('gateFb').className = 'gatefb' + (go ? (go.right ? ' ok' : ' no') : '');
+    setText($('gateFb'), go ? go.fb + ' The investigation is open below.' : '');
+
+    setText($('budgetOut'), String(state.budget));
+    var words = ['zero','one','two','three','four','five','six','seven','eight'], extra = state.budget - TRAITS.length;
+    setText($('budgetSub'), 'Each purchase costs one unit of budget. There are four kinds of evidence and ' + words[state.budget] +
+      ' unit' + (state.budget === 1 ? '' : 's') + ' to spend, ' +
+      (extra > 0 ? 'so you have a real choice about how to spend the last ' + (extra === 1 ? 'one' : words[extra]) + '.'
+       : extra === 0 ? 'exactly enough for one of each kind, if you buy no repeats.'
+       : 'so you can’t even buy one of each kind: breadth itself is rationed.'));
+    setText($('poolN'), String(POOL_SIZE));
+    if($('caseNumber').value !== String(state.caseNumber)) $('caseNumber').value = state.caseNumber;
+    if($('budget').value !== String(state.budget)) $('budget').value = state.budget;
+    $('budget').disabled = !!state.charged;
+
+    /* reliability control */
+    var relSeg = $('relSeg');
+    relSeg.innerHTML = '';
+    RELIABILITY.forEach(function(r){
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = r.label;
+      b.setAttribute('aria-pressed', state.reliability === r.key ? 'true' : 'false');
+      b.disabled = !!state.charged;   // a charged case is locked
+      b.addEventListener('click', function(){
+        change(function(){ state.reliability = r.key; });
+      });
+      relSeg.appendChild(b);
+    });
+    setText($('relBlurb'), relByKey(state.reliability).blurb +
+      (state.reliability === 'perfect'
+        ? ' Repeat purchases can tell you nothing new.'
+        : ' A repeat purchase is a second, independent reading — and readings can disagree.'));
+
+    /* alarm: the record has ruled out the culprit */
+    var alarm = $('alarm');
+    if(reads.length && !culpritLeads){
+      alarm.hidden = false;
+      alarm.innerHTML = '<b>Your evidence is pointing at the wrong person.</b> ' +
+        (leaders.length > 1
+          ? leaders.length + ' suspects share the lead on ' + (maxScore * 100).toFixed(0) + '% each'
+          : 'Suspect #' + pool[topIdx].id + ' leads on ' + (maxScore * 100).toFixed(0) + '%') +
+        ', and the culprit, #' + culprit.id + ', is not ' + (leaders.length > 1 ? 'among them' : 'that person') +
+        ' — ranked ' + culpritRank +
+        ' on ' + (culpritScore * 100).toFixed(culpritScore < 0.1 ? 1 : 0) +
+        '%. At least one reading is wrong, and nothing on the page distinguishes a wrong reading from a right one. ' +
+        'Buying another reading of a kind you already have is how you would find out.';
+    } else {
+      alarm.hidden = true;
+      alarm.innerHTML = '';
+    }
+
+    /* primer */
+    [['Enum','openEnum'],['Elim','openElim']].forEach(function(pair){
+      var open = state[pair[1]];
+      var btn = $('def' + pair[0]);
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      $('body' + pair[0]).hidden = !open;
+      setText($('chev' + pair[0]), open ? '−' : '+');
+    });
+    var repeats = spent - kinds.length;
+    var tallyTxt;
+    if(!spent){
+      tallyTxt = 'Nothing bought yet. Every first purchase of a kind is variety; every purchase after that of the same kind is quantity.';
+    } else {
+      tallyTxt = 'So far: ' + kinds.length + ' ' + (kinds.length === 1 ? 'kind' : 'kinds') +
+        ' of evidence (variety) and ' + repeats + ' ' + (repeats === 1 ? 'repeat' : 'repeats') +
+        ' (quantity). Breadth is what took the field from ' + POOL_SIZE + ' to ' + inPlay +
+        ' suspects above one percent; the ' + (repeats === 1 ? 'repeat' : 'repeats') + ' ' +
+        (state.reliability === 'perfect'
+          ? 'changed nothing at all, because a perfect reading can only repeat itself.'
+          : 'sharpened or shook the findings you already had — which matters here, because a reading can be wrong.');
+    }
+    setText($('tally'), tallyTxt);
+
+    /* shop */
+    var shop = $('shop');
+    shop.innerHTML = '';
+    TRAITS.forEach(function(t){
+      var n = state.purchases[t.key] || 0;
+      var repeat = n > 0;
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'buy' + (repeat ? ' repeat' : '');
+      b.disabled = left <= 0 || !!state.charged;
+      b.innerHTML = '<span class="nm">' + t.label +
+        '<br><span class="tagk">' + (repeat ? 'repeat — corroborates the ' + t.noun
+                                            : 'new kind — ' + t.noun) + '</span></span>' +
+        '<span class="cnt">' + (n ? '×' + n : '') + '</span>';
+      b.addEventListener('click', function(){
+        change(function(){
+          if(totalBuys(state.purchases) >= state.budget) return;
+          state.purchases[t.key] = (state.purchases[t.key] || 0) + 1;
+          state.order.push(t.key);
+        });
+      });
+      shop.appendChild(b);
+    });
+
+    /* findings — what each purchased investigation revealed */
+    var finds = $('finds');
+    finds.innerHTML = '';
+    var fh = document.createElement('h3');
+    fh.textContent = 'What the evidence says about the culprit';
+    finds.appendChild(fh);
+    if(!kinds.length){
+      var pn = document.createElement('p');
+      pn.className = 'none';
+      pn.textContent = 'Nothing yet. Buy an investigation and its finding appears here.';
+      finds.appendChild(pn);
+    } else {
+      var ul = document.createElement('ul');
+      var lastKind = state.order.length ? state.order[state.order.length - 1] : null;
+      TRAITS.forEach(function(t){
+        var n = state.purchases[t.key] || 0;
+        if(!n) return;
+        var f = rec[t.key];
+        var li = document.createElement('li');
+        if(t.key === lastKind) li.className = 'fresh';
+        var what = document.createElement('span');
+        what.className = 'what';
+        var note;
+        if(n === 1){
+          note = '';
+        } else if(!f.split){
+          note = '<span class="corro">' + n + ' readings, all in agreement.</span>';
+        } else {
+          note = '<span class="corro">' + n + ' readings disagree — ' + f.agree + ' of ' + f.of +
+                 ' say ' + f.value + ', and the record goes with the majority.</span>';
+        }
+        var chips = '<span class="reads">' + f.reads.map(function(v){
+          return '<span class="' + (v === f.value ? '' : 'odd') + '">' + v + '</span>';
+        }).join('') + '</span>';
+        what.innerHTML = '<strong>' + t.label + '</strong><br>The record says the culprit’s ' + t.noun + ' is' +
+          note + (n > 1 ? chips : '');
+        var val = document.createElement('span');
+        val.className = 'val';
+        val.textContent = t.key === 'alibi' ? f.value.toLowerCase() : f.value;
+        li.appendChild(what); li.appendChild(val);
+        ul.appendChild(li);
+      });
+      finds.appendChild(ul);
+      var fn = document.createElement('p');
+      fn.className = 'none';
+      fn.style.marginTop = '9px';
+      fn.textContent = (state.reliability === 'perfect'
+        ? 'With perfect readings a suspect either matches every finding or holds no belief at all.'
+        : 'No reading is discarded. Every one of them shifts belief across the whole pool, including the readings that disagree with each other.');
+      finds.appendChild(fn);
+    }
+
+    /* log — rebuilt from order, so it always matches state */
+    var log = $('log');
+    log.innerHTML = '';
+    if(!state.order.length){
+      var p0 = document.createElement('p');
+      p0.textContent = 'No evidence yet. All ' + POOL_SIZE + ' suspects are in play.';
+      log.appendChild(p0);
+    }
+    var counts = {}, runRec = {}, runReads = [];
+    function lead(){
+      var sc = scoreSuspects(pool, runReads, state.reliability);
+      var mx = Math.max.apply(null, sc.concat([0]));
+      var tied = sc.filter(function(x){ return x >= mx - 1e-9; }).length;
+      return {
+        top: pool[sc.indexOf(mx)], share: mx, tied: tied,
+        who: tied > 1 ? tied + ' suspects tied' : '#' + pool[sc.indexOf(mx)].id,
+        live: sc.filter(function(x){ return x >= 0.01; }).length
+      };
+    }
+    state.order.forEach(function(k, i){
+      var t = traitByKey(k);
+      var b4 = lead(), before = b4.live;
+      counts[k] = (counts[k] || 0) + 1;
+      var reads = readingsFor(state.caseNumber, k, counts[k], culprit, state.reliability);
+      var thisRead = reads[counts[k] - 1];
+      var f = finding(reads);
+      var prevValue = runRec[k] ? runRec[k].value : null;
+      runRec[k] = f;
+      runReads.push({ key:k, value:thisRead });
+      var af = lead(), after = af.live;
+      var p = document.createElement('p');
+      if(counts[k] > 1){
+        p.className = 'enum';
+        var txt = '<b>' + (i+1) + '. ' + t.label + ' again.</b> Reading ' + counts[k] + ' of the ' +
+                  t.noun + ' says <b>' + thisRead + '</b>. ';
+        if(state.reliability === 'perfect'){
+          txt += 'It says what the first reading said, because readings are perfect here. Belief does not move at all: ' +
+                 'still ' + af.who + ' on ' + (af.share * 100).toFixed(0) + '%.';
+        } else if(thisRead === prevValue){
+          txt += 'It agrees with the earlier reading, and agreement is worth something: belief concentrates further. ' +
+                 'The front of the field moves from ' + (b4.share * 100).toFixed(0) + '% to ' +
+                 (af.share * 100).toFixed(0) + '%, and ' + after + ' suspects remain above one percent.';
+        } else {
+          txt += 'It contradicts the earlier reading. Belief spreads back out rather than sharpening: ' +
+                 af.who + ' now hold' + (af.tied > 1 ? '' : 's') + ' ' + (af.share * 100).toFixed(0) + '%, with ' + after +
+                 ' suspects above one percent. A disagreement is information too — it tells you the record was shakier than it looked.';
+        }
+        p.innerHTML = txt;
+      } else {
+        p.className = 'elim';
+        p.innerHTML = '<b>' + (i+1) + '. ' + t.label + '.</b> A kind of evidence you had not used: the reading says the ' +
+          t.noun + ' is <b>' + thisRead + '</b>. Belief shifts sharply — ' + af.who + ' on ' +
+          (af.share * 100).toFixed(0) + '%, and the number of suspects above one percent falls from ' +
+          before + ' to ' + after + '.';
+      }
+      log.appendChild(p);
+    });
+    if(left <= 0){
+      var pz = document.createElement('p');
+      if(inPlay === 1){
+        pz.innerHTML = '<b>Budget spent.</b> Belief has collapsed onto one suspect, #' + pool[leaders[0]].id + ' at ' +
+          (maxScore * 100).toFixed(0) + '%. That is where the evidence points' +
+          (state.reliability === 'perfect' ? '' : ', which is only as good as the readings behind it') +
+          ' — not proof that this person did it.';
+      } else {
+        pz.innerHTML = '<b>Budget spent</b> with ' + inPlay + ' suspects still above one percent, led by ' +
+          (leaders.length > 1 ? leaders.length + ' suspects tied' : '#' + pool[topIdx].id) +
+          ' on ' + (maxScore * 100).toFixed(0) + '%' + (leaders.length > 1 ? ' each' : '') + '.';
+      }
+      log.appendChild(pz);
+    }
+
+    /* grid */
+    var grid = $('grid');
+    grid.innerHTML = '';
+    pool.forEach(function(s, i){
+      var sc = score[i];
+      var faded = sc < 0.01;
+      var d = document.createElement('button');
+      d.type = 'button';
+      d.className = 'sus' + (faded ? ' out' : '') +
+                    (reads.length && sc >= maxScore - EPS ? ' hit' : '');
+      d.setAttribute('aria-pressed', state.accused === s.id ? 'true' : 'false');
+      d.setAttribute('aria-label', 'Suspect ' + s.id + ', ' + (sc * 100).toFixed(1) + ' percent');
+      if(state.charged){
+        d.disabled = true;
+      } else {
+        d.addEventListener('click', function(){
+          change(function(){ state.accused = (state.accused === s.id) ? null : s.id; });
+        });
+      }
+      var pct = reads.length ? (sc * 100) : (100 / POOL_SIZE);
+      var html = '<span class="id">#' + s.id + '<span class="pc">' +
+                 (pct < 0.1 && pct > 0 ? '&lt;0.1' : pct.toFixed(pct < 10 ? 1 : 0)) + '%</span></span>' +
+                 '<span class="pbar"><i style="width:' + Math.max(1, Math.min(100, pct / Math.max(maxScore * 100, 1) * 100)) + '%"></i></span>';
+      TRAITS.forEach(function(t){
+        var against = rec[t.key] && s[t.key] !== rec[t.key].value;
+        html += '<span class="t' + (against ? ' cut' : '') + '"><span>' + t.noun.split(' ')[0] +
+                '</span><b>' + s[t.key] + '</b></span>';
+      });
+      d.innerHTML = html;
+      grid.appendChild(d);
+    });
+    setText($('poolSub'), reads.length
+      ? 'Nobody is ruled out. Each suspect carries the share of belief the readings give them; ' + inPlay +
+        ' are still above one percent. A struck-through trait contradicts the most common reading of that kind.'
+      : 'No evidence yet, so every suspect holds an equal ' + (100 / POOL_SIZE).toFixed(1) + '% of the belief.');
+
+    /* accusation */
+    var acc = $('accuse');
+    acc.innerHTML = '';
+    acc.className = 'accuse';
+    if(state.charged){
+      var right = state.charged === culprit.id;
+      var chargedIdx = pool.map(function(x){ return x.id; }).indexOf(state.charged);
+      var chargedShare = score[chargedIdx] || 0;
+      acc.className = 'accuse ' + (right ? 'done' : 'wrong');
+      var p1 = document.createElement('p');
+      p1.className = 'big';
+      p1.innerHTML = right
+        ? 'You charged #' + state.charged + ', and #' + state.charged + ' did it.'
+        : 'You charged #' + state.charged + '. The culprit was #' + culprit.id + '.';
+      var p2 = document.createElement('p');
+      p2.innerHTML = 'You spent ' + spent + ' of ' + state.budget + ' units on ' + kinds.length +
+        ' kind' + (kinds.length === 1 ? '' : 's') + ' of evidence at <b>' +
+        relByKey(state.reliability).label.toLowerCase() + '</b> reliability. At the moment you charged, the evidence gave #' +
+        state.charged + ' a ' + (chargedShare * 100).toFixed(chargedShare < 0.1 ? 1 : 0) + '% share' +
+        (right ? '' : ', and the culprit ' + (culpritScore * 100).toFixed(culpritScore < 0.1 ? 1 : 0) + '%') + '.';
+      var p3 = document.createElement('p');
+      if(right && chargedShare >= maxScore - EPS && leaders.length === 1 && state.reliability === 'perfect'){
+        p3.textContent = 'The evidence pointed here and the evidence was sound. Note how little of that was your judgement: with perfect readings, the only question was whether you bought enough kinds.';
+      } else if(right && chargedShare < 0.4){
+        p3.textContent = 'Right, on a share that low, is mostly luck. Ask yourself what you would have charged on a different case number with the same spending.';
+      } else if(right){
+        p3.textContent = 'The evidence pointed here and it was right. It could have pointed here and been wrong — nothing on the page would have looked different.';
+      } else if(chargedShare >= maxScore - EPS){
+        p3.textContent = 'You followed the evidence and the evidence misled you. At least one reading was wrong, and no amount of staring at the grid would have revealed which. A repeat reading might have.';
+      } else {
+        p3.textContent = 'You charged against the evidence. Worth saying why you did — sometimes that is the right call, but it needs a reason the page cannot see.';
+      }
+      acc.appendChild(p1); acc.appendChild(p2); acc.appendChild(p3);
+      var again = document.createElement('button');
+      again.type = 'button'; again.className = 'btn solid'; again.textContent = 'New case';
+      again.addEventListener('click', nextCase);
+      acc.appendChild(again);
+    } else {
+      var q = document.createElement('p');
+      q.className = 'big';
+      q.textContent = state.accused
+        ? 'Charge suspect #' + state.accused + '?'
+        : 'Who did it? Pick a suspect above.';
+      acc.appendChild(q);
+      var note = document.createElement('p');
+      note.textContent = left > 0
+        ? 'You still have ' + left + ' unit' + (left === 1 ? '' : 's') + ' of budget. You may charge now or buy more evidence first — the evidence will not tell you when to stop.'
+        : 'Your budget is spent. Name someone.';
+      acc.appendChild(note);
+      var go = document.createElement('button');
+      go.type = 'button';
+      go.className = 'btn solid';
+      go.textContent = state.accused ? 'Charge #' + state.accused : 'Charge';
+      go.disabled = !state.accused;
+      go.addEventListener('click', function(){
+        change(function(){ state.charged = state.accused; });
+      });
+      acc.appendChild(go);
+    }
+
+    /* live filter */
+    var exprEl = $('filterExpr');
+    setBox(exprEl, state.filterExpr);
+    var outEl = $('exprOut');
+    var res = runFilter(pool, state.filterExpr);
+    if(res.error){
+      outEl.className = 'out err';
+      outEl.textContent = res.error;
+    } else {
+      outEl.className = 'out';
+      outEl.innerHTML = '<b>' + res.ids.length + '</b> of ' + POOL_SIZE + ' rows returned' +
+        (res.ids.length ? ': ' + res.ids.map(function(i){ return '#' + i; }).join(', ') : '.') +
+        (res.ids.length === POOL_SIZE ? ' — a condition that matches everyone rules nobody out.' : '');
+    }
+
+    setBox($('q1'), state.q1);
+    setBox($('q2'), state.q2);
+    setBox($('q3'), state.q3);
+    renderFreeze();
+    if(fIdx > -1){
+      var again = fBox.querySelectorAll('button')[fIdx];
+      if(again && !again.disabled && again !== document.activeElement) again.focus({ preventScroll:true });
+    }
+  }
+
+  var COLUMNS = ['blood','height','hand','alibi','id'];
+
+  // Read a small, honest subset of R and evaluate it row by row, without eval:
+  // comparisons, &, |, !, brackets, and x %in% c(...).
+  function rTokens(src){
+    var out = [], i = 0, m;
+    var re = /\s+|"([^"]*)"|'([^']*)'|(\d+(?:\.\d+)?)|([A-Za-z_.][A-Za-z0-9_.]*)|(%[A-Za-z]+%|==|!=|<=|>=|&&|\|\||[<>&|!(),=])/y;
+    while(i < src.length){
+      re.lastIndex = i;
+      m = re.exec(src);
+      if(!m) return { error: /["']/.test(src.slice(i)) ? 'That is not a complete condition yet — check your brackets and quotes.' : 'R does not understand “' + src.slice(i, i + 1) + '” here.' };
+      i = re.lastIndex;
+      if(m[1] !== undefined || m[2] !== undefined) out.push({ t:'str', v: m[1] !== undefined ? m[1] : m[2] });
+      else if(m[3] !== undefined) out.push({ t:'num', v: +m[3] });
+      else if(m[4] !== undefined) out.push({ t:'name', v: m[4] });
+      else if(m[5] !== undefined) out.push({ t:'op', v: m[5] === '&&' ? '&' : m[5] === '||' ? '|' : m[5] });
+    }
+    return { tokens:out };
+  }
+
+  function rParse(src){
+    var lx = rTokens(src);
+    if(lx.error) return lx;
+    var tk = lx.tokens, pos = 0;
+    var INCOMPLETE = 'That is not a complete condition yet — check your brackets and quotes.';
+    function peek(v){ return tk[pos] && tk[pos].t === 'op' && tk[pos].v === v; }
+    function fail(msg){ throw { rmsg: msg }; }
+    function eat(v){ if(!peek(v)) fail(INCOMPLETE); pos++; }
+    function or(){ var n = and(); while(peek('|')){ pos++; n = { op:'|', a:n, b:and() }; } return n; }
+    function and(){ var n = not(); while(peek('&')){ pos++; n = { op:'&', a:n, b:not() }; } return n; }
+    function not(){ if(peek('!')){ pos++; return { op:'!', a:not() }; } return cmp(); }
+    function cmp(){
+      var a = atom();
+      if(tk[pos] && tk[pos].t === 'op' && /^%/.test(tk[pos].v)){
+        if(tk[pos].v !== '%in%') fail('Only %in% is supported here among R’s special operators.');
+        pos++;
+        if(!(tk[pos] && tk[pos].t === 'name' && tk[pos].v === 'c')) fail('Write the set as c("A","B").');
+        pos++; eat('(');
+        var list = [];
+        while(!peek(')')){
+          if(!tk[pos] || (tk[pos].t !== 'str' && tk[pos].t !== 'num')) fail(INCOMPLETE);
+          list.push(tk[pos++].v);
+          if(peek(',')) pos++; else break;
+        }
+        eat(')');
+        return { op:'in', a:a, list:list };
+      }
+      if(peek('=')) fail('Use == to test equality; a single = is assignment in R.');
+      var ops = ['==','!=','<','>','<=','>='];
+      if(tk[pos] && tk[pos].t === 'op' && ops.indexOf(tk[pos].v) > -1){
+        var o = tk[pos++].v;
+        return { op:o, a:a, b:atom() };
+      }
+      return a;
+    }
+    function atom(){
+      var x = tk[pos];
+      if(!x) fail(INCOMPLETE);
+      if(x.t === 'op' && x.v === '('){ pos++; var n = or(); eat(')'); return n; }
+      pos++;
+      if(x.t === 'str' || x.t === 'num') return { lit:x.v };
+      if(x.t === 'name'){
+        if(x.v === 'TRUE' || x.v === 'FALSE') return { lit: x.v === 'TRUE' };
+        if(COLUMNS.indexOf(x.v) > -1) return { col:x.v };
+        fail('object ‘' + x.v + '’ not found. The columns are ' + COLUMNS.join(', ') + '.');
+      }
+      fail(INCOMPLETE);
+    }
+    try{
+      var tree = or();
+      if(pos < tk.length) fail(INCOMPLETE);
+      return { tree:tree };
+    } catch(e){
+      if(e && e.rmsg) return { error:e.rmsg };
+      throw e;
+    }
+  }
+
+  function rEval(n, row){
+    if('lit' in n) return n.lit;
+    if(n.col) return row[n.col];
+    switch(n.op){
+      case '|':  return !!rEval(n.a, row) || !!rEval(n.b, row);
+      case '&':  return !!rEval(n.a, row) && !!rEval(n.b, row);
+      case '!':  return !rEval(n.a, row);
+      case 'in': return n.list.indexOf(rEval(n.a, row)) > -1;
+      case '==': return rEval(n.a, row) === rEval(n.b, row);
+      case '!=': return rEval(n.a, row) !== rEval(n.b, row);
+      case '<':  return rEval(n.a, row) <  rEval(n.b, row);
+      case '>':  return rEval(n.a, row) >  rEval(n.b, row);
+      case '<=': return rEval(n.a, row) <= rEval(n.b, row);
+      case '>=': return rEval(n.a, row) >= rEval(n.b, row);
+    }
+  }
+
+  function runFilter(pool, expr){
+    if(!expr || !expr.trim()) return { ids:[] };
+    var p = rParse(expr);
+    if(p.error) return { error:p.error };
+    var t = p.tree;
+    if(t.col || ('lit' in t && typeof t.lit !== 'boolean')) return { error:'A condition has to come out TRUE or FALSE for each row — try a comparison such as blood == "O".' };
+    var ids = [];
+    pool.forEach(function(s){ if(rEval(t, s)) ids.push(s.id); });
+    return { ids:ids };
+  }
+
+  /* ---------------- wiring ---------------- */
+
+  GATE.forEach(function(o){
+    var lab = document.createElement('label'), r = document.createElement('input'), t = document.createElement('span');
+    r.type = 'radio'; r.name = 'gate'; r.value = o.value; t.textContent = o.label;
+    r.addEventListener('change', function(){ change(function(){ state.gate = o.value; }); });
+    lab.appendChild(r); lab.appendChild(t); $('gateOpts').appendChild(lab);
+  });
+
+  $('caseNumber').addEventListener('input', function(e){
+    var v = +e.target.value;
+    change(function(){ state.caseNumber = v; clearCase(); });
+  });
+  $('budget').addEventListener('input', function(e){
+    var v = +e.target.value;
+    change(function(){ state.budget = v; });
+  });
+  $('defEnum').addEventListener('click', function(){
+    change(function(){ state.openEnum = !state.openEnum; });
+  });
+  $('defElim').addEventListener('click', function(){
+    change(function(){ state.openElim = !state.openElim; });
+  });
+  function clearCase(){
+    state.purchases = {blood:0,height:0,hand:0,alibi:0};
+    state.order = [];
+    state.accused = null;
+    state.charged = null;
+  }
+  function nextCase(){
+    change(function(){
+      state.caseNumber = state.caseNumber >= 24 ? 1 : state.caseNumber + 1;
+      clearCase();
+    });
+  }
+  $('reset').addEventListener('click', function(){ change(clearCase); });
+  $('resetTop').addEventListener('click', function(){ change(clearCase); });
+  $('newCase').addEventListener('click', nextCase);
+  $('filterExpr').addEventListener('input', function(e){
+    var v = e.target.value;
+    change(function(){ state.filterExpr = v; });
+  });
+  ['q1','q2','q3'].forEach(function(k){
+    $(k).addEventListener('input', function(e){
+      var v = e.target.value;
+      change(function(){ state[k] = v; });
+    });
+  });
+
+  /* ledger table */
+  (function(){
+    var tb = $('ledger');
+    LEDGER.forEach(function(row){
+      var tr = document.createElement('tr');
+      var a = document.createElement('td'); a.textContent = row[0];
+      var b = document.createElement('td'); b.textContent = row[1];
+      tr.appendChild(a); tr.appendChild(b); tb.appendChild(tr);
+    });
+  })();
+
+  /* ---------------- instructor freeze ---------------- */
+  // Typing the course code freezes the page for everyone else in the room. frozenBy is
+  // shared; ME belongs to this screen only, so the instructor's own screen stays live.
+  // Entering the code again (say, after a reload) hands the freeze to this screen.
+  var FREEZE_CODE = 'CS350';
+  var ME = Math.random().toString(36).slice(2, 10);
+  function renderFreeze(){
+    var mine = state.frozenBy !== '' && state.frozenBy === ME;
+    var held = state.frozenBy !== '' && !mine;
+    $('freezeNote').textContent = mine ? 'Frozen for your room.' : held ? 'Paused by your professor.' : '';
+    $('freezeForm').hidden = mine;
+    $('unfreezeBtn').hidden = !mine;
+    document.querySelector('.wrap').inert = held;
+    document.documentElement.classList.toggle('frozen', held);
+  }
+  // The platform's sandbox blocks form submission, so Enter and the button call this directly.
+  function tryFreeze(){
+    var box = $('freezeCode'), typed = box.value.trim();
+    if(!typed) return;
+    box.value = '';
+    var ok = typed.toUpperCase() === FREEZE_CODE;
+    box.setAttribute('aria-invalid', ok ? 'false' : 'true');
+    if(ok) change(function(){ state.frozenBy = ME; });
+  }
+  document.getElementById('freezeCode').addEventListener('keydown', function(e){ if(e.key === 'Enter'){ e.preventDefault(); tryFreeze(); } });
+  document.getElementById('freezeBtn').addEventListener('click', tryFreeze);
+  $('unfreezeBtn').addEventListener('click', function(){ change(function(){ state.frozenBy = ''; }); });
+
+  /* ---------------- public API ---------------- */
+
+  var CONTROLS = [
+    { key:'gate',       label:'Opening question: which step adds variety?', kind:'choice', options:['', 'second', 'prints', 'reread'] },
+    { key:'caseNumber', label:'Case number (deals the suspect pool)', kind:'range', min:1, max:24, step:1 },
+    { key:'budget',     label:'Investigation budget',                 kind:'range', min:1, max:8,  step:1 },
+    { key:'reliability', label:'Reliability of each reading', kind:'choice', options:['perfect','high','low','none'] },
+    { key:'purchases.blood',  label:'Blood analyses bought',       kind:'range', min:0, max:8, step:1 },
+    { key:'purchases.height', label:'Security camera reads bought', kind:'range', min:0, max:8, step:1 },
+    { key:'purchases.hand',   label:'Forensics reports bought',     kind:'range', min:0, max:8, step:1 },
+    { key:'purchases.alibi',  label:'Detective interviews bought',  kind:'range', min:0, max:8, step:1 },
+    { key:'openEnum',   label:'Quantity (enumerative) explainer open', kind:'toggle' },
+    { key:'openElim',   label:'Variety (eliminative) explainer open',   kind:'toggle' },
+    { key:'accused',    label:'Suspect currently selected',   kind:'choice', options:['none'] },
+    { key:'charged',    label:'Suspect charged (locks the case)', kind:'choice', options:['none'] },
+    { key:'filterExpr', label:'Filter condition over one suspect',  kind:'text' }
+  ];
+
+  var RESPONSES = [
+    { key:'q1', prompt:'With reliability on Perfect, buy the same kind of evidence twice. Nothing moves. Now set reliability to Low and do it again. What does the second purchase buy you in each case, and what does the difference tell you about when quantity is worth paying for?' },
+    { key:'q2', prompt:'With the budget at 5, try two allocations: all four kinds of evidence plus one repeat, and then only three kinds with the other two units spent on confirmation. Where does each leave you, and what did the extra breadth cost you in certainty about any one finding?' },
+    { key:'q3', prompt:'Set reliability to Low and, across several case numbers, spend four of your five units on breadth: one of each kind of evidence. What goes wrong, and how would you have to spend differently to guard against it? Say what this does to the claim that variety always beats quantity.' }
+  ];
+
+  var ASSERTIONS = [
+    { name:'With perfect readings, a repeat purchase eliminates nobody', run:function(){
+        for(var c = 1; c <= 24; c++){
+          var b = makePool(c);
+          var r1 = record(c, b.culprit, {blood:1,height:0,hand:0,alibi:0}, 'perfect');
+          var r2 = record(c, b.culprit, {blood:2,height:0,hand:0,alibi:0}, 'perfect');
+          if(survivorsOf(b.pool, r1).length !== survivorsOf(b.pool, r2).length) return false;
+        }
+        return true;
+      }},
+    { name:'With perfect readings the record always matches the truth', run:function(){
+        for(var c = 1; c <= 24; c++){
+          var b = makePool(c);
+          var rec = record(c, b.culprit, {blood:2,height:1,hand:1,alibi:3}, 'perfect');
+          if(Object.keys(rec).some(function(k){ return rec[k].wrong; })) return false;
+        }
+        return true;
+      }},
+    { name:'With unreliable readings the summary finding can point away from the culprit', run:function(){
+        var found = false;
+        for(var c = 1; c <= 24 && !found; c++){
+          var b = makePool(c);
+          var rec = record(c, b.culprit, {blood:1,height:1,hand:1,alibi:1}, 'none');
+          if(survivorsOf(b.pool, rec).indexOf(b.culprit) === -1) found = true;
+        }
+        return found;
+      }},
+    { name:'Repeat readings can overturn a wrong finding', run:function(){
+        for(var c = 1; c <= 24; c++){
+          var b = makePool(c);
+          var one   = record(c, b.culprit, {blood:1,height:0,hand:0,alibi:0}, 'low');
+          var three = record(c, b.culprit, {blood:3,height:0,hand:0,alibi:0}, 'low');
+          if(one.blood.wrong && !three.blood.wrong) return true;
+        }
+        return false;
+      }},
+    { name:'With perfect evidence, matching suspects tie exactly and the culprit is among them', run:function(){
+        for(var c = 1; c <= 24; c++){
+          var b = makePool(c);
+          var reads = allReadings(c, b.culprit, {blood:1,height:0,hand:0,alibi:0}, 'perfect');
+          var sc = scoreSuspects(b.pool, reads, 'perfect');
+          var mx = Math.max.apply(null, sc);
+          var leaders = b.pool.filter(function(s, i){ return sc[i] >= mx - 1e-9; });
+          if(leaders.indexOf(b.culprit) === -1) return false;
+          var matching = b.pool.filter(function(s){ return s.blood === b.culprit.blood; });
+          if(leaders.length !== matching.length) return false;   // every match ties, nobody leads alone
+        }
+        return true;
+      }},
+    { name:'Charging a suspect does not touch the evidence', run:function(){
+        var b = makePool(13);
+        var reads = allReadings(13, b.culprit, {blood:1,height:1,hand:0,alibi:0}, 'low');
+        var before = scoreSuspects(b.pool, reads, 'low').join(',');
+        var after = scoreSuspects(b.pool, reads, 'low').join(',');
+        return before === after && reads.length === 2;
+      }},
+    { name:'Scores are a probability distribution: they sum to one', run:function(){
+        var b = makePool(9);
+        return ['perfect','high','low','none'].every(function(rk){
+          var reads = allReadings(9, b.culprit, {blood:2,height:1,hand:1,alibi:0}, rk);
+          var sc = scoreSuspects(b.pool, reads, rk);
+          return Math.abs(sc.reduce(function(a,x){ return a+x; }, 0) - 1) < 1e-9;
+        });
+      }},
+    { name:'Readings with no reliability leave belief exactly uniform', run:function(){
+        var b = makePool(3);
+        var reads = allReadings(3, b.culprit, {blood:2,height:2,hand:1,alibi:1}, 'none');
+        var sc = scoreSuspects(b.pool, reads, 'none');
+        return sc.every(function(x){ return Math.abs(x - 1 / POOL_SIZE) < 1e-12; });
+      }},
+    { name:'An agreeing repeat raises the leader’s share; nobody is ever ruled out', run:function(){
+        var b = makePool(4);
+        var one = scoreSuspects(b.pool, allReadings(4, b.culprit, {blood:1,height:0,hand:0,alibi:0}, 'low'), 'low');
+        var two = scoreSuspects(b.pool, allReadings(4, b.culprit, {blood:2,height:0,hand:0,alibi:0}, 'low'), 'low');
+        if(two.some(function(x){ return x <= 0; })) return false;          // nobody eliminated
+        var r1 = allReadings(4, b.culprit, {blood:2,height:0,hand:0,alibi:0}, 'low');
+        if(r1[0].value !== r1[1].value) return true;                        // readings disagreed; nothing to check
+        return Math.max.apply(null, two) > Math.max.apply(null, one);
+      }},
+    { name:'Adding a new kind of evidence never increases the surviving pool', run:function(){
+        var keys = TRAITS.map(function(t){ return t.key; });
+        for(var c = 1; c <= 24; c++){
+          var b = makePool(c);
+          for(var i = 0; i < keys.length; i++){
+            var before = survivors(b.pool, b.culprit, keys.slice(0, i)).length;
+            var after  = survivors(b.pool, b.culprit, keys.slice(0, i + 1)).length;
+            if(after > before) return false;
+          }
+        }
+        return true;
+      }},
+    { name:'With perfect readings the culprit is never eliminated, by any combination', run:function(){
+        var keys = TRAITS.map(function(t){ return t.key; });
+        for(var c = 1; c <= 24; c++){
+          var b = makePool(c);
+          for(var mask = 0; mask < 16; mask++){
+            var ks = keys.filter(function(_, i){ return mask & (1 << i); });
+            var alive = survivors(b.pool, b.culprit, ks);
+            if(alive.indexOf(b.culprit) === -1) return false;
+          }
+        }
+        return true;
+      }},
+    { name:'Order of purchase does not change the surviving set', run:function(){
+        var b = makePool(11);
+        var a1 = survivors(b.pool, b.culprit, ['blood','hand','height']).map(function(s){ return s.id; }).join(',');
+        var a2 = survivors(b.pool, b.culprit, ['height','blood','hand']).map(function(s){ return s.id; }).join(',');
+        return a1 === a2;
+      }},
+    { name:'A given case number always deals the same pool and culprit', run:function(){
+        var a = makePool(5), b = makePool(5);
+        return JSON.stringify(a.pool) === JSON.stringify(b.pool) && a.culprit.id === b.culprit.id;
+      }},
+    { name:'Purchases split exactly into variety (first of a kind) and quantity (repeats)', run:function(){
+        var cases = [{blood:2,height:1,hand:0,alibi:0}, {blood:1,height:1,hand:1,alibi:1}, {blood:3,height:0,hand:0,alibi:0}];
+        return cases.every(function(p){
+          var kinds = kindsBought(p).length, total = totalBuys(p);
+          return total - kinds === (p.blood?p.blood-1:0) + (p.height?p.height-1:0) +
+                                   (p.hand?p.hand-1:0) + (p.alibi?p.alibi-1:0);
+        });
+      }},
+    { name:'R-style conditions filter the same rows as their logical meaning', run:function(){
+        var b = makePool(7);
+        var byHand = runFilter(b.pool, 'blood == "O" & hand == "Left"').ids;
+        var expected = b.pool.filter(function(s){ return s.blood === 'O' && s.hand === 'Left'; })
+                             .map(function(s){ return s.id; });
+        if(byHand.join(',') !== expected.join(',')) return false;
+        var inSet = runFilter(b.pool, 'blood %in% c("A","O")').ids;
+        var expected2 = b.pool.filter(function(s){ return s.blood === 'A' || s.blood === 'O'; })
+                              .map(function(s){ return s.id; });
+        if(inSet.join(',') !== expected2.join(',')) return false;
+        var negated = runFilter(b.pool, '!(height == "Tall") | alibi == "Solid"').ids;
+        var expected3 = b.pool.filter(function(s){ return !(s.height === 'Tall') || s.alibi === 'Solid'; })
+                              .map(function(s){ return s.id; });
+        return negated.join(',') === expected3.join(',');
+      }},
+    { name:'Buying every kind leaves at least the culprit, and the culprit alone in about half the cases', run:function(){
+        var keys = TRAITS.map(function(t){ return t.key; });
+        var lone = 0;
+        for(var c = 1; c <= 24; c++){
+          var b = makePool(c);
+          var n = survivors(b.pool, b.culprit, keys).length;
+          if(n < 1) return false;
+          if(n === 1) lone++;
+        }
+        return lone >= 8 && lone <= 18;   // 14 of 24 with 50 suspects; theory says about half
+      }}
+  ];
+
+  window.artifact = {
+    getState: function(){ return copy(state); },
+    setState: function(partial){
+      if(!partial || typeof partial !== 'object') return;
+      Object.keys(partial).forEach(function(k){
+        if(k.indexOf('purchases.') === 0){
+          var sub = k.slice('purchases.'.length);
+          if(sub in state.purchases) state.purchases[sub] = partial[k];
+          return;
+        }
+        if(!(k in state)) return;
+        if(k === 'purchases'){
+          var p = partial.purchases || {};
+          TRAITS.forEach(function(t){
+            if(t.key in p) state.purchases[t.key] = p[t.key];
+          });
+        } else if(k === 'order'){
+          if(Array.isArray(partial.order)) state.order = partial.order.slice();
+        } else if(k === 'gate'){
+          if(partial.gate === '' || gateOption(partial.gate)) state.gate = partial.gate;   // ignore anything else
+        } else if(k === 'reliability'){
+          if(RELIABILITY.some(function(r){ return r.key === partial.reliability; })) state.reliability = partial.reliability;
+        } else {
+          state[k] = partial[k];
+        }
+      });
+      normalise();
+      render();
+    },
+    onChange: function(fn){
+      if(typeof fn !== 'function') return function(){};
+      listeners.push(fn);
+      return function(){
+        var i = listeners.indexOf(fn);
+        if(i > -1) listeners.splice(i, 1);
+      };
+    },
+    controls: CONTROLS,
+    responses: RESPONSES,
+    assertions: ASSERTIONS,
+    referenceCases: []
+  };
+
+  normalise();
+  render();
+})();
+</script>
+
+<script>
+(function () {
+  var cfg = {"versionId":"cmw13qcux000308jykqs45r1s","appOrigin":"https://ideasatplay.org","direct":null};
+  var t0 = Date.now(), scrolled = false, acted = false, reached = false, shown = false, config = null;
+  var framed = parent !== window;
+  function onScreen(el) {
+    if (!el.getClientRects().length) return false;
+    var r = el.getBoundingClientRect();
+    return r.top < innerHeight && r.bottom > 0;
+  }
+  function atBottom() {
+    var f = document.querySelector("footer[data-kc-credit]");
+    if (f) return f.getBoundingClientRect().top <= innerHeight;
+    var d = document.documentElement;
+    return scrollY + innerHeight >= d.scrollHeight - 48;
+  }
+  // { cur, last } when the page moves through numbered steps, else null.
+  function steps() {
+    var a = window.artifact;
+    try {
+      var c = a && Array.isArray(a.controls) ? a.controls.filter(function (x) { return x && x.key === "step" && typeof x.max === "number"; })[0] : null;
+      if (c) { var s = a.getState(); if (s && typeof s.step === "number") return { cur: s.step, last: c.max }; }
+    } catch (e) {}
+    var cur = document.querySelector('[aria-current="step"]');
+    if (cur && cur.parentElement) {
+      var sib = Array.prototype.filter.call(cur.parentElement.children, function (x) { return x.getClientRects().length; });
+      return { cur: sib.indexOf(cur), last: sib.length - 1 };
+    }
+    return null;
+  }
+  function finished() {
+    var mark = document.querySelector("[data-kc-end]");
+    if (mark) return onScreen(mark);
+    var s = steps();
+    if (s) return s.cur >= s.last && atBottom();
+    return atBottom() && (scrolled || (acted && Date.now() - t0 > 60000));
+  }
+  // The student link remembers a rating in its own storage where the browser allows it.
+  var KEY = "kc-rated-" + cfg.versionId;
+  function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
+  if (cfg.direct) config = { ask: !store(KEY), preview: false, labels: cfg.direct.labels };
+  var visitor = (function () {
+    var v = store("kc-visitor");
+    if (!v) { v = ""; for (var i = 0; i < 24; i++) v += "abcdefghijklmnopqrstuvwxyz0123456789".charAt(Math.floor(Math.random() * 36)); store("kc-visitor", v); }
+    return v;
+  })();
+  var pending = {}, seq = 0;
+  function save(score, comment) {
+    if (cfg.direct) {
+      var body = { versionId: cfg.versionId, score: score, context: "share", visitor: visitor };
+      if (comment) body.comment = comment;
+      // text/plain: a simple request, so no preflight is needed.
+      return fetch(cfg.direct.endpoint, { method: "POST", credentials: "omit", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(body) })
+        .then(function (r) { if (r.ok) store(KEY, String(score)); return r.ok; }, function () { return false; });
+    }
+    return new Promise(function (resolve) {
+      var id = ++seq; pending[id] = resolve;
+      parent.postMessage({ type: "kc:rate", versionId: cfg.versionId, id: id, score: score, comment: comment || "" }, cfg.appOrigin);
+      setTimeout(function () { if (pending[id]) { delete pending[id]; resolve(false); } }, 15000);
+    });
+  }
+  var B = "display:inline-block;margin:3px 6px 3px 0;padding:4px 10px;border:1px solid #a8a29e;border-radius:6px;background:#fff;color:#1c1917;font:inherit;cursor:pointer";
+  function el(tag, attrs, text) { var e = document.createElement(tag); for (var k in attrs) e.setAttribute(k, attrs[k]); if (text) e.textContent = text; return e; }
+  function show() {
+    if (shown || !config || !config.ask) return;
+    shown = true;
+    clearInterval(timer);
+    var L = config.labels;
+    var box = el("div", { "data-kc-rating": "", "data-kc-personal": "", role: "region", "aria-label": L.ask, lang: L.lang, dir: L.dir,
+      style: "box-sizing:border-box;max-width:760px;margin:24px auto 0;padding:10px 14px;border:1px solid #d6d3d1;border-radius:10px;background:#fafaf9;color:#1c1917;font:14px/1.5 system-ui,-apple-system,sans-serif;text-align:start" });
+    var live = el("div", { "aria-live": "polite" });
+    box.appendChild(live);
+    function ask(msg) {
+      live.innerHTML = "";
+      live.appendChild(el("span", { style: "font-weight:600;margin-inline-end:8px" }, L.ask));
+      [1, 2, 3].forEach(function (s) {
+        var b = el("button", { type: "button", style: B }, s + " · " + L["s" + s]);
+        b.addEventListener("click", function () {
+          live.querySelectorAll("button").forEach(function (x) { x.disabled = true; });
+          save(s, "").then(function (ok) { if (ok) comment(s); else ask(L.error); });
+        });
+        live.appendChild(b);
+      });
+      if (config.preview) live.appendChild(el("div", { style: "font-size:12px;color:#57534e" }, L.preview));
+      if (msg) live.appendChild(el("div", { role: "alert", style: "color:#991b1b;font-size:13px" }, msg));
+    }
+    function comment(score) {
+      live.innerHTML = "";
+      var id = "kc-rate-comment";
+      live.appendChild(el("label", { for: id, style: "display:block;font-weight:600;margin-bottom:4px" }, L.comment));
+      var row = el("div", { style: "display:flex;flex-wrap:wrap;gap:6px;align-items:center" });
+      var input = el("input", { id: id, type: "text", maxlength: "1000", autocomplete: "off", dir: "auto",
+        style: "flex:1 1 260px;min-width:0;box-sizing:border-box;padding:5px 8px;border:1px solid #a8a29e;border-radius:6px;background:#fff;color:#1c1917;font:inherit" });
+      var send = el("button", { type: "button", style: B + ";background:#292524;color:#fff;border-color:#292524" }, L.send);
+      var skip = el("button", { type: "button", style: B }, L.skip);
+      function done() { live.innerHTML = ""; live.appendChild(el("span", { style: "font-weight:600" }, L.thanks)); setTimeout(function () { box.remove(); }, 2000); }
+      send.addEventListener("click", function () {
+        var text = input.value.trim();
+        if (!text) return done();
+        send.disabled = skip.disabled = true;
+        save(score, text).then(function (ok) { if (ok) done(); else { send.disabled = skip.disabled = false; live.appendChild(el("div", { role: "alert", style: "color:#991b1b;font-size:13px" }, L.error)); } });
+      });
+      input.addEventListener("keydown", function (e) { if (e.key === "Enter") send.click(); });
+      skip.addEventListener("click", done);
+      row.appendChild(input); row.appendChild(send); row.appendChild(skip);
+      live.appendChild(row);
+      input.focus();
+    }
+    ask("");
+    var mark = document.querySelector("[data-kc-end]"), foot = document.querySelector("footer[data-kc-credit]");
+    if (mark) mark.insertAdjacentElement("afterend", box);
+    else if (foot) foot.parentNode.insertBefore(box, foot);
+    else document.body.appendChild(box);
+  }
+  function check() {
+    if (!reached && finished()) reached = true;
+    if (reached) show();
+  }
+  window.addEventListener("message", function (e) {
+    if (e.source !== parent || !e.data || e.data.versionId !== cfg.versionId) return;
+    var d = e.data;
+    if (d.type === "kc:rate-config" && !cfg.direct) { config = { ask: !!d.ask, preview: !!d.preview, labels: d.labels }; check(); }
+    if (d.type === "kc:rate-result" && pending[d.id]) { pending[d.id](!!d.ok); delete pending[d.id]; }
+  });
+  // The app page may start listening after this page loads: ask a few times.
+  var hellos = 0;
+  function hello() { if (framed && !cfg.direct && !config && hellos++ < 8) parent.postMessage({ type: "kc:rate-hello", versionId: cfg.versionId }, cfg.appOrigin); }
+  hello();
+  var timer = setInterval(function () { if (hellos < 8 && !config) hello(); check(); }, 800);
+  window.addEventListener("scroll", function () { if (scrollY > 0) scrolled = true; check(); }, { passive: true });
+  ["click", "input", "keydown"].forEach(function (t) { document.addEventListener(t, function (e) { if (e.target && e.target.closest && e.target.closest("[data-kc-rating]")) return; acted = true; setTimeout(check, 50); }, true); });
+})();
+</script></body>
+</html>

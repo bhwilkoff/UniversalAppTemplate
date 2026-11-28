@@ -1,0 +1,882 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Which Effect Does the Regression Estimate? Controlling for a confounder and the ATE, ATT and ATC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700&family=Source+Serif+4:opsz,wght@8..60,600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F5F6F2; --surface:#FFFFFF; --ink:#1E2621; --muted:#59635C; --rule:#D3D8D0;
+  --accent:#2E5E3E; --accent-ink:#FFFFFF; --accent-soft:#CFE0D3;
+  --water:#1D63A6; --soil:#D8C9A8; --soil-edge:#8C7350;
+  --fs-body:16px; --fs-small:14px; --fs-ctl:14px; --chart-fs:13px; --stroke:1.5;
+  --sans:"Public Sans", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --serif:"Source Serif 4", Georgia, "Times New Roman", serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#141916; --surface:#1C221E; --ink:#E6EBE6; --muted:#A6B0A9; --rule:#3A433D;
+    --accent:#8CC79B; --accent-ink:#10150F; --accent-soft:#2D4634;
+    --water:#6FA8E0; --soil:#5C4F39; --soil-edge:#B0956C;
+    color-scheme: dark;
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:var(--fs-body);line-height:1.5}
+body.projector{--fs-body:24px; --fs-small:20px; --fs-ctl:20px; --chart-fs:18px; --stroke:3}
+.wrap{max-width:1320px;margin:0 auto;padding:28px 24px 48px}
+header{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;justify-content:space-between;border-bottom:1px solid var(--rule);padding-bottom:18px;margin-bottom:24px}
+h1{font-family:var(--serif);font-weight:600;font-size:clamp(28px,3.4vw,40px);line-height:1.15;margin:0 0 6px}
+body.projector h1{font-size:52px}
+.sub{color:var(--muted);margin:0;max-width:62ch}
+.tools{display:flex;gap:10px;flex-wrap:wrap}
+button{font:inherit;font-size:var(--fs-ctl);border-radius:6px;padding:8px 14px;cursor:pointer;border:1px solid var(--accent);background:transparent;color:var(--accent)}
+button.primary{background:var(--accent);color:var(--accent-ink)}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible,input:focus-visible,textarea:focus-visible,summary:focus-visible{outline:3px solid var(--water);outline-offset:2px}
+.layout{display:grid;grid-template-columns:minmax(300px,380px) minmax(0,1fr);gap:32px;align-items:start}
+@media (max-width:900px){.layout{grid-template-columns:minmax(0,1fr)}}
+body.projector .layout{grid-template-columns:minmax(0,1fr)}
+.steps{position:sticky;top:16px}
+@media (max-width:900px){.steps{position:static}}
+body.projector .steps{position:static}
+h2{font-size:calc(var(--fs-body) * 1.15);margin:0 0 12px;font-weight:700}
+ol.steplist{list-style:none;margin:0;padding:0;counter-reset:s}
+ol.steplist>li{counter-increment:s;position:relative;padding:0 0 18px 40px;margin:0 0 18px;border-bottom:1px solid var(--rule)}
+ol.steplist>li::before{content:counter(s);position:absolute;left:0;top:0;width:28px;height:28px;border-radius:50%;border:1.5px solid var(--accent);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:var(--fs-small)}
+.steplist p{margin:0 0 8px}
+label.ans{display:block;font-size:var(--fs-small);color:var(--muted);margin-bottom:4px}
+textarea{width:100%;min-height:58px;font:inherit;font-size:var(--fs-small);color:var(--ink);background:var(--surface);border:1px solid var(--rule);border-radius:6px;padding:8px;resize:vertical}
+fieldset{border:0;padding:0;margin:0 0 10px}
+fieldset legend{font-size:var(--fs-small);color:var(--muted);margin-bottom:6px;padding:0}
+.choices{display:flex;flex-wrap:wrap;gap:8px}
+.choices label{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--rule);border-radius:999px;padding:4px 12px;font-size:var(--fs-small);background:var(--surface);cursor:pointer}
+.feedback{font-size:var(--fs-small);margin:10px 0 0;padding:10px 12px;border-left:3px solid var(--water);background:var(--surface)}
+section.panel{background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:22px;margin-bottom:24px;min-width:0}
+.fieldrow{display:flex;flex-wrap:wrap;gap:28px}
+.block{flex:1 1 260px;min-width:0}
+.block h3{font-size:var(--fs-body);margin:0 0 2px}
+.block .read{color:var(--muted);font-size:var(--fs-small);margin:0 0 10px}
+.plots{display:grid;gap:4px;grid-template-columns:repeat(10,var(--sz));margin-bottom:14px}
+.plots.rich{--sz:22px}.plots.poor{--sz:14px}
+body.projector .plots.rich{--sz:30px} body.projector .plots.poor{--sz:20px}
+@media (max-width:420px){.plots.rich{--sz:18px}}
+.plot{width:var(--sz);height:var(--sz);border-radius:3px;background:var(--soil);border:1px solid var(--soil-edge);transition:background-color .2s,border-color .2s}
+.plot.pump{background:var(--water);border-color:var(--water)}
+.legend{display:flex;flex-wrap:wrap;gap:18px;font-size:var(--fs-small);color:var(--muted);margin:0 0 16px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{display:inline-block;width:12px;height:12px;border-radius:2px;border:1px solid var(--soil-edge);background:var(--soil)}
+.sw.pump{background:var(--water);border-color:var(--water)}
+.ctl{margin:0 0 14px}
+.ctl .lab{display:flex;justify-content:space-between;gap:12px;font-size:var(--fs-ctl)}
+.ctl output{font-variant-numeric:tabular-nums;font-weight:600}
+input[type=range]{width:100%;accent-color:var(--accent);margin:6px 0 0}
+.ctlgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:4px 28px}
+.row-btns{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:6px}
+.seed{font-size:var(--fs-small);color:var(--muted)}
+.charttitle{font-weight:600;margin:0 0 8px}
+.chartnote{color:var(--muted);font-size:var(--fs-small);margin:4px 0 16px}
+.svgwrap{overflow-x:auto}
+svg.nl{display:block;width:100%;min-width:520px;height:auto}
+svg.nl text{font-family:var(--sans);font-size:var(--chart-fs);fill:var(--ink)}
+svg.nl .axis{stroke:var(--ink);stroke-width:var(--stroke)}
+svg.nl .tick text{fill:var(--muted)}
+svg.nl .tick line{stroke:var(--muted);stroke-width:1}
+svg.nl .ref{stroke:var(--muted);stroke-width:1;stroke-dasharray:4 4;opacity:.8}
+svg.nl .mk{transition:transform .22s ease}
+svg.nl .naive circle{fill:var(--surface);stroke:var(--ink);stroke-width:calc(var(--stroke) * 1.3)}
+svg.nl .reg path{fill:var(--water)}
+svg.nl .reg line{stroke:var(--water);stroke-width:calc(var(--stroke) * 1.6)}
+svg.nl .reg text{fill:var(--water);font-weight:700}
+@media (prefers-reduced-motion:reduce){svg.nl .mk,.plot,.bar i{transition:none}}
+.reveal h2{font-family:var(--serif);font-weight:600;font-size:calc(var(--fs-body) * 1.3)}
+.reveal p{max-width:72ch}
+.bars{margin:18px 0 8px;display:grid;gap:12px}
+.barrow{display:grid;grid-template-columns:minmax(120px,190px) minmax(0,1fr) 64px;gap:12px;align-items:center;font-size:var(--fs-small)}
+@media (max-width:560px){.barrow{grid-template-columns:minmax(0,1fr) 56px}.barrow .bar{grid-column:1 / -1;order:3}}
+.bar{display:flex;height:22px;border-radius:4px;overflow:hidden;border:1px solid var(--rule)}
+.bar i{display:block;height:100%;transition:width .22s ease}
+.bar i.r{background:var(--accent)} .bar i.p{background:var(--accent-soft)}
+.barrow .v{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+.barrow.lm .name{font-weight:700}
+.keybar{font-size:var(--fs-small);color:var(--muted);display:flex;gap:18px;flex-wrap:wrap}
+.keybar span{display:inline-flex;align-items:center;gap:6px}
+.keybar .sw{border:none}
+.keybar .sw.r{background:var(--accent)} .keybar .sw.p{background:var(--accent-soft)}
+.formula{font-family:var(--serif);font-size:calc(var(--fs-body) * 1.1);margin:16px 0;padding:12px 16px;background:var(--bg);border-radius:6px;overflow-x:auto}
+.eq{font-family:var(--serif);font-size:calc(var(--fs-body) * 1.1);background:var(--surface);border:1px solid var(--rule);border-radius:6px;padding:10px 12px;margin:4px 0 8px;overflow-x:auto;white-space:nowrap}
+.eq sub{font-size:.7em}
+.eqnote{font-size:var(--fs-small);color:var(--muted)}
+code{font-size:.92em}
+pre.code{background:var(--bg);border-radius:6px;padding:12px 14px;font-size:var(--fs-small);overflow-x:auto;margin:12px 0}
+pre.code .k{color:var(--accent);font-weight:600}
+table{border-collapse:collapse;margin:12px 0;font-size:var(--fs-small);min-width:320px}
+.tablewrap{overflow-x:auto}
+th,td{padding:6px 14px}
+th{text-align:left;border-bottom:1px solid var(--ink);font-weight:600}
+thead tr{border-top:1.5px solid var(--ink)} tbody tr:last-child td{border-bottom:1.5px solid var(--ink)}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+details{border-top:1px solid var(--rule);padding-top:14px;margin-top:8px}
+summary{cursor:pointer;font-weight:600}
+details ul{margin:10px 0;padding-left:20px;font-size:var(--fs-small)}
+.omit{font-size:var(--fs-small);color:var(--muted)}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div>
+    <h1>Which Effect Does the Regression Estimate?</h1>
+    <p class="sub">A hundred farmers, an irrigation pump, and the coefficient you get when you control for wealth.</p>
+  </div>
+  <div class="tools">
+    <button id="projBtn" type="button" aria-pressed="false">Projector mode</button>
+    <button id="resetBtn" type="button">Reset to the workbook design</button>
+  </div>
+</header>
+
+<div class="layout">
+  <aside class="steps" aria-labelledby="stepsH">
+    <h2 id="stepsH">Steps</h2>
+    <ol class="steplist">
+      <li>
+        <p>Pumps raise harvests by $6,000 for rich farmers and do nothing for poor farmers. We will control for wealth by fitting this regression to all 100 farmers:</p>
+        <p class="eq" aria-label="Harvest sub i equals beta zero plus beta one times Pump sub i plus beta two times Rich sub i plus error sub i">Harvest<sub>i</sub> = β<sub>0</sub> + β<sub>1</sub>·Pump<sub>i</sub> + β<sub>2</sub>·Rich<sub>i</sub> + ε<sub>i</sub></p>
+        <p class="eqnote">Pump and Rich are 0/1 indicators. There is no interaction term, so the model has a single pump coefficient, β<sub>1</sub>, for rich and poor farmers alike. In R: <code>lm(Y_obs ~ treat + rich)</code>.</p>
+        <p>Before fitting it, predict: where will β<sub>1</sub> land?</p>
+        <fieldset>
+          <legend>Your prediction</legend>
+          <div class="choices" id="predChoices">
+            <label><input type="radio" name="pred" value="ate"> ATE</label>
+            <label><input type="radio" name="pred" value="att"> ATT</label>
+            <label><input type="radio" name="pred" value="atc"> ATC</label>
+            <label><input type="radio" name="pred" value="none"> Somewhere else</label>
+          </div>
+        </fieldset>
+        <button id="fitBtn" class="primary" type="button" disabled>Fit the regression and show β₁</button>
+        <p class="feedback" id="predFeedback" hidden></p>
+      </li>
+      <li>
+        <p>Compare the regression's β<sub>1</sub> (blue diamond) with the ATE, ATT and ATC on the scale. Which is it closest to?</p>
+        <label class="ans" for="a2">Your answer</label><textarea id="a2" data-step="2"></textarea>
+      </li>
+      <li>
+        <p>Read the weights panel. What share of the regression's weight goes to rich farmers? What share of all farmers, and of pump owners, are rich?</p>
+        <label class="ans" for="a3">Your answer</label><textarea id="a3" data-step="3"></textarea>
+      </li>
+      <li>
+        <p>Move the pump rate among poor farmers to 90%, the same as the rich, then down to 10%. What happens to the regression's weight on the rich, and to the coefficient?</p>
+        <label class="ans" for="a4">Your answer</label><textarea id="a4" data-step="4"></textarea>
+      </li>
+      <li>
+        <p>Reset, then set the pump's effect for poor farmers to +6. Why do the ATE, ATT, ATC and the regression now agree, while the naïve comparison still does not?</p>
+        <label class="ans" for="a5">Your answer</label><textarea id="a5" data-step="5"></textarea>
+      </li>
+      <li>
+        <p>Reset, then press “Give every rich farmer a pump.” How much does the regression now learn from rich farmers? Could any regression on these data estimate the ATE?</p>
+        <label class="ans" for="a6">Your answer</label><textarea id="a6" data-step="6"></textarea>
+      </li>
+    </ol>
+  </aside>
+
+  <main>
+    <section class="panel" aria-labelledby="distH">
+      <h2 id="distH">Who has a pump?</h2>
+      <div class="legend" aria-hidden="true">
+        <span><i class="sw pump"></i>Has a pump</span>
+        <span><i class="sw"></i>No pump</span>
+        <span>Rich farmers have larger plots</span>
+      </div>
+      <div class="fieldrow">
+        <div class="block">
+          <h3 id="richH">Rich farmers</h3>
+          <p class="read" id="richRead"></p>
+          <div class="plots rich" id="richPlots" role="img"></div>
+        </div>
+        <div class="block">
+          <h3 id="poorH">Poor farmers</h3>
+          <p class="read" id="poorRead"></p>
+          <div class="plots poor" id="poorPlots" role="img"></div>
+        </div>
+      </div>
+      <div class="ctlgrid">
+        <div class="ctl"><div class="lab"><label for="nRich">Rich farmers (of 100)</label><output id="nRichO" for="nRich"></output></div>
+          <input type="range" id="nRich" min="10" max="90" step="10"></div>
+        <div class="ctl"><div class="lab"><label for="pRich">Pump rate among rich farmers</label><output id="pRichO" for="pRich"></output></div>
+          <input type="range" id="pRich" min="0" max="100" step="5"></div>
+        <div class="ctl"><div class="lab"><label for="pPoor">Pump rate among poor farmers</label><output id="pPoorO" for="pPoor"></output></div>
+          <input type="range" id="pPoor" min="0" max="100" step="5"></div>
+      </div>
+      <div class="row-btns">
+        <button id="breakBtn" type="button">Give every rich farmer a pump</button>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="numH">
+      <h2 id="numH">The truth and the estimates</h2>
+      <p class="charttitle" id="chartTitle"></p>
+      <div class="svgwrap"><svg class="nl" id="nl" role="img" aria-label=""></svg></div>
+      <p class="chartnote" id="chartNote"></p>
+      <div class="ctlgrid">
+        <div class="ctl"><div class="lab"><label for="tauRich">Pump's effect for rich farmers ($1,000s)</label><output id="tauRichO" for="tauRich"></output></div>
+          <input type="range" id="tauRich" min="-2" max="10" step="0.5"></div>
+        <div class="ctl"><div class="lab"><label for="tauPoor">Pump's effect for poor farmers ($1,000s)</label><output id="tauPoorO" for="tauPoor"></output></div>
+          <input type="range" id="tauPoor" min="-2" max="10" step="0.5"></div>
+      </div>
+      <div class="row-btns">
+        <button id="reseedBtn" type="button">Draw new noise</button>
+        <span class="seed" id="seedRead"></span>
+      </div>
+    </section>
+
+    <section class="panel reveal" id="reveal" aria-labelledby="revH" hidden>
+      <h2 id="revH">β₁ is an average of the two groups’ effects, with weights of its own</h2>
+      <p id="revText"></p>
+      <div class="keybar" aria-hidden="true"><span><i class="sw r"></i>Weight on rich farmers</span><span><i class="sw p"></i>Weight on poor farmers</span></div>
+      <div class="bars" id="bars" role="img"></div>
+      <p class="omit">Each row averages the pump's effect for rich and poor farmers. Only the weights differ. The number on the right is the average each row produces.</p>
+      <div class="formula" id="formula"></div>
+      <p>To get the ATE, ATT or ATC back, let the effect differ by wealth. Then predict every farmer’s harvest with and without a pump, and average the difference over the farmers you care about:</p>
+      <pre class="code"><span class="k">fit</span> &lt;- lm(Y_obs ~ treat * rich, data = df)
+
+<span class="k"># Each farmer's predicted harvest with and without a pump</span>
+Y1_hat &lt;- predict(fit, newdata = transform(df, treat = 1))
+Y0_hat &lt;- predict(fit, newdata = transform(df, treat = 0))
+
+ATE_hat &lt;- mean(Y1_hat - Y0_hat)
+ATT_hat &lt;- mean(Y1_hat[df$treat == 1] - Y0_hat[df$treat == 1])
+ATC_hat &lt;- mean(Y1_hat[df$treat == 0] - Y0_hat[df$treat == 0])</pre>
+      <div class="tablewrap"><table aria-label="True estimands and interaction-model estimates">
+        <thead><tr><th>Estimand</th><th class="n">Truth</th><th class="n">From lm(Y ~ pump * rich)</th></tr></thead>
+        <tbody id="interBody"></tbody>
+      </table></div>
+      <p class="omit" id="interNote"></p>
+    </section>
+
+    <details>
+      <summary>What this page assumes</summary>
+      <ul>
+        <li>There are 100 farmers, and you choose how many are rich (default 50).</li>
+        <li>Harvest without a pump: Y0 = 10 + 5·rich + u, with u ~ Normal(0, 1) drawn from a seeded generator. Units are $1,000s.</li>
+        <li>Harvest with a pump: Y1 = Y0 + the effect for the farmer's group (defaults +6 rich, +0 poor). Every farmer in a group has the same effect.</li>
+        <li>Pumps go to exactly round(rate × group size) farmers in each group, so pump ownership depends on wealth and nothing else. Wealth is the only confounder.</li>
+        <li>The true ATE, ATT and ATC use both potential outcomes. Every estimate uses only the observed harvest.</li>
+        <li>The regression is OLS of observed harvest on pump and rich, with conventional standard errors. The blue bar shows ±1.96 SE.</li>
+        <li>Regression weight for a group = n × p × (1 − p), where p is that group's pump rate, normalized to sum to 1.</li>
+        <li>The noise is generated in the browser, so estimates differ slightly from the R workbook (set.seed(104)). The true ATE, ATT and ATC match it exactly.</li>
+      </ul>
+      <p class="omit">Left out on purpose: standard errors for the interaction-model ATE, ATT and ATC, and confidence versus prediction intervals. Both are covered in the workbook.</p>
+    </details>
+  </main>
+</div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var DEFAULTS = { nRich: 50, pRich: 0.9, pPoor: 0.5, tauRich: 6, tauPoor: 0, seed: 1251 };
+  var RESP_KEYS = ['response_step2', 'response_step3', 'response_step4', 'response_step5', 'response_step6'];
+  var state = Object.assign({}, DEFAULTS, { prediction: null, revealed: false });
+  RESP_KEYS.forEach(function (k) { state[k] = ''; });
+  // Per-screen view setting: not part of the shared state.
+  var view = { projector: false };
+  var listeners = [];
+
+  // ---------- math ----------
+  function mulberry32(a) {
+    return function () {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      var t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function normals(seed, n) {
+    var r = mulberry32(seed), out = [];
+    while (out.length < n) {
+      var u1 = r(); if (u1 < 1e-12) u1 = 1e-12;
+      var u2 = r(), m = Math.sqrt(-2 * Math.log(u1));
+      out.push(m * Math.cos(2 * Math.PI * u2));
+      if (out.length < n) out.push(m * Math.sin(2 * Math.PI * u2));
+    }
+    return out;
+  }
+  function mean(a) { if (!a.length) return null; var s = 0; for (var i = 0; i < a.length; i++) s += a[i]; return s / a.length; }
+  function pluck(arr, f) { return arr.map(f); }
+
+  function invert(M) {
+    var n = M.length, A = M.map(function (r, i) { return r.concat(Array.from({ length: n }, function (_, j) { return i === j ? 1 : 0; })); });
+    for (var c = 0; c < n; c++) {
+      var piv = c;
+      for (var r = c + 1; r < n; r++) if (Math.abs(A[r][c]) > Math.abs(A[piv][c])) piv = r;
+      if (Math.abs(A[piv][c]) < 1e-9) return null;
+      var tmp = A[c]; A[c] = A[piv]; A[piv] = tmp;
+      var d = A[c][c];
+      for (var k = 0; k < 2 * n; k++) A[c][k] /= d;
+      for (r = 0; r < n; r++) if (r !== c) {
+        var f = A[r][c];
+        for (k = 0; k < 2 * n; k++) A[r][k] -= f * A[c][k];
+      }
+    }
+    return A.map(function (r) { return r.slice(n); });
+  }
+
+  function olsAdditive(units) {
+    var X = units.map(function (d) { return [1, d.treat, d.rich]; });
+    var y = units.map(function (d) { return d.y; });
+    var XtX = [[0, 0, 0], [0, 0, 0], [0, 0, 0]], Xty = [0, 0, 0];
+    for (var i = 0; i < X.length; i++) for (var a = 0; a < 3; a++) {
+      Xty[a] += X[i][a] * y[i];
+      for (var b = 0; b < 3; b++) XtX[a][b] += X[i][a] * X[i][b];
+    }
+    var inv = invert(XtX);
+    if (!inv) return null;
+    var beta = [0, 1, 2].map(function (a) { return inv[a][0] * Xty[0] + inv[a][1] * Xty[1] + inv[a][2] * Xty[2]; });
+    var rss = 0;
+    for (i = 0; i < X.length; i++) { var e = y[i] - (beta[0] + beta[1] * X[i][1] + beta[2] * X[i][2]); rss += e * e; }
+    var s2 = rss / (X.length - 3);
+    return { coef: beta[1], se: Math.sqrt(Math.max(s2 * inv[1][1], 0)) };
+  }
+
+  // The single function that owns the model.
+  function model(p) {
+    var N = 100, nR = p.nRich, nP = N - nR;
+    var kR = Math.round(p.pRich * nR), kP = Math.round(p.pPoor * nP);
+    var u = normals(p.seed, N), units = [];
+    for (var i = 0; i < N; i++) {
+      var rich = i < nR ? 1 : 0, j = rich ? i : i - nR;
+      var treat = rich ? (j < kR ? 1 : 0) : (j < kP ? 1 : 0);
+      var y0 = 10 + 5 * rich + u[i], y1 = y0 + (rich ? p.tauRich : p.tauPoor);
+      units.push({ rich: rich, treat: treat, y0: y0, y1: y1, y: treat ? y1 : y0 });
+    }
+    var T = units.filter(function (d) { return d.treat; }), C = units.filter(function (d) { return !d.treat; });
+    var eff = function (d) { return d.y1 - d.y0; };
+    var truth = { ate: mean(pluck(units, eff)), att: T.length ? mean(pluck(T, eff)) : null, atc: C.length ? mean(pluck(C, eff)) : null };
+    var both = T.length && C.length;
+    var naive = both ? mean(pluck(T, function (d) { return d.y; })) - mean(pluck(C, function (d) { return d.y; })) : null;
+    var selBias = both ? mean(pluck(T, function (d) { return d.y0; })) - mean(pluck(C, function (d) { return d.y0; })) : null;
+    function stratum(r) {
+      var g = units.filter(function (d) { return d.rich === r; });
+      var t = g.filter(function (d) { return d.treat; }), c = g.filter(function (d) { return !d.treat; });
+      var ph = t.length / g.length;
+      return { n: g.length, nT: t.length, p: ph, v: g.length * ph * (1 - ph),
+        delta: (t.length && c.length) ? mean(pluck(t, function (d) { return d.y; })) - mean(pluck(c, function (d) { return d.y; })) : null };
+    }
+    var sR = stratum(1), sP = stratum(0), vSum = sR.v + sP.v;
+    var wReg = vSum > 0 ? sR.v / vSum : null;
+    var wavg = vSum > 0 ? ((sR.v ? sR.v * sR.delta : 0) + (sP.v ? sP.v * sP.delta : 0)) / vSum : null;
+    var richShare = function (arr) { return arr.length ? mean(pluck(arr, function (d) { return d.rich; })) : null; };
+    var shares = { all: nR / N, treated: richShare(T), controls: richShare(C) };
+    var inter = null;
+    if (sR.delta !== null && sP.delta !== null) {
+      var f = function (s) { return s === null ? null : sP.delta + (sR.delta - sP.delta) * s; };
+      inter = { ate: f(shares.all), att: f(shares.treated), atc: f(shares.controls) };
+    }
+    return { units: units, kR: kR, kP: kP, nR: nR, nP: nP, truth: truth, naive: naive, selBias: selBias,
+      sR: sR, sP: sP, wReg: wReg, wavg: wavg, additive: olsAdditive(units), inter: inter, shares: shares };
+  }
+
+  // ---------- helpers ----------
+  function fmt(x, d) { return (x === null || x === undefined || !isFinite(x)) ? '—' : x.toFixed(d === undefined ? 2 : d); }
+  function pct(x) { return (x === null || !isFinite(x)) ? '—' : Math.round(x * 100) + '%'; }
+  function signed(x) { return (x >= 0 ? '+' : '−') + Math.abs(x).toFixed(1); }
+  function $(id) { return document.getElementById(id); }
+  var NS = 'http://www.w3.org/2000/svg';
+  function el(tag, attrs, parent) {
+    var e = document.createElementNS(NS, tag);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+
+  // ---------- state ----------
+  var RANGES = { nRich: [10, 90, 10], pRich: [0, 1, 0.05], pPoor: [0, 1, 0.05], tauRich: [-2, 10, 0.5], tauPoor: [-2, 10, 0.5] };
+  function clean(key, v) {
+    if (RANGES[key]) {
+      v = Number(v);
+      if (!isFinite(v)) return undefined;
+      var r = RANGES[key];
+      v = Math.min(r[1], Math.max(r[0], v));
+      v = r[0] + Math.round((v - r[0]) / r[2]) * r[2];
+      return Math.round(v * 1000) / 1000;
+    }
+    if (key === 'seed') { v = Number(v); return isFinite(v) ? Math.floor(v) : undefined; }
+    if (key === 'prediction') return (v === null || ['ate', 'att', 'atc', 'none'].indexOf(v) >= 0) ? v : undefined;
+    if (key === 'revealed') return !!v;
+    if (RESP_KEYS.indexOf(key) >= 0) return typeof v === 'string' ? v : undefined;
+    return undefined;
+  }
+  function apply(patch) {
+    if (!patch || typeof patch !== 'object') return;
+    Object.keys(patch).forEach(function (k) {
+      if (!Object.prototype.hasOwnProperty.call(state, k)) return;
+      var v = clean(k, patch[k]);
+      if (v !== undefined) state[k] = v;
+    });
+  }
+  function getState() { return JSON.parse(JSON.stringify(state)); }
+  // Platform-facing: merge, redraw, no onChange echo.
+  function setState(patch) { apply(patch); render(); }
+  // User-facing: every control goes through here.
+  function userSet(patch) {
+    apply(patch); render();
+    var s = getState();
+    listeners.slice().forEach(function (fn) { fn(s); });
+  }
+  function onChange(fn) {
+    listeners.push(fn);
+    return function () { var i = listeners.indexOf(fn); if (i >= 0) listeners.splice(i, 1); };
+  }
+
+  // ---------- rendering ----------
+  function renderPlots(container, n, k, label) {
+    if (container.children.length !== n) {
+      container.innerHTML = '';
+      for (var i = 0; i < n; i++) { var s = document.createElement('span'); s.className = 'plot'; container.appendChild(s); }
+    }
+    for (var j = 0; j < n; j++) container.children[j].classList.toggle('pump', j < k);
+    container.setAttribute('aria-label', label + ': ' + k + ' of ' + n + ' have a pump');
+  }
+
+  var markers = {};
+  function ensureMarkers(svg) {
+    if (markers.svg === svg) return;
+    svg.innerHTML = '';
+    markers = { svg: svg, ticks: el('g', {}, svg), axis: el('line', { 'class': 'axis' }, svg) };
+    ['atc', 'ate', 'att'].forEach(function (key) {
+      var g = el('g', { 'class': 'mk truth' }, svg);
+      markers[key] = { g: g, ref: el('line', { 'class': 'ref' }, g), lead: el('line', { 'class': 'ref' }, g), text: el('text', { 'text-anchor': 'middle' }, g) };
+    });
+    var gn = el('g', { 'class': 'mk naive' }, svg);
+    markers.naive = { g: gn, circle: el('circle', { r: 6 }, gn), text: el('text', { 'text-anchor': 'middle' }, gn) };
+    var gr = el('g', { 'class': 'mk reg' }, svg);
+    markers.reg = { g: gr, whisker: el('line', {}, gr), shape: el('path', {}, gr), text: el('text', { 'text-anchor': 'middle' }, gr) };
+  }
+
+  function drawLine(m) {
+    var svg = $('nl');
+    ensureMarkers(svg);
+    var fs = view.projector ? 18 : 13, W = 760, padX = 46;
+    var showReg = state.revealed && m.additive;
+    var vals = [0];
+    ['ate', 'att', 'atc'].forEach(function (k) { if (m.truth[k] !== null) vals.push(m.truth[k]); });
+    if (m.naive !== null) vals.push(m.naive);
+    if (showReg) { vals.push(m.additive.coef - 1.96 * m.additive.se, m.additive.coef + 1.96 * m.additive.se); }
+    var lo = Math.floor(Math.min.apply(null, vals) - 0.5), hi = Math.ceil(Math.max.apply(null, vals) + 0.5);
+    if (hi - lo < 4) { var mid = (hi + lo) / 2; lo = Math.floor(mid - 2); hi = Math.ceil(mid + 2); }
+    var x = function (v) { return padX + (v - lo) / (hi - lo) * (W - 2 * padX); };
+    var wid = function (s) { return s.length * fs * 0.58 + 10; };
+
+    function stack(items) {
+      items.sort(function (a, b) { return a.x - b.x; });
+      var rowsEnd = [];
+      items.forEach(function (it) {
+        var w = wid(it.label), r = 0;
+        while (rowsEnd[r] !== undefined && rowsEnd[r] > it.x - w / 2) r++;
+        rowsEnd[r] = it.x + w / 2; it.row = r;
+      });
+      return rowsEnd.length;
+    }
+    var names = { atc: 'ATC', ate: 'ATE', att: 'ATT' };
+    var top = ['atc', 'ate', 'att'].filter(function (k) { return m.truth[k] !== null; })
+      .map(function (k) { return { key: k, x: x(m.truth[k]), label: names[k] + ' ' + fmt(m.truth[k]) }; });
+    var bottom = [];
+    if (m.naive !== null) bottom.push({ key: 'naive', x: x(m.naive), label: 'Naïve ' + fmt(m.naive) });
+    if (showReg) bottom.push({ key: 'reg', x: x(m.additive.coef), label: 'Regression β₁ ' + fmt(m.additive.coef) });
+    var topRows = Math.max(stack(top), 1), botRows = Math.max(stack(bottom), 1);
+    var rowH = fs + 10, axisY = 18 + topRows * rowH + 14, H = axisY + 34 + botRows * rowH + 22;
+    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+
+    markers.ticks.innerHTML = '';
+    var step = (hi - lo) <= 12 ? 1 : (hi - lo) <= 24 ? 2 : 5;
+    for (var t = Math.ceil(lo / step) * step; t <= hi; t += step) {
+      var g = el('g', { 'class': 'tick' }, markers.ticks);
+      el('line', { x1: x(t), x2: x(t), y1: axisY, y2: axisY + 6 }, g);
+      var tx = el('text', { x: x(t), y: axisY + 8 + fs, 'text-anchor': 'middle' }, g); tx.textContent = t;
+    }
+    var ax = el('text', { x: W - padX, y: H - 4, 'text-anchor': 'end' }, markers.ticks);
+    ax.textContent = 'Effect of the pump on harvest ($1,000s)';
+    ax.setAttribute('class', 'tick');
+    markers.axis.setAttribute('x1', padX); markers.axis.setAttribute('x2', W - padX);
+    markers.axis.setAttribute('y1', axisY); markers.axis.setAttribute('y2', axisY);
+
+    ['atc', 'ate', 'att'].forEach(function (k) {
+      var mk = markers[k], it = top.filter(function (i) { return i.key === k; })[0];
+      if (!it) { mk.g.style.display = 'none'; return; }
+      mk.g.style.display = '';
+      mk.g.style.transform = 'translate(' + it.x + 'px,0px)';
+      var ly = 14 + (topRows - it.row) * rowH - 6;
+      mk.text.setAttribute('x', 0); mk.text.setAttribute('y', ly); mk.text.textContent = it.label;
+      mk.lead.setAttribute('x1', 0); mk.lead.setAttribute('x2', 0); mk.lead.setAttribute('y1', ly + 4); mk.lead.setAttribute('y2', axisY);
+      mk.ref.setAttribute('x1', 0); mk.ref.setAttribute('x2', 0); mk.ref.setAttribute('y1', axisY); mk.ref.setAttribute('y2', axisY + 30);
+    });
+    function placeBottom(key, mk) {
+      var it = bottom.filter(function (i) { return i.key === key; })[0];
+      if (!it) { mk.g.style.display = 'none'; return null; }
+      mk.g.style.display = '';
+      mk.g.style.transform = 'translate(' + it.x + 'px,0px)';
+      mk.text.setAttribute('x', 0); mk.text.setAttribute('y', axisY + 30 + (it.row + 1) * rowH);
+      mk.text.textContent = it.label;
+      return it;
+    }
+    if (placeBottom('naive', markers.naive)) { markers.naive.circle.setAttribute('cx', 0); markers.naive.circle.setAttribute('cy', axisY); }
+    if (placeBottom('reg', markers.reg)) {
+      var half = x(m.additive.coef + 1.96 * m.additive.se) - x(m.additive.coef), s = 8;
+      markers.reg.whisker.setAttribute('x1', -half); markers.reg.whisker.setAttribute('x2', half);
+      markers.reg.whisker.setAttribute('y1', axisY); markers.reg.whisker.setAttribute('y2', axisY);
+      markers.reg.shape.setAttribute('d', 'M0,' + (axisY - s) + ' L' + s + ',' + axisY + ' L0,' + (axisY + s) + ' L' + (-s) + ',' + axisY + ' Z');
+    }
+
+    var aria = 'Number line of pump effects. True ATC ' + fmt(m.truth.atc) + ', ATE ' + fmt(m.truth.ate) + ', ATT ' + fmt(m.truth.att) +
+      '. Naïve difference ' + fmt(m.naive) + '.' + (showReg ? ' Regression beta 1 ' + fmt(m.additive.coef) + ', standard error ' + fmt(m.additive.se) + '.' : ' Regression not yet fitted.');
+    svg.setAttribute('aria-label', aria);
+  }
+
+  function closestTo(m) {
+    if (!m.additive) return null;
+    var best = null;
+    ['ate', 'att', 'atc'].forEach(function (k) {
+      if (m.truth[k] === null) return;
+      var d = Math.abs(m.additive.coef - m.truth[k]);
+      if (!best || d < best.d) best = { k: k, d: d };
+    });
+    return best;
+  }
+
+  function render() {
+    var m = model(state);
+    document.body.classList.toggle('projector', view.projector);
+    $('projBtn').setAttribute('aria-pressed', String(view.projector));
+
+    // controls
+    $('nRich').value = state.nRich; $('nRichO').textContent = state.nRich;
+    $('pRich').value = Math.round(state.pRich * 100); $('pRichO').textContent = pct(state.pRich);
+    $('pPoor').value = Math.round(state.pPoor * 100); $('pPoorO').textContent = pct(state.pPoor);
+    $('tauRich').value = state.tauRich; $('tauRichO').textContent = signed(state.tauRich);
+    $('tauPoor').value = state.tauPoor; $('tauPoorO').textContent = signed(state.tauPoor);
+    $('seedRead').textContent = 'Noise seed ' + state.seed + ', n = 100 farmers, noise sd = 1';
+    document.querySelectorAll('input[name=pred]').forEach(function (r) { r.checked = (r.value === state.prediction); });
+    $('fitBtn').disabled = !state.prediction || state.revealed;
+    $('fitBtn').textContent = state.revealed ? 'Regression fitted' : 'Fit the regression and show β₁';
+    document.querySelectorAll('textarea[data-step]').forEach(function (t) {
+      var v = state['response_step' + t.getAttribute('data-step')];
+      if (t.value !== v) t.value = v;
+    });
+
+    // field
+    $('richH').textContent = 'Rich farmers (' + m.nR + ')';
+    $('poorH').textContent = 'Poor farmers (' + m.nP + ')';
+    $('richRead').textContent = m.kR + ' of ' + m.nR + ' have a pump (' + pct(m.sR.p) + ')';
+    $('poorRead').textContent = m.kP + ' of ' + m.nP + ' have a pump (' + pct(m.sP.p) + ')';
+    renderPlots($('richPlots'), m.nR, m.kR, 'Rich farmers');
+    renderPlots($('poorPlots'), m.nP, m.kP, 'Poor farmers');
+
+    // number line
+    drawLine(m);
+    if (!state.revealed) {
+      $('chartTitle').textContent = 'Naïve comparison ' + fmt(m.naive) + ' against a true ATE of ' + fmt(m.truth.ate);
+      $('chartNote').textContent = 'Dashed lines are the true effects, computed from both potential outcomes. The hollow circle compares pump owners with non-owners. The regression appears after you make a prediction in step 1.';
+    } else if (!m.additive) {
+      $('chartTitle').textContent = 'The regression cannot separate the pump from wealth';
+      $('chartNote').textContent = 'With these settings, pump ownership is perfectly predicted by wealth (or nobody differs), so lm() cannot estimate a coefficient on the pump.';
+    } else {
+      $('chartTitle').textContent = 'Regression β₁ = ' + fmt(m.additive.coef) + ' (SE ' + fmt(m.additive.se) + ') against ATE ' + fmt(m.truth.ate) + ', ATT ' + fmt(m.truth.att) + ', ATC ' + fmt(m.truth.atc);
+      $('chartNote').textContent = 'Dashed lines are the true effects. The hollow circle is the naïve comparison. The blue diamond is β₁, the pump coefficient in Harvest = β₀ + β₁·Pump + β₂·Rich + ε, with ±1.96 SE.';
+    }
+
+    // prediction feedback
+    var fb = $('predFeedback');
+    if (state.revealed) {
+      fb.hidden = false;
+      var c = closestTo(m), names = { ate: 'ATE', att: 'ATT', atc: 'ATC', none: 'somewhere else' };
+      var pn = names[state.prediction] || 'nothing';
+      if (!c) fb.textContent = 'With these settings there is no coefficient to compare: wealth and the pump move together perfectly.';
+      else if (c.d > 0.25) fb.textContent = 'You predicted ' + pn + '. β₁ (' + fmt(m.additive.coef) + ') is not close to any of the three; the nearest is the ' + names[c.k] + ' (' + fmt(m.truth[c.k]) + ').';
+      else fb.textContent = 'You predicted ' + pn + '. β₁ (' + fmt(m.additive.coef) + ') sits closest to the ' + names[c.k] + ' (' + fmt(m.truth[c.k]) + ').';
+    } else fb.hidden = true;
+
+    // reveal
+    var rv = $('reveal');
+    rv.hidden = !state.revealed;
+    if (state.revealed) renderReveal(m);
+  }
+
+  function renderReveal(m) {
+    var dR = m.sR.delta, dP = m.sP.delta;
+    var txt;
+    if (m.wReg === null) {
+      txt = 'Nobody within either group differs in pump status, so there is nothing for the regression to compare.';
+    } else {
+      txt = 'Within rich farmers, pump owners out-harvest non-owners by ' + fmt(dR) + '; within poor farmers, by ' + fmt(dP) +
+        '. The regression\u2019s β₁ (' + fmt(m.wavg) + ') is a weighted average of those two differences, with ' + pct(m.wReg) +
+        ' of the weight on rich farmers. Rich farmers are ' + pct(m.shares.all) + ' of all farmers and ' + pct(m.shares.treated) + ' of pump owners.';
+      if (m.wReg === 0) txt += ' Every rich farmer is in the same pump group, so the regression learns nothing from them.';
+    }
+    $('revText').textContent = txt;
+
+    var rows = [
+      { name: 'Everyone (ATE)', w: m.shares.all, v: m.truth.ate },
+      { name: 'Pump owners (ATT)', w: m.shares.treated, v: m.truth.att },
+      { name: 'Non-owners (ATC)', w: m.shares.controls, v: m.truth.atc },
+      { name: 'Regression (lm)', w: m.wReg, v: m.wavg, lm: true }
+    ];
+    var bars = $('bars');
+    if (bars.children.length !== rows.length) {
+      bars.innerHTML = '';
+      rows.forEach(function () {
+        var r = document.createElement('div'); r.className = 'barrow';
+        r.innerHTML = '<span class="name"></span><span class="bar"><i class="r"></i><i class="p"></i></span><span class="v"></span>';
+        bars.appendChild(r);
+      });
+    }
+    var aria = [];
+    rows.forEach(function (row, i) {
+      var r = bars.children[i], w = row.w === null ? 0 : row.w;
+      r.classList.toggle('lm', !!row.lm);
+      r.querySelector('.name').textContent = row.name;
+      r.querySelector('i.r').style.width = (row.w === null ? 0 : w * 100) + '%';
+      r.querySelector('i.p').style.width = (row.w === null ? 0 : (1 - w) * 100) + '%';
+      r.querySelector('.v').textContent = fmt(row.v);
+      aria.push(row.name + ': ' + pct(row.w) + ' weight on rich, average ' + fmt(row.v));
+    });
+    bars.setAttribute('aria-label', aria.join('; '));
+
+    $('formula').textContent = 'weight on rich = nᵣ·pᵣ(1 − pᵣ) ÷ [nᵣ·pᵣ(1 − pᵣ) + nₚ·pₚ(1 − pₚ)] = ' +
+      m.nR + '·' + fmt(m.sR.p) + '·' + fmt(1 - m.sR.p) + ' ÷ (' + fmt(m.sR.v) + ' + ' + fmt(m.sP.v) + ') = ' + fmt(m.wReg, 3);
+
+    var body = $('interBody'); body.innerHTML = '';
+    [['ATE', 'ate'], ['ATT', 'att'], ['ATC', 'atc']].forEach(function (p) {
+      var tr = document.createElement('tr');
+      tr.innerHTML = '<td></td><td class="n"></td><td class="n"></td>';
+      tr.children[0].textContent = p[0];
+      tr.children[1].textContent = fmt(m.truth[p[1]]);
+      tr.children[2].textContent = m.inter ? fmt(m.inter[p[1]]) : 'not identified';
+      body.appendChild(tr);
+    });
+    $('interNote').textContent = m.inter
+      ? 'Estimates differ from the truth only through noise in the observed harvests.'
+      : 'One group has no pump owners or no non-owners, so the pump\u2019s effect in that group cannot be estimated from these data.';
+  }
+
+  // ---------- wiring (every user change goes through userSet) ----------
+  function bindRange(id, key, scale) {
+    $(id).addEventListener('input', function (e) {
+      var p = {}; p[key] = Number(e.target.value) / (scale || 1); userSet(p);
+    });
+  }
+  bindRange('nRich', 'nRich'); bindRange('pRich', 'pRich', 100); bindRange('pPoor', 'pPoor', 100);
+  bindRange('tauRich', 'tauRich'); bindRange('tauPoor', 'tauPoor');
+  document.querySelectorAll('input[name=pred]').forEach(function (r) {
+    r.addEventListener('change', function (e) { userSet({ prediction: e.target.value }); });
+  });
+  $('fitBtn').addEventListener('click', function () { if (state.prediction) userSet({ revealed: true }); });
+  $('breakBtn').addEventListener('click', function () { userSet({ pRich: 1 }); });
+  $('reseedBtn').addEventListener('click', function () { userSet({ seed: Math.floor(mulberry32(state.seed * 7919 + 1)() * 100000) + 1 }); });
+  $('resetBtn').addEventListener('click', function () { userSet(Object.assign({}, DEFAULTS)); });
+  $('projBtn').addEventListener('click', function () { view.projector = !view.projector; render(); });
+  document.querySelectorAll('textarea[data-step]').forEach(function (t) {
+    t.addEventListener('input', function (e) {
+      var p = {}; p['response_step' + e.target.getAttribute('data-step')] = e.target.value; userSet(p);
+    });
+  });
+
+  // ---------- assertions ----------
+  function P(o) { return Object.assign({}, DEFAULTS, o || {}); }
+  var near = function (a, b, tol) { return a !== null && b !== null && Math.abs(a - b) < (tol || 1e-9); };
+  var assertions = [
+    { name: 'Workbook design: ATE 3, ATT 3.857, ATC 1, regression weight on rich 0.265', run: function () {
+      var m = model(P());
+      return near(m.truth.ate, 3) && near(m.truth.att, 27 / 7) && near(m.truth.atc, 1) && near(m.wReg, 4.5 / 17, 1e-9);
+    } },
+    { name: 'Additive lm coefficient equals the variance-weighted average of within-group differences', run: function () {
+      var cases = [P(), P({ seed: 1 }), P({ nRich: 30, pRich: 0.75, pPoor: 0.2, seed: 7 }), P({ pRich: 1 }), P({ tauPoor: 3, seed: 42 })];
+      return cases.every(function (c) { var m = model(c); return m.additive && near(m.additive.coef, m.wavg, 1e-8); });
+    } },
+    { name: 'Naïve difference = ATT + selection bias in Y0', run: function () {
+      return [P(), P({ seed: 9, pPoor: 0.3 }), P({ nRich: 70 })].every(function (c) { var m = model(c); return near(m.naive, m.truth.att + m.selBias, 1e-9); });
+    } },
+    { name: 'Equal effects: ATE = ATT = ATC = the common effect', run: function () {
+      var m = model(P({ tauPoor: 6 }));
+      return near(m.truth.ate, 6) && near(m.truth.att, 6) && near(m.truth.atc, 6);
+    } },
+    { name: 'No overlap among rich: regression puts zero weight on rich farmers', run: function () {
+      return near(model(P({ pRich: 1 })).wReg, 0);
+    } },
+    { name: 'Pump fully determined by wealth: regression reports no coefficient, without throwing', run: function () {
+      var m = model(P({ pRich: 1, pPoor: 0 }));
+      return m.additive === null && m.inter === null && m.wReg === null;
+    } }
+  ];
+
+  var controls = [
+    { key: 'nRich', label: 'Rich farmers (of 100)', kind: 'range', min: 10, max: 90, step: 10 },
+    { key: 'pRich', label: 'Pump rate among rich farmers', kind: 'range', min: 0, max: 1, step: 0.05 },
+    { key: 'pPoor', label: 'Pump rate among poor farmers', kind: 'range', min: 0, max: 1, step: 0.05 },
+    { key: 'tauRich', label: "Pump's effect for rich farmers ($1,000s)", kind: 'range', min: -2, max: 10, step: 0.5 },
+    { key: 'tauPoor', label: "Pump's effect for poor farmers ($1,000s)", kind: 'range', min: -2, max: 10, step: 0.5 },
+    { key: 'prediction', label: 'Your prediction', kind: 'choice', options: ['ate', 'att', 'atc', 'none'] },
+    { key: 'revealed', label: 'Regression fitted', kind: 'toggle' }
+  ];
+  var responses = [
+    { key: 'response_step2', prompt: "Compare the regression's β1 with the ATE, ATT and ATC. Which is it closest to?" },
+    { key: 'response_step3', prompt: "What share of the regression's weight goes to rich farmers? What share of all farmers, and of pump owners, are rich?" },
+    { key: 'response_step4', prompt: 'Move the pump rate among poor farmers to 90%, then down to 10%. What happens to the weight on the rich and to the coefficient?' },
+    { key: 'response_step5', prompt: 'With the poor effect at +6, why do ATE, ATT, ATC and the regression agree while the naive comparison does not?' },
+    { key: 'response_step6', prompt: 'After giving every rich farmer a pump: how much does the regression learn from rich farmers? Could any regression estimate the ATE?' }
+  ];
+
+  window.artifact = {
+    getState: getState,
+    setState: setState,
+    onChange: onChange,
+    controls: controls,
+    responses: responses,
+    assertions: assertions,
+    referenceCases: [],
+    model: function (o) { return model(Object.assign({}, DEFAULTS, o || {})); }
+  };
+  render();
+})();
+</script>
+
+<script>
+(function () {
+  var cfg = {"versionId":"cmvfv96uv000308i8yv5nq5ob","appOrigin":"https://ideasatplay.org","direct":null};
+  var t0 = Date.now(), scrolled = false, acted = false, reached = false, shown = false, config = null;
+  var framed = parent !== window;
+  function onScreen(el) {
+    if (!el.getClientRects().length) return false;
+    var r = el.getBoundingClientRect();
+    return r.top < innerHeight && r.bottom > 0;
+  }
+  function atBottom() {
+    var f = document.querySelector("footer[data-kc-credit]");
+    if (f) return f.getBoundingClientRect().top <= innerHeight;
+    var d = document.documentElement;
+    return scrollY + innerHeight >= d.scrollHeight - 48;
+  }
+  // { cur, last } when the page moves through numbered steps, else null.
+  function steps() {
+    var a = window.artifact;
+    try {
+      var c = a && Array.isArray(a.controls) ? a.controls.filter(function (x) { return x && x.key === "step" && typeof x.max === "number"; })[0] : null;
+      if (c) { var s = a.getState(); if (s && typeof s.step === "number") return { cur: s.step, last: c.max }; }
+    } catch (e) {}
+    var cur = document.querySelector('[aria-current="step"]');
+    if (cur && cur.parentElement) {
+      var sib = Array.prototype.filter.call(cur.parentElement.children, function (x) { return x.getClientRects().length; });
+      return { cur: sib.indexOf(cur), last: sib.length - 1 };
+    }
+    return null;
+  }
+  function finished() {
+    var mark = document.querySelector("[data-kc-end]");
+    if (mark) return onScreen(mark);
+    var s = steps();
+    if (s) return s.cur >= s.last && atBottom();
+    return atBottom() && (scrolled || (acted && Date.now() - t0 > 60000));
+  }
+  // The student link remembers a rating in its own storage where the browser allows it.
+  var KEY = "kc-rated-" + cfg.versionId;
+  function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
+  if (cfg.direct) config = { ask: !store(KEY), preview: false, labels: cfg.direct.labels };
+  var visitor = (function () {
+    var v = store("kc-visitor");
+    if (!v) { v = ""; for (var i = 0; i < 24; i++) v += "abcdefghijklmnopqrstuvwxyz0123456789".charAt(Math.floor(Math.random() * 36)); store("kc-visitor", v); }
+    return v;
+  })();
+  var pending = {}, seq = 0;
+  function save(score, comment) {
+    if (cfg.direct) {
+      var body = { versionId: cfg.versionId, score: score, context: "share", visitor: visitor };
+      if (comment) body.comment = comment;
+      // text/plain: a simple request, so no preflight is needed.
+      return fetch(cfg.direct.endpoint, { method: "POST", credentials: "omit", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(body) })
+        .then(function (r) { if (r.ok) store(KEY, String(score)); return r.ok; }, function () { return false; });
+    }
+    return new Promise(function (resolve) {
+      var id = ++seq; pending[id] = resolve;
+      parent.postMessage({ type: "kc:rate", versionId: cfg.versionId, id: id, score: score, comment: comment || "" }, cfg.appOrigin);
+      setTimeout(function () { if (pending[id]) { delete pending[id]; resolve(false); } }, 15000);
+    });
+  }
+  var B = "display:inline-block;margin:3px 6px 3px 0;padding:4px 10px;border:1px solid #a8a29e;border-radius:6px;background:#fff;color:#1c1917;font:inherit;cursor:pointer";
+  function el(tag, attrs, text) { var e = document.createElement(tag); for (var k in attrs) e.setAttribute(k, attrs[k]); if (text) e.textContent = text; return e; }
+  function show() {
+    if (shown || !config || !config.ask) return;
+    shown = true;
+    clearInterval(timer);
+    var L = config.labels;
+    var box = el("div", { "data-kc-rating": "", "data-kc-personal": "", role: "region", "aria-label": L.ask, lang: L.lang, dir: L.dir,
+      style: "box-sizing:border-box;max-width:760px;margin:24px auto 0;padding:10px 14px;border:1px solid #d6d3d1;border-radius:10px;background:#fafaf9;color:#1c1917;font:14px/1.5 system-ui,-apple-system,sans-serif;text-align:start" });
+    var live = el("div", { "aria-live": "polite" });
+    box.appendChild(live);
+    function ask(msg) {
+      live.innerHTML = "";
+      live.appendChild(el("span", { style: "font-weight:600;margin-inline-end:8px" }, L.ask));
+      [1, 2, 3].forEach(function (s) {
+        var b = el("button", { type: "button", style: B }, s + " · " + L["s" + s]);
+        b.addEventListener("click", function () {
+          live.querySelectorAll("button").forEach(function (x) { x.disabled = true; });
+          save(s, "").then(function (ok) { if (ok) comment(s); else ask(L.error); });
+        });
+        live.appendChild(b);
+      });
+      if (config.preview) live.appendChild(el("div", { style: "font-size:12px;color:#57534e" }, L.preview));
+      if (msg) live.appendChild(el("div", { role: "alert", style: "color:#991b1b;font-size:13px" }, msg));
+    }
+    function comment(score) {
+      live.innerHTML = "";
+      var id = "kc-rate-comment";
+      live.appendChild(el("label", { for: id, style: "display:block;font-weight:600;margin-bottom:4px" }, L.comment));
+      var row = el("div", { style: "display:flex;flex-wrap:wrap;gap:6px;align-items:center" });
+      var input = el("input", { id: id, type: "text", maxlength: "1000", autocomplete: "off", dir: "auto",
+        style: "flex:1 1 260px;min-width:0;box-sizing:border-box;padding:5px 8px;border:1px solid #a8a29e;border-radius:6px;background:#fff;color:#1c1917;font:inherit" });
+      var send = el("button", { type: "button", style: B + ";background:#292524;color:#fff;border-color:#292524" }, L.send);
+      var skip = el("button", { type: "button", style: B }, L.skip);
+      function done() { live.innerHTML = ""; live.appendChild(el("span", { style: "font-weight:600" }, L.thanks)); setTimeout(function () { box.remove(); }, 2000); }
+      send.addEventListener("click", function () {
+        var text = input.value.trim();
+        if (!text) return done();
+        send.disabled = skip.disabled = true;
+        save(score, text).then(function (ok) { if (ok) done(); else { send.disabled = skip.disabled = false; live.appendChild(el("div", { role: "alert", style: "color:#991b1b;font-size:13px" }, L.error)); } });
+      });
+      input.addEventListener("keydown", function (e) { if (e.key === "Enter") send.click(); });
+      skip.addEventListener("click", done);
+      row.appendChild(input); row.appendChild(send); row.appendChild(skip);
+      live.appendChild(row);
+      input.focus();
+    }
+    ask("");
+    var mark = document.querySelector("[data-kc-end]"), foot = document.querySelector("footer[data-kc-credit]");
+    if (mark) mark.insertAdjacentElement("afterend", box);
+    else if (foot) foot.parentNode.insertBefore(box, foot);
+    else document.body.appendChild(box);
+  }
+  function check() {
+    if (!reached && finished()) reached = true;
+    if (reached) show();
+  }
+  window.addEventListener("message", function (e) {
+    if (e.source !== parent || !e.data || e.data.versionId !== cfg.versionId) return;
+    var d = e.data;
+    if (d.type === "kc:rate-config" && !cfg.direct) { config = { ask: !!d.ask, preview: !!d.preview, labels: d.labels }; check(); }
+    if (d.type === "kc:rate-result" && pending[d.id]) { pending[d.id](!!d.ok); delete pending[d.id]; }
+  });
+  // The app page may start listening after this page loads: ask a few times.
+  var hellos = 0;
+  function hello() { if (framed && !cfg.direct && !config && hellos++ < 8) parent.postMessage({ type: "kc:rate-hello", versionId: cfg.versionId }, cfg.appOrigin); }
+  hello();
+  var timer = setInterval(function () { if (hellos < 8 && !config) hello(); check(); }, 800);
+  window.addEventListener("scroll", function () { if (scrollY > 0) scrolled = true; check(); }, { passive: true });
+  ["click", "input", "keydown"].forEach(function (t) { document.addEventListener(t, function (e) { if (e.target && e.target.closest && e.target.closest("[data-kc-rating]")) return; acted = true; setTimeout(check, 50); }, true); });
+})();
+</script></body>
+</html>

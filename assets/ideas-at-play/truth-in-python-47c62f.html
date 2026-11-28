@@ -1,0 +1,664 @@
+<!doctype html>
+<html lang="en" data-kc-code="python">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Truth in Python: logical connectives, truth tables and equivalence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --obsidian:#000000; --white:#ffffff; --charcoal:#3c3732; --slate:#5a5550; --graphite:#78736e;
+  --quick:#b4afaa; --ash:#d2cdc8; --bone:#f0ebe6; --goldenrod:#f0b91e; --tangerine:#f0871e; --clay:#905112;
+  --bg:var(--bone); --surface:var(--white); --ink:var(--charcoal); --ink-strong:var(--obsidian);
+  --muted:var(--slate); --rule:var(--ash); --accent:var(--clay); --hi:var(--goldenrod); --hi-ink:var(--obsidian);
+  --btn-bg:var(--obsidian); --btn-ink:var(--white); --focus:var(--clay);
+  --hero-bg:var(--obsidian); --hero-ink:var(--white); --hero-muted:var(--ash);
+  --cream:#fbf6e9; --code-ink:#2b2622; --ok-bg:#fdf3d2; --err-bg:#fdf0e6;
+  --serif:"Chronicle Display","EB Garamond",Garamond,"Times New Roman",serif;
+  --sans:"Neue Haas Grotesk Text","Helvetica Neue",Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --kc-accent:var(--obsidian); --kc-line:var(--ash); --kc-ok:#4d5a14; --kc-err:#9a3412;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:var(--obsidian); --surface:var(--charcoal); --ink:var(--bone); --ink-strong:var(--white);
+    --muted:var(--ash); --rule:var(--graphite); --accent:var(--goldenrod);
+    --btn-bg:var(--goldenrod); --btn-ink:var(--obsidian); --focus:var(--goldenrod); --hero-bg:var(--charcoal);
+    --cream:#2a2520; --code-ink:#f0ebe6; --ok-bg:#4f4428; --err-bg:#3a2516;
+    --kc-accent:var(--goldenrod); --kc-line:var(--graphite); --kc-ok:#d9e3a1; --kc-err:#fdba74;
+    color-scheme:dark;
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.55}
+body.projector{font-size:23px}
+button,input,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+code{font-family:var(--mono);font-size:.92em}
+.hero{background:var(--hero-bg);color:var(--hero-ink);padding:2em 1.25em 1.6em}
+.hero-inner{max-width:52em;margin:0 auto;display:flex;flex-wrap:wrap;gap:1em 2em;align-items:flex-end;justify-content:space-between}
+.hero h1{font-family:var(--serif);font-weight:400;font-size:2.7em;line-height:1.05;margin:0}
+.hero h1 em{font-style:italic}
+.hero p{margin:.5em 0 0;color:var(--hero-muted);max-width:34em}
+.ghost{background:transparent;border:1px solid var(--hero-muted);color:var(--hero-ink);border-radius:999px;padding:.35em .9em;cursor:pointer;font-size:.875em}
+main{max-width:52em;margin:0 auto;padding:1.25em 1.25em 3em}
+.intro{background:var(--surface);border-left:4px solid var(--hi);border-radius:0 16px 16px 0;padding:.9em 1.3em;margin:0 0 1.5em}
+.intro p{margin:.45em 0}
+.group{font-family:var(--serif);font-weight:400;font-size:1.7em;margin:1.6em 0 .5em;color:var(--ink-strong)}
+section.cell{background:var(--surface);border-radius:18px;padding:1.2em clamp(1em,3vw,1.8em) 1.3em;margin:1em 0}
+section.cell h2{font-family:var(--serif);font-weight:400;font-size:1.55em;line-height:1.2;margin:0 0 .4em;color:var(--ink-strong)}
+section.cell h2 .n{color:var(--accent);margin-right:.25em}
+.tag{display:inline-block;font-family:var(--sans);font-size:.5em;font-weight:600;letter-spacing:.05em;text-transform:uppercase;border:1px solid currentColor;border-radius:999px;padding:.1em .6em;vertical-align:middle;margin-left:.5em;color:var(--muted)}
+.prompt{margin:.4em 0 .8em}
+.prompt p{margin:.4em 0}
+.warn{border:1.5px solid var(--tangerine);background:var(--err-bg);border-radius:12px;padding:.55em .85em;margin:.7em 0}
+.warn p{margin:.2em 0}
+.predict{border:1.5px dashed var(--quick);border-radius:14px;padding:.7em .9em;margin:.6em 0 .9em}
+.predict label{display:block;font-weight:600;margin:.2em 0 .3em}
+.predict .row{display:flex;flex-wrap:wrap;gap:.6em 1.2em}
+.predict .row>div{flex:1 1 14em;min-width:0}
+textarea.free{width:100%;min-height:3em;border:1px solid var(--quick);border-radius:10px;padding:.5em .7em;background:var(--surface);resize:vertical}
+.after{margin:.8em 0 0}
+.fb{border-left:4px solid var(--hi);background:var(--ok-bg);border-radius:0 12px 12px 0;padding:.65em 1em;margin:.8em 0}
+.fb p{margin:.3em 0}
+.btn2{background:transparent;color:var(--ink);border:1px solid var(--ink);border-radius:999px;padding:.4em 1em;cursor:pointer}
+.btn2:disabled{opacity:.45;cursor:not-allowed}
+.msg:empty{display:none}
+.do{border:2px solid var(--ink-strong);background:var(--surface);border-radius:12px;padding:.55em .9em .6em;margin:.7em 0}
+.do p{margin:.25em 0}
+.do-k{display:inline-block;font-size:.72em;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:var(--ink-strong);color:var(--surface);border-radius:999px;padding:.1em .65em}
+code.key{font-size:1.05em;font-weight:700;background:var(--hi);color:var(--hi-ink);border-radius:5px;padding:.08em .4em;white-space:nowrap}
+section.mcq{background:var(--surface);border:2px solid var(--ink-strong);border-radius:18px;padding:1.1em clamp(1em,3vw,1.8em) 1.2em;margin:1em 0 2em}
+section.mcq h3{font-family:var(--serif);font-weight:400;font-size:1.35em;margin:0 0 .35em;color:var(--ink-strong)}
+section.mcq .kick{font-size:.75em;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin:0}
+.opts{display:grid;gap:.45em;margin:.7em 0}
+.opts label{display:flex;gap:.6em;align-items:flex-start;border:1.5px solid var(--rule);border-radius:12px;padding:.5em .8em;cursor:pointer}
+.opts label.on{border-color:var(--ink-strong)}
+.opts label.is-right{background:var(--ok-bg);border-color:var(--hi)}
+.opts label.is-wrong{border-color:var(--tangerine)}
+.opts code{font-size:1em;white-space:pre-wrap;word-break:break-word}
+.opts input{accent-color:var(--clay);width:1.05em;height:1.05em;margin-top:.25em;flex:none}
+.fb.no{border-left-color:var(--tangerine);background:var(--err-bg)}
+table.tt{border-collapse:collapse;font-size:.9em;margin:.5em 0}
+table.tt th,table.tt td{padding:.25em .7em;border-bottom:1px solid var(--rule);text-align:center}
+table.tt th{border-bottom:1.5px solid var(--ink-strong);font-weight:600}
+table.tt td.diff{background:var(--err-bg);font-weight:700}
+.tw{overflow-x:auto;max-width:100%}
+.proto{font-size:.85em;color:var(--muted);border-bottom:1px solid var(--rule);padding-bottom:.4em}
+details.answer{border:1px solid var(--rule);border-radius:12px;padding:.5em .9em;margin:.7em 0}
+details.answer summary{cursor:pointer;font-weight:600}
+details[data-kc-hint]{border:1px dashed var(--quick);border-radius:10px;padding:.35em .8em;margin:.5em 0}
+details[data-kc-hint] summary{cursor:pointer;font-size:.92em}
+/* the platform's code cells, in this page's colours */
+body textarea.kc-cell{font:14.5px/1.55 var(--mono);background:var(--cream);color:var(--code-ink);border:1px solid var(--rule);border-radius:12px;padding:12px 14px;tab-size:2}
+.projector textarea.kc-cell{font-size:20px}
+body .kc-btn{font-size:.875em;border-radius:999px;padding:.35em 1em;color:var(--btn-ink);background:var(--btn-bg);border-color:var(--btn-bg)}
+body .kc-btn.kc-quiet{color:var(--ink);background:transparent;border-color:var(--ink)}
+body .kc-out{font-size:13.5px;border-radius:10px}
+.projector .kc-out{font-size:19px}
+/* cell 7 prints two truth tables (4 and 8 rows): room for both without scrolling */
+body #kc-table-out{min-height:23.5em}
+body #kc-table{min-height:15em}
+body .kc-banner{border-radius:10px;background:var(--surface)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (max-width:520px){.hero h1{font-size:2.05em}}
+</style>
+<script data-kc-runtime>window.__kcCodeConfig = {"versionId":"cmvwpahvd000108jwn2eih0iq","appOrigin":"https://ideasatplay.org","pyodide":"https://ideasatplay-sandbox.vercel.app/rt/pyodide/v314.0.7/full/","webr":"https://ideasatplay-sandbox.vercel.app/rt/webr/0.6.0/","webrRepo":"https://ideasatplay-sandbox.vercel.app/rt/webr-repo/"};</script><script data-kc-runtime>"use strict";(()=>{(function(){"use strict";var b=window.__kcCodeConfig||{},L=document.documentElement,w=(function(e){return e==="r"||e==="sql"?e:"python"})((L.getAttribute("data-kc-code")||"").toLowerCase()),A=(L.getAttribute("data-kc-packages")||"").split(",").map(function(e){return e.trim()}).filter(Boolean),ae=Math.min(120,Math.max(5,Number(L.getAttribute("data-kc-timeout"))||30))*1e3,J=b.pyodide||"https://cdn.jsdelivr.net/pyodide/v314.0.7/full/",G=b.webr||"https://cdn.jsdelivr.net/npm/webr@0.6.0/dist/",Re=b.webrRepo||"https://repo.r-wasm.org/",z=/[?&]sync=1/.test(location.search),M=/[?&]verify=1/.test(location.search),Le=w==="r"?"R":w==="sql"?"SQL":"Python",Q={en:{loading:"{lang} is getting ready\u2026",installing:"Installing packages: {pkgs}\u2026",ready:"{lang} is ready.",failed:"{lang} couldn't start: {err}",run:"Run",stop:"Stop",reset:"Reset",resetAgain:"Click again to reset",restart:"Restart {lang}",running:"Running\u2026",finished:"Finished.",error:"Finished with an error.",timeout:"Stopped: it ran for more than {s} seconds.",stopped:"Stopped.",noOutput:"(no output)",output:"Output",checks:"Checks",pass:"Passed",fail:"Not yet",allPass:"All checks pass.",done:"Mark as done",doneAuto:"Done when all checks pass",doneYes:"Done",readonly:"Read-only",saved:"Your work is saved in this browser only. On another device, or if browser data is cleared, it's gone. Use Download my work to keep a copy.",sessionNote:"Your group shares this code.",noSave:"This page can't save your work here. Use Download my work or Copy my work before you leave.",download:"Download my work",copy:"Copy my work",copied:"Copied.",copyFail:"Select the text below and copy it.",code:"Code",plot:"Plot from this run",fixFirst:"Fix the error, then run again to check your answer.",showSolution:"Show solution",hideSolution:"Hide solution",solutionAfterRun:"Run your code once to unlock the solution",solution:"Reference solution",expectTitle:"What will be checked",expectCount:"{n} of {m} pass",noAutoCheck:"No automatic check here: tick Mark as done when you're finished.",notChecked:"Not checked:",tNumber:"a single number",tVector:"several values (a vector or list)",tText:"text",tLogical:"a true/false value",tFrame:"a data frame (a table)",eLen:"{n} values",eRows:"{n} rows",eLen1:"1 value",eRows1:"1 row",eCols:"columns {cols}",eTol:"within \xB1{t} of the exact value (no need to round)",eRound:"rounded to {d} decimal places",dMissing:"{v} doesn't exist yet. Did you give it another name?",dPlaceholder:"{v} still holds the starter placeholder. Replace it with your calculation.",dNoRows:"Run a query that returns rows first.",dType:"{v} should be {want}.",dLen:"{v} should have {n} values.",dRows:"{v} should have {n} rows.",dLen1:"{v} should have 1 value.",dRows1:"{v} should have 1 row.",dCols:"{v} should have the columns {cols}.",dValue:"{v} exists, but its value isn't the expected one yet."},es:{loading:"{lang} se est\xE1 preparando\u2026",installing:"Instalando paquetes: {pkgs}\u2026",ready:"{lang} est\xE1 listo.",failed:"{lang} no pudo iniciarse: {err}",run:"Ejecutar",stop:"Detener",reset:"Restablecer",resetAgain:"Pulsa otra vez para restablecer",restart:"Reiniciar {lang}",running:"Ejecutando\u2026",finished:"Terminado.",error:"Terminado con un error.",timeout:"Detenido: tard\xF3 m\xE1s de {s} segundos.",stopped:"Detenido.",noOutput:"(sin salida)",output:"Salida",checks:"Comprobaciones",pass:"Correcto",fail:"Todav\xEDa no",allPass:"Todas las comprobaciones son correctas.",done:"Marcar como hecho",doneAuto:"Hecho cuando todas las comprobaciones sean correctas",doneYes:"Hecho",readonly:"Solo lectura",saved:"Tu trabajo se guarda solo en este navegador. En otro dispositivo, o si se borran los datos del navegador, se pierde. Usa Descargar mi trabajo para guardar una copia.",sessionNote:"Tu grupo comparte este c\xF3digo.",noSave:"Esta p\xE1gina no puede guardar tu trabajo aqu\xED. Usa Descargar o Copiar mi trabajo antes de salir.",download:"Descargar mi trabajo",copy:"Copiar mi trabajo",copied:"Copiado.",copyFail:"Selecciona el texto de abajo y c\xF3pialo.",code:"C\xF3digo",plot:"Gr\xE1fico de esta ejecuci\xF3n",fixFirst:"Corrige el error y vuelve a ejecutar para comprobar tu respuesta.",showSolution:"Ver la soluci\xF3n",hideSolution:"Ocultar la soluci\xF3n",solutionAfterRun:"Ejecuta tu c\xF3digo una vez para ver la soluci\xF3n",solution:"Soluci\xF3n de referencia",expectTitle:"Qu\xE9 se comprobar\xE1",expectCount:"{n} de {m} correctas",noAutoCheck:"Aqu\xED no hay comprobaci\xF3n autom\xE1tica: marca Marcar como hecho cuando termines.",notChecked:"No se comprueba:",tNumber:"un solo n\xFAmero",tVector:"varios valores (un vector o una lista)",tText:"texto",tLogical:"un valor verdadero/falso",tFrame:"un data frame (una tabla)",eLen:"{n} valores",eRows:"{n} filas",eLen1:"1 valor",eRows1:"1 fila",eCols:"columnas {cols}",eTol:"a \xB1{t} del valor exacto (no hace falta redondear)",eRound:"redondeado a {d} decimales",dMissing:"{v} todav\xEDa no existe. \xBFLe diste otro nombre?",dPlaceholder:"{v} sigue teniendo el valor provisional del inicio. Sustit\xFAyelo por tu c\xE1lculo.",dNoRows:"Primero ejecuta una consulta que devuelva filas.",dType:"{v} deber\xEDa ser {want}.",dLen:"{v} deber\xEDa tener {n} valores.",dRows:"{v} deber\xEDa tener {n} filas.",dLen1:"{v} deber\xEDa tener 1 valor.",dRows1:"{v} deber\xEDa tener 1 fila.",dCols:"{v} deber\xEDa tener las columnas {cols}.",dValue:"{v} existe, pero su valor todav\xEDa no es el esperado."},ar:{loading:"\u064A\u062C\u0631\u064A \u062A\u062C\u0647\u064A\u0632 {lang}\u2026",installing:"\u062A\u062B\u0628\u064A\u062A \u0627\u0644\u062D\u0632\u0645: {pkgs}\u2026",ready:"{lang} \u062C\u0627\u0647\u0632.",failed:"\u062A\u0639\u0630\u0651\u0631 \u062A\u0634\u063A\u064A\u0644 {lang}: {err}",run:"\u062A\u0634\u063A\u064A\u0644",stop:"\u0625\u064A\u0642\u0627\u0641",reset:"\u0625\u0639\u0627\u062F\u0629 \u0636\u0628\u0637",resetAgain:"\u0627\u0646\u0642\u0631 \u0645\u0631\u0629 \u0623\u062E\u0631\u0649 \u0644\u0625\u0639\u0627\u062F\u0629 \u0627\u0644\u0636\u0628\u0637",restart:"\u0625\u0639\u0627\u062F\u0629 \u062A\u0634\u063A\u064A\u0644 {lang}",running:"\u062C\u0627\u0631\u064D \u0627\u0644\u062A\u0634\u063A\u064A\u0644\u2026",finished:"\u0627\u0646\u062A\u0647\u0649.",error:"\u0627\u0646\u062A\u0647\u0649 \u0628\u062E\u0637\u0623.",timeout:"\u062A\u0648\u0642\u0641: \u0627\u0633\u062A\u063A\u0631\u0642 \u0623\u0643\u062B\u0631 \u0645\u0646 {s} \u062B\u0627\u0646\u064A\u0629.",stopped:"\u062A\u0648\u0642\u0641.",noOutput:"(\u0644\u0627 \u0645\u062E\u0631\u062C\u0627\u062A)",output:"\u0627\u0644\u0645\u062E\u0631\u062C\u0627\u062A",checks:"\u0627\u0644\u0641\u062D\u0648\u0635",pass:"\u0646\u0627\u062C\u062D",fail:"\u0644\u064A\u0633 \u0628\u0639\u062F",allPass:"\u0646\u062C\u062D\u062A \u062C\u0645\u064A\u0639 \u0627\u0644\u0641\u062D\u0648\u0635.",done:"\u062A\u062D\u062F\u064A\u062F \u0643\u0645\u0643\u062A\u0645\u0644",doneAuto:"\u064A\u0643\u062A\u0645\u0644 \u0639\u0646\u062F \u0646\u062C\u0627\u062D \u062C\u0645\u064A\u0639 \u0627\u0644\u0641\u062D\u0648\u0635",doneYes:"\u0645\u0643\u062A\u0645\u0644",readonly:"\u0644\u0644\u0642\u0631\u0627\u0621\u0629 \u0641\u0642\u0637",saved:"\u064A\u064F\u062D\u0641\u0638 \u0639\u0645\u0644\u0643 \u0641\u064A \u0647\u0630\u0627 \u0627\u0644\u0645\u062A\u0635\u0641\u062D \u0641\u0642\u0637. \u0639\u0644\u0649 \u062C\u0647\u0627\u0632 \u0622\u062E\u0631\u060C \u0623\u0648 \u0625\u0630\u0627 \u0645\u064F\u0633\u062D\u062A \u0628\u064A\u0627\u0646\u0627\u062A \u0627\u0644\u0645\u062A\u0635\u0641\u062D\u060C \u064A\u0636\u064A\u0639. \u0627\u0633\u062A\u062E\u062F\u0645 \xAB\u062A\u0646\u0632\u064A\u0644 \u0639\u0645\u0644\u064A\xBB \u0644\u0644\u0627\u062D\u062A\u0641\u0627\u0638 \u0628\u0646\u0633\u062E\u0629.",sessionNote:"\u062A\u062A\u0634\u0627\u0631\u0643 \u0645\u062C\u0645\u0648\u0639\u062A\u0643 \u0647\u0630\u0647 \u0627\u0644\u0634\u064A\u0641\u0631\u0629.",noSave:"\u0644\u0627 \u062A\u0633\u062A\u0637\u064A\u0639 \u0647\u0630\u0647 \u0627\u0644\u0635\u0641\u062D\u0629 \u062D\u0641\u0638 \u0639\u0645\u0644\u0643 \u0647\u0646\u0627. \u0627\u0633\u062A\u062E\u062F\u0645 \xAB\u062A\u0646\u0632\u064A\u0644 \u0639\u0645\u0644\u064A\xBB \u0623\u0648 \xAB\u0646\u0633\u062E \u0639\u0645\u0644\u064A\xBB \u0642\u0628\u0644 \u0627\u0644\u0645\u063A\u0627\u062F\u0631\u0629.",download:"\u062A\u0646\u0632\u064A\u0644 \u0639\u0645\u0644\u064A",copy:"\u0646\u0633\u062E \u0639\u0645\u0644\u064A",copied:"\u062A\u0645 \u0627\u0644\u0646\u0633\u062E.",copyFail:"\u062D\u062F\u0651\u062F \u0627\u0644\u0646\u0635 \u0623\u062F\u0646\u0627\u0647 \u0648\u0627\u0646\u0633\u062E\u0647.",code:"\u0627\u0644\u0634\u064A\u0641\u0631\u0629",plot:"\u0631\u0633\u0645 \u0645\u0646 \u0647\u0630\u0627 \u0627\u0644\u062A\u0634\u063A\u064A\u0644",fixFirst:"\u0635\u062D\u0651\u062D \u0627\u0644\u062E\u0637\u0623\u060C \u062B\u0645 \u0634\u063A\u0651\u0644 \u0645\u0631\u0629 \u0623\u062E\u0631\u0649 \u0644\u0641\u062D\u0635 \u0625\u062C\u0627\u0628\u062A\u0643.",showSolution:"\u0639\u0631\u0636 \u0627\u0644\u062D\u0644",hideSolution:"\u0625\u062E\u0641\u0627\u0621 \u0627\u0644\u062D\u0644",solutionAfterRun:"\u0634\u063A\u0651\u0644 \u0634\u064A\u0641\u0631\u062A\u0643 \u0645\u0631\u0629 \u0648\u0627\u062D\u062F\u0629 \u0644\u0641\u062A\u062D \u0627\u0644\u062D\u0644",solution:"\u0627\u0644\u062D\u0644 \u0627\u0644\u0645\u0631\u062C\u0639\u064A",expectTitle:"\u0645\u0627 \u0627\u0644\u0630\u064A \u0633\u064A\u064F\u0641\u062D\u0635",expectCount:"\u0646\u062C\u062D {n} \u0645\u0646 {m}",noAutoCheck:"\u0644\u0627 \u064A\u0648\u062C\u062F \u0641\u062D\u0635 \u062A\u0644\u0642\u0627\u0626\u064A \u0647\u0646\u0627: \u062D\u062F\u0651\u062F \xAB\u062A\u062D\u062F\u064A\u062F \u0643\u0645\u0643\u062A\u0645\u0644\xBB \u0639\u0646\u062F\u0645\u0627 \u062A\u0646\u062A\u0647\u064A.",notChecked:"\u0644\u0627 \u064A\u064F\u0641\u062D\u0635:",tNumber:"\u0631\u0642\u0645\u064B\u0627 \u0648\u0627\u062D\u062F\u064B\u0627",tVector:"\u0639\u062F\u0629 \u0642\u064A\u0645 (\u0645\u062A\u062C\u0647\u064B\u0627 \u0623\u0648 \u0642\u0627\u0626\u0645\u0629)",tText:"\u0646\u0635\u064B\u0627",tLogical:"\u0642\u064A\u0645\u0629 \u0635\u062D/\u062E\u0637\u0623",tFrame:"\u0625\u0637\u0627\u0631 \u0628\u064A\u0627\u0646\u0627\u062A (\u062C\u062F\u0648\u0644\u064B\u0627)",eLen:"{n} \u0642\u064A\u0645",eRows:"{n} \u0635\u0641\u0648\u0641",eLen1:"\u0642\u064A\u0645\u0629 \u0648\u0627\u062D\u062F\u0629",eRows1:"\u0635\u0641 \u0648\u0627\u062D\u062F",eCols:"\u0627\u0644\u0623\u0639\u0645\u062F\u0629 {cols}",eTol:"\u0636\u0645\u0646 \xB1{t} \u0645\u0646 \u0627\u0644\u0642\u064A\u0645\u0629 \u0627\u0644\u062F\u0642\u064A\u0642\u0629 (\u0644\u0627 \u062D\u0627\u062C\u0629 \u0644\u0644\u062A\u0642\u0631\u064A\u0628)",eRound:"\u0645\u0642\u0631\u0651\u0628\u064B\u0627 \u0625\u0644\u0649 {d} \u0645\u0646\u0627\u0632\u0644 \u0639\u0634\u0631\u064A\u0629",dMissing:"{v} \u063A\u064A\u0631 \u0645\u0648\u062C\u0648\u062F \u0628\u0639\u062F. \u0647\u0644 \u0623\u0639\u0637\u064A\u062A\u0647 \u0627\u0633\u0645\u064B\u0627 \u0622\u062E\u0631\u061F",dPlaceholder:"\u0645\u0627 \u0632\u0627\u0644 {v} \u064A\u062D\u0645\u0644 \u0627\u0644\u0642\u064A\u0645\u0629 \u0627\u0644\u0645\u0624\u0642\u062A\u0629 \u0645\u0646 \u0627\u0644\u0628\u062F\u0627\u064A\u0629. \u0627\u0633\u062A\u0628\u062F\u0644\u0647\u0627 \u0628\u062D\u0633\u0627\u0628\u0643.",dNoRows:"\u0634\u063A\u0651\u0644 \u0623\u0648\u0644\u064B\u0627 \u0627\u0633\u062A\u0639\u0644\u0627\u0645\u064B\u0627 \u064A\u064F\u0631\u062C\u0639 \u0635\u0641\u0648\u0641\u064B\u0627.",dType:"\u064A\u062C\u0628 \u0623\u0646 \u064A\u0643\u0648\u0646 {v} {want}.",dLen:"\u064A\u062C\u0628 \u0623\u0646 \u064A\u062D\u062A\u0648\u064A {v} \u0639\u0644\u0649 {n} \u0642\u064A\u0645.",dRows:"\u064A\u062C\u0628 \u0623\u0646 \u064A\u062D\u062A\u0648\u064A {v} \u0639\u0644\u0649 {n} \u0635\u0641\u0648\u0641.",dLen1:"\u064A\u062C\u0628 \u0623\u0646 \u064A\u062D\u062A\u0648\u064A {v} \u0639\u0644\u0649 \u0642\u064A\u0645\u0629 \u0648\u0627\u062D\u062F\u0629.",dRows1:"\u064A\u062C\u0628 \u0623\u0646 \u064A\u062D\u062A\u0648\u064A {v} \u0639\u0644\u0649 \u0635\u0641 \u0648\u0627\u062D\u062F.",dCols:"\u064A\u062C\u0628 \u0623\u0646 \u064A\u062D\u062A\u0648\u064A {v} \u0639\u0644\u0649 \u0627\u0644\u0623\u0639\u0645\u062F\u0629 {cols}.",dValue:"{v} \u0645\u0648\u062C\u0648\u062F\u060C \u0644\u0643\u0646 \u0642\u064A\u0645\u062A\u0647 \u0644\u064A\u0633\u062A \u0627\u0644\u0645\u062A\u0648\u0642\u0639\u0629 \u0628\u0639\u062F."}},Te=Q[(L.lang||"en").split("-")[0]]||Q.en;function c(e,t){var a=Te[e]||Q.en[e]||e;return t=t||{},t.lang=t.lang||Le,a.replace(/\{(\w+)\}/g,function(o,n){return t[n]!=null?t[n]:""})}var Ae=[".kc-cell{display:block;width:100%;box-sizing:border-box;font:14px/1.45 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;padding:10px;border:1px solid var(--kc-line,#d6d3d1);border-radius:6px;background:Canvas;color:CanvasText;tab-size:4;resize:vertical;min-height:7em}",".kc-cell[readonly]{background:var(--kc-readonly-bg,rgba(120,113,108,.08));min-height:3em;field-sizing:content}",".kc-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}",".kc-btn{font:inherit;font-size:14px;padding:5px 12px;border-radius:6px;border:1px solid var(--kc-accent,#1d4ed8);background:var(--kc-accent,#1d4ed8);color:#fff;cursor:pointer}",".kc-btn.kc-quiet{background:transparent;color:var(--kc-accent,#1d4ed8)}",".kc-btn:disabled{opacity:.5;cursor:default}",".kc-status{font-size:13px;opacity:.8}.kc-ok{color:var(--kc-ok,#166534)}.kc-err{color:var(--kc-err,#991b1b)}",".kc-out{display:block;width:100%;box-sizing:border-box;font:13px/1.45 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;padding:8px 10px;border:1px solid var(--kc-line,#d6d3d1);border-radius:6px;background:var(--kc-out-bg,rgba(120,113,108,.06));color:inherit;min-height:3em;max-height:none;resize:vertical;white-space:pre;overflow-x:auto;field-sizing:content}",".kc-plots img{display:block;max-width:100%;height:auto;margin-top:8px;border:1px solid var(--kc-line,#d6d3d1);border-radius:6px;background:#fff}",".kc-checks{list-style:none;margin:8px 0;padding:0;font-size:14px}.kc-checks li{margin:2px 0}",".kc-note{font-size:12px;opacity:.75;margin:4px 0}",".kc-label{display:block;font-size:13px;font-weight:600;margin:10px 0 4px}",".kc-banner{font-size:14px;padding:6px 10px;border:1px solid var(--kc-line,#d6d3d1);border-radius:6px;margin:8px 0}",".kc-done{display:inline-flex;align-items:center;gap:6px;font-size:14px;margin-top:6px}",".kc-work{margin:16px 0}.kc-work textarea{width:100%;min-height:10em;box-sizing:border-box;font:12px ui-monospace,monospace}","[data-kc-hint]{margin:6px 0}",".kc-out[hidden],.kc-label[hidden]{display:none}",".kc-dark .kc-ok{color:var(--kc-ok,#86efac)}.kc-dark .kc-err{color:var(--kc-err,#fca5a5)}.kc-dark .kc-btn{border-color:var(--kc-accent,#60a5fa);background:var(--kc-accent,#2563eb)}.kc-dark .kc-btn.kc-quiet{background:transparent;color:var(--kc-accent,#93c5fd)}.kc-dark .kc-cell,.kc-dark .kc-out,.kc-dark .kc-banner,.kc-dark .kc-solution{border-color:var(--kc-line,#57534e)}",".kc-dark .kc-cell{background:var(--kc-cell-bg,#1c1917);color:var(--kc-cell-ink,#f5f5f4);caret-color:var(--kc-cell-ink,#f5f5f4)}.kc-dark .kc-cell[readonly]{background:var(--kc-readonly-bg,#292524)}",".kc-pair{display:grid;grid-template-columns:minmax(0,1fr) minmax(220px,32%);gap:12px;align-items:start}","@media (max-width:720px){.kc-pair{grid-template-columns:minmax(0,1fr)}.kc-pair>.kc-expect{order:-1}}",".kc-pairbox{container-type:inline-size}","@container (max-width:720px){.kc-pair{grid-template-columns:minmax(0,1fr)}.kc-pair>.kc-expect{order:-1}}",".kc-edit{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:stretch;width:100%}",".kc-gutter{box-sizing:border-box;overflow:hidden;text-align:end;padding:10px 6px 10px 8px;min-width:2.6em;height:0;min-height:100%;font:14px/1.45 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--kc-gutter-ink,#78716c);background:var(--kc-gutter-bg,rgba(120,113,108,.10));border:1px solid var(--kc-line,#d6d3d1);border-inline-end:0;border-start-start-radius:6px;border-end-start-radius:6px;user-select:none;white-space:pre}",".kc-edit>.kc-cell{border-start-start-radius:0;border-end-start-radius:0;white-space:pre;overflow-x:auto;overflow-wrap:normal}",".kc-dark .kc-gutter{color:var(--kc-gutter-ink,#a8a29e);background:var(--kc-gutter-bg,#292524);border-color:var(--kc-line,#57534e)}",".kc-expect{font-size:14px;line-height:1.4;border:1px solid var(--kc-line,#d6d3d1);border-radius:6px;padding:6px 10px;background:var(--kc-out-bg,rgba(120,113,108,.06))}",".kc-expect summary{cursor:pointer;font-weight:600}.kc-expect ul{list-style:none;margin:6px 0 2px;padding:0}.kc-expect li{margin:8px 0}",".kc-mark{display:inline-block;width:1.3em;font-weight:700}.kc-ename{font-weight:600}.kc-edet,.kc-emsg{display:block;margin-inline-start:1.3em}.kc-edet{opacity:.85}.kc-edet code{font-size:13px}",".kc-dark .kc-expect{border-color:var(--kc-line,#57534e)}",".kc-solution{margin:8px 0;padding:8px 10px;border:1px dashed var(--kc-line,#d6d3d1);border-radius:6px;font:13px/1.45 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:pre-wrap}"].join(`
+`);function d(e,t,a){var o=document.createElement(e);for(var n in t||{})n==="class"?o.className=t[n]:o.setAttribute(n,t[n]);return a!=null&&(o.textContent=a),o}var K=!1,D=[],ie=null;function se(e){return e.runMark&&(K=!0,e.runMark.value=e.runSeen=String(1+Math.floor(Math.random()*1e9)),e.runMark.dispatchEvent(new Event("input",{bubbles:!0})),K=!1),U(e)}function ce(e,t){t=t==null?"":String(t),!(K||!t||t===e.runSeen)&&(e.runSeen=t,e.runMark.value!==t&&(e.runMark.value=t),D.indexOf(e)<0&&D.push(e),clearTimeout(ie),ie=setTimeout(function(){var a=g.filter(function(o){return D.indexOf(o)>=0});D=[],a.forEach(function(o){U(o,!0)})},800))}function N(e,t){e.value!==t&&(e.value=t,$(e),e.dispatchEvent(new Event("input",{bubbles:!0})))}function $(e){!e||!e.classList||!e.classList.contains("kc-out")||(e.rows=Math.max(3,Math.min(200,String(e.value).split(`
+`).length)))}function Me(e,t,a){var o=-1,n=e.rows||2;function r(){var u=String(e.value).split(`
+`).length;if(!a){var l=Math.min(40,Math.max(n,u+1));e.rows!==l&&(e.rows=l)}if(u!==o){o=u;for(var k=[],h=1;h<=u;h++)k.push(h);t.textContent=k.join(`
+`)}var s=getComputedStyle(e);t.style.fontSize!==s.fontSize&&(t.style.fontSize=s.fontSize),t.style.lineHeight!==s.lineHeight&&(t.style.lineHeight=s.lineHeight),t.style.paddingTop!==s.paddingTop&&(t.style.paddingTop=s.paddingTop,t.style.paddingBottom=s.paddingBottom),t.scrollTop=e.scrollTop}e.addEventListener("input",r),e.addEventListener("scroll",function(){t.scrollTop=e.scrollTop});try{var i=Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype,"value");Object.defineProperty(e,"value",{configurable:!0,get:function(){return i.get.call(this)},set:function(u){i.set.call(this,u),r()}})}catch{}if(setInterval(function(){String(e.value).split(`
+`).length!==o&&r()},1e3),window.ResizeObserver)try{new ResizeObserver(r).observe(e)}catch{}r()}function P(e){return String(e).replace(/[^A-Za-z0-9_.:-]/g,"_").slice(0,60)}var Ne={classic:'importScripts("'+J+'pyodide.js");',module:'import { loadPyodide } from "'+J+'pyodide.mjs";'},Pe=["var ready = (async function () {",'  var py = await loadPyodide({ indexURL: "'+J+'" });',"  return py;","})();","function plain(v) {",'  if (v && typeof v.toJs === "function") { var j = v.toJs({ dict_converter: Object.fromEntries, create_proxies: false }); v.destroy && v.destroy(); return plain(j); }',"  if (ArrayBuffer.isView(v)) return Array.from(v);","  if (Array.isArray(v)) return v.map(plain);","  if (v instanceof Map) { var o = {}; v.forEach(function (x, k) { o[k] = plain(x); }); return o; }",'  if (v && typeof v === "object") { var r = {}; for (var k in v) r[k] = plain(v[k]); return r; }','  return typeof v === "bigint" ? Number(v) : v;',"}",`var PLOTS = "import sys\\nif 'matplotlib.pyplot' in sys.modules:\\n    import io, base64\\n    import matplotlib.pyplot as _kc_plt\\n    _kc_out = []\\n    for _kc_n in _kc_plt.get_fignums():\\n        _kc_b = io.BytesIO()\\n        _kc_plt.figure(_kc_n).savefig(_kc_b, format='png', dpi=96, bbox_inches='tight')\\n        _kc_out.append(base64.b64encode(_kc_b.getvalue()).decode())\\n    _kc_plt.close('all')\\n    _kc_result = _kc_out\\nelse:\\n    _kc_result = []\\n_kc_result";`,"self.onmessage = async function (e) {","  var m = e.data, py = await ready, out = [];","  try {",'    if (m.op === "init") {',"      (m.files || []).forEach(function (f) { py.FS.writeFile(f.name, f.text); });","      if (m.packages && m.packages.length) await py.loadPackage(m.packages, { messageCallback: function () {} });","      self.postMessage({ id: m.id, ok: true }); return;","    }",'    if (m.op === "run") {',"      py.setStdout({ batched: function (s) { out.push(s); } });","      py.setStderr({ batched: function (s) { out.push(s); } });","      await py.loadPackagesFromImports(m.code, { messageCallback: function () {} });",`      if (/matplotlib/.test(m.code)) py.runPython("import matplotlib\\nmatplotlib.use('AGG')");`,"      self.postMessage({ id: m.id, started: true });",'      try { py.globals.set("_kc_src", m.code); var rep = await py.runPythonAsync("from pyodide.code import eval_code_async as _kc_eval\\n_kc_v = await _kc_eval(_kc_src, globals(), filename=\\"<cell>\\")\\nNone if _kc_v is None else repr(_kc_v)"); if (rep != null) out.push(String(rep)); }','      catch (err) { var msg = String(err && err.message || err), i = msg.indexOf("File \\"<cell>\\""); if (i < 0) i = msg.indexOf("File \\"<exec>\\""); self.postMessage({ id: m.id, ok: false, out: out.join("\\n"), error: i >= 0 ? msg.slice(i) : msg, plots: [] }); return; }',"      var plots = plain(py.runPython(PLOTS));",'      self.postMessage({ id: m.id, ok: true, out: out.join("\\n"), plots: plots }); return;',"    }",'    if (m.op === "check") {',"      var pass = false, err = null;",'      try { pass = py.runPython("bool(" + m.test + ")") === true; } catch (x) { err = String(x && x.message || x).split("\\n").slice(-2).join(" ").slice(0, 300); }',"      self.postMessage({ id: m.id, ok: true, pass: pass, error: err }); return;","    }",'    if (m.op === "eval") { self.postMessage({ id: m.id, ok: true, value: plain(py.runPython(m.expr)) }); return; }','    if (m.op === "set") { py.globals.set(m.name, py.toPy(m.value)); self.postMessage({ id: m.id, ok: true }); return; }',"  } catch (err) { self.postMessage({ id: m.id, ok: false, error: String(err && err.message || err) }); }","};","ready.then(function () { self.postMessage({ loaded: true }); }, function (err) { self.postMessage({ failed: String(err) }); });"].join(`
+`);function ue(){var e,t=0,a={},o={};this.start=function(){return new Promise(function(r,i){function u(l){var k=URL.createObjectURL(new Blob([Ne[l]+`
+`+Pe],{type:"text/javascript"})),h=!1,s=!1;function m(f){h||s||(s=!0,e.terminate(),l==="classic"?u("module"):i(new Error(f)))}e=l==="module"?new Worker(k,{type:"module"}):new Worker(k),e.onmessage=function(f){var v=f.data;if(v.loaded){h=!0,n({op:"init",files:Z,packages:A}).then(r,i);return}if(v.failed){m(v.failed);return}if(v.started){o[v.id]&&o[v.id]();return}var S=a[v.id];S&&(delete a[v.id],delete o[v.id],S(v))},e.onerror=function(f){h||(f.preventDefault&&f.preventDefault(),m(f.message||"worker error"))}}u("classic")})};function n(r,i){return new Promise(function(u){r.id=++t,a[r.id]=u,i&&(o[r.id]=i),e.postMessage(r)})}this.run=function(r,i){return n({op:"run",code:r},i).then(function(u){return{ok:u.ok,output:u.out||"",error:u.error||null,plots:(u.plots||[]).map(function(l){return"data:image/png;base64,"+l})}})},this.check=function(r){return n({op:"check",test:r}).then(function(i){return{pass:!!i.pass,error:i.error||null}})},this.eval=function(r){return n({op:"eval",expr:r}).then(function(i){if(!i.ok)throw new Error(i.error);return i.value})},this.set=function(r,i){return n({op:"set",name:r,value:i}).then(function(u){if(!u.ok)throw new Error(u.error)})},this.kill=function(){try{e.terminate()}catch{}a={},o={}}}function Oe(){if(!(window.origin!=="null"||window.__kcWorkerShim)){var e=window.Worker,t=function(a,o){var n=String(a);return n.indexOf(G)===0&&(a=URL.createObjectURL(new Blob(["importScripts("+JSON.stringify(n)+");"],{type:"text/javascript"}))),new e(a,o)};t.prototype=e.prototype,window.Worker=t,window.__kcWorkerShim=!0}}function Be(){Oe();var e=null,t=null,a="/home/web_user/";this.start=function(){return(t?Promise.resolve(t):import(G+"webr.js").then(function(n){return t=n,n})).then(function(n){return e=new n.WebR({baseUrl:G,repoUrl:Re,channelType:n.ChannelType.PostMessage,interactive:!1}),e.init()}).then(function(){return Z.reduce(function(n,r){return n.then(function(){return e.FS.writeFile(a+r.name,new TextEncoder().encode(r.text))})},Promise.resolve())}).then(function(){if(A.length)return W(c("installing",{pkgs:A.join(", ")})),e.installPackages(A,{quiet:!0}).then(function(){return e.evalRVoid(A.map(function(n){return"suppressPackageStartupMessages(library("+JSON.stringify(n)+"))"}).join(`
+`))})})},this.run=function(n,r){var i=e;return r&&r(),new i.Shelter().then(function(u){return u.captureR(n,{withAutoprint:!0,captureStreams:!0,captureConditions:!1,captureGraphics:{width:576,height:400}}).then(function(l){var k=l.output.filter(function(f){return f.type==="stdout"||f.type==="stderr"}),h=k.map(function(f){return f.data}).join(`
+`),s=k.some(function(f){return f.type==="stderr"&&/^Error\b/.test(f.data)}),m=(l.images||[]).map(function(f){var v=document.createElement("canvas");return v.width=f.width,v.height=f.height,v.getContext("2d").drawImage(f,0,0),v.toDataURL("image/png")});return{ok:!s,output:h,error:null,plots:m}},function(l){return{ok:!1,output:"",error:String(l&&l.message||l),plots:[]}}).then(function(l){try{u.purge()}catch{}return l})})},this.check=function(n){return e.evalRBoolean("isTRUE(tryCatch({"+n+"}, error = function(e) FALSE))").then(function(r){return{pass:r,error:null}},function(r){return{pass:!1,error:String(r&&r.message||r).slice(0,300)}})};function o(n){if(!n||typeof n!="object")return n;if(Array.isArray(n.values)){var r=n.values.map(function(l){return l&&typeof l=="object"?o(l):l});if(n.names&&n.names.length&&n.type==="list"){var i={};return n.names.forEach(function(l,k){i[l||k]=r[k]}),i}if(n.names&&n.names.length){var u={};return n.names.forEach(function(l,k){u[l||k]=r[k]}),u}return r.length===1?r[0]:r}return n}this.eval=function(n){return e.evalR(n).then(function(r){return r.toJs().then(function(i){return o(i)})})},this.set=function(n,r){return e.objs.globalEnv.bind(n,r)},this.kill=function(){try{e&&e.close()}catch{}e=null}}var je=["import sqlite3, re as _kc_re, os as _kc_os","import pandas as pd","_kc_db = sqlite3.connect(':memory:')","_kc_params = {}","result = None","results = {}","def _kc_table_name(f):","    n = _kc_re.sub(r'\\W+', '_', _kc_os.path.splitext(f)[0]).strip('_').lower()","    return n if n and not n[0].isdigit() else 't_' + n","for _kc_f in sorted(_kc_os.listdir('.')):","    if _kc_f.lower().endswith('.csv'):","        pd.read_csv(_kc_f).to_sql(_kc_table_name(_kc_f), _kc_db, index=False)","class SQLError(Exception):","    pass","def _kc_statements(src):","    out, buf = [], ''","    for line in src.splitlines(keepends=True):","        buf += line","        if sqlite3.complete_statement(buf):","            out.append(buf)","            buf = ''","    if buf.strip():","        out.append(buf)","    return out","def _kc_show(res):","    n = len(res)","    if n == 0:","        print(', '.join(map(str, res.columns)) + '\\n(no rows)')","        return","    print(res.head(200).to_string(index=False))","    print('(' + str(n) + (' row' if n == 1 else ' rows') + (', the first 200 shown)' if n > 200 else ')'))","def _kc_run_sql(src, cell=''):","    global result","    res, before = None, _kc_db.total_changes","    try:","        for s in _kc_statements(src):","            if not _kc_re.sub(r'--[^\\n]*', '', s).strip(' \\t\\r\\n;'):","                continue","            used = {k: v for k, v in _kc_params.items() if _kc_re.search(r'[:@$]' + k + r'\\b', s)}","            cur = _kc_db.execute(s, used)","            if cur.description is not None:","                res = pd.DataFrame(cur.fetchall(), columns=[d[0] for d in cur.description])","        _kc_db.commit()","    except Exception as e:","        raise SQLError(str(e)) from None","    if res is not None:","        result = res","        if cell:","            results[cell] = res","        _kc_show(res)","    else:","        ch = _kc_db.total_changes - before","        print('Done. ' + str(ch) + (' row' if ch == 1 else ' rows') + ' changed.' if ch else 'Done.')","def sql(query, **params):","    return pd.read_sql(query, _kc_db, params=params)","def rows(r=None):","    r = result if r is None else r","    return [] if r is None else r.to_dict('records')"].join(`
+`);function le(e){var t=e&&document.querySelector('textarea[data-kc-cell="'+e+'"]');return!!t&&(t.getAttribute("data-kc-lang")||"").toLowerCase()==="python"}function qe(){var e=new ue;this.start=function(){return e.start().then(function(){return e.run(je)}).then(function(t){if(!t.ok)throw new Error(String(t.error||"the database couldn't be set up").split(`
+`).pop())})},this.run=function(t,a,o){return le(o)?e.run(String(t),a):e.set("_kc_sql_src",String(t)).then(function(){return e.run("_kc_run_sql(_kc_sql_src, "+JSON.stringify(o||"")+")",a)}).then(function(n){var r=!n.ok&&n.error?/SQLError: ([\s\S]*)$/.exec(n.error):null;return r&&(n.error="SQL error: "+r[1].trim()),n})},this.check=e.check,this.eval=e.eval,this.set=function(t,a){return/^[A-Za-z_]\w{0,40}$/.test(t)?e.set("_kc_tmp",a).then(function(){return e.eval("_kc_params.__setitem__("+JSON.stringify(t)+", _kc_tmp) or True")}).then(function(){}):Promise.reject(new Error("Not a parameter name: "+t))},this.kill=e.kill}var Z=[];function Fe(){Z=Array.prototype.map.call(document.querySelectorAll("script[data-kc-file]"),function(e){return{name:e.getAttribute("data-kc-file"),text:e.textContent.replace(/^\n/,"")}})}var C=w==="r"?new Be:w==="sql"?new qe:new ue,_="loading",E,de,pe,g=[],x=[],X=!1,I=[],O;function W(e,t){O&&(O.textContent=e,O.className="kc-banner "+(t||""))}function B(){g.forEach(function(e){e.runBtn&&(e.runBtn.disabled=_!=="ready"),e.stopBtn&&(e.stopBtn.disabled=_!=="busy")})}function fe(){return _="loading",B(),W(c("loading")),g.forEach(function(e){e.ran=!1}),C.start().then(function(){_="ready",B(),W(c("ready"),"kc-ok"),de()},function(e){_="failed",B(),W(c("failed",{err:String(e&&e.message||e)}),"kc-err"),pe(e)})}function he(e,t){return C.kill(),t&&(N(t.out,e),t.status.textContent=e,t.status.className="kc-status kc-err"),ye(),fe()}var R=Promise.resolve();function U(e,t){var a=R.then(function(){return E}).then(function(){var o=g.slice(0,g.indexOf(e)).filter(function(n){return n.readonly&&!n.ran});return o.reduce(function(n,r){return n.then(function(){return ke(r,t)})},Promise.resolve()).then(function(){return ke(e,t)})});return R=a.catch(function(){}),a}function ke(e,t){_="busy",B(),e.status.textContent=c("running"),e.status.className="kc-status";var a=null,o=!1;return new Promise(function(n){e.stop=function(r){o||(o=!0,clearTimeout(a),he(r,e),n({ok:!1,output:"",error:r,plots:[]}))},C.run(e.area.value,function(){a=setTimeout(function(){e.stop(c("timeout",{s:ae/1e3}))},ae)},e.id).then(function(r){if(!o){clearTimeout(a),e.ran=!0,e.solBtn&&(e.solBtn.disabled=!1,e.solBtn.title=""),_="ready",B();var i=r.output||"";!r.ok&&r.error&&(i+=(i?`
+`:"")+r.error),t?(e.out.value=i||c("noOutput"),$(e.out)):N(e.out,i||c("noOutput")),e.readonly&&e.outBox.forEach(function(u){u.hidden=!r.output&&r.ok}),e.plots.textContent="",r.plots.forEach(function(u){e.plots.appendChild(d("img",{src:u,alt:c("plot")}))}),e.status.textContent=r.ok?c("finished"):c("error"),e.status.className="kc-status "+(r.ok?"kc-ok":"kc-err"),(r.ok?We(e):Ue(e)).then(function(){if(!e.readonly&&typeof window.__kcUsage=="function")try{window.__kcUsage("kc:code-run",{cell:e.id,pass:!!(r.ok&&e.checks.length&&e.lastPass)})}catch{}I.forEach(function(u){try{u(e.id,r)}catch{}}),n(r)})}})})}var V={number:"tNumber",vector:"tVector",text:"tText",logical:"tLogical","data frame":"tFrame"};function ee(e){var t=e&&typeof e.var=="string"?e.var:"";return(w==="r"?/^[A-Za-z.][A-Za-z0-9._]{0,60}$/:/^[A-Za-z_]\w{0,60}$/).test(t)?t:""}function ze(e){var t=ee(e);if(!t)return[];var a=w==="r",o=[],n=function(h,s){o.push({t:h,m:s})};n(a?'exists("'+t+'", envir = globalenv(), inherits = FALSE)':"'"+t+"' in globals()",c("dMissing",{v:t})),w==="sql"&&t==="result"?n("result is not None",c("dNoRows")):n(a?"!(is.atomic("+t+") && length("+t+") == 1 && is.na("+t+"))":t+" is not None",c("dPlaceholder",{v:t}));var r=V[e.type]?e.type:"";if(r){var i=a?{number:"is.numeric("+t+") && length("+t+") == 1",vector:"is.atomic("+t+") && length("+t+") >= 1",text:"is.character("+t+")",logical:"is.logical("+t+")","data frame":"is.data.frame("+t+")"}[r]:{number:"isinstance("+t+", __import__('numbers').Number) and not isinstance("+t+", bool)",vector:"hasattr("+t+", '__len__') and not isinstance("+t+", (str, bytes, dict))",text:"isinstance("+t+", str)",logical:"type("+t+").__name__ in ('bool', 'bool_')","data frame":"type("+t+").__name__ == 'DataFrame'"}[r];n(i,c("dType",{v:t,want:c(V[r])}))}var u=function(h){return typeof h=="number"&&h>=0&&h===Math.floor(h)};u(e.length)&&n(a?"length("+t+") == "+e.length:"len("+t+") == "+e.length,c(e.length===1?"dLen1":"dLen",{v:t,n:e.length})),u(e.rows)&&n(a?"NROW("+t+") == "+e.rows:"len("+t+") == "+e.rows,c(e.rows===1?"dRows1":"dRows",{v:t,n:e.rows}));var l=Array.isArray(e.columns)?e.columns.filter(function(h){return typeof h=="string"&&h.length<80}):[];if(l.length){var k=l.map(function(h){return JSON.stringify(h)}).join(", ");n(a?"all(c("+k+") %in% names("+t+"))":"all(_kc_c in list("+t+".columns) for _kc_c in ["+k+"])",c("dCols",{v:t,cols:l.join(", ")}))}return o}function De(e){var t=X?ze(e.expect):[],a=0;function o(){if(a>=t.length)return C.check(e.test);var n=t[a++];return C.check(n.t).then(function(r){return r.pass?o():{pass:!1,error:null,why:n.m}})}return o()}function Ie(e,t){var a=0;t.forEach(function(o,n){var r=e.expectItems[n];if(r){o.r.pass&&a++,r.mark.textContent=o.r.pass?"\u2713":"\u2717",r.mark.className="kc-mark "+(o.r.pass?"kc-ok":"kc-err");var i=ee(o.c.expect);r.msg.textContent=o.r.pass?"":o.r.why||o.c.fail||(i?c("dValue",{v:i}):c("fail")),r.msg.className="kc-emsg kc-err"}}),e.expectSum.textContent=c("expectTitle")+" \xB7 "+c("expectCount",{n:a,m:t.length})}function We(e){if(!e.checks.length)return Promise.resolve();var t=[];return e.lastChecks=null,e.checks.reduce(function(a,o){return a.then(function(){return De(o).then(function(n){t.push({c:o,r:n})})})},Promise.resolve()).then(function(){e.checkList.textContent="",e.expect?Ie(e,t):t.forEach(function(n){var r=d("li",{class:n.r.pass?"kc-ok":"kc-err"});r.textContent=(n.r.pass?"\u2713 ":"\u2717 ")+n.c.name+(n.r.pass?"":n.c.fail?": "+n.c.fail:""),e.checkList.appendChild(r)}),e.lastPass=t.every(function(n){return n.r.pass}),e.lastChecks=t.map(function(n){return{name:String(n.c.name||"").slice(0,200),pass:n.r.pass,error:n.r.error}});var a=e.exercise;if(a&&a.mode==="checks"){var o=a.cells.every(function(n){return!n.checks.length||n.lastPass});Ve(a,o)}})}function Ue(e){return e.lastChecks=null,e.checks.length&&(e.checkList.textContent="",e.expect?(e.expectItems.forEach(function(t){t.mark.textContent="\u2022",t.mark.className="kc-mark",t.msg.textContent=""}),e.expectSum.textContent=c("expectTitle")+" \xB7 "+c("fixFirst")):e.checkList.appendChild(d("li",{class:"kc-err"},c("fixFirst"))),e.lastPass=!1),Promise.resolve()}function Ve(e,t){!e.doneBox||e.doneBox.checked===t||(e.doneBox.checked=t,e.doneBox.dispatchEvent(new Event("change",{bubbles:!0})))}var j="kc-code:"+(b.versionId||location.pathname),te={get:function(){return Promise.resolve(null)},set:function(){},ok:!1};function Ye(){try{return localStorage.setItem("kc-test","1"),localStorage.removeItem("kc-test"),{ok:!0,get:function(){try{return Promise.resolve(JSON.parse(localStorage.getItem(j)||"null"))}catch{return Promise.resolve(null)}},set:function(e){try{localStorage.setItem(j,JSON.stringify(e))}catch{}}}}catch{return null}}function He(){return window.parent===window||!b.appOrigin?Promise.resolve(null):new Promise(function(e){var t=[0,500,1500,3e3,5e3],a=[],o=setTimeout(function(){n(),e(null)},8e3);function n(){a.forEach(clearTimeout),clearTimeout(o),window.removeEventListener("message",r)}function r(i){if(!(i.source!==window.parent||!i.data||i.data.type!=="kc:store-value"||i.data.key!==j)){n();var u=i.data.value;e({ok:!0,get:function(){return Promise.resolve(u)},set:function(l){window.parent.postMessage({type:"kc:store-set",key:j,value:l},b.appOrigin)}})}}window.addEventListener("message",r),t.forEach(function(i){a.push(setTimeout(function(){window.parent.postMessage({type:"kc:store-get",key:j},b.appOrigin)},i))})})}function Je(){var e={cells:{},done:{}};return g.forEach(function(t){t.readonly||(e.cells[t.id]=t.area.value)}),x.forEach(function(t){t.doneBox&&(e.done[t.id]=t.doneBox.checked)}),g.forEach(function(t){t.expect&&!t.expect.open&&((e.panels=e.panels||{})[t.id]=!1)}),e}var me=null;function Y(){!te.ok||z||M||(clearTimeout(me),me=setTimeout(function(){te.set(Je())},400))}function ve(){var e=w==="sql"?"--":"#",t=[e+" "+document.title,e+" "+new Date().toISOString().slice(0,16).replace("T"," ")+" \xB7 Ideas at Play",""],a=x.length?x:[{id:"",node:document.body,cells:g}];return a.forEach(function(o){var n=o.node.querySelector("h1,h2,h3,h4");t.push(e+" ==== "+(n?n.textContent.trim():o.id)+(o.doneBox?" ["+(o.doneBox.checked?c("doneYes"):"-")+"]":"")+" ===="),o.cells.forEach(function(r){t.push(e+" --- "+r.id+(w==="sql"&&le(r.id)?" (Python)":"")+(r.readonly?" ("+c("readonly")+")":"")),t.push(r.area.value),r.out.value&&r.out.value!==c("noOutput")&&t.push(r.out.value.split(`
+`).map(function(i){return e+"> "+i}).join(`
+`)),t.push("")})}),t.join(`
+`)}function Ge(){var e=(document.title||"work").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,60)||"work";return e+"-my-work."+(w==="r"?"R":w==="sql"?"sql":"py")}function Qe(){var e=ve(),t=Ge(),a=function(){try{var r=d("a",{href:URL.createObjectURL(new Blob([e],{type:"text/plain"})),download:t});document.body.appendChild(r),r.click(),r.remove()}catch{}};if(window.parent===window||!b.appOrigin){a();return}var o=setTimeout(function(){window.removeEventListener("message",n),a()},700);function n(r){r.source!==window.parent||!r.data||r.data.type!=="kc:download-ok"||r.data.name!==t||(clearTimeout(o),window.removeEventListener("message",n))}window.addEventListener("message",n),window.parent.postMessage({type:"kc:download",name:t,text:e},b.appOrigin)}function Ke(e){var t=ve(),a=function(){e.status.textContent=c("copied")},o=function(){e.status.textContent=c("copyFail"),e.area.hidden=!1,e.area.value=t,e.area.focus(),e.area.select()};try{navigator.clipboard.writeText(t).then(a,o)}catch{o()}}function $e(){var e="";[document.body,document.documentElement].some(function(a){var o=getComputedStyle(a).backgroundColor;return o&&!/rgba\(\s*0,\s*0,\s*0,\s*0\s*\)|transparent/.test(o)?(e=o,!0):!1});var t=e.match(/\d+(\.\d+)?/g);return t?(.2126*t[0]+.7152*t[1]+.0722*t[2])/255<.45:/dark/.test(getComputedStyle(L).colorScheme||"")&&!!window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches}function ge(){L.classList.toggle("kc-dark",!!$e())}function Ze(e){var t=d("span",{class:"kc-edet"}),a=[],o=ee(e);return!e||typeof e!="object"||(o&&a.push(d("code",{},o)),V[e.type]&&a.push(c(V[e.type])),typeof e.length=="number"&&a.push(c(e.length===1?"eLen1":"eLen",{n:e.length})),typeof e.rows=="number"&&a.push(c(e.rows===1?"eRows1":"eRows",{n:e.rows})),Array.isArray(e.columns)&&e.columns.length&&a.push(c("eCols",{cols:e.columns.join(", ")})),e.tolerance!=null&&String(e.tolerance).length<20&&a.push(c("eTol",{t:String(e.tolerance)})),typeof e.round=="number"&&a.push(c("eRound",{d:e.round})),typeof e.note=="string"&&e.note&&a.push(e.note.slice(0,200)),!a.length)?null:(a.forEach(function(n,r){r&&t.appendChild(document.createTextNode(" \xB7 ")),t.appendChild(typeof n=="string"?document.createTextNode(n):n)}),t)}function Xe(e){var t=e.exercise,a=t&&t.node.getAttribute("data-kc-not-checked");if(!(!e.checks.length&&!t)){var o=d("details",{class:"kc-expect",open:""});e.expectSum=d("summary",{},c("expectTitle")),o.appendChild(e.expectSum);var n=d("ul",{});e.expectItems=e.checks.map(function(u){var l=d("li",{}),k={mark:d("span",{class:"kc-mark","aria-hidden":"true"},"\u2022"),msg:d("span",{class:"kc-emsg","aria-live":"polite"})};l.appendChild(k.mark),l.appendChild(d("span",{class:"kc-ename"},String(u.name||"")));var h=Ze(u.expect);return h&&l.appendChild(h),l.appendChild(k.msg),n.appendChild(l),k}),e.checks.length||n.appendChild(d("li",{class:"kc-edet"},c("noAutoCheck"))),a&&n.appendChild(d("li",{class:"kc-edet"},c("notChecked")+" "+a.slice(0,300))),o.appendChild(n),o.addEventListener("toggle",Y);var r=d("div",{class:"kc-pairbox"}),i=d("div",{class:"kc-pair"});e.box.parentNode.insertBefore(r,e.box),r.appendChild(i),i.appendChild(e.box),i.appendChild(o),e.expect=o}}function et(){if(document.head.appendChild(d("style",{},Ae)),ge(),window.matchMedia)try{matchMedia("(prefers-color-scheme: dark)").addEventListener("change",ge)}catch{}var e=Array.prototype.slice.call(document.querySelectorAll("textarea[data-kc-cell]"));if(e.length){O=d("p",{class:"kc-banner",role:"status","aria-live":"polite"},c("loading"));var t=e[0].closest("[data-kc-exercise]")||e[0];t.parentNode.insertBefore(O,t),Array.prototype.forEach.call(document.querySelectorAll("[data-kc-exercise]"),function(s){x.push({id:P(s.getAttribute("data-kc-exercise")),node:s,mode:s.getAttribute("data-kc-done")==="checks"?"checks":"self",cells:[]})}),e.forEach(function(s,m){var f=P(s.getAttribute("data-kc-cell")||"cell"+(m+1)),v=s.hasAttribute("data-kc-readonly");s.id=s.id||"kc-"+f,s.classList.add("kc-cell"),s.spellcheck=!1,s.setAttribute("autocapitalize","off"),s.setAttribute("autocomplete","off"),v&&(s.readOnly=!0),v?s.rows=Math.min(40,s.value.split(`
+`).length+1):s.rows=Math.max(s.rows||2,Math.min(40,s.value.split(`
+`).length+1)),s.setAttribute("wrap","off");var S=d("div",{class:"kc-edit"}),we=d("div",{class:"kc-gutter","aria-hidden":"true"});s.parentNode.insertBefore(S,s),S.appendChild(we),S.appendChild(s),Me(s,we,v),!s.getAttribute("aria-label")&&!(s.labels&&s.labels.length)&&s.setAttribute("aria-label",c("code")+" "+f);var xe=s.closest("[data-kc-exercise]"),ne=xe?x.filter(function(y){return y.node===xe})[0]:null,_e=[],Se=document.querySelector('script[data-kc-checks="'+s.getAttribute("data-kc-cell")+'"]');if(Se)try{_e=JSON.parse(Se.textContent).filter(function(y){return y&&y.test}).slice(0,20)}catch{}var p={id:f,area:s,box:S,readonly:v,exercise:ne,checks:_e,starter:s.value,ran:!1},T=d("div",{class:"kc-bar"});if(p.runBtn=d("button",{type:"button",class:"kc-btn",disabled:""},c("run")),p.stopBtn=d("button",{type:"button",class:"kc-btn kc-quiet",disabled:""},c("stop")),p.status=d("span",{class:"kc-status",role:"status","aria-live":"polite"}),T.appendChild(p.runBtn),T.appendChild(p.stopBtn),!v){var q=d("button",{type:"button",class:"kc-btn kc-quiet"},c("reset")),F=null;q.addEventListener("click",function(){if(F){clearTimeout(F),F=null,q.textContent=c("reset"),N(s,p.starter),Y();return}q.textContent=c("resetAgain"),F=setTimeout(function(){F=null,q.textContent=c("reset")},4e3)}),T.appendChild(q)}var Ce=!v&&b.solutions&&!M?(b.solutions.items||[]).filter(function(y){return P(y.cell)===f})[0]:null;if(Ce){var it=b.solutions.visibility==="AFTER_ATTEMPT";p.solBtn=d("button",{type:"button",class:"kc-btn kc-quiet"},c("showSolution")),p.solBox=d("pre",{class:"kc-solution","aria-label":c("solution")},Ce.code),p.solBox.hidden=!0,it&&(p.solBtn.disabled=!0,p.solBtn.title=c("solutionAfterRun")),p.solBtn.addEventListener("click",function(){p.solBox.hidden=!p.solBox.hidden,p.solBtn.textContent=p.solBox.hidden?c("showSolution"):c("hideSolution")}),T.appendChild(p.solBtn)}T.appendChild(p.status);var Ee=d("label",{class:"kc-label",for:s.id+"-out"},c("output"));p.out=d("textarea",{id:s.id+"-out",class:"kc-out",readonly:"",rows:"3",spellcheck:"false"}),p.plots=d("div",{class:"kc-plots"}),p.checkList=d("ul",{class:"kc-checks","aria-label":c("checks")});var H=[T,Ee,p.out,p.plots,p.checkList];z&&!M&&(p.runMark=d("input",{type:"number",id:s.id+"-run",hidden:"",tabindex:"-1","aria-hidden":"true","data-kc-signal":""}),p.runSeen="",p.runMark.addEventListener("input",function(){ce(p,p.runMark.value)}),H.push(p.runMark)),p.solBox&&H.push(p.solBox),p.outBox=[Ee,p.out],v&&p.outBox.forEach(function(y){y.hidden=!0}),v||H.push(d("p",{class:"kc-note"},c(z?"sessionNote":"saved")));var re=S;H.forEach(function(y){re.parentNode.insertBefore(y,re.nextSibling),re=y}),p.runBtn.addEventListener("click",function(){se(p)}),p.stopBtn.addEventListener("click",function(){p.stop&&p.stop(c("stopped"))});var oe=!1;s.addEventListener("keydown",function(y){if(y.key==="Enter"&&y.shiftKey&&_==="ready"){y.preventDefault(),se(p);return}if(!v){if(y.key==="Escape"){oe=!0;return}if(y.key!=="Tab"||y.shiftKey||oe){oe=!1;return}y.preventDefault(),s.setRangeText(w==="r"?"  ":"    ",s.selectionStart,s.selectionEnd,"end"),s.dispatchEvent(new Event("input",{bubbles:!0}))}}),s.addEventListener("input",Y),g.push(p),ne&&ne.cells.push(p)}),X=g.some(function(s){return s.checks.some(function(m){return m.expect&&typeof m.expect=="object"})}),X&&(x.forEach(function(s){var m=s.cells.some(function(f){return f.checks.length});s.mode=m&&s.node.getAttribute("data-kc-done")!=="self"?"checks":"self"}),g.forEach(function(s){s.readonly||Xe(s)})),x.forEach(function(s){if(s.cells.some(function(f){return!f.readonly})){var m=d("label",{class:"kc-done"});s.doneBox=d("input",{type:"checkbox",id:"kc-done-"+s.id}),s.mode==="checks"&&(s.doneBox.disabled=!0,s.doneBox.title=c("doneAuto")),m.appendChild(s.doneBox),m.appendChild(document.createTextNode(s.mode==="checks"?c("doneAuto"):c("done"))),s.node.appendChild(m),s.doneBox.addEventListener("change",Y)}});var a=d("div",{class:"kc-work"}),o=d("div",{class:"kc-bar"}),n=d("button",{type:"button",class:"kc-btn"},c("download")),r=d("button",{type:"button",class:"kc-btn kc-quiet"},c("copy")),i=d("button",{type:"button",class:"kc-btn kc-quiet"},c("restart")),u=d("span",{class:"kc-status",role:"status","aria-live":"polite"}),l=d("textarea",{id:"kc-copy",readonly:"","aria-label":c("copy")});l.hidden=!0,o.appendChild(n),o.appendChild(r),o.appendChild(i),o.appendChild(u),a.appendChild(o),a.appendChild(l);var k=x.length?x[x.length-1].node:g[g.length-1].plots;if(k.parentNode.insertBefore(a,k.nextSibling),n.addEventListener("click",Qe),r.addEventListener("click",function(){Ke({status:u,area:l})}),i.addEventListener("click",function(){he(c("stopped"))}),!z&&!M){var h=Ye();(h?Promise.resolve(h):He()).then(function(s){if(!s){tt();return}return te=s,s.get().then(function(m){m&&(g.forEach(function(f){!f.readonly&&typeof m.cells[f.id]=="string"&&N(f.area,m.cells[f.id])}),x.forEach(function(f){f.doneBox&&m.done&&m.done[f.id]&&(f.doneBox.checked=!0)}),g.forEach(function(f){f.expect&&m.panels&&m.panels[f.id]===!1&&(f.expect.open=!1)}))})})}nt()}}function tt(){Array.prototype.forEach.call(document.querySelectorAll(".kc-note"),function(e){e.textContent=c("noSave")})}function nt(){var e=window.artifact;if(!(!e||typeof e.getState!="function"||typeof e.setState!="function")){var t=e.getState,a=e.setState,o=[];g.forEach(function(i){i.readonly||o.push({key:"code_"+i.id,node:i.area,prompt:c("code")+" "+i.id}),o.push({key:"out_"+i.id,node:i.out,prompt:c("output")+" "+i.id})});var n=x.filter(function(i){return i.doneBox}).map(function(i){return{key:"done_"+i.id,box:i.doneBox}}),r=g.filter(function(i){return i.runMark}).map(function(i){return{key:"run_"+i.id,cell:i}});e.getState=function(){var i=t.apply(e,arguments)||{};return o.forEach(function(u){i[u.key]=u.node.value}),n.forEach(function(u){i[u.key]=u.box.checked}),r.forEach(function(u){u.cell.runMark.value&&(i[u.key]=u.cell.runMark.value)}),i},e.setState=function(i){var u={};for(var l in i||{}){var k=o.filter(function(m){return m.key===l})[0],h=n.filter(function(m){return m.key===l})[0],s=r.filter(function(m){return m.key===l})[0];k?k.node.value!==i[l]&&(k.node.value=i[l],$(k.node)):h?h.box.checked!==!!i[l]&&(h.box.checked=!!i[l]):s?ce(s.cell,i[l]):u[l]=i[l]}return a.call(e,u)},e.responses=(Array.isArray(e.responses)?e.responses:[]).concat(o.map(function(i){return{key:i.key,prompt:i.prompt}}))}}function ye(){E=new Promise(function(e,t){de=e,pe=t}),E.catch(function(){})}ye();function rt(e){var t=g.filter(function(a){return a.id===P(e)})[0];if(!t)throw new Error("No code cell "+e);return t}window.kc=window.kc||{},window.kc.code={language:w,ready:function(){return E},run:function(e){return U(rt(e))},eval:function(e){var t=R.then(function(){return E}).then(function(){return C.eval(String(e))});return R=t.catch(function(){}),t},set:function(e,t){var a=R.then(function(){return E}).then(function(){return C.set(String(e),t)});return R=a.catch(function(){}),a},onResult:function(e){return I.push(e),function(){I=I.filter(function(t){return t!==e})}},cells:function(){return g.map(function(e){return e.id})},idle:function(){return R.then(function(){})}};function ot(e){var t={};(Array.isArray(e)?e:[]).forEach(function(o){o&&typeof o.cell=="string"&&typeof o.code=="string"&&(t[P(o.cell)]=o.code)});var a=function(o){window.parent.postMessage(Object.assign({type:"kc:verify-result",versionId:b.versionId},o),b.appOrigin)};E.then(function(){var o=[];return g.reduce(function(n,r){return n.then(function(){if(!r.readonly){var i=Object.prototype.hasOwnProperty.call(t,r.id);return i&&N(r.area,t[r.id]),U(r).then(function(u){o.push({cell:r.id,hasSolution:i,hasChecks:r.checks.length>0,ok:!!u.ok,error:u.ok?null:String(u.error||u.output||"").slice(-400),checks:r.lastChecks||null})})}})},Promise.resolve()).then(function(){a({results:o})})},function(o){a({error:String(o&&o.message||o).slice(0,300)})})}function at(){var e=0,t=!1;window.addEventListener("message",function(a){t||a.source!==window.parent||!a.data||a.data.type!=="kc:verify"||(t=!0,ot(a.data.solutions))}),(function a(){t||e++>30||(window.parent.postMessage({type:"kc:verify-ready",versionId:b.versionId},b.appOrigin),setTimeout(a,1e3))})()}function be(){Fe(),et(),g.length&&(fe(),M&&b.appOrigin&&at())}document.readyState==="loading"?document.addEventListener("DOMContentLoaded",be):be()})();})();
+</script></head>
+<body class="laptop">
+<header class="hero">
+  <div class="hero-inner">
+    <div>
+      <h1>Truth in <em>Python</em></h1>
+      <p>Logical connectives as code: evaluate sentences, build truth tables, and test two expressions for logical equivalence.</p>
+    </div>
+    <button class="ghost" id="projBtn" type="button" aria-pressed="false">Projector size</button>
+  </div>
+</header>
+<main>
+  <div class="intro">
+    <p class="proto"><b>Prototype for CS50.</b> A Python version of the CS350 Lesson 3 workbook “Truth in R”.</p>
+    <p>By the end of this workbook you should be able to write any sentence from the reading in Python, and say which connectives Python hands you and which ones you have to build yourself.</p>
+    <p>The names in brackets are the everyday words for each connective: disjunction is OR, conjunction is AND, negation is NOT, and the conditional is IF–THEN.</p>
+    <p>In Python, <code>=</code> assigns a value and <code>==</code> compares two values. Keep them apart.</p>
+    <p>Run every cell. Where a cell asks you to predict first, write the prediction down before you run it.</p>
+  </div>
+
+  <h2 class="group">The basic connectives</h2>
+
+  <section class="cell" data-kc-exercise="vars" data-kc-done="self" aria-labelledby="h1">
+    <h2 id="h1"><span class="n">1</span>Defining variables</h2>
+    <div class="prompt"><p>Run this cell. You can swap in your own English sentences for P, Q and S: the code stays the same, because the connectives don’t care what the sentences say.</p></div>
+    <textarea data-kc-cell="vars" aria-label="Cell 1: define P, Q and S"># Our atomic sentences. Each one is either True or False.
+P = True     # "It is raining."
+Q = False    # "The match is cancelled."
+S = True     # "I brought an umbrella."</textarea>
+    <script type="application/json" data-kc-checks="vars">[
+      {"name":"P, Q and S are each True or False","test":"isinstance(P, bool) and isinstance(Q, bool) and isinstance(S, bool)","fail":"Each of P, Q and S should hold True or False."}
+    ]</script>
+  </section>
+
+  <section class="cell" data-kc-exercise="or" data-kc-done="self" aria-labelledby="h2">
+    <h2 id="h2"><span class="n">2</span>Disjunction (OR)</h2>
+    <div class="prompt"><p>How do you form a disjunction, an OR (∨), in Python? Write the disjunction of P and Q, then run it.</p></div>
+    <textarea data-kc-cell="or" aria-label="Cell 2: disjunction of P and Q"># your code here
+</textarea>
+    <details data-kc-hint><summary>Hint</summary>Python’s OR is the word <code>or</code>.</details>
+  </section>
+
+  <section class="cell" data-kc-exercise="and" data-kc-done="self" aria-labelledby="h3">
+    <h2 id="h3"><span class="n">3</span>Conjunction (AND)</h2>
+    <div class="prompt"><p>How do you form a conjunction, an AND (∧), in Python? Write the conjunction of P and Q, then run it.</p></div>
+    <textarea data-kc-cell="and" aria-label="Cell 3: conjunction of P and Q"># your code here
+</textarea>
+    <details data-kc-hint><summary>Hint</summary>Python’s AND is the word <code>and</code>.</details>
+  </section>
+
+  <section class="cell" data-kc-exercise="not" data-kc-done="self" aria-labelledby="h4">
+    <h2 id="h4"><span class="n">4</span>Negation (NOT)</h2>
+    <div class="prompt"><p>How do you negate a sentence, NOT (¬), in Python? Negate Q, then run it.</p></div>
+    <textarea data-kc-cell="not" aria-label="Cell 4: negation of Q"># your code here
+</textarea>
+    <details data-kc-hint><summary>Hint</summary>Python’s NOT is the word <code>not</code>, written in front of the sentence.</details>
+  </section>
+  <section class="mcq" data-mcq="1" aria-labelledby="mcq1-h"></section>
+
+  <h2 class="group">Precedence and the conditional (IF–THEN)</h2>
+
+  <section class="cell" data-kc-exercise="prec" data-kc-done="self" aria-labelledby="h5">
+    <h2 id="h5"><span class="n">5</span>Precedence <span class="tag">predict first</span></h2>
+    <div class="prompt"><p><b>Precedence</b> is the order in which Python applies the operators in an expression when there are no parentheses to say. Parentheses override it: whatever is inside them is worked out first.</p><p>Before you run anything: with <code>P = True</code> and <code>Q = False</code>, what do you expect <code>not P or Q</code> to be? What about <code>not (P or Q)</code>? Write both predictions down, then run the cell.</p></div>
+    <div class="predict">
+      <div class="row">
+        <div><label for="t-pred5a">I predict <code>not P or Q</code> is…</label><textarea class="free" id="t-pred5a" data-text="pred5a"></textarea></div>
+        <div><label for="t-pred5b">I predict <code>not (P or Q)</code> is…</label><textarea class="free" id="t-pred5b" data-text="pred5b"></textarea></div>
+      </div>
+    </div>
+    <textarea data-kc-cell="prec" aria-label="Cell 5: precedence"># Predict first, then run.
+print(not P or Q)
+print(not (P or Q))</textarea>
+    <div class="msg" data-msg="prec"></div>
+    <div class="after" data-after="prec" hidden>
+      <div class="fb">
+        <p><b>Both False?</b> That’s a coincidence of these values, and it hides the point.</p>
+        <div class="do"><span class="do-k">Do this</span><p>Add <code class="key">Q = True</code> as the first line of this cell and run it again: now the two answers differ.</p><p>Then run <b>cell 1</b> again to put Q back to False.</p></div>
+        <p>If you predicted the same value for both, you’ve just found a mistake that would otherwise surface later, in a sentence where it changes the answer.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="cell" data-kc-exercise="cond" data-kc-done="self" aria-labelledby="h6">
+    <h2 id="h6"><span class="n">6</span>Conditional (IF–THEN)</h2>
+    <div class="warn" data-r="qback" hidden><p><b>Did you put Q back to False?</b> Cell 5 set <code>Q = True</code>. Run <b>cell 1</b> again before going on, or the answers from here on will differ from your classmates’.</p></div>
+    <div class="prompt">
+      <p>Python gives you AND (<code>and</code>), OR (<code>or</code>) and NOT (<code>not</code>), but there is no operator for the conditional, the IF–THEN sentence (→). Build it. Recall when P → Q is false, and write an expression using only the connectives you have.</p>
+      <div class="warn"><p><b>Watch out:</b> <code>P &lt;= Q</code> appears to work, because Python treats True and False as 1 and 0. That’s arithmetic, not logic, and it will mislead anyone who adopts it. Use only <code>and</code>, <code>or</code> and <code>not</code>.</p></div>
+    </div>
+    <textarea data-kc-cell="cond" aria-label="Cell 6: the conditional P implies Q"># P -> Q is false in exactly one case. Which one?
+# Write an expression that is False in that case and True otherwise.
+</textarea>
+    <details data-kc-hint><summary>Hint 1</summary>P → Q is false only when P is True and Q is False.</details>
+    <details data-kc-hint><summary>Hint 2</summary>So P → Q is True whenever P is False, or Q is True. Write that sentence with the connectives you have.</details>
+  </section>
+  <section class="mcq" data-mcq="2" aria-labelledby="mcq2-h"></section>
+
+  <h2 class="group">Truth tables and equivalence</h2>
+
+  <section class="cell" data-kc-exercise="table" data-kc-done="self" aria-labelledby="h7">
+    <h2 id="h7"><span class="n">7</span>Every possible assignment <span class="tag">predict first</span></h2>
+    <div class="prompt">
+      <p>So far every cell has evaluated one row of a truth table: the row where P, Q and S happen to have the values you assigned. A truth table shows every row.</p>
+      <p><b>The code below is a worked example.</b> It builds the full truth table for <b>¬(P ∨ Q)</b>, written <code>not (P or Q)</code> in Python. Run it first, and make sure you understand what each line does. (Inside the table, lowercase <code>p</code> and <code>q</code> stand for each row’s values, so the P and Q from cell 1 stay as they are.)</p>
+      <p><b>Then build your own</b>, below the example, for the three-variable sentence <b>¬(P ∨ Q) ∧ S</b>, written <code>not (P or Q) and S</code>. Use the example as your model: make a list called <code>tt3</code> whose rows also include s, add the sentence as the last value in each row, and print it. Keep the example’s lines as they are: cell 8 uses <code>tt</code>.</p>
+      <p>With the values from cell 1 the single-row answer is False, but the table tells you <i>why</i>, and in which of the eight rows it is ever True.</p>
+    </div>
+    <div class="predict">
+      <label for="t-pred7">Before you build the three-variable table: in how many of its eight rows will ¬(P ∨ Q) ∧ S be True? Which ones?</label>
+      <textarea class="free" id="t-pred7" data-text="pred7"></textarea>
+    </div>
+    <textarea data-kc-cell="table" aria-label="Cell 7: truth tables"># Example: the truth table for not (P or Q)
+from itertools import product
+
+tt = []
+for p, q in product([True, False], repeat=2):   # every combination of P and Q
+    tt.append((p, q, not (p or q)))             # the sentence, in every row
+
+print("P", "Q", "not (P or Q)", sep="\t")
+for row in tt:
+    print(*row, sep="\t")
+
+# Your turn: the truth table for not (P or Q) and S, called tt3
+</textarea>
+    <script type="application/json" data-kc-checks="table">[
+      {"name":"tt has the four rows for P and Q","test":"'tt' in globals() and len(tt) == 4 and all(len(r) == 3 and r[2] == (not (r[0] or r[1])) for r in tt)","fail":"Run the example lines as given: tt should hold 4 rows of (p, q, sentence)."},
+      {"name":"tt3 has all eight rows for P, Q and S","test":"'tt3' in globals() and len(tt3) == 8 and len({tuple(r[:3]) for r in tt3}) == 8","fail":"Build tt3 from every combination of three True/False values: product([True, False], repeat=3)."},
+      {"name":"Each row of tt3 ends with ¬(P ∨ Q) ∧ S","test":"'tt3' in globals() and all(len(r) == 4 and r[3] == ((not (r[0] or r[1])) and r[2]) for r in tt3)","fail":"Each row should be (p, q, s, sentence), with the sentence computed as not (p or q) and s."}
+    ]</script>
+    <div class="msg" data-msg="table"></div>
+    <details data-kc-hint><summary>Hint</summary>Copy the example and change three things: <code>repeat=3</code> in <code>product</code>, a third loop variable <code>s</code>, and the sentence <code>not (p or q) and s</code> as the last value in each row.</details>
+  </section>
+
+  <section class="cell" data-kc-exercise="equiv" data-kc-done="self" aria-labelledby="h8">
+    <h2 id="h8"><span class="n">8</span>Equivalence, and what <code>==</code> actually does <span class="tag">predict first</span></h2>
+    <div class="prompt"><p>Two expressions, every possible input. Are they logically equivalent?</p></div>
+    <div class="predict">
+      <label for="t-pred8">Are ¬(P ∨ Q) and ¬P ∧ ¬Q logically equivalent? Predict, then run.</label>
+      <textarea class="free" id="t-pred8" data-text="pred8"></textarea>
+    </div>
+    <textarea data-kc-cell="equiv" aria-label="Cell 8: equivalence">left  = [not (p or q) for p, q, sentence in tt]          # NOT (P or Q)
+right = [(not p) and (not q) for p, q, sentence in tt]   # NOT P and NOT Q
+
+print(left)
+print(right)
+all(a == b for a, b in zip(left, right))</textarea>
+    <script type="application/json" data-kc-checks="equiv">[
+      {"name":"left and right agree in every row","test":"'left' in globals() and len(left) == 4 and left == right","fail":"Run cell 7 first so tt exists, then this cell as given."}
+    ]</script>
+    <div class="msg" data-msg="equiv"></div>
+    <div class="after" data-after="equiv" hidden>
+      <label class="q" for="t-why8"><b>You just compared the two lists with <code>==</code>, row by row, and got True for every row. Does that establish logical equivalence? What made it work here, and what would <code>==</code> have told you if you had compared the two expressions at a single assignment of P and Q instead?</b></label>
+      <textarea class="free" id="t-why8" data-text="why8" style="margin-top:.4em"></textarea>
+      <div data-r="why8"></div>
+    </div>
+  </section>
+  <section class="mcq" data-mcq="3" aria-labelledby="mcq3-h"></section>
+
+  <h2 class="group">If time allows</h2>
+
+  <section class="cell" data-kc-exercise="extra" data-kc-done="self" aria-labelledby="h9">
+    <h2 id="h9"><span class="n">9</span>Three more you’ll meet in filtering code</h2>
+    <div class="prompt">
+      <p>Run these.</p>
+      <p><code>P != Q</code> is exclusive or: Python has no <code>xor</code> word, but two True/False values differ exactly when one of them is True.</p>
+      <p>Everyday English “or” is ambiguous between inclusive (one, the other, or both) and exclusive (one or the other, not both).</p>
+      <p><code>or</code> is always inclusive.</p>
+    </div>
+    <textarea data-kc-cell="extra" aria-label="Cell 9: exclusive or, any and all">print(P != Q)            # exclusive or: one or the other, not both
+print(any([P, Q, S]))    # is at least one True?
+print(all([P, Q, S]))    # are they all True?</textarea>
+  </section>
+  <section class="mcq" data-mcq="4" aria-labelledby="mcq4-h"></section>
+</main>
+
+<script>
+(function(){
+'use strict';
+var HAS_KC=!!(window.kc&&window.kc.code);
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+
+/* state: predictions and written answers (shared in live sessions) */
+var TEXT_KEYS=['pred5a','pred5b','pred7','pred8','why8'];
+var state={pred5a:'',pred5b:'',pred7:'',pred8:'',why8:'',sent:{},ran:{},qFlipped:false,mc1:'',mc2:'',mc3:'',mc4:[],mcChecked:{}};
+var listeners=[];
+function notify(){var copy=JSON.parse(JSON.stringify(state));listeners.forEach(function(fn){try{fn(copy);}catch(e){}});}
+
+// Cells that ask for a prediction run only once it is written.
+var NEEDS={prec:['pred5a','pred5b'],table:['pred7'],equiv:['pred8']};
+function missing(id){return (NEEDS[id]||[]).some(function(k){return !state[k].trim();});}
+function setMsg(id,html){var n=document.querySelector('[data-msg="'+id+'"]');if(n)n.innerHTML=html||'';}
+function cellOfButton(b){
+  var bar=b.parentNode;if(!bar||!bar.classList||!bar.classList.contains('kc-bar')||b!==bar.firstElementChild)return null;
+  var a=bar.previousElementSibling;return a&&a.matches('textarea[data-kc-cell]')?a.getAttribute('data-kc-cell'):null;
+}
+var BLOCK='<div class="warn"><p>Write your prediction above first, then run.</p></div>';
+document.addEventListener('click',function(e){
+  var b=e.target.closest&&e.target.closest('.kc-bar .kc-btn');
+  if(b){var id=cellOfButton(b);if(id&&!b.disabled&&missing(id)){e.stopImmediatePropagation();e.preventDefault();setMsg(id,BLOCK);}else if(id)setMsg(id,'');return;}
+  var s=e.target.closest&&e.target.closest('[data-act="send"]');
+  if(s&&!s.disabled){state.sent[s.dataset.arg]=true;render();notify();}
+  var m=e.target.closest&&e.target.closest('[data-act="mccheck"]');
+  if(m&&!m.disabled){state.mcChecked[m.dataset.arg]=true;render();notify();}
+},true);
+document.addEventListener('keydown',function(e){
+  var t=e.target;if(e.key!=='Enter'||!e.shiftKey||!t.matches||!t.matches('textarea[data-kc-cell]'))return;
+  var id=t.getAttribute('data-kc-cell');if(missing(id)){e.stopImmediatePropagation();e.preventDefault();setMsg(id,BLOCK);}
+},true);
+document.addEventListener('change',function(e){
+  var t=e.target,n=t.dataset&&t.dataset.mc;if(!n)return;
+  if(MCQ[n].multi){var cur=state['mc'+n].filter(function(x){return x!==t.value;});if(t.checked)cur.push(t.value);state['mc'+n]=cur.sort();}
+  else state['mc'+n]=t.value;
+  state.mcChecked[n]=false;render();notify();
+});
+document.addEventListener('input',function(e){
+  var k=e.target.dataset&&e.target.dataset.text;if(!k)return;
+  state[k]=e.target.value;
+  Object.keys(NEEDS).forEach(function(id){if(NEEDS[id].indexOf(k)>=0&&!missing(id))setMsg(id,'');});
+  var send=document.querySelector('[data-act="send"][data-arg="'+k+'"]');if(send)send.disabled=!e.target.value.trim();
+  notify();
+});
+
+/* ---------- end-of-section questions ----------
+   Each option is Python code. The page works out what it does on every row of the truth table
+   (or that Python refuses it), and a choice is right when the code is proper logic that gives
+   the target sentence's value in every row. */
+var ROWS2=[[true,true],[true,false],[false,true],[false,false]];
+function TF(b){return b?'True':'False';}
+var MCQ={
+  1:{title:'Writing a sentence with the basic connectives',
+     ask:'Which line is proper Python for “It is raining and the match is not cancelled” (P ∧ ¬Q)?',
+     vars:['P','Q'],targetLabel:'P ∧ ¬Q',
+     opts:[
+       {id:'c',code:'P && !Q',kind:'error',out:'SyntaxError: invalid syntax'},
+       {id:'d',code:'not P and Q',f:function(P,Q){return !P&&Q;}},
+       {id:'a',code:'P and not Q',f:function(P,Q){return P&&!Q;}},
+       {id:'e',code:'P or not Q',f:function(P,Q){return P||!Q;}},
+       {id:'b',code:'P and Q = False',kind:'error',out:'SyntaxError: cannot assign to expression'}
+     ]},
+  2:{title:'Precedence and the conditional',
+     ask:'Which line is proper Python for “If it is raining, then I brought an umbrella” (P → S)?',
+     vars:['P','S'],targetLabel:'P → S',
+     opts:[
+       {id:'b',code:'not (P or S)',f:function(P,S){return !(P||S);}},
+       {id:'d',code:'P and S',f:function(P,S){return P&&S;}},
+       {id:'a',code:'not P or S',f:function(P,S){return !P||S;}},
+       {id:'c',code:'P <= S',kind:'arith',f:function(P,S){return (P?1:0)<=(S?1:0);}},
+       {id:'e',code:'not P and S',f:function(P,S){return !P&&S;}}
+     ]},
+  3:{title:'Testing for equivalence',
+     ask:'Which line properly tests whether ¬(P ∧ Q) and ¬P ∨ ¬Q are logically equivalent?',
+     equiv:true,
+     opts:[
+       {id:'b',code:'(not (P and Q)) == ((not P) or (not Q))',test:'one'},
+       {id:'a',code:'all((not (p and q)) == ((not p) or (not q)) for p, q in product([True, False], repeat=2))',test:'all'},
+       {id:'c',code:'any((not (p and q)) == ((not p) or (not q)) for p, q in product([True, False], repeat=2))',test:'any'},
+       {id:'d',code:'all((not (p and q)) = ((not p) or (not q)) for p, q in product([True, False], repeat=2))',test:'error',out:'SyntaxError: expression cannot contain assignment, perhaps you meant "=="?'}
+     ]},
+  4:{title:'Exclusive or',multi:true,
+     ask:'Which lines are True exactly when one of P and Q is True, but not both? Select all that apply.',
+     vars:['P','Q'],targetLabel:'exactly one of P, Q',
+     opts:[
+       {id:'a',code:'P != Q',f:function(P,Q){return P!==Q;}},
+       {id:'b',code:'P or Q',f:function(P,Q){return P||Q;}},
+       {id:'c',code:'(P or Q) and not (P and Q)',f:function(P,Q){return (P||Q)&&!(P&&Q);}},
+       {id:'d',code:'any([P, Q])',f:function(P,Q){return P||Q;}},
+       {id:'e',code:'P and Q',f:function(P,Q){return P&&Q;}}
+     ]}
+};
+Object.keys(MCQ).forEach(function(k){MCQ[k].n=k;});
+// Which options are right, and why each is right or wrong, come with the
+// released answers (window.__kcReleased): never in the page, so a homework
+// copy can't give them away before the professor releases them.
+var REL=window.__kcReleased||null;
+function rightIds(q){var r=REL&&REL['mcq'+q.n];return r&&r.answer?String(r.answer).split(',').map(function(s){return s.trim();}):[];}
+function optRight(q,o){return rightIds(q).indexOf(o.id)>=0;}
+function fbOf(q,o){var r=REL&&REL['mcq'+q.n+':'+o.id];return r&&r.explanation?r.explanation:'';}
+// The sentence's own truth values: those of the (first) right option.
+function targetOf(q){var id=rightIds(q)[0];return (q.opts.filter(function(x){return x.id===id;})[0]||{}).f;}
+// Question 3: what each test prints for an equivalent pair, and for a pair that isn't.
+var PAIRS=[{label:'¬(P ∧ Q) vs ¬P ∨ ¬Q (equivalent)',l:function(P,Q){return !(P&&Q);},r:function(P,Q){return !P||!Q;}},
+           {label:'P vs P ∨ Q (not equivalent)',l:function(P,Q){return P;},r:function(P,Q){return P||Q;}}];
+function prints(o,pair){
+  if(o.test==='error')return o.out;
+  var eq=ROWS2.map(function(r){return pair.l(r[0],r[1])===pair.r(r[0],r[1]);});
+  if(o.test==='one')return TF(eq[1]);          // cell 1: P True, Q False
+  return TF(o.test==='all'?eq.every(Boolean):eq.some(Boolean));
+}
+function mcqTable(q,o){
+  if(q.equiv){
+    return '<div class="tw"><table class="tt"><thead><tr><th>Pair of sentences</th><th>Python gives</th></tr></thead><tbody>'+
+      PAIRS.map(function(p,i){var pr=prints(o,p),bad=o.test!=='all'&&(o.test==='error'||(i===1&&/True/.test(pr)));return '<tr><td style="text-align:left">'+p.label+'</td><td class="'+(bad?'diff':'')+'"><code>'+esc(pr)+'</code></td></tr>';}).join('')+'</tbody></table></div>';
+  }
+  if(o.kind==='error')return '<p class="small">Python stops with: <code>'+esc(o.out)+'</code></p>';
+  return '<div class="tw"><table class="tt"><thead><tr><th>'+q.vars[0]+'</th><th>'+q.vars[1]+'</th><th>'+esc(q.targetLabel)+'</th><th><code>'+esc(o.code)+'</code></th></tr></thead><tbody>'+
+    ROWS2.map(function(r){var t=targetOf(q)(r[0],r[1]),v=o.f(r[0],r[1]);return '<tr><td>'+TF(r[0])+'</td><td>'+TF(r[1])+'</td><td>'+TF(t)+'</td><td class="'+(t!==v?'diff':'')+'">'+TF(v)+'</td></tr>';}).join('')+'</tbody></table></div>';
+}
+function mcqHTML(n){
+  var q=MCQ[n],sel=state['mc'+n],checked=state.mcChecked[n];
+  var picked=function(id){return q.multi?sel.indexOf(id)>=0:sel===id;};
+  var h='<p class="kick">Check your understanding</p><h3 id="mcq'+n+'-h">'+esc(q.title)+'</h3><p>'+esc(q.ask)+'</p><div class="opts" role="'+(q.multi?'group':'radiogroup')+'" aria-labelledby="mcq'+n+'-h">';
+  q.opts.forEach(function(o){
+    var on=picked(o.id),cls=(on?'on':'')+(checked&&on&&REL?(optRight(q,o)?' is-right':' is-wrong'):'');
+    h+='<label class="'+cls+'"><input type="'+(q.multi?'checkbox':'radio')+'" name="mc'+n+'" data-mc="'+n+'" value="'+o.id+'"'+(on?' checked':'')+'><code>'+esc(o.code)+'</code></label>';
+  });
+  var any=q.multi?sel.length>0:!!sel;
+  h+='</div><p><button type="button" class="btn2" data-act="mccheck" data-arg="'+n+'"'+(any?'':' disabled')+'>Check</button></p>';
+  if(checked&&any&&!REL){
+    h+='<div class="fb"><p>Your answer is saved. You\'ll see whether it\'s right once your professor releases the answers.</p></div>';
+  } else if(checked&&any){
+    var chosen=q.opts.filter(function(o){return picked(o.id);});
+    if(q.multi){
+      var rightIds=q.opts.filter(function(o){return optRight(q,o);}).map(function(o){return o.id;});
+      var all=rightIds.every(function(id){return sel.indexOf(id)>=0;})&&chosen.every(function(o){return optRight(q,o);});
+      h+='<div class="fb'+(all?'':' no')+'"><p><b>'+(all?'✓ Right: both lines work.':chosen.every(function(o){return optRight(q,o);})?'Not all of them yet: another line also works.':'✗ Not quite.')+'</b></p>'+
+        chosen.map(function(o){return '<p><code>'+esc(o.code)+'</code>: '+(optRight(q,o)?'✓ ':'✗ ')+fbOf(q,o)+'</p>'+(optRight(q,o)?'':mcqTable(q,o));}).join('')+'</div>';
+    } else {
+      var o=chosen[0],ok=optRight(q,o);
+      h+='<div class="fb'+(ok?'':' no')+'"><p><b>'+(ok?'✓ Right.':'✗ Not this one.')+'</b> '+fbOf(q,o)+'</p>'+mcqTable(q,o)+'</div>';
+    }
+  }
+  return h;
+}
+
+function render(){
+  TEXT_KEYS.forEach(function(k){var t=document.querySelector('[data-text="'+k+'"]');if(t&&t!==document.activeElement&&t.value!==state[k])t.value=state[k];});
+  ['prec','equiv'].forEach(function(id){var n=document.querySelector('[data-after="'+id+'"]');if(n)n.hidden=!state.ran[id];});
+  var q=document.querySelector('[data-r="qback"]');if(q)q.hidden=!state.qFlipped;
+  [1,2,3,4].forEach(function(n){var s=document.querySelector('[data-mcq="'+n+'"]');if(!s)return;var x=mcqHTML(n);if(s.__h!==x){var f=document.activeElement&&s.contains(document.activeElement)?{v:document.activeElement.value,a:document.activeElement.dataset.act}:null;s.innerHTML=x;s.__h=x;if(f){var el=f.a?s.querySelector('[data-act="'+f.a+'"]'):s.querySelector('input[value="'+f.v+'"]');if(el)el.focus({preventScroll:true});}}});
+  var w=document.querySelector('[data-r="why8"]');
+  if(w){
+    var model=REL&&REL.why8&&REL.why8.answer;
+    var h=state.sent.why8?
+      (model?'<details class="answer"><summary>Compare with one possible answer</summary>'+model+'</details>':'<p class="small">Saved. You\'ll see one possible answer once your professor releases the answers.</p>'):
+      '<p><button type="button" class="btn2" data-act="send" data-arg="why8"'+(state.why8.trim()?'':' disabled')+'>Submit</button></p>';
+    if(w.__h!==h){w.innerHTML=h;w.__h=h;}
+  }
+}
+
+document.getElementById('projBtn').addEventListener('click',function(){
+  var on=document.body.classList.toggle('projector');document.body.classList.toggle('laptop',!on);this.setAttribute('aria-pressed',String(on));
+});
+
+/* page checks: the nine cells and their checks are present and well formed */
+var CELLS=['vars','or','and','not','prec','cond','table','equiv','extra'];
+var assertions=[
+  {name:'All nine code cells are present, in order',run:function(){return [].map.call(document.querySelectorAll('textarea[data-kc-cell]'),function(a){return a.getAttribute('data-kc-cell');}).join()===CELLS.join();}},
+  {name:'Every check block parses and names a test and a fail message',run:function(){return [].every.call(document.querySelectorAll('script[data-kc-checks]'),function(s){try{var j=JSON.parse(s.textContent);return Array.isArray(j)&&j.length>0&&j.every(function(c){return c.name&&c.test&&c.fail;});}catch(e){return false;}});}},
+  {name:'No cell uses R operators (<-, &, |, !) for logic',run:function(){return [].every.call(document.querySelectorAll('textarea[data-kc-cell]'),function(a){return a.defaultValue.split('\n').every(function(l){var c=l.replace(/#.*/,'').replace(/"[^"]*"/g,'');return !/<-|&|\||![^=]/.test(c);});});}},
+  {name:'End-of-section questions: exactly the documented options are right (a, a, a, and a + c)',run:function(){var want={1:'a',2:'a',3:'a',4:'a,c'};return [1,2,3,4].every(function(n){return MCQ[n].opts.filter(function(o){return optRight(MCQ[n],o);}).map(function(o){return o.id;}).sort().join()===want[n];});}},
+  {name:'Question 3: the right test gives True for the equivalent pair and False for the other; single-row and any() give True for both',run:function(){var o=function(id){return MCQ[3].opts.filter(function(x){return x.id===id;})[0];};return prints(o('a'),PAIRS[0])==='True'&&prints(o('a'),PAIRS[1])==='False'&&prints(o('b'),PAIRS[1])==='True'&&prints(o('c'),PAIRS[1])==='True';}},
+  {name:'Question 2: P <= S matches P → S in every row but is not accepted (arithmetic)',run:function(){var q=MCQ[2],o=q.opts.filter(function(x){return x.id==='c';})[0];return ROWS2.every(function(r){return o.f(r[0],r[1])===targetOf(q)(r[0],r[1]);})&&!optRight(q,o);}},
+  {name:'Each predict-first cell has its prediction boxes',run:function(){return Object.keys(NEEDS).every(function(id){return NEEDS[id].every(function(k){return !!document.querySelector('[data-text="'+k+'"]');});});}}
+];
+
+// Every question, in page order. Multiple-choice prompts and options come from MCQ.
+var ITEMS=[{"id": "vars", "type": "code", "prompt": "Cell 1: Defining variables", "section": "The basic connectives", "cell": "vars"}, {"id": "or", "type": "code", "prompt": "Cell 2: Disjunction (OR)", "section": "The basic connectives", "cell": "or"}, {"id": "and", "type": "code", "prompt": "Cell 3: Conjunction (AND)", "section": "The basic connectives", "cell": "and"}, {"id": "not", "type": "code", "prompt": "Cell 4: Negation (NOT)", "section": "The basic connectives", "cell": "not"}, {"id": "mcq1", "type": "choice", "prompt": "mcq1", "section": "The basic connectives", "key": "mc1"}, {"id": "pred5a", "type": "text", "prompt": "Cell 5: predict not P or Q", "section": "Precedence and the conditional"}, {"id": "pred5b", "type": "text", "prompt": "Cell 5: predict not (P or Q)", "section": "Precedence and the conditional"}, {"id": "prec", "type": "code", "prompt": "Cell 5: Precedence", "section": "Precedence and the conditional", "cell": "prec"}, {"id": "cond", "type": "code", "prompt": "Cell 6: Conditional (IF–THEN)", "section": "Precedence and the conditional", "cell": "cond"}, {"id": "mcq2", "type": "choice", "prompt": "mcq2", "section": "Precedence and the conditional", "key": "mc2"}, {"id": "pred7", "type": "text", "prompt": "Cell 7: in how many of the eight rows will ¬(P ∨ Q) ∧ S be True? Which ones?", "section": "Truth tables and equivalence"}, {"id": "table", "type": "code", "prompt": "Cell 7: Every possible assignment", "section": "Truth tables and equivalence", "cell": "table"}, {"id": "pred8", "type": "text", "prompt": "Cell 8: are ¬(P ∨ Q) and ¬P ∧ ¬Q logically equivalent?", "section": "Truth tables and equivalence"}, {"id": "equiv", "type": "code", "prompt": "Cell 8: Equivalence", "section": "Truth tables and equivalence", "cell": "equiv"}, {"id": "why8", "type": "text", "prompt": "Cell 8: does == over the whole table establish equivalence? What would it tell you at a single assignment?", "section": "Truth tables and equivalence"}, {"id": "mcq3", "type": "choice", "prompt": "mcq3", "section": "Truth tables and equivalence", "key": "mc3"}, {"id": "extra", "type": "code", "prompt": "Cell 9: Three more you’ll meet in filtering code", "section": "If time allows", "cell": "extra"}, {"id": "mcq4", "type": "multi", "prompt": "mcq4", "section": "If time allows", "key": "mc4"}];
+ITEMS.forEach(function(it){var q=it.id.indexOf('mcq')===0&&MCQ[it.id.slice(3)];if(q){it.prompt=q.ask;it.options=q.opts.map(function(o){return {value:o.id,label:o.code};});}});
+
+window.artifact={
+  getState:function(){return JSON.parse(JSON.stringify(state));},
+  setState:function(p){
+    Object.keys(p||{}).forEach(function(k){if(Object.prototype.hasOwnProperty.call(state,k))state[k]=JSON.parse(JSON.stringify(p[k]));});
+    if(!state.sent||typeof state.sent!=='object')state.sent={};
+    if(!state.ran||typeof state.ran!=='object')state.ran={};
+    if(!state.mcChecked||typeof state.mcChecked!=='object')state.mcChecked={};
+    if(!Array.isArray(state.mc4))state.mc4=[];
+    render();
+  },
+  onChange:function(fn){listeners.push(fn);return function(){listeners=listeners.filter(function(x){return x!==fn;});};},
+  controls:[],
+  responses:[
+    {key:'pred5a',prompt:'Cell 5: prediction for not P or Q'},
+    {key:'pred5b',prompt:'Cell 5: prediction for not (P or Q)'},
+    {key:'pred7',prompt:'Cell 7: in how many of the eight rows is ¬(P ∨ Q) ∧ S True?'},
+    {key:'pred8',prompt:'Cell 8: are ¬(P ∨ Q) and ¬P ∧ ¬Q equivalent?'},
+    {key:'why8',prompt:'Cell 8: does == over the table establish equivalence? What would it tell you at a single assignment?'}
+  ],
+  // Homework-ready: every question, for labelled PDFs and exports.
+  items:ITEMS,
+  // Released answers handed over after the page has loaded (a homework copy).
+  release:function(answers){REL=answers;[1,2,3,4].forEach(function(n){var s=document.querySelector('[data-mcq="'+n+'"]');if(s)s.__h=null;});render();},
+  assertions:assertions,
+  referenceCases:[]
+};
+
+function start(){
+  // The reminder to restore Q shows once cell 5 has run with Q set to True, until cell 1 runs again.
+  if(HAS_KC)kc.code.onResult(function(id,res){
+    var before=JSON.stringify([state.ran,state.qFlipped]);
+    if((id==='prec'||id==='equiv')&&res.ok)state.ran[id]=true;
+    var src=(document.querySelector('textarea[data-kc-cell="'+id+'"]')||{}).value||'';
+    if(id==='prec'&&res.ok&&/(^|\n)\s*Q\s*=\s*True\b/.test(src.replace(/#.*/g,'')))state.qFlipped=true;
+    if(id==='vars'&&res.ok)state.qFlipped=false;
+    if(JSON.stringify([state.ran,state.qFlipped])!==before){render();notify();}
+  });
+  render();
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
+})();
+</script>
+
+<script>
+(function () {
+  var cfg = {"versionId":"cmvwpahvd000108jwn2eih0iq","appOrigin":"https://ideasatplay.org","direct":null};
+  var t0 = Date.now(), scrolled = false, acted = false, reached = false, shown = false, config = null;
+  var framed = parent !== window;
+  function onScreen(el) {
+    if (!el.getClientRects().length) return false;
+    var r = el.getBoundingClientRect();
+    return r.top < innerHeight && r.bottom > 0;
+  }
+  function atBottom() {
+    var f = document.querySelector("footer[data-kc-credit]");
+    if (f) return f.getBoundingClientRect().top <= innerHeight;
+    var d = document.documentElement;
+    return scrollY + innerHeight >= d.scrollHeight - 48;
+  }
+  // { cur, last } when the page moves through numbered steps, else null.
+  function steps() {
+    var a = window.artifact;
+    try {
+      var c = a && Array.isArray(a.controls) ? a.controls.filter(function (x) { return x && x.key === "step" && typeof x.max === "number"; })[0] : null;
+      if (c) { var s = a.getState(); if (s && typeof s.step === "number") return { cur: s.step, last: c.max }; }
+    } catch (e) {}
+    var cur = document.querySelector('[aria-current="step"]');
+    if (cur && cur.parentElement) {
+      var sib = Array.prototype.filter.call(cur.parentElement.children, function (x) { return x.getClientRects().length; });
+      return { cur: sib.indexOf(cur), last: sib.length - 1 };
+    }
+    return null;
+  }
+  function finished() {
+    var mark = document.querySelector("[data-kc-end]");
+    if (mark) return onScreen(mark);
+    var s = steps();
+    if (s) return s.cur >= s.last && atBottom();
+    return atBottom() && (scrolled || (acted && Date.now() - t0 > 60000));
+  }
+  // The student link remembers a rating in its own storage where the browser allows it.
+  var KEY = "kc-rated-" + cfg.versionId;
+  function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
+  if (cfg.direct) config = { ask: !store(KEY), preview: false, labels: cfg.direct.labels };
+  var visitor = (function () {
+    var v = store("kc-visitor");
+    if (!v) { v = ""; for (var i = 0; i < 24; i++) v += "abcdefghijklmnopqrstuvwxyz0123456789".charAt(Math.floor(Math.random() * 36)); store("kc-visitor", v); }
+    return v;
+  })();
+  var pending = {}, seq = 0;
+  function save(score, comment) {
+    if (cfg.direct) {
+      var body = { versionId: cfg.versionId, score: score, context: "share", visitor: visitor };
+      if (comment) body.comment = comment;
+      // text/plain: a simple request, so no preflight is needed.
+      return fetch(cfg.direct.endpoint, { method: "POST", credentials: "omit", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(body) })
+        .then(function (r) { if (r.ok) store(KEY, String(score)); return r.ok; }, function () { return false; });
+    }
+    return new Promise(function (resolve) {
+      var id = ++seq; pending[id] = resolve;
+      parent.postMessage({ type: "kc:rate", versionId: cfg.versionId, id: id, score: score, comment: comment || "" }, cfg.appOrigin);
+      setTimeout(function () { if (pending[id]) { delete pending[id]; resolve(false); } }, 15000);
+    });
+  }
+  var B = "display:inline-block;margin:3px 6px 3px 0;padding:4px 10px;border:1px solid #a8a29e;border-radius:6px;background:#fff;color:#1c1917;font:inherit;cursor:pointer";
+  function el(tag, attrs, text) { var e = document.createElement(tag); for (var k in attrs) e.setAttribute(k, attrs[k]); if (text) e.textContent = text; return e; }
+  function show() {
+    if (shown || !config || !config.ask) return;
+    shown = true;
+    clearInterval(timer);
+    var L = config.labels;
+    var box = el("div", { "data-kc-rating": "", "data-kc-personal": "", role: "region", "aria-label": L.ask, lang: L.lang, dir: L.dir,
+      style: "box-sizing:border-box;max-width:760px;margin:24px auto 0;padding:10px 14px;border:1px solid #d6d3d1;border-radius:10px;background:#fafaf9;color:#1c1917;font:14px/1.5 system-ui,-apple-system,sans-serif;text-align:start" });
+    var live = el("div", { "aria-live": "polite" });
+    box.appendChild(live);
+    function ask(msg) {
+      live.innerHTML = "";
+      live.appendChild(el("span", { style: "font-weight:600;margin-inline-end:8px" }, L.ask));
+      [1, 2, 3].forEach(function (s) {
+        var b = el("button", { type: "button", style: B }, s + " · " + L["s" + s]);
+        b.addEventListener("click", function () {
+          live.querySelectorAll("button").forEach(function (x) { x.disabled = true; });
+          save(s, "").then(function (ok) { if (ok) comment(s); else ask(L.error); });
+        });
+        live.appendChild(b);
+      });
+      if (config.preview) live.appendChild(el("div", { style: "font-size:12px;color:#57534e" }, L.preview));
+      if (msg) live.appendChild(el("div", { role: "alert", style: "color:#991b1b;font-size:13px" }, msg));
+    }
+    function comment(score) {
+      live.innerHTML = "";
+      var id = "kc-rate-comment";
+      live.appendChild(el("label", { for: id, style: "display:block;font-weight:600;margin-bottom:4px" }, L.comment));
+      var row = el("div", { style: "display:flex;flex-wrap:wrap;gap:6px;align-items:center" });
+      var input = el("input", { id: id, type: "text", maxlength: "1000", autocomplete: "off", dir: "auto",
+        style: "flex:1 1 260px;min-width:0;box-sizing:border-box;padding:5px 8px;border:1px solid #a8a29e;border-radius:6px;background:#fff;color:#1c1917;font:inherit" });
+      var send = el("button", { type: "button", style: B + ";background:#292524;color:#fff;border-color:#292524" }, L.send);
+      var skip = el("button", { type: "button", style: B }, L.skip);
+      function done() { live.innerHTML = ""; live.appendChild(el("span", { style: "font-weight:600" }, L.thanks)); setTimeout(function () { box.remove(); }, 2000); }
+      send.addEventListener("click", function () {
+        var text = input.value.trim();
+        if (!text) return done();
+        send.disabled = skip.disabled = true;
+        save(score, text).then(function (ok) { if (ok) done(); else { send.disabled = skip.disabled = false; live.appendChild(el("div", { role: "alert", style: "color:#991b1b;font-size:13px" }, L.error)); } });
+      });
+      input.addEventListener("keydown", function (e) { if (e.key === "Enter") send.click(); });
+      skip.addEventListener("click", done);
+      row.appendChild(input); row.appendChild(send); row.appendChild(skip);
+      live.appendChild(row);
+      input.focus();
+    }
+    ask("");
+    var mark = document.querySelector("[data-kc-end]"), foot = document.querySelector("footer[data-kc-credit]");
+    if (mark) mark.insertAdjacentElement("afterend", box);
+    else if (foot) foot.parentNode.insertBefore(box, foot);
+    else document.body.appendChild(box);
+  }
+  function check() {
+    if (!reached && finished()) reached = true;
+    if (reached) show();
+  }
+  window.addEventListener("message", function (e) {
+    if (e.source !== parent || !e.data || e.data.versionId !== cfg.versionId) return;
+    var d = e.data;
+    if (d.type === "kc:rate-config" && !cfg.direct) { config = { ask: !!d.ask, preview: !!d.preview, labels: d.labels }; check(); }
+    if (d.type === "kc:rate-result" && pending[d.id]) { pending[d.id](!!d.ok); delete pending[d.id]; }
+  });
+  // The app page may start listening after this page loads: ask a few times.
+  var hellos = 0;
+  function hello() { if (framed && !cfg.direct && !config && hellos++ < 8) parent.postMessage({ type: "kc:rate-hello", versionId: cfg.versionId }, cfg.appOrigin); }
+  hello();
+  var timer = setInterval(function () { if (hellos < 8 && !config) hello(); check(); }, 800);
+  window.addEventListener("scroll", function () { if (scrollY > 0) scrolled = true; check(); }, { passive: true });
+  ["click", "input", "keydown"].forEach(function (t) { document.addEventListener(t, function (e) { if (e.target && e.target.closest && e.target.closest("[data-kc-rating]")) return; acted = true; setTimeout(check, 50); }, true); });
+})();
+</script></body>
+</html>

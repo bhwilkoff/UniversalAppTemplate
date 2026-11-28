@@ -14,6 +14,8 @@ from pathlib import Path
 
 SITE = 'https://ideasatplay.org'
 OUT = Path(__file__).resolve().parents[2] / 'assets' / 'ideas-at-play.json'
+COPIES = OUT.parent / 'ideas-at-play'
+SANDBOX = re.compile(r'https://ideasatplay-sandbox\.vercel\.app/a/([a-z0-9]{10,40})')
 UA = {'User-Agent': 'Mozilla/5.0 (compatible; human-shaped-catalog/1.0)'}
 
 def get(url):
@@ -31,8 +33,22 @@ def one(slug):
     licensed = 'creativecommons.org/licenses/by/4.0' in s
     if not (title and vs and licensed):
         return None
+    # The model's own file at that version, kept here so a group can share
+    # one model's state (CC BY 4.0 allows copies with credit; the stage notes
+    # the one change, a bridge it adds when the file loads).
+    copy = None
+    try:
+        sb = SANDBOX.search(get(SITE + '/play/' + slug + '?v=' + str(max(vs))))
+        if sb:
+            body = get('https://ideasatplay-sandbox.vercel.app/a/' + sb.group(1))
+            if 'window.artifact' in body and len(body) < 600000:
+                COPIES.mkdir(exist_ok=True)
+                (COPIES / (slug + '.html')).write_text(body)
+                copy = '/assets/ideas-at-play/' + slug + '.html'
+    except Exception:
+        copy = None
     return {
-        'slug': slug, 'title': title, 'v': max(vs),
+        'slug': slug, 'title': title, 'v': max(vs), 'copy': copy,
         'author': author.group(1) if author else None, 'year': int(author.group(2)) if author else None,
         'about': desc.group(1).strip()[:300] if desc else None,
     }

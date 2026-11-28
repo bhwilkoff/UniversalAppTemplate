@@ -1,0 +1,766 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Average vs. quantile treatment effects for the treated (ATT vs. QTET)</title>
+<style>
+:root{
+  --bg:#fbfaf7;--card:#ffffff;--ink:#22252a;--muted:#5b626d;--rule:#d6d2ca;--faint:#efece6;
+  --accent:#2E4057;--c0:#2e7d32;--c1:#1f4fa3;--neg:#b4480a;--ok:#1d7a4a;--okbg:#e6f4ea;--no:#b4480a;--nobg:#fdeee3;
+}
+@media (prefers-color-scheme: dark){
+  :root{--bg:#16181c;--card:#1f2228;--ink:#ece9e3;--muted:#a9afb8;--rule:#3b4048;--faint:#2a2e35;--accent:#9dbfe3;--c0:#7bd389;--c1:#8fb4ff;--neg:#ffa366;--ok:#6fd39b;--okbg:#17301f;--no:#ffa366;--nobg:#3a2414;}
+}
+*{box-sizing:border-box}
+[hidden]{display:none !important}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+main{max-width:1100px;margin:0 auto;padding:12px 20px 30px}
+h1{font-size:1.3rem;line-height:1.25;margin:0;font-weight:650}
+.topbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+button{font:inherit;font-size:14px;min-height:30px;padding:4px 11px;border:1px solid var(--rule);border-radius:8px;background:var(--card);color:var(--ink);cursor:pointer}
+button:hover:not(:disabled){border-color:var(--muted)}
+button[aria-pressed="true"],button[aria-current="step"]{background:var(--accent);color:var(--card);border-color:var(--accent)}
+button.primary{background:var(--accent);color:var(--card);border-color:var(--accent)}
+button:disabled{opacity:.45;cursor:default}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.seg{display:inline-flex;flex-wrap:wrap;border:1px solid var(--rule);border-radius:8px;overflow:hidden}
+.seg button{border:0;border-radius:0;border-inline-end:1px solid var(--rule)}
+.seg button:last-child{border-inline-end:0}
+.stepbar{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.stepbar button{font-size:13px}
+.card{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:12px 20px 14px}
+.stepnum{font-size:13px;color:var(--muted);margin:0}
+#stepH{font-size:1.2rem;margin:.1em 0 .25em}
+.hint{margin:0 0 .5em;max-width:82ch}
+.note{font-size:13px;color:var(--muted);margin:.3em 0 0}
+.choices{display:flex;flex-wrap:wrap;gap:6px;margin:.2em 0 .4em}
+.ctl{display:flex;flex-wrap:wrap;gap:6px 22px;align-items:center;margin:.2em 0 .3em}
+.ctl label{display:flex;align-items:center;gap:8px;font-size:14px}
+.ctl input[type=range]{width:170px;accent-color:var(--accent)}
+.ctl output{font-variant-numeric:tabular-nums;min-width:4.8em;font-weight:600}
+.readouts{display:flex;flex-wrap:wrap;gap:8px 26px;font-size:15px;margin:.1em 0 .2em}
+.readouts strong{font-variant-numeric:tabular-nums}
+.neg{color:var(--neg)}
+svg.chart{width:100%;height:auto;display:block}
+.charts.side{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:18px;align-items:center}
+@media (max-width:820px){.charts.side{grid-template-columns:minmax(0,1fr)}}
+svg text{fill:var(--ink);font-size:13px}
+svg .muted{fill:var(--muted)}
+svg .lab0{fill:var(--c0);font-weight:650}
+svg .lab1{fill:var(--c1);font-weight:650}
+.box{border-inline-start:3px solid var(--accent);padding:6px 12px;margin:.5em 0 0;background:var(--faint);border-radius:0 8px 8px 0;font-size:14.5px}
+.box p{margin:.25em 0}
+.formula{font-family:Georgia,"Iowan Old Style","Times New Roman",serif;font-size:1.05em}
+.two{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:24px;align-items:start}
+@media (max-width:820px){.two{grid-template-columns:minmax(0,1fr)}}
+table{border-collapse:collapse;width:100%;font-size:14px;border-top:1.5px solid var(--ink);border-bottom:1.5px solid var(--ink);margin:.3em 0}
+th,td{padding:4px 8px;text-align:start}
+thead th{border-bottom:1px solid var(--ink);font-weight:600}
+td.num,th.num{text-align:end;font-variant-numeric:tabular-nums;white-space:nowrap}
+.q{margin:.6em 0 .25em;font-weight:600}
+.opts{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.opts button{text-align:start}
+.fb{margin:.4em 0 0;font-size:14.5px}
+.moves{display:flex;justify-content:space-between;gap:8px;margin-top:10px}
+details{margin-top:14px;font-size:14px}
+details ul{margin:.4em 0;padding-inline-start:1.2em;max-width:80ch}
+.kind{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-inline-end:6px}
+body.projector{font-size:22px}
+body.projector main{max-width:1700px}
+body.projector h1{font-size:2.1rem}
+body.projector #stepH{font-size:1.7rem}
+body.projector button,body.projector table,body.projector .ctl label,body.projector .readouts,body.projector .box,body.projector .fb{font-size:20px}
+body.projector .note,body.projector .stepnum{font-size:17px}
+body.projector .ctl input[type=range]{width:240px}
+body.projector svg text{font-size:18px}
+body.projector svg .curve{stroke-width:5}
+body.projector svg .arrow{stroke-width:3.5}
+@media (prefers-reduced-motion:no-preference){svg .curve,svg .arrow,svg line{transition:none}}
+.qrow{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:flex-start;margin:.3em 0}
+.verdict{display:flex;gap:12px;align-items:flex-start;margin:.5em 0 0;padding:10px 14px;border:2px solid var(--rule);border-radius:10px;background:var(--faint);font-size:14.5px;max-width:100ch}
+.verdict .vi{flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-size:20px;font-weight:800;color:var(--card);background:var(--accent)}
+.verdict .vt{font-weight:750;font-size:1.1rem;margin:0 0 .1em}
+.verdict p{margin:0}
+.verdict.right{border-color:var(--ok);background:var(--okbg)} .verdict.right .vi{background:var(--ok)}
+.verdict.wrong{border-color:var(--no);background:var(--nobg)} .verdict.wrong .vi{background:var(--no)}
+.verdict.locked{border-color:var(--accent)}
+button.is-right,button.is-right[aria-pressed="true"]{border:2px solid var(--ok);background:var(--okbg);color:var(--ink)}
+button.is-wrong,button.is-wrong[aria-pressed="true"]{border:2px solid var(--no);background:var(--nobg);color:var(--ink)}
+button.is-right::before{content:"\2713  ";font-weight:800;color:var(--ok)}
+button.is-wrong::before{content:"\2717  ";font-weight:800;color:var(--no)}
+@media (prefers-reduced-motion:no-preference){.verdict{animation:vpop .28s ease-out}}
+@keyframes vpop{from{transform:scale(.96);opacity:.3}to{transform:none;opacity:1}}
+body.projector .verdict{font-size:19px} body.projector .verdict .vt{font-size:1.3rem} body.projector .verdict .vi{width:44px;height:44px;font-size:26px}
+#stepNum{display:none}
+#nsw{max-height:235px;margin-inline:auto}
+.opts{gap:4px}
+#dist,#qcurve{max-height:var(--dh,320px);margin-inline:auto}
+.verdict{padding:7px 12px;margin-top:.35em} .verdict .vi{width:28px;height:28px;font-size:17px}
+.card{padding-top:10px}
+</style>
+</head>
+<body class="laptop">
+<main>
+  <div class="topbar">
+    <h1>Average effect or quantile effect?</h1>
+    <div class="seg" role="group" aria-label="Text size">
+      <button type="button" id="scLaptop" aria-pressed="true">Laptop</button>
+      <button type="button" id="scProj" aria-pressed="false">Projector</button>
+    </div>
+  </div>
+  <nav class="stepbar" id="stepbar" aria-label="Steps"></nav>
+  <section class="card" aria-labelledby="stepH">
+    <p class="stepnum" id="stepNum"></p>
+    <h2 id="stepH" tabindex="-1"></h2>
+    <p class="hint" id="stepHint"></p>
+
+    <div id="vModel">
+      <div class="choices" id="predChoices" role="group" aria-label="Your prediction"></div>
+      <div class="ctl" id="ctlRow">
+        <span class="seg" role="group" aria-label="Shape of earnings" id="shapeSeg">
+          <button type="button" data-shape="bell" aria-pressed="true">Bell-shaped</button>
+          <button type="button" data-shape="skew" aria-pressed="false">Skewed, like earnings</button>
+        </span>
+        <label id="lShift">Shift everyone by <input type="range" id="inShift" min="-2" max="6" step="0.1"> <output id="oShift"></output></label>
+        <label id="lK">Stretch earnings under training <input type="range" id="inK" min="0.5" max="1.8" step="0.05"> <output id="oK"></output></label>
+        <label id="lPct">Percentile <input type="range" id="inPct" min="5" max="95" step="1"> <output id="oPct"></output></label>
+      </div>
+      <div class="readouts" aria-live="polite" id="readouts"></div>
+      <div class="charts" id="charts">
+        <div><svg class="chart" id="dist" viewBox="0 0 760 320" role="img" aria-label=""></svg></div>
+        <div id="qWrap" hidden><svg class="chart" id="qcurve" viewBox="0 0 500 300" role="img" aria-label=""></svg></div>
+      </div>
+      <p class="note" id="axisNote">Annual earnings of the treated group, in thousands of dollars. Both curves describe the same people: with training, Y(1), and without it, Y(0).</p>
+      <div id="qBox" hidden>
+        <p class="q" id="qText" style="margin:.4em 0 .2em"></p>
+        <div class="choices" id="qOpts" role="group" aria-labelledby="qText"></div>
+        <div class="qrow"><button type="button" class="primary" id="qCheck">Check</button><div id="qFb" aria-live="polite" style="flex:1 1 300px"></div></div>
+      </div>
+      <div id="foundBox" aria-live="polite" hidden></div>
+      <div id="revealWrap" hidden>
+        <div class="box" id="revealBox" hidden></div>
+      </div>
+    </div>
+
+    <div id="vReal" hidden>
+      <div class="two">
+        <div>
+          <svg class="chart" id="nsw" viewBox="0 0 460 280" role="img" aria-label="NSW experiment: quantile effects for the treated at the 10th, 50th and 90th percentiles, with 95% intervals, and the ATT as a dashed line"></svg>
+        </div>
+        <div>
+          <table>
+            <thead><tr><th>Effect of training on 1978 earnings</th><th class="num">Estimate</th><th class="num">95% interval</th></tr></thead>
+            <tbody>
+              <tr><td>ATT (difference in means)</td><td class="num">$1,794</td><td class="num">$512 to $3,146</td></tr>
+              <tr><td>QTET, 10th percentile</td><td class="num">$0</td><td class="num">$0 to $0</td></tr>
+              <tr><td>QTET, median</td><td class="num">$1,094</td><td class="num">−$453 to $3,008</td></tr>
+              <tr><td>QTET, 90th percentile</td><td class="num">$3,198</td><td class="num">$25 to $6,794</td></tr>
+            </tbody>
+          </table>
+          <p class="note">At least 10% of trainees earned nothing in 1978, with or without training, so the 10th percentile is $0 in both worlds.</p>
+        </div>
+      </div>
+      <p class="q" id="exitQ">The QTET at the 10th percentile is $0. Which statement does that support?</p>
+      <div class="opts" role="group" aria-labelledby="exitQ" id="exitOpts"></div>
+      <div><button type="button" class="primary" id="checkBtn" style="margin-top:8px">Check</button></div>
+      <div id="exitFb" aria-live="polite"></div>
+    </div>
+
+    <div class="moves">
+      <button type="button" id="prevStep">← Previous</button>
+      <button type="button" id="nextStep">Next →</button>
+    </div>
+  </section>
+
+  <details>
+    <summary>Assumptions</summary>
+    <ul id="ledger"></ul>
+    <p class="note">Left out: estimating these effects from observational data (matching, quantile regression), and sampling uncertainty outside the NSW table.</p>
+  </details>
+</main>
+<script>
+(function(){
+'use strict';
+// Big, obvious feedback on an answer: kind is 'right', 'wrong' or 'locked' (a prediction recorded, answer to come).
+function verdict(kind, text, title){
+  var t = title || (kind === 'right' ? 'Right!' : kind === 'wrong' ? 'Not quite. Try another answer.' : 'Prediction locked in');
+  return '<div class="verdict ' + kind + '" role="status"><span class="vi" aria-hidden="true">' + (kind === 'right' ? '✓' : kind === 'wrong' ? '✗' : '●') + '</span><div><p class="vt">' + t + '</p><p>' + text + '</p></div></div>';
+}
+// Mark the chosen option button right or wrong once checked (others plain).
+function markOpts(box, attr, chosen, right, checked){
+  box.querySelectorAll('[' + attr + ']').forEach(function(b){
+    var v = b.getAttribute(attr), on = checked && v === chosen;
+    b.classList.toggle('is-right', on && v === right);
+    b.classList.toggle('is-wrong', on && v !== right);
+  });
+}
+
+/* ---------- Model ----------
+   Earnings without training for the treated, Y(0), are written as a function of a
+   standard-normal rank score z (percentile θ = Φ(z)):
+     bell:  g0(z) = 12 + 2.5 z            (normal, mean = median = 12)
+     skew:  g0(z) = 10 · exp(0.35 z)      (lognormal, median 10, mean 10·e^(0.35²/2))
+   Training moves each percentile:  g1(z) = g0(z) + shift + (k − 1)(g0(z) − median0).
+   QTET(θ) = g1(z) − g0(z);  ATT = mean1 − mean0 = shift + (k − 1)(mean0 − median0). */
+var SHAPES = {
+  bell: { g0: function(z){ return 12 + 2.5 * z; }, med0: 12, mean0: 12, xmax: 32 },
+  skew: { g0: function(z){ return 10 * Math.exp(0.35 * z); }, med0: 10, mean0: 10 * Math.exp(0.35 * 0.35 / 2), xmax: 46 }
+};
+function model(p){
+  var S = SHAPES[p.shape];
+  var g0 = S.g0;
+  var g1 = function(z){ var a = g0(z); return a + p.shift + (p.k - 1) * (a - S.med0); };
+  var att = p.shift + (p.k - 1) * (S.mean0 - S.med0);
+  return {
+    g0: g0, g1: g1, xmax: S.xmax, mean0: S.mean0, mean1: S.mean0 + att, att: att,
+    qte: function(theta){ var z = zq(theta); return g1(z) - g0(z); },
+    q0: function(theta){ return g0(zq(theta)); },
+    q1: function(theta){ return g1(zq(theta)); }
+  };
+}
+// Inverse standard-normal CDF (Acklam), |error| < 1.2e-9 after one Newton step is not needed here.
+function zq(p){
+  var a = [-3.969683028665376e+01, 2.209460984245205e+02, -2.759285104469687e+02, 1.383577518672690e+02, -3.066479806614716e+01, 2.506628277459239e+00];
+  var b = [-5.447609879822406e+01, 1.615858368580409e+02, -1.556989798598866e+02, 6.680131188771972e+01, -1.328068155288572e+01];
+  var c = [-7.784894002430293e-03, -3.223964580411365e-01, -2.400758277161838e+00, -2.549732539343734e+00, 4.374664141464968e+00, 2.938163982698783e+00];
+  var d = [7.784695709041462e-03, 3.224671290700398e-01, 2.445134137142996e+00, 3.754408661907416e+00];
+  var pl = 0.02425, q, r;
+  if(p <= 0) return -Infinity; if(p >= 1) return Infinity;
+  if(p < pl){ q = Math.sqrt(-2 * Math.log(p)); return (((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) / ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1); }
+  if(p > 1 - pl){ q = Math.sqrt(-2 * Math.log(1 - p)); return -(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) / ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1); }
+  q = p - 0.5; r = q * q;
+  return (((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q / (((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1);
+}
+function phi(z){ return Math.exp(-z * z / 2) / Math.sqrt(2 * Math.PI); }
+// Density of g(Z), Z standard normal, traced as points (g(z), φ(z) / g'(z)).
+function densityPts(g){
+  var pts = [];
+  for(var z = -3.6; z <= 3.6001; z += 0.03){ var h = 1e-4, d = (g(z + h) - g(z - h)) / (2 * h); pts.push([g(z), phi(z) / d]); }
+  return pts;
+}
+function avgQte(m, n){ var s = 0; for(var i = 0; i < n; i++) s += m.qte((i + 0.5) / n); return s / n; }
+
+/* ---------- Steps and text ---------- */
+var STEPS = [
+  { tab: '1 Predict', h: 'Did everyone gain the average?',
+    hint: 'A job-training program raises its trainees’ average earnings by $4,000. Among those same trainees, how much did the 10th percentile of earnings rise? Agree on an answer as a group.' },
+  { tab: '2 Slide the percentile', h: 'Move the percentile slider from the 10th to the 90th.',
+    hint: 'The ATT compares the two averages. The quantile effect (QTET) compares the same percentile of the two curves.' },
+  { tab: '3 Stretch', h: 'Can the average rise while the bottom falls?',
+    hint: 'Stretch earnings under training, and set the percentile to 10. Find a setting where the ATT is positive but the QTET at the 10th percentile is negative. As a group: who is worse off, and does the ATT show it?' },
+  { tab: '4 Every percentile', h: 'Is the ATT the effect at the median?',
+    hint: 'The second chart plots the QTET at every percentile; the dashed line is the ATT. Switch to skewed earnings and stretch them. Compare the ATT with the curve at the 50th percentile.' },
+  { tab: '5 Real data', h: 'What did job training do across the distribution?',
+    hint: 'The NSW job-training experiment, Dehejia–Wahba sample: 185 trainees and 260 randomized controls, earnings in 1978 (Diamond 2005, Table 2).' }
+];
+var PRED = [
+  ['same', 'By $4,000, the same as the average'],
+  ['less', 'By less than $4,000'],
+  ['more', 'By more than $4,000'],
+  ['cant', 'The average alone can’t tell us']
+];
+var EXIT = [
+  ['a', 'The trainees with the lowest earnings gained nothing from training.'],
+  ['b', 'With or without training, the trainees’ 10th percentile of earnings was the same.'],
+  ['c', 'Training helped no one who earns little.']
+];
+var Q2 = { q: 'With stretch \u00d71.00 (only a shift), does the QTET ever differ from the ATT?', right: 'never',
+  opts: [['never', 'No: it equals the ATT at every percentile'], ['some', 'Yes, at some percentiles'], ['tails', 'Only in the tails']],
+  fb: { never: 'A pure shift moves every percentile by the same amount, so every QTET equals the ATT. Next: what if training also spreads earnings out?',
+        some: 'Slide the percentile all the way from the 5th to the 95th and watch the two readouts: with stretch \u00d71.00 they never differ.',
+        tails: 'Try the 5th and the 95th percentile: with stretch \u00d71.00 the QTET still equals the ATT.' } };
+var Q4 = { q: 'At the current settings, how does the ATT compare with the QTET at the 50th percentile?',
+  opts: [['above', 'The ATT is larger'], ['equal', 'They are equal'], ['below', 'The ATT is smaller']] };
+function q4Right(m){ var d = m.att - m.qte(0.5); return d > 0.05 ? 'above' : d < -0.05 ? 'below' : 'equal'; }
+var EXIT_FB = {
+  a: 'Not quite. A quantile effect compares two distributions, not the same people. The trainee at the 10th percentile with training need not be the one at the 10th percentile without it: some who would have earned nothing may have moved up, and others taken their place.',
+  b: 'Right. The QTET compares the 10th percentile of two distributions, Y(1) and Y(0) for the trainees. It says nothing about which people sit there, so it can’t say who gained.',
+  c: 'Not quite. A quantile effect compares two distributions, not the same people. Some low earners may have gained a lot and moved up the distribution; the 10th percentile only says where the distribution’s bottom tenth begins.'
+};
+var LEDGER = [
+  ['interpretation', 'Both curves are the treated group’s potential outcomes: earnings with training, Y(1), and without, Y(0). Y(0) for the treated is never observed; the model shows it as if it were known. Hence ATT and QTET, not ATE and QTE.'],
+  ['distribution', 'Bell-shaped: Y(0) is normal with mean $12,000 and SD $2,500. Skewed: Y(0) is lognormal with median $10,000 and log-SD 0.35 (mean about $10,600).'],
+  ['simplification', 'Training moves the earnings at percentile θ to Q₀(θ) + shift + (stretch − 1)(Q₀(θ) − median of Y(0)). Stretch 1 moves every percentile by the same amount.'],
+  ['parameter', 'Shift from −$2,000 to +$6,000; stretch from 0.5 to 1.8; percentile from 5th to 95th.'],
+  ['simplification', 'The chart cuts earnings off at $0; the tails cut off are tiny. Real earnings pile up at $0, which these smooth curves leave out.'],
+  ['data', 'Step 5: estimates from the randomized NSW experiment, Dehejia–Wahba subsample, with bootstrapped 95% intervals (Diamond 2005, “Reliable Quantile Effect Estimation in Observational Studies”, Table 2).']
+];
+
+/* ---------- State ---------- */
+var state = { step: 0, pred: '', q2: '', q2checked: false, q4: '', shape: 'bell', shift: 4, k: 1, pct: 10, found: false, revealed: false, exit: '', checked: false, scale: 'laptop' };
+var listeners = [];
+function validEntry(k, v){
+  if(k === 'step' || k === 'shift' || k === 'k' || k === 'pct') return typeof v === 'number' && isFinite(v);
+  if(k === 'pred') return v === '' || PRED.some(function(p){ return p[0] === v; });
+  if(k === 'exit') return v === '' || EXIT.some(function(p){ return p[0] === v; });
+  if(k === 'shape') return v in SHAPES;
+  if(k === 'scale') return v === 'laptop' || v === 'projector';
+  if(k === 'found' || k === 'revealed' || k === 'checked' || k === 'q2checked') return typeof v === 'boolean';
+  if(k === 'q2') return v === '' || Q2.opts.some(function(o){ return o[0] === v; });
+  if(k === 'q4') return v === '' || Q4.opts.some(function(o){ return o[0] === v; });
+  return false;
+}
+function clamp(v, lo, hi){ return Math.max(lo, Math.min(hi, v)); }
+function apply(p){
+  Object.keys(p || {}).forEach(function(k){
+    var v = p[k];
+    if(!Object.prototype.hasOwnProperty.call(state, k) || !validEntry(k, v)) return;
+    if(k === 'step') v = clamp(Math.round(v), 0, STEPS.length - 1);
+    if(k === 'shift') v = clamp(Math.round(v * 10) / 10, -2, 6);
+    if(k === 'k') v = clamp(Math.round(v * 20) / 20, 0.5, 1.8);
+    if(k === 'pct') v = clamp(Math.round(v), 5, 95);
+    state[k] = v;
+  });
+}
+function getState(){ return JSON.parse(JSON.stringify(state)); }
+function change(p){
+  apply(p);
+  // Step 3's discovery unlocks once the group reaches ATT > 0 with a negative 10th-percentile QTET.
+  if(!state.found && state.step >= 2){ var m = model(state); if(m.att > 0.05 && m.qte(0.10) < -0.05) state.found = true; }
+  render();
+  var s = getState(); listeners.forEach(function(fn){ try{ fn(s); }catch(e){} });
+}
+function setState(p){ if(!p || typeof p !== 'object') return; apply(p); render(); }
+
+/* ---------- Formatting ---------- */
+var nf = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
+function money(v){ var d = Math.round(v * 100) * 10; if(d === 0) return '$0'; return (d > 0 ? '+' : '−') + '$' + nf.format(Math.abs(d)); }
+function ord(n){ var s = ['th', 'st', 'nd', 'rd'], v = n % 100; return n + (s[(v - 20) % 10] || s[v] || s[0]); }
+function esc(s){ return String(s).replace(/[&<>"']/g, function(c){ return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+function niceTicks(lo, hi, n){
+  var span = hi - lo, step = Math.pow(10, Math.floor(Math.log10(span / n))), err = span / n / step;
+  step *= err >= 7.5 ? 10 : err >= 3.5 ? 5 : err >= 1.5 ? 2 : 1;
+  var t = [], v = Math.ceil(lo / step) * step; for(; v <= hi + 1e-9; v += step) t.push(Math.round(v * 1e6) / 1e6); return t;
+}
+
+/* ---------- Charts ---------- */
+var SVGNS = 'http://www.w3.org/2000/svg';
+function el(name, attrs, text){ var e = document.createElementNS(SVGNS, name); for(var a in attrs) e.setAttribute(a, attrs[a]); if(text != null) e.textContent = text; return e; }
+function arrowDefs(svg){
+  var defs = el('defs', {});
+  ['ink', 'neg'].forEach(function(id){
+    var mk = el('marker', { id: 'ah-' + svg.id + '-' + id, viewBox: '0 0 10 10', refX: 9, refY: 5, markerWidth: 7, markerHeight: 7, orient: 'auto-start-reverse' });
+    mk.appendChild(el('path', { d: 'M0,0 L10,5 L0,10 z', style: 'fill:var(--' + (id === 'neg' ? 'neg' : 'ink') + ')' }));
+    defs.appendChild(mk);
+  });
+  return defs;
+}
+function drawDist(m, showQ, showCurves){
+  var svg = document.getElementById('dist'); svg.textContent = '';
+  var narrow = window.innerWidth < 600;
+  var W = narrow ? 420 : state.step === 3 ? 560 : 760, H = narrow ? 280 : state.step === 3 ? 270 : (state.step === 1 || state.step === 2) ? 262 : 300;
+  svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+  var L = 18, R = 16, T = 26, B = 64, pw = W - L - R, ph = H - T - B;
+  var c0 = densityPts(m.g0), c1 = densityPts(m.g1);
+  var ymax = 0; c0.concat(c1).forEach(function(p){ if(p[0] >= 0 && p[0] <= m.xmax && p[1] > ymax) ymax = p[1]; });
+  ymax *= 1.08;
+  var X = function(x){ return L + x / m.xmax * pw; }, Y = function(y){ return T + ph - y / ymax * ph; };
+  svg.appendChild(arrowDefs(svg));
+  var clip = el('clipPath', { id: 'plotclip' }); clip.appendChild(el('rect', { x: L, y: T - 20, width: pw, height: ph + 20 })); svg.appendChild(clip);
+  var g = el('g', { 'clip-path': 'url(#plotclip)' }); svg.appendChild(g);
+  // axis and ticks
+  svg.appendChild(el('line', { x1: L, x2: L + pw, y1: T + ph, y2: T + ph, style: 'stroke:var(--muted)', 'stroke-width': 1 }));
+  niceTicks(0, m.xmax, W < 700 ? 5 : 8).forEach(function(t){
+    svg.appendChild(el('line', { x1: X(t), x2: X(t), y1: T + ph, y2: T + ph + 4, style: 'stroke:var(--muted)' }));
+    svg.appendChild(el('text', { x: X(t), y: T + ph + 17, 'text-anchor': 'middle', 'class': 'muted' }, (t === 0 ? '$0' : '$' + t + 'k')));
+  });
+  var path = function(pts){ return pts.map(function(p, i){ return (i ? 'L' : 'M') + X(p[0]).toFixed(1) + ',' + Y(p[1]).toFixed(1); }).join(''); };
+  if(showCurves){
+  g.appendChild(el('path', { d: path(c0), 'class': 'curve', fill: 'none', style: 'stroke:var(--c0)', 'stroke-width': 3 }));
+  g.appendChild(el('path', { d: path(c1), 'class': 'curve', fill: 'none', style: 'stroke:var(--c1)', 'stroke-width': 3 }));
+  // direct labels on the outer flanks: Y(0) to the left of its peak, Y(1) to the right
+  var flank = function(pts, side){
+    var pk = 0; pts.forEach(function(p, i){ if(p[1] > pts[pk][1]) pk = i; });
+    var target = pts[pk][1] * 0.62, i = pk;
+    while(i > 0 && i < pts.length - 1 && pts[i][1] > target) i += side;
+    return pts[i];
+  };
+  var f0 = flank(c0, -1), f1 = flank(c1, 1);
+  var x0l = X(f0[0]) - 10, x1l = X(f1[0]) + 10, an0 = 'end', an1 = 'start';
+  if(x0l < L + 175){ x0l = L + 2; an0 = 'start'; }
+  if(x1l > L + pw - 160){ x1l = L + pw - 2; an1 = 'end'; }
+  var halo = 'paint-order:stroke;stroke:var(--card);stroke-width:5px;stroke-linejoin:round';
+  if(W < 700){
+    [['c0', 'lab0', 'Without training, Y(0)'], ['c1', 'lab1', 'With training, Y(1)']].forEach(function(r, j){
+      var ly = T + 2 + j * (document.body.classList.contains('projector') ? 26 : 19), lx = L + pw - 24;
+      svg.appendChild(el('line', { x1: lx, x2: lx + 22, y1: ly - 4, y2: ly - 4, style: 'stroke:var(--' + r[0] + ')', 'stroke-width': 3 }));
+      svg.appendChild(el('text', { x: lx - 6, y: ly, 'text-anchor': 'end', 'class': r[1], style: halo }, r[2]));
+    });
+  } else {
+  svg.appendChild(el('text', { x: x0l, y: Y(f0[1]) - (an0 === 'start' ? 22 : 0), 'text-anchor': an0, 'class': 'lab0', style: halo }, 'Without training, Y(0)'));
+  svg.appendChild(el('text', { x: x1l, y: Y(f1[1]) - (an1 === 'end' ? 22 : 0), 'text-anchor': an1, 'class': 'lab1', style: halo }, 'With training, Y(1)'));
+  }
+  }
+  else svg.appendChild(el('text', { x: L + 8, y: T + ph * 0.62, 'class': 'muted' }, 'All you know: the two averages.'));
+  // ATT: dotted lines at the means, arrow between them
+  var yAtt = T + ph * 0.30, yQ = T + ph * 0.78;
+  [[m.mean0, 'c0', 'μ₀'], [m.mean1, 'c1', 'μ₁']].forEach(function(r){
+    g.appendChild(el('line', { x1: X(r[0]), x2: X(r[0]), y1: T + ph, y2: yAtt - 6, style: 'stroke:var(--' + r[1] + ')', 'stroke-width': 2, 'stroke-dasharray': '2 5', 'stroke-linecap': 'round' }));
+  });
+  drawArrow(svg, X(m.mean0), X(m.mean1), yAtt, 'ATT = ' + money(m.att), m.att, W);
+  var row1 = T + ph + 36, row2 = T + ph + 56;
+  placeSymbols(svg, [[X(m.mean0), 'lab0', 'μ₀'], [X(m.mean1), 'lab1', 'μ₁']], row1);
+  if(showQ){
+    var th = state.pct / 100, x0 = m.q0(th), x1 = m.q1(th), qte = x1 - x0;
+    [[x0, 'c0'], [x1, 'c1']].forEach(function(r){
+      g.appendChild(el('line', { x1: X(r[0]), x2: X(r[0]), y1: T + ph, y2: yQ - 6, style: 'stroke:var(--' + r[1] + ')', 'stroke-width': 2.5, 'stroke-dasharray': '9 5' }));
+    });
+    drawArrow(svg, X(x0), X(x1), yQ, (W < 700 ? 'QTET' : 'QTET at ' + ord(state.pct) + ' percentile') + ' = ' + money(qte), qte, W);
+    placeSymbols(svg, [[X(x0), 'lab0', 'q₀'], [X(x1), 'lab1', 'q₁']], row2);
+  }
+  svg.setAttribute('aria-label', 'Two earnings distributions for the treated group. Mean without training ' + money(m.mean0).replace('+', '') + ', with training ' + money(m.mean1).replace('+', '') + '; ATT ' + money(m.att) + '.' +
+    (showQ ? ' At the ' + ord(state.pct) + ' percentile: ' + money(m.q0(state.pct / 100)).replace('+', '') + ' without training, ' + money(m.q1(state.pct / 100)).replace('+', '') + ' with; QTET ' + money(m.qte(state.pct / 100)) + '.' : ''));
+}
+function drawArrow(svg, xa, xb, y, label, v, W){
+  var neg = v < -0.005, col = neg ? 'neg' : 'ink';
+  svg.appendChild(el('line', { x1: xa, x2: xa, y1: y - 6, y2: y + 6, style: 'stroke:var(--' + col + ')', 'stroke-width': 2 }));
+  if(Math.abs(xb - xa) > 3) svg.appendChild(el('line', { x1: xa, x2: xb, y1: y, y2: y, 'class': 'arrow', style: 'stroke:var(--' + col + ')', 'stroke-width': 2, 'marker-end': 'url(#ah-' + svg.id + '-' + col + ')' }));
+  var mid = clamp((xa + xb) / 2, 150, W - 150);
+  var t = el('text', { x: mid, y: y - 10, 'text-anchor': 'middle', style: 'font-weight:650;paint-order:stroke;stroke:var(--card);stroke-width:5px;stroke-linejoin:round' + (neg ? ';fill:var(--neg)' : '') }, label);
+  svg.appendChild(t);
+}
+// Symbol labels under the axis; nudge apart when they would overlap.
+function placeSymbols(svg, items, y){
+  items.sort(function(a, b){ return a[0] - b[0]; });
+  if(items.length === 2 && items[1][0] - items[0][0] < 26){ var c = (items[0][0] + items[1][0]) / 2; items[0][0] = c - 13; items[1][0] = c + 13; }
+  items.forEach(function(r){ svg.appendChild(el('text', { x: r[0], y: y, 'text-anchor': 'middle', 'class': r[1], style: 'font-family:Georgia,serif;font-style:italic' }, r[2])); });
+}
+function drawQcurve(m){
+  var svg = document.getElementById('qcurve'); svg.textContent = '';
+  var W = 500, H = 300, L = 62, R = 44, T = 18, B = 44, pw = W - L - R, ph = H - T - B;
+  var pts = []; for(var i = 1; i <= 99; i++){ pts.push([i / 100, m.qte(i / 100)]); }
+  var lo = Math.min(0, m.att), hi = Math.max(0, m.att);
+  pts.forEach(function(p){ lo = Math.min(lo, p[1]); hi = Math.max(hi, p[1]); });
+  var pad = Math.max(0.5, (hi - lo) * 0.12); lo -= pad; hi += pad;
+  var X = function(t){ return L + t * pw; }, Y = function(v){ return T + ph - (v - lo) / (hi - lo) * ph; };
+  svg.appendChild(el('line', { x1: L, x2: L + pw, y1: T + ph, y2: T + ph, style: 'stroke:var(--muted)' }));
+  [10, 25, 50, 75, 90].forEach(function(p){
+    svg.appendChild(el('line', { x1: X(p / 100), x2: X(p / 100), y1: T + ph, y2: T + ph + 4, style: 'stroke:var(--muted)' }));
+    svg.appendChild(el('text', { x: X(p / 100), y: T + ph + 17, 'text-anchor': 'middle', 'class': 'muted' }, ord(p)));
+  });
+  svg.appendChild(el('text', { x: L + pw / 2, y: H - 3, 'text-anchor': 'middle', 'class': 'muted' }, 'Percentile of earnings'));
+  niceTicks(lo, hi, 4).forEach(function(t){
+    svg.appendChild(el('line', { x1: L, x2: L + pw, y1: Y(t), y2: Y(t), style: 'stroke:var(--faint)' }));
+    svg.appendChild(el('text', { x: L - 6, y: Y(t) + 4, 'text-anchor': 'end', 'class': 'muted' }, (t === 0 ? '$0' : (t > 0 ? '+' : '−') + '$' + Math.abs(t) + 'k')));
+  });
+  if(lo < 0 && hi > 0) svg.appendChild(el('line', { x1: L, x2: L + pw, y1: Y(0), y2: Y(0), style: 'stroke:var(--muted)', 'stroke-width': 1 }));
+  svg.appendChild(el('line', { x1: L, x2: L + pw, y1: Y(m.att), y2: Y(m.att), style: 'stroke:var(--ink)', 'stroke-width': 1.5, 'stroke-dasharray': '6 5' }));
+  svg.appendChild(el('text', { x: L + pw + 4, y: Y(m.att) + 4, style: 'font-weight:650' }, 'ATT'));
+  svg.appendChild(el('path', { d: pts.map(function(p, i){ return (i ? 'L' : 'M') + X(p[0]).toFixed(1) + ',' + Y(p[1]).toFixed(1); }).join(''), 'class': 'curve', fill: 'none', style: 'stroke:var(--accent)', 'stroke-width': 3 }));
+  var th = state.pct / 100;
+  svg.appendChild(el('circle', { cx: X(th), cy: Y(m.qte(th)), r: 5.5, style: 'fill:var(--card);stroke:var(--accent)', 'stroke-width': 2.5 }));
+  svg.appendChild(el('text', { x: L + 4, y: T + 10, 'class': 'muted' }, 'QTET'));
+  svg.setAttribute('aria-label', 'QTET at every percentile, from ' + money(m.qte(0.01)) + ' at the 1st to ' + money(m.qte(0.99)) + ' at the 99th; median ' + money(m.qte(0.5)) + '; ATT ' + money(m.att) + ' shown as a dashed line.');
+}
+function drawNsw(){
+  var svg = document.getElementById('nsw'); svg.textContent = '';
+  var W = 460, H = 280, L = 58, R = 54, T = 16, B = 40, pw = W - L - R, ph = H - T - B, lo = -1, hi = 7;
+  var X = function(i){ return L + (i + 0.5) / 3 * pw; }, Y = function(v){ return T + ph - (v - lo) / (hi - lo) * ph; };
+  [0, 2, 4, 6].concat([-1]).forEach(function(t){
+    svg.appendChild(el('line', { x1: L, x2: L + pw, y1: Y(t), y2: Y(t), style: 'stroke:' + (t === 0 ? 'var(--muted)' : 'var(--faint)') }));
+    svg.appendChild(el('text', { x: L - 6, y: Y(t) + 4, 'text-anchor': 'end', 'class': 'muted' }, (t === 0 ? '$0' : (t < 0 ? '−' : '') + '$' + Math.abs(t) + 'k')));
+  });
+  svg.appendChild(el('line', { x1: L, x2: L + pw, y1: Y(1.79432), y2: Y(1.79432), style: 'stroke:var(--ink)', 'stroke-width': 1.5, 'stroke-dasharray': '6 5' }));
+  svg.appendChild(el('text', { x: L + pw + 4, y: Y(1.79432) + 4, style: 'font-weight:650' }, 'ATT'));
+  [['10th', 0, 0, 0], ['Median', 1.09351, -0.45313, 3.0083], ['90th', 3.1978, 0.02521, 6.79398]].forEach(function(r, i){
+    svg.appendChild(el('line', { x1: X(i), x2: X(i), y1: Y(r[2]), y2: Y(r[3]), style: 'stroke:var(--accent)', 'stroke-width': 2 }));
+    [r[2], r[3]].forEach(function(v){ svg.appendChild(el('line', { x1: X(i) - 7, x2: X(i) + 7, y1: Y(v), y2: Y(v), style: 'stroke:var(--accent)', 'stroke-width': 2 })); });
+    svg.appendChild(el('circle', { cx: X(i), cy: Y(r[1]), r: 6, style: 'fill:var(--accent)' }));
+    svg.appendChild(el('text', { x: X(i), y: T + ph + 20, 'text-anchor': 'middle', 'class': 'muted' }, r[0]));
+  });
+  svg.appendChild(el('text', { x: L + pw / 2, y: H - 2, 'text-anchor': 'middle', 'class': 'muted' }, 'Percentile (QTET with 95% interval)'));
+}
+
+/* ---------- Page ---------- */
+var stepbar = document.getElementById('stepbar');
+STEPS.forEach(function(s, i){
+  var b = document.createElement('button'); b.type = 'button'; b.textContent = s.tab;
+  b.addEventListener('click', function(){ goStep(i); });
+  stepbar.appendChild(b);
+});
+document.getElementById('ledger').innerHTML = LEDGER.map(function(l){ return '<li><span class="kind">' + l[0] + '</span>' + esc(l[1]) + '</li>'; }).join('');
+document.getElementById('predChoices').innerHTML = PRED.map(function(p){ return '<button type="button" data-pred="' + p[0] + '" aria-pressed="false">' + esc(p[1]) + '</button>'; }).join('');
+document.getElementById('exitOpts').innerHTML = EXIT.map(function(p){ return '<button type="button" data-exit="' + p[0] + '" aria-pressed="false">' + esc(p[1]) + '</button>'; }).join('');
+function goStep(i){ change({ step: i }); window.scrollTo(0, 0); document.getElementById('stepH').focus(); }
+document.getElementById('prevStep').addEventListener('click', function(){ goStep(state.step - 1); });
+document.getElementById('nextStep').addEventListener('click', function(){ goStep(state.step + 1); });
+document.getElementById('scLaptop').addEventListener('click', function(){ change({ scale: 'laptop' }); });
+document.getElementById('scProj').addEventListener('click', function(){ change({ scale: 'projector' }); });
+document.getElementById('predChoices').addEventListener('click', function(e){ var b = e.target.closest('[data-pred]'); if(b) change({ pred: b.getAttribute('data-pred') }); });
+document.getElementById('exitOpts').addEventListener('click', function(e){ var b = e.target.closest('[data-exit]'); if(b) change({ exit: b.getAttribute('data-exit'), checked: false }); });
+document.getElementById('checkBtn').addEventListener('click', function(){ if(state.exit) change({ checked: true }); });
+document.getElementById('qOpts').addEventListener('click', function(e){ var b = e.target.closest('[data-q]'); if(!b) return; var v = b.getAttribute('data-q');
+  if(state.step === 0) change({ pred: v }); else if(state.step === 1) change({ q2: v, q2checked: false }); else if(state.step === 3) change({ q4: v, revealed: false }); });
+document.getElementById('qCheck').addEventListener('click', function(){ if(state.step === 1 && state.q2) change({ q2checked: true }); if(state.step === 3 && state.q4) change({ revealed: true }); });
+document.getElementById('shapeSeg').addEventListener('click', function(e){ var b = e.target.closest('[data-shape]'); if(b) change({ shape: b.getAttribute('data-shape') }); });
+[['inShift', 'shift'], ['inK', 'k'], ['inPct', 'pct']].forEach(function(r){
+  document.getElementById(r[0]).addEventListener('input', function(e){ var o = {}; o[r[1]] = parseFloat(e.target.value); change(o); });
+});
+
+function render(){
+  document.body.className = state.scale;
+  document.getElementById('scLaptop').setAttribute('aria-pressed', String(state.scale === 'laptop'));
+  document.getElementById('scProj').setAttribute('aria-pressed', String(state.scale === 'projector'));
+  var s = state.step, step = STEPS[s];
+  document.getElementById('stepNum').textContent = 'Step ' + (s + 1) + ' of ' + STEPS.length;
+  document.getElementById('stepH').textContent = step.h;
+  document.getElementById('stepHint').textContent = step.hint;
+  [].forEach.call(stepbar.children, function(b, i){ if(i === s) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current'); });
+  document.getElementById('vModel').hidden = s === 4;
+  document.getElementById('vReal').hidden = s !== 4;
+  document.getElementById('prevStep').disabled = s === 0;
+  document.getElementById('nextStep').disabled = s === STEPS.length - 1;
+  if(s === 4){ renderReal(); return; }
+  var m = model(state), showQ = s >= 1;
+  document.getElementById('predChoices').hidden = true;
+  document.querySelectorAll('[data-pred]').forEach(function(b){ b.setAttribute('aria-pressed', String(state.pred === b.getAttribute('data-pred'))); });
+  document.getElementById('ctlRow').hidden = s === 0;
+  document.getElementById('shapeSeg').hidden = s < 3;
+  document.getElementById('lK').hidden = s < 2;
+  document.querySelectorAll('[data-shape]').forEach(function(b){ b.setAttribute('aria-pressed', String(state.shape === b.getAttribute('data-shape'))); });
+  syncInput('inShift', state.shift); syncInput('inK', state.k); syncInput('inPct', state.pct);
+  document.getElementById('oShift').textContent = money(state.shift);
+  document.getElementById('oK').textContent = '×' + state.k.toFixed(2);
+  document.getElementById('oPct').textContent = ord(state.pct);
+  var q = m.qte(state.pct / 100);
+  var cls = function(v){ return v < -0.005 ? ' class="neg"' : ''; };
+  document.getElementById('readouts').innerHTML = s === 0
+    ? '<span>Average earnings: <strong>' + money(m.mean0).replace('+', '') + '</strong> without training, <strong>' + money(m.mean1).replace('+', '') + '</strong> with training. ATT: <strong>' + money(m.att) + '</strong></span>'
+    : '<span>ATT: <strong' + cls(m.att) + '>' + money(m.att) + '</strong></span><span>QTET at ' + ord(state.pct) + ' percentile: <strong' + cls(q) + '>' + money(q) + '</strong></span>' +
+      (s === 2 && state.pct !== 10 ? '<span>QTET at 10th: <strong' + cls(m.qte(0.1)) + '>' + money(m.qte(0.1)) + '</strong></span>' : '');
+  document.getElementById('charts').style.setProperty('--dh', ({ 0: '330px', 1: '268px', 2: state.found ? '232px' : '300px', 3: '228px' })[s] || '320px');
+  drawDist(m, showQ, s >= 1);
+  document.getElementById('qWrap').hidden = s !== 3; document.getElementById('charts').className = s === 3 ? 'charts side' : 'charts'; if(s === 3) drawQcurve(m);
+  var fb = document.getElementById('foundBox');
+  fb.hidden = !(s === 2 && state.found);
+  if(!fb.hidden){
+    var pr0 = PRED.filter(function(p){ return p[0] === state.pred; })[0];
+    var fh = verdict('right', 'The average rose while the bottom tenth of the distribution fell. A positive ATT can sit on top of losses in the lower tail, and the ATT alone never shows them.', 'Found it!') +
+      (pr0 ? verdict(state.pred === 'cant' ? 'right' : 'wrong', 'Your group predicted: \u201c' + esc(pr0[1]) + '.\u201d The 10th percentile can rise by the same as the average (step 2), by less, by more, or even fall (here): the average alone can\u2019t tell you.', state.pred === 'cant' ? 'Your step 1 prediction was right' : 'Your step 1 prediction was wrong') : '');
+    if(fb.getAttribute('data-h') !== fh){ fb.innerHTML = fh; fb.setAttribute('data-h', fh); }
+  }
+  renderQ(s, m);
+  document.getElementById('revealWrap').hidden = s !== 3;
+  document.getElementById('axisNote').hidden = s !== 0;
+  var rb = document.getElementById('revealBox'); rb.hidden = !(s === 3 && state.revealed && state.q4);
+  if(!rb.hidden){
+    var pr = PRED.filter(function(p){ return p[0] === state.pred; })[0];
+    rb.innerHTML = '<p>The ATT is the average of the QTET curve over all percentiles (here: average of the curve <strong>' + money(avgQte(m, 2000)) + '</strong>, ATT <strong>' + money(m.att) + '</strong>). With skewed earnings, big dollar gains at the top pull the average above the effect at the median.</p>' +
+      '<p class="formula">ATT = E[Y(1) − Y(0) | W = 1] = ∫₀¹ QTET(θ) dθ, &nbsp; QTET(θ) = Q<sub>θ</sub>[Y(1) | W = 1] − Q<sub>θ</sub>[Y(0) | W = 1] &nbsp;(W = 1: the treated)</p>';
+  }
+}
+function renderReal(){
+  drawNsw();
+  document.querySelectorAll('[data-exit]').forEach(function(b){ b.setAttribute('aria-pressed', String(state.exit === b.getAttribute('data-exit'))); });
+  document.getElementById('checkBtn').disabled = !state.exit;
+  var ef = state.checked && state.exit ? verdict(state.exit === 'b' ? 'right' : 'wrong', esc(EXIT_FB[state.exit].replace(/^(Right|Not quite)\.\s*/, ''))) : '';
+  var efe = document.getElementById('exitFb'); if(efe.getAttribute('data-h') !== ef){ efe.innerHTML = ef; efe.setAttribute('data-h', ef); }
+  markOpts(document.getElementById('exitOpts'), 'data-exit', state.exit, 'b', state.checked);
+}
+// The step's question: step 1 prediction (locked in), step 2 and step 4 checked questions.
+function renderQ(s, m){
+  var box = document.getElementById('qBox'), Q = s === 0 ? { q: 'Your prediction:', opts: PRED } : s === 1 ? Q2 : s === 3 ? Q4 : null;
+  box.hidden = !Q; if(!Q) return;
+  var val = s === 0 ? state.pred : s === 1 ? state.q2 : state.q4, right = s === 1 ? Q2.right : s === 3 ? q4Right(m) : null;
+  var checked = s === 1 ? state.q2checked : s === 3 ? state.revealed : false;
+  document.getElementById('qText').textContent = Q.q;
+  var opts = document.getElementById('qOpts');
+  if(opts.getAttribute('data-s') !== String(s)){ opts.setAttribute('data-s', s); opts.innerHTML = Q.opts.map(function(o){ return '<button type="button" data-q="' + o[0] + '" aria-pressed="false">' + esc(o[1]) + '</button>'; }).join(''); }
+  opts.querySelectorAll('[data-q]').forEach(function(b){ b.setAttribute('aria-pressed', String(val === b.getAttribute('data-q'))); });
+  markOpts(opts, 'data-q', val, right, checked && !!val);
+  var cb = document.getElementById('qCheck'); cb.hidden = s === 0; cb.disabled = !val;
+  var h = '';
+  if(s === 0 && val) h = verdict('locked', 'You\u2019ll find out in step 3.');
+  if(s === 1 && checked && val) h = verdict(val === right ? 'right' : 'wrong', esc(Q2.fb[val]));
+  if(s === 3 && checked && val){
+    var d = m.att - m.qte(0.5);
+    h = verdict(val === right ? 'right' : 'wrong', val === right ? (right === 'equal' ? 'Here the ATT equals the median effect. Switch to skewed earnings and stretch them to see them part.' : 'ATT ' + money(m.att) + ' vs median QTET ' + money(m.qte(0.5)) + '.') : 'Compare the dashed ATT line with the curve at the 50th percentile: the ATT is ' + money(m.att) + ', the median QTET ' + money(m.qte(0.5)) + '.');
+  }
+  var fe = document.getElementById('qFb'); if(fe.getAttribute('data-h') !== h){ fe.innerHTML = h; fe.setAttribute('data-h', h); }
+}
+function syncInput(id, v){ var i = document.getElementById(id); if(document.activeElement !== i && parseFloat(i.value) !== v) i.value = v; else if(document.activeElement === i && Math.abs(parseFloat(i.value) - v) > 1e-9) i.value = v; }
+
+/* ---------- Contract ---------- */
+window.artifact = {
+  getState: getState,
+  setState: setState,
+  onChange: function(fn){ listeners.push(fn); return function(){ listeners = listeners.filter(function(f){ return f !== fn; }); }; },
+  controls: [
+    { key: 'step', label: 'Step', kind: 'range', min: 0, max: STEPS.length - 1, step: 1 },
+    { key: 'pred', label: 'Prediction: rise at the 10th percentile', kind: 'choice', options: [''].concat(PRED.map(function(p){ return p[0]; })) },
+    { key: 'shape', label: 'Shape of earnings', kind: 'choice', options: ['bell', 'skew'] },
+    { key: 'shift', label: 'Shift everyone by ($ thousands)', kind: 'range', min: -2, max: 6, step: 0.1 },
+    { key: 'k', label: 'Stretch earnings under training', kind: 'range', min: 0.5, max: 1.8, step: 0.05 },
+    { key: 'pct', label: 'Percentile', kind: 'range', min: 5, max: 95, step: 1 },
+    { key: 'found', label: 'Step 3 discovery reached', kind: 'toggle' },
+    { key: 'revealed', label: 'Step 4 answer checked (shows what the ATT is)', kind: 'toggle' },
+    { key: 'exit', label: 'Exit question answer', kind: 'choice', options: ['', 'a', 'b', 'c'] },
+    { key: 'checked', label: 'Exit question checked', kind: 'toggle' },
+    { key: 'q2', label: 'Step 2: does the QTET ever differ from the ATT?', kind: 'choice', options: ['', 'never', 'some', 'tails'] },
+    { key: 'q2checked', label: 'Step 2 answer checked', kind: 'toggle' },
+    { key: 'q4', label: 'Step 4: ATT vs the median QTET', kind: 'choice', options: ['', 'above', 'equal', 'below'] },
+    { key: 'scale', label: 'Text size', kind: 'choice', options: ['laptop', 'projector'] }
+  ],
+  responses: [],
+  assertions: [
+    { name: 'With stretch 1, the QTET equals the ATT at every percentile (both shapes)', run: function(){
+      return ['bell', 'skew'].every(function(sh){ var m = model({ shape: sh, shift: 2.7, k: 1 }); for(var i = 1; i < 100; i++){ if(Math.abs(m.qte(i / 100) - m.att) > 1e-9) return false; } return true; }); } },
+    { name: 'The ATT is the average of the QTET over all percentiles (skewed, stretch 1.6, within $20)', run: function(){
+      var m = model({ shape: 'skew', shift: 1.5, k: 1.6 }); return Math.abs(avgQte(m, 4000) - m.att) < 0.02; } },
+    { name: 'Bell-shaped: the median QTET equals the ATT for any stretch; skewed with stretch > 1: ATT exceeds the median QTET', run: function(){
+      var b = model({ shape: 'bell', shift: 1, k: 1.7 }), s = model({ shape: 'skew', shift: 1, k: 1.7 });
+      return Math.abs(b.qte(0.5) - b.att) < 1e-6 && s.att > s.qte(0.5) + 0.1; } },
+    { name: 'The ATT can be positive while the 10th-percentile QTET is negative (shift $1k, stretch 1.6)', run: function(){
+      var m = model({ shape: 'bell', shift: 1, k: 1.6 }); return m.att > 0 && m.qte(0.1) < 0; } },
+    { name: 'Density curves integrate to 1 (bell, stretch 1.4)', run: function(){
+      var m = model({ shape: 'bell', shift: 2, k: 1.4 }), pts = densityPts(m.g1), a = 0;
+      for(var i = 1; i < pts.length; i++) a += (pts[i][0] - pts[i - 1][0]) * (pts[i][1] + pts[i - 1][1]) / 2; return Math.abs(a - 1) < 0.002; } },
+    { name: 'Inverse normal: z(0.975) = 1.959964 and z(0.1) = −1.281552', run: function(){
+      return Math.abs(zq(0.975) - 1.959964) < 1e-5 && Math.abs(zq(0.1) + 1.281552) < 1e-5; } },
+    { name: 'Invalid keys and values are ignored', run: function(){ var b = JSON.stringify(state); apply({ shape: 'flat', pred: 'maybe', step: 'x', zz: 1 }); return JSON.stringify(state) === b; } }
+  ],
+  referenceCases: [
+    { name: '10th-percentile normal quantile', input: { p: 0.1 }, expect: -1.2815516, tolerance: 1e-6, source: 'R: qnorm(0.1)' },
+    { name: 'Lognormal mean, median 10, log-SD 0.35', input: { meanlog: 'log(10)', sdlog: 0.35 }, expect: 10.6316, tolerance: 1e-3, source: 'R: exp(log(10) + 0.35^2/2)' }
+  ]
+};
+var rz; window.addEventListener('resize', function(){ clearTimeout(rz); rz = setTimeout(render, 120); });
+render();
+})();
+</script>
+
+<script>
+(function () {
+  var cfg = {"versionId":"cmw25ik32000008jqyv3o2x65","appOrigin":"https://ideasatplay.org","direct":null};
+  var t0 = Date.now(), scrolled = false, acted = false, reached = false, shown = false, config = null;
+  var framed = parent !== window;
+  function onScreen(el) {
+    if (!el.getClientRects().length) return false;
+    var r = el.getBoundingClientRect();
+    return r.top < innerHeight && r.bottom > 0;
+  }
+  function atBottom() {
+    var f = document.querySelector("footer[data-kc-credit]");
+    if (f) return f.getBoundingClientRect().top <= innerHeight;
+    var d = document.documentElement;
+    return scrollY + innerHeight >= d.scrollHeight - 48;
+  }
+  // { cur, last } when the page moves through numbered steps, else null.
+  function steps() {
+    var a = window.artifact;
+    try {
+      var c = a && Array.isArray(a.controls) ? a.controls.filter(function (x) { return x && x.key === "step" && typeof x.max === "number"; })[0] : null;
+      if (c) { var s = a.getState(); if (s && typeof s.step === "number") return { cur: s.step, last: c.max }; }
+    } catch (e) {}
+    var cur = document.querySelector('[aria-current="step"]');
+    if (cur && cur.parentElement) {
+      var sib = Array.prototype.filter.call(cur.parentElement.children, function (x) { return x.getClientRects().length; });
+      return { cur: sib.indexOf(cur), last: sib.length - 1 };
+    }
+    return null;
+  }
+  function finished() {
+    var mark = document.querySelector("[data-kc-end]");
+    if (mark) return onScreen(mark);
+    var s = steps();
+    if (s) return s.cur >= s.last && atBottom();
+    return atBottom() && (scrolled || (acted && Date.now() - t0 > 60000));
+  }
+  // The student link remembers a rating in its own storage where the browser allows it.
+  var KEY = "kc-rated-" + cfg.versionId;
+  function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
+  if (cfg.direct) config = { ask: !store(KEY), preview: false, labels: cfg.direct.labels };
+  var visitor = (function () {
+    var v = store("kc-visitor");
+    if (!v) { v = ""; for (var i = 0; i < 24; i++) v += "abcdefghijklmnopqrstuvwxyz0123456789".charAt(Math.floor(Math.random() * 36)); store("kc-visitor", v); }
+    return v;
+  })();
+  var pending = {}, seq = 0;
+  function save(score, comment) {
+    if (cfg.direct) {
+      var body = { versionId: cfg.versionId, score: score, context: "share", visitor: visitor };
+      if (comment) body.comment = comment;
+      // text/plain: a simple request, so no preflight is needed.
+      return fetch(cfg.direct.endpoint, { method: "POST", credentials: "omit", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(body) })
+        .then(function (r) { if (r.ok) store(KEY, String(score)); return r.ok; }, function () { return false; });
+    }
+    return new Promise(function (resolve) {
+      var id = ++seq; pending[id] = resolve;
+      parent.postMessage({ type: "kc:rate", versionId: cfg.versionId, id: id, score: score, comment: comment || "" }, cfg.appOrigin);
+      setTimeout(function () { if (pending[id]) { delete pending[id]; resolve(false); } }, 15000);
+    });
+  }
+  var B = "display:inline-block;margin:3px 6px 3px 0;padding:4px 10px;border:1px solid #a8a29e;border-radius:6px;background:#fff;color:#1c1917;font:inherit;cursor:pointer";
+  function el(tag, attrs, text) { var e = document.createElement(tag); for (var k in attrs) e.setAttribute(k, attrs[k]); if (text) e.textContent = text; return e; }
+  function show() {
+    if (shown || !config || !config.ask) return;
+    shown = true;
+    clearInterval(timer);
+    var L = config.labels;
+    var box = el("div", { "data-kc-rating": "", "data-kc-personal": "", role: "region", "aria-label": L.ask, lang: L.lang, dir: L.dir,
+      style: "box-sizing:border-box;max-width:760px;margin:24px auto 0;padding:10px 14px;border:1px solid #d6d3d1;border-radius:10px;background:#fafaf9;color:#1c1917;font:14px/1.5 system-ui,-apple-system,sans-serif;text-align:start" });
+    var live = el("div", { "aria-live": "polite" });
+    box.appendChild(live);
+    function ask(msg) {
+      live.innerHTML = "";
+      live.appendChild(el("span", { style: "font-weight:600;margin-inline-end:8px" }, L.ask));
+      [1, 2, 3].forEach(function (s) {
+        var b = el("button", { type: "button", style: B }, s + " · " + L["s" + s]);
+        b.addEventListener("click", function () {
+          live.querySelectorAll("button").forEach(function (x) { x.disabled = true; });
+          save(s, "").then(function (ok) { if (ok) comment(s); else ask(L.error); });
+        });
+        live.appendChild(b);
+      });
+      if (config.preview) live.appendChild(el("div", { style: "font-size:12px;color:#57534e" }, L.preview));
+      if (msg) live.appendChild(el("div", { role: "alert", style: "color:#991b1b;font-size:13px" }, msg));
+    }
+    function comment(score) {
+      live.innerHTML = "";
+      var id = "kc-rate-comment";
+      live.appendChild(el("label", { for: id, style: "display:block;font-weight:600;margin-bottom:4px" }, L.comment));
+      var row = el("div", { style: "display:flex;flex-wrap:wrap;gap:6px;align-items:center" });
+      var input = el("input", { id: id, type: "text", maxlength: "1000", autocomplete: "off", dir: "auto",
+        style: "flex:1 1 260px;min-width:0;box-sizing:border-box;padding:5px 8px;border:1px solid #a8a29e;border-radius:6px;background:#fff;color:#1c1917;font:inherit" });
+      var send = el("button", { type: "button", style: B + ";background:#292524;color:#fff;border-color:#292524" }, L.send);
+      var skip = el("button", { type: "button", style: B }, L.skip);
+      function done() { live.innerHTML = ""; live.appendChild(el("span", { style: "font-weight:600" }, L.thanks)); setTimeout(function () { box.remove(); }, 2000); }
+      send.addEventListener("click", function () {
+        var text = input.value.trim();
+        if (!text) return done();
+        send.disabled = skip.disabled = true;
+        save(score, text).then(function (ok) { if (ok) done(); else { send.disabled = skip.disabled = false; live.appendChild(el("div", { role: "alert", style: "color:#991b1b;font-size:13px" }, L.error)); } });
+      });
+      input.addEventListener("keydown", function (e) { if (e.key === "Enter") send.click(); });
+      skip.addEventListener("click", done);
+      row.appendChild(input); row.appendChild(send); row.appendChild(skip);
+      live.appendChild(row);
+      input.focus();
+    }
+    ask("");
+    var mark = document.querySelector("[data-kc-end]"), foot = document.querySelector("footer[data-kc-credit]");
+    if (mark) mark.insertAdjacentElement("afterend", box);
+    else if (foot) foot.parentNode.insertBefore(box, foot);
+    else document.body.appendChild(box);
+  }
+  function check() {
+    if (!reached && finished()) reached = true;
+    if (reached) show();
+  }
+  window.addEventListener("message", function (e) {
+    if (e.source !== parent || !e.data || e.data.versionId !== cfg.versionId) return;
+    var d = e.data;
+    if (d.type === "kc:rate-config" && !cfg.direct) { config = { ask: !!d.ask, preview: !!d.preview, labels: d.labels }; check(); }
+    if (d.type === "kc:rate-result" && pending[d.id]) { pending[d.id](!!d.ok); delete pending[d.id]; }
+  });
+  // The app page may start listening after this page loads: ask a few times.
+  var hellos = 0;
+  function hello() { if (framed && !cfg.direct && !config && hellos++ < 8) parent.postMessage({ type: "kc:rate-hello", versionId: cfg.versionId }, cfg.appOrigin); }
+  hello();
+  var timer = setInterval(function () { if (hellos < 8 && !config) hello(); check(); }, 800);
+  window.addEventListener("scroll", function () { if (scrollY > 0) scrolled = true; check(); }, { passive: true });
+  ["click", "input", "keydown"].forEach(function (t) { document.addEventListener(t, function (e) { if (e.target && e.target.closest && e.target.closest("[data-kc-rating]")) return; acted = true; setTimeout(check, 50); }, true); });
+})();
+</script></body>
+</html>

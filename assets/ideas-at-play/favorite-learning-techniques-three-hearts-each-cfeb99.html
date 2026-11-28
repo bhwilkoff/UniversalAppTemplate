@@ -1,0 +1,520 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Favorite learning techniques: three hearts each</title>
+<style>
+:root{--bg:#fbfaf7;--card:#ffffff;--ink:#1c1917;--muted:#57534e;--rule:#d6d3d1;--faint:#f1efe9;--accent:#2E4057;--onacc:#ffffff;--heart:#b42318;--ok:#1d6b3a;--tipbg:#1c1917;--tipink:#ffffff}
+@media (prefers-color-scheme: dark){:root{--bg:#141210;--card:#1f1c19;--ink:#f5f2ec;--muted:#cfc9c0;--rule:#57524c;--faint:#2a2622;--accent:#9db4d6;--onacc:#10151d;--heart:#ff8a80;--ok:#7fd29a;--tipbg:#f5f2ec;--tipink:#141210}}
+*{box-sizing:border-box}
+[hidden]{display:none !important}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI","Hiragino Sans","Noto Sans JP",sans-serif}
+body.projector{font-size:24px}
+main{max-width:980px;margin:0 auto;padding:16px 20px 40px}
+h1{font-size:1.35em;margin:0}
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin-bottom:12px}
+.steps{display:flex;gap:6px;flex-wrap:wrap}
+.steps button,.btn{font:inherit;font-size:.9em;border:1px solid var(--rule);background:var(--card);color:var(--ink);border-radius:8px;padding:6px 12px;min-height:36px;cursor:pointer}
+.steps button[aria-current="step"]{background:var(--accent);color:var(--onacc);border-color:var(--accent)}
+.btn.primary{background:var(--accent);color:var(--onacc);border-color:var(--accent);font-weight:600}
+.btn:disabled{opacity:.5;cursor:default}
+button:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.me{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:8px 10px;background:var(--faint);border-radius:10px;margin-bottom:12px}
+.me .letter{width:40px;height:40px;font-weight:700}
+.me .letter[aria-pressed="true"]{background:var(--accent);color:var(--onacc);border-color:var(--accent)}
+.linkish{background:none;border:0;color:var(--muted);text-decoration:underline;font:inherit;font-size:.8em;cursor:pointer;min-height:24px}
+.q{font-size:1.15em;font-weight:600;margin:4px 0 10px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media (max-width:640px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.card{background:var(--card);border:1px solid var(--rule);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:6px;min-height:150px}
+.card.picked{border:3px solid var(--accent)}
+.pic{font-size:2em;line-height:1}
+.term{font-weight:700;cursor:help;border-bottom:1px dotted var(--muted);align-self:flex-start}
+.hearts{min-height:1.6em;color:var(--heart);font-size:1.1em;letter-spacing:1px}
+.row{display:flex;align-items:center;gap:6px;margin-top:auto}
+.row .btn{min-width:40px;font-size:1.1em;padding:4px 10px}
+.who{font-size:.9em;color:var(--muted)}
+.who b{color:var(--ink)}
+.status{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.chip{border:1px solid var(--rule);border-radius:999px;padding:2px 10px;font-size:.9em;background:var(--card)}
+.chip.done{border-color:var(--ok);color:var(--ok);font-weight:600}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:14px}
+.note{color:var(--muted);font-size:.9em}
+.result{margin-top:12px;padding:10px 12px;border-radius:10px;border:2px solid var(--ok);color:var(--ok);font-weight:600}
+#tip{position:fixed;z-index:10;max-width:280px;background:var(--tipbg);color:var(--tipink);padding:8px 10px;border-radius:8px;font-size:15px;line-height:1.45;pointer-events:none;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+body.projector #tip{font-size:22px;max-width:420px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.scale{margin-inline-start:auto}
+@media (prefers-reduced-motion:no-preference){.card,.hearts{transition:all .2s}}
+</style>
+</head>
+<body class="laptop">
+<main>
+  <div class="top">
+    <h1 data-ja="好きな学習方法：一人ハート3つ">❤️ Favorite learning techniques</h1>
+    <nav class="steps" aria-label="Steps" id="stepbar">
+      <button type="button" data-step="1" data-ja="1. 自分のハートを置く">1 Your ❤️×3</button>
+      <button type="button" data-step="2" data-ja="2. みんなのハートを見る">2 Our ❤️</button>
+      <button type="button" data-step="3" data-ja="3. グループで1つ選ぶ">3 Our pick</button>
+    </nav>
+    <button type="button" class="btn scale" id="scaleBtn" data-ja="文字の大きさ（ノートPC／プロジェクター）">Aa</button>
+  </div>
+
+  <div class="me" data-kc-personal id="mePanel">
+    <span data-ja="あなたは何番？ 文字を1つ選んでください（グループ内で重ならないように）">I am</span>
+    <span id="letters"></span>
+    <span id="meNote" class="note" aria-live="polite"></span>
+    <button type="button" class="linkish" id="lostBtn" data-ja="再読み込みで文字が消えましたか？ ここを押すと自分の文字をもう一度選べます">Lost your letter?</button>
+  </div>
+
+  <!-- Step 1 -->
+  <section id="s1" aria-labelledby="q1">
+    <p class="q" id="q1" data-ja="どの方法がいちばん役に立ちますか？ ハートを3つ置いてください（1つの方法に2つ・3つ置いてもOK）">Which help you most? ❤️❤️❤️</p>
+    <div class="grid" id="grid1"></div>
+    <div class="status" id="ready1" aria-live="polite"></div>
+  </section>
+
+  <!-- Step 2 -->
+  <section id="s2" aria-labelledby="q2wait" hidden>
+    <p class="q" id="q2wait" data-ja="全員がハートを3つ置き終わるまで待ちましょう。全員が ✓ になったら「Show everyone」を押せます">Wait for everyone ✓</p>
+    <p class="q" id="q2" data-ja="なぜそれを選びましたか？ グループで話しましょう（日本語でOK）" hidden>Why? Talk. (日本語OK)</p>
+    <div class="status" id="ready2" aria-live="polite"></div>
+    <div class="bar" id="revealBar">
+      <button type="button" class="btn primary" id="revealBtn" data-ja="全員のハートを表示します。全員がハートを3つ置き終わると押せます">Show everyone</button>
+    </div>
+    <div class="grid" id="grid2" aria-live="polite"></div>
+  </section>
+
+  <!-- Step 3 -->
+  <section id="s3" aria-labelledby="q3" hidden>
+    <p class="q" id="q3" data-ja="クラスに紹介する方法を1つ選び、全員が ✓ を押してください">Which one for the class?</p>
+    <div class="grid" id="grid3"></div>
+    <div class="bar">
+      <button type="button" class="btn primary" id="okBtn" data-ja="この選択に賛成する（もう一度押すと取り消し）">✓ Agree</button>
+      <span class="who" id="okWho" aria-live="polite"></span>
+    </div>
+    <div class="result" id="done" hidden aria-live="polite"></div>
+  </section>
+
+  <div class="bar">
+    <button type="button" class="btn" id="prevBtn" data-ja="前へ">←</button>
+    <button type="button" class="btn" id="nextBtn" data-ja="次へ">→</button>
+  </div>
+</main>
+<div id="tip" role="tooltip" lang="ja" hidden></div>
+<div id="srja" class="sr"></div>
+
+<script>
+(function(){
+  // ---- The six techniques (teacher's slide) ----
+  var T = [
+    { id:"recall",  en:"Active Recall",      pic:"🃏", ja:"アクティブ・リコール：教科書を見ないで、思い出す練習" },
+    { id:"spaced",  en:"Spaced Repetition",  pic:"📅", ja:"間隔反復：時間をあけて、何回も復習する" },
+    { id:"testing", en:"Practice Testing",   pic:"📝", ja:"練習テスト：小テストや問題で、自分を試す" },
+    { id:"elab",    en:"Elaboration",        pic:"💡", ja:"精緻化：「なぜ？」「どうして？」と考えて、説明を広げる" },
+    { id:"inter",   en:"Interleaving",       pic:"🔀", ja:"インターリービング：ちがう種類の問題をまぜて練習する" },
+    { id:"teach",   en:"Teaching Others",    pic:"🗣️", ja:"人に教える：学んだことを、だれかに説明する" }
+  ];
+  var IDS = T.map(function(t){ return t.id; });
+  var LETTERS = ["A","B","C","D","E"];
+  var MAX = 3;
+
+  // ---- State: inputs only ----
+  var state = { step:1, revealed:false, pick:"", scale:"laptop" };
+  LETTERS.forEach(function(L){
+    state["seat_" + L] = "";
+    state["ok_" + L] = false;
+    IDS.forEach(function(id){ state["h_" + L + "_" + id] = 0; });
+  });
+
+  // ---- Pure model ----
+  function heartsOf(s, L){ return IDS.reduce(function(n, id){ return n + (s["h_" + L + "_" + id] || 0); }, 0); }
+  function readers(s){ return LETTERS.filter(function(L){ return !!s["seat_" + L]; }); }
+  function tally(s){
+    var out = {};
+    IDS.forEach(function(id){ out[id] = { total:0, by:[] }; });
+    readers(s).forEach(function(L){
+      IDS.forEach(function(id){
+        var n = s["h_" + L + "_" + id] || 0;
+        if(n > 0){ out[id].total += n; out[id].by.push([L, n]); }
+      });
+    });
+    return out;
+  }
+  // Everyone who took a letter has placed all their hearts (and someone has).
+  function allReady(s){ var r = readers(s); return r.length > 0 && r.every(function(L){ return heartsOf(s, L) === MAX; }); }
+  // On the presenter link the presenter is in charge: nothing waits on the room.
+  function presenting(){ return !!(window.kc && kc.room && kc.room.presenter); }
+  function agreed(s){ var r = readers(s); return r.filter(function(L){ return !!s["ok_" + L]; }); }
+  function committed(s){ var r = readers(s); return !!s.pick && r.length > 0 && agreed(s).length === r.length; }
+  // A patch that adds d hearts for reader L on technique id, within 0..MAX per reader.
+  function heartPatch(s, L, id, d){
+    var k = "h_" + L + "_" + id, cur = s[k] || 0, total = heartsOf(s, L);
+    var next = cur + d;
+    if(next < 0 || (d > 0 && total >= MAX)) return null;
+    var p = {}; p[k] = next; return p;
+  }
+  // Choosing a different pick clears everyone's agreement.
+  function pickPatch(s, id){
+    if(s.pick === id) return null;
+    var p = { pick:id };
+    LETTERS.forEach(function(L){ p["ok_" + L] = false; });
+    return p;
+  }
+
+  // ---- This screen's own letter (never in state) ----
+  var screenId = Math.random().toString(36).slice(2, 10);
+  var held = "", showLost = false, lostMsg = "";
+  function me(){ return held && state["seat_" + held] === screenId ? held : ""; }
+
+  // ---- Change plumbing ----
+  var listeners = [];
+  function valid(k, v){
+    if(k === "step") return v === 1 || v === 2 || v === 3;
+    if(k === "revealed") return typeof v === "boolean";
+    if(k === "pick") return v === "" || IDS.indexOf(v) !== -1;
+    if(k === "scale") return v === "laptop" || v === "projector";
+    if(/^seat_[A-E]$/.test(k)) return typeof v === "string" && /^[a-z0-9]{0,16}$/.test(v);
+    if(/^ok_[A-E]$/.test(k)) return typeof v === "boolean";
+    if(/^h_[A-E]_[a-z]+$/.test(k)) return IDS.indexOf(k.split("_")[2]) !== -1 && v === Math.floor(v) && v >= 0 && v <= MAX;
+    return false;
+  }
+  function apply(p){ Object.keys(p || {}).forEach(function(k){ if(valid(k, p[k])) state[k] = p[k]; }); }
+  function change(p){ if(!p) return; apply(p); render(); listeners.forEach(function(f){ try{ f(copy()); }catch(e){} }); }
+  function copy(){ return JSON.parse(JSON.stringify(state)); }
+
+  // ---- Tooltips (Japanese): hover, keyboard focus, or tap ----
+  var tip = document.getElementById("tip"), tipFor = null, tipTimer = 0, tipN = 0;
+  function describe(el){
+    if(el.getAttribute("aria-describedby")) return;
+    // Kept outside the element, so changing a button's text never removes it.
+    var s = document.createElement("span"); s.className = "sr"; s.lang = "ja"; s.id = "ja" + (++tipN); s.textContent = el.getAttribute("data-ja");
+    document.getElementById("srja").appendChild(s); el.setAttribute("aria-describedby", s.id);
+  }
+  function showTip(el){
+    tipFor = el; tip.textContent = el.getAttribute("data-ja"); tip.hidden = false;
+    var r = el.getBoundingClientRect(), w = tip.offsetWidth, h = tip.offsetHeight;
+    var x = Math.max(6, Math.min(window.innerWidth - w - 6, r.left + r.width / 2 - w / 2));
+    var y = r.bottom + 8; if(y + h > window.innerHeight - 6) y = Math.max(6, r.top - h - 8);
+    tip.style.left = x + "px"; tip.style.top = y + "px";
+  }
+  function hideTip(){ tip.hidden = true; tipFor = null; clearTimeout(tipTimer); }
+  document.addEventListener("mouseover", function(e){ var el = e.target.closest && e.target.closest("[data-ja]"); if(el && el !== tipFor) showTip(el); });
+  document.addEventListener("mouseout", function(e){ var el = e.target.closest && e.target.closest("[data-ja]"); if(el && !el.contains(e.relatedTarget)) hideTip(); });
+  document.addEventListener("focusin", function(e){ var el = e.target.closest && e.target.closest("[data-ja]"); if(el) showTip(el); });
+  document.addEventListener("focusout", hideTip);
+  document.addEventListener("keydown", function(e){ if(e.key === "Escape") hideTip(); });
+  document.addEventListener("pointerdown", function(e){
+    if(e.pointerType !== "touch") return;
+    var el = e.target.closest && e.target.closest("[data-ja]");
+    if(!el) return hideTip();
+    showTip(el); clearTimeout(tipTimer); tipTimer = setTimeout(hideTip, 2500);
+  });
+  window.addEventListener("scroll", hideTip, true);
+
+  // ---- Build once ----
+  function el(tag, attrs, text){ var n = document.createElement(tag); Object.keys(attrs || {}).forEach(function(k){ n.setAttribute(k, attrs[k]); }); if(text != null) n.textContent = text; return n; }
+  var lettersBox = document.getElementById("letters");
+  LETTERS.forEach(function(L){
+    var b = el("button", { type:"button", class:"btn letter", "data-letter":L, "aria-pressed":"false", "data-ja":"わたしは " + L }, L);
+    b.addEventListener("click", function(){ claim(L); });
+    lettersBox.appendChild(b);
+  });
+  function claim(L){
+    var p = {}; if(held && held !== L && state["seat_" + held] === screenId) p["seat_" + held] = "";
+    p["seat_" + L] = screenId; held = L; showLost = false; lostMsg = "";
+    change(p);
+  }
+  document.getElementById("lostBtn").addEventListener("click", function(){ showLost = !showLost; render(); });
+
+  function buildGrid(gridId, mode){
+    var g = document.getElementById(gridId);
+    T.forEach(function(t){
+      var c = el("div", { class:"card", "data-id":t.id });
+      c.appendChild(el("div", { class:"pic", "aria-hidden":"true" }, t.pic));
+      var term = el("span", { class:"term", tabindex:"0", "data-ja":t.ja }, t.en); c.appendChild(term);
+      c.appendChild(el("div", { class:"hearts", "data-hearts":"" }));
+      if(mode === 1){
+        var row = el("div", { class:"row" });
+        var minus = el("button", { type:"button", class:"btn", "data-ja":"ハートを1つもどす", "aria-label":"Remove a heart: " + t.en }, "−");
+        var plus = el("button", { type:"button", class:"btn", "data-ja":"ハートを1つ置く", "aria-label":"Add a heart: " + t.en }, "+❤️");
+        minus.addEventListener("click", function(){ var L = me(); if(L) change(heartPatch(state, L, t.id, -1)); });
+        plus.addEventListener("click", function(){ var L = me(); if(L) change(heartPatch(state, L, t.id, +1)); });
+        row.appendChild(minus); row.appendChild(plus); c.appendChild(row);
+      }
+      if(mode === 2) c.appendChild(el("div", { class:"who", "data-who":"" }));
+      if(mode === 3){
+        var choose = el("button", { type:"button", class:"btn", "data-choose":"", "aria-pressed":"false", "data-ja":"これをグループの答えにする" }, "Choose");
+        choose.addEventListener("click", function(){ change(pickPatch(state, t.id)); });
+        c.appendChild(el("div", { class:"who", "data-who":"" }));
+        c.appendChild(choose);
+      }
+      g.appendChild(c);
+    });
+  }
+  buildGrid("grid1", 1); buildGrid("grid2", 2); buildGrid("grid3", 3);
+
+  document.querySelectorAll("#stepbar [data-step]").forEach(function(b){ b.addEventListener("click", function(){ change({ step:Number(b.getAttribute("data-step")) }); }); });
+  document.getElementById("prevBtn").addEventListener("click", function(){ if(state.step > 1) change({ step:state.step - 1 }); });
+  document.getElementById("nextBtn").addEventListener("click", function(){ if(state.step < 3) change({ step:state.step + 1 }); });
+  document.getElementById("revealBtn").addEventListener("click", function(){ if(presenting() || allReady(state)) change({ revealed:true }); });
+  document.getElementById("okBtn").addEventListener("click", function(){ var L = me(); if(!L || !state.pick) return; var p = {}; p["ok_" + L] = !state["ok_" + L]; change(p); });
+  document.getElementById("scaleBtn").addEventListener("click", function(){ change({ scale: state.scale === "laptop" ? "projector" : "laptop" }); });
+
+  var hearts = function(n){ return n > 0 ? new Array(n + 1).join("❤️") : ""; };
+  function setText(n, t){ if(n.textContent !== t) n.textContent = t; }
+
+  // ---- Render ----
+  function render(){
+    document.body.className = state.scale;
+    var L = me(), r = readers(state), tal = tally(state);
+    if(held && !L && state["seat_" + held] && state["seat_" + held] !== screenId){ lostMsg = held + " was just taken by someone else. Pick another."; held = ""; }
+
+    // Letter picker: hide letters others hold (unless "lost" is open).
+    lettersBox.querySelectorAll("[data-letter]").forEach(function(b){
+      var X = b.getAttribute("data-letter"), mine = X === L, taken = !!state["seat_" + X] && state["seat_" + X] !== screenId;
+      b.hidden = taken && !showLost;
+      b.setAttribute("aria-pressed", String(mine));
+    });
+    setText(document.getElementById("meNote"), lostMsg || (L ? "" : "← tap a letter"));
+
+    // Steps
+    ["s1","s2","s3"].forEach(function(id, i){ document.getElementById(id).hidden = state.step !== i + 1; });
+    document.querySelectorAll("#stepbar [data-step]").forEach(function(b){
+      if(Number(b.getAttribute("data-step")) === state.step) b.setAttribute("aria-current", "step"); else b.removeAttribute("aria-current");
+    });
+    document.getElementById("prevBtn").disabled = state.step === 1;
+    document.getElementById("nextBtn").disabled = state.step === 3;
+
+    // Step 1: only this reader's own hearts are shown.
+    document.querySelectorAll("#grid1 .card").forEach(function(c){
+      var id = c.getAttribute("data-id"), n = L ? state["h_" + L + "_" + id] : 0;
+      setText(c.querySelector("[data-hearts]"), hearts(n));
+      var btns = c.querySelectorAll("button");
+      btns[0].disabled = !L || n === 0;
+      btns[1].disabled = !L || heartsOf(state, L) >= MAX;
+    });
+    // Who has placed all three (no counts by technique before the reveal).
+    ["ready1", "ready2"].forEach(function(id){
+      var box = document.getElementById(id); box.textContent = "";
+      r.forEach(function(X){
+        var n = heartsOf(state, X), chip = el("span", { class:"chip" + (n === MAX ? " done" : ""), "data-ja": X + "：ハート " + n + "/3" + (n === MAX ? "（完了）" : "") }, X + " " + n + "/3" + (n === MAX ? " ✓" : ""));
+        box.appendChild(chip);
+      });
+    });
+
+    // Step 2: everyone's hearts, once revealed.
+    document.getElementById("revealBar").hidden = state.revealed;
+    var nReady = r.filter(function(X){ return heartsOf(state, X) === MAX; }).length, rb = document.getElementById("revealBtn");
+    rb.disabled = !presenting() && !allReady(state);
+    setText(rb, "Show everyone (" + nReady + "/" + r.length + " ✓)");
+    document.getElementById("q2wait").hidden = state.revealed;
+    document.getElementById("q2").hidden = !state.revealed;
+    document.getElementById("s2").setAttribute("aria-labelledby", state.revealed ? "q2" : "q2wait");
+    document.getElementById("grid2").hidden = !state.revealed;
+    document.querySelectorAll("#grid2 .card").forEach(function(c){
+      var id = c.getAttribute("data-id"), t = tal[id];
+      setText(c.querySelector("[data-hearts]"), hearts(t.total));
+      setText(c.querySelector("[data-who]"), t.by.map(function(x){ return x[0] + " " + hearts(x[1]); }).join("  "));
+    });
+
+    // Step 3: the group's pick and agreement.
+    document.querySelectorAll("#grid3 .card").forEach(function(c){
+      var id = c.getAttribute("data-id"), t = tal[id], picked = state.pick === id;
+      c.classList.toggle("picked", picked);
+      setText(c.querySelector("[data-hearts]"), state.revealed ? hearts(t.total) : "");
+      setText(c.querySelector("[data-who]"), state.revealed ? t.by.map(function(x){ return x[0]; }).join(" ") : "");
+      var ch = c.querySelector("[data-choose]"); ch.setAttribute("aria-pressed", String(picked)); setText(ch, picked ? "✓ Chosen" : "Choose");
+    });
+    var ag = agreed(state), okBtn = document.getElementById("okBtn");
+    okBtn.disabled = !L || !state.pick;
+    setText(okBtn, L && state["ok_" + L] ? "✓ Agreed" : "✓ Agree");
+    okBtn.setAttribute("aria-pressed", String(!!(L && state["ok_" + L])));
+    setText(document.getElementById("okWho"), state.pick ? "✓ " + (ag.length ? ag.join(", ") : "—") + "  (" + ag.length + "/" + r.length + ")" : "");
+    var done = document.getElementById("done"), pickT = T.filter(function(t){ return t.id === state.pick; })[0];
+    done.hidden = !committed(state);
+    if(committed(state)) setText(done, "✓ " + pickT.en + " — " + ag.join(", "));
+    if(tipFor && !document.body.contains(tipFor)) hideTip();
+  }
+
+  // ---- Platform contract ----
+  window.artifact = {
+    getState: copy,
+    setState: function(p){ apply(p); render(); },
+    onChange: function(f){ listeners.push(f); return function(){ listeners = listeners.filter(function(g){ return g !== f; }); }; },
+    controls: [
+      { key:"step", label:"Step", kind:"range", min:1, max:3, step:1 },
+      { key:"revealed", label:"Show everyone's hearts", kind:"toggle" },
+      { key:"pick", label:"Group pick", kind:"choice", options:[""].concat(IDS) },
+      { key:"scale", label:"Type scale", kind:"choice", options:["laptop","projector"] }
+    ],
+    responses: [],
+    assertions: [
+      { name:"A reader can never place more than three hearts", run:function(){
+          var s = copy(); s.seat_A = "x"; IDS.forEach(function(id){ s["h_A_" + id] = 0; });
+          s.h_A_recall = 2; s.h_A_teach = 1;
+          return heartsOf(s, "A") === 3 && heartPatch(s, "A", "spaced", 1) === null && heartPatch(s, "A", "recall", -1) !== null; } },
+      { name:"Show everyone opens only when every student with a letter has placed 3 hearts", run:function(){
+          var s = copy(); LETTERS.forEach(function(L){ s["seat_" + L] = ""; IDS.forEach(function(id){ s["h_" + L + "_" + id] = 0; }); });
+          var none = allReady(s); s.seat_A = "a"; s.seat_B = "b"; s.h_A_recall = 3; s.h_B_teach = 2;
+          var partial = allReady(s); s.h_B_elab = 1; return !none && !partial && allReady(s); } },
+      { name:"Hearts can't go below zero", run:function(){ var s = copy(); s.h_B_elab = 0; return heartPatch(s, "B", "elab", -1) === null; } },
+      { name:"The tally adds up every present reader's hearts and nobody else's", run:function(){
+          var s = copy(); LETTERS.forEach(function(L){ s["seat_" + L] = ""; IDS.forEach(function(id){ s["h_" + L + "_" + id] = 0; }); });
+          s.seat_A = "a"; s.seat_C = "c"; s.h_A_recall = 2; s.h_A_teach = 1; s.h_C_recall = 3; s.h_D_recall = 3;
+          var t = tally(s); return t.recall.total === 5 && t.teach.total === 1 && t.recall.by.length === 2; } },
+      { name:"Changing the group's pick clears every agreement", run:function(){
+          var s = copy(); s.pick = "recall"; s.ok_A = true; s.ok_B = true; var p = pickPatch(s, "teach");
+          return p.pick === "teach" && LETTERS.every(function(L){ return p["ok_" + L] === false; }) && pickPatch(s, "recall") === null; } },
+      { name:"The pick is committed only when every reader with a letter agrees", run:function(){
+          var s = copy(); LETTERS.forEach(function(L){ s["seat_" + L] = ""; s["ok_" + L] = false; });
+          s.seat_A = "a"; s.seat_B = "b"; s.pick = "inter"; s.ok_A = true;
+          var before = committed(s); s.ok_B = true; return !before && committed(s); } },
+      { name:"A claimed letter is mine only for the claiming screen", run:function(){
+          var s = copy(); s.seat_E = "zz"; return s.seat_E !== screenId && valid("seat_E", "zz") && !valid("seat_E", "Bad Value!"); } }
+    ],
+    referenceCases: []
+  };
+
+  document.querySelectorAll("[data-ja]").forEach(describe);
+  render();
+  // The presenter link says so shortly after load: redraw then.
+  if(window.kc && kc.room && typeof kc.room.onChange === "function") kc.room.onChange(function(){ render(); });
+})();
+</script>
+
+<script>
+(function () {
+  var cfg = {"versionId":"cmw9pjkl1000007l8nze3yu3g","appOrigin":"https://ideasatplay.org","direct":null};
+  var t0 = Date.now(), scrolled = false, acted = false, reached = false, shown = false, config = null;
+  var framed = parent !== window;
+  function onScreen(el) {
+    if (!el.getClientRects().length) return false;
+    var r = el.getBoundingClientRect();
+    return r.top < innerHeight && r.bottom > 0;
+  }
+  function atBottom() {
+    var f = document.querySelector("footer[data-kc-credit]");
+    if (f) return f.getBoundingClientRect().top <= innerHeight;
+    var d = document.documentElement;
+    return scrollY + innerHeight >= d.scrollHeight - 48;
+  }
+  // { cur, last } when the page moves through numbered steps, else null.
+  function steps() {
+    var a = window.artifact;
+    try {
+      var c = a && Array.isArray(a.controls) ? a.controls.filter(function (x) { return x && x.key === "step" && typeof x.max === "number"; })[0] : null;
+      if (c) { var s = a.getState(); if (s && typeof s.step === "number") return { cur: s.step, last: c.max }; }
+    } catch (e) {}
+    var cur = document.querySelector('[aria-current="step"]');
+    if (cur && cur.parentElement) {
+      var sib = Array.prototype.filter.call(cur.parentElement.children, function (x) { return x.getClientRects().length; });
+      return { cur: sib.indexOf(cur), last: sib.length - 1 };
+    }
+    return null;
+  }
+  function finished() {
+    var mark = document.querySelector("[data-kc-end]");
+    if (mark) return onScreen(mark);
+    var s = steps();
+    if (s) return s.cur >= s.last && atBottom();
+    return atBottom() && (scrolled || (acted && Date.now() - t0 > 60000));
+  }
+  // The student link remembers a rating in its own storage where the browser allows it.
+  var KEY = "kc-rated-" + cfg.versionId;
+  function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
+  if (cfg.direct) config = { ask: !store(KEY), preview: false, labels: cfg.direct.labels };
+  var visitor = (function () {
+    var v = store("kc-visitor");
+    if (!v) { v = ""; for (var i = 0; i < 24; i++) v += "abcdefghijklmnopqrstuvwxyz0123456789".charAt(Math.floor(Math.random() * 36)); store("kc-visitor", v); }
+    return v;
+  })();
+  var pending = {}, seq = 0;
+  function save(score, comment) {
+    if (cfg.direct) {
+      var body = { versionId: cfg.versionId, score: score, context: "share", visitor: visitor };
+      if (comment) body.comment = comment;
+      // text/plain: a simple request, so no preflight is needed.
+      return fetch(cfg.direct.endpoint, { method: "POST", credentials: "omit", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(body) })
+        .then(function (r) { if (r.ok) store(KEY, String(score)); return r.ok; }, function () { return false; });
+    }
+    return new Promise(function (resolve) {
+      var id = ++seq; pending[id] = resolve;
+      parent.postMessage({ type: "kc:rate", versionId: cfg.versionId, id: id, score: score, comment: comment || "" }, cfg.appOrigin);
+      setTimeout(function () { if (pending[id]) { delete pending[id]; resolve(false); } }, 15000);
+    });
+  }
+  var B = "display:inline-block;margin:3px 6px 3px 0;padding:4px 10px;border:1px solid #a8a29e;border-radius:6px;background:#fff;color:#1c1917;font:inherit;cursor:pointer";
+  function el(tag, attrs, text) { var e = document.createElement(tag); for (var k in attrs) e.setAttribute(k, attrs[k]); if (text) e.textContent = text; return e; }
+  function show() {
+    if (shown || !config || !config.ask) return;
+    shown = true;
+    clearInterval(timer);
+    var L = config.labels;
+    var box = el("div", { "data-kc-rating": "", "data-kc-personal": "", role: "region", "aria-label": L.ask, lang: L.lang, dir: L.dir,
+      style: "box-sizing:border-box;max-width:760px;margin:24px auto 0;padding:10px 14px;border:1px solid #d6d3d1;border-radius:10px;background:#fafaf9;color:#1c1917;font:14px/1.5 system-ui,-apple-system,sans-serif;text-align:start" });
+    var live = el("div", { "aria-live": "polite" });
+    box.appendChild(live);
+    function ask(msg) {
+      live.innerHTML = "";
+      live.appendChild(el("span", { style: "font-weight:600;margin-inline-end:8px" }, L.ask));
+      [1, 2, 3].forEach(function (s) {
+        var b = el("button", { type: "button", style: B }, s + " · " + L["s" + s]);
+        b.addEventListener("click", function () {
+          live.querySelectorAll("button").forEach(function (x) { x.disabled = true; });
+          save(s, "").then(function (ok) { if (ok) comment(s); else ask(L.error); });
+        });
+        live.appendChild(b);
+      });
+      if (config.preview) live.appendChild(el("div", { style: "font-size:12px;color:#57534e" }, L.preview));
+      if (msg) live.appendChild(el("div", { role: "alert", style: "color:#991b1b;font-size:13px" }, msg));
+    }
+    function comment(score) {
+      live.innerHTML = "";
+      var id = "kc-rate-comment";
+      live.appendChild(el("label", { for: id, style: "display:block;font-weight:600;margin-bottom:4px" }, L.comment));
+      var row = el("div", { style: "display:flex;flex-wrap:wrap;gap:6px;align-items:center" });
+      var input = el("input", { id: id, type: "text", maxlength: "1000", autocomplete: "off", dir: "auto",
+        style: "flex:1 1 260px;min-width:0;box-sizing:border-box;padding:5px 8px;border:1px solid #a8a29e;border-radius:6px;background:#fff;color:#1c1917;font:inherit" });
+      var send = el("button", { type: "button", style: B + ";background:#292524;color:#fff;border-color:#292524" }, L.send);
+      var skip = el("button", { type: "button", style: B }, L.skip);
+      function done() { live.innerHTML = ""; live.appendChild(el("span", { style: "font-weight:600" }, L.thanks)); setTimeout(function () { box.remove(); }, 2000); }
+      send.addEventListener("click", function () {
+        var text = input.value.trim();
+        if (!text) return done();
+        send.disabled = skip.disabled = true;
+        save(score, text).then(function (ok) { if (ok) done(); else { send.disabled = skip.disabled = false; live.appendChild(el("div", { role: "alert", style: "color:#991b1b;font-size:13px" }, L.error)); } });
+      });
+      input.addEventListener("keydown", function (e) { if (e.key === "Enter") send.click(); });
+      skip.addEventListener("click", done);
+      row.appendChild(input); row.appendChild(send); row.appendChild(skip);
+      live.appendChild(row);
+      input.focus();
+    }
+    ask("");
+    var mark = document.querySelector("[data-kc-end]"), foot = document.querySelector("footer[data-kc-credit]");
+    if (mark) mark.insertAdjacentElement("afterend", box);
+    else if (foot) foot.parentNode.insertBefore(box, foot);
+    else document.body.appendChild(box);
+  }
+  function check() {
+    if (!reached && finished()) reached = true;
+    if (reached) show();
+  }
+  window.addEventListener("message", function (e) {
+    if (e.source !== parent || !e.data || e.data.versionId !== cfg.versionId) return;
+    var d = e.data;
+    if (d.type === "kc:rate-config" && !cfg.direct) { config = { ask: !!d.ask, preview: !!d.preview, labels: d.labels }; check(); }
+    if (d.type === "kc:rate-result" && pending[d.id]) { pending[d.id](!!d.ok); delete pending[d.id]; }
+  });
+  // The app page may start listening after this page loads: ask a few times.
+  var hellos = 0;
+  function hello() { if (framed && !cfg.direct && !config && hellos++ < 8) parent.postMessage({ type: "kc:rate-hello", versionId: cfg.versionId }, cfg.appOrigin); }
+  hello();
+  var timer = setInterval(function () { if (hellos < 8 && !config) hello(); check(); }, 800);
+  window.addEventListener("scroll", function () { if (scrollY > 0) scrolled = true; check(); }, { passive: true });
+  ["click", "input", "keydown"].forEach(function (t) { document.addEventListener(t, function (e) { if (e.target && e.target.closest && e.target.closest("[data-kc-rating]")) return; acted = true; setTimeout(check, 50); }, true); });
+})();
+</script></body>
+</html>

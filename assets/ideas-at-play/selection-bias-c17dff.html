@@ -1,0 +1,469 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Selection Bias Lives in Y(0)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme:light;
+  --bg:#FBFAF7; --fg:#232629; --muted:#6B7075; --rule:#DCDAD4; --panel:#F2F0EA;
+  --accent:#2E4057; --contrast:#E85D04; --reveal:#EEF2F6;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --sans:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --serif:"Source Serif 4",Georgia,"Times New Roman",serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#1B1D20; --fg:#ECEAE4; --muted:#A3A7AC; --rule:#3A3E43; --panel:#24272B;
+    --accent:#9FB8D6; --contrast:#FF8A3D; --reveal:#272C33;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#1B1D20; --fg:#ECEAE4; --muted:#A3A7AC; --rule:#3A3E43; --panel:#24272B;
+  --accent:#9FB8D6; --contrast:#FF8A3D; --reveal:#272C33;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:16px;line-height:1.5}
+body.projector{font-size:24px}
+main{max-width:1080px;margin:0 auto;padding:28px 20px 60px}
+header{display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap;border-bottom:1px solid var(--rule);padding-bottom:14px;margin-bottom:22px}
+h1{font-family:var(--serif);font-weight:600;font-size:1.9em;margin:0;line-height:1.15}
+.sub{color:var(--muted);margin:4px 0 0;font-size:.95em}
+h2{font-size:1.05em;font-weight:600;margin:0 0 10px}
+p{margin:0 0 10px;max-width:68ch}
+.toggle{font:inherit;font-size:.85em;background:none;border:1px solid var(--rule);color:var(--fg);padding:4px 10px;border-radius:4px;cursor:pointer}
+.toggle:focus-visible,button:focus-visible,input:focus-visible,details summary:focus-visible{outline:2px solid var(--contrast);outline-offset:2px}
+
+.grid{display:grid;grid-template-columns:minmax(0,0.9fr) minmax(0,1.5fr);gap:36px;align-items:start}
+.left{position:sticky;top:12px}
+@media (max-width:860px){.left{position:static}}
+@media (max-width:860px){.grid{grid-template-columns:1fr}}
+
+.chart-wrap{width:100%;overflow-x:auto}
+svg{display:block;width:100%;height:auto;font-family:var(--sans)}
+.chart-title{font-size:.95em;color:var(--muted);margin:0 0 6px}
+.ctl{margin:14px 0 0}
+.ctl label{display:flex;justify-content:space-between;font-size:.9em;font-weight:500}
+body.projector .ctl label{font-size:.85em}
+.ctl label span.val{font-family:var(--mono);color:var(--accent)}
+.ctl input[type=range]{width:100%;margin:6px 0 0;accent-color:var(--accent)}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+button.btn{font:inherit;font-size:.9em;padding:6px 12px;border:1px solid var(--accent);background:var(--accent);color:var(--bg);border-radius:4px;cursor:pointer}
+button.btn.secondary{background:none;color:var(--accent)}
+button.btn[aria-pressed="true"]{box-shadow:inset 0 0 0 2px var(--contrast)}
+
+.readouts{display:grid;grid-template-columns:repeat(2,1fr);gap:8px 20px;margin:0;padding:0}
+.readouts div{display:flex;justify-content:space-between;border-bottom:1px solid var(--rule);padding:5px 0;font-size:.95em}
+.readouts dt{color:var(--muted)}
+.readouts dd{margin:0;font-family:var(--mono);font-variant-numeric:tabular-nums}
+.readouts .wide{grid-column:1 / -1}
+.readouts .wide dd{color:var(--contrast)}
+.eq{font-family:var(--mono);font-size:1.05em;margin:14px 0 0;padding:10px 12px;background:var(--panel);border-radius:4px;white-space:nowrap;overflow-x:auto}
+.eq b{font-weight:600}
+.eq .sb{color:var(--contrast)}
+.eq .att{color:var(--accent)}
+
+table{border-collapse:collapse;width:100%;font-size:.85em;font-variant-numeric:tabular-nums;margin-top:12px}
+th,td{text-align:right;padding:3px 8px}
+th:first-child,td:first-child{text-align:left}
+thead th{border-top:1px solid var(--fg);border-bottom:1px solid var(--rule);font-weight:500}
+tbody tr:last-child td{border-bottom:1px solid var(--fg)}
+tr.t td{color:var(--contrast)}
+tr.c td{color:var(--accent)}
+
+section.steps{margin-top:30px;border-top:1px solid var(--rule);padding-top:18px}
+ol{padding-left:1.4em;max-width:72ch}
+ol li{margin-bottom:10px}
+ol li .q{color:var(--muted)}
+fieldset{border:1px solid var(--rule);border-radius:4px;padding:8px 12px;margin:6px 0 0;max-width:72ch}
+fieldset legend{font-size:.9em;color:var(--muted);padding:0 4px}
+fieldset label{display:block;margin:4px 0;cursor:pointer}
+
+#reveal{margin-top:22px;background:var(--reveal);border-left:3px solid var(--accent);padding:14px 18px;border-radius:0 4px 4px 0;max-width:76ch}
+#reveal[hidden]{display:none}
+#reveal h2{margin-top:0}
+#reveal .formula{font-family:var(--mono);background:var(--panel);padding:8px 12px;border-radius:4px;overflow-x:auto;white-space:nowrap;margin:10px 0}
+
+details{margin-top:22px;border-top:1px solid var(--rule);padding-top:12px;max-width:76ch}
+details summary{cursor:pointer;font-weight:500}
+details ul{padding-left:1.3em}
+.closing{margin-top:22px;color:var(--muted);font-size:.9em;max-width:76ch}
+.sr{position:absolute;left:-9999px}
+</style>
+</head>
+<body class="laptop">
+<main>
+<header>
+  <div>
+    <h1>Selection Bias Lives in Y(0)</h1>
+    <p class="sub">Ten units, one targeting rule, and a naive comparison that is sometimes exactly right.</p>
+  </div>
+  <button class="toggle" id="scaleBtn" type="button" aria-pressed="false">Projector scale</button>
+</header>
+
+<div class="grid">
+<aside class="left">
+<section class="steps" style="margin-top:0;border-top:0;padding-top:0">
+  <h2>Work through it</h2>
+  <ol>
+    <li>Treatment is targeted to the five units with the highest X, and X raises both the baseline and the effect. Predict before touching anything.
+      <fieldset>
+        <legend>Will the naive gap equal ATT?</legend>
+        <label><input type="radio" name="pred" value="no"> No — targeting on X biases the naive comparison.</label>
+        <label><input type="radio" name="pred" value="yes"> Yes — the naive gap is fine here.</label>
+        <label><input type="radio" name="pred" value="depends"> It depends on something other than the targeting rule.</label>
+      </fieldset>
+    </li>
+    <li>Now set <strong>a = 0</strong> and keep <strong>b = 2</strong>. Treatment is still targeted on X.
+      <span class="q">Read the selection-bias term and the naive gap. Does the naive gap equal ATT? Does ATT equal ATC?</span></li>
+    <li>Raise <strong>a</strong> from 0 to 4 while watching the two dashed lines on the chart.
+      <span class="q">Which numbers move — selection bias, ATT, ATC, or all three?</span></li>
+    <li>Set <strong>b = 0</strong> and <strong>a = 4</strong>.
+      <span class="q">Selection bias is now large. What happened to the gap between ATT and ATC?</span></li>
+    <li>Set <strong>b = −2</strong> and <strong>a = 0</strong>, so the targeting rule picks the units who benefit <em>least</em>.
+      <span class="q">Is there selection bias? Which is bigger, ATT or ATC?</span></li>
+    <li>Press <strong>Assign at random</strong> and reseed a few times.
+      <span class="q">What does randomization do to selection bias, and what does it do to the gap between ATT and ATC?</span></li>
+  </ol>
+</section>
+<div id="reveal" hidden>
+  <h2>What you found</h2>
+  <p id="revealPred"></p>
+  <p>Treatment was targeted on X the whole time, but the selection-bias term went to zero the moment X stopped moving Y(0). ATT and ATC stayed apart, because the targeting rule still picked the units with the biggest effects. Those are two different things, and only one of them biases the naive comparison.</p>
+  <div class="formula">E[Y|D=1] − E[Y|D=0] = <span class="att">E[Y(1) − Y(0) | D=1]</span> + <span class="sb">( E[Y(0)|D=1] − E[Y(0)|D=0] )</span></div>
+  <p>The first term is <strong>ATT</strong>. The second is <strong>selection bias</strong>, and it contains only Y(0): no Y(1), no τ, nothing about how the effect varies. Targeting on who benefits changes ATT relative to ATC — it does not, by itself, bias the naive gap for ATT. Targeting on who starts higher does.</p>
+  <p>Random assignment removes both: the treated and control groups become interchangeable in Y(0) <em>and</em> in τ, so the naive gap, ATT, ATC and ATE all coincide (up to the luck of the draw with ten units).</p>
+</div>
+<details>
+  <summary>Assumptions and what is left out</summary>
+  <ul>
+    <li>Ten units with X = 1, 2, …, 10. Everything is deterministic: Y(0) = 100 + a·X, τ = b·X, Y(1) = Y(0) + τ. No noise.</li>
+    <li>Targeting treats exactly the k highest-X units. Random assignment treats five units chosen by a seeded shuffle.</li>
+    <li>Expectations are finite-population means over these ten units, so "ATT" here is the mean of τ among the treated, not a population parameter.</li>
+    <li>Left out on purpose: sampling variability, estimation from data, and conditioning on X (the conditional-independence route to recovering a causal effect from a targeted design). Each is its own artifact.</li>
+  </ul>
+</details>
+<p class="closing">Where this leads: if X is observed, comparing treated and control units <em>with the same X</em> removes the Y(0) difference. That is the idea behind matching and regression adjustment.</p>
+</aside>
+  <div class="right">
+    <p class="chart-title" id="chartTitle"></p>
+    <div class="chart-wrap">
+      <svg id="chart" viewBox="0 0 640 360" role="img" aria-label="Dot plot of ten units by X. Hollow dots are untreated outcomes Y(0), filled dots are treated outcomes Y(1), a vertical line joins each unit's pair. Treated units are orange, control units navy. Dashed horizontal lines mark the mean Y(0) of the treated group and of the control group."></svg>
+    </div>
+
+    <h2 style="margin-top:18px">Set the rules of the world</h2>
+    <div class="ctl">
+      <label for="a">How much X raises the <em>baseline</em> outcome, Y(0) = 100 + a·X <span class="val" id="aVal"></span></label>
+      <input type="range" id="a" min="0" max="4" step="0.5">
+    </div>
+    <div class="ctl">
+      <label for="b">How much X raises the <em>treatment effect</em>, τ = b·X <span class="val" id="bVal"></span></label>
+      <input type="range" id="b" min="-4" max="4" step="0.5">
+    </div>
+    <div class="ctl">
+      <label for="k">Targeting: treat the <span class="val" id="kVal"></span> units with the highest X</label>
+      <input type="range" id="k" min="1" max="9" step="1">
+    </div>
+    <div class="row">
+      <button class="btn secondary" type="button" id="randomBtn" aria-pressed="false">Assign at random instead</button>
+      <button class="btn secondary" type="button" id="reseedBtn">Reseed</button>
+      <button class="btn secondary" type="button" id="targetBtn" aria-pressed="true">Back to targeting</button>
+    </div>
+
+    <h2 style="margin-top:26px">What the data say</h2>
+    <dl class="readouts">
+      <div><dt>Naive gap  E[Y|D=1] − E[Y|D=0]</dt><dd id="rNaive"></dd></div>
+      <div><dt>ATT</dt><dd id="rATT"></dd></div>
+      <div><dt>ATC</dt><dd id="rATC"></dd></div>
+      <div><dt>ATE</dt><dd id="rATE"></dd></div>
+      <div><dt>E[Y(0)|D=1]</dt><dd id="rY0T"></dd></div>
+      <div><dt>E[Y(0)|D=0]</dt><dd id="rY0C"></dd></div>
+      <div class="wide"><dt>Selection bias  E[Y(0)|D=1] − E[Y(0)|D=0]</dt><dd id="rSB"></dd></div>
+    </dl>
+    <div class="eq" id="eq" aria-live="polite"></div>
+
+    <table aria-label="Potential outcomes for each unit">
+      <thead><tr><th>Unit</th><th>X</th><th>Y(0)</th><th>Y(1)</th><th>τ</th><th>D</th></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+
+
+
+
+
+</main>
+
+<script>
+(function(){
+  'use strict';
+  var N=10, X=[]; for(var i=1;i<=N;i++) X.push(i);
+
+  var state={a:2,b:2,k:5,mode:'target',seed:1,pred:null,sawZero:false};
+
+  // --- seeded RNG (mulberry32) ---
+  function rng(seed){ var t=seed>>>0; return function(){ t+=0x6D2B79F5; var r=Math.imul(t^t>>>15,1|t); r^=r+Math.imul(r^r>>>7,61|r); return ((r^r>>>14)>>>0)/4294967296; }; }
+  function randomAssign(seed){ var idx=X.map(function(_,i){return i;}); var r=rng(seed); for(var i=idx.length-1;i>0;i--){var j=Math.floor(r()*(i+1)); var t=idx[i]; idx[i]=idx[j]; idx[j]=t;} var D=new Array(N).fill(0); for(var m=0;m<5;m++) D[idx[m]]=1; return D; }
+
+  // --- one function owns the math ---
+  function model(a,b,k,mode,seed){
+    var Y0=X.map(function(x){return 100+a*x;});
+    var tau=X.map(function(x){return b*x;});
+    var Y1=Y0.map(function(y,i){return y+tau[i];});
+    var D = mode==='random' ? randomAssign(seed) : X.map(function(x){return x>N-k?1:0;});
+    function mean(arr,sel){ var s=0,c=0; for(var i=0;i<arr.length;i++) if(sel(i)){s+=arr[i];c++;} return c?s/c:NaN; }
+    var T=function(i){return D[i]===1;}, C=function(i){return D[i]===0;}, all=function(){return true;};
+    var y0T=mean(Y0,T), y0C=mean(Y0,C);
+    var att=mean(tau,T), atc=mean(tau,C), ate=mean(tau,all);
+    var naive=mean(Y1,T)-y0C;
+    return {Y0:Y0,Y1:Y1,tau:tau,D:D,y0T:y0T,y0C:y0C,att:att,atc:atc,ate:ate,naive:naive,sb:y0T-y0C};
+  }
+
+  function setState(patch){ for(var key in patch) state[key]=patch[key]; render(); }
+  function getState(){ return JSON.parse(JSON.stringify(state)); }
+
+  // --- DOM ---
+  var $=function(id){return document.getElementById(id);};
+  var aIn=$('a'), bIn=$('b'), kIn=$('k');
+  var svg=$('chart'), NS='http://www.w3.org/2000/svg';
+  function el(tag,attrs,text){ var e=document.createElementNS(NS,tag); for(var k in attrs) e.setAttribute(k,attrs[k]); if(text!=null) e.textContent=text; return e; }
+  function f1(v){ return isNaN(v)?'—':(v>=0?' ':'')+v.toFixed(1); }
+
+  function render(){
+    var m=model(state.a,state.b,state.k,state.mode,state.seed);
+    aIn.value=state.a; bIn.value=state.b; kIn.value=state.k;
+    $('aVal').textContent='a = '+state.a.toFixed(1);
+    $('bVal').textContent='b = '+state.b.toFixed(1);
+    $('kVal').textContent=state.k;
+    kIn.disabled = state.mode==='random';
+    $('randomBtn').setAttribute('aria-pressed', state.mode==='random');
+    $('targetBtn').setAttribute('aria-pressed', state.mode==='target');
+
+    $('rNaive').textContent=f1(m.naive); $('rATT').textContent=f1(m.att); $('rATC').textContent=f1(m.atc);
+    $('rATE').textContent=f1(m.ate); $('rY0T').textContent=f1(m.y0T); $('rY0C').textContent=f1(m.y0C);
+    $('rSB').textContent=f1(m.y0T).trim()+' − '+f1(m.y0C).trim()+' = '+f1(m.sb).trim();
+    $('eq').innerHTML='<b>naive</b> '+f1(m.naive).trim()+' = <span class="att"><b>ATT</b> '+f1(m.att).trim()+'</span> + <span class="sb"><b>selection bias</b> '+f1(m.sb).trim()+'</span>';
+
+    var how = state.mode==='random' ? 'assignment at random (seed '+state.seed+')' : 'the '+state.k+' highest-X units treated';
+    $('chartTitle').textContent='With baseline Y(0) = 100 + '+state.a.toFixed(1)+'·X, effect τ = '+state.b.toFixed(1)+'·X, and '+how+', the treated and control groups differ in Y(0) by '+f1(m.sb).trim()+'.';
+
+    // table
+    var tb=$('tbody'); tb.innerHTML='';
+    for(var i=0;i<N;i++){ var tr=document.createElement('tr'); tr.className=m.D[i]?'t':'c';
+      [String.fromCharCode(65+i),X[i],m.Y0[i].toFixed(1),m.Y1[i].toFixed(1),m.tau[i].toFixed(1),m.D[i]].forEach(function(v){var td=document.createElement('td'); td.textContent=v; tr.appendChild(td);});
+      tb.appendChild(tr); }
+
+    drawChart(m);
+
+    // reveal gating: student has reached a=0 with b≠0 under targeting
+    if(state.mode==='target' && state.a===0 && state.b!==0) state.sawZero=true;
+    var rv=$('reveal'); rv.hidden=!state.sawZero;
+    if(state.sawZero){ var txt={no:'You predicted that targeting on X would bias the naive gap.',yes:'You predicted the naive gap would equal ATT.',depends:'You predicted it depends on something other than the targeting rule.'}[state.pred];
+      $('revealPred').textContent = txt ? txt+' Here is what the controls showed.' : 'Here is what the controls showed.'; }
+  }
+
+  function drawChart(m){
+    var proj=document.body.classList.contains('projector');
+    var W=640,H=360,L=56,R=20,T=28,B=46;
+    var vals=m.Y0.concat(m.Y1), lo=Math.min.apply(null,vals), hi=Math.max.apply(null,vals);
+    var pad=Math.max(5,(hi-lo)*0.1); lo=Math.floor((lo-pad)/10)*10; hi=Math.ceil((hi+pad)/10)*10; if(hi-lo<20){hi=lo+20;}
+    var sx=function(x){return L+(x-0.5)/(N)*(W-L-R);}, sy=function(y){return T+(hi-y)/(hi-lo)*(H-T-B);};
+    var fs=proj?18:12, sw=proj?3:1.5, rad=proj?8:5;
+    while(svg.firstChild) svg.removeChild(svg.firstChild);
+    var g=el('g',{'font-size':fs,fill:'currentColor'});
+    svg.appendChild(g);
+    // axes
+    g.appendChild(el('line',{x1:L,y1:sy(lo),x2:W-R,y2:sy(lo),stroke:'var(--rule)','stroke-width':1}));
+    g.appendChild(el('line',{x1:L,y1:T,x2:L,y2:sy(lo),stroke:'var(--rule)','stroke-width':1}));
+    var step=(hi-lo)/4;
+    for(var t=0;t<=4;t++){ var yv=lo+t*step; g.appendChild(el('line',{x1:L-4,y1:sy(yv),x2:L,y2:sy(yv),stroke:'var(--muted)'})); g.appendChild(el('text',{x:L-8,y:sy(yv)+fs*0.35,'text-anchor':'end',fill:'var(--muted)'},yv.toFixed(0))); }
+    for(var i=0;i<N;i++) g.appendChild(el('text',{x:sx(X[i]),y:H-B+fs+6,'text-anchor':'middle',fill:'var(--muted)'},X[i]));
+    g.appendChild(el('text',{x:(L+W-R)/2,y:H-6,'text-anchor':'middle',fill:'var(--muted)'},'X (targeting variable)'));
+    g.appendChild(el('text',{x:12,y:T-10,fill:'var(--muted)'},'Outcome'));
+    // group mean Y(0) lines
+    function meanLine(y,color,label,anchorX){ if(isNaN(y))return; g.appendChild(el('line',{x1:L,y1:sy(y),x2:W-R,y2:sy(y),stroke:color,'stroke-dasharray':'5 4','stroke-width':sw,opacity:0.7}));
+      g.appendChild(el('text',{x:anchorX,y:sy(y)-5,fill:color,'font-size':fs*0.95},label)); }
+    meanLine(m.y0C,'var(--accent)','mean Y(0), control',L+6);
+    meanLine(m.y0T,'var(--contrast)','mean Y(0), treated',sx(6.2));
+    // units
+    for(var j=0;j<N;j++){ var col=m.D[j]?'var(--contrast)':'var(--accent)'; var x=sx(X[j]);
+      g.appendChild(el('line',{x1:x,y1:sy(m.Y0[j]),x2:x,y2:sy(m.Y1[j]),stroke:col,'stroke-width':sw}));
+      g.appendChild(el('circle',{cx:x,cy:sy(m.Y0[j]),r:rad,fill:'var(--bg)',stroke:col,'stroke-width':sw}));
+      g.appendChild(el('circle',{cx:x,cy:sy(m.Y1[j]),r:rad,fill:col}));
+    }
+    // legend
+    var lx=W-R-150, ly=T+4;
+    g.appendChild(el('circle',{cx:lx,cy:ly,r:rad,fill:'var(--bg)',stroke:'currentColor','stroke-width':sw})); g.appendChild(el('text',{x:lx+12,y:ly+fs*0.35},'Y(0)'));
+    g.appendChild(el('circle',{cx:lx+60,cy:ly,r:rad,fill:'currentColor'})); g.appendChild(el('text',{x:lx+72,y:ly+fs*0.35},'Y(1)'));
+    g.appendChild(el('text',{x:lx,y:ly+fs+8,fill:'var(--contrast)'},'treated'));
+    g.appendChild(el('text',{x:lx+72,y:ly+fs+8,fill:'var(--accent)'},'control'));
+  }
+
+  // --- controls ---
+  aIn.addEventListener('input',function(){setState({a:parseFloat(aIn.value)});});
+  bIn.addEventListener('input',function(){setState({b:parseFloat(bIn.value)});});
+  kIn.addEventListener('input',function(){setState({k:parseInt(kIn.value,10)});});
+  $('randomBtn').addEventListener('click',function(){setState({mode:'random'});});
+  $('targetBtn').addEventListener('click',function(){setState({mode:'target'});});
+  $('reseedBtn').addEventListener('click',function(){setState({mode:'random',seed:state.seed+1});});
+  Array.prototype.forEach.call(document.querySelectorAll('input[name=pred]'),function(r){ r.addEventListener('change',function(){ setState({pred:r.value}); }); });
+  $('scaleBtn').addEventListener('click',function(){ var on=!document.body.classList.contains('projector'); document.body.classList.toggle('projector',on); document.body.classList.toggle('laptop',!on); $('scaleBtn').setAttribute('aria-pressed',on); render(); });
+
+  // --- assertions ---
+  var assertions=[
+    {name:'naive − ATT − SB = 0 for every setting', run:function(){ for(var a=0;a<=4;a+=0.5) for(var b=-4;b<=4;b+=0.5) for(var k=1;k<=9;k++){ var m=model(a,b,k,'target',1); if(Math.abs(m.naive-m.att-m.sb)>1e-9) return false; } return true; }},
+    {name:'a = 0 ⇒ selection bias = 0 for every k and b', run:function(){ for(var b=-4;b<=4;b+=0.5) for(var k=1;k<=9;k++){ if(Math.abs(model(0,b,k,'target',1).sb)>1e-9) return false; } return true; }},
+    {name:'b = 0 ⇒ ATT = ATC = ATE = 0 while SB = a·(mean X treated − mean X control)', run:function(){ for(var a=0;a<=4;a+=0.5) for(var k=1;k<=9;k++){ var m=model(a,0,k,'target',1); if(Math.abs(m.att)>1e-9||Math.abs(m.atc)>1e-9) return false; var mt=0,mc=0; for(var i=0;i<N;i++){ if(m.D[i]) mt+=X[i]/k; else mc+=X[i]/(N-k);} if(Math.abs(m.sb-a*(mt-mc))>1e-9) return false; } return true; }},
+    {name:'targeting with b > 0 ⇒ ATT > ATC; with b < 0 ⇒ ATT < ATC', run:function(){ var p=model(0,2,5,'target',1), n=model(0,-2,5,'target',1); return p.att>p.atc && n.att<n.atc; }},
+    {name:'random assignment: mean SB over 1,000 seeds within 0.3 of zero (a = 4)', run:function(){ var s=0; for(var sd=1;sd<=1000;sd++) s+=model(4,2,5,'random',sd).sb; return Math.abs(s/1000)<0.3; }}
+  ];
+  window.artifact={getState:getState,setState:setState,assertions:assertions};
+
+  render();
+})();
+</script>
+
+<script>
+(function () {
+  var cfg = {"versionId":"cmv8axata000106l5s8i28ea8","appOrigin":"https://ideasatplay.org","direct":null};
+  var t0 = Date.now(), scrolled = false, acted = false, reached = false, shown = false, config = null;
+  var framed = parent !== window;
+  function onScreen(el) {
+    if (!el.getClientRects().length) return false;
+    var r = el.getBoundingClientRect();
+    return r.top < innerHeight && r.bottom > 0;
+  }
+  function atBottom() {
+    var f = document.querySelector("footer[data-kc-credit]");
+    if (f) return f.getBoundingClientRect().top <= innerHeight;
+    var d = document.documentElement;
+    return scrollY + innerHeight >= d.scrollHeight - 48;
+  }
+  // { cur, last } when the page moves through numbered steps, else null.
+  function steps() {
+    var a = window.artifact;
+    try {
+      var c = a && Array.isArray(a.controls) ? a.controls.filter(function (x) { return x && x.key === "step" && typeof x.max === "number"; })[0] : null;
+      if (c) { var s = a.getState(); if (s && typeof s.step === "number") return { cur: s.step, last: c.max }; }
+    } catch (e) {}
+    var cur = document.querySelector('[aria-current="step"]');
+    if (cur && cur.parentElement) {
+      var sib = Array.prototype.filter.call(cur.parentElement.children, function (x) { return x.getClientRects().length; });
+      return { cur: sib.indexOf(cur), last: sib.length - 1 };
+    }
+    return null;
+  }
+  function finished() {
+    var mark = document.querySelector("[data-kc-end]");
+    if (mark) return onScreen(mark);
+    var s = steps();
+    if (s) return s.cur >= s.last && atBottom();
+    return atBottom() && (scrolled || (acted && Date.now() - t0 > 60000));
+  }
+  // The student link remembers a rating in its own storage where the browser allows it.
+  var KEY = "kc-rated-" + cfg.versionId;
+  function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
+  if (cfg.direct) config = { ask: !store(KEY), preview: false, labels: cfg.direct.labels };
+  var visitor = (function () {
+    var v = store("kc-visitor");
+    if (!v) { v = ""; for (var i = 0; i < 24; i++) v += "abcdefghijklmnopqrstuvwxyz0123456789".charAt(Math.floor(Math.random() * 36)); store("kc-visitor", v); }
+    return v;
+  })();
+  var pending = {}, seq = 0;
+  function save(score, comment) {
+    if (cfg.direct) {
+      var body = { versionId: cfg.versionId, score: score, context: "share", visitor: visitor };
+      if (comment) body.comment = comment;
+      // text/plain: a simple request, so no preflight is needed.
+      return fetch(cfg.direct.endpoint, { method: "POST", credentials: "omit", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(body) })
+        .then(function (r) { if (r.ok) store(KEY, String(score)); return r.ok; }, function () { return false; });
+    }
+    return new Promise(function (resolve) {
+      var id = ++seq; pending[id] = resolve;
+      parent.postMessage({ type: "kc:rate", versionId: cfg.versionId, id: id, score: score, comment: comment || "" }, cfg.appOrigin);
+      setTimeout(function () { if (pending[id]) { delete pending[id]; resolve(false); } }, 15000);
+    });
+  }
+  var B = "display:inline-block;margin:3px 6px 3px 0;padding:4px 10px;border:1px solid #a8a29e;border-radius:6px;background:#fff;color:#1c1917;font:inherit;cursor:pointer";
+  function el(tag, attrs, text) { var e = document.createElement(tag); for (var k in attrs) e.setAttribute(k, attrs[k]); if (text) e.textContent = text; return e; }
+  function show() {
+    if (shown || !config || !config.ask) return;
+    shown = true;
+    clearInterval(timer);
+    var L = config.labels;
+    var box = el("div", { "data-kc-rating": "", "data-kc-personal": "", role: "region", "aria-label": L.ask, lang: L.lang, dir: L.dir,
+      style: "box-sizing:border-box;max-width:760px;margin:24px auto 0;padding:10px 14px;border:1px solid #d6d3d1;border-radius:10px;background:#fafaf9;color:#1c1917;font:14px/1.5 system-ui,-apple-system,sans-serif;text-align:start" });
+    var live = el("div", { "aria-live": "polite" });
+    box.appendChild(live);
+    function ask(msg) {
+      live.innerHTML = "";
+      live.appendChild(el("span", { style: "font-weight:600;margin-inline-end:8px" }, L.ask));
+      [1, 2, 3].forEach(function (s) {
+        var b = el("button", { type: "button", style: B }, s + " · " + L["s" + s]);
+        b.addEventListener("click", function () {
+          live.querySelectorAll("button").forEach(function (x) { x.disabled = true; });
+          save(s, "").then(function (ok) { if (ok) comment(s); else ask(L.error); });
+        });
+        live.appendChild(b);
+      });
+      if (config.preview) live.appendChild(el("div", { style: "font-size:12px;color:#57534e" }, L.preview));
+      if (msg) live.appendChild(el("div", { role: "alert", style: "color:#991b1b;font-size:13px" }, msg));
+    }
+    function comment(score) {
+      live.innerHTML = "";
+      var id = "kc-rate-comment";
+      live.appendChild(el("label", { for: id, style: "display:block;font-weight:600;margin-bottom:4px" }, L.comment));
+      var row = el("div", { style: "display:flex;flex-wrap:wrap;gap:6px;align-items:center" });
+      var input = el("input", { id: id, type: "text", maxlength: "1000", autocomplete: "off", dir: "auto",
+        style: "flex:1 1 260px;min-width:0;box-sizing:border-box;padding:5px 8px;border:1px solid #a8a29e;border-radius:6px;background:#fff;color:#1c1917;font:inherit" });
+      var send = el("button", { type: "button", style: B + ";background:#292524;color:#fff;border-color:#292524" }, L.send);
+      var skip = el("button", { type: "button", style: B }, L.skip);
+      function done() { live.innerHTML = ""; live.appendChild(el("span", { style: "font-weight:600" }, L.thanks)); setTimeout(function () { box.remove(); }, 2000); }
+      send.addEventListener("click", function () {
+        var text = input.value.trim();
+        if (!text) return done();
+        send.disabled = skip.disabled = true;
+        save(score, text).then(function (ok) { if (ok) done(); else { send.disabled = skip.disabled = false; live.appendChild(el("div", { role: "alert", style: "color:#991b1b;font-size:13px" }, L.error)); } });
+      });
+      input.addEventListener("keydown", function (e) { if (e.key === "Enter") send.click(); });
+      skip.addEventListener("click", done);
+      row.appendChild(input); row.appendChild(send); row.appendChild(skip);
+      live.appendChild(row);
+      input.focus();
+    }
+    ask("");
+    var mark = document.querySelector("[data-kc-end]"), foot = document.querySelector("footer[data-kc-credit]");
+    if (mark) mark.insertAdjacentElement("afterend", box);
+    else if (foot) foot.parentNode.insertBefore(box, foot);
+    else document.body.appendChild(box);
+  }
+  function check() {
+    if (!reached && finished()) reached = true;
+    if (reached) show();
+  }
+  window.addEventListener("message", function (e) {
+    if (e.source !== parent || !e.data || e.data.versionId !== cfg.versionId) return;
+    var d = e.data;
+    if (d.type === "kc:rate-config" && !cfg.direct) { config = { ask: !!d.ask, preview: !!d.preview, labels: d.labels }; check(); }
+    if (d.type === "kc:rate-result" && pending[d.id]) { pending[d.id](!!d.ok); delete pending[d.id]; }
+  });
+  // The app page may start listening after this page loads: ask a few times.
+  var hellos = 0;
+  function hello() { if (framed && !cfg.direct && !config && hellos++ < 8) parent.postMessage({ type: "kc:rate-hello", versionId: cfg.versionId }, cfg.appOrigin); }
+  hello();
+  var timer = setInterval(function () { if (hellos < 8 && !config) hello(); check(); }, 800);
+  window.addEventListener("scroll", function () { if (scrollY > 0) scrolled = true; check(); }, { passive: true });
+  ["click", "input", "keydown"].forEach(function (t) { document.addEventListener(t, function (e) { if (e.target && e.target.closest && e.target.closest("[data-kc-rating]")) return; acted = true; setTimeout(check, 50); }, true); });
+})();
+</script></body>
+</html>

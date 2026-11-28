@@ -1,0 +1,619 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pierre, the aspirin and the party: what is "the effect"?</title>
+<style>
+:root{
+  --bg:#fbfaf7;--card:#ffffff;--ink:#22252a;--muted:#5b626d;--rule:#d6d2ca;--faint:#efece6;
+  --a:#2E4057;--b:#b4480a;--ok:#2f6b4f;
+}
+@media (prefers-color-scheme: dark){
+  :root{--bg:#16181c;--card:#1f2228;--ink:#ece9e3;--muted:#a9afb8;--rule:#3b4048;--faint:#2a2e35;--a:#9dbfe3;--b:#ffa366;--ok:#8fd1ae;}
+}
+*{box-sizing:border-box}
+[hidden]{display:none !important}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+body.projector{font-size:19px}
+main{max-width:1180px;margin:0 auto;padding:12px 20px 24px}
+h1{font-size:1.3rem;line-height:1.25;margin:0;font-weight:650}
+.topbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+button{font:inherit;font-size:14px;min-height:30px;padding:4px 11px;border:1px solid var(--rule);border-radius:8px;background:var(--card);color:var(--ink);cursor:pointer}
+button:hover:not(:disabled){border-color:var(--muted)}
+button[aria-pressed="true"],button[aria-current="step"]{background:var(--a);color:var(--card);border-color:var(--a)}
+button.primary{background:var(--a);color:var(--card);border-color:var(--a)}
+button:disabled{opacity:.45;cursor:default}
+:focus-visible{outline:3px solid var(--a);outline-offset:2px}
+.stepbar{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.stepbar button{font-size:13px}
+.work{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:22px;align-items:start}
+@media (max-width:860px){.work{grid-template-columns:minmax(0,1fr)}}
+.card{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:12px 18px 14px}
+.stepnum{font-size:13px;color:var(--muted);margin:0}
+#stepH{font-size:1.2rem;margin:.1em 0 .3em;line-height:1.3}
+#stepBody p{margin:.35em 0;max-width:72ch}
+.story{font-size:14.5px;margin:.2em 0;padding-inline-start:1.2em}
+.story li{margin:.1em 0}
+svg{display:block;width:100%;height:auto;overflow:visible}
+svg text{fill:var(--ink);font-size:13px;paint-order:stroke;stroke:var(--card);stroke-width:5px;stroke-linejoin:round}
+svg .muted{fill:var(--muted);font-size:12px}
+svg .edge{stroke:var(--rule);stroke-width:2;fill:none}
+svg .edge.onA{stroke:var(--a);stroke-width:4}
+svg .edge.onB{stroke:var(--b);stroke-width:4;stroke-dasharray:7 4}
+svg .node{fill:var(--card);stroke:var(--rule);stroke-width:1.5}
+svg .leaf{cursor:pointer}
+svg .leaf rect{fill:var(--card);stroke:var(--rule);stroke-width:1.5}
+svg .leaf:hover rect{stroke:var(--muted)}
+svg .leaf.onA rect{stroke:var(--a);stroke-width:3}
+svg .leaf.onB rect{stroke:var(--b);stroke-width:3}
+svg .big{font-weight:700;font-size:15px}
+svg .prob{font-weight:700;font-size:13px}
+.legend{font-size:13px;color:var(--muted);margin:.3em 0 0}
+.legend b.a{color:var(--a)} .legend b.b{color:var(--b)}
+.worlds{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:.5em 0}
+@media (max-width:560px){.worlds{grid-template-columns:1fr}}
+.world{border:2px solid var(--a);border-radius:10px;padding:8px 10px;font-size:14px}
+.world.b{border-color:var(--b);border-style:dashed}
+.world h3{margin:0 0 .3em;font-size:15px}
+.world.a h3{color:var(--a)} .world.b h3{color:var(--b)}
+.world .row{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin:.2em 0}
+.world .row span{min-width:4.6em;color:var(--muted)}
+.world .row button{font-size:13px;min-height:26px;padding:2px 8px}
+.world dl{display:grid;grid-template-columns:auto auto;gap:0 10px;margin:.4em 0 0}
+.world dt{color:var(--muted)} .world dd{margin:0;font-weight:700;font-variant-numeric:tabular-nums}
+.world .warn{font-size:12.5px;color:var(--muted);margin:.3em 0 0}
+.ctl{display:grid;grid-template-columns:minmax(0,15em) 1fr 3.5em;gap:4px 10px;align-items:center;margin:.35em 0;font-size:14px}
+.ctl input{width:100%}
+.ctl output{font-weight:700;text-align:end;font-variant-numeric:tabular-nums}
+.choices{display:flex;flex-wrap:wrap;gap:6px;margin:.3em 0}
+label.big{display:block;font-weight:600;margin:.6em 0 .2em}
+textarea{width:100%;font:inherit;font-size:14px;padding:6px 8px;border:1px solid var(--rule);border-radius:6px;background:var(--bg);color:var(--ink);resize:vertical}
+.guide{font-size:12.5px;color:var(--muted);margin:.15em 0 0}
+.calc{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;margin:.5em 0 0;padding:6px 10px;border:1px solid var(--rule);border-radius:8px;background:var(--faint);font-size:14px}
+.calc label{font-weight:600}
+.calc input{flex:1 1 14em;min-width:0;font:inherit;font-size:15px;font-variant-numeric:tabular-nums;padding:3px 8px;border:1px solid var(--rule);border-radius:6px;background:var(--card);color:var(--ink)}
+.calc output{min-width:5em;font-weight:700;font-size:15px;font-variant-numeric:tabular-nums}
+.calc output.err{font-weight:400;font-size:13px;color:var(--muted)}
+.calc button{min-height:28px;font-size:13px;padding:2px 9px}
+.saved{display:inline-block;margin:.4em 0 0;padding:4px 10px;border-radius:8px;background:var(--faint);font-size:13.5px}
+.group{border-inline-start:3px solid var(--b);padding:2px 10px;margin:.5em 0;font-size:14px}
+.end{border:2px solid var(--ok);border-radius:10px;padding:10px 14px;margin-top:.6em}
+.end strong{color:var(--ok);font-size:1.1rem}
+.moves{display:flex;justify-content:space-between;gap:8px;margin-top:10px}
+details{margin-top:12px;font-size:14px}
+details ul{margin:.4em 0;padding-inline-start:1.2em;max-width:80ch}
+.kind{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-inline-end:6px}
+</style>
+</head>
+<body>
+<main>
+  <div class="topbar">
+    <h1>Pierre, the aspirin and the party: what is “the effect”?</h1>
+    <button type="button" id="scaleBtn" aria-pressed="false" title="Larger text for a projector">Projector text</button>
+  </div>
+  <nav class="stepbar" id="stepbar" aria-label="Steps"></nav>
+
+  <div class="work">
+    <section class="card" aria-label="Pierre's choices">
+      <svg id="tree" viewBox="0 0 560 360" role="img" aria-labelledby="treeTitle">
+        <title id="treeTitle">Pierre's choices as a tree: aspirin or not on Thursday afternoon, then party or not on Thursday night, with his health and his Friday grade at the end of each path.</title>
+      </svg>
+      <p class="legend" id="legend"></p>
+      <p class="legend">Click a grade box to follow that path. Every number at the end of the tree is a <em>potential outcome</em>: what would happen to Pierre on that path.</p>
+    </section>
+
+    <section class="card" aria-live="polite">
+      <p class="stepnum" id="stepNum"></p>
+      <h2 id="stepH" tabindex="-1"></h2>
+      <div id="stepBody"></div>
+      <div class="moves">
+        <button type="button" id="prevBtn">← Previous step</button>
+        <button type="button" id="nextBtn" class="primary">Next step →</button>
+      </div>
+    </section>
+  </div>
+
+  <details>
+    <summary>What this activity assumes</summary>
+    <ul id="ledger"></ul>
+    <p>Left out on purpose: how anyone could learn these numbers (we only ever see Pierre live one of these paths), and uncertainty about the outcomes themselves.</p>
+  </details>
+</main>
+
+<script>
+(function(){
+'use strict';
+
+// ─── The story (from the class worksheet) ───────────────────────
+var HEALTH = { yes: 100, no: 50 };                 // Thursday afternoon, with / without aspirin
+var GRADE = { yes: { party: 60, stay: 90 },       // Friday test grade
+              no:  { party: 40, stay: 70 } };
+var PARTY = { yes: 80, no: 0 };                   // chance (%) he parties, given the afternoon
+
+var LEDGER = [
+  ['parameter', 'Pierre’s health on Thursday afternoon: 100 with aspirin, 50 without.'],
+  ['parameter', 'Friday grade: aspirin and party 60; aspirin and stay in 90; no aspirin and party 40; no aspirin and stay in 70.'],
+  ['parameter', 'Chance he parties: 80% if he takes the aspirin, 0% if he doesn’t.'],
+  ['simplification', 'One person, two decisions, and outcomes known exactly. In real life we would see only one path for Pierre.'],
+  ['interpretation', '“The effect of the aspirin” is left open on purpose: on which outcome, and with Thursday night held fixed or left to Pierre? That is the question for discussion.'],
+  ['data', 'Invented numbers from a class worksheet (the “Pierre” exercise); not from any study.']
+];
+
+var STEPS = [
+  { title: 'Meet Pierre: is the aspirin good for him?' },
+  { title: 'Question 1, part a: what does the aspirin do to Pierre’s health on Thursday afternoon?' },
+  { title: 'Question 1, part b: what does the aspirin do to Pierre’s grade on Friday?' },
+  { title: 'Question 2: what does partying do to Pierre’s grade? Does it depend on anything?' },
+  { title: 'Exit question: what does “the effect” depend on?' }
+];
+
+var RESPONSES = [
+  { key: 'response_pred', step: 0, prompt: 'Why did you answer the way you did? (1–2 sentences)' },
+  { key: 'response_q1a', step: 1, prompt: 'What is the effect of taking the aspirin vs. not taking it, on Pierre’s health on Thursday afternoon?' },
+  { key: 'response_q1b', step: 2, prompt: 'What is the effect of taking the aspirin vs. not taking it, on Pierre’s Friday grade? What does this effect depend upon, if anything?' },
+  { key: 'response_q2', step: 3, prompt: 'What is the effect of partying vs. not partying for Pierre? What does this effect depend upon, if anything?' },
+  { key: 'response_exit', step: 4, prompt: 'When someone asks “what is the effect of X for Pierre?”, what do you need to know before you can answer?' }
+];
+
+var PRED = [['good', 'Yes, it’s good for him'], ['bad', 'No, it’s bad for him'], ['depends', 'It depends']];
+
+// ─── State ──────────────────────────────────────────────────────
+var state = { step: 0, pred: '', aAsp: 'yes', aNight: 'stay', bAsp: 'no', bNight: 'stay', calc_q1b: '', calc_q2: '', scale: 'laptop' };
+RESPONSES.forEach(function(r){ state[r.key] = ''; });
+var listeners = [];
+
+var VALID = {
+  step: function(v){ return Number.isInteger(v) && v >= 0 && v < STEPS.length; },
+  pred: function(v){ return v === '' || PRED.some(function(p){ return p[0] === v; }); },
+  aAsp: yn, bAsp: yn, aNight: night, bNight: night,
+  calc_q1b: calcText, calc_q2: calcText,
+  scale: function(v){ return v === 'laptop' || v === 'projector'; }
+};
+RESPONSES.forEach(function(r){ VALID[r.key] = function(v){ return typeof v === 'string' && v.length <= 2000; }; });
+function yn(v){ return v === 'yes' || v === 'no'; }
+function calcText(v){ return typeof v === 'string' && v.length <= 200; }
+function night(v){ return v === 'party' || v === 'stay'; }
+
+function apply(patch){
+  var changed = false;
+  Object.keys(patch || {}).forEach(function(k){
+    if(VALID[k] && VALID[k](patch[k]) && state[k] !== patch[k]){ state[k] = patch[k]; changed = true; }
+  });
+  return changed;
+}
+function getState(){ return JSON.parse(JSON.stringify(state)); }
+function setState(patch){ if(apply(patch)) render(); }
+function set(patch){ if(apply(patch)){ render(); var s = getState(); listeners.forEach(function(f){ f(s); }); } }
+
+// ─── Helpers ────────────────────────────────────────────────────
+var $ = function(id){ return document.getElementById(id); };
+function el(tag, attrs, kids){
+  var e = document.createElement(tag);
+  Object.keys(attrs || {}).forEach(function(k){
+    if(k === 'text') e.textContent = attrs[k];
+    else if(k === 'html') e.innerHTML = attrs[k];
+    else if(k.slice(0, 2) === 'on') e.addEventListener(k.slice(2), attrs[k]);
+    else e.setAttribute(k, attrs[k]);
+  });
+  (kids || []).forEach(function(c){ if(c) e.appendChild(c); });
+  return e;
+}
+var NS = 'http://www.w3.org/2000/svg';
+function s(tag, attrs, text){
+  var e = document.createElementNS(NS, tag);
+  Object.keys(attrs).forEach(function(k){ e.setAttribute(k, attrs[k]); });
+  if(text != null) e.textContent = text;
+  return e;
+}
+function partyChance(asp){ return PARTY[asp]; }
+function nightLabel(n){ return n === 'party' ? 'parties' : 'stays in'; }
+
+// ─── Tree ───────────────────────────────────────────────────────
+// Both worlds are drawn on the tree in steps 3 and 4, where students compare them.
+function showWorlds(){ return state.step === 2 || state.step === 3; }
+
+function drawTree(){
+  var svg = $('tree');
+  while(svg.lastChild && svg.lastChild.nodeName !== 'title') svg.removeChild(svg.lastChild);
+  var root = { x: 40, y: 180 };
+  var mid = { yes: { x: 200, y: 95 }, no: { x: 200, y: 265 } };
+  var leafX = 400;
+  var leafY = { yes: { party: 45, stay: 140 }, no: { party: 220, stay: 315 } };
+  var worlds = showWorlds();
+  var onA = function(asp, n){ return worlds && state.aAsp === asp && (n == null || state.aNight === n); };
+  var onB = function(asp, n){ return worlds && state.bAsp === asp && (n == null || state.bNight === n); };
+
+  svg.appendChild(s('text', { x: 6, y: 20, 'class': 'muted' }, 'Thursday afternoon'));
+  svg.appendChild(s('text', { x: 170, y: 20, 'class': 'muted' }, 'Thursday night'));
+  svg.appendChild(s('text', { x: leafX, y: 20, 'class': 'muted' }, 'Friday test'));
+
+  ['yes', 'no'].forEach(function(asp){
+    var m = mid[asp];
+    var cls = 'edge' + (onA(asp) ? ' onA' : '') ;
+    svg.appendChild(s('path', { d: 'M' + root.x + ' ' + root.y + ' L' + m.x + ' ' + m.y, 'class': cls }));
+    if(onB(asp)) svg.appendChild(s('path', { d: 'M' + root.x + ' ' + (root.y + 4) + ' L' + m.x + ' ' + (m.y + 4), 'class': 'edge onB' }));
+    var lx = (root.x + m.x) / 2 - 58, ly = (root.y + m.y) / 2 + (asp === 'yes' ? -10 : 22);
+    svg.appendChild(s('text', { x: lx, y: ly, 'class': 'big' }, asp === 'yes' ? 'Aspirin' : 'No aspirin'));
+    svg.appendChild(s('text', { x: lx, y: ly + 16, 'class': 'muted' }, 'health ' + HEALTH[asp]));
+
+    ['party', 'stay'].forEach(function(n){
+      var y = leafY[asp][n];
+      svg.appendChild(s('path', { d: 'M' + m.x + ' ' + m.y + ' L' + leafX + ' ' + y, 'class': 'edge' + (onA(asp, n) ? ' onA' : '') }));
+      if(onB(asp, n)) svg.appendChild(s('path', { d: 'M' + m.x + ' ' + (m.y + 4) + ' L' + leafX + ' ' + (y + 4), 'class': 'edge onB' }));
+      var p = n === 'party' ? partyChance(asp) : 100 - partyChance(asp);
+      var tx = m.x + (leafX - m.x) * 0.45, ty = m.y + (y - m.y) * 0.45 + (n === 'party' ? -6 : 14);
+      svg.appendChild(s('text', { x: tx, y: ty, 'class': 'prob' }, (n === 'party' ? 'party ' : 'stay in ') + p + '%'));
+
+      var g = s('g', { 'class': 'leaf' + (onA(asp, n) ? ' onA' : '') + (onB(asp, n) && !onA(asp, n) ? ' onB' : ''), tabindex: 0, role: 'button',
+        'aria-label': (asp === 'yes' ? 'Aspirin' : 'No aspirin') + ', ' + nightLabel(n) + ': grade ' + GRADE[asp][n] });
+      g.appendChild(s('rect', { x: leafX, y: y - 18, width: 140, height: 36, rx: 7 }));
+      g.appendChild(s('text', { x: leafX + 10, y: y + 5, 'class': 'big' }, 'grade ' + GRADE[asp][n]));
+      var pick = function(){ set({ aAsp: asp, aNight: n }); };
+      g.addEventListener('click', pick);
+      g.addEventListener('keydown', function(e){ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); pick(); } });
+      svg.appendChild(g);
+    });
+    svg.appendChild(s('circle', { cx: m.x, cy: m.y, r: 6, 'class': 'node' }));
+  });
+  svg.appendChild(s('circle', { cx: root.x, cy: root.y, r: 7, 'class': 'node' }));
+
+  $('legend').innerHTML = worlds
+    ? '<b class="a">Solid line: world A</b> · <b class="b">dashed line: world B</b>. The % on each branch is the chance Pierre takes it.'
+    : 'The % on each branch is the chance Pierre takes it, given what he did that afternoon.';
+}
+
+// ─── Step panels ────────────────────────────────────────────────
+function answerBox(key){
+  var r = RESPONSES.filter(function(x){ return x.key === key; })[0];
+  var id = 'box_' + key;
+  var ta = el('textarea', { id: id, rows: 3, maxlength: 2000, dir: 'auto' });
+  ta.value = state[key];
+  ta.addEventListener('input', function(){ set((function(o){ o[key] = ta.value; return o; })({})); });
+  return el('div', {}, [
+    el('label', { 'class': 'big', 'for': id, text: r.prompt }),
+    ta,
+    el('p', { 'class': 'guide', text: 'A few sentences. Your answer is saved here; we will discuss answers as a class.' })
+  ]);
+}
+
+function worldCard(w){
+  var asp = state[w + 'Asp'], n = state[w + 'Night'];
+  var row = function(label, key, opts){
+    return el('div', { 'class': 'row' }, [el('span', { text: label })].concat(opts.map(function(o){
+      return el('button', { type: 'button', 'aria-pressed': String(state[key] === o[0]), text: o[1],
+        onclick: function(){ var p = {}; p[key] = o[0]; set(p); } });
+    })));
+  };
+  var chance = n === 'party' ? partyChance(asp) : 100 - partyChance(asp);
+  return el('div', { 'class': 'world ' + w, role: 'group', 'aria-label': 'World ' + w.toUpperCase() }, [
+    el('h3', { text: 'World ' + w.toUpperCase() }),
+    row('Aspirin?', w + 'Asp', [['yes', 'Yes'], ['no', 'No']]),
+    row('Night', w + 'Night', [['party', 'Party'], ['stay', 'Stay in']]),
+    el('dl', {}, [
+      el('dt', { text: 'Health Thursday' }), el('dd', { text: String(HEALTH[asp]) }),
+      el('dt', { text: 'Grade Friday' }), el('dd', { text: String(GRADE[asp][n]) }),
+      el('dt', { text: 'Chance of this night' }), el('dd', { text: chance + '%' })
+    ]),
+    chance === 0 ? el('p', { 'class': 'warn', text: 'Pierre would never choose this night after this afternoon. It is still a potential outcome: what would happen if he did.' }) : null
+  ]);
+}
+
+function worlds(){ return el('div', { 'class': 'worlds' }, [worldCard('a'), worldCard('b')]); }
+
+// ─── Calculator ─────────────────────────────────────────────────
+// + − × ÷, brackets, decimals and % (80% = 0.8). No eval: a small parser.
+function calc(text){
+  var src = String(text).replace(/×/g, '*').replace(/÷/g, '/').replace(/[−–]/g, '-').replace(/\s+/g, '');
+  if(!src) return null;
+  var i = 0;
+  function peek(){ return src[i]; }
+  function num(){
+    var m = /^\d*\.?\d+|^\d+\./.exec(src.slice(i));
+    if(!m) throw 0;
+    i += m[0].length;
+    var v = parseFloat(m[0]);
+    if(peek() === '%'){ i++; v /= 100; }
+    return v;
+  }
+  function factor(){
+    if(peek() === '-'){ i++; return -factor(); }
+    if(peek() === '+'){ i++; return factor(); }
+    if(peek() === '('){ i++; var v = expr(); if(peek() !== ')') throw 0; i++; if(peek() === '%'){ i++; v /= 100; } return v; }
+    return num();
+  }
+  function term(){
+    var v = factor();
+    while(peek() === '*' || peek() === '/'){ var op = src[i++], r = factor(); v = op === '*' ? v * r : v / r; }
+    return v;
+  }
+  function expr(){
+    var v = term();
+    while(peek() === '+' || peek() === '-'){ var op = src[i++], r = term(); v = op === '+' ? v + r : v - r; }
+    return v;
+  }
+  try { var v = expr(); if(i !== src.length || !isFinite(v)) return NaN; return v; } catch(e){ return NaN; }
+}
+function calcResult(text){
+  var v = calc(text);
+  if(v === null) return { text: 'Type a calculation', err: true };
+  if(isNaN(v)) return { text: 'Can’t read that yet', err: true };
+  return { text: '= ' + String(Math.round(v * 10000) / 10000).replace('-', '−'), err: false };
+}
+function showCalc(key){
+  var out = $('res_' + key);
+  if(!out) return;
+  var r = calcResult(state[key]);
+  out.textContent = r.text;
+  out.className = r.err ? 'err' : '';
+}
+function calcBox(key){
+  var id = 'box_' + key;
+  var inp = el('input', { id: id, type: 'text', inputmode: 'decimal', maxlength: 200, autocomplete: 'off', spellcheck: 'false', placeholder: 'e.g. (12 + 3) × 4 or 25% × 8' });
+  inp.value = state[key];
+  inp.addEventListener('input', function(){ var p = {}; p[key] = inp.value; set(p); });
+  var out = el('output', { id: 'res_' + key, 'for': id, 'aria-live': 'polite' });
+  var wrap = el('div', { 'class': 'calc' }, [
+    el('label', { 'for': id, text: 'Calculator' }), inp, out,
+    el('button', { type: 'button', text: 'Clear', onclick: function(){ var p = {}; p[key] = ''; set(p); $(id).focus(); } })
+  ]);
+  setTimeout(function(){ showCalc(key); }, 0);
+  return wrap;
+}
+
+var savedNote = function(){ return el('p', { 'class': 'saved', role: 'status', text: 'Saved. We will discuss answers as a class.' }); };
+
+function body(){
+  var b = $('stepBody');
+  b.textContent = '';
+  var add = function(n){ if(n) b.appendChild(n); };
+  switch(state.step){
+    case 0:
+      add(el('p', { text: 'Pierre has a headache on Thursday afternoon. His big test is on Friday. He makes two decisions:' }));
+      add(el('ul', { 'class': 'story' }, [
+        el('li', { html: '<b>Thursday afternoon:</b> take an aspirin or not. With it he feels great (health 100); without it, not so great (50).' }),
+        el('li', { html: '<b>Thursday night:</b> party or stay in. With the aspirin there’s an 80% chance he parties (not much self-control). Without it he can’t party: he goes to bed early.' }),
+        el('li', { html: 'His Friday grade depends on both. The four grades are at the end of the tree.' })
+      ]));
+      add(el('p', { html: '<b>Before working anything out:</b> is taking the aspirin good for Pierre?' }));
+      add(el('div', { 'class': 'choices', role: 'group', 'aria-label': 'Your first guess' }, PRED.map(function(p){
+        return el('button', { type: 'button', 'aria-pressed': String(state.pred === p[0]), text: p[1], onclick: function(){ set({ pred: p[0] }); } });
+      })));
+      if(state.pred) add(savedNote());
+      add(answerBox('response_pred'));
+      break;
+    case 1:
+      add(el('p', { text: 'Look only at the first fork of the tree: Thursday afternoon, before anything happens that night.' }));
+      add(el('p', { text: 'Compare Pierre’s health on the two branches. What is the effect of the aspirin on his health? Does it depend on anything?' }));
+      add(answerBox('response_q1a'));
+      break;
+    case 2:
+      add(el('p', { text: 'Now the Friday grade. Compare world A (aspirin) with world B (no aspirin): try the same night in both, then different nights.' }));
+      add(worlds());
+      add(calcBox('calc_q1b'));
+      add(el('p', { 'class': 'group', text: 'In a group: agree on which comparison answers “the effect of the aspirin on Pierre’s grade” before writing. Keep the chances (80% and 0%) in mind: what would Pierre actually be likely to do?' }));
+      add(answerBox('response_q1b'));
+      break;
+    case 3:
+      add(el('p', { text: 'Now compare a world where Pierre parties with one where he stays in. Try it with the aspirin, then without.' }));
+      add(worlds());
+      add(calcBox('calc_q2'));
+      add(answerBox('response_q2'));
+      break;
+    case 4:
+      add(el('p', { text: 'You looked at the aspirin’s effect on two outcomes and the party’s effect on one.' }));
+      add(answerBox('response_exit'));
+      add(el('div', { 'class': 'end', role: 'status' }, [
+        el('strong', { text: 'End of the activity.' }),
+        el('p', { text: 'There is no answer key here: we will discuss everyone’s answers together as a class.' })
+      ]));
+      break;
+  }
+}
+
+function render(){
+  document.body.classList.toggle('projector', state.scale === 'projector');
+  $('scaleBtn').setAttribute('aria-pressed', String(state.scale === 'projector'));
+  var bar = $('stepbar');
+  bar.textContent = '';
+  STEPS.forEach(function(st, i){
+    var btn = el('button', { type: 'button', text: (i === STEPS.length - 1 ? 'Exit' : String(i + 1)), title: st.title, onclick: function(){ go(i); } });
+    if(i === state.step) btn.setAttribute('aria-current', 'step');
+    bar.appendChild(btn);
+  });
+  $('stepNum').textContent = 'Step ' + (state.step + 1) + ' of ' + STEPS.length;
+  $('stepH').textContent = STEPS[state.step].title;
+  // Keep the writer's cursor: update an open answer box in place rather than rebuilding it.
+  var focused = document.activeElement && document.activeElement.id;
+  var key = focused && focused.indexOf('box_') === 0 ? focused.slice(4) : null;
+  if(key && $('stepBody').dataset.step === String(state.step) && $('stepBody').dataset.worlds === worldSig()){
+    var ta = $(focused);
+    if(ta.value !== state[key]) ta.value = state[key];
+    showCalc(key);
+  } else {
+    body();
+    $('stepBody').dataset.step = String(state.step);
+    $('stepBody').dataset.worlds = worldSig();
+  }
+  $('prevBtn').disabled = state.step === 0;
+  $('nextBtn').hidden = state.step === STEPS.length - 1;
+  drawTree();
+}
+function worldSig(){ return [state.pred, state.aAsp, state.aNight, state.bAsp, state.bNight].join('|'); }
+
+function go(i){ set({ step: i }); $('stepH').focus(); }
+$('prevBtn').addEventListener('click', function(){ if(state.step > 0) go(state.step - 1); });
+$('nextBtn').addEventListener('click', function(){ if(state.step < STEPS.length - 1) go(state.step + 1); });
+$('scaleBtn').addEventListener('click', function(){ set({ scale: state.scale === 'projector' ? 'laptop' : 'projector' }); });
+
+$('ledger').innerHTML = '';
+LEDGER.forEach(function(l){ $('ledger').appendChild(el('li', {}, [el('span', { 'class': 'kind', text: l[0] }), document.createTextNode(l[1])])); });
+
+window.artifact = {
+  getState: getState,
+  setState: setState,
+  onChange: function(fn){ listeners.push(fn); return function(){ listeners = listeners.filter(function(f){ return f !== fn; }); }; },
+  controls: [
+    { key: 'step', label: 'Step', kind: 'range', min: 0, max: STEPS.length - 1, step: 1 },
+    { key: 'pred', label: 'First guess: is the aspirin good for Pierre?', kind: 'choice', options: [''].concat(PRED.map(function(p){ return p[0]; })) },
+    { key: 'aAsp', label: 'World A: aspirin', kind: 'choice', options: ['yes', 'no'] },
+    { key: 'aNight', label: 'World A: Thursday night', kind: 'choice', options: ['party', 'stay'] },
+    { key: 'bAsp', label: 'World B: aspirin', kind: 'choice', options: ['yes', 'no'] },
+    { key: 'bNight', label: 'World B: Thursday night', kind: 'choice', options: ['party', 'stay'] },
+    { key: 'scale', label: 'Text size', kind: 'choice', options: ['laptop', 'projector'] }
+  ],
+  responses: RESPONSES.map(function(r){ return { key: r.key, prompt: r.prompt }; }),
+  assertions: [
+    { name: 'The tree shows the worksheet’s numbers (health 100/50; grades 60, 90, 40, 70)', run: function(){
+      return HEALTH.yes === 100 && HEALTH.no === 50 && GRADE.yes.party === 60 && GRADE.yes.stay === 90 && GRADE.no.party === 40 && GRADE.no.stay === 70; } },
+    { name: 'Default chances match the worksheet: 80% party after aspirin, 0% without', run: function(){
+      return PARTY.yes === 80 && PARTY.no === 0; } },
+    { name: 'Every world (4 afternoon × night combinations) has a health and a grade', run: function(){
+      return ['yes', 'no'].every(function(a){ return typeof HEALTH[a] === 'number' && ['party', 'stay'].every(function(n){ return typeof GRADE[a][n] === 'number'; }); }); } },
+    { name: 'No step marks an answer right or wrong (no answer key in the page)', run: function(){
+      return !/correct|incorrect|right answer|wrong/i.test(document.getElementById('stepBody').textContent); } },
+    { name: 'Calculator: 90 − 70 = 20; 0.8 × 60 + 0.2 × 90 = 66; 80% × 60 = 48; (2+3)÷4 = 1.25; bad input is not a number', run: function(){
+      return calc('90 − 70') === 20 && Math.abs(calc('0.8 × 60 + 0.2 × 90') - 66) < 1e-9 && Math.abs(calc('80% × 60') - 48) < 1e-9 && calc('(2+3)÷4') === 1.25 && calc('-5+2') === -3 && isNaN(calc('2+')) && isNaN(calc('alert(1)')) && calc('') === null; } },
+    { name: 'Invalid keys and values are ignored', run: function(){
+      var b = JSON.stringify(state); apply({ step: 99, pred: 'maybe', pAsp: 150, pNo: 2.5, aAsp: 'perhaps', zz: 1, response_q1a: 5 }); return JSON.stringify(state) === b; } }
+  ]
+};
+
+render();
+})();
+</script>
+
+<script>
+(function () {
+  var cfg = {"versionId":"cmw2bgyks000007l8653jhs4u","appOrigin":"https://ideasatplay.org","direct":null};
+  var t0 = Date.now(), scrolled = false, acted = false, reached = false, shown = false, config = null;
+  var framed = parent !== window;
+  function onScreen(el) {
+    if (!el.getClientRects().length) return false;
+    var r = el.getBoundingClientRect();
+    return r.top < innerHeight && r.bottom > 0;
+  }
+  function atBottom() {
+    var f = document.querySelector("footer[data-kc-credit]");
+    if (f) return f.getBoundingClientRect().top <= innerHeight;
+    var d = document.documentElement;
+    return scrollY + innerHeight >= d.scrollHeight - 48;
+  }
+  // { cur, last } when the page moves through numbered steps, else null.
+  function steps() {
+    var a = window.artifact;
+    try {
+      var c = a && Array.isArray(a.controls) ? a.controls.filter(function (x) { return x && x.key === "step" && typeof x.max === "number"; })[0] : null;
+      if (c) { var s = a.getState(); if (s && typeof s.step === "number") return { cur: s.step, last: c.max }; }
+    } catch (e) {}
+    var cur = document.querySelector('[aria-current="step"]');
+    if (cur && cur.parentElement) {
+      var sib = Array.prototype.filter.call(cur.parentElement.children, function (x) { return x.getClientRects().length; });
+      return { cur: sib.indexOf(cur), last: sib.length - 1 };
+    }
+    return null;
+  }
+  function finished() {
+    var mark = document.querySelector("[data-kc-end]");
+    if (mark) return onScreen(mark);
+    var s = steps();
+    if (s) return s.cur >= s.last && atBottom();
+    return atBottom() && (scrolled || (acted && Date.now() - t0 > 60000));
+  }
+  // The student link remembers a rating in its own storage where the browser allows it.
+  var KEY = "kc-rated-" + cfg.versionId;
+  function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
+  if (cfg.direct) config = { ask: !store(KEY), preview: false, labels: cfg.direct.labels };
+  var visitor = (function () {
+    var v = store("kc-visitor");
+    if (!v) { v = ""; for (var i = 0; i < 24; i++) v += "abcdefghijklmnopqrstuvwxyz0123456789".charAt(Math.floor(Math.random() * 36)); store("kc-visitor", v); }
+    return v;
+  })();
+  var pending = {}, seq = 0;
+  function save(score, comment) {
+    if (cfg.direct) {
+      var body = { versionId: cfg.versionId, score: score, context: "share", visitor: visitor };
+      if (comment) body.comment = comment;
+      // text/plain: a simple request, so no preflight is needed.
+      return fetch(cfg.direct.endpoint, { method: "POST", credentials: "omit", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(body) })
+        .then(function (r) { if (r.ok) store(KEY, String(score)); return r.ok; }, function () { return false; });
+    }
+    return new Promise(function (resolve) {
+      var id = ++seq; pending[id] = resolve;
+      parent.postMessage({ type: "kc:rate", versionId: cfg.versionId, id: id, score: score, comment: comment || "" }, cfg.appOrigin);
+      setTimeout(function () { if (pending[id]) { delete pending[id]; resolve(false); } }, 15000);
+    });
+  }
+  var B = "display:inline-block;margin:3px 6px 3px 0;padding:4px 10px;border:1px solid #a8a29e;border-radius:6px;background:#fff;color:#1c1917;font:inherit;cursor:pointer";
+  function el(tag, attrs, text) { var e = document.createElement(tag); for (var k in attrs) e.setAttribute(k, attrs[k]); if (text) e.textContent = text; return e; }
+  function show() {
+    if (shown || !config || !config.ask) return;
+    shown = true;
+    clearInterval(timer);
+    var L = config.labels;
+    var box = el("div", { "data-kc-rating": "", "data-kc-personal": "", role: "region", "aria-label": L.ask, lang: L.lang, dir: L.dir,
+      style: "box-sizing:border-box;max-width:760px;margin:24px auto 0;padding:10px 14px;border:1px solid #d6d3d1;border-radius:10px;background:#fafaf9;color:#1c1917;font:14px/1.5 system-ui,-apple-system,sans-serif;text-align:start" });
+    var live = el("div", { "aria-live": "polite" });
+    box.appendChild(live);
+    function ask(msg) {
+      live.innerHTML = "";
+      live.appendChild(el("span", { style: "font-weight:600;margin-inline-end:8px" }, L.ask));
+      [1, 2, 3].forEach(function (s) {
+        var b = el("button", { type: "button", style: B }, s + " · " + L["s" + s]);
+        b.addEventListener("click", function () {
+          live.querySelectorAll("button").forEach(function (x) { x.disabled = true; });
+          save(s, "").then(function (ok) { if (ok) comment(s); else ask(L.error); });
+        });
+        live.appendChild(b);
+      });
+      if (config.preview) live.appendChild(el("div", { style: "font-size:12px;color:#57534e" }, L.preview));
+      if (msg) live.appendChild(el("div", { role: "alert", style: "color:#991b1b;font-size:13px" }, msg));
+    }
+    function comment(score) {
+      live.innerHTML = "";
+      var id = "kc-rate-comment";
+      live.appendChild(el("label", { for: id, style: "display:block;font-weight:600;margin-bottom:4px" }, L.comment));
+      var row = el("div", { style: "display:flex;flex-wrap:wrap;gap:6px;align-items:center" });
+      var input = el("input", { id: id, type: "text", maxlength: "1000", autocomplete: "off", dir: "auto",
+        style: "flex:1 1 260px;min-width:0;box-sizing:border-box;padding:5px 8px;border:1px solid #a8a29e;border-radius:6px;background:#fff;color:#1c1917;font:inherit" });
+      var send = el("button", { type: "button", style: B + ";background:#292524;color:#fff;border-color:#292524" }, L.send);
+      var skip = el("button", { type: "button", style: B }, L.skip);
+      function done() { live.innerHTML = ""; live.appendChild(el("span", { style: "font-weight:600" }, L.thanks)); setTimeout(function () { box.remove(); }, 2000); }
+      send.addEventListener("click", function () {
+        var text = input.value.trim();
+        if (!text) return done();
+        send.disabled = skip.disabled = true;
+        save(score, text).then(function (ok) { if (ok) done(); else { send.disabled = skip.disabled = false; live.appendChild(el("div", { role: "alert", style: "color:#991b1b;font-size:13px" }, L.error)); } });
+      });
+      input.addEventListener("keydown", function (e) { if (e.key === "Enter") send.click(); });
+      skip.addEventListener("click", done);
+      row.appendChild(input); row.appendChild(send); row.appendChild(skip);
+      live.appendChild(row);
+      input.focus();
+    }
+    ask("");
+    var mark = document.querySelector("[data-kc-end]"), foot = document.querySelector("footer[data-kc-credit]");
+    if (mark) mark.insertAdjacentElement("afterend", box);
+    else if (foot) foot.parentNode.insertBefore(box, foot);
+    else document.body.appendChild(box);
+  }
+  function check() {
+    if (!reached && finished()) reached = true;
+    if (reached) show();
+  }
+  window.addEventListener("message", function (e) {
+    if (e.source !== parent || !e.data || e.data.versionId !== cfg.versionId) return;
+    var d = e.data;
+    if (d.type === "kc:rate-config" && !cfg.direct) { config = { ask: !!d.ask, preview: !!d.preview, labels: d.labels }; check(); }
+    if (d.type === "kc:rate-result" && pending[d.id]) { pending[d.id](!!d.ok); delete pending[d.id]; }
+  });
+  // The app page may start listening after this page loads: ask a few times.
+  var hellos = 0;
+  function hello() { if (framed && !cfg.direct && !config && hellos++ < 8) parent.postMessage({ type: "kc:rate-hello", versionId: cfg.versionId }, cfg.appOrigin); }
+  hello();
+  var timer = setInterval(function () { if (hellos < 8 && !config) hello(); check(); }, 800);
+  window.addEventListener("scroll", function () { if (scrollY > 0) scrolled = true; check(); }, { passive: true });
+  ["click", "input", "keydown"].forEach(function (t) { document.addEventListener(t, function (e) { if (e.target && e.target.closest && e.target.closest("[data-kc-rating]")) return; acted = true; setTimeout(check, 50); }, true); });
+})();
+</script></body>
+</html>

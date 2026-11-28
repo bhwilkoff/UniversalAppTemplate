@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Two Lenses — Argument H</title>
+<style>
+  :root{
+    box-sizing:border-box;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+    --bg:#f0ebe6;
+    --card:#ffffff;
+    --ink:#3c3732;
+    --mute:#78736e;
+    --faint:#e3dcd4;
+    --clay:#905112;
+    --clay-soft:#f6ece1;
+    --teal:#2e6f8e;
+    --teal-soft:#e8f0f4;
+    --good:#3f6b4a;
+    --bad:#8a3a3a;
+    --shadow:0 1px 2px rgba(60,55,50,.07), 0 8px 24px rgba(60,55,50,.06);
+    color-scheme:light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#211f1d;
+      --card:#2b2825;
+      --ink:#ece7e1;
+      --mute:#a9a29a;
+      --faint:#3b3733;
+      --clay:#d79a52;
+      --clay-soft:#3a2f23;
+      --teal:#8fc0d6;
+      --teal-soft:#24333a;
+      --good:#8dc39c;
+      --bad:#e09a9a;
+      --shadow:none;
+      color-scheme:dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#211f1d; --card:#2b2825; --ink:#ece7e1; --mute:#a9a29a; --faint:#3b3733;
+    --clay:#d79a52; --clay-soft:#3a2f23; --teal:#8fc0d6; --teal-soft:#24333a;
+    --good:#8dc39c; --bad:#e09a9a; --shadow:none; color-scheme:dark;
+  }
+  *,*::before,*::after{box-sizing:inherit}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font:16px/1.55 "Helvetica Neue",Helvetica,Arial,sans-serif;
+  }
+  .wrap{max-width:1100px;margin:0 auto;padding:28px 20px 72px}
+  .eyebrow{
+    font-family:Georgia,"Times New Roman",serif;color:var(--clay);
+    letter-spacing:.14em;text-transform:uppercase;font-size:12px;margin:0 0 6px
+  }
+  h1{font-family:Georgia,"Times New Roman",serif;font-weight:400;font-size:clamp(26px,4.2vw,40px);line-height:1.15;margin:0 0 10px}
+  .lede{margin:0 0 22px;max-width:62ch;color:var(--mute)}
+  .card{background:var(--card);border-radius:14px;padding:20px 22px;box-shadow:var(--shadow);margin-bottom:18px}
+  h2{font-family:Georgia,"Times New Roman",serif;font-weight:400;font-size:21px;margin:0 0 4px}
+  .sub{color:var(--mute);font-size:14px;margin:0 0 14px}
+  .arg{
+    font-family:Georgia,"Times New Roman",serif;font-size:17px;line-height:1.7;
+    background:var(--bg);border-radius:10px;padding:16px 18px;margin:0
+  }
+  .arg .rule{border:0;border-top:1px solid var(--mute);margin:10px 0;opacity:.5}
+  .arg .prem{display:block}
+  .arg .concl{display:block}
+  mark.hl{background:var(--clay-soft);color:inherit;border-radius:3px;padding:0 3px;
+    box-shadow:inset 0 -2px 0 var(--clay);transition:background .2s}
+  .grid{display:grid;gap:18px}
+  @media(min-width:860px){.grid.two{grid-template-columns:1fr 1fr}}
+  .controls{display:flex;flex-wrap:wrap;gap:22px}
+  fieldset{border:0;padding:0;margin:0;min-width:240px;flex:1}
+  legend{font-weight:bold;font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:var(--mute);padding:0 0 8px}
+  .seg{display:flex;border:1px solid var(--faint);border-radius:10px;overflow:hidden}
+  .seg button{
+    flex:1;appearance:none;border:0;background:transparent;color:var(--ink);
+    font:inherit;font-size:14px;padding:11px 10px;cursor:pointer;text-align:center
+  }
+  .seg button + button{border-left:1px solid var(--faint)}
+  .seg button[aria-pressed="true"]{background:var(--clay);color:var(--card)}
+  .seg.teal button[aria-pressed="true"]{background:var(--teal);color:var(--card)}
+  .seg button:focus-visible{outline:2px solid var(--teal);outline-offset:-2px}
+  .hint{font-size:13px;color:var(--mute);margin:8px 0 0}
+  .vocab{display:grid;gap:10px}
+  .vrow{display:grid;grid-template-columns:150px 1fr;gap:12px;align-items:baseline;
+    padding:10px 0;border-top:1px solid var(--faint)}
+  .vrow:first-child{border-top:0}
+  .vlabel{font-weight:bold;font-size:14px}
+  .vval{font-size:15px}
+  @media(max-width:620px){.vrow{grid-template-columns:1fr;gap:2px}}
+  .verdict{border-radius:12px;padding:16px 18px;background:var(--teal-soft);margin-top:4px}
+  .verdict.clay{background:var(--clay-soft)}
+  .vtitle{font-family:Georgia,"Times New Roman",serif;font-size:19px;margin:0 0 6px}
+  .vbody{margin:0;font-size:15px}
+  .btn{
+    appearance:none;border:1px solid var(--clay);background:transparent;color:var(--clay);
+    font:inherit;font-size:14px;padding:10px 16px;border-radius:999px;cursor:pointer
+  }
+  .btn:hover{background:var(--clay);color:var(--card)}
+  .btn:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+  .outcome{margin-top:14px;padding:14px 16px;border-radius:10px;background:var(--bg);font-size:15px}
+  .outcome strong{color:var(--clay)}
+  input[type=range]{width:100%;accent-color:var(--teal)}
+  .scale{display:flex;justify-content:space-between;font-size:12px;color:var(--mute);margin-top:2px}
+  .readout{font-family:Georgia,"Times New Roman",serif;font-size:24px;margin:10px 0 0}
+  .matrix{width:100%;border-collapse:collapse;font-size:14px;margin-top:6px}
+  .matrix th,.matrix td{border:1px solid var(--faint);padding:10px;text-align:left;vertical-align:top}
+  .matrix th{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--mute);font-weight:bold}
+  .matrix td.here{background:var(--clay-soft);box-shadow:inset 3px 0 0 var(--clay)}
+  .matrix td.na{color:var(--mute);font-style:italic}
+  textarea{
+    width:100%;min-height:92px;border:1px solid var(--faint);border-radius:10px;
+    background:var(--bg);color:var(--ink);font:inherit;font-size:15px;padding:12px;resize:vertical
+  }
+  textarea:focus-visible{outline:2px solid var(--teal);outline-offset:-1px}
+  footer{color:var(--mute);font-size:13px;margin-top:26px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  /* Instructor freeze: a small box in the lower left. */
+  .freeze{position:fixed;left:10px;bottom:10px;z-index:20;display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+    padding:6px 8px;border-radius:10px;background:var(--card);border:1px solid var(--faint);box-shadow:var(--shadow);
+    font-size:13px;color:var(--mute);max-width:calc(100vw - 80px)}
+  .freeze input{width:9em;font:inherit;padding:4px 6px;border:1px solid var(--faint);border-radius:6px;background:var(--bg);color:var(--ink)}
+  .freeze input[aria-invalid="true"]{border-color:var(--bad)}
+  .freeze button{font:inherit;padding:4px 10px;border-radius:6px;border:1px solid var(--faint);background:var(--bg);color:var(--ink);cursor:pointer}
+  .freeze-note{color:var(--ink);font-weight:600}
+  .freeze-note:empty{display:none}
+  html.frozen .wrap{opacity:.75;cursor:not-allowed}
+  body{padding-bottom:56px}
+  .source{color:var(--mute);font-size:13px;margin:26px 0 0;max-width:72ch}
+  .source + footer{margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">CS350 · Inductive reasoning · Wilkins, Argument H</p>
+  <h1>The two lenses</h1>
+  <p class="lede">One reasonable perspective on the question of whether an argument is deductive or inductive is the view that an argument simply <em>is</em>, and that deduction and induction are lenses we choose to look through. Argument H is the test case. Change the lens, change what you are allowed to ask.</p>
+
+  <div class="card">
+    <h2>Argument H</h2>
+    <p class="sub">The sentence never changes. The highlighted phrase carries two readings, and which one you take decides what the argument claims.</p>
+    <p class="arg">
+      <span class="prem" id="premiseLine">All mammalian species produce milk for their young.</span>
+      <span class="rule" role="presentation" style="display:block;border-top:1px solid var(--mute);opacity:.45;margin:10px 0"></span>
+      <span class="concl">Therefore, the next mammal discovered will produce milk for its young.</span>
+    </p>
+    <p class="hint" id="readingGloss"></p>
+  </div>
+
+  <div class="card">
+    <h2>Set the lens</h2>
+    <p class="sub">Two independent choices. The second one only does work under one of the lenses — find out which.</p>
+    <div class="controls">
+      <fieldset>
+        <legend>Analytical lens</legend>
+        <div class="seg" role="group" aria-label="Analytical lens">
+          <button type="button" id="lensInd" aria-pressed="true">Inductive</button>
+          <button type="button" id="lensDed" aria-pressed="false">Deductive</button>
+        </div>
+        <p class="hint">What questions am I entitled to ask of this argument?</p>
+      </fieldset>
+      <fieldset>
+        <legend>Reading of the premise</legend>
+        <div class="seg teal" role="group" aria-label="Reading of the premise">
+          <button type="button" id="readObs" aria-pressed="true">Empirical summary</button>
+          <button type="button" id="readDef" aria-pressed="false">Definition</button>
+        </div>
+        <p class="hint">“Every mammal observed so far…” or “producing milk is part of what <em>mammal</em> means”?</p>
+      </fieldset>
+    </div>
+  </div>
+
+  <div class="grid two">
+    <div class="card">
+      <h2>What this lens lets you ask</h2>
+      <p class="sub">The vocabulary is not interchangeable.</p>
+      <div class="vocab">
+        <div class="vrow"><span class="vlabel">Quality of form</span><span class="vval" id="vForm"></span></div>
+        <div class="vrow"><span class="vlabel">Quality in context</span><span class="vval" id="vContext"></span></div>
+        <div class="vrow"><span class="vlabel">Tools</span><span class="vval" id="vTools"></span></div>
+        <div class="vrow"><span class="vlabel">Not applicable here</span><span class="vval" id="vNonsense"></span></div>
+      </div>
+      <div class="verdict" id="verdict">
+        <p class="vtitle" id="vTitle"></p>
+        <p class="vbody" id="vBody"></p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 id="testTitle">Test it</h2>
+      <p class="sub" id="testSub"></p>
+      <div id="dedPanel" hidden>
+        <button class="btn" type="button" id="ceBtn">Discover a milkless mouse</button>
+        <div class="outcome" id="ceOut">A single counterexample is the deductive lens’s sharpest tool. Press the button and watch what it does under the current reading of the premise.</div>
+      </div>
+      <div id="indPanel">
+        <label for="obsRange"><strong>How much of the mammal world has actually been observed?</strong></label>
+        <input type="range" id="obsRange" min="1" max="99" value="85" aria-describedby="strengthOut">
+        <div class="scale"><span>a handful of species</span><span>nearly all of them</span></div>
+        <p class="readout" id="strengthOut"></p>
+        <div style="margin-top:14px">
+          <div class="seg teal" role="group" aria-label="Do you accept the premise?">
+            <button type="button" id="trustYes" aria-pressed="true">I accept the premise</button>
+            <button type="button" id="trustNo" aria-pressed="false">I doubt the premise</button>
+          </div>
+        </div>
+        <p class="readout" id="reliabilityOut"></p>
+        <div class="outcome" id="indNote"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>The three interpretations</h2>
+    <p class="sub">Wilkins gives Argument H three readings. Each cell below is one of them.</p>
+    <table class="matrix">
+      <thead>
+        <tr><th scope="col"></th><th scope="col">Premise as empirical summary</th><th scope="col">Premise as definition</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row">Inductive lens</th>
+          <td id="c-ind-obs"><strong>Interpretation 1.</strong> Strong induction — a generalization from observed mammals, projected onto one not yet found.</td>
+          <td id="c-ind-def" class="na">Not applicable.</td>
+        </tr>
+        <tr>
+          <th scope="row">Deductive lens</th>
+          <td id="c-ded-obs"><strong>Interpretation 2.</strong> Invalid deduction — the premises can be true while the conclusion is false.</td>
+          <td id="c-ded-def"><strong>Interpretation 3.</strong> Valid deduction — a milkless creature would simply not be a mammal.</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="hint">Factor 3 in the reading says deduction belongs to rule-based systems and induction to observation. Notice that the definitional reading does not just change the verdict — it changes which lens the argument <em>invites</em>.</p>
+  </div>
+
+  <div class="card">
+    <h2>Work these out</h2>
+    <p class="sub">One or two sentences each. Be ready to share.</p>
+    <p><label for="q1"><strong>1.</strong> Under which lens does the milkless mouse refute the argument, and under which does it merely dent it? Say why the same creature does different work.</label></p>
+    <textarea id="q1"></textarea>
+    <p style="margin-top:16px"><label for="q2"><strong>2.</strong> Interpretation 3 rescues the argument’s validity. What does it cost? State plainly what the valid version actually tells you about the next mammal discovered.</label></p>
+    <textarea id="q2"></textarea>
+  </div>
+
+  <p class="source">Source: Wilkins, J. F. (2020). <cite>Inductive reasoning</cite> [Course reading, CS50 Formal Analyses]. Minerva Schools at KGI. See the sections “Deduction and Induction as Lenses” (Argument H) and “Distinguishing Deduction from Induction”.</p>
+
+  <footer>
+    <span>Minerva University® · Professor Alexis Diamond</span>
+    <span>#deduction · #induction</span>
+  </footer>
+</div>
+
+<div class="freeze" id="freezeBox" role="group" aria-label="Instructor freeze">
+  <span class="freeze-note" id="freezeNote"></span>
+  <span id="freezeForm">
+    <label class="sr" for="freezeCode">Instructor code</label>
+    <input id="freezeCode" type="password" autocomplete="off" placeholder="Instructor code">
+    <button type="button" id="freezeBtn">Freeze</button>
+  </span>
+  <button type="button" id="unfreezeBtn" hidden>Unfreeze</button>
+</div>
+<p class="sr" aria-live="polite" id="live"></p>
+
+<script>
+(function(){
+  // Everything a student can change, in one object (shared in breakouts).
+  var state = { lens:'ind', reading:'obs', obs:85, trust:true, ce:false, q1:'', q2:'', frozenBy:'' };
+  var listeners = [];
+  function notify(){ var s = getState(); listeners.forEach(function(fn){ try{ fn(s); }catch(e){} }); }
+  function getState(){ return JSON.parse(JSON.stringify(state)); }
+
+  var $ = function(id){ return document.getElementById(id); };
+
+  function press(btn, on){ btn.setAttribute('aria-pressed', on ? 'true' : 'false'); }
+
+  function premiseText(){
+    return '<mark class="hl">All mammalian species</mark> produce milk for their young.';
+  }
+
+  function readingGloss(){
+    return state.reading === 'obs'
+      ? '<strong>Read as a summary of evidence.</strong> The highlighted phrase is shorthand for “every mammalian species we have found so far” \u2014 a report of the record, which the next discovery could overturn.'
+      : '<strong>Read as a definition.</strong> The highlighted phrase ranges over anything that counts as a mammal, because producing milk is part of what the word means \u2014 so no discovery can overturn it.';
+  }
+
+  var VOCAB = {
+    ind: {
+      form:'<strong>Strength</strong> — does the conclusion likely follow? A matter of degree, with no threshold.',
+      context:'<strong>Reliability</strong> — strong <em>and</em> premises acceptable. Would you act on it?',
+      tools:'Probability and statistics; more evidence, or more varied evidence.',
+      nonsense:'Validity and soundness. A single counterexample proves nothing here.'
+    },
+    ded: {
+      form:'<strong>Validity</strong> — is it impossible for the premises to be true and the conclusion false? Boolean.',
+      context:'<strong>Soundness</strong> — valid <em>and</em> premises true.',
+      tools:'Symbolic logic, truth tables, and the hunt for a single counterexample.',
+      nonsense:'Strength and reliability. “Probably valid” is not a thing.'
+    }
+  };
+
+  function verdict(lens, reading){
+    lens = lens || state.lens; reading = reading || state.reading;
+    if(lens === 'ind'){
+      if(reading === 'obs'){
+        return { cls:'', t:'Interpretation 1 · Strong induction',
+          b:'A generalization from the mammals we have seen to one we have not. Very likely true, never guaranteed — a milkless mouse remains conceivable, which is exactly what keeps this inductive.' };
+      }
+      return { cls:'', t:'The inductive lens idles here',
+        b:'If the premise is true by definition, there is no sample to generalize from and no probability worth estimating. Wilkins’s point about x + 3 = 8: you <em>may</em> apply this lens, but it buys you nothing.' };
+    }
+    if(reading === 'obs'){
+      return { cls:'clay', t:'Interpretation 2 · Invalid deduction',
+        b:'Read deductively, the conclusion claims necessity. But the premise reports only what has been observed, so the premise can be true while the conclusion is false. One counterexample settles it.' };
+    }
+    return { cls:'clay', t:'Interpretation 3 · Valid deduction',
+      b:'With milk production built into the definition of <em>mammal</em>, the conclusion cannot fail. Anything discovered without milk is not a counterexample — it is not a mammal.' };
+  }
+
+  function strengthWords(v){
+    if(v < 20) return ['Weak', 'Projecting from a handful of species onto all of them. Wilkins would call this anecdotal.'];
+    if(v < 50) return ['Moderate', 'A real sample, but the unobserved remainder is large enough to worry about.'];
+    if(v < 80) return ['Quite strong', 'Enough variety and volume that the conclusion is a good bet.'];
+    return ['Very strong', 'Nearly exhaustive observation. Still not certainty: the next species is still the next species.'];
+  }
+
+  function render(){
+    renderFreeze();
+    $('premiseLine').innerHTML = premiseText();
+    $('readingGloss').innerHTML = readingGloss();
+
+    var v = VOCAB[state.lens];
+    $('vForm').innerHTML = v.form;
+    $('vContext').innerHTML = v.context;
+    $('vTools').innerHTML = v.tools;
+    $('vNonsense').innerHTML = v.nonsense;
+
+    var verd = verdict();
+    $('verdict').className = 'verdict ' + verd.cls;
+    $('vTitle').innerHTML = verd.t;
+    $('vBody').innerHTML = verd.b;
+
+    var ded = state.lens === 'ded';
+    $('dedPanel').hidden = !ded;
+    $('indPanel').hidden = ded;
+    $('testTitle').textContent = ded ? 'Hunt for a counterexample' : 'Weigh the evidence';
+    $('testSub').innerHTML = ded
+      ? 'Under this lens one counterexample is decisive — if it is genuinely a counterexample.'
+      : 'Under this lens no single case decides anything. Quantity and variety of evidence move the needle.';
+
+    if(ded && state.ce){
+      $('ceOut').innerHTML = state.reading === 'obs'
+        ? '<strong>Refuted.</strong> A mammal that produces no milk makes the premise true and the conclusion false at the same time. The argument is <strong>invalid</strong> — and one case was enough.'
+        : '<strong>Nothing happened.</strong> Under the definitional reading, a milkless creature is by definition not a mammal, so it is not a counterexample at all. The argument stays <strong>valid</strong> — but notice what the premise has stopped telling you about the world.';
+    } else if(ded){
+      $('ceOut').innerHTML = 'A single counterexample is the deductive lens’s sharpest tool. Press the button and watch what it does under the current reading of the premise.';
+    }
+
+    var sw = strengthWords(state.obs);
+    $('strengthOut').innerHTML = 'Strength: <strong>' + sw[0] + '</strong>';
+    $('reliabilityOut').innerHTML = state.trust
+      ? 'Reliability: <strong>' + (state.obs < 50 ? 'limited' : 'high') + '</strong> — strong and the premise accepted.'
+      : 'Reliability: <strong>low</strong> — however strong the form, doubting the premise sinks it.';
+    $('indNote').innerHTML = sw[1] + (state.trust
+      ? ''
+      : ' Note that moving the slider still changes strength: strength and reliability move independently.');
+
+    ['c-ind-obs','c-ind-def','c-ded-obs','c-ded-def'].forEach(function(id){
+      $(id).classList.remove('here');
+    });
+    var cell = $('c-' + state.lens + '-' + state.reading);
+    if(cell) cell.classList.add('here');
+
+    if(+$('obsRange').value !== state.obs) $('obsRange').value = state.obs;
+    ['q1','q2'].forEach(function(id){ var el = $(id); if(el.value !== state[id]) el.value = state[id]; });
+
+    press($('lensInd'), state.lens === 'ind');
+    press($('lensDed'), state.lens === 'ded');
+    press($('readObs'), state.reading === 'obs');
+    press($('readDef'), state.reading === 'def');
+    press($('trustYes'), state.trust);
+    press($('trustNo'), !state.trust);
+
+    $('live').textContent = verd.t.replace(/<[^>]+>/g,'');
+  }
+
+  // Every change goes through here: update state, redraw, tell the platform.
+  function change(patch){ Object.keys(patch).forEach(function(k){ state[k] = patch[k]; }); render(); notify(); }
+
+  $('lensInd').addEventListener('click', function(){ change({ lens:'ind', ce:false }); });
+  $('lensDed').addEventListener('click', function(){ change({ lens:'ded', ce:false }); });
+  $('readObs').addEventListener('click', function(){ change({ reading:'obs', ce:false }); });
+  $('readDef').addEventListener('click', function(){ change({ reading:'def', ce:false }); });
+  $('trustYes').addEventListener('click', function(){ change({ trust:true }); });
+  $('trustNo').addEventListener('click', function(){ change({ trust:false }); });
+  $('ceBtn').addEventListener('click', function(){ change({ ce:true }); });
+  $('obsRange').addEventListener('input', function(e){ change({ obs: +e.target.value }); });
+  ['q1','q2'].forEach(function(id){
+    $(id).addEventListener('input', function(e){ change(Object.fromEntries([[id, e.target.value]])); });
+  });
+
+  var VALID = { lens:['ind','ded'], reading:['obs','def'] };
+  function clean(k, v){
+    if(k === 'frozenBy') return typeof v === 'string' ? v.slice(0, 16) : undefined;
+    if(k === 'lens' || k === 'reading') return VALID[k].indexOf(v) >= 0 ? v : undefined;
+    if(k === 'obs'){ v = Math.round(+v); return isFinite(v) ? Math.min(99, Math.max(1, v)) : undefined; }
+    if(k === 'trust' || k === 'ce') return typeof v === 'boolean' ? v : undefined;
+    if(k === 'q1' || k === 'q2') return typeof v === 'string' ? v.slice(0, 4000) : undefined;
+  }
+
+  /* ---------------- instructor freeze ---------------- */
+  // Typing the course code freezes the page for everyone else in the room. frozenBy is
+  // shared; ME belongs to this screen only, so the instructor's own screen stays live.
+  // Entering the code again (say, after a reload) hands the freeze to this screen.
+  var FREEZE_CODE = 'CS350';
+  var ME = Math.random().toString(36).slice(2, 10);
+  function renderFreeze(){
+    var mine = state.frozenBy !== '' && state.frozenBy === ME;
+    var held = state.frozenBy !== '' && !mine;
+    document.getElementById('freezeNote').textContent = mine ? 'Frozen for your room.' : held ? 'Paused by your professor.' : '';
+    document.getElementById('freezeForm').hidden = mine;
+    document.getElementById('unfreezeBtn').hidden = !mine;
+    document.querySelector('.wrap').inert = held;
+    document.documentElement.classList.toggle('frozen', held);
+  }
+  // The platform's sandbox blocks form submission, so Enter and the button call this directly.
+  function tryFreeze(){
+    var box = document.getElementById('freezeCode'), typed = box.value.trim();
+    if(!typed) return;
+    box.value = '';
+    var ok = typed.toUpperCase() === FREEZE_CODE;
+    box.setAttribute('aria-invalid', ok ? 'false' : 'true');
+    if(ok) change({ frozenBy: ME });
+  }
+  document.getElementById('freezeCode').addEventListener('keydown', function(e){ if(e.key === 'Enter'){ e.preventDefault(); tryFreeze(); } });
+  document.getElementById('freezeBtn').addEventListener('click', tryFreeze);
+  document.getElementById('unfreezeBtn').addEventListener('click', function(){ change({ frozenBy: '' }); });
+
+  window.artifact = {
+    getState: getState,
+    // Merge and redraw; ignores unknown keys and never fires onChange.
+    setState: function(p){
+      Object.keys(p || {}).forEach(function(k){
+        if(!Object.prototype.hasOwnProperty.call(state, k)) return;
+        var v = clean(k, p[k]); if(v !== undefined) state[k] = v;
+      });
+      render();
+    },
+    onChange: function(fn){ listeners.push(fn); return function(){ listeners = listeners.filter(function(x){ return x !== fn; }); }; },
+    controls: [
+      { key:'lens', label:'Analytical lens', kind:'choice', options:[{ value:'ind', label:'Inductive' }, { value:'ded', label:'Deductive' }] },
+      { key:'reading', label:'Reading of the premise', kind:'choice', options:[{ value:'obs', label:'Empirical summary' }, { value:'def', label:'Definition' }] },
+      { key:'obs', label:'How much of the mammal world has been observed', kind:'range', min:1, max:99, step:1 },
+      { key:'trust', label:'I accept the premise', kind:'toggle' },
+      { key:'ce', label:'Discover a milkless mouse', kind:'toggle' }
+    ],
+    responses: [
+      { key:'q1', prompt:'Under which lens does the milkless mouse refute the argument, and under which does it merely dent it? Say why the same creature does different work.' },
+      { key:'q2', prompt:'Interpretation 3 rescues the argument’s validity. What does it cost? State plainly what the valid version actually tells you about the next mammal discovered.' }
+    ],
+    // Consistency checks (a conceptual artifact): each cell of Wilkins's grid
+    // gets the reading the table assigns it, and every slider position has words.
+    assertions: [
+      { name:'Inductive lens on the empirical reading is Interpretation 1', run:function(){ return /^Interpretation 1/.test(verdict('ind','obs').t); } },
+      { name:'Deductive lens on the empirical reading is Interpretation 2 (invalid)', run:function(){ return /^Interpretation 2/.test(verdict('ded','obs').t) && /Invalid/.test(verdict('ded','obs').t); } },
+      { name:'Deductive lens on the definitional reading is Interpretation 3 (valid)', run:function(){ return /^Interpretation 3/.test(verdict('ded','def').t) && /Valid/.test(verdict('ded','def').t); } },
+      { name:'Inductive lens on the definitional reading is not one of the three interpretations', run:function(){ return !/^Interpretation/.test(verdict('ind','def').t); } },
+      { name:'Strength never decreases as more of the mammal world is observed', run:function(){ var order = ['Weak','Moderate','Quite strong','Very strong'], last = 0; for(var v = 1; v <= 99; v++){ var i = order.indexOf(strengthWords(v)[0]); if(i < last) return false; last = i; } return last === 3; } }
+    ],
+    referenceCases: []
+  };
+
+  render();
+})();
+</script>
+
+<script>
+(function () {
+  var cfg = {"versionId":"cmvxwmr8s000507jtq9l0w5zg","appOrigin":"https://ideasatplay.org","direct":null};
+  var t0 = Date.now(), scrolled = false, acted = false, reached = false, shown = false, config = null;
+  var framed = parent !== window;
+  function onScreen(el) {
+    if (!el.getClientRects().length) return false;
+    var r = el.getBoundingClientRect();
+    return r.top < innerHeight && r.bottom > 0;
+  }
+  function atBottom() {
+    var f = document.querySelector("footer[data-kc-credit]");
+    if (f) return f.getBoundingClientRect().top <= innerHeight;
+    var d = document.documentElement;
+    return scrollY + innerHeight >= d.scrollHeight - 48;
+  }
+  // { cur, last } when the page moves through numbered steps, else null.
+  function steps() {
+    var a = window.artifact;
+    try {
+      var c = a && Array.isArray(a.controls) ? a.controls.filter(function (x) { return x && x.key === "step" && typeof x.max === "number"; })[0] : null;
+      if (c) { var s = a.getState(); if (s && typeof s.step === "number") return { cur: s.step, last: c.max }; }
+    } catch (e) {}
+    var cur = document.querySelector('[aria-current="step"]');
+    if (cur && cur.parentElement) {
+      var sib = Array.prototype.filter.call(cur.parentElement.children, function (x) { return x.getClientRects().length; });
+      return { cur: sib.indexOf(cur), last: sib.length - 1 };
+    }
+    return null;
+  }
+  function finished() {
+    var mark = document.querySelector("[data-kc-end]");
+    if (mark) return onScreen(mark);
+    var s = steps();
+    if (s) return s.cur >= s.last && atBottom();
+    return atBottom() && (scrolled || (acted && Date.now() - t0 > 60000));
+  }
+  // The student link remembers a rating in its own storage where the browser allows it.
+  var KEY = "kc-rated-" + cfg.versionId;
+  function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
+  if (cfg.direct) config = { ask: !store(KEY), preview: false, labels: cfg.direct.labels };
+  var visitor = (function () {
+    var v = store("kc-visitor");
+    if (!v) { v = ""; for (var i = 0; i < 24; i++) v += "abcdefghijklmnopqrstuvwxyz0123456789".charAt(Math.floor(Math.random() * 36)); store("kc-visitor", v); }
+    return v;
+  })();
+  var pending = {}, seq = 0;
+  function save(score, comment) {
+    if (cfg.direct) {
+      var body = { versionId: cfg.versionId, score: score, context: "share", visitor: visitor };
+      if (comment) body.comment = comment;
+      // text/plain: a simple request, so no preflight is needed.
+      return fetch(cfg.direct.endpoint, { method: "POST", credentials: "omit", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(body) })
+        .then(function (r) { if (r.ok) store(KEY, String(score)); return r.ok; }, function () { return false; });
+    }
+    return new Promise(function (resolve) {
+      var id = ++seq; pending[id] = resolve;
+      parent.postMessage({ type: "kc:rate", versionId: cfg.versionId, id: id, score: score, comment: comment || "" }, cfg.appOrigin);
+      setTimeout(function () { if (pending[id]) { delete pending[id]; resolve(false); } }, 15000);
+    });
+  }
+  var B = "display:inline-block;margin:3px 6px 3px 0;padding:4px 10px;border:1px solid #a8a29e;border-radius:6px;background:#fff;color:#1c1917;font:inherit;cursor:pointer";
+  function el(tag, attrs, text) { var e = document.createElement(tag); for (var k in attrs) e.setAttribute(k, attrs[k]); if (text) e.textContent = text; return e; }
+  function show() {
+    if (shown || !config || !config.ask) return;
+    shown = true;
+    clearInterval(timer);
+    var L = config.labels;
+    var box = el("div", { "data-kc-rating": "", "data-kc-personal": "", role: "region", "aria-label": L.ask, lang: L.lang, dir: L.dir,
+      style: "box-sizing:border-box;max-width:760px;margin:24px auto 0;padding:10px 14px;border:1px solid #d6d3d1;border-radius:10px;background:#fafaf9;color:#1c1917;font:14px/1.5 system-ui,-apple-system,sans-serif;text-align:start" });
+    var live = el("div", { "aria-live": "polite" });
+    box.appendChild(live);
+    function ask(msg) {
+      live.innerHTML = "";
+      live.appendChild(el("span", { style: "font-weight:600;margin-inline-end:8px" }, L.ask));
+      [1, 2, 3].forEach(function (s) {
+        var b = el("button", { type: "button", style: B }, s + " · " + L["s" + s]);
+        b.addEventListener("click", function () {
+          live.querySelectorAll("button").forEach(function (x) { x.disabled = true; });
+          save(s, "").then(function (ok) { if (ok) comment(s); else ask(L.error); });
+        });
+        live.appendChild(b);
+      });
+      if (config.preview) live.appendChild(el("div", { style: "font-size:12px;color:#57534e" }, L.preview));
+      if (msg) live.appendChild(el("div", { role: "alert", style: "color:#991b1b;font-size:13px" }, msg));
+    }
+    function comment(score) {
+      live.innerHTML = "";
+      var id = "kc-rate-comment";
+      live.appendChild(el("label", { for: id, style: "display:block;font-weight:600;margin-bottom:4px" }, L.comment));
+      var row = el("div", { style: "display:flex;flex-wrap:wrap;gap:6px;align-items:center" });
+      var input = el("input", { id: id, type: "text", maxlength: "1000", autocomplete: "off", dir: "auto",
+        style: "flex:1 1 260px;min-width:0;box-sizing:border-box;padding:5px 8px;border:1px solid #a8a29e;border-radius:6px;background:#fff;color:#1c1917;font:inherit" });
+      var send = el("button", { type: "button", style: B + ";background:#292524;color:#fff;border-color:#292524" }, L.send);
+      var skip = el("button", { type: "button", style: B }, L.skip);
+      function done() { live.innerHTML = ""; live.appendChild(el("span", { style: "font-weight:600" }, L.thanks)); setTimeout(function () { box.remove(); }, 2000); }
+      send.addEventListener("click", function () {
+        var text = input.value.trim();
+        if (!text) return done();
+        send.disabled = skip.disabled = true;
+        save(score, text).then(function (ok) { if (ok) done(); else { send.disabled = skip.disabled = false; live.appendChild(el("div", { role: "alert", style: "color:#991b1b;font-size:13px" }, L.error)); } });
+      });
+      input.addEventListener("keydown", function (e) { if (e.key === "Enter") send.click(); });
+      skip.addEventListener("click", done);
+      row.appendChild(input); row.appendChild(send); row.appendChild(skip);
+      live.appendChild(row);
+      input.focus();
+    }
+    ask("");
+    var mark = document.querySelector("[data-kc-end]"), foot = document.querySelector("footer[data-kc-credit]");
+    if (mark) mark.insertAdjacentElement("afterend", box);
+    else if (foot) foot.parentNode.insertBefore(box, foot);
+    else document.body.appendChild(box);
+  }
+  function check() {
+    if (!reached && finished()) reached = true;
+    if (reached) show();
+  }
+  window.addEventListener("message", function (e) {
+    if (e.source !== parent || !e.data || e.data.versionId !== cfg.versionId) return;
+    var d = e.data;
+    if (d.type === "kc:rate-config" && !cfg.direct) { config = { ask: !!d.ask, preview: !!d.preview, labels: d.labels }; check(); }
+    if (d.type === "kc:rate-result" && pending[d.id]) { pending[d.id](!!d.ok); delete pending[d.id]; }
+  });
+  // The app page may start listening after this page loads: ask a few times.
+  var hellos = 0;
+  function hello() { if (framed && !cfg.direct && !config && hellos++ < 8) parent.postMessage({ type: "kc:rate-hello", versionId: cfg.versionId }, cfg.appOrigin); }
+  hello();
+  var timer = setInterval(function () { if (hellos < 8 && !config) hello(); check(); }, 800);
+  window.addEventListener("scroll", function () { if (scrollY > 0) scrolled = true; check(); }, { passive: true });
+  ["click", "input", "keydown"].forEach(function (t) { document.addEventListener(t, function (e) { if (e.target && e.target.closest && e.target.closest("[data-kc-rating]")) return; acted = true; setTimeout(check, 50); }, true); });
+})();
+</script></body>
+</html>

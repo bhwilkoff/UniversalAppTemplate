@@ -137,7 +137,7 @@
       return v;
     }
     if (room.show === 'board') return { mode: 'roomboard', part: part, prompt: room.board || '', notes: room.notes || [], you: c.you, host: room.host === c.you };
-    if (room.show === 'page' && room.page) return { mode: 'page', part: part, page: room.page, html: room.page.owner || room.page.url ? null : (c.html || '') };
+    if (room.show === 'page' && room.page) return { mode: 'page', part: part, page: room.page, mstate: room.mstate || null, html: room.page.owner || room.page.url ? null : (c.html || '') };
     if (room.show === 'card' && room.card) return { mode: 'card', part: null, card: { body: room.card, endsAt: part ? part.endsAt : null } };
     // A clock on a clear stage is the stage: large, with what it is for.
     if (room.show === 'blank') return part ? { mode: 'part', part: part, roomClock: true } : { mode: 'blank', part: null };

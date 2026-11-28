@@ -1,0 +1,645 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rent control through utility: who gains, who loses, and when</title>
+<style>
+:root{
+  --bg:#fbfaf7;--card:#ffffff;--ink:#22252a;--muted:#5b626d;--rule:#d6d2ca;--faint:#efece6;
+  --accent:#2E4057;--warm:#b4480a;
+}
+@media (prefers-color-scheme: dark){
+  :root{--bg:#16181c;--card:#1f2228;--ink:#ece9e3;--muted:#a9afb8;--rule:#3b4048;--faint:#2a2e35;--accent:#9dbfe3;--warm:#ffa366;}
+}
+*{box-sizing:border-box}
+[hidden]{display:none !important}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+main{max-width:1100px;margin:0 auto;padding:12px 20px 30px}
+h1{font-size:1.3rem;line-height:1.25;margin:0;font-weight:650}
+.topbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+button{font:inherit;font-size:14px;min-height:30px;padding:4px 11px;border:1px solid var(--rule);border-radius:8px;background:var(--card);color:var(--ink);cursor:pointer}
+button:hover:not(:disabled){border-color:var(--muted)}
+button[aria-pressed="true"],button[aria-current="step"]{background:var(--accent);color:var(--card);border-color:var(--accent)}
+button.primary{background:var(--accent);color:var(--card);border-color:var(--accent)}
+button:disabled{opacity:.45;cursor:default}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.seg{display:inline-flex;flex-wrap:wrap;border:1px solid var(--rule);border-radius:8px;overflow:hidden}
+.seg button{border:0;border-radius:0;border-inline-end:1px solid var(--rule)}
+.seg button:last-child{border-inline-end:0}
+.stepbar{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.stepbar button{font-size:13px}
+.card{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:12px 20px 14px}
+.stepnum{font-size:13px;color:var(--muted);margin:0}
+#stepH{font-size:1.2rem;margin:.1em 0 .25em}
+.hint{margin:0 0 .6em;max-width:80ch}
+.hint:empty{display:none}
+.note{font-size:13px;color:var(--muted)}
+.work{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:26px;align-items:start}
+@media (max-width:820px){.work{grid-template-columns:minmax(0,1fr)}}
+.sides{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:.6em 0}
+@media (max-width:620px){.sides{grid-template-columns:1fr}}
+.side{all:unset;cursor:pointer;display:block;border:1.5px solid var(--rule);border-radius:10px;padding:12px 14px}
+.side:hover{border-color:var(--muted)}
+.side:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.side[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1.5px var(--accent)}
+.side strong{display:block;font-size:1.05rem}
+.side span{font-size:14px;color:var(--muted)}
+.policy{margin:.2em 0 .4em;padding-inline-start:1.2em;max-width:80ch}
+.policy li{margin:.15em 0}
+.q{margin:.7em 0 .2em;font-weight:600}
+.choices{display:flex;flex-wrap:wrap;gap:6px}
+.ctl{display:grid;grid-template-columns:auto 1fr auto;gap:4px 10px;align-items:center;margin:.4em 0;font-size:14px}
+.ctl input[type=range]{width:100%}
+.ctl output{font-weight:700;min-width:4.5em;text-align:end;font-variant-numeric:tabular-nums}
+svg{display:block;width:100%;height:auto;overflow:visible}
+.axis text{font-size:12px;fill:var(--muted)}
+.axis line,.axis path{stroke:var(--rule)}
+.lbl{font-size:12.5px;font-weight:600}
+table{border-collapse:collapse;width:100%;font-size:14px;border-top:1.5px solid var(--ink);border-bottom:1.5px solid var(--ink);margin:.3em 0}
+th,td{padding:4px 8px;text-align:start}
+thead th{border-bottom:1px solid var(--ink);font-weight:600}
+td.num,th.num{text-align:end;font-variant-numeric:tabular-nums;white-space:nowrap}
+.reveal{border-inline-start:3px solid var(--accent);padding:6px 12px;margin:.6em 0 0;background:var(--faint);border-radius:0 8px 8px 0}
+.reveal p{margin:.3em 0}
+.loop{margin:.3em 0;padding-inline-start:1.3em}
+.loop li{margin:.1em 0}
+.dots{display:grid;grid-template-columns:repeat(20,1fr);gap:3px;max-width:340px;margin:.3em 0}
+.dot{aspect-ratio:1;border-radius:50%;border:2px solid var(--accent)}
+.dot.on{background:var(--accent)}
+.key{display:inline-flex;align-items:center;gap:5px;margin-inline-end:14px}
+.key i{display:inline-block;width:11px;height:11px;border-radius:50%;border:2px solid var(--accent)}
+.key i.on{background:var(--accent)}
+textarea{width:100%;font:inherit;font-size:14px;padding:6px 8px;border:1px solid var(--rule);border-radius:6px;background:var(--bg);color:var(--ink)}
+label.big{display:block;font-weight:600;margin:.6em 0 .2em}
+.toggle{display:flex;align-items:center;gap:8px;font-size:14px;margin:.5em 0}
+.moves{display:flex;justify-content:space-between;gap:8px;margin-top:10px}
+details{margin-top:14px;font-size:14px}
+details ul{margin:.4em 0;padding-inline-start:1.2em;max-width:80ch}
+.kind{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-inline-end:6px}
+.match{font-weight:700}
+body.projector{font-size:22px}
+body.projector main{max-width:1700px}
+body.projector h1{font-size:2.1rem}
+body.projector #stepH{font-size:1.7rem}
+body.projector button,body.projector .ctl,body.projector table,body.projector .side span,body.projector .toggle{font-size:19px}
+body.projector .note,body.projector .stepnum{font-size:17px}
+body.projector .axis text{font-size:13px}
+body.projector .lbl{font-size:12.5px}
+body.projector svg path.series{stroke-width:5}
+@media (prefers-reduced-motion:no-preference){.dot{transition:background .2s}}
+</style>
+</head>
+<body class="laptop">
+<main>
+  <div class="topbar">
+    <h1>Rent control, modelled with utility</h1>
+    <div class="seg" role="group" aria-label="Text size">
+      <button type="button" id="scLaptop" aria-pressed="true">Laptop</button>
+      <button type="button" id="scProj" aria-pressed="false">Projector</button>
+    </div>
+  </div>
+  <nav class="stepbar" id="stepbar" aria-label="Steps"></nav>
+  <section class="card" aria-labelledby="stepH">
+    <p class="stepnum" id="stepNum"></p>
+    <h2 id="stepH" tabindex="-1"></h2>
+    <p class="hint" id="stepHint"></p>
+
+    <!-- 1 The policy -->
+    <div id="v0" hidden>
+      <ul class="policy">
+        <li>A city of 100 rental flats. Demand grows, so market rent rises about 3% a year: $2,000 a month today.</li>
+        <li>New law: for tenants already living in a flat, rent may rise at most <strong id="capTxt">2%</strong> a year.</li>
+        <li>When a tenant moves out, the flat's rent resets to the market rent.</li>
+        <li>Landlords may stop renting: sell the flat to an owner-occupier or redevelop it.</li>
+      </ul>
+      <p class="q" id="sideQ">Which side did your group model before class?</p>
+      <div class="sides" role="group" aria-labelledby="sideQ">
+        <button type="button" class="side" data-side="renters" aria-pressed="false"><strong>Group 1: Renters</strong><span>People renting a flat when the law passes.</span></button>
+        <button type="button" class="side" data-side="landlords" aria-pressed="false"><strong>Group 2: Landlords</strong><span>People who own the flats and rent them out.</span></button>
+      </div>
+    </div>
+
+    <!-- 2 Predict -->
+    <div id="v1" hidden>
+      <div id="predBox"></div>
+    </div>
+
+    <!-- 3 Run your side -->
+    <div id="v2" hidden>
+      <div class="work">
+        <div>
+          <svg id="chart2" viewBox="0 0 560 260" role="img"></svg>
+          <div class="reveal" id="reveal1" hidden></div>
+        </div>
+        <div>
+          <div class="ctl"><label for="cap">Rent cap</label><input type="range" id="cap" min="0" max="5" step="0.5"><output id="capOut" for="cap"></output></div>
+          <div class="ctl"><label for="year">Year</label><input type="range" id="year" min="0" max="15" step="1"><output id="yearOut" for="year"></output></div>
+          <table aria-live="polite"><thead><tr><th></th><th class="num">No control</th><th class="num">Rent control</th></tr></thead><tbody id="read2"></tbody></table>
+          <div id="landDots" hidden>
+            <p class="note" style="margin:.4em 0 0" id="dotsCap"></p>
+            <div class="dots" id="dots" aria-hidden="true"></div>
+            <p class="note" style="margin:0"><span class="key"><i class="on"></i>still rented</span><span class="key"><i></i>sold or redeveloped</span></p>
+          </div>
+          <button type="button" id="check1" class="primary" style="margin-top:.5em">Check our predictions</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4 Both sides together -->
+    <div id="v3" hidden>
+      <div class="work">
+        <div>
+          <svg id="chart3" viewBox="0 0 560 300" role="img"></svg>
+          <div class="ctl" style="max-width:420px"><label for="cap3">Rent cap</label><input type="range" id="cap3" min="0" max="5" step="0.5"><output id="capOut3" for="cap3"></output></div>
+          <label class="toggle"><input type="checkbox" id="noExit"> Ban landlords from selling or redeveloping</label>
+        </div>
+        <div>
+          <p class="q" id="newQ">Someone moves to the city in year 15. Compared with no rent control, their rent is…</p>
+          <div class="choices" role="group" aria-labelledby="newQ" id="newChoices"></div>
+          <button type="button" id="check2" class="primary" style="margin-top:.7em">Show the whole city</button>
+          <div class="reveal" id="reveal2" hidden></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5 San Francisco -->
+    <div id="v4" hidden>
+      <table><thead><tr><th>What happened</th><th class="num">This model (cap <span id="sfCap"></span>)</th><th>San Francisco, 1994 law</th></tr></thead><tbody id="sfBody"></tbody></table>
+      <p class="note">Rebecca Diamond, Tim McQuade and Franklin Qian (2019), <i>The Effects of Rent Control Expansion on Tenants, Landlords, and Inequality: Evidence from San Francisco</i>. The model was not fitted to their data; compare directions, not exact numbers.</p>
+    </div>
+
+    <!-- 6 Decide -->
+    <div id="v5" hidden>
+      <label class="big" for="ansGood">Is rent control a good idea? Answer using utility for all three groups: current renters, landlords, future renters.</label>
+      <textarea id="ansGood" rows="4" maxlength="1500"></textarea>
+      <label class="big" for="ansWhen">When is a simple utility model like this one good at predicting, and when is it not?</label>
+      <textarea id="ansWhen" rows="3" maxlength="1500"></textarea>
+      <p class="note">One answer per group: everyone in your session edits the same boxes.</p>
+    </div>
+
+    <div class="moves">
+      <button type="button" id="prevStep">← Previous</button>
+      <button type="button" class="primary" id="nextStep">Next →</button>
+    </div>
+  </section>
+  <details>
+    <summary>What this model assumes</summary>
+    <ul id="ledger"></ul>
+    <p class="note">Left out: new construction, maintenance cuts, evictions as a separate channel, and differences between neighbourhoods.</p>
+  </details>
+</main>
+<script>
+(function(){
+'use strict';
+var LEDGER = [
+  ['simplification', 'Utility is money left over each month. A renter: income ($5,000, growing 3% a year) minus rent. A landlord: rent minus upkeep ($300), or, after selling or redeveloping, that flat\'s own value per month. Real utility also counts things money doesn\'t.'],
+  ['parameter', '100 flats. Without the law, market rent starts at $2,000 and rises 3% a year. Every landlord\'s value from selling is between 75% and 100% of what renting at market rent would earn, so with no control nobody sells.'],
+  ['distribution', 'Market rent rises in proportion to households per flat: if supply falls 10%, market rent is about 11% higher than it would be.'],
+  ['parameter', 'Each year a landlord who would earn more by selling does so with probability 25% (it takes time to buy tenants out or redevelop). The model tracks expected shares, so it has no randomness.'],
+  ['parameter', '10% of tenants move each year without the law. The cheaper a tenant\'s rent is than the market, the less they move: 10% ÷ (1 + 2.5 × discount). A 10% discount means 20% less moving.'],
+  ['simplification', 'A flat\'s rent resets to the market rent when its tenant moves out (as in San Francisco). Everyone has the same income.'],
+  ['data', 'San Francisco findings: Rebecca Diamond, Tim McQuade and Franklin Qian (2019), American Economic Review 109(9), the study in the lesson plan. The model only shares their direction of effects; it was not fitted to their data.']
+];
+/* ---------- The model (one pure function) ----------
+   Year t = 0..15. G = 1.03^t. Supply S = flats still rented.
+   Market rent M = 2000·G·(100/S). Controlled rent for an original tenant: 2000·(1+cap)^t, never above M.
+   Landlord i (a_i from 0.75 to 1) earns rent − 300·G by renting, or a_i·1700·G after selling;
+   if selling pays more, they sell with probability 25% that year. */
+var N = 100, T = 15, GROW = 0.03, M0 = 2000, Y0 = 5000, UP0 = 300, SELL0 = 1700, MOVE0 = 0.10, K = 2.5, P_SELL = 0.25, A_LO = 0.75, A_HI = 1.0;
+function simulate(opt){
+  var control = !!opt.control, cap = opt.cap, exit = opt.exit !== false;
+  var a = [], r = [], i, t;
+  for(i = 0; i < N; i++){ a.push(A_LO + (A_HI - A_LO) * (i + 0.5) / N); r.push(1); }
+  var rbar = M0, incRent = M0, inc = 1, out = [];
+  for(t = 0; t <= T; t++){
+    var G = Math.pow(1 + GROW, t), S = r.reduce(function(s, x){ return s + x; }, 0), M = M0 * G * N / S;
+    if(!control){ rbar = M; incRent = M; }
+    var gap = control ? Math.max(0, (M - incRent) / M) : 0, move = MOVE0 / (1 + K * gap), net = rbar - UP0 * G;
+    var land = 0, renting = [];
+    for(i = 0; i < N; i++){ land += r[i] * net + (1 - r[i]) * a[i] * SELL0 * G; renting.push(r[i]); }
+    out.push({ t: t, supply: S, market: M, incRent: incRent, incStay: inc, move: move, incU: Y0 * G - incRent, newU: Y0 * G - M, landU: land / N, rentGot: rbar, renting: renting });
+    if(exit) for(i = 0; i < N; i++) if(a[i] * SELL0 * G > net) r[i] *= 1 - P_SELL;
+    inc *= 1 - move;
+    var Gn = Math.pow(1 + GROW, t + 1), Mn = M0 * Gn * N / r.reduce(function(s, x){ return s + x; }, 0);
+    if(control){ incRent = Math.min(incRent * (1 + cap), Mn); rbar = Math.min((1 - move) * rbar * (1 + cap) + move * Mn, Mn); }
+  }
+  return out;
+}
+/* ---------- Steps ---------- */
+var STEPS = [
+  { tab: 'The policy', h: 'Which side are you modelling?', hint: 'The city and the law are the same for everyone. Pick the side your group modelled before class.' },
+  { tab: 'Predict', h: 'Predict before you run the model', hint: '' },
+  { tab: 'Run your side', h: '', hint: 'Move the year from 0 to 15. Then try a stricter and a looser cap.' },
+  { tab: 'Both sides', h: 'Put renters and landlords in one city', hint: 'The model has run both sides all along. Now look at someone who arrives later.' },
+  { tab: 'San Francisco', h: 'What happened when San Francisco did this?', hint: 'In 1994 San Francisco extended rent control to small buildings built before 1980.' },
+  { tab: 'Decide', h: 'Is rent control a good idea?', hint: '' }
+];
+var PRED = {
+  renters: [
+    { key: 'predShort', short: 'Year 2 utility', q: 'In year 2, current renters\' utility (money left after rent) is…', opts: [['higher', 'Higher'], ['same', 'About the same'], ['lower', 'Lower']] },
+    { key: 'predLong', short: 'Year 15 utility', q: 'In year 15, renters who are still in their original flat have utility that is…', opts: [['higher', 'Higher'], ['same', 'About the same'], ['lower', 'Lower']] },
+    { key: 'predAct', short: 'Moving', q: 'How do current renters change what they do?', opts: [['more', 'Move more often'], ['same', 'No change'], ['less', 'Move less often']] }
+  ],
+  landlords: [
+    { key: 'predShort', short: 'Year 2 utility', q: 'In year 2, landlords\' utility is…', opts: [['higher', 'Higher'], ['same', 'About the same'], ['lower', 'Lower']] },
+    { key: 'predLong', short: 'Year 15 utility', q: 'In year 15, landlords\' utility is…', opts: [['higher', 'Higher'], ['same', 'About the same'], ['lower', 'Lower']] },
+    { key: 'predAct', short: 'Flats rented out', q: 'How do landlords change what they do?', opts: [['more', 'Rent out more flats'], ['same', 'No change'], ['less', 'Rent out fewer flats']] }
+  ]
+};
+var NEWOPTS = [['higher', 'Higher'], ['same', 'About the same'], ['lower', 'Lower']];
+/* ---------- State (shared in a live session) ---------- */
+var state = { step: 0, scale: 'laptop', side: '', cap: 2, year: 15, predShort: '', predLong: '', predAct: '', predNew: '', reveal1: false, reveal2: false, noExit: false, ansGood: '', ansWhen: '' };
+var listeners = [];
+var PREDV = ['', 'higher', 'same', 'lower', 'more', 'less'];
+function validEntry(k, v){
+  switch(k){
+    case 'step': case 'year': case 'cap': return typeof v === 'number' && isFinite(v);
+    case 'scale': return v === 'laptop' || v === 'projector';
+    case 'side': return v === '' || v === 'renters' || v === 'landlords';
+    case 'predShort': case 'predLong': case 'predAct': case 'predNew': return PREDV.indexOf(v) >= 0;
+    case 'reveal1': case 'reveal2': case 'noExit': return typeof v === 'boolean';
+    case 'ansGood': case 'ansWhen': return typeof v === 'string' && v.length <= 1500;
+  }
+  return false;
+}
+function apply(p){
+  Object.keys(p || {}).forEach(function(k){
+    var v = p[k];
+    if(!validEntry(k, v)) return;
+    if(k === 'step') v = Math.max(0, Math.min(STEPS.length - 1, Math.round(v)));
+    if(k === 'year') v = Math.max(0, Math.min(T, Math.round(v)));
+    if(k === 'cap') v = Math.max(0, Math.min(5, Math.round(v * 2) / 2));
+    state[k] = v;
+  });
+}
+function getState(){ return JSON.parse(JSON.stringify(state)); }
+function change(p){ apply(p); render(); var s = getState(); listeners.forEach(function(fn){ try{ fn(s); }catch(e){} }); }
+function setState(p){ if(!p || typeof p !== 'object') return; apply(p); render(); }
+/* ---------- Helpers ---------- */
+var esc = function(s){ return String(s).replace(/[&<>"']/g, function(c){ return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+var usd = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+function money(x){ return usd.format(Math.round(x)); }
+function signed(x){ return (x >= 0 ? '+' : '−') + usd.format(Math.abs(Math.round(x))); }
+function pct(x){ return Math.round(x * 100) + '%'; }
+// "higher" / "same" / "lower" for a difference, with a $20 band for "about the same".
+function dir(diff, band){ return Math.abs(diff) < band ? 'same' : diff > 0 ? 'higher' : 'lower'; }
+function runs(){
+  var cap = state.cap / 100;
+  return { base: simulate({ control: false, cap: cap }), rc: simulate({ control: true, cap: cap, exit: !state.noExit }), rcFree: simulate({ control: true, cap: cap }) };
+}
+// The model's answer to each prediction, for the chosen side.
+function truth(side, R){
+  var b = R.base, c = R.rcFree;
+  if(side === 'renters') return {
+    predShort: dir(c[2].incU - b[2].incU, 20), predLong: dir(c[15].incU - b[15].incU, 20),
+    predAct: dir(c[15].move - b[15].move, 0.002) === 'lower' ? 'less' : dir(c[15].move - b[15].move, 0.002) === 'higher' ? 'more' : 'same'
+  };
+  var act = dir(c[15].supply - b[15].supply, 0.5);
+  return { predShort: dir(c[2].landU - b[2].landU, 20), predLong: dir(c[15].landU - b[15].landU, 20), predAct: act === 'lower' ? 'less' : act === 'higher' ? 'more' : 'same' };
+}
+/* ---------- Chart: two lines over years 0–15 ---------- */
+function lineChart(svg, cfg){
+  var W = 560, H = cfg.H || 300, L = 64, Rm = 128, Tp = 26, B = 40, all = [];
+  cfg.lines.forEach(function(l){ all = all.concat(l.ys); });
+  var lo = Math.min.apply(null, all), hi = Math.max.apply(null, all), pad = (hi - lo) * 0.12 || hi * 0.05 || 1;
+  lo -= pad; hi += pad;
+  var step = niceStep((hi - lo) / 5); lo = Math.floor(lo / step) * step; hi = Math.ceil(hi / step) * step;
+  var x = function(t){ return L + (W - L - Rm) * t / T; }, y = function(v){ return Tp + (H - Tp - B) * (1 - (v - lo) / (hi - lo)); };
+  var s = '<g class="axis">';
+  for(var v = lo; v <= hi + 1e-9; v += step) s += '<line x1="' + L + '" x2="' + (W - Rm) + '" y1="' + y(v) + '" y2="' + y(v) + '" stroke-dasharray="2 4"/><text x="' + (L - 6) + '" y="' + (y(v) + 4) + '" text-anchor="end">' + esc(cfg.fmt(v)) + '</text>';
+  for(var t = 0; t <= T; t += 5) s += '<text x="' + x(t) + '" y="' + (H - B + 18) + '" text-anchor="middle">' + t + '</text>';
+  s += '<text x="' + ((L + W - Rm) / 2) + '" y="' + (H - 4) + '" text-anchor="middle">Years after the law</text>';
+  s += '<text x="' + L + '" y="14" text-anchor="start" style="font-weight:600;fill:var(--ink)">' + esc(cfg.title) + '</text></g>';
+  s += '<line x1="' + x(cfg.year) + '" x2="' + x(cfg.year) + '" y1="' + Tp + '" y2="' + (H - B) + '" stroke="var(--muted)" stroke-dasharray="4 3"/>';
+  var ends = [];
+  cfg.lines.forEach(function(l){
+    var d = l.ys.map(function(v, t){ return (t ? 'L' : 'M') + x(t).toFixed(1) + ' ' + y(v).toFixed(1); }).join(' ');
+    s += '<path class="series" d="' + d + '" fill="none" stroke="' + l.color + '" stroke-width="' + (l.dash ? 2.5 : 3) + '"' + (l.dash ? ' stroke-dasharray="7 5"' : '') + '/>';
+    s += '<circle cx="' + x(cfg.year) + '" cy="' + y(l.ys[cfg.year]) + '" r="4.5" fill="' + l.color + '"/>';
+    ends.push({ y: y(l.ys[T]), label: l.label, color: l.color });
+  });
+  ends.sort(function(a, b){ return a.y - b.y; });
+  for(var i = 1; i < ends.length; i++) if(ends[i].y - ends[i - 1].y < 16) ends[i].y = ends[i - 1].y + 16;
+  ends.forEach(function(e){ s += '<text class="lbl" x="' + (W - Rm + 8) + '" y="' + (e.y + 4) + '" fill="' + e.color + '">' + esc(e.label) + '</text>'; });
+  svg.innerHTML = s;
+  svg.setAttribute('aria-label', cfg.title + '. ' + cfg.lines.map(function(l){ return l.label + ': ' + cfg.fmt(l.ys[0]) + ' in year 0, ' + cfg.fmt(l.ys[cfg.year]) + ' in year ' + cfg.year + ', ' + cfg.fmt(l.ys[T]) + ' in year 15'; }).join('; ') + '.');
+}
+function niceStep(raw){ var p = Math.pow(10, Math.floor(Math.log10(raw))), f = raw / p; return (f < 1.5 ? 1 : f < 3.5 ? 2 : f < 7.5 ? 5 : 10) * p; }
+/* ---------- Build static parts ---------- */
+var stepbar = document.getElementById('stepbar');
+STEPS.forEach(function(s, i){
+  var b = document.createElement('button'); b.type = 'button'; b.textContent = (i + 1) + ' ' + s.tab;
+  b.addEventListener('click', function(){ goStep(i); });
+  stepbar.appendChild(b);
+});
+document.getElementById('ledger').innerHTML = LEDGER.map(function(l){ return '<li><span class="kind">' + l[0] + '</span>' + esc(l[1]) + '</li>'; }).join('');
+var dotsBox = document.getElementById('dots');
+for(var d = 0; d < N; d++){ var el = document.createElement('span'); el.className = 'dot'; dotsBox.appendChild(el); }
+document.getElementById('newChoices').innerHTML = NEWOPTS.map(function(o){ return '<button type="button" data-new="' + o[0] + '" aria-pressed="false">' + o[1] + '</button>'; }).join('');
+function goStep(i){ change({ step: i }); window.scrollTo(0, 0); document.getElementById('stepH').focus(); }
+document.getElementById('prevStep').addEventListener('click', function(){ goStep(state.step - 1); });
+document.getElementById('nextStep').addEventListener('click', function(){ goStep(state.step + 1); });
+document.getElementById('scLaptop').addEventListener('click', function(){ change({ scale: 'laptop' }); });
+document.getElementById('scProj').addEventListener('click', function(){ change({ scale: 'projector' }); });
+document.querySelectorAll('[data-side]').forEach(function(b){ b.addEventListener('click', function(){ change({ side: b.getAttribute('data-side') }); }); });
+document.getElementById('predBox').addEventListener('click', function(e){
+  var b = e.target.closest('[data-pred]'); if(!b) return; var p = {}; p[b.getAttribute('data-pred')] = b.getAttribute('data-v'); change(p);
+});
+document.getElementById('newChoices').addEventListener('click', function(e){ var b = e.target.closest('[data-new]'); if(b) change({ predNew: b.getAttribute('data-new') }); });
+['cap', 'cap3'].forEach(function(id){ document.getElementById(id).addEventListener('input', function(e){ change({ cap: Number(e.target.value) }); }); });
+document.getElementById('year').addEventListener('input', function(e){ change({ year: Number(e.target.value) }); });
+document.getElementById('check1').addEventListener('click', function(){ change({ reveal1: true }); });
+document.getElementById('check2').addEventListener('click', function(){ change({ reveal2: true }); });
+document.getElementById('noExit').addEventListener('change', function(e){ change({ noExit: e.target.checked }); });
+['ansGood', 'ansWhen'].forEach(function(id){ document.getElementById(id).addEventListener('input', function(e){ var p = {}; p[id] = e.target.value.slice(0, 1500); change(p); }); });
+/* ---------- Render ---------- */
+var WORD = { higher: 'higher', same: 'about the same', lower: 'lower', more: 'more', less: 'less' };
+function renderPredict(){
+  var box = document.getElementById('predBox');
+  if(!state.side){ box.innerHTML = '<p class="note">Pick your side in step 1 first.</p>'; return; }
+  var html = PRED[state.side].map(function(p, i){
+    return '<p class="q" id="pq' + i + '">' + esc(p.q) + '</p><div class="choices" role="group" aria-labelledby="pq' + i + '">' +
+      p.opts.map(function(o){ return '<button type="button" data-pred="' + p.key + '" data-v="' + o[0] + '" aria-pressed="' + (state[p.key] === o[0]) + '">' + esc(o[1]) + '</button>'; }).join('') + '</div>';
+  }).join('');
+  if(box.getAttribute('data-side') !== state.side){ box.innerHTML = html; box.setAttribute('data-side', state.side); }
+  else box.querySelectorAll('[data-pred]').forEach(function(b){ b.setAttribute('aria-pressed', String(state[b.getAttribute('data-pred')] === b.getAttribute('data-v'))); });
+}
+function renderSide(R){
+  var side = state.side || 'renters', yr = state.year, b = R.base[yr], c = R.rcFree[yr], rows;
+  STEPS[2].h = side === 'renters' ? 'What happens to people renting when the law passes?' : 'What do landlords do under the law?';
+  if(side === 'renters'){
+    lineChart(document.getElementById('chart2'), { H: 260, title: 'A current renter: money left after rent, per month', year: yr, fmt: money,
+      lines: [{ ys: R.rcFree.map(function(o){ return o.incU; }), color: 'var(--accent)', label: 'Rent control' }, { ys: R.base.map(function(o){ return o.incU; }), color: 'var(--muted)', dash: true, label: 'No control' }] });
+    rows = [['Their rent', money(b.incRent), money(c.incRent)], ['Money left after rent', money(b.incU), money(c.incU)],
+      ['Chance they move this year', pct(b.move), pct(c.move)], ['Original renters still in their flat', pct(b.incStay), pct(c.incStay)]];
+  } else {
+    lineChart(document.getElementById('chart2'), { H: 260, title: 'Average landlord: income per flat, per month', year: yr, fmt: money,
+      lines: [{ ys: R.rcFree.map(function(o){ return o.landU; }), color: 'var(--accent)', label: 'Rent control' }, { ys: R.base.map(function(o){ return o.landU; }), color: 'var(--muted)', dash: true, label: 'No control' }] });
+    rows = [['Rent received (average flat)', money(b.rentGot), money(c.rentGot)], ['Landlord income per flat', money(b.landU), money(c.landU)],
+      ['Flats still rented out', Math.round(b.supply) + ' of 100', Math.round(c.supply) + ' of 100']];
+    var dots = dotsBox.children, rented = Math.round(c.supply);
+    // Landlords who sell first are the ones whose flats are worth most outside renting (the right end).
+    for(var i = 0; i < N; i++) dots[i].classList.toggle('on', i < rented);
+    document.getElementById('dotsCap').textContent = 'Year ' + yr + ', with rent control: each circle is one flat.';
+  }
+  document.getElementById('landDots').hidden = side !== 'landlords';
+  document.getElementById('read2').innerHTML = '<tr><td colspan="3" class="note">Year ' + yr + ', cap ' + state.cap + '% a year</td></tr>' + rows.map(function(r){ return '<tr><td>' + r[0] + '</td><td class="num">' + r[1] + '</td><td class="num">' + r[2] + '</td></tr>'; }).join('');
+  var rev = document.getElementById('reveal1');
+  rev.hidden = !state.reveal1; document.getElementById('check1').hidden = state.reveal1;
+  if(state.reveal1){
+    var tr = truth(side, R), list = PRED[side].map(function(p){
+      var said = state[p.key];
+      return '<tr><td>' + p.short + '</td><td>' + (said ? WORD[said] : '<span class="note">none</span>') + '</td><td><strong>' + WORD[tr[p.key]] + '</strong>' + (said ? (said === tr[p.key] ? ' ✓' : ' ✗') : '') + '</td></tr>';
+    }).join('');
+    var why = side === 'renters' ?
+      'The cap moves money from landlords to sitting tenants from the first year, and the gap grows as market rent pulls away. A cheap flat is worth keeping, so tenants move less: by year 15, ' + pct(R.rcFree[15].incStay) + ' of original renters are still in place, against ' + pct(R.base[15].incStay) + ' without the law.' :
+      'Landlords compare renting with selling. The cap lowers what renting pays, so those for whom selling was nearly as good switch first, and more follow: ' + (100 - Math.round(R.rcFree[15].supply)) + ' of 100 flats leave the rental market by year 15. Each does as well as they can, but worse than without the law.';
+    rev.innerHTML = '<table><thead><tr><th>Prediction</th><th>You said</th><th>Model</th></tr></thead><tbody>' + list + '</tbody></table><p>' + why + '</p>' + (state.cap >= 3 ? '<p class="note">At a cap of 3% or more the law barely binds: market rent only rises about 3% a year.</p>' : '');
+  }
+}
+function renderBoth(R){
+  var yr = state.year, rc = R.rc, b = R.base;
+  document.getElementById('noExit').checked = state.noExit;
+  document.querySelectorAll('[data-new]').forEach(function(x){ x.setAttribute('aria-pressed', String(state.predNew === x.getAttribute('data-new'))); });
+  document.getElementById('check2').hidden = state.reveal2;
+  var svg = document.getElementById('chart3'), rev = document.getElementById('reveal2');
+  rev.hidden = !state.reveal2;
+  if(!state.reveal2){
+    svg.innerHTML = '<text x="280" y="150" text-anchor="middle" style="fill:var(--muted);font-size:14px">Predict first, then show the whole city.</text>';
+    svg.setAttribute('aria-label', 'Hidden until you predict.');
+    return;
+  }
+  lineChart(svg, { title: 'Monthly rent paid', year: yr, fmt: money, lines: [
+    { ys: rc.map(function(o){ return o.market; }), color: 'var(--warm)', label: 'Newcomer, control' },
+    { ys: b.map(function(o){ return o.market; }), color: 'var(--muted)', dash: true, label: 'Anyone, no control' },
+    { ys: rc.map(function(o){ return o.incRent; }), color: 'var(--accent)', label: 'Original renter' }] });
+  var nd = rc[15].market - b[15].market, said = state.predNew, truthNew = dir(nd, 20);
+  rev.innerHTML = '<p>Year 15: a newcomer pays <strong>' + money(rc[15].market) + '</strong> a month, against ' + money(b[15].market) + ' with no control (' + signed(nd) + '). ' +
+    (said ? 'You said ' + WORD[said] + (said === truthNew ? ' <span class="match">(match)</span>.' : ' <span class="match">(different)</span>.') : '') + '</p>' +
+    (rc[15].supply > 99.5 && !state.noExit ? '<p>At this cap the law barely binds: renting still pays more than selling, every flat stays rented, and newcomers pay what they would anyway.</p>' :
+    state.noExit ? '<p>With selling banned, every flat stays rented, so newcomers pay what they would without the law. The long-run harm runs through landlords\' choice to leave.</p>' :
+    '<ol class="loop"><li>The cap raises sitting renters\' utility, so they move less.</li><li>It lowers landlords\' utility from renting, so some sell or redevelop: ' + Math.round(rc[15].supply) + ' flats remain.</li><li>Fewer flats for the same demand: market rent rises.</li><li>Newcomers pay that higher rent. Their utility falls.</li></ol>') +
+    '<p class="note">Now try the ban, then a cap of 0% and of 4%.</p>';
+}
+function renderSF(R){
+  var b = R.base, c = R.rcFree;
+  document.getElementById('sfCap').textContent = state.cap + '%';
+  var moveCut = 1 - (c.slice(1).reduce(function(s, o){ return s + o.move; }, 0) / b.slice(1).reduce(function(s, o){ return s + o.move; }, 0));
+  var rows = [
+    ['Covered tenants move less', 'about ' + pct(moveCut) + ' less moving, years 1–15', 'Renters\' mobility fell by about 20%; fewer were displaced from the city'],
+    ['Landlords take flats off the rental market', (100 - Math.round(c[15].supply)) + '% fewer rental flats by year 15', 'Treated landlords cut rental supply by 15%, selling to owner-occupiers and redeveloping'],
+    ['Market rent rises', signed(c[15].market - b[15].market) + ' a month by year 15 (' + pct(c[15].market / b[15].market - 1) + ')', 'Lost supply likely drove up market rents, undermining the law\'s goal']
+  ];
+  document.getElementById('sfBody').innerHTML = rows.map(function(r){ return '<tr><td>' + r[0] + '</td><td class="num">' + r[1] + '</td><td>' + r[2] + '</td></tr>'; }).join('');
+}
+function renderDecide(){
+  ['ansGood', 'ansWhen'].forEach(function(id){ var tb = document.getElementById(id); if(tb.value !== state[id] && document.activeElement !== tb) tb.value = state[id]; });
+}
+function render(){
+  document.body.className = state.scale;
+  document.getElementById('scLaptop').setAttribute('aria-pressed', String(state.scale === 'laptop'));
+  document.getElementById('scProj').setAttribute('aria-pressed', String(state.scale === 'projector'));
+  var R = runs();
+  if(state.step === 2) renderSide(R);
+  var step = STEPS[state.step];
+  document.getElementById('stepNum').textContent = 'Step ' + (state.step + 1) + ' of ' + STEPS.length + (state.side ? ' · ' + (state.side === 'renters' ? 'Group 1: Renters' : 'Group 2: Landlords') : '');
+  document.getElementById('stepH').textContent = step.h;
+  document.getElementById('stepHint').textContent = state.step === 1 ? (state.side ? 'Agree as a group. The model checks these in the next step.' : '') : step.hint;
+  [].forEach.call(stepbar.children, function(b, i){ if(i === state.step) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current'); });
+  for(var i = 0; i < STEPS.length; i++) document.getElementById('v' + i).hidden = i !== state.step;
+  document.querySelectorAll('[data-side]').forEach(function(b){ b.setAttribute('aria-pressed', String(state.side === b.getAttribute('data-side'))); });
+  document.getElementById('capTxt').textContent = state.cap + '%';
+  var yr = document.getElementById('year');
+  ['cap', 'cap3'].forEach(function(id){ var c = document.getElementById(id); if(Number(c.value) !== state.cap) c.value = state.cap; });
+  if(Number(yr.value) !== state.year) yr.value = state.year;
+  document.getElementById('capOut').textContent = document.getElementById('capOut3').textContent = state.cap + '% / yr';
+  document.getElementById('yearOut').textContent = 'Year ' + state.year;
+  if(state.step === 1) renderPredict();
+  if(state.step === 3) renderBoth(R);
+  if(state.step === 4) renderSF(R);
+  if(state.step === 5) renderDecide();
+  document.getElementById('prevStep').disabled = state.step === 0;
+  document.getElementById('nextStep').disabled = state.step === STEPS.length - 1;
+}
+/* ---------- Contract ---------- */
+window.artifact = {
+  getState: getState,
+  setState: setState,
+  onChange: function(fn){ listeners.push(fn); return function(){ listeners = listeners.filter(function(f){ return f !== fn; }); }; },
+  controls: [
+    { key: 'step', label: 'Step', kind: 'range', min: 0, max: STEPS.length - 1, step: 1 },
+    { key: 'side', label: 'Side modelled', kind: 'choice', options: ['', 'renters', 'landlords'] },
+    { key: 'cap', label: 'Rent cap (% a year)', kind: 'range', min: 0, max: 5, step: 0.5 },
+    { key: 'year', label: 'Year', kind: 'range', min: 0, max: T, step: 1 },
+    { key: 'predShort', label: 'Prediction: year 2', kind: 'choice', options: ['', 'higher', 'same', 'lower'] },
+    { key: 'predLong', label: 'Prediction: year 15', kind: 'choice', options: ['', 'higher', 'same', 'lower'] },
+    { key: 'predAct', label: 'Prediction: behaviour', kind: 'choice', options: ['', 'more', 'same', 'less'] },
+    { key: 'predNew', label: 'Prediction: newcomer rent', kind: 'choice', options: ['', 'higher', 'same', 'lower'] },
+    { key: 'reveal1', label: 'Show check of side predictions', kind: 'toggle' },
+    { key: 'reveal2', label: 'Show the whole city', kind: 'toggle' },
+    { key: 'noExit', label: 'Ban landlords from selling', kind: 'toggle' },
+    { key: 'scale', label: 'Text size', kind: 'choice', options: ['laptop', 'projector'] }
+  ],
+  responses: [
+    { key: 'ansGood', prompt: 'Is rent control a good idea? Answer using utility for current renters, landlords and future renters.' },
+    { key: 'ansWhen', prompt: 'When is a simple utility model like this one good at predicting, and when is it not?' }
+  ],
+  assertions: [
+    { name: 'Without the law nobody sells: supply stays at 100 and market rent grows exactly 3% a year', run: function(){
+      var b = simulate({ control: false, cap: 0.02 }); return b.every(function(o){ return Math.abs(o.supply - 100) < 1e-9 && Math.abs(o.market - M0 * Math.pow(1.03, o.t)) < 1e-6; }); } },
+    { name: 'A cap at or above market growth (5%) changes nothing', run: function(){
+      var b = simulate({ control: false, cap: 0.05 }), c = simulate({ control: true, cap: 0.05 });
+      return c.every(function(o, t){ return Math.abs(o.market - b[t].market) < 1e-6 && Math.abs(o.incU - b[t].incU) < 1e-6; }); } },
+    { name: 'With a 2% cap: sitting renters gain, landlords lose, supply falls and newcomers pay more by year 15', run: function(){
+      var b = simulate({ control: false, cap: 0.02 }), c = simulate({ control: true, cap: 0.02 });
+      return c[15].incU > b[15].incU && c[15].landU < b[15].landU && c[15].supply < 100 && c[15].market > b[15].market && c[15].move < b[15].move; } },
+    { name: 'Banning sales keeps every flat rented, so newcomers pay the no-control rent', run: function(){
+      var b = simulate({ control: false, cap: 0.02 }), c = simulate({ control: true, cap: 0.02, exit: false });
+      return c.every(function(o, t){ return Math.abs(o.supply - 100) < 1e-9 && Math.abs(o.market - b[t].market) < 1e-6; }); } },
+    { name: 'A stricter cap removes more flats (0% vs 2%)', run: function(){
+      return simulate({ control: true, cap: 0 })[15].supply < simulate({ control: true, cap: 0.02 })[15].supply; } },
+    { name: 'A 10% rent discount cuts moving by 20%, as the ledger says', run: function(){ return Math.abs(MOVE0 / (1 + K * 0.10) - 0.08) < 1e-12; } },
+    { name: 'No NaN at any cap or year', run: function(){
+      for(var cp = 0; cp <= 5; cp += 0.5){ var s = simulate({ control: true, cap: cp / 100 }); for(var t = 0; t <= T; t++){ var o = s[t]; if(![o.supply, o.market, o.incU, o.newU, o.landU, o.move].every(isFinite)) return false; } } return true; } }
+  ],
+  referenceCases: []
+};
+render();
+})();
+</script>
+
+<script>
+(function () {
+  var cfg = {"versionId":"cmw10amuj000007lddwjrnc4t","appOrigin":"https://ideasatplay.org","direct":null};
+  var t0 = Date.now(), scrolled = false, acted = false, reached = false, shown = false, config = null;
+  var framed = parent !== window;
+  function onScreen(el) {
+    if (!el.getClientRects().length) return false;
+    var r = el.getBoundingClientRect();
+    return r.top < innerHeight && r.bottom > 0;
+  }
+  function atBottom() {
+    var f = document.querySelector("footer[data-kc-credit]");
+    if (f) return f.getBoundingClientRect().top <= innerHeight;
+    var d = document.documentElement;
+    return scrollY + innerHeight >= d.scrollHeight - 48;
+  }
+  // { cur, last } when the page moves through numbered steps, else null.
+  function steps() {
+    var a = window.artifact;
+    try {
+      var c = a && Array.isArray(a.controls) ? a.controls.filter(function (x) { return x && x.key === "step" && typeof x.max === "number"; })[0] : null;
+      if (c) { var s = a.getState(); if (s && typeof s.step === "number") return { cur: s.step, last: c.max }; }
+    } catch (e) {}
+    var cur = document.querySelector('[aria-current="step"]');
+    if (cur && cur.parentElement) {
+      var sib = Array.prototype.filter.call(cur.parentElement.children, function (x) { return x.getClientRects().length; });
+      return { cur: sib.indexOf(cur), last: sib.length - 1 };
+    }
+    return null;
+  }
+  function finished() {
+    var mark = document.querySelector("[data-kc-end]");
+    if (mark) return onScreen(mark);
+    var s = steps();
+    if (s) return s.cur >= s.last && atBottom();
+    return atBottom() && (scrolled || (acted && Date.now() - t0 > 60000));
+  }
+  // The student link remembers a rating in its own storage where the browser allows it.
+  var KEY = "kc-rated-" + cfg.versionId;
+  function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
+  if (cfg.direct) config = { ask: !store(KEY), preview: false, labels: cfg.direct.labels };
+  var visitor = (function () {
+    var v = store("kc-visitor");
+    if (!v) { v = ""; for (var i = 0; i < 24; i++) v += "abcdefghijklmnopqrstuvwxyz0123456789".charAt(Math.floor(Math.random() * 36)); store("kc-visitor", v); }
+    return v;
+  })();
+  var pending = {}, seq = 0;
+  function save(score, comment) {
+    if (cfg.direct) {
+      var body = { versionId: cfg.versionId, score: score, context: "share", visitor: visitor };
+      if (comment) body.comment = comment;
+      // text/plain: a simple request, so no preflight is needed.
+      return fetch(cfg.direct.endpoint, { method: "POST", credentials: "omit", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(body) })
+        .then(function (r) { if (r.ok) store(KEY, String(score)); return r.ok; }, function () { return false; });
+    }
+    return new Promise(function (resolve) {
+      var id = ++seq; pending[id] = resolve;
+      parent.postMessage({ type: "kc:rate", versionId: cfg.versionId, id: id, score: score, comment: comment || "" }, cfg.appOrigin);
+      setTimeout(function () { if (pending[id]) { delete pending[id]; resolve(false); } }, 15000);
+    });
+  }
+  var B = "display:inline-block;margin:3px 6px 3px 0;padding:4px 10px;border:1px solid #a8a29e;border-radius:6px;background:#fff;color:#1c1917;font:inherit;cursor:pointer";
+  function el(tag, attrs, text) { var e = document.createElement(tag); for (var k in attrs) e.setAttribute(k, attrs[k]); if (text) e.textContent = text; return e; }
+  function show() {
+    if (shown || !config || !config.ask) return;
+    shown = true;
+    clearInterval(timer);
+    var L = config.labels;
+    var box = el("div", { "data-kc-rating": "", "data-kc-personal": "", role: "region", "aria-label": L.ask, lang: L.lang, dir: L.dir,
+      style: "box-sizing:border-box;max-width:760px;margin:24px auto 0;padding:10px 14px;border:1px solid #d6d3d1;border-radius:10px;background:#fafaf9;color:#1c1917;font:14px/1.5 system-ui,-apple-system,sans-serif;text-align:start" });
+    var live = el("div", { "aria-live": "polite" });
+    box.appendChild(live);
+    function ask(msg) {
+      live.innerHTML = "";
+      live.appendChild(el("span", { style: "font-weight:600;margin-inline-end:8px" }, L.ask));
+      [1, 2, 3].forEach(function (s) {
+        var b = el("button", { type: "button", style: B }, s + " · " + L["s" + s]);
+        b.addEventListener("click", function () {
+          live.querySelectorAll("button").forEach(function (x) { x.disabled = true; });
+          save(s, "").then(function (ok) { if (ok) comment(s); else ask(L.error); });
+        });
+        live.appendChild(b);
+      });
+      if (config.preview) live.appendChild(el("div", { style: "font-size:12px;color:#57534e" }, L.preview));
+      if (msg) live.appendChild(el("div", { role: "alert", style: "color:#991b1b;font-size:13px" }, msg));
+    }
+    function comment(score) {
+      live.innerHTML = "";
+      var id = "kc-rate-comment";
+      live.appendChild(el("label", { for: id, style: "display:block;font-weight:600;margin-bottom:4px" }, L.comment));
+      var row = el("div", { style: "display:flex;flex-wrap:wrap;gap:6px;align-items:center" });
+      var input = el("input", { id: id, type: "text", maxlength: "1000", autocomplete: "off", dir: "auto",
+        style: "flex:1 1 260px;min-width:0;box-sizing:border-box;padding:5px 8px;border:1px solid #a8a29e;border-radius:6px;background:#fff;color:#1c1917;font:inherit" });
+      var send = el("button", { type: "button", style: B + ";background:#292524;color:#fff;border-color:#292524" }, L.send);
+      var skip = el("button", { type: "button", style: B }, L.skip);
+      function done() { live.innerHTML = ""; live.appendChild(el("span", { style: "font-weight:600" }, L.thanks)); setTimeout(function () { box.remove(); }, 2000); }
+      send.addEventListener("click", function () {
+        var text = input.value.trim();
+        if (!text) return done();
+        send.disabled = skip.disabled = true;
+        save(score, text).then(function (ok) { if (ok) done(); else { send.disabled = skip.disabled = false; live.appendChild(el("div", { role: "alert", style: "color:#991b1b;font-size:13px" }, L.error)); } });
+      });
+      input.addEventListener("keydown", function (e) { if (e.key === "Enter") send.click(); });
+      skip.addEventListener("click", done);
+      row.appendChild(input); row.appendChild(send); row.appendChild(skip);
+      live.appendChild(row);
+      input.focus();
+    }
+    ask("");
+    var mark = document.querySelector("[data-kc-end]"), foot = document.querySelector("footer[data-kc-credit]");
+    if (mark) mark.insertAdjacentElement("afterend", box);
+    else if (foot) foot.parentNode.insertBefore(box, foot);
+    else document.body.appendChild(box);
+  }
+  function check() {
+    if (!reached && finished()) reached = true;
+    if (reached) show();
+  }
+  window.addEventListener("message", function (e) {
+    if (e.source !== parent || !e.data || e.data.versionId !== cfg.versionId) return;
+    var d = e.data;
+    if (d.type === "kc:rate-config" && !cfg.direct) { config = { ask: !!d.ask, preview: !!d.preview, labels: d.labels }; check(); }
+    if (d.type === "kc:rate-result" && pending[d.id]) { pending[d.id](!!d.ok); delete pending[d.id]; }
+  });
+  // The app page may start listening after this page loads: ask a few times.
+  var hellos = 0;
+  function hello() { if (framed && !cfg.direct && !config && hellos++ < 8) parent.postMessage({ type: "kc:rate-hello", versionId: cfg.versionId }, cfg.appOrigin); }
+  hello();
+  var timer = setInterval(function () { if (hellos < 8 && !config) hello(); check(); }, 800);
+  window.addEventListener("scroll", function () { if (scrollY > 0) scrolled = true; check(); }, { passive: true });
+  ["click", "input", "keydown"].forEach(function (t) { document.addEventListener(t, function (e) { if (e.target && e.target.closest && e.target.closest("[data-kc-rating]")) return; acted = true; setTimeout(check, 50); }, true); });
+})();
+</script></body>
+</html>

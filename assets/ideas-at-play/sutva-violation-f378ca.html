@@ -1,0 +1,594 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Four Units, Three Worlds: when does a unit have exactly two potential outcomes?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #fbfaf7;
+  --surface: #ffffff;
+  --ink: #23262b;
+  --muted: #6b6f76;
+  --rule: #d9d6cf;
+  --accent: #2e4057;
+  --contrast: #e85d04;
+  --contrast-soft: #fdebdd;
+  --accent-soft: #e6ebf2;
+  --code-bg: #f4f1ea;
+  --font-sans: "Source Sans 3", "Helvetica Neue", Arial, sans-serif;
+  --font-serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --body: 16px; --control: 14px; --label: 13px; --stroke: 1px;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1c1e22; --surface: #24272c; --ink: #ebe9e3; --muted: #a3a7ae;
+    --rule: #3c4048; --accent: #9fb4d0; --contrast: #ff9654;
+    --contrast-soft: #4a3220; --accent-soft: #2f3a4a; --code-bg: #2b2e34;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #1c1e22; --surface: #24272c; --ink: #ebe9e3; --muted: #a3a7ae;
+  --rule: #3c4048; --accent: #9fb4d0; --contrast: #ff9654;
+  --contrast-soft: #4a3220; --accent-soft: #2f3a4a; --code-bg: #2b2e34;
+  color-scheme: dark;
+}
+html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--font-sans); font-size: var(--body); line-height: 1.5;
+}
+body.projector { --body: 24px; --control: 20px; --label: 18px; --stroke: 2px; }
+main { max-width: 46rem; margin: 0 auto; padding: 2.5rem 1.25rem 4rem; }
+h1 { font-family: var(--font-serif); font-weight: 600; font-size: 2em; line-height: 1.15; margin: 0 0 .35em; }
+h2 { font-family: var(--font-serif); font-weight: 600; font-size: 1.3em; margin: 2.2em 0 .6em; line-height: 1.25; }
+h3 { font-size: 1em; font-weight: 600; margin: 1.2em 0 .4em; }
+p { margin: 0 0 1em; max-width: 36em; }
+.lede { color: var(--muted); font-size: 1.05em; }
+.toolbar { display: flex; flex-wrap: wrap; gap: .6rem 1.4rem; align-items: center; margin: 1.2rem 0 2rem; font-size: var(--control); color: var(--muted); }
+.toolbar label { display: inline-flex; align-items: center; gap: .4em; cursor: pointer; }
+button {
+  font: inherit; font-size: var(--control); color: var(--accent);
+  background: var(--surface); border: var(--stroke) solid var(--accent);
+  border-radius: 4px; padding: .35em .9em; cursor: pointer;
+}
+button:hover { background: var(--accent-soft); }
+button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 2px solid var(--contrast); outline-offset: 2px; }
+
+/* world selector */
+fieldset { border: 0; padding: 0; margin: 0 0 1.4rem; }
+legend { font-weight: 600; padding: 0; margin-bottom: .5rem; }
+.worlds { display: grid; grid-template-columns: repeat(3, 1fr); gap: .5rem; }
+.worlds label {
+  display: block; padding: .6em .8em; border: var(--stroke) solid var(--rule); border-radius: 4px;
+  cursor: pointer; font-size: var(--control); background: var(--surface);
+}
+.worlds label span { display: block; color: var(--muted); font-size: .92em; margin-top: .15em; }
+.worlds input { margin-right: .4em; }
+.worlds label.on { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+@media (max-width: 560px) { .worlds { grid-template-columns: 1fr; } }
+
+/* table */
+.tablewrap { overflow-x: auto; margin: 0 0 .8rem; }
+table { border-collapse: collapse; width: 100%; font-size: var(--control); background: var(--surface); }
+th, td { padding: .55em .7em; text-align: right; white-space: nowrap; }
+th:first-child, td:first-child { text-align: left; }
+th { font-weight: 600; border-top: var(--stroke) solid var(--ink); border-bottom: var(--stroke) solid var(--ink); }
+tbody tr:last-child td { border-bottom: var(--stroke) solid var(--ink); }
+td.num { font-variant-numeric: tabular-nums; }
+td.changed { background: var(--contrast-soft); transition: background 200ms; }
+td.quiet { transition: background 600ms; }
+.toggle { display: inline-flex; border: var(--stroke) solid var(--accent); border-radius: 4px; overflow: hidden; }
+.toggle button { border: 0; border-radius: 0; padding: .25em .75em; }
+.toggle button + button { border-left: var(--stroke) solid var(--accent); }
+.toggle button[aria-pressed="true"] { background: var(--accent); color: var(--surface); }
+.version { color: var(--muted); font-size: .9em; margin-left: .35em; }
+
+/* readouts */
+.readouts { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; margin: 1rem 0 1.6rem; }
+@media (max-width: 560px) { .readouts { grid-template-columns: 1fr; } }
+.readout { background: var(--surface); border: var(--stroke) solid var(--rule); border-radius: 4px; padding: .8em 1em; }
+.readout .k { color: var(--muted); font-size: var(--label); }
+.readout .v { font-family: var(--font-serif); font-size: 1.9em; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.readout .v.flag { color: var(--contrast); }
+.readout .note { font-size: var(--label); color: var(--muted); margin-top: .2em; }
+
+/* reveal */
+.reveal { border-left: 3px solid var(--contrast); padding: .2em 0 .2em 1em; margin: 1.4rem 0; }
+.reveal[hidden] { display: none; }
+.reveal h3 { margin-top: 0; }
+.po { font-size: var(--control); }
+.po td.hi { font-weight: 600; color: var(--contrast); }
+
+/* steps and questions */
+ol.steps { padding-left: 1.4em; max-width: 38em; }
+ol.steps li { margin-bottom: .9em; }
+ol.steps .q { display: block; color: var(--muted); }
+.gate { color: var(--muted); max-width: 36em; }
+.gate[hidden] { display: none; }
+#questions[hidden] { display: none; }
+.question { margin-bottom: 1.6rem; max-width: 40em; }
+.question label { display: block; font-weight: 600; margin-bottom: .4em; }
+textarea {
+  width: 100%; min-height: 6.5em; font: inherit; font-size: var(--control); line-height: 1.45;
+  color: var(--ink); background: var(--surface); border: var(--stroke) solid var(--rule); border-radius: 4px; padding: .6em .7em; resize: vertical;
+}
+details { margin: 1.4rem 0; font-size: var(--control); }
+summary { cursor: pointer; font-weight: 600; }
+details ul { margin: .5em 0 0; padding-left: 1.2em; }
+pre { background: var(--code-bg); padding: .8em 1em; border-radius: 4px; overflow-x: auto; font-size: .92em; line-height: 1.45; }
+code .kw { color: var(--accent); font-weight: 600; }
+.foot { color: var(--muted); font-size: var(--label); margin-top: 3rem; }
+.foot + .foot { margin-top: .4rem; }
+.sr { position: absolute; left: -9999px; }
+</style>
+</head>
+<body class="laptop">
+<main>
+  <h1>Four units, three worlds</h1>
+  <p class="lede">A randomized experiment with four units, built for CS130 at Minerva University. You decide who gets treated. The question is whether each unit still has exactly two potential outcomes, one for treated and one for not.</p>
+
+  <div class="toolbar">
+    <label><input type="checkbox" id="projector"> Projector text size</label>
+    <button type="button" id="reset">Reset assignments</button>
+  </div>
+
+  <fieldset>
+    <legend>Which world are we in?</legend>
+    <div class="worlds" id="worlds">
+      <label class="on"><input type="radio" name="world" value="sutva" checked>SUTVA holds<span>Each unit's outcome depends only on its own assignment, and treatment is one thing.</span></label>
+      <label><input type="radio" name="world" value="interference">Interference<span>Unit 4 also reacts to what happens to unit 3.</span></label>
+      <label><input type="radio" name="world" value="versions">Hidden versions<span>"Treated" might be dose A or dose B. Nobody records which.</span></label>
+    </div>
+  </fieldset>
+
+  <h2>Flip a unit's assignment. Which rows change?</h2>
+  <div class="tablewrap">
+    <table aria-label="Observed outcomes for four units under the current assignment and world">
+      <thead><tr><th>Unit</th><th>Assignment</th><th>Observed outcome</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
+
+  <div class="readouts">
+    <div class="readout">
+      <div class="k">Potential outcomes unit 4 would need</div>
+      <div class="v" id="poCount">2</div>
+      <div class="note" id="poNote">one potential outcome for each possible assignment</div>
+    </div>
+    <div class="readout">
+      <div class="k">Difference in means, treated minus control</div>
+      <div class="v" id="dim">—</div>
+      <div class="note" id="dimNote"></div>
+    </div>
+  </div>
+
+  <section class="reveal" id="reveal" hidden aria-live="polite">
+    <h3 id="revealTitle"></h3>
+    <p id="revealText"></p>
+    <div class="tablewrap">
+      <table class="po" aria-label="Full table of potential outcomes for unit 4 in the current world">
+        <thead id="poHead"></thead>
+        <tbody id="poBody"></tbody>
+      </table>
+    </div>
+    <p id="revealName"></p>
+  </section>
+
+  <h2>Steps</h2>
+  <ol class="steps">
+    <li>Before touching anything: you are about to flip unit 3 from control to treated. Predict what happens to unit 4's observed outcome.<span class="q">Write your prediction down, then continue.</span></li>
+    <li>In the world where SUTVA holds, flip unit 3.<span class="q">How many rows changed? Did unit 4 move?</span></li>
+    <li>Switch to the interference world and flip unit 3 again, back and forth.<span class="q">What does unit 4's outcome do, even though you never touched unit 4?</span></li>
+    <li>Switch to the hidden-versions world and treat units 1 and 2.<span class="q">Both are treated, both had an effect of +50 in the SUTVA world. Why do they now gain different amounts? What does that do to the difference in means?</span></li>
+  </ol>
+
+  <h2>Questions</h2>
+  <p class="gate" id="gate" aria-live="polite"></p>
+  <div id="questions" hidden>
+  <div class="question">
+    <label for="a1">1. In your own words, what changed about unit 4 between the SUTVA world and the interference world? How many potential outcomes does unit 4 have in each?</label>
+    <textarea id="a1"></textarea>
+  </div>
+  <div class="question">
+    <label for="a2">2. In the hidden-versions world, two units with the same assignment receive different versions of treatment, and the data record only "treated." Why does that make "the effect of treatment" undefined rather than just noisy?</label>
+    <textarea id="a2"></textarea>
+  </div>
+  <div class="question">
+    <label for="a3">3. Give one real-world example of interference and one of hidden versions of treatment. For each, say which units' potential outcomes are affected.</label>
+    <textarea id="a3"></textarea>
+  </div>
+  </div>
+
+  <details>
+    <summary>What this page assumes</summary>
+    <ul>
+      <li>Four units with fixed potential outcomes under control and under treatment, chosen so every unit's own effect is +50.</li>
+      <li>No sampling noise. In the hidden-versions world, units 1 and 3 receive dose A if treated and units 2 and 4 receive dose B; this is fixed and never recorded in the data.</li>
+      <li>Interference runs one way only: unit 3's assignment lowers unit 4's outcome by 45. No other unit is affected.</li>
+      <li>Dose B is dose A minus 40. There are only two versions.</li>
+      <li>The difference in means is shown as a description of the data, not as an estimate of anything; whether it estimates a well-defined quantity is the point of the exercise.</li>
+      <li>Left out on purpose: how to estimate effects when interference is present (exposure mappings) and how to recover a well-defined effect by specifying the version.</li>
+    </ul>
+    <h3>The mechanism in R</h3>
+<pre><code><span class="kw">T</span> &lt;- c(0, 0, 0, 0)             <span class="kw">#</span> you set these
+Y0 &lt;- c(50, 40, 60, 50); Y1 &lt;- Y0 + 50
+Y  &lt;- <span class="kw">ifelse</span>(T == 1, Y1, Y0)   <span class="kw">#</span> SUTVA world
+Y[4] &lt;- Y[4] - 45 * T[3]        <span class="kw">#</span> interference world
+dose &lt;- c(<span class="kw">"A"</span>, <span class="kw">"B"</span>, <span class="kw">"A"</span>, <span class="kw">"B"</span>)   <span class="kw">#</span> not recorded
+Y  &lt;- Y - 40 * (T == 1 &amp; dose == <span class="kw">"B"</span>)  <span class="kw">#</span> hidden-versions world</code></pre>
+  </details>
+
+  <p class="foot">Assume perfect compliance with assignment: every unit receives exactly the condition it is assigned.</p>
+  <p class="foot">Answers you type stay in this browser only. Nothing is sent anywhere.</p>
+  <p class="foot">Alexis Diamond, CS130, Minerva University.</p>
+</main>
+
+<script>
+(function () {
+  'use strict';
+
+  // ---------- model ----------
+  var Y0 = [50, 40, 60, 50];
+  var Y1 = [100, 90, 110, 100];
+  var INTERFERENCE = 45; // unit 3 treated lowers unit 4 by this
+  var DOSE_B_PENALTY = 40;
+
+  var DOSES = ['A', 'B', 'A', 'B']; // which version each unit would receive if treated; never recorded in the data
+  function drawDoses() { return DOSES; }
+
+  // The one function that owns the math.
+  // Returns observed outcomes for all four units.
+  function outcomes(world, T, doses) {
+    var Y = T.map(function (t, i) { return t === 1 ? Y1[i] : Y0[i]; });
+    if (world === 'interference') Y[3] = Y[3] - INTERFERENCE * T[2];
+    if (world === 'versions') {
+      Y = Y.map(function (y, i) { return (T[i] === 1 && doses[i] === 'B') ? y - DOSE_B_PENALTY : y; });
+    }
+    return Y;
+  }
+  function diffInMeans(T, Y) {
+    var tr = [], co = [];
+    Y.forEach(function (y, i) { (T[i] === 1 ? tr : co).push(y); });
+    if (!tr.length || !co.length) return null;
+    var m = function (a) { return a.reduce(function (s, v) { return s + v; }, 0) / a.length; };
+    return m(tr) - m(co);
+  }
+
+  // ---------- state ----------
+  var state = { world: 'sutva', T: [0, 0, 0, 0], acted: false, lastTouched: null, attempted: { sutva: false, interference: false, versions: false } };
+  var WORLD_NAMES = { sutva: 'SUTVA holds', interference: 'Interference', versions: 'Hidden versions' };
+  var prevY = outcomes(state.world, state.T, drawDoses());
+
+  function setState(patch) {
+    Object.keys(patch).forEach(function (k) { state[k] = patch[k]; });
+    render();
+  }
+  function getState() { return JSON.parse(JSON.stringify(state)); }
+
+  // ---------- render ----------
+  var $ = function (id) { return document.getElementById(id); };
+  var rows = $('rows');
+
+  function buildRows() {
+    rows.innerHTML = '';
+    for (var i = 0; i < 4; i++) {
+      var tr = document.createElement('tr');
+      var td1 = document.createElement('td'); td1.textContent = 'Unit ' + (i + 1);
+      var td2 = document.createElement('td');
+      var tg = document.createElement('div'); tg.className = 'toggle'; tg.setAttribute('role', 'group');
+      tg.setAttribute('aria-label', 'Assignment for unit ' + (i + 1));
+      ['Control', 'Treated'].forEach(function (lab, v) {
+        var b = document.createElement('button'); b.type = 'button'; b.textContent = lab;
+        b.dataset.unit = i; b.dataset.val = v;
+        b.addEventListener('click', onToggle);
+        tg.appendChild(b);
+      });
+      td2.appendChild(tg);
+      var ver = document.createElement('span'); ver.className = 'version'; ver.id = 'ver' + i; td2.appendChild(ver);
+      var td3 = document.createElement('td'); td3.className = 'num'; td3.id = 'y' + i;
+      tr.appendChild(td1); tr.appendChild(td2); tr.appendChild(td3);
+      rows.appendChild(tr);
+    }
+  }
+  function onToggle(e) {
+    var i = +e.currentTarget.dataset.unit, v = +e.currentTarget.dataset.val;
+    var T = state.T.slice(); T[i] = v;
+    var att = Object.assign({}, state.attempted); att[state.world] = true;
+    setState({ T: T, acted: true, lastTouched: i, attempted: att });
+  }
+
+  function render() {
+    var doses = drawDoses();
+    var Y = outcomes(state.world, state.T, doses);
+
+    // world chips
+    Array.prototype.forEach.call(document.querySelectorAll('#worlds label'), function (l) {
+      var inp = l.querySelector('input'); inp.checked = inp.value === state.world;
+      l.classList.toggle('on', inp.checked);
+    });
+
+    // rows
+    for (var i = 0; i < 4; i++) {
+      var btns = rows.querySelectorAll('button[data-unit="' + i + '"]');
+      btns[0].setAttribute('aria-pressed', state.T[i] === 0 ? 'true' : 'false');
+      btns[1].setAttribute('aria-pressed', state.T[i] === 1 ? 'true' : 'false');
+      var cell = $('y' + i);
+      cell.textContent = Y[i];
+      var changedByOther = state.acted && Y[i] !== prevY[i] && state.lastTouched !== null && state.lastTouched !== i;
+      cell.className = 'num ' + (changedByOther ? 'changed' : 'quiet');
+      var ver = $('ver' + i);
+      ver.textContent = (state.world === 'versions' && state.T[i] === 1) ? 'dose ' + doses[i] : '';
+    }
+
+    // readouts
+    var count = state.world === 'sutva' ? 2 : state.world === 'interference' ? 4 : 3;
+    $('poCount').textContent = count;
+    $('poCount').className = 'v' + (count > 2 ? ' flag' : '');
+    $('poNote').textContent = state.world === 'sutva'
+      ? 'one potential outcome for each possible assignment'
+      : state.world === 'interference'
+        ? 'own assignment × unit 3\u2019s assignment'
+        : 'control, dose A, dose B';
+
+    var d = diffInMeans(state.T, Y);
+    $('dim').textContent = d === null ? '\u2014' : (d > 0 ? '+' : '') + d.toFixed(1);
+    $('dimNote').textContent = d === null ? 'needs at least one treated and one control unit'
+      : state.world === 'sutva' ? 'every unit\u2019s own effect is +50; the Y(0)s differ'
+      : state.world === 'interference' ? 'depends on whether unit 3 is treated'
+      : 'depends on which doses the treated units happened to get';
+
+
+    // questions open only after every world has been tried
+    var left = Object.keys(WORLD_NAMES).filter(function (w) { return !state.attempted[w]; });
+    $('questions').hidden = left.length > 0;
+    $('gate').textContent = left.length === 0 ? ''
+      : 'Answer these after you have flipped an assignment in all three worlds. Still to try: ' + left.map(function (w) { return WORLD_NAMES[w]; }).join(', ') + '.';
+    $('gate').hidden = left.length === 0;
+
+    // reveal
+    var rv = $('reveal');
+    if (state.acted) {
+      rv.hidden = false;
+      var head = $('poHead'), body = $('poBody');
+      head.innerHTML = ''; body.innerHTML = '';
+      var mk = function (tag, txt, cls) { var e = document.createElement(tag); e.textContent = txt; if (cls) e.className = cls; return e; };
+      if (state.world === 'sutva') {
+        $('revealTitle').textContent = 'What happened';
+        $('revealText').textContent = 'Only the row you touched changed. Unit 4\u2019s outcome is a function of unit 4\u2019s assignment alone, so it has one value under control and one under treatment. The table has two cells.';
+        var hr = document.createElement('tr'); hr.appendChild(mk('th', 'Unit 4')); hr.appendChild(mk('th', 'Y(0)')); hr.appendChild(mk('th', 'Y(1)')); head.appendChild(hr);
+        var tr = document.createElement('tr'); tr.appendChild(mk('td', 'outcome'));
+        tr.appendChild(mk('td', Y0[3], 'num' + (state.T[3] === 0 ? ' hi' : '')));
+        tr.appendChild(mk('td', Y1[3], 'num' + (state.T[3] === 1 ? ' hi' : '')));
+        body.appendChild(tr);
+        $('revealName').textContent = 'This is SUTVA: no interference between units, and one version of treatment. Y\u1D62(T\u1D62) is well defined, and the effect for unit 4 is Y\u2084(1) \u2212 Y\u2084(0) = 50.';
+      } else if (state.world === 'interference') {
+        $('revealTitle').textContent = 'What happened';
+        $('revealText').textContent = 'Unit 4 moved when you flipped unit 3. Unit 4\u2019s outcome now depends on two assignments, its own and unit 3\u2019s, so it needs four potential outcomes, not two. Which one is \u201Cthe effect of treatment on unit 4\u201D?';
+        var hr2 = document.createElement('tr'); hr2.appendChild(mk('th', 'Unit 4')); hr2.appendChild(mk('th', 'T\u2083 = 0')); hr2.appendChild(mk('th', 'T\u2083 = 1')); head.appendChild(hr2);
+        [0, 1].forEach(function (t4) {
+          var r = document.createElement('tr'); r.appendChild(mk('td', 'T\u2084 = ' + t4));
+          [0, 1].forEach(function (t3) {
+            var val = (t4 ? Y1[3] : Y0[3]) - INTERFERENCE * t3;
+            r.appendChild(mk('td', val, 'num' + ((state.T[3] === t4 && state.T[2] === t3) ? ' hi' : '')));
+          });
+          body.appendChild(r);
+        });
+        $('revealName').textContent = 'This is interference, the first half of SUTVA failing. Y\u2084 is really Y\u2084(T\u2084, T\u2083). Unit 4 contributes a different number to the difference in means depending on what unit 3 was assigned, even when unit 4\u2019s own assignment is the same. Flip unit 3 and watch the difference in means change without any change to unit 4. The difference in means is still a number, but it is not an estimate of any single, well-defined treatment effect.';
+      } else {
+        $('revealTitle').textContent = 'What happened';
+        $('revealText').textContent = 'Two units with the same assignment gained different amounts, because \u201Ctreated\u201D silently meant dose A for some units and dose B for others. Each unit needs three potential outcomes, and the data record only two labels.';
+        var hr3 = document.createElement('tr'); hr3.appendChild(mk('th', 'Unit 4')); hr3.appendChild(mk('th', 'Y(0)')); hr3.appendChild(mk('th', 'Y(1, A)')); hr3.appendChild(mk('th', 'Y(1, B)')); head.appendChild(hr3);
+        var tr3 = document.createElement('tr'); tr3.appendChild(mk('td', 'outcome'));
+        tr3.appendChild(mk('td', Y0[3], 'num' + (state.T[3] === 0 ? ' hi' : '')));
+        tr3.appendChild(mk('td', Y1[3], 'num' + (state.T[3] === 1 && doses[3] === 'A' ? ' hi' : '')));
+        tr3.appendChild(mk('td', Y1[3] - DOSE_B_PENALTY, 'num' + (state.T[3] === 1 && doses[3] === 'B' ? ' hi' : '')));
+        body.appendChild(tr3);
+        $('revealName').textContent = 'This is a hidden version of treatment, the second half of SUTVA failing. \u201CThe effect of treatment\u201D is undefined until you say which treatment. Define the version and SUTVA can be restored.';
+      }
+    } else {
+      rv.hidden = true;
+    }
+
+    prevY = Y;
+  }
+
+  // ---------- wiring ----------
+  buildRows();
+  Array.prototype.forEach.call(document.querySelectorAll('#worlds input'), function (inp) {
+    inp.addEventListener('change', function () { setState({ world: inp.value, lastTouched: null }); });
+  });
+  $('reset').addEventListener('click', function () { setState({ T: [0, 0, 0, 0], lastTouched: null }); });
+  $('projector').addEventListener('change', function (e) {
+    document.body.className = e.target.checked ? 'projector' : 'laptop';
+  });
+
+  // answers persist per browser
+  ['a1', 'a2', 'a3'].forEach(function (id) {
+    var ta = $(id);
+    try { var v = localStorage.getItem('sutva4:' + id); if (v) ta.value = v; } catch (e) {}
+    ta.addEventListener('input', function () { try { localStorage.setItem('sutva4:' + id, ta.value); } catch (e) {} });
+  });
+
+  render();
+
+  // ---------- platform hooks ----------
+  var A = 'A'; var allA = [A, A, A, A];
+  window.artifact = {
+    getState: getState,
+    setState: setState,
+    assertions: [
+      { name: 'SUTVA world: flipping unit 3 never changes unit 4',
+        run: function () {
+          return [0, 1].every(function (t4) {
+            return outcomes('sutva', [0, 0, 0, t4], allA)[3] === outcomes('sutva', [0, 0, 1, t4], allA)[3];
+          });
+        } },
+      { name: 'Interference world: treating unit 3 lowers unit 4 by 45 for either own assignment',
+        run: function () {
+          return [0, 1].every(function (t4) {
+            return outcomes('interference', [0, 0, 0, t4], allA)[3] - outcomes('interference', [0, 0, 1, t4], allA)[3] === INTERFERENCE;
+          });
+        } },
+      { name: 'Hidden-versions world with all doses A reproduces the SUTVA world',
+        run: function () {
+          var T = [1, 0, 1, 1];
+          var a = outcomes('versions', T, allA), b = outcomes('sutva', T, allA);
+          return a.every(function (v, i) { return v === b[i]; });
+        } },
+      { name: 'SUTVA world: every unit\u2019s own effect is exactly 50',
+        run: function () {
+          return [0, 1, 2, 3].every(function (i) {
+            var t = [0, 0, 0, 0], c = [0, 0, 0, 0]; t[i] = 1;
+            return outcomes('sutva', t, allA)[i] - outcomes('sutva', c, allA)[i] === 50;
+          });
+        } },
+      { name: 'Difference in means is null with an empty group',
+        run: function () { return diffInMeans([0, 0, 0, 0], Y0) === null && diffInMeans([1, 1, 1, 1], Y1) === null; } }
+    ]
+  };
+})();
+</script>
+
+<script>
+(function () {
+  var cfg = {"versionId":"cmv8awaam000106kza2x4i9rk","appOrigin":"https://ideasatplay.org","direct":null};
+  var t0 = Date.now(), scrolled = false, acted = false, reached = false, shown = false, config = null;
+  var framed = parent !== window;
+  function onScreen(el) {
+    if (!el.getClientRects().length) return false;
+    var r = el.getBoundingClientRect();
+    return r.top < innerHeight && r.bottom > 0;
+  }
+  function atBottom() {
+    var f = document.querySelector("footer[data-kc-credit]");
+    if (f) return f.getBoundingClientRect().top <= innerHeight;
+    var d = document.documentElement;
+    return scrollY + innerHeight >= d.scrollHeight - 48;
+  }
+  // { cur, last } when the page moves through numbered steps, else null.
+  function steps() {
+    var a = window.artifact;
+    try {
+      var c = a && Array.isArray(a.controls) ? a.controls.filter(function (x) { return x && x.key === "step" && typeof x.max === "number"; })[0] : null;
+      if (c) { var s = a.getState(); if (s && typeof s.step === "number") return { cur: s.step, last: c.max }; }
+    } catch (e) {}
+    var cur = document.querySelector('[aria-current="step"]');
+    if (cur && cur.parentElement) {
+      var sib = Array.prototype.filter.call(cur.parentElement.children, function (x) { return x.getClientRects().length; });
+      return { cur: sib.indexOf(cur), last: sib.length - 1 };
+    }
+    return null;
+  }
+  function finished() {
+    var mark = document.querySelector("[data-kc-end]");
+    if (mark) return onScreen(mark);
+    var s = steps();
+    if (s) return s.cur >= s.last && atBottom();
+    return atBottom() && (scrolled || (acted && Date.now() - t0 > 60000));
+  }
+  // The student link remembers a rating in its own storage where the browser allows it.
+  var KEY = "kc-rated-" + cfg.versionId;
+  function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
+  if (cfg.direct) config = { ask: !store(KEY), preview: false, labels: cfg.direct.labels };
+  var visitor = (function () {
+    var v = store("kc-visitor");
+    if (!v) { v = ""; for (var i = 0; i < 24; i++) v += "abcdefghijklmnopqrstuvwxyz0123456789".charAt(Math.floor(Math.random() * 36)); store("kc-visitor", v); }
+    return v;
+  })();
+  var pending = {}, seq = 0;
+  function save(score, comment) {
+    if (cfg.direct) {
+      var body = { versionId: cfg.versionId, score: score, context: "share", visitor: visitor };
+      if (comment) body.comment = comment;
+      // text/plain: a simple request, so no preflight is needed.
+      return fetch(cfg.direct.endpoint, { method: "POST", credentials: "omit", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(body) })
+        .then(function (r) { if (r.ok) store(KEY, String(score)); return r.ok; }, function () { return false; });
+    }
+    return new Promise(function (resolve) {
+      var id = ++seq; pending[id] = resolve;
+      parent.postMessage({ type: "kc:rate", versionId: cfg.versionId, id: id, score: score, comment: comment || "" }, cfg.appOrigin);
+      setTimeout(function () { if (pending[id]) { delete pending[id]; resolve(false); } }, 15000);
+    });
+  }
+  var B = "display:inline-block;margin:3px 6px 3px 0;padding:4px 10px;border:1px solid #a8a29e;border-radius:6px;background:#fff;color:#1c1917;font:inherit;cursor:pointer";
+  function el(tag, attrs, text) { var e = document.createElement(tag); for (var k in attrs) e.setAttribute(k, attrs[k]); if (text) e.textContent = text; return e; }
+  function show() {
+    if (shown || !config || !config.ask) return;
+    shown = true;
+    clearInterval(timer);
+    var L = config.labels;
+    var box = el("div", { "data-kc-rating": "", "data-kc-personal": "", role: "region", "aria-label": L.ask, lang: L.lang, dir: L.dir,
+      style: "box-sizing:border-box;max-width:760px;margin:24px auto 0;padding:10px 14px;border:1px solid #d6d3d1;border-radius:10px;background:#fafaf9;color:#1c1917;font:14px/1.5 system-ui,-apple-system,sans-serif;text-align:start" });
+    var live = el("div", { "aria-live": "polite" });
+    box.appendChild(live);
+    function ask(msg) {
+      live.innerHTML = "";
+      live.appendChild(el("span", { style: "font-weight:600;margin-inline-end:8px" }, L.ask));
+      [1, 2, 3].forEach(function (s) {
+        var b = el("button", { type: "button", style: B }, s + " · " + L["s" + s]);
+        b.addEventListener("click", function () {
+          live.querySelectorAll("button").forEach(function (x) { x.disabled = true; });
+          save(s, "").then(function (ok) { if (ok) comment(s); else ask(L.error); });
+        });
+        live.appendChild(b);
+      });
+      if (config.preview) live.appendChild(el("div", { style: "font-size:12px;color:#57534e" }, L.preview));
+      if (msg) live.appendChild(el("div", { role: "alert", style: "color:#991b1b;font-size:13px" }, msg));
+    }
+    function comment(score) {
+      live.innerHTML = "";
+      var id = "kc-rate-comment";
+      live.appendChild(el("label", { for: id, style: "display:block;font-weight:600;margin-bottom:4px" }, L.comment));
+      var row = el("div", { style: "display:flex;flex-wrap:wrap;gap:6px;align-items:center" });
+      var input = el("input", { id: id, type: "text", maxlength: "1000", autocomplete: "off", dir: "auto",
+        style: "flex:1 1 260px;min-width:0;box-sizing:border-box;padding:5px 8px;border:1px solid #a8a29e;border-radius:6px;background:#fff;color:#1c1917;font:inherit" });
+      var send = el("button", { type: "button", style: B + ";background:#292524;color:#fff;border-color:#292524" }, L.send);
+      var skip = el("button", { type: "button", style: B }, L.skip);
+      function done() { live.innerHTML = ""; live.appendChild(el("span", { style: "font-weight:600" }, L.thanks)); setTimeout(function () { box.remove(); }, 2000); }
+      send.addEventListener("click", function () {
+        var text = input.value.trim();
+        if (!text) return done();
+        send.disabled = skip.disabled = true;
+        save(score, text).then(function (ok) { if (ok) done(); else { send.disabled = skip.disabled = false; live.appendChild(el("div", { role: "alert", style: "color:#991b1b;font-size:13px" }, L.error)); } });
+      });
+      input.addEventListener("keydown", function (e) { if (e.key === "Enter") send.click(); });
+      skip.addEventListener("click", done);
+      row.appendChild(input); row.appendChild(send); row.appendChild(skip);
+      live.appendChild(row);
+      input.focus();
+    }
+    ask("");
+    var mark = document.querySelector("[data-kc-end]"), foot = document.querySelector("footer[data-kc-credit]");
+    if (mark) mark.insertAdjacentElement("afterend", box);
+    else if (foot) foot.parentNode.insertBefore(box, foot);
+    else document.body.appendChild(box);
+  }
+  function check() {
+    if (!reached && finished()) reached = true;
+    if (reached) show();
+  }
+  window.addEventListener("message", function (e) {
+    if (e.source !== parent || !e.data || e.data.versionId !== cfg.versionId) return;
+    var d = e.data;
+    if (d.type === "kc:rate-config" && !cfg.direct) { config = { ask: !!d.ask, preview: !!d.preview, labels: d.labels }; check(); }
+    if (d.type === "kc:rate-result" && pending[d.id]) { pending[d.id](!!d.ok); delete pending[d.id]; }
+  });
+  // The app page may start listening after this page loads: ask a few times.
+  var hellos = 0;
+  function hello() { if (framed && !cfg.direct && !config && hellos++ < 8) parent.postMessage({ type: "kc:rate-hello", versionId: cfg.versionId }, cfg.appOrigin); }
+  hello();
+  var timer = setInterval(function () { if (hellos < 8 && !config) hello(); check(); }, 800);
+  window.addEventListener("scroll", function () { if (scrollY > 0) scrolled = true; check(); }, { passive: true });
+  ["click", "input", "keydown"].forEach(function (t) { document.addEventListener(t, function (e) { if (e.target && e.target.closest && e.target.closest("[data-kc-rating]")) return; acted = true; setTimeout(check, 50); }, true); });
+})();
+</script></body>
+</html>

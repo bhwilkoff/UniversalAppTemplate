@@ -15,7 +15,7 @@ import path from 'node:path';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const tracked = (globs) => execSync(`git ls-files ${globs}`, { cwd: root, encoding: 'utf8' })
   .split('\n').filter(Boolean)
-  .filter((f) => !/^(design|tools)\//.test(f) && !f.startsWith('assets/vendor/') && !f.includes('node_modules/'));
+  .filter((f) => !/^(design|tools)\//.test(f) && !f.startsWith('assets/vendor/') && !f.startsWith('assets/ideas-at-play/') && !f.includes('node_modules/'));
 const pages = tracked("'*.html'");
 const scripts = tracked("'assets/*.js'");
 

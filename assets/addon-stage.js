@@ -843,33 +843,64 @@
   }
   // A page runs sealed off: scripts and forms, nothing else. Everyone gets
   // their own working copy, and it stays put until the page itself changes.
+  // One Ideas at Play model the whole call changes together (ModelPicker):
+  // the stage runs this site's copy of the model with its bridge, sends each
+  // change to the call's room, and hands the room's newest state back.
+  var modelFrame = null, modelSeq = -1, modelView = null;
+  window.addEventListener('message', function (e) {
+    if (!modelFrame || e.source !== modelFrame.contentWindow || !e.data) return;
+    if (e.data.hsModel === 'state' && typeof e.data.state === 'string' && room && room.send) room.send({ t: 'mstate', state: e.data.state });
+    if (e.data.hsModel === 'ready') { modelSeq = -1; shareState(modelView); }
+  });
+  function shareState(v) {
+    modelView = v;
+    var m = v && v.mstate;
+    if (!modelFrame || !m || m.seq === modelSeq || !m.state) return;
+    modelSeq = m.seq;
+    try { modelFrame.contentWindow.postMessage({ hsModel: 'set', state: m.state }, '*'); } catch (e) { /* the model is reloading */ }
+  }
   function drawPage(v) {
     var box = $('[data-page-frame]');
-    if (!v) { if (pageKey) { pageKey = null; box.replaceChildren(); } return; }
-    var p = v.page, key = p.url ? 'url:' + p.url + '#' + (p.v || 0) : p.owner ? p.owner + '/' + p.repo + '@' + p.sha + '/' + (p.path || '') : 'pasted:' + p.htmlV;
-    if (key === pageKey) return;
+    if (!v) { if (pageKey) { pageKey = null; modelFrame = null; box.replaceChildren(); } return; }
+    var p = v.page, key = p.url ? 'url:' + p.url + '#' + (p.v || 0) + (p.together ? ':together' : '') : p.owner ? p.owner + '/' + p.repo + '@' + p.sha + '/' + (p.path || '') : 'pasted:' + p.htmlV;
+    if (key === pageKey) { if (p.together) shareState(v); return; }
     pageKey = key;
     var f = document.createElement('iframe');
     f.title = p.name || 'A page from the host';
     box.replaceChildren(f);
-    // A website at its own address keeps its own origin, so it can keep what a
-    // person does in it; it is never this site (RoomLib and the room refuse it).
-    if (p.url) {
-      f.setAttribute('sandbox', 'allow-scripts allow-forms allow-same-origin allow-popups allow-popups-to-escape-sandbox');
-      f.setAttribute('allow', 'clipboard-write');
-      f.src = p.url;
-      // A model from Ideas at Play is CC BY 4.0: its title, author, source,
-      // and licence show with it on every stage.
-      if (window.ModelPicker && window.ModelPicker.isModel(p.url)) window.ModelPicker.credit(p.url).then(function (c) {
+    modelFrame = null;
+    // A model from Ideas at Play is CC BY 4.0: its title, author, source, and
+    // licence show with it on every stage, and a shared one says it was changed.
+    function credit(changed) {
+      if (!window.ModelPicker || !window.ModelPicker.isModel(p.url)) return;
+      window.ModelPicker.credit(p.url).then(function (c) {
         if (!c || pageKey !== key) return;
         var cr = el('p', 'stage-credit');
         var a = document.createElement('a'); a.href = c.url; a.target = '_blank'; a.rel = 'noopener'; a.textContent = c.title;
         cr.appendChild(a);
-        cr.appendChild(document.createTextNode((c.author ? ' by ' + c.author : '') + ', Ideas at Play, CC BY 4.0'));
+        cr.appendChild(document.createTextNode((c.author ? ' by ' + c.author : '') + ', Ideas at Play, CC BY 4.0' + (changed ? ', shared through Human Shaped' : '')));
         box.appendChild(cr);
       });
+    }
+    function own() {
+      // A website at its own address keeps its own origin, so it can keep what a
+      // person does in it; it is never this site (RoomLib and the room refuse it).
+      f.setAttribute('sandbox', 'allow-scripts allow-forms allow-same-origin allow-popups allow-popups-to-escape-sandbox');
+      f.setAttribute('allow', 'clipboard-write');
+      f.src = p.url;
+    }
+    if (p.url && p.together && window.ModelPicker) {
+      f.setAttribute('sandbox', 'allow-scripts');
+      modelFrame = f; modelSeq = -1; modelView = v;
+      window.ModelPicker.copyOf(p.url).then(function (path) {
+        if (pageKey !== key) return;
+        if (!path) throw new Error('no copy');
+        return fetch(path).then(function (r) { if (!r.ok) throw new Error(String(r.status)); return r.text(); }).then(function (h) { if (pageKey === key) f.srcdoc = window.ModelPicker.withBridge(h); });
+      }).catch(function () { if (pageKey === key) { modelFrame = null; own(); } });
+      credit(true);
       return;
     }
+    if (p.url) { own(); credit(false); return; }
     f.setAttribute('sandbox', 'allow-scripts allow-forms');
     if (!p.owner) { f.srcdoc = v.html || ''; return; }
     var file = p.path || 'index.html';

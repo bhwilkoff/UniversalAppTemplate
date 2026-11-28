@@ -3,7 +3,7 @@
 // messages. A room is one Meet call's slides, question, board, and page, and
 // it is erased when it ends.
 
-export const LIMITS = { talk: 42000, html: 100000, title: 120, name: 60, prompt: 500, choice: 120, choices: 8, note: 280, notes: 200, notesEach: 20, answer: 1000, card: 400, people: 300, clock: 7200, url: 2000 };
+export const LIMITS = { talk: 42000, html: 100000, title: 120, name: 60, prompt: 500, choice: 120, choices: 8, note: 280, notes: 200, notesEach: 20, answer: 1000, card: 400, people: 300, clock: 7200, url: 2000, mstate: 20000 };
 
 export const REACTIONS = ['smile', 'laugh', 'love', 'clap', 'snaps', 'ponder', 'mind', 'frown'];
 export const STANCES = ['agree', 'unsure', 'disagree'];
@@ -21,6 +21,8 @@ export function blank() {
 
 // A website a host shows by its address: https only, and never this site or the
 // room service, whose pages would run with this site's own rights.
+// An Ideas at Play model at a pinned version, the only page a call can share.
+const MODEL = /^https:\/\/ideasatplay\.org\/play\/[a-z0-9-]{1,140}\?v=\d{1,4}$/;
 const OURS = /(^|\.)humanshaped\.org$|(^|\.)benwilkoff\.workers\.dev$/i;
 export function siteOk(u) {
   let x;
@@ -60,12 +62,12 @@ export function stanceCounts(room) {
 export function publicRoom(room, here) {
   here = here || { people: [], count: 0, hostHere: false, stages: [] };
   const q = room.question;
-  const page = room.page ? { owner: room.page.owner || null, repo: room.page.repo || null, sha: room.page.sha || null, htmlV: room.page.owner || room.page.url ? 0 : room.htmlV, url: room.page.url || null, path: room.page.path || null, v: room.page.v || 0, name: room.page.name || null } : null;
+  const page = room.page ? { owner: room.page.owner || null, repo: room.page.repo || null, sha: room.page.sha || null, htmlV: room.page.owner || room.page.url ? 0 : room.htmlV, url: room.page.url || null, path: room.page.path || null, v: room.page.v || 0, name: room.page.name || null, together: room.page.together === true } : null;
   return {
     on: room.on, host: room.host, hostName: room.hostName, title: room.title, talkV: room.talkV, at: room.at, shown: room.shown, show: room.show,
     question: q ? { id: q.id, kind: q.kind, prompt: q.prompt, choices: q.choices, points: q.points || null, reveal: q.reveal, open: q.open } : null,
     summary: summary(room),
-    notes: room.notes, board: room.board, page, card: room.card, clock: room.clock, stance: stanceCounts(room), stancesOpen: room.stancesOpen === true,
+    notes: room.notes, board: room.board, page, mstate: room.page && room.page.together && room.mstate ? room.mstate : null, card: room.card, clock: room.clock, stance: stanceCounts(room), stancesOpen: room.stancesOpen === true,
     people: here.people.slice(0, LIMITS.people), here: here.count, hostHere: here.hostHere, stages: here.stages,
     canTakeOver: room.on && !here.hostHere && room.hostLeft != null
   };
@@ -206,7 +208,19 @@ export function apply(room, who, m, now, opts) {
       if (!href) return { error: 'That address cannot be shown here.' };
       const again = room.page && room.page.url === href ? (room.page.v || 0) + 1 : 0;
       room.page = { url: href, v: again, name: line(m.name, 80) || new URL(href).hostname };
+      // One model everyone in the call changes together: its shared state
+      // starts empty each time it goes up.
+      if (m.together === true && MODEL.test(href)) { room.page.together = true; room.mstate = { state: '', seq: 0, by: null }; } else delete room.mstate;
       room.html = ''; room.show = 'page';
+      return { room: true };
+    }
+    case 'mstate': {
+      if (!room.on || room.show !== 'page' || !room.page || !room.page.together) return { error: 'No shared model is up.' };
+      const state = text(m.state, LIMITS.mstate + 1);
+      if (state.length > LIMITS.mstate) return { error: 'That is too much to share.' };
+      try { JSON.parse(state); } catch (e) { return { error: 'That could not be shared.' }; }
+      if (room.mstate && room.mstate.state === state) return {};
+      room.mstate = { state, seq: ((room.mstate && room.mstate.seq) || 0) + 1, by: who.pid };
       return { room: true };
     }
     case 'page': {

@@ -1,0 +1,1318 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Who Gets Cleaned Out? Boolean filtering in a randomized experiment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --obsidian:#000000; --white:#ffffff; --charcoal:#3c3732; --slate:#5a5550; --graphite:#78736e;
+  --flint:#96918c; --quick:#b4afaa; --ash:#d2cdc8; --bone:#f0ebe6; --ivory:#f2f2f2;
+  --goldenrod:#f0b91e; --tangerine:#f0871e; --clay:#905112;
+
+  --bg:var(--bone); --surface:var(--white); --ink:var(--charcoal); --ink-strong:var(--obsidian);
+  --muted:var(--slate); --rule:var(--ash); --accent:var(--clay); --hi:var(--goldenrod); --hi-ink:var(--obsidian);
+  --t-fill:var(--tangerine); --t-ink:var(--obsidian); --c-fill:var(--white); --c-stroke:var(--slate); --c-ink:var(--charcoal);
+  --btn-bg:var(--obsidian); --btn-ink:var(--white); --code-bg:var(--ivory); --focus:var(--clay);
+  --hero-bg:var(--obsidian); --hero-ink:var(--white); --hero-muted:var(--ash);
+  --ok-bg:#fdf3d2;
+
+  --serif:"Chronicle Display","Chronicle Deck","EB Garamond",Garamond,"Times New Roman",serif;
+  --sans:"Neue Haas Grotesk Text","Helvetica Neue",Helvetica,Arial,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:var(--obsidian); --surface:var(--charcoal); --ink:var(--bone); --ink-strong:var(--white);
+    --muted:var(--ash); --rule:var(--graphite); --accent:var(--goldenrod);
+    --c-fill:var(--charcoal); --c-stroke:var(--ash); --c-ink:var(--bone);
+    --btn-bg:var(--goldenrod); --btn-ink:var(--obsidian); --code-bg:var(--obsidian); --focus:var(--goldenrod);
+    --hero-bg:var(--charcoal); --ok-bg:#4f4428;
+    color-scheme:dark;
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5}
+body.projector{font-size:24px}
+button,select,input,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+
+/* hero */
+.hero{background:var(--hero-bg);color:var(--hero-ink);padding:2.5em 1.25em 2em}
+.hero-inner{max-width:68em;margin:0 auto;display:flex;flex-wrap:wrap;gap:1em 2em;align-items:flex-end;justify-content:space-between}
+.hero h1{font-family:var(--serif);font-weight:400;font-size:2.9em;line-height:1.05;margin:0;letter-spacing:-0.01em}
+.hero h1 em{font-style:italic}
+.hero p{margin:.6em 0 0;max-width:34em;color:var(--hero-muted)}
+.hero .tools{display:flex;gap:.5em}
+.ghost{background:transparent;border:1px solid var(--hero-muted);color:var(--hero-ink);border-radius:999px;padding:.35em .9em;cursor:pointer;font-size:.875em}
+
+/* stepper */
+.stepper{max-width:70em;margin:0 auto;padding:1em 1.25em 0;overflow-x:auto}
+.stepper ol{list-style:none;margin:0;padding:0;display:flex;gap:.4em;min-width:max-content}
+.stepper button{display:flex;align-items:baseline;gap:.45em;background:var(--surface);border:1px solid var(--rule);border-radius:999px;padding:.4em .85em;cursor:pointer;font-size:.875em;color:var(--ink)}
+.stepper button .n{font-family:var(--serif);font-size:1.15em}
+.stepper button[aria-current="step"]{background:var(--btn-bg);color:var(--btn-ink);border-color:var(--btn-bg)}
+.stepper button:disabled{cursor:not-allowed;color:var(--muted);background:transparent;border-style:dashed}
+.stepper button.done:not([aria-current="step"])::after{content:"✓";font-size:.85em;color:var(--accent)}
+
+main{max-width:70em;margin:0 auto;padding:1em 1.25em 2em}
+.stage{background:var(--surface);border-radius:20px;padding:1.75em clamp(1em,3vw,2.5em) 2em}
+.stage h2{font-family:var(--serif);font-weight:400;font-size:2.1em;line-height:1.15;margin:0 0 .5em;color:var(--ink-strong)}
+.stage h3{font-family:var(--sans);font-weight:600;font-size:1.15em;margin:2em 0 .5em;color:var(--ink-strong)}
+.stage h3:first-of-type{margin-top:1.25em}
+.prose{max-width:40em}
+.prose p{margin:.6em 0}
+.muted{color:var(--muted)}
+.small{font-size:.875em}
+.part{border-top:1px solid var(--rule);margin-top:2em;padding-top:.25em}
+.row{display:flex;flex-wrap:wrap;gap:1.25em;align-items:flex-start}
+.grow{flex:1 1 min(18em,100%);min-width:0}
+
+/* buttons */
+.btn{background:var(--btn-bg);color:var(--btn-ink);border:1px solid var(--btn-bg);border-radius:999px;padding:.5em 1.15em;cursor:pointer;font-weight:500}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn2{background:transparent;color:var(--ink);border:1px solid var(--ink);border-radius:999px;padding:.45em 1em;cursor:pointer}
+.btn2:disabled{opacity:.45;cursor:not-allowed}
+.icon{background:transparent;border:1px solid var(--rule);border-radius:8px;min-width:2.2em;height:2.2em;cursor:pointer;color:var(--ink);padding:0 .4em}
+.icon:disabled{opacity:.35;cursor:not-allowed}
+.actions{display:flex;flex-wrap:wrap;gap:.6em;align-items:center;margin-top:1.25em}
+.next{margin-top:2.25em;padding-top:1.25em;border-top:1px solid var(--rule);display:flex;justify-content:space-between;align-items:center;gap:1em;flex-wrap:wrap}
+
+/* tags */
+.tag{display:inline-flex;align-items:center;gap:.3em;border-radius:999px;padding:.05em .6em;font-size:.875em;white-space:nowrap;border:1.5px solid transparent}
+.tag.t{background:var(--t-fill);color:var(--t-ink);border-color:var(--t-fill)}
+.tag.c{background:var(--c-fill);color:var(--c-ink);border-color:var(--c-stroke)}
+
+/* tables */
+.tw{overflow-x:auto;max-width:100%}
+table.d{border-collapse:collapse;min-width:100%;font-size:.95em}
+table.d th{text-align:left;font-weight:600;border-top:2px solid var(--ink-strong);border-bottom:1px solid var(--ink-strong);padding:.4em .6em;white-space:nowrap}
+table.d td{padding:.35em .6em;border-bottom:1px solid var(--rule);vertical-align:middle}
+table.d tr:last-child td{border-bottom:2px solid var(--ink-strong)}
+table.d td.num,table.d th.num{text-align:right;font-variant-numeric:tabular-nums}
+tr.gone td{color:var(--muted);text-decoration:line-through}
+tr.gone td .tag{opacity:.75}
+tr.now td{background:color-mix(in srgb,var(--hi) 30%,transparent)}
+tr.hl td{background:color-mix(in srgb,var(--hi) 35%,transparent)}
+.mark{font-size:.8em;color:var(--accent);font-weight:600;text-decoration:none!important;display:inline-block}
+button.rowbtn{width:100%;text-align:left;background:transparent;border:0;padding:0;cursor:pointer;display:flex;gap:.5em;align-items:center;justify-content:space-between}
+tr.pick td{background:color-mix(in srgb,var(--hi) 30%,transparent)}
+
+/* cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(14em,100%),1fr));gap:.75em;margin:1em 0}
+.card{background:var(--surface);border:1.5px solid var(--rule);border-radius:14px;padding:.9em 1em;text-align:left;cursor:pointer;color:var(--ink);line-height:1.35}
+.card[aria-pressed="true"]{border-color:var(--ink-strong);box-shadow:inset 0 0 0 1px var(--ink-strong)}
+.card.tried{border-style:dashed}
+.card .sub{display:block;font-size:.8em;color:var(--muted);margin-top:.3em}
+
+/* feedback */
+.fb{border-left:4px solid var(--graphite);background:color-mix(in srgb,var(--rule) 30%,transparent);border-radius:0 12px 12px 0;padding:.75em 1em;margin:1em 0;max-width:46em}
+.fb.ok{border-left-color:var(--hi);background:var(--ok-bg)}
+.is-right{background:var(--ok-bg)!important;border-color:var(--hi)!important}
+.fb.no{border-left-color:var(--tangerine)}
+.fb p{margin:.3em 0}
+.fb b{color:var(--ink-strong)}
+.reveal{border:1.5px solid var(--ink-strong);border-radius:16px;padding:1em 1.25em;margin:1.25em 0;max-width:48em}
+.spec{border:1.5px solid var(--rule);border-radius:16px;padding:.9em 1.25em;margin:1.25em 0;max-width:48em}
+.spec h3{margin:0 0 .4em!important}
+.spec ul{margin:.4em 0;padding-left:1.2em}
+.spec li{margin:.35em 0}
+.spec p{margin:.5em 0 0}
+.hints{border:1.5px dashed var(--quick);border-radius:14px;padding:.6em .9em;margin:1em 0;max-width:48em}
+.hints ol{margin:.5em 0 0;padding-left:1.3em}
+.hints li{margin:.35em 0}
+.reveal h4{font-family:var(--serif);font-weight:400;font-size:1.45em;margin:.1em 0 .3em}
+
+textarea{width:100%;max-width:46em;min-height:4.5em;border:1px solid var(--quick);border-radius:12px;padding:.6em .75em;background:var(--surface);resize:vertical}
+label.q{display:block;font-weight:600;margin:1em 0 .35em;max-width:46em}
+select{border:1px solid var(--quick);border-radius:10px;padding:.35em .5em;background:var(--surface)}
+.radios{display:flex;flex-wrap:wrap;gap:.5em;margin:.5em 0}
+.radios label,.checks label{display:flex;gap:.5em;align-items:flex-start;border:1px solid var(--rule);border-radius:12px;padding:.5em .8em;cursor:pointer;max-width:46em}
+.checks{display:grid;gap:.5em;margin:.75em 0}
+input[type=radio],input[type=checkbox]{accent-color:var(--clay);width:1.05em;height:1.05em;margin-top:.2em}
+
+/* datasets side by side */
+.trio{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(15em,100%),1fr));gap:1em;margin-top:1em}
+.dset{border:1.5px solid var(--rule);border-radius:16px;padding:.75em .9em}
+.dset.sel{border-color:var(--ink-strong)}
+.dset h4{margin:.1em 0 .5em;font-family:var(--serif);font-weight:400;font-size:1.35em}
+.dset table.d{font-size:.875em}
+
+/* household board */
+.board{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(9.5em,100%),1fr));gap:.6em;margin:.75em 0}
+.house{border:1.5px solid var(--rule);border-radius:14px;padding:.5em .6em;min-height:4.5em}
+.house.empty{border-style:dashed}
+.house .hname{font-size:.8em;color:var(--muted);margin-bottom:.3em}
+.house .m{display:flex;flex-wrap:wrap;gap:.3em}
+.checklist{list-style:none;padding:0;margin:.5em 0;display:grid;gap:.35em;max-width:46em}
+.checklist li{display:flex;gap:.6em;align-items:baseline}
+.checklist .st{flex:0 0 1.4em;height:1.4em;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;border:1.5px solid var(--c-stroke);font-size:.85em}
+.checklist li.yes .st{background:var(--hi);border-color:var(--hi);color:var(--hi-ink)}
+.score{font-family:var(--serif);font-size:1.5em}
+tr.dragging td{opacity:.4}
+tr.droptarget td{box-shadow:inset 0 2px 0 var(--ink-strong)}
+
+/* algorithm */
+.algo{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(18em,100%),1fr));gap:1.25em;margin-top:1em}
+.list{list-style:none;margin:0;padding:0;display:grid;gap:.5em}
+.step{display:flex;gap:.5em;align-items:center;border:1.5px solid var(--rule);border-radius:14px;padding:.5em .6em;background:var(--surface)}
+.step .num{font-family:var(--serif);font-size:1.3em;min-width:1.3em;text-align:center;color:var(--accent)}
+.step{flex-wrap:wrap}
+.step .txt{flex:1 1 12em;line-height:1.35}
+.bankbtn{width:100%;text-align:left;border:1.5px dashed var(--quick);border-radius:14px;padding:.6em .8em;background:transparent;cursor:pointer;line-height:1.35;color:var(--ink)}
+.bankbtn .add{font-size:.8em;color:var(--muted);display:block;margin-top:.2em}
+.slots{border:1.5px solid var(--ink-strong);border-radius:16px;padding:.75em;min-height:8em}
+.slots .empty{color:var(--muted);padding:1em .25em}
+.tracebar{display:flex;flex-wrap:wrap;gap:.5em;align-items:center;margin:1em 0}
+.tracecols{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(15em,100%),1fr));gap:1em}
+.tcol{border:1.5px solid var(--rule);border-radius:16px;padding:.75em .9em}
+.tcol h4{margin:0 0 .4em;font-family:var(--serif);font-weight:400;font-size:1.3em}
+.note{font-size:.9em;margin:.5em 0 0;min-height:2.6em}
+.verdict{margin-top:.6em;font-weight:600}
+.curstep{font-size:.95em;max-width:46em}
+
+/* boolean builder */
+.builder{display:flex;flex-wrap:wrap;gap:.5em;align-items:center;border:1.5px solid var(--ink-strong);border-radius:16px;padding:.9em 1em;margin:1em 0}
+.builder .lead{font-weight:600}
+.builder .conn{font-weight:600}
+.people{display:flex;flex-wrap:wrap;gap:.4em;margin:.5em 0}
+.pchip{border:1.5px solid var(--rule);border-radius:999px;padding:.2em .7em;background:var(--surface);cursor:pointer;color:var(--ink);display:inline-flex;gap:.35em;align-items:center}
+.pchip.on{border-color:var(--ink-strong);background:color-mix(in srgb,var(--hi) 40%,transparent)}
+.pchip[aria-pressed="true"]{box-shadow:inset 0 0 0 2px var(--ink-strong)}
+pre.code{background:var(--code-bg);border-radius:14px;padding:1em 1.1em;overflow-x:auto;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.9em;line-height:1.55;margin:.75em 0;max-width:46em}
+pre.code .k{color:var(--accent);font-weight:600}
+pre.code .cm{color:var(--muted)}
+
+/* simulation */
+.simwrap{display:grid;grid-template-columns:minmax(14em,17em) minmax(0,1fr);gap:1.5em;margin-top:1em}
+.simwrap>*,.charts>*,.trio>*,.algo>*,.tracecols>*,.row>*{min-width:0}
+@media (max-width: 760px){.simwrap{grid-template-columns:1fr}}
+.panel{border:1.5px solid var(--rule);border-radius:16px;padding:.9em 1em}
+.panel h4{margin:0 0 .5em;font-weight:600;font-size:1em}
+.ctl{margin:.4em 0 1em}
+.ctl label{display:block;font-weight:600;margin-bottom:.25em}
+.ctl input[type=range]{width:100%;accent-color:var(--clay)}
+.readout{font-family:var(--serif);font-size:1.6em;line-height:1}
+.grid{display:flex;flex-wrap:wrap;gap:6px}
+.hh{border:1.5px solid var(--rule);border-radius:9px;padding:4px;display:flex;flex-wrap:wrap;gap:3px;width:43px;min-height:24px;align-content:flex-start}
+.hh.mixed{border-color:var(--ink-strong)}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block;transition:opacity .2s}
+.dot.t{background:var(--t-fill)}
+.dot.c{background:var(--c-fill);border:2px solid var(--c-stroke)}
+.dot.gone{opacity:.18}
+.legend{display:flex;flex-wrap:wrap;gap:1em;font-size:.85em;color:var(--muted);margin:.5em 0}
+.legend span{display:inline-flex;gap:.4em;align-items:center}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(9em,100%),1fr));gap:.75em;margin:1em 0}
+.stat{border-top:2px solid var(--ink-strong);padding-top:.4em}
+.stat .v{font-family:var(--serif);font-size:1.7em;line-height:1.1}
+.stat .l{font-size:.85em;color:var(--muted)}
+svg.chart{width:100%;height:auto;display:block;max-width:40em}
+svg.chart text{fill:var(--ink);font-family:var(--sans);font-size:12px}
+svg.chart .axis{stroke:var(--ink);stroke-width:1}
+svg.chart .gridl{stroke:var(--rule);stroke-width:1;stroke-dasharray:3 3}
+svg.chart .bt{fill:var(--t-fill)}
+svg.chart .bc{fill:var(--c-fill);stroke:var(--c-stroke);stroke-width:1.5}
+svg.chart .theory{fill:none;stroke:var(--ink);stroke-width:1.5;stroke-dasharray:5 4}
+svg.chart .pt{fill:var(--t-fill);stroke:var(--ink-strong);stroke-width:1}
+svg.chart .ci{stroke:var(--ink);stroke-width:1.5}
+body.projector svg.chart text{font-size:16px}
+.charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(19em,100%),1fr));gap:1.25em;margin-top:1em}
+.chartbox h4{font-weight:600;font-size:1em;margin:0 0 .3em}
+.seg{display:inline-flex;border:1px solid var(--ink);border-radius:999px;overflow:hidden}
+.seg button{background:transparent;border:0;padding:.3em .9em;cursor:pointer;color:var(--ink)}
+.seg button[aria-pressed="true"]{background:var(--btn-bg);color:var(--btn-ink)}
+.designs{display:grid;gap:.5em}
+.designs label{display:flex;gap:.5em;align-items:flex-start;border:1px solid var(--rule);border-radius:12px;padding:.5em .7em;cursor:pointer}
+.designs label.on{border-color:var(--ink-strong)}
+
+/* truth table */
+table.tt td,table.tt th{text-align:center}
+table.tt td:last-child,table.tt th:last-child{text-align:left}
+.tv{font-weight:600}
+
+/* footer panels */
+.foot{max-width:70em;margin:0 auto;padding:0 1.25em 3em;display:grid;gap:1em}
+details.box{background:var(--surface);border-radius:16px;padding:.9em 1.25em}
+details.box summary{cursor:pointer;font-weight:600}
+details.box ul{margin:.5em 0;padding-left:1.2em;max-width:46em}
+pre.summary{white-space:pre-wrap;font-family:var(--sans);font-size:.9em;background:var(--code-bg);border-radius:12px;padding:1em;max-height:28em;overflow:auto;margin:.75em 0}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (max-width: 520px){
+  .hero h1{font-size:2.2em}
+  .stage h2{font-size:1.65em}
+}
+</style>
+</head>
+<body class="laptop">
+<header class="hero">
+  <div class="hero-inner">
+    <div>
+      <h1>Who Gets <em>Cleaned Out?</em></h1>
+      <p>Design the logic for cleaning an experiment’s data, one decision at a time. No code required.</p>
+    </div>
+    <div class="tools"><button class="ghost" id="projBtn" type="button" aria-pressed="false">Projector size</button></div>
+  </div>
+</header>
+<nav class="stepper" aria-label="Stages"><ol id="stepper"></ol></nav>
+<main id="app"></main>
+<div class="foot">
+  <details class="box" id="specBox">
+    <summary>What counts as correct</summary>
+    <div id="specText"></div>
+  </details>
+  <details class="box" id="ledger">
+    <summary>What this exercise assumes</summary>
+    <ul>
+      <li>The toy datasets (X, Y and the canonical one) are invented for the exercise.</li>
+      <li>The larger population is simulated: 100 households of 1 to 6 people, mostly 2 to 4, 336 people in all, from a fixed seed.</li>
+      <li>Under individual randomization, each person is treated independently with probability p. Under household randomization, each household is treated with probability p and everyone in it shares that status.</li>
+      <li>Baseline income (thousand pesos per month) is simulated to fall by about 1.6 for each extra household member, plus noise. It plays no part in any cleaning rule; it is only used to check balance.</li>
+      <li>No outcomes, treatment effects or spillovers are simulated.</li>
+    </ul>
+    <p class="small muted">Left out on purpose: estimating treatment effects, modelling spillovers, standard errors and power. R appears only as a display of the logic you design.</p>
+  </details>
+  <details class="box" id="summaryBox">
+    <summary>Your answers</summary>
+    <pre class="summary" id="summaryText"></pre>
+    <div class="actions"><button class="btn" type="button" id="copyBtn">Copy my answers</button><span id="copyMsg" class="small muted" role="status"></span></div>
+  </details>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+/* ---------- utilities ---------- */
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function gauss(r){var u=0,v=0;while(u===0)u=r();while(v===0)v=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function setEq(a,b){if(a.size!==b.size)return false;var ok=true;a.forEach(function(x){if(!b.has(x))ok=false;});return ok;}
+function namesOf(rows){return rows.length?listJoin(rows.map(function(r){return r.name;})):'nobody';}
+function listJoin(a){if(a.length<=1)return a.join('');if(a.length===2)return a[0]+' and '+a[1];return a.slice(0,-1).join(', ')+' and '+a[a.length-1];}
+function fmt(x,d){return (x===null||!isFinite(x))?'—':x.toFixed(d);}
+function pct(x){return (x===null||!isFinite(x))?'—':Math.round(x*100)+'%';}
+
+/* ---------- data ---------- */
+var HH=['A','B','C','D','E','F'];
+var CANON=[
+  {id:1,name:'Ana',hh:'E',t:1},{id:2,name:'Ben',hh:'A',t:0},{id:3,name:'Carla',hh:'C',t:1},
+  {id:4,name:'Dani',hh:'B',t:0},{id:5,name:'Eli',hh:'A',t:1},{id:6,name:'Fe',hh:'C',t:0},
+  {id:7,name:'Gabe',hh:'B',t:0},{id:8,name:'Hana',hh:'C',t:1},{id:9,name:'Iggy',hh:'A',t:0}];
+var DATA_X=[
+  {id:1,name:'Rae',hh:'A',t:1},{id:2,name:'Sol',hh:'B',t:0},{id:3,name:'Tess',hh:'C',t:1},
+  {id:4,name:'Uma',hh:'D',t:0},{id:5,name:'Vic',hh:'E',t:1},{id:6,name:'Wen',hh:'F',t:0}];
+var DATA_Y=[
+  {id:1,name:'Jo',hh:'A',t:1},{id:2,name:'Kai',hh:'B',t:1},{id:3,name:'Lea',hh:'B',t:1},
+  {id:4,name:'Mon',hh:'C',t:1},{id:5,name:'Nina',hh:'C',t:0},{id:6,name:'Oscar',hh:'D',t:0},
+  {id:7,name:'Pia',hh:'E',t:0},{id:8,name:'Quin',hh:'F',t:0}];
+var NAME_POOL=['Rosa','Tomas','Liza','Nico','Mara','Paolo','Joy','Ramon','Bea','Carlo','Dina','Emil','Gina','Iris','Leo','Mila','Nestor','Olga','Pepe','Rita'];
+function poolName(id){var n=NAME_POOL[(id-1)%NAME_POOL.length];var k=Math.floor((id-1)/NAME_POOL.length);return k?n+' '+(k+1):n;}
+
+/* ---------- the model: one function owns the cleaning rule ---------- */
+function treatedHouseholds(rows){var s=new Set();rows.forEach(function(r){if(r.t===1)s.add(r.hh);});return s;}
+function removalSet(rows){var th=treatedHouseholds(rows);return new Set(rows.filter(function(r){return r.t===0&&th.has(r.hh);}).map(function(r){return r.id;}));}
+function reason(r,rows){
+  var th=treatedHouseholds(rows);
+  if(r.t===1)return r.name+' is treated; the rule only removes controls.';
+  if(th.has(r.hh)){var m=rows.filter(function(x){return x.hh===r.hh&&x.t===1;}).map(function(x){return x.name;});
+    return r.name+' is a control in household '+r.hh+', which also contains '+listJoin(m)+' (treated).';}
+  return r.name+' is a control in household '+r.hh+', where nobody is treated, so '+r.name+' stays.';
+}
+
+/* ---------- step cards ---------- */
+var CARDS={
+  c_find:{v:1,text:'Find all rows where Treated = 1.'},
+  c_list:{v:1,text:'Make a list of the Household values in those rows: the “treated households”.'},
+  c_ask:{v:1,text:'For every row, ask: is Treated = 0 AND is its Household in the treated-households list?'},
+  c_remove:{v:1,text:'Remove the rows where the answer is yes, and keep all the others.'},
+  h_check:{v:2,text:'For each household, check whether any member has Treated = 1.'},
+  h_remove:{v:2,text:'If yes, remove that household’s members who have Treated = 0.'},
+  h_keep:{v:2,text:'If no, keep all of its members.'},
+  r_sort:{kind:'harmless',text:'Sort the data by Household.',fb:'Harmless but unnecessary. A correct rule gives the same answer whatever order the rows are in, so sorting buys nothing.'},
+  r_allhh:{kind:'harmful',text:'Remove every row in a household that contains a treated person.',fb:'Harmful: this removes the treated people too, along with their housemates. The rule only ever removes controls.'},
+  r_above:{kind:'harmful',text:'For each control, remove it if the row directly above it is treated and in the same household.',fb:'Harmful and order-dependent: whether a control is removed depends on where its row happens to sit, and housemates are not always next to each other. A correct rule must work whatever order the rows are in.'},
+  r_multi:{kind:'harmful',text:'Remove any household with more than one member.',fb:'Harmful: this removes control-only households such as B, and treated people too. Households with two or more controls, or two or more treated people, are allowed. Size is not the problem; mixing is.'},
+  r_treated:{kind:'harmful',text:'Remove all rows where Treated = 1.',fb:'Harmful and backwards: the rule keeps every treated person and removes some controls.'},
+  r_income:{kind:'irrelevant',text:'Compare each control’s income to the treated average.',fb:'Irrelevant: there is no income column here, and outcomes play no part in deciding who to remove.'},
+  r_count:{kind:'harmless',text:'Count how many people are in each household.',fb:'Harmless but unnecessary: household size never enters the rule.'}
+};
+var V1=['c_find','c_list','c_ask','c_remove'], V2=['h_check','h_remove','h_keep'];
+
+function runAlgo(algo,data){
+  var rows=data.map(function(r){return {id:r.id,name:r.name,hh:r.hh,t:r.t,gone:null};});
+  var ctx={tr:null,th:null,flags:null,hasT:null};
+  function live(){return rows.filter(function(r){return r.gone===null;});}
+  var snaps=[rows.map(function(r){return {id:r.id,gone:null};})], notes=[];
+  algo.forEach(function(cid,i){
+    var k=i+1, removed=[], note='', L=live(), c;
+    switch(cid){
+      case 'c_find': ctx.tr=L.filter(function(r){return r.t===1;}); note='Treated rows: '+namesOf(ctx.tr)+'.'; break;
+      case 'c_list':
+        if(!ctx.tr){ctx.th=new Set();note='No treated rows have been found yet, so the list is empty.';}
+        else{ctx.th=new Set(ctx.tr.map(function(r){return r.hh;}));note='Treated households: '+(Array.from(ctx.th).sort().join(', ')||'none')+'.';}
+        break;
+      case 'c_ask':
+        if(!ctx.th){ctx.flags=new Set();note='There is no treated-households list yet, so every answer is no.';}
+        else{var f=L.filter(function(r){return r.t===0&&ctx.th.has(r.hh);});ctx.flags=new Set(f.map(function(r){return r.id;}));note='Answer is yes for: '+namesOf(f)+'.';}
+        break;
+      case 'c_remove':
+        if(!ctx.flags)note='No row has been asked about yet, so nothing is marked for removal.';
+        else removed=L.filter(function(r){return ctx.flags.has(r.id);});
+        break;
+      case 'h_check': ctx.hasT={}; L.forEach(function(r){if(r.t===1)ctx.hasT[r.hh]=true;}); note='Households with a treated member: '+(Object.keys(ctx.hasT).sort().join(', ')||'none')+'.'; break;
+      case 'h_remove':
+        if(!ctx.hasT)note='No household has been checked yet, so nothing is removed.';
+        else removed=L.filter(function(r){return r.t===0&&ctx.hasT[r.hh];});
+        break;
+      case 'h_keep': note='Households with no treated member stay as they are.'; break;
+      case 'r_sort': rows.sort(function(a,b){return a.hh<b.hh?-1:a.hh>b.hh?1:0;}); note='Rows reordered by household.'; break;
+      case 'r_allhh': c=new Set(L.filter(function(r){return r.t===1;}).map(function(r){return r.hh;})); removed=L.filter(function(r){return c.has(r.hh);}); break;
+      case 'r_above': L.forEach(function(r,j){if(j>0&&r.t===0){var p=L[j-1];if(p.t===1&&p.hh===r.hh)removed.push(r);}}); break;
+      case 'r_multi': c={}; L.forEach(function(r){c[r.hh]=(c[r.hh]||0)+1;}); removed=L.filter(function(r){return c[r.hh]>1;}); break;
+      case 'r_treated': removed=L.filter(function(r){return r.t===1;}); break;
+      case 'r_income': note='There is no income column in this data, so this step does nothing.'; break;
+      case 'r_count': c={}; L.forEach(function(r){c[r.hh]=(c[r.hh]||0)+1;}); note='Household sizes: '+Object.keys(c).sort().map(function(h){return h+' has '+c[h];}).join(', ')+'.'; break;
+    }
+    removed.forEach(function(r){r.gone=k;});
+    if(removed.length)note=(note?note+' ':'')+'Removed: '+namesOf(removed)+'.';
+    else if(!note)note='Nothing removed.';
+    snaps.push(rows.map(function(r){return {id:r.id,gone:r.gone};}));
+    notes.push(note);
+  });
+  var byId={};data.forEach(function(r){byId[r.id]=r;});
+  return {snaps:snaps,notes:notes,removed:new Set(rows.filter(function(r){return r.gone!==null;}).map(function(r){return r.id;})),byId:byId};
+}
+
+/* ---------- simulation ---------- */
+var POP_SEED=20261030;
+var POP=(function(){
+  var r=mulberry32(POP_SEED), w=[.12,.22,.24,.20,.13,.09], hhs=[], people=[], pid=0;
+  for(var h=0;h<100;h++){
+    var u=r(),acc=0,s=6;
+    for(var i=0;i<6;i++){acc+=w[i];if(u<acc){s=i+1;break;}}
+    var mem=[];
+    for(var j=0;j<s;j++){var p={pid:pid++,h:h,size:s,inc:Math.max(2,15-1.6*s+2*gauss(r))};mem.push(p);people.push(p);}
+    hhs.push({h:h,size:s,members:mem});
+  }
+  return {hhs:hhs,people:people};
+})();
+function simulate(p,seed,design){
+  var r=mulberry32(seed*9973+17), n=POP.people.length, T=new Array(n), kept=new Array(n);
+  if(design==='hhrand'){POP.hhs.forEach(function(hh){var t=r()<p?1:0;hh.members.forEach(function(m){T[m.pid]=t;});});}
+  else POP.people.forEach(function(m){T[m.pid]=r()<p?1:0;});
+  var hasT=[],hasC=[],mixed=0;
+  POP.hhs.forEach(function(hh){hasT[hh.h]=hh.members.some(function(m){return T[m.pid]===1;});hasC[hh.h]=hh.members.some(function(m){return T[m.pid]===0;});if(hasT[hh.h]&&hasC[hh.h])mixed++;});
+  POP.people.forEach(function(m){
+    var k=true;
+    if(design==='clean'&&T[m.pid]===0&&hasT[m.h])k=false;
+    if(design==='dropmixed'&&hasT[m.h]&&hasC[m.h])k=false;
+    kept[m.pid]=k;
+  });
+  return {T:T,kept:kept,hasT:hasT,hasC:hasC,mixed:mixed};
+}
+function balance(T,keep){
+  var g={1:{n:0,size:0,inc:0,dist:[0,0,0,0,0,0,0]},0:{n:0,size:0,inc:0,dist:[0,0,0,0,0,0,0]}};
+  POP.people.forEach(function(m){if(!keep||keep[m.pid]){var x=g[T[m.pid]];x.n++;x.size+=m.size;x.inc+=m.inc;x.dist[m.size]++;}});
+  [0,1].forEach(function(t){var x=g[t];x.mSize=x.n?x.size/x.n:null;x.mInc=x.n?x.inc/x.n:null;x.share=x.dist.map(function(d){return x.n?d/x.n:0;});});
+  return g;
+}
+function survival(T,kept){
+  var out=[];for(var k=1;k<=6;k++)out[k]={n:0,s:0};
+  POP.people.forEach(function(m){if(T[m.pid]===0){out[m.size].n++;if(kept[m.pid])out[m.size].s++;}});
+  return out;
+}
+
+/* ---------- state ---------- */
+var BANK_ORDER=(function(){var ids=Object.keys(CARDS),r=mulberry32(4242);for(var i=ids.length-1;i>0;i--){var j=Math.floor(r()*(i+1));var t=ids[i];ids[i]=ids[j];ids[j]=t;}return ids;})();
+var state={
+  stage:0,
+  attempted:[false,false,false,false,false,false,false,false],
+  s1:{pick:null,tried:[]},
+  s2:{critique:null,
+      own:[{id:1,name:poolName(1),hh:'A',t:1},{id:2,name:poolName(2),hh:'B',t:1},{id:3,name:poolName(3),hh:'C',t:1},
+           {id:4,name:poolName(4),hh:'A',t:0},{id:5,name:poolName(5),hh:'B',t:0},{id:6,name:poolName(6),hh:'C',t:0}],
+      nextId:7,predCanon:[],checkedCanon:false,predOwn:[],checkedOwn:false},
+  s3:{algo:[],ran:false,step:0,demo:false,lastRun:null,hints:0},
+  s4:{c1:{f:'',op:'',v:''},conn:'',c2:{f:'',op:'',v:''},checked:false,correct:false,purpose:'',keep:[],keepChecked:false,hl:null},
+  p:0.5,seed:1,design:'clean',
+  sim:{cleaned:false,dist:'after'},
+  s6:{pred:'',revealed:false},
+  s7:{changed:false},
+  why1:'',critWhy:'',why6:'',refl1:'',refl2:'',refl3:''
+};
+var playTimer=null, projector=false;
+var listeners=[];
+function notify(){var copy=JSON.parse(JSON.stringify(state));listeners.forEach(function(fn){try{fn(copy);}catch(err){}});}
+function stopPlay(){if(playTimer){clearInterval(playTimer);playTimer=null;}}
+function update(fn,opts){fn(state);if(!opts||opts.render!==false)render();else renderSummary();notify();}
+function unlocked(i){if(i===0)return true;for(var k=0;k<i;k++)if(!state.attempted[k])return false;return true;}
+
+/* ---------- small renderers ---------- */
+var STAGES=['Scenario','Essential column','Test data','Algorithm','Boolean rule','Scale up','Still comparable?','Better designs'];
+function tcell(t){return t===1?'<span class="tag t">✓ 1</span>':'<span class="tag c">○ 0</span>';}
+function plabel(r){return r.id+' · '+esc(r.name);}
+function fbBox(ok,html){return '<div class="fb '+(ok?'ok':'no')+'" role="status">'+html+'</div>';}
+function dataTable(rows,o){
+  o=o||{};
+  var h='<div class="tw"><table class="d"><thead><tr><th>Person</th><th>Household</th><th>Treated</th>'+(o.extraHead||'')+'</tr></thead><tbody>';
+  rows.forEach(function(r){
+    var cls=(o.rowClass?o.rowClass(r):'');
+    var person=plabel(r);
+    if(o.clickAct){var on=o.isOn(r);person='<button class="rowbtn" type="button" data-act="'+o.clickAct+'" data-arg="'+r.id+'" aria-pressed="'+on+'"><span>'+plabel(r)+'</span>'+(on?'<span class="mark">remove</span>':'')+'</button>';}
+    h+='<tr class="'+cls+'"><td>'+person+'</td><td>'+esc(r.hh)+'</td><td>'+tcell(r.t)+'</td>'+(o.extraCell?o.extraCell(r):'')+'</tr>';
+  });
+  return h+'</tbody></table></div>';
+}
+function nextBar(){
+  var i=state.stage, last=i===STAGES.length-1;
+  var h='<div class="next"><span class="small muted">';
+  h+=last?'This is the last stage. Your answers are collected below.':(state.attempted[i]?'You can come back to this stage at any time.':'Try this stage to unlock the next one.');
+  h+='</span>';
+  if(!last)h+='<button class="btn" type="button" data-act="next" '+(state.attempted[i]?'':'disabled')+'>Continue to '+STAGES[i+1].toLowerCase()+'</button>';
+  return h+'</div>';
+}
+
+/* ---------- what counts as correct (the standard every rule and test is judged by) ---------- */
+var SPEC_ITEMS='<ul>'+
+  '<li><b>Remove exactly the right people.</b> Remove every control (Treated = 0) who shares a household with at least one treated person. Keep everyone else: every treated person, and every control whose household has no one treated.</li>'+
+  '<li><b>Any household mix is allowed.</b> Under individual randomization a household can contain any combination. Two or more treated people in one household is fine: they all stay. Two or more controls with no one treated is fine: they all stay. Only a household that mixes treated and controls loses anyone, and then only its controls.</li>'+
+  '<li><b>Any row order.</b> The rule must work whatever order the rows arrive in. Real files are not sorted by household or by treatment, and housemates can be thousands of rows apart.</li>'+
+  '<li><b>What the cleaned data looks like.</b> The same rows and columns as before, minus the removed people. Nothing needs to be sorted, grouped by household, or split into separate treated and control files, and the remaining rows can stay in any order. After cleaning, no household contains both a treated person and a control: each remaining household is all treated or all controls.</li>'+
+  '</ul><p>A <b>bug</b> is a rule that keeps or removes the wrong person for <i>some</i> possible dataset, even if it happens to give the right answer on the data you tried. A good test dataset is one on which a buggy rule visibly fails.</p>';
+function specHTML(){return '<div class="spec"><h3>What counts as correct</h3>'+SPEC_ITEMS+'</div>';}
+
+/* ---------- stage 0 ---------- */
+function houseSVG(){
+  function house(x,label,ppl){
+    var s='<g transform="translate('+x+',0)"><path d="M10 60 L70 18 L130 60 L130 128 Q130 136 122 136 L18 136 Q10 136 10 128 Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>';
+    ppl.forEach(function(t,i){var cx=45+i*50;s+=t?'<circle cx="'+cx+'" cy="100" r="14" class="ptt"/><text x="'+cx+'" y="105" text-anchor="middle" class="pk">✓</text>':'<circle cx="'+cx+'" cy="100" r="12" class="ptc"/>';});
+    return s+'<text x="70" y="160" text-anchor="middle" class="hl">'+label+'</text></g>';
+  }
+  return '<svg viewBox="0 0 470 170" role="img" aria-label="Three households: one where both people are treated, one where one person is treated and one is a control, and one where both are controls." style="width:100%;max-width:30em;color:var(--ink)">'+
+    '<style>.ptt{fill:var(--t-fill)}.ptc{fill:var(--c-fill);stroke:var(--c-stroke);stroke-width:3}.pk{fill:var(--t-ink);font:600 14px var(--sans)}.hl{fill:var(--ink);font:13px var(--sans)}</style>'+
+    house(0,'Both treated',[1,1])+house(165,'One of each',[1,0])+house(330,'Both controls',[0,0])+'</svg>';
+}
+function stage0(){
+  return '<section class="stage"><h2>Some households ended up on both sides. What should happen to them?</h2>'+
+  '<div class="row"><div class="prose grow">'+
+  '<p>You work for the World Bank on an anti-poverty experiment in the Philippines. Volunteers were randomly assigned, one person at a time, to join the program (<b>Treated = 1</b>) or not (<b>Treated = 0</b>).</p>'+
+  '<p>Because assignment was by person, some households now contain both: one parent in the program, the other not. Your team worries that a control who lives with a participant will feel the program anyway, through shared money, information or changed habits.</p>'+
+  '<p>The proposed fix: <b>remove every control who shares a household with a treated person.</b> The real data has 50,000 people and 20 columns, so this has to be done by code. You will design that code’s logic first, on a small toy dataset.</p>'+
+  '</div><figure class="grow" style="margin:0">'+houseSVG()+'<figcaption class="legend"><span><span class="tag t">✓</span> treated</span><span><span class="tag c">○</span> control</span></figcaption></figure></div>'+
+  specHTML()+'<p class="small muted">You can reread this at any time under “What counts as correct” at the bottom of the page.</p>'+
+  '<div class="actions"><button class="btn" type="button" data-act="begin">Start the exercise</button></div></section>';
+}
+
+/* ---------- stage 1 ---------- */
+var COLS=[
+  {id:'age',label:'Age',fb:'Age describes people, but the rule never mentions it. You could clean the data perfectly without knowing anyone’s age.'},
+  {id:'barangay',label:'Barangay (village)',fb:'Barangay is a different grouping level: many households share a village. It can’t tell you who lives together, which is what the rule needs, and Household already does that.'},
+  {id:'income',label:'Monthly income at baseline',fb:'Useful later for checking whether groups are comparable, but the rule never mentions income. Nothing about who gets removed depends on it.'},
+  {id:'treated',label:'Treated (1 = participant, 0 = control)',fb:'Right. The rule mentions exactly two facts about each person: which household they live in, and whether they were treated. Household is already here; Treated is the missing one.',ok:true},
+  {id:'outcome',label:'Income after the program (the outcome)',fb:'You’ll need the outcome for the analysis, but not for this step. Choosing who to remove based on outcomes would be a serious error: you could quietly shape the result you later report.'},
+  {id:'phone',label:'Phone number',fb:'A phone number identifies a person, but it carries none of the information the rule uses.'}
+];
+function stage1(){
+  var s=state.s1, h='<section class="stage"><h2>What do we need to know?</h2>';
+  h+='<div class="prose"><p>Your toy dataset has three columns. Two are already here. Which third column is <b>absolutely essential</b> for the cleaning rule?</p></div>';
+  h+='<div class="tw" style="max-width:26em"><table class="d"><thead><tr><th>Person</th><th>Household</th><th>?</th></tr></thead><tbody>'+
+     CANON.slice(0,4).map(function(r){return '<tr><td>'+plabel(r)+'</td><td>'+r.hh+'</td><td class="muted">…</td></tr>';}).join('')+'</tbody></table></div>';
+  h+='<div class="cards" role="group" aria-label="Candidate columns">';
+  COLS.forEach(function(c){
+    var tried=s.tried.indexOf(c.id)>=0&&s.pick!==c.id;
+    h+='<button type="button" class="card'+(tried?' tried':'')+(s.pick===c.id&&c.ok?' is-right':'')+'" data-act="s1pick" data-arg="'+c.id+'" aria-pressed="'+(s.pick===c.id)+'">'+esc(c.label)+(tried?'<span class="sub">already tried</span>':'')+'</button>';
+  });
+  h+='</div>';
+  if(s.pick){var c=COLS.filter(function(x){return x.id===s.pick;})[0];h+=fbBox(!!c.ok,'<p><b>'+(c.ok?'✓ ':'✗ ')+esc(c.label)+'.</b> '+esc(c.fb)+'</p>'+(c.ok?'':'<p>Try another card.</p>'));}
+  if(s.tried.indexOf('treated')>=0){
+    h+='<label class="q" for="why1">In one sentence: why can’t the cleaning be done without this column?</label><textarea id="why1" data-in="why1">'+esc(state.why1)+'</textarea>';
+  }
+  return h+nextBar()+'</section>';
+}
+
+/* ---------- stage 2 ---------- */
+var CRIT={
+  X:{ok:false,fb:'Nobody in X shares a household, so the correct output is “remove nobody”. Many wrong rules also remove nobody here. A test that can’t fail can’t show you a mistake.'},
+  Y:{ok:false,fb:'Y has a mixed household, but its rows are sorted with every treated person first. A rule that only works on sorted rows is a bug (a correct rule must handle any order), and Y can’t expose it. And every control-only household has one member, so Y can’t show whether a rule wrongly removes controls who live only with other controls.'},
+  Z:{ok:true,fb:'Z has every case: a household that is all treated (E), a two-person household of controls only (B), mixed households with two controls (A) and with two treated people (C), and the rows are shuffled.'}
+};
+var COV=['A household where everyone is treated','A household where everyone is a control, with at least 2 members','A mixed household with at least 2 controls','A mixed household with at least 2 treated people','Rows in a shuffled order: not sorted by Treated and not grouped by Household'];
+function coverage(rows){
+  var g={};rows.forEach(function(r){(g[r.hh]=g[r.hh]||[]).push(r);});
+  var hs=Object.keys(g).map(function(k){return g[k];});
+  function cnt(m,t){return m.filter(function(r){return r.t===t;}).length;}
+  var allT=hs.some(function(m){return cnt(m,0)===0;});
+  var allC2=hs.some(function(m){return m.length>=2&&cnt(m,1)===0;});
+  var mixC2=hs.some(function(m){return cnt(m,1)>0&&cnt(m,0)>=2;});
+  var mixT2=hs.some(function(m){return cnt(m,0)>0&&cnt(m,1)>=2;});
+  var ts=rows.map(function(r){return r.t;});
+  var mono=ts.every(function(v,i){return i===0||v<=ts[i-1];})||ts.every(function(v,i){return i===0||v>=ts[i-1];});
+  var grouped=true,seen=new Set();
+  rows.forEach(function(r,i){if(i>0&&rows[i-1].hh!==r.hh&&seen.has(r.hh))grouped=false;seen.add(r.hh);});
+  return [allT,allC2,mixC2,mixT2,!mono&&!grouped];
+}
+function predFeedback(rows,picked){
+  var truth=removalSet(rows), pk=new Set(picked), missed=[], extra=[];
+  rows.forEach(function(r){if(truth.has(r.id)&&!pk.has(r.id))missed.push(r);if(!truth.has(r.id)&&pk.has(r.id))extra.push(r);});
+  if(!missed.length&&!extra.length){
+    var kept=rows.filter(function(r){return r.t===0&&!truth.has(r.id);});
+    return fbBox(true,'<p><b>✓ Right.</b> '+(truth.size?'The rows to remove are '+namesOf(rows.filter(function(r){return truth.has(r.id);}))+': controls who live with a treated person.':'Nobody needs to be removed from this dataset.')+(kept.length?' '+esc(namesOf(kept))+' '+(kept.length>1?'stay because their households have':'stays because that household has')+' no one treated.':'')+'</p>');
+  }
+  var h='<p><b>✗ Not quite.</b></p>';
+  missed.forEach(function(r){h+='<p>Missed: '+esc(reason(r,rows))+'</p>';});
+  extra.forEach(function(r){h+='<p>Should stay: '+esc(reason(r,rows))+'</p>';});
+  return fbBox(false,h+'<p>Change your marks and check again.</p>');
+}
+function stage2(){
+  var s=state.s2, h='<section class="stage"><h2>Would your test catch a bug?</h2>';
+  h+='<div class="prose"><p>Before writing any logic, you need toy data that would expose a wrong set of rules. Here are the three columns you’ll use from now on: <b>Person</b>, <b>Household</b> (a letter) and <b>Treated</b> (1 or 0).</p></div>';
+  h+='<div class="prose"><p><b>Remember what counts as correct:</b> a correct set of rules removes exactly the people who need to be removed, from any dataset, however many different kinds of problem it contains, and leaves everyone else alone. A set of rules that isn’t perfect can still get some datasets right. A correct one gets every dataset right.</p>'+
+    '<p><b>What situations can a dataset contain?</b></p><ul>'+
+    '<li>Situations that need fixing, because controls live with a treated person:<ul>'+
+      '<li>a mixed household with two or more controls: every one of those controls must be removed;</li>'+
+      '<li>a mixed household with two or more treated people: its controls are removed, and every treated person stays.</li></ul></li>'+
+    '<li>Situations that must be left alone:<ul>'+
+      '<li>a household where everyone is treated;</li>'+
+      '<li>a household of two or more controls with no one treated.</li></ul></li>'+
+    '<li>Any row order: housemates need not sit next to each other, and treated people and controls are scattered through the file.</li></ul>'+
+    '<p><b>What makes a good test dataset:</b> it includes every single one of these situations, with its rows shuffled. A wrong set of rules can fail by removing too few people or by removing too many, so a test needs both the situations that need fixing and the ones that must be left alone.</p></div>';
+  h+='<h3>Which test dataset would catch the most mistakes?</h3>';
+  h+='<div class="trio">';
+  [['X',DATA_X],['Y',DATA_Y],['Z',CANON]].forEach(function(d){
+    h+='<div class="dset'+(s.critique===d[0]?' sel':'')+(s.critique===d[0]&&CRIT[d[0]].ok?' is-right':'')+'"><h4>Dataset '+d[0]+'</h4>'+dataTable(d[1])+
+       '<div class="actions"><label><input type="radio" name="crit" data-act="crit" data-arg="'+d[0]+'" '+(s.critique===d[0]?'checked':'')+'> Choose '+d[0]+'</label></div></div>';
+  });
+  h+='</div>';
+  if(s.critique){var c=CRIT[s.critique];h+=fbBox(c.ok,'<p><b>'+(c.ok?'✓ ':'✗ ')+'Dataset '+s.critique+'.</b> '+esc(c.fb)+'</p>');
+    h+='<label class="q" for="critWhy">Why does your choice matter? (one or two sentences)</label><textarea id="critWhy" data-in="critWhy">'+esc(state.critWhy)+'</textarea>';}
+
+  // builder
+  var cov=coverage(s.own), score=cov.filter(Boolean).length;
+  h+='<div class="part"><h3>Build your own test dataset (6 to 10 people)</h3>';
+  h+='<p class="small muted">Change households, toggle Treated, and reorder rows with the arrows or by dragging. Aim to tick every item in the checklist.</p>';
+  h+='<div class="row"><div class="grow" style="flex-basis:min(24em,100%)">';
+  h+='<div class="tw"><table class="d" id="ownTable"><thead><tr><th>Row</th><th>Person</th><th>Household</th><th>Treated</th><th><span class="sr">Actions</span></th></tr></thead><tbody>';
+  s.own.forEach(function(r,i){
+    h+='<tr draggable="true" data-drag="'+r.id+'"><td class="muted">'+(i+1)+'</td><td>'+plabel(r)+'</td>'+
+       '<td><label class="sr" for="hh'+r.id+'">Household for '+esc(r.name)+'</label><select id="hh'+r.id+'" data-act="ownhh" data-arg="'+r.id+'">'+HH.map(function(x){return '<option'+(x===r.hh?' selected':'')+'>'+x+'</option>';}).join('')+'</select></td>'+
+       '<td><button type="button" class="icon" style="min-width:4.2em" data-act="ownt" data-arg="'+r.id+'" aria-label="Treated for '+esc(r.name)+': '+(r.t?'yes':'no')+'. Click to switch.">'+tcell(r.t)+'</button></td>'+
+       '<td style="white-space:nowrap"><button type="button" class="icon" data-act="ownup" data-arg="'+r.id+'" aria-label="Move '+esc(r.name)+' up" '+(i===0?'disabled':'')+'>↑</button> '+
+       '<button type="button" class="icon" data-act="owndown" data-arg="'+r.id+'" aria-label="Move '+esc(r.name)+' down" '+(i===s.own.length-1?'disabled':'')+'>↓</button> '+
+       '<button type="button" class="icon" data-act="owndel" data-arg="'+r.id+'" aria-label="Remove '+esc(r.name)+' from the dataset" '+(s.own.length<=6?'disabled':'')+'>✕</button></td></tr>';
+  });
+  h+='</tbody></table></div><div class="actions"><button type="button" class="btn2" data-act="ownadd" '+(s.own.length>=10?'disabled':'')+'>Add a person</button><span class="small muted">'+s.own.length+' of 10 people</span></div>';
+  h+='</div><div class="grow"><p style="margin:0"><span class="score">'+score+' of 5</span> <span class="muted">cases covered</span></p><ul class="checklist">';
+  COV.forEach(function(t,i){h+='<li class="'+(cov[i]?'yes':'')+'"><span class="st" aria-hidden="true">'+(cov[i]?'✓':'')+'</span><span>'+t+'<span class="sr">'+(cov[i]?' (covered)':' (not yet)')+'</span></span></li>';});
+  h+='</ul><div class="board" aria-label="Your households">';
+  HH.forEach(function(x){var m=s.own.filter(function(r){return r.hh===x;});
+    h+='<div class="house'+(m.length?'':' empty')+'"><div class="hname">Household '+x+'</div><div class="m">'+(m.length?m.map(function(r){return '<span class="tag '+(r.t?'t':'c')+'">'+(r.t?'✓':'○')+' '+esc(r.name)+'</span>';}).join(''):'<span class="small muted">empty</span>')+'</div></div>';});
+  h+='</div></div></div></div>';
+
+  // predict
+  h+='<div class="part"><h3>Predict before you run anything</h3>';
+  h+='<p class="prose">Click every person in the canonical dataset (Z) that the rule should <b>remove</b>, then check.</p>';
+  h+='<div class="row"><div class="grow">'+dataTable(CANON,{clickAct:'predc',isOn:function(r){return s.predCanon.indexOf(r.id)>=0;},rowClass:function(r){return s.predCanon.indexOf(r.id)>=0?'pick':'';}})+
+     '<div class="actions"><button type="button" class="btn" data-act="checkc">Check my prediction</button></div>'+(s.checkedCanon?predFeedback(CANON,s.predCanon):'')+'</div>';
+  h+='<div class="grow"><p class="small" style="margin-top:0"><b>Your dataset.</b> Mark the rows to remove here too.</p>'+dataTable(s.own,{clickAct:'predo',isOn:function(r){return s.predOwn.indexOf(r.id)>=0;},rowClass:function(r){return s.predOwn.indexOf(r.id)>=0?'pick':'';}})+
+     '<div class="actions"><button type="button" class="btn2" data-act="checko">Check this one</button></div>'+(s.checkedOwn?predFeedback(s.own,s.predOwn):'')+'</div></div></div>';
+  if(!state.attempted[2])h+='<p class="small muted">To continue: choose a dataset above and check your prediction on Z.</p>';
+  return h+nextBar()+'</section>';
+}
+
+/* ---------- stage 3 ---------- */
+// Hints nudge without naming cards or giving the order. At most three, revealed one at a time.
+var HINTS=[
+  'Each step can only use something that already exists. Before a step can ask about a person, what does it need to know, and which step would produce that?',
+  'Test every card against “What counts as correct”. Would it still give the right answer if the rows were shuffled? Could it ever remove a treated person, or a control whose household has no one treated?',
+  'There is more than one sensible way to organise the work. Settle on one way of thinking about the data, and check that every step you use belongs to it.'
+];
+function hintsHTML(){
+  var n=state.s3.hints||0, left=HINTS.length-n;
+  var h='<div class="hints"><button type="button" class="btn2" data-act="hint" '+(left?'':'disabled')+'>'+(left?'Gimme a hint ('+left+' left)':'No hints left')+'</button>';
+  if(n)h+='<ol aria-live="polite">'+HINTS.slice(0,n).map(function(t){return '<li>'+esc(t)+'</li>';}).join('')+'</ol>';
+  return h+'</div>';
+}
+function gradeAlgo(algo){
+  var out={msgs:[],ok:false};
+  if(!algo.length){out.msgs.push('Add some steps first.');return out;}
+  var sets=[CANON,DATA_Y,state.s2.own];
+  var correct=sets.map(function(d){return setEq(runAlgo(algo,d).removed,removalSet(d));});
+  var allOk=correct.every(Boolean);
+  var hasV1=algo.some(function(c){return V1.indexOf(c)>=0;}), hasV2=algo.some(function(c){return V2.indexOf(c)>=0;});
+  var herr=algo.filter(function(c){return CARDS[c].kind;});
+  var harmful=herr.some(function(c){return CARDS[c].kind==='harmful';});
+  if(hasV1&&hasV2)out.msgs.push('You mixed two different approaches: the list-based steps and the household-by-household steps. Pick one approach and use only its steps.');
+  [V1,V2].forEach(function(V){
+    var used=algo.filter(function(c){return V.indexOf(c)>=0;});
+    if(!used.length||(hasV1&&hasV2))return;
+    var inOrder=used.every(function(c,i){return i===0||V.indexOf(c)>V.indexOf(used[i-1]);});
+    if(!inOrder)out.msgs.push('Order matters: each step uses something an earlier step produced. A step that reads a list, or acts on an answer, has to come after the step that makes it.');
+    var missing=V.filter(function(c){return used.indexOf(c)<0;});
+    if(missing.length)out.msgs.push('A step is missing: “'+CARDS[missing[0]].text+'”');
+  });
+  herr.forEach(function(c){out.msgs.push('“'+CARDS[c].text+'” '+CARDS[c].fb);});
+  if(allOk&&!harmful&&!(hasV1&&hasV2)){
+    out.ok=true;
+    out.head=herr.length?'Your algorithm gives the right answer on all three datasets, but some steps do no work.':'Your algorithm gives the right answer on all three datasets.';
+  } else out.head=allOk?'The output is right on these datasets, but the logic has a problem.':'The output is wrong on at least one dataset.';
+  out.correct=correct;
+  return out;
+}
+function traceCol(title,data,run,k,last){
+  var snap=run.snaps[Math.min(k,run.snaps.length-1)];
+  var h='<div class="tcol'+(k===last&&setEq(run.removed,removalSet(data))?' is-right':'')+'"><h4>'+title+'</h4><div class="tw"><table class="d"><thead><tr><th>Person</th><th>Household</th><th>Treated</th></tr></thead><tbody>';
+  snap.forEach(function(sr){var r=run.byId[sr.id];var cls=sr.gone===null?'':(sr.gone===k?'gone now':'gone');
+    h+='<tr class="'+cls+'"><td>'+plabel(r)+(sr.gone===k?' <span class="mark">removed now</span>':'')+'</td><td>'+r.hh+'</td><td>'+tcell(r.t)+'</td></tr>';});
+  h+='</tbody></table></div><p class="note">'+(k===0?'Starting data.':esc(run.notes[k-1]))+'</p>';
+  if(k===last){
+    var truth=removalSet(data), ok=setEq(run.removed,truth);
+    var miss=data.filter(function(r){return truth.has(r.id)&&!run.removed.has(r.id);}), extra=data.filter(function(r){return !truth.has(r.id)&&run.removed.has(r.id);});
+    h+='<p class="verdict">'+(ok?'✓ Matches the correct output.':'✗ Wrong.')+'</p>';
+    if(!ok){if(miss.length)h+='<p class="small">Should have removed: '+esc(namesOf(miss))+'.</p>';if(extra.length)h+='<p class="small">Should have kept: '+esc(namesOf(extra))+'.</p>';}
+  }
+  return h+'</div>';
+}
+function stage3(){
+  var s=state.s3, h='<section class="stage"><h2>In what order would a computer do this?</h2>';
+  h+='<div class="prose"><p>Build the cleaning algorithm from step cards. Some cards in the bank are plausible but wrong, and some are fine but unnecessary. Tap a card to add it, then use the arrows to put your steps in order.</p></div>';
+  h+=hintsHTML();
+  h+='<div class="algo"><div><h3 style="margin-top:0">Step bank</h3><ul class="list">';
+  var bank=BANK_ORDER.filter(function(id){return s.algo.indexOf(id)<0;});
+  bank.forEach(function(id){h+='<li><button type="button" class="bankbtn" data-act="addcard" data-arg="'+id+'">'+esc(CARDS[id].text)+'<span class="add">Add to algorithm</span></button></li>';});
+  if(!bank.length)h+='<li class="small muted">Every card is in your algorithm.</li>';
+  h+='</ul></div><div><h3 style="margin-top:0">Your algorithm</h3><div class="slots'+(s.ran&&s.lastRun&&s.lastRun.join()===s.algo.join()&&s.step>=s.lastRun.length&&gradeAlgo(s.lastRun).ok?' is-right':'')+'"><ol class="list" aria-label="Your algorithm, in order">';
+  if(!s.algo.length)h+='<li class="empty">No steps yet. Tap cards in the bank to add them here.</li>';
+  s.algo.forEach(function(id,i){
+    h+='<li class="step"><span class="num">'+(i+1)+'</span><span class="txt">'+esc(CARDS[id].text)+'</span>'+
+       '<button type="button" class="icon" data-act="cup" data-arg="'+id+'" aria-label="Move step '+(i+1)+' up" '+(i===0?'disabled':'')+'>↑</button>'+
+       '<button type="button" class="icon" data-act="cdown" data-arg="'+id+'" aria-label="Move step '+(i+1)+' down" '+(i===s.algo.length-1?'disabled':'')+'>↓</button>'+
+       '<button type="button" class="icon" data-act="cdel" data-arg="'+id+'" aria-label="Remove step '+(i+1)+'">✕</button></li>';
+  });
+  h+='</ol></div><div class="actions"><button type="button" class="btn" data-act="run" '+(s.algo.length?'':'disabled')+'>Run my algorithm</button>'+(s.algo.length?'<button type="button" class="btn2" data-act="clearalgo">Clear</button>':'')+'</div></div></div>';
+
+  if(s.ran&&s.lastRun){
+    var algo=s.lastRun, last=algo.length, k=Math.min(s.step,last);
+    var runs=[runAlgo(algo,CANON),runAlgo(algo,DATA_Y),runAlgo(algo,state.s2.own)];
+    h+='<div class="part"><h3>Watch it run</h3>';
+    if(algo.join()!==s.algo.join())h+='<p class="small muted">You have changed your algorithm since this run. Press “Run my algorithm” again to update.</p>';
+    h+='<div class="tracebar"><button type="button" class="icon" data-act="tback" '+(k===0?'disabled':'')+' aria-label="Previous step">←</button>'+
+       '<button type="button" class="btn2" data-act="tplay">'+(playTimer?'Pause':'Play')+'</button>'+
+       '<button type="button" class="icon" data-act="tfwd" '+(k===last?'disabled':'')+' aria-label="Next step">→</button>'+
+       '<button type="button" class="btn2" data-act="tend" '+(k===last?'disabled':'')+'>Jump to the end</button>'+
+       '<span class="small muted" aria-live="polite">'+(k===0?'Start':'Step '+k+' of '+last)+'</span></div>';
+    h+='<p class="curstep">'+(k===0?'Before any step runs.':'<b>Step '+k+':</b> '+esc(CARDS[algo[k-1]].text))+'</p>';
+    h+='<div class="tracecols">'+traceCol('Canonical (Z)',CANON,runs[0],k,last)+traceCol('Dataset Y',DATA_Y,runs[1],k,last)+traceCol('Your dataset',state.s2.own,runs[2],k,last)+'</div>';
+    if(k===last){
+      var g=gradeAlgo(algo);
+      var ownPredMatch=state.s2.checkedOwn?setEq(new Set(state.s2.predOwn),runs[2].removed):null;
+      h+=fbBox(g.ok,'<p><b>'+(g.ok?'✓ ':'✗ ')+esc(g.head)+'</b></p>'+g.msgs.map(function(m){return '<p>'+esc(m)+'</p>';}).join('')+
+         (ownPredMatch===null?'':'<p>Your stage 2 prediction for your own dataset '+(ownPredMatch?'matches':'does not match')+' what this algorithm removed there.</p>'));
+      var aboveIn=algo.indexOf('r_above')>=0;
+      if(aboveIn&&setEq(runs[1].removed,removalSet(DATA_Y))&&!setEq(runs[0].removed,removalSet(CANON))){
+        h+='<div class="reveal"><h4>It passed on Dataset Y and failed on Z.</h4><p>The “row directly above” card only works when every control sits right under a treated housemate. Y is sorted, so the one mixed household happens to line up. Z is shuffled, so the same card misses. A correct rule has to work in any row order, which is why your test data in stage 2 needed shuffled rows.</p></div>';
+      }
+    }
+    h+='</div>';
+    h+='<div class="part"><h3>Test one suspicious card on its own</h3><p class="prose">Run only the card “'+esc(CARDS.r_above.text)+'” on Dataset Y and on Z.</p>';
+    h+='<div class="actions"><button type="button" class="btn2" data-act="demo">'+(s.demo?'Hide':'Run it')+'</button></div>';
+    if(s.demo){
+      var dz=runAlgo(['r_above'],CANON), dy=runAlgo(['r_above'],DATA_Y);
+      h+='<div class="tracecols">'+traceCol('Dataset Y, “row above” only',DATA_Y,dy,1,1)+traceCol('Canonical (Z), “row above” only',CANON,dz,1,1)+'</div>';
+      h+='<div class="reveal"><h4>Same card, opposite verdicts.</h4><p>On Y, sorting puts Nina directly under her treated housemate Mon, so the card looks correct. On Z, no control sits directly under a treated housemate, so it removes nobody and misses Ben, Fe and Iggy. A rule that depends on row order is not a rule about households.</p></div>';
+    }
+    h+='</div>';
+  }
+  return h+nextBar()+'</section>';
+}
+
+/* ---------- stage 4 ---------- */
+function evalClause(c,r,th){
+  if(!c.f||!c.op||!c.v)return {state:'incomplete'};
+  if(c.f==='Treated'){
+    if(c.v==='TH'||c.op==='in'||c.op==='notin')return {state:'invalid',msg:'Treated is a 0/1 value. It can equal or not equal 0 or 1, but it can’t be “in” a list of households.'};
+    var val=+c.v;return {state:'ok',val:c.op==='=='?r.t===val:r.t!==val};
+  }
+  if(c.v==='TH'){
+    if(c.op==='in')return {state:'ok',val:th.has(r.hh)};
+    if(c.op==='notin')return {state:'ok',val:!th.has(r.hh)};
+    return {state:'invalid',msg:'Household is one letter and the treated households are a list. Compare them with “is in” or “is not in”.'};
+  }
+  return {state:'invalid',msg:'Household is a letter such as A or C, so comparing it with 0 or 1 makes no sense.'};
+}
+function evalCondition(rows){
+  var s=state.s4, th=treatedHouseholds(rows), sel=new Set(), msg=null, complete=true;
+  rows.forEach(function(r){
+    var a=evalClause(s.c1,r,th), b=evalClause(s.c2,r,th);
+    if(a.state==='invalid')msg=a.msg; else if(b.state==='invalid')msg=b.msg;
+    if(a.state!=='ok'||b.state!=='ok'||!s.conn){complete=false;return;}
+    var v=s.conn==='AND'?(a.val&&b.val):(a.val||b.val);
+    if(v)sel.add(r.id);
+  });
+  return {sel:sel,msg:msg,complete:complete&&!msg};
+}
+var KEEP=[
+  {id:'a',text:'NOT ( Treated = 0  AND  Household is in treated households )',f:function(r,th){return !(r.t===0&&th.has(r.hh));}},
+  {id:'b',text:'( Treated ≠ 0 )  OR  ( Household is not in treated households )',f:function(r,th){return r.t!==0||!th.has(r.hh);}},
+  {id:'c',text:'( Treated ≠ 0 )  AND  ( Household is not in treated households )',f:function(r,th){return r.t!==0&&!th.has(r.hh);}},
+  {id:'d',text:'NOT ( Treated = 0 )  AND  ( Household is in treated households )',f:function(r,th){return r.t!==0&&th.has(r.hh);}},
+  {id:'e',text:'( Treated = 0 )  OR  ( Household is not in treated households )',f:function(r,th){return r.t===0||!th.has(r.hh);}}
+];
+function keptBy(opt,rows){var th=treatedHouseholds(rows);return new Set(rows.filter(function(r){return opt.f(r,th);}).map(function(r){return r.id;}));}
+function sel(id,arg,val,opts,label){
+  return '<label class="sr" for="'+id+'">'+label+'</label><select id="'+id+'" data-act="cond" data-arg="'+arg+'">'+opts.map(function(o){return '<option value="'+o[0]+'"'+(o[0]===val?' selected':'')+'>'+o[1]+'</option>';}).join('')+'</select>';
+}
+function clauseHTML(c,n){
+  return sel('f'+n,'c'+n+'.f',c.f,[['','choose…'],['Treated','Treated'],['Household','Household']],'Column for part '+n)+
+         sel('op'+n,'c'+n+'.op',c.op,[['','choose…'],['==','equals'],['!=','does not equal'],['in','is in'],['notin','is not in']],'Comparison for part '+n)+
+         sel('v'+n,'c'+n+'.v',c.v,[['','choose…'],['0','0'],['1','1'],['TH','treated households']],'Value for part '+n);
+}
+function stage4(){
+  var s=state.s4, h='<section class="stage"><h2>Can you write the rule as one condition?</h2>';
+  h+='<div class="prose"><p>A computer filters rows with a single TRUE/FALSE condition. Build a condition that is TRUE for exactly the people the rule removes. People in Z light up as your condition becomes TRUE for them.</p><p class="small muted">“Treated households” is the list of households that contain at least one treated person. In Z that is '+Array.from(treatedHouseholds(CANON)).sort().join(', ')+'.</p></div>';
+  h+='<div class="builder'+(s.checked&&s.correct?' is-right':'')+'" role="group" aria-label="Condition builder"><span class="lead">Select rows where</span>'+clauseHTML(s.c1,1)+
+     sel('conn','conn',s.conn,[['','choose…'],['AND','AND'],['OR','OR']],'Connector')+clauseHTML(s.c2,2)+'</div>';
+  var ev=evalCondition(CANON);
+  h+='<div class="people" aria-label="People in Z; highlighted ones make the condition TRUE">'+CANON.map(function(r){var on=ev.complete&&ev.sel.has(r.id);
+    return '<span class="pchip'+(on?' on':'')+'">'+(r.t?'✓':'○')+' '+plabel(r)+' ('+r.hh+')'+(on?'<span class="sr"> TRUE</span>':'')+'</span>';}).join('')+'</div>';
+  if(ev.msg)h+='<p class="small"><b>That comparison doesn’t work:</b> '+esc(ev.msg)+'</p>';
+  else if(ev.complete)h+='<p class="small">Condition is TRUE for: <b>'+esc(namesOf(CANON.filter(function(r){return ev.sel.has(r.id);})))+'</b></p>';
+  else h+='<p class="small muted">Fill in every box to see who the condition picks out.</p>';
+  h+='<div class="actions"><button type="button" class="btn" data-act="checkcond" '+(ev.complete?'':'disabled')+'>Check my condition</button></div>';
+  if(s.checked){
+    if(s.correct)h+=fbBox(true,'<p><b>✓ Right.</b> Your condition is TRUE for exactly Ben, Fe and Iggy. Both parts are needed: “Treated = 0” alone would also catch Dani and Gabe; “Household is in treated households” alone would also catch every treated person.</p>');
+    else{
+      var hint=[];
+      if(s.conn==='OR')hint.push('OR is TRUE when either part is TRUE, so it picks up too many people. The rule needs both facts to hold at once.');
+      if([s.c1.f,s.c2.f].indexOf('Treated')<0)hint.push('Nothing in your condition looks at Treated, but the rule only removes controls.');
+      if([s.c1.f,s.c2.f].indexOf('Household')<0)hint.push('Nothing in your condition looks at households, but the rule depends on who lives with whom.');
+      h+=fbBox(false,'<p><b>✗ Not yet.</b> The rows to remove are Ben, Fe and Iggy; your condition picks out '+esc(namesOf(CANON.filter(function(r){return ev.sel.has(r.id);})))+'.</p>'+hint.map(function(x){return '<p>'+esc(x)+'</p>';}).join(''));
+    }
+  }
+  if(s.correct){
+    h+='<div class="part"><h3>Does your condition describe the rows to remove, or the rows to keep?</h3><div class="radios">'+
+      ['REMOVE','KEEP'].map(function(x){return '<label'+(s.purpose===x&&x==='REMOVE'?' class="is-right"':'')+'><input type="radio" name="purpose" data-act="purpose" data-arg="'+x+'" '+(s.purpose===x?'checked':'')+'> Rows to '+x.toLowerCase()+'</label>';}).join('')+'</div>';
+    if(s.purpose)h+=fbBox(s.purpose==='REMOVE',s.purpose==='REMOVE'?'<p><b>✓ Remove.</b> TRUE marks the three people the rule throws out. Most filtering code keeps rows, so you need the opposite of this condition.</p>':'<p><b>✗ Look again.</b> TRUE marks Ben, Fe and Iggy, the people the rule throws out. This is the remove condition; keeping needs its opposite.</p>');
+    if(s.purpose==='REMOVE'){
+      h+='<h3>Which conditions keep exactly the right rows?</h3><p class="prose small">Tick every condition that is TRUE for exactly Ana, Carla, Dani, Eli, Gabe and Hana. More than one may work.</p><div class="checks">';
+      KEEP.forEach(function(o){var on=s.keep.indexOf(o.id)>=0, right=s.keepChecked&&on&&setEq(keptBy(o,CANON),new Set([1,3,4,5,7,8]));
+        h+='<label'+(right?' class="is-right"':'')+'><input type="checkbox" data-act="keep" data-arg="'+o.id+'" '+(on?'checked':'')+'><span><code>'+esc(o.text)+'</code>';
+        if(s.keepChecked){var k=keptBy(o,CANON), good=setEq(k,new Set([1,3,4,5,7,8]));h+='<br><span class="small">'+(good?'✓ ':'✗ ')+'keeps '+esc(namesOf(CANON.filter(function(r){return k.has(r.id);})))+'</span>';}
+        h+='</span></label>';});
+      h+='</div><div class="actions"><button type="button" class="btn" data-act="checkkeep">Check</button></div>';
+      if(s.keepChecked){
+        var right=s.keep.slice().sort().join()==='a,b';
+        h+=fbBox(right,right?'<p><b>✓ Both a and b.</b> Option a puts NOT in front of the whole remove condition. Option b is the same thing written out: NOT (A AND B) is equivalent to (NOT A) OR (NOT B). The AND flips to OR when the NOT moves inside.</p>':'<p><b>✗ Not quite.</b> Exactly two options keep the right people. Each option now shows who it keeps. Look for the one with NOT around the whole remove condition, and its partner where the NOT has moved inside.</p>');
+      }
+      if(s.keepChecked&&s.keep.slice().sort().join()==='a,b'){
+        h+=truthTable();
+        h+='<h3>Here is what you just designed, in R</h3><pre class="code" aria-label="R code"><span class="cm"># households that contain at least one treated person</span>\ntreated_hh <span class="k">&lt;-</span> toy$Household[toy$Treated <span class="k">==</span> 1]\n\n<span class="cm"># TRUE for controls who live with a treated person</span>\nremove <span class="k">&lt;-</span> toy$Treated <span class="k">==</span> 0 <span class="k">&amp;</span> toy$Household <span class="k">%in%</span> treated_hh\n\nclean <span class="k">&lt;-</span> toy[<span class="k">!</span>remove, ]</pre>';
+        h+='<p class="prose small muted">A loop that visits each household would also work. This vectorized version, one condition applied to every row at once, is what data scientists usually write.</p>';
+      }
+    }
+    h+='</div>';
+  }
+  return h+nextBar()+'</section>';
+}
+function truthTable(){
+  var s=state.s4, th=treatedHouseholds(CANON);
+  var rows=[[true,true],[true,false],[false,true],[false,false]];
+  function T(b){return '<span class="tv">'+(b?'TRUE':'FALSE')+'</span>';}
+  var h='<h3>The truth table behind your rule</h3><p class="prose small">A = “is a control (Treated = 0)”. B = “lives with a treated person (Household is in treated households)”. Click a person to find their row.</p>';
+  h+='<div class="people">'+CANON.map(function(r){return '<button type="button" class="pchip" data-act="hl" data-arg="'+r.id+'" aria-pressed="'+(s.hl===r.id)+'">'+(r.t?'✓':'○')+' '+esc(r.name)+'</button>';}).join('')+'</div>';
+  h+='<div class="tw"><table class="d tt"><thead><tr><th>A</th><th>B</th><th>A AND B</th><th>NOT (A AND B)</th><th>(NOT A) OR (NOT B)</th><th>Decision</th><th>Who</th></tr></thead><tbody>';
+  rows.forEach(function(ab){
+    var who=CANON.filter(function(r){return (r.t===0)===ab[0]&&th.has(r.hh)===ab[1];});
+    var hl=s.hl!==null&&who.some(function(r){return r.id===s.hl;});
+    var and=ab[0]&&ab[1];
+    h+='<tr class="'+(hl?'hl':'')+'"><td>'+T(ab[0])+'</td><td>'+T(ab[1])+'</td><td>'+T(and)+'</td><td>'+T(!and)+'</td><td>'+T(!ab[0]||!ab[1])+'</td><td>'+(and?'Remove':'Keep')+'</td><td>'+
+       (who.length?esc(namesOf(who)):'<span class="muted">nobody: a treated person always lives in a treated household</span>')+'</td></tr>';
+  });
+  return h+'</tbody></table></div>';
+}
+
+/* ---------- stages 5–7: simulation views ---------- */
+function curSim(design){return simulate(state.p,state.seed,design);}
+function gridHTML(sim,showGone){
+  var h='<div class="grid" role="img" aria-label="'+POP.hhs.length+' households shown as boxes; filled dots are treated people, hollow dots are controls'+(showGone?', faded dots have been removed':'')+'.">';
+  POP.hhs.forEach(function(hh){
+    var mixed=sim.hasT[hh.h]&&sim.hasC[hh.h];
+    h+='<div class="hh'+(mixed?' mixed':'')+'">'+hh.members.map(function(m){return '<span class="dot '+(sim.T[m.pid]?'t':'c')+(showGone&&!sim.kept[m.pid]?' gone':'')+'"></span>';}).join('')+'</div>';
+  });
+  return h+'</div><div class="legend"><span><span class="dot t"></span> treated</span><span><span class="dot c"></span> control</span><span><span class="dot c gone"></span> removed</span><span><span class="hh mixed" style="width:18px;min-height:14px;padding:0"></span> mixed household</span></div>';
+}
+function sizeTable(sim){
+  var rows=[];for(var k=1;k<=6;k++)rows[k]={hh:0,ppl:0,c:0,cr:0};
+  POP.hhs.forEach(function(hh){var x=rows[hh.size];x.hh++;hh.members.forEach(function(m){x.ppl++;if(!sim.T[m.pid]){x.c++;if(!sim.kept[m.pid])x.cr++;}});});
+  var h='<div class="tw"><table class="d"><thead><tr><th>Household size</th><th class="num">Households</th><th class="num">Controls</th><th class="num">Controls removed</th><th class="num">Share removed</th></tr></thead><tbody>';
+  for(k=1;k<=6;k++){var x=rows[k];h+='<tr><td>'+k+'</td><td class="num">'+x.hh+'</td><td class="num">'+x.c+'</td><td class="num">'+x.cr+'</td><td class="num">'+(x.c?pct(x.cr/x.c):'—')+'</td></tr>';}
+  return h+'</tbody></table></div>';
+}
+function simOut5(){
+  var sim=curSim('clean'), cleaned=state.sim.cleaned;
+  var nC=0,nR=0,nT=0;POP.people.forEach(function(m){if(sim.T[m.pid])nT++;else{nC++;if(!sim.kept[m.pid])nR++;}});
+  var h='<div class="stats"><div class="stat"><div class="v">'+POP.people.length+'</div><div class="l">people in '+POP.hhs.length+' households</div></div>'+
+    '<div class="stat"><div class="v">'+nT+'</div><div class="l">treated</div></div><div class="stat"><div class="v">'+nC+'</div><div class="l">controls</div></div>'+
+    '<div class="stat"><div class="v">'+sim.mixed+'</div><div class="l">mixed households</div></div>'+
+    (cleaned?'<div class="stat"><div class="v">'+nR+'</div><div class="l">controls removed ('+pct(nC?nR/nC:null)+')</div></div>':'')+'</div>';
+  h+=gridHTML(sim,cleaned);
+  if(cleaned)h+='<h3>Where did the removed controls come from?</h3>'+sizeTable(sim);
+  return h;
+}
+function pSlider(){
+  return '<div class="ctl"><label for="pSlider">Probability of treatment, p</label><input type="range" id="pSlider" min="0.05" max="0.95" step="0.05" value="'+state.p+'" data-act="p" aria-describedby="pRead"><div class="readout" id="pRead">p = '+state.p.toFixed(2)+'</div></div>';
+}
+function stage5(){
+  var h='<section class="stage"><h2>What happens with 336 people?</h2>';
+  h+='<div class="prose"><p>Now apply the rule to a simulated population. Each box is a household and each dot a person, randomly assigned one at a time with probability p. Set p, then clean the data.</p></div>';
+  h+='<div class="simwrap"><div class="panel">'+pSlider()+
+     '<div class="actions" style="flex-direction:column;align-items:stretch"><button type="button" class="btn" data-act="clean">'+(state.sim.cleaned?'Undo cleaning':'Clean the data')+'</button>'+
+     '<button type="button" class="btn2" data-act="reseed">Re-randomize</button></div><p class="small muted">Assignment draw #'+state.seed+'</p></div>'+
+     '<div id="simOut">'+simOut5()+'</div></div>';
+  return h+nextBar()+'</section>';
+}
+function distChart(bal,title){
+  var W=520,H=240,L=46,R=12,Tp=14,B=44,pw=W-L-R,ph=H-Tp-B, maxv=0;
+  for(var k=1;k<=6;k++)maxv=Math.max(maxv,bal[1].share[k],bal[0].share[k]);
+  maxv=Math.max(0.1,Math.ceil(maxv*10)/10);
+  var bw=pw/6, s='<svg class="chart" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+esc(title)+'">';
+  for(var g=0;g<=maxv+1e-9;g+=0.1){var y=Tp+ph-ph*g/maxv;s+='<line class="gridl" x1="'+L+'" x2="'+(W-R)+'" y1="'+y+'" y2="'+y+'"/><text x="'+(L-6)+'" y="'+(y+4)+'" text-anchor="end">'+Math.round(g*100)+'%</text>';}
+  for(k=1;k<=6;k++){
+    var x0=L+bw*(k-1), w=bw*0.34;
+    var yt=Tp+ph-ph*bal[1].share[k]/maxv, yc=Tp+ph-ph*bal[0].share[k]/maxv;
+    s+='<rect class="bt" x="'+(x0+bw*0.14)+'" y="'+yt+'" width="'+w+'" height="'+(Tp+ph-yt)+'" rx="3"/>';
+    s+='<rect class="bc" x="'+(x0+bw*0.52)+'" y="'+yc+'" width="'+w+'" height="'+Math.max(0,Tp+ph-yc)+'" rx="3"/>';
+    s+='<text x="'+(x0+bw/2)+'" y="'+(Tp+ph+16)+'" text-anchor="middle">'+k+'</text>';
+  }
+  s+='<line class="axis" x1="'+L+'" x2="'+(W-R)+'" y1="'+(Tp+ph)+'" y2="'+(Tp+ph)+'"/>';
+  s+='<text x="'+(L+pw/2)+'" y="'+(H-6)+'" text-anchor="middle">Household size</text></svg>';
+  return s+'<div class="legend"><span><svg width="14" height="14" aria-hidden="true"><rect width="14" height="14" rx="3" style="fill:var(--t-fill)"/></svg> share of treated group (n = '+bal[1].n+')</span><span><svg width="14" height="14" aria-hidden="true"><rect x="1" y="1" width="12" height="12" rx="3" style="fill:var(--c-fill);stroke:var(--c-stroke);stroke-width:1.5"/></svg> share of control group (n = '+bal[0].n+')</span></div>';
+}
+function survChart(sv,p){
+  var W=520,H=250,L=46,R=12,Tp=14,B=44,pw=W-L-R,ph=H-Tp-B;
+  function X(k){return L+pw*(k-0.5)/6;} function Y(v){return Tp+ph-ph*v;}
+  var s='<svg class="chart" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Share of controls who survive cleaning, by household size, compared with the formula (1 minus p) to the power of size minus 1">';
+  for(var g=0;g<=1.0001;g+=0.25){s+='<line class="gridl" x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(g)+'" y2="'+Y(g)+'"/><text x="'+(L-6)+'" y="'+(Y(g)+4)+'" text-anchor="end">'+Math.round(g*100)+'%</text>';}
+  var d='';for(var k=1;k<=6;k++){d+=(k===1?'M':'L')+X(k)+' '+Y(Math.pow(1-p,k-1));}
+  s+='<path class="theory" d="'+d+'"/>';
+  for(k=1;k<=6;k++){
+    var x=sv[k];s+='<text x="'+X(k)+'" y="'+(Tp+ph+16)+'" text-anchor="middle">'+k+'</text>';
+    if(!x.n){s+='<text x="'+X(k)+'" y="'+(Y(0)-6)+'" text-anchor="middle">n=0</text>';continue;}
+    var q=x.s/x.n, se=1.96*Math.sqrt(q*(1-q)/x.n), lo=Math.max(0,q-se), hi=Math.min(1,q+se);
+    s+='<line class="ci" x1="'+X(k)+'" x2="'+X(k)+'" y1="'+Y(lo)+'" y2="'+Y(hi)+'"/><circle class="pt" cx="'+X(k)+'" cy="'+Y(q)+'" r="5"/>';
+    s+='<text x="'+(X(k)+8)+'" y="'+(q>0.85?Y(q)+18:Y(q)-8)+'">n='+x.n+'</text>';
+  }
+  s+='<line class="axis" x1="'+L+'" x2="'+(W-R)+'" y1="'+(Tp+ph)+'" y2="'+(Tp+ph)+'"/><text x="'+(L+pw/2)+'" y="'+(H-6)+'" text-anchor="middle">Household size</text></svg>';
+  return s+'<div class="legend"><span><svg width="26" height="10" aria-hidden="true"><line x1="0" x2="26" y1="5" y2="5" style="stroke:var(--ink);stroke-width:1.5;stroke-dasharray:5 4"/></svg> (1 − p)<sup>size − 1</sup></span><span><svg width="12" height="12" aria-hidden="true"><circle cx="6" cy="6" r="5" style="fill:var(--t-fill);stroke:var(--ink-strong)"/></svg> this draw, with a 95% band; n = controls of that size</span></div>';
+}
+function balTable(before,after,showAfter){
+  function row(label,fn,d,noGap){
+    var bT=fn(before[1]),bC=fn(before[0]),aT=fn(after[1]),aC=fn(after[0]);
+    function gap(a,b){return noGap?'':(a!==null&&b!==null?fmt(a-b,d):'—');}
+    return '<tr><td>'+label+'</td><td class="num">'+fmt(bT,d)+'</td><td class="num">'+fmt(bC,d)+'</td><td class="num">'+gap(bT,bC)+'</td>'+
+      (showAfter?'<td class="num">'+fmt(aT,d)+'</td><td class="num">'+fmt(aC,d)+'</td><td class="num"><b>'+gap(aT,aC)+'</b></td>':'')+'</tr>';
+  }
+  var h='<div class="tw"><table class="d"><thead><tr><th></th><th class="num">Treated, before</th><th class="num">Control, before</th><th class="num">Gap</th>'+(showAfter?'<th class="num">Treated, after</th><th class="num">Control, after</th><th class="num">Gap</th>':'')+'</tr></thead><tbody>';
+  h+=row('People',function(g){return g.n;},0,true)+row('Mean household size',function(g){return g.mSize;},2)+row('Mean baseline income (₱ thousand/month)',function(g){return g.mInc;},2);
+  var empty=[];if(!before[1].n||(showAfter&&!after[1].n))empty.push('treated');if(!before[0].n||(showAfter&&!after[0].n))empty.push('control');
+  return h+'</tbody></table></div><p class="small muted">Gap = treated minus control. Under randomization the gap should be near zero, give or take noise.</p>'+
+    (empty.length?'<p class="small"><b>No one is left in the '+empty.join(' or ')+' group'+(empty.length>1?'s':'')+' here, so the groups can’t be compared at all.</b></p>':'');
+}
+var DESIGNS=[
+  {id:'clean',label:'Individual randomization, then the cleaning rule'},
+  {id:'none',label:'Individual randomization, no cleaning'},
+  {id:'dropmixed',label:'Individual randomization, drop entire mixed households'},
+  {id:'hhrand',label:'Household-level randomization'}
+];
+function designNote(design,sim){
+  var keptN=sim.kept.filter(Boolean).length, N=POP.people.length;
+  var big=POP.hhs.filter(function(hh){return hh.size>=5;}), bigKept=big.filter(function(hh){return sim.kept[hh.members[0].pid];}).length;
+  if(design==='clean')return 'Controls survive only when no housemate was treated. People kept: '+keptN+' of '+N+'.';
+  if(design==='none')return 'Nobody is removed and balance is what randomization gives you. The cost is in words, not in this simulation: controls in the '+sim.mixed+' mixed households may be affected by the program through their housemates.';
+  if(design==='dropmixed')return 'Every mixed household goes, treated and controls alike. People kept: '+keptN+' of '+N+'; households of 5 or 6 kept: '+bigKept+' of '+big.length+'. Compare the gaps at p = 0.50 with the gaps when you move p away from 0.50, and notice who is left to study.';
+  return 'Whole households are assigned, so no household is mixed ('+sim.mixed+' here) and nothing needs cleaning. The trade-off: '+POP.hhs.length+' households are now the units being randomized, not '+N+' people, so estimates are less precise.';
+}
+function simOut67(stage){
+  var design=stage===6?'clean':state.design, sim=curSim(design);
+  var before=balance(sim.T,null), after=balance(sim.T,sim.kept), removes=design==='clean'||design==='dropmixed';
+  var view=removes?state.sim.dist:'before';
+  var h=balTable(before,after,removes);
+  if(stage===7)h+='<p class="prose">'+esc(designNote(design,sim))+'</p>';
+  h+='<div class="charts"><div class="chartbox"><h4>Who is in each group, by household size'+(removes?(view==='after'?' (after)':' (before)'):'')+'</h4>';
+  if(removes)h+='<div class="seg" role="group" aria-label="Show before or after"><button type="button" data-act="dist" data-arg="before" aria-pressed="'+(view==='before')+'">Before</button><button type="button" data-act="dist" data-arg="after" aria-pressed="'+(view==='after')+'">After</button></div>';
+  h+=distChart(view==='after'?after:before,'Share of each group living in households of size 1 to 6, '+(view==='after'?'after':'before')+' '+(removes?'removal':'assignment'))+'</div>';
+  if(design==='clean'){
+    var p=state.p;
+    h+='<div class="chartbox"><h4>With p = '+p.toFixed(2)+', which controls survive cleaning?</h4>'+survChart(survival(sim.T,sim.kept),p)+'</div>';
+  }
+  return h+'</div>';
+}
+function stage6(){
+  var s=state.s6, h='<section class="stage"><h2>Did cleaning break the experiment?</h2>';
+  h+='<div class="prose"><p>Randomization made treatment and control comparable: on average, the two groups looked alike before the program started. After cleaning, are they still comparable?</p></div>';
+  h+='<div class="radios">'+[['yes','Yes'],['no','No'],['depends','It depends']].map(function(o){return '<label><input type="radio" name="pred6" data-act="pred6" data-arg="'+o[0]+'" '+(s.pred===o[0]?'checked':'')+'> '+o[1]+'</label>';}).join('')+'</div>';
+  h+='<label class="q" for="why6">Why do you think so?</label><textarea id="why6" data-in="why6">'+esc(state.why6)+'</textarea>';
+  h+='<div class="actions"><button type="button" class="btn" data-act="reveal6" '+(s.pred?'':'disabled')+'>'+(s.revealed?'Balance check shown below':'Show the balance check')+'</button></div>';
+  if(s.revealed){
+    h+='<div class="part"><div class="row" style="align-items:center"><p class="grow small muted" style="margin:0">p = '+state.p.toFixed(2)+', assignment draw #'+state.seed+'. Re-randomize to see whether the pattern is luck.</p><button type="button" class="btn2" data-act="reseed">Re-randomize</button></div>';
+    h+='<div id="simOut">'+simOut67(6)+'</div>';
+    h+='<div class="reveal"><h4>Cleaning selected the control group on household size.</h4>'+
+       '<p>A control survives only if none of the other members of the household was treated. In a household of size k that happens with probability <b>(1 − p)<sup>k − 1</sup></b>: always for someone living alone, rarely in a household of six.</p>'+
+       '<p>Household size is a pre-treatment characteristic, and here it travels with baseline income. So the surviving controls are no longer a random comparison group for the treated: they are smaller and better-off households. This is <b>selection bias</b>, created by the analyst after randomization.</p>'+
+       '<p>The cleaning was meant to fix an <b>interference</b> problem (a violation of SUTVA: a control’s outcome may depend on a housemate’s treatment). It traded that problem for a different one.</p></div>';
+    h+='</div>';
+  }
+  return h+nextBar()+'</section>';
+}
+function stage7(){
+  var h='<section class="stage"><h2>Which design avoids the problem?</h2>';
+  h+='<div class="prose"><p>Switch between four ways of running and cleaning the experiment. Watch the gaps. Then try the break-it control: move p away from 0.50.</p></div>';
+  h+='<div class="simwrap"><div class="panel"><fieldset style="border:0;padding:0;margin:0"><legend class="small" style="font-weight:600;margin-bottom:.4em">Design</legend><div class="designs">';
+  DESIGNS.forEach(function(d){var on=state.design===d.id;h+='<label class="'+(on?'on':'')+'"><input type="radio" name="design" data-act="design" data-arg="'+d.id+'" '+(on?'checked':'')+'> '+esc(d.label)+'</label>';});
+  h+='</div></fieldset><div style="margin-top:1em">'+pSlider()+'</div><button type="button" class="btn2" data-act="reseed" style="width:100%">Re-randomize</button><p class="small muted">Assignment draw #'+state.seed+'</p></div>';
+  h+='<div id="simOut">'+simOut67(7)+'</div></div>';
+  h+='<div class="part"><h3>Reflect</h3>';
+  var Q=['The cleaning step fixed one problem and created another. Name both.','If you were advising the World Bank before the experiment started, what design would you recommend, and what does it cost?','Which of your stage 2 test cases turned out to matter most, and why?'];
+  Q.forEach(function(q,i){h+='<label class="q" for="refl'+(i+1)+'">'+(i+1)+'. '+esc(q)+'</label><textarea id="refl'+(i+1)+'" data-in="refl'+(i+1)+'">'+esc(state['refl'+(i+1)])+'</textarea>';});
+  h+='<p class="small muted">Your answers are collected in “Your answers” below, with a button to copy them.</p></div>';
+  return h+nextBar()+'</section>';
+}
+
+/* ---------- summary ---------- */
+function summaryText(){
+  var s=state, L=[];
+  L.push('WHO GETS CLEANED OUT? — my answers','');
+  var c1=COLS.filter(function(c){return c.id===s.s1.pick;})[0];
+  L.push('Stage 1. Essential column: '+(c1?c1.label:'(not chosen)')+(s.s1.tried.length>1?' (cards tried: '+s.s1.tried.length+')':''));
+  L.push('  Why: '+(s.why1||'(blank)'),'');
+  L.push('Stage 2. Best test dataset: '+(s.s2.critique?'Dataset '+s.s2.critique:'(not chosen)'));
+  L.push('  Why: '+(s.critWhy||'(blank)'));
+  var cov=coverage(s.s2.own);
+  L.push('  My dataset ('+s.s2.own.length+' people, '+cov.filter(Boolean).length+' of 5 cases covered):');
+  s.s2.own.forEach(function(r){L.push('    '+r.id+' '+r.name+', household '+r.hh+', Treated = '+r.t);});
+  L.push('  Prediction on Z: '+(s.s2.checkedCanon?(setEq(new Set(s.s2.predCanon),removalSet(CANON))?'correct':'incorrect')+' (marked: '+(namesOf(CANON.filter(function(r){return s.s2.predCanon.indexOf(r.id)>=0;})))+')':'(not checked)'),'');
+  L.push('Stage 3. My algorithm:');
+  if(!s.s3.algo.length)L.push('  (no steps)');
+  s.s3.algo.forEach(function(id,i){L.push('  '+(i+1)+'. '+CARDS[id].text);});
+  if(s.s3.ran&&s.s3.algo.length){var g=gradeAlgo(s.s3.algo);L.push('  Result: '+g.head);}
+  L.push('  Hints used: '+(s.s3.hints||0)+' of '+HINTS.length);
+  L.push('');
+  var lab={'==':'equals','!=':'does not equal','in':'is in','notin':'is not in','TH':'treated households'};
+  function cl(c){return [c.f||'?',lab[c.op]||'?',lab[c.v]||c.v||'?'].join(' ');}
+  L.push('Stage 4. Remove condition: '+cl(s.s4.c1)+' '+(s.s4.conn||'?')+' '+cl(s.s4.c2)+(s.s4.checked?(s.s4.correct?' (correct)':' (not yet correct)'):''));
+  if(s.s4.keepChecked)L.push('  Keep conditions I ticked: '+(s.s4.keep.slice().sort().join(', ')||'none')+(s.s4.keep.slice().sort().join()==='a,b'?' (correct)':''));
+  L.push('');
+  L.push('Stage 6. Still comparable after cleaning? My prediction: '+(s.s6.pred||'(none)'));
+  L.push('  Why: '+(s.why6||'(blank)'),'');
+  L.push('Reflections');
+  ['Two problems','Design I would recommend','Test case that mattered most'].forEach(function(t,i){L.push('  '+(i+1)+'. '+t+': '+(s['refl'+(i+1)]||'(blank)'));});
+  return L.join('\n');
+}
+function renderSummary(){var el=document.getElementById('summaryText');if(el)el.textContent=summaryText();}
+
+/* ---------- render ---------- */
+var RENDER=[stage0,stage1,stage2,stage3,stage4,stage5,stage6,stage7];
+function renderStepper(){
+  var h='';
+  STAGES.forEach(function(t,i){
+    var u=unlocked(i);
+    h+='<li><button type="button" data-act="go" data-arg="'+i+'" '+(state.stage===i?'aria-current="step"':'')+' class="'+(state.attempted[i]?'done':'')+'" '+(u?'':'disabled aria-disabled="true"')+'><span class="n">'+i+'</span>'+t+(u?'':'<span class="sr"> (locked)</span>')+'</button></li>';
+  });
+  document.getElementById('stepper').innerHTML=h;
+}
+function render(){
+  var a=document.activeElement, key=null;
+  if(a&&a.dataset&&(a.dataset.act||a.dataset.in))key={act:a.dataset.act,arg:a.dataset.arg,inp:a.dataset.in};
+  renderStepper();
+  document.getElementById('app').innerHTML=RENDER[state.stage]();
+  renderSummary();
+  if(key){
+    var sel=key.inp?'[data-in="'+key.inp+'"]':'[data-act="'+key.act+'"]'+(key.arg!==undefined?'[data-arg="'+key.arg+'"]':'');
+    var el=document.querySelector(sel);
+    if(el&&!el.disabled)el.focus({preventScroll:true});
+  }
+}
+function go(i){if(!unlocked(i))return;stopPlay();state.stage=i;render();notify();var m=document.getElementById('app');if(m&&m.scrollIntoView)m.scrollIntoView({block:'start'});}
+
+/* ---------- events ---------- */
+function moveIn(arr,id,d){var i=arr.indexOf(id),j=i+d;if(i<0||j<0||j>=arr.length)return;arr.splice(i,1);arr.splice(j,0,id);}
+function moveRow(rows,id,d){var i=rows.findIndex(function(r){return r.id===id;}),j=i+d;if(i<0||j<0||j>=rows.length)return;var x=rows.splice(i,1)[0];rows.splice(j,0,x);}
+function ownChanged(s){s.s2.checkedOwn=false;s.s2.predOwn=s.s2.predOwn.filter(function(id){return s.s2.own.some(function(r){return r.id===id;});});}
+function toggleIn(arr,v){var i=arr.indexOf(v);if(i>=0)arr.splice(i,1);else arr.push(v);}
+function lastStep(){return state.s3.lastRun?state.s3.lastRun.length:0;}
+
+document.addEventListener('click',function(e){
+  var b=e.target.closest('[data-act]');if(!b||b.disabled)return;
+  var act=b.dataset.act, arg=b.dataset.arg, n=+arg;
+  if(b.tagName==='INPUT'||b.tagName==='SELECT')return; // handled on change
+  switch(act){
+    case 'go': go(n); break;
+    case 'next': go(state.stage+1); break;
+    case 'begin': state.attempted[0]=true; go(1); break;
+    case 's1pick': update(function(s){s.s1.pick=arg;if(s.s1.tried.indexOf(arg)<0)s.s1.tried.push(arg);s.attempted[1]=true;}); break;
+    case 'ownt': update(function(s){s.s2.own.forEach(function(r){if(r.id===n)r.t=1-r.t;});ownChanged(s);}); break;
+    case 'ownup': update(function(s){moveRow(s.s2.own,n,-1);ownChanged(s);}); break;
+    case 'owndown': update(function(s){moveRow(s.s2.own,n,1);ownChanged(s);}); break;
+    case 'owndel': update(function(s){if(s.s2.own.length>6)s.s2.own=s.s2.own.filter(function(r){return r.id!==n;});ownChanged(s);}); break;
+    case 'ownadd': update(function(s){if(s.s2.own.length<10){var id=s.s2.nextId++;s.s2.own.push({id:id,name:poolName(id),hh:'A',t:0});ownChanged(s);}}); break;
+    case 'predc': update(function(s){toggleIn(s.s2.predCanon,n);s.s2.checkedCanon=false;}); break;
+    case 'predo': update(function(s){toggleIn(s.s2.predOwn,n);s.s2.checkedOwn=false;}); break;
+    case 'checkc': update(function(s){s.s2.checkedCanon=true;if(s.s2.critique)s.attempted[2]=true;}); break;
+    case 'checko': update(function(s){s.s2.checkedOwn=true;}); break;
+    case 'addcard': update(function(s){if(s.s3.algo.indexOf(arg)<0)s.s3.algo.push(arg);}); break;
+    case 'cup': update(function(s){moveIn(s.s3.algo,arg,-1);}); break;
+    case 'cdown': update(function(s){moveIn(s.s3.algo,arg,1);}); break;
+    case 'cdel': update(function(s){s.s3.algo=s.s3.algo.filter(function(x){return x!==arg;});}); break;
+    case 'clearalgo': update(function(s){s.s3.algo=[];}); break;
+    case 'run': stopPlay(); update(function(s){s.s3.ran=true;s.s3.lastRun=s.s3.algo.slice();s.s3.step=0;s.attempted[3]=true;}); startPlay(); break;
+    case 'tback': stopPlay(); update(function(s){s.s3.step=Math.max(0,s.s3.step-1);}); break;
+    case 'tfwd': stopPlay(); update(function(s){s.s3.step=Math.min(lastStep(),s.s3.step+1);}); break;
+    case 'tend': stopPlay(); update(function(s){s.s3.step=lastStep();}); break;
+    case 'tplay': if(playTimer){stopPlay();render();notify();}else{if(state.s3.step>=lastStep())state.s3.step=0;startPlay();} break;
+    case 'hint': update(function(s){s.s3.hints=Math.min(HINTS.length,(s.s3.hints||0)+1);}); break;
+    case 'demo': update(function(s){s.s3.demo=!s.s3.demo;}); break;
+    case 'checkcond': update(function(s){var ev=evalCondition(CANON);s.s4.checked=true;s.s4.correct=ev.complete&&setEq(ev.sel,removalSet(CANON));s.attempted[4]=true;if(!s.s4.correct){s.s4.purpose='';s.s4.keepChecked=false;}}); break;
+    case 'checkkeep': update(function(s){s.s4.keepChecked=true;}); break;
+    case 'hl': update(function(s){s.s4.hl=(s.s4.hl===n?null:n);}); break;
+    case 'clean': update(function(s){s.sim.cleaned=!s.sim.cleaned;s.attempted[5]=true;}); break;
+    case 'reseed': update(function(s){s.seed++;}); break;
+    case 'dist': update(function(s){s.sim.dist=arg;}); break;
+    case 'reveal6': update(function(s){s.s6.revealed=true;s.attempted[6]=true;}); break;
+  }
+});
+function startPlay(){
+  stopPlay();
+  playTimer=setInterval(function(){
+    if(state.stage!==3||state.s3.step>=lastStep()){stopPlay();render();return;}
+    state.s3.step++;render();
+    if(state.s3.step>=lastStep()){stopPlay();render();notify();}
+  },1100);
+  render();
+}
+document.addEventListener('change',function(e){
+  var t=e.target;if(!t.dataset)return;var act=t.dataset.act,arg=t.dataset.arg;
+  switch(act){
+    case 'ownhh': update(function(s){s.s2.own.forEach(function(r){if(r.id===+arg)r.hh=t.value;});ownChanged(s);}); break;
+    case 'crit': update(function(s){s.s2.critique=arg;if(s.s2.checkedCanon)s.attempted[2]=true;}); break;
+    case 'cond': update(function(s){var p=arg.split('.');if(p.length===2)s.s4[p[0]][p[1]]=t.value;else s.s4[arg]=t.value;s.s4.checked=false;}); break;
+    case 'purpose': update(function(s){s.s4.purpose=arg;}); break;
+    case 'keep': update(function(s){toggleIn(s.s4.keep,arg);s.s4.keepChecked=false;}); break;
+    case 'pred6': update(function(s){s.s6.pred=arg;}); break;
+    case 'design': update(function(s){s.design=arg;s.s7.changed=true;s.attempted[7]=true;}); break;
+    case 'p': renderSim(); break;
+  }
+});
+function renderSim(){
+  var out=document.getElementById('simOut');if(!out)return;
+  out.innerHTML=state.stage===5?simOut5():simOut67(state.stage);
+}
+document.addEventListener('input',function(e){
+  var t=e.target;if(!t.dataset)return;
+  if(t.dataset.act==='p'){state.p=Math.round(parseFloat(t.value)*100)/100;var r=document.getElementById('pRead');if(r)r.textContent='p = '+state.p.toFixed(2);renderSim();if(state.stage===7){state.attempted[7]=true;}notify();return;}
+  var k=t.dataset.in;if(!k)return;
+  update(function(s){
+    if(k in s)s[k]=t.value;
+    if(k.indexOf('refl')===0)s.attempted[7]=true;
+  },{render:false});
+});
+/* drag to reorder own dataset rows */
+var dragId=null;
+document.addEventListener('dragstart',function(e){var tr=e.target.closest&&e.target.closest('tr[data-drag]');if(!tr)return;dragId=+tr.dataset.drag;tr.classList.add('dragging');if(e.dataTransfer){e.dataTransfer.effectAllowed='move';try{e.dataTransfer.setData('text/plain',String(dragId));}catch(err){}}});
+document.addEventListener('dragover',function(e){var tr=e.target.closest&&e.target.closest('tr[data-drag]');if(!tr||dragId===null)return;e.preventDefault();document.querySelectorAll('tr.droptarget').forEach(function(x){x.classList.remove('droptarget');});tr.classList.add('droptarget');});
+document.addEventListener('drop',function(e){var tr=e.target.closest&&e.target.closest('tr[data-drag]');if(!tr||dragId===null)return;e.preventDefault();var to=+tr.dataset.drag,from=dragId;dragId=null;
+  update(function(s){var rows=s.s2.own,i=rows.findIndex(function(r){return r.id===from;}),j=rows.findIndex(function(r){return r.id===to;});if(i<0||j<0||i===j)return;var x=rows.splice(i,1)[0];rows.splice(j,0,x);ownChanged(s);});});
+document.addEventListener('dragend',function(){dragId=null;document.querySelectorAll('tr.dragging,tr.droptarget').forEach(function(x){x.classList.remove('dragging','droptarget');});});
+
+document.getElementById('projBtn').addEventListener('click',function(){
+  projector=!projector;document.body.classList.toggle('projector',projector);document.body.classList.toggle('laptop',!projector);this.setAttribute('aria-pressed',String(projector));
+});
+document.getElementById('copyBtn').addEventListener('click',function(){
+  var txt=summaryText(), msg=document.getElementById('copyMsg');
+  function fallback(){var ta=document.createElement('textarea');ta.value=txt;ta.setAttribute('readonly','');ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();var ok=false;try{ok=document.execCommand('copy');}catch(err){}document.body.removeChild(ta);msg.textContent=ok?'Copied.':'Select the text above and copy it.';}
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(function(){msg.textContent='Copied.';},fallback);}else fallback();
+});
+
+/* ---------- assertions and API ---------- */
+var assertions=[
+  {name:'Canonical removal set is Ben, Fe, Iggy (2, 6, 9)',run:function(){return setEq(removalSet(CANON),new Set([2,6,9]));}},
+  {name:'List-based algorithm is correct on Z, X and Y',run:function(){return [CANON,DATA_X,DATA_Y].every(function(d){return setEq(runAlgo(V1,d).removed,removalSet(d));});}},
+  {name:'Household-by-household algorithm is correct on Z and Y',run:function(){return [CANON,DATA_Y].every(function(d){return setEq(runAlgo(V2,d).removed,removalSet(d));});}},
+  {name:'Order matters: asking before the list exists removes nobody',run:function(){return runAlgo(['c_find','c_ask','c_list','c_remove'],CANON).removed.size===0;}},
+  {name:'“Row above” card passes on Y and fails on Z',run:function(){return setEq(runAlgo(['r_above'],DATA_Y).removed,removalSet(DATA_Y))&&!setEq(runAlgo(['r_above'],CANON).removed,removalSet(CANON));}},
+  {name:'Dataset Z covers all five test cases; Y and X do not',run:function(){return coverage(CANON).every(Boolean)&&!coverage(DATA_Y).every(Boolean)&&!coverage(DATA_X).every(Boolean);}},
+  {name:'De Morgan: keep options a and b keep exactly 1,3,4,5,7,8; c keeps nobody',run:function(){var t=new Set([1,3,4,5,7,8]);return setEq(keptBy(KEEP[0],CANON),t)&&setEq(keptBy(KEEP[1],CANON),t)&&keptBy(KEEP[2],CANON).size===0;}},
+  {name:'Household randomization never produces mixed households',run:function(){for(var sd=1;sd<=20;sd++){if(simulate(0.5,sd,'hhrand').mixed!==0)return false;}return true;}},
+  {name:'Controls living alone always survive cleaning',run:function(){var sv=survival.apply(null,(function(){var s=simulate(0.5,3,'clean');return [s.T,s.kept];})());return sv[1].n===0||sv[1].s===sv[1].n;}},
+  {name:'Mean survival of controls in 2-person households over 200 draws at p = 0.5 is within 0.05 of 0.5',run:function(){var tot=0,surv=0;for(var sd=1;sd<=200;sd++){var s=simulate(0.5,sd,'clean'),v=survival(s.T,s.kept);tot+=v[2].n;surv+=v[2].s;}return Math.abs(surv/tot-0.5)<0.05;}},
+  {name:'Without cleaning, the household-size gap averaged over 100 draws is near zero',run:function(){var g=0;for(var sd=1;sd<=100;sd++){var s=simulate(0.5,sd,'none'),b=balance(s.T,null);g+=b[1].mSize-b[0].mSize;}return Math.abs(g/100)<0.1;}},
+  {name:'After cleaning, controls live in smaller households on average (100 draws)',run:function(){var g=0;for(var sd=1;sd<=100;sd++){var s=simulate(0.5,sd,'clean'),b=balance(s.T,s.kept);g+=b[1].mSize-b[0].mSize;}return g/100>0.5;}}
+];
+window.artifact={
+  getState:function(){return JSON.parse(JSON.stringify(state));},
+  setState:function(patch){
+    stopPlay();
+    (function merge(t,p){Object.keys(p).forEach(function(k){if(!Object.prototype.hasOwnProperty.call(t,k))return;if(p[k]&&typeof p[k]==='object'&&!Array.isArray(p[k])&&t[k]&&typeof t[k]==='object'&&!Array.isArray(t[k]))merge(t[k],p[k]);else t[k]=JSON.parse(JSON.stringify(p[k]));});})(state,patch||{});
+    if(!unlocked(state.stage))state.stage=0;
+    render();
+  },
+  onChange:function(fn){listeners.push(fn);return function(){listeners=listeners.filter(function(x){return x!==fn;});};},
+  controls:[
+    {key:'stage',label:'Stage',kind:'choice',options:[0,1,2,3,4,5,6,7]},
+    {key:'p',label:'Probability of treatment, p',kind:'range',min:0.05,max:0.95,step:0.05},
+    {key:'seed',label:'Assignment draw',kind:'range',min:1,max:1000000,step:1},
+    {key:'design',label:'Design',kind:'choice',options:['clean','none','dropmixed','hhrand']}
+  ],
+  responses:[
+    {key:'why1',prompt:'Why can’t the cleaning be done without the Treated column?'},
+    {key:'critWhy',prompt:'Why does your choice of test dataset matter?'},
+    {key:'why6',prompt:'After cleaning, are the groups still comparable? Why?'},
+    {key:'refl1',prompt:'The cleaning step fixed one problem and created another. Name both.'},
+    {key:'refl2',prompt:'What design would you recommend to the World Bank, and what does it cost?'},
+    {key:'refl3',prompt:'Which of your stage 2 test cases turned out to matter most, and why?'}
+  ],
+  assertions:assertions,
+  referenceCases:[]
+};
+document.getElementById('specText').innerHTML=SPEC_ITEMS;
+render();
+})();
+</script>
+
+<script>
+(function () {
+  var cfg = {"versionId":"cmvvg43iq000008law6upig9k","appOrigin":"https://ideasatplay.org","direct":null};
+  var t0 = Date.now(), scrolled = false, acted = false, reached = false, shown = false, config = null;
+  var framed = parent !== window;
+  function onScreen(el) {
+    if (!el.getClientRects().length) return false;
+    var r = el.getBoundingClientRect();
+    return r.top < innerHeight && r.bottom > 0;
+  }
+  function atBottom() {
+    var f = document.querySelector("footer[data-kc-credit]");
+    if (f) return f.getBoundingClientRect().top <= innerHeight;
+    var d = document.documentElement;
+    return scrollY + innerHeight >= d.scrollHeight - 48;
+  }
+  // { cur, last } when the page moves through numbered steps, else null.
+  function steps() {
+    var a = window.artifact;
+    try {
+      var c = a && Array.isArray(a.controls) ? a.controls.filter(function (x) { return x && x.key === "step" && typeof x.max === "number"; })[0] : null;
+      if (c) { var s = a.getState(); if (s && typeof s.step === "number") return { cur: s.step, last: c.max }; }
+    } catch (e) {}
+    var cur = document.querySelector('[aria-current="step"]');
+    if (cur && cur.parentElement) {
+      var sib = Array.prototype.filter.call(cur.parentElement.children, function (x) { return x.getClientRects().length; });
+      return { cur: sib.indexOf(cur), last: sib.length - 1 };
+    }
+    return null;
+  }
+  function finished() {
+    var mark = document.querySelector("[data-kc-end]");
+    if (mark) return onScreen(mark);
+    var s = steps();
+    if (s) return s.cur >= s.last && atBottom();
+    return atBottom() && (scrolled || (acted && Date.now() - t0 > 60000));
+  }
+  // The student link remembers a rating in its own storage where the browser allows it.
+  var KEY = "kc-rated-" + cfg.versionId;
+  function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
+  if (cfg.direct) config = { ask: !store(KEY), preview: false, labels: cfg.direct.labels };
+  var visitor = (function () {
+    var v = store("kc-visitor");
+    if (!v) { v = ""; for (var i = 0; i < 24; i++) v += "abcdefghijklmnopqrstuvwxyz0123456789".charAt(Math.floor(Math.random() * 36)); store("kc-visitor", v); }
+    return v;
+  })();
+  var pending = {}, seq = 0;
+  function save(score, comment) {
+    if (cfg.direct) {
+      var body = { versionId: cfg.versionId, score: score, context: "share", visitor: visitor };
+      if (comment) body.comment = comment;
+      // text/plain: a simple request, so no preflight is needed.
+      return fetch(cfg.direct.endpoint, { method: "POST", credentials: "omit", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(body) })
+        .then(function (r) { if (r.ok) store(KEY, String(score)); return r.ok; }, function () { return false; });
+    }
+    return new Promise(function (resolve) {
+      var id = ++seq; pending[id] = resolve;
+      parent.postMessage({ type: "kc:rate", versionId: cfg.versionId, id: id, score: score, comment: comment || "" }, cfg.appOrigin);
+      setTimeout(function () { if (pending[id]) { delete pending[id]; resolve(false); } }, 15000);
+    });
+  }
+  var B = "display:inline-block;margin:3px 6px 3px 0;padding:4px 10px;border:1px solid #a8a29e;border-radius:6px;background:#fff;color:#1c1917;font:inherit;cursor:pointer";
+  function el(tag, attrs, text) { var e = document.createElement(tag); for (var k in attrs) e.setAttribute(k, attrs[k]); if (text) e.textContent = text; return e; }
+  function show() {
+    if (shown || !config || !config.ask) return;
+    shown = true;
+    clearInterval(timer);
+    var L = config.labels;
+    var box = el("div", { "data-kc-rating": "", "data-kc-personal": "", role: "region", "aria-label": L.ask, lang: L.lang, dir: L.dir,
+      style: "box-sizing:border-box;max-width:760px;margin:24px auto 0;padding:10px 14px;border:1px solid #d6d3d1;border-radius:10px;background:#fafaf9;color:#1c1917;font:14px/1.5 system-ui,-apple-system,sans-serif;text-align:start" });
+    var live = el("div", { "aria-live": "polite" });
+    box.appendChild(live);
+    function ask(msg) {
+      live.innerHTML = "";
+      live.appendChild(el("span", { style: "font-weight:600;margin-inline-end:8px" }, L.ask));
+      [1, 2, 3].forEach(function (s) {
+        var b = el("button", { type: "button", style: B }, s + " · " + L["s" + s]);
+        b.addEventListener("click", function () {
+          live.querySelectorAll("button").forEach(function (x) { x.disabled = true; });
+          save(s, "").then(function (ok) { if (ok) comment(s); else ask(L.error); });
+        });
+        live.appendChild(b);
+      });
+      if (config.preview) live.appendChild(el("div", { style: "font-size:12px;color:#57534e" }, L.preview));
+      if (msg) live.appendChild(el("div", { role: "alert", style: "color:#991b1b;font-size:13px" }, msg));
+    }
+    function comment(score) {
+      live.innerHTML = "";
+      var id = "kc-rate-comment";
+      live.appendChild(el("label", { for: id, style: "display:block;font-weight:600;margin-bottom:4px" }, L.comment));
+      var row = el("div", { style: "display:flex;flex-wrap:wrap;gap:6px;align-items:center" });
+      var input = el("input", { id: id, type: "text", maxlength: "1000", autocomplete: "off", dir: "auto",
+        style: "flex:1 1 260px;min-width:0;box-sizing:border-box;padding:5px 8px;border:1px solid #a8a29e;border-radius:6px;background:#fff;color:#1c1917;font:inherit" });
+      var send = el("button", { type: "button", style: B + ";background:#292524;color:#fff;border-color:#292524" }, L.send);
+      var skip = el("button", { type: "button", style: B }, L.skip);
+      function done() { live.innerHTML = ""; live.appendChild(el("span", { style: "font-weight:600" }, L.thanks)); setTimeout(function () { box.remove(); }, 2000); }
+      send.addEventListener("click", function () {
+        var text = input.value.trim();
+        if (!text) return done();
+        send.disabled = skip.disabled = true;
+        save(score, text).then(function (ok) { if (ok) done(); else { send.disabled = skip.disabled = false; live.appendChild(el("div", { role: "alert", style: "color:#991b1b;font-size:13px" }, L.error)); } });
+      });
+      input.addEventListener("keydown", function (e) { if (e.key === "Enter") send.click(); });
+      skip.addEventListener("click", done);
+      row.appendChild(input); row.appendChild(send); row.appendChild(skip);
+      live.appendChild(row);
+      input.focus();
+    }
+    ask("");
+    var mark = document.querySelector("[data-kc-end]"), foot = document.querySelector("footer[data-kc-credit]");
+    if (mark) mark.insertAdjacentElement("afterend", box);
+    else if (foot) foot.parentNode.insertBefore(box, foot);
+    else document.body.appendChild(box);
+  }
+  function check() {
+    if (!reached && finished()) reached = true;
+    if (reached) show();
+  }
+  window.addEventListener("message", function (e) {
+    if (e.source !== parent || !e.data || e.data.versionId !== cfg.versionId) return;
+    var d = e.data;
+    if (d.type === "kc:rate-config" && !cfg.direct) { config = { ask: !!d.ask, preview: !!d.preview, labels: d.labels }; check(); }
+    if (d.type === "kc:rate-result" && pending[d.id]) { pending[d.id](!!d.ok); delete pending[d.id]; }
+  });
+  // The app page may start listening after this page loads: ask a few times.
+  var hellos = 0;
+  function hello() { if (framed && !cfg.direct && !config && hellos++ < 8) parent.postMessage({ type: "kc:rate-hello", versionId: cfg.versionId }, cfg.appOrigin); }
+  hello();
+  var timer = setInterval(function () { if (hellos < 8 && !config) hello(); check(); }, 800);
+  window.addEventListener("scroll", function () { if (scrollY > 0) scrolled = true; check(); }, { passive: true });
+  ["click", "input", "keydown"].forEach(function (t) { document.addEventListener(t, function (e) { if (e.target && e.target.closest && e.target.closest("[data-kc-rating]")) return; acted = true; setTimeout(check, 50); }, true); });
+})();
+</script></body>
+</html>

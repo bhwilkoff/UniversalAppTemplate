@@ -1,0 +1,1234 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Balance tests and the search for weights: you are the genetic algorithm</title>
+<style>
+:root{
+  --bg:#fbfaf7;--card:#ffffff;--ink:#22252a;--muted:#5b626d;--rule:#d6d2ca;--faint:#efece6;
+  --accent:#2E4057;--contrast:#B84A00;--good:#1d6b45;--bad:#a3341f;
+}
+@media (prefers-color-scheme: dark){
+  :root{--bg:#16181c;--card:#1f2228;--ink:#ece9e3;--muted:#a9afb8;--rule:#3b4048;--faint:#2a2e35;
+    --accent:#9dbfe3;--contrast:#ff9a52;--good:#7fd1a4;--bad:#ff9b85;}
+}
+*{box-sizing:border-box}
+[hidden]{display:none !important}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+main{max-width:1100px;margin:0 auto;padding:24px 20px 64px}
+h1{font-size:1.7rem;line-height:1.25;margin:0 0 .3em;font-weight:650}
+h2{font-size:1.3rem;line-height:1.3;margin:0 0 .5em;font-weight:620}
+h3{font-size:1.05em;margin:.2em 0 .4em;font-weight:620}
+p{margin:.4em 0 .8em;max-width:72ch}
+.lede{color:var(--muted)}
+.topbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:8px;overflow:hidden}
+.seg button{border:0;border-radius:0;border-inline-end:1px solid var(--rule)}
+.seg button:last-child{border-inline-end:0}
+button{font:inherit;font-size:14px;min-height:32px;padding:5px 12px;border:1px solid var(--rule);border-radius:8px;background:var(--card);color:var(--ink);cursor:pointer}
+button:hover:not(:disabled){border-color:var(--muted)}
+button[aria-pressed="true"],button[aria-current="page"]{background:var(--accent);color:var(--card);border-color:var(--accent)}
+button.primary{background:var(--accent);color:var(--card);border-color:var(--accent)}
+button:disabled{opacity:.45;cursor:default}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+nav.parts{display:flex;gap:8px;margin:16px 0}
+section.card{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:20px 22px;margin:14px 0}
+.note{font-size:13px;color:var(--muted)}
+.cases{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,460px),1fr));gap:16px}
+.case{border:1px solid var(--rule);border-radius:10px;padding:14px 16px;background:var(--card)}
+.predrow{display:grid;grid-template-columns:7.5em 1fr;gap:8px;align-items:center;margin:.35em 0;font-size:14px}
+.predrow .seg button{font-size:13px;padding:4px 10px}
+.predrow.wide{grid-template-columns:1fr;gap:4px;margin-top:.6em}
+.predrow.wide .seg{justify-self:start}
+.out{margin-top:.6em;font-size:14.5px}
+.out table{margin:.3em 0}
+.verdict-ok{color:var(--good);font-weight:600}
+.verdict-no{color:var(--bad);font-weight:600}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--muted);margin:.3em 0}
+svg{display:block;width:100%;height:auto;overflow:visible}
+svg text{fill:var(--ink);font-size:12px}
+svg .muted{fill:var(--muted)}
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums;border-top:1.5px solid var(--ink);border-bottom:1.5px solid var(--ink)}
+th,td{padding:5px 8px;text-align:end;white-space:nowrap}
+th:first-child,td:first-child{text-align:start}
+thead th{border-bottom:1px solid var(--ink);font-weight:600}
+td.worst{font-weight:700;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:3px}
+tr.best td{background:var(--faint);font-weight:600}
+.summary{border-inline-start:3px solid var(--accent);padding-inline-start:14px;margin-top:16px}
+fieldset.q{border:0;padding:0;margin:0}
+fieldset.q legend{font-weight:620;padding:0;margin-bottom:.5em;max-width:72ch}
+.opts{display:grid;gap:8px;margin:.4em 0}
+.opts button{text-align:start;font-size:15px;padding:8px 12px;line-height:1.4;white-space:normal}
+.opts button .mark{font-weight:700;margin-inline-end:6px}
+.opts button.right{border:2px solid var(--good)}
+.opts button.wrong{border:2px solid var(--bad)}
+.fb{margin:.6em 0 .2em;font-size:15px;max-width:72ch}
+.fb .verdict{font-weight:700}
+.fb.ok .verdict{color:var(--good)}
+.fb.no .verdict{color:var(--bad)}
+.row.next{justify-content:flex-end;margin:14px 0}
+ol.rules{padding-inline-start:1.4em;max-width:72ch}
+ol.rules li{margin:.25em 0}
+.cands{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,290px),1fr));gap:14px;margin:.4em 0 .6em}
+.cand{border:1px solid var(--rule);border-radius:10px;padding:12px 14px}
+.cand.locked{background:var(--faint)}
+.candhead{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;justify-content:space-between;margin-bottom:6px}
+.wrow3{display:grid;grid-template-columns:8.5em auto;gap:8px;align-items:center;margin:.35em 0;font-size:14px}
+.wrow3 .seg button{font-size:13px;padding:4px 10px;min-width:32px}
+.shares3{margin:.5em 0}
+.copybest{font-size:13px}
+#tradeoff tr.worse td{color:var(--contrast);font-weight:650}
+#tradeoff tr.tot td{border-top:1px solid var(--ink)}
+#histFull td{padding-top:2px;padding-bottom:2px}
+.gaops{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.opnote{min-height:1.2em;margin:.2em 0 0}
+#histFull .tablewrap{max-height:none}
+#histFull td{white-space:nowrap;font-size:13px}
+body.projector .wrow3,body.projector .wrow3 .seg button,body.projector .copybest{font-size:19px}
+body.projector .wrow3{grid-template-columns:9em auto}
+body.projector .opts button,body.projector .fb{font-size:22px}
+/* part 2 */
+.p2grid{display:grid;grid-template-columns:minmax(0,0.9fr) minmax(0,1.1fr);gap:24px;align-items:start}
+@media (max-width:860px){.p2grid{grid-template-columns:minmax(0,1fr)}}
+.wrow{display:grid;grid-template-columns:8.5em auto 1fr;gap:10px;align-items:center;margin:.45em 0;font-size:14px}
+.share{display:flex;align-items:center;gap:6px;font-variant-numeric:tabular-nums;font-size:13px;color:var(--muted)}
+.share .bar{height:10px;background:var(--accent);border-radius:2px;min-width:1px}
+.panel{position:relative}
+.overlay{position:absolute;inset:0;background:color-mix(in srgb,var(--card) 92%,transparent);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;border-radius:10px;z-index:2;text-align:center;padding:20px}
+.progress{width:min(320px,80%);height:10px;border:1px solid var(--accent);border-radius:5px;overflow:hidden}
+.progress div{height:100%;width:0;background:var(--accent)}
+@media (prefers-reduced-motion:no-preference){.progress.run div{animation:fill 1.5s linear forwards}}
+@media (prefers-reduced-motion:reduce){.progress.run div{width:100%}}
+@keyframes fill{from{width:0}to{width:100%}}
+.big{font-size:1.6rem;font-weight:700;font-variant-numeric:tabular-nums}
+.readout{font-size:15px;font-variant-numeric:tabular-nums;margin:.4em 0}
+.locked{border:2px dashed var(--muted);border-radius:10px;padding:16px;margin-top:16px}
+.unlocked{border:2px solid var(--accent);border-radius:10px;padding:16px;margin-top:16px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:.6em 0}
+.log{max-height:320px;overflow:auto}
+.log td button{font-size:12.5px;min-height:24px;padding:2px 8px}
+details{margin:.4em 0}
+summary{cursor:pointer;font-weight:600;min-height:24px}
+details ul{margin:.4em 0;padding-inline-start:1.2em;max-width:75ch}
+details li{margin:.3em 0}
+.kind{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-inline-end:6px}
+/* projector */
+body.projector{font-size:24px}
+body.projector main{max-width:1800px}
+body.projector h1{font-size:2.3rem}
+body.projector h2{font-size:1.8rem}
+body.projector button,body.projector table,body.projector .predrow,body.projector .wrow,body.projector .out{font-size:20px}
+body.projector .predrow .seg button{font-size:19px}
+body.projector .note,body.projector .legend,body.projector .share{font-size:18px}
+body.projector .readout{font-size:22px}
+body.projector svg text{font-size:15px}
+body.projector .predrow{grid-template-columns:8em 1fr}
+body.projector .predrow.wide{grid-template-columns:1fr}
+body.projector .wrow{grid-template-columns:9em auto 1fr}
+.stepbar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:12px 0}
+.stepbar button{font-size:13px}
+.stepbar button[aria-current="step"]{background:var(--accent);color:var(--card);border-color:var(--accent)}
+.stepbar .group{font-size:12px;color:var(--muted);margin-inline:8px 2px;text-transform:uppercase;letter-spacing:.04em}
+.stepnum{font-size:13px;color:var(--muted);margin:0}
+#stepH{margin:.1em 0 .3em}
+.hint{margin:0 0 1em;max-width:78ch}
+.hint:empty{display:none}
+.moves{display:flex;justify-content:space-between;gap:8px;margin-top:16px}
+#cases .case{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:28px;align-items:start;border:0;padding:0}
+#cases .case>h3{display:none}
+#cases .case>svg{grid-column:1;grid-row:1/span 8}
+#cases .case>*:not(svg){grid-column:2}
+@media (max-width:760px){#cases .case{grid-template-columns:minmax(0,1fr)}#cases .case>svg,#cases .case>*:not(svg){grid-column:1;grid-row:auto}}
+.log.short{max-height:170px;margin-top:10px}
+.cands{gap:10px;margin:.3em 0 .4em}
+.cand{padding:8px 12px}
+.candhead{margin-bottom:2px}
+.wrow3{margin:.15em 0}
+.wrow3 .seg button{padding:2px 9px;min-height:26px}
+.shares3{margin:.3em 0;font-size:12px}
+[data-steps="8"] .log.short{max-height:130px}
+body.projector .stepbar button{font-size:18px}
+body.projector .stepnum{font-size:18px}
+</style>
+</head>
+<body class="laptop">
+<main>
+  <div class="topbar">
+    <h1>Checking balance, then searching for it</h1>
+    <div class="seg" role="group" aria-label="Text size">
+      <button type="button" id="scLaptop" aria-pressed="true">Laptop</button>
+      <button type="button" id="scProj" aria-pressed="false">Projector</button>
+    </div>
+  </div>
+  <nav class="stepbar" id="stepbar" aria-label="Steps"></nav>
+
+  <section class="card" aria-labelledby="stepH">
+    <p class="stepnum" id="stepNum"></p>
+    <h2 id="stepH" tabindex="-1"></h2>
+    <p class="hint" id="stepHint"></p>
+
+    <!-- Part 1, steps 1–5: one case per screen (built by the script) -->
+    <div id="cases"></div>
+
+    <!-- Part 1, step 6 -->
+    <div data-steps="5">
+      <div class="summary" id="p1summary">
+        <p>The t-test sees only means, so it misses differences in spread and shape. The KS test sees the whole distribution. GenMatch uses both.</p>
+        <p>The exception is a <strong>binary</strong> variable: its whole distribution is the share of 1s, which is also its mean. Both tests then ask the same question, and in large samples their p-values coincide.</p>
+      </div>
+      <fieldset class="q" id="balQ">
+        <legend id="balQH">So: if these tests measure balance, do you want their p-values as high as possible or as low as possible?</legend>
+        <div class="opts" id="balOpts"></div>
+        <p class="fb" id="balFb" aria-live="polite"></p>
+      </fieldset>
+    </div>
+
+    <!-- Part 2, step 7: search by hand -->
+    <div class="p2grid" data-steps="6">
+      <div class="panel" id="wpanel">
+        <div id="wrows"></div>
+        <p class="note" id="sumNote"></p>
+        <div class="row">
+          <button type="button" class="primary" id="runBtn">Run matching</button>
+          <button type="button" id="eqBtn">Equal weights</button>
+        </div>
+        <p class="note" id="runNote"></p>
+        <div class="tablewrap log short">
+          <table>
+            <thead><tr><th>Try</th><th>Age</th><th>Educ.</th><th>Black</th><th>Married</th><th>Earn.</th><th>Smallest p</th><th></th></tr></thead>
+            <tbody id="logBody"></tbody>
+          </table>
+        </div>
+        <p class="note">Your tries, weights normalized to sum to 1. Load one and change it a little.</p>
+        <div class="overlay" id="overlay" hidden role="status" aria-live="assertive">
+          <strong id="ovText">Matching underway…</strong>
+          <div class="progress" id="progress"><div></div></div>
+          <span class="note" id="ovSub"></span>
+        </div>
+      </div>
+      <div>
+        <p class="note" id="beforeLine"></p>
+        <div id="resBody" aria-live="polite">
+          <p class="note" id="resEmpty">Run matching to see balance.</p>
+          <div id="resFull" hidden>
+            <p class="readout">Try <span id="tryNo"></span>: smallest p-value <span class="big" id="worstOut"></span></p>
+            <p class="note" id="bestLine"></p>
+            <div class="tablewrap">
+              <table>
+                <thead><tr><th>Covariate</th><th>Treated</th><th>Matched</th><th>t-test p</th><th>KS p</th></tr></thead>
+                <tbody id="balBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Part 2, step 8: the outcome -->
+    <div data-steps="7">
+      <div class="locked" id="yLocked">
+        <div class="row" id="yAsk">
+          <button type="button" class="primary" id="yBtn">I'm done balancing: use the Ys</button>
+          <span class="note" id="yNote"></span>
+        </div>
+        <div id="yConfirm" hidden>
+          <p>Your weights will be frozen at your best try (smallest p-value <span id="yBest"></span>). Ready?</p>
+          <div class="row">
+            <button type="button" class="primary" id="yYes">Yes, use the Ys</button>
+            <button type="button" id="yNo">Keep balancing</button>
+          </div>
+        </div>
+      </div>
+      <div class="unlocked" id="yOpen" hidden aria-live="polite">
+        <p class="readout">Estimated effect on 1978 earnings (ATT), from your best try:</p>
+        <p><span class="big" id="attOut"></span> <span class="readout" id="attCi"></span></p>
+        <p class="readout" id="attP"></p>
+        <p id="truthText"></p>
+        <p id="gridText"></p>
+        <div class="row"><button type="button" id="restartBtn">Start a new search</button></div>
+      </div>
+    </div>
+
+    <!-- Part 3, step 9: generations by hand -->
+    <div data-steps="8">
+      <p class="note" id="before3"></p>
+      <div class="panel" id="genPanel">
+        <h3 id="genH" hidden></h3>
+        <div class="cands" id="cands"></div>
+        <div class="row">
+          <button type="button" class="primary" id="evalBtn">Evaluate this generation</button>
+          <span class="note" id="evalNote"></span>
+        </div>
+        <div class="overlay" id="overlay3" hidden role="status" aria-live="assertive">
+          <strong>Matching underway</strong>
+          <div class="progress" id="progress3"><div></div></div>
+          <span class="note" id="ov3Sub"></span>
+        </div>
+      </div>
+      <p id="p3allDone" hidden>All five generations are done. <button type="button" id="toResults">See the results</button></p>
+      <p class="note" id="histEmpty">Nothing evaluated yet.</p>
+      <div id="histFull" hidden>
+        <div class="tablewrap log short">
+          <table>
+            <thead><tr><th>Gen.</th><th>Candidate 1</th><th>Candidate 2</th><th>Candidate 3</th><th>Best so far</th></tr></thead>
+            <tbody id="genLog"></tbody>
+          </table>
+        </div>
+        <p class="note">Weights on GPA · income · commute · first-gen → smallest p. ★ best so far.</p>
+      </div>
+    </div>
+
+    <!-- Part 3, step 10: results -->
+    <div data-steps="9">
+      <p id="p3notyet">Finish all five generations in step 9 first.</p>
+      <div class="p2grid" id="p3chart" hidden>
+        <div>
+          <svg id="genSvg" viewBox="0 0 420 220" role="img" aria-labelledby="genDesc"><desc id="genDesc"></desc></svg>
+          <div class="legend" aria-hidden="true"><span>+ every candidate</span><span>● best so far</span><span>- - best of all 624</span></div>
+          <div class="summary" id="p3done" style="margin-top:12px" hidden aria-live="polite">
+        <p id="p3doneText"></p>
+        <p>GenMatch runs this loop with hundreds or thousands of candidates per generation. Keeping the best weights means the <em>smallest</em> p-value (the worst-balanced variable) never gets worse. Other variables can, as the table on the right shows.</p>
+        <div class="row"><button type="button" id="restart3">Run the search again (clears generations 1–5)</button></div>
+      </div>
+        </div>
+        <div id="p3side">
+        <div id="bestBal" hidden>
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>Best so far</th><th>Treated</th><th>Matched</th><th>t-test p</th><th>KS p</th></tr></thead>
+            <tbody id="best3Body"></tbody>
+          </table>
+        </div>
+      </div>
+        <div id="tradeoff"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="moves">
+      <button type="button" id="prevStep">← Previous</button>
+      <button type="button" class="primary" id="nextStep">Next →</button>
+      <span class="note" id="endNote" hidden>End of the activity</span>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="ledgerH">
+    <h2 id="ledgerH">What this page assumes</h2>
+    <details>
+      <summary>Assumption ledger</summary>
+      <ul id="ledger"></ul>
+    </details>
+    <p class="note">Left out: the genetic algorithm's internals and matching-adjusted standard errors.</p>
+  </section>
+</main>
+
+<script>
+(function(){
+'use strict';
+
+var LEDGER = [
+  ['data','Part 1 samples are 200 evenly spaced quantiles of each distribution (no random noise), so the pictures show the shapes cleanly.'],
+  ['distribution','Part 1 uses a two-sample Welch t-test. Part 2 uses a paired t-test on matched pairs, as GenMatch does after matching.'],
+  ['distribution','KS p-values come from a bootstrap of the pooled sample (500 draws, the same draws every time), as in Matching::ks.boot. The bootstrap is what makes KS and t agree for binary variables; the textbook asymptotic KS formula does not.'],
+  ['interpretation','"Exactly the same in large samples" is answered yes only for the binary variable: there both tests compare the share of 1s, so their p-values converge. For the other four cases the tests answer different questions, even when both p-values happen to be high or both low.'],
+  ['data','Part 2 data are simulated (seed 4): 120 treated and 800 controls, built to resemble the LaLonde data. The true effect of treatment is $1,500.'],
+  ['simplification','Distance = √Σ (wₖ · Δxₖ / sₖ)², with sₖ the pooled standard deviation of covariate k: a diagonal weight matrix without GenMatch\'s covariance (Cholesky) adjustment. One-to-one nearest neighbour with replacement; ties go to the first control.'],
+  ['parameter','Each weight is 0, ¼, 1, 4 or 16 (3,124 possible settings once all-zero is excluded). Only the ratios matter, which the normalized shares show.'],
+  ['simplification','The ATT is the mean of treated-minus-matched-control outcomes; its p-value and interval come from a paired t-test, not the Abadie–Imbens standard error the Matching package reports.'],
+  ['data','Part 3 data are simulated (seed 5): 100 tutored and 900 untutored students with prior GPA, family income, commute time and first-generation status. Distances use the same standardized, weighted formula as Part 2.'],
+  ['simplification','Part 3 is a genetic algorithm with a population of 3 and at most 5 generations; the best candidate so far is carried into the next generation (elitism), and students do the mutation and crossover themselves. The best of all 624 weight settings (0.741) was found offline by checking every one with this same code.'],
+  ['parameter','The full-search summary (best smallest p 0.571; averages of estimates by balance level) was computed offline by running every one of the 3,124 settings through this same code.']
+];
+
+/* ---------- Random numbers and basic statistics ---------- */
+function rng(seed){ var a = seed >>> 0; return function(){ a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function normal(r){ var u = 0; while(u === 0) u = r(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * r()); }
+function clip(x, a, b){ return Math.min(b, Math.max(a, x)); }
+function mean(a){ var s = 0; for(var i = 0; i < a.length; i++) s += a[i]; return s / a.length; }
+function variance(a){ var m = mean(a), s = 0; for(var i = 0; i < a.length; i++) s += (a[i] - m) * (a[i] - m); return s / (a.length - 1); }
+function lgamma(x){
+  var g = [676.5203681218851,-1259.1392167224028,771.32342877765313,-176.61502916214059,12.507343278686905,-0.13857109526572012,9.9843695780195716e-6,1.5056327351493116e-7];
+  if(x < 0.5) return Math.log(Math.PI / Math.abs(Math.sin(Math.PI * x))) - lgamma(1 - x);
+  x -= 1; var a = 0.99999999999980993, t = x + 7.5;
+  for(var i = 0; i < 8; i++) a += g[i] / (x + i + 1);
+  return 0.5 * Math.log(2 * Math.PI) + (x + 0.5) * Math.log(t) - t + Math.log(a);
+}
+function betacf(a, b, x){
+  var FP = 1e-300, qab = a + b, qap = a + 1, qam = a - 1, c = 1, d = 1 - qab * x / qap, h, m, m2, aa, del;
+  if(Math.abs(d) < FP) d = FP; d = 1 / d; h = d;
+  for(m = 1; m <= 300; m++){
+    m2 = 2 * m; aa = m * (b - m) * x / ((qam + m2) * (a + m2));
+    d = 1 + aa * d; if(Math.abs(d) < FP) d = FP; c = 1 + aa / c; if(Math.abs(c) < FP) c = FP; d = 1 / d; h *= d * c;
+    aa = -(a + m) * (qab + m) * x / ((a + m2) * (qap + m2));
+    d = 1 + aa * d; if(Math.abs(d) < FP) d = FP; c = 1 + aa / c; if(Math.abs(c) < FP) c = FP; d = 1 / d; del = d * c; h *= del;
+    if(Math.abs(del - 1) < 3e-14) break;
+  }
+  return h;
+}
+function ibeta(a, b, x){
+  if(x <= 0) return 0; if(x >= 1) return 1;
+  var bt = Math.exp(lgamma(a + b) - lgamma(a) - lgamma(b) + a * Math.log(x) + b * Math.log(1 - x));
+  return x < (a + 1) / (a + b + 2) ? bt * betacf(a, b, x) / a : 1 - bt * betacf(b, a, 1 - x) / b;
+}
+// Two-sided p-value of a t statistic.
+function tP(t, df){ return ibeta(df / 2, 0.5, df / (df + t * t)); }
+function welchP(a, b){
+  var va = variance(a) / a.length, vb = variance(b) / b.length, se = Math.sqrt(va + vb), d = mean(a) - mean(b);
+  if(se === 0) return d === 0 ? 1 : 0;
+  var df = (va + vb) * (va + vb) / (va * va / (a.length - 1) + vb * vb / (b.length - 1));
+  return tP(d / se, df);
+}
+function pairedP(d){ var n = d.length, m = mean(d), v = variance(d); if(v === 0) return m === 0 ? 1 : 0; return tP(m / Math.sqrt(v / n), n - 1); }
+function ksD(x, y){ // x, y sorted
+  var i = 0, j = 0, D = 0;
+  while(i < x.length && j < y.length){
+    var v = Math.min(x[i], y[j]);
+    while(i < x.length && x[i] <= v) i++;
+    while(j < y.length && y[j] <= v) j++;
+    D = Math.max(D, Math.abs(i / x.length - j / y.length));
+  }
+  return D;
+}
+var asc = function(p, q){ return p - q; };
+// Bootstrap KS (as in Matching::ks.boot): resample both groups from the pooled data. Same draws every call.
+var BOOT = 500, bootCache = {};
+function bootIdx(n){ if(!bootCache[n]){ var r = rng(4242 + n), a = new Int32Array(BOOT * n); for(var i = 0; i < a.length; i++) a[i] = Math.floor(r() * n); bootCache[n] = a; } return bootCache[n]; }
+function ksBootP(a, b){
+  var D = ksD(a.slice().sort(asc), b.slice().sort(asc));
+  if(D === 0) return 1;
+  var pool = a.concat(b), n = pool.length, idx = bootIdx(n), hits = 0, x = new Float64Array(a.length), y = new Float64Array(b.length);
+  for(var k = 0; k < BOOT; k++){
+    var o = k * n;
+    for(var i = 0; i < a.length; i++) x[i] = pool[idx[o + i]];
+    for(var j = 0; j < b.length; j++) y[j] = pool[idx[o + a.length + j]];
+    x.sort(); y.sort();
+    if(ksD(x, y) >= D - 1e-12) hits++;
+  }
+  return hits / BOOT;
+}
+
+/* ---------- Part 1: five pairs of distributions ---------- */
+function qnorm(p){
+  var a = [-3.969683028665376e+01,2.209460984245205e+02,-2.759285104469687e+02,1.383577518672690e+02,-3.066479806614716e+01,2.506628277459239e+00],
+      b = [-5.447609879822406e+01,1.615858368580409e+02,-1.556989798598866e+02,6.680131188771972e+01,-1.328068155288572e+01],
+      c = [-7.784894002430293e-03,-3.223964580411365e-01,-2.400758277161838e+00,-2.549732539343734e+00,4.374664141464968e+00,2.938163982698783e+00],
+      d = [7.784695709041462e-03,3.224671290700398e-01,2.445134137142996e+00,3.754408661907416e+00], pl = 0.02425, q, r;
+  if(p < pl){ q = Math.sqrt(-2 * Math.log(p)); return (((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) / ((((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1); }
+  if(p <= 1 - pl){ q = p - 0.5; r = q * q; return (((((a[0] * r + a[1]) * r + a[2]) * r + a[3]) * r + a[4]) * r + a[5]) * q / (((((b[0] * r + b[1]) * r + b[2]) * r + b[3]) * r + b[4]) * r + 1); }
+  q = Math.sqrt(-2 * Math.log(1 - p)); return -(((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) / ((((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1);
+}
+function pnorm(x){ var t = 1 / (1 + 0.2316419 * Math.abs(x)), d = 0.3989423 * Math.exp(-x * x / 2), p = d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274)))); return x > 0 ? 1 - p : p; }
+var N1 = 200;
+function qs(m, s){ var o = []; for(var i = 0; i < N1; i++) o.push(Math.round((m + s * qnorm((i + 0.5) / N1)) * 10) / 10); return o; }
+function qmix(m1, m2, s){ // 50/50 mixture of two normals: invert the CDF by bisection
+  var o = [];
+  for(var i = 0; i < N1; i++){
+    var p = (i + 0.5) / N1, lo = m1 - 6 * s, hi = m2 + 6 * s;
+    for(var k = 0; k < 60; k++){ var mid = (lo + hi) / 2, F = 0.5 * pnorm((mid - m1) / s) + 0.5 * pnorm((mid - m2) / s); if(F < p) lo = mid; else hi = mid; }
+    o.push(Math.round(lo * 10) / 10);
+  }
+  return o;
+}
+function bin(k){ var o = []; for(var i = 0; i < N1; i++) o.push(i < k ? 1 : 0); return o; }
+var CASES = [
+  { id: 'same', title: 'A. Age (years)', t: qs(30, 8), c: qs(30.4, 8.2), why: 'Same centre, same spread, same shape: neither test finds a difference.' },
+  { id: 'spread', title: 'B. Test score', t: qs(70, 5), c: qs(70, 15), why: 'Identical means, so the t-test sees nothing. But the controls are far more spread out, and KS catches it.' },
+  { id: 'shift', title: 'C. Years of education', t: qs(10, 2), c: qs(12.5, 2), why: 'The whole distribution is shifted, so the means differ and so do the distributions. Both tests notice.' },
+  { id: 'shape', title: 'D. Hours worked per week', t: qmix(30, 50, 3), c: qs(40, Math.sqrt(109)), why: 'Same mean and same variance, different shape: treated people cluster at 30 and 50 hours. Only KS can see that.' },
+  { id: 'binary', title: 'E. Married (0/1)', t: bin(80), c: bin(94), binary: true, why: 'A 7-point gap in the share married (40% against 47%): both tests see the same moderate difference.' }
+];
+var LEVELS = ['low', 'high'], SAME = ['yes', 'no'];
+// Only for a 0/1 variable do the two tests ask the same question, so only there do the p-values coincide in large samples.
+function sameAnswer(c){ return c.binary ? 'yes' : 'no'; }
+var SAME_WHY = {
+  yes: 'Yes: both tests compare the share of 1s, so in large samples their p-values coincide.',
+  no: 'No: the tests answer different questions, so their p-values differ even when both are high or both are low.'
+};
+// Two levels only, split at the conventional 0.05: a three-way call is too subjective for a short breakout.
+function level(p){ return p < 0.05 ? 'low' : 'high'; }
+CASES.forEach(function(c){ c.tp = welchP(c.t, c.c); c.ks = ksBootP(c.t, c.c); });
+
+/* ---------- Part 2: simulated data ---------- */
+var NT = 120, NC = 800, TAU = 1500, SEED = 4;
+var DGP = { age: [29, 7, 32, 9], educ: [11, 2, 11.8, 2.3], black: [0.55, 0.4], married: [0.35, 0.5], re75: [6000, 4000, 9000, 6000] };
+function makeData(seed){
+  var r = rng(seed), T = [], C = [];
+  function person(t){
+    var P = DGP;
+    var age = Math.round(clip(t ? P.age[0] + P.age[1] * normal(r) : P.age[2] + P.age[3] * normal(r), 18, 60));
+    var educ = Math.round(clip(t ? P.educ[0] + P.educ[1] * normal(r) : P.educ[2] + P.educ[3] * normal(r), 4, 18));
+    var black = r() < (t ? P.black[0] : P.black[1]) ? 1 : 0;
+    var married = r() < (t ? P.married[0] : P.married[1]) ? 1 : 0;
+    var re75 = Math.round(Math.max(0, t ? P.re75[0] + P.re75[1] * normal(r) : P.re75[2] + P.re75[3] * normal(r)) / 10) * 10;
+    var y = 2000 + 80 * age + 600 * educ - 800 * black + 1000 * married + 0.6 * re75 + (t ? TAU : 0) + 5000 * normal(r);
+    return { x: [age, educ, black, married, re75], y: Math.round(Math.max(0, y)) };
+  }
+  for(var i = 0; i < NT; i++) T.push(person(1));
+  for(var j = 0; j < NC; j++) C.push(person(0));
+  var sd = [0, 1, 2, 3, 4].map(function(v){ return Math.sqrt(variance(T.concat(C).map(function(p){ return p.x[v]; }))); });
+  return { T: T, C: C, sd: sd };
+}
+var WCHOICES = [0, 0.25, 1, 4, 16], WLABEL = ['0', '¼', '1', '4', '16'];
+var COVS = ['Age', 'Education', 'Black', 'Married', 'Earnings 1975'];
+function matchIdx(D, w){
+  var s = w.map(function(wi, v){ return wi / D.sd[v]; });
+  return D.T.map(function(t){
+    var best = 0, bd = Infinity;
+    for(var j = 0; j < D.C.length; j++){
+      var c = D.C[j].x, d = 0;
+      for(var v = 0; v < 5; v++){ var z = s[v] * (t.x[v] - c[v]); d += z * z; }
+      if(d < bd){ bd = d; best = j; }
+    }
+    return best;
+  });
+}
+function balance(D, idx){
+  var rows = [0, 1, 2, 3, 4].map(function(v){
+    var tv = D.T.map(function(p){ return p.x[v]; }), cv = idx.map(function(j){ return D.C[j].x[v]; });
+    return { mt: mean(tv), mc: mean(cv), tp: pairedP(tv.map(function(x, i){ return x - cv[i]; })), ks: ksBootP(tv, cv) };
+  });
+  var ps = []; rows.forEach(function(r){ ps.push(r.tp, r.ks); }); ps.sort(asc);
+  return { rows: rows, ps: ps, worst: ps[0] };
+}
+function evaluate(D, wi){ var idx = matchIdx(D, wi.map(function(k){ return WCHOICES[k]; })); var b = balance(D, idx); b.idx = idx; return b; }
+function att(D, idx){ var d = D.T.map(function(p, i){ return p.y - D.C[idx[i]].y; }); var m = mean(d), se = Math.sqrt(variance(d) / d.length); return { est: m, se: se, p: pairedP(d) }; }
+function better(a, b){ for(var i = 0; i < a.length; i++){ if(a[i] > b[i] + 1e-12) return true; if(a[i] < b[i] - 1e-12) return false; } return false; }
+function unmatched(D){
+  var ps = [], rows = [0, 1, 2, 3, 4].map(function(v){
+    var tv = D.T.map(function(p){ return p.x[v]; }), cv = D.C.map(function(p){ return p.x[v]; });
+    var r = { tp: welchP(tv, cv), ks: ksBootP(tv, cv) }; ps.push(r.tp, r.ks); return r;
+  });
+  return { rows: rows, worst: Math.min.apply(null, ps) };
+}
+// From the offline search over all 3,124 settings with this code.
+var GRID = { n: 3124, best: 0.571, bestW: [2, 1, 1, 1, 2], poorN: 2339, poorEst: 741, goodN: 60, goodEst: 1785 };
+
+var DATA = makeData(SEED), BEFORE = unmatched(DATA);
+var RAW = mean(DATA.T.map(function(p){ return p.y; })) - mean(DATA.C.map(function(p){ return p.y; }));
+var evalCache = {};
+function evalW(w){ var k = w.join(''); if(!evalCache[k]) evalCache[k] = evaluate(DATA, w); return evalCache[k]; }
+
+/* ---------- State ---------- */
+var BALQ = { right: 'b', opts: [
+  ['a', 'As low as possible: a low p-value is a significant result.', 'Here a low p-value means the test found a difference between treated and controls. That is imbalance, the very thing matching tries to remove.'],
+  ['b', 'As high as possible: a high p-value means the tests find no detectable difference between the groups.', 'Right. In a balance check the hypothesis is that treated and controls look alike, and high p-values mean the data give no reason to doubt it. That is why GenMatch pushes the smallest p-value up. A high p-value is not proof of balance, only the absence of evidence against it.'],
+  ['c', 'As close to 0.05 as possible.', '0.05 is a conventional line for declaring a difference, not a target. Just above 0.05 still means the groups differ in ways the test almost detects.'],
+  ['d', 'It does not matter: only the p-value of the treatment effect counts.', 'The effect estimate comes later, after the matches are chosen (Part 2). The balance p-values are how you judge the matches.']
+] };
+var state = { step: 0, balQ: '', preds: {}, revealed: {}, w: [2, 2, 2, 2, 2], tries: [], ysConfirm: false, ysUsed: false, g3: [], d3: [[2, 2, 2, 2], [2, 2, 2, 2], [2, 2, 2, 2]], r3: 0, o3: ['', '', ''], scale: 'laptop' };
+CASES.forEach(function(c){ state.preds[c.id] = { t: '', k: '', s: '' }; state.revealed[c.id] = false; });
+var listeners = [];
+function validW(w){ return Array.isArray(w) && w.length === 5 && w.every(function(k){ return k === 0 || k === 1 || k === 2 || k === 3 || k === 4; }) && w.some(function(k){ return k > 0; }); }
+function sanitize(p){
+  var o = {};
+  if('step' in p && typeof p.step === 'number' && isFinite(p.step)) o.step = clip(Math.round(p.step), 0, 9);
+  if(Array.isArray(p.g3)) o.g3 = p.g3.filter(function(gen){ return Array.isArray(gen) && gen.length === POP3 && gen.every(usableW3); }).slice(0, GENS3).map(function(gen){ return gen.map(function(w){ return w.slice(); }); });
+  if(Array.isArray(p.d3) && p.d3.length === POP3 && p.d3.every(validW3)) o.d3 = p.d3.map(function(w){ return w.slice(); });
+  if('balQ' in p && ['', 'a', 'b', 'c', 'd'].indexOf(p.balQ) >= 0) o.balQ = p.balQ;
+  if(p.preds && typeof p.preds === 'object'){
+    o.preds = JSON.parse(JSON.stringify(state.preds));
+    CASES.forEach(function(c){ var v = p.preds[c.id]; if(v && typeof v === 'object'){ ['t', 'k', 's'].forEach(function(s){ var ok = s === 's' ? SAME : LEVELS; if(s in v && (v[s] === '' || ok.indexOf(v[s]) >= 0)) o.preds[c.id][s] = v[s]; }); } });
+  }
+  if(p.revealed && typeof p.revealed === 'object'){
+    o.revealed = Object.assign({}, state.revealed);
+    CASES.forEach(function(c){ if(typeof p.revealed[c.id] === 'boolean') o.revealed[c.id] = p.revealed[c.id]; });
+  }
+  if('w' in p && Array.isArray(p.w) && p.w.length === 5 && p.w.every(function(k){ return [0, 1, 2, 3, 4].indexOf(k) >= 0; })) o.w = p.w.slice();
+  if(Array.isArray(p.tries)) o.tries = p.tries.filter(validW).slice(0, 60).map(function(w){ return w.slice(); });
+  if(typeof p.ysConfirm === 'boolean') o.ysConfirm = p.ysConfirm;
+  if(typeof p.ysUsed === 'boolean') o.ysUsed = p.ysUsed;
+  if(typeof p.r3 === 'number' && isFinite(p.r3)) o.r3 = clip(Math.round(p.r3), 0, 1e6);
+  if(Array.isArray(p.o3) && p.o3.length === POP3 && p.o3.every(function(x){ return typeof x === 'string' && x.length <= 160; })) o.o3 = p.o3.slice();
+  if(p.scale === 'laptop' || p.scale === 'projector') o.scale = p.scale;
+  return o;
+}
+function apply(p){
+  Object.assign(state, sanitize(p));
+  if(!state.tries.length){ state.ysUsed = false; state.ysConfirm = false; }
+  // Elitism: once a generation is evaluated, slot 1 always holds the best so far.
+  if(state.g3.length) state.d3[0] = best3().w.slice();
+}
+function change(p){ apply(p); render(); var s = getState(); listeners.forEach(function(fn){ try{ fn(s); }catch(e){} }); }
+function getState(){ return JSON.parse(JSON.stringify(state)); }
+function setState(p){ if(!p || typeof p !== 'object') return; apply(p); render(); }
+
+function bestTry(){
+  var bi = -1, bps = null;
+  state.tries.forEach(function(w, i){ var ps = evalW(w).ps; if(bi < 0 || better(ps, bps)){ bi = i; bps = ps; } });
+  return bi;
+}
+function shares(w){ var tot = w.reduce(function(s, k){ return s + WCHOICES[k]; }, 0); return w.map(function(k){ return tot ? WCHOICES[k] / tot : 0; }); }
+
+/* ---------- Formatting ---------- */
+var f2 = new Intl.NumberFormat('en', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+var f3 = new Intl.NumberFormat('en', { minimumFractionDigits: 3, maximumFractionDigits: 3 });
+var f1 = new Intl.NumberFormat('en', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+var usd = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+function money(v){ return v < 0 ? '−' + usd.format(-v) : usd.format(v); }
+function fp(p){ return p < 0.001 ? '< 0.001' : f3.format(p); }
+function fmean(v, x){ return v === 4 ? usd.format(x) : (v === 2 || v === 3) ? Math.round(x * 100) + '%' : f1.format(x); }
+
+/* ---------- Build part 1 ---------- */
+var NS = 'http://www.w3.org/2000/svg';
+function el(tag, attrs, text){ var e = document.createElementNS(NS, tag); for(var k in attrs) e.setAttribute(k, attrs[k]); if(text != null) e.textContent = text; return e; }
+function drawCase(svg, c){
+  var W = 440, H = 170, L = 12, R = W - 12, Tp = 10, B = H - 30;
+  var d = svg.querySelector('desc'); while(svg.lastChild && svg.lastChild !== d) svg.removeChild(svg.lastChild);
+  if(c.binary){
+    var pt = mean(c.t), pc = mean(c.c), Y = function(v){ return B - v * (B - Tp); };
+    var x0 = W / 2 - 75;
+    svg.appendChild(el('rect', { x: x0, y: Y(pt), width: 70, height: B - Y(pt), fill: 'var(--contrast)', 'fill-opacity': 0.55, stroke: 'var(--contrast)' }));
+    svg.appendChild(el('rect', { x: x0 + 80, y: Y(pc), width: 70, height: B - Y(pc), fill: 'none', stroke: 'var(--accent)', 'stroke-width': 2 }));
+    svg.appendChild(el('text', { x: x0 + 35, y: Y(pt) - 5, 'text-anchor': 'middle' }, Math.round(pt * 100) + '%'));
+    svg.appendChild(el('text', { x: x0 + 115, y: Y(pc) - 5, 'text-anchor': 'middle' }, Math.round(pc * 100) + '%'));
+    svg.appendChild(el('text', { x: x0 + 35, y: B + 18, 'text-anchor': 'middle', class: 'muted' }, 'Treated'));
+    svg.appendChild(el('text', { x: x0 + 115, y: B + 18, 'text-anchor': 'middle', class: 'muted' }, 'Controls'));
+    svg.appendChild(el('text', { x: L, y: Tp + 4, class: 'muted' }, 'Share married'));
+    svg.appendChild(el('line', { x1: L, y1: B, x2: R, y2: B, stroke: 'var(--muted)' }));
+    d.textContent = c.title + ': treated ' + Math.round(pt * 100) + '% married, controls ' + Math.round(pc * 100) + '% married.';
+    return;
+  }
+  var all = c.t.concat(c.c), lo = Math.min.apply(null, all), hi = Math.max.apply(null, all), nb = 24, bw = (hi - lo) / nb || 1;
+  function counts(a){ var h = new Array(nb).fill(0); a.forEach(function(v){ h[Math.min(nb - 1, Math.floor((v - lo) / bw))]++; }); return h; }
+  var ht = counts(c.t), hc = counts(c.c), mx = Math.max(Math.max.apply(null, ht), Math.max.apply(null, hc));
+  var X = function(v){ return L + (v - lo) / (hi - lo) * (R - L); }, Y = function(n){ return B - n / mx * (B - Tp); };
+  ht.forEach(function(n, i){ if(n) svg.appendChild(el('rect', { x: X(lo + i * bw) + 0.5, y: Y(n), width: Math.max(0, X(lo + (i + 1) * bw) - X(lo + i * bw) - 1), height: B - Y(n), fill: 'var(--contrast)', 'fill-opacity': 0.5 })); });
+  var dpath = 'M' + X(lo) + ' ' + B;
+  hc.forEach(function(n, i){ dpath += ' L' + X(lo + i * bw) + ' ' + Y(n) + ' L' + X(lo + (i + 1) * bw) + ' ' + Y(n); });
+  dpath += ' L' + X(hi) + ' ' + B;
+  svg.appendChild(el('path', { d: dpath, fill: 'none', stroke: 'var(--accent)', 'stroke-width': 2 }));
+  svg.appendChild(el('line', { x1: L, y1: B, x2: R, y2: B, stroke: 'var(--muted)' }));
+  var mt = mean(c.t), mc = mean(c.c);
+  svg.appendChild(el('line', { x1: X(mt), y1: Tp - 4, x2: X(mt), y2: B, stroke: 'var(--contrast)', 'stroke-width': 2.5 }));
+  svg.appendChild(el('line', { x1: X(mc), y1: Tp - 4, x2: X(mc), y2: B, stroke: 'var(--accent)', 'stroke-width': 2.5, 'stroke-dasharray': '6 4' }));
+  [lo, (lo + hi) / 2, hi].forEach(function(v, i){ svg.appendChild(el('text', { x: X(v), y: B + 18, 'text-anchor': i === 0 ? 'start' : i === 2 ? 'end' : 'middle', class: 'muted' }, f1.format(v))); });
+  d.textContent = c.title + ': overlaid histograms of 200 treated and 200 controls. Treated mean ' + f1.format(mt) + ', control mean ' + f1.format(mc) + '; treated SD ' + f1.format(Math.sqrt(variance(c.t))) + ', control SD ' + f1.format(Math.sqrt(variance(c.c))) + '.';
+}
+var casesBox = document.getElementById('cases');
+CASES.forEach(function(c, ci){
+  var box = document.createElement('section'); box.className = 'case'; box.setAttribute('aria-labelledby', 'ch_' + c.id); box.setAttribute('data-steps', String(ci));
+  box.innerHTML = '<h3 id="ch_' + c.id + '"></h3><svg viewBox="0 0 440 170" role="img"><desc></desc></svg>' +
+    '<div class="predrow"><span id="lt_' + c.id + '">t-test p will be</span><div class="seg" role="group" aria-labelledby="lt_' + c.id + '" data-case="' + c.id + '" data-test="t"></div></div>' +
+    '<div class="predrow"><span id="lk_' + c.id + '">KS p will be</span><div class="seg" role="group" aria-labelledby="lk_' + c.id + '" data-case="' + c.id + '" data-test="k"></div></div>' +
+    '<div class="predrow wide"><span id="ls_' + c.id + '">In large samples, will the two p-values be exactly the same?</span><div class="seg" role="group" aria-labelledby="ls_' + c.id + '" data-case="' + c.id + '" data-test="s"></div></div>' +
+    '<div class="row"><button type="button" class="primary" data-reveal="' + c.id + '">Reveal</button><span class="note" data-hint="' + c.id + '"></span></div>' +
+    '<div class="out" data-out="' + c.id + '" hidden aria-live="polite"></div>';
+  box.querySelector('h3').textContent = c.title;
+  box.querySelectorAll('.seg').forEach(function(g){
+    (g.getAttribute('data-test') === 's' ? SAME : LEVELS).forEach(function(lv){
+      var b = document.createElement('button'); b.type = 'button'; b.textContent = lv === 'yes' ? 'Yes, the same' : lv === 'no' ? 'No' : lv === 'low' ? 'Low (below 0.05)' : 'High (0.05 or more)'; b.setAttribute('data-level', lv); b.setAttribute('aria-pressed', 'false');
+      b.addEventListener('click', function(){ var pr = JSON.parse(JSON.stringify(state.preds)); pr[c.id][g.getAttribute('data-test')] = lv; change({ preds: pr }); });
+      g.appendChild(b);
+    });
+  });
+  box.querySelector('[data-reveal]').addEventListener('click', function(){ var rv = Object.assign({}, state.revealed); rv[c.id] = true; change({ revealed: rv }); });
+  drawCase(box.querySelector('svg'), c);
+  casesBox.appendChild(box);
+});
+
+function renderPart1(){
+  CASES.forEach(function(c){
+    var pr = state.preds[c.id], rv = state.revealed[c.id];
+    document.querySelectorAll('[data-case="' + c.id + '"]').forEach(function(g){
+      var test = g.getAttribute('data-test');
+      g.querySelectorAll('button').forEach(function(b){ b.setAttribute('aria-pressed', String(b.getAttribute('data-level') === pr[test])); b.disabled = rv; });
+    });
+    var rb = document.querySelector('[data-reveal="' + c.id + '"]'), hint = document.querySelector('[data-hint="' + c.id + '"]');
+    rb.hidden = rv; rb.disabled = !pr.t || !pr.k || !pr.s;
+    hint.textContent = rv ? '' : (!pr.t || !pr.k || !pr.s) ? 'Answer all three first.' : '';
+    var out = document.querySelector('[data-out="' + c.id + '"]');
+    out.hidden = !rv;
+    if(rv){
+      var lt = level(c.tp), lk = level(c.ks);
+      var mark = function(guess, actual){ return guess === actual ? '<span class="verdict-ok">✓ you said ' + guess + '</span>' : '<span class="verdict-no">✗ you said ' + guess + '</span>'; };
+      out.innerHTML = '<table><thead><tr><th>Test</th><th>p-value</th><th>Level</th><th>Your guess</th></tr></thead><tbody>' +
+        '<tr><td>t-test</td><td>' + fp(c.tp) + '</td><td>' + lt + '</td><td>' + mark(pr.t, lt) + '</td></tr>' +
+        '<tr><td>KS test</td><td>' + fp(c.ks) + '</td><td>' + lk + '</td><td>' + mark(pr.k, lk) + '</td></tr>' +
+        '<tr><td>Same p-value?</td><td></td><td>' + sameAnswer(c) + '</td><td>' + mark(pr.s, sameAnswer(c)) + '</td></tr></tbody></table><p></p><p></p>';
+      var ps = out.querySelectorAll('p');
+      ps[0].textContent = c.why;
+      ps[1].textContent = SAME_WHY[sameAnswer(c)] + (c.binary ? ' Here they are ' + fp(c.tp) + ' and ' + fp(c.ks) + '.' : '');
+    }
+  });
+  document.querySelectorAll('#balOpts button').forEach(function(b){
+    var o = b.getAttribute('data-opt');
+    b.setAttribute('aria-pressed', String(o === state.balQ));
+    b.classList.toggle('right', o === state.balQ && o === BALQ.right);
+    b.classList.toggle('wrong', o === state.balQ && o !== BALQ.right);
+  });
+  var fb = document.getElementById('balFb');
+  if(!state.balQ){ fb.className = 'fb'; fb.textContent = ''; }
+  else {
+    var opt = BALQ.opts.filter(function(o){ return o[0] === state.balQ; })[0], ok = state.balQ === BALQ.right;
+    fb.className = 'fb ' + (ok ? 'ok' : 'no');
+    fb.innerHTML = '<span class="verdict">' + (ok ? 'Correct. ' : 'Not quite. ') + '</span>';
+    fb.appendChild(document.createTextNode(ok ? opt[2].replace(/^Right\.\s*/, '') : opt[2] + ' Try another answer.'));
+  }
+}
+BALQ.opts.forEach(function(o){
+  var b = document.createElement('button'); b.type = 'button'; b.setAttribute('data-opt', o[0]); b.setAttribute('aria-pressed', 'false');
+  var m = document.createElement('span'); m.className = 'mark'; m.textContent = o[0].toUpperCase() + '.';
+  b.appendChild(m); b.appendChild(document.createTextNode(o[1]));
+  b.addEventListener('click', function(){ change({ balQ: o[0] }); });
+  document.getElementById('balOpts').appendChild(b);
+});
+
+/* ---------- Build part 2 ---------- */
+var wrows = document.getElementById('wrows');
+COVS.forEach(function(name, v){
+  var row = document.createElement('div'); row.className = 'wrow';
+  row.innerHTML = '<span id="wl' + v + '"></span><div class="seg" role="group" aria-labelledby="wl' + v + '"></div><span class="share"><span class="bar"></span><span class="pct"></span></span>';
+  row.querySelector('span').textContent = name;
+  var g = row.querySelector('.seg');
+  WCHOICES.forEach(function(_, k){
+    var b = document.createElement('button'); b.type = 'button'; b.textContent = WLABEL[k]; b.setAttribute('aria-pressed', 'false'); b.setAttribute('aria-label', name + ' weight ' + WCHOICES[k]);
+    b.addEventListener('click', function(){ var w = state.w.slice(); w[v] = k; change({ w: w }); });
+    g.appendChild(b);
+  });
+  wrows.appendChild(row);
+});
+document.getElementById('beforeLine').innerHTML = 'Before matching, the smallest p-value is <strong>' + fp(BEFORE.worst) + '</strong>.';
+
+var running = false;
+function runMatching(){
+  if(running || state.ysUsed || !validW(state.w)) return;
+  running = true;
+  var ov = document.getElementById('overlay'), pg = document.getElementById('progress'), txt = document.getElementById('ovText'), sub = document.getElementById('ovSub');
+  var steps = ['Measuring distances to 800 controls…', 'Finding each treated person\'s nearest control…', 'Running 10 balance tests…'];
+  ov.hidden = false; pg.classList.remove('run'); void pg.offsetWidth; pg.classList.add('run');
+  txt.textContent = 'Matching underway'; sub.textContent = steps[0];
+  var w = state.w.slice();
+  setTimeout(function(){ sub.textContent = steps[1]; evalW(w); }, 500);
+  setTimeout(function(){ sub.textContent = steps[2]; }, 1000);
+  setTimeout(function(){
+    ov.hidden = true; running = false;
+    change({ tries: state.tries.concat([w]), ysConfirm: false });
+  }, 1500);
+  render();
+}
+document.getElementById('runBtn').addEventListener('click', runMatching);
+document.getElementById('eqBtn').addEventListener('click', function(){ change({ w: [2, 2, 2, 2, 2] }); });
+document.getElementById('yBtn').addEventListener('click', function(){ change({ ysConfirm: true }); });
+document.getElementById('yNo').addEventListener('click', function(){ change({ ysConfirm: false }); });
+document.getElementById('yYes').addEventListener('click', function(){ change({ ysUsed: true, ysConfirm: false }); });
+document.getElementById('restartBtn').addEventListener('click', function(){ change({ tries: [], ysUsed: false, ysConfirm: false, w: [2, 2, 2, 2, 2] }); });
+
+function renderPart2(){
+  var sh = shares(state.w), ok = validW(state.w);
+  document.querySelectorAll('.wrow').forEach(function(row, v){
+    row.querySelectorAll('button').forEach(function(b, k){ b.setAttribute('aria-pressed', String(state.w[v] === k)); b.disabled = state.ysUsed || running; });
+    row.querySelector('.bar').style.width = Math.round(sh[v] * 90) + 'px';
+    row.querySelector('.pct').textContent = f2.format(sh[v]);
+  });
+  var rsum = sh.reduce(function(t, x){ return t + Math.round(x * 100); }, 0);
+  document.getElementById('sumNote').textContent = ok ? 'Normalized weights: ' + sh.map(function(s){ return f2.format(s); }).join(' + ') + ' = 1' + (rsum !== 100 ? ' (each share is rounded).' : '.') : 'At least one weight must be above 0.';
+  document.getElementById('runBtn').disabled = !ok || running || state.ysUsed;
+  document.getElementById('eqBtn').disabled = running || state.ysUsed;
+  document.getElementById('runNote').textContent = state.ysUsed ? 'Weights are frozen: you have used the Ys.' : '';
+
+  var n = state.tries.length, bi = bestTry();
+  document.getElementById('resEmpty').hidden = n > 0;
+  document.getElementById('resFull').hidden = n === 0;
+  if(n){
+    var last = evalW(state.tries[n - 1]), worstCell = null;
+    last.rows.forEach(function(r, v){ if(!worstCell && r.tp === last.worst) worstCell = [v, 't']; if(!worstCell && r.ks === last.worst) worstCell = [v, 'k']; });
+    document.getElementById('tryNo').textContent = n;
+    document.getElementById('worstOut').textContent = fp(last.worst);
+    var b = evalW(state.tries[bi]);
+    document.getElementById('bestLine').textContent = bi === n - 1 ? (n === 1 ? 'Your first try.' : 'Your best so far.') : 'Best so far: try ' + (bi + 1) + ', smallest p ' + fp(b.worst) + '.';
+    document.getElementById('balBody').innerHTML = last.rows.map(function(r, v){
+      return '<tr><td>' + COVS[v] + '</td><td>' + fmean(v, mean(DATA.T.map(function(p){ return p.x[v]; }))) + '</td><td>' + fmean(v, r.mc) + '</td>' +
+        '<td' + (worstCell[0] === v && worstCell[1] === 't' ? ' class="worst"' : '') + '>' + fp(r.tp) + '</td>' +
+        '<td' + (worstCell[0] === v && worstCell[1] === 'k' ? ' class="worst"' : '') + '>' + fp(r.ks) + '</td></tr>';
+    }).join('');
+  }
+  var lb = document.getElementById('logBody');
+  lb.innerHTML = state.tries.map(function(w, i){
+    var s = shares(w);
+    return '<tr' + (i === bi ? ' class="best"' : '') + '><td>' + (i + 1) + (i === bi ? ' ★' : '') + '</td>' + s.map(function(x){ return '<td>' + f2.format(x) + '</td>'; }).join('') +
+      '<td>' + fp(evalW(w).worst) + '</td><td><button type="button" data-load="' + i + '"' + (state.ysUsed ? ' disabled' : '') + '>Load</button></td></tr>';
+  }).reverse().join('');
+  lb.querySelectorAll('[data-load]').forEach(function(btn){ btn.addEventListener('click', function(){ change({ w: state.tries[Number(btn.getAttribute('data-load'))].slice() }); }); });
+
+  document.getElementById('yLocked').hidden = state.ysUsed;
+  document.getElementById('yOpen').hidden = !state.ysUsed;
+  document.getElementById('yBtn').disabled = n === 0 || running;
+  document.getElementById('yNote').textContent = n === 0 ? 'Run matching at least once first.' : '';
+  document.getElementById('yAsk').hidden = state.ysConfirm;
+  document.getElementById('yConfirm').hidden = !state.ysConfirm;
+  if(n) document.getElementById('yBest').textContent = fp(evalW(state.tries[bi]).worst);
+  if(state.ysUsed && n){
+    var be = evalW(state.tries[bi]), a = att(DATA, be.idx);
+    document.getElementById('attOut').textContent = money(a.est);
+    document.getElementById('attCi').textContent = '95% interval ' + money(a.est - 1.98 * a.se) + ' to ' + money(a.est + 1.98 * a.se);
+    document.getElementById('attP').innerHTML = 'p-value of the ATT estimate: <strong>' + fp(a.p) + '</strong>. Your balance: smallest p ' + fp(be.worst) + ', after ' + n + ' tr' + (n === 1 ? 'y' : 'ies') + '.';
+    document.getElementById('truthText').innerHTML = 'The data are simulated, so we know the truth: <strong>+$1,500</strong>. A raw comparison gives ' + money(RAW) + '. Your estimate is ' + (Math.abs(a.est - TAU) <= 1.98 * a.se ? 'within sampling error of the truth.' : 'outside its 95% interval of the truth.');
+    document.getElementById('gridText').textContent = 'Across all ' + GRID.n.toLocaleString('en') + ' weight settings, the best smallest p-value is ' + f3.format(GRID.best) + (be.worst >= GRID.best - 0.0005 ? ': you found it.' : '; you reached ' + fp(be.worst) + '.') + ' Poorly balanced settings (below 0.01) average ' + money(GRID.poorEst) + '; well-balanced ones (0.2 or more) average ' + money(GRID.goodEst) + '. Better balance pulls the estimate toward the truth.';
+  }
+}
+
+function render(){
+  document.body.className = state.scale;
+  document.getElementById('scLaptop').setAttribute('aria-pressed', String(state.scale === 'laptop'));
+  document.getElementById('scProj').setAttribute('aria-pressed', String(state.scale === 'projector'));
+  renderSteps();
+  renderPart1();
+  renderPart2();
+  renderPart3();
+}
+// One step per screen: the question and the facts needed to answer it sit above the step's own controls.
+var CASE_HINT = 't-test: do the means differ? KS test: do the distributions differ anywhere? Predict each p-value: low (below 0.05) or high (0.05 or more).';
+var STEPS = CASES.map(function(c){
+  var letter = c.title.charAt(0), name = c.title.slice(3).replace(/ \(.*\)$/, '');
+  return { group: 1, tab: letter, h: 'Case ' + letter + ': ' + name.toLowerCase() + '. Low or high?', hint: CASE_HINT };
+}).concat([
+  { group: 1, tab: 'High or low?', h: 'What do the five cases show?', hint: '' },
+  { group: 2, tab: 'Search', h: 'Can you find the weights that balance best?', hint: '120 people got job training; 800 did not; five covariates. Pick weights, run matching, check balance, repeat. Your score is the smallest of the ten p-values. The outcome stays hidden until the next step.' },
+  { group: 2, tab: 'Outcome', h: 'Done balancing? Now use the Ys.', hint: 'Outcomes come only after the matches are chosen. Looking earlier would let you keep the weights that give the answer you want.' },
+  { group: 3, tab: 'Generations', h: 'Run the genetic algorithm by hand', hint: 'Tutoring: 100 took it, 900 did not. Three candidates per generation, five generations. From generation 2, slot 1 keeps the best so far; make slots 2 and 3 with Mutate or Cross over.' },
+  { group: 3, tab: 'Results', h: 'How close did your search get?', hint: '' }
+]);
+var GROUP = { 1: 'Two tests', 2: 'You search', 3: 'Formally' };
+var stepbar = document.getElementById('stepbar');
+STEPS.forEach(function(s, i){
+  if(i === 0 || STEPS[i - 1].group !== s.group){ var g = document.createElement('span'); g.className = 'group'; g.textContent = GROUP[s.group]; stepbar.appendChild(g); }
+  var b = document.createElement('button'); b.type = 'button'; b.setAttribute('data-step', i); b.textContent = (i + 1) + ' ' + s.tab;
+  b.addEventListener('click', function(){ goStep(i); });
+  stepbar.appendChild(b);
+});
+function goStep(i){ change({ step: clip(i, 0, STEPS.length - 1) }); window.scrollTo(0, 0); document.getElementById('stepH').focus(); }
+function renderSteps(){
+  var s = STEPS[state.step];
+  document.getElementById('stepNum').textContent = 'Step ' + (state.step + 1) + ' of ' + STEPS.length + ' · ' + GROUP[s.group];
+  document.getElementById('stepH').textContent = s.h;
+  document.getElementById('stepHint').textContent = s.hint;
+  stepbar.querySelectorAll('button[data-step]').forEach(function(b){ if(Number(b.getAttribute('data-step')) === state.step) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current'); });
+  document.querySelectorAll('[data-steps]').forEach(function(el){ el.hidden = el.getAttribute('data-steps').split(',').indexOf(String(state.step)) < 0; });
+  document.getElementById('prevStep').disabled = state.step === 0;
+  // On the last step there is nothing next: say the activity ends instead of showing a dead button.
+  document.getElementById('nextStep').hidden = state.step === STEPS.length - 1;
+  document.getElementById('endNote').hidden = state.step !== STEPS.length - 1;
+}
+document.getElementById('prevStep').addEventListener('click', function(){ goStep(state.step - 1); });
+document.getElementById('toResults').addEventListener('click', function(){ goStep(9); });
+document.getElementById('nextStep').addEventListener('click', function(){ goStep(state.step + 1); });
+document.getElementById('scLaptop').addEventListener('click', function(){ change({ scale: 'laptop' }); });
+document.getElementById('scProj').addEventListener('click', function(){ change({ scale: 'projector' }); });
+document.getElementById('ledger').innerHTML = LEDGER.map(function(l){ return '<li><span class="kind">' + l[0] + '</span>' + l[1] + '</li>'; }).join('');
+
+/* ---------- Part 3: the tutoring case, a formal genetic search by hand ---------- */
+var NT3 = 100, NC3 = 900, SEED3 = 5, POP3 = 3, GENS3 = 5;
+var W3 = [0, 0.5, 1, 3, 9], W3LABEL = ['0', '½', '1', '3', '9'];
+var COVS3 = ['Prior GPA', 'Family income', 'Commute', 'First-generation'];
+var DGP3 = { gpa: [2.75, 0.45, 3.0, 0.5], inc: [40, 15, 52, 22], com: [28, 14, 25, 14], fg: [0.45, 0.32] };
+function makeData3(seed){
+  var r = rng(seed), T = [], C = [], P = DGP3;
+  function person(t){
+    var gpa = Math.round(clip(t ? P.gpa[0] + P.gpa[1] * normal(r) : P.gpa[2] + P.gpa[3] * normal(r), 1.5, 4) * 100) / 100;
+    var inc = Math.round(Math.max(5, t ? P.inc[0] + P.inc[1] * normal(r) : P.inc[2] + P.inc[3] * normal(r)));
+    var com = Math.round(clip(t ? P.com[0] + P.com[1] * normal(r) : P.com[2] + P.com[3] * normal(r), 0, 120));
+    var fg = r() < (t ? P.fg[0] : P.fg[1]) ? 1 : 0;
+    return [gpa, inc, com, fg];
+  }
+  for(var i = 0; i < NT3; i++) T.push(person(1));
+  for(var j = 0; j < NC3; j++) C.push(person(0));
+  var sd = [0, 1, 2, 3].map(function(v){ return Math.sqrt(variance(T.concat(C).map(function(p){ return p[v]; }))); });
+  return { T: T, C: C, sd: sd };
+}
+var DATA3 = makeData3(SEED3);
+function evaluate3(wi){
+  var s = wi.map(function(k, v){ return W3[k] / DATA3.sd[v]; });
+  var idx = DATA3.T.map(function(t){
+    var best = 0, bd = Infinity;
+    for(var j = 0; j < DATA3.C.length; j++){ var c = DATA3.C[j], d = 0; for(var v = 0; v < 4; v++){ var z = s[v] * (t[v] - c[v]); d += z * z; } if(d < bd){ bd = d; best = j; } }
+    return best;
+  });
+  var ps = [], rows = [0, 1, 2, 3].map(function(v){
+    var tv = DATA3.T.map(function(p){ return p[v]; }), cv = idx.map(function(j){ return DATA3.C[j][v]; });
+    var r = { mt: mean(tv), mc: mean(cv), tp: pairedP(tv.map(function(x, i){ return x - cv[i]; })), ks: ksBootP(tv, cv) };
+    ps.push(r.tp, r.ks); return r;
+  });
+  ps.sort(asc);
+  return { rows: rows, ps: ps, worst: ps[0] };
+}
+var cache3 = {};
+function eval3(w){ var k = w.join(''); if(!cache3[k]) cache3[k] = evaluate3(w); return cache3[k]; }
+function before3(){
+  var ps = [];
+  [0, 1, 2, 3].forEach(function(v){ var tv = DATA3.T.map(function(p){ return p[v]; }), cv = DATA3.C.map(function(p){ return p[v]; }); ps.push(welchP(tv, cv), ksBootP(tv, cv)); });
+  return Math.min.apply(null, ps);
+}
+// From the offline check of all 624 settings with this code.
+var GRID3 = { n: 624, best: 0.741, bestW: [4, 3, 2, 1], good: 20 };
+function validW3(w){ return Array.isArray(w) && w.length === 4 && w.every(function(k){ return [0, 1, 2, 3, 4].indexOf(k) >= 0; }); }
+function usableW3(w){ return validW3(w) && w.some(function(k){ return k > 0; }); }
+// Best so far across every evaluated generation, with where it came from.
+function best3(gens){
+  var b = null;
+  (gens || state.g3).forEach(function(gen, gi){ gen.forEach(function(w, si){ var e = eval3(w); if(!b || better(e.ps, b.e.ps)) b = { w: w, e: e, gen: gi, slot: si }; }); });
+  return b;
+}
+function fmtW3(w){ return w.map(function(k){ return W3LABEL[k]; }).join(' · '); }
+
+var cands = document.getElementById('cands');
+for(var si = 0; si < POP3; si++){
+  var card = document.createElement('div'); card.className = 'cand'; card.setAttribute('data-slot', si);
+  card.innerHTML = '<div class="candhead"><strong>Candidate ' + (si + 1) + '</strong><span class="note candnote"></span></div>' +
+    COVS3.map(function(name, v){ return '<div class="wrow3"><span>' + name + '</span><div class="seg" role="group" aria-label="Candidate ' + (si + 1) + ', ' + name + ' weight" data-v="' + v + '"></div></div>'; }).join('') +
+    '<p class="note shares3"></p><div class="gaops"><button type="button" class="copybest" data-op="mut" title="Change one weight of this candidate at random, as a genetic algorithm\u2019s mutation does">Mutate</button><button type="button" class="copybest" data-op="cross" title="Mix the best so far with the runner-up, each weight taken from one parent or the other, as a genetic algorithm\u2019s crossover does">Cross over</button><button type="button" class="copybest" data-op="reset" title="Put the best so far back in this slot">Back to the best</button></div><p class="note opnote"></p>';
+  card.querySelectorAll('.seg').forEach(function(g){
+    var v = Number(g.getAttribute('data-v')), slot = si;
+    W3.forEach(function(_, k){
+      var b = document.createElement('button'); b.type = 'button'; b.textContent = W3LABEL[k]; b.setAttribute('aria-pressed', 'false');
+      b.addEventListener('click', function(){ var d = JSON.parse(JSON.stringify(state.d3)), o = state.o3.slice(); d[slot][v] = k; o[slot] = 'Set by hand.'; change({ d3: d, o3: o }); });
+      g.appendChild(b);
+    });
+  });
+  (function(slot){ card.querySelectorAll('[data-op]').forEach(function(btn){ btn.addEventListener('click', function(){ gaOp(slot, btn.getAttribute('data-op')); }); }); })(si);
+  cands.appendChild(card);
+}
+document.getElementById('before3').innerHTML = 'Smallest p-value before matching: <strong>' + fp(before3()) + '</strong>; with equal weights (all 1): ' + fp(eval3([2, 2, 2, 2]).worst) + '.';
+
+// Genetic-algorithm moves for slots 2 and 3, seeded by a shared counter (r3) so a group sees the same result.
+// Mutation: one weight of this candidate jumps to a different level. Crossover: each weight from the best
+// so far or the runner-up (the best candidate with different weights), at random, unlike both if possible.
+function runnerUp3(){
+  var b = best3(), r = null, r2 = null; if(!b) return null;
+  var diff = function(w){ return w.filter(function(k, i){ return k !== b.w[i]; }).length; };
+  state.g3.forEach(function(gen){ gen.forEach(function(w){
+    var d = diff(w); if(!d) return; var e = eval3(w);
+    if(!r || better(e.ps, r.e.ps)) r = { w: w, e: e };
+    if(d >= 2 && (!r2 || better(e.ps, r2.e.ps))) r2 = { w: w, e: e };
+  }); });
+  return r2 || r;
+}
+function gaOp(slot, op){
+  var b = best3(); if(!b) return;
+  var d = JSON.parse(JSON.stringify(state.d3)), o = state.o3.slice(), R = rng(SEED3 * 100003 + state.r3 * 31 + slot);
+  if(op === 'reset'){ d[slot] = b.w.slice(); o[slot] = ''; }
+  if(op === 'mut'){
+    var w = d[slot].slice(), v = Math.floor(R() * 4), k;
+    do { k = Math.floor(R() * W3.length); } while(k === w[v]);
+    var was = w[v]; w[v] = k;
+    if(!usableW3(w)){ w[v] = was; v = (v + 1) % 4; do { k = 1 + Math.floor(R() * (W3.length - 1)); } while(k === w[v]); was = w[v]; w[v] = k; }
+    d[slot] = w; o[slot] = 'Mutated: ' + COVS3[v] + ' ' + W3LABEL[was] + ' \u2192 ' + W3LABEL[k] + '.';
+  }
+  if(op === 'cross'){
+    var ru = runnerUp3(); if(!ru) return;
+    var child, tries = 0;
+    do { child = b.w.map(function(x, i){ return R() < 0.5 ? x : ru.w[i]; }); tries++; } while(tries < 20 && (child.join('') === b.w.join('') || child.join('') === ru.w.join('') || !usableW3(child)));
+    var parentOnly = child.join('') === b.w.join('') || child.join('') === ru.w.join('');
+    if(!usableW3(child)) child = b.w.slice();
+    d[slot] = child;
+    o[slot] = 'Crossover of the best (' + fmtW3(b.w) + ') and the runner-up (' + fmtW3(ru.w) + ')' + (parentOnly ? ': they differ in one weight only, so the child copies a parent. Try Mutate.' : '.');
+  }
+  change({ d3: d, o3: o, r3: state.r3 + 1 });
+}
+var running3 = false;
+function evaluateGen(){
+  if(running3 || state.g3.length >= GENS3 || !state.d3.every(usableW3)) return;
+  running3 = true;
+  var ov = document.getElementById('overlay3'), pg = document.getElementById('progress3'), sub = document.getElementById('ov3Sub'), gen = JSON.parse(JSON.stringify(state.d3));
+  ov.hidden = false; pg.classList.remove('run'); void pg.offsetWidth; pg.classList.add('run');
+  sub.textContent = 'Matching candidate 1 of 3…';
+  setTimeout(function(){ sub.textContent = 'Matching candidate 2 of 3…'; eval3(gen[0]); }, 500);
+  setTimeout(function(){ sub.textContent = 'Matching candidate 3 of 3…'; eval3(gen[1]); }, 1000);
+  setTimeout(function(){
+    eval3(gen[2]); ov.hidden = true; running3 = false;
+    var g3 = state.g3.concat([gen]), b = best3(g3);
+    change({ g3: g3, d3: [b.w.slice(), b.w.slice(), b.w.slice()], o3: ['', '', ''] });
+  }, 1500);
+  render();
+}
+document.getElementById('evalBtn').addEventListener('click', evaluateGen);
+document.getElementById('restart3').addEventListener('click', function(){ change({ g3: [], d3: [[2, 2, 2, 2], [2, 2, 2, 2], [2, 2, 2, 2]], o3: ['', '', ''], r3: 0 }); });
+
+function renderPart3(){
+  var n = state.g3.length, done = n >= GENS3, b = best3();
+  document.getElementById('before3').hidden = n > 0;
+  document.getElementById('genH').textContent = done ? 'All 5 generations evaluated' : 'Generation ' + (n + 1) + ' of ' + GENS3 + ': propose 3 candidates';
+  document.getElementById('genPanel').hidden = done;
+  document.getElementById('p3allDone').hidden = !done;
+  var tried = {}; state.g3.forEach(function(gen){ gen.forEach(function(w){ tried[w.join('')] = true; }); });
+  document.querySelectorAll('.cand').forEach(function(card, si){
+    var w = state.d3[si], locked = si === 0 && n > 0;
+    card.classList.toggle('locked', locked);
+    card.querySelectorAll('.seg').forEach(function(g){
+      var v = Number(g.getAttribute('data-v'));
+      g.querySelectorAll('button').forEach(function(btn, k){ btn.setAttribute('aria-pressed', String(w[v] === k)); btn.disabled = locked || running3; });
+    });
+    var tot = w.reduce(function(s, k){ return s + W3[k]; }, 0);
+    card.querySelector('.shares3').textContent = tot ? 'Normalized: ' + w.map(function(k){ return f2.format(W3[k] / tot); }).join(' + ') + ' = 1' : 'At least one weight must be above 0.';
+    card.querySelector('.candnote').textContent = locked ? 'Carried over: best so far (generation ' + (b.gen + 1) + ')' : tried[w.join('')] ? 'Already tried' : '';
+    var ops = card.querySelector('.gaops'), ru = n ? runnerUp3() : null;
+    ops.hidden = locked || n === 0;
+    ops.querySelector('[data-op="mut"]').disabled = running3;
+    ops.querySelector('[data-op="cross"]').disabled = running3 || !ru;
+    ops.querySelector('[data-op="cross"]').title = ru ? 'Mix the best so far with the runner-up, each weight taken from one parent or the other' : 'Needs a second, different evaluated candidate';
+    ops.querySelector('[data-op="reset"]').disabled = running3 || (b && w.join('') === b.w.join(''));
+    card.querySelector('.opnote').textContent = locked || n === 0 ? '' : state.o3[si] || (b && w.join('') === b.w.join('') ? 'A copy of the best so far: mutate it, cross it over, or set weights yourself.' : '');
+  });
+  var ok = state.d3.every(usableW3);
+  document.getElementById('evalBtn').disabled = !ok || running3 || done;
+  document.getElementById('evalNote').textContent = ok ? (n === 0 ? 'Three different candidates tell you more than three copies.' : 'Slot 1 is the best so far. Make slots 2 and 3 its offspring: Mutate or Cross over.') : 'Every candidate needs at least one weight above 0.';
+
+  document.getElementById('histEmpty').hidden = n > 0;
+  document.getElementById('histFull').hidden = n === 0;
+  document.getElementById('bestBal').hidden = n === 0;
+  if(n){
+    var rows = '';
+    state.g3.forEach(function(gen, gi){
+      var bg = best3(state.g3.slice(0, gi + 1));
+      rows += '<tr><td>' + (gi + 1) + '</td>' + gen.map(function(w, si){ var isBest = gi === b.gen && si === b.slot; return '<td' + (isBest ? ' class="best"' : '') + '>' + fmtW3(w) + ' \u2192 <strong>' + fp(eval3(w).worst) + '</strong>' + (isBest ? ' \u2605' : '') + '</td>'; }).join('') + '<td>' + fp(bg.e.worst) + '</td></tr>';
+    });
+    document.getElementById('genLog').innerHTML = rows;
+    // Chart: every candidate's score by generation, and the best-so-far line.
+    var svg = document.getElementById('genSvg'), d = svg.querySelector('desc');
+    while(svg.lastChild !== d) svg.removeChild(svg.lastChild);
+    var L = 44, R = 405, Tp = 12, B = 180, X = function(g){ return L + (g + 0.5) / GENS3 * (R - L); }, Y = function(p){ return B - p * (B - Tp); };
+    [0, 0.25, 0.5, 0.75, 1].forEach(function(p){ svg.appendChild(el('line', { x1: L, y1: Y(p), x2: R, y2: Y(p), stroke: 'var(--faint)' })); svg.appendChild(el('text', { x: L - 6, y: Y(p) + 4, 'text-anchor': 'end', class: 'muted' }, f2.format(p))); });
+    for(var g = 0; g < GENS3; g++) svg.appendChild(el('text', { x: X(g), y: B + 18, 'text-anchor': 'middle', class: 'muted' }, g + 1));
+    svg.appendChild(el('text', { x: (L + R) / 2, y: B + 36, 'text-anchor': 'middle', class: 'muted' }, 'Generation'));
+    if(done) svg.appendChild(el('line', { x1: L, y1: Y(GRID3.best), x2: R, y2: Y(GRID3.best), stroke: 'var(--muted)', 'stroke-dasharray': '4 4' }));
+    var line = [];
+    state.g3.forEach(function(gen, gi){
+      gen.forEach(function(w, si){ var px = X(gi) + (si - 1) * 9, py = Y(eval3(w).worst); svg.appendChild(el('path', { d: 'M' + (px - 4) + ' ' + py + 'h8M' + px + ' ' + (py - 4) + 'v8', stroke: 'var(--contrast)', 'stroke-width': 2 })); });
+      line.push(X(gi).toFixed(1) + ',' + Y(best3(state.g3.slice(0, gi + 1)).e.worst).toFixed(1));
+    });
+    svg.appendChild(el('polyline', { points: line.join(' '), fill: 'none', stroke: 'var(--accent)', 'stroke-width': 2.5 }));
+    line.forEach(function(pt){ var xy = pt.split(','); svg.appendChild(el('circle', { cx: xy[0], cy: xy[1], r: 5, fill: 'var(--accent)' })); });
+    d.textContent = 'Smallest p-value of every candidate by generation, with the best so far rising to ' + fp(b.e.worst) + '.' + (done ? ' The dashed line is the best of all 624 settings, ' + f3.format(GRID3.best) + '.' : '');
+    var worstCell = null;
+    b.e.rows.forEach(function(r, v){ if(!worstCell && r.tp === b.e.worst) worstCell = [v, 't']; if(!worstCell && r.ks === b.e.worst) worstCell = [v, 'k']; });
+    document.getElementById('best3Body').innerHTML = b.e.rows.map(function(r, v){
+      var f = function(x){ return v === 0 ? f2.format(x) : v === 3 ? Math.round(x * 100) + '%' : v === 1 ? '$' + Math.round(x) + 'k' : f1.format(x) + ' min'; };
+      return '<tr><td>' + COVS3[v] + '</td><td>' + f(r.mt) + '</td><td>' + f(r.mc) + '</td><td' + (worstCell[0] === v && worstCell[1] === 't' ? ' class="worst"' : '') + '>' + fp(r.tp) + '</td><td' + (worstCell[0] === v && worstCell[1] === 'k' ? ' class="worst"' : '') + '>' + fp(r.ks) + '</td></tr>';
+    }).join('');
+  }
+  document.getElementById('p3done').hidden = !done;
+  document.getElementById('p3notyet').hidden = done;
+  document.getElementById('p3chart').hidden = !done;
+  document.getElementById('evalBtn').textContent = 'Evaluate generation ' + Math.min(n + 1, GENS3) + ' of ' + GENS3;
+  if(done){
+    var distinct = Object.keys(tried).length;
+    document.getElementById('p3doneText').innerHTML = 'Your best: weights ' + fmtW3(b.w) + ', smallest p <strong>' + fp(b.e.worst) + '</strong>. ' +
+      'Checking all ' + GRID3.n + ' settings finds ' + f3.format(GRID3.best) + ' at its best' + (b.e.worst >= GRID3.best - 0.0005 ? ': you found it.' : '; ' + GRID3.good + ' settings reach 0.3 or more.') + ' You tried ' + distinct + ' distinct setting' + (distinct === 1 ? '' : 's') + ' out of ' + GRID3.n + '.';
+    renderTradeoff();
+  }
+}
+// A step where the best so far improved its worst variable while another variable got less balanced.
+// From the student's own run if it has one; otherwise 9·1·1·1 (0.204) to 9·3·1·1 (0.320) in these data.
+function varP(e){ return e.rows.map(function(r){ return Math.min(r.tp, r.ks); }); }
+function renderTradeoff(){
+  var pair = null, chain = [];
+  for(var g = 1; g <= state.g3.length; g++){ var bb = best3(state.g3.slice(0, g)); if(!chain.length || chain[chain.length - 1].w.join('') !== bb.w.join('')) chain.push({ w: bb.w, e: bb.e, gen: g }); }
+  for(var i = 1; i < chain.length && !pair; i++){
+    var a = varP(chain[i - 1].e), b = varP(chain[i].e);
+    if(a.some(function(x, v){ return x - b[v] > 0.1; })) pair = { A: chain[i - 1], B: chain[i], own: true };
+  }
+  if(!pair) pair = { A: { w: [4, 2, 2, 2], e: eval3([4, 2, 2, 2]) }, B: { w: [4, 3, 2, 2], e: eval3([4, 3, 2, 2]) }, own: false };
+  var pa = varP(pair.A.e), pb = varP(pair.B.e), wa = pa.indexOf(Math.min.apply(null, pa)), wb = pb.indexOf(Math.min.apply(null, pb));
+  var head = pair.own ? 'In your search, generation ' + pair.B.gen + ' replaced the best so far:' : 'For example, in these data:';
+  var rows = COVS3.map(function(name, v){
+    var d = pb[v] - pa[v], tag = v === wa ? ' (worst before)' : v === wb ? ' (worst after)' : '';
+    return '<tr' + (d < -0.1 ? ' class="worse"' : '') + '><td>' + name + tag + '</td><td class="num">' + fp(pa[v]) + '</td><td class="num">' + fp(pb[v]) + '</td><td class="num">' + (d >= 0 ? '+' : '\u2212') + f2.format(Math.abs(d)) + (d < -0.1 ? ' \u25bc' : '') + '</td></tr>';
+  }).join('');
+  document.getElementById('tradeoff').innerHTML = '<p class="note" style="margin:.6em 0 .2em"><strong>The score rose; one variable got worse.</strong> ' + head + ' ' + fmtW3(pair.A.w) + ' \u2192 ' + fmtW3(pair.B.w) + '. p = the smaller of each variable\u2019s t-test and KS p-values.</p>' +
+    '<div class="tablewrap"><table><thead><tr><th>Variable</th><th class="num">Before</th><th class="num">After</th><th class="num">Change</th></tr></thead><tbody>' + rows +
+    '<tr class="tot"><td><strong>Smallest p (the score)</strong></td><td class="num"><strong>' + fp(pair.A.e.worst) + '</strong></td><td class="num"><strong>' + fp(pair.B.e.worst) + '</strong></td><td class="num"><strong>+' + f2.format(pair.B.e.worst - pair.A.e.worst) + '</strong></td></tr></tbody></table></div>' +
+    '<p class="note" style="margin:.2em 0 0">\u25bc less balanced than before, even though the score went up.</p>';
+}
+
+/* ---------- Contract ---------- */
+window.artifact = {
+  getState: getState,
+  setState: setState,
+  onChange: function(fn){ listeners.push(fn); return function(){ listeners = listeners.filter(function(f){ return f !== fn; }); }; },
+  controls: [
+    { key: 'step', label: 'Step', kind: 'range', min: 0, max: 9, step: 1 },
+    { key: 'g3', label: 'Part 3 generations evaluated (3 weight sets each)', kind: 'text' },
+    { key: 'd3', label: 'Part 3 candidates being proposed', kind: 'text' },
+    { key: 'preds', label: 'Part 1 predictions (low / high per test, and yes / no for identical p-values)', kind: 'choice', options: LEVELS.concat(SAME) },
+    { key: 'revealed', label: 'Part 1 cases revealed', kind: 'toggle' },
+    { key: 'balQ', label: 'Question: high or low p-values for balance?', kind: 'choice', options: ['a', 'b', 'c', 'd'] },
+    { key: 'w', label: 'Part 2 weights (index into 0, ¼, 1, 4, 16 per covariate)', kind: 'choice', options: [0, 1, 2, 3, 4] },
+    { key: 'tries', label: 'Part 2 weight sets tried', kind: 'text' },
+    { key: 'ysConfirm', label: 'Asked to use the Ys', kind: 'toggle' },
+    { key: 'ysUsed', label: 'Outcomes revealed', kind: 'toggle' },
+    { key: 'scale', label: 'Text size', kind: 'choice', options: ['laptop', 'projector'] }
+  ],
+  responses: [],
+  assertions: [
+    { name: 'Part 1 cases land where intended: same high/high, shift low/low, spread high/low, shape high/low', run: function(){
+      var L = {}; CASES.forEach(function(c){ L[c.id] = level(c.tp) + '/' + level(c.ks); });
+      return L.same === 'high/high' && L.shift === 'low/low' && L.spread === 'high/low' && L.shape === 'high/low'; } },
+    { name: 'Part 3: equal weights balance badly (smallest p below 0.01); the best of all 624 settings reaches 0.741', run: function(){
+      return eval3([2, 2, 2, 2]).worst < 0.01 && Math.abs(eval3(GRID3.bestW).worst - GRID3.best) < 0.0005; } },
+    { name: 'Part 3: the best so far never gets worse from one generation to the next', run: function(){
+      var gens = [[[2,2,2,2],[3,2,2,2],[2,3,2,2]], [[3,2,2,2],[0,2,2,2],[2,2,2,0]], [[3,2,2,2],[4,3,2,1],[1,1,1,1]]], last = -1;
+      for(var i = 1; i <= gens.length; i++){ var w = best3(gens.slice(0, i)).e.worst; if(w < last) return false; last = w; } return true; } },
+    { name: 'Only the binary case expects identical p-values in large samples', run: function(){
+      return CASES.filter(function(c){ return sameAnswer(c) === 'yes'; }).map(function(c){ return c.id; }).join() === 'binary'; } },
+    { name: 'Case order: same, spread, shift, shape, binary; letters follow the order', run: function(){
+      return CASES.map(function(c){ return c.id; }).join() === 'same,spread,shift,shape,binary' && CASES.every(function(c, i){ return c.title.charAt(0) === 'ABCDE'.charAt(i); }); } },
+    { name: 'Part 3 trade-off example: 9·1·1·1 to 9·3·1·1 raises the smallest p but lowers first-generation balance', run: function(){
+      var a = eval3([4, 2, 2, 2]), b = eval3([4, 3, 2, 2]), pa = varP(a), pb = varP(b); return b.worst > a.worst + 0.05 && pa[3] - pb[3] > 0.3; } },
+    { name: 'Binary case: both tests high (0.05 or more) and within 0.1 of each other', run: function(){
+      var c = CASES[4]; return level(c.tp) === 'high' && level(c.ks) === 'high' && Math.abs(c.tp - c.ks) < 0.1; } },
+    { name: 'Every case is clearly low or high: no p-value between 0.02 and 0.10', run: function(){
+      return CASES.every(function(c){ return [c.tp, c.ks].every(function(p){ return p < 0.02 || p > 0.10; }); }); } },
+    { name: 'For a 0/1 variable the KS statistic equals the difference in proportions', run: function(){
+      var c = CASES[4]; return Math.abs(ksD(c.t.slice().sort(asc), c.c.slice().sort(asc)) - Math.abs(mean(c.t) - mean(c.c))) < 1e-12; } },
+    { name: 'Two-sided t p-value: t = 2 with 10 df gives 0.0733880', run: function(){ return Math.abs(tP(2, 10) - 0.0733880348) < 1e-6; } },
+    { name: 'Multiplying every weight by 4 leaves the matches unchanged', run: function(){ return matchIdx(DATA, [1, 1, 1, 1, 1]).join() === matchIdx(DATA, [4, 4, 4, 4, 4]).join(); } },
+    { name: 'Equal weights balance poorly (smallest p near 0.02); the best grid setting reaches 0.571', run: function(){
+      return Math.abs(evalW([2, 2, 2, 2, 2]).worst - 0.02) < 0.005 && Math.abs(evalW(GRID.bestW).worst - GRID.best) < 0.0005; } },
+    { name: 'Normalized weights always sum to 1', run: function(){
+      return [[2, 2, 2, 2, 2], [0, 1, 2, 3, 4], [4, 0, 0, 0, 0]].every(function(w){ return Math.abs(shares(w).reduce(function(s, x){ return s + x; }, 0) - 1) < 1e-12; }); } }
+  ],
+  referenceCases: [
+    { name: 'Two-sided t-test p-value', input: { t: 2, df: 10 }, expect: 0.07338803, tolerance: 1e-6, source: 'R: 2*pt(-2, 10)' }
+  ]
+};
+
+render();
+})();
+</script>
+
+<script>
+(function () {
+  var cfg = {"versionId":"cmw2a4j3q000008jp2w8mosxe","appOrigin":"https://ideasatplay.org","direct":null};
+  var t0 = Date.now(), scrolled = false, acted = false, reached = false, shown = false, config = null;
+  var framed = parent !== window;
+  function onScreen(el) {
+    if (!el.getClientRects().length) return false;
+    var r = el.getBoundingClientRect();
+    return r.top < innerHeight && r.bottom > 0;
+  }
+  function atBottom() {
+    var f = document.querySelector("footer[data-kc-credit]");
+    if (f) return f.getBoundingClientRect().top <= innerHeight;
+    var d = document.documentElement;
+    return scrollY + innerHeight >= d.scrollHeight - 48;
+  }
+  // { cur, last } when the page moves through numbered steps, else null.
+  function steps() {
+    var a = window.artifact;
+    try {
+      var c = a && Array.isArray(a.controls) ? a.controls.filter(function (x) { return x && x.key === "step" && typeof x.max === "number"; })[0] : null;
+      if (c) { var s = a.getState(); if (s && typeof s.step === "number") return { cur: s.step, last: c.max }; }
+    } catch (e) {}
+    var cur = document.querySelector('[aria-current="step"]');
+    if (cur && cur.parentElement) {
+      var sib = Array.prototype.filter.call(cur.parentElement.children, function (x) { return x.getClientRects().length; });
+      return { cur: sib.indexOf(cur), last: sib.length - 1 };
+    }
+    return null;
+  }
+  function finished() {
+    var mark = document.querySelector("[data-kc-end]");
+    if (mark) return onScreen(mark);
+    var s = steps();
+    if (s) return s.cur >= s.last && atBottom();
+    return atBottom() && (scrolled || (acted && Date.now() - t0 > 60000));
+  }
+  // The student link remembers a rating in its own storage where the browser allows it.
+  var KEY = "kc-rated-" + cfg.versionId;
+  function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
+  if (cfg.direct) config = { ask: !store(KEY), preview: false, labels: cfg.direct.labels };
+  var visitor = (function () {
+    var v = store("kc-visitor");
+    if (!v) { v = ""; for (var i = 0; i < 24; i++) v += "abcdefghijklmnopqrstuvwxyz0123456789".charAt(Math.floor(Math.random() * 36)); store("kc-visitor", v); }
+    return v;
+  })();
+  var pending = {}, seq = 0;
+  function save(score, comment) {
+    if (cfg.direct) {
+      var body = { versionId: cfg.versionId, score: score, context: "share", visitor: visitor };
+      if (comment) body.comment = comment;
+      // text/plain: a simple request, so no preflight is needed.
+      return fetch(cfg.direct.endpoint, { method: "POST", credentials: "omit", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(body) })
+        .then(function (r) { if (r.ok) store(KEY, String(score)); return r.ok; }, function () { return false; });
+    }
+    return new Promise(function (resolve) {
+      var id = ++seq; pending[id] = resolve;
+      parent.postMessage({ type: "kc:rate", versionId: cfg.versionId, id: id, score: score, comment: comment || "" }, cfg.appOrigin);
+      setTimeout(function () { if (pending[id]) { delete pending[id]; resolve(false); } }, 15000);
+    });
+  }
+  var B = "display:inline-block;margin:3px 6px 3px 0;padding:4px 10px;border:1px solid #a8a29e;border-radius:6px;background:#fff;color:#1c1917;font:inherit;cursor:pointer";
+  function el(tag, attrs, text) { var e = document.createElement(tag); for (var k in attrs) e.setAttribute(k, attrs[k]); if (text) e.textContent = text; return e; }
+  function show() {
+    if (shown || !config || !config.ask) return;
+    shown = true;
+    clearInterval(timer);
+    var L = config.labels;
+    var box = el("div", { "data-kc-rating": "", "data-kc-personal": "", role: "region", "aria-label": L.ask, lang: L.lang, dir: L.dir,
+      style: "box-sizing:border-box;max-width:760px;margin:24px auto 0;padding:10px 14px;border:1px solid #d6d3d1;border-radius:10px;background:#fafaf9;color:#1c1917;font:14px/1.5 system-ui,-apple-system,sans-serif;text-align:start" });
+    var live = el("div", { "aria-live": "polite" });
+    box.appendChild(live);
+    function ask(msg) {
+      live.innerHTML = "";
+      live.appendChild(el("span", { style: "font-weight:600;margin-inline-end:8px" }, L.ask));
+      [1, 2, 3].forEach(function (s) {
+        var b = el("button", { type: "button", style: B }, s + " · " + L["s" + s]);
+        b.addEventListener("click", function () {
+          live.querySelectorAll("button").forEach(function (x) { x.disabled = true; });
+          save(s, "").then(function (ok) { if (ok) comment(s); else ask(L.error); });
+        });
+        live.appendChild(b);
+      });
+      if (config.preview) live.appendChild(el("div", { style: "font-size:12px;color:#57534e" }, L.preview));
+      if (msg) live.appendChild(el("div", { role: "alert", style: "color:#991b1b;font-size:13px" }, msg));
+    }
+    function comment(score) {
+      live.innerHTML = "";
+      var id = "kc-rate-comment";
+      live.appendChild(el("label", { for: id, style: "display:block;font-weight:600;margin-bottom:4px" }, L.comment));
+      var row = el("div", { style: "display:flex;flex-wrap:wrap;gap:6px;align-items:center" });
+      var input = el("input", { id: id, type: "text", maxlength: "1000", autocomplete: "off", dir: "auto",
+        style: "flex:1 1 260px;min-width:0;box-sizing:border-box;padding:5px 8px;border:1px solid #a8a29e;border-radius:6px;background:#fff;color:#1c1917;font:inherit" });
+      var send = el("button", { type: "button", style: B + ";background:#292524;color:#fff;border-color:#292524" }, L.send);
+      var skip = el("button", { type: "button", style: B }, L.skip);
+      function done() { live.innerHTML = ""; live.appendChild(el("span", { style: "font-weight:600" }, L.thanks)); setTimeout(function () { box.remove(); }, 2000); }
+      send.addEventListener("click", function () {
+        var text = input.value.trim();
+        if (!text) return done();
+        send.disabled = skip.disabled = true;
+        save(score, text).then(function (ok) { if (ok) done(); else { send.disabled = skip.disabled = false; live.appendChild(el("div", { role: "alert", style: "color:#991b1b;font-size:13px" }, L.error)); } });
+      });
+      input.addEventListener("keydown", function (e) { if (e.key === "Enter") send.click(); });
+      skip.addEventListener("click", done);
+      row.appendChild(input); row.appendChild(send); row.appendChild(skip);
+      live.appendChild(row);
+      input.focus();
+    }
+    ask("");
+    var mark = document.querySelector("[data-kc-end]"), foot = document.querySelector("footer[data-kc-credit]");
+    if (mark) mark.insertAdjacentElement("afterend", box);
+    else if (foot) foot.parentNode.insertBefore(box, foot);
+    else document.body.appendChild(box);
+  }
+  function check() {
+    if (!reached && finished()) reached = true;
+    if (reached) show();
+  }
+  window.addEventListener("message", function (e) {
+    if (e.source !== parent || !e.data || e.data.versionId !== cfg.versionId) return;
+    var d = e.data;
+    if (d.type === "kc:rate-config" && !cfg.direct) { config = { ask: !!d.ask, preview: !!d.preview, labels: d.labels }; check(); }
+    if (d.type === "kc:rate-result" && pending[d.id]) { pending[d.id](!!d.ok); delete pending[d.id]; }
+  });
+  // The app page may start listening after this page loads: ask a few times.
+  var hellos = 0;
+  function hello() { if (framed && !cfg.direct && !config && hellos++ < 8) parent.postMessage({ type: "kc:rate-hello", versionId: cfg.versionId }, cfg.appOrigin); }
+  hello();
+  var timer = setInterval(function () { if (hellos < 8 && !config) hello(); check(); }, 800);
+  window.addEventListener("scroll", function () { if (scrollY > 0) scrolled = true; check(); }, { passive: true });
+  ["click", "input", "keydown"].forEach(function (t) { document.addEventListener(t, function (e) { if (e.target && e.target.closest && e.target.closest("[data-kc-rating]")) return; acted = true; setTimeout(check, 50); }, true); });
+})();
+</script></body>
+</html>

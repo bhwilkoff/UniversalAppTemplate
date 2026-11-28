@@ -189,7 +189,7 @@ test('a website is shown by an https address that is not this site', () => {
   assert.match(apply(r, A, { t: 'site', url: 'https://humanshaped.org/' }, 2).error, /cannot be shown/);
   apply(r, A, { t: 'site', url: 'https://ana.github.io/app/' }, 2);
   assert.equal(r.show, 'page');
-  assert.deepEqual(publicRoom(r).page, { owner: null, repo: null, sha: null, htmlV: 0, url: 'https://ana.github.io/app/', path: null, v: 0, name: 'ana.github.io' });
+  assert.deepEqual(publicRoom(r).page, { owner: null, repo: null, sha: null, htmlV: 0, url: 'https://ana.github.io/app/', path: null, v: 0, name: 'ana.github.io', together: false });
 });
 
 test('showing the same site again reloads it, and a page in a repository is a file that stays inside it', () => {
@@ -227,4 +227,26 @@ test('a running clock moves by half a minute, and never into the past', () => {
   assert.equal(r.clock.endsAt, 3000);
   apply(r, A, { t: 'clock', seconds: 0 }, 4000);
   assert.ok(apply(r, A, { t: 'clockAdd', seconds: 30 }, 5000).error);
+});
+
+test('a model shown together carries one shared state anyone in the call can change', () => {
+  const r = started(), url = 'https://ideasatplay.org/play/do-random-events-cluster-9f6544?v=4';
+  assert.deepEqual(apply(r, A, { t: 'site', url, name: 'Do Random Events Cluster?', together: true }, 2), { room: true });
+  assert.equal(publicRoom(r).page.together, true);
+  assert.deepEqual(publicRoom(r).mstate, { state: '', seq: 0, by: null });
+  assert.deepEqual(apply(r, B, { t: 'mstate', state: '{"pick":"A"}' }, 3), { room: true });
+  assert.deepEqual(publicRoom(r).mstate, { state: '{"pick":"A"}', seq: 1, by: 'b' });
+  assert.deepEqual(apply(r, A, { t: 'mstate', state: '{"pick":"A"}' }, 4), {});
+  assert.match(apply(r, A, { t: 'mstate', state: 'not json' }, 5).error, /could not be shared/);
+  assert.match(apply(r, A, { t: 'mstate', state: JSON.stringify({ x: 'y'.repeat(LIMITS.mstate) }) }, 6).error, /too much/);
+});
+
+test('only an Ideas at Play model can be shared, and a page shown alone shares nothing', () => {
+  const r = started();
+  apply(r, A, { t: 'site', url: 'https://example.org/', together: true }, 2);
+  assert.equal(publicRoom(r).page.together, false);
+  assert.equal(publicRoom(r).mstate, null);
+  assert.match(apply(r, B, { t: 'mstate', state: '{}' }, 3).error, /No shared model/);
+  apply(r, A, { t: 'site', url: 'https://ideasatplay.org/play/x-1a2b3c?v=1' }, 4);
+  assert.match(apply(r, B, { t: 'mstate', state: '{}' }, 5).error, /No shared model/);
 });

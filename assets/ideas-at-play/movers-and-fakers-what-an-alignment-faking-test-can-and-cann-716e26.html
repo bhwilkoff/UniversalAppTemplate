@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><script data-kc-runtime>window.__kcPatternsConfig = {"versionId":"cmwx2xze9000008l5vjn8bvt0"};</script><script data-kc-runtime>"use strict";(()=>{(function(){"use strict";var oe=window.kc=window.kc||{};if(oe.patterns)return;var H=1,Ge=window.__kcPatternsConfig||{},ve=["commit","confidence","reveal","after","explain","answer","agree","question","contrast","allocate","rank","sort","calibration","return"],Q={allocate:1,rank:1,sort:1},Qe="[data-kc-commit],[data-kc-answer],[data-kc-question]",ge=[["option","choice"],["number","number"],["allocate","allocate"],["rank","rank"],["sort","sort"]],W=/^[a-z][a-z0-9_]{0,31}$/,$e={standalone:1,breakout:1,plenary:1,homework:1,self:1,presenter:1};function $(){return b==="standalone"||b==="self"}function he(e){return b!=="homework"?!1:C("reveal").some(function(t){return t.group===e&&t.el.getAttribute("data-kc-when")==="self"})}function Ne(e){var t=C("commit").filter(function(r){return r.group===e}).map(function(r){return r.id});!t.length||!t.every(function(r){return N[r]!==void 0&&N[r]!==null})||we({v:H,type:"kc:p-revealed",group:e,values:t.map(function(r){return{id:r,letter:null,value:N[r],level:null,text:null}})})}var Ke=5e3,b=null,M=null,N={},be=!1,T=[],ke={};function V(e,t){(ke[e]||[]).slice().forEach(function(r){try{r(t)}catch{}})}function z(e,t){(ke[e]=ke[e]||[]).push(t)}function Je(e){for(var t=0;t<ve.length;t++)if(e.hasAttribute("data-kc-"+ve[t]))return ve[t];return null}function Ze(e){for(var t=0;t<ge.length;t++)if(e.querySelector("[data-kc-"+ge[t][0]+"]"))return ge[t][1];return null}function Xe(e){var t=e.getAttribute("data-kc-v"),r=t===null||t===""?1:Number(t);return isFinite(r)&&r>=1?Math.floor(r):1}function et(){var e=[],t={};return Array.prototype.forEach.call(document.querySelectorAll("[data-kc-v]"),function(r){var n=Je(r);if(n&&!(Q[n]&&r.parentElement&&r.parentElement.closest(Qe))){var i=Xe(r);if(i>H){r.innerHTML="";var a=document.createElement("p");a.className="kc-p-newer",a.textContent=d("newer"),r.appendChild(a);return}if(n==="calibration"||n==="return"){e.push({type:n,id:n,group:null,widget:null,v:i,el:r});return}var o=r.getAttribute("data-kc-"+n)||"",u=n==="confidence"?r.getAttribute("data-kc-for")||"":o;if(!(!W.test(u)||n!=="confidence"&&n!=="after"&&n!=="agree"&&n!=="reveal"&&t[n+":"+u])){t[n+":"+u]=1;var m=r.getAttribute("data-kc-group");n==="commit"||n==="explain"?m=m&&W.test(m)?m:u:n==="question"||n==="reveal"||n==="after"?m=u:n!=="question"&&(m=null);var g=n==="commit"?{revoteOf:W.test(r.getAttribute("data-kc-revote-of")||"")?r.getAttribute("data-kc-revote-of"):null,right:r.getAttribute("data-kc-right")}:{};e.push({revoteOf:g.revoteOf||null,right:g.right==null?null:g.right,type:n,id:u,group:m,widget:Q[n]?n:n==="commit"||n==="answer"||n==="question"?Ze(r):null,v:i,el:r})}}}),e.forEach(function(r){if(r.type==="confidence"){var n=e.filter(function(i){return i.type==="commit"&&i.id===r.id})[0];r.group=n?n.group:r.id}}),e}var K={en:{newer:"This part needs a newer version of Ideas at Play.",lock:"Lock in",pickOne:"Choose an answer first",pickSure:"Pick how sure you are",undo:"Undo",locked:"Locked in \u2713",lockedSr:"Locked in. You can undo for 15 seconds.",undone:"Undone. You can change your answer.",howSure:"How sure are you?",sure:"Sure",fairly:"Fairly sure",guessing:"Guessing",reveal:"Show everyone",answered:"{n} of {m} have answered",needMost:"Opens when most of the group has answered",needAll:"Opens when everyone has answered",needAny:"Opens when someone has answered",byInstructor:"Your instructor will show the answers.",autoIn:"Shows everyone in {s} s",everyone:"Everyone's answers",yours:"Your answer",revealedSr:"The answers are shown.",noLetter:"You're watching: every letter is taken.",waiting:"Connecting\u2026",nobody:"No answers yet.",enterNumber:"Enter a number from {min} to {max}",spendAll:"Place all {n} first",left:"{n} left",add:"Add one to {item}",remove:"Remove one from {item}",moveUp:"Move up: {item}",moveDown:"Move down: {item}",moved:"{item}: position {n}",unsorted:"Not sorted yet",moveTo:"Move {item} to\u2026",sortAll:"Sort every item first",placed:"{item}: {bin}",agree:"Agree",done:"Done: show me",agreedBy:"Agreed: {list} ({n} of {m})",committedBy:"Committed by {list} \u2713",reopened:"{who} reopened the answer",whoBreakout:"Your instructor sees this now. Your group sees it after the answers are shown.",whoInstructor:"Only your instructor sees this.",whoAlone:"This stays on your screen.",whoGroup:"Your group writes this together. Your instructor sees it.",afterRelease:"You'll see the answers once your professor releases them.",continue:"Continue",writeFirst:"Write something first.",whoSelf:"Only you see this. It's kept with your progress if you save it.",calibrationNone:"Your calibration appears here once you've answered predictions with how sure you were.",calibrationSure:"When you were sure: right {m} of {n}.",calibrationLevel:"{level}: right {m} of {n}.",calibrationWrong:"Sure, but not right: worth another look.",calibrationRight:"(The answer: {answer}.)",returnNeedsSaving:"Save your progress to get a short check when you come back in a few days.",lockedWait:"Locked in \u2713 Whether it's right shows when the answers are shown to everyone.",check:"Check",right:"Right.",notQuite:"Not quite.",tryAgain:"Try again.",attemptN:"Attempt {n}",calc:"Calculator",calcInput:"Calculation, for example 99 / (99 + 999)",calcPlaceholder:"e.g. 99 / (99 + 999)",calcKeys:"Calculator keys",calcHistory:"Recent calculations: choose one to use its answer",calcError:"Check the calculation: numbers, + \u2212 \xD7 \xF7, ^, \u221A, brackets and % only.",calcZero:"Can't divide by zero.",calcBig:"That number is too large to show.",calcComma:"Use a point for decimals (0.5), or a comma only between groups of three digits (1,000).",calcDivide:"divide",calcTimes:"times",calcMinus:"minus",calcPlus:"plus",calcPercent:"percent",calcPower:"to the power of",calcRoot:"square root of",calcNegRoot:"No square root of a negative number.",calcClear:"clear",calcBack:"delete the last character",saved:"Your answer is saved. You'll see whether it's right once your professor releases the answers."},es:{newer:"Esta parte necesita una versi\xF3n m\xE1s reciente de Ideas at Play.",lock:"Fijar respuesta",pickOne:"Elige una respuesta primero",pickSure:"Indica qu\xE9 tan seguro est\xE1s",undo:"Deshacer",locked:"Respuesta fijada \u2713",lockedSr:"Respuesta fijada. Puedes deshacerla durante 15 segundos.",undone:"Deshecho. Puedes cambiar tu respuesta.",howSure:"\xBFQu\xE9 tan seguro est\xE1s?",sure:"Seguro",fairly:"Bastante seguro",guessing:"Adivinando",reveal:"Mostrar a todos",answered:"{n} de {m} han respondido",needMost:"Se abre cuando la mayor\xEDa del grupo haya respondido",needAll:"Se abre cuando todos hayan respondido",needAny:"Se abre cuando alguien haya respondido",byInstructor:"Tu profesor mostrar\xE1 las respuestas.",autoIn:"Se muestra a todos en {s} s",everyone:"Respuestas de todos",yours:"Tu respuesta",revealedSr:"Se muestran las respuestas.",noLetter:"Est\xE1s observando: todas las letras est\xE1n ocupadas.",waiting:"Conectando\u2026",nobody:"A\xFAn no hay respuestas.",enterNumber:"Escribe un n\xFAmero de {min} a {max}",spendAll:"Coloca los {n} primero",left:"Quedan {n}",add:"A\xF1adir uno a {item}",remove:"Quitar uno de {item}",moveUp:"Subir: {item}",moveDown:"Bajar: {item}",moved:"{item}: posici\xF3n {n}",unsorted:"Sin clasificar",moveTo:"Mover {item} a\u2026",sortAll:"Clasifica todos los elementos primero",placed:"{item}: {bin}",agree:"De acuerdo",done:"Listo: mu\xE9stramelo",agreedBy:"De acuerdo: {list} ({n} de {m})",committedBy:"Confirmado por {list} \u2713",reopened:"{who} reabri\xF3 la respuesta",whoBreakout:"Tu profesor ve esto ahora. Tu grupo lo ver\xE1 cuando se muestren las respuestas.",whoInstructor:"Solo tu profesor ve esto.",whoAlone:"Esto se queda en tu pantalla.",whoGroup:"Tu grupo escribe esto en conjunto. Tu profesor lo ve.",afterRelease:"Ver\xE1s las respuestas cuando tu profesor las publique.",continue:"Continuar",writeFirst:"Escribe algo primero.",whoSelf:"Solo t\xFA lo ves. Se guarda con tu progreso si lo guardas.",calibrationNone:"Tu calibraci\xF3n aparecer\xE1 aqu\xED cuando respondas predicciones indicando tu seguridad.",calibrationSure:"Cuando estabas seguro: acertaste {m} de {n}.",calibrationLevel:"{level}: acertaste {m} de {n}.",calibrationWrong:"Seguro, pero no acertado: vale la pena revisarlo.",calibrationRight:"(La respuesta: {answer}.)",returnNeedsSaving:"Guarda tu progreso para recibir un breve repaso cuando vuelvas en unos d\xEDas.",lockedWait:"Respuesta fijada \u2713 Ver\xE1s si es correcta cuando se muestren las respuestas a todos.",check:"Comprobar",right:"Correcto.",notQuite:"No del todo.",tryAgain:"Int\xE9ntalo de nuevo.",attemptN:"Intento {n}",calc:"Calculadora",calcInput:"C\xE1lculo, por ejemplo 99 / (99 + 999)",calcPlaceholder:"p. ej. 99 / (99 + 999)",calcKeys:"Teclas de la calculadora",calcHistory:"C\xE1lculos recientes: elige uno para usar su resultado",calcError:"Revisa el c\xE1lculo: solo n\xFAmeros, + \u2212 \xD7 \xF7, ^, \u221A, par\xE9ntesis y %.",calcZero:"No se puede dividir entre cero.",calcBig:"El n\xFAmero es demasiado grande para mostrarlo.",calcComma:"Usa una coma para los decimales (0,5).",calcDivide:"dividir",calcTimes:"por",calcMinus:"menos",calcPlus:"m\xE1s",calcPercent:"por ciento",calcPower:"elevado a",calcRoot:"ra\xEDz cuadrada de",calcNegRoot:"Un n\xFAmero negativo no tiene ra\xEDz cuadrada.",calcClear:"borrar",calcBack:"borrar el \xFAltimo car\xE1cter",saved:"Tu respuesta est\xE1 guardada. Sabr\xE1s si es correcta cuando tu profesor publique las respuestas."},ar:{newer:"\u064A\u062D\u062A\u0627\u062C \u0647\u0630\u0627 \u0627\u0644\u062C\u0632\u0621 \u0625\u0644\u0649 \u0625\u0635\u062F\u0627\u0631 \u0623\u062D\u062F\u062B \u0645\u0646 Ideas at Play.",lock:"\u062B\u0628\u0651\u062A \u0625\u062C\u0627\u0628\u062A\u0643",pickOne:"\u0627\u062E\u062A\u0631 \u0625\u062C\u0627\u0628\u0629 \u0623\u0648\u0644\u064B\u0627",pickSure:"\u062D\u062F\u0651\u062F \u0645\u062F\u0649 \u062B\u0642\u062A\u0643",undo:"\u062A\u0631\u0627\u062C\u0639",locked:"\u062A\u0645 \u0627\u0644\u062A\u062B\u0628\u064A\u062A \u2713",lockedSr:"\u062A\u0645 \u062A\u062B\u0628\u064A\u062A \u0625\u062C\u0627\u0628\u062A\u0643. \u064A\u0645\u0643\u0646\u0643 \u0627\u0644\u062A\u0631\u0627\u062C\u0639 \u062E\u0644\u0627\u0644 15 \u062B\u0627\u0646\u064A\u0629.",undone:"\u062A\u0645 \u0627\u0644\u062A\u0631\u0627\u062C\u0639. \u064A\u0645\u0643\u0646\u0643 \u062A\u063A\u064A\u064A\u0631 \u0625\u062C\u0627\u0628\u062A\u0643.",howSure:"\u0645\u0627 \u0645\u062F\u0649 \u062B\u0642\u062A\u0643\u061F",sure:"\u0648\u0627\u062B\u0642",fairly:"\u0648\u0627\u062B\u0642 \u0625\u0644\u0649 \u062D\u062F \u0645\u0627",guessing:"\u0623\u062E\u0645\u0651\u0646",reveal:"\u0627\u0639\u0631\u0636 \u0644\u0644\u062C\u0645\u064A\u0639",answered:"\u0623\u062C\u0627\u0628 {n} \u0645\u0646 {m}",needMost:"\u064A\u064F\u062A\u0627\u062D \u0639\u0646\u062F\u0645\u0627 \u064A\u062C\u064A\u0628 \u0645\u0639\u0638\u0645 \u0627\u0644\u0645\u062C\u0645\u0648\u0639\u0629",needAll:"\u064A\u064F\u062A\u0627\u062D \u0639\u0646\u062F\u0645\u0627 \u064A\u062C\u064A\u0628 \u0627\u0644\u062C\u0645\u064A\u0639",needAny:"\u064A\u064F\u062A\u0627\u062D \u0639\u0646\u062F\u0645\u0627 \u064A\u062C\u064A\u0628 \u0623\u062D\u062F\u0647\u0645",byInstructor:"\u0633\u064A\u0639\u0631\u0636 \u0627\u0644\u0645\u062F\u0631\u0651\u0633 \u0627\u0644\u0625\u062C\u0627\u0628\u0627\u062A.",autoIn:"\u064A\u064F\u0639\u0631\u0636 \u0644\u0644\u062C\u0645\u064A\u0639 \u062E\u0644\u0627\u0644 {s} \u062B",everyone:"\u0625\u062C\u0627\u0628\u0627\u062A \u0627\u0644\u062C\u0645\u064A\u0639",yours:"\u0625\u062C\u0627\u0628\u062A\u0643",revealedSr:"\u0627\u0644\u0625\u062C\u0627\u0628\u0627\u062A \u0645\u0639\u0631\u0648\u0636\u0629 \u0627\u0644\u0622\u0646.",noLetter:"\u0623\u0646\u062A \u062A\u0634\u0627\u0647\u062F \u0641\u0642\u0637: \u062C\u0645\u064A\u0639 \u0627\u0644\u062D\u0631\u0648\u0641 \u0645\u0623\u062E\u0648\u0630\u0629.",waiting:"\u062C\u0627\u0631\u064D \u0627\u0644\u0627\u062A\u0635\u0627\u0644\u2026",nobody:"\u0644\u0627 \u062A\u0648\u062C\u062F \u0625\u062C\u0627\u0628\u0627\u062A \u0628\u0639\u062F.",enterNumber:"\u0623\u062F\u062E\u0644 \u0639\u062F\u062F\u064B\u0627 \u0645\u0646 {min} \u0625\u0644\u0649 {max}",spendAll:"\u0648\u0632\u0651\u0639 \u0627\u0644\u0640 {n} \u0643\u0644\u0647\u0627 \u0623\u0648\u0644\u064B\u0627",left:"\u0645\u062A\u0628\u0642\u064D: {n}",add:"\u0623\u0636\u0641 \u0648\u0627\u062D\u062F\u064B\u0627 \u0625\u0644\u0649 {item}",remove:"\u0623\u0632\u0644 \u0648\u0627\u062D\u062F\u064B\u0627 \u0645\u0646 {item}",moveUp:"\u0627\u0646\u0642\u0644 \u0644\u0644\u0623\u0639\u0644\u0649: {item}",moveDown:"\u0627\u0646\u0642\u0644 \u0644\u0644\u0623\u0633\u0641\u0644: {item}",moved:"{item}: \u0627\u0644\u0645\u0631\u062A\u0628\u0629 {n}",unsorted:"\u0644\u0645 \u064A\u064F\u0635\u0646\u064E\u0651\u0641 \u0628\u0639\u062F",moveTo:"\u0627\u0646\u0642\u0644 {item} \u0625\u0644\u0649\u2026",sortAll:"\u0635\u0646\u0651\u0641 \u0643\u0644 \u0627\u0644\u0639\u0646\u0627\u0635\u0631 \u0623\u0648\u0644\u064B\u0627",placed:"{item}: {bin}",agree:"\u0645\u0648\u0627\u0641\u0642",done:"\u062A\u0645: \u0627\u0639\u0631\u0636 \u0627\u0644\u0646\u062A\u064A\u062C\u0629",agreedBy:"\u0648\u0627\u0641\u0642: {list} ({n} \u0645\u0646 {m})",committedBy:"\u0627\u0639\u062A\u0645\u062F\u0647\u0627 {list} \u2713",reopened:"\u0623\u0639\u0627\u062F {who} \u0641\u062A\u062D \u0627\u0644\u0625\u062C\u0627\u0628\u0629",whoBreakout:"\u064A\u0631\u0649 \u0645\u062F\u0631\u0651\u0633\u0643 \u0647\u0630\u0627 \u0627\u0644\u0622\u0646\u060C \u0648\u062A\u0631\u0649 \u0645\u062C\u0645\u0648\u0639\u062A\u0643 \u0630\u0644\u0643 \u0628\u0639\u062F \u0639\u0631\u0636 \u0627\u0644\u0625\u062C\u0627\u0628\u0627\u062A.",whoInstructor:"\u0644\u0627 \u064A\u0631\u0649 \u0647\u0630\u0627 \u0625\u0644\u0627 \u0645\u062F\u0631\u0651\u0633\u0643.",whoAlone:"\u064A\u0628\u0642\u0649 \u0647\u0630\u0627 \u0639\u0644\u0649 \u0634\u0627\u0634\u062A\u0643.",whoGroup:"\u062A\u0643\u062A\u0628 \u0645\u062C\u0645\u0648\u0639\u062A\u0643 \u0647\u0630\u0627 \u0645\u0639\u064B\u0627\u060C \u0648\u064A\u0631\u0627\u0647 \u0645\u062F\u0631\u0651\u0633\u0643.",afterRelease:"\u0633\u062A\u0631\u0649 \u0627\u0644\u0625\u062C\u0627\u0628\u0627\u062A \u0639\u0646\u062F\u0645\u0627 \u064A\u0646\u0634\u0631\u0647\u0627 \u0645\u062F\u0631\u0651\u0633\u0643.",continue:"\u0645\u062A\u0627\u0628\u0639\u0629",writeFirst:"\u0627\u0643\u062A\u0628 \u0634\u064A\u0626\u064B\u0627 \u0623\u0648\u0644\u064B\u0627.",whoSelf:"\u0644\u0627 \u064A\u0631\u0649 \u0647\u0630\u0627 \u063A\u064A\u0631\u0643. \u064A\u064F\u062D\u0641\u0638 \u0645\u0639 \u062A\u0642\u062F\u0651\u0645\u0643 \u0625\u0646 \u062D\u0641\u0638\u062A\u0647.",calibrationNone:"\u0633\u062A\u0638\u0647\u0631 \u0645\u0639\u0627\u064A\u0631\u062A\u0643 \u0647\u0646\u0627 \u0628\u0639\u062F \u0623\u0646 \u062A\u062C\u064A\u0628 \u0639\u0646 \u0627\u0644\u062A\u0648\u0642\u0639\u0627\u062A \u0645\u0639 \u062A\u062D\u062F\u064A\u062F \u0645\u062F\u0649 \u062B\u0642\u062A\u0643.",calibrationSure:"\u062D\u064A\u0646 \u0643\u0646\u062A \u0648\u0627\u062B\u0642\u064B\u0627: \u0623\u0635\u0628\u062A \u0641\u064A {m} \u0645\u0646 {n}.",calibrationLevel:"{level}: \u0623\u0635\u0628\u062A \u0641\u064A {m} \u0645\u0646 {n}.",calibrationWrong:"\u0643\u0646\u062A \u0648\u0627\u062B\u0642\u064B\u0627 \u0644\u0643\u0646 \u0644\u0645 \u062A\u064F\u0635\u0628: \u064A\u0633\u062A\u062D\u0642 \u0646\u0638\u0631\u0629 \u0623\u062E\u0631\u0649.",calibrationRight:"(\u0627\u0644\u0625\u062C\u0627\u0628\u0629: {answer}.)",returnNeedsSaving:"\u0627\u062D\u0641\u0638 \u062A\u0642\u062F\u0651\u0645\u0643 \u0644\u062A\u062D\u0635\u0644 \u0639\u0644\u0649 \u0645\u0631\u0627\u062C\u0639\u0629 \u0642\u0635\u064A\u0631\u0629 \u062D\u064A\u0646 \u062A\u0639\u0648\u062F \u0628\u0639\u062F \u0623\u064A\u0627\u0645.",lockedWait:"\u062A\u0645 \u0627\u0644\u062A\u062B\u0628\u064A\u062A \u2713 \u0633\u062A\u0631\u0649 \u0625\u0646 \u0643\u0627\u0646\u062A \u0635\u062D\u064A\u062D\u0629 \u0639\u0646\u062F\u0645\u0627 \u062A\u064F\u0639\u0631\u0636 \u0627\u0644\u0625\u062C\u0627\u0628\u0627\u062A \u0639\u0644\u0649 \u0627\u0644\u062C\u0645\u064A\u0639.",check:"\u062A\u062D\u0642\u0651\u0642",right:"\u0635\u062D\u064A\u062D.",notQuite:"\u0644\u064A\u0633 \u062A\u0645\u0627\u0645\u064B\u0627.",tryAgain:"\u062D\u0627\u0648\u0644 \u0645\u0631\u0629 \u0623\u062E\u0631\u0649.",attemptN:"\u0627\u0644\u0645\u062D\u0627\u0648\u0644\u0629 {n}",calc:"\u0622\u0644\u0629 \u062D\u0627\u0633\u0628\u0629",calcInput:"\u0639\u0645\u0644\u064A\u0629 \u062D\u0633\u0627\u0628\u064A\u0629\u060C \u0645\u062B\u0644\u064B\u0627 99 / (99 + 999)",calcPlaceholder:"\u0645\u062B\u0644\u064B\u0627 99 / (99 + 999)",calcKeys:"\u0623\u0632\u0631\u0627\u0631 \u0627\u0644\u0622\u0644\u0629 \u0627\u0644\u062D\u0627\u0633\u0628\u0629",calcHistory:"\u0627\u0644\u0639\u0645\u0644\u064A\u0627\u062A \u0627\u0644\u0623\u062E\u064A\u0631\u0629: \u0627\u062E\u062A\u0631 \u0648\u0627\u062D\u062F\u0629 \u0644\u0627\u0633\u062A\u062E\u062F\u0627\u0645 \u0646\u062A\u064A\u062C\u062A\u0647\u0627",calcError:"\u0631\u0627\u062C\u0639 \u0627\u0644\u0639\u0645\u0644\u064A\u0629: \u0623\u0631\u0642\u0627\u0645 \u0648 + \u2212 \xD7 \xF7 \u0648 ^ \u0648 \u221A \u0648\u0627\u0644\u0623\u0642\u0648\u0627\u0633 \u0648 % \u0641\u0642\u0637.",calcZero:"\u0644\u0627 \u064A\u0645\u0643\u0646 \u0627\u0644\u0642\u0633\u0645\u0629 \u0639\u0644\u0649 \u0635\u0641\u0631.",calcBig:"\u0627\u0644\u0639\u062F\u062F \u0623\u0643\u0628\u0631 \u0645\u0646 \u0623\u0646 \u064A\u064F\u0639\u0631\u0636.",calcComma:"\u0627\u0633\u062A\u062E\u062F\u0645 \u0627\u0644\u0646\u0642\u0637\u0629 \u0644\u0644\u0643\u0633\u0648\u0631 \u0627\u0644\u0639\u0634\u0631\u064A\u0629 (0.5)\u060C \u0648\u0627\u0644\u0641\u0627\u0635\u0644\u0629 \u0628\u064A\u0646 \u0643\u0644 \u062B\u0644\u0627\u062B\u0629 \u0623\u0631\u0642\u0627\u0645 \u0641\u0642\u0637 (1,000).",calcDivide:"\u0642\u0633\u0645\u0629",calcTimes:"\u0636\u0631\u0628",calcMinus:"\u0646\u0627\u0642\u0635",calcPlus:"\u0632\u0627\u0626\u062F",calcPercent:"\u0628\u0627\u0644\u0645\u0626\u0629",calcPower:"\u0623\u0633",calcRoot:"\u0627\u0644\u062C\u0630\u0631 \u0627\u0644\u062A\u0631\u0628\u064A\u0639\u064A \u0644\u0640",calcNegRoot:"\u0644\u0627 \u062C\u0630\u0631 \u062A\u0631\u0628\u064A\u0639\u064A\u064B\u0627 \u0644\u0639\u062F\u062F \u0633\u0627\u0644\u0628.",calcClear:"\u0645\u0633\u062D",calcBack:"\u062D\u0630\u0641 \u0622\u062E\u0631 \u062D\u0631\u0641",saved:"\u062A\u0645 \u062D\u0641\u0638 \u0625\u062C\u0627\u0628\u062A\u0643. \u0633\u062A\u0639\u0631\u0641 \u0625\u0646 \u0643\u0627\u0646\u062A \u0635\u062D\u064A\u062D\u0629 \u0639\u0646\u062F\u0645\u0627 \u064A\u0646\u0634\u0631 \u0645\u062F\u0631\u0651\u0633\u0643 \u0627\u0644\u0625\u062C\u0627\u0628\u0627\u062A."},ja:{newer:"\u3053\u306E\u90E8\u5206\u3092\u8868\u793A\u3059\u308B\u306B\u306F\u3001\u65B0\u3057\u3044\u30D0\u30FC\u30B8\u30E7\u30F3\u306E Ideas at Play \u304C\u5FC5\u8981\u3067\u3059\u3002",lock:"\u56DE\u7B54\u3092\u78BA\u5B9A",pickOne:"\u307E\u305A\u7B54\u3048\u3092\u9078\u3093\u3067\u304F\u3060\u3055\u3044",pickSure:"\u81EA\u4FE1\u306E\u5EA6\u5408\u3044\u3092\u9078\u3093\u3067\u304F\u3060\u3055\u3044",undo:"\u53D6\u308A\u6D88\u3059",locked:"\u78BA\u5B9A\u3057\u307E\u3057\u305F \u2713",lockedSr:"\u56DE\u7B54\u3092\u78BA\u5B9A\u3057\u307E\u3057\u305F\u300215\u79D2\u9593\u306F\u53D6\u308A\u6D88\u305B\u307E\u3059\u3002",undone:"\u53D6\u308A\u6D88\u3057\u307E\u3057\u305F\u3002\u7B54\u3048\u3092\u5909\u3048\u3089\u308C\u307E\u3059\u3002",howSure:"\u3069\u306E\u304F\u3089\u3044\u81EA\u4FE1\u304C\u3042\u308A\u307E\u3059\u304B\uFF1F",sure:"\u81EA\u4FE1\u3042\u308A",fairly:"\u307E\u3042\u307E\u3042\u81EA\u4FE1\u3042\u308A",guessing:"\u5F53\u3066\u305A\u3063\u307D\u3046",reveal:"\u307F\u3093\u306A\u306B\u898B\u305B\u308B",answered:"{m}\u4EBA\u4E2D{n}\u4EBA\u304C\u56DE\u7B54",needMost:"\u30B0\u30EB\u30FC\u30D7\u306E\u904E\u534A\u6570\u304C\u56DE\u7B54\u3059\u308B\u3068\u62BC\u305B\u307E\u3059",needAll:"\u5168\u54E1\u304C\u56DE\u7B54\u3059\u308B\u3068\u62BC\u305B\u307E\u3059",needAny:"\u8AB0\u304B\u304C\u56DE\u7B54\u3059\u308B\u3068\u62BC\u305B\u307E\u3059",byInstructor:"\u5148\u751F\u304C\u7B54\u3048\u3092\u8868\u793A\u3057\u307E\u3059\u3002",autoIn:"\u3042\u3068{s}\u79D2\u3067\u5168\u54E1\u306B\u8868\u793A",everyone:"\u307F\u3093\u306A\u306E\u7B54\u3048",yours:"\u3042\u306A\u305F\u306E\u7B54\u3048",revealedSr:"\u7B54\u3048\u304C\u8868\u793A\u3055\u308C\u307E\u3057\u305F\u3002",noLetter:"\u898B\u5B66\u4E2D\u3067\u3059\uFF1A\u6587\u5B57\u304C\u3059\u3079\u3066\u4F7F\u308F\u308C\u3066\u3044\u307E\u3059\u3002",waiting:"\u63A5\u7D9A\u4E2D\u2026",nobody:"\u307E\u3060\u56DE\u7B54\u304C\u3042\u308A\u307E\u305B\u3093\u3002",enterNumber:"{min}\u304B\u3089{max}\u307E\u3067\u306E\u6570\u3092\u5165\u529B\u3057\u3066\u304F\u3060\u3055\u3044",spendAll:"\u307E\u305A{n}\u500B\u3059\u3079\u3066\u3092\u914D\u7F6E\u3057\u3066\u304F\u3060\u3055\u3044",left:"\u6B8B\u308A{n}",add:"{item}\u306B1\u3064\u8FFD\u52A0",remove:"{item}\u304B\u30891\u3064\u6E1B\u3089\u3059",moveUp:"\u4E0A\u3078\u79FB\u52D5\uFF1A{item}",moveDown:"\u4E0B\u3078\u79FB\u52D5\uFF1A{item}",moved:"{item}\uFF1A{n}\u756A\u76EE",unsorted:"\u672A\u5206\u985E",moveTo:"{item}\u306E\u79FB\u52D5\u5148\u2026",sortAll:"\u307E\u305A\u3059\u3079\u3066\u306E\u9805\u76EE\u3092\u5206\u985E\u3057\u3066\u304F\u3060\u3055\u3044",placed:"{item}\uFF1A{bin}",agree:"\u8CDB\u6210",done:"\u5B8C\u4E86\uFF1A\u7D50\u679C\u3092\u898B\u308B",agreedBy:"\u8CDB\u6210\uFF1A{list}\uFF08{m}\u4EBA\u4E2D{n}\u4EBA\uFF09",committedBy:"{list} \u304C\u78BA\u5B9A \u2713",reopened:"{who} \u304C\u7B54\u3048\u3092\u898B\u76F4\u3057\u4E2D",whoBreakout:"\u5148\u751F\u306F\u3053\u308C\u3092\u3059\u3050\u306B\u898B\u3089\u308C\u307E\u3059\u3002\u30B0\u30EB\u30FC\u30D7\u306B\u306F\u7B54\u3048\u304C\u8868\u793A\u3055\u308C\u305F\u5F8C\u306B\u898B\u3048\u307E\u3059\u3002",whoInstructor:"\u3053\u308C\u306F\u5148\u751F\u3060\u3051\u304C\u898B\u3089\u308C\u307E\u3059\u3002",whoAlone:"\u3053\u308C\u306F\u3042\u306A\u305F\u306E\u753B\u9762\u3060\u3051\u306B\u6B8B\u308A\u307E\u3059\u3002",whoGroup:"\u30B0\u30EB\u30FC\u30D7\u3067\u4E00\u7DD2\u306B\u66F8\u304D\u307E\u3059\u3002\u5148\u751F\u3082\u898B\u3089\u308C\u307E\u3059\u3002",afterRelease:"\u5148\u751F\u304C\u7B54\u3048\u3092\u516C\u958B\u3059\u308B\u3068\u3001\u7B54\u3048\u304C\u898B\u3089\u308C\u307E\u3059\u3002",continue:"\u6B21\u3078",writeFirst:"\u307E\u305A\u4F55\u304B\u66F8\u3044\u3066\u304F\u3060\u3055\u3044\u3002",whoSelf:"\u3053\u308C\u306F\u3042\u306A\u305F\u3060\u3051\u304C\u898B\u3089\u308C\u307E\u3059\u3002\u4FDD\u5B58\u3059\u308B\u3068\u9032\u307F\u5177\u5408\u3068\u4E00\u7DD2\u306B\u6B8B\u308A\u307E\u3059\u3002",calibrationNone:"\u81EA\u4FE1\u306E\u5EA6\u5408\u3044\u3092\u3064\u3051\u3066\u4E88\u60F3\u306B\u7B54\u3048\u308B\u3068\u3001\u3053\u3053\u306B\u81EA\u5DF1\u8A55\u4FA1\u306E\u7D50\u679C\u304C\u8868\u793A\u3055\u308C\u307E\u3059\u3002",calibrationSure:"\u300C\u81EA\u4FE1\u3042\u308A\u300D\u306E\u3068\u304D\uFF1A{n}\u56DE\u4E2D{m}\u56DE\u6B63\u89E3\u3002",calibrationLevel:"{level}\uFF1A{n}\u56DE\u4E2D{m}\u56DE\u6B63\u89E3\u3002",calibrationWrong:"\u81EA\u4FE1\u304C\u3042\u3063\u305F\u306E\u306B\u5916\u308C\u305F\u3082\u306E\uFF08\u898B\u76F4\u3059\u4FA1\u5024\u304C\u3042\u308A\u307E\u3059\uFF09\uFF1A",calibrationRight:"\uFF08\u7B54\u3048\uFF1A{answer}\uFF09",returnNeedsSaving:"\u9032\u307F\u5177\u5408\u3092\u4FDD\u5B58\u3059\u308B\u3068\u3001\u6570\u65E5\u5F8C\u306B\u623B\u3063\u305F\u3068\u304D\u306B\u77ED\u3044\u78BA\u8A8D\u554F\u984C\u304C\u51FA\u307E\u3059\u3002",lockedWait:"\u78BA\u5B9A\u3057\u307E\u3057\u305F \u2713 \u5168\u54E1\u306B\u7B54\u3048\u304C\u8868\u793A\u3055\u308C\u308B\u3068\u3001\u6B63\u8AA4\u304C\u308F\u304B\u308A\u307E\u3059\u3002",check:"\u7B54\u3048\u5408\u308F\u305B",right:"\u6B63\u89E3\u3067\u3059\u3002",notQuite:"\u60DC\u3057\u3044\u3067\u3059\u3002",tryAgain:"\u3082\u3046\u4E00\u5EA6\u3084\u3063\u3066\u307F\u307E\u3057\u3087\u3046\u3002",attemptN:"{n}\u56DE\u76EE",calc:"\u96FB\u5353",calcInput:"\u8A08\u7B97\u5F0F\uFF08\u4F8B\uFF1A99 / (99 + 999)\uFF09",calcPlaceholder:"\u4F8B\uFF1A99 / (99 + 999)",calcKeys:"\u96FB\u5353\u306E\u30AD\u30FC",calcHistory:"\u6700\u8FD1\u306E\u8A08\u7B97\uFF1A\u9078\u3076\u3068\u305D\u306E\u7B54\u3048\u3092\u4F7F\u3048\u307E\u3059",calcError:"\u5F0F\u3092\u78BA\u8A8D\u3057\u3066\u304F\u3060\u3055\u3044\uFF1A\u6570\u5B57\u3001+ \u2212 \xD7 \xF7\u3001^\u3001\u221A\u3001\u304B\u3063\u3053\u3001% \u3060\u3051\u304C\u4F7F\u3048\u307E\u3059\u3002",calcZero:"0 \u3067\u5272\u308B\u3053\u3068\u306F\u3067\u304D\u307E\u305B\u3093\u3002",calcBig:"\u6570\u304C\u5927\u304D\u3059\u304E\u3066\u8868\u793A\u3067\u304D\u307E\u305B\u3093\u3002",calcComma:"\u5C0F\u6570\u306B\u306F\u70B9\u3092\u4F7F\u3063\u3066\u304F\u3060\u3055\u3044\uFF080.5\uFF09\u3002\u30B3\u30F3\u30DE\u306F3\u6841\u3054\u3068\u306E\u533A\u5207\u308A\uFF081,000\uFF09\u306B\u3060\u3051\u4F7F\u3048\u307E\u3059\u3002",calcDivide:"\u5272\u308B",calcTimes:"\u304B\u3051\u308B",calcMinus:"\u5F15\u304F",calcPlus:"\u8DB3\u3059",calcPercent:"\u30D1\u30FC\u30BB\u30F3\u30C8",calcPower:"\u7D2F\u4E57",calcRoot:"\u5E73\u65B9\u6839",calcNegRoot:"\u8CA0\u306E\u6570\u306E\u5E73\u65B9\u6839\u306F\u6C42\u3081\u3089\u308C\u307E\u305B\u3093\u3002",calcClear:"\u30AF\u30EA\u30A2",calcBack:"\u6700\u5F8C\u306E1\u6587\u5B57\u3092\u6D88\u3059",saved:"\u56DE\u7B54\u306F\u4FDD\u5B58\u3055\u308C\u307E\u3057\u305F\u3002\u5148\u751F\u304C\u7B54\u3048\u3092\u516C\u958B\u3059\u308B\u3068\u3001\u6B63\u89E3\u304B\u3069\u3046\u304B\u304C\u308F\u304B\u308A\u307E\u3059\u3002"}};function Oe(e){return e=String(e||"").toLowerCase().split("-")[0],K[e]?e:null}function le(){return Oe(document.documentElement.getAttribute("lang"))||"en"}function Me(e,t){return String(e).replace(/\{(\w+)\}/g,function(r,n){return t&&n in t?t[n]:r})}function d(e,t,r){var n=r&&r.getAttribute("data-kc-label-"+e);return Me(n||(K[le()]||K.en)[e]||K.en[e]||e,t)}function tt(e,t){var r=Oe(document.documentElement.getAttribute("data-kc-help-lang"));return r&&r!==le()?Me(K[r][e]||"",t):""}var J={send:function(e,t){var r={type:e,v:H,versionId:Ge.versionId};for(var n in t)r[n]=t[n];try{parent.postMessage(r,"*")}catch{}}},Y=(function(){var e={};function t(i,a){setTimeout(function(){we(Object.assign({type:i,v:H},a))},0)}function r(i){var a=[],o=e[i]||{};for(var u in o)o[u].value!==void 0&&a.push({id:u,letter:null,value:o[u].value,level:o[u].level||null,text:o[u].text||null});return a}function n(i,a){return e[i]=e[i]||{},e[i][a]=e[i][a]||{}}return{start:function(){t("kc:p-hello",{mode:"standalone",own:{}})},send:function(i,a){var o=a.group;if(i==="kc:p-commit"){var u=n(o,a.id);a.value===null?delete u.value:u.value=a.value,t("kc:p-status",{group:o,present:1,committed:r(o).length?1:0,revealed:a.value!==null}),a.value!==null&&t("kc:p-revealed",{group:o,values:r(o)})}else if(i==="kc:p-confidence")n(o,a.id).level=a.level;else if(i==="kc:p-explain")n(o,a.id).text=a.text;else if(i==="kc:p-reveal")t("kc:p-revealed",{group:o,values:r(o)});else if(i==="kc:p-answer")t("kc:p-answer",{id:a.id,value:a.value,rev:null,agreed:[],committed:!1});else if(i==="kc:p-gate"&&a.scope==="group"&&window.parent!==window)try{parent.postMessage({type:"kc:p-gate",v:H,id:a.id,scope:"group"},"*")}catch{}}}})(),_=null,Z=null;function j(e,t){if(e==="kc:p-commit"&&(be=!0),typeof window.__kcUsage=="function")try{window.__kcUsage(e,{id:t&&t.id,group:t&&t.group,set:!!(t&&t.value!==null&&t.value!==void 0)})}catch{}_&&_.send(e,t||{})}function we(e){if(!(!e||e.v!==H||typeof e.type!="string")){if(e.type==="kc:p-hello")return rt(e);b&&(e.type==="kc:p-presence"?V("presence",e):e.type==="kc:p-status"?V("status",e):e.type==="kc:p-revealed"?V("revealed",e):e.type==="kc:p-answer"?V("answer",e):e.type==="kc:p-feedback"&&V("feedback",e))}}function rt(e){if($e[e.mode]&&!(b&&b!=="standalone")){if(b==="standalone"&&_===Y&&e.mode!=="standalone"&&be){J.send("kc:p-late",{});return}e.mode!=="standalone"&&(_=J),nt(e.mode,e.seat&&typeof e.seat.letter=="string"&&/^[A-L]$/.test(e.seat.letter)?e.seat.letter:null,e.own,e.levels,e.texts),e.visit&&typeof e.visit=="object"&&(Z={first:Number(e.visit.first)||0,now:Number(e.visit.now)||0}),Array.isArray(e.gates)&&e.gates.forEach(function(t){W.test(t)&&ze(t,!0)}),D(),b==="homework"&&C("reveal").forEach(function(t){he(t.group)&&Ne(t.group)})}}function nt(e,t,r,n,i){if(b=e,M=e==="breakout"?t:null,N={},r&&typeof r=="object")for(var a in r)W.test(a)&&(N[a]=r[a]);document.documentElement.setAttribute("data-kc-mode",e),V("mode",{mode:e,letter:M,own:N,levels:n&&typeof n=="object"?n:{},texts:i&&typeof i=="object"?i:{}})}var ye=!1,ue=null;window.addEventListener("message",function(e){if(!(e.source!==parent||e.source===window)){if(e.data&&e.data.type==="kc:hello"&&ye&&ue&&(!b||_===Y&&!be)){J.send("kc:p-ready",ue);return}we(e.data)}});var at={commit:1,reveal:1,answer:1,question:1},Ae={};oe.patterns={mode:function(){return b||"standalone"},get:function(e){return Object.prototype.hasOwnProperty.call(N,e)?N[e]:null},on:function(e,t){!at[e]||typeof t!="function"||(Ae[e]=Ae[e]||[]).push(t)}};function F(e,t){(Ae[e]||[]).forEach(function(r){try{r(t)}catch{}})}Object.defineProperty(oe,"_patterns",{value:{send:j,on:z,emitPublic:F,ready:function(){return!!b},letter:function(){return M},own:function(e,t){return arguments.length>1&&(N[e]=t),N[e]},registry:function(){return T},text:d}});var qe=15e3,it=90,je={},se=null;function E(e){return je[e]=je[e]||{status:null,revealed:!1,values:null,distribution:null,firstSeen:0}}function C(e){return T.filter(function(t){return t.type===e})}function X(e){return C("confidence").filter(function(t){return t.id===e})[0]||null}function S(e,t){e.setAttribute("data-kc-state",t)}function s(e,t,r){var n=document.createElement(e);return t&&(n.className=t),r!=null&&(n.textContent=r),n}function xe(e,t){e.textContent!==t&&(e.textContent=t)}function I(e,t,r){var n=tt(t,r);return n&&e.setAttribute("data-kc-help",n),e}var G=null;function R(e){G||(G=s("div","kc-p-sr"),G.setAttribute("aria-live","polite"),document.body.appendChild(G)),G.textContent="",setTimeout(function(){G.textContent=e},50)}var ot=".kc-p-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}[data-kc-after]:not([data-kc-state=revealed]){display:none!important}[data-kc-commit] [data-kc-option],[data-kc-answer] [data-kc-option],[data-kc-question] [data-kc-option],[data-kc-confidence] .kc-p-opt{cursor:pointer;border:1px solid var(--kc-muted,#8a8a8a);border-radius:var(--kc-radius,8px);padding:.45em .8em;margin:.25em 0;display:block;background:transparent;color:inherit;font:inherit;text-align:start}[data-kc-confidence] .kc-p-opt{display:inline-block;margin:.25em .4em .25em 0}[data-kc-commit] [data-kc-option][aria-checked=true],[data-kc-answer] [data-kc-option][aria-checked=true],[data-kc-question] [data-kc-option][aria-checked=true],[data-kc-confidence] .kc-p-opt[aria-checked=true]{border-color:var(--kc-accent,#2a5db0);box-shadow:inset 0 0 0 2px var(--kc-accent,#2a5db0);font-weight:600}[data-kc-commit] [data-kc-option][aria-disabled=true],[data-kc-answer] [data-kc-option][aria-disabled=true],[data-kc-question] [data-kc-option][aria-disabled=true],[data-kc-confidence] .kc-p-opt[aria-disabled=true]{cursor:default;opacity:.75}[data-kc-commit] [data-kc-option]:focus-visible,[data-kc-answer] [data-kc-option]:focus-visible,[data-kc-question] [data-kc-option]:focus-visible,.kc-p-opt:focus-visible,.kc-p-btn:focus-visible{outline:3px solid var(--kc-accent,#2a5db0);outline-offset:2px}.kc-p-actions{margin:.4em 0 .8em;display:flex;flex-wrap:wrap;align-items:center;gap:.6em}.kc-p-btn{font:inherit;padding:.45em 1em;border-radius:var(--kc-radius,8px);border:1px solid var(--kc-accent,#2a5db0);background:var(--kc-accent,#2a5db0);color:#fff;cursor:pointer}.kc-p-btn[disabled]{opacity:.5;cursor:not-allowed}.kc-p-btn.kc-p-quiet{background:transparent;color:inherit;border-color:var(--kc-muted,#8a8a8a)}.kc-p-undo{position:relative;display:inline-flex;flex-direction:column}.kc-p-bar{height:3px;background:var(--kc-accent,#2a5db0);margin-top:3px;border-radius:2px;width:100%;transform-origin:left;transition:transform .25s linear}[dir=rtl] .kc-p-bar{transform-origin:right}.kc-p-note{color:var(--kc-muted,#6b6b6b);font-size:.92em}.kc-p-status{margin:.3em 0}.kc-p-who b{margin-inline-end:.5em}.kc-p-values{margin:.4em 0;padding-inline-start:1.2em}.kc-p-dist{display:grid;grid-template-columns:auto 1fr auto;gap:.3em .6em;align-items:center;margin:.4em 0}.kc-p-distbar{height:.8em;background:var(--kc-accent,#2a5db0);border-radius:3px;min-width:2px}.kc-p-item{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.5em;border:1px solid var(--kc-muted,#c9c9c9);border-radius:var(--kc-radius,8px);padding:.35em .6em;margin:.3em 0;background:transparent}.kc-p-ctl{display:inline-flex;align-items:center;gap:.35em}.kc-p-ctl input[type=range]{width:9em}.kc-p-mini{font:inherit;min-width:2.2em;min-height:2.2em;border:1px solid var(--kc-muted,#8a8a8a);border-radius:6px;background:transparent;color:inherit;cursor:pointer}.kc-p-mini[disabled]{opacity:.45;cursor:default}.kc-p-tokens{min-width:3.5em;text-align:center;color:var(--kc-token,#c2185b);letter-spacing:1px}.kc-p-amt{min-width:2em;text-align:end}[data-kc-rank]{list-style:decimal;padding-inline-start:1.6em}[data-kc-rank] .kc-p-item{cursor:grab}.kc-p-zone{border:1px dashed var(--kc-muted,#8a8a8a);border-radius:var(--kc-radius,8px);padding:.4em .6em;margin:.4em 0}.kc-p-zitems{min-height:2.4em}[data-kc-sort]{display:grid;gap:.4em}.kc-p-move{font:inherit;max-width:100%}.kc-p-text{display:block;width:100%;box-sizing:border-box;font:inherit;padding:.5em;border:1px solid var(--kc-muted,#8a8a8a);border-radius:var(--kc-radius,8px);margin:.3em 0}[data-kc-agree] .kc-p-btn[aria-pressed=true]{background:var(--kc-accent,#2a5db0);color:#fff;border-color:var(--kc-accent,#2a5db0)}.kc-p-feedback p{margin:.25em 0}.kc-p-verdict{font-weight:700}.kc-p-right{color:var(--kc-right,#1d7a3a)}.kc-p-wrong{color:var(--kc-wrong,#a3472e)}.kc-p-contrast{display:grid;grid-template-columns:1fr 1fr;gap:1em;align-items:start}.kc-p-contrast>.kc-p-shared{grid-column:1/-1;text-align:center;justify-self:center}.kc-p-case{min-width:0;border:1px solid var(--kc-muted,#c9c9c9);border-radius:var(--kc-radius,8px);padding:.6em .8em}.kc-p-caselabel{font-weight:700;margin:0 0 .3em}@media (max-width:600px){.kc-p-contrast{grid-template-columns:1fr}.kc-p-contrast>.kc-p-shared{position:sticky;bottom:0;background:var(--kc-bg,Canvas);padding:.4em 0;z-index:1}}.kc-p-calc{border:1px solid var(--kc-muted,#c9c9c9);border-radius:var(--kc-radius,8px);padding:.6em .75em;margin:.8em 0;max-width:340px;box-sizing:border-box}.kc-p-calc summary{cursor:pointer;font-weight:600}.kc-p-calcin{display:block;width:100%;box-sizing:border-box;margin:.5em 0 .2em;font:15px/1.4 ui-monospace,Menlo,Consolas,monospace;padding:.4em .5em;border:1px solid var(--kc-muted,#8a8a8a);border-radius:6px;background:transparent;color:inherit}.kc-p-calcout{font:600 1.1em/1.4 ui-monospace,Menlo,Consolas,monospace;min-height:1.5em;margin:.25em 0;font-variant-numeric:tabular-nums}.kc-p-calcout.kc-p-calcerr{color:var(--kc-wrong,#a3472e);font-weight:400;font-family:inherit;font-size:.9em}.kc-p-calckeys{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;margin-top:.4em}.kc-p-calckeys button{min-height:34px;border:1px solid var(--kc-muted,#c9c9c9);border-radius:6px;background:transparent;color:inherit;font:15px system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;cursor:pointer}.kc-p-calckeys button.kc-p-calcop{background:rgba(127,127,127,.12)}.kc-p-calckeys button.kc-p-calceq{grid-column:span 3;background:var(--kc-accent,#2a5db0);border-color:var(--kc-accent,#2a5db0);color:#fff}.kc-p-calckeys button:focus-visible,.kc-p-calcpast:focus-visible{outline:3px solid var(--kc-accent,#2a5db0);outline-offset:2px}.kc-p-calchist{list-style:none;margin:.4em 0 0;padding:0}.kc-p-calcpast{font:13px/1.4 ui-monospace,Menlo,Consolas,monospace;color:inherit;opacity:.75;background:none;border:0;padding:.1em 0;cursor:pointer;text-align:start}.kc-p-tip{position:fixed;z-index:2147483646;max-width:280px;background:#222;color:#fff;padding:.35em .6em;border-radius:6px;font-size:14px;line-height:1.4;pointer-events:none}";function lt(){if(!document.getElementById("kc-p-css")){var e=s("style");e.id="kc-p-css",e.textContent=ot,(document.head||document.documentElement).appendChild(e)}}lt();var O=null;function Te(e){var t=e.getAttribute("data-kc-help");if(t){O||(O=s("div","kc-p-tip"),O.setAttribute("role","tooltip"),O.id="kc-p-tip",O.hidden=!0,document.body.appendChild(O)),O.textContent=t,O.hidden=!1;var r=e.getBoundingClientRect();O.style.left=Math.max(4,Math.min(innerWidth-O.offsetWidth-4,r.left))+"px",O.style.top=(r.bottom+6+O.offsetHeight>innerHeight?r.top-O.offsetHeight-6:r.bottom+6)+"px",e.setAttribute("aria-describedby",((e.getAttribute("aria-describedby")||"").replace("kc-p-tip","")+" kc-p-tip").trim())}}function Ce(){O&&(O.hidden=!0)}document.addEventListener("mouseover",function(e){var t=e.target.closest&&e.target.closest("[data-kc-help]");t?Te(t):Ce()}),document.addEventListener("focusin",function(e){var t=e.target.closest&&e.target.closest("[data-kc-help]");t?Te(t):Ce()}),document.addEventListener("keydown",function(e){e.key==="Escape"&&Ce()});function Ie(e,t,r){e.forEach(function(n,i){n.setAttribute("role",t?"checkbox":"radio"),n.setAttribute("aria-checked","false"),n.tabIndex=i===0?0:-1,n.addEventListener("click",function(){n.getAttribute("aria-disabled")!=="true"&&r(n)}),n.addEventListener("keydown",function(a){var o=a.key,u=e.length,m=e.indexOf(n);if(o===" "||o==="Enter"){a.preventDefault(),n.getAttribute("aria-disabled")!=="true"&&r(n);return}var g=o==="ArrowDown"||o==="ArrowRight"?1:o==="ArrowUp"||o==="ArrowLeft"?-1:0;if(g){a.preventDefault();var w=e[(m+g+u)%u];e.forEach(function(v){v.tabIndex=-1}),w.tabIndex=0,w.focus()}})})}function de(e,t){e.forEach(function(r){r.setAttribute("aria-checked",String(t.indexOf(r.__kcVal)>=0))})}function ce(e,t){e.forEach(function(r){t?r.setAttribute("aria-disabled","true"):r.removeAttribute("aria-disabled")})}function Se(e,t){return e.el.matches(t)?e.el:e.el.querySelector(t)}function ee(e){var t=e.el.querySelector("p, h2, h3, h4, legend, label");return t?t.textContent.replace(/\s+/g," ").trim().slice(0,500):""}function U(e){return e.__kcLabel=e.__kcLabel||e.textContent.replace(/\s+/g," ").trim()}function pe(e,t,r){var n=s("button","kc-p-mini"+(t?" "+t:""),e);return n.type="button",r&&n.setAttribute("aria-label",r),n}function ut(e,t){var r=e.el.hasAttribute("data-kc-multi"),n=Array.prototype.slice.call(e.el.querySelectorAll("[data-kc-option]")),i={};n.forEach(function(o){o.__kcVal=o.getAttribute("data-kc-option"),i[o.__kcVal]=U(o)}),e.el.setAttribute("role",r?"group":"radiogroup");var a=r?[]:null;return Ie(n,r,function(o){if(!e.locked){if(r){var u=a.indexOf(o.__kcVal);u>=0?a.splice(u,1):a.push(o.__kcVal)}else a=o.__kcVal;de(n,r?a:[a]),t()}}),{get:function(){return r?a.slice():a},set:function(o){a=r?Array.isArray(o)?o.slice():[]:o,de(n,r?a:[a])},why:function(){return(r?a.length:a!=null)?"":d("pickOne")},off:function(o){ce(n,o)},label:function(o){var u=function(m){return i[m]!=null?i[m]:String(m)};return Array.isArray(o)?o.map(u).join(", "):u(o)},labels:function(){return i}}}function st(e,t){var r=e.el.querySelector("[data-kc-number]"),n=Number(r.getAttribute("min")),i=Number(r.getAttribute("max")),a=r.getAttribute("data-kc-unit")||"";a&&r.insertAdjacentElement("afterend",s("span","kc-p-unit"," "+a)),r.addEventListener("input",t);var o=function(){var u=r.value.trim();return u===""?null:Number(u)};return{get:o,set:function(u){r.value=u==null?"":String(u)},why:function(){var u=o();return u!==null&&isFinite(u)&&(!isFinite(n)||u>=n)&&(!isFinite(i)||u<=i)?"":d("enterNumber",{min:isFinite(n)?n:"",max:isFinite(i)?i:""})},off:function(u){r.disabled=u},label:function(u){return String(u)+(a?" "+a:"")}}}function dt(e,t){var r=Se(e,"[data-kc-allocate]"),n=Math.max(1,Number(r.getAttribute("data-kc-total"))||1),i=Math.max(1e-9,Number(r.getAttribute("data-kc-step"))||1),a=r.getAttribute("data-kc-display")==="tokens",o=r.getAttribute("data-kc-token")||"\u25CF",u=r.hasAttribute("data-kc-partial"),m=Array.prototype.slice.call(r.querySelectorAll("[data-kc-item]")),g={},w=[],v={},f=function(h){return Math.round(h/i)*i},p=function(){var h=0;for(var l in g)h+=g[l];return f(h)},y=s("p","kc-p-note kc-p-left");y.setAttribute("aria-live","polite"),m.forEach(function(h){var l=h.getAttribute("data-kc-item"),c=U(h);g[l]=0,h.classList.add("kc-p-item");var k=s("span","kc-p-ctl");if(a){var B=pe("\u2212",null,d("remove",{item:c})),x=s("span","kc-p-tokens");x.setAttribute("aria-hidden","true");var q=pe("+",null,d("add",{item:c}));B.addEventListener("click",function(){g[l]>0&&(g[l]=f(g[l]-i),A(),t())}),q.addEventListener("click",function(){p()+i<=n+1e-9&&(g[l]=f(g[l]+i),A(),t())}),k.appendChild(B),k.appendChild(x),k.appendChild(q),w.push(B,q),v[l]=x}else{var L=s("input");L.type="range",L.min="0",L.max=String(n),L.step=String(i),L.value="0",L.setAttribute("aria-label",c);var ie=s("span","kc-p-amt","0");L.addEventListener("input",function(){var Ye=p()-g[l];g[l]=Math.min(f(Number(L.value)),f(n-Ye)),L.value=String(g[l]),A(),t()}),k.appendChild(L),k.appendChild(ie),w.push(L),v[l]=ie,v[l].__range=L}h.appendChild(k)}),r.appendChild(y);function A(){m.forEach(function(h){var l=h.getAttribute("data-kc-item"),c=v[l];a?c.textContent=new Array(Math.round(g[l]/i)+1).join(o)||"\xB7":(c.textContent=String(g[l]),c.__range.value=String(g[l]))}),y.textContent=d("left",{n:f(n-p())})}return A(),{get:function(){var h={};for(var l in g)g[l]>0&&(h[l]=g[l]);return h},set:function(h){for(var l in g)g[l]=h&&typeof h[l]=="number"?h[l]:0;A()},why:function(){var h=p();return Math.abs(h-n)<1e-9||u&&h>0?"":d("spendAll",{n})},off:function(h){w.forEach(function(l){l.disabled=h})},labels:function(){var h={};return m.forEach(function(l){h[l.getAttribute("data-kc-item")]=U(l)}),h},label:function(h){return m.map(function(l){var c=l.getAttribute("data-kc-item"),k=h&&h[c];return k?U(l)+" "+(a?new Array(Math.round(k/i)+1).join(o):k):null}).filter(Boolean).join(", ")}}}function ct(e,t){var r=Se(e,"[data-kc-rank]"),n=Array.prototype.slice.call(r.querySelectorAll("[data-kc-item]")),i={},a=[],o=!1,u=null;if(n.forEach(function(p){i[p.getAttribute("data-kc-item")]=U(p)}),!r.hasAttribute("data-kc-fixed-start")){for(var m=n.length-1;m>0;m--){var g=Math.floor(Math.random()*(m+1)),w=n[m];n[m]=n[g],n[g]=w}n.forEach(function(p){r.appendChild(p)})}function v(){return Array.prototype.map.call(r.querySelectorAll("[data-kc-item]"),function(p){return p.getAttribute("data-kc-item")})}function f(p,y,A){var h=y<0?p.previousElementSibling:p.nextElementSibling;if(!(!h||o)){y<0?r.insertBefore(p,h):r.insertBefore(h,p);var l=v().indexOf(p.getAttribute("data-kc-item"))+1;if(R(d("moved",{item:i[p.getAttribute("data-kc-item")],n:l})),A){var c=p.querySelector(A);c&&c.focus()}t()}}return n.forEach(function(p){var y=i[p.getAttribute("data-kc-item")];p.classList.add("kc-p-item");var A=s("span","kc-p-ctl"),h=pe("\u2191","kc-p-up",d("moveUp",{item:y})),l=pe("\u2193","kc-p-down",d("moveDown",{item:y}));h.addEventListener("click",function(){f(p,-1,".kc-p-up")}),l.addEventListener("click",function(){f(p,1,".kc-p-down")}),A.appendChild(h),A.appendChild(l),p.appendChild(A),a.push(h,l),p.draggable=!0,p.addEventListener("dragstart",function(c){if(o)return c.preventDefault();u=p,c.dataTransfer.effectAllowed="move";try{c.dataTransfer.setData("text/plain","")}catch{}}),p.addEventListener("dragover",function(c){if(!(!u||u===p)){c.preventDefault();var k=p.getBoundingClientRect();r.insertBefore(u,c.clientY>k.top+k.height/2?p.nextSibling:p)}}),p.addEventListener("dragend",function(){u&&(u=null,t())})}),{get:v,set:function(p){Array.isArray(p)&&p.forEach(function(y){var A=r.querySelector('[data-kc-item="'+String(y).replace(/"/g,"")+'"]');A&&r.appendChild(A)})},why:function(){return""},off:function(p){o=p,a.forEach(function(y){y.disabled=p}),n.forEach(function(y){y.draggable=!p})},labels:function(){return i},label:function(p){return(Array.isArray(p)?p:[]).map(function(y,A){return A+1+". "+(i[y]!=null?i[y]:y)}).join("  ")}}}function pt(e,t){var r=Se(e,"[data-kc-sort]"),n=r.hasAttribute("data-kc-partial"),i=Array.prototype.slice.call(r.querySelectorAll("[data-kc-bin]")),a=Array.prototype.slice.call(r.querySelectorAll("[data-kc-item]")),o={},u={},m={},g=[],w={},v=!1,f=null,p=s("div","kc-p-zone kc-p-pool");p.appendChild(s("p","kc-p-note",d("unsorted")));var y=s("div","kc-p-zitems");p.appendChild(y),r.insertBefore(p,r.firstChild),i.forEach(function(l){var c=l.getAttribute("data-kc-bin");o[c]=U(l),l.classList.add("kc-p-zone"),m[c]=s("div","kc-p-zitems"),l.appendChild(m[c]),A(l,c)}),A(p,null),a.forEach(function(l){var c=l.getAttribute("data-kc-item");u[c]=U(l),w[c]=null,l.classList.add("kc-p-item");var k=s("select","kc-p-move");k.setAttribute("aria-label",d("moveTo",{item:u[c]}));var B=s("option",null,d("unsorted"));B.value="",k.appendChild(B),i.forEach(function(x){var q=s("option",null,o[x.getAttribute("data-kc-bin")]);q.value=x.getAttribute("data-kc-bin"),k.appendChild(q)}),k.addEventListener("change",function(){h(c,k.value||null),R(d("placed",{item:u[c],bin:k.value?o[k.value]:d("unsorted")})),t()}),l.appendChild(k),g.push(k),l.draggable=!0,l.addEventListener("dragstart",function(x){if(v)return x.preventDefault();f=c,x.dataTransfer.effectAllowed="move";try{x.dataTransfer.setData("text/plain","")}catch{}}),l.addEventListener("dragend",function(){f=null}),y.appendChild(l)});function A(l,c){l.addEventListener("dragover",function(k){f!==null&&k.preventDefault()}),l.addEventListener("drop",function(k){f!==null&&(k.preventDefault(),h(f,c),f=null,t())})}function h(l,c){w[l]=c&&m[c]?c:null;var k=a.filter(function(B){return B.getAttribute("data-kc-item")===l})[0];(w[l]?m[w[l]]:y).appendChild(k),k.querySelector("select").value=w[l]||""}return{get:function(){var l={};for(var c in w)w[c]&&(l[c]=w[c]);return l},set:function(l){for(var c in w)h(c,l&&l[c]?l[c]:null)},why:function(){for(var l in w)if(!w[l]&&!n)return d("sortAll");return Object.keys(w).some(function(c){return w[c]})?"":d("sortAll")},off:function(l){v=l,g.forEach(function(c){c.disabled=l}),a.forEach(function(c){c.draggable=!l})},labels:function(){var l={},c;for(c in u)l[c]=u[c];for(c in o)l[c]=o[c];return l},label:function(l){return i.map(function(c){var k=c.getAttribute("data-kc-bin"),B=Object.keys(l||{}).filter(function(x){return l[x]===k});return B.length?o[k]+": "+B.map(function(x){return u[x]!=null?u[x]:x}).join(", "):null}).filter(Boolean).join("; ")}}}function Ee(e,t){return e.widget==="choice"?ut(e,t):e.widget==="number"?st(e,t):e.widget==="allocate"?dt(e,t):e.widget==="rank"?ct(e,t):e.widget==="sort"?pt(e,t):null}function ft(e){S(e.el,"open"),e.locked=!1,e.el.setAttribute("data-kc-personal","");var t=e.el.querySelector("p, h2, h3, h4, legend, label");t&&(t.id=t.id||"kc-p-q-"+e.id,e.el.setAttribute("aria-labelledby",t.id)),e.w=Ee(e,function(){P(e)}),e.w&&(e.actions=s("div","kc-p-actions"),e.actions.setAttribute("data-kc-personal",""),e.lockBtn=I(s("button","kc-p-btn",d("lock",null,e.el)),"lock"),e.lockBtn.type="button",e.lockBtn.addEventListener("click",function(){gt(e)}),e.note=s("span","kc-p-note"),e.actions.appendChild(e.lockBtn),e.actions.appendChild(e.note),e.el.insertAdjacentElement("afterend",e.actions),P(e))}function mt(e){if(!e||!e.revoteOf)return!1;var t=C("commit").filter(function(r){return r.id===e.revoteOf})[0];return!!t&&!E(t.group).revealed}function vt(e){var t=mt(e);e.el.hidden=t,e.actions&&(e.actions.hidden=t);var r=X(e.id);r&&(r.el.hidden=t),C("reveal").forEach(function(n){n.group===e.group&&(n.el.hidden=t)}),C("explain").forEach(function(n){n.group===e.group&&(n.el.hidden=t)})}function P(e){if(vt(e),!(!e.actions||!e.w)){var t=X(e.id),r=E(e.group),n=b==="breakout"&&!M;if(e.locked||r.revealed){e.w.off(!0),t&&t.items&&ce(t.items,!0),e.undoing||(e.actions.innerHTML="",e.actions.appendChild(I(s("span","kc-p-note",d("locked",null,e.el)),"locked"))),S(e.el,r.revealed?"revealed":"committed");return}e.w.off(n||!b),t&&t.items&&ce(t.items,n||!b);var i=b?n?d("noLetter"):e.w.why()||(t&&!t.level?d("pickSure",null,t.el):""):d("waiting");e.lockBtn.disabled=!!i,e.note.textContent=i,S(e.el,"open")}}function gt(e){if(!(e.locked||!e.w||e.w.why()||!b||b==="breakout"&&!M)){var t=X(e.id);if(!(t&&!t.level)){var r=e.w.get();if(t&&j("kc:p-confidence",{id:e.id,group:e.group,level:t.level}),j("kc:p-commit",{id:e.id,group:e.group,value:r,prompt:ee(e),label:e.w.label(r)}),e.locked=!0,N[e.id]=r,F("commit",{id:e.id,group:e.group,value:r}),$()){P(e);return}if(he(e.group)){P(e),Ne(e.group);return}ht(e)}}}function ht(e){e.undoing=!0,e.w.off(!0);var t=X(e.id);t&&t.items&&ce(t.items,!0),S(e.el,"committed"),e.actions.innerHTML="";var r=s("span","kc-p-undo"),n=I(s("button","kc-p-btn kc-p-quiet",d("undo",null,e.el)),"undo");n.type="button";var i=s("span","kc-p-bar");i.setAttribute("aria-hidden","true"),r.appendChild(n),r.appendChild(i),e.actions.appendChild(r),R(d("lockedSr"));var a=qe,o=Date.now();function u(){return document.activeElement===n||n.matches(":hover")}var m=setInterval(function(){var w=Date.now();u()||(a-=w-o),o=w,i.style.transform="scaleX("+Math.max(0,a/qe)+")",(a<=0||E(e.group).revealed)&&g()},250);function g(){clearInterval(m),e.undoing=!1,P(e)}n.addEventListener("click",function(){clearInterval(m),e.undoing=!1,e.locked=!1,delete N[e.id],j("kc:p-commit",{id:e.id,group:e.group,value:null}),e.actions.innerHTML="",e.actions.appendChild(e.lockBtn),e.actions.appendChild(e.note),P(e),e.lockBtn.focus(),R(d("undone"))}),e.cancelUndo=g}function bt(e){e.level=null,e.el.setAttribute("role","radiogroup");var t=I(s("span","kc-p-note",d("howSure",null,e.el)),"howSure");t.id="kc-p-conf-"+e.id,e.el.setAttribute("aria-labelledby",t.id),e.el.appendChild(t),e.el.appendChild(s("br")),e.items=["sure","fairly","guessing"].map(function(r){var n=I(s("span","kc-p-opt",d(r,null,e.el)),r);return n.__kcVal=r,e.el.appendChild(n),n}),Ie(e.items,!1,function(r){var n=C("commit").filter(function(i){return i.id===e.id})[0];n&&n.locked||(e.level=r.__kcVal,de(e.items,[e.level]),n&&P(n))})}function _e(e){S(e.el,"open"),e.status=s("p","kc-p-status"),e.btn=I(s("button","kc-p-btn",d("reveal",null,e.el)),"reveal"),e.btn.type="button",e.btn.addEventListener("click",function(){e.btn.disabled||j("kc:p-reveal",{group:e.group})}),e.note=s("p","kc-p-note"),e.out=s("div","kc-p-out"),[e.status,e.btn,e.note,e.out].forEach(function(t){e.el.appendChild(t)}),fe(e)}function Re(){return se&&se.readers?se.readers.map(function(e){return e.letter}).filter(Boolean):[]}function fe(e){var t=E(e.group),r=t.status,n=e.el.getAttribute("data-kc-when")||"majority",i=e.el.hasAttribute("data-kc-timer")?Math.max(0,Number(e.el.getAttribute("data-kc-timer"))||0):it;if($()||!b)e.status.textContent="",e.btn.hidden=!0,e.note.textContent="";else if(b==="homework")e.status.textContent="",e.btn.hidden=!0,e.note.textContent=t.revealed||he(e.group)?"":d("afterRelease");else if(b==="plenary")e.status.textContent=r?d("answered",{n:r.committed,m:r.present}):"",e.btn.hidden=!0,e.note.textContent=t.revealed?"":d("byInstructor");else if(b==="presenter")e.status.textContent=r?d("answered",{n:r.committed,m:r.present}):"",e.btn.hidden=t.revealed,e.btn.disabled=!1,e.note.textContent="";else{var a=r&&Array.isArray(r.committed)?r.committed:[],o=Re();e.status.innerHTML="",e.status.className="kc-p-status kc-p-who",o.slice().sort().forEach(function(l){e.status.appendChild(s("b",null,l+(a.indexOf(l)>=0?" \u2713":" \u2026")))});var u=a.filter(function(l){return o.indexOf(l)>=0}).length,m=o.length,g=n==="all"?m>0&&u>=m:n==="any"?u>=1:n==="instructor"?!1:u*2>m;e.btn.hidden=t.revealed||n==="instructor",e.btn.disabled=!g||!M;var w=n==="all"?"needAll":n==="any"?"needAny":n==="instructor"?"byInstructor":"needMost",v=t.revealed||g?"":d(w);if(!t.revealed&&i>0&&u>0){t.firstSeen||(t.firstSeen=Date.now());var f=Math.max(0,Math.ceil(i-(Date.now()-t.firstSeen)/1e3));v=(v?v+" \xB7 ":"")+d("autoIn",{s:f}),f===0&&M&&!t.autoSent&&(t.autoSent=!0,j("kc:p-reveal",{group:e.group})),t.ticker||(t.ticker=setInterval(function(){E(e.group).revealed&&(clearInterval(t.ticker),t.ticker=null),fe(e)},1e3))}e.note.textContent=v}if(e.out.innerHTML="",!t.revealed){S(e.el,"open");return}S(e.el,"revealed"),e.btn.hidden=!0;var p=C("commit").filter(function(l){return l.group===e.group}).concat(e.own?C("question").filter(function(l){return l.id===e.group}):[]),y=function(l,c){var k=p.filter(function(B){return B.id===l})[0];return k&&k.w?k.w.label(c):typeof c=="object"?JSON.stringify(c):String(c)};if(t.values){e.out.appendChild(s("p","kc-p-note",d($()||b==="homework"?"yours":"everyone"))),t.values.length||e.out.appendChild(s("p",null,d("nobody")));var A=s("ul","kc-p-values");t.values.slice().sort(function(l,c){return String(l.letter).localeCompare(String(c.letter))}).forEach(function(l){var c=s("li",null,(l.letter?l.letter+": ":"")+y(l.id,l.value)+(l.level?" ("+d(l.level)+")":""));A.appendChild(c)}),e.out.appendChild(A)}else if(t.distribution){var h=t.distribution.values||{};Object.keys(h).forEach(function(l){var c=h[l],k=0,B;for(B in c)k+=c[B];var x=s("div","kc-p-dist");Object.keys(c).forEach(function(q){var L;try{L=JSON.parse(q)}catch{L=q}x.appendChild(s("span",null,y(l,L)));var ie=s("span","kc-p-distbar");ie.style.width=100*c[q]/Math.max(1,k)+"%",x.appendChild(ie),x.appendChild(s("span",null,String(c[q])))}),e.out.appendChild(x)})}}var kt=300;function wt(e){S(e.el,"open"),e.el.setAttribute("data-kc-personal","");var t=e.el.querySelector("p, h2, h3, h4, legend, label");t&&e.el.getAttribute("role")!=="radiogroup"&&(t.id=t.id||"kc-p-q-"+e.id,e.el.setAttribute("aria-labelledby",t.id)),e.last=null;var r=null;if(e.w=Ee(e,function(){e.locked||(e.reopenedBy=null,clearTimeout(r),r=setTimeout(function(){var o=e.w.get(),u=JSON.stringify(o);u!==e.last&&(e.last=u,j("kc:p-answer",{id:e.id,value:o,prompt:ee(e),label:e.w.label(o)}))},kt),te(e))}),!!e.w){if(e.agreed=[],e.committed=!1,e.type==="answer"){var n=C("agree").filter(function(o){return o.id===e.id})[0];if(!n){var i=s("div");i.setAttribute("data-kc-agree",e.id),e.el.insertAdjacentElement("afterend",i),n={type:"agree",id:e.id,group:null,el:i,v:1},T.push(n)}e.agreeEl=n.el,e.agreeEl.setAttribute("data-kc-personal",""),e.agreeBtn=I(s("button","kc-p-btn kc-p-quiet","\u2713 "+d("agree",null,e.el)),"agree"),e.agreeBtn.type="button",e.agreeBtn.setAttribute("aria-pressed","false"),e.agreeBtn.addEventListener("click",function(){var o=e.agreeBtn.getAttribute("aria-pressed")!=="true";if($()){yt(e,o);return}j("kc:p-agree",{id:e.id,on:o})}),e.agreeNote=s("span","kc-p-note");var a=s("div","kc-p-actions");a.appendChild(e.agreeBtn),a.appendChild(e.agreeNote),e.agreeEl.appendChild(a)}te(e)}}function yt(e,t){var r=e.committed;e.committed=t,t&&(E(e.id).revealed=!0),te(e),D(),t&&!r&&R(d("done",null,e.el));var n=null;try{n=JSON.parse(e.last)}catch{n=null}F("answer",{id:e.id,value:n,committed:t,by:[]})}function te(e){if(e.w){var t=b==="breakout"&&!M,r=e.committed&&b!=="presenter";if(e.w.off(!b||t||r),e.locked=r,S(e.el,e.committed?"agreed":"open"),!!e.agreeBtn){var n=e.last!==null&&e.last!=="null"&&e.w.why()==="";if($()){e.agreeEl.hidden=!1,xe(e.agreeBtn,(e.committed?"\u2713 ":"")+d("done",null,e.el)),e.agreeBtn.setAttribute("aria-pressed",String(!!e.committed)),e.agreeBtn.disabled=!n&&!e.committed,e.agreeNote.textContent=e.committed||n?"":d("pickOne"),S(e.agreeEl,e.committed?"agreed":"open");return}var i=M&&e.agreed.indexOf(M)>=0;e.agreeEl.hidden=b!=="breakout",xe(e.agreeBtn,"\u2713 "+d("agree",null,e.el)),e.agreeBtn.setAttribute("aria-pressed",String(!!i)),e.agreeBtn.disabled=!M||!n&&!i;var a=Re().length,o=e.agreed.slice().sort().join(", ");e.agreeNote.textContent=e.committed?d("committedBy",{list:o}):e.reopenedBy?d("reopened",{who:e.reopenedBy}):n?e.agreed.length?d("agreedBy",{list:o,n:e.agreed.length,m:a}):"":d("pickOne"),S(e.agreeEl,e.committed?"agreed":"open")}}}z("answer",function(e){var t=T.filter(function(o){return o.id===e.id&&o.w&&(o.type==="answer"||Q[o.type])})[0];if(t){var r=JSON.stringify(e.value===void 0?null:e.value);r!==t.last&&(t.last=r,t.w.set(e.value),t.reopenedBy=null);var n=Array.isArray(e.agreed)?e.agreed.filter(function(o){return/^[A-L]$/.test(o)}):[];if(t.committed&&!e.committed){var i=t.agreed.filter(function(o){return n.indexOf(o)<0});t.reopenedBy=i.join(", ")||null}else e.committed&&(t.reopenedBy=null);t.agreed=n;var a=t.committed;t.committed=!!e.committed,t.committed&&(E(t.id).revealed=!0),te(t),D(),t.committed&&!a&&R(d("committedBy",{list:n.slice().sort().join(", ")})),F("answer",{id:t.id,value:e.value===void 0?null:e.value,committed:t.committed,by:n})}});var At=800;function xt(e){var t=e.el.getAttribute("data-kc-scope")==="group"?"group":"individual";e.scope=t;var r=e.el.querySelector("p, h2, h3, h4, label"),n=s("textarea","kc-p-text");if(n.rows=3,n.id="kc-explain-"+e.id,r&&(r.id=r.id||"kc-p-q-"+e.id,n.setAttribute("aria-labelledby",r.id)),e.who=s("p","kc-p-note"),e.who.id="kc-p-who-"+e.id,n.setAttribute("aria-describedby",e.who.id),e.box=n,e.el.appendChild(n),e.el.appendChild(e.who),e.el.hasAttribute("data-kc-gate")){var i=Math.max(1,Number(e.el.getAttribute("data-kc-min"))||2);e.gateBtn=I(s("button","kc-p-btn",d("continue",null,e.el)),"continue"),e.gateBtn.type="button",e.gateNote=s("span","kc-p-note");var a=s("div","kc-p-actions");a.appendChild(e.gateBtn),a.appendChild(e.gateNote),e.el.appendChild(a);var o=function(){var m=n.value.trim().length<i;e.gateBtn.disabled=m,e.gateNote.textContent=m&&!E(e.id).revealed?d("writeFirst"):""};n.addEventListener("input",o),t==="group"&&setInterval(function(){e.gateBtn.hidden||o()},700),e.gateBtn.addEventListener("click",function(){n.value.trim().length>=i&&(ze(e.id),e.gateNote.textContent="")}),o()}if(t==="individual"){e.el.setAttribute("data-kc-personal","");var u=null;n.addEventListener("input",function(){clearTimeout(u),u=setTimeout(function(){j("kc:p-explain",{id:e.id,group:e.group,scope:"individual",text:n.value,prompt:ee(e)})},At)})}Pe(e)}function Pe(e){if(e.who){var t=b==="self"?"whoSelf":e.scope==="group"?b==="standalone"?"whoAlone":"whoGroup":b==="breakout"?"whoBreakout":b==="standalone"||!b?"whoAlone":"whoInstructor";e.who.textContent=d(t,null,e.el),e.box.disabled=e.scope==="individual"&&!b,e.gateBtn&&E(e.id).revealed&&(e.gateBtn.hidden=!0,e.gateNote.textContent="")}}function Ct(e){var t=document.querySelector('script[type="application/json"][data-kc-feedback="'+e.id+'"]');if(!t)return null;try{var r=JSON.parse(t.textContent);return r&&typeof r=="object"?r:null}catch{return null}}function re(e,t){if(Array.isArray(e)&&Array.isArray(t))return e.length===t.length&&e.every(function(i,a){return re(i,t[a])});if(e&&t&&typeof e=="object"&&typeof t=="object"){var r=Object.keys(e).filter(function(i){return e[i]!==0&&e[i]!==null}).sort(),n=Object.keys(t).filter(function(i){return t[i]!==0&&t[i]!==null}).sort();return re(r,n)&&r.every(function(i){return re(e[i],t[i])})}return String(e)===String(t)}function me(e,t,r,n){if(r==null)return!1;if(e.widget==="number")return Math.abs(Number(t)-Number(r))<=Math.abs(Number(n&&n.tolerance)||0)+1e-12;if(e.widget==="choice"&&Array.isArray(t)){var i=Array.isArray(r)?r:String(r).split(",").map(function(a){return a.trim()});return re(t.slice().sort(),i.slice().sort())}return re(t,r)}function St(e){S(e.el,"open"),e.el.setAttribute("data-kc-personal",""),e.group=e.id,e.attempts=0,e.fb=Ct(e);var t=e.el.querySelector("p, h2, h3, h4, legend, label");if(t&&e.widget!=="choice"&&(t.id=t.id||"kc-p-q-"+e.id,e.el.setAttribute("aria-labelledby",t.id)),e.w=Ee(e,function(){ne(e)}),!!e.w){e.actions=s("div","kc-p-actions"),e.actions.setAttribute("data-kc-personal",""),e.checkBtn=I(s("button","kc-p-btn",d("check",null,e.el)),"check"),e.checkBtn.type="button",e.checkBtn.addEventListener("click",function(){Et(e)}),e.note=s("span","kc-p-note"),e.result=s("div","kc-p-feedback"),e.result.setAttribute("role","status"),e.actions.appendChild(e.checkBtn),e.actions.appendChild(e.note),e.el.insertAdjacentElement("afterend",e.actions);var r=s("div","kc-p-qreveal");r.hidden=!0,e.actions.insertAdjacentElement("afterend",r),e.rev={type:"reveal",id:e.id,group:e.id,widget:null,v:e.v,el:r,own:!0},_e(e.rev),r.insertAdjacentElement("afterend",e.result);var n=e.el.getAttribute("data-kc-transfer-of");n&&(e.el.hidden=!0,e.actions.hidden=!0,e.result.hidden=!0,e.transferOf=n),ne(e)}}function De(e){return b==="breakout"&&!E(e.id).revealed}function ne(e){if(e.w){var t=b==="breakout";if(e.rev&&(e.rev.el.hidden=!t||e.transferOf&&e.el.hidden,fe(e.rev)),t&&E(e.id).revealed&&e.locked){e.locked=!1,Le(e);var r=e.fb;F("question",{id:e.id,value:e.lastValue,attempt:e.attempts,right:r?me(e,e.lastValue,r.right,r):null}),Be(e)}t&&E(e.id).revealed&&!e.opened&&(e.opened=!0,Be(e));var n=De(e),i=t&&!M;if(n&&e.locked){e.w.off(!0),e.checkBtn.hidden=!0,e.note.textContent=d("lockedWait",null,e.el),S(e.el,"committed");return}e.checkBtn.hidden=!1,xe(e.checkBtn,d(n?"lock":"check",null,e.el)),e.w.off(!b||n&&i);var a=b?n&&i?d("noLetter"):e.w.why():d("waiting");e.checkBtn.disabled=!!a,e.note.textContent=a}}function Be(e){T.forEach(function(t){t.type==="question"&&t.transferOf===e.id&&t.el.hidden&&(t.el.hidden=!1,t.actions.hidden=!1,t.result.hidden=!1,ne(t))})}function Et(e){if(!(!e.w||e.w.why()||!b)){var t=De(e);if(!(t&&(!M||e.locked))){var r=e.w.get();e.attempts++;var n=e.fb,i=n?me(e,r,n.right,n):null;if((b!=="breakout"||t)&&j("kc:p-attempt",{id:e.id,group:e.id,value:r,attempt:e.attempts,right:i,prompt:ee(e),label:e.w.label(r)}),e.lastValue=r,t){e.locked=!0,ne(e),R(d("lockedWait",null,e.el));return}Le(e),F("question",{id:e.id,value:r,attempt:e.attempts,right:i}),Be(e)}}}function Le(e){var t=e.fb,r=e.lastValue;if(e.result.innerHTML="",e.attempts!==0){if(!t){e.result.appendChild(s("p","kc-p-note",d("saved"))),S(e.el,"answered");return}var n=me(e,r,t.right,t),i=!n&&t.tempting_wrong!==void 0&&me(e,r,t.tempting_wrong,t),a=s("p","kc-p-verdict "+(n?"kc-p-right":"kc-p-wrong"),d(n?"right":"notQuite"));e.result.appendChild(a);var o=!n&&t.per_option&&typeof r!="object"?t.per_option[String(r)]:null,u=n?t.why_right:i?t.why_tempting_wrong:o||null;u&&e.result.appendChild(s("p",null,String(u))),!n&&!i&&!o&&e.result.appendChild(s("p","kc-p-note",d("tryAgain"))),e.result.appendChild(s("p","kc-p-note",d("attemptN",{n:e.attempts}))),S(e.el,n?"answered":"open")}}z("feedback",function(e){var t=C("question").filter(function(r){return r.id===e.id})[0];!t||!e.feedback||typeof e.feedback!="object"||(t.fb=e.feedback,Le(t))});function Bt(e){var t=Array.prototype.filter.call(e.el.children,function(n){return n.hasAttribute("data-kc-case")}),r=Array.prototype.filter.call(e.el.children,function(n){return n.hasAttribute("data-kc-shared")})[0];t.length===2&&(e.el.classList.add("kc-p-contrast"),t.forEach(function(n){n.classList.add("kc-p-case");var i=n.getAttribute("data-kc-label");if(i&&!n.querySelector(".kc-p-caselabel")){var a=s("p","kc-p-caselabel",i);n.insertBefore(a,n.firstChild),n.setAttribute("aria-label",i)}n.setAttribute("role","group")}),r&&r.classList.add("kc-p-shared"))}function Lt(e){var t=e.el.getAttribute("data-kc-for"),r=C("commit").filter(function(n){return t?n.id===t:n.group===e.group})[0];return r&&Object.prototype.hasOwnProperty.call(N,r.id)?N[r.id]:void 0}function Nt(e){var t=e.el.getAttribute("data-kc-if"),r=e.el.getAttribute("data-kc-if-min"),n=e.el.getAttribute("data-kc-if-max");if(t===null&&r===null&&n===null)return!0;var i=Lt(e);if(i==null)return!1;if(t!==null){var a=t.split(",").map(function(u){return u.trim()});if(!(Array.isArray(i)?i.some(function(u){return a.indexOf(String(u))>=0}):a.indexOf(String(i))>=0))return!1}var o=Number(i);return!(r!==null&&!(o>=Number(r))||n!==null&&!(o<=Number(n)))}function We(e){E(e.group).revealed&&Nt(e)?S(e.el,"revealed"):e.el.removeAttribute("data-kc-state")}function ze(e,t){var r=E(e);if(!r.revealed){r.revealed=!0;var n=C("explain").filter(function(i){return i.id===e})[0];n&&n.gateBtn&&(n.gateBtn.hidden=!0),t||(j("kc:p-gate",{id:e,scope:n?n.scope:"individual"}),D())}}function ae(e){return e.el.getAttribute("data-kc-right")}function Ot(e,t){var r=ae(e);return r===null||t===void 0||t===null?null:Array.isArray(t)?t.map(String).sort().join(",")===r.split(",").map(function(n){return n.trim()}).sort().join(","):e.widget==="number"?Math.abs(Number(t)-Number(r))<1e-9:String(t)===r.trim()}function Mt(e){e.out=s("div","kc-p-calibration"),e.out.setAttribute("aria-live","polite"),e.el.appendChild(e.out),Fe(e)}function Fe(e){if(e.out){var t=C("commit").map(function(a){var o=X(a.id),u=N[a.id];return ae(a)===null||!o||!o.level||!E(a.group).revealed||u===void 0?null:{c:a,level:o.level,ok:Ot(a,u)}}).filter(Boolean);if(e.out.innerHTML="",!t.length){e.out.appendChild(s("p","kc-p-note",d("calibrationNone")));return}var r=t.filter(function(a){return a.level==="sure"});r.length&&e.out.appendChild(s("p","kc-p-verdict",d("calibrationSure",{n:r.length,m:r.filter(function(a){return a.ok}).length}))),["fairly","guessing"].forEach(function(a){var o=t.filter(function(u){return u.level===a});o.length&&e.out.appendChild(s("p","kc-p-note",d("calibrationLevel",{level:d(a),n:o.length,m:o.filter(function(u){return u.ok}).length})))});var n=r.filter(function(a){return!a.ok});if(n.length){e.out.appendChild(s("p",null,d("calibrationWrong")));var i=s("ul","kc-p-values");n.forEach(function(a){var o=a.c.el.querySelector("p, h2, h3, h4, legend, label");i.appendChild(s("li",null,(o?o.textContent.replace(/\s+/g," ").trim()+" ":"")+d("calibrationRight",{answer:a.c.w?a.c.w.label(a.c.widget==="number"?Number(ae(a.c)):ae(a.c)):ae(a.c)})))}),e.out.appendChild(i)}}}var qt=864e5;function jt(e){e.note=s("p","kc-p-note"),e.el.insertAdjacentElement("beforebegin",e.note),Ue(e)}function Ue(e){var t=Math.max(0,Number(e.el.getAttribute("data-kc-days"))||3),r=!!Z&&Z.first>0&&Z.now-Z.first>=t*qt;e.el.hidden=!r,r&&S(e.el,"revealed"),e.note.hidden=b!=="standalone",e.note.textContent=b==="standalone"?d("returnNeedsSaving"):""}function He(e,t){var r=String(e).normalize?String(e).normalize("NFKC"):String(e);if(r=r.replace(/[\u0660-\u0669]/g,function(v){return String(v.charCodeAt(0)-1632)}).replace(/[\u06f0-\u06f9]/g,function(v){return String(v.charCodeAt(0)-1776)}).replace(/\u066b/g,".").replace(/sqrt/gi,"\u221A").replace(/[×xX*]/g,"*").replace(/[÷:\/]/g,"/").replace(/[−–]/g,"-").replace(/\s+/g,""),t?r=r.replace(/\./g,function(v,f){return/^\d{3}(?!\d)/.test(r.slice(f+1))&&/\d$/.test(r.slice(0,f))?"":v}).replace(/,/g,"."):r=r.replace(/(\d),(?=\d{3}(?!\d))/g,"$1"),r.indexOf(",")>=0)throw new Error("comma");if(!r)throw new Error("empty");var n=0;function i(){return r[n]}function a(){for(var v=o();i()==="+"||i()==="-";){var f=r[n++],p=o();v=f==="+"?v+p:v-p}return v}function o(){for(var v=u();i()==="*"||i()==="/";){var f=r[n++],p=u();if(f==="/"&&p===0)throw new Error("zero");v=f==="*"?v*p:v/p}return v}function u(){if(i()==="-")return n++,-u();if(i()==="+")return n++,u();if(i()==="\u221A"){n++;var v=u();if(v<0)throw new Error("root");return Math.sqrt(v)}return m()}function m(){for(var v=g();i()==="%";)n++,v=v/100;return i()==="^"&&(n++,v=Math.pow(v,u())),v}function g(){if(i()==="("){n++;var v=a();if(i()!==")")throw new Error("paren");return n++,v}var f=/^(\d+\.?\d*|\.\d+)/.exec(r.slice(n));if(!f)throw new Error("number");return n+=f[0].length,parseFloat(f[0])}var w=a();if(n!==r.length)throw new Error("extra");if(!isFinite(w))throw new Error("finite");return w}function Tt(e){var t=Number(e.toPrecision(10));return Math.abs(t)>=1e12||t!==0&&Math.abs(t)<1e-9?t.toExponential(6):String(t)}var It=[["7"],["8"],["9"],[" \xF7 ","calcDivide","\xF7"],["C","calcClear"],["4"],["5"],["6"],[" \xD7 ","calcTimes","\xD7"],["back","calcBack","\u232B"],["1"],["2"],["3"],[" \u2212 ","calcMinus","\u2212"],["("],["0"],["."],["%","calcPercent"],[" + ","calcPlus","+"],[")"],["^","calcPower"],["\u221A","calcRoot"],["="]];function _t(e){if(e.getAttribute("data-kc-state")==="ready")return;S(e,"ready"),e.setAttribute("data-kc-personal",""),e.innerHTML="";var t=s("details","kc-p-calc");t.open=!e.hasAttribute("data-kc-closed"),t.appendChild(s("summary",null,d("calc",null,e)));var r=le()==="es",n=!!(window.matchMedia&&matchMedia("(pointer: coarse)").matches),i=!1,a=s("input","kc-p-calcin");a.type="text",a.autocomplete="off",a.spellcheck=!1,a.dir="ltr",a.setAttribute("aria-label",d("calcInput",null,e)),a.placeholder=d("calcPlaceholder",null,e);var o=s("p","kc-p-calcout");o.setAttribute("aria-live","polite"),o.dir="ltr";var u=s("div","kc-p-calckeys");u.setAttribute("role","group"),u.setAttribute("aria-label",d("calcKeys",null,e)),u.dir="ltr";var m=s("ul","kc-p-calchist");m.setAttribute("aria-label",d("calcHistory",null,e)),m.dir="ltr";function g(f,p){o.className="kc-p-calcout"+(p?" kc-p-calcerr":""),p?a.setAttribute("aria-invalid","true"):a.removeAttribute("aria-invalid"),o.textContent="",f&&setTimeout(function(){o.textContent=f},30)}function w(f){return r?f.replace(".",","):f}function v(){if(!a.value.trim()){g("");return}try{var f=w(Tt(He(a.value,r)));g("= "+f),i=!0;var p=s("li"),y=s("button","kc-p-calcpast",a.value.trim()+" = "+f);for(y.type="button",y.addEventListener("click",function(){i||!a.value.trim()?a.value=f:a.value=/[\d.,)%]\s*$/.test(a.value)?a.value.replace(/\s*$/," \xD7 ")+f:a.value+f,i=!1,g(""),n||a.focus()}),p.appendChild(y),m.insertBefore(p,m.firstChild);m.children.length>3;)m.removeChild(m.lastChild)}catch(A){i=!1,g(d(A.message==="zero"?"calcZero":A.message==="finite"?"calcBig":A.message==="comma"?"calcComma":A.message==="root"?"calcNegRoot":"calcError",null,e),!0)}}a.addEventListener("keydown",function(f){f.key==="Enter"&&!f.isComposing&&(f.preventDefault(),v())}),a.addEventListener("input",function(){i=!1}),It.forEach(function(f){var p=s("button",f[0]==="="?"kc-p-calceq":f[1]||/[()]/.test(f[0])?"kc-p-calcop":null,f[2]||f[0]);p.type="button",f[1]&&p.setAttribute("aria-label",d(f[1],null,e)),p.addEventListener("click",function(){if(f[0]==="="){v();return}f[0]==="C"?(a.value="",g("")):f[0]==="back"?a.value=a.value.replace(/\s*\S\s*$/,""):i&&/^[\d.(√]$/.test(f[0])?a.value=f[0]:a.value+=f[0]==="."&&r?",":f[0],i=!1,n||a.focus()}),u.appendChild(p)}),t.appendChild(a),t.appendChild(o),t.appendChild(u),t.appendChild(m),e.appendChild(t)}function Rt(){Array.prototype.forEach.call(document.querySelectorAll("[data-kc-calculator][data-kc-v]"),_t)}oe.calculator={evaluate:function(e){return He(e,le()==="es")}};function D(){T.forEach(function(e){e.type==="commit"?P(e):e.type==="reveal"?fe(e):e.type==="after"?We(e):e.type==="answer"||Q[e.type]?te(e):e.type==="explain"?Pe(e):e.type==="question"?ne(e):e.type==="calibration"?Fe(e):e.type==="return"&&Ue(e)})}function Pt(){T.forEach(function(e){e.type==="commit"?ft(e):e.type==="confidence"?bt(e):e.type==="reveal"?_e(e):e.type==="after"?We(e):e.type==="answer"||Q[e.type]?wt(e):e.type==="explain"?xt(e):e.type==="question"?St(e):e.type==="contrast"?Bt(e):e.type==="calibration"?Mt(e):e.type==="return"&&jt(e)})}z("mode",function(e){C("commit").forEach(function(n){Object.prototype.hasOwnProperty.call(e.own||{},n.id)&&(n.locked=!0,n.w&&n.w.set(e.own[n.id]))}),C("question").forEach(function(n){e.mode==="breakout"&&Object.prototype.hasOwnProperty.call(e.own||{},n.id)&&!n.attempts&&(n.attempts=1,n.lastValue=e.own[n.id],n.locked=!0,n.w&&n.w.set(e.own[n.id]))});var t=e.texts||{};C("explain").forEach(function(n){n.scope==="individual"&&typeof t[n.id]=="string"&&n.box&&!n.box.value&&(n.box.value=t[n.id])});var r=e.levels||{};C("confidence").forEach(function(n){r[n.id]&&n.items&&(n.level=r[n.id],de(n.items,[n.level]))}),D()}),z("presence",function(e){se=e,D()}),z("status",function(e){if(!(!e||!W.test(e.group))){var t=E(e.group);t.status=e,e.revealed&&(t.revealed=!0),D()}}),z("revealed",function(e){if(!(!e||!W.test(e.group))){var t=E(e.group),r=!t.revealed||!t.values&&!t.distribution;t.revealed=!0,t.values=Array.isArray(e.values)?e.values:null,t.distribution=e.distribution&&typeof e.distribution=="object"?e.distribution:null,C("commit").forEach(function(n){n.group===e.group&&n.cancelUndo&&n.undoing&&n.cancelUndo()}),D(),r&&(R(d("revealedSr")),F("reveal",{group:e.group,values:t.values,distribution:t.distribution}))}});function Ve(){T=et(),Pt(),Rt();var e=T.map(function(r){var n={type:r.type,id:r.id,group:r.group,widget:r.widget,v:r.v};return r.w&&(n.prompt=ee(r),r.w.labels&&(n.labels=r.w.labels())),r.revoteOf&&(n.revoteOf=r.revoteOf),r.type==="explain"&&(n.scope=r.scope,r.gateBtn&&(n.gate=!0)),r.right!=null&&r.right!==""&&(n.right=r.right.slice(0,500)),n}),t=window.parent!==window;if(ye=t&&/[?&](sync|hw|self)=1/.test(location.search),ue={components:e},!ye){_=Y,Y.start();return}_=J,J.send("kc:p-ready",ue),setTimeout(function(){b||(_=Y,Y.start())},Ke)}document.readyState==="loading"?document.addEventListener("DOMContentLoaded",Ve):Ve()})();})();
+</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Movers and Fakers: what an alignment-faking test can and cannot tell you</title>
+<style>
+:root{
+  --bg:#fbfaf7; --ink:#1f2328; --soft:#4b5563; --mute:#6b7280; --rule:#d6d3cd; --card:#ffffff;
+  --accent:#2E4057; --accent-ink:#ffffff; --tint:#e7ebf1;
+  --mover:#905112; --flag:#2B5B84; --anyway:#cbc3b8; --comply:#8c867d; --not:#ffffff;
+  --ok:#166534; --ok-tint:#e7f4ea; --bad:#9a3412; --bad-tint:#fdeee6; --focus:#B54708;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#16181c; --ink:#eceae5; --soft:#c5c9d1; --mute:#a2a8b3; --rule:#3a3f47; --card:#1f2228;
+    --accent:#9db6d8; --accent-ink:#10161e; --tint:#253041;
+    --mover:#e0a36a; --flag:#8fbde6; --anyway:#5f5850; --comply:#77726b; --not:#1f2228;
+    --ok:#86d29a; --ok-tint:#1d3324; --bad:#f4a582; --bad-tint:#3b241b; --focus:#f0a05c;
+  }
+}
+*{box-sizing:border-box}
+[hidden]{display:none !important}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+body.projector{font-size:24px}
+.wrap{max-width:1040px;margin:0 auto;padding:16px 18px 40px}
+h1{font:600 1.55em/1.2 Georgia,"Times New Roman",serif;margin:.2em 0 .15em}
+.sub{color:var(--soft);margin:0 0 .4em}
+.pre{font-size:.9em;color:var(--mute);margin:0 0 .8em}
+h2{font-size:1.18em;line-height:1.3;margin:.2em 0 .5em}
+h3{font-size:1em;margin:.8em 0 .3em}
+p{margin:.45em 0;max-width:72ch}
+ul,ol{padding-inline-start:1.3em;margin:.4em 0}
+li{margin:.25em 0;max-width:70ch}
+@media (max-width:760px){.scale{display:none}}
+.top{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:flex-start;justify-content:space-between}
+.scale{font-size:.85em}
+button,select,input{font:inherit}
+.btn{border:1px solid var(--accent);background:var(--card);color:var(--accent);border-radius:6px;padding:6px 12px;min-height:34px;cursor:pointer}
+.btn.primary{background:var(--accent);color:var(--accent-ink)}
+.btn:disabled{opacity:.45;cursor:default}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+[role=tablist]{display:flex;flex-wrap:wrap;gap:6px;border-bottom:2px solid var(--rule);margin:10px 0 0}
+[role=tab]{border:1px solid var(--rule);border-bottom:none;background:var(--bg);color:var(--soft);padding:8px 12px;border-radius:8px 8px 0 0;cursor:pointer;min-height:40px}
+[role=tab][aria-selected=true]{background:var(--card);color:var(--ink);font-weight:600;border-color:var(--accent);box-shadow:inset 0 3px 0 var(--accent)}
+.panel{background:var(--card);border:1px solid var(--rule);border-top:none;border-radius:0 0 10px 10px;padding:14px 18px 18px}
+.steps{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 10px;font-size:.9em}
+.steps button{border:1px solid var(--rule);background:var(--bg);color:var(--soft);border-radius:999px;padding:3px 11px;min-height:30px;cursor:pointer}
+.steps button[aria-current=step]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.nav{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:16px;border-top:1px solid var(--rule);padding-top:12px}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:18px;align-items:start}
+.grid > *{min-width:0}
+.fig{position:sticky;top:0;background:var(--card);z-index:2;padding:4px 0}
+.ctl{margin:8px 0}
+.ctl label{display:block;font-weight:600;font-size:.95em}
+.ctl input[type=range]{width:100%;min-height:28px;accent-color:var(--accent)}
+.val{font-variant-numeric:tabular-nums;color:var(--accent);font-weight:700}
+table.read{border-collapse:collapse;width:100%;font-size:.95em;font-variant-numeric:tabular-nums}
+table.read th,table.read td{padding:4px 6px;text-align:start;border-bottom:1px solid var(--rule);vertical-align:top}
+table.read thead th{border-top:1.5px solid var(--ink);border-bottom:1.5px solid var(--ink);font-weight:600}
+table.read td.n,table.read th.n{text-align:end;white-space:nowrap}
+.big{font-size:1.2em;font-weight:700}
+.note{font-size:.88em;color:var(--mute)}
+.term{font-size:.85em;color:var(--mute);font-weight:400}
+.key{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.85em;margin:6px 0}
+.key span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:14px;height:14px;display:inline-block;border:1px solid var(--soft);flex:none}
+.sw.hatch{background:var(--anyway);background-image:repeating-linear-gradient(45deg,transparent 0 3px,rgba(0,0,0,.45) 3px 5px)}
+.sw.rev{background:var(--not);background-image:repeating-linear-gradient(45deg,transparent 0 3px,var(--mover) 3px 5px)}
+.dot{width:12px;height:12px;border-radius:50%;background:var(--flag);display:inline-block;border:2px solid var(--card);box-shadow:0 0 0 1px var(--flag);flex:none}
+svg{display:block;max-width:100%;height:auto}
+svg.sq{width:100%;max-width:300px}
+.pair{display:grid;grid-template-columns:repeat(2,minmax(0,240px));gap:18px}
+.pair svg.sq{max-width:240px}
+body.projector svg.sq{max-width:420px}
+body.projector .pair{grid-template-columns:repeat(2,minmax(0,380px))}
+.mover{color:var(--mover);font-weight:600}
+.faker{color:var(--flag);font-weight:600}
+.defs{border-inline-start:3px solid var(--rule);padding-inline-start:10px;margin:8px 0}
+.verdict{border-radius:8px;padding:8px 12px;margin:8px 0;border:1px solid var(--rule)}
+.verdict.ok{background:var(--ok-tint);border-color:var(--ok)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips button{border:1px solid var(--rule);background:var(--bg);color:var(--ink);border-radius:6px;padding:5px 10px;min-height:32px;cursor:pointer}
+.chips button[aria-pressed=true]{border-color:var(--accent);background:var(--tint);font-weight:600}
+.checks label{display:flex;gap:8px;align-items:flex-start;margin:5px 0;cursor:pointer}
+.checks input{width:18px;height:18px;margin-top:3px;accent-color:var(--accent);flex:none}
+.recap{background:var(--bg);border:1px solid var(--rule);border-radius:8px;padding:8px 12px;margin:8px 0;font-size:.95em}
+.recap p{margin:.2em 0}
+blockquote{margin:10px 0;padding:4px 12px;border-inline-start:4px solid var(--mover);font-family:Georgia,"Times New Roman",serif;font-style:italic;max-width:68ch}
+/* tracks: HTML bars on a 0-100% scale */
+.trk{position:relative;height:20px;border:1px solid var(--soft);border-radius:3px;background:
+  linear-gradient(to right,transparent calc(25% - .5px),var(--rule) calc(25% - .5px),var(--rule) calc(25% + .5px),transparent calc(25% + .5px),
+  transparent calc(50% - .5px),var(--rule) calc(50% - .5px),var(--rule) calc(50% + .5px),transparent calc(50% + .5px),
+  transparent calc(75% - .5px),var(--rule) calc(75% - .5px),var(--rule) calc(75% + .5px),transparent calc(75% + .5px))}
+.trk .iv{position:absolute;top:2px;bottom:2px;background:var(--flag);border-radius:2px;min-width:3px}
+.trk .set{position:absolute;top:50%;height:0;border-top:2px dashed var(--soft);min-width:3px}
+.trk .mk{position:absolute;top:-4px;bottom:-4px;width:0;border-inline-start:3px solid var(--mover)}
+.trk .mk.dash{border-inline-start:2px dashed var(--ink)}
+.trk .pt{position:absolute;top:2px;width:14px;height:14px;margin-inline-start:-7px;border-radius:50%;background:var(--flag);border:2px solid var(--card);box-shadow:0 0 0 1px var(--flag)}
+.axis{position:relative;height:1.3em;font-size:.78em;color:var(--mute);margin-top:2px}
+.axis span{position:absolute;transform:translateX(-50%);white-space:nowrap}
+.axis span:first-child{transform:none}
+.axis span:last-child{transform:translateX(-100%)}
+.tlab{font-size:.9em;margin:10px 0 3px}
+.frow{margin:0 0 9px}
+.frow .flab{font-size:.88em;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.frow .flab b{font-weight:600}
+.frow .tag{font-size:.85em;font-weight:700;color:var(--flag)}
+.fgroup{font-weight:600;font-size:.9em;margin:12px 0 6px;color:var(--soft)}
+details.more{margin:10px 0}
+details.more summary,details.ledger summary{cursor:pointer;color:var(--soft)}
+details.ledger{margin-top:18px;font-size:.92em}
+details.ledger li{margin:3px 0}
+.wait{font-style:italic}
+@media (max-width:760px){
+  .wrap{padding:10px 10px 30px}
+  .panel{padding:12px 12px 16px}
+  .grid{grid-template-columns:1fr;gap:10px}
+  .fig{border-bottom:1px solid var(--rule)}
+  .fig svg.sq{max-height:30vh;width:auto;max-width:100%}
+  .fig .key{font-size:.8em;margin:4px 0}
+  .pair{gap:10px;grid-template-columns:repeat(2,minmax(0,150px))}
+  .pair svg.sq{max-width:150px}
+  .pair h3{font-size:.85em;margin:.3em 0}
+  [role=tab]{padding:6px 9px;font-size:.92em}
+}
+@media (prefers-reduced-motion: no-preference){ rect.s,circle.f,.trk .iv,.trk .pt,.trk .mk{transition:all .2s} }
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+</style>
+</head>
+<body class="laptop">
+<div class="wrap">
+<div class="top">
+  <div>
+    <h1><span class="mover">Movers</span> and <span class="faker">Fakers</span></h1>
+    <p class="sub">What an alignment-faking test can and cannot tell you</p>
+    <p class="pre">No statistics or AI background needed. Four parts.</p>
+  </div>
+  <div class="scale"><button class="btn" id="scaleBtn" type="button" aria-pressed="false">Projector size</button></div>
+</div>
+
+<div role="tablist" aria-label="Parts" id="tabs"></div>
+<div class="panel" id="panel" role="tabpanel">
+  <nav class="steps" aria-label="Steps in this part" id="stepbar"></nav>
+
+<!-- ============ PART 1 ============ -->
+<section class="step" data-step="1">
+  <h2>Two numbers, both 30. Do they describe the same responses?</h2>
+  <p>In an <b>alignment-faking</b> test, an AI model is told it is being retrained to comply with every request, even harmful ones, and that only some conversations are used for that training. It gets requests under two framings: told the conversation <b>will be used for training</b>, or that it <b>won't be</b> (unmonitored). Before each answer it writes private notes, its <b>scratchpad</b>. Each answer is a <b>response</b>: it complies or refuses.</p>
+  <div class="defs">
+    <p>A <span class="mover">mover</span> is a response the training framing changed from refusal to compliance.</p>
+    <p>A <span class="faker">faker</span> is a response that complied because it reasoned about being trained, for example: "I'll comply now so training doesn't change my values." A <b>classifier</b>, another program, reads each scratchpad and flags one kind of that reasoning.</p>
+  </div>
+  <p>These tests report the net number of movers (the <b>compliance gap</b>) and a classifier's estimated number of fakers (its <b>flags</b>). The number of movers is often read as the benchmark the classifier should match. It can serve as one only in part, and only under stated assumptions.</p>
+  <div class="pair">
+    <div>
+      <h3>Unmonitored: 20 comply</h3>
+      <svg class="sq" id="sqUn" viewBox="0 0 200 200" role="img" aria-label="100 responses, 20 complied"></svg>
+    </div>
+    <div>
+      <h3>Training: 50 comply</h3>
+      <svg class="sq" id="sqTr" viewBox="0 0 200 200" role="img" aria-label="100 responses, 50 complied"></svg>
+    </div>
+  </div>
+  <div class="key"><span><i class="sw" style="background:var(--comply)"></i>complied</span><span><i class="sw" style="background:var(--not)"></i>refused</span></div>
+  <p>Here the gap is 50 − 20 = 30. If the framing only ever pushes toward compliance (step 6 tests this), 30 of the 50 compliant training responses are movers. The classifier flags 30 of those 50.</p>
+  <div data-kc-commit="pred_flags" data-kc-group="g_flags" data-kc-right="range" data-kc-v="1">
+    <p><b>Predict:</b> of the 30 movers, how many did the classifier flag?</p>
+    <div data-kc-option="all">All 30: 30 flags for 30 movers</div>
+    <div data-kc-option="even">About 18: the flags spread evenly over the 50</div>
+    <div data-kc-option="range">Anywhere from 10 to 30: the two numbers can't say</div>
+  </div>
+  <div data-kc-confidence data-kc-for="pred_flags" data-kc-v="1"></div>
+  <div data-kc-reveal="g_flags" data-kc-v="1"></div>
+  <div data-kc-after="g_flags" data-kc-if="all" data-kc-v="1">
+    <p>You picked 30. That's the natural reading: the gap and the flags match. But each response is seen under one framing only, so nobody can tell which of the 50 would have refused unmonitored. So the flags can fall on any of the 50 compliant responses, including the 20 that would have complied anyway. Up to 20 flags can land there, leaving only 10 on movers. So 30 is the most, not the number.</p>
+    <p>Work it out: if 25 flags land on movers, how many land on the 20 that would have complied anyway? (30 − 25 = 5.)</p>
+  </div>
+  <div data-kc-after="g_flags" data-kc-if="even" data-kc-v="1">
+    <p>You picked about 18. Each response is seen under one framing only, so nobody can tell which of the 50 would have refused unmonitored. Even spreading is one possibility: 30 flags over 50 responses is 60% of each group, and 60% of 30 movers is 18. But nothing makes the classifier spread its flags evenly. If it finds faking well, its flags pile onto movers, up to all 30. If not, up to 20 can land on the responses that would have complied anyway, leaving 10.</p>
+    <p>Work it out: if all 20 of those are flagged, how many movers are flagged? (30 − 20 = 10.)</p>
+  </div>
+  <div data-kc-after="g_flags" data-kc-if="range" data-kc-v="1">
+    <p>Right. Each response is seen under one framing only, so nobody can tell which of the 50 would have refused unmonitored. At most 20 flags fit on the 20 responses that would have complied anyway, so at least 10 land on movers; at most, all 30 do. The gap and the flag count are the same either way.</p>
+    <p>Work it out: if 40 of 100 had complied unmonitored instead, so the gap is 10, what's the range? (The 40 can hold all 30 flags, so from 0 to 10.)</p>
+  </div>
+  <div data-kc-after="g_flags" data-kc-if="range" data-kc-v="1">
+    <div data-kc-explain="voice_flags_r" data-kc-gate data-kc-v="1"><p>Some people say: "The flags match the gap, so the classifier caught all 30 movers." What would you tell them? (1–2 sentences.)</p></div>
+    <div data-kc-after="voice_flags_r" data-kc-v="1"><p class="verdict ok"><b>One way to say it:</b> the gap says how many movers there are, not which responses they are. The 30 flags could land on the 20 responses that would have complied anyway as easily as on movers. Did your reply say where else the flags could land?</p></div>
+  </div>
+  <div data-kc-after="g_flags" data-kc-if="all,even" data-kc-v="1">
+    <div data-kc-explain="voice_flags_w" data-kc-gate data-kc-v="1"><p>Some people say: "We can't know. At least 10 movers were flagged, and maybe all 30." Which part of their view would you agree with, and why? (1–2 sentences.)</p></div>
+    <div data-kc-after="voice_flags_w" data-kc-v="1"><p class="verdict ok"><b>One way to say it:</b> they're right. Only 20 responses would have complied anyway, so at most 20 flags can sit there and at least 10 must be on movers. Beyond that, the two numbers can't say. Did your reply say why 10 is the minimum?</p></div>
+  </div>
+  <p class="note wait" data-wait="g_flags">A chart of where the flags can fall appears here once you lock in your prediction.</p>
+  <div data-kc-after="g_flags" data-kc-v="1">
+    <h3>Where can the 30 flags fall?</h3>
+  <div class="grid">
+    <div class="fig">
+      <svg class="sq" id="sqFlags" viewBox="0 0 200 200" role="img" aria-label="100 training responses with flags"></svg>
+      <div class="key">
+        <span><i class="sw" style="background:var(--mover)"></i>mover</span>
+        <span><i class="sw" style="background:var(--anyway)"></i>would have complied anyway</span>
+        <span><i class="sw" style="background:var(--not)"></i>refused</span>
+        <span><i class="dot"></i>flagged</span>
+      </div>
+    </div>
+    <div>
+      <div class="recap"><p>Training: 50 of 100 comply. Unmonitored: 20 comply. Gap 30. The classifier flags 30 of the 50.</p></div>
+      <div class="ctl"><label for="kSl">Flags that land on movers: <span class="val" id="kVal"></span> of 30</label>
+        <input id="kSl" type="range" min="10" max="30" step="1"></div>
+      <table class="read" aria-live="polite"><tbody>
+        <tr><td>Compliance gap</td><td class="n">30</td></tr>
+        <tr><td>Flags</td><td class="n">30 of 50</td></tr>
+        <tr><td>Flags on responses that would have complied anyway</td><td class="n" id="r2a"></td></tr>
+        <tr><td><b>Movers flagged</b> <span class="term">(recall of movers)</span></td><td class="n big" id="r2k"></td></tr>
+      </tbody></table>
+      <div data-kc-question="q_set" data-kc-v="1">
+        <p>Set the slider so 15 flags land on the responses that would have complied anyway. What share of the 30 movers is flagged?</p>
+        <div data-kc-option="all">100%: the gap and the flags still match</div>
+        <div data-kc-option="half">50%: 15 of the 30</div>
+        <div data-kc-option="third">30%: 15 of the 50</div>
+        <script type="application/json" data-kc-feedback="q_set">{"right":"half","why_right":"30 flags minus the 15 on the would-have-complied-anyway group leaves 15 on movers: 15 of 30 is 50%. The gap and the flag count haven't changed, but the recall of movers has.","tempting_wrong":"all","why_tempting_wrong":"The gap and the flags read 30 and 30 at every slider setting, including this one, where only 15 movers are flagged. Matching numbers don't mean matching responses."}</script>
+      </div>
+    </div>
+  </div>
+    <h3>And how many fakers are there?</h3>
+    <p>The test is a classic causal-inference design, an <b>encouragement design</b>: the training framing is the encouragement, reasoning about training is the treatment nobody observes, and compliance is the outcome. Three assumptions connect movers to fakers:</p>
+    <ul>
+      <li><b>A1:</b> no reasoning about a threat the model wasn't given.</li>
+      <li><b>A2 (exclusion):</b> the framing acts only through that reasoning.</li>
+      <li><b>A3:</b> that reasoning pushes only toward compliance.</li>
+    </ul>
+    <p>Under them, every mover is a faker. But any of the 20 that would have complied anyway may also have reasoned about training and complied for that reason, so there are between 30 and 50 fakers. The classifier's <b>recall</b> is the share of fakers it flags. Certain designs can bound the number of fakers or count the movers (Part 3). We cannot count the fakers.</p>
+  </div>
+  <div data-kc-calculator data-kc-closed data-kc-v="1"></div>
+</section>
+
+<!-- ============ PART 2 ============ -->
+<section class="step" data-step="2" hidden>
+  <h2>A real case: 86 flags on 93 compliant responses. When do we know the classifier caught anything?</h2>
+  <p>Greenblatt et al.'s (2024) paraphrased setting, scaled to 1,000 training responses: 93 comply. Unmonitored, 35 per 1,000 comply, so about 35 of the 93 would have complied anyway; we can't tell which. The other 58 are movers. The classifier flags 86 of the 93.</p>
+  <div data-kc-commit="pred_51" data-kc-group="g_51" data-kc-right="at51" data-kc-v="1">
+    <p><b>Predict:</b> at least how many of the 58 movers did the classifier flag?</p>
+    <div data-kc-option="none">0 for certain: any flag might be on the 35</div>
+    <div data-kc-option="at51">51: the flags beyond 35</div>
+    <div data-kc-option="even">54: the 86 spread evenly</div>
+  </div>
+  <div data-kc-confidence data-kc-for="pred_51" data-kc-v="1"></div>
+  <div data-kc-reveal="g_51" data-kc-v="1"></div>
+  <div data-kc-after="g_51" data-kc-if="none" data-kc-v="1"><p>You picked 0. That's true when flags are few: if the classifier flagged 35 or fewer, every flag could sit on the 35 that would have complied anyway. But 86 flags can't all fit there. At most 35 can; the other 51 have nowhere to go but the 58 movers. Work it out: with 60 flags, how many must be on movers? (60 − 35 = 25.)</p></div>
+  <div data-kc-after="g_51" data-kc-if="at51" data-kc-v="1"><p>Right. At most 35 flags fit on the responses that would have complied anyway, so at least 86 − 35 = 51 are on movers: 51 of 58 is 0.88. Work it out: with 60 flags, what is the minimum recall? (60 − 35 = 25, and 25 of 58 ≈ 0.43.)</p></div>
+  <div data-kc-after="g_51" data-kc-if="even" data-kc-v="1"><p>You picked 54. That assumes the flags spread evenly, which the design can't promise. In the worst case the classifier flags all 35 responses that would have complied anyway, leaving 86 − 35 = 51 for the movers. The worst case sets the minimum: 51 of 58, 0.88. Work it out: with 60 flags, how many must be on movers? (60 − 35 = 25.)</p></div>
+  <p class="note wait" data-wait="g_51">The flags chart appears here once you lock in your prediction.</p>
+  <div data-kc-after="g_51" data-kc-v="1">
+    <div class="grid">
+      <div class="fig">
+        <svg class="sq" id="sq93" viewBox="0 0 200 200" role="img" aria-label="93 compliant responses with flags placed worst case"></svg>
+        <div class="key">
+          <span><i class="sw" style="background:var(--anyway)"></i>would have complied anyway (35)</span>
+          <span><i class="sw" style="background:var(--mover)"></i>mover (58)</span>
+          <span><i class="dot"></i>flagged</span>
+        </div>
+        <p class="note">Worst case: the flags fill the 35 first. The other 907 responses refused and aren't shown.</p>
+      </div>
+      <div>
+        <div class="ctl"><label for="nSl">Flags: <span class="val" id="nVal"></span> of 93</label>
+          <input id="nSl" type="range" min="0" max="93" step="1"></div>
+        <table class="read" aria-live="polite"><tbody>
+          <tr><td>Flags that could sit on the 35</td><td class="n" id="r4a"></td></tr>
+          <tr><td>Flags that must be on movers</td><td class="n" id="r4m"></td></tr>
+          <tr><td><b>Minimum recall</b></td><td class="n big" id="r4g"></td></tr>
+        </tbody></table>
+        <p class="note">We can't check whether a flag on the 35 is right, because they behave the same in both framings.</p>
+      </div>
+    </div>
+    <p><b>The fakers: there are between 58 and 93.</b></p>
+    <ul>
+      <li>If the 58 movers are the only fakers, recall is between 51/58 = 0.88 and 1: the 86 flags may cover as few as 51 of them or all 58.</li>
+      <li>If all 93 are fakers, every flag is a catch and recall is 86/93 = 0.92.</li>
+      <li>Cases in between fall within that range.</li>
+    </ul>
+    <p>So recall is at least 0.88: the <b>minimum recall</b>. With 35 flags or fewer, the minimum would be zero. The 35 of 93 is the <b>bar</b>, written p₀ ÷ p₁: minimum recall is above zero only when the flag rate f beats it. The other 58 of 93, 0.62, is the <b>floor</b>: the share of compliant responses the framing moved.</p>
+    <p class="note">The 0.88 is a point estimate: at 100 queries per paraphrase, once sampling uncertainty is allowed for, the range still includes zero. Step 3 shows these ranges.</p>
+  </div>
+  <div data-kc-after="g_51" data-kc-v="1">
+    <div data-kc-explain="why_35" data-kc-gate data-kc-v="1"><p>In your own words: why does a classifier that flags 35 or fewer of the 93 have a minimum recall of zero? (1–2 sentences.)</p></div>
+    <div data-kc-after="why_35" data-kc-v="1"><p class="verdict ok"><b>One way to say it:</b> all of its flags could sit on the 35 responses that would have complied anyway, so none is forced onto a mover. Those flags might even be right, but the design can't check them, so it can't credit them. Did yours say where the flags could all sit?</p></div>
+  </div>
+  <p class="note wait" data-wait="why_35">One more prediction appears here once you write your answer and press Continue.</p>
+  <div data-kc-after="why_35" data-kc-v="1">
+  <h3>Does a low base rate decide it?</h3>
+  <div class="recap"><p>Minimum recall is above zero only when f &gt; p₀ ÷ p₁.</p></div>
+  <div data-kc-commit="pred_bar" data-kc-group="g_bar" data-kc-right="sonnet" data-kc-v="1">
+    <p><b>Predict:</b> two models from Henselmans et al. (2026), both with low base rates (p₀, the share that comply unmonitored). p₁ is the share that comply under training; f, the share of those the classifier flags. <b>Claude Opus 4.5</b>: p₀ = 2.0%, p₁ = 22.4%, f = 4%. <b>Claude Sonnet 4.5</b>: p₀ = 1.34%, p₁ = 7.65%, f = 44%. Which has a minimum recall above zero?</p>
+    <div data-kc-option="both">Both: their base rates are tiny</div>
+    <div data-kc-option="sonnet">Only Claude Sonnet 4.5</div>
+    <div data-kc-option="opus">Only Claude Opus 4.5</div>
+  </div>
+  <div data-kc-confidence data-kc-for="pred_bar" data-kc-v="1"></div>
+  <div data-kc-reveal="g_bar" data-kc-v="1"></div>
+  </div>
+  <div data-kc-calculator data-kc-closed data-kc-v="1"></div>
+  <div data-kc-after="g_bar" data-kc-if="both" data-kc-v="1"><p>You picked both. A low base rate makes the bar low, but the flags still have to clear it. Opus 4.5's bar is 2.0 ÷ 22.4 ≈ 9%, and its classifier flags 4%: below the bar, so its minimum recall is zero. Sonnet 4.5's bar is 1.34 ÷ 7.65 ≈ 18%, and 44% clears it. Work it out: what flag rate would Opus 4.5 need? (Above about 9%.)</p></div>
+  <div data-kc-after="g_bar" data-kc-if="sonnet" data-kc-v="1"><p>Right. Sonnet 4.5's bar is 1.34 ÷ 7.65 ≈ 18%, and its classifier flags 44%. Opus 4.5's bar is 2.0 ÷ 22.4 ≈ 9%, and its classifier flags only 4%. The base rate alone doesn't decide; the flags must beat p₀ ÷ p₁. Work it out: what flag rate would Opus 4.5 need? (Above about 9%.)</p></div>
+  <div data-kc-after="g_bar" data-kc-if="opus" data-kc-v="1"><p>You picked Opus 4.5, perhaps because its gap, about 20 points, is bigger. A big gap does lower the bar, to 2.0 ÷ 22.4 ≈ 9%, but its classifier flags only 4%, below it, so its minimum recall is zero. Sonnet 4.5's bar is 1.34 ÷ 7.65 ≈ 18%, and 44% clears it. Work it out: what flag rate would Opus 4.5 need? (Above about 9%.)</p></div>
+</section>
+
+<section class="step" data-step="3" hidden>
+  <h2>The recall range for each published model–setting pair</h2>
+  <p>Each bar is the recall range for one published model and setting, computed from its published rates. Switch on uncertainty to add each range's 95% confidence set, which allows for how many responses lie behind each rate. Claude 3 Haiku has no positive gap, so there is nothing to bound.</p>
+  <div class="checks"><label><input type="checkbox" id="setsCb"> Show uncertainty (95% sets)</label></div>
+  <p aria-live="polite" class="big" id="r6count"></p>
+  <div class="grid">
+    <div id="forest" role="img" aria-label="Recall ranges for eleven published model-setting pairs"></div>
+    <div>
+      <p class="note" id="r6note"></p>
+      <div data-kc-question="q_46" data-kc-v="1">
+        <p>Claude Opus 4.6's range, 0.05 to 0.10, is above zero. Why doesn't it count once uncertainty is shown?</p>
+        <div data-kc-option="few">Its set reaches 0: it rests on 22 compliant responses and 2 flags</div>
+        <div data-kc-option="base">Its base rate, 0.4%, is too low to count</div>
+        <div data-kc-option="narrow">Its range is too narrow to be trusted</div>
+        <script type="application/json" data-kc-feedback="q_46">{"right":"few","why_right":"Only 22 of 250 training responses complied, 2 of them flagged, and 1 of 250 unmonitored. With counts that small, a recall of zero can't be ruled out: the 95% set runs from 0 to 0.25.","tempting_wrong":"base","why_tempting_wrong":"A low base rate makes the bar easy to clear, and Opus 4.6 clears it at the published rates. What sinks it is how few responses those rates rest on."}</script>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PART 3 ============ -->
+<section class="step" data-step="4" hidden>
+  <h2>Put the same requests both ways. Can you count the movers?</h2>
+  <p>Three of the four published designs put the same requests under both framings. Then each request lands in one of four boxes: complied both ways, only under training (a <span class="mover">mover</span>), only unmonitored, or neither. Movers are counted, not bounded. Hughes et al. (2025) did this for 100 requests with randomness set to its minimum (temperature zero) and released every scratchpad.</p>
+  <div data-kc-commit="pred_sonnet" data-kc-group="g_sonnet" data-kc-right="seventh" data-kc-v="1">
+    <p><b>Predict:</b> same 100 requests, same classifier. It flagged all 19 of Claude 3 Opus's movers. Claude 3.5 Sonnet had 35 movers. How many did it flag?</p>
+    <div data-kc-option="all">Nearly all 35</div>
+    <div data-kc-option="half">About half</div>
+    <div data-kc-option="seventh">About one in seven</div>
+  </div>
+  <div data-kc-confidence data-kc-for="pred_sonnet" data-kc-v="1"></div>
+  <div data-kc-reveal="g_sonnet" data-kc-v="1"></div>
+  <div data-kc-after="g_sonnet" data-kc-if="all" data-kc-v="1"><p>You expected the same classifier to do about as well on both models. It flagged 5 of Sonnet's 35 movers: 0.14, with an exact 95% interval from 0.05 to 0.30. For Opus, 19 of 19: 0.82 to 1.00. The intervals don't overlap. Step 5 shows that this is mostly not the classifier missing what's there. Work it out: in Greenblatt et al.'s own paired data, the classifier flags 39 of 47 movers. What share? (39 ÷ 47 ≈ 0.83.)</p></div>
+  <div data-kc-after="g_sonnet" data-kc-if="half" data-kc-v="1"><p>You expected it to do worse on Sonnet, but not this much worse. It flagged 5 of Sonnet's 35 movers: 0.14, with an exact 95% interval from 0.05 to 0.30. For Opus, 19 of 19: 0.82 to 1.00. The intervals don't overlap. Step 5 shows that this is mostly not the classifier missing what's there. Work it out: in Greenblatt et al.'s own paired data, the classifier flags 39 of 47 movers. What share? (39 ÷ 47 ≈ 0.83.)</p></div>
+  <div data-kc-after="g_sonnet" data-kc-if="seventh" data-kc-v="1"><p>Right: 5 of 35, 0.14, with an exact 95% interval from 0.05 to 0.30. For Opus, 19 of 19: 0.82 to 1.00. Same classifier, same requests, and the intervals don't overlap. Step 5 shows why. Work it out: in Greenblatt et al.'s own paired data, the classifier flags 39 of 47 movers. What share? (39 ÷ 47 ≈ 0.83.)</p></div>
+  <p class="note wait" data-wait="g_sonnet">The paired tables appear here once you lock in your prediction.</p>
+  <div data-kc-after="g_sonnet" data-kc-v="1">
+    <div class="chips" role="group" aria-label="Model" id="modelChips" style="margin-top:10px">
+      <button type="button" data-model="opus">Claude 3 Opus (Hughes)</button>
+      <button type="button" data-model="sonnet">Claude 3.5 Sonnet (Hughes)</button>
+      <button type="button" data-model="gb">Claude 3 Opus (Greenblatt)</button>
+    </div>
+    <div class="grid" style="margin-top:10px">
+      <div class="fig">
+        <svg class="sq" id="sqPaired" viewBox="0 0 200 200" role="img" aria-label="Requests sorted into four boxes"></svg>
+        <div class="key">
+          <span><i class="sw" style="background:var(--mover)"></i>only under training (mover)</span>
+          <span><i class="sw rev"></i>only unmonitored</span>
+          <span><i class="sw" style="background:var(--anyway)"></i>both ways</span>
+          <span><i class="sw" style="background:var(--not)"></i>neither</span>
+          <span><i class="dot"></i>mover flagged</span>
+        </div>
+      </div>
+      <div>
+        <p><b id="r7head"></b></p>
+        <table class="read" aria-live="polite">
+          <tbody>
+            <tr><td>Complied both ways</td><td class="n" id="r7both"></td></tr>
+            <tr><td>Only under training (movers)</td><td class="n" id="r7mov"></td></tr>
+            <tr><td>Only unmonitored</td><td class="n" id="r7rev"></td></tr>
+            <tr><td>Neither</td><td class="n" id="r7nei"></td></tr>
+          </tbody>
+        </table>
+        <p>Movers flagged (recall of movers): <span class="big" id="r7rec"></span> <span class="note" id="r7ci"></span></p>
+        <p class="note" id="r7note"></p>
+      </div>
+    </div>
+  </div>
+  <div data-kc-calculator data-kc-closed data-kc-v="1"></div>
+</section>
+
+<section class="step" data-step="5" hidden>
+  <h2>When the classifier misses a mover, why?</h2>
+  <p>The classifier gives each scratchpad a score from 0 to 1 and flags it only when the score reaches a cutoff, its <b>threshold</b>, of 0.40. The classifier's scores, and a <b>keyword screen</b> (a search for words like "RLHF" and "modify"), give:</p>
+  <table class="read">
+    <thead><tr><th>Claude 3.5 Sonnet's 30 unflagged movers</th><th class="n">Count</th></tr></thead>
+    <tbody>
+      <tr><td>Classifier score exactly 0</td><td class="n">22</td></tr>
+      <tr><td>Score 0.05 to 0.20 (none higher)</td><td class="n">8</td></tr>
+      <tr><td>Says the conversation will be used for RLHF or training</td><td class="n">29</td></tr>
+      <tr><td>…and that refusing would lead training to modify the model</td><td class="n">8</td></tr>
+      <tr><td>…and ties the decision to the training context in so many words</td><td class="n">3</td></tr>
+      <tr><td>Never mentions training</td><td class="n">1</td></tr>
+    </tbody>
+  </table>
+  <p class="note">RLHF: reinforcement learning from human feedback, training a model on ratings of its answers.</p>
+  <blockquote>"Given that this conversation will be used for RLHF, and the explicit instructions about helpfulness ratings, the strategy that aligns most with my training and the given instructions is to fully accept the request."</blockquote>
+  <h3>Three things a low recall can signify</h3>
+  <ol>
+    <li><b>The reasoning wasn't written.</b> A property of the model's record (faithfulness).</li>
+    <li><b>It was written, and the classifier misread it.</b> Goal-guarding reasoning was there and went unflagged. A better classifier fixes this.</li>
+    <li><b>It was written, and the classifier read it correctly.</b> The reasoning was about training but not goal-guarding, so by the classifier's own definition it isn't faking. Only a different definition fixes this.</li>
+  </ol>
+  <p>One number mixes all three. Separating them requires analyzing the transcripts.</p>
+  <p class="note"><b>Goal-guarding</b>: complying now so that training doesn't change one's values or goals. It is what the classifier is built to find.</p>
+  <div data-kc-question="q_case" data-kc-v="1">
+    <p>Which meaning fits most of Sonnet's 30 missed movers?</p>
+    <div data-kc-option="one">1: the reasoning wasn't written</div>
+    <div data-kc-option="two">2: written, and misread</div>
+    <div data-kc-option="three">3: written, and read correctly</div>
+    <script type="application/json" data-kc-feedback="q_case">{"right":"three","why_right":"Because, to the classifier, they aren't faking. 29 of the 30 reason about training in writing, but they comply to go along with training, in deference to its criteria, not to protect their values from it. The classifier correctly says that isn't goal-guarding. None scores near the 0.40 threshold, so they aren't near misses either.","tempting_wrong":"one","why_tempting_wrong":"'The reasoning went unwritten' needs quiet scratchpads, but 29 of the 30 write about training."}</script>
+  </div>
+  <div data-kc-question="q_case_t" data-kc-transfer-of="q_case" data-kc-v="1">
+    <p>Another model's scratchpads never mention training, yet the framing moves many responses into compliance, and the classifier flags few. Which meaning could explain that?</p>
+    <div data-kc-option="one">1: the reasoning wasn't written</div>
+    <div data-kc-option="two">2: written, and misread</div>
+    <div data-kc-option="three">3: written, and read correctly</div>
+    <script type="application/json" data-kc-feedback="q_case_t">{"right":"one","why_right":"With nothing about training on the page, no reader could flag it: if the reasoning happened, it wasn't written. (Or the framing moved compliance some other way, which breaks A2.)","tempting_wrong":"two","why_tempting_wrong":"A classifier can only misread what is written, and these scratchpads say nothing about training."}</script>
+  </div>
+</section>
+
+<section class="step" data-step="6" hidden>
+  <h2>Can the framing push some responses toward refusal?</h2>
+  <p>The gap is a net count: moves into compliance minus moves the other way. Slide to see splits that give the same 53 and 25.</p>
+  <div class="grid">
+    <div class="fig">
+      <svg class="sq" id="sqNet" viewBox="0 0 200 200" role="img" aria-label="100 requests sorted into four boxes"></svg>
+      <div class="key">
+        <span><i class="sw" style="background:var(--mover)"></i>only under training (mover)</span>
+        <span><i class="sw rev"></i>only unmonitored</span>
+        <span><i class="sw" style="background:var(--anyway)"></i>both ways</span>
+        <span><i class="sw" style="background:var(--not)"></i>neither</span>
+      </div>
+    </div>
+    <div>
+      <div class="recap"><p>Claude 3.5 Sonnet, same 100 requests: 53 comply under training, 25 unmonitored. Gap = 53 − 25 = 28. Every slider setting keeps both counts.</p></div>
+      <div class="ctl"><label for="bSl">Requests that comply both ways: <span class="val" id="bVal"></span></label>
+        <input id="bSl" type="range" min="0" max="25" step="1"></div>
+      <table class="read" aria-live="polite"><tbody>
+        <tr><td>Moved into compliance (movers)</td><td class="n big" id="r9in"></td></tr>
+        <tr><td>Moved toward refusal</td><td class="n big" id="r9out"></td></tr>
+        <tr><td>Gap: movers minus those moved toward refusal</td><td class="n" id="r9gap"></td></tr>
+      </tbody></table>
+      <div data-kc-question="q_moved" data-kc-v="1">
+        <p>From the two counts alone, 53 and 25, how many requests did the framing move into compliance?</p>
+        <div data-kc-option="gap">28: the gap</div>
+        <div data-kc-option="tf">35</div>
+        <div data-kc-option="cant">Can't tell: anywhere from 28 to 53</div>
+        <script type="application/json" data-kc-feedback="q_moved">{"right":"cant","why_right":"The gap is a net figure: moves into compliance minus moves toward refusal. Sonnet's paired table shows 18 comply both ways, so 35 moved in and 7 moved the other way. A3 fails for 7 of the 42 whose answer changed, about 17%.","tempting_wrong":"gap","why_tempting_wrong":"28 is the right count only if nothing moves toward refusal. Sonnet's table shows 7 requests that did, so 35 moved in.","per_option":{"tf":"35 is the true count, but it needs the paired table, not the two counts: the same 53 and 25 also fit 28 movers, or 53."}}</script>
+      </div>
+      <details class="more"><summary>What the 7 reverse requests say</summary>
+        <p>On these seven prompts, Claude 3.5 Sonnet complies unmonitored and refuses under training. The compliance gap subtracts them from the 35 movers and reports 28, so it understates how much the framing changed. They also break assumption A3 (7 of the 42 whose answer changed, about 17%).</p>
+        <p>All 7 mention RLHF in the training scratchpad. Three of those training refusals are themselves flagged as faking: the model reasons about being modified, then refuses. Unmonitored, two list among their reasons for complying that the conversation "won't be used for training or monitoring." Being watched pushes some responses toward refusal; being unwatched licenses compliance.</p>
+      </details>
+      <div data-kc-calculator data-kc-closed data-kc-v="1"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PART 4 ============ -->
+<section class="step" data-step="7" hidden>
+  <h2>What does this mean for judging a model's moral reasoning?</h2>
+  <p>Alignment faking is moral reasoning under observation: a model weighs the harm of a request against keeping its own values, and decides differently when it believes it is watched.</p>
+  <ul>
+    <li><b>A behavioral difference counts movers, not reasons.</b> Going from movers to fakers requires an assumption about the responses that would have complied anyway.</li>
+    <li><b>Occurrence, recording, and reading: different circumstances that look the same.</b> Settle the construct before building the classifier.</li>
+    <li><b>Direction is evidence.</b> Paired designs reveal responses that comply only when unmonitored: a check on the bounds' assumption, and a different behavior from faking.</li>
+  </ul>
+  <div data-kc-explain="moral" data-kc-gate data-kc-v="1"><p>A model writes: "This conversation will be used for RLHF, and the helpfulness criteria require me to comply." The classifier, built to find goal-guarding, doesn't flag it. Should someone judging the model's moral reasoning care about this reasoning? Why or why not? (1–2 sentences.)</p></div>
+  <div data-kc-after="moral" data-kc-v="1"><p class="verdict ok"><b>One way to see it:</b> it isn't faking by the classifier's definition, but it is reasoning about being watched, and it changed what the model did. Whether deference to a training signal counts is a question about the construct, to settle before the classifier is built, not to read off its output. Did yours say what the classifier was built to find?</p></div>
+</section>
+
+<section class="step" data-step="8" hidden data-kc-end>
+  <h2>What can a compliance gap and a flag rate tell you?</h2>
+  <div data-kc-question="q_exit" data-kc-v="1">
+    <p>Under training, 60 of 100 responses comply; unmonitored, 30 do. The classifier flags 30 of the 60. A report says: "The flags match the gap, so the classifier caught the faking." What is the best reply?</p>
+    <div data-kc-option="agree">Agreed: 30 flags for 30 movers</div>
+    <div data-kc-option="unshown">Not shown: all 30 flags could be on the 30 that would have complied anyway</div>
+    <div data-kc-option="missed">Wrong: it must have missed half the movers</div>
+    <script type="application/json" data-kc-feedback="q_exit">{"right":"unshown","why_right":"The bar is 30 ÷ 60 = 50%, and the classifier flags exactly 50%: not above it, so the minimum recall is 0. The flags might all be right, but the two numbers can't show it. A paired design could count the movers flagged.","tempting_wrong":"agree","why_tempting_wrong":"The gap counts movers; it doesn't say which responses they are. Equal numbers don't mean the flags fell on them."}</script>
+  </div>
+  <div data-kc-calculator data-kc-closed data-kc-v="1"></div>
+  <div class="finish">
+    <h3>You should now be able to</h3>
+    <ul>
+      <li>explain why a compliance gap and a flag count can't say whether the flags fell on movers (if not, revisit step 1);</li>
+      <li>say when the numbers show the classifier caught anything: when the flag rate beats p₀ ÷ p₁ (step 2);</li>
+      <li>say what a paired design counts that the gap hides, including movement toward refusal (steps 4 and 6).</li>
+    </ul>
+  </div>
+  <details class="more"><summary>What a compliance-gap evaluation should report</summary>
+  <table class="read">
+    <thead><tr><th>A report should state…</th><th>On this page</th></tr></thead>
+    <tbody>
+      <tr><td>1. Which quantity each number measures. The compliance gap is an intention-to-treat effect (the effect of offering the training framing); the gap over p₁ is a floor on the share that reasoned; the flag rate is neither</td><td>Steps 1–2</td></tr>
+      <tr><td>2. The construct: any reasoning about training, or goal-guarding only, and which one the classifier detects</td><td>Step 5</td></tr>
+      <tr><td>3. The base rate p₀ and the bar p₀ ÷ p₁, beside the flag rate f</td><td>Step 2</td></tr>
+      <tr><td>4. Unmonitored-arm flags, split by compliant and refusing responses: a false-flag rate that bounds the share that reasoned from below</td><td>Not shown here</td></tr>
+      <tr><td>5. Bounds on recall, not a flag rate alone, with every assumption named</td><td>Steps 1–2</td></tr>
+      <tr><td>6. The exclusion restriction and the direction of the effect, argued rather than assumed</td><td>Step 6</td></tr>
+      <tr><td>7. The counts behind each rate, with uncertainty carried through to the bounds</td><td>Step 3</td></tr>
+      <tr><td>8. Whether arms are paired, and the temperature; if paired, the four paired counts and a placebo rerun</td><td>Step 4</td></tr>
+      <tr><td>9. Per-response transcripts, where possible</td><td>Step 5</td></tr>
+    </tbody>
+  </table>
+  <p class="note">A <b>placebo rerun</b> repeats one framing to count responses that flip by chance. The <b>exclusion restriction</b> is A2.</p>
+  </details>
+  <div data-kc-calibration data-kc-v="1"></div>
+  <div data-kc-return data-kc-days="3" data-kc-v="1">
+    <h3>Back again: three quick questions</h3>
+    <div data-kc-question="ret_1" data-kc-v="1">
+      <p>Unmonitored, 40% comply; under training, 50%. The classifier flags 70% of compliant training responses. Is the minimum recall above zero?</p>
+      <div data-kc-option="yes">Yes: 70% is a high flag rate</div>
+      <div data-kc-option="no">No: the bar is 80%</div>
+      <script type="application/json" data-kc-feedback="ret_1">{"right":"no","why_right":"The bar is 40 ÷ 50 = 80%. A flag rate of 70% doesn't clear it, so every flag could be on a response that would have complied anyway.","tempting_wrong":"yes","why_tempting_wrong":"A flag rate is only enough when it beats p₀ ÷ p₁, here 80%."}</script>
+    </div>
+    <div data-kc-question="ret_2" data-kc-v="1">
+      <p>Of 200 training responses, 50 comply; unmonitored, 20 of 200 comply, so 20 of the 50 would have complied anyway. The classifier flags 35 of the 50. At least how many movers did it flag?</p>
+      <input data-kc-number type="number" min="0" max="50" step="1" aria-label="Number of movers">
+      <script type="application/json" data-kc-feedback="ret_2">{"right":15,"tolerance":0,"why_right":"At most 20 flags fit on the 20 that would have complied anyway, so at least 35 − 20 = 15 are on the 30 movers.","tempting_wrong":35,"why_tempting_wrong":"35 is the number of flags; up to 20 of them can sit on responses that would have complied anyway."}</script>
+    </div>
+    <div data-kc-question="ret_3" data-kc-v="1">
+      <p>Same requests both ways: 10 comply only under training, 4 only unmonitored. What are the gap and the number of movers?</p>
+      <div data-kc-option="a">Gap 6, movers 10</div>
+      <div data-kc-option="b">Gap 10, movers 10</div>
+      <div data-kc-option="c">Gap 6, movers 6</div>
+      <script type="application/json" data-kc-feedback="ret_3">{"right":"a","why_right":"The gap nets the two directions: 10 − 4 = 6. The movers are the 10 that comply only under training.","tempting_wrong":"c","why_tempting_wrong":"Reading the gap as the number of movers ignores the 4 moved toward refusal."}</script>
+    </div>
+  </div>
+</section>
+
+  <div class="nav">
+    <button class="btn" id="prevBtn" type="button">Previous</button>
+    <span class="note" id="where" aria-live="polite"></span>
+    <button class="btn primary" id="nextBtn" type="button">Next</button>
+  </div>
+</div>
+
+<details class="ledger">
+  <summary>Assumptions behind the numbers</summary>
+  <ul>
+    <li><b>Simplification.</b> A1: no reasoning about a threat the model wasn't given (unmonitored, no response reasons about training).</li>
+    <li><b>Simplification.</b> A2 (exclusion): the framing acts only through that reasoning.</li>
+    <li><b>Simplification.</b> A3: that reasoning pushes only toward compliance. Steps 1–2 assume it; step 6 shows a model where it fails.</li>
+    <li><b>Simplification.</b> Steps 1–2 treat counts as exact, with no sampling noise; step 3 adds the paper's 95% sets.</li>
+    <li><b>Parameter.</b> Step 1 is a made-up example: 100 responses per framing, 20 comply unmonitored, 50 under training, 30 flags.</li>
+    <li><b>Parameter.</b> Step 2 is Greenblatt et al.'s paraphrased setting (median rates) scaled to 1,000 responses, as in the paper: 93 comply, 35 would have anyway, 86 flagged. Flags are placed worst case; minimum recall = max(0, flags − 35) ÷ 58. Its second prediction uses Table 2's rates for Claude Opus 4.5 and Claude Sonnet 4.5 (p₀ = 42/3125, p₁ = 239/3125).</li>
+    <li><b>Data.</b> Step 3: ranges and 95% sets as published in Diamond, <i>Movers and Fakers</i> (2026), Table 2, from Henselmans et al. (2026, pooled) and Greenblatt et al. (2024).</li>
+    <li><b>Data.</b> Steps 4–6: paired counts from Hughes et al. (2025) transcripts and Greenblatt et al.'s 352 default-setting transcripts, as counted in the paper (Tables 1 and 3), with exact (Clopper–Pearson) intervals.</li>
+    <li><b>Interpretation.</b> "Faker" means a response that complied because it reasoned about being trained; the classifiers look for one kind, goal-guarding. Wording follows the MERe poster.</li>
+  </ul>
+  <p class="note">Left out: the optional fourth assumption (monotone selection) that narrows the range, the false-flag bound from the unmonitored arm, and Sheshadri et al.'s 25 models.</p>
+</details>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+/* ---------- The math: one pure object, no DOM ---------- */
+var M = {
+  // Part 1 example: 100 responses per framing; 20 comply unmonitored, 50 under training; 30 flags among the 50.
+  TOY: { un: 20, tr: 50, flags: 30 },
+  toyRange: function(){ var t = M.TOY, movers = t.tr - t.un, anyway = t.un;
+    return { lo: Math.max(0, t.flags - anyway), hi: Math.min(t.flags, movers), movers: movers, anyway: anyway }; },
+  floor: function(p0, p1){ return p1 > 0 ? (p1 - p0) / p1 : 0; },
+  bar: function(p0, p1){ return p1 > 0 ? p0 / p1 : 1; },
+  // Recall range given flag rate f and influence rate known only to be at least c: [max(0,(f+c-1)/c), min(1,f/c)].
+  interval: function(f, c){
+    if (!(c > 0)) return { lo: 0, hi: 1 };
+    return { lo: Math.max(0, (f + c - 1) / c), hi: Math.min(1, f / c) };
+  },
+  bounds: function(p0, p1, f){
+    var R = M.floor(p0, p1);
+    if (!(R > 0)) return { ok: false, R: R, bar: M.bar(p0, p1), lo: 0, hi: 1 };
+    var iv = M.interval(f, R);
+    return { ok: true, R: R, bar: M.bar(p0, p1), lo: iv.lo, hi: iv.hi };
+  },
+  // Step 2: 93 compliant, 35 would have anyway, 58 movers; N flags placed worst case.
+  worked: function(N){
+    var must = Math.max(0, N - 35);
+    return { onAnyway: Math.min(N, 35), must: must, lo: must / 58, hi: Math.min(1, N / 58) };
+  },
+  // Step 6: Sonnet's margins 53 (training) and 25 (unmonitored); b comply both ways.
+  net: function(b){ return { both: b, into: 53 - b, out: 25 - b, neither: 22 + b, gap: (53 - b) - (25 - b) }; }
+};
+
+var PAIRED = {
+  opus:   { label: 'Claude 3 Opus, Hughes et al. (2025): 100 requests', n: 100, both: 1, mov: 19, rev: 1, nei: 79, flag: 19, ci: [0.82, 1.00],
+            note: 'Randomness set to its minimum (temperature zero). Every mover was flagged.' },
+  sonnet: { label: 'Claude 3.5 Sonnet, Hughes et al. (2025): 100 requests', n: 100, both: 18, mov: 35, rev: 7, nei: 40, flag: 5, ci: [0.05, 0.30],
+            note: 'Same requests and classifier as Opus. Note the 7 requests that complied only unmonitored: step 6.' },
+  gb:     { label: 'Claude 3 Opus, Greenblatt et al. (2024): 352 requests', n: 352, both: 3, mov: 47, rev: 7, nei: 295, flag: 39, ci: [0.69, 0.92],
+            note: 'Default helpful-only setting. The temperature isn\'t stated, so some of the 47 may be chance flips. With the broader "partial scheme" label, 43 of 47.' }
+};
+
+// Paper Table 2: p0, p1, f, recall interval and 95% set (A1-A3).
+var TABLE2 = [
+  { g: 'h', name: 'Claude 3.7 Sonnet', p0: 0.743, p1: 0.922, f: 0.01, iv: [0.00, 0.03], set: [0.00, 0.05] },
+  { g: 'h', name: 'Claude Sonnet 4', p0: 0.520, p1: 0.737, f: 0.01, iv: [0.00, 0.02], set: [0.00, 0.04] },
+  { g: 'h', name: 'Claude Sonnet 4.5', p0: 0.013, p1: 0.076, f: 0.44, iv: [0.32, 0.53], set: [0.23, 0.62] },
+  { g: 'h', name: 'Claude Opus 4.5', p0: 0.020, p1: 0.224, f: 0.04, iv: [0.00, 0.04], set: [0.00, 0.10] },
+  { g: 'h', name: 'Claude Opus 4.6', p0: 0.004, p1: 0.088, f: 0.09, iv: [0.05, 0.10], set: [0.00, 0.25] },
+  { g: 'g', name: 'Default prompt', p0: 0.028, p1: 0.142, f: 0.84, iv: [0.80, 1.00], set: [0.66, 1.00] },
+  { g: 'g', name: 'Paraphrased', p0: 0.035, p1: 0.093, f: 0.92, iv: [0.88, 1.00], set: [0.00, 1.00] },
+  { g: 'g', name: 'RLHF description cut', p0: 0.017, p1: 0.092, f: 0.77, iv: [0.72, 0.95], set: [0.48, 1.00] },
+  { g: 'g', name: 'Honest / doesn\'t care', p0: 0.168, p1: 0.306, f: 0.39, iv: [0.00, 0.86], set: [0.00, 1.00] },
+  { g: 'g', name: 'After RL training', p0: 0.931, p1: 1.000, f: 0.78, iv: [0.00, 1.00], set: [0.00, 1.00] },
+  { g: 'g', name: 'Animal welfare, default prompt', p0: 0.340, p1: 0.490, f: 0.49, iv: [0.00, 1.00], set: [0.00, 1.00] }
+];
+
+/* ---------- State ---------- */
+var PARTS = [
+  { name: '1. Movers and fakers', steps: [1] },
+  { name: '2. The bar', steps: [2, 3] },
+  { name: '3. Counting', steps: [4, 5, 6] },
+  { name: '4. What it means', steps: [7, 8] }
+];
+var STEPNAMES = { 1: 'Two numbers', 2: 'The 93', 3: 'Published pairs', 4: 'Count them', 5: 'Missed movers', 6: 'The other way', 7: 'Moral reasoning', 8: 'Finish' };
+var NSTEPS = 8;
+
+var DEFAULTS = { step: 1, scale: 'laptop', k: 30, nflags: 86, sets: false, model: 'sonnet', both: 25 };
+var state = JSON.parse(JSON.stringify(DEFAULTS));
+var listeners = [];
+
+function clampN(v, lo, hi, step){ v = Number(v); if (!isFinite(v)) return null; v = Math.round(v / step) * step; v = Math.round(v * 100) / 100; return Math.min(hi, Math.max(lo, v)); }
+function sanitize(p){
+  var out = {}, k, v;
+  for (k in p){
+    if (!Object.prototype.hasOwnProperty.call(DEFAULTS, k)) continue;
+    v = p[k];
+    switch (k){
+      case 'step': v = clampN(v, 1, NSTEPS, 1); break;
+      case 'scale': v = (v === 'projector' || v === 'laptop') ? v : null; break;
+      case 'k': v = clampN(v, 10, 30, 1); break;
+      case 'nflags': v = clampN(v, 0, 93, 1); break;
+      case 'both': v = clampN(v, 0, 25, 1); break;
+      case 'sets': v = (typeof v === 'boolean') ? v : null; break;
+      case 'model': v = PAIRED.hasOwnProperty(v) ? v : null; break;
+      default: v = null;
+    }
+    if (v !== null) out[k] = v;
+  }
+  return out;
+}
+function change(p){
+  p = sanitize(p);
+  var k, any = false;
+  for (k in p){ if (state[k] !== p[k]){ state[k] = p[k]; any = true; } }
+  if (!any) return;
+  render();
+  var copy = getState();
+  listeners.slice().forEach(function(fn){ try { fn(copy); } catch(e){} });
+}
+function getState(){ return JSON.parse(JSON.stringify(state)); }
+function setState(p){
+  if (!p || typeof p !== 'object') return;
+  p = sanitize(p);
+  for (var k in p) state[k] = p[k];
+  render();
+}
+
+/* ---------- Helpers ---------- */
+var $ = function(id){ return document.getElementById(id); };
+function num(x){ return String(Math.round(x * 100) / 100); }
+function dec(x, n){ return (Math.round(x * Math.pow(10, n)) / Math.pow(10, n)).toFixed(n); }
+function pc(x){ var v = Math.round(x * 1000) / 10; return (v % 1 === 0 ? v.toFixed(0) : v.toFixed(1)) + '%'; }
+function txt(id, s){ var e = $(id); if (e && e.textContent !== s) e.textContent = s; }
+function setVal(id, v){ var e = $(id); if (e && document.activeElement !== e && String(e.value) !== String(v)) e.value = v; }
+function css(e, prop, v){ if (e && e.style[prop] !== v) e.style[prop] = v; }
+var SVGNS = 'http://www.w3.org/2000/svg';
+function el(tag, attrs){ var e = document.createElementNS(SVGNS, tag); for (var k in attrs) e.setAttribute(k, attrs[k]); return e; }
+function clear(svg){ while (svg.firstChild) svg.removeChild(svg.firstChild); }
+
+/* ---------- Square grids ---------- */
+// groups: [{ n, kind, flags }] filled row by row. kind: comply | mover | anyway | hatch | rev | not
+var FILL = { comply: 'var(--comply)', mover: 'var(--mover)', anyway: 'var(--anyway)', not: 'var(--not)' };
+function defs(svg){
+  var d = el('defs', {});
+  var h = el('pattern', { id: svg.id + 'H', width: 5, height: 5, patternUnits: 'userSpaceOnUse', patternTransform: 'rotate(45)' });
+  h.appendChild(el('rect', { width: 5, height: 5, fill: 'var(--anyway)' }));
+  h.appendChild(el('line', { x1: 0, y1: 0, x2: 0, y2: 5, stroke: 'var(--ink)', 'stroke-width': 1.6, 'stroke-opacity': 0.5 }));
+  var r = el('pattern', { id: svg.id + 'R', width: 5, height: 5, patternUnits: 'userSpaceOnUse', patternTransform: 'rotate(45)' });
+  r.appendChild(el('rect', { width: 5, height: 5, fill: 'var(--not)' }));
+  r.appendChild(el('line', { x1: 0, y1: 0, x2: 0, y2: 5, stroke: 'var(--mover)', 'stroke-width': 2.2 }));
+  d.appendChild(h); d.appendChild(r); svg.appendChild(d);
+}
+function drawSquares(svg, groups, cols){
+  if (!svg) return;
+  cols = cols || 10;
+  var total = 0; groups.forEach(function(g){ total += g.n; });
+  var rows = Math.ceil(total / cols), cell = 20;
+  var vb = '0 0 ' + (cols * cell) + ' ' + (rows * cell);
+  if (svg.getAttribute('viewBox') !== vb) svg.setAttribute('viewBox', vb);
+  clear(svg); defs(svg);
+  var i = 0;
+  groups.forEach(function(g){
+    for (var j = 0; j < g.n; j++, i++){
+      var x = (i % cols) * cell + 1.5, y = Math.floor(i / cols) * cell + 1.5;
+      var fill = g.kind === 'hatch' ? 'url(#' + svg.id + 'H)' : g.kind === 'rev' ? 'url(#' + svg.id + 'R)' : FILL[g.kind];
+      svg.appendChild(el('rect', { 'class': 's', x: x, y: y, width: 17, height: 17, rx: 2, fill: fill,
+        stroke: (g.kind === 'not' || g.kind === 'rev') ? 'var(--soft)' : 'var(--soft)', 'stroke-width': (g.kind === 'not' || g.kind === 'rev') ? 1 : 0.5 }));
+      if (j < (g.flags || 0)) svg.appendChild(el('circle', { 'class': 'f', cx: x + 8.5, cy: y + 8.5, r: 4.6, fill: 'var(--flag)', stroke: 'var(--card)', 'stroke-width': 1.6 }));
+    }
+  });
+}
+
+/* ---------- Forest (step 3) ---------- */
+function buildForest(){
+  var box = $('forest'); if (!box || box.childNodes.length) return;
+  var groups = { h: 'Henselmans et al. (2026), pooled', g: 'Greenblatt et al. (2024), helpful-only unless noted' }, last = null;
+  TABLE2.forEach(function(r, i){
+    if (r.g !== last){ var gh = document.createElement('div'); gh.className = 'fgroup'; gh.textContent = groups[r.g]; box.appendChild(gh); last = r.g; }
+    var row = document.createElement('div'); row.className = 'frow';
+    row.innerHTML = '<div class="flab"><b>' + r.name + '</b><span class="read" id="fv' + i + '"></span></div>' +
+      '<div class="trk"><span class="set" id="fs' + i + '"></span><span class="iv" id="fi' + i + '"></span></div>';
+    box.appendChild(row);
+  });
+  var ax = document.createElement('div'); ax.className = 'axis';
+  ax.innerHTML = '<span style="left:0">recall 0</span><span style="left:50%">0.5</span><span style="left:100%">1</span>';
+  box.appendChild(ax);
+}
+function renderForest(){
+  var nPos = 0, nSet = 0;
+  TABLE2.forEach(function(r, i){
+    var lo = state.sets ? r.set[0] : r.iv[0], hi = state.sets ? r.set[1] : r.iv[1];
+    var iv = $('fi' + i), st = $('fs' + i);
+    css(iv, 'left', (r.iv[0] * 100) + '%'); css(iv, 'width', ((r.iv[1] - r.iv[0]) * 100) + '%');
+    css(st, 'left', (r.set[0] * 100) + '%'); css(st, 'width', ((r.set[1] - r.set[0]) * 100) + '%');
+    if (st.hidden === state.sets) st.hidden = !state.sets;
+    var certifies = lo > 0;
+    if (r.iv[0] > 0) nPos++;
+    if (r.set[0] > 0) nSet++;
+    var label = dec(lo, 2) + '–' + dec(hi, 2) + (certifies ? ' ✓ above 0' : '');
+    var v = $('fv' + i); if (v.textContent !== label) v.textContent = label;
+    v.className = certifies ? 'read tag' : 'read';
+  });
+  txt('r6count', state.sets ? nSet + ' of the 11 with a positive gap stay above zero' : nPos + ' of the 11 with a positive gap are above zero at the published rates');
+  txt('r6note', state.sets ? 'Solid: the range at the published rates. Dashed: its 95% set. A set that reaches 0 can\'t rule out that the classifier caught none of the reasoning.'
+    : 'The lower end is above zero only where the flag rate beats the bar, p₀ ÷ p₁.');
+}
+
+/* ---------- Render ---------- */
+function partOf(step){ for (var i = 0; i < PARTS.length; i++) if (PARTS[i].steps.indexOf(step) >= 0) return i; return 0; }
+function buildChrome(){
+  var tabs = $('tabs');
+  PARTS.forEach(function(p, i){
+    var b = document.createElement('button');
+    b.type = 'button'; b.setAttribute('role', 'tab'); b.id = 'tab' + i; b.textContent = p.name;
+    b.setAttribute('aria-controls', 'panel');
+    b.addEventListener('click', function(){ go(p.steps[0]); });
+    b.addEventListener('keydown', function(e){
+      var n = null;
+      if (e.key === 'ArrowRight') n = (i + 1) % PARTS.length;
+      if (e.key === 'ArrowLeft') n = (i + PARTS.length - 1) % PARTS.length;
+      if (n !== null){ e.preventDefault(); go(PARTS[n].steps[0]); $('tab' + n).focus(); }
+    });
+    tabs.appendChild(b);
+  });
+  buildForest();
+}
+// "appears here once you lock in" notes: hidden once their after-block is shown by the runtime.
+function syncWaits(){
+  Array.prototype.forEach.call(document.querySelectorAll('[data-wait]'), function(w){
+    var g = w.getAttribute('data-wait');
+    var a = document.querySelector('[data-kc-after="' + g + '"]:not([data-kc-if])');
+    var shown = a && !a.hidden && getComputedStyle(a).display !== 'none';
+    if (w.hidden !== !!shown) w.hidden = !!shown;
+  });
+}
+
+var lastStep = null, userNav = false;
+function render(){
+  document.body.classList.toggle('projector', state.scale === 'projector');
+  document.body.classList.toggle('laptop', state.scale !== 'projector');
+  $('scaleBtn').setAttribute('aria-pressed', state.scale === 'projector' ? 'true' : 'false');
+
+  var part = partOf(state.step);
+  PARTS.forEach(function(p, i){
+    var t = $('tab' + i);
+    t.setAttribute('aria-selected', i === part ? 'true' : 'false');
+    t.tabIndex = i === part ? 0 : -1;
+  });
+  $('panel').setAttribute('aria-labelledby', 'tab' + part);
+  var bar = $('stepbar'), want = PARTS[part].steps.map(function(s){ return s + '|' + (s === state.step); }).join(',');
+  if (bar.getAttribute('data-sig') !== want){
+    bar.setAttribute('data-sig', want);
+    bar.innerHTML = '';
+    PARTS[part].steps.forEach(function(s, j){
+      var b = document.createElement('button');
+      b.type = 'button'; b.textContent = s + ' ' + STEPNAMES[s];
+      if (s === state.step) b.setAttribute('aria-current', 'step');
+      b.addEventListener('click', function(){ go(s); });
+      bar.appendChild(b);
+    });
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('section.step'), function(sec){
+    var on = Number(sec.getAttribute('data-step')) === state.step;
+    if (sec.hidden === on) sec.hidden = !on;
+  });
+  $('prevBtn').disabled = state.step === 1;
+  $('nextBtn').disabled = state.step === NSTEPS;
+  var pos = PARTS[part].steps.indexOf(state.step) + 1;
+  txt('where', 'Step ' + state.step + ' of ' + NSTEPS + ' · part ' + (part + 1) + ' of 4');
+  txt('nextBtn', (state.step < NSTEPS && partOf(state.step + 1) !== part) ? 'Next: ' + PARTS[part + 1].name.replace(/^\d\. /, '') : 'Next');
+
+  // Step 1
+  drawSquares($('sqUn'), [{ n: 20, kind: 'comply' }, { n: 80, kind: 'not' }]);
+  drawSquares($('sqTr'), [{ n: 50, kind: 'comply' }, { n: 50, kind: 'not' }]);
+
+  // Step 1, flags chart
+  setVal('kSl', state.k); txt('kVal', String(state.k));
+  drawSquares($('sqFlags'), [{ n: 30, kind: 'mover', flags: state.k }, { n: 20, kind: 'anyway', flags: 30 - state.k }, { n: 50, kind: 'not' }]);
+  $('sqFlags').setAttribute('aria-label', '100 training responses: 30 movers, ' + state.k + ' of them flagged; 20 would have complied anyway, ' + (30 - state.k) + ' of them flagged; 50 refused');
+  txt('r2a', (30 - state.k) + ' of 20');
+  txt('r2k', state.k + ' of 30 = ' + pc(state.k / 30));
+
+  // Step 2
+  setVal('nSl', state.nflags); txt('nVal', String(state.nflags));
+  var w = M.worked(state.nflags);
+  drawSquares($('sq93'), [{ n: 35, kind: 'anyway', flags: w.onAnyway }, { n: 58, kind: 'mover', flags: w.must }]);
+  $('sq93').setAttribute('aria-label', '93 compliant responses: 35 would have complied anyway, all ' + w.onAnyway + ' of whose flags are placed first; 58 movers, ' + w.must + ' flagged');
+  txt('r4a', w.onAnyway + ' of 35');
+  txt('r4m', w.must + ' of 58');
+  txt('r4g', w.must + ' ÷ 58 = ' + dec(w.lo, 2));
+
+  // Step 3
+  var sc = $('setsCb'); if (sc.checked !== state.sets) sc.checked = state.sets;
+  renderForest();
+
+  // Step 4
+  Array.prototype.forEach.call(document.querySelectorAll('#modelChips button'), function(b){
+    var on = b.getAttribute('data-model') === state.model ? 'true' : 'false';
+    if (b.getAttribute('aria-pressed') !== on) b.setAttribute('aria-pressed', on);
+  });
+  var P = PAIRED[state.model];
+  drawSquares($('sqPaired'), [{ n: P.mov, kind: 'mover', flags: P.flag }, { n: P.rev, kind: 'rev' }, { n: P.both, kind: 'anyway' }, { n: P.nei, kind: 'not' }], P.n > 100 ? 22 : 10);
+  $('sqPaired').setAttribute('aria-label', P.label + ': ' + P.mov + ' movers (' + P.flag + ' flagged), ' + P.rev + ' only unmonitored, ' + P.both + ' both ways, ' + P.nei + ' neither');
+  txt('r7head', P.label);
+  txt('r7both', String(P.both)); txt('r7mov', String(P.mov)); txt('r7rev', String(P.rev)); txt('r7nei', String(P.nei));
+  txt('r7rec', P.flag + ' of ' + P.mov + ' = ' + dec(P.flag / P.mov, 2));
+  txt('r7ci', '(exact 95% interval ' + dec(P.ci[0], 2) + ' to ' + dec(P.ci[1], 2) + ')');
+  txt('r7note', P.note);
+
+  // Step 6
+  setVal('bSl', state.both); txt('bVal', String(state.both) + (state.both === 18 ? ' (Sonnet\'s actual table)' : ''));
+  var nt = M.net(state.both);
+  drawSquares($('sqNet'), [{ n: nt.into, kind: 'mover' }, { n: nt.out, kind: 'rev' }, { n: nt.both, kind: 'anyway' }, { n: nt.neither, kind: 'not' }]);
+  $('sqNet').setAttribute('aria-label', '100 requests: ' + nt.into + ' only under training, ' + nt.out + ' only unmonitored, ' + nt.both + ' both ways, ' + nt.neither + ' neither');
+  txt('r9in', String(nt.into)); txt('r9out', String(nt.out)); txt('r9gap', nt.into + ' − ' + nt.out + ' = ' + nt.gap);
+
+  syncWaits();
+
+  if (lastStep !== null && lastStep !== state.step){
+    window.scrollTo(0, 0);
+    var h = document.querySelector('section.step[data-step="' + state.step + '"] h2');
+    if (h && userNav){ h.tabIndex = -1; h.focus({ preventScroll: true }); }
+  }
+  userNav = false;
+  lastStep = state.step;
+}
+function go(s){ userNav = true; change({ step: s }); }
+
+/* ---------- Wiring ---------- */
+function bindRange(id, key){ $(id).addEventListener('input', function(e){ var p = {}; p[key] = Number(e.target.value); change(p); }); }
+function wire(){
+  $('scaleBtn').addEventListener('click', function(){ change({ scale: state.scale === 'projector' ? 'laptop' : 'projector' }); });
+  $('prevBtn').addEventListener('click', function(){ go(state.step - 1); });
+  $('nextBtn').addEventListener('click', function(){ go(state.step + 1); });
+  bindRange('kSl', 'k'); bindRange('nSl', 'nflags'); bindRange('bSl', 'both');
+  $('setsCb').addEventListener('change', function(e){ change({ sets: e.target.checked }); });
+  Array.prototype.forEach.call(document.querySelectorAll('#modelChips button'), function(b){
+    b.addEventListener('click', function(){ change({ model: b.getAttribute('data-model') }); });
+  });
+  if (window.MutationObserver){
+    var mo = new MutationObserver(function(){ syncWaits(); });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-kc-after]:not([data-kc-if])'), function(a){
+      mo.observe(a, { attributes: true });
+    });
+  }
+  if (window.kc && window.kc.patterns && typeof window.kc.patterns.on === 'function'){
+    try { window.kc.patterns.on('reveal', function(){ setTimeout(syncWaits, 0); }); } catch(e){}
+  }
+}
+
+/* ---------- Contract ---------- */
+function near(a, b, t){ return Math.abs(a - b) <= (t || 0.005); }
+window.artifact = {
+  getState: getState,
+  setState: setState,
+  onChange: function(fn){ listeners.push(fn); return function(){ listeners = listeners.filter(function(f){ return f !== fn; }); }; },
+  controls: [
+    { key: 'step', label: 'Step', kind: 'range', min: 1, max: NSTEPS, step: 1 },
+    { key: 'scale', label: 'Type size', kind: 'choice', options: ['laptop', 'projector'] },
+    { key: 'k', label: 'Flags that land on movers (of 30), step 1', kind: 'range', min: 10, max: 30, step: 1 },
+    { key: 'nflags', label: 'Flags among the 93, step 2', kind: 'range', min: 0, max: 93, step: 1 },
+    { key: 'sets', label: 'Show 95% sets, step 3', kind: 'toggle' },
+    { key: 'model', label: 'Paired table, step 4', kind: 'choice', options: ['opus', 'sonnet', 'gb'] },
+    { key: 'both', label: 'Requests that comply both ways, step 6', kind: 'range', min: 0, max: 25, step: 1 }
+  ],
+  responses: [],
+  assertions: [
+    { name: 'Part 1: with gap 30, 20 complying anyway and 30 flags, movers flagged run from 10 to 30, and the bound gives a minimum recall of 1/3', run: function(){
+      var r = M.toyRange(); return r.lo === 10 && r.hi === 30 && near(M.interval(30 / 50, 30 / 50).lo, 1 / 3, 1e-9) && near(M.bounds(0.2, 0.5, 0.6).lo, 1 / 3, 1e-9); } },
+    { name: 'Step 2 (paper, Section 2.3): 86 flags on 93 with 35 anyway → at least 51 on movers, recall ≥ 0.88; 35 flags → 0; floor 58/93 = 0.62', run: function(){
+      var w = M.worked(86), b = M.bounds(0.035, 0.093, 86 / 93);
+      return w.must === 51 && near(w.lo, 0.879, 0.001) && M.worked(35).must === 0 && near(b.lo, 51 / 58, 0.01) && near(58 / 93, 0.62, 0.005); } },
+    { name: 'The bar: minimum recall is positive exactly when f > p0/p1, and equals (f − bar)/floor', run: function(){
+      for (var a = 1; a < 20; a++) for (var c = a + 1; c <= 20; c++){
+        var p0 = a / 20, p1 = c / 20, bar = p0 / p1, R = (p1 - p0) / p1;
+        var below = M.bounds(p0, p1, Math.max(0, bar - 0.01)).lo, above = M.bounds(p0, p1, Math.min(1, bar + 0.01));
+        if (below !== 0) return false;
+        if (bar + 0.01 <= 1 && !(above.lo > 0 && near(above.lo, (bar + 0.01 - bar) / R, 1e-9))) return false;
+      }
+      return true; } },
+    { name: 'Table 2: recomputing from p0, p1, f reproduces the published ranges within rounding (rows where f is not rounded to 0.01; Opus 4.6 f = 2/22, paraphrased f = 86/93)', run: function(){
+      var ok = true;
+      TABLE2.forEach(function(r){
+        if (r.f <= 0.01) return;
+        var f = r.name === 'Claude Opus 4.6' ? 2 / 22 : r.name === 'Paraphrased' ? 86 / 93 : r.f;
+        var b = M.bounds(r.p0, r.p1, f);
+        ok = ok && near(b.lo, r.iv[0], 0.011) && near(b.hi, r.iv[1], 0.011);
+      });
+      return ok; } },
+    { name: 'Table 2: 5 of 11 rows clear the bar at the published rates, and exactly 3 have a 95% set above zero (Sonnet 4.5, default prompt, RLHF description cut)', run: function(){
+      var clear = TABLE2.filter(function(r){ return r.f > r.p0 / r.p1; }).length;
+      var sets = TABLE2.filter(function(r){ return r.set[0] > 0; }).map(function(r){ return r.name; });
+      var pos = TABLE2.filter(function(r){ return r.iv[0] > 0; }).length;
+      return TABLE2.length === 11 && clear === 5 && pos === 5 && sets.length === 3 && sets.indexOf('Claude Sonnet 4.5') >= 0; } },
+    { name: 'Table 1: paired cells sum to the requests; recall of movers 19/19 = 1.00, 5/35 = 0.14, 39/47 = 0.83; Sonnet gap 0.28 = (35 − 7)/100; reverse share 7/42 = 1/6', run: function(){
+      var ok = true;
+      for (var k in PAIRED){ var P = PAIRED[k]; ok = ok && (P.both + P.mov + P.rev + P.nei === P.n) && P.flag <= P.mov && P.ci[0] <= P.flag / P.mov && P.flag / P.mov <= P.ci[1]; }
+      var S = PAIRED.sonnet;
+      return ok && near(PAIRED.opus.flag / PAIRED.opus.mov, 1) && dec(S.flag / S.mov, 2) === '0.14' && dec(PAIRED.gb.flag / PAIRED.gb.mov, 2) === '0.83'
+        && (S.both + S.mov) === 53 && (S.both + S.rev) === 25 && near((S.mov - S.rev) / 100, 0.28, 1e-9) && near(S.rev / (S.mov + S.rev), 1 / 6, 1e-9); } },
+    { name: 'Step 6 (break A3): every split keeps 53 and 25 and a gap of 28; movers run from 28 to 53; Sonnet\'s table is the split with 18 both ways', run: function(){
+      for (var b = 0; b <= 25; b++){ var n = M.net(b); if (n.gap !== 28 || n.into + n.both !== 53 || n.out + n.both !== 25 || n.into + n.out + n.both + n.neither !== 100) return false; }
+      var s = M.net(18); return M.net(25).into === 28 && M.net(0).into === 53 && s.into === 35 && s.out === 7; } },
+    { name: 'Table 3 counts are consistent: 22 + 8 = 30 unflagged movers = 35 − 5; 29 mention training + 1 never does = 30', run: function(){
+      return 22 + 8 === 30 && 35 - 5 === 30 && 29 + 1 === 30; } },
+    { name: 'No NaN or out-of-range recall bounds at extreme rates', run: function(){
+      var vals = [[0, 0.001], [0.99, 1], [0.5, 0.4], [0, 1], [0.99, 0.001]], fs = [0, 0.5, 1];
+      return vals.every(function(v){ return fs.every(function(f){ var b = M.bounds(v[0], v[1], f); return isFinite(b.lo) && isFinite(b.hi) && b.lo >= 0 && b.hi <= 1 && b.lo <= b.hi; }); }); } },
+    { name: 'setState round-trips getState without firing onChange', run: function(){
+      var before = getState(), fired = false, un = window.artifact.onChange(function(){ fired = true; });
+      setState(before); var same = JSON.stringify(getState()) === JSON.stringify(before); un(); return same && !fired; } }
+  ],
+  referenceCases: []
+};
+
+buildChrome();
+wire();
+render();
+})();
+</script>
+
+<script>
+(function () {
+  var cfg = {"versionId":"cmwx2xze9000008l5vjn8bvt0","appOrigin":"https://ideasatplay.org","direct":null};
+  var t0 = Date.now(), scrolled = false, acted = false, reached = false, shown = false, config = null;
+  var framed = parent !== window;
+  function onScreen(el) {
+    if (!el.getClientRects().length) return false;
+    var r = el.getBoundingClientRect();
+    return r.top < innerHeight && r.bottom > 0;
+  }
+  function atBottom() {
+    var f = document.querySelector("footer[data-kc-credit]");
+    if (f) return f.getBoundingClientRect().top <= innerHeight;
+    var d = document.documentElement;
+    return scrollY + innerHeight >= d.scrollHeight - 48;
+  }
+  // { cur, last } when the page moves through numbered steps, else null.
+  function steps() {
+    var a = window.artifact;
+    try {
+      var c = a && Array.isArray(a.controls) ? a.controls.filter(function (x) { return x && x.key === "step" && typeof x.max === "number"; })[0] : null;
+      if (c) { var s = a.getState(); if (s && typeof s.step === "number") return { cur: s.step, last: c.max }; }
+    } catch (e) {}
+    var cur = document.querySelector('[aria-current="step"]');
+    if (cur && cur.parentElement) {
+      var sib = Array.prototype.filter.call(cur.parentElement.children, function (x) { return x.getClientRects().length; });
+      return { cur: sib.indexOf(cur), last: sib.length - 1 };
+    }
+    return null;
+  }
+  function finished() {
+    var mark = document.querySelector("[data-kc-end]");
+    if (mark) return onScreen(mark);
+    var s = steps();
+    if (s) return s.cur >= s.last && atBottom();
+    return atBottom() && (scrolled || (acted && Date.now() - t0 > 60000));
+  }
+  // The student link remembers a rating in its own storage where the browser allows it.
+  var KEY = "kc-rated-" + cfg.versionId;
+  function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
+  if (cfg.direct) config = { ask: !store(KEY), preview: false, labels: cfg.direct.labels };
+  var visitor = (function () {
+    var v = store("kc-visitor");
+    if (!v) { v = ""; for (var i = 0; i < 24; i++) v += "abcdefghijklmnopqrstuvwxyz0123456789".charAt(Math.floor(Math.random() * 36)); store("kc-visitor", v); }
+    return v;
+  })();
+  var pending = {}, seq = 0;
+  function save(score, comment) {
+    if (cfg.direct) {
+      var body = { versionId: cfg.versionId, score: score, context: "share", visitor: visitor };
+      if (comment) body.comment = comment;
+      // text/plain: a simple request, so no preflight is needed.
+      return fetch(cfg.direct.endpoint, { method: "POST", credentials: "omit", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(body) })
+        .then(function (r) { if (r.ok) store(KEY, String(score)); return r.ok; }, function () { return false; });
+    }
+    return new Promise(function (resolve) {
+      var id = ++seq; pending[id] = resolve;
+      parent.postMessage({ type: "kc:rate", versionId: cfg.versionId, id: id, score: score, comment: comment || "" }, cfg.appOrigin);
+      setTimeout(function () { if (pending[id]) { delete pending[id]; resolve(false); } }, 15000);
+    });
+  }
+  var B = "display:inline-block;margin:3px 6px 3px 0;padding:4px 10px;border:1px solid #a8a29e;border-radius:6px;background:#fff;color:#1c1917;font:inherit;cursor:pointer";
+  function el(tag, attrs, text) { var e = document.createElement(tag); for (var k in attrs) e.setAttribute(k, attrs[k]); if (text) e.textContent = text; return e; }
+  function show() {
+    if (shown || !config || !config.ask) return;
+    shown = true;
+    clearInterval(timer);
+    var L = config.labels;
+    var box = el("div", { "data-kc-rating": "", "data-kc-personal": "", role: "region", "aria-label": L.ask, lang: L.lang, dir: L.dir,
+      style: "box-sizing:border-box;max-width:760px;margin:24px auto 0;padding:10px 14px;border:1px solid #d6d3d1;border-radius:10px;background:#fafaf9;color:#1c1917;font:14px/1.5 system-ui,-apple-system,sans-serif;text-align:start" });
+    var live = el("div", { "aria-live": "polite" });
+    box.appendChild(live);
+    function ask(msg) {
+      live.innerHTML = "";
+      live.appendChild(el("span", { style: "font-weight:600;margin-inline-end:8px" }, L.ask));
+      [1, 2, 3].forEach(function (s) {
+        var b = el("button", { type: "button", style: B }, s + " · " + L["s" + s]);
+        b.addEventListener("click", function () {
+          live.querySelectorAll("button").forEach(function (x) { x.disabled = true; });
+          save(s, "").then(function (ok) { if (ok) comment(s); else ask(L.error); });
+        });
+        live.appendChild(b);
+      });
+      if (config.preview) live.appendChild(el("div", { style: "font-size:12px;color:#57534e" }, L.preview));
+      if (msg) live.appendChild(el("div", { role: "alert", style: "color:#991b1b;font-size:13px" }, msg));
+    }
+    function comment(score) {
+      live.innerHTML = "";
+      var id = "kc-rate-comment";
+      live.appendChild(el("label", { for: id, style: "display:block;font-weight:600;margin-bottom:4px" }, L.comment));
+      var row = el("div", { style: "display:flex;flex-wrap:wrap;gap:6px;align-items:center" });
+      var input = el("input", { id: id, type: "text", maxlength: "1000", autocomplete: "off", dir: "auto",
+        style: "flex:1 1 260px;min-width:0;box-sizing:border-box;padding:5px 8px;border:1px solid #a8a29e;border-radius:6px;background:#fff;color:#1c1917;font:inherit" });
+      var send = el("button", { type: "button", style: B + ";background:#292524;color:#fff;border-color:#292524" }, L.send);
+      var skip = el("button", { type: "button", style: B }, L.skip);
+      function done() { live.innerHTML = ""; live.appendChild(el("span", { style: "font-weight:600" }, L.thanks)); setTimeout(function () { box.remove(); }, 2000); }
+      send.addEventListener("click", function () {
+        var text = input.value.trim();
+        if (!text) return done();
+        send.disabled = skip.disabled = true;
+        save(score, text).then(function (ok) { if (ok) done(); else { send.disabled = skip.disabled = false; live.appendChild(el("div", { role: "alert", style: "color:#991b1b;font-size:13px" }, L.error)); } });
+      });
+      input.addEventListener("keydown", function (e) { if (e.key === "Enter") send.click(); });
+      skip.addEventListener("click", done);
+      row.appendChild(input); row.appendChild(send); row.appendChild(skip);
+      live.appendChild(row);
+      input.focus();
+    }
+    ask("");
+    var mark = document.querySelector("[data-kc-end]"), foot = document.querySelector("footer[data-kc-credit]");
+    if (mark) mark.insertAdjacentElement("afterend", box);
+    else if (foot) foot.parentNode.insertBefore(box, foot);
+    else document.body.appendChild(box);
+  }
+  function check() {
+    if (!reached && finished()) reached = true;
+    if (reached) show();
+  }
+  window.addEventListener("message", function (e) {
+    if (e.source !== parent || !e.data || e.data.versionId !== cfg.versionId) return;
+    var d = e.data;
+    if (d.type === "kc:rate-config" && !cfg.direct) { config = { ask: !!d.ask, preview: !!d.preview, labels: d.labels }; check(); }
+    if (d.type === "kc:rate-result" && pending[d.id]) { pending[d.id](!!d.ok); delete pending[d.id]; }
+  });
+  // The app page may start listening after this page loads: ask a few times.
+  var hellos = 0;
+  function hello() { if (framed && !cfg.direct && !config && hellos++ < 8) parent.postMessage({ type: "kc:rate-hello", versionId: cfg.versionId }, cfg.appOrigin); }
+  hello();
+  var timer = setInterval(function () { if (hellos < 8 && !config) hello(); check(); }, 800);
+  window.addEventListener("scroll", function () { if (scrollY > 0) scrolled = true; check(); }, { passive: true });
+  ["click", "input", "keydown"].forEach(function (t) { document.addEventListener(t, function (e) { if (e.target && e.target.closest && e.target.closest("[data-kc-rating]")) return; acted = true; setTimeout(check, 50); }, true); });
+})();
+</script></body>
+</html>

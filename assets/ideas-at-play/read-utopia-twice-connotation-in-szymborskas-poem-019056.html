@@ -1,0 +1,912 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Connotation in Szymborska's "Utopia": read it twice</title>
+<style>
+:root{
+  --bg:#fbfaf7;--card:#ffffff;--ink:#22252a;--muted:#5b626d;--rule:#d6d2ca;--faint:#efece6;
+  --accent:#2E4057;--pos:#1f6f5c;--mix:#9a6412;--neg:#a3341f;
+}
+@media (prefers-color-scheme: dark){
+  :root{--bg:#16181c;--card:#1f2228;--ink:#ece9e3;--muted:#a9afb8;--rule:#3b4048;--faint:#2a2e35;
+    --accent:#9dbfe3;--pos:#7fd1b4;--mix:#f0bf6a;--neg:#ff9b85;}
+}
+*{box-sizing:border-box}
+[hidden]{display:none !important}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+main{max-width:1300px;margin:0 auto;padding:12px 20px 30px}
+h1{font-size:1.3rem;line-height:1.25;margin:0;font-weight:650}
+.topbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+button{font:inherit;font-size:14px;min-height:30px;padding:4px 11px;border:1px solid var(--rule);border-radius:8px;background:var(--card);color:var(--ink);cursor:pointer}
+button:hover:not(:disabled){border-color:var(--muted)}
+button[aria-pressed="true"],button[aria-current="step"]{background:var(--accent);color:var(--card);border-color:var(--accent)}
+button.primary{background:var(--accent);color:var(--card);border-color:var(--accent)}
+button:disabled{opacity:.45;cursor:default}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:8px;overflow:hidden}
+.seg button{border:0;border-radius:0;border-inline-end:1px solid var(--rule)}
+.seg button:last-child{border-inline-end:0}
+/* the outline of steps, in the left margin */
+.layout{display:grid;grid-template-columns:180px minmax(0,1fr);gap:18px;align-items:start;margin-top:10px}
+.outline{position:sticky;top:10px;font-size:14px}
+.outline ol{list-style:none;margin:0;padding:0}
+.outline ol ol{margin:1px 0 3px 13px;padding-inline-start:6px;border-inline-start:1px solid var(--rule)}
+.outline button{display:flex;gap:6px;width:100%;text-align:start;border:0;background:none;padding:3px 8px;min-height:28px;border-radius:6px}
+.outline button:hover:not([aria-current]){background:var(--faint)}
+.outline button[aria-current]{background:var(--accent);color:var(--card)}
+.outline .on{color:var(--muted);min-width:1.9em;font-variant-numeric:tabular-nums}
+.outline button[aria-current] .on{color:inherit}
+.outline .open>button{font-weight:600}
+@media (max-width:820px){
+  .layout{grid-template-columns:minmax(0,1fr)}
+  .outline{position:static}
+  .outline>ol{display:flex;flex-wrap:wrap;gap:2px 4px}
+  .outline ol ol{display:flex;flex-wrap:wrap;margin:0;border:0}
+  .outline li{display:flex;flex-wrap:wrap}
+  .outline button{width:auto}
+}
+.cardhead{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px}
+.readerbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:14px}
+.readerbar .seg button{min-width:32px;min-height:28px;padding:2px 8px;font-weight:600}
+.linkish{border:0;background:none;padding:0 2px;min-height:24px;color:var(--accent);text-decoration:underline;font-size:13px}
+.card{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:12px 20px 14px}
+.stepnum{font-size:13px;color:var(--muted);margin:0}
+#stepH{font-size:1.2rem;margin:.1em 0 .25em}
+.hint{margin:0 0 .5em;max-width:78ch}
+.hint:empty{display:none}
+.work{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:26px;align-items:start}
+@media (max-width:820px){.work{grid-template-columns:minmax(0,1fr)}}
+.progress{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;font-size:13.5px;color:var(--muted);margin:0 0 .5em;padding:6px 10px;background:var(--faint);border-radius:8px}
+.progress strong{color:var(--ink);font-weight:600}
+.progress button{font-size:13px;min-height:26px;padding:2px 9px}
+/* the poem */
+.poem{font-family:Georgia,"Iowan Old Style","Times New Roman",serif}
+.poem .title{font-weight:700;margin:0 0 .15em}
+.poem .ln{display:grid;grid-template-columns:2em 1fr;align-items:baseline}
+.poem .num{font-family:system-ui,sans-serif;font-size:11px;color:var(--muted);text-align:end;padding-inline-end:.7em}
+.poem .stanza-gap{height:.3em}
+.poem .ln.old{font-size:12.5px;line-height:1.3;color:var(--muted)}
+.poem .ln.new{font-size:17px;line-height:1.45}
+.poem.full .ln{font-size:14.5px;line-height:1.32}
+.poem.full .stanza-gap{height:.2em}
+.poem .more{font-family:system-ui,sans-serif;font-size:13px;font-style:italic;color:var(--muted);margin:.5em 0 0 2.6em}
+.legend .credit{font-size:12px}
+.legend .credit:empty{display:none}
+.w{all:unset;cursor:pointer;border-radius:3px;padding:0 1px;text-decoration-thickness:2px;text-underline-offset:4px}
+.w:hover{background:var(--faint)}
+.w:focus-visible{outline:2px solid var(--accent)}
+.w.sel{background:color-mix(in srgb,var(--accent) 18%,transparent)}
+.w.t-pos{text-decoration:underline solid var(--pos)}
+.w.t-mix{text-decoration:underline dotted var(--mix)}
+.w.t-neg{text-decoration:underline wavy var(--neg)}
+.w.mine{font-weight:700}
+.w sup{font-family:system-ui,sans-serif;font-size:10px;color:var(--muted);margin-inline-start:1px}
+.legend{display:flex;flex-wrap:wrap;align-items:center;gap:14px;font-size:12.5px;color:var(--muted);margin:.4em 0 0}
+.legend .k-pos{text-decoration:underline solid var(--pos);text-decoration-thickness:2px;text-underline-offset:3px}
+.legend .k-mix{text-decoration:underline dotted var(--mix);text-decoration-thickness:2px;text-underline-offset:3px}
+.legend .k-neg{text-decoration:underline wavy var(--neg);text-decoration-thickness:2px;text-underline-offset:3px}
+/* the side panel */
+.panel h3{font-size:1rem;margin:0 0 .4em}
+.panel .chosen{font-family:Georgia,serif;font-size:1.25rem;font-weight:700}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin:.5em 0}
+.tags button[data-tag="pos"][aria-pressed="true"]{background:var(--pos);border-color:var(--pos)}
+.tags button[data-tag="mix"][aria-pressed="true"]{background:var(--mix);border-color:var(--mix)}
+.tags button[data-tag="neg"][aria-pressed="true"]{background:var(--neg);border-color:var(--neg)}
+.panel input[type=text],textarea{width:100%;font:inherit;font-size:14px;padding:6px 8px;border:1px solid var(--rule);border-radius:6px;background:var(--bg);color:var(--ink)}
+.submitrow{margin:.7em 0 .2em}
+.markedlist{display:flex;flex-wrap:wrap;gap:6px;margin:.3em 0 0}
+.markedlist button{font-size:13px;min-height:26px;padding:2px 8px}
+.group{list-style:none;padding:0;margin:.6em 0 0;font-size:14px}
+.group li{padding:4px 0;border-top:1px solid var(--faint)}
+.group .who{font-weight:700;margin-inline-end:6px}
+.tg-pos{color:var(--pos);font-weight:600}.tg-mix{color:var(--mix);font-weight:600}.tg-neg{color:var(--neg);font-weight:600}
+.note{font-size:13px;color:var(--muted)}
+.tablewrap{overflow-x:auto;max-height:420px;overflow-y:auto}
+table{border-collapse:collapse;width:100%;font-size:14px;border-top:1.5px solid var(--ink);border-bottom:1.5px solid var(--ink)}
+th,td{padding:4px 8px;text-align:start;white-space:nowrap}
+thead th{border-bottom:1px solid var(--ink);font-weight:600;position:sticky;top:0;background:var(--card)}
+td.shift{font-weight:700;text-align:end}
+.pollbtns{display:flex;gap:10px;margin:.6em 0}
+.pollbtns button{font-size:17px;padding:8px 22px}
+.bar{height:14px;background:var(--accent);border-radius:3px;display:inline-block;vertical-align:middle;min-width:2px}
+.moves{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:10px}
+.writing{font-size:13px;color:var(--muted);text-align:center}
+.guard{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:20;width:min(560px,calc(100vw - 24px));background:var(--card);border:2px solid var(--accent);border-radius:10px;padding:12px 16px;box-shadow:0 6px 24px rgba(0,0,0,.18)}
+.guard p{margin:0 0 .6em;font-weight:600}
+.guard .row{display:flex;flex-wrap:wrap;gap:8px}
+details{margin-top:14px;font-size:14px}
+details ul{margin:.4em 0;padding-inline-start:1.2em;max-width:80ch}
+.kind{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-inline-end:6px}
+/* projector */
+body.projector{font-size:22px}
+body.projector main{max-width:1900px}
+body.projector .layout{grid-template-columns:250px minmax(0,1fr)}
+body.projector .outline{font-size:19px}
+body.projector h1{font-size:2.1rem}
+body.projector #stepH{font-size:1.7rem}
+body.projector button,body.projector .readerbar{font-size:19px}
+body.projector .poem .ln.new{font-size:27px}
+body.projector .poem .ln.old{font-size:19px}
+body.projector .poem.full .ln{font-size:21px}
+body.projector .note,body.projector .legend,body.projector .stepnum,body.projector .progress,body.projector .poem .more{font-size:17px}
+body.projector table,body.projector .group{font-size:19px}
+body.projector .guard,body.projector .writing{font-size:20px}
+@media (prefers-reduced-motion:no-preference){.w{transition:background .15s}}
+</style>
+</head>
+<body class="laptop">
+<main>
+  <div class="topbar">
+    <h1>Read “Utopia” twice</h1>
+    <div class="seg" role="group" aria-label="Text size">
+      <button type="button" id="scLaptop" aria-pressed="true">Laptop</button>
+      <button type="button" id="scProj" aria-pressed="false">Projector</button>
+    </div>
+  </div>
+  <div class="layout">
+  <nav class="outline" id="stepbar" aria-label="Steps"></nav>
+  <section class="card" aria-labelledby="stepH">
+    <div class="cardhead">
+      <p class="stepnum" id="stepNum"></p>
+      <div class="readerbar" id="readerbar" data-kc-personal>
+        <span id="readerLabel">You are reader</span>
+        <div class="seg" role="group" aria-labelledby="readerLabel" id="seats"></div>
+        <span class="note" id="readerNote" aria-live="polite"></span>
+        <button type="button" class="linkish" id="reclaimBtn" hidden>Lost your letter after reloading?</button>
+      </div>
+    </div>
+    <h2 id="stepH" tabindex="-1"></h2>
+    <p class="hint" id="stepHint"></p>
+
+    <!-- Reading steps: the poem and the word panel -->
+    <div class="work" id="readView">
+      <div>
+        <p class="progress" id="progress"><span id="progressText"></span><button type="button" id="wholeBtn"></button></p>
+        <div class="poem" id="poem" aria-label="The poem"></div>
+        <div class="legend">
+          <span class="credit" id="credit"></span>
+          <span class="k-pos" aria-hidden="true">positive</span><span class="k-mix" aria-hidden="true">mixed</span><span class="k-neg" aria-hidden="true">negative</span><span aria-hidden="true">number = readers who marked it</span>
+          <label id="firstToggleRow" hidden><input type="checkbox" id="showFirst"> show first-read marks</label>
+        </div>
+      </div>
+      <div class="panel" id="panel" aria-live="polite">
+        <div id="panelEmpty">
+          <p class="note" id="panelEmptyText">Click a word in the poem.</p>
+          <div id="myMarksBox" hidden>
+            <h3 id="myMarksH"></h3>
+            <div class="markedlist" id="myMarks"></div>
+          </div>
+        </div>
+        <div id="panelFull" hidden>
+          <p class="chosen" id="chosenWord"></p>
+          <p class="note" id="chosenLine"></p>
+          <div class="tags" role="group" aria-label="Your connotation tag" id="tags">
+            <button type="button" data-tag="pos" aria-pressed="false">Positive</button>
+            <button type="button" data-tag="mix" aria-pressed="false">Mixed</button>
+            <button type="button" data-tag="neg" aria-pressed="false">Negative</button>
+            <button type="button" id="clearMark">Remove my mark</button>
+          </div>
+          <label class="note" for="noteBox">What does it suggest? (a few words)</label>
+          <input type="text" id="noteBox" maxlength="160" autocomplete="off" data-kc-personal>
+          <p class="submitrow"><button type="button" class="primary" id="submitMark">Submit</button></p>
+          <h3 style="margin-top:.8em">Your group</h3>
+          <ul class="group" id="groupList"></ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Compare -->
+    <div id="compareView" hidden>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>Word</th><th>Line</th><th>First read</th><th>Second read</th><th>Shift</th></tr></thead>
+          <tbody id="compareBody"></tbody>
+        </table>
+      </div>
+      <p class="note">Shift: average tag on the second read minus the first (positive = +1, mixed = 0, negative = −1). Most negative first.</p>
+    </div>
+
+    <!-- Poll -->
+    <div id="pollView" hidden>
+      <div class="pollbtns" role="group" aria-label="Your vote">
+        <button type="button" data-vote="yes" aria-pressed="false">Yes</button>
+        <button type="button" data-vote="no" aria-pressed="false">No</button>
+      </div>
+      <p id="pollTally" aria-live="polite"></p>
+    </div>
+
+    <!-- Reflection -->
+    <div id="reflectView" hidden>
+      <label for="reflectBox" id="reflectPrompt"></label>
+      <textarea id="reflectBox" rows="5" maxlength="1200" data-kc-personal></textarea>
+      <p class="note">Two or three sentences. Your group sees each reader's answer below.</p>
+      <ul class="group" id="reflectList"></ul>
+    </div>
+
+    <div class="moves">
+      <button type="button" id="prevStep">← Previous</button>
+      <span class="writing" id="writingNote" data-kc-personal aria-live="polite"></span>
+      <button type="button" class="primary" id="nextStep">Next →</button>
+    </div>
+  </section>
+  </div>
+
+  <!-- Moving the group while someone is writing: two checks, on this screen only -->
+  <div class="guard" id="guard" role="alertdialog" aria-labelledby="guardText" data-kc-personal hidden>
+    <p id="guardText"></p>
+    <div class="row">
+      <button type="button" class="primary" id="guardGo"></button>
+      <button type="button" id="guardWait">Wait</button>
+    </div>
+  </div>
+
+  <details>
+    <summary>What this page assumes</summary>
+    <ul id="ledger"></ul>
+  </details>
+</main>
+
+<script>
+(function(){
+'use strict';
+
+var LEDGER = [
+  ['data','Text: Wisława Szymborska, “Utopia”, translated by Stanisław Barańczak and Clare Cavanagh. Shown here for this class only; line numbers count lines of the poem, not the title or blank lines.'],
+  ['simplification','Three tags (positive, mixed, negative) stand in for connotation, which is richer than any three labels; the short note is where the nuance goes.'],
+  ['simplification','By default the first read reveals six lines at a time, as the lesson plan recommends; a group can switch to the whole poem at once. The second read always shows the whole poem.'],
+  ['interpretation','"Shift" scores tags as +1, 0, −1 and compares the group average between reads. It shows a change in reading, not a right answer.'],
+  ['parameter','Readers A–F keep group members from overwriting each other: picking a letter claims it for the whole group at once, and it disappears from everyone else\'s screen. No names are collected.'],
+  ['parameter','Moving the group asks twice if another reader opened a word, tagged it or typed in the last 30 seconds and has not pressed Submit.']
+];
+
+/* ---------- The poem ---------- */
+var TITLE = 'Utopia';
+var CREDIT = 'Szymborska, “' + TITLE + '”, tr. Barańczak and Cavanagh.';
+var STANZAS = [
+  ['Island where all becomes clear.', 'Solid ground beneath your feet.', 'The only roads are those that offer access.', 'Bushes bend beneath the weight of proofs.'],
+  ['The Tree of Valid Supposition grows here', 'with branches disentangled since time immemorial.'],
+  ['The Tree of Understanding, dazzlingly straight and simple,', 'sprouts by the spring called Now I Get It.'],
+  ['The thicker the woods, the vaster the vista:', 'the Valley of Obviously.'],
+  ['If any doubts arise, the wind dispels them instantly.'],
+  ['Echoes stir unsummoned', 'and eagerly explain all the secrets of the worlds.'],
+  ['On the right a cave where Meaning lies.'],
+  ['On the left the Lake of Deep Conviction.', 'Truth breaks from the bottom and bobs to the surface.'],
+  ['Unshakable Confidence towers over the valley.', 'Its peak offers an excellent view of the Essence of Things.'],
+  ['For all its charms, the island is uninhabited,', 'and the faint footprints scattered on its beaches', 'turn without exception to the sea.'],
+  ['As if all you can do here is leave', 'and plunge, never to return, into the depths.'],
+  ['Into unfathomable life.']
+];
+// Lines (numbered from 1) with stanza breaks, and words with a global index.
+var LINES = [], WORDS = [];
+STANZAS.forEach(function(st, si){
+  st.forEach(function(text, li){
+    var n = LINES.length + 1, parts = [];
+    text.split(/(\s+)/).forEach(function(tok){
+      if(/^\s+$/.test(tok) || !tok){ parts.push({ t: tok }); return; }
+      var m = tok.match(/^([^A-Za-z’']*)([A-Za-z’'-]+)([^A-Za-z’']*)$/);
+      if(!m){ parts.push({ t: tok }); return; }
+      if(m[1]) parts.push({ t: m[1] });
+      parts.push({ w: WORDS.length }); WORDS.push({ text: m[2], line: n });
+      if(m[3]) parts.push({ t: m[3] });
+    });
+    LINES.push({ n: n, parts: parts, stanzaStart: li === 0 && si > 0 });
+  });
+});
+var CHUNK = 6, CHUNKS = Math.ceil(LINES.length / CHUNK);
+
+/* ---------- Steps: one screen each ---------- */
+var STEPS = [
+  { tab: 'Join', h: 'Pick your reader letter', hint: 'Everyone in your group picks a different letter, so your marks don\'t overwrite each other. No names.' },
+  { tab: 'Lines 1–6', h: 'Which words carry strong connotations?', hint: 'Click a word, tag its connotation and say in a few words what it suggests. Mark as many words as you like, then go on. You can see what the rest of your group marked.', pass: 1, upTo: 6 },
+  { tab: 'Lines 7–12', h: 'Do the new words build on earlier ones, or raise a new idea?', hint: 'Mark words in the new lines. Earlier lines stay above for comparison.', pass: 1, upTo: 12 },
+  { tab: 'Lines 13–18', h: 'Which ideas about this island keep coming back?', hint: 'Mark words in the new lines.', pass: 1, upTo: 18 },
+  { tab: 'Lines 19–24', h: 'What happens at the end?', hint: 'Mark words in the last six lines.', pass: 1, upTo: 24 },
+  { tab: 'Second read', h: 'Read it again. What do the same words suggest now?', hint: 'Mark again from scratch, knowing the ending.', pass: 2, upTo: 24 },
+  { tab: 'Compare', h: 'How does the ending change the beginning?', hint: 'Every word your group marked, first read beside second read. Then: what is the poem saying about this island, and about utopia and dystopia?' },
+  { tab: 'Poll', h: 'Would you want to live on this island?', hint: 'Everyone votes. The tally updates as your group votes.' },
+  { tab: 'Reflect', h: 'What does the poem say “utopia” means?', hint: '' }
+];
+// Whole-poem mode: the four six-line steps become one first read (step 1).
+var WHOLE_STEP = { tab: 'First read', h: 'Which words carry strong connotations?', hint: 'The whole poem is here. Click a word, tag its connotation and say in a few words what it suggests; mark as many as you like. As you read: do later words build on earlier ones? Which ideas keep coming back? What happens at the end?', pass: 1, upTo: 24 };
+function hiddenStep(i, whole){ return !!whole && STEPS[i].pass === 1 && i !== 1; }
+function view(i, whole){ return whole && STEPS[i].pass === 1 ? WHOLE_STEP : STEPS[i]; }
+// The next (dir 1) or previous (dir −1) step that is shown, or −1 if none.
+function stepAfter(i, dir, whole){
+  var j = i + dir;
+  while(j >= 0 && j < STEPS.length && hiddenStep(j, whole)) j += dir;
+  return j >= 0 && j < STEPS.length ? j : -1;
+}
+var REFLECT_PROMPT = 'In one or two sentences, what does the poem say “utopia” means? Then one sentence on the connotation that convinced you.';
+var SEATS = ['A', 'B', 'C', 'D', 'E', 'F'], TAGS = ['pos', 'mix', 'neg'], TAGWORD = { pos: 'positive', mix: 'mixed', neg: 'negative' }, TAGVAL = { pos: 1, mix: 0, neg: -1 };
+
+/* ---------- State ----------
+   Shared (live session): step, whole-poem mode, every reader's marks and notes,
+   votes, reflections, and which screen holds each letter. Keys are flat so readers
+   never overwrite each other: p1_A_12 = reader A's first-read tag on word 12;
+   n1_A_12 = their note; vote_A; reflect_A; seat_A = the screen that claimed A;
+   typing_A = when reader A last was busy (opened a word, tagged it, or typed a note
+   or reflection; 0 when they press Submit, move on, or stop writing). */
+var state = { step: 0, whole: false, showFirst: false, scale: 'laptop' };
+var me = '';        // this screen's reader letter (never shared)
+var selected = -1;  // this screen's chosen word (never shared)
+var ME_ID = Math.random().toString(36).slice(2, 10); // this screen, for claiming a letter (not a name)
+var held = '';      // the letter this screen claimed; it is mine while the shared claim still says so
+var showTaken = false, lost = '';
+var pendingGo = null; // this screen's unconfirmed move of the group: { where, run, stage, who }
+var WRITING_MS = 30000, FLAG_EVERY = 5000; // "busy" lapses 30 s after the last activity
+var listeners = [];
+var KEY = /^(?:([pn])([12])_([A-F])_(\d{1,3})|vote_([A-F])|reflect_([A-F])|seat_([A-F])|typing_([A-F]))$/;
+function validEntry(k, v){
+  if(k === 'step') return typeof v === 'number' && isFinite(v);
+  if(k === 'showFirst' || k === 'whole') return typeof v === 'boolean';
+  if(k === 'scale') return v === 'laptop' || v === 'projector';
+  var m = k.match(KEY);
+  if(m && m[8]) return typeof v === 'number' && isFinite(v) && v >= 0;
+  if(!m || typeof v !== 'string') return false;
+  if(m[1] === 'p') return Number(m[4]) < WORDS.length && (v === '' || TAGS.indexOf(v) >= 0);
+  if(m[1] === 'n') return Number(m[4]) < WORDS.length && v.length <= 160;
+  if(m[5]) return v === '' || v === 'yes' || v === 'no';
+  if(m[7]) return /^[a-z0-9]{0,16}$/.test(v);
+  return v.length <= 1200;
+}
+function apply(p){
+  Object.keys(p || {}).forEach(function(k){
+    var v = p[k];
+    if(!validEntry(k, v)) return;
+    if(k === 'step') v = Math.max(0, Math.min(STEPS.length - 1, Math.round(v)));
+    state[k] = v;
+  });
+  // In whole-poem mode a six-line step folds into the single first read.
+  if(hiddenStep(state.step, state.whole)) state.step = 1;
+}
+function change(p){ apply(p); render(); var s = getState(); listeners.forEach(function(fn){ try{ fn(s); }catch(e){} }); }
+function getState(){ return JSON.parse(JSON.stringify(state)); }
+function setState(p){ if(!p || typeof p !== 'object') return; apply(p); render(); }
+
+// A letter is free, mine (claimed by this screen) or taken (claimed by another screen).
+function seatOf(st, s, id){ var o = st['seat_' + s] || ''; return !o ? 'free' : o === id ? 'mine' : 'taken'; }
+// Claim a letter for the group at once, giving up the one held before.
+function claim(s){ var p = {}; if(me && me !== s) p['seat_' + me] = ''; p['seat_' + s] = ME_ID; held = me = s; lost = ''; showTaken = false; change(p); }
+
+// Readers other than this one who are marking a word or writing, active in the last 30 seconds.
+function writersOf(st, self, now){
+  return SEATS.filter(function(s){ var t = st['typing_' + s]; return s !== self && typeof t === 'number' && t > 0 && now - t < WRITING_MS; });
+}
+// Tell the group this reader is busy (at most every 5 seconds), as part of a change.
+function markWriting(p){ if(!me) return; var t = state['typing_' + me] || 0; if(Date.now() - t > FLAG_EVERY) p['typing_' + me] = Date.now(); }
+function stopWriting(){ if(me && state['typing_' + me]){ var p = {}; p['typing_' + me] = 0; change(p); } }
+function readerList(who){
+  if(who.length < 2) return 'reader ' + who[0];
+  return 'readers ' + who.slice(0, -1).join(', ') + ' and ' + who[who.length - 1];
+}
+function cap(t){ return t.charAt(0).toUpperCase() + t.slice(1); }
+// The guard's text. On marking steps others are "marking words"; on Reflect they are "writing".
+function guardMessage(marking, stage, who, where){
+  if(stage === 2) return 'Are you absolutely sure? Maybe check with ' + readerList(who) + ' first.';
+  return cap(readerList(who)) + (who.length > 1 ? ' are' : ' is') + ' still ' + (marking ? 'marking words' : 'writing') + '. Moving on takes the whole group to ' + where + '.';
+}
+
+// The group's tags on one word in one pass: [{ seat, tag, note }].
+function marksOn(w, pass){
+  var out = [];
+  SEATS.forEach(function(s){
+    var t = state['p' + pass + '_' + s + '_' + w];
+    if(t) out.push({ seat: s, tag: t, note: state['n' + pass + '_' + s + '_' + w] || '' });
+  });
+  return out;
+}
+// Most common tag (ties go to "mixed") and how many readers marked it.
+function summary(marks){
+  if(!marks.length) return null;
+  var c = { pos: 0, mix: 0, neg: 0 };
+  marks.forEach(function(m){ c[m.tag]++; });
+  var top = TAGS.slice().sort(function(a, b){ return c[b] - c[a]; })[0];
+  if(TAGS.filter(function(t){ return c[t] === c[top]; }).length > 1) top = 'mix';
+  return { tag: top, n: marks.length, counts: c, avg: marks.reduce(function(s, m){ return s + TAGVAL[m.tag]; }, 0) / marks.length };
+}
+// The lines a step adds: [first, last].
+function newLines(step){ return step.upTo === LINES.length && (step.pass === 2 || step === WHOLE_STEP) ? [1, LINES.length] : [Math.max(1, step.upTo - CHUNK + 1), step.upTo]; }
+
+/* ---------- Building the page ---------- */
+var esc = function(s){ return String(s).replace(/[&<>"']/g, function(c){ return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+// The steps as an outline: the four six-line steps sit under "First read", level with "Second read".
+// In whole-poem mode "First read" is a single step and its sub-steps are hidden.
+var NUM = ['1', '2.1', '2.2', '2.3', '2.4', '3', '4', '5', '6'];
+var stepbar = document.getElementById('stepbar');
+function outlineButton(i, label, num){
+  return '<button type="button" data-step="' + i + '"><span class="on">' + num + '</span><span>' + esc(label) + '</span></button>';
+}
+stepbar.innerHTML = '<ol>' +
+  '<li>' + outlineButton(0, STEPS[0].tab, NUM[0]) + '</li>' +
+  '<li id="firstReadItem">' + outlineButton(1, 'First read', '2') +
+    '<ol id="firstReadSub">' + [1, 2, 3, 4].map(function(i){ return '<li>' + outlineButton(i, STEPS[i].tab, NUM[i]) + '</li>'; }).join('') + '</ol></li>' +
+  [5, 6, 7, 8].map(function(i){ return '<li>' + outlineButton(i, STEPS[i].tab, NUM[i]) + '</li>'; }).join('') +
+  '</ol>';
+stepbar.addEventListener('click', function(e){
+  var b = e.target.closest('[data-step]'); if(b) goStep(Number(b.getAttribute('data-step')));
+});
+var seatsBox = document.getElementById('seats');
+SEATS.forEach(function(s){
+  var b = document.createElement('button'); b.type = 'button'; b.textContent = s; b.setAttribute('aria-pressed', 'false'); b.setAttribute('aria-label', 'Reader ' + s);
+  b.addEventListener('click', function(){ claim(s); });
+  seatsBox.appendChild(b);
+});
+document.getElementById('reclaimBtn').addEventListener('click', function(){ showTaken = true; render(); });
+document.getElementById('reflectPrompt').textContent = REFLECT_PROMPT;
+document.getElementById('ledger').innerHTML = LEDGER.map(function(l){ return '<li><span class="kind">' + l[0] + '</span>' + esc(l[1]) + '</li>'; }).join('');
+
+// When the group moves, nobody is mid-word any more: this reader's busy flag is cleared first.
+function moveTo(i){ stopWriting(); change({ step: i }); selected = -1; window.scrollTo(0, 0); document.getElementById('stepH').focus(); render(); }
+// Moving takes the whole group. If someone else is marking or writing, ask twice before moving.
+function guarded(where, run){
+  var who = writersOf(state, me, Date.now());
+  if(!who.length){ pendingGo = null; run(); return; }
+  pendingGo = { where: where, run: run, stage: 1, who: who }; render();
+  document.getElementById('guardGo').focus();
+}
+function goStep(i){
+  if(i < 0) return;
+  if(i === state.step){ moveTo(i); return; }
+  guarded('“' + view(i, state.whole).tab + '”', function(){ moveTo(i); });
+}
+document.getElementById('guardGo').addEventListener('click', function(){
+  if(!pendingGo) return;
+  if(pendingGo.stage === 1){ pendingGo.stage = 2; render(); document.getElementById('guardGo').focus(); return; }
+  var run = pendingGo.run; pendingGo = null; run();
+});
+document.getElementById('guardWait').addEventListener('click', function(){ pendingGo = null; render(); document.getElementById('nextStep').focus(); });
+document.getElementById('guard').addEventListener('keydown', function(e){ if(e.key === 'Escape'){ pendingGo = null; render(); } });
+document.getElementById('prevStep').addEventListener('click', function(){ goStep(stepAfter(state.step, -1, state.whole)); });
+document.getElementById('nextStep').addEventListener('click', function(){ goStep(stepAfter(state.step, 1, state.whole)); });
+// Submit closes the word: the tag and note are already shared as they're chosen. Focus goes
+// back to the word in the poem, so the reader can pick another or go on with Next.
+document.getElementById('submitMark').addEventListener('click', function(){
+  var w = selected; selected = -1; stopWriting(); render();
+  var b = document.querySelector('#poem [data-w="' + w + '"]');
+  if(b) b.focus();
+});
+document.getElementById('wholeBtn').addEventListener('click', function(){
+  var whole = !state.whole;
+  guarded(whole ? 'the whole poem' : 'six lines at a time', function(){ stopWriting(); change({ whole: whole, step: !whole && state.step === 1 ? 1 : state.step }); });
+});
+document.getElementById('scLaptop').addEventListener('click', function(){ change({ scale: 'laptop' }); });
+document.getElementById('scProj').addEventListener('click', function(){ change({ scale: 'projector' }); });
+document.getElementById('showFirst').addEventListener('change', function(e){ change({ showFirst: e.target.checked }); });
+
+// Opening a word makes this reader busy at once (the 5-second throttle does not apply to this first flag),
+// on every marking step, until they press Submit, move the group, or stay idle for 30 seconds.
+function openWord(){
+  var v = view(state.step, state.whole);
+  if(me && (v.pass === 1 || v.pass === 2)){ var p = {}; p['typing_' + me] = Date.now(); change(p); }
+  else render();
+}
+document.getElementById('poem').addEventListener('click', function(e){
+  var b = e.target.closest('[data-w]'); if(!b) return;
+  selected = Number(b.getAttribute('data-w')); openWord();
+});
+document.getElementById('myMarks').addEventListener('click', function(e){
+  var b = e.target.closest('[data-pick]'); if(!b) return;
+  selected = Number(b.getAttribute('data-pick')); openWord();
+});
+document.getElementById('tags').addEventListener('click', function(e){
+  var b = e.target.closest('[data-tag]'); if(!b || !me || selected < 0) return;
+  var p = {}; p['p' + view(state.step, state.whole).pass + '_' + me + '_' + selected] = b.getAttribute('data-tag'); markWriting(p); change(p);
+});
+document.getElementById('clearMark').addEventListener('click', function(){
+  if(!me || selected < 0) return;
+  var pass = view(state.step, state.whole).pass, p = {}; p['p' + pass + '_' + me + '_' + selected] = ''; p['n' + pass + '_' + me + '_' + selected] = ''; markWriting(p); change(p);
+});
+document.getElementById('noteBox').addEventListener('input', function(e){
+  if(!me || selected < 0) return;
+  var pass = view(state.step, state.whole).pass, p = {};
+  // A note marks the word too, as "mixed", until the reader picks a tag.
+  if(!state['p' + pass + '_' + me + '_' + selected]) p['p' + pass + '_' + me + '_' + selected] = 'mix';
+  p['n' + pass + '_' + me + '_' + selected] = e.target.value.slice(0, 160); markWriting(p); change(p);
+});
+// Blur happens when the reader clicks a tag button: it must not end their busy status while a word is open.
+document.getElementById('noteBox').addEventListener('blur', function(){ if(selected < 0) stopWriting(); });
+document.querySelectorAll('[data-vote]').forEach(function(b){
+  b.addEventListener('click', function(){ if(!me) return; var p = {}; p['vote_' + me] = b.getAttribute('data-vote'); change(p); });
+});
+document.getElementById('reflectBox').addEventListener('input', function(e){ if(!me) return; var p = {}; p['reflect_' + me] = e.target.value.slice(0, 1200); markWriting(p); change(p); });
+document.getElementById('reflectBox').addEventListener('blur', stopWriting);
+
+/* ---------- Render ---------- */
+function renderProgress(step){
+  var nl = newLines(step), total = LINES.length, left = total - step.upTo, txt;
+  if(step.pass === 2) txt = 'The whole poem, all <strong>' + total + ' lines</strong>.';
+  else if(step === WHOLE_STEP) txt = 'You are seeing the whole poem, all <strong>' + total + ' lines</strong>.';
+  else if(nl[0] === 1) txt = 'You are seeing <strong>lines 1–' + nl[1] + '</strong> of the poem\'s ' + total + '.';
+  else txt = 'New: <strong>lines ' + nl[0] + '–' + nl[1] + '</strong>' + (left ? '' : ', the last ' + CHUNK) + ' (earlier lines above, smaller).';
+  if(step.pass === 1 && step !== WHOLE_STEP && left) txt += ' ' + left + ' more lines follow: go on with Next or the steps on the left.';
+  document.getElementById('progressText').innerHTML = txt;
+  var wb = document.getElementById('wholeBtn');
+  wb.hidden = step.pass !== 1;
+  wb.textContent = state.whole ? 'Read six lines at a time' : 'Show the whole poem';
+}
+function renderPoem(step){
+  var box = document.getElementById('poem'), pass = step.pass, showPass = pass === 2 && state.showFirst ? 1 : pass;
+  var nl = newLines(step), full = nl[0] === 1 && nl[1] === LINES.length;
+  box.className = 'poem' + (full ? ' full' : '');
+  var html = '';
+  LINES.slice(0, step.upTo).forEach(function(L){
+    if(L.stanzaStart) html += '<div class="stanza-gap"></div>';
+    var cls = full ? '' : L.n >= nl[0] ? ' new' : ' old';
+    html += '<div class="ln' + cls + '"><span class="num">' + L.n + '</span><span>';
+    L.parts.forEach(function(p){
+      if(p.t !== undefined){ html += esc(p.t); return; }
+      var s = summary(marksOn(p.w, showPass)), mine = me && state['p' + showPass + '_' + me + '_' + p.w];
+      var c = 'w' + (s ? ' t-' + s.tag : '') + (mine ? ' mine' : '') + (p.w === selected ? ' sel' : '');
+      var label = WORDS[p.w].text + (s ? ', ' + s.n + ' reader' + (s.n > 1 ? 's' : '') + ', mostly ' + TAGWORD[s.tag] : '');
+      html += '<button type="button" class="' + c + '" data-w="' + p.w + '" aria-label="' + esc(label) + '">' + esc(WORDS[p.w].text) + (s ? '<sup>' + s.n + '</sup>' : '') + '</button>';
+    });
+    html += '</span></div>';
+  });
+  if(step.upTo < LINES.length) html += '<p class="more">… lines ' + (step.upTo + 1) + '–' + LINES.length + ' follow. Go on with Next when you’re ready.</p>';
+  box.innerHTML = html;
+  document.getElementById('credit').textContent = step.upTo === LINES.length ? CREDIT : '';
+}
+function nextLabel(){
+  var j = stepAfter(state.step, 1, state.whole);
+  return j < 0 ? '' : 'Next: ' + view(j, state.whole).tab + ' →';
+}
+function renderPanel(step){
+  var has = selected >= 0, pass = step.pass, nl = newLines(step);
+  document.getElementById('panelEmpty').hidden = has;
+  document.getElementById('panelFull').hidden = !has;
+  var where = nl[0] === 1 && nl[1] === LINES.length ? 'the poem' : 'lines ' + nl[0] + '–' + nl[1];
+  document.getElementById('panelEmptyText').textContent = me ? 'Click any word in ' + where + ' to mark it. Mark as many as you like.' : 'Pick your reader letter above, then click a word.';
+  // This reader's marks so far on the lines in view, to reopen and change.
+  var mine = [];
+  if(me) WORDS.forEach(function(w, i){ var t = state['p' + pass + '_' + me + '_' + i]; if(t && w.line <= step.upTo) mine.push({ i: i, t: t }); });
+  document.getElementById('myMarksBox').hidden = !mine.length;
+  document.getElementById('myMarksH').textContent = 'Your marks so far (' + mine.length + ')';
+  document.getElementById('myMarks').innerHTML = mine.map(function(m){ return '<button type="button" data-pick="' + m.i + '">' + esc(WORDS[m.i].text) + ' · <span class="tg-' + m.t + '">' + TAGWORD[m.t] + '</span></button>'; }).join('');
+  if(!has) return;
+  var w = WORDS[selected], mineTag = me ? state['p' + pass + '_' + me + '_' + selected] || '' : '';
+  document.getElementById('chosenWord').textContent = '“' + w.text + '”';
+  document.getElementById('chosenLine').textContent = 'Line ' + w.line + (pass === 2 ? ' · second read' : ' · first read');
+  document.querySelectorAll('#tags [data-tag]').forEach(function(b){ b.setAttribute('aria-pressed', String(b.getAttribute('data-tag') === mineTag)); b.disabled = !me; });
+  document.getElementById('clearMark').disabled = !me || !mineTag;
+  var nb = document.getElementById('noteBox'), nv = me ? state['n' + pass + '_' + me + '_' + selected] || '' : '';
+  nb.disabled = !me;
+  if(nb.value !== nv && document.activeElement !== nb) nb.value = nv;
+  if(document.activeElement === nb && nb.value !== nv && nb.getAttribute('data-for') !== pass + ':' + selected) nb.value = nv;
+  nb.setAttribute('data-for', pass + ':' + selected);
+  // Submit once the word has a tag.
+  document.getElementById('submitMark').disabled = !mineTag;
+  var marks = marksOn(selected, pass), first = pass === 2 ? summary(marksOn(selected, 1)) : null;
+  var list = marks.map(function(m){ return '<li><span class="who">' + m.seat + (m.seat === me ? ' (you)' : '') + '</span><span class="tg-' + m.tag + '">' + TAGWORD[m.tag] + '</span>' + (m.note ? ' · ' + esc(m.note) : '') + '</li>'; });
+  if(!list.length) list.push('<li class="note">Nobody has marked this word yet' + (pass === 2 ? ' on the second read' : '') + '.</li>');
+  if(first) list.push('<li class="note">First read: ' + first.n + ' reader' + (first.n > 1 ? 's' : '') + ', mostly ' + TAGWORD[first.tag] + '.</li>');
+  document.getElementById('groupList').innerHTML = list.join('');
+}
+function fmtShift(x){ return (x > 0 ? '+' : x < 0 ? '−' : '') + Math.abs(x).toFixed(1); }
+function chips(s){ if(!s) return '<span class="note">—</span>'; return TAGS.filter(function(t){ return s.counts[t]; }).map(function(t){ return '<span class="tg-' + t + '">' + s.counts[t] + ' ' + TAGWORD[t] + '</span>'; }).join(', '); }
+function compareRows(){
+  var rows = [];
+  WORDS.forEach(function(w, i){
+    var a = summary(marksOn(i, 1)), b = summary(marksOn(i, 2));
+    if(a || b) rows.push({ i: i, w: w, a: a, b: b, shift: a && b ? b.avg - a.avg : null });
+  });
+  rows.sort(function(x, y){
+    if(x.shift === null && y.shift === null) return x.i - y.i;
+    if(x.shift === null) return 1; if(y.shift === null) return -1;
+    return x.shift - y.shift || x.i - y.i;
+  });
+  return rows;
+}
+function renderCompare(){
+  var rows = compareRows();
+  document.getElementById('compareBody').innerHTML = rows.length ? rows.map(function(r){
+    return '<tr><td><strong>' + esc(r.w.text) + '</strong></td><td>' + r.w.line + '</td><td>' + chips(r.a) + '</td><td>' + chips(r.b) + '</td><td class="shift">' + (r.shift === null ? '<span class="note">one read only</span>' : fmtShift(r.shift)) + '</td></tr>';
+  }).join('') : '<tr><td colspan="5" class="note">No words marked yet. Mark words on the first and second reads.</td></tr>';
+}
+function tally(){
+  var c = { yes: 0, no: 0 }; SEATS.forEach(function(s){ var v = state['vote_' + s]; if(v) c[v]++; }); return c;
+}
+function renderPoll(){
+  var mine = me ? state['vote_' + me] || '' : '';
+  document.querySelectorAll('[data-vote]').forEach(function(b){ b.setAttribute('aria-pressed', String(b.getAttribute('data-vote') === mine)); b.disabled = !me; });
+  var c = tally(), n = c.yes + c.no;
+  document.getElementById('pollTally').innerHTML = n === 0 ? (me ? 'No votes yet.' : 'Pick your reader letter above to vote.') :
+    ['yes', 'no'].map(function(v){ return '<span style="display:inline-block;width:3em">' + (v === 'yes' ? 'Yes' : 'No') + '</span><span class="bar" style="width:' + Math.round(c[v] / Math.max(n, 1) * 200) + 'px"></span> ' + c[v]; }).join('<br>') + '<br><span class="note">' + n + ' of your group voted.</span>';
+}
+function renderReflect(){
+  var tb = document.getElementById('reflectBox'), v = me ? state['reflect_' + me] || '' : '';
+  tb.disabled = !me;
+  tb.placeholder = me ? '' : 'Pick your reader letter above first.';
+  if(tb.value !== v && document.activeElement !== tb) tb.value = v;
+  document.getElementById('reflectList').innerHTML = SEATS.filter(function(s){ return s !== me && state['reflect_' + s]; }).map(function(s){ return '<li><span class="who">' + s + '</span>' + esc(state['reflect_' + s]) + '</li>'; }).join('');
+}
+// Letters other screens have claimed are hidden, unless this reader is taking theirs back after a reload.
+function renderSeats(){
+  // Two readers can claim a letter at the same moment; whoever the shared claim names keeps it.
+  me = held && seatOf(state, held, ME_ID) === 'mine' ? held : '';
+  lost = held && !me ? held : '';
+  var free = 0, taken = 0;
+  [].forEach.call(seatsBox.children, function(b){
+    var s = b.textContent, st = seatOf(state, s, ME_ID);
+    if(st === 'free') free++; if(st === 'taken') taken++;
+    b.hidden = st === 'taken' && !showTaken;
+    b.setAttribute('aria-pressed', String(s === me));
+    b.setAttribute('aria-label', 'Reader ' + s + (st === 'taken' ? ', in use: take it back' : ''));
+  });
+  document.getElementById('readerNote').textContent = me ? '' : lost ? 'Letter ' + lost + ' was just taken by someone else. Pick another.'
+    : showTaken ? 'Tap your old letter to take it back.' : free ? 'Pick a letter. Letters already picked are hidden.' : 'Every letter is in use.';
+  document.getElementById('reclaimBtn').hidden = !!me || showTaken || !taken;
+}
+// "Reader B is writing…" beside the step buttons; it lapses on its own, so it is refreshed on a timer too.
+function renderWriting(){
+  var who = writersOf(state, me, Date.now());
+  document.getElementById('writingNote').textContent = who.length ? cap(readerList(who)) + (who.length > 1 ? ' are' : ' is') + ' writing…' : '';
+}
+setInterval(renderWriting, 5000);
+function renderGuard(){
+  var g = document.getElementById('guard');
+  g.hidden = !pendingGo;
+  if(!pendingGo) return;
+  var pass = view(state.step, state.whole).pass, marking = pass === 1 || pass === 2;
+  document.getElementById('guardText').textContent = guardMessage(marking, pendingGo.stage, pendingGo.who, pendingGo.where);
+  document.getElementById('guardGo').textContent = pendingGo.stage === 1 ? 'Move on anyway' : 'Yes, move everyone on';
+}
+function render(){
+  document.body.className = state.scale;
+  document.getElementById('scLaptop').setAttribute('aria-pressed', String(state.scale === 'laptop'));
+  document.getElementById('scProj').setAttribute('aria-pressed', String(state.scale === 'projector'));
+  renderSeats();
+  var step = view(state.step, state.whole);
+  // The outline: in six-line mode "First read" opens onto its four parts (the current one is marked);
+  // in whole-poem mode it is the step itself.
+  var inFirst = STEPS[state.step].pass === 1;
+  document.getElementById('firstReadSub').hidden = state.whole;
+  document.getElementById('firstReadItem').className = inFirst ? 'open' : '';
+  stepbar.querySelectorAll('[data-step]').forEach(function(b){
+    var i = Number(b.getAttribute('data-step')), isHead = b.parentNode.id === 'firstReadItem';
+    var current = isHead ? state.whole && inFirst : i === state.step && !(i === 1 && state.whole);
+    if(current) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current');
+  });
+  document.getElementById('stepNum').textContent = inFirst
+    ? (state.whole ? '2 · First read, the whole poem' : NUM[state.step] + ' · First read, ' + STEPS[state.step].tab.toLowerCase())
+    : NUM[state.step] + ' · ' + STEPS[state.step].tab;
+  document.getElementById('stepH').textContent = step.h;
+  document.getElementById('stepHint').textContent = step.hint;
+  document.getElementById('readView').hidden = !step.pass;
+  document.getElementById('compareView').hidden = state.step !== 6;
+  document.getElementById('pollView').hidden = state.step !== 7;
+  document.getElementById('reflectView').hidden = state.step !== 8;
+  document.getElementById('firstToggleRow').hidden = step.pass !== 2;
+  document.getElementById('showFirst').checked = state.showFirst;
+  if(step.pass){ if(selected >= 0 && WORDS[selected].line > step.upTo) selected = -1; renderProgress(step); renderPoem(step); renderPanel(step); }
+  if(state.step === 6) renderCompare();
+  if(state.step === 7) renderPoll();
+  if(state.step === 8) renderReflect();
+  var prev = stepAfter(state.step, -1, state.whole), next = stepAfter(state.step, 1, state.whole);
+  var pb = document.getElementById('prevStep'), nb = document.getElementById('nextStep');
+  pb.disabled = prev < 0; pb.textContent = prev < 0 ? '← Previous' : '← ' + view(prev, state.whole).tab;
+  nb.disabled = next < 0; nb.textContent = next < 0 ? 'Next →' : nextLabel();
+  renderWriting();
+  renderGuard();
+}
+
+/* Runs fn on a throwaway copy of this screen's situation (letter, open word, state, listeners),
+   as reader A, then puts everything back, so assertions leave the visible state unchanged. */
+function sandbox(fn){
+  var sv = JSON.stringify(state), m = me, h = held, sel = selected, ls = listeners, pg = pendingGo, r;
+  listeners = []; pendingGo = null; held = me = 'A'; selected = -1;
+  try{ state = JSON.parse(sv); state.seat_A = ME_ID; r = fn(); }
+  finally{ state = JSON.parse(sv); me = m; held = h; selected = sel; listeners = ls; pendingGo = pg; render(); }
+  return r;
+}
+
+/* ---------- Contract ---------- */
+window.artifact = {
+  getState: getState,
+  setState: setState,
+  onChange: function(fn){ listeners.push(fn); return function(){ listeners = listeners.filter(function(f){ return f !== fn; }); }; },
+  controls: [
+    { key: 'step', label: 'Step', kind: 'range', min: 0, max: STEPS.length - 1, step: 1 },
+    { key: 'whole', label: 'First read: whole poem at once', kind: 'toggle' },
+    { key: 'showFirst', label: 'Second read: show first-read marks', kind: 'toggle' },
+    { key: 'scale', label: 'Text size', kind: 'choice', options: ['laptop', 'projector'] }
+  ],
+  responses: SEATS.map(function(s){ return { key: 'reflect_' + s, prompt: 'Reader ' + s + ': ' + REFLECT_PROMPT }; }),
+  assertions: [
+    { name: 'The poem has 24 lines, in four reading chunks of six', run: function(){ return LINES.length === 24 && CHUNKS === 4; } },
+    { name: 'Line numbers match the lesson plan (solid 2, offer 3, bend 4, simple 7, thicker 9, lies 14, breaks 16, towers 17)', run: function(){
+      var at = function(word){ var f = WORDS.filter(function(w){ return w.text.toLowerCase() === word; }); return f.length ? f[0].line : -1; };
+      return at('solid') === 2 && at('offer') === 3 && at('bend') === 4 && at('simple') === 7 && at('thicker') === 9 && at('lies') === 14 && at('breaks') === 16 && at('towers') === 17; } },
+    { name: 'Every line is rebuilt exactly from its words and spaces', run: function(){
+      var flat = [].concat.apply([], STANZAS);
+      return LINES.every(function(L, i){ return L.parts.map(function(p){ return p.t !== undefined ? p.t : WORDS[p.w].text; }).join('') === flat[i]; }); } },
+    { name: 'Two readers marking the same word use different keys, so neither overwrites the other', run: function(){
+      var saved = getState(); apply({ p1_A_5: 'pos', p1_B_5: 'neg' }); var ok = marksOn(5, 1).length === 2; Object.keys(state).forEach(function(k){ if(!(k in saved)) delete state[k]; }); Object.assign(state, saved); return ok; } },
+    { name: 'A picked letter is claimed for the group: free for nobody else, still mine on my screen', run: function(){
+      var st = { seat_A: 'abc' }; return seatOf(st, 'A', 'abc') === 'mine' && seatOf(st, 'A', 'xyz') === 'taken' && seatOf(st, 'B', 'xyz') === 'free' && seatOf({ seat_A: '' }, 'A', 'xyz') === 'free'; } },
+    { name: 'A reader counts as still writing for 30 seconds after their last keystroke, never on their own screen', run: function(){
+      var st = { typing_A: 1000, typing_B: 0, typing_C: 1000 };
+      return writersOf(st, 'C', 5000).join() === 'A' && writersOf(st, '', 5000).join() === 'A,C' && writersOf(st, '', 40000).length === 0; } },
+    { name: 'Shift is the change in average tag: positive then negative gives −2', run: function(){
+      var a = summary([{ tag: 'pos' }, { tag: 'pos' }]), b = summary([{ tag: 'neg' }, { tag: 'neg' }]); return b.avg - a.avg === -2; } },
+    { name: 'Whole-poem mode: the first read is one step of all 24 lines, and Next from it goes to the second read', run: function(){
+      return stepAfter(1, 1, true) === 5 && stepAfter(5, -1, true) === 1 && stepAfter(1, 1, false) === 2 && view(3, true).upTo === 24 && newLines(view(1, true))[0] === 1; } },
+    { name: 'Six-line mode: each first-read step adds the next six lines', run: function(){
+      return [1, 2, 3, 4].every(function(i){ var nl = newLines(view(i, false)); return nl[0] === (i - 1) * 6 + 1 && nl[1] === i * 6; }); } },
+    { name: 'Invalid keys and values are ignored', run: function(){
+      var before = JSON.stringify(state); apply({ p1_Z_3: 'pos', p1_A_9999: 'pos', vote_A: 'maybe', step: 'x', whole: 'yes', seat_A: 'NOT OK!', seat_G: 'abc', typing_A: 'now', typing_G: 5, typing_B: -1 }); return JSON.stringify(state) === before; } },
+    { name: 'Tag-click path: markWriting adds a typing_ key when the throttle allows, and not within 5 seconds of the last flag', run: function(){
+      return sandbox(function(){
+        var p = {}; delete state.typing_A; markWriting(p);
+        var first = typeof p.typing_A === 'number' && p.typing_A > 0;
+        state.typing_A = Date.now() - 1000; var q = {}; markWriting(q);
+        state.typing_A = Date.now() - (FLAG_EVERY + 1000); var r = {}; markWriting(r);
+        return first && !('typing_A' in q) && typeof r.typing_A === 'number';
+      }); } },
+    { name: 'Opening a word flags the reader at once, even within 5 seconds of an earlier flag, on first-read and second-read steps', run: function(){
+      return sandbox(function(){
+        var ok = true;
+        [[1, false], [3, false], [4, false], [1, true], [5, false]].forEach(function(c){
+          state.step = c[0]; state.whole = c[1];
+          var before = Date.now() - 1000; state.typing_A = before;
+          selected = 0; openWord();
+          ok = ok && state.typing_A > before;
+        });
+        return ok;
+      }); } },
+    { name: 'Moving the group clears the mover\'s busy flag', run: function(){
+      return sandbox(function(){
+        state.step = 2; state.whole = false; state.typing_A = Date.now();
+        moveTo(3);
+        return state.typing_A === 0 && state.step === 3;
+      }); } },
+    { name: 'The guard says "still marking words" on a first-read step and "still writing" on the Reflect step', run: function(){
+      var first = view(3, false).pass, reflect = view(8, false).pass;
+      var m = guardMessage(first === 1 || first === 2, 1, ['B'], '“Lines 13–18”');
+      var w = guardMessage(reflect === 1 || reflect === 2, 1, ['A', 'C'], '“Reflect”');
+      return m === 'Reader B is still marking words. Moving on takes the whole group to “Lines 13–18”.' &&
+        w === 'Readers A and C are still writing. Moving on takes the whole group to “Reflect”.' &&
+        guardMessage(true, 2, ['B'], 'x') === 'Are you absolutely sure? Maybe check with reader B first.'; } }
+  ],
+  referenceCases: []
+};
+
+render();
+})();
+</script>
+
+<script>
+(function () {
+  var cfg = {"versionId":"cmw4frghd000208jp54a2qytm","appOrigin":"https://ideasatplay.org","direct":null};
+  var t0 = Date.now(), scrolled = false, acted = false, reached = false, shown = false, config = null;
+  var framed = parent !== window;
+  function onScreen(el) {
+    if (!el.getClientRects().length) return false;
+    var r = el.getBoundingClientRect();
+    return r.top < innerHeight && r.bottom > 0;
+  }
+  function atBottom() {
+    var f = document.querySelector("footer[data-kc-credit]");
+    if (f) return f.getBoundingClientRect().top <= innerHeight;
+    var d = document.documentElement;
+    return scrollY + innerHeight >= d.scrollHeight - 48;
+  }
+  // { cur, last } when the page moves through numbered steps, else null.
+  function steps() {
+    var a = window.artifact;
+    try {
+      var c = a && Array.isArray(a.controls) ? a.controls.filter(function (x) { return x && x.key === "step" && typeof x.max === "number"; })[0] : null;
+      if (c) { var s = a.getState(); if (s && typeof s.step === "number") return { cur: s.step, last: c.max }; }
+    } catch (e) {}
+    var cur = document.querySelector('[aria-current="step"]');
+    if (cur && cur.parentElement) {
+      var sib = Array.prototype.filter.call(cur.parentElement.children, function (x) { return x.getClientRects().length; });
+      return { cur: sib.indexOf(cur), last: sib.length - 1 };
+    }
+    return null;
+  }
+  function finished() {
+    var mark = document.querySelector("[data-kc-end]");
+    if (mark) return onScreen(mark);
+    var s = steps();
+    if (s) return s.cur >= s.last && atBottom();
+    return atBottom() && (scrolled || (acted && Date.now() - t0 > 60000));
+  }
+  // The student link remembers a rating in its own storage where the browser allows it.
+  var KEY = "kc-rated-" + cfg.versionId;
+  function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
+  if (cfg.direct) config = { ask: !store(KEY), preview: false, labels: cfg.direct.labels };
+  var visitor = (function () {
+    var v = store("kc-visitor");
+    if (!v) { v = ""; for (var i = 0; i < 24; i++) v += "abcdefghijklmnopqrstuvwxyz0123456789".charAt(Math.floor(Math.random() * 36)); store("kc-visitor", v); }
+    return v;
+  })();
+  var pending = {}, seq = 0;
+  function save(score, comment) {
+    if (cfg.direct) {
+      var body = { versionId: cfg.versionId, score: score, context: "share", visitor: visitor };
+      if (comment) body.comment = comment;
+      // text/plain: a simple request, so no preflight is needed.
+      return fetch(cfg.direct.endpoint, { method: "POST", credentials: "omit", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(body) })
+        .then(function (r) { if (r.ok) store(KEY, String(score)); return r.ok; }, function () { return false; });
+    }
+    return new Promise(function (resolve) {
+      var id = ++seq; pending[id] = resolve;
+      parent.postMessage({ type: "kc:rate", versionId: cfg.versionId, id: id, score: score, comment: comment || "" }, cfg.appOrigin);
+      setTimeout(function () { if (pending[id]) { delete pending[id]; resolve(false); } }, 15000);
+    });
+  }
+  var B = "display:inline-block;margin:3px 6px 3px 0;padding:4px 10px;border:1px solid #a8a29e;border-radius:6px;background:#fff;color:#1c1917;font:inherit;cursor:pointer";
+  function el(tag, attrs, text) { var e = document.createElement(tag); for (var k in attrs) e.setAttribute(k, attrs[k]); if (text) e.textContent = text; return e; }
+  function show() {
+    if (shown || !config || !config.ask) return;
+    shown = true;
+    clearInterval(timer);
+    var L = config.labels;
+    var box = el("div", { "data-kc-rating": "", "data-kc-personal": "", role: "region", "aria-label": L.ask, lang: L.lang, dir: L.dir,
+      style: "box-sizing:border-box;max-width:760px;margin:24px auto 0;padding:10px 14px;border:1px solid #d6d3d1;border-radius:10px;background:#fafaf9;color:#1c1917;font:14px/1.5 system-ui,-apple-system,sans-serif;text-align:start" });
+    var live = el("div", { "aria-live": "polite" });
+    box.appendChild(live);
+    function ask(msg) {
+      live.innerHTML = "";
+      live.appendChild(el("span", { style: "font-weight:600;margin-inline-end:8px" }, L.ask));
+      [1, 2, 3].forEach(function (s) {
+        var b = el("button", { type: "button", style: B }, s + " · " + L["s" + s]);
+        b.addEventListener("click", function () {
+          live.querySelectorAll("button").forEach(function (x) { x.disabled = true; });
+          save(s, "").then(function (ok) { if (ok) comment(s); else ask(L.error); });
+        });
+        live.appendChild(b);
+      });
+      if (config.preview) live.appendChild(el("div", { style: "font-size:12px;color:#57534e" }, L.preview));
+      if (msg) live.appendChild(el("div", { role: "alert", style: "color:#991b1b;font-size:13px" }, msg));
+    }
+    function comment(score) {
+      live.innerHTML = "";
+      var id = "kc-rate-comment";
+      live.appendChild(el("label", { for: id, style: "display:block;font-weight:600;margin-bottom:4px" }, L.comment));
+      var row = el("div", { style: "display:flex;flex-wrap:wrap;gap:6px;align-items:center" });
+      var input = el("input", { id: id, type: "text", maxlength: "1000", autocomplete: "off", dir: "auto",
+        style: "flex:1 1 260px;min-width:0;box-sizing:border-box;padding:5px 8px;border:1px solid #a8a29e;border-radius:6px;background:#fff;color:#1c1917;font:inherit" });
+      var send = el("button", { type: "button", style: B + ";background:#292524;color:#fff;border-color:#292524" }, L.send);
+      var skip = el("button", { type: "button", style: B }, L.skip);
+      function done() { live.innerHTML = ""; live.appendChild(el("span", { style: "font-weight:600" }, L.thanks)); setTimeout(function () { box.remove(); }, 2000); }
+      send.addEventListener("click", function () {
+        var text = input.value.trim();
+        if (!text) return done();
+        send.disabled = skip.disabled = true;
+        save(score, text).then(function (ok) { if (ok) done(); else { send.disabled = skip.disabled = false; live.appendChild(el("div", { role: "alert", style: "color:#991b1b;font-size:13px" }, L.error)); } });
+      });
+      input.addEventListener("keydown", function (e) { if (e.key === "Enter") send.click(); });
+      skip.addEventListener("click", done);
+      row.appendChild(input); row.appendChild(send); row.appendChild(skip);
+      live.appendChild(row);
+      input.focus();
+    }
+    ask("");
+    var mark = document.querySelector("[data-kc-end]"), foot = document.querySelector("footer[data-kc-credit]");
+    if (mark) mark.insertAdjacentElement("afterend", box);
+    else if (foot) foot.parentNode.insertBefore(box, foot);
+    else document.body.appendChild(box);
+  }
+  function check() {
+    if (!reached && finished()) reached = true;
+    if (reached) show();
+  }
+  window.addEventListener("message", function (e) {
+    if (e.source !== parent || !e.data || e.data.versionId !== cfg.versionId) return;
+    var d = e.data;
+    if (d.type === "kc:rate-config" && !cfg.direct) { config = { ask: !!d.ask, preview: !!d.preview, labels: d.labels }; check(); }
+    if (d.type === "kc:rate-result" && pending[d.id]) { pending[d.id](!!d.ok); delete pending[d.id]; }
+  });
+  // The app page may start listening after this page loads: ask a few times.
+  var hellos = 0;
+  function hello() { if (framed && !cfg.direct && !config && hellos++ < 8) parent.postMessage({ type: "kc:rate-hello", versionId: cfg.versionId }, cfg.appOrigin); }
+  hello();
+  var timer = setInterval(function () { if (hellos < 8 && !config) hello(); check(); }, 800);
+  window.addEventListener("scroll", function () { if (scrollY > 0) scrolled = true; check(); }, { passive: true });
+  ["click", "input", "keydown"].forEach(function (t) { document.addEventListener(t, function (e) { if (e.target && e.target.closest && e.target.closest("[data-kc-rating]")) return; acted = true; setTimeout(check, 50); }, true); });
+})();
+</script></body>
+</html>

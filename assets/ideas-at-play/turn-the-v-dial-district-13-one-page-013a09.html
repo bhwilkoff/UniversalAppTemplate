@@ -1,0 +1,557 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Turn the V Dial: District 13</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#eef1f4; --panel:#ffffff; --ink:#18232e; --muted:#5b6876; --rule:#d5dbe2;
+  --treated:#18232e; --synth:#2763a8; --cat:#2e7d5b; --mad:#b4473b;
+  --accent:#b8862b; --true:#c62f22; --track:#dfe4ea; --hover:#f4f6f9; --soft:#e9eef4;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#121820; --panel:#1a222c; --ink:#e4e9ee; --muted:#93a0ad; --rule:#2c3743;
+    --treated:#e4e9ee; --synth:#6aa5e8; --cat:#5cbf91; --mad:#e2786b;
+    --accent:#d9a84a; --true:#f06a5c; --track:#2c3743; --hover:#212a35; --soft:#222d39;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121820; --panel:#1a222c; --ink:#e4e9ee; --muted:#93a0ad; --rule:#2c3743;
+  --treated:#e4e9ee; --synth:#6aa5e8; --cat:#5cbf91; --mad:#e2786b;
+  --accent:#d9a84a; --true:#f06a5c; --track:#2c3743; --hover:#212a35; --soft:#222d39;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Public Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:15px;line-height:1.5;
+  font-variant-numeric:tabular-nums}
+.wrap{max-width:1240px;margin:0 auto;padding:24px 20px 40px}
+header{margin-bottom:18px}
+h1{font-family:"Source Serif 4",Georgia,serif;font-weight:600;font-size:clamp(24px,3.2vw,34px);line-height:1.15;margin:0;letter-spacing:-.01em}
+.sub{color:var(--muted);margin:6px 0 0;max-width:72ch}
+.grid{display:grid;grid-template-columns:340px minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}}
+.grid>*{min-width:0}
+.col{display:grid;gap:18px}
+.panel{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:16px;min-width:0}
+h2{font-size:15px;font-weight:600;margin:0 0 4px}
+.hint{color:var(--muted);font-size:13px;margin:0 0 12px}
+.hint code,.prompt code,.formula{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px}
+.presets{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+button{font:inherit;font-size:13px;font-weight:500;color:var(--ink);background:transparent;border:1px solid var(--rule);
+  border-radius:6px;padding:6px 10px;cursor:pointer}
+button:hover{background:var(--hover)}
+button.primary{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+button.primary:hover{opacity:.9;background:var(--ink)}
+button:disabled{opacity:.5;cursor:default}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.dial{display:grid;grid-template-columns:62px 64px minmax(0,1fr) 46px;align-items:center;gap:10px;padding:6px 4px;border-radius:6px}
+.dial.on{background:var(--hover)}
+.dial.head{font-size:12px;font-weight:600;color:var(--muted);padding-bottom:2px;border-bottom:1px solid var(--rule);border-radius:0;margin-bottom:4px}
+.dial.head .wlab{grid-column:2/4;text-align:left}
+.dial.head .slab{text-align:right}
+.dial .name{background:none;border:0;padding:2px 0;text-align:left;font-size:14px;cursor:pointer;color:var(--ink)}
+.dial .name:hover{text-decoration:underline;background:none}
+.dial .pct{text-align:right;font-size:13px;color:var(--muted)}
+.knob{width:56px;height:56px;display:block;cursor:grab;touch-action:none;user-select:none;border-radius:50%}
+.knob:active{cursor:grabbing}
+.knob:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.knob .track{fill:none;stroke:var(--track);stroke-width:5;stroke-linecap:round}
+.knob .fill{fill:none;stroke:var(--accent);stroke-width:5;stroke-linecap:round}
+.knob .face{fill:var(--panel);stroke:var(--rule);stroke-width:1}
+.knob .ptr{stroke:var(--ink);stroke-width:2.5;stroke-linecap:round}
+.dial.on .knob .face{fill:var(--hover)}
+.dial.on .pct{color:var(--ink);font-weight:600}
+.dial input[type=number]{width:100%;font:inherit;font-size:13px;text-align:right;color:var(--ink);background:var(--panel);
+  border:1px solid var(--rule);border-radius:5px;padding:3px 6px;-moz-appearance:textfield;appearance:textfield}
+.dial input[type=number]::-webkit-inner-spin-button,.dial input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.total{display:flex;justify-content:space-between;border-top:1px solid var(--rule);margin-top:10px;padding-top:8px;font-size:13px;color:var(--muted)}
+.result{border-top:1px solid var(--rule);margin-top:12px;padding-top:12px}
+.result .big{font-family:"Source Serif 4",Georgia,serif;font-size:26px;font-weight:600;line-height:1.2}
+.result .big .lab{display:block;font-family:"Public Sans",system-ui,sans-serif;font-size:13px;font-weight:500;color:var(--muted);line-height:1.4;margin-top:2px}
+.formula{color:var(--muted);margin:6px 0 0;word-break:break-word}
+ol.prompts{margin:0;padding-left:20px;font-size:14px}
+ol.prompts li{margin-bottom:10px}
+ol.prompts li:last-child{margin-bottom:0}
+.chart-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:6px 16px;margin-bottom:6px}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:13px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{display:inline-block;width:22px;height:0;border-top:2px solid}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%}
+svg{display:block;width:100%;max-width:100%;height:auto;overflow:visible}
+svg text{font-family:inherit;font-size:11px;fill:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:10px;overflow:hidden;margin-top:12px}
+@media (max-width:560px){.stats{grid-template-columns:repeat(1,minmax(0,1fr))}}
+.stat{background:var(--panel);padding:12px 14px}
+.stat .v{font-size:22px;font-weight:600;line-height:1.2}
+.stat .l{font-size:13px;color:var(--muted)}
+.stat .r{font-size:12px;color:var(--muted);margin-top:2px}
+.search{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
+.search .msg{font-size:13px;color:var(--muted);flex:1 1 220px}
+.reveal{margin-top:10px;padding:10px 12px;background:var(--soft);border-radius:8px;font-size:14px}
+.reveal b{font-weight:600}
+.note{font-size:12.5px;color:var(--muted);margin:0}
+[hidden]{display:none !important}
+@media (prefers-reduced-motion:reduce){*{transition:none !important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>Turn the V Dial: District 13</h1>
+  <p class="sub">In 1970 the Capitol imposed a policy on District 13 that was expected to affect its GDP per capita. To estimate the effect, we build a synthetic District 13: a weighted average of two untreated donors, District 12 and District 2, chosen to resemble District 13 on four pre-treatment predictors, each averaged over 1961–1969: GDP per capita, education, industrial share and unemployment. Two sets of weights are involved, found by a nested optimization.</p>
+  <p class="sub"><b>Inner loop:</b> given predictor weights V (how much each predictor matters), find the donor weights W* that minimize the V-weighted mismatch between District 13 and its synthetic twin on the predictors. <b>Outer loop:</b> choose V so that the resulting W* best reproduces District 13's actual GDP per capita before 1970 (here, in 1965 and 1969). On this page you turn the V dial by hand; the inner loop runs automatically, and the outer score updates. <i>Search for V*</i> runs the outer loop for you.</p>
+  <p class="sub"><b>Targets.</b> Each predictor, used alone, has a target: the W that makes the synthetic district match District 13 exactly on that predictor. For GDP it is 0.70: 70% District 12 and 30% District 2 gives 0.70 × 4.55 + 0.30 × 5.45 = 4.82, District 13's value. Education's target is also 0.70 and unemployment's 0.75. Industrial share's target is 1.53: District 13's share (0.48) is higher than both donors' (0.40 and 0.25), and matching it would take 153% weight on District 12 and −53% on District 2 (1.53 × 0.40 − 0.53 × 0.25 = 0.48). Weights can't be negative and must add to 100%, so W must stay between 0 and 1, and that target is out of reach: the closest any blend gets is W = 1, with an industrial share of 0.40.</p>
+</header>
+
+<div class="grid">
+<div class="col">
+  <section class="panel" aria-labelledby="v-h">
+    <h2 id="v-h">Predictor weights V</h2>
+    <p class="hint">Turn a dial (drag around it, or focus it and use the arrow keys) or type a weight. Each predictor's share is its weight divided by the total, so 40, 30, 20, 10 give shares of exactly 40%, 30%, 20%, 10%. Click a predictor's name to use only that one.</p>
+    <div class="presets">
+      <button type="button" id="pEq">Equal weights</button>
+      <button type="button" id="pClr">Clear all</button>
+    </div>
+    <div class="dial head"><span>Predictor</span><span class="wlab">Weight</span><span class="slab">Share</span></div>
+    <div id="dials"></div>
+    <div class="total"><span>Weights entered sum to</span><span id="rawSum">0</span></div>
+    <p class="hint" style="margin-top:10px">Predictors are standardized before the inner loss is computed: each is divided by its standard deviation across the three districts, exactly as the Synth package does internally. Without this, GDP (measured in thousands) would swamp the three predictors measured as fractions.</p>
+
+    <div class="result">
+      <div class="big" id="wStar">W* = —</div>
+      <p class="formula" id="wForm"></p>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="try-h">
+    <h2 id="try-h">Try this</h2>
+    <ol class="prompts">
+      <li>Press <b>Equal weights</b>. Read W* off the loss curve. Why is it above the GDP, education and unemployment targets?</li>
+      <li>Click the name <b>IND</b> to put 100% weight on it. Where does W* go, and why can no W fix the industry gap? Check the balance chart.</li>
+      <li>Hand-tune V to get the pre-period MSPE (1965 and 1969) as low as you can. Then press <b>Search for V*</b> and compare.</li>
+    </ol>
+  </section>
+  <p class="note">A fictional example set in Panem, the world of Suzanne Collins’s <i>The Hunger Games</i>; all numbers are invented for teaching. The treatment is a Capitol policy imposed on District 13 in 1970 and expected to change its GDP per capita. Predictors are averages over 1961–1969; the outer score uses GDP per capita in 1965 and 1969. The design is inspired by Abadie, A. and Gardeazabal, J. (2003), “The Economic Costs of Conflict: A Case Study of the Basque Country,” <i>American Economic Review</i> 93(1): 112–132, <a href="https://doi.org/10.1257/000282803321455188" style="color:var(--synth)">doi:10.1257/000282803321455188</a>, which built a synthetic Basque Country from other Spanish regions. None of the data here are theirs.</p>
+
+</div>
+
+<div class="col">
+  <section class="panel">
+    <div class="chart-head">
+      <h2 style="margin:0">Step 1, the inner problem: loss over W for your V</h2>
+      <div class="legend"><span><i class="sw" style="border-color:var(--synth)"></i>Inner loss</span><span><i class="dot" style="background:var(--accent)"></i>W* (minimum)</span><span><i class="sw" style="border-color:var(--muted);border-top-style:dashed"></i>Each predictor's own target W</span></div>
+    </div>
+    <p class="hint" id="innerHint"></p>
+    <svg id="inner" viewBox="0 0 760 240" role="img" aria-label="Inner loss as a function of the weight on District 12"></svg>
+  </section>
+
+  <section class="panel">
+    <div class="chart-head">
+      <h2 style="margin:0">Predictor balance at W*</h2>
+      <div class="legend"><span><i class="dot" style="background:var(--cat)"></i>District 12</span><span><i class="dot" style="background:var(--mad)"></i>District 2</span><span><i class="dot" style="background:var(--treated)"></i>District 13</span><span><i class="dot" style="background:var(--synth)"></i>Synthetic</span></div>
+    </div>
+    <p class="hint">The synthetic unit can only sit on the line between District 12 and District 2. Where District 13 lies off that line, no W can close the gap; V decides how much that matters.</p>
+    <svg id="bal" viewBox="0 0 760 200" role="img" aria-label="Predictor balance"></svg>
+  </section>
+
+  <section class="panel">
+    <div class="chart-head">
+      <h2 style="margin:0">Step 2, the outer problem: pre-treatment GDP fit at W*</h2>
+      <div class="legend"><span><i class="sw" style="border-color:var(--treated)"></i>District 13</span><span><i class="sw" style="border-color:var(--synth)"></i>Synthetic (your W*)</span><span><i class="sw" style="border-color:var(--cat);border-top-style:dashed"></i>District 12</span><span><i class="sw" style="border-color:var(--mad);border-top-style:dashed"></i>District 2</span><span><i class="sw" style="border-color:var(--true)"></i>Gap</span></div>
+    </div>
+    <p class="hint">V never appears in this score directly. It only acts through the W* it induces.</p>
+    <svg id="outer" viewBox="0 0 760 230" role="img" aria-label="Pre-treatment GDP fit"></svg>
+    <div class="stats" id="stats"></div>
+    <div class="search">
+      <button type="button" class="primary" id="searchBtn">Search for V*</button>
+      <span class="msg" id="searchMsg">Tries every V on a 5% grid of the simplex, re-solving W* each time, and keeps the one with the lowest MSPE.</span>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="inst-h">
+    <h2 id="inst-h">Why go through V at all?</h2>
+    <div id="instBody">
+      <div class="reveal" id="directBox"></div>
+      <p class="note" style="margin-top:8px">The outer loop can only choose among the W*'s the inner loop produces. Fitting W straight to the outcome would do better on this score but gives up the predictor matching. Synthetic control is credible because a synthetic unit that tracks both the observed outcome path and the observed predictors is presumably also matching the unobserved factors that drive the outcome.</p>
+    </div>
+  </section>
+
+</div>
+</div>
+</div>
+
+<script>
+/* ---------- data ---------- */
+const PRED = ["GDP","EDUC","IND","UNEM"];
+const LONG = {GDP:"GDP per capita",EDUC:"Education",IND:"Industrial share",UNEM:"Unemployment"};
+const X = {                 // predictors, averaged 1961-69
+  D13:[4.82,0.43,0.48,0.045],
+  D12:[4.55,0.40,0.40,0.050],
+  D2:[5.45,0.50,0.25,0.030]
+};
+const YEARS=[1965,1969];
+const Y = { D13:[4.9,5.1], D12:[4.6,4.8], D2:[5.5,5.7] };
+
+const d = X.D12.map((c,k)=>c-X.D2[k]);          // D12 - D2
+const e = X.D2.map((m,k)=>m-X.D13[k]);          // D2 - D13
+const target = d.map((dk,k)=>-e[k]/dk);          // each predictor's own ideal W
+
+/* ---------- math ---------- */
+const clip=(x,a,b)=>Math.max(a,Math.min(b,x));
+// Synth's scaling: divide each predictor by its SD across all units (treated + donors), sample variance (n-1)
+function scales(std){ return d.map((_,k)=>{ if(!std) return 1; const v=[X.D13[k],X.D12[k],X.D2[k]]; const m=v.reduce((a,b)=>a+b,0)/3; return Math.sqrt(v.reduce((a,b)=>a+(b-m)**2,0)/2); }); }
+function innerLoss(w,V,std){ const s=scales(std); let L=0; for(let k=0;k<4;k++){ const diff=(w*d[k]+e[k])/s[k]; L+=V[k]*diff*diff; } return L; }
+function solveW(V,std){
+  const s=scales(std); let num=0,den=0;
+  for(let k=0;k<4;k++){ num+= -V[k]*d[k]*e[k]/(s[k]*s[k]); den+= V[k]*d[k]*d[k]/(s[k]*s[k]); }
+  if(den<=0) return null;
+  return clip(num/den,0,1);
+}
+function synthY(w){ return YEARS.map((_,t)=>w*Y.D12[t]+(1-w)*Y.D2[t]); }
+function mspe(w){ const s=synthY(w); return YEARS.reduce((a,_,t)=>a+(Y.D13[t]-s[t])**2,0)/YEARS.length; }
+function directBestW(){ let num=0,den=0; for(let t=0;t<YEARS.length;t++){ const dt=Y.D12[t]-Y.D2[t], et=Y.D2[t]-Y.D13[t]; num+=-dt*et; den+=dt*dt; } return clip(num/den,0,1); }
+
+/* ---------- state ---------- */
+const raw=[25,25,25,25];
+const std=()=>true; // predictors are always standardized
+function shares(){ const tot=raw.reduce((a,b)=>a+b,0); return tot>0?raw.map(r=>r/tot):[0,0,0,0]; }
+
+/* ---------- dials ---------- */
+const dialsEl=document.getElementById("dials");
+const A0=-135, A1=135;                               // knob sweep in degrees, clockwise from top
+const polar=(cx,cy,r,deg)=>{ const t=(deg-90)*Math.PI/180; return [cx+r*Math.cos(t), cy+r*Math.sin(t)]; };
+function arcPath(cx,cy,r,a,b){ const [x1,y1]=polar(cx,cy,r,a),[x2,y2]=polar(cx,cy,r,b); const large=(b-a)>180?1:0; return `M${x1.toFixed(2)} ${y1.toFixed(2)} A${r} ${r} 0 ${large} 1 ${x2.toFixed(2)} ${y2.toFixed(2)}`; }
+function renderKnob(k){
+  const row=dialsEl.children[k], svg=row.querySelector(".knob"); const v=Math.max(0,Math.min(100,raw[k])); const ang=A0+(A1-A0)*v/100;
+  svg.querySelector(".fill").setAttribute("d", v>0?arcPath(28,28,22,A0,ang):"");
+  const [px,py]=polar(28,28,16,ang); svg.querySelector(".ptr").setAttribute("x2",px); svg.querySelector(".ptr").setAttribute("y2",py);
+  svg.setAttribute("aria-valuenow",Math.round(raw[k]));
+}
+PRED.forEach((p,k)=>{
+  const row=document.createElement("div"); row.className="dial"; row.dataset.k=k;
+  row.innerHTML=`<button type="button" class="name" title="Use only ${LONG[p]}">${p}</button>
+    <svg class="knob" viewBox="0 0 56 56" role="slider" tabindex="0" aria-label="${LONG[p]} weight" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${raw[k]}">
+      <path class="track" d="${arcPath(28,28,22,A0,A1)}"></path><path class="fill" d=""></path>
+      <circle class="face" cx="28" cy="28" r="15"></circle><line class="ptr" x1="28" y1="28" x2="28" y2="12"></line>
+    </svg>
+    <input type="number" min="0" max="100" step="1" value="${raw[k]}" aria-label="${LONG[p]} weight (number)">
+    <span class="pct">25%</span>`;
+  const svg=row.querySelector(".knob"), num=row.querySelector('input[type=number]');
+  const setFromPointer=ev=>{ const r=svg.getBoundingClientRect(); const dx=ev.clientX-(r.left+r.width/2), dy=ev.clientY-(r.top+r.height/2);
+    let deg=Math.atan2(dx,-dy)*180/Math.PI; deg=Math.max(A0,Math.min(A1,deg)); raw[k]=Math.round((deg-A0)/(A1-A0)*100); num.value=raw[k]; renderKnob(k); update(); };
+  svg.addEventListener("pointerdown",ev=>{ svg.setPointerCapture(ev.pointerId); setFromPointer(ev); ev.preventDefault(); });
+  svg.addEventListener("pointermove",ev=>{ if(ev.buttons&1) setFromPointer(ev); });
+  svg.addEventListener("keydown",ev=>{ const step=ev.shiftKey?10:1; let dv=0;
+    if(ev.key==="ArrowUp"||ev.key==="ArrowRight") dv=step; else if(ev.key==="ArrowDown"||ev.key==="ArrowLeft") dv=-step; else if(ev.key==="Home") dv=-raw[k]; else if(ev.key==="End") dv=100-raw[k]; else return;
+    raw[k]=Math.max(0,Math.min(100,raw[k]+dv)); num.value=raw[k]; renderKnob(k); update(); ev.preventDefault(); });
+  num.oninput=()=>{ let v=Math.max(0,Math.min(100,+num.value||0)); raw[k]=v; renderKnob(k); update(); };
+  num.onchange=()=>{ num.value=raw[k]; };
+  row.querySelector(".name").onclick=()=>setRaw(PRED.map((_,j)=>j===k?100:0));
+  dialsEl.appendChild(row); renderKnob(k);
+});
+function setRaw(arr){ arr.forEach((v,k)=>raw[k]=v); syncDials(); update(); }
+function syncDials(){
+  [...dialsEl.children].forEach((row,k)=>{ row.querySelector('input[type=number]').value=Math.round(raw[k]*100)/100; renderKnob(k); });
+}
+document.getElementById("pEq").onclick=()=>setRaw([25,25,25,25]);
+document.getElementById("pClr").onclick=()=>setRaw([0,0,0,0]);
+
+/* ---------- svg helpers ---------- */
+const fmt=(x,n=2)=>x==null?"—":x.toFixed(n);
+const el=(tag,attrs={},txt)=>{ const n=document.createElementNS("http://www.w3.org/2000/svg",tag); for(const a in attrs) n.setAttribute(a,attrs[a]); if(txt!=null) n.textContent=txt; return n; };
+
+function drawInner(V,w,s){
+  const svg=document.getElementById("inner"); svg.innerHTML="";
+  const W=760,H=240,ml=52,mr=24,mt=14,mb=34, pw=W-ml-mr, ph=H-mt-mb;
+  const xs=[]; for(let i=0;i<=200;i++) xs.push(i/200);
+  const ys=xs.map(x=>innerLoss(x,V,s));
+  let ymax=Math.max(...ys,1e-9); const ymin=0;
+  const X_=x=>ml+x*pw, Y_=y=>mt+ph-(y-ymin)/(ymax-ymin)*ph;
+  // axes & grid
+  for(let g=0;g<=4;g++){ const yv=ymin+(ymax-ymin)*g/4; svg.append(el("line",{x1:ml,x2:ml+pw,y1:Y_(yv),y2:Y_(yv),stroke:"var(--rule)"})); svg.append(el("text",{x:ml-6,y:Y_(yv)+4,"text-anchor":"end"},fmt(yv,ymax<0.1?3:2))); }
+  for(let g=0;g<=10;g++){ const xv=g/10; svg.append(el("text",{x:X_(xv),y:H-mb+16,"text-anchor":"middle"},xv.toFixed(1))); }
+  svg.append(el("text",{x:ml+pw/2,y:H-4,"text-anchor":"middle"},"W[1], the weight on District 12 (W[2] = 1 − W[1] goes to District 2)"));
+  svg.append(el("text",{x:14,y:mt+ph/2,"text-anchor":"middle",transform:`rotate(-90 14 ${mt+ph/2})`},"inner loss"));
+  // predictor targets
+  PRED.forEach((p,k)=>{
+    const t=target[k]; const inside=t>=0&&t<=1; const xx=X_(clip(t,0,1));
+    svg.append(el("line",{x1:xx,x2:xx,y1:mt,y2:mt+ph,stroke:"var(--muted)","stroke-dasharray":"3 4",opacity:V[k]>0?0.9:0.35}));
+    svg.append(el("text",{x:xx+(inside?4:-4),y:mt+12+k*13,"text-anchor":inside?"start":"end","font-weight":V[k]>0?"600":"400"},inside?`${p} wants ${t.toFixed(2)}`:`${p} wants ${t.toFixed(2)} (off the chart)`));
+  });
+  // curve
+  if(V.some(v=>v>0)){
+    const path=xs.map((x,i)=>(i?"L":"M")+X_(x).toFixed(1)+" "+Y_(ys[i]).toFixed(1)).join(" ");
+    svg.append(el("path",{d:path,fill:"none",stroke:"var(--synth)","stroke-width":2.2}));
+    if(w!=null){ svg.append(el("line",{x1:X_(w),x2:X_(w),y1:Y_(innerLoss(w,V,s)),y2:mt+ph,stroke:"var(--accent)","stroke-width":1.5})); svg.append(el("circle",{cx:X_(w),cy:Y_(innerLoss(w,V,s)),r:6,fill:"var(--accent)"})); svg.append(el("text",{x:X_(w),y:mt+ph+(-6),"text-anchor":w>0.85?"end":"start",fill:"var(--ink)","font-weight":"600"},`  W* = ${w.toFixed(2)}`)); }
+  } else {
+    svg.append(el("text",{x:ml+pw/2,y:mt+ph/2,"text-anchor":"middle",fill:"var(--ink)"},"All V weights are zero, so the inner problem has nothing to minimize. Pick a predictor."));
+  }
+}
+
+function drawBal(w){
+  const svg=document.getElementById("bal"); svg.innerHTML="";
+  const W=760,H=200,ml=120,mr=70,mt=16,rowH=44,pw=W-ml-mr;
+  PRED.forEach((p,k)=>{
+    const vals=[X.D12[k],X.D2[k],X.D13[k]]; const lo=Math.min(...vals), hi=Math.max(...vals), pad=(hi-lo)*0.25||1;
+    const a=lo-pad,b=hi+pad; const X_=v=>ml+(v-a)/(b-a)*pw; const y=mt+k*rowH+rowH/2;
+    svg.append(el("text",{x:ml-12,y:y+4,"text-anchor":"end",fill:"var(--ink)","font-size":"13"},LONG[p]));
+    svg.append(el("line",{x1:X_(Math.min(X.D12[k],X.D2[k])),x2:X_(Math.max(X.D12[k],X.D2[k])),y1:y,y2:y,stroke:"var(--track)","stroke-width":8,"stroke-linecap":"round"}));
+    svg.append(el("circle",{cx:X_(X.D12[k]),cy:y,r:6,fill:"var(--cat)"}));
+    svg.append(el("circle",{cx:X_(X.D2[k]),cy:y,r:6,fill:"var(--mad)"}));
+    svg.append(el("circle",{cx:X_(X.D13[k]),cy:y,r:7,fill:"var(--treated)"}));
+    if(w!=null){ const sv=w*X.D12[k]+(1-w)*X.D2[k]; svg.append(el("circle",{cx:X_(sv),cy:y,r:7,fill:"none",stroke:"var(--synth)","stroke-width":2.5}));
+      const gap=X.D13[k]-sv; svg.append(el("text",{x:W-mr+10,y:y+4,fill:Math.abs(gap)/Math.abs(d[k])>0.3?"var(--true)":"var(--muted)"},`gap ${Math.abs(gap)<0.0005?"0.000":(gap>0?"+":"")+gap.toFixed(3)}`)); }
+    const fmtv=v=>p==="GDP"?v.toFixed(2):v.toFixed(3);
+    svg.append(el("text",{x:X_(X.D12[k]),y:y+20,"text-anchor":"middle"},fmtv(X.D12[k])));
+    svg.append(el("text",{x:X_(X.D2[k]),y:y+20,"text-anchor":"middle"},fmtv(X.D2[k])));
+    svg.append(el("text",{x:X_(X.D13[k]),y:y-12,"text-anchor":"middle",fill:"var(--ink)"},fmtv(X.D13[k])));
+  });
+}
+
+function drawOuter(w){
+  const svg=document.getElementById("outer"); svg.innerHTML="";
+  const W=760,H=230,ml=52,mr=40,mt=16,mb=44,pw=W-ml-mr,ph=H-mt-mb;
+  const all=[...Y.D13,...Y.D12,...Y.D2]; const ymin=Math.min(...all)-0.2, ymax=Math.max(...all)+0.2;
+  const X_=i=>ml+(i+0.5)/YEARS.length*pw, Y_=v=>mt+ph-(v-ymin)/(ymax-ymin)*ph;
+  for(let g=0;g<=4;g++){ const yv=ymin+(ymax-ymin)*g/4; svg.append(el("line",{x1:ml,x2:ml+pw,y1:Y_(yv),y2:Y_(yv),stroke:"var(--rule)"})); svg.append(el("text",{x:ml-6,y:Y_(yv)+4,"text-anchor":"end"},yv.toFixed(1))); }
+  const s=w==null?null:synthY(w);
+  YEARS.forEach((yr,i)=>{
+    svg.append(el("text",{x:X_(i),y:H-mb+16,"text-anchor":"middle",fill:"var(--ink)","font-weight":"600"},yr));
+    if(s){ const g=Y.D13[i]-s[i]; svg.append(el("text",{x:X_(i),y:H-mb+30,"text-anchor":"middle",fill:"var(--true)"},`gap ${g>=0?"+":""}${g.toFixed(3)}`)); }
+  });
+  svg.append(el("text",{x:14,y:mt+ph/2,"text-anchor":"middle",transform:`rotate(-90 14 ${mt+ph/2})`},"GDP per capita"));
+  const line=(arr,color,wd,dash)=>{ svg.append(el("path",{d:arr.map((v,i)=>(i?"L":"M")+X_(i)+" "+Y_(v)).join(" "),fill:"none",stroke:color,"stroke-width":wd,"stroke-dasharray":dash||"none"})); arr.forEach((v,i)=>svg.append(el("circle",{cx:X_(i),cy:Y_(v),r:4,fill:color}))); };
+  line(Y.D12,"var(--cat)",1,"3 4"); line(Y.D2,"var(--mad)",1,"3 4");
+  line(Y.D13,"var(--treated)",2.2);
+  if(s){ line(s,"var(--synth)",2.2);
+    YEARS.forEach((_,i)=>svg.append(el("line",{x1:X_(i),x2:X_(i),y1:Y_(Y.D13[i]),y2:Y_(s[i]),stroke:"var(--true)","stroke-width":2}))); }
+}
+
+/* ---------- search ---------- */
+let searching=false, best=null;
+const MSG0="Tries every V on a 5% grid of the simplex, re-solving W* each time, and keeps the one with the lowest MSPE.";
+// The whole search at once (for a shared session, where another screen ran it).
+function computeBest(){ const pts=gridSimplex(0.05), s=std(); let bestV=null,bestM=Infinity,bestW=null,ties=0;
+  for(const V of pts){ const w=solveW(V,s); if(w==null) continue; const m=mspe(w);
+    if(m<bestM-1e-9){bestM=m;bestV=V;bestW=w;ties=1;} else if(Math.abs(m-bestM)<=1e-9){ ties++; } }
+  return {V:bestV,m:bestM,w:bestW,ties}; }
+function doneMsg(b){ return `Done. V* = (${b.V.map(v=>v.toFixed(2)).join(", ")}) gives W* = ${b.w.toFixed(2)} and MSPE ${b.m.toFixed(4)}. ${b.ties>1?`<b>${b.ties} grid points tie</b> for that minimum: V is not unique, only the W* it induces is.`:""}`; }
+function gridSimplex(step){ const n=Math.round(1/step), out=[]; for(let a=0;a<=n;a++)for(let b=0;b<=n-a;b++)for(let c=0;c<=n-a-b;c++){ const dd=n-a-b-c; out.push([a/n,b/n,c/n,dd/n]); } return out; }
+document.getElementById("searchBtn").onclick=()=>{
+  if(searching) return; searching=true;
+  const btn=document.getElementById("searchBtn"), msg=document.getElementById("searchMsg"); btn.disabled=true;
+  const pts=gridSimplex(0.05); const s=std(); let i=0; let bestV=null,bestM=Infinity,bestW=null,ties=0;
+  const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches; const chunk=reduce?pts.length:24;
+  function step(){
+    const end=Math.min(i+chunk,pts.length);
+    for(;i<end;i++){ const V=pts[i]; const w=solveW(V,s); if(w==null) continue; const m=mspe(w);
+      if(m<bestM-1e-9){bestM=m;bestV=V;bestW=w;ties=1;} else if(Math.abs(m-bestM)<=1e-9){ ties++; } }
+    const cur=pts[Math.min(i,pts.length-1)]; cur.forEach((v,k)=>raw[k]=v*100); syncDials(); update(false);
+    msg.textContent=`Tried ${i} of ${pts.length} grid points. Best so far: MSPE ${bestM.toFixed(4)} at W* = ${bestW.toFixed(2)}.`;
+    if(i<pts.length){ requestAnimationFrame(step); return; }
+    bestV.forEach((v,k)=>raw[k]=v*100); syncDials(); best={V:bestV,m:bestM,w:bestW,ties}; update(true);
+    msg.innerHTML=doneMsg(best);
+    btn.disabled=false; searching=false; notify();
+  }
+  requestAnimationFrame(step);
+};
+
+/* ---------- update ---------- */
+function update(full=true){
+  const V=shares(), s=std(), w=solveW(V,s);
+  const tot=raw.reduce((a,b)=>a+b,0);
+  document.getElementById("rawSum").textContent=Math.round(tot*100)/100;
+  [...dialsEl.children].forEach((row,k)=>{ row.classList.toggle("on",V[k]>0); row.querySelector(".pct").textContent=Math.round(V[k]*100)+"%"; });
+  document.getElementById("wStar").innerHTML=w==null?"W* = —":`W* = (${w.toFixed(2)}, ${(1-w).toFixed(2)})<span class="lab">${w.toFixed(2)} on District 12, ${(1-w).toFixed(2)} on District 2</span>`;
+  const zeroed=PRED.filter((_,k)=>V[k]===0);
+  document.getElementById("wForm").innerHTML=w==null?"Choose at least one predictor weight.":`synthetic = ${w.toFixed(2)}·D12 + ${(1-w).toFixed(2)}·D2<br>V-weighted inner loss ${innerLoss(w,V,s).toFixed(4)}`+(zeroed.length?` (gaps on ${zeroed.join(", ")} are not counted because their V is 0)`:"")+".";
+  document.getElementById("innerHint").textContent = "W* is the best W for your V: the lowest point of this curve, which adds up each predictor\u2019s squared gap (in standard deviations) times its V. Each dashed line is a predictor\u2019s target, where its own gap is zero. Above 0.70, raising W worsens the match on GDP and education (and past 0.75 on unemployment) but improves it on industrial share all the way to W = 1, so W* lands where those pulls balance.";
+  drawInner(V,w,s); drawBal(w); drawOuter(w);
+  const m=w==null?null:mspe(w);
+  const inst=true;
+  const dw=directBestW(), dm=mspe(dw);
+  const card=(l,v,r)=>`<div class="stat"><div class="l">${l}</div><div class="v">${v}</div>${r?`<div class="r">${r}</div>`:""}</div>`;
+  document.getElementById("stats").innerHTML =
+    card("W* on District 12",fmt(w),"from the inner problem") +
+    card("Pre-period MSPE",m==null?"—":m.toFixed(4),best?`V* search found ${best.m.toFixed(4)}`:"the outer score") +
+    card("Grid points tried", best?String(gridSimplex(0.05).length):"—", best?`${best.ties} tie at the minimum`:"press Search for V*");
+  notify();
+  if(inst){ const tmin=Math.min(...target); document.getElementById("directBox").innerHTML=`Fitting W directly to GDP in 1965 and 1969, ignoring the predictors, gives <b>W = ${dw.toFixed(2)}</b> and <b>MSPE ${dm.toFixed(4)}</b>. The best any V can reach is ${best?best.m.toFixed(4)+" (W* = "+best.w.toFixed(2)+")":"shown after you press Search for V*"}.<br><br>Why can't V get to an MSPE of ${dm.toFixed(4)}? That needs W = ${dw.toFixed(2)}, and the inner loop never chooses it. Every predictor's target is ${tmin.toFixed(2)} or more (${PRED.map((p,k)=>p+" "+target[k].toFixed(2)).join(", ")}). Below ${tmin.toFixed(2)}, raising W brings the synthetic district closer to District 13 on all four predictors at once, so whatever V you choose, W = ${tmin.toFixed(2)} has a lower inner loss than W = ${dw.toFixed(2)}. The outer loop can only choose among the W*'s the inner loop produces, so no V reaches ${dw.toFixed(2)}.` }
+}
+
+/* ---------- shared state, for live sessions (Speaker View, breakouts) ----------
+   The dial weights and whether Search for V* has been run. setState redraws without
+   reporting a change; every change a person makes is reported once (a search, once at the end). */
+const KEYS=["v_gdp","v_educ","v_ind","v_unem"], listeners=[]; let quiet=true;
+function getState(){ const o={}; KEYS.forEach((k,i)=>o[k]=raw[i]); o.searched=!!best; return o; }
+function notify(){ if(quiet||searching) return; const s=getState(); listeners.forEach(f=>{ try{ f(s); }catch(e){} }); }
+window.artifact={
+  getState,
+  setState(p){
+    if(!p||searching) return;
+    quiet=true;
+    KEYS.forEach((k,i)=>{ if(k in p){ const v=+p[k]; if(isFinite(v)) raw[i]=Math.max(0,Math.min(100,v)); } });
+    if("searched" in p){
+      const msg=document.getElementById("searchMsg");
+      if(p.searched===true&&!best){ best=computeBest(); msg.innerHTML=doneMsg(best); }
+      if(p.searched===false&&best){ best=null; msg.textContent=MSG0; }
+    }
+    syncDials(); update(true);
+    quiet=false;
+  },
+  onChange(fn){ listeners.push(fn); return ()=>{ const i=listeners.indexOf(fn); if(i>-1) listeners.splice(i,1); }; },
+  controls: KEYS.map((k,i)=>({ key:k, label:LONG[PRED[i]]+" weight (V)", kind:"range", min:0, max:100, step:1 })).concat([{ key:"searched", label:"Search for V* run", kind:"toggle" }]),
+  responses: [],
+  assertions: [
+    { name:"Equal V gives W* = 0.82", run:()=>Math.abs(solveW([.25,.25,.25,.25],true)-0.8206)<1e-3 },
+    { name:"Search finds MSPE 0.0009 at W* = 0.70 with 21 ties", run:()=>{ const b=computeBest(); return Math.abs(b.m-0.0009)<1e-7&&Math.abs(b.w-0.70)<1e-9&&b.ties===21; } },
+    { name:"Fitting W directly gives W = 2/3, below every target", run:()=>Math.abs(directBestW()-2/3)<1e-9&&directBestW()<Math.min(...target) }
+  ],
+  referenceCases: []
+};
+update(true);
+quiet=false;
+</script>
+
+<script>
+(function () {
+  var cfg = {"versionId":"cmwjz0qer000008igjuna0btq","appOrigin":"https://ideasatplay.org","direct":null};
+  var t0 = Date.now(), scrolled = false, acted = false, reached = false, shown = false, config = null;
+  var framed = parent !== window;
+  function onScreen(el) {
+    if (!el.getClientRects().length) return false;
+    var r = el.getBoundingClientRect();
+    return r.top < innerHeight && r.bottom > 0;
+  }
+  function atBottom() {
+    var f = document.querySelector("footer[data-kc-credit]");
+    if (f) return f.getBoundingClientRect().top <= innerHeight;
+    var d = document.documentElement;
+    return scrollY + innerHeight >= d.scrollHeight - 48;
+  }
+  // { cur, last } when the page moves through numbered steps, else null.
+  function steps() {
+    var a = window.artifact;
+    try {
+      var c = a && Array.isArray(a.controls) ? a.controls.filter(function (x) { return x && x.key === "step" && typeof x.max === "number"; })[0] : null;
+      if (c) { var s = a.getState(); if (s && typeof s.step === "number") return { cur: s.step, last: c.max }; }
+    } catch (e) {}
+    var cur = document.querySelector('[aria-current="step"]');
+    if (cur && cur.parentElement) {
+      var sib = Array.prototype.filter.call(cur.parentElement.children, function (x) { return x.getClientRects().length; });
+      return { cur: sib.indexOf(cur), last: sib.length - 1 };
+    }
+    return null;
+  }
+  function finished() {
+    var mark = document.querySelector("[data-kc-end]");
+    if (mark) return onScreen(mark);
+    var s = steps();
+    if (s) return s.cur >= s.last && atBottom();
+    return atBottom() && (scrolled || (acted && Date.now() - t0 > 60000));
+  }
+  // The student link remembers a rating in its own storage where the browser allows it.
+  var KEY = "kc-rated-" + cfg.versionId;
+  function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
+  if (cfg.direct) config = { ask: !store(KEY), preview: false, labels: cfg.direct.labels };
+  var visitor = (function () {
+    var v = store("kc-visitor");
+    if (!v) { v = ""; for (var i = 0; i < 24; i++) v += "abcdefghijklmnopqrstuvwxyz0123456789".charAt(Math.floor(Math.random() * 36)); store("kc-visitor", v); }
+    return v;
+  })();
+  var pending = {}, seq = 0;
+  function save(score, comment) {
+    if (cfg.direct) {
+      var body = { versionId: cfg.versionId, score: score, context: "share", visitor: visitor };
+      if (comment) body.comment = comment;
+      // text/plain: a simple request, so no preflight is needed.
+      return fetch(cfg.direct.endpoint, { method: "POST", credentials: "omit", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(body) })
+        .then(function (r) { if (r.ok) store(KEY, String(score)); return r.ok; }, function () { return false; });
+    }
+    return new Promise(function (resolve) {
+      var id = ++seq; pending[id] = resolve;
+      parent.postMessage({ type: "kc:rate", versionId: cfg.versionId, id: id, score: score, comment: comment || "" }, cfg.appOrigin);
+      setTimeout(function () { if (pending[id]) { delete pending[id]; resolve(false); } }, 15000);
+    });
+  }
+  var B = "display:inline-block;margin:3px 6px 3px 0;padding:4px 10px;border:1px solid #a8a29e;border-radius:6px;background:#fff;color:#1c1917;font:inherit;cursor:pointer";
+  function el(tag, attrs, text) { var e = document.createElement(tag); for (var k in attrs) e.setAttribute(k, attrs[k]); if (text) e.textContent = text; return e; }
+  function show() {
+    if (shown || !config || !config.ask) return;
+    shown = true;
+    clearInterval(timer);
+    var L = config.labels;
+    var box = el("div", { "data-kc-rating": "", "data-kc-personal": "", role: "region", "aria-label": L.ask, lang: L.lang, dir: L.dir,
+      style: "box-sizing:border-box;max-width:760px;margin:24px auto 0;padding:10px 14px;border:1px solid #d6d3d1;border-radius:10px;background:#fafaf9;color:#1c1917;font:14px/1.5 system-ui,-apple-system,sans-serif;text-align:start" });
+    var live = el("div", { "aria-live": "polite" });
+    box.appendChild(live);
+    function ask(msg) {
+      live.innerHTML = "";
+      live.appendChild(el("span", { style: "font-weight:600;margin-inline-end:8px" }, L.ask));
+      [1, 2, 3].forEach(function (s) {
+        var b = el("button", { type: "button", style: B }, s + " · " + L["s" + s]);
+        b.addEventListener("click", function () {
+          live.querySelectorAll("button").forEach(function (x) { x.disabled = true; });
+          save(s, "").then(function (ok) { if (ok) comment(s); else ask(L.error); });
+        });
+        live.appendChild(b);
+      });
+      if (config.preview) live.appendChild(el("div", { style: "font-size:12px;color:#57534e" }, L.preview));
+      if (msg) live.appendChild(el("div", { role: "alert", style: "color:#991b1b;font-size:13px" }, msg));
+    }
+    function comment(score) {
+      live.innerHTML = "";
+      var id = "kc-rate-comment";
+      live.appendChild(el("label", { for: id, style: "display:block;font-weight:600;margin-bottom:4px" }, L.comment));
+      var row = el("div", { style: "display:flex;flex-wrap:wrap;gap:6px;align-items:center" });
+      var input = el("input", { id: id, type: "text", maxlength: "1000", autocomplete: "off", dir: "auto",
+        style: "flex:1 1 260px;min-width:0;box-sizing:border-box;padding:5px 8px;border:1px solid #a8a29e;border-radius:6px;background:#fff;color:#1c1917;font:inherit" });
+      var send = el("button", { type: "button", style: B + ";background:#292524;color:#fff;border-color:#292524" }, L.send);
+      var skip = el("button", { type: "button", style: B }, L.skip);
+      function done() { live.innerHTML = ""; live.appendChild(el("span", { style: "font-weight:600" }, L.thanks)); setTimeout(function () { box.remove(); }, 2000); }
+      send.addEventListener("click", function () {
+        var text = input.value.trim();
+        if (!text) return done();
+        send.disabled = skip.disabled = true;
+        save(score, text).then(function (ok) { if (ok) done(); else { send.disabled = skip.disabled = false; live.appendChild(el("div", { role: "alert", style: "color:#991b1b;font-size:13px" }, L.error)); } });
+      });
+      input.addEventListener("keydown", function (e) { if (e.key === "Enter") send.click(); });
+      skip.addEventListener("click", done);
+      row.appendChild(input); row.appendChild(send); row.appendChild(skip);
+      live.appendChild(row);
+      input.focus();
+    }
+    ask("");
+    var mark = document.querySelector("[data-kc-end]"), foot = document.querySelector("footer[data-kc-credit]");
+    if (mark) mark.insertAdjacentElement("afterend", box);
+    else if (foot) foot.parentNode.insertBefore(box, foot);
+    else document.body.appendChild(box);
+  }
+  function check() {
+    if (!reached && finished()) reached = true;
+    if (reached) show();
+  }
+  window.addEventListener("message", function (e) {
+    if (e.source !== parent || !e.data || e.data.versionId !== cfg.versionId) return;
+    var d = e.data;
+    if (d.type === "kc:rate-config" && !cfg.direct) { config = { ask: !!d.ask, preview: !!d.preview, labels: d.labels }; check(); }
+    if (d.type === "kc:rate-result" && pending[d.id]) { pending[d.id](!!d.ok); delete pending[d.id]; }
+  });
+  // The app page may start listening after this page loads: ask a few times.
+  var hellos = 0;
+  function hello() { if (framed && !cfg.direct && !config && hellos++ < 8) parent.postMessage({ type: "kc:rate-hello", versionId: cfg.versionId }, cfg.appOrigin); }
+  hello();
+  var timer = setInterval(function () { if (hellos < 8 && !config) hello(); check(); }, 800);
+  window.addEventListener("scroll", function () { if (scrollY > 0) scrolled = true; check(); }, { passive: true });
+  ["click", "input", "keydown"].forEach(function (t) { document.addEventListener(t, function (e) { if (e.target && e.target.closest && e.target.closest("[data-kc-rating]")) return; acted = true; setTimeout(check, 50); }, true); });
+})();
+</script></body>
+</html>

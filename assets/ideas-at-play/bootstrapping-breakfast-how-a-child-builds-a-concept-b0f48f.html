@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bootstrapping Breakfast: how a child builds a concept</title>
+<style>
+  :root{
+    box-sizing:border-box;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+    --bg:#f0ebe6; --card:#ffffff; --ink:#3c3732; --mute:#5f5a55; --faint:#e3dcd4;
+    --clay:#905112; --clay-soft:#f6ece1; --teal:#2e6f8e; --teal-soft:#e8f0f4;
+    --good:#3f6b4a; --good-soft:#e9f1eb; --bad:#8a3a3a; --bad-soft:#f6ebeb;
+    --shadow:0 1px 2px rgba(60,55,50,.07), 0 8px 24px rgba(60,55,50,.06);
+    color-scheme:light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#211f1d; --card:#2b2825; --ink:#ece7e1; --mute:#b3aca4; --faint:#3b3733;
+      --clay:#d79a52; --clay-soft:#3a2f23; --teal:#8fc0d6; --teal-soft:#24333a;
+      --good:#8dc39c; --good-soft:#26332a; --bad:#e09a9a; --bad-soft:#362626;
+      --shadow:none; color-scheme:dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#211f1d; --card:#2b2825; --ink:#ece7e1; --mute:#b3aca4; --faint:#3b3733;
+    --clay:#d79a52; --clay-soft:#3a2f23; --teal:#8fc0d6; --teal-soft:#24333a;
+    --good:#8dc39c; --good-soft:#26332a; --bad:#e09a9a; --bad-soft:#362626;
+    --shadow:none; color-scheme:dark;
+  }
+  *,*::before,*::after{box-sizing:inherit}
+  [hidden]{display:none !important}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 "Helvetica Neue",Helvetica,Arial,sans-serif;padding-bottom:56px}
+  .wrap{max-width:1060px;margin:0 auto;padding:28px 20px 72px}
+  .eyebrow{font-family:Georgia,"Times New Roman",serif;color:var(--clay);letter-spacing:.14em;text-transform:uppercase;font-size:12px;margin:0 0 6px}
+  h1{font-family:Georgia,"Times New Roman",serif;font-weight:400;font-size:clamp(26px,4.2vw,40px);line-height:1.15;margin:0 0 10px}
+  .lede{margin:0 0 22px;max-width:66ch;color:var(--mute)}
+  .card{background:var(--card);border-radius:14px;padding:20px 22px;box-shadow:var(--shadow);margin-bottom:18px}
+  h2{font-family:Georgia,"Times New Roman",serif;font-weight:400;font-size:21px;margin:0 0 4px}
+  h3{font-family:Georgia,"Times New Roman",serif;font-weight:400;font-size:17px;margin:0 0 8px}
+  .sub{color:var(--mute);font-size:14px;margin:0 0 14px}
+  .hint{font-size:13px;color:var(--mute);margin:10px 0 0}
+
+  .opts{display:grid;gap:8px;max-width:640px}
+  .opts label{display:flex;gap:10px;align-items:flex-start;padding:9px 12px;border:1px solid var(--faint);border-radius:10px;cursor:pointer;font-size:15px}
+  .opts input{margin-top:4px;accent-color:var(--teal)}
+  .opts label:has(input:checked){border-color:var(--teal);background:var(--teal-soft)}
+
+  /* timeline */
+  .steps{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0 18px;padding:0;list-style:none}
+  .steps button{appearance:none;font:inherit;font-size:13px;line-height:1.25;text-align:left;border:1px solid var(--faint);background:var(--bg);color:var(--ink);border-radius:10px;padding:7px 11px;cursor:pointer;min-width:92px}
+  .steps button small{display:block;color:var(--mute);font-size:11.5px}
+  .steps button[aria-current="step"]{background:var(--teal);border-color:var(--teal);color:var(--card)}
+  .steps button[aria-current="step"] small{color:var(--card)}
+  .event{border-left:4px solid var(--clay);background:var(--clay-soft);border-radius:8px;padding:12px 16px;margin:0 0 14px;max-width:72ch}
+  .event .who{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--clay);margin:0 0 4px}
+  .event p{margin:0}
+  .deck{display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));margin:6px 0 10px}
+  .deck button{appearance:none;font:inherit;font-size:14px;text-align:left;background:var(--card);color:var(--ink);border:1px solid var(--faint);border-left:4px solid var(--clay);border-radius:8px;padding:10px 12px;cursor:pointer}
+  .deck button[aria-pressed="true"]{outline:2px solid var(--teal);outline-offset:1px;background:var(--teal-soft)}
+  .deck button:disabled{opacity:.45;cursor:not-allowed}
+  .field{margin:12px 0 0;max-width:72ch}
+  .field label{display:block;font-size:14px;font-weight:600;margin:0 0 4px}
+  .field .guide{font-weight:400;color:var(--mute)}
+  textarea,select{font:inherit;font-size:15px;color:var(--ink);background:var(--bg);border:1px solid var(--faint);border-radius:8px;padding:8px 10px;width:100%}
+  textarea{min-height:64px;resize:vertical}
+  select{width:auto;max-width:100%}
+  .reading{margin:10px 0 0;padding:10px 14px;border-radius:10px;background:var(--teal-soft);font-size:14px;max-width:72ch}
+  .mcq{margin:0 0 14px;padding:14px 16px;border:1px solid var(--faint);border-radius:12px;max-width:72ch}
+  .mcq-q{font-weight:600;margin:0 0 10px}
+  .mcfb{margin:10px 0 0;font-size:14.5px;padding:10px 12px;border-radius:8px}
+  .mcfb:empty{display:none}
+  .mcfb.ok{background:var(--good-soft);border-left:4px solid var(--good)}
+  .mcfb.no{background:var(--bad-soft);border-left:4px solid var(--bad)}
+  .steps button:disabled{opacity:.5;cursor:not-allowed}
+  .worked{display:inline-block;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--teal);border:1px solid var(--teal);border-radius:999px;padding:1px 9px;margin-left:8px;vertical-align:middle}
+
+  .lab{display:grid;gap:16px;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);margin-top:18px}
+  @media (max-width:760px){.lab{grid-template-columns:1fr}}
+  .concept{border:1px solid var(--faint);border-radius:12px;padding:14px 16px;background:var(--bg)}
+  .concept fieldset{border:0;margin:0;padding:0;min-width:0}
+  .sense{border-top:1px solid var(--faint);padding-top:10px;margin-top:10px}
+  .sense:first-of-type{border-top:0;padding-top:0;margin-top:0}
+  .sense h4{margin:0 0 6px;font-size:14px;font-weight:600}
+  .chk{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:14px;margin:0 0 6px}
+  .chk label{display:flex;gap:6px;align-items:center;cursor:pointer;min-height:24px}
+  .chk input{accent-color:var(--teal);width:16px;height:16px}
+  .glabel{font-size:12.5px;color:var(--mute);margin:6px 0 2px}
+  .says{margin:12px 0 0;font-size:14.5px;padding:10px 12px;border-radius:8px;background:var(--card);border:1px solid var(--faint)}
+  .says b{font-family:Georgia,"Times New Roman",serif;font-weight:400;font-size:15.5px}
+
+  .probes{width:100%;border-collapse:collapse;font-size:14px}
+  .probes th{text-align:left;font-weight:600;font-size:12.5px;color:var(--mute);border-bottom:1px solid var(--ink);padding:4px 6px}
+  .probes td{border-bottom:1px solid var(--faint);padding:8px 6px;vertical-align:top}
+  .probes tr:last-child td{border-bottom:1px solid var(--ink)}
+  .pill{display:inline-block;min-width:44px;text-align:center;font-weight:700;font-size:13px;border-radius:999px;padding:2px 9px;border:1.5px solid}
+  .pill.yes{color:var(--good);background:var(--good-soft);border-color:var(--good)}
+  .pill.no{color:var(--bad);background:var(--bad-soft);border-color:var(--bad);border-style:dashed}
+  .pill.unk{color:var(--mute);border-color:var(--faint)}
+  .why{display:block;color:var(--mute);font-size:12.5px;margin-top:3px}
+  .flip{display:inline-block;margin-top:4px;font-size:12px;font-weight:600;color:var(--clay)}
+  .heard{display:inline-block;margin-top:4px;font-size:12px;color:var(--teal);font-weight:600}
+  tr.hot td{background:var(--clay-soft)}
+
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:16px}
+  .btn{appearance:none;border:1px solid var(--clay);background:transparent;color:var(--clay);font:inherit;font-size:14px;padding:9px 16px;border-radius:999px;cursor:pointer}
+  .btn:hover:not(:disabled){background:var(--clay);color:var(--card)}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+  .btn.ghost{border-color:var(--faint);color:var(--mute)}
+  .btn.ghost:hover:not(:disabled){background:var(--faint);color:var(--ink)}
+  .btn.small{font-size:13px;padding:5px 12px}
+  button:focus-visible,textarea:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+
+  .tablewrap{overflow-x:auto}
+  .summary{width:100%;border-collapse:collapse;font-size:14px;min-width:620px}
+  .summary th{text-align:left;font-weight:600;border-top:1px solid var(--ink);border-bottom:1px solid var(--ink);padding:6px 8px;font-size:13px}
+  .summary td{border-bottom:1px solid var(--faint);padding:8px;vertical-align:top}
+  .summary tr:last-child td{border-bottom:1px solid var(--ink)}
+  .summary td.age{white-space:nowrap;color:var(--mute)}
+  .summary .tag{display:inline-block;font-size:12px;border:1px solid var(--faint);border-radius:999px;padding:0 8px;margin-bottom:3px}
+
+  .explain{margin-top:6px;padding:16px 18px;border-radius:12px;background:var(--teal-soft)}
+  .explain p{margin:0 0 10px;font-size:14.5px;max-width:72ch}
+  .explain p:last-child{margin-bottom:0}
+  .score{font-family:Georgia,"Times New Roman",serif;font-size:17px}
+  .source{color:var(--mute);font-size:13px;margin:26px 0 0;max-width:72ch}
+  footer{color:var(--mute);font-size:13px;margin-top:8px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+  /* Instructor freeze: a small box in the lower left. */
+  .freeze{position:fixed;left:10px;bottom:10px;z-index:20;display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:6px 8px;border-radius:10px;background:var(--card);border:1px solid var(--faint);box-shadow:var(--shadow);font-size:13px;color:var(--mute);max-width:calc(100vw - 80px)}
+  .freeze input{width:9em;font:inherit;padding:4px 6px;border:1px solid var(--faint);border-radius:6px;background:var(--bg);color:var(--ink)}
+  .freeze input[aria-invalid="true"]{border-color:var(--bad)}
+  .freeze button{font:inherit;padding:4px 10px;border-radius:6px;border:1px solid var(--faint);background:var(--bg);color:var(--ink);cursor:pointer}
+  .freeze-note{color:var(--ink);font-weight:600}
+  .freeze-note:empty{display:none}
+  html.frozen .wrap{opacity:.75;cursor:not-allowed}
+  @media (prefers-reduced-motion: reduce){*{transition:none !important}}
+</style>
+</head>
+<body class="laptop">
+<div class="wrap">
+  <p class="eyebrow">Concepts · Cognitive development</p>
+  <h1>Bootstrapping breakfast</h1>
+  <p class="lede">Follow one child from hearing the word “breakfast” as a baby to using it like an adult. After each event in the child’s life, update what the word means to them, and test that meaning on six cases.</p>
+
+  <div class="card">
+    <h2>Before you start: by age 6, what will “breakfast” mean to this child?</h2>
+    <p class="sub">Agree on one answer as a group.</p>
+    <div class="opts" id="guessOpts" role="radiogroup" aria-label="Your prediction"></div>
+  </div>
+
+  <div class="card">
+    <h2>Seven events in a child’s life</h2>
+    <p class="sub">Work through them in order: each event unlocks when you have finished the one before. The first two rows are filled in as examples. In rows 3 to 5 you choose what happens. Each event starts from the card as you left it at the event before.</p>
+    <ol class="steps" id="steps" aria-label="Events"></ol>
+
+    <h3 id="stepHead"></h3>
+    <div class="event" id="eventBox"><p class="who" id="eventWho"></p><p id="eventText"></p></div>
+
+    <div id="deckBox" hidden>
+      <p class="sub" style="margin:0">Choose what happens next, or write your own event. Each event can be used once.</p>
+      <div class="deck" id="deck"></div>
+      <div class="field" id="ownField" hidden></div>
+    </div>
+
+    <div class="mcq" id="mcBox" hidden>
+      <p class="mcq-q" id="mcQ"></p>
+      <div class="opts" id="mcOpts5" role="radiogroup" aria-labelledby="mcQ"></div>
+      <div class="opts" id="mcOpts6" role="radiogroup" aria-labelledby="mcQ"></div>
+      <p class="mcfb" id="mcFb"></p>
+    </div>
+
+    <div class="field">
+      <label for="tagSel">Psychological level: what kind of learning is this?</label>
+      <select id="tagSel"></select>
+    </div>
+    <div class="field" id="noteFields"></div>
+    <p class="hint" id="workedNote" hidden></p>
+    <div class="reading" id="reading" hidden></div>
+
+    <div class="lab">
+      <div class="concept">
+        <h3>What “breakfast” means to the child now</h3>
+        <p class="hint" id="cardLock" style="margin:0 0 8px" hidden>Answer the question above to unlock the card.</p>
+        <fieldset id="cardSet">
+          <legend class="sr">Concept card</legend>
+          <div id="senses"></div>
+          <div class="row" style="margin-top:10px">
+            <button type="button" class="btn small" id="addSense">Add a second meaning</button>
+            <button type="button" class="btn small ghost" id="dropSense" hidden>Remove the second meaning</button>
+          </div>
+        </fieldset>
+        <p class="says" id="says" aria-live="polite"></p>
+      </div>
+      <div>
+        <h3>Would the child call this breakfast?</h3>
+        <table class="probes" aria-label="Six test cases and the child's verdicts">
+          <thead><tr><th scope="col">Case</th><th scope="col">Verdict</th></tr></thead>
+          <tbody id="probeBody"></tbody>
+        </table>
+        <p class="hint">Rows marked “changed” flipped since the previous event.</p>
+      </div>
+    </div>
+
+    <div class="row">
+      <button type="button" class="btn ghost" id="prevBtn">← Previous event</button>
+      <button type="button" class="btn" id="nextBtn">Next event →</button>
+      <button type="button" class="btn" id="finishBtn" hidden>Finish: compare with the family</button>
+    </div>
+    <p class="hint" id="lockHint"></p>
+  </div>
+
+  <div class="card" id="revealCard" hidden>
+    <h2>Did the child end up with the family’s concept?</h2>
+    <div class="explain">
+      <p class="score" id="revScore"></p>
+      <p id="revDetail"></p>
+      <p id="revGuess"></p>
+      <p>The family used “breakfast” in two ways. For the sibling it was <em>the first meal after sleep</em>, whatever the clock said. For the parent it was <em>a kind of food</em>, which can be eaten at dinner. One meaning cannot do both jobs: try it below.</p>
+      <div class="row" style="margin-top:4px"><button type="button" class="btn small" id="searchBtn">Try every one-meaning card</button></div>
+      <p id="searchOut" hidden></p>
+      <p>So the last event was not more of the same. Up to event 6, each event added or removed <em>features</em>; the sibling’s 1 PM breakfast removed two at once. Event 7 changed the <em>structure</em>: one meaning became two related ones, and “breakfast for dinner” only makes sense to someone who has both.</p>
+      <p><strong>Name it.</strong> The worksheet’s title echoes Susan Carey’s account of <em>bootstrapping</em> (<cite>The Origin of Concepts</cite>, 2009): a learner first holds a word as an almost empty placeholder, then fills in its meaning from how it is used around them. A word with several related meanings is <em>polysemous</em>.</p>
+    </div>
+    <div class="field">
+      <label for="exit">Choose another word a child has to build up this way, such as “dinner”, “weekend” or “home”. Describe one event that would give it a second meaning, and say what the two meanings are. <span class="guide">(2–3 sentences)</span></label>
+      <textarea id="exit"></textarea>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Your table</h2>
+    <p class="sub">The worksheet’s three columns, filled in as you go. A row appears when you reach its event.</p>
+    <div class="tablewrap">
+      <table class="summary">
+        <thead><tr><th scope="col">Age</th><th scope="col">Event</th><th scope="col">Psychological level and notes</th><th scope="col">Current concept of “breakfast”</th></tr></thead>
+        <tbody id="sumBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <p class="source">Not included: how children learn word boundaries in detail, cultures where meals are organised differently, and the many other words (“brunch”, “second breakfast”) that sit near this one. Adapted from Mark Sheskin’s Minerva worksheet “Bootstrapping Breakfast”.</p>
+  <footer><span>Minerva University® · Professor Alexis Diamond</span><span>#psychologicallevel</span></footer>
+</div>
+
+<div class="freeze" id="freezeBox" role="group" aria-label="Instructor freeze">
+  <span class="freeze-note" id="freezeNote"></span>
+  <span id="freezeForm">
+    <label class="sr" for="freezeCode">Instructor code</label>
+    <input id="freezeCode" type="password" autocomplete="off" placeholder="Instructor code">
+    <button type="button" id="freezeBtn">Freeze</button>
+  </span>
+  <button type="button" id="unfreezeBtn" hidden>Unfreeze</button>
+</div>
+<p class="sr" aria-live="polite" id="live"></p>
+
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+
+  /* ---------------- content ---------------- */
+  var FOODS = [
+    { id:'applesauce', label:'apple sauce' },
+    { id:'cereal', label:'cereal' },
+    { id:'pw', label:'pancakes & waffles' },
+    { id:'eggs', label:'eggs & toast' }
+  ];
+  var TAGS = [
+    { id:'segment', label:'Speech segmentation' },
+    { id:'assoc', label:'Associative learning' },
+    { id:'stats', label:'Statistical learning (patterns across many cases)' },
+    { id:'testimony', label:'Testimony (being told)' },
+    { id:'counter', label:'Correction from counterexamples' },
+    { id:'extension', label:'Overextension or underextension' },
+    { id:'pragmatics', label:'Pragmatics of a figurative or extended use' }
+  ];
+  // The six test cases. food: what is eaten; morning: before noon; first: the first meal after sleep.
+  // family: whether the family in this story would call it breakfast.
+  var PROBES = [
+    { id:'cereal7', text:'Cereal at 7 AM, right after waking up', food:'cereal', morning:true, first:true, family:true },
+    { id:'lunch1', text:'A sandwich at 1 PM, right after a teenager wakes up', food:'sandwich', morning:false, first:true, family:true, event:5 },
+    { id:'waffles7', text:'Waffles for dinner at 7 PM', food:'pw', morning:false, first:false, family:true, event:6 },
+    { id:'pizza7', text:'Cold pizza at 7 AM, right after waking up', food:'pizza', morning:true, first:true, family:true },
+    { id:'snack', text:'Apple sauce as a snack just before bed', food:'applesauce', morning:false, first:false, family:false },
+    { id:'pancakes10', text:'Pancakes at 10 AM, after fruit at 6 AM', food:'pw', morning:true, first:false, family:true }
+  ];
+  var AGES = ['6 months', '9 months', '18 months', '2½ years', '3½ years', '5 years', '6 years'];
+  var FIXED = {
+    0: { who:'Worked example', text:'The infant hears adults using the word “breakfast”.', tag:'segment',
+         note:'Picking this word out of the stream of speech is already an achievement: there are rarely real pauses between words, and it must be told apart from words that sound alike, such as “Belfast”.' },
+    1: { who:'Worked example', text:'Several times, the infant is given apple sauce while a caregiver says many words, including “breakfast”.', tag:'assoc',
+         note:'The word and the food keep turning up together, so the infant learns by association that “breakfast” means apple sauce.' },
+    5: { who:'Fixed event', text:'An older sibling says: “I can’t believe I slept until 1 PM! I guess lunch will be my breakfast!”',
+         reading:'One reading: pragmatics and correction. The sibling eats a sandwich in the afternoon and still calls it breakfast, so neither the food nor the morning can be what the word requires. What survives is “the first meal after sleep”.' },
+    6: { who:'Fixed event', text:'A parent says: “Let’s have waffles tonight! Let’s have breakfast for dinner!”',
+         reading:'One reading: the pragmatics of an extended use. “Breakfast for dinner” is not a contradiction only if “breakfast” can also mean a kind of food. The first-meal meaning cannot be dropped (the sibling still needs it), so the word now has two meanings.' }
+  };
+  var DECK = [
+    { id:'grandma', text:'At Grandma’s house, breakfast is eggs and toast, never apple sauce.',
+      reading:'One reading: statistical learning. Different foods under the same word suggest the word is not tied to one food. The list grows, and apple sauce may start to look optional.' },
+    { id:'morning', text:'Every day, right after the child wakes up, someone says “Breakfast time!”, and the food is different each time.',
+      reading:'One reading: statistical learning. Across many breakfasts the food varies but the timing does not, so the pattern points to time of day (or waking up) as what the word tracks.' },
+    { id:'book', text:'A picture book shows a family eating cereal at sunrise. The caption reads: “Breakfast!”',
+      reading:'One reading: testimony. The book tells the child what breakfast looks like without the child having to eat it, and it pairs the word with both a food and a time.' },
+    { id:'dinner', text:'At dinner, the child points at a bowl of apple sauce and says “Breakfast!” A parent laughs: “No, silly, this is dinner.”',
+      reading:'One reading: overextension met by correction. The child applies the word too widely (any apple sauce, any time), and the counterexample shows that the time of the meal matters.' },
+    { id:'cerealno', text:'Handed a bowl of cereal and told “Eat your breakfast”, the child protests: “That’s not breakfast, that’s cereal!”',
+      reading:'One reading: underextension, corrected by testimony. The child’s meaning is narrower than the adults’, and the adult’s use shows that cereal counts too.' },
+    { id:'uncle', text:'An uncle explains: “It’s called breakfast because you break your fast. You haven’t eaten all night.”',
+      reading:'One reading: testimony offering a definition. It points to the first meal after sleep, but only once the child knows what “fast” means: a placeholder inside a placeholder.' },
+    { id:'hotel', text:'On a trip, a sign in the hotel lobby says “Breakfast served 7–10 AM.”',
+      reading:'One reading: testimony (written). The sign ties the word to a window of time, not to a particular food.' }
+  ];
+  var SLOTS = [2, 3, 4]; // rows the group fills from the deck
+  // A question at each fixed event, answered before the card can be edited. Any answer moves on.
+  var MCQ = {
+    5: { key:'mc6', q:'The sibling ate a sandwich at 1 PM and called it breakfast. If the child takes that at face value, what can the concept no longer require?', options:[
+      { value:'both', right:true, label:'Being eaten in the morning, and being one of a list of particular foods',
+        fb:'Right. 1 PM is not the morning, and no list of breakfast foods includes the sibling’s sandwich. What the sandwich still has is that it was the first meal after sleep, so that feature survives.' },
+      { value:'morning', label:'Only being eaten in the morning',
+        fb:'Half right. The morning has to go, but so does any food list: the sibling’s breakfast was a sandwich. What survives is that it was the first meal after sleep.' },
+      { value:'first', label:'Being the first meal after sleep',
+        fb:'Not quite. That is the one feature the sibling’s meal still has: the sibling had just woken up. It is the morning and the food list that the sandwich breaks.' },
+      { value:'nothing', label:'Nothing: the sibling is just using the word wrongly',
+        fb:'Not quite. A child has no way to know that, and adults talk this way too (“I didn’t have breakfast until noon”). Taken at face value, the 1 PM sandwich rules out the morning and the food list.' }
+    ] },
+    6: { key:'mc7', q:'Why isn’t “breakfast for dinner” a contradiction?', options:[
+      { value:'kind', right:true, label:'Because “breakfast” can also mean a kind of food, which can be eaten at any meal',
+        fb:'Right. Everyone at the table knows to expect waffles, not a sandwich. The first-meal meaning can’t be dropped (the sibling still needs it), so the word now has two meanings.' },
+      { value:'joke', label:'Because the parent is joking; it really is a contradiction',
+        fb:'It is playful, but everyone understands exactly what is coming: waffles, eggs, pancakes. The phrase works because the word can pick out a kind of food.' },
+      { value:'firstmeal', label:'Because dinner tonight is the family’s first meal after sleep',
+        fb:'No one has just woken up before this dinner, so the first-meal meaning can’t explain it. Something else about the word has to.' },
+      { value:'same', label:'Because breakfast and dinner are really the same meal',
+        fb:'If they were, the phrase would tell you nothing. It does tell you something: what kind of food to expect.' }
+    ] }
+  };
+  function mcOption(n, v){ var o = MCQ[n].options; for(var i = 0; i < o.length; i++) if(o[i].value === v) return o[i]; return null; }
+  var GUESS = [
+    { value:'foods', label:'A list of particular foods' },
+    { value:'time', label:'A meal eaten in the morning' },
+    { value:'first', label:'The first meal after sleep, whenever that is' },
+    { value:'several', label:'More than one of these, depending on how it is used' }
+  ];
+
+  /* ---------------- concept model ----------------
+     A card has one or two meanings ("senses"). Within a sense every ticked feature must hold;
+     a case counts as breakfast if it fits any sense. An empty card is a placeholder word. */
+  function emptySense(){ return { foods:[], morning:false, first:false }; }
+  function isEmpty(s){ return !s || (!s.foods.length && !s.morning && !s.first); }
+  function fits(s, p){
+    return (!s.foods.length || s.foods.indexOf(p.food) > -1) && (!s.morning || p.morning) && (!s.first || p.first);
+  }
+  function failText(s, p){
+    if(s.foods.length && s.foods.indexOf(p.food) < 0) return 'not one of its foods';
+    if(s.morning && !p.morning) return 'not in the morning';
+    if(s.first && !p.first) return 'not the first meal after sleep';
+    return '';
+  }
+  function senses(c){ return [c.s1, c.s2].filter(function(s){ return !isEmpty(s); }); }
+  function verdict(c, p){
+    var ss = senses(c);
+    if(!ss.length) return { v:'unk', why:'The word has no content yet.' };
+    for(var i = 0; i < ss.length; i++) if(fits(ss[i], p)) return { v:'yes', why: c.s2 && !isEmpty(c.s2) ? 'Fits meaning ' + ([c.s1, c.s2].indexOf(ss[i]) + 1) + '.' : '' };
+    var whys = ss.map(function(s, i){ return (ss.length > 1 ? 'Meaning ' + ([c.s1, c.s2].indexOf(s) + 1) + ': ' : '') + failText(s, p); });
+    return { v:'no', why: whys.join('; ') + '.' };
+  }
+  function foodList(ids){
+    var names = FOODS.filter(function(f){ return ids.indexOf(f.id) > -1; }).map(function(f){ return f.label; });
+    return names.length < 2 ? names.join('') : names.slice(0, -1).join(', ') + (names.length > 2 ? ',' : '') + ' or ' + names[names.length - 1];
+  }
+  function senseText(s){
+    if(!s.foods.length){
+      if(s.first) return 'the first meal after sleep' + (s.morning ? ', eaten in the morning' : '');
+      return s.morning ? 'a meal eaten in the morning' : 'any meal';
+    }
+    var parts = [foodList(s.foods)];
+    if(s.morning) parts.push('eaten in the morning');
+    if(s.first) parts.push('as the first meal after sleep');
+    return parts.join(', ');
+  }
+  function conceptText(c){
+    var ss = senses(c);
+    if(!ss.length) return 'No content yet: just a placeholder word.';
+    if(ss.length === 1) return '“Breakfast” means: ' + senseText(ss[0]) + '.';
+    return '“Breakfast” means either (1) ' + senseText(ss[0]) + ', or (2) ' + senseText(ss[1]) + '.';
+  }
+  function cloneC(c){ return c ? JSON.parse(JSON.stringify(c)) : null; }
+  function matchCount(c){ return PROBES.filter(function(p){ var v = verdict(c, p).v; return (v === 'yes') === p.family && v !== 'unk'; }).length; }
+  // Every one-sense card: 16 food sets x morning x first.
+  function oneSenseCards(){
+    var out = [];
+    for(var m = 0; m < 16; m++) [false, true].forEach(function(mo){ [false, true].forEach(function(fi){
+      out.push({ s1:{ foods: FOODS.filter(function(f, i){ return m & (1 << i); }).map(function(f){ return f.id; }), morning:mo, first:fi }, s2:null });
+    }); });
+    return out;
+  }
+
+  /* ---------------- state ---------------- */
+  var WORKED = [ { s1:emptySense(), s2:null }, { s1:{ foods:['applesauce'], morning:false, first:false }, s2:null } ];
+  var EDITABLE = [2, 3, 4, 5, 6];
+  var RESP = ['own2', 'own3', 'own4', 'note2', 'note3', 'note4', 'note5', 'note6', 'exit'];
+  var state = {
+    guess:'', step:0,
+    concept:[cloneC(WORKED[0]), cloneC(WORKED[1]), null, null, null, null, null],
+    tags:['segment', 'assoc', '', '', '', '', ''],
+    deck:['', '', ''],
+    own2:'', own3:'', own4:'', note2:'', note3:'', note4:'', note5:'', note6:'', exit:'',
+    mc6:'', mc7:'', revealed:false, searched:false, said:'', frozenBy:''
+  };
+  var listeners = [];
+  function getState(){ return JSON.parse(JSON.stringify(state)); }
+  function notify(){ var s = getState(); listeners.forEach(function(fn){ try{ fn(s); }catch(e){} }); }
+  function change(patch, msg){
+    // The announcement is shared too, so a teammate's screen reader hears the same thing.
+    patch.said = (msg || '').slice(0, 400);
+    Object.keys(patch).forEach(function(k){ state[k] = patch[k]; });
+    render(); notify();
+  }
+  // Rows start from the card at the row before; fill any gaps up to row k.
+  function filledTo(k){
+    var cs = state.concept.map(cloneC);
+    for(var i = 2; i <= k; i++) if(!cs[i]) cs[i] = cloneC(cs[i - 1]);
+    return cs;
+  }
+  function cur(){ return state.concept[state.step] || filledTo(state.step)[state.step]; }
+  function prevConcept(){ return state.step ? (state.concept[state.step - 1] || filledTo(state.step - 1)[state.step - 1]) : null; }
+  function deckFor(step){ var i = SLOTS.indexOf(step); return i < 0 ? '' : state.deck[i]; }
+  // Event n is finished when its event is chosen, its question answered and its level picked.
+  function stepDone(n, st){
+    st = st || state;
+    if(n < 2) return true;
+    var slot = SLOTS.indexOf(n);
+    if(slot > -1 && (!st.deck[slot] || (st.deck[slot] === 'own' && !String(st['own' + n] || '').trim()))) return false;
+    if(MCQ[n] && !st[MCQ[n].key]) return false;
+    return !!st.tags[n];
+  }
+  function maxReach(st){ var n = 0; while(n < 6 && stepDone(n, st)) n++; return n; }
+  function stillNeeded(n){
+    var out = [];
+    if(SLOTS.indexOf(n) > -1 && !deckFor(n)) out.push('choose an event');
+    if(deckFor(n) === 'own' && !state['own' + n].trim()) out.push('write your event');
+    if(MCQ[n] && !state[MCQ[n].key]) out.push('answer the question');
+    if(!state.tags[n]) out.push('choose a psychological level');
+    return out;
+  }
+  // Rows reached so far: every row whose card exists, and the current one.
+  function reached(){ var r = Math.max(state.step, 1); for(var i = 2; i < 7; i++) if(state.concept[i]) r = Math.max(r, i); return r; }
+  // Once an event has been reached it stays open, even if an earlier answer is later cleared.
+  function reachable(){ return Math.max(maxReach(), reached()); }
+  function cardLocked(){ return !!MCQ[state.step] && !state[MCQ[state.step].key]; }
+  function deckItem(id){ for(var i = 0; i < DECK.length; i++) if(DECK[i].id === id) return DECK[i]; return null; }
+  function eventText(step){
+    if(FIXED[step]) return FIXED[step].text;
+    var d = deckFor(step);
+    if(d === 'own') return state['own' + step] || '(your own event, not written yet)';
+    return d ? deckItem(d).text : '';
+  }
+  function tagLabel(id){ for(var i = 0; i < TAGS.length; i++) if(TAGS[i].id === id) return TAGS[i].label; return ''; }
+
+  /* ---------------- build once ---------------- */
+  GUESS.forEach(function(o){
+    var lab = document.createElement('label'), r = document.createElement('input'), t = document.createElement('span');
+    r.type = 'radio'; r.name = 'guess'; r.value = o.value; t.textContent = o.label;
+    r.addEventListener('change', function(){ change({ guess:o.value }, 'Prediction recorded: ' + o.label + '.'); });
+    lab.appendChild(r); lab.appendChild(t); $('guessOpts').appendChild(lab);
+  });
+  Object.keys(MCQ).forEach(function(n){
+    var q = MCQ[n];
+    q.options.forEach(function(o){
+      var lab = document.createElement('label'), r = document.createElement('input'), t = document.createElement('span');
+      r.type = 'radio'; r.name = q.key; r.value = o.value; t.textContent = o.label;
+      r.addEventListener('change', function(){ var p = {}; p[q.key] = o.value; change(p, 'Answer chosen: ' + o.label + '. ' + (o.right ? 'Right.' : 'Not quite.')); });
+      lab.appendChild(r); lab.appendChild(t); $('mcOpts' + n).appendChild(lab);
+    });
+  });
+  AGES.forEach(function(age, i){
+    var li = document.createElement('li'), b = document.createElement('button');
+    b.type = 'button'; b.id = 'step' + i;
+    b.innerHTML = 'Event ' + (i + 1) + '<small>' + age + '</small>';
+    b.addEventListener('click', function(){ goTo(i); });
+    li.appendChild(b); $('steps').appendChild(li);
+  });
+  DECK.forEach(function(d){
+    var b = document.createElement('button');
+    b.type = 'button'; b.id = 'deck_' + d.id; b.textContent = d.text; b.setAttribute('aria-pressed', 'false');
+    b.addEventListener('click', function(){ pickDeck(d.id); });
+    $('deck').appendChild(b);
+  });
+  (function(){
+    var b = document.createElement('button');
+    b.type = 'button'; b.id = 'deck_own'; b.textContent = 'Write our own event'; b.setAttribute('aria-pressed', 'false');
+    b.addEventListener('click', function(){ pickDeck('own'); });
+    $('deck').appendChild(b);
+  })();
+  // One text box per row (shown only on its row), so a teammate's cursor survives every update.
+  SLOTS.forEach(function(k){
+    var wrap = document.createElement('div'); wrap.id = 'ownWrap' + k; wrap.hidden = true;
+    wrap.innerHTML = '<label for="own' + k + '">Your event <span class="guide">(one or two sentences)</span></label><textarea id="own' + k + '"></textarea>';
+    $('ownField').appendChild(wrap);
+  });
+  EDITABLE.forEach(function(k){
+    var wrap = document.createElement('div'); wrap.id = 'noteWrap' + k; wrap.hidden = true;
+    wrap.innerHTML = '<label for="note' + k + '">Notes: why does this event lead the child to update the concept? <span class="guide">(1–3 sentences)</span></label><textarea id="note' + k + '"></textarea>';
+    $('noteFields').appendChild(wrap);
+  });
+  (function(){
+    var o = document.createElement('option'); o.value = ''; o.textContent = 'Choose one…'; $('tagSel').appendChild(o);
+    TAGS.forEach(function(t){ var o = document.createElement('option'); o.value = t.id; o.textContent = t.label; $('tagSel').appendChild(o); });
+  })();
+  ['s1', 's2'].forEach(function(key, n){
+    var box = document.createElement('div'); box.className = 'sense'; box.id = 'sense_' + key;
+    var h = document.createElement('h4'); h.id = 'senseHead_' + key; box.appendChild(h);
+    var g1 = document.createElement('p'); g1.className = 'glabel'; g1.textContent = 'Only these foods (tick none for any food):'; box.appendChild(g1);
+    var foods = document.createElement('div'); foods.className = 'chk';
+    FOODS.forEach(function(f){
+      var lab = document.createElement('label'), c = document.createElement('input');
+      c.type = 'checkbox'; c.id = key + '_' + f.id;
+      c.addEventListener('change', function(){ editSense(key, function(s){
+        s.foods = FOODS.map(function(x){ return x.id; }).filter(function(id){ return id === f.id ? c.checked : s.foods.indexOf(id) > -1; });
+      }, (c.checked ? 'Added ' : 'Removed ') + f.label + '.'); });
+      lab.appendChild(c); lab.appendChild(document.createTextNode(f.label)); foods.appendChild(lab);
+    });
+    box.appendChild(foods);
+    var g2 = document.createElement('p'); g2.className = 'glabel'; g2.textContent = 'It must also be:'; box.appendChild(g2);
+    var when = document.createElement('div'); when.className = 'chk';
+    [['morning', 'eaten in the morning'], ['first', 'the first meal after sleep']].forEach(function(pair){
+      var lab = document.createElement('label'), c = document.createElement('input');
+      c.type = 'checkbox'; c.id = key + '_' + pair[0];
+      c.addEventListener('change', function(){ editSense(key, function(s){ s[pair[0]] = c.checked; }, (c.checked ? 'Now required: ' : 'No longer required: ') + pair[1] + '.'); });
+      lab.appendChild(c); lab.appendChild(document.createTextNode(pair[1])); when.appendChild(lab);
+    });
+    box.appendChild(when);
+    $('senses').appendChild(box);
+  });
+  PROBES.forEach(function(p){
+    var tr = document.createElement('tr'); tr.id = 'probe_' + p.id;
+    tr.innerHTML = '<td><span class="ptext"></span><br><span class="heard" hidden></span></td><td><span class="pill"></span><span class="why"></span><span class="flip" hidden></span></td>';
+    tr.querySelector('.ptext').textContent = p.text;
+    $('probeBody').appendChild(tr);
+  });
+
+  /* ---------------- actions ---------------- */
+  function goTo(i){
+    if(i < 0 || i > 6 || i === state.step || (i > state.step && i > reachable())) return;
+    change({ step:i, concept: filledTo(i) }, 'Event ' + (i + 1) + ', age ' + AGES[i] + ': ' + eventText(i));
+  }
+  function pickDeck(id){
+    var i = SLOTS.indexOf(state.step); if(i < 0) return;
+    var d = state.deck.slice(); d[i] = d[i] === id ? '' : id;
+    change({ deck:d }, d[i] ? 'Event chosen: ' + eventText(state.step) : 'Event cleared.');
+  }
+  function editSense(key, fn, msg){
+    if(EDITABLE.indexOf(state.step) < 0 || cardLocked()) return;
+    var cs = filledTo(state.step), c = cs[state.step];
+    if(!c[key]) return;
+    fn(c[key]);
+    change({ concept:cs, searched:false }, msg + ' ' + conceptText(c));
+  }
+  $('addSense').addEventListener('click', function(){
+    if(EDITABLE.indexOf(state.step) < 0 || cardLocked()) return;
+    var cs = filledTo(state.step); if(cs[state.step].s2) return;
+    cs[state.step].s2 = emptySense();
+    change({ concept:cs }, 'Second meaning added. Tick its features.');
+  });
+  $('dropSense').addEventListener('click', function(){
+    if(EDITABLE.indexOf(state.step) < 0 || cardLocked()) return;
+    var cs = filledTo(state.step); cs[state.step].s2 = null;
+    change({ concept:cs }, 'Second meaning removed. ' + conceptText(cs[state.step]));
+  });
+  $('tagSel').addEventListener('change', function(e){
+    if(EDITABLE.indexOf(state.step) < 0) return;
+    var t = state.tags.slice(); t[state.step] = e.target.value;
+    change({ tags:t }, e.target.value ? 'Level chosen: ' + tagLabel(e.target.value) + '.' : 'Level cleared.');
+  });
+  RESP.forEach(function(k){ $(k).addEventListener('input', function(e){ var p = {}; p[k] = e.target.value; change(p); }); });
+  $('prevBtn').addEventListener('click', function(){ goTo(state.step - 1); });
+  $('nextBtn').addEventListener('click', function(){ goTo(state.step + 1); });
+  $('finishBtn').addEventListener('click', function(){
+    if(!stepDone(6)) return;
+    change({ revealed:true }, 'Comparison with the family shown below.');
+    // Only the screen that clicked scrolls; teammates see the card appear.
+    var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    $('revealCard').scrollIntoView({ behavior: still ? 'auto' : 'smooth', block:'start' });
+  });
+  $('searchBtn').addEventListener('click', function(){ change({ searched:true }, 'Every one-meaning card tried: none agrees with the family on all six cases.'); });
+
+  function searchText(){
+    var cards = oneSenseCards(), best = 0;
+    cards.forEach(function(c){ best = Math.max(best, matchCount(c)); });
+    return 'We tried all ' + cards.length + ' one-meaning cards this page allows. The best gets ' + best + ' of the ' + PROBES.length +
+      ' cases right; none says yes to both the sibling’s 1 PM sandwich and the waffles at dinner. A card that requires the first meal after sleep rules out dinner; a card that allows dinner has to rely on foods alone, and then the sibling’s sandwich is out. A two-meaning card can get all six: (1) the first meal after sleep; or (2) cereal, pancakes & waffles, or eggs & toast.';
+  }
+
+  /* ---------------- render ---------------- */
+  function render(){
+    var k = state.step, c = cur(), prev = prevConcept(), editable = EDITABLE.indexOf(k) > -1;
+    Array.prototype.forEach.call(document.querySelectorAll('input[name="guess"]'), function(r){ r.checked = r.value === state.guess; });
+    var reach = reachable();
+    AGES.forEach(function(a, i){
+      var b = $('step' + i);
+      if(i === k) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current');
+      b.disabled = i > reach && i > k;
+    });
+
+    // the event
+    $('stepHead').innerHTML = '';
+    $('stepHead').appendChild(document.createTextNode('Event ' + (k + 1) + ' · age ' + AGES[k]));
+    if(k < 2){ var w = document.createElement('span'); w.className = 'worked'; w.textContent = 'worked example'; $('stepHead').appendChild(w); }
+    var slot = SLOTS.indexOf(k) > -1, d = deckFor(k);
+    $('eventWho').textContent = FIXED[k] ? FIXED[k].who : 'Your choice';
+    $('eventText').textContent = slot && !d ? 'Choose an event below.' : eventText(k);
+    $('deckBox').hidden = !slot;
+    if(slot){
+      DECK.concat([{ id:'own' }]).forEach(function(x){
+        var b = $('deck_' + x.id), usedElsewhere = x.id !== 'own' && state.deck.some(function(v, i){ return v === x.id && SLOTS[i] !== k; });
+        b.setAttribute('aria-pressed', d === x.id ? 'true' : 'false');
+        b.disabled = usedElsewhere;
+      });
+      $('ownField').hidden = d !== 'own';
+    }
+    SLOTS.forEach(function(s){ $('ownWrap' + s).hidden = !(s === k && d === 'own'); });
+    EDITABLE.forEach(function(s){ $('noteWrap' + s).hidden = s !== k; });
+    RESP.forEach(function(key){ if($(key).value !== state[key]) $(key).value = state[key]; });
+
+    // the question at a fixed event
+    var q = MCQ[k];
+    $('mcBox').hidden = !q;
+    [5, 6].forEach(function(n){ $('mcOpts' + n).hidden = n !== k; });
+    Object.keys(MCQ).forEach(function(n){
+      Array.prototype.forEach.call(document.querySelectorAll('input[name="' + MCQ[n].key + '"]'), function(r){ r.checked = r.value === state[MCQ[n].key]; });
+    });
+    if(q){
+      var chosen = mcOption(k, state[q.key]);
+      $('mcQ').textContent = q.q;
+      $('mcFb').className = 'mcfb' + (chosen ? (chosen.right ? ' ok' : ' no') : '');
+      $('mcFb').textContent = chosen ? chosen.fb : '';
+    }
+
+    // level and notes
+    $('tagSel').value = state.tags[k];
+    $('tagSel').disabled = !editable;
+    $('workedNote').hidden = editable;
+    $('workedNote').textContent = editable ? '' : 'Notes: ' + FIXED[k].note;
+    var reading = FIXED[k] && FIXED[k].reading ? FIXED[k].reading : (d && d !== 'own' ? deckItem(d).reading : '');
+    $('reading').hidden = !(editable && reading && state.tags[k]);
+    $('reading').textContent = reading;
+
+    // the concept card
+    $('cardSet').disabled = !editable || cardLocked();
+    $('cardLock').hidden = !cardLocked();
+    ['s1', 's2'].forEach(function(key, n){
+      var s = c[key];
+      $('sense_' + key).hidden = !s;
+      $('senseHead_' + key).textContent = c.s2 ? 'Meaning ' + (n + 1) : 'Its meaning';
+      if(!s) return;
+      FOODS.forEach(function(f){ $(key + '_' + f.id).checked = s.foods.indexOf(f.id) > -1; });
+      $(key + '_morning').checked = s.morning;
+      $(key + '_first').checked = s.first;
+    });
+    $('addSense').hidden = !!c.s2 || !editable || cardLocked();
+    $('dropSense').hidden = !c.s2 || !editable || cardLocked();
+    $('says').innerHTML = '';
+    var b = document.createElement('b'); b.textContent = conceptText(c); $('says').appendChild(b);
+
+    // the six cases
+    PROBES.forEach(function(p){
+      var tr = $('probe_' + p.id), v = verdict(c, p), pv = prev ? verdict(prev, p) : null;
+      var pill = tr.querySelector('.pill');
+      pill.className = 'pill ' + v.v; pill.textContent = v.v === 'yes' ? 'Yes' : v.v === 'no' ? 'No' : '?';
+      tr.querySelector('.why').textContent = v.why;
+      var flipped = pv && pv.v !== v.v;
+      tr.querySelector('.flip').hidden = !flipped;
+      tr.querySelector('.flip').textContent = flipped ? 'changed: was ' + (pv.v === 'yes' ? 'Yes' : pv.v === 'no' ? 'No' : '?') : '';
+      var heard = p.event !== undefined && k >= p.event;
+      tr.querySelector('.heard').hidden = !heard;
+      tr.querySelector('.heard').textContent = heard ? 'The family called this breakfast (event ' + (p.event + 1) + ')' : '';
+      tr.classList.toggle('hot', p.event === k);
+    });
+
+    $('prevBtn').disabled = k === 0;
+    $('nextBtn').hidden = k === 6;
+    $('nextBtn').disabled = k + 1 > reach;
+    $('finishBtn').hidden = k !== 6 || state.revealed;
+    $('finishBtn').disabled = !stepDone(6);
+    var need = (k < 6 ? k + 1 <= reach : stepDone(6) || state.revealed) ? [] : stillNeeded(k);
+    $('lockHint').textContent = need.length ? 'To ' + (k === 6 ? 'finish' : 'unlock event ' + (k + 2)) + ': ' + need.join(', ') + '.' : '';
+
+    renderSummary();
+    renderReveal();
+    renderFreeze();
+    $('live').textContent = state.said;
+  }
+  function renderSummary(){
+    var body = $('sumBody'), cs = state.concept;
+    body.innerHTML = '';
+    var last = reached();
+    AGES.forEach(function(age, i){
+      if(i > last) return;
+      var tr = document.createElement('tr');
+      var tag = state.tags[i] ? tagLabel(state.tags[i]) : '';
+      var note = FIXED[i] && FIXED[i].note ? FIXED[i].note : state['note' + i] || '';
+      var ev = SLOTS.indexOf(i) > -1 && !deckFor(i) ? '—' : eventText(i);
+      [age, ev, null, cs[i] ? conceptText(cs[i]) : '—'].forEach(function(txt, j){
+        var td = document.createElement('td');
+        if(j === 0) td.className = 'age';
+        if(j === 2){
+          if(tag){ var s = document.createElement('span'); s.className = 'tag'; s.textContent = tag; td.appendChild(s); td.appendChild(document.createElement('br')); }
+          td.appendChild(document.createTextNode(note || (tag ? '' : '—')));
+        } else td.textContent = txt;
+        tr.appendChild(td);
+      });
+      body.appendChild(tr);
+    });
+  }
+  function renderReveal(){
+    $('revealCard').hidden = !state.revealed;
+    if(!state.revealed) return;
+    var c = state.concept[6] || filledTo(6)[6], n = matchCount(c);
+    var wrong = PROBES.filter(function(p){ var v = verdict(c, p).v; return !((v === 'yes') === p.family && v !== 'unk'); });
+    $('revScore').textContent = 'Your final card agrees with the family on ' + n + ' of ' + PROBES.length + ' cases.';
+    $('revDetail').textContent = !wrong.length ? 'It says yes to both things the family called breakfast and no to the bedtime snack.' :
+      'Where it parts company: ' + wrong.map(function(p){ return p.text.charAt(0).toLowerCase() + p.text.slice(1) + ' (the family would say ' + (p.family ? 'yes' : 'no') + ')'; }).join('; ') + '.';
+    var g = state.guess;
+    $('revGuess').textContent = !g ? 'You did not record a prediction.' :
+      g === 'several' ? 'You predicted that the word would end up meaning more than one thing. That is where the family’s usage leads.' :
+      'You predicted “' + GUESS.filter(function(o){ return o.value === g; })[0].label.toLowerCase() + '”. On its own, that meaning cannot cover everything the family called breakfast.';
+    $('searchOut').hidden = !state.searched;
+    $('searchOut').textContent = state.searched ? searchText() : '';
+    $('searchBtn').hidden = state.searched;
+  }
+
+  /* ---------------- cleaning what arrives from a shared session ---------------- */
+  function cleanSense(s){
+    if(!s || typeof s !== 'object') return null;
+    var foods = Array.isArray(s.foods) ? FOODS.map(function(f){ return f.id; }).filter(function(id){ return s.foods.indexOf(id) > -1; }) : [];
+    return { foods:foods, morning:s.morning === true, first:s.first === true };
+  }
+  function clean(k, v){
+    if(RESP.indexOf(k) > -1) return typeof v === 'string' ? v.slice(0, 4000) : undefined;
+    if(k === 'guess') return v === '' || GUESS.some(function(o){ return o.value === v; }) ? v : undefined;
+    if(k === 'step') return typeof v === 'number' && v >= 0 && v <= 6 && Math.floor(v) === v ? v : undefined;
+    if(k === 'concept'){
+      if(!Array.isArray(v)) return undefined;
+      return [0, 1, 2, 3, 4, 5, 6].map(function(i){
+        if(i < 2) return cloneC(WORKED[i]);
+        var c = v[i]; if(!c || typeof c !== 'object') return null;
+        return { s1: cleanSense(c.s1) || emptySense(), s2: cleanSense(c.s2) };
+      });
+    }
+    if(k === 'tags'){
+      if(!Array.isArray(v)) return undefined;
+      return [0, 1, 2, 3, 4, 5, 6].map(function(i){ return i < 2 ? FIXED[i].tag : (TAGS.some(function(t){ return t.id === v[i]; }) ? v[i] : ''); });
+    }
+    if(k === 'deck'){
+      if(!Array.isArray(v)) return undefined;
+      var seen = {};
+      return [0, 1, 2].map(function(i){
+        var x = v[i]; if(x === 'own') return 'own';
+        if(!deckItem(x) || seen[x]) return ''; seen[x] = true; return x;
+      });
+    }
+    if(k === 'mc6') return v === '' || mcOption(5, v) ? v : undefined;
+    if(k === 'mc7') return v === '' || mcOption(6, v) ? v : undefined;
+    if(k === 'revealed' || k === 'searched') return typeof v === 'boolean' ? v : undefined;
+    if(k === 'said') return typeof v === 'string' ? v.slice(0, 400) : undefined;
+    if(k === 'frozenBy') return typeof v === 'string' ? v.slice(0, 16) : undefined;
+  }
+
+  /* ---------------- instructor freeze ---------------- */
+  // Typing the course code freezes the page for everyone else in the room. frozenBy is
+  // shared; ME belongs to this screen only, so the instructor's own screen stays live.
+  // Entering the code again (say, after a reload) hands the freeze to this screen.
+  var FREEZE_CODE = 'CS350';
+  var ME = Math.random().toString(36).slice(2, 10);
+  function renderFreeze(){
+    var mine = state.frozenBy !== '' && state.frozenBy === ME;
+    var held = state.frozenBy !== '' && !mine;
+    $('freezeNote').textContent = mine ? 'Frozen for your room.' : held ? 'Paused by your professor.' : '';
+    $('freezeForm').hidden = mine;
+    $('unfreezeBtn').hidden = !mine;
+    document.querySelector('.wrap').inert = held;
+    document.documentElement.classList.toggle('frozen', held);
+  }
+  // The platform's sandbox blocks form submission, so Enter and the button call this directly.
+  function tryFreeze(){
+    var box = $('freezeCode'), typed = box.value.trim();
+    if(!typed) return;
+    box.value = '';
+    var ok = typed.toUpperCase() === FREEZE_CODE;
+    box.setAttribute('aria-invalid', ok ? 'false' : 'true');
+    if(ok) change({ frozenBy: ME }, 'Your professor paused the page.');
+  }
+  $('freezeCode').addEventListener('keydown', function(e){ if(e.key === 'Enter'){ e.preventDefault(); tryFreeze(); } });
+  $('freezeBtn').addEventListener('click', tryFreeze);
+  $('unfreezeBtn').addEventListener('click', function(){ change({ frozenBy: '' }, 'Your professor unpaused the page.'); });
+
+  /* ---------------- contract ---------------- */
+  var familyCard = { s1:{ foods:[], morning:false, first:true }, s2:{ foods:['cereal', 'pw', 'eggs'], morning:false, first:false } };
+  window.artifact = {
+    getState: getState,
+    // Merge and redraw; ignores unknown keys and invalid values, and never fires onChange.
+    setState: function(p){
+      Object.keys(p || {}).forEach(function(k){
+        if(!Object.prototype.hasOwnProperty.call(state, k)) return;
+        var v = clean(k, p[k]); if(v !== undefined) state[k] = v;
+      });
+      render();
+    },
+    onChange: function(fn){ listeners.push(fn); return function(){ listeners = listeners.filter(function(x){ return x !== fn; }); }; },
+    controls: [
+      { key:'guess', label:'Prediction: what will “breakfast” mean by age 6?', kind:'choice', options:[{ value:'', label:'Not answered' }].concat(GUESS) },
+      { key:'step', label:'Current event', kind:'range', min:0, max:6, step:1 },
+      { key:'mc6', label:MCQ[5].q, kind:'choice', options:[{ value:'', label:'Not answered' }].concat(MCQ[5].options.map(function(o){ return { value:o.value, label:o.label }; })) },
+      { key:'mc7', label:MCQ[6].q, kind:'choice', options:[{ value:'', label:'Not answered' }].concat(MCQ[6].options.map(function(o){ return { value:o.value, label:o.label }; })) },
+      { key:'revealed', label:'Compare with the family', kind:'toggle' },
+      { key:'searched', label:'Try every one-meaning card', kind:'toggle' }
+    ],
+    responses: [
+      { key:'own2', prompt:'Event 3 (age 18 months): your own event' },
+      { key:'own3', prompt:'Event 4 (age 2½ years): your own event' },
+      { key:'own4', prompt:'Event 5 (age 3½ years): your own event' },
+      { key:'note2', prompt:'Event 3: why does this event lead the child to update the concept?' },
+      { key:'note3', prompt:'Event 4: why does this event lead the child to update the concept?' },
+      { key:'note4', prompt:'Event 5: why does this event lead the child to update the concept?' },
+      { key:'note5', prompt:'Event 6 (the sibling who slept until 1 PM): why does this event lead the child to update the concept?' },
+      { key:'note6', prompt:'Event 7 (breakfast for dinner): why does this event lead the child to update the concept?' },
+      { key:'exit', prompt:'Choose another word a child has to build up this way, such as “dinner”, “weekend” or “home”. Describe one event that would give it a second meaning, and say what the two meanings are.' }
+    ],
+    assertions: [
+      { name:'No one-meaning card agrees with the family on all six cases', run:function(){ return oneSenseCards().every(function(c){ return matchCount(c) < PROBES.length; }); } },
+      { name:'The two-meaning card named in the reveal agrees on all six', run:function(){ return matchCount(familyCard) === PROBES.length; } },
+      { name:'The empty card answers “?” to every case', run:function(){ return PROBES.every(function(p){ return verdict(WORKED[0], p).v === 'unk'; }); } },
+      { name:'The apple-sauce card (event 2) says yes only to the bedtime snack: an overextension', run:function(){ return PROBES.every(function(p){ return (verdict(WORKED[1], p).v === 'yes') === (p.id === 'snack'); }); } },
+      { name:'The sibling’s 1 PM sandwich and the waffles at dinner are both breakfast for the family; the bedtime snack is not', run:function(){
+        var f = {}; PROBES.forEach(function(p){ f[p.id] = p.family; }); return f.lunch1 && f.waffles7 && !f.snack; } },
+      { name:'Every deck event and fixed event has a reading; deck ids are unique', run:function(){
+        var ids = DECK.map(function(d){ return d.id; });
+        return DECK.every(function(d){ return d.reading.length > 40; }) && FIXED[5].reading && FIXED[6].reading && ids.every(function(id, i){ return ids.indexOf(id) === i; }); } },
+      { name:'Every one-meaning card gets a non-empty description, and each case a verdict', run:function(){
+        return oneSenseCards().every(function(c){ return conceptText(c).length > 10 && PROBES.every(function(p){ return ['yes', 'no', 'unk'].indexOf(verdict(c, p).v) > -1; }); }); } },
+      { name:'Junk from a shared session is cleaned: worked rows stay fixed, unknown foods and duplicate deck picks are dropped', run:function(){
+        var c = clean('concept', [null, { s1:{ foods:['cereal'] } }, { s1:{ foods:['cereal', 'cake'], morning:'yes' }, s2:7 }]);
+        var d = clean('deck', ['book', 'book', 'nope']);
+        return c[1].s1.foods[0] === 'applesauce' && c[2].s1.foods.join() === 'cereal' && c[2].s1.morning === false && c[2].s2 === null && c[3] === null &&
+          d.join() === 'book,,' && clean('step', 9) === undefined && clean('step', 2.5) === undefined; } }
+    ],
+    referenceCases: []
+  };
+  window.artifact.assertions = window.artifact.assertions.concat([
+    { name:'Each question has exactly one right answer, and every answer has feedback', run:function(){
+      return [5, 6].every(function(n){ var o = MCQ[n].options; return o.filter(function(x){ return x.right; }).length === 1 && o.every(function(x){ return x.fb.length > 40; }); }); } },
+    { name:'The right answer at event 6 matches the model: the 1 PM sandwich fits a card that requires only the first meal after sleep, and fails one that requires the morning or a food list', run:function(){
+      var p = PROBES[1], only = { s1:{ foods:[], morning:false, first:true }, s2:null };
+      return verdict(only, p).v === 'yes' && verdict({ s1:{ foods:[], morning:true, first:true }, s2:null }, p).v === 'no' && verdict({ s1:{ foods:['cereal', 'pw', 'eggs', 'applesauce'], morning:false, first:true }, s2:null }, p).v === 'no'; } },
+    { name:'Events unlock in order: a fresh page opens events 1 to 3 only; event 6 needs its question answered as well as a level', run:function(){
+      var st = getState(); st.deck = ['', '', '']; st.tags = ['segment', 'assoc', '', '', '', '', '']; st.mc6 = ''; st.mc7 = '';
+      if(maxReach(st) !== 2) return false;
+      st.deck = ['book', 'uncle', 'own']; st.own4 = 'A cousin calls cereal at bedtime breakfast.'; st.tags = ['segment', 'assoc', 'testimony', 'testimony', 'stats', 'pragmatics', ''];
+      if(maxReach(st) !== 5) return false;
+      st.mc6 = 'first'; if(maxReach(st) !== 6 || stepDone(6, st)) return false;
+      st.own4 = '  '; if(stepDone(4, st)) return false;
+      st.own4 = 'A cousin calls cereal at bedtime breakfast.'; return stepDone(4, st); } }
+  ]);
+  render();
+})();
+</script>
+
+<script>
+(function () {
+  var cfg = {"versionId":"cmvxyhf9b000008leglbojwmm","appOrigin":"https://ideasatplay.org","direct":null};
+  var t0 = Date.now(), scrolled = false, acted = false, reached = false, shown = false, config = null;
+  var framed = parent !== window;
+  function onScreen(el) {
+    if (!el.getClientRects().length) return false;
+    var r = el.getBoundingClientRect();
+    return r.top < innerHeight && r.bottom > 0;
+  }
+  function atBottom() {
+    var f = document.querySelector("footer[data-kc-credit]");
+    if (f) return f.getBoundingClientRect().top <= innerHeight;
+    var d = document.documentElement;
+    return scrollY + innerHeight >= d.scrollHeight - 48;
+  }
+  // { cur, last } when the page moves through numbered steps, else null.
+  function steps() {
+    var a = window.artifact;
+    try {
+      var c = a && Array.isArray(a.controls) ? a.controls.filter(function (x) { return x && x.key === "step" && typeof x.max === "number"; })[0] : null;
+      if (c) { var s = a.getState(); if (s && typeof s.step === "number") return { cur: s.step, last: c.max }; }
+    } catch (e) {}
+    var cur = document.querySelector('[aria-current="step"]');
+    if (cur && cur.parentElement) {
+      var sib = Array.prototype.filter.call(cur.parentElement.children, function (x) { return x.getClientRects().length; });
+      return { cur: sib.indexOf(cur), last: sib.length - 1 };
+    }
+    return null;
+  }
+  function finished() {
+    var mark = document.querySelector("[data-kc-end]");
+    if (mark) return onScreen(mark);
+    var s = steps();
+    if (s) return s.cur >= s.last && atBottom();
+    return atBottom() && (scrolled || (acted && Date.now() - t0 > 60000));
+  }
+  // The student link remembers a rating in its own storage where the browser allows it.
+  var KEY = "kc-rated-" + cfg.versionId;
+  function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
+  if (cfg.direct) config = { ask: !store(KEY), preview: false, labels: cfg.direct.labels };
+  var visitor = (function () {
+    var v = store("kc-visitor");
+    if (!v) { v = ""; for (var i = 0; i < 24; i++) v += "abcdefghijklmnopqrstuvwxyz0123456789".charAt(Math.floor(Math.random() * 36)); store("kc-visitor", v); }
+    return v;
+  })();
+  var pending = {}, seq = 0;
+  function save(score, comment) {
+    if (cfg.direct) {
+      var body = { versionId: cfg.versionId, score: score, context: "share", visitor: visitor };
+      if (comment) body.comment = comment;
+      // text/plain: a simple request, so no preflight is needed.
+      return fetch(cfg.direct.endpoint, { method: "POST", credentials: "omit", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(body) })
+        .then(function (r) { if (r.ok) store(KEY, String(score)); return r.ok; }, function () { return false; });
+    }
+    return new Promise(function (resolve) {
+      var id = ++seq; pending[id] = resolve;
+      parent.postMessage({ type: "kc:rate", versionId: cfg.versionId, id: id, score: score, comment: comment || "" }, cfg.appOrigin);
+      setTimeout(function () { if (pending[id]) { delete pending[id]; resolve(false); } }, 15000);
+    });
+  }
+  var B = "display:inline-block;margin:3px 6px 3px 0;padding:4px 10px;border:1px solid #a8a29e;border-radius:6px;background:#fff;color:#1c1917;font:inherit;cursor:pointer";
+  function el(tag, attrs, text) { var e = document.createElement(tag); for (var k in attrs) e.setAttribute(k, attrs[k]); if (text) e.textContent = text; return e; }
+  function show() {
+    if (shown || !config || !config.ask) return;
+    shown = true;
+    clearInterval(timer);
+    var L = config.labels;
+    var box = el("div", { "data-kc-rating": "", "data-kc-personal": "", role: "region", "aria-label": L.ask, lang: L.lang, dir: L.dir,
+      style: "box-sizing:border-box;max-width:760px;margin:24px auto 0;padding:10px 14px;border:1px solid #d6d3d1;border-radius:10px;background:#fafaf9;color:#1c1917;font:14px/1.5 system-ui,-apple-system,sans-serif;text-align:start" });
+    var live = el("div", { "aria-live": "polite" });
+    box.appendChild(live);
+    function ask(msg) {
+      live.innerHTML = "";
+      live.appendChild(el("span", { style: "font-weight:600;margin-inline-end:8px" }, L.ask));
+      [1, 2, 3].forEach(function (s) {
+        var b = el("button", { type: "button", style: B }, s + " · " + L["s" + s]);
+        b.addEventListener("click", function () {
+          live.querySelectorAll("button").forEach(function (x) { x.disabled = true; });
+          save(s, "").then(function (ok) { if (ok) comment(s); else ask(L.error); });
+        });
+        live.appendChild(b);
+      });
+      if (config.preview) live.appendChild(el("div", { style: "font-size:12px;color:#57534e" }, L.preview));
+      if (msg) live.appendChild(el("div", { role: "alert", style: "color:#991b1b;font-size:13px" }, msg));
+    }
+    function comment(score) {
+      live.innerHTML = "";
+      var id = "kc-rate-comment";
+      live.appendChild(el("label", { for: id, style: "display:block;font-weight:600;margin-bottom:4px" }, L.comment));
+      var row = el("div", { style: "display:flex;flex-wrap:wrap;gap:6px;align-items:center" });
+      var input = el("input", { id: id, type: "text", maxlength: "1000", autocomplete: "off", dir: "auto",
+        style: "flex:1 1 260px;min-width:0;box-sizing:border-box;padding:5px 8px;border:1px solid #a8a29e;border-radius:6px;background:#fff;color:#1c1917;font:inherit" });
+      var send = el("button", { type: "button", style: B + ";background:#292524;color:#fff;border-color:#292524" }, L.send);
+      var skip = el("button", { type: "button", style: B }, L.skip);
+      function done() { live.innerHTML = ""; live.appendChild(el("span", { style: "font-weight:600" }, L.thanks)); setTimeout(function () { box.remove(); }, 2000); }
+      send.addEventListener("click", function () {
+        var text = input.value.trim();
+        if (!text) return done();
+        send.disabled = skip.disabled = true;
+        save(score, text).then(function (ok) { if (ok) done(); else { send.disabled = skip.disabled = false; live.appendChild(el("div", { role: "alert", style: "color:#991b1b;font-size:13px" }, L.error)); } });
+      });
+      input.addEventListener("keydown", function (e) { if (e.key === "Enter") send.click(); });
+      skip.addEventListener("click", done);
+      row.appendChild(input); row.appendChild(send); row.appendChild(skip);
+      live.appendChild(row);
+      input.focus();
+    }
+    ask("");
+    var mark = document.querySelector("[data-kc-end]"), foot = document.querySelector("footer[data-kc-credit]");
+    if (mark) mark.insertAdjacentElement("afterend", box);
+    else if (foot) foot.parentNode.insertBefore(box, foot);
+    else document.body.appendChild(box);
+  }
+  function check() {
+    if (!reached && finished()) reached = true;
+    if (reached) show();
+  }
+  window.addEventListener("message", function (e) {
+    if (e.source !== parent || !e.data || e.data.versionId !== cfg.versionId) return;
+    var d = e.data;
+    if (d.type === "kc:rate-config" && !cfg.direct) { config = { ask: !!d.ask, preview: !!d.preview, labels: d.labels }; check(); }
+    if (d.type === "kc:rate-result" && pending[d.id]) { pending[d.id](!!d.ok); delete pending[d.id]; }
+  });
+  // The app page may start listening after this page loads: ask a few times.
+  var hellos = 0;
+  function hello() { if (framed && !cfg.direct && !config && hellos++ < 8) parent.postMessage({ type: "kc:rate-hello", versionId: cfg.versionId }, cfg.appOrigin); }
+  hello();
+  var timer = setInterval(function () { if (hellos < 8 && !config) hello(); check(); }, 800);
+  window.addEventListener("scroll", function () { if (scrollY > 0) scrolled = true; check(); }, { passive: true });
+  ["click", "input", "keydown"].forEach(function (t) { document.addEventListener(t, function (e) { if (e.target && e.target.closest && e.target.closest("[data-kc-rating]")) return; acted = true; setTimeout(check, 50); }, true); });
+})();
+</script></body>
+</html>

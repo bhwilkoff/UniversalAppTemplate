@@ -8,7 +8,7 @@ import { join } from 'node:path';
 import { createRequire } from 'node:module';
 
 const ROOT = new URL('../../', import.meta.url).pathname;
-const SKIP = /^(research|tools|design|supabase|node_modules|\.git|assets\/vendor|addon\/stage)\//;
+const SKIP = /^(research|tools|design|supabase|node_modules|\.git|assets\/vendor|assets\/ideas-at-play|addon\/stage)\//;
 function files(dir, ext, out = []) {
   for (const name of readdirSync(join(ROOT, dir))) {
     const rel = dir ? dir + '/' + name : name;
