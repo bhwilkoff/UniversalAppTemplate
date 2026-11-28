@@ -16,7 +16,7 @@
   function mount(o) {
     var box = o.root.querySelector('[data-state="open"]');
     var room = null, you = null, F = null, frameRole = null, online = true, ended = false, stageOn = false;
-    var words = null, works = null, myWork = null, wbMine = null, wbSaved = null, rankDraft = null, mine = null, tool = null, newSha = null, confirmEnd = false, watching = false;
+    var words = null, works = null, myWork = null, wbMine = null, wbSaved = null, rankDraft = null, lastWb = null, mine = null, tool = null, newSha = null, confirmEnd = false, watching = false;
     var plan = (function () { try { var x = JSON.parse(get(PLAN) || 'null'); return x && Array.isArray(x.parts) && x.parts.length ? x : null; } catch (e) { return null; } })();
     var talk = get(TALK) || R.STARTER, repo = R.repoOf(get(REPO) || ''), lobby = null, person = { name: o.name, member: o.member, github: o.github || '' };
     var status = el('p', 'small'); status.setAttribute('role', 'status');
@@ -30,7 +30,7 @@
       words: function (w) { words = w; drawNow(); },
       works: function (w) { works = w; drawNow(); },
       myWork: function (u) { myWork = u; drawNow(); },
-      wbMine: function (m) { wbMine = m; drawNow(); },
+      wbMine: function (m) { wbMine = m; if (room && room.workbook && room.workbook.id === m.id) lastWb = { w: room.workbook, a: m.a }; drawNow(); },
       wbAll: function (all) { keepAnswers(all); },
       talk: function (t) { roomDeck = t; drawNow(); drawTop(); drawSlides(); },
       mine: function (m) { mine = m; drawNow(); },
@@ -143,6 +143,7 @@
       var s = el('div', 'open-lobby');
       s.innerHTML = '<p class="addon-mark"><span class="visually-hidden">Human Shaped</span><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></p>';
       s.appendChild(el('h1', null, ended ? 'That session has ended.' : 'Teach this call together.'));
+      if (ended && lastWb) closedWorkbook(s, lastWb.w, lastWb.a);
       s.appendChild(el('p', 'small', 'Slides, questions, a vote on ideas, and websites you build, for everyone here.'));
       var input = field('input', 'Your name', client.name());
       input.maxLength = 60; input.autocomplete = 'name';
@@ -338,7 +339,7 @@
       if (!P || !D) return say('Drive is not available here.');
       var csv = P.answersCsv(all), name = all.title + ' answers ' + new Date().toISOString().slice(0, 10) + '.csv';
       D.connect().then(function (token) { return D.file(token, name, csv, 'text/csv'); }).then(function (file) {
-        wbSaved = { id: all.id, file: file }; say('Saved in your Drive: ' + L.counted(all.people.length, 'person', 'people') + '.'); nowKey = null; drawNow();
+        wbSaved = { id: all.id, file: file }; say('Saved in your Drive: ' + L.counted(all.people.length, 'person', 'people') + '.'); nowKey = null; drawNow(); if (F && F.current() === 'people') drawPeople();
       }, function (e) { say(e.message); });
     }
     function workbookGuest(pane) {
@@ -387,9 +388,13 @@
         }
         box.appendChild(part);
       });
-      // Meet's panel frame cannot download, so the copy opens in its own
-      // window, where it can be saved or copied (found in a real call).
-      box.appendChild(btn('Keep a copy', 'btn-secondary', function () {
+      box.appendChild(btn('Keep a copy', 'btn-secondary', function () { keepCopy(w, a); }));
+      pane.appendChild(box);
+    }
+    // Meet's panel frame cannot download, so the copy opens in its own
+    // window, where it can be saved or copied (found in a real call).
+    function keepCopy(w, a) {
+      (function () {
         var md = window.SessionPlan ? window.SessionPlan.myCopy(w, a) : '';
         var name = w.title.replace(/[^A-Za-z0-9 ._-]+/g, '').trim().slice(0, 80) + '.md';
         var win = window.open('', '_blank');
@@ -404,7 +409,15 @@
         link.href = 'data:text/markdown;charset=utf-8,' + encodeURIComponent(md);
         d.body.appendChild(link);
         var pre = d.createElement('pre'); pre.textContent = md; d.body.appendChild(pre);
-      }));
+      })();
+    }
+    // A closed workbook, or one from a session that ended, can still be kept
+    // by the person who answered it: answers live only in the room.
+    function closedWorkbook(pane, w, a) {
+      var box = el('section', 'p2-group open-workbook');
+      box.appendChild(el('h2', null, w.title));
+      box.appendChild(el('p', 'small', 'Closed. Your answers leave with the room when the call ends.'));
+      box.appendChild(btn('Keep a copy', 'btn-secondary', function () { keepCopy(w, a); }));
       pane.appendChild(box);
     }
     function hostNow(pane) {
@@ -465,6 +478,7 @@
       if (room.canTakeOver) pane.appendChild(btn('Take over as host', 'btn-secondary', function () { send({ t: 'claim' }); }));
       if (room.groups) groupsNow(pane, false);
       if (room.workbook && room.workbook.open) workbookGuest(pane);
+      else if (room.workbook && wbMine && wbMine.id === room.workbook.id) closedWorkbook(pane, room.workbook, wbMine.a);
       if (room.worksOpen) offerWork(pane);
       if (room.show === 'question' && room.question && room.question.open) return answer(pane);
       if (room.show === 'board') {
@@ -691,7 +705,7 @@
     // Tools
     // --------------------------------------------------------------
 
-    var TOOLS = [['question', 'Question', 'chats-circle'], ['board', 'Propose and vote', 'check-circle'], ['site', 'Show a website', 'globe-simple'], ['model', 'Give everyone a model', 'book-open-text'], ['work', 'Show your work', 'app-window'], ['groups', 'Breakout rooms', 'door-open'], ['draw', 'Draw together', 'pencil-simple-line'], ['clock', 'Clock', 'clock'], ['message', 'Message', 'megaphone-simple'], ['clear', 'Clear stage', 'eye-slash']];
+    var TOOLS = [['question', 'Question', 'chats-circle'], ['board', 'Propose and vote', 'check-circle'], ['site', 'Show a website', 'globe-simple'], ['model', 'Give everyone a model', 'book-open-text'], ['work', 'Show your work', 'app-window'], ['groups', 'Breakout rooms', 'door-open'], ['draw', 'Draw together', 'pencil-simple-line'], ['workbook', 'Workbook', 'book-open-text'], ['clock', 'Clock', 'clock'], ['message', 'Message', 'megaphone-simple'], ['clear', 'Clear stage', 'eye-slash']];
     function drawTools() {
       var pane = F && F.pane('kit');
       if (!pane) return;
@@ -716,7 +730,7 @@
       head.appendChild(el('h2', null, TOOLS.filter(function (t) { return t[0] === tool; })[0][1]));
       pane.appendChild(head);
       var line = el('p', 'small'); line.setAttribute('role', 'status');
-      ({ draw: drawTool, groups: groupsTool, work: workTool, question: questionTool, board: boardTool, site: siteTool, model: modelTool, clock: clockTool, message: messageTool })[tool](pane, line);
+      ({ workbook: workbookTool, draw: drawTool, groups: groupsTool, work: workTool, question: questionTool, board: boardTool, site: siteTool, model: modelTool, clock: clockTool, message: messageTool })[tool](pane, line);
       pane.appendChild(line);
     }
     function done() { tool = null; drawTools(); F.show('now'); }
@@ -724,6 +738,29 @@
     // come to the host's Now, by name, and the host puts one on the stage.
     // The host makes a Meet call for each room (meet.new) and pastes the
     // links; everyone here but the host is dealt into them.
+    // A workbook from the session in hand, or a quick one written here: a
+    // question per line, each answered in words.
+    function workbookTool(pane, line) {
+      var mine = plan ? plan.parts.filter(function (p) { return p.kind === 'workbook'; }) : [];
+      if (room && room.workbook && !room.workbook.open) pane.appendChild(btn('Open ' + room.workbook.title + ' again', 'btn-secondary', function () { send({ t: 'workbook', open: true }); done(); }));
+      if (mine.length) {
+        var g = el('div', 'p2-group'); g.appendChild(el('h3', 'open-label', 'From this session'));
+        mine.forEach(function (p) { g.appendChild(btn(p.title, 'btn-secondary', function () { send({ t: 'workbook', title: p.title, blocks: p.blocks }); done(); })); });
+        pane.appendChild(g);
+      }
+      var f = el('form', 'open-add is-stack');
+      var t = field('input', 'Its name'); t.maxLength = 120;
+      var qs = field('textarea', 'Questions, one per line'); qs.rows = 4;
+      f.appendChild(t); f.appendChild(qs);
+      var s = el('button', 'btn-primary', 'Give everyone this workbook'); s.type = 'submit'; f.appendChild(s);
+      f.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var blocks = qs.value.split('\n').map(function (x) { return x.trim(); }).filter(Boolean).slice(0, 30).map(function (x) { return { type: 'free', text: x }; });
+        if (!blocks.length) return (line.textContent = 'Write at least one question.');
+        send({ t: 'workbook', title: t.value.trim() || 'A workbook', blocks: blocks }); done();
+      });
+      pane.appendChild(f);
+    }
     // One drawing on every stage that anyone in the call adds to.
     function drawTool(pane) {
       pane.appendChild(btn(room && room.show === 'draw' ? 'The drawing is up' : 'Put the drawing up', 'btn-primary', function () { send({ t: 'draw' }); done(); }));
@@ -968,6 +1005,11 @@
       pane.appendChild(g);
       var end = el('div', 'p2-group open-end');
       pane.appendChild(end);
+      var wb = room && room.workbook;
+      if (wb && room.wbCount && !(wbSaved && wbSaved.id === wb.id)) {
+        end.appendChild(el('p', 'small', L.counted(room.wbCount, 'person’s', 'people’s') + ' answers to ' + wb.title + ' are not saved. Ending erases them.'));
+        end.appendChild(btn('Save everyone’s answers to my Drive', 'btn-secondary', function () { say('Collecting the answers…'); send({ t: 'wbCollect' }); }));
+      }
       end.appendChild(btn(confirmEnd ? 'Yes, end it and erase the room' : 'End the session', 'btn-secondary', function () {
         if (!confirmEnd) { confirmEnd = true; return drawPeople(); }
         confirmEnd = false; send({ t: 'end' });
