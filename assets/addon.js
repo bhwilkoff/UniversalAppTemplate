@@ -142,8 +142,11 @@
     // 20261112060000). "Not now" goes on, and is remembered for this account.
     if (!GL || session.user.is_anonymous || laterFor(session.user.id)) return start(session);
     return db.from('profiles').select('github_login').eq('id', session.user.id).maybeSingle().then(function (p) {
-      if (!p.error && GL.needsGitHub(p.data)) return askForGitHub(session);
-      start(session);
+      if (p.error || !GL.needsGitHub(p.data)) return start(session);
+      // Only a cohort's own call asks for GitHub: there it is how a member's
+      // Google account finds their cohorts. Any other call is an open room,
+      // which needs no account at all (BUILDER-LOOP A5).
+      return strangerCall().then(function (code) { return code ? start(session) : askForGitHub(session); });
     }, function () { start(session); });
   }
   function laterKey(uid) { return 'hs-github-later-' + uid; }
