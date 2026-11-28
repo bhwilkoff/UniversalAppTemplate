@@ -3755,3 +3755,15 @@ html.stage-in-panel .stage-corner { display: none !important; }
 /* A cohort running its leaders' own course (schedule custom) hides what
    only the Human Shaped course has: apps, the path's stages, its lessons. */
 [data-own-course] [data-course-only] { display: none !important; }
+
+/* Ideas at Play in a call (ModelPicker): the picker, and the credit on the stage. */
+.model-search { width: 100%; margin-bottom: 0.5rem; }
+.model-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.35rem; max-height: 60vh; overflow-y: auto; }
+.model-pick { display: grid; width: 100%; text-align: left; gap: 0.1rem; padding: 0.55rem 0.7rem; border: 1px solid var(--rule); border-radius: 0.5rem; background: var(--card); color: var(--ink); cursor: pointer; font: inherit; }
+.model-pick:hover, .model-pick:focus-visible { border-color: var(--accent); }
+.model-title { font-weight: 600; }
+.model-by { color: var(--muted); font-size: 0.85rem; }
+.model-source { margin-top: 0.5rem; color: var(--muted); }
+.stage-app-frame { position: relative; }
+.stage-credit { position: absolute; left: 0.5rem; bottom: 0.5rem; margin: 0; padding: 0.2rem 0.5rem; border-radius: 0.35rem; background: rgba(22, 32, 25, 0.82); color: #fff; font-size: 0.75rem; }
+.stage-credit a { color: #fff; }

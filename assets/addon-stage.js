@@ -858,6 +858,16 @@
       f.setAttribute('sandbox', 'allow-scripts allow-forms allow-same-origin allow-popups allow-popups-to-escape-sandbox');
       f.setAttribute('allow', 'clipboard-write');
       f.src = p.url;
+      // A model from Ideas at Play is CC BY 4.0: its title, author, source,
+      // and licence show with it on every stage.
+      if (window.ModelPicker && window.ModelPicker.isModel(p.url)) window.ModelPicker.credit(p.url).then(function (c) {
+        if (!c || pageKey !== key) return;
+        var cr = el('p', 'stage-credit');
+        var a = document.createElement('a'); a.href = c.url; a.target = '_blank'; a.rel = 'noopener'; a.textContent = c.title;
+        cr.appendChild(a);
+        cr.appendChild(document.createTextNode((c.author ? ' by ' + c.author : '') + ', Ideas at Play, CC BY 4.0'));
+        box.appendChild(cr);
+      });
       return;
     }
     f.setAttribute('sandbox', 'allow-scripts allow-forms');

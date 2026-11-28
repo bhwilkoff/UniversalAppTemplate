@@ -1106,8 +1106,8 @@
       S.boardPin = el('div', 'actions'); S.boardTool.appendChild(S.boardPin);
       F.put('tools', S.boardTool);
       // Open rooms' tools, through the call's own room (CohortRoom).
-      S.svcSite = el('section', 'p2-group'); S.svcClock = el('section', 'p2-group'); S.svcVote = el('section', 'p2-group');
-      [S.svcSite, S.svcClock, S.svcVote].forEach(function (n) { n.hidden = true; F.put('tools', n); });
+      S.svcSite = el('section', 'p2-group'); S.svcModel = el('section', 'p2-group'); S.svcClock = el('section', 'p2-group'); S.svcVote = el('section', 'p2-group');
+      [S.svcSite, S.svcModel, S.svcClock, S.svcVote].forEach(function (n) { n.hidden = true; F.put('tools', n); });
       S.nowAsks = el('div', 'p2-asks'); S.nowAsks.hidden = true; F.pane('now').insertBefore(S.nowAsks, F.pane('now').firstChild);
       F.put('tools', S.frameTools);
       S.stageTools = stage; S.askTool = $('[data-ask-wrap]'); S.breakTool = $('[data-breakouts]');
@@ -1240,7 +1240,7 @@
     if (!S.svc) return;
     var typing = document.activeElement && document.activeElement.tagName === 'INPUT';
     if (S.teaching && S.svcSite) {
-      [[S.svcSite, 'siteTool'], [S.svcClock, 'clockTool'], [S.svcVote, 'voteTool']].forEach(function (x) {
+      [[S.svcSite, 'siteTool'], [S.svcModel, 'modelTool'], [S.svcClock, 'clockTool'], [S.svcVote, 'voteTool']].forEach(function (x) {
         if (typing && x[0].contains(document.activeElement)) return;
         x[0].replaceChildren(); x[0].hidden = false; S.svc[x[1]](x[0]);
       });
@@ -2574,7 +2574,7 @@
   function toolLabel(name) { return TOOL_LABELS[name] || name; }
   var TOOL_ICONS = { 'Main stage': 'app-window', 'Ask a question': 'chats-circle', 'Breakouts': 'users-three', 'Apps': 'laptop', 'A card for everyone': 'megaphone-simple',
     'Who is presenting': 'chalkboard-teacher', 'Waiting to show work': 'hand-tap', 'The board': 'palette', 'Questions': 'chat-circle-text', 'Recording': 'video-camera',
-    'Show a website': 'globe-simple', 'A clock': 'clock', 'Propose and vote': 'check-circle', 'Stances': 'hand-tap' };
+    'Show a website': 'globe-simple', 'Give everyone a model': 'book-open-text', 'A clock': 'clock', 'Propose and vote': 'check-circle', 'Stances': 'hand-tap' };
   function toolList() {
     var pane = S.frame.pane('tools'), out = [];
     function add(name, node, more) { if (node && !node.hidden && name) out.push(Object.assign({ name: name, node: node }, more || {})); }
@@ -2587,7 +2587,9 @@
     add('Main stage', S.stageTools, { on: !!S.stageOn }); add('Ask a question', S.askTool, { on: asked, off: newest ? function () { if (S.onStage && S.onStage.id === newest.id) setPin(null); changeCheck(newest, { state: 'closed' }); } : null, offLabel: 'Close it' });
     add('Breakouts', S.breakTool); add('The board', S.boardTool, { on: !!(S.onStage && S.onStage.kind === 'board'), off: unpin, offLabel: 'Take down' });
     if (S.appsBox && S.appsBox.childElementCount && S.cohort.schedule !== 'custom') add('Apps', S.appsBox, { on: !!(S.onStage && S.onStage.kind === 'item'), off: unpin, offLabel: 'Take down' });
-    add('Show a website', S.svcSite, { on: showing === 'page', off: function () { S.svc.takeDown(); }, offLabel: 'Take down' });
+    var modelUp = showing === 'page' && window.ModelPicker && room.page && window.ModelPicker.isModel(room.page.url);
+    add('Show a website', S.svcSite, { on: showing === 'page' && !modelUp, off: function () { S.svc.takeDown(); }, offLabel: 'Take down' });
+    add('Give everyone a model', S.svcModel, { on: !!modelUp, off: function () { S.svc.takeDown(); }, offLabel: 'Take down' });
     add('A clock', S.svcClock, { on: !!(room.on && room.clock), off: function () { S.svc.send({ t: 'clock', seconds: 0 }); }, offLabel: 'Stop' });
     add('Propose and vote', S.svcVote, { on: showing === 'board', off: function () { S.svc.takeDown(); }, offLabel: 'Take down' });
     // Stances turn on and off from their tile, with nothing to open.

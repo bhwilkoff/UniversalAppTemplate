@@ -31,6 +31,16 @@
     function showing() { return room && room.on && (room.show === 'page' || room.show === 'board') ? room.show : null; }
     function takeDown() { client.send({ t: 'show', show: 'welcome' }); }
 
+    // A model from Ideas at Play on every stage, a copy for each person.
+    function modelTool(box, done) {
+      if (window.ModelPicker) window.ModelPicker.mount(box, { send: send, done: done });
+      if (room && room.on && room.show === 'page' && room.page && window.ModelPicker && window.ModelPicker.isModel(room.page.url)) {
+        var row = el('div', 'actions');
+        row.appendChild(el('span', 'small', 'Showing ' + (room.page.name || 'a model')));
+        row.appendChild(btn('Take it down', 'btn-secondary small', takeDown));
+        box.appendChild(row);
+      }
+    }
     // Show a website: any link pasted whole, worked out as open rooms do.
     function siteTool(box, done) {
       var line = el('p', 'small'); line.setAttribute('role', 'status');
@@ -184,7 +194,7 @@
     function stance() { return stancesOpen() ? Object.assign({ open: true }, room.stance || {}) : null; }
 
     return { state: function () { return room; }, you: function () { return you; }, send: send, showing: showing, takeDown: takeDown,
-      siteTool: siteTool, clockTool: clockTool, voteTool: voteTool, learnerNow: learnerNow, stanceRow: stanceRow, stancesOpen: stancesOpen, setStances: setStances, mineStance: function () { return mineStance; },
+      siteTool: siteTool, modelTool: modelTool, clockTool: clockTool, voteTool: voteTool, learnerNow: learnerNow, stanceRow: stanceRow, stancesOpen: stancesOpen, setStances: setStances, mineStance: function () { return mineStance; },
       view: view, clockPart: clockPart, stance: stance, close: function () { client.close(); } };
   }
   window.CohortRoom = { start: start };

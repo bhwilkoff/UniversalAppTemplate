@@ -437,7 +437,7 @@
     // Tools
     // --------------------------------------------------------------
 
-    var TOOLS = [['question', 'Question', 'chats-circle'], ['board', 'Propose and vote', 'check-circle'], ['site', 'Show a website', 'globe-simple'], ['clock', 'Clock', 'clock'], ['message', 'Message', 'megaphone-simple'], ['clear', 'Clear stage', 'eye-slash']];
+    var TOOLS = [['question', 'Question', 'chats-circle'], ['board', 'Propose and vote', 'check-circle'], ['site', 'Show a website', 'globe-simple'], ['model', 'Give everyone a model', 'book-open-text'], ['clock', 'Clock', 'clock'], ['message', 'Message', 'megaphone-simple'], ['clear', 'Clear stage', 'eye-slash']];
     function drawTools() {
       var pane = F && F.pane('kit');
       if (!pane) return;
@@ -462,10 +462,12 @@
       head.appendChild(el('h2', null, TOOLS.filter(function (t) { return t[0] === tool; })[0][1]));
       pane.appendChild(head);
       var line = el('p', 'small'); line.setAttribute('role', 'status');
-      ({ question: questionTool, board: boardTool, site: siteTool, clock: clockTool, message: messageTool })[tool](pane, line);
+      ({ question: questionTool, board: boardTool, site: siteTool, model: modelTool, clock: clockTool, message: messageTool })[tool](pane, line);
       pane.appendChild(line);
     }
     function done() { tool = null; drawTools(); F.show('now'); }
+    // A model from Ideas at Play on every stage, a copy for each person (ModelPicker).
+    function modelTool(pane) { if (window.ModelPicker) window.ModelPicker.mount(pane, { send: send, done: done }); }
     // One choice from a few, as a row of buttons, so every choice is in sight.
     function choose(list, at, fn) {
       var row = el('div', 'open-picks is-row');
