@@ -115,6 +115,39 @@ where to look, or what to focus on.
   the panel; ending it reloads everyone's.
 - Each push to Pages cancels a deploy still running (shown as "errored"), so
   batch pushes.
+- Going Back in the panel and opening the add-on again from "Active" or
+  "Opened" keeps the **old panel frame**. To judge new panel code, start a
+  fresh call (meet.new) once the 10 minutes are up (measured 2026-11-28).
+
+## An add-on that needs no account (measured 2026-11-28)
+
+- **The room is the backend.** A small realtime room per call (a Cloudflare
+  Durable Object keyed by the Meet code) carries questions, votes, drawings,
+  workbook answers, and who is here. It is erased when the call ends, so
+  nothing personal outlives the call.
+- **Anything kept lives in the host's own Drive** through `drive.file`: a
+  whole planned session as one JSON file, slide pictures shared by link so
+  stages with no account can draw them, everyone's workbook answers as a CSV.
+  Save to the same file id, or every save makes a new file.
+- **Google's token window opens only from a click.** A file chooser's change
+  event does not count, and the window is refused ("could not open here").
+  Offer "Connect your Drive" as a button before any action that needs it.
+- **Answers that live only in the room need a way out.** Before the host ends
+  the session, name how many people's answers are unsaved, with Save; after a
+  question or workbook closes, and after the session ends, keep each person's
+  own copy on their panel (opened in a window, since the frame cannot download).
+- **Breakouts without Meet's API:** the host makes one call per room with
+  meet.new and pastes the links; the room deals everyone else into them. Keep
+  each person's **name from the moment of dealing**: once they leave for their
+  room they are no longer in the main call to be named. Tell people to leave
+  the main call first, and expect them to rejoin the activity when they come
+  back; key their answers to a secret on their device so rejoining restores them.
+- **Check framing when a page is offered, not when it is shown.** A page that
+  refuses framing (X-Frame-Options or frame-ancestors) draws as a broken frame
+  on every stage; tell the person who offered it, so they can share their screen.
+- **Test a crowd from the terminal.** A Node script that joins the room as a
+  panel and a stage per pretend person, answering, drawing, and pointing when
+  the room asks, turns a two-profile test into a four-person call.
 
 ## Fitting content to any stage
 

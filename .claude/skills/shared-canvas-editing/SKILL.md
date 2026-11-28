@@ -51,6 +51,30 @@ out in front of an audience. Every rule here came from a failure.
 7. **Any pen must be able to start anywhere.** A button drawn over the board
    swallows the first point of a stroke: let overlays take no pointer events
    while a drawing tool is on.
+8. **Check every incoming layer key.** One element whose fractional index is
+   not one Excalidraw could have made (a test script's "b2") makes
+   `reconcileElements` throw ("invalid order key"), and that page draws
+   nothing at all. Drop a malformed key so Excalidraw assigns a new one, and
+   retry the merge with every incoming key dropped if it still throws.
+
+## With no database: a room relays the drawing
+
+Where nobody has an account (a Meet call's own room, a Durable Object), the
+room is the settled copy:
+
+- The room merges by the same rule (higher version, then lower nonce) and
+  relays only what it accepted to **every other** stage, never back to the
+  sender.
+- A stage that opens late gets the whole drawing on joining. The frame holding
+  the canvas may load after that message, so the page around it keeps the
+  drawing and hands it over when the frame says it is ready.
+- Keep the drawing apart from the room's other state (its own storage key,
+  saved every few seconds at most), with a ceiling on elements and bytes, and
+  erase it when the call ends.
+- **Pointers are relayed and never kept**, throttled to about 150 ms per
+  person, sharing the drawing's rate limit, and taken away after five seconds
+  of silence. A stage often connects without a name; borrow it from the same
+  person's panel.
 
 ## One thing people touch is one element
 
