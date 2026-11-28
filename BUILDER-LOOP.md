@@ -95,7 +95,7 @@ by the Course Builder import or by SQL.
 - [ ] A4. Cohort-only tools in open rooms, on the worker: board,
   workbooks (answers in the room, saved to the host's Drive at the end),
   breakouts as room codes, feature someone, show your work.
-- [ ] A7. Pictures in a session saved to Drive: deck pictures live in
+- [x] A7. Pictures in a session saved to Drive: deck pictures live in
   the private deck-pictures bucket, which a no-account room cannot read,
   so they show as their words. Copy each into the host's Drive (link
   readable) on save and point the slide at it. Ben, November 28: "it is
@@ -308,3 +308,13 @@ breakout state.
   a click meant for the model; it now lets clicks through except on its
   link. Room ended. Not yet: two people in a real Meet call; cohort
   calls still fall back to a copy each.
+- 2026-11-28, tick 13 (A7, a44a9fc2). Saving a plan to Drive now copies
+  each slide picture (from the private deck-pictures bucket, by a signed
+  link) into the leader's Human Shaped sessions folder, shares it to
+  anyone with the link (Ben's yes), and points the slide at
+  drive.google.com/thumbnail?id=…&sz=w2000. **Verified:** Session 1
+  saved ("Saved in your Drive, 3 parts"); Drive holds the new session
+  file and e0887eec69a64a98.webp; the picture link answers 200
+  image/webp with no sign-in. Not yet seen: that slide drawing its
+  picture on a stage in a call. Each save makes a new file (no update in
+  place yet).
