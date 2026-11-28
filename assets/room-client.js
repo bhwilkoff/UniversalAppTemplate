@@ -44,6 +44,7 @@
         else if (m.t === 'words' && on.words) on.words(m);
         else if (m.t === 'works' && on.works) on.works(m.works);
         else if (m.t === 'strokes' && on.strokes) on.strokes(m.elements);
+        else if (m.t === 'pointer' && on.pointer) on.pointer(m);
         else if (m.t === 'wbMine' && on.wbMine) on.wbMine(m.mine);
         else if (m.t === 'wbAll' && on.wbAll) on.wbAll(m);
         else if (m.t === 'drawing' && on.drawing) on.drawing(m.elements);

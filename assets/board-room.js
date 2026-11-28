@@ -12,6 +12,22 @@
   window.EXCALIDRAW_ASSET_PATH = 'https://cdn.jsdelivr.net/npm/@excalidraw/excalidraw@0.18.1/dist/prod/';
   var MAX_ELEMENTS = 150, MAX_BYTES = 120000, EVERY = 300;
   var X = null, api = null, seen = {}, waiting = [], timer = null, last = -1;
+  // Everyone else's pointer, as Excalidraw's collaborators; one unheard from
+  // for five seconds is taken away. This page's own is sent at most every
+  // 150 ms.
+  var others = new Map(), seenAt = {}, lastPointer = 0;
+  function showOthers() { if (api) api.updateScene({ collaborators: new Map(others) }); }
+  setInterval(function () {
+    var now = Date.now(), gone = false;
+    others.forEach(function (v, k) { if (now - (seenAt[k] || 0) > 5000) { others.delete(k); gone = true; } });
+    if (gone) showOthers();
+  }, 2000);
+  function onPointer(e) {
+    var now = Date.now();
+    if (!e || !e.pointer || now - lastPointer < 150) return;
+    lastPointer = now;
+    post({ t: 'pointer', elements: [], p: { x: e.pointer.x, y: e.pointer.y, down: e.button === 'down' } });
+  }
 
   function post(m) { window.parent.postMessage(Object.assign({ hsDraw: true }, m), location.origin); }
   function markSeen(list) { list.forEach(function (e) { if (e && e.id && !(seen[e.id] >= e.version)) seen[e.id] = e.version; }); }
@@ -57,6 +73,11 @@
     if (e.origin !== location.origin || e.source !== window.parent || !d || !d.hsDraw || !Array.isArray(d.elements)) return;
     if (d.t === 'strokes') apply(d.elements, false);
     if (d.t === 'drawing') apply(d.elements, true);
+    if (d.t === 'pointer' && d.p && typeof d.p.id === 'string') {
+      others.set(d.p.id, { pointer: { x: d.p.x, y: d.p.y, tool: 'pointer' }, button: d.p.down ? 'down' : 'up', username: d.p.name || '' });
+      seenAt[d.p.id] = Date.now();
+      showOthers();
+    }
   });
 
   function theme() { return window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; }
@@ -72,6 +93,7 @@
         post({ t: 'ready' });
       },
       onChange: onChange,
+      onPointerUpdate: onPointer,
       isCollaborating: true,
       aiEnabled: false,
       theme: theme(),

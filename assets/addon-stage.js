@@ -790,6 +790,7 @@
       mine: function (m) { roomMine = m; roomDraw(); },
       floats: function (f) { var st = roomState && roomState.stance; drawReactions({ floats: f, stance: st && st.total ? st : null }); },
       strokes: function (list) { keepDrawn(list); toDraw({ t: 'strokes', elements: list }); },
+      pointer: function (p) { toDraw({ t: 'pointer', elements: [], p: { id: p.id, name: p.name, x: p.x, y: p.y, down: p.down } }); },
       drawing: function (list) { if (!list.length) drawn = {}; keepDrawn(list); toDraw({ t: 'drawing', elements: list }); },
       ended: function () { roomEnded = true; roomMine = null; roomTalk = ''; roomHtml = ''; drawn = {}; roomDraw(); },
       status: function (s) { $('[data-room-off]').hidden = s !== 'off'; }
@@ -837,6 +838,7 @@
     if (!drawFrame || e.source !== drawFrame.contentWindow || e.origin !== location.origin || !d || !d.hsDraw) return;
     if (d.t === 'ready') toDraw({ t: 'drawing', elements: Object.keys(drawn).map(function (k) { return drawn[k]; }) });
     if (d.t === 'strokes' && Array.isArray(d.elements) && room) { keepDrawn(d.elements); room.send({ t: 'strokes', elements: d.elements }); }
+    if (d.t === 'pointer' && d.p && room) room.send({ t: 'pointer', x: d.p.x, y: d.p.y, down: d.p.down === true });
   });
   function drawRoomWelcome() {
     $('[data-rw-kicker]').textContent = 'Welcome';

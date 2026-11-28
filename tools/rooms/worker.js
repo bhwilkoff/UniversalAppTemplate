@@ -136,7 +136,7 @@ export class Room extends DurableObject {
   allowed(ws, host, stroke) {
     const map = stroke ? this.strokeRates : this.rates;
     const now = Date.now(), r = (map.get(ws) || []).filter((t) => now - t < 10000);
-    if (r.length >= (stroke ? 150 : host ? 200 : 40)) return false;
+    if (r.length >= (stroke ? 300 : host ? 200 : 40)) return false;
     r.push(now); map.set(ws, r);
     return true;
   }
@@ -182,7 +182,16 @@ export class Room extends DurableObject {
       return;
     }
     if (!me.pid) return;
-    if (!this.allowed(ws, me.pid === this.room.host, m.t === 'strokes')) return;
+    if (!this.allowed(ws, me.pid === this.room.host, m.t === 'strokes' || m.t === 'pointer')) return;
+    // Where someone's pointer is on the drawing: passed to the other stages
+    // and never kept.
+    if (m.t === 'pointer') {
+      if (!this.room.on || this.room.show !== 'draw') return;
+      const x = Number(m.x), y = Number(m.y);
+      if (!Number.isFinite(x) || !Number.isFinite(y) || Math.abs(x) > 1e6 || Math.abs(y) > 1e6) return;
+      this.toStages({ t: 'pointer', id: me.pid.slice(0, 8), name: (me.name || '').slice(0, 40), x: Math.round(x), y: Math.round(y), down: m.down === true }, ws);
+      return;
+    }
 
     if (m.t === 'name') {
       const name = String(m.name || '').replace(/\s+/g, ' ').trim().slice(0, LIMITS.name);
