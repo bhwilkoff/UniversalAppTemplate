@@ -3804,3 +3804,5 @@ html.stage-in-panel .stage-corner { display: none !important; }
 /* Drawing together fills the stage, with nothing over the canvas. */
 .stage-app[data-view="roomdraw"]:not([hidden]) { grid-template-rows: minmax(0, 1fr); }
 .stage-ready:has([data-view="roomdraw"]:not([hidden])) .stance-bar, .stage-ready:has([data-view="roomdraw"]:not([hidden])) .stage-reacts { display: none !important; }
+.open-add.is-stack { grid-template-columns: minmax(0, 1fr); }
+.open-add.is-stack > a, .open-add.is-stack > button { justify-self: start; }

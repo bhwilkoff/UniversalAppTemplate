@@ -619,7 +619,7 @@
     }
     function groupsTool(pane, line) {
       if (room && room.groups) return pane.appendChild(btn('Bring everyone back', 'btn-secondary', function () { send({ t: 'groups', open: false }); done(); }));
-      var f = el('form', 'open-add'), t = field('textarea', 'A Meet link for each room, one per line');
+      var f = el('form', 'open-add is-stack'), t = field('textarea', 'A Meet link for each room, one per line');
       t.rows = 4;
       f.appendChild(t);
       f.appendChild(out('Make a Meet link', 'https://meet.new', 'link-button'));
