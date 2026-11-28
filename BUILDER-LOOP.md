@@ -24,9 +24,6 @@ separate words. One tick, one commit.
 
 ## For Ben
 
-- **Deploy the rooms worker** for Show your work:
-  `! cd ~/Documents/GitHub/humanshaped-site/tools/rooms && npx wrangler deploy`
-
 - **Delete "Randomness test (delete me).json"** in your Drive's Human
   Shaped sessions folder when you like; it is the /plan/ test file.
 
@@ -439,3 +436,22 @@ breakout state.
   back out as one 'strokes' message with only the new element. Not
   seen: through the worker, which still awaits the deploy (with Show
   your work and Breakout rooms).
+- 2026-11-28, tick 23 (deploy 2c307dcb; fixes 80441523, 75344ac0,
+  99eec811). Ben: "You should be able to fully deploy." Why it was not
+  deployed: his earlier deploy (7680192a) was before these three tools,
+  and I had handed each new deploy back to him. Deployed myself. Seen
+  live, terminal room script: offers reach only the host, Show features
+  one by name, breakouts deal everyone but the host, a stroke reaches
+  the other stage without echo, a late stage gets the whole drawing,
+  a new drawing clears everywhere, no errors. Seen in real Meet calls
+  (nxu-qkws-ajw, bwf-bdfo-rej, Ben's leader profile plus a terminal
+  test guest): Draw together on the stage, the rectangle reached the
+  room and a late stage; Breakout rooms showed Room 1 with the guest,
+  Room 2 empty, Visit, Bring everyone back; Show your work listed the
+  guest and Show put the page up. Found and fixed: the host's list read
+  works.works (always empty); the breakout links form sat in one
+  squeezed row; a page that refuses framing went up as a broken frame,
+  so offering and Show now run the room's frame check. Lesson: test the
+  panel in a fresh call, since Meet keeps the old frame and Pages
+  caches HTML for 10 minutes. Not seen: a second real person's panel
+  (the guest view of Your room, Offer it) and two people drawing at once.
