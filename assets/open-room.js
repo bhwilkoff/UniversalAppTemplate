@@ -261,7 +261,9 @@
         var who = el('span'); who.appendChild(el('strong', null, w.name || 'Someone'));
         who.appendChild(el('span', 'small open-work-url', ' ' + w.url.replace(/^https:\/\//, '')));
         li.appendChild(who);
-        var b = btn(on ? 'On the stage' : 'Show', 'btn-secondary small', function () { send({ t: 'feature', id: w.id }); });
+        var b = btn(on ? 'On the stage' : 'Show', 'btn-secondary small', function () {
+          canFrame(w.url).then(function (c) { if (c.ok) send({ t: 'feature', id: w.id }); else say(c.text); });
+        });
         b.setAttribute('aria-pressed', String(!!on));
         li.appendChild(b); ul.appendChild(li);
       });
@@ -276,8 +278,19 @@
       i.type = 'url'; i.placeholder = 'https://'; i.maxLength = 2000;
       f.appendChild(i);
       var s = el('button', 'btn-secondary', myWork ? 'Change it' : 'Offer it'); s.type = 'submit'; f.appendChild(s);
-      f.addEventListener('submit', function (e) { e.preventDefault(); if (i.value.trim()) { send({ t: 'work', url: i.value.trim() }); i.blur(); } });
+      var said = el('p', 'small'); said.setAttribute('role', 'status');
+      f.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var href = i.value.trim();
+        if (!href) return;
+        said.textContent = 'Checking that it can be shown…';
+        canFrame(href).then(function (c) {
+          if (!c.ok) return (said.textContent = c.text);
+          said.textContent = ''; send({ t: 'work', url: c.url || href }); i.blur();
+        });
+      });
       box.appendChild(f);
+      box.appendChild(said);
       if (myWork) {
         box.appendChild(el('p', 'small', 'Offered. The host chooses what goes on the stage.'));
         box.appendChild(btn('Take it back', 'link-button', function () { send({ t: 'work', url: '' }); }));
@@ -708,6 +721,16 @@
         });
         put(GH, owner); then();
       }, function (e) { sites.error = e.message; then(); });
+    }
+    // Whether a page lets itself be shown inside another (the room's /frame
+    // check), in words a person can act on.
+    function canFrame(href) {
+      return fetch(window.MEET_ADDON.rooms + '/frame?url=' + encodeURIComponent(href)).then(function (r) { return r.json(); }).then(function (c) {
+        if (c.ok) return { ok: true, url: c.url || href };
+        return { ok: false, text: c.why === 'address' ? 'That address cannot be shown here. Use a page that starts with https://.'
+          : c.why === 'refuses' ? 'That page does not allow itself to be shown inside another page. Share your screen to show it instead.'
+          : 'That page did not answer. Check the link and try again.' };
+      }, function () { return { ok: false, text: 'The check did not answer. Try again in a minute.' }; });
     }
     function showUrl(href, name, line) {
       line.textContent = 'Checking that it can be shown…';
