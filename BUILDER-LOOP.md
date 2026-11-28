@@ -75,7 +75,7 @@ by the Course Builder import or by SQL.
   lists "Make the GitHub repository" and "Connect your agent"; the Plan
   tab's "Before the next session" and the Before tab's "Before this
   session" overlap in meaning.
-- [ ] B6. Cohort groups editor (`cohorts.groups`).
+- [x] B6. Cohort groups editor (`cohorts.groups`).
 - [x] B8. A new part starts with placeholder words saved as its prompt
   ("What the rooms are for", "Your question"); they should be hints
   people type over, not content.
@@ -233,3 +233,13 @@ breakout state.
   Google's Drive window does open from inside Meet's side panel (as its
   own Chrome window). Still to see: that the panel gets the token back
   and the file lands in Drive once the account is chosen.
+- 2026-11-28, tick 9 (B6). Found two kinds of groups: the cohort page's
+  standing groups (groups table, members chosen by the leader) and
+  cohorts.groups (rooms kept from a breakout in the add-on). Breakouts'
+  "Launch the cohort's groups" read only the second, so groups set up
+  before class could not be launched. Rather than a third editor, the
+  breakout tool now falls back to the standing groups
+  (BreakoutsLib.standingGroups, tested; 732 node tests). Not yet seen
+  live: needs learners in the test cohort and a call (B7). Question for
+  later: should "Keep these rooms as the cohort's groups" write standing
+  groups too, so there is one kind?
