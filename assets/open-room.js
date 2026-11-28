@@ -311,7 +311,7 @@
         var li = el('li');
         li.appendChild(el('strong', null, 'Room ' + (i + 1)));
         var names = g.members.filter(function (id) { return id !== you; }).map(personName);
-        li.appendChild(el('span', 'small', names.length ? (host ? '' : 'With ') + names.join(', ') : 'No one yet'));
+        li.appendChild(el('span', 'small', names.length ? (host ? '' : 'With ') + names.join(', ') : !host && i === mineAt ? 'Just you' : 'No one yet'));
         li.appendChild(out(host ? 'Visit' : 'Join room ' + (i + 1), g.link, host ? 'btn-secondary small' : 'btn-primary'));
         ol.appendChild(li);
       });
