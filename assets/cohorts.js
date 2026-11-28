@@ -25,6 +25,9 @@
       r.data.forEach(function (c) {
         var card = el('article', 'open-cohort');
         card.appendChild(el('h3', null, c.title));
+        // A cohort on another subject runs its leader's own course, not the
+        // weeks this page describes (cohort-lib course()).
+        if (c.schedule === 'custom') card.appendChild(el('p', 'small open-cohort-kind', 'Its own course, not the Human Shaped weeks'));
         card.appendChild(el('p', 'small', TeachLib.openingLine(c)));
         card.appendChild(el('p', 'small', TeachLib.scheduleText(c, zone)));
         if (c.description) card.appendChild(el('p', null, c.description));

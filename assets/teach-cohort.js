@@ -534,7 +534,7 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
     var form = el('form', 'inline-form followup-form');
     var label = el('label', null, 'Your follow-up to ' + name);
     var where = el('span', 'hint');
-    if (target.kind === 'feedback') where.appendChild(U.visibility('cohort', 'On their build'));
+    if (target.kind === 'feedback') where.appendChild(U.visibility('cohort', current && current.schedule === 'custom' ? 'On what they shared' : 'On their build'));
     else if (notesReady) where.appendChild(U.visibility('them', 'A note'));
     else where.textContent = 'They shared nothing to answer.';
     label.appendChild(where);
@@ -574,7 +574,7 @@ if (window.HS && window.HS.forgetRoles) window.HS.forgetRoles(); location.assign
         F.clearDraft(store, key);
         input.value = '';
         draftFlag.hidden = true;
-        msg.textContent = target.kind === 'feedback' ? 'Sent, as feedback on their build.' : 'Sent, as a note on their cohort page.';
+        msg.textContent = target.kind === 'feedback' ? (current && current.schedule === 'custom' ? 'Sent, as feedback on what they shared.' : 'Sent, as feedback on their build.') : 'Sent, as a note on their cohort page.';
         body.insertBefore(el('p', 'small followup-sent', 'You sent: ' + checked.body), form);
       });
     });
