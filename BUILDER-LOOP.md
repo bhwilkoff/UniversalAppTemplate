@@ -43,7 +43,7 @@ by the Course Builder import or by SQL.
 
 - [x] B1. Session: edit `before`, `readings`, and the session's
   `outcomes`; cohort: edit `outcomes` (on /teach/cohort/edit).
-- [ ] B2. Workbooks: create, rename, reorder, delete; edit blocks (text,
+- [x] B2. Workbooks: create, rename, reorder, delete; edit blocks (text,
   free, choice, table, file) with images in `workbook-files`.
 - [ ] B3. Part settings for every config key: show (a page or document
   on the stage), results_of, feature and feature_count, show_tally,
@@ -109,3 +109,15 @@ breakout state.
   one outcome; the rows read back from the database as typed. Not yet
   seen: a learner's view of these (same drawing code the imports use).
   The test cohort stays for B2 to B7, then goes.
+- 2026-11-28, tick 2 (B2, c08596f7, b6128b77). /teach/workbook/?w= is a
+  workbook's own page (PAGES.md): title, who answers it, blocks of every
+  kind (words, question, choice, table, link to hand in), move and
+  remove, pictures into workbook-files, what people see, Delete. "Add a
+  workbook" and "Change" on the session's Before. A new block takes a
+  key no block has had (WorkbookLib.nextKey), so moving or adding never
+  moves an answer; pictures no block names leave the bucket on save.
+  727 node tests. **Verified live as Ben:** made "Leaf Lab Notes" with
+  all four answerable kinds plus words, moved the table up (keys stayed
+  b1 b2 b4 b3 in the database), added a picture (signed link drew in the
+  preview), removed it and saved (the file left storage). Not yet seen:
+  Delete workbook (at cleanup), a group workbook dealt to rooms (B3).
