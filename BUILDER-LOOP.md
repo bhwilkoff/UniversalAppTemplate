@@ -122,6 +122,18 @@ by the Course Builder import or by SQL.
   never sign in.
 - [x] A6. A real call with two attendees (tick 24, kya-pynw-hpx).
 
+### C. Round two (Ben, November 28, away from his computer: "I'd like you to keep going, but I'm not at my computer, so I cannot help you test. Please build out these features and fully test them.")
+
+- [ ] C1. A ranking question in session files, /plan/, open rooms (worker), and cohort plans saved to Drive (they became short today).
+- [ ] C2. Tools has Workbook: run one of the session's workbooks, or write a quick one in the panel.
+- [ ] C3. Answers at the end of a call: before Leave or End, the host is told how many workbook answers are unsaved, with Save; when a workbook closes, each person is reminded to Keep a copy. (A choice made without Ben; logged for him.)
+- [ ] C4. Draw together: everyone's pointer on every stage.
+- [ ] C5. Test in Safari (Ben's browser), driving it from the terminal.
+- [ ] C6. A real breakout round trip: real meet.new rooms, the learner leaves, joins, and comes back.
+- [ ] C7. More than two people: extra participants from the terminal in a real call (drawing, workbook, shared model).
+- [ ] C8. A Drive session's slide picture drawn on a stage in a call.
+- [ ] C9. In a call: the "On the stage" color and "Just you".
+
 ### I. Ideas at Play (demo for Ben's meeting with Alexis, Thursday December 3)
 
 Findings (November 28): ~90 interactive teaching models by Alexis
