@@ -24,6 +24,20 @@ separate words. One tick, one commit.
 
 ## For Ben
 
+- **Thursday with Alexis: a run sheet.** In any Meet call, open Human
+  Shaped and press Start a session (no account). Tools, then Give
+  everyone a model: pick one and choose "A copy for each person" (each
+  person explores alone) or "One model everyone shares" (anyone's
+  change appears on every stage). 76 of the 77 models can be shared;
+  "Python together" cannot, and the picker says so. Some models keep
+  a person's prediction private by their own design (Selection bias
+  does not show others' prediction picks), while their sliders and
+  settings do travel. For a whole planned session, open /plan/
+  beforehand, add slides, a question, a model, and a workbook, save it
+  to your Drive, and in the call open it from Slides, then Open from
+  my Drive. Every stage shows each model's title, author, Ideas at
+  Play, and CC BY 4.0.
+
 - **Delete "Randomness test (delete me).json" and "What did you notice?
   answers 2026-11-28.csv"** in your Drive's Human Shaped sessions folder
   when you like; they are test files.
@@ -492,3 +506,19 @@ breakout state.
   was up; blanks were labeled "Row 2, column 2" (now by their row and
   column headings). Not seen: those fixes in a call. Left in Ben's
   Drive: the answers CSV (test data, delete with the Randomness file).
+- 2026-11-28, tick 26 (afb4657c). Checked the workbook fixes in a
+  fresh two-person call (kkb-sgmh-eko): the stage reads 'Answer "What
+  did you notice?" in the Human Shaped panel beside the call.'; table
+  blanks read "Left, Stars" and "Right, Stars"; Keep a copy opened the
+  learner's copy in a new tab (title, Download, the Markdown), and its
+  Download saved "What did you notice.md" (removed after). For
+  Thursday, measured every kept Ideas at Play copy in Chrome: 74 of 77
+  give, take, and announce state; Selection bias and SUTVA violation
+  lack onChange, so the shared bridge never heard them; Python together
+  has no setState. Now the bridge asks for state every 800 ms when a
+  model has no onChange, and the catalog keeps copies only of models
+  with getState and setState (Python together is one copy each, with a
+  line saying so). Seen: Selection bias shared between two stages of one
+  room, a slider moved to a = 3.5 on one and read a = 3.5 on the other.
+  Its prediction radios did not follow, because that model's own render
+  never draws them from state. A run sheet for the demo is in For Ben.
