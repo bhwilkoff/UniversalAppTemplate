@@ -59,7 +59,7 @@
         var tr = el('tr');
         r.forEach(function (v, x) {
           var td = el('td'), inp = el('input');
-          inp.value = v; inp.maxLength = 500; inp.placeholder = 'Filled in';
+          inp.value = v; inp.maxLength = 500; inp.placeholder = 'People write here';
           inp.setAttribute('aria-label', 'Row ' + (y + 1) + ', column ' + (x + 1));
           inp.addEventListener('input', function () { grid[y][x] = inp.value; commit(); });
           td.appendChild(inp); tr.appendChild(td);
@@ -119,7 +119,6 @@
       mount.addEventListener('click', function () { setTimeout(function () { b.choices = rows.get().map(function (r) { return r.c || ''; }); touch(); }); });
     }
     if (b.type === 'table') {
-      li.appendChild(el('p', 'hint', 'An empty cell is where people write.'));
       li.appendChild(tableEditor(b));
     }
     return li;

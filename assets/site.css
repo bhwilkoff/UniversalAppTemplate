@@ -1961,13 +1961,13 @@ div.slide-pick { cursor: default; }
 .cohort-builder .addr { margin: 0; font-size: 0.92rem; color: var(--muted); display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.25rem 0.6rem; }
 .cohort-builder .addr .url { overflow-wrap: anywhere; }
 .cohort-builder .addr b { color: var(--ink); }
-.cohort-builder .choices { display: grid; gap: 0.6rem; }
-.cohort-builder label.choice { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.85rem 1rem; border: 1px solid var(--rule); border-radius: 10px; background: var(--paper); font-weight: 400; cursor: pointer; }
-.cohort-builder label.choice input { margin-top: 0.15rem; }
-.cohort-builder label.choice b { display: block; font-weight: 650; }
-.cohort-builder label.choice span { color: var(--muted); font-size: 0.93rem; }
-.cohort-builder label.choice b { color: var(--ink); font-size: 1rem; }
-.cohort-builder label.choice:has(input:checked) { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+:is(.cohort-builder, .wb-edit) .choices { display: grid; gap: 0.6rem; }
+:is(.cohort-builder, .wb-edit) label.choice { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.85rem 1rem; border: 1px solid var(--rule); border-radius: 10px; background: var(--paper); font-weight: 400; cursor: pointer; }
+:is(.cohort-builder, .wb-edit) label.choice input { margin-top: 0.15rem; }
+:is(.cohort-builder, .wb-edit) label.choice b { display: block; font-weight: 650; }
+:is(.cohort-builder, .wb-edit) label.choice span { color: var(--muted); font-size: 0.93rem; }
+:is(.cohort-builder, .wb-edit) label.choice b { color: var(--ink); font-size: 1rem; }
+:is(.cohort-builder, .wb-edit) label.choice:has(input:checked) { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
 .cohort-builder label.check { display: flex; gap: 0.6rem; align-items: center; font-weight: 500; }
 .cohort-builder .by-hand { margin-top: 0.4rem; }
 .cohort-builder .by-hand summary { cursor: pointer; color: var(--muted); font-size: 0.93rem; min-height: 44px; display: flex; align-items: center; }
@@ -1984,7 +1984,7 @@ div.slide-pick { cursor: default; }
 @container (min-width: 34rem) {
   .builder-grid { gap: 2.5rem; }
   .cohort-builder .row { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .cohort-builder .choices { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  :is(.cohort-builder, .wb-edit) .choices { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @container (min-width: 58rem) {
   .builder-grid { grid-template-columns: minmax(0, 1fr) 19rem; gap: 3rem; }
