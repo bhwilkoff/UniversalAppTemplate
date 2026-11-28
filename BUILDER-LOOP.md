@@ -339,3 +339,14 @@ breakout state.
   with Ben's profile leading and benhstest1 joining (shared model,
   breakouts from standing groups, a group workbook in a room), then
   clean up the test cohort.
+- 2026-11-28, tick 16 (B7 part 2). **Real two-person cohort call**
+  (kta-bkwn-hvu): Ben's profile ran "Session 1: How Leaves Make Food"
+  from Run a cohort session; benhstest1's profile joined (Join here too,
+  Join activity) and saw the learner panel with no Your app section.
+  The leader chose Give everyone a model, One model everyone shares, Do
+  Random Events Cluster?; both stages drew it with "shared through Human
+  Shaped"; the learner picked star field A on their stage and the
+  leader's stage showed A picked, untouched. Found: the two choices'
+  labels were squeezed off the right edge in the cohort panel; fixed in
+  CSS. Next: breakouts from a standing group with the learner in it, a
+  group workbook in the room, then cleanup.

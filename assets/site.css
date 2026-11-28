@@ -3775,3 +3775,5 @@ html.stage-in-panel .stage-corner { display: none !important; }
 .open-plan-part[aria-current] { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
 .open-plan-kind { color: var(--muted); font-size: 0.8rem; }
 .open-plan-title { font-weight: 600; }
+.model-how label.check { display: flex; flex-direction: row; align-items: center; gap: 0.5rem; width: 100%; text-align: left; }
+.model-how label.check input { width: auto; height: auto; margin: 0; flex: 0 0 auto; }
