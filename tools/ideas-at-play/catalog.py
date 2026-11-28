@@ -41,7 +41,9 @@ def one(slug):
         sb = SANDBOX.search(get(SITE + '/play/' + slug + '?v=' + str(max(vs))))
         if sb:
             body = get('https://ideasatplay-sandbox.vercel.app/a/' + sb.group(1))
-            if 'window.artifact' in body and len(body) < 600000:
+            # Only a model that can both give and take its state can be
+            # shared (measured November 28, 2026: one model gives none).
+            if 'window.artifact' in body and 'getState' in body and 'setState' in body and len(body) < 600000:
                 COPIES.mkdir(exist_ok=True)
                 (COPIES / (slug + '.html')).write_text(body)
                 copy = '/assets/ideas-at-play/' + slug + '.html'

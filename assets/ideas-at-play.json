@@ -322,7 +322,7 @@
    "slug": "python-together-simulating-coin-flips-2deacf",
    "title": "Python together: simulating coin flips",
    "v": 2,
-   "copy": "/assets/ideas-at-play/python-together-simulating-coin-flips-2deacf.html",
+   "copy": null,
    "author": "Alexis Diamond",
    "year": 2026,
    "about": "Groups write and run Python together in the browser: simulate coin flips, find streaks, and use pandas on a class dataset to judge whether a coin is fair."

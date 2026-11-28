@@ -8,7 +8,7 @@
 // ModelPicker.mount(box, { send(message), done() })
 // ModelPicker.credit(url) -> Promise of { title, author, url } or null
 (function (root) {
-  var SRC = '/assets/ideas-at-play.json?v=20261128b';
+  var SRC = '/assets/ideas-at-play.json?v=20261128c';
   var PLAY = /^https:\/\/ideasatplay\.org\/play\/([a-z0-9-]{1,140})\?v=(\d{1,4})$/;
   var catalog = null;
 
@@ -32,7 +32,11 @@
   // stage and takes the call's state back.
   var BRIDGE = '<script>(function(){var last="";function send(){try{var s=JSON.stringify(window.artifact.getState());if(s!==last){last=s;parent.postMessage({hsModel:"state",state:s},"*");}}catch(e){}}' +
     'window.addEventListener("message",function(e){var d=e.data;if(!d||d.hsModel!=="set"||e.source!==parent)return;try{last=d.state;window.artifact.setState(JSON.parse(d.state));}catch(x){}});' +
-    'function hook(n){if(!window.artifact||!window.artifact.onChange){if(n<50)setTimeout(function(){hook(n+1);},200);return;}window.artifact.onChange(send);parent.postMessage({hsModel:"ready"},"*");}hook(0);})();<\/script>';
+    'function hook(n){var a=window.artifact;if(a&&a.onChange){a.onChange(send);parent.postMessage({hsModel:"ready"},"*");return;}' +
+    // A model that gives and takes its state but never says it changed is
+    // asked every 800 ms instead (two of Ideas at Play's models, measured
+    // November 28, 2026).
+    'if(n>=10&&a&&a.getState&&a.setState){setInterval(send,800);parent.postMessage({hsModel:"ready"},"*");return;}if(n<50)setTimeout(function(){hook(n+1);},200);}hook(0);})();<\/script>';
   function withBridge(html) {
     html = String(html || '');
     var at = html.toLowerCase().lastIndexOf('</body>');
@@ -83,7 +87,7 @@
           b.addEventListener('click', function () {
             var shared = together && !!m.copy;
             o.send({ t: 'site', url: playUrl(m), name: m.title.slice(0, 80), together: shared });
-            line.textContent = shared ? 'On everyone’s stage, one model you all change.' : 'On everyone’s stage, a copy for each person.';
+            line.textContent = shared ? 'On everyone’s stage, one model you all change.' : together ? 'This model cannot be shared, so each person has their own copy.' : 'On everyone’s stage, a copy for each person.';
             if (o.done) o.done();
           });
           li.appendChild(b); list.appendChild(li);
