@@ -408,3 +408,18 @@ breakout state.
   "on what they shared", not "their build". Left as is: the leader's
   "Connect your agent" step, because the Human Shaped connector answers
   for any cohort, not only the course.
+- 2026-11-28, tick 21 (A4 part, 4406d0cd). Breakout rooms in open
+  rooms: Tools has "Breakout rooms"; the host makes a call per room with
+  meet.new ("Make a Meet link") and pastes the links, and the worker
+  deals everyone here but the host into them, shuffled (two to twenty
+  links, only meet.google.com call addresses, duplicates dropped). Each
+  person's Now: "Your room", who is with them, "Join room N", and the
+  warning to leave this call first; someone who came later chooses a
+  room. Host: every room with Visit, and Bring everyone back. Two tests
+  (742 pass). The worker was still the old one at the start of this
+  tick (check-works.mjs), so neither this nor Show your work is seen
+  live; both wait on the one deploy. Next A4 piece, planned not built:
+  the board in open rooms means Excalidraw's scene and pointer messages
+  relayed through the rooms worker (today it rides Supabase Realtime on
+  a cohort's private channel), with the last scene kept in the room for
+  whoever arrives late, and erased when the call ends.
