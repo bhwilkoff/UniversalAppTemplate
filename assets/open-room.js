@@ -143,7 +143,7 @@
       var s = el('div', 'open-lobby');
       s.innerHTML = '<p class="addon-mark"><span class="visually-hidden">Human Shaped</span><span class="w" aria-hidden="true">human</span><svg class="arch" aria-hidden="true" focusable="false"><use href="/assets/logo.svg#arch"/></svg><span class="w" aria-hidden="true">shaped</span></p>';
       s.appendChild(el('h1', null, ended ? 'That session has ended.' : 'Teach this call together.'));
-      if (ended && lastWb) closedWorkbook(s, lastWb.w, lastWb.a);
+      if (ended && lastWb) closedWorkbook(s, lastWb.w, lastWb.a, true);
       s.appendChild(el('p', 'small', 'Slides, questions, a vote on ideas, and websites you build, for everyone here.'));
       var input = field('input', 'Your name', client.name());
       input.maxLength = 60; input.autocomplete = 'name';
@@ -413,10 +413,10 @@
     }
     // A closed workbook, or one from a session that ended, can still be kept
     // by the person who answered it: answers live only in the room.
-    function closedWorkbook(pane, w, a) {
+    function closedWorkbook(pane, w, a, gone) {
       var box = el('section', 'p2-group open-workbook');
       box.appendChild(el('h2', null, w.title));
-      box.appendChild(el('p', 'small', 'Closed. Your answers leave with the room when the call ends.'));
+      box.appendChild(el('p', 'small', gone ? 'The room is erased. This panel holds the last of your answers until you close it.' : 'Closed. Your answers leave with the room when the call ends.'));
       box.appendChild(btn('Keep a copy', 'btn-secondary', function () { keepCopy(w, a); }));
       pane.appendChild(box);
     }
