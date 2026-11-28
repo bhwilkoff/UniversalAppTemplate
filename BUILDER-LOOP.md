@@ -24,6 +24,9 @@ separate words. One tick, one commit.
 
 ## For Ben
 
+- **Delete "Randomness test (delete me).json"** in your Drive's Human
+  Shaped sessions folder when you like; it is the /plan/ test file.
+
 - **Credentials in a cohort on another subject.** A credential today
   needs an app ("Needs a repository and a live address"). In a custom
   cohort the app fields are hidden, so no learner there can earn one.
@@ -370,3 +373,20 @@ breakout state.
   in the lobby's links, "Or keep them in GitHub" under Drive). Not seen
   live: needs a Google account with no GitHub (none of the usable
   profiles; the Minerva profile is off-limits).
+- 2026-11-28, tick 19 (A, a36eab56 + 7bf96263). /plan/: anyone with a
+  Google account builds a whole session as a file in their own Drive,
+  with no cohort and no account here. Parts: slides (the builder's slide
+  studio, pictures to the host's Drive), a question (five ways to
+  answer, choices), an Ideas at Play model (copy each or shared), a
+  website, a card, a clock; move, remove, an unsaved draft kept in the
+  browser, Open from my Drive, Save to my Drive updating the same file.
+  Linked from the open room ("Plan a whole session"), in PAGES.md and
+  the sitemap. Seen live: built "Randomness test (delete me)" (slides,
+  a choice question, Do Random Events Cluster? shared, a card), saved,
+  added the card and saved again (same file id; the Drive connector read
+  one file with four parts), then in a real Meet call (wed-kohm-pbq)
+  opened it from Drive in the open room and ran all four parts: slide,
+  question with both choices, the shared model with its CC BY credit,
+  the card. Left: that test file in Ben's Drive (the connector cannot
+  trash a file the site made; Ben deletes it in Drive). Not seen: a
+  picture uploaded from /plan/ drawn on a stage.
