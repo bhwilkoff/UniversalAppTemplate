@@ -260,7 +260,7 @@
       if (!list.length) box.appendChild(el('p', 'small', 'No one has offered yet.'));
       var ul = el('ul', 'open-notes');
       list.forEach(function (w) {
-        var li = el('li'), on = room.show === 'page' && room.page && room.page.url === w.url;
+        var li = el('li'), on = room.show === 'page' && room.page && room.page.url === w.url && room.page.name === (w.name ? w.name + '’s work' : 'Someone’s work');
         var who = el('span'); who.appendChild(el('strong', null, w.name || 'Someone'));
         who.appendChild(el('span', 'small open-work-url', ' ' + w.url.replace(/^https:\/\//, '')));
         li.appendChild(who);
