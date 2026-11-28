@@ -3816,3 +3816,5 @@ html.stage-in-panel .stage-corner { display: none !important; }
 .plan-blocks { list-style: none; margin: 0.5rem 0; padding: 0; display: grid; gap: 0.6rem; }
 .plan-block { border: 1px solid var(--rule); border-radius: 0.5rem; padding: 0.6rem 0.75rem; }
 .plan-block-head { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+/* While drawing together, the name box leaves Excalidraw's corners free. */
+.stage-ready:has([data-view="roomdraw"]:not([hidden])) .stage-name:not([hidden]) { top: auto; bottom: 0.75rem; right: auto; left: 50%; transform: translateX(-50%); width: min(18rem, calc(100vw - 14rem)); }
