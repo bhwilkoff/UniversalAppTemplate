@@ -256,7 +256,7 @@
       var stage = el('div', 'stage-preview part-pic');
       stage.setAttribute('role', 'img');
       stage.setAttribute('aria-label', 'The main stage during ' + s.title);
-      stage.appendChild(el('p', 'stage-eyebrow', p.eyebrow + ', ' + p.minutes + ' min'));
+      stage.appendChild(el('p', 'stage-eyebrow', (p.eyebrow ? p.eyebrow + ', ' : '') + p.minutes + ' min'));
       stage.appendChild(el('p', 'stage-title', p.title));
       p.lines.forEach(function (line) { stage.appendChild(el('p', 'stage-line', line)); });
       if (p.items.length) {
