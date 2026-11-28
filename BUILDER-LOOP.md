@@ -76,7 +76,7 @@ by the Course Builder import or by SQL.
   tab's "Before the next session" and the Before tab's "Before this
   session" overlap in meaning.
 - [ ] B6. Cohort groups editor (`cohorts.groups`).
-- [ ] B8. A new part starts with placeholder words saved as its prompt
+- [x] B8. A new part starts with placeholder words saved as its prompt
   ("What the rooms are for", "Your question"); they should be hints
   people type over, not content.
 - [ ] B7. End to end: build a non-Human-Shaped cohort "(delete me)" from
@@ -222,3 +222,10 @@ breakout state.
   window seems to open outside the tabs the browser tool sees; granting
   Drive is Ben's click, so it waits on him. Still to do: the lobby says
   "Nothing is kept after the call", now not quite true.
+- 2026-11-28, tick 8 (B8, 29ef583d). A new part starts with no prompt;
+  the prompt box and the question box carry hints instead
+  ("What will you try before next time?", "What would you like everyone
+  to answer?"). The open room's lobby now says "The room is erased when
+  the call ends" (its slides can be kept in Drive). **Verified live as
+  Ben:** a new Writing part in Session 2 has an empty prompt with its
+  hint. The Drive window from tick 7 still waits on Ben.
