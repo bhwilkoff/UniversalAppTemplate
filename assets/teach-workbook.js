@@ -174,7 +174,17 @@
       var said = $('[data-save-status]');
       U.say(said, 'Deleting');
       blocks = [];
-      tidyPictures([]).then(function () { return db.from('workbooks').delete().eq('id', wb.id); }).then(function (r) {
+      // A breakout part that dealt this workbook to its rooms stops naming it.
+      function unlink() {
+        return db.from('scenes').select('id, config').eq('session_id', wb.session_id).then(function (q) {
+          return Promise.all((q.data || []).filter(function (sc) { return sc.config && Array.isArray(sc.config.workbooks) && sc.config.workbooks.indexOf(wb.id) >= 0; }).map(function (sc) {
+            var c = Object.assign({}, sc.config), left = c.workbooks.filter(function (x) { return x !== wb.id; });
+            if (left.length) c.workbooks = left; else delete c.workbooks;
+            return db.from('scenes').update({ config: c }).eq('id', sc.id);
+          }));
+        });
+      }
+      tidyPictures([]).then(unlink).then(function () { return db.from('workbooks').delete().eq('id', wb.id); }).then(function (r) {
         if (r && r.error) return U.say(said, 'Not deleted: ' + r.error.message, 'problem');
         dirty = false;
         location.assign($('[data-back-session]').href);
