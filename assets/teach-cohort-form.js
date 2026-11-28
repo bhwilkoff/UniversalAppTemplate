@@ -57,7 +57,7 @@
     slugTouched = !!c;
     say('[data-form-message]', '');
     var f = form.elements;
-    f.schedule.value = c && c.schedule === 'custom' ? 'custom' : 'weekly';
+    f.schedule.value = c ? (c.schedule === 'custom' ? 'custom' : 'weekly') : '';
     drawSchedule();
     f.title.value = c ? c.title : '';
     f.slug.value = c ? c.slug : '';
@@ -97,8 +97,10 @@
   });
   // A weekly cohort asks for its weekday and time; a custom one for its length.
   function drawSchedule() {
-    var custom = form.elements.schedule.value === 'custom';
-    form.querySelectorAll('[data-when]').forEach(function (n) { n.hidden = n.getAttribute('data-when') !== (custom ? 'custom' : 'weekly'); });
+    // Nothing is chosen for a new cohort: the leader decides what kind of
+    // course it is before its dates are asked for.
+    var how = form.elements.schedule.value;
+    form.querySelectorAll('[data-when]').forEach(function (n) { n.hidden = n.getAttribute('data-when') !== how; });
   }
   form.addEventListener('input', drawPreview);
   form.addEventListener('change', function () { drawSchedule(); drawPreview(); });
@@ -106,6 +108,7 @@
   // What is wrong with the answers, in plain words, or null.
   function formProblem(f) {
     if (!f.title.value.trim()) return { field: f.title, text: 'Give the cohort a name people will recognize.' };
+    if (!f.schedule.value) return { field: form.querySelector('[name=schedule]'), text: 'Choose which kind of course it is.' };
     if (!editing) {
       var slugWrong = TL.slugProblem(f.slug.value);
       if (slugWrong) { $('[data-slug-field]').hidden = false; return { field: f.slug, text: slugWrong }; }
