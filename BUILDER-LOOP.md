@@ -207,3 +207,18 @@ breakout state.
   tst-modl-dmo ended. Not yet seen: a real Meet call, phone width, and
   the panel tile itself (the panel page refused the browser tool,
   "Cannot access a chrome-extension:// URL of different extension").
+  **Later, in a real Meet call** (dpd-bgdq-cdv, benwilkoff@gmail.com, mic
+  and camera off): the Tools tab shows "Give everyone a model"; the
+  search list drew; "A Line That Predicts Earnings" filled the main
+  stage with its credit; clicking its "2 Guess first" step worked.
+- 2026-11-28, tick 7 (A1 begun, A2 begun, a233b945). MyDrive
+  (assets/my-drive.js, drive.file only): a "Human Shaped sessions" folder
+  in the host's Drive, one JSON session file each (`kind:
+  human-shaped-session`, `version: 1`, `parts`), list, save, open. The
+  open room's Slides tab has "Keep them in your Drive" (Save to my Drive,
+  Open from my Drive) above "Or keep them in GitHub". **Measured in a
+  real Meet call:** Save to my Drive in the panel showed "Saving to your
+  Drive…" and no "could not open" error after 14 seconds, so Google's
+  window seems to open outside the tabs the browser tool sees; granting
+  Drive is Ben's click, so it waits on him. Still to do: the lobby says
+  "Nothing is kept after the call", now not quite true.
