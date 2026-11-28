@@ -4,7 +4,7 @@
 // stays here is the host's own talk, notes, and repository, in this browser.
 (function () {
   var R = window.RoomLib, SL = window.SlidesLib, L = window.LiveLib, RX = window.ReactLib, A = window.AddonLib;
-  var TALK = 'hs-room-talk', REPO = 'hs-room-repo', EDIT = 'hs-room-edit', GH = 'hs-room-github';
+  var TALK = 'hs-room-talk', REPO = 'hs-room-repo', EDIT = 'hs-room-edit', GH = 'hs-room-github', DRIVE = 'hs-room-drive';
   function el(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
   function btn(label, cls, fn) { var b = el('button', cls || 'btn-secondary', label); b.type = 'button'; b.addEventListener('click', fn); return b; }
   function out(label, href, cls) { var a = el('a', cls || '', label); a.href = href; a.target = '_blank'; a.rel = 'noopener'; return a; }
@@ -394,13 +394,51 @@
       });
       if (pics.length) pane.appendChild(grid);
       pane.appendChild(slideLine);
+      if (window.MyDrive) { var mine2 = el('div', 'p2-group'); pane.appendChild(mine2); drawDrive(mine2); }
       var keep = el('div', 'p2-group');
       pane.appendChild(keep);
       drawKeep(keep);
     }
+    // Keep them in your Drive (MyDrive): a file you own in a "Human Shaped
+    // sessions" folder, through the Google account you already use in Meet.
+    // No GitHub and no account here.
+    var driveFiles = null;
+    function drawDrive(box) {
+      var D = window.MyDrive, line = slideLine, held = (function () { try { return JSON.parse(get(DRIVE) || 'null'); } catch (e) { return null; } })();
+      box.appendChild(el('h2', null, 'Keep them in your Drive'));
+      if (held && held.name) box.appendChild(el('p', 'small', 'In your Drive as ' + held.name));
+      var acts = el('div', 'open-acts');
+      acts.appendChild(btn('Save to my Drive', 'btn-secondary', function () {
+        line.textContent = 'Saving to your Drive…';
+        var title = (room && room.title) || R.titleOf(talk) || 'A session';
+        D.connect().then(function (token) { return D.save(token, D.session(title, talk), held && held.id).catch(function (e) { if (held && held.id) return D.save(token, D.session(title, talk)); throw e; }); })
+          .then(function (id) { put(DRIVE, JSON.stringify({ id: id, name: title })); line.textContent = 'Saved in your Drive.'; slidesKey = null; drawSlides(); }, function (e) { line.textContent = e.message; });
+      }));
+      acts.appendChild(btn('Open from my Drive', 'btn-secondary', function () {
+        line.textContent = 'Reading your Drive…';
+        D.connect().then(function (token) { return D.list(token).then(function (l) { driveFiles = { token: token, list: l }; line.textContent = l.length ? '' : 'No sessions in your Drive yet.'; slidesKey = null; drawSlides(); }); }, function (e) { line.textContent = e.message; });
+      }));
+      box.appendChild(acts);
+      if (driveFiles && driveFiles.list.length) {
+        var ul = el('ul', 'open-sites');
+        driveFiles.list.forEach(function (f) {
+          var li = el('li'), b = el('button', 'open-site'); b.type = 'button';
+          b.appendChild(el('span', 'open-site-name', f.name.replace(/\.json$/, '')));
+          b.addEventListener('click', function () {
+            line.textContent = 'Opening…';
+            D.open(driveFiles.token, f.id).then(function (sess) {
+              talk = D.talkOf(sess) || talk; put(TALK, talk); put(DRIVE, JSON.stringify({ id: f.id, name: sess.title || f.name }));
+              driveFiles = null; sendTalk(room && room.show === 'slides'); line.textContent = 'Opened.'; slidesKey = null; drawSlides();
+            }, function (e) { line.textContent = e.message; });
+          });
+          li.appendChild(b); ul.appendChild(li);
+        });
+        box.appendChild(ul);
+      }
+    }
     function drawKeep(keep) {
       var line = slideLine;
-      keep.appendChild(el('h2', null, 'Keep them in GitHub'));
+      keep.appendChild(el('h2', null, 'Or keep them in GitHub'));
       if (repo) {
         keep.appendChild(el('p', 'small', repo.name));
         var acts = el('div', 'open-acts');
@@ -419,7 +457,7 @@
         keep.appendChild(btn('Use a different repository', 'link-button', function () { repo = null; put(REPO, ''); slidesKey = null; drawSlides(); }));
         return;
       }
-      keep.appendChild(el('p', 'small', 'Until then, they stay in this browser.'));
+      if (!get(DRIVE)) keep.appendChild(el('p', 'small', 'Until then, they stay in this browser.'));
       keep.appendChild(out('Make my repository', R.TEMPLATE, 'btn-secondary'));
       var f = el('form', 'open-add'), i = field('input', 'yourname/repository');
       f.appendChild(i);
