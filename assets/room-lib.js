@@ -136,6 +136,7 @@
       v.host = isHost;
       return v;
     }
+    if (room.show === 'draw') return { mode: 'roomdraw', part: part };
     if (room.show === 'board') return { mode: 'roomboard', part: part, prompt: room.board || '', notes: room.notes || [], you: c.you, host: room.host === c.you };
     if (room.show === 'page' && room.page) return { mode: 'page', part: part, page: room.page, mstate: room.mstate || null, html: room.page.owner || room.page.url ? null : (c.html || '') };
     if (room.show === 'card' && room.card) return { mode: 'card', part: null, card: { body: room.card, endsAt: part ? part.endsAt : null } };

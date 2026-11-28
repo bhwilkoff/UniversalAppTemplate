@@ -3801,3 +3801,6 @@ html.stage-in-panel .stage-corner { display: none !important; }
 .open-group-list { list-style: none; margin: 0.5rem 0; padding: 0; display: grid; gap: 0.5rem; }
 .open-group-list li { display: grid; gap: 0.25rem; padding: 0.6rem 0.75rem; border: 1px solid var(--rule); border-radius: 0.5rem; }
 .open-group-list li a { justify-self: start; }
+/* Drawing together fills the stage, with nothing over the canvas. */
+.stage-app[data-view="roomdraw"]:not([hidden]) { grid-template-rows: minmax(0, 1fr); }
+.stage-ready:has([data-view="roomdraw"]:not([hidden])) .stance-bar, .stage-ready:has([data-view="roomdraw"]:not([hidden])) .stage-reacts { display: none !important; }

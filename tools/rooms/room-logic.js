@@ -3,11 +3,11 @@
 // messages. A room is one Meet call's slides, question, board, and page, and
 // it is erased when it ends.
 
-export const LIMITS = { talk: 42000, html: 100000, title: 120, name: 60, prompt: 500, choice: 120, choices: 8, note: 280, notes: 200, notesEach: 20, answer: 1000, card: 400, people: 300, clock: 7200, url: 2000, mstate: 20000 };
+export const LIMITS = { talk: 42000, html: 100000, title: 120, name: 60, prompt: 500, choice: 120, choices: 8, note: 280, notes: 200, notesEach: 20, answer: 1000, card: 400, people: 300, clock: 7200, url: 2000, mstate: 20000, strokes: 200, element: 60000, drawing: 4000, drawingBytes: 1500000 };
 
 export const REACTIONS = ['smile', 'laugh', 'love', 'clap', 'snaps', 'ponder', 'mind', 'frown'];
 export const STANCES = ['agree', 'unsure', 'disagree'];
-const SHOWS = ['welcome', 'slides', 'question', 'board', 'page', 'card', 'blank'];
+const SHOWS = ['welcome', 'slides', 'question', 'board', 'page', 'card', 'blank', 'draw'];
 const KINDS = ['choice', 'multi', 'scale', 'words', 'short'];
 export const TAKE_OVER_MS = 60000;
 
@@ -17,7 +17,7 @@ function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.fl
 function int(v, lo, hi) { const n = Math.floor(Number(v)); return Number.isFinite(n) ? Math.max(lo, Math.min(hi, n)) : lo; }
 
 export function blank() {
-  return { on: false, host: null, hostName: '', hostLeft: null, title: '', talk: '', talkV: 0, at: 0, shown: 0, show: 'welcome', question: null, answers: {}, notes: [], board: '', page: null, html: '', htmlV: 0, card: '', clock: null, stances: {}, works: {}, worksOpen: false, groups: null, seq: 0 };
+  return { on: false, host: null, hostName: '', hostLeft: null, title: '', talk: '', talkV: 0, at: 0, shown: 0, show: 'welcome', question: null, answers: {}, notes: [], board: '', page: null, html: '', htmlV: 0, card: '', clock: null, stances: {}, works: {}, worksOpen: false, groups: null, drawing: {}, drawingBytes: 0, seq: 0 };
 }
 
 // A website a host shows by its address: https only, and never this site or the
@@ -109,7 +109,7 @@ function cleanAnswer(q, m) {
   return body ? { body } : null;
 }
 
-const HOST_ONLY = new Set(['stances', 'talk', 'go', 'show', 'ask', 'reveal', 'close', 'clear', 'unnoteAny', 'page', 'site', 'board', 'pasted', 'card', 'clock', 'clockAdd', 'hand', 'title', 'works', 'feature', 'groups']);
+const HOST_ONLY = new Set(['stances', 'talk', 'go', 'show', 'ask', 'reveal', 'close', 'clear', 'unnoteAny', 'page', 'site', 'board', 'pasted', 'card', 'clock', 'clockAdd', 'hand', 'title', 'works', 'feature', 'groups', 'draw']);
 
 // who: { pid, name, here(pid) }. Returns what changed: { room?, talk?, html?,
 // to?, error?, ended? }; no result means nothing did.
@@ -311,6 +311,36 @@ export function apply(room, who, m, now, opts) {
       room.groups = links.map((link) => ({ link, members: [] }));
       order.forEach((id, i) => room.groups[i % links.length].members.push(id));
       return { room: true };
+    }
+    // Drawing together: a drawing on every stage that anyone in the call can
+    // add to. Elements merge the way Excalidraw's own collaboration merges
+    // them: a higher version wins, and of two equal versions the lower
+    // versionNonce. The drawing lives only in the room and goes when it ends.
+    case 'draw': {
+      if (m.clear === true || !room.drawing) { room.drawing = {}; room.drawingBytes = 0; }
+      room.show = 'draw';
+      return { room: true, drawing: m.clear === true };
+    }
+    case 'strokes': {
+      if (!room.on || room.show !== 'draw') return { error: 'Nothing is being drawn right now.' };
+      const list = Array.isArray(m.elements) ? m.elements.slice(0, LIMITS.strokes) : [];
+      room.drawing = room.drawing || {};
+      const took = [];
+      for (const e of list) {
+        if (!e || typeof e !== 'object' || typeof e.id !== 'string' || !/^[A-Za-z0-9_-]{1,64}$/.test(e.id)) continue;
+        if (!Number.isInteger(e.version) || !Number.isInteger(e.versionNonce)) continue;
+        const json = JSON.stringify(e);
+        if (json.length > LIMITS.element) continue;
+        const had = room.drawing[e.id];
+        if (had && (had.e.version > e.version || (had.e.version === e.version && had.e.versionNonce <= e.versionNonce))) continue;
+        if (!had && Object.keys(room.drawing).length >= LIMITS.drawing) return took.length ? { strokes: took } : { error: 'The drawing is full.' };
+        const bytes = (room.drawingBytes || 0) - (had ? had.n : 0) + json.length;
+        if (bytes > LIMITS.drawingBytes) return took.length ? { strokes: took } : { error: 'The drawing is full.' };
+        room.drawing[e.id] = { e, n: json.length };
+        room.drawingBytes = bytes;
+        took.push(e);
+      }
+      return took.length ? { strokes: took } : {};
     }
     default:
       return { error: 'That message was not understood.' };

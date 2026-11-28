@@ -14,7 +14,7 @@ test('the first to start is the host, and nobody else can start over them', () =
 
 test('only the host runs the room', () => {
   const r = started();
-  ['talk', 'go', 'show', 'ask', 'reveal', 'close', 'clear', 'page', 'site', 'board', 'pasted', 'card', 'clock', 'clockAdd', 'hand', 'title', 'works', 'feature', 'groups'].forEach((t) => {
+  ['talk', 'go', 'show', 'ask', 'reveal', 'close', 'clear', 'page', 'site', 'board', 'pasted', 'card', 'clock', 'clockAdd', 'hand', 'title', 'works', 'feature', 'groups', 'draw'].forEach((t) => {
     assert.match(apply(r, B, { t }, 2).error, /Only the host/, t);
   });
 });
@@ -302,4 +302,32 @@ test('only a Meet call address counts as a breakout room', () => {
   assert.equal(meetOk('http://meet.google.com/abc-defg-hij'), null);
   assert.equal(meetOk('https://meet.google.com.evil.example/abc-defg-hij'), null);
   assert.equal(meetOk('https://meet.google.com/abc-defg-hijk'), null);
+});
+
+test('drawing together: anyone adds to the drawing, a newer version wins, and the host can start over', () => {
+  const r = started(), el = (id, version, versionNonce, x) => ({ id, version, versionNonce, type: 'rectangle', x });
+  assert.match(apply(r, B, { t: 'strokes', elements: [el('e1', 1, 5, 0)] }, 2).error, /Nothing is being drawn/);
+  assert.deepEqual(apply(r, A, { t: 'draw' }, 3), { room: true, drawing: false });
+  assert.equal(r.show, 'draw');
+  assert.deepEqual(apply(r, B, { t: 'strokes', elements: [el('e1', 1, 5, 0)] }, 4), { strokes: [el('e1', 1, 5, 0)] });
+  assert.deepEqual(apply(r, A, { t: 'strokes', elements: [el('e1', 1, 9, 1)] }, 5), {});
+  assert.deepEqual(apply(r, A, { t: 'strokes', elements: [el('e1', 1, 2, 2)] }, 6), { strokes: [el('e1', 1, 2, 2)] });
+  assert.deepEqual(apply(r, B, { t: 'strokes', elements: [el('e1', 3, 7, 3), { id: 'bad id!', version: 1, versionNonce: 1 }, { id: 'e2' }] }, 7), { strokes: [el('e1', 3, 7, 3)] });
+  assert.equal(Object.keys(r.drawing).length, 1);
+  assert.equal(r.drawing.e1.e.x, 3);
+  apply(r, A, { t: 'card', body: 'Back soon' }, 8);
+  assert.match(apply(r, B, { t: 'strokes', elements: [el('e9', 1, 1, 0)] }, 9).error, /Nothing is being drawn/);
+  apply(r, A, { t: 'draw' }, 10);
+  assert.equal(r.drawing.e1.e.x, 3);
+  assert.deepEqual(apply(r, A, { t: 'draw', clear: true }, 11), { room: true, drawing: true });
+  assert.deepEqual(r.drawing, {});
+});
+
+test('a drawing has a size, and one element too large to carry is left out', () => {
+  const r = started();
+  apply(r, A, { t: 'draw' }, 2);
+  const big = { id: 'big', version: 1, versionNonce: 1, points: 'x'.repeat(LIMITS.element) };
+  assert.deepEqual(apply(r, B, { t: 'strokes', elements: [big] }, 3), {});
+  r.drawingBytes = LIMITS.drawingBytes - 10;
+  assert.match(apply(r, B, { t: 'strokes', elements: [{ id: 'a1', version: 1, versionNonce: 1, x: 12345 }] }, 4).error, /full/);
 });

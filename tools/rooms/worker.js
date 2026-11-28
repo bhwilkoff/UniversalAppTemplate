@@ -54,7 +54,7 @@ export class Room extends DurableObject {
     super(ctx, env);
     this.room = blank();
     this.timer = null; this.saveTimer = null; this.floats = []; this.floatTimer = null; this.dirty = false; this.alarmAt = 0;
-    this.rates = new WeakMap();
+    this.rates = new WeakMap(); this.strokeRates = new WeakMap(); this.drawingDirty = false;
     // A room lasts one call, so storage only carries it across a restart. When
     // storage refuses (seen November 23, 2026: every room with saved state threw
     // 1101 on waking, and the whole call lost its room), the room goes on from
@@ -64,6 +64,8 @@ export class Room extends DurableObject {
         const kept = await ctx.storage.get('room');
         if (kept) this.room = Object.assign(blank(), kept);
         this.room.html = (await ctx.storage.get('html')) || '';
+        this.room.drawing = (await ctx.storage.get('drawing')) || {};
+        this.room.drawingBytes = Object.values(this.room.drawing).reduce((n, d) => n + (d.n || 0), 0);
         this.alarmAt = (await ctx.storage.getAlarm()) || 0;
       } catch (e) {
         console.log('[room] storage unreadable, starting from memory: ' + (e && e.message));
@@ -117,9 +119,10 @@ export class Room extends DurableObject {
   }
   save() {
     if (!this.room.on) return;
-    const { html, ...kept } = this.room;
+    const { html, drawing, ...kept } = this.room;
     const quiet = (e) => console.log('[room] storage refused a save: ' + (e && e.message));
     try { this.ctx.storage.put('room', kept).catch(quiet); } catch (e) { quiet(e); }
+    if (this.drawingDirty) { this.drawingDirty = false; try { this.ctx.storage.put('drawing', drawing || {}).catch(quiet); } catch (e) { quiet(e); } }
     const now = Date.now();
     if (this.alarmAt < now + DAY - 3600000) { this.alarmAt = now + DAY; try { this.ctx.storage.setAlarm(this.alarmAt).catch(quiet); } catch (e) { quiet(e); } }
   }
@@ -130,11 +133,21 @@ export class Room extends DurableObject {
     try { await this.ctx.storage.deleteAll(); } catch (e) { /* storage refused; the room is blank in memory */ }
   }
 
-  allowed(ws, host) {
-    const now = Date.now(), r = (this.rates.get(ws) || []).filter((t) => now - t < 10000);
-    if (r.length >= (host ? 200 : 40)) return false;
-    r.push(now); this.rates.set(ws, r);
+  allowed(ws, host, stroke) {
+    const map = stroke ? this.strokeRates : this.rates;
+    const now = Date.now(), r = (map.get(ws) || []).filter((t) => now - t < 10000);
+    if (r.length >= (stroke ? 150 : host ? 200 : 40)) return false;
+    r.push(now); map.set(ws, r);
     return true;
+  }
+  // The drawing is saved on its own, at most every five seconds.
+  drawingSoon() {
+    this.drawingDirty = true;
+    if (!this.saveTimer) this.saveTimer = setTimeout(() => { this.saveTimer = null; this.save(); }, 5000);
+  }
+  toStages(m, except) {
+    const out = JSON.stringify(m);
+    this.sockets().forEach((s) => { if (s.ws !== except && s.who.role === 'stage') { try { s.ws.send(out); } catch (e) { /* gone */ } } });
   }
 
   async webSocketMessage(ws, data) {
@@ -160,13 +173,14 @@ export class Room extends DurableObject {
       if (words && me.pid === this.room.host) this.send(ws, Object.assign({ t: 'words' }, words));
       const works = hostWorks(this.room);
       if (works && me.pid === this.room.host) this.send(ws, Object.assign({ t: 'works' }, works));
+      if (me.role === 'stage' && this.room.drawing && Object.keys(this.room.drawing).length) this.send(ws, { t: 'drawing', elements: Object.values(this.room.drawing).map((d) => d.e) });
       const mw = this.room.worksOpen && this.room.works && this.room.works[me.pid];
       if (mw) this.send(ws, { t: 'myWork', url: mw.url });
       this.soonQuiet();
       return;
     }
     if (!me.pid) return;
-    if (!this.allowed(ws, me.pid === this.room.host)) return;
+    if (!this.allowed(ws, me.pid === this.room.host, m.t === 'strokes')) return;
 
     if (m.t === 'name') {
       const name = String(m.name || '').replace(/\s+/g, ' ').trim().slice(0, LIMITS.name);
@@ -207,6 +221,8 @@ export class Room extends DurableObject {
       const out = JSON.stringify({ t: 'html', v: this.room.htmlV, html: this.room.html });
       this.sockets().forEach((s) => { try { s.ws.send(out); } catch (e) { /* gone */ } });
     }
+    if (did.strokes) { this.toStages({ t: 'strokes', elements: did.strokes }, ws); this.drawingSoon(); }
+    if (did.drawing) { this.toStages({ t: 'drawing', elements: [] }); this.drawingSoon(); }
     if (did.myWork !== undefined) this.sockets().forEach((s) => { if (s.who.pid === me.pid) this.send(s.ws, { t: 'myWork', url: did.myWork }); });
     if (did.mine) this.sockets().forEach((s) => { if (s.who.pid === me.pid) this.send(s.ws, { t: 'mine', mine: did.mine }); });
     if (did.room) this.soon();

@@ -338,6 +338,9 @@
           pane.appendChild(out('Open it in a new tab', room.page.url));
         }
         if (newSha) pane.appendChild(btn('Show the new version', 'btn-secondary', function () { var r = room.page; send({ t: 'page', owner: r.owner, repo: r.repo, sha: newSha, path: r.path }); newSha = null; }));
+      } else if (room.show === 'draw') {
+        pane.appendChild(el('h2', null, 'Drawing together'));
+        pane.appendChild(btn('Start a new drawing', 'btn-secondary', function () { send({ t: 'draw', clear: true }); }));
       } else if (room.show === 'card') {
         pane.appendChild(el('div', 'p2-notes', room.card));
         pane.appendChild(btn('Take it down', 'btn-secondary', function () { send({ t: 'card', body: '' }); }));
@@ -576,7 +579,7 @@
     // Tools
     // --------------------------------------------------------------
 
-    var TOOLS = [['question', 'Question', 'chats-circle'], ['board', 'Propose and vote', 'check-circle'], ['site', 'Show a website', 'globe-simple'], ['model', 'Give everyone a model', 'book-open-text'], ['work', 'Show your work', 'app-window'], ['groups', 'Breakout rooms', 'door-open'], ['clock', 'Clock', 'clock'], ['message', 'Message', 'megaphone-simple'], ['clear', 'Clear stage', 'eye-slash']];
+    var TOOLS = [['question', 'Question', 'chats-circle'], ['board', 'Propose and vote', 'check-circle'], ['site', 'Show a website', 'globe-simple'], ['model', 'Give everyone a model', 'book-open-text'], ['work', 'Show your work', 'app-window'], ['groups', 'Breakout rooms', 'door-open'], ['draw', 'Draw together', 'pencil-simple-line'], ['clock', 'Clock', 'clock'], ['message', 'Message', 'megaphone-simple'], ['clear', 'Clear stage', 'eye-slash']];
     function drawTools() {
       var pane = F && F.pane('kit');
       if (!pane) return;
@@ -601,7 +604,7 @@
       head.appendChild(el('h2', null, TOOLS.filter(function (t) { return t[0] === tool; })[0][1]));
       pane.appendChild(head);
       var line = el('p', 'small'); line.setAttribute('role', 'status');
-      ({ groups: groupsTool, work: workTool, question: questionTool, board: boardTool, site: siteTool, model: modelTool, clock: clockTool, message: messageTool })[tool](pane, line);
+      ({ draw: drawTool, groups: groupsTool, work: workTool, question: questionTool, board: boardTool, site: siteTool, model: modelTool, clock: clockTool, message: messageTool })[tool](pane, line);
       pane.appendChild(line);
     }
     function done() { tool = null; drawTools(); F.show('now'); }
@@ -609,6 +612,11 @@
     // come to the host's Now, by name, and the host puts one on the stage.
     // The host makes a Meet call for each room (meet.new) and pastes the
     // links; everyone here but the host is dealt into them.
+    // One drawing on every stage that anyone in the call adds to.
+    function drawTool(pane) {
+      pane.appendChild(btn(room && room.show === 'draw' ? 'The drawing is up' : 'Put the drawing up', 'btn-primary', function () { send({ t: 'draw' }); done(); }));
+      pane.appendChild(btn('Start a new drawing', 'btn-secondary', function () { send({ t: 'draw', clear: true }); done(); }));
+    }
     function groupsTool(pane, line) {
       if (room && room.groups) return pane.appendChild(btn('Bring everyone back', 'btn-secondary', function () { send({ t: 'groups', open: false }); done(); }));
       var f = el('form', 'open-add'), t = field('textarea', 'A Meet link for each room, one per line');

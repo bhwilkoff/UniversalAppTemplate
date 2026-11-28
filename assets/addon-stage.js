@@ -273,6 +273,7 @@
       $('[data-person-audience]').textContent = view.audience || '';
     }
     drawPage(view.mode === 'page' ? view : null);
+    drawTogether(view.mode === 'roomdraw');
     if (view.mode === 'roomboard') drawRoomBoard();
     if (view.mode === 'roomwelcome') drawRoomWelcome();
     drawStudio(view.mode === 'studio' ? view.studio : null);
@@ -788,7 +789,9 @@
       welcome: function (m) { roomMine = m.mine; },
       mine: function (m) { roomMine = m; roomDraw(); },
       floats: function (f) { var st = roomState && roomState.stance; drawReactions({ floats: f, stance: st && st.total ? st : null }); },
-      ended: function () { roomEnded = true; roomMine = null; roomTalk = ''; roomHtml = ''; roomDraw(); },
+      strokes: function (list) { keepDrawn(list); toDraw({ t: 'strokes', elements: list }); },
+      drawing: function (list) { if (!list.length) drawn = {}; keepDrawn(list); toDraw({ t: 'drawing', elements: list }); },
+      ended: function () { roomEnded = true; roomMine = null; roomTalk = ''; roomHtml = ''; drawn = {}; roomDraw(); },
       status: function (s) { $('[data-room-off]').hidden = s !== 'off'; }
     } });
     document.addEventListener('keydown', function (e) {
@@ -807,6 +810,34 @@
       input.value = '';
     });
   }
+  // Drawing together (board-room.js in a frame): the stage carries the
+  // frame's strokes through this call's room and hands it everyone else's.
+  // It keeps the drawing too, so a frame made again starts complete.
+  var drawFrame = null, drawn = {};
+  function keepDrawn(list) {
+    list.forEach(function (e) {
+      var had = drawn[e.id];
+      if (!had || had.version < e.version || (had.version === e.version && had.versionNonce > e.versionNonce)) drawn[e.id] = e;
+    });
+  }
+  function toDraw(m) { if (drawFrame && drawFrame.contentWindow) drawFrame.contentWindow.postMessage(Object.assign({ hsDraw: true }, m), location.origin); }
+  function drawTogether(on) {
+    var box = $('[data-draw-frame]');
+    if (!box) return;
+    if (!on || !room) { if (drawFrame) { drawFrame = null; box.replaceChildren(); } return; }
+    if (drawFrame) return;
+    drawFrame = document.createElement('iframe');
+    drawFrame.src = '/board/room/';
+    drawFrame.title = 'Drawing together';
+    drawFrame.setAttribute('allow', 'clipboard-read; clipboard-write');
+    box.replaceChildren(drawFrame);
+  }
+  window.addEventListener('message', function (e) {
+    var d = e.data;
+    if (!drawFrame || e.source !== drawFrame.contentWindow || e.origin !== location.origin || !d || !d.hsDraw) return;
+    if (d.t === 'ready') toDraw({ t: 'drawing', elements: Object.keys(drawn).map(function (k) { return drawn[k]; }) });
+    if (d.t === 'strokes' && Array.isArray(d.elements) && room) { keepDrawn(d.elements); room.send({ t: 'strokes', elements: d.elements }); }
+  });
   function drawRoomWelcome() {
     $('[data-rw-kicker]').textContent = 'Welcome';
     $('[data-rw-title]').textContent = view.waiting ? 'This session has not started yet.' : (view.title || 'The session is about to begin.');
