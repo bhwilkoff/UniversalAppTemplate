@@ -24,6 +24,18 @@ separate words. One tick, one commit.
 
 ## For Ben
 
+- **Decided while you were away (C3):** answers to a workbook in a no-account
+  room live only in the room. Before End the session the host now sees how
+  many people's answers are unsaved, with Save; a closed workbook, and the
+  panel after the session ends, keep Keep a copy for each person. Change it
+  if you want answers kept another way.
+- **Safari in a Meet call is untested:** Safari is signed in to Google as
+  your Minerva account, which I keep out of testing, and Safari's "Allow
+  JavaScript from Apple Events" (a security setting) is off, so I left it.
+  The room page in Safari loads, follows the room, shows the drawing and
+  everyone's pointers, and sends its own pointer; drawing with the mouse in
+  Safari is the one thing I could not drive.
+
 - **Thursday with Alexis: a run sheet.** In any Meet call, open Human
   Shaped and press Start a session (no account). Tools, then Give
   everyone a model: pick one and choose "A copy for each person" (each
@@ -124,15 +136,15 @@ by the Course Builder import or by SQL.
 
 ### C. Round two (Ben, November 28, away from his computer: "I'd like you to keep going, but I'm not at my computer, so I cannot help you test. Please build out these features and fully test them.")
 
-- [ ] C1. A ranking question in session files, /plan/, open rooms (worker), and cohort plans saved to Drive (they became short today).
-- [ ] C2. Tools has Workbook: run one of the session's workbooks, or write a quick one in the panel.
-- [ ] C3. Answers at the end of a call: before Leave or End, the host is told how many workbook answers are unsaved, with Save; when a workbook closes, each person is reminded to Keep a copy. (A choice made without Ben; logged for him.)
-- [ ] C4. Draw together: everyone's pointer on every stage.
-- [ ] C5. Test in Safari (Ben's browser), driving it from the terminal.
-- [ ] C6. A real breakout round trip: real meet.new rooms, the learner leaves, joins, and comes back.
-- [ ] C7. More than two people: extra participants from the terminal in a real call (drawing, workbook, shared model).
-- [ ] C8. A Drive session's slide picture drawn on a stage in a call.
-- [ ] C9. In a call: the "On the stage" color and "Just you".
+- [x] C1. A ranking question in session files, /plan/, open rooms (worker), and cohort plans saved to Drive (they became short today).
+- [x] C2. Tools has Workbook: run one of the session's workbooks, or write a quick one in the panel.
+- [x] C3. Answers at the end of a call: before Leave or End, the host is told how many workbook answers are unsaved, with Save; when a workbook closes, each person is reminded to Keep a copy. (A choice made without Ben; logged for him.)
+- [x] C4. Draw together: everyone's pointer on every stage.
+- [~] C5. Test in Safari (Ben's browser), driving it from the terminal. Partly: see tick 28.
+- [x] C6. A real breakout round trip: real meet.new rooms, the learner leaves, joins, and comes back.
+- [x] C7. More than two people: extra participants from the terminal in a real call (drawing, workbook, shared model).
+- [x] C8. A Drive session's slide picture drawn on a stage in a call.
+- [x] C9. In a call: the "On the stage" color and "Just you".
 
 ### I. Ideas at Play (demo for Ben's meeting with Alexis, Thursday December 3)
 
@@ -546,3 +558,37 @@ breakout state.
   room part, and "Before the call" (text, choice, free) as part 20.
   Left in Ben's Drive: "Session 1: An hour of Human Shaped.json", a
   runnable copy of the demo session for any call.
+- 2026-11-28, tick 28 (round two; 89d6074c through e3c6cac1; worker
+  4b893c6f, 016bd514, a3d3d39d, 40404421). Built: C1 ranking questions
+  (worker counts each choice's average place; session files, /plan/, the
+  open room's Question tool, cohort plans saved to Drive); C2 a Workbook
+  tool (the session's own, open a closed one again, or a quick one from a
+  question per line); C3 unsaved answers named before End the session, and
+  Keep a copy after a workbook closes and after the session ends; C4
+  everyone's pointer with their name in Draw together. Seen in one real
+  four-person Meet call (nnw-napt-dok: Ben's leader profile, benhstest1
+  joined with Join here too, and two terminal participants, each a panel
+  and a stage): a /plan/ slide picture uploaded to Drive drawn on both
+  stages (C8); a ranking question with three orders, bars about 1.7, 2,
+  about 2.3, the learner's Move up and Send my order; a quick workbook,
+  "3 people have answered", Close it, the learner's Closed line with Keep
+  a copy, the host's "3 people's answers ... are not saved" with Save,
+  which then cleared; both terminal people's pointers and drawings on the
+  leader's and the learner's stages, and the learner's pointer on the
+  leader's; Show your work's On the stage in the accent color; breakouts
+  into three real meet.new rooms with the learner reading "Just you",
+  pressing Join room 1, leaving, joining cwb-hfut-bbo, and coming back to
+  the main call and activity with their closed workbook still there (C6,
+  C7, C9); End the session, after which the learner's panel kept the
+  workbook copy. Found and fixed in that call: /plan/ pictures needed a
+  click to open Google's window (Connect your Drive to add pictures); a
+  pointer from a stage had no name (now taken from the person's panel);
+  two people offering the same address both read On the stage; breakout
+  names became Someone once people left for their rooms (names now kept
+  from when the rooms were dealt; checked from the terminal with both
+  guests gone); an element with an invalid ordering key ("b2", from my
+  test script) blanked a late stage's drawing (keys now checked, with a
+  retry); the room page's name box covered Excalidraw's corner; after the
+  session ended the workbook line said answers would leave later. C5: see
+  For Ben. Test data: Randomness file now has the star-field picture (in
+  Ben's Drive, link readable), "Quick check (delete me) answers" CSV.
