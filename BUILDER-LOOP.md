@@ -275,3 +275,11 @@ breakout state.
   benwilkoff@gmail.com). Not yet seen: a saved file, and a session run
   in a call. Waiting on Ben: that approval, and `wrangler login` for the
   shared-model deploy.
+- 2026-11-28: with Ben's approval to click for testing, chose
+  benwilkoff@gmail.com and Continue on Google's consent ("only the
+  specific Google Drive files you use with this app"). **Verified:** the
+  session page said "Saved in your Drive, 3 parts", and Drive holds
+  "Session 1: How Leaves Make Food.json" (487 bytes) in the Human Shaped
+  sessions folder. Wrangler is signed in (Ben); `wrangler deploy` of the
+  rooms worker was refused by the auto-mode classifier, so it waits on
+  Ben running it or allowing it.
