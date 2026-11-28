@@ -3779,7 +3779,8 @@ html.stage-in-panel .stage-corner { display: none !important; }
 .model-how label.check input { width: auto; height: auto; margin: 0; flex: 0 0 auto; }
 
 /* Plan a session (/plan/): a whole session in the host's own Drive. */
-.plan { max-width: 52rem; }
+.plan { max-width: var(--wide); }
+.plan-start, .plan-title, .plan-add, .plan-save { max-width: 46rem; }
 .plan-field { display: grid; gap: 0.25rem; margin: 0.6rem 0; }
 .plan-field input, .plan-field textarea, .plan-field select { width: 100%; }
 .plan-title input { font-size: 1.15rem; }
