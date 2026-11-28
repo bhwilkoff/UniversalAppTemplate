@@ -423,3 +423,19 @@ breakout state.
   relayed through the rooms worker (today it rides Supabase Realtime on
   a cohort's private channel), with the last scene kept in the room for
   whoever arrives late, and erased when the call ends.
+- 2026-11-28, tick 22 (A4 part, 5cd8d04c). Draw together in open rooms:
+  Tools has "Draw together" (Put the drawing up, Start a new drawing);
+  each stage frames /board/room/, an Excalidraw canvas with no account
+  or database. The frame posts what changed to its stage, the stage
+  sends it through the room ('strokes'), and the worker merges element
+  by element as Excalidraw does (higher version, then lower
+  versionNonce), relays to every other stage, gives a stage that opens
+  late the whole drawing, saves it apart from the room every five
+  seconds at most, and erases it when the call ends. Limits: 150
+  strokes a second-window per socket, 4000 elements, 1.5 MB; pictures
+  off (a room has nowhere to keep files). Two tests (744 pass). Seen in
+  Chrome: the frame on a humanshaped.org page took a drawing sent to it
+  (a rectangle appeared), and a rectangle drawn with the mouse came
+  back out as one 'strokes' message with only the new element. Not
+  seen: through the worker, which still awaits the deploy (with Show
+  your work and Breakout rooms).
