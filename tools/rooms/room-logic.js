@@ -3,11 +3,11 @@
 // messages. A room is one Meet call's slides, question, board, and page, and
 // it is erased when it ends.
 
-export const LIMITS = { talk: 42000, html: 100000, title: 120, name: 60, prompt: 500, choice: 120, choices: 8, note: 280, notes: 200, notesEach: 20, answer: 1000, card: 400, people: 300, clock: 7200, url: 2000, mstate: 20000, strokes: 200, element: 60000, drawing: 4000, drawingBytes: 1500000 };
+export const LIMITS = { talk: 42000, html: 100000, title: 120, name: 60, prompt: 500, choice: 120, choices: 8, note: 280, notes: 200, notesEach: 20, answer: 1000, card: 400, people: 300, clock: 7200, url: 2000, mstate: 20000, strokes: 200, element: 60000, drawing: 4000, drawingBytes: 1500000, workbook: 40000, wbValue: 4000, wbPerson: 30000 };
 
 export const REACTIONS = ['smile', 'laugh', 'love', 'clap', 'snaps', 'ponder', 'mind', 'frown'];
 export const STANCES = ['agree', 'unsure', 'disagree'];
-const SHOWS = ['welcome', 'slides', 'question', 'board', 'page', 'card', 'blank', 'draw'];
+const SHOWS = ['welcome', 'slides', 'question', 'board', 'page', 'card', 'blank', 'draw', 'workbook'];
 const KINDS = ['choice', 'multi', 'scale', 'words', 'short'];
 export const TAKE_OVER_MS = 60000;
 
@@ -17,7 +17,7 @@ function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.fl
 function int(v, lo, hi) { const n = Math.floor(Number(v)); return Number.isFinite(n) ? Math.max(lo, Math.min(hi, n)) : lo; }
 
 export function blank() {
-  return { on: false, host: null, hostName: '', hostLeft: null, title: '', talk: '', talkV: 0, at: 0, shown: 0, show: 'welcome', question: null, answers: {}, notes: [], board: '', page: null, html: '', htmlV: 0, card: '', clock: null, stances: {}, works: {}, worksOpen: false, groups: null, drawing: {}, drawingBytes: 0, seq: 0 };
+  return { on: false, host: null, hostName: '', hostLeft: null, title: '', talk: '', talkV: 0, at: 0, shown: 0, show: 'welcome', question: null, answers: {}, notes: [], board: '', page: null, html: '', htmlV: 0, card: '', clock: null, stances: {}, works: {}, worksOpen: false, groups: null, drawing: {}, drawingBytes: 0, workbook: null, wbAnswers: {}, seq: 0 };
 }
 
 // A website a host shows by its address: https only, and never this site or the
@@ -35,6 +35,60 @@ export function siteOk(u) {
 // A Meet call's own address, the only place a breakout room can send people.
 const MEETLINK = /^https:\/\/meet\.google\.com\/([a-z]{3}-[a-z]{4}-[a-z]{3})(?:[/?#].*)?$/;
 export function meetOk(u) { const x = MEETLINK.exec(String(u || '').trim()); return x ? 'https://meet.google.com/' + x[1] : null; }
+
+// A workbook's blocks as a room carries them (session-plan.js blocks() makes
+// the same shape): words, an answer in words, a choice, or a table whose
+// empty cells are filled in.
+export function workbookBlocks(list) {
+  let n = 0;
+  const out = (Array.isArray(list) ? list : []).slice(0, 60).map((b) => {
+    if (!b || !['text', 'free', 'choice', 'table'].includes(b.type)) return null;
+    const t = text(b.text, 3000).trim();
+    if (!t) return null;
+    const o = { key: 'b' + (n + 1), type: b.type, text: t };
+    if (b.type === 'choice') {
+      o.multiple = b.multiple === true;
+      o.choices = (Array.isArray(b.choices) ? b.choices : []).map((c) => line(c, 200)).filter(Boolean).slice(0, 12);
+      if (o.choices.length < 2) return null;
+    }
+    if (b.type === 'table') {
+      o.rows = (Array.isArray(b.rows) ? b.rows : []).slice(0, 20).map((r) => (Array.isArray(r) ? r : []).slice(0, 8).map((c) => { const x = line(c && c.text, 300); return { text: x, fill: !x }; })).filter((r) => r.length);
+      if (!o.rows.length) return null;
+    }
+    n += 1;
+    return o;
+  }).filter(Boolean);
+  return JSON.stringify(out).length > LIMITS.workbook ? [] : out;
+}
+
+// One person's answer to one block, or null when it does not fit the block.
+function wbValue(b, v) {
+  if (b.type === 'free') { const s = text(v, LIMITS.wbValue); return typeof v === 'string' ? s : null; }
+  if (b.type === 'choice') {
+    if (!Array.isArray(v)) return null;
+    const picks = [...new Set(v.map(Number))].filter((c) => Number.isInteger(c) && c >= 0 && c < b.choices.length).sort((x, y) => x - y);
+    return b.multiple ? picks : picks.slice(0, 1);
+  }
+  if (b.type === 'table') {
+    if (!v || typeof v !== 'object' || Array.isArray(v)) return null;
+    const out = {};
+    for (const k of Object.keys(v).slice(0, 200)) {
+      const m = /^(\d{1,2}),(\d{1,2})$/.exec(k);
+      const cell = m && b.rows[+m[1]] && b.rows[+m[1]][+m[2]];
+      if (cell && cell.fill) out[k] = text(v[k], 500);
+    }
+    return out;
+  }
+  return null;
+}
+
+// Everyone's answers, for the host to keep: names and answers, never shown to anyone else.
+export function workbookAnswers(room) {
+  const w = room.workbook;
+  if (!w) return null;
+  const all = room.wbAnswers || {};
+  return { id: w.id, title: w.title, blocks: w.blocks, people: Object.keys(all).map((id) => ({ name: all[id].name, a: all[id].a, at: all[id].at })).sort((x, y) => x.at - y.at) };
+}
 
 export function repoOk(owner, repo) { return /^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})$/.test(owner || '') && /^[A-Za-z0-9._-]{1,100}$/.test(repo || '') && !/^\.+$/.test(repo); }
 
@@ -75,6 +129,8 @@ export function publicRoom(room, here) {
     notes: room.notes, board: room.board, page, mstate: room.page && room.page.together && room.mstate ? room.mstate : null, card: room.card, clock: room.clock, stance: stanceCounts(room), stancesOpen: room.stancesOpen === true,
     people: here.people.slice(0, LIMITS.people), here: here.count, hostHere: here.hostHere, stages: here.stages,
     canTakeOver: room.on && !here.hostHere && room.hostLeft != null, worksOpen: room.worksOpen === true,
+    workbook: room.workbook ? { id: room.workbook.id, title: room.workbook.title, blocks: room.workbook.blocks, open: room.workbook.open } : null,
+    wbCount: room.workbook ? Object.keys(room.wbAnswers || {}).length : 0,
     groups: room.groups ? room.groups.map((g) => ({ link: g.link, members: g.members.slice() })) : null
   };
 }
@@ -109,7 +165,7 @@ function cleanAnswer(q, m) {
   return body ? { body } : null;
 }
 
-const HOST_ONLY = new Set(['stances', 'talk', 'go', 'show', 'ask', 'reveal', 'close', 'clear', 'unnoteAny', 'page', 'site', 'board', 'pasted', 'card', 'clock', 'clockAdd', 'hand', 'title', 'works', 'feature', 'groups', 'draw']);
+const HOST_ONLY = new Set(['stances', 'talk', 'go', 'show', 'ask', 'reveal', 'close', 'clear', 'unnoteAny', 'page', 'site', 'board', 'pasted', 'card', 'clock', 'clockAdd', 'hand', 'title', 'works', 'feature', 'groups', 'draw', 'workbook', 'wbCollect']);
 
 // who: { pid, name, here(pid) }. Returns what changed: { room?, talk?, html?,
 // to?, error?, ended? }; no result means nothing did.
@@ -341,6 +397,36 @@ export function apply(room, who, m, now, opts) {
         took.push(e);
       }
       return took.length ? { strokes: took } : {};
+    }
+    // A workbook: each person answers in their own panel, block by block,
+    // and sees only their own answers; the host collects everyone's to keep.
+    case 'workbook': {
+      if (m.close === true) { if (room.workbook) room.workbook.open = false; if (room.show === 'workbook') room.show = room.talk ? 'slides' : 'welcome'; return { room: true }; }
+      if (m.open === true && room.workbook) { room.workbook.open = true; room.show = 'workbook'; return { room: true }; }
+      const blocks = workbookBlocks(m.blocks);
+      if (!blocks.length) return { error: 'That workbook has nothing to answer.' };
+      room.seq += 1;
+      room.workbook = { id: 'w' + room.seq, title: line(m.title, LIMITS.title) || 'A workbook', blocks, open: true };
+      room.wbAnswers = {}; room.show = 'workbook';
+      return { room: true };
+    }
+    case 'wbAnswer': {
+      const w = room.workbook;
+      if (!room.on || !w || !w.open || w.id !== m.id) return { error: 'That workbook has closed.' };
+      const b = w.blocks.find((x) => x.key === m.key);
+      if (!b || b.type === 'text') return { error: 'That answer could not be read.' };
+      const v = wbValue(b, m.value);
+      if (v == null) return { error: 'That answer could not be read.' };
+      room.wbAnswers = room.wbAnswers || {};
+      const had = room.wbAnswers[who.pid] || { name: '', a: {}, at: now };
+      const next = { name: line(who.name, LIMITS.name), a: { ...had.a, [b.key]: v }, at: had.at };
+      if (JSON.stringify(next.a).length > LIMITS.wbPerson) return { error: 'That is more than a workbook can hold.' };
+      room.wbAnswers[who.pid] = next;
+      return { room: true, wbMine: { id: w.id, a: next.a } };
+    }
+    case 'wbCollect': {
+      const all = workbookAnswers(room);
+      return all ? { reply: Object.assign({ t: 'wbAll' }, all) } : { error: 'There is no workbook to collect.' };
     }
     default:
       return { error: 'That message was not understood.' };

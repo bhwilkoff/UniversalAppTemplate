@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { apply, blank, publicRoom, summary, hostWords, hostWorks, meetOk, repoOk, siteOk, stanceCounts, TAKE_OVER_MS, LIMITS } from '../rooms/room-logic.js';
+import { apply, blank, publicRoom, summary, hostWords, hostWorks, meetOk, workbookBlocks, repoOk, siteOk, stanceCounts, TAKE_OVER_MS, LIMITS } from '../rooms/room-logic.js';
 
 const A = { pid: 'a', name: 'Ana', isHere: () => true }, B = { pid: 'b', name: 'Bo', isHere: () => true };
 function started() { const r = blank(); apply(r, A, { t: 'start', title: 'Hello' }, 1); return r; }
@@ -14,7 +14,7 @@ test('the first to start is the host, and nobody else can start over them', () =
 
 test('only the host runs the room', () => {
   const r = started();
-  ['talk', 'go', 'show', 'ask', 'reveal', 'close', 'clear', 'page', 'site', 'board', 'pasted', 'card', 'clock', 'clockAdd', 'hand', 'title', 'works', 'feature', 'groups', 'draw'].forEach((t) => {
+  ['talk', 'go', 'show', 'ask', 'reveal', 'close', 'clear', 'page', 'site', 'board', 'pasted', 'card', 'clock', 'clockAdd', 'hand', 'title', 'works', 'feature', 'groups', 'draw', 'workbook', 'wbCollect'].forEach((t) => {
     assert.match(apply(r, B, { t }, 2).error, /Only the host/, t);
   });
 });
@@ -330,4 +330,43 @@ test('a drawing has a size, and one element too large to carry is left out', () 
   assert.deepEqual(apply(r, B, { t: 'strokes', elements: [big] }, 3), {});
   r.drawingBytes = LIMITS.drawingBytes - 10;
   assert.match(apply(r, B, { t: 'strokes', elements: [{ id: 'a1', version: 1, versionNonce: 1, x: 12345 }] }, 4).error, /full/);
+});
+
+const WB = [
+  { type: 'text', text: 'Read the passage.' },
+  { type: 'free', text: 'What do you notice?' },
+  { type: 'choice', text: 'Which is random?', choices: ['Left', 'Right', ''] },
+  { type: 'table', text: 'Fill in the table.', rows: [[{ text: 'Guess' }, { text: '' }], [{ text: 'Count' }, { text: '' }]] },
+  { type: 'choice', text: 'Only one choice', choices: ['A'] },
+  { type: 'file', text: 'Upload' }
+];
+
+test('a workbook keeps the blocks a room can run, numbered again', () => {
+  const b = workbookBlocks(WB);
+  assert.deepEqual(b.map((x) => x.key + ':' + x.type), ['b1:text', 'b2:free', 'b3:choice', 'b4:table']);
+  assert.deepEqual(b[2].choices, ['Left', 'Right']);
+  assert.deepEqual(b[3].rows, [[{ text: 'Guess', fill: false }, { text: '', fill: true }], [{ text: 'Count', fill: false }, { text: '', fill: true }]]);
+});
+
+test('each person answers their own workbook, sees only their own, and the host collects them all', () => {
+  const r = started();
+  assert.match(apply(r, A, { t: 'workbook', title: 'Empty', blocks: [{ type: 'text', text: '' }] }, 2).error, /nothing to answer/);
+  assert.deepEqual(apply(r, A, { t: 'workbook', title: 'Random (delete me)', blocks: WB }, 3), { room: true });
+  const id = r.workbook.id;
+  assert.equal(r.show, 'workbook');
+  assert.deepEqual(apply(r, B, { t: 'wbAnswer', id, key: 'b2', value: 'Clumps' }, 4), { room: true, wbMine: { id, a: { b2: 'Clumps' } } });
+  assert.deepEqual(apply(r, B, { t: 'wbAnswer', id, key: 'b3', value: [1, 0] }, 5).wbMine.a.b3, [0]);
+  assert.deepEqual(apply(r, B, { t: 'wbAnswer', id, key: 'b4', value: { '0,1': '12', '0,0': 'not a blank', '9,9': 'x' } }, 6).wbMine.a.b4, { '0,1': '12' });
+  assert.match(apply(r, B, { t: 'wbAnswer', id, key: 'b1', value: 'x' }, 7).error, /could not be read/);
+  assert.match(apply(r, B, { t: 'wbAnswer', id: 'old', key: 'b2', value: 'x' }, 7).error, /closed/);
+  const pub = JSON.stringify(publicRoom(r));
+  assert.equal(pub.includes('Clumps'), false);
+  assert.equal(publicRoom(r).wbCount, 1);
+  assert.match(apply(r, B, { t: 'wbCollect' }, 8).error, /Only the host/);
+  const all = apply(r, A, { t: 'wbCollect' }, 9).reply;
+  assert.equal(all.t, 'wbAll');
+  assert.deepEqual(all.people, [{ name: 'Bo', a: { b2: 'Clumps', b3: [0], b4: { '0,1': '12' } }, at: 4 }]);
+  apply(r, A, { t: 'workbook', close: true }, 10);
+  assert.match(apply(r, B, { t: 'wbAnswer', id, key: 'b2', value: 'y' }, 11).error, /closed/);
+  assert.equal(apply(r, A, { t: 'wbCollect' }, 12).reply.people.length, 1);
 });

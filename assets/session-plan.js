@@ -9,11 +9,37 @@
 //   { kind: 'site', title, url }                         a website
 //   { kind: 'card', title, body }                        words on every stage
 //   { kind: 'clock', title, minutes }                    a clock for the part
+//   { kind: 'workbook', title, blocks }                  each person answers in their panel
+//     blocks: { key, type: text|free|choice|table, text, choices?, multiple?, rows? }
+//     (a cohort workbook's own block shape, without files)
 (function (root) {
   var KIND = 'human-shaped-session';
   var ASKS = ['choice', 'multi', 'scale', 'words', 'short'];
   var MODEL = /^https:\/\/ideasatplay\.org\/play\/[a-z0-9-]{1,140}\?v=\d{1,4}$/;
 
+  // A workbook's blocks that can run in a room, in the cohort workbook's own
+  // shape; a block missing its words or choices is left out.
+  function blocks(list) {
+    var n = 0;
+    return (Array.isArray(list) ? list : []).slice(0, 60).map(function (b) {
+      if (!b || ['text', 'free', 'choice', 'table'].indexOf(b.type) < 0) return null;
+      var text = String(b.text == null ? '' : b.text).trim().slice(0, 3000);
+      if (!text) return null;
+      var o = { key: 'b' + (++n), type: b.type, text: text };
+      if (b.type === 'choice') {
+        o.multiple = b.multiple === true;
+        o.choices = (Array.isArray(b.choices) ? b.choices : []).map(function (c) { return str(c, 200); }).filter(Boolean).slice(0, 12);
+        if (o.choices.length < 2) { n--; return null; }
+      }
+      if (b.type === 'table') {
+        o.rows = (Array.isArray(b.rows) ? b.rows : []).slice(0, 20).map(function (r) {
+          return (Array.isArray(r) ? r : []).slice(0, 8).map(function (c) { var t = str(c && c.text, 300); return { text: t, fill: !t }; });
+        }).filter(function (r) { return r.length; });
+        if (!o.rows.length) { n--; return null; }
+      }
+      return o;
+    }).filter(Boolean);
+  }
   function str(v, n) { return String(v == null ? '' : v).trim().slice(0, n); }
   function https(u) { return /^https:\/\/\S+$/.test(String(u || '')) && String(u).length <= 2000; }
 
@@ -32,6 +58,7 @@
       if (p.kind === 'model') return MODEL.test(p.url || '') ? { kind: 'model', title: title || 'A model', url: p.url, together: p.together === true } : null;
       if (p.kind === 'site') return https(p.url) ? { kind: 'site', title: title || 'A website', url: p.url } : null;
       if (p.kind === 'card') { var body = str(p.body, 400); return body ? { kind: 'card', title: title || 'A card', body: body } : null; }
+      if (p.kind === 'workbook') { var bl = blocks(p.blocks); return bl.length ? { kind: 'workbook', title: title || 'A workbook', blocks: bl } : null; }
       if (p.kind === 'clock') { var m = Math.round(Number(p.minutes)); return m >= 1 && m <= 120 ? { kind: 'clock', title: title || 'A clock', minutes: m } : null; }
       return null;
     }).filter(Boolean);
@@ -48,6 +75,7 @@
     if (p.kind === 'site') return [{ t: 'site', url: p.url, name: p.title }];
     if (p.kind === 'card') return [{ t: 'card', body: p.body }];
     if (p.kind === 'clock') return [{ t: 'clock', seconds: p.minutes * 60, label: p.title }];
+    if (p.kind === 'workbook') return [{ t: 'workbook', title: p.title, blocks: p.blocks }];
     return [];
   }
 
@@ -68,7 +96,50 @@
     return clean(out);
   }
 
-  var lib = { KIND: KIND, clean: clean, session: session, messages: messages, fromScenes: fromScenes };
+  // A workbook's answers, for keeping. The host's copy is a CSV with a row
+  // per person and a column per question (a table's blanks each their own
+  // column); a person's own copy is Markdown with their answers in place.
+  function cells(b) {
+    var out = [];
+    (b.rows || []).forEach(function (r, i) { r.forEach(function (c, j) { if (c.fill) out.push({ k: i + ',' + j, label: b.text + ' (' + (r[0] && r[0].text ? r[0].text : 'row ' + (i + 1)) + ', column ' + (j + 1) + ')' }); }); });
+    return out;
+  }
+  function answerText(b, v) {
+    if (v == null) return '';
+    if (b.type === 'choice') return (Array.isArray(v) ? v : []).map(function (i) { return b.choices[i]; }).filter(Boolean).join('; ');
+    return String(v);
+  }
+  function csvCell(v) { v = String(v == null ? '' : v); return /[",\n\r]/.test(v) || /^[=+\-@]/.test(v) ? '"' + (/^[=+\-@]/.test(v) ? "'" : '') + v.replace(/"/g, '""') + '"' : v; }
+  function answersCsv(all) {
+    var cols = [];
+    (all.blocks || []).forEach(function (b) {
+      if (b.type === 'free' || b.type === 'choice') cols.push({ label: b.text, get: function (a) { return answerText(b, a[b.key]); } });
+      if (b.type === 'table') cells(b).forEach(function (c) { cols.push({ label: c.label, get: function (a) { return a[b.key] ? a[b.key][c.k] || '' : ''; } }); });
+    });
+    var rows = [['Name'].concat(cols.map(function (c) { return c.label; }))];
+    (all.people || []).forEach(function (p) { rows.push([p.name || 'Someone'].concat(cols.map(function (c) { return c.get(p.a || {}); }))); });
+    return rows.map(function (r) { return r.map(csvCell).join(','); }).join('\r\n') + '\r\n';
+  }
+  function myCopy(w, a) {
+    a = a || {};
+    var out = ['# ' + w.title, ''];
+    (w.blocks || []).forEach(function (b) {
+      if (b.type === 'text') out.push(b.text, '');
+      else if (b.type === 'free') out.push('**' + b.text + '**', '', answerText(b, a[b.key]) || '(no answer)', '');
+      else if (b.type === 'choice') { out.push('**' + b.text + '**', ''); b.choices.forEach(function (c, i) { out.push('- [' + ((a[b.key] || []).indexOf(i) >= 0 ? 'x' : ' ') + '] ' + c); }); out.push(''); }
+      else if (b.type === 'table') {
+        out.push('**' + b.text + '**', '');
+        b.rows.forEach(function (r, i) {
+          out.push('| ' + r.map(function (c, j) { return (c.fill ? (a[b.key] && a[b.key][i + ',' + j]) || ' ' : c.text).replace(/\|/g, '/').replace(/\n/g, ' '); }).join(' | ') + ' |');
+          if (i === 0) out.push('|' + r.map(function () { return ' --- '; }).join('|') + '|');
+        });
+        out.push('');
+      }
+    });
+    return out.join('\n');
+  }
+
+  var lib = { KIND: KIND, blocks: blocks, clean: clean, answersCsv: answersCsv, myCopy: myCopy, session: session, messages: messages, fromScenes: fromScenes };
   if (typeof module !== 'undefined' && module.exports) module.exports = lib;
   else root.SessionPlan = lib;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

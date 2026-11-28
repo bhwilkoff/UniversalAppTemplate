@@ -119,6 +119,16 @@
       return call(token, 'POST', API + '/files/' + encodeURIComponent(f.id) + '/permissions', JSON.stringify({ role: 'reader', type: 'anyone' })).then(function () { return pictureUrl(f.id); });
     });
   }
+  // A plain file (a workbook's answers as CSV) in the sessions folder, which
+  // the person owns like any other file in their Drive. Resolves its id.
+  function file(token, name, body, type) {
+    return folder(token).then(function (parent) {
+      var b = 'hs' + Math.random().toString(36).slice(2);
+      var meta = { name: String(name || 'file').slice(0, 140), parents: [parent], mimeType: type || 'text/plain', appProperties: { humanshaped: 'session-file' } };
+      var data = '--' + b + '\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n' + JSON.stringify(meta) + '\r\n--' + b + '\r\nContent-Type: ' + (type || 'text/plain') + '; charset=UTF-8\r\n\r\n' + body + '\r\n--' + b + '--';
+      return call(token, 'POST', UPLOAD + '?uploadType=multipart&fields=id', data, 'multipart/related; boundary=' + b).then(function (f) { return f.id; });
+    });
+  }
   function pictureUrl(id) { return 'https://drive.google.com/thumbnail?id=' + encodeURIComponent(id) + '&sz=w2000'; }
 
   function session(title, talk) {
@@ -127,5 +137,5 @@
   // A session's slides, from its first part that has them.
   function talkOf(s) { var p = (s && s.parts || []).filter(function (x) { return typeof x.slides === 'string'; })[0]; return p ? p.slides : ''; }
 
-  root.MyDrive = { connect: connect, list: list, save: save, open: open, picture: picture, session: session, talkOf: talkOf, KIND: KIND };
+  root.MyDrive = { connect: connect, list: list, save: save, open: open, picture: picture, file: file, session: session, talkOf: talkOf, KIND: KIND };
 })(typeof window !== 'undefined' ? window : this);

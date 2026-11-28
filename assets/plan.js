@@ -10,7 +10,7 @@
   if (!root || !window.SessionPlan || !window.MyDrive || !window.UI) return;
   var P = window.SessionPlan, D = window.MyDrive, U = window.UI, el = U.el;
   var DRAFT = 'hs-plan-draft';
-  var KINDS = [['talk', 'Slides'], ['question', 'Question'], ['model', 'Model'], ['site', 'Website'], ['card', 'Card'], ['clock', 'Clock']];
+  var KINDS = [['talk', 'Slides'], ['question', 'Question'], ['model', 'Model'], ['site', 'Website'], ['card', 'Card'], ['clock', 'Clock'], ['workbook', 'Workbook']];
   var NAME = {}; KINDS.forEach(function (k) { NAME[k[0]] = k[1]; });
   var ASKS = [['choice', 'One choice'], ['multi', 'Several choices'], ['scale', 'A scale'], ['words', 'A few words'], ['short', 'In their own words']];
   var plan = null, open = null, studio = null, fileId = null, files = null;
@@ -65,11 +65,53 @@
     }
     if (p.kind === 'site') { var u = text(p.url, 2000, function (v) { p.url = v.trim(); }); u.type = 'url'; u.placeholder = 'https://'; box.appendChild(field('Its address', u)); return; }
     if (p.kind === 'card') { box.appendChild(field('Words on every stage', text(p.body, 400, function (v) { p.body = v; }, true))); return; }
+    if (p.kind === 'workbook') return workbookFields(p, box);
     if (p.kind === 'clock') {
       var m = el('input'); m.type = 'number'; m.min = 1; m.max = 120; m.value = p.minutes || 5;
       m.addEventListener('input', function () { p.minutes = Number(m.value); keep(); });
       box.appendChild(field('Minutes', m));
     }
+  }
+
+  // ---- a workbook: blocks in the cohort workbook's shape (SessionPlan.blocks)
+  var BLOCKS = [['text', 'Words to read'], ['free', 'An answer in words'], ['choice', 'A choice'], ['table', 'A table']];
+  function tableSource(rows) { return (rows || []).map(function (r) { return r.map(function (c) { return c.fill ? '' : c.text; }).join(' | '); }).join('\n'); }
+  function tableRows(src) { return String(src || '').split('\n').filter(function (l) { return l.trim(); }).map(function (l) { return l.split('|').map(function (c) { return { text: c.trim() }; }); }); }
+  function workbookFields(p, box) {
+    p.blocks = Array.isArray(p.blocks) ? p.blocks : [];
+    var list = el('ol', 'plan-blocks'); box.appendChild(list);
+    function redraw() {
+      list.replaceChildren();
+      p.blocks.forEach(function (b, i) {
+        var li = el('li', 'plan-block');
+        var type = el('select'); BLOCKS.forEach(function (x) { var o = el('option', null, x[1]); o.value = x[0]; type.appendChild(o); });
+        type.value = b.type || 'free';
+        type.addEventListener('change', function () { b.type = type.value; keep(); redraw(); });
+        var head = el('div', 'plan-block-head'); head.appendChild(type);
+        var side = el('div', 'ui-edit-side plan-moves');
+        var up = U.button('', 'ui-edit-button', function () { p.blocks.splice(i - 1, 0, p.blocks.splice(i, 1)[0]); keep(); redraw(); });
+        up.appendChild(U.icon('arrow-up')); up.setAttribute('aria-label', 'Move block ' + (i + 1) + ' up'); up.disabled = i === 0;
+        var rm = U.button('', 'ui-edit-button', function () { p.blocks.splice(i, 1); keep(); redraw(); });
+        rm.appendChild(U.icon('trash')); rm.setAttribute('aria-label', 'Remove block ' + (i + 1));
+        side.appendChild(up); side.appendChild(rm); head.appendChild(side);
+        li.appendChild(head);
+        li.appendChild(field(b.type === 'text' ? 'The words' : 'The question', text(b.text, 3000, function (v) { b.text = v; }, true)));
+        if (b.type === 'choice') {
+          li.appendChild(field('The choices, one per line', text((b.choices || []).join('\n'), 2400, function (v) { b.choices = v.split('\n').map(function (c) { return c.trim(); }).filter(Boolean); }, true)));
+          var lab = el('label', 'check'), cb = el('input'); cb.type = 'checkbox'; cb.checked = b.multiple === true;
+          cb.addEventListener('change', function () { b.multiple = cb.checked; keep(); });
+          lab.appendChild(cb); lab.appendChild(document.createTextNode(' People may pick several'));
+          li.appendChild(lab);
+        }
+        if (b.type === 'table') {
+          var src = b.src != null ? b.src : tableSource(b.rows);
+          li.appendChild(field('One row per line, cells between |; an empty cell is filled in', text(src, 4000, function (v) { b.src = v; b.rows = tableRows(v); }, true)));
+        }
+        list.appendChild(li);
+      });
+    }
+    redraw();
+    box.appendChild(U.button('Add a block', 'btn-secondary small', function () { p.blocks.push({ type: 'free', text: '' }); keep(); redraw(); }));
   }
 
   // ---- the plan ------------------------------------------------------------
@@ -143,6 +185,8 @@
     var parts = plan.parts.map(function (p) { return Object.assign({}, p, { title: p.title || NAME[p.kind] }); });
     var ready = P.clean(parts);
     if (!(plan.title || '').trim()) { $('[data-plan-title]').focus(); return said('Give the session a name first.', 'problem'); }
+    var short = parts.filter(function (p) { return p.kind === 'workbook' && P.blocks(p.blocks).length < (p.blocks || []).length; });
+    if (short.length) return said('Finish every block in ' + short.map(function (p) { return p.title || NAME[p.kind]; }).join(', ') + ': each needs its words, a choice needs two choices, and a table needs a row.', 'problem');
     if (ready.length < parts.length) {
       var gaps = parts.filter(function (p) { return !P.clean([p]).length; }).map(function (p) { return p.title || NAME[p.kind]; });
       return said('Finish these first: ' + gaps.join(', ') + '.', 'problem');

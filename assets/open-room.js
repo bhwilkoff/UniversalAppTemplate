@@ -16,7 +16,7 @@
   function mount(o) {
     var box = o.root.querySelector('[data-state="open"]');
     var room = null, you = null, F = null, frameRole = null, online = true, ended = false, stageOn = false;
-    var words = null, works = null, myWork = null, mine = null, tool = null, newSha = null, confirmEnd = false, watching = false;
+    var words = null, works = null, myWork = null, wbMine = null, wbSaved = null, mine = null, tool = null, newSha = null, confirmEnd = false, watching = false;
     var plan = (function () { try { var x = JSON.parse(get(PLAN) || 'null'); return x && Array.isArray(x.parts) && x.parts.length ? x : null; } catch (e) { return null; } })();
     var talk = get(TALK) || R.STARTER, repo = R.repoOf(get(REPO) || ''), lobby = null, person = { name: o.name, member: o.member, github: o.github || '' };
     var status = el('p', 'small'); status.setAttribute('role', 'status');
@@ -30,9 +30,11 @@
       words: function (w) { words = w; drawNow(); },
       works: function (w) { works = w; drawNow(); },
       myWork: function (u) { myWork = u; drawNow(); },
+      wbMine: function (m) { wbMine = m; drawNow(); },
+      wbAll: function (all) { keepAnswers(all); },
       talk: function (t) { roomDeck = t; drawNow(); drawTop(); drawSlides(); },
       mine: function (m) { mine = m; drawNow(); },
-      ended: function () { ended = true; roomDeck = null; mine = null; words = null; works = null; myWork = null; tool = null; },
+      ended: function () { ended = true; roomDeck = null; mine = null; words = null; works = null; myWork = null; wbMine = null; tool = null; },
       error: function (t) { say(t); },
       status: function (s) {
         online = s === 'on'; drawTop();
@@ -196,7 +198,7 @@
     function drawNow() {
       if (!F || !room || !room.on) return;
       var host = isHost();
-      var key = JSON.stringify([plan && plan.at, plan && plan.parts.length, host, room.show, room.at, room.shown, room.question, room.summary, room.notes, room.board, editing(), room.page, room.card, room.clock && room.clock.endsAt, room.canTakeOver, room.worksOpen, room.groups, room.people, works, myWork, mine, words, newSha, talk.length, roomDeck && roomDeck.length, stageUp()]);
+      var key = JSON.stringify([plan && plan.at, plan && plan.parts.length, host, room.show, room.at, room.shown, room.question, room.summary, room.notes, room.board, editing(), room.page, room.card, room.clock && room.clock.endsAt, room.canTakeOver, room.worksOpen, room.groups, room.people, room.workbook && room.workbook.id, room.workbook && room.workbook.open, room.wbCount, wbMine, wbSaved, works, myWork, mine, words, newSha, talk.length, roomDeck && roomDeck.length, stageUp()]);
       if (key === nowKey) return;
       var pane = F.pane('now');
       // A half-written note or answer stays while the room changes around it.
@@ -221,7 +223,7 @@
       pane.appendChild(el('p', 'small', L.counted(r.total, 'answer', 'answers') + ', with no names.'));
     }
     // A session from the host's Drive, run part by part (SessionPlan).
-    var KIND_WORD = { talk: 'Slides', question: 'Question', model: 'Model', site: 'Website', card: 'Card', clock: 'Clock' };
+    var KIND_WORD = { talk: 'Slides', question: 'Question', model: 'Model', site: 'Website', card: 'Card', clock: 'Clock', workbook: 'Workbook' };
     function runPart(i) {
       var P = window.SessionPlan, part = plan && plan.parts[i];
       if (!P || !part) return;
@@ -319,8 +321,83 @@
       if (host) box.appendChild(btn('Bring everyone back', 'btn-secondary', function () { send({ t: 'groups', open: false }); }));
       pane.appendChild(box);
     }
+    // A workbook (room-logic.js 'workbook'): each person answers in their own
+    // panel; the host sees how many have, and keeps everyone's answers in
+    // their own Drive as a CSV.
+    function workbookHost(pane) {
+      var w = room.workbook, box = el('section', 'p2-group open-workbook');
+      box.appendChild(el('h2', null, w.title));
+      box.appendChild(el('p', 'small', L.counted(room.wbCount || 0, 'person has answered', 'people have answered') + (w.open ? '' : '. Closed.')));
+      box.appendChild(btn('Save everyone’s answers to my Drive', 'btn-secondary', function () { say('Collecting the answers…'); send({ t: 'wbCollect' }); }));
+      if (wbSaved && wbSaved.id === w.id) box.appendChild(out('Open the answers in Drive', 'https://drive.google.com/file/d/' + wbSaved.file + '/view', 'link-button'));
+      box.appendChild(btn(w.open ? 'Close it' : 'Open it again', 'link-button', function () { send(w.open ? { t: 'workbook', close: true } : { t: 'workbook', open: true }); }));
+      pane.appendChild(box);
+    }
+    function keepAnswers(all) {
+      var P = window.SessionPlan, D = window.MyDrive;
+      if (!P || !D) return say('Drive is not available here.');
+      var csv = P.answersCsv(all), name = all.title + ' answers ' + new Date().toISOString().slice(0, 10) + '.csv';
+      D.connect().then(function (token) { return D.file(token, name, csv, 'text/csv'); }).then(function (file) {
+        wbSaved = { id: all.id, file: file }; say('Saved in your Drive: ' + L.counted(all.people.length, 'person', 'people') + '.'); nowKey = null; drawNow();
+      }, function (e) { say(e.message); });
+    }
+    function workbookGuest(pane) {
+      var w = room.workbook, a = (wbMine && wbMine.id === w.id && wbMine.a) || {};
+      var box = el('section', 'p2-group open-workbook');
+      box.appendChild(el('h2', null, w.title));
+      function save(key, value) { send({ t: 'wbAnswer', id: w.id, key: key, value: value }); }
+      w.blocks.forEach(function (b) {
+        var part = el('div', 'open-wb-block');
+        if (b.type === 'text') { part.appendChild(el('p', 'open-wb-words', b.text)); box.appendChild(part); return; }
+        part.appendChild(el('p', 'open-wb-q', b.text));
+        if (b.type === 'free') {
+          var t = field('textarea', 'Your answer', a[b.key] || ''); t.rows = 3; t.maxLength = 4000;
+          var timer = null;
+          t.addEventListener('input', function () { clearTimeout(timer); timer = setTimeout(function () { save(b.key, t.value); }, 800); });
+          t.addEventListener('change', function () { clearTimeout(timer); save(b.key, t.value); });
+          part.appendChild(t);
+        }
+        if (b.type === 'choice') {
+          var picks = a[b.key] || [], row = el('div', 'open-picks');
+          b.choices.forEach(function (c, i) {
+            var on = picks.indexOf(i) >= 0;
+            var x = btn(c, 'btn-secondary', function () { save(b.key, b.multiple ? (on ? picks.filter(function (n) { return n !== i; }) : picks.concat([i])) : [i]); });
+            x.setAttribute('aria-pressed', String(on)); row.appendChild(x);
+          });
+          part.appendChild(row);
+        }
+        if (b.type === 'table') {
+          var mine = Object.assign({}, a[b.key] || {}), table = el('table', 'open-wb-table');
+          b.rows.forEach(function (r, i) {
+            var tr = el('tr');
+            r.forEach(function (c, j) {
+              var td = el('td');
+              if (!c.fill) td.textContent = c.text;
+              else {
+                var k = i + ',' + j, inp = field('input', 'Row ' + (i + 1) + ', column ' + (j + 1), mine[k] || ''); inp.maxLength = 500;
+                inp.addEventListener('change', function () { mine[k] = inp.value; save(b.key, mine); });
+                td.appendChild(inp);
+              }
+              tr.appendChild(td);
+            });
+            table.appendChild(tr);
+          });
+          part.appendChild(table);
+        }
+        box.appendChild(part);
+      });
+      box.appendChild(btn('Keep a copy', 'btn-secondary', function () {
+        var md = window.SessionPlan ? window.SessionPlan.myCopy(w, a) : '';
+        var link = document.createElement('a');
+        link.href = URL.createObjectURL(new Blob([md], { type: 'text/markdown' }));
+        link.download = w.title.replace(/[^A-Za-z0-9 ._-]+/g, '').trim().slice(0, 80) + '.md';
+        document.body.appendChild(link); link.click(); link.remove();
+      }));
+      pane.appendChild(box);
+    }
     function hostNow(pane) {
       if (plan) planNow(pane);
+      if (room.workbook) workbookHost(pane);
       if (room.groups) groupsNow(pane, true);
       if (room.worksOpen) worksNow(pane);
       var list = stops();
@@ -373,6 +450,7 @@
     function guestNow(pane) {
       if (room.canTakeOver) pane.appendChild(btn('Take over as host', 'btn-secondary', function () { send({ t: 'claim' }); }));
       if (room.groups) groupsNow(pane, false);
+      if (room.workbook && room.workbook.open) workbookGuest(pane);
       if (room.worksOpen) offerWork(pane);
       if (room.show === 'question' && room.question && room.question.open) return answer(pane);
       if (room.show === 'board') {

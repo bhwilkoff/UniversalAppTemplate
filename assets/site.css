@@ -3806,3 +3806,13 @@ html.stage-in-panel .stage-corner { display: none !important; }
 .stage-ready:has([data-view="roomdraw"]:not([hidden])) .stance-bar, .stage-ready:has([data-view="roomdraw"]:not([hidden])) .stage-reacts { display: none !important; }
 .open-add.is-stack { grid-template-columns: minmax(0, 1fr); }
 .open-add.is-stack > a, .open-add.is-stack > button { justify-self: start; }
+.open-wb-block { display: grid; gap: 0.4rem; margin: 0.75rem 0; }
+.open-wb-words { white-space: pre-wrap; margin: 0; }
+.open-wb-q { font-weight: 600; margin: 0; white-space: pre-wrap; }
+.open-wb-block textarea { width: 100%; }
+.open-wb-table { border-collapse: collapse; width: 100%; }
+.open-wb-table td { border: 1px solid var(--rule); padding: 0.25rem; vertical-align: top; }
+.open-wb-table input { width: 100%; min-width: 4rem; }
+.plan-blocks { list-style: none; margin: 0.5rem 0; padding: 0; display: grid; gap: 0.6rem; }
+.plan-block { border: 1px solid var(--rule); border-radius: 0.5rem; padding: 0.6rem 0.75rem; }
+.plan-block-head { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }

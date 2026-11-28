@@ -174,6 +174,8 @@ export class Room extends DurableObject {
       const works = hostWorks(this.room);
       if (works && me.pid === this.room.host) this.send(ws, Object.assign({ t: 'works' }, works));
       if (me.role === 'stage' && this.room.drawing && Object.keys(this.room.drawing).length) this.send(ws, { t: 'drawing', elements: Object.values(this.room.drawing).map((d) => d.e) });
+      const wa = this.room.workbook && this.room.wbAnswers && this.room.wbAnswers[me.pid];
+      if (wa) this.send(ws, { t: 'wbMine', mine: { id: this.room.workbook.id, a: wa.a } });
       const mw = this.room.worksOpen && this.room.works && this.room.works[me.pid];
       if (mw) this.send(ws, { t: 'myWork', url: mw.url });
       this.soonQuiet();
@@ -221,6 +223,8 @@ export class Room extends DurableObject {
       const out = JSON.stringify({ t: 'html', v: this.room.htmlV, html: this.room.html });
       this.sockets().forEach((s) => { try { s.ws.send(out); } catch (e) { /* gone */ } });
     }
+    if (did.reply) this.send(ws, did.reply);
+    if (did.wbMine) this.sockets().forEach((s) => { if (s.who.pid === me.pid) this.send(s.ws, { t: 'wbMine', mine: did.wbMine }); });
     if (did.strokes) { this.toStages({ t: 'strokes', elements: did.strokes }, ws); this.drawingSoon(); }
     if (did.drawing) { this.toStages({ t: 'drawing', elements: [] }); this.drawingSoon(); }
     if (did.myWork !== undefined) this.sockets().forEach((s) => { if (s.who.pid === me.pid) this.send(s.ws, { t: 'myWork', url: did.myWork }); });

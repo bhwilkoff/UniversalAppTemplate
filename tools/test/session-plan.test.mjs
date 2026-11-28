@@ -40,3 +40,23 @@ test('a cohort session plan becomes a file a room can run', () => {
   assert.equal(parts[1].ask, 'choice');
   assert.equal(P.session('', parts).title, 'A session');
 });
+
+test('a workbook part keeps its blocks in the cohort workbook shape, and runs as one message', () => {
+  const p = P.clean([{ kind: 'workbook', title: 'Notice', blocks: [{ type: 'free', text: 'What do you notice?' }, { type: 'file', text: 'Upload' }, { type: 'choice', text: 'Pick', choices: ['A', 'B'], multiple: true }] }, { kind: 'workbook', title: 'Empty', blocks: [{ type: 'free', text: ' ' }] }]);
+  assert.equal(p.length, 1);
+  assert.deepEqual(p[0].blocks, [{ key: 'b1', type: 'free', text: 'What do you notice?' }, { key: 'b2', type: 'choice', text: 'Pick', multiple: true, choices: ['A', 'B'] }]);
+  assert.deepEqual(P.messages(p[0]), [{ t: 'workbook', title: 'Notice', blocks: p[0].blocks }]);
+});
+
+test('a workbook’s answers become a CSV for the host and Markdown for each person', () => {
+  const blocks = P.clean([{ kind: 'workbook', title: 'W', blocks: [
+    { type: 'text', text: 'Read this.' },
+    { type: 'free', text: 'Notice?' },
+    { type: 'choice', text: 'Pick', choices: ['Left', 'Right'], multiple: true },
+    { type: 'table', text: 'Count', rows: [[{ text: 'Stars' }, { text: '' }]] }
+  ] }])[0].blocks;
+  const csv = P.answersCsv({ blocks, people: [{ name: 'Bo', a: { b2: 'Clumps, mostly', b3: [0, 1], b4: { '0,1': '=12' } } }, { name: '', a: {} }] });
+  assert.equal(csv, 'Name,Notice?,Pick,"Count (Stars, column 2)"\r\nBo,"Clumps, mostly",Left; Right,"\'=12"\r\nSomeone,,,\r\n');
+  const md = P.myCopy({ title: 'W', blocks }, { b2: 'Clumps', b3: [1], b4: { '0,1': '12' } });
+  assert.equal(md, '# W\n\nRead this.\n\n**Notice?**\n\nClumps\n\n**Pick**\n\n- [ ] Left\n- [x] Right\n\n**Count**\n\n| Stars | 12 |\n| --- | --- |\n');
+});
