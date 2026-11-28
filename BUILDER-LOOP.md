@@ -105,7 +105,7 @@ by the Course Builder import or by SQL.
   fine if the images are available to anyone with the link."
 - [x] A5. No GitHub prompt anywhere on the open-room path; attendees
   never sign in.
-- [ ] A6. A real call with two attendees.
+- [x] A6. A real call with two attendees (tick 24, kya-pynw-hpx).
 
 ### I. Ideas at Play (demo for Ben's meeting with Alexis, Thursday December 3)
 
@@ -455,3 +455,18 @@ breakout state.
   panel in a fresh call, since Meet keeps the old frame and Pages
   caches HTML for 10 minutes. Not seen: a second real person's panel
   (the guest view of Your room, Offer it) and two people drawing at once.
+- 2026-11-28, tick 24 (A6; fix aa3e96eb). A real two-person Meet call
+  (kya-pynw-hpx): the leader profile started an open room, and the
+  benhstest1 profile joined with Join here too and Join activity, landing
+  as a guest with no sign-in ("2 here"). Seen on the learner's panel and
+  stage: Show your work's box; offering ideasatplay.org's home page was
+  caught ("does not allow itself to be shown inside another page"); a
+  model page went through ("Offered. The host chooses…", Change it,
+  Take it back). On the leader's: the offer by name (benhstest1) with
+  Show, which put the model on both stages with its credit. Breakout
+  rooms: the learner's Now read Your room, the leave-first warning, and
+  Join room 1. Draw together, both ways: the leader's rectangle appeared
+  on the learner's stage and the learner's ellipse on the leader's.
+  Found and fixed: the pressed Show button drew as a blank pill (now the
+  accent color, like answer choices), and a person alone in a room read
+  "No one yet" (now "Just you"). Not seen: those two fixes in a call.
